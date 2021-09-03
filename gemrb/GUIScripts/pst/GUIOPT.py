@@ -32,7 +32,7 @@
 # 9 - Autopause options window
 
 ###################################################
-import CommonWindow
+import Container
 import GemRB
 import GUICommon
 import GUICommonWindows
@@ -47,7 +47,7 @@ def InitOptionsWindow (Window):
 	GemRB.GamePause (1, 1)
 	TrySavingConfiguration ()
 
-	CommonWindow.CloseContainerWindow ()
+	Container.CloseContainerWindow ()
 
 	def ConfigOptButton(button, strref, action):
 		button.SetText (strref)
@@ -60,7 +60,12 @@ def InitOptionsWindow (Window):
 	ConfigOptButton(Window.GetControl (1), 2595, OpenQuitMsgWindow)
 
 	# Load Game
-	ConfigOptButton(Window.GetControl (2), 2592, OpenLoadMsgWindow)
+	# german pst has two spaces that need to be squished
+	LoadButton = Window.GetControl (2)
+	LoadGameString = GemRB.GetString (2592)
+	NewString = " ".join(LoadGameString.split())
+	LoadButton.SetText (NewString)
+	LoadButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
 
 	# Save Game
 	ConfigOptButton(Window.GetControl (3), 20639, GUISAVE.OpenSaveWindow)
@@ -180,7 +185,7 @@ def UpdateVolume (volume_ref):
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
-	global SubOptionsWindow, GameplayHelpText
+	global GameplayHelpText
 
 	Window = GemRB.LoadWindow (6, "GUIOPT")
 
@@ -396,7 +401,6 @@ def OpenKeyboardMappingsWindow ():
 def keys_setup_page (Window, pageno):
 	# Page n of n
 	Label = Window.GetControl (0x10000001)
-	#txt = GemRB.ReplaceVarsInText (49053, {'PAGE': str (pageno + 1), 'NUMPAGES': str (KEYS_PAGE_COUNT)})
 	GemRB.SetToken ('PAGE', str (pageno + 1))
 	GemRB.SetToken ('NUMPAGES', str (KEYS_PAGE_COUNT))
 	Label.SetText (49053)
@@ -415,7 +419,7 @@ def keys_setup_page (Window, pageno):
 
 			Label = Window.GetControl (0x10000041 + i)
 			Label.SetText (label)
-			Label.SetTextColor ({'r' : 0, 'g' : 255, 'b' : 255})
+			Label.SetColor ({'r' : 0, 'g' : 255, 'b' : 255})
 		else:
 			Label = Window.GetControl (0x10000005 + i)
 			Label.SetText (key)
@@ -436,14 +440,14 @@ def OnActionLabelPress (Window):
 
 	if last_key_action != None:
 		Label = Window.GetControl (0x10000005 + last_key_action)
-		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+		Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		Label = Window.GetControl (0x10000041 + last_key_action)
-		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+		Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		
 	Label = Window.GetControl (0x10000005 + i)
-	Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+	Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	Label = Window.GetControl (0x10000041 + i)
-	Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+	Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 
 	last_key_action = i
 
@@ -472,6 +476,7 @@ def OpenMoviesWindow ():
 	# movie list
 	List = Window.GetControl (0)
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
+	GemRB.SetVar ('SelectedMovie', 0)
 	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())], 'SelectedMovie', -1)
 
 	Window.ShowModal (MODAL_SHADOW_BLACK)
@@ -479,11 +484,6 @@ def OpenMoviesWindow ():
 ###################################################
 def OnPlayMoviePress ():
 	selected = GemRB.GetVar ('SelectedMovie')
-
-	# FIXME: This should not happen, when the PlayMovie button gets
-	#   properly disabled/enabled, but it does not now
-	if selected == -1:
-		return
 	
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
 	key = MovieTable.GetRowName (selected)

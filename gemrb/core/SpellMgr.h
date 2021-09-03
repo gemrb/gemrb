@@ -40,8 +40,6 @@ namespace GemRB {
 
 class GEM_EXPORT SpellMgr : public Plugin {
 public:
-	SpellMgr(void);
-	~SpellMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Spell* GetSpell(Spell *spl, bool silent=false) = 0;
 };

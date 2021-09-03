@@ -22,12 +22,6 @@
 
 namespace GemRB {
 
-/*************** point ****************************/
-Point::Point(void)
-{
-	x = y = 0;
-}
-
 bool Point::operator==(const Point& pnt) const
 {
 	return (x == pnt.x) && (y == pnt.y);
@@ -62,29 +56,25 @@ Point& Point::operator-=(const Point& rhs)
 	return *this;
 }
 
-Point::Point(short x, short y)
+Point& Point::operator/(int div)
+{
+	x /= div;
+	y /= div;
+	return *this;
+}
+
+Point::Point(int x, int y)
 {
 	this->x = x;
 	this->y = y;
 }
 
-ieDword Point::asDword() const
-{
-	return ((y & 0xFFFF) << 16) | (x & 0xFFFF);
-}
-
-void Point::fromDword(ieDword val)
-{
-	x = val & 0xFFFF;
-	y = val >> 16;
-}
-
-bool Point::isnull() const
+bool Point::IsZero() const
 {
 	return (x == 0) && (y == 0);
 }
 
-bool Point::isempty() const
+bool Point::IsInvalid() const
 {
 	return (x == -1) && (y == -1);
 }
@@ -94,11 +84,6 @@ bool Point::isWithinRadius(int r, const Point& p) const
 	Point d = operator-(p);
 	// sqrt is slow, just check a^2 + b^2 = c^2 <= r^2
 	return (d.x * d.x) + (d.y * d.y) <= r * r;
-}
-
-Size::Size()
-{
-	w = h = 0;
 }
 
 Size::Size(int w, int h)
@@ -115,12 +100,6 @@ bool Size::operator==(const Size& size) const
 bool Size::operator!=(const Size& size) const
 {
 	return !(*this == size);
-}
-
-/*************** region ****************************/
-Region::Region(void)
-{
-	x = y = w = h = 0;
 }
 
 bool Region::operator==(const Region& rgn) const
@@ -143,10 +122,25 @@ Region::Region(int x, int y, int w, int h)
 
 Region::Region(const Point &p, const Size& s)
 {
-	this->x = p.x;
-	this->y = p.y;
-	this->w = s.w;
-	this->h = s.h;
+	origin = p;
+	size = s;
+}
+
+Region::Region(const Region &r)
+: origin(r.origin), size(r.size)
+{}
+
+Region::Region(Region&& r) noexcept
+: origin(r.origin), size(r.size)
+{}
+
+Region& Region::operator=(const Region &rhs)
+{
+	if (&rhs != this) {
+		origin = rhs.origin;
+		size = rhs.size;
+	}
+	return *this;
 }
 
 bool Region::PointInside(const Point &p) const
@@ -217,8 +211,8 @@ void Region::ExpandToPoint(const Point& p)
 
 void Region::ExpandToRegion(const Region& r)
 {
-	ExpandToPoint(r.Origin());
-	ExpandToPoint(r.Origin() + Point(r.w, 0));
+	ExpandToPoint(r.origin);
+	ExpandToPoint(r.origin + Point(r.w, 0));
 	ExpandToPoint(r.Maximum());
 	ExpandToPoint(r.Maximum() - Point(r.w, 0));
 }

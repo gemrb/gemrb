@@ -21,7 +21,7 @@
 #ifndef SDLVIDEODRIVER_H
 #define SDLVIDEODRIVER_H
 
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "GUI/EventMgr.h"
 
@@ -67,17 +67,11 @@ public:
 	~SDLVideoDriver(void) override;
 	int Init(void) override;
 
-	Holder<Sprite2D> CreateSprite(const Region& rgn, int bpp, ieDword rMask,
-		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
-		bool cK = false, int index = 0) override;
-	Holder<Sprite2D> CreateSprite8(const Region& rgn, void* pixels,
-							PaletteHolder palette, bool cK, int index) override;
-	Holder<Sprite2D> CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
-								   Color* palette, bool cK = false, int index = 0) override;
+	Holder<Sprite2D> CreateSprite(const Region& rgn, void* pixels, const PixelFormat&) override;
 
-	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
+	void BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
 					BlitFlags flags, Color tint = Color()) override;
-	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, BlitFlags flags, Color tint = Color()) override;
+	void BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color tint = Color()) override;
 
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -97,16 +91,16 @@ protected:
 	virtual inline vid_buf_t* CurrentStencilBuffer() const=0;
 	Region CurrentRenderClip() const;
 	
-	BlitFlags RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* = NULL);
+	BlitFlags RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* = nullptr) const;
 
-	virtual void BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL)=0;
-	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL)=0;
-	void BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL);
+	virtual void BlitSpriteRLEClipped(const Holder<Sprite2D>& spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL)=0;
+	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL)=0;
+	void BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = nullptr);
 
 	int PollEvents() override;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
-	void Wait(unsigned long w) override { SDL_Delay(w); }
+	void Wait(uint32_t w) override { SDL_Delay(w); }
 
 private:
 	virtual int CreateSDLDisplay(const char* title) = 0;
@@ -115,11 +109,9 @@ private:
 	void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, BlitFlags flags) override;
 	void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
 							   double anglefrom, double angleto, bool drawlines, BlitFlags flags) override;
-	void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags) override;
-
 public:
 	// static functions for manipulating surfaces
-	static int SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors = 256);
+	static bool SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors = 256);
 };
 
 }

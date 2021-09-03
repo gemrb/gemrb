@@ -23,23 +23,14 @@
 #include "RGBAColor.h"
 
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
-
-static ieDword red_mask = 0x00ff0000;
-static ieDword green_mask = 0x0000ff00;
-static ieDword blue_mask = 0x000000ff;
 
 PLTImporter::PLTImporter(void)
 {
 	Width = Height = 0;
 	pixels = NULL;
-	if (DataStream::BigEndian()) {
-		red_mask = 0x0000ff00;
-		green_mask = 0x00ff0000;
-		blue_mask = 0xff000000;
-	}
 }
 
 PLTImporter::~PLTImporter(void)
@@ -49,12 +40,8 @@ PLTImporter::~PLTImporter(void)
 	}
 }
 
-bool PLTImporter::Open(DataStream* str)
+bool PLTImporter::Import(DataStream* str)
 {
-	if (!str) {
-		return false;
-	}
-
 	char Signature[8];
 	unsigned short unknown[4];
 
@@ -66,12 +53,11 @@ bool PLTImporter::Open(DataStream* str)
 	}
 
 	str->Read( unknown, 8 );
-	str->ReadDword( &Width );
-	str->ReadDword( &Height );
+	str->ReadDword(Width);
+	str->ReadDword(Height);
 
 	pixels = malloc( Width * Height * 2 );
 	str->Read( pixels, Width * Height * 2 );
-	delete str;
 	return true;
 }
 
@@ -84,7 +70,7 @@ Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteInde
 	}
 	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * dest = p;
-	unsigned char * src = NULL;
+	const unsigned char* src = nullptr;
 	for (int y = Height - 1; y >= 0; y--) {
 		src = ( unsigned char * ) pixels + ( y * Width * 2 );
 		for (unsigned int x = 0; x < Width; x++) {
@@ -99,9 +85,14 @@ Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteInde
 				*dest++ = 0xff;
 		}
 	}
-	Holder<Sprite2D> spr = core->GetVideoDriver()->CreateSprite( Region(0,0,Width,Height), 32,
-		red_mask, green_mask, blue_mask, 0, p,
-		true, green_mask );
+	constexpr uint32_t red_mask = 0x00ff0000;
+	constexpr uint32_t green_mask = 0x0000ff00;
+	constexpr uint32_t blue_mask = 0x000000ff;
+	PixelFormat fmt(4, red_mask, green_mask, blue_mask, 0);
+	fmt.HasColorKey = true;
+	fmt.ColorKey = green_mask;
+
+	Holder<Sprite2D> spr = core->GetVideoDriver()->CreateSprite(Region(0,0,Width,Height), p, fmt);
 	spr->Frame.x = 0;
 	spr->Frame.y = 0;
 	return spr;

@@ -3,7 +3,6 @@
 
 #include "globals.h"
 #include "TableMgr.h"
-#include "Map.h"
 
 #define EFX_MAX_REVERB_PROFILE_INDEX 19
 #define EFX_PROFILE_REVERB_INVALID 0xFF
@@ -13,6 +12,8 @@
 #define EFX_PROFILE_DUNGEON 5
 
 namespace GemRB {
+
+class Map;
 
 typedef struct {
 	struct ReverbData {
@@ -49,9 +50,9 @@ typedef struct {
 
 class GEM_EXPORT MapReverb {
 public:
-	MapReverb(Map&);
+	explicit MapReverb(Map&);
 
-	void getReverbProperties(MapReverbProperties&);
+	void getReverbProperties(MapReverbProperties&) const;
 
 private:
 	AutoTable reverbMapping;

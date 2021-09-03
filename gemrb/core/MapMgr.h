@@ -31,7 +31,6 @@
 
 namespace GemRB {
 
-class DataStream;
 class Map;
 
 /**
@@ -39,16 +38,13 @@ class Map;
  * Abstract loader for Map objects
  */
 
-class GEM_EXPORT MapMgr : public Plugin {
+class GEM_EXPORT MapMgr : public ImporterBase {
 public:
-	MapMgr(void);
-	~MapMgr(void) override;
-	virtual bool Open(DataStream* stream) = 0;
 	virtual bool ChangeMap(Map *map, bool day_or_night) = 0;
 	virtual Map* GetMap(const char* ResRef, bool day_or_night) = 0;
 
 	virtual int GetStoredFileSize(Map *map) = 0;
-	virtual int PutArea(DataStream* stream, Map *map) = 0;
+	virtual int PutArea(DataStream* stream, const Map *map) const = 0;
 };
 
 }

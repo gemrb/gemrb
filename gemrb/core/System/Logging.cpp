@@ -25,11 +25,7 @@
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/TextArea.h"
 
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
+#include <cstdarg>
 #include <memory>
 #include <vector>
 
@@ -51,7 +47,7 @@ std::unique_ptr<Logger> logger;
 void ToggleLogging(bool enable)
 {
 	if (enable && logger == nullptr) {
-		logger = std::unique_ptr<Logger>(new Logger(writers));
+		logger = GemRB::make_unique<Logger>(writers);
 	} else if (!enable) {
 		logger = nullptr;
 	}
@@ -93,11 +89,10 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 
 		const wchar_t* fmt = L"%s%s: [/color]%s%s[/color]\n";
 		size_t len = msg.message.length() + msg.owner.length() + wcslen(fmt) + 2 * strlen(colors[0]);
-		wchar_t* text = (wchar_t*)malloc(len * sizeof(wchar_t));
+		String text(len, L'\0');
 		int level = msg.level == INTERNAL ? 0 : msg.level;
-		swprintf(text, len, fmt, colors[msg.color], msg.owner.c_str(), colors[log_level_color[level]], msg.message.c_str());
+		swprintf(&text[0], len, fmt, colors[msg.color], msg.owner.c_str(), colors[log_level_color[level]], msg.message.c_str());
 		ta->AppendText(text);
-		free(text);
 	}
 }
 
@@ -131,10 +126,10 @@ void AddLogWriter(Logger::WriterPtr&& writer)
 
 static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)
 {
-    va_list ap_copy;
-    va_copy(ap_copy, ap);
-    const size_t len = vsnprintf(NULL, 0, message, ap_copy);
-    va_end(ap_copy);
+	va_list ap_copy;
+	va_copy(ap_copy, ap);
+	const size_t len = vsnprintf(nullptr, 0, message, ap_copy);
+	va_end(ap_copy);
 
 	char *buf = new char[len+1];
 	vsnprintf(buf, len + 1, message, ap);
@@ -182,11 +177,11 @@ static void addGemRBLog()
 {
 	char log_path[_MAX_PATH];
 	FileStream* log_file = new FileStream();
-	PathJoin(log_path, core->GamePath, "GemRB.log", NULL);
+	PathJoin(log_path, core->config.GamePath, "GemRB.log", nullptr);
 	if (log_file->Create(log_path)) {
 		AddLogWriter(createStreamLogWriter(log_file));
 	} else {
-		PathJoin(log_path, core->CachePath, "GemRB.log", NULL);
+		PathJoin(log_path, core->config.CachePath, "GemRB.log", nullptr);
 		if (log_file->Create(log_path)) {
 			AddLogWriter(createStreamLogWriter(log_file));
 		} else {

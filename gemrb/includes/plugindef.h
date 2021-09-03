@@ -101,6 +101,7 @@
 
 #include "exports.h"
 #include "PluginMgr.h"
+#include "Platform.h"
 
 namespace GemRB {
 
@@ -133,7 +134,6 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version();
 #ifndef STATIC_LINK
 
 #ifdef WIN32
-#include <windows.h>
 
 BOOL APIENTRY DllMain(HANDLE, DWORD,	LPVOID);
 BOOL APIENTRY DllMain(HANDLE /*hModule*/, DWORD  /*ul_reason_for_call*/,

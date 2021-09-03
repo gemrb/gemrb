@@ -32,20 +32,17 @@ namespace GemRB {
   */
 
 class CHUImporter : public GUIFactory {
-private:
-	DataStream* str;
-//	bool autoFree;
-	ieDword WindowCount, CTOffset, WEOffset;
-public: 
-	CHUImporter();
-	~CHUImporter() override;
+	ieDword WindowCount = 0;
+	ieDword CTOffset = 0;
+	ieDword WEOffset = 0;
+public:
 	/** Returns the number of available windows */
 	unsigned int GetWindowsCount() override;
-	bool LoadWindowPack(const ResRef&) override;
+	bool LoadWindowPack(const ScriptingGroup_t&) override;
 	/** Returns the i-th window in the Previously Loaded Stream */
 	Window* GetWindow(ScriptingId) const override;
 	/** This function loads all available windows from the 'stream' parameter. */
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 };
 
 }

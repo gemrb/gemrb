@@ -58,6 +58,15 @@ public:
 		PosHmid = 12,	// left + right = hmid
 		PosCentered = 15// top + bottom + left + right = center
 	};
+	
+	// Colors of modal window shadow
+	// !!! Keep these synchronized with GUIDefines.py !!!
+	enum class ModalShadow {
+		None = 0,
+		Gray,
+		Black
+	};
+	ModalShadow modalShadow = ModalShadow::None;
 
 	enum WindowFlags {
 		Draggable = 1,			// window can be dragged (by clicking anywhere in its frame) a la PST radial menu
@@ -110,14 +119,14 @@ private:
 	
 	bool OnControllerButtonDown(const ControllerEvent& ce) override;
 	
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 public:
 	Window(const Region& frame, WindowManager& mgr);
 
 	void Close();
 	void Focus();
-	bool DisplayModal(WindowManager::ModalShadow = WindowManager::ShadowNone);
+	bool DisplayModal(ModalShadow = ModalShadow::None);
 	
 	void FocusLost();
 	void FocusGained();
@@ -134,11 +143,11 @@ public:
 	bool IsReceivingEvents() const override { return true; }
 
 	const VideoBufferPtr& DrawWithoutComposition();
-	void RedrawControls(const char* VarName, unsigned int Sum);
+	void RedrawControls(const char* VarName, unsigned int Sum) const;
 
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
-	bool UnRegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
+	bool UnRegisterHotKeyCallback(const EventMgr::EventCallback&, KeyboardKey key);
 	
 	bool IsOpaque() const override { return (Flags()&AlphaChannel) == 0; }
 	bool HitTest(const Point& p) const override;
@@ -160,7 +169,7 @@ private: // Private attributes
 	
 	Point dragOrigin;
 	UniqueDragOp drag;
-	unsigned long lastMouseMoveTime;
+	tick_t lastMouseMoveTime;
 
 	VideoBufferPtr backBuffer = nullptr;
 	WindowManager& manager;

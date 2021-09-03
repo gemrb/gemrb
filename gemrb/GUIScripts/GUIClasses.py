@@ -241,14 +241,12 @@ class GWindow(GView, Scrollable):
 
 class GControl(GView):
 	methods = {
-		'HasAnimation': _GemRB.Control_HasAnimation,
 		'SetVarAssoc': _GemRB.Control_SetVarAssoc,
-		'SetAnimationPalette': _GemRB.Control_SetAnimationPalette,
-		'SetAnimation': _GemRB.Control_SetAnimation,
 		'QueryText': _GemRB.Control_QueryText,
 		'SetText': _GemRB.Control_SetText,
 		'SetAction': _GemRB.Control_SetAction,
 		'SetActionInterval': _GemRB.Control_SetActionInterval,
+		'SetColor': _GemRB.Control_SetColor,
 		'SetStatus': _GemRB.Control_SetStatus
 	}
 
@@ -286,19 +284,17 @@ class GControl(GView):
 class GLabel(GControl):
 	methods = {
 		'SetFont': _GemRB.Label_SetFont,
-		'SetTextColor': _GemRB.Label_SetTextColor
 	}
 
 class GTextArea(GControl, Scrollable):
 	methods = {
 		'ChapterText': _GemRB.TextArea_SetChapterText,
 		'Append': _GemRB.TextArea_Append,
-		'SetColor': _GemRB.TextArea_SetColor
 	}
 	__slots__ = ['DefaultText']
 
 	def ListResources(self, what, opts=0):
-		_GemRB.TextArea_SetColor(self, ColorWhitish, TA_COLOR_OPTIONS)
+		_GemRB.Control_SetColor(self, ColorWhitish, TA_COLOR_OPTIONS)
 		return _GemRB.TextArea_ListResources(self, what, opts)
 
 	def Clear(self):
@@ -329,7 +325,6 @@ class GButton(GControl):
 		'SetHotKey': _GemRB.Button_SetHotKey,
 		'SetAnchor': _GemRB.Button_SetAnchor,
 		'SetPushOffset': _GemRB.Button_SetPushOffset,
-		'SetTextColor': _GemRB.Button_SetTextColor,
 		'SetState': _GemRB.Button_SetState,
 		'SetPictureClipping': _GemRB.Button_SetPictureClipping,
 		'SetPicture': _GemRB.Button_SetPicture,
@@ -337,7 +332,8 @@ class GButton(GControl):
 		'SetBAM': _GemRB.Button_SetBAM,
 		'SetSpellIcon': _GemRB.Button_SetSpellIcon,
 		'SetItemIcon': _GemRB.Button_SetItemIcon,
-		'SetActionIcon': _GemRB.Button_SetActionIcon
+		'SetActionIcon': _GemRB.Button_SetActionIcon,
+		'SetAnimation': _GemRB.Button_SetAnimation,
 	}
 
 	def MakeDefault(self, glob=False):
@@ -357,6 +353,10 @@ class GButton(GControl):
 	def CreateLabel(self, labelid, *args):
 		frame = self.GetFrame()
 		return self.CreateControl(labelid, IE_GUI_LABEL, 0, 0, frame['w'], frame['h'], args)
+		
+	def CreateButton(self, btnid):
+		frame = self.GetFrame()
+		return self.CreateControl(btnid, IE_GUI_BUTTON, 0, 0, frame['w'], frame['h'])
 
 class GWorldMap(GControl, Scrollable):
 	methods = {

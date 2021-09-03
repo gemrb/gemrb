@@ -26,6 +26,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import GUICommonWindows
+from CommonWindow import AddScrollbarProxy
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -158,20 +159,6 @@ def PositionStoreWinRelativeTo(win):
 		storeframe['y'] = winframe['y'] + winframe['h']
 
 	storewin.SetFrame(storeframe)
-	
-def AddScrollbarProxy(win, sbar, leftctl):
-	frame = sbar.GetFrame()
-	
-	ctlFrame = leftctl.GetFrame()
-	frame['w'] = frame['x'] - ctlFrame['x']
-	frame['x'] = ctlFrame['x']
-	
-	scrollview = GemRB.CreateView(AddScrollbarProxy.proxyID, IE_GUI_VIEW, frame)
-	AddScrollbarProxy.proxyID += 1
-	scrollview = win.AddSubview(scrollview, win.GetControl(99)) # just something behind all the buttons and labels
-	scrollview.SetEventProxy(sbar)
-	
-AddScrollbarProxy.proxyID = 1000
 
 def OpenStoreWindow ():
 	global Store
@@ -453,7 +440,7 @@ def UpdateStoreShoppingWindow (Window):
 	if LeftCount<0:
 		LeftCount=0
 	ScrollBar = Window.GetControlAlias ('STOSBARL')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", 0, 0, LeftCount)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	if LeftTopIndex>LeftCount:
 		GemRB.SetVar ("LeftTopIndex", LeftCount)
@@ -467,7 +454,7 @@ def UpdateStoreShoppingWindow (Window):
 		RightCount=0
 
 	ScrollBar = Window.GetControlAlias ('STOSBARR')
-	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount)
+	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, RightCount)
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
 	if RightTopIndex>RightCount:
 		GemRB.SetVar ("RightTopIndex", RightCount)
@@ -546,7 +533,7 @@ def UpdateStoreIdentifyWindow (Window):
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	Count = len(inventory_slots)
 	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetVarAssoc ("TopIndex", max(0, Count - ItemButtonCount))
+	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, max(0, Count - ItemButtonCount))
 	GemRB.SetVar ("Index", -1)
 	RedrawStoreIdentifyWindow (Window)
 	return
@@ -647,13 +634,13 @@ def UpdateStoreStealWindow (Window):
 	Store = GemRB.GetStore ()
 	LeftCount = Store['StoreItemCount']
 	ScrollBar = Window.GetControlAlias ('SWLSBAR')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", max(0, LeftCount - ItemButtonCount))
+	ScrollBar.SetVarAssoc ("LeftTopIndex", 0, 0, max(0, LeftCount - ItemButtonCount))
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControlAlias ('SWRSBAR')
-	ScrollBar.SetVarAssoc ("RightTopIndex", max(0, RightCount - ItemButtonCount))
+	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, max(0, RightCount - ItemButtonCount))
 	GemRB.SetVar ("LeftIndex", -1)
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow (Window)
@@ -680,7 +667,7 @@ def InitStoreDonateWindow (Window):
 	# graphics
 	Button = Window.GetControl (10)
 	if Button:
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_PLAYONCE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Donate
@@ -780,7 +767,7 @@ def InitStoreHealWindow (Window):
 		Count = Count-4
 	else:
 		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, Count)
 	return
 
 def UpdateStoreHealWindow (Window):
@@ -1820,10 +1807,8 @@ def GetRealPrice (pc, mode, Item, Slot):
 			                    CommonTables.ItemType.GetRowIndex ("AMULET")]:
 				count = 0
 			# give at least 20 %
-			if count * Store['Depreciation'] > 80:
-				mod = 20
-			else:
-				mod -= count * Store['Depreciation']
+			mod -= count * Store['Depreciation']
+			mod = max(mod, 20)
 	else:
 		# charisma modifier (in percent)
 		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
@@ -1923,7 +1908,7 @@ def BuyHeal ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 	# for anything but raise/resurrect, the talker should be the caster, so
-	# self-targetting spells work properly. Raise dead is an exception as
+	# self-targeting spells work properly. Raise dead is an exception as
 	# the teleporting to the temple would not work otherwise
 	if Spell["SpellTargetType"] == 3: # non-living
 		GemRB.ApplySpell (pc, Cure['CureResRef'], Store['StoreOwner'])

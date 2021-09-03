@@ -21,254 +21,163 @@
 
 #include "BAMImporter.h"
 
-#include "FileCache.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
-#include "BAMSprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
+#include "Video/RLE.h"
 #include "System/FileStream.h"
 
 #include "System/swab.h"
 
 using namespace GemRB;
 
-BAMImporter::BAMImporter(void)
+bool BAMImporter::Import(DataStream* str)
 {
-	str = NULL;
-	frames = NULL;
-	cycles = NULL;
-	FramesCount = 0;
-	CyclesCount = 0;
-	CompressedColorIndex = DataStart = 0;
-	FramesOffset = PaletteOffset = FLTOffset = 0;
-}
-
-BAMImporter::~BAMImporter(void)
-{
-	delete str;
-	delete[] frames;
-	delete[] cycles;
-}
-
-bool BAMImporter::Open(DataStream* stream)
-{
-	unsigned int i;
-
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	delete[] frames;
-	delete[] cycles;
-	frames = nullptr;
-	cycles = nullptr;
-	palette = nullptr;
-
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "BAMCV1  ", 8 ) == 0) {
 		str->Seek( 4, GEM_CURRENT_POS );
-		DataStream* cached = CacheCompressedStream(stream, stream->filename);
-		delete str;
-		if (!cached)
+		str = DecompressStream(str);
+		if (!str)
 			return false;
-		str = cached;
 		str->Read( Signature, 8 );
 	}
 	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
 		return false;
 	}
-	str->ReadWord( &FramesCount );
-	str->Read( &CyclesCount, 1 );
+
+	ieWord frameCount;
+	str->ReadWord(frameCount);
+	frames.resize(frameCount);
+
+	ieByte cycleCount;
+	str->Read(&cycleCount, 1);
+	cycles.resize(cycleCount);
+	
 	str->Read( &CompressedColorIndex, 1 );
-	str->ReadDword( &FramesOffset );
-	str->ReadDword( &PaletteOffset );
-	str->ReadDword( &FLTOffset );
+	str->ReadDword(FramesOffset);
+	str->ReadDword(PaletteOffset);
+	str->ReadDword(FLTOffset);
 	str->Seek( FramesOffset, GEM_STREAM_START );
-	frames = new FrameEntry[FramesCount];
+	
 	DataStart = str->Size();
-	for (i = 0; i < FramesCount; i++) {
-		str->ReadWord( &frames[i].Width );
-		str->ReadWord( &frames[i].Height );
-		str->ReadWord( &frames[i].XPos );
-		str->ReadWord( &frames[i].YPos );
-		str->ReadDword( &frames[i].FrameData );
-		if ((frames[i].FrameData & 0x7FFFFFFF) < DataStart)
-			DataStart = (frames[i].FrameData & 0x7FFFFFFF);
+	for (auto& frame : frames) {
+		ieWord w, h;
+		ieWordSigned x , y;
+		str->ReadScalar(w);
+		frame.bounds.w = w;
+		str->ReadScalar(h);
+		frame.bounds.h = h;
+		str->ReadScalar(x);
+		frame.bounds.x = x;
+		str->ReadScalar(y);
+		frame.bounds.y = y;
+		ieDword offset;
+		str->ReadScalar(offset);
+		frame.RLE = (offset & 0x80000000) == 0;
+		frame.dataOffset = offset & 0x7FFFFFFF;
+		DataStart = std::min(DataStart, frame.dataOffset);
 	}
-	cycles = new CycleEntry[CyclesCount];
-	for (i = 0; i < CyclesCount; i++) {
-		str->ReadWord( &cycles[i].FramesCount );
-		str->ReadWord( &cycles[i].FirstFrame );
+	
+	for (auto& cycle : cycles) {
+		str->ReadWord(cycle.FramesCount);
+		str->ReadWord(cycle.FirstFrame);
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
-	palette = new Palette();
+	palette = MakeHolder<Palette>();
 	// no need to switch this
-	for (i = 0; i < 256; i++) {
+	for (auto& color : palette->col) {
 		// bgra format
-		str->Read( &palette->col[i].b, 1 );
-		str->Read( &palette->col[i].g, 1 );
-		str->Read( &palette->col[i].r, 1 );
+		str->Read(&color.b, 1);
+		str->Read(&color.g, 1);
+		str->Read(&color.r, 1);
 		unsigned char a;
 		str->Read( &a, 1 );
 
 		// BAM v2 (EEs) supports alpha, but for backwards compatibility an alpha of 0 is still 255
-		palette->col[i].a = a ? a : 255;
-	}
-	// old bamworkshop semicorrupted shadow entry: recreate a plausible one instead of pink
-	if (palette->col[1].r == 255 && palette->col[1].g == 101 && palette->col[1].b == 151) {
-		palette->col[1].r = palette->col[1].g = palette->col[1].b = 35;
-		palette->col[1].a = 200;
+		color.a = a ? a : 255;
 	}
 
 	return true;
 }
 
-int BAMImporter::GetCycleSize(unsigned char Cycle)
+BAMImporter::index_t BAMImporter::GetCycleSize(index_t cycle)
 {
-	if(Cycle >= CyclesCount ) {
-		return -1;
+	if (cycle >= cycles.size()) {
+		return AnimationFactory::InvalidIndex;
 	}
-	return cycles[Cycle].FramesCount;
+	return cycles[cycle].FramesCount;
 }
 
-Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
-										bool RLESprite, unsigned char* data)
+Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool RLESprite, uint8_t* data)
 {
 	Holder<Sprite2D> spr;
-
+	Video* video = core->GetVideoDriver();
+	const Region& rgn = frameInfo.bounds;
+	uint8_t* dataBegin = data + frameInfo.dataOffset;
+	
 	if (RLESprite) {
-		assert(data);
-		unsigned char* framedata = data;
-		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
-		spr = new BAMSprite2D (Region(0,0, frames[findex].Width, frames[findex].Height),
-							   framedata, palette, CompressedColorIndex);
+		PixelFormat fmt = PixelFormat::RLE8Bit(palette, CompressedColorIndex);
+		const uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
+		ptrdiff_t dataLen = dataEnd - dataBegin;
+		if (dataLen == 0) return nullptr;
+		void* pixels = malloc(dataLen);
+		memcpy(pixels, dataBegin, dataLen);
+		spr = video->CreateSprite(rgn, pixels, fmt);
 	} else {
-		void* pixels = GetFramePixels(findex);
-		Region r(0,0, frames[findex].Width, frames[findex].Height);
-		spr = core->GetVideoDriver()->CreateSprite8(r, pixels, palette, true, CompressedColorIndex);
+		void* pixels = nullptr;
+		if (frameInfo.RLE) {
+			pixels = DecodeRLEData(dataBegin, rgn.size, CompressedColorIndex);
+		} else {
+			pixels = malloc(rgn.w * rgn.h);
+			memcpy(pixels, dataBegin, rgn.w * rgn.h);
+		}
+		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
+		spr = video->CreateSprite(rgn, pixels, fmt);
 	}
 
-	spr->Frame.x = (ieWordSigned)frames[findex].XPos;
-	spr->Frame.y = (ieWordSigned)frames[findex].YPos;
-	if (mode == IE_SHADED) {
-		// CHECKME: is this ever used? Should we modify the sprite's palette
-		// without creating a local copy for this sprite?
-		PaletteHolder pal = spr->GetPalette();
-		pal->CreateShadedAlphaChannel();
-	}
 	return spr;
 }
 
-void* BAMImporter::GetFramePixels(unsigned short findex)
+std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 {
-	if (findex >= FramesCount) {
-		findex = cycles[0].FirstFrame;
-	}
-	str->Seek( ( frames[findex].FrameData & 0x7FFFFFFF ), GEM_STREAM_START );
-	unsigned long pixelcount = frames[findex].Height * frames[findex].Width;
-	void* pixels = malloc( pixelcount );
-	bool RLECompressed = ( ( frames[findex].FrameData & 0x80000000 ) == 0 );
-	if (RLECompressed) {
-		//if RLE Compressed
-		unsigned long RLESize;
-		RLESize = ( unsigned long )
-			( frames[findex].Width * frames[findex].Height * 3 ) / 2 + 1;
-		//without partial reads, we should be careful
-		unsigned long remains = str->Remains();
-		if (RLESize > remains) {
-			RLESize = remains;
-		}
-		unsigned char* inpix;
-		inpix = (unsigned char*)malloc( RLESize );
-		if (str->Read( inpix, RLESize ) == GEM_ERROR) {
-			free( pixels );
-			free( inpix );
-			return NULL;
-		}
-		unsigned char * p = inpix;
-		unsigned char * Buffer = (unsigned char*)pixels;
-		unsigned int i = 0;
-		while (i < pixelcount) {
-			if (*p == CompressedColorIndex) {
-				p++;
-				// FIXME: Czech HOW has apparently broken frame
-				// #141 in REALMS.BAM. Maybe we should put
-				// this condition to #ifdef BROKEN_xx ?
-				// Or maybe rather put correct REALMS.BAM
-				// into override/ dir?
-				if (i + ( *p ) + 1 > pixelcount) {
-					memset( &Buffer[i], CompressedColorIndex, pixelcount - i );
-					print("Broken frame %d", findex);
-				} else {
-					memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
-				}
-				i += *p;
-			} else 
-				Buffer[i] = *p;
-			p++;
-			i++;
-		}
-		free( inpix );
-	} else {
-		str->Read( pixels, pixelcount );
-	}
-	return pixels;
-}
-
-ieWord * BAMImporter::CacheFLT(unsigned int &count)
-{
-	count = 0;
-	for (int i = 0; i < CyclesCount; i++) {
-		unsigned int tmp = cycles[i].FirstFrame + cycles[i].FramesCount;
+	index_t count = 0;
+	for (const auto& cycle : cycles) {
+		index_t tmp = cycle.FirstFrame + cycle.FramesCount;
 		if (tmp > count) {
 			count = tmp;
 		}
 	}
-	if (count == 0) return NULL;
+	if (count == 0) return {};
 
-	ieWord * FLT = ( ieWord * ) calloc( count, sizeof(ieWord) );
+	std::vector<index_t> FLT(count);
 	str->Seek( FLTOffset, GEM_STREAM_START );
-	str->Read( FLT, count * sizeof(ieWord) );
+	str->Read(&FLT[0], count * sizeof(ieWord));
 	if( DataStream::BigEndian() ) {
-		swabs(FLT, count * sizeof(ieWord));
+		swabs(&FLT[0], count * sizeof(ieWord));
 	}
 	return FLT;
 }
 
-AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned char mode, bool allowCompression)
+AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
 {
-	unsigned int i, count;
-	AnimationFactory* af = new AnimationFactory( ResRef );
-	ieWord *FLT = CacheFLT( count );
+	str->Seek( DataStart, GEM_STREAM_START );
+	strpos_t length = str->Remains();
+	if (length == 0) return nullptr;
+	
+	auto FLT = CacheFLT();
+	uint8_t *data = (uint8_t*)malloc(length);
+	str->Read(data, length);
 
-	allowCompression = allowCompression && core->GetVideoDriver()->SupportsBAMSprites();
-	unsigned char* data = NULL;
+	std::vector<Holder<Sprite2D>> animframes;
+	for (const auto& frameInfo : frames) {
+		bool RLECompressed = allowCompression && frameInfo.RLE;
+		animframes.push_back(GetFrameInternal(frameInfo, RLECompressed, data - DataStart));
+	}
+	free(data);
 
-	if (allowCompression) {
-		str->Seek( DataStart, GEM_STREAM_START );
-		unsigned long length = str->Remains();
-		if (length == 0) return af;
-		//data = new unsigned char[length];
-		data = (unsigned char *) malloc(length);
-		str->Read( data, length );
-		af->SetFrameData(data);
-	}
-
-	for (i = 0; i < FramesCount; ++i) {
-		bool RLECompressed = allowCompression && (frames[i].FrameData & 0x80000000) == 0;
-		Holder<Sprite2D> frame = GetFrameInternal(i, mode, RLECompressed, data);
-		assert(!RLECompressed || frame->BAM);
-		af->AddFrame(frame);
-	}
-	for (i = 0; i < CyclesCount; ++i) {
-		af->AddCycle( cycles[i] );
-	}
-	af->LoadFLT ( FLT, count );
-	free (FLT);
-	return af;
+	return new AnimationFactory(resref, std::move(animframes), cycles, std::move(FLT));
 }
 
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
@@ -280,7 +189,8 @@ Holder<Sprite2D> BAMImporter::GetPalette()
 	for (int i = 0; i < 256; i++) {
 		*p++ = ( unsigned char ) i;
 	}
-	return core->GetVideoDriver()->CreateSprite8(Region(0,0,16,16), pixels, palette );
+	PixelFormat fmt = PixelFormat::Paletted8Bit(palette);
+	return core->GetVideoDriver()->CreateSprite(Region(0,0,16,16), pixels, fmt);
 }
 
 #include "BAMFontManager.h"
@@ -289,5 +199,5 @@ Holder<Sprite2D> BAMImporter::GetPalette()
 
 GEMRB_PLUGIN(0x3AD6427A, "BAM File Importer")
 PLUGIN_IE_RESOURCE(BAMFontManager, "bam", (ieWord)IE_BAM_CLASS_ID)
-PLUGIN_CLASS(IE_BAM_CLASS_ID, BAMImporter)
+PLUGIN_CLASS(IE_BAM_CLASS_ID, ImporterPlugin<BAMImporter>)
 END_PLUGIN()

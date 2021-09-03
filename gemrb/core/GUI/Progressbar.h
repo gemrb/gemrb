@@ -43,7 +43,7 @@ namespace GemRB {
 class GEM_EXPORT Progressbar : public Control  {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 
 public:
 	struct Action {
@@ -62,7 +62,7 @@ public:
 	/** Sets the mos coordinates for the progressbar filler mos/cap */
 	void SetSliderPos(const Point& knob, const Point& cap);
 	/** Refreshes a progressbar which is associated with VariableName */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t) override;
 
 private: // Private attributes
 	Holder<Sprite2D> BackGround2; //mos resource for the filling of the bar

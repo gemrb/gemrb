@@ -20,7 +20,12 @@
 #ifndef PATHFINDER_H
 #define PATHFINDER_H
 
+#include "EnumFlags.h"
+
 #include "Region.h"
+#include "Resource.h"
+
+#include <cstdint>
 
 namespace GemRB {
 
@@ -33,7 +38,7 @@ enum class PathMapFlags : uint8_t {
 	TRAVEL = 2,
 	NO_SEE = 4,
 	SIDEWALL = 8,
-	AREAMASK = 15,
+	AREAMASK = (IMPASSABLE | PASSABLE | TRAVEL | NO_SEE | SIDEWALL),
 	DOOR_OPAQUE = 16,
 	DOOR_IMPASSABLE = 32,
 	PC = 64,

@@ -53,11 +53,7 @@
 #include "RNG.h"
 #include "System/StringBuffer.h"
 
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
+#include <cstdarg>
 
 namespace GemRB {
 
@@ -494,7 +490,7 @@ static const ActionLink actionnames[] = {
 	{"addworldmapareaflag", GameScript::AddWorldmapAreaFlag, 0},
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},
-	{"addxpvar", GameScript::AddXPVar, 0},
+	{"addxpvar", GameScript::AddXPVar, AF_INSTANT},
 	{"advancetime", GameScript::AdvanceTime, 0},
 	{"allowarearesting", GameScript::SetAreaRestFlag, 0},//iwd2
 	{"ally", GameScript::Ally, 0},
@@ -503,7 +499,7 @@ static const ActionLink actionnames[] = {
 	{"ankheghide", GameScript::AnkhegHide, AF_ALIVE},
 	{"applydamage", GameScript::ApplyDamage, 0},
 	{"applydamagepercent", GameScript::ApplyDamagePercent, 0},
-	{"applyspell", GameScript::ApplySpell, 0},
+	{"applyspell", GameScript::ApplySpell, AF_IWD2_OVERRIDE},
 	{"applyspellpoint", GameScript::ApplySpellPoint, 0}, //gemrb extension
 	{"attachtransitiontodoor", GameScript::AttachTransitionToDoor, 0},
 	{"attack", GameScript::Attack,AF_BLOCKING|AF_ALIVE},
@@ -669,8 +665,8 @@ static const ActionLink actionnames[] = {
 	{"forcehide", GameScript::ForceHide, 0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcemarkedspell", GameScript::ForceMarkedSpell, 0},
-	{"forcespell", GameScript::ForceSpell, AF_BLOCKING|AF_ALIVE},
-	{"forcespellpoint", GameScript::ForceSpellPoint, AF_BLOCKING|AF_ALIVE},
+	{"forcespell", GameScript::ForceSpell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"forcespellpoint", GameScript::ForceSpellPoint, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"forcespellpointrange", GameScript::ForceSpellPointRange, AF_BLOCKING|AF_ALIVE},
 	{"forcespellpointrangeres", GameScript::ForceSpellPointRange, AF_BLOCKING|AF_ALIVE},
 	{"forcespellrange", GameScript::ForceSpellRange, AF_BLOCKING|AF_ALIVE},
@@ -826,8 +822,8 @@ static const ActionLink actionnames[] = {
 	{"randomwalkcontinuous", GameScript::RandomWalkContinuous, AF_BLOCKING|AF_ALIVE},
 	{"randomwalkcontinuoustime", GameScript::RandomWalkContinuous, AF_BLOCKING|AF_ALIVE},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
-	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},
-	{"reallyforcespellres", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},
+	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"reallyforcespellres", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"reallyforcespelldead", GameScript::ReallyForceSpellDead, AF_BLOCKING},
 	{"reallyforcespelldeadres", GameScript::ReallyForceSpellDead, AF_BLOCKING},
 	{"reallyforcespelllevel", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},//this is the same action
@@ -910,7 +906,7 @@ static const ActionLink actionnames[] = {
 	{"sethp", GameScript::SetHP, 0},
 	{"sethppercent", GameScript::SetHPPercent, 0},
 	{"setinternal", GameScript::SetInternal, 0},
-	{"setinterrupt", GameScript::SetInterrupt, 0},
+	{"setinterrupt", GameScript::SetInterrupt, AF_INSTANT},
 	{"setitemflags", GameScript::SetItemFlags, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setleavepartydialoguefile", GameScript::SetLeavePartyDialogFile, 0},
@@ -960,13 +956,13 @@ static const ActionLink actionnames[] = {
 	{"spawnptactivate", GameScript::SpawnPtActivate, 0},
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
 	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
-	{"spell", GameScript::Spell, AF_BLOCKING|AF_ALIVE},
+	{"spell", GameScript::Spell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"spellcasteffect", GameScript::SpellCastEffect, 0},
 	{"spellhiteffectpoint", GameScript::SpellHitEffectPoint, 0},
 	{"spellhiteffectsprite", GameScript::SpellHitEffectSprite, 0},
-	{"spellnodec", GameScript::SpellNoDec, AF_BLOCKING|AF_ALIVE},
-	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},
-	{"spellpointnodec", GameScript::SpellPointNoDec, AF_BLOCKING|AF_ALIVE},
+	{"spellnodec", GameScript::SpellNoDec, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"spellpointnodec", GameScript::SpellPointNoDec, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"startcombatcounter", GameScript::StartCombatCounter, 0},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutsceneex", GameScript::StartCutSceneEx, 0}, //pst (unknown), EE perhaps as of PST:EE
@@ -1187,10 +1183,8 @@ static const TriggerLink* FindTrigger(const char* triggername)
 	}
 	int len = strlench( triggername, '(' );
 	for (int i = 0; triggernames[i].Name; i++) {
-		if (!strnicmp( triggernames[i].Name, triggername, len )) {
-			if (!triggernames[i].Name[len]) {
-				return triggernames + i;
-			}
+		if (!strnicmp(triggernames[i].Name, triggername, len)) {
+			return triggernames + i;
 		}
 	}
 	return NULL;
@@ -1203,10 +1197,8 @@ static const ActionLink* FindAction(const char* actionname)
 	}
 	int len = strlench( actionname, '(' );
 	for (int i = 0; actionnames[i].Name; i++) {
-		if (!strnicmp( actionnames[i].Name, actionname, len )) {
-			if (!actionnames[i].Name[len]) {
-				return actionnames + i;
-			}
+		if (!strnicmp(actionnames[i].Name, actionname, len)) {
+			return actionnames + i;
 		}
 	}
 	return NULL;
@@ -1219,10 +1211,8 @@ static const ObjectLink* FindObject(const char* objectname)
 	}
 	int len = strlench( objectname, '(' );
 	for (int i = 0; objectnames[i].Name; i++) {
-		if (!strnicmp( objectnames[i].Name, objectname, len )) {
-			if (!objectnames[i].Name[len]) {
-				return objectnames + i;
-			}
+		if (!strnicmp(objectnames[i].Name, objectname, len)) {
+			return objectnames + i;
 		}
 	}
 	return NULL;
@@ -1275,18 +1265,18 @@ const targettype *Targets::GetLastTarget(int Type)
 {
 	targetlist::const_iterator m = objects.end();
 	while (m--!=objects.begin() ) {
-		if ( (Type==-1) || ((*m).actor->Type==Type) ) {
-			return &(*(m));
+		if (Type == -1 || (*m).actor->Type == Type) {
+			return &(*m);
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 const targettype *Targets::GetFirstTarget(targetlist::iterator &m, int Type)
 {
 	m=objects.begin();
 	while (m!=objects.end() ) {
-		if ( (Type!=-1) && ( (*m).actor->Type!=Type)) {
+		if (Type != -1 && (*m).actor->Type != Type) {
 			m++;
 			continue;
 		}
@@ -1299,7 +1289,7 @@ const targettype *Targets::GetNextTarget(targetlist::iterator &m, int Type)
 {
 	m++;
 	while (m!=objects.end() ) {
-		if ( (Type!=-1) && ( (*m).actor->Type!=Type)) {
+		if (Type != -1 && (*m).actor->Type != Type) {
 			m++;
 			continue;
 		}
@@ -1312,7 +1302,7 @@ Scriptable *Targets::GetTarget(unsigned int index, int Type)
 {
 	targetlist::iterator m = objects.begin();
 	while(m!=objects.end() ) {
-		if ( (Type==-1) || ((*m).actor->Type==Type)) {
+		if (Type == -1 || (*m).actor->Type == Type) {
 			if (!index) {
 				return (*m).actor;
 			}
@@ -1334,10 +1324,8 @@ void Targets::AddTarget(Scriptable* target, unsigned int distance, int ga_flags)
 	case ST_ACTOR:
 		//i don't know if unselectable actors are targetable by script
 		//if yes, then remove GA_SELECT
-		if (ga_flags) {
-			if (!((Actor *) target)->ValidTarget(ga_flags) ) {
-				return;
-			}
+		if (ga_flags && !((Actor *) target)->ValidTarget(ga_flags)) {
+			return;
 		}
 		break;
 	case ST_GLOBAL:
@@ -1391,17 +1379,14 @@ void Targets::FilterObjectRect(const Object *oC)
 /** releasing global memory */
 static void CleanupIEScript()
 {
-	triggersTable.release();
-	actionsTable.release();
-	objectsTable.release();
-	overrideActionsTable.release();
-	overrideTriggersTable.release();
-	if (ObjectIDSTableNames)
-		free(ObjectIDSTableNames);
-	ObjectIDSTableNames = NULL;
+	triggersTable.reset();
+	actionsTable.reset();
+	objectsTable.reset();
+	overrideActionsTable.reset();
+	overrideTriggersTable.reset();
 }
 
-static void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
+static void printFunction(StringBuffer& buffer, const std::shared_ptr<SymbolMgr>& table, int index)
 {
 	const char *str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
@@ -1424,11 +1409,11 @@ static void LoadActionFlags(const char *tableName, int flag, bool critical)
 			return;
 		}
 	}
-	Holder<SymbolMgr> table = core->GetSymbol(tableIndex);
+	auto table = core->GetSymbol(tableIndex);
 	if (!table) {
 		error("GameScript", "Couldn't load %s symbols!\n",tableName);
 	}
-	int j = table->GetSize();
+	size_t j = table->GetSize();
 	while (j--) {
 		int i = table->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
@@ -1463,7 +1448,7 @@ void InitializeIEScript()
 	int oT = core->LoadSymbol( "object" );
 	int gaT = core->LoadSymbol( "gemact" );
 	int gtT = core->LoadSymbol( "gemtrig" );
-	AutoTable objNameTable("script");
+	AutoTable objNameTable = gamedata->LoadTable("script");
 	if (tT < 0 || aT < 0 || oT < 0 || !objNameTable) {
 		error("GameScript", "A critical scripting file is missing!\n");
 	}
@@ -1483,7 +1468,7 @@ void InitializeIEScript()
 		error("GameScript", "The IDS Count shouldn't be more than 10!\n");
 	}
 
-	ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
+	ObjectIDSTableNames.resize(ObjectIDSCount);
 	for (int i = 0; i < ObjectIDSCount; i++) {
 		const char *idsname;
 		idsname=objNameTable->QueryField( 0, i + 1 );
@@ -1494,7 +1479,7 @@ void InitializeIEScript()
 		else {
 			idtargets[i]=poi->Function;
 		}
-		strnlwrcpy(ObjectIDSTableNames[i], idsname, 8 );
+		ObjectIDSTableNames[i] = MakeLowerCaseResRef(idsname);
 	}
 	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
@@ -1513,10 +1498,8 @@ void InitializeIEScript()
 	memset( actionflags, 0, sizeof( actionflags ) );
 	memset( objects, 0, sizeof( objects ) );
 
-	int max;
-
-	max = triggersTable->GetSize();
-	for (int j = 0; j < max; j++) {
+	size_t max = triggersTable->GetSize();
+	for (size_t j = 0; j < max; j++) {
 		int i = triggersTable->GetValueIndex(j);
 		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ));
 
@@ -1551,7 +1534,7 @@ void InitializeIEScript()
 			// missing trigger which might be resolved later
 			triggers[i] = NULL;
 			triggerflags[i] = 0;
-			missing_triggers.push_back(j);
+			missing_triggers.push_back(static_cast<int>(j));
 			continue;
 		}
 		triggers[i] = poi->Function;
@@ -1586,7 +1569,7 @@ void InitializeIEScript()
 	}
 
 	max = actionsTable->GetSize();
-	for (int j = 0; j < max; j++) {
+	for (size_t j = 0; j < max; j++) {
 		int i = actionsTable->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
 			Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
@@ -1617,7 +1600,7 @@ void InitializeIEScript()
 		if (poi == NULL) {
 			actions[i] = NULL;
 			actionflags[i] = 0;
-			missing_actions.push_back(j);
+			missing_actions.push_back(static_cast<int>(j));
 			continue;
 		}
 		actions[i] = poi->Function;
@@ -1630,7 +1613,7 @@ void InitializeIEScript()
 		 * right now you can't print or generate these actions!
 		 */
 		max = overrideActionsTable->GetSize();
-		for (int j = 0; j < max; j++) {
+		for (size_t j = 0; j < max; j++) {
 			int i = overrideActionsTable->GetValueIndex(j);
 			if (i >= MAX_ACTIONS) {
 				Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
@@ -1642,7 +1625,7 @@ void InitializeIEScript()
 				StringBuffer buffer;
 
 				buffer.append("Couldn't assign function to override action: ");
-				printFunction(buffer, overrideActionsTable, j);
+				printFunction(buffer, overrideActionsTable, static_cast<int>(j));
 				continue;
 			}
 			if (actions[i] && (actions[i]!=poi->Function || actionflags[i]!=poi->Flags) ) {
@@ -1669,7 +1652,7 @@ void InitializeIEScript()
 		 * right now you can't print or generate these actions!
 		 */
 		max = overrideTriggersTable->GetSize();
-		for (int j = 0; j < max; j++) {
+		for (size_t j = 0; j < max; j++) {
 			int i = overrideTriggersTable->GetValueIndex( j );
 			bool was_condition = (i & 0x4000);
 			i &= 0x3fff;
@@ -1686,7 +1669,7 @@ void InitializeIEScript()
 				StringBuffer buffer;
 
 				buffer.append("Couldn't assign function to override trigger: ");
-				printFunction(buffer, overrideTriggersTable, j);
+				printFunction(buffer, overrideTriggersTable, static_cast<int>(j));
 				continue;
 			}
 			int tf = poi->Flags | (was_condition?TF_CONDITION:0);
@@ -1700,7 +1683,7 @@ void InitializeIEScript()
 					printFunction(buffer, triggersTable, x);
 				} else {
 					x = overrideTriggersTable->FindValue(i);
-					if (x<0 || x>=j) x = overrideTriggersTable->FindValue(i|0x4000);
+					if (x < 0 || size_t(x) >= j) x = overrideTriggersTable->FindValue(i|0x4000);
 					printFunction(buffer, overrideTriggersTable, x);
 				}
 				Log(MESSAGE, "GameScript", buffer);
@@ -1734,7 +1717,7 @@ void InitializeIEScript()
 		Log(WARNING, "GameScript", buffer);
 	}
 
-	int j = objectsTable->GetSize();
+	size_t j = objectsTable->GetSize();
 	while (j--) {
 		int i = objectsTable->GetValueIndex(j);
 		if (i >= MAX_OBJECTS) {
@@ -1761,7 +1744,7 @@ void InitializeIEScript()
 		}
 		if (poi == NULL) {
 			objects[i] = NULL;
-			missing_objects.push_back(j);
+			missing_objects.push_back(static_cast<int>(j));
 		} else {
 			objects[i] = poi->Function;
 		}
@@ -1788,7 +1771,7 @@ void InitializeIEScript()
 		}
 		StringBuffer buffer;
 		buffer.append("Couldn't assign function to object: ");
-		printFunction(buffer, objectsTable, j);
+		printFunction(buffer, objectsTable, static_cast<int>(j));
 		Log(WARNING, "GameScript", buffer);
 	}
 
@@ -1806,7 +1789,7 @@ void InitializeIEScript()
 		// leaving this as not strictly necessary, for now
 		Log(WARNING, "GameScript", "Couldn't find saved trigger symbols!");
 	} else {
-		Holder<SymbolMgr> savedTriggersTable = core->GetSymbol(savedTriggersIndex);
+		auto savedTriggersTable = core->GetSymbol(savedTriggersIndex);
 		if (!savedTriggersTable) {
 			error("GameScript", "Couldn't load saved trigger symbols!\n");
 		}
@@ -1830,16 +1813,11 @@ void InitializeIEScript()
 }
 
 /********************** GameScript *******************************/
-GameScript::GameScript(const ieResRef ResRef, Scriptable* MySelf,
+GameScript::GameScript(const ResRef& resref, Scriptable* MySelf,
 	int ScriptLevel, bool AIScript)
-	: MySelf(MySelf)
+	: MySelf(MySelf), Name(resref), scriptlevel(ScriptLevel)
 {
-	scriptlevel = ScriptLevel;
-	lastAction = (unsigned int) ~0;
-
-	strnlwrcpy( Name, ResRef, 8 );
-
-	script = CacheScript( Name, AIScript);
+	script = CacheScript(Name, AIScript);
 }
 
 GameScript::~GameScript(void)
@@ -1847,45 +1825,44 @@ GameScript::~GameScript(void)
 	if (script) {
 		//set 3. parameter to true if you want instant free
 		//and possible death
-		ScriptDebugLog(ID_REFERENCE, "One instance of %s is dropped from %d.", Name, BcsCache.RefCount(Name));
+		ScriptDebugLog(ID_REFERENCE, "One instance of %s is dropped from %d.", Name.CString(), BcsCache.RefCount(Name));
 		int res = BcsCache.DecRef(script, Name, true);
 
 		if (res<0) {
-			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name);
+			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name.CString());
 		}
 		if (!res) {
-			//print("Freeing script %s because its refcount has reached 0.", Name);
 			script->Release();
 		}
 		script = NULL;
 	}
 }
 
-Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
+Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 {
 	char line[10];
 
 	SClass_ID type = AIScript ? IE_BS_CLASS_ID : IE_BCS_CLASS_ID;
 
-	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
+	Script *newScript = (Script *) BcsCache.GetResource(resRef);
 	if ( newScript ) {
-		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", ResRef, BcsCache.RefCount(ResRef));
+		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", resRef.CString(), BcsCache.RefCount(resRef));
 		return newScript;
 	}
 
-	DataStream* stream = gamedata->GetResource( ResRef, type );
+	DataStream* stream = gamedata->GetResource(resRef, type);
 	if (!stream) {
 		return NULL;
 	}
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "SC", 2 ) != 0) {
 		Log(WARNING, "GameScript", "Not a Compiled Script file");
-		delete( stream );
-		return NULL;
+		delete stream;
+		return nullptr;
 	}
 	newScript = new Script( );
-	BcsCache.SetAt( ResRef, (void *) newScript );
-	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", ResRef, BcsCache.RefCount(ResRef));
+	BcsCache.SetAt(resRef, (void *) newScript);
+	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", resRef.CString(), BcsCache.RefCount(resRef));
 
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );
@@ -1894,7 +1871,7 @@ Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 		newScript->responseBlocks.push_back( rB );
 		stream->ReadLine( line, 10 );
 	}
-	delete( stream );
+	delete stream;
 	return newScript;
 }
 
@@ -1947,8 +1924,8 @@ static Object* DecodeObject(const char* line)
 	if (HasAdditionalRect && (*line=='[') ) {
 		line++; //Skip [
 		int tmp[4];
-		for (int i = 0; i < 4; i++) {
-			tmp[i] = ParseInt(line);
+		for (int& i : tmp) {
+			i = ParseInt(line);
 		}
 		oB->objectRect = Region(tmp[0], tmp[1], tmp[2] - tmp[0], tmp[3] - tmp[1]);
 		if (*line == ' ')
@@ -1994,7 +1971,7 @@ static Trigger* ReadTrigger(DataStream* stream)
 	Trigger* tR = new Trigger();
 	//this exists only in PST?
 	if (HasTriggerPoint) {
-		sscanf( line, "%hu %d %d %d %d [%hd,%hd] \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf( line, "%hu %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, &tR->pointParameter.x,
 			&tR->pointParameter.y, tR->string0Parameter, tR->string1Parameter );
@@ -2084,48 +2061,50 @@ bool GameScript::Update(bool *continuing, bool *done)
 	RandomNumValue = RAND_ALL();
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
-		if (rB->condition->Evaluate(MySelf)) {
-			//if this isn't a continue-d block, we have to clear the queue
-			//we cannot clear the queue and cannot execute the new block
-			//if we already have stuff on the queue!
-			if (!continueExecution) {
-				if (MySelf->GetCurrentAction() || MySelf->GetNextAction()) {
-					if (MySelf->GetInternalFlag()&IF_NOINT) {
-						// we presumably don't want any further execution?
-						if (done) *done = true;
-						return false;
-					}
+		if (!rB->condition->Evaluate(MySelf)) {
+			continue;
+		}
 
-					if (lastAction==a) {
-						// we presumably don't want any further execution?
-						// this one is a bit more complicated, due to possible
-						// interactions with Continue() (lastAction here is always
-						// the first block encountered), needs more testing
-						// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
-						// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
-						// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
-						if (core->HasFeature(GF_3ED_RULES)) {
-							if (done) *done = true;
-						}
-						return false;
-					}
-
-					//movetoobjectfollow would break if this isn't called
-					//(what is broken if it is here?)
-					//IE even clears the path, shall we?
-					//yes we must :)
-					MySelf->Stop();
+		// if this isn't a continue-d block, we have to clear the queue
+		// we cannot clear the queue and cannot execute the new block
+		// if we already have stuff on the queue!
+		if (!continueExecution) {
+			if (MySelf->GetCurrentAction() || MySelf->GetNextAction()) {
+				if (MySelf->GetInternalFlag() & IF_NOINT) {
+					// we presumably don't want any further execution?
+					if (done) *done = true;
+					return false;
 				}
-				lastAction=a;
+
+				if (lastAction == a) {
+					// we presumably don't want any further execution?
+					// this one is a bit more complicated, due to possible
+					// interactions with Continue() (lastAction here is always
+					// the first block encountered), needs more testing
+					// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
+					// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
+					// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
+					if (core->HasFeature(GF_3ED_RULES) && done) {
+						*done = true;
+					}
+					return false;
+				}
+
+				// movetoobjectfollow would break if this isn't called
+				// (what is broken if it is here?)
+				// IE even clears the path, shall we?
+				// yes we must :)
+				MySelf->Stop();
 			}
-			running = true;
-			continueExecution = ( rB->responseSet->Execute(MySelf) != 0);
-			running = false;
-			if (continuing) *continuing = continueExecution;
-			if (!continueExecution) {
-				if (done) *done = true;
-				return true;
-			}
+			lastAction = a;
+		}
+		running = true;
+		continueExecution = rB->responseSet->Execute(MySelf) != 0;
+		running = false;
+		if (continuing) *continuing = continueExecution;
+		if (!continueExecution) {
+			if (done) *done = true;
+			return true;
 		}
 	}
 	return continueExecution;
@@ -2163,29 +2142,26 @@ void GameScript::EvaluateAllBlocks()
 	// cutscenes don't evaluate conditions - they just choose the
 	// first response, take the object from the first action,
 	// and then add the actions to that object's queue.
-	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
-		ResponseBlock* rB = script->responseBlocks[a];
-		ResponseSet * rS = rB->responseSet;
-		if (rS->responses.size()) {
-			Response *response = rS->responses[0];
-			if (response->actions.size()) {
-				Action *action = response->actions[0];
-				Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
-				if (target) {
-					// save the target in case it selfdestructs and we need to manually exit the cutscene
-					core->SetCutSceneRunner(target);
-					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
-					rS->responses[0]->Execute(target);
-					// NOTE: this will break blocking instants, if there are any
-					target->ReleaseCurrentAction();
-				} else {
-					Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
-					if (core->InDebugMode(ID_CUTSCENE)) {
-						if (action->objects[1]) {
-							action->objects[1]->dump();
-						}
-					}
-				}
+	for (const auto rB : script->responseBlocks) {
+		const ResponseSet *rS = rB->responseSet;
+		if (rS->responses.empty()) continue;
+
+		const Response *response = rS->responses[0];
+		if (response->actions.empty()) continue;
+
+		const Action *action = response->actions[0];
+		Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
+		if (target) {
+			// save the target in case it selfdestructs and we need to manually exit the cutscene
+			core->SetCutSceneRunner(target);
+			// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
+			rS->responses[0]->Execute(target);
+			// NOTE: this will break blocking instants, if there are any
+			target->ReleaseCurrentAction();
+		} else {
+			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
+			if (core->InDebugMode(ID_CUTSCENE) && action->objects[1]) {
+				action->objects[1]->dump();
 			}
 		}
 	}
@@ -2238,7 +2214,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	rE->weight = 0;
 	stream->ReadLine( line, 1024 );
 	char *poi;
-	rE->weight = (unsigned char)strtoul(line,&poi,10);
+	rE->weight = strtounsigned<uint8_t>(line,&poi,10);
 	if (strncmp(poi, "AC", 2) != 0) {
 		free(line);
 		return rE;
@@ -2248,7 +2224,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		//not autofreed, because it is referenced by the Script
 		Action* aC = new Action(false);
 		stream->ReadLine( line, 1024 );
-		aC->actionID = (unsigned short)strtoul(line, NULL,10);
+		aC->actionID = strtounsigned<uint16_t>(line, nullptr, 10);
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
 			Object* oB = DecodeObject( line );
@@ -2257,7 +2233,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 				stream->ReadLine( line, 1024 );
 		}
 		stream->ReadLine( line, 1024 );
-		sscanf( line, "%d %hd %hd %d %d\"%[^\"]\" \"%[^\"]\" AC",
+		sscanf( line, "%d %d %d %d %d\"%[^\"]\" \"%[^\"]\" AC",
 			&aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
 			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter,
 			aC->string1Parameter );
@@ -2329,9 +2305,9 @@ bool Condition::Evaluate(Scriptable *Sender) const
 		if (result > 1) {
 			//we started an Or() block
 			if (ORcount) {
-				Log(WARNING, "GameScript", "Unfinished OR block encountered!");
+				Log(WARNING, "GameScript", "Unfinished OR block encountered! 1");
 				if (!subresult) {
-					return 0;
+					return false;
 				}
 			}
 			ORcount = result;
@@ -2346,14 +2322,14 @@ bool Condition::Evaluate(Scriptable *Sender) const
 			result = subresult;
 		}
 		if (!result) {
-			return 0;
+			return false;
 		}
 	}
 	if (ORcount) {
-		Log(WARNING, "GameScript", "Unfinished OR block encountered!");
+		Log(WARNING, "GameScript", "Unfinished OR block encountered! 2");
 		return subresult;
 	}
-	return 1;
+	return true;
 }
 
 /* this may return more than a boolean, in case of Or(x) */
@@ -2374,7 +2350,7 @@ int Trigger::Evaluate(Scriptable *Sender) const
 			triggerID, tmpstr );
 		return 0;
 	}
-	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s", triggerID, tmpstr);
+	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s (Sender: %s / %s)", triggerID, tmpstr, Sender->GetScriptName(), Sender->GetName(1));
 
 	int ret = func( Sender, this );
 	if (flags & TF_NEGATE) {
@@ -2445,6 +2421,35 @@ static void PrintAction(StringBuffer& buffer, int actionID)
 	buffer.appendFormatted("Action: %d %s\n", actionID, actionsTable->GetValue(actionID));
 }
 
+static void HandleActionOverride(Scriptable* target, const Action* aC)
+{
+	Action *newAction = ParamCopyNoOverride(aC);
+	// mark the target action, so other ActionOverrides don't clear it
+	// only happened for queued actions, but since instants are gone immediately,
+	// it shouldn't matter that we set it on all
+	newAction->flags |= ACF_OVERRIDE;
+
+	if (core->HasFeature(GF_CLEARING_ACTIONOVERRIDE)) {
+		// bg2, but not iwd2, clears the previous non-actionoverriden actions in the queue
+		target->ClearActions(1);
+	} else if (core->HasFeature(GF_3ED_RULES)) { // iwd2
+		// it was more complicated, always releasing if the game was paused — not something to replicate
+		if (target->CurrentActionInterruptable) {
+			target->ReleaseCurrentAction();
+		}
+	} else { // for all the games we don't understand fully yet
+		target->ReleaseCurrentAction();
+	}
+
+	target->AddAction(newAction);
+	if (!(actionflags[aC->actionID] & AF_INSTANT)) {
+		assert(target->GetNextAction());
+		// there are plenty of places where it's vital that ActionOverride is not interrupted,
+		// so make double sure it doesn't happen
+		target->CurrentActionInterruptable = false;
+	}
+}
+
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	int actionID = aC->actionID;
@@ -2458,29 +2463,17 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)
 	if (aC->objects[0]) {
 		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0], GA_NO_DEAD);
-
 		aC->IncRef(); // if aC is us, we don't want it deleted!
 		Sender->ReleaseCurrentAction();
 
 		if (scr) {
 			ScriptDebugLog(ID_ACTIONS, "Sender %s ran ActionOverride on %s", Sender->GetScriptName(), scr->GetScriptName());
-			scr->ReleaseCurrentAction();
-			scr->AddAction(ParamCopyNoOverride(aC));
-			if (!(actionflags[actionID] & AF_INSTANT)) {
-				assert(scr->GetNextAction());
-				// TODO: below was written before i added instants, this might be unnecessary now
-
-				// there are plenty of places where it's vital that ActionOverride is not interrupted and if
-				// there are actions left on the queue after the release above, we can't instant-execute,
-				// so this is my best guess for now..
-				scr->CurrentActionInterruptable = false;
-			}
+			HandleActionOverride(scr, aC);
 		} else {
 			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
 			aC->objects[0]->dump();
 			aC->dump();
 		}
-
 		aC->Release();
 		return;
 	}
@@ -2496,12 +2489,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		//uninterruptable actions will set it back
 		if (Sender->Type==ST_ACTOR) {
 			Sender->Activate();
-			if (actionflags[actionID]&AF_ALIVE) {
-				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-					Log(WARNING, "GameScript", "Aborted action due to death!");
-					Sender->ReleaseCurrentAction();
-					return;
-				}
+			if (actionflags[actionID] & AF_ALIVE && Sender->GetInternalFlag() & IF_STOPATTACK) {
+				Log(WARNING, "GameScript", "Aborted action due to death!");
+				Sender->ReleaseCurrentAction();
+				return;
 			}
 		}
 		func( Sender, aC );
@@ -2552,8 +2543,8 @@ Trigger* GenerateTrigger(char* String)
 		Log(ERROR, "GameScript", "Invalid scripting trigger: %s", String);
 		return NULL;
 	}
-	char *src = String+len;
-	char *str = triggersTable->GetStringIndex( i )+len;
+	const char *src = String + len;
+	const char *str = triggersTable->GetStringIndex(i) + len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
 		Log(ERROR, "GameScript", "Malformed scripting trigger: %s", String);
@@ -2571,9 +2562,9 @@ Action* GenerateAction(const char* String)
 	ScriptDebugLog(ID_ACTIONS, "Compiling: %s", String);
 
 	int len = strlench(String,'(')+1; //including (
-	char *src = actionString+len;
+	const char *src = actionString + len;
 	int i = -1;
-	char *str;
+	const char *str;
 	unsigned short actionID;
 	if (overrideActionsTable) {
 		i = overrideActionsTable->FindString(actionString, len);
@@ -2608,7 +2599,7 @@ Action *GenerateActionDirect(const char *String, const Scriptable *object)
 	if (tmp && tmp->objectFields[0]==-1) {
 		tmp->objectFields[1] = object->GetGlobalID();
 	}
-	action->pointParameter.empty();
+	action->pointParameter = Point(-1, -1);
 	return action;
 }
 
@@ -2621,7 +2612,7 @@ void Object::dump() const
 
 void Object::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	if(objectName[0]) {
 		buffer.appendFormatted("Object: %s\n",objectName);
 		return;
@@ -2664,7 +2655,7 @@ void Trigger::dump() const
 
 void Trigger::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	buffer.appendFormatted("Trigger: %d\n", triggerID);
 	buffer.appendFormatted("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
@@ -2687,7 +2678,7 @@ void Action::dump() const
 
 void Action::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
 	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);

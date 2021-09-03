@@ -43,8 +43,8 @@ namespace GemRB {
 
 class GEM_EXPORT Point {
 public:
-	Point(void);
-	Point(short x, short y);
+	Point() = default;
+	Point(int x, int y);
 
 	bool operator==(const Point &pnt) const;
 	bool operator!=(const Point &pnt) const;
@@ -55,39 +55,40 @@ public:
 	Point& operator+=(const Point& rhs);
 	Point& operator-=(const Point& rhs);
 
-	/** if it is [-1.-1] */
-	bool isempty() const;
-	/** if it is [0.0] */
-	bool isnull() const;
-	inline void empty() {
-		x=-1;
-		y=-1;
-	}
-	inline void null() {
-		x=0;
-		y=0;
+	Point& operator/(int div);
+
+	bool IsZero() const; // (0, 0)
+	bool IsInvalid() const; // (-1, -1)
+
+	inline void reset() {
+		x = y = 0;
 	}
 
 	// true if p is within the circle of radius r centered at p
 	bool isWithinRadius(int r, const Point& p) const;
 
-	ieDword asDword() const; // store coordinates in uint32 ((y << 16) | x)
-	void fromDword(ieDword val); // extract coordinates from uint32
-
-	short x,y;
+	int x = 0;
+	int y = 0;
 };
 
 class GEM_EXPORT Size {
 public:
-	int w, h;
-	Size();
+	int w = 0;
+	int h = 0;
+	Size() = default;
 	Size(int, int);
+	
+	inline void reset() {
+		w = h = 0;
+	}
 
 	bool operator==(const Size& size) const;
 	bool operator!=(const Size& size) const;
 	int Area() const { return w * h; }
 	bool IsZero() const { return w == 0 && h == 0; }
-	bool IsEmpty() const { return w <= 0 || h <= 0; }
+	bool IsInvalid() const { return w <= 0 || h <= 0; }
+	
+	bool PointInside(const Point& p) const { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
 };
 
 /**
@@ -97,12 +98,24 @@ public:
 
 class GEM_EXPORT Region {
 public:
-	int x, y;
-	int w, h;
+	// WARNING: we reinterpret_cast this struct!
+	// Point and Size must be first and in this order
+	Point origin;
+	Size size;
+	
+	// unfortunatly anonymous structs are an extenison in C++...
+	int& x = origin.x;
+	int& y = origin.y;
+	int& w = size.w;
+	int& h = size.h;
 
-	Region(void);
+	Region() = default;
 	Region(int x, int y, int w, int h);
 	Region(const Point& p, const Size& s);
+	Region(const Region&);
+	Region(Region&&) noexcept;
+	
+	Region& operator=(const Region&);
 
 	bool operator==(const Region& rgn) const;
 	bool operator!=(const Region& rgn) const;
@@ -113,18 +126,16 @@ public:
 	bool IntersectsRegion(const Region& rgn) const;
 	Region Intersect(const Region& rgn) const;
 
-	void SetOrigin(const Point& p) { x = p.x; y = p.y; }
-	Point Origin() const { return Point(x, y); }
 	Point Center() const { return Point(x + w / 2, y + h / 2); }
 	Point Maximum() const { return Point(x + w, y + h); }
-	Size Dimensions() const { return Size(w, h); }
 	
 	void ExpandToPoint(const Point& p);
 	void ExpandToRegion(const Region& r);
 	void ExpandAllSides(int amt);
 	
 	static Region RegionEnclosingRegions(const Region& r1, const Region& r2) {
-		Point min, max;
+		Point min;
+		Point max;
 
 		min.x = std::min(r1.x, r2.x);
 		min.y = std::min(r1.y, r2.y);

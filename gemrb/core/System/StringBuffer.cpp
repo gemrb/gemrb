@@ -19,45 +19,25 @@
 #include "System/StringBuffer.h"
 
 #include <cstdio>
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
+#include <cstdarg>
 
 namespace GemRB {
-
-StringBuffer::StringBuffer()
-{}
-
-StringBuffer::~StringBuffer()
-{}
 
 void StringBuffer::appendFormatted(const char* message, ...)
 {
 	va_list ap;
-
-#if defined(_MSC_VER) || defined(__sgi)
-	// Don't try to be smart.
-	// Assume this is long enough. If not, message will be truncated.
-	// MSVC6 has old vsnprintf that doesn't give length
-	const size_t len = 4095;
-#else
 	va_start(ap, message);
 	const size_t len = vsnprintf(NULL, 0, message, ap);
 	va_end(ap);
-#endif
 
-#if defined(__GNUC__)
-	__extension__ // Variable-length arrays
-#endif
-	char buf[len+1];
+	thread_local std::string buf;
+	buf.resize(len + 1, '\0');
 	va_start(ap, message);
-	vsnprintf(buf, len + 1, message, ap);
+	vsnprintf(&buf[0], len + 1, message, ap);
 	va_end(ap);
 
 	// TODO: If we manage the string ourselves, we can avoid this extra copy.
-	buffer += buf;
+	buffer += buf.c_str();
 }
 
 void StringBuffer::append(const char* message)

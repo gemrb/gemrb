@@ -24,8 +24,6 @@ debug dump.
 In case of complicated bugs or hard to reach states, please provide a save
 game, so we can reproduce the problem more easily.
 
-GemRB version: 
-
 #### Steps to reproduce
 1. Go to '...'
 2. Click on '....'
@@ -37,3 +35,13 @@ Add a clear and concise description of what you expected to happen.
 
 #### Screenshots
 If applicable, add screenshots to help explain your problem.
+
+GemRB version (check as many as you know apply)
+- [ ] master as of this issue
+- [ ] 0.9.0
+- [ ] 0.8.8
+
+Video Driver (check as many as you know apply)
+- [ ] SDL1.2
+- [ ] SDL2 built with `USE_OPENGL_BACKEND`
+- [ ] SDL2 without `USE_OPENGL_BACKEND`

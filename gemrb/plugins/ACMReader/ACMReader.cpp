@@ -22,32 +22,31 @@
 
 using namespace GemRB;
 
-bool ACMReader::Open(DataStream* stream)
+bool ACMReader::Import(DataStream* str)
 {
-	str = stream;
 	Close();
 
 	ACM_Header hdr;
 
 	char Signature[4];
 	ieDword SignatureDword;
-	stream->Read( Signature, 4 );
-	stream->Seek( 0, GEM_STREAM_START );
-	stream->ReadDword( &SignatureDword );
+	str->Read( Signature, 4 );
+	str->Seek( 0, GEM_STREAM_START );
+	str->ReadDword(SignatureDword);
 	if (!memcmp( Signature, "WAVC", 4 )) {
 		str->Seek( 28, GEM_STREAM_START );
 	} else if (SignatureDword == IP_ACM_SIG) {
-		stream->Seek( 0, GEM_STREAM_START );
+		str->Seek( 0, GEM_STREAM_START );
 	} else {
 		return false;
 	}
 
-	str->ReadDword( &hdr.signature );
-	str->ReadDword( &hdr.samples );
-	str->ReadWord( &hdr.channels );
-	str->ReadWord( &hdr.rate );
+	str->ReadDword(hdr.signature);
+	str->ReadDword(hdr.samples);
+	str->ReadWord(hdr.channels);
+	str->ReadWord(hdr.rate);
 	ieWord tmpword;
-	str->ReadWord( &tmpword );
+	str->ReadWord(tmpword);
 	subblocks = tmpword >> 4;
 	levels = tmpword & 15;
 

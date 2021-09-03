@@ -25,7 +25,7 @@
 
 #include "ImageFactory.h"
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 // CHECKME: how should we include png.h ? (And how should we check for it?)
 #include <png.h>
@@ -46,19 +46,12 @@ struct GemRB::PNGInternal {
 	png_infop end_info;
 };
 
-
-static ieDword blue_mask = 0x00ff0000;
-static ieDword green_mask = 0x0000ff00;
-static ieDword red_mask = 0x000000ff;
-static ieDword alpha_mask = 0xff000000;
-
 PNGImporter::PNGImporter(void)
 {
 	inf = new PNGInternal();
 	inf->png_ptr = 0;
 	inf->info_ptr = 0;
 	inf->end_info = 0;
-	Width = Height = 0;
 	hasPalette = false;
 }
 
@@ -81,9 +74,8 @@ void PNGImporter::Close()
 	}
 }
 
-bool PNGImporter::Open(DataStream* stream)
+bool PNGImporter::Import(DataStream* stream)
 {
-	str = stream;
 	Close();
 
 	png_byte header[8];
@@ -145,9 +137,7 @@ bool PNGImporter::Open(DataStream* stream)
 
 	png_read_update_info(inf->png_ptr, inf->info_ptr);
 
-
-	Width = width;
-	Height = height;
+	size = Size(width, height);
 
 	hasPalette = (color_type == PNG_COLOR_TYPE_PALETTE);
 
@@ -158,10 +148,10 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 {
 	Holder<Sprite2D> spr;
 	unsigned char* buffer = 0;
-	png_bytep* row_pointers = new png_bytep[Height];
-	buffer = (unsigned char *) malloc((hasPalette?1:4)*Width*Height);
-	for (unsigned int i = 0; i < Height; ++i)
-		row_pointers[i] = static_cast<png_bytep>(&buffer[(hasPalette?1:4)*i*Width]);
+	png_bytep* row_pointers = new png_bytep[size.h];
+	buffer = (unsigned char *) malloc((hasPalette?1:4) * size.Area());
+	for (int i = 0; i < size.h; ++i)
+		row_pointers[i] = static_cast<png_bytep>(&buffer[(hasPalette?1:4) * i * size.w]);
 
 	if (setjmp(png_jmpbuf(inf->png_ptr))) {
 		delete[] row_pointers;
@@ -179,14 +169,18 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	png_read_end(inf->png_ptr, inf->end_info);
 
 	if (hasPalette) {
-		Color pal[256];
-		int ck = GetPalette(256, pal);
-		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, Width, Height), 8, buffer, pal, (ck >= 0), ck);
+		PaletteHolder pal = MakeHolder<Palette>();
+		int ck = GetPalette(256, pal->col);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, (ck >= 0), ck);
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), buffer, fmt);
 	} else {
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
-												   red_mask, green_mask,
-												   blue_mask, alpha_mask,
-												   buffer, false, 0);
+		constexpr ieDword blue_mask = 0x00ff0000;
+		constexpr ieDword green_mask = 0x0000ff00;
+		constexpr ieDword red_mask = 0x000000ff;
+		constexpr ieDword alpha_mask = 0xff000000;
+		static const PixelFormat fmt(4, red_mask, green_mask, blue_mask, alpha_mask);
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h),
+												   buffer, fmt);
 	}
 
 	png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);

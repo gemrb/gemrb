@@ -40,8 +40,7 @@ namespace GemRB {
 
 class GEM_EXPORT StringBuffer {
 public:
-	StringBuffer();
-	virtual ~StringBuffer();
+	StringBuffer() = default;
 
 	/// Append formatted string to buffer
 	void appendFormatted(const char* message, ...)

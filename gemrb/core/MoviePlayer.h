@@ -35,7 +35,9 @@
 #include "GUI/TextSystem/Font.h"
 #include "GUI/Window.h"
 #include "System/String.h"
-#include "Video.h"
+#include "Video/Video.h"
+
+#include <chrono>
 
 namespace GemRB {
 
@@ -46,6 +48,8 @@ namespace GemRB {
 
 class GEM_EXPORT MoviePlayer : public Resource {
 public:
+	using microseconds = std::chrono::microseconds;
+
 	static const TypeID ID;
 
 	class SubtitleSet {
@@ -53,13 +57,12 @@ public:
 		Font* font;
 	
 	public:
-		SubtitleSet(Font* fnt, Color col = ColorWhite)
-		: col(col) {
-			font = fnt;
+		explicit SubtitleSet(Font* fnt, Color col = ColorWhite)
+		: col(col), font(fnt) {
 			assert(font);
 		}
 		
-		virtual ~SubtitleSet() {}
+		virtual ~SubtitleSet() = default;
 
 		virtual size_t NextSubtitleFrame() const = 0;
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
@@ -85,9 +88,19 @@ protected:
 	Size movieSize;
 	size_t framePos;
 
+	microseconds lastTime = microseconds(0);
+
+	microseconds frame_wait = microseconds(0);
+	unsigned int video_frameskip = 0;
+	unsigned int video_skippedframes = 0;
+
 protected:
 	void DisplaySubtitle(const String& sub);
 	void PresentMovie(const Region&, Video::BufferFormat fmt);
+
+	microseconds get_current_time() const;
+	void timer_start();
+	void timer_wait(microseconds frameWait);
 
 	virtual bool DecodeFrame(VideoBuffer&) = 0;
 
@@ -95,7 +108,7 @@ public:
 	MoviePlayer(void);
 	~MoviePlayer(void) override;
 
-	Size Dimensions() { return movieSize; }
+	Size Dimensions() const { return movieSize; }
 	void Play(Window* win);
 	void Stop();
 
@@ -109,7 +122,7 @@ class MoviePlayerControls : public View {
 
 private:
 	// currently dont have any real controls
-	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) override {}
+	void DrawSelf(const Region& /*drawFrame*/, const Region& /*clip*/) override {}
 	
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) override {
 		KeyboardKey keycode = Key.keycode;
@@ -131,7 +144,7 @@ private:
 	}
 
 public:
-	MoviePlayerControls(MoviePlayer& player)
+	explicit MoviePlayerControls(MoviePlayer& player)
 	: View(Region(Point(), player.Dimensions())), player(player) {}
 };
 

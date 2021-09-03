@@ -23,6 +23,7 @@
 
 #include "AmbientMgr.h"
 #include "Region.h"
+#include "globals.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -35,42 +36,42 @@ namespace GemRB {
 
 class Ambient;
 
-class AmbientMgrAL : public AmbientMgr {
+class AmbientMgrAL final : public AmbientMgr {
 public:
 	AmbientMgrAL();
-	~AmbientMgrAL();
+	~AmbientMgrAL() final;
 
-	void activate(const std::string &name) override;
-	void activate() override;
-	void deactivate(const std::string &name) override;
-	void deactivate() override;
+	void activate(const std::string &name) final;
+	void activate() final;
+	void deactivate(const std::string &name) final;
+	void deactivate() final;
 
 	void UpdateVolume(unsigned short value);
 private:
-	void ambientsSet(const std::vector<Ambient *>&) override;
+	void ambientsSet(const std::vector<Ambient *>&) final;
 	
 	class AmbientSource {
 	public:
-		AmbientSource(const Ambient *a);
+		explicit AmbientSource(const Ambient *a);
 		~AmbientSource();
-		uint64_t tick(uint64_t ticks, Point listener, ieDword timeslice);
+		tick_t tick(tick_t ticks, Point listener, ieDword timeslice);
 		void hardStop();
-		void SetVolume(unsigned short volume);
+		void SetVolume(unsigned short volume) const;
 	private:
 		int stream;
 		const Ambient* ambient;
-		uint64_t lastticks;
-		unsigned int nextdelay;
-		unsigned int nextref;
+		tick_t lastticks;
+		tick_t nextdelay;
+		size_t nextref;
 		unsigned int totalgain;
 
 		bool isHeard(const Point &listener) const;
-		int enqueue();
+		tick_t enqueue() const;
 	};
 	std::vector<AmbientSource *> ambientSources;
 	
 	int play();
-	uint64_t tick(uint64_t ticks) const;
+	tick_t tick(tick_t ticks) const;
 	void hardStop() const;
 	
 	mutable std::recursive_mutex mutex;

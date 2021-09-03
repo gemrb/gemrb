@@ -83,7 +83,7 @@ def InitInventoryWindow (Window):
 	# paperdoll
 	Button = Window.GetControl (50)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetAction (InventoryCommon.OnAutoEquip, IE_ACT_DRAG_DROP_DST)
 
 	# portrait
@@ -178,13 +178,6 @@ def RefreshInventoryWindow ():
 
 	# paperdoll
 	Button = Window.GetControl (50)
-	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
-	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
-	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
-	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
-	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 
 	Button.SetFlags (IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
 	pdoll = GUICommonWindows.GetActorPaperDoll (pc)+"WK"
@@ -193,8 +186,8 @@ def RefreshInventoryWindow ():
 	# can ever keep drawing the gamecontrol underneath ...
 	# and then remove this block
 	if GemRB.HasResource (pdoll, RES_BAM):
-		Button.SetAnimation (pdoll)
-		Button.SetAnimationPalette (Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0)
+		pal = [GemRB.GetPlayerStat (pc, c) for c in range(IE_METAL_COLOR, IE_HAIR_COLOR + 1)]
+		Button.SetAnimation (pdoll, 0, 0, pal)
 
 	# portrait
 	Button = Window.GetControl (84)

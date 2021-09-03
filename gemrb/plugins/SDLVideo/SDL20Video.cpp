@@ -70,13 +70,14 @@ int SDL20VideoDriver::Init()
 
 	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
 		Log(ERROR, "SDL2", "InitSubSystem failed: %s", SDL_GetError());
-	} else {
-		for (int i = 0; i < SDL_NumJoysticks(); ++i) {
-			if (SDL_IsGameController(i)) {
-				gameController = SDL_GameControllerOpen(i);
-				if (gameController != nullptr) {
-					break;
-				}
+		return ret;
+	}
+
+	for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+		if (SDL_IsGameController(i)) {
+			gameController = SDL_GameControllerOpen(i);
+			if (gameController != nullptr) {
+				break;
 			}
 		}
 	}
@@ -104,8 +105,7 @@ static void SetWindowIcon(SDL_Window* window)
 int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 {
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
-	// TODO: scale methods can be nearest or linear, and should be settable in config
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
 
 #if USE_OPENGL_BACKEND
 #if USE_OPENGL_API
@@ -201,7 +201,7 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		Log(ERROR, "SDL 2", "%s", SDL_GetError());
 		return nullptr;
 	}
-	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt, renderer);
+	return new SDLTextureVideoBuffer(r.origin, tex, fmt, renderer);
 }
 
 void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
@@ -276,7 +276,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 		return ret;
 	}
 
-	if (screenClip.Dimensions() == screenSize)
+	if (screenClip.size == screenSize)
 	{
 		// Some SDL backends complain on having a clip rect of the entire renderer size
 		// I'm not sure if it is an SDL bug; possibly its just 0 based so it is out of bounds?
@@ -300,7 +300,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 	return 0;
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const Region& src, const Region& dst, BlitFlags flags, const SDL_Color* tint)
 {
 	BlitFlags version = BlitFlags::NONE;
 #if !USE_OPENGL_BACKEND
@@ -308,7 +308,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	version = (BlitFlags::GREY | BlitFlags::SEPIA) & flags;
 #endif
 	// WARNING: software fallback == slow
-	if (spr->Bpp == 8 && (flags & BlitFlags::ALPHA_MOD)) {
+	if (spr->Format().Bpp == 1 && (flags & BlitFlags::ALPHA_MOD)) {
 		version |= BlitFlags::ALPHA_MOD;
 		flags &= ~RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
 	} else {
@@ -319,8 +319,11 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL_Rect& srect, const SDL_Rect& drect, BlitFlags flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Region& srgn, const Region& drgn, BlitFlags flags, const SDL_Color* tint)
 {
+	SDL_Rect srect = RectFromRegion(srgn);
+	SDL_Rect drect = RectFromRegion(drgn);
+	
 	int ret = 0;
 	if (flags&BLIT_STENCIL_MASK) {
 		// 1. clear scratchpad segment
@@ -390,15 +393,15 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 	}
 }
 
-void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags, const Color* tint)
+void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags, Color tint)
 {
 	auto tex = static_cast<SDLTextureVideoBuffer&>(*buf).GetTexture();
 	const Region& r = buf->Rect();
-	Point origin = r.Origin() + p;
+	Point origin = r.origin + p;
 
-	SDL_Rect srect = {0, 0, r.w, r.h};
-	SDL_Rect drect = {origin.x, origin.y, r.w, r.h};
-	BlitSpriteNativeClipped(tex, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
+	const Region& srect = {0, 0, r.w, r.h};
+	const Region& drect = {origin, r.size};
+	BlitSpriteNativeClipped(tex, srect, drect, flags, reinterpret_cast<const SDL_Color*>(&tint));
 }
 
 int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
@@ -459,17 +462,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 
 void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
-	// TODO: refactor Point to use int so this is not needed
-	std::vector<SDL_Point> sdlpoints;
-	sdlpoints.reserve(points.size());
-
-	for (size_t i = 0; i < points.size(); ++i) {
-		const Point& point = points[i];
-		SDL_Point sdlpoint = {point.x, point.y};
-		sdlpoints.push_back(sdlpoint);
-	}
-
-	DrawSDLPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLPoints(reinterpret_cast<const std::vector<SDL_Point>&>(points), reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
 void SDL20VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
@@ -489,17 +482,7 @@ void SDL20VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlag
 
 void SDL20VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
-	// TODO: refactor Point to use int so this is not needed
-	std::vector<SDL_Point> sdlpoints;
-	sdlpoints.reserve(points.size());
-
-	for (size_t i = 0; i < points.size(); ++i) {
-		const Point& point = points[i];
-		SDL_Point sdlpoint = {point.x, point.y};
-		sdlpoints.push_back(sdlpoint);
-	}
-
-	DrawSDLLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLLines(reinterpret_cast<const std::vector<SDL_Point>&>(points), reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
 void SDL20VideoDriver::DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
@@ -544,7 +527,7 @@ void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& orig
 		std::vector<SDL_Point> points(poly->Count() + 1);
 		size_t i = 0;
 		for (; i < poly->Count(); ++i) {
-			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
+			const Point& p = poly->vertices[i] - poly->BBox.origin + origin;
 			points[i].x = p.x;
 			points[i].y = p.y;
 		}
@@ -563,12 +546,12 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
-	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), 24,
-															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	static const PixelFormat fmt(3, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), fmt);
 
 	SDL_Texture* target = SDL_GetRenderTarget(renderer);
 	if (buf) {
-		auto texture = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
+		auto texture = static_cast<SDLTextureVideoBuffer*>(buf.get())->GetTexture();
 		SDL_SetRenderTarget(renderer, texture);
 	} else {
 		SDL_SetRenderTarget(renderer, nullptr);
@@ -579,7 +562,7 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 
 	SDL_SetRenderTarget(renderer, target);
 
-	return screenshot;
+	return Holder<Sprite2D>(screenshot);
 }
 
 int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const
@@ -587,7 +570,7 @@ int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], 
 	int numf = SDL_GetNumTouchFingers(device);
 
 	for (int i = 0; i < numf; ++i) {
-		SDL_Finger* finger = SDL_GetTouchFinger(device, i);
+		const SDL_Finger* finger = SDL_GetTouchFinger(device, i);
 		assert(finger);
 
 		fingers[i].id = finger->id;
@@ -612,7 +595,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	switch (event.type) {
 		case SDL_CONTROLLERDEVICEREMOVED:
 			if (gameController != nullptr) {
-				SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
+				const SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
 				if (removedController == gameController) {
 					SDL_GameControllerClose(gameController);
 					gameController = nullptr;
@@ -630,7 +613,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				float pct = event.caxis.value / float(sizeof(Sint16));
 				bool xaxis = event.caxis.axis % 2;
 				// FIXME: I'm sure this delta needs to be scaled
-				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
+				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
 				InputAxis axis = InputAxis(event.caxis.axis);
 				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
 				EvntManager->DispatchEvent(std::move(e));
@@ -706,7 +689,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					unitIsPixels = true;
 				}
 				
-				int speed = (unitIsPixels) ? 1 : core->GetMouseScrollSpeed();
+				int speed = unitIsPixels ? 1 : core->GetMouseScrollSpeed();
 				if (SDL_GetModState() & KMOD_SHIFT) {
 					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.y * speed, event.wheel.x * speed));
 				} else {
@@ -728,8 +711,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			// TODO: must destroy all SDLTextureSprite2D textures
 
 			// fallthough
+		case SDL_APP_DIDENTERFOREGROUND:
 		case SDL_RENDER_TARGETS_RESET:
-			// TODO: must destroy all SDLTextureVideoBuffer textures
+			e = EventMgr::CreateRedrawRequestEvent();
+			EvntManager->DispatchEvent(std::move(e));
 			break;
 		case SDL_WINDOWEVENT://SDL 1.2
 			switch (event.window.event) {

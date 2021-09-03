@@ -52,13 +52,13 @@ private:
 	bool isValid;
 
 private:
-	bool InitWithINIData(DataStream* const cfgStream);
+	bool InitWithINIData(DataStream* cfgStream);
 
 public:
 	CFGConfig(int argc, char *argv[]);
 	~CFGConfig() override;
 
-	bool IsValidConfig() {return isValid;};
+	bool IsValidConfig() const { return isValid; };
 };
 
 }

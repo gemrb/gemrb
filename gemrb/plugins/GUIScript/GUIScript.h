@@ -78,7 +78,7 @@ public:
 	/** Exec a single File */
 	bool ExecFile(const char* file);
 	/** Exec a single String */
-	bool ExecString(const char* string, bool feedback=false) override;
+	bool ExecString(const std::string &string, bool feedback=false) override;
 	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
 	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);

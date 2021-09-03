@@ -30,8 +30,6 @@ namespace GemRB {
 
 const TypeID Video::ID = { "Video" };
 
-static Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags);
-
 Video::Video(void)
 {
 	drawingBuffer = NULL;
@@ -86,7 +84,7 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 		r = clip->Intersect(r);
 	}
 	// the clip must be "safe". no negative values or crashy crashy
-	if (r.Dimensions().IsEmpty()) { // logically equivalent to no intersection
+	if (r.size.IsInvalid()) { // logically equivalent to no intersection
 		r.h = 0;
 		r.w = 0;
 	}
@@ -151,8 +149,8 @@ int Video::SwapBuffers(unsigned int fpscap)
 	SetScreenClip(NULL);
 
 	if (fpscap) {
-		unsigned int lim = 1000/fpscap;
-		unsigned long time = GetTicks();
+		tick_t lim = 1000/fpscap;
+		tick_t time = GetTicks();
 		if (( time - lastTime ) < lim) {
 			Wait(lim - int(time - lastTime));
 			time = GetTicks();
@@ -188,7 +186,7 @@ void Video::SetEventMgr(EventMgr* evnt)
 // Flips given sprite according to the flags. If MirrorAnchor=true,
 // flips its anchor (i.e. origin/base point) as well
 // returns new sprite
-Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D> sprite, BlitFlags flags, bool MirrorAnchor)
+Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags, bool MirrorAnchor)
 {
 	if (!sprite)
 		return NULL;
@@ -216,13 +214,13 @@ bool Video::GetFullscreenMode() const
 	return fullscreen;
 }
 
-void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
+void Video::BlitSprite(const Holder<Sprite2D>& spr, Point p, const Region* clip)
 {
-	p -= spr->Frame.Origin();
-	Region dst(p, spr->Frame.Dimensions());
+	p -= spr->Frame.origin;
+	Region dst(p, spr->Frame.size);
 	Region fClip = ClippedDrawingRect(dst, clip);
 
-	if (fClip.Dimensions().IsEmpty()) {
+	if (fClip.size.IsInvalid()) {
 		return; // already know blit fails
 	}
 
@@ -242,7 +240,7 @@ void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 	BlitSprite(spr, src, fClip, BlitFlags::BLENDED);
 }
 
-void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
+void Video::BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const PaletteHolder& pal, const Point& p,
 									  BlitFlags flags, Color tint)
 {
 	if (pal) {
@@ -255,7 +253,7 @@ void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, c
 	}
 }
 
-Holder<Sprite2D> Video::SpriteScaleDown( const Holder<Sprite2D> sprite, unsigned int ratio )
+Holder<Sprite2D> Video::SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned int ratio)
 {
 	Region scaledFrame = sprite->Frame;
 	scaledFrame.w /= ratio;
@@ -272,8 +270,8 @@ Holder<Sprite2D> Video::SpriteScaleDown( const Holder<Sprite2D> sprite, unsigned
 		}
 	}
 
-	Holder<Sprite2D> small = CreateSprite(scaledFrame, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
-0xff000000, pixels, false, 0 );
+	static const PixelFormat fmt(4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	Holder<Sprite2D> small = CreateSprite(scaledFrame, pixels, fmt);
 
 	small->Frame.x = sprite->Frame.x / ratio;
 	small->Frame.y = sprite->Frame.y / ratio;
@@ -302,7 +300,8 @@ Holder<Sprite2D> Video::CreateLight(int radius, int intensity)
 		}
 	}
 
-	Holder<Sprite2D> light = CreateSprite(Region(0,0, radius*2, radius*2), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
+	static const PixelFormat fmt(4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	Holder<Sprite2D> light = CreateSprite(Region(0,0, radius*2, radius*2), pixels, fmt);
 
 	light->Frame.x = radius;
 	light->Frame.y = radius;
@@ -310,7 +309,7 @@ Holder<Sprite2D> Video::CreateLight(int radius, int intensity)
 	return light;
 }
 
-Color Video::SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
+Color Video::SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio) const
 {
 	// TODO: turn this into one of our software "shaders"
 	Color sum;
@@ -319,7 +318,8 @@ Color Video::SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xba
 
 	for (unsigned int x = 0; x < ratio; x++) {
 		for (unsigned int y = 0; y < ratio; y++) {
-			Color c = sprite->GetPixel( xbase*ratio+x, ybase*ratio+y );
+			const Point p(xbase * ratio + x, ybase * ratio + y);
+			Color c = sprite->GetPixel(p);
 			r += Gamma22toGamma10[c.r];
 			g += Gamma22toGamma10[c.g];
 			b += Gamma22toGamma10[c.b];
@@ -335,7 +335,7 @@ Color Video::SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xba
 	return sum;
 }
 
-Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags)
+static Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags)
 {
 	Color outC = inCol;
 	if (flags & BlitFlags::HALFTRANS) {
@@ -397,7 +397,10 @@ void Video::DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned 
 void Video::DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
-	DrawEllipseImp(origin, xr, yr, c, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, 0, M_PI_2, false, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI_2, M_PI, false, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI, M_PI + M_PI_2, false, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI + M_PI_2, 2 * M_PI, false, flags);
 }
 
 void Video::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags)

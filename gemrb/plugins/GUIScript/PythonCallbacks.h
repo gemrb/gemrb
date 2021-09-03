@@ -67,11 +67,11 @@ inline bool CallPython(PyObject* function, PyObject* args = NULL)
 }
 
 struct PythonCallback {
-	PythonCallback(PyObject* fn)
+	explicit PythonCallback(PyObject* fn)
 	: Function(fn)
 	{
 		assert(Py_IsInitialized());
-		if (PyCallable_Check(Function)) {
+		if (Function && PyCallable_Check(Function)) {
 			Py_INCREF(Function);
 		} else {
 			Function = NULL;
@@ -95,7 +95,7 @@ protected:
 
 template <class R, class ARG_T>
 struct PythonComplexCallback : public PythonCallback {
-	PythonComplexCallback(PyObject* fn) : PythonCallback(fn) {}
+	explicit PythonComplexCallback(PyObject* fn) : PythonCallback(fn) {}
 	
 	PyObject* GetArgs(ARG_T arg) const {
 #if PY_MAJOR_VERSION >= 3

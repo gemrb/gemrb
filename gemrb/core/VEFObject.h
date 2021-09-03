@@ -23,9 +23,10 @@
 #include "exports.h"
 #include "ie_types.h"
 #include "Region.h"
+#include "Resource.h"
 #include "RGBAColor.h"
 #include "SClassID.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <cstdint>
 #include <vector>
@@ -35,24 +36,24 @@ namespace GemRB {
 class DataStream;
 class ScriptedAnimation;
 
-typedef enum VEF_TYPES {VEF_INVALID = -1, VEF_BAM, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
+enum class VEFTypes { INVALID = -1, BAM, VVC, VEF, _2DA };
 
 struct ScheduleEntry {
-	ieResRef resourceName;
+	ResRef resourceName;
 	ieDword start;
 	ieDword length;
 	Point offset;
-	ieDword type;
+	VEFTypes type;
 	void *ptr;
 };
 
 class GEM_EXPORT VEFObject {
 public:
-	ieResRef ResName;
+	ResRef ResName;
 	Point Pos; // position of the effect in game coordinates
 
 	VEFObject();
-	VEFObject(ScriptedAnimation *sca);
+	explicit VEFObject(ScriptedAnimation *sca);
 	~VEFObject();
 private:
 	std::vector<ScheduleEntry> entries;
@@ -60,20 +61,20 @@ private:
 	bool SingleObject;
 public:
 	//adds a new entry (use when loading)
-	void AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
+	void AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, VEFTypes type, ieDword gtime);
 	//renders the object
 	bool UpdateDrawingState(int orientation);
 	void Draw(const Region &screen, const Color &p_tint, int height, BlitFlags flags) const;
-	void Load2DA(const ieResRef resource);
+	void Load2DA(const ResRef &resource);
 	void LoadVEF(DataStream *stream);
 	ScriptedAnimation *GetSingleObject() const;
 private:
 	//clears the schedule, used internally
 	void Init();
 	//load a 2DA/VEF resource into the object
-	VEFObject *CreateObject(const ieResRef res, SClass_ID id);
+	VEFObject *CreateObject(const ResRef &res, SClass_ID id);
 	//load a BAM/VVC resource into the object
-	ScriptedAnimation *CreateCell(const ieResRef res, ieDword start, ieDword end);
+	ScriptedAnimation *CreateCell(const ResRef &res, ieDword start, ieDword end);
 	//load a single entry from stream
 	void ReadEntry(DataStream *stream);
 };

@@ -10,10 +10,13 @@ skip_commits:
   message: /\[ci skip\]/
 only_commits:
   files:
+    - CMakeLists.txt
     - gemrb/**/*
     - cmake/**/*
     - platforms/windows/**/*
     - .appveyor.yml
+matrix:
+  fast_finish: true
 environment:
   SF_ACC:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
@@ -28,7 +31,7 @@ install:
     vcpkg install zlib
     vcpkg install sdl2
     vcpkg install sdl2-mixer
-    vcpkg install python2
+    vcpkg install python3
     vcpkg install openal-soft
     vcpkg install libpng
     vcpkg install libogg

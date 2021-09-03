@@ -31,20 +31,20 @@ public:
 	~NullSound(void) override;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) override;
-	int CreateStream(Holder<SoundMgr>) override;
+		const Point&, unsigned int flags = 0, tick_t *length = nullptr) override;
+	int CreateStream(std::shared_ptr<SoundMgr>) override;
 	bool Play() override;
 	bool Stop() override;
 	bool Pause() override;
 	bool Resume() override;
 	bool CanPlay() override;
 	void ResetMusics() override;
-	void UpdateListenerPos(int XPos, int YPos) override;
-	void GetListenerPos(int& XPos, int& YPos) override;
+	void UpdateListenerPos(const Point&) override;
+	Point GetListenerPos() override;
 	void UpdateVolume(unsigned int) override {}
 
 	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange) override;
-	int QueueAmbient(int stream, const char* sound) override;
+	tick_t QueueAmbient(int stream, const char* sound) override;
 	bool ReleaseStream(int stream, bool hardstop) override;
 	void SetAmbientStreamVolume(int stream, int gain) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
@@ -52,7 +52,7 @@ public:
 				short* memory, int size, int samplerate) override;
 
 private:
-	int XPos, YPos;
+	Point pos;
 };
 
 }

@@ -44,6 +44,14 @@ class MapNote;
 
 class GEM_EXPORT MapControl : public Control {
 private:
+	enum NOTE_STATE : Control::value_t {
+		NO_NOTES	= 0,
+		VIEW_NOTES 	= 1,
+		SET_NOTE	= 2,
+		REVEAL		= 3,
+		EDIT_NOTE	= 4
+	};
+
 	Region mosRgn;
 	Point notePos;
 
@@ -60,12 +68,12 @@ public:
 	MapControl(const Region& frame, AnimationFactory* af);
 
 	/** Refreshes the control after its associated variable has changed */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t) override;
 	bool IsAnimated() const override { return true; } // map must constantly update actor positions
 
 private:
 	/** Call event handler on click */
-	void ClickHandle(const MouseEvent&);
+	void ClickHandle(const MouseEvent&) const;
 	/** Move viewport */
 	void UpdateViewport(Point p);
 	void UpdateCursor();
@@ -76,13 +84,12 @@ private:
 	Region GetViewport() const;
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void DrawFog(const Region& rgn) const;
 	
 	Point ConvertPointToGame(Point) const;
 	Point ConvertPointFromGame(Point) const;
 	
-protected:
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
 	/** Mouse Over Event */

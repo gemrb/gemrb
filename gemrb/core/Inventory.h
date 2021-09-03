@@ -70,18 +70,20 @@ class StringBuffer;
 #define SLOT_ANY       32767
 #define SLOT_INVENTORY 32768
 #define SLOT_ALL       65535
+#define SLOT_UMD       0x100000 // marker for a use magic device-d slot item
+#define SLOT_UMD_MASK  (0x100000 - 1)
 
 //weapon slot types (1000==not equipped)
 #define IW_NO_EQUIPPED  1000
 
 /** Inventory types */
-typedef enum ieInventoryType {
-	INVENTORY_HEAP = 0,
-	INVENTORY_CREATURE = 1
-} ieInventoryType;
+enum class ieInventoryType {
+	HEAP = 0,
+	CREATURE = 1
+};
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-typedef enum ieCREItemFlagBits : uint32_t {
+using ieCREItemFlagBits = enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_IDENTIFIED = 1,
 	IE_INV_ITEM_UNSTEALABLE = 2,
 	IE_INV_ITEM_STOLEN = 4, // denotes steel items in pst
@@ -111,7 +113,7 @@ typedef enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_STOLEN2 = 0x40000, //same as 4
 	IE_INV_ITEM_CONVERSABLE = 0x80000,
 	IE_INV_ITEM_PULSATING = 0x100000
-} ieCREItemFlagBits;
+};
 
 #define IE_INV_DEPLETABLE (IE_INV_ITEM_MAGICAL|IE_INV_ITEM_DESTRUCTIBLE)
 
@@ -127,13 +129,13 @@ typedef enum ieCREItemFlagBits : uint32_t {
 //item header itself
 struct ItemExtHeader {
 	ieDword slot;
-	ieDword headerindex;
+	size_t headerindex;
 	//from itmextheader
 	ieByte AttackType;
 	ieByte IDReq;
 	ieByte Location;
 	ieByte unknown1;
-	ieResRef UseIcon;
+	ResRef UseIcon;
 	ieStrRef Tooltip;
 	ieByte Target;
 	ieByte TargetNumber;
@@ -155,7 +157,10 @@ struct ItemExtHeader {
 	ieWord MeleeAnimation[3];
 	int ProjectileQualifier; //this is a derived value determined on load time
 	//other data
-	ieResRef itemname;
+	ResRef itemName;
+
+	// copy over shared fields
+	void CopyITMExtHeader(const ITMExtHeader& src);
 };
 
 /**
@@ -167,7 +172,7 @@ struct ItemExtHeader {
 
 class GEM_EXPORT CREItem {
 public:
-	ieResRef ItemResRef;
+	ResRef ItemResRef;
 	//recent research showed that this field is used by the create item
 	//for days effect. This field shows the expiration in gametime hours
 	ieWord Expired;
@@ -186,15 +191,17 @@ public:
 		Flags = 0;
 		Expired = 0;
 	};
-	CREItem(STOItem *item)
+	explicit CREItem(const STOItem *item)
 	{
 		CopySTOItem(item);
 	};
-	void CopySTOItem(STOItem *item)
+	void CopySTOItem(const STOItem *item)
 	{
-		CopyResRef(ItemResRef, item->ItemResRef);
+		ItemResRef = item->ItemResRef;
 		Expired = 0; // PurchasedAmount in STOItem
-		memcpy(Usages, item->Usages, sizeof(ieWord)*CHARGE_COUNTERS);
+		Usages[0] = item->Usages[0];
+		Usages[1] = item->Usages[1];
+		Usages[2] = item->Usages[2];
 		Flags = item->Flags;
 		Weight = item->Weight;
 		MaxStackAmount = item->MaxStackAmount;
@@ -210,7 +217,7 @@ class GEM_EXPORT Inventory {
 private:
 	std::vector<CREItem*> Slots;
 	Actor* Owner;
-	int InventoryType;
+	ieInventoryType InventoryType = ieInventoryType::HEAP;
 	/** Total weight of all items in Inventory */
 	int Weight;
 
@@ -231,16 +238,16 @@ public:
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
 	/** Returns number of items in the inventory */
-	int CountItems(const char *resref, bool charges) const;
+	int CountItems(const ResRef &resref, bool charges) const;
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const char *resref, unsigned int slot) const;
 	/** returns true if contains one itemtype equipped */
 	bool HasItemType(ieDword type) const;
 	/** Looks for a particular item in the inventory.
 	 * flags: see ieCREItemFlagBits */
-	bool HasItem(const char *resref, ieDword flags) const;
+	bool HasItem(const ResRef &resref, ieDword flags) const;
 
-	void SetInventoryType(int arg);
+	void SetInventoryType(ieInventoryType arg);
 	void SetOwner(Actor* act) { Owner = act; }
 
 	/** returns number of all slots in the inventory */
@@ -277,17 +284,17 @@ public:
 
 	bool ItemsAreCompatible(const CREItem* target, const CREItem* source) const;
 	//depletes charged items
-	int DepleteItem(ieDword flags);
+	int DepleteItem(ieDword flags) const;
 	//charges recharging items
-	void ChargeAllItems(int hours);
+	void ChargeAllItems(int hours) const;
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
-	int FindItem(const char *resref, unsigned int flags, unsigned int skip=0) const;
+	int FindItem(const ResRef &resref, unsigned int flags, unsigned int skip=0) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc);
-	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, const Point &loc);
+	bool DropItemAtLocation(const ResRef& resRef, unsigned int flags, Map *map, const Point &loc);
 	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX=false);
 	int GetEquipped() const;
 	int GetEquippedHeader() const;
-	ITMExtHeader *GetEquippedExtHeader(int header=0) const;
+	const ITMExtHeader *GetEquippedExtHeader(int header=0) const;
 	void SetEquipped(ieWordSigned slot, ieWord header);
 	//right hand
 	int GetEquippedSlot() const;
@@ -301,7 +308,7 @@ public:
 	ieDword GetItemFlag(unsigned int slot) const;
 	/** Changes the inventory flags */
 	/** flags: see ieCREItemFlagBits */
-	bool ChangeItemFlag(ieDword slot, ieDword value, int mode);
+	bool ChangeItemFlag(ieDword slot, ieDword value, int mode) const;
 	/** Equips the item, don't use it directly for weapons */
 	bool EquipItem(ieDword slot);
 	bool UnEquipItem(ieDword slot, bool removecurse) const;
@@ -316,9 +323,9 @@ public:
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL) const;
 	/** Creates an item in the slot*/
-	void SetSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
+	void SetSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** Adds item to slot*/
-	void AddSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
+	void AddSlotItemRes(const ResRef& ItemResRef, int Slot, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** returns the itemtype held in the left hand */
 	ieWord GetShieldItemType() const;
 	/** returns the itemtype of the item in the armor slot, mostly used in IWD2 */
@@ -332,19 +339,19 @@ public:
 	/** Equips best weapon */
 	void EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */
-	bool GetEquipmentInfo(ItemExtHeader *array, int startindex, int count);
+	bool GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count) const;
 	/** returns the exclusion bits */
 	ieDword GetEquipExclusion(int index) const;
 	/** returns if a slot is temporarily blocked */
 	bool IsSlotBlocked(int slot) const;
 	/** returns true if a two handed weapon is in slot */
-	inline bool TwoHandedInSlot(int slot) const;
+	bool TwoHandedInSlot(int slot) const;
 	/** returns the strref for the reason why the item cannot be equipped */
 	int WhyCantEquip(int slot, int twohanded, bool ranged = false) const;
 	/** returns a slot that has a stealable item */
 	int FindStealableItem();
 	/** checks if any equipped item provides critical hit aversion */
-	bool ProvidesCriticalAversion();
+	bool ProvidesCriticalAversion() const;
 	/** tries to merge the passed item with the one in the passed slot */
 	int MergeItems(int slot, CREItem *item);
 	bool FistsEquipped() const;

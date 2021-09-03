@@ -83,7 +83,7 @@ public:
 	public:
 		std::atomic<log_level> level;
 		
-		LogWriter(log_level level) : level(level) {}
+		explicit LogWriter(log_level level) : level(level) {}
 		virtual ~LogWriter() = default;
 		
 		void WriteLogMessage(log_level level, const char* owner, const char* message, log_color color) {
@@ -108,7 +108,7 @@ private:
 	void ProcessMessages(QueueType queue);
 	
 public:
-	Logger(std::deque<WriterPtr>);
+	explicit Logger(std::deque<WriterPtr>);
 	~Logger();
 	
 	void AddLogWriter(WriterPtr writer);
@@ -117,7 +117,7 @@ public:
 	void LogMsg(LogMessage&& msg);
 };
 
-extern const char* log_level_text[];
+extern const char* const log_level_text[];
 
 }
 

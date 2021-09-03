@@ -18,6 +18,8 @@
 
 #include "OGGReader.h"
 
+#include "System/Logging.h"
+
 using namespace GemRB;
 
 static size_t ovfd_read(void *ptr, size_t size, size_t nmemb, void *datasource)
@@ -63,13 +65,12 @@ static int ovfd_close(void * /*datasource*/) {
 }
 
 static long ovfd_tell(void *datasource) {
-	DataStream *vb = (DataStream *) datasource;
+	const DataStream *vb = (const DataStream *) datasource;
 	return (long) vb->GetPos();
 }
 
-bool OGGReader::Open(DataStream* stream)
+bool OGGReader::Import(DataStream* stream)
 {
-	str = stream;
 	Close();
 
 	char Signature[4];
@@ -78,13 +79,13 @@ bool OGGReader::Open(DataStream* stream)
 	if(strnicmp(Signature, "oggs", 4) != 0)
 		return false;
 
-	vorbis_info *info;
+	const vorbis_info *info;
 	int res;
 	ov_callbacks cbstruct = {
 		ovfd_read, ovfd_seek, ovfd_close, ovfd_tell
 	};
 
-	res=ov_open_callbacks(str, &OggStream, NULL, 0, cbstruct);
+	res=ov_open_callbacks(stream, &OggStream, NULL, 0, cbstruct);
 	if(res<0) {
 		Log(ERROR, "Sound", "Couldn't initialize vorbis!");
 		return false;

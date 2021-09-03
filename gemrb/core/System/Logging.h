@@ -30,11 +30,7 @@
 
 #include "System/Logger.h"
 
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
+#include <cstdarg>
 
 namespace GemRB {
 

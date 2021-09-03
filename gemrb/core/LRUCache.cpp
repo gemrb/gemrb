@@ -37,11 +37,6 @@ LRUCache::LRUCache() : v(), head(0), tail(0) {
 	v.ParseKey(1);
 }
 
-LRUCache::~LRUCache()
-{
-
-}
-
 int LRUCache::GetCount() const
 {
 	return v.GetCount();

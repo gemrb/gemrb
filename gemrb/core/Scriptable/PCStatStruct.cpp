@@ -25,52 +25,8 @@
 
 namespace GemRB {
 
-void PCStatsStruct::Init(bool all)
+PCStatsStruct::PCStatsStruct(const std::list<int>& levels)
 {
-	BestKilledName = 0xffffffff;
-	BestKilledXP = 0;
-	KillsChapterXP = 0;
-	KillsChapterCount = 0;
-	KillsTotalXP = 0;
-	KillsTotalCount = 0;
-	memset( FavouriteSpells, 0, sizeof(FavouriteSpells) );
-	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
-	memset( FavouriteWeapons, 0, sizeof(FavouriteWeapons) );
-	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
-	memset(QSlots, 0, sizeof(QSlots));
-	QSlots[0]=0xff;
-	memset( QuickSpells, 0, sizeof(QuickSpells) );
-	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
-	memset( QuickItemSlots, -1, sizeof(QuickItemSlots) );
-	memset( QuickItemHeaders, -1, sizeof(QuickItemHeaders) );
-	memset( QuickWeaponSlots, -1, sizeof(QuickWeaponSlots) );
-	memset( QuickWeaponHeaders, -1, sizeof(QuickWeaponHeaders) );
-	memset( ExtraSettings, 0, sizeof(ExtraSettings) );
-	JoinDate = 0;
-	if (!all) {
-		return;
-	}
-	// move them up as needed
-	AwayTime = 0;
-	unknown10 = 0;
-	Happiness = 0;
-	SoundSet[0]=0;
-	SoundFolder[0]=0;
-	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
-	memset( PreviousPortraitIcons, -1, sizeof(PreviousPortraitIcons) );
-	memset( PortraitIconString, 0, sizeof(PortraitIconString) );
-	LastLeft = 0;
-	LastJoined = 0;
-}
-
-PCStatsStruct::PCStatsStruct()
-{
-	Init();
-}
-
-PCStatsStruct::PCStatsStruct(std::list<int> levels)
-{
-	Init();
 	UpdateClassLevels(levels);
 }
 
@@ -84,12 +40,14 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	KillsChapterCount = source.KillsChapterCount;
 	KillsTotalXP = source.KillsTotalXP;
 	KillsTotalCount = source.KillsTotalCount;
-	memcpy(FavouriteSpells, source.FavouriteSpells, sizeof(FavouriteSpells));
+	std::copy(std::begin(source.FavouriteSpells), std::end(source.FavouriteSpells), std::begin(FavouriteSpells));
 	memcpy(FavouriteSpellsCount, source.FavouriteSpellsCount, sizeof(FavouriteSpellsCount));
-	memcpy(FavouriteWeapons, source.FavouriteWeapons, sizeof(FavouriteWeapons));
+	std::copy(std::begin(source.FavouriteWeapons), std::end(source.FavouriteWeapons), std::begin(FavouriteWeapons));
 	memcpy(FavouriteWeaponsCount, source.FavouriteWeaponsCount, sizeof(FavouriteWeaponsCount));
 	memcpy(QSlots, source.QSlots, sizeof(QSlots));
-	memcpy(QuickSpells, source.QuickSpells, sizeof(QuickSpells));
+	for (int i = 0; i < MAX_QSLOTS; i++) {
+		QuickSpells[i] = source.QuickSpells[i];
+	}
 	memcpy(QuickSpellClass, source.QuickSpellClass, sizeof(QuickSpellClass));
 	memcpy(QuickItemSlots, source.QuickItemSlots, sizeof(QuickItemSlots));
 	memcpy(QuickItemHeaders, source.QuickItemHeaders, sizeof(QuickItemHeaders));
@@ -100,11 +58,9 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	AwayTime = source.AwayTime;
 	unknown10 = source.unknown10;
 	Happiness = source.Happiness;
-	strlcpy(SoundSet, source.SoundSet, sizeof(ieResRef));
+	SoundSet = source.SoundSet;
 	strlcpy(SoundFolder, source.SoundFolder, SOUNDFOLDERSIZE-1);
-	memcpy(PortraitIcons, source.PortraitIcons, sizeof(PortraitIcons));
-	memcpy(PreviousPortraitIcons, source.PreviousPortraitIcons, sizeof(PreviousPortraitIcons));
-	memcpy(PortraitIconString, source.PortraitIconString, sizeof(PortraitIconString));
+	States = source.States;
 	LastLeft = source.LastLeft;
 	LastJoined = source.LastJoined;
 	UpdateClassLevels(source.ClassLevels);
@@ -146,16 +102,14 @@ void PCStatsStruct::SetQuickItemSlot(int idx, int slot, int headerindex)
 void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 {
 	if (!which) {
-		int i;
-
-		for(i=0;i<MAX_QUICKITEMSLOT;i++) {
+		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
 			if (slot==QuickItemSlots[i]) {
 				QuickItemHeaders[i]=headerindex;
 				return;
 			}
 		}
 
-		for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+		for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
 			if (slot==QuickWeaponSlots[i]) {
 				QuickWeaponHeaders[i]=headerindex;
 				return;
@@ -225,7 +179,7 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 }
 
 //returns both the inventory slot and the header index associated to a quickslot
-void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex)
+void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex) const
 {
 	int idx;
 
@@ -255,15 +209,13 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 
 //return the item extended header assigned to an inventory slot (the ability to use)
 //only quickslots have this assignment, equipment items got all abilities available
-int PCStatsStruct::GetHeaderForSlot(int slot)
+int PCStatsStruct::GetHeaderForSlot(int slot) const
 {
-	int i;
-
-	for(i=0;i<MAX_QUICKITEMSLOT;i++) {
+	for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
 		if(QuickItemSlots[i]==slot) return (ieWordSigned) QuickItemHeaders[i];
 	}
 
-	for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+	for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
 		if(QuickWeaponSlots[i]==slot) return (ieWordSigned) QuickWeaponHeaders[i];
 	}
 	return -1;
@@ -278,9 +230,9 @@ int PCStatsStruct::GetHeaderForSlot(int slot)
 //but also swap it with a previous slot if its usage count is now better, so the last slot is always the weakest
 //finally if it was not found anywhere, register it as the new candidate with 1 usage
 
-void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
+void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
 {
-	ieResRef *respoi;
+	ResRef *respoi;
 	ieWord *cntpoi;
 
 	switch (what) {
@@ -301,7 +253,7 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 	int mincnt = cntpoi[0];
 	int pos = 0;
 	for (pos = 0; pos<MAX_FAVOURITES-1; pos++) {
-		if (!strnicmp(fav, respoi[pos], 8) ) {
+		if (fav == respoi[pos]) {
 			//found an old favourite, just increase its usage count and done
 			if (cntpoi[pos]<0xffff) {
 				if (cntpoi[pos] == mincnt) {
@@ -322,10 +274,9 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 	}
 
 	//pos is always MAX_FAVOURITES-1 here
-	if (strnicmp(fav, respoi[pos], 8) ) {
+	if (fav != respoi[pos]) {
 		//new favourite candidate, scrapping the old one
 		cntpoi[pos] = 1;
-		strnuprcpy(respoi[pos], fav, 8);
 		return;
 	}
 	//increase the favourite candidate
@@ -334,13 +285,49 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 		//if it is now exceeding an old favourite, swap them
 
 		//move the old resref to the last position
-		memcpy(respoi[pos], respoi[minpos], sizeof(ieResRef) );
+		respoi[pos] = respoi[minpos];
 		//store the new resref into the new position
-		strnuprcpy(respoi[minpos], fav, 8);
+		respoi[minpos] = fav;
 		//store the new count to the new position
 		cntpoi[minpos] = cntpoi[pos];
 		//store the old count to the last position
 		cntpoi[pos] = mincnt;
+	}
+}
+
+std::string PCStatsStruct::GetStateString() const
+{
+	std::string str;
+	str.reserve(MAX_PORTRAIT_ICONS);
+	for (const auto& state : States) {
+		if (state.enabled) {
+			str.push_back(state.state + 66);
+		}
+	}
+	return str;
+}
+
+void PCStatsStruct::EnableState(state_t icon)
+{	
+	for (auto& state : States) {
+		if (state.state == InvalidState) {
+			state.state = icon;
+			state.enabled = true;
+			return;
+		} else if (state.state == icon) {
+			state.enabled = true;
+			return;
+		}
+	}
+}
+
+void PCStatsStruct::DisableState(state_t icon)
+{
+	for (auto& state : States) {
+		if (state.state == icon) {
+			state.enabled = false;
+			return;
+		}
 	}
 }
 

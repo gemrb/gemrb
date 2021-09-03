@@ -25,17 +25,15 @@
 
 #include "globals.h"
 
-#define _USE_MATH_DEFINES
-
 #include <cmath>
 #include <cstdint>
-#include <ctype.h>
+#include <cctype>
 #include <cstdint>
-#include <errno.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cerrno>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
  
 #define av_const
 #define av_cold

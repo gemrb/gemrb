@@ -31,19 +31,14 @@
 #include "ie_types.h"
 #include <type_traits>
 
-#define VERSION_GEMRB "0.9.0"
+#include <cmath>
+
+#define VERSION_GEMRB "0.9.0-git"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 #define PACKAGE "GemRB"
 
-#ifdef ANDROID
-# define S_IEXEC  S_IXUSR
-# define S_IREAD  S_IRUSR
-# define S_IWRITE S_IWUSR
-#endif
-
 #include "RGBAColor.h"
-#include "SClassID.h"
 #include "errors.h"
 
 #include "Region.h"
@@ -51,19 +46,14 @@
 #include "System/String.h"
 
 #include <algorithm>
-#include <chrono>
-
-#include "System/Logging.h"
-
 #include <bitset>
 #include <climits>
+#include <chrono>
+#include <memory>
 
 namespace GemRB {
 
 //Global Variables
-
-#define IE_NORMAL 0
-#define IE_SHADED 1
 
 #define IE_STR_STRREFON   1
 #define IE_STR_SOUND      2
@@ -166,6 +156,7 @@ enum GameFeatureFlags : uint32_t {
 	GF_HAPPINESS,                   	// all except pst and iwd2
 	GF_EFFICIENT_OR,                	// does the OR trigger shortcircuit on success or not? Only in iwd2
 	GF_LAYERED_WATER_TILES,				// TileOverlay for water has an extra half transparent layer (all but BG1)
+	GF_CLEARING_ACTIONOVERRIDE, // bg2, not iwd2
 
 	GF_COUNT // sentinal count
 };
@@ -201,25 +192,84 @@ GEM_EXPORT unsigned int SquaredMapDistance(const Scriptable *a, const Scriptable
 GEM_EXPORT unsigned int PersonalLineDistance(const Point &v, const Point &w, const Scriptable *s, double *proj);
 GEM_EXPORT double Feet2Pixels(int feet, double angle);
 GEM_EXPORT bool WithinAudibleRange(const Actor *actor, const Point &dest);
-GEM_EXPORT bool WithinRange(const Actor *actor, const Point &dest, int distance);
-GEM_EXPORT bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance);
+GEM_EXPORT bool WithinRange(const Scriptable *actor, const Point &dest, int distance);
+GEM_EXPORT bool WithinPersonalRange(const Scriptable *actor, const Point &dest, int distance);
 GEM_EXPORT int EARelation(const Scriptable *a, const Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
+GEM_EXPORT int CountElements(const char *str, char separator);
+
+// explode a CSV resref list into separate storage
+template<typename T>
+std::vector<T> GetElements(const char *str)
+{
+	std::vector<T> elements;
+	int i = 0;
+	for (char *part = strtok((char*) str, ","); part; part = strtok(nullptr, ",")) {
+		// there is one single screwed up entry in pst ar1100.ini: cre_file = bird, outlim
+		if (*part == ' ') part++;
+		elements.emplace_back(part);
+		i++;
+	}
+	return elements;
+}
 
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
-inline unsigned long GetTicks()
+using tick_t = unsigned long; // milliseconds
+inline tick_t GetTicks()
 {
 	using namespace std::chrono;
 	return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-inline bool valid_number(const char* string, long& val)
+template<typename T>
+T strtosigned(const char* str, char** endptr = nullptr, int base = 0)
 {
-	char* endpr;
+	static_assert(std::is_integral<T>::value, "Type must be integral.");
+	static_assert(sizeof(T) <= sizeof(long), "Type is too big for conversion.");
+	static_assert(std::is_signed<T>::value, "Type must be signed");
+	
+	long ret = strtol(str, endptr, base);
+	if (ret > std::numeric_limits<T>::max()) {
+		return std::numeric_limits<T>::max();
+	}
+	
+	if (ret < std::numeric_limits<T>::min()) {
+		return std::numeric_limits<T>::min();
+	}
+	
+	return static_cast<T>(ret);
+}
 
-	val = (long) strtoul( string, &endpr, 0 );
-	return ( const char * ) endpr != string;
+template<typename T>
+inline bool valid_signednumber(const char* string, T& val)
+{
+	char* endpr = nullptr;
+	val = strtosigned<T>(string, &endpr, 0);
+	return endpr != string;
+}
+
+template<typename T>
+T strtounsigned(const char* str, char** endptr = nullptr, int base = 0)
+{
+	static_assert(std::is_integral<T>::value, "Type must be integral.");
+	static_assert(sizeof(T) <= sizeof(long), "Type is too big for conversion.");
+	static_assert(std::is_unsigned<T>::value, "Type must be unsigned");
+	
+	unsigned long ret = strtoul(str, endptr, base);
+	if (ret > std::numeric_limits<T>::max()) {
+		return std::numeric_limits<T>::max();
+	}
+	
+	return static_cast<T>(ret);
+}
+
+template<typename T>
+inline bool valid_unsignednumber(const char* string, T& val)
+{
+	char* endpr = nullptr;
+	val = strtounsigned<T>(string, &endpr, 0);
+	return endpr != string;
 }
 
 template <typename T>
@@ -232,7 +282,6 @@ inline bool SetBits(T& flag, const T& value, int mode)
 		case OP_AND: flag &= value; break;
 		case OP_XOR: flag ^= value; break;
 		default:
-			Log(ERROR, "SetBits", "Unrecognized Bit Operation %i", mode);
 			return false;
 	}
 	return true;
@@ -292,6 +341,13 @@ inline T CeilDiv(T dividend, T divisor)
 	} else {
 		return CeilDivSlow(dividend, divisor);
 	}
+}
+
+// TODO: remove this when we switch to c++14
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
 //we need 32+6 bytes at least, because we store 'context' in the variable

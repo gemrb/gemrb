@@ -32,18 +32,12 @@ from ie_stats import *
 CommonTables.Load ()
 
 def GetWindowPack():
-	width = GemRB.GetSystemVariable (SV_WIDTH)
 	height = GemRB.GetSystemVariable (SV_HEIGHT)
 
 	if GemRB.GameType == "pst":
 		default = "GUIWORLD"
 	else:
 		default = "GUIW"
-
-	# use a custom gui if there is one
-	gui = "CGUI" + str(width)[:2] + str(height)[:2]
-	if GemRB.HasResource (gui, RES_CHU, 1):
-		return gui
 
 	# select this based on height
 	# we do this because:
@@ -101,10 +95,6 @@ def GetActorPaperDoll (actor):
 
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
-
-def GearsClicked ():
-	#GemRB.SetPlayerStat(GemRB.GameGetFirstSelectedPC (),44,249990)
-	GemRB.GamePause (2, 0)
 
 def GetAbilityBonus (Actor, Stat):
 	Ability = GemRB.GetPlayerStat (Actor, Stat)
@@ -288,14 +278,14 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 	ratio = encumbrance / max_encumb
 	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
 		if ratio > 1.0:
-			Control.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
+			Control.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
 		elif ratio > 0.8:
-			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+			Control.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+			Control.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 		if Control2ID:
-			Control2.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
+			Control2.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
 
 	else:
 		if ratio > 1.0:

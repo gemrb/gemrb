@@ -42,13 +42,10 @@ static bool inited = false;
 InfoPoint::InfoPoint(void)
 	: Highlightable( ST_TRIGGER )
 {
-	Destination[0] = 0;
-	EntranceName[0] = 0;
 	Flags = 0;
 	TrapDetectionDiff = 0;
 	TrapRemovalDiff = 0;
 	TrapDetected = 0;
-	TrapLaunch.empty();
 	if (!inited) {
 		inited = true;
 		//TRAP_USEPOINT may have three values
@@ -60,18 +57,12 @@ InfoPoint::InfoPoint(void)
 		else TRAP_USEPOINT = 0;
 	}
 	StrRef = 0;
-	UsePoint.empty();
-	TalkPos.empty();
-}
-
-InfoPoint::~InfoPoint(void)
-{
 }
 
 void InfoPoint::SetEnter(const char *resref)
 {
 	if (gamedata->Exists(resref, IE_WAV_CLASS_ID) ) {
-		strnuprcpy(EnterWav, resref, 8);
+		EnterWav = MakeUpperCaseResRef(resref);
 	}
 }
 
@@ -82,7 +73,7 @@ ieDword InfoPoint::GetUsePoint() const {
 //checks if the actor may use this travel trigger
 //bit 1 : can use
 //bit 2 : whole team
-int InfoPoint::CheckTravel(Actor *actor)
+int InfoPoint::CheckTravel(const Actor *actor) const
 {
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
 	bool pm = actor->IsPartyMember();
@@ -173,7 +164,7 @@ bool InfoPoint::Entered(Actor *actor)
 		// be more lenient for travel regions, fixed iwd2 ar1100 to1101 region
 		if (Type == ST_TRAVEL && outline->BBox.PointInside(actor->Pos)) goto check;
 		if (outline->PointIn( actor->Pos)) goto check;
-	} else if (!BBox.Dimensions().IsEmpty()) {
+	} else if (!BBox.size.IsInvalid()) {
 		if (BBox.PointInside(actor->Pos)) goto check;
 	} else {
 		// this is to trap possible bugs in our understanding of ARE polygons that arent actually polygons
@@ -252,7 +243,7 @@ void InfoPoint::dump() const
 	buffer.appendFormatted( "UsePoint: %d.%d  (on: %s)\n", UsePoint.x, UsePoint.y, YESNO(GetUsePoint()));
 	switch(Type) {
 	case ST_TRAVEL:
-		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination, EntranceName);
+		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination.CString(), EntranceName.CString());
 		break;
 	case ST_PROXIMITY:
 		buffer.appendFormatted( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
@@ -264,11 +255,11 @@ void InfoPoint::dump() const
 		break;
 	default:;
 	}
-	const char *name = "NONE";
+	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, Dialog );
+	buffer.appendFormatted("Script: %s, Key: %s, Dialog: %s\n", name.CString(), KeyResRef.CString(), Dialog.CString());
 	buffer.appendFormatted( "Deactivated: %s\n", YESNO(Flags&TRAP_DEACTIVATED));
 	buffer.appendFormatted( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
 	Log(DEBUG, "InfoPoint", buffer);

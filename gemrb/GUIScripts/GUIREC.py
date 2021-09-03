@@ -127,6 +127,8 @@ def UpdateRecordsWindow (Window):
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	pic = GemRB.GetPlayerPortrait (pc, 0)["Sprite"]
+	if not pic:
+		pic = ""
 	if GameCheck.IsBG2() and not GameCheck.IsBG2Demo():
 		Button.SetPicture (pic, "NOPORTMD")
 	else:
@@ -167,27 +169,27 @@ def UpdateRecordsWindow (Window):
 
 	Label = Window.GetControl (0x1000002f)
 	Label.SetText (sstr)
-	Label.SetTextColor (cstr)
+	Label.SetColor (cstr)
 
 	Label = Window.GetControl (0x10000009)
 	Label.SetText (sdex)
-	Label.SetTextColor (cdex)
+	Label.SetColor (cdex)
 
 	Label = Window.GetControl (0x1000000a)
 	Label.SetText (scon)
-	Label.SetTextColor (ccon)
+	Label.SetColor (ccon)
 
 	Label = Window.GetControl (0x1000000b)
 	Label.SetText (sint)
-	Label.SetTextColor (cint)
+	Label.SetColor (cint)
 
 	Label = Window.GetControl (0x1000000c)
 	Label.SetText (swis)
-	Label.SetTextColor (cwis)
+	Label.SetColor (cwis)
 
 	Label = Window.GetControl (0x1000000d)
 	Label.SetText (schr)
-	Label.SetTextColor (cchr)
+	Label.SetColor (cchr)
 
 	# class
 	ClassTitle = GUICommon.GetActorClassTitle (pc)
@@ -424,16 +426,10 @@ def GetEffectIcons(pc,LevelDiff):
 	# but don't display them in levelup stat view
 	if sum (LevelDiff) == 0:
 		effects = GemRB.GetPlayerStates (pc)
-		print(222, effects)
 		if len (effects):
 			for c in effects:
-				c2 = c
-				if isinstance(c, int):
-					c2 = "".join(chr(x) for x in bytes([c]))
-				else:
-					c = ord(c)
 				tmp = StateTable.GetValue (str(c - 66), "DESCRIPTION")
-				stats.append ((tmp, c2, 'a'))
+				stats.append ((tmp, c, 'a'))
 	return TypeSetStats (stats, pc)
 
 ########################################################################
@@ -459,10 +455,10 @@ def GetProficiencies(pc, cdet):
 		stats.append ( (9457, str(tohit["Base"])+" ("+str(tohit["Total"])+")", '0') )
 
 	tmp = cdet["APR"]
+	tmp2 = str(tmp // 2)
 	if (tmp&1):
-		tmp2 = str (tmp // 2) + chr (189) #must use one higher than the frame count
-	else:
-		tmp2 = str (tmp // 2)
+		tmp2 += "[+int=" + str(189) + "]" #must use one higher than the frame count
+
 	stats.append ( (9458, tmp2, '') )
 	return TypeSetStats (stats, pc)
 
@@ -774,7 +770,7 @@ def TypeSetStats(stats, pc=0):
 				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif stattype == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
-				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
+				res.append ("[cap][int=" + str(val) + "]%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 				noP = True
 			elif stattype == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
@@ -968,7 +964,6 @@ def KitDonePress():
 	return
 
 def OpenColorWindow ():
-	global PortraitWindow
 	global PaperdollButton
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
@@ -978,22 +973,23 @@ def OpenColorWindow ():
 	MajorColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
 	SkinColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
 	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	GUIRECCommon.SubCustomizeWindow = GemRB.LoadWindow (21)
+	Window = GemRB.LoadWindow (21)
+	Window.AddAlias("SUB_WIN", 0)
 
-	PaperdollButton = GUIRECCommon.SubCustomizeWindow.GetControl (0)
+	PaperdollButton = Window.GetControl (0)
 	PaperdollButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PaperdollButton.SetState (IE_GUI_BUTTON_LOCKED)
 
-	HairButton = GUIRECCommon.SubCustomizeWindow.GetControl (3)
-	SkinButton = GUIRECCommon.SubCustomizeWindow.GetControl (4)
-	MajorButton = GUIRECCommon.SubCustomizeWindow.GetControl (5)
-	MinorButton = GUIRECCommon.SubCustomizeWindow.GetControl (6)
+	HairButton = Window.GetControl (3)
+	SkinButton = Window.GetControl (4)
+	MajorButton = Window.GetControl (5)
+	MinorButton = Window.GetControl (6)
 
-	DoneButton = GUIRECCommon.SubCustomizeWindow.GetControl (12)
+	DoneButton = Window.GetControl (12)
 	DoneButton.SetText (11973)
 	DoneButton.MakeDefault()
 
-	CancelButton = GUIRECCommon.SubCustomizeWindow.GetControl (13)
+	CancelButton = Window.GetControl (13)
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
 
@@ -1002,10 +998,10 @@ def OpenColorWindow ():
 	MajorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMajorColor)
 	MinorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMinorColor)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneColorWindow)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.CloseSubCustomizeWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	UpdatePaperDoll ()
 
-	GUIRECCommon.SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DoneColorWindow ():
@@ -1014,7 +1010,7 @@ def DoneColorWindow ():
 	GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, MajorColor)
 	GemRB.SetPlayerStat (pc, IE_SKIN_COLOR, SkinColor)
 	GemRB.SetPlayerStat (pc, IE_HAIR_COLOR, HairColor)
-	GUIRECCommon.CloseSubCustomizeWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	return
 
 def UpdatePaperDoll ():
@@ -1063,11 +1059,12 @@ def SetMajorColor ():
 	return
 
 def OpenColorPicker ():
-	GUIRECCommon.SubSubCustomizeWindow = GemRB.LoadWindow (22)
+	Window = GemRB.LoadWindow (22)
+	Window.AddAlias("SUB_WIN", 1)
 
 	GemRB.SetVar ("Selected",-1)
 	for i in range (1,35):
-		Button = GUIRECCommon.SubSubCustomizeWindow.GetControl (i)
+		Button = Window.GetControl (i)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
 
@@ -1075,7 +1072,7 @@ def OpenColorPicker ():
 		MyColor = ColorTable.GetValue (ColorIndex, i)
 		if MyColor == "*":
 			break
-		Button = GUIRECCommon.SubSubCustomizeWindow.GetControl (i+1)
+		Button = Window.GetControl (i+1)
 		Button.SetBAM("COLGRAD", 2, 0, MyColor)
 		if PickedColor == MyColor:
 			GemRB.SetVar ("Selected",i)
@@ -1083,14 +1080,14 @@ def OpenColorPicker ():
 		Button.SetVarAssoc("Selected",i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 
-	GUIRECCommon.SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DonePress():
 	global HairColor, SkinColor, MajorColor, MinorColor
 	global PickedColor
 
-	GUIRECCommon.CloseSubSubCustomizeWindow ()
+	GemRB.GetView("SUB_WIN", 1).Close()
 	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
 	if ColorIndex==0:
 		HairColor=PickedColor

@@ -5,7 +5,6 @@
 
 #cmakedefine SIZEOF_INT ${SIZEOF_INT}
 #cmakedefine SIZEOF_LONG_INT ${SIZEOF_LONG_INT}
-#cmakedefine HAVE_SIZEOF_SSIZE_T 1
 #cmakedefine HAVE_STRNDUP 1
 #cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_REALPATH 1
@@ -23,7 +22,6 @@
 #cmakedefine HAVE_UNISTD_H 1
 #cmakedefine HAVE_LANGINFO_H 1
 #cmakedefine HAVE_DLFCN_H 1
-#cmakedefine HAS_OBJALIGN4 1
 #cmakedefine HAS_WSTRING 1
 #cmakedefine HAVE_OPENAL_EFX_H 1
 #cmakedefine WIN32_USE_STDIO 1

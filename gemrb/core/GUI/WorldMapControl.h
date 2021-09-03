@@ -48,7 +48,7 @@ class GEM_EXPORT WorldMapControl : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
-	void DrawSelf(Region drawFrame, const Region&) override;
+	void DrawSelf(const Region& drawFrame, const Region&) override;
 
 public:
 	WorldMapControl(const Region& frame, Font *font);
@@ -63,6 +63,7 @@ public:
 	Point Pos;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area = nullptr;
+	Holder<Sprite2D> areaIndicator;
 	ColorAnimation hoverAnim;
 
 protected:
@@ -84,7 +85,7 @@ private:
 	//font for printing area names
 	Font* ftext;
 	//current area
-	ieResRef currentArea;
+	ResRef currentArea;
 
 	/** Label color of a visited area */
 

@@ -25,7 +25,7 @@
 
 #include "Inventory.h"
 #include "Scriptable/Scriptable.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -40,7 +40,6 @@ namespace GemRB {
 class GEM_EXPORT Container : public Highlightable {
 public:
 	Container(void);
-	~Container(void) override;
 	void SetContainerLocked(bool lock);
 	//turns the container to a pile
 	void DestroyContainer();
@@ -55,16 +54,15 @@ public:
 	int IsOpen() const;
 	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor *actor);
-	bool TryUnlock(Actor *actor);
+	bool TryUnlock(Actor *actor) const;
 	void dump() const;
 	int TrapResets() const override { return Flags & CONT_RESET; }
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
-	void FreeGroundIcons();
 public:
 	Point toOpen;
-	ieWord Type;
+	ieWord containerType;
 	ieDword Flags;
 	ieWord LockDifficulty;
 	Inventory inventory;

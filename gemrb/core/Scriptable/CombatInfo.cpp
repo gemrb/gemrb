@@ -34,28 +34,30 @@ static bool third = false;
 static void SetBonusInternal(int& current, int bonus, int mod)
 {
 	int newBonus = current;
+	int tmp;
 
 	switch (mod) {
-		case 0: // cummulative modifier
-			if (third) {
-				// 3ed boni don't stack
-				// but, use some extra logic so any negative boni first try to cancel out
-				int tmp = bonus;
-				if ((current < 0) ^ (bonus < 0)) {
-					tmp = current + bonus;
-				}
-				if (tmp != bonus) {
-					// we just summed the boni, so we need to be careful about the resulting sign, since (-2+3)>(-2), but abs(-2+3)<abs(-2)
-					if (tmp > current) {
-						newBonus = tmp;
-					} // else leave it be at the current value
-				} else {
-					if (abs(tmp) > abs(current)) {
-						newBonus = tmp;
-					} // else leave it be at the current value
-				}
-			} else {
+		case 0: // cumulative modifier
+			if (!third) {
 				newBonus += bonus;
+				break;
+			}
+
+			// 3ed boni don't stack
+			// but, use some extra logic so any negative boni first try to cancel out
+			tmp = bonus;
+			if ((current < 0) ^ (bonus < 0)) {
+				tmp = current + bonus;
+			}
+			if (tmp != bonus) {
+				// we just summed the boni, so we need to be careful about the resulting sign, since (-2+3)>(-2), but abs(-2+3)<abs(-2)
+				if (tmp > current) {
+					newBonus = tmp;
+				} // else leave it be at the current value
+			} else {
+				if (abs(tmp) > abs(current)) {
+					newBonus = tmp;
+				} // else leave it be at the current value
 			}
 			break;
 		// like with other effects, the following options have chicked-and-egg problems and the result depends on the order of application
@@ -78,8 +80,6 @@ static void SetBonusInternal(int& current, int bonus, int mod)
  */
 ArmorClass::ArmorClass()
 {
-	natural = 0;
-	Owner = NULL;
 	ResetAll();
 
 	third = !!core->HasFeature(GF_3ED_RULES);
@@ -197,9 +197,6 @@ void ArmorClass::dump() const
  */
 ToHitStats::ToHitStats()
 {
-	base = 0;
-	babDecrement = 0;
-	Owner = NULL;
 	ResetAll();
 
 	third = !!core->HasFeature(GF_3ED_RULES);

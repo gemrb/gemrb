@@ -22,11 +22,10 @@
 #define SCRIPTENGINE_H
 
 #include "Plugin.h"
-#include "Resource.h"
+#include "System/String.h"
 
 #include <cstdint>
 #include <map>
-#include <string>
 #include <typeinfo>
 #include <vector>
 
@@ -36,20 +35,22 @@ class Point;
 
 using ScriptingId = uint64_t;
 using ScriptingClassId = std::string;
+using ScriptingGroup_t = FixedSizeString<15, strnicmp>;
+static_assert(sizeof(ScriptingGroup_t) <= 16, "Please try to keep this sensibly small. 16 bytes fits in 2 64bit registers.");
 
 class ScriptingRefBase {
 public:
 	const ScriptingId Id; // unique id for each object in a ScriptingGroup
 
-	ScriptingRefBase(ScriptingId id)
+	explicit ScriptingRefBase(ScriptingId id)
 	: Id(id) {}
 
-	virtual ~ScriptingRefBase() {};
+	virtual ~ScriptingRefBase() = default;
 
 	// key to separate groups of objects for faster searching and id collision prevention
-	virtual const ResRef& ScriptingGroup() const=0;
+	virtual const ScriptingGroup_t& ScriptingGroup() const=0;
 	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass() const=0;
+	virtual ScriptingClassId ScriptingClass() const=0;
 };
 
 template <class T>
@@ -71,19 +72,19 @@ public:
 	using ScriptingDefinitions = std::map<ScriptingId, const ScriptingRefBase*>;
 	
 private:
-	using ScriptingDict = std::map<ResRef, ScriptingDefinitions>;
+	using ScriptingDict = std::map<ScriptingGroup_t, ScriptingDefinitions>;
 	static ScriptingDict GUIDict;
 
 public:
 	static bool RegisterScriptingRef(const ScriptingRefBase* ref);
 	static bool UnregisterScriptingRef(const ScriptingRefBase* ref);
 
-	static ScriptingDefinitions GetScriptingGroup(ResRef groupId)
+	static ScriptingDefinitions GetScriptingGroup(ScriptingGroup_t groupId)
 	{
 		return GUIDict[groupId];
 	}
 
-	static const ScriptingRefBase* GetScripingRef(ResRef group, ScriptingId id)
+	static const ScriptingRefBase* GetScripingRef(ScriptingGroup_t group, ScriptingId id)
 	{
 		const ScriptingRefBase* ref = NULL;
 		ScriptingDefinitions::iterator it = GUIDict[group].find(id);
@@ -95,7 +96,7 @@ public:
 
 	class Parameter {
 		struct TypeInterface {
-			virtual ~TypeInterface() {};
+			virtual ~TypeInterface() = default;
 			virtual TypeInterface* Clone() const = 0;
 			virtual const std::type_info& Type() const = 0;
 		};
@@ -103,7 +104,7 @@ public:
 		template <typename T>
 		struct ConcreteType : public TypeInterface {
 			T value;
-			ConcreteType(T value) : value(value) {}
+			explicit ConcreteType(T value) : value(value) {}
 
 			TypeInterface *Clone() const override
 			{
@@ -119,7 +120,7 @@ public:
 
 	public:
 		template <typename T>
-		Parameter(T value) {
+		explicit Parameter(T value) {
 			ptr = new ConcreteType<T>(value);
 		}
 
@@ -144,7 +145,7 @@ public:
 		}
 
 		const std::type_info& Type() const {
-			return (ptr) ? ptr->Type() : typeid(void);
+			return ptr ? ptr->Type() : typeid(void);
 		}
 
 		template <typename T>
@@ -164,8 +165,7 @@ public:
 	static const ScriptingId InvalidId = static_cast<ScriptingId>(-1);
 
 public:
-	ScriptEngine(void) {};
-	~ScriptEngine(void) override {};
+	ScriptEngine() = default;
 	/** Initialization Routine */
 	virtual bool Init(void) = 0;
 	/** Load Script */
@@ -176,7 +176,7 @@ public:
 	virtual bool RunFunction(const char *ModuleName, const char* FunctionName, bool report_error=true, int intparam=-1) = 0;
 	virtual bool RunFunction(const char* Modulename, const char* FunctionName, bool report_error, Point) = 0;
 	/** Exec a single String */
-	virtual bool ExecString(const char* string, bool feedback) = 0;
+	virtual bool ExecString(const std::string &string, bool feedback) = 0;
 };
 
 }

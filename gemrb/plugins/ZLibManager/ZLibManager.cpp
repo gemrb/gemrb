@@ -26,16 +26,6 @@
 
 using namespace GemRB;
 
-
-ZLibManager::ZLibManager(void)
-{
-}
-
-ZLibManager::~ZLibManager(void)
-{
-}
-
-
 #define INPUTSIZE  8192
 #define OUTPUTSIZE 8192
 
@@ -56,7 +46,7 @@ int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int s
 	}
 
 	stream.avail_in = 0;
-	while (1) {
+	while (true) {
 		stream.next_out = bufferout;
 		stream.avail_out = OUTPUTSIZE;
 		if (stream.avail_in == 0) {
@@ -66,7 +56,8 @@ int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int s
 			}
 			if (!stream.avail_in || stream.avail_in > source->Remains()) {
 				//Read doesn't allow partial reads, but provides Remains
-				stream.avail_in = source->Remains();
+				unsigned long remains = std::min<unsigned long>(source->Remains(), std::numeric_limits<uInt>::max());
+				stream.avail_in = static_cast<uInt>(remains);
 			}
 			if (stream.avail_in > INPUTSIZE) {
 				stream.avail_in=INPUTSIZE;
@@ -116,13 +107,14 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 	}
 
 	stream.avail_in = 0;
-	while (1) {
+	while (true) {
 		stream.next_out = bufferout;
 		stream.avail_out = OUTPUTSIZE;
 		if (stream.avail_in == 0) {
 			stream.next_in = bufferin;
 			//Read doesn't allow partial reads, but provides Remains
-			stream.avail_in = source->Remains();
+			unsigned long remains = std::min<unsigned long>(source->Remains(), std::numeric_limits<uInt>::max());
+			stream.avail_in = static_cast<uInt>(remains);
 			if (stream.avail_in > INPUTSIZE) {
 				stream.avail_in=INPUTSIZE;
 			}

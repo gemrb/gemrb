@@ -22,7 +22,7 @@
 #include "Palette.h"
 #include "Sprite2D.h"
 #include "System/String.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <algorithm>
 #include <climits>
@@ -37,17 +37,17 @@ Content::Content(const Size& size)
 
 LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 {
-	return { std::make_shared<LayoutRegion>(Region(rgn.Origin() + p, frame.Dimensions())) };
+	return { std::make_shared<LayoutRegion>(Region(rgn.origin + p, frame.size)) };
 }
 
 TextSpan::TextSpan(const String& string, const Font* fnt, const Size* frame)
-	: Content((frame) ? *frame : Size()), text(string), font(fnt)
+	: Content(frame ? *frame : Size()), text(string), font(fnt)
 {
 	Alignment = IE_FONT_ALIGN_LEFT;
 }
 
 TextSpan::TextSpan(const String& string, const Font* fnt, Font::PrintColors cols, const Size* frame)
-	: Content((frame) ? *frame : Size()), text(string), font(fnt), colors(new Font::PrintColors(cols))
+	: Content(frame ? *frame : Size()), text(string), font(fnt), colors(new Font::PrintColors(cols))
 {
 	Alignment = IE_FONT_ALIGN_LEFT;
 }
@@ -72,18 +72,18 @@ inline const Font* TextSpan::LayoutFont() const
 {
 	if (font) return font;
 
-	TextContainer* container = static_cast<TextContainer*>(parent);
+	const TextContainer* container = static_cast<const TextContainer*>(parent);
 	if (container) {
 		return container->TextFont();
 	}
-	return NULL;
+	return nullptr;
 }
 
 inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) const
 {
 	const Font* layoutFont = LayoutFont();
-	Size maxSize = frame.Dimensions();
-	Region drawRegion = Region(p + rgn.Origin(), maxSize);
+	Size maxSize = frame.size;
+	Region drawRegion = Region(p + rgn.origin, maxSize);
 	if (maxSize.w <= 0) {
 		if (maxSize.w == -1) {
 			// take remainder of parent width
@@ -109,11 +109,11 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
 {
 	LayoutRegions layoutRegions;
-	const Point& drawOrigin = rgn.Origin();
+	const Point& drawOrigin = rgn.origin;
 	const Font* layoutFont = LayoutFont();
 	assert(layoutFont);
 
-	if (frame.Dimensions().IsZero()) {
+	if (frame.size.IsZero()) {
 		// this means we get to wrap :)
 		// calculate each line and print line by line
 		int lineheight = layoutFont->LineHeight;
@@ -122,7 +122,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 		lineRgn.y -= lineheight;
 		Region lineSegment;
 
-#define LINE_REMAINDER lineRgn.w - lineSegment.x;
+#define LINE_REMAINDER (lineRgn.w - lineSegment.x)
 		const Region* excluded = NULL;
 		size_t numPrinted = 0;
 		bool newline = true;
@@ -133,7 +133,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				lineRgn.x = drawOrigin.x;
 				lineRgn.y += lineheight;
 				lineRgn.w = rgn.w;
-				layoutPoint = lineRgn.Origin();
+				layoutPoint = lineRgn.origin;
 
 				lineSegment = lineRgn;
 			}
@@ -193,7 +193,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 						subLen = nextLine - numPrinted + 1; // +1 for the \n
 					}
 					const String& substr = text.substr(numPrinted, subLen);
-					Font::StringSizeMetrics metrics = {lineSegment.Dimensions(), 0, 0, lineSegment.w == lineRgn.w};
+					Font::StringSizeMetrics metrics = {lineSegment.size, 0, 0, lineSegment.w == lineRgn.w};
 					Size printSize = layoutFont->StringSize(substr, &metrics);
 					numOnLine = metrics.numChars;
 					assert(numOnLine || !metrics.forceBreak);
@@ -217,7 +217,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				}
 				numPrinted += numOnLine;
 			}
-			assert(!lineSegment.Dimensions().IsEmpty());
+			assert(!lineSegment.size.IsInvalid());
 			lineExclusions.push_back(lineSegment);
 
 		newline:
@@ -256,7 +256,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		drawRect.y += offset.y;
 		const Font* printFont = LayoutFont();
 		const Font::PrintColors* pc = colors;
-		TextContainer* container = static_cast<TextContainer*>(parent);
+		const TextContainer* container = static_cast<const TextContainer*>(parent);
 		if (!pc && container) {
 			pc = container->TextColors();
 		}
@@ -282,8 +282,8 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 	}
 }
 
-ImageSpan::ImageSpan(Holder<Sprite2D> im)
-	: Content(im->Frame.Dimensions())
+ImageSpan::ImageSpan(const Holder<Sprite2D>& im)
+	: Content(im->Frame.size)
 {
 	image = im;
 }
@@ -294,7 +294,7 @@ void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& of
 	Region r = rgns.front()->region;
 	r.x += offset.x;
 	r.y += offset.y;
-	core->GetVideoDriver()->BlitSprite(image, r.Origin(), &r);
+	core->GetVideoDriver()->BlitSprite(image, r.origin, &r);
 }
 
 ContentContainer::ContentContainer(const Region& frame)
@@ -349,7 +349,7 @@ void ContentContainer::DidDraw(const Region& /*drawFrame*/, const Region& clip)
 	core->GetVideoDriver()->SetScreenClip(&clip);
 }
 
-void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
+void ContentContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 {
 	Video* video = core->GetVideoDriver();
 	if (core->InDebugMode(ID_TEXT)) {
@@ -366,7 +366,7 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 
 	// layout shouldn't be empty unless there is no content anyway...
 	if (layout.empty()) return;
-	Point dp = drawFrame.Origin() + Point(margin.left, margin.top);
+	Point dp = drawFrame.origin + Point(margin.left, margin.top);
 	
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
@@ -442,7 +442,7 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 		content->parent = NULL;
 		layout.erase(std::find(layout.begin(), layout.end(), content));
 
-		layoutPoint = Point(); // reset cached layoutPoint
+		layoutPoint.reset(); // reset cached layoutPoint
 		if (doLayout) {
 			LayoutContentsFrom(it);
 		}
@@ -459,7 +459,7 @@ ContentContainer::EraseContent(ContentList::iterator it)
 	Content* content = *it;
 	content->parent = NULL;
 	layout.erase(std::find(layout.begin(), layout.end(), content));
-	layoutPoint = Point(); // reset cached layoutPoint
+	layoutPoint.reset(); // reset cached layoutPoint
 	ContentRemoved(content);
 	delete content;
 
@@ -507,7 +507,7 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 			++it;
 			count -= step + 1;
 		} else {
-			std::advance(it, -step);
+			std::advance(it, -std::make_signed<size_t>::type(step));
 			count = step;
 		}
 	}
@@ -581,7 +581,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	for (; clearit != contents.end(); ++clearit) {
 		ContentLayout::iterator i = std::find(layout.begin(), layout.end(), *clearit);
 		if (i != layout.end()) {
-			layoutPoint = Point(); // reset cached layoutPoint
+			layoutPoint.reset(); // reset cached layoutPoint
 			// since 'layout' is sorted alongsize 'contents' we should be able clear everyting following 'i' and bail
 			layout.erase(i, layout.end());
 			break;
@@ -601,7 +601,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		layoutFrame.h -= margin.top + margin.bottom;
 	}
 
-	assert(!layoutFrame.Dimensions().IsEmpty());
+	assert(!layoutFrame.size.IsInvalid());
 	while (it != contents.end()) {
 		const Content* content = *it++;
 		while (exContent) {
@@ -626,7 +626,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			assert(exContent != content);
 		}
 		const LayoutRegions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
-		layout.push_back(Layout(content, rgns));
+		layout.emplace_back(content, rgns);
 		exContent = content;
 
 		ieDword flags = Flags();
@@ -649,13 +649,13 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	ResizeSubviews(oldSize);
 }
 
-void ContentContainer::DeleteContentsInRect(Region exclusion)
+void ContentContainer::DeleteContentsInRect(const Region& exclusion)
 {
 	int top = exclusion.y;
 	int bottom = top;
 	const Content* content;
 	while (const Region* rgn = ContentRegionForRect(exclusion)) {
-		content = ContentAtPoint(rgn->Origin());
+		content = ContentAtPoint(rgn->origin);
 		assert(content);
 
 		top = (rgn->y < top) ? rgn->y : top;
@@ -753,7 +753,7 @@ String TextContainer::TextFrom(ContentList::const_iterator it) const
 	return text;
 }
 
-void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
+void TextContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 {
 	printPos = 0;
 	ContentContainer::DrawSelf(drawFrame, clip);
@@ -766,7 +766,7 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 }
 
 LayoutRegions::const_iterator
-TextContainer::FindCursorRegion(const Layout& layout)
+TextContainer::FindCursorRegion(const Layout& layout) const
 {
 	auto end = layout.regions.end();
 	for (auto it = layout.regions.begin(); it != end; ++it) {
@@ -795,7 +795,7 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 			auto cursorRegion = static_cast<const TextLayout&>(**it);
 			size_t begin = cursorRegion.beginCharIdx;
 			const Region& rect = cursorRegion.region;
-			cursorPoint = rect.Origin();
+			cursorPoint = rect.origin;
 			const String& substr = text.substr(begin, cursorPos - begin);
 			cursorPoint.x += printFont->StringSizeWidth(substr, 0);
 		}
@@ -850,7 +850,7 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 			} else {
 				// not in this one so we need to consume some text
 				// TODO: this could be faster if we stored it while calculating layout
-				metrics.size = rect.Dimensions();
+				metrics.size = rect.size;
 				printFont->StringSize(text.substr(numChars), &metrics);
 				numChars += metrics.numChars;
 			}
@@ -1003,7 +1003,7 @@ TextContainer::ContentIndex TextContainer::FindContentForChar(size_t idx)
 	size_t charCount = 0;
 	ContentList::iterator it = contents.begin();
 	while (it != contents.end()) {
-		TextSpan* ts = static_cast<TextSpan*>(*it);
+		const TextSpan* ts = static_cast<const TextSpan*>(*it);
 		size_t textLen = ts->Text().length();
 		if (charCount + textLen >= idx) {
 			break;

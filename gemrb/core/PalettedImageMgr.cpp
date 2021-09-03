@@ -22,12 +22,4 @@ namespace GemRB {
 
 const TypeID PalettedImageMgr::ID = { "PalettedImageMgr" };
 
-PalettedImageMgr::PalettedImageMgr(void)
-{
-}
-
-PalettedImageMgr::~PalettedImageMgr(void)
-{
-}
-
 }

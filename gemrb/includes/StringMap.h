@@ -21,12 +21,7 @@
 #ifndef STRINGMAP_H
 #define STRINGMAP_H
 
-// glibc doesn't care, but other systems may
-#ifdef __sgi
-# include <strings.h>
-#else
-# include <string>
-#endif
+#include <string>
 
 #include "ie_types.h"
 
@@ -102,11 +97,9 @@ public:
 	}
 };
 
-// disabled, msvc6 hates it
-#if 0
 template<unsigned int size>
 struct HashKey<char[size]> {
-	typedef char array[size];
+	using array = char[size];
 
 	static inline unsigned int hash(const array &key)
 	{
@@ -129,7 +122,6 @@ struct HashKey<char[size]> {
 		strncpy(a, b, size);
 	}
 };
-#endif
 
 }
 

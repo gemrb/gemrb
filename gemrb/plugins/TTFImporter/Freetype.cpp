@@ -36,13 +36,12 @@ void LogFTError(FT_Error errCode)
 		const char*  err_msg;
 	} ft_errors[] =
 #include FT_ERRORS_H
-	int i;
 	const char *err_msg;
 
 	err_msg = NULL;
-	for ( i=0; i < (int)((sizeof ft_errors)/(sizeof ft_errors[0])); ++i ) {
-		if ( errCode == ft_errors[i].err_code ) {
-			err_msg = ft_errors[i].err_msg;
+	for (const auto ftError : ft_errors) {
+		if (errCode == ftError.err_code) {
+			err_msg = ftError.err_msg;
 			break;
 		}
 	}

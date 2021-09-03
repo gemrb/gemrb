@@ -23,7 +23,6 @@
 #include "GUI/Window.h"
 
 #include "ie_cursors.h"
-#include "ControlAnimation.h"
 #include "Interface.h"
 #include "Sprite2D.h"
 #include "Variables.h"
@@ -35,7 +34,7 @@ namespace GemRB {
 
 unsigned int Control::ActionRepeatDelay = 250;
 
-const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<ieDword>::max());
+const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<value_t>::max());
 
 Control::Control(const Region& frame)
 : View(frame) // dont pass superview to View constructor
@@ -43,7 +42,6 @@ Control::Control(const Region& frame)
 	VarName[0] = 0;
 	SetValueRange(MaxValueRange);
 
-	animation = NULL;
 	ControlType = IE_GUI_INVALID;
 
 	actionTimer = NULL;
@@ -53,18 +51,11 @@ Control::Control(const Region& frame)
 Control::~Control()
 {
 	ClearActionTimer();
-
-	delete animation;
-}
-
-bool Control::IsOpaque() const
-{
-	 return AnimPicture && AnimPicture->HasTransparency() == false;
 }
 
 void Control::SetText(const String* string)
 {
-	SetText((string) ? *string : L"");
+	SetText(string ? *string : L"");
 }
 
 void Control::SetAction(ControlEventHandler handler, Control::Action type, EventButton button,
@@ -80,7 +71,7 @@ void Control::SetAction(Responder handler, const ActionKey& key)
 		actions[key] = handler;
 	} else {
 		// delete the entry if there is one instead of setting it to NULL
-		ActionIterator it = actions.find(key);
+		const auto& it = actions.find(key);
 		if (it != actions.end()) {
 			actions.erase(it);
 		}
@@ -111,7 +102,7 @@ bool Control::PerformAction(const ActionKey& key)
 		return false;
 	}
 	
-	ActionIterator it = actions.find(key);
+	const auto& it = actions.find(key);
 	if (it != actions.end()) {
 		if (!window) {
 			Log(WARNING, "Control", "Executing event handler for a control with no window. This most likely indicates a programming or scripting error.");
@@ -130,7 +121,7 @@ void Control::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
-void Control::UpdateState(const char* varname, unsigned int val)
+void Control::UpdateState(const char* varname, value_t val)
 {
 	if (strnicmp(VarName, varname, MAX_VARIABLE_LENGTH-1) == 0) {
 		UpdateState(val);
@@ -143,14 +134,14 @@ void Control::SetFocus()
 	MarkDirty();
 }
 
-bool Control::IsFocused()
+bool Control::IsFocused() const
 {
 	return window->FocusedView() == this;
 }
 
-void Control::SetValue(ieDword val)
+void Control::SetValue(value_t val)
 {
-	ieDword oldVal = Value;
+	value_t oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
 	
 	if (VarName[0] != 0) {
@@ -169,20 +160,14 @@ void Control::SetValue(ieDword val)
 void Control::SetValueRange(ValueRange r)
 {
 	range = r;
-	if (Value != CTL_INVALID_VALUE) {
+	if (Value != INVALID_VALUE) {
 		SetValue(Value); // update the value if it falls outside the range
 	}
 }
 
-void Control::SetValueRange(ieDword min, ieDword max)
+void Control::SetValueRange(value_t min, value_t max)
 {
 	SetValueRange(ValueRange(min, max));
-}
-
-void Control::SetAnimPicture(Holder<Sprite2D> newpic)
-{
-	AnimPicture = newpic;
-	MarkDirty();
 }
 
 void Control::ClearActionTimer()
@@ -200,7 +185,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 		SetActionInterval(repeatDelay);
 
 		if (VarName[0] != 0) {
-			ieDword val = GetValue();
+			value_t val = GetValue();
 			core->GetDictionary()->SetAt(VarName, val);
 			window->RedrawControls(VarName, val);
 		}
@@ -209,15 +194,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 	};
 	// always start the timer with ActionRepeatDelay
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
-	return &core->SetTimer(h, (delay) ? delay : ActionRepeatDelay);
-}
-	
-bool Control::HitTest(const Point& p) const
-{
-	if (!(flags & (IgnoreEvents | Invisible))) {
-		return View::HitTest(p);
-	}
-	return false;
+	return &core->SetTimer(h, delay ? delay : ActionRepeatDelay);
 }
 
 View::UniqueDragOp Control::DragOperation()
@@ -236,7 +213,7 @@ View::UniqueDragOp Control::DragOperation()
 
 		actionTimer = &core->SetTimer(h, 0, 0);
 	}
-	return std::unique_ptr<ControlDragOp>(new ControlDragOp(this));
+	return GemRB::make_unique<ControlDragOp>(this);
 }
 
 bool Control::AcceptsDragOperation(const DragOp& dop) const
@@ -336,7 +313,7 @@ void Control::HandleTouchActionTimer(const Control* ctrl)
 	PerformAction(key);
 }
 
-ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)
+ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new ControlScriptingRef(this, id, group);
 }

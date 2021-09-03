@@ -38,39 +38,35 @@ protected:
 		SDL_Surface* surface;
 		PaletteHolder palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
 
-		SurfaceHolder(SDL_Surface* surf) : surface(surf), palette(NULL) {}
+		explicit SurfaceHolder(SDL_Surface* surf) : surface(surf) {}
 		~SurfaceHolder() override { SDL_FreeSurface(surface); }
 
-		SDL_Surface* operator->() { return surface; }
-		operator SDL_Surface* () { return surface; }
+		SDL_Surface* operator->() const { return surface; }
+		operator SDL_Surface* () const { return surface; }
 	};
 
 	Holder<SurfaceHolder> original;
 	mutable Holder<SurfaceHolder> surface;
 	mutable version_t version = 0;
 	mutable version_t palVersion = 0;
+	
+	void SetPaletteFromSurface() const noexcept;
+	bool SetPaletteColors(const Color* pal) const noexcept;
+	void UpdatePalette(PaletteHolder) noexcept override;
+	void UpdateColorKey(colorkey_t key) noexcept override;
 
 public:
-	SDLSurfaceSprite2D(const Region&, int Bpp, void* pixels,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLSurfaceSprite2D(const Region&, int Bpp,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj);
+	SDLSurfaceSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
+	SDLSurfaceSprite2D(const Region&, const PixelFormat& fmt) noexcept;
+	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept;
 	Holder<Sprite2D> copy() const override;
 
 	const void* LockSprite() const override;
 	void* LockSprite() override;
 	void UnlockSprite() const override;
 
-	PaletteHolder GetPalette() const override;
-	int SetPalette(const Color* pal) const;
-	void SetPalette(PaletteHolder pal) override;
-	int32_t GetColorKey() const override;
-	void SetColorKey(ieDword pxvalue) override;
-	bool HasTransparency() const override;
-	Color GetPixel(const Point&) const override;
-	bool ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
-						 ieDword bmask, ieDword amask) override;
+	bool HasTransparency() const noexcept override;
+	bool ConvertFormatTo(const PixelFormat& tofmt) noexcept override;
 
 	SDL_Surface* GetSurface() const { return *surface; };
 
@@ -89,32 +85,30 @@ public:
 // it would probably be better to not inherit from SDLSurfaceSprite2D
 // the hard part is handling the palettes ourselves
 class SDLTextureSprite2D : public SDLSurfaceSprite2D {
-	struct TextureHolder : public Held<TextureHolder>
+	struct TextureHolder final : public Held<TextureHolder>
 	{
 		SDL_Texture* texture;
 
-		TextureHolder(SDL_Texture* tex) : texture(tex) {}
-		~TextureHolder() { SDL_DestroyTexture(texture); }
+		explicit TextureHolder(SDL_Texture* tex) : texture(tex) {}
+		~TextureHolder() final { SDL_DestroyTexture(texture); }
 
-		SDL_Texture* operator->() { return texture; }
-		operator SDL_Texture* () { return texture; }
+		SDL_Texture* operator->() const { return texture; }
+		operator SDL_Texture* () const { return texture; }
 	};
 
 	mutable Uint32 texFormat = SDL_PIXELFORMAT_UNKNOWN;
 	mutable Holder<TextureHolder> texture;
 	mutable bool staleTexture = false;
 	
+	void UpdatePalette(PaletteHolder) noexcept override;
+	void UpdateColorKey(colorkey_t key) noexcept override;
+	
 public:
-	SDLTextureSprite2D(const Region&, int Bpp, void* pixels,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLTextureSprite2D(const Region&, int Bpp,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
+	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
+	SDLTextureSprite2D(const Region&, const PixelFormat& fmt) noexcept;
 	Holder<Sprite2D> copy() const override;
 	
 	void UnlockSprite() const override;
-
-	using SDLSurfaceSprite2D::SetPalette;
-	void SetColorKey(ieDword pxvalue) override;
 
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
 

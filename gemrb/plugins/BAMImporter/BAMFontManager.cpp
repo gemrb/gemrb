@@ -35,19 +35,21 @@ BAMFontManager::BAMFontManager(void)
 	bamImp = new BAMImporter();
 }
 
-bool BAMFontManager::Open(DataStream* stream)
+bool BAMFontManager::Import(DataStream* stream)
 {
 	resRef = stream->filename;
 	// compare only first 6 chars so we can match states2 or others
 	if (strnicmp(resRef, "STATES", 6) == 0) {
 		isStateFont = true;
 	}
+	
+	str = nullptr; // hand ownership over to bamImp
 	return bamImp->Open(stream);
 }
 
 Font* BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*style*/, bool background)
 {
-	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, IE_NORMAL, false); // released by BAMFont
+	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, false); // released by BAMFont
 	// FIXME: this test only exists to let the minimal test pass
 	// we should maybe instead use a *valid* font for such a "test"
 	if (af->GetFrame(0) == nullptr) {

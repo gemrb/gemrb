@@ -26,10 +26,7 @@ from GUIDefines import *
 from ie_stats import IE_SEX, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
 from ie_restype import RES_WAV
 
-BiographyWindow = None
 CustomizeWindow = None
-SubCustomizeWindow = None
-SubSubCustomizeWindow = None
 ExportWindow = None
 NameField = ExportDoneButton = None
 ScriptsTable = None
@@ -122,15 +119,16 @@ def OpenCustomizeWindow ():
 	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSoundWindow)
 	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenScriptWindow)
 	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CustomizeWindow.Close())
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  lambda: CustomizeWindow.Close())
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  lambda: CustomizeWindow.Close()) # FIXME: this should revert changes I assume
 
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OpenPortraitSelectWindow ():
-	global PortraitPictureButton, SubCustomizeWindow
+	global PortraitPictureButton
 
 	SubCustomizeWindow = GemRB.LoadWindow (18)
+	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	PortraitPictureButton = SubCustomizeWindow.GetControl (0)
 	PortraitPictureButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -152,7 +150,7 @@ def OpenPortraitSelectWindow ():
 
 	PortraitCancelButton = SubCustomizeWindow.GetControl (4)
 	PortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
+	PortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SubCustomizeWindow.Close())
 	PortraitCancelButton.SetText (13727)
 	PortraitCancelButton.MakeEscape()
 
@@ -180,7 +178,7 @@ def PortraitDonePress ():
 		GemRB.FillPlayerInfo (pc, Portrait.Name () + "M", Portrait.Name () + "S")
 	else:
 		GemRB.FillPlayerInfo (pc, Portrait.Name () + "L", Portrait.Name () + "S")
-	CloseSubCustomizeWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	return
 
 def PortraitLeftPress ():
@@ -194,32 +192,32 @@ def PortraitRightPress ():
 	PortraitPictureButton.SetPicture (Portrait.Next () + PortraitNameSuffix, "NOPORTLG")
 
 def OpenCustomPortraitWindow ():
-	global SubSubCustomizeWindow
 	global PortraitList1, PortraitList2
 	global RowCount1, RowCount2
 
-	SubSubCustomizeWindow = GemRB.LoadWindow (19)
+	Window = GemRB.LoadWindow (19)
+	Window.AddAlias("SUB_WIN", 1)
 
-	CustomPortraitDoneButton = SubSubCustomizeWindow.GetControl (10)
+	CustomPortraitDoneButton = Window.GetControl (10)
 	CustomPortraitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	CustomPortraitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPortraitDonePress)
 	CustomPortraitDoneButton.SetText (11973)
 	CustomPortraitDoneButton.MakeDefault()
 
-	CustomPortraitCancelButton = SubSubCustomizeWindow.GetControl (11)
+	CustomPortraitCancelButton = Window.GetControl (11)
 	CustomPortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	CustomPortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubSubCustomizeWindow)
+	CustomPortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	CustomPortraitCancelButton.SetText (13727)
 	CustomPortraitCancelButton.MakeEscape()
 
 	if not GameCheck.IsIWD1():
-		SmallPortraitButton = SubSubCustomizeWindow.GetControl (1)
+		SmallPortraitButton = Window.GetControl (1)
 		SmallPortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-		LargePortraitButton = SubSubCustomizeWindow.GetControl (0)
+		LargePortraitButton = Window.GetControl (0)
 		LargePortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
 	# Portrait List Large
-	PortraitList1 = SubSubCustomizeWindow.GetControl (2)
+	PortraitList1 = Window.GetControl (2)
 	if GameCheck.IsIWD2():
 		RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 2))
 	else:
@@ -228,25 +226,28 @@ def OpenCustomPortraitWindow ():
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	# Portrait List Small
-	PortraitList2 = SubSubCustomizeWindow.GetControl (3)
+	PortraitList2 = Window.GetControl (3)
 	RowCount2 = len(PortraitList2.ListResources (CHR_PORTRAITS, 0))
 	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, SmallCustomPortrait)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
-	SubSubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def CustomPortraitDonePress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.FillPlayerInfo (pc, PortraitList1.QueryText () , PortraitList2.QueryText ())
-
-	CloseSubSubCustomizeWindow ()
+	
 	#closing the generic portraits, because we just set a custom one
-	CloseSubCustomizeWindow ()
+	subwin = GemRB.GetView("SUB_WIN", 0)
+	if subwin:
+		subwin.Close()
+		
+	GemRB.GetView("SUB_WIN", 1).Close()
 	return
 
 def LargeCustomPortrait ():
-	Window = SubSubCustomizeWindow
+	Window = GemRB.GetView("SUB_WIN", 1)
 
 	Portrait = PortraitList1.QueryText ()
 	#small hack
@@ -269,7 +270,7 @@ def LargeCustomPortrait ():
 	return
 
 def SmallCustomPortrait ():
-	Window = SubSubCustomizeWindow
+	Window = GemRB.GetView("SUB_WIN", 1)
 
 	Portrait = PortraitList2.QueryText ()
 	#small hack
@@ -293,11 +294,11 @@ def SmallCustomPortrait ():
 
 def OpenSoundWindow ():
 	global VoiceList, OldVoiceSet
-	global SubCustomizeWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	OldVoiceSet = GemRB.GetPlayerSound (pc)
 	SubCustomizeWindow = GemRB.LoadWindow (20)
+	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
 	Voices = VoiceList.ListResources (CHR_SOUNDS)
@@ -338,7 +339,7 @@ def OpenSoundWindow ():
 def CloseSoundWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.SetPlayerSound (pc, OldVoiceSet)
-	CloseSubCustomizeWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	return
 
 def DoneSoundWindow ():
@@ -347,7 +348,7 @@ def DoneSoundWindow ():
 	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
 	GemRB.SetPlayerSound (pc, CharSound)
 
-	CloseSubCustomizeWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	return
 
 def PlaySoundPressed():
@@ -392,11 +393,11 @@ def FindScriptFile(selected):
 
 options = {}
 def OpenScriptWindow ():
-	global SubCustomizeWindow
 	global ScriptTextArea, SelectedTextArea
 	global options
 
 	SubCustomizeWindow = GemRB.LoadWindow (11)
+	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
 	scripts = ScriptTextArea.ListResources (CHR_SCRIPTS)
@@ -462,7 +463,7 @@ def OpenScriptWindow ():
 	CancelButton.MakeEscape()
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneScriptWindow)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SubCustomizeWindow.Close())
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -472,7 +473,7 @@ def DoneScriptWindow ():
 	selected = GemRB.GetVar ("Selected")
 	script = FindScriptFile (selected)
 	GemRB.SetPlayerScript (pc, script)
-	CloseSubCustomizeWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	return
 
 def RevertBiography(ta):
@@ -491,7 +492,6 @@ def RevertBiography(ta):
 	return
 
 def OpenBiographyEditWindow ():
-	global SubCustomizeWindow
 	global RevertButton
 	global BioStrRef
 	global TextArea
@@ -507,6 +507,8 @@ def OpenBiographyEditWindow ():
 		SubCustomizeWindow = GemRB.LoadWindow (51)
 	else:
 		SubCustomizeWindow = GemRB.LoadWindow (23)
+		
+	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	ClearButton = SubCustomizeWindow.GetControl (5)
 	if GameCheck.IsBG2():
@@ -538,7 +540,7 @@ def OpenBiographyEditWindow ():
 	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ClearBiography(TextArea))
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DoneBiographyWindow(TextArea))
 	RevertButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: RevertBiography(TextArea))
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSubCustomizeWindow)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SubCustomizeWindow.Close())
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -562,15 +564,13 @@ def DoneBiographyWindow (ta):
 	if BioStrRef != 33347:
 		GemRB.CreateString (BioStrRef, ta.QueryText())
 	GemRB.SetPlayerString (pc, BioStrRefSlot, BioStrRef)
-	CloseSubCustomizeWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	return
 
 def OpenBiographyWindow ():
-	global BiographyWindow
+	BiographyWindow = GemRB.LoadWindow (12)
 
-	BiographyWindow = Window = GemRB.LoadWindow (12)
-
-	TextArea = Window.GetControl (0)
+	TextArea = BiographyWindow.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if GameCheck.IsBG1 () and GemRB.GetPlayerName (pc, 2) == 'none':
 		TextArea.SetText (GetProtagonistBiography (pc))
@@ -578,26 +578,11 @@ def OpenBiographyWindow ():
 		TextArea.SetText (GemRB.GetPlayerString (pc, BioStrRefSlot))
 
 	# Done
-	Button = Window.GetControl (2)
+	Button = BiographyWindow.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseBiographyWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: BiographyWindow.Close())
 
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CloseBiographyWindow ():
-	import GUIREC
-	global BiographyWindow
-
-	if BiographyWindow:
-		BiographyWindow.Unload ()
-		BiographyWindow = None
-	# TODO: check if bg1 wouldn't benefit from modality too
-	if GUIREC.InformationWindow:
-		if GameCheck.IsBG2() or GameCheck.IsIWD1():
-			GUIREC.InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
-		else:
-			GUIREC.InformationWindow.Focus()
+	BiographyWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def GetProtagonistBiography (pc):
@@ -660,24 +645,4 @@ def ExportEditChanged():
 		ExportDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		ExportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	return
-
-def CloseSubCustomizeWindow ():
-	global SubCustomizeWindow, CustomizeWindow
-
-	if SubCustomizeWindow:
-		SubCustomizeWindow.Unload ()
-		SubCustomizeWindow = None
-	if CustomizeWindow:
-		CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CloseSubSubCustomizeWindow ():
-	global SubSubCustomizeWindow, SubCustomizeWindow
-
-	if SubSubCustomizeWindow:
-		SubSubCustomizeWindow.Unload ()
-		SubSubCustomizeWindow = None
-	if SubCustomizeWindow:
-		SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

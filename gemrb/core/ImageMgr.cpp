@@ -27,51 +27,6 @@ namespace GemRB {
 
 const TypeID ImageMgr::ID = { "ImageMgr" };
 
-ImageMgr::ImageMgr(void)
-{
-}
-
-ImageMgr::~ImageMgr(void)
-{
-}
-
-Bitmap* ImageMgr::GetBitmap()
-{
-	unsigned int height = GetHeight();
-	unsigned int width = GetWidth();
-	Bitmap *data = new Bitmap(width, height);
-
-	Log(ERROR, "ImageMgr", "Don't know how to handle 24bit bitmap from %s...",
-		str->filename );
-
-	Holder<Sprite2D> spr = GetSprite2D();
-
-	for (unsigned int y = 0; y < height; y++) {
-		for (unsigned int x = 0; x < width; x++) {
-			data->SetAt(x,y, spr->GetPixel(x,y).r);
-		}
-	}
-
-	return data;
-}
-
-Image* ImageMgr::GetImage()
-{
-	unsigned int height = GetHeight();
-	unsigned int width = GetWidth();
-	Image *data = new Image(width, height);
-
-	Holder<Sprite2D> spr = GetSprite2D();
-
-	for (unsigned int y = 0; y < height; y++) {
-		for (unsigned int x = 0; x < width; x++) {
-			data->SetPixel(x,y, spr->GetPixel(x,y));
-		}
-	}
-
-	return data;
-}
-
 int ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
 {
 	return -1;

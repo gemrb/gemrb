@@ -49,7 +49,7 @@ namespace GemRB {
 class GEM_EXPORT Slider : public Control  {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	
 	// set postion pased on a point expressed in local (frame) coordinates
 	void SetPosition(const Point& p);
@@ -59,15 +59,15 @@ public:
 		   short KnobStep, unsigned short KnobStepsCount);
 
 	/** Returns the actual Slider Position */
-	unsigned int GetPosition();
+	unsigned int GetPosition() const;
 	/** Sets the actual Slider Position trimming to the Max and Min Values */
 	void SetPosition(unsigned int pos);
 	/** Sets the selected image */
-	void SetImage(unsigned char type, Holder<Sprite2D> img);
+	void SetImage(unsigned char type, const Holder<Sprite2D>& img);
 	/** Sets the State of the Slider */
 	void SetState(int arg) { State=(unsigned char) arg; }
 	/** Refreshes a slider which is associated with VariableName */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t) override;
 
 private: // Private attributes
 	/** Knob Image */

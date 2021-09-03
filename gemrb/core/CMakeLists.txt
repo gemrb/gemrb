@@ -1,27 +1,18 @@
 ADD_DEFINITIONS(-DGEM_BUILD_DLL)
 
 FILE(GLOB gemrb_core_LIB_SRCS
-	ActorMgr.cpp
 	Ambient.cpp
 	AmbientMgr.cpp
 	Animation.cpp
 	AnimationFactory.cpp
-	AnimationMgr.cpp
-	ArchiveImporter.cpp
 	Audio.cpp
-	Bitmap.cpp
 	Cache.cpp
 	Calendar.cpp
 	CharAnimations.cpp
-	Compressor.cpp
-	ControlAnimation.cpp
 	Core.cpp
-	DataFileMgr.cpp
 	Dialog.cpp
 	DialogHandler.cpp
-	DialogMgr.cpp
 	DisplayMessage.cpp
-	EffectMgr.cpp
 	EffectQueue.cpp
 	Factory.cpp
 	FactoryObject.cpp
@@ -30,11 +21,8 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Game.cpp
 	GameData.cpp
 	GlobalTimer.cpp
-	Image.cpp
 	ImageFactory.cpp
 	ImageMgr.cpp
-	ImageWriter.cpp
-	IndexedArchive.cpp
 	IniSpawn.cpp
 	Interface.cpp
 	InterfaceConfig.cpp
@@ -44,50 +32,34 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	KeyMap.cpp
 	LRUCache.cpp
 	Map.cpp
-	MapMgr.cpp
 	MapReverb.cpp
 	MoviePlayer.cpp
-	MusicMgr.cpp
 	Palette.cpp
 	PalettedImageMgr.cpp
 	Particles.cpp
 	PathFinder.cpp
-	Plugin.cpp
 	PluginMgr.cpp
 	Polygon.cpp
 	Projectile.cpp
-	ProjectileMgr.cpp
 	ProjectileServer.cpp
 	Region.cpp
-	Resource.cpp
 	ResourceDesc.cpp
 	ResourceManager.cpp
-	ResourceSource.cpp
+	SaveGameAREExtractor.cpp
 	SaveGameIterator.cpp
-	SaveGameMgr.cpp
 	ScriptEngine.cpp
 	ScriptedAnimation.cpp
 	SoundMgr.cpp
 	Spell.cpp
-	SpellMgr.cpp
 	Spellbook.cpp
 	Sprite2D.cpp
 	SpriteCover.cpp
 	Store.cpp
-	StoreMgr.cpp
-	StringMgr.cpp
-	SymbolMgr.cpp
-	TableMgr.cpp
-	Tile.cpp
 	TileMap.cpp
-	TileMapMgr.cpp
 	TileOverlay.cpp
-	TileSetMgr.cpp
 	Variables.cpp
 	VEFObject.cpp
-	Video.cpp
 	WorldMap.cpp
-	WorldMapMgr.cpp
 	GameScript/Actions.cpp
 	GameScript/GSUtils.cpp
 	GameScript/GameScript.cpp
@@ -135,8 +107,10 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/SlicedStream.cpp
 	System/String.cpp
 	System/StringBuffer.cpp
-	System/swab.c
+	System/swab.cpp
 	System/VFS.cpp
+	Video/Pixels.cpp
+	Video/Video.cpp
 	)
 
 IF(SUPPORTS_MEMSTREAM)
@@ -177,6 +151,8 @@ else (STATIC_LINK)
 	  INSTALL(TARGETS gemrb_core LIBRARY DESTINATION ${LIB_DIR})
 	ENDIF(WIN32)
 endif (STATIC_LINK)
+
+target_compile_definitions(gemrb_core PRIVATE _USE_MATH_DEFINES)
 
 # make lintian happy
 SET_TARGET_PROPERTIES(gemrb_core PROPERTIES

@@ -44,7 +44,7 @@ class GEM_EXPORT Gem_Polygon {
 public:
 	using LineSegment = std::pair<Point, Point>;
 
-	Gem_Polygon(const Point* points, unsigned int count, Region *bbox = NULL);
+	Gem_Polygon(std::vector<Point>&&, const Region *bbox = nullptr);
 
 	Region BBox;
 	std::vector<Point> vertices;
@@ -79,7 +79,6 @@ public:
 	using Gem_Polygon::Gem_Polygon;
 	//is the point above the baseline
 	bool PointBehind(const Point &p) const;
-	bool PointBehind(int x, int y) const;
 	ieDword GetPolygonFlag() const { return wall_flag; }
 	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
 	void SetBaseline(const Point &a, const Point &b);

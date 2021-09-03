@@ -22,14 +22,10 @@
 
 namespace GemRB {
 
-Factory::Factory(void)
-{
-}
-
 Factory::~Factory(void)
 {
-	for (unsigned int i = 0; i < fobjects.size(); i++) {
-		delete( fobjects[i] );
+	for (auto& fObject : fobjects) {
+		delete fObject;
 	}
 }
 
@@ -38,15 +34,15 @@ void Factory::AddFactoryObject(FactoryObject* fobject)
 	fobjects.push_back( fobject );
 }
 
-int Factory::IsLoaded(const char* ResRef, SClass_ID type) const
+int Factory::IsLoaded(const ResRef& resref, SClass_ID type) const
 {
-	if (ResRef == nullptr) {
+	if (resref.IsEmpty()) {
 		return -1;
 	}
 
 	for (unsigned int i = 0; i < fobjects.size(); i++) {
 		if (fobjects[i]->SuperClassID == type) {
-			if (strnicmp( fobjects[i]->ResRef, ResRef, 8 ) == 0) {
+			if (fobjects[i]->resRef == resref) {
 				return i;
 			}
 		}
@@ -57,13 +53,6 @@ int Factory::IsLoaded(const char* ResRef, SClass_ID type) const
 FactoryObject* Factory::GetFactoryObject(int pos) const
 {
 	return fobjects[pos];
-}
-
-void Factory::FreeObjects(void)
-{
-	for (unsigned int i = 0; i < fobjects.size(); i++) {
-		delete( fobjects[i] );
-	}
 }
 
 }

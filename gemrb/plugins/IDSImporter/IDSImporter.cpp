@@ -28,14 +28,10 @@
 
 using namespace GemRB;
 
-IDSImporter::IDSImporter(void)
-{
-}
-
 IDSImporter::~IDSImporter(void)
 {
-	for (unsigned int i = 0; i < ptrs.size(); i++) {
-		free( ptrs[i] );
+	for (auto& ptr : ptrs) {
+		free(ptr);
 	}
 }
 
@@ -54,7 +50,7 @@ bool IDSImporter::Open(DataStream* str)
 	}
 	while (true) {
 		char* line = ( char* ) malloc( 256 );
-		int len = str->ReadLine( line, 256 );
+		strret_t len = str->ReadLine( line, 256 );
 		strlwr( line );
 		if (len == -1) {
 			free( line );
@@ -68,7 +64,7 @@ bool IDSImporter::Open(DataStream* str)
 			line = ( char * ) realloc( line, len + 1 );
 		char* str = strtok( line, " " );
 		Pair p;
-		p.val = strtoul( str, NULL, 0 );
+		p.val = strtosigned<int>(str, nullptr, 0);
 		str = strtok( NULL, " " );
 		p.str = str;
 		if (str != NULL) {
@@ -85,9 +81,9 @@ bool IDSImporter::Open(DataStream* str)
 
 int IDSImporter::GetValue(const char* txt) const
 {
-	for (unsigned int i = 0; i < pairs.size(); i++) {
-		if (stricmp( pairs[i].str, txt ) == 0) {
-			return pairs[i].val;
+	for (const auto pair : pairs) {
+		if (stricmp(pair.str, txt) == 0) {
+			return pair.val;
 		}
 	}
 	return -1;
@@ -95,15 +91,15 @@ int IDSImporter::GetValue(const char* txt) const
 
 char* IDSImporter::GetValue(int val) const
 {
-	for (unsigned int i = 0; i < pairs.size(); i++) {
-		if (pairs[i].val == val) {
-			return pairs[i].str;
+	for (const auto pair : pairs) {
+		if (pair.val == val) {
+			return pair.str;
 		}
 	}
 	return NULL;
 }
 
-char* IDSImporter::GetStringIndex(unsigned int Index) const
+char* IDSImporter::GetStringIndex(size_t Index) const
 {
 	if (Index >= pairs.size()) {
 		return NULL;
@@ -111,7 +107,7 @@ char* IDSImporter::GetStringIndex(unsigned int Index) const
 	return pairs[Index].str;
 }
 
-int IDSImporter::GetValueIndex(unsigned int Index) const
+int IDSImporter::GetValueIndex(size_t Index) const
 {
 	if (Index >= pairs.size()) {
 		return 0;
@@ -121,7 +117,7 @@ int IDSImporter::GetValueIndex(unsigned int Index) const
 
 int IDSImporter::FindString(char *str, int len) const
 {
-	int i=pairs.size();
+	int i = static_cast<int>(pairs.size());
 	while(i--) {
 		if (strnicmp(pairs[i].str, str, len) == 0) {
 			return i;
@@ -132,7 +128,7 @@ int IDSImporter::FindString(char *str, int len) const
 
 int IDSImporter::FindValue(int val) const
 {
-	int i=pairs.size();
+	int i = static_cast<int>(pairs.size());
 	while(i--) {
 		if(pairs[i].val==val) {
 			return i;
@@ -143,7 +139,7 @@ int IDSImporter::FindValue(int val) const
 
 int IDSImporter::GetHighestValue() const
 {
-	int i = pairs.size();
+	int i = static_cast<int>(pairs.size());
 	if (!i) {
 		return -1;
 	}

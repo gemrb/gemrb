@@ -24,13 +24,9 @@
 
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
-
-TISImporter::TISImporter(void)
-{
-}
 
 TISImporter::~TISImporter(void)
 {
@@ -52,76 +48,80 @@ bool TISImporter::Open(DataStream* stream)
 			Log(ERROR, "TISImporter", "Not a Valid TIS file!");
 			return false;
 		}
-		str->ReadDword( &TilesCount );
-		str->ReadDword( &TilesSectionLen );
-		str->ReadDword( &headerShift );
-		str->ReadDword( &TileSize );
+		str->ReadDword(TilesCount);
+		str->ReadDword(TilesSectionLen);
+		str->ReadDword(headerShift);
+		str->ReadDword(TileSize);
 	} else {
 		str->Seek( -8, GEM_CURRENT_POS );
 	}
 	return true;
 }
 
-Tile* TISImporter::GetTile(unsigned short* indexes, int count,
-	unsigned short* secondary)
+Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
+						   unsigned short* secondary)
 {
-	Animation* ani = new Animation( count );
+	size_t count = indexes.size();
+	std::vector<Animation::frame_t> frames;
+	frames.reserve(count);
+	for (size_t i = 0; i < count; i++) {
+		frames.push_back(GetTile(indexes[i]));
+	}
+	
+	Animation ani = Animation(std::move(frames));
 	//pause key stops animation
-	ani->gameAnimation = true;
+	ani.gameAnimation = true;
 	//the turning crystal in ar3202 (bg1) requires animations to be synced
-	ani->pos = 0;
-	for (int i = 0; i < count; i++) {
-		ani->AddFrame( GetTile( indexes[i] ), i );
-	}
+	ani.frameIdx = 0;
+	
 	if (secondary) {
-		Animation* sec = new Animation( count );
-		for (int i = 0; i < count; i++) {
-			sec->AddFrame( GetTile( secondary[i] ), i );
+		frames.clear();
+		for (size_t i = 0; i < count; i++) {
+			frames.push_back(GetTile(secondary[i]));
 		}
-		return new Tile( ani, sec );
+		Animation sec = Animation(frames);
+		return new Tile(ani, sec);
 	}
-	return new Tile( ani );
+	return new Tile(ani);
 }
 
 Holder<Sprite2D> TISImporter::GetTile(int index)
 {
-	Color Col[256];
-	Color Palette[256]{};
-	void* pixels = calloc(4096, 1);
+	PaletteHolder pal = MakeHolder<Palette>();
+	PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
+	
 	unsigned long pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos+1024+4096) {
 		// try to only report error once per file
-		static TISImporter *last_corrupt = NULL;
+		static const TISImporter *last_corrupt = nullptr;
 		if (last_corrupt != this) {
 			Log(ERROR, "TISImporter", "Corrupt WED file encountered; couldn't find any more tiles at tile %d", index);
 			last_corrupt = this;
 		}
 	
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
-		Palette[0].g = 200;
-		return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette );
+		pal->col[0].g = 200;
+		return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 	}
 	str->Seek( pos, GEM_STREAM_START );
-	str->Read( &Col, 1024 );
-	int transindex = 0;
-	bool transparent = false;
+	Color Col[256];
+	str->Read(&Col, 1024 );
+
 	for (int i = 0; i < 256; i++) {
 		// bgra format
-		Palette[i].r = Col[i].b;
-		Palette[i].g = Col[i].g;
-		Palette[i].b = Col[i].r;
-		Palette[i].a = (Col[i].a) ? Col[i].a : 255; // alpha is unused by the originals but SDL will happily use it
-		if (Palette[i].g==255 && !Palette[i].r && !Palette[i].b) {
-			if (transparent) {
-				Log(ERROR, "TISImporter", "Tile has two green (transparent) palette entries");
-			} else {
-				transparent = true;
-				transindex = i;
-			}
+		pal->col[i].r = Col[i].b;
+		pal->col[i].g = Col[i].g;
+		pal->col[i].b = Col[i].r;
+		pal->col[i].a = (Col[i].a) ? Col[i].a : 255; // alpha is unused by the originals but SDL will happily use it
+		if (pal->col[i].g==255 && !pal->col[i].r && !pal->col[i].b) {
+			fmt.HasColorKey = true;
+			fmt.ColorKey = i;
 		}
 	}
-	str->Read( pixels, 4096 );
-	return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette, transparent, transindex );
+	auto spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+	str->Read(spr->LockSprite(), 4096);
+	spr->UnlockSprite();
+	return spr;
 }
 
 #include "plugindef.h"

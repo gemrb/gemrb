@@ -118,9 +118,11 @@ def OnLoad():
 		CharGenCommon.CharGenWindow.Close ()
 
 		CommonWindow.SetGameGUIHidden(True)
-		# fade with some number longer than it takes to get everything setup and running
-		# eventually another fade call is executed which will cancel the remaining time
-		GemRB.ExecuteString ("FadeFromColor([1000.0],0)", MyChar)
+		if not GameCheck.HasBGT () and not GameCheck.HasTutu ():
+			# fade with some number longer than it takes to get everything setup and running
+			# eventually another fade call is executed which will cancel the remaining time
+			GemRB.ExecuteString ("FadeFromColor([1000.0],0)", MyChar)
+
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
 		if GameCheck.IsTOB ():
@@ -148,7 +150,7 @@ def GiveEquipment(MyChar, ClassName, KitIndex):
 		EquipmentTable = GemRB.LoadTable ("25stweap")
 
 		# a map of slots in the table to the real slots
-		# SLOT_BAG is invalid, so use the inventory (first occurence)
+		# SLOT_BAG is invalid, so use the inventory (first occurrence)
 		# SLOT_INVENTORY: use -1 instead, that's what CreateItem expects
 		RealSlots = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, -1, SLOT_RING, \
 					SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, \

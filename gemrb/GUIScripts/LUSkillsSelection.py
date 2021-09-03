@@ -24,6 +24,7 @@ from ie_stats import *
 import GameCheck
 import GUICommon
 import CommonTables
+from CommonWindow import AddScrollbarProxy
 
 #constants
 LUSKILLS_TYPE_LEVELUP = 1
@@ -50,7 +51,6 @@ SkillsLabelIncrement = 1
 #internal variables
 SkillsIndices = []
 SkillPointsLeft = 0
-SkillsTopIndex = 0
 SkillsTable = 0
 SkillsOldPos = 0
 SkillsClickCount = 0
@@ -63,7 +63,7 @@ SkillsAssignable = 0
 # If nothing can be assigned, it will return 0 prior to accessing any of the window methods.
 def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0, scroll=True):
 	global SkillsWindow, SkillsCallback, SkillsOffsetPress, SkillsOffsetButton1, SkillsOffsetName
-	global SkillsOffsetPoints, SkillsOffsetSum, SkillsIndices, SkillPointsLeft, SkillsTopIndex
+	global SkillsOffsetPoints, SkillsOffsetSum, SkillsIndices, SkillPointsLeft
 	global SkillsTable, SkillsOldPos, SkillsClickCount, SkillsOldDirection, SkillsNumButtons
 	global SkillsTextArea, SkillsKitName, SkillsAssignable, SkillsLabelIncrement
 
@@ -146,6 +146,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	else:
 		return
 
+	ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, 0)
 	#get our class id and name
 	IsDual = GUICommon.IsDualClassed (pc, 1)
 	IsMulti = GUICommon.IsMultiClassed (pc, 1)
@@ -265,16 +266,18 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		return
 
 	#skills scrollbar
-	SkillsTopIndex = 0
-	GemRB.SetVar ("SkillsTopIndex", SkillsTopIndex)
 	if len(SkillsIndices) > SkillsNumButtons:
-		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, SkillScrollBarPress)
+		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: SkillsRedraw())
 		#decrease it with the number of controls on screen (list size) and two unrelated rows
-		ScrollBar.SetVarAssoc ("SkillsTopIndex", SkillsTable.GetRowCount()-SkillsNumButtons-2)
+		maxvalue = SkillsTable.GetRowCount() - SkillsNumButtons - 2
+		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, maxvalue)
+		Button = SkillsWindow.GetControl(SkillsOffsetPress)
+		AddScrollbarProxy(SkillsWindow, ScrollBar, Button)
+	elif len(SkillsIndices) and SkillsAssignable:
+		#autoscroll to the first valid skill; luckily all three monk ones are adjacent
+		GemRB.SetVar ("SkillsTopIndex", SkillsIndices[0])
 	else:
-		if len(SkillsIndices) and SkillsAssignable:
-			#autoscroll to the first valid skill; luckily all three monk ones are adjacent
-			GemRB.SetVar ("SkillsTopIndex", SkillsIndices[0])
+		GemRB.SetVar ("SkillsTopIndex", 0)
 
 	#setup all the visible buttons
 	for i in range(len(SkillsIndices)):
@@ -311,7 +314,7 @@ def SkillsRedraw (direction=0):
 			continue
 
 		#show the current skills name
-		Pos = SkillsIndices[SkillsTopIndex+i]
+		Pos = SkillsIndices[GemRB.GetVar ("SkillsTopIndex") + i]
 		SkillName = SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "CAP_REF")
 		Label = SkillsWindow.GetControl (0x10000000+SkillsOffsetName+(i*SkillsLabelIncrement))
 		Label.SetText (SkillName)
@@ -347,14 +350,14 @@ def SkillsRedraw (direction=0):
 	return
 
 def SkillJustPress(btn, val):
-	Pos = val+SkillsTopIndex
+	Pos = val + GemRB.GetVar ("SkillsTopIndex")
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	return
 
 def SkillDecreasePress(btn, val):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
-	Pos = val+SkillsTopIndex
+	Pos = val + GemRB.GetVar ("SkillsTopIndex")
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
@@ -374,7 +377,7 @@ def SkillDecreasePress(btn, val):
 def SkillIncreasePress(btn, val):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
-	Pos = val+SkillsTopIndex
+	Pos = val + GemRB.GetVar ("SkillsTopIndex")
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	if SkillPointsLeft == 0:
 		return
@@ -390,13 +393,6 @@ def SkillIncreasePress(btn, val):
 	GemRB.SetVar ("SkillPointsLeft", SkillPointsLeft)
 	SkillsRedraw(1)
 	SkillsCallback ()
-	return
-
-def SkillScrollBarPress():
-	global SkillsTopIndex
-
-	SkillsTopIndex = GemRB.GetVar("SkillsTopIndex")
-	SkillsRedraw ()
 	return
 
 # saves all the skills

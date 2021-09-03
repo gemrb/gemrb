@@ -21,14 +21,12 @@
 #ifndef RESOURCEDESC_H
 #define RESOURCEDESC_H
 
-#include "SClassID.h"
-#include "exports.h"
 #include "ie_types.h"
+
+#include "Resource.h"
 
 namespace GemRB {
 
-class DataStream;
-class Resource;
 class TypeID;
 
 /**
@@ -36,7 +34,7 @@ class TypeID;
  */
 class GEM_EXPORT ResourceDesc {
 public:
-	typedef Resource* (*CreateFunc)(DataStream*);
+	using CreateFunc = Resource* (*)(DataStream*);
 private:
 	const TypeID *type;
 	const char *ext;
@@ -52,7 +50,6 @@ public:
 	 * @param[in] keyType \iespecific Type identifier used in key/biff files.
 	 */
 	ResourceDesc(const TypeID* type, CreateFunc create, const char *ext, ieWord keyType = 0);
-	~ResourceDesc(void);
 	const char* GetExt() const;
 	const TypeID* GetType() const;
 	ieWord GetKeyType() const;

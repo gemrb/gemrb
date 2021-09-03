@@ -47,7 +47,7 @@ TLKImporter::TLKImporter(void)
 		charname=-1;
 	}
 
-	AutoTable tm("gender");
+	AutoTable tm = gamedata->LoadTable("gender");
 	int gtcount = 0;
 	if (tm) {
 		gtcount = tm->GetRowCount();
@@ -109,9 +109,9 @@ bool TLKImporter::Open(DataStream* stream)
 		Log(ERROR, "TLKImporter", "Not a valid TLK File.");
 		return false;
 	}
-	str->ReadWord( &Language ); // English is 0
-	str->ReadDword( &StrRefCount );
-	str->ReadDword( &Offset );
+	str->ReadWord(Language); // English is 0
+	str->ReadDword(StrRefCount);
+	str->ReadDword(Offset);
 	if (StrRefCount >= STRREF_START) {
 		Log(ERROR, "TLKImporter", "Too many strings (%d), increase STRREF_START.", StrRefCount);
 		return false;
@@ -158,7 +158,7 @@ char *TLKImporter::Gabber() const
 {
 	const Actor *act = core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
-		return strdup(act->LongName);
+		return strdup(act->LongName.CString());
 	}
 	return strdup("?");
 }
@@ -167,7 +167,7 @@ char *TLKImporter::CharName(int slot) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
-		return strdup(act->LongName);
+		return strdup(act->LongName.CString());
 	}
 	return strdup("?");
 }
@@ -180,7 +180,7 @@ int TLKImporter::ClassStrRef(int slot) const
 		clss = act->GetActiveClass();
 	}
 
-	AutoTable tab("classes");
+	AutoTable tab = gamedata->LoadTable("classes");
 	if (!tab) {
 		return -1;
 	}
@@ -196,7 +196,7 @@ int TLKImporter::RaceStrRef(int slot) const
 		race=act->GetStat(IE_RACE);
 	}
 
-	AutoTable tab("races");
+	AutoTable tab = gamedata->LoadTable("races");
 	if (!tab) {
 		return -1;
 	}
@@ -204,7 +204,7 @@ int TLKImporter::RaceStrRef(int slot) const
 	return atoi(tab->QueryField(row,0) );
 }
 
-int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref)
+int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act && (act->GetStat(IE_SEX)==SEX_FEMALE) ) {
@@ -282,7 +282,7 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
 		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
-		AutoTable tm("magesch");
+		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
 			const char* value = tm->QueryField( row, 2 );
 			Decoded = GetCString( atoi( value ), 0 );
@@ -300,7 +300,7 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 	if (Decoded) {
 		size_t TokenLength = strlen(Decoded);
 		if (dest) {
-			memcpy( dest, Decoded, TokenLength );
+			memcpy(dest, Decoded, TokenLength);
 		}
 		//Decoded is always a copy
 		free( Decoded );
@@ -309,15 +309,15 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 	return -1;
 }
 
-bool TLKImporter::ResolveTags(char* dest, const char* source, int Length)
+bool TLKImporter::ResolveTags(char* dest, const char* source, size_t Length)
 {
 	char Token[MAX_VARIABLE_LENGTH + 1];
-	int NewLength = 0;
+	size_t NewLength = 0;
 	for (int i = 0; source[i]; i++) {
 		if (source[i] == '<') {
 			i = (int) (mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) - source);
-			int TokenLength = BuiltinToken( Token, dest + NewLength );
-			if (TokenLength == -1) {
+			size_t TokenLength = BuiltinToken( Token, dest + NewLength );
+			if (TokenLength == size_t(-1)) {
 				TokenLength = core->GetTokenDictionary()->GetValueLength( Token );
 				if (TokenLength) {
 					if (TokenLength + NewLength > Length) return false;
@@ -340,12 +340,12 @@ bool TLKImporter::ResolveTags(char* dest, const char* source, int Length)
 	return true;
 }
 
-bool TLKImporter::GetNewStringLength(const char* string, int& Length)
+bool TLKImporter::GetNewStringLength(const char* string, size_t& Length)
 {
 	char Token[MAX_VARIABLE_LENGTH + 1];
 	bool lChange = false;
-	int NewLength = 0;
-	for (int i = 0; i < Length; i++) {
+	size_t NewLength = 0;
+	for (size_t i = 0; i < Length; i++) {
 		if (string[i] == '<') {
 			// token
 			lChange = true;
@@ -393,8 +393,8 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 	char* string;
 	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
 	ieWord type;
-	int Length;
-	ieResRef SoundResRef;
+	size_t Length;
+	ResRef SoundResRef;
 
 	if (empty || strref >= STRREF_START || (strref >= BIO_START && strref <= BIO_END)) {
 		if (OverrideTLK) {
@@ -405,26 +405,22 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 			string[0] = 0;
 		}
 		type = 0;
-		SoundResRef[0]=0;
+		SoundResRef.Reset();
 	} else {
 		ieDword Volume, Pitch, StrOffset;
 		ieDword l;
 		if (str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START ) == GEM_ERROR) {
 			return strdup("");
 		}
-		str->ReadWord( &type );
+		str->ReadWord(type);
 		str->ReadResRef( SoundResRef );
 		// volume and pitch variance fields are known to be unused at minimum in bg1
-		str->ReadDword( &Volume );
-		str->ReadDword( &Pitch );
-		str->ReadDword( &StrOffset );
-		str->ReadDword( &l );
-		if (l > 65535) {
-			Length = 65535; //safety limit, it could be a dword actually
-		}
-		else {
-			Length = l;
-		}
+		str->ReadDword(Volume);
+		str->ReadDword(Pitch);
+		str->ReadDword(StrOffset);
+		str->ReadDword(l);
+		
+		Length = l;
 		
 		if (type & 1) {
 			str->Seek( StrOffset + Offset, GEM_STREAM_START );
@@ -450,10 +446,10 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 			string = string2;
 		}
 	}
-	if (type & 2 && flags & IE_STR_SOUND && SoundResRef[0] != 0) {
+	if (type & 2 && flags & IE_STR_SOUND && !SoundResRef.IsEmpty()) {
 		// GEM_SND_SPEECH will stop the previous sound source
 		unsigned int flag = GEM_SND_RELATIVE | (flags & (GEM_SND_SPEECH | GEM_SND_QUEUE));
-		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, 0, 0, flag);
+		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
 	}
 	if (flags & IE_STR_STRREFON) {
 		char* string2 = ( char* ) malloc( Length + 13 );
@@ -479,8 +475,8 @@ StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
 	}
 	ieWord type;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
-	str->ReadWord( &type );
-	ieResRef soundRef;
+	str->ReadWord(type);
+	ResRef soundRef;
 	str->ReadResRef( soundRef );
 	return StringBlock(GetString( strref, flags ), soundRef);
 }

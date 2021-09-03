@@ -29,20 +29,7 @@
 
 using namespace GemRB;
 
-KEYImporter::KEYImporter(void)
-{
-	description = NULL;
-}
-
-KEYImporter::~KEYImporter(void)
-{
-	free(description);
-	for (unsigned int i = 0; i < biffiles.size(); i++) {
-		free( biffiles[i].name );
-	}
-}
-
-static char* AddCBF(char *file)
+static char* AddCBF(const char *file)
 {
 	assert(strnlen(file, _MAX_PATH/2) < _MAX_PATH/2);
 	// This is safe in single-threaded, since the
@@ -59,11 +46,11 @@ static char* AddCBF(char *file)
 
 static bool PathExists(BIFEntry *entry, const char *path)
 {
-	PathJoin(entry->path, path, entry->name, nullptr);
+	PathJoin(entry->path, path, entry->name.c_str(), nullptr);
 	if (file_exists(entry->path)) {
 		return true;
 	}
-	PathJoin(entry->path, path, AddCBF(entry->name), nullptr);
+	PathJoin(entry->path, path, AddCBF(entry->name.c_str()), nullptr);
 	if (file_exists(entry->path)) {
 		return true;
 	}
@@ -73,10 +60,8 @@ static bool PathExists(BIFEntry *entry, const char *path)
 
 static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist)
 {
-	size_t i;
-	
-	for(i=0;i<pathlist.size();i++) {
-		if (PathExists(entry, pathlist[i].c_str() )) {
+	for (const auto& path : pathlist) {
+		if (PathExists(entry, path.c_str())) {
 			return true;
 		}
 	}
@@ -87,38 +72,37 @@ static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist
 static void FindBIF(BIFEntry *entry)
 {
 	entry->cd = 0;
-	entry->found = PathExists(entry, core->GamePath);
+	entry->found = PathExists(entry, core->config.GamePath);
 	if (entry->found) {
 		return;
 	}
 	// also check the data/Data path for gog
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, core->GameDataPath, nullptr);
+	PathJoin(path, core->config.GamePath, core->config.GameDataPath, nullptr);
 	entry->found = PathExists(entry, path);
 	if (entry->found) {
 		return;
 	}
 
 	for (int i = 0; i < MAX_CD; i++) {
-		if (PathExists(entry, core->CD[i]) ) {
+		if (PathExists(entry, core->config.CD[i])) {
 			entry->found = true;
 			entry->cd = i;
 			return;
 		}
 	}
 
-	Log(ERROR, "KEYImporter", "Cannot find %s...", entry->name);
+	Log(ERROR, "KEYImporter", "Cannot find %s...", entry->name.c_str());
 }
 
 bool KEYImporter::Open(const char *resfile, const char *desc)
 {
-	free(description);
-	description = strdup(desc);
+	description = desc;
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
 		Log(ERROR, "KEYImporter", "An Archive Plug-in is not Available");
 		return false;
 	}
-	unsigned int i;
+
 	// NOTE: Interface::Init has already resolved resfile.
 	Log(MESSAGE, "KEYImporter", "Opening %s...", resfile);
 	FileStream* f = FileStream::OpenFile(resfile);
@@ -138,15 +122,15 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	f->Read( Signature, 8 );
 	if (strncmp( Signature, "KEY V1  ", 8 ) != 0) {
 		Log(ERROR, "KEYImporter", "File has an Invalid Signature.");
-		delete( f );
+		delete f;
 		return false;
 	}
 	Log(MESSAGE, "KEYImporter", "Reading Resources...");
 	ieDword BifCount, ResCount, BifOffset, ResOffset;
-	f->ReadDword( &BifCount );
-	f->ReadDword( &ResCount );
-	f->ReadDword( &BifOffset );
-	f->ReadDword( &ResOffset );
+	f->ReadDword(BifCount);
+	f->ReadDword(ResCount);
+	f->ReadDword(BifOffset);
+	f->ReadDword(ResOffset);
 	Log(MESSAGE, "KEYImporter", "BIF Files Count: %d (Starting at %d Bytes)",
 			BifCount, BifOffset );
 	Log(MESSAGE, "KEYImporter", "RES Count: %d (Starting at %d Bytes)",
@@ -155,16 +139,16 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 
 	ieDword BifLen, ASCIIZOffset;
 	ieWord ASCIIZLen;
-	for (i = 0; i < BifCount; i++) {
+	for (unsigned int i = 0; i < BifCount; i++) {
 		BIFEntry be;
 		f->Seek( BifOffset + ( 12 * i ), GEM_STREAM_START );
-		f->ReadDword( &BifLen );
-		f->ReadDword( &ASCIIZOffset );
-		f->ReadWord( &ASCIIZLen );
-		f->ReadWord( &be.BIFLocator );
-		be.name = ( char * ) malloc( ASCIIZLen );
+		f->ReadDword(BifLen);
+		f->ReadDword(ASCIIZOffset);
+		f->ReadWord(ASCIIZLen);
+		f->ReadWord(be.BIFLocator);
+		be.name.resize(ASCIIZLen);
 		f->Seek( ASCIIZOffset, GEM_STREAM_START );
-		f->Read( be.name, ASCIIZLen );
+		f->Read(&be.name[0], ASCIIZLen);
 		for (int p = 0; p < ASCIIZLen; p++) {
 			//some MAC versions use : as delimiter
 			if (be.name[p] == '\\' || be.name[p] == ':')
@@ -182,24 +166,24 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	// only ~1% of the bg2 entries are of bucket lenght >4
 	resources.init(ResCount > 32 * 1024 ? 32 * 1024 : ResCount, ResCount);
 
-	for (i = 0; i < ResCount; i++) {
+	for (unsigned int i = 0; i < ResCount; i++) {
 		f->ReadResRef(key.ref);
-		f->ReadWord(&key.type);
-		f->ReadDword(&ResLocator);
+		f->ReadWord(key.type);
+		f->ReadDword(ResLocator);
 
 		// seems to be always the last entry?
-		if (key.ref[0] != 0)
+		if (!key.ref.IsEmpty())
 			resources.set(key, ResLocator);
 	}
 
 	Log(MESSAGE, "KEYImporter", "Resources Loaded...");
-	delete( f );
+	delete f;
 	return true;
 }
 
 bool KEYImporter::HasResource(const char* resname, SClass_ID type)
 {
-	return resources.has(resname, type);
+	return resources.has(ResRef(resname), type);
 }
 
 bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
@@ -212,7 +196,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 	if (type == 0)
 		return NULL;
 
-	const ieDword *ResLocator = resources.get(resname, type);
+	const ieDword *ResLocator = resources.get(ResRef(resname), type);
 	if (!ResLocator)
 		return 0;
 
@@ -220,11 +204,11 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 
 	if (!biffiles[bifnum].found) {
 		print("Cannot find %s... Resource unavailable.",
-				biffiles[bifnum].name );
+				biffiles[bifnum].name.c_str());
 		return NULL;
 	}
 
-	PluginHolder<IndexedArchive> ai(IE_BIF_CLASS_ID);
+	PluginHolder<IndexedArchive> ai = MakePluginHolder<IndexedArchive>(IE_BIF_CLASS_ID);
 	if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
 		print("Cannot open archive %s", biffiles[bifnum].path);
 		return NULL;

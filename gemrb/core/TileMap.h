@@ -36,26 +36,21 @@ class InfoPoint;
 class TileObject;
 
 class GEM_EXPORT TileMap {
-private:
-	std::vector< TileOverlay*> overlays;
-	std::vector< TileOverlay*> rain_overlays;
-	std::vector< Door*> doors;
-	std::vector< Container*> containers;
-	std::vector< InfoPoint*> infoPoints;
-	std::vector< TileObject*> tiles;
 public:
-	TileMap(void);
+	using TileOverlayPtr = TileOverlay::TileOverlayPtr;
+	
+	TileMap() = default;
 	~TileMap(void);
 
 	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,
-		int ClosedIndex, unsigned short* indices, int count, DoorTrigger&& dt);
+				  int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt);
 	//gets door by active region (click target)
 	Door* GetDoor(const Point &position) const;
 	//gets door by activation position (spell target)
 	Door* GetDoorByPosition(const Point &position) const;
 	Door* GetDoor(size_t idx) const;
 	Door* GetDoor(const char* Name) const;
-	size_t GetDoorCount() { return doors.size(); }
+	size_t GetDoorCount() const { return doors.size(); }
 	//update doors for a new overlay
 	void UpdateDoors();
 	void AutoLockDoors() const;
@@ -72,10 +67,10 @@ public:
 	int CleanupContainer(Container *container);
 	size_t GetContainerCount() const { return containers.size(); }
 
-	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline);
+	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline);
 	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
 	InfoPoint* GetInfoPoint(const char* Name) const;
-	InfoPoint* GetInfoPoint(unsigned int idx) const;
+	InfoPoint* GetInfoPoint(size_t idx) const;
 	InfoPoint* GetTravelTo(const char* Destination) const;
 	InfoPoint* AdjustNearestTravel(Point &p);
 	size_t GetInfoPointCount() const { return infoPoints.size(); }
@@ -84,15 +79,22 @@ public:
 		unsigned short* openindices, int opencount,unsigned short* closeindices, int closecount);
 	TileObject* GetTile(unsigned int idx);
 	TileObject* GetTile(const char* Name);
-	size_t GetTileCount() { return tiles.size(); }
+	size_t GetTileCount() const { return tiles.size(); }
 
 	void ClearOverlays();
-	void AddOverlay(TileOverlay* overlay);
-	void AddRainOverlay(TileOverlay* overlay);
+	void AddOverlay(TileOverlayPtr overlay);
+	void AddRainOverlay(TileOverlayPtr overlay);
 	void DrawOverlays(const Region& screen, bool rain, BlitFlags flags);
-	Size GetMapSize();
-public:
+	Size GetMapSize() const;
+
 	int XCellCount = 0, YCellCount = 0;
+private:
+	std::vector<TileOverlayPtr> overlays;
+	std::vector<TileOverlayPtr> rain_overlays;
+	std::vector< Door*> doors;
+	std::vector< Container*> containers;
+	std::vector< InfoPoint*> infoPoints;
+	std::vector< TileObject*> tiles;
 };
 
 }

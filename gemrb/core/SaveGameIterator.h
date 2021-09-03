@@ -33,21 +33,21 @@ namespace GemRB {
 
 class GEM_EXPORT SaveGameIterator {
 private:
-	typedef std::vector<Holder<SaveGame> > charlist;
+	using charlist = std::vector<Holder<SaveGame>>;
 	charlist save_slots;
 
 public:
-	SaveGameIterator(void);
-	~SaveGameIterator(void);
+	SaveGameIterator() = default;
+	~SaveGameIterator() = default;
 	const charlist& GetSaveGames();
-	void DeleteSaveGame(Holder<SaveGame>);
-	int CreateSaveGame(Holder<SaveGame>, const char *slotname);
-	int CreateSaveGame(int index, bool mqs = false);
+	void DeleteSaveGame(const Holder<SaveGame>&) const;
+	int CreateSaveGame(Holder<SaveGame>, const char *slotname, bool force = false) const;
+	int CreateSaveGame(int index, bool mqs = false) const;
 	Holder<SaveGame> GetSaveGame(const char *slotname);
 private:
 	bool RescanSaveGames();
 	static Holder<SaveGame> BuildSaveGame(const char *slotname);
-	void PruneQuickSave(const char *folder);
+	void PruneQuickSave(const char *folder) const;
 };
 
 }

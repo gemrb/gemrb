@@ -18,23 +18,22 @@
 
 #include "swab.h"
 
-// fallback for platforms that don't have it
-// plus making it work with overlapping buffers (undefined in POSIX)
-void swab (const void *bfrom, void *bto, ssize_t n)
+// we use this because it works with overlapping buffers (undefined in POSIX)
+void swab_const (const void *bfrom, void *bto, long n)
 {
-  const char *from = (const char *) bfrom;
-  char *to = (char *) bto;
+	const char *from = (const char *) bfrom;
+	char *to = (char *) bto;
 
-  n &= ~((ssize_t) 1);
-  while (n > 1)
-    {
-      const char b0 = from[--n], b1 = from[--n];
-      to[n] = b0;
-      to[n + 1] = b1;
-    }
+	n &= ~((long) 1);
+	while (n > 1) {
+		const char b0 = from[--n];
+		const char b1 = from[--n];
+		to[n] = b0;
+		to[n + 1] = b1;
+	}
 }
 
-void swabs (void *buf, ssize_t n)
+void swabs (void *buf, long n)
 {
-	swab(buf, buf, n);
+	swab_const(buf, buf, n);
 }

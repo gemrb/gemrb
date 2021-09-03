@@ -74,7 +74,6 @@ GameData::GameData()
 GameData::~GameData()
 {
 	delete factory;
-	ItemSounds.clear();
 }
 
 void GameData::ClearCaches()
@@ -83,25 +82,20 @@ void GameData::ClearCaches()
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
 	PaletteCache.clear ();
+	colors.clear();
 
 	while (!stores.empty()) {
 		Store *store = stores.begin()->second;
 		stores.erase(stores.begin());
 		delete store;
 	}
-	for (auto& c : colors) {
-		free(const_cast<char*>(c.first));
-	}
 }
 
 Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 {
 	DataStream* ds = GetResource( ResRef, IE_CRE_CLASS_ID );
-	if (!ds)
-		return 0;
-
-	PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
-	if (!actormgr->Open(ds)) {
+	auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, ds);
+	if (!actormgr) {
 		return 0;
 	}
 	Actor* actor = actormgr->GetActor(PartySlot);
@@ -116,10 +110,10 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 	if (character) {
 		char nPath[_MAX_PATH], fName[16];
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
-		PathJoin( nPath, core->GamePath, "characters", fName, NULL );
+		PathJoin(nPath, core->config.GamePath, "characters", fName, nullptr);
 		stream = FileStream::OpenFile(nPath);
-		PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
-		if (!actormgr->Open(stream)) {
+		auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, stream);
+		if (!actormgr) {
 			return -1;
 		}
 		actor = actormgr->GetActor(PartySlot);
@@ -136,7 +130,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 	}
 
 	//both fields are of length 9, make this sure!
-	memcpy(actor->Area, core->GetGame()->CurrentArea, sizeof(actor->Area) );
+	actor->Area = core->GetGame()->CurrentArea;
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->SetStance( IE_ANI_TWITCH );
 	} else {
@@ -153,88 +147,44 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 }
 
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-int GameData::LoadTable(const ieResRef ResRef, bool silent)
+AutoTable GameData::LoadTable(const char *tabname, bool silent)
 {
-	int ind = GetTableIndex( ResRef );
-	if (ind != -1) {
-		tables[ind].refcount++;
-		return ind;
+	ResRef resRef = tabname;
+	if (tables.count(resRef)) {
+		return tables.at(resRef);
 	}
-	//print("(%s) Table not found... Loading from file", ResRef);
-	DataStream* str = GetResource( ResRef, IE_2DA_CLASS_ID, silent );
+
+	DataStream* str = GetResource(tabname, IE_2DA_CLASS_ID, silent);
 	if (!str) {
-		return -1;
+		return nullptr;
 	}
-	PluginHolder<TableMgr> tm(IE_2DA_CLASS_ID);
+	PluginHolder<TableMgr> tm = MakePluginHolder<TableMgr>(IE_2DA_CLASS_ID);
 	if (!tm) {
 		delete str;
-		return -1;
+		return nullptr;
 	}
 	if (!tm->Open(str)) {
-		return -1;
+		return nullptr;
 	}
-	Table t;
-	t.refcount = 1;
-	CopyResRef(t.ResRef, ResRef);
-	t.tm = tm;
-	ind = -1;
-	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].refcount == 0) {
-			ind = ( int ) i;
-			break;
-		}
-	}
-	if (ind != -1) {
-		tables[ind] = t;
-		return ind;
-	}
-	tables.push_back( t );
-	return ( int ) tables.size() - 1;
+	
+	tables[resRef] = tm;
+	return tm;
+}
+
+AutoTable GameData::LoadTable(const ResRef& resRef, bool silent)
+{
+	return LoadTable(resRef.CString(), silent);
 }
 /** Gets the index of a loaded table, returns -1 on error */
-int GameData::GetTableIndex(const char* ResRef) const
+AutoTable GameData::GetTable(const ResRef &resRef) const
 {
-	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].refcount == 0)
-			continue;
-		if (strnicmp( tables[i].ResRef, ResRef, 8 ) == 0)
-			return ( int ) i;
+	if (tables.count(resRef)) {
+		return tables.at(resRef);
 	}
-	return -1;
-}
-/** Gets a Loaded Table by its index, returns NULL on error */
-Holder<TableMgr> GameData::GetTable(size_t index) const
-{
-	if (index >= tables.size()) {
-		return NULL;
-	}
-	if (tables[index].refcount == 0) {
-		return NULL;
-	}
-	return tables[index].tm;
+	return nullptr;
 }
 
-/** Frees a Loaded Table, returns false on error, true on success */
-bool GameData::DelTable(unsigned int index)
-{
-	if (index==0xffffffff) {
-		tables.clear();
-		return true;
-	}
-	if (index >= tables.size()) {
-		return false;
-	}
-	if (tables[index].refcount == 0) {
-		return false;
-	}
-	tables[index].refcount--;
-	if (tables[index].refcount == 0)
-		if (tables[index].tm)
-			tables[index].tm.release();
-	return true;
-}
-
-PaletteHolder GameData::GetPalette(const ResRef resname)
+PaletteHolder GameData::GetPalette(const ResRef& resname)
 {
 	auto iter = PaletteCache.find(resname);
 	if (iter != PaletteCache.end())
@@ -246,41 +196,27 @@ PaletteHolder GameData::GetPalette(const ResRef resname)
 		return NULL;
 	}
 
-	PaletteHolder palette = new Palette();
+	PaletteHolder palette = MakeHolder<Palette>();
 	im->GetPalette(256,palette->col);
 	palette->named=true;
 	PaletteCache[resname] = palette;
 	return palette;
 }
 
-void GameData::FreePalette(PaletteHolder &pal, const ieResRef)
-{
-	// This was previously much hairier, trying to keep track of two different
-	// palette refcounts.  Now we just rely on Holder/Held to make sure memory
-	// is freed, while not bothering about freeing named palettes from the
-	// map.
-	pal = nullptr;
-}
-
-Item* GameData::GetItem(const ieResRef resname, bool silent)
+Item* GameData::GetItem(const ResRef &resname, bool silent)
 {
 	Item *item = (Item *) ItemCache.GetResource(resname);
 	if (item) {
 		return item;
 	}
 	DataStream* str = GetResource(resname, IE_ITM_CLASS_ID, silent);
-	PluginHolder<ItemMgr> sm(IE_ITM_CLASS_ID);
+	PluginHolder<ItemMgr> sm = GetImporter<ItemMgr>(IE_ITM_CLASS_ID, str);
 	if (!sm) {
-		delete ( str );
-		return NULL;
-	}
-	if (!sm->Open(str)) {
-		return NULL;
+		return nullptr;
 	}
 
 	item = new Item();
-	//this is required for storing the 'source'
-	strnlwrcpy(item->Name, resname, 8);
+	item->Name = resname;
 	sm->GetItem( item );
 
 	ItemCache.SetAt(resname, (void *) item);
@@ -288,88 +224,83 @@ Item* GameData::GetItem(const ieResRef resname, bool silent)
 }
 
 //you can supply name for faster access
-void GameData::FreeItem(Item const *itm, const ieResRef name, bool free)
+void GameData::FreeItem(Item const *itm, const ResRef &name, bool free)
 {
 	int res;
 
-	res=ItemCache.DecRef((void *) itm, name, free);
+	res = ItemCache.DecRef((const void *) itm, name, free);
 	if (res<0) {
-		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", name);
+		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", name.CString());
 	}
 	if (res) return;
 	if (free) delete itm;
 }
 
-Spell* GameData::GetSpell(const ieResRef resname, bool silent)
+Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 {
 	Spell *spell = (Spell *) SpellCache.GetResource(resname);
 	if (spell) {
 		return spell;
 	}
 	DataStream* str = GetResource( resname, IE_SPL_CLASS_ID, silent );
-	PluginHolder<SpellMgr> sm(IE_SPL_CLASS_ID);
+	PluginHolder<SpellMgr> sm = MakePluginHolder<SpellMgr>(IE_SPL_CLASS_ID);
 	if (!sm) {
-		delete ( str );
-		return NULL;
+		delete str;
+		return nullptr;
 	}
 	if (!sm->Open(str)) {
-		return NULL;
+		return nullptr;
 	}
 
 	spell = new Spell();
-	//this is required for storing the 'source'
-	strnlwrcpy(spell->Name, resname, 8);
+	spell->Name = resname;
 	sm->GetSpell( spell, silent );
 
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
 }
 
-void GameData::FreeSpell(Spell *spl, const ieResRef name, bool free)
+void GameData::FreeSpell(const Spell *spl, const ResRef &name, bool free)
 {
-	int res;
-
-	res=SpellCache.DecRef((void *) spl, name, free);
+	int res = SpellCache.DecRef((const void *) spl, name, free);
 	if (res<0) {
 		error("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: %.8s or %.8s\n",
-			name, spl->Name);
+			name.CString(), spl->Name.CString());
 	}
 	if (res) return;
 	if (free) delete spl;
 }
 
-Effect* GameData::GetEffect(const ieResRef resname)
+Effect* GameData::GetEffect(const ResRef &resname)
 {
 	Effect *effect = (Effect *) EffectCache.GetResource(resname);
 	if (effect) {
 		return effect;
 	}
 	DataStream* str = GetResource( resname, IE_EFF_CLASS_ID );
-	PluginHolder<EffectMgr> em(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> em = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	if (!em) {
-		delete ( str );
-		return NULL;
+		delete str;
+		return nullptr;
 	}
 	if (!em->Open(str)) {
-		return NULL;
+		return nullptr;
 	}
 
-	effect = em->GetEffect(new Effect() );
-	if (effect == NULL) {
-		return NULL;
+	effect = em->GetEffect();
+	if (effect == nullptr) {
+		return nullptr;
 	}
 
 	EffectCache.SetAt(resname, (void *) effect);
 	return effect;
 }
 
-void GameData::FreeEffect(Effect *eff, const ieResRef name, bool free)
+void GameData::FreeEffect(const Effect *eff, const ResRef &name, bool free)
 {
-	int res;
-
-	res=EffectCache.DecRef((void *) eff, name, free);
+	int res = EffectCache.DecRef((const void *) eff, name, free);
 	if (res<0) {
-		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", name);
+		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", name.CString());
 	}
 	if (res) return;
 	if (free) delete eff;
@@ -377,7 +308,7 @@ void GameData::FreeEffect(Effect *eff, const ieResRef name, bool free)
 
 //if the default setup doesn't fit for an animation
 //create a vvc for it!
-ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doublehint)
+ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef &effect, bool doublehint)
 {
 	ScriptedAnimation *ret = NULL;
 
@@ -386,14 +317,14 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 		ret = new ScriptedAnimation(ds);
 	} else {
 		AnimationFactory *af = (AnimationFactory *)
-			GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
+			GetFactoryResource(effect, IE_BAM_CLASS_ID);
 		if (af) {
 			ret = new ScriptedAnimation();
 			ret->LoadAnimationFactory( af, doublehint?2:0);
 		}
 	}
 	if (ret) {
-		strnlwrcpy(ret->ResName, effect, 8);
+		ret->ResName = effect;
 	}
 	return ret;
 }
@@ -405,7 +336,7 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 	if (Exists( effect, IE_VEF_CLASS_ID, true ) ) {
 		DataStream *ds = GetResource( effect, IE_VEF_CLASS_ID );
 		ret = new VEFObject();
-		strnlwrcpy(ret->ResName, effect, 8);
+		ret->ResName = effect;
 		ret->LoadVEF(ds);
 	} else {
 		if (Exists( effect, IE_2DA_CLASS_ID, true ) ) {
@@ -423,11 +354,11 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
 // otherwise it's not efficient
-Holder<Sprite2D> GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent)
+Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent)
 {
 	Holder<Sprite2D> tspr;
-	AnimationFactory* af = ( AnimationFactory* )
-		GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL, silent );
+	const AnimationFactory* af = (const AnimationFactory *)
+		GetFactoryResource(resRef, IE_BAM_CLASS_ID, silent);
 	if (!af) return 0;
 	if (cycle == -1)
 		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
@@ -449,10 +380,9 @@ Holder<Sprite2D> GameData::GetAnySprite(const char *resRef, int cycle, int frame
 	return img;
 }
 
-FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
-	unsigned char mode, bool silent)
+FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type, bool silent)
 {
-	int fobjindex = factory->IsLoaded(resname,type);
+	int fobjindex = factory->IsLoaded(ResRef(resname), type);
 	// already cached
 	if ( fobjindex != -1)
 		return factory->GetFactoryObject( fobjindex );
@@ -463,14 +393,14 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	switch (type) {
 	case IE_BAM_CLASS_ID:
 	{
-		DataStream* ret = GetResource( resname, type, silent );
-		if (ret) {
-			PluginHolder<AnimationMgr> ani(IE_BAM_CLASS_ID);
-			if (!ani)
-				return NULL;
-			if (!ani->Open(ret))
-				return NULL;
-			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
+		DataStream* str = GetResource(resname, type, silent);
+		if (str) {
+			auto importer = GetImporter<AnimationMgr>(IE_BAM_CLASS_ID, str);
+			if (importer == nullptr) {
+				return nullptr;
+			}
+
+			AnimationFactory* af = importer->GetAnimationFactory(resname);
 			factory->AddFactoryObject( af );
 			return af;
 		}
@@ -494,35 +424,39 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 }
 
+FactoryObject* GameData::GetFactoryResource(const ResRef& resname, SClass_ID type, bool silent)
+{
+	return GetFactoryResource(resname.CString(), type, silent);
+}
+
 void GameData::AddFactoryResource(FactoryObject* res)
 {
 	factory->AddFactoryObject(res);
 }
 
-Store* GameData::GetStore(const ieResRef ResRef)
+Store* GameData::GetStore(const ResRef &resRef)
 {
-	StoreMap::iterator it = stores.find(ResRef);
+	StoreMap::iterator it = stores.find(resRef);
 	if (it != stores.end()) {
 		return it->second;
 	}
 
-	DataStream* str = gamedata->GetResource(ResRef, IE_STO_CLASS_ID);
-	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
+	DataStream* str = gamedata->GetResource(resRef, IE_STO_CLASS_ID);
+	PluginHolder<StoreMgr> sm = MakePluginHolder<StoreMgr>(IE_STO_CLASS_ID);
 	if (sm == nullptr) {
-		delete ( str );
-		return NULL;
+		delete str;
+		return nullptr;
 	}
 	if (!sm->Open(str)) {
-		return NULL;
+		return nullptr;
 	}
 
 	Store* store = sm->GetStore(new Store());
-	if (store == NULL) {
-		return NULL;
+	if (store == nullptr) {
+		return nullptr;
 	}
-	strnlwrcpy(store->Name, ResRef, 8);
-	// The key needs to last as long as the store,
-	// so use the one we just copied.
+	
+	store->Name = resRef;
 	stores[store->Name] = store;
 	return store;
 }
@@ -536,7 +470,7 @@ void GameData::SaveStore(Store* store)
 		error("GameData", "Saving a store that wasn't cached.");
 	}
 
-	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
+	PluginHolder<StoreMgr> sm = MakePluginHolder<StoreMgr>(IE_STO_CLASS_ID);
 	if (sm == nullptr) {
 		error("GameData", "Can't save store to cache.");
 	}
@@ -563,7 +497,7 @@ void GameData::SaveAllStores()
 
 void GameData::ReadItemSounds()
 {
-	AutoTable itemsnd("itemsnd");
+	AutoTable itemsnd = LoadTable("itemsnd");
 	if (!itemsnd) {
 		return;
 	}
@@ -571,19 +505,18 @@ void GameData::ReadItemSounds()
 	int rowCount = itemsnd->GetRowCount();
 	int colCount = itemsnd->GetColumnCount();
 	for (int i = 0; i < rowCount; i++) {
-		ItemSounds[i] = std::vector<const char*>();
+		ItemSounds[i] = {};
 		for (int j = 0; j < colCount; j++) {
-			ieResRef snd;
-			strnlwrcpy(snd, itemsnd->QueryField(i, j), 8);
-			if (!strcmp(snd, "*")) break;
-			ItemSounds[i].push_back(strdup(snd));
+			ResRef snd = MakeLowerCaseResRef(itemsnd->QueryField(i, j));
+			if (snd == ResRef("*")) break;
+			ItemSounds[i].push_back(snd);
 		}
 	}
 }
 
 bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
 {
-	Sound = 0;
+	Sound.Reset();
 
 	if (ItemSounds.empty()) {
 		ReadItemSounds();
@@ -620,7 +553,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 {
 	static bool loadedRacialTHAC0 = false;
 	if (!loadedRacialTHAC0) {
-		raceTHAC0Bonus.load("racethac", true);
+		raceTHAC0Bonus = LoadTable("racethac", true);
 		loadedRacialTHAC0 = true;
 	}
 
@@ -634,8 +567,8 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 
 bool GameData::HasInfravision(const char *raceName)
 {
-	if (!racialInfravision.ok()) {
-		racialInfravision.load("racefeat", true);
+	if (!racialInfravision) {
+		racialInfravision = LoadTable("racefeat", true);
 	}
 	if (!raceName) return false;
 
@@ -646,7 +579,8 @@ int GameData::GetSpellAbilityDie(const Actor *target, int which)
 {
 	static bool loadedSpellAbilityDie = false;
 	if (!loadedSpellAbilityDie) {
-		if (!spellAbilityDie.load("clssplab", true)) {
+		spellAbilityDie = LoadTable("clssplab", true);
+		if (!spellAbilityDie) {
 			Log(ERROR, "GameData", "GetSpellAbilityDie failed loading clssplab.2da!");
 			return 6;
 		}
@@ -662,8 +596,8 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 {
 	if (!core->HasFeature(GF_3ED_RULES)) return 0;
 
-	if (!trapSaveBonus.ok()) {
-		trapSaveBonus.load("trapsave", true);
+	if (!trapSaveBonus) {
+		trapSaveBonus = LoadTable("trapsave", true);
 	}
 
 	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
@@ -671,8 +605,8 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 
 int GameData::GetTrapLimit(Scriptable *trapper)
 {
-	if (!trapLimit.ok()) {
-		trapLimit.load("traplimt", true);
+	if (!trapLimit) {
+		trapLimit = LoadTable("traplimt", true);
 	}
 
 	if (trapper->Type != ST_ACTOR) {
@@ -694,8 +628,8 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 
 int GameData::GetSummoningLimit(ieDword sex)
 {
-	if (!summoningLimit.ok()) {
-		summoningLimit.load("summlimt", true);
+	if (!summoningLimit) {
+		summoningLimit = LoadTable("summlimt", true);
 	}
 
 	unsigned int row = 1000;
@@ -717,10 +651,10 @@ const Color& GameData::GetColor(const char *row)
 {
 	// preload converted colors
 	if (colors.empty()) {
-		AutoTable colorTable("colors", true);
+		AutoTable colorTable = LoadTable("colors", true);
 		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
-			ieDword c = strtol(colorTable->QueryField(r, 0), nullptr, 0);
-			colors[strdup(colorTable->GetRowName(r))] = Color(c);
+			ieDword c = strtounsigned<ieDword>(colorTable->QueryField(r, 0));
+			colors[colorTable->GetRowName(r)] = Color(c);
 		}
 	}
 	const auto it = colors.find(row);
@@ -735,8 +669,8 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 {
 	// preload optimized version, since this gets called each tick several times
 	if (weaponStyleAPRBonusMax.IsZero()) {
-		AutoTable bonusTable("wspatck", true);
-		if (!bonusTable.ok()) {
+		AutoTable bonusTable = LoadTable("wspatck", true);
+		if (!bonusTable) {
 			weaponStyleAPRBonusMax.w = -1;
 			return 0;
 		}
@@ -770,6 +704,58 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 		col = weaponStyleAPRBonusMax.w - 1;
 	}
 	return weaponStyleAPRBonus[row * weaponStyleAPRBonusMax.w + col];
+}
+
+bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data)
+{
+	if (!data.empty()) {
+		data.clear();
+	}
+	AutoTable tm = LoadTable(tableName);
+	if (!tm) {
+		Log(ERROR, "GameData", "Cannot find %s.2da.", tableName.CString());
+		return false;
+	}
+
+	size_t count = tm->GetRowCount();
+	data.resize(count);
+	for (size_t i = 0; i < count; i++) {
+		data[i] = MakeLowerCaseResRef(tm->QueryField(i, 0));
+		// * marks an empty resource
+		if (IsStar(data[i])) {
+			data[i].Reset();
+		}
+	}
+	return true;
+}
+
+void GameData::ReadSpellProtTable()
+{
+	AutoTable tab = LoadTable("splprot");
+	if (!tab) {
+		return;
+	}
+	ieDword rowCount = tab->GetRowCount();
+	spellProt.resize(rowCount);
+	for (ieDword i = 0; i < rowCount; i++) {
+		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
+		spellProt[i].stat = (ieWord) stat;
+		spellProt[i].value = strtounsigned<ieDword>(tab->QueryField(i, 1));
+		spellProt[i].relation = strtounsigned<ieWord>(tab->QueryField(i, 2));
+	}
+}
+
+static const IWDIDSEntry badEntry = {};
+const IWDIDSEntry& GameData::GetSpellProt(index_t idx)
+{
+	if (spellProt.empty()) {
+		ReadSpellProtTable();
+	}
+
+	if (idx >= spellProt.size()) {
+		return badEntry;
+	}
+	return spellProt[idx];
 }
 
 }

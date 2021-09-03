@@ -28,7 +28,7 @@
 
 namespace GemRB {
 
-SlicedStream::SlicedStream(DataStream* str, int startpos, int size)
+SlicedStream::SlicedStream(DataStream* str, strpos_t startpos, strpos_t size)
 {
 	this->str = str->Clone();
 	assert(this->str);
@@ -49,7 +49,7 @@ DataStream* SlicedStream::Clone()
 	return new SlicedStream(str, startpos, size);
 }
 
-int SlicedStream::Read(void* dest, unsigned int length)
+strret_t SlicedStream::Read(void* dest, strpos_t length)
 {
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
@@ -69,12 +69,12 @@ int SlicedStream::Read(void* dest, unsigned int length)
 	return c;
 }
 
-int SlicedStream::Write(const void* /*src*/, unsigned int /*length*/)
+strret_t SlicedStream::Write(const void* /*src*/, strpos_t /*length*/)
 {
 	error("SlicedStream", "Attempted to use unimplemented SlicedStream::Write method!");
 }
 
-int SlicedStream::Seek(int newpos, int type)
+stroff_t SlicedStream::Seek(stroff_t newpos, strpos_t type)
 {
 	switch (type) {
 		case GEM_CURRENT_POS:
@@ -91,17 +91,17 @@ int SlicedStream::Seek(int newpos, int type)
 	str->Seek(startpos + Pos /*+ (Encrypted ? 2 : 0)*/, GEM_STREAM_START);
 	//we went past the buffer
 	if (Pos>size) {
-		print("[Streams]: Invalid seek position: %ld(limit: %ld)", Pos, size);
+		print("[Streams]: Invalid seek position: %lu (limit: %lu)", static_cast<unsigned long>(Pos), static_cast<unsigned long>(size));
 		return GEM_ERROR;
 	}
 	return GEM_OK;
 }
 
-DataStream* SliceStream(DataStream* str, unsigned long startpos, unsigned long size, bool preservepos)
+DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool preservepos)
 {
 	if (size <= 16384) {
 		// small (or empty) substream, just read it into a buffer instead of expensive file I/O
-		unsigned long oldpos;
+		strpos_t oldpos;
 		if (preservepos)
 			oldpos = str->GetPos();
 		str->Seek(startpos, GEM_STREAM_START);

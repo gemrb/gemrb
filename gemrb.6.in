@@ -101,8 +101,9 @@ Specify language used in the game data.
 .TP
 .BR GUIEnhancements =INT
 The value is a bitfield. Set it to 1 to enable a few GUI enhancements, mostly in BG2.
-Set to 2 or 3 to try to autoidentify items on transfer (if the character has enough lore).
-Disabled by default.
+Add or set to 2 to try to autoidentify items on transfer (if the character has enough lore).
+Add or set 4 if you want to skip the item description window when opening bags.
+Enabled by default.
 
 .TP
 .BR EndianSwitch =(0|1)
@@ -455,13 +456,6 @@ if you want to keep the save game compatible with the original engine. It is ena
 Set this parameter to
 .IR 1 ,
 if you want to keep the cache after exiting GemRB. It is disabled by default.
-
-.TP
-.BR IgnoreOriginalINI =(0|1)
-Set this parameter to
-.IR 1 ,
-if you want to ignore the settings from the original configuration files - baldur.ini
-/ icewind.ini / torment.ini. It is disabled by default.
 
 .TP
 .BR GamepadPointerSpeed =INT

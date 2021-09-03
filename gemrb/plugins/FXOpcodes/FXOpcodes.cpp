@@ -90,10 +90,6 @@ using namespace GemRB;
 #define PI_CSHIELD  162
 #define PI_CSHIELD2 163
 
-static ieResRef *casting_glows = NULL;
-static int cgcount = -1;
-static ieResRef *spell_hits = NULL;
-static int shcount = -1;
 static int *polymorph_stats = NULL;
 static int polystatcount = 0;
 
@@ -312,6 +308,7 @@ int fx_bounce_secondary_type (Scriptable* Owner, Actor* target, Effect* fx);//cb
 int fx_protection_school (Scriptable* Owner, Actor* target, Effect* fx); //cc
 int fx_protection_secondary_type (Scriptable* Owner, Actor* target, Effect* fx); //cd
 int fx_resist_spell (Scriptable* Owner, Actor* target, Effect* fx);//ce
+int fx_resist_spell2(Scriptable* Owner, Actor* target, Effect* fx); // ce (iwd2, ee), remapped to 0x200 in bgs to be also available there
 int fx_resist_spell_dec (Scriptable* Owner, Actor* target, Effect* fx);//??
 int fx_bounce_spell (Scriptable* Owner, Actor* target, Effect* fx);//cf
 int fx_bounce_spell_dec (Scriptable* Owner, Actor* target, Effect* fx);//??
@@ -428,8 +425,14 @@ int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only)
 //13f Usability:ItemUsability
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
-int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx);
-int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx);
+int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
+
+int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect *fx); // 0x144 (0x122) - 324
+
+int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx); // 402 in iwd2, 326 in ees
+
+int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
+int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 459
 
 int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 
@@ -452,6 +455,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ApplyEffectCurse", fx_apply_effect_curse, 0, -1 ),
 	EffectDesc("ApplyEffectItem", fx_apply_effect_item, 0, -1 ),
 	EffectDesc("ApplyEffectItemType", fx_apply_effect_item_type, 0, -1 ),
+	EffectDesc("ApplyEffectsList", fx_add_effects_list, 0, -1),
 	EffectDesc("ApplyEffectRepeat", fx_apply_effect_repeat, 0, -1 ),
 	EffectDesc("CutScene2", fx_cutscene2, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("AttackSpeedModifier", fx_attackspeed_modifier, 0, -1 ),
@@ -667,6 +671,8 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Protection:SecondaryType",fx_protection_secondary_type, 0, -1 ),//overlay?
 	EffectDesc("Protection:SecondaryTypeDec",fx_protection_secondary_type_dec, 0, -1 ),//overlay?
 	EffectDesc("Protection:Spell",fx_resist_spell, 0, -1 ),//overlay?
+	EffectDesc("Protection:Spell2", fx_resist_spell2, 0, -1),
+	EffectDesc("Protection:Spell3", fx_resist_spell_and_message, 0, -1),
 	EffectDesc("Protection:SpellDec",fx_resist_spell_dec, 0, -1 ),//overlay?
 	EffectDesc("Protection:SpellLevel",fx_protection_spelllevel, 0, -1 ),//overlay?
 	EffectDesc("Protection:SpellLevelDec",fx_protection_spelllevel_dec, 0, -1 ),//overlay?
@@ -681,6 +687,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Reveal:Magic", fx_reveal_magic, 0, -1 ),
 	EffectDesc("Reveal:Tracks", fx_reveal_tracks, 0, -1 ),
 	EffectDesc("RemoveCurse", fx_remove_curse, 0, -1 ),
+	EffectDesc("RemoveEffectsByResource", fx_remove_effects, 0, -1),
 	EffectDesc("RemoveImmunity", fx_remove_immunity, 0, -1 ),
 	EffectDesc("RemoveMapNote", fx_remove_map_note, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("RemoveProjectile", fx_remove_projectile, 0, -1 ), //removes effects from actor and area
@@ -821,6 +828,7 @@ static EffectRef fx_movement_modifier_ref = { "MovementRateModifier2", -1 }; //0
 static EffectRef fx_familiar_constitution_loss_ref = { "FamiliarBond", -1 }; //0xc3
 static EffectRef fx_familiar_marker_ref = { "FamiliarMarker", -1 }; //0xc4
 static EffectRef fx_immunity_effect_ref = { "Protection:Spell", -1 }; //0xce
+static EffectRef fx_resist_spell2_ref = { "Protection:Spell2", -1 }; //0xce (IWD2, ee), 0x200 bgs
 static EffectRef fx_imprisonment_ref = { "State:Imprisonment", -1 }; //0xd3
 static EffectRef fx_maze_ref = { "Maze", -1 }; //0xd5
 static EffectRef fx_leveldrain_ref = { "LevelDrainModifier", -1 }; //0xd8
@@ -841,6 +849,7 @@ static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_venom_ref = { "EyeOfVenom", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 static EffectRef fx_eye_fortitude_ref = { "EyeOfFortitude", -1 };
+static EffectRef fx_remove_effects_ref = { "RemoveEffectsByResource", -1 };
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
@@ -851,8 +860,6 @@ static EffectRef fx_chr_ref = { "CharismaModifier", -1 };
 
 static void Cleanup()
 {
-	core->FreeResRefTable(casting_glows, cgcount);
-	core->FreeResRefTable(spell_hits, shcount);
 	if(polymorph_stats) free(polymorph_stats);
 	polymorph_stats=NULL;
 }
@@ -901,7 +908,7 @@ EffectRef mainStatRefs[] = { fx_str_ref, fx_str_ref, fx_int_ref, fx_wis_ref, fx_
 
 // handle 3ed's effect exclusion for main stats, where only the highest bonus counts
 // NOTE: handles only additive bonuses, since others aren't present and would only muddy matters
-static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
+static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx)
 {
 	int bonus = fx->Parameter1;
 	if (!core->HasFeature(GF_3ED_RULES) || fx->Parameter2 != MOD_ADDITIVE) return;
@@ -922,7 +929,7 @@ static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
 	EffectRef &eff_ref = mainStatRefs[stat-IE_STR];
 
 	// maybe it's the only effect
-	if (target->fxqueue.CountEffects(eff_ref, fx->Parameter1, fx->Parameter2, NULL) == 1) {
+	if (target->fxqueue.CountEffects(eff_ref, fx->Parameter1, fx->Parameter2) == 1) {
 		return;
 	}
 
@@ -935,23 +942,22 @@ static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
 	}
 	fx->Parameter1 = 0;
 	fx->Parameter3 = bonus;
-	return;
 }
 
-static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)
+static inline void PlayRemoveEffect(const char *defsound, const Actor *target, const Effect* fx)
 {
-	core->GetAudioDrv()->Play(fx->Resource[0] ? fx->Resource : defsound,
-			SFX_CHAN_ACTIONS, target->Pos.x, target->Pos.y);
+	core->GetAudioDrv()->Play(fx->Resource.IsEmpty() ? defsound : fx->Resource.CString(),
+			SFX_CHAN_ACTIONS, target->Pos);
 }
 
 //resurrect code used in many places
-static void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
+static void Resurrect(const Scriptable *Owner, Actor *target, const Effect *fx, const Point &p)
 {
-	Scriptable *caster = GetCasterObject();
+	const Scriptable *caster = GetCasterObject();
 	if (!caster) {
 		caster = Owner;
 	}
-	Map *area = caster->GetCurrentArea();
+	const Map *area = caster->GetCurrentArea();
 
 	if (area && target->GetCurrentArea()!=area) {
 		MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
@@ -961,7 +967,7 @@ static void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 
 
 // handles the percentage damage spread over time by converting it to absolute damage
-inline void HandlePercentageDamage(Effect *fx, Actor *target) {
+inline void HandlePercentageDamage(Effect *fx, const Actor *target) {
 	if (fx->Parameter2 == RPD_PERCENT && fx->FirstApply) {
 		// distribute the damage to one second intervals
 		int seconds = (fx->Duration - core->GetGame()->GameTime) / AI_UPDATE_TIME;
@@ -991,7 +997,7 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 		//has a twohanded weapon equipped
 		slot = target->inventory.GetWeaponSlot();
 		if (slot>0) {
-			CREItem *item = target->inventory.GetItem(slot);
+			const CREItem *item = target->inventory.GetItem(slot);
 			if (item->Flags&IE_INV_ITEM_TWOHANDED) return FX_APPLIED;
 		}
 	}
@@ -1158,7 +1164,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	// if there are several effects on the queue, suppress all but the newest
-	unsigned int count = target->fxqueue.CountEffects(fx_set_charmed_state_ref, -1, -1, NULL);
+	unsigned int count = target->fxqueue.CountEffects(fx_set_charmed_state_ref, -1, -1);
 	if (count > 1 && target->fxqueue.GetEffectOrder(fx_set_charmed_state_ref, fx) < count) {
 		return FX_PERMANENT;
 	}
@@ -1425,7 +1431,7 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// Actor::CheckOnDeath handles the actual chunking
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
 		// bg1 & iwds have this file, bg2 & pst none
-		core->GetAudioDrv()->Play("GORE", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play("GORE", SFX_CHAN_HITS, target->Pos);
 		break;
 	case 16:
 		BASE_STATE_SET(STATE_PETRIFIED);
@@ -1439,12 +1445,12 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_PETRIFIED);
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
 		// file only in iwds
-		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos);
 		break;
 	case 128:
 		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_FROZEN);
 		damagetype = DAMAGE_COLD|DAMAGE_CHUNKING;
-		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos);
 		break;
 	case 256:
 		damagetype = DAMAGE_ELECTRICITY;
@@ -1558,10 +1564,10 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x11 CurrentHPModifier
-static int GetSpecialHealAmount(int type, Scriptable *caster)
+static int GetSpecialHealAmount(int type, const Scriptable *caster)
 {
 	if (!caster || caster->Type!=ST_ACTOR) return 0;
-	Actor *actor = (Actor *) caster;
+	const Actor *actor = (const Actor *) caster;
 	switch(type) {
 		case 3: //paladin's lay on hands, the amount is already calculated in a compatible way
 			return actor->GetSafeStat(IE_LAYONHANDSAMOUNT);
@@ -1579,8 +1585,7 @@ int fx_current_hp_modifier (Scriptable* Owner, Actor* target, Effect* fx)
 	// print("fx_current_hp_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	if (fx->Parameter2&0x10000) {
-		Point p(fx->PosX, fx->PosY);
-		Resurrect(Owner, target, fx, p);
+		Resurrect(Owner, target, fx, fx->Pos);
 	}
 	if (fx->Parameter2&0x20000) {
 		target->fxqueue.RemoveAllNonPermanentEffects();
@@ -1851,8 +1856,8 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STATE_SET( STATE_POISONED );
 
 	ieDword damage = 0;
-	int tmp = fx->Parameter1;
-	int timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
+	tick_t tmp = fx->Parameter1;
+	tick_t timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
 
 	HandlePercentageDamage(fx, target);
 	Scriptable *caster = GetCasterObject();
@@ -1936,7 +1941,7 @@ int fx_remove_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		while(i--) {
 			//does this slot need unequipping
 			if (core->QuerySlotEffects(i) ) {
-				if (fx->Resource[0] && strnicmp(inv->GetSlotItem(i)->ItemResRef, fx->Resource,8) ) {
+				if (!fx->Resource.IsEmpty() && inv->GetSlotItem(i)->ItemResRef != fx->Resource) {
 					continue;
 				}
 				if (!(inv->GetItemFlag(i)&IE_INV_ITEM_CURSED)) {
@@ -2028,8 +2033,7 @@ int fx_cure_dead_state (Scriptable* Owner, Actor* target, Effect* fx)
 	// print("fx_cure_dead_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	//call this only if the target is dead, otherwise some variables can get wrong
 	if (STATE_GET(STATE_DEAD) ) {
-		Point p(fx->PosX, fx->PosY);
-		Resurrect(Owner, target, fx, p);
+		Resurrect(Owner, target, fx, fx->Pos);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2168,9 +2172,8 @@ int fx_sparkle (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_APPLIED;
 	}
-	Point p(fx->PosX, fx->PosY);
 
-	map->Sparkle( fx->Duration, fx->Parameter1, fx->Parameter2, p, fx->Parameter3);
+	map->Sparkle( fx->Duration, fx->Parameter1, fx->Parameter2, fx->Pos, fx->Parameter3);
 	return FX_NOT_APPLIED;
 }
 
@@ -2308,7 +2311,7 @@ int fx_cure_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 int fx_cure_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_cure_invisible_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!STATE_GET(STATE_NONDET) && !game->StateOverrideFlag && !game->StateOverrideTime) {
 		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 			BASE_STATE_CURE( STATE_PST_INVIS );
@@ -2456,9 +2459,9 @@ int fx_kill_creature_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 1 - switch good and evil
 // 2 - switch lawful and chaotic
 
-static int al_switch_both[12]={0,0x33,0x32,0x31,0,0x23,0x22,0x21,0,0x13,0x12,0x11};
-static int al_switch_law[12]={0,0x31,0x32,0x33,0,0x21,0x22,0x23,0,0x11,0x12,0x13};
-static int al_switch_good[12]={0,0x13,0x12,0x11,0,0x23,0x22,0x21,0,0x33,0x32,0x31};
+static const int al_switch_both[12] = { 0, 0x33, 0x32, 0x31, 0, 0x23, 0x22, 0x21, 0, 0x13, 0x12, 0x11 };
+static const int al_switch_law[12] = { 0, 0x31, 0x32, 0x33, 0, 0x21, 0x22, 0x23, 0, 0x11, 0x12, 0x13 };
+static const int al_switch_good[12] = { 0, 0x13, 0x12, 0x11, 0, 0x23, 0x22, 0x21, 0, 0x33, 0x32, 0x31 };
 int fx_alignment_invert (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_alignment_invert(%2d)", fx->Opcode);
@@ -2497,13 +2500,11 @@ int fx_alignment_change (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_dispel_effects(%2d): Value: %d, IDS: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	ieResRef Removed;
-
 	switch (fx->Parameter2) {
 	case 0:
 	default:
 		// dispel everything
-		target->fxqueue.RemoveLevelEffects(Removed, 0xffffffff, RL_DISPELLABLE, 0);
+		target->fxqueue.RemoveLevelEffects(0xffffffff, RL_DISPELLABLE, 0);
 		break;
 	case 1:
 		//same level: 50% success, positive level diff modifies it by 5%, negative by -10%
@@ -2691,7 +2692,7 @@ int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x43 SummonCreature
 
-static int eamods[]={EAM_ALLY,EAM_ALLY,EAM_DEFAULT,EAM_ALLY,EAM_DEFAULT,EAM_ENEMY,EAM_ALLY};
+static const int eamods[] = { EAM_ALLY, EAM_ALLY, EAM_DEFAULT, EAM_ALLY, EAM_DEFAULT, EAM_ENEMY, EAM_ALLY };
 
 int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -2709,11 +2710,8 @@ int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//the monster should appear near the effect position
-	Point p(fx->PosX, fx->PosY);
-
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, eamod, 0, newfx);
-	delete newfx;
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, eamod, 0, newfx);
 	return FX_NOT_APPLIED;
 }
 
@@ -2840,7 +2838,7 @@ int fx_damage_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // only the special type of 0 means a flat bonus
 int fx_damage_bonus_modifier2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if(0) print("fx_damage_bonus_modifier2(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// print("fx_damage_bonus_modifier2(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	switch (fx->Parameter2) {
 		case 0:
@@ -3298,7 +3296,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int damage;
 	int tmp = fx->Parameter1;
 	ieDword gameTime = core->GetGame()->GameTime;
-	int timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
+	tick_t timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
 
 	if (fx->FirstApply) {
 		//ensure we prepare Parameter3 now
@@ -3319,16 +3317,16 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		tmp *= core->Time.round_sec;
 		// fall through
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
-		fx->Parameter3 = gameTime + tmp*timeStep;
+		fx->Parameter3 = gameTime + tmp * static_cast<ieDword>(timeStep);
 		damage = 1;
 		break;
 	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
 		damage = fx->Parameter1;
-		fx->Parameter3 = gameTime + timeStep;
+		fx->Parameter3 = gameTime + static_cast<ieDword>(timeStep);
 		break;
 	default:
-		fx->Parameter3 = gameTime + timeStep;
+		fx->Parameter3 = gameTime + static_cast<ieDword>(timeStep);
 		damage = 1;
 		break;
 	}
@@ -3337,7 +3335,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// x hp per 1 round
 	if (fx->Parameter2 == RPD_ROUNDS && core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		damage = fx->Parameter1;
-		fx->Parameter3 = gameTime + core->Time.round_sec*timeStep;
+		fx->Parameter3 = gameTime + core->Time.round_sec * static_cast<ieDword>(timeStep);
 	}
 
 	if (fx->FirstApply) {
@@ -3526,7 +3524,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//equip the weapon
 	// but don't add new effects if there are none, which is an ugly workaround
 	// fixes infinite loop with wm_sqrl spell from "wild mage additions" mod
-	Item *itm = gamedata->GetItem(fx->Resource, true);
+	const Item *itm = gamedata->GetItem(fx->Resource, true);
 	if (!itm) return FX_NOT_APPLIED;
 	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
 	gamedata->FreeItem(itm, fx->Resource);
@@ -3645,7 +3643,7 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_reveal_area(%2d): Value: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	Map *map = NULL;
+	Map *map = nullptr;
 
 	if (target) {
 		map = target->GetCurrentArea();
@@ -3788,10 +3786,10 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_create_inventory_item(%2d)", fx->Opcode);
 	// EEs added randomness that can't hurt elsewhere
-	ieResRef *refs[] = { &fx->Resource, &fx->Resource2, &fx->Resource3 };
+	ResRef *refs[] = { &fx->Resource, &fx->Resource2, &fx->Resource3 };
 	char count = 1;
-	if (fx->Resource2[0]) count++;
-	if (fx->Resource3[0]) count++;
+	if (!fx->Resource2.IsEmpty()) count++;
+	if (!fx->Resource3.IsEmpty()) count++;
 	int choice = RAND(0, count - 1);
 
 	target->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
@@ -3799,7 +3797,7 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//if this effect has expiration, then it will remain as a remove_item
 		//on the effect queue, inheriting all the parameters
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
-		CopyResRef(fx->Resource, *refs[choice]);
+		fx->Resource = *refs[choice];
 		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
 		return FX_APPLIED;
 	}
@@ -3829,8 +3827,7 @@ int fx_dimension_door (Scriptable* Owner, Actor* target, Effect* fx)
 	switch(fx->Parameter2)
 	{
 	case 0: //target to point
-		p.x=fx->PosX;
-		p.y=fx->PosY;
+		p = fx->Pos;
 		break;
 	case 1: //owner to target
 		if (Owner->Type!=ST_ACTOR) {
@@ -3861,20 +3858,19 @@ int fx_dimension_door (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_knock (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_knock(%2d) [%d.%d]", fx->Opcode, fx->PosX, fx->PosY);
-	Map *map = Owner->GetCurrentArea();
+	const Map *map = Owner->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	Point p(fx->PosX, fx->PosY);
 
-	Door *door = map->TMap->GetDoorByPosition(p);
+	Door *door = map->TMap->GetDoorByPosition(fx->Pos);
 	if (door) {
 		if (door->LockDifficulty<100) {
 			door->SetDoorLocked(false, true);
 		}
 		return FX_NOT_APPLIED;
 	}
-	Container *container = map->TMap->GetContainerByPosition(p);
+	Container *container = map->TMap->GetContainerByPosition(fx->Pos);
 	if (container) {
 		if(container->LockDifficulty<100) {
 			container->SetContainerLocked(false);
@@ -3921,8 +3917,8 @@ int fx_movement_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 #define FX_MS 10
-static const ieResRef monster_summoning_2da[FX_MS]={"MONSUM01","MONSUM02","MONSUM03",
- "ANISUM01","ANISUM02", "MONSUM01", "MONSUM02","MONSUM03","ANISUM01","ANISUM02"};
+static const ResRef monster_summoning_2da[FX_MS] = { "MONSUM01", "MONSUM02", "MONSUM03",
+ "ANISUM01", "ANISUM02", "MONSUM01", "MONSUM02", "MONSUM03", "ANISUM01", "ANISUM02" };
 
 // 0x7f MonsterSummoning
 int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
@@ -3938,32 +3934,26 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//get monster resref from 2da determined by fx->Resource or fx->Parameter2
-	ieResRef monster;
-	ieResRef hit;
-	ieResRef areahit;
-	ieResRef table;
+	ResRef monster;
+	ResRef hit;
+	ResRef areahit;
+	ResRef table;
 	int level = fx->Parameter1;
 
-	if (fx->Resource[0]) {
-		strnuprcpy(table, fx->Resource, 8);
+	if (!fx->Resource.IsEmpty()) {
+		table = fx->Resource;
 	} else {
 		if (fx->Parameter2 >= FX_MS) {
-			strnuprcpy(table, "ANISUM03", 8);
+			table = "ANISUM03";
 		} else {
-			strnuprcpy(table, monster_summoning_2da[fx->Parameter2], 8);
+			table = monster_summoning_2da[fx->Parameter2];
 		}
 	}
 	core->GetResRefFrom2DA(table, monster, hit, areahit);
 
-	if (!hit[0]) {
-		strnuprcpy(hit, fx->Resource2, 8);
+	if (hit.IsEmpty()) {
+		hit = fx->Resource2;
 	}
-	if (!areahit[0]) {
-		strnuprcpy(areahit, fx->Resource3, 8);
-	}
-
-	//the monster should appear near the effect position
-	Point p(fx->PosX, fx->PosY);
 
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	//The hostile flag should cover these cases, all else is arbitrary
@@ -3982,8 +3972,8 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	//caster may be important here (Source), even if currently the EA modifiers
 	//don't use it
 	Scriptable *caster = GetCasterObject();
-	core->SummonCreature(monster, hit, caster, target, p, eamod, level, newfx);
-	delete newfx;
+	//the monster should appear near the effect position
+	core->SummonCreature(monster, hit, caster, target, fx->Pos, eamod, level, newfx);
 	return FX_NOT_APPLIED;
 }
 
@@ -4144,11 +4134,11 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 	target->SendDiedTrigger();
 
 	// end the game if everyone in the party gets petrified
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int partySize = game->GetPartySize(true);
 	int stoned = 0;
 	for (int j=0; j<partySize; j++) {
-		Actor *pc = game->GetPC(j, true);
+		const Actor *pc = game->GetPC(j, true);
 		if (pc->GetStat(IE_STATE_ID) & STATE_PETRIFIED) stoned++;
 	}
 	if (stoned == partySize) {
@@ -4163,10 +4153,8 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 // 0x87 Polymorph
 static void CopyPolymorphStats(Actor *source, Actor *target)
 {
-	int i;
-
 	if(!polymorph_stats) {
-		AutoTable tab("polystat");
+		AutoTable tab = gamedata->LoadTable("polystat");
 		if (!tab) {
 			polymorph_stats = NULL;
 			polystatcount=0;
@@ -4174,18 +4162,18 @@ static void CopyPolymorphStats(Actor *source, Actor *target)
 		}
 		polystatcount = tab->GetRowCount();
 		polymorph_stats=(int *) malloc(sizeof(int)*polystatcount);
-		for (i=0;i<polystatcount;i++) {
+		for (int i = 0; i < polystatcount; i++) {
 			polymorph_stats[i]=core->TranslateStat(tab->QueryField(i,0));
 		}
 	}
 
 	assert(target->polymorphCache);
 
-	if (!target->polymorphCache->stats) {
-		target->polymorphCache->stats = new ieDword[polystatcount];
+	if (target->polymorphCache->stats.empty()) {
+		target->polymorphCache->stats.resize(polystatcount);
 	}
 
-	for(i=0;i<polystatcount;i++) {
+	for (int i = 0; i < polystatcount; i++) {
 		target->polymorphCache->stats[i] = source->Modified[polymorph_stats[i]];
 	}
 }
@@ -4215,7 +4203,7 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		cached = false;
 		target->polymorphCache = new PolymorphCache();
 	}
-	if (!cached || strnicmp(fx->Resource,target->polymorphCache->Resource,sizeof(fx->Resource))) {
+	if (!cached || fx->Resource != target->polymorphCache->Resource) {
 		Actor *newCreature = gamedata->GetCreature(fx->Resource,0);
 
 		//I don't know how could this happen, existance of the resource was already checked
@@ -4223,7 +4211,7 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 
-		memcpy(target->polymorphCache->Resource, fx->Resource, sizeof(fx->Resource));
+		target->polymorphCache->Resource = fx->Resource;
 		CopyPolymorphStats(newCreature, target);
 
 		delete newCreature;
@@ -4268,7 +4256,7 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 		target->Modified[IE_PUPPETTYPE]=0;
 
 		//go after the original puppetmarker in the puppet too
-		Actor *puppet = core->GetGame()->GetActorByGlobalID(target->GetSafeStat(IE_PUPPETID) );
+		const Actor *puppet = core->GetGame()->GetActorByGlobalID(target->GetSafeStat(IE_PUPPETID) );
 		if (puppet) {
 			Effect *puppetmarker = puppet->fxqueue.HasEffect(fx_puppetmarker_ref);
 
@@ -4316,11 +4304,11 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if(fx->Resource[0]) {
+	if (!fx->Resource.IsEmpty()) {
 		//TODO: create a single list reader that handles src and 2da too
-		SrcVector *rndstr=LoadSrc(fx->Resource);
+		const SrcVector *rndstr = LoadSrc(fx->Resource);
 		if (rndstr) {
-			fx->Parameter1 = rndstr->at(RAND(0, rndstr->size() - 1));
+			fx->Parameter1 = rndstr->at(RAND<size_t>(size_t(0), rndstr->size() - 1));
 			FreeSrc(rndstr, fx->Resource);
 			DisplayStringCore(target, fx->Parameter1, DS_HEAD);
 			target->overColor = Color(fx->Parameter2);
@@ -4328,7 +4316,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 
 		//random text for other games
-		ieDword *rndstr2 = core->GetListFrom2DA(fx->Resource);
+		const ieDword *rndstr2 = core->GetListFrom2DA(fx->Resource);
 		int cnt = rndstr2[0];
 		if (cnt) {
 			fx->Parameter1 = rndstr2[core->Roll(1,cnt,0)];
@@ -4348,12 +4336,8 @@ static const int xpos_by_direction[16]={0,-10,-12,-14,-16,-14,-12,-10,0,10,12,14
 int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_casting_glow(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	if (cgcount<0) {
-		cgcount = core->ReadResRefTable("cgtable",casting_glows);
-	}
-
-	if (fx->Parameter2<(ieDword) cgcount) {
-		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(casting_glows[fx->Parameter2], false);
+	if (fx->Parameter2 < gamedata->castingGlows.size()) {
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(gamedata->castingGlows[fx->Parameter2], false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -4385,16 +4369,16 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_visual_spell_hit(%2d): Target: %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	if (shcount<0) {
-		shcount = core->ReadResRefTable("shtable",spell_hits);
+	if (gamedata->spellHits.empty()) {
+		gamedata->ReadResRefTable(ResRef("shtable"), gamedata->spellHits);
 	}
 	//remove effect if map is not loaded
 	Map *map = target->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	if (fx->Parameter2<(ieDword) shcount) {
-		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(spell_hits[fx->Parameter2], false);
+	if (fx->Parameter2 < gamedata->spellHits.size()) {
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(gamedata->spellHits[fx->Parameter2], false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -4402,7 +4386,7 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (fx->Parameter1) {
 			sca->Pos = target->Pos;
 		} else {
-			sca->Pos = Point(fx->PosX, fx->PosY);
+			sca->Pos = fx->Pos;
 		}
 		sca->ZOffset += 45; // roughly half the target height; empirical value to match original
 		if (fx->Parameter2<32) {
@@ -4476,8 +4460,8 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 16 - class (SPCL)
 */
 
-static ieDword dsc_bits_iwd2[7]={1, 14, 6, 2, 4, 8, 16};
-static ieDword dsc_bits_bg2[7]={1, 4, 2, 8, 16, 14, 6};
+static const ieDword dsc_bits_iwd2[7] = { 1, 14, 6, 2, 4, 8, 16 };
+static const ieDword dsc_bits_bg2[7] = { 1, 4, 2, 8, 16, 14, 6 };
 int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_disable_spellcasting(%2d): Button: %d", fx->Opcode, fx->Parameter2);
@@ -4521,23 +4505,41 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x92 Spell:Cast
-// param2 was supposedly distinguishing between normal and instant casts, but uses in bg2 disagree
 int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_cast_spell(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 	if (Owner->Type == ST_ACTOR) {
-		Actor *owner = (Actor *) Owner;
+		const Actor *owner = (const Actor *) Owner;
 		// prevent eg. True Sight continuing after death
 		if (!owner->ValidTarget(GA_NO_DEAD)) {
 			return FX_NOT_APPLIED;
 		}
 	}
-	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ieResRef OldSpellResRef;
-	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	// flags: no deplete, instant, no interrupt
-	Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, fx->Parameter2, false);
-	Owner->SetSpellResRef(OldSpellResRef);
+
+	if (fx->Parameter2 == 0 || target->Type == ST_CONTAINER) {
+		// no deplete, no interrupt, caster or provided level
+		// ForceSpell doesn't have a RES variant, so there's more work
+		char tmp[60];
+		if (target == Owner) {
+			// charname has no scriptname ...
+			snprintf(tmp, sizeof(tmp), "ForceSpell(Myself,%d)", ResolveSpellNumber(fx->Resource));
+		} else {
+			snprintf(tmp, sizeof(tmp), "ForceSpell(\"%s\",%d)", target->GetScriptName(), ResolveSpellNumber(fx->Resource));
+		}
+		Action *forceSpellAction = GenerateAction(tmp);
+		if (fx->Parameter1 != 0) {
+			// override casting level
+			forceSpellAction->int1Parameter = fx->Parameter1;
+		}
+		Owner->AddActionInFront(forceSpellAction);
+		Owner->ImmediateEvent();
+	} else if (fx->Parameter2 == 1) {
+		// no deplete, instant, no interrupt, caster level
+		core->ApplySpell(fx->Resource, target, Owner, fx->CasterLevel);
+	} else { // ees introduce 2
+		// no deplete, instant, no interrupt, provided level
+		core->ApplySpell(fx->Resource, target, Owner, fx->Parameter1);
+	}
 
 	return FX_NOT_APPLIED;
 }
@@ -4558,13 +4560,26 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x94 Spell:CastSpellPoint
 int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_cast_spell_point(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
-	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ieResRef OldSpellResRef;
-	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Point p(fx->PosX, fx->PosY);
-	Owner->DirectlyCastSpellPoint(p, fx->Resource, fx->Parameter1, true, false);
-	Owner->SetSpellResRef(OldSpellResRef);
+	if (fx->Parameter2 == 0) {
+		// no deplete, no interrupt, caster or provided level
+		// ForceSpellPoint doesn't have a RES variant, so there's more work
+		char tmp[40];
+		snprintf(tmp, sizeof(tmp), "ForceSpellPoint([%d.%d],%d)", fx->Pos.x, fx->Pos.y, ResolveSpellNumber(fx->Resource));
+		Action *forceSpellAction = GenerateAction(tmp);
+		if (fx->Parameter1 != 0) {
+			// override casting level
+			forceSpellAction->int1Parameter = fx->Parameter1;
+		}
+		Owner->AddActionInFront(forceSpellAction);
+		Owner->ImmediateEvent();
+	} else if (fx->Parameter2 == 1) {
+		// no deplete, instant, no interrupt, caster level
+		core->ApplySpellPoint(fx->Resource, Owner->GetCurrentArea(), fx->Pos, Owner, fx->CasterLevel);
+	} else { // gemrb extension to mirror fx_cast_spell
+		// no deplete, instant, no interrupt, provided level
+		core->ApplySpellPoint(fx->Resource, Owner->GetCurrentArea(), fx->Pos, Owner, fx->Parameter1);
+	}
+
 	return FX_NOT_APPLIED;
 }
 
@@ -4616,7 +4631,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 	}
 
-	TileMap *TMap = target->GetCurrentArea()->TMap;
+	const TileMap *TMap = target->GetCurrentArea()->TMap;
 
 	int Count = 0;
 	while (true) {
@@ -4672,9 +4687,6 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//the monster should appear near the effect position? (unsure)
-	Point p(fx->PosX, fx->PosY);
-
 	//remove old creature
 	switch(fx->Parameter2) {
 	case 0: //remove silently
@@ -4698,11 +4710,9 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 		break;
 	default:;
 	}
-	//create replacement; should we be passing the target instead of NULL?
-	//noooo, don't unsummon replacement creatures! - fuzzie
-	//Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1, NULL, 0);
-	//delete newfx;
+	// don't unsummon replacement creatures
+	// the monster should appear near the effect position
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, nullptr, fx->Pos, EAM_DEFAULT, -1, nullptr, false);
 	return FX_NOT_APPLIED;
 }
 
@@ -4953,7 +4963,7 @@ int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	Actor *actor = target;
 
-	if (fx->Resource[0]) {
+	if (!fx->Resource.IsEmpty()) {
 		if (map) {
 			actor = map->GetActorByResource(fx->Resource);
 		} else {
@@ -5009,7 +5019,7 @@ int fx_remove_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	default:
 		// in yet another poor IE design decision ...
-		onlyknown = strnlen(fx->Resource, sizeof(ieResRef)) == 8;
+		onlyknown = strnlen(fx->Resource, 9) == 8;
 		target->spellbook.RemoveSpell(fx->Resource, onlyknown);
 		break;
 	case 1: //forget all spells of Resource
@@ -5046,9 +5056,9 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is probably inaccurate
 	if (target) {
-		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos);
 	} else {
-		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS);
+		core->GetAudioDrv()->PlayRelative(fx->Resource, SFX_CHAN_HITS);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;
@@ -5115,16 +5125,13 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Point p(fx->PosX, fx->PosY);
-
 	//apply effect, if the effect is a goner, then kill
 	//this effect too
-	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
+	const Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 	if (!newfx)
 		return FX_NOT_APPLIED;
 
-	Effect *myfx = new Effect;
-	memcpy(myfx, newfx, sizeof(Effect));
+	Effect *myfx = new Effect(*newfx);
 	myfx->random_value = core->Roll(1,100,-1);
 	myfx->Target = FX_TARGET_PRESET;
 	myfx->TimingMode = fx->TimingMode;
@@ -5137,9 +5144,8 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			// FIXME: should this happen for all effects?
 			//hack to entirely replace this effect with the applied effect, this is required for some generic effects
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
-			CopyResRef(myfx->Source, fx->Source); // more?
+			myfx->Source = fx->Source; // more?
 			target->fxqueue.AddEffect(myfx);
-			delete myfx;
 			return FX_NOT_APPLIED;
 		}
 		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
@@ -5200,7 +5206,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//remove actor from current map, and set destination map
 	if (fx->FirstApply) {
 		//if current area is different from target area
-		if (strnicmp(game->CurrentArea, fx->Resource, 8) ) {
+		if (game->CurrentArea != fx->Resource) {
 			//make global
 			game->AddNPC( target );
 			//remove from current area
@@ -5209,12 +5215,12 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				map->RemoveActor( target );
 			}
 			//set the destination area
-			strnuprcpy(target->Area, fx->Resource, 8);
+			target->Area = MakeUpperCaseResRef(fx->Resource);
 			return FX_APPLIED;
 		}
 	}
 
-	if (!strnicmp(game->CurrentArea, fx->Resource, 8) ) {
+	if (game->CurrentArea == fx->Resource) {
 		//UnMakeGlobal only if it was not in the party
 		int slot = core->GetGame()->InStore( target );
 		if (slot >= 0) {
@@ -5224,8 +5230,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			}
 		}
 		//move to area
-		Point p(fx->PosX,fx->PosY);
-		MoveBetweenAreasCore(target, fx->Resource, p, fx->Parameter2, true);
+		MoveBetweenAreasCore(target, fx->Resource, fx->Pos, fx->Parameter2, true);
 		//remove the effect now
 		return FX_NOT_APPLIED;
 	}
@@ -5276,14 +5281,14 @@ int fx_castinglevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print( "fx_castinglevel_modifier (%2d) Value:%d Type:%d", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	switch (fx->Parameter2) {
 	case 0:
-		if (fx->Resource[0]) {
+		if (!fx->Resource.IsEmpty()) {
 			STAT_MUL( IE_CASTINGLEVELBONUSMAGE, fx->Parameter1 );
 		} else {
 			STAT_SET( IE_CASTINGLEVELBONUSMAGE, fx->Parameter1 );
 		}
 		break;
 	case 1:
-		if (fx->Resource[0]) {
+		if (!fx->Resource.IsEmpty()) {
 			STAT_MUL( IE_CASTINGLEVELBONUSCLERIC, fx->Parameter1 );
 		} else {
 			STAT_SET( IE_CASTINGLEVELBONUSCLERIC, fx->Parameter1 );
@@ -5303,7 +5308,7 @@ int fx_castinglevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define FAMILIAR_RESOURCE  2
 
 //returns the familiar if there was no error
-static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef resource)
+static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *fx, const ResRef& resource)
 {
 	//summon familiar
 	Actor *fam = gamedata->GetCreature(resource);
@@ -5321,8 +5326,7 @@ static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef
 	if (!map) return NULL;
 
 	map->AddActor(fam, true);
-	Point p(fx->PosX, fx->PosY);
-	fam->SetPosition(p, true, 0);
+	fam->SetPosition(fx->Pos, true, 0);
 	fam->RefreshEffects(NULL);
 	//Make the familiar an NPC (MoveGlobal needs this)
 	Game *game = core->GetGame();
@@ -5331,7 +5335,6 @@ static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef
 	//Add some essential effects
 	Effect *newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, fam->GetBase(IE_HITPOINTS)/2, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, fam, fam);
-	delete newfx;
 
 	//the familiar marker needs to be set to 2 in case of ToB
 	ieDword fm = 0;
@@ -5340,17 +5343,15 @@ static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef
 	}
 	newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, fm, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, fam, fam);
-	delete newfx;
 
 	//maximum hp bonus of half the familiar's hp, there is no hp new bonus upgrade when upgrading familiar
 	//this is a bug even in the original engine, so I don't care
 	if (Owner) {
 		newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fam->GetBase(IE_HITPOINTS)/2, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(newfx, (Actor *) Owner, Owner);
-		delete newfx;
 	}
 
-	if (fx->Resource2[0]) {
+	if (!fx->Resource2.IsEmpty()) {
 		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(fx->Resource2, false);
 		if (vvc) {
 			//This is the final position of the summoned creature
@@ -5378,7 +5379,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//FIXME: the familiar block field is not saved in the game and not set when the
 	//familiar is itemized, so a game reload will clear it (see how this is done in original)
 	if (game->familiarBlock) {
@@ -5404,14 +5405,13 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		if (alignment>8) {
 			return FX_NOT_APPLIED;
 		}
-		Game *game = core->GetGame();
 
-		memcpy(fx->Resource, game->Familiars[alignment],sizeof(ieResRef) );
 		//ToB familiars
 		if (game->Expansion==5) {
 			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
-			fx->Resource[6] = '2';
-			fx->Resource[7] = '5';
+			fx->Resource.SNPrintF("%.6s25", game->GetFamiliar(alignment).CString());
+		} else {
+			fx->Resource = game->GetFamiliar(alignment);
 		}
 		fx->Parameter2=FAMILIAR_RESOURCE;
 	}
@@ -5452,17 +5452,14 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	//lose 1 point of constitution
 	newfx = EffectQueue::CreateEffect(fx_constitution_modifier_ref, (ieDword) -1, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	//remove the maximum hp bonus
 	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	//damage for half of the familiar's hitpoints
 	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	return FX_NOT_APPLIED;
 }
@@ -5479,16 +5476,13 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//upgrade familiar to ToB version
 	if ((fx->Parameter1!=2) && (game->Expansion == 5) ) {
-		ieResRef resource;
-
-		memset(resource,0,sizeof(resource));
-		memcpy(resource,target->GetScriptName(),6);
-		strncat(resource,"25",8);
+		ResRef resource;
+		resource.SNPrintF("%.6s25", target->GetScriptName());
 		//set this field, so the upgrade is triggered only once
 		fx->Parameter1 = 2;
 
 		//the NULL here is probably fine when upgrading, Owner (Original summoner) is not needed.
-		Actor *fam = GetFamiliar(NULL, target, fx, resource);
+		const Actor *fam = GetFamiliar(nullptr, target, fx, resource);
 
 		if (fam) {
 			//upgrade successful
@@ -5596,9 +5590,22 @@ int fx_protection_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect *
 //0xce Protection:Spell
 int fx_resist_spell (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 {
-	// print("fx_resist_spell(%2d): Resource: %s", fx->Opcode, fx->Resource);
-	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+	if (fx->Resource != fx->SourceRef) {
 		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE);
+		return FX_APPLIED;
+	}
+	//this has effect only on first apply, it will stop applying the spell
+	return FX_ABORT;
+}
+
+//0xce (same place as in bg2, but different targeting)
+int fx_resist_spell2(Scriptable* Owner, Actor* target, Effect *fx)
+{
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (fx->Resource != fx->SourceRef) {
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
@@ -5616,7 +5623,7 @@ int fx_resist_spell_dec (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+	if (fx->Resource != fx->SourceRef) {
 		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE_DEC);
 		return FX_APPLIED;
 	}
@@ -5735,7 +5742,7 @@ int fx_freedom (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_maze(%2d)", fx->Opcode);
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (fx->Parameter2) {
 		//this version of maze works only in combat
 		if (!fx->FirstApply && !game->CombatCounter) {
@@ -5773,11 +5780,10 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->GetDictionary()->SetAt("ActionLevel", 5);
 	} else {
 		//all spells listed in 2da
-		ieResRef *data = NULL;
+		std::vector<ResRef> data;
+		gamedata->ReadResRefTable(fx->Resource, data);
+		sb->SetCustomSpellInfo(data, fx->SourceRef, 0);
 
-		int count = core->ReadResRefTable(fx->Resource, data);
-		sb->SetCustomSpellInfo(data, fx->Source, count);
-		core->FreeResRefTable(data, count);
 		core->GetDictionary()->SetAt("ActionLevel", 11);
 	}
 	// force a redraw of the action bar
@@ -5847,14 +5853,14 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// used for example in Horror, where you want only one screaming face at the target location, not all secondaries #198
 		// (both the main and secondary projectiles carry this effect with the same resource)
 		// BUT child pros shouldn't actually draw this, since their timing is not in sync and the last few frames will then flicker, as each copy ends
-		if (fx->SourceX != 0 || fx->SourceY != 0) {
-			if (map->HasVVCCell(fx->Resource, Point(fx->SourceX, fx->SourceY))) {
+		if (!fx->Source.IsZero()) {
+			if (map->HasVVCCell(fx->Resource, fx->Source)) {
 				delete sca;
 				return FX_NOT_APPLIED;
 			}
-			sca->Pos = Point(fx->SourceX, fx->SourceY);
+			sca->Pos = fx->Source;
 		} else {
-			sca->Pos = Point(fx->PosX, fx->PosY);
+			sca->Pos = fx->Pos;
 		}
 	} else {
 		sca->Pos = target->Pos;
@@ -5956,19 +5962,15 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xdc DispelSchool
 int fx_dispel_school (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieResRef Removed;
-
 	// print("fx_dispel_school(%2d): Level: %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 //0xdd DispelSecondaryType
 int fx_dispel_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieResRef Removed;
-
 	// print("fx_dispel_secondary_type(%2d): Level: %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSECTYPE, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSECTYPE, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
@@ -5977,13 +5979,13 @@ int fx_teleport_field (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_teleport_field(%2d): Distance: %d", fx->Opcode, fx->Parameter1);
 
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
 	//the origin is the effect's target point
-	Point p(fx->PosX+core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)),
-		fx->PosY+core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)) );
+	Point p = Point(core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)),
+					core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)) ) + fx->Pos;
 
 	target->SetPosition( p, true, 0);
 	return FX_NOT_APPLIED;
@@ -6076,20 +6078,16 @@ int fx_bounce_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effect* 
 //0xe5 DispelSchoolOne
 int fx_dispel_school_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieResRef Removed;
-
 	// print("fx_dispel_school_one(%2d): Level: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
 //0xe6 DispelSecondaryTypeOne
 int fx_dispel_secondary_type_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieResRef Removed;
-
 	// print("fx_dispel_secondary_type_one(%2d): Level: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSECTYPE|RL_REMOVEFIRST, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSECTYPE|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
@@ -6176,9 +6174,9 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	bool condition = false;
 	bool per_round = true; // 4xxx trigger?
-	const TriggerEntry *entry = NULL;
+	const TriggerEntry *entry = nullptr;
 	Trigger* parameters;
-	Actor *nearest = NULL;
+	const Actor *nearest = nullptr;
 
 	// check the condition
 	switch (fx->Parameter2) {
@@ -6295,7 +6293,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 				condition = false;
 			}
 		} else {
-			Actor *act = (Actor *) Owner;
+			const Actor *act = (const Actor *) Owner;
 			if (Owner->Ticks % act->GetAdjustedTime(core->Time.round_size)) {
 				condition = false;
 			}
@@ -6304,7 +6302,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		fx->Parameter5 = 0;
 	} else {
 		// This is a normal trigger which gets a single opportunity every frame.
-		condition = (entry != NULL);
+		condition = (entry != nullptr);
 
 		// make sure we don't apply once per tick to the same target, potentially triggering 2 actor recursion
 		// there could be more than one tick in between successful triggers; trying with a half a round limit
@@ -6317,23 +6315,17 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (condition) {
 		// The trigger was evaluated as true, cast the spells now.
-		// TODO: fail remaining spells if an earlier one fails?
-		unsigned int i, dist;
-		ieResRef refs[4];
-		CopyResRef(refs[0], fx->Resource);
-		CopyResRef(refs[1], fx->Resource2);
-		CopyResRef(refs[2], fx->Resource3);
-		CopyResRef(refs[3], fx->Resource4);
+		ResRef refs[4] = { fx->Resource, fx->Resource2, fx->Resource3, fx->Resource4 };
 		// save the current spell ref, so the rest of its effects can be applied afterwards (in case of a surge)
-		ieResRef OldSpellResRef;
-		memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-		for (i=0; i < 4; i++) {
-			if (!refs[i][0]) {
+		ResRef OldSpellResRef(Owner->SpellResRef);
+
+		for (unsigned int i = 0; i < 4; i++) {
+			if (refs[i].IsEmpty()) {
 				continue;
 			}
 			// Actually, atleast fire shields also have a range check
 			if (fx->Parameter2 == COND_GOTHIT) {
-				dist = GetSpellDistance(refs[i], target);
+				unsigned int dist = GetSpellDistance(refs[i], target);
 				if (!dist) {
 					displaymsg->DisplayConstantStringName(STR_CONTFAIL, DMC_RED, target);
 					continue;
@@ -6386,7 +6378,7 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//this effect terminates in cutscene mode
 	if (core->InCutSceneMode()) return FX_NOT_APPLIED;
 
-	if (target->fxqueue.HasEffectWithSource(fx_contingency_ref, fx->Source)) {
+	if (target->fxqueue.HasEffectWithSource(fx_contingency_ref, fx->SourceRef)) {
 		displaymsg->DisplayConstantStringName(STR_CONTDUP, DMC_WHITE, target);
 		return FX_NOT_APPLIED;
 	}
@@ -6398,6 +6390,8 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		dict->SetAt( "P1", fx->Parameter1 );
 		dict->SetAt( "P2", fx->Parameter2 );
 		core->SetEventFlag(EF_SEQUENCER);
+		// set also this for GUIMG, since the spell won't be normally cast, but applied
+		target->LastSpellOnMe = ResolveSpellNumber(fx->SourceRef);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -6408,8 +6402,8 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define WB_OWNDIR 6
 #define WB_AWAYOWNDIR 7
 
-static int coords[16][2]={ {0,12},{-4,9},{-8,6},{-12,3},{-16,0},{-12,-3},{-8,-6},{-4,-9},
-{0,-12},{4,-9},{8,-6},{12,-3},{16,0},{12,3},{8,6},{4,9},};
+static const int coords[16][2]={ {0, 12}, {-4, 9}, {-8, 6}, {-12, 3}, {-16, 0}, {-12, -3}, {-8, -6}, {-4, -9},
+{0, -12}, {4, -9}, {8, -6}, {12, -3}, {16, 0}, {12, 3}, {8, 6}, {4, 9}, };
 
 // 0xeb WingBuffet
 int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -6425,7 +6419,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	if (fx->FirstApply) {
 		fx->Parameter4 = game->GameTime;
@@ -6441,10 +6435,10 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 		case WB_AWAY:
 		default:
-			dir = GetOrient(target->Pos, Point(fx->SourceX, fx->SourceY));
+			dir = GetOrient(target->Pos, fx->Source);
 			break;
 		case WB_TOWARDS:
-			dir = GetOrient(Point(fx->SourceX, fx->SourceY), target->Pos);
+			dir = GetOrient(fx->Source, target->Pos);
 			break;
 		case WB_FIXDIR:
 			dir = fx->Parameter3;
@@ -6462,7 +6456,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	newpos.y += coords[dir][1]*(signed) fx->Parameter1*ticks/12;///AI_UPDATE_TIME;
 
 	//change is minimal, lets try later
-	if (newpos.x==target->Pos.x && newpos.y==target->Pos.y)
+	if (newpos == target->Pos)
 		return FX_APPLIED;
 
 	target->SetPosition(newpos, true, 0);
@@ -6474,8 +6468,6 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0xec ProjectImage
 int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	const char * resref = NULL;
-
 	// print("fx_puppet_master(%2d): Value: %d, Stat: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	//copyself doesn't copy scripts, so the script clearing code is not needed
@@ -6484,47 +6476,44 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	if (newfx) {
 		core->ApplyEffect(newfx, copy, copy);
-		delete newfx;
 	}
 
-	ieResRef script;
-
+	ResRef script;
 	//intentionally 7, to leave room for the last letter
-	strnlwrcpy(script,target->GetScript(SCR_CLASS),7);
-	//no need of buffer defense as long as you don't mess with the 7 above
-	strcat(script,"m");
+	// if this ever breaks, try with the CRE file name as the prefix (sources disagree)
+	script.SNPrintF("%.7sm", target->GetScript(SCR_CLASS).CString());
 	//if the caster is inparty, the script is turned off by the AI disable flag
 	copy->SetScript(script, SCR_CLASS, target->InParty!=0);
 
+	ResRef puppetRef;
 	switch(fx->Parameter2)
 	{
 	case 1:
-		resref = "mislead";
+		puppetRef = "mislead";
 		//set the gender to illusionary, so ids matching will work
 		copy->SetBase(IE_SEX, SEX_ILLUSION);
 		copy->SetBase(IE_MAXHITPOINTS, copy->GetBase(IE_MAXHITPOINTS)/2);
 		break;
 	case 2:
-		resref = "projimg";
+		puppetRef = "projimg";
 		copy->SetBase(IE_SEX, SEX_ILLUSION);
 		break;
 	case 3:
-		resref = "simulacr";
+		puppetRef = "simulacr";
 		// healable level drain
 		// second generation simulacri are supposedly at a different level, but that makes little sense:
 		// level = original caster - caster / 2; eg. lvl 32 -> 16 -> 24 -> 20 -> 22 -> 21
 		newfx = EffectQueue::CreateEffect(fx_leveldrain_ref, copy->GetXPLevel(1)/2, 0, FX_DURATION_INSTANT_PERMANENT);
 		if (newfx) {
 			core->ApplyEffect(newfx, copy, copy);
-			delete newfx;
 		}
 		break;
 	default:
-		resref = fx->Resource;
+		puppetRef = fx->Resource;
 		break;
 	}
-	if (resref[0]) {
-		core->ApplySpell(resref,copy,copy,0);
+	if (!puppetRef.IsEmpty()) {
+		core->ApplySpell(puppetRef, copy, copy, 0);
 	}
 
 	copy->ApplyEffectCopy(fx, fx_puppetmarker_ref, copy, fx->CasterID, fx->Parameter2);
@@ -6599,15 +6588,13 @@ int fx_farsee (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	Point p(fx->PosX, fx->PosY);
-
 	//don't explore unexplored points
 	if (!(fx->Parameter2&FS_UNEXPLORED)) {
-		if (!map->IsExplored(p)) {
+		if (!map->IsExplored(fx->Pos)) {
 			return FX_NOT_APPLIED;
 		}
 	}
-	map->ExploreMapChunk(p, fx->Parameter1, fx->Parameter2&FS_LOS);
+	map->ExploreMapChunk(fx->Pos, fx->Parameter1, fx->Parameter2&FS_LOS);
 	return FX_NOT_APPLIED;
 }
 
@@ -6710,7 +6697,7 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_change_bardsong(%2d): %s", fx->Opcode, fx->Resource);
 	// remove any previous song effects, as they are used with permanent timing
-	unsigned int count = target->fxqueue.CountEffects(fx_change_bardsong_ref, -1, -1, NULL);
+	unsigned int count = target->fxqueue.CountEffects(fx_change_bardsong_ref, -1, -1);
 	unsigned int songCount = target->spellbook.GetSpellInfoSize(1<<IE_IWD2_SPELL_SONG);
 	if (count > 0 && songCount > 0) {
 		for (unsigned int i=0; i<songCount; i++) {
@@ -6718,7 +6705,7 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->fxqueue.RemoveAllEffectsWithParam(fx_change_bardsong_ref, i);
 		}
 	}
-	memcpy(target->BardSong, fx->Resource, 8);
+	target->BardSong = fx->Resource;
 	return FX_APPLIED;
 }
 
@@ -6762,14 +6749,8 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		//failure
 		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, DMC_WHITE, target);
 		if (target->LuckyRoll(1,100,0)<25) {
-			ieResRef spl;
-
-			strnuprcpy(spl, fx->Resource, 8);
-			if (strlen(spl)<8) {
-				strcat(spl,"F");
-			} else {
-				spl[7]='F';
-			}
+			ResRef spl;
+			spl.SNPrintF("%.7sF", fx->Resource.CString());
 			core->ApplySpell(spl, target, Owner, fx->Power);
 		}
 		return FX_NOT_APPLIED;
@@ -6778,9 +6759,8 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, DMC_WHITE, target);
 	target->VerbalConstant(VB_TRAP_SET);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ieResRef OldSpellResRef;
-	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, level, 1, false);
+	ResRef OldSpellResRef(Owner->SpellResRef);
+	Owner->DirectlyCastSpellPoint(fx->Pos, fx->Resource, level, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
@@ -6789,11 +6769,10 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_set_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_set_map_note(%2d): StrRef: %d Color: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	Scriptable *marker = target?target:Owner;
+	const Scriptable *marker = target ? target : Owner;
 	Map *map = marker->GetCurrentArea();
 	if (!map) return FX_APPLIED; //delay effect
-	Point p(fx->PosX, fx->PosY);
-	map->AddMapNote(p, fx->Parameter2, fx->Parameter1);
+	map->AddMapNote(fx->Pos, fx->Parameter2, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 
@@ -6801,11 +6780,10 @@ int fx_set_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_remove_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_remove_map_note(%2d)", fx->Opcode);
-	Scriptable *marker = target?target:Owner;
+	const Scriptable *marker = target ? target : Owner;
 	Map *map = marker->GetCurrentArea();
 	if (!map) return FX_APPLIED; //delay effect
-	Point p(fx->PosX, fx->PosY);
-	map->RemoveMapNote(p);
+	map->RemoveMapNote(fx->Pos);
 	return FX_NOT_APPLIED;
 }
 
@@ -6854,7 +6832,7 @@ int fx_store_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_create_spell_sequencer(%2d): Level: %d, Count: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	if (target->fxqueue.HasEffectWithSource(fx_spell_sequencer_active_ref, fx->Source)) {
+	if (target->fxqueue.HasEffectWithSource(fx_spell_sequencer_active_ref, fx->SourceRef)) {
 		displaymsg->DisplayConstantStringName(STR_SEQDUP, DMC_WHITE, target);
 		return FX_NOT_APPLIED;
 	}
@@ -6951,7 +6929,7 @@ int fx_backstab_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x108 DropWeapon
 int fx_drop_weapon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (fx->Resource[0]) {
+	if (!fx->Resource.IsEmpty()) {
 		target->DropItem(fx->Resource, 0);
 		return FX_NOT_APPLIED;
 	}
@@ -6972,20 +6950,17 @@ int fx_drop_weapon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_modify_global_variable (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	Game *game = core->GetGame();
-	//convert it to internal variable format
 	if (!fx->IsVariable) {
-		char *poi=fx->Resource+8;
-		memmove(poi, fx->Resource2,8);
-		poi+=8;
-		memmove(poi, fx->Resource3,8);
-		poi+=8;
-		memmove(poi, fx->Resource4,8);
+		//convert it to internal variable format by shifting to overwrite the null terminators
+		memmove(&fx->VariableName[8], &fx->Resource2, 8);
+		memmove(&fx->VariableName[16], &fx->Resource3, 8);
+		memmove(&fx->VariableName[24], &fx->Resource4, 8);
 		fx->IsVariable=1;
 	}
 
 	//hack for IWD
-	if (!fx->Resource[0]) {
-		strnuprcpy(fx->Resource,"RETURN_TO_LONELYWOOD",32);
+	if (fx->Resource.IsEmpty()) {
+		strnuprcpy(fx->VariableName, "RETURN_TO_LONELYWOOD", 32);
 	}
 
 	// print("fx_modify_global_variable(%2d): Variable: %s Value: %d Type: %d", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2);
@@ -7086,15 +7061,14 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_apply_effect_repeat(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	Point p(fx->PosX, fx->PosY);
-	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
+	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 	//core->GetEffect is a borrowed reference, don't delete it
 	if (!newfx) {
 		return FX_NOT_APPLIED;
 	}
 
 	// don't apply the effect if a similar one is already applied with a shorter duration
-	Effect *oldfx = target->fxqueue.HasEffect(fx_apply_effect_repeat_ref);
+	const Effect *oldfx = target->fxqueue.HasEffect(fx_apply_effect_repeat_ref);
 	if (oldfx && oldfx->Duration < fx->Duration) {
 		return FX_NOT_APPLIED;
 	}
@@ -7145,7 +7119,7 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	switch (fx->Parameter2) {
 	case 0: //standard bg2
-		projectilelist = core->GetListFrom2DA("clearair");
+		projectilelist = core->GetListFrom2DA(ResRef("clearair"));
 		break;
 	case 1: //you can give a 2da for projectile list (gemrb)
 		projectilelist = core->GetListFrom2DA(fx->Resource);
@@ -7159,8 +7133,6 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	//The first element is the counter, so don't decrease the counter here
-	Point p(fx->PosX, fx->PosY);
-
 	int i = projectilelist[0];
 
 	while(i) {
@@ -7170,7 +7142,7 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		size_t cnt = area->GetProjectileCount(piter);
 		while( cnt--) {
 			Projectile *pro = *piter;
-			if ((pro->GetType()==projectile) && pro->PointInRadius(p) ) {
+			if ((pro->GetType()==projectile) && pro->PointInRadius(fx->Pos)) {
 				pro->Cleanup();
 			}
 		}
@@ -7297,14 +7269,11 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
-		Point p(fx->PosX, fx->PosY);
-
 		//apply effect, if the effect is a goner, then kill
 		//this effect too
-		Effect *newfx = core->GetEffect(fx->Resource, fx->Power, p);
+		const Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 		if (newfx) {
-			Effect *myfx = new Effect;
-			memcpy(myfx, newfx, sizeof(Effect));
+			Effect *myfx = new Effect(*newfx);
 			myfx->random_value = fx->random_value;
 			myfx->TimingMode=fx->TimingMode;
 			myfx->Duration=fx->Duration;
@@ -7447,9 +7416,7 @@ int fx_protection_from_turn (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //runs a predetermined script in cutscene mode
 int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	int i;
 	Game *game;
-	ieResRef resref;
 
 	// print("fx_cutscene2(%2d): Locations: %d Resource: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (core->InCutSceneMode()) return FX_NOT_APPLIED;
@@ -7459,12 +7426,12 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	switch(fx->Parameter1) {
 	case 1://simple party locations
 		game->ClearSavedLocations();
-		for (i = 0; i < game->GetPartySize(false); i++) {
-			Actor* act = game->GetPC( i, false );
+		for (int i = 0; i < game->GetPartySize(false); i++) {
+			const Actor* act = game->GetPC(i, false);
 			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
 			if (act && gle) {
 				gle->Pos = act->Pos;
-				memcpy(gle->AreaResRef, act->Area, 9);
+				gle->AreaResRef = act->Area;
 			}
 		}
 		break;
@@ -7472,28 +7439,29 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		break;
 	default://original plane locations
 		game->ClearPlaneLocations();
-		for (i = 0; i < game->GetPartySize(false); i++) {
-			Actor* act = game->GetPC( i, false );
+		for (int i = 0; i < game->GetPartySize(false); i++) {
+			const Actor* act = game->GetPC(i, false);
 			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
 			if (act && gle) {
 				gle->Pos = act->Pos;
-				memcpy(gle->AreaResRef, act->Area, 9);
+				gle->AreaResRef = act->Area;
 			}
 		}
 	}
 
 	core->SetCutSceneMode(true);
 
+	ResRef resRef;
 	//GemRB enhancement: allow a custom resource
 	if (fx->Parameter2) {
-		strnlwrcpy(resref,fx->Resource, 8);
+		resRef = MakeLowerCaseResRef(fx->Resource);
 	} else {
-		strnlwrcpy(resref,"cut250a",8);
+		resRef = "cut250a";
 	}
 
-	GameScript* gs = new GameScript( resref, game );
+	GameScript* gs = new GameScript(resRef, game);
 	gs->EvaluateAllBlocks();
-	delete( gs );
+	delete gs;
 	return FX_NOT_APPLIED;
 }
 //0x12b ChaosShieldModifier
@@ -7547,13 +7515,11 @@ int fx_mass_raise_dead (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_mass_raise_dead(%2d)", fx->Opcode);
 
-	Game *game=core->GetGame();
-
+	const Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
-	Point p(fx->PosX,fx->PosY);
 	while (i--) {
 		Actor *actor=game->GetPC(i,false);
-		Resurrect(Owner, actor, fx, p);
+		Resurrect(Owner, actor, fx, fx->Pos);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -7608,14 +7574,11 @@ int fx_protection_from_tracking (Scriptable* /*Owner*/, Actor* target, Effect* f
 // 0x135 ModifyLocalVariable
 int fx_modify_local_variable (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	//convert it to internal variable format
 	if (!fx->IsVariable) {
-		char *poi = fx->Resource+8;
-		memmove(poi, fx->Resource2, 8);
-		poi+=8;
-		memmove(poi, fx->Resource3, 8);
-		poi+=8;
-		memmove(poi, fx->Resource4, 8);
+		//convert it to internal variable format by shifting to overwrite the null terminators
+		memmove(&fx->VariableName[8], &fx->Resource2, 8);
+		memmove(&fx->VariableName[16], &fx->Resource3, 8);
+		memmove(&fx->VariableName[24], &fx->Resource4, 8);
 		fx->IsVariable=1;
 	}
 	// print("fx_modify_local_variable(%2d): %s, Mod: %d", fx->Opcode, fx->Resource, fx->Parameter2);
@@ -7642,17 +7605,15 @@ int fx_timeless_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //GemRB extension: you can use different tables and not only wisdom stat
 int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	ieResRef spl;
-
 	// print("fx_generate_wish(%2d): Mod: %d", fx->Opcode, fx->Parameter2);
 	if (!fx->Parameter2) {
 		fx->Parameter2=IE_WIS;
 	}
 	int stat = target->GetSafeStat(fx->Parameter2);
-	if (!fx->Resource[0]) {
-		memcpy(fx->Resource,"wishcode",8);
+	if (fx->Resource.IsEmpty()) {
+		fx->Resource = "wishcode";
 	}
-	AutoTable tm(fx->Resource);
+	AutoTable tm = gamedata->LoadTable(fx->Resource);
 	if (!tm) {
 		return FX_NOT_APPLIED;
 	}
@@ -7670,7 +7631,9 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 		int max = atoi(tm->QueryField(i, 2));
 		if (stat>=min && stat<=max) break;
 	}
-	strnuprcpy(spl, tm->QueryField(i,0), 8);
+
+	ResRef spl;
+	spl = tm->QueryField(i, 0);
 	core->ApplySpell(spl, target, Owner, fx->Power);
 	return FX_NOT_APPLIED;
 }
@@ -7802,7 +7765,7 @@ int fx_uncanny_dodge (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 we allow also setting the normal stats, below index 256
 */
 static EffectRef fx_damage_bonus_modifier2_ref = { "DamageBonusModifier2", -1 };
-static int damage_mod_map[] = { 4, 2, 9, 3, 1, 8, 6, 5, 10, 7, 11, 12, 13 };
+static const int damage_mod_map[] = { 4, 2, 9, 3, 1, 8, 6, 5, 10, 7, 11, 12, 13 };
 int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	ieWord stat = fx->Parameter2 & 0x0000ffff;
@@ -7829,10 +7792,78 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+// remove effects matching effects in the passed item or spell
+// parameter2 dictates whether to work on all effects, equipping or non-equipping
+int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	target->fxqueue.RemoveAllEffectsWithSource(fx_remove_effects_ref, fx->Resource, fx->Parameter2);
+	return FX_APPLIED;
+}
+
+// 0x122 (290) Protection:Spell3 with IWD ids targeting
+// 0x144 (324) Protection: Immunity to Resource and Message in EEs
+// this is a variant of fx_resist_spell that is used in iwd2 (different than bg2, see IWDOpcodes!)
+int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
+{
+	//changed this to the opposite (cure light wounds resisted by undead)
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+
+	//convert effect to the normal resist spell effect (without text)
+	//in case it lingers
+	fx->Opcode = EffectQueue::ResolveEffect(fx_resist_spell2_ref);
+
+	if (fx->Resource != fx->SourceRef) {
+		return FX_APPLIED;
+	}
+	//display message too
+	ieStrRef sourceNameRef = -1;
+
+	if(gamedata->Exists(fx->Resource, IE_ITM_CLASS_ID)) {
+		const Item *poi = gamedata->GetItem(fx->Resource);
+		sourceNameRef = poi->ItemName;
+		gamedata->FreeItem(poi, fx->Resource, false);
+	} else if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID)) {
+		const Spell *poi = gamedata->GetSpell(fx->Resource, true);
+		sourceNameRef = poi->SpellName;
+		gamedata->FreeSpell(poi, fx->Resource, false);
+	} else {
+		// ees also try one char shorter resref, so eg. the sunfire child spell finds the main one
+		ResRef tmp;
+		tmp.SNPrintF("%.7s", fx->Resource.CString());
+		if (gamedata->Exists(tmp, IE_SPL_CLASS_ID)) {
+			const Spell *poi = gamedata->GetSpell(tmp, true);
+			sourceNameRef = poi->SpellName;
+			gamedata->FreeSpell(poi, tmp, false);
+		}
+	}
+
+	if (sourceNameRef != ieStrRef(-1)) {
+		char *sourceName = core->GetCString(sourceNameRef, 0);
+		core->GetTokenDictionary()->SetAtCopy("RESOURCE", sourceName);
+		free(sourceName);
+		displaymsg->DisplayConstantStringName(STR_RES_RESISTED, DMC_WHITE, target);
+	}
+	//this has effect only on first apply, it will stop applying the spell
+	return FX_ABORT;
+}
+
+// 402 in iwd2, 326 ees
+int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	// after iwd2 style ids targeting, apply the spell named in the resource field
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
+	return FX_NOT_APPLIED;
+}
+
 // unknown
 int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	print("fx_unknown(%2d): P1: %d P2: %d ResRef: %s", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource);
+	print("fx_unknown(%2d): P1: %d P2: %d ResRef: %s", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource.CString());
 	return FX_NOT_APPLIED;
 }
 

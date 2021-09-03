@@ -48,7 +48,7 @@ def OnLoad():
 		AnimButton = StartWindow.CreateButton (0xfff0001, 57, 333, 100, 100);
 		AnimButton.SetAnimation ("MMTRCHB")
 		AnimButton.SetState (IE_GUI_BUTTON_LOCKED)
-		AnimButton.SetFlags (IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
+		AnimButton.SetFlags (IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
 
 	ProtocolButton = StartWindow.GetControl(0x00)
 	NewGameButton = StartWindow.GetControl(0x02)
@@ -178,7 +178,7 @@ def OptionsPress():
 	return
 
 def QuitPress():
-	QuitWindow = GemRB.LoadWindow(22)
+	QuitWindow = GemRB.LoadWindow(22, "GUICONN")
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 	CancelButton.MakeEscape()
@@ -195,6 +195,5 @@ def QuitPress():
 	return
 
 def NewGamePress():
-	StartWindow.Close()
 	GemRB.SetNextScript("SPParty")
 	return

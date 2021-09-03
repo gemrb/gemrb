@@ -20,9 +20,9 @@
 
 #include "GlobalTimer.h"
 
-#include "ControlAnimation.h"
 #include "Game.h"
 #include "Interface.h"
+#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
 #include "RNG.h"
 
@@ -32,24 +32,12 @@ GlobalTimer::GlobalTimer(void)
 {
 	//AI_UPDATE_TIME: how many AI updates in a second
 	interval = ( 1000 / AI_UPDATE_TIME );
-	ClearAnimations();
-}
-
-GlobalTimer::~GlobalTimer(void)
-{
-	std::vector<AnimationRef *>::iterator i;
-	for(i = animations.begin(); i != animations.end(); ++i) {
-		delete (*i);
-	}
 }
 
 void GlobalTimer::Freeze()
 {
-	unsigned long thisTime;
+	tick_t thisTime = GetTicks();
 
-	UpdateAnimations(true);
-
-	thisTime = GetTicks();
 	if (UpdateViewport(thisTime) == false) {
 		return;
 	}
@@ -62,9 +50,9 @@ void GlobalTimer::Freeze()
 	game->RealTime++;
 }
 
-bool GlobalTimer::ViewportIsMoving()
+bool GlobalTimer::ViewportIsMoving() const
 {
-	return shakeCounter || (!goal.isempty() && goal != currentVP.Origin());
+	return shakeCounter || (!goal.IsInvalid() && goal != currentVP.origin);
 }
 
 void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
@@ -94,8 +82,8 @@ void GlobalTimer::DoStep(int count)
 
 	GameControl* gc = core->GetGameControl();
 
-	Point p = currentVP.Origin();
-	if (p != goal && !goal.isempty()) {
+	Point p = currentVP.origin;
+	if (p != goal && !goal.IsInvalid()) {
 		int d = Distance(goal, p);
 		int magnitude = count * speed;
 		
@@ -113,7 +101,7 @@ void GlobalTimer::DoStep(int count)
 		// we have moved as close to the goal as possible
 		// something must have set a goal beyond the map
 		// update the goal just in case we are in a shake
-		goal = gc->Viewport().Origin();
+		goal = gc->Viewport().origin;
 	}
 
 	// do a possible shake in addition to the standard pan
@@ -122,7 +110,7 @@ void GlobalTimer::DoStep(int count)
 	if (shakeCounter > 0) {
 		shakeCounter = std::max(0, shakeCounter - count);
 		if (shakeCounter) {
-			Point shakeP = gc->Viewport().Origin();
+			Point shakeP = gc->Viewport().origin;
 			shakeP += RandomPoint(-shakeVec.x, shakeVec.x, -shakeVec.y, shakeVec.y);
 			gc->MoveViewportUnlockedTo(shakeP, false);
 		}
@@ -131,9 +119,9 @@ void GlobalTimer::DoStep(int count)
 	currentVP = gc->Viewport();
 }
 
-bool GlobalTimer::UpdateViewport(unsigned long thisTime)
+bool GlobalTimer::UpdateViewport(tick_t thisTime)
 {
-	unsigned long advance = thisTime - startTime;
+	tick_t advance = thisTime - startTime;
 	if ( advance < interval) {
 		return false;
 	}
@@ -148,10 +136,8 @@ bool GlobalTimer::Update()
 {
 	Map *map;
 	Game *game;
-	GameControl* gc;
-	unsigned long thisTime = GetTicks();
-
-	UpdateAnimations(false);
+	const GameControl* gc;
+	tick_t thisTime = GetTicks();
 
 	if (!startTime) {
 		goto end;
@@ -197,11 +183,14 @@ end:
 void GlobalTimer::DoFadeStep(ieDword count) {
 	WindowManager* wm = core->GetWindowManager();
 	if (fadeToCounter) {
-		fadeToCounter-=count;
-		if (fadeToCounter<0) {
-			fadeToCounter=0;
+		
+		if (count > fadeToCounter) {
+			fadeToCounter = 0;
 			fadeToFactor = 1;
+		} else {
+			fadeToCounter -= count;
 		}
+
 		wm->FadeColor.a = 255 * (double( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
 		//bug/patch #1837747 made this unneeded
 		//goto end; //hmm, freeze gametime?
@@ -231,7 +220,7 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 	}
 }
 
-void GlobalTimer::SetFadeToColor(unsigned long Count, unsigned short factor)
+void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 {
 	if(!Count) {
 		Count = 64;
@@ -244,7 +233,7 @@ void GlobalTimer::SetFadeToColor(unsigned long Count, unsigned short factor)
 	fadeToFactor = factor;
 }
 
-void GlobalTimer::SetFadeFromColor(unsigned long Count, unsigned short factor)
+void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 {
 	if(!Count) {
 		Count = 64;
@@ -254,87 +243,16 @@ void GlobalTimer::SetFadeFromColor(unsigned long Count, unsigned short factor)
 	fadeFromFactor = factor;
 }
 
-void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
-{
-	AnimationRef* anim;
-	unsigned long thisTime;
-
-	thisTime = GetTicks();
-	time += thisTime;
-
-	// if there are no free animation reference objects,
-	// alloc one, else take the first free one
-	if (first_animation == 0)
-		anim = new AnimationRef;
-	else {
-		anim = animations.front ();
-		animations.erase (animations.begin());
-		first_animation--;
-	}
-
-	// fill in data
-	anim->time = time;
-	anim->ctlanim = ctlanim;
-
-	// and insert it into list of other anim refs, sorted by time
-	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); ++it) {
-		if ((*it)->time > time) {
-			animations.insert( it, anim );
-			anim = NULL;
-			break;
-		}
-	}
-	if (anim)
-		animations.push_back( anim );
-}
-
-void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
-{
-	// Animation refs for given control are not physically removed,
-	// but just marked by erasing ptr to the control. They will be
-	// collected when they get to the front of the vector
-	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); ++it) {
-		if ((*it)->ctlanim == ctlanim) {
-			(*it)->ctlanim = NULL;
-		}
-	}
-}
-
-void GlobalTimer::UpdateAnimations(bool paused)
-{
-	unsigned long thisTime;
-	thisTime = GetTicks();
-	while (animations.begin() + first_animation != animations.end()) {
-		AnimationRef* anim = animations[first_animation];
-		if (anim->ctlanim == NULL) {
-			first_animation++;
-			continue;
-		}
-
-		if (anim->time <= thisTime) {
-			anim->ctlanim->UpdateAnimation(paused);
-			first_animation++;
-			continue;
-		}
-		break;
-	}
-}
-
-void GlobalTimer::ClearAnimations()
-{
-	first_animation = (unsigned int) animations.size();
-}
-
 void GlobalTimer::SetScreenShake(const Point &shake, int count)
 {
 	shakeVec.x = std::abs(shake.x);
 	shakeVec.y = std::abs(shake.y);
 	shakeCounter = count + 1;
 	
-	if (goal.isempty()) {
-		GameControl* gc = core->GetGameControl();
+	if (goal.IsInvalid()) {
+		const GameControl* gc = core->GetGameControl();
 		currentVP = gc->Viewport();
-		goal = currentVP.Origin();
+		goal = currentVP.origin;
 		speed = 1000;
 	}
 }

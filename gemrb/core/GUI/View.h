@@ -42,7 +42,7 @@ public:
 		View* dragView = nullptr;
 		View* dropView = nullptr;
 		
-		Holder<Sprite2D> cursor = nullptr;
+		Holder<Sprite2D> cursor;
 		
 		DragOp(View* v, Holder<Sprite2D> cursor);
 		virtual ~DragOp();
@@ -74,48 +74,48 @@ public:
 private:
 	Color backgroundColor;
 	Holder<Sprite2D> background;
-	Holder<Sprite2D> cursor;
+	Holder<Sprite2D> cursor = nullptr;
 	std::vector<ViewScriptingRef*> scriptingRefs;
 
-	mutable bool dirty;
+	mutable bool dirty = true;
 
 	// TODO: we could/should generalize this
 	// MarkDirty could take a region, and more complicated views could potentially
 	// save a lot of drawing time by only drawing their dirty portions (GameControl?)
 	Regions dirtyBGRects;
 	
-	View* eventProxy;
+	View* eventProxy = nullptr;
 
 protected:
-	View* superView;
+	View* superView = nullptr;
 	// for convenience because we need to get this so much
 	// all it is is a saved pointer returned from View::GetWindow and is updated in AddedToView
-	Window* window;
+	Window* window = nullptr;
 
 	Region frame;
 	std::list<View*> subViews;
 	String tooltip;
 
 	// Flags: top byte is reserved for View flags, subclasses may use the remaining bits however they want
-	unsigned int flags;
-	unsigned short autoresizeFlags; // these flags don't produce notifications
+	unsigned int flags = 0;
+	unsigned short autoresizeFlags = ResizeNone; // these flags don't produce notifications
 
 private:
-	void DirtyBGRect(const Region&);
+	void DirtyBGRect(const Region&, bool force = false);
 	void DrawBackground(const Region*) const;
-	void DrawSubviews() const;
+	void DrawSubviews();
 	void MarkDirty(const Region*);
 	bool NeedsDrawRecursive() const;
 
 	// TODO: to support partial redraws, we should change the clip parameter to a list of dirty rects
 	// that have all been clipped to the video ScreenClip
 	// subclasses can then use the list to efficiently redraw only those sections that are dirty
-	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
+	virtual void DrawSelf(const Region& /*drawFrame*/, const Region& /*clip*/) {};
 	Region DrawingFrame() const;
 
 	void AddedToWindow(Window*);
 	void AddedToView(View*);
-	void RemovedFromView(View*);
+	void RemovedFromView(const View*);
 	virtual void SubviewAdded(View* /*view*/, View* /*parent*/) {};
 	virtual void SubviewRemoved(View* /*view*/, View* /*parent*/) {};
 
@@ -128,7 +128,7 @@ private:
 	
 	virtual bool IsPerPixelScrollable() const { return true; }
 	
-	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
+	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group);
 
 protected:
 	void ClearScriptingRefs();
@@ -179,16 +179,16 @@ public:
 	bool SetAutoResizeFlags(unsigned short arg_flags, int opcode);
 	unsigned short AutoResizeFlags() const { return autoresizeFlags; }
 
-	void SetVisible(bool vis) { SetFlags(Invisible, (vis) ? OP_NAND : OP_OR ); }
+	void SetVisible(bool vis) { SetFlags(Invisible, vis ? OP_NAND : OP_OR); }
 	bool IsVisible() const;
-	void SetDisabled(bool disable) { SetFlags(Disabled, (disable) ? OP_OR : OP_NAND); }
+	void SetDisabled(bool disable) { SetFlags(Disabled, disable ? OP_OR : OP_NAND); }
 	bool IsDisabled() const { return flags&Disabled; }
 	virtual bool IsDisabledCursor() const;
 	virtual bool IsReceivingEvents() const;
 
 	Region Frame() const { return frame; }
-	Point Origin() const { return frame.Origin(); }
-	Size Dimensions() const { return frame.Dimensions(); }
+	Point Origin() const { return frame.origin; }
+	Size Dimensions() const { return frame.size; }
 	void SetFrame(const Region& r);
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);
@@ -257,11 +257,11 @@ public:
 	void SetEventProxy(View* proxy);
 
 	// GUIScripting
-	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);
-	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group);
+	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, const ScriptingGroup_t& group);
+	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ScriptingGroup_t& group);
 	const ViewScriptingRef* RemoveScriptingRef(const ViewScriptingRef*);
 	const ViewScriptingRef* GetScriptingRef() const;
-	const ViewScriptingRef* GetScriptingRef(ScriptingId id, ResRef group) const;
+	const ViewScriptingRef* GetScriptingRef(ScriptingId id, ScriptingGroup_t group) const;
 };
 
 }

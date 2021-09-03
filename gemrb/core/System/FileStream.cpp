@@ -98,7 +98,7 @@ bool FileStream::Modify(const char* fname)
 //Creating file in the cache
 bool FileStream::Create(const char* fname, SClass_ID ClassID)
 {
-	return Create(core->CachePath, fname, ClassID);
+	return Create(core->config.CachePath, fname, ClassID);
 }
 
 bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID)
@@ -128,7 +128,7 @@ bool FileStream::Create(const char *path)
 	return true;
 }
 
-int FileStream::Read(void* dest, unsigned int length)
+strret_t FileStream::Read(void* dest, strpos_t length)
 {
 	if (!opened) {
 		return GEM_ERROR;
@@ -149,7 +149,7 @@ int FileStream::Read(void* dest, unsigned int length)
 	return c;
 }
 
-int FileStream::Write(const void* src, unsigned int length)
+strret_t FileStream::Write(const void* src, strpos_t length)
 {
 	if (!created) {
 		return GEM_ERROR;
@@ -167,7 +167,7 @@ int FileStream::Write(const void* src, unsigned int length)
 	return c;
 }
 
-int FileStream::Seek(int newpos, int type)
+strret_t FileStream::Seek(stroff_t newpos, strpos_t type)
 {
 	if (!opened && !created) {
 		return GEM_ERROR;
@@ -191,7 +191,7 @@ int FileStream::Seek(int newpos, int type)
 			return GEM_ERROR;
 	}
 	if (Pos>size) {
-		print("[Streams]: Invalid seek position %ld in file %s(limit: %ld)", Pos, filename, size);
+		print("[Streams]: Invalid seek position %lu in file %s (limit: %lu)", static_cast<unsigned long>(Pos), filename, static_cast<unsigned long>(size));
 		return GEM_ERROR;
 	}
 	return GEM_OK;

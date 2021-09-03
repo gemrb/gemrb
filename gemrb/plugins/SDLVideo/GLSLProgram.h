@@ -17,14 +17,14 @@ namespace GemRB
 		static const std::string GetLastError();
 
 		~GLSLProgram();
-		void Use();
+		void Use() const;
 		void UnUse();
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLfloat value1, GLfloat value2 = 0.0f, GLfloat value3 = 0.0f, GLfloat value4 = 0.0f);
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLint value1, GLint value2 = 0, GLint value3 = 0, GLint value4 = 0);
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value);
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLint* value);
 		bool SetUniformMatrixValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value);
-		GLint GetAttribLocation(std::string attribName);
+		GLint GetAttribLocation(std::string attribName) const;
 	private:	
 		static std::string errMessage;
 

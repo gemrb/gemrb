@@ -32,12 +32,7 @@
 #define R_OK 04
 #endif
 
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
-
+#include <cstdarg>
 #include <cstring>
 #include <cerrno>
 
@@ -229,7 +224,7 @@ static bool FindInDir(const char* Dir, char *Filename)
 		return true;
 	}
 
-	if (!core->CaseSensitive) {
+	if (!core->config.CaseSensitive) {
 		return false;
 	}
 
@@ -289,7 +284,7 @@ bool PathJoin (char *target, const char *base, ...)
 	return true;
 
 finish:
-	while (char *source = va_arg(ap, char*)) {
+	while (const char *source = va_arg(ap, char*)) {
 		PathAppend(target, source);
 	}
 	va_end( ap );
@@ -345,7 +340,7 @@ void ResolveFilePath(char* FilePath)
 		}
 	}
 
-	if (core && !core->CaseSensitive) {
+	if (core && !core->config.CaseSensitive) {
 		return;
 	}
 	if (strlcpy(TempFilePath, FilePath, _MAX_PATH-1) >= _MAX_PATH-1) {
@@ -367,7 +362,7 @@ void ResolveFilePath(std::string& FilePath)
 		}
 	}
 
-	if (core && !core->CaseSensitive) {
+	if (core && !core->config.CaseSensitive) {
 		return;
 	}
 	PathJoin(TempFilePath, FilePath[0] == PathDelimiter ? SPathDelimiter : "", FilePath.c_str(), nullptr);
@@ -419,7 +414,7 @@ bool MakeDirectory(const char* path)
 #ifdef WIN32
 #define mkdir(path, mode) _mkdir(path)
 #endif
-	if (mkdir(path, S_IREAD|S_IWRITE|S_IEXEC) < 0) {
+	if (mkdir(path, S_IRWXU) < 0) {
 		if (errno != EEXIST) {
 			return false;
 		}
@@ -432,7 +427,7 @@ bool MakeDirectory(const char* path)
 
 GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
 {
-	char* home = getenv( "HOME" );
+	const char* home = getenv("HOME");
 	if (home) {
 		strlcpy(outPath, home, maxLen);
 		return outPath;

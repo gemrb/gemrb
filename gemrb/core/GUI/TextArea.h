@@ -45,10 +45,10 @@ static const Color SelectOptionSelected(55, 100, 0, 255);// default selected col
  * It is usually scrolled with a ScrollBar widget
  */
 
-class GEM_EXPORT TextArea : public Control, public View::Scrollable {
+class GEM_EXPORT TextArea final : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	
 	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {
@@ -116,7 +116,7 @@ public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps);
 	
-	~TextArea();
+	~TextArea() final;
 
 	bool IsOpaque() const override { return false; }
 	
@@ -147,7 +147,7 @@ public:
 	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	void SetAnimPicture(Holder<Sprite2D> Picture) override;
+	void SetSpeakerPicture(Holder<Sprite2D> Picture);
 
 	ContentContainer::Margin GetMargins() const;
 	void SetMargins(ContentContainer::Margin m);
@@ -155,7 +155,7 @@ public:
 	/** Returns the selected text */
 	String QueryText() const override;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(unsigned int optIdx) override;
+	void UpdateState(value_t optIdx) override;
 	void DidFocus() override;
 	void DidUnFocus() override;
 	
@@ -163,8 +163,9 @@ public:
 
 private: // Private attributes
 	// dialog and listbox handling
-	std::vector<ieDword> values;
+	std::vector<value_t> values;
 	const Content* dialogBeginNode;
+	Holder<Sprite2D> speakerPic;
 	// dialog options container
 	SpanSelector* selectOptions;
 	// standard text display container

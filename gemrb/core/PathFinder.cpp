@@ -42,7 +42,6 @@
 #include "Scriptable/Actor.h"
 
 #include <array>
-#include <cmath>
 #include <limits>
 
 namespace GemRB {
@@ -69,7 +68,8 @@ PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 	size_t tries = 0;
 	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->GetSpeed());
 	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		if (!(GetBlockedInRadius(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy), size) & PathMapFlags::PASSABLE)) {
+		Point rad(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy));
+		if (!(GetBlockedInRadius(rad, size) & PathMapFlags::PASSABLE)) {
 			tries++;
 			// Give up and call the pathfinder if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) break;
@@ -90,21 +90,21 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 {
 	if (!caller || !caller->GetSpeed()) return nullptr;
 	NavmapPoint p = s;
-	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM - 1);
+	size_t i = RAND<size_t>(0, RAND_DEGREES_OF_FREEDOM - 1);
 	double dx = 3 * dxRand[i];
 	double dy = 3 * dyRand[i];
 
 	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->GetSpeed());
 	size_t tries = 0;
 	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		if (!(GetBlockedInRadius(p.x + dx, p.y + dx, size) & PathMapFlags::PASSABLE)) {
+		if (!(GetBlockedInRadius(p + Point(dx, dy), size) & PathMapFlags::PASSABLE)) {
 			tries++;
 			// Give up if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) {
 				return nullptr;
 			}
 			// Random rotation
-			i = RAND(0, RAND_DEGREES_OF_FREEDOM - 1);
+			i = RAND<size_t>(0, RAND_DEGREES_OF_FREEDOM - 1);
 			dx = 3 * dxRand[i];
 			dy = 3 * dyRand[i];
 			NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->GetSpeed());
@@ -114,16 +114,16 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 			p.y += dy;
 		}
 	}
-	while (!(GetBlockedInRadius(p.x + dx, p.y + dx, size) & (PathMapFlags::PASSABLE|PathMapFlags::ACTOR))) {
-
+	while (!(GetBlockedInRadius(p + Point(dx, dy), size) & (PathMapFlags::PASSABLE|PathMapFlags::ACTOR))) {
 		p.x -= dx;
 		p.y -= dy;
 	}
 	PathNode *step = new PathNode;
 	step->x = p.x;
 	step->y = p.y;
-	step->x = Clamp(step->x, 1u, (Width - 1) * 16);
-	step->y = Clamp(step->y, 1u, (Height - 1) * 12);
+	const Size& mapSize = PropsSize();
+	step->x = Clamp<unsigned int>(step->x, 1u, (mapSize.w - 1) * 16);
+	step->y = Clamp<unsigned int>(step->y, 1u, (mapSize.h - 1) * 12);
 	step->Parent = nullptr;
 	step->Next = nullptr;
 	step->orient = GetOrient(p, s);
@@ -140,7 +140,7 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 		PathNode *thisNode = path;
 		while (thisNode) {
 			PathNode *nextNode = thisNode->Next;
-			delete(thisNode);
+			delete thisNode;
 			thisNode = nextNode;
 		}
 	}
@@ -195,16 +195,18 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 	int Max = Distance(start, dest);
 	for (int Steps = 0; Steps < Max; Steps++) {
 		Point p;
-		p.x = (ieWord) start.x + ((dest.x - start.x) * Steps / Max);
-		p.y = (ieWord) start.y + ((dest.y - start.y) * Steps / Max);
+		p.x = start.x + ((dest.x - start.x) * Steps / Max);
+		p.y = start.y + ((dest.y - start.y) * Steps / Max);
 
 		//the path ends here as it would go off the screen, causing problems
 		//maybe there is a better way, but i needed a quick hack to fix
 		//the crash in projectiles
-		if ((signed) p.x < 0 || (signed) p.y < 0) {
+		if (p.x < 0 || p.y < 0) {
 			return Return;
 		}
-		if ((ieWord) p.x > Width * 16 || (ieWord) p.y > Height * 12) {
+		
+		const Size& mapSize = PropsSize();
+		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
 			return Return;
 		}
 
@@ -221,7 +223,7 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		StartNode->x = p.x;
 		StartNode->y = p.y;
 		StartNode->orient = Orientation;
-		bool wall = bool(GetBlocked(p.x / 16, p.y / 12) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
+		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) & 15;
@@ -242,8 +244,9 @@ PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 	PathNode *step = new PathNode;
 	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
 	step->y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
-	step->x = Clamp(step->x, 1u, (Width - 1) * 16);
-	step->y = Clamp(step->y, 1u, (Height - 1) * 12);
+	const Size& mapSize = PropsSize();
+	step->x = Clamp<unsigned int>(step->x, 1u, (mapSize.w - 1) * 16);
+	step->y = Clamp<unsigned int>(step->y, 1u, (mapSize.h - 1) * 12);
 	step->orient = GetOrient(Point(step->x, step->y), p);
 	step->Next = nullptr;
 	step->Parent = nullptr;
@@ -257,14 +260,14 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	Log(DEBUG, "FindPath", "s = (%d, %d), d = (%d, %d), caller = %s, dist = %d, size = %d", s.x, s.y, d.x, d.y, caller ? caller->GetName(0) : "nullptr", minDistance, size);
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
-	if (!(GetBlockedInRadius(d.x, d.y, size) & PathMapFlags::PASSABLE)) {
+	if (!(GetBlockedInRadius(d, size) & PathMapFlags::PASSABLE)) {
 		// If the desired target is blocked, find the path
 		// to the nearest reachable point.
 		// Also avoid bumping a still actor out of its position,
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
-	if (minDistance < size && !(GetBlockedInRadius(nmptDest.x, nmptDest.y, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
+	if (minDistance < size && !(GetBlockedInRadius(nmptDest, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
 		Log(DEBUG, "FindPath", "%s can't fit in destination", caller ? caller->GetName(0) : "nullptr");
 		return nullptr;
 	}
@@ -272,13 +275,16 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
 	if (smptDest == smptSource) return nullptr;
 
+	const Size& mapSize = PropsSize();
+	if (!mapSize.PointInside(smptSource)) return nullptr;
+
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
-	std::vector<bool> isClosed(Width * Height, false);
-	std::vector<NavmapPoint> parents(Width * Height, Point(0, 0));
-	std::vector<unsigned short> distFromStart(Width * Height, std::numeric_limits<unsigned short>::max());
-	distFromStart[smptSource.y * Width + smptSource.x] = 0;
-	parents[smptSource.y * Width + smptSource.x] = nmptSource;
+	std::vector<bool> isClosed(mapSize.Area(), false);
+	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
+	std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
+	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
+	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
 	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
 	unsigned int squaredMinDist = minDistance * minDistance;
@@ -287,7 +293,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		NavmapPoint nmptCurrent = open.top().point;
 		open.pop();
 		SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
-		if (parents[smptCurrent.y * Width + smptCurrent.x] == Point(0, 0)) {
+		if (parents[smptCurrent.y * mapSize.w + smptCurrent.x] == Point(0, 0)) {
 			continue;
 		}
 
@@ -296,7 +302,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			foundPath = true;
 			break;
 		} else if (minDistance) {
-			if (parents[smptCurrent.y * Width + smptCurrent.x] != nmptCurrent &&
+			if (parents[smptCurrent.y * mapSize.w + smptCurrent.x] != nmptCurrent &&
 					SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist) {
 				if (!(flags & PF_SIGHT) || IsVisibleLOS(nmptCurrent, d)) {
 					smptDest = smptCurrent;
@@ -306,47 +312,47 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 				}
 			}
 		}
-		isClosed[smptCurrent.y * Width + smptCurrent.x] = true;
+		isClosed[smptCurrent.y * mapSize.w + smptCurrent.x] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
 			SearchmapPoint smptChild(nmptChild.x / 16, nmptChild.y / 12);
 			// Outside map
-			if (smptChild.x < 0 ||	smptChild.y < 0 || (unsigned) smptChild.x >= Width || (unsigned) smptChild.y >= Height) continue;
+			if (smptChild.x < 0 ||	smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
-			if (isClosed[smptChild.y * Width + smptChild.x]) continue;
+			if (isClosed[smptChild.y * mapSize.w + smptChild.x]) continue;
 			// If there's an actor, check it can be bumped away
-			Actor* childActor = GetActor(nmptChild, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 
-			PathMapFlags childBlockStatus = GetBlockedInRadius(nmptChild.x, nmptChild.y, size);
+			PathMapFlags childBlockStatus = GetBlockedInRadius(nmptChild, size);
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR | PathMapFlags::TRAVEL));
 			if (childBlocked) continue;
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 			const float HEURISTIC_WEIGHT = 1.5;
-			SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
-			NavmapPoint nmptParent = parents[smptCurrent.y * Width + smptCurrent.x];
-			unsigned short oldDist = distFromStart[smptChild.y * Width + smptChild.x];
+			SearchmapPoint smptCurrent2(nmptCurrent.x / 16, nmptCurrent.y / 12);
+			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
+			unsigned short oldDist = distFromStart[smptChild.y * mapSize.w + smptChild.x];
 			// Theta-star path if there is LOS
 			if (IsWalkableTo(nmptParent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
 				SearchmapPoint smptParent(nmptParent.x / 16, nmptParent.y / 12);
-				unsigned short newDist = distFromStart[smptParent.y * Width + smptParent.x] + Distance(smptParent, smptChild);
+				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
-					parents[smptChild.y * Width + smptChild.x] = nmptParent;
-					distFromStart[smptChild.y * Width + smptChild.x] = newDist;
+					parents[smptChild.y * mapSize.w + smptChild.x] = nmptParent;
+					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
 				}
 			// Fall back to A-star path
 			} else if (IsWalkableTo(nmptCurrent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
-				unsigned short newDist = distFromStart[smptCurrent.y * Width + smptCurrent.x] + Distance(smptCurrent, smptChild);
+				unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
 				if (newDist < oldDist) {
-					parents[smptChild.y * Width + smptChild.x] = nmptCurrent;
-					distFromStart[smptChild.y * Width + smptChild.x] = newDist;
+					parents[smptChild.y * mapSize.w + smptChild.x] = nmptCurrent;
+					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
 				}
 			}
 
-			if (distFromStart[smptChild.y * Width + smptChild.x] < oldDist) {
+			if (distFromStart[smptChild.y * mapSize.w + smptChild.x] < oldDist) {
 				// Calculate heuristic
 				int xDist = smptChild.x - smptDest.x;
 				int yDist = smptChild.y - smptDest.y;
@@ -356,7 +362,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
 				double distance = std::sqrt(xDist * xDist + yDist * yDist);
 				double heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
-				double estDist = distFromStart[smptChild.y * Width + smptChild.x] + heuristic;
+				double estDist = distFromStart[smptChild.y * mapSize.w + smptChild.x] + heuristic;
 				PQNode newNode(nmptChild, estDist);
 				open.emplace(newNode);
 			}
@@ -368,8 +374,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 		NavmapPoint nmptCurrent = nmptDest;
 		NavmapPoint nmptParent;
 		SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
-		while (!resultPath || nmptCurrent != parents[smptCurrent.y * Width + smptCurrent.x]) {
-			nmptParent = parents[smptCurrent.y * Width + smptCurrent.x];
+		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
+			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
 			PathNode *newStep = new PathNode;
 			newStep->x = nmptCurrent.x;
 			newStep->y = nmptCurrent.y;

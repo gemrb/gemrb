@@ -34,16 +34,14 @@ class ResourceDesc;
 
 class GEM_EXPORT ResourceSource : public Plugin {
 public:
-	ResourceSource(void);
-	~ResourceSource(void) override;
 	virtual bool Open(const char *filename, const char *description) = 0;
 	virtual bool HasResource(const char* resname, SClass_ID type) = 0;
 	virtual bool HasResource(const char* resname, const ResourceDesc &type) = 0;
 	virtual DataStream* GetResource(const char* resname, SClass_ID type) = 0;
 	virtual DataStream* GetResource(const char* resname, const ResourceDesc &type) = 0;
-	const char *GetDescription() const { return description; }
+	const std::string& GetDescription() const { return description; }
 protected:
-	char *description;
+	std::string description;
 };
 
 }

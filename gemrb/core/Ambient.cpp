@@ -33,14 +33,6 @@ Ambient::Ambient()
 	pitchVariance = appearance = flags = 0;
 }
 
-Ambient::~Ambient()
-{
-	unsigned int i=sounds.size();
-	while(i--) {
-		free(sounds[i]);
-	}
-}
-
 ieWord Ambient::getTotalGain() const
 {
 	ieWord g = gain;
@@ -51,9 +43,9 @@ ieWord Ambient::getTotalGain() const
 	return g;
 }
 
-ieDword Ambient::getTotalInterval() const
+tick_t Ambient::getTotalInterval() const
 {
-	ieDword i = interval;
+	tick_t i = interval;
 	if (intervalVariance != 0) {
 		ieWord var = std::min(intervalVariance, interval / 2);
 		i += RAND(0, 2 * var) - var;
@@ -65,7 +57,7 @@ ieDword Ambient::getTotalPitch() const
 {
 	ieDword p = 100;
 	if (pitchVariance != 0) {
-		p += RAND(0, 2 * pitchVariance) - pitchVariance;
+		p += RAND(0u, 2 * pitchVariance) - pitchVariance;
 	}
 	return p;
 }

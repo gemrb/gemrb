@@ -21,33 +21,23 @@
 #ifndef RESOURCEMANGER_H
 #define RESOURCEMANGER_H
 
-#include "SClassID.h"
 #include "exports.h"
 
 #include "Holder.h"
+#include "Resource.h"
+#include "ResourceSource.h"
 
 #include <vector>
-
-#if defined(_MSC_VER) || defined(__sgi) // No SFINAE
-#include "ResourceSource.h"
-#endif
 
 namespace GemRB {
 
 #define RM_REPLACE_SAME_SOURCE 1
 
-class DataStream;
-class Resource;
-#ifndef __sgi
 class ResourceSource;
-#endif
 class TypeID;
 
 class GEM_EXPORT ResourceManager {
 public:
-	ResourceManager();
-	~ResourceManager();
-
 	/**
 	 * Add ResourceSource to search path
 	 * @param[in] path Path to be used for source.
@@ -58,17 +48,21 @@ public:
 	bool AddSource(const char *path, const char *description, PluginID type, int flags=0);
 
 	/** returns true if resource exists */
-	bool Exists(const char *ResRef, SClass_ID type, bool silent=false) const;
+	bool Exists(const char *resRef, SClass_ID type, bool silent=false) const;
+	bool Exists(const ResRef &resRef, SClass_ID type, bool silent=false) const;
 	/** returns true if resource exists */
-	bool Exists(const char *ResRef, const TypeID *type, bool silent=false) const;
+	bool Exists(const char *resRef, const TypeID *type, bool silent=false) const;
+	bool Exists(const ResRef &resRef, const TypeID *type, bool silent=false) const;
 
 	/** Returns stream associated to given resource */
 	DataStream* GetResource(const char* resname, SClass_ID type, bool silent = false) const;
+	DataStream* GetResource(const ResRef &resname, SClass_ID type, bool silent = false) const;
 	/** Returns Resource object associated to given resource */
 	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
+	Resource* GetResource(const ResRef &resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
 
 private:
-	std::vector<Holder<ResourceSource> > searchPath;
+	std::vector<std::shared_ptr<ResourceSource> > searchPath;
 };
 
 }

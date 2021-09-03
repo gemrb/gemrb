@@ -31,7 +31,7 @@
 #ifdef CACHE_TLK_OVERRIDE
 #include <map>
 
-typedef std::map<ieStrRef, char *> StringMapType;
+using StringMapType = std::map<ieStrRef, char *>;
 #endif
 
 namespace GemRB {
@@ -60,7 +60,7 @@ private:
 	DataStream *tot_str;
 	DataStream *toh_str;
 	ieDword AuxCount;
-	ieDword FreeOffset;
+	strpos_t FreeOffset;
 	ieDword NextStrRef;
 
 	void CloseResources();
@@ -78,7 +78,7 @@ public:
 	virtual ~CTlkOverride();
 
 	bool Init();
-	char *ResolveAuxString(ieStrRef strref, int &Length);
+	char *ResolveAuxString(ieStrRef strref, size_t &Length);
 	ieStrRef UpdateString(ieStrRef strref, const char *newvalue);
 };
 

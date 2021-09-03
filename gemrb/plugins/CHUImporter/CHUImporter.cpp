@@ -37,34 +37,18 @@
 
 using namespace GemRB;
 
-CHUImporter::CHUImporter()
-{
-	str = NULL;
-	WindowCount = CTOffset = WEOffset = 0;
-}
-
-CHUImporter::~CHUImporter()
-{
-	delete str;
-}
-
 /** This function loads all available windows from the 'stream' parameter. */
-bool CHUImporter::Open(DataStream* stream)
+bool CHUImporter::Import(DataStream* str)
 {
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "CHUIV1  ", 8 ) != 0) {
 		Log(ERROR, "CHUImporter", "Not a Valid CHU File");
 		return false;
 	}
-	str->ReadDword( &WindowCount );
-	str->ReadDword( &CTOffset );
-	str->ReadDword( &WEOffset );
+	str->ReadDword(WindowCount);
+	str->ReadDword(CTOffset);
+	str->ReadDword(WEOffset);
 	return true;
 }
 
@@ -73,8 +57,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 {
 	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
 	ieWord ControlsCount, FirstControl;
-	ieResRef MosFile;
-	unsigned int i;
+	ResRef MosFile;
 
 	if (!str) {
 		Log(ERROR, "CHUImporter", "No data stream to read from, skipping controls");
@@ -84,7 +67,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	bool found = false;
 	for (unsigned int c = 0; c < WindowCount; c++) {
 		str->Seek( WEOffset + ( 0x1c * c ), GEM_STREAM_START );
-		str->ReadWord( &WindowID );
+		str->ReadWord(WindowID);
 		if (WindowID == wid) {
 			found = true;
 			break;
@@ -93,15 +76,16 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	if (!found) {
 		return NULL;
 	}
-	str->Seek( 2, GEM_CURRENT_POS );
-	str->ReadWord( &XPos );
-	str->ReadWord( &YPos );
-	str->ReadWord( &Width );
-	str->ReadWord( &Height );
-	str->ReadWord( &BackGround );
-	str->ReadWord( &ControlsCount );
+	str->Seek(2, GEM_CURRENT_POS); // windowID was a dword in bg2
+	str->ReadWord(XPos);
+	str->ReadWord(YPos);
+	str->ReadWord(Width);
+	str->ReadWord(Height);
+	str->ReadWord(BackGround);
+	str->ReadWord(ControlsCount);
 	str->ReadResRef( MosFile );
-	str->ReadWord( &FirstControl );
+	str->ReadWord(FirstControl);
+	// also a word for Flags with only bit 0 relating to modal windows known ("don't dim the bg" in NI)
 
 	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height));
 	Holder<Sprite2D> bg;
@@ -117,34 +101,34 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");
 		return win;
 	}
-	for (i = 0; i < ControlsCount; i++) {
+	for (unsigned int i = 0; i < ControlsCount; i++) {
 		Control* ctrl = NULL;
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		ieDword COffset, CLength, ControlID;
 		Region ctrlFrame;
 		ieWord tmp;
 		ieByte ControlType, temp;
-		str->ReadDword( &COffset );
-		str->ReadDword( &CLength );
+		str->ReadDword(COffset);
+		str->ReadDword(CLength);
 		str->Seek( COffset, GEM_STREAM_START );
-		str->ReadDword( &ControlID );
-		str->ReadWord( &tmp );
+		str->ReadDword(ControlID);
+		str->ReadWord(tmp);
 		ctrlFrame.x = tmp;
-		str->ReadWord( &tmp);
+		str->ReadWord(tmp);
 		ctrlFrame.y = tmp;
-		str->ReadWord( &tmp );
+		str->ReadWord(tmp);
 		ctrlFrame.w = tmp;
-		str->ReadWord( &tmp );
+		str->ReadWord(tmp);
 		ctrlFrame.h = tmp;
 		str->Read( &ControlType, 1 );
-		str->Read( &temp, 1 );
+		str->Read(&temp, 1); // in bg2 ControlType was a word
 		switch (ControlType) {
 			case IE_GUI_BUTTON:
 			{
 				//Button
 				Button* btn = new Button(ctrlFrame);
 				ctrl = btn;
-				ieResRef BAMFile;
+				ResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
 				ieByte UnpressedIndex, x1;
@@ -178,15 +162,11 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					btn->SetAnchor(x1 | (x2<<8), y1 | (y2<<8));
 				}
 
-				if (strnicmp( BAMFile, "guictrl\0", 8 ) == 0) {
-					if (UnpressedIndex == 0) {
-						//printMessage("CHUImporter", "Special Button Control, Skipping Image Loading\n",GREEN );
-						break;
-					}
+				if (BAMFile == "guictrl" && UnpressedIndex == 0) {
+					break;
 				}
-				AnimationFactory* bam = ( AnimationFactory* )
-					gamedata->GetFactoryResource( BAMFile,
-							IE_BAM_CLASS_ID, IE_NORMAL );
+				const AnimationFactory* bam = (const AnimationFactory *)
+					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if (!bam ) {
 					Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
 					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
@@ -200,7 +180,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
 				// work around several controls not setting all the indices
-				int cycleSize = bam->GetCycleSize(Cycle);
+				AnimationFactory::index_t cycleSize = bam->GetCycleSize(Cycle);
 				bool resetIndex = false;
 				if (core->HasFeature(GF_IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
 						resetIndex = true;
@@ -219,34 +199,32 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_PROGRESSBAR:
 			{
 				//GemRB specific, progressbar
-				ieResRef MOSFile, MOSFile2;
-				ieResRef BAMFile;
-				ieWord KnobXPos, KnobYPos;
-				ieWord CapXPos, CapYPos;
+				ResRef MOSFile;
+				ResRef MOSFile2;
+				ResRef BAMFile;
+				Point knobP;
+				Point capP;
 				ieWord KnobStepsCount;
 				ieWord Cycle;
 
 				str->ReadResRef( MOSFile );
 				str->ReadResRef( MOSFile2 );
 				str->ReadResRef( BAMFile );
-				str->ReadWord( &KnobStepsCount );
-				str->ReadWord( &Cycle );
-				str->ReadWord( &KnobXPos );
-				str->ReadWord( &KnobYPos );
-				str->ReadWord( &CapXPos );
-				str->ReadWord( &CapYPos );
+				str->ReadWord(KnobStepsCount);
+				str->ReadWord(Cycle);
+				str->ReadPoint(knobP);
+				str->ReadPoint(capP);
 				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount);
-				// TODO: fix this with #232
-				pbar->SetSliderPos(Point(KnobXPos, KnobYPos), Point(CapXPos, CapYPos));
+				pbar->SetSliderPos(knobP, capP);
 
 				Holder<Sprite2D> img;
 				Holder<Sprite2D> img2;
 				Holder<Sprite2D> img3;
-				if ( MOSFile[0] ) {
+				if (!MOSFile.IsEmpty()) {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 					img = mos->GetSprite2D();
 				}
-				if ( MOSFile2[0] ) {
+				if (!MOSFile2.IsEmpty()) {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile2);
 					img2 = mos->GetSprite2D();
 				}
@@ -259,7 +237,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					if (af) {
 						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
 					} else {
-						Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: %s", BAMFile);
+						Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: %s", BAMFile.CString());
 					}
 				}
 				else {
@@ -274,26 +252,27 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_SLIDER:
 			{
 				//Slider
-				ieResRef MOSFile, BAMFile;
+				ResRef MOSFile;
+				ResRef BAMFile;
 				ieWord Cycle, Knob, GrabbedKnob;
 				ieWord KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
 				str->ReadResRef( MOSFile );
 				str->ReadResRef( BAMFile );
-				str->ReadWord( &Cycle );
-				str->ReadWord( &Knob );
-				str->ReadWord( &GrabbedKnob );
-				str->ReadWord( &KnobXPos );
-				str->ReadWord( &KnobYPos );
-				str->ReadWord( &KnobStep );
-				str->ReadWord( &KnobStepsCount );
+				str->ReadWord(Cycle);
+				str->ReadWord(Knob);
+				str->ReadWord(GrabbedKnob);
+				str->ReadWord(KnobXPos);
+				str->ReadWord(KnobYPos);
+				str->ReadWord(KnobStep);
+				str->ReadWord(KnobStepsCount);
+				// ee documents 4 more words: ActiveBarTop, bottom, left, right
 				Slider* sldr = new Slider(ctrlFrame, Point(KnobXPos, KnobYPos), KnobStep, KnobStepsCount);
 				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 				Holder<Sprite2D> img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 
-				AnimationFactory* bam = ( AnimationFactory* )
-					gamedata->GetFactoryResource( BAMFile,
-							IE_BAM_CLASS_ID, IE_NORMAL );
+				const AnimationFactory* bam = (const AnimationFactory *)
+					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if( bam ) {
 					img = bam->GetFrame( Knob, 0 );
 					sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
@@ -310,8 +289,9 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_EDIT:
 			{
 				//Text Edit
-				ieResRef BGMos;
-				ieResRef FontResRef, CursorResRef;
+				ResRef BGMos;
+				ResRef FontResRef;
+				ResRef CursorResRef;
 				ieWord maxInput;
 				ieWord CurCycle, CurFrame;
 				ieWord PosX, PosY;
@@ -319,31 +299,31 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				ieVariable Initial;
 
 				str->ReadResRef( BGMos );
-				//These are two more MOS resrefs, probably unused
+				//These are two more MOS resrefs, probably unused, labeled EditClientFocus EditClientNoFocus
 				str->Seek( 16, GEM_CURRENT_POS );
 				str->ReadResRef( CursorResRef );
-				str->ReadWord( &CurCycle );
-				str->ReadWord( &CurFrame );
-				str->ReadWord( &PosX );
-				str->ReadWord( &PosY );
+				str->ReadWord(CurCycle);
+				str->ReadWord(CurFrame);
+				str->ReadWord(PosX); // "XEditClientOffset"
+				str->ReadWord(PosY); // "YEditClientOffset"
 				//FIXME: I still don't know what to do with this point
 				//Contrary to forum posts, it is definitely not a scrollbar ID
-				str->ReadWord( &Pos2X );
-				str->ReadWord( &Pos2Y );
+				// ee docs call them XEditCaretOffset and YEditCaretOffset
+				str->ReadWord(Pos2X);
+				str->ReadWord(Pos2Y);
 				str->ReadResRef( FontResRef );
-				//this field is still unknown or unused
+				//this field is still unknown or unused, labeled SequenceText
 				str->Seek( 2, GEM_CURRENT_POS );
 				//This is really a text field, but apparently the original engine
-				//always writes it over, and never uses it
-				str->Read( Initial, 32 );
-				Initial[32]=0;
-				str->ReadWord( &maxInput );
+				//always writes it over, and never uses it (labeled DefaultString)
+				str->ReadVariable(Initial);
+				str->ReadWord(maxInput);
+				// word: caseformat: 0 normal, 1 upper, 2 lower TODO (Allowed case in NI)
+				// word: typeformat, unknown
 				Font* fnt = core->GetFont( FontResRef );
 
-				AnimationFactory* bam = ( AnimationFactory* )
-					gamedata->GetFactoryResource( CursorResRef,
-							IE_BAM_CLASS_ID,
-							IE_NORMAL );
+				const AnimationFactory* bam = (const AnimationFactory *)
+					gamedata->GetFactoryResource(CursorResRef, IE_BAM_CLASS_ID);
 				Holder<Sprite2D> cursor;
 				if (bam) {
 					cursor = bam->GetFrame( CurCycle, CurFrame );
@@ -368,7 +348,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_TEXTAREA:
 			{
 				//Text Area
-				ieResRef FontResRef, InitResRef;
+				ResRef FontResRef;
+				ResRef InitResRef;
 				Color fore, init, back;
 				ieWord SBID;
 				str->ReadResRef( FontResRef );
@@ -378,7 +359,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->Read( &fore, 4 );
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
-				str->ReadWord( &SBID );
+				str->ReadWord(SBID);
 				
 				fore.a = init.a = back.a = 0xff;
 
@@ -399,10 +380,10 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_LABEL:
 			{
 				//Label
-				ieResRef FontResRef;
+				ResRef FontResRef;
 				ieStrRef StrRef;
 				ieWord alignment;
-				str->ReadDword( &StrRef );
+				str->ReadDword(StrRef);
 				str->ReadResRef( FontResRef );
 				Font* fnt = core->GetFont( FontResRef );
 
@@ -412,7 +393,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				
 				textCol.a = bgCol.a = 0xff;
 
-				str->ReadWord( &alignment );
+				str->ReadWord(alignment);
 				String* str = core->GetString( StrRef );
 				Label* lab = new Label(ctrlFrame, fnt, *str);
 				delete str;
@@ -452,24 +433,23 @@ endalign:
 			case IE_GUI_SCROLLBAR:
 			{
 				//ScrollBar
-				ieResRef BAMResRef;
+				ResRef BAMResRef;
 				ieWord Cycle, TAID, imgIdx;
 				str->ReadResRef( BAMResRef );
-				str->ReadWord( &Cycle );
+				str->ReadWord(Cycle);
 
-				AnimationFactory* bam = ( AnimationFactory* )
-				gamedata->GetFactoryResource( BAMResRef,
-											 IE_BAM_CLASS_ID, IE_NORMAL );
+				const AnimationFactory* bam = (const AnimationFactory *)
+				gamedata->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
 				if (!bam) {
-					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef);
+					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef.CString());
 					break;
 				}
 				Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
-				for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
-					str->ReadWord(&imgIdx);
-					images[i] = bam->GetFrame(imgIdx, Cycle);
+				for (auto& image : images) {
+					str->ReadWord(imgIdx);
+					image = bam->GetFrame(imgIdx, Cycle);
 				}
-				str->ReadWord( &TAID );
+				str->ReadWord(TAID);
 
 				ScrollBar* sb = new ScrollBar(ctrlFrame, images);
 
@@ -510,7 +490,7 @@ unsigned int CHUImporter::GetWindowsCount()
 }
 
 /** Loads a WindowPack (CHUI file) in the Window Manager */
-bool CHUImporter::LoadWindowPack(const ResRef& ref)
+bool CHUImporter::LoadWindowPack(const ScriptingGroup_t& ref)
 {
 	if (ref == winPack) {
 		return true; // already loaded
@@ -533,5 +513,5 @@ bool CHUImporter::LoadWindowPack(const ResRef& ref)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x23A7F6CA, "CHU File Importer")
-PLUGIN_CLASS(IE_CHU_CLASS_ID, CHUImporter)
+PLUGIN_CLASS(IE_CHU_CLASS_ID, ImporterPlugin<CHUImporter>)
 END_PLUGIN()

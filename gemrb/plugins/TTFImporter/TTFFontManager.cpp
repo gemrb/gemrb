@@ -75,7 +75,7 @@ TTFFontManager::TTFFontManager(void)
 : ftStream(NULL), face(NULL)
 {}
 
-bool TTFFontManager::Open(DataStream* stream)
+bool TTFFontManager::Import(DataStream* stream)
 {
 	Close();
 	if (stream) {
@@ -117,7 +117,7 @@ void TTFFontManager::Close()
 
 Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /*background*/)
 {
-	PaletteHolder pal = new Palette(ColorWhite, ColorBlack);
+	PaletteHolder pal = MakeHolder<Palette>(ColorWhite, ColorBlack);
 	pal->CreateShadedAlphaChannel();
 
 	FT_Error error = 0;

@@ -168,7 +168,7 @@ public:
 			// SDL_ConvertPixels doesn't support palettes... must do it ourselves
 			va_list args;
 			va_start(args, pitch);
-			Palette *pal = va_arg(args, Palette *);
+			const Palette *pal = va_arg(args, Palette *);
 			va_end(args);
 
 			Uint32* dst = static_cast<Uint32*>(conversionBuffer->pixels);
@@ -242,7 +242,7 @@ public:
 	bool TouchInputEnabled() override;
 
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
-						 const Color* tint = nullptr) override;
+						 Color tint = Color()) override;
 
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) override;
@@ -273,11 +273,11 @@ private:
 
 	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) override;
 
-	void BlitSpriteBAMClipped(const Holder<Sprite2D> /*spr*/, const Region& /*src*/, const Region& /*dst*/,
+	void BlitSpriteRLEClipped(const Holder<Sprite2D>& /*spr*/, const Region& /*src*/, const Region& /*dst*/,
 							  BlitFlags /*flags*/ = BlitFlags::NONE, const Color* /*tint*/ = NULL) override { assert(false); } // SDL2 does not support this
-	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
+	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst,
 								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
-	void BlitSpriteNativeClipped(SDL_Texture* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL);
+	void BlitSpriteNativeClipped(SDL_Texture* spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL);
 
 	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* = NULL);
 

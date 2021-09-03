@@ -46,7 +46,7 @@ Dialog::~Dialog(void)
 	if (Order) free(Order);
 }
 
-DialogState* Dialog::GetState(unsigned int index)
+DialogState* Dialog::GetState(unsigned int index) const
 {
 	if (index >= TopLevelCount) {
 		return NULL;
@@ -58,20 +58,21 @@ void Dialog::FreeDialogState(DialogState* ds)
 {
 	for (unsigned int i = 0; i < ds->transitionsCount; i++) {
 		DialogTransition *trans = ds->transitions[i];
-		for (size_t j = 0; j < trans->actions.size(); ++j)
-			trans->actions[j]->Release();
+		for (auto& action : trans->actions) {
+			action->Release();
+		}
 		if (trans->condition)
 			delete trans->condition;
-		delete( trans );
+		delete trans;
 	}
 	free( ds->transitions );
 	if (ds->condition) {
 		delete ds->condition;
 	}
-	delete( ds );
+	delete ds;
 }
 
-int Dialog::FindFirstState(Scriptable* target)
+int Dialog::FindFirstState(Scriptable* target) const
 {
 	for (unsigned int i = 0; i < TopLevelCount; i++) {
 		const Condition *cond = GetState(Order[i])->condition;
@@ -82,11 +83,11 @@ int Dialog::FindFirstState(Scriptable* target)
 	return -1;
 }
 
-int Dialog::FindRandomState(Scriptable* target)
+int Dialog::FindRandomState(Scriptable* target) const
 {
 	unsigned int max = TopLevelCount;
 	if (!max) return -1;
-	unsigned int pick = RAND(0, max-1);
+	unsigned int pick = RAND(0u, max-1);
 	for (unsigned int i = pick; i < max; i++) {
 		const Condition *cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {

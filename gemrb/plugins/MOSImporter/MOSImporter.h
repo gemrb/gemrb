@@ -27,15 +27,12 @@ namespace GemRB {
 
 class MOSImporter : public ImageMgr {
 private:
-	ieWord Width, Height, Cols, Rows;
+	ieWord Cols, Rows;
 	ieDword BlockSize, PalOffset;
 public:
 	MOSImporter(void);
-	~MOSImporter(void) override;
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
-	int GetWidth() override { return (int) Width; }
-	int GetHeight() override { return (int) Height; }
 };
 
 }

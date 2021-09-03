@@ -34,67 +34,65 @@ class EffectQueue;
 
 class AREImporter : public MapMgr {
 private:
-	DataStream* str;
-	int bigheader;
-	ieResRef WEDResRef;
-	ieDword LastSave;
-	ieDword AreaFlags;
-	ieWord  AreaType, WRain, WSnow, WFog, WLightning, WUnknown;
-	ieDword ActorOffset, EmbeddedCreOffset, AnimOffset, AnimCount;
-	ieDword VerticesOffset;
-	ieDword DoorsCount, DoorsOffset;
-	ieDword ExploredBitmapSize, ExploredBitmapOffset;
-	ieDword EntrancesOffset, EntrancesCount;
-	ieDword SongHeader, RestHeader;
-	ieWord  ActorCount, VerticesCount, AmbiCount;
-	ieWord  ContainersCount, InfoPointsCount, ItemsCount;
-	ieDword VariablesCount;
-	ieDword ContainersOffset, InfoPointsOffset, ItemsOffset;
-	ieDword AmbiOffset, VariablesOffset;
-	ieDword SpawnOffset, SpawnCount;
-	ieDword TileOffset, TileCount;
-	ieDword NoteOffset, NoteCount;
-	ieDword TrapOffset, TrapCount;  //only in ToB?
-	proIterator piter; //iterator for saving projectiles
-	ieDword EffectOffset;
-	ieResRef Script;
-	ieResRef Dream1, Dream2; //only in ToB
-	ieByte AreaDifficulty;
+	int bigheader = 0;
+	ResRef WEDResRef;
+	ieDword LastSave = 0;
+	ieDword AreaFlags = 0;
+	MapEnv AreaType = AT_UNINITIALIZED;
+	ieWord WRain = 0, WSnow = 0, WFog = 0, WLightning = 0, WUnknown = 0;
+	ieDword ActorOffset = 0, EmbeddedCreOffset = 0, AnimOffset = 0, AnimCount = 0;
+	ieDword VerticesOffset = 0;
+	ieDword DoorsCount = 0, DoorsOffset = 0;
+	ieDword ExploredBitmapSize = 0, ExploredBitmapOffset = 0;
+	ieDword EntrancesOffset = 0, EntrancesCount = 0;
+	ieDword SongHeader = 0, RestHeader = 0;
+	ieWord  ActorCount = 0, VerticesCount = 0, AmbiCount = 0;
+	ieWord  ContainersCount = 0, InfoPointsCount = 0, ItemsCount = 0;
+	ieDword VariablesCount = 0;
+	ieDword ContainersOffset = 0, InfoPointsOffset = 0, ItemsOffset = 0;
+	ieDword AmbiOffset = 0, VariablesOffset = 0;
+	ieDword SpawnOffset = 0, SpawnCount = 0;
+	ieDword TileOffset = 0, TileCount = 0;
+	ieDword NoteOffset = 0, NoteCount = 0;
+	ieDword TrapOffset = 0, TrapCount = 0;  // only in ToB?
+	ieDword EffectOffset = 0;
+	ResRef Script;
+	ResRef Dream1; // only in ToB
+	ResRef Dream2; // only in ToB
+	ieByte AreaDifficulty = 0;
 public:
-	AREImporter(void);
-	~AREImporter(void) override;
-	bool Open(DataStream* stream) override;
+	AREImporter() = default;
+	bool Import(DataStream* stream) override;
 	bool ChangeMap(Map *map, bool day_or_night) override;
-	Map* GetMap(const char* ResRef, bool day_or_night) override;
+	Map* GetMap(const char* resRef, bool day_or_night) override;
 	int GetStoredFileSize(Map *map) override;
 	/* stores an area in the Cache (swaps it out) */
-	int PutArea(DataStream *stream, Map *map) override;
+	int PutArea(DataStream *stream, const Map *map) const override;
 private:
-	void AdjustPSTFlags(AreaAnimation*);
-	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
+	void AdjustPSTFlags(AreaAnimation&) const;
+	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount) const;
 	CREItem* GetItem();
-	int PutHeader(DataStream *stream, const Map *map);
-	int PutPoints(DataStream *stream, const std::vector<Point>&);
-	int PutPoints(DataStream *stream, const Point *p, size_t count);
-	int PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex);
-	int PutItems(DataStream *stream, const Map *map);
-	int PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex);
-	int PutRegions(DataStream *stream, const Map *map, ieDword &VertIndex);
-	int PutVertices(DataStream *stream, const Map *map);
-	int PutSpawns(DataStream *stream, const Map *map);
-	void PutScript(DataStream *stream, const Actor *ac, unsigned int index);
-	int PutActors(DataStream *stream, const Map *map);
-	int PutAnimations(DataStream *stream, const Map *map);
-	int PutEntrances(DataStream *stream, const Map *map);
-	int PutVariables(DataStream *stream, const Map *map);
-	int PutAmbients(DataStream *stream, const Map *map);
-	int PutMapnotes(DataStream *stream, const Map *map);
-	int PutEffects( DataStream *stream, const EffectQueue *fxqueue);
-	int PutTraps(DataStream *stream, const Map *map);
-	int PutExplored(DataStream *stream, const Map *map);
-	int PutTiles(DataStream *stream, const Map *map);
-	int PutRestHeader(DataStream *stream, const Map *map);
-	int PutSongHeader(DataStream *stream, const Map *map);
+	int PutHeader(DataStream *stream, const Map *map) const;
+	int PutPoints(DataStream *stream, const std::vector<Point>&) const;
+	int PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex) const;
+	int PutItems(DataStream *stream, const Map *map) const;
+	int PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex) const;
+	int PutRegions(DataStream *stream, const Map *map, ieDword &VertIndex) const;
+	int PutVertices(DataStream *stream, const Map *map) const;
+	int PutSpawns(DataStream *stream, const Map *map) const;
+	void PutScript(DataStream *stream, const Actor *ac, unsigned int index) const;
+	int PutActors(DataStream *stream, const Map *map) const;
+	int PutAnimations(DataStream *stream, const Map *map) const;
+	int PutEntrances(DataStream *stream, const Map *map) const;
+	int PutVariables(DataStream *stream, const Map *map) const;
+	int PutAmbients(DataStream *stream, const Map *map) const;
+	int PutMapnotes(DataStream *stream, const Map *map) const;
+	int PutEffects(DataStream *stream, const EffectQueue *fxqueue) const;
+	int PutTraps(DataStream *stream, const Map *map) const;
+	int PutExplored(DataStream *stream, const Map *map) const;
+	int PutTiles(DataStream *stream, const Map *map) const;
+	int PutRestHeader(DataStream *stream, const Map *map) const;
+	int PutSongHeader(DataStream *stream, const Map *map) const;
 };
 
 }

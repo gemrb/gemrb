@@ -33,16 +33,10 @@ protected:
 	unsigned int chunk_size;
 	unsigned int chunk_offset;
 
-	long timer_last_sec;
-	long timer_last_usec;
-	unsigned int frame_wait;
-
 	_GstMveDemuxStream *video_data;
 	unsigned short *video_back_buf;
 	bool truecolour;
 	bool video_rendered_frame;
-	unsigned int video_frameskip;
-	unsigned int video_skippedframes;
 
 	bool audio_compressed;
 	int audio_num_channels;
@@ -62,13 +56,10 @@ protected:
 			unsigned char type, unsigned char version);
 
 	void segment_create_timer();
-	void timer_start();
-	void timer_wait();
 
 	void segment_video_init(unsigned char version);
 	void segment_video_mode();
 	void segment_video_palette();
-	void segment_video_compressedpalette();
 	void segment_video_codemap(unsigned short size);
 	void segment_video_data(unsigned short size);
 	void segment_video_play();
@@ -77,13 +68,13 @@ protected:
 	void segment_audio_data(bool silent);
 
 public:
-	MVEPlayer(class MVEPlay *file);
+	explicit MVEPlayer(class MVEPlay *file);
 	~MVEPlayer();
 
 	bool start_playback();
 	bool next_frame();
 	
-	bool is_truecolour() { return truecolour; }
+	bool is_truecolour() const { return truecolour; }
 };
 
 }

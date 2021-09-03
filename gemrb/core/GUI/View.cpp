@@ -24,14 +24,16 @@
 #include "GUI/TextSystem/Font.h"
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <typeinfo>
+#include <utility>
+
 
 namespace GemRB {
 
 View::DragOp::DragOp(View* v, Holder<Sprite2D> cursor)
-: dragView(v), cursor(cursor)
+: dragView(v), cursor(std::move(cursor))
 {}
 
 View::DragOp::~DragOp() {
@@ -40,15 +42,7 @@ View::DragOp::~DragOp() {
 
 View::View(const Region& frame)
 	: frame(frame)
-{
-	eventProxy = NULL;
-	superView = NULL;
-	window = NULL;
-
-	dirty = true;
-	flags = 0;
-	autoresizeFlags = ResizeNone;
-}
+{}
 
 View::~View()
 {
@@ -67,7 +61,7 @@ View::~View()
 
 void View::SetBackground(Holder<Sprite2D> bg, const Color* c)
 {
-	background = bg;
+	background = std::move(bg);
 	if (c) backgroundColor = *c;
 
 	MarkDirty();
@@ -75,7 +69,7 @@ void View::SetBackground(Holder<Sprite2D> bg, const Color* c)
 
 void View::SetCursor(Holder<Sprite2D> c)
 {
-	cursor = c;
+	cursor = std::move(c);
 }
 
 void View::SetEventProxy(View* proxy)
@@ -95,29 +89,29 @@ void View::MarkDirty(const Region* rgn)
 	// TODO: we could implement partial redraws by storing the dirty region
 	// not much to gain at the moment, however
 
-	if (dirty == false) {
-		dirty = true;
+	if (dirty) return;
 
-		if (superView && !IsOpaque()) {
-			superView->DirtyBGRect(frame);
-		}
+	dirty = true;
 
-		std::list<View*>::iterator it;
-		for (it = subViews.begin(); it != subViews.end(); ++it) {
-			View* view = *it;
-			if (rgn) {
-				Region intersect = view->frame.Intersect(*rgn);
-				const Size& idims = intersect.Dimensions();
-				if (!idims.IsEmpty()) {
-					Point p = view->ConvertPointFromSuper(intersect.Origin());
-					Region r = Region(p, idims);
-					view->MarkDirty(&r);
-				}
-			} else {
-				Point p = view->ConvertPointFromSuper(Point());
-				Region r = Region(p, Dimensions());
+	if (superView && !IsOpaque()) {
+		superView->DirtyBGRect(frame);
+	}
+
+	std::list<View*>::iterator it;
+	for (it = subViews.begin(); it != subViews.end(); ++it) {
+		View* view = *it;
+		if (rgn) {
+			Region intersect = view->frame.Intersect(*rgn);
+			const Size& idims = intersect.size;
+			if (!idims.IsInvalid()) {
+				Point p = view->ConvertPointFromSuper(intersect.origin);
+				Region r = Region(p, idims);
 				view->MarkDirty(&r);
 			}
+		} else {
+			Point p = view->ConvertPointFromSuper(Point());
+			Region r = Region(p, Dimensions());
+			view->MarkDirty(&r);
 		}
 	}
 }
@@ -130,7 +124,7 @@ void View::MarkDirty()
 bool View::NeedsDraw() const
 {
 	// cull anything that can't be seen
-	if (frame.Dimensions().IsEmpty() || (flags&Invisible)) return false;
+	if (frame.size.IsInvalid() || (flags&Invisible)) return false;
 
 	// check ourselves
 	if (dirty || IsAnimated()) {
@@ -180,16 +174,16 @@ bool View::IsReceivingEvents() const
 	return getEvents;
 }
 
-void View::DirtyBGRect(const Region& r)
+void View::DirtyBGRect(const Region& r, bool force)
 {
 	// no need to draw the parent BG for opaque views
 	if (superView && !IsOpaque()) {
-		Region rgn = frame.Intersect(Region(ConvertPointToSuper(r.Origin()), r.Dimensions()));
-		superView->DirtyBGRect(rgn);
+		Region rgn = frame.Intersect(Region(ConvertPointToSuper(r.origin), r.size));
+		superView->DirtyBGRect(rgn, force);
 	}
 
 	// if we are going to draw the entire BG, no need to compute and store this
-	if (NeedsDrawRecursive())
+	if (!force && NeedsDrawRecursive())
 		return;
 
 	// do we want to intersect this too?
@@ -201,11 +195,13 @@ void View::DirtyBGRect(const Region& r)
 	MarkDirty(&dirty);
 }
 
-void View::DrawSubviews() const
+void View::DrawSubviews()
 {
-	std::list<View*>::const_iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		(*it)->Draw();
+	for (View* subview : subViews) {
+		subview->Draw();
+		if (subview->IsAnimated() && !subview->IsOpaque()) {
+			DirtyBGRect(subview->frame, true);
+		}
 	}
 }
 
@@ -219,11 +215,11 @@ void View::DrawBackground(const Region* rgn) const
 	Video* video = core->GetVideoDriver();
 	if (backgroundColor.a > 0) {
 		if (rgn) {
-			Point p = ConvertPointToWindow(rgn->Origin());
-			video->DrawRect(Region(p, rgn->Dimensions()), backgroundColor, true);
+			Point p = ConvertPointToWindow(rgn->origin);
+			video->DrawRect(Region(p, rgn->size), backgroundColor, true);
 		} else if (window) {
 			assert(superView);
-			Point p = superView->ConvertPointToWindow(frame.Origin());
+			Point p = superView->ConvertPointToWindow(frame.origin);
 			video->DrawRect(Region(p, Dimensions()), backgroundColor, true);
 		} else {
 			// FIXME: this is a Window and we need this hack becasue Window::WillDraw() changed the coordinate system
@@ -238,8 +234,8 @@ void View::DrawBackground(const Region* rgn) const
 	if (background) {
 		if (rgn) {
 			Region intersect = rgn->Intersect(background->Frame);
-			Point screenPt = ConvertPointToWindow(intersect.Origin());
-			Region toClip(screenPt, intersect.Dimensions());
+			Point screenPt = ConvertPointToWindow(intersect.origin);
+			Region toClip(screenPt, intersect.size);
 			video->BlitSprite(background, intersect, toClip, BlitFlags::BLENDED);
 		} else {
 			Point dp = ConvertPointToWindow(Point(background->Frame.x, background->Frame.y));
@@ -256,7 +252,7 @@ void View::Draw()
 	const Region clip = video->GetScreenClip();
 	const Region& drawFrame = DrawingFrame();
 	const Region& intersect = clip.Intersect(drawFrame);
-	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
+	if (intersect.size.IsInvalid()) return; // outside the window/screen
 
 	// clip drawing to the view bounds, then restore after drawing
 	video->SetScreenClip(&intersect);
@@ -297,7 +293,7 @@ void View::Draw()
 		if (debuginfo) {
 			const ViewScriptingRef* ref = GetScriptingRef();
 			if (ref) {
-				Font* fnt = core->GetTextFont();
+				const Font* fnt = core->GetTextFont();
 				ScriptingId id = ref->Id;
 				id &= 0x00000000ffffffff; // control id is lower 32bits
 
@@ -305,8 +301,8 @@ void View::Draw()
 				swprintf(string, 255, L"id: %lu  grp: %s  \nflgs: %u\ntype:%s",
 					 id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
 				Region r = drawFrame;
-				r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
-				Font::StringSizeMetrics metrics = {r.Dimensions(), 0, 0, true};
+				r.w = win ? win->Frame().w - r.x : Frame().w - r.x;
+				Font::StringSizeMetrics metrics = {r.size, 0, 0, true};
 				fnt->StringSize(string, &metrics);
 				r.h = metrics.size.h;
 				r.w = metrics.size.w;
@@ -371,37 +367,37 @@ Point View::ConvertPointFromScreen(const Point& p) const
 
 Region View::ConvertRegionToSuper(Region r) const
 {
-	r.SetOrigin(ConvertPointToSuper(r.Origin()));
+	r.origin = ConvertPointToSuper(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionFromSuper(Region r) const
 {
-	r.SetOrigin(ConvertPointFromSuper(r.Origin()));
+	r.origin = ConvertPointFromSuper(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionToWindow(Region r) const
 {
-	r.SetOrigin(ConvertPointToWindow(r.Origin()));
+	r.origin = ConvertPointToWindow(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionFromWindow(Region r) const
 {
-	r.SetOrigin(ConvertPointFromWindow(r.Origin()));
+	r.origin = ConvertPointFromWindow(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionToScreen(Region r) const
 {
-	r.SetOrigin(ConvertPointToScreen(r.Origin()));
+	r.origin = ConvertPointToScreen(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionFromScreen(Region r) const
 {
-	r.SetOrigin(ConvertPointFromScreen(r.Origin()));
+	r.origin = ConvertPointFromScreen(r.origin);
 	return r;
 }
 
@@ -412,7 +408,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	std::list<View*>::iterator it;
 	it = std::find(subViews.begin(), subViews.end(), back);
 
-	View* super = front->superView;
+	const View* super = front->superView;
 	if (super == this) {
 		// already here, but may need to move the view
 		std::list<View*>::iterator cur;
@@ -495,9 +491,9 @@ void View::AddedToView(View* view)
 	}
 }
 
-void View::RemovedFromView(View*)
+void View::RemovedFromView(const View*)
 {
-	window = NULL;
+	window = nullptr;
 }
 
 bool View::IsOpaque() const
@@ -511,6 +507,10 @@ bool View::IsOpaque() const
 
 bool View::HitTest(const Point& p) const
 {
+	if (flags & (IgnoreEvents | Invisible)) {
+		return false;
+	}
+
 	Region r(Point(), Dimensions());
 	if (!r.PointInside(p)) {
 		return false;
@@ -532,7 +532,7 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 		if ((ignoreTransparency && v->frame.PointInside(p)) || v->HitTest(subP)) {
 			if (recursive) {
 				View* subV = v->SubviewAt(subP, ignoreTransparency, recursive);
-				v = (subV) ? subV : v;
+				v = subV ? subV : v;
 			}
 			return v;
 		}
@@ -570,7 +570,7 @@ Window* View::GetWindow() const
 
 	if (superView) {
 		Window* win = dynamic_cast<Window*>(superView);
-		return (win) ? win : superView->GetWindow();
+		return win ? win : superView->GetWindow();
 	}
 	return NULL;
 }
@@ -616,25 +616,24 @@ void View::ResizeSubviews(const Size& oldSize)
 
 void View::SetFrame(const Region& r)
 {
-	SetFrameOrigin(r.Origin());
-	SetFrameSize(r.Dimensions());
+	SetFrameOrigin(r.origin);
+	SetFrameSize(r.size);
 }
 
 void View::SetFrameOrigin(const Point& p)
 {
-	Point oldP = frame.Origin();
+	Point oldP = frame.origin;
 	if (oldP == p) return;
 	
 	MarkDirty(); // refresh the old position in the superview
-	frame.x = p.x;
-	frame.y = p.y;
+	frame.origin = p;
 	
 	OriginChanged(oldP);
 }
 
 void View::SetFrameSize(const Size& s)
 {
-	const Size oldSize = frame.Dimensions();
+	const Size oldSize = frame.size;
 	if (oldSize == s) return;
 
 	MarkDirty(); // refresh the old position in the superview
@@ -903,7 +902,7 @@ bool View::OnControllerButtonUp(const ControllerEvent& ce)
 	return OnKeyRelease(ke, 0);
 }
 
-const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group)
+const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ScriptingGroup_t& group)
 {
 	std::vector<ViewScriptingRef*>::iterator it = std::find(scriptingRefs.begin(), scriptingRefs.end(), old);
 	if (it != scriptingRefs.end()) {
@@ -942,12 +941,12 @@ void View::ClearScriptingRefs()
 	}
 }
 	
-ViewScriptingRef* View::CreateScriptingRef(ScriptingId id, ResRef group)
+ViewScriptingRef* View::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new ViewScriptingRef(this, id, group);
 }
 	
-const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, ResRef group)
+const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, const ScriptingGroup_t& group)
 {
 	ViewScriptingRef* ref = CreateScriptingRef(id, group);
 	if (ScriptEngine::RegisterScriptingRef(ref)) {
@@ -959,7 +958,7 @@ const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, ResRef group)
 	}
 }
 
-const ViewScriptingRef* View::GetScriptingRef(ScriptingId id, ResRef group) const
+const ViewScriptingRef* View::GetScriptingRef(ScriptingId id, ScriptingGroup_t group) const
 {
 	auto it = std::find_if(scriptingRefs.begin(), scriptingRefs.end(), [&](const ViewScriptingRef* ref) {
 		return ref->Id == id && ref->ScriptingGroup() == group;

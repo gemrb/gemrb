@@ -27,15 +27,15 @@
 
 namespace GemRB {
 
-Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
-: vertices(points, points + cnt)
+Gem_Polygon::Gem_Polygon(std::vector<Point>&& points, const Region *bbox)
+: vertices(std::move(points))
 {
-	assert(cnt >= 3);
+	assert(vertices.size() >= 3);
 
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
 	
-	assert(!BBox.Dimensions().IsEmpty());
+	assert(!BBox.size.IsInvalid());
 	
 	Rasterize();
 }
@@ -75,13 +75,15 @@ void Gem_Polygon::Rasterize()
 
 			bool merged = false;
 			for (auto& seg : rasterData[y]) {
-				if (rt >= seg.first.x && lt <= seg.second.x) {
-					// merge overlapping segment
-					seg.first.x = std::min<int>(seg.first.x, lt);
-					seg.second.x = std::max<int>(seg.second.x, rt);
-					merged = true;
-					break;
+				if (rt < seg.first.x || lt > seg.second.x) {
+					continue;
 				}
+
+				// merge overlapping segment
+				seg.first.x = std::min<int>(seg.first.x, lt);
+				seg.second.x = std::max<int>(seg.second.x, rt);
+				merged = true;
+				break;
 			}
 
 			if (!merged) {
@@ -127,7 +129,7 @@ void Gem_Polygon::RecalcBBox()
 
 bool Gem_Polygon::PointIn(const Point& p) const
 {
-	Point relative = p - BBox.Origin();
+	Point relative = p - BBox.origin;
 
 	if (relative.y < 0 || relative.y >= int(rasterData.size())) {
 		return false;
@@ -153,7 +155,7 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 	// most ot the time an intersection would contain one
 	// and we can avoid a more expensive search
 
-	if (PointIn(rect.Origin()) ||
+	if (PointIn(rect.origin) ||
 		PointIn(rect.x + rect.w, rect.y) ||
 		PointIn(rect.x, rect.y + rect.h) ||
 		PointIn(rect.Maximum()))
@@ -161,7 +163,7 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 		return true;
 	}
 
-	Point relative = rect.Origin() - BBox.Origin();
+	Point relative = rect.origin - BBox.origin;
 	if (relative.y < 0 || relative.y + rect.h >= int(rasterData.size())) {
 		return false;
 	}
@@ -171,11 +173,8 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 		int xmax = relative.x + rect.w;
 
 		for (const auto& seg : rasterData[y]) {
-			if (xmax >= seg.first.x) {
-				if (xmin <= seg.second.x) {
-					return true;
-				}
-				//break;
+			if (xmax >= seg.first.x && xmin <= seg.second.x) {
+				return true;
 			}
 		}
 	}
@@ -221,8 +220,8 @@ static bool intersectSegments(const Point& a, const Point& b, const Point& c, co
 	int64_t A1 = area2(c, d, a);
 	int64_t A2 = area2(d, c, b);
 
-	s.x = (short) ((b.x*A1 + a.x*A2) / (A1 + A2));
-	s.y = (short) ((b.y*A1 + a.y*A2) / (A1 + A2));
+	s.x = int((b.x*A1 + a.x*A2) / (A1 + A2));
+	s.y = int((b.y*A1 + a.y*A2) / (A1 + A2));
 
 	return true;
 }
@@ -290,9 +289,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 	ys.reserve(2*count);
 
 	// y coords of vertices
-	unsigned int i;
-
-	for (i = 0; i < count; ++i)
+	for (unsigned int i = 0; i < count; ++i)
 		ys.push_back(vertices[i].y);
 
 	Point p;
@@ -346,7 +343,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 		// (We're taking the intersections along the 'upper' edge of 
 		// the nexty scanline.)
 		ints.clear();
-		for (i = 0; i < count; ++i) {
+		for (unsigned int i = 0; i < count; ++i) {
 			const Point& a = vertices[i];
 			const Point& b = vertices[(i+1)%count];
 
@@ -377,7 +374,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 		std::sort(ints.begin(), ints.end());
 		unsigned int newtcount = (unsigned int) (ints.size() / 2);
 
-		for (i = 0; i < newtcount; ++i) {
+		for (unsigned int i = 0; i < newtcount; ++i) {
 			t.left_edge = ints[2*i].pi;
 			t.right_edge = ints[2*i+1].pi;
 
@@ -433,13 +430,6 @@ bool Wall_Polygon::PointBehind(const Point &p) const
 	}
 	return true;
 }
-
-bool Wall_Polygon::PointBehind(int tx, int ty) const
-{
-	Point p((short) tx, (short) ty);
-	return PointBehind(p);
-}
-
 
 void Wall_Polygon::SetDisabled(bool disabled)
 {

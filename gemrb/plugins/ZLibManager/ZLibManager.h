@@ -27,8 +27,7 @@ namespace GemRB {
 
 class ZLibManager : public Compressor {
 public:
-	ZLibManager(void);
-	~ZLibManager(void) override;
+	ZLibManager() = default;
 	// ZLib Decompression Routine
 	int Decompress(DataStream* dest, DataStream* source, unsigned int size_guess) const override;
 	// ZLib Compression

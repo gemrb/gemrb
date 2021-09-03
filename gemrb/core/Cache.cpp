@@ -20,20 +20,14 @@
 
 #include "Cache.h"
 
+#include "Resource.h"
+
 #include <cassert>
-#include <ctype.h>
+#include <cctype>
 
 namespace GemRB {
 
-// private inlines
-inline unsigned int Cache::MyHashKey(const char* key) const
-{
-	unsigned int nHash = tolower(key[0]);
-	for (int i=1;(i<KEYSIZE) && key[i];i++) {
-		nHash = (nHash << 5) ^ tolower(key[i]);
-	}
-	return nHash % m_nHashTableSize;
-}
+static const CstrHashCI<ResRef> MyHashKey;
 
 Cache::Cache(int nBlockSize, int nHashTableSize)
 {
@@ -73,9 +67,9 @@ void Cache::RemoveAll(ReleaseFun fun)
 	if (m_pHashTable) {
 		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++)
 		{
-			MyAssoc* pAssoc, *pAssocTmp;
-			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; )
-			{
+			MyAssoc* pAssoc = m_pHashTable[nHash];
+			MyAssoc* pAssocTmp;
+			while (pAssoc != nullptr) {
 				if (fun)
 					fun(pAssoc->data);
 				pAssocTmp = pAssoc->pNext;
@@ -175,7 +169,7 @@ Cache::MyAssoc *Cache::GetNextAssoc(Cache::MyAssoc *Position) const
 	if (pAssocNext == NULL)
 	{
 		// go to next bucket
-		for (unsigned int nBucket = MyHashKey(pAssocRet->key) + 1;
+		for (size_t nBucket = MyHashKey(pAssocRet->key) % m_nHashTableSize + 1;
 			nBucket < m_nHashTableSize; nBucket++)
 			if ((pAssocNext = m_pHashTable[nBucket]) != NULL)
 				break;
@@ -184,28 +178,25 @@ Cache::MyAssoc *Cache::GetNextAssoc(Cache::MyAssoc *Position) const
 	return pAssocNext;
 }
 
-Cache::MyAssoc* Cache::GetAssocAt(const ieResRef key) const
+Cache::MyAssoc* Cache::GetAssocAt(const ResRef& key) const
 	// find association (or return NULL)
 {
-	if (m_pHashTable == NULL) {
-		return NULL;
+	if (m_pHashTable == nullptr || key.IsEmpty()) {
+		return nullptr;
 	}
 
-	unsigned int nHash = MyHashKey( key );
+	size_t nHash = MyHashKey(key) % m_nHashTableSize;
 
 	// see if it exists
-	Cache::MyAssoc* pAssoc;
-	for (pAssoc = m_pHashTable[nHash];
-		pAssoc != NULL;
-		pAssoc = pAssoc->pNext) {
-		if (!strnicmp( pAssoc->key, key, KEYSIZE )) {
+	 for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
+		if (key == pAssoc->key) {
 			return pAssoc;
 		}
 	}
 	return NULL;
 }
 
-void *Cache::GetResource(const ieResRef key) const
+void *Cache::GetResource(const ResRef& key) const
 {
 	Cache::MyAssoc* pAssoc = GetAssocAt( key );
 	if (pAssoc == NULL) {
@@ -217,9 +208,9 @@ void *Cache::GetResource(const ieResRef key) const
 }
 
 //returns true if it was successful
-bool Cache::SetAt(const ieResRef key, void *rValue)
+bool Cache::SetAt(const ResRef& key, void *rValue)
 {
-	int i;
+	if (key.IsEmpty()) return false;
 
 	if (m_pHashTable == NULL) {
 		InitHashTable( m_nHashTableSize );
@@ -234,15 +225,10 @@ bool Cache::SetAt(const ieResRef key, void *rValue)
 
 	// it doesn't exist, add a new Association
 	pAssoc = NewAssoc();
-	for (i=0;i<KEYSIZE && key[i];i++) {
-		pAssoc->key[i]=tolower(key[i]);
-	}
-	for (;i<KEYSIZE;i++) {
-		pAssoc->key[i]=0;
-	}
+	pAssoc->key = key;
 	pAssoc->data=rValue;
 	// put into hash table
-	unsigned int nHash = MyHashKey(pAssoc->key);
+	size_t nHash = MyHashKey(pAssoc->key) % m_nHashTableSize;
 	pAssoc->pNext = m_pHashTable[nHash];
 	pAssoc->pPrev = &m_pHashTable[nHash];
 	if (pAssoc->pNext) {
@@ -252,20 +238,20 @@ bool Cache::SetAt(const ieResRef key, void *rValue)
 	return true;
 }
 
-int Cache::RefCount(const ieResRef key) const
+int Cache::RefCount(const ResRef& key) const
 {
-	Cache::MyAssoc* pAssoc=GetAssocAt( key );
+	const Cache::MyAssoc* pAssoc = GetAssocAt(key);
 	if (pAssoc) {
 		return pAssoc->nRefCount;
 	}
 	return -1;
 }
 
-int Cache::DecRef(void *data, const ieResRef key, bool remove)
+int Cache::DecRef(const void *data, const ResRef& key, bool remove)
 {
 	Cache::MyAssoc* pAssoc;
 
-	if (key) {
+	if (!key.IsEmpty()) {
 		pAssoc=GetAssocAt( key );
 		if (pAssoc && (pAssoc->data==data) ) {
 			if (!pAssoc->nRefCount) {

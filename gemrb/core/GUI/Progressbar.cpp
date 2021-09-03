@@ -21,9 +21,12 @@
 #include "GUI/Progressbar.h"
 
 #include "Interface.h"
+
 #include "GUI/Window.h"
 
 #include <cstring>
+#include <utility>
+
 
 namespace GemRB {
 
@@ -53,13 +56,13 @@ bool Progressbar::IsOpaque() const
 }
 
 /** Draws the Control on the Output Display */
-void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
+void Progressbar::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	ieDword val = GetValue();
 
 	if((val >= 100) && KnobStepsCount && BackGround2) {
 		//animated progbar end stage
-		core->GetVideoDriver()->BlitSprite(BackGround2, rgn.Origin());
+		core->GetVideoDriver()->BlitSprite(BackGround2, rgn.origin);
 		return; //done for animated progbar
 	}
 
@@ -67,13 +70,13 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	if(!KnobStepsCount) {
 		//linear progressbar (pst, iwd)
-		const Size& size = BackGround2->Frame.Dimensions();
+		const Size& size = BackGround2->Frame.size;
 		//this is the PST/IWD specific part
 		Count = val * size.w / 100;
-		Region r(rgn.Origin() + KnobPos, Size(Count, size.h));
-		core->GetVideoDriver()->BlitSprite(BackGround2, r.Origin(), &r);
+		Region r(rgn.origin + KnobPos, Size(Count, size.h));
+		core->GetVideoDriver()->BlitSprite(BackGround2, r.origin, &r);
 
-		Point p = rgn.Origin() + CapPos;
+		Point p = rgn.origin + CapPos;
 		p.x += Count - PBarCap->Frame.w;
 		core->GetVideoDriver()->BlitSprite(PBarCap, p);
 		return;
@@ -87,19 +90,21 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 }
 
-void Progressbar::UpdateState(unsigned int Sum)
+void Progressbar::UpdateState(value_t Sum)
 {
+	if (Sum == INVALID_VALUE) return;
+
 	SetValue(Sum);
-    if(GetValue() == 100) {
-        PerformAction(Action::EndReached);
-    }
+	if (GetValue() == 100) {
+		PerformAction(Action::EndReached);
+	}
 }
 
 /** Sets the selected image */
 void Progressbar::SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap)
 {
-	BackGround2 = bg;
-	PBarCap = cap;
+	BackGround2 = std::move(bg);
+	PBarCap = std::move(cap);
 	MarkDirty();
 }
 

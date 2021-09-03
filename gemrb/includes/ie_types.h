@@ -29,31 +29,72 @@
 #define IE_TYPES_H
 
 #include "Platform.h"
+#include "System/String.h"
 
 namespace GemRB {
 
-typedef unsigned char ieByte;
-typedef signed char ieByteSigned;
-typedef unsigned short ieWord;
-typedef signed short ieWordSigned;
+using ieByte = unsigned char;
+using ieByteSigned = signed char;
+using ieWord = unsigned short;
+using ieWordSigned = signed short;
 
 #if (SIZEOF_INT == 4)
-typedef unsigned int ieDword;
-typedef signed int ieDwordSigned;
+using ieDword = unsigned int;
+using ieDwordSigned = signed int;
 #elif (SIZE_LONG_INT == 4)
-typedef unsigned long int ieDword;
-typedef signed long int ieDwordSigned;
+using ieDword = unsigned long int;
+using ieDwordSigned = signed long int;
 #else
-typedef unsigned long int ieDword;
-typedef signed long int ieDwordSigned;
+using ieDword = unsigned long int;
+using ieDwordSigned = signed long int;
 #endif
 
 /** string reference into TLK file */
-typedef ieDword ieStrRef; 
+using ieStrRef = ieDword;
 
-/** Resource reference */
-typedef char ieResRef[9];
-typedef char ieVariable[33];
+class ieVariable
+{
+	char var[33] {'\0'};
+	
+public:
+	ieVariable() = default;
+	ieVariable(std::nullptr_t) = delete;
+
+	explicit ieVariable(const char* c) noexcept {
+		operator=(c);
+	}
+	
+	ieVariable& operator=(const char* c) noexcept {
+		if (c) {
+			strncpy(var, c, sizeof(var) - 1);
+		} else {
+			memset(var, 0, sizeof(var));
+		}
+		return *this;
+	}
+	
+	explicit operator const char*() const noexcept {
+		return var;
+	}
+
+	char operator[](size_t i) const noexcept {
+		return var[i];
+	}
+	
+	char& operator[](size_t i) noexcept {
+		return var[i];
+	}
+
+	operator char*() noexcept {
+		return var;
+	}
+	
+	const char* CString() const noexcept {
+		return var;
+	}
+};
+
+using ResRef = FixedSizeString<8, strnicmp>;
 
 }
 

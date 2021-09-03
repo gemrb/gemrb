@@ -4,8 +4,8 @@
 namespace GemRB {
 
 MapReverb::MapReverb (Map& _map) :
-		reverbMapping(AutoTable("area_reverbs"))
-	, reverbs(AutoTable("reverb"))
+		reverbMapping(gamedata->LoadTable("area_reverbs"))
+	, reverbs(gamedata->LoadTable("reverb"))
 	, map(_map)
 	, reverbProfile(EFX_PROFILE_REVERB_INVALID) {
 	MapReverbProperties _properties = {EFX_REVERB_GENERIC, true};
@@ -30,7 +30,8 @@ MapReverb::MapReverb (Map& _map) :
 	}
 }
 
-void MapReverb::getReverbProperties (MapReverbProperties& props) {
+void MapReverb::getReverbProperties(MapReverbProperties& props) const
+{
 	memcpy(&props, &properties, sizeof(MapReverbProperties));
 }
 
@@ -82,14 +83,12 @@ unsigned char MapReverb::obtainProfile () {
 	unsigned char configValue = 0;
 
 	for (int i = 0; i < rows; ++i) {
-		char mapName[8] = {0};
-		strnlwrcpy(mapName, reverbMapping->GetRowName(i), 7);
+		ResRef mapName = reverbMapping->GetRowName(i);
+		if (mapName == map.WEDResRef) {
+			uint8_t profile = strtounsigned<uint8_t>(reverbMapping->QueryField(i, 0));
 
-		if (0 == strncmp(mapName, map.WEDResRef, 8)) {
-			long profile = strtoul(reverbMapping->QueryField(i, 0), NULL, 0);
-
-			if (profile >= 0 && profile < EFX_MAX_REVERB_PROFILE_INDEX) {
-				configValue = static_cast<unsigned char>(profile);
+			if (profile < EFX_MAX_REVERB_PROFILE_INDEX) {
+				configValue = profile;
 			}
 			break;
 		}

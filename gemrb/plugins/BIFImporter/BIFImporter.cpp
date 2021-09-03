@@ -42,9 +42,7 @@ BIFImporter::BIFImporter(void)
 
 BIFImporter::~BIFImporter(void)
 {
-	if (stream) {
-		delete( stream );
-	}
+	delete stream;
 	if (fentries) {
 		delete[] fentries;
 	}
@@ -58,9 +56,9 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 	print("Decompressing");
 	if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
 		return NULL;
-	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
+	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
 	ieDword unCompBifSize;
-	compressed->ReadDword( &unCompBifSize );
+	compressed->ReadDword(unCompBifSize);
 #if !defined(SUPPORTS_MEMSTREAM)
 	fflush(stdout);
 #endif
@@ -73,8 +71,8 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 	int laststep = 0;
 	while (finalsize < unCompBifSize) {
 		ieDword complen, declen;
-		compressed->ReadDword( &declen );
-		compressed->ReadDword( &complen );
+		compressed->ReadDword(declen);
+		compressed->ReadDword(complen);
 		if (comp->Decompress( &out, compressed, complen ) != GEM_OK) {
 			return NULL;
 		}
@@ -94,26 +92,24 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*path*/)
 {
 	ieDword fnlen, complen, declen;
-	compressed->ReadDword( &fnlen );
+	compressed->ReadDword(fnlen);
 	compressed->Seek(fnlen, GEM_CURRENT_POS);
-	compressed->ReadDword(&declen);
-	compressed->ReadDword(&complen);
+	compressed->ReadDword(declen);
+	compressed->ReadDword(complen);
 	print("Decompressing");
 	return CacheCompressedStream(compressed, compressed->filename, complen);
 }
 
 int BIFImporter::OpenArchive(const char* path)
 {
-	if (stream) {
-		delete( stream );
-		stream = NULL;
-	}
+	delete stream;
+	stream = nullptr;
 
 	char filename[_MAX_PATH];
 	ExtractFileFromPath(filename, path);
 
 	char cachePath[_MAX_PATH];
-	PathJoin(cachePath, core->CachePath, filename, NULL);
+	PathJoin(cachePath, core->config.CachePath, filename, nullptr);
 	char Signature[8];
 #if defined(SUPPORTS_MEMSTREAM)
 	auto cacheStream = new MappedFileMemoryStream{cachePath};
@@ -195,9 +191,9 @@ DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
 void BIFImporter::ReadBIF(void)
 {
 	ieDword foffset;
-	stream->ReadDword( &fentcount );
-	stream->ReadDword( &tentcount );
-	stream->ReadDword( &foffset );
+	stream->ReadDword(fentcount);
+	stream->ReadDword(tentcount);
+	stream->ReadDword(foffset);
 	stream->Seek( foffset, GEM_STREAM_START );
 	fentries = new FileEntry[fentcount];
 	tentries = new TileEntry[tentcount];
@@ -212,22 +208,21 @@ void BIFImporter::ReadBIF(void)
 		}
 		return;
 	}
-	unsigned int i;
 
-	for (i=0;i<fentcount;i++) {
-		stream->ReadDword( &fentries[i].resLocator);
-		stream->ReadDword( &fentries[i].dataOffset);
-		stream->ReadDword( &fentries[i].fileSize);
-		stream->ReadWord( &fentries[i].type);
-		stream->ReadWord( &fentries[i].u1);
+	for (unsigned int i = 0; i < fentcount; i++) {
+		stream->ReadDword(fentries[i].resLocator);
+		stream->ReadDword(fentries[i].dataOffset);
+		stream->ReadDword(fentries[i].fileSize);
+		stream->ReadWord(fentries[i].type);
+		stream->ReadWord(fentries[i].u1);
 	}
-	for (i=0;i<tentcount;i++) {
-		stream->ReadDword( &tentries[i].resLocator);
-		stream->ReadDword( &tentries[i].dataOffset);
-		stream->ReadDword( &tentries[i].tilesCount);
-		stream->ReadDword( &tentries[i].tileSize);
-		stream->ReadWord( &tentries[i].type);
-		stream->ReadWord( &tentries[i].u1);
+	for (unsigned int i = 0; i < tentcount; i++) {
+		stream->ReadDword(tentries[i].resLocator);
+		stream->ReadDword(tentries[i].dataOffset);
+		stream->ReadDword(tentries[i].tilesCount);
+		stream->ReadDword(tentries[i].tileSize);
+		stream->ReadWord(tentries[i].type);
+		stream->ReadWord(tentries[i].u1);
 	}
 }
 

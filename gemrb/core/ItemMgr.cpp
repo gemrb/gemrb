@@ -20,18 +20,15 @@
 
 #include "ItemMgr.h"
 
+#include "GameData.h"
+
 namespace GemRB {
 
 ItemMgr::ItemMgr(void)
 {
-	// FIXME: could make these tables static...
-	tooltipTable.load("tooltip", true);
-	exclusionTable.load("itemexcl", true);
-	dialogTable.load("itemdial", true);
-}
-
-ItemMgr::~ItemMgr(void)
-{
+	tooltipTable = gamedata->LoadTable("tooltip", true);
+	exclusionTable = gamedata->LoadTable("itemexcl", true);
+	dialogTable = gamedata->LoadTable("itemdial", true);
 }
 
 }

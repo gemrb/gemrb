@@ -24,7 +24,6 @@
 
 namespace GemRB {
 
-class Resource;
 class ResourceDesc;
 
 class DirectoryImporter : public ResourceSource {
@@ -32,8 +31,7 @@ protected:
 	char path[_MAX_PATH];
 
 public:
-	DirectoryImporter(void);
-	~DirectoryImporter(void) override;
+	DirectoryImporter(void) = default;
 	bool Open(const char *dir, const char *desc) override;
 	/** predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type) override;
@@ -48,9 +46,7 @@ protected:
 	StringMap cache;
 
 public:
-	CachedDirectoryImporter();
-	~CachedDirectoryImporter() override;
-
+	CachedDirectoryImporter() = default;
 	bool Open(const char *dir, const char *desc) override;
 	void Refresh();
 	/** predicts the availability of a resource */

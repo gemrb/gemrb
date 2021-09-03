@@ -23,6 +23,11 @@
 #include "GUI/Label.h"
 #include "Interface.h"
 
+#include <chrono>
+#include <thread>
+
+using namespace std::chrono;
+
 namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
@@ -71,9 +76,10 @@ void MoviePlayer::Play(Window* win)
 	const Region& winFrame = win->Frame();
 	const Size& size = Dimensions();
 	Point center(winFrame.w/2 - size.w/2, winFrame.h/2 - size.h/2);
-	center = center + winFrame.Origin();
-	VideoBufferPtr subBuf = nullptr, vb = video->CreateBuffer(Region(center, size), movieFormat);
-	
+	center = center + winFrame.origin;
+	VideoBufferPtr subBuf = nullptr;
+	VideoBufferPtr vb = video->CreateBuffer(Region(center, size), movieFormat);
+
 	if (subtitles) {
 		// FIXME: arbitrary frame of my choosing, not sure there is a better method
 		// this hould probably at least be sized according to line height
@@ -116,6 +122,31 @@ void MoviePlayer::Play(Window* win)
 void MoviePlayer::Stop()
 {
 	isPlaying = false;
+}
+
+microseconds MoviePlayer::get_current_time() const
+{
+	return duration_cast<microseconds>(steady_clock::now().time_since_epoch());
+}
+
+void MoviePlayer::timer_start()
+{
+	lastTime = get_current_time();
+}
+
+void MoviePlayer::timer_wait(microseconds frameWait)
+{
+	auto time = get_current_time();
+
+	while (time - lastTime > frameWait) {
+		time -= frameWait;
+		video_frameskip++;
+	}
+
+	microseconds to_sleep = frameWait - (time - lastTime);
+	std::this_thread::sleep_for(to_sleep);
+
+	timer_start();
 }
 
 }

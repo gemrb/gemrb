@@ -76,20 +76,22 @@ void ScrollView::ContentView::ResizeToSubviews()
 	frame.h = newSize.h;
 
 	ScrollView* sv = static_cast<ScrollView*>(superView);
-	sv->UpdateScrollbars();
+	if (!sv->animation) {
+		sv->UpdateScrollbars();
+	}
 }
 	
 void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region& clip)
 {
-	ScrollView* parent = static_cast<ScrollView*>(superView);
+	const ScrollView* parent = static_cast<const ScrollView*>(superView);
 	
 	Region clipArea = parent->ContentRegion();
-	Point origin = parent->ConvertPointToWindow(clipArea.Origin());
+	Point origin = parent->ConvertPointToWindow(clipArea.origin);
 	clipArea.x = origin.x;
 	clipArea.y = origin.y;
 	
 	const Region intersect = clip.Intersect(clipArea);
-	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
+	if (intersect.size.IsInvalid()) return; // outside the window/screen
 	
 	// clip drawing to the ContentRegion, then restore after drawing
 	Video* video = core->GetVideoDriver();
@@ -105,7 +107,7 @@ ScrollView::ScrollView(const Region& frame)
 : View(frame), contentView(Region())
 {
 	View::AddSubviewInFrontOfView(&contentView);
-	contentView.SetFrame(Region(Point(), frame.Dimensions()));
+	contentView.SetFrame(Region(Point(), frame.size));
 	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
 	contentView.SetAutoResizeFlags(ResizeAll, OP_SET);
 
@@ -167,14 +169,14 @@ void ScrollView::SetHScroll(ScrollBar*)
 void ScrollView::UpdateScrollbars()
 {
 	// FIXME: this is assuming an origin of 0,0
-	const Size& mySize = ContentRegion().Dimensions();
+	const Size& mySize = ContentRegion().size;
 	const Region& contentFrame = contentView.Frame();
 
 	if (hscroll && contentFrame.w > mySize.w) {
 		// assert(hscroll);
 		// TODO: add horizontal scrollbars
 		// this is a limitation in the Scrollbar class
-		hscroll->SetValue(-contentFrame.Origin().x);
+		hscroll->SetValue(-contentFrame.origin.x);
 	}
 	if (vscroll) {
 		if (contentFrame.h > mySize.h) {
@@ -186,19 +188,19 @@ void ScrollView::UpdateScrollbars()
 		} else {
 			vscroll->SetVisible(false);
 		}
-		vscroll->SetValue(-contentFrame.Origin().y);
+		vscroll->SetValue(-contentFrame.origin.y);
 	}
 }
 	
-void ScrollView::ScrollbarValueChange(ScrollBar* sb)
+void ScrollView::ScrollbarValueChange(const ScrollBar* sb)
 {
 	const Point& origin = contentView.Origin();
 	
 	if (sb == hscroll) {
-		Point p(-short(sb->GetValue()), origin.y);
+		Point p(-int(sb->GetValue()), origin.y);
 		ScrollTo(p);
 	} else if (sb == vscroll) {
-		Point p(origin.x, -short(sb->GetValue()));
+		Point p(origin.x, -int(sb->GetValue()));
 		ScrollTo(p);
 	} else {
 		Log(ERROR, "ScrollView", "ScrollbarValueChange for unknown scrollbar");
@@ -278,12 +280,11 @@ View* ScrollView::SubviewAt(const Point& p, bool ignoreTransparency, bool recurs
 void ScrollView::Update()
 {
 	contentView.ResizeToSubviews();
-	UpdateScrollbars();
 }
 
 bool ScrollView::CanScroll(const Point& p) const
 {
-	const Size& mySize = ContentRegion().Dimensions();
+	const Size& mySize = ContentRegion().size;
 	const Size& contentSize = contentView.Dimensions();
 	return contentSize.h > mySize.h + p.y && contentSize.w > mySize.w + p.x;
 }
@@ -320,15 +321,15 @@ void ScrollView::ScrollTo(const Point& p)
 
 void ScrollView::ScrollTo(Point newP, ieDword duration)
 {
-	short maxx = frame.w - contentView.Dimensions().w;
-	short maxy = frame.h - contentView.Dimensions().h;
+	int maxx = frame.w - contentView.Dimensions().w;
+	int maxy = frame.h - contentView.Dimensions().h;
 	assert(maxx <= 0 && maxy <= 0);
 
 	// clamp values so we dont scroll beyond the content
-	newP.x = Clamp<short>(newP.x, maxx, 0);
-	newP.y = Clamp<short>(newP.y, maxy, 0);
+	newP.x = Clamp(newP.x, maxx, 0);
+	newP.y = Clamp(newP.y, maxy, 0);
 
-	Point current = (animation) ? animation.Current() : contentView.Origin();
+	Point current = animation ? animation.Current() : contentView.Origin();
 	contentView.SetFrameOrigin(newP);
 	UpdateScrollbars();
 
@@ -360,7 +361,7 @@ bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 			scroll.x = -amount;
 			break;
 	}
-	if (!scroll.isnull() && CanScroll(scroll)) {
+	if (!scroll.IsZero() && CanScroll(scroll)) {
 		ScrollDelta(scroll);
 		return true;
 	}

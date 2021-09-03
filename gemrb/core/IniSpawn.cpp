@@ -23,6 +23,8 @@
 
 #include "IniSpawn.h"
 
+#include "globals.h"
+
 #include "CharAnimations.h"
 #include "Game.h"
 #include "GameData.h"
@@ -38,108 +40,100 @@
 namespace GemRB {
 
 static const int StatValues[9]={
-IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
+IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC,
 IE_SEX, IE_ALIGNMENT };
 
-IniSpawn::IniSpawn(Map *owner)
-{
-	map = owner;
-	NamelessSpawnArea[0] = 0;
-	NamelessState = 35;
-	NamelessVar = NULL;
-	namelessvarcount = 0;
-	Locals = NULL;
-	localscount = 0;
-	eventspawns = NULL;
-	eventcount = 0;
-	//high detail level by default
-	detail_level = 2;
-	core->GetDictionary()->Lookup("Detail Level", detail_level);
-}
-
-IniSpawn::~IniSpawn()
-{
-	if (eventspawns) {
-		delete[] eventspawns;
-		eventspawns = NULL;
-	}
-
-	if (Locals) {
-		delete[] Locals;
-		Locals = NULL;
-	}
-
-	if (NamelessVar) {
-		delete[] NamelessVar;
-		NamelessVar = NULL;
-	}
-}
-
-static Holder<DataFileMgr> GetIniFile(const ieResRef DefaultArea)
+static std::shared_ptr<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
 	if (!gamedata->Exists( DefaultArea, IE_INI_CLASS_ID)) {
-		return NULL;
+		return {};
 	}
 
 	DataStream* inifile = gamedata->GetResource( DefaultArea, IE_INI_CLASS_ID );
 	if (!inifile) {
-		return NULL;
+		return {};
 	}
 	if (!core->IsAvailable( IE_INI_CLASS_ID )) {
 		Log(ERROR, "IniSpawn", "No INI Importer Available.");
-		return NULL;
+		return {};
 	}
 
-	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
+	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 	return ini;
 }
 
-/*** initializations ***/
-
-static inline int CountElements(const char *s, char separator)
+IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 {
-	int ret = 1;
-	while(*s) {
-		if (*s==separator) ret++;
-		s++;
+	map = owner;
+	NamelessState = 35;
+	//high detail level by default
+	detail_level = 2;
+	core->GetDictionary()->Lookup("Detail Level", detail_level);
+
+	const auto inifile = GetIniFile(DefaultArea);
+	if (!inifile) {
+		NamelessSpawnArea = DefaultArea;
+		return;
 	}
-	return ret;
-}
 
-static inline void GetElements(const char *s, ieResRef *storage, int count)
-{
-	while(count--) {
-		ieResRef *field = storage+count;
-		strnuprcpy(*field, s, sizeof(ieResRef)-1);
-		for(size_t i=0;i<sizeof(ieResRef) && (*field)[i];i++) {
-			if ((*field)[i]==',') {
-				(*field)[i]='\0';
-				break;
-			}
+	const char *s = inifile->GetKeyAsString("nameless", "destare", DefaultArea);
+	NamelessSpawnArea = s;
+	s = inifile->GetKeyAsString("nameless","point","[0.0]");
+	if (sscanf(s, "[%d.%d]", &NamelessSpawnPoint.x, &NamelessSpawnPoint.y) != 2) {
+		NamelessSpawnPoint.reset();
+	}
+
+	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
+	PartySpawnArea = s;
+	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
+	if (sscanf(s, "[%d.%d]", &PartySpawnPoint.x, &PartySpawnPoint.y) != 2) {
+		PartySpawnPoint = NamelessSpawnPoint;
+	}
+
+	// animstat.ids values
+	//35 - already standing
+	//36 - getting up
+	NamelessState = inifile->GetKeyAsInt("nameless","state",36);
+
+	auto namelessvarcount = inifile->GetKeysCount("namelessvar");
+	NamelessVar.reserve(namelessvarcount);
+	for (int y = 0; y < namelessvarcount; ++y) {
+		const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
+		auto val = inifile->GetKeyAsInt("namelessvar",Key,0);
+		NamelessVar.emplace_back(Key, val);
+	}
+
+	auto localscount = inifile->GetKeysCount("locals");
+	Locals.reserve(localscount);
+	for (int y = 0; y < localscount; ++y) {
+		const char* Key = inifile->GetKeyNameByIndex("locals",y);
+		auto val = inifile->GetKeyAsInt("locals",Key,0);
+		Locals.emplace_back(Key, val);
+	}
+
+	s = inifile->GetKeyAsString("spawn_main","enter",NULL);
+	if (s) {
+		ReadSpawnEntry(inifile.get(), s, enterspawn);
+	}
+
+	s = inifile->GetKeyAsString("spawn_main","exit",NULL);
+	if (s) {
+		ReadSpawnEntry(inifile.get(), s, exitspawn);
+	}
+
+	s = inifile->GetKeyAsString("spawn_main","events",NULL);
+	if (s) {
+		auto events = GetElements<const char*>(s);
+		auto eventcount = events.size();
+		eventspawns.resize(eventcount);
+		while(eventcount--) {
+			ReadSpawnEntry(inifile.get(), events[eventcount], eventspawns[eventcount]);
 		}
-		if (!count) break;
-		while(*s && *s!=',') s++;
-		s++;
-		if (*s==' ') s++; //this is because there is one single screwed up entry in ar1100.ini
 	}
-}
-
-static inline void GetElements(const char *s, ieVariable *storage, int count)
-{
-	while(count--) {
-		ieVariable *field = storage+count;
-		strnuprcpy(*field, s, sizeof(ieVariable)-1);
-		for(size_t i=0;i<sizeof(ieVariable) && (*field)[i];i++) {
-			if ((*field)[i]==',') {
-				(*field)[i]='\0';
-				break;
-			}
-		}
-		while(*s && *s!=',') s++;
-		s++;
-	}
+	//maybe not correct
+	InitialSpawn();
 }
 
 // possible values implemented in DiffMode, but not needed here
@@ -163,23 +157,160 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 	return NO_OPERATION;
 }
 
-//unimplemented tags (* marks partially implemented, # marks not working in original either):
-//*check_crowd
-// control_var
-// spec_area
-//*death_faction
-//*death_team
-// check_by_view_port
-//*do_not_spawn
-// hold_selected_point_key
-// inc_spawn_point_index
-//*find_safest_point
-//#spawn_time_of_day
-// exit - similar to enter[spawn], this is a spawn branch type (on exiting an area?)
-// PST only
-//*auto_buddy
-//*detail_level
-void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
+inline bool VarHasContext(const char *str)
+{
+	return strnlen(str, 40) > 9 && str[6] == ':' && str[7] == ':';
+}
+
+inline bool ParsePointDef(const char* pointString, Point& destPoint, int& orient)
+{
+	int parsed = sscanf(pointString, "[%d%*[,.]%d:%d]", &destPoint.x, &destPoint.y, &orient);
+	if (parsed != 3 && sscanf(pointString, "[%d%*[,.]%d]", &destPoint.x, &destPoint.y) != 2) {
+		Log(ERROR, "IniSpawn", "Malformed spawn point definition: %s", pointString);
+		return false;
+	}
+	return true;
+}
+
+// determine the final spawn point
+void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
+{
+	if (critter.SpawnMode == 'e') {
+		// nothing to do, everyone will use the point stored in the var, which was handled on read
+		return;
+	}
+
+	const auto spawnPointStrings = GetElements<const char*>(critter.SpawnPointsDef.c_str());
+	int spawnCount = static_cast<int>(spawnPointStrings.size());
+	Point chosenPoint;
+	int orient = -1;
+
+	if (critter.Flags & CF_SAFEST_POINT) {
+		// try to find it, otherwise behave as if nothing happened and retry normally
+		Point tmp;
+		for (const auto& point : spawnPointStrings) {
+			if (!ParsePointDef(point, tmp, orient)) {
+				continue;
+			}
+			if (map->IsVisible(tmp)) continue;
+
+			chosenPoint = tmp;
+		}
+	}
+
+	if (chosenPoint.IsZero()) {
+		// only spawn_point_global / spawn_facing_global support 'e'
+		int idx = 0;
+		if (critter.SpawnMode == 'r') {
+			// select one of the spawnpoints randomly
+			idx = core->Roll(1, spawnCount, -1);
+		} else if (critter.SpawnMode == 'i' && critter.PointSelectVar) {
+			// choose a point by spawn index
+			idx = CheckVariable(map, critter.PointSelectVar + 8, critter.PointSelectVar) % spawnCount;
+		} // else is 's' mode - single
+
+		ParsePointDef(spawnPointStrings[idx], chosenPoint, orient);
+	}
+
+	critter.SpawnPoint = chosenPoint;
+	if (orient != -1) {
+		critter.Orientation = orient;
+	} else if (critter.Orientation2 != -1) {
+		critter.Orientation = critter.Orientation2;
+	} else {
+		critter.Orientation = core->Roll(1, 16, -1);
+	}
+
+	// store point and/or orientation in a global var
+	if (critter.SaveSelectedPoint.CString()[0]) {
+		if (VarHasContext(critter.SaveSelectedPoint)) {
+			SetPointVariable(map, critter.SaveSelectedPoint + 8, critter.SpawnPoint, critter.SaveSelectedPoint);
+		} else {
+			SetPointVariable(map, critter.SaveSelectedPoint, critter.SpawnPoint, "GLOBAL");
+		}
+	}
+
+	if (critter.SaveSelectedFacing.CString()[0]) {
+		if (VarHasContext(critter.SaveSelectedFacing)) {
+			SetVariable(map, critter.SaveSelectedFacing + 8, critter.Orientation, critter.SaveSelectedFacing);
+		} else {
+			SetVariable(map, critter.SaveSelectedFacing, critter.Orientation, "GLOBAL");
+		}
+	}
+}
+
+void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const
+{
+	// spawn point could be (point_select):
+	// s - single
+	// r - random
+	// e - preset (read from var)
+	// i - indexed sequential (read from var)
+	// but also find_safest_point can override that
+	// NOTE: it affects several following keys
+	const char *pointSelect = iniFile->GetKeyAsString(critterName, "point_select", nullptr);
+	char spawnMode = 0;
+	if (pointSelect) {
+		spawnMode = pointSelect[0];
+	}
+	critter.SpawnMode = spawnMode;
+
+	const char *spawnPoints = iniFile->GetKeyAsString(critterName, "spawn_point", nullptr);
+	if (!spawnPoints) {
+		Log(ERROR, "IniSpawn", "No spawn points defined, skipping creature: %s", critterName);
+		return;
+	}
+	critter.SpawnPointsDef = spawnPoints;
+
+	// indexed sequential mode
+	const char *pointSelectVar = iniFile->GetKeyAsString(critterName, "point_select_var", nullptr);
+	if (pointSelectVar) {
+		critter.PointSelectVar = pointSelectVar;
+	}
+	bool incSpawnPointIndex = iniFile->GetKeyAsBool(critterName, "inc_spawn_point_index", false);
+	if (incSpawnPointIndex && critter.SpawnMode == 'i') {
+		critter.Flags |= CF_INC_INDEX;
+	}
+
+	// don't spawn when spawnpoint is visible
+	bool ignoreCanSee = iniFile->GetKeyAsBool(critterName, "ignore_can_see", false);
+	if (ignoreCanSee) {
+		critter.Flags |= CF_IGNORECANSEE;
+	}
+
+	// find first in fog, unless ignore_can_see is on
+	bool safestPoint = iniFile->GetKeyAsBool(critterName,"find_safest_point", false);
+	if (safestPoint && !ignoreCanSee) {
+		critter.Flags |= CF_SAFEST_POINT;
+	}
+
+	// Keys that store or retrieve spawn point and orientation ("facing").
+	// take point from variable
+	const char *spawnPointGlobal = iniFile->GetKeyAsString(critterName,"spawn_point_global", nullptr);
+	if (spawnPointGlobal && critter.SpawnMode == 'e') {
+		critter.SpawnPoint = CheckPointVariable(map, spawnPointGlobal + 8, spawnPointGlobal);
+	}
+
+	// take facing from variable
+	// NOTE: not replicating original buggy behavior:
+	// Due to a bug in the implementation "point_select_var" is also used to
+	// determine the creature orientation if "point_select" is set to 'e'
+	// However, both attributes had to be specified to work
+	const char *spawnFacingGlobal = iniFile->GetKeyAsString(critterName,"spawn_facing_global", nullptr);
+	if (spawnFacingGlobal  && critter.SpawnMode == 'e') {
+		critter.Orientation = static_cast<int>(CheckVariable(map, spawnFacingGlobal + 8, spawnFacingGlobal));
+	}
+
+	// should all create_qty spawns use the same spawn point?
+	bool holdSelectedPointKey = iniFile->GetKeyAsBool(critterName, "hold_selected_point_key", false);
+	if (holdSelectedPointKey) {
+		critter.Flags |= CF_HOLD_POINT;
+	}
+}
+
+// tags not working in originals either, see IESDP for details:
+// control_var, spec_area, check_crowd, spawn_time_of_day, check_view_port (used!) & check_by_view_port
+void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
 {
 	const char *s;
 	int ps;
@@ -222,14 +353,20 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		}
 	}
 
+	// PSTEE only
+	bool disableRenderer = inifile->GetKeyAsBool(crittername, "disable_renderer", false);
+	if (disableRenderer) {
+		critter.Flags |= CF_DISABLE_RENDERER;
+	}
+
 	//all specvars are using global, but sometimes it is explicitly given
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
 	if (s) {
-		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			strnuprcpy(critter.SpecContext, s, 6);
+		if (VarHasContext(s)) {
+			critter.SpecContext.SNPrintF("%.6s", s);
 			strnlwrcpy(critter.SpecVar, s+8, 32);
 		} else {
-			strnuprcpy(critter.SpecContext, "GLOBAL", 6);
+			critter.SpecContext = "GLOBAL";
 			strnlwrcpy(critter.SpecVar, s, 32);
 		}
 	}
@@ -251,94 +388,24 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//the creature resource(s)
 	s = inifile->GetKeyAsString(crittername,"cre_file",NULL);
 	if (s) {
-		critter.creaturecount = CountElements(s,',');
-		critter.CreFile=new ieResRef[critter.creaturecount];
-		GetElements(s, critter.CreFile, critter.creaturecount);
+		critter.CreFile = GetElements<ResRef>(s);
 	} else {
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);
 	}
 
-	s = inifile->GetKeyAsString(crittername,"point_select",NULL);
-	
-	if (s) {
-		ps=s[0];
-	} else {
-		ps=0;
-	}
+	PrepareSpawnPoints(inifile, crittername, critter);
 
-	s = inifile->GetKeyAsString(crittername,"spawn_point",NULL);
-	if (s) {
-		//expect more than one spawnpoint
-		if (ps=='r') {
-			//select one of the spawnpoints randomly
-			int count = core->Roll(1,CountElements(s,']'),-1);
-			//go to the selected spawnpoint
-			while(count--) {
-				while(*s++!=']') ;
-			}
-		}
-		//parse the selected spawnpoint
-		short x, y;
-		int o;
-		if (sscanf(s, "[%hd%*[,.]%hd:%d]", &x, &y, &o) == 3) {
-			critter.SpawnPoint.x = x;
-			critter.SpawnPoint.y = y;
-			critter.Orientation = o;
-		} else if (sscanf(s, "[%hd%*[,.]%hd]", &x, &y) == 2) {
-			critter.SpawnPoint.x = x;
-			critter.SpawnPoint.y = y;
-			critter.Orientation = core->Roll(1, 16, -1);
-		}
-	}
-
-	//store or retrieve spawn point
-	s = inifile->GetKeyAsString(crittername,"spawn_point_global", NULL);
-	if (s) {
-		switch (ps) {
-		case 'e':
-			critter.SpawnPoint.fromDword(CheckVariable(map, s+8,s));
-			break;
-		default:
-			//see save_selected_point
-			//SetVariable(map, s+8, s, critter.SpawnPoint.asDword());
-			break;
-		}
-	}
-
-	//take facing from variable
-	s = inifile->GetKeyAsString(crittername,"spawn_facing_global", NULL);
-	if (s) {
-		switch (ps) {
-		case 'e':
-			critter.Orientation=(int) CheckVariable(map, s+8,s);
-			break;
-		default:
-			//see save_selected_point
-			//SetVariable(map, s+8, s, (ieDword) critter.Orientation);
-			break;
-		}
-	}
-
+	// store point and/or orientation in a global var
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
-	if (s) {
-		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			SetVariable(map, s+8, s, critter.SpawnPoint.asDword());
-		} else {
-			SetVariable(map, s, "GLOBAL", critter.SpawnPoint.asDword());
-		}
-	}
+	if (s) critter.SaveSelectedPoint = s;
+
 	s = inifile->GetKeyAsString(crittername,"save_selected_facing",NULL);
-	if (s) {
-		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			SetVariable(map, s+8, s, (ieDword) critter.Orientation);
-		} else {
-			SetVariable(map, s, "GLOBAL", (ieDword) critter.Orientation);
-		}
-	}
+	if (s) critter.SaveSelectedFacing = s;
 
 	//sometimes only the orientation is given, the point is stored in a variable
 	ps = inifile->GetKeyAsInt(crittername,"facing",-1);
-	if (ps!=-1) critter.Orientation = ps;
+	critter.Orientation2 = ps;
+
 	ps = inifile->GetKeyAsInt(crittername, "ai_ea",-1);
 	if (ps!=-1) critter.SetSpec[AI_EA] = (ieByte) ps;
 	ps = inifile->GetKeyAsInt(crittername, "ai_team",-1);
@@ -382,67 +449,67 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//special 1 == area
 	s = inifile->GetKeyAsString(crittername,"script_special_1",NULL);
 	if (s) {
-		strnuprcpy(critter.AreaScript,s, 8);
+		critter.AreaScript = MakeUpperCaseResRef(s);
 	}
 	//special 2 == class
 	s = inifile->GetKeyAsString(crittername,"script_special_2",NULL);
 	if (s) {
-		strnuprcpy(critter.ClassScript,s, 8);
+		critter.ClassScript = MakeUpperCaseResRef(s);
 	}
 	//special 3 == general
 	s = inifile->GetKeyAsString(crittername,"script_special_3",NULL);
 	if (s) {
-		strnuprcpy(critter.GeneralScript,s, 8);
+		critter.GeneralScript = MakeUpperCaseResRef(s);
 	}
 	//team == specific
 	s = inifile->GetKeyAsString(crittername,"script_team",NULL);
 	if (s) {
-		strnuprcpy(critter.SpecificScript,s, 8);
+		critter.SpecificScript = MakeUpperCaseResRef(s);
 	}
 
 	//combat == race
 	s = inifile->GetKeyAsString(crittername,"script_combat",NULL);
 	if (s) {
-		strnuprcpy(critter.RaceScript,s, 8);
+		critter.RaceScript = MakeUpperCaseResRef(s);
 	}
 	//movement == default
 	s = inifile->GetKeyAsString(crittername,"script_movement",NULL);
 	if (s) {
-		strnuprcpy(critter.DefaultScript,s, 8);
+		critter.DefaultScript = MakeUpperCaseResRef(s);
 	}
 
 	//pst script names
 	s = inifile->GetKeyAsString(crittername,"script_override",NULL);
 	if (s) {
-		strnuprcpy(critter.OverrideScript,s, 8);
+		critter.OverrideScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_class",NULL);
 	if (s) {
-		strnuprcpy(critter.ClassScript,s, 8);
+		critter.ClassScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_race",NULL);
 	if (s) {
-		strnuprcpy(critter.RaceScript,s, 8);
+		critter.RaceScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_general",NULL);
 	if (s) {
-		strnuprcpy(critter.GeneralScript,s, 8);
+		critter.GeneralScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_default",NULL);
 	if (s) {
-		strnuprcpy(critter.DefaultScript,s, 8);
+		critter.DefaultScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_area",NULL);
 	if (s) {
-		strnuprcpy(critter.AreaScript,s, 8);
+		critter.AreaScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_specifics",NULL);
 	if (s) {
-		strnuprcpy(critter.SpecificScript,s, 8);
+		critter.SpecificScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"dialog",NULL);
 	if (s) {
-		strnuprcpy(critter.Dialog,s, 8);
+		critter.Dialog = MakeUpperCaseResRef(s);
 	}
 
 	//flags
@@ -479,22 +546,6 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		critter.Flags|=CF_BUDDY;
 	}
 
-	//don't spawn when spawnpoint is visible
-	if (inifile->GetKeyAsBool(crittername,"ignore_can_see",false)) {
-		critter.Flags|=CF_IGNORECANSEE;
-	}
-	//unsure, but could be similar to previous
-	if (inifile->GetKeyAsBool(crittername,"check_view_port", false)) {
-		critter.Flags|=CF_CHECKVIEWPORT;
-	}
-	//unknown, this is used only in pst
-	if (inifile->GetKeyAsBool(crittername,"check_crowd", false)) {
-		critter.Flags|=CF_CHECKCROWD;
-	}
-	//unknown, this is used only in pst
-	if (inifile->GetKeyAsBool(crittername,"find_safest_point", false)) {
-		critter.Flags|=CF_SAFESTPOINT;
-	}
 	//disable spawn based on game difficulty
 	if (inifile->GetKeyAsBool(crittername,"area_diff_1", false)) {
 		critter.Flags|=CF_NO_DIFF_1;
@@ -507,7 +558,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	}
 }
 
-void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, SpawnEntry &entry) const
+void IniSpawn::ReadSpawnEntry(const DataFileMgr *inifile, const char *entryname, SpawnEntry &entry) const
 {
 	const char *s;
 	entry.name = strdup(entryname);
@@ -516,106 +567,22 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	//don't default to NULL here, some entries may be missing in original game
 	//an empty default string here will create an empty but consistent entry
 	s = inifile->GetKeyAsString(entryname,"critters","");
-	int crittercount = CountElements(s,',');
-	entry.crittercount=crittercount;
-	entry.critters = new CritterEntry[crittercount]();
-	ieVariable *critters = new ieVariable[crittercount];
-	GetElements(s, critters, crittercount);
+	auto critters = GetElements<const char*>(s);
+	size_t crittercount = critters.size();
+	entry.critters.resize(crittercount);
+	
 	while(crittercount--) {
 		ReadCreature(inifile, critters[crittercount], entry.critters[crittercount]);
 	}
-	delete[] critters;
 }
 
 /* set by action */
-void IniSpawn::SetNamelessDeath(const ieResRef area, Point &pos, ieDword state) 
+void IniSpawn::SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state)
 {
-	strnuprcpy(NamelessSpawnArea, area, 8);
+	NamelessSpawnArea = area;
 	NamelessSpawnPoint = pos;
 	NamelessState = state;
 }
-
-void IniSpawn::InitSpawn(const ieResRef DefaultArea)
-{
-	const char *s;
-
-	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
-	if (!inifile) {
-		strnuprcpy(NamelessSpawnArea, DefaultArea, 8);
-		return;
-	}
-
-	s = inifile->GetKeyAsString("nameless","destare",DefaultArea);
-	strnuprcpy(NamelessSpawnArea, s, 8);
-	s = inifile->GetKeyAsString("nameless","point","[0.0]");
-	int x,y;
-	if (sscanf(s,"[%d.%d]", &x, &y)!=2) {
-		x=0;
-		y=0;
-	}
-	NamelessSpawnPoint.x=x;
-	NamelessSpawnPoint.y=y;
-
-	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
-	strnuprcpy(PartySpawnArea, s, 8);
-	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
-	if (sscanf(s,"[%d.%d]", &x, &y) != 2) {
-		x = NamelessSpawnPoint.x;
-		y = NamelessSpawnPoint.y;
-	}
-	PartySpawnPoint.x = x;
-	PartySpawnPoint.y = y;
-
-	//35 - already standing
-	//36 - getting up
-	NamelessState = inifile->GetKeyAsInt("nameless","state",36);
-
-	namelessvarcount = inifile->GetKeysCount("namelessvar");
-	if (namelessvarcount) {
-		NamelessVar = new VariableSpec[namelessvarcount];
-		for (y=0;y<namelessvarcount;y++) {
-			const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
-			strnlwrcpy(NamelessVar[y].Name, Key, 32);
-			NamelessVar[y].Value = inifile->GetKeyAsInt("namelessvar",Key,0);
-		}
-	}
-
-	localscount = inifile->GetKeysCount("locals");
-	if (localscount) {
-		Locals = new VariableSpec[localscount];
-		for (y=0;y<localscount;y++) {
-			const char* Key = inifile->GetKeyNameByIndex("locals",y);
-			strnlwrcpy(Locals[y].Name, Key, 32);
-			Locals[y].Value = inifile->GetKeyAsInt("locals",Key,0);
-		}
-	}
-
-	s = inifile->GetKeyAsString("spawn_main","enter",NULL);
-	if (s) {
-		ReadSpawnEntry(inifile.get(), s, enterspawn);
-	}
-
-	s = inifile->GetKeyAsString("spawn_main","exit",NULL);
-	if (s) {
-		ReadSpawnEntry(inifile.get(), s, exitspawn);
-	}
-
-	s = inifile->GetKeyAsString("spawn_main","events",NULL);
-	if (s) {
-		eventcount = CountElements(s,',');
-		eventspawns = new SpawnEntry[eventcount];
-		ieVariable *events = new ieVariable[eventcount];
-		GetElements(s, events, eventcount);
-		int ec = eventcount;
-		while(ec--) {
-			ReadSpawnEntry(inifile.get(), events[ec], eventspawns[ec]);
-		}
-		delete[] events;
-	}
-	//maybe not correct
-	InitialSpawn();
-}
-
 
 /*** events ***/
 
@@ -634,10 +601,10 @@ void IniSpawn::RespawnNameless()
 		return;
 	}
 
-	if (NamelessSpawnPoint.isnull()) {
-		core->GetGame()->JoinParty(nameless,JP_INITPOS);
+	if (NamelessSpawnPoint.IsZero()) {
+		game->JoinParty(nameless, JP_INITPOS);
 		NamelessSpawnPoint=nameless->Pos;
-		strnuprcpy(NamelessSpawnArea, nameless->Area, 8);
+		NamelessSpawnArea = nameless->Area;
 	}
 
 	nameless->Resurrect(NamelessSpawnPoint);
@@ -647,32 +614,38 @@ void IniSpawn::RespawnNameless()
 
 	// reselect nameless, since he didn't really 'die'
 	// this matches the unconditional reselect behavior of the original
-	core->GetGame()->SelectActor(nameless, true, SELECT_NORMAL);
+	game->SelectActor(nameless, true, SELECT_NORMAL);
 
 	//hardcoded!!!
 	if (NamelessState==36) {
 		nameless->SetStance(IE_ANI_PST_START);
 	}
-	int i;
 
-	for (i=0;i<game->GetPartySize(false);i++) {
+	for (int i = 0; i < game->GetPartySize(false); i++) {
 		MoveBetweenAreasCore(game->GetPC(i, false),NamelessSpawnArea,NamelessSpawnPoint,-1, true);
 	}
 
 	//certain variables are set when nameless dies
-	for (i=0;i<namelessvarcount;i++) {
-		SetVariable(game, NamelessVar[i].Name,"GLOBAL", NamelessVar[i].Value);
+	for (const auto& var : NamelessVar) {
+		SetVariable(game, var.Name.CString(), var.Value, "GLOBAL");
 	}
 	core->GetGameControl()->ChangeMap(nameless, true);
 }
 
-void IniSpawn::SpawnCreature(CritterEntry &critter) const
+inline void SetScript(Actor *cre, const ResRef& script, int slot)
 {
-	if (!critter.creaturecount) {
+	if (!script.IsEmpty()) {
+		cre->SetScript(script, slot);
+	}
+}
+
+void IniSpawn::SpawnCreature(const CritterEntry &critter) const
+{
+	if (critter.CreFile.empty()) {
 		return;
 	}
 
-	ieDword specvar = CheckVariable(map, critter.SpecVar, critter.SpecContext);
+	ieDword specvar = CheckVariable(map, critter.SpecVar.CString(), critter.SpecContext);
 
 	if (critter.SpecVar[0]) {
 		if (critter.SpecVarOperator>=0) {
@@ -724,35 +697,45 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 	if (critter.ScriptName[0] && (critter.Flags&CF_CHECK_NAME) ) {
 		//maybe this one needs to be using getobjectcount as well
 		//currently we cannot count objects with scriptname???
-		if (map->GetActor( critter.ScriptName, 0 )) {
+		if (map->GetActor(critter.ScriptName.CString(), 0)) {
 			return;
 		}
 	} else {
-		//Object *object = new Object();
 		Object object;
 		//objectfields based on spec
-		object.objectFields[0]=critter.Spec[0];
-		object.objectFields[1]=critter.Spec[1];
-		object.objectFields[2]=critter.Spec[2];
-		object.objectFields[3]=critter.Spec[3];
-		object.objectFields[4]=critter.Spec[4];
-		object.objectFields[5]=critter.Spec[5];
-		object.objectFields[6]=critter.Spec[6];
-		object.objectFields[7]=critter.Spec[7];
-		object.objectFields[8]=critter.Spec[8];
+		for (int i = 0; i <= 8; i++) {
+			object.objectFields[i] = critter.Spec[i];
+		}
+
 		int cnt = GetObjectCount(map, &object);
 		if (cnt>=critter.TotalQuantity) {
 			return;
 		}
 	}
 
-	int x = core->Roll(1,critter.creaturecount,-1);
+	int x = core->Roll(1, int(critter.CreFile.size()), -1);
 	Actor* cre = gamedata->GetCreature(critter.CreFile[x]);
 	if (!cre) {
 		return;
 	}
 
-	SetVariable(map, critter.SpecVar, critter.SpecContext, specvar+(ieDword) critter.SpecVarInc);
+	// TODO: ee, verify and adjust after the action is added
+	// disable_renderer = boolean_value
+	//   Argent says: It looks like this attribute simply skips the rendering pass for the spawned creature.
+	//   This state is not saved. This attribute seems to have the side effect that filtering is ignored —
+	//   in my tests the creature was spawned continuously even if spec_qty and create_qty are defined.
+	//   This attribute seems to be related to the script action SetRenderable.
+	if (critter.Flags & CF_DISABLE_RENDERER) {
+		cre->SetBase(IE_AVATARREMOVAL, 1);
+	}
+
+	if (critter.Flags & CF_INC_INDEX) {
+		int value = CheckVariable(map, critter.PointSelectVar.CString());
+		// NOTE: not replicating bug where it would increment the index twice if create_qty > 1
+		SetVariable(map, critter.PointSelectVar.CString(), value + 1);
+	}
+
+	SetVariable(map, critter.SpecVar.CString(), specvar + (ieDword) critter.SpecVarInc, critter.SpecContext);
 	map->AddActor(cre, true);
 	for (x=0;x<9;x++) {
 		if (critter.SetSpec[x]) {
@@ -761,9 +744,9 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 	}
 	cre->SetPosition( critter.SpawnPoint, 0, 0);//maybe critters could be repositioned
 	cre->SetOrientation(critter.Orientation,false);
-	if (critter.ScriptName[0]) {
-		cre->SetScriptName(critter.ScriptName);
-	}
+
+	cre->SetScriptName(critter.ScriptName.CString());
+
 	//increases death variable
 	if (critter.Flags&CF_DEATHVAR) {
 		cre->AppearanceFlags|=APP_DEATHVAR;
@@ -801,35 +784,22 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 		cre->AppearanceFlags|=APP_BUDDY;
 	}
 
-	if (critter.OverrideScript[0]) {
-		cre->SetScript(critter.OverrideScript, SCR_OVERRIDE);
-	}
-	if (critter.ClassScript[0]) {
-		cre->SetScript(critter.ClassScript, SCR_CLASS);
-	}
-	if (critter.RaceScript[0]) {
-		cre->SetScript(critter.RaceScript, SCR_RACE);
-	}
-	if (critter.GeneralScript[0]) {
-		cre->SetScript(critter.GeneralScript, SCR_GENERAL);
-	}
-	if (critter.DefaultScript[0]) {
-		cre->SetScript(critter.DefaultScript, SCR_DEFAULT);
-	}
-	if (critter.AreaScript[0]) {
-		cre->SetScript(critter.AreaScript, SCR_AREA);
-	}
-	if (critter.SpecificScript[0]) {
-		cre->SetScript(critter.SpecificScript, SCR_SPECIFICS);
-	}
-	if (critter.Dialog[0]) {
+	SetScript(cre, critter.OverrideScript, SCR_OVERRIDE);
+	SetScript(cre, critter.ClassScript, SCR_CLASS);
+	SetScript(cre, critter.RaceScript, SCR_RACE);
+	SetScript(cre, critter.GeneralScript, SCR_GENERAL);
+	SetScript(cre, critter.DefaultScript, SCR_DEFAULT);
+	SetScript(cre, critter.AreaScript, SCR_AREA);
+	SetScript(cre, critter.SpecificScript, SCR_SPECIFICS);
+
+	if (!critter.Dialog.IsEmpty()) {
 		cre->SetDialog(critter.Dialog);
 	}
 }
 
-void IniSpawn::SpawnGroup(SpawnEntry &event)
+void IniSpawn::SpawnGroup(SpawnEntry &event) const
 {
-	if (!event.critters) {
+	if (event.critters.empty()) {
 		return;
 	}
 	unsigned int interval = event.interval;
@@ -841,13 +811,16 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 		}
 	}
 	
-	for(int i=0;i<event.crittercount;i++) {
-		CritterEntry* critter = event.critters+i;
-		if (!Schedule(critter->TimeOfDay, event.lastSpawndate) ) {
+	for (auto& critter : event.critters) {
+		if (!Schedule(critter.TimeOfDay, event.lastSpawndate) ) {
 			continue;
 		}
-		for(int j=0;j<critter->SpawnCount;j++) {
-			SpawnCreature(*critter);
+		for(int j = 0; j < critter.SpawnCount; ++j) {
+			// try a potentially different location unless specified
+			if (j == 0 || !(critter.Flags & CF_HOLD_POINT)) {
+				SelectSpawnPoint(critter);
+			}
+			SpawnCreature(critter);
 		}
 		event.lastSpawndate = gameTime;
 	}
@@ -858,12 +831,12 @@ void IniSpawn::InitialSpawn()
 {
 	SpawnGroup(enterspawn);
 	//these variables are set when entering first
-	for (int i=0;i<localscount;i++) {
-		SetVariable(map, Locals[i].Name,"LOCALS", Locals[i].Value);
+	for (const auto& local : Locals) {
+		SetVariable(map, local.Name.CString(), local.Value, "LOCALS");
 	}
 
 	// move the rest of the party if needed
-	if (!PartySpawnPoint.isnull()) {
+	if (!PartySpawnPoint.IsZero()) {
 		Game *game = core->GetGame();
 		while (game->GetPartySize(false) > 1) {
 			Actor *pc = game->GetPC(1, false); // skip TNO
@@ -874,7 +847,6 @@ void IniSpawn::InitialSpawn()
 	}
 }
 
-//FIXME:call this at the right time (this feature is not explored yet, and unused in original dataset)
 void IniSpawn::ExitSpawn()
 {
 	SpawnGroup(exitspawn);
@@ -883,8 +855,8 @@ void IniSpawn::ExitSpawn()
 //checks if a respawn event occurred
 void IniSpawn::CheckSpawn()
 {
-	for(int i=0;i<eventcount;i++) {
-		SpawnGroup(eventspawns[i]);
+	for (SpawnEntry& event : eventspawns) {
+		SpawnGroup(event);
 	}
 }
 

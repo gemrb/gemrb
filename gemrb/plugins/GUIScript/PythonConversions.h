@@ -27,26 +27,32 @@
 #include "Sprite2D.h"
 #include "TableMgr.h"
 #include "SymbolMgr.h"
+#include "System/Logging.h"
 
 namespace GemRB {
 
-template <typename T>
-class CObject : public Holder<T> {
+template <typename T, template<class> class PTR = Holder>
+class CObject final {
 public:
+	using CAP_T = PTR<T>;
+	
 	operator PyObject* () const
 	{
-		if (Holder<T>::ptr) {
-			Holder<T>::ptr->acquire();
-			PyObject *obj = PyCapsule_New(Holder<T>::ptr, T::ID.description, PyRelease);
-			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
-			PyObject *ret = gs->ConstructObject(T::ID.description, NULL, kwargs);
-			Py_DECREF(kwargs);
-			return ret;
+		if (pycap) {
+			Py_INCREF(pycap);
+			return pycap;
 		} else {
 			Py_RETURN_NONE;
 		}
 	}
-	CObject(PyObject *obj)
+	
+	operator CAP_T () const
+	{
+		static CAP_T none;
+		return cap ? cap->ptr : none;
+	}
+
+	explicit CObject(PyObject *obj)
 	{
 		if (obj == Py_None)
 			return;
@@ -56,45 +62,84 @@ public:
 		else
 			PyErr_Clear();
 
-		Holder<T>::ptr = static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description));
-		if (Holder<T>::ptr) {
-			Holder<T>::ptr->acquire();
-		} else {
+		pycap = obj;
+		Py_INCREF(pycap);
+		cap = static_cast<Capsule*>(PyCapsule_GetPointer(obj, T::ID.description));
+		if (cap == nullptr) {
 			Log(ERROR, "GUIScript", "Bad CObject extracted.");
 		}
 		Py_XDECREF(id);
 	}
-	CObject(const Holder<T>& ptr)
-	: Holder<T>(ptr)
+
+	explicit CObject(CAP_T ptr)
 	{
+		if (ptr) {
+			cap = new Capsule(std::move(ptr));
+			PyObject *obj = PyCapsule_New(cap, T::ID.description, PyRelease);
+			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
+			pycap = gs->ConstructObject(T::ID.description, nullptr, kwargs);
+			Py_DECREF(kwargs);
+		}
 	}
-	// This is here because of lookup order issues.
-	operator bool () const
-	{
-		return Holder<T>::ptr;
+	
+	~CObject() {
+		Py_XDECREF(pycap);
 	}
+	
 private:
 	static void PyRelease(PyObject *obj)
 	{
 		void* ptr = PyCapsule_GetPointer(obj, T::ID.description);
-		static_cast<T*>(ptr)->release();
+		delete static_cast<Capsule*>(ptr);
 	}
+	
+	struct Capsule {
+		CAP_T ptr;
+		
+		Capsule(CAP_T ptr)
+		: ptr(std::move(ptr))
+		{}
+	} *cap = nullptr;
+	
+	PyObject* pycap = nullptr;
 };
 
 // Python 3 forward compatibility
 // WARNING: dont use these for new code
 // they are temporary while we compete the transition to Python 3
 #if PY_MAJOR_VERSION >= 3
-struct PyStringWrapper {
+class PyStringWrapper {
+	wchar_t* buffer = nullptr;
 	const char* str = nullptr;
 	PyObject* obj = nullptr;
-		
-	operator const char*() const {
+	
+public:
+	PyStringWrapper(PyObject* obj, const char* encoding) noexcept {
+		if (PyUnicode_Check(obj)) {
+			PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, encoding, "strict"); // Owned reference
+			if (temp_bytes != NULL) {
+				str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+				obj = temp_bytes; // needs to outlive our use of wrap.str
+			} else { // raw data...
+				PyErr_Clear();
+				Py_ssize_t buflen = PyUnicode_GET_LENGTH(obj);
+				buffer = new wchar_t[buflen + 1];
+				Py_ssize_t strlen = PyUnicode_AsWideChar(obj, buffer, buflen);
+				buffer[strlen] = L'\0';
+				str = reinterpret_cast<const char*>(buffer);
+			}
+		} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
+			str = PyBytes_AS_STRING(obj);
+		}
+	}
+	
+	operator const char*() const noexcept {
 		return str;
 	}
 	
-	~PyStringWrapper() {
+	~PyStringWrapper() noexcept {
 		Py_XDECREF(obj);
+		delete[] buffer;
 	}
 };
 PyStringWrapper PyString_AsString(PyObject* obj);
@@ -112,9 +157,7 @@ Region RectFromPy(PyObject* obj);
 
 ResRef ResRefFromPy(PyObject* obj);
 
-Holder<TableMgr> GetTable(PyObject* obj);
-
-Holder<SymbolMgr> GetSymbols(PyObject* obj);
+std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj);
 
 Holder<Sprite2D> SpriteFromPy(PyObject* obj);
 
@@ -122,10 +165,9 @@ Holder<Sprite2D> SpriteFromPy(PyObject* obj);
  Conversions to PyObject
 */
 
-// Like PyString_FromString(), but for ResRef
-PyObject* PyString_FromResRef(const ieResRef& ResRef);
+// Like PyString_FromString(), but for (ie)ResRef
+PyObject* PyString_FromResRef(const ResRef& resRef);
 
-// Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromAnimID(const char* AnimID);
 	
 PyObject* PyString_FromStringObj(const std::string&);
@@ -168,7 +210,7 @@ class DecRef
 	PyObject* obj = nullptr;
 public:
 	template<typename FUNC, typename... ARGS>
-	DecRef(FUNC fn, ARGS&&... args) {
+	explicit DecRef(FUNC fn, ARGS&&... args) {
 		obj = fn(std::forward<ARGS>(args)...);
 	}
 	

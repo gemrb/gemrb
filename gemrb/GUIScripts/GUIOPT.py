@@ -29,7 +29,7 @@
 # 9 - Autopause options window
 
 ###################################################
-import CommonWindow
+import Container
 import GameCheck
 import GemRB
 import GUICommonWindows
@@ -43,8 +43,6 @@ HelpTextArea = None
 
 LoadMsgWindow = None
 QuitMsgWindow = None
-SubOptionsWindow = None
-SubSubOptionsWindow = None
 
 if GameCheck.IsBG1():
 	HelpTextArea2 = None
@@ -56,7 +54,7 @@ else:
 def InitOptionsWindow (Window):
 	"""Open main options window"""
 
-	CommonWindow.CloseContainerWindow ()
+	Container.CloseContainerWindow ()
 
 	# Return to Game
 	Button = Window.GetControl (11)
@@ -121,16 +119,17 @@ def TrySavingConfiguration():
 ###################################################
 
 def CloseVideoOptionsWindow ():
-	CloseSubOptionsWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	TrySavingConfiguration()
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
-	global SubOptionsWindow, HelpTextArea
+	global HelpTextArea
 
-	CloseSubOptionsWindow ()
+	#GemRB.GetView("SUB_WIN", 0).Close()
 
 	Window = GemRB.LoadWindow (6, "GUIOPT")
+	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('VideoOptions', Window, 33, 18038)
@@ -151,8 +150,6 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18038, 18004, HelpTextArea, Window, 40, 44, 17134, 'SoftMirrorBlt')
 	GUIOPTControls.OptCheckbox (18038, 18006, HelpTextArea, Window, 41, 46, 17136, 'SoftSrcKeyBlt') # software standard blit
 	GUIOPTControls.OptCheckbox (18038, 18007, HelpTextArea, Window, 42, 48, 17135, 'SoftBltFast') # software transparent blit
-
-	SubOptionsWindow = Window
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -186,16 +183,17 @@ def SetGfxCorrection ():
 ###################################################
 
 def CloseAudioOptionsWindow ():
-	CloseSubOptionsWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	TrySavingConfiguration()
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
-	global SubOptionsWindow, HelpTextArea
+	global HelpTextArea
 
-	CloseSubOptionsWindow ()
+	#GemRB.GetView("SUB_WIN", 0).Close()
 
 	Window = GemRB.LoadWindow (7, "GUIOPT")
+	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea = GUIOPTControls.OptHelpText ('AudioOptions', Window, 14, 18040)
 
@@ -211,8 +209,6 @@ def OpenAudioOptionsWindow ():
 
 	GUIOPTControls.OptCheckbox (18040, 18022, HelpTextArea, Window, 26, 28, 20689, 'Environmental Audio')
 
-	SubOptionsWindow = Window
-
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -226,20 +222,19 @@ def DisplayHelpMusicVolume ():
 
 ###################################################
 
-def CloseCharacterSoundsWindow ():
-	CloseSubSubOptionsWindow ()
-
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
 
-	global SubSubOptionsWindow, HelpTextArea2
+	global HelpTextArea2
 
-	CloseSubSubOptionsWindow ()
+	#GemRB.GetView("SUB_WIN", 1).Close()
 
 	Window = GemRB.LoadWindow (12, "GUIOPT")
+	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
 
+	CloseCharacterSoundsWindow = lambda: Window.Close()
 	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
 	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
 
@@ -255,8 +250,6 @@ def OpenCharacterSoundsWindow ():
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
-	SubSubOptionsWindow = Window
-
 def DisplayHelpCommandSounds ():
 	# same as HelpTextArea if not BG1
 	HelpTextArea2.SetText (18016)
@@ -270,17 +263,18 @@ def DisplayHelpSelectionSounds ():
 def CloseGameplayOptionsWindow ():
 	# FIXME: don't need to do anything, since we save stuff immediately
 	# ergo canceling does not work
-	CloseSubOptionsWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	TrySavingConfiguration()
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
-	global SubOptionsWindow, HelpTextArea
+	global HelpTextArea
 
-	CloseSubOptionsWindow ()
+	#GemRB.GetView("SUB_WIN", 0).Close()
 
 	#gameplayoptions
 	Window = GemRB.LoadWindow (8, "GUIOPT")
+	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 40, 18042)
@@ -312,7 +306,6 @@ def OpenGameplayOptionsWindow ():
 	if GameCheck.IsBG2():
 		GUIOPTControls.OptButton (OpenHotkeyOptionsWindow, Window, 51, 816)
 
-	SubOptionsWindow = Window
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -326,19 +319,15 @@ def DisplayHelpMouseScrollingSpeed ():
 
 ###################################################
 
-def CloseFeedbackOptionsWindow ():
-	# FIXME: don't need to do anything, since we save stuff immediately
-	# ergo canceling does not work
-	CloseSubSubOptionsWindow ()
-
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
 
-	global SubSubOptionsWindow, HelpTextArea2
+	global HelpTextArea2
 
-	CloseSubSubOptionsWindow ()
+	#GemRB.GetView("SUB_WIN", 1).Close()
 
 	Window = GemRB.LoadWindow (9, "GUIOPT")
+	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# same as HelpTextArea if not BG1
@@ -346,6 +335,7 @@ def OpenFeedbackOptionsWindow ():
 
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
+	CloseFeedbackOptionsWindow = lambda: Window.Close()
 	GUIOPTControls.OptDone (CloseFeedbackOptionsWindow, Window, 26)
 	GUIOPTControls.OptCancel (CloseFeedbackOptionsWindow, Window, 27)
 
@@ -364,8 +354,6 @@ def OpenFeedbackOptionsWindow ():
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
-	SubSubOptionsWindow = Window
-
 	return
 
 def DisplayHelpMarkerFeedback ():
@@ -375,23 +363,20 @@ def DisplayHelpMarkerFeedback ():
 
 ###################################################
 
-def CloseAutopauseOptionsWindow ():
-	# FIXME: don't need to do anything, since we save stuff immediately
-	# ergo canceling does not work
-	CloseSubSubOptionsWindow ()
-
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
 
-	global SubSubOptionsWindow, HelpTextArea2
+	global HelpTextArea2
 
-	CloseSubSubOptionsWindow ()
+	#GemRB.GetView("SUB_WIN", 1).Close()
 
 	Window = GemRB.LoadWindow (10, "GUIOPT")
+	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
+	CloseAutopauseOptionsWindow = lambda: Window.Close()
 	GUIOPTControls.OptDone (CloseAutopauseOptionsWindow, Window, 11)
 	GUIOPTControls.OptCancel (CloseAutopauseOptionsWindow, Window, 14)
 
@@ -415,8 +400,6 @@ def OpenAutopauseOptionsWindow ():
 		GUIOPTControls.OptCheckbox (18044, 31872, HelpTextArea2, Window, 34, 33, 57354, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (18044, 10571, HelpTextArea2, Window, 37, 36, 10574, 'Auto Pause Center', None, 1)
 
-	SubSubOptionsWindow = Window
-
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -429,9 +412,10 @@ def MoviePlayPress():
 # for iwd2 only, the rest use GUIMOVIE
 # TODO: investigate a merger, so it can get removed from GUIOPT
 def OpenMovieWindow ():
-	global SubOptionsWindow, TextAreaControl, MoviesTable
+	global TextAreaControl, MoviesTable
 
-	SubOptionsWindow = Window = GemRB.LoadWindow(2, "GUIMOVIE")
+	Window = GemRB.LoadWindow(2, "GUIMOVIE")
+	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	TextAreaControl = Window.GetControl(0)
 	PlayButton = Window.GetControl(2)
@@ -439,36 +423,15 @@ def OpenMovieWindow ():
 	DoneButton = Window.GetControl(4)
 	MoviesTable = GemRB.LoadTable("MOVIDESC")
 	opts = [MoviesTable.GetValue (i, 0) for i in range(MoviesTable.GetRowCount ()) if GemRB.GetVar(MoviesTable.GetRowName (i)) == 1]
+	TextAreaControl.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 	TextAreaControl.SetOptions (opts, "MovieIndex", 0)
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
 	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePlayPress)
 	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.PlayMovie("CREDITS"))
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseSubOptionsWindow)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-###################################################
-
-def CloseSubOptionsWindow ():
-	global SubOptionsWindow, GameOptionsWindow
-
-	if SubOptionsWindow:
-		SubOptionsWindow.Unload ()
-		SubOptionsWindow = None
-	if GameOptionsWindow:
-		GameOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CloseSubSubOptionsWindow ():
-	global SubSubOptionsWindow, SubOptionsWindow
-
-	if SubSubOptionsWindow:
-		SubSubOptionsWindow.Unload ()
-		SubSubOptionsWindow = None
-	if SubOptionsWindow:
-		SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 ###################################################
@@ -498,9 +461,9 @@ def QuitGamePress ():
 		GemRB.Quit()
 		return
 
-	GemRB.SetVar ("SelectedWindow", 0)
 	CloseQuitMsgWindow()
 
+	GUICommonWindows.CloseTopWindow ()
 	GemRB.QuitGame ()
 	GemRB.SetNextScript ("Start")
 	return

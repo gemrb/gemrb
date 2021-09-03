@@ -52,20 +52,17 @@
 
 namespace GemRB {
 
-class ControlAnimation;
 class Control;
 class Sprite2D;
-    
+
 #define ACTION_CAST(a) \
 static_cast<Control::Action>(a)
-	
+
 #define ACTION_IS_SCREEN(a) \
 (a <= Control::HoverEnd)
-    
+
 #define ACTION_DEFAULT ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
-
-#define CTL_INVALID_VALUE ieDword(-1)
 
 /**
  * @class Control
@@ -79,7 +76,7 @@ class GEM_EXPORT Control : public View, public ControlActionResponder {
 private:
 	void ClearActionTimer();
 	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 	void HandleTouchActionTimer(const Control*);
     
@@ -99,14 +96,14 @@ public: // Public attributes
 		ValueChange, // many times we only care that the value has changed, not about the event that changed it
 
 		DragDropCreate,
-		DragDropSource, // a DragOp was succesfully taken from here
+		DragDropSource, // a DragOp was successfully taken from here
 		DragDropDest, // a DragOp was successfully dropped here
 
 		CustomAction // entry value for defining custom actions in subclasses. Must be last in enum.
 	};
 	
 	struct ControlDragOp : public DragOp {
-		ControlDragOp(Control* c)
+		explicit ControlDragOp(Control* c)
 		: DragOp(c, c->DragCursor()){}
 		
 		Control* Source() const {
@@ -135,12 +132,12 @@ public: // Public attributes
 			}
 		}
 	};
+	
+	using value_t = ieDword;
+	static constexpr value_t INVALID_VALUE = -1;
 
 	/** Variable length is 40-1 (zero terminator) */
 	char VarName[MAX_VARIABLE_LENGTH];
-
-	ControlAnimation* animation;
-	Holder<Sprite2D> AnimPicture;
 
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;
@@ -153,21 +150,18 @@ public:
 	explicit Control(const Region& frame);
 	~Control() override;
 
-	bool IsAnimated() const override { return animation && AnimPicture; }
-	bool IsOpaque() const override;
-
 	/** Sets the Text of the current control */
 	void SetText(const String*);
 	virtual void SetText(const String&) {};
 
 	/** Update the control if it's tied to a GUI variable */
-	void UpdateState(const char*, unsigned int);
-	virtual void UpdateState(unsigned int) {}
+	void UpdateState(const char*, value_t);
+	virtual void UpdateState(value_t) {}
 
 	/** Returns the Owner */
 	virtual void SetFocus();
-	bool IsFocused();
-    
+	bool IsFocused() const;
+
 	bool TracksMouseDown() const override { return bool(actionTimer); }
 	
 	UniqueDragOp DragOperation() override;
@@ -185,21 +179,17 @@ public:
 	bool SupportsAction(const ActionKey&) override;
 
 	virtual String QueryText() const { return String(); }
-	/** Sets the animation picture ref */
-	virtual void SetAnimPicture(Holder<Sprite2D> Picture);
 
-	typedef std::pair<ieDword, ieDword> ValueRange;
+	using ValueRange = std::pair<value_t, value_t>;
 	const static ValueRange MaxValueRange;
 	
-	ieDword GetValue() const { return Value; }
+	value_t GetValue() const { return Value; }
 	ValueRange GetValueRange() const { return range; }
 	
-	void SetValue(ieDword val);
+	void SetValue(value_t val);
 	void SetValueRange(ValueRange range = MaxValueRange);
-	void SetValueRange(ieDword min, ieDword max = std::numeric_limits<ieDword>::max());
-	
-	bool HitTest(const Point& p) const override;
-	
+	void SetValueRange(value_t min, value_t max = std::numeric_limits<value_t>::max());
+
 protected:
 	using ActionKey = ControlActionResponder::ActionKey;
 	struct ControlActionKey : public ActionKey {		
@@ -235,12 +225,11 @@ private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
 	// otherwise action fires on input release up only
 	unsigned int repeatDelay;
-	typedef std::map<ActionKey, ControlEventHandler>::iterator ActionIterator;
 	std::map<ActionKey, ControlEventHandler> actions;
 	Timer* actionTimer;
 
 	/** the value of the control to add to the variable */
-	ieDword Value = CTL_INVALID_VALUE;
+	value_t Value = INVALID_VALUE;
 	ValueRange range;
 
 };

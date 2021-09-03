@@ -37,9 +37,10 @@
 #include "Scriptable/Scriptable.h"
 #include "Scriptable/PCStatStruct.h"
 #include "Variables.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <atomic>
+#include <array>
 #include <vector>
 
 namespace GemRB {
@@ -132,9 +133,9 @@ struct PCStruct {
 	ieWord   PartyOrder;
 	ieDword  OffsetToCRE;
 	ieDword  CRESize;
-	ieResRef CREResRef;
+	ResRef CREResRef;
 	ieDword  Orientation;
-	ieResRef Area;
+	ResRef Area;
 	ieWord   XPos;
 	ieWord   YPos;
 	ieWord   ViewXPos;
@@ -144,7 +145,7 @@ struct PCStruct {
 	ieDword  Interact[MAX_INTERACT];
 	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
 	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
-	ieResRef QuickSpellResRef[MAX_QSLOTS];
+	ResRef QuickSpellResRef[MAX_QSLOTS];
 	ieWord   QuickItemSlot[MAX_QUICKITEMSLOT];
 	ieWord   QuickItemHeader[MAX_QUICKITEMSLOT];
 	char Name[32];
@@ -174,7 +175,7 @@ struct GAMJournalEntry {
 
 // Saved location of party member.
 struct GAMLocationEntry {
-	ieResRef AreaResRef;
+	ResRef AreaResRef;
 	Point Pos;
 };
 
@@ -238,7 +239,7 @@ struct maze_header {
 
 #define MAX_CRLEVEL 32
 
-typedef int CRRow[MAX_CRLEVEL];
+using CRRow = int[MAX_CRLEVEL];
 
 /**
  * @class Game
@@ -256,56 +257,57 @@ private:
 	std::vector< GAMJournalEntry*> Journals;
 	std::vector< GAMLocationEntry*> savedpositions;
 	std::vector< GAMLocationEntry*> planepositions;
-	std::vector< char*> mastarea;
+	std::vector<ResRef> mastarea;
 	std::vector<std::vector<ResRef> > npclevels;
-	int *bntchnc;
-	int bntrows;
+	int *bntchnc = nullptr;
+	int bntrows = -1;
 	CRRow *crtable = nullptr;
-	ieResRef restmovies[8];
-	ieResRef daymovies[8];
-	ieResRef nightmovies[8];
-	int MapIndex;
+	ResRef restmovies[8];
+	ResRef daymovies[8];
+	ResRef nightmovies[8];
+	int MapIndex = -1;
+	ResRef Familiars[9];
 public:
 	std::vector< Actor*> selected;
-	int version;
-	Variables* kaputz;
-	ieByte* beasts;
-	ieByte* mazedata; //only in PST
-	ieResRef Familiars[9];
-	ieDword CombatCounter;
-	ieDword StateOverrideFlag, StateOverrideTime;
-	ieDword BanterBlockFlag, BanterBlockTime;
+	int version = 0;
+	Variables* kaputz = nullptr;
+	std::array<ieByte, BESTIARY_SIZE> beasts;
+	ieByte* mazedata = nullptr; //only in PST
+	ieDword CombatCounter = 0;
+	ieDword StateOverrideFlag = 0;
+	ieDword StateOverrideTime = 0;
+	ieDword BanterBlockFlag = 0;
+	ieDword BanterBlockTime = 0;
 
 	/** Index of PC selected in non-walking environment (shops, inventory...) */
-	int SelectedSingle;
+	int SelectedSingle = 1;
 	/** 0 if the protagonist's death doesn't cause game over */
 	/** 1 if the protagonist's death causes game over */
 	/** 2 if no check is needed (pst) */
-	int protagonist;
+	int protagonist = PM_YES;
 	/** if party size exceeds this amount, a callback will be called */
-	size_t partysize;
-	ieDword Ticks;
-	ieDword interval; // 1000/AI_UPDATE (a tenth of a round in ms)
+	size_t partysize = 6;
+	ieDword interval = 1000 / AI_UPDATE_TIME; // a tenth of a round in ms
 	std::atomic_uint32_t GameTime {0};
-	ieDword LastScriptUpdate; // GameTime at which UpdateScripts last ran
-	ieDword RealTime;
-	ieWord  WhichFormation;
-	ieWord  Formations[5];
-	ieDword PartyGold;
+	ieDword LastScriptUpdate = 0; // GameTime at which UpdateScripts last ran
+	ieDword RealTime = 0;
+	ieWord  WhichFormation = 0;
+	ieWord  Formations[5]{};
+	ieDword PartyGold = 0;
 	ieWord NPCAreaViewed = 0;
-	ieWord WeatherBits;
-	ieDword CurrentLink; //named currentLink in original engine (set to -1)
-	ieDword Reputation;
-	ieDword ControlStatus; // used in bg2, iwd (where you can switch panes off)
-	ieDword Expansion; // mostly used by BG2. IWD games set it to 3 on newgame
-	ieResRef AnotherArea;
-	ieResRef CurrentArea;
-	ieResRef PreviousArea; //move here if the worldmap exit is illegal?
-	ieResRef LoadMos;
-	ieResRef TextScreen;
-	Particles *weather;
-	int event_timer;
-	EventHandler event_handler;
+	ieWord WeatherBits = 0;
+	ieDword CurrentLink = 0; //named currentLink in original engine (set to -1)
+	ieDword Reputation = 0;
+	ieDword ControlStatus = 0; // used in bg2, iwd (where you can switch panes off)
+	ieDword Expansion = 0; // mostly used by BG2. IWD games set it to 3 on newgame
+	ResRef AnotherArea;
+	ResRef CurrentArea;
+	ResRef PreviousArea; //move here if the worldmap exit is illegal?
+	ResRef LoadMos;
+	ResRef TextScreen;
+	Particles *weather = nullptr;
+	int event_timer = 0;
+	EventHandler event_handler = nullptr;
 	bool hasInfra = false;
 	bool familiarBlock = false;
 	bool PartyAttack = false;
@@ -313,13 +315,13 @@ public:
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
-	Actor *timestop_owner;
-	ieDword timestop_end;
+	Actor *timestop_owner = nullptr;
+	ieDword timestop_end = 0;
 public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID) const;
 	/** Returns actor by slot */
-	Actor* GetPC(unsigned int slot, bool onlyalive) const;
+	Actor* GetPC(size_t slot, bool onlyalive) const;
 	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
 	Actor* FindPC(unsigned int partyID) const;
 	Actor* FindNPC(unsigned int partyID) const;
@@ -364,29 +366,29 @@ public:
 	Map* GetMap(unsigned int index) const;
 	/** Returns a map from area name, loads it if needed
 	 * use it for the biggest safety, change = true will change the current map */
-	Map* GetMap(const char *areaname, bool change);
+	Map* GetMap(const ResRef &areaname, bool change);
 	/** Returns slot of the map if found */
-	int FindMap(const char *ResRef) const;
+	int FindMap(const ResRef &resRef) const;
 	int AddMap(Map* map);
 	/** Determine if area is master area*/
-	bool MasterArea(const char *area) const;
+	bool MasterArea(const ResRef &area) const;
 	/** Dynamically adding an area to master areas*/
-	void SetMasterArea(const char *area);
+	void SetMasterArea(const ResRef &area);
 	/** Guess the master area of the given area*/
 	//Map* GetMasterArea(const char *area);
 	/** place persistent actors in the fresly loaded area*/
-	void PlacePersistents(Map *map, const char *ResRef);
+	void PlacePersistents(Map *map, const ResRef &resRef);
 	/** Returns slot of the map, if it was already loaded,
 	 * don't load it again, set changepf == true,
 	 * if you want to change the pathfinder too. */
-	int LoadMap(const char* ResRef, bool loadscreen);
+	int LoadMap(const ResRef &ResRef, bool loadscreen);
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index) const;
 	void SwapPCs(unsigned int pc1, unsigned int pc2) const;
 	bool IsDay() const;
 	/** checks if the actor should be replaced via npclevel.2da and then does it */
-	bool CheckForReplacementActor(int i);
+	bool CheckForReplacementActor(size_t i);
 
 	//journal entries
 	/** Deletes one or all journal entries if strref is -1 */
@@ -413,21 +415,16 @@ public:
 	void ClearPlaneLocations();
 	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);
 
-	char *GetFamiliar(unsigned int Index);
+	const ResRef& GetFamiliar(size_t index) const;
+	void SetFamiliar(const ResRef& familiar, size_t index);
 
 	bool IsBeastKnown(unsigned int Index) const {
-		if (!beasts) {
-			return false;
-		}
 		if (Index>=BESTIARY_SIZE) {
 			return false;
 		}
 		return beasts[Index] != 0;
 	}
 	void SetBeastKnown(unsigned int Index) {
-		if (!beasts) {
-			return;
-		}
 		if (Index>=BESTIARY_SIZE) {
 			return;
 		}
@@ -511,16 +508,16 @@ public:
 	Actor *GetTimestopOwner() const { return timestop_owner; };
 	void SetTimestopOwner(Actor *owner) { timestop_owner = owner; };
 	/** Checks the bounty encounters (used in bg1) */
-	bool RandomEncounter(ieResRef &BaseArea);
+	bool RandomEncounter(ResRef &BaseArea);
 	/** Resets the area and bored comment timers of the whole party */
 	void ResetPartyCommentTimes() const;
 	void ReversePCs() const;
 	bool OnlyNPCsSelected() const;
 private:
 	bool DetermineStartPosType(const TableMgr *strta) const;
-	ieResRef *GetDream(Map *area);
+	ResRef *GetDream(Map *area);
 	void CastOnRest() const;
-	void PlayerDream();
+	void PlayerDream() const;
 	void TextDream();
 };
 

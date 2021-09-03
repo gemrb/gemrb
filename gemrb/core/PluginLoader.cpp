@@ -18,9 +18,8 @@
 
 #include "PluginLoader.h"
 
-#include "SClassID.h" // For PluginID
-
 #include "Interface.h"
+#include "Platform.h"
 #include "PluginMgr.h"
 #include "System/FileFilters.h"
 #include "Variables.h"
@@ -29,27 +28,22 @@
 #include <cstdlib>
 #include <set>
 
-#ifdef WIN32
-#include <string.h>
-#include <windows.h>
-#include <tchar.h>
-#include <strsafe.h>
-#elif defined(HAVE_DLFCN_H)
+#if defined(HAVE_DLFCN_H)
 #include <dlfcn.h>
 #endif
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
-# include <assert.h>
+# include <cassert>
 #endif
 
 namespace GemRB {
 
 #ifdef WIN32
 #define TCHAR_FORMAT "%ls"
-typedef HMODULE LibHandle;
+using LibHandle = HMODULE;
 #else
 #define TCHAR_FORMAT "%s"
-typedef void *LibHandle;
+using LibHandle = void*;
 #endif
 
 namespace GemRB {
@@ -65,13 +59,13 @@ struct PluginDesc {
 	bool (*Register)(PluginMgr*);
 };
 
-typedef const char* (*Version_t)(void);
-typedef const char* (*Description_t)(void);
-typedef PluginID (*ID_t)();
-typedef bool (* Register_t)(PluginMgr*);
+using Version_t = const char* (*)(void);
+using Description_t = const char* (*)(void);
+using ID_t = PluginID (*)();
+using Register_t = bool (*)(PluginMgr*);
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
-typedef void *(* voidvoid)(void);
+using voidvoid = void* (*)(void);
 static inline voidvoid my_dlsym(void *handle, const char *symbol)
 {
 	void *value = dlsym(handle,symbol);
@@ -85,6 +79,8 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 #endif
 
 #ifdef WIN32
+#define STRSAFE_NO_DEPRECATE
+#include <strsafe.h>
 #define FREE_PLUGIN( handle )  FreeLibrary( handle )
 #define GET_PLUGIN_SYMBOL( handle, name )  GetProcAddress( handle, name )
 #else
@@ -183,7 +179,7 @@ void LoadPlugins(const char* pluginpath)
 	dirIt.SetFlags(DirectoryIterator::Files);
 	dirIt.SetFilterPredicate(new ExtFilter(pluginExt)); // rewinds
 
-	typedef std::set<std::string> PathSet;
+	using PathSet = std::set<std::string>;
 	PathSet delayedPlugins;
 
 	if (!dirIt) {
@@ -199,7 +195,7 @@ void LoadPlugins(const char* pluginpath)
 		// module is sent to the back
 		if (flags == PLF_DELAY) {
 			Log(MESSAGE, "PluginLoader", "Loading \"%s\" delayed.", name);
-			delayedPlugins.insert( name );
+			delayedPlugins.emplace(name);
 			continue;
 		}
 
@@ -209,7 +205,7 @@ void LoadPlugins(const char* pluginpath)
 			continue;
 		}
 
-		PathJoin( path, pluginpath, name, NULL );
+		PathJoin(path, pluginpath, name, nullptr);
 		LoadPlugin(path);
 	} while (++dirIt);
 

@@ -21,11 +21,104 @@
 #ifndef PIXELS_H
 #define PIXELS_H
 
-#include "Video.h"
+#include "Region.h"
+#include "Palette.h"
+
+#define ERROR_UNKNOWN_BPP error("Video", "Invalid bpp.")
 
 namespace GemRB {
 
-struct RGBBlender {
+using colorkey_t = uint32_t;
+
+struct GEM_EXPORT PixelFormat {
+	uint8_t  Rloss = 0;
+	uint8_t  Gloss = 0;
+	uint8_t  Bloss = 0;
+	uint8_t  Aloss = 0;
+	uint8_t  Rshift = 0;
+	uint8_t  Gshift = 0;
+	uint8_t  Bshift = 0;
+	uint8_t  Ashift = 0;
+	uint32_t Rmask = 0;
+	uint32_t Gmask = 0;
+	uint32_t Bmask = 0;
+	uint32_t Amask = 0;
+	
+	uint8_t Bpp = 0; // bytes per pixel
+	uint8_t Depth = 0;
+	colorkey_t ColorKey = 0;
+	bool HasColorKey = false;
+	bool RLE = false;
+	PaletteHolder palette;
+	
+	PixelFormat() noexcept = default;
+	PixelFormat(uint8_t bpp, uint32_t rmask, uint32_t gmask, uint32_t bmask, uint32_t amask) noexcept
+	: Rmask(rmask), Gmask(gmask), Bmask(bmask), Amask(amask), Bpp(bpp), Depth(bpp * 8)
+	{}
+	
+	// we wouldnt need this monster in C++14...
+	PixelFormat(uint8_t rloss, uint8_t gloss, uint8_t bloss, uint8_t aloss,
+				uint8_t rshift, uint8_t gshift, uint8_t bshift, uint8_t ashift,
+				uint32_t rmask, uint32_t gmask, uint32_t bmask, uint32_t amask,
+				uint8_t bpp, uint8_t depth,
+				colorkey_t ck, bool hasCk, bool rle, PaletteHolder pal) noexcept
+	: Rloss(rloss), Gloss(gloss), Bloss(bloss), Aloss(aloss),
+	Rshift(rshift), Gshift(gshift), Bshift(bshift), Ashift(ashift),
+	Rmask(rmask), Gmask(gmask), Bmask(bmask), Amask(amask),
+	Bpp(bpp), Depth(depth), ColorKey(ck), HasColorKey(hasCk),
+	RLE(rle), palette(std::move(pal))
+	{}
+	
+	static PixelFormat Paletted8Bit(PaletteHolder pal, bool hasColorKey = false, colorkey_t key = 0) {
+		return PixelFormat {
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			1, 8,
+			key, hasColorKey,
+			false, std::move(pal)
+		};
+	}
+	
+	static PixelFormat RLE8Bit(PaletteHolder pal, colorkey_t key) {
+		return PixelFormat {
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			1, 8,
+			key, true,
+			true, std::move(pal)
+		};
+	}
+};
+
+#pragma pack(push,1)
+struct GEM_EXPORT Pixel24Bit {
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+#else
+	uint8_t b;
+	uint8_t g;
+	uint8_t r;
+#endif
+	
+	Pixel24Bit& operator=(uint32_t pixel) {
+		r = (pixel & 0xff000000) >> 24;
+		g = (pixel & 0x00ff0000) >> 16;
+		b = (pixel & 0x0000ff00) >> 8;
+		return *this;
+	}
+	
+	operator uint32_t() const {
+		return r + ((uint32_t)g << 8) + ((uint32_t)b << 16);
+	}
+};
+#pragma pack(pop)
+static_assert(sizeof(Pixel24Bit) == 3, "24bit pixel should be 3 bytes.");
+
+struct GEM_EXPORT RGBBlender {
 	virtual void operator()(const Color& src, Color& dst, uint8_t mask) const=0;
 	virtual ~RGBBlender() = default;
 };
@@ -81,7 +174,7 @@ struct OneMinusSrcA : RGBBlender {
 	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		ShaderBlend<SRCALPHA>(c, dst);
 		if (MASKED) {
-			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+			dst.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 		}
 	}
 };
@@ -91,7 +184,7 @@ struct TintDst : RGBBlender {
 	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		ShaderTint(c, dst);
 		if (MASKED) {
-			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+			dst.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 		}
 	}
 };
@@ -101,7 +194,7 @@ struct SrcRGBA : RGBBlender {
 	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		dst = c;
 		if (MASKED) {
-			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+			dst.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 		}
 	}
 };
@@ -117,13 +210,13 @@ enum class SHADER {
 // using a template to avoid runtime branch evaluation
 // by optimizing down to a single case
 template <SHADER SHADE, bool SRCALPHA>
-class RGBBlendingPipeline : RGBBlender {
+class RGBBlendingPipeline : private RGBBlender {
 	Color tint;
 	unsigned int shift;
 	void (*blender)(const Color& src, Color& dst);
 
 public:
-	RGBBlendingPipeline(void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
+	explicit RGBBlendingPipeline(void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
 	: tint(1,1,1,0xff), blender(blender) {
 		shift = 0;
 		if (SHADE == SHADER::GREYSCALE || SHADE == SHADER::SEPIA) {
@@ -131,7 +224,7 @@ public:
 		}
 	}
 
-	RGBBlendingPipeline(const Color& tint, void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
+	explicit RGBBlendingPipeline(const Color& tint, void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
 	: tint(tint), blender(blender) {
 		shift = 8; // we shift by 8 as a fast aproximation of dividing by 255
 		if (SHADE == SHADER::GREYSCALE || SHADE == SHADER::SEPIA) {
@@ -145,7 +238,7 @@ public:
 		}
 		
 		Color c = src;
-		c.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+		c.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 
 		// first apply "shader"
 		switch (SHADE) {
@@ -185,7 +278,7 @@ public:
 	}
 };
 
-struct IPixelIterator
+struct GEM_EXPORT IPixelIterator
 {
 	enum Direction {
 		Reverse = -1,
@@ -199,32 +292,34 @@ struct IPixelIterator
 	Direction xdir;
 	Direction ydir;
 
-	IPixelIterator(void* px, int pitch, Direction x, Direction y)
+	IPixelIterator(void* px, int pitch, Direction x, Direction y) noexcept
 	: pixel(px), pitch(pitch), xdir(x), ydir(y) {}
 
-	virtual ~IPixelIterator() = default;
+	virtual ~IPixelIterator() noexcept = default;
 
-	virtual IPixelIterator* Clone() const=0;
-	virtual void Advance(int)=0;
-	virtual uint8_t Channel(uint32_t mask, uint8_t shift) const=0;
-	virtual const Point& Position() const=0;
+	virtual IPixelIterator* Clone() const noexcept=0;
+	virtual void Advance(int) noexcept=0;
+	virtual uint8_t Channel(uint32_t mask, uint8_t shift) const noexcept=0;
+	virtual const Point& Position() const noexcept=0;
 
-	IPixelIterator& operator++() {
+	IPixelIterator& operator++() noexcept {
 		Advance(1);
 		return *this;
 	}
 
-	bool operator!=(const IPixelIterator& rhs) const {
+	bool operator!=(const IPixelIterator& rhs) const noexcept {
 		return pixel != rhs.pixel;
 	}
 };
 
 template <typename PIXEL>
-struct PixelIterator : IPixelIterator
+class PixelIterator : public IPixelIterator
 {
+protected:
 	Size size;
 	Point pos;
 
+public:
 	PixelIterator(PIXEL* p, Size s, int pitch)
 	: IPixelIterator(p, pitch, Forward, Forward), size(s) {
 		assert(size.w >= 0); // == 0 is the same thing as an end iterator so it is valid too
@@ -247,16 +342,16 @@ struct PixelIterator : IPixelIterator
 		return static_cast<PIXEL*>(pixel);
 	}
 
-	uint8_t Channel(uint32_t mask, uint8_t shift) const override {
+	uint8_t Channel(uint32_t mask, uint8_t shift) const noexcept override {
 		return ((*static_cast<PIXEL*>(pixel))&mask) >> shift;
 	}
 
-	IPixelIterator* Clone() const override {
+	IPixelIterator* Clone() const noexcept override {
 		return new PixelIterator<PIXEL>(*this);
 	}
 
-	void Advance(int dx) override {
-		if (dx == 0 || size.IsEmpty()) return;
+	void Advance(int dx) noexcept override {
+		if (dx == 0 || size.IsInvalid()) return;
 
 		uint8_t* ptr = static_cast<uint8_t*>(pixel);
 		
@@ -290,12 +385,53 @@ struct PixelIterator : IPixelIterator
 		pixel = ptr;
 	}
 	
-	const Point& Position() const override {
+	const Point& Position() const noexcept override {
 		return pos;
 	}
 };
 
-struct IAlphaIterator
+class GEM_EXPORT PixelFormatIterator : public IPixelIterator
+{
+private:
+	IPixelIterator* imp = nullptr;
+	IPixelIterator* InitImp(void* pixel, int pitch) const noexcept;
+
+public:
+	const PixelFormat& format;
+	Region clip;
+
+	PixelFormatIterator(void* pixels, int pitch, const PixelFormat& fmt, const Region& clip) noexcept;
+	PixelFormatIterator(void* pixels, int pitch, const PixelFormat& fmt, Direction x, Direction y, const Region& clip) noexcept;
+	PixelFormatIterator(const PixelFormatIterator& orig) noexcept;
+
+	~PixelFormatIterator() noexcept override;
+
+	static PixelFormatIterator end(const PixelFormatIterator& beg) noexcept;
+
+	PixelFormatIterator& operator++() noexcept;
+
+	bool operator!=(const PixelFormatIterator& rhs) const noexcept;
+
+	uint8_t& operator*() const noexcept;
+
+	uint8_t* operator->() const noexcept;
+
+	uint8_t Channel(uint32_t mask, uint8_t shift) const noexcept override;
+
+	IPixelIterator* Clone() const noexcept override;
+
+	void Advance(int amt) noexcept override;
+	
+	Color ReadRGBA() const noexcept;
+
+	void ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept;
+
+	void WriteRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept;
+	
+	const Point& Position() const noexcept override;
+};
+
+struct GEM_EXPORT IAlphaIterator
 {
 	virtual ~IAlphaIterator() = default;
 	
@@ -309,11 +445,11 @@ struct IAlphaIterator
 };
 
 // an endless iterator that always returns 'alpha' when dereferenced
-struct StaticAlphaIterator : public IAlphaIterator
+struct GEM_EXPORT StaticAlphaIterator : public IAlphaIterator
 {
 	uint8_t alpha;
 
-	StaticAlphaIterator(uint8_t a) : alpha(a) {}
+	explicit StaticAlphaIterator(uint8_t a) : alpha(a) {}
 
 	uint8_t operator*() const override {
 		return alpha;
@@ -322,22 +458,22 @@ struct StaticAlphaIterator : public IAlphaIterator
 	void Advance(int) override {}
 };
 
-struct RGBAChannelIterator : public IAlphaIterator
+struct GEM_EXPORT RGBAChannelIterator : public IAlphaIterator
 {
 	uint32_t mask;
 	uint8_t shift;
-	IPixelIterator* pixelIt;
+	IPixelIterator& pixelIt;
 
-	RGBAChannelIterator(IPixelIterator* it, uint32_t mask, uint8_t shift)
+	RGBAChannelIterator(IPixelIterator& it, uint32_t mask, uint8_t shift)
 	: mask(mask), shift(shift), pixelIt(it)
 	{}
 
 	uint8_t operator*() const override {
-		return pixelIt->Channel(mask, shift);
+		return pixelIt.Channel(mask, shift);
 	}
 	
 	void Advance(int amt) override {
-		pixelIt->Advance(amt);
+		pixelIt.Advance(amt);
 	}
 };
 

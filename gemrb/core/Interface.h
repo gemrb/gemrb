@@ -43,23 +43,14 @@
 #include "InterfaceConfig.h"
 #include "Resource.h"
 #include "Timer.h"
+#include "Variables.h"
+#include "SaveGameAREExtractor.h"
 #include "System/VFS.h"
 
-#include <array>
 #include <map>
 #include <string>
 #include <vector>
-
-// No SFINAE
-#if defined(_MSC_VER) || defined(__sgi)
-#include "DataFileMgr.h"
-#include "MusicMgr.h"
-#include "SaveGame.h"
-#include "ScriptEngine.h"
-#include "StringMgr.h"
-#include "SymbolMgr.h"
-#include "Video.h"
-#endif
+#include <unordered_map>
 
 namespace GemRB {
 
@@ -78,7 +69,6 @@ class Game;
 class GameControl;
 class GlobalTimer;
 class ITMExtHeader;
-class Image;
 class Item;
 class KeyMap;
 class Label;
@@ -87,7 +77,6 @@ class MusicMgr;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 class ProjectileServer;
-class Resource;
 class SPLExtHeader;
 class SaveGame;
 class SaveGameIterator;
@@ -97,10 +86,8 @@ class Spell;
 class Sprite2D;
 class Store;
 class StringMgr;
-#ifndef __sgi
 class SymbolMgr;
 class TableMgr;
-#endif
 class TextArea;
 class Variables;
 class Video;
@@ -109,18 +96,18 @@ class WorldMap;
 class WorldMapArray;
 
 struct Symbol {
-	Holder<SymbolMgr> sm;
-	char ResRef[8];
+	std::shared_ptr<SymbolMgr> sm;
+	ResRef symbolName;
 };
 
 struct SlotType {
 	ieDword slot;
-	ieDword slottype;
-	ieDword slottip;
-	ieDword slotid;
-	ieDword sloteffects;
-	ieDword slotflags;
-	ieResRef slotresref;
+	ieDword slotType;
+	ieDword slotTip;
+	ieDword slotID;
+	ieDword slotEffects = 100; // SLOT_EFFECT_ALIAS
+	ieDword slotFlags;
+	ResRef slotResRef;
 };
 
 struct DamageInfoStruct {
@@ -143,24 +130,26 @@ struct TimeStruct {
 	unsigned int day_sec;
 	unsigned int day_size;
 
-	int GetHour(unsigned int time) { return (time/AI_UPDATE_TIME)%day_sec/hour_sec; }
+	int GetHour(unsigned int time) const { return (time / AI_UPDATE_TIME ) % day_sec / hour_sec; }
 };
 
 struct EncodingStruct
 {
-	std::string encoding;
-	bool widechar;
-	bool multibyte;
-	bool zerospace;
+	std::string encoding = "ISO-8859-1";
+	bool widechar = false;
+	bool multibyte = false;
+	bool zerospace = false;
 };
 
+// cache of speldesc.2da entries
 struct SpellDescType {
-	ieResRef resref;
+	ResRef resref;
 	ieStrRef value;
+	// pst also has a SOUND_EFFECT column, but we use it from GUISTORE.py directly
 };
 
 struct SpecialSpellType {
-	ieResRef resref;
+	ResRef resref;
 	int flags;
 	int amount;
 	int bonus_limit;
@@ -172,29 +161,23 @@ struct SpecialSpellType {
 #define SP_HEAL_ALL  16     //any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
 
 struct SurgeSpell {
-	ieResRef spell;
+	ResRef spell;
 	ieStrRef message;
 };
 
 class ItemList {
 public:
-	ieResRef *ResRefs;
-	unsigned int Count;
+	std::vector<ResRef> ResRefs;
 	//if count is odd and the column titles start with 2, the random roll should be 2d((c+1)/2)-1
 	bool WeightOdds;
 
-	ItemList(unsigned int size, int label) {
-		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
-		Count = size;
-		if ((size&1) && (label==2)) {
+	ItemList(std::vector<ResRef> refs, int label)
+	: ResRefs(std::move(refs))
+	{
+		if ((ResRefs.size() & 1) && label == 2) {
 			WeightOdds=true;
 		} else {
 			WeightOdds=false;
-		}
-	}
-	~ItemList() {
-		if (ResRefs) {
-			free(ResRefs);
 		}
 	}
 };
@@ -282,6 +265,7 @@ public:
 #define SLOT_EFFECT_MISSILE  5 //quiver slots
 #define SLOT_EFFECT_LEFT     6 //shield (left hand) slot
 #define SLOT_EFFECT_HEAD     7 //head slot
+#define SLOT_EFFECT_ALIAS    100 // marker for aliased slots
 
 enum PluginFlagsType {
 	PLF_NORMAL,
@@ -323,19 +307,64 @@ enum DebugModeBits {
 	ID_TEXT = 256
 };
 
-template<int SIZE>
-using ColorPal = std::array<Color, SIZE>;
-
 // TODO: there is no reason why this can't be generated directly from
 // the inventory button drag event using the button value as the slot id
 // to get the appropriate CREItem
 struct ItemDragOp : public Control::ControlDragOp {
 	CREItem* item;
 
-	ItemDragOp(CREItem* item);
+	explicit ItemDragOp(CREItem* item);
 	
 private:
 	static Control dragDummy;
+};
+
+struct CFGConfigData {
+	char GamePath[_MAX_PATH]{};
+	char GameDataPath[_MAX_PATH]{};
+	char GameOverridePath[_MAX_PATH]{};
+	char GameSoundsPath[_MAX_PATH]{};
+	char GameScriptsPath[_MAX_PATH]{};
+	char GamePortraitsPath[_MAX_PATH]{};
+	char GameCharactersPath[_MAX_PATH]{};
+	char SavePath[_MAX_PATH]{};
+	char CachePath[_MAX_PATH]{};
+	std::vector<std::string> CD[MAX_CD];
+	std::vector<std::string> ModPath;
+	char CustomFontPath[_MAX_PATH]{};
+
+	char GemRBPath[_MAX_PATH]{};
+	char GemRBOverridePath[_MAX_PATH]{};
+	char GemRBUnhardcodedPath[_MAX_PATH]{};
+	char PluginsPath[_MAX_PATH]{};
+	char GUIScriptsPath[_MAX_PATH]{};
+	bool CaseSensitive = true;
+
+	char GameName[_MAX_PATH]{};
+	char GameType[10]{};
+	std::string Encoding = "default";
+
+	int GamepadPointerSpeed = 10;
+	bool UseSoftKeyboard = false; // TODO: reevaluate the need for this, see comments in StartTextInput
+	unsigned short NumFingScroll = 2;
+	unsigned short NumFingKboard = 3;
+	unsigned short NumFingInfo = 2;
+	int MouseFeedback = 0;
+
+	int Width = 640;
+	int Height = 480;
+	int Bpp = 32;
+	bool DrawFPS = false;
+	int debugMode = 0;
+	bool CheatFlag = false; /** Cheats enabled? */
+	int MaxPartySize = 6;
+
+	bool KeepCache = false;
+	bool MultipleQuickSaves = false;
+	// once GemRB own format is working well, this might be set to 0
+	int SaveAsOriginal = 1; // if true, saves files in compatible mode
+	std::string VideoDriverName = "sdl"; // consider deprecating? It's now a hidden option
+	std::string AudioDriverName = "openal";
 };
 
 /**
@@ -348,36 +377,34 @@ class GEM_EXPORT Interface
 private:
 	// dirvers must be deallocated last (keep them at the top)
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
-	Holder<Video> video;
-	Holder<Audio> AudioDriver;
+	std::shared_ptr<Video> video;
+	std::shared_ptr<Audio> AudioDriver;
 
-	std::string VideoDriverName;
-	std::string AudioDriverName;
-	ProjectileServer * projserv;
+	ProjectileServer* projserv = nullptr;
 
-	WindowManager* winmgr;
-	Holder<GUIFactory> guifact;
-	Holder<ScriptEngine> guiscript;
+	WindowManager* winmgr = nullptr;
+	std::shared_ptr<GUIFactory> guifact;
+	std::shared_ptr<ScriptEngine> guiscript;
 	GameControl* gamectrl = nullptr;
-	SaveGameIterator *sgiterator;
+	SaveGameIterator *sgiterator = nullptr;
 	Variables * vars;
 	Variables * tokens;
 	Variables * lists;
-	Holder<MusicMgr> music;
+	std::shared_ptr<MusicMgr> music;
 	std::vector<Symbol> symbols;
-	Holder<DataFileMgr> INIparty;
-	Holder<DataFileMgr> INIbeasts;
-	Holder<DataFileMgr> INIquests;
-	Holder<DataFileMgr> INIresdata;
-	Game * game;
-	Calendar * calendar;
-	WorldMapArray* worldmap;
-	ieDword GameFeatures[(GF_COUNT+31)/32];
+	std::shared_ptr<DataFileMgr> INIparty;
+	std::shared_ptr<DataFileMgr> INIbeasts;
+	std::shared_ptr<DataFileMgr> INIquests;
+	std::shared_ptr<DataFileMgr> INIresdata;
+	Game* game = nullptr;
+	Calendar* calendar = nullptr;
+	WorldMapArray* worldmap = nullptr;
+	ieDword GameFeatures[(GF_COUNT+31)/32]{};
 	ResRef MainCursorsImage;
 	ResRef TextCursorBam;
 	ResRef ScrollCursorBam;
-	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
-	int GroundCircleScale[MAX_CIRCLE_SIZE];
+	ResRef GroundCircleBam[MAX_CIRCLE_SIZE];
+	int GroundCircleScale[MAX_CIRCLE_SIZE]{};
 
 	std::map<ResRef, Font*> fonts;
 	ResRef ButtonFontResRef;
@@ -386,9 +413,7 @@ private:
 	ResRef TooltipFontResRef;
 	std::string DefaultWindowTitle;
 
-	TooltipBackground* TooltipBG;
-	ieResRef *DefSound; //default sounds
-	int DSCount;
+	TooltipBackground* TooltipBG = nullptr;
 
 	ResRef Palette16;
 	ResRef Palette32;
@@ -397,54 +422,53 @@ private:
 	std::vector<ColorPal<32>>  palettes32;
 	std::vector<ColorPal<16>>  palettes16;
 
-	ieDword* slotmatrix; //itemtype vs slottype
+	ieDword* slotmatrix = nullptr; // itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
-	SlotType* slottypes;
-	int ItemTypes;
+	std::vector<SlotType> slotTypes;
+	int ItemTypes = 0;
 
 	// Currently dragged item or NULL
 	std::unique_ptr<ItemDragOp> DraggedItem;
 	// Current Store
-	Store* CurrentStore;
+	Store* CurrentStore = nullptr;
 	// Index of current container
-	Container* CurrentContainer;
-	bool UseContainer;
+	Container* CurrentContainer = nullptr;
+	bool UseContainer = false;
 	// Scrolling speed
-	int mousescrollspd;
-	bool update_scripts;
+	int mousescrollspd = 10;
+	bool update_scripts = false;
 	/** Next Script Name */
 	char NextScript[64];
 
 	std::deque<Timer> timers;
-	int SpecialSpellsCount;
-	SpecialSpellType *SpecialSpells;
-	KeyMap *keymap;
-	std::string Encoding;
-	Scriptable *CutSceneRunner;
-	int debugMode = 0;
+	std::vector<SpecialSpellType> SpecialSpells;
+	KeyMap *keymap = nullptr;
+	Scriptable *CutSceneRunner = nullptr;
+
+	int MaximumAbility = 0;
 
 public:
 	const char * SystemEncoding;
 	EncodingStruct TLKEncoding;
-	Holder<StringMgr> strings;
-	Holder<StringMgr> strings2;
+	std::shared_ptr<StringMgr> strings;
+	std::shared_ptr<StringMgr> strings2;
 	GlobalTimer timer;
 	Color InfoTextColor;
-	int SaveAsOriginal; //if true, saves files in compatible mode
-	int QuitFlag;
-	int EventFlag;
+	int QuitFlag = QF_NORMAL;
+	int EventFlag = EF_CONTROL;
 	Holder<SaveGame> LoadGameIndex;
-	int VersionOverride;
-	unsigned int SlotTypes; //this is the same as the inventory size
-	ResRef GlobalScript;
-	ResRef WorldMapName[2];
-	Variables * AreaAliasTable;
+	SaveGameAREExtractor saveGameAREExtractor;
+	int VersionOverride = 0;
+	unsigned int SlotTypes = 0; // this is the same as the inventory size
+	ResRef GlobalScript = "BALDUR";
+	ResRef WorldMapName[2] = { "WORLDMAP", "" };
+	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<Holder<Sprite2D> > Cursors;
 	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
-	TimeStruct Time;
+	TimeStruct Time{};
 	std::vector<SurgeSpell> SurgeSpells;
 public:
 	Interface();
@@ -452,7 +476,7 @@ public:
 	
 	Interface(const Interface&) = delete;
 	
-	int Init(InterfaceConfig* config);
+	int Init(const InterfaceConfig* config);
 	//TODO: Core Methods in Interface Class
 	void SetFeature(int value, int position);
 	/* don't rely on the exact return value of this function */
@@ -482,18 +506,18 @@ public:
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
-	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod=1);
+	Actor *SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, const Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod = true);
 	/** Get the Window Manager */
 	WindowManager *GetWindowManager() const { return winmgr; };
 	/** Loads a Window in the Window Manager */
-	Window* LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition = Window::PosCentered);
+	Window* LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition = Window::PosCentered);
 	/** Creates a Window in the Window Manager */
 #undef CreateWindow // Win32 might define this, so nix it
 	Window* CreateWindow(unsigned short WindowID, const Region&);
-	void ToggleViewsVisible(bool visible, const ResRef& group);
-	void ToggleViewsEnabled(bool enabled, const ResRef& group);
+	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
+	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 
-	Tooltip CreateTooltip();
+	Tooltip CreateTooltip() const;
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
@@ -514,7 +538,7 @@ public:
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
 	int GetSymbolIndex(const char * ResRef) const;
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
-	Holder<SymbolMgr> GetSymbol(unsigned int index) const;
+	std::shared_ptr<SymbolMgr> GetSymbol(unsigned int index) const;
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */
@@ -567,7 +591,8 @@ public:
 	}
 
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
-	WorldMap * GetWorldMap(const char *area = NULL);
+	WorldMap* GetWorldMap() const;
+	WorldMap* GetWorldMap(const ResRef& area) const;
 	GameControl *GetGameControl() const { return game ? gamectrl : nullptr; }
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
@@ -577,11 +602,11 @@ public:
 	to override the saved game's version */
 	void LoadGame(SaveGame *save, int ver_override);
 	/** reloads the world map from a resource file */
-	void UpdateWorldMap(ResRef wmResRef);
+	void UpdateWorldMap(const ResRef& wmResRef);
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 
-	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY);
+	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY) const;
 
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
 	ieDword FindSlot(unsigned int idx) const;
@@ -601,42 +626,42 @@ public:
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int slottype, const Item *item, const Actor *actor = nullptr, bool feedback = false, bool equipped = false) const;
 	/*removes single file from cache*/
-	void RemoveFromCache(const ieResRef resref, SClass_ID SClassID);
+	void RemoveFromCache(const ResRef& resref, SClass_ID SClassID) const;
 	/*removes all files from directory*/
-	void DelTree(const char *path, bool onlysaved);
+	void DelTree(const char *path, bool onlysaved) const;
 	/*returns 0,1,2 based on how the file should be saved */
-	int SavedExtension(const char *filename);
+	int SavedExtension(const char *filename) const;
 	/*returns true if the file should never be deleted accidentally */
-	bool ProtectedExtension(const char *filename);
+	bool ProtectedExtension(const char *filename) const;
 	/*returns true if the directory path isn't good as a Cache */
-	bool StupidityDetector(const char* Pt);
-	bool InDebugMode(int mode) const { return debugMode & mode; };
-	void SetDebugMode(int mode) { debugMode = mode; };
+	bool StupidityDetector(const char* Pt) const;
+	bool InDebugMode(int mode) const { return config.debugMode & mode; };
+	void SetDebugMode(int mode) { config.debugMode = mode; };
 	/*handles the load screen*/
 	void LoadProgress(int percent);
 
-	void DragItem(CREItem* item, const ieResRef Picture);
+	void DragItem(CREItem* item, const ResRef& Picture);
 	const ItemDragOp* GetDraggedItem() const { return DraggedItem.get(); }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();
-	CREItem *ReadItem(DataStream *str);
-	CREItem *ReadItem(DataStream *str, CREItem *itm);
+	CREItem *ReadItem(DataStream *str) const;
+	CREItem *ReadItem(DataStream *str, CREItem *itm) const;
 	void SanitizeItem(CREItem *item) const;
-	bool ResolveRandomItem(CREItem *itm);
-	ieStrRef GetRumour(const ieResRef resname);
+	bool ResolveRandomItem(CREItem *itm) const;
+	ieStrRef GetRumour(const ResRef& resname);
 	Container *GetCurrentContainer();
 	int CloseCurrentContainer();
-	void SetCurrentContainer(Actor *actor, Container *arg, bool flag=false);
+	void SetCurrentContainer(const Actor *actor, Container *arg, bool flag = false);
 	Store *GetCurrentStore();
 	void CloseCurrentStore();
-	Store *SetCurrentStore(const ieResRef resname, ieDword owner);
+	Store *SetCurrentStore(const ResRef &resName, ieDword owner);
 	void SetMouseScrollSpeed(int speed);
-	int GetMouseScrollSpeed();
+	int GetMouseScrollSpeed() const;
 
 	//creates a standalone effect with opcode
 	Effect *GetEffect(ieDword opcode);
 	/** plays stock gui sound referenced by index */
-	Holder<SoundHandle> PlaySound(int idx, unsigned int channel);
+	Holder<SoundHandle> PlaySound(size_t idx, unsigned int channel);
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
@@ -662,59 +687,57 @@ public:
 	int GetReputationMod(int column) const;
 
 	/** applies the spell on the target */
-	void ApplySpell(const ieResRef resname, Actor *target, Scriptable *caster, int level);
+	void ApplySpell(const ResRef& spellRef, Actor *target, Scriptable *caster, int level) const;
 	/** applies the spell on the area or on a scriptable object */
-	void ApplySpellPoint(const ieResRef resname, Map *area, const Point &pos, Scriptable *caster, int level);
+	void ApplySpellPoint(const ResRef& spellRef, Map *area, const Point &pos, Scriptable *caster, int level) const;
 	/** applies a single effect on the target */
-	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
+	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster) const;
 	/** applies an effect queue on the target */
-	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster);
-	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p);
-	Effect *GetEffect(const ieResRef resname, int level, const Point &p);
+	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster) const;
+	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p) const;
+	Effect *GetEffect(const ResRef& resname, int level, const Point &p);
 	/** dumps an area object to the cache */
-	int SwapoutArea(Map *map);
+	int SwapoutArea(Map *map) const;
 	/** saves (exports a character to the characters folder */
-	int WriteCharacter(const char *name, Actor *actor);
+	int WriteCharacter(const char *name, const Actor *actor);
 	/** saves the game object to the destination folder */
 	int WriteGame(const char *folder);
 	/** saves the worldmap object to the destination folder */
 	int WriteWorldMap(const char *folder);
 	/** saves the .are and .sto files to the destination folder */
-	int CompressSave(const char *folder);
+	int CompressSave(const char *folder, bool overrideRunning);
 	/** toggles the pause. returns either PAUSE_ON or PAUSE_OFF to reflect the script state after toggling. */
-	PauseSetting TogglePause();
+	PauseSetting TogglePause() const;
 	/** returns true the passed pause setting was applied. false otherwise. */
-	bool SetPause(PauseSetting pause, int flags = 0);
+	bool SetPause(PauseSetting pause, int flags = 0) const;
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
-	bool Autopause(ieDword flag, Scriptable *target);
+	bool Autopause(ieDword flag, Scriptable *target) const;
 	/** registers engine opcodes */
-	void RegisterOpcodes(int count, const EffectDesc *opcodes);
+	void RegisterOpcodes(int count, const EffectDesc *opcodes) const;
 	/** reads a list of resrefs into an array, returns array size */
-	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
-	/** frees the data */
-	void FreeResRefTable(ieResRef *&table, int &count);
+	bool ReadResRefTable(const ResRef& tablename, std::vector<ResRef>& data);
 	/** Returns the virtual worldmap entry of a sub-area */
-	int GetAreaAlias(const ieResRef areaname) const;
+	int GetAreaAlias(const ResRef &areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly
 	unwanted return variables could be omitted */
-	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = NULL, ieResRef resource3 = NULL);
+	void GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const;
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
-	ieDword *GetListFrom2DA(const ieResRef resref);
+	ieDword *GetListFrom2DA(const ResRef& resref);
 	/** translates a stat symbol to numeric value */
 	ieDword TranslateStat(const char *stat_name);
 	/** resolves a stat bonus based on multiple stats */
-	int ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags = 0, int value = 0);
+	int ResolveStatBonus(const Actor *actor, const char *tablename, ieDword flags = 0, int value = 0);
 	/** Opens CD prompt window and waits for the specified disc */
-	void WaitForDisc(int disc_number, const char* path);
+	void WaitForDisc(int disc_number, const char* path) const;
 	/** Returns the music playlist corresponding to the provided type */
 	/** it allows scrapping the entry, hence it isn't const */
 	char *GetMusicPlaylist(int SongType) const;
 	/** Returns the DeathVarFormat of the day */
 	static const char *GetDeathVarFormat();
-	int CheckSpecialSpell(const ieResRef resref, Actor *actor);
-	int GetSpecialSpell(const ieResRef resref);
-	int GetSpecialSpellsCount() { return SpecialSpellsCount; }
-	SpecialSpellType *GetSpecialSpells() { return SpecialSpells; }
+	int CheckSpecialSpell(const ResRef& resRef, const Actor *actor) const;
+	int GetSpecialSpell(const ResRef& resref) const;
+	size_t GetSpecialSpellsCount() const { return SpecialSpells.size(); }
+	const std::vector<SpecialSpellType>& GetSpecialSpells() const { return SpecialSpells; }
 	/** Saves config variables to a file */
 	bool SaveConfig();
 private:
@@ -725,21 +748,22 @@ private:
 	bool LoadEncoding();
 
 	template<int SIZE>
-	bool LoadPalette(ResRef resref, std::vector<ColorPal<SIZE>>& palettes)
+	bool LoadPalette(const ResRef& resref, std::vector<ColorPal<SIZE>>& palettes) const
 	{
 		static_assert(SIZE == 16 || SIZE == 32 || SIZE == 256, "invalid palette size");
 
 		ResourceHolder<ImageMgr> palim = GetResourceHolder<ImageMgr>(resref);
 		if (palim) {
-			auto image = palim->GetImage();
-			int height = image->GetHeight();
+			auto image = palim->GetSprite2D();
+			int height = image->Frame.h;
 			palettes.resize(height);
-			for (int row = 0; row < height; ++row) {
-				for (int col = 0; col < SIZE; ++col) {
-					palettes[row][col] = image->GetPixel(col, row);
-				}
+			Region clip(0, 0, SIZE, height);
+			auto it = image->GetIterator(IPixelIterator::Direction::Forward, IPixelIterator::Direction::Forward, clip);
+			auto end = it.end(it);
+			for (; it != end; ++it) {
+				const Point& p = it.Position();
+				palettes[p.y][p.x] = it.ReadRGBA();
 			}
-			delete image;
 			return true;
 		}
 		return false;
@@ -748,84 +772,55 @@ private:
 	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();
-	bool ReadItemTable(const ieResRef item, const char *Prefix);
-	bool ReadAbilityTables();
-	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
-	bool ReadMusicTable(const ieResRef name, int col);
+	bool ReadItemTable(const ResRef& item, const char *Prefix);
+	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
-	bool ReadReputationModTable();
+	bool ReadReputationModTable() const;
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
-	bool ReadSoundChannelsTable();
+	bool ReadSoundChannelsTable() const;
 	/** Reads table of area name mappings for WorldMap (PST only) */
-	bool ReadAreaAliasTable(const ieResRef name);
+	bool ReadAreaAliasTable(const ResRef& name);
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
 	/** handles the EventFlag bits (conditional events) */
 	void HandleEvents();
 	/** handles hardcoded gui behaviour */
-	void HandleGUIBehaviour();
+	void HandleGUIBehaviour(GameControl*);
 	/** Creates a game control, closes all other windows */
 	GameControl* StartGameControl();
 	/** Executes everything (non graphical) in the main game loop */
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */
-	ieDword *GetListFrom2DAInternal(const ieResRef resref);
+	ieDword *GetListFrom2DAInternal(const ResRef& resref);
 
 public:
-	char GameDataPath[_MAX_PATH];
-	char GameOverridePath[_MAX_PATH];
-	char GameSoundsPath[_MAX_PATH];
-	char GameScriptsPath[_MAX_PATH];
-	char GamePortraitsPath[_MAX_PATH];
-	char GameCharactersPath[_MAX_PATH];
-	char GemRBOverridePath[_MAX_PATH];
-	char GemRBUnhardcodedPath[_MAX_PATH];
-	ieResRef GameNameResRef;
-	ieResRef GoldResRef; //MISC07.itm
-	Variables *RtRows;
-	char CustomFontPath[_MAX_PATH];
-	char GameName[_MAX_PATH];
-	char GameType[10];
-	int GamepadPointerSpeed = 10;
-	char GemRBPath[_MAX_PATH];
-	char PluginsPath[_MAX_PATH];
-	char CachePath[_MAX_PATH];
-	char GUIScriptsPath[_MAX_PATH];
-	char SavePath[_MAX_PATH];
-	char INIConfig[_MAX_PATH];
-	char GamePath[_MAX_PATH];
-	std::vector<std::string> CD[MAX_CD];
-	std::vector<std::string> ModPath;
-	int Width = 640, Height = 480, Bpp = 32;
-	int IgnoreOriginalINI;
+	CFGConfigData config;
+	ResRef GameNameResRef;
+	ResRef GoldResRef; //MISC07.itm
+	ResRefMap<ItemList> RtRows;
+
+	char INIConfig[_MAX_PATH] = "baldur.ini";
 	bool DitherSprites = true;
-	bool CaseSensitive = true, DrawFPS = false;
-	bool UseSoftKeyboard; // TODO: reevaluate the need for this, see comments in StartTextInput
-	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
-	int MouseFeedback;
-	int MaxPartySize;
-	bool KeepCache;
-	bool MultipleQuickSaves;
-	bool UseCorruptedHack;
-	int FeedbackLevel;
+	bool UseCorruptedHack = false;
+	int FeedbackLevel = 0;
 
 	Variables *plugin_flags;
 	/** The Main program loop */
 	void Main(void);
 	/** returns true if the game is paused */
-	bool IsFreezed();
+	bool IsFreezed() const;
 	void AskAndExit();
 	void ExitGemRB(void);
 	/** CheatKey support */
 	inline void EnableCheatKeys(int Flag)
 	{
-		CheatFlag=(Flag > 0);
+		config.CheatFlag = Flag > 0;
 	}
 
-	inline bool CheatEnabled()
+	inline bool CheatEnabled() const
 	{
-		return CheatFlag;
+		return config.CheatFlag;
 	}
 
 	inline void SetEventFlag(int Flag)
@@ -836,17 +831,20 @@ public:
 	{
 		EventFlag&=~Flag;
 	}
+	inline void ResetActionBar()
+	{
+		vars->SetAt("ActionLevel", 0, false);
+		SetEventFlag(EF_ACTION);
+	}
 
 	static void SanityCheck(const char *ver);
 
 	/** Set Next Script */
 	void SetNextScript(const char *script);
-	/** Cheats enabled? */
-	bool CheatFlag;
 
 	Audio* GetAudioDrv(void) const;
 
-	Timer& SetTimer(const EventHandler&, unsigned long interval, int repeats = -1);
+	Timer& SetTimer(const EventHandler&, tick_t interval, int repeats = -1);
 };
 
 extern GEM_EXPORT Interface * core;

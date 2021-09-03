@@ -40,6 +40,7 @@
 	#ifdef WIN32
 		#define _MAX_PATH 260
 	#else
+		#include <cstdio> // for FILENAME_MAX...
 		#define _MAX_PATH FILENAME_MAX
 	#endif
 #endif
@@ -50,10 +51,6 @@
 	#include <unistd.h>
 #endif
 
-#include <cstdio>
-#include <cstdlib>
-
-#include "System/Logging.h"
-#include "System/String.h"
+#include <cstddef>
 
 #endif  //! PLATFORM_H

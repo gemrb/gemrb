@@ -31,7 +31,6 @@
 
 #define MIXER_CHANNELS 16
 #define BUFFER_CACHE_SIZE 100
-#define AUDIO_DISTANCE_ROLLOFF_MOD 1.3
 
 namespace GemRB {
 
@@ -39,8 +38,7 @@ class SDLAudioSoundHandle : public SoundHandle
 {
 public:
 	SDLAudioSoundHandle(Mix_Chunk *chunk, int channel, bool relative) : mixChunk(chunk), chunkChannel(channel), sndRelative(relative) { };
-	virtual ~SDLAudioSoundHandle() { }
-	virtual void SetPos(int XPos, int YPos);
+	virtual void SetPos(const Point&);
 	virtual bool Playing();
 	virtual void Stop();
 	virtual void StopLooping();
@@ -67,20 +65,20 @@ public:
 	~SDLAudio(void) override;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) override;
-	int CreateStream(Holder<SoundMgr>) override;
+		const Point&, unsigned int flags = 0, tick_t *length = 0) override;
+	int CreateStream(std::shared_ptr<SoundMgr>) override;
 	bool Play() override;
 	bool Stop() override;
 	bool Pause() override { return true; } /*not implemented*/
 	bool Resume() override { return true; } /*not implemented*/
 	bool CanPlay() override;
 	void ResetMusics() override;
-	void UpdateListenerPos(int XPos, int YPos) override;
-	void GetListenerPos(int& XPos, int& YPos) override;
+	void UpdateListenerPos(const Point&) override;
+	Point GetListenerPos() override;
 	void UpdateVolume(unsigned int) override {}
 
 	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange) override;
-	int QueueAmbient(int stream, const char* sound) override;
+	tick_t QueueAmbient(int stream, const char* sound) override;
 	bool ReleaseStream(int stream, bool hardstop) override;
 	void SetAmbientStreamVolume(int stream, int gain) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
@@ -95,10 +93,10 @@ private:
 	static void buffer_callback(void *udata, uint8_t *stream, int len);
 	bool evictBuffer();
 	void clearBufferCache();
-	Mix_Chunk* loadSound(const char *ResRef, unsigned int &time_length);
+	Mix_Chunk* loadSound(const char *ResRef, tick_t &time_length);
 
 	Point listenerPos;
-	Holder<SoundMgr> MusicReader;
+	std::shared_ptr<SoundMgr> MusicReader;
 
 	bool MusicPlaying;
 	unsigned int curr_buffer_offset;

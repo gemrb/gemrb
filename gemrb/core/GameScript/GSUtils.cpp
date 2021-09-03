@@ -51,17 +51,16 @@
 #include "ScriptedAnimation.h"
 #include "System/StringBuffer.h"
 
-#include <cmath>
 #include <cstdio>
 
 namespace GemRB {
 
 //these tables will get freed by Core
-Holder<SymbolMgr> triggersTable;
-Holder<SymbolMgr> actionsTable;
-Holder<SymbolMgr> overrideTriggersTable;
-Holder<SymbolMgr> overrideActionsTable;
-Holder<SymbolMgr> objectsTable;
+std::shared_ptr<SymbolMgr> triggersTable;
+std::shared_ptr<SymbolMgr> actionsTable;
+std::shared_ptr<SymbolMgr> overrideTriggersTable;
+std::shared_ptr<SymbolMgr> overrideActionsTable;
+std::shared_ptr<SymbolMgr> objectsTable;
 TriggerFunction triggers[MAX_TRIGGERS];
 ActionFunction actions[MAX_ACTIONS];
 short actionflags[MAX_ACTIONS];
@@ -77,8 +76,7 @@ bool HasTriggerPoint = false;
 //don't create new variables
 bool NoCreate = false;
 bool HasKaputz = false;
-//released by ReleaseMemory
-ieResRef *ObjectIDSTableNames;
+std::vector<ResRef> ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int RandomNumValue;
@@ -94,29 +92,29 @@ void InitScriptTables()
 {
 	//initializing the happiness table
 	{
-	AutoTable tab("happy");
+	AutoTable tab = gamedata->LoadTable("happy");
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
-				happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
+				happiness[alignment][reputation] = strtosigned<int>(tab->QueryField(reputation,alignment));
 			}
 		}
 	}
 	}
 
 	//initializing the reaction mod. reputation table
-	AutoTable rmr("rmodrep");
+	AutoTable rmr = gamedata->LoadTable("rmodrep");
 	if (rmr) {
 		for (int reputation=0; reputation<MAX_REP_COLUMN; reputation++) {
-			rmodrep[reputation] = strtol(rmr->QueryField(0, reputation), NULL, 0);
+			rmodrep[reputation] = strtosigned<int>(rmr->QueryField(0, reputation));
 		}
 	}
 
 	//initializing the reaction mod. charisma table
-	AutoTable rmc("rmodchr");
+	AutoTable rmc = gamedata->LoadTable("rmodchr");
 	if (rmc) {
 		for (int charisma=0; charisma<MAX_CHR_COLUMN; charisma++) {
-			rmodchr[charisma] = strtol(rmc->QueryField(0, charisma), NULL, 0);
+			rmodchr[charisma] = strtosigned<int>(rmc->QueryField(0, charisma));
 		}
 	}
 
@@ -190,15 +188,15 @@ void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 
 // SPIT is not in the original engine spec, it is reserved for the
 // enchantable items feature
-//                                        0       1       2       3       4
-static const char *spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "SPCL" };
+//                                              0       1       2       3       4
+static const char* const spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "SPCL" };
 
 //this function handles the polymorphism of Spell[RES] actions
 //it returns spellres
-bool ResolveSpellName(ieResRef spellres, Action *parameters)
+bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
 {
 	if (parameters->string0Parameter[0]) {
-		strnlwrcpy(spellres, parameters->string0Parameter, 8);
+		spellRes = MakeLowerCaseResRef(parameters->string0Parameter);
 	} else {
 		//resolve spell
 		int type = parameters->int0Parameter/1000;
@@ -206,12 +204,12 @@ bool ResolveSpellName(ieResRef spellres, Action *parameters)
 		if (type>4) {
 			return false;
 		}
-		snprintf(spellres, sizeof(ieResRef), "%s%03d", spell_suffices[type], spellid);
+		spellRes.SNPrintF("%s%03d", spell_suffices[type], spellid);
 	}
-	return gamedata->Exists(spellres, IE_SPL_CLASS_ID);
+	return gamedata->Exists(spellRes, IE_SPL_CLASS_ID);
 }
 
-void ResolveSpellName(ieResRef spellres, ieDword number)
+void ResolveSpellName(ResRef& spellRes, ieDword number)
 {
 	//resolve spell
 	unsigned int type = number/1000;
@@ -219,41 +217,39 @@ void ResolveSpellName(ieResRef spellres, ieDword number)
 	if (type>4) {
 		type=0;
 	}
-	snprintf(spellres, sizeof(ieResRef), "%s%03d", spell_suffices[type], spellid);
+	spellRes.SNPrintF("%s%03d", spell_suffices[type], spellid);
 }
 
-ieDword ResolveSpellNumber(const ieResRef spellres)
+ieDword ResolveSpellNumber(const ResRef& spellRef)
 {
-	int i;
-
-	for(i=0;i<5;i++) {
-		if(!strnicmp(spellres, spell_suffices[i], 4)) {
-			int n = -1;
-			sscanf(spellres+4,"%d", &n);
-			if (n<0) {
+	ResRef tmp;
+	tmp.SNPrintF("%.4s", spellRef.CString());
+	for (int i = 0; i < 5; i++) {
+		if (tmp == spell_suffices[i]) {
+			tmp = spellRef.CString() + 4;
+			ieDword n = strtounsigned<ieDword>(tmp.CString());
+			if (!n) {
 				return 0xffffffff;
 			}
-			return i*1000+n;
+			return i * 1000 + n;
 		}
 	}
 	return 0xffffffff;
 }
 
-bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot)
+bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot)
 {
-	CREItem *itm = act->inventory.GetSlotItem(Slot);
+	const CREItem *itm = act->inventory.GetSlotItem(Slot);
 	if(itm) {
-		strnlwrcpy(itemres, itm->ItemResRef, 8);
+		itemres = itm->ItemResRef;
 		return gamedata->Exists(itemres, IE_ITM_CLASS_ID);
 	}
 	return false;
 }
 
-bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
+bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname)
 {
-	CREItem item;
-
-	Store* store = gamedata->GetStore(storename);
+	const Store* store = gamedata->GetStore(storename);
 	if (!store) {
 		Log(ERROR, "GameScript", "Store cannot be opened!");
 		return false;
@@ -268,7 +264,7 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	return ret;
 }
 
-static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname, unsigned int count)
+static bool StoreGetItemCore(CREItem &item, const ResRef& storename, const ResRef& itemname, unsigned int count)
 {
 	Store* store = gamedata->GetStore(storename);
 	if (!store) {
@@ -300,7 +296,7 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 {
 	Point mp = me.Pos();
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -328,7 +324,7 @@ void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 	Sender->ReleaseCurrentAction();
 }
 
-void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value)
+void PlaySequenceCore(Scriptable *Sender, const Action *parameters, ieDword value)
 {
 	Scriptable* tar;
 
@@ -357,18 +353,18 @@ void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value)
 	actor->SetStance( value );
 }
 
-void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
+void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone)
 {
 	int i = actor->inventory.GetSlotCount();
 	while(i--) {
-		CREItem *item = actor->inventory.GetSlotItem(i);
+		const CREItem *item = actor->inventory.GetSlotItem(i);
 		if (!item) {
 			continue;
 		}
-		if (strnicmp(item->ItemResRef, parameters->string0Parameter, 8) ) {
+		if (item->ItemResRef != parameters->string0Parameter) {
 			continue;
 		}
-		actor->inventory.SetSlotItemRes(parameters->string1Parameter,i,parameters->int0Parameter,parameters->int1Parameter,parameters->int2Parameter);
+		actor->inventory.SetSlotItemRes(ResRef(parameters->string1Parameter), i, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 		if (onlyone) {
 			break;
 		}
@@ -376,7 +372,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 }
 
 //check if an inventory (container or actor) has item (could be recursive ?)
-bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword flags)
+bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword flags)
 {
 	if (inventory->HasItem(itemname, flags)) {
 		return true;
@@ -384,10 +380,10 @@ bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword fl
 	int i=inventory->GetSlotCount();
 	while (i--) {
 		//maybe we could speed this up if we mark bag items with a flags bit
-		CREItem *itemslot = inventory->GetSlotItem(i);
+		const CREItem *itemslot = inventory->GetSlotItem(i);
 		if (!itemslot)
 			continue;
-		Item *item = gamedata->GetItem(itemslot->ItemResRef);
+		const Item *item = gamedata->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
 		bool ret = false;
@@ -404,15 +400,15 @@ bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword fl
 }
 
 //finds and takes an item from a container in the given inventory
-static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname, int count)
+static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, const ResRef& itemname, int count)
 {
 	int i=inventory->GetSlotCount();
 	while (i--) {
 		//maybe we could speed this up if we mark bag items with a flags bit
-		CREItem *itemslot = inventory->GetSlotItem(i);
+		const CREItem *itemslot = inventory->GetSlotItem(i);
 		if (!itemslot)
 			continue;
-		Item *item = gamedata->GetItem(itemslot->ItemResRef);
+		const Item *item = gamedata->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
 		bool ret = core->CanUseItemType(SLOT_BAG,item,NULL);
@@ -434,8 +430,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		return;
 	}
 
-	char Sound[_MAX_PATH] = "";
-	ieResRef soundRef = {};
+	char Sound[_MAX_PATH] = {};
+	ResRef soundRef;
 	unsigned int channel = SFX_CHAN_DIALOG;
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
@@ -453,12 +449,11 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		int tmp=(int) actor->GetVerbalConstant(Strref);
 		if (tmp <= 0 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 			//get soundset based string constant
-			actor->ResolveStringConstant(soundRef, (unsigned int) Strref);
+			actor->GetVerbalConstantSound(soundRef, static_cast<unsigned int>(Strref));
 			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
-				snprintf(Sound, _MAX_PATH, "%s/%s",
-					actor->PCStats->SoundFolder, soundRef);
+				snprintf(Sound, _MAX_PATH, "%s/%s",actor->PCStats->SoundFolder, soundRef.CString());
 			} else {
-				memcpy(Sound, soundRef, sizeof(ieResRef) );
+				strlcpy(Sound, soundRef.CString(), sizeof(Sound));
 			}
 		}
 		Strref = tmp;
@@ -484,9 +479,11 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		flags &= ~DS_CONSOLE;
 	}
 
-	if ((Strref != -1) && !soundRef[0]) {
+	if (Strref != -1 && soundRef.IsEmpty()) {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
-		memcpy(Sound, sb.Sound, sizeof(ieResRef) );
+		if (!sb.Sound.IsEmpty()) {
+			strlcpy(Sound, sb.Sound, sizeof(Sound));
+		}
 		if (sb.text) {
 			if (flags & DS_CONSOLE) {
 				//can't play the sound here, we have to delay action
@@ -505,9 +502,9 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			}
 		}
 	}
-	if (Sound[0] && !(flags&DS_SILENT) ) {
+	if (Sound[0] && !(flags & DS_SILENT)) {
 		ieDword speech = 0;
-		Point pos(Sender->Pos.x, Sender->Pos.y);
+		Point pos = Sender->Pos;
 		if (flags&DS_SPEECH) {
 			speech = GEM_SND_SPEECH;
 		}
@@ -515,12 +512,12 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		if (Sender->Type != ST_ACTOR || static_cast<Actor*>(Sender)->InParty ||
 			core->InCutSceneMode() || core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
 			speech |= GEM_SND_RELATIVE;
-			pos.x = pos.y = 0;
+			pos.reset();
 		}
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
-		unsigned int len = 0;
-		core->GetAudioDrv()->Play(Sound, channel, pos.x, pos.y, speech, &len);
-		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
+		tick_t len = 0;
+		core->GetAudioDrv()->Play(Sound, channel, pos, speech, &len);
+		tick_t counter = ( AI_UPDATE_TIME * len ) / 1000;
 
 		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
 			static_cast<Actor*>(Sender)->SetAnimatedTalking(len);
@@ -559,7 +556,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 			los = false;
 		}
 
-		if (Distance(target->Pos, Sender->Pos) > dist * VOODOO_CANSEE_F) {
+		if (!WithinRange(target, Sender->Pos, dist)) {
 			return 0;
 		}
 		if (!los) {
@@ -647,7 +644,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		item = new CREItem();
 
 		if (count <= 0) count = 1;
-		if (!GetItemContainer(*item, myinv, resref, count)) {
+		if (!GetItemContainer(*item, myinv, ResRef(resref), count)) {
 			delete item;
 			item = NULL;
 		}
@@ -682,10 +679,8 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
 		if (gotitem) {
-			if (target->Type == ST_ACTOR) {
-				if (((Actor *) target)->InParty) {
-					((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL);
-				}
+			if (target->Type == ST_ACTOR && ((Actor *) target)->InParty) {
+				((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL);
 			}
 			displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		}
@@ -755,7 +750,7 @@ static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatur
 	Region vp0 = core->GetGameControl()->Viewport();
 	// go for 640x480, so large viewports are less likely to interfere with scripting
 	Region vp(vp0.x + (vp0.w - 640) / 2, vp0.y + (vp0.h - 480) / 2, 640, 480);
-	Point vpCenter = Point(vp.x + vp.w / 2, vp.y + vp.h / 2);
+	Point vpCenter = vp.Center();
 	int maxRandExclusive = std::max(vp.w, vp.h);
 	int firstRandStep = RAND(0, maxRandExclusive);
 	int currentStep = RAND(0, 3);
@@ -785,7 +780,7 @@ static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatur
 
 			if (isPassable) {
 				// Check if the search map allows a creature to be at walkableStartPoint (note: ignoring creatureSize)
-				isPassable = bool(map->GetBlockedNavmap(walkableStartPoint) & PathMapFlags::PASSABLE);
+				isPassable = bool(map->GetBlocked(walkableStartPoint) & PathMapFlags::PASSABLE);
 			}
 
 			// Check if walkableStartPoint can traverse to walkableGoal
@@ -846,7 +841,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			// handle also the combo with CC_OBJECT, so we don't have fallthrough problems
 			if (flags & CC_OBJECT && tmp) referer = tmp;
 			pnt = FindOffScreenPoint(referer, flags, ab->size, 0);
-			if (pnt.isnull()) {
+			if (pnt.IsZero()) {
 				pnt = FindOffScreenPoint(referer, flags, ab->size, 1);
 			}
 			break;
@@ -854,20 +849,16 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			if (tmp) Sender=tmp;
 			//fall through
 		case CC_OFFSET://use sender + offset
-			pnt.x = parameters->pointParameter.x + Sender->Pos.x;
-			pnt.y = parameters->pointParameter.y + Sender->Pos.y;
+			pnt = parameters->pointParameter + Sender->Pos;
 			break;
 		default: //absolute point, but -1,-1 means AtFeet
-			pnt.x = parameters->pointParameter.x;
-			pnt.y = parameters->pointParameter.y;
-			if (!pnt.isempty()) break;
+			pnt = parameters->pointParameter;
+			if (!pnt.IsInvalid()) break;
 
 			if (Sender->Type == ST_PROXIMITY || Sender->Type == ST_TRIGGER) {
-				pnt.x = ((InfoPoint *) Sender)->TrapLaunch.x;
-				pnt.y = ((InfoPoint *) Sender)->TrapLaunch.y;
+				pnt = static_cast<InfoPoint*>(Sender)->TrapLaunch;
 			} else {
-				pnt.x = Sender->Pos.x;
-				pnt.y = Sender->Pos.y;
+				pnt = Sender->Pos;
 			}
 			break;
 	}
@@ -922,7 +913,7 @@ void CreateVisualEffectCore(Actor *target, const char *effect, int iterations)
 	}
 }
 
-void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const char *effect, int iterations)
+void CreateVisualEffectCore(const Scriptable *Sender, const Point &position, const char *effect, int iterations)
 {
 	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
@@ -962,7 +953,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 	char Tmp[256];
 
 	if (Sender->CurrentActionTicks<100) {
-		if ( !p.isempty() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
+		if (!p.IsInvalid() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
 			//MoveNearerTo will return 0, if the actor is in move
 			//it will return 1 (the fourth parameter) if the target is unreachable
 			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
@@ -980,7 +971,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 		sprintf( Tmp, "DestroySelf()" );
 	} else {
 		// last parameter is 'face', which should be passed from relevant action parameter..
-		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%hd.%hd],%d)", area, enter.x, enter.y, 0 );
+		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%d.%d],%d)", area, enter.x, enter.y, 0 );
 	}
 	Log(MESSAGE, "GSUtils", "Executing %s in EscapeAreaCore", Tmp);
 	//drop this action, but add another (destroyself or movebetweenareas)
@@ -1043,9 +1034,9 @@ void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest
 	}
 }
 
-static ieResRef PlayerDialogRes = "PLAYERx\0";
+static char PlayerDialogRes[] = "PLAYERx\0";
 
-void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
+void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 {
 	Scriptable* tar = NULL, *scr = NULL;
 
@@ -1088,13 +1079,11 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		return;
 	}
 
-	Actor *speaker, *target;
-
-	speaker = NULL;
-	target = (Actor *) tar;
+	const Actor *speaker = nullptr;
+	Actor *target = (Actor *) tar;
 	bool swap = false;
 	if (scr->Type==ST_ACTOR) {
-		speaker = (Actor *) scr;
+		speaker = (const Actor *) scr;
 		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			StringBuffer buffer;
 			buffer.append("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
@@ -1105,7 +1094,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			return;
 		}
 		//making sure speaker is the protagonist, player, actor
-		Actor *protagonist = core->GetGame()->GetPC(0, false);
+		const Actor *protagonist = core->GetGame()->GetPC(0, false);
 		if (target == protagonist) swap = true;
 		else if (speaker != protagonist && target->InParty) swap = true;
 		//CHECKDIST works only for mobile scriptables
@@ -1160,7 +1149,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// starting a dialog ends cutscenes!
 	core->SetCutSceneMode(false);
 
-	const char* Dialog = NULL;
+	ResRef Dialog;
 	AutoTable pdtable;
 
 	switch (Flags & BD_LOCMASK) {
@@ -1188,10 +1177,10 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		case BD_RESERVED:
 			//what if playerdialog was initiated from Player2?
 			PlayerDialogRes[5] = '1';
-			Dialog = ( const char * ) PlayerDialogRes;
+			Dialog = PlayerDialogRes;
 			break;
 		case BD_INTERACT: //using the source for the dialog
-			Game *game = core->GetGame();
+			const Game *game = core->GetGame();
 			if (game->BanterBlockFlag || game->BanterBlockTime) {
 				Log(MESSAGE, "GameScript", "Banterblock disabled interaction.");
 				Sender->ReleaseCurrentAction();
@@ -1200,8 +1189,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			const char* scriptingname = scr->GetScriptName();
 
 			/* banter dialogue */
-			pdtable.load("interdia");
-			//Dialog is a borrowed reference, and pdtable will be freed automagically
+			pdtable = gamedata->LoadTable("interdia");
 			if (pdtable) {
 				//5 is the magic number for the ToB expansion
 				if (game->Expansion==5) {
@@ -1216,7 +1204,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// moved this here from InitDialog, because InitDialog doesn't know which side is which
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
-	Action *curact = target->GetCurrentAction();
+	const Action *curact = target->GetCurrentAction();
 	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && \
 	  (!curact && target->GetNextAction())) {
 		core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
@@ -1230,16 +1218,24 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Scriptable *tmp = tar;
 			tar = scr;
 			scr = tmp;
-		} else {
-			if (!(Flags & BD_INTERRUPT)) {
-				// added CurrentAction as part of blocking action fixes
-				if (tar->GetCurrentAction() || tar->GetNextAction()) {
-					core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
-					displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
-					Sender->ReleaseCurrentAction();
-					return;
-				}
+		} else if (!(Flags & BD_INTERRUPT)) {
+			// added CurrentAction as part of blocking action fixes
+			if (tar->GetCurrentAction() || tar->GetNextAction()) {
+				core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
+				displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
+				Sender->ReleaseCurrentAction();
+				return;
 			}
+		}
+	}
+
+	// When dialog is initiated in IWD2 it directly clears the action queue of all party members.
+	// Bubb: in this case, and only this case as far as I can tell, it specifically preserves spell actions.
+	if (core->HasFeature(GF_3ED_RULES)) {
+		const Game* game = core->GetGame();
+		for (int i = game->GetPartySize(false) - 1; i >= 0; --i) {
+			Actor *pc = game->GetPC(i, false);
+			pc->ClearActions(2);
 		}
 	}
 
@@ -1295,26 +1291,25 @@ static EffectRef fx_movetoarea_ref = { "MoveToArea", -1 };
 
 bool CreateMovementEffect(Actor* actor, const char *area, const Point &position, int face)
 {
-	if (!strnicmp(area, actor->Area, 8) ) return false; //no need of this for intra area movement
+	if (actor->Area == area) return false; //no need of this for intra area movement
 
 	Effect *fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;
 	fx->SetPosition(position);
-	strnuprcpy(fx->Resource, area, 8);
+	fx->Resource = MakeUpperCaseResRef(area);
 	core->ApplyEffect(fx, actor, actor);
-	delete fx;
 	return true;
 }
 
-void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
+void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust)
 {
 	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %s to %s [%d.%d] face: %d",
-		actor->GetName(0), area,position.x,position.y, face);
+		actor->GetName(0), area.CString(), position.x, position.y, face);
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
 	bool newSong = false;
-	if (area[0] && (!map1 || stricmp(area, map1->GetScriptName()))) { //do we need to switch area?
+	if (!area.IsEmpty() && (!map1 || area != map1->GetScriptName())) { //do we need to switch area?
 		//we have to change the pathfinder
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);
@@ -1326,14 +1321,12 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 
 		// update the worldmap if needed
 		if (actor->InParty) {
-			WorldMap *worldmap = core->GetWorldMap();
+			const WorldMap *worldmap = core->GetWorldMap();
 			unsigned int areaindex;
 			WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
-			if (entry) {
-				// make sure the area is marked as revealed and visited
-				if (!(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-					entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, OP_OR);
-				}
+			// make sure the area is marked as revealed and visited
+			if (entry && !(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
+				entry->SetAreaStatus(WMP_ENTRY_VISIBLE | WMP_ENTRY_VISITED, OP_OR);
 			}
 		}
 	}
@@ -1354,7 +1347,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 
 //repeat movement, until goal isn't reached
 //if int0parameter is !=0, then it will try only x times
-void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee)
+void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flags, bool untilsee)
 {
 	if (Sender->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -1408,18 +1401,17 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 	Sender->ReleaseCurrentAction();
 }
 
-bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
+bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c)
 {
-	//copy the whole resref, including the terminating zero
-	strnuprcpy(item->ItemResRef, resref, 8);
+	item->ItemResRef = resref;
 	if (!core->ResolveRandomItem(item))
 		return false;
 	if (a==-1) {
 		//use the default charge counts of the item
-		Item *origitem = gamedata->GetItem(item->ItemResRef);
+		const Item *origitem = gamedata->GetItem(item->ItemResRef);
 		if (origitem) {
 			for(int i=0;i<3;i++) {
-				ITMExtHeader *e = origitem->GetExtHeader(i);
+				const ITMExtHeader *e = origitem->GetExtHeader(i);
 				item->Usages[i]=e?e->Charges:0;
 			}
 			gamedata->FreeItem(origitem, item->ItemResRef, false);
@@ -1456,9 +1448,9 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
-	Actor *tar = NULL;
+	const Actor *tar = nullptr;
 	if (target->Type==ST_ACTOR) {
-		tar = (Actor *) target;
+		tar = (const Actor *) target;
 
 		// release if target is invisible to sender (because of death or invisbility spell)
 		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
@@ -1478,7 +1470,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	WeaponInfo wi;
 	bool leftorright = false;
-	ITMExtHeader *header = actor->GetWeapon(wi, leftorright);
+	const ITMExtHeader *header = actor->GetWeapon(wi, leftorright);
 	//will return false on any errors (eg, unusable weapon)
 	if (!header || !actor->WeaponIsUsable(leftorright, header)) {
 		actor->StopAttack();
@@ -1494,28 +1486,26 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
 		weaponrange += 10;
 	}
-	if (!(flags&AC_NO_SOUND) ) {
-		if (!Sender->CurrentActionTicks) {
-			// play the battle cry
-			// pick from all 5 possible verbal constants
-			if (!actor->PlayWarCry(5)) {
-				// for monsters also try their 2da/ini file sounds
-				if (!actor->InParty) {
-					ieResRef sound;
-					actor->GetSoundFromFile(sound, 200);
-					core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos.x, actor->Pos.y);
-				}
+	if (!(flags & AC_NO_SOUND) && !Sender->CurrentActionTicks) {
+		// play the battle cry
+		// pick from all 5 possible verbal constants
+		if (!actor->PlayWarCry(5)) {
+			// for monsters also try their 2da/ini file sounds
+			if (!actor->InParty) {
+				ResRef sound;
+				actor->GetSoundFromFile(sound, 200);
+				core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos);
 			}
-			//display attack message
-			if (target->GetGlobalID() != Sender->LastTarget) {
-				displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
-			}
+		}
+		//display attack message
+		if (target->GetGlobalID() != Sender->LastTarget) {
+			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
 		}
 	}
 
-	double angle = atan2(actor->Pos.y - target->Pos.y, actor->Pos.x - target->Pos.x);
+	double angle = AngleFromPoints(actor->Pos, target->Pos);
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-		!WithinPersonalRange(actor, target, weaponrange) ||
+		!WithinPersonalRange(actor, target->Pos, weaponrange) ||
 		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
 		!CanSee(Sender, target, true, 0)) {
 		MoveNearerTo(Sender, target, Feet2Pixels(weaponrange, angle));
@@ -1561,14 +1551,14 @@ inline bool ismysymbol(const char letter)
 static int GetIdsValue(const char *&symbol, const char *idsname)
 {
 	char *newsymbol;
-	int value=strtol(symbol, &newsymbol, 0);
+	int value = strtosigned<int>(symbol, &newsymbol);
 	if (symbol!=newsymbol) {
 		symbol=newsymbol;
 		return value;
 	}
 
 	int idsfile = core->LoadSymbol(idsname);
-	Holder<SymbolMgr> valHook = core->GetSymbol(idsfile);
+	auto valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
 		Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!", idsname, symbol);
 		return -1;
@@ -1592,9 +1582,9 @@ static int ParseIntParam(const char *&src, const char *&str)
 	}
 	if (*str=='*') { //there may be an IDS table
 		str++;
-		ieResRef idsTabName;
+		char idsTabName[9];
 		char *cur = idsTabName;
-		const char *end = idsTabName + sizeof(ieResRef) - 1;
+		const char *end = idsTabName + 9 - 1;
 		while (*str != ',' && *str != ')') {
 			// limit IDS file length to 8 characters
 			 if (cur != end) {
@@ -1610,7 +1600,7 @@ static int ParseIntParam(const char *&src, const char *&str)
 		}
 	}
 	//no IDS table
-	return strtol(src, (char **) &src, 0);
+	return strtosigned<int>(src, (char **) &src);
 }
 
 static void ParseIdsTarget(const char *&src, Object *&object)
@@ -1694,7 +1684,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 	//this flag tells us to merge 2 consecutive strings together to get
 	//a variable (context+variablename)
 	int mergestrings = actionflags[newAction->actionID]&AF_MERGESTRINGS;
-	int objectCount = ( newAction->actionID == 1 ) ? 0 : 1;
+	int objectCount = (newAction->actionID == 1) ? 0 : 1; // only object 2 and 3 are used by actions, 1 being reserved for ActionOverride
 	int stringsCount = 0;
 	int intCount = 0;
 	if (actionflags[newAction->actionID]&AF_DIRECT) {
@@ -1716,9 +1706,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newAction->pointParameter.x = (short) strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.x = strtosigned<int>( src, (char **) &src, 10);
 				src++; //Skip .
-				newAction->pointParameter.y = (short) strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.y = strtosigned<int>( src, (char **) &src, 10);
 				src++; //Skip ]
 				break;
 
@@ -1737,7 +1727,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			break;
 
 			case 'a':
-			//Action
+			// Action - only ActionOverride takes such a parameter
 			{
 				SKIP_ARGUMENT();
 				char action[257];
@@ -1777,7 +1767,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			case 'o': //Object
 				if (objectCount==3) {
 					Log(ERROR, "GSUtils", "Invalid object count!");
-					//abort();
 					delete newAction;
 					return NULL;
 				}
@@ -1834,7 +1823,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					str++;
 					if (*str!='s') {
 						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
-						//abort();
 						delete newAction;
 						return NULL;
 					}
@@ -1901,7 +1889,7 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 	// we deliberately don't try GetLikelyPosition here for now,
 	// maybe a future idea if we have a better implementation
 	// (the old code used it - by passing true not 0 below - when target was a movable)
-	GetPositionFromScriptable(target, p, 0);
+	GetPositionFromScriptable(target, p, false);
 
 	// account for PersonalDistance (which caller uses, but pathfinder doesn't)
 	if (distance && Sender->Type == ST_ACTOR) {
@@ -1932,8 +1920,9 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 	Actor *actor = (Actor *)Sender;
 
 	if (!actor->InMove() || actor->Destination != p) {
-		bool always_run = core->GetGameControl()->ShouldRun(actor);
-		actor->WalkTo(p, always_run ? IF_RUNNING : 0, distance);
+		ieDword flags = core->GetGameControl()->ShouldRun(actor) ? IF_RUNNING : 0;
+		flags |= IF_NORETICLE;
+		actor->WalkTo(p, flags, distance);
 	}
 
 	if (!actor->InMove()) {
@@ -1947,18 +1936,18 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 	return 0;
 }
 
-void FreeSrc(SrcVector *poi, const ieResRef key)
+void FreeSrc(const SrcVector *poi, const ResRef& key)
 {
-	int res = SrcCache.DecRef((void *) poi, key, true);
+	int res = SrcCache.DecRef((const void *) poi, key, true);
 	if (res<0) {
-		error("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: %.8s\n", key);
+		error("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: %.8s\n", key.CString());
 	}
 	if (!res) {
 		delete poi;
 	}
 }
 
-SrcVector *LoadSrc(const ieResRef resname)
+SrcVector *LoadSrc(const ResRef& resname)
 {
 	SrcVector *src = (SrcVector *) SrcCache.GetResource(resname);
 	if (src) {
@@ -1969,37 +1958,48 @@ SrcVector *LoadSrc(const ieResRef resname)
 		return NULL;
 	}
 	ieDword size=0;
-	str->ReadDword(&size);
+	str->ReadDword(size);
 	src = new SrcVector(size);
 	SrcCache.SetAt( resname, (void *) src );
 	while (size--) {
 		ieDword tmp;
-		str->ReadDword(&tmp);
+		str->ReadDword(tmp);
 		src->at(size)=tmp;
-		str->ReadDword(&tmp);
+		str->ReadDword(tmp);
 	}
-	delete ( str );
+	delete str;
 	return src;
 }
 
 // checks the odd HasAdditionalRect / ADDITIONAL_RECT matching
 // also returns true if the trigger is supposed to succeed
+// formats supported by the originals:
+// Normal (disabled) - If either the first or second parameter is negative.
+// Point form: [x.y.range.unused] - If the fourth parameter is negative.
+// Rect form: [left.top.right.bottom] (which we convert to a normal Region on load)
 bool IsInObjectRect(const Point &pos, const Region &rect)
 {
 	if (!HasAdditionalRect) return true;
-	if (rect.w <= 0 || rect.h <= 0) return true;
+	if (rect.x < 0 || rect.y < 0) return true;
+	if (rect.w <= 0) return true;
 
 	// iwd2: testing shows the first point must be 0.0 for matching to work
-	if (core->HasFeature(GF_3ED_RULES) && (rect.x != 0 || rect.y != 0)) {
+	if (core->HasFeature(GF_3ED_RULES) && !rect.origin.IsZero()) {
 		return false;
 	}
 
-	return rect.PointInside(pos);
+	// point or rect?
+	if (rect.h <= 0) {
+		unsigned int range = rect.w;
+		return SquaredDistance(pos, rect.origin) <= range * range;
+	} else {
+		return rect.PointInside(pos);
+	}
 }
 
 #define MEMCPY(a,b) memcpy((a),(b),sizeof(a) )
 
-static Object *ObjectCopy(Object *object)
+static Object *ObjectCopy(const Object *object)
 {
 	if (!object) return NULL;
 	Object *newObject = new Object();
@@ -2010,7 +2010,7 @@ static Object *ObjectCopy(Object *object)
 	return newObject;
 }
 
-Action *ParamCopy(Action *parameters)
+Action *ParamCopy(const Action *parameters)
 {
 	Action *newAction = new Action(true);
 	newAction->actionID = parameters->actionID;
@@ -2026,7 +2026,7 @@ Action *ParamCopy(Action *parameters)
 	return newAction;
 }
 
-Action *ParamCopyNoOverride(Action *parameters)
+Action *ParamCopyNoOverride(const Action *parameters)
 {
 	Action *newAction = new Action(true);
 	newAction->actionID = parameters->actionID;
@@ -2064,9 +2064,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newTrigger->pointParameter.x = (short) strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.x = strtosigned<int>(src, (char **) &src, 10);
 				src++; //Skip .
-				newTrigger->pointParameter.y = (short) strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.y = strtosigned<int>(src, (char **) &src, 10);
 				src++; //Skip ]
 				break;
 
@@ -2130,7 +2130,6 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					str++;
 					if (*str!='s') {
 						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
-						//abort();
 						delete newTrigger;
 						return NULL;
 					}
@@ -2171,171 +2170,113 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 	return newTrigger;
 }
 
-void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value)
+void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const char* Context)
 {
 	char newVarName[8+33];
-
-	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s%s\", %d)", Context, VarName, value);
-
-	strlcpy( newVarName, Context, 7 );
-	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->SetAt( VarName, value, NoCreate );
-		return;
-	}
-	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
-		Sender->locals->SetAt( VarName, value, NoCreate );
-		return;
-	}
-	Game *game = core->GetGame();
-	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
-		game->kaputz->SetAt( VarName, value );
-		return;
-	}
-
-	if (strnicmp(newVarName,"GLOBAL",6) ) {
-		Map *map=game->GetMap(game->FindMap(newVarName));
-		if (map) {
-			map->locals->SetAt( VarName, value, NoCreate);
-		} else if (core->InDebugMode(ID_VARIABLES)) {
-			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
-				Context, VarName);
+	
+	const char *poi = VarName;
+	if (Context == nullptr) {
+		poi = &VarName[6];
+		//some HoW triggers use a : to separate the scope from the variable name
+		if (*poi==':') {
+			poi++;
 		}
+		strlcpy(newVarName, VarName, 7);
 	} else {
-		game->locals->SetAt(VarName, value, NoCreate);
+		strlcpy(newVarName, Context, 7);
 	}
-}
-
-void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
-{
-	char newVarName[8];
-	const char *poi;
-
-	poi = &VarName[6];
-	//some HoW triggers use a : to separate the scope from the variable name
-	if (*poi==':') {
-		poi++;
-	}
-
-	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s\", %d)", VarName, value);
-
-	strlcpy( newVarName, VarName, 7 );
-	if (stricmp( newVarName, "MYAREA" ) == 0) {
+	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s%s\", %d)", Context, VarName, value);
+	
+	if (strnicmp( newVarName, "MYAREA", 6) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (stricmp( newVarName, "LOCALS" ) == 0) {
+	if (strnicmp( newVarName, "LOCALS", 6) == 0) {
 		Sender->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
 	Game *game = core->GetGame();
-	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
+	if (HasKaputz && !strnicmp(newVarName, "KAPUTZ", 6)) {
 		game->kaputz->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (stricmp(newVarName,"GLOBAL") ) {
+	if (strnicmp(newVarName, "GLOBAL", 6) != 0) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
 		} else if (core->InDebugMode(ID_VARIABLES)) {
-			Log(WARNING, "GameScript", "Invalid variable %s in setvariable",
-				VarName);
+			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
+				Context, VarName);
 		}
 	} else {
 		game->locals->SetAt(poi, value, NoCreate);
 	}
 }
 
-ieDword CheckVariable(const Scriptable *Sender, const char *VarName, bool *valid)
+void SetPointVariable(Scriptable *Sender, const char *VarName, const Point &p, const char* Context)
 {
-	char newVarName[8];
-	const char *poi;
-	ieDword value = 0;
-
-	strlcpy( newVarName, VarName, 7 );
-	poi = &VarName[6];
-	//some HoW triggers use a : to separate the scope from the variable name
-	if (*poi==':') {
-		poi++;
-	}
-
-	if (stricmp( newVarName, "MYAREA" ) == 0) {
-		Sender->GetCurrentArea()->locals->Lookup( poi, value );
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
-		return value;
-	}
-	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		Sender->locals->Lookup( poi, value );
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
-		return value;
-	}
-	const Game *game = core->GetGame();
-	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
-		game->kaputz->Lookup( poi, value );
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
-		return value;
-	}
-	if (stricmp(newVarName,"GLOBAL") ) {
-		Map *map=game->GetMap(game->FindMap(newVarName));
-		if (map) {
-			map->locals->Lookup( poi, value);
-		} else {
-			if (valid) {
-				*valid=false;
-			}
-			ScriptDebugLog(ID_VARIABLES, "Invalid variable %s in CheckVariable", VarName);
-		}
-	} else {
-		game->locals->Lookup( poi, value );
-	}
-	ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
-	return value;
+	SetVariable(Sender, VarName, ((p.y & 0xFFFF) << 16) | (p.x & 0xFFFF), Context);
 }
 
 ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
 {
 	char newVarName[8];
+	const char *poi = VarName;
 	ieDword value = 0;
 
-	strlcpy(newVarName, Context, 7);
-	if (stricmp( newVarName, "MYAREA" ) == 0) {
-		Sender->GetCurrentArea()->locals->Lookup( VarName, value );
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
-		return value;
-	}
-	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		if (!Sender->locals->Lookup(VarName, value)) {
-			if (valid) {
-				*valid = false;
-			}
+	if (Context == nullptr) {
+		strlcpy(newVarName, VarName, 7);
+		poi = &VarName[6];
+		//some HoW triggers use a : to separate the scope from the variable name
+		if (*poi==':') {
+			poi++;
 		}
+	} else {
+		strlcpy(newVarName, Context, 7);
+	}
+	
+	if (stricmp(newVarName, "MYAREA") == 0) {
+		Sender->GetCurrentArea()->locals->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
+	
+	if (stricmp( newVarName, "LOCALS" ) == 0) {
+		Sender->locals->Lookup(poi, value);
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
+		return value;
+	}
+	
 	const Game *game = core->GetGame();
-	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
-		game->kaputz->Lookup( VarName, value );
+	if (HasKaputz && !stricmp(newVarName,"KAPUTZ")) {
+		game->kaputz->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
-	if (stricmp(newVarName,"GLOBAL") ) {
-		Map *map=game->GetMap(game->FindMap(newVarName));
+	
+	if (stricmp(newVarName, "GLOBAL") != 0) {
+		const Map *map = game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->locals->Lookup( VarName, value);
+			map->locals->Lookup(poi, value);
 		} else {
-			if (valid) {
-				*valid=false;
-			}
+			if (valid) *valid = false;
 			ScriptDebugLog(ID_VARIABLES, "Invalid variable %s %s in checkvariable", Context, VarName);
 		}
 	} else {
-		game->locals->Lookup( VarName, value );
+		game->locals->Lookup(poi, value);
 	}
 	ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 	return value;
 }
 
+Point CheckPointVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
+{
+	ieDword val = CheckVariable(Sender, VarName, Context, valid);
+	return Point(val & 0xFFFF, val >> 16);
+}
+
 // checks if a variable exists in any context
-bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context)
+bool VariableExists(const Scriptable *Sender, const char *VarName, const char *Context)
 {
 	ieDword value = 0;
 	char newVarName[8];
@@ -2351,81 +2292,42 @@ bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context
 	} else if (game->locals->Lookup(VarName, value)) {
 		return true;
 	} else {
-		Map *map = game->GetMap(game->FindMap(newVarName));
-		if (map) {
-			if (map->locals->Lookup(VarName, value)) {
-				return true;
-			}
+		const Map *map = game->GetMap(game->FindMap(newVarName));
+		if (map && map->locals->Lookup(VarName, value)) {
+			return true;
 		}
 	}
 	return false;
 }
 
-int DiffCore(ieDword a, ieDword b, int diffmode)
+bool DiffCore(ieDword a, ieDword b, int diffMode)
 {
-	switch (diffmode) {
+	switch (diffMode) {
 		case LESS_THAN:
-			if (a<b) {
-				return 1;
-			}
-			break;
+			return a < b;
 		case EQUALS:
-			if (a==b) {
-				return 1;
-			}
-			break;
+			return a == b;
 		case GREATER_THAN:
-			if (a>b) {
-				return 1;
-			}
-			break;
+			return a > b;
 		case GREATER_OR_EQUALS:
-			if (a>=b) {
-				return 1;
-			}
-			break;
+			return a >= b;
 		case NOT_EQUALS:
-			if (a!=b) {
-				return 1;
-			}
-			break;
+			return a != b;
 		case BINARY_LESS_OR_EQUALS:
-			if ((a&b) == a) {
-				return 1;
-			}
-			break;
+			return (a & b) == a;
 		case BINARY_MORE:
-			if ((a&b) != a) {
-				return 1;
-			}
-			break;
+			return (a & b) != a;
 		case BINARY_MORE_OR_EQUALS:
-			if ((a&b) == b) {
-				return 1;
-			}
-			break;
+			return (a & b) == b;
 		case BINARY_LESS:
-			if ((a&b) != b) {
-				return 1;
-			}
-			break;
+			return (a & b) != b;
 		case BINARY_INTERSECT:
-			if (a&b) {
-				return 1;
-			}
-			break;
+			return static_cast<bool>(a & b);
 		case BINARY_NOT_INTERSECT:
-			if (!(a&b)) {
-				return 1;
-			}
-			break;
+			return !(a & b);
 		default: //less or equals
-			if (a<=b) {
-				return 1;
-			}
-			break;
+			return a <= b;
 	}
-	return 0;
 }
 
 int GetGroup(const Actor *actor)
@@ -2517,34 +2419,29 @@ Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
 
 Point GetEntryPoint(const char *areaname, const char *entryname)
 {
-	Point p;
-
-	AutoTable tab("entries");
+	AutoTable tab = gamedata->LoadTable("entries");
 	if (!tab) {
-		return p;
+		return {};
 	}
 	const char *tmpstr = tab->QueryField(areaname, entryname);
-	short x = -1;
-	short y = -1;
-	sscanf(tmpstr, "%hd.%hd", &x, &y);
-	p.x = x;
-	p.y = y;
+	Point p;
+	sscanf(tmpstr, "%d.%d", &p.x, &p.y);
 	return p;
 }
 
 /* returns a spell's casting distance, it depends on the caster (level), and targeting mode too
  the used header is calculated from the caster level */
-unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
+unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable *Sender)
 {
 	unsigned int dist;
 
-	Spell* spl = gamedata->GetSpell( spellres );
+	const Spell* spl = gamedata->GetSpell(spellRes);
 	if (!spl) {
-		Log(ERROR, "GameScript", "Spell couldn't be found:%.8s.", spellres);
+		Log(ERROR, "GameScript", "Spell couldn't be found:%.8s.", spellRes.CString());
 		return 0;
 	}
 	dist = spl->GetCastingDistance(Sender);
-	gamedata->FreeSpell(spl, spellres, false);
+	gamedata->FreeSpell(spl, spellRes, false);
 
 	//make possible special return values (like 0xffffffff means the spell doesn't need distance)
 	//this is used with special targeting mode (3)
@@ -2556,16 +2453,14 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
  the used header is explictly given */
-unsigned int GetItemDistance(const ieResRef itemres, int header)
+unsigned int GetItemDistance(const ResRef& itemres, int header)
 {
-	unsigned int dist;
-
-	Item* itm = gamedata->GetItem( itemres );
+	const Item* itm = gamedata->GetItem(itemres);
 	if (!itm) {
-		Log(ERROR, "GameScript", "Item couldn't be found:%.8s.", itemres);
+		Log(ERROR, "GameScript", "Item couldn't be found:%.8s.", itemres.CString());
 		return 0;
 	}
-	dist=itm->GetCastingDistance(header);
+	unsigned int dist = itm->GetCastingDistance(header);
 	gamedata->FreeItem(itm, itemres, false);
 
 	//make possible special return values (like 0xffffffff means the item doesn't need distance)
@@ -2579,23 +2474,18 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 //read the wish 2da
 void SetupWishCore(Scriptable *Sender, int column, int picks)
 {
-	int count;
-	ieVariable varname;
-	int *selects;
-	int i,j;
-
 	// in the original, picks was at first the number of wish choices to set up,
 	// but then it was hard coded to 5 (and SetupWishObject disused)
 	if (picks == 1) picks = 5;
 
-	AutoTable tm("wish");
+	AutoTable tm = gamedata->LoadTable("wish");
 	if (!tm) {
 		Log(ERROR, "GameScript", "Cannot find wish.2da.");
 		return;
 	}
 
-	selects = (int *) malloc(picks*sizeof(int));
-	count = tm->GetRowCount();
+	int *selects = (int *) malloc(picks*sizeof(int));
+	int count = tm->GetRowCount();
 	// handle the unused SetupWishObject, which passes WIS instead of a column
 	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
 	int cols = tm->GetColumnCount();
@@ -2604,25 +2494,27 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 		if (column == 4) column = RAND(0, 3);
 	}
 
-	for(i=0;i<99;i++) {
+	ieVariable varname;
+	for (int i = 0; i < 99; i++) {
 		snprintf(varname,32, "wishpower%02d", i);
 		if(CheckVariable(Sender, varname, "GLOBAL") ) {
-			SetVariable(Sender, varname, "GLOBAL", 0);
+			SetVariable(Sender, varname, 0, "GLOBAL");
 		}
 	}
 
 	if (count<picks) {
-		for(i=0;i<count;i++) {
+		int i;
+		for (i = 0; i < count; i++) {
 			selects[i]=i;
 		}
 		while(i++<picks) {
 			selects[i]=-1;
 		}
 	} else {
-		for(i=0;i<picks;i++) {
+		for (int i = 0; i < picks; i++) {
 			selects[i]=RAND(0, count-1);
 retry:
-			for(j=0;j<i;j++) {
+			for (int j = 0; j < i; j++) {
 				if(selects[i]==selects[j]) {
 					selects[i]++;
 					goto retry;
@@ -2631,17 +2523,17 @@ retry:
 		}
 	}
 
-	for (i = 0; i < picks; i++) {
+	for (int i = 0; i < picks; i++) {
 		if (selects[i]<0)
 			continue;
 		int spnum = atoi( tm->QueryField( selects[i], column-1 ) );
 		snprintf(varname,32,"wishpower%02d", spnum);
-		SetVariable(Sender, varname, "GLOBAL",1);
+		SetVariable(Sender, varname, 1, "GLOBAL");
 	}
 	free(selects);
 }
 
-void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
+void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, int flag)
 {
 	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
 	if (!anim) {
@@ -2657,17 +2549,11 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
 		}
 		return;
 	}
-	int i;
-	if (flag) {
-		anim->Flags |= A_ANI_ACTIVE;
-		for (i=0; i<anim->animcount; i++) {
-			anim->animation[i]->Flags |= A_ANI_ACTIVE;
-		}
-	} else {
-		anim->Flags &= ~A_ANI_ACTIVE;
-		for (i=0; i<anim->animcount; i++) {
-			anim->animation[i]->Flags &= ~A_ANI_ACTIVE;
-		}
+
+	flag = flag ? OP_OR : OP_NAND;
+	SetBits<ieDword>(anim->Flags, A_ANI_ACTIVE, flag);
+	for (size_t i = 0; i < anim->animation.size(); ++i) {
+		SetBits<ieDword>(anim->animation[i].Flags, A_ANI_ACTIVE, flag);
 	}
 }
 
@@ -2676,7 +2562,7 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
 //read a polygon 2da
 Gem_Polygon *GetPolygon2DA(ieDword index)
 {
-	ieResRef resref;
+	ResRef resRef;
 
 	if (index>=MAX_ISLAND_POLYGONS) {
 		return NULL;
@@ -2688,8 +2574,8 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	if (polygons[index]) {
 		return polygons[index];
 	}
-	snprintf(resref, sizeof(ieResRef), "ISLAND%02d", index);
-	AutoTable tm(resref);
+	resRef.SNPrintF("ISLAND%02d", index);
+	AutoTable tm = gamedata->LoadTable(resRef);
 	if (!tm) {
 		return NULL;
 	}
@@ -2697,16 +2583,14 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	if (!cnt) {
 		return NULL;
 	}
-	Point *p = new Point[cnt];
-
-	int i = cnt;
-	while(i--) {
-		p[i].x = atoi(tm->QueryField(i, 0));
-		p[i].y = atoi(tm->QueryField(i, 1));
+	
+	std::vector<Point> p(cnt);
+	while(cnt--) {
+		p[cnt].x = atoi(tm->QueryField(cnt, 0));
+		p[cnt].y = atoi(tm->QueryField(cnt, 1));
 	}
 
-	polygons[index] = new Gem_Polygon(p, cnt, NULL);
-	delete [] p;
+	polygons[index] = new Gem_Polygon(std::move(p), nullptr);
 	return polygons[index];
 }
 
@@ -2728,26 +2612,27 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 	// abort casting on invisible or dead targets
 	// not all spells should be interrupted on death - some for chunking, some for raising the dead
 	if (Sender->LastSpellTarget) {
-		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
-		if (target) {
-			ieDword state = target->GetStat(IE_STATE_ID);
-			if (state & STATE_DEAD) {
-				if (state & ~(STATE_PETRIFIED|STATE_FROZEN)) {
-					Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
-					if (!spl) return false;
-					SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
-					bool invalidTarget = seh && seh->Target != TARGET_DEAD;
-					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
-					if (invalidTarget) {
-						if (caster->InParty) {
-							core->Autopause(AP_NOTARGET, caster);
-						}
-						caster->SetStance(IE_ANI_READY);
-						return true;
-					}
-				}
-			}
+		const Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
+		if (!target) return false; // shouldn't happen, though perhaps it would be better to return true
+
+		ieDword state = target->GetStat(IE_STATE_ID);
+		if (!(state & STATE_DEAD) || (state & ~(STATE_PETRIFIED | STATE_FROZEN)) != state) {
+			return false;
 		}
+
+		const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
+		if (!spl) return false;
+
+		const SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
+		bool invalidTarget = seh && seh->Target != TARGET_DEAD;
+		gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+		if (!invalidTarget) return false;
+
+		if (caster->InParty) {
+			core->Autopause(AP_NOTARGET, caster);
+		}
+		caster->SetStance(IE_ANI_READY);
+		return true;
 	}
 	return false;
 }
@@ -2755,7 +2640,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 // shared spellcasting action code for casting on scriptables
 void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 {
-	ieResRef spellres = {};
+	ResRef spellResRef;
 	int level = 0;
 	static bool third = core->HasFeature(GF_3ED_RULES);
 
@@ -2767,19 +2652,19 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		ResolveSpellName(spellres, Sender->LastMarkedSpell);
+		ResolveSpellName(spellResRef, Sender->LastMarkedSpell);
 	}
 
 	//resolve spellname
-	if (!spellres[0] && !ResolveSpellName(spellres, parameters)) {
+	if (spellResRef.IsEmpty() && !ResolveSpellName(spellResRef, parameters)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
-		if (!Sender->SpellResRef[0] || stricmp(Sender->SpellResRef, spellres)) {
+		if (Sender->SpellResRef.IsEmpty() || Sender->SpellResRef != spellResRef) {
 			if (Sender->CurrentActionTicks) {
 				Log(WARNING, "GameScript", "SpellCore: Action (%d) lost spell somewhere!", parameters->actionID);
 			}
-			Sender->SetSpellResRef(spellres);
+			Sender->SetSpellResRef(spellResRef);
 		}
 	}
 	if (!Sender->CurrentActionTicks) {
@@ -2802,7 +2687,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 	//parse target
 	int seeflag = 0;
-	unsigned int dist = GetSpellDistance(spellres, Sender);
+	unsigned int dist = GetSpellDistance(spellResRef, Sender);
 	if ((flags&SC_NO_DEAD) && dist != 0xffffffff) {
 		seeflag = GA_NO_DEAD;
 	}
@@ -2825,7 +2710,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, tar->Pos)) {
-				Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				const Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags&SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, tar, dist);
@@ -2847,6 +2732,13 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
 		return;
 	}
+
+	// mark as uninterruptible in the action sense, so further script
+	// updates don't remove the action before the casting is done
+	// the originals or at least iwd2 even marked it as IF_NOINT,
+	// so it also guarded against the ClearActions action
+	// ... but just for the actual spellcasting part
+	Sender->CurrentActionInterruptable = false;
 
 	int duration;
 	if (!parameters->int2Parameter) {
@@ -2879,7 +2771,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	if (Sender->LastSpellTarget) {
 		//if target was set, fire spell
 		Sender->CastSpellEnd(level, flags&SC_INSTANT);
-	} else if(!Sender->LastTargetPos.isempty()) {
+	} else if(!Sender->LastTargetPos.IsInvalid()) {
 		//the target was converted to a point
 		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {
@@ -2893,19 +2785,19 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 // shared spellcasting action code for casting on the ground
 void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 {
-	ieResRef spellres;
+	ResRef spellResRef;
 	int level = 0;
 
 	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
+	if (!ResolveSpellName(spellResRef, parameters)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
-		if (!Sender->SpellResRef[0] || stricmp(Sender->SpellResRef, spellres)) {
+		if (Sender->SpellResRef.IsEmpty() || Sender->SpellResRef != spellResRef) {
 			if (Sender->CurrentActionTicks) {
 				Log(WARNING, "GameScript", "SpellPointCore: Action (%d) lost spell somewhere!", parameters->actionID);
 			}
-			Sender->SetSpellResRef(spellres);
+			Sender->SetSpellResRef(spellResRef);
 		}
 	}
 	if (!Sender->CurrentActionTicks) {
@@ -2922,7 +2814,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 
 	if(Sender->Type==ST_ACTOR) {
-		unsigned int dist = GetSpellDistance(spellres, Sender);
+		unsigned int dist = GetSpellDistance(spellResRef, Sender);
 
 		Actor *act = (Actor *) Sender;
 		//move near to target
@@ -2932,7 +2824,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, parameters->pointParameter)) {
-				Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				const Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags&SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
@@ -2951,6 +2843,13 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
 		return;
 	}
+
+	// mark as uninterruptible in the action sense, so further script
+	// updates don't remove the action before the casting is done
+	// the originals or at least iwd2 even marked it as IF_NOINT,
+	// so it also guarded against the ClearActions action
+	// ... but just for the actual spellcasting part
+	Sender->CurrentActionInterruptable = false;
 
 	int duration;
 	if (!parameters->int2Parameter) {
@@ -2977,7 +2876,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	}
 
-	if(!Sender->LastTargetPos.isempty()) {
+	if(!Sender->LastTargetPos.IsInvalid()) {
 		//if target was set, fire spell
 		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {
@@ -2986,14 +2885,14 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	Sender->ReleaseCurrentAction();
 }
 
-void AddXPCore(Action *parameters, bool divide)
+void AddXPCore(const Action *parameters, bool divide)
 {
 	AutoTable xptable;
 
 	if (core->HasFeature(GF_HAS_EXPTABLE)) {
-		xptable.load("exptable");
+		xptable = gamedata->LoadTable("exptable");
 	} else {
-		xptable.load("xplist");
+		xptable = gamedata->LoadTable("xplist");
 	}
 
 	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
@@ -3016,6 +2915,72 @@ void AddXPCore(Action *parameters, bool divide)
 		core->GetGame()->ShareXP(atoi(xpvalue), 0);
 	}
 	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
+}
+
+int NumItemsCore(Scriptable *Sender, const Trigger *parameters)
+{
+	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!target) {
+		return 0;
+	}
+
+	const Inventory *inventory = nullptr;
+	if (target->Type == ST_ACTOR) {
+		inventory = &(((const Actor *) target)->inventory);
+	} else if (target->Type == ST_CONTAINER) {
+		inventory = &(((const Container *) target)->inventory);
+	}
+	if (!inventory) {
+		return 0;
+	}
+
+	return inventory->CountItems(parameters->string0Parameter, true);
+}
+
+static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
+static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
+unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
+{
+	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!target || target->Type != ST_ACTOR) {
+		return 0;
+	}
+	const Actor *actor = (const Actor *) target;
+
+	unsigned int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
+		bounceCount = 0xFFFFFFFF;
+	} else {
+		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount;
+}
+
+static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
+static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
+int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
+{
+	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!target || target->Type != ST_ACTOR) {
+		return 0;
+	}
+	const Actor *actor = (const Actor *) target;
+
+	unsigned int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
+		bounceCount = 0xFFFFFFFF;
+	} else {
+		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount;
 }
 
 }

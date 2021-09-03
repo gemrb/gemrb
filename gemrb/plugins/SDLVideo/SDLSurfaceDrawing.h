@@ -26,13 +26,15 @@
 #include <cmath>
 
 #include "SDLPixelIterator.h"
+
+#include "System/Logging.h"
 #include "Polygon.h"
 
 namespace GemRB {
 
 static_assert(std::is_trivially_destructible<Point>::value, "Expected Point to be trivially destructable.");
 
-inline bool PointClipped(SDL_Surface* surf, const Point& p)
+inline bool PointClipped(const SDL_Surface* surf, const Point& p)
 {
 	if (p.x < 0 || p.x >= surf->w) {
 		return true;
@@ -47,7 +49,7 @@ inline bool PointClipped(SDL_Surface* surf, const Point& p)
 
 #if SDL_VERSION_ATLEAST(1,3,0)
 template<typename T>
-inline const SDL_Rect& RectFromRegion(T&& rgn)
+inline const SDL_Rect& RectFromRegion(T& rgn)
 {
 	return reinterpret_cast<const SDL_Rect&>(rgn);
 }
@@ -64,7 +66,7 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 {
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to
 
-	p = Clamp(p, clip.Origin(), clip.Maximum());
+	p = Clamp(p, clip.origin, clip.Maximum());
 	if (PointClipped(dst, p)) return;
 
 	Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
@@ -86,7 +88,7 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 template<SHADER SHADE = SHADER::NONE>
 void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& srcc)
 {
-	SDL_PixelFormat* fmt = surface->format;
+	const SDL_PixelFormat* fmt = surface->format;
 	SDL_LockSurface( surface );
 
 	std::vector<Point>::const_iterator it;
@@ -158,7 +160,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 				}
 				break;
 			default:
-				Log(ERROR, "sprite_t", "Working with unknown pixel format: %s", SDL_GetError());
+				ERROR_UNKNOWN_BPP;
 				break;
 		}
 	}
@@ -167,7 +169,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 }
 
 template<SHADER SHADE = SHADER::NONE>
-void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, const Color& color)
+void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, const Color& color)
 {
 	assert(clip.x >= 0 && clip.w <= dst->w);
 	assert(clip.y >= 0 && clip.h <= dst->h);
@@ -199,8 +201,8 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 	if (SHADE != SHADER::NONE) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
 		r.h = 1;
-		SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
-		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+		auto dstit = MakeSDLPixelIterator(dst, r.Intersect(clip));
+		auto dstend = SDLPixelIterator::end(dstit);
 		
 		if (SHADE == SHADER::TINT) {
 			const static TintDst<false> blender;
@@ -219,7 +221,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 }
 
 template<SHADER SHADE = SHADER::NONE>
-inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& clip, const Color& color)
+inline void DrawVLineSurface(SDL_Surface* dst, Point p, int y2, const Region& clip, const Color& color)
 {
 	assert(clip.x >= 0 && clip.w <= dst->w);
 	assert(clip.y >= 0 && clip.h <= dst->h);
@@ -243,8 +245,8 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	r.w = 1;
-	SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
-	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+	auto dstit = MakeSDLPixelIterator(dst, r.Intersect(clip));
+	auto dstend = SDLPixelIterator::end(dstit);
 
 	if (SHADE == SHADER::BLEND) {
 		const static OneMinusSrcA<false, false> blender;
@@ -374,14 +376,14 @@ void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Poi
 		s_points.clear();
 		s_points.resize(poly->Count()*2); // resize, not reserve! (it wont shrink the capacity FYI)
 
-		const Point& p = poly->vertices[0] - poly->BBox.Origin() + origin;
+		const Point& p = poly->vertices[0] - poly->BBox.origin + origin;
 		s_points[0].x = p.x;
 		s_points[0].y = p.y;
 
 		size_t j = 1;
 		for (size_t i = 1; i < poly->Count(); ++i, j+=2) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
-			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
+			const Point& p = poly->vertices[i] - poly->BBox.origin + origin;
 			s_points[j].x = p.x;
 			s_points[j].y = p.y;
 			s_points[j+1] = s_points[j];

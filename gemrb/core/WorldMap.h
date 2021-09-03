@@ -38,6 +38,15 @@
 
 namespace GemRB {
 
+/** this is the physical order the links appear in WMPAreaEntry */
+enum class WMPDirection {
+	NONE = -1,
+	NORTH = 0,
+	WEST = 1,
+	SOUTH = 2,
+	EAST = 3
+};
+
 /** Area is visible on WorldMap */
 #define WMP_ENTRY_VISIBLE    0x1
 /** Area is visible on WorldMap only when party is in adjacent area */
@@ -51,13 +60,6 @@ namespace GemRB {
 /** Area can be passed through when travelling directly to some more distant area on WorldMap */
 #define WMP_ENTRY_PASSABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED)
 
-/** this is the physical order the links appear in WMPAreaEntry */
-typedef enum ieDirectionType {
-	WMP_NORTH=0,
-	WMP_WEST=1,
-	WMP_SOUTH=2, 
-	WMP_EAST=3
-} ieDirectionType;
 
 /**
  * @class WMPAreaEntry
@@ -68,7 +70,7 @@ class GEM_EXPORT WMPAreaEntry {
 public:
 	WMPAreaEntry();
 	~WMPAreaEntry();
-	ieDword GetAreaStatus();
+	ieDword GetAreaStatus() const;
 	void SetAreaStatus(ieDword status, int op);
 
 	//! return the map icon of this location. Free the sprite afterwards.
@@ -85,14 +87,14 @@ private:
 	bool SingleFrame;
 
 public:
-	ieResRef AreaName;
-	ieResRef AreaResRef;
+	ResRef AreaName;
+	ResRef AreaResRef;
 	ieVariable AreaLongName;
 	ieDword IconSeq;
 	Point pos;
 	ieStrRef LocCaptionName;
 	ieStrRef LocTooltipName;
-	ieResRef LoadScreenResRef;
+	ResRef LoadScreenResRef;
 	ieDword AreaLinksIndex[4];
 	ieDword AreaLinksCount[4];
 };
@@ -107,7 +109,7 @@ struct WMPAreaLink {
 	ieVariable DestEntryPoint;
 	ieDword DistanceScale;
 	ieDword DirectionFlags; //where will the player appear on dest. area
-	ieResRef EncounterAreaResRef[5];
+	ResRef EncounterAreaResRef[5];
 	ieDword EncounterChance;
 };
 
@@ -122,14 +124,14 @@ public:
 	WorldMap();
 	~WorldMap();
 public: //struct members
-	ieResRef MapResRef;
+	ResRef MapResRef;
 	ieDword Width;
 	ieDword Height;
 	ieDword MapNumber;
 	ieStrRef AreaName;
 	ieDword unknown1;
 	ieDword unknown2;
-	ieResRef MapIconResRef;
+	ResRef MapIconResRef;
 	ieDword Flags;
 
 	AnimationFactory *bam;
@@ -139,70 +141,66 @@ private: //non-struct members
 	std::vector< WMPAreaLink*> area_links;
 	int *Distances;
 	int *GotHereFrom;
-	int encounterArea;
+	size_t encounterArea;
 public:
 	void SetMapIcons(AnimationFactory *bam);
 	Holder<Sprite2D> GetMapMOS() const { return MapMOS; }
 	void SetMapMOS(Holder<Sprite2D> newmos);
 	int GetEntryCount() const { return (int) area_entries.size(); }
-	WMPAreaEntry *GetEntry(unsigned int index) { return area_entries[index]; }
+	WMPAreaEntry *GetEntry(unsigned int index) const { return area_entries[index]; }
 	int GetLinkCount() const { return (int) area_links.size(); }
 	WMPAreaLink *GetLink(unsigned int index) const { return area_links[index]; }
-	WMPAreaEntry *GetNewAreaEntry() const;
 	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
-	void InsertAreaLink(unsigned int idx, unsigned int dir, WMPAreaLink *arealink);
-	void SetAreaLink(unsigned int index, WMPAreaLink *arealink);
+	void InsertAreaLink(unsigned int idx, unsigned int dir, const WMPAreaLink *arealink);
+	void SetAreaLink(unsigned int index, const WMPAreaLink *arealink);
 	void AddAreaEntry(WMPAreaEntry *ae);
 	void AddAreaLink(WMPAreaLink *al);
 	/** Calculates the distances from A, call this when first on an area */
-	int CalculateDistances(const ieResRef A, int direction);
+	int CalculateDistances(const ResRef& A, int direction);
 	/** Returns the precalculated distance to area B */
-	int GetDistance(const ieResRef A) const;
+	int GetDistance(const ResRef& A) const;
 	/** Returns the link between area A and area B */
-	WMPAreaLink *GetLink(const ieResRef A, const ieResRef B) const;
+	WMPAreaLink *GetLink(const ResRef& A, const ResRef& B) const;
 	/** Returns the area link we will fall into if we head in B direction */
 	/** If the area name differs it means we are in a random encounter */
-	WMPAreaLink *GetEncounterLink(const ieResRef B, bool &encounter) const;
+	WMPAreaLink *GetEncounterLink(const ResRef& B, bool &encounter) const;
 	/** Sets area status */
-	void SetAreaStatus(const ieResRef, int Bits, int Op);
+	void SetAreaStatus(const ResRef&, int Bits, int Op) const;
 	/** Gets area pointer and index from area name.
 	 * also called from WorldMapArray to find the right map	*/
-	WMPAreaEntry* GetArea(const ieResRef AreaName, unsigned int &i) const;
+	WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i) const;
 	/** Finds an area name closest to the given area */
-	WMPAreaEntry* FindNearestEntry(const ieResRef AreaName, unsigned int &i) const;
-	void SetEncounterArea(const ieResRef area, WMPAreaLink *link);
+	WMPAreaEntry* FindNearestEntry(const ResRef& areaName, unsigned int &i) const;
+	void SetEncounterArea(const ResRef& area, const WMPAreaLink *link);
 	void ClearEncounterArea();
 private:
 	/** updates visibility of adjacent areas, called from CalculateDistances */
-	void UpdateAreaVisibility(const ieResRef AreaName, int direction);
+	void UpdateAreaVisibility(const ResRef& areaName, int direction);
 	/** internal function to calculate the distances from areaindex */
 	void CalculateDistance(int areaindex, int direction);
 	unsigned int WhoseLinkAmI(int link_index) const;
 	/** update reachable areas from worlde.2da */
-	void UpdateReachableAreas();
+	void UpdateReachableAreas() const;
 };
 
 class GEM_EXPORT WorldMapArray {
-public:
-	WorldMapArray(unsigned int count);
-	~WorldMapArray();
-	void SetWorldMap(WorldMap *m, unsigned int index);
 private:
-	WorldMap **all_maps;
-	unsigned int MapCount;
-	unsigned int CurrentMap;
-	bool single;
+	mutable std::vector<WorldMap> maps; // FIXME: our constness is all screwed up
+	size_t CurrentMap = 0;
+	bool single = true;
 public:
+	explicit WorldMapArray(size_t count);
+
 	bool IsSingle() const { return single; }
 	void SetSingle(bool arg) { single = arg; }
-	unsigned int GetMapCount() const { return MapCount; }
-	unsigned int GetCurrentMapIndex() const { return CurrentMap; }
-	WorldMap *NewWorldMap(unsigned int index);
-	WorldMap *GetWorldMap(unsigned int index) const { return all_maps[index]; }
-	WorldMap *GetCurrentMap() const { return all_maps[CurrentMap]; }
-	void SetWorldMap(unsigned int index);
-	void SetCurrentMap(unsigned int index) { CurrentMap = index; }
-	unsigned int FindAndSetCurrentMap(const ieResRef area);
+	size_t GetMapCount() const { return maps.size(); }
+	size_t GetCurrentMapIndex() const { return CurrentMap; }
+	WorldMap *NewWorldMap(size_t index);
+	WorldMap *GetWorldMap(size_t index) const { return &maps[index]; }
+	WorldMap *GetCurrentMap() const { return &maps[CurrentMap]; }
+	void SetWorldMap(size_t index);
+	void SetCurrentMap(size_t index) { CurrentMap = index; }
+	size_t FindAndSetCurrentMap(const ResRef& area);
 };
 
 }

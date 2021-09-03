@@ -36,21 +36,19 @@ namespace GemRB {
 // IP's ACM files
 class ACMReader : public SoundMgr {
 private:
-	int samples_left; // count of unread samples
-	int levels, subblocks;
-	int block_size;
-	int* block, * values;
-	int samples_ready;
-	CValueUnpacker* unpacker; // ACM-stream unpacker
-	CSubbandDecoder* decoder; // IP's subband decoder
+	int samples_left = 0; // count of unread samples
+	int levels = 0;
+	int subblocks = 0;
+	int block_size = 0;
+	int* block = nullptr;
+	int* values = nullptr;
+	int samples_ready = 0;
+	CValueUnpacker* unpacker = nullptr; // ACM-stream unpacker
+	CSubbandDecoder* decoder = nullptr; // IP's subband decoder
 
 	int make_new_samples();
 public:
-	ACMReader()
-		: samples_left(0), levels(0), subblocks(0), block_size(0), block(NULL), values(NULL),
-		samples_ready( 0 ), unpacker( NULL ), decoder( NULL )
-	{
-	}
+	ACMReader() = default;
 	~ACMReader() override
 	{
 		Close();
@@ -68,7 +66,7 @@ public:
 		}
 	}
 
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 	int read_samples(short* buffer, int count) override;
 };
 

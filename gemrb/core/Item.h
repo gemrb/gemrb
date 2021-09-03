@@ -132,12 +132,11 @@ struct DMGOpcodeInfo {
 class GEM_EXPORT ITMExtHeader {
 public:
 	ITMExtHeader();
-	~ITMExtHeader();
 	ieByte AttackType;
 	ieByte IDReq;
 	ieByte Location;
 	ieByte AltDiceSides = 0;
-	ieResRef UseIcon;
+	ResRef UseIcon;
 	ieStrRef Tooltip;
 	ieByte Target;
 	ieByte TargetNumber;
@@ -155,7 +154,6 @@ public:
 	ieWord DiceThrown;
 	ieWordSigned DamageBonus; //this must be signed!!!
 	ieWord DamageType;
-	ieWord FeatureCount;
 	ieWord FeatureOffset;
 	ieWord Charges;
 	ieWord ChargeDepletion;
@@ -164,7 +162,7 @@ public:
 	ieWord MeleeAnimation[3];
 	//this value is set in projectiles and launchers too
 	int ProjectileQualifier; //this is a derived value determined on load time
-	Effect *features;
+	std::vector<Effect*> features;
 };
 
 /**
@@ -175,23 +173,22 @@ public:
 class GEM_EXPORT Item {
 public:
 	Item();
-	~Item();
 
-	ITMExtHeader *ext_headers;
-	Effect *equipping_features;
-	ieResRef Name; //the resref of the item itself!
+	std::vector<ITMExtHeader> ext_headers;
+	std::vector<Effect*> equipping_features;
+	ResRef Name; //the resref of the item itself!
 
 	ieStrRef ItemName;
 	ieStrRef ItemNameIdentified;
-	ieResRef ReplacementItem;
+	ResRef ReplacementItem;
 	ieDword Flags;
 	ieWord ItemType;
 	ieDword UsabilityBitmask;
 	char AnimationType[2];
 	ieByte MinLevel;
-	ieByte unknown1;
+	ieByte unknown1; // ee docs say it's part of MinLevel read as a word, so useless
 	ieByte MinStrength;
-	ieByte unknown2;
+	ieByte unknown2; // ee docs say it's part of MinStrength read as a word, so useless
 	ieByte MinStrengthBonus;
 	//kit1
 	ieByte MinIntelligence;
@@ -203,26 +200,25 @@ public:
 	ieByte MinConstitution;
 	ieByte WeaProf;
 	ieByte MinCharisma;
-	ieByte unknown3;
+	ieByte unknown3; // ee docs say it's part of MinCharisma read as a word, so useless
 	ieDword KitUsability;
 	ieDword Price;
 	ieWord MaxStackAmount;
-	ieResRef ItemIcon;
+	ResRef ItemIcon;
 	ieWord LoreToID;
-	ieResRef GroundIcon;
+	ResRef GroundIcon;
 	ieDword Weight;
 	ieStrRef ItemDesc;
 	ieStrRef ItemDescIdentified;
-	ieResRef DescriptionIcon;
+	ResRef DescriptionIcon;
 	ieDword Enchantment;
 	ieDword ExtHeaderOffset;
-	ieWord ExtHeaderCount;
 	ieDword FeatureBlockOffset;
 	ieWord EquippingFeatureOffset;
 	ieWord EquippingFeatureCount;
 
 	// PST and BG2 only
-	ieResRef Dialog;
+	ResRef Dialog;
 	ieStrRef DialogName;
 
 	// PST only
@@ -261,14 +257,14 @@ public:
 
 	//returns the requested extended header
 	//-1 will return melee weapon header, -2 the ranged one
-	ITMExtHeader *GetExtHeader(int which) const
+	const ITMExtHeader *GetExtHeader(int which) const
 	{
 		if(which < 0)
 			return GetWeaponHeader(which == -2) ;
-		if(ExtHeaderCount<=which) {
+		if (int(ext_headers.size()) <= which) {
 			return NULL;
 		}
-		return ext_headers+which;
+		return &ext_headers[which];
 	}
 	ieDword GetWieldedGradient() const
 	{
@@ -284,9 +280,9 @@ public:
 	//this stuff is not item specific, could be moved elsewhere
 	Effect *BuildGlowEffect(int gradient) const;
 	//returns the average damage of the weapon (doesn't check for special effects)
-	int GetDamagePotential(bool ranged, ITMExtHeader *&header) const;
+	int GetDamagePotential(bool ranged, const ITMExtHeader *&header) const;
 	//returns the weapon header
-	ITMExtHeader *GetWeaponHeader(bool ranged) const;
+	const ITMExtHeader *GetWeaponHeader(bool ranged) const;
 	int GetWeaponHeaderNumber(bool ranged) const;
 	int GetEquipmentHeaderNumber(int cnt) const;
 	unsigned int GetCastingDistance(int header) const;

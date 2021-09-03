@@ -20,9 +20,12 @@
 
 #include "Window.h"
 
-#include "GUI/GUIScriptInterface.h"
 #include "Interface.h"
 #include "ScrollBar.h"
+
+#include "GUI/GUIScriptInterface.h"
+
+#include <utility>
 
 namespace GemRB {
 
@@ -81,9 +84,10 @@ bool Window::HasFocus() const
 	return manager.GetFocusWindow() == this;
 }
 
-bool Window::DisplayModal(WindowManager::ModalShadow shadow)
+bool Window::DisplayModal(ModalShadow shadow)
 {
-	return manager.PresentModalWindow(this, shadow);
+	modalShadow = shadow;
+	return manager.PresentModalWindow(this);
 }
 
 /** Add a Control in the Window */
@@ -119,9 +123,8 @@ void Window::SubviewRemoved(View* subview, View* parent)
 	if (subview->ContainsView(focusView)) {
 		focusView->DidUnFocus();
 		focusView = NULL;
-		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-			Control* ctrl = *c;
-			if (TrySetFocus(ctrl) == ctrl) {
+		for (auto control : Controls) {
+			if (TrySetFocus(control) == control) {
 				break;
 			}
 		}
@@ -168,7 +171,7 @@ const VideoBufferPtr& Window::DrawWithoutComposition()
 
 void Window::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
-	backBuffer->SetOrigin(frame.Origin());
+	backBuffer->SetOrigin(frame.origin);
 	core->GetVideoDriver()->PushDrawingBuffer(backBuffer);
 }
 
@@ -243,7 +246,7 @@ bool Window::IsDisabledCursor() const
 void Window::SetPosition(WindowPosition pos)
 {
 	// start at top left
-	Region newFrame(Point(), frame.Dimensions());
+	Region newFrame(Point(), frame.size);
 	Size screen = manager.ScreenSize();
 
 	// adjust horizontal
@@ -262,11 +265,10 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::RedrawControls(const char* VarName, unsigned int Sum)
+void Window::RedrawControls(const char* VarName, Control::value_t val) const
 {
-	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-		Control* ctrl = *c;
-		ctrl->UpdateState( VarName, Sum);
+	for (auto ctrl : Controls) {
+		ctrl->UpdateState(VarName, val);
 	}
 }
 
@@ -307,8 +309,7 @@ bool Window::HitTest(const Point& p) const
 	bool hit = View::HitTest(p);
 	if (hit == false){
 		// check the control list. we could make View::HitTest optionally recursive, but this is cheaper
-		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-			Control* ctrl = *c;
+		for (const auto ctrl : Controls) {
 			if (ctrl->IsVisible() && ctrl->View::HitTest(ctrl->ConvertPointFromWindow(p))) {
 				hit = true;
 				break;
@@ -325,7 +326,7 @@ void Window::SetAction(Responder handler, const ActionKey& key)
 
 bool Window::PerformAction(const ActionKey& key)
 {
-	auto& handler = eventHandlers[key.Value()];
+	const auto& handler = eventHandlers[key.Value()];
 	if (handler) {
 		(handler)(this);
 		return true;
@@ -474,7 +475,7 @@ bool Window::DispatchEvent(const Event& event)
 	View* target = NULL;
 
 	if (event.type == Event::TextInput) {
-		focusView->TextInput(event.text);
+		if (focusView) focusView->TextInput(event.text);
 		return true;
 	}
 
@@ -528,9 +529,15 @@ bool Window::DispatchEvent(const Event& event)
 			}
 			return true;
 		default:
+			bool reset = false;
+			if (event.type == Event::MouseDown && event.mouse.button == GEM_MB_MENU) {
+				reset = true;
+			}
 			if (target == NULL) {
 				target = this;
+				if (reset) core->ResetActionBar();
 			} else if (target->IsDisabled()) {
+				if (reset) core->ResetActionBar();
 				return true; // we still absorb the event
 			}
 			break;
@@ -560,8 +567,7 @@ bool Window::DispatchEvent(const Event& event)
 	
 bool Window::InActionHandler() const
 {
-	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-		Control* ctrl = *c;
+	for (const auto ctrl : Controls) {
 		if (ctrl->IsExecutingResponseHandler()) {
 			return true;
 		}
@@ -583,11 +589,11 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
 		HotKeys.erase(it);
 	}
 
-	HotKeys[key] = cb;
+	HotKeys[key] = std::move(cb);
 	return true;
 }
 
-bool Window::UnRegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
+bool Window::UnRegisterHotKeyCallback(const EventMgr::EventCallback& cb, KeyboardKey key)
 {
 	KeyMap::iterator it = HotKeys.find(key);
 	if (it != HotKeys.end() && FunctionTargetsEqual(it->second, cb)) {
@@ -602,7 +608,7 @@ bool Window::OnMouseDrag(const MouseEvent& me)
 	assert(me.buttonStates);
 	// dragging the window to a new position. only happens with left mouse.
 	if (IsDragable()) {
-		Point newOrigin = frame.Origin() - me.Delta();
+		Point newOrigin = frame.origin - me.Delta();
 		SetFrameOrigin(newOrigin);
 	} else {
 		ScrollView::OnMouseDrag(me);
@@ -638,7 +644,7 @@ bool Window::OnControllerButtonDown(const ControllerEvent& ce)
 	return View::OnControllerButtonDown(ce);
 }
 	
-ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ResRef group)
+ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new WindowScriptingRef(this, id, group);
 }

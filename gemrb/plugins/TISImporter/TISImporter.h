@@ -33,10 +33,10 @@ private:
 	ieDword TilesSectionLen = 0;
 	ieDword TileSize = 0;
 public:
-	TISImporter(void);
+	TISImporter() = default;
 	~TISImporter(void) override;
 	bool Open(DataStream* stream) override;
-	Tile* GetTile(unsigned short* indexes, int count,
+	Tile* GetTile(const std::vector<ieWord>& indexes,
 		unsigned short* secondary = NULL) override;
 	Holder<Sprite2D> GetTile(int index);
 public:

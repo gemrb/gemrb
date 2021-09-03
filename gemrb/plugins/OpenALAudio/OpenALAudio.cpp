@@ -26,6 +26,11 @@
 #include <cassert>
 #include <cstdio>
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace GemRB;
 
 template <typename TO, typename FROM>
@@ -68,11 +73,11 @@ static void showALCError(const char* msg, log_level level, ALCdevice *device) {
 	}
 }
 
-void OpenALSoundHandle::SetPos(int XPos, int YPos) {
+void OpenALSoundHandle::SetPos(const Point& p) {
 	if (!parent) return;
 
 	ALfloat SourcePos[] = {
-		(float) XPos, (float) YPos, 0.0f
+		float(p.x), float(p.y), 0.0f
 	};
 
 	alSourcefv(parent->Source, AL_POSITION, SourcePos);
@@ -99,7 +104,7 @@ void OpenALSoundHandle::StopLooping() {
 	checkALError("Unable to stop audio loop", WARNING);
 }
 
-void AudioStream::ClearProcessedBuffers()
+void AudioStream::ClearProcessedBuffers() const
 {
 	ALint processed = 0;
 	alGetSourcei( Source, AL_BUFFERS_PROCESSED, &processed );
@@ -176,23 +181,18 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	MusicSource = num_streams = 0;
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
 	ambim = NULL;
-	stayAlive = false;
 	hasReverbProperties = false;
-#ifdef HAVE_OPENAL_EFX_H
-	hasEFX = false;
-	efxEffectSlot = efxEffect = 0;
 	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));
 	reverbProperties.reverbDisabled = true;
-#endif
 }
 
-void OpenALAudioDriver::PrintDeviceList ()
+void OpenALAudioDriver::PrintDeviceList() const
 {
-	char *deviceList;
+	const char *deviceList;
 
 	if (alcIsExtensionPresent(nullptr, (const ALchar*) "ALC_ENUMERATION_EXT") == AL_TRUE) { // try out enumeration extension
 		Log(MESSAGE, "OpenAL", "Usable audio output devices:");
-		deviceList = (char *)alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+		deviceList = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
 
 		while(deviceList && *deviceList) {
 			Log(MESSAGE,"OpenAL", "Devices: %s", deviceList);
@@ -239,8 +239,6 @@ bool OpenALAudioDriver::Init(void)
 
 	Log(MESSAGE, "OpenAL", "Allocated %d streams.%s",
 		num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ));
-
-	stayAlive = true;
 
 	musicThread = std::thread(&OpenALAudioDriver::MusicManager, this);
 
@@ -376,7 +374,7 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	delete ambim;
 }
 
-ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_length)
+ALuint OpenALAudioDriver::loadSound(const char *ResRef, tick_t &time_length)
 {
 	ALuint Buffer = 0;
 
@@ -438,11 +436,10 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	return Buffer;
 }
 
-Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int channel, int XPos, int YPos,
-	unsigned int flags, unsigned int *length)
+Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int channel, const Point& p,
+	unsigned int flags, tick_t *length)
 {
 	ALuint Buffer;
-	unsigned int time_length;
 
 	if (ResRef == NULL || !ResRef[0]) {
 		if((flags & GEM_SND_SPEECH) && (speech.Source && alIsSource(speech.Source))) {
@@ -454,6 +451,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 		return Holder<SoundHandle>();
 	}
 
+	tick_t time_length;
 	Buffer = loadSound( ResRef, time_length );
 	if (Buffer == 0) {
 		return Holder<SoundHandle>();
@@ -464,7 +462,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 	}
 
 	ALfloat SourcePos[] = {
-		(float) XPos, (float) YPos, 0.0f
+		float(p.x), float(p.y), 0.0f
 	};
 	ALfloat SourceVel[] = {
 		0.0f, 0.0f, 0.0f
@@ -534,7 +532,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 	ieDword efxSetting;
 	core->GetDictionary()->Lookup("Environmental Audio", efxSetting);
 
-	if (efxSetting && hasReverbProperties && ((0 != XPos && 0 != YPos) || (flags & GEM_SND_RELATIVE))) {
+	if (efxSetting && hasReverbProperties && (!p.IsZero() || (flags & GEM_SND_RELATIVE))) {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, efxEffectSlot, 0, 0);
 	} else {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, 0, 0, 0);
@@ -550,8 +548,8 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 		return Holder<SoundHandle>();
 	}
 
-	stream->handle = new OpenALSoundHandle(stream);
-	return stream->handle.get();
+	stream->handle = MakeHolder<OpenALSoundHandle>(stream);
+	return Holder<SoundHandle>(stream->handle.get()); // TODO: we need something like static_ptr_cast
 }
 
 void OpenALAudioDriver::UpdateVolume(unsigned int flags)
@@ -651,12 +649,12 @@ bool OpenALAudioDriver::Resume()
 	return true;
 }
 
-int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
+int OpenALAudioDriver::CreateStream(std::shared_ptr<SoundMgr> newMusic)
 {
 	std::lock_guard<std::recursive_mutex> l(musicMutex);
 
 	// Free old MusicReader
-	MusicReader = newMusic;
+	MusicReader = std::move(newMusic);
 	if (!MusicReader) {
 		MusicPlaying = false;
 	}
@@ -696,19 +694,18 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 	return 0;
 }
 
-void OpenALAudioDriver::UpdateListenerPos(int XPos, int YPos )
+void OpenALAudioDriver::UpdateListenerPos(const Point& p)
 {
-	alListener3f( AL_POSITION, (float) XPos, (float) YPos, LISTENER_HEIGHT );
+	alListener3f(AL_POSITION, p.x, p.y, LISTENER_HEIGHT);
 	checkALError("Unable to update listener position.", WARNING);
 }
 
-void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
+Point OpenALAudioDriver::GetListenerPos()
 {
 	ALfloat listen[3];
 	alGetListenerfv( AL_POSITION, listen );
-	if (checkALError("Unable to get listener pos", ERROR)) return;
-	XPos = (int) listen[0];
-	YPos = (int) listen[1];
+	if (checkALError("Unable to get listener pos", ERROR)) return {};
+	return Point(listen[0], listen[1]);
 }
 
 bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
@@ -771,7 +768,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	return stream;
 }
 
-int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
+tick_t OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 {
 	if (streams[stream].free || !streams[stream].ambient)
 		return -1;
@@ -784,7 +781,7 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 	if (sound == 0)
 		return 0;
 
-	unsigned int time_length;
+	tick_t time_length;
 	ALuint Buffer = loadSound(sound, time_length);
 	if (0 == Buffer) {
 		return -1;
@@ -889,7 +886,6 @@ ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits) const
 int OpenALAudioDriver::MusicManager(void* arg)
 {
 	OpenALAudioDriver* driver = (OpenALAudioDriver*) arg;
-	ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;
 	while (driver->stayAlive) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(30));
@@ -913,9 +909,9 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					// ensure that MusicSource has no buffers attached by passing "NULL" buffer
 					alSourcei(driver->MusicSource, AL_BUFFER, 0);
 					checkALError("Unable to detach buffers from music source.", WARNING);
-					for (int i = 0; i < MUSICBUFFERS; i++) {
+					for (unsigned int buffer : driver->MusicBuffer) {
 						driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
-						alBufferData( driver->MusicBuffer[i], AL_FORMAT_STEREO16,
+						alBufferData(buffer, AL_FORMAT_STEREO16,
 							driver->music_memory, ACM_BUFFERSIZE,
 							driver->MusicReader->get_samplerate() );
 					}
@@ -952,7 +948,6 @@ int OpenALAudioDriver::MusicManager(void* arg)
 				return -1;
 			}
 			if (processed > 0) {
-				buffersreturned += processed;
 				while (processed) {
 					ALuint BufferID;
 					alSourceUnqueueBuffers( driver->MusicSource, 1, &BufferID );
@@ -1026,7 +1021,7 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 // Private Methods
 // !!!!!!!!!!!!!!!
 
-int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
+int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer) const
 {
 #ifdef DEBUG_AUDIO
 	ALint frequency, bits, channels;
@@ -1064,12 +1059,11 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
 	return GEM_OK;
 }
 
-#ifdef HAVE_OPENAL_EFX_H
 void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
 	if (hasEFX) {
 		mapReverb.getReverbProperties(reverbProperties);
 		hasReverbProperties = true;
-
+#ifdef HAVE_OPENAL_EFX_H
 		alDeleteEffects(1, &efxEffect);
 		alGenEffects(1, &efxEffect);
 
@@ -1094,11 +1088,12 @@ void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
 		}
 
 		alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
+#endif
 	}
 }
-#else
-void OpenALAudioDriver::UpdateMapAmbient(MapReverb&) {
-}
+
+#ifdef __clang__
+#pragma clang diagnostic pop
 #endif
 
 #include "plugindef.h"

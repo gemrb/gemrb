@@ -88,21 +88,9 @@ ResRef ResRefFromPy(PyObject* obj) {
 	return ResRef();
 }
 
-Holder<TableMgr> GetTable(PyObject* obj) {
-	Holder<TableMgr> tm;
-
-	PyObject* id = PyObject_GetAttrString(obj, "ID");
-	if (!id) {
-		RuntimeError("Invalid Table reference, no ID attribute.");
-	} else {
-		tm = gamedata->GetTable( PyInt_AsLong( id ) );
-	}
-	return tm;
-}
-
-Holder<SymbolMgr> GetSymbols(PyObject* obj)
+std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj)
 {
-	Holder<SymbolMgr> sm;
+	std::shared_ptr<SymbolMgr> sm;
 
 	PyObject* id = PyObject_GetAttrString(obj, "ID");
 	if (!id) {
@@ -130,31 +118,17 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 #if PY_MAJOR_VERSION >= 3
 PyStringWrapper PyString_AsString(PyObject* obj)
 {
-	PyStringWrapper wrap;
-	if (PyUnicode_Check(obj)) {
-		PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, core->SystemEncoding, "strict"); // Owned reference
-		if (temp_bytes != NULL) {
-			wrap.str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-			wrap.obj = temp_bytes; // needs to outlive our use of wrap.str
-		} else { // raw data... probalby this if for our "state" font
-			PyErr_Clear();
-			wrap.str = PyUnicode_AS_DATA(obj);
-		}
-	} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
-		wrap.str = PyBytes_AS_STRING(obj);
-	}
-	return wrap;
+	return PyStringWrapper(obj, core->SystemEncoding);
 }
 #endif
 
 // Like PyString_FromString(), but for ResRef
-PyObject* PyString_FromResRef(const ieResRef& ResRef)
+PyObject* PyString_FromResRef(const ResRef& resRef)
 {
-	size_t i = strnlen(ResRef,sizeof(ieResRef));
-	return PyString_FromStringAndSize( ResRef, i );
+	size_t i = strnlen(resRef.CString(), 9);
+	return PyString_FromStringAndSize(resRef.CString(), i);
 }
 
-// Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromAnimID(const char* AnimID)
 {
 	unsigned int i = strnlen(AnimID,2);

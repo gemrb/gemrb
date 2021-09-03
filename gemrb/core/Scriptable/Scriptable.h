@@ -77,7 +77,7 @@ class Sprite2D;
 //#define TRAP_ENEMY	 16 // "trap set off by enemy" in NI, unused
 #define TRAP_TUTORIAL	 32 //active only when in tutorial mode
 #define TRAP_NPC	64 // "trap set off by NPC"
-//#define TRAP_SILENT	128 // "trigger silent", unused
+#define TRAP_SILENT	128 // "trigger silent" / "no string", used in pst
 #define TRAP_DEACTIVATED  256
 #define _TRAVEL_NONPC      512
 #define _TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)
@@ -132,8 +132,8 @@ class Sprite2D;
 #define MAX_BUMP_BACK_TRIES 16
 #define MAX_RAND_WALK 10
 
-typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
-ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
+using ScriptableType = enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
+	ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 };
 
 enum {
 	trigger_acquired = 0x1, // unused and broken in the original
@@ -214,7 +214,7 @@ enum {
 };
 
 struct TriggerEntry {
-	TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0), flags(0) { }
+	explicit TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0), flags(0) { }
 	TriggerEntry(unsigned short id, ieDword p1) : triggerID(id), param1(p1), param2(0), flags(0) { }
 	TriggerEntry(unsigned short id, ieDword p1, ieDword p2) : triggerID(id), param1(p1), param2(p2), flags(0) { }
 
@@ -224,105 +224,106 @@ struct TriggerEntry {
 	unsigned int flags;
 };
 
-//typedef std::list<ieDword *> TriggerObjects;
+//using TriggerObjects = std::list<ieDword *>;
 
 //#define SEA_RESET		0x00000002
 //#define SEA_PARTY_REQUIRED	0x00000004
 
 class GEM_EXPORT Scriptable {
 public:
-	Scriptable(ScriptableType type);
+	explicit Scriptable(ScriptableType type);
 	virtual ~Scriptable(void);
 private:
-	unsigned long WaitCounter;
+	tick_t WaitCounter = 0;
 	std::map<ieDword,ieDword> script_timers;
-	ieDword globalID;
+	ieDword globalID = 0;
 protected: //let Actor access this
 	std::list<TriggerEntry> triggers;
-	Map *area;
+	Map *area = nullptr;
 	ieVariable scriptName;
-	ieDword InternalFlags; //for triggers
-	ieResRef Dialog;
+	ieDword InternalFlags = 0; // for triggers
+	ResRef Dialog;
 	std::list< Action*> actionQueue;
-	Action* CurrentAction;
+	Action* CurrentAction = nullptr;
 
 	// Variables for overhead text.
-	Point overHeadTextPos;
-	bool overheadTextDisplaying;
-	unsigned long timeStartDisplaying;
+	Point overHeadTextPos = Point(-1, -1);
+	bool overheadTextDisplaying = false;
+	tick_t timeStartDisplaying = 0;
 	String OverheadText;
 public:
 	Region BBox;
 	// State relating to the currently-running action.
-	int CurrentActionState;
-	ieDword CurrentActionTarget;
-	bool CurrentActionInterruptable;
-	ieDword CurrentActionTicks;
+	int CurrentActionState = 0;
+	ieDword CurrentActionTarget = 0;
+	bool CurrentActionInterruptable = true;
+	ieDword CurrentActionTicks = 0;
 
 	// The number of times this was updated.
-	ieDword Ticks;
+	ieDword Ticks = 0;
 	// The same, after adjustment for being slowed/hasted.
-	ieDword AdjustedTicks;
+	ieDword AdjustedTicks = 0;
 	// The number of times UpdateActions() was run.
-	ieDword ScriptTicks;
+	ieDword ScriptTicks = 0;
 	// The number of times since UpdateActions() tried to do anything.
-	ieDword IdleTicks;
+	ieDword IdleTicks = 0;
 	// The number of ticks since the last spellcast
-	ieDword AuraTicks;
+	ieDword AuraTicks = 0;
 	// The countdown for forced activation by triggers.
-	ieDword TriggerCountdown;
+	ieDword TriggerCountdown = 0;
 
 	Variables* locals;
-	ScriptableType Type;
+	ScriptableType Type = ST_ACTOR;
 	Point Pos;
 
-	ieStrRef DialogName;
+	ieStrRef DialogName = 0;
 
-	GameScript* Scripts[MAX_SCRIPTS];
-	int scriptlevel;
+	GameScript* Scripts[MAX_SCRIPTS] = {};
+	int scriptlevel = 0;
 
-	ieDword UnselectableTimer;
+	ieDword UnselectableTimer = 0;
 
 	// Stored objects.
-	ieDword LastAttacker;
-	ieDword LastCommander;
-	ieDword LastProtector;
-	ieDword LastProtectee;
-	ieDword LastTargetedBy;
-	ieDword LastHitter;
-	ieDword LastHelp;
-	ieDword LastTrigger;
-	ieDword LastSeen;
-	ieDword LastTalker;
-	ieDword LastHeard;
-	ieDword LastSummoner;
-	ieDword LastFollowed; // gemrb extension (LeaderOf)
-	ieDword LastMarked; // iwd2
+	ieDword LastAttacker = 0;
+	ieDword LastCommander = 0;
+	ieDword LastProtector = 0;
+	ieDword LastProtectee = 0;
+	ieDword LastTargetedBy = 0;
+	ieDword LastHitter = 0;
+	ieDword LastHelp = 0;
+	ieDword LastTrigger = 0;
+	ieDword LastSeen = 0;
+	ieDword LastTalker = 0;
+	ieDword LastHeard = 0;
+	ieDword LastSummoner = 0;
+	ieDword LastFollowed = 0; // gemrb extension (LeaderOf)
+	ieDword LastMarked = 0; // iwd2
 	ieDword MyTarget = 0; // iwd2, has nothing to do with LastTarget
 
-	int LastMarkedSpell; // iwd2
+	int LastMarkedSpell = 0; // iwd2
 
 	// this is used by GUIScript :(
-	ieDword LastSpellOnMe;  //Last spell cast on this scriptable
+	ieDword LastSpellOnMe = 0xffffffff;  // Last spell cast on this scriptable
 
-	ieDword LastTarget, LastSpellTarget;
-	ieDword LastTargetPersistent; // gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
+	ieDword LastTarget = 0;
+	ieDword LastSpellTarget = 0;
+	ieDword LastTargetPersistent = 0; // gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
 	Point LastTargetPos;
-	int SpellHeader;
-	ieResRef SpellResRef;
-	bool InterruptCasting;
+	int SpellHeader = 0;
+	ResRef SpellResRef;
+	bool InterruptCasting = false;
 public:
 	/** Gets the Dialog ResRef */
-	const char* GetDialog(void) const
+	ResRef GetDialog() const
 	{
 		return Dialog;
 	}
-	void SetDialog(const char *resref);
+	void SetDialog(const ResRef &resref);
 	void SetFloatingText(char*);
-	void SetScript(const ieResRef aScript, int idx, bool ai=false);
-	void SetSpellResRef(ieResRef resref);
-	void SetWait(unsigned long time);
-	unsigned long GetWait() const;
+	void SetScript(const ResRef &aScript, int idx, bool ai = false);
+	void SetSpellResRef(const ResRef& resref);
+	void SetWait(tick_t time);
+	tick_t GetWait() const;
 	void LeftDialog();
 	void Interrupt();
 	void NoInterrupt();
@@ -353,8 +354,8 @@ public:
 	Action* GetCurrentAction() const { return CurrentAction; }
 	Action* GetNextAction() const;
 	Action* PopNextAction();
-	void ClearActions();
-	virtual void Stop();
+	void ClearActions(int skipFlags = 0);
+	virtual void Stop(int flags = 0);
 	virtual void ReleaseCurrentAction();
 	bool InMove() const;
 	void ProcessActions();
@@ -363,7 +364,7 @@ public:
 	void ClearTriggers();
 	void AddTrigger(TriggerEntry trigger);
 	void SetLastTrigger(ieDword triggerID, ieDword globalID);
-	bool MatchTrigger(unsigned short id, ieDword param = 0);
+	bool MatchTrigger(unsigned short id, ieDword param = 0) const;
 	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0) const;
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
 	void SendTriggerToAll(TriggerEntry entry);
@@ -371,13 +372,13 @@ public:
 	void DrawOverheadText();
 	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
-	int CanCast(const ieResRef SpellRef, bool verbose = true);
+	int CanCast(const ResRef& SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
-	void SpellcraftCheck(const Actor *caster, const ieResRef SpellRef);
+	void SpellcraftCheck(const Actor *caster, const ResRef& spellRef);
 	/* internal spellcasting shortcuts */
-	void DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete);
-	void DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpellPoint(const Point &target, const ResRef& spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpell(Scriptable *target, const ResRef& spellref, int level, int no_stance, bool deplete);
 	/* actor/scriptable casts spell */
 	int CastSpellPoint( const Point &Target, bool deplete, bool instant = false, bool nointerrupt = false );
 	int CastSpell( Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false );
@@ -395,16 +396,16 @@ private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant, Scriptable *target = NULL);
 	/* also part of the spellcasting process, creating the projectile */
-	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
+	void CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
-	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
+	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster);
 	void ResetCastingState(Actor* caster);
-	void DisplaySpellCastMessage(ieDword tgt, Spell *spl);
+	void DisplaySpellCastMessage(ieDword tgt, const Spell *spl);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {
 public:
-	Selectable(ScriptableType type);
+	explicit Selectable(ScriptableType type);
 public:
 	ieWord Selected; //could be 0x80 for unselectable
 	bool Over;
@@ -425,7 +426,7 @@ public:
 
 class GEM_EXPORT Highlightable : public Scriptable {
 public:
-	Highlightable(ScriptableType type);
+	explicit Highlightable(ScriptableType type);
 	virtual int TrapResets() const = 0;
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
@@ -434,22 +435,25 @@ public:
 	Color outlineColor;
 	ieDword Cursor;
 	bool Highlight;
-	Point TrapLaunch;
+	Point TrapLaunch = Point(-1, -1);
 	ieWord TrapDetectionDiff;
 	ieWord TrapRemovalDiff;
 	ieWord Trapped;
 	ieWord TrapDetected;
-	ieResRef KeyResRef;
+	ResRef KeyResRef;
 	//play this wav file when stepping on the trap (on PST)
-	ieResRef EnterWav;
+	ResRef EnterWav;
 public:
 	bool IsOver(const Point &Place) const;
 	void DrawOutline(Point origin) const;
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const
 	{
-		if (KeyResRef[0]) return KeyResRef;
-		return NULL;
+		if (KeyResRef.IsEmpty()) {
+			return nullptr;
+		} else {
+			return KeyResRef.CString();
+		}
 	}
 	void SetTrapDetected(int x);
 	void TryDisarm(const Actor *actor);
@@ -460,7 +464,7 @@ public:
 	bool VisibleTrap(int only_detected) const;
 	//returns true if trap has been triggered, tumble skill???
 	virtual bool TriggerTrap(int skill, ieDword ID);
-	bool TryUnlock(Actor *actor, bool removekey);
+	bool TryUnlock(Actor *actor, bool removekey) const;
 };
 
 class GEM_EXPORT Movable : public Selectable {
@@ -493,10 +497,10 @@ public:
 	{
 		randomBackoff--;
 	}
-	Movable(ScriptableType type);
+	explicit Movable(ScriptableType type);
 	~Movable(void) override;
 	Point Destination;
-	ieResRef Area;
+	ResRef Area;
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
@@ -535,7 +539,7 @@ public:
 
 	void SetStance(unsigned int arg);
 	void SetOrientation(int value, bool slow);
-	void SetAttackMoveChances(ieWord *amc);
+	void SetAttackMoveChances(const ieWord *amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, bool noBackAway);
@@ -544,7 +548,7 @@ public:
 	void MoveLine(int steps, ieDword Orient);
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
-	void Stop() override;
+	void Stop(int flags = 0) override;
 	void ClearPath(bool resetDestination = true);
 
 	/* returns the most likely position of this actor */
@@ -564,7 +568,7 @@ public:
 
 public:
 	ieVariable Name;
-	ieResRef Tileset; //or wed door ID?
+	ResRef Tileset; //or wed door ID?
 	ieDword Flags;
 	unsigned short* opentiles;
 	ieDword opencount;

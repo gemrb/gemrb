@@ -30,114 +30,44 @@
 #include "Plugin.h"
 #include "System/String.h"
 
+#include <unordered_map>
+
 namespace GemRB {
 
 /** Resource reference */
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!
- This type is deprecated
- Use the ResRef class wrapper
-!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-typedef char ieResRef[9];
-
-// safely copies a ResRef (ie. nulls out the unused buffer size)
-inline void CopyResRef(ieResRef& d, const ieResRef s)
-{
-	strncpy(d, s, sizeof(ieResRef) - 1);
-	d[sizeof(ieResRef) - 1] = '\0';
-}
-
 class DataStream;
 
-/* Hopefully we can slowly replace the char array version with this struct... */
-struct ResRef {
-private:
+// ResRef is case insensitive, but the originals weren't always
+// in some cases we need lower/upper case for save compatibility with originals
+// so we provide factories the create ResRef with the required case
+inline ResRef MakeLowerCaseResRef(const char* str) {
+	if (!str) return ResRef();
+
 	char ref[9];
-private:
-	void Clear() {
-		memset(ref, 0, sizeof(ref));
-	}
-public:
-	ResRef() {
-		Clear();
-	}
+	strnlwrcpy(ref, str, sizeof(ref) - 1);
+	return ResRef(ref);
+}
 
-	ResRef(const char* str) {
-		operator=(str);
-	};
+inline ResRef MakeUpperCaseResRef(const char* str) {
+	if (!str) return ResRef();
 
-	ResRef(const ResRef& rhs) {
-		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
-	}
+	char ref[9];
+	strnuprcpy(ref, str, sizeof(ref) - 1);
+	return ResRef(ref);
+}
 
-	ResRef& operator=(const ResRef& rhs) {
-		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
-		return *this;
-	}
-	
-	ResRef& operator=(const char* str) {
-		if (str == NULL) {
-			Clear();
-		} else {
-			// using strnlwrcpy: this wrapper is case insensitive,
-			// but many older functions (taking ieResRef) will "convert" it to a cstring where it is no longer proper case
-			// typically this shouldnt matter, but some older code was lowercasing their ieResRefs
-			strnlwrcpy(ref, str, sizeof(ref)-1 );
-			ref[sizeof(ref)-1] = '\0';
-		}
-		
-		return *this;
-	}
+inline bool IsStar(const ResRef& resref) {
+	return resref[0] == '*';
+}
 
-	struct Hash
-	{
-		size_t operator() (const ResRef &) const;
-	};
-	friend struct Hash;
-
-	bool IsEmpty() {
-		return (ref[0] == '\0');
-	}
-
-	const char* CString() const { return ref; }
-
-	operator const char*() const {
-		return (ref[0] == '\0') ? NULL : ref;
-	}
-
-	// Case insensitive
-	bool operator<(const ResRef& rhs) const {
-		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) < 0;
-	};
-
-	bool operator==(const ResRef& rhs) const {
-		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) == 0;
-	};
-	
-	bool operator==(const char* str) const {
-		return strnicmp(ref, str, sizeof(ref)-1) == 0;
-	};
-};
+template <typename T>
+using ResRefMap = std::unordered_map<ResRef, T, CstrHashCI<ResRef>>;
 
 /**
  * Base class for all GemRB resources
  */
 
-class GEM_EXPORT Resource : public Plugin {
-protected:
-	DataStream* str;
-public:
-	Resource();
-	~Resource() override;
-	/**
-	 * Reads the resource from the given stream.
-	 *
-	 * This should only be called once for a given resource object.
-	 * @param[in] stream Non-NULL Stream containg the resource
-	 * @retval true stream contains the given resource.
-	 * @retval false stream does not contain valid resource.
-	 */
-	virtual bool Open(DataStream* stream) = 0;
-};
+using Resource = ImporterBase;
 
 }
 

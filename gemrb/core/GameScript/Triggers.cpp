@@ -32,12 +32,13 @@
 #include "GameData.h"
 #include "Polygon.h"
 #include "TableMgr.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "GUI/GameControl.h"
-#include "math.h" //needs for acos
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+
+#include <cmath>
 
 namespace GemRB {
 
@@ -259,7 +260,7 @@ int GameScript::IsTeamBitOn(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::NearbyDialog(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *target = Sender->GetCurrentArea()->GetActorByDialog(parameters->string0Parameter);
+	const Scriptable *target = Sender->GetCurrentArea()->GetScriptableByDialog(parameters->string0Parameter);
 	if ( !target ) {
 		return 0;
 	}
@@ -291,7 +292,7 @@ int GameScript::IsValidForPartyDialog(Scriptable *Sender, const Trigger *paramet
 	//don't accept parties with the no interrupt flag
 	//this fixes bug #2573808 on gamescript level
 	//(still someone has to turn the no interrupt flag off)
-	if(!target->GetDialog(GD_CHECK)) {
+	if (target->GetDialog(GD_CHECK).IsEmpty()) {
 		return 0;
 	}
 	return CanSee( Sender, target, false, GA_NO_DEAD|GA_NO_UNSCHEDULED );
@@ -506,7 +507,7 @@ int GameScript::BitCheck(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && value & parameters->int0Parameter) return 1;
 	return 0;
 }
@@ -515,7 +516,7 @@ int GameScript::BitCheckExact(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
 		ieDword tmp = (ieDword) parameters->int0Parameter ;
 		if ((value & tmp) == tmp) return 1;
@@ -529,7 +530,7 @@ int GameScript::BitGlobal_Trigger(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
 		HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
 		if (value!=0) return 1;
@@ -541,10 +542,10 @@ int GameScript::GlobalOrGlobal_Trigger(Scriptable *Sender, const Trigger *parame
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid);
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
 		if (value1) return 1;
-		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid);
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && value2) return 1;
 	}
 	return 0;
@@ -554,9 +555,9 @@ int GameScript::GlobalAndGlobal_Trigger(Scriptable *Sender, const Trigger *param
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter, &valid );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && value1) {
-		ieDword value2 = CheckVariable( Sender, parameters->string1Parameter, &valid );
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && value2) return 1;
 	}
 	return 0;
@@ -566,9 +567,9 @@ int GameScript::GlobalBAndGlobal_Trigger(Scriptable *Sender, const Trigger *para
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && (value1 & value2) != 0) return 1;
 	}
 	return 0;
@@ -578,9 +579,9 @@ int GameScript::GlobalBAndGlobalExact(Scriptable *Sender, const Trigger *paramet
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && (value1 & value2) == value2) return 1;
 	}
 	return 0;
@@ -590,9 +591,9 @@ int GameScript::GlobalBitGlobal_Trigger(Scriptable *Sender, const Trigger *param
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid) {
 			HandleBitMod( value1, value2, parameters->int1Parameter);
 			if (value1!=0) return 1;
@@ -614,7 +615,7 @@ int GameScript::Xor(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && (value ^ parameters->int0Parameter) != 0) return 1;
 	return 0;
 }
@@ -674,9 +675,9 @@ int GameScript::Global(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
-	if (valid) {
-		if ( value == parameters->int0Parameter ) return 1;
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
+	if (valid && value == parameters->int0Parameter) {
+		return 1;
 	}
 	return 0;
 }
@@ -691,7 +692,7 @@ int GameScript::GlobalLT(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && value < parameters->int0Parameter) return 1;
 	return 0;
 }
@@ -706,7 +707,7 @@ int GameScript::GlobalGT(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && value > parameters->int0Parameter) return 1;
 	return 0;
 }
@@ -715,9 +716,9 @@ int GameScript::GlobalLTGlobal(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && value1 < value2) return 1;
 	}
 	return 0;
@@ -727,9 +728,9 @@ int GameScript::GlobalGTGlobal(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && value1 > value2) return 1;
 	}
 	return 0;
@@ -927,31 +928,6 @@ int GameScript::NumItemsPartyLT(Scriptable */*Sender*/, const Trigger *parameter
 	return cnt<parameters->int0Parameter;
 }
 
-int GameScript::NumItems(Scriptable *Sender, const Trigger *parameters)
-{
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar) {
-		return 0;
-	}
-
-	const Inventory *inv = nullptr;
-	switch (tar->Type) {
-		case ST_ACTOR:
-			inv = &(((const Actor *) tar)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(((const Container *) tar)->inventory);
-			break;
-		default:;
-	}
-	if (!inv) {
-		return 0;
-	}
-
-	int cnt = inv->CountItems(parameters->string0Parameter, true);
-	return cnt==parameters->int0Parameter;
-}
-
 int GameScript::TotalItemCnt(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
@@ -974,29 +950,22 @@ int GameScript::TotalItemCntExclude(Scriptable *Sender, const Trigger *parameter
 	return cnt==parameters->int0Parameter;
 }
 
+int GameScript::NumItems(Scriptable *Sender, const Trigger *parameters)
+{
+	int num = NumItemsCore(Sender, parameters);
+	return num == parameters->int0Parameter;
+}
+
 int GameScript::NumItemsGT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar) {
-		return 0;
-	}
+	int num = NumItemsCore(Sender, parameters);
+	return num > parameters->int0Parameter;
+}
 
-	const Inventory *inv = NULL;
-	switch (tar->Type) {
-		case ST_ACTOR:
-			inv = &(((const Actor *) tar)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(((const Container *) tar)->inventory);
-			break;
-		default:;
-	}
-	if (!inv) {
-		return 0;
-	}
-
-	int cnt = inv->CountItems(parameters->string0Parameter, true);
-	return cnt>parameters->int0Parameter;
+int GameScript::NumItemsLT(Scriptable *Sender, const Trigger *parameters)
+{
+	int num = NumItemsCore(Sender, parameters);
+	return num < parameters->int0Parameter;
 }
 
 int GameScript::TotalItemCntGT(Scriptable *Sender, const Trigger *parameters)
@@ -1019,31 +988,6 @@ int GameScript::TotalItemCntExcludeGT(Scriptable *Sender, const Trigger *paramet
 	const Actor *actor = (const Actor *) tar;
 	int cnt = actor->inventory.CountItems("", true) - actor->inventory.CountItems(parameters->string0Parameter, true); //shall we count heaps or not?
 	return cnt>parameters->int0Parameter;
-}
-
-int GameScript::NumItemsLT(Scriptable *Sender, const Trigger *parameters)
-{
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar) {
-		return 0;
-	}
-
-	const Inventory *inv = nullptr;
-	switch (tar->Type) {
-		case ST_ACTOR:
-			inv = &(((const Actor *) tar)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(((const Container *) tar)->inventory);
-			break;
-		default:;
-	}
-	if (!inv) {
-		return 0;
-	}
-
-	int cnt = inv->CountItems(parameters->string0Parameter, true);
-	return cnt<parameters->int0Parameter;
 }
 
 int GameScript::TotalItemCntLT(Scriptable *Sender, const Trigger *parameters)
@@ -1077,7 +1021,7 @@ int GameScript::Contains(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Container *cnt = (const Container *) tar;
-	if (HasItemCore(&cnt->inventory, parameters->string0Parameter, parameters->int0Parameter)) {
+	if (HasItemCore(&cnt->inventory, ResRef(parameters->string0Parameter), parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -1085,7 +1029,7 @@ int GameScript::Contains(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::StoreHasItem(Scriptable */*Sender*/, const Trigger *parameters)
 {
-	return StoreHasItemCore(parameters->string0Parameter, parameters->string1Parameter);
+	return StoreHasItemCore(ResRef(parameters->string0Parameter), ResRef(parameters->string1Parameter));
 }
 
 //the int0 parameter is an addition, normally it is 0
@@ -1106,7 +1050,7 @@ int GameScript::HasItem(Scriptable *Sender, const Trigger *parameters)
 		default:
 			break;
 	}
-	if (inventory && HasItemCore(inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
+	if (inventory && HasItemCore(inventory, ResRef(parameters->string0Parameter), parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
@@ -1125,7 +1069,7 @@ int GameScript::ItemIsIdentified(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	if (HasItemCore(&actor->inventory, parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
+	if (HasItemCore(&actor->inventory, ResRef(parameters->string0Parameter), IE_INV_ITEM_IDENTIFIED) ) {
 		return 1;
 	}
 	return 0;
@@ -1213,7 +1157,7 @@ int GameScript::PartyHasItem(Scriptable * /*Sender*/, const Trigger *parameters)
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		if (HasItemCore(&actor->inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
+		if (HasItemCore(&actor->inventory, ResRef(parameters->string0Parameter), parameters->int0Parameter) ) {
 			return 1;
 		}
 	}
@@ -1510,7 +1454,7 @@ int GameScript::PersonalSpaceDistance(Scriptable *Sender, const Trigger *paramet
 		return 0;
 	}
 
-	if (WithinPersonalRange(scr, Sender, parameters->int0Parameter)) {
+	if (WithinPersonalRange(scr, Sender->Pos, parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -1578,8 +1522,8 @@ int GameScript::AtLocation( Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		return 0;
 	}
-	if ( (tar->Pos.x==parameters->pointParameter.x) &&
-		(tar->Pos.y==parameters->pointParameter.y) ) {
+	// NOTE: this is very strict — keep it in mind if any script has problem with this action
+	if (tar->Pos == parameters->pointParameter) {
 		return 1;
 	}
 	return 0;
@@ -1594,22 +1538,20 @@ int GameScript::NearLocation(Scriptable *Sender, const Trigger *parameters)
 	if (!scr) {
 		return 0;
 	}
-	if (parameters->pointParameter.isnull()) {
-		int distance;
+	if (parameters->pointParameter.IsZero()) {
+		Point p;
 		if (parameters->int0Parameter < 0) { // use Sender's position
-			distance = PersonalDistance(Sender, scr);
+			p = Sender->Pos;
 		} else {
-			Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
-			distance = PersonalDistance(p, scr);
+			p = Point(parameters->int0Parameter, parameters->int1Parameter);
 		}
-		if (distance <= (parameters->int2Parameter * VOODOO_NEARLOC_F)) {
+		if (WithinPersonalRange(scr, p, parameters->int2Parameter)) {
 			return 1;
 		}
 		return 0;
 	}
 	//personaldistance is needed for modron constructs in PST maze
-	int distance = PersonalDistance(parameters->pointParameter, scr);
-	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
+	if (WithinPersonalRange(scr, parameters->pointParameter, parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -1631,12 +1573,11 @@ int GameScript::NearSavedLocation(Scriptable *Sender, const Trigger *parameters)
 	if ((signed) actor->GetStat(IE_SAVEDXPOS) <= 0 && (signed) actor->GetStat(IE_SAVEDYPOS) <= 0) {
 		p = actor->HomeLocation;
 	} else {
-		p.x = (short) actor->GetStat(IE_SAVEDXPOS);
-		p.y = (short) actor->GetStat(IE_SAVEDYPOS);
+		p.x = actor->GetStat(IE_SAVEDXPOS);
+		p.y = actor->GetStat(IE_SAVEDYPOS);
 	}
 	// should this be PersonalDistance?
-	int distance = Distance(p, Sender);
-	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
+	if (WithinRange(Sender, p, parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -1739,20 +1680,26 @@ int GameScript::IsOverMe(Scriptable *Sender, const Trigger *parameters)
 	const Highlightable *trap = (Highlightable *) Sender;
 
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-	int ret = 0;
+	ieDword ret = 0;
 	if (tgts) {
 		targetlist::iterator m;
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
 			const Actor *actor = (Actor *) tt->actor;
 			if (trap->IsOver(actor->Pos)) {
-				ret = 1;
+				ret = actor->GetGlobalID();
 				break;
 			}
 			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		}
 	}
 	delete tgts;
+
+	// manually set LastTrigger, since IsOverMe is not in svtriobj
+	if (ret != 0) {
+		Sender->LastTrigger = ret;
+		ret = 1;
+	}
 	return ret;
 }
 
@@ -1798,7 +1745,7 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::CreatureHidden(Scriptable *Sender, const Trigger *parameters)
 {
-	Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
 	if (!target) {
 		return 0;
 	}
@@ -2236,10 +2183,10 @@ int GameScript::SetSpellTarget(Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
 		scr->LastSpellTarget = 0;
-		scr->LastTargetPos.empty();
+		scr->LastTargetPos = Point(-1, -1);
 		return 1;
 	}
-	scr->LastTargetPos.empty();
+	scr->LastTargetPos = Point(-1, -1);
 	scr->LastSpellTarget = tar->GetGlobalID();
 	return 1;
 }
@@ -2417,37 +2364,21 @@ int GameScript::NumCreaturesGTMyLevel(Scriptable *Sender, const Trigger *paramet
 
 int GameScript::NumCreatureVsParty(Scriptable *Sender, const Trigger *parameters)
 {
-	//creating object on the spot
-	Object *obj = parameters->objectParameter;
-	if (!obj) {
-		obj = new Object();
-	}
-	int value = GetObjectCount(Sender, obj);
-	if (!obj->isNull()) obj->Release();
+	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value == parameters->int0Parameter;
 }
 
 int GameScript::NumCreatureVsPartyGT(Scriptable *Sender, const Trigger *parameters)
 {
-	Object *obj = parameters->objectParameter;
-	if (!obj) {
-		obj = new Object();
-	}
-	int value = GetObjectCount(Sender, obj);
-	if (!obj->isNull()) obj->Release();
+	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value > parameters->int0Parameter;
 }
 
 int GameScript::NumCreatureVsPartyLT(Scriptable *Sender, const Trigger *parameters)
 {
-	Object *obj = parameters->objectParameter;
-	if (!obj) {
-		obj = new Object();
-	}
-	int value = GetObjectCount(Sender, obj);
-	if (!obj->isNull()) obj->Release();
+	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value < parameters->int0Parameter;
 }
@@ -2821,9 +2752,9 @@ int GameScript::CurrentAreaIs(Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		return 0;
 	}
-	ieResRef arearesref;
-	snprintf(arearesref, 8, "AR%04d", parameters->int0Parameter);
-	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, 8)) {
+	ResRef arearesref;
+	arearesref.SNPrintF("AR%04d", parameters->int0Parameter);
+	if (arearesref == tar->GetCurrentArea()->GetScriptName()) {
 		return 1;
 	}
 	return 0;
@@ -2838,14 +2769,13 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		return 0;
 	}
-	ieResRef arearesref;
+	ResRef arearesref;
 	if (parameters->string0Parameter[0]) {
-		strnlwrcpy(arearesref, parameters->string0Parameter, 8);
+		arearesref = parameters->string0Parameter;
 	} else {
-		strnlwrcpy(arearesref, "AR30", 8); //InWatchersKeep
+		arearesref = "ar30"; //InWatchersKeep
 	}
-	size_t i = strlen(arearesref);
-	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, i)) {
+	if (arearesref == tar->GetCurrentArea()->GetScriptName()) {
 		return 1;
 	}
 	return 0;
@@ -2853,7 +2783,7 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::EntirePartyOnMap(Scriptable *Sender, const Trigger */*parameters*/)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	const Game *game = core->GetGame();
 	int i=game->GetPartySize(true);
 	while (i--) {
@@ -2867,7 +2797,7 @@ int GameScript::EntirePartyOnMap(Scriptable *Sender, const Trigger */*parameters
 
 int GameScript::AnyPCOnMap(Scriptable *Sender, const Trigger */*parameters*/)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	const Game *game = core->GetGame();
 	int i=game->GetPartySize(true);
 	while (i--) {
@@ -3212,7 +3142,7 @@ int GameScript::CalledByName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) tar;
-	if (stricmp(actor->GetScriptName(), parameters->string0Parameter) ) {
+	if (stricmp(actor->GetScriptName(), parameters->string0Parameter) != 0) {
 		return 0;
 	}
 	return 1;
@@ -3226,7 +3156,7 @@ int GameScript::CharName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	if (!strnicmp(actor->ShortName, parameters->string0Parameter, 32) ) {
+	if (!strnicmp(actor->ShortName.CString(), parameters->string0Parameter, 32)) {
 		return 1;
 	}
 	return 0;
@@ -3630,7 +3560,7 @@ int GameScript::InWeaponRange(Scriptable *Sender, const Trigger *parameters)
 	if (header && (wi.range>wrange)) {
 		wrange = actor->GetWeaponRange(wi);
 	}
-	if (WithinPersonalRange(actor, tar, wrange)) {
+	if (WithinPersonalRange(actor, tar->Pos, wrange)) {
 		return 1;
 	}
 	return 0;
@@ -4247,11 +4177,11 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (!actor->LastArea[0]) {
+	if (actor->LastArea.IsEmpty()) {
 		return 0;
 	}
 
-	AutoTable tm(parameters->string0Parameter);
+	AutoTable tm = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tm) {
 		return 0;
 	}
@@ -4259,11 +4189,11 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 	int count = tm->GetRowCount();
 	for (int i=0;i<count;i++) {
 		const char *area = tm->QueryField( i, 0 );
-		if (strnicmp(actor->LastArea, area, 8) ) {
+		if (actor->LastArea != area) {
 			continue;
 		}
 		const char *exit = tm->QueryField( i, 1 );
-		if (strnicmp(actor->UsedExit, exit, 32) ) {
+		if (strnicmp(actor->UsedExit.CString(), exit, 32) != 0) {
 			continue;
 		}
 		return 1;
@@ -4403,65 +4333,20 @@ int GameScript::BouncingSpellLevel(Scriptable *Sender, const Trigger *parameters
  */
 int GameScript::NumBouncingSpellLevel(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount == (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumBouncingSpellLevelCore(Sender, parameters);
+	return bounceCount == static_cast<unsigned>(parameters->int1Parameter);
 }
 
 int GameScript::NumBouncingSpellLevelGT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount > (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumBouncingSpellLevelCore(Sender, parameters);
+	return bounceCount > static_cast<unsigned>(parameters->int1Parameter);
 }
 
 int GameScript::NumBouncingSpellLevelLT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount < (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumBouncingSpellLevelCore(Sender, parameters);
+	return bounceCount < static_cast<unsigned>(parameters->int1Parameter);
 }
 
 /* Returns true if the target creature specified by Object is protected from spells of power Level.
@@ -4487,65 +4372,20 @@ int GameScript::ImmuneToSpellLevel(Scriptable *Sender, const Trigger *parameters
  */
 int GameScript::NumImmuneToSpellLevel(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount == (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumImmuneToSpellLevelCore(Sender, parameters);
+	return bounceCount == static_cast<unsigned>(parameters->int1Parameter);
 }
 
 int GameScript::NumImmuneToSpellLevelGT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount > (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumImmuneToSpellLevelCore(Sender, parameters);
+	return bounceCount > static_cast<unsigned>(parameters->int1Parameter);
 }
 
 int GameScript::NumImmuneToSpellLevelLT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount < (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumImmuneToSpellLevelCore(Sender, parameters);
+	return bounceCount < static_cast<unsigned>(parameters->int1Parameter);
 }
 
 // Compares the number of ticks left of time stop to Number.

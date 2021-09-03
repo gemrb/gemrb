@@ -62,9 +62,9 @@ protected:
 	struct AudioStream *parent;
 
 public:
-	OpenALSoundHandle(AudioStream *p) : parent(p) { }
+	explicit OpenALSoundHandle(AudioStream *p) : parent(p) { }
 	~OpenALSoundHandle() override { }
-	void SetPos(int XPos, int YPos) override;
+	void SetPos(const Point&) override;
 	bool Playing() override;
 	void Stop() override;
 	void StopLooping() override;
@@ -83,7 +83,7 @@ struct AudioStream {
 	bool delete_buffers;
 
 	void ClearIfStopped();
-	void ClearProcessedBuffers();
+	void ClearProcessedBuffers() const;
 	void ForceClear();
 
 	Holder<OpenALSoundHandle> handle;
@@ -91,18 +91,18 @@ struct AudioStream {
 
 struct CacheEntry {
 	ALuint Buffer;
-	unsigned int Length;
+	tick_t Length;
 };
 
 class OpenALAudioDriver : public Audio {
 public:
 	OpenALAudioDriver(void);
 	~OpenALAudioDriver(void) override;
-	void PrintDeviceList();
+	void PrintDeviceList() const;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-					int XPos, int YPos, unsigned int flags = 0,
-					unsigned int *length = 0) override;
+					const Point&, unsigned int flags = 0,
+					tick_t *length = nullptr) override;
 	void UpdateVolume(unsigned int flags) override;
 	bool CanPlay() override;
 	void ResetMusics() override;
@@ -110,13 +110,13 @@ public:
 	bool Stop() override;
 	bool Pause() override;
 	bool Resume() override;
-	int CreateStream(Holder<SoundMgr>) override;
-	void UpdateListenerPos(int XPos, int YPos ) override;
-	void GetListenerPos( int &XPos, int &YPos ) override;
+	int CreateStream(std::shared_ptr<SoundMgr>) override;
+	void UpdateListenerPos(const Point&) override;
+	Point GetListenerPos() override;
 	bool ReleaseStream(int stream, bool HardStop) override;
 	int SetupNewStream( ieWord x, ieWord y, ieWord z,
 					ieWord gain, bool point, int ambientRange) override;
-	int QueueAmbient(int stream, const char* sound) override;
+	tick_t QueueAmbient(int stream, const char* sound) override;
 	void SetAmbientStreamVolume(int stream, int volume) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
 	void QueueBuffer(int stream, unsigned short bits,
@@ -124,7 +124,7 @@ public:
 				int size, int samplerate) override;
 	void UpdateMapAmbient(MapReverb&) override;
 private:
-	int QueueALBuffer(ALuint source, ALuint buffer);
+	int QueueALBuffer(ALuint source, ALuint buffer) const;
 
 private:
 	ALCcontext *alutContext;
@@ -132,30 +132,28 @@ private:
 	bool MusicPlaying;
 	std::recursive_mutex musicMutex;
 	ALuint MusicBuffer[MUSICBUFFERS];
-	Holder<SoundMgr> MusicReader;
+	std::shared_ptr<SoundMgr> MusicReader;
 	LRUCache buffercache;
 	AudioStream speech;
 	AudioStream streams[MAX_STREAMS];
-	ALuint loadSound(const char* ResRef, unsigned int &time_length);
+	ALuint loadSound(const char* ResRef, tick_t &time_length);
 	int num_streams;
 	int CountAvailableSources(int limit);
 	bool evictBuffer();
 	void clearBufferCache(bool force);
 	ALenum GetFormatEnum(int channels, int bits) const;
 	static int MusicManager(void* args);
-	bool stayAlive;
+	std::atomic_bool stayAlive {true};
 	short* music_memory;
 	std::thread musicThread;
 
 	bool InitEFX(void);
 	bool hasReverbProperties;
 
-#ifdef HAVE_OPENAL_EFX_H
-	bool hasEFX;
-	ALuint efxEffectSlot;
-	ALuint efxEffect;
+	bool hasEFX = false;
+	ALuint efxEffectSlot = 0;
+	ALuint efxEffect = 0;
 	MapReverbProperties reverbProperties;
-#endif
 };
 
 }

@@ -21,62 +21,46 @@
 #define GLOBALTIMER_H
 
 #include "exports.h"
+#include "globals.h"
 
 #include "Region.h"
 
-#include <vector>
-
 namespace GemRB {
-
-class ControlAnimation;
-
-struct AnimationRef
-{
-	ControlAnimation *ctlanim;
-	unsigned long  time;
-};
-
 
 class GEM_EXPORT GlobalTimer {
 private:
-	unsigned long startTime = 0; //forcing an update;
-	unsigned long interval;
+	tick_t startTime = 0; //forcing an update;
+	tick_t interval;
 
-	int fadeToCounter = 0, fadeToMax = 0;
-	int fadeFromCounter = 0, fadeFromMax = 0;
+	tick_t fadeToCounter = 0;
+	tick_t fadeToMax = 0;
+	tick_t fadeFromCounter = 0;
+	tick_t fadeFromMax = 0;
 	unsigned short fadeToFactor = 1, fadeFromFactor = 1;
 	int shakeCounter = 0;
 	Point shakeVec;
-	unsigned int first_animation;
-	std::vector<AnimationRef*>  animations;
+
 	//move viewport to this coordinate
 	Point goal = Point(-1, -1);
 	int speed = 0;
 	Region currentVP;
 
 	void DoFadeStep(ieDword count);
-	void UpdateAnimations(bool paused);
+	bool UpdateViewport(tick_t time);
 public:
 	GlobalTimer(void);
-	~GlobalTimer(void);
 	
 	GlobalTimer(GlobalTimer&&) = default;
 	GlobalTimer& operator=(GlobalTimer&&) = default;
-public:
+
 	void Freeze();
 	bool Update();
-	bool ViewportIsMoving();
+	bool ViewportIsMoving() const;
 	void DoStep(int count);
 	void SetMoveViewPort(Point p, int spd, bool center);
-	void SetFadeToColor(unsigned long Count, unsigned short factor = 1);
-	void SetFadeFromColor(unsigned long Count, unsigned short factor = 1);
+	void SetFadeToColor(tick_t Count, unsigned short factor = 1);
+	void SetFadeFromColor(tick_t Count, unsigned short factor = 1);
 	void SetScreenShake(const Point&, int Count);
-	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
-	void RemoveAnimation(ControlAnimation* ctlanim);
-	void ClearAnimations();
-
-private:
-	bool UpdateViewport(unsigned long time);
 };
 
 }

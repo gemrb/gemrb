@@ -27,34 +27,8 @@
 
 namespace GemRB {
 
-/*
-struct State {
-	ieStrRef StrRef;
-	ieDword  FirstTransitionIndex;
-	ieDword  TransitionsCount;
-	ieDword  TriggerIndex;
-};
-*/
-/*
-struct Transition {
-	ieDword  Flags;
-	ieStrRef AnswerStrRef;
-	ieStrRef JournalStrRef;
-	ieDword  TriggerIndex;
-	ieDword  ActionIndex;
-	ieResRef DLGResRef;
-	ieDword  NextStateIndex;
-};
-*/
-/*
-struct VarOffset {
-	ieDword Offset;
-	ieDword Length;
-};
-*/
 class DLGImporter : public DialogMgr {
 private:
-	DataStream* str;
 	ieDword StatesCount;
 	ieDword StatesOffset;
 	ieDword TransitionsCount;
@@ -70,11 +44,11 @@ private:
 
 public:
 	DLGImporter(void);
-	~DLGImporter(void) override;
-	bool Open(DataStream* stream) override;
+	
 	Dialog* GetDialog() const override;
 	Condition* GetCondition(char *string) const override;
 private:
+	bool Import(DataStream* stream) override;
 	DialogState* GetDialogState(Dialog *d, unsigned int index) const;
 	DialogTransition* GetTransition(unsigned int index) const;
 	Condition* GetStateTrigger(unsigned int index) const;

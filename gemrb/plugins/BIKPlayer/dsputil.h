@@ -33,9 +33,9 @@
 #include "common.h"
 
 /* dct code */
-typedef short DCTELEM;
-typedef int DWTELEM;
-typedef short IDWTELEM;
+using DCTELEM = short;
+using DWTELEM = int;
+using IDWTELEM = short;
 
 /**
  * Scantable.
@@ -74,7 +74,7 @@ extern int mm_flags;
 
 /* NOTE: soon integer code will be added, so you must use the
    FFTSample type */
-typedef float FFTSample;
+using FFTSample = float;
 
 struct MDCTContext;
 
@@ -90,7 +90,7 @@ typedef struct FFTContext {
     FFTComplex *exptab1; /* only used by SSE code */
     FFTComplex *tmp_buf;
     void (*fft_permute)(struct FFTContext *s, FFTComplex *z);
-    void (*fft_calc)(struct FFTContext *s, FFTComplex *z);
+    void (*fft_calc)(const struct FFTContext *s, FFTComplex *z);
     int split_radix;
     int permutation;
 #define FF_MDCT_PERM_NONE       0
@@ -147,7 +147,7 @@ extern SINTABLE(65536);
  */
 int ff_fft_init(FFTContext *s, int nbits, int inverse);
 void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z);
+void ff_fft_calc_c(const FFTContext *s, FFTComplex *z);
 
 /**
  * Do the permutation needed BEFORE calling ff_fft_calc().
@@ -160,7 +160,7 @@ static inline void ff_fft_permute(FFTContext *s, FFTComplex *z)
  * Do a complex FFT with the parameters defined in ff_fft_init(). The
  * input data must be permuted before. No 1.0/sqrt(n) normalization is done.
  */
-static inline void ff_fft_calc(FFTContext *s, FFTComplex *z)
+static inline void ff_fft_calc(const FFTContext *s, FFTComplex *z)
 {
     s->fft_calc(s, z);
 }

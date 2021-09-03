@@ -30,9 +30,7 @@
 #include "SClassID.h" // For PluginID
 #include "exports.h"
 #include "globals.h"
-#include "iless.h"
-#include "Holder.h"
-
+#include "Plugin.h"
 #include "ResourceDesc.h"
 
 #include <cstring>
@@ -42,8 +40,6 @@
 
 namespace GemRB {
 
-class Plugin;
-class Resource;
 class TypeID;
 
 /**
@@ -55,15 +51,14 @@ class TypeID;
 
 class GEM_EXPORT PluginMgr {
 public:
-	typedef Resource* (*ResourceFunc)(DataStream*);
-	typedef Plugin* (*PluginFunc)();
+	using ResourceFunc = Resource* (*)(DataStream*);
+	using PluginFunc = Plugin* (*)();
 public:
 	/** Return global instance of PluginMgr */
 	static PluginMgr* Get();
 private:
-	PluginMgr();
-public: // HACK: MSVC6 is buggy.
-	~PluginMgr();
+	PluginMgr() = default;
+	~PluginMgr() = default;
 private:
 	std::map< SClass_ID, PluginFunc> plugins;
 	std::map< const TypeID*, std::vector<ResourceDesc> > resources;
@@ -71,7 +66,7 @@ private:
 	std::vector<void (*)(void)> initializerFunctions;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
-	typedef std::map<const char*, PluginFunc, iless> driver_map;
+	using driver_map = std::map<std::string, PluginFunc>;
 	std::map<const TypeID*, driver_map> drivers;
 public:
 	size_t GetPluginCount() const { return plugins.size(); }
@@ -136,20 +131,37 @@ public:
 	Plugin* GetDriver(const TypeID* type, const char* name);
 };
 
-template <class T>
-class PluginHolder : public Holder<T> {
-public:
-	PluginHolder()
-	{
+template <typename T>
+using PluginHolder = std::shared_ptr<T>;
+
+template <typename T>
+PluginHolder<T> MakePluginHolder(PluginID id) {
+	return PluginHolder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)));
+}
+
+template <typename T>
+PluginHolder<ImporterPlugin<T>> MakeImporterPluginHolder(PluginID id) {
+	return MakePluginHolder<ImporterPlugin<T>>(id);
+}
+
+template <typename T>
+PluginHolder<T> GetImporter(PluginID id) {
+	auto plugin = MakeImporterPluginHolder<T>(id);
+	if (plugin) {
+		return plugin->GetImporter();
 	}
-	PluginHolder(PluginID id)
-		: Holder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)))
-	{
+	return nullptr;
+}
+
+template <typename T>
+PluginHolder<T> GetImporter(PluginID id, DataStream* str) {
+	auto plugin = MakeImporterPluginHolder<T>(id);
+	if (plugin) {
+		return plugin->GetImporter(str);
 	}
-	~PluginHolder()
-	{
-	}
-};
+	delete str;
+	return nullptr;
+}
 
 }
 

@@ -21,17 +21,8 @@
 #include "SDLVideo.h"
 
 #include "Interface.h"
-#include "Palette.h"
+#include "Video/RLE.h"
 #include "SDLPixelIterator.h"
-
-#if defined(__sgi)
-#  include <math.h>
-#  ifdef __cplusplus
-extern "C" double round(double);
-#  endif
-#else
-#  include <cmath>
-#endif
 
 using namespace GemRB;
 
@@ -226,7 +217,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				float pct = event.jaxis.value / float(sizeof(Sint16));
 				bool xaxis = event.jaxis.axis % 2;
 				// FIXME: I'm sure this delta needs to be scaled
-				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
+				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
 				InputAxis axis = InputAxis(event.jaxis.axis);
 				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
 				EvntManager->DispatchEvent(std::move(e));
@@ -245,44 +236,24 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	return GEM_OK;
 }
 
-Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask,
-	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
+Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
 {
-	sprite_t* spr = new sprite_t(rgn, bpp, pixels, rMask, gMask, bMask, aMask);
-
-	if (cK) {
-		spr->SetColorKey(index);
+	if (fmt.RLE) {
+#if SDL_VERSION_ATLEAST(1,3,0)
+		// SDL2 should not allow RLE sprites so convert it
+		void* newpixels = DecodeRLEData(static_cast<uint8_t*>(pixels), rgn.size, fmt.ColorKey);
+		free(pixels);
+		PixelFormat newfmt = fmt;
+		newfmt.RLE = false;
+		return Holder<Sprite2D>(new sprite_t(rgn, newpixels, newfmt));
+#else
+		return MakeHolder<Sprite2D>(rgn, pixels, fmt);
+#endif
 	}
-	/*
-	 there is at least one place (BlitGameSprite) that requires 8 or 32bpp sprites
-	 untill we support 16bpp fully we cannot do this
-
-	// make sure colorkey is set prior to conversion
-	SDL_PixelFormat* fmt = backBuf->format;
-	spr->ConvertFormatTo(fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
-	*/
-	return spr;
+	return Holder<Sprite2D>(new sprite_t(rgn, pixels, fmt));
 }
 
-Holder<Sprite2D> SDLVideoDriver::CreateSprite8(const Region& rgn, void* pixels,
-										PaletteHolder palette, bool cK, int index)
-{
-	return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
-}
-
-Holder<Sprite2D> SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
-											   Color* palette, bool cK, int index)
-{
-	sprite_t* spr = new sprite_t(rgn, bpp, pixels, 0, 0, 0, 0);
-
-	spr->SetPalette(palette);
-	if (cK) {
-		spr->SetColorKey(index);
-	}
-	return spr;
-}
-
-void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
+void SDLVideoDriver::BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
 								BlitFlags flags, Color tint)
 {
 	dst.x -= spr->Frame.x;
@@ -290,11 +261,11 @@ void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, R
 	BlitSpriteClipped(spr, src, dst, flags, &tint);
 }
 
-void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
+void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p,
 									BlitFlags flags, Color tint)
 {
-	Region srect(Point(0, 0), spr->Frame.Dimensions());
-	Region drect = Region(p - spr->Frame.Origin(), spr->Frame.Dimensions());
+	Region srect(Point(0, 0), spr->Frame.size);
+	Region drect = Region(p - spr->Frame.origin, spr->Frame.size);
 	BlitSpriteClipped(spr, srect, drect, flags, &tint);
 }
 
@@ -321,25 +292,23 @@ if (_r.PointInside(_p)) { points.push_back(_p); } }
 void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color& color, BlitFlags flags)
 {
 	//Uses the Breshenham's Circle Algorithm
-	long x, y, xc, yc, re;
-
-	x = r;
-	y = 0;
-	xc = 1 - ( 2 * r );
-	yc = 1;
-	re = 0;
+	int x = r;
+	int y = 0;
+	long xc = 1 - ( 2 * r );
+	long yc = 1;
+	long re = 0;
 
 	std::vector<SDL_Point> points;
 
 	while (x >= y) {
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
-		SetPixel( drawingBuffer, c.x + ( short ) y, c.y + ( short ) x );
-		SetPixel( drawingBuffer, c.x - ( short ) y, c.y + ( short ) x );
-		SetPixel( drawingBuffer, c.x - ( short ) y, c.y - ( short ) x );
-		SetPixel( drawingBuffer, c.x + ( short ) y, c.y - ( short ) x );
+		SetPixel( drawingBuffer, c.x + x, c.y + y );
+		SetPixel( drawingBuffer, c.x - x, c.y + y );
+		SetPixel( drawingBuffer, c.x - x, c.y - y );
+		SetPixel( drawingBuffer, c.x + x, c.y - y );
+		SetPixel( drawingBuffer, c.x + y, c.y + x );
+		SetPixel( drawingBuffer, c.x - y, c.y + x );
+		SetPixel( drawingBuffer, c.x - y, c.y - x );
+		SetPixel( drawingBuffer, c.x + y, c.y - x );
 
 		y++;
 		re += yc;
@@ -368,12 +337,12 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 	/* beware, dragons and clockwise angles be here! */
 	double radiusfrom = ellipseradius(xr, yr, anglefrom);
 	double radiusto = ellipseradius(xr, yr, angleto);
-	long xfrom = (long)round(radiusfrom * cos(anglefrom));
-	long yfrom = (long)round(radiusfrom * sin(anglefrom));
-	long xto = (long)round(radiusto * cos(angleto));
-	long yto = (long)round(radiusto * sin(angleto));
-	long xrl = (long) xr;
-	long yrl = (long) yr;
+	int xfrom = round(radiusfrom * cos(anglefrom));
+	int yfrom = round(radiusfrom * sin(anglefrom));
+	int xto = round(radiusto * cos(angleto));
+	int yto = round(radiusto * sin(angleto));
+	int xrl = xr;
+	int yrl = yr;
 
 	if (drawlines) {
 		DrawLine(c, Point(c.x + xfrom, c.y + yfrom), color, flags);
@@ -384,10 +353,10 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 	// TODO: this doesn't work very well - you can't actually bound many
 	// arcs this way (imagine a segment with a small piece cut out).
 	if (xfrom > xto) {
-		long tmp = xfrom; xfrom = xto; xto = tmp;
+		int tmp = xfrom; xfrom = xto; xto = tmp;
 	}
 	if (yfrom > yto) {
-		long tmp = yfrom; yfrom = yto; yto = tmp;
+		int tmp = yfrom; yfrom = yto; yto = tmp;
 	}
 	if (xfrom >= 0 && yto >= 0) xto = xr;
 	if (xto <= 0 && yto >= 0) xfrom = -xr;
@@ -395,7 +364,8 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 	if (yto <= 0 && xto >= 0) yfrom = -yr;
 
 	//Uses Bresenham's Ellipse Algorithm
-	long x, y, xc, yc, ee, tas, tbs, sx, sy;
+	long xc, yc, ee, tas, tbs, sx, sy;
+	int x, y;
 
 	tas = 2 * xrl * xrl;
 	tbs = 2 * yrl * yrl;
@@ -411,13 +381,13 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 
 	while (sx >= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
+			SetPixel( drawingBuffer, c.x + x, c.y + y );
 		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
+			SetPixel( drawingBuffer, c.x - x, c.y + y );
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
+			SetPixel( drawingBuffer, c.x - x, c.y - y );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
+			SetPixel( drawingBuffer, c.x + x, c.y - y );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -440,80 +410,13 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 
 	while (sx <= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
+			SetPixel( drawingBuffer, c.x + x, c.y + y );
 		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
+			SetPixel( drawingBuffer, c.x - x, c.y + y );
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
+			SetPixel( drawingBuffer, c.x - x, c.y - y );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
-		x++;
-		sx += tbs;
-		ee += xc;
-		xc += tbs;
-		if (( 2 * ee + yc ) > 0) {
-			y--;
-			sy -= tas;
-			ee += yc;
-			yc += tas;
-		}
-	}
-
-	DrawSDLPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
-}
-
-
-/** This functions Draws an Ellipse */
-void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
-									unsigned short yr, const Color& color, BlitFlags flags)
-{
-	//Uses Bresenham's Ellipse Algorithm
-	long x, y, xc, yc, ee, tas, tbs, sx, sy;
-	long xrl = (long) xr;
-	long yrl = (long) yr;
-
-	tas = 2 * xrl * xrl;
-	tbs = 2 * yrl * yrl;
-	x = xrl;
-	y = 0;
-	xc = yrl * yrl * (1 - (2 * xrl));
-	yc = xrl * xrl;
-	ee = 0;
-	sx = tbs * xrl;
-	sy = 0;
-
-	std::vector<SDL_Point> points;
-
-	while (sx >= sy) {
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
-		y++;
-		sy += tas;
-		ee += yc;
-		yc += tas;
-		if (( 2 * ee + xc ) > 0) {
-			x--;
-			sx -= tbs;
-			ee += xc;
-			xc += tbs;
-		}
-	}
-
-	x = 0;
-	y = yrl;
-	xc = yrl * yrl;
-	yc = xrl * xrl * (1 - (2 * yrl));
-	ee = 0;
-	sx = 0;
-	sy = tas * yrl;
-
-	while (sx <= sy) {
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
+			SetPixel( drawingBuffer, c.x + x, c.y - y );
 		x++;
 		sx += tbs;
 		ee += xc;
@@ -531,7 +434,7 @@ void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
 
 #undef SetPixel
 
-void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
+void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
 	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BlitFlags::MIRRORX or BlitFlags::MIRRORY is set
@@ -561,7 +464,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 		}
 	} // already have appropriate y for right clip
 
-	if (dclipped.Dimensions().IsEmpty() || src.Dimensions().IsEmpty()) {
+	if (dclipped.size.IsInvalid() || src.size.IsInvalid()) {
 		return;
 	}
 
@@ -584,23 +487,21 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 		flags &= ~BlitFlags::BLENDED;
 	}
 
-	if (spr->BAM) {
-		BlitSpriteBAMClipped(spr, src, dclipped, flags, tint);
+	if (spr->Format().RLE) {
+		BlitSpriteRLEClipped(spr, src, dclipped, flags, tint);
 	} else {
-		SDL_Rect srect = RectFromRegion(src);
-		SDL_Rect drect = RectFromRegion(dclipped);
 		const sprite_t* native = static_cast<const sprite_t*>(spr.get ());
-		BlitSpriteNativeClipped(native, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
+		BlitSpriteNativeClipped(native, src, dclipped, flags, reinterpret_cast<const SDL_Color*>(tint));
 	}
 }
 
-BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* tint)
+BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* tint) const
 {
 	SDLSurfaceSprite2D::version_t oldVersion = spr->GetVersion();
 	SDLSurfaceSprite2D::version_t newVersion = renderflags;
 	auto ret = (BlitFlags::GREY | BlitFlags::SEPIA) & newVersion;
 	
-	if (spr->Bpp == 8) {
+	if (spr->Format().Bpp == 1) {
 		if (tint) {
 			assert(renderflags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD));
 			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
@@ -642,8 +543,8 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
 		SDL_LockSurface(newV);
 
-		SDL_Rect r = {0, 0, (unsigned short)newV->w, (unsigned short)newV->h};
-		SDLPixelIterator beg(newV, r);
+		const Region& r = {0, 0, newV->w, newV->h};
+		SDLPixelIterator beg = MakeSDLPixelIterator(newV, r);
 		SDLPixelIterator end = SDLPixelIterator::end(beg);
 		StaticAlphaIterator alpha(0xff);
 
@@ -661,11 +562,11 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 
 // static class methods
 
-int SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)
+bool SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)
 {
 	if (pal) {
 #if SDL_VERSION_ATLEAST(1,3,0)
-		return SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
+		return SDL_SetPaletteColors(surf->format->palette, pal, 0, numcolors) == 0;
 #else
 		// const_cast because SDL doesnt alter this and we want our interface to be const correct
 		return SDL_SetPalette( surf, SDL_LOGPAL, const_cast<SDL_Color*>(pal), 0, numcolors );

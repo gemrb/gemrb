@@ -55,17 +55,15 @@ const unsigned char data_4cc[] = {
 	'd', 'a', 't', 'a'
 };
 
-bool RawPCMReader::Open(DataStream* stream)
+bool RawPCMReader::Import(DataStream* str)
 {
-	str = stream;
-
 	samples = str->Size();
 	str->Seek( 0, GEM_STREAM_START );
 	if (is16bit) {
 		samples >>= 1; // each sample has 16 bit
 	}
 	samples_left = samples;
-	return 1;
+	return true;
 }
 
 inline void fix_endian(ieDword &dest)
@@ -84,13 +82,13 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	if (count > samples_left) {
 		count = samples_left;
 	}
-	int res = 0;
+	strret_t res = 0;
 	if (count) {
 		res = str->Read(buffer, count * (is16bit ? 2 : 1));
 	}
 	if (!is16bit) {
 		char* alt_buff = ( char* ) buffer;
-		int i = res;
+		strret_t i = res;
 		while(i--) {
 			alt_buff[( i << 1 ) + 1] = ( char ) ( alt_buff[i] - 0x80 );
 			alt_buff[i << 1] = 0;
@@ -108,9 +106,9 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	return res;
 }
 
-bool WavPCMReader::Open(DataStream* stream)
+bool WavPCMReader::Import(DataStream* stream)
 {
-	if (!RawPCMReader::Open(stream))
+	if (!RawPCMReader::Import(stream))
 		return false;
 
 	char Signature[4];
@@ -127,7 +125,7 @@ bool WavPCMReader::Open(DataStream* stream)
 	//str->Read( &r_hdr, sizeof( r_hdr ) );
 	//don't swap this
 	str->Read(&r_hdr.fourcc, 4);
-	str->ReadDword(&r_hdr.length);
+	str->ReadDword(r_hdr.length);
 	//don't swap this
 	str->Read( &wave, 4 );
 	if (memcmp(&r_hdr.fourcc, RIFF_4cc, 4) != 0 ||
@@ -138,7 +136,7 @@ bool WavPCMReader::Open(DataStream* stream)
 	//str->Read( &fmt_hdr, sizeof( fmt_hdr ) );
 	//don't swap this
 	str->Read(&fmt_hdr.fourcc,4);
-	str->ReadDword(&fmt_hdr.length);
+	str->ReadDword(fmt_hdr.length);
 	if (memcmp(&fmt_hdr.fourcc, fmt_4cc, 4) != 0 ||
 		fmt_hdr.length > sizeof( cWAVEFORMATEX )) {
 		return false;
@@ -166,13 +164,13 @@ bool WavPCMReader::Open(DataStream* stream)
 	//str->Read( &data_hdr, sizeof( data_hdr ) );
 	//don't swap this
 	str->Read(&data_hdr.fourcc,4);
-	str->ReadDword(&data_hdr.length);
+	str->ReadDword(data_hdr.length);
 
 	if (memcmp(&data_hdr.fourcc, fact_4cc, 4) == 0) {
 		str->Seek( data_hdr.length, GEM_CURRENT_POS );
 		//str->Read( &data_hdr, sizeof( data_hdr ) );
-		str->ReadDword(&data_hdr.fourcc);
-		str->ReadDword(&data_hdr.length);
+		str->ReadDword(data_hdr.fourcc);
+		str->ReadDword(data_hdr.length);
 	}
 	if (memcmp(&data_hdr.fourcc, data_4cc, 4) != 0) {
 		return false;

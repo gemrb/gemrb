@@ -22,9 +22,12 @@
 
 #include "Interface.h"
 #include "Variables.h"
+
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
+
+#include <utility>
 
 namespace GemRB {
 	
@@ -164,7 +167,7 @@ void TextArea::SpanSelector::MakeSelection(size_t idx)
 	}
 
 	// beware, this will recursively call this function.
-	ta.UpdateState(static_cast<unsigned int>(idx));
+	ta.UpdateState(static_cast<value_t>(idx));
 }
 	
 TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
@@ -203,7 +206,7 @@ bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
-	TextContainer* span = TextAtPoint(p);
+	const TextContainer* span = TextAtPoint(p);
 	
 	if (span) {
 		std::list<View*>::reverse_iterator it = subViews.rbegin();
@@ -247,7 +250,6 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps)
 	// initialize the Text containers
 	ClearSelectOptions();
 	ClearText();
-	SetAnimPicture(NULL);
 
 	scrollview.SetScrollIncrement(LineHeight());
 	scrollview.SetAutoResizeFlags(ResizeAll, OP_SET);
@@ -259,15 +261,14 @@ TextArea::~TextArea()
 	ClearHistoryTimer();
 }
 
-void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
+void TextArea::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 {
-	if (AnimPicture) {
-		// speaker portrait
-		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.Origin());
+	if (speakerPic) {
+		core->GetVideoDriver()->BlitSprite(speakerPic, drawFrame.origin);
 	}
 }
 
-void TextArea::SetAnimPicture(Holder<Sprite2D> pic)
+void TextArea::SetSpeakerPicture(Holder<Sprite2D> pic)
 {
 	if (core->HasFeature(GF_DIALOGUE_SCROLLS)) {
 		// FIXME: there isnt a specific reason why animatied dialog couldnt also use pics
@@ -275,7 +276,8 @@ void TextArea::SetAnimPicture(Holder<Sprite2D> pic)
 		return;
 	}
 
-	Control::SetAnimPicture(pic);
+	speakerPic = std::move(pic);
+	MarkDirty();
 
 	assert(textContainer);
 	UpdateTextFrame();
@@ -310,9 +312,9 @@ Region TextArea::UpdateTextFrame()
 		r.w = cr.w + cr.x;
 		r.h = 0; // auto grow
 
-		if (AnimPicture) {
+		if (speakerPic) {
 			// shrink and shift the container to accommodate the image
-			r.x = AnimPicture->Frame.w + 5;
+			r.x = speakerPic->Frame.w + 5;
 			r.w -= r.x;
 		} else {
 			r.x = 0;
@@ -343,7 +345,7 @@ void TextArea::UpdateScrollview()
 
 		if (core->HasFeature(GF_DIALOGUE_SCROLLS)) {
 			anim = 500;
-			y = -9999999; // FIXME: properly calculate the "bottom"?
+			y = 9999999; // FIXME: properly calculate the "bottom"?
 		} else {
 			int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
 			if (blankH > 0) {
@@ -444,7 +446,7 @@ void TextArea::TrimHistory(size_t lines)
 
 void TextArea::AppendText(const String& text)
 {
-	if ((flags&ClearHistory)) {
+	if (flags & ClearHistory) {
 		ClearHistoryTimer();
 
 		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
@@ -538,7 +540,7 @@ void TextArea::ScrollToY(int y, ieDword duration)
 	scrollview.ScrollTo(Point(0, y), duration);
 }
 
-void TextArea::UpdateState(unsigned int optIdx)
+void TextArea::UpdateState(value_t optIdx)
 {
 	if (!selectOptions) {
 		// no selectable options present
@@ -552,7 +554,7 @@ void TextArea::UpdateState(unsigned int optIdx)
 	}
 	
 	if (optIdx >= selectOptions->NumOpts()) {
-		SetValue(-1);
+		SetValue(INVALID_VALUE);
 		selectOptions->MakeSelection(-1);
 		return;
 	}
@@ -586,17 +588,17 @@ void TextArea::AddSubviewInFrontOfView(View* front, const View* back)
 {
 	// we dont have a way of retrieving a TextArea's scrollview so
 	// we have no direct way of placing subviews in front of it so we let NULL represent it
-	const View* target = (back) ? back : &scrollview;
+	const View* target = back ? back : &scrollview;
 	View::AddSubviewInFrontOfView(front, target);
 }
 	
 int TextArea::TextHeight() const
 {
-	return (textContainer) ? textContainer->Dimensions().h : 0;
+	return textContainer ? textContainer->Dimensions().h : 0;
 }
 int TextArea::OptionsHeight() const
 {
-	return (selectOptions) ? selectOptions->Dimensions().h : 0;
+	return selectOptions ? selectOptions->Dimensions().h : 0;
 }
 
 int TextArea::ContentHeight() const
@@ -652,7 +654,7 @@ void TextArea::SetScrollbar(ScrollBar* sb)
 	SetFrame(combined);
 	SetMargins(margins);
 	
-	Point origin = ConvertPointFromWindow(sb->Frame().Origin());
+	Point origin = ConvertPointFromWindow(sb->Frame().origin);
 	sb->SetFrameOrigin(origin);
 
 	scrollview.SetVScroll(sb);
@@ -677,7 +679,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	ContentContainer::Margin m;
 	size_t selectIdx = -1;
 	if (dialogBeginNode) {
-		if (AnimPicture)
+		if (speakerPic)
 			m = ContentContainer::Margin(10, 20);
 		else
 			m = ContentContainer::Margin(LineHeight(), 40, 10);

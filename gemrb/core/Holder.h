@@ -25,23 +25,20 @@
 #include <cassert>
 #include <cstddef>
 
-#if defined(sgi)
-#include <iostream>
-#endif
-
 namespace GemRB {
 
 template <class T>
 class Held {
 public:
-	Held() : RefCount(0) {}
-	virtual ~Held() = default;
-	void acquire() { ++RefCount; }
-	void release() { assert(RefCount && "Broken Held usage.");
-		if (!--RefCount) delete static_cast<T*>(this); }
-	size_t GetRefCount() { return RefCount; }
+	Held() noexcept = default;
+	virtual ~Held() noexcept = default;
+	void acquire() noexcept { ++RefCount; }
+	void release() noexcept {
+		assert(RefCount && "Broken Held usage.");
+		if (--RefCount == 0) delete static_cast<T*>(this);
+	}
 private:
-	size_t RefCount;
+	size_t RefCount = 0;
 };
 
 /**
@@ -51,35 +48,67 @@ private:
  * The class T must have member function acquire and release, such that
  * acquire increases the refcount, and release decreses the refcount and
  * frees the object if needed.
- *
- * Derived class of Holder shouldn't add member variables. That way,
- * they can freely converted to Holder without slicing.
  */
 
 template <class T>
-class Holder {
+class Holder final {
 public:
-	Holder(T* ptr = NULL)
-		: ptr(ptr)
+	Holder() noexcept = default;
+
+	Holder(std::nullptr_t) noexcept
+	{}
+
+	explicit Holder(T* ptr) noexcept
+	: ptr(ptr)
 	{
 		if (ptr)
 			ptr->acquire();
 	}
-	~Holder()
+
+	Holder(const Holder& rhs) noexcept
+	: ptr(rhs.ptr)
+	{
+		if (rhs.ptr)
+			rhs.ptr->acquire();
+	}
+	
+	Holder(Holder&& rhs) noexcept
+	{
+		std::swap(rhs.ptr, ptr);
+	}
+	
+	~Holder() noexcept
 	{
 		if (ptr)
 			ptr->release();
 	}
-	Holder(const Holder& rhs)
-		: ptr(rhs.ptr)
+	
+	Holder& operator=(const Holder& rhs) noexcept
 	{
-		if (ptr)
-			ptr->acquire();
+		if (&rhs != this) {
+			if (rhs.ptr) {
+				rhs.ptr->acquire();
+			}
+			if (ptr) {
+				ptr->release();
+			}
+			ptr = rhs.ptr;
+		}
+		return *this;
 	}
 	
-	Holder& operator=(Holder rhs)
+	Holder& operator=(Holder&& rhs) noexcept
 	{
-		std::swap(rhs.ptr, ptr);
+		if (&rhs != this) {
+			std::swap(rhs.ptr, ptr);
+		}
+		return *this;
+	}
+	
+	Holder& operator=(std::nullptr_t) noexcept
+	{
+		if (ptr) ptr->release();
+		ptr = nullptr;
 		return *this;
 	}
 	
@@ -99,14 +128,14 @@ public:
 		return ptr;
 	}
 
-	void release() {
+	void release() noexcept {
 		if (ptr)
 			ptr->release();
-		ptr = NULL;
+		ptr = nullptr;
 	}
 
-protected:
-	T *ptr;
+private:
+	T *ptr = nullptr;
 };
 
 template<class T>
@@ -118,13 +147,13 @@ inline bool operator==(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
 template<class T>
 inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
-    return !bool(lhs);
+	return !bool(lhs);
 }
 
 template<class T>
 inline bool operator==(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
-    return !bool(rhs);
+	return !bool(rhs);
 }
 
 template<class T>
@@ -136,20 +165,19 @@ inline bool operator!=(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
 template<class T>
 inline bool operator!=(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
-    return bool(lhs);
+	return bool(lhs);
 }
 
 template<class T>
 inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
-    return bool(rhs);
+	return bool(rhs);
 }
 
 template<class T, typename... ARGS>
-inline Holder<T> MakeHolder(ARGS&&... args)
+inline Holder<T> MakeHolder(ARGS&&... args) noexcept
 {
-	Holder<T> holder(new T(std::forward<ARGS>(args)...));
-	return holder;
+	return Holder<T>(new T(std::forward<ARGS>(args)...));
 }
 
 }

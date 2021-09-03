@@ -18,9 +18,6 @@
 
 #include "PluginMgr.h"
 
-#include "Plugin.h"
-#include "ResourceDesc.h"
-
 namespace GemRB {
 
 PluginMgr *PluginMgr::Get()
@@ -28,15 +25,6 @@ PluginMgr *PluginMgr::Get()
 	static PluginMgr mgr;
 	return &mgr;
 }
-
-PluginMgr::PluginMgr()
-{
-}
-
-PluginMgr::~PluginMgr()
-{
-}
-
 
 bool PluginMgr::IsAvailable(SClass_ID plugintype) const
 {
@@ -66,7 +54,7 @@ bool PluginMgr::RegisterPlugin(SClass_ID id, PluginFunc create)
 
 void PluginMgr::RegisterResource(const TypeID* type, ResourceFunc create, const char *ext, ieWord keyType)
 {
-	resources[type].push_back(ResourceDesc(type,create,ext,keyType));
+	resources[type].emplace_back(type, create, ext, keyType);
 }
 
 void PluginMgr::RegisterInitializer(void (*func)(void))
@@ -81,14 +69,16 @@ void PluginMgr::RegisterCleanup(void (*func)(void))
 
 void PluginMgr::RunInitializers() const
 {
-	for (size_t i = 0; i < initializerFunctions.size(); i++)
-		initializerFunctions[i]();
+	for (const auto initializerFunction : initializerFunctions) {
+		initializerFunction();
+	}
 }
 
 void PluginMgr::RunCleanup() const
 {
-	for (size_t i = 0; i < cleanupFunctions.size(); i++)
-		cleanupFunctions[i]();
+	for (const auto cleanupFunction : cleanupFunctions) {
+		cleanupFunction();
+	}
 }
 
 bool PluginMgr::RegisterDriver(const TypeID* type, const char* name, PluginFunc create)

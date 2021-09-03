@@ -24,10 +24,10 @@
 #include "SClassID.h"
 #include "exports.h"
 #include "ie_types.h"
-#include "iless.h"
 
 #include "Cache.h"
 #include "Holder.h"
+#include "Palette.h"
 #include "Resource.h"
 #include "ResourceManager.h"
 #include "TableMgr.h"
@@ -38,26 +38,23 @@
 
 namespace GemRB {
 
-static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
+static const ResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
 class Actor;
 struct Effect;
 class Factory;
 class FactoryObject;
 class Item;
-class Palette;
-using PaletteHolder = Holder<Palette>;
 class ScriptedAnimation;
 class Spell;
 class Sprite2D;
 class Store;
-class TableMgr;
 class VEFObject;
 
-struct Table {
-	Holder<TableMgr> tm;
-	ieResRef ResRef;
-	unsigned int refcount;
+struct IWDIDSEntry {
+	ieDword value;
+	ieWord stat = USHRT_MAX;
+	ieWord relation;
 };
 
 class GEM_EXPORT GameData : public ResourceManager
@@ -66,6 +63,7 @@ public:
 	GameData();
 	~GameData();
 
+	using index_t = uint16_t;
 	void ClearCaches();
 
 	/** Returns actor */
@@ -78,43 +76,38 @@ public:
 	// (See also the AutoTable class)
 
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-	int LoadTable(const ieResRef ResRef, bool silent=false);
-	/** Gets the index of a loaded table, returns -1 on error */
-	int GetTableIndex(const char * ResRef) const;
-	/** Gets a Loaded Table by its index, returns NULL on error */
-	Holder<TableMgr> GetTable(size_t index) const;
-	/** Frees a Loaded Table, returns false on error, true on success */
-	bool DelTable(unsigned int index);
+	AutoTable LoadTable(const char *ResRef, bool silent = false);
+	AutoTable LoadTable(const ResRef& resRef, bool silent = false);
+	AutoTable GetTable(const ResRef& resRef) const;
 
-	PaletteHolder GetPalette(const ResRef resname);
-	void FreePalette(PaletteHolder &pal, const ieResRef name=NULL);
+	PaletteHolder GetPalette(const ResRef& resname);
 
-	Item* GetItem(const ieResRef resname, bool silent=false);
-	void FreeItem(Item const *itm, const ieResRef name, bool free=false);
-	Spell* GetSpell(const ieResRef resname, bool silent=false);
-	void FreeSpell(Spell *spl, const ieResRef name, bool free=false);
-	Effect* GetEffect(const ieResRef resname);
-	void FreeEffect(Effect *eff, const ieResRef name, bool free=false);
+	Item* GetItem(const ResRef &resname, bool silent=false);
+	void FreeItem(Item const *itm, const ResRef &name, bool free=false);
+	Spell* GetSpell(const ResRef &resname, bool silent=false);
+	void FreeSpell(const Spell *spl, const ResRef &name, bool free = false);
+	Effect* GetEffect(const ResRef &resname);
+	void FreeEffect(const Effect *eff, const ResRef &name, bool free = false);
 
 	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
+	ScriptedAnimation* GetScriptedAnimation(const ResRef &resRef, bool doublehint);
 
 	/** creates a composite vef/2da animation */
 	VEFObject* GetVEFObject( const char *ResRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
-	Holder<Sprite2D> GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
+	Holder<Sprite2D> GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent=false);
 
 	/* returns a single BAM or static image sprite, checking in that order */
 	Holder<Sprite2D> GetAnySprite(const char *resRef, int cycle, int frame, bool silent = true);
 
 	/** returns factory resource, currently works only with animations */
-	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type,
-		unsigned char mode = IE_NORMAL, bool silent=false);
+	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type, bool silent=false);
+	FactoryObject* GetFactoryResource(const ResRef& resname, SClass_ID type, bool silent = false);
 
 	void AddFactoryResource(FactoryObject* res);
 
-	Store* GetStore(const ieResRef ResRef);
+	Store* GetStore(const ResRef &resRef);
 	/// Saves a store to the cache and frees it.
 	void SaveStore(Store* store);
 	/// Saves all stores in the cache
@@ -132,22 +125,25 @@ public:
 	int GetSummoningLimit(ieDword sex);
 	const Color& GetColor(const char *row);
 	int GetWeaponStyleAPRBonus(int row, int col);
-	inline int GetStepTime() { return stepTime; }
+	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
+	const IWDIDSEntry& GetSpellProt(index_t idx);
+	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
 	inline int GetTextSpeed() const { return TextScreenSpeed; }
 	inline void SetTextSpeed(int speed) { TextScreenSpeed = speed; }
 private:
 	void ReadItemSounds();
+	void ReadSpellProtTable();
 private:
 	Cache ItemCache;
 	Cache SpellCache;
 	Cache EffectCache;
-	std::unordered_map<ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
+	ResRefMap<PaletteHolder> PaletteCache;
 	Factory* factory;
-	std::vector<Table> tables;
-	typedef std::map<const char*, Store*, iless> StoreMap;
+	ResRefMap<AutoTable> tables;
+	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;
-	std::map<ieDword, std::vector<const char*> > ItemSounds;
+	std::map<ieDword, std::vector<ResRef>> ItemSounds;
 	AutoTable racialInfravision;
 	AutoTable raceTHAC0Bonus;
 	AutoTable spellAbilityDie;
@@ -155,27 +151,46 @@ private:
 	AutoTable trapLimit;
 	AutoTable summoningLimit;
 	std::vector<int> weaponStyleAPRBonus;
-	std::map<const char*, Color, iless> colors;
+	std::map<std::string, Color> colors;
+	std::vector<IWDIDSEntry> spellProt;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};
+
+public:
+	std::vector<ResRef> defaultSounds;
+	std::vector<ResRef> castingGlows;
+	std::vector<int> castingSounds;
+	std::vector<ResRef> spellHits;
 };
 
 extern GEM_EXPORT GameData * gamedata;
 
 template <class T>
-using ResourceHolder = Holder<T>;
+using ResourceHolder = std::shared_ptr<T>;
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const char* resname, bool silent = false, bool useCorrupt = false)
 {
-	return Holder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
+	return ResourceHolder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
 }
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const char* resname, const ResourceManager& manager, bool silent = false)
 {
-	return Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
+	return ResourceHolder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
+}
+
+template <class T>
+inline ResourceHolder<T> GetResourceHolder(const ResRef &resref, bool silent = false, bool useCorrupt = false)
+{
+	return ResourceHolder<T>(static_cast<T*>(gamedata->GetResource(resref.CString(), &T::ID, silent, useCorrupt)));
+}
+
+template <class T>
+inline ResourceHolder<T> GetResourceHolder(const ResRef &resref, const ResourceManager& manager, bool silent = false)
+{
+	return ResourceHolder<T>(static_cast<T*>(manager.GetResource(resref.CString(), &T::ID,silent)));
 }
 
 }

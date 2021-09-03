@@ -42,9 +42,10 @@ class DataStream;
  */
 
 class GEM_EXPORT TableMgr : public Plugin {
-public: 
-	TableMgr();
-	~TableMgr() override;
+public:
+	static constexpr TypeID ID = { "Table" };
+
+	TableMgr() = default;
 	/** Returns the actual number of Rows in the Table */
 	virtual ieDword GetRowCount() const = 0;
 	/** Returns the number of Columns in the Table */
@@ -74,33 +75,7 @@ public:
 	virtual bool Open(DataStream* stream) = 0;
 };
 
-/**
- *  Utility class to automatically handle loading a table,
- *  and obtain and free a reference to it.
- */
-class GEM_EXPORT AutoTable
-{
-public:
-	AutoTable();
-	AutoTable(const char* ResRef, bool silent=false);
-	~AutoTable();
-	AutoTable(const AutoTable &);
-	AutoTable& operator=(const AutoTable&);
-
-	bool load(const char* ResRef, bool silent=false);
-	void release();
-	bool ok() const noexcept { return table != nullptr; }
-	operator bool() const noexcept { return table != nullptr; }
-
-	const TableMgr& operator*() const { return *table; }
-	const TableMgr* operator->() const { return &*table; }
-	const TableMgr* ptr() const { return &*table; }
-
-private:
-	Holder<TableMgr> table;
-	unsigned int tableref;
-};
-
+using AutoTable = std::shared_ptr<TableMgr>;
 
 }
 

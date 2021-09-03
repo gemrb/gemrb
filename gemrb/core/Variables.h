@@ -21,8 +21,6 @@
 #ifndef VARIABLES_H 
 #define VARIABLES_H
 
-
-#include "SClassID.h"
 #include "exports.h"
 #include "globals.h"
 
@@ -31,7 +29,7 @@
 namespace GemRB {
 
 #ifndef ReleaseFun
-typedef void (*ReleaseFun)(void *);
+using ReleaseFun = void (*)(void*);
 #endif
 
 #define GEM_VARIABLES_INT      0
@@ -57,10 +55,10 @@ protected:
 	};
 public:
 	// abstract iteration position
-	typedef MyAssoc *iterator;
+	using iterator = MyAssoc*;
 public:
 	// Construction
-	Variables(int nBlockSize = 10, int nHashTableSize = 2049);
+	explicit Variables(int nBlockSize = 10, int nHashTableSize = 2049);
 	void LoadInitialValues(const char* name);
 
 	// Attributes
@@ -88,10 +86,11 @@ public:
 
 	// Lookup
 	int GetValueLength(const char* key) const;
-	bool Lookup(const char* key, char* dest, int MaxLength) const;
+	bool Lookup(const char* key, char* dest, size_t MaxLength) const;
 	bool Lookup(const char* key, ieDword& rValue) const;
 	bool Lookup(const char* key, char*& dest) const;
 	bool Lookup(const char* key, void*& dest) const;
+	bool HasKey(const char* key) const;
 
 	// Operations
 	void SetAtCopy(const char* key, const char* newValue);
@@ -107,7 +106,7 @@ public:
 		ieDword& rValue) const;
 
 	// Debugging
-	void DebugDump();
+	void DebugDump() const;
 	// Implementation
 protected:
 	Variables::MyAssoc** m_pHashTable;

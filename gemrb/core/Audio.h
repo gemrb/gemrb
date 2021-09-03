@@ -71,17 +71,15 @@ class MapReverb;
 class GEM_EXPORT SoundHandle : public Held<SoundHandle> {
 public:
 	virtual bool Playing() = 0;
-	virtual void SetPos(int XPos, int YPos) = 0;
+	virtual void SetPos(const Point&) = 0;
 	virtual void Stop() = 0;
 	virtual void StopLooping() = 0;
-	~SoundHandle() override;
 };
 
 class GEM_EXPORT Channel {
 public:
-	Channel(const char *label) : volume(100), reverb(0.0f)
+	explicit Channel(const char *label) : volume(100), reverb(0.0f)
 		{ strlcpy(name, label, sizeof(name)); }
-	~Channel() {}
 
 	const char *getName() const { return name; }
 	int getVolume() const { return volume; }
@@ -100,12 +98,15 @@ public:
 	static const TypeID ID;
 public:
 	Audio(void);
-	~Audio() override;
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-				int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) = 0;
-	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel, unsigned int *length = 0)
-			{ return Play(ResRef, channel, 0, 0, GEM_SND_RELATIVE, length); }
+	const Point&, unsigned int flags = 0, tick_t *length = nullptr) = 0;
+	Holder<SoundHandle> PlayRelative(const char* ResRef, unsigned int channel, tick_t *length = 0)
+			{ return Play(ResRef, channel, Point(), GEM_SND_RELATIVE, length); }
+	
+	Holder<SoundHandle> Play(const ResRef &resRef, unsigned int channel, const Point& p, unsigned int flags = 0, tick_t *length = nullptr);
+	Holder<SoundHandle> PlayRelative(const ResRef &resRef, unsigned int channel, tick_t *length = 0);
+	
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }
 	virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
 	virtual bool CanPlay() = 0;
@@ -114,13 +115,13 @@ public:
 	virtual bool Stop() = 0;
 	virtual bool Pause() = 0;
 	virtual bool Resume() = 0;
-	virtual int CreateStream(Holder<SoundMgr>) = 0;
-	virtual void UpdateListenerPos(int XPos, int YPos ) = 0;
-	virtual void GetListenerPos(int &XPos, int &YPos ) = 0;
+	virtual int CreateStream(std::shared_ptr<SoundMgr>) = 0;
+	virtual void UpdateListenerPos(const Point&) = 0;
+	virtual Point GetListenerPos() = 0;
 	virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;
 	virtual int SetupNewStream( ieWord x, ieWord y, ieWord z,
 				ieWord gain, bool point, int ambientRange) = 0;
-	virtual int QueueAmbient(int stream, const char* sound) = 0;
+	virtual tick_t QueueAmbient(int stream, const char* sound) = 0;
 	virtual void SetAmbientStreamVolume(int stream, int volume) = 0;
 	virtual void SetAmbientStreamPitch(int stream, int pitch) = 0;
 	virtual void QueueBuffer(int stream, unsigned short bits,

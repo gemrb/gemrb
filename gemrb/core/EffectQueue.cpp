@@ -28,6 +28,7 @@
 #include "Effect.h"
 #include "Game.h"
 #include "GameScript/GameScript.h" // only for ID_Allegiance
+#include "GameScript/GSUtils.h" // for DiffCore
 #include "Interface.h"
 #include "Map.h"
 #include "SymbolMgr.h"
@@ -46,8 +47,7 @@ namespace GemRB {
 static EffectDesc Opcodes[MAX_EFFECTS];
 
 static int initialized = 0;
-static EffectDesc *effectnames = NULL;
-static int effectnames_count = 0;
+static std::vector<EffectDesc> effectnames;
 static int pstflags = false;
 static bool iwd2fx = false;
 
@@ -113,10 +113,8 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	case 3: //GENERAL
 		//this is a hack to support dead only projectiles in PST
 		//if it interferes with something feel free to remove
-		if (value==GEN_DEAD) {
-			if (target->GetStat(IE_STATE_ID)&STATE_DEAD) {
-				return true;
-			}
+		if (value == GEN_DEAD && target->GetStat(IE_STATE_ID) & STATE_DEAD) {
+			return true;
 		}
 		stat = IE_GENERAL; break;
 	case 4: //RACE
@@ -130,16 +128,12 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	case 8: //ALIGNMENT
 		stat = target->GetStat(IE_ALIGNMENT);
 		a = value&15;
-		if( a) {
-			if( a != ( stat & 15 )) {
-				return false;
-			}
+		if (a && a != (stat & 15)) {
+			return false;
 		}
 		a = value & 0xf0;
-		if( a) {
-			if( a != ( stat & 0xf0 )) {
-				return false;
-			}
+		if (a && a != (stat & 0xf0)) {
+			return false;
 		}
 		return true;
 	case 9:
@@ -167,7 +161,7 @@ static inline bool IsInstant(ieByte timingmode)
 
 static const bool fx_equipped[MAX_TIMING_MODE] = { false, false, true, false, false, true, false, false, true, false, false, false };
 
-static inline bool IsEquipped(ieByte timingmode)
+static inline bool IsEquipped(ieWord timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
 	return fx_equipped[timingmode];
@@ -189,7 +183,7 @@ static inline bool NeedPrepare(ieWord timingmode)
 static const int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
 DELAYED, DELAYED, DELAYED, DELAYED, PERMANENT, PERMANENT, DURATION, PERMANENT}; //4-11
 
-static inline int DelayType(ieByte timingmode)
+static inline int DelayType(ieWord timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return INVALID;
 	return fx_prepared[timingmode];
@@ -198,7 +192,7 @@ static inline int DelayType(ieByte timingmode)
 //which effects are removable
 static const bool fx_removable[MAX_TIMING_MODE] = { true, true, false, true, true, false, true, true, false, false, true, true };
 
-static inline int IsRemovable(ieByte timingmode)
+static inline int IsRemovable(ieWord timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return INVALID;
 	return fx_removable[timingmode];
@@ -230,10 +224,10 @@ static int find_effect(const void *a, const void *b)
 
 static EffectDesc* FindEffect(const char* effectname)
 {
-	if( !effectname || !effectnames) {
+	if (!effectname || effectnames.empty()) {
 		return NULL;
 	}
-	void *tmp = bsearch(effectname, effectnames, effectnames_count, sizeof(EffectDesc), find_effect);
+	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), find_effect);
 	if( !tmp) {
 		Log(WARNING, "EffectQueue", "Couldn't assign effect: %s", effectname);
 	}
@@ -243,7 +237,7 @@ static EffectDesc* FindEffect(const char* effectname)
 static inline void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if( effect_reference.opcode==-1) {
-		EffectDesc* ref = FindEffect(effect_reference.Name);
+		const EffectDesc* ref = FindEffect(effect_reference.Name);
 		if( ref && ref->opcode>=0) {
 			effect_reference.opcode = ref->opcode;
 			return;
@@ -261,20 +255,20 @@ bool Init_EffectQueue()
 	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
 	initialized = 1;
 
-	AutoTable efftextTable("efftext");
+	AutoTable efftextTable = gamedata->LoadTable("efftext");
 
 	int eT = core->LoadSymbol( "effects" );
 	if (eT < 0) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is missing!");
 		return false;
 	}
-	Holder<SymbolMgr> effectsTable = core->GetSymbol( eT );
+	auto effectsTable = core->GetSymbol( eT );
 	if (!effectsTable) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is damaged!");
 		return false;
 	}
 
-	for (long i = 0; i < MAX_EFFECTS; i++) {
+	for (int i = 0; i < MAX_EFFECTS; i++) {
 		const char* effectname = effectsTable->GetValue( i );
 
 		EffectDesc* poi = FindEffect( effectname );
@@ -284,7 +278,7 @@ bool Init_EffectQueue()
 			//reverse linking opcode number
 			//using this unused field
 			if( (poi->opcode!=-1) && effectname[0]!='*') {
-				error("EffectQueue", "Clashing Opcodes FN: %ld vs. %d, %s\n", i, poi->opcode, effectname);
+				error("EffectQueue", "Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
 			}
 			poi->opcode = i;
 		}
@@ -293,8 +287,8 @@ bool Init_EffectQueue()
 			int row = efftextTable->GetRowCount();
 			while (row--) {
 				const char* ret = efftextTable->GetRowName( row );
-				long val;
-				if( valid_number( ret, val ) && (i == val) ) {
+				int val;
+				if(valid_signednumber(ret, val) && (i == val)) {
 					Opcodes[i].Strref = atoi( efftextTable->QueryField( row, 1 ) );
 				} else {
 					Opcodes[i].Strref = -1;
@@ -307,31 +301,17 @@ bool Init_EffectQueue()
 	return true;
 }
 
-void EffectQueue_ReleaseMemory()
-{
-	if( effectnames) {
-		free (effectnames);
-	}
-	effectnames_count = 0;
-	effectnames = NULL;
-}
-
 void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 {
-	if( ! effectnames) {
-		effectnames = (EffectDesc*) malloc( (count+1) * sizeof( EffectDesc ) );
-	} else {
-		effectnames = (EffectDesc*) realloc( effectnames, (effectnames_count + count + 1) * sizeof( EffectDesc ) );
-	}
+	size_t oldc = effectnames.size();
+	effectnames.resize(effectnames.size() + count);
 
-	std::copy(opcodes, opcodes + count, effectnames + effectnames_count);
-	effectnames_count += count;
-	effectnames[effectnames_count].Name = NULL;
+	std::copy(opcodes, opcodes + count, &effectnames[0] + oldc);
 
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
-	qsort(effectnames, effectnames_count, sizeof(EffectDesc), compare_effects);
+	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), compare_effects);
 }
 
 EffectQueue::EffectQueue()
@@ -341,9 +321,8 @@ EffectQueue::EffectQueue()
 
 EffectQueue::~EffectQueue()
 {
-	std::list< Effect* >::iterator f;
-	for (f = effects.begin(); f != effects.end(); ++f) {
-		delete (*f);
+	for (const auto& fx : effects) {
+		delete fx;
 	}
 }
 
@@ -356,21 +335,20 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 	if( !fx) {
 		return NULL;
 	}
-	memset(fx,0,sizeof(Effect));
+
 	fx->Target = FX_TARGET_SELF;
 	fx->Opcode = opcode;
 	fx->ProbabilityRangeMax = 100;
 	fx->Parameter1 = param1;
 	fx->Parameter2 = param2;
 	fx->TimingMode = timing;
-	fx->PosX = 0xffffffff;
-	fx->PosY = 0xffffffff;
+	fx->Pos = Point(-1, -1);
 	return fx;
 }
 
 //return the count of effects with matching parameters
 //useful for effects where there is no separate stat to see
-ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *resource) const
+ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const ResRef &resource) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -391,13 +369,10 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 	ModifyEffectPoint(effect_reference.opcode, x, y);
 }
 
-void EffectQueue::ModifyAllEffectSources(const Point &source)
+void EffectQueue::ModifyAllEffectSources(const Point &source) const
 {
-	std::list< Effect* >::const_iterator f;
-
-	for (f = effects.begin(); f != effects.end(); ++f) {
-		(*f)->SourceX = source.x;
-		(*f)->SourceY = source.y;
+	for (const auto& fx : effects) {
+		fx->Source = source;
 	}
 }
 
@@ -413,17 +388,17 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 //copies the whole effectqueue (area projectiles use it)
 EffectQueue *EffectQueue::CopySelf() const
 {
-	EffectQueue *effects;
+	EffectQueue *newQueue;
 
-	effects = new EffectQueue();
+	newQueue = new EffectQueue();
 	std::list< Effect* >::const_iterator fxit = GetFirstEffect();
-	Effect *fx;
+	const Effect *fx;
 
 	while( (fx = GetNextEffect(fxit))) {
-		effects->AddEffect(fx, false);
+		newQueue->AddEffect(new Effect(*fx), false);
 	}
-	effects->SetOwner(GetOwner());
-	return effects;
+	newQueue->SetOwner(GetOwner());
+	return newQueue;
 }
 
 //create a new effect with most of the characteristics of the old effect
@@ -435,11 +410,9 @@ Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDwo
 	if( opcode==0xffffffff) {
 		return NULL;
 	}
-	Effect *fx = new Effect();
-	if( !fx) {
-		return NULL;
-	}
-	memcpy(fx,oldfx,sizeof(Effect) );
+	Effect *fx = new Effect(*oldfx);
+	if (!fx) return nullptr;
+
 	fx->Opcode=opcode;
 	fx->Parameter1=param1;
 	fx->Parameter2=param2;
@@ -462,7 +435,7 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 		newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
 		newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
 		newfx->Target = FX_TARGET_PRESET;
-		strnuprcpy(newfx->Resource, newfx->Resource3[0] ? newfx->Resource3 : "SPGFLSH1", sizeof(ieResRef) - 1);
+		newfx->Resource =  newfx->Resource3.IsEmpty() ? "SPGFLSH1" : newfx->Resource3;
 		if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
 			//unprepare duration
 			newfx->Duration = (newfx->Duration-core->GetGame()->GameTime)/AI_UPDATE_TIME;
@@ -472,14 +445,12 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 	return newfx;
 }
 
-void EffectQueue::AddEffect(const Effect* fx, bool insert)
+void EffectQueue::AddEffect(Effect* fx, bool insert)
 {
-	Effect* new_fx = new Effect;
-	memcpy( new_fx, fx, sizeof( Effect ) );
-	if( insert) {
-		effects.insert( effects.begin(), new_fx );
+	if (insert) {
+		effects.push_front(fx);
 	} else {
-		effects.push_back( new_fx );
+		effects.push_back(fx);
 	}
 }
 
@@ -487,12 +458,9 @@ void EffectQueue::AddEffect(const Effect* fx, bool insert)
 //an exact matching effect
 bool EffectQueue::RemoveEffect(const Effect* fx)
 {
-	int invariant_size = offsetof( Effect, random_value );
-
 	for (std::list<Effect*>::iterator f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx2 = *f;
-
-		if( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
+		if (*fx == *fx2) {
 			delete fx2;
 			effects.erase( f );
 			return true;
@@ -539,7 +507,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	int flg;
 	ieDword spec = 0;
 	Actor *st = (self && (self->Type==ST_ACTOR)) ?(Actor *) self:NULL;
-	Effect* new_fx;
 	// HACK: 00p2229.baf in ar1006 does this silly thing, crashing later
 	if (!st && self && (self->Type==ST_CONTAINER) && (fx->Target == FX_TARGET_SELF)) {
 		fx->Target = FX_TARGET_PRESET;
@@ -564,30 +531,25 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
-		assert(self != NULL);
+		assert(self != nullptr);
 		fx->SetPosition(self->Pos);
 
 		flg = ApplyEffect( st, fx, 1 );
-		if( fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-			if( st) {
-				st->fxqueue.AddEffect( fx, flg==FX_INSERT );
-			}
+		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && st) {
+			st->fxqueue.AddEffect(fx, flg == FX_INSERT);
 		}
 		break;
 	case FX_TARGET_SELF:
 		fx->SetPosition(dest);
 
 		flg = ApplyEffect( st, fx, 1 );
-		if( fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-			if( st) {
-				st->fxqueue.AddEffect( fx, flg==FX_INSERT );
-			}
+		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && st) {
+			st->fxqueue.AddEffect(fx, flg == FX_INSERT);
 		}
 		break;
 
 	case FX_TARGET_ALL_BUT_SELF:
-		assert(self != NULL);
-		new_fx = new Effect;
+		assert(self != nullptr);
 		map=self->GetCurrentArea();
 		i= map->GetActorCount(true);
 		while(i--) {
@@ -596,7 +558,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			if( st==actor) {
 				continue;
 			}
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -604,7 +566,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 
@@ -615,7 +577,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		map = self->GetCurrentArea();
 		spec = st->GetStat(IE_SPECIFIC);
 
-		new_fx = new Effect;
 		//GetActorCount(false) returns all nonparty critters
 		i = map->GetActorCount(false);
 		while(i--) {
@@ -623,7 +584,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			if( actor->GetStat(IE_SPECIFIC)!=spec) {
 				continue;
 			}
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -631,7 +592,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 	case FX_TARGET_OTHER_SIDE:
@@ -642,7 +603,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		map = self->GetCurrentArea();
 		spec = pretarget->GetStat(IE_SPECIFIC);
 
-		new_fx = new Effect;
 		//GetActorCount(false) returns all nonparty critters
 		i = map->GetActorCount(false);
 		while(i--) {
@@ -650,7 +610,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			if( actor->GetStat(IE_SPECIFIC)!=spec) {
 				continue;
 			}
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -659,7 +619,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 	case FX_TARGET_PRESET:
@@ -668,21 +628,18 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		fx->SetPosition(dest);
 
 		flg = ApplyEffect( pretarget, fx, 1 );
-		if( fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-			if( pretarget) {
-				pretarget->fxqueue.AddEffect( fx, flg==FX_INSERT );
-			}
+		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && pretarget) {
+			pretarget->fxqueue.AddEffect(fx, flg == FX_INSERT);
 		}
 		break;
 
 	case FX_TARGET_PARTY:
 all_party:
-		new_fx = new Effect;
 		game = core->GetGame();
 		i = game->GetPartySize(false);
 		while(i--) {
 			Actor* actor = game->GetPC( i, false );
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -690,18 +647,17 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 
 	case FX_TARGET_ALL:
 		assert(self != NULL);
-		new_fx = new Effect;
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(true);
 		while(i--) {
 			Actor* actor = map->GetActor( i, true );
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -709,18 +665,17 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 
 	case FX_TARGET_ALL_BUT_PARTY:
 		assert(self != NULL);
-		new_fx = new Effect;
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(false);
 		while(i--) {
 			Actor* actor = map->GetActor( i, false );
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -729,7 +684,7 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 
@@ -737,6 +692,7 @@ all_party:
 	default:
 		Log(MESSAGE, "EffectQueue", "Unknown FX target type: %d", fx->Target);
 		flg = FX_ABORT;
+		delete fx;
 		break;
 	}
 
@@ -757,14 +713,13 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 	if( target) {
 		target->RollSaves();
 	}
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		//handle resistances and saving throws here
-		(*f)->random_value = random_value;
+		fx->random_value = random_value;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
 
-		int tmp = AddEffect(*f, Owner, target, destination);
+		int tmp = AddEffect(new Effect(*fx), Owner, target, destination);
 		//lets try without Owner, any crash?
 		//If yes, then try to fix the individual effect
 		//If you use target for Owner here, the wand in chateau irenicus will work
@@ -795,7 +750,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
 		//this is a hack for PST style diced effects
 		if( core->HasFeature(GF_SAVE_FOR_HALF) ) {
-			if( memcmp(fx->Resource,"NEG",4) ) {
+			if (!fx->Resource.IsEmpty() && !fx->Resource.StartsWith("NEG", 4)) {
 				fx->IsSaveForHalfDamage=1;
 			}
 		} else {
@@ -820,16 +775,12 @@ static inline bool check_level(const Actor *target, Effect *fx)
 
 	ieDword level = target->GetXPLevel(true);
 	//return true if resisted
-	if ((signed)fx->MinAffectedLevel > 0) {
-		if ((signed)level < (signed)fx->MinAffectedLevel) {
-			return true;
-		}
+	if ((signed) fx->MinAffectedLevel > 0 && (signed) level < (signed) fx->MinAffectedLevel) {
+		return true;
 	}
 
-	if ((signed)fx->MaxAffectedLevel > 0) {
-		if ((signed)level > (signed)fx->MaxAffectedLevel) {
-			return true;
-		}
+	if ((signed) fx->MaxAffectedLevel > 0 && (signed) level > (signed) fx->MaxAffectedLevel) {
+		return true;
 	}
 	return false;
 }
@@ -875,14 +826,14 @@ static int check_type(const Actor *actor, const Effect *fx)
 
 	//source immunity (spell name)
 	//if source is unspecified, don't resist it
-	if( fx->Source[0]) {
-		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
-			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (%s)", fx->Source);
+	if(!fx->SourceRef.IsEmpty()) {
+		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->SourceRef) ) {
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (%s)", fx->SourceRef.CString());
 			return 0;
 		}
-		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
-			if (strnicmp(fx->Source, "detect", 6)) { // our secret door pervasive effect
-				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->Source);
+		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->SourceRef) ) {
+			if (fx->SourceRef != "detect") { // our secret door pervasive effect
+				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->SourceRef.CString());
 			}
 			return 0;
 		}
@@ -915,8 +866,8 @@ static int check_type(const Actor *actor, const Effect *fx)
 	}
 
 	//decrementing spell immunity
-	if( fx->Source[0]) {
-		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->Source);
+	if(!fx->SourceRef.IsEmpty()) {
+		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->SourceRef);
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (decrementing)");
 			return 0;
@@ -973,7 +924,7 @@ static int check_type(const Actor *actor, const Effect *fx)
 		return -1;
 	}
 
-	if( fx->Source[0] && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
+	if(!fx->SourceRef.IsEmpty() && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->SourceRef) ) {
 		Log(DEBUG, "EffectQueue", "Bounced by resource");
 		return -1;
 	}
@@ -994,17 +945,15 @@ static int check_type(const Actor *actor, const Effect *fx)
 	//decrementing bounce checks
 
 	//level decrementing bounce check
-	if (fx->Power) {
-		if (bounce & BNC_LEVEL_DEC) {
-			efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
-			if (efx && DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
-				return -1;
-			}
+	if (fx->Power && bounce & BNC_LEVEL_DEC) {
+		efx = actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
+			return -1;
 		}
 	}
 
-	if( fx->Source[0] && (bounce&BNC_RESOURCE_DEC)) {
+	if(!fx->SourceRef.IsEmpty() && (bounce&BNC_RESOURCE_DEC)) {
 		efx=actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx->Resource);
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by resource (decrementing)");
@@ -1282,65 +1231,68 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	}
 
 	int res = FX_ABORT;
-	if( fx->Opcode<MAX_EFFECTS) {
-		if (!(target || (Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR))) {
-			Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: %d, skipping", fx->Opcode);
-			return FX_NOT_APPLIED;
-		}
-		
-		const EffectDesc& ed = Opcodes[fx->Opcode];
-		if (ed) {
-			if( target && fx->FirstApply ) {
-				if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-					displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, DMC_WHITE,
-												  target, IE_STR_SOUND);
-				}
-			}
-			
-			res = ed(Owner, target, fx);
-			fx->FirstApply = 0;
+	if (fx->Opcode >= MAX_EFFECTS) {
+		return res;
+	}
 
-			switch(res) {
-				case FX_APPLIED:
-					//normal effect with duration
-					break;
-				case FX_ABORT:
-				case FX_NOT_APPLIED:
-					//instant effect, pending removal
-					//for example, a damage effect
-					fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-					break;
-				case FX_INSERT:
-					//put this effect in the beginning of the queue
-					//all known insert effects are 'permanent' too
-					//that is the AC effect only
-					//actually, permanent effects seem to be
-					//inserted by the game engine too
-				case FX_PERMANENT:
-					//don't stick around if it was executed permanently
-					//for example, a permanent strength modifier effect
-					if(fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
-						fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-					}
-					break;
-				default:
-					error("EffectQueue", "Unknown effect result '%x', aborting ...\n", res);
-			}
+	if (!target && !(Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR)) {
+		Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: %d, skipping", fx->Opcode);
+		return FX_NOT_APPLIED;
+	}
+
+	const EffectDesc& ed = Opcodes[fx->Opcode];
+	if (!ed) {
+		return res;
+	}
+
+	if (target && fx->FirstApply) {
+		if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0)) {
+			displaymsg->DisplayStringName(Opcodes[fx->Opcode].Strref, DMC_WHITE, target, IE_STR_SOUND);
 		}
 	}
-	
+
+	res = ed(Owner, target, fx);
+	fx->FirstApply = 0;
+
+	switch (res) {
+		case FX_APPLIED:
+			// normal effect with duration
+			break;
+		case FX_ABORT:
+		case FX_NOT_APPLIED:
+			// instant effect, pending removal
+			// for example, a damage effect
+			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+			break;
+		case FX_INSERT:
+			// put this effect in the beginning of the queue
+			// all known insert effects are 'permanent' too
+			// that is the AC effect only
+			// actually, permanent effects seem to be
+			// inserted by the game engine too
+		case FX_PERMANENT:
+			// don't stick around if it was executed permanently
+			// for example, a permanent strength modifier effect
+			if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+			}
+			break;
+		default:
+			error("EffectQueue", "Unknown effect result '%x', aborting ...\n", res);
+	}
+
 	return res;
 }
 
 // looks for opcode with param2
 
-#define MATCH_OPCODE() if((*f)->Opcode!=opcode) { continue; }
+#define MATCH_OPCODE() if (fx->Opcode != opcode) { continue; }
 
 // useful for: remove equipped item
-#define MATCH_SLOTCODE() if((*f)->InventorySlot!=slotcode) { continue; }
+#define MATCH_SLOTCODE() if (fx->InventorySlot != slotcode) { continue; }
 
 // useful for: remove projectile type
-#define MATCH_PROJECTILE() if((*f)->Projectile!=projectile) { continue; }
+#define MATCH_PROJECTILE() if (fx->Projectile != projectile) { continue; }
 
 static const bool fx_live[MAX_TIMING_MODE] = { true, true, true, false, false, false, false, false, true, true, true, false };
 static inline bool IsLive(ieByte timingmode)
@@ -1349,23 +1301,20 @@ static inline bool IsLive(ieByte timingmode)
 	return fx_live[timingmode];
 }
 
-#define MATCH_LIVE_FX() if(!IsLive((*f)->TimingMode)) { continue; }
-#define MATCH_PARAM1() if((*f)->Parameter1!=param1) { continue; }
-#define MATCH_PARAM2() if((*f)->Parameter2!=param2) { continue; }
-#define MATCH_RESOURCE() if( strnicmp( (*f)->Resource, resource, 8) ) { continue; }
-#define MATCH_SOURCE() if( strnicmp( (*f)->Source, Removed, 8) ) { continue; }
-#define MATCH_TIMING() if( (*f)->TimingMode!=timing) { continue; }
+#define MATCH_LIVE_FX() if (!IsLive(fx->TimingMode)) { continue; }
+#define MATCH_PARAM1() if (fx->Parameter1 != param1) { continue; }
+#define MATCH_PARAM2() if (fx->Parameter2 != param2) { continue; }
+#define MATCH_TIMING() if (fx->TimingMode != timing) { continue; }
 
 //call this from an applied effect, after it returns, these effects
 //will be killed along with it
 void EffectQueue::RemoveAllEffects(ieDword opcode) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
@@ -1373,12 +1322,11 @@ void EffectQueue::RemoveAllEffects(ieDword opcode) const
 bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
 {
 	bool removed = false;
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if( !IsEquipped((*f)->TimingMode)) continue;
+	for (const auto& fx : effects) {
+		if (!IsEquipped(fx->TimingMode)) continue;
 		MATCH_SLOTCODE()
 
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		removed = true;
 	}
 	return removed;
@@ -1387,23 +1335,23 @@ bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
 //removes all effects that match projectile
 void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_PROJECTILE()
 
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //remove effects belonging to a given spell
-void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
+void EffectQueue::RemoveAllEffects(const ResRef &removed) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_LIVE_FX()
-		MATCH_SOURCE()
+		if (removed != fx->SourceRef) {
+			continue;
+		}
 
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 
 	if (!Owner || (Owner->Type != ST_ACTOR)) return;
@@ -1411,16 +1359,14 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 	// we didn't catch effects that don't persist — they still need to be undone
 	// FX_PERMANENT returners aren't part of the queue, so permanent stat mods can't be detected
 	// good test case is the Oozemaster druid kit from Divine remix, which decreases charisma in its clab
-	Spell *spell = gamedata->GetSpell(Removed, true);
+	const Spell *spell = gamedata->GetSpell(removed, true);
 	if (!spell) return; // can be hit until all the iwd2 clabs are implemented
-	if (spell->ExtHeaderCount > 1) {
-		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", Removed);
+	if (spell->ext_headers.size() > 1) {
+		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", removed.CString());
 	}
 	const SPLExtHeader *sph = spell->GetExtHeader(0);
 	if (!sph) return; // some iwd2 clabs are only markers
-	for (int i=0; i < sph->FeatureCount; i++) {
-		const Effect *origfx = sph->features+i;
-
+	for (const Effect *origfx : sph->features) {
 		if (origfx->TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
 		if (!(Opcodes[origfx->Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;
 
@@ -1440,22 +1386,23 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 
 		fx->Parameter1 = -fx->Parameter1;
 
-		Log(DEBUG, "EffectQueue", "Manually removing effect %d (from %s)", fx->Opcode, Removed);
+		Log(DEBUG, "EffectQueue", "Manually removing effect %d (from %s)", fx->Opcode, removed.CString());
 		ApplyEffect((Actor *)Owner, fx, 1, 0);
 		delete fx;
 	}
-	gamedata->FreeSpell(spell, Removed, false);
+	gamedata->FreeSpell(spell, removed, false);
 }
 
 //remove effects belonging to a given spell, but only if they match timing method x
-void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieByte timing) const
+void EffectQueue::RemoveAllEffects(const ResRef &removed, ieByte timing) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_TIMING()
-		MATCH_SOURCE()
+		if (removed != fx->SourceRef) {
+			continue;
+		}
 
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
@@ -1470,47 +1417,76 @@ void EffectQueue::RemoveAllEffects(EffectRef &effect_reference) const
 }
 
 //Removes all effects with a matching resource field
-void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource) const
+void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ResRef &resource) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		MATCH_RESOURCE()
+		if (fx->Resource != resource) { continue; }
 
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //this will modify effect reference
-void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const
+void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource) const
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithResource(effect_reference.opcode, resource);
+}
+
+//Removes all effects with a matching resource field
+void EffectQueue::RemoveAllEffectsWithSource(ieDword opcode, const ResRef &source, int mode) const
+{
+	for (const auto& fx : effects) {
+		MATCH_OPCODE()
+		if (fx->SourceRef != source) continue;
+
+		// equipping effects only
+		// IsEquipped excludes to many to match ee's opcode 321
+		if (mode == 1 && fx->TimingMode != FX_DURATION_INSTANT_WHILE_EQUIPPED) {
+			continue;
+		}
+
+		// "timed" effects only
+		if (mode == 2 && (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED || fx->TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
+			continue;
+		}
+
+		// mode 0 or anything else means remove all effects that match
+
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+void EffectQueue::RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode) const
+{
+	ResolveEffectRef(effectReference);
+	RemoveAllEffectsWithSource(effectReference.opcode, source, mode);
 }
 
 //This method could be used to remove stat modifiers that would lower a stat
 //(works only if a higher stat means good for the target)
 void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		switch((*f)->Parameter2) {
+
+		switch (fx->Parameter2) {
 		case 0:case 3:
-			if( ((signed) (*f)->Parameter1)>=0) continue;
+			if ((signed) fx->Parameter1 >= 0) continue;
 			break;
 		case 1:case 4:
-			if( ((signed) (*f)->Parameter1)>=(signed) current) continue;
+			if ((signed) fx->Parameter1 >= (signed) current) continue;
 			break;
 		case 2:case 5:
-			if( ((signed) (*f)->Parameter1)>=100) continue;
+			if ((signed) fx->Parameter1 >= 100) continue;
 			break;
 		default:
 			break;
 		}
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
@@ -1527,13 +1503,12 @@ void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDwo
 //opcode need to be removed (see removal of portrait icon)
 void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
 
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
@@ -1545,23 +1520,21 @@ void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword
 }
 
 //Removes all effects with a matching resource field
-void EffectQueue::RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ieResRef resource) const
+void EffectQueue::RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ResRef &resource) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
-		if(resource[0]) {
-			MATCH_RESOURCE()
-		}
+		
+		if (!resource.IsEmpty() && fx->Resource != resource) continue;
 
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //this will modify effect reference
-void EffectQueue::RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ieResRef resource) const
+void EffectQueue::RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource) const
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithParamAndResource(effect_reference.opcode, param2, resource);
@@ -1579,14 +1552,11 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 		GameTime += futuretime;
 	}
 
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		//FIXME: how this method handles delayed effects???
 		//it should remove them as well, i think
-		if( DelayType( ((*f)->TimingMode) )!=PERMANENT ) {
-			if( (*f)->Duration<=GameTime) {
-				(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
-			}
+		if (DelayType(fx->TimingMode) != PERMANENT && fx->Duration <= GameTime) {
+			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
 }
@@ -1595,10 +1565,9 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 //which i call permanent after death (iesdp calls it permanent after bonuses)
 void EffectQueue::RemoveAllNonPermanentEffects() const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if( IsRemovable((*f)->TimingMode) ) {
-			(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+	for (const auto& fx : effects) {
+		if (IsRemovable(fx->TimingMode)) {
+			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
 }
@@ -1606,43 +1575,36 @@ void EffectQueue::RemoveAllNonPermanentEffects() const
 //remove certain levels of effects, possibly matching school/secondary type
 //this method removes whole spells (tied together by their source)
 //FIXME: probably this isn't perfect
-void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword Flags, ieDword match) const
+void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match) const
 {
-	Removed[0]=0;
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if( (*f)->Power>level) {
+	ResRef removed;
+	for (const auto& fx : effects) {
+		if (fx->Power > level) {
 			continue;
 		}
 
-		if( Removed[0]) {
-			MATCH_SOURCE()
+		if (removed != fx->SourceRef) {
+			continue;
 		}
-		if( Flags&RL_MATCHSCHOOL) {
-			if( (*f)->PrimaryType!=match) {
-				continue;
-			}
+		if (Flags & RL_MATCHSCHOOL && fx->PrimaryType != match) {
+			continue;
 		}
-		if( Flags&RL_MATCHSECTYPE) {
-			if( (*f)->SecondaryType!=match) {
-				continue;
-			}
+		if (Flags & RL_MATCHSECTYPE && fx->SecondaryType != match) {
+			continue;
 		}
 		//if dispellable was not set, or the effect is dispellable
 		//then remove it
-		if( Flags&RL_DISPELLABLE) {
-			if( !((*f)->Resistance&FX_CAN_DISPEL)) {
-				continue;
-			}
+		if (Flags & RL_DISPELLABLE && !(fx->Resistance & FX_CAN_DISPEL)) {
+			continue;
 		}
-		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
-		if( Flags&RL_REMOVEFIRST) {
-			memcpy(Removed,(*f)->Source, sizeof(Removed));
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		if (Flags & RL_REMOVEFIRST) {
+			removed = fx->SourceRef;
 		}
 	}
 }
 
-void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
+void EffectQueue::DispelEffects(const Effect *dispeller, ieDword level) const
 {
 	for (Effect *fx : effects) {
 		if (fx == dispeller) continue;
@@ -1673,14 +1635,13 @@ void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
 
 Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		return (*f);
+		return fx;
 	}
-	return NULL;
+	return nullptr;
 }
 
 Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
@@ -1694,15 +1655,14 @@ Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
 
 Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
 
-		return (*f);
+		return fx;
 	}
-	return NULL;
+	return nullptr;
 }
 
 //this will modify effect reference
@@ -1720,8 +1680,7 @@ Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword par
 
 Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
@@ -1730,9 +1689,9 @@ Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDw
 			MATCH_PARAM1()
 		}
 
-		return (*f);
+		return fx;
 	}
-	return NULL;
+	return nullptr;
 }
 
 //this will modify effect reference
@@ -1748,11 +1707,10 @@ Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword
 //this could be used for stoneskins and mirror images as well
 void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		ieDword value = (*f)->Parameter1;
+		ieDword value = fx->Parameter1;
 		if( value>amount) {
 			value -= amount;
 			amount = 0;
@@ -1760,7 +1718,7 @@ void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
 			amount -= value;
 			value = 0;
 		}
-		(*f)->Parameter1=value;
+		fx->Parameter1 = value;
 		if (value) {
 			return;
 		}
@@ -1780,12 +1738,11 @@ void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword am
 //returns the damage amount NOT soaked
 int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
-		ieDword value = (*f)->Parameter3;
+		ieDword value = fx->Parameter3;
 		if( value>amount) {
 			value -= amount;
 			amount = 0;
@@ -1793,7 +1750,7 @@ int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword 
 			amount -= value;
 			value = 0;
 		}
-		(*f)->Parameter3=value;
+		fx->Parameter3 = value;
 		if (value) {
 			return 0;
 		}
@@ -1819,14 +1776,13 @@ static const int ids_stats[9]={IE_FACTION, IE_TEAM, IE_EA, IE_GENERAL, IE_RACE, 
 //0,1 and 9 are only in GemRB
 int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 {
-	int sum = 0;
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	ieDword sum = 0;
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if( (*f)->Parameter1) {
+		if (fx->Parameter1) {
 			ieDword param1;
-			ieDword ids = (*f)->Parameter2;
+			ieDword ids = fx->Parameter2;
 			switch(ids) {
 			case 0:
 			case 1:
@@ -1845,20 +1801,20 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 				break;
 			case 9:
 				//pseudo stat/classmask
-				param1 = actor->GetClassMask() & (*f)->Parameter1;
+				param1 = actor->GetClassMask() & fx->Parameter1;
 				if (!param1) continue;
 				break;
 			default:
 				break;
 			}
 		}
-		int val = (int) (*f)->Parameter3;
+		ieDword val = fx->Parameter3;
 		//we are really lucky with this, most of these boni are using +2 (including fiendslayer feat)
 		//it would be much more inconvenient if we had to use v2 effect files
-		if( !val) val = 2;
+		if (!val) val = 2;
 		sum += val;
 	}
-	return sum;
+	return static_cast<int>(sum);
 }
 
 int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, const Actor *actor) const
@@ -1873,12 +1829,11 @@ int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, const Actor *
 int EffectQueue::BonusForParam2(ieDword opcode, ieDword param2) const
 {
 	int sum = 0;
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
-		sum += (*f)->Parameter1;
+		sum += fx->Parameter1;
 	}
 	return sum;
 }
@@ -1896,12 +1851,11 @@ int EffectQueue::MaxParam1(ieDword opcode, bool positive) const
 {
 	int max = 0;
 	ieDwordSigned param1 = 0;
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		param1 = signed((*f)->Parameter1);
+		param1 = signed(fx->Parameter1);
 		if ((positive && param1 > max) || (!positive && param1 < max)) {
 			max = param1;
 		}
@@ -1920,18 +1874,17 @@ int EffectQueue::MaxParam1(EffectRef &effect_reference, bool positive) const
 
 bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const
 {
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		int magic = (int) (*f)->Parameter1;
-		ieDword mask = (*f)->Parameter3;
-		ieDword value = (*f)->Parameter4;
-		if (magic == 0) {
-			if (enchantment) continue;
-		} else if (magic > 0) {
-			if (enchantment > magic) continue;
+		int magic = (int) fx->Parameter1;
+		ieDword mask = fx->Parameter3;
+		ieDword value = fx->Parameter4;
+		if (magic == 0 && enchantment) {
+			continue;
+		} else if (magic > 0 && enchantment > magic) {
+			continue;
 		}
 
 		if ((weapontype&mask) != value) {
@@ -1946,7 +1899,7 @@ bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 {
 	ResolveEffectRef(fx_weapon_immunity_ref);
 	if (fx_weapon_immunity_ref.opcode < 0) {
-		return 0;
+		return false;
 	}
 	return WeaponImmunity(fx_weapon_immunity_ref.opcode, enchantment, weapontype);
 }
@@ -1961,15 +1914,14 @@ void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) cons
 	ieDword opcode = fx_ref.opcode;
 	Point p(-1,-1);
 
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		//
-		Effect *fx = core->GetEffect( (*f)->Resource, (*f)->Power, p);
-		if (!fx) continue;
-		fx->Target = FX_TARGET_PRESET;
-		fxqueue->AddEffect(fx, true);
+		Effect *fx2 = core->GetEffect(fx->Resource, fx->Power, p);
+		if (!fx2) continue;
+		fx2->Target = FX_TARGET_PRESET;
+		fxqueue->AddEffect(fx2, true);
 	}
 }
 
@@ -1981,13 +1933,10 @@ int EffectQueue::SumDamageReduction(EffectRef &effect_reference, ieDword weaponE
 	int remaining = 0;
 	int count = 0;
 
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		Effect* fx = *f;
-		if (!fx) continue;
 		count++;
 		// add up if the effect has enough enchantment (or ignores it)
 		if (!fx->Parameter2 || fx->Parameter2 > weaponEnchantment) {
@@ -2003,20 +1952,19 @@ int EffectQueue::SumDamageReduction(EffectRef &effect_reference, ieDword weaponE
 }
 
 //useful for immunity vs spell, can't use item, etc.
-Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const
+Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ResRef &resource) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		MATCH_RESOURCE()
+		if (fx->Resource != resource) continue;
 
-		return (*f);
+		return fx;
 	}
-	return NULL;
+	return nullptr;
 }
 
-Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource) const
+Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ResRef &resource) const
 {
 	ResolveEffectRef(effect_reference);
 	return HasOpcodeWithResource(effect_reference.opcode, resource);
@@ -2031,46 +1979,47 @@ Effect *EffectQueue::HasEffectWithPower(EffectRef &effect_reference, ieDword pow
 
 Effect *EffectQueue::HasOpcodeWithPower(ieDword opcode, ieDword power) const
 {
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		// NOTE: matching greater or equals!
-		if ((*f)->Power < power) { continue; }
+		if (fx->Power < power) continue;
 
-		return (*f);
+		return fx;
 	}
-	return NULL;
+	return nullptr;
 }
 
 //returns the first effect with source 'Removed'
-Effect *EffectQueue::HasSource(const ieResRef Removed) const
+Effect *EffectQueue::HasSource(const ResRef &removed) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_LIVE_FX()
-		MATCH_SOURCE()
+		if (removed != fx->SourceRef) {
+			continue;
+		}
 
-		return (*f);
+		return fx;
 	}
-	return NULL;
+	return nullptr;
 }
 
 //used in contingency/sequencer code (cannot have the same contingency twice)
-Effect *EffectQueue::HasOpcodeWithSource(ieDword opcode, const ieResRef Removed) const
+Effect *EffectQueue::HasOpcodeWithSource(ieDword opcode, const ResRef &removed) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		MATCH_SOURCE()
+		if (removed != fx->SourceRef) {
+			continue;
+		}
 
-		return (*f);
+		return fx;
 	}
-	return NULL;
+	return nullptr;
 }
 
-Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ieResRef resource) const
+Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ResRef &resource) const
 {
 	ResolveEffectRef(effect_reference);
 	return HasOpcodeWithSource(effect_reference.opcode, resource);
@@ -2102,18 +2051,9 @@ void EffectQueue::dump(StringBuffer& buffer) const
 			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: %d! Report this immediately!", fx->Opcode);
 			return;
 		}
-		buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->Source);
+		buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->SourceRef.CString());
 	}
 }
-/*
-Effect *EffectQueue::GetEffect(ieDword idx) const
-{
-	if( effects.size()<=idx) {
-		return NULL;
-	}
-	return effects[idx];
-}
-*/
 
 //returns true if the effect supports simplified duration
 bool EffectQueue::HasDuration(const Effect *fx)
@@ -2184,36 +2124,31 @@ Effect *EffectQueue::GetNextEffect(std::list< Effect* >::const_iterator &f) cons
 	return NULL;
 }
 
-ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *resource) const
+ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef &resource) const
 {
 	ieDword cnt = 0;
 
-	std::list< Effect* >::const_iterator f;
-
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		if( param1!=0xffffffff)
 			MATCH_PARAM1()
 		if( param2!=0xffffffff)
 			MATCH_PARAM2()
-		if( resource) {
-			MATCH_RESOURCE()
-		}
+		if (!resource.IsEmpty() && fx->Resource != resource) continue;
 		cnt++;
 	}
 	return cnt;
 }
 
-unsigned int EffectQueue::GetEffectOrder(EffectRef& effect_reference, const Effect* fx) const
+unsigned int EffectQueue::GetEffectOrder(EffectRef& effect_reference, const Effect* fx2) const
 {
 	ieDword cnt = 1;
 	ieDword opcode = ResolveEffect(effect_reference);
 
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); ++f) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if (*f == fx) break;
+		if (fx == fx2) break;
 		cnt++;
 	}
 	return cnt;
@@ -2221,13 +2156,10 @@ unsigned int EffectQueue::GetEffectOrder(EffectRef& effect_reference, const Effe
 
 void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const
 {
-	std::list< Effect* >::const_iterator f;
-
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for (const auto& fx : effects) {
 		MATCH_OPCODE()
-		(*f)->PosX=x;
-		(*f)->PosY=y;
-		(*f)->Parameter3=0;
+		fx->Pos = Point(x, y);
+		fx->Parameter3 = 0;
 		return;
 	}
 }
@@ -2275,10 +2207,8 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		//check specific spell immunity
 		//check school/sectype immunity
 		int ret = check_type(target, fx);
-		if (ret<0) {
-			if (target->Modified[IE_SANCTUARY]&(1<<OV_BOUNCE) ) {
-				target->Modified[IE_SANCTUARY]|=(1<<OV_BOUNCE2);
-			}
+		if (ret < 0 && target->Modified[IE_SANCTUARY] & (1 << OV_BOUNCE)) {
+			target->Modified[IE_SANCTUARY]|=(1<<OV_BOUNCE2);
 		}
 		return ret;
 	}
@@ -2286,7 +2216,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 }
 
 void EffectQueue::AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue,
-		unsigned int range, const Actor *except)
+		unsigned int range, const Actor *except) const
 {
 	int cnt = map->GetActorCount(true);
 	while(cnt--) {
@@ -2328,6 +2258,159 @@ bool EffectQueue::HasHostileEffects() const
 	}
 
 	return hostile;
+}
+
+// iwd got a weird targeting system
+// the opcode parameters are:
+//   * param1 - optional value used only rarely
+//   * param2 - a specific condition mostly based on target's stats
+//     this is partly superior, partly inferior to the bioware ids targeting:
+//       * superior because it can handle other stats and conditions
+//       * inferior because it is not so readily moddable
+//   * stat is usually a stat, but for special conditions it is a
+//     function code (>=0x100).
+//     If value is -1, then GemRB will use Param1, otherwise it is
+//     compared to the target's stat using the relation function.
+// The relation function is exactly the same as the extended
+// diffmode for gemrb. (Thus scripts can use the very same relation
+// functions).
+// The hardcoded conditions are simulated via the IWDIDSEntry
+// structure.
+
+// returns true if the target matches iwd ids targeting
+// usually this is used to restrict an effect to specific targets
+bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx)
+{
+	const IWDIDSEntry& entry = gamedata->GetSpellProt(type);
+	ieDword idx = entry.stat;
+	ieDword val = entry.value;
+	ieDword rel = entry.relation;
+	if (idx == STI_INVALID) {
+		// bad entry, don't match
+		return false;
+	}
+
+	//if IDS value is 'anything' then the supplied value is in Parameter1
+	if (val == 0xffffffff) {
+		val = value;
+	}
+	switch (idx) {
+		case STI_EA_RELATION:
+			return DiffCore(EARelation(Owner, target), val, rel);
+		case STI_ALLIES:
+			return DiffCore(EARelation(Owner, target), EAR_FRIEND, rel);
+		case STI_ENEMIES:
+			return DiffCore(EARelation(Owner, target), EAR_HOSTILE, rel);
+		case STI_DAYTIME:
+			ieDword timeofday;
+			timeofday = core->Time.GetHour(core->GetGame()->GameTime);
+			// handle the clock jumping at midnight
+			if (val > rel) {
+				return timeofday >= val || timeofday <= rel;
+			} else {
+				return timeofday >= val && timeofday <= rel;
+			}
+		case STI_AREATYPE:
+			return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, rel);
+		case STI_MORAL_ALIGNMENT:
+			if(Owner && Owner->Type==ST_ACTOR) {
+				return DiffCore(((Actor *) Owner)->GetStat(IE_ALIGNMENT) & AL_GE_MASK, STAT_GET(IE_ALIGNMENT) & AL_GE_MASK, rel);
+			} else {
+				return DiffCore(AL_TRUE_NEUTRAL, STAT_GET(IE_ALIGNMENT) & AL_GE_MASK, rel);
+			}
+		case STI_TWO_ROWS:
+			//used in checks where any of two matches are ok (golem or undead etc)
+			return CheckIWDTargeting(Owner, target, value, rel, fx) ||
+				CheckIWDTargeting(Owner, target, value, val, fx);
+		case STI_NOT_TWO_ROWS:
+			//this should be the opposite as above
+			return !(CheckIWDTargeting(Owner, target, value, rel, fx) ||
+				 CheckIWDTargeting(Owner, target, value, val, fx));
+		case STI_SOURCE_TARGET:
+			return Owner == target;
+		case STI_SOURCE_NOT_TARGET:
+			return Owner != target;
+		case STI_CIRCLESIZE:
+			return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
+		case STI_SPELLSTATE:
+			// only used with 1 and 5, so we don't need another accessor
+			if (rel == EQUALS) {
+				return target->HasSpellState(val);
+			} else {
+				return !target->HasSpellState(val);
+			}
+		case STI_SUMMONED_NUM:
+			ieDword count;
+			count = target->GetCurrentArea()->CountSummons(GA_NO_DEAD, SEX_SUMMON);
+			return DiffCore(count, val, rel);
+		case STI_CHAPTER_CHECK:
+			ieDword chapter;
+			core->GetGame()->locals->Lookup("CHAPTER", chapter);
+			return DiffCore(chapter, val, rel);
+		case STI_EVASION:
+			if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+				// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)
+				// FIXME: check for evasion itself
+				if (target->GetThiefLevel() < 2 && target->GetMonkLevel() < 1) {
+					return false;
+				}
+				val = target->GetSavingThrow(4, 0, fx); // reflex
+			} else {
+				if (target->GetThiefLevel() < 7 ) {
+					return false;
+				}
+				val = target->GetSavingThrow(1, 0); // breath
+			}
+
+			return val;
+		case STI_WATERY:
+			// NOTE: this got reused in EEs for alignment matching, while the originals were about water.
+			// Luckily the relation is unset in the later and the default 0 doesn't make sense for alignment
+			if (rel == 0) {
+				// hardcoded via animation id, so we can't use STI_TWO_ROWS
+				// sahuagin x2, water elementals x2 (and water weirds)
+				ieDword animID = target->GetSafeStat(IE_ANIMATION_ID);
+				int ret = !val;
+				if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
+					ret = val;
+				}
+				return ret;
+			} else {
+				// alignment.ids check - see below
+				idx = IE_ALIGNMENT;
+			}
+			// fall-through and explict values for extra EE modes, so it's clearer we implemented them
+		case STI_EA:
+		case STI_GENERAL:
+		case STI_RACE:
+		case STI_CLASS:
+		case STI_SPECIFIC:
+		case STI_GENDER:
+		case STI_STATE:
+		default:
+			if (idx >= STI_EA && idx <= STI_STATE) {
+				// the 0 will never be hit, since that is for STI_SUMMONED_NUM
+				static const size_t fake2real[] = { IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, 0, IE_STATE_ID };
+				idx = fake2real[idx - STI_EA];
+			}
+			ieDword stat;
+			stat = STAT_GET(idx);
+			if (idx == IE_SUBRACE) {
+				//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
+				stat |= STAT_GET(IE_RACE) << 16;
+			} else if (idx == IE_ALIGNMENT) {
+				//alignment checks can be for good vs. evil, or chaotic vs. lawful, or both
+				ieDword almask = 0;
+				if (val & AL_GE_MASK) {
+					almask |= AL_GE_MASK;
+				}
+				if (val & AL_LC_MASK) {
+					almask |= AL_LC_MASK;
+				}
+				stat &= almask;
+			}
+			return DiffCore(stat, val, rel);
+	}
 }
 
 }

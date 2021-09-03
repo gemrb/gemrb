@@ -35,7 +35,7 @@ public:
 	DialogHandler();
 	~DialogHandler();
 
-	Scriptable *GetTarget();
+	Scriptable *GetTarget() const;
 	Actor *GetSpeaker();
 	bool InDialog(const Scriptable *scr) const { return IsSpeaker(scr) || IsTarget(scr); }
 	bool IsSpeaker(const Scriptable *scr) const { return scr->GetGlobalID() == speakerID; }
@@ -43,23 +43,23 @@ public:
 	void SetSpeaker(const Scriptable *scr) { speakerID = scr->GetGlobalID(); }
 	void SetTarget(const Scriptable *scr) { targetID = scr->GetGlobalID(); }
 
-	bool InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref, ieDword si=-1);
+	bool InitDialog(Scriptable* speaker, Scriptable* target, const ResRef& dlgref, ieDword si = -1);
 	void EndDialog(bool try_to_break=false);
 	bool DialogChoose(unsigned int choose);
 
 private:
 	/** this function safely retrieves an Actor by ID */
-	Actor *GetActorByGlobalID(ieDword ID);
-	void UpdateJournalForTransition(DialogTransition *tr);
+	Actor *GetLocalActorByGlobalID(ieDword ID);
+	void UpdateJournalForTransition(const DialogTransition *tr);
 
-	DialogState* ds;
-	Dialog* dlg;
+	DialogState* ds = nullptr;
+	Dialog* dlg = nullptr;
 
-	ieDword speakerID;
-	ieDword targetID;
-	ieDword originalTargetID;
+	ieDword speakerID = 0;
+	ieDword targetID = 0;
+	ieDword originalTargetID = 0;
 
-	int initialState;
+	int initialState = -1;
 	Point prevViewPortLoc;
 };
 

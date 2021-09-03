@@ -31,18 +31,16 @@ namespace GemRB {
 
 class Font;
 
-class GEM_EXPORT AnimationMgr : public Plugin {
+class GEM_EXPORT AnimationMgr : public ImporterBase {
 public:
-	AnimationMgr(void);
-	~AnimationMgr(void) override;
-	virtual bool Open(DataStream* stream) = 0;
-	virtual int GetCycleSize(unsigned char Cycle) = 0;
-	virtual AnimationFactory* GetAnimationFactory(const char* ResRef,
-		unsigned char mode = IE_NORMAL, bool allowCompression = true) = 0;
+	using index_t = AnimationFactory::index_t;
+	
+	virtual index_t GetCycleSize(index_t Cycle) = 0;
+	virtual AnimationFactory* GetAnimationFactory(const ResRef &resref, bool allowCompression = true) = 0;
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	virtual Holder<Sprite2D> GetPalette() = 0;
-	virtual int GetCycleCount() = 0;
+	virtual index_t GetCycleCount() = 0;
 };
 
 }

@@ -31,19 +31,19 @@ class GEM_EXPORT SlicedStream : public DataStream
 {
 private:
 //	bool autoFree;
-	unsigned long startpos;
+	strpos_t startpos;
 	DataStream* str;
 public:
-	SlicedStream(DataStream* cfs, int startpos, int size);
+	SlicedStream(DataStream* cfs, strpos_t startpos, strpos_t size);
 	~SlicedStream() override;
 	DataStream* Clone() override;
 
-	int Read(void* dest, unsigned int length) override;
-	int Write(const void* src, unsigned int length) override;
-	int Seek(int pos, int startpos) override;
+	strret_t Read(void* dest, strpos_t length) override;
+	strret_t Write(const void* src, strpos_t length) override;
+	stroff_t Seek(stroff_t pos, strpos_t startpos) override;
 };
 
-GEM_EXPORT DataStream* SliceStream(DataStream* str, unsigned long startpos, unsigned long size, bool preservepos = false);
+GEM_EXPORT DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool preservepos = false);
 
 }
 

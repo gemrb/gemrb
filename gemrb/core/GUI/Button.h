@@ -39,6 +39,7 @@
 
 namespace GemRB {
 
+class SpriteAnimation;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 
@@ -60,7 +61,6 @@ using PaletteHolder = Holder<Palette>;
 #define IE_GUI_BUTTON_CAPS         0x00000008   // convert text to uppercase
 #define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
 #define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
-#define IE_GUI_BUTTON_ANIMATED     0x00000080
 
 //these bits are hardcoded in the .chu structure
 #define IE_GUI_BUTTON_ALIGN_LEFT   0x00000100
@@ -68,9 +68,9 @@ using PaletteHolder = Holder<Palette>;
 #define IE_GUI_BUTTON_ALIGN_TOP    0x00000400
 #define IE_GUI_BUTTON_ALIGN_BOTTOM 0x00000800
 #define IE_GUI_BUTTON_ALIGNMENT_FLAGS (IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_BOTTOM)
-#define IE_GUI_BUTTON_ANCHOR       0x00001000 //not implemented yet
+#define IE_GUI_BUTTON_ANCHOR       0x00001000
 #define IE_GUI_BUTTON_LOWERCASE    0x00002000
-//#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag
+//#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag; labeled "no word wrap"
 //end of hardcoded part
 #define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
 #define IE_GUI_BUTTON_PLAYRANDOM   0x00020000
@@ -113,7 +113,7 @@ enum BUTTON_IMAGE_TYPE {
 
 class GEM_EXPORT Button : public Control {
 public:
-	Button(Region& frame);
+	explicit Button(const Region& frame);
 	~Button() override;
 
 	bool IsAnimated() const override;
@@ -127,10 +127,11 @@ public:
 	void SetText(const String& string) override;
 	/** Sets the Picture */
 	void SetPicture(Holder<Sprite2D> Picture);
+	void SetAnimation(SpriteAnimation* anim);
 	/** Clears the list of Pictures */
 	void ClearPictureList();
 	/** Add picture to the end of the list of Pictures */
-	void StackPicture(Holder<Sprite2D> Picture);
+	void StackPicture(const Holder<Sprite2D>& Picture);
 	/** Sets border/frame parameters */
 	void SetBorder(int index, const Region&, const Color &color, bool enabled = false, bool filled = false);
 	/** Sets horizontal overlay, used in portrait hp overlay */
@@ -150,7 +151,7 @@ public:
 	Holder<Sprite2D> Cursor() const override;
 
 	/** Refreshes the button from a radio group */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t Sum) override;
 	/** Set palette used for drawing button label in normal state.  */
 	void SetTextColor(const Color &color);
 	/** Sets percent (0-1.0) of width for clipping picture */
@@ -174,6 +175,7 @@ private: // Private attributes
 	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
 	Holder<Sprite2D> Picture;
+	SpriteAnimation* animation = nullptr;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
 	std::vector<Holder<Sprite2D>> PictureList;
 	/** The current state of the Button */
@@ -195,7 +197,7 @@ private: // Private attributes
 		short mod = 0;
 		bool global = false;
 
-		operator bool() const {
+		explicit operator bool() const {
 			return key != '\0';
 		}
 	} hotKey;
@@ -207,8 +209,10 @@ private: // Private attributes
 	void DoToggle();
 
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
+	void FlagsChanged(unsigned int /*oldflags*/) override;
 	
 protected:
 	/** Mouse Enter */

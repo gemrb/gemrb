@@ -26,7 +26,7 @@
 #include "Interface.h"
 #include "Palette.h"
 #include "Variables.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <cassert>
 #include <cstdio>
@@ -42,7 +42,7 @@ MVEPlay::MVEPlay(void)
 	video = core->GetVideoDriver();
 	validVideo = false;
 	vidBuf = NULL;
-	g_palette = new Palette();
+	g_palette = MakeHolder<Palette>();
 
 	// these colors don't change
 	g_palette->col[0] = ColorBlack;
@@ -50,13 +50,8 @@ MVEPlay::MVEPlay(void)
 	g_palette->col[255] = Color(50,50,50,255);
 }
 
-MVEPlay::~MVEPlay(void)
+bool MVEPlay::Import(DataStream* str)
 {
-}
-
-bool MVEPlay::Open(DataStream* stream)
-{
-	str = stream;
 	validVideo = false;
 
 	char Signature[MVE_SIGNATURE_LEN];
@@ -80,9 +75,7 @@ bool MVEPlay::DecodeFrame(VideoBuffer& buf)
 
 unsigned int MVEPlay::fileRead(void* buf, unsigned int count)
 {
-	unsigned numread;
-
-	numread = str->Read( buf, count );
+	strret_t numread = str->Read( buf, count );
 	return ( numread == count );
 }
 
@@ -98,7 +91,7 @@ void MVEPlay::showFrame(const unsigned char* buf, unsigned int bufw, unsigned in
 	vidBuf->CopyPixels(Region(dest_x, dest_y, bufw, bufh), buf, NULL, g_palette.get());
 }
 
-void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
+void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count) const
 {
 	p = p + (start * 3);
 	for (unsigned int i = start; i < start+count; i++) {
@@ -109,7 +102,7 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
 	}
 }
 
-int MVEPlay::setAudioStream()
+int MVEPlay::setAudioStream() const
 {
 	ieDword volume ;
 	core->GetDictionary()->Lookup( "Volume Movie", volume) ;
@@ -117,7 +110,7 @@ int MVEPlay::setAudioStream()
 	return source;
 }
 
-void MVEPlay::freeAudioStream(int stream)
+void MVEPlay::freeAudioStream(int stream) const
 {
 	if (stream > -1)
 		core->GetAudioDrv()->ReleaseStream(stream, true);
@@ -125,7 +118,7 @@ void MVEPlay::freeAudioStream(int stream)
 
 void MVEPlay::queueBuffer(int stream, unsigned short bits,
 			int channels, short* memory,
-			int size, int samplerate)
+			int size, int samplerate) const
 {
 	if (stream > -1)
 		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate) ;

@@ -24,10 +24,9 @@
 #include "PathFinder.h"
 #include "Polygon.h"
 #include "Scriptable/Scriptable.h"
+#include "TileOverlay.h"
 
 namespace GemRB {
-
-class TileOverlay;
 
 //door flags
 #define DOOR_OPEN        1
@@ -69,14 +68,12 @@ public:
 
 class GEM_EXPORT Door : public Highlightable {
 public:
-	Door(TileOverlay* Overlay, DoorTrigger&& trigger);
-	~Door(void) override;
+	Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger);
 public:
 	ieVariable LinkedInfo;
-	ieResRef ID; //WED ID
-	TileOverlay* overlay;
-	unsigned short* tiles;
-	int tilecount;
+	ResRef ID; //WED ID
+	Holder<TileOverlay> overlay;
+	std::vector<ieWord> tiles;
 	ieDword Flags;
 	int closedIndex;
 	//trigger areas
@@ -84,43 +81,41 @@ public:
 	Region& OpenBBox = BBox; // an alias for the base class BBox
 	Region ClosedBBox;
 	//impeded blocks
-	Point* open_ib; //impeded blocks stored in a Point array
-	int oibcount;
-	Point* closed_ib;
-	int cibcount;
+	std::vector<Point> open_ib; //impeded blocks stored in a Point array
+	std::vector<Point> closed_ib;
 
 	Point toOpen[2];
-	ieResRef OpenSound;
-	ieResRef CloseSound;
-	ieResRef LockSound;
-	ieResRef UnLockSound;
+	ResRef OpenSound;
+	ResRef CloseSound;
+	ResRef LockSound;
+	ResRef UnLockSound;
 	ieDword DiscoveryDiff;
 	ieDword LockDifficulty; //this is a dword?
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
 	ieWord hp, ac;          //unused???, but learned from IE DEV info
 private:
-	void ImpedeBlocks(int count, Point *points, PathMapFlags value) const;
+	void ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const;
 	void UpdateDoor();
 	bool BlockedOpen(int Open, int ForceOpen) const;
 public:
 	void ToggleTiles(int State, int playsound = false);
-	void SetName(const char* Name); // sets door ID
-	void SetTiles(unsigned short* Tiles, int count);
+	void SetName(const ResRef &Name); // sets door ID
+	void SetTiles(std::vector<ieWord>);
 	bool CanDetectTrap() const override;
 	void SetDoorLocked(int Locked, int playsound);
-	void SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger = true);
+	void SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigger = true);
 	int IsOpen() const;
 	bool HitTest(const Point& p) const;
 	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor* actor) ;
-	bool TryUnlock(Actor *actor);
+	bool TryUnlock(Actor *actor) const;
 	void TryDetectSecret(int skill, ieDword actorID);
 	bool Visible() const;
 	void dump() const;
 	int TrapResets() const override { return Flags & DOOR_RESET; }
 	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }
-	void SetNewOverlay(TileOverlay *Overlay);
+	void SetNewOverlay(Holder<TileOverlay> Overlay);
 
 	std::shared_ptr<Gem_Polygon> OpenTriggerArea() const;
 	std::shared_ptr<Gem_Polygon> ClosedTriggerArea() const;

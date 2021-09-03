@@ -20,14 +20,14 @@
 
 #include "GUI/EventMgr.h"
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "globals.h"
 
 namespace GemRB {
 
-unsigned long EventMgr::DCDelay = 250;
-unsigned long EventMgr::DPDelay = 250;
+tick_t EventMgr::DCDelay = 250;
+tick_t EventMgr::DPDelay = 250;
 bool EventMgr::TouchInputEnabled = false;
 
 EventMgr::buttonbits EventMgr::mouseButtonFlags;
@@ -47,7 +47,7 @@ MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
 	me.deltaX = te.deltaX;
 	me.deltaY = te.deltaY;
 
-	me.buttonStates = (down) ? GEM_MB_ACTION : 0;
+	me.buttonStates = down ? GEM_MB_ACTION : 0;
 	me.button = GEM_MB_ACTION;
 	me.repeats = 1;
 
@@ -83,7 +83,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 			break;
 	}
 
-	me.buttonStates = (down) ? btn : 0;
+	me.buttonStates = down ? btn : 0;
 	me.button = btn;
 
 	return me;
@@ -140,7 +140,7 @@ bool EventMgr::ControllerButtonState(EventButton btn)
 	return (controllerButtonStates & buttonbits(btn)).any();
 }
 
-void EventMgr::DispatchEvent(Event&& e)
+void EventMgr::DispatchEvent(Event&& e) const
 {
 	if (TouchInputEnabled == false && e.EventMaskFromType(e.type) & Event::AllTouchMask) {
 		return;
@@ -156,7 +156,7 @@ void EventMgr::DispatchEvent(Event&& e)
 		}
 	} else if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
 		// first check for hot key listeners
-		static unsigned long lastKeyDown = 0;
+		static tick_t lastKeyDown = 0;
 		static unsigned char repeatCount = 0;
 		static KeyboardKey repeatKey = 0;
 
@@ -178,7 +178,7 @@ void EventMgr::DispatchEvent(Event&& e)
 
 		KeyMap::const_iterator hit = HotKeys.find(flags);
 		if (hit != HotKeys.end()) {
-			assert(hit->second.size() > 0);
+			assert(!hit->second.empty());
 			KeyMap::value_type::second_type list = hit->second;
 			EventCallback cb = hit->second.front();
 			if (cb(e)) {
@@ -200,7 +200,7 @@ void EventMgr::DispatchEvent(Event&& e)
 		) {
 			// WARNING: these are shared between mouse and touch
 			// it is assumed we wont be using both simultaniously
-			static unsigned long lastMouseDown = 0;
+			static tick_t lastMouseDown = 0;
 			static unsigned char repeatCount = 0;
 			static EventButton repeatButton = 0;
 			static Point repeatPos;
@@ -231,12 +231,12 @@ void EventMgr::DispatchEvent(Event&& e)
 			se.repeats = repeatCount;
 		}
 
-		if (e.EventMaskFromType(e.type) & (Event::AllMouseMask)) {
+		if (e.EventMaskFromType(e.type) & Event::AllMouseMask) {
 			// set/clear the appropriate buttons
 			mouseButtonFlags = e.mouse.buttonStates;
 			mousePos = e.mouse.Pos();
 		} else { // touch
-			TouchEvent& te = (e.type == Event::TouchGesture) ? static_cast<TouchEvent&>(e.gesture) : static_cast<TouchEvent&>(e.touch);
+			const TouchEvent& te = e.type == Event::TouchGesture ? static_cast<const TouchEvent&>(e.gesture) : static_cast<const TouchEvent&>(e.touch);
 			uint64_t id = te.fingers[0].id;
 
 			switch (e.type) {
@@ -281,7 +281,7 @@ void EventMgr::DispatchEvent(Event&& e)
 	}
 }
 
-bool EventMgr::RegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short mod)
+bool EventMgr::RegisterHotKeyCallback(const EventCallback& cb, KeyboardKey key, short mod)
 {
 	if (key < ' ') { // allowing certain non printables (eg 'F' keys)
 		return false;
@@ -300,7 +300,7 @@ bool EventMgr::RegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short m
 	return true;
 }
 
-void EventMgr::UnRegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short mod)
+void EventMgr::UnRegisterHotKeyCallback(const EventCallback& cb, KeyboardKey key, short mod)
 {
 	int flags = mod << 16;
 	flags |= key;
@@ -308,7 +308,7 @@ void EventMgr::UnRegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short
 	KeyMap::iterator it = HotKeys.find(flags);
 	if (it != HotKeys.end()) {
 		KeyMap::value_type::second_type::iterator cbit;
-		cbit = std::find_if(it->second.begin(), it->second.end(), [&cb](const decltype(cb)& item) {
+		cbit = std::find_if(it->second.begin(), it->second.end(), [&cb](decltype(cb)& item) {
 			return FunctionTargetsEqual(cb, item);
 		});
 		if (cbit != it->second.end()) {
@@ -320,7 +320,7 @@ void EventMgr::UnRegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short
 	}
 }
 
-EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(EventCallback cb, Event::EventTypeMask mask)
+EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(const EventCallback& cb, Event::EventTypeMask mask)
 {
 	static size_t id = 0;
 	Taps[id] = std::make_pair(mask, cb);
@@ -383,7 +383,7 @@ Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 {
 	Event e = {}; // initialize all members to 0
 	e.mod = mod;
-	e.type = (down) ? Event::KeyDown : Event::KeyUp;
+	e.type = down ? Event::KeyDown : Event::KeyUp;
 	e.keyboard.keycode = key;
 	e.isScreen = false;
 
@@ -410,7 +410,7 @@ Event EventMgr::CreateTouchEvent(const TouchEvent::Finger fingers[], int numFing
 	Event e = {};
 	e.isScreen = true;
 	e.mod = 0;
-	e.type = (down) ? Event::TouchDown : Event::TouchUp;
+	e.type = down ? Event::TouchDown : Event::TouchUp;
 
 	if (numFingers) {
 		for (int i = 0; i < numFingers; ++i) {
@@ -496,6 +496,13 @@ Event EventMgr::CreateControllerButtonEvent(EventButton btn, bool down)
 		e.controller.buttonStates &= ~btn;
 	}
 	e.controller.button = btn;
+
+	return e;
+}
+
+Event EventMgr::CreateRedrawRequestEvent() {
+	Event e = {};
+	e.type = Event::RedrawRequest;
 
 	return e;
 }

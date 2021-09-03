@@ -114,9 +114,9 @@ def getAbilities(area):
 	area.Append("\n")
 	for i in range(AbilityCount):
 		v = AbilityTable.GetValue(i,2)
-		id = AbilityTable.GetValue(i,3)
+		stat = AbilityTable.GetValue (i, 3)
 		area.Append(v)
-		area.Append(": " + str(GemRB.GetPlayerStat(MyChar,id)) + "\n")
+		area.Append (": " + str(GemRB.GetPlayerStat (MyChar, stat)) + "\n")
 	area.Append("\n")
 
 #Skill
@@ -209,9 +209,9 @@ def getSkills(TextAreaControl):
 	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount () - 2):
 			name = SkillTable.GetValue (skill+2, 1, GTV_REF)
-			id = SkillTable.GetValue (skill+2, 2)
+			stat = SkillTable.GetValue (skill + 2, 2)
 			available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
-			value = GemRB.GetPlayerStat(MyChar,id)
+			value = GemRB.GetPlayerStat (MyChar, stat)
 			if value >= 0 and available != -1:
 				info += name + ": " + str(value) + "\n"
 				
@@ -236,9 +236,9 @@ def getProfi(TextAreaControl):
 	#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
 	for i in range(ProfCount):
 		# 4294967296 overflows to -1 on some arches, so we use a smaller invalid strref
-		id = TmpTable.GetValue (i, 0)+IE_PROFICIENCYBASTARDSWORD
+		stat = TmpTable.GetValue (i, 0) + IE_PROFICIENCYBASTARDSWORD
 		Weapon = TmpTable.GetValue (i, 1, GTV_REF)
-		Value = GemRB.GetPlayerStat (MyChar,id)
+		Value = GemRB.GetPlayerStat (MyChar, stat)
 		if Value:
 			pluses = " "
 			for plus in range(0, Value):

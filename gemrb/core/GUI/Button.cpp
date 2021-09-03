@@ -32,13 +32,13 @@
 #include "GameData.h"
 #include "Palette.h"
 
-#include <cmath>
+#include <utility>
 
 #define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
 
 namespace GemRB {
 
-Button::Button(Region& frame)
+Button::Button(const Region& frame)
 	: Control(frame),
 	buttonImages()
 {
@@ -59,6 +59,7 @@ Button::Button(Region& frame)
 
 Button::~Button()
 {
+	delete animation;
 	SetImage(BUTTON_IMAGE_NONE, NULL);
 	ClearPictureList();
 
@@ -88,12 +89,12 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 	}
 
 	if (type <= BUTTON_IMAGE_NONE) {
-		for (int i = 0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
-			buttonImages[i] = nullptr;
+		for (auto& buttonImage : buttonImages) {
+			buttonImage = nullptr;
 		}
 		flags &= IE_GUI_BUTTON_NO_IMAGE;
 	} else {
-		buttonImages[type] = img;
+		buttonImages[type] = std::move(img);
 		/*
 		 currently IE_GUI_BUTTON_NO_IMAGE cannot be infered from the presence or lack of images
 		 leaving this here commented out in case it may be useful in the future.
@@ -120,13 +121,25 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 
 void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
+	tick_t time = GetTicks();
 	if (overlayAnim) {
-		overlayAnim.Next(GetTicks());
+		overlayAnim.Next(time);
+	}
+	if (animation) {
+		animation->Next(time);
+	}
+}
+
+void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
+	if (animation && animation->HasEnded()) {
+		delete animation;
+		animation = nullptr;
 	}
 }
 
 /** Draws the Control on the Output Display */
-void Button::DrawSelf(Region rgn, const Region& /*clip*/)
+void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	Video * video = core->GetVideoDriver();
 
@@ -153,7 +166,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (Image) {
 			// FIXME: maybe it's useless...
 			Point offset((frame.w / 2) - (Image->Frame.w / 2), (frame.h / 2) - (Image->Frame.h / 2));
-			video->BlitSprite(Image, rgn.Origin() + offset);
+			video->BlitSprite(Image, rgn.origin + offset);
 		}
 	}
 
@@ -170,7 +183,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		picPos.x = (rgn.w / 2) - (Picture->Frame.w / 2) + rgn.x;
 		picPos.y = (rgn.h / 2) - (Picture->Frame.h / 2) + rgn.y;
 		if (flags & IE_GUI_BUTTON_HORIZONTAL) {
-			picPos += Picture->Frame.Origin();
+			picPos += Picture->Frame.origin;
 
 			// Clipping: 0 = overlay over full button, 1 = no overlay
 			int overlayHeight = Picture->Frame.h * (1.0 - Clipping);
@@ -187,23 +200,24 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			}
 
 			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
-			video->BlitSprite( Picture, rb.Origin(), &rb );
+			video->BlitSprite( Picture, rb.origin, &rb );
 		} else {
 			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
-			video->BlitSprite(Picture, Picture->Frame.Origin() + r.Origin(), &r);
+			video->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r);
 		}
 	}
 
 	// Button animation
-	if (AnimPicture) {
+	if (animation && animation->Current()) {
+		auto AnimPicture = animation->Current();
 		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
 		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, r.Origin() + AnimPicture->Frame.Origin(), &r );
+			video->BlitSprite( AnimPicture, r.origin + AnimPicture->Frame.origin, &r );
 		} else {
-			video->BlitSprite( AnimPicture, r.Origin(), &r );
+			video->BlitSprite( AnimPicture, r.origin, &r );
 		}
 	}
 
@@ -224,7 +238,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 
 		for (; iter != PictureList.end(); ++iter) {
-			video->BlitSprite(*iter, rgn.Origin() + offset);
+			video->BlitSprite(*iter, rgn.origin + offset);
 		}
 	}
 
@@ -260,7 +274,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			r.w -= Anchor.x;
 			r.h -= Anchor.y;
 		} else {
-			Font::StringSizeMetrics metrics {r.Dimensions(), 0, 0, false};
+			Font::StringSizeMetrics metrics {r.size, 0, 0, false};
 			font->StringSize(Text, &metrics);
 
 			if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & flags)) {
@@ -284,12 +298,12 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
-		for (int i = 0; i < MAX_NUM_BORDERS; i++) {
-			ButtonBorder *fr = &borders[i];
+		for (const auto& border : borders) {
+			const ButtonBorder *fr = &border;
 			if (! fr->enabled) continue;
 
 			const Region& frRect = fr->rect;
-			Region r = Region( rgn.Origin() + frRect.Origin(), frRect.Dimensions() );
+			Region r = Region( rgn.origin + frRect.origin, frRect.size );
 			if (pulseBorder && !fr->filled) {
 				Color mix = GlobalColorCycle.Blend(ColorWhite, fr->color);
 				video->DrawRect( r, mix, fr->filled, BlitFlags::BLENDED );
@@ -299,6 +313,23 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 	}
 }
+
+void Button::FlagsChanged(unsigned int /*oldflags*/)
+{
+	if (animation) {
+		animation->flags = SpriteAnimation::PLAY_NORMAL;
+		if (flags & IE_GUI_BUTTON_PLAYRANDOM) {
+			animation->flags |= SpriteAnimation::PLAY_RANDOM;
+		}
+		if (flags & IE_GUI_BUTTON_PLAYONCE) {
+			animation->flags |= SpriteAnimation::PLAY_ONCE;
+		}
+		if (flags & IE_GUI_BUTTON_PLAYALWAYS) {
+			animation->flags |= SpriteAnimation::PLAY_ALWAYS;
+		}
+	}
+}
+
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
 {
@@ -317,6 +348,10 @@ void Button::SetState(unsigned char state)
 
 bool Button::IsAnimated() const
 {
+	if (animation) {
+		return true;
+	}
+
 	if (overlayAnim) {
 		return true;
 	}
@@ -325,14 +360,24 @@ bool Button::IsAnimated() const
 		return true;
 	}
 
-	return Control::IsAnimated();
+	return false;
 }
 
 bool Button::IsOpaque() const
 {
-	return Picture != NULL
-		&& !(flags&IE_GUI_BUTTON_NO_IMAGE)
-		&& Picture->HasTransparency() == false;
+	if (animation) {
+		// we are dirty every frame anyway
+		// so no need to get fancy
+		// just redraw everything
+		return false;
+	}
+
+	bool opaque = View::IsOpaque();
+	if (!opaque && Picture) {
+		opaque = !(flags&IE_GUI_BUTTON_NO_IMAGE) && !Picture->HasTransparency();
+	}
+	
+	return opaque;
 }
 
 void Button::SetBorder(int index, const Region& rgn, const Color &color, bool enabled, bool filled)
@@ -412,7 +457,7 @@ String Button::TooltipText() const
 Holder<Sprite2D> Button::Cursor() const
 {
 	if (IS_PORTRAIT) {
-		GameControl* gc = core->GetGameControl();
+		const GameControl* gc = core->GetGameControl();
 		if (gc) {
 			Holder<Sprite2D> cur = gc->GetTargetActionCursor();
 			if (cur) return cur;
@@ -458,9 +503,9 @@ Holder<Sprite2D> Button::DragCursor() const
 bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
 	ActionKey key(Action::DragDropDest);
-    if (core->GetDraggedItem() && !SupportsAction(key)) {
-        return true;
-    }
+	if (core->GetDraggedItem() && !SupportsAction(key)) {
+		return true;
+	}
     
 	if (me.button == GEM_MB_ACTION) {
 		if (State == IE_GUI_BUTTON_LOCKED) {
@@ -524,8 +569,8 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 		SetState( IE_GUI_BUTTON_PRESSED );
 	}
 
-	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
-		ButtonBorder *fr = &borders[i];
+	for (const auto& border : borders) {
+		const ButtonBorder *fr = &border;
 		if (fr->enabled) {
 			pulseBorder = !fr->filled;
 			MarkDirty();
@@ -565,7 +610,7 @@ void Button::SetText(const String& string)
 }
 
 /** Refresh a button from a given radio button group */
-void Button::UpdateState(unsigned int Sum)
+void Button::UpdateState(value_t Sum)
 {
 	if (IsDisabled()) {
 		return;
@@ -623,10 +668,10 @@ void Button::DoToggle()
 void Button::SetPicture(Holder<Sprite2D> newpic)
 {
 	ClearPictureList();
-	Picture = newpic;
+	Picture = std::move(newpic);
 	if (Picture) {
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
-		unsigned int ratio = round((float) Picture->Frame.w / (float) frame.w);
+		unsigned int ratio = CeilDiv(Picture->Frame.w, frame.w);
 		if (ratio > 1) {
 			Holder<Sprite2D> img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
 			Picture = img;
@@ -638,6 +683,23 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 	MarkDirty();
 }
 
+void Button::SetAnimation(SpriteAnimation* anim)
+{
+	// if this button says the resource is the same
+	// we wanted to set, we don't reset it
+	// but we must reinitialize it, if it was play once
+	if (animation && animation->SameResource(anim) && !(animation->flags & SpriteAnimation::PLAY_ONCE)) {
+		delete anim;
+		return;
+	} else {
+		delete animation;
+		animation = anim;
+		FlagsChanged(flags); // sync animation flags
+	}
+	
+	MarkDirty();
+}
+
 /** Clears the list of Pictures */
 void Button::ClearPictureList()
 {
@@ -646,7 +708,7 @@ void Button::ClearPictureList()
 }
 
 /** Add picture to the end of the list of Pictures */
-void Button::StackPicture(Holder<Sprite2D> Picture)
+void Button::StackPicture(const Holder<Sprite2D>& Picture)
 {
 	PictureList.push_back(Picture);
 	MarkDirty();
@@ -660,7 +722,7 @@ bool Button::HitTest(const Point& p) const
 		// some buttons have hollow Image frame filled w/ Picture
 		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 		Holder<Sprite2D> Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
-		if (Picture || PictureList.size() || !Unpressed) return true;
+		if (Picture || !PictureList.empty() || !Unpressed) return true;
 
 		Point off;
 		off.x = (frame.w / 2) - (Unpressed->Frame.w / 2) + Unpressed->Frame.x;

@@ -137,7 +137,7 @@ def InitInventoryWindow (Window):
 
 	# info label, game paused, etc
 	Label = Window.GetControl (0x1000003d)
-	Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
+	Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	Label.SetText ("")
 
 	return

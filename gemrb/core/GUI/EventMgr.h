@@ -30,6 +30,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "globals.h"
 
 #include "Callback.h"
 #include "Region.h"
@@ -105,9 +106,9 @@ enum ControllerButton : int8_t {
 	CONTROLLER_BUTTON_DPAD_RIGHT
 };
 
-typedef unsigned char EventButton;
-typedef unsigned short KeyboardKey;
-typedef unsigned short ButtonMask;
+using EventButton = unsigned char;
+using KeyboardKey = unsigned short;
+using ButtonMask = unsigned short;
 
 struct EventBase {
 	unsigned short repeats; // number of times this event has been repeated (within the repeat time interval)
@@ -164,6 +165,9 @@ struct GEM_EXPORT GestureEvent : public TouchEvent {
 	float dDist;
 };
 
+struct GEM_EXPORT ApplicationEvent : public EventBase {
+};
+
 struct GEM_EXPORT Event {
 	enum EventType {
 		MouseMove = 0,
@@ -182,8 +186,10 @@ struct GEM_EXPORT Event {
 		
 		ControllerAxis,
 		ControllerButtonUp,
-		ControllerButtonDown
+		ControllerButtonDown,
 
+		// Something wants the whole screen to be refreshed (SDL backend, OS, ...)
+		RedrawRequest
 		// leaving off types for unused events
 	};
 
@@ -216,6 +222,9 @@ struct GEM_EXPORT Event {
 		
 		AllControllerMask = ControllerAxisMask | ControllerButtonUpMask | ControllerButtonDownMask,
 
+		RedrawRequestMask = 1 << RedrawRequest,
+		AllApplicationMask = RedrawRequestMask,
+
 		AllEventsMask = 0xffffffffU
 	};
 
@@ -227,14 +236,15 @@ struct GEM_EXPORT Event {
 		KeyboardEvent keyboard;
 		TouchEvent touch;
 		GestureEvent gesture;
+		ApplicationEvent application;
 	};
 
 	TextEvent text; // text is nontrivial so it stands alone (until C++11 is allowed)
-    
-    typedef unsigned short EventMods;
+
+	using EventMods = unsigned short;
 
 	EventType type;
-	unsigned long time;
+	tick_t time;
 	EventMods mod; // modifier keys held during the event
 	bool isScreen; // event coresponsds to location on screen
 };
@@ -251,15 +261,15 @@ KeyboardEvent KeyEventFromController(const ControllerEvent& ce);
 
 class GEM_EXPORT EventMgr {
 public:
-	typedef std::bitset<sizeof(short) * CHAR_BIT> buttonbits;
+	using buttonbits = std::bitset<sizeof(short) * CHAR_BIT>;
 	using EventCallback = Callback<bool, const Event&>;
-	typedef size_t TapMonitorId;
+	using TapMonitorId = size_t;
 	
 	static constexpr int mouseClickRadius = 5; // radius for reapeat click events
 	static constexpr int mouseDragRadius = 10; // radius for drag events
 
-	static unsigned long DCDelay;
-	static unsigned long DPDelay;
+	static tick_t DCDelay;
+	static tick_t DPDelay;
 	static bool TouchInputEnabled;
 
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
@@ -277,17 +287,19 @@ public:
 	static Event CreateControllerAxisEvent(InputAxis axis, int delta, float pct);
 	static Event CreateControllerButtonEvent(EventButton btn, bool down);
 
-	static bool RegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
-	static void UnRegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
-	static TapMonitorId RegisterEventMonitor(EventCallback, Event::EventTypeMask mask = Event::AllEventsMask);
+	static Event CreateRedrawRequestEvent();
+
+	static bool RegisterHotKeyCallback(const EventCallback&, KeyboardKey key, short mod = 0);
+	static void UnRegisterHotKeyCallback(const EventCallback&, KeyboardKey key, short mod = 0);
+	static TapMonitorId RegisterEventMonitor(const EventCallback&, Event::EventTypeMask mask = Event::AllEventsMask);
 	static void UnRegisterEventMonitor(TapMonitorId monitor);
 
 private:
 	// FIXME: this shouldnt really be static... but im not sure we want direct access to the EventMgr instance...
 	// currently the delays are static so it makes sense for now that the HotKeys are...
 	// map combination of keyboard key and modifier keys to a callback
-	typedef std::map<TapMonitorId, std::pair<Event::EventTypeMask, EventCallback> > EventTaps;
-	typedef std::map<int, std::list<EventCallback> > KeyMap;
+	using EventTaps = std::map<TapMonitorId, std::pair<Event::EventTypeMask, EventCallback>>;
+	using KeyMap = std::map<int, std::list<EventCallback>>;
 
 	static EventTaps Taps;
 	static KeyMap HotKeys;
@@ -301,7 +313,7 @@ private:
 	static buttonbits controllerButtonStates;
 
 public:
-	void DispatchEvent(Event&& e);
+	void DispatchEvent(Event&& e) const;
 
 	static bool ModState(unsigned short mod);
 

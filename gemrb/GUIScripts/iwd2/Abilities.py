@@ -89,7 +89,7 @@ def RollPress():
 
 	GemRB.SetVar("Ability",0)
 	SumLabel = AbilityWindow.GetControl(0x10000002)
-	SumLabel.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+	SumLabel.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	SumLabel.SetText(str(PointsLeft))
 
 	for i in range(0,6):
@@ -103,7 +103,7 @@ def RollPress():
 		Label.SetText(str(v) )
 
 		Label = AbilityWindow.GetControl(0x10000024+i)
-		Label.SetTextColor (GetModColor (b))
+		Label.SetColor (GetModColor (b))
 		Label.SetText("%+d"%(b))
 	return
 
@@ -194,12 +194,12 @@ def RightPress(btn, Abidx):
 	PointsLeft = PointsLeft + 1
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetText(str(PointsLeft) )
-	SumLabel.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+	SumLabel.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	Label = AbilityWindow.GetControl(0x10000003+Abidx)
 	Label.SetText(str(Ability) )
 	Label = AbilityWindow.GetControl(0x10000024+Abidx)
 	b = Ability // 2 - 5
-	Label.SetTextColor (GetModColor (b))
+	Label.SetColor (GetModColor (b))
 	Label.SetText("%+d"%(b))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	return
@@ -229,13 +229,13 @@ def LeftPress(btn, Abidx):
 	PointsLeft = PointsLeft - 1
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	if PointsLeft == 0:
-		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
+		SumLabel.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	SumLabel.SetText(str(PointsLeft) )
 	Label = AbilityWindow.GetControl(0x10000003+Abidx)
 	Label.SetText(str(Ability) )
 	Label = AbilityWindow.GetControl(0x10000024+Abidx)
 	b = Ability // 2 - 5
-	Label.SetTextColor (GetModColor (b))
+	Label.SetColor (GetModColor (b))
 	Label.SetText("%+d"%(b))
 	if PointsLeft == 0:
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)

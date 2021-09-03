@@ -23,15 +23,11 @@
 
 #include "Dialog.h"
 #include "Plugin.h"
-#include "System/DataStream.h"
 
 namespace GemRB {
 
-class GEM_EXPORT DialogMgr : public Plugin {
+class GEM_EXPORT DialogMgr : public ImporterBase {
 public:
-	DialogMgr(void);
-	~DialogMgr(void) override;
-	virtual bool Open(DataStream* stream) = 0;
 	virtual Dialog* GetDialog() const = 0;
 	virtual Condition* GetCondition(char *string) const = 0;
 };

@@ -30,8 +30,7 @@
 
 using namespace GemRB;
 
-int *profs = NULL;
-int profcount = -1;
+static std::vector<int> profs;
 
 static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
 static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
@@ -41,26 +40,21 @@ std::map<char,int> zzmap;
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	if (profs) {
-		free(profs);
-		profs = NULL;
-	}
-	profcount = 0;
-	AutoTable tm("proftype");
+	AutoTable tm = gamedata->LoadTable("proftype");
 	if (!tm) {
 		Log(ERROR, "ITMImporter", "Cannot find proftype.2da.");
 		return;
 	}
-	profcount = tm->GetRowCount();
-	profs = (int *) calloc( profcount, sizeof(int) );
+	int profcount = tm->GetRowCount();
+	profs.resize(profcount);
 	for (int i = 0; i < profcount; i++) {
 		profs[i] = atoi(tm->QueryField( i, 0 ) );
 	}
 
 	// check for iwd1 zz-weapon bonus table
-	AutoTable tm2("zzweaps");
+	AutoTable tm2 = gamedata->LoadTable("zzweaps");
 	int indR = core->LoadSymbol("race");
-	Holder<SymbolMgr> sm = core->GetSymbol(indR);
+	auto sm = core->GetSymbol(indR);
 	if (!tm2 || !sm || indR == -1) {
 		return;
 	}
@@ -78,44 +72,20 @@ static void Initializer()
 	}
 }
 
-static void ReleaseMemoryITM()
-{
-	free(profs);
-	profs = NULL;
-	profcount = -1;
-}
-
 static int GetProficiency(ieDword ItemType)
 {
-	if (profcount<0) {
+	if (profs.empty()) {
 		Initializer();
 	}
 
-	if (ItemType>=(ieDword) profcount) {
+	if (ItemType >= profs.size()) {
 		return 0;
 	}
 	return profs[ItemType];
 }
 
-ITMImporter::ITMImporter(void)
+bool ITMImporter::Import(DataStream* str)
 {
-	str = NULL;
-	version = 0;
-}
-
-ITMImporter::~ITMImporter(void)
-{
-	delete str;
-	str = NULL;
-}
-
-bool ITMImporter::Open(DataStream* stream)
-{
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "ITM V1  ", 8 ) == 0) {
@@ -139,7 +109,7 @@ bool ITMImporter::Open(DataStream* stream)
 static void AddZZFeatures(Item *s)
 {
 	// the targeting code (3rd char) is: digit = align(ment), letter = race
-	char targetIDS = toupper(s->Name[2]);
+	char targetIDS = toupper(s->Name.CString()[2]);
 	ieByte IDSval = zzmap[targetIDS];
 	ieByte IDSfile = 4;
 	if (targetIDS <= '9') {
@@ -150,7 +120,7 @@ static void AddZZFeatures(Item *s)
 	// 0: -5, 1: -4, 2: -3, 3: -2, 4: -1,
 	// 5: +1, 6: +2 ... 9: +5
 	// this bonus is on top of the default one, so less descriptions are wrong than it may seem
-	int bonus = atoi(&s->Name[3]);
+	int bonus = atoi(&s->Name.CString()[3]);
 	if (bonus < 5) {
 		bonus -= 5;
 	} else {
@@ -161,31 +131,29 @@ static void AddZZFeatures(Item *s)
 	for (unsigned int i=0; i < sizeof(zzRefs)/sizeof(*zzRefs); i++) {
 		Effect *fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 		fx->Parameter3 = bonus;
-		CopyResRef(fx->Source, s->Name);
+		fx->SourceRef = s->Name;
 		// use the space reserved earlier
-		memcpy(s->equipping_features + (s->EquippingFeatureCount - 1 - i), fx, sizeof(Effect));
-		delete fx;
+		s->equipping_features[s->EquippingFeatureCount - 1 - i] = fx;
 	}
 }
 
 Item* ITMImporter::GetItem(Item *s)
 {
-	unsigned int i;
 	ieByte k1,k2,k3,k4;
 
 	if( !s) {
 		return NULL;
 	}
-	str->ReadDword( &s->ItemName );
-	str->ReadDword( &s->ItemNameIdentified );
+	str->ReadDword(s->ItemName);
+	str->ReadDword(s->ItemNameIdentified);
 	str->ReadResRef( s->ReplacementItem );
-	str->ReadDword( &s->Flags );
-	str->ReadWord( &s->ItemType );
-	str->ReadDword( &s->UsabilityBitmask );
+	str->ReadDword(s->Flags);
+	str->ReadWord(s->ItemType);
+	str->ReadDword(s->UsabilityBitmask);
 	str->Read( s->AnimationType,2 ); //intentionally not reading word!
-	for (i=0;i<2;i++) {
-		if (s->AnimationType[i]==' ') {
-			s->AnimationType[i]=0;
+	for (char& c : s->AnimationType) {
+		if (c == ' ') {
+			c = 0;
 		}
 	}
 	str->Read( &s->MinLevel, 1 );
@@ -211,8 +179,8 @@ Item* ITMImporter::GetItem(Item *s)
 
 	str->Read( &s->MinCharisma, 1 );
 	str->Read( &s->unknown3, 1 );
-	str->ReadDword( &s->Price );
-	str->ReadWord( &s->MaxStackAmount );
+	str->ReadDword(s->Price);
+	str->ReadWord(s->MaxStackAmount);
 
 	//hack for non stacked items, so MaxStackAmount could be used as a boolean
 	if (s->MaxStackAmount==1) {
@@ -220,18 +188,19 @@ Item* ITMImporter::GetItem(Item *s)
 	}
 
 	str->ReadResRef( s->ItemIcon );
-	str->ReadWord( &s->LoreToID );
+	str->ReadWord(s->LoreToID);
 	str->ReadResRef( s->GroundIcon );
-	str->ReadDword( &s->Weight );
-	str->ReadDword( &s->ItemDesc );
-	str->ReadDword( &s->ItemDescIdentified );
+	str->ReadDword(s->Weight);
+	str->ReadDword(s->ItemDesc);
+	str->ReadDword(s->ItemDescIdentified);
 	str->ReadResRef( s->DescriptionIcon );
-	str->ReadDword( &s->Enchantment );
-	str->ReadDword( &s->ExtHeaderOffset );
-	str->ReadWord( &s->ExtHeaderCount );
-	str->ReadDword( &s->FeatureBlockOffset );
-	str->ReadWord( &s->EquippingFeatureOffset );
-	str->ReadWord( &s->EquippingFeatureCount );
+	str->ReadDword(s->Enchantment);
+	str->ReadDword(s->ExtHeaderOffset);
+	ieWord headerCount;
+	str->ReadWord(headerCount);
+	str->ReadDword(s->FeatureBlockOffset);
+	str->ReadWord(s->EquippingFeatureOffset);
+	str->ReadWord(s->EquippingFeatureCount);
 
 	s->WieldColor = 0xffff;
 	memset( s->unknown, 0, 26 );
@@ -243,9 +212,9 @@ Item* ITMImporter::GetItem(Item *s)
 	if (version == ITM_VER_PST) {
 		//pst data
 		str->ReadResRef( s->Dialog );
-		str->ReadDword( &s->DialogName );
+		str->ReadDword(s->DialogName);
 		ieWord WieldColor;
-		str->ReadWord( &WieldColor );
+		str->ReadWord(WieldColor);
 		if (s->AnimationType[0]) {
 			s->WieldColor = WieldColor;
 		}
@@ -254,10 +223,10 @@ Item* ITMImporter::GetItem(Item *s)
 		//all non pst
 		int row = dialogTable->GetRowIndex(s->Name);
 		s->DialogName = atoi(dialogTable->QueryField(row, 0));
-		CopyResRef(s->Dialog, dialogTable->QueryField(row, 1));
+		s->Dialog = dialogTable->QueryField(row, 1);
 	} else {
 		s->DialogName = -1;
-		s->Dialog[0] = '\0';
+		s->Dialog.Reset();
 	}
 
 	if (exclusionTable) {
@@ -267,9 +236,9 @@ Item* ITMImporter::GetItem(Item *s)
 		s->ItemExcl = 0;
 	}
 
-	s->ext_headers = new ITMExtHeader[s->ExtHeaderCount];
+	s->ext_headers = std::vector<ITMExtHeader>(headerCount);
 
-	for (i = 0; i < s->ExtHeaderCount; i++) {
+	for (ieWord i = 0; i < headerCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
 		ITMExtHeader* eh = &s->ext_headers[i];
 		GetExtHeader( s, eh );
@@ -290,12 +259,12 @@ Item* ITMImporter::GetItem(Item *s)
 	}
 
 	//48 is the size of the feature block
-	s->equipping_features = new Effect[s->EquippingFeatureCount + extraFeatureCount];
+	s->equipping_features.reserve(s->EquippingFeatureCount + extraFeatureCount);
 
 	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
 			GEM_STREAM_START );
-	for (i = 0; i < s->EquippingFeatureCount; i++) {
-		GetFeature(s->equipping_features+i, s);
+	for (unsigned int i = 0; i < s->EquippingFeatureCount; i++) {
+		s->equipping_features.push_back(GetFeature(s));
 	}
 
 	// add remaining features
@@ -314,7 +283,7 @@ Item* ITMImporter::GetItem(Item *s)
 #define IT_DAGGER     0x10
 #define IT_SHORTSWORD 0x13
 
-void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
+void ITMImporter::GetExtHeader(const Item *s, ITMExtHeader* eh)
 {
 	ieByte tmpByte;
 	ieWord ProjectileType;
@@ -330,27 +299,27 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 		tmpByte = 1;
 	}
 	eh->TargetNumber = tmpByte;
-	str->ReadWord( &eh->Range );
+	str->ReadWord(eh->Range);
 	str->Read(&ProjectileType, 1);
 	str->Read(&eh->AltDiceThrown, 1);
 	str->Read(&eh->Speed, 1);
 	str->Read(&eh->AltDamageBonus, 1);
-	str->ReadWord( &eh->THAC0Bonus );
-	str->ReadWord( &eh->DiceSides );
-	str->ReadWord( &eh->DiceThrown );
-	//if your compiler doesn't like this, then we need a ReadWordSigned
-	str->ReadWord( (ieWord *) &eh->DamageBonus );
-	str->ReadWord( &eh->DamageType );
-	str->ReadWord( &eh->FeatureCount );
-	str->ReadWord( &eh->FeatureOffset );
-	str->ReadWord( &eh->Charges );
-	str->ReadWord( &eh->ChargeDepletion );
-	str->ReadDword( &eh->RechargeFlags );
+	str->ReadWord(eh->THAC0Bonus);
+	str->ReadWord(eh->DiceSides);
+	str->ReadWord(eh->DiceThrown);
+	str->ReadScalar<ieWordSigned>(eh->DamageBonus);
+	str->ReadWord(eh->DamageType);
+	ieWord featureCount;
+	str->ReadWord(featureCount);
+	str->ReadWord(eh->FeatureOffset);
+	str->ReadWord(eh->Charges);
+	str->ReadWord(eh->ChargeDepletion);
+	str->ReadDword(eh->RechargeFlags);
 
 	//hack for default weapon finesse
 	if (s->ItemType==IT_DAGGER || s->ItemType==IT_SHORTSWORD) eh->RechargeFlags^=IE_ITEM_USEDEXTERITY;
 
-	str->ReadWord( &eh->ProjectileAnimation );
+	str->ReadWord(eh->ProjectileAnimation);
 	//for some odd reasons 0 and 1 are the same
 	if (eh->ProjectileAnimation) {
 		eh->ProjectileAnimation--;
@@ -361,17 +330,17 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 		eh->ProjectileAnimation = 78;
 	}
 
-	for (unsigned int i = 0; i < 3; i++) {
-		str->ReadWord( &eh->MeleeAnimation[i] );
+	for (unsigned short& i : eh->MeleeAnimation) {
+		str->ReadWord(i);
 	}
 
 	ieWord tmp;
 	ieDword pq = 0;
-	str->ReadWord( &tmp ); //arrow
+	str->ReadWord(tmp); //arrow
 	if (tmp) pq |= PROJ_ARROW;
-	str->ReadWord( &tmp ); //xbow
+	str->ReadWord(tmp); //xbow
 	if (tmp) pq |= PROJ_BOLT;
-	str->ReadWord( &tmp ); //bullet
+	str->ReadWord(tmp); //bullet
 	if (tmp) pq |= PROJ_BULLET;
 	//this hack is required for Nordom's crossbow in PST
 	if (!pq && (eh->AttackType == ITEM_AT_BOW)) {
@@ -389,24 +358,24 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	eh->ProjectileQualifier = pq;
 
 	//48 is the size of the feature block
-	eh->features = new Effect[eh->FeatureCount];
+	eh->features.reserve(featureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
-		GetFeature(eh->features+i, s);
+	for (ieWord i = 0; i < featureCount; i++) {
+		eh->features.push_back(GetFeature(s));
 	}
 }
 
-void ITMImporter::GetFeature(Effect *fx, Item *s)
+Effect* ITMImporter::GetFeature(const Item *s)
 {
-	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
-	eM->GetEffect( fx );
-	CopyResRef(fx->Source, s->Name);
+	Effect* fx = eM->GetEffect();
+	fx->SourceRef = s->Name;
+	return fx;
 }
 
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
-PLUGIN_CLASS(IE_ITM_CLASS_ID, ITMImporter)
-PLUGIN_CLEANUP(ReleaseMemoryITM)
+PLUGIN_CLASS(IE_ITM_CLASS_ID, ImporterPlugin<ITMImporter>)
 END_PLUGIN()

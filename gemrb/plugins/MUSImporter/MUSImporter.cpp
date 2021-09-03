@@ -40,16 +40,15 @@ MUSImporter::MUSImporter()
 	PLNameNew[0] = '\0';
 	lastSound = 0xffffffff;
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, musicsubfolder, nullptr);
+	PathJoin(path, core->config.GamePath, musicsubfolder, nullptr);
 	manager.AddSource(path, "Music", PLUGIN_RESOURCE_DIRECTORY);
 }
 
 MUSImporter::~MUSImporter()
 {
-	if (str) {
-		delete( str );
-	}
+	delete str;
 }
+
 /** Initializes the PlayList Manager */
 bool MUSImporter::Init()
 {
@@ -70,13 +69,13 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		return false;
 	}
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, musicsubfolder, name, nullptr);
+	PathJoin(path, core->config.GamePath, musicsubfolder, name, nullptr);
 	Log(MESSAGE, "MUSImporter", "Loading %s...", path);
 	if (!str->Open(path)) {
 		Log(ERROR, "MUSImporter", "Didn't find playlist '%s'.", path);
 		return false;
 	}
-	int c = str->ReadLine( PLName, 32 );
+	strret_t c = str->ReadLine( PLName, 32 );
 	while (c > 0) {
 		if (( PLName[c - 1] == ' ' ) || ( PLName[c - 1] == '\t' ))
 			PLName[c - 1] = 0;
@@ -89,7 +88,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 	int count = atoi( counts );
 	while (count != 0) {
 		char line[64];
-		int len = str->ReadLine( line, 64 );
+		strret_t len = str->ReadLine( line, 64 );
 		int i = 0;
 		int p = 0;
 		PLString pls;
@@ -178,38 +177,41 @@ bool MUSImporter::OpenPlaylist(const char* name)
 /** Start the PlayList Music Execution */
 void MUSImporter::Start()
 {
-	if (!Playing) {
-		PLpos = 0;
-		if (playlist.empty()) return;
-		if (playlist[PLpos].PLLoop[0] != 0) {
-			for (unsigned int i = 0; i < playlist.size(); i++) {
-				if (stricmp( playlist[i].PLFile, playlist[PLpos].PLLoop ) == 0) {
-					PLnext = i;
-					break;
-				}
+	if (Playing) return;
+	if (playlist.empty()) return;
+
+	PLpos = 0;
+	if (playlist[PLpos].PLLoop[0] != 0) {
+		for (unsigned int i = 0; i < playlist.size(); i++) {
+			if (stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
+				PLnext = i;
+				break;
 			}
-		} else {
-			PLnext = PLpos + 1;
-			if ((unsigned int) PLnext >= playlist.size())
-				PLnext = 0;
 		}
-		PlayMusic( PLpos );
-		core->GetAudioDrv()->Play();
-		lastSound = playlist[PLpos].soundID;
-		Playing = true;
+	} else {
+		PLnext = PLpos + 1;
+		if ((unsigned int) PLnext >= playlist.size()) {
+			PLnext = 0;
+		}
 	}
+
+	PlayMusic(PLpos);
+	core->GetAudioDrv()->Play();
+	lastSound = playlist[PLpos].soundID;
+	Playing = true;
 }
 /** Ends the Current PlayList Execution */
 void MUSImporter::End()
 {
-	if (Playing) {
-		if (playlist.empty()) return;
-		if (playlist[PLpos].PLEnd[0] != 0) {
-			if (stricmp( playlist[PLpos].PLEnd, "end" ) != 0)
-				PlayMusic( playlist[PLpos].PLEnd );
+	if (!Playing) return;
+	if (playlist.empty()) return;
+
+	if (playlist[PLpos].PLEnd[0] != 0) {
+		if (stricmp(playlist[PLpos].PLEnd, "end") != 0) {
+			PlayMusic(playlist[PLpos].PLEnd);
 		}
-		PLnext = -1;
 	}
+	PLnext = -1;
 }
 
 void MUSImporter::HardEnd()
@@ -305,7 +307,7 @@ void MUSImporter::PlayMusic(char* name)
 		strlcpy(FName, name, _MAX_PATH);
 	}
 
-	ResourceHolder<SoundMgr> sound = GetResourceHolder<SoundMgr>(FName, manager);
+	ResourceHolder<SoundMgr> sound = GetResourceHolder<SoundMgr>(FName, manager, true);
 	if (sound) {
 		int soundID = core->GetAudioDrv()->CreateStream( sound );
 		if (soundID == -1) {

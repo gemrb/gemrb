@@ -23,6 +23,7 @@
 
 #include "exports.h"
 #include "globals.h"
+#include "Resource.h"
 
 #include <vector>
 
@@ -52,7 +53,7 @@ struct DialogTransition {
 	ieStrRef journalStrRef;
 	Condition* condition;
 	std::vector<Action*> actions;
-	ieResRef Dialog;
+	ResRef Dialog;
 	ieDword stateIndex;
 };
 
@@ -72,16 +73,12 @@ private:
 	void FreeDialogState(DialogState* ds);
 public:
 	void AddState(DialogState* ds);
-	DialogState* GetState(unsigned int index);
-	int FindFirstState(Scriptable* target);
-	int FindRandomState(Scriptable* target);
+	DialogState* GetState(unsigned int index) const;
+	int FindFirstState(Scriptable* target) const;
+	int FindRandomState(Scriptable* target) const;
 
-	void Release()
-	{
-		delete this;
-	}
 public:
-	ieResRef ResRef;
+	ResRef resRef;
 	ieDword Flags; //freeze flags (bg2)
 	unsigned int TopLevelCount;
 	ieDword* Order;

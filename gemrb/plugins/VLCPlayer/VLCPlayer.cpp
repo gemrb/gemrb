@@ -19,17 +19,13 @@
  */
 
 #include "VLCPlayer.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
 
 VLCPlayer::VLCPlayer(void)
 {
-	libvlc = libvlc_new(0, NULL);
-	mediaPlayer = NULL;
-	planes[0] = NULL;
-	planes[1] = NULL;
-	planes[2] = NULL;
+	libvlc = libvlc_new(0, nullptr);
 }
 
 VLCPlayer::~VLCPlayer(void)
@@ -39,7 +35,7 @@ VLCPlayer::~VLCPlayer(void)
 	libvlc_release(libvlc);
 }
 
-bool VLCPlayer::Open(DataStream* stream)
+bool VLCPlayer::Import(DataStream* stream)
 {
 	DestroyPlayer();
 	if (stream) {
@@ -48,8 +44,8 @@ bool VLCPlayer::Open(DataStream* stream)
 		mediaPlayer = libvlc_media_player_new_from_media(media);
 		libvlc_media_release(media); //player retains the media
 
-		libvlc_video_set_callbacks(mediaPlayer, lock, NULL, NULL, this);
-		libvlc_video_set_format_callbacks(mediaPlayer, setup, NULL);
+		libvlc_video_set_callbacks(mediaPlayer, lock, nullptr, nullptr, this);
+		libvlc_video_set_format_callbacks(mediaPlayer, setup, nullptr);
 
 		bool success = libvlc_media_player_play(mediaPlayer) == 0;
 
@@ -93,8 +89,8 @@ void VLCPlayer::DestroyPlayer()
 		libvlc_media_player_release(mediaPlayer);
 	}
 
-	for (int i = 0; i < 3; ++i) {
-		delete[] planes[i];
+	for (auto& plane : planes) {
+		delete[] plane;
 	}
 }
 
@@ -102,13 +98,13 @@ void VLCPlayer::DestroyPlayer()
 
 void* VLCPlayer::lock(void *data, void **planes)
 {
-	VLCPlayer* player = static_cast<VLCPlayer*>(data);
+	const VLCPlayer* player = static_cast<const VLCPlayer*>(data);
 
 	planes[0] = player->planes[0];
 	planes[1] = player->planes[1];
 	planes[2] = player->planes[2];
 
-	return NULL; // we are using a single buffer so return NULL
+	return nullptr; // we are using a single buffer so return nullptr
 }
 
 unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines)

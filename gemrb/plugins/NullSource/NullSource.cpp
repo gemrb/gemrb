@@ -26,20 +26,9 @@
 
 using namespace GemRB;
 
-NullSource::NullSource(void)
-{
-	description = NULL;
-}
-
-NullSource::~NullSource(void)
-{
-	free(description);
-}
-
 bool NullSource::Open(const char *, const char *desc)
 {
-	free(description);
-	description = strdup(desc);
+	description = desc;
 	return true;
 }
 

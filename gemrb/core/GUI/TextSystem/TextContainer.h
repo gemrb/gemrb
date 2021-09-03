@@ -20,11 +20,13 @@
 #define TEXTCONTAINER_H
 
 #include "Font.h"
-#include "GUI/View.h"
 #include "Region.h"
+
+#include "GUI/View.h"
 #include "System/String.h"
 
 #include <deque>
+#include <utility>
 
 namespace GemRB {
 
@@ -37,8 +39,8 @@ class TextContainer;
 struct LayoutRegion {
 	Region region;
 	
-	LayoutRegion(Region r)
-	: region(r) {}
+	explicit LayoutRegion(Region r)
+	: region(std::move(r)) {}
 };
 
 using LayoutRegions = std::vector<std::shared_ptr<LayoutRegion>>;
@@ -54,10 +56,10 @@ protected:
 	ContentContainer* parent;
 
 public:
-	Content(const Size& size);
+	explicit Content(const Size& size);
 	virtual ~Content() = default;
 
-	virtual Size ContentFrame() const { return frame.Dimensions(); };
+	virtual Size ContentFrame() const { return frame.size; };
 
 protected:
 	// point is relative to Region. Region is a screen region.
@@ -67,7 +69,7 @@ protected:
 
 
 // Content classes
-class TextSpan : public Content
+class TextSpan final : public Content
 {
 friend class TextContainer;
 private:
@@ -80,7 +82,7 @@ private:
 		size_t endCharIdx;
 		
 		TextLayoutRegion(Region r, size_t begin, size_t end)
-		: LayoutRegion(r), beginCharIdx(begin), endCharIdx(end) {}
+		: LayoutRegion(std::move(r)), beginCharIdx(begin), endCharIdx(end) {}
 	};
 
 public:
@@ -88,7 +90,7 @@ public:
 	// TODO: we should probably be able to align the text in the frame
 	TextSpan(const String& string, const Font* font, const Size* = nullptr);
 	TextSpan(const String& string, const Font* font, Font::PrintColors cols, const Size* = nullptr);
-	~TextSpan();
+	~TextSpan() final;
 	
 	void ClearColors();
 	void SetColors(const Color& fg, const Color& bg);
@@ -113,7 +115,7 @@ private:
 	Holder<Sprite2D> image;
 
 public:
-	ImageSpan(Holder<Sprite2D> image);
+	explicit ImageSpan(const Holder<Sprite2D>& image);
 
 protected:
 	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;
@@ -134,7 +136,7 @@ public:
 
 		Margin() : top(0), right(0), bottom(0), left(0) {}
 
-		Margin(ieByte top)
+		explicit Margin(ieByte top)
 		: top(top), right(top), bottom(top), left(top) {}
 
 		Margin(ieByte top, ieByte right)
@@ -156,7 +158,7 @@ protected:
 		
 		Layout(const Content* c, LayoutRegions rgns)
 		: content(c), regions(std::move(rgns)) {
-			assert(regions.size());
+			assert(!regions.empty());
 		}
 
 		bool operator==(const Content* c) const {
@@ -186,7 +188,7 @@ protected:
 	Margin margin;
 
 public:
-	ContentContainer(const Region& frame);
+	explicit ContentContainer(const Region& frame);
 	~ContentContainer() override;
 
 	// append a container to the end of the container. The container takes ownership of the span.
@@ -196,10 +198,10 @@ public:
 	// removes the span from the container and transfers ownership to the caller.
 	// Returns a non-const pointer to the removed span.
 	Content* RemoveContent(const Content* content);
-	virtual void DeleteContentsInRect(Region);
+	virtual void DeleteContentsInRect(const Region&);
 
 	Content* ContentAtPoint(const Point& p) const;
-	const ContentList& Contents() { return contents; }
+	const ContentList& Contents() const { return contents; }
 
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
@@ -222,7 +224,7 @@ protected:
 	const Layout& LayoutForContent(const Content*) const;
 	const Layout* LayoutAtPoint(const Point& p) const;
 
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	virtual void DrawContents(const Layout& layout, Point point);
 	
 	void SizeChanged(const Size& oldSize) override;
@@ -244,7 +246,8 @@ private:
 	unsigned char alignment;
 
 	size_t textLen;
-	size_t cursorPos, printPos;
+	size_t cursorPos;
+	size_t printPos;
 	Point cursorPoint;
 
 private:
@@ -253,18 +256,9 @@ private:
 	void ContentRemoved(const Content* content) override;
 
 	void MoveCursorToPoint(const Point& p);
-	LayoutRegions::const_iterator FindCursorRegion(const Layout&);
+	LayoutRegions::const_iterator FindCursorRegion(const Layout&) const;
 
-	// relative to cursor pos
-	void InsertText(const String& text);
-	void DeleteText(size_t len);
-
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
-	bool OnMouseDrag(const MouseEvent& /*me*/) override;
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
-	void OnTextInput(const TextEvent& /*te*/) override;
-
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void DrawContents(const Layout& layout, Point point) override;
 
 	virtual bool Editable() const { return IsReceivingEvents(); }
@@ -275,7 +269,11 @@ private:
 
 public:
 	TextContainer(const Region& frame, Font* font);
-	~TextContainer();
+	~TextContainer() override;
+	
+	// relative to cursor pos
+	void InsertText(const String& text);
+	void DeleteText(size_t len);
 
 	void AppendText(const String& text);
 	void AppendText(const String& text, const Font* fnt, const Font::PrintColors* = nullptr);
@@ -295,6 +293,11 @@ public:
 	void CursorHome();
 	void CursorEnd();
 	void AdvanceCursor(int);
+	
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+	void OnTextInput(const TextEvent& /*te*/) override;
 
 	using EditCallback = Callback<void, TextContainer&>;
 	EditCallback callback;

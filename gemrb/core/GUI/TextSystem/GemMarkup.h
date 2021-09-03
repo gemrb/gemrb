@@ -33,7 +33,8 @@ public:
 		TEXT = 0,
 		OPEN_TAG,
 		CLOSE_TAG,
-		COLOR
+		COLOR,
+		INT
 	};
 
 	GemMarkupParser();
@@ -77,8 +78,8 @@ private:
 			std::swap(textColor, swapColor);
 		}
 
-		void SetTextColor(Font::PrintColors c) {
-			textColor = std::move(c);
+		void SetTextColor(const Font::PrintColors& c) {
+			textColor = c;
 		}
 
 		const Font::PrintColors& TextColor() const {

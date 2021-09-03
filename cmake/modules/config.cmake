@@ -8,7 +8,6 @@ INCLUDE (CheckTypeSize)
 CHECK_TYPE_SIZE("int" SIZEOF_INT)
 CHECK_TYPE_SIZE("long int" SIZEOF_LONG_INT)
 CHECK_TYPE_SIZE("uint64_t" HAVE_UINT64_T)
-CHECK_TYPE_SIZE("ssize_t" SIZEOF_SSIZE_T)
 
 INCLUDE (CheckFunctionExists)
 CHECK_FUNCTION_EXISTS("strndup" HAVE_STRNDUP)
@@ -17,6 +16,9 @@ CHECK_FUNCTION_EXISTS("setenv" HAVE_SETENV)
 CHECK_FUNCTION_EXISTS("ldexpf" HAVE_LDEXPF)
 CHECK_FUNCTION_EXISTS("realpath" HAVE_REALPATH)
 CHECK_FUNCTION_EXISTS("mmap" HAVE_MMAP)
+CHECK_FUNCTION_EXISTS("_aligned_malloc" HAVE_ALIGNED_MALLOC)
+CHECK_FUNCTION_EXISTS("memalign" HAVE_MEMALIGN)
+CHECK_FUNCTION_EXISTS("posix_memalign" HAVE_POSIX_MEMALIGN)
 
 INCLUDE(CheckIncludeFiles)
 CHECK_INCLUDE_FILES("unistd.h" HAVE_UNISTD_H)
@@ -24,22 +26,11 @@ CHECK_INCLUDE_FILES("malloc.h" HAVE_MALLOC_H)
 CHECK_INCLUDE_FILES("langinfo.h" HAVE_LANGINFO_H)
 CHECK_INCLUDE_FILES("dlfcn.h" HAVE_DLFCN_H)
 
-IF(HAVE_MALLOC_H)
-	CHECK_FUNCTION_EXISTS("_aligned_malloc" HAVE_ALIGNED_MALLOC)
-	CHECK_FUNCTION_EXISTS("memalign" HAVE_MEMALIGN)
-	CHECK_FUNCTION_EXISTS("posix_memalign" HAVE_POSIX_MEMALIGN)
-ENDIF()
-
 IF(HAVE_MMAP OR WIN32)
 	SET(SUPPORTS_MEMSTREAM 1)
 ENDIF()
 
 INCLUDE (CheckCXXSourceCompiles)
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
-	check_cxx_source_compiles("
-		struct Color {unsigned char r,g,b,a;}__attribute__((aligned(4)));
-		int main(void) {return 0;}" HAS_OBJALIGN4)
-ENDIF()
 check_cxx_source_compiles("#include <string>
 	std::wstring a; int main(void) {return 0;}" HAS_WSTRING)
 

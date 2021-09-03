@@ -44,10 +44,10 @@ openTrigger(std::move(openTrigger)), closedTrigger(std::move(closedTrigger))
 void DoorTrigger::SetState(bool open)
 {
 	isOpen = open;
-	for (auto& wp : openWalls) {
+	for (const auto& wp : openWalls) {
 		wp->SetDisabled(!isOpen);
 	}
-	for (auto& wp : closedWalls) {
+	for (const auto& wp : closedWalls) {
 		wp->SetDisabled(isOpen);
 	}
 }
@@ -62,45 +62,20 @@ std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon(bool open) const
 	return open ? openTrigger : closedTrigger;
 }
 
-Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)
-	: Highlightable( ST_DOOR ), doorTrigger(std::move(trigger))
+Door::Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger)
+: Highlightable( ST_DOOR ), overlay(std::move(Overlay)), doorTrigger(std::move(trigger))
 {
-	tiles = NULL;
-	tilecount = 0;
 	Flags = 0;
-	open_ib = NULL;
-	oibcount = 0;
-	closed_ib = NULL;
-	cibcount = 0;
-	OpenSound[0] = 0;
-	CloseSound[0] = 0;
-	LockSound[0] = 0;
-	UnLockSound[0] = 0;
-	overlay = Overlay;
-	LinkedInfo[0] = 0;
 	OpenStrRef = (ieDword) -1;
 	closedIndex = NameStrRef = hp = ac = 0;
 	DiscoveryDiff = LockDifficulty = 0;
 }
 
-Door::~Door(void)
+void Door::ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const
 {
-	if (tiles) {
-		free( tiles );
-	}
-	if (open_ib) {
-		free( open_ib );
-	}
-	if (closed_ib) {
-		free( closed_ib );
-	}
-}
-
-void Door::ImpedeBlocks(int count, Point *points, PathMapFlags value) const
-{
-	for(int i = 0;i<count;i++) {
-		PathMapFlags tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PathMapFlags::NOTDOOR;
-		area->SetInternalSearchMap(points[i].x, points[i].y, tmp|value);
+	for (const Point& point : points) {
+		PathMapFlags tmp = area->tileProps.QuerySearchMap(point) & PathMapFlags::NOTDOOR;
+		area->tileProps.SetSearchMap(point, tmp|value);
 	}
 }
 
@@ -125,12 +100,12 @@ void Door::UpdateDoor()
 		pmdflags = PathMapFlags::DOOR_OPAQUE|PathMapFlags::DOOR_IMPASSABLE;
 	}
 	if (Flags &DOOR_OPEN) {
-		ImpedeBlocks(cibcount, closed_ib, PathMapFlags::IMPASSABLE);
-		ImpedeBlocks(oibcount, open_ib, pmdflags);
+		ImpedeBlocks(closed_ib, PathMapFlags::IMPASSABLE);
+		ImpedeBlocks(open_ib, pmdflags);
 	}
 	else {
-		ImpedeBlocks(oibcount, open_ib, PathMapFlags::IMPASSABLE);
-		ImpedeBlocks(cibcount, closed_ib, pmdflags);
+		ImpedeBlocks(open_ib, PathMapFlags::IMPASSABLE);
+		ImpedeBlocks(closed_ib, pmdflags);
 	}
 
 	InfoPoint *ip = area->TMap->GetInfoPoint(LinkedInfo);
@@ -142,20 +117,21 @@ void Door::UpdateDoor()
 
 void Door::ToggleTiles(int State, int playsound)
 {
-	int i;
 	int state;
 
 	if (State) {
 		state = !closedIndex;
-		if (playsound && ( OpenSound[0] != '\0' ))
-			core->GetAudioDrv()->Play(OpenSound, SFX_CHAN_ACTIONS);
+		if (playsound && !OpenSound.IsEmpty()) {
+			core->GetAudioDrv()->PlayRelative(OpenSound, SFX_CHAN_ACTIONS);
+		}
 	} else {
 		state = closedIndex;
-		if (playsound && ( CloseSound[0] != '\0' ))
-			core->GetAudioDrv()->Play(CloseSound, SFX_CHAN_ACTIONS);
+		if (playsound && !CloseSound.IsEmpty()) {
+			core->GetAudioDrv()->PlayRelative(CloseSound, SFX_CHAN_ACTIONS);
+		}
 	}
-	for (i = 0; i < tilecount; i++) {
-		overlay->tiles[tiles[i]]->tileIndex = (ieByte) state;
+	for (const auto& tile : tiles) {
+		overlay->tiles[tile].tileIndex = (ieByte) state;
 	}
 
 	//set door_open as state
@@ -163,25 +139,21 @@ void Door::ToggleTiles(int State, int playsound)
 }
 
 //this is the short name (not the scripting name)
-void Door::SetName(const char* name)
+void Door::SetName(const ResRef &name)
 {
-	strnlwrcpy( ID, name, 8 );
+	ID = name;
 }
 
-void Door::SetTiles(unsigned short* Tiles, int cnt)
+void Door::SetTiles(std::vector<ieWord> Tiles)
 {
-	if (tiles) {
-		free( tiles );
-	}
-	tiles = Tiles;
-	tilecount = cnt;
+	tiles = std::move(Tiles);
 }
 
 bool Door::CanDetectTrap() const
 {
-    // Traps can be detected on all types of infopoint, as long
-    // as the trap is detectable and isn't deactivated.
-    return ((Flags&DOOR_DETECTABLE) && Trapped);
+	// Traps can be detected on all types of infopoint, as long
+	// as the trap is detectable and isn't deactivated.
+	return (Flags & DOOR_DETECTABLE) && Trapped;
 }
 
 void Door::SetDoorLocked(int Locked, int playsound)
@@ -191,14 +163,14 @@ void Door::SetDoorLocked(int Locked, int playsound)
 		Flags|=DOOR_LOCKED;
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
 		if (core->HasFeature(GF_REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
-		if (playsound && ( LockSound[0] != '\0' ))
-			core->GetAudioDrv()->Play(LockSound, SFX_CHAN_ACTIONS);
+		if (playsound && !LockSound.IsEmpty())
+			core->GetAudioDrv()->PlayRelative(LockSound, SFX_CHAN_ACTIONS);
 	}
 	else {
 		if (!(Flags & DOOR_LOCKED)) return;
 		Flags&=~DOOR_LOCKED;
-		if (playsound && ( UnLockSound[0] != '\0' ))
-			core->GetAudioDrv()->Play(UnLockSound, SFX_CHAN_ACTIONS);
+		if (playsound && !UnLockSound.IsEmpty())
+			core->GetAudioDrv()->PlayRelative(UnLockSound, SFX_CHAN_ACTIONS);
 	}
 }
 
@@ -242,38 +214,24 @@ std::shared_ptr<Gem_Polygon> Door::ClosedTriggerArea() const
 //also mark actors to fix position
 bool Door::BlockedOpen(int Open, int ForceOpen) const
 {
-	bool blocked;
-	int count;
-	Point *points;
+	const std::vector<Point> *points = Open ? &open_ib : &closed_ib;
+	bool blocked = false;
 
-	blocked = false;
-	if (Open) {
-		count = oibcount;
-		points = open_ib;
-	} else {
-		count = cibcount;
-		points = closed_ib;
-	}
 	//getting all impeded actors flagged for jump
 	Region rgn;
 	rgn.w = 16;
 	rgn.h = 12;
-	for(int i = 0;i<count;i++) {
-		Actor** ab;
-		rgn.x = points[i].x*16;
-		rgn.y = points[i].y*12;
-		PathMapFlags tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PathMapFlags::ACTOR;
+	for(const Point& p : *points) {
+		rgn.origin = Map::ConvertCoordFromTile(p);
+		PathMapFlags tmp = area->tileProps.QuerySearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {
-			int ac = area->GetActorsInRect(ab, rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-			while(ac--) {
-				if (ab[ac]->GetBase(IE_DONOTJUMP)) {
+			auto actors = area->GetActorsInRect(rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			for (Actor* actor : actors) {
+				if (actor->GetBase(IE_DONOTJUMP)) {
 					continue;
 				}
-				ab[ac]->SetBase(IE_DONOTJUMP, DNJ_JUMP);
+				actor->SetBase(IE_DONOTJUMP, DNJ_JUMP);
 				blocked = true;
-			}
-			if (ab) {
-				free(ab);
 			}
 		}
 	}
@@ -284,7 +242,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 	return blocked;
 }
 
-void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
+void Door::SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigger)
 {
 	if (playsound) {
 		//the door cannot be blocked when opening,
@@ -300,9 +258,9 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
 	if (Open) {
 		if (addTrigger) {
 			if (Trapped) {
-				AddTrigger(TriggerEntry(trigger_opened, ID));
+				AddTrigger(TriggerEntry(trigger_opened, openerID));
 			} else {
-				AddTrigger(TriggerEntry(trigger_harmlessopened, ID));
+				AddTrigger(TriggerEntry(trigger_harmlessopened, openerID));
 			}
 		}
 
@@ -312,9 +270,9 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
 		}
 	} else if (addTrigger) {
 		if (Trapped) {
-			AddTrigger(TriggerEntry(trigger_closed, ID));
+			AddTrigger(TriggerEntry(trigger_closed, openerID));
 		} else {
-			AddTrigger(TriggerEntry(trigger_harmlessclosed, ID));
+			AddTrigger(TriggerEntry(trigger_harmlessclosed, openerID));
 		}
 	}
 	ToggleTiles(Open, playsound);
@@ -324,7 +282,8 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
 	core->SetEventFlag(EF_TARGETMODE);
 }
 
-bool Door::TryUnlock(Actor *actor) {
+bool Door::TryUnlock(Actor *actor) const
+{
 	if (!(Flags&DOOR_LOCKED)) return true;
 
 	// don't remove key in PS:T!
@@ -349,8 +308,8 @@ bool Door::Visible() const
 	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) && !(Flags & DOOR_HIDDEN);
 }
 
-void Door::SetNewOverlay(TileOverlay *Overlay) {
-	overlay = Overlay;
+void Door::SetNewOverlay(Holder<TileOverlay> Overlay) {
+	overlay = std::move(Overlay);
 	ToggleTiles(IsOpen(), false);
 }
 
@@ -504,11 +463,11 @@ void Door::dump() const
 	}
 	buffer.appendFormatted( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
 	const char *Key = GetKey();
-	const char *name = "NONE";
+	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted( "Script: %s, Key (%s) removed: %s, Dialog: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog );
+	buffer.appendFormatted("Script: %s, Key (%s) removed: %s, Dialog: %s\n", name.CString(), Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog.CString());
 
 	Log(DEBUG, "Door", buffer);
 }

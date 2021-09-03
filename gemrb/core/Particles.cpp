@@ -24,7 +24,7 @@
 #include "Game.h"
 #include "Interface.h"
 #include "TableMgr.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -36,43 +36,32 @@ static const int spark_color_indices[MAX_SPARK_COLOR] = {12, 5, 0, 6, 1, 8, 2, 7
 static void TranslateColor(const char *value, Color &color)
 {
 	//if not RGB then try to interpret it as a dword
-	if (strnicmp(value,"RGB(",4)) {
-		long c = strtol(value,NULL,0);
-		color.r = c&0xff;
-		color.g = (c>>8)&0xff;
-		color.b = (c>>16)&0xff;
-		color.a = (c>>24)&0xff;
+	if (strnicmp(value, "RGB(", 4) != 0) {
+		uint32_t c = strtounsigned<uint32_t>(value);
+		color = Color::FromABGR(c);
 	} else {
-		int r = 0;
-		int g = 0;
-		int b = 0;
-
-		sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
-		color.r=r;
-		color.g=g;
-		color.b=b;
+		sscanf(value+4,"%hhu,%hhu,%hhu)", &color.r, &color.g, &color.b);
 	}
 }
 
 static void InitSparks()
 {
-	int i,j;
-	AutoTable tab("sprklclr");
+	AutoTable tab = gamedata->LoadTable("sprklclr");
 	if (!tab)
 		return;
 
 	memset(sparkcolors,0,sizeof(sparkcolors));
-	for (i=0;i<MAX_SPARK_COLOR;i++) {
-		for (j=0;j<MAX_SPARK_PHASE;j++) {
+	for (int i = 0; i < MAX_SPARK_COLOR; i++) {
+		for (int j = 0; j < MAX_SPARK_PHASE; j++) {
 			sparkcolors[i][j].a=0xff;
 		}
 	}
-	i = tab->GetRowCount();
+	int i = tab->GetRowCount();
 	if (i>MAX_SPARK_COLOR) {
 		i = MAX_SPARK_COLOR;
 	}
 	while (i--) {
-		for (int j=0;j<MAX_SPARK_PHASE;j++) {
+		for (int j = 0; j < MAX_SPARK_PHASE; j++) {
 			int idx;
 
 			if (i < MAX_SPARK_COLOR) {
@@ -89,7 +78,7 @@ static void InitSparks()
 
 Particles::Particles(int s)
 {
-	points = (Element *) calloc(s, sizeof(Element) );
+	points.resize(s);
 	/*
 	for (int i=0;i<MAX_SPARK_PHASE;i++) {
 		bitmap[i]=NULL;
@@ -101,26 +90,11 @@ Particles::Particles(int s)
 	size = last_insert = s;
 }
 
-Particles::~Particles()
-{
-	if (points) {
-		free(points);
-	}
-	/*
-	for (int i=0;i<MAX_SPARK_PHASE;i++) {
-		delete( bitmap[i]);
-	}
-	*/
-	delete fragments;
-}
-
 void Particles::SetBitmap(unsigned int FragAnimID)
 {
 	//int i;
 
-	delete fragments;
-
-	fragments = new CharAnimations(FragAnimID, 0);
+	fragments = GemRB::make_unique<CharAnimations>(FragAnimID, 0);
 /*
 	for (i=0;i<MAX_SPARK_PHASE;i++) {
 		delete( bitmap[i] );
@@ -185,7 +159,7 @@ bool Particles::AddNew(const Point &point)
 void Particles::Draw(Point p)
 {
 	Video *video=core->GetVideoDriver();
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	if (owner) {
 		p.x-=pos.x;
@@ -232,16 +206,18 @@ void Particles::Draw(Point p)
 			if (fragments) {
 				//IE_ANI_CAST stance has a simple looping animation
 				Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
-				if (anims) {
-					Animation* anim = anims[0];
-					Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
-
-					BlitFlags flags = BlitFlags::NONE;
-					if (game) game->ApplyGlobalTint(clr, flags);
-
-					video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
-													 points[i].pos - p, flags, clr);
+				if (!anims) {
+					break;
 				}
+
+				const Animation* anim = anims[0];
+				Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
+
+				BlitFlags flags = BlitFlags::NONE;
+				if (game) game->ApplyGlobalTint(clr, flags);
+
+				video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
+													points[i].pos - p, flags, clr);
 			}
 			break;
 		case SP_TYPE_CIRCLE:
@@ -295,8 +271,6 @@ void Particles::AddParticles(int count)
 int Particles::Update()
 {
 	int drawn=false;
-	int i;
-	int grow;
 
 	if (phase==P_EMPTY) {
 		return drawn;
@@ -309,6 +283,7 @@ int Particles::Update()
 		}
 	}
 
+	int grow;
 	switch(spawn_type) {
 	case SP_SPAWN_NONE:
 		grow = 0;
@@ -321,7 +296,7 @@ int Particles::Update()
 	default:
 		grow = size/10;
 	}
-	for(i=0;i<size;i++) {
+	for (int i = 0; i < size; i++) {
 		if (points[i].state==-1) {
 			continue;
 		}

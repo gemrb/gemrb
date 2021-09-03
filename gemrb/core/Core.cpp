@@ -31,11 +31,9 @@
 #include "Scriptable/Actor.h"
 
 #include <cmath>
-#include <ctype.h>
+#include <cctype>
 
-#if defined(__sgi)
 #include <iostream>
-#endif
 
 #ifdef WIN32
 
@@ -63,8 +61,8 @@ double AngleFromPoints(const Point& p1, const Point& p2)
 
 Point RotatePoint(const Point& p, double angle)
 {
-	int newx = p.x * std::cos(angle) - p.y * std::sin(angle);
-	int newy = p.x * std::sin(angle) + p.y * std::cos(angle);
+	int newx = static_cast<int>(p.x * std::cos(angle) - p.y * std::sin(angle));
+	int newy = static_cast<int>(p.x * std::sin(angle) + p.y * std::cos(angle));
 	return Point(newx, newy);
 }
 
@@ -102,7 +100,7 @@ unsigned int SquaredDistance(const Point &p, const Point &q)
 {
 	long x = p.x - q.x;
 	long y = p.y - q.y;
-	return x * x + y * y;
+	return static_cast<unsigned int>(x * x + y * y);
 }
 
 /** Calculates distance squared from a point to a scriptable */
@@ -137,7 +135,7 @@ unsigned int SquaredPersonalDistance(const Point &p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
-	int ret =  x*x + y*y;
+	int ret = static_cast<int>(x * x + y * y);
 	if (b->Type==ST_ACTOR) {
 		ret -= ((const Actor *) b)->size * 100;
 	}
@@ -187,7 +185,7 @@ unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
-	int ret =  x*x + y*y;
+	int ret = static_cast<int>(x * x + y * y);
 	if (a->Type==ST_ACTOR) {
 		ret -= ((const Actor *) a)->size * 100;
 	}
@@ -218,7 +216,8 @@ unsigned int PersonalLineDistance(const Point &v, const Point &w, const Scriptab
 			p = w;
 		} else {
 			// projection on the line
-			p = Point(short(v.x + (w.x - v.x) * t), short(v.y + (w.y - v.y) * t));
+			p.x = static_cast<int>(v.x + (w.x - v.x) * t);
+			p.y = static_cast<int>(v.y + (w.y - v.y) * t);
 		}
 	}
 
@@ -277,15 +276,15 @@ bool WithinAudibleRange(const Actor *actor, const Point &dest)
 	return WithinRange(actor, dest, distance);
 }
 
-bool WithinRange(const Actor *actor, const Point &dest, int distance)
+bool WithinRange(const Scriptable *actor, const Point &dest, int distance)
 {
-	double angle = atan2(actor->Pos.y - dest.y, actor->Pos.x - dest.x);
+	double angle = AngleFromPoints(actor->Pos, dest);
 	return Distance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
-bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance)
+bool WithinPersonalRange(const Scriptable *actor, const Point &dest, int distance)
 {
-	double angle = atan2(actor->Pos.y - dest->Pos.y, actor->Pos.x - dest->Pos.x);
+	double angle = AngleFromPoints(actor->Pos, dest);
 	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
@@ -334,6 +333,16 @@ int EARelation(const Scriptable* Owner, const Actor* target)
 bool Schedule(ieDword schedule, ieDword time)
 {
 	return (schedule & SCHEDULE_MASK(time)) != 0;
+}
+
+int CountElements(const char *str, char separator)
+{
+	int count = 1;
+	while (*str) {
+		if (*str == separator) count++;
+		str++;
+	}
+	return count;
 }
 
 }

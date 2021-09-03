@@ -31,11 +31,12 @@ from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
 from ie_sounds import CHAN_HITS
 from GameCheck import MAX_PARTY_SIZE
-from Clock import UpdateClock
+from Clock import UpdateClock, CreateClockButton
 import GameCheck
 import GUICommon
 import CommonTables
 import CommonWindow
+import Container
 import LUCommon
 import InventoryCommon
 if not GameCheck.IsPST():
@@ -237,31 +238,17 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	# pause button
 	if Gears:
-		# Pendulum, gears, sun/moon dial (time)
-		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		if how: # how doesn't have this in the right place
 			pos = Window.GetFrame()["h"] - 71
 			Window.CreateButton (OptionControl['Time'], 0, pos, 64, 71)
+		CreateClockButton(Window.GetControl(OptionControl['Time']))
 
-		Button = Window.GetControl (OptionControl['Time'])
-		if bg2:
-			Label = Button.CreateLabel (0x10000009, "NORMAL", "", IE_FONT_SINGLE_LINE)
-			Label.SetAnimation ("CPEN")
-
-		Button.SetAnimation ("CGEAR")
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 		if iwd2:
-			Button.SetState (IE_GUI_BUTTON_LOCKED) #no button depression, timer is an inset stone planet
 			rb = OptionControl['Rest']
 		else:
 			rb = 11
-		UpdateClock ()
 	else:
 		rb = OptionControl['Rest']
-		if iwd2:
-			UpdateClock ()
 
 	# BG1 doesn't have a rest button on the main window, so this creates one
 	# from what would be the multiplayer arbitration control
@@ -416,20 +403,7 @@ def GroupControls ():
 	return
 
 def OpenActionsWindowControls (Window):
-	# 1280 and higher don't have this control
-	if not Window.GetControl (62):
-		UpdateActionsWindow ()
-		return
-	# Gears (time) when options pane is down
-	Button = Window.GetControl (62)
-	Label = Button.CreateLabel (0x1000003e, "NORMAL", "", IE_FONT_SINGLE_LINE)
-
-	# FIXME: display all animations
-	Label.SetAnimation ("CPEN")
-	Button.SetAnimation ("CGEAR")
-	Button.SetState (IE_GUI_BUTTON_ENABLED)
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+	CreateClockButton(Window.GetControl (62))
 	UpdateActionsWindow ()
 	return
 
@@ -1755,30 +1729,36 @@ def UpdatePortraitWindow ():
 		Button.SetFlags (portraitFlags, OP_SET)
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		if pic == None:
+			pic = ""
 		Button.SetPicture (pic, "NOPORTSM")
 		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 
 		# character - 1 == bam cycle
-		talk = store = flag = blank = ' '
+		talk = store = flag = blank = bytearray([32])
 		if GameCheck.IsBG2():
 			# as far as I can tell only BG2 has icons for talk or store
-			flag = blank = chr(238)
-			talk = 154 # dialog icon
-			store = 155 # shopping icon
+			flag = blank = bytearray([238])
+			talk = bytearray([154]) # dialog icon
+			store = bytearray([155]) # shopping icon
 
 			if pc == pcID and GemRB.GetStore() != None:
-				flag = chr(store)
-
+				flag = store
 			# talk icon
-			if GemRB.GameGetSelectedPCSingle(1) == pcID:
-				flag = chr(talk)
+			elif GemRB.GameGetSelectedPCSingle(1) == pcID:
+				flag = talk
 
 		if LUCommon.CanLevelUp (pcID):
-			flag = flag + blank + chr(255)
-		elif GameCheck.IsIWD1() or GameCheck.IsIWD2():
-			HPLabel = Window.GetControl (100+i)
-			HPLabel.SetText (ratio_str)
-			HPLabel.SetTextColor (color)
+			flag = flag + blank + bytearray([255])
+		else:
+			flag = flag + blank + blank
+			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+				HPLabel = Window.GetControl (100+i)
+				HPLabel.SetText (ratio_str)
+				HPLabel.SetColor (color)
+			
+		FlagLabel = Window.GetControl (200 + i)
+		FlagLabel.SetText(flag)
 
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (pcID)
@@ -1786,23 +1766,15 @@ def UpdatePortraitWindow ():
 		numCols = 4 if GameCheck.IsIWD2() else 3
 		numEffects = len(effects)
 
-		states = b""
 		# calculate the partial row
 		idx = numEffects % numCols
-		states = effects[0:idx]
+		states = bytearray(effects[0:idx])
 		# now do any rows that are full
 		for x in range(idx, numEffects):
 			if (x - idx) % numCols == 0:
-				states = states + b"\n"
-			states = states + bytes(effects[x])
+				states.append(ord('\n'))
+			states.append(effects[x])
 
-		# FIXME: hack, check shouldn't be needed
-		FlagLabel = Window.GetControl (200 + i)
-		if FlagLabel:
-			if flag != blank:
-				FlagLabel.SetText (flag.ljust(3, blank))
-			else:
-				FlagLabel.SetText ("")
 		Button.SetText(states)
 	return
 
@@ -1814,7 +1786,7 @@ def UpdateAnimatedPortrait (Window,i):
 	pic = GemRB.GetPlayerPortrait (i+1, 0)["ResRef"]
 	if not pic:
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetAnimation ("")
+		Button.SetAnimation (None)
 		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		ButtonHP.SetText ("")
 		ButtonHP.SetBAM ("", 0, 0)
@@ -1838,7 +1810,7 @@ def UpdateAnimatedPortrait (Window,i):
 	else:
 		cycle = 0
 
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	if cycle<6:
 		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
 
@@ -1855,7 +1827,7 @@ def UpdateAnimatedPortrait (Window,i):
 	g = int (255 * ratio)
 
 	ButtonHP.SetText ("%s / %d" %(hp, hp_max))
-	ButtonHP.SetTextColor ({'r' : r, 'g' : g, 'b' : 0})
+	ButtonHP.SetColor ({'r' : r, 'g' : g, 'b' : 0})
 	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
 	ButtonHP.SetPictureClipping (ratio)
 
@@ -1933,7 +1905,7 @@ def SelectionChanged ():
 		for i, Button in PortraitButtons.items():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 
-	CommonWindow.CloseContainerWindow()
+	Container.CloseContainerWindow()
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 	return
@@ -1962,8 +1934,6 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 	if Slot != None:
 		Item = GemRB.GetItem (Slot['ItemResRef'])
 		identified = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
-		#Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
-		#Button.SetSprites ('IVSLOT', 0,  0, 0, 0, 0)
 		Button.SetItemIcon (Slot['ItemResRef'],0)
 
 		if Item['MaxStackAmount'] > 1:
@@ -1977,16 +1947,10 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 		else:
 			Button.SetTooltip (Item['ItemNameIdentified'])
 
-		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PressHandler)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ShiftPressHandler)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, DragDropHandler)
 
 	else:
-		#Button.SetVarAssoc ("LeftIndex", -1)
 		Button.SetItemIcon ('')
 		Button.SetTooltip (4273)  # Ground Item
 		Button.SetText ('')
@@ -1994,8 +1958,6 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, None)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow

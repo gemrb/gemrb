@@ -27,13 +27,15 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include "SClassID.h" // FIXME
 #include "exports.h"
 
-#include "Holder.h"
 #include "TypeID.h"
 
-#include <cstddef>
+#include "FileCache.h"
+#include "System/DataStream.h"
+
+#include <memory>
+#include <stdexcept>
 
 namespace GemRB {
 
@@ -42,10 +44,76 @@ namespace GemRB {
  * Base class for all GemRB plugins
  */
 
-class GEM_EXPORT Plugin : public Held<Plugin> {
+class GEM_EXPORT Plugin
+{
 public:
-	Plugin(void);
-	~Plugin(void) override;
+	virtual ~Plugin() = default;
+};
+
+class GEM_EXPORT ImporterBase
+{
+protected:
+	DataStream* str = nullptr;
+	virtual bool Import(DataStream* stream) = 0;
+
+protected:
+	DataStream* DecompressStream(DataStream* stream) {
+		DataStream* cstream = CacheCompressedStream(stream, stream->filename);
+		if (!cstream) {
+			return nullptr;
+		}
+
+		if (stream == str) {
+			delete stream;
+			str = cstream;
+		}
+		return cstream;
+	}
+
+public:
+	bool Open(DataStream* stream) noexcept {
+		str = stream;
+		return Import(str);
+	}
+
+	virtual ~ImporterBase() {
+		delete str;
+	}
+};
+
+/* MSVC must not see an abstract type _anywhere_ going into a `new` or `make_shared`. */
+template<class T>
+	std::shared_ptr<typename std::enable_if<!std::is_abstract<T>::value, T>::type>
+MakeImporter() noexcept {
+	return std::make_shared<T>();
+}
+
+template<class T>
+	std::shared_ptr<typename std::enable_if<std::is_abstract<T>::value, T>::type>
+MakeImporter() noexcept {
+	return {};
+}
+
+template <class IMPORTER>
+class GEM_EXPORT ImporterPlugin final : public Plugin
+{
+	std::shared_ptr<IMPORTER> importer = MakeImporter<IMPORTER>();
+public:
+	std::shared_ptr<IMPORTER> GetImporter() const noexcept {
+		return importer;
+	}
+
+	std::shared_ptr<IMPORTER> GetImporter(DataStream* str) noexcept {
+		if (str == nullptr) {
+			return nullptr;
+		}
+
+		if (importer->Open(str) == false) {
+			return nullptr;
+		}
+
+		return importer;
+	}
 };
 
 }

@@ -29,10 +29,8 @@ namespace GemRB {
 
 class GEM_EXPORT TileSetMgr : public Plugin {
 public:
-	TileSetMgr(void);
-	~TileSetMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
-	virtual Tile* GetTile(unsigned short* indexes, int count,
+	virtual Tile* GetTile(const std::vector<ieWord>& indexes,
 		unsigned short* secondary = NULL) = 0;
 };
 

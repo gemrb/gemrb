@@ -40,6 +40,12 @@ using namespace GemRB;
     return self;
 }
 
+- (void)dealloc
+{
+	[_configWindow release];
+	[super dealloc];
+}
+
 - (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *) filename
 {
 	NSFileManager* fm = [NSFileManager defaultManager];
@@ -192,8 +198,7 @@ using namespace GemRB;
 		}
 	}
 	
-	int status;
-	if ((status = core->Init(config)) == GEM_ERROR) {
+	if (core->Init(config) == GEM_ERROR) {
 		delete config;
 		delete( core );
 		core = NULL;
@@ -252,23 +257,17 @@ using namespace GemRB;
 /* Main entry point to executable - should *not* be GemRB_main! */
 int main (int __unused argc, char ** __unused argv)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	CocoaWrapper* wrapper = [[CocoaWrapper alloc] init];
+	@autoreleasepool {
+		/* Ensure the application object is initialized */
+		NSApplication* app = [NSApplication sharedApplication];
 
-    /* Ensure the application object is initialized */
-    NSApplication* app = [NSApplication sharedApplication];
-
-    /* Set up the menubar */
-    [NSApp setMainMenu:[[NSMenu alloc] init]];
-
-    CocoaWrapper* wrapper = [[CocoaWrapper alloc] init];
-    [app setDelegate:wrapper];
-
-    /* Start the main event loop */
-	[pool drain];
-    [NSApp run];
-
-    [wrapper release];
-    [pool release];
-
+		/* Set up the menubar */
+		[NSApp setMainMenu:[[[NSMenu alloc] init] autorelease]];
+		[app setDelegate:wrapper];
+	}
+	[NSApp run];
+	[wrapper release];
     return 0;
 }
+  

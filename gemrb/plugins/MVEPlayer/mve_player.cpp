@@ -32,6 +32,8 @@
 
 #include "Interface.h"
 
+using namespace std::chrono;
+
 /* mvevideodec8.cpp */
 extern int ipvideo_decode_frame8 (const GstMveDemuxStream * s,
 	const unsigned char *data, unsigned short len);
@@ -53,20 +55,15 @@ MVEPlayer::MVEPlayer(class MVEPlay *file) {
 	done = false;
 
 	audio_buffer = NULL;
-	frame_wait = 0;
-	timer_last_sec = 0;
 
 	video_data = NULL;
 	video_back_buf = NULL;
-
-	video_frameskip = 0;
-	video_skippedframes = 0;
 
 	audio_stream = -1;
 
 	playsound = core->GetAudioDrv()->CanPlay();
 
-	buffersize = chunk_size = chunk_offset = timer_last_usec = 0;
+	buffersize = chunk_size = chunk_offset = 0;
 	audio_num_channels = audio_sample_rate = audio_sample_size = 0;
 	truecolour = video_rendered_frame = audio_compressed = false;
 }
@@ -83,8 +80,9 @@ MVEPlayer::~MVEPlayer() {
 
 	if (audio_stream != -1) host->freeAudioStream(audio_stream);
 
-	if (video_skippedframes)
-		print("Warning: Had to drop %d video frame(s).", video_skippedframes);
+	if (host->video_skippedframes) {
+		print("Warning: Had to drop %d video frame(s).", host->video_skippedframes);
+	}
 }
 
 /*
@@ -108,7 +106,7 @@ bool MVEPlayer::start_playback() {
 }
 
 bool MVEPlayer::next_frame() {
-	if (timer_last_sec) timer_wait();
+	if (host->lastTime > seconds(0)) host->timer_wait(host->frame_wait);
 
 	video_rendered_frame = false;
 	while (!video_rendered_frame) {
@@ -116,7 +114,7 @@ bool MVEPlayer::next_frame() {
 		if (!process_chunk()) return false;
 	}
 
-	if (!timer_last_sec) timer_start();
+	if (host->lastTime == seconds(0)) host->timer_start();
 
 	return true;
 }
@@ -202,7 +200,7 @@ bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned
 			segment_video_palette();
 			break;
 		case MVE_OC_PALETTE_COMPRESSED:
-			segment_video_compressedpalette();
+			error("MVEPlayer", "MVE_OC_PALETTE_COMPRESSED encountered, which video was playing?");
 			break;
 		case MVE_OC_CODE_MAP:
 			segment_video_codemap(len);
@@ -233,47 +231,12 @@ bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned
  * timer handling
  */
 
-static void get_current_time(long &sec, long &usec) {
-	auto time = GetTicks();
-
-	sec = time / 1000;
-	usec = (time % 1000) * 1000;
-}
-
-void MVEPlayer::timer_start() {
-	get_current_time(timer_last_sec, timer_last_usec);
-}
-
-void MVEPlayer::timer_wait() {
-	long sec, usec;
-	get_current_time(sec, usec);
-
-	while (sec > timer_last_sec) {
-		usec += 1000000;
-		timer_last_sec++;
-	}
-
-	while (usec - timer_last_usec > (long)frame_wait) {
-		usec -= frame_wait;
-		video_frameskip++;
-	}
-
-	long to_sleep = frame_wait - (usec - timer_last_usec);
-#ifdef _WIN32
-	Sleep(to_sleep / 1000);
-#else
-	usleep(to_sleep);
-#endif
-
-	timer_start();
-}
-
 void MVEPlayer::segment_create_timer() {
 	/* new frame every (timer_rate * timer_subdiv) microseconds */
 	unsigned int timer_rate = GST_READ_UINT32_LE(buffer);
 	unsigned short timer_subdiv = GST_READ_UINT16_LE(buffer + 4);
 
-	frame_wait = timer_rate * timer_subdiv;
+	host->frame_wait = microseconds(timer_rate * timer_subdiv);
 }
 
 /*
@@ -329,32 +292,6 @@ void MVEPlayer::segment_video_palette() {
 	host->setPalette((unsigned char *)palette - (3 * palette_start), palette_start, palette_count);
 }
 
-//appears to be unused
-void MVEPlayer::segment_video_compressedpalette() {
-#if 0
-	char *data = buffer;
-
-	unsigned int i, j;
-	for (i = 0; i < 32; ++i) {
-		unsigned char mask = *data;
-		data++;
-
-		if (mask) {
-			for (j = 0; j < 8; ++j) {
-				unsigned char r, g, b;
-				r = (*data) << 2;
-				++data;
-				g = (*data) << 2;
-				++data;
-				b = (*data) << 2;
-				++data;
-				/* TODO: set palette position (i * 8) + j */
-			}
-		}
-	}
-#endif
-}
-
 void MVEPlayer::segment_video_codemap(unsigned short size) {
 	if (!video_data) return; /* return failure? */
 
@@ -377,7 +314,7 @@ void MVEPlayer::segment_video_data(unsigned short size) {
 	(void)x_size; (void)y_size; /* unused? */
 	unsigned short flags = GST_READ_UINT16_LE(buffer + 12);
 
-	char *data = buffer + 14;
+	const char *data = buffer + 14;
 
 	if (flags & MVE_VIDEO_DELTA_FRAME) {
 		guint16 *temp = video_data->back_buf1;
@@ -391,9 +328,9 @@ void MVEPlayer::segment_video_data(unsigned short size) {
 }
 
 void MVEPlayer::segment_video_play() {
-	if (video_frameskip) {
-		video_frameskip--;
-		video_skippedframes++;
+	if (host->video_frameskip) {
+		host->video_frameskip--;
+		host->video_skippedframes++;
 	} else {
 		host->showFrame( (guint8 *) video_data->back_buf1, video_data->width, video_data->height);
 	}
@@ -444,7 +381,7 @@ void MVEPlayer::segment_audio_data(bool silent) {
 	(void)seq_index; /* we don't care */
 	unsigned short stream_mask = GST_READ_UINT16_LE(buffer + 2);
 	unsigned short audio_size = GST_READ_UINT16_LE(buffer + 4);
-	char *data = buffer + 6;
+	const char *data = buffer + 6;
 
 	if (stream_mask & MVE_DEFAULT_AUDIO_STREAM) {
 		if (silent) {

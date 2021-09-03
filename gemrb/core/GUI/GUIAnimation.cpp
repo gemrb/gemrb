@@ -19,13 +19,18 @@
 
 #include "GUIAnimation.h"
 
+#include "AnimationFactory.h"
+#include "GUI/Button.h"
+#include "Interface.h"
+#include "RNG.h"
+
 namespace GemRB {
 
 // so far everything we need uses this cycle
 static const unsigned long ColorCycleSteps[] = {6,4,2,0,2,4,6,8};
 ColorCycle GlobalColorCycle(7);
 
-void ColorCycle::AdvanceTime(unsigned long time)
+void ColorCycle::AdvanceTime(tick_t time)
 {
 	step = ColorCycleSteps[(time >> speed) & 7];
 }
@@ -46,7 +51,7 @@ bool PointAnimation::HasEnded() const
 	return current == end;
 }
 	
-Point PointAnimation::GenerateNext(unsigned long curTime)
+Point PointAnimation::GenerateNext(tick_t curTime)
 {
 	if (curTime < endtime) {
 		int deltax = end.x - begin.x;
@@ -62,7 +67,7 @@ Point PointAnimation::GenerateNext(unsigned long curTime)
 	}
 }
 
-Color ColorAnimation::GenerateNext(unsigned long time)
+Color ColorAnimation::GenerateNext(tick_t time)
 {
 	cycle.AdvanceTime(time - timeOffset);
 	return cycle.Blend(end, begin);
@@ -70,7 +75,120 @@ Color ColorAnimation::GenerateNext(unsigned long time)
 
 bool ColorAnimation::HasEnded() const
 {
-	return (repeat) ? false : current == end;
+	return repeat ? false : current == end;
+}
+
+SpriteAnimation::SpriteAnimation(AnimationFactory* af, int cycle)
+: bam(af), cycle(cycle)
+{
+	assert(bam);
+	nextFrameTime = begintime + CalculateNextFrameDelta();
+}
+
+bool SpriteAnimation::SameResource(const SpriteAnimation *anim) const
+{
+	if (!anim || anim->bam->resRef != bam->resRef) return false;
+	uint8_t c = cycle;
+	if (flags & PLAY_RANDOM) {
+		c &= ~1;
+	}
+	if (anim->cycle != c) return false;
+	return true;
+}
+
+void SpriteAnimation::SetPaletteGradients(const ieDword *col)
+{
+	memcpy(colors, col, 8*sizeof(ieDword));
+	has_palette = true;
+}
+
+void SpriteAnimation::SetBlend(bool b)
+{
+	is_blended = b;
+}
+
+tick_t SpriteAnimation::CalculateNextFrameDelta()
+{
+	tick_t delta = 0;
+	if (flags & PLAY_RANDOM) {
+		// simple Finite-State Machine
+		if (anim_phase == 0) {
+			frame = 0;
+			anim_phase = 1;
+			// note: the granularity of time should be
+			// one of twenty values from [500, 10000]
+			// but not the full range.
+			delta = 500 + 500 * RAND(0, 19);
+			cycle &= ~1;
+		} else if (anim_phase == 1) {
+			if (!RAND(0,29)) {
+				cycle |= 1;
+			}
+			anim_phase = 2;
+			delta = 100;
+		} else {
+			frame++;
+			delta = 100;
+		}
+	} else {
+		frame++;
+		if (has_palette) {
+			delta = 100;  //hack for slower movement
+		} else {
+			delta = 15;
+		}
+	}
+	return delta;
+}
+
+Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
+{
+	if (time < nextFrameTime) return current;
+
+	// even if we are paused we need to generate the first frame
+	if (current && !(flags & PLAY_ALWAYS) && core->IsFreezed()) {
+		nextFrameTime = time + 1;
+		return current;
+	}
+
+	nextFrameTime = time + CalculateNextFrameDelta();
+	assert(nextFrameTime);
+	
+	Holder<Sprite2D> pic = bam->GetFrame(frame, cycle);
+
+	if (pic == nullptr) {
+		//stopping at end frame
+		if (flags & PLAY_ONCE) {
+			nextFrameTime = 0;
+			return current;
+		}
+		anim_phase = 0;
+		frame = 0;
+		pic = bam->GetFrame(0, cycle);
+	}
+
+	if (pic == nullptr) {
+		// I guess we just return the existing frame...
+		// we already did the palette manipulation (probably)
+		return current;
+	}
+
+	if (has_palette) {
+		PaletteHolder palette = pic->GetPalette();
+		palette->SetupPaperdollColours(colors, 0);
+	}
+	
+	if (is_blended) {
+		PaletteHolder palette = pic->GetPalette();
+		palette->CreateShadedAlphaChannel();
+	}
+
+	return pic;
+}
+
+bool SpriteAnimation::HasEnded() const
+{
+	return nextFrameTime == 0;
 }
 
 }

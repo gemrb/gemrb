@@ -35,17 +35,15 @@ namespace GemRB {
 
 class ITMImporter : public ItemMgr {
 private:
-	DataStream* str;
-	int version;
+	int version = 0;
 
 public:
-	ITMImporter(void);
-	~ITMImporter(void) override;
-	bool Open(DataStream* stream) override;
 	Item* GetItem(Item *s) override;
+	
 private:
-	void GetExtHeader(Item *s, ITMExtHeader* eh);
-	void GetFeature(Effect *f, Item *s);
+	bool Import(DataStream* stream) override;
+	void GetExtHeader(const Item *s, ITMExtHeader* eh);
+	Effect *GetFeature(const Item *s);
 };
 
 

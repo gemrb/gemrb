@@ -46,7 +46,6 @@ IE_GUI_BUTTON_SOUND      = 0x00000004
 IE_GUI_BUTTON_CAPS       = 0x00000008   #capitalize all the text
 IE_GUI_BUTTON_CHECKBOX   = 0x00000010   #or radio button
 IE_GUI_BUTTON_RADIOBUTTON= 0x00000020   #sticks in a state
-IE_GUI_BUTTON_ANIMATED   = 0x00000080   # the button is animated
 
 #these bits are hardcoded in the .chu structure, don't move them
 IE_GUI_BUTTON_ALIGN_LEFT = 0x00000100
@@ -196,6 +195,12 @@ WINDOW_CENTER		 = 0xF
 ACTION_WINDOW_CLOSED		= 0
 ACTION_WINDOW_FOCUS_GAINED	= 1
 ACTION_WINDOW_FOCUS_LOST	= 2
+
+# animation flags
+ANIM_PLAY_NORMAL		= 0,
+ANIM_PLAY_RANDOM		= 1, # the button animation is random
+ANIM_PLAY_ONCE			= 2, # the button animation won't restart
+ANIM_PLAY_ALWAYS		= 4  # animation will play when game is paused
 
 # GameScreen flags
 GS_PARTYAI           = 1
@@ -392,3 +397,8 @@ ITM_F_DRINK = 1
 ITM_F_READ = 2
 ITM_F_CONTAINER = 4
 ITM_F_ABILITIES = 8
+
+# modifier keys - keep in sync with EventMgr.h
+GEM_MOD_SHIFT = 1
+GEM_MOD_CTRL = 2
+GEM_MOD_ALT = 4

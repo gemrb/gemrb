@@ -25,77 +25,51 @@
 
 namespace GemRB {
 
-AnimationFactory::AnimationFactory(const char* ResRef)
-	: FactoryObject( ResRef, IE_BAM_CLASS_ID )
+AnimationFactory::AnimationFactory(const ResRef &resref,
+								   std::vector<Holder<Sprite2D>> f,
+								   std::vector<CycleEntry> c,
+								   std::vector<index_t> flt)
+: FactoryObject(resref, IE_BAM_CLASS_ID),
+frames(std::move(f)),
+cycles(std::move(c)),
+FLTable(std::move(flt))
 {
-	FLTable = NULL;
-	FrameData = NULL;
+	assert(frames.size() < InvalidIndex);
+	assert(cycles.size() < InvalidIndex);
+	assert(FLTable.size() < InvalidIndex);
 }
 
-AnimationFactory::~AnimationFactory(void)
-{
-	if (FLTable)
-		free( FLTable);
-
-	if (FrameData)
-		free( FrameData);
-}
-
-void AnimationFactory::AddFrame(Holder<Sprite2D> frame)
-{
-	frames.push_back( frame );
-}
-
-void AnimationFactory::AddCycle(CycleEntry cycle)
-{
-	cycles.push_back( cycle );
-}
-
-void AnimationFactory::LoadFLT(unsigned short* buffer, int count)
-{
-	if (FLTable) {
-		free( FLTable );
-	}
-	//FLTable = new unsigned short[count];
-	FLTable = (unsigned short *) malloc(count * sizeof( unsigned short ) );
-	memcpy( FLTable, buffer, count * sizeof( unsigned short ) );
-}
-
-void AnimationFactory::SetFrameData(unsigned char* FrameData)
-{
-	this->FrameData = FrameData;
-}
-
-
-Animation* AnimationFactory::GetCycle(unsigned char cycle)
+Animation* AnimationFactory::GetCycle(index_t cycle)
 {
 	if (cycle >= cycles.size() || cycles[cycle].FramesCount == 0) {
 		return nullptr;
 	}
-	int ff = cycles[cycle].FirstFrame;
-	int lf = ff + cycles[cycle].FramesCount;
-	Animation* anim = new Animation( cycles[cycle].FramesCount );
-	int c = 0;
-	for (int i = ff; i < lf; i++) {
-		anim->AddFrame(frames[FLTable[i]], c++);
+	index_t ff = cycles[cycle].FirstFrame;
+	index_t lf = ff + cycles[cycle].FramesCount;
+	std::vector<Animation::frame_t> animframes;
+	animframes.reserve(cycles[cycle].FramesCount);
+	for (index_t i = ff; i < lf; i++) {
+		animframes.push_back(frames[FLTable[i]]);
 	}
-	return anim;
+	assert(cycles[cycle].FramesCount == animframes.size());
+	return new Animation(std::move(animframes));
 }
 
 /* returns the required frame of the named cycle, cycle defaults to 0 */
-Holder<Sprite2D> AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) const
+Holder<Sprite2D> AnimationFactory::GetFrame(index_t index, index_t cycle) const
 {
 	if (cycle >= cycles.size()) {
-		return NULL;
+		return nullptr;
 	}
-	int ff = cycles[cycle].FirstFrame, fc = cycles[cycle].FramesCount;
+	index_t ff = cycles[cycle].FirstFrame;
+	index_t fc = cycles[cycle].FramesCount;
 	if(index >= fc) {
-		return NULL;
+		return nullptr;
 	}
 	return frames[FLTable[ff+index]];
 }
 
-Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(unsigned short index) const
+Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(index_t index) const
 {
 	if(index >= frames.size()) {
 		return NULL;
@@ -107,22 +81,23 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 		Holder<Sprite2D> &Picture2, unsigned int type) const
 {
 	if (frames.size()<2) {
-		return NULL;
+		return nullptr;
 	}
 
 	// mod paperdolls can be unsorted (Longer Road Irenicus cycle: 1 1 0)
-	int first = -1, second = -1; // top and bottom half
-	int ff = cycles[0].FirstFrame;
-	for (int f=0; f < cycles[0].FramesCount; f++) {
-		int idx = FLTable[ff+f];
-		if (first == -1) {
+	index_t first = InvalidIndex; // top half
+	index_t second = InvalidIndex; // bottom half
+	index_t ff = cycles[0].FirstFrame;
+	for (index_t f = 0; f < cycles[0].FramesCount; f++) {
+		index_t idx = FLTable[ff + f];
+		if (first == InvalidIndex) {
 			first = idx;
-		} else if (second == -1 && idx != first) {
+		} else if (second == InvalidIndex && idx != first) {
 			second = idx;
 			break;
 		}
 	}
-	if (second == -1) {
+	if (second == InvalidIndex) {
 		return NULL;
 	}
 
@@ -135,8 +110,8 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 		palette->SetupPaperdollColours(Colors, type);
 	}
 
-	Picture2->Frame.x = (short)frames[second]->Frame.x;
-	Picture2->Frame.y = (short)frames[second]->Frame.y - 80;
+	Picture2->Frame.x = frames[second]->Frame.x;
+	Picture2->Frame.y = frames[second]->Frame.y - 80;
 
 	Holder<Sprite2D> spr = frames[first]->copy();
 	if (Colors) {
@@ -144,12 +119,12 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 		palette->SetupPaperdollColours(Colors, type);
 	}
 
-	spr->Frame.x = (short)frames[first]->Frame.x;
-	spr->Frame.y = (short)frames[first]->Frame.y;
+	spr->Frame.x = frames[first]->Frame.x;
+	spr->Frame.y = frames[first]->Frame.y;
 	return spr;
 }
 
-int AnimationFactory::GetCycleSize(size_t idx) const
+AnimationFactory::index_t AnimationFactory::GetCycleSize(index_t idx) const
 {
 	if (idx >= cycles.size())
 		return 0;

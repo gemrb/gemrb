@@ -21,11 +21,13 @@
 #include "System/DataStream.h"
 
 #include "errors.h"
-#include <ctype.h>
+#include "Resource.h"
+
+#include <cctype>
 
 namespace GemRB {
 
-static const char* GEM_ENCRYPTION_KEY = "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca";
+static const char* const GEM_ENCRYPTION_KEY = "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca";
 
 const static ieWord endiantest = 1;
 bool DataStream::IsBigEndian = ((char *)&endiantest)[1] == 1;
@@ -34,10 +36,6 @@ DataStream::DataStream(void)
 {
 	Pos = size = 0;
 	Encrypted = false;
-}
-
-DataStream::~DataStream(void)
-{
 }
 
 void DataStream::SetBigEndian(bool be)
@@ -67,7 +65,7 @@ bool DataStream::CheckEncrypted()
 	return false;
 }
 /** No descriptions */
-void DataStream::ReadDecrypted(void* buf, unsigned long size)
+void DataStream::ReadDecrypted(void* buf, strpos_t size) const
 {
 	for (unsigned int i = 0; i < size; i++)
 		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
@@ -79,119 +77,90 @@ void DataStream::Rewind()
 	Pos = 0;
 }
 
-unsigned long DataStream::GetPos() const
+strpos_t DataStream::GetPos() const
 {
 	return Pos;
 }
 
-unsigned long DataStream::Size() const
+strpos_t DataStream::Size() const
 {
 	return size;
 }
 
-unsigned long DataStream::Remains() const
+strpos_t DataStream::Remains() const
 {
 	return size-Pos;
 }
 
-int DataStream::ReadWord(ieWord *dest)
+strret_t DataStream::ReadResRef(ResRef& dest)
 {
-	int len = Read(dest, 2);
-	if (IsBigEndian) {
-		unsigned char tmp;
-		tmp=((unsigned char *) dest)[0];
-		((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
-		((unsigned char *) dest)[1]=tmp;
-	}
-	return len;
-}
-
-int DataStream::ReadWordSigned(ieWordSigned *dest)
-{
-	int len = Read(dest, 2);
-	if (IsBigEndian) {
-		unsigned char tmp;
-		tmp=((unsigned char *) dest)[0];
-		((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
-		((unsigned char *) dest)[1]=tmp;
-	}
-	return len;
-}
-
-int DataStream::WriteWord(const ieWord *src)
-{
-	int len;
-	if (IsBigEndian) {
-		char tmp[2];
-		tmp[0]=((unsigned char *) src)[1];
-		tmp[1]=((unsigned char *) src)[0];
-		len = Write( tmp, 2 );
-	}
-	else {
-		len = Write( src, 2 );
-	}
-	return len;
-}
-
-int DataStream::ReadDword(ieDword *dest)
-{
-	int len = Read(dest, 4);
-	if (IsBigEndian) {
-		unsigned char tmp;
-		tmp=((unsigned char *) dest)[0];
-		((unsigned char *) dest)[0]=((unsigned char *) dest)[3];
-		((unsigned char *) dest)[3]=tmp;
-		tmp=((unsigned char *) dest)[1];
-		((unsigned char *) dest)[1]=((unsigned char *) dest)[2];
-		((unsigned char *) dest)[2]=tmp;
-	}
-	return len;
-}
-
-int DataStream::WriteDword(const ieDword *src)
-{
-	int len;
-	if (IsBigEndian) {
-		char tmp[4];
-		tmp[0]=((unsigned char *) src)[3];
-		tmp[1]=((unsigned char *) src)[2];
-		tmp[2]=((unsigned char *) src)[1];
-		tmp[3]=((unsigned char *) src)[0];
-		len = Write( tmp, 4 );
-	}
-	else {
-		len = Write( src, 4 );
-	}
-	return len;
-}
-
-int DataStream::ReadResRef(ieResRef dest)
-{
-	int len = Read(dest, 8);
-	if (len == GEM_ERROR) {
-		dest[0] = 0;
-		return 0;
-	}
-	// lowercase the resref
-	for (int i = 0; i < 8; i++) {
-		dest[i] = (char) tolower(dest[i]);
-	}
+	char ref[9];
+	strret_t len = Read(ref, 8);
+	ref[len] = '\0';
+	
 	// remove trailing spaces
-	for (int i = 7; i >= 0; i--) {
-		if (dest[i] == ' ') dest[i] = 0;
+	for (strret_t i = len - 1; i >= 0; --i) {
+		if (ref[i] == ' ') ref[i] = '\0';
 		else break;
 	}
-	// null-terminate
-	dest[8] = 0;
+	
+	dest = MakeLowerCaseResRef(ref);
 	return len;
 }
 
-int DataStream::WriteResRef(const ieResRef src)
+strret_t DataStream::WriteResRef(const ResRef& src)
 {
-	return Write( src, 8);
+	return Write(src.CString(), 8);
 }
 
-int DataStream::ReadLine(void* buf, unsigned long maxlen)
+strret_t DataStream::WriteResRefLC(const ResRef& src)
+{
+	return WriteResRef(MakeLowerCaseResRef(src.CString()));
+}
+
+strret_t DataStream::WriteResRefUC(const ResRef& src)
+{
+	return WriteResRef(MakeUpperCaseResRef(src.CString()));
+}
+
+strret_t DataStream::ReadVariable(ieVariable& dest)
+{
+	char ref[33];
+	strret_t len = Read(ref, 32);
+	ref[len] = '\0';
+
+	// remove trailing spaces
+	for (strret_t i = len - 1; i >= 0; --i) {
+		if (ref[i] == ' ') ref[i] = '\0';
+		else break;
+	}
+
+	dest = ref;
+	return len;
+}
+
+strret_t DataStream::WriteVariable(const ieVariable& src)
+{
+	return Write(src.CString(), 32);
+}
+
+strret_t DataStream::ReadPoint(Point &p)
+{
+	// in the data files Points are 16bit per coord as opposed to our 32ish
+	strret_t ret = ReadScalar<int, ieWord>(p.x);
+	ret += ReadScalar<int, ieWord>(p.y);
+	return ret;
+}
+
+strret_t DataStream::WritePoint(const Point &p)
+{
+	// in the data files Points are 16bit per coord as opposed to our 32ish
+	strret_t ret = WriteScalar<int, ieWord>(p.x);
+	ret += WriteScalar<int, ieWord>(p.y);
+	return ret;
+}
+
+strret_t DataStream::ReadLine(void* buf, strpos_t maxlen)
 {
 	// FIXME: eof?
 	if (!maxlen) {

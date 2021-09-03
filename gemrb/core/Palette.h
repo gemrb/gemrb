@@ -51,7 +51,7 @@ using PaletteHolder = Holder<Palette>;
 class GEM_EXPORT Palette : public Held<Palette>
 {
 private:
-	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst);
+	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const;
 	void UpdateAlpha();
 public:
 	Palette(const Color &color, const Color &back);
@@ -77,9 +77,9 @@ public:
 	void Brighten();
 
 	void SetupPaperdollColours(const ieDword* Colors, unsigned int type);
-	void SetupRGBModification(const PaletteHolder src, const RGBModifier* mods,
+	void SetupRGBModification(const PaletteHolder& src, const RGBModifier* mods,
 		unsigned int type);
-	void SetupGlobalRGBModification(const PaletteHolder src,
+	void SetupGlobalRGBModification(const PaletteHolder& src,
 		const RGBModifier& mod);
 
 	PaletteHolder Copy() const;

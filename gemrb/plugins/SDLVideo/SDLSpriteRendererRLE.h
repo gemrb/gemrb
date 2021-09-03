@@ -111,36 +111,20 @@ struct SRBlender_Alpha { };
 
 template<typename PTYPE, typename BLENDER>
 struct SRBlender {
-	SRBlender(SDL_PixelFormat* format);
+	SRBlender(const PixelFormat& format);
 
 	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const;
 };
 
 template<typename BLENDER>
 struct SRBlender<Uint16, BLENDER> {
-	uint8_t RLOSS;
-	uint8_t GLOSS;
-	uint8_t BLOSS;
-
-	uint8_t RSHIFT;
-	uint8_t GSHIFT;
-	uint8_t BSHIFT;
-	
-	Uint16 AMASK;
+	const PixelFormat& fmt;
 	Uint16 halfmask;
 
-	SRBlender(SDL_PixelFormat* fmt) {
-		RLOSS = fmt->Rloss;
-		GLOSS = fmt->Gloss;
-		BLOSS = fmt->Bloss;
-		
-		RSHIFT = fmt->Rshift;
-		GSHIFT = fmt->Gshift;
-		BSHIFT = fmt->Bshift;
-		
-		AMASK = fmt->Amask;
-		
-		halfmask = ((0xFFU >> (RLOSS + 1)) << RSHIFT) | ((0xFFU >> (GLOSS + 1)) << GSHIFT) | ((0xFFU >> (BLOSS + 1)) << BSHIFT);
+	SRBlender(const PixelFormat& fmt)
+	: fmt(fmt)
+	{
+		halfmask = ((0xFFU >> (fmt.Rloss + 1)) << fmt.Rshift) | ((0xFFU >> (fmt.Gloss + 1)) << fmt.Gshift) | ((0xFFU >> (fmt.Bloss + 1)) << fmt.Bshift);
 	}
 	
 	void operator()(Uint16& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const;
@@ -148,21 +132,13 @@ struct SRBlender<Uint16, BLENDER> {
 
 template<typename BLENDER>
 struct SRBlender<Uint32, BLENDER> {
-	uint8_t RSHIFT;
-	uint8_t GSHIFT;
-	uint8_t BSHIFT;
-	
-	Uint32 AMASK;
+	const PixelFormat& fmt;
 	Uint32 halfmask;
 
-	SRBlender(SDL_PixelFormat* fmt) {
-		RSHIFT = fmt->Rshift;
-		GSHIFT = fmt->Gshift;
-		BSHIFT = fmt->Bshift;
-		
-		AMASK = fmt->Amask;
-		
-		halfmask = ((0xFFU >> 1) << RSHIFT) | ((0xFFU >> 1) << GSHIFT) | ((0xFFU >> 1) << BSHIFT);
+	SRBlender(const PixelFormat& fmt)
+	: fmt(fmt)
+	{
+		halfmask = ((0xFFU >> 1) << fmt.Rshift) | ((0xFFU >> 1) << fmt.Gshift) | ((0xFFU >> 1) << fmt.Bshift);
 	}
 	
 	void operator()(Uint32& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const;
@@ -170,51 +146,51 @@ struct SRBlender<Uint32, BLENDER> {
 
 template<> // 16 bpp, 565
 void SRBlender<Uint16, SRBlender_NoAlpha>::operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-	pix = ((r >> RLOSS) << RSHIFT) |
-		  ((g >> GLOSS) << GSHIFT) |
-		  ((b >> BLOSS) << BSHIFT);
+	pix = ((r >> fmt.Rloss) << fmt.Rshift) |
+		  ((g >> fmt.Gloss) << fmt.Gshift) |
+		  ((b >> fmt.Bloss) << fmt.Bshift);
 }
 
 template<> // 16 bpp, 565
 void SRBlender<Uint16, SRBlender_HalfAlpha>::operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
 	pix = ((pix >> 1) & halfmask) +
-	((((r >> (RLOSS + 1)) << RSHIFT) | ((g >> (GLOSS + 1)) << GSHIFT) | ((b >> (BLOSS + 1)) << BSHIFT)) & halfmask);
+	((((r >> (fmt.Rloss + 1)) << fmt.Rshift) | ((g >> (fmt.Gloss + 1)) << fmt.Gshift) | ((b >> (fmt.Bloss + 1)) << fmt.Bshift)) & halfmask);
 }
 
 template<> // 16 bpp, 565
 void SRBlender<Uint16, SRBlender_Alpha>::operator()(Uint16& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
-	unsigned int dr = 1 + a*(r >> RLOSS) + (255-a)*((pix >> RSHIFT) & ((1 << (8-RLOSS))-1));
-	unsigned int dg = 1 + a*(g >> GLOSS) + (255-a)*((pix >> GSHIFT) & ((1 << (8-GLOSS))-1));
-	unsigned int db = 1 + a*(b >> BLOSS) + (255-a)*((pix >> BSHIFT) & ((1 << (8-BLOSS))-1));
+	unsigned int dr = 1 + a*(r >> fmt.Rloss) + (255-a)*((pix >> fmt.Rshift) & ((1 << (8-fmt.Rloss))-1));
+	unsigned int dg = 1 + a*(g >> fmt.Gloss) + (255-a)*((pix >> fmt.Gshift) & ((1 << (8-fmt.Gloss))-1));
+	unsigned int db = 1 + a*(b >> fmt.Bloss) + (255-a)*((pix >> fmt.Bshift) & ((1 << (8-fmt.Bloss))-1));
 
 	r = (dr + (dr>>8)) >> 8;
 	g = (dg + (dg>>8)) >> 8;
 	b = (db + (db>>8)) >> 8;
-	pix = (r << RSHIFT) |
-		  (g << GSHIFT) |
-		  (b << BSHIFT);
+	pix = (r << fmt.Rshift) |
+		  (g << fmt.Gshift) |
+		  (b << fmt.Bshift);
 }
 
 template<> // 32 bpp, 888
 void SRBlender<Uint32, SRBlender_NoAlpha>::operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-	pix = (r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT);
+	pix = (r << fmt.Rshift) | (g << fmt.Gshift) | (b << fmt.Bshift);
 }
 
 template<> // 32 bpp, 888
 void SRBlender<Uint32, SRBlender_HalfAlpha>::operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
 	pix = ((pix >> 1) & halfmask) +
-	((((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT)) >> 1) & halfmask);
+	((((r << fmt.Rshift) | (g << fmt.Gshift) | (b << fmt.Bshift)) >> 1) & halfmask);
 }
 
 template<> // 32 bpp, 888
 void SRBlender<Uint32, SRBlender_Alpha>::operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8 a) const {
-	unsigned int dr = 1 + a*r + (255-a)*((pix >> RSHIFT) & 0xFF);
-	unsigned int dg = 1 + a*g + (255-a)*((pix >> GSHIFT) & 0xFF);
-	unsigned int db = 1 + a*b + (255-a)*((pix >> BSHIFT) & 0xFF);
+	unsigned int dr = 1 + a*r + (255-a)*((pix >> fmt.Rshift) & 0xFF);
+	unsigned int dg = 1 + a*g + (255-a)*((pix >> fmt.Gshift) & 0xFF);
+	unsigned int db = 1 + a*b + (255-a)*((pix >> fmt.Bshift) & 0xFF);
 	r = (dr + (dr>>8)) >> 8;
 	g = (dg + (dg>>8)) >> 8;
 	b = (db + (db>>8)) >> 8;
-	pix = (r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT);
+	pix = (r << fmt.Rshift) | (g << fmt.Gshift) | (b << fmt.Bshift);
 }
 
 // these always change together
@@ -232,7 +208,7 @@ void TintedBlend(SDLPixelIterator& dest, Uint8 alpha,
 	blend(pix, col.r, col.g, col.b, col.a);
 	
 	// FIXME: we should probably address this in the blenders instead
-	pix |= blend.AMASK; // color keyed surface is 100% opaque
+	pix |= blend.fmt.Amask; // color keyed surface is 100% opaque
 }
 
 template<typename PTYPE, typename Tinter, typename Blender>
@@ -359,31 +335,31 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 						  IAlphaIterator* cover,
 						  BlitFlags flags, const Tinter& tint)
 {
-	assert(spr->BAM);
+	assert(spr && spr->Format().RLE);
 
-	if (srect.Dimensions().IsEmpty())
+	if (srect.size.IsInvalid())
 		return;
 
-	if (drect.Dimensions().IsEmpty())
+	if (drect.size.IsInvalid())
 		return;
 
 	PaletteHolder palette = spr->GetPalette();
 	const Uint8* rledata = (const Uint8*)spr->LockSprite();
 	uint8_t ck = spr->GetColorKey();
 
-	bool partial = spr->Frame.Dimensions() != srect.Dimensions();
+	bool partial = spr->Frame.size != srect.size;
 
 	IPixelIterator::Direction xdir = (flags&BlitFlags::MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 	IPixelIterator::Direction ydir = (flags&BlitFlags::MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 
-	SDLPixelIterator dstit = SDLPixelIterator(dst, xdir, ydir, RectFromRegion(drect));
+	auto dstit = MakeSDLPixelIterator(dst, xdir, ydir, drect);
 
 	static StaticAlphaIterator nomask(0);
 	if (cover == nullptr) {
 		cover = &nomask;
 	}
 
-	switch (dstit.format->BytesPerPixel) {
+	switch (dstit.format.Bpp) {
 		case 4:
 		{
 			SRBlender<Uint32, Blender> blend(dstit.format);

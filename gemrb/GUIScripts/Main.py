@@ -18,6 +18,8 @@ def Init():
 	# this function is run after the game type is set
 	# this is where we would run initializations (even on a per-game type basis)
 	
+	print("Python version: " + sys.version)
+	
 	# create a global scrollbar for the ScrollView to clone from
 	# but only if we can (would fail in tests)
 	SBArgs = CreateScrollbarARGs ()

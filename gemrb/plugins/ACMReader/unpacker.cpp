@@ -24,7 +24,7 @@
 
 #include <cstdio>
 
-char Table1[27] = {
+const char Table1[27] = {
 	0, 1, 2, 4, 5, 6, 8, 9, 10, 16, 17, 18, 20, 21, 22, 24, 25, 26, 32, 33,
 	34, 36, 37, 38, 40, 41, 42
 };
@@ -33,7 +33,7 @@ char Table1[27] = {
 //		000 001 002  010 011 012  020 021 022
 //		100 101 102  110 111 112  120 121 122
 //		200 201 202  210 211 212  220 221 222
-short Table2[125] = {
+const short Table2[125] = {
 	0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 16, 17, 18, 19, 20, 24, 25, 26, 27, 28,
 	32, 33, 34, 35, 36, 64, 65, 66, 67, 68, 72, 73, 74, 75, 76, 80, 81, 82,
 	83, 84, 88, 89, 90, 91, 92, 96, 97, 98, 99, 100, 128, 129, 130, 131, 132,
@@ -49,7 +49,7 @@ short Table2[125] = {
 //		100 101 102 103 104 ...
 //		200 ...
 //		...
-unsigned char Table3[121] = {
+const unsigned char Table3[121] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x10,
 	0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x20, 0x21,
 	0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x30, 0x31, 0x32,
@@ -63,7 +63,7 @@ unsigned char Table3[121] = {
 	0xAA
 };
 
-FillerProc Fillers[32] = {
+const FillerProc Fillers[32] = {
 	&CValueUnpacker::zero_fill, & CValueUnpacker::return0,
 	& CValueUnpacker::return0, & CValueUnpacker::linear_fill,
 	& CValueUnpacker::linear_fill, & CValueUnpacker::linear_fill,
@@ -132,13 +132,13 @@ int CValueUnpacker::get_one_block(int* block)
 	block_ptr = block;
 	int pwr = get_bits( 4 ) & 0xF, val = get_bits( 16 ) & 0xFFFF,
 		count = 1 << pwr, v = 0;
-	int i;
-	for (i = 0; i < count; i++) {
+
+	for (int i = 0; i < count; i++) {
 		buff_middle[i] = ( short ) v;
 		v += val;
 	}
 	v = -val;
-	for (i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		buff_middle[-i - 1] = ( short ) v;
 		v -= val;
 	}
@@ -174,7 +174,7 @@ int CValueUnpacker::zero_fill(int pass, int /*ind*/)
 int CValueUnpacker::linear_fill(int pass, int ind)
 {
 	int mask = ( 1 << ind ) - 1;
-	short* lb_ptr = buff_middle + int( ((size_t)-1) << ( ind - 1 ) );
+	const short* lb_ptr = buff_middle + int(((size_t) -1) << (ind - 1));
 
 	for (int i = 0; i < subblocks; i++)
 		block_ptr[i * sb_size + pass] = lb_ptr[get_bits( ind ) & mask];

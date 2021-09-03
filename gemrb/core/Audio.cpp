@@ -19,6 +19,7 @@
  */
 
 #include "Audio.h"
+#include "Resource.h"
 
 namespace GemRB {
 
@@ -57,13 +58,9 @@ Audio::Audio(void)
 	CreateChannel("ARMOR");
 }
 
-Audio::~Audio(void)
-{
-}
-
 unsigned int Audio::CreateChannel(const char *name)
 {
-	channels.push_back(Channel(name));
+	channels.emplace_back(name);
 	return channels.size() - 1;
 }
 
@@ -123,8 +120,14 @@ float Audio::GetReverb(unsigned int channel) const
 	return channels[channel].getReverb();
 }
 
-SoundHandle::~SoundHandle()
+Holder<SoundHandle> Audio::Play(const ResRef &resRef, unsigned int channel, const Point& p, unsigned int flags, tick_t *length)
 {
+	return Play(resRef.CString(), channel, p, flags, length);
+}
+
+Holder<SoundHandle> Audio::PlayRelative(const ResRef &resRef, unsigned int channel, tick_t *length)
+{
+	return PlayRelative(resRef.CString(), channel, length);
 }
 
 }

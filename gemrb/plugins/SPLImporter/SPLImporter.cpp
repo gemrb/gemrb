@@ -27,53 +27,46 @@
 
 using namespace GemRB;
 
-int *cgsounds = NULL;
-int cgcount = -1;
-
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	if (cgsounds) {
-		free(cgsounds);
-		cgsounds = NULL;
-	}
-	cgcount = 0;
-	AutoTable tm("cgtable");
+	AutoTable tm = gamedata->LoadTable("cgtable");
 	if (!tm) {
 		Log(ERROR, "SPLImporter", "Cannot find cgtable.2da.");
 		return;
 	}
-	cgcount = tm->GetRowCount();
-	cgsounds = (int *) calloc( cgcount, sizeof(int) );
-	for (int i = 0; i < cgcount; i++) {
-		cgsounds[i] = atoi(tm->QueryField( i, 1 ) );
-	}
-}
 
-static void ReleaseMemorySPL()
-{
-	free(cgsounds);
-	cgsounds = NULL;
-	cgcount = -1;
+	size_t count = tm->GetRowCount();
+	gamedata->castingGlows.resize(count);
+	gamedata->castingSounds.resize(count);
+	for (size_t i = 0; i < count; i++) {
+		gamedata->castingGlows[i] = tm->QueryField(i, 0);
+		gamedata->castingSounds[i] = atoi(tm->QueryField(i, 1));
+		// * marks an empty resource
+		if (IsStar(gamedata->castingGlows[i])) {
+			gamedata->castingGlows[i].Reset();
+		}
+	}
+
 }
 
 static int GetCGSound(ieDword CastingGraphics)
 {
-	if (cgcount<0) {
+	if (gamedata->castingGlows.empty()) {
 		Initializer();
 	}
 
-	if (CastingGraphics>=(ieDword) cgcount) {
+	if (CastingGraphics >= gamedata->castingSounds.size()) {
 		return -1;
 	}
 	int ret = -1;
 	if (core->HasFeature(GF_CASTING_SOUNDS) ) {
-		ret = cgsounds[CastingGraphics];
+		ret = gamedata->castingSounds[CastingGraphics];
 		if (core->HasFeature(GF_CASTING_SOUNDS2) ) {
 			ret |= 0x100;
 		}
 	} else if (!core->HasFeature(GF_CASTING_SOUNDS2)) {
-		ret = cgsounds[CastingGraphics];
+		ret = gamedata->castingSounds[CastingGraphics];
 	}
 	return ret;
 }
@@ -112,46 +105,45 @@ bool SPLImporter::Open(DataStream* stream)
 
 Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 {
-	size_t i;
-
-	str->ReadDword( &s->SpellName );
-	str->ReadDword( &s->SpellNameIdentified );
+	str->ReadDword(s->SpellName);
+	str->ReadDword(s->SpellNameIdentified);
 	str->ReadResRef( s->CompletionSound );
-	str->ReadDword( &s->Flags );
-	str->ReadWord( &s->SpellType );
-	str->ReadWord( &s->ExclusionSchool );
-	str->ReadWord( &s->PriestType );
-	str->ReadWord( &s->CastingGraphics );
+	str->ReadDword(s->Flags);
+	str->ReadWord(s->SpellType);
+	str->ReadWord(s->ExclusionSchool);
+	str->ReadWord(s->PriestType);
+	str->ReadWord(s->CastingGraphics);
 	s->CastingSound = GetCGSound(s->CastingGraphics);
 	str->Read( &s->unknown1, 1 );
-	str->ReadWord( &s->PrimaryType );
+	str->ReadWord(s->PrimaryType);
 	str->Read( &s->SecondaryType, 1 );
-	str->ReadDword( &s->unknown2 );
-	str->ReadDword( &s->unknown3 );
-	str->ReadDword( &s->unknown4 );
-	str->ReadDword( &s->SpellLevel );
-	str->ReadWord( &s->unknown5 );
+	str->ReadDword(s->unknown2);
+	str->ReadDword(s->unknown3);
+	str->ReadDword(s->unknown4);
+	str->ReadDword(s->SpellLevel);
+	str->ReadWord(s->unknown5);
 	str->ReadResRef( s->SpellbookIcon );
 	//this hack is needed in ToB at least
-	if (s->SpellbookIcon[0] && core->HasFeature(GF_SPELLBOOKICONHACK)) {
-		i=strlen(s->SpellbookIcon);
-		if (i) s->SpellbookIcon[i-1]='c';
+	if (!s->SpellbookIcon.IsEmpty() && core->HasFeature(GF_SPELLBOOKICONHACK)) {
+		ResRef tmp = s->SpellbookIcon;
+		s->SpellbookIcon.SNPrintF("%.7sc", tmp.CString());
 	}
 
-	str->ReadWord( &s->unknown6 );
-	str->ReadDword( &s->unknown7 );
-	str->ReadDword( &s->unknown8 );
-	str->ReadDword( &s->unknown9 );
-	str->ReadDword( &s->SpellDesc );
-	str->ReadDword( &s->SpellDescIdentified );
-	str->ReadDword( &s->unknown10 );
-	str->ReadDword( &s->unknown11 );
-	str->ReadDword( &s->unknown12 );
-	str->ReadDword( &s->ExtHeaderOffset );
-	str->ReadWord( &s->ExtHeaderCount );
-	str->ReadDword( &s->FeatureBlockOffset );
-	str->ReadWord( &s->CastingFeatureOffset );
-	str->ReadWord( &s->CastingFeatureCount );
+	str->ReadWord(s->unknown6);
+	str->ReadDword(s->unknown7);
+	str->ReadDword(s->unknown8);
+	str->ReadDword(s->unknown9);
+	str->ReadDword(s->SpellDesc);
+	str->ReadDword(s->SpellDescIdentified);
+	str->ReadDword(s->unknown10);
+	str->ReadDword(s->unknown11);
+	str->ReadDword(s->unknown12);
+	str->ReadDword(s->ExtHeaderOffset);
+	ieWord headerCount;
+	str->ReadWord(headerCount);
+	str->ReadDword(s->FeatureBlockOffset);
+	str->ReadWord(s->CastingFeatureOffset);
+	str->ReadWord(s->CastingFeatureCount);
 
 	memset( s->unknown13, 0, 14 );
 	if (version == 20) {
@@ -175,24 +167,24 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 		}
 	}
 
-	s->ext_headers = new SPLExtHeader[s->ExtHeaderCount];
+	s->ext_headers = std::vector<SPLExtHeader>(headerCount);
 
-	for (int i = 0; i < s->ExtHeaderCount; i++) {
+	for (ieWord i = 0; i < headerCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 40, GEM_STREAM_START );
-		GetExtHeader( s, s->ext_headers+i );
+		GetExtHeader(s, &s->ext_headers[i]);
 	}
 
-	s->casting_features = new Effect[s->CastingFeatureCount];
+	s->casting_features.reserve(s->CastingFeatureCount);
 	str->Seek( s->FeatureBlockOffset + 48*s->CastingFeatureOffset,
 			GEM_STREAM_START );
 	for (int i = 0; i < s->CastingFeatureCount; i++) {
-		GetFeature(s, s->casting_features+i);
+		s->casting_features.push_back(GetFeature(s));
 	}
 
 	return s;
 }
 
-void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
+void SPLImporter::GetExtHeader(const Spell *s, SPLExtHeader* eh)
 {
 	ieByte tmpByte;
 
@@ -201,7 +193,7 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	str->Read( &eh->Hostile, 1 );
 	str->Read( &eh->Location, 1 );
 	str->Read( &eh->unknown2, 1 );
-	str->ReadResRef( eh->MemorisedIcon );
+	str->ReadResRef(eh->memorisedIcon);
 	str->Read( &eh->Target, 1 );
 
 	//this hack is to let gemrb target dead actors by some spells
@@ -215,43 +207,44 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 		tmpByte = 1;
 	}
 	eh->TargetNumber = tmpByte;
-	str->ReadWord( &eh->Range );
-	str->ReadWord( &eh->RequiredLevel );
-	str->ReadDword( &eh->CastingTime );
-	str->ReadWord( &eh->DiceSides );
-	str->ReadWord( &eh->DiceThrown );
-	str->ReadWord( &eh->DamageBonus );
-	str->ReadWord( &eh->DamageType );
-	str->ReadWord( &eh->FeatureCount );
-	str->ReadWord( &eh->FeatureOffset );
-	str->ReadWord( &eh->Charges );
-	str->ReadWord( &eh->ChargeDepletion );
-	str->ReadWord( &eh->ProjectileAnimation );
+	str->ReadWord(eh->Range);
+	str->ReadWord(eh->RequiredLevel);
+	str->ReadDword(eh->CastingTime);
+	str->ReadWord(eh->DiceSides);
+	str->ReadWord(eh->DiceThrown);
+	str->ReadWord(eh->DamageBonus);
+	str->ReadWord(eh->DamageType);
+	ieWord featureCount;
+	str->ReadWord(featureCount);
+	str->ReadWord(eh->FeatureOffset);
+	str->ReadWord(eh->Charges);
+	str->ReadWord(eh->ChargeDepletion);
+	str->ReadWord(eh->ProjectileAnimation);
 
 	//for some odd reasons 0 and 1 are the same
 	if (eh->ProjectileAnimation) {
 		eh->ProjectileAnimation--;
 	}
-	eh->features = new Effect[eh->FeatureCount];
+	eh->features.reserve(featureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
-		GetFeature(s, eh->features+i);
+	for (ieWord i = 0; i < featureCount; ++i) {
+		eh->features.push_back(GetFeature(s));
 	}
 }
 
-void SPLImporter::GetFeature(Spell *s, Effect *fx)
+Effect *SPLImporter::GetFeature(const Spell *s)
 {
-	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
-	eM->GetEffect( fx );
-	memcpy(fx->Source, s->Name, 9);
+	Effect* fx = eM->GetEffect();
+	fx->SourceRef = s->Name;
 	fx->PrimaryType = s->PrimaryType;
 	fx->SecondaryType = s->SecondaryType;
+	return fx;
 }
 
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xA8D1014, "SPL File Importer")
 PLUGIN_CLASS(IE_SPL_CLASS_ID, SPLImporter)
-PLUGIN_CLEANUP(ReleaseMemorySPL)
 END_PLUGIN()

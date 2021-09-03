@@ -38,27 +38,15 @@ namespace GemRB {
 Container::Container(void)
 	: Highlightable( ST_CONTAINER )
 {
-	Type = 0;
+	containerType = 0;
 	LockDifficulty = 0;
 	Flags = 0;
 	TrapDetectionDiff = 0;
 	TrapRemovalDiff = 0;
 	Trapped = 0;
 	TrapDetected = 0;
-	inventory.SetInventoryType(INVENTORY_HEAP);
+	inventory.SetInventoryType(ieInventoryType::HEAP);
 	OpenFail = 0;
-}
-
-void Container::FreeGroundIcons()
-{
-	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
-		groundicons[i] = nullptr;
-	}
-}
-
-Container::~Container()
-{
-	FreeGroundIcons();
 }
 
 Region Container::DrawingRegion() const
@@ -86,13 +74,13 @@ void Container::Draw(bool highlight, const Region& vp, Color tint, BlitFlags fla
 		const Holder<Sprite2D> icon = groundicons[i];
 		if (icon) {
 			if (highlight) {
-				video->BlitGameSprite(icon, Pos - vp.Origin(), flags, tint);
+				video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
 			} else {
 				const Color trans;
 				PaletteHolder p = icon->GetPalette();
 				Color tmpc = p->col[1];
 				p->CopyColorRange(&trans, &trans + 1, 1);
-				video->BlitGameSprite(icon, Pos - vp.Origin(), flags, tint);
+				video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
 				p->CopyColorRange(&tmpc, &tmpc + 1, 1);
 			}
 		}
@@ -113,9 +101,9 @@ void Container::SetContainerLocked(bool lock)
 void Container::DestroyContainer()
 {
 	//it is already a groundpile?
-	if (Type == IE_CONTAINER_PILE)
+	if (containerType == IE_CONTAINER_PILE)
 		return;
-	Type = IE_CONTAINER_PILE;
+	containerType = IE_CONTAINER_PILE;
 	RefreshGroundIcons();
 	//probably we should stop the script or trigger it, whatever
 }
@@ -125,7 +113,7 @@ CREItem *Container::RemoveItem(unsigned int idx, unsigned int count)
 {
 	CREItem *ret = inventory.RemoveItem(idx, count);
 	//if we just took one of the first few items, groundpile changed
-	if ((Type == IE_CONTAINER_PILE) && (idx<MAX_GROUND_ICON_DRAWN)) {
+	if (containerType == IE_CONTAINER_PILE && idx < MAX_GROUND_ICON_DRAWN) {
 		RefreshGroundIcons();
 	}
 	return ret;
@@ -137,7 +125,7 @@ int Container::AddItem(CREItem *item)
 {
 	inventory.AddItem(item);
 	//we just added a 3. or less item, groundpile changed
-	if ((Type == IE_CONTAINER_PILE) && (inventory.GetSlotCount()<=MAX_GROUND_ICON_DRAWN)) {
+	if (containerType == IE_CONTAINER_PILE && inventory.GetSlotCount() <= MAX_GROUND_ICON_DRAWN) {
 		RefreshGroundIcons();
 	}
 	return 2;
@@ -148,10 +136,14 @@ void Container::RefreshGroundIcons()
 	int i = inventory.GetSlotCount();
 	if (i>MAX_GROUND_ICON_DRAWN)
 		i = MAX_GROUND_ICON_DRAWN;
-	FreeGroundIcons();
+
+	int count = MAX_GROUND_ICON_DRAWN;
+	while (count > i) {
+		groundicons[--count] = nullptr;
+	}
 	while (i--) {
-		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
-		Item *itm = gamedata->GetItem( slot->ItemResRef ); //cached reference
+		const CREItem* slot = inventory.GetSlotItem(i); //borrowed reference
+		const Item* itm = gamedata->GetItem(slot->ItemResRef); //cached reference
 		if (!itm) continue;
 		//well, this is required in PST, needs more work if some other
 		//game is broken by not using -1,0
@@ -209,7 +201,7 @@ void Container::TryPickLock(const Actor *actor)
 
 void Container::TryBashLock(Actor *actor)
 {
-	//Get the strength bonus agains lock difficulty
+	// Get the strength bonus against lock difficulty
 	int bonus;
 	unsigned int roll;
 
@@ -249,20 +241,21 @@ void Container::dump() const
 	buffer.appendFormatted( "Debugdump of Container %s\n", GetScriptName() );
 	buffer.appendFormatted( "Container Global ID: %d\n", GetGlobalID());
 	buffer.appendFormatted( "Position: %d.%d\n", Pos.x, Pos.y);
-	buffer.appendFormatted( "Type: %d, Locked: %s, LockDifficulty: %d\n", Type, YESNO(Flags&CONT_LOCKED), LockDifficulty );
+	buffer.appendFormatted("Type: %d, Locked: %s, LockDifficulty: %d\n", containerType, YESNO(Flags&CONT_LOCKED), LockDifficulty);
 	buffer.appendFormatted( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
 	buffer.appendFormatted( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
-	const char *name = "NONE";
+	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted( "Script: %s, Key: %s\n", name, KeyResRef );
+	buffer.appendFormatted("Script: %s, Key: %s\n", name.CString(), KeyResRef.CString());
 	inventory.dump(buffer);
 	Log(DEBUG, "Container", buffer);
 }
 
-bool Container::TryUnlock(Actor *actor) {
+bool Container::TryUnlock(Actor *actor) const
+{
 	if (!(Flags&CONT_LOCKED)) return true;
 
 	return Highlightable::TryUnlock(actor, false);

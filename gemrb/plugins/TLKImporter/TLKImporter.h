@@ -59,16 +59,16 @@ private:
 	/** resolves day and monthname tokens */
 	void GetMonthName(int dayandmonth);
 	/** replaces tags in dest, don't exceed Length */
-	bool ResolveTags(char* dest, const char* source, int Length);
+	bool ResolveTags(char* dest, const char* source, size_t Length);
 	/** returns the needed length in Length, 
 		if there was no token, returns false */
-	bool GetNewStringLength(const char* string, int& Length);
+	bool GetNewStringLength(const char* string, size_t& Length);
 	/**returns the decoded length of the built-in token
 		 if dest is not NULL it also returns the decoded value */
 	int BuiltinToken(const char* Token, char* dest);
 	int ClassStrRef(int slot) const;
 	int RaceStrRef(int slot) const;
-	int GenderStrRef(int slot, int malestrref, int femalestrref);
+	int GenderStrRef(int slot, int malestrref, int femalestrref) const;
 	char *Gabber() const;
 	char *CharName(int slot) const;
 };

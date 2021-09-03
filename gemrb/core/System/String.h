@@ -20,8 +20,9 @@
 #define STRING_H
 
 #include "exports.h"
-#include "ie_types.h"
 
+#include <algorithm>
+#include <cstdarg>
 #include <cstring>
 #include <cwctype>
 #include <string>
@@ -39,9 +40,9 @@ extern GEM_EXPORT unsigned char pl_uppercase[256];
 extern GEM_EXPORT unsigned char pl_lowercase[256];
 
 #ifdef HAS_WSTRING
-typedef std::wstring String;
+using String = std::wstring;
 #else
-typedef std::basic_string<wchar_t> String;
+using String = std::basic_string<wchar_t>;
 #endif
 
 // String creators
@@ -105,5 +106,137 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
 #ifndef WIN32
 GEM_EXPORT char* strlwr(char* string);
 #endif
+
+constexpr int NoTransform(int c) { return c; }
+
+template <typename STR_T, int(*TRANS)(int) = NoTransform>
+struct CstrHash
+{
+	size_t operator() (const STR_T &str) const {
+		size_t nHash = 0;
+		for (const auto& c : str) {
+			if (c == '\0')
+				break;
+			nHash = (nHash << 5) ^ TRANS(c);
+		}
+		return nHash;
+	}
+};
+
+template <typename STR_T>
+using CstrHashCI = CstrHash<STR_T, tolower>;
+
+template<size_t LEN, int(*CMP)(const char*, const char*, size_t) = strncmp>
+class FixedSizeString {
+	char str[LEN + 1] {'\0'};
+	
+public:
+	FixedSizeString() noexcept = default;
+	FixedSizeString(std::nullptr_t) noexcept = delete;
+	FixedSizeString& operator=(std::nullptr_t) noexcept = delete;
+	
+	FixedSizeString(const char* cstr) noexcept {
+		operator=(cstr);
+	}
+	
+	FixedSizeString& operator=(const char* c) noexcept {
+		if (c) {
+			strncpy(str, c, sizeof(str) - 1);
+		} else {
+			std::fill(begin(), end(), '\0');
+		}
+		return *this;
+	}
+	
+	FixedSizeString(const FixedSizeString&) noexcept = default;
+	FixedSizeString& operator=(const FixedSizeString&) noexcept = default;
+	
+	template<typename T>
+	typename std::enable_if<std::is_integral<T>::value, char>::type
+	operator[](T i) const noexcept {
+		return str[i];
+	}
+	
+	template<typename T>
+	typename std::enable_if<std::is_integral<T>::value, char&>::type
+	operator[](T i) noexcept {
+		return str[i];
+	}
+	
+	bool operator==(const char* cstr) const noexcept {
+		return CMP(str, cstr, LEN) == 0;
+	}
+	
+	bool operator==(const FixedSizeString& other) const noexcept {
+		return CMP(str, other.str, LEN) == 0;
+	}
+	
+	bool operator!=(const char* cstr) const noexcept {
+		return CMP(str, cstr, LEN) != 0;
+	}
+	
+	bool operator!=(const FixedSizeString& other) const noexcept {
+		return CMP(str, other.str, LEN) != 0;
+	}
+	
+	bool operator<(const char* cstr) const noexcept {
+		return CMP(str, cstr, LEN) < 0;
+	}
+	
+	bool operator<(const FixedSizeString& other) const noexcept {
+		return CMP(str, other.str, LEN) < 0;
+	}
+	
+	bool StartsWith(const char* cstr, size_t len) const noexcept {
+		return CMP(str, cstr, len) == 0;
+	}
+	
+	uint8_t CStrLen() const noexcept {
+		return strnlen(str, sizeof(str));
+	}
+	
+	void Reset() noexcept {
+		std::fill(begin(), end(), '\0');
+	}
+	
+	void SNPrintF(const char* format, ...) noexcept {
+		va_list args;
+		va_start(args, format);
+		vsnprintf(str, sizeof(str), format, args);
+		va_end(args);
+	}
+	
+	const char* CString() const noexcept {
+		return str;
+	}
+	
+	bool IsEmpty() const noexcept {
+		return str[0] == '\0';
+	}
+	
+	operator const char*() const noexcept {
+		return str;
+	}
+	
+	explicit operator bool() const noexcept {
+		return str[0] != '\0';
+	}
+	
+	const char* begin() const noexcept {
+		return str;
+	}
+	
+	const char* end() const noexcept {
+		return &str[LEN + 1];
+	}
+	
+	char* begin() noexcept {
+		return str;
+	}
+	
+	char* end() noexcept {
+		return &str[LEN + 1];
+	}
+};
 
 #endif

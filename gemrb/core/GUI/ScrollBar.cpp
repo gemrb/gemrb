@@ -26,8 +26,6 @@
 #include "GUI/TextArea.h"
 #include "GUI/Window.h"
 
-#include <cmath>
-
 namespace GemRB {
 
 ScrollBar::ScrollBar(const Region& frame, const Holder<Sprite2D> images[IMAGE_COUNT])
@@ -71,7 +69,7 @@ int ScrollBar::GetFrameHeight(int frame) const
 void ScrollBar::ScrollDelta(const Point& delta)
 {
 	Point p = Point(-delta.x, -delta.y);
-	short xy = *((State&SLIDER_HORIZONTAL) ? &p.x : &p.y);
+	int xy = *((State&SLIDER_HORIZONTAL) ? &p.x : &p.y);
 	if (xy == 0) return;
 
 	if (p.y > 0) {
@@ -79,7 +77,6 @@ void ScrollBar::ScrollDelta(const Point& delta)
 		p.y += GetFrameHeight(IMAGE_SLIDER);
 	}
 	ScrollTo(p + AxisPosFromValue());
-	return;
 }
 
 // FIXME: horizontal broken
@@ -89,7 +86,7 @@ void ScrollBar::ScrollTo(const Point& p)
 	double percent = Clamp<double>(p.y, 0, pxRange) / pxRange;
 	const ValueRange& range = GetValueRange();
 
-	ieDword newPos = round(double((percent * (range.second - range.first)) + range.first));
+	value_t newPos = round(double((percent * (range.second - range.first)) + range.first));
 	SetValue(newPos);
 }
 
@@ -99,7 +96,7 @@ Point ScrollBar::AxisPosFromValue() const
 	if (range.second <= range.first) return Point();
 	
 	Point p;
-	short xy = round((SliderPxRange() / double(range.second - range.first)) * GetValue());
+	int xy = round((SliderPxRange() / double(range.second - range.first)) * GetValue());
 	if (State&SLIDER_HORIZONTAL) {
 		p.x = xy;
 	} else {
@@ -109,16 +106,16 @@ Point ScrollBar::AxisPosFromValue() const
 }
 
 /** Refreshes the ScrollBar according to a guiscript variable */
-void ScrollBar::UpdateState(unsigned int Sum)
+void ScrollBar::UpdateState(value_t val)
 {
-	SetValue( Sum );
+	SetValue(val);
 }
 
 void ScrollBar::ScrollBySteps(int steps)
 {
 	int val = GetValue() + (steps * StepIncrement);
 	const ValueRange& range = GetValueRange();
-	ieDword clamped = Clamp<int>(val, range.first, range.second);
+	value_t clamped = Clamp<int>(val, range.first, range.second);
 	SetValue(clamped);
 }
 
@@ -138,7 +135,7 @@ bool ScrollBar::IsOpaque() const
 }
 
 /** Draws the ScrollBar control */
-void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
+void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 {
 	Video *video=core->GetVideoDriver();
 	int upMy = GetFrameHeight(IMAGE_UP_UNPRESSED);
@@ -147,9 +144,9 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
-		video->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.Origin());
+		video->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.origin);
 	} else {
-		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.Origin());
+		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.origin);
 	}
 	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED);
 	int stepy = GetFrameHeight(IMAGE_TROUGH);
@@ -161,17 +158,17 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 			Region rgn( drawFrame.x, drawFrame.y + upMy, drawFrame.w, domy - upMy);
 			for (int dy = drawFrame.y + upMy; dy < maxy; dy += stepy) {
 				//TROUGH surely exists if it has a nonzero height
-				Point p = Frames[IMAGE_TROUGH]->Frame.Origin();
+				Point p = Frames[IMAGE_TROUGH]->Frame.origin;
 				p.x += ((frame.w - Frames[IMAGE_TROUGH]->Frame.w - 1) / 2) + drawFrame.x;
 				p.y += dy;
 				video->BlitSprite(Frames[IMAGE_TROUGH], p, &rgn);
 			}
 		}
 		// draw the slider
-		short slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
+		int slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
 		// FIXME: doesnt respect SLIDER_HORIZONTAL
 		int sly = AxisPosFromValue().y;
-		Point p = drawFrame.Origin() + Frames[IMAGE_SLIDER]->Frame.Origin();
+		Point p = drawFrame.origin + Frames[IMAGE_SLIDER]->Frame.origin;
 		p.x += slx;
 		p.y += upMy + sly;
 		video->BlitSprite(Frames[IMAGE_SLIDER], p);

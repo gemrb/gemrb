@@ -40,7 +40,7 @@ Label::Label(const Region& frame, Font* font, const String& string)
 }
 
 /** Draws the Control on the Output Display */
-void Label::DrawSelf(Region rgn, const Region& /*clip*/)
+void Label::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	if (font && Text.length()) {
 		if (flags & UseColor) {
@@ -49,14 +49,6 @@ void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 			font->Print(rgn, Text, Alignment);
 		}
 	}
-
-	if (AnimPicture) {
-		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
-		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
-		Region r(rgn.x + xOffs, rgn.y + yOffs, AnimPicture->Frame.w, AnimPicture->Frame.h);
-		core->GetVideoDriver()->BlitSprite(AnimPicture, r.Origin(), &r );
-	}
-
 }
 /** This function sets the actual Label Text */
 void Label::SetText(const String& string)
@@ -85,10 +77,8 @@ void Label::SetAlignment(unsigned char Alignment)
 		Alignment |= IE_FONT_NO_CALC;
 	}
 	this->Alignment = Alignment;
-	if (Alignment == IE_FONT_ALIGN_CENTER) {
-		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
-			StringToLower(Text);
-		}
+	if (Alignment == IE_FONT_ALIGN_CENTER && core->HasFeature(GF_LOWER_LABEL_TEXT)) {
+		StringToLower(Text);
 	}
 	MarkDirty();
 }

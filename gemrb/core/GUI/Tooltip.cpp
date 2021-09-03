@@ -21,10 +21,12 @@
 
 #include "Interface.h"
 
+#include <utility>
+
 namespace GemRB {
 
 TooltipBackground::TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> left, Holder<Sprite2D> right)
-: background(bg), leftbg(left), rightbg(right)
+: background(std::move(bg)), leftbg(std::move(left)), rightbg(std::move(right))
 {
 	assert(background);
 	assert((leftbg && rightbg) || (!leftbg && !rightbg));
@@ -78,7 +80,7 @@ void TooltipBackground::Draw(Region rgn) const
 	rgn.w += margin * 2;
 	rgn.x -= margin;
 
-	Point dp = rgn.Origin();
+	Point dp = rgn.origin;
 	dp.x += (rgn.w / 2);
 	dp.x -= (animationPos / 2); // start @ left curl pos
 
@@ -123,7 +125,7 @@ void Tooltip::SetText(const String& t)
 
 	Font::StringSizeMetrics metrics = {Size(), 0, 0, true};
 	// NOTE: arbitrary fallback size which doesn't come into play with original data
-	metrics.size = (background) ? background->MaxTextSize() : Size(128,128);
+	metrics.size = background ? background->MaxTextSize() : Size(128, 128);
 	textSize = font->StringSize( text, &metrics );
 
 	if (background)

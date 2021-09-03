@@ -31,13 +31,6 @@
 #include <cstdio>
 #include <vector>
 
-// absent from msvc6
-#ifdef _MSC_VER
-#ifndef __FUNCTION__
-#define __FUNCTION__ "no message"
-#endif
-#endif
-
 namespace GemRB {
 
 class Action;
@@ -130,7 +123,13 @@ class StringBuffer;
 #define SC_AURA_CHECK   32
 #define SC_NOINTERRUPT  64
 
-#define ACF_REALLOW_SCRIPTS 1
+#define ACF_OVERRIDE 1 // was this action invoked via ActionOverride?
+#define ACF_REALLOW_SCRIPTS 0x1000 // gemrb internal
+#define ACF_FOLLOW_DONE 0x10000000 // Bubb: written during CGameSprite::Follow(), I believe it means the MoveToPoint() ended with ACTION_DONE
+// NOTE: if it ever becomes useful, this is where it came into play
+// CGameSprite::Follow() is used in the Follow action, as well as when Leader() is used in
+// combination with FollowObjectFormation(), Formation(), MoveToObject(), and MoveToPoint().
+// Leader() is also used internally when processing the "Follow the Leader" group formation.
 
 //trigger flags stored in triggers in .bcs files
 #define TF_NEGATE  1   //negate trigger result
@@ -140,28 +139,20 @@ class StringBuffer;
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING		5
 
-typedef std::vector<ieDword> SrcVector;
+using SrcVector = std::vector<ieDword>;
 
 struct targettype {
 	Scriptable *actor; //hmm, could be door
 	unsigned int distance;
 };
 
-typedef std::list<targettype> targetlist;
+using targetlist = std::list<targettype>;
 
 class GEM_EXPORT Targets {
-public:
-	Targets()
-	{
-	}
-
-	~Targets()
-	{
-		Clear();
-	}
-private:
 	targetlist objects;
 public:
+	Targets() = default;
+	
 	int Count() const;
 	void dump() const;
 	targettype *RemoveTargetAt(targetlist::iterator &m);
@@ -182,7 +173,7 @@ protected:
 	{
 		canary = (unsigned long) 0xdeadbeef;
 	}
-	~Canary() // protected destructor
+	virtual ~Canary() // protected destructor
 	{
 		AssertCanary("Destroying Canary");
 		canary = 0xdddddddd;
@@ -201,19 +192,14 @@ protected:
 
 class GEM_EXPORT Object : protected Canary {
 public:
-	Object()
-	{
-		memset( objectName, 0, 65 );
-		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
-		memset( objectFilters, 0, MAX_NESTING * sizeof( int ) );
-	}
-public:
-	int objectFields[MAX_OBJECT_FIELDS];
-	int objectFilters[MAX_NESTING];
+	int objectFields[MAX_OBJECT_FIELDS]{};
+	int objectFilters[MAX_NESTING]{};
 	Region objectRect{};
-	char objectName[65];
+	char objectName[65]{};
 
 public:
+	Object() = default;
+
 	void dump() const;
 	void dump(StringBuffer&) const;
 	void Release()
@@ -223,38 +209,27 @@ public:
 	bool isNull() const;
 };
 
-class GEM_EXPORT Trigger : protected Canary {
+class GEM_EXPORT Trigger final : protected Canary {
 public:
-	Trigger()
-	{
-		triggerID = 0;
-		flags = 0;
-		objectParameter = NULL;
-		memset(string0Parameter, 0, 65);
-		memset(string1Parameter, 0, 65);
-		int0Parameter = 0;
-		int1Parameter = 0;
-		int2Parameter = 0;
-		pointParameter.null();
-	}
-	~Trigger()
+	Trigger() = default;
+	~Trigger() final
 	{
 		if (objectParameter) {
 			objectParameter->Release();
-			objectParameter = NULL;
+			objectParameter = nullptr;
 		}
 	}
 	int Evaluate(Scriptable *Sender) const;
 
-	unsigned short triggerID;
-	int int0Parameter;
-	int flags;
-	int int1Parameter;
-	int int2Parameter;
+	unsigned short triggerID = 0;
+	int int0Parameter = 0;
+	int flags = 0;
+	int int1Parameter = 0;
+	int int2Parameter = 0;
 	Point pointParameter;
-	char string0Parameter[65];
-	char string1Parameter[65];
-	Object* objectParameter;
+	char string0Parameter[65]{};
+	char string1Parameter[65]{};
+	Object* objectParameter = nullptr;
 
 	void dump() const;
 	void dump(StringBuffer&) const;
@@ -265,14 +240,14 @@ public:
 	}
 };
 
-class GEM_EXPORT Condition : protected Canary {
+class GEM_EXPORT Condition final : protected Canary {
 public:
-	~Condition()
+	~Condition() final
 	{
-		for (size_t c = 0; c < triggers.size(); ++c) {
-			if (triggers[c]) {
-				triggers[c]->Release();
-				triggers[c] = NULL;
+		for (auto& trigger : triggers) {
+			if (trigger) {
+				trigger->Release();
+				trigger = nullptr;
 			}
 		}
 	}
@@ -285,51 +260,40 @@ public:
 	std::vector<Trigger*> triggers;
 };
 
-class GEM_EXPORT Action : protected Canary {
+class GEM_EXPORT Action final : protected Canary {
 public:
-	Action(bool autoFree)
+	explicit Action(bool autoFree)
 	{
-		actionID = 0;
-		objects[0] = NULL;
-		objects[1] = NULL;
-		objects[2] = NULL;
-		memset(string0Parameter, 0, 65);
-		memset(string1Parameter, 0, 65);
-		int0Parameter = 0;
-		pointParameter.null();
-		int1Parameter = 0;
-		int2Parameter = 0;
 		//changed now
 		if (autoFree) {
 			RefCount = 0; //refcount will be increased by each AddAction
 		} else {
-			RefCount = 1; //one reference hold by the script
+			RefCount = 1; //one reference held by the script
 		}
-		flags = 0;
 	}
-	~Action()
+	~Action() final
 	{
-		for (int c = 0; c < 3; c++) {
-			if (objects[c]) {
-				objects[c]->Release();
-				objects[c] = NULL;
+		for (auto& object : objects) {
+			if (object) {
+				object->Release();
+				object = nullptr;
 			}
 		}
 	}
 
-	unsigned short actionID;
-	Object* objects[3];
-	int int0Parameter;
+	unsigned short actionID = 0;
+	Object* objects[3]{};
+	int int0Parameter = 0;
 	Point pointParameter;
-	int int1Parameter;
-	int int2Parameter;
-	char string0Parameter[65];
-	char string1Parameter[65];
-	unsigned short flags;
+	int int1Parameter = 0;
+	int int2Parameter = 0;
+	char string0Parameter[65]{};
+	char string1Parameter[65]{};
+	uint32_t flags = 0;
 private:
-	int RefCount;
+	int RefCount = 0;
 public:
-	int GetRef() {
+	int GetRef() const {
 		return RefCount;
 	}
 
@@ -338,7 +302,7 @@ public:
 
 	void Release()
 	{
-		AssertCanary(__FUNCTION__);
+		AssertCanary(__func__);
 		if (!RefCount) {
 			error("GameScript", "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__);
@@ -350,7 +314,7 @@ public:
 	}
 	void IncRef()
 	{
-		AssertCanary(__FUNCTION__);
+		AssertCanary(__func__);
 		RefCount++;
 		if (RefCount >= 65536) {
 			error("GameScript", "Refcount increased to: %d in action %d\n", RefCount,
@@ -359,21 +323,18 @@ public:
 	}
 };
 
-class GEM_EXPORT Response : protected Canary {
+class GEM_EXPORT Response final : protected Canary {
 public:
-	Response()
+	Response() = default;
+	~Response() final
 	{
-		weight = 0;
-	}
-	~Response()
-	{
-		for (size_t c = 0; c < actions.size(); c++) {
-			if (actions[c]) {
-				if (actions[c]->GetRef()>2) {
-					print("Residue action %d with refcount %d", actions[c]->actionID, actions[c]->GetRef());
+		for (auto& action : actions) {
+			if (action) {
+				if (action->GetRef() > 2) {
+					print("Residue action %d with refcount %d", action->actionID, action->GetRef());
 				}
-				actions[c]->Release();
-				actions[c] = NULL;
+				action->Release();
+				action = nullptr;
 			}
 		}
 	}
@@ -383,17 +344,17 @@ public:
 	}
 	int Execute(Scriptable* Sender);
 
-	unsigned char weight;
+	unsigned char weight = 0;
 	std::vector<Action*> actions;
 };
 
-class GEM_EXPORT ResponseSet : protected Canary {
+class GEM_EXPORT ResponseSet final : protected Canary {
 public:
-	~ResponseSet()
+	~ResponseSet() final
 	{
-		for (size_t b = 0; b < responses.size(); b++) {
-			responses[b]->Release();
-			responses[b] = NULL;
+		for (auto& response : responses) {
+			response->Release();
+			response = nullptr;
 		}
 	}
 	void Release()
@@ -405,22 +366,18 @@ public:
 	std::vector<Response*> responses;
 };
 
-class GEM_EXPORT ResponseBlock : protected Canary {
+class GEM_EXPORT ResponseBlock final : protected Canary {
 public:
-	ResponseBlock()
-	{
-		condition = NULL;
-		responseSet = NULL;
-	}
-	~ResponseBlock()
+	ResponseBlock() = default;
+	~ResponseBlock() final
 	{
 		if (condition) {
 			condition->Release();
-			condition = NULL;
+			condition = nullptr;
 		}
 		if (responseSet) {
 			responseSet->Release();
-			responseSet = NULL;
+			responseSet = nullptr;
 		}
 	}
 	void Release()
@@ -428,18 +385,18 @@ public:
 		delete this;
 	}
 
-	Condition* condition;
-	ResponseSet* responseSet;
+	Condition* condition = nullptr;
+	ResponseSet* responseSet = nullptr;
 };
 
-class GEM_EXPORT Script : protected Canary {
+class GEM_EXPORT Script final : protected Canary {
 public:
-	~Script()
+	~Script() final
 	{
-		for (unsigned int i = 0; i < responseBlocks.size(); i++) {
-			if (responseBlocks[i]) {
-				responseBlocks[i]->Release();
-				responseBlocks[i] = NULL;
+		for (auto& responseBlock : responseBlocks) {
+			if (responseBlock) {
+				responseBlock->Release();
+				responseBlock = nullptr;
 			}
 		}
 	}
@@ -452,10 +409,10 @@ public:
 	}
 };
 
-typedef int (* TriggerFunction)(Scriptable *, const Trigger *);
-typedef void (* ActionFunction)(Scriptable*, Action*);
-typedef Targets *(* ObjectFunction)(const Scriptable *, Targets*, int ga_flags);
-typedef int (* IDSFunction)(const Actor *, int parameter);
+using TriggerFunction = int (*)(Scriptable*, const Trigger*);
+using ActionFunction = void (*)(Scriptable*, Action*);
+using ObjectFunction = Targets* (*)(const Scriptable*, Targets*, int ga_flags);
+using IDSFunction = int (*)(const Actor*, int parameter);
 
 #define TF_NONE		0
 #define TF_CONDITION    1 //this isn't a trigger, just a condition (0x4000)
@@ -515,6 +472,7 @@ struct TriggerLink {
 #define AF_DLG_INSTANT  4096 //instant dialog actions
 #define AF_SCR_INSTANT  8192 //instant script actions
 #define AF_INSTANT      (AF_DLG_INSTANT|AF_SCR_INSTANT) //only iwd2 treats them separately; 12288
+#define AF_IWD2_OVERRIDE 16384 // marking actions that require special attention when clearing during ActionOverride
 
 struct ActionLink {
 	const char* Name;
@@ -542,14 +500,14 @@ extern int RandomNumValue;
 
 class GEM_EXPORT GameScript {
 public:
-	GameScript(const ieResRef ResRef, Scriptable* Myself,
+	GameScript(const ResRef& ResRef, Scriptable* Myself,
 		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
 
 	bool dead = false;      // Script replaced itself with another and should be deleted when done running
 	bool running = false;   // Script is currently running so defer any deletion to caller
 
-	const char *GetName() const { return Name; }
+	ResRef GetName() const { return Name; }
 	static void ExecuteString(Scriptable* Sender, const char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
@@ -557,7 +515,7 @@ public:
 	bool Update(bool *continuing = NULL, bool *done = NULL);
 	void EvaluateAllBlocks();
 private: //Internal Functions
-	Script* CacheScript(ieResRef ResRef, bool AIScript);
+	Script* CacheScript(const ResRef& ResRef, bool AIScript);
 	ResponseBlock* ReadResponseBlock(DataStream* stream);
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
@@ -566,9 +524,9 @@ private: //Internal Functions
 
 	// Internal variables
 	Scriptable* const MySelf;
-	ieResRef Name;
+	ResRef Name;
 	Script* script;
-	unsigned int lastAction;
+	size_t lastAction = -1;
 	int scriptlevel;
 public: //Script Functions
 	static int ID_Alignment(const Actor *actor, int parameter);

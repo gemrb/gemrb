@@ -21,7 +21,7 @@
 #include "TileMap.h"
 
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
@@ -29,14 +29,8 @@
 
 namespace GemRB {
 
-TileMap::TileMap(void)
-{
-}
-
 TileMap::~TileMap(void)
 {
-	ClearOverlays();
-
 	for (const InfoPoint *infoPoint : infoPoints) {
 		delete infoPoint;
 	}
@@ -49,12 +43,6 @@ TileMap::~TileMap(void)
 //this needs in case of a tileset switch (for extended night)
 void TileMap::ClearOverlays()
 {
-	for (const TileOverlay *overlay : overlays) {
-		delete overlay;
-	}
-	for (const TileOverlay *rain : rain_overlays) {
-		delete rain;
-	}
 	overlays.clear();
 	rain_overlays.clear();
 }
@@ -66,7 +54,7 @@ TileObject* TileMap::AddTile(const char *ID, const char* Name, unsigned int Flag
 	TileObject* tile = new TileObject();
 	tile->Flags=Flags;
 	strnspccpy(tile->Name, Name, 32);
-	strnlwrcpy(tile->Tileset, ID, 8);
+	tile->Tileset = ID;
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );
 	tiles.push_back(tile);
@@ -83,12 +71,12 @@ TileObject* TileMap::GetTile(unsigned int idx)
 
 //doors
 Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
-	int ClosedIndex, unsigned short* indices, int count, DoorTrigger&& dt)
+	int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt)
 {
 	Door* door = new Door(overlays[0], std::move(dt));
 	door->Flags = Flags;
 	door->closedIndex = ClosedIndex;
-	door->SetTiles( indices, count );
+	door->SetTiles(std::move(indices));
 	door->SetName( ID );
 	door->SetScriptName( Name );
 	doors.push_back( door );
@@ -156,30 +144,22 @@ void TileMap::AutoLockDoors() const
 }
 
 //overlays, allow pushing of NULL
-void TileMap::AddOverlay(TileOverlay* overlay)
+void TileMap::AddOverlay(TileOverlayPtr overlay)
 {
 	if (overlay) {
-		if (overlay->w > XCellCount) {
-			XCellCount = overlay->w;
-		}
-		if (overlay->h > YCellCount) {
-			YCellCount = overlay->h;
-		}
+		XCellCount = std::max(XCellCount, overlay->size.w);
+		YCellCount = std::max(YCellCount, overlay->size.h);
 	}
-	overlays.push_back( overlay );
+	overlays.push_back(std::move(overlay));
 }
 
-void TileMap::AddRainOverlay(TileOverlay* overlay)
+void TileMap::AddRainOverlay(TileOverlayPtr overlay)
 {
 	if (overlay) {
-		if (overlay->w > XCellCount) {
-			XCellCount = overlay->w;
-		}
-		if (overlay->h > YCellCount) {
-			YCellCount = overlay->h;
-		}
+		XCellCount = std::max(XCellCount, overlay->size.w);
+		YCellCount = std::max(YCellCount, overlay->size.h);
 	}
-	rain_overlays.push_back( overlay );
+	rain_overlays.push_back(std::move(overlay));
 }
 
 void TileMap::DrawOverlays(const Region& viewport, bool rain, BlitFlags flags)
@@ -217,21 +197,21 @@ Container* TileMap::GetContainer(const char* Name) const
 Container* TileMap::GetContainer(const Point &position, int type) const
 {
 	for (Container *container : containers) {
-		if (type != -1 && type != container->Type) {
+		if (type != -1 && type != container->containerType) {
 			continue;
 		}
 
 		if (!container->BBox.PointInside(position)) continue;
 
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (container->Type == IE_CONTAINER_PILE) {
+		if (container->containerType == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
 			//if we looked only for piles, then we still return them
 			if ((type == -1) && !container->inventory.GetSlotCount()) {
 				continue;
 			}
 			return container;
-		} else if (container->outline->PointIn(position)) {
+		} else if (container->outline && container->outline->PointIn(position)) {
 			return container;
 		}
 	}
@@ -241,7 +221,7 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 Container* TileMap::GetContainerByPosition(const Point &position, int type) const
 {
 	for (Container *container : containers) {
-		if (type != -1 && type != container->Type) {
+		if (type != -1 && type != container->containerType) {
 			continue;
 		}
 
@@ -250,7 +230,7 @@ Container* TileMap::GetContainerByPosition(const Point &position, int type) cons
 		}
 
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (container->Type == IE_CONTAINER_PILE) {
+		if (container->containerType == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
 			//if we looked only for piles, then we still return them
 			if ((type == -1) && !container->inventory.GetSlotCount()) {
@@ -265,7 +245,7 @@ Container* TileMap::GetContainerByPosition(const Point &position, int type) cons
 
 int TileMap::CleanupContainer(Container *container)
 {
-	if (container->Type!=IE_CONTAINER_PILE)
+	if (container->containerType != IE_CONTAINER_PILE)
 		return 0;
 	if (container->inventory.GetSlotCount())
 		return 0;
@@ -283,7 +263,7 @@ int TileMap::CleanupContainer(Container *container)
 }
 
 //infopoints
-InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline)
+InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline)
 {
 	InfoPoint* ip = new InfoPoint();
 	ip->SetScriptName( Name );
@@ -313,7 +293,7 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, std::sha
 }
 
 //if detectable is set, then only detectable infopoints will be returned
-InfoPoint* TileMap::GetInfoPoint(const Point &p, bool detectable) const
+InfoPoint* TileMap::GetInfoPoint(const Point &p, bool skipSilent) const
 {
 	for (InfoPoint *infoPoint : infoPoints) {
 		//these flags disable any kind of user interaction
@@ -321,14 +301,17 @@ InfoPoint* TileMap::GetInfoPoint(const Point &p, bool detectable) const
 		if (infoPoint->Flags & (INFO_DOOR | TRAP_DEACTIVATED))
 			continue;
 
-		if (detectable) {
-			if (infoPoint->Type == ST_PROXIMITY && !infoPoint->VisibleTrap(0)) {
+		if (infoPoint->Type == ST_PROXIMITY && !infoPoint->VisibleTrap(0)) {
+			continue;
+		}
+
+		// skip portals without PORTAL_CURSOR set
+		if (infoPoint->IsPortal() && !(infoPoint->Trapped & PORTAL_CURSOR)) {
 				continue;
-			}
-			// skip portals without PORTAL_CURSOR set
-			if (infoPoint->IsPortal() && !(infoPoint->Trapped & PORTAL_CURSOR)) {
-					continue;
-			}
+		}
+
+		if (skipSilent && infoPoint->Flags & TRAP_SILENT) {
+			continue;
 		}
 
 		if (!(infoPoint->GetInternalFlag() & IF_ACTIVE))
@@ -355,7 +338,7 @@ InfoPoint* TileMap::GetInfoPoint(const char* Name) const
 	return NULL;
 }
 
-InfoPoint* TileMap::GetInfoPoint(unsigned int idx) const
+InfoPoint* TileMap::GetInfoPoint(size_t idx) const
 {
 	if (idx >= infoPoints.size()) {
 		return NULL;
@@ -368,7 +351,7 @@ InfoPoint* TileMap::GetTravelTo(const char* Destination) const
 	for (InfoPoint *infoPoint : infoPoints) {
 		if (infoPoint->Type != ST_TRAVEL) continue;
 
-		if (strnicmp(infoPoint->Destination, Destination, 8) == 0) {
+		if (infoPoint->Destination == Destination) {
 			return infoPoint;
 		}
 	}
@@ -395,7 +378,7 @@ InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 	return best;
 }
 
-Size TileMap::GetMapSize()
+Size TileMap::GetMapSize() const
 {
 	return Size((XCellCount*64), (YCellCount*64));
 }

@@ -37,7 +37,6 @@ namespace GemRB {
 
 class GAMImporter : public SaveGameMgr {
 private:
-	DataStream* str;
 	int version;
 	unsigned int PCSize;
 	ieDword PCOffset, PCCount;
@@ -51,33 +50,34 @@ private:
 	ieDword PPLocOffset, PPLocCount;
 public:
 	GAMImporter(void);
-	~GAMImporter(void) override;
-	bool Open(DataStream* stream) override;
+
 	Game* LoadGame(Game *newGame, int ver_override = 0) override;
 
-	int GetStoredFileSize(Game *game) override;
+	int GetStoredFileSize(const Game *game) override;
 	/* stores a gane in the savegame folder */
-	int PutGame(DataStream *stream, Game *game) override;
+	int PutGame(DataStream *stream, Game *game) const override;
 private:
-	Actor* GetActor(Holder<ActorMgr> aM, bool is_in_party );
+	bool Import(DataStream* stream) override;
+
+	Actor* GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_party);
 	void GetPCStats(PCStatsStruct* ps, bool extended);
 	GAMJournalEntry* GetJournalEntry();
 
-	int PutHeader(DataStream *stream, Game *game);
-	int PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version);
-	int PutPCs(DataStream *stream, const Game *game);
-	int PutNPCs(DataStream *stream, const Game *game);
-	int PutJournals(DataStream *stream, const Game *game);
-	int PutVariables( DataStream *stream, const Game *game);
-	int PutKillVars(DataStream *stream, const Game *game);
-	void GetMazeHeader(void *memory);
-	void GetMazeEntry(void *memory);
-	void PutMazeHeader(DataStream *stream, void *memory);
-	void PutMazeEntry(DataStream *stream, void *memory);
-	int PutMaze(DataStream *stream, const Game *game);
-	int PutFamiliars(DataStream *stream, Game *game);
-	int PutSavedLocations(DataStream *stream, Game *game);
-	int PutPlaneLocations(DataStream *stream, Game *game);
+	int PutHeader(DataStream *stream, const Game *game) const;
+	int PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version) const;
+	int PutPCs(DataStream *stream, const Game *game) const;
+	int PutNPCs(DataStream *stream, const Game *game) const;
+	int PutJournals(DataStream *stream, const Game *game) const;
+	int PutVariables( DataStream *stream, const Game *game) const;
+	int PutKillVars(DataStream *stream, const Game *game) const;
+	void GetMazeHeader(void *memory) const;
+	void GetMazeEntry(void *memory) const;
+	void PutMazeHeader(DataStream *stream, void *memory) const;
+	void PutMazeEntry(DataStream *stream, void *memory) const;
+	int PutMaze(DataStream *stream, const Game *game) const;
+	int PutFamiliars(DataStream *stream, const Game *game) const;
+	int PutSavedLocations(DataStream *stream, Game *game) const;
+	int PutPlaneLocations(DataStream *stream, Game *game) const;
 };
 
 #endif

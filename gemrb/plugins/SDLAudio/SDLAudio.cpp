@@ -28,31 +28,28 @@
 
 #include <SDL.h>
 #include <SDL_mixer.h>
-#include <cmath>
 
 using namespace GemRB;
 
-static void SetChannelPosition(int listenerXPos, int listenerYPos, int XPos, int YPos, int channel)
+static void SetChannelPosition(const Point &listenerPos, const Point &p, int channel)
 {
-	int x = listenerXPos - XPos;
-	int y = listenerYPos - YPos;
-	int16_t angle = atan2(y, x) * 180 / M_PI - 90;
+	int16_t angle = AngleFromPoints(listenerPos, p) * 180 / M_PI - 90;
 	if (angle < 0) {
 		angle += 360;
 	}
-	uint8_t distance = std::min(static_cast<int32_t>(sqrt(x * x + y * y) / AUDIO_DISTANCE_ROLLOFF_MOD), 255);
+	
+	constexpr float AUDIO_DISTANCE_ROLLOFF_MOD (1.3 * 1.3); // squared to save a sqrt
+	uint8_t distance = std::min<uint8_t>((SquaredDistance(listenerPos, p) / AUDIO_DISTANCE_ROLLOFF_MOD), 255u);
 	Mix_SetPosition(channel, angle, distance);
 }
 
-void SDLAudioSoundHandle::SetPos(int XPos, int YPos)
+void SDLAudioSoundHandle::SetPos(const Point& p)
 {
 	if (sndRelative)
 		return;
 
-	int listenerXPos = 0;
-	int listenerYPos = 0;
-	core->GetAudioDrv()->GetListenerPos(listenerXPos, listenerYPos);
-	SetChannelPosition(listenerXPos, listenerYPos, XPos, YPos, chunkChannel);
+	Point pos = core->GetAudioDrv()->GetListenerPos();
+	SetChannelPosition(pos, p, chunkChannel);
 }
 
 bool SDLAudioSoundHandle::Playing()
@@ -225,7 +222,7 @@ void SDLAudio::clearBufferCache()
 	}
 }
 
-Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
+Mix_Chunk* SDLAudio::loadSound(const char *ResRef, tick_t &time_length)
 {
 	Mix_Chunk *chunk = nullptr;
 	CacheEntry *e;
@@ -290,10 +287,9 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 }
 
 Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
-	int XPos, int YPos, unsigned int flags, unsigned int *length)
+	const Point& p, unsigned int flags, tick_t *length)
 {
 	Mix_Chunk *chunk;
-	unsigned int time_length;
 
 	if (!ResRef) {
 		if (flags & GEM_SND_SPEECH) {
@@ -318,6 +314,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		return Holder<SoundHandle>();
 	}
 
+	tick_t time_length;
 	chunk = loadSound(ResRef, time_length);
 	if (chunk == nullptr) {
 		return Holder<SoundHandle>();
@@ -336,18 +333,19 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	}
 
 	if (!(flags & GEM_SND_RELATIVE)) {
-		SetChannelPosition(listenerPos.x, listenerPos.y, XPos, YPos, chan);
+		SetChannelPosition(listenerPos, p, chan);
 	}
 
-	return new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE);
+	// TODO: we need something like static_ptr_cast
+	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE));
 }
 
-int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)
+int SDLAudio::CreateStream(std::shared_ptr<SoundMgr> newMusic)
 {
 	std::lock_guard<std::recursive_mutex> l(MusicMutex);
 
 	print("SDLAudio setting new music");
-	MusicReader = newMusic;
+	MusicReader = std::move(newMusic);
 
 	return 0;
 }
@@ -382,16 +380,14 @@ bool SDLAudio::CanPlay()
 	return true;
 }
 
-void SDLAudio::UpdateListenerPos(int x, int y)
+void SDLAudio::UpdateListenerPos(const Point& p)
 {
-	listenerPos.x = x;
-	listenerPos.y = y;
+	listenerPos = p;
 }
 
-void SDLAudio::GetListenerPos(int& x, int& y)
+Point SDLAudio::GetListenerPos()
 {
-	x = listenerPos.x;
-	y = listenerPos.y;
+	return listenerPos;
 }
 
 void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
@@ -465,7 +461,7 @@ int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
 	return 0;
 }
 
-int SDLAudio::QueueAmbient(int, const char*)
+tick_t SDLAudio::QueueAmbient(int, const char*)
 {
 	// TODO: ambient sounds
 	return -1;

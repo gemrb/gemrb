@@ -20,6 +20,7 @@
 #ifndef RGBACOLOR_H
 #define RGBACOLOR_H
 
+#include <array>
 #include <cstdint>
 
 namespace GemRB {
@@ -55,6 +56,9 @@ struct Color {
 		return Color(px, px >> 8, px >> 16, px >> 24);
 	}
 }; // close of Color struct
+
+template<int SIZE>
+using ColorPal = std::array<Color, SIZE>;
 
 static constexpr Color ColorBlack {0x00, 0x00, 0x00, 0xff};
 static constexpr Color ColorBlue {0x00, 0x00, 0xff, 0xff};

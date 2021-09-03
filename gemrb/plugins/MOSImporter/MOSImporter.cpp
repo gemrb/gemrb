@@ -24,68 +24,55 @@
 
 #include "FileCache.h"
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
 
-static ieDword red_mask = 0x00ff0000;
-static ieDword green_mask = 0x0000ff00;
-static ieDword blue_mask = 0x000000ff;
-
 MOSImporter::MOSImporter(void)
 {
-	Width = Height = Cols = Rows = BlockSize = PalOffset = 0;
-	if (DataStream::BigEndian()) {
-		red_mask = 0x0000ff00;
-		green_mask = 0x00ff0000;
-		blue_mask = 0xff000000;
-	}
+	Cols = Rows = BlockSize = PalOffset = 0;
 }
 
-MOSImporter::~MOSImporter(void)
+bool MOSImporter::Import(DataStream* str)
 {
-}
-
-bool MOSImporter::Open(DataStream* stream)
-{
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "MOSCV1  ", 8 ) == 0) {
 		str->Seek( 4, GEM_CURRENT_POS );
-		DataStream* cached = CacheCompressedStream(stream, stream->filename);
-		delete str;
-		if (!cached)
+		str = DecompressStream(str);
+		if (!str)
 			return false;
-		str = cached;
 		str->Read( Signature, 8 );
 	}
 	if (strncmp( Signature, "MOS V1  ", 8 ) != 0) {
 		return false;
 	}
-	str->ReadWord( &Width );
-	str->ReadWord( &Height );
-	str->ReadWord( &Cols );
-	str->ReadWord( &Rows );
-	str->ReadDword( &BlockSize );
-	str->ReadDword( &PalOffset );
+	ieWord tmp;
+	str->ReadWord(tmp);
+	size.w = tmp;
+	str->ReadWord(tmp);
+	size.h = tmp;
+	str->ReadWord(Cols);
+	str->ReadWord(Rows);
+	str->ReadDword(BlockSize);
+	str->ReadDword(PalOffset);
 	return true;
 }
 
 Holder<Sprite2D> MOSImporter::GetSprite2D()
 {
 	Color Col[256];
-	unsigned char * pixels = ( unsigned char * ) malloc( Width * Height * 4 );
+	unsigned char * pixels = ( unsigned char * ) malloc(size.Area() * 4);
 	unsigned char * blockpixels = ( unsigned char * )
 		malloc( BlockSize * BlockSize );
 	ieDword blockoffset;
 	for (int y = 0; y < Rows; y++) {
 		int bh = ( y == Rows - 1 ) ?
-			( ( Height % 64 ) == 0 ? 64 : Height % 64 ) :
+			( ( size.h % 64 ) == 0 ? 64 : size.h % 64 ) :
 			64;
 		for (int x = 0; x < Cols; x++) {
 			int bw = ( x == Cols - 1 ) ?
-				( ( Width % 64 ) == 0 ? 64 : Width % 64 ) :
+				( ( size.w % 64 ) == 0 ? 64 : size.w % 64 ) :
 				64;
 			str->Seek( PalOffset + ( y * Cols * 1024 ) +
 				( x * 1024 ), GEM_STREAM_START );
@@ -93,14 +80,14 @@ Holder<Sprite2D> MOSImporter::GetSprite2D()
 			str->Seek( PalOffset + ( Rows * Cols * 1024 ) +
 				( y * Cols * 4 ) + ( x * 4 ),
 				GEM_STREAM_START );
-			str->ReadDword( &blockoffset );
+			str->ReadDword(blockoffset);
 			str->Seek( PalOffset + ( Rows * Cols * 1024 ) +
 				( Rows * Cols * 4 ) + blockoffset,
 				GEM_STREAM_START );
 			str->Read( blockpixels, bw * bh );
-			unsigned char * bp = blockpixels;
+			const unsigned char* bp = blockpixels;
 			unsigned char * startpixel = pixels +
-				( ( Width * 4 * y ) * 64 ) +
+				( ( size.w * 4 * y ) * 64 ) +
 				( 4 * x * 64 );
 			for (int h = 0; h < bh; h++) {
 				for (int w = 0; w < bw; w++) {
@@ -114,15 +101,20 @@ Holder<Sprite2D> MOSImporter::GetSprite2D()
 					startpixel++;
 					bp++;
 				}
-				startpixel = startpixel + ( Width * 4 ) - ( 4 * bw );
+				startpixel = startpixel + ( size.w * 4 ) - ( 4 * bw );
 			}
 		}
 	}
 	free( blockpixels );
-	Holder<Sprite2D> ret = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
-		red_mask, green_mask, blue_mask, 0,
-		pixels, true, green_mask );
-	return ret;
+	
+	constexpr uint32_t red_mask = 0x00ff0000;
+	constexpr uint32_t green_mask = 0x0000ff00;
+	constexpr uint32_t blue_mask = 0x000000ff;
+	PixelFormat fmt(4, red_mask, green_mask, blue_mask, 0);
+	fmt.HasColorKey = true;
+	fmt.ColorKey = green_mask;
+	
+	return core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), pixels,fmt);
 }
 
 #include "plugindef.h"

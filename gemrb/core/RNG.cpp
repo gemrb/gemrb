@@ -34,7 +34,7 @@ namespace GemRB {
  */
 RNG::RNG() {
 	time_t now = time(NULL);
-	unsigned char *ptr = (unsigned char *) &now;
+	const unsigned char *ptr = (unsigned char *) &now;
 	uint32_t seed = 0;
 
 	/* The actual value of a time_t may not be portable, so we compute a “hash” of the
@@ -44,7 +44,7 @@ RNG::RNG() {
 	 * time_t value into a compatible integer, will work.
 	 */
 	for (size_t i = 0; i < sizeof(now); ++i) {
-		seed = seed * (UCHAR_MAX + 2u) + ptr[i];
+		seed = seed * (std::numeric_limits<unsigned char>::max() + 2u) + ptr[i];
 	}
 
 	engine.seed(seed);
@@ -56,32 +56,6 @@ RNG::RNG() {
 RNG& RNG::getInstance() {
 	static thread_local RNG instance;
 	return instance;
-}
-
-/**
- * It is possible to generate random numbers from [-min, +/-max].
- * It is only necessary that the upper bound is larger or equal to the lower bound - with the exception
- * that someone wants something like rand() % -foo.
- */
-int32_t RNG::rand(int32_t min, int32_t max) {
-	int32_t signum = 1;
-	if (min == max) {
-		// For complete fairness and equal timing, this should be a roll, but let's skip it anyway
-		return max;
-	} else if (min == 0 && max < 0) {
-		// Someone wants rand() % -foo, so we compute -rand(0, +foo)
-		// This is the only time where min > max is (sort of) legal.
-		// Not handling this will cause the application to crash.
-		signum = -1;
-		max = -max;
-	} else if (min > max) {
-		// makes no sense, but also gives unexpected results
-		GemRB::error("RNG", "Invalid bounds for RNG! Got min %d, max %d\n", min, max);
-	}
-
-	std::uniform_int_distribution<int32_t> distribution(min, max);
-	int32_t randomNum = distribution(engine);
-	return signum * randomNum;
 }
 
 }

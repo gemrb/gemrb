@@ -26,23 +26,12 @@
 
 using namespace GemRB;
 
-DirectoryImporter::DirectoryImporter(void)
-{
-	description = NULL;
-}
-
-DirectoryImporter::~DirectoryImporter(void)
-{
-	free(description);
-}
-
 bool DirectoryImporter::Open(const char *dir, const char *desc)
 {
 	if (!dir_exists(dir))
 		return false;
 
-	free(description);
-	description = strdup(desc);
+	description = desc;
 	if (strlcpy(path, dir, _MAX_PATH) >= _MAX_PATH) {
 		Log(ERROR, "DirectoryImporter", "Directory with too long path: %s!", dir);
 		return false;
@@ -97,14 +86,6 @@ DataStream* DirectoryImporter::GetResource(const char* resname, const ResourceDe
 	return SearchIn( path, resname, type.GetExt() );
 }
 
-CachedDirectoryImporter::CachedDirectoryImporter()
-{
-}
-
-CachedDirectoryImporter::~CachedDirectoryImporter()
-{
-}
-
 bool CachedDirectoryImporter::Open(const char *dir, const char *desc)
 {
 	if (!DirectoryImporter::Open(dir, desc))
@@ -145,9 +126,9 @@ void CachedDirectoryImporter::Refresh()
 	} while (++it);
 }
 
-static const char *ConstructFilename(const char* resname, const char* ext)
+static std::string ConstructFilename(const char* resname, const char* ext)
 {
-	static char buf[_MAX_PATH];
+	char buf[_MAX_PATH];
 	assert(strnlen(ext, 5) < 5);
 	strnlwrcpy(buf, resname, _MAX_PATH-6, false);
 	strcat(buf, ".");
@@ -157,20 +138,20 @@ static const char *ConstructFilename(const char* resname, const char* ext)
 
 bool CachedDirectoryImporter::HasResource(const char* resname, SClass_ID type)
 {
-	const char* filename = ConstructFilename(resname, core->TypeExt(type));
-	return cache.has(filename);
+	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
+	return cache.has(filename.c_str());
 }
 
 bool CachedDirectoryImporter::HasResource(const char* resname, const ResourceDesc &type)
 {
-	const char* filename = ConstructFilename(resname, type.GetExt());
-	return cache.has(filename);
+	const std::string& filename = ConstructFilename(resname, type.GetExt());
+	return cache.has(filename.c_str());
 }
 
 DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID type)
 {
-	const char* filename = ConstructFilename(resname, core->TypeExt(type));
-	const std::string *s = cache.get(filename);
+	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
+	const std::string *s = cache.get(filename.c_str());
 	if (!s)
 		return NULL;
 	char buf[_MAX_PATH];
@@ -181,8 +162,8 @@ DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID 
 
 DataStream* CachedDirectoryImporter::GetResource(const char* resname, const ResourceDesc &type)
 {
-	const char* filename = ConstructFilename(resname, type.GetExt());
-	const std::string *s = cache.get(filename);
+	const std::string& filename = ConstructFilename(resname, type.GetExt());
+	const std::string *s = cache.get(filename.c_str());
 	if (!s)
 		return NULL;
 	char buf[_MAX_PATH];

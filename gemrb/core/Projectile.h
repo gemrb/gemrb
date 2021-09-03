@@ -37,7 +37,7 @@
 #include "Palette.h"
 #include "PathFinder.h"
 #include "Audio.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -164,12 +164,12 @@ namespace GemRB {
 #define APF_TILED 4096
 #define APF_PLAYONCE 8192
 
-struct ProjectileExtension
+struct ProjectileExtension : Held<ProjectileExtension>
 {
 	ieDword AFlags;
 	ieWord TriggerRadius;
 	ieWord ExplosionRadius;
-	ieResRef SoundRes; //used for areapro.2da explosion sound
+	ResRef SoundRes; //used for areapro.2da explosion sound
 	ieWord Delay;
 	ieWord FragAnimID;
 	ieWord FragProjIdx;
@@ -177,13 +177,13 @@ struct ProjectileExtension
 	ieByte ExplType;
 	ieWord ExplColor; // a byte in the original, followed by padding
 	ieWord ExplProjIdx;
-	ieResRef VVCRes;  //used for areapro.2da second resref (center animation)
+	ResRef VVCRes;  //used for areapro.2da second resref (center animation)
 	ieWord ConeWidth;
 	//these are GemRB specific (from areapro.2da)
 	ieDword APFlags;    //areapro.2da flags
-	ieResRef Spread;    //areapro.2da first resref
-	ieResRef Secondary; //areapro.2da third resref
-	ieResRef AreaSound; //areapro.2da second sound resource
+	ResRef Spread;    //areapro.2da first resref
+	ResRef Secondary; //areapro.2da third resref
+	ResRef AreaSound; //areapro.2da second sound resource
 	//used for target or HD counting
 	ieWord DiceCount;
 	ieWord DiceSize;
@@ -196,84 +196,83 @@ class GEM_EXPORT Projectile
 public:
 	Projectile();
 	~Projectile();
-	void InitExtension();
 
-	ieWord Speed;
-	ieDword SFlags;
-	ieResRef FiringSound;
-	ieResRef ArrivalSound;
-	ieResRef TravelVVC;
-	ieDword SparkColor;
-	ieDword ExtFlags;
-	ieDword StrRef;
+	ieWord Speed = 20;
+	ieDword SFlags = PSF_FLYING;
+	ResRef FiringSound;
+	ResRef ArrivalSound;
+	ResRef TravelVVC;
+	ieDword SparkColor = 0;
+	ieDword ExtFlags = 0;
+	ieDword StrRef = 0;
 	Color RGB;
-	ieWord ColorSpeed;
-	ieWord Shake;
-	ieWord IDSType;
-	ieWord IDSValue;
-	ieWord IDSType2;
-	ieWord IDSValue2;
-	ieResRef FailSpell;
-	ieResRef SuccSpell;
+	ieWord ColorSpeed = 0;
+	ieWord Shake = 0;
+	ieWord IDSType = 0;
+	ieWord IDSValue = 0;
+	ieWord IDSType2 = 0;
+	ieWord IDSValue2 = 0;
+	ResRef failureSpell;
+	ResRef successSpell;
 	////// gap
-	ieDword TFlags;
-	ieResRef BAMRes1;
-	ieResRef BAMRes2;
-	ieByte Seq1, Seq2;
-	ieWord LightX;
-	ieWord LightY;
-	ieWord LightZ;
-	ieResRef PaletteRes;
+	ieDword TFlags = 0;
+	ResRef BAMRes1;
+	ResRef BAMRes2;
+	ieByte Seq1 = 0;
+	ieByte Seq2 = 0;
+	ieWord LightX = 0;
+	ieWord LightY = 0;
+	ieWord LightZ = 0;
+	ResRef PaletteRes;
 	ieByte Gradients[7];
-	ieByte SmokeSpeed;
+	ieByte SmokeSpeed = 0;
 	ieByte SmokeGrad[7];
-	ieByte Aim; // original bg2: m_numDirections // list of {1, 5, 9}
-	ieWord SmokeAnimID;
-	ieResRef TrailBAM[3];
+	ieByte Aim = 0; // original bg2: m_numDirections, a list of {1, 5, 9}
+	ieWord SmokeAnimID = 0;
+	ResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
-	unsigned int Range;
+	unsigned int Range = 0;
 	//these are public but not in the .pro file
-	ProjectileExtension* Extension;
-	bool autofree;
-	PaletteHolder palette;
+	Holder<ProjectileExtension> Extension;
+	PaletteHolder palette = nullptr;
 	//internals
-protected:
-	ieResRef smokebam;
-	ieDword timeStartStep;
+private:
+	ResRef smokebam;
+	ieDword timeStartStep = 0;
 	//attributes from moveable object
-	unsigned char Orientation, NewOrientation;
-	PathNode* path; //whole path
-	PathNode* step; //actual step
+	unsigned char Orientation = 0;
+	unsigned char NewOrientation = 0;
+	PathNode* path = nullptr; // whole path
+	PathNode* step = nullptr; // actual step
 	//similar to normal actors
-	Map *area;
-	Point Pos;
-	int ZPos;
-	Point Destination;
+	Map *area = nullptr;
+	Point Pos = Point(-1, -1);
+	int ZPos = 0;
+	Point Destination = Pos;
 	Point Origin;
-	ieDword Caster;    //the globalID of the caster actor
-	int Level;         //the caster's level
-	ieDword Target;    //the globalID of target actor
-	ieDword FakeTarget; //a globalID for target that isn't followed
-	int phase;
+	ieDword Caster = 0;    // the globalID of the caster actor
+	int Level = 0;         // the caster's level
+	ieDword Target = 0;    // the globalID of target actor
+	ieDword FakeTarget = 0; // a globalID for target that isn't followed
+	int phase = P_UNINITED;
 	//saved in area
-	ieResRef name;
-	ieWord type;
+	ResRef projectileName; // used also for namesake externalized spells
+	ieWord type = 0;
 	//these come from the extension area
-	int extension_delay;
-	int extension_explosioncount;
-	int extension_targetcount;
+	int extension_delay = 0;
+	int extension_explosioncount = 0;
+	int extension_targetcount = 0;
 	Color tint;
 
 	//special (not using char animations)
-	Animation* travel[MAX_ORIENT];
-	Animation* shadow[MAX_ORIENT];
-	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
-	EffectQueue* effects;
-	Projectile **children;
-	int child_size;
-	int pathcounter;
-	int bend;
-	int drawSpark;
+	Animation* travel[MAX_ORIENT]{};
+	Animation* shadow[MAX_ORIENT]{};
+	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation
+	EffectQueue* effects = nullptr;
+	std::vector<Projectile*> children;
+	int pathcounter = 0x7fff;
+	int bend = 0;
+	int drawSpark = 0;
 	Holder<SoundHandle> travel_handle;
 public:
 	void SetCaster(ieDword t, int level);
@@ -286,7 +285,7 @@ public:
 	void Cleanup();
 
 	inline Point GetDestination() const { return Destination; }
-	inline const char * GetName() const { return name; }
+	inline const ResRef& GetName() const { return projectileName; }
 	inline ieWord GetType() const { return type; }
 	//This assumes that the effect queue cannot be bigger than 65535
 	//which is a sane expectation
@@ -315,7 +314,7 @@ public:
 		return Pos.y;
 	}
 
-	void SetIdentifiers(const char *name, ieWord type);
+	void SetIdentifiers(const ResRef &name, size_t idx);
 
 	void SetEffectsCopy(const EffectQueue *eq, const Point &source);
 
@@ -358,17 +357,17 @@ public:
 	int Update();
 	//draw object
 	void Draw(const Region &screen);
-	void SetGradient(int gradient, bool tint);
+	void SetGradient(int gradient, bool tinted);
 	void StaticTint(const Color &newtint);
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
-	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
+	void CreateAnimations(Animation **anims, const ResRef& bam, int Seq);
 	//pillar type animations
-	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq);
+	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq) const;
 	//oriented animations (also simple ones)
-	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
-	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal);
+	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq) const;
+	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal) const;
 	void GetSmokeAnim();
 	void SetBlend(int brighten);
 	//apply spells and effects on the target, only in single travel mode
@@ -377,7 +376,7 @@ private:
 	//if there is an extension, convert to exploding or wait for trigger
 	void EndTravel();
 	//apply default spell
-	void ApplyDefault();
+	void ApplyDefault() const;
 	//stops the current sound
 	void StopSound();
 	//kickstarts the secondary sound
@@ -385,7 +384,7 @@ private:
 	//reached end of single travel missile, explode or expire now
 	void ChangePhase();
 	//drop a BAM or VVC on the trail path, return the length of the animation
-	int AddTrail(const ieResRef BAM, const ieByte *pal) const;
+	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
 	void DoStep(unsigned int walk_speed);
 	void LineTarget() const;      //line projectiles (walls, scorchers)
 	void LineTarget(const PathNode *beg, const PathNode *end) const;
@@ -401,21 +400,21 @@ private:
 	void DrawExploded(const Region &screen);
 	int GetTravelPos(int face) const;
 	int GetShadowPos(int face) const;
-	void SetPos(int face, int frame1, int frame2);
+	void SetPos(int face, int frame1, int frame2) const;
 	inline int GetZPos() const;
 
 	//logic to resolve target when single projectile hit destination
 	int CalculateTargetFlag() const;
 	//logic to resolve the explosion count (may be based on caster level)
-	int CalculateExplosionCount();
+	int CalculateExplosionCount() const;
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
-	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients);
+	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients) const;
 
 private:
-	void Draw(Holder<Sprite2D> spr, const Point& p,
-			  BlitFlags flags, Color tint) const;
+	void Draw(const Holder<Sprite2D>& spr, const Point& p,
+			  BlitFlags flags, Color overrideTint) const;
 };
 
 }

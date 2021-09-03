@@ -24,7 +24,7 @@
 #include "Resource.h"
 #include "Sprite2D.h"
 #include "Tooltip.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <deque>
 
@@ -38,24 +38,16 @@ using WindowList = std::deque<Window*>;
 struct ToolTipData
 {
 	Tooltip tt;
-	unsigned long time = 0;
+	tick_t time = 0;
 	Holder<SoundHandle> tooltip_sound;
 	bool reset = false;
 	
-	ToolTipData(Tooltip tt)
+	explicit ToolTipData(Tooltip tt)
 	: tt(std::move(tt)) {}
 };
 
 class WindowManager {
 public:
-	// Colors of modal window shadow
-	// !!! Keep these synchronized with GUIDefines.py !!!
-	enum ModalShadow {
-		ShadowNone = 0,
-		ShadowGray,
-		ShadowBlack
-	};
-
 	enum CursorFeedback {
 		MOUSE_ALL			= 0,
 		MOUSE_NO_CURSOR		= 1,
@@ -71,7 +63,7 @@ public:
 	struct HUDLock {
 		const WindowManager& wm;
 
-		HUDLock(WindowManager& wm)
+		explicit HUDLock(const WindowManager& wm)
 		: wm(wm) {
 			wm.video->PushDrawingBuffer(wm.HUDBuf);
 		}
@@ -86,23 +78,21 @@ private:
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
 	Region screen; // only a Region for convinience. we dont use x,y
-	Window* modalWin;
 	Window* gameWin;
 	Window* hoverWin;
 	Window* trackingWin;
 
 	EventMgr eventMgr;
 
-	Holder<Video> video;
+	std::shared_ptr<Video> video;
 	VideoBufferPtr HUDBuf = nullptr; // heads up display layer. Contains cursors/tooltips/borders and whatever gets drawn via DrawHUD()
-	ModalShadow modalShadow = ShadowNone;
-	
+
 	// these are mutable instead of statice because Sprite2Ds must be released before the video driver is unloaded
 	mutable ToolTipData tooltip;
 	mutable std::map<ResRef, Holder<Sprite2D>> winframes;
 
-	static int ToolTipDelay;
-	static unsigned long TooltipTime;
+	static tick_t ToolTipDelay;
+	static tick_t TooltipTime;
 
 private:
 	bool IsOpenWindow(Window* win) const;
@@ -116,12 +106,13 @@ private:
 
 	Window* NextEventWindow(const Event& event, WindowList::const_iterator& current);
 	bool DispatchEvent(const Event&);
-	bool HotKey(const Event&);
+	bool HotKey(const Event&) const;
 
 	inline void DestroyWindows(WindowList& list);
+	void MarkAllDirty() const;
 
 public:
-	WindowManager(Video* vid);
+	explicit WindowManager(const std::shared_ptr<Video>& vid);
 	~WindowManager();
 	
 	WindowManager(const WindowManager&) = delete;
@@ -135,13 +126,13 @@ public:
 	bool OrderRelativeTo(Window* win, Window* win2, bool front);
 
 	bool FocusWindow(Window* win);
-	bool IsPresentingModalWindow() const;
-	bool PresentModalWindow(Window* win, ModalShadow Shadow = ShadowNone);
+	Window* ModalWindow() const;
+	bool PresentModalWindow(Window* win);
 
 	CursorFeedback SetCursorFeedback(CursorFeedback feedback);
 
 	// all drawing will be done directly on the screen until DrawingLock is destoryed
-	HUDLock DrawHUD();
+	HUDLock DrawHUD() const;
 
 	/*
 	 Drawing is done in layers:
@@ -153,7 +144,7 @@ public:
 	*/
 	void DrawWindows() const;
 
-	Size ScreenSize() const { return screen.Dimensions(); }
+	Size ScreenSize() const { return screen.size; }
 
 	Holder<Sprite2D> GetScreenshot(Window* win);
 	Window* GetGameWindow() const { return gameWin; }

@@ -64,9 +64,8 @@ bool CTlkOverride::Init()
 		return false;
 	}
 	toh_str->Seek( 8, GEM_CURRENT_POS );
-	toh_str->ReadDword( &AuxCount );
-
-	if (tot_str->ReadDword( &FreeOffset ) != 4) {
+	toh_str->ReadDword(AuxCount);
+	if (tot_str->ReadScalar<strpos_t, ieDword>(FreeOffset) != 4) {
 		FreeOffset = 0xffffffff;
 	}
 	NextStrRef = 0xffffffff;
@@ -107,7 +106,7 @@ ieDword CTlkOverride::GetLength(ieDword offset)
 		}
 		memset(buffer,0,sizeof(buffer));
 		tot_str->Read(buffer, SEGMENT_SIZE);
-		tot_str->ReadDword(&tmp);
+		tot_str->ReadDword(tmp);
 		if (tmp != 0xffffffff) {
 			length += SEGMENT_SIZE;
 		}
@@ -137,7 +136,7 @@ char* CTlkOverride::GetString(ieDword offset)
 		ieDword tmp = std::min<ieDword>(length, SEGMENT_SIZE);
 		tot_str->Read(pos, tmp);
 		tot_str->Seek(SEGMENT_SIZE-tmp, GEM_CURRENT_POS);
-		tot_str->ReadDword(&offset);
+		tot_str->ReadDword(offset);
 		length-=tmp;
 		pos+=tmp;
 	}
@@ -156,7 +155,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 	}
 
 	// FIXME: newvalue could be a multibyte string in an encoding incompatible with ASCII
-	ieDword length = strlen(newvalue);
+	size_t length = strlen(newvalue);
 	if(length>65535) length=65535;
 	length++;
 
@@ -167,14 +166,14 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 	{
 		//fill the backpointer
 		tot_str->Seek(offset + 4, GEM_STREAM_START);
-		tot_str->WriteDword(&backp);
-		ieDword seglen = std::min<ieDword>(SEGMENT_SIZE, length);
+		tot_str->WriteDword(backp);
+		size_t seglen = std::min<size_t>(SEGMENT_SIZE, length);
 		tot_str->Write(newvalue + memoffset, seglen);
 		length -= seglen;
 		memoffset += seglen;
 		backp = offset;
 		tot_str->Seek(SEGMENT_SIZE - seglen, GEM_CURRENT_POS);
-		tot_str->ReadDword(&offset);
+		tot_str->ReadDword(offset);
 
 		//end of string
 		if (!length) {
@@ -182,7 +181,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 				ieDword freep = offset;
 				offset = 0xffffffff;
 				tot_str->Seek(-4,GEM_CURRENT_POS);
-				tot_str->WriteDword(&offset);
+				tot_str->WriteDword(offset);
 				ReleaseSegment(freep);
 			}
 			break;
@@ -192,7 +191,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 			//no more space, but we need some
 			offset = ClaimFreeSegment();
 			tot_str->Seek(-4,GEM_CURRENT_POS);
-			tot_str->WriteDword(&offset);
+			tot_str->WriteDword(offset);
 		}
 	} while(length);
 
@@ -201,14 +200,14 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 
 ieDword CTlkOverride::ClaimFreeSegment()
 {
-	ieDword offset = FreeOffset;
-	unsigned long pos = tot_str->GetPos();
+	strpos_t offset = FreeOffset;
+	strpos_t pos = tot_str->GetPos();
 	
 	if (offset == 0xffffffff) {
 		offset = tot_str->Size();
 	} else {
 		tot_str->Seek(offset, GEM_STREAM_START);
-		if (tot_str->ReadDword(&FreeOffset) != 4) {
+		if (tot_str->ReadScalar<strpos_t, ieDword>(FreeOffset) != 4) {
 			FreeOffset = 0xffffffff;
 		}
 	}
@@ -216,17 +215,17 @@ ieDword CTlkOverride::ClaimFreeSegment()
 	char buffer[SEGMENT_SIZE];
 	memset(buffer, 0, sizeof(buffer));
 	tot_str->Seek(offset, GEM_STREAM_START);
-	tot_str->WriteDword(&tmp);
+	tot_str->WriteDword(tmp);
 	tmp = 0xffffffff;
-	tot_str->WriteDword(&tmp);
+	tot_str->WriteDword(tmp);
 	tot_str->Write(buffer, SEGMENT_SIZE);
-	tot_str->WriteDword(&tmp);
+	tot_str->WriteDword(tmp);
 
 	//update free segment pointer
 	tot_str->Seek(0, GEM_STREAM_START);
-	tot_str->WriteDword(&FreeOffset);
+	tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
 	tot_str->Seek(pos, GEM_STREAM_START);
-	return offset;
+	return static_cast<ieDword>(offset);
 }
 
 void CTlkOverride::ReleaseSegment(ieDword offset)
@@ -234,13 +233,13 @@ void CTlkOverride::ReleaseSegment(ieDword offset)
 	// also release linked segments, if any
 	do {
 		tot_str->Seek(offset, GEM_STREAM_START);
-		tot_str->WriteDword(&FreeOffset);
+		tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
 		FreeOffset = offset;
 		tot_str->Seek(SEGMENT_SIZE + 4, GEM_CURRENT_POS);
-		tot_str->ReadDword(&offset);
+		tot_str->ReadDword(offset);
 	} while (offset != 0xffffffff);
 	tot_str->Seek(0, GEM_STREAM_START);
-	tot_str->WriteDword(&FreeOffset);
+	tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
 }
 
 ieStrRef CTlkOverride::GetNextStrRef()
@@ -259,7 +258,7 @@ ieStrRef CTlkOverride::GetNextStrRef()
 				AuxCount--;
 				continue;
 			}
-			toh_str->ReadDword(&last);
+			toh_str->ReadDword(last);
 		}
 		NextStrRef = std::max<ieDword>(STRREF_START, ++last);
 	}
@@ -281,12 +280,12 @@ ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
 	entry.offset = ClaimFreeSegment();
 
 	toh_str->Seek(TOH_HEADER_SIZE + AuxCount * sizeof(EntryType), GEM_STREAM_START);
-	toh_str->WriteDword(&entry.strref);
+	toh_str->WriteDword(entry.strref);
 	toh_str->Write(entry.dummy, 20);
-	toh_str->WriteDword(&entry.offset);
+	toh_str->WriteDword(entry.offset);
 	AuxCount++;
 	toh_str->Seek(12,GEM_STREAM_START);
-	toh_str->WriteDword(&AuxCount);
+	toh_str->WriteDword(AuxCount);
 	return entry.strref;
 }
 
@@ -298,9 +297,9 @@ ieDword CTlkOverride::LocateString(ieStrRef strref)
 	if (!toh_str) return 0xffffffff;
 	toh_str->Seek(TOH_HEADER_SIZE,GEM_STREAM_START);
 	for(ieDword i=0;i<AuxCount;i++) {
-		toh_str->ReadDword(&strref2);
+		toh_str->ReadDword(strref2);
 		toh_str->Seek(20,GEM_CURRENT_POS);
-		toh_str->ReadDword(&offset);
+		toh_str->ReadDword(offset);
 		if (strref2==strref) {
 			return offset;
 		}
@@ -311,7 +310,7 @@ ieDword CTlkOverride::LocateString(ieStrRef strref)
 //this function handles all of the .tlk override mechanism with caching
 //strings it once found
 //it is possible to turn off caching
-char* CTlkOverride::ResolveAuxString(ieStrRef strref, int &Length)
+char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
 {
 	char *string;
 
@@ -345,7 +344,7 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 	char nPath[_MAX_PATH];
 	char Signature[TOH_HEADER_SIZE];
 
-	PathJoin( nPath, core->CachePath, "default.toh", NULL );
+	PathJoin(nPath, core->config.CachePath, "default.toh", nullptr);
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify(nPath)) {
@@ -353,8 +352,7 @@ retry:
 	}
 	if (create) {
 		fs->Create( "default", IE_TOH_CLASS_ID);
-		memset(Signature,0,sizeof(Signature));
-		memcpy(Signature,"TLK ",4);
+		strncpy(Signature, "TLK ", TOH_HEADER_SIZE - 1);
 		fs->Write(Signature, sizeof(Signature));
 		create = false;
 		goto retry;
@@ -366,7 +364,7 @@ retry:
 DataStream* CTlkOverride::GetAuxTlk(bool create)
 {
 	char nPath[_MAX_PATH];
-	PathJoin( nPath, core->CachePath, "default.tot", NULL );
+	PathJoin(nPath, core->config.CachePath, "default.tot", nullptr);
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify(nPath)) {
@@ -375,7 +373,7 @@ retry:
 			// if this happens we also need to account for the TOH file
 			AuxCount = 0;
 			if (toh_str->Seek(12, GEM_STREAM_START) == GEM_OK) {
-				toh_str->WriteDword(&AuxCount);
+				toh_str->WriteDword(AuxCount);
 			}
 			toh_str->Rewind();
 		} else {

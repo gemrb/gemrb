@@ -18,18 +18,14 @@
 #ifndef IE_SWAB_H
 #define IE_SWAB_H
 
-#include "exports.h"
+#include "Platform.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-#ifndef HAVE_SIZEOF_SSIZE_T
-# define HAVE_SIZEOF_SSIZE_T
- typedef long int ssize_t;
-#endif
-
-GEM_EXPORT void swabs(void *buf, ssize_t n);
+GEM_EXPORT void swab_const(const void *bfrom, void *bto, long n);
+GEM_EXPORT void swabs(void *buf, long n);
 
 #if defined(__cplusplus)
 }  /* extern "C" */

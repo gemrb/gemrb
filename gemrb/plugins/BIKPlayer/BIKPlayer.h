@@ -48,11 +48,11 @@ namespace GemRB {
 	*(ptr) = (value) && 0xff; \
 	(ptr)++; \
 	*(ptr) = ((value) >> 8) && 0xff; \
-	(ptr)++;
+	(ptr)++
 #else
 #define SET_INT_TYPE int16_t
 #define SET_INT_VALUE(ptr, value)\
-	*(ptr)++ = (value);
+	*(ptr)++ = (value)
 #endif
 
 #if defined(__arm__)
@@ -60,11 +60,11 @@ namespace GemRB {
 	(value) = *(ptr); \
 	(ptr)++; \
 	(value) |= (*(ptr)) << 8; \
-	(ptr)++;
+	(ptr)++
 #else
 #define GET_INT_VALUE(value, ptr)\
 	(value) = *reinterpret_cast<int16_t*>(ptr); \
-	(ptr) += 2;
+	(ptr) += 2
 #endif
 
 enum BinkAudFlags {
@@ -135,10 +135,10 @@ typedef struct AVFrame {
 		linesize[2] = w2;
 	}
 	
-	void release_buffer()
+	void release_buffer() const
 	{
-		for(int i=0;i<3;i++) {
-			av_free(data[i]);
+		for (auto& i : data) {
+			av_free(i);
 		}
 	}
 	
@@ -175,8 +175,8 @@ typedef struct {
 
 typedef struct {
 	int     keyframe;
-	ieDword pos;
-	ieDword size;
+	strpos_t pos;
+	strpos_t size;
 } binkframe;
 
 typedef struct Bundle {
@@ -222,12 +222,8 @@ private:
 
 	//video context (consider packing it in a struct)
 	AVRational v_timebase;
-	long timer_last_sec;
-	long timer_last_usec;
-	unsigned int frame_wait;
 	bool video_rendered_frame;
-	unsigned int video_frameskip;
-	unsigned int video_skippedframes;
+
 	//bink specific
 	ScanTable c_scantable;
 	Bundle c_bundle[BINK_NB_SRC];  ///< bundles for decoding all data types
@@ -240,22 +236,21 @@ private:
 	GetBitContext v_gb;
 	
 	AVFrame c_frames[2];
-	AVFrame *c_pic, *c_last;
+	AVFrame *c_pic;
+	AVFrame *c_last;
 
 private:
-	void timer_start();
-	void timer_wait();
 	void segment_video_play();
-	unsigned int fileRead(unsigned int pos, void* buf, unsigned int count);
+	strret_t fileRead(strpos_t pos, void* buf, strpos_t count);
 
-	int setAudioStream();
-	void freeAudioStream(int stream);
+	int setAudioStream() const;
+	void freeAudioStream(int stream) const;
 	void queueBuffer(int stream, unsigned short bits,
-		int channels, short* memory, int size, int samplerate);
+		int channels, short* memory, int size, int samplerate) const;
 	int sound_init(bool need_init);
-	void ff_init_scantable(ScanTable *st, const uint8_t *src_scantable);
+	void ff_init_scantable(ScanTable *st, const uint8_t *src_scantable) const;
 	int video_init();
-	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den);
+	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den) const;
 	int ReadHeader();
 	void DecodeBlock(short *out);
 	int DecodeAudioFrame(void *data, int data_size);
@@ -281,7 +276,7 @@ protected:
 public:
 	BIKPlayer(void);
 	~BIKPlayer(void) override;
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 
 	void Stop();
 };

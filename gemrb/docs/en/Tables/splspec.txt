@@ -5,7 +5,7 @@ Columns
   1 - spells with identification properties
   2 - spells that can be used while silenced
   4 - spells that can't be used during a wild surge
-  8 - spells that are autocast on rest (targetting only injured party members)
+  8 - spells that are autocast on rest (targeting only injured party members)
  16 - spells that are autocast on rest (whole party; special case for healing estimation)
 
 - amount and bonus_limit are currently only used for healing on rest. The

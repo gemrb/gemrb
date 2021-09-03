@@ -21,9 +21,9 @@
 #include "exports.h"
 #include "Interface.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cerrno>
-#include <ctype.h>
+#include <cctype>
 #include <cwctype>
 
 #if HAVE_ICONV
@@ -148,7 +148,7 @@ String* StringFromCString(const char* string)
 {
 	// if multibyte is false this is basic expansion of cstring to wchar_t
 	// the only reason this is special, is because it allows characters 128-256.
-	return StringFromEncodedData((ieByte*)string, core->TLKEncoding);
+	return StringFromEncodedData((const ieByte*) string, core->TLKEncoding);
 }
 
 char* MBCStringFromString(const String& string)
@@ -283,9 +283,8 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
 
 char* strlwr(char* string)
 {
-	char* s;
 	if (string) {
-		for (s = string; *s; ++s)
+		for (char* s = string; *s; ++s)
 			*s = tolower( *s );
 	}
 	return string;

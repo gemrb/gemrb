@@ -26,8 +26,9 @@
  * FFT/IFFT transforms.
  */
 
-#include <math.h>
 #include "dsputil.h"
+
+#include <cmath>
 
 /* cos(2*pi*x/n) for 0<=x<=n/4, followed by its reverse */
 COSTABLE(16);
@@ -68,15 +69,15 @@ av_cold void ff_init_ff_cos_tabs(int index)
     double freq = 2*M_PI/m;
     FFTSample *tab = ff_cos_tabs[index];
     for(i=0; i<=m/4; i++)
-        tab[i] = (float) cos(i*freq);
+        tab[i] = (float) std::cos(i * freq);
     for(i=1; i<m/4; i++)
         tab[m/2-i] = tab[i];
 }
 
 av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
 {
-    int i, j, m, n;
-    float alpha, c1, s1, s2;
+    int n;
+    float s2;
     //int av_unused has_vectors;
 
     if (nbits < 2 || nbits > 16)
@@ -101,37 +102,35 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     s->split_radix = 1;
 
     if (s->split_radix) {
-        for(j=4; j<=nbits; j++) {
+        for (int j = 4; j <= nbits; j++) {
             ff_init_ff_cos_tabs(j);
         }
-        for(i=0; i<n; i++)
+        for (int i = 0; i < n; i++) {
             s->revtab[-split_radix_permutation(i, n, s->inverse) & (n-1)] = i;
+        }
         s->tmp_buf = (struct FFTComplex *) av_malloc(n * sizeof(FFTComplex));
         if(!s->tmp_buf) {
           goto fail;
         }
 
     } else {
-        int np, nblocks, np2, l;
-        FFTComplex *q;
-
-        for(i=0; i<(n/2); i++) {
-            alpha = (float) (2 * M_PI * (float)i / (float)n);
-            c1 = cos(alpha);
-            s1 = sin(alpha) * s2;
+        for (int i = 0; i < n / 2; i++) {
+            float alpha = (float) (2 * M_PI * (float) i / (float) n);
+            float c1 = std::cos(alpha);
+            float s1 = std::sin(alpha) * s2;
             s->exptab[i].re = c1;
             s->exptab[i].im = s1;
         }
 
-        np = 1 << nbits;
-        nblocks = np >> 3;
-        np2 = np >> 1;
+        int np = 1 << nbits;
+        int nblocks = np >> 3;
+        int np2 = np >> 1;
         s->exptab1 = (struct FFTComplex *) av_malloc(np * 2 * sizeof(FFTComplex));
         if (!s->exptab1)
             goto fail;
-        q = s->exptab1;
+        FFTComplex *q = s->exptab1;
         do {
-            for(l = 0; l < np2; l += 2 * nblocks) {
+            for (int l = 0; l < np2; l += 2 * nblocks) {
                 *q++ = s->exptab[l];
                 *q++ = s->exptab[l + nblocks];
 
@@ -147,9 +146,9 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
         av_freep((void **) &s->exptab);
 
         /* compute bit reverse table */
-        for(i=0;i<n;i++) {
-            m=0;
-            for(j=0;j<nbits;j++) {
+        for (int i = 0; i < n; i++) {
+            int m = 0;
+            for (int j = 0; j < nbits; j++) {
                 m |= ((i >> j) & 1) << (nbits-j-1);
             }
             s->revtab[i]=m;
@@ -167,21 +166,20 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
 
 void ff_fft_permute_c(FFTContext *s, FFTComplex *z)
 {
-    int j, k, np;
     FFTComplex tmp;
     const uint16_t *revtab = s->revtab;
-    np = 1 << s->nbits;
+    int np = 1 << s->nbits;
 
     if (s->tmp_buf) {
         /* TODO: handle split-radix permute in a more optimal way, probably in-place */
-        for(j=0;j<np;j++) s->tmp_buf[revtab[j]] = z[j];
+        for (int j = 0; j < np; j++) s->tmp_buf[revtab[j]] = z[j];
         memcpy(z, s->tmp_buf, np * sizeof(FFTComplex));
         return;
     }
 
     /* reverse */
-    for(j=0;j<np;j++) {
-        k = revtab[j];
+    for (int j = 0; j < np; j++) {
+        int k = revtab[j];
         if (k < j) {
             tmp = z[k];
             z[k] = z[j];
@@ -351,7 +349,7 @@ static void (* const fft_dispatch[])(FFTComplex*) = {
     fft2048, fft4096, fft8192, fft16384, fft32768, fft65536,
 };
 
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
+void ff_fft_calc_c(const FFTContext *s, FFTComplex *z)
 {
     fft_dispatch[s->nbits-2](z);
 }

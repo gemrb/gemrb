@@ -118,17 +118,16 @@ def InitWorldMapWindow (Window):
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 
 	if GameCheck.IsBG2():
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt")
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt", "WMDAG")
 	elif GameCheck.IsBG1():
 		cnormal = {'r' : 0, 'g' : 0, 'b' : 0, 'a' : 0xff}
 		cselected = {'r' : 0xff, 'g' : 0, 'b' : 0, 'a' : 0xff}
 		cnotvisited = {'r' : 0x80, 'g' : 0x80, 'b' : 0xf0, 'a' : 0xa0}
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "toolfont", cnormal, cselected, cnotvisited)
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "toolfont", "WMDAG", cnormal, cselected, cnotvisited)
 	else:
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont")
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont", "WMDAG")
 
 	WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
-	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 	WorldMapControl.SetAction(ChangeTooltip, IE_ACT_MOUSE_ENTER)
 	# center on current area
@@ -183,7 +182,12 @@ def InitWorldMapWindow (Window):
 
 	# Done
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
+	if GemRB.GetVar ("Travel") == -1:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
+	else:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+
 	Button.SetHotKey('m')
 
 	return
@@ -202,16 +206,18 @@ def AddNoteWindow ():
 
 	Label = MapWindow.GetControl (0x10000003)
 	Text = Label.QueryText ()
-	if Text == "":
-		Text = "Note"
 
 	NoteWindow = GemRB.LoadWindow (5, "GUIMAP")
 	NoteWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
+	
+	Map = MapWindow.GetControl (2)
+	NoteWindow.SetAction (lambda: Map.SetVarAssoc("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES), ACTION_WINDOW_CLOSED)
 
 	if GameCheck.IsIWD2():
 		#convert to multiline, destroy unwanted resources
 		NoteLabel = NoteWindow.ReplaceSubview(1, IE_GUI_TEXTAREA, "NORMAL")
 		NoteLabel.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
+		NoteLabel.SetColor (ColorWhitish, TA_COLOR_NORMAL)
 
 		# center relative to map
 		mapframe = MapWindow.GetFrame()
@@ -268,9 +274,9 @@ def ChangeTooltip ():
 	tt = ""
 	area = WorldMapControl.GetDestinationArea ()
 	if area and area["Distance"] >= 0:
-		str = GemRB.GetString(23084)
-		if (str):
-			tt = "%s: %d"%(str,area["Distance"])
+		travelStr = GemRB.GetString (23084)
+		if (travelStr):
+			tt = "%s: %d" %(travelStr, area["Distance"])
 
 	WorldMapControl.SetTooltip (tt)
 	return

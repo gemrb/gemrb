@@ -138,14 +138,14 @@ def ColorDiff (Window, Label, diff):
 	else:
 		Color = {'r' : 255, 'g' : 255, 'b' : 255}
 
-	Label.SetTextColor (Color)
+	Label.SetColor (Color)
 	return
 
 def ColorDiff2 (Window, Label, diff):
 	if diff:
-		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+		Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	else:
-		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+		Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	return
 
 def GetBonusSpells (pc):
@@ -341,12 +341,8 @@ def DisplayGeneral (pc, targetTextArea):
 		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(32052) + "[/color]\n")
 		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
-			c2 = str(c)
-			if isinstance(c, str):
-				c2 = c
-				c = ord(c)
 			tmp = StateTable.GetValue (str(c - 66), "DESCRIPTION", GTV_REF)
-			RecordsTextArea.Append ("[cap]" + c2 + "%[/cap][p]" + tmp + "[/p]")
+			RecordsTextArea.Append ("[cap][int=" + str(c) + "]%[/cap][p]" + tmp + "[/p]")
 
 	# TODO: Active Feats (eg. Power attack 4)
 
@@ -1083,9 +1079,9 @@ def UpdateHelpWindow ():
 		#Button = Window.GetControl (i+27)
 		Label = Window.GetControl (i+0x10000004)
 		if Topic==i:
-			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 	resource = HelpTable.GetValue (Topic, 1)
 	if DescTable:
@@ -1125,9 +1121,9 @@ def RefreshHelpWindow ():
 		Label = Window.GetControl (i+0x10000030)
 
 		if i+TopIndex==Selected:
-			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		if DescTable:
 			title = DescTable.GetValue (i+startrow+TopIndex, titlecol)
 			Label.SetText (title)

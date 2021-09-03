@@ -21,7 +21,7 @@
 #define __GemRB__Tooltip__
 
 #include "Region.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "GUI/TextSystem/Font.h"
 
@@ -37,7 +37,7 @@ class TooltipBackground {
 	Holder<Sprite2D> rightbg;
 
 public:
-	TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> = NULL, Holder<Sprite2D> right = NULL);
+	explicit TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> = nullptr, Holder<Sprite2D> right = nullptr);
 	TooltipBackground(const TooltipBackground&);
 
 	void Draw(Region rgn) const;

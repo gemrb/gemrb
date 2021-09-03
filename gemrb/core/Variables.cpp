@@ -30,10 +30,10 @@ namespace GemRB {
 // private inlines 
 inline bool Variables::MyCopyKey(char*& dest, const char* key) const
 {
-	int i, j;
+	int j = 0;
 
 	//use j
-	for (i = 0,j = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++)
+	for (int i = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++)
 		if (key[i] != ' ') {
 			j++;
 		}
@@ -41,7 +41,8 @@ inline bool Variables::MyCopyKey(char*& dest, const char* key) const
 	if (!dest) {
 		return false;
 	}
-	for (i = 0,j = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++) {
+	j = 0;
+	for (int i = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++) {
 		if (key[i] != ' ') {
 			dest[j++] = (char) tolower( key[i] );
 		}
@@ -98,7 +99,7 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 	Variables::MyAssoc* pAssocNext;
 	if (( pAssocNext = pAssocRet->pNext ) == NULL) {
 		// go to next bucket
-		for (unsigned int nBucket = pAssocRet->nHashValue + 1;
+		for (size_t nBucket = pAssocRet->nHashValue + 1;
 			nBucket < m_nHashTableSize;
 			nBucket++)
 			if (( pAssocNext = m_pHashTable[nBucket] ) != NULL)
@@ -152,10 +153,7 @@ void Variables::RemoveAll(ReleaseFun fun)
 	if (m_pHashTable != NULL) {
 		// destroy elements (values and keys)
 		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++) {
-			Variables::MyAssoc* pAssoc;
-			for (pAssoc = m_pHashTable[nHash];
-				pAssoc != NULL;
-				pAssoc = pAssoc->pNext) {
+			for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 				if (fun) {
 					fun((void *) pAssoc->Value.sValue);
 				}
@@ -263,10 +261,7 @@ Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) 
 	}
 
 	// see if it exists
-	Variables::MyAssoc* pAssoc;
-	for (pAssoc = m_pHashTable[nHash];
-		pAssoc != NULL;
-		pAssoc = pAssoc->pNext) {
+	for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 		if (m_lParseKey) {
 			if (!MyCompareKey( pAssoc->key, key) ) {
 				return pAssoc;
@@ -284,7 +279,7 @@ Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) 
 int Variables::GetValueLength(const char* key) const
 {
 	unsigned int nHash;
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		return 0; // not in map
 	}
@@ -292,11 +287,11 @@ int Variables::GetValueLength(const char* key) const
 	return ( int ) strlen( pAssoc->Value.sValue );
 }
 
-bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
+bool Variables::Lookup(const char* key, char* dest, size_t MaxLength) const
 {
 	unsigned int nHash;
 	assert( m_type == GEM_VARIABLES_STRING );
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		dest[0] = 0;
 		return false; // not in map
@@ -310,7 +305,7 @@ bool Variables::Lookup(const char* key, char *&dest) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_STRING);
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		return false;
 	} // not in map
@@ -323,7 +318,7 @@ bool Variables::Lookup(const char* key, void *&dest) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_POINTER);
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		return false;
 	} // not in map
@@ -336,13 +331,19 @@ bool Variables::Lookup(const char* key, ieDword& rValue) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_INT);
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		return false;
 	} // not in map
 
 	rValue = pAssoc->Value.nValue;
 	return true;
+}
+
+bool Variables::HasKey(const char* key) const
+{
+	unsigned int nHash;
+	return GetAssocAt(key, nHash) != nullptr;
 }
 
 void Variables::SetAtCopy(const char* key, const char* value)
@@ -393,6 +394,8 @@ void Variables::SetAt(const char* key, char* value)
 	if (pAssoc->key) {
 		pAssoc->Value.sValue = value;
 		pAssoc->nHashValue = nHash;
+	} else {
+		free(value);
 	}
 }
 
@@ -431,6 +434,8 @@ void Variables::SetAt(const char* key, ieDword value, bool nocreate)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
+
+	if (!key) return;
 
 	assert( m_type == GEM_VARIABLES_INT );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
@@ -486,7 +491,7 @@ void Variables::LoadInitialValues(const char* name)
 {
 	char nPath[_MAX_PATH];
 	// we only support PST's var.var for now
-	PathJoin( nPath, core->GamePath, "var.var", NULL );
+	PathJoin(nPath, core->config.GamePath, "var.var", nullptr);
 	FileStream fs;
 	if (!fs.Open(nPath)) {
 		return;
@@ -499,14 +504,14 @@ void Variables::LoadInitialValues(const char* name)
 	
 	// first value is useless
 	if (!fs.Read(buffer, 40)) return;
-	if (fs.ReadDword(&value) != 4) return;
+	if (fs.ReadDword(value) != 4) return;
 	
 	while (fs.Remains()) {
 		// read data
 		if (!fs.Read(buffer, 40)) return;
-		if (fs.ReadDword(&value) != 4) return;
+		if (fs.ReadDword(value) != 4) return;
 		// is it the type we want? if not, skip
-		if (strnicmp(buffer, name, 6)) continue;
+		if (strnicmp(buffer, name, 6) != 0) continue;
 		// copy variable (types got 2 extra spaces, and the name is padded too)
 		// (true = uppercase, needed for original engine save compat, see 315b8f2e)
 		strnspccpy(varname,buffer+8,32, true);
@@ -514,7 +519,7 @@ void Variables::LoadInitialValues(const char* name)
 	}  
 }
 
-void Variables::DebugDump()
+void Variables::DebugDump() const
 {
 	const char *poi;
 
@@ -535,8 +540,7 @@ void Variables::DebugDump()
 	Log (DEBUG, "Variables", "Item count: %d", m_nCount);
 	Log (DEBUG, "Variables", "HashTableSize: %d\n", m_nHashTableSize);
 	for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++) {
-		Variables::MyAssoc* pAssoc;
-		for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; pAssoc = pAssoc->pNext) {
+		for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 			switch(m_type) {
 			case GEM_VARIABLES_STRING:
 				Log (DEBUG, "Variables", "%s = %s", pAssoc->key, pAssoc->Value.sValue);

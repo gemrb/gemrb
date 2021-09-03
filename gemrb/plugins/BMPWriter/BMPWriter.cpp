@@ -1,7 +1,7 @@
 #include "BMPWriter.h"
 
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <cstring>
 
@@ -10,14 +10,6 @@ using namespace GemRB;
 #define BMP_HEADER_SIZE  54 //FIXME: duplicate
 
 #define GET_SCANLINE_LENGTH(width, bitsperpixel)  (((width)*(bitsperpixel)+7)/8)
-
-BMPWriter::BMPWriter()
-{
-}
-
-BMPWriter::~BMPWriter()
-{
-}
 
 void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 {
@@ -36,31 +28,32 @@ void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 	//always save in truecolor (24 bit), no palette
 	output->Write( filling, 2);
 	tmpDword = fullsize+BMP_HEADER_SIZE;  // FileSize
-	output->WriteDword( &tmpDword);
+	output->WriteDword(tmpDword);
 	tmpDword = 0;
-	output->WriteDword( &tmpDword);       // ??
+	output->WriteDword(tmpDword);       // ??
 	tmpDword = BMP_HEADER_SIZE;           // DataOffset
-	output->WriteDword( &tmpDword);
+	output->WriteDword(tmpDword);
 	tmpDword = 40;                        // Size
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &Width);
-	output->WriteDword( &Height);
+	output->WriteDword(tmpDword);
+	output->WriteDword(Width);
+	output->WriteDword(Height);
 	tmpWord = 1;                          // Planes
-	output->WriteWord( &tmpWord);
+	output->WriteWord(tmpWord);
 	tmpWord = 24; //24 bits               // BitCount
-	output->WriteWord( &tmpWord);
+	output->WriteWord(tmpWord);
 	tmpDword = 0;                         // Compression
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);       // ImageSize
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
+	output->WriteDword(tmpDword);
+	output->WriteDword(tmpDword);       // ImageSize
+	output->WriteDword(tmpDword);
+	output->WriteDword(tmpDword);
+	output->WriteDword(tmpDword);
+	output->WriteDword(tmpDword);
 
+	auto it = spr->GetIterator(IPixelIterator::Direction::Forward, IPixelIterator::Direction::Reverse);
 	memset( filling,0,sizeof(filling) );
 	for (unsigned int y=0;y<Height;y++) {
-		for (unsigned int x=0;x<Width;x++) {
-			Color c = spr->GetPixel(x,Height-y-1);
+		for (unsigned int x = 0; x < Width; ++x, ++it) {
+			const Color& c = it.ReadRGBA();
 
 			output->Write( &c.b, 1);
 			output->Write( &c.g, 1);

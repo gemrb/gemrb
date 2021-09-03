@@ -23,12 +23,13 @@
 #include "exports.h"
 
 #include "Audio.h"
+#include "Animation.h"
 #include "Palette.h"
-#include "Video.h"
+#include "Resource.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
-class Animation;
 class AnimationFactory;
 class DataStream;
 class Sprite2D;
@@ -97,7 +98,7 @@ class GEM_EXPORT ScriptedAnimation {
 public:
 	ScriptedAnimation();
 	~ScriptedAnimation(void);
-	ScriptedAnimation(DataStream* stream);
+	explicit ScriptedAnimation(DataStream* stream);
 	void Init();
 	void LoadAnimationFactory(AnimationFactory *af, int gettwin = 0);
 	//there are 3 phases: start, hold, release
@@ -107,7 +108,7 @@ public:
 	Animation* anims[3*MAX_ORIENT];
 	//there is only one palette
 	Holder<Palette> palette;
-	ieResRef sounds[3];
+	ResRef sounds[3];
 	Color Tint = ColorWhite;
 	int Fade;
 	ieDword Transparency;
@@ -124,14 +125,14 @@ public:
 	ieDword Duration;
 	ieDword Delay;
 	bool justCreated;
-	ieResRef ResName;
+	ResRef ResName;
 	int Phase;
 	int SoundPhase;
 	ScriptedAnimation *twin;
 	bool active;
 	bool effect_owned;
 	Holder<SoundHandle> sound_handle;
-	unsigned long starttime;
+	tick_t starttime;
 public:
 	//draws the next frame of the videocell
 	bool UpdateDrawingState(int orientation);
@@ -140,16 +141,16 @@ public:
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)
-	void SetSound(int arg, const ieResRef sound);
+	void SetSound(int arg, const ResRef &sound);
 	//sets the animation to play only once
 	void PlayOnce();
 	//sets gradient colour slot to gradient
 	void SetPalette(int gradient, int start=-1);
 	//sets complete palette to ResRef
-	void SetFullPalette(const ieResRef PaletteResRef);
+	void SetFullPalette(const ResRef &PaletteResRef);
 	//sets complete palette to own name+index
 	void SetFullPalette(int idx);
-	int GetCurrentFrame() const;
+	Animation::index_t GetCurrentFrame() const;
 	ieDword GetSequenceDuration(ieDword multiplier) const;
 	/* sets up a delay in the beginning of the vvc */
 	void SetDelay(ieDword delay);
@@ -168,7 +169,7 @@ public:
 	/* returns possible twin after altering it to become underlay */
 	ScriptedAnimation *DetachTwin();
 private:
-	Animation *PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false);
+	Animation *PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false) const;
 	bool UpdatePhase();
 	void GetPaletteCopy();
 	void IncrementPhase();

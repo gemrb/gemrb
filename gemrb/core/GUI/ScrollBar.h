@@ -76,7 +76,7 @@ public:
 	void ScrollBySteps(int steps);
 
 	/** refreshes scrollbar if associated with VarName */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t) override;
 	bool TracksMouseDown() const override { return true; }
 
 private: //Private attributes
@@ -90,7 +90,7 @@ private:
 		ControlType = IE_GUI_SCROLLBAR;
 		State = 0;
 		StepIncrement = 1;
-		Size s = frame.Dimensions();
+		Size s = frame.size;
 
 		for(int i=0; i < IMAGE_COUNT; i++) {
 			Frames[i] = images[i];
@@ -102,7 +102,7 @@ private:
 		SetFrameSize(s);
 	}
 
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	Point AxisPosFromValue() const;
 	int GetFrameHeight(int frame) const;
 	/** Range of the slider in pixels. The height - buttons - slider */

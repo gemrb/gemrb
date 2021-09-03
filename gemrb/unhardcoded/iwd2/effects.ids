@@ -307,6 +307,7 @@ IDS
 0x131	SpellcraftModifier
 0x132	CriticalHitModifier
 0x133	TurnLevelModifier
+0x141	RemoveEffectsByResource
 395	CastSpellOnCondition
 396	ChangeBardSong
 397	SpellResistance
@@ -314,7 +315,7 @@ IDS
 399	AlterAnimation
 400	Hopelessness
 401	ProtectionFromEvil
-402	AddEffectsList
+402	ApplyEffectsList
 403	ArmorOfFaith
 404	Nausea
 405	Enfeeblement
