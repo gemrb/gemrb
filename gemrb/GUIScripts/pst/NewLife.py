@@ -252,13 +252,9 @@ def AcceptPress():
 	#interestingly enough, the game adds only one level's con bonus
 	Table = GemRB.LoadTable ("hpinit")
 	x = Table.GetValue (str(Stats[4]), "HP")
-
-	print("Setting max hp to: ", x)
-	GemRB.SetPlayerStat(1, IE_MAXHITPOINTS, x)
 	
-	x = x + 100 #ensures the player starts at max hp when con > 14
-	print("Setting current hp to: ", x)
-	GemRB.SetPlayerStat(1, IE_HITPOINTS, x)
+	GemRB.SetPlayerStat(1, IE_MAXHITPOINTS, x)
+	GemRB.SetPlayerStat(1, IE_HITPOINTS, x + 100) # x + 100 ensures the player starts at max hp when con > 14
 
 	GemRB.FillPlayerInfo(1) #does all the rest
 	#LETS PLAY!!
