@@ -224,6 +224,11 @@ SDLTextureSprite2D::SDLTextureSprite2D(const Region& rgn, const PixelFormat& fmt
 : SDLSurfaceSprite2D(rgn, fmt)
 {}
 
+SDLTextureSprite2D::~SDLTextureSprite2D() noexcept
+{
+	SDL_DestroyTexture(texture);
+}
+
 Holder<Sprite2D> SDLTextureSprite2D::copy() const
 {
 	return Holder<Sprite2D>(new SDLTextureSprite2D(*this));
@@ -232,22 +237,21 @@ Holder<Sprite2D> SDLTextureSprite2D::copy() const
 SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 {
 	if (texture == nullptr) {
-		SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, GetSurface());
-		SDL_QueryTexture(tex, &texFormat, nullptr, nullptr, nullptr);
-		texture = MakeHolder<TextureHolder>(tex);
+		texture = SDL_CreateTextureFromSurface(renderer, GetSurface());
+		SDL_QueryTexture(texture, &texFormat, nullptr, nullptr, nullptr);
 	} else if (staleTexture) {
 		SDL_Surface *surface = GetSurface();
 		if (texFormat == surface->format->format) {
-			SDL_UpdateTexture(*texture, nullptr, surface->pixels, surface->pitch);
+			SDL_UpdateTexture(texture, nullptr, surface->pixels, surface->pitch);
 		} else {
 			SDL_Surface *temp = SDL_ConvertSurfaceFormat(surface, texFormat, 0);
 			assert(temp);
-			SDL_UpdateTexture(*texture, nullptr, temp->pixels, temp->pitch);
+			SDL_UpdateTexture(texture, nullptr, temp->pixels, temp->pitch);
 			SDL_FreeSurface(temp);
 		}
 		staleTexture = false;
 	}
-	return *texture;
+	return texture;
 }
 
 void SDLTextureSprite2D::Invalidate() const

@@ -74,24 +74,15 @@ public:
 // it would probably be better to not inherit from SDLSurfaceSprite2D
 // the hard part is handling the palettes ourselves
 class SDLTextureSprite2D : public SDLSurfaceSprite2D {
-	struct TextureHolder final : public Held<TextureHolder>
-	{
-		SDL_Texture* texture;
-
-		explicit TextureHolder(SDL_Texture* tex) : texture(tex) {}
-		~TextureHolder() final { SDL_DestroyTexture(texture); }
-
-		SDL_Texture* operator->() const { return texture; }
-		operator SDL_Texture* () const { return texture; }
-	};
-
 	mutable Uint32 texFormat = SDL_PIXELFORMAT_UNKNOWN;
-	mutable Holder<TextureHolder> texture;
+	mutable SDL_Texture* texture = nullptr;
 	mutable bool staleTexture = false;
 	
 public:
 	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLTextureSprite2D(const Region&, const PixelFormat& fmt) noexcept;
+	~SDLTextureSprite2D() noexcept;
+	
 	Holder<Sprite2D> copy() const override;
 	
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
