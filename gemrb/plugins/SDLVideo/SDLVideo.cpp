@@ -444,7 +444,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	// This fixes bizzare clipping issues when a "flipped" sprite is partially offscreen
 	// we still will clip with screenClip later so no worries there
 	// we still want to do the clipping for the purposes of avoiding calls to BlitSpriteNativeClipped where
-	// expensive calls to RenderSpriteVersion may take place
+	// expensive calls to SDLSurfaceSprite2D::RenderWithFlags may take place
 	Region originalSrc = src;
 #endif
 	// FIXME?: srect isn't verified
@@ -493,70 +493,6 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 		const sprite_t* native = static_cast<const sprite_t*>(spr.get ());
 		BlitSpriteNativeClipped(native, src, dclipped, flags, reinterpret_cast<const SDL_Color*>(tint));
 	}
-}
-
-BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* tint) const
-{
-	SDLSurfaceSprite2D::version_t oldVersion = spr->GetVersion();
-	SDLSurfaceSprite2D::version_t newVersion = renderflags;
-	auto ret = (BlitFlags::GREY | BlitFlags::SEPIA) & newVersion;
-	
-	if (spr->Format().Bpp == 1) {
-		if (tint) {
-			assert(renderflags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD));
-			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
-			newVersion |= tintv << 32;
-		}
-		
-		if (oldVersion != newVersion) {
-			if (spr->IsPaletteStale()) {
-				spr->Invalidate();
-			}
-			SDL_Palette* pal = static_cast<SDL_Palette*>(spr->NewVersion(newVersion));
-
-			for (size_t i = 0; i < 256; ++i) {
-				Color& dstc = reinterpret_cast<Color&>(pal->colors[i]);
-
-				if (renderflags&BlitFlags::COLOR_MOD) {
-					assert(tint);
-					ShaderTint(*tint, dstc);
-					ret |= BlitFlags::COLOR_MOD;
-				}
-				
-				if (renderflags & BlitFlags::ALPHA_MOD) {
-					assert(tint);
-					dstc.a = tint->a;
-					ret |= BlitFlags::ALPHA_MOD;
-				}
-
-				if (renderflags&BlitFlags::GREY) {
-					ShaderGreyscale(dstc);
-				} else if (renderflags&BlitFlags::SEPIA) {
-					ShaderSepia(dstc);
-				}
-			}
-		} else {
-			ret |= (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD) & newVersion;
-		}
-	} else if (oldVersion != newVersion) {
-		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
-		SDL_LockSurface(newV);
-
-		const Region& r = {0, 0, newV->w, newV->h};
-		SDLPixelIterator beg = MakeSDLPixelIterator(newV, r);
-		SDLPixelIterator end = SDLPixelIterator::end(beg);
-		StaticAlphaIterator alpha(0xff);
-
-		if (renderflags & BlitFlags::GREY) {
-			RGBBlendingPipeline<SHADER::GREYSCALE, true> blender;
-			Blit(beg, beg, end, alpha, blender);
-		} else if (renderflags & BlitFlags::SEPIA) {
-			RGBBlendingPipeline<SHADER::SEPIA, true> blender;
-			Blit(beg, beg, end, alpha, blender);
-		}
-		SDL_UnlockSurface(newV);
-	}
-	return static_cast<BlitFlags>(ret);
 }
 
 // static class methods

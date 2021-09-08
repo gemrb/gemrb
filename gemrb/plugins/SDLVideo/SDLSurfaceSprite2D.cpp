@@ -107,7 +107,7 @@ void SDLSurfaceSprite2D::UnlockSprite() const
 	SDL_UnlockSurface(surface);
 }
 
-bool SDLSurfaceSprite2D::IsPaletteStale() const
+bool SDLSurfaceSprite2D::IsPaletteStale() const noexcept
 {
 	if (version) return true; // 'version' implies tha palette was color modified
 	
@@ -183,7 +183,7 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 	return false;
 }
 
-void SDLSurfaceSprite2D::Invalidate() const
+void SDLSurfaceSprite2D::Invalidate() const noexcept
 {
 	version = 0;
 	if (renderedSurface != surface) {
@@ -195,7 +195,7 @@ void SDLSurfaceSprite2D::Invalidate() const
 	}
 }
 
-void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const
+void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const noexcept
 {
 	if (newversion == 0 || version != newversion) {
 		Invalidate();
@@ -213,6 +213,70 @@ void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const
 		renderedSurface = SDL_ConvertSurface(surface, surface->format, 0);
 	}
 	return renderedSurface;
+}
+	
+BlitFlags SDLSurfaceSprite2D::RenderWithFlags(BlitFlags renderflags, const Color* tint) const noexcept
+{
+	SDLSurfaceSprite2D::version_t oldVersion = version;
+	SDLSurfaceSprite2D::version_t newVersion = renderflags;
+	auto ret = (BlitFlags::GREY | BlitFlags::SEPIA) & newVersion;
+	
+	if (format.Bpp == 1) {
+		if (tint) {
+			assert(renderflags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD));
+			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
+			newVersion |= tintv << 32;
+		}
+		
+		if (oldVersion != newVersion) {
+			if (IsPaletteStale()) {
+				Invalidate();
+			}
+			SDL_Palette* pal = static_cast<SDL_Palette*>(NewVersion(newVersion));
+
+			for (size_t i = 0; i < 256; ++i) {
+				Color& dstc = reinterpret_cast<Color&>(pal->colors[i]);
+
+				if (renderflags&BlitFlags::COLOR_MOD) {
+					assert(tint);
+					ShaderTint(*tint, dstc);
+					ret |= BlitFlags::COLOR_MOD;
+				}
+				
+				if (renderflags & BlitFlags::ALPHA_MOD) {
+					assert(tint);
+					dstc.a = tint->a;
+					ret |= BlitFlags::ALPHA_MOD;
+				}
+
+				if (renderflags&BlitFlags::GREY) {
+					ShaderGreyscale(dstc);
+				} else if (renderflags&BlitFlags::SEPIA) {
+					ShaderSepia(dstc);
+				}
+			}
+		} else {
+			ret |= (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD) & newVersion;
+		}
+	} else if (oldVersion != newVersion) {
+		SDL_Surface* newV = (SDL_Surface*)NewVersion(newVersion);
+		SDL_LockSurface(newV);
+
+		const Region& r = {0, 0, newV->w, newV->h};
+		SDLPixelIterator beg = MakeSDLPixelIterator(newV, r);
+		SDLPixelIterator end = SDLPixelIterator::end(beg);
+		StaticAlphaIterator alpha(0xff);
+
+		if (renderflags & BlitFlags::GREY) {
+			RGBBlendingPipeline<SHADER::GREYSCALE, true> blender;
+			Blit(beg, beg, end, alpha, blender);
+		} else if (renderflags & BlitFlags::SEPIA) {
+			RGBBlendingPipeline<SHADER::SEPIA, true> blender;
+			Blit(beg, beg, end, alpha, blender);
+		}
+		SDL_UnlockSurface(newV);
+	}
+	return static_cast<BlitFlags>(ret);
 }
 
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -254,7 +318,7 @@ SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 	return texture;
 }
 
-void SDLTextureSprite2D::Invalidate() const
+void SDLTextureSprite2D::Invalidate() const noexcept
 {
 	staleTexture = true;
 	SDLSurfaceSprite2D::Invalidate();

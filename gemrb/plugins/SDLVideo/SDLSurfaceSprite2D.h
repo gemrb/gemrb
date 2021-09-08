@@ -42,6 +42,14 @@ protected:
 	void UpdatePalette() noexcept override;
 	void UpdateColorKey() noexcept override;
 
+	bool IsPaletteStale() const noexcept;
+	// restore the sprite to version 0 (aka original) and free the versioned resources
+	// an 8 bit sprite will be also implicitly restored by SetPalette()
+	virtual void Invalidate() const noexcept;
+	
+	// return a copy of the surface or the palette if 8 bit
+	// this copy is what is returned from GetSurface for rendering
+	void* NewVersion(version_t version) const noexcept;
 public:
 	SDLSurfaceSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLSurfaceSprite2D(const Region&, const PixelFormat& fmt) noexcept;
@@ -58,15 +66,11 @@ public:
 	bool ConvertFormatTo(const PixelFormat& tofmt) noexcept override;
 
 	SDL_Surface* GetSurface() const { return renderedSurface; };
-
-	// return a copy of the surface or the palette if 8 bit
-	// this copy is what is returned from GetSurface for rendering
-	void* NewVersion(version_t version) const;
-	version_t GetVersion() const noexcept { return version; }
-	bool IsPaletteStale() const;
-	// restore the sprite to version 0 (aka original) and free the versioned resources
-	// an 8 bit sprite will be also implicitly restored by SetPalette()
-	virtual void Invalidate() const;
+	
+	// render to 'renderedSurface' any supported options passed in 'flags'
+	// returns the flags which were sucessfully applied
+	// operations are not cumulative and don't permanantly alter the 'surface'
+	BlitFlags RenderWithFlags(BlitFlags flags, const Color* = nullptr) const noexcept;
 };
 
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -78,6 +82,7 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	mutable SDL_Texture* texture = nullptr;
 	mutable bool staleTexture = false;
 	
+	void Invalidate() const noexcept override;
 public:
 	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLTextureSprite2D(const Region&, const PixelFormat& fmt) noexcept;
@@ -86,8 +91,6 @@ public:
 	Holder<Sprite2D> copy() const override;
 	
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
-
-	void Invalidate() const override;
 };
 #endif
 
