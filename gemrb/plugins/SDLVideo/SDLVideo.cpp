@@ -510,7 +510,7 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 		
 		if (oldVersion != newVersion) {
 			if (spr->IsPaletteStale()) {
-				spr->Restore();
+				spr->Invalidate();
 			}
 			SDL_Palette* pal = static_cast<SDL_Palette*>(spr->NewVersion(newVersion));
 
