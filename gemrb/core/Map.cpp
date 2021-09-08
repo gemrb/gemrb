@@ -3927,7 +3927,7 @@ void AreaAnimation::InitAnimation()
 		anim->Flags = Flags;
 		anim->pos = Pos;
 		if (anim->Flags&A_ANI_MIRROR) {
-			anim->MirrorAnimation();
+			anim->MirrorAnimation(BlitFlags::MIRRORX);
 		}
 
 		return anim;

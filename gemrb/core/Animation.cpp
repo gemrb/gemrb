@@ -176,28 +176,23 @@ Animation::frame_t Animation::GetFrame(index_t i) const
 	return frames[i];
 }
 
-void Animation::MirrorAnimation()
+void Animation::MirrorAnimation(BlitFlags flags)
 {
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		frames[i] = video->MirrorSprite(frames[i], BlitFlags::MIRRORX, true);
+		frames[i] = video->MirrorSprite(frames[i], flags & (BlitFlags::MIRRORX | BlitFlags::MIRRORY), true);
 	}
 
-	// flip animArea horizontally as well
-	animArea.x = -animArea.w - animArea.x;
-}
-
-void Animation::MirrorAnimationVert()
-{
-	Video *video = core->GetVideoDriver();
-
-	for (size_t i = 0; i < indicesCount; i++) {
-		frames[i] = video->MirrorSprite(frames[i], BlitFlags::MIRRORY, true);
+	if (flags & BlitFlags::MIRRORX) {
+		// flip animArea horizontally as well
+		animArea.x = -animArea.w - animArea.x;
 	}
-
-	// flip animArea vertically as well
-	animArea.y = -animArea.h - animArea.y;
+	
+	if (flags & BlitFlags::MIRRORY) {
+		// flip animArea vertically as well
+		animArea.y = -animArea.h - animArea.y;
+	}
 }
 
 void Animation::AddAnimArea(const Animation* slave)
