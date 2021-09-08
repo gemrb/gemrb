@@ -61,7 +61,7 @@ public:
 
 	// return a copy of the surface or the palette if 8 bit
 	// this copy is what is returned from GetSurface for rendering
-	virtual void* NewVersion(version_t version) const;
+	void* NewVersion(version_t version) const;
 	version_t GetVersion() const noexcept { return version; }
 	bool IsPaletteStale() const;
 	// restore the sprite to version 0 (aka original) and free the versioned resources
@@ -96,7 +96,6 @@ public:
 	
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
 
-	void* NewVersion(version_t version) const override;
 	void Invalidate() const override;
 };
 #endif

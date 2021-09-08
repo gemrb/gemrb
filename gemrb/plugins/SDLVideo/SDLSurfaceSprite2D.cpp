@@ -250,12 +250,6 @@ SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 	return *texture;
 }
 
-void* SDLTextureSprite2D::NewVersion(version_t version) const
-{
-	staleTexture = true;
-	return SDLSurfaceSprite2D::NewVersion(version);
-}
-
 void SDLTextureSprite2D::Invalidate() const
 {
 	staleTexture = true;
