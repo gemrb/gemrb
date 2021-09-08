@@ -61,6 +61,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, const PixelFormat& fm
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 : SDLSurfaceSprite2D(obj.Frame, nullptr, obj.format)
 {
+	renderFlags = obj.renderFlags;
 	SDL_BlitSurface(obj.surface, nullptr, surface, nullptr);
 }
 
