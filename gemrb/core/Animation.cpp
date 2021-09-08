@@ -181,7 +181,15 @@ void Animation::MirrorAnimation(BlitFlags flags)
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		frames[i] = video->MirrorSprite(frames[i], flags & (BlitFlags::MIRRORX | BlitFlags::MIRRORY), true);
+		frame_t& sprite = frames[i];
+		sprite = video->MirrorSprite(sprite, flags & (BlitFlags::MIRRORX | BlitFlags::MIRRORY));
+		
+		if (flags & BlitFlags::MIRRORX) {
+			sprite->Frame.x = sprite->Frame.w - sprite->Frame.x;
+		}
+		if (flags & BlitFlags::MIRRORY) {
+			sprite->Frame.y = sprite->Frame.h - sprite->Frame.y;
+		}
 	}
 
 	if (flags & BlitFlags::MIRRORX) {

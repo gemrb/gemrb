@@ -183,10 +183,9 @@ void Video::SetEventMgr(EventMgr* evnt)
 	EvntManager = evnt;
 }
 
-// Flips given sprite according to the flags. If MirrorAnchor=true,
-// flips its anchor (i.e. origin/base point) as well
+// Flips given sprite according to the flags.
 // returns new sprite
-Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags, bool MirrorAnchor)
+Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags)
 {
 	if (!sprite)
 		return NULL;
@@ -195,14 +194,10 @@ Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags f
 
 	if (flags&BlitFlags::MIRRORX) {
 		dest->renderFlags ^= BlitFlags::MIRRORX;
-		if (MirrorAnchor)
-			dest->Frame.x = sprite->Frame.w - sprite->Frame.x;
 	}
 
 	if (flags&BlitFlags::MIRRORY) {
 		dest->renderFlags ^= BlitFlags::MIRRORY;
-		if (MirrorAnchor)
-			dest->Frame.y = sprite->Frame.h - sprite->Frame.y;
 	}
 
 	return dest;

@@ -202,7 +202,7 @@ public:
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite, returns new sprite */
-	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags, bool MirrorAnchor);
+	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags);
 
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);
