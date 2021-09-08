@@ -59,36 +59,9 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, const PixelFormat& fm
 {}
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
-: Sprite2D(obj)
+: SDLSurfaceSprite2D(obj.Frame, nullptr, obj.format)
 {
-	pixels = (*obj.surface)->pixels;
-
-	surface = MakeHolder<SurfaceHolder>(
-			SDL_CreateRGBSurfaceFrom(
-				pixels,
-				Frame.w,
-				Frame.h,
-				format.Depth,
-				Frame.w * format.Bpp,
-				format.Rmask,
-				format.Gmask,
-				format.Bmask,
-				format.Amask
-			)
-		);
-	
-	if (format.palette) {
-		UpdatePalette(format.palette);
-	}
-	UpdateColorKey(format.ColorKey);
-	
-	format = PixelFormatForSurface(*surface, obj.format.palette);
-
-	if (pixels == nullptr) {
-		pixels = (*surface)->pixels;
-	}
-	
-	original = surface;
+	SDL_BlitSurface(*obj.surface, nullptr, *surface, nullptr);
 }
 
 void SDLSurfaceSprite2D::SetPaletteFromSurface() const noexcept
