@@ -44,7 +44,7 @@ public:
 					 std::vector<CycleEntry> cycles,
 					 std::vector<index_t> FLTable);
 
-	Animation* GetCycle(index_t cycle);
+	Animation* GetCycle(index_t cycle) const noexcept;
 	/** No descriptions */
 	Holder<Sprite2D> GetFrame(index_t index, index_t cycle = 0) const;
 	Holder<Sprite2D> GetFrameWithoutCycle(index_t index) const;
