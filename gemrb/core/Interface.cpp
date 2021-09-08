@@ -839,28 +839,20 @@ int Interface::LoadSprites()
 	// Load fog-of-war bitmaps
 	anim = (const AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Fog-Of-War bitmaps...");
-	if (!anim || anim->GetCycleSize( 0 ) != 8) {
+	if (!anim) {
 		// unknown type of fog anim
 		Log(ERROR, "Core", "Failed to load Fog-of-War bitmaps.");
 		return GEM_ERROR;
 	}
 
-	FogSprites[1] = anim->GetFrame( 0, 0 );
-	FogSprites[2] = anim->GetFrame( 1, 0 );
-	FogSprites[3] = anim->GetFrame( 2, 0 );
-
-	FogSprites[4] = video->MirrorSprite(FogSprites[1], BlitFlags::MIRRORY);
-
-	assert(FogSprites[4]->renderFlags&BlitFlags::MIRRORY);
-
-	FogSprites[6] = video->MirrorSprite(FogSprites[3], BlitFlags::MIRRORY);
-
-	FogSprites[8] = video->MirrorSprite(FogSprites[2], BlitFlags::MIRRORX);
-	assert(FogSprites[8]->renderFlags&BlitFlags::MIRRORX);
-	FogSprites[9] = video->MirrorSprite(FogSprites[3], BlitFlags::MIRRORX);
-
-	FogSprites[12] = video->MirrorSprite(FogSprites[6], BlitFlags::MIRRORX);
-	assert(FogSprites[12]->renderFlags&BlitFlags::MIRRORX);
+	FogSprites[1] = anim->GetFrame(0, 0); // horizontal edge
+	FogSprites[2] = anim->GetFrame(1, 0); // vertical edge
+	FogSprites[3] = anim->GetFrame(2, 0); // corner
+	FogSprites[4] = FogSprites[1];
+	FogSprites[6] = FogSprites[3];
+	FogSprites[8] = FogSprites[2];
+	FogSprites[9] = FogSprites[3];
+	FogSprites[12] = FogSprites[6];
 
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");

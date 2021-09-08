@@ -24,7 +24,6 @@
 #include "Interface.h"
 #include "Map.h"
 #include "Sprite2D.h"
-#include "Video/Video.h"
 #include "RNG.h"
 
 namespace GemRB {
@@ -178,11 +177,9 @@ Animation::frame_t Animation::GetFrame(index_t i) const
 
 void Animation::MirrorAnimation(BlitFlags flags)
 {
-	Video *video = core->GetVideoDriver();
-
 	for (size_t i = 0; i < indicesCount; i++) {
 		frame_t& sprite = frames[i];
-		sprite = video->MirrorSprite(sprite, flags & (BlitFlags::MIRRORX | BlitFlags::MIRRORY));
+		sprite->renderFlags ^= flags & (BlitFlags::MIRRORX | BlitFlags::MIRRORY);
 		
 		if (flags & BlitFlags::MIRRORX) {
 			sprite->Frame.x = sprite->Frame.w - sprite->Frame.x;
