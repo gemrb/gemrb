@@ -2019,19 +2019,19 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 {
 	PyObject* Value;
 	char* VarName;
-	PyObject* min = NULL;
-	PyObject* max = NULL;
-	PARSE_ARGS( args, "OsO|OO", &self, &VarName, &Value, &min, &max );
+	unsigned int min = Control::INVALID_VALUE;
+	unsigned int max = Control::INVALID_VALUE;
+	PARSE_ARGS(args, "OsO|II", &self, &VarName, &Value, &min, &max);
 
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 	
-	if (min) {
+	if (min != Control::INVALID_VALUE) {
 		// blank out any old varname so we can set the control value without setting the old variable
 		ctrl->VarName[0] = '\0';
 		// this may set the value if its already set outside the range
-		ctrl->SetValueRange(Control::value_t(PyLong_AsUnsignedLong(min)),
-							Control::value_t(PyLong_AsUnsignedLong(max)));
+		ctrl->SetValueRange(Control::value_t(min),
+							Control::value_t(max));
 	}
 	
 	// now that the value range is setup, we can change the dictionary variable
