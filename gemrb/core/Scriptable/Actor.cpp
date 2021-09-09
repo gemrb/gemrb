@@ -1366,6 +1366,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		if (NeedsLevelUp == 1) {
 			displaymsg->DisplayConstantStringName(STR_LEVELUP, DMC_WHITE, actor);
 			actor->GotLUFeedback = true;
+			core->SetEventFlag(EF_PORTRAIT);
 		}
 	}
 }
