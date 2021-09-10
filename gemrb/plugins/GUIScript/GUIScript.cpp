@@ -1963,8 +1963,8 @@ control, which has various uses.\n\
 
 static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 {
-	int status;
-	PARSE_ARGS( args, "Oi", &self, &status );
+	Button::State status;
+	PARSE_ARGS(args, "OB", &self, &status);
 
 	Control* ctrl = GetView<Control>(self);
 	if (ctrl == NULL) {
@@ -3548,8 +3548,8 @@ is a checkbox or a radio button though, their states are handled internally.\n\
 
 static PyObject* GemRB_Button_SetState(PyObject* self, PyObject* args)
 {
-	int state;
-	PARSE_ARGS( args,  "Oi", &self, &state );
+	Button::State state;
+	PARSE_ARGS(args,  "OB", &self, &state);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
@@ -10574,10 +10574,10 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	packtype row;
 
 	row.data = GUIAction[Index];
-	SetButtonCycle(bam, btn, (char) row.bytes[0], IE_GUI_BUTTON_UNPRESSED);
-	SetButtonCycle(bam, btn, (char) row.bytes[1], IE_GUI_BUTTON_PRESSED);
-	SetButtonCycle(bam, btn, (char) row.bytes[2], IE_GUI_BUTTON_SELECTED);
-	SetButtonCycle(bam, btn, (char) row.bytes[3], IE_GUI_BUTTON_DISABLED);
+	SetButtonCycle(bam, btn, (char) row.bytes[0], Button::UNPRESSED);
+	SetButtonCycle(bam, btn, (char) row.bytes[1], Button::PRESSED);
+	SetButtonCycle(bam, btn, (char) row.bytes[2], Button::SELECTED);
+	SetButtonCycle(bam, btn, (char) row.bytes[3], Button::DISABLED);
 	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_NAND);
 	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
 	PyObject *func = PyDict_GetItem(dict, Event);
@@ -10714,16 +10714,16 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		}
 
 		if (!Picture) {
-			btn->SetState(IE_GUI_BUTTON_DISABLED);
+			btn->SetState(Button::DISABLED);
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET);
 			btn->SetTooltip(L"");
 		} else {
-			SetButtonCycle(bam, btn, 0, IE_GUI_BUTTON_UNPRESSED);
-			SetButtonCycle(bam, btn, 1, IE_GUI_BUTTON_PRESSED);
-			SetButtonCycle(bam, btn, 2, IE_GUI_BUTTON_SELECTED);
-			SetButtonCycle(bam, btn, 3, IE_GUI_BUTTON_DISABLED);
+			SetButtonCycle(bam, btn, 0, Button::UNPRESSED);
+			SetButtonCycle(bam, btn, 1, Button::PRESSED);
+			SetButtonCycle(bam, btn, 2, Button::SELECTED);
+			SetButtonCycle(bam, btn, 3, Button::DISABLED);
 			btn->SetPicture( Picture );
-			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
+			btn->SetState(Button::UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET);
 
 			SetViewTooltipFromRef(btn, item.Tooltip);
@@ -10731,7 +10731,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			if (item.Charges && item.Charges != 0xffff) {
 				SetItemText(btn, item.Charges, false);
 			} else if (!item.Charges && item.ChargeDepletion == CHG_NONE) {
-				btn->SetState(IE_GUI_BUTTON_DISABLED);
+				btn->SetState(Button::DISABLED);
 			}
 		}
 	}
@@ -10889,7 +10889,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			else if ( (action>=ACT_IWDQSONG) && (action<=ACT_IWDQSONG+9) ) action = ACT_IWDQSONG;
 		}
 
-		int state = IE_GUI_BUTTON_UNPRESSED;
+		Button::State state = Button::UNPRESSED;
 		ieDword modalstate = actor->Modal.State;
 		int type;
 		std::vector<ItemExtHeader> itemdata; // not really used!
@@ -10901,7 +10901,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 				type = 1<<IE_SPELL_TYPE_INNATE;
 			}
 			if (!actor->spellbook.GetSpellInfoSize(type)) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			}
 			break;
 		case ACT_CAST:
@@ -10913,7 +10913,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			}
 			//returns true if there are ANY spells to cast
 			if (!actor->spellbook.GetSpellInfoSize(type) || !actor->GetAnyActiveCasterLevel()) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			}
 			break;
 		case ACT_BARD:
@@ -10933,7 +10933,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			}
 			//returns true if there is ANY shape
 			if (!actor->spellbook.GetSpellInfoSize(type)) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			}
 			break;
 		case ACT_WILDSHAPE:
@@ -10945,65 +10945,65 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			}
 			//returns true if there is ANY shape
 			if (!actor->spellbook.GetSpellInfoSize(type)) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			}
 			break;
 		case ACT_USE:
 			//returns true if there is ANY equipment
 			if (!actor->inventory.GetEquipmentInfo(itemdata, 0, 0)) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			}
 			break;
 		case ACT_BARDSONG:
 			if (actor->spellbook.IsIWDSpellBook()) {
 				type = 1<<IE_IWD2_SPELL_SONG;
 				if (!actor->spellbook.GetSpellInfoSize(type)) {
-					state = IE_GUI_BUTTON_DISABLED;
+					state = Button::DISABLED;
 				} else if (modalstate == MS_BATTLESONG) {
-					state = IE_GUI_BUTTON_SELECTED;
+					state = Button::SELECTED;
 				}
 			} else {
 				if (modalstate==MS_BATTLESONG) {
-					state = IE_GUI_BUTTON_SELECTED;
+					state = Button::SELECTED;
 				}
 			}
 			break;
 		case ACT_TURN:
 			if (actor->GetStat(IE_TURNUNDEADLEVEL)<1) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			} else {
 				if (modalstate==MS_TURNUNDEAD) {
-					state = IE_GUI_BUTTON_SELECTED;
+					state = Button::SELECTED;
 				}
 			}
 			break;
 		case ACT_STEALTH:
 			if (!CanUseActionButton(actor, action)) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			} else {
 				if (modalstate==MS_STEALTH) {
-					state = IE_GUI_BUTTON_SELECTED;
+					state = Button::SELECTED;
 				}
 			}
 			break;
 		case ACT_SEARCH:
 			//in IWD2 everyone can try to search, in bg2 only thieves get the icon
 			if (!CanUseActionButton(actor, action)) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			} else {
 				if (modalstate == MS_DETECTTRAPS) {
-					state = IE_GUI_BUTTON_SELECTED;
+					state = Button::SELECTED;
 				}
 			}
 			break;
 		case ACT_THIEVING:
 			if (!CanUseActionButton(actor, action)) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			}
 			break;
 		case ACT_TAMING:
 			if (actor->GetStat(IE_ANIMALS)<=0 ) {
-				state = IE_GUI_BUTTON_DISABLED;
+				state = Button::DISABLED;
 			}
 			break;
 		case ACT_WEAPON1:
@@ -11045,9 +11045,9 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
 						if (gc->GetTargetMode() == TARGET_MODE_ATTACK) {
-							state = IE_GUI_BUTTON_SELECTED;
+							state = Button::SELECTED;
 						} else {
-							state = IE_GUI_BUTTON_FAKEDISABLED;
+							state = Button::FAKEDISABLED;
 						}
 					} else {
 						btn->EnableBorder(0, false);
@@ -11092,7 +11092,7 @@ jump_label2:
 				SetSpellIcon(btn, poi, 1, 1, i+1);
 				int mem = actor->spellbook.GetMemorizedSpellsCount(*poi, -1, true);
 				if (!mem) {
-					state = IE_GUI_BUTTON_FAKEDISABLED;
+					state = Button::FAKEDISABLED;
 				}
 				SetItemText(btn, mem, true);
 			}
@@ -11159,14 +11159,14 @@ jump_label:
 		}
 		ieDword disabledbutton = actor->GetStat(IE_DISABLEDBUTTON);
 		if (action<0 || (action <= ACT_SKILLS && (disabledbutton & (1<<action) ))) {
-			state = IE_GUI_BUTTON_DISABLED;
+			state = Button::DISABLED;
 		} else if (action >= ACT_QSPELL1 && action <= ACT_QSPELL3 && (disabledbutton & (1<<ACT_CAST))) {
-			state = IE_GUI_BUTTON_DISABLED;
+			state = Button::DISABLED;
 		}
 		btn->SetState(state);
 		//you have to set this overlay up
 		// this state check looks bizzare, but without it most buttons get misrendered
-		btn->EnableBorder(1, state==IE_GUI_BUTTON_DISABLED);
+		btn->EnableBorder(1, state == Button::DISABLED);
 	}
 	Py_RETURN_NONE;
 }

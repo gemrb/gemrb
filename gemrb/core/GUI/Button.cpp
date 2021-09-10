@@ -43,7 +43,6 @@ Button::Button(const Region& frame)
 	buttonImages()
 {
 	ControlType = IE_GUI_BUTTON;
-	State = IE_GUI_BUTTON_UNPRESSED;
 	HotKeyCallback = METHOD_CALLBACK(&Button::HandleHotKey, this);
 
 	hasText = false;
@@ -147,16 +146,16 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	if (!( flags & IE_GUI_BUTTON_NO_IMAGE )) {
 		Holder<Sprite2D> Image;
 
-		switch (State) {
-			case IE_GUI_BUTTON_FAKEPRESSED:
-			case IE_GUI_BUTTON_PRESSED:
+		switch (ButtonState) {
+			case FAKEPRESSED:
+			case PRESSED:
 				Image = buttonImages[BUTTON_IMAGE_PRESSED];
 				break;
-			case IE_GUI_BUTTON_SELECTED:
+			case SELECTED:
 				Image = buttonImages[BUTTON_IMAGE_SELECTED];
 				break;
-			case IE_GUI_BUTTON_DISABLED:
-			case IE_GUI_BUTTON_FAKEDISABLED:
+			case DISABLED:
+			case FAKEDISABLED:
 				Image = buttonImages[BUTTON_IMAGE_DISABLED];
 				break;
 			default:
@@ -170,7 +169,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		}
 	}
 
-	if (State == IE_GUI_BUTTON_PRESSED) {
+	if (ButtonState == PRESSED) {
 		//shift the writing/border a bit
 		rgn.x += PushOffset.x;
 		rgn.y += PushOffset.y;
@@ -287,7 +286,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		}
 		
 		Color c = textColor;
-		if (State == IE_GUI_BUTTON_DISABLED || IsDisabled()) {
+		if (ButtonState == DISABLED || IsDisabled()) {
 			c.r *= 0.66;
 			c.g *= 0.66;
 			c.b *= 0.66;
@@ -331,18 +330,18 @@ void Button::FlagsChanged(unsigned int /*oldflags*/)
 }
 
 /** Sets the Button State */
-void Button::SetState(unsigned char state)
+void Button::SetState(State state)
 {
-	if (state > IE_GUI_BUTTON_LOCKED_PRESSED) {// If wrong value inserted
+	if (state > LOCKED_PRESSED) {// If wrong value inserted
 		return;
 	}
 
 	// FIXME: we should properly consolidate IE_GUI_BUTTON_DISABLED with the view Disabled flag
-	SetDisabled(state == IE_GUI_BUTTON_DISABLED);
+	SetDisabled(state == DISABLED);
 
-	if (State != state) {
+	if (ButtonState != state) {
 		MarkDirty();
-		State = state;
+		ButtonState = state;
 	}
 }
 
@@ -508,11 +507,11 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 	}
     
 	if (me.button == GEM_MB_ACTION) {
-		if (State == IE_GUI_BUTTON_LOCKED) {
-			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
+		if (ButtonState == LOCKED) {
+			SetState(PRESSED);
 			return true;
 		}
-		SetState( IE_GUI_BUTTON_PRESSED );
+		SetState(PRESSED);
 		if (flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound(DS_BUTTON_PRESSED, SFX_CHAN_GUI);
 		}
@@ -535,16 +534,16 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		}
 	}
 
-	switch (State) {
-	case IE_GUI_BUTTON_PRESSED:
+	switch (ButtonState) {
+	case PRESSED:
 		if (ToggleState) {
-			SetState( IE_GUI_BUTTON_SELECTED );
+			SetState(SELECTED);
 		} else {
-			SetState( IE_GUI_BUTTON_UNPRESSED );
+			SetState(UNPRESSED);
 		}
 		break;
-	case IE_GUI_BUTTON_LOCKED_PRESSED:
-		SetState( IE_GUI_BUTTON_LOCKED );
+	case LOCKED_PRESSED:
+		SetState(LOCKED);
 		break;
 	}
 
@@ -554,7 +553,7 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 
 bool Button::OnMouseOver(const MouseEvent& me)
 {
-	if (State == IE_GUI_BUTTON_LOCKED) {
+	if (ButtonState == LOCKED) {
 		return true;
 	}
 
@@ -566,7 +565,7 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 	Control::OnMouseEnter(me, dop);
 
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
-		SetState( IE_GUI_BUTTON_PRESSED );
+		SetState(PRESSED);
 	}
 
 	for (const auto& border : borders) {
@@ -583,8 +582,8 @@ void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 {
 	Control::OnMouseLeave(me, dop);
 
-	if (State == IE_GUI_BUTTON_PRESSED && (dop == nullptr || dop->dragView == this)) {
-		SetState( IE_GUI_BUTTON_UNPRESSED );
+	if (ButtonState == PRESSED && (dop == nullptr || dop->dragView == this)) {
+		SetState(UNPRESSED);
 	}
 
 	if (pulseBorder) {
@@ -636,9 +635,9 @@ void Button::UpdateState(value_t Sum)
 	}
 
 	if (ToggleState) {
-		SetState(IE_GUI_BUTTON_SELECTED);
+		SetState(SELECTED);
 	} else {
-		SetState(IE_GUI_BUTTON_UNPRESSED);
+		SetState(UNPRESSED);
 	}
 }
 
