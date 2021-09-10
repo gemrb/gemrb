@@ -122,7 +122,7 @@ void Control::FlagsChanged(unsigned int /*oldflags*/)
 
 void Control::UpdateState(const char* varname, value_t val)
 {
-	if (strnicmp(VarName, varname, MAX_VARIABLE_LENGTH-1) == 0) {
+	if (VarName == varname) {
 		UpdateState(val);
 	}
 }
@@ -251,7 +251,7 @@ bool Control::AcceptsDragOperation(const DragOp& dop) const
 	if (cdop) {
 		assert(cdop->dragView != this);
 		// if 2 controls share the same VarName we assume they are swappable...
-		return (strnicmp(VarName, cdop->Source()->VarName, MAX_VARIABLE_LENGTH-1) == 0);
+		return (VarName == cdop->Source()->VarName);
 	}
 	
 	return View::AcceptsDragOperation(dop);
