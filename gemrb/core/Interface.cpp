@@ -3615,7 +3615,7 @@ void Interface::LoadProgress(int percent)
 	const Window* loadwin = GetWindow(0, "LOADWIN");
 	if (loadwin) {
 		// loadwin is NULL when LoadMap is called and passes false for the loadscreen param
-		loadwin->RedrawControls("Progress", percent);
+		loadwin->RedrawControls("Progress");
 	}
 
 	video->SwapBuffers();

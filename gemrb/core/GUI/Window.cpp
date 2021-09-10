@@ -265,8 +265,10 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::RedrawControls(const Control::varname_t& VarName, Control::value_t val) const
+void Window::RedrawControls(const Control::varname_t& VarName) const
 {
+	Control::value_t val = Control::INVALID_VALUE;
+	core->GetDictionary()->Lookup(VarName, val);
 	for (auto ctrl : Controls) {
 		ctrl->UpdateState(VarName, val);
 	}

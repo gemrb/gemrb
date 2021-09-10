@@ -155,7 +155,7 @@ void Control::SetValue(value_t val)
 		
 		const Window* win = GetWindow();
 		if (win) {
-			win->RedrawControls(VarName, curVal);
+			win->RedrawControls(VarName);
 		} else {
 			UpdateState(VarName, curVal);
 		}
@@ -214,9 +214,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 		SetActionInterval(repeatDelay);
 
 		if (IsDictBound()) {
-			value_t val = GetValue();
-			core->GetDictionary()->SetAt(VarName, val);
-			window->RedrawControls(VarName, val);
+			SetValue(GetValue());
 		}
 
 		return action(this);
