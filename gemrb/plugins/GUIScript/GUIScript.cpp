@@ -10700,8 +10700,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		}
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
 		btn->SetAction(PythonControlCallback(Function), Control::Click, GEM_MB_ACTION, 0, 1);
-		btn->VarName = "Equipment";
-		btn->SetValue( Start+i );
+		btn->BindDictVariable("Equipment", Start + i);
 
 		const ItemExtHeader& item = ItemArray[i];
 		Holder<Sprite2D> Picture;
@@ -13840,7 +13839,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	if (PyObject_IsInstance(obj, controlClass)) {
 		const Control* ctl = static_cast<Control*>(GetView(ref));
 		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
-		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->VarName));
+		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->DictVariable()));
 		PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, ctl->GetValue()));
 	} else if (PyObject_IsInstance(obj, windowClass)) {
 		const Window* win = static_cast<Window*>(GetView(ref));

@@ -69,8 +69,8 @@ void Slider::SetPosition(unsigned int pos)
 	if (pos <= KnobStepsCount) {
 		Pos = pos;
 	}
-	if (VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, pos * GetValue() );
+	if (IsDictBound()) {
+		core->GetDictionary()->SetAt(DictVariable(), pos * GetValue());
 	}
 	MarkDirty();
 }

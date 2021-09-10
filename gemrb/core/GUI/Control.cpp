@@ -39,7 +39,6 @@ const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeri
 Control::Control(const Region& frame)
 : View(frame) // dont pass superview to View constructor
 {
-	VarName[0] = 0;
 	SetValueRange(MaxValueRange);
 
 	ControlType = IE_GUI_INVALID;
@@ -144,7 +143,7 @@ void Control::SetValue(value_t val)
 	value_t oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
 	
-	if (VarName[0] != 0) {
+	if (IsDictBound()) {
 		// set this even when the value doesn't change
 		// if a radio is clicked, then one of its siblings, the siblings value wont change
 		// but we expect the dictionary to reflect the selected value
@@ -195,6 +194,11 @@ void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange ran
 	}
 }
 
+bool Control::IsDictBound() const noexcept
+{
+	return !VarName.IsEmpty();
+}
+
 void Control::ClearActionTimer()
 {
 	if (actionTimer) {
@@ -209,7 +213,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 		// update the timer to use the actual repeatDelay
 		SetActionInterval(repeatDelay);
 
-		if (VarName[0] != 0) {
+		if (IsDictBound()) {
 			value_t val = GetValue();
 			core->GetDictionary()->SetAt(VarName, val);
 			window->RedrawControls(VarName, val);

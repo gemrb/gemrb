@@ -133,11 +133,9 @@ public: // Public attributes
 		}
 	};
 	
+	using varname_t = FixedSizeString<MAX_VARIABLE_LENGTH, strnicmp>;
 	using value_t = ieDword;
 	static constexpr value_t INVALID_VALUE = -1;
-
-	using varname_t = FixedSizeString<MAX_VARIABLE_LENGTH, strnicmp>;
-	varname_t VarName;
 
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;
@@ -191,6 +189,8 @@ public:
 	void SetValueRange(value_t min, value_t max = std::numeric_limits<value_t>::max());
 	
 	void BindDictVariable(const varname_t& var, value_t val, ValueRange range = MaxValueRange) noexcept;
+	bool IsDictBound() const noexcept;
+	const varname_t& DictVariable() const noexcept { return VarName; }
 
 protected:
 	using ActionKey = ControlActionResponder::ActionKey;
@@ -233,7 +233,7 @@ private:
 	/** the value of the control to add to the variable */
 	value_t Value = INVALID_VALUE;
 	ValueRange range;
-
+	varname_t VarName;
 };
 
 

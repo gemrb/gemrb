@@ -216,7 +216,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	cursor = pic;
 
 	// FIXME: this VarName is not consistant
-	dragDummy.VarName = "itembutton";
+	dragDummy.BindDictVariable("itembutton", Control::INVALID_VALUE);
 }
 
 Interface::Interface()

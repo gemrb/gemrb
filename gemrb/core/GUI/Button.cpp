@@ -643,12 +643,12 @@ void Button::DoToggle()
 			SetState( IE_GUI_BUTTON_SELECTED );
 		else
 			SetState( IE_GUI_BUTTON_UNPRESSED );
-		if (VarName[0] != 0) {
+		if (IsDictBound()) {
 			ieDword tmp = 0;
-			core->GetDictionary()->Lookup( VarName, tmp );
+			core->GetDictionary()->Lookup(DictVariable(), tmp);
 			tmp ^= GetValue();
-			core->GetDictionary()->SetAt( VarName, tmp );
-			window->RedrawControls( VarName, tmp );
+			core->GetDictionary()->SetAt(DictVariable(), tmp);
+			window->RedrawControls(DictVariable(), tmp);
 		}
 	} else {
 		if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
@@ -656,10 +656,10 @@ void Button::DoToggle()
 			ToggleState = true;
 			SetState( IE_GUI_BUTTON_SELECTED );
 		}
-		if (VarName[0] != 0) {
+		if (IsDictBound()) {
 			ieDword val = GetValue();
-			core->GetDictionary()->SetAt( VarName, val );
-			window->RedrawControls( VarName, val );
+			core->GetDictionary()->SetAt(DictVariable(), val);
+			window->RedrawControls(DictVariable(), val);
 		}
 	}
 }

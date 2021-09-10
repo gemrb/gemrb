@@ -239,7 +239,6 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps)
 	assert(ftext && finit);
 
 	ControlType = IE_GUI_TEXTAREA;
-	VarName = "Selected";
 
 	selectOptions = NULL;
 	textContainer = NULL;
@@ -254,6 +253,8 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps)
 	scrollview.SetScrollIncrement(LineHeight());
 	scrollview.SetAutoResizeFlags(ResizeAll, OP_SET);
 	scrollview.SetFlags(View::IgnoreEvents, (Flags()&View::IgnoreEvents) ? OP_OR : OP_NAND);
+	
+	BindDictVariable("Selected", Control::INVALID_VALUE);
 }
 
 TextArea::~TextArea()
@@ -549,7 +550,7 @@ void TextArea::UpdateState(value_t optIdx)
 		return;
 	}
 
-	if (!VarName[0]) {
+	if (!IsDictBound()) {
 		return;
 	}
 	
