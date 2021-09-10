@@ -2035,7 +2035,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	}
 	
 	// now that the value range is setup, we can change the dictionary variable
-	strnlwrcpy(ctrl->VarName, VarName, MAX_VARIABLE_LENGTH - 1);
+	ctrl->VarName = VarName;
 	
 	Control::value_t val = (ieDword)PyInt_AsUnsignedLongMask(Value);
 	ctrl->SetValue(val);
@@ -10722,7 +10722,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		}
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
 		btn->SetAction(PythonControlCallback(Function), Control::Click, GEM_MB_ACTION, 0, 1);
-		strcpy(btn->VarName,"Equipment");
+		btn->VarName = "Equipment";
 		btn->SetValue( Start+i );
 
 		const ItemExtHeader& item = ItemArray[i];

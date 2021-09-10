@@ -136,8 +136,8 @@ public: // Public attributes
 	using value_t = ieDword;
 	static constexpr value_t INVALID_VALUE = -1;
 
-	/** Variable length is 40-1 (zero terminator) */
-	char VarName[MAX_VARIABLE_LENGTH];
+	using varname_t = FixedSizeString<MAX_VARIABLE_LENGTH, strnicmp>;
+	varname_t VarName;
 
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;

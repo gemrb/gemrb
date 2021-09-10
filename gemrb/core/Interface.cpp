@@ -216,7 +216,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	cursor = pic;
 
 	// FIXME: this VarName is not consistant
-	strnlwrcpy(dragDummy.VarName, "itembutton", MAX_VARIABLE_LENGTH - 1);
+	dragDummy.VarName = "itembutton";
 }
 
 Interface::Interface()

@@ -239,7 +239,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps)
 	assert(ftext && finit);
 
 	ControlType = IE_GUI_TEXTAREA;
-	strncpy(VarName, "Selected", sizeof(VarName));
+	VarName = "Selected";
 
 	selectOptions = NULL;
 	textContainer = NULL;
