@@ -73,13 +73,6 @@ using ControlActionResponder = View::ActionResponder<Control*>;
 using ControlEventHandler = ControlActionResponder::Responder;
 
 class GEM_EXPORT Control : public View, public ControlActionResponder {
-private:
-	void ClearActionTimer();
-	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
-
-	void HandleTouchActionTimer(const Control*);
-    
 public: // Public attributes
 	enum Action : ControlActionResponder::Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
@@ -234,6 +227,12 @@ private:
 	value_t Value = INVALID_VALUE;
 	ValueRange range;
 	varname_t VarName;
+	
+	void ClearActionTimer();
+	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
+
+	void HandleTouchActionTimer(const Control*);
 };
 
 
