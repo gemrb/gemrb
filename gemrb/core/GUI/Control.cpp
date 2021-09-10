@@ -147,7 +147,17 @@ void Control::SetValue(value_t val)
 		// set this even when the value doesn't change
 		// if a radio is clicked, then one of its siblings, the siblings value wont change
 		// but we expect the dictionary to reflect the selected value
-		core->GetDictionary()->SetAt(VarName, Value);
+		value_t curVal = INVALID_VALUE;
+		core->GetDictionary()->Lookup(VarName, curVal);
+		curVal = GetDictValue(curVal);
+		core->GetDictionary()->SetAt(VarName, curVal);
+		
+		const Window* win = GetWindow();
+		if (win) {
+			win->RedrawControls(VarName, curVal);
+		} else {
+			UpdateState(VarName, curVal);
+		}
 	}
 
 	if (oldVal != Value) {
@@ -181,17 +191,6 @@ void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange ran
 	// now that the value range is setup, we can change the dictionary variable
 	VarName = var;
 	SetValue(val);
-	
-	Control::value_t curVal = Control::INVALID_VALUE;
-	core->GetDictionary()->Lookup(VarName, curVal);
-	assert(curVal == GetValue());
-
-	const Window* win = GetWindow();
-	if (win) {
-		win->RedrawControls(VarName, curVal);
-	} else {
-		UpdateState(VarName, curVal);
-	}
 }
 
 bool Control::IsDictBound() const noexcept

@@ -609,19 +609,27 @@ void Button::SetText(const String& string)
 	MarkDirty();
 }
 
+Control::value_t Button::GetDictValue(value_t curDictVal) const noexcept
+{
+	if (flags & IE_GUI_BUTTON_CHECKBOX) {
+		if (curDictVal == Control::INVALID_VALUE) {
+			curDictVal = 0;
+		}
+		return curDictVal ^ GetValue();
+	}
+	
+	return GetValue();
+}
+
 /** Refresh a button from a given radio button group */
 void Button::UpdateState(value_t Sum)
 {
-	if (IsDisabled()) {
-		return;
-	}
-
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		//radio button, exact value
-		ToggleState = ( Sum == GetValue() );
+		ToggleState = Sum == GetValue();
 	} else if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox, bitvalue
-		ToggleState = !!( Sum & GetValue() );
+		ToggleState = bool(Sum & GetValue());
 	} else {
 		//other buttons, nothing to redraw
 		return;
@@ -636,31 +644,8 @@ void Button::UpdateState(value_t Sum)
 
 void Button::DoToggle()
 {
-	if (flags & IE_GUI_BUTTON_CHECKBOX) {
-		//checkbox
-		ToggleState = !ToggleState;
-		if (ToggleState)
-			SetState( IE_GUI_BUTTON_SELECTED );
-		else
-			SetState( IE_GUI_BUTTON_UNPRESSED );
-		if (IsDictBound()) {
-			ieDword tmp = 0;
-			core->GetDictionary()->Lookup(DictVariable(), tmp);
-			tmp ^= GetValue();
-			core->GetDictionary()->SetAt(DictVariable(), tmp);
-			window->RedrawControls(DictVariable(), tmp);
-		}
-	} else {
-		if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
-			//radio button
-			ToggleState = true;
-			SetState( IE_GUI_BUTTON_SELECTED );
-		}
-		if (IsDictBound()) {
-			ieDword val = GetValue();
-			core->GetDictionary()->SetAt(DictVariable(), val);
-			window->RedrawControls(DictVariable(), val);
-		}
+	if (flags & (IE_GUI_BUTTON_CHECKBOX | IE_GUI_BUTTON_RADIOBUTTON)) {
+		SetValue(GetValue());
 	}
 }
 

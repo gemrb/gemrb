@@ -233,6 +233,8 @@ private:
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 	void HandleTouchActionTimer(const Control*);
+	
+	virtual value_t GetDictValue(value_t /*curDictVal*/) const noexcept { return Value; }
 };
 
 
