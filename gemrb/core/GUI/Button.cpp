@@ -48,7 +48,6 @@ Button::Button(const Region& frame)
 	hasText = false;
 	SetFont(core->GetButtonFont());
 	SetFlags(IE_GUI_BUTTON_NORMAL, OP_OR);
-	ToggleState = false;
 	pulseBorder = false;
 	Picture = NULL;
 	Clipping = 1.0;
@@ -534,17 +533,8 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		}
 	}
 
-	switch (ButtonState) {
-	case PRESSED:
-		if (ToggleState) {
-			SetState(SELECTED);
-		} else {
-			SetState(UNPRESSED);
-		}
-		break;
-	case LOCKED_PRESSED:
+	if (ButtonState == LOCKED_PRESSED) {
 		SetState(LOCKED);
-		break;
 	}
 
 	DoToggle();
@@ -623,22 +613,19 @@ Control::value_t Button::GetDictValue(value_t curDictVal) const noexcept
 /** Refresh a button from a given radio button group */
 void Button::UpdateState(value_t Sum)
 {
+	State state = UNPRESSED;
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		//radio button, exact value
-		ToggleState = Sum == GetValue();
+		state = Sum == GetValue() ? SELECTED : UNPRESSED;
 	} else if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox, bitvalue
-		ToggleState = bool(Sum & GetValue());
+		state = bool(Sum & GetValue()) ? SELECTED : UNPRESSED;
 	} else {
 		//other buttons, nothing to redraw
 		return;
 	}
 
-	if (ToggleState) {
-		SetState(SELECTED);
-	} else {
-		SetState(UNPRESSED);
-	}
+	SetState(state);
 }
 
 void Button::DoToggle()

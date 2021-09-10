@@ -170,7 +170,6 @@ private: // Private attributes
 	String Text;
 	bool hasText;
 	Font* font;
-	bool ToggleState;
 	bool pulseBorder;
 	Color textColor = ColorWhite;
 
