@@ -124,6 +124,7 @@ void Control::UpdateState(const varname_t& varname, value_t val)
 {
 	if (VarName == varname) {
 		UpdateState(val);
+		MarkDirty();
 	}
 }
 

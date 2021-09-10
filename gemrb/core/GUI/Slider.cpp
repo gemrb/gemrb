@@ -109,7 +109,6 @@ void Slider::UpdateState(value_t Sum)
 	if (Sum <= KnobStepsCount) {
 		Pos = Sum;
 	}
-	MarkDirty();
 }
 
 /** Sets the selected image */
