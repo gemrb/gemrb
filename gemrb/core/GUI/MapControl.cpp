@@ -78,11 +78,6 @@ void MapControl::DrawFog(const Region& rgn) const
 
 	video->DrawPoints(points, ColorBlack);
 }
-
-void MapControl::UpdateState(value_t val)
-{
-	SetValue(val);
-}
 	
 Point MapControl::ConvertPointToGame(Point p) const
 {

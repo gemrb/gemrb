@@ -67,8 +67,6 @@ public:
 
 	MapControl(const Region& frame, AnimationFactory* af);
 
-	/** Refreshes the control after its associated variable has changed */
-	void UpdateState(value_t) override;
 	bool IsAnimated() const override { return true; } // map must constantly update actor positions
 
 private:
