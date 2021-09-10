@@ -2026,30 +2026,8 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 	
-	if (min != Control::INVALID_VALUE) {
-		// blank out any old varname so we can set the control value without setting the old variable
-		ctrl->VarName[0] = '\0';
-		// this may set the value if its already set outside the range
-		ctrl->SetValueRange(Control::value_t(min),
-							Control::value_t(max));
-	}
-	
-	// now that the value range is setup, we can change the dictionary variable
-	ctrl->VarName = VarName;
-	
 	Control::value_t val = (ieDword)PyInt_AsUnsignedLongMask(Value);
-	ctrl->SetValue(val);
-	
-	/* it is possible to set up a default value, if Lookup returns false, use it */
-	Control::value_t curVal = Control::INVALID_VALUE;
-	core->GetDictionary()->Lookup(VarName, curVal);
-
-	const Window* win = ctrl->GetWindow();
-	if (win) {
-		win->RedrawControls(VarName, curVal);
-	} else {
-		ctrl->UpdateState(VarName, curVal);
-	}
+	ctrl->BindDictVariable(VarName, val, Control::ValueRange(min, max));
 
 	Py_RETURN_NONE;
 }

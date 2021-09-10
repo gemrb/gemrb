@@ -170,6 +170,31 @@ void Control::SetValueRange(value_t min, value_t max)
 	SetValueRange(ValueRange(min, max));
 }
 
+void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange range) noexcept
+{
+	if (range.first != Control::INVALID_VALUE) {
+		// blank out any old varname so we can set the control value without setting the old variable
+		VarName[0] = '\0';
+		// this may set the value if its already set outside the range
+		SetValueRange(range);
+	}
+	
+	// now that the value range is setup, we can change the dictionary variable
+	VarName = var;
+	SetValue(val);
+	
+	Control::value_t curVal = Control::INVALID_VALUE;
+	core->GetDictionary()->Lookup(VarName, curVal);
+	assert(curVal == GetValue());
+
+	const Window* win = GetWindow();
+	if (win) {
+		win->RedrawControls(VarName, curVal);
+	} else {
+		UpdateState(VarName, curVal);
+	}
+}
+
 void Control::ClearActionTimer()
 {
 	if (actionTimer) {
