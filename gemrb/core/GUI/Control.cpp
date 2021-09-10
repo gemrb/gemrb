@@ -120,7 +120,7 @@ void Control::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
-void Control::UpdateState(const char* varname, value_t val)
+void Control::UpdateState(const varname_t& varname, value_t val)
 {
 	if (VarName == varname) {
 		UpdateState(val);

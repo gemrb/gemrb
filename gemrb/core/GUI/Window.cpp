@@ -265,7 +265,7 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::RedrawControls(const char* VarName, Control::value_t val) const
+void Window::RedrawControls(const Control::varname_t& VarName, Control::value_t val) const
 {
 	for (auto ctrl : Controls) {
 		ctrl->UpdateState(VarName, val);

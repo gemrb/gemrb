@@ -153,7 +153,7 @@ public:
 	virtual void SetText(const String&) {};
 
 	/** Update the control if it's tied to a GUI variable */
-	void UpdateState(const char*, value_t);
+	void UpdateState(const varname_t&, value_t);
 	virtual void UpdateState(value_t) {}
 
 	/** Returns the Owner */
