@@ -535,6 +535,8 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 
 	if (ButtonState == LOCKED_PRESSED) {
 		SetState(LOCKED);
+	} else {
+		SetState(UNPRESSED);
 	}
 
 	DoToggle();
