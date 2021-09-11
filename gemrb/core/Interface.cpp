@@ -3606,16 +3606,14 @@ void Interface::DelTree(const char* Pt, bool onlysave) const
 
 void Interface::LoadProgress(int percent)
 {
-	vars->SetAt("Progress", percent);
-
 	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	winmgr->DrawWindows();
 	winmgr->SetCursorFeedback(cur);
 
-	const Window* loadwin = GetWindow(0, "LOADWIN");
-	if (loadwin) {
+	Control* prog = GetControl<Control>("LOAD_PROG", 0);
+	if (prog) {
 		// loadwin is NULL when LoadMap is called and passes false for the loadscreen param
-		loadwin->RedrawControls("Progress");
+		prog->SetValue(percent);
 	}
 
 	video->SwapBuffers();

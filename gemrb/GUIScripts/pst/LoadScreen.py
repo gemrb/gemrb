@@ -49,7 +49,6 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 	Window.SetBackground (LoadPic)
 
 	def EndLoadScreen ():
-		GemRB.SetVar ("Progress", 0)
 		Skull = Window.GetControl (1)
 		Skull.SetMOS ("GSKULON")
 		
@@ -58,8 +57,8 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 		return
 	
 	Bar = Window.GetControl (0)
-	Progress = GemRB.GetVar ("Progress")
-	Bar.SetVarAssoc ("Progress", Progress)
+	Bar.AddAlias("LOAD_PROG")
+	Bar.SetVarAssoc ("Progress", 0)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	Skull = Window.GetControl (1)
 	Skull.SetMOS ("GSKULOFF")
