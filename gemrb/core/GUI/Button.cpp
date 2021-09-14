@@ -600,16 +600,13 @@ void Button::SetText(const String& string)
 	MarkDirty();
 }
 
-Control::value_t Button::GetDictValue(value_t curDictVal) const noexcept
+BitOp Button::GetDictOp() const noexcept
 {
 	if (flags & IE_GUI_BUTTON_CHECKBOX) {
-		if (curDictVal == Control::INVALID_VALUE) {
-			curDictVal = 0;
-		}
-		return curDictVal ^ GetValue();
+		return BitOp::XOR;
 	}
 	
-	return GetValue();
+	return BitOp::SET;
 }
 
 /** Refresh a button from a given radio button group */
@@ -633,7 +630,7 @@ void Button::UpdateState(value_t Sum)
 void Button::DoToggle()
 {
 	if (flags & (IE_GUI_BUTTON_CHECKBOX | IE_GUI_BUTTON_RADIOBUTTON)) {
-		SetValue(GetValue());
+		UpdateDictValue();
 	}
 }
 

@@ -124,7 +124,6 @@ void Control::UpdateState(const varname_t& varname, value_t val)
 {
 	if (VarName == varname) {
 		UpdateState(val);
-		MarkDirty();
 	}
 }
 
@@ -144,24 +143,10 @@ void Control::SetValue(value_t val)
 	value_t oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
 	
-	if (IsDictBound()) {
-		// set this even when the value doesn't change
-		// if a radio is clicked, then one of its siblings, the siblings value wont change
-		// but we expect the dictionary to reflect the selected value
-		value_t curVal = INVALID_VALUE;
-		core->GetDictionary()->Lookup(VarName, curVal);
-		curVal = GetDictValue(curVal);
-		core->GetDictionary()->SetAt(VarName, curVal);
-		
-		const Window* win = GetWindow();
-		if (win) {
-			win->RedrawControls(VarName);
-		} else {
-			UpdateState(VarName, curVal);
-		}
-	}
-
 	if (oldVal != Value) {
+		if (IsDictBound()) {
+			UpdateDictValue();
+		}
 		PerformAction(ValueChange);
 		MarkDirty();
 	}
@@ -180,18 +165,50 @@ void Control::SetValueRange(value_t min, value_t max)
 	SetValueRange(ValueRange(min, max));
 }
 
-void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange range) noexcept
+void Control::UpdateDictValue() noexcept
 {
-	if (range.first != Control::INVALID_VALUE) {
-		// blank out any old varname so we can set the control value without setting the old variable
-		VarName[0] = '\0';
-		// this may set the value if its already set outside the range
-		SetValueRange(range);
+	if (!IsDictBound()) {
+		return;
 	}
 	
+	// set this even when the value doesn't change
+	// if a radio is clicked, then one of its siblings, the siblings value wont change
+	// but we expect the dictionary to reflect the selected value
+	BitOp op = GetDictOp();
+	value_t curVal = op == BitOp::SET ? INVALID_VALUE : 0;
+	core->GetDictionary()->Lookup(VarName, curVal);
+	value_t newVal = curVal;
+	SetBits(newVal, Value, op);
+	core->GetDictionary()->SetAt(VarName, newVal);
+	
+	const Window* win = GetWindow();
+	if (win) {
+		win->RedrawControls(VarName);
+	} else {
+		UpdateState(VarName, newVal);
+	}
+}
+
+void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange range) noexcept
+{
+	// blank out any old varname so we can set the control value without setting the old variable
+	VarName[0] = '\0';
+	if (range.first != Control::INVALID_VALUE) {
+		SetValueRange(range);
+	}
+	SetValue(val);
 	// now that the value range is setup, we can change the dictionary variable
 	VarName = var;
-	SetValue(val);
+	
+	if (GetDictOp() == BitOp::SET) {
+		// SET implies the dictionary value should always mirror Value
+		UpdateDictValue();
+	} else {
+		value_t dictVal = INVALID_VALUE;
+		if (core->GetDictionary()->Lookup(VarName, dictVal)) {
+			UpdateState(VarName, dictVal);
+		}
+	}
 }
 
 bool Control::IsDictBound() const noexcept

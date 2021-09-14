@@ -215,7 +215,7 @@ private: // Private attributes
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 	
-	value_t GetDictValue(value_t /*curDictVal*/) const noexcept override;
+	BitOp GetDictOp() const noexcept override;
 	
 protected:
 	/** Mouse Enter */

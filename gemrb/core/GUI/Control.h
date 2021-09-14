@@ -203,6 +203,8 @@ protected:
 		ControlActionKey(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0)
 		: ActionKey(BuildKeyValue(type, mod, button, count) ) {}
 	};
+	
+	void UpdateDictValue() noexcept;
 
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 	
@@ -234,7 +236,7 @@ private:
 
 	void HandleTouchActionTimer(const Control*);
 	
-	virtual value_t GetDictValue(value_t /*curDictVal*/) const noexcept { return Value; }
+	virtual BitOp GetDictOp() const noexcept { return BitOp::SET; }
 };
 
 
