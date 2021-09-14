@@ -64,14 +64,6 @@ namespace GemRB {
 // checked against the strref itself
 #define IE_STR_ALTREF 0x0100000 // use alternate tlk file: dialogf.tlk
 
-// bitflag operations
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define OP_SET  0 //gemrb extension
-#define OP_AND  1
-#define OP_OR   2
-#define OP_XOR  3
-#define OP_NAND 4 //gemrb extension
-
 /////feature flags
 enum GameFeatureFlags : uint32_t {
 	GF_HAS_KAPUTZ,          			//pst
@@ -272,15 +264,25 @@ inline bool valid_unsignednumber(const char* string, T& val)
 	return endpr != string;
 }
 
+// bitflag operations
+// !!! Keep these synchronized with GUIDefines.py !!!
+enum class BitOp : int {
+	SET = 0, //gemrb extension
+	AND = 1,
+	OR = 2,
+	XOR = 3,
+	NAND = 4 //gemrb extension
+};
+
 template <typename T>
-inline bool SetBits(T& flag, const T& value, int mode)
+inline bool SetBits(T& flag, const T& value, BitOp mode)
 {
 	switch(mode) {
-		case OP_OR: flag |= value; break;
-		case OP_NAND: flag &= ~value; break;
-		case OP_SET: flag = value; break;
-		case OP_AND: flag &= value; break;
-		case OP_XOR: flag ^= value; break;
+		case BitOp::OR: flag |= value; break;
+		case BitOp::NAND: flag &= ~value; break;
+		case BitOp::SET: flag = value; break;
+		case BitOp::AND: flag &= value; break;
+		case BitOp::XOR: flag ^= value; break;
 		default:
 			return false;
 	}

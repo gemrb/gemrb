@@ -44,7 +44,7 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 	max = maxLength;
 	textContainer.SetMargin(p.y, p.x);
 
-	SetFlags(Alpha|Numeric, OP_OR);
+	SetFlags(Alpha|Numeric, BitOp::OR);
 	
 	textContainer.SetEventProxy(this);
 }

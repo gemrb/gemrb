@@ -481,7 +481,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 		ta->AppendText(String(newlines + 1, L'\n'));
 
 		delete chapText;
-		ta->SetFlags(View::IgnoreEvents, OP_OR);
+		ta->SetFlags(View::IgnoreEvents, BitOp::OR);
 		int lines = ta->ContentHeight() / rowHeight;
 		float heightScale = 12.0f / rowHeight; // scale based on text size so smaller text scrolls more slowly
 		float widthScale = 640.0f / w;  // scale based on width to become more slow as we get wider
@@ -640,7 +640,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 
 	Window* win = core->LoadWindow( WindowID, ref, pos );
 	ABORT_IF_NULL(win);
-	win->SetFlags(Window::AlphaChannel, OP_OR);
+	win->SetFlags(Window::AlphaChannel, BitOp::OR);
 	PyObject* pyWin = ConstructObjectForScriptableView( win->GetScriptingRef() );
 	return pyWin;
 }
@@ -1368,7 +1368,7 @@ static PyObject* GemRB_Control_SetColor(PyObject* self, PyObject* args)
 	} else if (ctrl->ControlType == IE_GUI_LABEL) {
 		Label* label = GetView<Label>(self);
 		label->SetColors(color, ColorBlack);
-		label->SetFlags(Label::UseColor, OP_OR);
+		label->SetFlags(Label::UseColor, BitOp::OR);
 	} else if (ctrl->ControlType == IE_GUI_TEXTAREA) {
 		TextArea* textArea = GetView<TextArea>(self);
 		textArea->SetColor(color, colorType);
@@ -2449,11 +2449,11 @@ PyDoc_STRVAR( GemRB_View_SetFlags__doc,
 **Parameters:**\n\
   * GView - the control's reference\n\
   * Flags - the bits to enable\n\
-  * Operation - the bit operation to use, defaults to OP_SET\n\
+  * Operation - the bit operation to use, defaults to SET\n\
 \n\
 **Examples:**\n\
-  Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)\n\
-  Window.SetFlags (WF_ALPHA_CHANNEL, OP_NAND)\n\
+  Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OR)\n\
+  Window.SetFlags (WF_ALPHA_CHANNEL, NAND)\n\
 \n\
 **Return value:** boolean marking success or failure"
 );
@@ -2461,16 +2461,16 @@ PyDoc_STRVAR( GemRB_View_SetFlags__doc,
 static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 {
 	unsigned int Flags;
-	int Operation = OP_SET;
+	BitOp Operation = BitOp::SET;
 	PARSE_ARGS( args, "OI|i", &self, &Flags, &Operation );
 
 	// check if we were called by a button, so we can ensure the
 	// Disabled state is preserved — also set by SetState
 	Button* btn = GetView<Button>(self);
-	if (btn && Operation == OP_SET) {
+	if (btn && Operation == BitOp::SET) {
 		bool wasDisabled = btn->Flags() & View::Disabled;
 		bool set = btn->SetFlags(Flags, Operation);
-		if (wasDisabled) btn->SetFlags(View::Disabled, OP_OR);
+		if (wasDisabled) btn->SetFlags(View::Disabled, BitOp::OR);
 		RETURN_BOOL(set);
 	}
 	View* view = GetView<View>(self);
@@ -2490,10 +2490,10 @@ PyDoc_STRVAR( GemRB_View_SetResizeFlags__doc,
 **Parameters:**\n\
   * GView - the control's reference\n\
   * Flags - the bits to enable\n\
-  * Operation - the bit operation to use, defaults to OP_SET\n\
+  * Operation - the bit operation to use, defaults to SET\n\
 \n\
 **Example:**\n\
-  TextArea.SetResizeFlags (IE_GUI_VIEW_RESIZE_ALL, OP_OR)\n\
+  TextArea.SetResizeFlags (IE_GUI_VIEW_RESIZE_ALL, OR)\n\
 \n\
 **Return value:** boolean marking success or failure"
 );
@@ -2501,7 +2501,7 @@ PyDoc_STRVAR( GemRB_View_SetResizeFlags__doc,
 static PyObject* GemRB_View_SetResizeFlags(PyObject* self, PyObject* args)
 {
 	unsigned int flags;
-	int op = OP_SET;
+	BitOp op = BitOp::SET;
 	PARSE_ARGS( args, "OI|i", &self, &flags, &op );
 
 	View* view = GetView<View>(self);
@@ -2882,7 +2882,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		entry->AreaName = MakeUpperCaseResRef(area);
 		entry->AreaResRef = MakeUpperCaseResRef(area);
 		strnuprcpy(entry->AreaLongName, script, 32);
-		entry->SetAreaStatus(flags, OP_SET);
+		entry->SetAreaStatus(flags, BitOp::SET);
 		entry->IconSeq = icon;
 		entry->pos.x = locx;
 		entry->pos.y = locy;
@@ -3363,7 +3363,8 @@ status, dialog textarea size).\n\
 
 static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 {
-	int Flags, Operation;
+	int Flags;
+	BitOp Operation;
 	PARSE_ARGS( args,  "ii", &Flags, &Operation );
 	GET_GAME();
 	RETURN_BOOL(game->SetControlStatus( Flags, Operation ));
@@ -3395,7 +3396,8 @@ Don't confuse it with the saved screen flags set by GameSetScreenFlags.\n\
 
 static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* args)
 {
-	int Flags, Operation;
+	int Flags;
+	BitOp Operation;
 	PARSE_ARGS( args,  "ii", &Flags, &Operation );
 	GET_GAMECONTROL();
 	RETURN_BOOL(gc->SetScreenFlags( Flags, Operation ));
@@ -3725,10 +3727,10 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 		btn->ClearPictureList();
 	btn->StackPicture(Picture);
 	if (Picture2) {
-		btn->SetFlags (IE_GUI_BUTTON_BG1_PAPERDOLL, OP_OR);
+		btn->SetFlags (IE_GUI_BUTTON_BG1_PAPERDOLL, BitOp::OR);
 		btn->StackPicture( Picture2 );
 	} else if (type == 0) {
-		btn->SetFlags (IE_GUI_BUTTON_BG1_PAPERDOLL, OP_NAND);
+		btn->SetFlags (IE_GUI_BUTTON_BG1_PAPERDOLL, BitOp::NAND);
 	}
 
 	Py_RETURN_NONE;
@@ -5642,7 +5644,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	actor->SetName(Name, Which);
-	actor->SetMCFlag(MC_EXPORTABLE,OP_OR);
+	actor->SetMCFlag(MC_EXPORTABLE, BitOp::OR);
 	Py_RETURN_NONE;
 }
 
@@ -6671,7 +6673,7 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 		return Py_None;
 	}
 
-	btn->SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR);
+	btn->SetFlags(IE_GUI_BUTTON_PICTURE, BitOp::OR);
 	Holder<Sprite2D> Picture;
 	bool setpicture = true;
 	switch (Which) {
@@ -8908,7 +8910,8 @@ identifies an item.\n\
 
 static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, Slot, Flags, Mode;
+	int globalID, Slot, Flags;
+	BitOp Mode;
 	PARSE_ARGS( args,  "iiii", &globalID, &Slot, &Flags, &Mode);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -10578,7 +10581,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	SetButtonCycle(bam, btn, (char) row.bytes[1], Button::PRESSED);
 	SetButtonCycle(bam, btn, (char) row.bytes[2], Button::SELECTED);
 	SetButtonCycle(bam, btn, (char) row.bytes[3], Button::DISABLED);
-	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_NAND);
+	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BitOp::NAND);
 	PyObject *Event = PyString_FromFormat("Action%sPressed", GUIEvent[Index]);
 	PyObject *func = PyDict_GetItem(dict, Event);
 	btn->SetAction(PythonControlCallback(func), Control::Click, GEM_MB_ACTION, 0, 1);
@@ -10715,7 +10718,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 
 		if (!Picture) {
 			btn->SetState(Button::DISABLED);
-			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET);
+			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::SET);
 			btn->SetTooltip(L"");
 		} else {
 			SetButtonCycle(bam, btn, 0, Button::UNPRESSED);
@@ -10724,7 +10727,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			SetButtonCycle(bam, btn, 3, Button::DISABLED);
 			btn->SetPicture( Picture );
 			btn->SetState(Button::UNPRESSED);
-			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET);
+			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BitOp::SET);
 
 			SetViewTooltipFromRef(btn, item.Tooltip);
 
@@ -10877,7 +10880,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			}
 		}
 
-		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET);
+		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BitOp::SET);
 		SetItemText(btn, 0, false);
 		const PyObject *ret = SetActionIcon(btn, dict, action, i + 1);
 

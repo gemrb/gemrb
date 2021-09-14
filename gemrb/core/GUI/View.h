@@ -174,14 +174,14 @@ public:
 	virtual bool IsOpaque() const;
 	virtual bool HitTest(const Point& p) const;
 
-	bool SetFlags(unsigned int arg_flags, int opcode);
+	bool SetFlags(unsigned int arg_flags, BitOp opcode);
 	inline unsigned int Flags() const { return flags; }
-	bool SetAutoResizeFlags(unsigned short arg_flags, int opcode);
+	bool SetAutoResizeFlags(unsigned short arg_flags, BitOp opcode);
 	unsigned short AutoResizeFlags() const { return autoresizeFlags; }
 
-	void SetVisible(bool vis) { SetFlags(Invisible, vis ? OP_NAND : OP_OR); }
+	void SetVisible(bool vis) { SetFlags(Invisible, vis ? BitOp::NAND : BitOp::OR); }
 	bool IsVisible() const;
-	void SetDisabled(bool disable) { SetFlags(Disabled, disable ? OP_OR : OP_NAND); }
+	void SetDisabled(bool disable) { SetFlags(Disabled, disable ? BitOp::OR : BitOp::NAND); }
 	bool IsDisabled() const { return flags&Disabled; }
 	virtual bool IsDisabledCursor() const;
 	virtual bool IsReceivingEvents() const;

@@ -4360,7 +4360,7 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 	}
 }
 
-void Actor::SetMCFlag(ieDword arg, int op)
+void Actor::SetMCFlag(ieDword arg, BitOp op)
 {
 	ieDword tmp = BaseStats[IE_MC_FLAGS];
 	SetBits(tmp, arg, op);
@@ -9689,7 +9689,7 @@ void Actor::InitButtons(ieDword cls, bool forced) const
 	SetActionButtonRow(myrow);
 }
 
-void Actor::SetFeat(unsigned int feat, int mode)
+void Actor::SetFeat(unsigned int feat, BitOp mode)
 {
 	if (feat>=MAX_FEATS) {
 		return;
@@ -9711,10 +9711,10 @@ void Actor::SetFeatValue(unsigned int feat, int value, bool init)
 	else if (value>featmax[feat]) value = featmax[feat];
 
 	if (value) {
-		SetFeat(feat, OP_OR);
+		SetFeat(feat, BitOp::OR);
 		if (featstats[feat]) SetBase(featstats[feat], value);
 	} else {
-		SetFeat(feat, OP_NAND);
+		SetFeat(feat, BitOp::NAND);
 		if (featstats[feat]) SetBase(featstats[feat], 0);
 	}
 
@@ -10359,7 +10359,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->BaseStats[IE_EXPLORE] = 0;
 
 	//IF_INITIALIZED shouldn't be set here, yet
-	newActor->SetMCFlag(MC_EXPORTABLE, OP_NAND);
+	newActor->SetMCFlag(MC_EXPORTABLE, BitOp::NAND);
 
 	//the creature importer does this too
 	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );

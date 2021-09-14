@@ -37,10 +37,10 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	hoverView = NULL;
 	lastMouseMoveTime = GetTicks();
 
-	SetFlags(DestroyOnClose, OP_OR);
+	SetFlags(DestroyOnClose, BitOp::OR);
 	// default ingame windows to frameless
 	if (core->HasCurrentArea()) {
-		SetFlags(Borderless, OP_OR);
+		SetFlags(Borderless, BitOp::OR);
 	}
 	RecreateBuffer();
 }

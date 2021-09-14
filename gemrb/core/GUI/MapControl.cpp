@@ -111,10 +111,10 @@ void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	if (LinkedLabel) {
 		if (GetValue() == EDIT_NOTE)
 		{
-			LinkedLabel->SetFlags(IgnoreEvents, OP_NAND);
+			LinkedLabel->SetFlags(IgnoreEvents, BitOp::NAND);
 			LinkedLabel->SetFocus();
 		} else {
-			LinkedLabel->SetFlags(IgnoreEvents, OP_OR);
+			LinkedLabel->SetFlags(IgnoreEvents, BitOp::OR);
 		}
 	}
 

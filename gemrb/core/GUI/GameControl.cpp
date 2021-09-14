@@ -2332,7 +2332,7 @@ void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryT
 		}
 		
 		// don't trigger the travel region, so everyone can bunch up there and NIDSpecial2 can take over
-		if (doWorldMap) actor->SetInternalFlag(IF_PST_WMAPPING, OP_OR);
+		if (doWorldMap) actor->SetInternalFlag(IF_PST_WMAPPING, BitOp::OR);
 	}
 
 	// p is a searchmap travel region or a plain travel region in pst (matching several other criteria)
@@ -2523,7 +2523,7 @@ void GameControl::SetCutSceneMode(bool active)
 		ScreenFlags &= ~SF_CUTSCENE;
 		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->config.MouseFeedback));
 	}
-	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? OP_OR : OP_NAND);
+	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? BitOp::OR : BitOp::NAND);
 }
 
 //Create an overhead text over a scriptable target
@@ -2588,15 +2588,15 @@ void GameControl::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
-bool GameControl::SetScreenFlags(unsigned int value, int mode)
+bool GameControl::SetScreenFlags(unsigned int value, BitOp mode)
 {
 	return SetBits(ScreenFlags, value, mode);
 }
 
-void GameControl::SetDialogueFlags(unsigned int value, int mode)
+void GameControl::SetDialogueFlags(unsigned int value, BitOp mode)
 {
 	SetBits(DialogueFlags, value, mode);
-	SetFlags(IgnoreEvents, (DialogueFlags&DF_IN_DIALOG || ScreenFlags&SF_CUTSCENE) ? OP_OR : OP_NAND);
+	SetFlags(IgnoreEvents, (DialogueFlags&DF_IN_DIALOG || ScreenFlags&SF_CUTSCENE) ? BitOp::OR : BitOp::NAND);
 }
 
 Map* GameControl::CurrentArea() const

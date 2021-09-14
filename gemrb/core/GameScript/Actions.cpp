@@ -94,7 +94,7 @@ void GameScript::SetAreaFlags(Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
 	ieDword value = map->AreaFlags;
-	HandleBitMod( value, parameters->int0Parameter, parameters->int1Parameter);
+	HandleBitMod( value, parameters->int0Parameter, BitOp(parameters->int1Parameter));
 	map->AreaFlags=value;
 }
 
@@ -798,7 +798,7 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 	int active = parameters->int0Parameter;
 
 	Game *game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, active ? OP_OR : OP_NAND);
+	game->SetControlStatus(CS_HIDEGUI, active ? BitOp::OR : BitOp::NAND);
 	if (active) {
 		core->GetWindowManager()->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
@@ -1075,7 +1075,7 @@ void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 {
 	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
 	GameControl *gc = core->GetGameControl();
-	gc->SetScreenFlags(SF_CENTERONACTOR, OP_NAND);
+	gc->SetScreenFlags(SF_CENTERONACTOR, BitOp::NAND);
 	core->timer.SetMoveViewPort( parameters->pointParameter, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
@@ -2001,20 +2001,20 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game* game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, OP_NAND);
+	game->SetControlStatus(CS_HIDEGUI, BitOp::NAND);
 }
 
 void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game* game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, OP_OR);
+	game->SetControlStatus(CS_HIDEGUI, BitOp::OR);
 }
 
 void GameScript::LockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_CENTERONACTOR|SF_ALWAYSCENTER, OP_OR);
+		gc->SetScreenFlags(SF_CENTERONACTOR|SF_ALWAYSCENTER, BitOp::OR);
 	}
 }
 
@@ -2022,7 +2022,7 @@ void GameScript::UnlockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_CENTERONACTOR|SF_ALWAYSCENTER, OP_NAND);
+		gc->SetScreenFlags(SF_CENTERONACTOR|SF_ALWAYSCENTER, BitOp::NAND);
 	}
 }
 
@@ -2806,7 +2806,7 @@ void GameScript::Activate(Scriptable* Sender, Action* parameters)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		//it could still be an area animation, PST allows deactivating them via Activate
-		AmbientActivateCore(Sender, parameters, 1);
+		AmbientActivateCore(Sender, parameters, true);
 		return;
 	}
 	if (tar->Type == ST_ACTOR) {
@@ -2832,7 +2832,7 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		//it could still be an area animation, PST allows deactivating them via Deactivate
-		AmbientActivateCore(Sender, parameters, 0);
+		AmbientActivateCore(Sender, parameters, false);
 		return;
 	}
 	if (tar->Type == ST_ACTOR) {
@@ -3647,9 +3647,9 @@ void GameScript::SetCriticalPathObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	if (parameters->int0Parameter) {
-		actor->SetMCFlag(MC_PLOT_CRITICAL, OP_OR);
+		actor->SetMCFlag(MC_PLOT_CRITICAL, BitOp::OR);
 	} else {
-		actor->SetMCFlag(MC_PLOT_CRITICAL, OP_NAND);
+		actor->SetMCFlag(MC_PLOT_CRITICAL, BitOp::NAND);
 	}
 }
 
@@ -3660,7 +3660,7 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	//it is bit 15 of the multi-class flags (confirmed)
-	actor->SetMCFlag(MC_BEENINPARTY, OP_OR);
+	actor->SetMCFlag(MC_BEENINPARTY, BitOp::OR);
 }
 
 /*iwd2 sets the high MC bits this way*/
@@ -3671,9 +3671,9 @@ void GameScript::SetCreatureAreaFlag(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (parameters->int1Parameter) {
-		actor->SetMCFlag(parameters->int0Parameter, OP_OR);
+		actor->SetMCFlag(parameters->int0Parameter, BitOp::OR);
 	} else {
-		actor->SetMCFlag(parameters->int0Parameter, OP_NAND);
+		actor->SetMCFlag(parameters->int0Parameter, BitOp::NAND);
 	}
 }
 
@@ -3687,7 +3687,7 @@ void GameScript::SetTextColor(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::BitGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
-	HandleBitMod( value, parameters->int0Parameter, parameters->int1Parameter);
+	HandleBitMod(value, parameters->int0Parameter, BitOp(parameters->int1Parameter));
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
@@ -3695,7 +3695,7 @@ void GameScript::GlobalBitGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
 	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
-	HandleBitMod( value1, value2, parameters->int1Parameter);
+	HandleBitMod(value1, value2, BitOp(parameters->int1Parameter));
 	SetVariable(Sender, parameters->string0Parameter, value1);
 }
 
@@ -4019,7 +4019,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true, act->GetClassID(ISPALADIN));
-	act->SetMCFlag(MC_FALLEN_PALADIN, OP_OR);
+	act->SetMCFlag(MC_FALLEN_PALADIN, BitOp::OR);
 	Effect *fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_TURN, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
 	fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_CAST, FX_DURATION_INSTANT_PERMANENT);
@@ -4034,7 +4034,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->ApplyKit(true, act->GetClassID(ISRANGER));
-	act->SetMCFlag(MC_FALLEN_RANGER, OP_OR);
+	act->SetMCFlag(MC_FALLEN_RANGER, BitOp::OR);
 	Effect *fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
 	fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_CAST, FX_DURATION_INSTANT_PERMANENT);
@@ -4048,7 +4048,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetMCFlag(MC_FALLEN_PALADIN, OP_NAND);
+	act->SetMCFlag(MC_FALLEN_PALADIN, BitOp::NAND);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_CAST);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_TURN);
 	act->ApplyKit(false, act->GetClassID(ISPALADIN));
@@ -4060,7 +4060,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetMCFlag(MC_FALLEN_RANGER, OP_NAND);
+	act->SetMCFlag(MC_FALLEN_RANGER, BitOp::NAND);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_CAST);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_STEALTH);
 	act->ApplyKit(false, act->GetClassID(ISRANGER));
@@ -4250,8 +4250,8 @@ void GameScript::SetItemFlags(Scriptable *Sender, Action* parameters)
 		return;
 	}
 
-	int op = OP_NAND;
-	if (parameters->int1Parameter) op = OP_OR;
+	BitOp op = BitOp::NAND;
+	if (parameters->int1Parameter) op = BitOp::OR;
 	myinv->ChangeItemFlag(slot, parameters->int0Parameter, op);
 }
 
@@ -4947,7 +4947,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 		error("GameScript", "Can't find worldmap!\n");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, OP_OR);
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BitOp::OR);
 	displaymsg->DisplayConstantString(STR_WORLDMAPCHANGE, DMC_BG2XPGREEN);
 }
 
@@ -4958,7 +4958,7 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 		error("GameScript", "Can't find worldmap!\n");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, OP_NAND);
+	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BitOp::NAND);
 }
 
 void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
@@ -4967,7 +4967,7 @@ void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!\n");
 	}
-	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, OP_OR);
+	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, BitOp::OR);
 }
 
 void GameScript::RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
@@ -4976,7 +4976,7 @@ void GameScript::RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* paramete
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!\n");
 	}
-	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, OP_NAND);
+	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, BitOp::NAND);
 }
 
 void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
@@ -6268,7 +6268,7 @@ void GameScript::PauseGame(Scriptable* Sender, Action* /*parameters*/)
 {
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
-		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
+		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BitOp::OR);
 		displaymsg->DisplayConstantString(STR_SCRIPTPAUSED, DMC_RED);
 	}
 	// releasing this action allows actions to continue executing,
@@ -6447,9 +6447,9 @@ void GameScript::DialogueInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if ( parameters->int0Parameter != 0 ) {
-		actor->SetMCFlag(MC_NO_TALK, OP_NAND);
+		actor->SetMCFlag(MC_NO_TALK, BitOp::NAND);
 	} else {
-		actor->SetMCFlag(MC_NO_TALK, OP_OR);
+		actor->SetMCFlag(MC_NO_TALK, BitOp::OR);
 	}
 }
 
@@ -7362,12 +7362,12 @@ void GameScript::SetOriginalClass(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor *actor = (Actor *) tar;
-	if (parameters->int1Parameter == OP_SET) {
+	if (parameters->int1Parameter == 0) {
 		// only reset the class bits
-		actor->SetMCFlag(MC_WAS_ANY, OP_NAND);
-		parameters->int1Parameter = OP_OR;
+		actor->SetMCFlag(MC_WAS_ANY, BitOp::NAND);
+		parameters->int1Parameter = int(BitOp::OR);
 	}
-	actor->SetMCFlag(classBit, parameters->int1Parameter);
+	actor->SetMCFlag(classBit, BitOp(parameters->int1Parameter));
 }
 
 }

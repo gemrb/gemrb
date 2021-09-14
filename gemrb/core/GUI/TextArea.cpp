@@ -34,7 +34,7 @@ namespace GemRB {
 TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered, Margin m)
 : ContentContainer(Region(0, 0, ta.Frame().w, 0)), ta(ta)
 {
-	SetFlags(RESIZE_WIDTH, OP_NAND);
+	SetFlags(RESIZE_WIDTH, BitOp::NAND);
 
 	selectedSpan = NULL;
 	hoverSpan = NULL;
@@ -57,7 +57,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 
 	for (size_t i = 0; i < opts.size(); i++) {
 		TextContainer* selOption = new OptSpan(r, ta.ftext, colors.fg, colors.bg);
-		selOption->SetAutoResizeFlags(ResizeHorizontal, OP_SET);
+		selOption->SetAutoResizeFlags(ResizeHorizontal, BitOp::SET);
 
 		if (numbered) {
 			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
@@ -251,8 +251,8 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps)
 	ClearText();
 
 	scrollview.SetScrollIncrement(LineHeight());
-	scrollview.SetAutoResizeFlags(ResizeAll, OP_SET);
-	scrollview.SetFlags(View::IgnoreEvents, (Flags()&View::IgnoreEvents) ? OP_OR : OP_NAND);
+	scrollview.SetAutoResizeFlags(ResizeAll, BitOp::SET);
+	scrollview.SetFlags(View::IgnoreEvents, (Flags()&View::IgnoreEvents) ? BitOp::OR : BitOp::NAND);
 	
 	BindDictVariable("Selected", Control::INVALID_VALUE);
 }
@@ -377,19 +377,19 @@ void TextArea::UpdateScrollview()
 void TextArea::FlagsChanged(unsigned int oldflags)
 {
 	if (Flags()&View::IgnoreEvents) {
-		scrollview.SetFlags(View::IgnoreEvents, OP_OR);
+		scrollview.SetFlags(View::IgnoreEvents, BitOp::OR);
 	} else if (oldflags&View::IgnoreEvents) {
-		scrollview.SetFlags(View::IgnoreEvents, OP_NAND);
+		scrollview.SetFlags(View::IgnoreEvents, BitOp::NAND);
 	}
 
 	if (Flags()&Editable) {
 		assert(textContainer);
-		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
+		textContainer->SetFlags(View::IgnoreEvents, BitOp::NAND);
 		textContainer->SetEventProxy(NULL);
 		SetEventProxy(textContainer);
 	} else if (oldflags&Editable) {
 		assert(textContainer);
-		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
+		textContainer->SetFlags(View::IgnoreEvents, BitOp::OR);
 		textContainer->SetEventProxy(&scrollview);
 		SetEventProxy(&scrollview);
 	}
@@ -720,10 +720,10 @@ void TextArea::ClearText()
 	textContainer->SetMargin(textMargins);
 	textContainer->callback = METHOD_CALLBACK(&TextArea::TextChanged, this);
 	if (Flags()&Editable) {
-		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
+		textContainer->SetFlags(View::IgnoreEvents, BitOp::NAND);
 		SetEventProxy(textContainer);
 	} else {
-		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
+		textContainer->SetFlags(View::IgnoreEvents, BitOp::OR);
 		textContainer->SetEventProxy(&scrollview);
 		SetEventProxy(&scrollview);
 	}

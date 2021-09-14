@@ -747,7 +747,7 @@ void Map::UpdateScripts()
 			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
 			//if that isn't true either, remove this block completely
 			if (actor->GetStat(IE_STATE_ID) & STATE_HELPLESS) {
-				actor->SetInternalFlag(IF_JUSTDIED, OP_NAND);
+				actor->SetInternalFlag(IF_JUSTDIED, BitOp::NAND);
 				continue;
 			}
 		}
@@ -1482,7 +1482,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			}
 
 			if (!visible || (actor->GetInternalFlag() & (IF_REALLYDIED | IF_ACTIVE)) == (IF_REALLYDIED | IF_ACTIVE)) {
-				actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
+				actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::NAND);
 				// turning actor inactive if there is no action next turn
 				actor->HibernateIfAble();
 			}
@@ -2063,7 +2063,7 @@ bool Map::HandleAutopauseForVisible(Actor *actor, bool doPause) const
 	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK)) {
 		if (doPause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
 			core->Autopause(AP_ENEMY, actor);
-		actor->SetInternalFlag(IF_TRIGGER_AP, OP_OR);
+		actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::OR);
 		return true;
 	}
 	return false;

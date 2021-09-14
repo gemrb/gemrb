@@ -151,13 +151,13 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 
 				/** Justification comes from the .chu, other bits are set by script */
 				if (!Width) {
-					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR);
+					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::OR);
 				}
 				if (core->HasFeature(GF_UPPER_BUTTON_TEXT)) {
-					btn->SetFlags(IE_GUI_BUTTON_CAPS, OP_OR);
+					btn->SetFlags(IE_GUI_BUTTON_CAPS, BitOp::OR);
 				}
 
-				btn->SetFlags(Flags, OP_OR);
+				btn->SetFlags(Flags, BitOp::OR);
 				if (Flags & IE_GUI_BUTTON_ANCHOR) {
 					btn->SetAnchor(x1 | (x2<<8), y1 | (y2<<8));
 				}
@@ -399,7 +399,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				delete str;
 
 				if (alignment & 1) {
-					lab->SetFlags(Label::UseColor, OP_OR);
+					lab->SetFlags(Label::UseColor, BitOp::OR);
 				}
 				lab->SetColors(textCol, bgCol);
 				int align = IE_FONT_ALIGN_CENTER;

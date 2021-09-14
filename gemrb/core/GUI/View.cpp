@@ -645,7 +645,7 @@ void View::SetFrameSize(const Size& s)
 	SizeChanged(oldSize);
 }
 
-bool View::SetFlags(unsigned int arg_flags, int opcode)
+bool View::SetFlags(unsigned int arg_flags, BitOp opcode)
 {
 	unsigned int oldflags = flags;
 	bool ret = SetBits(flags, arg_flags, opcode);
@@ -664,7 +664,7 @@ bool View::SetFlags(unsigned int arg_flags, int opcode)
 	return ret;
 }
 	
-bool View::SetAutoResizeFlags(unsigned short arg_flags, int opcode)
+bool View::SetAutoResizeFlags(unsigned short arg_flags, BitOp opcode)
 {
 	return SetBits(autoresizeFlags, arg_flags, opcode);
 }

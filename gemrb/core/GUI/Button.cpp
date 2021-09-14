@@ -47,7 +47,7 @@ Button::Button(const Region& frame)
 
 	hasText = false;
 	SetFont(core->GetButtonFont());
-	SetFlags(IE_GUI_BUTTON_NORMAL, OP_OR);
+	SetFlags(IE_GUI_BUTTON_NORMAL, BitOp::OR);
 	pulseBorder = false;
 	Picture = NULL;
 	Clipping = 1.0;
