@@ -171,26 +171,27 @@ void Control::UpdateDictValue() noexcept
 		return;
 	}
 	
+	Window* win = GetWindow();
+	assert(win);
+	
 	// set this even when the value doesn't change
 	// if a radio is clicked, then one of its siblings, the siblings value wont change
 	// but we expect the dictionary to reflect the selected value
 	BitOp op = GetDictOp();
-	value_t curVal = op == BitOp::SET ? INVALID_VALUE : 0;
-	core->GetDictionary()->Lookup(VarName, curVal);
-	value_t newVal = curVal;
-	SetBits(newVal, Value, op);
-	core->GetDictionary()->SetAt(VarName, newVal);
-	
-	const Window* win = GetWindow();
-	if (win) {
-		win->RedrawControls(VarName);
-	} else {
-		UpdateState(VarName, newVal);
+	value_t curVal = win->GetDictVariable(VarName);
+	if (curVal == INVALID_VALUE && op != BitOp::SET) {
+		curVal = 0;
 	}
+	SetBits(curVal, Value, op);
+	win->SetDictVariable(VarName, curVal);
 }
 
-void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange range) noexcept
+bool Control::BindDictVariable(const varname_t& var, value_t val, ValueRange range) noexcept
 {
+	const Window* win = GetWindow();
+	if (win == nullptr) {
+		return false;
+	}
 	// blank out any old varname so we can set the control value without setting the old variable
 	VarName[0] = '\0';
 	if (range.first != Control::INVALID_VALUE) {
@@ -203,12 +204,11 @@ void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange ran
 	if (GetDictOp() == BitOp::SET) {
 		// SET implies the dictionary value should always mirror Value
 		UpdateDictValue();
-	} else {
-		value_t dictVal = INVALID_VALUE;
-		if (core->GetDictionary()->Lookup(VarName, dictVal)) {
-			UpdateState(VarName, dictVal);
-		}
+	} else if ((val = win->GetDictVariable(VarName)) != INVALID_VALUE) {
+		UpdateState(VarName, val);
 	}
+	
+	return true;
 }
 
 bool Control::IsDictBound() const noexcept
