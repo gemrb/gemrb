@@ -4176,11 +4176,17 @@ The above lines set up some windows of the main game screen.\n\
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
 	char *Variable;
-	//this should be 32 bits, always, but i cannot tell that to Python
-	unsigned long value;
-	PARSE_ARGS( args,  "sl", &Variable, &value );
+	PyObject* pynum = nullptr;
+	PARSE_ARGS(args, "sO", &Variable, &pynum);
+	
+	Control::value_t val = Control::INVALID_VALUE;
+	if (PyInt_Check(pynum)) {
+		val = Control::value_t(PyInt_AsUnsignedLongMask(pynum));
+	} else if (pynum != Py_None) {
+		return RuntimeError("Expected a numeric or None type.");
+	}
 
-	core->GetDictionary()->SetAt( Variable, (ieDword) value );
+	core->GetDictionary()->SetAt(Variable, val);
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
@@ -4270,8 +4276,8 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	ieDword value;
 	PARSE_ARGS( args,  "s", &Variable );
 
-	if (!core->GetDictionary()->Lookup( Variable, value )) {
-		return PyInt_FromLong( 0 );
+	if (!core->GetDictionary()->Lookup(Variable, value) || value == Control::INVALID_VALUE) {
+		Py_RETURN_NONE;
 	}
 
 	// A PyInt is internally (probably) a long. Since we sometimes set
