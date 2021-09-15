@@ -1977,16 +1977,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	}
 	
 	Control::varname_t varname = Control::varname_t(VarName);
-	Control::value_t realVal = 0;
-	core->GetDictionary()->Lookup(varname, realVal);
-
 	if (ctrl->BindDictVariable(varname, val, Control::ValueRange(min, max))) {
-		// restore variable for sliders, since it's only a multiplier for them
-		if (ctrl->ControlType == IE_GUI_SLIDER) {
-			ctrl->UpdateState(realVal);
-			core->GetDictionary()->SetAt(varname, val * static_cast<Slider*>(ctrl)->GetPosition());
-		}
-
 		gs->AssignViewAttributes(self, ctrl);
 		Py_RETURN_TRUE;
 	}

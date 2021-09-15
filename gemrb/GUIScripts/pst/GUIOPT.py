@@ -44,7 +44,6 @@ def InitOptionsWindow (Window):
 	"""Open main options window (peacock tail)"""
 
 	GemRB.GamePause (1, 1)
-	TrySavingConfiguration ()
 
 	Container.CloseContainerWindow ()
 
@@ -92,10 +91,21 @@ def InitOptionsWindow (Window):
 
 ToggleOptionsWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIOPT", GUICommonWindows.ToggleWindow, InitOptionsWindow)
 OpenOptionsWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIOPT", GUICommonWindows.OpenWindowOnce, InitOptionsWindow)
-	
-def TrySavingConfiguration():
-	if not GemRB.SaveConfig():
-		print("ARGH, could not write config to disk!!")
+
+def SaveSettings(Window, settings):
+	# volume sliders are multiplers, so apply thay before commition
+	volumes = ['Volume Ambients', 'Volume SFX',
+				'Volume Voices', 'Volume Music',
+				'Volume Movie'];
+
+	for var in volumes:
+		val = Window.GetVar(var)
+		if val is not None:
+			Window.SetVar(var, val * GemRB.GetVar(var))
+
+	Window.StoreGlobalVariables(settings)
+	GemRB.SaveConfig()
+	Window.Close()
 
 ###################################################
 
@@ -103,15 +113,16 @@ def OpenVideoOptionsWindow ():
 	"""Open video options window"""
 	global VideoHelpText
 
-	def OnClose(Window):
-		TrySavingConfiguration()
-
 	Window = GemRB.LoadWindow (1, "GUIOPT")
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
+	
+	settings = ['Brightness Correction', 'Gamma Correction',
+		'SoftBlt', 'SoftMirrorBlt', 'SoftSrcKeyBlt'];
+			
+	Window.LoadGlobalVariables(settings)
 
 	VideoHelpText = GUIOPTControls.OptHelpText ('VideoOptions', Window, 9, 31052)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 7)
+	GUIOPTControls.OptDone (lambda: SaveSettings(Window, settings), Window, 7)
 	GUIOPTControls.OptCancel (Window.Close, Window, 8)
 
 	GUIOPTControls.OptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", lambda: GammaFeedback(31431))
@@ -139,27 +150,15 @@ def OpenAudioOptionsWindow ():
 
 	Window = GemRB.LoadWindow (5, "GUIOPT")
 
-	def OnClose(Window):
-		global AudioHelpText
-		# Restore values in case of cancel
-		if GemRB.GetVar ("Cancel") == 1:
-			for k, v in list(saved_audio_options.items ()):
-				GemRB.SetVar (k, v)
-			AudioHelpText = None
-			UpdateVolume (31210)
+	settings = ['Volume Ambients', 'Volume SFX',
+		'Volume Voices', 'Volume Music', 'Volume Movie',
+		'Environmental Audio', 'Sound Processing', 'Music Processing'];
 
-		TrySavingConfiguration()
-
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
-
-	# save values, so we can restore them on cancel
-	for v in "Volume Ambients", "Volume SFX", "Volume Voices", "Volume Music", "Volume Movie", "Sound Processing", "Music Processing":
-		saved_audio_options[v] = GemRB.GetVar (v)
-
+	Window.LoadGlobalVariables(settings)
 
 	AudioHelpText = GUIOPTControls.OptHelpText ('AudioOptions', Window, 9, 31210)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 7)
+	GUIOPTControls.OptDone (lambda: SaveSettings(Window, settings), Window, 7)
 	GUIOPTControls.OptCancel (Window.Close, Window, 8)
 
 	GUIOPTControls.OptSlider (31210, 31227, AudioHelpText, Window, 1, 10, 31460, "Volume Ambients", lambda: UpdateVolume(31227))
@@ -188,14 +187,15 @@ def OpenGameplayOptionsWindow ():
 
 	Window = GemRB.LoadWindow (6, "GUIOPT")
 
-	def OnClose(Window):
-		TrySavingConfiguration()
-
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
+	settings = ['Tooltips', 'Mouse Scroll Speed',
+		'Keyboard Scroll Speed', 'Difficulty Level',
+		'Always Dither', 'Gore', 'Always Run'];
+			
+	Window.LoadGlobalVariables(settings)
 
 	GameplayHelpText = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 12, 31212)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 10)
+	GUIOPTControls.OptDone (lambda: SaveSettings(Window, settings), Window, 10)
 	GUIOPTControls.OptCancel (Window.Close, Window, 11)
 
 	GUIOPTControls.OptSlider (31212, 31232, GameplayHelpText, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
