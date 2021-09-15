@@ -289,20 +289,13 @@ def RefreshSpellBookLevel (update=True):
 
 def OpenSpellBookSpellInfoWindow ():
 	global SpellBookSpellInfoWindow
-
-	if SpellBookSpellInfoWindow != None:
-		SpellBookSpellInfoWindow.Unload ()
-		SpellBookSpellInfoWindow = None
-
-		return
-
 	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3)
 
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
 	Button.MakeEscape()
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellInfoWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
