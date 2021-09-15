@@ -22,7 +22,7 @@ import GameCheck
 
 from GUIDefines import *
 from MetaClasses import metaIDWrapper, add_metaclass
-from GemRB import GetView, CreateView, RemoveView, RemoveScriptingRef
+from GemRB import GetView, CreateView, RemoveView, RemoveScriptingRef, GetVar, SetVar
 
 DefaultScrollbars = {
 	"bg1": "GUIWSBR",
@@ -207,7 +207,9 @@ class GWindow(GView, Scrollable):
 		'SetupControls': _GemRB.Window_SetupControls,
 		'Focus': _GemRB.Window_Focus,
 		'ShowModal': _GemRB.Window_ShowModal,
-		'SetAction': _GemRB.Window_SetAction
+		'SetAction': _GemRB.Window_SetAction,
+		'GetVar': _GemRB.Window_GetVar,
+		'SetVar': _GemRB.Window_SetVar
 	}
 
 	__slots__ = ['HasFocus']
@@ -227,6 +229,19 @@ class GWindow(GView, Scrollable):
 				control.AddAlias(alias, self.ID)
 			else:
 				print("no control with id=" + str(cid))
+				
+	def LoadVariables(self, vardict):
+		for var, val in vardict.items():
+			self.SetVar(var, val)
+				
+	def LoadGlobalVariables(self, varlist):
+		for var in varlist:
+			self.SetVar(var, GetVar(var))
+			
+	def StoreGlobalVariables(self, varlist):
+		for var in varlist:
+			print(var + '=' + str(self.GetVar(var)))
+			SetVar(var, self.GetVar(var))
 
 	def GetControlAlias(self, alias): # see AliasControls()
 		return GetView(alias, self.ID)

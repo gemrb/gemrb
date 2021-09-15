@@ -1994,6 +1994,74 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Py_RETURN_FALSE;
 }
 
+PyDoc_STRVAR( GemRB_Window_GetVar__doc,
+"===== Window_GetVar =====\n\
+\n\
+**Prototype:** GWindow.GetVar (var)\n\
+\n\
+**Metaclass Prototype:** GetVar (var)\n\
+\n\
+**Description:** Get the value of a window variable.\n\
+Variables are set as a result of calling SetVarAssoc on a GControl.\n\
+\n\
+**Parameters:**\n\
+  * var - the string name of the variable\n\
+\n\
+**Return value:** a Control::value_t representing the value of the variable."
+);
+
+static PyObject* GemRB_Window_GetVar(PyObject* self, PyObject* args)
+{
+	PyObject* varname = nullptr;
+	PARSE_ARGS(args, "OO", &self, &varname);
+
+	const Window* win = GetView<Window>(self);
+	ABORT_IF_NULL(win);
+	
+	Control::value_t val = win->GetDictVariable(VarFromPy(varname));
+	if (val == Control::INVALID_VALUE) {
+		Py_RETURN_NONE;
+	}
+	return PyLong_FromUnsignedLong(val);
+}
+
+PyDoc_STRVAR( GemRB_Window_SetVar__doc,
+"===== Window_SetVar =====\n\
+\n\
+**Prototype:** GWindow.SetVar (var, val)\n\
+\n\
+**Metaclass Prototype:** SetVar (var, val)\n\
+\n\
+**Description:** Set the value of a window variable.\n\
+Variables are set as a result of calling SetVarAssoc on a GControl.\n\
+\n\
+**Parameters:**\n\
+  * var - the string name of the variable\n\
+  * val - the value to assign the variable\n\
+\n\
+**Return value:** N/A"
+);
+
+static PyObject* GemRB_Window_SetVar(PyObject* self, PyObject* args)
+{
+	PyObject* varname = nullptr;
+	PyObject* pynum = nullptr;
+	PARSE_ARGS(args, "OOO", &self, &varname, &pynum);
+	
+	Control::value_t val = Control::INVALID_VALUE;
+	if (PyLong_Check(pynum)) {
+		val = Control::value_t(PyLong_AsUnsignedLongMask(pynum));
+	} else if (pynum != Py_None) {
+		return RuntimeError("Expected a numeric or None type.");
+	}
+
+	Window* win = GetView<Window>(self);
+	ABORT_IF_NULL(win);
+	
+	win->SetDictVariable(VarFromPy(varname), val);
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_RemoveScriptingRef__doc,
 "===== View_RemoveScriptingRef =====\n\
 \n\
@@ -13357,6 +13425,8 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
+	METHOD(Window_GetVar, METH_VARARGS),
+	METHOD(Window_SetVar, METH_VARARGS),
 	METHOD(WorldMap_GetDestinationArea, METH_VARARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}

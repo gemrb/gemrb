@@ -262,13 +262,25 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::RedrawControls(const Control::varname_t& VarName) const
+void Window::SetDictVariable(const Control::varname_t& var, Control::value_t val) noexcept
 {
-	Control::value_t val = Control::INVALID_VALUE;
-	core->GetDictionary()->Lookup(VarName, val);
+	Dictionary[var] = val;
+	
+	// FIXME: remove this later, its a hack to keep things working while scripts are updated
+	core->GetDictionary()->SetAt(var, val);
+
 	for (auto ctrl : Controls) {
-		ctrl->UpdateState(VarName, val);
+		ctrl->UpdateState(var, val);
 	}
+}
+
+Control::value_t Window::GetDictVariable(const Control::varname_t& var) const noexcept
+{
+	if (Dictionary.count(var)) {
+		return Dictionary.at(var);
+	}
+	
+	return Control::INVALID_VALUE;
 }
 
 View* Window::TrySetFocus(View* target)
