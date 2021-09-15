@@ -145,12 +145,12 @@ def OpenLoadMsgWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def LoadGamePress ():
+def LoadGamePress (btn, val):
 	if GemRB.GetView("GC"): # FIXME: is this the best way to know if we are ingame?
 		OpenLoadMsgWindow()
 		return
 	
-	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
+	Pos = LoadWindow.GetVar ("TopIndex") + val
 	LoadScreen.StartLoadScreen()
 	#loads savegame
 	GemRB.LoadGame (Games[Pos])

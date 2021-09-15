@@ -37,7 +37,7 @@ def StartLoadScreen ():
 	LoadScreen.AddAlias("LOADWIN")
 	
 	Middle = LoadScreen.GetControl (3)
-	Progress = GemRB.GetVar ("Progress")
+	Progress = LoadScreen.GetVar ("Progress")
 
 	if not GameCheck.IsBG2Demo():
 		LoadPic = GemRB.GetGameString (STR_LOADMOS)

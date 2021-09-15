@@ -29,15 +29,12 @@ TextAreaControl = 0
 DoneButton = 0
 RaceTable = 0
 RaceCount = 0
-TopIndex = 0
 MyChar = 0
 #the size of the selection list
 LISTSIZE = 11
 
 def DisplayRaces():
-	global TopIndex
-
-	TopIndex=GemRB.GetVar("TopIndex")
+	TopIndex = RaceWindow.GetVar("TopIndex")
 	for i in range(LISTSIZE):
 		Button = RaceWindow.GetControl(i+6)
 		Val = RaceTable.GetValue(i+TopIndex,0)
@@ -53,7 +50,7 @@ def DisplayRaces():
 
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
-	global RaceTable, RaceCount, TopIndex, MyChar
+	global RaceTable, RaceCount, MyChar
 
 	MyChar = GemRB.GetVar ("Slot")
 	ClassName = GUICommon.GetClassRowName (MyChar)
@@ -68,8 +65,6 @@ def OnLoad():
 	if RaceCount<0:
 		RaceCount=0
 
-	TopIndex = 0
-	GemRB.SetVar("TopIndex", 0)
 	ScrollBarControl = RaceWindow.GetControl(1)
 	ScrollBarControl.SetVarAssoc("TopIndex", RaceCount)
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRaces)

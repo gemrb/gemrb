@@ -30,7 +30,6 @@ TextAreaControl = 0
 DoneButton = 0
 SchoolList = 0
 ClassName = 0
-TopIndex = 0
 RowCount = 10
 KitTable = 0
 Init = 0
@@ -41,7 +40,7 @@ EnhanceGUI = GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS #extra kit button and
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
 	global SchoolList, ClassName
-	global RowCount, TopIndex, KitTable, Init, MyChar
+	global RowCount, KitTable, Init, MyChar
 
 	MyChar = GemRB.GetVar ("Slot")
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
@@ -80,8 +79,6 @@ def OnLoad():
 		else:
 			RowCount = KitTable.GetRowCount()
 
-	TopIndex = 0
-	GemRB.SetVar("TopIndex", 0)
 	if EnhanceGUI:
 		tmpRowCount = RowCount
 		if RowCount>10: #create 11 kit button
@@ -127,9 +124,9 @@ def OnLoad():
 	return
 
 def RedrawKits():
-	global TopIndex, Init, KitSelected
+	global Init, KitSelected
 
-	TopIndex=GemRB.GetVar("TopIndex")
+	TopIndex = KitWindow.GetVar("TopIndex")
 	EnabledButtons = []
 	for i in range(RowCount):
 		if i<4:
@@ -188,6 +185,7 @@ def RedrawKits():
 def KitPress():
 	global KitSelected
 
+	TopIndex = KitWindow.GetVar("TopIndex")
 	ButtonPressed=GemRB.GetVar("ButtonPressed")
 	KitSelected = ButtonPressed + TopIndex
 	if not KitTable:

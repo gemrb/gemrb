@@ -29,7 +29,6 @@ TextAreaControl = 0
 DoneButton = 0
 SkillTable = 0
 CostTable = 0
-TopIndex = 0
 PointsLeft = 0
 Level = 0
 ClassColumn = 0
@@ -38,7 +37,7 @@ StatLowerLimit = [0] * 16
 ButtonCount = 0
 
 def RedrawSkills():
-	global CostTable, TopIndex
+	global CostTable
 
 	SumLabel = SkillWindow.GetControl(0x1000000c)
 	if PointsLeft == 0 or (not CharGen and PointsLeft == 1):
@@ -49,6 +48,7 @@ def RedrawSkills():
 	SumLabel.SetText(str(PointsLeft) )
 
 	maxSkill = Level + 3
+	TopIndex = SkillWindow.GetVar("TopIndex")
 	# ^ crossclass skills max is handled implicitly by the higher cost
 	for i in range(ButtonCount):
 		Pos=TopIndex+i
@@ -97,12 +97,8 @@ def RedrawSkills():
 
 	return
 
-def ScrollBarPress():
-	global TopIndex
-
-	newTopIndex = GemRB.GetVar("TopIndex")
+def ScrollBarPress(sb, newTopIndex):
 	if newTopIndex + ButtonCount <= len(StatLowerLimit):
-		TopIndex = newTopIndex
 		RedrawSkills()
 
 	return
@@ -111,7 +107,7 @@ def OnLoad():
 	OpenSkillsWindow (1, 1)
 
 def OpenSkillsWindow(chargen, level=0):
-	global SkillWindow, TextAreaControl, DoneButton, TopIndex
+	global SkillWindow, TextAreaControl, DoneButton
 	global SkillTable, CostTable, PointsLeft
 	global Level, ClassColumn
 	global CharGen, StatLowerLimit, ButtonCount
@@ -211,8 +207,6 @@ def OpenSkillsWindow(chargen, level=0):
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
 	SkillWindow.SetEventProxy(ScrollBarControl)
 	#decrease it with the number of controls on screen (list size)
-	TopIndex = 0
-	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10+1)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
@@ -226,15 +220,13 @@ def OpenSkillsWindow(chargen, level=0):
 
 	return
 
-def JustPress():
-	Pos = GemRB.GetVar("Skill")+TopIndex
+def JustPress(btn, Pos):
 	TextAreaControl.SetText(SkillTable.GetValue(Pos,2) )
 	return
 
-def RightPress():
+def RightPress(btn, Pos):
 	global PointsLeft
 
-	Pos = GemRB.GetVar("Skill")+TopIndex
 	Cost = CostTable.GetValue(Pos, ClassColumn)
 	if Cost==0:
 		return
@@ -248,10 +240,9 @@ def RightPress():
 	RedrawSkills()
 	return
 
-def LeftPress():
+def LeftPress(btn, Pos):
 	global PointsLeft
 
-	Pos = GemRB.GetVar("Skill")+TopIndex
 	Cost = CostTable.GetValue(Pos, ClassColumn)
 	if Cost==0:
 		return

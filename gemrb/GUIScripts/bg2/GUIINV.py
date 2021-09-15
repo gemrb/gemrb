@@ -37,6 +37,7 @@ def InitInventoryWindow (Window):
 
 	Window.AddAlias("WIN_INV")
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
+	Window.SetVar("TopIndex", 0)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
@@ -99,8 +100,6 @@ def InitInventoryWindow (Window):
 			#keeping 2 in the original place, because it is how
 			#the gui resource has it, but setting the other cycles
 			Button.SetSprites ("STONSLOT",0,0,2,4,3)
-
-	GemRB.SetVar ("TopIndex", 0)
 
 	return
 
@@ -223,7 +222,7 @@ def RefreshInventoryWindow (Window):
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = Window.GetVar ("TopIndex")
 	for i in range (5):
 		Button = Window.GetControl (i+68)
 		if GemRB.IsDraggingItem ()==1:

@@ -874,12 +874,11 @@ def OpenItemWindow ():
 	GemRB.EnterStore (ResRef)
 	return
 
-def DialogItemWindow ():
+def DialogItemWindow (btn, slot):
 	"""Converse with an item."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 
 	ResRef = slot_item['ItemResRef']

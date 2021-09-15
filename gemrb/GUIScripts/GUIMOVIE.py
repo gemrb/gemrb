@@ -52,7 +52,7 @@ def OnLoad():
 	return
 
 def PlayPress():
-	s = GemRB.GetVar ("MovieIndex")
+	s = MovieWindow.GetVar ("MovieIndex")
 	for i in range (MoviesTable.GetRowCount ()):
 		t = MoviesTable.GetRowName (i)
 		if GemRB.GetVar (t)==1:

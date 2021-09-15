@@ -313,19 +313,17 @@ def AIPress (toggle=1):
 
 	AI = GemRB.GetGUIFlags () & GS_PARTYAI
 	if AI:
-		GemRB.SetVar ("AI", 0)
+		Button.SetVarAssoc ("AI", 0)
 		Button.SetTooltip (AITip['Deactivate'])
 		Button.SetState(IE_GUI_BUTTON_SELECTED)
 	else:
-		GemRB.SetVar ("AI", GS_PARTYAI)
+		Button.SetVarAssoc ("AI", GS_PARTYAI)
 		Button.SetTooltip (AITip['Enable'])
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	if GameCheck.IsPST ():
 		GemRB.SetGlobal ("partyScriptsActive", "GLOBALS", AI)
 
-	#force redrawing, in case a hotkey triggered this function
-	Button.SetVarAssoc ("AI", GS_PARTYAI)
 	return
 
 ## The following four functions are for the action bar
@@ -347,9 +345,9 @@ def EmptyControls ():
 		Button.SetVisible (False)
 	return
 
-def SelectFormationPreset ():
+def SelectFormationPreset (btn, val):
 	"""Choose the default formation."""
-	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
+	GemRB.GameSetFormation (val, CurrentWindow.GetVar ("Formation") )
 	GroupControls ()
 	return
 
@@ -385,7 +383,7 @@ def GroupControls ():
 	Button.SetActionIcon (globals(), -1, 6)
 	Button = CurrentWindow.GetControl (6+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1, 7)
-	GemRB.SetVar ("Formation", GemRB.GameGetFormation ())
+	CurrentWindow.SetVar ("Formation", GemRB.GameGetFormation ())
 	for i in range (5):
 		Button = CurrentWindow.GetControl (7+ActionBarControlOffset+i)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -408,18 +406,16 @@ def OpenActionsWindowControls (Window):
 	return
 
 ##not used in pst - not sure any items have abilities, but it is worth making a note to find out
-def SelectItemAbility():
+def SelectItemAbility(btn, ability):
 	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
-	ability = GemRB.GetVar ("Ability")
 	GemRB.SetupQuickSlot (pc, 0, slot, ability)
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	return
 
 #in pst only nordom has bolts and they show on the same floatmenu as quickweapons, so needs work here
-def SelectQuiverSlot():
+def SelectQuiverSlot(btn, slot):
 	pc = GemRB.GameGetFirstSelectedActor ()
-	slot = GemRB.GetVar ("Slot")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	# HACK: implement SetEquippedAmmunition instead?
 	if not GemRB.IsDraggingItem ():
@@ -585,7 +581,7 @@ def SetupSkillSelection ():
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
 	global CurrentWindow
-	global level, TopIndex
+	global level
 	
 	PortraitWindow = GemRB.GetView("PORTWIN")
 	ActionsWindow = GemRB.GetView("ACTWIN")
@@ -1046,8 +1042,7 @@ def ActionWildShapesPressed ():
 	TypeSpellPressed(IE_IWD2_SPELL_SHAPE)
 	return
 
-def SpellShiftPressed ():
-	Spell = GemRB.GetVar ("Spell") # spellindex from spellbook jumbled with booktype
+def SpellShiftPressed (btn, Spell):
 	Type =  Spell // 1000
 	SpellIndex = Spell % 1000
 
@@ -1059,7 +1054,7 @@ def SpellShiftPressed ():
 		SponCastTable = GemRB.LoadTable (SponCastTableName, 1)
 		if not SponCastTable:
 			print("SpellShiftPressed: skipping, non-existent spontaneous casting table used! ResRef:", SponCastTableName)
-			SpellPressed ()
+			SpellPressed (btn, Spell)
 			return
 
 		# determine the column number (spell variety) depending on alignment
@@ -1095,19 +1090,17 @@ def SpellShiftPressed ():
 				GemRB.DisplayString (39742, ColorWhite, pc) # Spontaneous Casting
 
 	# proceed as if nothing happened
-	SpellPressed ()
+	SpellPressed (btn, Spell)
 
 # This is the endpoint for spellcasting, finally calling SpellCast. This always happens at least
 # twice though, the second time to reset the action bar (more if wild magic or subspell selection is involved).
 # Spell and Type (spellbook type) are set during the spell bar construction/use, which is in turn
 # affected by ActionLevel (see UpdateActionsWindow of this module).
 # Keep in mind, that the core resets Type and/or ActionLevel in the case of subspells (fx_select_spell).
-def SpellPressed ():
+def SpellPressed (btn, Spell):
 	"""Prepares a spell to be cast."""
 
 	pc = GemRB.GameGetFirstSelectedActor ()
-
-	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
 
 	if Type == 1<<IE_IWD2_SPELL_SONG:
@@ -1120,7 +1113,7 @@ def SpellPressed ():
 		Type = Spell // 1000
 	Spell = Spell % 1000
 	slot = GemRB.GetVar ("QSpell")
-	if slot>=0:
+	if slot and slot >= 0:
 		#setup quickspell slot
 		#if spell has no target, return
 		#otherwise continue with casting
@@ -1142,11 +1135,10 @@ def SpellPressed ():
 	UpdateActionsWindow ()
 	return
 
-def EquipmentPressed ():
+def EquipmentPressed (btn, Item):
 	pc = GemRB.GameGetFirstSelectedActor ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
-	Item = GemRB.GetVar ("Equipment")
 	#equipment index
 	GemRB.UseItem (pc, -1, Item, -1)
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)

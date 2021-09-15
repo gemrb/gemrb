@@ -31,7 +31,6 @@ TextAreaControl = 0
 DoneButton = 0
 FeatTable = 0
 FeatReqTable = 0
-TopIndex = 0
 KitColumn = 0
 RaceColumn = 0
 FeatsClassColumn = 0
@@ -117,7 +116,7 @@ def GetBaseValue(feat):
 	return Val
 
 def RedrawFeats():
-	global TopIndex, PointsLeft, FeatWindow, FeatReqTable
+	global PointsLeft, FeatWindow, FeatReqTable
 
 	SumLabel = FeatWindow.GetControl(0x1000000c)
 	if PointsLeft == 0:
@@ -129,6 +128,7 @@ def RedrawFeats():
 
 	SumLabel.SetText(str(PointsLeft) )
 
+	TopIndex = FeatWindow.GetVar("TopIndex")
 	for i in range(ButtonCount):
 		Pos=TopIndex+i
 		FeatName = FeatTable.GetValue(Pos, 1)
@@ -193,18 +193,11 @@ def RedrawFeats():
 				Star.SetFlags(IE_GUI_BUTTON_PICTURE, OP_NAND)
 	return
 
-def ScrollBarPress():
-	global TopIndex
-
-	TopIndex = GemRB.GetVar("TopIndex")
-	RedrawFeats()
-	return
-
 def OnLoad():
 	OpenFeatsWindow(1)
 
 def OpenFeatsWindow(chargen=0):
-	global FeatWindow, TextAreaControl, DoneButton, TopIndex
+	global FeatWindow, TextAreaControl, DoneButton
 	global FeatTable, FeatReqTable
 	global KitName, PointsLeft, ButtonCount, CharGen
 	global KitColumn, RaceColumn, FeatsClassColumn, LUStat
@@ -337,10 +330,8 @@ def OpenFeatsWindow(chargen=0):
 	TextAreaControl.SetText(36476)
 
 	ScrollBarControl = FeatWindow.GetControl(104)
-	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawFeats)
 	#decrease it with the number of controls on screen (list size)
-	TopIndex = 0
-	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10)
 	FeatWindow.SetEventProxy(ScrollBarControl)
 
@@ -353,15 +344,12 @@ def OpenFeatsWindow(chargen=0):
 		FeatWindow.Focus()
 	return
 
-def JustPress():
-	Pos = GemRB.GetVar("Feat")+TopIndex
+def JustPress(btn, Pos):
 	TextAreaControl.SetText(FeatTable.GetValue(Pos,2) )
 	return
 
-def RightPress():
+def RightPress(btn, Pos):
 	global PointsLeft
-
-	Pos = GemRB.GetVar("Feat")+TopIndex
 
 	TextAreaControl.SetText(FeatTable.GetValue(Pos,2) )
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
@@ -373,10 +361,8 @@ def RightPress():
 	RedrawFeats()
 	return
 
-def LeftPress():
+def LeftPress(btn, Pos):
 	global PointsLeft
-
-	Pos = GemRB.GetVar("Feat")+TopIndex
 
 	TextAreaControl.SetText(FeatTable.GetValue(Pos,2) )
 	if PointsLeft < 1:

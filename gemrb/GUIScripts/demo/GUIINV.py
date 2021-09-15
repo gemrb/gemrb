@@ -39,6 +39,7 @@ def InitInventoryWindow (Window):
 
 	Window.AddAlias("WIN_INV")
 	InventoryWindow = Window
+	Window.SetVar("TopIndex", 0)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
@@ -124,17 +125,14 @@ def InitInventoryWindow (Window):
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			Button.SetFont ("NUMBER")
 
-	GemRB.SetVar ("TopIndex", 0)
-
 	for i in range (0, 3, 2):
 		Button = Window.GetControl (109+i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChangeWeaponPressed)
 		Button.SetVarAssoc("Equipped", i/2)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-def ChangeWeaponPressed ():
+def ChangeWeaponPressed (btn, Equipped):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Equipped = GemRB.GetVar ("Equipped")
 	GemRB.SetEquippedQuickSlot (pc, Equipped, -1)
 	return
 
@@ -234,7 +232,7 @@ def RefreshInventoryWindow ():
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = Window.GetVar ("TopIndex")
 	for i in range (6):
 		if i<5:
 			Button = Window.GetControl (i+68)

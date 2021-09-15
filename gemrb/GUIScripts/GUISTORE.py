@@ -261,11 +261,6 @@ def InitStoreShoppingWindow (Window):
 	Window.AddAlias('WINSHOP')
 	PositionStoreWinRelativeTo(Window)
 
-	GemRB.SetVar ("LeftIndex", 0) # reset the shopkeeps list
-	GemRB.SetVar ("LeftTopIndex", 0)
-	GemRB.SetVar ("RightTopIndex", 0)
-	GemRB.SetVar ("LeftTopIndex", 0)
-
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		# strings must be able to fit into a resref (<= 8 char)
@@ -470,9 +465,6 @@ def InitStoreIdentifyWindow (Window):
 
 	PositionStoreWinRelativeTo(Window)
 
-	GemRB.SetVar ("Index", -1)
-	GemRB.SetVar ("TopIndex", 0)
-
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		Window.AliasControls ({ 'IDSBAR' : 5, 'IDLBTN' : 4, 'IDTA' : 14,
@@ -534,7 +526,6 @@ def UpdateStoreIdentifyWindow (Window):
 	Count = len(inventory_slots)
 	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, max(0, Count - ItemButtonCount))
-	GemRB.SetVar ("Index", -1)
 	RedrawStoreIdentifyWindow (Window)
 	return
 
@@ -545,11 +536,6 @@ def InitStoreStealWindow (Window):
 	global LeftButton
 
 	PositionStoreWinRelativeTo(Window)
-
-	GemRB.SetVar ("RightIndex", 0)
-	GemRB.SetVar ("LeftIndex", 0)
-	GemRB.SetVar ("RightTopIndex", 0)
-	GemRB.SetVar ("LeftTopIndex", 0)
 
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
@@ -720,9 +706,6 @@ ToggleStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"
 OpenStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreDonateWindow, UpdateStoreDonateWindow, StoreWindowPlacement)
 
 def InitStoreHealWindow (Window):
-	GemRB.SetVar ("Index", -1)
-	GemRB.SetVar ("TopIndex", 0)
-
 	Window.AddAlias('WINHEAL')
 
 	PositionStoreWinRelativeTo(Window)
@@ -772,8 +755,8 @@ def InitStoreHealWindow (Window):
 
 def UpdateStoreHealWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", None, "STOGOLD")
-	TopIndex = GemRB.GetVar ("TopIndex")
-	Index = GemRB.GetVar ("Index")
+	TopIndex = Window.GetVar ("TopIndex")
+	Index = Window.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	labelOffset = 0x1000000c
 	if GameCheck.IsIWD2():
@@ -828,8 +811,6 @@ ToggleStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "
 OpenStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreHealWindow, UpdateStoreHealWindow, StoreWindowPlacement)
 
 def InitStoreRumourWindow (Window):
-	GemRB.SetVar ("TopIndex", 0)
-
 	Window.AddAlias('WINRUMOR')
 
 	PositionStoreWinRelativeTo(Window)
@@ -873,7 +854,7 @@ def InitStoreRumourWindow (Window):
 
 def UpdateStoreRumourWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", None, "STOGOLD")
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = Window.GetVar ("TopIndex")
 	DrinkButtonCount = ItemButtonCount + 1
 	offset = 0
 	if GameCheck.IsIWD2():
@@ -1015,11 +996,6 @@ def GetPC():
 		pc = GemRB.GameGetSelectedPCSingle ()
 		if PreviousPC != pc:
 			PreviousPC = pc
-			# reset the store indices, to prevent overscrolling
-			GemRB.SetVar ("RightIndex", 0)
-			GemRB.SetVar ("RightTopIndex", 0)
-			GemRB.SetVar ("Index", 0)
-			GemRB.SetVar ("TopIndex", 0)
 			UnselectBag ()
 			GemRB.CloseRighthandStore ()
 			UnselectNoRedraw ()
@@ -1154,10 +1130,6 @@ def OpenBag (Window):
 	Slot = GemRB.GetSlotItem (pc, inventory_slots[RightIndex])
 	Item = GemRB.GetItem (Slot['ItemResRef'])
 	if Item['Function'] & ITM_F_CONTAINER:
-		GemRB.SetVar ("RightIndex", 0)
-		GemRB.SetVar ("RightTopIndex", 0)
-		GemRB.SetVar ("Index", 0)
-		GemRB.SetVar ("TopIndex", 0)
 		UnselectNoRedraw ()
 		GemRB.LoadRighthandStore (Slot['ItemResRef'])
 		UpdateStoreShoppingWindow (Window)
@@ -1166,10 +1138,7 @@ def OpenBag (Window):
 def CloseBag (Window):
 	if not Bag:
 		return
-	GemRB.SetVar ("RightIndex", 0)
-	GemRB.SetVar ("RightTopIndex", 0)
-	GemRB.SetVar ("Index", 0)
-	GemRB.SetVar ("TopIndex", 0)
+
 	UnselectBag ()
 	GemRB.CloseRighthandStore ()
 	UnselectNoRedraw ()
@@ -1193,10 +1162,10 @@ def RedrawStoreShoppingWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
-	LeftIndex = GemRB.GetVar ("LeftIndex")
-	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	RightIndex = GemRB.GetVar ("RightIndex")
+	LeftTopIndex = Window.GetVar ("LeftTopIndex")
+	LeftIndex = Window.GetVar ("LeftIndex")
+	RightTopIndex = Window.GetVar ("RightTopIndex")
+	RightIndex = Window.GetVar ("RightIndex")
 	idx = [ LeftTopIndex, RightTopIndex, LeftIndex, RightIndex ]
 	LeftCount = Store['StoreItemCount']
 	BuySum = 0

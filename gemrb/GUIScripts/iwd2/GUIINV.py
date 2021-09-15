@@ -39,6 +39,7 @@ def InitInventoryWindow (Window):
 
 	Window.AddAlias("WIN_INV")
 	InventoryWindow = Window
+	Window.SetVar("TopIndex", 0)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
@@ -121,8 +122,6 @@ def InitInventoryWindow (Window):
 			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			Button.SetFont ("NUMFONT")
-
-	GemRB.SetVar ("TopIndex", 0)
 	
 	for i in range (4):
 		Button = Window.GetControl (109+i)
@@ -229,7 +228,7 @@ def RefreshInventoryWindow ():
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = Window.GetVar ("TopIndex")
 	for i in range (6):
 		if i<5:
 			Button = Window.GetControl (i+68)

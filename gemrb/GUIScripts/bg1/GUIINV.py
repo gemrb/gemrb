@@ -36,6 +36,7 @@ def InitInventoryWindow (Window):
 
 	Window.AddAlias("WIN_INV")
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
+	Window.SetVar("TopIndex", 0)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)

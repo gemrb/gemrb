@@ -149,14 +149,13 @@ def MageNextLevelPress ():
 		MageSpellLevel = MageSpellLevel + 1
 		UpdateMageWindow ()
 
-def OpenMageSpellInfoWindow ():
+def OpenMageSpellInfoWindow (btn, index):
 	Window = GemRB.LoadWindow (4)
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
-	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
 		ResRef = MageMemorizedSpellList[index]
 	else:
@@ -187,7 +186,7 @@ def OnMageMemorizeSpell ():
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = GemRB.GetVar ("SpellButton") - 100
+	index = MageWindow.GetVar ("SpellButton") - 100
 
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		UpdateMageWindow ()

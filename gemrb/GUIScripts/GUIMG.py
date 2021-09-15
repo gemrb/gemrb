@@ -243,7 +243,7 @@ def RefreshMageLevel ():
 	UpdateMageWindow (MageWindow)
 	return
 
-def OpenMageSpellInfoWindow ():
+def OpenMageSpellInfoWindow (btn, index):
 	Window = GemRB.LoadWindow (3, "GUIMG")
 
 	#back
@@ -252,14 +252,13 @@ def OpenMageSpellInfoWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	#erase
-	index = GemRB.GetVar ("SpellButton")
 	Button = Window.GetControl (6)
 	if Button:
 		if index < 100 or Sorcerer:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMageSpellRemoveWindow(Window))
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMageSpellRemoveWindow(Window, index - 100))
 			Button.SetText (63668)
 	if index < 100:
 		ResRef = MageMemorizedSpellList[index]
@@ -280,12 +279,12 @@ def OpenMageSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def OnMageMemorizeSpell ():
+def OnMageMemorizeSpell (btn, val):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = GemRB.GetVar ("SpellButton") - 100
+	index = val - 100
 	blend = 1
 	if GameCheck.IsBG2():
 		blend = 0
@@ -300,7 +299,7 @@ def OnMageMemorizeSpell ():
 		Button.SetAnimation ("FLASH", 0, blend)
 	return
 
-def OpenMageSpellRemoveWindow (parentWin):
+def OpenMageSpellRemoveWindow (parentWin, index):
 	if GameCheck.IsBG2():
 		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
@@ -315,7 +314,7 @@ def OpenMageSpellRemoveWindow (parentWin):
 	Button.SetText (17507)
 	
 	def RemoveSpell ():
-		OnMageRemoveSpell()
+		OnMageRemoveSpell(index)
 		Window.Close()
 		parentWin.Close()
 	
@@ -377,12 +376,10 @@ def OnMageUnmemorizeSpell (btn, index):
 		Button.SetAnimation ("FLASH", 0, blend)
 	return
 
-def OnMageRemoveSpell ():
+def OnMageRemoveSpell (index):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
-
-	index = GemRB.GetVar ("SpellButton")-100
 
 	#remove spell from book
 	GemRB.RemoveSpell (pc, spelltype, level, index)

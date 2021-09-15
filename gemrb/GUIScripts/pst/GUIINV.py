@@ -64,12 +64,10 @@ def InitInventoryWindow (Window):
 	global AvSlotsTable
 
 	Window.AddAlias("WIN_INV")
+	Window.SetVar("TopIndex", 0)
 
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)
-
-	# Reset the ScrollBar index, since it is shared with other windows eg GUILOAD
-	GemRB.SetVar("TopIndex", 0)
 
 	# inventory slots
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
@@ -221,7 +219,7 @@ def RefreshInventoryWindow (Window):
 	GUICommon.AdjustWindowVisibility (Window, pc, False)
 
 	# update ground inventory slots
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = Window.GetVar ("TopIndex")
 	for i in range (10):
 		Button = Window.GetControl (i+47)
 		if GemRB.IsDraggingItem ():

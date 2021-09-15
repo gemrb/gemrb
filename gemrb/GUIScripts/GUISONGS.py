@@ -50,15 +50,14 @@ def OnLoad():
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
-	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PlayPress)
+	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: PlayMusic(MovieWindow.GetVar("MovieIndex"), ColOffset))
 	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CreditsPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	MovieWindow.Focus()
 	return
 	
-def PlayPress():
-	s = GemRB.GetVar ("MovieIndex") + ColOffset
-	t = MoviesTable.GetValue (s, 1-ColOffset)
+def PlayMusic(idx, col):
+	t = MoviesTable.GetValue (idx + col, 1 - col)
 	GemRB.LoadMusicPL(t,1)
 	return
 

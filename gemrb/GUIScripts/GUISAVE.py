@@ -96,7 +96,6 @@ def OpenSaveWindow ():
 	GUICommon.SetSaveDir ()
 	Games = GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - num_rows + 1) #one more for the 'new game'
-	GemRB.SetVar ("TopIndex",TopIndex)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
 	Window.SetEventProxy(ScrollBar)
 	ScrollBarPress ()
@@ -107,7 +106,7 @@ def ScrollBarPress():
 	Window = SaveWindow
 
 	# draw load game portraits
-	Pos = GemRB.GetVar ("TopIndex")
+	Pos = Window.GetVar ("TopIndex")
 	for i in range(num_rows):
 		ActPos = Pos + i
 
@@ -180,7 +179,7 @@ def AbortedSaveGame():
 def ConfirmedSaveGame():
 	global ConfirmWindow
 
-	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
+	Pos = SaveWindow.GetVar ("TopIndex") + SaveWindow.GetVar ("SaveIdx")
 	Label = ConfirmWindow.GetControl (ctrl_offset[7])
 	Slotname = Label.QueryText ()
 	Slotname = Slotname.replace ("/", "|") # can't have path separators in the name
@@ -211,7 +210,7 @@ def OpenConfirmWindow ():
 		ConfirmWindow = None
 		return
 
-	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
+	Pos = SaveWindow.GetVar ("TopIndex") + SaveWindow.GetVar ("SaveIdx")
 	ConfirmWindow = GemRB.LoadWindow (1)
 
 	# Slot name
@@ -287,12 +286,10 @@ def EditChange():
 def DeleteGameConfirm():
 	global Games
 
-	TopIndex = GemRB.GetVar ("TopIndex")
-	Pos = TopIndex + GemRB.GetVar ("SaveIdx")
+	TopIndex = SaveWindow.GetVar ("TopIndex")
+	Pos = TopIndex + SaveWindow.GetVar ("SaveIdx")
 	GemRB.DeleteSaveGame (Games[Pos])
 	del Games[Pos]
-	if TopIndex>0:
-		GemRB.SetVar ("TopIndex",TopIndex-1)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
 	ScrollBarPress()
 

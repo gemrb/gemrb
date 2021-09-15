@@ -31,15 +31,12 @@ TextAreaControl = 0
 DoneButton = 0
 RacialEnemyTable = 0
 RaceCount = 0
-TopIndex = 0
 CharGen = 0
 RacialEnemies = [255] * 9
 RacialStats = [0] * 9
 
 def DisplayRaces():
-	global TopIndex
-
-	TopIndex=GemRB.GetVar("TopIndex")
+	TopIndex = RaceWindow.GetVar("TopIndex")
 	for i in range(11):
 		Button = RaceWindow.GetControl(i+22)
 		Val = RacialEnemyTable.GetValue(i+TopIndex,0)
@@ -120,8 +117,6 @@ def OpenEnemyWindow(chargen=0):
 
 	TextAreaControl = RaceWindow.GetControl(8)
 	TextAreaControl.SetText(17256)
-	TopIndex = 0
-	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl = RaceWindow.GetControl(1)
 	ScrollBarControl.SetVarAssoc("TopIndex",RaceCount)
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRaces)

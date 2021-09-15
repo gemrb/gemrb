@@ -30,7 +30,6 @@ TextAreaControl = 0
 DoneButton = 0
 
 def RedrawSkills():
-	global TopIndex
 	if GemRB.GetVar ("SkillPointsLeft") == 0:
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	else:

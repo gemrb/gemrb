@@ -81,10 +81,9 @@ def BackPress():
 	return
 
 def NextPress():
-	if GenderWindow:
-		GenderWindow.Unload()
-
-	Gender = GemRB.GetVar ("Gender")
+	Gender = GenderWindow.GetVar ("Gender")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
 	GemRB.SetNextScript("GUICG12") #appearance
+	if GenderWindow:
+		GenderWindow.Unload()
 	return

@@ -1083,12 +1083,12 @@ def OpenColorPicker ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def DonePress():
+def DonePress(btn, val):
 	global HairColor, SkinColor, MajorColor, MinorColor
 	global PickedColor
 
 	GemRB.GetView("SUB_WIN", 1).Close()
-	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
+	PickedColor=ColorTable.GetValue (ColorIndex, val)
 	if ColorIndex==0:
 		HairColor=PickedColor
 		UpdatePaperDoll ()

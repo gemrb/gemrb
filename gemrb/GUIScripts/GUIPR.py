@@ -185,14 +185,14 @@ def PriestNextLevelPress ():
 		UpdatePriestWindow (PriestSpellWindow)
 	return
 
-def RefreshPriestLevel ():
+def RefreshPriestLevel (btn, val):
 	global PriestSpellLevel
 
-	PriestSpellLevel = GemRB.GetVar ("PriestSpellLevel")
+	PriestSpellLevel = val
 	UpdatePriestWindow (PriestSpellWindow)
 	return
 
-def OpenPriestSpellInfoWindow ():
+def OpenPriestSpellInfoWindow (btn, index):
 	Window = GemRB.LoadWindow (3)
 
 	#back
@@ -200,7 +200,6 @@ def OpenPriestSpellInfoWindow ():
 	Button.SetText (15416)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
-	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
 		ResRef = PriestMemorizedSpellList[index]
 	else:
@@ -228,7 +227,7 @@ def OnPriestMemorizeSpell ():
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton") - 100
+	index = PriestSpellWindow.GetVar ("SpellButton") - 100
 
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		UpdatePriestWindow (PriestSpellWindow)
@@ -313,11 +312,11 @@ def OnPriestRemoveSpell ():
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton") - 100
+	index = PriestSpellWindow.GetVar("SpellButton") - 100
 
 	#remove spell from memory
 	GemRB.RemoveSpell (pc, spelltype, level, index)
-	OpenPriestSpellInfoWindow()
+	UpdatePriestWindow(PriestSpellWindow)
 	return
 
 ###################################################

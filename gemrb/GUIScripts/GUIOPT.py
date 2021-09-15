@@ -426,10 +426,6 @@ def OpenAutopauseOptionsWindow ():
 
 ###################################################
 
-def MoviePlayPress():
-	movie = MoviesTable.GetRowName (GemRB.GetVar ("MovieIndex"))
-	GemRB.PlayMovie (movie, 1)
-
 # for iwd2 only, the rest use GUIMOVIE
 # TODO: investigate a merger, so it can get removed from GUIOPT
 def OpenMovieWindow ():
@@ -449,7 +445,7 @@ def OpenMovieWindow ():
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
-	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePlayPress)
+	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.PlayMovie(MoviesTable.GetRowName (Window.GetVar ("MovieIndex"))))
 	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.PlayMovie("CREDITS"))
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Window.ShowModal (MODAL_SHADOW_GRAY)

@@ -44,7 +44,7 @@ def OnLoad():
 	return
 	
 def PlayPress():
-	s = GemRB.GetVar("MovieIndex")
+	s = MovieWindow.GetVar("MovieIndex")
 	t = MoviesTable.GetValue(s, 0)
 	GemRB.LoadMusicPL(t,1)
 	return

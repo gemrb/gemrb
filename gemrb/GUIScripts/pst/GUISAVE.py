@@ -143,12 +143,11 @@ def SaveGamePress ():
 def DeleteGameConfirm():
 	global Games
 
-	TopIndex = GemRB.GetVar("TopIndex")
-	Pos = TopIndex +GemRB.GetVar("SaveIdx")
+	TopIndex = SaveWindow.GetVar("TopIndex")
+	Pos = TopIndex + SaveWindow.GetVar("SaveIdx")
 	GemRB.DeleteSaveGame (Games[Pos])
 	del Games[Pos]
-	if TopIndex>0:
-		GemRB.SetVar("TopIndex",TopIndex-1)
+
 	ScrollBar.SetVarAssoc("TopIndex", len(Games))
 	ScrollBarPress()
 	if ConfirmWindow:
@@ -203,7 +202,7 @@ def OpenSaveDetailWindow ():
 
 	SaveDetailWindow = Window = GemRB.LoadWindow (1)
 
-	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
+	Pos = Window.GetVar ("TopIndex") + Window.GetVar ("SaveIdx")
 
 
 	# Save/Overwrite
@@ -274,7 +273,7 @@ def CheckSaveName ():
 def ConfirmedSaveGame ():
 	Window = SaveDetailWindow
 
-	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
+	Pos = Window.GetVar ("TopIndex") + Window.GetVar ("SaveIdx")
 	Label = Window.GetControl (1)
 	Slotname = Label.QueryText ()
 

@@ -129,10 +129,10 @@ def ScrollBarPress ():
 				Button.SetPicture (None)
 	return
 
-def LoadGamePress ():
+def LoadGamePress (btn, val):
 	if LoadWindow:
 		LoadWindow.Unload ()
-	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
+	Pos = LoadWindow.GetVar ("TopIndex") + val
 	LoadScreen.StartLoadScreen ()
 	GemRB.LoadGame(Games[Pos]) # load & start game
 	GemRB.EnterGame ()

@@ -37,6 +37,7 @@ def InitInventoryWindow (Window):
 
 	Window.AddAlias("WIN_INV")
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
+	Window.SetVar("TopIndex", 0)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
@@ -100,7 +101,6 @@ def InitInventoryWindow (Window):
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			Button.SetSprites ("STONSLOT",0,0,1,2,3)
 
-	GemRB.SetVar ("TopIndex", 0)
 	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 
 	return
@@ -117,7 +117,7 @@ def UpdateInventoryWindow (Window = None):
 	Count = Container['ItemCount']
 	if Count<1:
 		Count=1
-	ScrollBar.SetVarAssoc ("TopIndex", GemRB.GetVar ("TopIndex"), 0, Count - 1)
+	ScrollBar.SetVarAssoc ("TopIndex", Window.GetVar ("TopIndex"), 0, Count - 1)
 	RefreshInventoryWindow (Window)
 	#populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
@@ -222,7 +222,7 @@ def RefreshInventoryWindow (Window):
 	Button.SetBAM ("COLGRAD", 1, 0, Color)
 
 	# update ground inventory slots
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = Window.GetVar ("TopIndex")
 	for i in range (5):
 		Button = Window.GetControl (i+68)
 		if GemRB.IsDraggingItem ()==1:

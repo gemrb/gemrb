@@ -242,7 +242,7 @@ def AddNoteWindow ():
 	def SetMapNote (Text):
 		PosX = GemRB.GetVar ("MapControlX")
 		PosY = GemRB.GetVar ("MapControlY")
-		Color = GemRB.GetVar ("Color")
+		Color = NoteWindow.GetVar ("Color")
 		GemRB.SetMapnote (PosX, PosY, Color, Text)
 		NoteWindow.Close()
 		return

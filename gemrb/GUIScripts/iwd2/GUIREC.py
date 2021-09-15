@@ -1040,8 +1040,6 @@ def OpenHelpWindow ():
 	InformationWindow = Window = GemRB.LoadWindow (57)
 
 	HelpTable = GemRB.LoadTable ("topics")
-	GemRB.SetVar("Topic", 0)
-	GemRB.SetVar("TopIndex", 0)
 
 	for i in range(11):
 		title = HelpTable.GetValue (i, 0)
@@ -1070,10 +1068,9 @@ def UpdateHelpWindow ():
 
 	Window = InformationWindow
 
-	if Topic!=GemRB.GetVar ("Topic"):
-		Topic = GemRB.GetVar ("Topic")
-		GemRB.SetVar ("TopIndex",0)
-		GemRB.SetVar ("Selected",0)
+	if Topic != Window.GetVar ("Topic"):
+		Topic = Window.GetVar ("Topic")
+		Window.SetVar ("Selected",0)
 
 	for i in range(11):
 		#Button = Window.GetControl (i+27)
@@ -1107,9 +1104,9 @@ def UpdateHelpWindow ():
 
 def RefreshHelpWindow ():
 	Window = InformationWindow
-	Topic = GemRB.GetVar ("Topic")
-	TopIndex = GemRB.GetVar ("TopIndex")
-	Selected = GemRB.GetVar ("Selected")
+	Topic = Window.GetVar ("Topic")
+	TopIndex = Window.GetVar ("TopIndex")
+	Selected = Window.GetVar ("Selected")
 
 	titlecol = HelpTable.GetValue (Topic, 2)
 	desccol = HelpTable.GetValue (Topic, 3)

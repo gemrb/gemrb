@@ -27,8 +27,6 @@ import GUICommonWindows
 
 ###################################################
 
-global Section
-Section = 1
 Chapter = 0
 Order = 0
 StartTime = 0
@@ -56,7 +54,7 @@ def InitJournalWindow (JournalWindow):
 	def Update():
 		UpdateLogWindow(JournalWindow)
 
-	GemRB.SetVar ("Section", Section)
+	JournalWindow.SetVar ("Section", 1)
 
 	# Quests completed
 	Button = JournalWindow.GetControl (7)
@@ -111,7 +109,7 @@ def UpdateLogWindow (JournalWindow):
 	if JournalWindow == None:
 		JournalWindow = GemRB.GetView("WIN_JRNL")
 
-	Section = GemRB.GetVar("Section")
+	Section = JournalWindow.GetVar("Section")
 	GemRB.SetToken ("CurrentChapter", str(Chapter) )
 	#sorting method
 	# Label = JournalWindow.GetControl (0x1000000a)

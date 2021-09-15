@@ -83,7 +83,7 @@ def OnLoad ():
 
 def ScrollBarPress ():
 	#draw load game portraits
-	Pos = GemRB.GetVar ("TopIndex")
+	Pos = LoadWindow.GetVar ("TopIndex")
 	for i in range (5):
 		ActPos = Pos + i
 
@@ -133,7 +133,7 @@ def ScrollBarPress ():
 def LoadGamePress ():
 	if LoadWindow:
 		LoadWindow.Unload ()
-	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
+	Pos = LoadWindow.GetVar ("TopIndex") + LoadWindow.GetVar ("LoadIdx")
 	LoadScreen.StartLoadScreen()
 	GemRB.LoadGame(Games[Pos]) #loads and enters savegame
 	GemRB.EnterGame ()
@@ -142,11 +142,11 @@ def LoadGamePress ():
 def DeleteGameConfirm():
 	global Games
 
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = LoadWindow.GetVar ("TopIndex")
 	Pos = TopIndex +GemRB.GetVar ("LoadIdx")
 	GemRB.DeleteSaveGame(Games[Pos])
 	if TopIndex>0:
-		GemRB.SetVar ("TopIndex",TopIndex-1)
+		LoadWindow.SetVar ("TopIndex",TopIndex-1)
 	del Games[Pos]
 	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
 	ScrollBarPress ()
