@@ -2017,18 +2017,23 @@ control. See more about this in 'data_exchange'.\n\
 
 static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 {
-	PyObject* Value;
+	PyObject* pynum;
 	char* VarName;
 	unsigned int min = Control::INVALID_VALUE;
 	unsigned int max = Control::INVALID_VALUE;
-	PARSE_ARGS(args, "OsO|II", &self, &VarName, &Value, &min, &max);
+	PARSE_ARGS(args, "OsO|II", &self, &VarName, &pynum, &min, &max);
 
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 	
-	Control::value_t val = (ieDword)PyInt_AsUnsignedLongMask(Value);
+	Control::value_t val = Control::INVALID_VALUE;
+	if (PyInt_Check(pynum)) {
+		val = Control::value_t(PyInt_AsUnsignedLongMask(pynum));
+	} else if (pynum != Py_None) {
+		return RuntimeError("Expected a numeric or None type.");
+	}
+	
 	ctrl->BindDictVariable(VarName, val, Control::ValueRange(min, max));
-
 	Py_RETURN_NONE;
 }
 
