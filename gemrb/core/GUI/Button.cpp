@@ -612,6 +612,11 @@ BitOp Button::GetDictOp() const noexcept
 /** Refresh a button from a given radio button group */
 void Button::UpdateState(value_t Sum)
 {
+	if (IsDisabled()) {
+		// FIXME: buttons should be able to both be disabled and reflect their state
+		return;
+	}
+	
 	State state = UNPRESSED;
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		//radio button, exact value
