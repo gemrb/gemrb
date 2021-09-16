@@ -112,15 +112,11 @@ def InitOptionsWindow (Window):
 ToggleOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.ToggleWindow, InitOptionsWindow)
 OpenOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.OpenWindowOnce, InitOptionsWindow)
 
-def TrySavingConfiguration():
-	if not GemRB.SaveConfig():
-		print("ARGH, could not write config to disk!!")
-
 ###################################################
 
 def SaveSettings(Window, settings):
 	Window.StoreGlobalVariables(settings)
-	TrySavingConfiguration()
+	GemRB.SaveConfig()
 	Window.Close()
 
 def OpenVideoOptionsWindow ():
