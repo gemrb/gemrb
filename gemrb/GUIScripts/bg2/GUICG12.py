@@ -19,6 +19,7 @@
 #character generation, appearance (GUICG12)
 import GemRB
 from ie_restype import RES_BMP
+from ie_stats import IE_SEX
 
 import CharGenCommon
 
@@ -38,9 +39,9 @@ def SetPicture ():
 
 def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
-	global Gender
 	
-	Gender=GemRB.GetVar ("Gender")
+	MyChar = GemRB.GetVar ("Slot")
+	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
 
 	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
 	CharGenCommon.PositionCharGenWin(AppearanceWindow, -6)
@@ -123,7 +124,6 @@ def BackPress():
 	if AppearanceWindow:
 		AppearanceWindow.Unload ()
 	GemRB.SetNextScript ("GUICG1")
-	GemRB.SetVar ("Gender",0) #scrapping the gender value
 	return
 
 def CustomDone():

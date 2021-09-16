@@ -47,7 +47,6 @@ def OnLoad():
 			break
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
-	GemRB.SetVar ("Race", -1)
 	for i in range(2, RaceCount+2):
 		Button = RaceWindow.GetControl(i)
 		Button.SetText(CommonTables.Races.GetValue(i-2,0) )
@@ -71,8 +70,7 @@ def OnLoad():
 	RaceWindow.Focus()
 	return
 
-def RacePress():
-	Race = GemRB.GetVar("Race")
+def RacePress(btn, Race):
 	TextAreaControl.SetText(CommonTables.Races.GetValue(Race,1) )
 	DoneButton.SetDisabled(False)
 	return
@@ -81,15 +79,12 @@ def BackPress():
 	if RaceWindow:
 		RaceWindow.Unload()
 	GemRB.SetNextScript("CharGen2")
-	GemRB.SetVar("Race",0)  #scrapping the race value
 	return
 
 def NextPress():
-	if RaceWindow:
-		RaceWindow.Unload()
-
-	Race = GemRB.GetVar ("Race")
+	Race = RaceWindow.GetVar ("Race")
 	GemRB.SetPlayerStat (MyChar, IE_RACE, CommonTables.Races.GetValue(Race,3) )
 
 	GemRB.SetNextScript("CharGen3") #class
+	RaceWindow.Close()
 	return

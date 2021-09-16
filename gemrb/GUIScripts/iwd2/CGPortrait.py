@@ -108,7 +108,6 @@ def BackPress ():
 	if AppearanceWindow:
 		AppearanceWindow.Unload ()
 	GemRB.SetNextScript ("CharGen")
-	GemRB.SetVar ("Gender",0) #scrapping the gender value
 	return
 
 def CustomDone ():

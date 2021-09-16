@@ -98,7 +98,7 @@ def OnLoad():
 
 	TextAreaControl = ClassWindow.GetControl(13)
 
-	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	ClassName = GUICommon.GetClassRowName (ClassWindow.GetVar("Class") - 1, "index")
 	if ClassName == "":
 		TextAreaControl.SetText(17242)
 		DoneButton.SetDisabled(True)
@@ -116,12 +116,10 @@ def BackPress():
 	if ClassWindow:
 		ClassWindow.Unload()
 	GemRB.SetNextScript("CharGen3")
-	GemRB.SetVar("Class",0)  #scrapping the class value
 	return
 
-def SetClass():
+def SetClass(ClassIndex):
 	# find the class from the class table
-	ClassIndex = GemRB.GetVar ("Class") - 1
 	ClassName = GUICommon.GetClassRowName (ClassIndex, "index")
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
@@ -170,21 +168,19 @@ def SetClass():
 			GemRB.SetPlayerStat (MyChar, IE_LEVEL2+i-1, CurrentLevel)
 
 def MultiClassPress():
-	GemRB.SetVar("Class Kit",0)
 	if ClassWindow:
 		ClassWindow.Unload()
 	GemRB.SetNextScript("GUICG10")
 	return
 
-def ClassPress():
-	SetClass()
+def ClassPress(btn, val):
+	SetClass(val - 1)
 	if ClassWindow:
 		ClassWindow.Unload()
 	GemRB.SetNextScript("GUICG22")
 	return
 
 def NextPress ():
-	SetClass()
 	if ClassWindow:
 		ClassWindow.Unload()
 	GemRB.SetNextScript("CharGen4") #alignment

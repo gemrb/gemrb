@@ -84,15 +84,14 @@ def OnLoad():
 	ClassWindow.Focus()
 	return
 
-def ClassPress():
+def ClassPress(btn, val):
 	GUICG2.SetClass()
-	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	ClassName = GUICommon.GetClassRowName (val - 1, "index")
 	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 	DoneButton.SetDisabled(False)
 	return
 
 def BackPress():
-	GemRB.SetVar("Class",0)  # scrapping it
 	if ClassWindow:
 		ClassWindow.Unload()
 	GemRB.SetNextScript("GUICG2")
@@ -100,15 +99,14 @@ def BackPress():
 
 def NextPress():
 	GUICG2.SetClass()
-	if ClassWindow:
-		ClassWindow.Unload()
 
 	# find the class from the class table
-	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
+	ClassName = GUICommon.GetClassRowName (ClassWindow.GetVar ("Class") - 1, "index")
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
 	GemRB.SetNextScript("CharGen4") #alignment
+	ClassWindow.Close()
 	return
 
 def RedrawMCs():

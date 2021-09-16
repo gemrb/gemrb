@@ -33,8 +33,6 @@ def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
 
 	MyChar = GemRB.GetVar ("Slot")
-
-	GemRB.SetVar("Alignment",-1)
 	
 	KitName = GUICommon.GetClassRowName (MyChar)
 
@@ -73,16 +71,15 @@ def OnLoad():
 	AlignmentWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
-def AlignmentPress():
-	Alignment = GemRB.GetVar("Alignment")
+def AlignmentPress(btn, Alignment):
 	TextAreaControl.SetText (CommonTables.Aligns.GetValue (Alignment,1))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	GemRB.SetVar ("Alignment", CommonTables.Aligns.GetValue (Alignment,3))
+	AlignmentWindow.SetVar ("Alignment", CommonTables.Aligns.GetValue (Alignment,3))
 	return
 
 def NextPress():
-	AlignmentWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
-	Alignment = GemRB.GetVar ("Alignment")
+	Alignment = AlignmentWindow.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
+	AlignmentWindow.Close()
 	CharGenCommon.next()

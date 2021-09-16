@@ -74,8 +74,6 @@ def OnLoad():
 		Button = RaceWindow.GetControl(i+6)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
-	GemRB.SetVar("HatedRace",0)
-
 	BackButton = RaceWindow.GetControl(4)
 	BackButton.SetText(15416)
 	BackButton.MakeEscape()
@@ -93,8 +91,7 @@ def OnLoad():
 	DisplayRaces()
 	return
 
-def RacePress():
-	Race = GemRB.GetVar("HatedRace")
+def RacePress(btn, Race):
 	Row = RaceTable.FindValue(1, Race)
 	TextAreaControl.SetText(RaceTable.GetValue(Row, 2) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
@@ -107,11 +104,10 @@ def BackPress():
 	GemRB.SetNextScript("CharGen6")
 	return
 
-def NextPress():
-	if RaceWindow:
-		RaceWindow.Unload()
+def NextPress():		
 	# save the hated race
-	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace"))
+	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, RaceWindow.GetVar ("HatedRace"))
 
 	GemRB.SetNextScript("GUICG7") #mage spells
+	RaceWindow.Close()
 	return

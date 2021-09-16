@@ -23,8 +23,6 @@ from ie_stats import *
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.SetVar("Class",0) #class
-	GemRB.SetVar("Class Kit",0) #class kit
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, 0)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, 0)
 

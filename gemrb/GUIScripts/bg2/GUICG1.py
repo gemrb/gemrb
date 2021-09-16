@@ -77,7 +77,6 @@ def BackPress():
 	if GenderWindow:
 		GenderWindow.Unload()
 	GemRB.SetNextScript("CharGen")
-	GemRB.SetVar("Gender",0)  #scrapping the gender value
 	return
 
 def NextPress():

@@ -57,6 +57,7 @@ def OnLoad():
 	#there is a specialist mage window, but it is easier to use
 	#the class kit window for both
 	KitWindow = GemRB.LoadWindow(22, "GUICG")
+	KitWindow.SetVar("TopIndex", 0)
 	CharGenCommon.PositionCharGenWin(KitWindow)
 	
 	if ClassName == "MAGE":
@@ -119,7 +120,6 @@ def OnLoad():
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	Init = 1
 	RedrawKits()
-	KitPress()
 	KitWindow.Focus()
 	return
 
@@ -171,10 +171,7 @@ def RedrawKits():
 		if Kit == "*":
 			continue
 		if Init and i+TopIndex==0:
-			if EnabledButtons:
-				GemRB.SetVar("ButtonPressed", EnabledButtons[0]) #but leave Init==1
-			else:
-				GemRB.SetVar("ButtonPressed", 0)
+			if not EnabledButtons:
 				Button.SetState(IE_GUI_BUTTON_SELECTED) 
 				KitSelected = i+TopIndex
 				Init=0
@@ -182,11 +179,10 @@ def RedrawKits():
 			Button.SetState(IE_GUI_BUTTON_SELECTED)
 	return
 
-def KitPress():
+def KitPress(btn, ButtonPressed):
 	global KitSelected
 
 	TopIndex = KitWindow.GetVar("TopIndex")
-	ButtonPressed=GemRB.GetVar("ButtonPressed")
 	KitSelected = ButtonPressed + TopIndex
 	if not KitTable:
 		if ClassName == "MAGE":
@@ -221,7 +217,6 @@ def KitPress():
 	return
 
 def BackPress():
-	GemRB.SetVar("Class Kit", 0) # reverting the value so we are idempotent
 	GemRB.SetVar("MAGESCHOOL", 0)
 	if KitWindow:
 		KitWindow.Unload()

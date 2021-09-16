@@ -81,8 +81,6 @@ def OnLoad():
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetText(KitName)
 		Button.SetVarAssoc("Class Kit",Kit)
-		if i==0:
-			GemRB.SetVar("Class Kit",Kit)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, KitPress)
 
 	BackButton = KitWindow.GetControl(12)
@@ -96,12 +94,10 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(KitWindow))
-	#KitPress()
 	KitWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
-def KitPress():
-	Kit = GemRB.GetVar("Class Kit")
+def KitPress(btn, Kit):
 	if Kit == 0:
 		KitName = CommonTables.Classes.GetValue(ClassName, "DESC_REF")
 	else:
@@ -114,15 +110,15 @@ def KitPress():
 	return
 
 def NextPress():
-	KitWindow.Close ()
 	#class	
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
-	KitIndex = GemRB.GetVar ("Class Kit")
+	KitIndex = KitWindow.GetVar ("Class Kit")
 	if ClassName == "MAGE":
 		GemRB.SetVar("MAGESCHOOL", KitIndex)
 	#the same as the unusable field
 	Kit = CommonTables.KitList.GetValue(KitIndex, 6)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
+	KitWindow.Close ()
 	CharGenCommon.next()

@@ -23,7 +23,6 @@ from ie_stats import IE_RACE
 
 def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.SetVar ("Race",0) #race
 	GemRB.SetPlayerStat (MyChar, IE_RACE, 0)
 
 	CharGenCommon.DisplayOverview (2)

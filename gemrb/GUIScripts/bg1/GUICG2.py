@@ -34,11 +34,6 @@ def OnLoad():
 
 	MyChar = GemRB.GetVar ("Slot")
 	
-	GemRB.SetVar("Class",0)
-	GemRB.SetVar("Multi Class",0)
-	GemRB.SetVar("Specialist",0)
-	GemRB.SetVar("Class Kit",0)
-	
 	ClassCount = CommonTables.Classes.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2, "GUICG")
 	RaceRow = CommonTables.Races.FindValue(3,GemRB.GetPlayerStat (MyChar, IE_RACE))

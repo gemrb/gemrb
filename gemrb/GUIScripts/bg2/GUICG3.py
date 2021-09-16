@@ -74,28 +74,24 @@ def OnLoad():
 	AlignmentWindow.Focus()
 	return
 
-def AlignmentPress():
-	Alignment = GemRB.GetVar("Alignment")
+def AlignmentPress(btn, Alignment):
 	TextAreaControl.SetText (CommonTables.Aligns.GetValue (Alignment, 1))
 	DoneButton.SetDisabled(False)
-	GemRB.SetVar ("Alignment", CommonTables.Aligns.GetValue (Alignment, 3))
+	AlignmentWindow.SetVar ("Alignment", CommonTables.Aligns.GetValue (Alignment, 3))
 	return
 
 def BackPress():
 	if AlignmentWindow:
 		AlignmentWindow.Unload()
-	GemRB.SetVar("Alignment",-1)  #scrapping the alignment value
 	GemRB.SetNextScript("CharGen4")
 	return
 
 def NextPress():
-	if AlignmentWindow:
-		AlignmentWindow.Unload()
 	# save previous stats:
 	#       alignment
 	#       reputation
 	#       alignment abilities
-	Alignment = GemRB.GetVar ("Alignment")
+	Alignment = AlignmentWindow.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
 
 	# use the alignment to apply starting reputation
@@ -109,4 +105,5 @@ def NextPress():
 		GemRB.GameSetReputation (Rep)
 
 	GemRB.SetNextScript("CharGen5") #appearance
+	AlignmentWindow.Close()
 	return

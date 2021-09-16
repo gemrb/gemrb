@@ -907,8 +907,6 @@ def ClassPress():
 	ClassCount = CommonTables.Classes.GetRowCount ()
 	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 	RaceName = CommonTables.Races.GetRowName (RaceRow)
-	GemRB.SetVar ("Class", 0)
-	GemRB.SetVar ("Class Kit", 0)
 	GemRB.SetVar ("MAGESCHOOL", 0)
 
 	for i in range (2, 10):
