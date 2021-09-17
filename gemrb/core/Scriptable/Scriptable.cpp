@@ -623,7 +623,7 @@ ieDword Scriptable::GetInternalFlag() const
 	return InternalFlags;
 }
 
-void Scriptable::SetInternalFlag(unsigned int value, int mode)
+void Scriptable::SetInternalFlag(unsigned int value, BitOp mode)
 {
 	SetBits(InternalFlags, value, mode);
 }

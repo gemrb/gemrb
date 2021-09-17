@@ -58,10 +58,8 @@ public:
 	void release(void);
 	/** Gets the i-th frame */
 	frame_t GetFrame(index_t i) const;
-	/** Mirrors all the frames vertically */
-	void MirrorAnimationVert();
-	/** Mirrors all the frames horizontally */
-	void MirrorAnimation();
+
+	void MirrorAnimation(BlitFlags flags);
 	/** sets frame index */
 	void SetFrame(index_t index);
 	/** Sets ScriptName for area animation */

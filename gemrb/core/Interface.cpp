@@ -216,7 +216,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	cursor = pic;
 
 	// FIXME: this VarName is not consistant
-	strnlwrcpy(dragDummy.VarName, "itembutton", MAX_VARIABLE_LENGTH - 1);
+	dragDummy.BindDictVariable("itembutton", Control::INVALID_VALUE);
 }
 
 Interface::Interface()
@@ -839,28 +839,20 @@ int Interface::LoadSprites()
 	// Load fog-of-war bitmaps
 	anim = (const AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Fog-Of-War bitmaps...");
-	if (!anim || anim->GetCycleSize( 0 ) != 8) {
+	if (!anim) {
 		// unknown type of fog anim
 		Log(ERROR, "Core", "Failed to load Fog-of-War bitmaps.");
 		return GEM_ERROR;
 	}
 
-	FogSprites[1] = anim->GetFrame( 0, 0 );
-	FogSprites[2] = anim->GetFrame( 1, 0 );
-	FogSprites[3] = anim->GetFrame( 2, 0 );
-
-	FogSprites[4] = video->MirrorSprite( FogSprites[1], BlitFlags::MIRRORY, false );
-
-	assert(FogSprites[4]->renderFlags&BlitFlags::MIRRORY);
-
-	FogSprites[6] = video->MirrorSprite( FogSprites[3], BlitFlags::MIRRORY, false );
-
-	FogSprites[8] = video->MirrorSprite( FogSprites[2], BlitFlags::MIRRORX, false );
-	assert(FogSprites[8]->renderFlags&BlitFlags::MIRRORX);
-	FogSprites[9] = video->MirrorSprite( FogSprites[3], BlitFlags::MIRRORX, false );
-
-	FogSprites[12] = video->MirrorSprite( FogSprites[6], BlitFlags::MIRRORX, false );
-	assert(FogSprites[12]->renderFlags&BlitFlags::MIRRORX);
+	FogSprites[1] = anim->GetFrame(0, 0); // horizontal edge
+	FogSprites[2] = anim->GetFrame(1, 0); // vertical edge
+	FogSprites[3] = anim->GetFrame(2, 0); // corner
+	FogSprites[4] = FogSprites[1];
+	FogSprites[6] = FogSprites[3];
+	FogSprites[8] = FogSprites[2];
+	FogSprites[9] = FogSprites[3];
+	FogSprites[12] = FogSprites[6];
 
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
@@ -2346,7 +2338,7 @@ Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame)
 	return guifact->CreateWindow(WindowID, frame);
 }
 
-inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flags, int op)
+inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flags, BitOp op)
 {
 	std::vector<View*>::const_iterator it = views.begin();
 	for (; it != views.end(); ++it) {
@@ -2358,17 +2350,17 @@ inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flag
 void Interface::ToggleViewsVisible(bool visible, const ScriptingGroup_t& group)
 {
 	if (game && group == "HIDE_CUT") {
-		game->SetControlStatus(CS_HIDEGUI, visible ? OP_NAND : OP_OR);
+		game->SetControlStatus(CS_HIDEGUI, visible ? BitOp::NAND : BitOp::OR);
 	}
 
 	std::vector<View*> views = GetViews(group);
-	SetGroupViewFlags(views, View::Invisible, visible ? OP_NAND : OP_OR);
+	SetGroupViewFlags(views, View::Invisible, visible ? BitOp::NAND : BitOp::OR);
 }
 
 void Interface::ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const
 {
 	std::vector<View*> views = GetViews(group);
-	SetGroupViewFlags(views, View::Disabled, enabled ? OP_NAND : OP_OR);
+	SetGroupViewFlags(views, View::Disabled, enabled ? BitOp::NAND : BitOp::OR);
 }
 
 bool Interface::IsFreezed() const
@@ -2433,22 +2425,22 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 		}
 		if (flg & DF_OPENCONTINUEWINDOW) {
 			guiscript->RunFunction( "GUIWORLD", "OpenContinueMessageWindow" );
-			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
+			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BitOp::NAND);
 		} else if (flg & DF_OPENENDWINDOW) {
 			guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
-			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
+			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BitOp::NAND);
 		}
 	}
 
 	//handling container
 	if (CurrentContainer && UseContainer) {
 		if (!(flg & DF_IN_CONTAINER) ) {
-			gc->SetDialogueFlags(DF_IN_CONTAINER, OP_OR);
+			gc->SetDialogueFlags(DF_IN_CONTAINER, BitOp::OR);
 			guiscript->RunFunction( "Container", "OpenContainerWindow" );
 		}
 	} else {
 		if (flg & DF_IN_CONTAINER) {
-			gc->SetDialogueFlags(DF_IN_CONTAINER, OP_NAND);
+			gc->SetDialogueFlags(DF_IN_CONTAINER, BitOp::NAND);
 			guiscript->RunFunction( "Container", "CloseContainerWindow" );
 		}
 	}
@@ -2696,7 +2688,7 @@ int Interface::PlayMovie(const char* resref)
 	SetCutSceneMode(true);
 	Region screen(0, 0, config.Width, config.Height);
 	Window* win = winmgr->MakeWindow(screen);
-	win->SetFlags(Window::Borderless|Window::NoSounds, OP_OR);
+	win->SetFlags(Window::Borderless|Window::NoSounds, BitOp::OR);
 	winmgr->PresentModalWindow(win);
 	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	winmgr->DrawWindows();
@@ -3115,7 +3107,7 @@ void Interface::UpdateWorldMap(const ResRef& wmResRef)
 		const WMPAreaEntry *ae = wm->GetEntry(i);
 		WMPAreaEntry *nae = nwm->GetArea(ae->AreaResRef, ni);
 		if (nae != NULL) {
-			nae->SetAreaStatus(ae->GetAreaStatus(), OP_SET);
+			nae->SetAreaStatus(ae->GetAreaStatus(), BitOp::SET);
 		}
 	}
 
@@ -3614,16 +3606,14 @@ void Interface::DelTree(const char* Pt, bool onlysave) const
 
 void Interface::LoadProgress(int percent)
 {
-	vars->SetAt("Progress", percent);
-
 	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	winmgr->DrawWindows();
 	winmgr->SetCursorFeedback(cur);
 
-	const Window* loadwin = GetWindow(0, "LOADWIN");
-	if (loadwin) {
+	Control* prog = GetControl<Control>("LOAD_PROG", 0);
+	if (prog) {
 		// loadwin is NULL when LoadMap is called and passes false for the loadscreen param
-		loadwin->RedrawControls("Progress", percent);
+		prog->SetValue(percent);
 	}
 
 	video->SwapBuffers();
@@ -4482,10 +4472,10 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 		int strref;
 		if (pause) {
 			strref = STR_PAUSED;
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BitOp::OR);
 		} else {
 			strref = STR_UNPAUSED;
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_NAND);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BitOp::NAND);
 		}
 		if (!(flags&PF_QUIET) ) {
 			if (pause) gc->SetDisplayText(strref, 0); // time 0 = removed instantly on unpause (for pst)

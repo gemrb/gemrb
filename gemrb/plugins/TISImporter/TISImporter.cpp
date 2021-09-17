@@ -87,11 +87,17 @@ Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
 
 Holder<Sprite2D> TISImporter::GetTile(int index)
 {
-	PaletteHolder pal = MakeHolder<Palette>();
-	PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
-	
-	unsigned long pos = index *(1024+4096) + headerShift;
-	if(str->Size()<pos+1024+4096) {
+	strpos_t pos = index *(1024+4096) + headerShift;
+	if (str->Size() < pos + 1024 + 4096) {
+		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
+		
+		if (badTile == nullptr) {
+			// we only want to generate a single bad tile on demand
+			PaletteHolder pal = MakeHolder<Palette>();
+			PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
+			badTile = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+		}
+		
 		// try to only report error once per file
 		static const TISImporter *last_corrupt = nullptr;
 		if (last_corrupt != this) {
@@ -99,27 +105,31 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 			last_corrupt = this;
 		}
 	
-		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
-		pal->col[0].g = 200;
-		return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+		return badTile;
 	}
-	str->Seek( pos, GEM_STREAM_START );
-	Color Col[256];
-	str->Read(&Col, 1024 );
+	
+	PaletteHolder pal = MakeHolder<Palette>();
+	PixelFormat fmt = PixelFormat::Paletted8Bit(pal, true, 0);
 
-	for (int i = 0; i < 256; i++) {
-		// bgra format
-		pal->col[i].r = Col[i].b;
-		pal->col[i].g = Col[i].g;
-		pal->col[i].b = Col[i].r;
-		pal->col[i].a = (Col[i].a) ? Col[i].a : 255; // alpha is unused by the originals but SDL will happily use it
-		if (pal->col[i].g==255 && !pal->col[i].r && !pal->col[i].b) {
-			fmt.HasColorKey = true;
-			fmt.ColorKey = i;
+	str->Seek( pos, GEM_STREAM_START );
+	str->Read(pal->col, 1024);
+	for (Color& c : pal->col) {
+		std::swap(c.b, c.r); // argb format
+	}
+
+	auto spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+	uint8_t* pixels = static_cast<uint8_t*>(spr->LockSprite());
+	str->Read(pixels, 4096);
+	
+	// work around bad data in BG2 AR1700
+	for (int i = 0; i < 4096; ++i) {
+		uint8_t& val = pixels[i];
+		const Color& c = pal->col[val];
+		if (c.r == 4 && c.b == 4 && c.g >= 78) {
+			val = 0;
 		}
 	}
-	auto spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
-	str->Read(spr->LockSprite(), 4096);
+	
 	spr->UnlockSprite();
 	return spr;
 }

@@ -33,32 +33,29 @@ public:
 	using version_t = uint64_t;
 
 protected:
-	struct SurfaceHolder : public Held<SurfaceHolder>
-	{
-		SDL_Surface* surface;
-		PaletteHolder palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
-
-		explicit SurfaceHolder(SDL_Surface* surf) : surface(surf) {}
-		~SurfaceHolder() override { SDL_FreeSurface(surface); }
-
-		SDL_Surface* operator->() const { return surface; }
-		operator SDL_Surface* () const { return surface; }
-	};
-
-	Holder<SurfaceHolder> original;
-	mutable Holder<SurfaceHolder> surface;
-	mutable version_t version = 0;
-	mutable version_t palVersion = 0;
+	SDL_Surface* surface = nullptr; // the actual surface backing the sprite, changes to it invalidate 'renderedSurface'
+	mutable version_t palVersion = 0; // the format.palette version applied to 'surface'
+	mutable SDL_Surface* renderedSurface = nullptr; // a cached surface matching 'version'
+	mutable version_t version = 0; // the flags used to render 'renderedSurface'
 	
-	void SetPaletteFromSurface() const noexcept;
-	bool SetPaletteColors(const Color* pal) const noexcept;
-	void UpdatePalette(PaletteHolder) noexcept override;
-	void UpdateColorKey(colorkey_t key) noexcept override;
+	void UpdateSurfacePalette() const noexcept;
+	void UpdatePalette() noexcept override;
+	void UpdateColorKey() noexcept override;
 
+	bool IsPaletteStale() const noexcept;
+	// restore the sprite to version 0 (aka original) and free the versioned resources
+	// an 8 bit sprite will be also implicitly restored by SetPalette()
+	virtual void Invalidate() const noexcept;
+	
+	// return a copy of the surface or the palette if 8 bit
+	// this copy is what is returned from GetSurface for rendering
+	void* NewVersion(version_t version) const noexcept;
 public:
 	SDLSurfaceSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLSurfaceSprite2D(const Region&, const PixelFormat& fmt) noexcept;
 	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept;
+	~SDLSurfaceSprite2D() noexcept;
+	
 	Holder<Sprite2D> copy() const override;
 
 	const void* LockSprite() const override;
@@ -68,16 +65,12 @@ public:
 	bool HasTransparency() const noexcept override;
 	bool ConvertFormatTo(const PixelFormat& tofmt) noexcept override;
 
-	SDL_Surface* GetSurface() const { return *surface; };
-
-	// return a copy of the surface or the palette if 8 bit
-	// this copy is what is returned from GetSurface for rendering
-	virtual void* NewVersion(version_t version) const;
-	version_t GetVersion() const noexcept { return version; }
-	bool IsPaletteStale() const;
-	// restore the sprite to version 0 (aka original) and free the versioned resources
-	// an 8 bit sprite will be also implicitly restored by SetPalette()
-	virtual void Restore() const;
+	SDL_Surface* GetSurface() const { return renderedSurface; };
+	
+	// render to 'renderedSurface' any supported options passed in 'flags'
+	// returns the flags which were sucessfully applied
+	// operations are not cumulative and don't permanantly alter the 'surface'
+	BlitFlags RenderWithFlags(BlitFlags flags, const Color* = nullptr) const noexcept;
 };
 
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -85,35 +78,19 @@ public:
 // it would probably be better to not inherit from SDLSurfaceSprite2D
 // the hard part is handling the palettes ourselves
 class SDLTextureSprite2D : public SDLSurfaceSprite2D {
-	struct TextureHolder final : public Held<TextureHolder>
-	{
-		SDL_Texture* texture;
-
-		explicit TextureHolder(SDL_Texture* tex) : texture(tex) {}
-		~TextureHolder() final { SDL_DestroyTexture(texture); }
-
-		SDL_Texture* operator->() const { return texture; }
-		operator SDL_Texture* () const { return texture; }
-	};
-
 	mutable Uint32 texFormat = SDL_PIXELFORMAT_UNKNOWN;
-	mutable Holder<TextureHolder> texture;
+	mutable SDL_Texture* texture = nullptr;
 	mutable bool staleTexture = false;
 	
-	void UpdatePalette(PaletteHolder) noexcept override;
-	void UpdateColorKey(colorkey_t key) noexcept override;
-	
+	void Invalidate() const noexcept override;
 public:
 	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLTextureSprite2D(const Region&, const PixelFormat& fmt) noexcept;
+	~SDLTextureSprite2D() noexcept;
+	
 	Holder<Sprite2D> copy() const override;
 	
-	void UnlockSprite() const override;
-
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
-
-	void* NewVersion(version_t version) const override;
-	void Restore() const override;
 };
 #endif
 

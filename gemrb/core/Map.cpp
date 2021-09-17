@@ -747,7 +747,7 @@ void Map::UpdateScripts()
 			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
 			//if that isn't true either, remove this block completely
 			if (actor->GetStat(IE_STATE_ID) & STATE_HELPLESS) {
-				actor->SetInternalFlag(IF_JUSTDIED, OP_NAND);
+				actor->SetInternalFlag(IF_JUSTDIED, BitOp::NAND);
 				continue;
 			}
 		}
@@ -980,52 +980,59 @@ void Map::DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, 
 	enum Directions : uint8_t {
 		N = 1,
 		W = 2,
-		NW = N|W,
+		NW = N|W, // 3
 		S = 4,
-		SW = S|W,
+		SW = S|W, // 6
 		E = 8,
-		NE = N|E,
-		SE = S|E
+		NE = N|E, // 9
+		SE = S|E // 12
+	};
+	
+	static const BlitFlags fogFlags[] {
+		BlitFlags::NONE, BlitFlags::NONE, BlitFlags::NONE, BlitFlags::NONE,
+		BlitFlags::MIRRORY, BlitFlags::NONE, BlitFlags::MIRRORY,
+		BlitFlags::NONE, BlitFlags::MIRRORX, BlitFlags::MIRRORX,
+		BlitFlags::NONE, BlitFlags::NONE, BlitFlags::MIRRORX | BlitFlags::MIRRORY
 	};
 		
 	Video* vid = core->GetVideoDriver();
-	if (vp.y < 0) { // top border
+	if (vp.y < 0) { // north border
 		Region r(0, 0, vp.w, -vp.y);
 		vid->DrawRect(r, ColorBlack, true);
 		r.y += r.h;
 		r.h = FUZZ_AMT;
 		for (int x = r.x + x0; x < r.w; x += CELL_SIZE) {
-			vid->BlitSprite(core->FogSprites[N], Point(x, r.y), &r);
+			vid->BlitSprite(core->FogSprites[N], Point(x, r.y), &r, fogFlags[N]);
 		}
 	}
 	
-	if (vp.y + vp.h > mapSize.h) { // bottom border
+	if (vp.y + vp.h > mapSize.h) { // south border
 		Region r(0, mapSize.h - vp.y, vp.w, vp.y + vp.h - mapSize.h);
 		vid->DrawRect(r, ColorBlack, true);
 		r.y -= FUZZ_AMT;
 		r.h = FUZZ_AMT;
 		for (int x = r.x + x0; x < r.w; x += CELL_SIZE) {
-			vid->BlitSprite(core->FogSprites[S], Point(x, r.y), &r);
+			vid->BlitSprite(core->FogSprites[S], Point(x, r.y), &r, fogFlags[S]);
 		}
 	}
 	
-	if (vp.x < 0) { // left border
+	if (vp.x < 0) { // west border
 		Region r(0, std::max(0, -vp.y), -vp.x, mapSize.h);
 		vid->DrawRect(r, ColorBlack, true);
 		r.x += r.w;
 		r.w = FUZZ_AMT;
 		for (int y = r.y + y0; y < r.h; y += CELL_SIZE) {
-			vid->BlitSprite(core->FogSprites[W], Point(r.x, y), &r);
+			vid->BlitSprite(core->FogSprites[W], Point(r.x, y), &r, fogFlags[W]);
 		}
 	}
 	
-	if (vp.x + vp.w > mapSize.w) { // right border
+	if (vp.x + vp.w > mapSize.w) { // east border
 		Region r(mapSize.w -vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
 		vid->DrawRect(r, ColorBlack, true);
 		r.x -= FUZZ_AMT;
 		r.w = FUZZ_AMT;
 		for (int y = r.y + y0; y < r.h; y += CELL_SIZE) {
-			vid->BlitSprite(core->FogSprites[E], Point(r.x, y), &r);
+			vid->BlitSprite(core->FogSprites[E], Point(r.x, y), &r, fogFlags[E]);
 		}
 	}
 	
@@ -1077,31 +1084,31 @@ void Map::DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, 
 			case E:
 			case NE:
 			case SE:
-				vid->BlitGameSprite(core->FogSprites[dirs], p, flags);
+				vid->BlitGameSprite(core->FogSprites[dirs], p, flags | fogFlags[dirs]);
 				return true;
 			case N|S:
-				vid->BlitGameSprite(core->FogSprites[N], p, flags);
-				vid->BlitGameSprite(core->FogSprites[S], p, flags);
+				vid->BlitGameSprite(core->FogSprites[N], p, flags | fogFlags[N]);
+				vid->BlitGameSprite(core->FogSprites[S], p, flags | fogFlags[S]);
 				return true;
 			case NW|SW:
-				vid->BlitGameSprite(core->FogSprites[NW], p, flags);
-				vid->BlitGameSprite(core->FogSprites[SW], p, flags);
+				vid->BlitGameSprite(core->FogSprites[NW], p, flags | fogFlags[NW]);
+				vid->BlitGameSprite(core->FogSprites[SW], p, flags | fogFlags[SW]);
 				return true;
 			case W|E:
-				vid->BlitGameSprite(core->FogSprites[W], p, flags);
-				vid->BlitGameSprite(core->FogSprites[E], p, flags);
+				vid->BlitGameSprite(core->FogSprites[W], p, flags | fogFlags[W]);
+				vid->BlitGameSprite(core->FogSprites[E], p, flags | fogFlags[E]);
 				return true;
 			case NW|NE:
-				vid->BlitGameSprite(core->FogSprites[NW], p, flags);
-				vid->BlitGameSprite(core->FogSprites[NE], p, flags);
+				vid->BlitGameSprite(core->FogSprites[NW], p, flags | fogFlags[NW]);
+				vid->BlitGameSprite(core->FogSprites[NE], p, flags | fogFlags[NE]);
 				return true;
 			case NE|SE:
-				vid->BlitGameSprite(core->FogSprites[NE], p, flags);
-				vid->BlitGameSprite(core->FogSprites[SE], p, flags);
+				vid->BlitGameSprite(core->FogSprites[NE], p, flags | fogFlags[NE]);
+				vid->BlitGameSprite(core->FogSprites[SE], p, flags | fogFlags[SE]);
 				return true;
 			case SW|SE:
-				vid->BlitGameSprite(core->FogSprites[SW], p, flags);
-				vid->BlitGameSprite(core->FogSprites[SE], p, flags);
+				vid->BlitGameSprite(core->FogSprites[SW], p, flags | fogFlags[SW]);
+				vid->BlitGameSprite(core->FogSprites[SE], p, flags | fogFlags[SE]);
 				return true;
 			default: // a fully surrounded tile is filled
 				return false;
@@ -1475,7 +1482,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			}
 
 			if (!visible || (actor->GetInternalFlag() & (IF_REALLYDIED | IF_ACTIVE)) == (IF_REALLYDIED | IF_ACTIVE)) {
-				actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
+				actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::NAND);
 				// turning actor inactive if there is no action next turn
 				actor->HibernateIfAble();
 			}
@@ -2056,7 +2063,7 @@ bool Map::HandleAutopauseForVisible(Actor *actor, bool doPause) const
 	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK)) {
 		if (doPause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
 			core->Autopause(AP_ENEMY, actor);
-		actor->SetInternalFlag(IF_TRIGGER_AP, OP_OR);
+		actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::OR);
 		return true;
 	}
 	return false;
@@ -3927,7 +3934,7 @@ void AreaAnimation::InitAnimation()
 		anim->Flags = Flags;
 		anim->pos = Pos;
 		if (anim->Flags&A_ANI_MIRROR) {
-			anim->MirrorAnimation();
+			anim->MirrorAnimation(BlitFlags::MIRRORX);
 		}
 
 		return anim;

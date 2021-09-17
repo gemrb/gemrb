@@ -45,9 +45,8 @@ def StartLoadScreen ():
 
 	SetLoadScreen()
 	Bar = LoadScreen.GetControl (0)
-	Progress = 0
-	GemRB.SetVar ("Progress", Progress)
-	Bar.SetVarAssoc ("Progress", Progress)
+	Bar.AddAlias("LOAD_PROG")
+	Bar.SetVarAssoc ("Progress", 0)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
 	return

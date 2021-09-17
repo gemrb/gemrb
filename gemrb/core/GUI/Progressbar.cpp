@@ -94,7 +94,6 @@ void Progressbar::UpdateState(value_t Sum)
 {
 	if (Sum == INVALID_VALUE) return;
 
-	SetValue(Sum);
 	if (GetValue() == 100) {
 		PerformAction(Action::EndReached);
 	}

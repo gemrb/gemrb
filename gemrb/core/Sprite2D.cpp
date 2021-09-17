@@ -126,13 +126,13 @@ void Sprite2D::SetPalette(const PaletteHolder& pal)
 		format.palette = pal->Copy();
 	}
 	
-	UpdatePalette(format.palette);
+	UpdatePalette();
 }
 
 void Sprite2D::SetColorKey(colorkey_t key)
 {
 	format.ColorKey = key;
-	UpdateColorKey(key);
+	UpdateColorKey();
 }
 
 bool Sprite2D::ConvertFormatTo(const PixelFormat& newfmt) noexcept

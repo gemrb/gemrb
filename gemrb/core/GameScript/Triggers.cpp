@@ -524,7 +524,7 @@ int GameScript::BitCheckExact(Scriptable *Sender, const Trigger *parameters)
 	return 0;
 }
 
-//OP_OR would make sense only if this trigger changes the value of the variable
+//OR would make sense only if this trigger changes the value of the variable
 //should I do that???
 int GameScript::BitGlobal_Trigger(Scriptable *Sender, const Trigger *parameters)
 {
@@ -532,7 +532,7 @@ int GameScript::BitGlobal_Trigger(Scriptable *Sender, const Trigger *parameters)
 
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
+		HandleBitMod(value, parameters->int0Parameter, BitOp(parameters->int1Parameter));
 		if (value!=0) return 1;
 	}
 	return 0;
@@ -595,7 +595,7 @@ int GameScript::GlobalBitGlobal_Trigger(Scriptable *Sender, const Trigger *param
 	if (valid) {
 		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid) {
-			HandleBitMod( value1, value2, parameters->int1Parameter);
+			HandleBitMod(value1, value2, BitOp(parameters->int1Parameter));
 			if (value1!=0) return 1;
 		}
 	}

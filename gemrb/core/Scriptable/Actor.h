@@ -595,7 +595,7 @@ public:
 	/* sets the actor in panic (turn/morale break) */
 	void Panic(const Scriptable *attacker, int panicmode);
 	/* sets a multi class flag (actually this is a lot of else too) */
-	void SetMCFlag(ieDword bitmask, int op);
+	void SetMCFlag(ieDword bitmask, BitOp op);
 	/* inlined dialogue start */
 	void Interact(int type) const;
 	/* returns a remapped verbal constant strref */
@@ -831,7 +831,7 @@ public:
 	int GetSkillStat(unsigned int skill) const;
 	int GetSkill(unsigned int skill, bool ids=false) const;
 	int GetFeat(unsigned int feat) const;
-	void SetFeat(unsigned int feat, int mode);
+	void SetFeat(unsigned int feat, BitOp mode);
 	void SetFeatValue(unsigned int feat, int value, bool init = true);
 	void SetUsedWeapon(const char (&AnimationType)[2], const ieWord *MeleeAnimation,
 		unsigned char WeaponType = IE_ANI_WEAPON_INVALID);

@@ -73,13 +73,6 @@ using ControlActionResponder = View::ActionResponder<Control*>;
 using ControlEventHandler = ControlActionResponder::Responder;
 
 class GEM_EXPORT Control : public View, public ControlActionResponder {
-private:
-	void ClearActionTimer();
-	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
-
-	void HandleTouchActionTimer(const Control*);
-    
 public: // Public attributes
 	enum Action : ControlActionResponder::Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
@@ -133,11 +126,9 @@ public: // Public attributes
 		}
 	};
 	
+	using varname_t = FixedSizeString<MAX_VARIABLE_LENGTH, strnicmp>;
 	using value_t = ieDword;
 	static constexpr value_t INVALID_VALUE = -1;
-
-	/** Variable length is 40-1 (zero terminator) */
-	char VarName[MAX_VARIABLE_LENGTH];
 
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;
@@ -155,7 +146,7 @@ public:
 	virtual void SetText(const String&) {};
 
 	/** Update the control if it's tied to a GUI variable */
-	void UpdateState(const char*, value_t);
+	void UpdateState(const varname_t&, value_t);
 	virtual void UpdateState(value_t) {}
 
 	/** Returns the Owner */
@@ -189,6 +180,10 @@ public:
 	void SetValue(value_t val);
 	void SetValueRange(ValueRange range = MaxValueRange);
 	void SetValueRange(value_t min, value_t max = std::numeric_limits<value_t>::max());
+	
+	void BindDictVariable(const varname_t& var, value_t val, ValueRange range = MaxValueRange) noexcept;
+	bool IsDictBound() const noexcept;
+	const varname_t& DictVariable() const noexcept { return VarName; }
 
 protected:
 	using ActionKey = ControlActionResponder::ActionKey;
@@ -208,6 +203,8 @@ protected:
 		ControlActionKey(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0)
 		: ActionKey(BuildKeyValue(type, mod, button, count) ) {}
 	};
+	
+	void UpdateDictValue() noexcept;
 
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 	
@@ -231,7 +228,15 @@ private:
 	/** the value of the control to add to the variable */
 	value_t Value = INVALID_VALUE;
 	ValueRange range;
+	varname_t VarName;
+	
+	void ClearActionTimer();
+	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
+	void HandleTouchActionTimer(const Control*);
+	
+	virtual BitOp GetDictOp() const noexcept { return BitOp::SET; }
 };
 
 

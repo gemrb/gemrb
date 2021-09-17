@@ -262,9 +262,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const Region
 	if (spr->Format().Bpp == 1) {
 		if (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
 			c.a = (BlitFlags::ALPHA_MOD) ? c.a : SDL_ALPHA_OPAQUE;
-			flags &= ~RenderSpriteVersion(spr, flags, &c);
+			flags &= ~spr->RenderWithFlags(flags, &c);
 		} else {
-			flags &= ~RenderSpriteVersion(spr, flags);
+			flags &= ~spr->RenderWithFlags(flags);
 		}
 	}
 

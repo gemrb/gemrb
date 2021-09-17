@@ -183,38 +183,13 @@ void Video::SetEventMgr(EventMgr* evnt)
 	EvntManager = evnt;
 }
 
-// Flips given sprite according to the flags. If MirrorAnchor=true,
-// flips its anchor (i.e. origin/base point) as well
-// returns new sprite
-Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags, bool MirrorAnchor)
-{
-	if (!sprite)
-		return NULL;
-
-	Holder<Sprite2D> dest = sprite->copy();
-
-	if (flags&BlitFlags::MIRRORX) {
-		dest->renderFlags ^= BlitFlags::MIRRORX;
-		if (MirrorAnchor)
-			dest->Frame.x = sprite->Frame.w - sprite->Frame.x;
-	}
-
-	if (flags&BlitFlags::MIRRORY) {
-		dest->renderFlags ^= BlitFlags::MIRRORY;
-		if (MirrorAnchor)
-			dest->Frame.y = sprite->Frame.h - sprite->Frame.y;
-	}
-
-	return dest;
-}
-
 /** Get the fullscreen mode */
 bool Video::GetFullscreenMode() const
 {
 	return fullscreen;
 }
 
-void Video::BlitSprite(const Holder<Sprite2D>& spr, Point p, const Region* clip)
+void Video::BlitSprite(const Holder<Sprite2D>& spr, Point p, const Region* clip, BlitFlags flags)
 {
 	p -= spr->Frame.origin;
 	Region dst(p, spr->Frame.size);
@@ -237,7 +212,7 @@ void Video::BlitSprite(const Holder<Sprite2D>& spr, Point p, const Region* clip)
 	// since the next stage is also public, we must readd the Pos becuase it will again be removed
 	fClip.x += spr->Frame.x;
 	fClip.y += spr->Frame.y;
-	BlitSprite(spr, src, fClip, BlitFlags::BLENDED);
+	BlitSprite(spr, src, fClip, flags | BlitFlags::BLENDED);
 }
 
 void Video::BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const PaletteHolder& pal, const Point& p,

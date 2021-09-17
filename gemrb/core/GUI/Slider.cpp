@@ -69,8 +69,8 @@ void Slider::SetPosition(unsigned int pos)
 	if (pos <= KnobStepsCount) {
 		Pos = pos;
 	}
-	if (VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, pos * GetValue() );
+	if (IsDictBound()) {
+		core->GetDictionary()->SetAt(DictVariable(), pos * GetValue());
 	}
 	MarkDirty();
 }
@@ -109,7 +109,6 @@ void Slider::UpdateState(value_t Sum)
 	if (Sum <= KnobStepsCount) {
 		Pos = Sum;
 	}
-	MarkDirty();
 }
 
 /** Sets the selected image */

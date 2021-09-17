@@ -28,6 +28,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "Control.h"
 #include "ScrollView.h"
 #include "WindowManager.h"
 
@@ -35,7 +36,6 @@
 
 namespace GemRB {
 
-class Control;
 class Sprite2D;
 
 /**
@@ -143,7 +143,7 @@ public:
 	bool IsReceivingEvents() const override { return true; }
 
 	const VideoBufferPtr& DrawWithoutComposition();
-	void RedrawControls(const char* VarName, unsigned int Sum) const;
+	void RedrawControls(const Control::varname_t& VarName) const;
 
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
