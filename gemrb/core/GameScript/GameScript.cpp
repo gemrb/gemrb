@@ -2456,7 +2456,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 	// reallow area scripts after us, if they were disabled
 	if (aC->flags & ACF_REALLOW_SCRIPTS) {
-		core->GetGameControl()->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_NAND);
+		core->GetGameControl()->SetDialogueFlags(DF_POSTPONE_SCRIPTS, BitOp::NAND);
 	}
 
 	// check for ActionOverride

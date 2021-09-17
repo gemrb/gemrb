@@ -32,26 +32,26 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* px, const Pixel
 : Sprite2D(rgn, px, fmt)
 {
 	if (px) {
-		surface = MakeHolder<SurfaceHolder>(SDL_CreateRGBSurfaceFrom(px, Frame.w, Frame.h, fmt.Depth, Frame.w * fmt.Bpp,
-															 fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
+		surface = SDL_CreateRGBSurfaceFrom(px, Frame.w, Frame.h, fmt.Depth, Frame.w * fmt.Bpp,
+										   fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask);
 	} else {
 		assert(fmt.Depth >= 8);
-		surface = MakeHolder<SurfaceHolder>(SDL_CreateRGBSurface(0, Frame.w, Frame.h, fmt.Depth, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
-		SDL_FillRect(*surface, NULL, 0);
-		pixels = (*surface)->pixels;
+		surface = SDL_CreateRGBSurface(0, Frame.w, Frame.h, fmt.Depth, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask);
+		SDL_FillRect(surface, nullptr, 0);
+		pixels = surface->pixels;
 	}
 
-	assert(*surface);
-	pitch = (*surface)->pitch;
+	assert(surface);
+	pitch = surface->pitch;
 	
 	if (format.palette) {
-		UpdatePalette(format.palette);
+		UpdatePalette();
 	}
-	UpdateColorKey(format.ColorKey);
+	UpdateColorKey();
 	
-	format = PixelFormatForSurface(*surface, format.palette);
+	format = PixelFormatForSurface(surface, format.palette);
 	
-	original = surface;
+	renderedSurface = surface;
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, const PixelFormat& fmt) noexcept
@@ -59,69 +59,31 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, const PixelFormat& fm
 {}
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
-: Sprite2D(obj)
+: SDLSurfaceSprite2D(obj.Frame, nullptr, obj.format)
 {
-	pixels = (*obj.surface)->pixels;
-
-	surface = MakeHolder<SurfaceHolder>(
-			SDL_CreateRGBSurfaceFrom(
-				pixels,
-				Frame.w,
-				Frame.h,
-				format.Depth,
-				Frame.w * format.Bpp,
-				format.Rmask,
-				format.Gmask,
-				format.Bmask,
-				format.Amask
-			)
-		);
-	
-	if (format.palette) {
-		UpdatePalette(format.palette);
-	}
-	UpdateColorKey(format.ColorKey);
-	
-	format = PixelFormatForSurface(*surface, obj.format.palette);
-
-	if (pixels == nullptr) {
-		pixels = (*surface)->pixels;
-	}
-	
-	original = surface;
+	renderFlags = obj.renderFlags;
+	SDL_BlitSurface(obj.surface, nullptr, surface, nullptr);
 }
 
-void SDLSurfaceSprite2D::SetPaletteFromSurface() const noexcept
+SDLSurfaceSprite2D::~SDLSurfaceSprite2D() noexcept
 {
-	const SDL_PixelFormat* fmt = (*surface)->format;
-	if (fmt->BytesPerPixel != 1) {
-		return;
+	if (renderedSurface != surface) {
+		SDL_FreeSurface(renderedSurface);
 	}
-	assert(fmt->palette->ncolors <= 256);
-	const Color* begin = reinterpret_cast<const Color*>(fmt->palette->colors);
-	const Color* end = begin + fmt->palette->ncolors;
-	
-	if (surface->palette == nullptr) {
-		surface->palette = MakeHolder<Palette>(begin, end);
-	} else {
-		surface->palette->CopyColorRange(begin, end, 0);
-	}
+	SDL_FreeSurface(surface);
 }
 
-bool SDLSurfaceSprite2D::SetPaletteColors(const Color* pal) const noexcept
+void SDLSurfaceSprite2D::UpdateSurfacePalette() const noexcept
 {
-	if (format.Depth > 8) {
-		return false;
-	}
-	bool ret = SDLVideoDriver::SetSurfacePalette(*surface, reinterpret_cast<const SDL_Color*>(pal), 0x01 << format.Depth);
-	if (ret) {
-		SetPaletteFromSurface();
+	assert (format.Depth <= 8);
+	
+	const auto& pal = format.palette;
+	SDLVideoDriver::SetSurfacePalette(surface, reinterpret_cast<const SDL_Color*>(pal->col), 0x01 << format.Depth);
 #if SDL_VERSION_ATLEAST(1,3,0)
-		// must reset the color key or SDL 2 wont render properly
-		SDL_SetColorKey(*surface, SDL_TRUE, GetColorKey());
+	// must reset the color key or SDL 2 wont render properly
+	SDL_SetColorKey(surface, SDL_bool(format.HasColorKey), GetColorKey());
 #endif
-	}
-	return ret;
+	palVersion = pal->GetVersion();
 }
 
 Holder<Sprite2D> SDLSurfaceSprite2D::copy() const
@@ -131,61 +93,54 @@ Holder<Sprite2D> SDLSurfaceSprite2D::copy() const
 
 const void* SDLSurfaceSprite2D::LockSprite() const
 {
-	SDL_LockSurface(*surface);
-	return (*surface)->pixels;
+	SDL_LockSurface(surface);
+	return surface->pixels;
 }
 
 void* SDLSurfaceSprite2D::LockSprite()
 {
-	SDL_LockSurface(*surface);
-	return (*surface)->pixels;
+	SDL_LockSurface(surface);
+	return surface->pixels;
 }
 
 void SDLSurfaceSprite2D::UnlockSprite() const
 {
-	SDL_UnlockSurface(*surface);
+	SDL_UnlockSurface(surface);
 }
 
-bool SDLSurfaceSprite2D::IsPaletteStale() const
+bool SDLSurfaceSprite2D::IsPaletteStale() const noexcept
 {
-	PaletteHolder pal = GetPalette();
-	return pal && pal->GetVersion() != palVersion;
-}
-
-void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
-{
-	// we don't use shared palettes because it is a performance bottleneck on SDL2
-	assert(pal && pal != surface->palette);
-
-	if (version != 0) {
-		Restore();
-	}
+	if (version) return true; // 'version' implies tha palette was color modified
 	
-	surface->palette = pal;
-	SetPaletteColors(pal->col);
-
-	palVersion = pal->GetVersion();
+	const PaletteHolder& pal = format.palette;
+	assert(pal);
+	return pal->GetVersion() != palVersion;
 }
 
-void SDLSurfaceSprite2D::UpdateColorKey(colorkey_t ck) noexcept
+void SDLSurfaceSprite2D::UpdatePalette() noexcept
+{
+	Invalidate();
+}
+
+void SDLSurfaceSprite2D::UpdateColorKey() noexcept
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
-	SDL_SetColorKey(*surface, SDL_bool(format.HasColorKey), ck);
+	SDL_SetColorKey(surface, SDL_bool(format.HasColorKey), format.ColorKey);
 	// don't RLE with SDL 2
 	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
 #else
 	Uint32 flag = format.HasColorKey ? SDL_SRCCOLORKEY : 0;
-	SDL_SetColorKey(*surface, flag | SDL_RLEACCEL, ck);
+	SDL_SetColorKey(surface, flag | SDL_RLEACCEL, ck);
 #endif
 }
 
 bool SDLSurfaceSprite2D::HasTransparency() const noexcept
 {
-	const SDL_PixelFormat* fmt = (*surface)->format;
+	const SDL_PixelFormat* fmt = surface->format;
 #if SDL_VERSION_ATLEAST(1,3,0)
-	return SDL_ISPIXELFORMAT_ALPHA(fmt->format) || SDL_GetColorKey(*surface, NULL) != -1;
+	return SDL_ISPIXELFORMAT_ALPHA(fmt->format) || SDL_GetColorKey(surface, NULL) != -1;
 #else
-	return fmt->Amask > 0 || ((*surface)->flags & SDL_SRCCOLORKEY);
+	return fmt->Amask > 0 || ((surface)->flags & SDL_SRCCOLORKEY);
 #endif
 }
 
@@ -198,7 +153,7 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 #if SDL_VERSION_ATLEAST(1,3,0)
 	Uint32 fmt = SDL_MasksToPixelFormatEnum(tofmt.Bpp * 8, tofmt.Rmask, tofmt.Gmask, tofmt.Bmask, tofmt.Amask);
 	if (fmt != SDL_PIXELFORMAT_UNKNOWN) {
-		SDL_Surface* ns = SDL_ConvertSurfaceFormat(*surface, fmt, 0);
+		SDL_Surface* ns = SDL_ConvertSurfaceFormat(surface, fmt, 0);
 #else
 	SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, Frame.w, Frame.h, tofmt.Depth, tofmt.Rmask, tofmt.Gmask, tofmt.Bmask, tofmt.Amask);
 	if (tmp) {
@@ -210,10 +165,10 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 				free(pixels);
 			}
 			freePixels = false;
-			surface = MakeHolder<SurfaceHolder>(ns);
+			surface = ns;
 			format.Bpp = tofmt.Bpp;
 			if (ns->format->palette) {
-				SetPaletteFromSurface();
+				UpdateSurfacePalette();
 			}
 			return true;
 		} else {
@@ -229,37 +184,97 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 	return false;
 }
 
-void SDLSurfaceSprite2D::Restore() const
+void SDLSurfaceSprite2D::Invalidate() const noexcept
 {
 	version = 0;
-	surface = original;
-	if (format.Bpp == 1 && original->palette) {
-		SetPaletteColors(original->palette->col);
+	if (renderedSurface != surface) {
+		SDL_FreeSurface(renderedSurface);
+		renderedSurface = surface;
+	}
+	if (format.Depth <= 8) {
+		UpdateSurfacePalette();
 	}
 }
 
-void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const
+void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const noexcept
 {
 	if (newversion == 0 || version != newversion) {
-		Restore();
+		Invalidate();
 		version = newversion;
 	}
 
 	if (format.Bpp == 1) {
 		// we just allow overwritting the palette
-		return surface->surface->format->palette;
+		return surface->format->palette;
 	}
 
 	palVersion = 0;
 
 	if (version != newversion) {
-		SDL_Surface* newVersion = SDL_ConvertSurface(*original, (*original)->format, 0);
-		surface = MakeHolder<SurfaceHolder>(newVersion);
-
-		return newVersion;
-	} else {
-		return surface->surface;
+		renderedSurface = SDL_ConvertSurface(surface, surface->format, 0);
 	}
+	return renderedSurface;
+}
+	
+BlitFlags SDLSurfaceSprite2D::RenderWithFlags(BlitFlags renderflags, const Color* tint) const noexcept
+{
+	SDLSurfaceSprite2D::version_t oldVersion = version;
+	SDLSurfaceSprite2D::version_t newVersion = renderflags;
+	auto ret = (BlitFlags::GREY | BlitFlags::SEPIA) & newVersion;
+	
+	if (format.Bpp == 1) {
+		if (tint) {
+			assert(renderflags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD));
+			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
+			newVersion |= tintv << 32;
+		}
+		
+		if (IsPaletteStale()) {
+			SDL_Palette* pal = static_cast<SDL_Palette*>(NewVersion(newVersion));
+
+			for (size_t i = 0; i < 256; ++i) {
+				Color& dstc = reinterpret_cast<Color&>(pal->colors[i]);
+
+				if (renderflags&BlitFlags::COLOR_MOD) {
+					assert(tint);
+					ShaderTint(*tint, dstc);
+					ret |= BlitFlags::COLOR_MOD;
+				}
+				
+				if (renderflags & BlitFlags::ALPHA_MOD) {
+					assert(tint);
+					dstc.a = tint->a;
+					ret |= BlitFlags::ALPHA_MOD;
+				}
+
+				if (renderflags&BlitFlags::GREY) {
+					ShaderGreyscale(dstc);
+				} else if (renderflags&BlitFlags::SEPIA) {
+					ShaderSepia(dstc);
+				}
+			}
+		} else {
+			ret |= (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD) & newVersion;
+		}
+	} else if (oldVersion != newVersion) {
+		SDL_Surface* newV = (SDL_Surface*)NewVersion(newVersion);
+		SDL_LockSurface(newV);
+
+		const Region& r = {0, 0, newV->w, newV->h};
+		SDLPixelIterator beg = MakeSDLPixelIterator(newV, r);
+		SDLPixelIterator end = SDLPixelIterator::end(beg);
+		StaticAlphaIterator alpha(0xff);
+
+		if (renderflags & BlitFlags::GREY) {
+			RGBBlendingPipeline<SHADER::GREYSCALE, true> blender;
+			Blit(beg, beg, end, alpha, blender);
+		} else if (renderflags & BlitFlags::SEPIA) {
+			RGBBlendingPipeline<SHADER::SEPIA, true> blender;
+			Blit(beg, beg, end, alpha, blender);
+		}
+		SDL_UnlockSurface(newV);
+	}
+	return static_cast<BlitFlags>(ret);
 }
 
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -271,6 +286,11 @@ SDLTextureSprite2D::SDLTextureSprite2D(const Region& rgn, const PixelFormat& fmt
 : SDLSurfaceSprite2D(rgn, fmt)
 {}
 
+SDLTextureSprite2D::~SDLTextureSprite2D() noexcept
+{
+	SDL_DestroyTexture(texture);
+}
+
 Holder<Sprite2D> SDLTextureSprite2D::copy() const
 {
 	return Holder<Sprite2D>(new SDLTextureSprite2D(*this));
@@ -279,57 +299,27 @@ Holder<Sprite2D> SDLTextureSprite2D::copy() const
 SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 {
 	if (texture == nullptr) {
-		SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, GetSurface());
-		SDL_QueryTexture(tex, &texFormat, nullptr, nullptr, nullptr);
-		texture = MakeHolder<TextureHolder>(tex);
+		texture = SDL_CreateTextureFromSurface(renderer, GetSurface());
+		SDL_QueryTexture(texture, &texFormat, nullptr, nullptr, nullptr);
 	} else if (staleTexture) {
 		SDL_Surface *surface = GetSurface();
 		if (texFormat == surface->format->format) {
-			SDL_UpdateTexture(*texture, nullptr, surface->pixels, surface->pitch);
+			SDL_UpdateTexture(texture, nullptr, surface->pixels, surface->pitch);
 		} else {
-			/* Set up a destination surface for the texture update */
-			SDL_PixelFormat *dst_fmt = SDL_AllocFormat(texFormat);
-			assert(dst_fmt);
-			
-			SDL_Surface *temp = SDL_ConvertSurface(surface, dst_fmt, 0);
-			SDL_FreeFormat(dst_fmt);
+			SDL_Surface *temp = SDL_ConvertSurfaceFormat(surface, texFormat, 0);
 			assert(temp);
-			SDL_UpdateTexture(*texture, nullptr, temp->pixels, temp->pitch);
+			SDL_UpdateTexture(texture, nullptr, temp->pixels, temp->pitch);
 			SDL_FreeSurface(temp);
 		}
 		staleTexture = false;
 	}
-	return *texture;
-}
-	
-void SDLTextureSprite2D::UnlockSprite() const
-{
-	SDLSurfaceSprite2D::UnlockSprite();
-	staleTexture = true;
+	return texture;
 }
 
-void SDLTextureSprite2D::UpdatePalette(PaletteHolder pal) noexcept
-{
-	SDLSurfaceSprite2D::UpdatePalette(pal);
-	staleTexture = true;
-}
-
-void SDLTextureSprite2D::UpdateColorKey(colorkey_t key) noexcept
-{
-	SDLSurfaceSprite2D::UpdateColorKey(key);
-	staleTexture = true;
-}
-
-void* SDLTextureSprite2D::NewVersion(version_t version) const
+void SDLTextureSprite2D::Invalidate() const noexcept
 {
 	staleTexture = true;
-	return SDLSurfaceSprite2D::NewVersion(version);
-}
-
-void SDLTextureSprite2D::Restore() const
-{
-	staleTexture = true;
-	SDLSurfaceSprite2D::Restore();
+	SDLSurfaceSprite2D::Invalidate();
 }
 #endif
 

@@ -37,10 +37,10 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	hoverView = NULL;
 	lastMouseMoveTime = GetTicks();
 
-	SetFlags(DestroyOnClose, OP_OR);
+	SetFlags(DestroyOnClose, BitOp::OR);
 	// default ingame windows to frameless
 	if (core->HasCurrentArea()) {
-		SetFlags(Borderless, OP_OR);
+		SetFlags(Borderless, BitOp::OR);
 	}
 	RecreateBuffer();
 }
@@ -265,8 +265,10 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::RedrawControls(const char* VarName, Control::value_t val) const
+void Window::RedrawControls(const Control::varname_t& VarName) const
 {
+	Control::value_t val = Control::INVALID_VALUE;
+	core->GetDictionary()->Lookup(VarName, val);
 	for (auto ctrl : Controls) {
 		ctrl->UpdateState(VarName, val);
 	}

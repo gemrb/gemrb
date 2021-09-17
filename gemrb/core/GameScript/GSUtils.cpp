@@ -181,7 +181,7 @@ int GetHPPercent(const Scriptable *Sender)
 	return hp2*100/hp1;
 }
 
-void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
+void HandleBitMod(ieDword &value1, ieDword value2, BitOp opcode)
 {
 	SetBits(value1, value2, opcode);
 }
@@ -1272,9 +1272,9 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 
 	//increasing NumTimesTalkedTo or NumTimesInteracted
 	if (Flags & BD_TALKCOUNT) {
-		gc->SetDialogueFlags(DF_TALKCOUNT, OP_OR);
+		gc->SetDialogueFlags(DF_TALKCOUNT, BitOp::OR);
 	} else if ((Flags & BD_LOCMASK) == BD_INTERACT) {
-		gc->SetDialogueFlags(DF_INTERACT, OP_OR);
+		gc->SetDialogueFlags(DF_INTERACT, BitOp::OR);
 	}
 
 	core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
@@ -1326,7 +1326,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 			WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
 			// make sure the area is marked as revealed and visited
 			if (entry && !(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-				entry->SetAreaStatus(WMP_ENTRY_VISIBLE | WMP_ENTRY_VISITED, OP_OR);
+				entry->SetAreaStatus(WMP_ENTRY_VISIBLE | WMP_ENTRY_VISITED, BitOp::OR);
 			}
 		}
 	}
@@ -1338,7 +1338,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 	// should this perhaps be a 'selected' check or similar instead?
 	if (actor->InParty) {
 		GameControl *gc=core->GetGameControl();
-		gc->SetScreenFlags(SF_CENTERONACTOR,OP_OR);
+		gc->SetScreenFlags(SF_CENTERONACTOR, BitOp::OR);
 		if (newSong) {
 			game->ChangeSong(false, true);
 		}
@@ -2533,7 +2533,7 @@ retry:
 	free(selects);
 }
 
-void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, int flag)
+void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, bool flag)
 {
 	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
 	if (!anim) {
@@ -2550,10 +2550,10 @@ void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, int
 		return;
 	}
 
-	flag = flag ? OP_OR : OP_NAND;
-	SetBits<ieDword>(anim->Flags, A_ANI_ACTIVE, flag);
+	BitOp op = flag ? BitOp::OR : BitOp::NAND;
+	SetBits<ieDword>(anim->Flags, A_ANI_ACTIVE, op);
 	for (size_t i = 0; i < anim->animation.size(); ++i) {
-		SetBits<ieDword>(anim->animation[i].Flags, A_ANI_ACTIVE, flag);
+		SetBits<ieDword>(anim->animation[i].Flags, A_ANI_ACTIVE, op);
 	}
 }
 

@@ -407,10 +407,10 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 void ContentContainer::SizeChanged(const Size& /*oldSize*/)
 {
 	if (frame.w <= 0) {
-		SetFlags(RESIZE_WIDTH, OP_OR);
+		SetFlags(RESIZE_WIDTH, BitOp::OR);
 	}
 	if (frame.h <= 0) {
-		SetFlags(RESIZE_HEIGHT, OP_OR);
+		SetFlags(RESIZE_HEIGHT, BitOp::OR);
 	}
 	LayoutContentsFrom(contents.begin());
 }

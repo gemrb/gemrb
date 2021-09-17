@@ -106,12 +106,7 @@ Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned in
 
 	Animation *anim = af->GetCycle(c);
 	if (anim) {
-		if (Transparency & IE_VVC_MIRRORX) {
-			anim->MirrorAnimation();
-		}
-		if (Transparency & IE_VVC_MIRRORY) {
-			anim->MirrorAnimationVert();
-		}
+		anim->MirrorAnimation(BlitFlags(Transparency) & (BlitFlags::MIRRORX | BlitFlags::MIRRORY));
 		//creature anims may start at random position, vvcs always start on 0
 		anim->frameIdx = 0;
 		//vvcs are always paused
@@ -173,7 +168,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 	}
 
 	for (unsigned int i = 0; i < cCount; i++) {
-		bool mirror = false;
+		BlitFlags mirrorFlags = BlitFlags::NONE;
 		int c = i;
 		int p = i;
 		if (type & DOUBLE) {
@@ -184,10 +179,10 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 			p *= MAX_ORIENT;
 		} else if (type & FIVE) {
 			c = SixteenToFive[c];
-			if ((i & 15) >= 5) mirror = true;
+			if ((i & 15) >= 5) mirrorFlags = BlitFlags::MIRRORX;
 		} else if (type & NINE) {
 			c = SixteenToNine[c];
-			if ((i & 15) >= 9) mirror = true;
+			if ((i & 15) >= 9) mirrorFlags = BlitFlags::MIRRORX;
 		} else if (!(type & SEVENEYES)) {
 			assert(p < 3);
 			p *= MAX_ORIENT;
@@ -196,9 +191,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 		anims[p] = af->GetCycle(c);
 		if (anims[p]) {
 			anims[p]->frameIdx = 0;
-			if (mirror) {
-				anims[p]->MirrorAnimation();
-			}
+			anims[p]->MirrorAnimation(mirrorFlags);
 			anims[p]->gameAnimation = true;
 		}
 	}

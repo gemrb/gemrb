@@ -24,7 +24,6 @@
 #include "Interface.h"
 #include "Map.h"
 #include "Sprite2D.h"
-#include "Video/Video.h"
 #include "RNG.h"
 
 namespace GemRB {
@@ -176,28 +175,29 @@ Animation::frame_t Animation::GetFrame(index_t i) const
 	return frames[i];
 }
 
-void Animation::MirrorAnimation()
+void Animation::MirrorAnimation(BlitFlags flags)
 {
-	Video *video = core->GetVideoDriver();
-
 	for (size_t i = 0; i < indicesCount; i++) {
-		frames[i] = video->MirrorSprite(frames[i], BlitFlags::MIRRORX, true);
+		frame_t& sprite = frames[i];
+		sprite->renderFlags ^= flags & (BlitFlags::MIRRORX | BlitFlags::MIRRORY);
+		
+		if (flags & BlitFlags::MIRRORX) {
+			sprite->Frame.x = sprite->Frame.w - sprite->Frame.x;
+		}
+		if (flags & BlitFlags::MIRRORY) {
+			sprite->Frame.y = sprite->Frame.h - sprite->Frame.y;
+		}
 	}
 
-	// flip animArea horizontally as well
-	animArea.x = -animArea.w - animArea.x;
-}
-
-void Animation::MirrorAnimationVert()
-{
-	Video *video = core->GetVideoDriver();
-
-	for (size_t i = 0; i < indicesCount; i++) {
-		frames[i] = video->MirrorSprite(frames[i], BlitFlags::MIRRORY, true);
+	if (flags & BlitFlags::MIRRORX) {
+		// flip animArea horizontally as well
+		animArea.x = -animArea.w - animArea.x;
 	}
-
-	// flip animArea vertically as well
-	animArea.y = -animArea.h - animArea.y;
+	
+	if (flags & BlitFlags::MIRRORY) {
+		// flip animArea vertically as well
+		animArea.y = -animArea.h - animArea.y;
+	}
 }
 
 void Animation::AddAnimArea(const Animation* slave)

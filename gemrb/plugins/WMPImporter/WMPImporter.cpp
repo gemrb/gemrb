@@ -175,7 +175,7 @@ WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str) const
 	str->ReadDword(tmpDword);
 	str->ReadDword(ae->IconSeq);
 	//this should be set after iconseq is known
-	ae->SetAreaStatus(tmpDword, OP_SET);
+	ae->SetAreaStatus(tmpDword, BitOp::SET);
 	ieDword coord;
 	str->ReadDword(coord);
 	ae->pos.x = coord;

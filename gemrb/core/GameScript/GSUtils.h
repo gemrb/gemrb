@@ -83,7 +83,7 @@ void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flag
 GEM_EXPORT bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c);
 void AttackCore(Scriptable *Sender, Scriptable *target, int flags);
 void InitScriptTables();
-void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
+void HandleBitMod(ieDword &value1, ieDword value2, BitOp opcode);
 bool ResolveSpellName(ResRef& spellRes, const Action *parameter);
 GEM_EXPORT void ResolveSpellName(ResRef& spellRes, ieDword number);
 GEM_EXPORT ieDword ResolveSpellNumber(const ResRef& spellRef);
@@ -134,7 +134,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 GEM_EXPORT unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable *Sender);
 unsigned int GetItemDistance(const ResRef& itemres, int header);
 void SetupWishCore(Scriptable *Sender, int column, int picks);
-void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, int flag);
+void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, bool flag);
 void SpellCore(Scriptable *Sender, Action *parameters, int flags);
 void SpellPointCore(Scriptable *Sender, Action *parameters, int flags);
 Gem_Polygon *GetPolygon2DA(ieDword index);

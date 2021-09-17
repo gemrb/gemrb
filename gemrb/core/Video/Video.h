@@ -164,7 +164,7 @@ public:
 	virtual Holder<Sprite2D> CreateSprite(const Region&, void* pixels, const PixelFormat&) = 0;
 	
 	void BlitSprite(const Holder<Sprite2D>& spr, Point p,
-					const Region* clip = NULL);
+					const Region* clip = nullptr, BlitFlags = BlitFlags::NONE);
 	
 	virtual void BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
 							BlitFlags flags, Color tint = Color()) = 0;
@@ -201,8 +201,6 @@ public:
 	void DrawLines(const std::vector<Point>& points, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
-	/** Flips sprite, returns new sprite */
-	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags, bool MirrorAnchor);
 
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);

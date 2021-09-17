@@ -32,6 +32,8 @@ private:
 	ieDword TilesCount = 0;
 	ieDword TilesSectionLen = 0;
 	ieDword TileSize = 0;
+	
+	Holder<Sprite2D> badTile; // blank tile to use to fill in bad data
 public:
 	TISImporter() = default;
 	~TISImporter(void) override;

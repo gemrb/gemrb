@@ -39,7 +39,6 @@ const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeri
 Control::Control(const Region& frame)
 : View(frame) // dont pass superview to View constructor
 {
-	VarName[0] = 0;
 	SetValueRange(MaxValueRange);
 
 	ControlType = IE_GUI_INVALID;
@@ -121,9 +120,9 @@ void Control::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
-void Control::UpdateState(const char* varname, value_t val)
+void Control::UpdateState(const varname_t& varname, value_t val)
 {
-	if (strnicmp(VarName, varname, MAX_VARIABLE_LENGTH-1) == 0) {
+	if (VarName == varname) {
 		UpdateState(val);
 	}
 }
@@ -144,14 +143,10 @@ void Control::SetValue(value_t val)
 	value_t oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
 	
-	if (VarName[0] != 0) {
-		// set this even when the value doesn't change
-		// if a radio is clicked, then one of its siblings, the siblings value wont change
-		// but we expect the dictionary to reflect the selected value
-		core->GetDictionary()->SetAt(VarName, Value);
-	}
-
 	if (oldVal != Value) {
+		if (IsDictBound()) {
+			UpdateDictValue();
+		}
 		PerformAction(ValueChange);
 		MarkDirty();
 	}
@@ -170,6 +165,57 @@ void Control::SetValueRange(value_t min, value_t max)
 	SetValueRange(ValueRange(min, max));
 }
 
+void Control::UpdateDictValue() noexcept
+{
+	if (!IsDictBound()) {
+		return;
+	}
+	
+	// set this even when the value doesn't change
+	// if a radio is clicked, then one of its siblings, the siblings value wont change
+	// but we expect the dictionary to reflect the selected value
+	BitOp op = GetDictOp();
+	value_t curVal = op == BitOp::SET ? INVALID_VALUE : 0;
+	core->GetDictionary()->Lookup(VarName, curVal);
+	value_t newVal = curVal;
+	SetBits(newVal, Value, op);
+	core->GetDictionary()->SetAt(VarName, newVal);
+	
+	const Window* win = GetWindow();
+	if (win) {
+		win->RedrawControls(VarName);
+	} else {
+		UpdateState(VarName, newVal);
+	}
+}
+
+void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange range) noexcept
+{
+	// blank out any old varname so we can set the control value without setting the old variable
+	VarName[0] = '\0';
+	if (range.first != Control::INVALID_VALUE) {
+		SetValueRange(range);
+	}
+	SetValue(val);
+	// now that the value range is setup, we can change the dictionary variable
+	VarName = var;
+	
+	if (GetDictOp() == BitOp::SET) {
+		// SET implies the dictionary value should always mirror Value
+		UpdateDictValue();
+	} else {
+		value_t dictVal = INVALID_VALUE;
+		if (core->GetDictionary()->Lookup(VarName, dictVal)) {
+			UpdateState(VarName, dictVal);
+		}
+	}
+}
+
+bool Control::IsDictBound() const noexcept
+{
+	return !VarName.IsEmpty();
+}
+
 void Control::ClearActionTimer()
 {
 	if (actionTimer) {
@@ -184,10 +230,8 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 		// update the timer to use the actual repeatDelay
 		SetActionInterval(repeatDelay);
 
-		if (VarName[0] != 0) {
-			value_t val = GetValue();
-			core->GetDictionary()->SetAt(VarName, val);
-			window->RedrawControls(VarName, val);
+		if (IsDictBound()) {
+			SetValue(GetValue());
 		}
 
 		return action(this);
@@ -222,7 +266,7 @@ bool Control::AcceptsDragOperation(const DragOp& dop) const
 	if (cdop) {
 		assert(cdop->dragView != this);
 		// if 2 controls share the same VarName we assume they are swappable...
-		return (strnicmp(VarName, cdop->Source()->VarName, MAX_VARIABLE_LENGTH-1) == 0);
+		return (VarName == cdop->Source()->VarName);
 	}
 	
 	return View::AcceptsDragOperation(dop);

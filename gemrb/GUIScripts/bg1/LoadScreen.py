@@ -41,9 +41,8 @@ def StartLoadScreen ():
 	LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,0))
 	Middle.SetMOS (LoadPic)
 	Bar = LoadScreen.GetControl (0)
-	Progress = 0
-	GemRB.SetVar ("Progress", Progress)
-	Bar.SetVarAssoc ("Progress", Progress)
+	Bar.AddAlias("LOAD_PROG")
+	Bar.SetVarAssoc ("Progress", 0)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK")

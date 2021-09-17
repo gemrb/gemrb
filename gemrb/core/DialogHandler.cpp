@@ -175,7 +175,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	if (!(dlg->Flags&7) ) {
 		flags |= DF_FREEZE_SCRIPTS;
 	}
-	gc->SetDialogueFlags(DF_IN_DIALOG|flags, OP_OR);
+	gc->SetDialogueFlags(DF_IN_DIALOG|flags, BitOp::OR);
 	return true;
 }
 
@@ -220,9 +220,9 @@ void DialogHandler::EndDialog(bool try_to_break)
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
-	core->GetGame()->SetControlStatus(CS_DIALOG, OP_NAND);
+	core->GetGame()->SetControlStatus(CS_DIALOG, BitOp::NAND);
 	GameControl* gc = core->GetGameControl();
-	gc->SetDialogueFlags(0, OP_SET);
+	gc->SetDialogueFlags(0, BitOp::SET);
 	gc->MoveViewportTo(prevViewPortLoc, false, DIALOG_MOVE_SPEED);
 	core->SetEventFlag(EF_PORTRAIT);
 }
@@ -262,14 +262,14 @@ static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& op
 			// it isn't important which END option was chosen, as it ends
 			core->GetDictionary()->SetAt("DialogOption", x);
 			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
-				core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
+				core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BitOp::OR);
 				break;
 			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 				if (ds->transitions[x]->condition && !ds->transitions[x]->condition->Evaluate(target)) {
 					continue;
 				}
 			}
-			core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, OP_OR);
+			core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BitOp::OR);
 			break;
 		} else {
 			String* string = core->GetString(ds->transitions[x]->textStrRef);
@@ -323,10 +323,10 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 		if (tgta) {
 			if (gc->GetDialogueFlags()&DF_TALKCOUNT) {
-				gc->SetDialogueFlags(DF_TALKCOUNT, OP_NAND);
+				gc->SetDialogueFlags(DF_TALKCOUNT, BitOp::NAND);
 				tgta->TalkCount++;
 			} else if (gc->GetDialogueFlags()&DF_INTERACT) {
-				gc->SetDialogueFlags(DF_INTERACT, OP_NAND);
+				gc->SetDialogueFlags(DF_INTERACT, BitOp::NAND);
 				tgta->InteractCount++;
 			}
 		}
@@ -375,7 +375,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
-			if (!tr->actions.empty()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_OR);
+			if (!tr->actions.empty()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, BitOp::OR);
 			EndDialog();
 			ta->AppendText(L"\n");
 			return false;
@@ -470,7 +470,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
 		Log(WARNING, "DialogHandler", "There were no valid dialog options!");
-		gc->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
+		gc->SetDialogueFlags(DF_OPENENDWINDOW, BitOp::OR);
 	}
 
 	return true;

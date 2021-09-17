@@ -129,7 +129,7 @@ void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *a
 void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq) const
 {
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
-		bool mirror = false, mirrorvert = false;
+		BlitFlags mirrorFlags = BlitFlags::NONE;
 		int c;
 		switch(Aim) {
 		default:
@@ -138,23 +138,20 @@ void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *a
 		case 5:
 			c = SixteenToFive[Cycle];
 			// orientations go counter-clockwise, starting south
-			if (Cycle <= 4) {
-				// bottom-right quadrant
-				mirror = false; mirrorvert = false;
-			} else if (Cycle <= 8) {
+			if (Cycle <= 8) {
 				// top-right quadrant
-				mirror = false; mirrorvert = true;
+				mirrorFlags = BlitFlags::MIRRORY;
 			} else if (Cycle < 12) {
 				// top-left quadrant
-				mirror = true; mirrorvert = true;
-			} else {
+				mirrorFlags = BlitFlags::MIRRORX | BlitFlags::MIRRORY;
+			} else if (Cycle > 4) {
 				// bottom-left quadrant
-				mirror = true; mirrorvert = false;
+				mirrorFlags = BlitFlags::MIRRORX;
 			}
 			break;
 		case 9:
 			c = SixteenToNine[Cycle];
-			if (Cycle>8) mirror=true;
+			if (Cycle > 8) mirrorFlags = BlitFlags::MIRRORX;
 			break;
 		case 16:
 			c=Cycle;
@@ -169,12 +166,7 @@ void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *a
 			a->SetFrame(0);
 		}
 
-		if (mirror) {
-			a->MirrorAnimation();
-		}
-		if (mirrorvert) {
-			a->MirrorAnimationVert();
-		}
+		a->MirrorAnimation(mirrorFlags);
 		a->gameAnimation = true;
 	}
 }

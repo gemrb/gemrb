@@ -67,7 +67,6 @@ def StartLoadScreen ():
 	Label.SetText(HintStr)
 
 	def EndLoadScreen ():
-		GemRB.SetVar ("Progress", 0)
 		TMessageTA = GemRB.GetView("MsgSys", 0)
 		TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 		
@@ -80,7 +79,8 @@ def StartLoadScreen ():
 		return
 
 	Bar = LoadScreen.GetControl (0)
-	Bar.SetVarAssoc ("Progress", Progress)
+	Bar.AddAlias("LOAD_PROG")
+	Bar.SetVarAssoc ("Progress", 0)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
 

@@ -894,7 +894,7 @@ ieDword Inventory::GetItemFlag(unsigned int slot) const
 	return item->Flags;
 }
 
-bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, int op) const
+bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, BitOp op) const
 {
 	CREItem *item = GetSlotItem(slot);
 	if (!item) {

@@ -49,7 +49,7 @@ WMPAreaEntry::~WMPAreaEntry()
 	free(StrTooltip);
 }
 
-void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
+void WMPAreaEntry::SetAreaStatus(ieDword arg, BitOp op)
 {
 	SetBits(AreaStatus, arg, op);
 	MapIcon = nullptr;
@@ -461,7 +461,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	}
 
 	WMPAreaEntry *ae = new WMPAreaEntry();
-	ae->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, OP_SET);
+	ae->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, BitOp::SET);
 	ae->AreaName = area;
 	ae->AreaResRef = area;
 	ae->LocCaptionName = -1;
@@ -551,7 +551,7 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 	//we are here, so we visited and it is visible too (i guess)
 	Log(DEBUG, "WorldMap", "Updated Area visibility: %s (visited, accessible and visible)", areaName.CString());
 
-	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, OP_OR);
+	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 	if (direction<0 || direction>3)
 		return;
 	i=ae->AreaLinksCount[direction];
@@ -560,12 +560,12 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 		if (ae2->GetAreaStatus()&WMP_ENTRY_ADJACENT) {
 			Log(DEBUG, "WorldMap", "Updated Area visibility: %s (accessible and visible)", ae2->AreaName.CString());
-			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, OP_OR);
+			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 		}
 	}
 }
 
-void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, int Op) const
+void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, BitOp Op) const
 {
 	unsigned int i;
 	WMPAreaEntry* ae = GetArea(areaName, i);
@@ -592,7 +592,7 @@ void WorldMap::UpdateReachableAreas() const
 		const char *varname = tab->QueryField(idx, 0);
 		if (game->locals->Lookup(varname, varval) && varval) {
 			const char *areaname = tab->QueryField(idx, 1);
-			SetAreaStatus(areaname, WMP_ENTRY_VISIBLE | WMP_ENTRY_ADJACENT | WMP_ENTRY_ACCESSIBLE, OP_OR);
+			SetAreaStatus(areaname, WMP_ENTRY_VISIBLE | WMP_ENTRY_ADJACENT | WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 		}
 	}
 }

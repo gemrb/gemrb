@@ -39,7 +39,7 @@ FLTable(std::move(flt))
 	assert(FLTable.size() < InvalidIndex);
 }
 
-Animation* AnimationFactory::GetCycle(index_t cycle)
+Animation* AnimationFactory::GetCycle(index_t cycle) const noexcept
 {
 	if (cycle >= cycles.size() || cycles[cycle].FramesCount == 0) {
 		return nullptr;

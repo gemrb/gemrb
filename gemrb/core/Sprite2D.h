@@ -90,8 +90,8 @@ protected:
 	PixelFormat format;
 	uint16_t pitch;
 	
-	virtual void UpdatePalette(PaletteHolder) noexcept {};
-	virtual void UpdateColorKey(colorkey_t) noexcept {};
+	virtual void UpdatePalette() noexcept {};
+	virtual void UpdateColorKey() noexcept {};
 
 public:
 	Region Frame;

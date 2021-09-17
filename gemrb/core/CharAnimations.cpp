@@ -1154,7 +1154,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			case IE_ANI_TWO_FILES_3C:
 			case IE_ANI_TWO_FILES_5:
 				if (Orient > 8) {
-					a->MirrorAnimation( );
+					a->MirrorAnimation(BlitFlags::MIRRORX);
 				}
 				break;
 			default:

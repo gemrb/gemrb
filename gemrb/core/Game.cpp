@@ -1310,7 +1310,7 @@ void Game::SetReputation(ieDword r)
 	}
 }
 
-bool Game::SetControlStatus(unsigned int value, int mode)
+bool Game::SetControlStatus(unsigned int value, BitOp mode)
 {
 	if (SetBits(ControlStatus, value, mode)) {
 		core->SetEventFlag(EF_CONTROL);

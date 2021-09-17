@@ -185,8 +185,8 @@ public:
 
 	void SetTargetMode(int mode);
 	int GetTargetMode() const { return target_mode; }
-	bool SetScreenFlags(unsigned int value, int mode);
-	void SetDialogueFlags(unsigned int value, int mode);
+	bool SetScreenFlags(unsigned int value, BitOp mode);
+	void SetDialogueFlags(unsigned int value, BitOp mode);
 	int GetScreenFlags() const { return ScreenFlags; }
 	int GetDialogueFlags() const { return DialogueFlags; }
 	void SetDisplayText(String* text, unsigned int time);

@@ -108,8 +108,8 @@ ScrollView::ScrollView(const Region& frame)
 {
 	View::AddSubviewInFrontOfView(&contentView);
 	contentView.SetFrame(Region(Point(), frame.size));
-	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
-	contentView.SetAutoResizeFlags(ResizeAll, OP_SET);
+	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, BitOp::OR);
+	contentView.SetAutoResizeFlags(ResizeAll, BitOp::SET);
 
 	SetVScroll(nullptr);
 	SetHScroll(nullptr);
@@ -140,7 +140,7 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 			sbFrame.h = frame.h;
 			
 			sbar->SetFrame(sbFrame);
-			sbar->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
+			sbar->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, BitOp::SET);
 		}
 	}
 	

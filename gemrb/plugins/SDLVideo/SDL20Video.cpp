@@ -310,9 +310,9 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	// WARNING: software fallback == slow
 	if (spr->Format().Bpp == 1 && (flags & BlitFlags::ALPHA_MOD)) {
 		version |= BlitFlags::ALPHA_MOD;
-		flags &= ~RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
+		flags &= ~spr->RenderWithFlags(version, reinterpret_cast<const Color*>(tint));
 	} else {
-		flags &= ~RenderSpriteVersion(spr, version);
+		flags &= ~spr->RenderWithFlags(version);
 	}
 
 	SDL_Texture* tex = spr->GetTexture(renderer);
@@ -420,7 +420,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 
 	spriteShader->SetUniformValue("s_sprite", 1, 0);
 #else
-	// "shaders" were already applied via software (RenderSpriteVersion)
+	// "shaders" were already applied via software (SDLSurfaceSprite2D::RenderWithFlags)
 	// they had to be applied very first so we could create a texture from the software rendering
 #endif
 	Uint8 alpha = SDL_ALPHA_OPAQUE;

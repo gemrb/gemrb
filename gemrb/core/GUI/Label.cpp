@@ -35,7 +35,7 @@ Label::Label(const Region& frame, Font* font, const String& string)
 	this->font = font;
 
 	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
-	SetFlags(IgnoreEvents, OP_OR);
+	SetFlags(IgnoreEvents, BitOp::OR);
 	SetText(string);
 }
 

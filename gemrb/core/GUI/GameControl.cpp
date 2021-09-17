@@ -1674,7 +1674,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		}
 
 		// TODO: make the overflow more dynamic
-		if (frame.w >= mapsize.w) {
+		if (frame.w >= mapsize.w + 64) {
 			p.x = (mapsize.w - frame.w)/2;
 			canMove = false;
 		} else if (p.x + frame.w >= mapsize.w + 64) {
@@ -1685,18 +1685,18 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 			canMove = false;
 		}
 
-		Region mwinframe;
+		int mwinh = 0;
 		const TextArea* mta = core->GetMessageTextArea();
 		if (mta) {
-			mwinframe = mta->GetWindow()->Frame();
+			mwinh = mta->GetWindow()->Frame().h;
 		}
 
 		constexpr int padding = 50;
-		if (frame.h >= mapsize.h + mwinframe.h + padding) {
+		if (frame.h >= mapsize.h + mwinh + padding) {
 			p.y = (mapsize.h - frame.h)/2 + padding;
 			canMove = false;
-		} else if (p.y + frame.h >= mapsize.h + mwinframe.h + padding) {
-			p.y = mapsize.h - frame.h + mwinframe.h + padding;
+		} else if (p.y + frame.h >= mapsize.h + mwinh + padding) {
+			p.y = mapsize.h - frame.h + mwinh + padding;
 			canMove = false;
 		} else if (p.y < 0) {
 			p.y = 0;
@@ -1706,7 +1706,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		MoveViewportUnlockedTo(p, false); // we already handled centering
 	} else {
 		updateVPTimer = true;
-		canMove = (p == vpOrigin);
+		canMove = (p != vpOrigin);
 	}
 
 	return canMove;
@@ -2332,7 +2332,7 @@ void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryT
 		}
 		
 		// don't trigger the travel region, so everyone can bunch up there and NIDSpecial2 can take over
-		if (doWorldMap) actor->SetInternalFlag(IF_PST_WMAPPING, OP_OR);
+		if (doWorldMap) actor->SetInternalFlag(IF_PST_WMAPPING, BitOp::OR);
 	}
 
 	// p is a searchmap travel region or a plain travel region in pst (matching several other criteria)
@@ -2523,7 +2523,7 @@ void GameControl::SetCutSceneMode(bool active)
 		ScreenFlags &= ~SF_CUTSCENE;
 		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->config.MouseFeedback));
 	}
-	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? OP_OR : OP_NAND);
+	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? BitOp::OR : BitOp::NAND);
 }
 
 //Create an overhead text over a scriptable target
@@ -2588,15 +2588,15 @@ void GameControl::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
-bool GameControl::SetScreenFlags(unsigned int value, int mode)
+bool GameControl::SetScreenFlags(unsigned int value, BitOp mode)
 {
 	return SetBits(ScreenFlags, value, mode);
 }
 
-void GameControl::SetDialogueFlags(unsigned int value, int mode)
+void GameControl::SetDialogueFlags(unsigned int value, BitOp mode)
 {
 	SetBits(DialogueFlags, value, mode);
-	SetFlags(IgnoreEvents, (DialogueFlags&DF_IN_DIALOG || ScreenFlags&SF_CUTSCENE) ? OP_OR : OP_NAND);
+	SetFlags(IgnoreEvents, (DialogueFlags&DF_IN_DIALOG || ScreenFlags&SF_CUTSCENE) ? BitOp::OR : BitOp::NAND);
 }
 
 Map* GameControl::CurrentArea() const

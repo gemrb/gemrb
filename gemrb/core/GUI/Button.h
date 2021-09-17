@@ -43,18 +43,6 @@ class SpriteAnimation;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 
-// NOTE: keep these synchronized with GUIDefines.py!!!
-#define IE_GUI_BUTTON_UNPRESSED 0
-#define IE_GUI_BUTTON_PRESSED   1
-#define IE_GUI_BUTTON_SELECTED  2
-#define IE_GUI_BUTTON_DISABLED  3
-// Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
-#define IE_GUI_BUTTON_LOCKED    4
-// Draws the disabled bitmap, but otherwise works like unpressed
-#define IE_GUI_BUTTON_FAKEDISABLED     5
-#define IE_GUI_BUTTON_FAKEPRESSED    6
-#define IE_GUI_BUTTON_LOCKED_PRESSED    7  //all the same as LOCKED
-
 #define IE_GUI_BUTTON_NO_IMAGE     0x00000001   // don't draw image (BAM)
 #define IE_GUI_BUTTON_PICTURE      0x00000002   // draw picture (BMP, MOS, ...)
 #define IE_GUI_BUTTON_SOUND        0x00000004
@@ -113,6 +101,20 @@ enum BUTTON_IMAGE_TYPE {
 
 class GEM_EXPORT Button : public Control {
 public:
+	// NOTE: keep these synchronized with GUIDefines.py!!!
+	enum State : uint8_t {
+		UNPRESSED,
+		PRESSED,
+		SELECTED,
+		DISABLED,
+		// Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
+		LOCKED,
+		// Draws the disabled bitmap, but otherwise works like unpressed
+		FAKEDISABLED,
+		FAKEPRESSED,
+		LOCKED_PRESSED // all the same as LOCKED
+	};
+	
 	explicit Button(const Region& frame);
 	~Button() override;
 
@@ -122,7 +124,7 @@ public:
 	see 'BUTTON_IMAGE_TYPE' */
 	void SetImage(BUTTON_IMAGE_TYPE, Holder<Sprite2D> img);
 	/** Sets the Button State */
-	void SetState(unsigned char state);
+	void SetState(State state);
 	/** Sets the Text of the current control */
 	void SetText(const String& string) override;
 	/** Sets the Picture */
@@ -168,7 +170,6 @@ private: // Private attributes
 	String Text;
 	bool hasText;
 	Font* font;
-	bool ToggleState;
 	bool pulseBorder;
 	Color textColor = ColorWhite;
 
@@ -179,7 +180,7 @@ private: // Private attributes
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
 	std::vector<Holder<Sprite2D>> PictureList;
 	/** The current state of the Button */
-	unsigned char State;
+	State ButtonState = UNPRESSED;
 	double Clipping;
 	/** HP Bar over portraits */
 	ColorAnimation overlayAnim;
@@ -213,6 +214,8 @@ private: // Private attributes
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void FlagsChanged(unsigned int /*oldflags*/) override;
+	
+	BitOp GetDictOp() const noexcept override;
 	
 protected:
 	/** Mouse Enter */

@@ -63,7 +63,7 @@ WindowManager::WindowManager(const std::shared_ptr<Video>& vid)
 	vid->SetEventMgr(&eventMgr);
 
 	gameWin = new Window(screen, *this);
-	gameWin->SetFlags(Window::Borderless|View::Invisible, OP_SET);
+	gameWin->SetFlags(Window::Borderless|View::Invisible, BitOp::SET);
 	gameWin->SetFrame(screen);
 
 	HUDBuf = vid->CreateBuffer(screen, Video::BufferFormat::DISPLAY_ALPHA);
@@ -127,7 +127,7 @@ bool WindowManager::PresentModalWindow(Window* win)
 
 	OrderFront(win);
 	win->SetDisabled(false);
-	win->SetFlags(Window::Modal, OP_OR);
+	win->SetFlags(Window::Modal, BitOp::OR);
 
 	if (win->Flags() & Window::Borderless && !(win->Flags() & Window::NoSounds)) {
 		core->PlaySound(DS_WINDOW_OPEN, SFX_CHAN_GUI);
@@ -254,7 +254,7 @@ void WindowManager::CloseWindow(Window* win)
 			core->PlaySound(DS_WINDOW_CLOSE, SFX_CHAN_GUI);
 		}
 
-		win->SetFlags(Window::Modal, OP_NAND);
+		win->SetFlags(Window::Modal, BitOp::NAND);
 	}
 
 	if (win == hoverWin) {
@@ -289,7 +289,7 @@ void WindowManager::DestroyAllWindows()
 	WindowList::iterator it = windows.begin();
 	for (; it != windows.end(); ++it) {
 		Window* win = *it;
-		win->SetFlags(Window::DestroyOnClose, OP_OR); // force delete
+		win->SetFlags(Window::DestroyOnClose, BitOp::OR); // force delete
 		win->Close();
 		if (windows.empty()) break;
 	}
