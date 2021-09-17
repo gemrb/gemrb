@@ -1738,7 +1738,7 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, idx, steal=0):
 				#containers are always clickable
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
-				color = {'r' : 61, 'g' : 47, 'b' :24, 'a' : 100}
+				color = {'r': 61, 'g': 47, 'b': 24, 'a': 100}
 				Button.SetBorder (0, color, 1,1)
 				Button.SetBorder (1, color, 1,1)
 				Button.SetBorder (2, color, 1,1)
