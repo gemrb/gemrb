@@ -115,6 +115,7 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	str->Read(pal->col, 1024);
 	for (Color& c : pal->col) {
 		std::swap(c.b, c.r); // argb format
+		c.a = c.a ? c.a : 255; // alpha is unused by the originals but SDL will happily use it
 	}
 
 	auto spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
