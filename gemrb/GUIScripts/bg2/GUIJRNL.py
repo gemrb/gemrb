@@ -90,7 +90,6 @@ def InitJournalWindow (JournalWindow):
 	Button = JournalWindow.GetControl (10)
 	Button.SetText (4627)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToggleOrderWindow)
-
 	Chapter = GemRB.GetGameVar("chapter")
 	if Chapter>65535:
 		Chapter=0
@@ -99,23 +98,31 @@ def InitJournalWindow (JournalWindow):
 
 def ToggleOrderWindow ():
 	global Order
-
+	JournalWindow = GemRB.GetView("WIN_JRNL")
+	Button = JournalWindow.GetControl (10)
 	if Order:
 		Order = 0
+		Button.SetText (4627)
 	else:
 		Order = 1
+		Button.SetText (4628)
 	UpdateLogWindow (None)
 	return
 
+def SortByName (entry):
+	je2 = GemRB.GetString(entry['Text']).split("\n",1)
+	return je2[0]
+
+def SortByDate (entry):
+	return entry["GameTime"]
+
 def UpdateLogWindow (JournalWindow):
+	global Order
 	if JournalWindow == None:
 		JournalWindow = GemRB.GetView("WIN_JRNL")
 
 	Section = GemRB.GetVar("Section")
 	GemRB.SetToken ("CurrentChapter", str(Chapter) )
-	#sorting method
-	# Label = JournalWindow.GetControl (0x1000000a)
-
 	# CurrentChapter
 	Label = JournalWindow.GetControl (5)
 	Label.SetText (15873)
@@ -126,11 +133,23 @@ def UpdateLogWindow (JournalWindow):
 	Text = JournalWindow.GetControl (1)
 
 	Text.Clear ()
+	list = []
 	for i in range (GemRB.GetJournalSize (Chapter, Section)):
 		je = GemRB.GetJournalEntry (Chapter, i, Section)
-
 		if je == None:
 			continue
+		list.append(je)
+	#sorting method
+	Label = JournalWindow.GetControl (0x1000000a)
+	if Order:
+		Label.SetText (45228)
+		list.sort(key=SortByName)
+	else:
+		Label.SetText (45202)
+		list.sort(key=SortByDate)
+
+	for i in range(len(list)):
+		je = list[i]
 		hours = je['GameTime'] // 4500
 		days = int(hours/24)
 		year = str (StartYear + int(days/365))
