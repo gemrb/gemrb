@@ -91,8 +91,8 @@ def InitJournalWindow (JournalWindow):
 	Button.SetText (4627)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToggleOrderWindow)
 	Chapter = GemRB.GetGameVar("chapter")
-	if Chapter>65535:
-		Chapter=0
+	if Chapter > 65535:
+		Chapter = 0
 
 	return
 
@@ -122,7 +122,7 @@ def UpdateLogWindow (JournalWindow):
 		JournalWindow = GemRB.GetView("WIN_JRNL")
 
 	Section = GemRB.GetVar("Section")
-	GemRB.SetToken ("CurrentChapter", str(Chapter) )
+	GemRB.SetToken ("CurrentChapter", str(Chapter))
 	# CurrentChapter
 	Label = JournalWindow.GetControl (5)
 	Label.SetText (15873)
