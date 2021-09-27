@@ -234,7 +234,9 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,26)
-
+	frame = Button.GetFrame()
+	ButtonOptionPositionY = frame['y']
+	ButtonOptionPositionX = frame['x']
 
 	# pause button
 	if Gears:
@@ -266,7 +268,14 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if Button:
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
-
+	elif rb == 11 and bg2:
+		pos = ButtonOptionPositionY + 44 + 37
+		if pos > Window.GetFrame()["h"]:
+			pos = Window.GetFrame()["h"] - 44
+		Button = Window.CreateButton (rb, ButtonOptionPositionX, pos, 50, 44)
+		Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
+		Button.SetTooltip (OptionTip['Rest'])
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 	return
 
 def OnLockViewPress ():
