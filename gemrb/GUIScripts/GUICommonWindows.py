@@ -235,8 +235,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,26)
 	frame = Button.GetFrame()
-	ButtonOptionPositionY = frame['y']
-	ButtonOptionPositionX = frame['x']
+	ButtonOptionFrame = frame
 
 	# pause button
 	if Gears:
@@ -269,10 +268,10 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 	elif rb == 11 and bg2:
-		pos = ButtonOptionPositionY + 44 + 37
+		pos = ButtonOptionFrame["y"] + ButtonOptionFrame["h"] + (ButtonOptionFrame["h"] / 2)
 		if pos > Window.GetFrame()["h"]:
-			pos = Window.GetFrame()["h"] - 44
-		Button = Window.CreateButton (rb, ButtonOptionPositionX, pos, 50, 44)
+			pos = Window.GetFrame()["h"] - ButtonOptionFrame["h"]
+		Button = Window.CreateButton (rb, ButtonOptionFrame["x"], pos, ButtonOptionFrame["w"], ButtonOptionFrame["h"])
 		Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
