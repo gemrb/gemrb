@@ -55,8 +55,10 @@ unsigned long TTFFontManager::read(FT_Stream		stream,
 
 void TTFFontManager::close( FT_Stream stream )
 {
-	if (stream)
-		free(stream);
+	if (stream) {
+		delete static_cast<DataStream*>(stream->descriptor.pointer);
+		delete stream;
+	}
 }
 
 TTFFontManager::~TTFFontManager(void)
@@ -81,7 +83,7 @@ bool TTFFontManager::Import(DataStream* stream)
 	if (stream) {
 		FT_Error error;
 
-		ftStream = (FT_Stream)calloc(sizeof(*ftStream), 1);
+		ftStream = new std::remove_pointer<FT_Stream>::type{};
 		ftStream->read = read;
 		ftStream->close = close;
 		ftStream->descriptor.pointer = stream;
@@ -98,6 +100,10 @@ bool TTFFontManager::Import(DataStream* stream)
 			Close();
 			return false;
 		}
+
+		// We take away `str` from the base class (the same as `stream` arg), as it
+		// must not be freed until FT2 leaves.
+		this->str = nullptr;
 
 		// we always convert to UTF-16
 		// TODO: maybe we should allow an override encoding?
