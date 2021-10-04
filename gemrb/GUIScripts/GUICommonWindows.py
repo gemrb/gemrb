@@ -234,8 +234,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
 	if iwd1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,26)
-	frame = Button.GetFrame()
-	ButtonOptionFrame = frame
+	ButtonOptionFrame = Button.GetFrame()
 
 	# pause button
 	if Gears:
@@ -268,7 +267,8 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 	elif rb == 11 and bg2:
-		pos = ButtonOptionFrame["y"] + ButtonOptionFrame["h"] + (ButtonOptionFrame["h"] / 2)
+		#The 15 gap came from the guiw8.chu that is the network button
+		pos = ButtonOptionFrame["y"] + ButtonOptionFrame["h"] + 15
 		if pos > Window.GetFrame()["h"]:
 			pos = Window.GetFrame()["h"] - ButtonOptionFrame["h"]
 		Button = Window.CreateButton (rb, ButtonOptionFrame["x"], pos, ButtonOptionFrame["w"], ButtonOptionFrame["h"])
