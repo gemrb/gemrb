@@ -9019,7 +9019,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# if the user has VLC installed re-link to its libraries.\n# this way the user doesnt have to install libVLC to use this plugin\n\nVLC=`mdfind \"kMDItemFSName==VLC.app&&kMDItemKind==Application\"`\nlibVLC=\"$VLC/Contents/MacOS/lib/libvlc.5.dylib\"\n\nif [ -e `$VLC`] # note: use VLC path because we wont have permission to the lib path\nthen\n    echo \"found libVLC:$libVLC\"\n    install_name_tool -change @loader_path/lib/libvlc.5.dylib \"${libVLC}\" \"$BUILT_PRODUCTS_DIR\"/\"$EXECUTABLE_NAME\"\nfi\n";
+			shellScript = "# if the user has VLC installed re-link to its libraries.\n# this way the user doesn't have to install libVLC to use this plugin\n\nVLC=`mdfind \"kMDItemFSName==VLC.app&&kMDItemKind==Application\"`\nlibVLC=\"$VLC/Contents/MacOS/lib/libvlc.5.dylib\"\n\nif [ -e `$VLC`] # note: use VLC path because we won't have permission to the lib path\nthen\n    echo \"found libVLC:$libVLC\"\n    install_name_tool -change @loader_path/lib/libvlc.5.dylib \"${libVLC}\" \"$BUILT_PRODUCTS_DIR\"/\"$EXECUTABLE_NAME\"\nfi\n";
 		};
 		A2D4C61613A978520086BCC4 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;

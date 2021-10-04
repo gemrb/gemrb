@@ -50,7 +50,7 @@ using LayoutRegions = std::vector<std::shared_ptr<LayoutRegion>>;
 class Content {
 friend class ContentContainer;
 protected:
-	// content doesnt have an x, y (-1, -1) unless we want absolute positioning
+	// content doesn't have an x, y (-1, -1) unless we want absolute positioning
 	// same applies for the dimensions, 0x0 implies unlimited area
 	Region frame; // TODO: origin currently unused
 	ContentContainer* parent;

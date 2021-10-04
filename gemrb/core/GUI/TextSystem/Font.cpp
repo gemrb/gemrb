@@ -231,7 +231,7 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>& 
 
 void Font::CreateAliasForChar(ieWord chr, ieWord alias)
 {
-	// we cannot create an alias for a character that doesnt exist
+	// we cannot create an alias for a character that doesn't exist
 	assert(AtlasIndex.size() > chr && AtlasIndex[chr].pageIdx != static_cast<ieWord>(-1));
 
 	// we need to now find the page for the existing character and add this new one to that page
@@ -421,7 +421,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 	// FIXME: I'm not sure how to handle Asian text
 	// should a "word" be a single Asian glyph? that way we wouldnt clip off text (we were doing this before the rewrite too).
 	// we could check the core encoding for the 'zerospace' attribute and treat single characters as words
-	// that would looks funny with partial translations, however. we would need to handle both simultaniously.
+	// that would looks funny with partial translations, however. we would need to handle both simultaneously.
 
 	// TODO: word breaks should probably happen on other characters such as '-' too.
 	// not as simple as adding it to find_first_of

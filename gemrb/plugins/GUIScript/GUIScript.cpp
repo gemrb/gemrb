@@ -1334,7 +1334,7 @@ PyDoc_STRVAR( GemRB_Control_SetColor__doc,
 \n\
 **Description:** Set the control's desired text color as a rgb dict.\n\
 Specifics depend on control type:\n\
-  * text area: set the text color coresponding to the index, which is from GUIDefines:\n\
+  * text area: set the text color corresponding to the index, which is from GUIDefines:\n\
     * TA_COLOR_NORMAL: text color\n\
     * TA_COLOR_INITIALS: color of the artful initial\n\
     * TA_COLOR_BACKGROUND: text background color\n\
@@ -1342,7 +1342,7 @@ Specifics depend on control type:\n\
     * TA_COLOR_HOVER: color of options on hover\n\
     * TA_COLOR_SELECTED: color of the selected option\n\
   * button: set the text color\n\
-  * label: set the text color and enable color mode (black backgroud by default)\n\
+  * label: set the text color and enable color mode (black background by default)\n\
 \n\
 **Parameters:**\n\
   * GTextArea - the TextArea to set a color for\n\
@@ -2400,7 +2400,7 @@ PyDoc_STRVAR( GemRB_View_SetBackground__doc,
   * GView - the control's reference\n\
   * ResRef - name of the image to use\n\
   * Color - a dict with colors to use for a plain fill\n\
-  * None - if the None object is passed, the backgroud is cleared\n\
+  * None - if the None object is passed, the background is cleared\n\
 \n\
 **Examples:**\n\
   StartWindow.SetBackground ('STARTOLD')\n\
@@ -3183,7 +3183,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 
 	if (arg1 == Py_None) {
 		btn = GetView<Button>(PyTuple_GetItem(args, 0));
-	} // work around a bug in cpython where PyArg_ParseTuple doesnt return as expected when 'c' format doesn't match
+	} // work around a bug in cpython where PyArg_ParseTuple doesn't return as expected when 'c' format doesn't match
 #if PY_MAJOR_VERSION >= 3
 	else if (PyObject_TypeCheck(arg1, &PyString_Type) && PyUnicode_GetLength(arg1) == 1) {
 		int ch = 0;
@@ -3209,7 +3209,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 
 		PyObject* moduleName = PyImport_ImportModule(func->moduleName.CString());
 		if (moduleName == nullptr) {
-			return RuntimeError("Hot key map referenced a moduleName that doesnt exist.");
+			return RuntimeError("Hot key map referenced a moduleName that doesn't exist.");
 		}
 		PyObject* dict = PyModule_GetDict(moduleName);
 
@@ -3217,7 +3217,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		/* pFunc: Borrowed reference */
 		if (!PyCallable_Check(pFunc)) {
 			Py_DECREF(moduleName);
-			return RuntimeError("Hot key map referenced a function that doesnt exist.");
+			return RuntimeError("Hot key map referenced a function that doesn't exist.");
 		}
 
 		btn->SetAction(PythonControlCallback(pFunc));

@@ -750,7 +750,7 @@ bool Button::SetHotKey(KeyboardKey key, short mod, bool global)
 			hotKey.global = true;
 			return true;
 		}
-	} else if (window->RegisterHotKeyCallback(HotKeyCallback, key)) { // FIXME: this doesnt respect mod param
+	} else if (window->RegisterHotKeyCallback(HotKeyCallback, key)) { // FIXME: this doesn't respect mod param
 		hotKey.key = key;
 		hotKey.mod = mod;
 		return true;
