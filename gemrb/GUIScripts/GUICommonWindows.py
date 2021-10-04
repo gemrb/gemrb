@@ -269,8 +269,6 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	elif rb == 11 and bg2:
 		#The 15 gap came from the guiw8.chu that is the network button
 		pos = ButtonOptionFrame["y"] + ButtonOptionFrame["h"] + 15
-		if pos > Window.GetFrame()["h"]:
-			pos = Window.GetFrame()["h"] - ButtonOptionFrame["h"]
 		Button = Window.CreateButton (rb, ButtonOptionFrame["x"], pos, ButtonOptionFrame["w"], ButtonOptionFrame["h"])
 		Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 		Button.SetTooltip (OptionTip['Rest'])
