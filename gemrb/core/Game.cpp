@@ -2082,7 +2082,7 @@ void Game::DrawWeather(bool update)
 		return;
 	}
 
-	// weather just needs to occur on screen. it doesnt actually require coordinates like a spell effect would.
+	// weather just needs to occur on screen. it doesn't actually require coordinates like a spell effect would.
 	weather->Draw(Point());
 	if (!update) {
 		return;

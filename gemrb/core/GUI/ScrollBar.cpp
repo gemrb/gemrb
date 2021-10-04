@@ -160,7 +160,7 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 		}
 		// draw the slider
 		int slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
-		// FIXME: doesnt respect SLIDER_HORIZONTAL
+		// FIXME: doesn't respect SLIDER_HORIZONTAL
 		int sly = AxisPosFromValue().y;
 		Point p = drawFrame.origin + Frames[IMAGE_SLIDER]->Frame.origin;
 		p.x += slx;
@@ -261,7 +261,7 @@ bool ScrollBar::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
 	if ( State == 0 ) {
 		switch (key.keycode) {
-			// TODO: should probably only handle keys coresponding to scroll direction
+			// TODO: should probably only handle keys corresponding to scroll direction
 			case GEM_UP:
 			ScrollUp();
 			return true;

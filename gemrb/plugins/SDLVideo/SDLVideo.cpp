@@ -91,7 +91,7 @@ static SDL_Keycode TranslateKeycode(SDLKey sym)
 			return GEM_RIGHT;
 		case SDLK_DELETE:
 #if TARGET_OS_IPHONE < 1
-			//iOS currently doesnt have a backspace so we use delete.
+			//iOS currently doesn't have a backspace so we use delete.
 			//This change should be future proof in the event apple changes the delete key to a backspace.
 			return GEM_DELETE;
 #endif
@@ -503,7 +503,7 @@ bool SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, 
 #if SDL_VERSION_ATLEAST(1,3,0)
 		return SDL_SetPaletteColors(surf->format->palette, pal, 0, numcolors) == 0;
 #else
-		// const_cast because SDL doesnt alter this and we want our interface to be const correct
+		// const_cast because SDL doesn't alter this and we want our interface to be const correct
 		return SDL_SetPalette( surf, SDL_LOGPAL, const_cast<SDL_Color*>(pal), 0, numcolors );
 #endif
 	}

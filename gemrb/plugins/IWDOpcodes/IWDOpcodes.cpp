@@ -3087,7 +3087,7 @@ int fx_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_damage_reduction(%2d) Hits: %d  Strength: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	// most of the uses have damage coresponding to this formula (eg. 5/+1, 15/+3)
+	// most of the uses have damage corresponding to this formula (eg. 5/+1, 15/+3)
 	if (!fx->Parameter1) fx->Parameter1 = 5*fx->Parameter2;
 	STAT_ADD(IE_RESISTSLASHING, fx->Parameter1);
 	STAT_ADD(IE_RESISTCRUSHING, fx->Parameter1);
@@ -3199,7 +3199,7 @@ int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_missile_damage_reduction (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_missile_damage_reduction(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
-	// most of the uses have damage coresponding to this formula (eg. 5/+1, 15/+3)
+	// most of the uses have damage corresponding to this formula (eg. 5/+1, 15/+3)
 	if (!fx->Parameter1) fx->Parameter1 = 5*fx->Parameter2;
 	STAT_ADD(IE_RESISTMISSILE, fx->Parameter1);
 	return FX_APPLIED;

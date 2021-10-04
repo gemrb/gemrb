@@ -223,7 +223,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 		newline:
 			if (newline || numPrinted == text.length()) {
 				// must claim the lineExclusions as part of the layout
-				// just because we didnt fit doesnt mean somethng else wont...
+				// just because we didnt fit doesn't mean something else won't...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
 				assert(lineLayout.h % lineheight == 0);
 				layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(lineLayout, begin, end));

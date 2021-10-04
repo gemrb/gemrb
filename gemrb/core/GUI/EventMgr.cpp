@@ -199,7 +199,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 									    | Event::TouchUpMask | Event::TouchDownMask)
 		) {
 			// WARNING: these are shared between mouse and touch
-			// it is assumed we wont be using both simultaniously
+			// it is assumed we won't be using both simultaneously
 			static tick_t lastMouseDown = 0;
 			static unsigned char repeatCount = 0;
 			static EventButton repeatButton = 0;

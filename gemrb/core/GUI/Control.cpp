@@ -172,7 +172,7 @@ void Control::UpdateDictValue() noexcept
 	}
 	
 	// set this even when the value doesn't change
-	// if a radio is clicked, then one of its siblings, the siblings value wont change
+	// if a radio is clicked, then one of its siblings, the siblings value won't change
 	// but we expect the dictionary to reflect the selected value
 	BitOp op = GetDictOp();
 	value_t curVal = op == BitOp::SET ? INVALID_VALUE : 0;
