@@ -2826,11 +2826,11 @@ void Map::SortQueues() const
 {
 	struct {
          bool operator()(Actor* a, Actor* b) const { return a->Pos.y < b->Pos.y; }
-    } questSort;
+    } queuesSort;
 
 	for (int q=0;q<QUEUE_COUNT;q++) {
 		Actor **baseline=queue[q];
-		std::sort(baseline, baseline+Qcount[q], questSort);
+		std::sort(baseline, baseline+Qcount[q], queuesSort);
 	}
 	
 }
