@@ -2825,7 +2825,7 @@ void Map::GenerateQueues()
 void Map::SortQueues() const
 {
 	struct {
-         bool operator()(Actor* a, Actor* b) const { return a->Pos.y < b->Pos.y; }
+         bool operator()(const Actor* a, const Actor* b) const { return a->Pos.y < b->Pos.y; }
     } queuesSort;
 
 	for (int q=0;q<QUEUE_COUNT;q++) {
