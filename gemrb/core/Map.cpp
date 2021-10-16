@@ -2824,15 +2824,12 @@ void Map::GenerateQueues()
 //the original qsort implementation was flawed
 void Map::SortQueues() const
 {
-	struct {
-         bool operator()(const Actor* a, const Actor* b) const { return a->Pos.y < b->Pos.y; }
-    } queuesSort;
-
-	for (int q=0;q<QUEUE_COUNT;q++) {
+	for (int q = 0; q < QUEUE_COUNT; ++q) {
 		Actor **baseline=queue[q];
-		std::sort(baseline, baseline+Qcount[q], queuesSort);
+		std::sort(baseline, baseline+Qcount[q], [](const Actor* a, const Actor* b) {
+			return a->Pos.y < b->Pos.y;
+		});
 	}
-	
 }
 
 void Map::AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake)
