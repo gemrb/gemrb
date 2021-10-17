@@ -167,9 +167,9 @@ void TextArea::SpanSelector::MakeSelection(size_t idx)
 	}
 
 	// beware, this will recursively call this function.
-	ta.UpdateState(static_cast<value_t>(idx));
+	ta.UpdateStateWithSelection(idx);
 }
-	
+
 TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
 {
 	// container only has text, so...
@@ -541,7 +541,7 @@ void TextArea::ScrollToY(int y, ieDword duration)
 	scrollview.ScrollTo(Point(0, y), duration);
 }
 
-void TextArea::UpdateState(value_t optIdx)
+void TextArea::UpdateState(value_t opt)
 {
 	if (!selectOptions) {
 		// no selectable options present
@@ -550,17 +550,14 @@ void TextArea::UpdateState(value_t optIdx)
 		return;
 	}
 
-	if (!IsDictBound()) {
-		return;
-	}
-	
-	if (optIdx >= selectOptions->NumOpts()) {
+	auto it = std::find(values.begin(), values.end(), opt);
+	if (it == values.end()) {
 		SetValue(INVALID_VALUE);
 		selectOptions->MakeSelection(-1);
 		return;
 	}
-
-	assert(optIdx < values.size());
+	
+	size_t optIdx = std::distance(values.begin(), it);
 	// always run the TextAreaOnSelect handler even if the value hasnt changed
 	// the *context* of the value can change (dialog) and the handler will want to know 
 	SetValue( values[optIdx] );
@@ -569,6 +566,16 @@ void TextArea::UpdateState(value_t optIdx)
 	selectOptions->MakeSelection(optIdx);
 
 	PerformAction(Action::Select);
+}
+
+void TextArea::UpdateStateWithSelection(size_t optIdx)
+{
+	assert(selectOptions);
+	if (optIdx < selectOptions->NumOpts()) {
+		UpdateState(values[optIdx]);
+	} else {
+		UpdateState(INVALID_VALUE);
+	}
 }
 
 void TextArea::DidFocus()
