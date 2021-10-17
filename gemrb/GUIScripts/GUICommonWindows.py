@@ -1291,13 +1291,14 @@ def CloseTopWindow ():
 
 def TopWindowClosed(window):
 	optwin = GemRB.GetView("OPTWIN")
-	btnid = GemRB.GetVar("OPTBTN")
-	button = optwin.GetControl(btnid) if optwin else None
-	if button:
-		button.SetState(IE_GUI_BUTTON_UNPRESSED)
-	rtgbtn = optwin.GetControl(0) if optwin else None # return to game button
-	if rtgbtn: # not in PST or IWD2
-		rtgbtn.SetState(IE_GUI_BUTTON_SELECTED)
+	if optwin:
+		btnid = optwin.GetVar("OPTBTN")
+		button = optwin.GetControl(btnid)
+		if button:
+			button.SetState(IE_GUI_BUTTON_UNPRESSED)
+		rtgbtn = optwin.GetControl(0) # return to game button
+		if rtgbtn: # not in PST or IWD2
+			rtgbtn.SetState(IE_GUI_BUTTON_SELECTED)
 		
 	print("pause state " + str(CreateTopWinLoader.PauseState))
 	if CreateTopWinLoader.PauseState is not None:
@@ -1370,11 +1371,11 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			optwin = GemRB.GetView("OPTWIN")
 			if optwin:
 				rtgbtn = optwin.GetControl(0) # return to game button
-			if optwin and rtgbtn: # not in PST or IWD2
-				rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
-			if btn:
-				btn.SetState(IE_GUI_BUTTON_SELECTED)
-				GemRB.SetVar("OPTBTN", val) # cant use btn.ID because it is "too large to convert to C long"
+				if btn:
+					btn.SetState(IE_GUI_BUTTON_SELECTED)
+					optwin.SetVar("OPTBTN", val) # cant use btn.ID because it is "too large to convert to C long"
+				if rtgbtn: # not in PST or IWD2
+					rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
 			
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
