@@ -106,7 +106,7 @@ void GlobalTimer::DoStep(int count)
 
 	// do a possible shake in addition to the standard pan
 	// this is separate because it is unbounded by the map boundaries
-	// and we assume it is possible to get a shake and pan simultaniously
+	// and we assume it is possible to get a shake and pan simultaneously
 	if (shakeCounter > 0) {
 		shakeCounter = std::max(0, shakeCounter - count);
 		if (shakeCounter) {

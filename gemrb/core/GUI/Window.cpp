@@ -287,7 +287,7 @@ View* Window::TrySetFocus(View* target)
 {
 	View* newFocus = focusView;
 	if (target && !target->CanLockFocus()) {
-		// target wont accept focus so dont bother unfocusing current
+		// target won't accept focus so dont bother unfocusing current
 	} else if (focusView && !focusView->CanUnlockFocus()) {
 		// current focus unwilling to reliquish
 	} else {
@@ -449,7 +449,7 @@ void Window::DispatchTouchGesture(View* target, const GestureEvent& gesture)
 {
 	// FIXME: this is incomplete
 	// this should be a bit closer to DispatchMouseMotion
-	// drag and drop for example wont function
+	// drag and drop for example won't function
 
 	//trackingView = target;
 	target->TouchGesture(gesture);

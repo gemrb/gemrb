@@ -374,7 +374,7 @@ void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Poi
 		// Point is trivial and clear() should be constant
 		static std::vector<Point> s_points;
 		s_points.clear();
-		s_points.resize(poly->Count()*2); // resize, not reserve! (it wont shrink the capacity FYI)
+		s_points.resize(poly->Count()*2); // resize, not reserve! (it won't shrink the capacity FYI)
 
 		const Point& p = poly->vertices[0] - poly->BBox.origin + origin;
 		s_points[0].x = p.x;

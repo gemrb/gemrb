@@ -60,7 +60,7 @@ public:
 
 	virtual void Clear() { Clear({0, 0, rect.w, rect.h}); };
 	virtual void Clear(const Region& rgn) = 0;
-	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their coresponding pitches
+	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their corresponding pitches
 	virtual void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) = 0;
 	
 	virtual bool RenderOnDisplay(void* display) const = 0;

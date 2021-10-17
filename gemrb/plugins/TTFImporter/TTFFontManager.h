@@ -28,17 +28,11 @@
 namespace GemRB {
 
 class TTFFontManager : public FontManager {
-/*
-Private ivars
-*/
 private:
 	FT_Stream ftStream;
 	FT_Face face;
 
 public:
-/*
-Public methods
-*/
 	~TTFFontManager(void) override;
 	TTFFontManager(void);
 
@@ -46,14 +40,6 @@ Public methods
 	void Close();
 
 	Font* GetFont(unsigned short pxSize, FontStyle style, bool background) override;
-
-	// freetype "callbacks"
-	static unsigned long read( FT_Stream       stream,
-							  unsigned long   offset,
-							  unsigned char*  buffer,
-							  unsigned long   count );
-
-	static void close( FT_Stream stream );
 };
 
 }

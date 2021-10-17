@@ -155,7 +155,7 @@ public:
 	/** Returns the selected text */
 	String QueryText() const override;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(value_t optIdx) override;
+	void UpdateState(value_t opt) override;
 	void DidFocus() override;
 	void DidUnFocus() override;
 	
@@ -186,6 +186,7 @@ private: //internal functions
 
 	void UpdateScrollview();
 	Region UpdateTextFrame();
+	void UpdateStateWithSelection(size_t optIdx);
 	void SizeChanged(const Size&) override { UpdateScrollview(); }
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 

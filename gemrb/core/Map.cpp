@@ -2824,39 +2824,11 @@ void Map::GenerateQueues()
 //the original qsort implementation was flawed
 void Map::SortQueues() const
 {
-	for (int q=0;q<QUEUE_COUNT;q++) {
+	for (int q = 0; q < QUEUE_COUNT; ++q) {
 		Actor **baseline=queue[q];
-		int n = Qcount[q];
-		int i = n/2;
-		int parent, child;
-		Actor * tmp;
-
-		for (;;) {
-			if (i>0) {
-				i--;
-				tmp = baseline[i];
-			} else {
-				n--;
-				if (n<=0) break; //breaking loop
-				tmp = baseline[n];
-				baseline[n] = baseline[0];
-			}
-			parent = i;
-			child = i*2+1;
-			while(child<n) {
-				int chp = child+1;
-				if (chp<n && baseline[chp]->Pos.y < baseline[child]->Pos.y) {
-					child=chp;
-				}
-				if (baseline[child]->Pos.y<tmp->Pos.y) {
-					baseline[parent] = baseline[child];
-					parent = child;
-					child = parent*2+1;
-				} else
-					break;
-			}
-			baseline[parent]=tmp;
-		}
+		std::sort(baseline, baseline+Qcount[q], [](const Actor* a, const Actor* b) {
+			return a->Pos.y < b->Pos.y;
+		});
 	}
 }
 

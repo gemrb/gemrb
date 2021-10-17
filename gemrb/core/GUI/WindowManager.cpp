@@ -524,7 +524,7 @@ void WindowManager::DrawWindowFrame(BlitFlags flags) const
 	// we also only need to draw the frame *once* (even if it applies to multiple windows)
 	// therefore, draw the frame on its own buffer (above everything else)
 	// ... I'm not 100% certain this works for all use cases.
-	// if it doesnt... i think it might be better to just forget about the window frames once the game is loaded
+	// if it doesn't... i think it might be better to just forget about the window frames once the game is loaded
 
 	video->SetScreenClip( NULL );
 

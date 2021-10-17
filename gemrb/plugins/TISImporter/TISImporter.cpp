@@ -109,13 +109,27 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	}
 	
 	PaletteHolder pal = MakeHolder<Palette>();
-	PixelFormat fmt = PixelFormat::Paletted8Bit(pal, true, 0);
+	PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
+	colorkey_t ck = 0;
+	
+	auto ckTest = [](const Color& c) {
+		// work around bad data in BG2 AR1700
+		return c.r <= 4 && c.b <= 4 && c.g >= 78;
+	};
 
 	str->Seek( pos, GEM_STREAM_START );
 	str->Read(pal->col, 1024);
 	for (Color& c : pal->col) {
 		std::swap(c.b, c.r); // argb format
+		c.a = c.a ? c.a : 255; // alpha is unused by the originals but SDL will happily use it
+		if (ck == 0 && ckTest(c)) {
+			c = ColorGreen;
+			ck = colorkey_t(&c - pal->col);
+		}
 	}
+	
+	fmt.ColorKey = ck;
+	fmt.HasColorKey = pal->col[ck] == ColorGreen;
 
 	auto spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 	uint8_t* pixels = static_cast<uint8_t*>(spr->LockSprite());
@@ -125,8 +139,9 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	for (int i = 0; i < 4096; ++i) {
 		uint8_t& val = pixels[i];
 		const Color& c = pal->col[val];
-		if (c.r == 4 && c.b == 4 && c.g >= 78) {
-			val = 0;
+		if (ckTest(c)) {
+			assert(fmt.HasColorKey);
+			val = ck;
 		}
 	}
 	

@@ -80,7 +80,7 @@ void SDLSurfaceSprite2D::UpdateSurfacePalette() const noexcept
 	const auto& pal = format.palette;
 	SDLVideoDriver::SetSurfacePalette(surface, reinterpret_cast<const SDL_Color*>(pal->col), 0x01 << format.Depth);
 #if SDL_VERSION_ATLEAST(1,3,0)
-	// must reset the color key or SDL 2 wont render properly
+	// must reset the color key or SDL 2 won't render properly
 	SDL_SetColorKey(surface, SDL_bool(format.HasColorKey), GetColorKey());
 #endif
 	palVersion = pal->GetVersion();

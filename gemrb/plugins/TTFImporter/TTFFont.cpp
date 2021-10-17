@@ -193,10 +193,7 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 TTFFont::TTFFont(PaletteHolder pal, FT_Face face, int lineheight, int baseline)
 : Font(std::move(pal), lineheight, baseline, false), face(face)
 {
-// on FT < 2.4.2 the manager will defer ownership to this object
-#if FREETYPE_VERSION_ATLEAST(2,4,2)
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
-#endif
 	// ttf fonts dont produce glyphs for whitespace
 	PixelFormat fmt = PixelFormat::Paletted8Bit(palette);
 	Holder<Sprite2D> blank = core->GetVideoDriver()->CreateSprite(Region(), nullptr, fmt);

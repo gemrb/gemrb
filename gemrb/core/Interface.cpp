@@ -977,7 +977,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	CONFIG_VARS("GUIEnhancements");
 	CONFIG_VARS("SkipIntroVideos");
 
-	//put into vars so that reading from game.ini wont overwrite
+	//put into vars so that reading from game.ini won't overwrite
 	CONFIG_VARS_MAP("BitsPerPixel", "Bpp");
 	CONFIG_VARS_MAP("Full Screen", "Fullscreen");
 
