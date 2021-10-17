@@ -117,14 +117,14 @@ def ScrollBarUpdated (sb, Pos):
 				Button.SetPicture (None)
 	return
 	
-def OpenLoadMsgWindow ():
+def OpenLoadMsgWindow (btn, val):
 	from GUIOPTControls import STR_OPT_CANCEL
 	LoadMsgWindow = Window = GemRB.LoadWindow (4, "GUIOPT")
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	
 	def AbandonGame():
 		GemRB.QuitGame()
-		GemRB.SetTimer(LoadGamePress, 0, 0)
+		GemRB.SetTimer(lambda: LoadGamePress(btn, val), 0, 0)
 
 	# Load
 	Button = Window.GetControl (0)
@@ -145,12 +145,12 @@ def OpenLoadMsgWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def LoadGamePress ():
+def LoadGamePress (btn, val):
 	if GemRB.GetView("GC"): # FIXME: is this the best way to know if we are ingame?
-		OpenLoadMsgWindow()
+		OpenLoadMsgWindow(btn, val)
 		return
 	
-	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
+	Pos = GemRB.GetVar ("TopIndex") + val
 	LoadScreen.StartLoadScreen()
 	#loads savegame
 	GemRB.LoadGame (Games[Pos])
