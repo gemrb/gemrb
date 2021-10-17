@@ -43,34 +43,9 @@ static void destroyFT()
 	}
 }
 
-unsigned long TTFFontManager::read(FT_Stream		stream,
-								   unsigned long	offset,
-								   unsigned char*	buffer,
-								   unsigned long	count )
-{
-	DataStream* dstream = (DataStream*)stream->descriptor.pointer;
-	dstream->Seek((int)offset, GEM_STREAM_START);
-	return dstream->Read(buffer, (int)count);
-}
-
-void TTFFontManager::close( FT_Stream stream )
-{
-	if (stream) {
-		delete static_cast<DataStream*>(stream->descriptor.pointer);
-		delete stream;
-	}
-}
-
 TTFFontManager::~TTFFontManager(void)
 {
-// TTFFont uses FT_Reference_Face only available in 2.4.2 or later
-// if using prior freetype let the font own the face and destroy it
-// WARNING: this carries the implication that the font manager can only create a single font
-#if FREETYPE_VERSION_ATLEAST(2,4,2)
-	if (face) {
-		FT_Done_Face(face);
-	}
-#endif
+	Close();
 }
 
 TTFFontManager::TTFFontManager(void)
@@ -84,9 +59,18 @@ bool TTFFontManager::Import(DataStream* stream)
 		FT_Error error;
 
 		ftStream = new std::remove_pointer<FT_Stream>::type{};
-		ftStream->read = read;
-		ftStream->close = close;
-		ftStream->descriptor.pointer = stream;
+		ftStream->read = [](FT_Stream stream, unsigned long	offset, unsigned char* buffer, unsigned long count)
+		-> unsigned long {
+			DataStream* dstream = (DataStream*)stream->descriptor.pointer;
+			dstream->Seek(offset, GEM_STREAM_START);
+			return dstream->Read(buffer, count);
+		};
+
+		ftStream->close = [](FT_Stream stream){
+			delete static_cast<DataStream*>(stream->descriptor.pointer);
+			delete stream;
+		};
+		ftStream->descriptor.pointer = stream->Clone();
 		ftStream->pos = stream->GetPos();
 		ftStream->size = stream->Size();
 
@@ -101,10 +85,6 @@ bool TTFFontManager::Import(DataStream* stream)
 			return false;
 		}
 
-		// We take away `str` from the base class (the same as `stream` arg), as it
-		// must not be freed until FT2 leaves.
-		this->str = nullptr;
-
 		// we always convert to UTF-16
 		// TODO: maybe we should allow an override encoding?
 		FT_Select_Charmap(face, FT_ENCODING_UNICODE);
@@ -118,7 +98,6 @@ void TTFFontManager::Close()
 	if (face) {
 		FT_Done_Face(face);
 	}
-	close(ftStream);
 }
 
 Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /*background*/)
