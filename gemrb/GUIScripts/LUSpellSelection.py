@@ -406,14 +406,14 @@ def ShowKnownSpells ():
 
 	return
 
-def MemorizePress ():
+def MemorizePress (btn, val):
 	"""Toggles the memorisation of the given spell."""
 
 	global SpellsSelectPointsLeft, Spells, SpellBook, MemoBook
 
 	# get our variables
 	j = RowIndex()
-	i = GemRB.GetVar ("MemorizePressed") + j
+	i = val + j
 
 	# get the spell that's been pushed
 	Spell = GemRB.GetSpell (Spells[SpellLevel][i][0], 1)
@@ -501,14 +501,14 @@ def ShowSpells ():
 
 	return
 
-def SpellsSelectPress ():
+def SpellsSelectPress (btn, val):
 	"""Toggles the selection of the given spell."""
 
 	global SpellsSelectPointsLeft, Spells, SpellBook
 
 	# get our variables
 	j = RowIndex()
-	i = GemRB.GetVar ("ButtonPressed") + j
+	i = val + j
 
 	# get the spell that's been pushed
 	Spell = GemRB.GetSpell (Spells[SpellLevel][i][0], 1)
