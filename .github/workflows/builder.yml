@@ -144,6 +144,14 @@ jobs:
         ln -s GemRB-*.AppImage grrr-gemrb.AppImage # workaround for xvfb
         echo "::endgroup::"
 
+        # update tar for appimagelint due to launchpad changes
+        # this whole block can be removed when CI runners use Ubuntu 21.04 or newer
+        sudo apt-get install zstd
+        curl -sL -o "tar-1.34.tar.gz" https://ftp.gnu.org/gnu/tar/tar-1.34.tar.gz
+        tar zxf "tar-1.34.tar.gz"
+        cd tar-1.34 && ./configure && make && sudo make install
+        sudo cp /usr/local/bin/tar /usr/bin/tar
+
         # check if it works on old systems
         echo "::group::AppImage conformance testing"
         ./appimagelint GemRB-*.AppImage
