@@ -501,6 +501,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 	//make a random pick
 
 	Game* game = core->GetGame();
+	const Map *map = game->GetMap(area, false);
 	if (EveryOne & CT_GO_CLOSER) {
 		//copy the area name if it exists on the worldmap
 		unsigned int index;
@@ -510,10 +511,11 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 			game->PreviousArea = entry->AreaName;
 		}
 
-		//perform autosave
-		core->GetSaveGameIterator()->CreateSaveGame(0, false);
+		// perform autosave, but not in ambush and other special areas
+		if (map && !(map->AreaFlags & AF_NOSAVE)) {
+			core->GetSaveGameIterator()->CreateSaveGame(0, false);
+		}
 	}
-	const Map *map = game->GetMap(area, false);
 	if (!map) {
 		Log(ERROR, "Map", "Invalid map: %s", area.CString());
 		command[0]=0;
