@@ -520,7 +520,7 @@ static int CanSave()
 
 	if (map->AreaFlags&AF_NOSAVE) {
 		//cannot save in area
-		displaymsg->DisplayConstantString(STR_CANTSAVEMONS, DMC_BG2XPGREEN);
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return 4;
 	}
 
