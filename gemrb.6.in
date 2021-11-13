@@ -134,18 +134,12 @@ critical settings.
 .TP
 .BR Width =INT
 Game window width (in pixels).
-
-.B WARNING:
-This is not arbitrary but depends on the game data. For custom resolutions
-the widescreen mod needs to be used.
+This can be arbitrary, but results depend on the game data. 
+Check the website for a detailed explanation of resolution modes.
 
 .TP
 .BR Height =INT
 Game window height (in pixels).
-
-.B WARNING:
-This is not arbitrary but depends on the game data. For custom resolutions
-the widescreen mod needs to be used.
 
 .TP
 .BR Bpp =INT
