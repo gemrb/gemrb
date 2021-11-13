@@ -155,14 +155,14 @@ public:
 	template<typename T>
 	typename std::enable_if<std::is_integral<T>::value, char>::type
 	operator[](T i) const noexcept {
-		assert(i < LEN);
+		assert(i < static_cast<T>(LEN));
 		return str[i];
 	}
 	
 	template<typename T>
 	typename std::enable_if<std::is_integral<T>::value, char&>::type
 	operator[](T i) noexcept {
-		assert(i < LEN);
+		assert(i < static_cast<T>(LEN));
 		return str[i];
 	}
 	
