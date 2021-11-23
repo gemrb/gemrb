@@ -373,11 +373,12 @@
 		A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FCE1395FF62006ADC12 /* Matching.cpp */; };
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
+		A2A2DE91274CCB54005842A6 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */; };
+		A2A2DE97274CCE28005842A6 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
 		A2A2EA3516A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
 		A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3616A5FC860092B903 /* Freetype.cpp */; };
 		A2A2EA3916A5FC860092B903 /* Freetype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3616A5FC860092B903 /* Freetype.cpp */; };
-		A2A2EA4716A76AE90092B903 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2A2EA4516A76ACC0092B903 /* libiconv.dylib */; };
 		A2A3A7D914A505FD00F705CF /* CocoaWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */; };
 		A2A3A7E514A5130F00F705CF /* CocoaMain.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7DF14A5130F00F705CF /* CocoaMain.m */; };
 		A2A3A7E614A5130F00F705CF /* GEM_ConfController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3A7E114A5130F00F705CF /* GEM_ConfController.m */; };
@@ -684,7 +685,6 @@
 		A2F7538A266A1DA800C3A764 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */; };
 		A2F7538B266A1DA800C3A764 /* SDL2_mixer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A2F94A1526C73E2E00928E46 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F94A1426C73E2D00928E46 /* Python.framework */; };
-		A2FA1E071EE788C600E51C25 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */; };
 		A2FA8E4E1FB8C483004AAEF9 /* MapReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */; };
 		A2FA8E4F1FB8C483004AAEF9 /* MapReverb.h in Headers */ = {isa = PBXBuildFile; fileRef = A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */; };
 		A2FE2C7316F21CBF00DDC6C7 /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2FE2C7216F21CBF00DDC6C7 /* defaults.plist */; };
@@ -1124,6 +1124,16 @@
 			name = "Copy Frameworks into .app bundle";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2A2DE93274CCB54005842A6 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A2E7EA1C266946B90064423F /* Copy Shaders */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1465,6 +1475,9 @@
 		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2A2DE87274CC871005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
+		A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/homebrew/Cellar/freetype/2.11.0/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
+		A2A2DE95274CCCF1005842A6 /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
 		A2A2EA3216A5EB630092B903 /* TTFFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TTFFont.cpp; sourceTree = "<group>"; };
 		A2A2EA3316A5EB630092B903 /* TTFFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTFFont.h; sourceTree = "<group>"; };
 		A2A2EA3616A5FC860092B903 /* Freetype.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Freetype.cpp; sourceTree = "<group>"; };
@@ -4235,8 +4248,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2FA1E071EE788C600E51C25 /* libfreetype.6.dylib in Frameworks */,
-				A2A2EA4716A76AE90092B903 /* libiconv.dylib in Frameworks */,
+				A2A2DE97274CCE28005842A6 /* libiconv.tbd in Frameworks */,
+				A2A2DE91274CCB54005842A6 /* libfreetype.6.dylib in Frameworks */,
 				A29504731609721300BB22AA /* libgemrb_core.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7805,6 +7818,9 @@
 		A2FA1E051EE788C600E51C25 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A2A2DE95274CCCF1005842A6 /* libiconv.2.tbd */,
+				A2A2DE87274CC871005842A6 /* libfreetype.6.dylib */,
+				A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */,
 				A2F94A1426C73E2D00928E46 /* Python.framework */,
 				A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */,
 				A2C1E13A262A2AA60024D213 /* CoreHaptics.framework */,
@@ -8696,6 +8712,7 @@
 			buildPhases = (
 				A295046F1609721300BB22AA /* Sources */,
 				A29504711609721300BB22AA /* Frameworks */,
+				A2A2DE93274CCB54005842A6 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
@@ -8851,7 +8868,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1310;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "GemRB" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -9006,7 +9023,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDL2Video -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -arch $ARCHS -project GemRB.xcodeproj -target SDL2Video -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
 		};
 		A2BD125D15A8E32B000FAB95 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -11248,11 +11265,14 @@
 				EXECUTABLE_PREFIX = "";
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
+					/opt/homebrew/include/freetype2,
 					../gemrb/includes,
-					/opt/X11/include/freetype2,
-					/usr/local/include/freetype2,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/homebrew/Cellar/freetype/2.11.0/lib,
+				);
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TTFImporter;
 			};
@@ -11268,11 +11288,14 @@
 				EXECUTABLE_PREFIX = "";
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
+					/opt/homebrew/include/freetype2,
 					../gemrb/includes,
-					/opt/X11/include/freetype2,
-					/usr/local/include/freetype2,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/homebrew/Cellar/freetype/2.11.0/lib,
+				);
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = TTFImporter;
 			};
@@ -11370,7 +11393,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GEM_IOS_INC_PATH = ios/lib/include;
@@ -11414,7 +11436,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GEM_IOS_INC_PATH = ios/lib/include;
@@ -11641,7 +11662,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
-				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					/Library/Frameworks,
@@ -11654,7 +11674,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.sourceforge.gemrb;
 				PRODUCT_NAME = GemRB;
-				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -11664,7 +11683,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
-				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -11677,7 +11695,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.sourceforge.gemrb;
 				PRODUCT_NAME = GemRB;
-				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				WRAPPER_EXTENSION = app;
@@ -11687,7 +11704,6 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -11712,9 +11728,8 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEPLOYMENT_POSTPROCESSING = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -11724,8 +11739,6 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				"GCC_VERSION[arch=x86_64]" = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -11740,14 +11753,11 @@
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
 					../../gemrb/includes,
-					/usr/local/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/opt/X11/lib,
-					/usr/local/lib,
+					/opt/homebrew/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
@@ -11765,19 +11775,15 @@
 					"-Wno-long-long",
 					"-DTARGET_OS_MAC=1",
 				);
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				USER_HEADER_SEARCH_PATHS = "./ ../../gemrb/ ../../gemrb/core/ ../../gemrb/includes/";
 				USE_HEADERMAP = NO;
 				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -11802,8 +11808,8 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(FRAMEWORK_SEARCH_PATHS)",
@@ -11812,8 +11818,6 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				"GCC_VERSION[arch=x86_64]" = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -11828,14 +11832,11 @@
 				HEADER_SEARCH_PATHS = (
 					"$(HEADER_SEARCH_PATHS)",
 					../../gemrb/includes,
-					/usr/local/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					/opt/X11/lib,
-					/usr/local/lib,
+					/opt/homebrew/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = (
@@ -11851,7 +11852,6 @@
 				USER_HEADER_SEARCH_PATHS = "./ ../../gemrb/ ../../gemrb/core/ ../../gemrb/includes/";
 				USE_HEADERMAP = NO;
 				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};

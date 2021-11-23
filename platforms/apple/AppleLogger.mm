@@ -16,6 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#import <TargetConditionals.h>
+
 #if TARGET_OS_IPHONE
 #import <Uikit/UIAlertView.h>
 #elif TARGET_OS_MAC
