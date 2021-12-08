@@ -435,6 +435,9 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	unsigned int channel = SFX_CHAN_DIALOG;
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
+	// Check if subtitles are not enabled
+	ieDword charactersubtitles = 0;
+	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
 	if (flags & DS_CONST) {
 		if (Sender->Type!=ST_ACTOR) {
 			Log(ERROR, "GameScript", "Verbal constant not supported for non actors!");
@@ -459,8 +462,6 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		Strref = tmp;
 
 		//display the verbal constants in the console
-		ieDword charactersubtitles = 0;
-		core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
 		if (charactersubtitles) {
 			flags |= DS_CONSOLE;
 		}
@@ -471,12 +472,6 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			channel = SFX_CHAN_MONSTER;
 		}
 	}
-	// Check if subtitles are not enabled
-	ieDword charactersubtitles = 0;
-	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
-	//if (!charactersubtitles) {
-	//	flags &= ~DS_CONSOLE;
-	//}
 	// PST does not echo verbal constants in the console, their strings
 	// actually contain development related identifying comments
 	// thus the console flag is unset.
