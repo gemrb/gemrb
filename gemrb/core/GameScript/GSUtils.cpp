@@ -471,11 +471,16 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			channel = SFX_CHAN_MONSTER;
 		}
 	}
-
+	// Check if subtitles are not enabled
+	ieDword charactersubtitles = 0;
+	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
+	//if (!charactersubtitles) {
+	//	flags &= ~DS_CONSOLE;
+	//}
 	// PST does not echo verbal constants in the console, their strings
 	// actually contain development related identifying comments
 	// thus the console flag is unset.
-	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+	if (core->HasFeature(GF_ONSCREEN_TEXT) || !charactersubtitles) {
 		flags &= ~DS_CONSOLE;
 	}
 
@@ -485,11 +490,6 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			strlcpy(Sound, sb.Sound, sizeof(Sound));
 		}
 		if (sb.text) {
-			ieDword charactersubtitles = 0;
-			core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
-			if (!charactersubtitles) {
-				flags &= ~DS_CONSOLE;
-			}
 			if (flags & DS_CONSOLE) {
 				//can't play the sound here, we have to delay action
 				//and for that, we have to know how long the text takes
