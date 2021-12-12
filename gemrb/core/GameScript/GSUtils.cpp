@@ -593,14 +593,12 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
-			//TODO: maybe set the other object references here too
 			Sender->LastTrigger = tar->GetGlobalID();
 			return 1;
 		}
 		// NOTE: Detect supposedly doesn't set LastMarked — disable on GA_DETECT if needed
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR && Sender!=tar) {
 			Actor* snd = ( Actor* ) Sender;
-			//additional checks for invisibility?
 			snd->LastSeen = tar->GetGlobalID();
 			snd->LastMarked = tar->GetGlobalID();
 		}
