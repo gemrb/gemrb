@@ -2,7 +2,7 @@
 
 [![GitHub build status](https://github.com/gemrb/gemrb/actions/workflows/builder.yml/badge.svg)](https://github.com/gemrb/gemrb/actions/workflows/builder.yml)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/k5atpwnihjjiv993?svg=true)](https://ci.appveyor.com/project/lynxlynxlynx/gemrb)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/17070b6b1608402b884123d8ecefa2a4)](https://www.codacy.com/app/gemrb/gemrb?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gemrb/gemrb&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://img.shields.io/badge/codacy-passed-brightgreen)](https://www.codacy.com/app/gemrb/gemrb?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=gemrb/gemrb&amp;utm_campaign=Badge_Grade)
 [![Coverity Badge](https://scan.coverity.com/projects/288/badge.svg)](https://scan.coverity.com/projects/gemrb)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gemrb_gemrb&metric=alert_status)](https://sonarcloud.io/dashboard?id=gemrb_gemrb)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3101/badge)](https://bestpractices.coreinfrastructure.org/projects/3101)
