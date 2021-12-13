@@ -148,6 +148,9 @@ def UpdateLogWindow (JournalWindow):
 		Label.SetText (45202)
 		list.sort(key=SortByDate)
 
+	Color = "800000"
+	if Section == 4:
+		Color = "003d00"
 	for i in range(len(list)):
 		je = list[i]
 		hours = je['GameTime'] // 4500
@@ -162,7 +165,7 @@ def UpdateLogWindow (JournalWindow):
 		# each journal entry consists of the title and description
 		# but the game displays the entry date between the two
 		je2 = GemRB.GetString(je['Text']).split("\n",1)
-		JournalTitle = "\n[color=800000]" + je2[0] + "[/color]\n"
+		JournalTitle = "\n[color=" + Color + "]" + je2[0] + "[/color]\n"
 		if len(je2) == 1:
 			# broken entry, bg1 style (no title)
 			JournalText = ""
