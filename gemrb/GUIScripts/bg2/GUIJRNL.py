@@ -149,6 +149,7 @@ def UpdateLogWindow (JournalWindow):
 		list.sort(key=SortByDate)
 
 	Color = "800000"
+	# Section with number 4 is defined on the Journal Button.
 	if Section == 4:
 		Color = "003d00"
 	for i in range(len(list)):
