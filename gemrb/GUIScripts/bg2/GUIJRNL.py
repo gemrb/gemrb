@@ -149,7 +149,7 @@ def UpdateLogWindow (JournalWindow):
 		list.sort(key=SortByDate)
 
 	Color = "800000"
-	# The color is change for been used on the Journal section.
+	# only the personal journal section used a different title color
 	if Section == 4:
 		Color = "003d00"
 	for i in range(len(list)):
