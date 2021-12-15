@@ -558,12 +558,12 @@ void TextArea::UpdateState(value_t opt)
 	}
 	
 	size_t optIdx = std::distance(values.begin(), it);
+	
+	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
+	selectOptions->MakeSelection(optIdx);
 	// always run the TextAreaOnSelect handler even if the value hasnt changed
 	// the *context* of the value can change (dialog) and the handler will want to know 
 	SetValue( values[optIdx] );
-
-	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
-	selectOptions->MakeSelection(optIdx);
 
 	PerformAction(Action::Select);
 }
