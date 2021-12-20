@@ -2026,7 +2026,11 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 	
-	Control::value_t val = (ieDword)PyInt_AsUnsignedLongMask(Value);
+	Control::value_t val = Control::INVALID_VALUE;
+	if (PyNumber_Check(Value))
+	{
+		val = static_cast<Control::value_t>(PyInt_AsUnsignedLongMask(Value));
+	}
 	ctrl->BindDictVariable(VarName, val, Control::ValueRange(min, max));
 
 	Py_RETURN_NONE;
