@@ -125,10 +125,8 @@ def OpenContinueMessageWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
 	Button.MakeDefault(True)
 
-def UpdateReformWindow ():
+def UpdateReformWindow (select):
 	Window = ReformPartyWindow
-
-	select = GemRB.GetVar ("Selected")
 
 	need_to_drop = GemRB.GetPartySize ()-MAX_PARTY_SIZE
 	if need_to_drop<0:
@@ -262,7 +260,10 @@ def OpenReformPartyWindow ():
 		Button.SetBorder (FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame(1,1,2,2))
 		if j < len(removable_pcs):
 			Button.SetVarAssoc ("Selected", removable_pcs[j])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateReformWindow)
+		else:
+			Button.SetVarAssoc ("Selected", None)
+
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn, val: UpdateReformWindow(val))
 
 	# Remove
 	Button = Window.GetControl (15)
@@ -280,7 +281,7 @@ def OpenReformPartyWindow ():
 		CommonWindow.SetGameGUIHidden(hideflag)
 		return
 
-	UpdateReformWindow ()
+	UpdateReformWindow (None)
 	CommonWindow.SetGameGUIHidden(hideflag)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
