@@ -36,7 +36,6 @@ FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
 ContinueWindow = None
-ReformPartyWindow = None
 
 removable_pcs = []
 
@@ -125,9 +124,7 @@ def OpenContinueMessageWindow ():
 	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
 	Button.MakeDefault(True)
 
-def UpdateReformWindow (select):
-	Window = ReformPartyWindow
-
+def UpdateReformWindow (Window, select):
 	need_to_drop = GemRB.GetPartySize ()-MAX_PARTY_SIZE
 	if need_to_drop<0:
 		need_to_drop = 0
@@ -176,16 +173,12 @@ def UpdateReformWindow (select):
 	return
 
 def RemovePlayer ():
-	global ReformPartyWindow
-
 	hideflag = CommonWindow.IsGameGUIHidden()
 
-	if ReformPartyWindow:
-		ReformPartyWindow.Unload ()
 	wid = 25
 	if GameCheck.IsHOW ():
 		wid = 0 # at least in guiw08, this is the correct window
-	ReformPartyWindow = Window = GemRB.LoadWindow (wid, GUICommon.GetWindowPack(), WINDOW_BOTTOM)
+	Window = GemRB.LoadWindow (wid, GUICommon.GetWindowPack(), WINDOW_BOTTOM | WINDOW_HCENTER)
 
 	#are you sure
 	Label = Window.GetControl (0x0fffffff)
@@ -200,7 +193,7 @@ def RemovePlayer ():
 	#cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerCancel)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	CommonWindow.SetGameGUIHidden(hideflag)
@@ -215,34 +208,15 @@ def RemovePlayerConfirm ():
 		GemRB.LeaveParty (slot, 1)
 	else:
 		GemRB.LeaveParty (slot)
-	OpenReformPartyWindow ()
-	return
-
-def RemovePlayerCancel ():
-	#Once for getting rid of the confirmation window
-	OpenReformPartyWindow ()
-	#and once for reopening the reform party window
-	OpenReformPartyWindow ()
 	return
 
 def OpenReformPartyWindow ():
-	global ReformPartyWindow
 	global removable_pcs
 
 	GemRB.SetVar ("Selected", 0)
 	hideflag = CommonWindow.IsGameGUIHidden()
 
-	if ReformPartyWindow:
-		ReformPartyWindow.Unload ()
-		ReformPartyWindow = None
-
-		CommonWindow.SetGameGUIHidden(hideflag)
-		#re-enabling party size control
-		GemRB.GameSetPartySize (MAX_PARTY_SIZE)
-		GUICommonWindows.UpdatePortraitWindow()
-		return
-
-	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_HCENTER|WINDOW_BOTTOM)
+	Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_HCENTER|WINDOW_BOTTOM)
 
 	# skip exportable party members (usually only the protagonist)
 	removable_pcs = []
@@ -263,7 +237,7 @@ def OpenReformPartyWindow ():
 		else:
 			Button.SetVarAssoc ("Selected", None)
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn, val: UpdateReformWindow(val))
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn, val: UpdateReformWindow(Window, val))
 
 	# Remove
 	Button = Window.GetControl (15)
@@ -273,15 +247,15 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	# if nobody can be removed, just close the window
 	if not removable_pcs:
-		OpenReformPartyWindow ()
+		Window.Close()
 		CommonWindow.SetGameGUIHidden(hideflag)
 		return
 
-	UpdateReformWindow (None)
+	UpdateReformWindow (Window, None)
 	CommonWindow.SetGameGUIHidden(hideflag)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
