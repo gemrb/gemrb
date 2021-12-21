@@ -194,8 +194,9 @@ def RemovePlayer (select):
 			GemRB.LeaveParty (select, 1)
 		else:
 			GemRB.LeaveParty (select)
-			
+
 		Window.Close()
+		GemRB.GetView ("WIN_REFORM", 0).Close ()
 		return
 
 	Button = Window.GetControl (1)
@@ -219,6 +220,7 @@ def OpenReformPartyWindow ():
 	hideflag = CommonWindow.IsGameGUIHidden()
 
 	Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_HCENTER|WINDOW_BOTTOM)
+	Window.AddAlias ("WIN_REFORM", 0)
 
 	# skip exportable party members (usually only the protagonist)
 	removable_pcs = []
