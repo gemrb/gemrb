@@ -142,6 +142,8 @@ def UpdateReformWindow (Window, select):
 
 	#remove
 	Button = Window.GetControl (15)
+	Button.SetText (17507)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: RemovePlayer(select))
 	if select:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -172,7 +174,7 @@ def UpdateReformWindow (Window, select):
 	GUICommonWindows.UpdatePortraitWindow ()
 	return
 
-def RemovePlayer ():
+def RemovePlayer (select):
 	hideflag = CommonWindow.IsGameGUIHidden()
 
 	wid = 25
@@ -185,6 +187,17 @@ def RemovePlayer ():
 	Label.SetText (17518)
 
 	#confirm
+	def RemovePlayerConfirm ():
+		if GameCheck.IsBG2():
+			GemRB.LeaveParty (select, 2)
+		elif GameCheck.IsBG1():
+			GemRB.LeaveParty (select, 1)
+		else:
+			GemRB.LeaveParty (select)
+			
+		Window.Close()
+		return
+
 	Button = Window.GetControl (1)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerConfirm)
@@ -200,20 +213,9 @@ def RemovePlayer ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def RemovePlayerConfirm ():
-	slot = GemRB.GetVar ("Selected")
-	if GameCheck.IsBG2():
-		GemRB.LeaveParty (slot, 2)
-	elif GameCheck.IsBG1():
-		GemRB.LeaveParty (slot, 1)
-	else:
-		GemRB.LeaveParty (slot)
-	return
-
 def OpenReformPartyWindow ():
 	global removable_pcs
 
-	GemRB.SetVar ("Selected", 0)
 	hideflag = CommonWindow.IsGameGUIHidden()
 
 	Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_HCENTER|WINDOW_BOTTOM)
@@ -238,11 +240,6 @@ def OpenReformPartyWindow ():
 			Button.SetVarAssoc ("Selected", None)
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn, val: UpdateReformWindow(Window, val))
-
-	# Remove
-	Button = Window.GetControl (15)
-	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayer)
 
 	# Done
 	Button = Window.GetControl (8)
