@@ -62,7 +62,6 @@ RepModTable = None
 SpellTable = None
 PreviousPC = 0
 BarteringPC = 0
-MaxAmount = 0
 
 # 0 - Store
 # 1 - Tavern
@@ -350,7 +349,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetBorder (1, color, 0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, lambda: OpenItemAmountWindow(Window))
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InfoLeftWindow(Window))
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -362,7 +361,7 @@ def InitStoreShoppingWindow (Window):
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 			Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, lambda: OpenBag(Window))
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InfoRightWindow(Window))
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -490,7 +489,7 @@ def InitStoreIdentifyWindow (Window):
 	LeftButton = Button = Window.GetControlAlias ('IDLBTN')
 	Button.SetText (strrefs["identify"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: IdentifyPressed (Window))
-	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InfoIdentifyWindow (Window))
 
 	# price ...
 	Label = Window.GetControlAlias ('IDPRICE')
@@ -511,7 +510,7 @@ def InitStoreIdentifyWindow (Window):
 		Button = Window.GetControlAlias ("IDBTN" + str(i))
 		Button.SetBorder (0, color, 0, 1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SelectID (Window))
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InfoIdentifyWindow(Window))
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -584,7 +583,7 @@ def InitStoreStealWindow (Window):
 
 		Button = Window.GetControlAlias ('SWRBTN' + str(i))
 		Button.SetBorder (0,color,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InfoRightWindow(Window))
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -627,7 +626,6 @@ def UpdateStoreStealWindow (Window):
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControlAlias ('SWRSBAR')
 	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, max(0, RightCount - ItemButtonCount))
-	GemRB.SetVar ("LeftIndex", -1)
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow (Window)
 	return
@@ -916,9 +914,6 @@ def InitStoreRentWindow (Window):
 			RentIndex = i
 			break
 
-	# RentIndex needs to be set before SetVarAssoc
-	GemRB.SetVar ("RentIndex", RentIndex)
-
 	for i in range (4):
 		ok = Store['StoreRoomPrices'][i]
 		Button = Window.GetControl (i)
@@ -946,12 +941,12 @@ def InitStoreRentWindow (Window):
 	# Rent
 	Button = Window.GetControlAlias ('RENTBTN')
 	Button.SetText (strrefs["rent"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentRoom)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: RentRoom(Window.GetVar("RentIndex")))
 	return
 
 def UpdateStoreRentWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", None, "STOGOLD")
-	RentIndex = GemRB.GetVar ("RentIndex")
+	RentIndex = Window.GetVar ("RentIndex")
 	Button = Window.GetControlAlias ('RENTBTN')
 	Label = Window.GetControlAlias ('RENTLBL')
 	if RentIndex>=0:
@@ -1023,16 +1018,17 @@ def UnselectNoRedraw ():
 
 def SelectID (Window):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Index = GemRB.GetVar ("Index")
+	Index = Window.GetVar ("Index")
 	GemRB.ChangeStoreItem (pc, inventory_slots[Index], SHOP_ID|SHOP_SELECT)
 	RedrawStoreIdentifyWindow (Window)
 	return
 
 def SelectBuy ():
+	Window = GemRB.GetView('WINSHOP')
 	pc = GemRB.GameGetSelectedPCSingle ()
-	LeftIndex = GemRB.GetVar ("LeftIndex")
+	LeftIndex = Window.GetVar ("LeftIndex")
 	GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_BUY|SHOP_SELECT)
-	RedrawStoreShoppingWindow (GemRB.GetView('WINSHOP'))
+	RedrawStoreShoppingWindow (Window)
 	return
 
 def ToBackpackPressed ():
@@ -1071,15 +1067,16 @@ def BuyPressed ():
 	return
 
 def SelectSell ():
+	Window = GemRB.GetView('WINSHOP')
 	pc = GemRB.GameGetSelectedPCSingle ()
-	RightIndex = GemRB.GetVar ("RightIndex")
+	RightIndex = Window.GetVar ("RightIndex")
 	if not Bag:
 		RightIndex = inventory_slots[RightIndex]
 	#bags may be clickable despite not being sellable
 	Flags = GemRB.IsValidStoreItem (pc, RightIndex, ITEM_BAG if Bag else ITEM_PC)
 	if Flags & SHOP_SELL:
 		GemRB.ChangeStoreItem (pc, RightIndex, SHOP_SELL|SHOP_SELECT)
-		RedrawStoreShoppingWindow (GemRB.GetView('WINSHOP'))
+		RedrawStoreShoppingWindow (Window)
 	return
 
 def ToBagPressed ():
@@ -1126,7 +1123,7 @@ def OpenBag (Window):
 	if Inventory:
 		return
 	pc = GemRB.GameGetSelectedPCSingle ()
-	RightIndex = GemRB.GetVar ("RightIndex")
+	RightIndex = Window.GetVar ("RightIndex")
 	Slot = GemRB.GetSlotItem (pc, inventory_slots[RightIndex])
 	Item = GemRB.GetItem (Slot['ItemResRef'])
 	if Item['Function'] & ITM_F_CONTAINER:
@@ -1280,8 +1277,6 @@ def RedrawStoreShoppingWindow (Window):
 	return
 
 def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
-	global MaxAmount
-
 	wid = 16
 	if GameCheck.IsIWD2() or GameCheck.IsIWD1():
 		wid = 20
@@ -1292,9 +1287,9 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 
 	Window = GemRB.LoadWindow (wid)
 	if store == STORE_MAIN:
-		Index = GemRB.GetVar ("LeftIndex")
+		Index = Window.GetVar ("LeftIndex")
 	else:
-		Index = GemRB.GetVar ("RightIndex")
+		Index = Window.GetVar ("RightIndex")
 	Slot = GemRB.GetStoreItem (Index, store)
 	Amount = Slot['Purchased']
 	if Amount == 0:
@@ -1334,6 +1329,19 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 	def CloseAmountWindow():
 		Window.Close()
 		UpdateStoreShoppingWindow(ShopWin)
+		
+	def ConfirmItemAmount (Number, store = STORE_MAIN):
+		if Number > MaxAmount:
+			Number = MaxAmount
+		elif Number < 0:
+			Number = 0
+		if store == STORE_MAIN:
+			Index = Window.GetVar ("LeftIndex")
+		else:
+			Index = Window.GetVar ("RightIndex")
+		GemRB.SetPurchasedAmount (Index, Number, store)
+
+		return
 
 	def Confirm():
 		ConfirmItemAmount(Text.QueryInteger(), store)
@@ -1353,24 +1361,9 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def ConfirmItemAmount (Number, store = STORE_MAIN):
-	global MaxAmount
-
-	if Number > MaxAmount:
-		Number = MaxAmount
-	elif Number < 0:
-		Number = 0
-	if store == STORE_MAIN:
-		Index = GemRB.GetVar ("LeftIndex")
-	else:
-		Index = GemRB.GetVar ("RightIndex")
-	GemRB.SetPurchasedAmount (Index, Number, store)
-
-	return
-
 def RedrawStoreIdentifyWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = Window.GetVar ("TopIndex")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Count = len(inventory_slots)
 	IDPrice = Store['IDPrice']
@@ -1471,8 +1464,8 @@ def IdentifyPressed (Window):
 	UpdateStoreIdentifyWindow (Window)
 	return
 
-def InfoIdentifyWindow ():
-	Index = GemRB.GetVar ("Index")
+def InfoIdentifyWindow (Window):
+	Index = Window.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Count = len(inventory_slots)
 	if Index >= Count:
@@ -1482,15 +1475,15 @@ def InfoIdentifyWindow ():
 	InfoWindow (Slot, Item)
 	return
 
-def InfoLeftWindow ():
-	Index = GemRB.GetVar ("LeftIndex")
+def InfoLeftWindow (Window):
+	Index = Window.GetVar ("LeftIndex")
 	Slot = GemRB.GetStoreItem (Index)
 	Item = GemRB.GetItem (Slot['ItemResRef'])
 	InfoWindow (Slot, Item)
 	return
 
-def InfoRightWindow ():
-	Index = GemRB.GetVar ("RightIndex")
+def InfoRightWindow (Window):
+	Index = Window.GetVar ("RightIndex")
 	if Bag:
 		Slot = GemRB.GetStoreItem (Index, STORE_BAG)
 		Item = GemRB.GetItem (Slot['ItemResRef'])
@@ -1566,7 +1559,7 @@ def InfoWindow (Slot, Item):
 	return
 
 def StealPressed (Window):
-	LeftIndex = GemRB.GetVar ("LeftIndex")
+	LeftIndex = Window.GetVar ("LeftIndex")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	#percentage skill check, if fails, trigger StealFailed
 	#if difficulty = 0 and skill=100, automatic success
@@ -1584,10 +1577,10 @@ def StealPressed (Window):
 
 def RedrawStoreStealWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
-	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
-	LeftIndex = GemRB.GetVar ("LeftIndex")
-	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	RightIndex = GemRB.GetVar ("RightIndex")
+	LeftTopIndex = Window.GetVar ("LeftTopIndex")
+	LeftIndex = Window.GetVar ("LeftIndex")
+	RightTopIndex = Window.GetVar ("RightTopIndex")
+	RightIndex = Window.GetVar ("RightIndex")
 	idx = [ LeftTopIndex, RightTopIndex, LeftIndex, RightIndex ]
 	LeftCount = Store['StoreItemCount']
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1835,7 +1828,7 @@ def InfoHealWindow ():
 	Window = GemRB.GetView('WINHEAL')
 
 	UpdateStoreHealWindow (Window)
-	Index = GemRB.GetVar ("Index")
+	Index = Window.GetVar ("Index")
 	Cure = GemRB.GetStoreCure (Index)
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 
@@ -1868,7 +1861,7 @@ def InfoHealWindow ():
 def BuyHeal ():
 	Window = GemRB.GetView('WINHEAL')
 
-	Index = GemRB.GetVar ("Index")
+	Index = Window.GetVar ("Index")
 	Cure = GemRB.GetStoreCure (Index)
 	gold = GemRB.GameGetPartyGold ()
 	if gold < Cure['Price']:
@@ -1911,7 +1904,7 @@ def GulpDrink ():
 		return
 
 	gold = GemRB.GameGetPartyGold ()
-	Index = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("Index")
+	Index = Window.GetVar ("TopIndex") + Window.GetVar ("Index")
 	Drink = GemRB.GetStoreDrink (Index)
 	if gold < Drink['Price']:
 		ErrorWindow (strrefs["drinktoocostly"])
@@ -1927,8 +1920,8 @@ def GulpDrink ():
 	UpdateStoreRumourWindow (Window)
 	return
 
-def RentConfirm (Window0):
-	RentIndex = GemRB.GetVar ("RentIndex")
+def RentConfirm (Window):
+	RentIndex = Window.GetVar ("RentIndex")
 	price = Store['StoreRoomPrices'][RentIndex]
 	Gold = GemRB.GameGetPartyGold ()
 	GemRB.GameSetPartyGold (Gold-price)
@@ -1950,15 +1943,13 @@ def RentConfirm (Window0):
 		#is there any way to change this???
 		GemRB.SetToken ("HP", "%d"%(RentIndex+1))
 		TextArea.SetText (strrefs["restedfor"])
-		GemRB.SetVar ("RentIndex", -1)
 		Button = Window.GetControl (RentIndex+4)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
-def RentRoom ():
+def RentRoom (RentIndex):
 	global RentConfirmWindow
 
-	RentIndex = GemRB.GetVar ("RentIndex")
 	price = Store['StoreRoomPrices'][RentIndex]
 	Gold = GemRB.GameGetPartyGold ()
 	if Gold<price:
