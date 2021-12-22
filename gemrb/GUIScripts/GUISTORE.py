@@ -435,9 +435,6 @@ def UpdateStoreShoppingWindow (Window):
 		LeftCount=0
 	ScrollBar = Window.GetControlAlias ('STOSBARL')
 	ScrollBar.SetVarAssoc ("LeftTopIndex", 0, 0, LeftCount)
-	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
-	if LeftTopIndex>LeftCount:
-		GemRB.SetVar ("LeftTopIndex", LeftCount)
 
 	if Bag:
 		RightCount = Bag['StoreItemCount'] - ItemButtonCount
@@ -449,9 +446,6 @@ def UpdateStoreShoppingWindow (Window):
 
 	ScrollBar = Window.GetControlAlias ('STOSBARR')
 	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, RightCount)
-	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	if RightTopIndex>RightCount:
-		GemRB.SetVar ("RightTopIndex", RightCount)
 
 	RedrawStoreShoppingWindow (Window)
 	return
