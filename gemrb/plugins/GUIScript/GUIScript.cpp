@@ -2032,7 +2032,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	} else if (pynum != Py_None) {
 		return RuntimeError("Expected a numeric or None type.");
 	}
-	
+
 	ctrl->BindDictVariable(VarName, val, Control::ValueRange(min, max));
 	Py_RETURN_NONE;
 }
@@ -13924,7 +13924,12 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 		const Control* ctl = static_cast<Control*>(GetView(ref));
 		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
 		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->DictVariable()));
-		PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, ctl->GetValue()));
+		Control::value_t val = ctl->GetValue();
+		if (val == Control::INVALID_VALUE) {
+			PyObject_SetAttrString(obj, "Value", Py_None);
+		} else {
+			PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, val));
+		}
 	} else if (PyObject_IsInstance(obj, windowClass)) {
 		const Window* win = static_cast<Window*>(GetView(ref));
 		PyObject_SetAttrString(obj, "HasFocus", DecRef(PyBool_FromLong, win->HasFocus()));

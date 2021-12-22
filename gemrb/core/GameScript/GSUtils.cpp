@@ -435,6 +435,9 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	unsigned int channel = SFX_CHAN_DIALOG;
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
+	// Check if subtitles are not enabled
+	ieDword charactersubtitles = 0;
+	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
 	if (flags & DS_CONST) {
 		if (Sender->Type!=ST_ACTOR) {
 			Log(ERROR, "GameScript", "Verbal constant not supported for non actors!");
@@ -459,8 +462,6 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		Strref = tmp;
 
 		//display the verbal constants in the console
-		ieDword charactersubtitles = 0;
-		core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
 		if (charactersubtitles) {
 			flags |= DS_CONSOLE;
 		}
@@ -471,11 +472,10 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			channel = SFX_CHAN_MONSTER;
 		}
 	}
-
 	// PST does not echo verbal constants in the console, their strings
 	// actually contain development related identifying comments
 	// thus the console flag is unset.
-	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+	if (core->HasFeature(GF_ONSCREEN_TEXT) || !charactersubtitles) {
 		flags &= ~DS_CONSOLE;
 	}
 
@@ -593,14 +593,12 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
-			//TODO: maybe set the other object references here too
 			Sender->LastTrigger = tar->GetGlobalID();
 			return 1;
 		}
 		// NOTE: Detect supposedly doesn't set LastMarked — disable on GA_DETECT if needed
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR && Sender!=tar) {
 			Actor* snd = ( Actor* ) Sender;
-			//additional checks for invisibility?
 			snd->LastSeen = tar->GetGlobalID();
 			snd->LastMarked = tar->GetGlobalID();
 		}

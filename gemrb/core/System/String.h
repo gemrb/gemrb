@@ -22,6 +22,7 @@
 #include "exports.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cstdarg>
 #include <cstring>
 #include <cwctype>
@@ -141,7 +142,7 @@ public:
 	
 	FixedSizeString& operator=(const char* c) noexcept {
 		if (c) {
-			strncpy(str, c, sizeof(str) - 1);
+			strncpy(str, c, LEN);
 		} else {
 			std::fill(begin(), end(), '\0');
 		}
@@ -154,12 +155,14 @@ public:
 	template<typename T>
 	typename std::enable_if<std::is_integral<T>::value, char>::type
 	operator[](T i) const noexcept {
+		assert(i < static_cast<T>(LEN));
 		return str[i];
 	}
 	
 	template<typename T>
 	typename std::enable_if<std::is_integral<T>::value, char&>::type
 	operator[](T i) noexcept {
+		assert(i < static_cast<T>(LEN));
 		return str[i];
 	}
 	

@@ -139,7 +139,11 @@ using PythonControlCallback = PythonComplexCallback<void, Control*>;
 template<>
 PyObject* PythonControlCallback::BuildArgs(Control* ctrl, PyObject* obj, long argc) const {
 	if (argc > 1) {
-		return Py_BuildValue("(Ni)", obj, ctrl->GetValue());
+		Control::value_t val = ctrl->GetValue();
+		if (val == Control::INVALID_VALUE) {
+			return Py_BuildValue("(NO)", obj, Py_None);
+		}
+		return Py_BuildValue("(Ni)", obj, val);
 	} else {
 		return Py_BuildValue("(N)", obj);
 	}

@@ -86,6 +86,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 	ProfsCallback = callback
 	ProfsTableOffset = profTableOffset
 	ProfsType = type
+	ProfsScrollBar = None
 
 	if proftype == LUPROFS_TYPE_CHARGEN and (GameCheck.IsBG1() or GameCheck.IsBG2()): #chargen
 		ProfsOffsetSum = 9

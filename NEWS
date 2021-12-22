@@ -1,4 +1,4 @@
-GemRB git (4429d1e):
+GemRB git (2419729):
   New features:
     - 
     - iwd2 can be progressed past the battle square challenge
@@ -10,7 +10,7 @@ GemRB git (4429d1e):
     - 
     - python3 support
     - spellcaster ai, effects, scripting
-    - audio, appimage, ini spawns
+    - audio, drawing, appimage, ini spawns
     - bugfixes
 
 GemRB v0.9.0 (2021-06-18):

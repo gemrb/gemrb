@@ -16,7 +16,7 @@ Optional dependencies:
   - SDL_mixer / SDL2_mixer (for faster, but lower-quality and rarer sound)
   - (lib)PNG (for the png importer plugin)
   - libvorbis (for ogg/vorbis support)
-  - FreeType (for the TTF fonts plugin)
+  - FreeType 2.4.2+ (for the TTF fonts plugin)
   - ICONV (for the TTF fonts plugin and only needed when using a non unicode compatible TLK)
   - (lib)VLC 2.0+ (for movies in some mac distributions of the games)
   - OpenGL/OpenGLES drivers and libraries.
