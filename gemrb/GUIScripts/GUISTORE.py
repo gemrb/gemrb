@@ -715,6 +715,12 @@ def InitStoreHealWindow (Window):
 		Window.AliasControls ({'HWLBTN' + str(x) : x+8 for x in range(ItemButtonCount)})
 
 	ScrollBar = Window.GetControlAlias ('HWSBAR')
+	Count = Store['StoreCureCount']
+	if Count>4:
+		Count = Count-4
+	else:
+		Count = 0
+	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, Count)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: UpdateStoreHealWindow(Window))
 	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('HWLBTN0'))
 
@@ -737,12 +743,6 @@ def InitStoreHealWindow (Window):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyHeal)
 	Button.SetDisabled (True)
 
-	Count = Store['StoreCureCount']
-	if Count>4:
-		Count = Count-4
-	else:
-		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, Count)
 	return
 
 def UpdateStoreHealWindow (Window):
