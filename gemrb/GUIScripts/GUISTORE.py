@@ -746,7 +746,7 @@ def InitStoreHealWindow (Window):
 	# Heal
 	Button = Window.GetControlAlias ('HEALBTN')
 	Button.SetText (strrefs["heal"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyHeal)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: BuyHeal(Window.GetVar("SelIndex")))
 	Button.SetDisabled (True)
 
 	return
@@ -1861,10 +1861,7 @@ def InfoHealWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def BuyHeal ():
-	Window = GemRB.GetView('WINHEAL')
-
-	Index = Window.GetVar ("Index")
+def BuyHeal (Index):
 	Cure = GemRB.GetStoreCure (Index)
 	gold = GemRB.GameGetPartyGold ()
 	if gold < Cure['Price']:
@@ -1891,7 +1888,6 @@ def BuyHeal ():
 		Spell = GemRB.GetSpell(Cure['CureResRef'])
 		sound = Spell['Completion']
 	GemRB.PlaySound (sound)
-	UpdateStoreHealWindow (Window)
 	return
 
 def GulpDrink ():
