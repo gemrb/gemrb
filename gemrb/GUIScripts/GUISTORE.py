@@ -723,13 +723,19 @@ def InitStoreHealWindow (Window):
 	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, Count)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: UpdateStoreHealWindow(Window))
 	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('HWLBTN0'))
+	
+	def SelectCure(btn, idx):
+		TopIndex = Window.GetVar ("TopIndex")
+		Window.SetVar("SelIndex", TopIndex + idx)
+		UpdateStoreHealWindow(Window)
 
 	#spell buttons
 	for i in range (ItemButtonCount):
 		Button = Window.GetControlAlias ('HWLBTN' + str(i))
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateStoreHealWindow(Window))
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectCure)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoHealWindow)
+		Button.SetVarAssoc ("BtnIndex", i)
 
 	UnselectNoRedraw ()
 
@@ -747,8 +753,10 @@ def InitStoreHealWindow (Window):
 
 def UpdateStoreHealWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", None, "STOGOLD")
+	
 	TopIndex = Window.GetVar ("TopIndex")
-	Index = Window.GetVar ("Index")
+	SelIndex = Window.GetVar ("SelIndex")
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	labelOffset = 0x1000000c
 	if GameCheck.IsIWD2():
@@ -756,16 +764,17 @@ def UpdateStoreHealWindow (Window):
 	elif GameCheck.IsPST():
 		labelOffset = 0x10000008
 	for i in range (ItemButtonCount):
-		Cure = GemRB.GetStoreCure (TopIndex+i)
+		CureIdx = TopIndex + i
+		Cure = GemRB.GetStoreCure (CureIdx)
 
 		Button = Window.GetControlAlias ('HWLBTN' + str(i))
 		Label = Window.GetControl (labelOffset+i)
-		Button.SetVarAssoc ("Index", TopIndex+i)
 		if Cure:
 			Spell = GemRB.GetSpell (Cure['CureResRef'])
 			Button.SetSpellIcon (Cure['CureResRef'], 1)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
 			dead = GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD
 			# toggle raise dead/resurrect based on state
 			# unfortunately the flags are not set properly in iwd
@@ -783,6 +792,15 @@ def UpdateStoreHealWindow (Window):
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Spell['SpellName']))
 			GemRB.SetToken ("ITEMCOST", str(Cure['Price']) )
 			Label.SetText (strrefs["itemnamecost"])
+			
+			if SelIndex is not None and CureIdx == SelIndex:
+				Button.SetState (IE_GUI_BUTTON_SELECTED)
+				TextArea = Window.GetControlAlias ("HWTA")
+				TextArea.SetText (Cure['Description'])
+				Label = Window.GetControlAlias ("HWPRICE")
+				Label.SetText (str(Cure['Price']) )
+				Button = Window.GetControlAlias ("HEALBTN")
+				Button.SetDisabled (False)
 		else:
 			Button.SetDisabled (True)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
@@ -790,13 +808,6 @@ def UpdateStoreHealWindow (Window):
 			Button.SetBorder (0, None, 0,0)
 			Label.SetText ("")
 
-		if TopIndex+i==Index:
-			TextArea = Window.GetControlAlias ("HWTA")
-			TextArea.SetText (Cure['Description'])
-			Label = Window.GetControlAlias ("HWPRICE")
-			Label.SetText (str(Cure['Price']) )
-			Button = Window.GetControlAlias ("HEALBTN")
-			Button.SetDisabled (False)
 	return
 
 ToggleStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreHealWindow, UpdateStoreHealWindow, StoreWindowPlacement)
