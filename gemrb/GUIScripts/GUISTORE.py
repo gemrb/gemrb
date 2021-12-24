@@ -728,13 +728,17 @@ def InitStoreHealWindow (Window):
 		TopIndex = Window.GetVar ("TopIndex")
 		Window.SetVar("SelIndex", TopIndex + idx)
 		UpdateStoreHealWindow(Window)
+		
+	def InfoCure(btn, idx):
+		TopIndex = Window.GetVar ("TopIndex")
+		InfoHealWindow(TopIndex + idx)
 
 	#spell buttons
 	for i in range (ItemButtonCount):
 		Button = Window.GetControlAlias ('HWLBTN' + str(i))
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectCure)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoHealWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoCure)
 		Button.SetVarAssoc ("BtnIndex", i)
 
 	UnselectNoRedraw ()
@@ -1827,11 +1831,7 @@ def DonateGold ():
 	UpdateStoreDonateWindow (Window)
 	return
 
-def InfoHealWindow ():
-	Window = GemRB.GetView('WINHEAL')
-
-	UpdateStoreHealWindow (Window)
-	Index = Window.GetVar ("Index")
+def InfoHealWindow (Index):
 	Cure = GemRB.GetStoreCure (Index)
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 
