@@ -539,7 +539,9 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		SetState(UNPRESSED);
 	}
 
-	DoToggle();
+	if (me.button == GEM_MB_ACTION) {
+		DoToggle();
+	}
 	return Control::OnMouseUp(me, mod);
 }
 
