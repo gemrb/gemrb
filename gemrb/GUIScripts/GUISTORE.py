@@ -293,11 +293,13 @@ def InitStoreShoppingWindow (Window):
 
 	# left scrollbar
 	ScrollBarLeft = Window.GetControlAlias ('STOSBARL')
+	ScrollBarLeft.SetVarAssoc("LeftTopIndex", 0)
 	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreShoppingWindow(Window))
 	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('LBTN0'))
 
 	# right scrollbar
 	ScrollBarRight = Window.GetControlAlias ('STOSBARR')
+	ScrollBarLeft.SetVarAssoc("RightTopIndex", 0)
 	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreShoppingWindow(Window))
 	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('RBTN0'))
 
@@ -334,6 +336,27 @@ def InitStoreShoppingWindow (Window):
 		# sell price ...
 		Label = Window.GetControlAlias ('PRICES')
 		Label.SetText ("0")
+		
+	def SelectBuy (btn, idx):
+		pc = GemRB.GameGetSelectedPCSingle ()
+		slot = Window.GetVar("LeftTopIndex") + idx
+		GemRB.ChangeStoreItem (pc, slot, SHOP_BUY|SHOP_SELECT)
+		Window.SetVar("LeftSelIndex", slot)
+		RedrawStoreShoppingWindow (Window)
+		return
+		
+	def SelectSell (btn, RightIndex):
+		pc = GemRB.GameGetSelectedPCSingle ()
+		if not Bag:
+			RightIndex = inventory_slots[RightIndex]
+			
+		Window.SetVar("RightSelIndex", RightIndex)
+		#bags may be clickable despite not being sellable
+		Flags = GemRB.IsValidStoreItem (pc, RightIndex, ITEM_BAG if Bag else ITEM_PC)
+		if Flags & SHOP_SELL:
+			GemRB.ChangeStoreItem (pc, RightIndex, SHOP_SELL|SHOP_SELECT)
+			RedrawStoreShoppingWindow (Window)
+		return
 
 	for i in range (ItemButtonCount):
 		if GameCheck.IsBG2():
@@ -347,6 +370,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 		Button.SetBorder (1, color, 0,1)
+		Button.SetVarAssoc("LeftIndex", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, lambda: OpenItemAmountWindow(Window))
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InfoLeftWindow(Window))
@@ -354,6 +378,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
 		Button = Window.GetControlAlias ('RBTN' + str(i))
+		Button.SetVarAssoc("RightIndex", i)
 		if GameCheck.IsBG2():
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 
@@ -1032,14 +1057,6 @@ def SelectID (Window):
 	RedrawStoreIdentifyWindow (Window)
 	return
 
-def SelectBuy ():
-	Window = GemRB.GetView('WINSHOP')
-	pc = GemRB.GameGetSelectedPCSingle ()
-	LeftIndex = Window.GetVar ("LeftIndex")
-	GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_BUY|SHOP_SELECT)
-	RedrawStoreShoppingWindow (Window)
-	return
-
 def ToBackpackPressed ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	LeftCount = Store['StoreItemCount']
@@ -1073,19 +1090,6 @@ def BuyPressed ():
 				GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-Price)
 
 	UpdateStoreShoppingWindow (GemRB.GetView('WINSHOP'))
-	return
-
-def SelectSell ():
-	Window = GemRB.GetView('WINSHOP')
-	pc = GemRB.GameGetSelectedPCSingle ()
-	RightIndex = Window.GetVar ("RightIndex")
-	if not Bag:
-		RightIndex = inventory_slots[RightIndex]
-	#bags may be clickable despite not being sellable
-	Flags = GemRB.IsValidStoreItem (pc, RightIndex, ITEM_BAG if Bag else ITEM_PC)
-	if Flags & SHOP_SELL:
-		GemRB.ChangeStoreItem (pc, RightIndex, SHOP_SELL|SHOP_SELECT)
-		RedrawStoreShoppingWindow (Window)
 	return
 
 def ToBagPressed ():
@@ -1169,9 +1173,9 @@ def RedrawStoreShoppingWindow (Window):
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	LeftTopIndex = Window.GetVar ("LeftTopIndex")
-	LeftIndex = Window.GetVar ("LeftIndex")
+	LeftIndex = Window.GetVar ("LeftSelIndex")
 	RightTopIndex = Window.GetVar ("RightTopIndex")
-	RightIndex = Window.GetVar ("RightIndex")
+	RightIndex = Window.GetVar ("RightSelIndex")
 	idx = [ LeftTopIndex, RightTopIndex, LeftIndex, RightIndex ]
 	LeftCount = Store['StoreItemCount']
 	BuySum = 0
@@ -1258,25 +1262,18 @@ def RedrawStoreShoppingWindow (Window):
 			CloseBagButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 	for i in range (ItemButtonCount):
-		if i+LeftTopIndex<LeftCount:
-			Slot = GemRB.GetStoreItem (i+LeftTopIndex)
-		else:
-			Slot = None
+		Slot = GemRB.GetStoreItem (i + LeftTopIndex)
 		Button = Window.GetControlAlias ('LBTN' + str(i))
 		Label = Window.GetControlAlias ('LLBL' + str(i))
-		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx)
 
-		if i+RightTopIndex<RightCount:
-			if Bag:
-				Slot = GemRB.GetStoreItem (i+RightTopIndex, STORE_BAG)
-			else:
-				Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
+		if Bag:
+			Slot = GemRB.GetStoreItem (i+RightTopIndex, STORE_BAG)
 		else:
-			Slot = None
+			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
+
 		Button = Window.GetControlAlias ('RBTN' + str(i))
 		Label = Window.GetControlAlias ('RLBL' + str(i))
-		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_BAG if Bag else ITEM_PC, idx)
 
 	if GameCheck.IsPST():
