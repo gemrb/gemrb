@@ -44,7 +44,7 @@
 
 namespace GemRB {
 
-class Control;
+class View;
 
 enum {
    SV_BPP,
@@ -84,6 +84,8 @@ public:
 	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);
 	PyObject* ConstructObject(const char* pyclassname, ScriptingId id);
 	PyObject* ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
+	
+	void AssignViewAttributes(PyObject* obj, View* view) const;
 };
 
 extern GUIScript *gs;

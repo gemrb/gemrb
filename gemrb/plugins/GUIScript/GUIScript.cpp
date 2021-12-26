@@ -2033,8 +2033,12 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 		return RuntimeError("Expected a numeric or None type.");
 	}
 
-	ctrl->BindDictVariable(VarName, val, Control::ValueRange(min, max));
-	Py_RETURN_NONE;
+	if (ctrl->BindDictVariable(VarName, val, Control::ValueRange(min, max))) {
+		gs->AssignViewAttributes(self, ctrl);
+		Py_RETURN_TRUE;
+	}
+	
+	Py_RETURN_FALSE;
 }
 
 PyDoc_STRVAR( GemRB_Window_GetVar__doc,
@@ -13907,6 +13911,27 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 	PyErr_Clear();
 	return false;
 }
+	
+void GUIScript::AssignViewAttributes(PyObject* obj, View* view) const
+{
+	static PyObject* controlClass = PyDict_GetItemString(pGUIClasses, "GControl");
+	static PyObject* windowClass = PyDict_GetItemString(pGUIClasses, "GWindow");
+	
+	if (PyObject_IsInstance(obj, controlClass)) {
+		const Control* ctl = static_cast<Control*>(view);
+		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
+		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->DictVariable()));
+		Control::value_t val = ctl->GetValue();
+		if (val == Control::INVALID_VALUE) {
+			PyObject_SetAttrString(obj, "Value", Py_None);
+		} else {
+			PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, val));
+		}
+	} else if (PyObject_IsInstance(obj, windowClass)) {
+		const Window* win = static_cast<Window*>(view);
+		PyObject_SetAttrString(obj, "HasFocus", DecRef(PyBool_FromLong, win->HasFocus()));
+	}
+}
 
 PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 {
@@ -13917,22 +13942,9 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromString, ref->ScriptingGroup()));
 	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
 	
-	static PyObject* controlClass = PyDict_GetItemString(pGUIClasses, "GControl");
-	static PyObject* windowClass = PyDict_GetItemString(pGUIClasses, "GWindow");
-	
-	if (PyObject_IsInstance(obj, controlClass)) {
-		const Control* ctl = static_cast<Control*>(GetView(ref));
-		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
-		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->DictVariable()));
-		Control::value_t val = ctl->GetValue();
-		if (val == Control::INVALID_VALUE) {
-			PyObject_SetAttrString(obj, "Value", Py_None);
-		} else {
-			PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, val));
-		}
-	} else if (PyObject_IsInstance(obj, windowClass)) {
-		const Window* win = static_cast<Window*>(GetView(ref));
-		PyObject_SetAttrString(obj, "HasFocus", DecRef(PyBool_FromLong, win->HasFocus()));
+	static PyObject* viewClass = PyDict_GetItemString(pGUIClasses, "GView");
+	if (PyObject_IsInstance(obj, viewClass)) {
+		AssignViewAttributes(obj, GetView(ref));
 	}
 	
 	return obj;
