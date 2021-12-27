@@ -199,18 +199,17 @@ void DialogHandler::EndDialog(bool try_to_break)
 	}
 
 	Actor *tmp = GetSpeaker();
+	Actor *target = Scriptable::As<Actor>(GetTarget());
 	speakerID = 0;
-	Scriptable *tmp2 = GetTarget();
 	targetID = 0;
 	originalTargetID = 0;
 
 	if (tmp) {
 		tmp->LeftDialog();
 	}
-	if (tmp2 && tmp2->Type == ST_ACTOR) {
-		tmp = (Actor *)tmp2;
-		tmp->LeftDialog();
-		tmp->SetCircleSize();
+	if (target) {
+		target->LeftDialog();
+		target->SetCircleSize();
 	}
 	ds = nullptr;
 	delete dlg;

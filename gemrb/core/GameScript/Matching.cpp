@@ -308,21 +308,22 @@ Scriptable *GetActorObject(const TileMap *TMap, const char *name)
 Scriptable *GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int ga_flags)
 {
 	Scriptable *tar = NULL;
+	const Actor* target;
 	// retrieve an existing target if it still exists and is valid
 	if (Sender->CurrentActionTarget) {
 		tar = core->GetGame()->GetActorByGlobalID(Sender->CurrentActionTarget);
-		if (tar && ((Actor *)tar)->ValidTarget(ga_flags)) {
+		target = Scriptable::As<Actor>(tar);
+		if (target && target->ValidTarget(ga_flags)) {
 			return tar;
 		}
 		return NULL; // target invalid/gone
 	}
 	tar = GetActorFromObject(Sender, oC, ga_flags);
+	target = Scriptable::As<Actor>(tar);
 	// maybe store the target if it's an actor..
-	if (tar && tar->Type == ST_ACTOR) {
-		// .. but we only want objects created via objectFilters
-		if (oC && oC->objectFilters[0]) {
-			Sender->CurrentActionTarget = tar->GetGlobalID();
-		}
+	// .. but we only want objects created via objectFilters
+	if (target && oC && oC->objectFilters[0]) {
+		Sender->CurrentActionTarget = tar->GetGlobalID();
 	}
 	return tar;
 }

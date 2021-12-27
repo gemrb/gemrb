@@ -28,6 +28,7 @@
 #include "Interface.h"
 #include "Projectile.h"
 #include "ProjectileServer.h"
+#include "Scriptable/Actor.h"
 
 namespace GemRB {
 
@@ -72,7 +73,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 	//collecting all self affecting effects in a single queue, so the random value is rolled only once
 	EffectQueue *fxqueue = new EffectQueue();
 	EffectQueue *selfqueue = new EffectQueue();
-	Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
+	Actor* target = Scriptable::As<Actor>(self);
 
 	for (size_t i = 0; i < count; ++i) {
 		Effect *fx = features[i];
@@ -94,7 +95,6 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 			fx->Projectile = pro;
 			fxqueue->AddEffect(new Effect(*fx));
 		} else {
-			//Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
 			fx->Projectile = 0;
 			fx->Pos = pos;
 			if (target) {

@@ -2179,9 +2179,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 	}
 	if (!map) return ab;
 
-	if (Owner && Owner->Type == ST_ACTOR) {
-		summoner = (Actor *) Owner;
-	}
+	summoner = Scriptable::As<Actor>(Owner);
 
 	while (cnt--) {
 		Actor *tmp = gamedata->GetCreature(resource);
@@ -4506,9 +4504,9 @@ bool Interface::Autopause(ieDword flag, Scriptable* target) const
 	if (centerOnAutoPause && target) {
 		GameControl* gc = GetGameControl();
 		gc->MoveViewportTo(target->Pos, true);
-
-		if (target->Type == ST_ACTOR && ((Actor *) target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
-			core->GetGame()->SelectActor((Actor *) target, true, SELECT_REPLACE);
+		Actor* tar = Scriptable::As<Actor>(target);
+		if (tar && tar->GetStat(IE_EA) < EA_GOODCUTOFF) {
+			core->GetGame()->SelectActor(tar, true, SELECT_REPLACE);
 		}
 	}
 	return true;

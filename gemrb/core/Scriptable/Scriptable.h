@@ -313,6 +313,21 @@ public:
 	ResRef SpellResRef;
 	bool InterruptCasting = false;
 public:
+
+	template <class RETURN>
+	static RETURN* As(Scriptable* obj) {
+		static_assert(std::is_base_of<Scriptable, RETURN>::value, "Attempted bad Scriptable cast!");
+		// dynamic_cast will return nullptr if the cast is invalid
+		return dynamic_cast<RETURN*>(obj);
+	}
+
+	template <class RETURN>
+	static const RETURN* As(const Scriptable* obj) {
+		static_assert(std::is_base_of<Scriptable, RETURN>::value, "Attempted bad Scriptable cast!");
+		// dynamic_cast will return nullptr if the cast is invalid
+		return dynamic_cast<const RETURN*>(obj);
+	}
+
 	/** Gets the Dialog ResRef */
 	ResRef GetDialog() const
 	{

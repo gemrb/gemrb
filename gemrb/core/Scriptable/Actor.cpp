@@ -3662,8 +3662,8 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		if (GetSubRace() == 0x20001 /* DROW */) ret += 2;
 
 		// Tyrant's dictum for clerics of Bane
-		if (caster && caster->Type == ST_ACTOR) {
-			const Actor *cleric = (Actor *) caster;
+		const Actor* cleric = Scriptable::As<Actor>(caster);
+		if (cleric) {
 			if (cleric->GetClericLevel() && BaseStats[IE_KIT] & 0x200000) saveDC += 1;
 			// the original limited this to domain spells, but that's pretty lame
 		}
@@ -4506,10 +4506,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	//FIXME: what does original do?
 	LastDamageType |= damagetype;
 
-	Actor *act = NULL;
-	if (hitter && hitter->Type == ST_ACTOR) {
-		act = (Actor *) hitter;
-	}
+	Actor* act = Scriptable::As<Actor>(hitter);
 
 	switch (modtype) {
 	case MOD_ADDITIVE:
@@ -5310,7 +5307,8 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		return;
 	}
 
-	if ((cleric->Type==ST_ACTOR) && GameScript::ID_Alignment((Actor *)cleric,AL_EVIL) ) {
+	const Actor* cleric2 = Scriptable::As<Actor>(cleric);
+	if (cleric2 && GameScript::ID_Alignment(cleric2, AL_EVIL)) {
 		evilcleric = true;
 	}
 
@@ -5511,17 +5509,16 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		AddTrigger(TriggerEntry(trigger_namelessbitthedust));
 	}
 
-	Actor *act=NULL;
 	if (!killer) {
 		// TODO: is this right?
 		killer = area->GetActorByGlobalID(LastHitter);
 	}
+	Actor* act = Scriptable::As<Actor>(killer);
 
 	bool killerPC = false;
-	if (killer && killer->Type == ST_ACTOR) {
-		act = (Actor *) killer;
+	if (act) {
 		// for unknown reasons the original only sends the trigger if the killer is ok
-		if (act && !(act->GetStat(IE_STATE_ID) & (STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN))) {
+		if (!(act->GetStat(IE_STATE_ID) & (STATE_DEAD | STATE_PETRIFIED | STATE_FROZEN))) {
 			killer->AddTrigger(TriggerEntry(trigger_killed, GetGlobalID()));
 			if (act->ShouldModifyMorale()) act->NewBase(IE_MORALE, 3, MOD_ADDITIVE);
 		}
@@ -7616,11 +7613,7 @@ int Actor::GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const
 /*Always call this on the suffering actor */
 void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype)
 {
-	Actor *attacker = NULL;
-
-	if (hitter && hitter->Type==ST_ACTOR) {
-		attacker = (Actor *) hitter;
-	}
+	Actor* attacker = Scriptable::As<Actor>(hitter);
 
 	//guardian mantle for PST
 	if (attacker && (Modified[IE_IMMUNITY]&IMM_GUARDIAN) ) {
@@ -9535,7 +9528,8 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 
 bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDword flags, int damage)
 {
-	if (target->Type!=ST_ACTOR) {
+	const Actor *tar = Scriptable::As<Actor>(target);
+	if (!tar) {
 		return UseItemPoint(slot, header, target->Pos, flags);
 	}
 	// HACK: disable use when stunned (remove if stunned/petrified/etc actors stop running scripts)
@@ -9548,7 +9542,6 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 		return false;
 	}
 
-	const Actor *tar = (const Actor *) target;
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
@@ -11164,8 +11157,9 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 bool Actor::IsInvisibleTo(const Scriptable *checker) const
 {
 	bool canSeeInvisibles = false;
-	if (checker && checker->Type == ST_ACTOR) {
-		canSeeInvisibles = ((Actor *) checker)->GetSafeStat(IE_SEEINVISIBLE);
+	const Actor* checker2 = Scriptable::As<Actor>(checker);
+	if (checker2) {
+		canSeeInvisibles = checker2->GetSafeStat(IE_SEEINVISIBLE);
 	}
 	bool invisible = GetSafeStat(IE_STATE_ID) & state_invisible;
 	if (!canSeeInvisibles && (invisible || HasSpellState(SS_SANCTUARY))) {

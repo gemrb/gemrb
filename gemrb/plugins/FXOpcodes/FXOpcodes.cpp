@@ -1177,8 +1177,9 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 
 		Scriptable *caster = GetCasterObject();
 		if (!caster) caster = Owner;
-		if (caster->Type==ST_ACTOR) {
-			casterenemy = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
+		const Actor* casterActor = Scriptable::As<Actor>(caster);
+		if (casterActor) {
+			casterenemy = casterActor->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
 		} else {
 			casterenemy = true;
 		}
@@ -1566,8 +1567,9 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x11 CurrentHPModifier
 static int GetSpecialHealAmount(int type, const Scriptable *caster)
 {
-	if (!caster || caster->Type!=ST_ACTOR) return 0;
-	const Actor *actor = (const Actor *) caster;
+	const Actor* actor = Scriptable::As<Actor>(caster);
+	if (!caster) return 0;
+
 	switch(type) {
 		case 3: //paladin's lay on hands, the amount is already calculated in a compatible way
 			return actor->GetSafeStat(IE_LAYONHANDSAMOUNT);
@@ -3493,10 +3495,11 @@ int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter1) {
 		target->Turn(Owner, fx->Parameter1);
 	} else {
-		if (Owner->Type!=ST_ACTOR) {
+		const Actor* actor = Scriptable::As<Actor>(Owner);
+		if (!actor) {
 			return FX_NOT_APPLIED;
 		}
-		target->Turn(Owner, ((Actor *) Owner)->GetStat(IE_TURNUNDEADLEVEL));
+		target->Turn(Owner, actor->GetStat(IE_TURNUNDEADLEVEL));
 	}
 	return FX_APPLIED;
 }
@@ -6731,8 +6734,8 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (Owner->Type==ST_ACTOR) {
-		const Actor *caster = (Actor *) Owner;
+	const Actor* caster = Scriptable::As<Actor>(Owner);
+	if (caster) {
 		skill = caster->GetStat(IE_SETTRAPS);
 		roll = target->LuckyRoll(1,100,0,LR_NEGATIVE);
 		// assuming functioning thief, but allowing modded exceptions
@@ -6853,11 +6856,12 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_activate_spell_sequencer(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_activate_spell_sequencer(%2d): Resource: %s", fx->Opcode, fx->Resource);
-	if (Owner->Type!=ST_ACTOR) {
+	const Actor* actor = Scriptable::As<Actor>(Owner);
+	if (!actor) {
 		return FX_NOT_APPLIED;
 	}
 
-	Effect *sequencer = ((Actor *) Owner)->fxqueue.HasEffect(fx_spell_sequencer_active_ref);
+	Effect *sequencer = actor->fxqueue.HasEffect(fx_spell_sequencer_active_ref);
 	if (!sequencer) {
 		return FX_NOT_APPLIED;
 	}

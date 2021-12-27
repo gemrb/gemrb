@@ -623,10 +623,12 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		return MIC_INVALID;
 	}
 	map=Sender->GetCurrentArea();
+	Actor* tmp = nullptr;
 	switch(Sender->Type) {
 		case ST_ACTOR:
-			myinv=&((Actor *) Sender)->inventory;
-			if (((Actor *)Sender)->InParty) lostitem = true;
+			tmp = Scriptable::As<Actor>(Sender);
+			myinv = &tmp->inventory;
+			if (tmp->InParty) lostitem = true;
 			break;
 		case ST_CONTAINER:
 			myinv=&((Container *) Sender)->inventory;
@@ -657,8 +659,9 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 
 	switch(target->Type) {
 		case ST_ACTOR:
-			myinv=&((Actor *) target)->inventory;
-			if (((Actor *) target)->InParty) gotitem = true;
+			tmp = Scriptable::As<Actor>(target);
+			myinv = &tmp->inventory;
+			if (tmp->InParty) gotitem = true;
 			break;
 		case ST_CONTAINER:
 			myinv=&((Container *) target)->inventory;
@@ -677,8 +680,9 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
 		if (gotitem) {
-			if (target->Type == ST_ACTOR && ((Actor *) target)->InParty) {
-				((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL);
+			tmp = Scriptable::As<Actor>(target);
+			if (tmp && tmp->InParty) {
+				tmp->VerbalConstant(VB_INVENTORY_FULL);
 			}
 			displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		}
@@ -1428,9 +1432,8 @@ bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c)
 //It is possible to attack CONTAINERS/DOORS as well!!!
 void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 {
-	//this is a dangerous cast, make sure actor is Actor * !!!
-	assert(Sender && Sender->Type == ST_ACTOR);
-	Actor *actor = (Actor *) Sender;
+	Actor *actor = Scriptable::As<Actor>(Sender);
+	assert(actor);
 
 	// if held or disabled, etc, then cannot start or continue attacking
 	if (actor->Immobile()) {
@@ -1446,10 +1449,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
-	const Actor *tar = nullptr;
-	if (target->Type==ST_ACTOR) {
-		tar = (const Actor *) target;
-
+	const Actor *tar = Scriptable::As<Actor>(target);
+	if (tar) {
 		// release if target is invisible to sender (because of death or invisbility spell)
 		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
 			actor->StopAttack();
@@ -1872,6 +1873,7 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 
 	const Map *myarea = Sender->GetCurrentArea();
 	const Map *hisarea = target->GetCurrentArea();
+	Actor* mover = Scriptable::As<Actor>(Sender);
 	if (hisarea && hisarea!=myarea) {
 		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptName());
 
@@ -1880,9 +1882,9 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		((Actor *) Sender)->UseExit(target->GetGlobalID());
+		mover->UseExit(target->GetGlobalID());
 	} else {
-		((Actor *) Sender)->UseExit(0);
+		mover->UseExit(0);
 	}
 	// we deliberately don't try GetLikelyPosition here for now,
 	// maybe a future idea if we have a better implementation
@@ -1890,8 +1892,8 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 	GetPositionFromScriptable(target, p, false);
 
 	// account for PersonalDistance (which caller uses, but pathfinder doesn't)
-	if (distance && Sender->Type == ST_ACTOR) {
-		distance += ((Actor *)Sender)->size*10;
+	if (distance && mover) {
+		distance += mover->size * 10;
 	}
 	if (distance && target->Type == ST_ACTOR) {
 		distance += ((const Actor *) target)->size * 10;
@@ -2678,10 +2680,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 	}
 
-	Actor *act = NULL;
-	if (Sender->Type==ST_ACTOR) {
-		act = (Actor *) Sender;
-	}
+	Actor* act = Scriptable::As<Actor>(Sender);;
 
 	//parse target
 	int seeflag = 0;
@@ -2811,10 +2810,10 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 	}
 
-	if(Sender->Type==ST_ACTOR) {
+	Actor* act = Scriptable::As<Actor>(Sender);
+	if (act) {
 		unsigned int dist = GetSpellDistance(spellResRef, Sender);
 
-		Actor *act = (Actor *) Sender;
 		//move near to target
 		if (flags&SC_RANGE_CHECK) {
 			if (PersonalDistance(parameters->pointParameter, Sender) > dist) {

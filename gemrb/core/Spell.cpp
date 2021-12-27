@@ -169,6 +169,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	Effect *const *features;
 	size_t count;
 	const auto& tables = SpellTables::Get();
+	Actor *caster = Scriptable::As<Actor>(self);
 
 	//iwd2 has this hack
 	if (block_index>=0) {
@@ -214,8 +215,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		fx->SpellLevel = SpellLevel;
 
 		// apply the stat-based spell duration modifier
-		if (self && self->Type == ST_ACTOR) {
-			const Actor *caster = (const Actor *) self;
+		if (caster) {
 			if (caster->Modified[IE_SPELLDURATIONMODMAGE] && SpellType == IE_SPL_WIZARD) {
 				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
 			} else if (caster->Modified[IE_SPELLDURATIONMODPRIEST] && SpellType == IE_SPL_PRIEST) {
@@ -261,8 +261,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		}
 	}
 	if (self && selfqueue) {
-		Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
-		core->ApplyEffectQueue(selfqueue, target, self);
+		core->ApplyEffectQueue(selfqueue, caster, self);
 		delete selfqueue;
 	}
 	return fxqueue;
@@ -291,8 +290,8 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 {
 	int level = 0;
 	unsigned int limit = VOODOO_VISUAL_RANGE;
-	if (Sender && Sender->Type==ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
+	Actor* actor = Scriptable::As<Actor>(Sender);
+	if (actor) {
 		level = actor->GetCasterLevel(SpellType);
 		limit = actor->GetStat(IE_VISUALRANGE);
 	}

@@ -748,11 +748,10 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_vampiric_touch(%2d): ResRef:%s Type: %d", fx->Opcode, fx->Resource, fx->Parameter2);
-	if (Owner->Type!=ST_ACTOR) {
+	Actor* owner = Scriptable::As<Actor>(Owner);
+	if (!owner) {
 		return FX_NOT_APPLIED;
 	}
-
-	Actor *owner = (Actor *) Owner;
 
 	if (owner==target) {
 		return FX_NOT_APPLIED;
@@ -1344,15 +1343,17 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 
 	bool enemyally = true;
 	Scriptable *caster = target->GetCurrentArea()->GetActorByGlobalID(fx->CasterID);
-	if (caster && caster->Type==ST_ACTOR) {
-		enemyally = ((Actor *) caster)->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
+	const Actor* caster2 = Scriptable::As<Actor>(caster);
+	if (caster2) {
+		enemyally = caster2->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
 	}
 
 	//do this only on first use
 	if (fx->FirstApply) {
-		if (Owner->Type == ST_ACTOR) {
-			fx->CasterID = Owner->GetGlobalID();
-			enemyally = ((Actor *) Owner)->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
+		const Actor* actor = Scriptable::As<Actor>(Owner);
+		if (actor) {
+			fx->CasterID = actor->GetGlobalID();
+			enemyally = actor->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
 		}
 		switch (fx->Parameter2) {
 		case 0: //charmed (target neutral after charm)
@@ -1631,18 +1632,19 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
 
 		// for each kill the caster receives a +1 bonus to Str, Dex and Con for 1 turn
-		if (Owner->Type == ST_ACTOR) {
+		Actor* actor = Scriptable::As<Actor>(Owner);
+		if (actor) {
 			newfx = EffectQueue::CreateEffect(fx_str_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
-			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+			core->ApplyEffect(newfx, actor, Owner);
 
 			newfx = EffectQueue::CreateEffect(fx_dex_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
-			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+			core->ApplyEffect(newfx, actor, Owner);
 
 			newfx = EffectQueue::CreateEffect(fx_con_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
-			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
+			core->ApplyEffect(newfx, actor, Owner);
 		}
 	}
 	return FX_NOT_APPLIED;
@@ -1836,10 +1838,11 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 		if (fx->Parameter1) {
 			target->Turn(Owner, fx->Parameter1);
 		} else {
-			if (Owner->Type!=ST_ACTOR) {
+			const Actor* actor = Scriptable::As<Actor>(Owner);
+			if (!actor) {
 				return FX_NOT_APPLIED;
 			}
-			target->Turn(Owner, ((Actor *) Owner)->GetStat(IE_TURNUNDEADLEVEL));
+			target->Turn(Owner, actor->GetStat(IE_TURNUNDEADLEVEL));
 		}
 		break;
 	}
@@ -2455,11 +2458,12 @@ int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 	}
-	// print("fx_control(%2d)", fx->Opcode);
+
 	bool enemyally = true;
 	const Scriptable *caster = GetCasterObject();
-	if (caster && caster->Type==ST_ACTOR) {
-		enemyally = ((const Actor *) caster)->GetStat(IE_EA) > EA_GOODCUTOFF;
+	const Actor* actor = Scriptable::As<Actor>(caster);
+	if (actor) {
+		enemyally = actor->GetStat(IE_EA) > EA_GOODCUTOFF;
 	}
 
 	if (fx->FirstApply) {

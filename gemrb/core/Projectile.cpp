@@ -997,10 +997,7 @@ int Projectile::CalculateTargetFlag() const
 	}
 
 	const Scriptable *caster = area->GetScriptableByGlobalID(Caster);
-	const Actor *act = nullptr;
-	if (caster && caster->Type == ST_ACTOR) {
-		act = (const Actor *) caster;
-	}
+	const Actor* act = Scriptable::As<Actor>(caster);
 	if (caster && (!checkingEA || (act && act->GetStat(IE_EA) < EA_GOODCUTOFF))) {
 		return flags;
 	}

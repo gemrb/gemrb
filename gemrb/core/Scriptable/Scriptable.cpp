@@ -331,11 +331,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	bool changed = false;
-
-	Actor *act = NULL;
-	if (Type == ST_ACTOR) {
-		act = (Actor *) this;
-	}
+	Actor* act = Scriptable::As<Actor>(this);
 
 	// don't run if the final dialog action queue is still playing out (we're already out of dialog!)
 	// currently limited with GF_CUTSCENE_AREASCRIPTS and to area scripts, to minimize risk into known test cases
@@ -697,13 +693,12 @@ const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned i
 void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int level, bool fake)
 {
 	Spell* spl = gamedata->GetSpell( SpellResRef );
-	Actor *caster = NULL;
+	Actor* caster = Scriptable::As<Actor>(this);
 
 	//PST has a weird effect, called Enoll Eva's duplication
 	//it creates every projectile of the affected actor twice
 	int projectileCount = 1;
-	if (Type == ST_ACTOR) {
-		caster = (Actor *) this;
+	if (caster) {
 		if (spl->Flags&SF_HOSTILE) {
 			caster->CureSanctuary();
 		}
@@ -715,7 +710,7 @@ void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int le
 		}
 	}
 
-	if (pst_flags && (Type == ST_ACTOR)) {
+	if (pst_flags && caster) {
 		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
 			//seriously, wild surges and EE in the same game?
 			//anyway, it would be too many duplications
@@ -929,7 +924,6 @@ inline void Scriptable::ResetCastingState(Actor *caster) {
 
 void Scriptable::CastSpellPointEnd(int level, int no_stance)
 {
-	Actor *caster = NULL;
 	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (!spl) {
 		return;
@@ -937,11 +931,9 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	int nSpellType = spl->SpellType;
 	gamedata->FreeSpell(spl, SpellResRef, false);
 
-	if (Type == ST_ACTOR) {
-		caster = ((Actor *) this);
-		if (!no_stance) {
-			caster->SetStance(IE_ANI_CONJURE);
-		}
+	Actor* caster = Scriptable::As<Actor>(this);
+	if (caster && !no_stance) {
+		caster->SetStance(IE_ANI_CONJURE);
 	}
 	if (level == 0) {
 		if (caster) {
@@ -1009,18 +1001,16 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 
 void Scriptable::CastSpellEnd(int level, int no_stance)
 {
-	Actor *caster = NULL;
 	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (!spl) {
 		return;
 	}
 	int nSpellType = spl->SpellType;
 	gamedata->FreeSpell(spl, SpellResRef, false);
-	if (Type == ST_ACTOR) {
-		caster = ((Actor *) this);
-		if (!no_stance) {
-			caster->SetStance(IE_ANI_CONJURE);
-		}
+
+	Actor* caster = Scriptable::As<Actor>(this);
+	if (caster && !no_stance) {
+		caster->SetStance(IE_ANI_CONJURE);
 	}
 	if (level == 0) {
 		if (caster) {
@@ -1258,13 +1248,10 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 {
 	LastSpellTarget = 0;
 	LastTargetPos = Point(-1, -1);
-	Actor *actor = NULL;
-	if (Type == ST_ACTOR) {
-		actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
-			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
-			return -1;
-		}
+	Actor* actor = Scriptable::As<Actor>(this);
+	if (actor && actor->HandleCastingStance(SpellResRef, deplete, instant)) {
+		Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
+		return -1;
 	}
 	if(!nointerrupt && !CanCast(SpellResRef)) {
 		SpellResRef.Reset();
@@ -1293,13 +1280,10 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 {
 	LastSpellTarget = 0;
 	LastTargetPos = Point(-1, -1);
-	Actor *actor = NULL;
-	if (Type == ST_ACTOR) {
-		actor = (Actor *) this;
-		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
-			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
-			return -1;
-		}
+	Actor* actor = Scriptable::As<Actor>(this);
+	if (actor && actor->HandleCastingStance(SpellResRef, deplete, instant)) {
+		Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
+		return -1;
 	}
 
 	assert(target);
@@ -1335,11 +1319,9 @@ static EffectRef fx_castingspeed_modifier_ref = { "CastingSpeedModifier", -1 };
 int Scriptable::SpellCast(bool instant, Scriptable *target)
 {
 	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
-	Actor *actor = NULL;
 	int level = 0;
-	if (Type == ST_ACTOR) {
-		actor = (Actor *) this;
-
+	Actor* actor = Scriptable::As<Actor>(this);
+	if (actor) {
 		//The ext. index is here to calculate the casting time
 		level = actor->GetCasterLevel(spl->SpellType);
 		SpellHeader = spl->GetHeaderIndexFromLevel(level);
@@ -1991,18 +1973,18 @@ void Movable::SetStance(unsigned int arg)
 		}
 	}
 
-	if (StanceID == IE_ANI_CONJURE && StanceID != arg && Type ==ST_ACTOR) {
-		Actor *caster = (Actor *) this;
-		if (caster->casting_sound) {
-			caster->casting_sound->Stop();
-			caster->casting_sound.release();
-		}
-	}
-
 	if (arg >= MAX_ANIMS) {
 		StanceID = IE_ANI_AWAKE;
 		Log(ERROR, "Movable", "Tried to set invalid stance id(%u)", arg);
 		return;
+	}
+
+	Actor* caster = Scriptable::As<Actor>(this);
+	if (StanceID == IE_ANI_CONJURE && StanceID != arg) {
+		if (caster && caster->casting_sound) {
+			caster->casting_sound->Stop();
+			caster->casting_sound.release();
+		}
 	}
 
 	StanceID = (unsigned char) arg;
@@ -2022,9 +2004,8 @@ void Movable::SetStance(unsigned int arg)
 	// this doesn't get hit on movement, since movement overrides the stance manually
 	// but it is needed for the twang/clank when an actor stops moving
 	// a lot of other stances would get skipped later, since we check we're out of combat
-	if (Type == ST_ACTOR) {
-		const Actor *actor = (Actor *) this;
-		actor->PlayArmorSound();
+	if (caster) {
+		caster->PlayArmorSound();
 	}
 }
 
@@ -2135,8 +2116,7 @@ void Movable::BumpBack()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
-	const Actor *actor = nullptr;
-	if (Type == ST_ACTOR) actor = (const Actor*) this;
+	const Actor* actor = Scriptable::As<Actor>(this);
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
 	if (!path) {
@@ -2270,8 +2250,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		return;
 	}
 
-	const Actor *actor = nullptr;
-	if (Type == ST_ACTOR) actor = (const Actor*) this;
+	const Actor* actor = Scriptable::As<Actor>(this);
 
 	prevTicks = Ticks;
 	Destination = Des;
