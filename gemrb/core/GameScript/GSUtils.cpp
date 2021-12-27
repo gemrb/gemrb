@@ -142,8 +142,9 @@ int GetReaction(const Actor *target, const Scriptable *Sender)
 	reaction = 10 + rmodrep[rep] + rmodchr[chr];
 
 	// add -4 penalty when dealing with racial enemies
-	if (Sender && target->GetRangerLevel() && (Sender->Type == ST_ACTOR) ) {
-		reaction -= target->GetRacialEnemyBonus((const Actor *) Sender);
+	const Actor* scr = Scriptable::As<Actor>(Sender);
+	if (scr && target->GetRangerLevel()) {
+		reaction -= target->GetRacialEnemyBonus(scr);
 	}
 
 	return reaction;
@@ -151,10 +152,11 @@ int GetReaction(const Actor *target, const Scriptable *Sender)
 
 int GetHappiness(const Scriptable *Sender, int reputation)
 {
-	if (Sender->Type != ST_ACTOR) {
+	const Actor* ab = Scriptable::As<Actor>(Sender);
+	if (!ab) {
 		return 0;
 	}
-	const Actor *ab = (const Actor *) Sender;
+
 	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GE_MASK; //good / evil
 	// handle unset alignment
 	if (!alignment) {
@@ -166,10 +168,11 @@ int GetHappiness(const Scriptable *Sender, int reputation)
 
 int GetHPPercent(const Scriptable *Sender)
 {
-	if (Sender->Type != ST_ACTOR) {
+	const Actor* ab = Scriptable::As<Actor>(Sender);
+	if (!ab) {
 		return 0;
 	}
-	const Actor *ab = (const Actor *) Sender;
+
 	int hp1 = ab->GetStat(IE_MAXHITPOINTS);
 	if (hp1<1) {
 		return 0;
@@ -346,10 +349,11 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, ieDword valu
 	} else {
 		tar = Sender;
 	}
-	if (tar->Type != ST_ACTOR) {
+
+	Actor* actor = Scriptable::As<Actor>(tar);
+	if (!actor) {
 		return;
 	}
-	Actor* actor = ( Actor* ) tar;
 	actor->SetStance( value );
 }
 
@@ -439,11 +443,12 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	ieDword charactersubtitles = 0;
 	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
 	if (flags & DS_CONST) {
-		if (Sender->Type!=ST_ACTOR) {
+		const Actor* actor = Scriptable::As<Actor>(Sender);
+		if (!actor) {
 			Log(ERROR, "GameScript", "Verbal constant not supported for non actors!");
 			return;
 		}
-		Actor* actor = ( Actor* ) Sender;
+
 		if ((ieDword) Strref>=VCONST_COUNT) {
 			Log(ERROR, "GameScript", "Invalid verbal constant!");
 			return;
@@ -509,7 +514,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			speech = GEM_SND_SPEECH;
 		}
 		// disable position, but only for party
-		if (Sender->Type != ST_ACTOR || static_cast<Actor*>(Sender)->InParty ||
+		Actor* actor = Scriptable::As<Actor>(Sender);
+		if (!actor || actor->InParty ||
 			core->InCutSceneMode() || core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
 			speech |= GEM_SND_RELATIVE;
 			pos.reset();
@@ -519,8 +525,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		core->GetAudioDrv()->Play(Sound, channel, pos, speech, &len);
 		tick_t counter = ( AI_UPDATE_TIME * len ) / 1000;
 
-		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
-			static_cast<Actor*>(Sender)->SetAnimatedTalking(len);
+		if (actor && len > 0 && flags & DS_CIRCLE) {
+			actor->SetAnimatedTalking(len);
 		}
 
 		if ((counter != 0) && (flags &DS_WAIT) )
@@ -531,7 +537,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int seeflag)
 {
 	if (target->Type==ST_ACTOR) {
-		const Actor *tar = (const Actor *) target;
+		const Actor *tar = static_cast<const Actor*>(target);
 
 		if (!tar->ValidTarget(seeflag, Sender)) {
 			return 0;
@@ -549,7 +555,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 		unsigned int dist;
 		bool los = true;
 		if (Sender->Type == ST_ACTOR) {
-			const Actor *snd = (const Actor *) Sender;
+			const Actor *snd = static_cast<const Actor*>(Sender);
 			dist = snd->Modified[IE_VISUALRANGE];
 		} else {
 			dist = VOODOO_VISUAL_RANGE;
@@ -598,7 +604,7 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 		}
 		// NOTE: Detect supposedly doesn't set LastMarked — disable on GA_DETECT if needed
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR && Sender!=tar) {
-			Actor* snd = ( Actor* ) Sender;
+			Actor* snd = static_cast<Actor*>(Sender);
 			snd->LastSeen = tar->GetGlobalID();
 			snd->LastMarked = tar->GetGlobalID();
 		}
@@ -872,7 +878,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	// also set it as Sender's LastMarkedObject (fixes worg rider dismount killing players)
 	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
+		Actor *actor = static_cast<Actor*>(Sender);
 		actor->LastMarked = ab->GetGlobalID();
 	}
 
@@ -990,6 +996,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 
 static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 {
+	const InfoPoint* ip;
 	switch (scr->Type) {
 		case ST_AREA: case ST_GLOBAL:
 			position = scr->Pos; //fake
@@ -999,14 +1006,15 @@ static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 			position = ((Movable *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			if (((InfoPoint *) scr)->GetUsePoint() ) {
-				position=((InfoPoint *) scr)->UsePoint;
+			ip = Scriptable::As<InfoPoint>(scr);
+			if (ip->GetUsePoint()) {
+				position = ip->UsePoint;
 				break;
 			}
-			position=((InfoPoint *) scr)->TalkPos;
+			position = ip->TalkPos;
 			break;
 		case ST_DOOR: case ST_CONTAINER:
-			position=((Highlightable *) scr)->TrapLaunch;
+			position = static_cast<Highlightable*>(scr)->TrapLaunch;
 			break;
 	}
 }
@@ -1017,22 +1025,25 @@ void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest
 		position = scr->Pos;
 		return;
 	}
+
+	const InfoPoint* ip;
 	switch (scr->Type) {
 		case ST_AREA: case ST_GLOBAL:
 			position = scr->Pos; //fake
 			break;
 		case ST_ACTOR:
 		//if there are other moveables, put them here
-			position = ((const Movable *) scr)->GetMostLikelyPosition();
+			position = static_cast<const Movable*>(scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			if (((const InfoPoint *) scr)->GetUsePoint()) {
-				position = ((const InfoPoint *) scr)->UsePoint;
+			ip = Scriptable::As<InfoPoint>(scr);
+			if (ip->GetUsePoint()) {
+				position = ip->UsePoint;
 				break;
 			}
 		// intentional fallthrough
 		case ST_DOOR: case ST_CONTAINER:
-			position = ((const Highlightable *) scr)->TrapLaunch;
+			position = static_cast<const Highlightable*>(scr)->TrapLaunch;
 	}
 }
 
@@ -1067,7 +1078,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		Log(ERROR, "GameScript", "Target for dialog couldn't be found (Sender: %s, Type: %d).",
 			Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
-			((Actor *) Sender)->dump();
+			static_cast<Actor*>(Sender)->dump();
 		}
 		StringBuffer buffer;
 		buffer.append("Target object: ");
@@ -1081,11 +1092,10 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		return;
 	}
 
-	const Actor *speaker = nullptr;
+	const Actor *speaker = Scriptable::As<Actor>(scr);
 	Actor *target = (Actor *) tar;
 	bool swap = false;
-	if (scr->Type==ST_ACTOR) {
-		speaker = (const Actor *) scr;
+	if (speaker) {
 		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			StringBuffer buffer;
 			buffer.append("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
@@ -1259,7 +1269,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		}
 		if (tar->Type==ST_ACTOR) {
 			// might not be equal to target anymore due to swapping
-			Actor *talkee = (Actor *) tar;
+			Actor *talkee = static_cast<Actor*>(tar);
 			if (!talkee->Immobile() && !(talkee->GetStat(IE_STATE_ID) & STATE_SLEEP) && !(talkee->AppearanceFlags&APP_NOTURN)) {
 				talkee->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
 				if (talkee->InParty) {
@@ -1351,7 +1361,8 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 //if int0parameter is !=0, then it will try only x times
 void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flags, bool untilsee)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!actor) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1360,10 +1371,10 @@ void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flag
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+
 	Point dest = target->Pos;
-	if (target->Type == ST_TRIGGER && ((const InfoPoint *)target)->GetUsePoint()) {
-		dest = ((const InfoPoint *)target)->UsePoint;
+	if (target->Type == ST_TRIGGER && static_cast<const InfoPoint*>(target)->GetUsePoint()) {
+		dest = static_cast<const InfoPoint*>(target)->UsePoint;
 	}
 	if (untilsee && CanSee(actor, target, true, 0) ) {
 		Sender->LastSeen = target->GetGlobalID();
@@ -1511,14 +1522,14 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	} else if (target->Type == ST_DOOR) {
 		//Forcing a lock does not launch the trap...
-		Door* door = (Door*) target;
+		Door* door = static_cast<Door*>(target);
 		if(door->Flags & DOOR_LOCKED) {
 			door->TryBashLock(actor);
 		}
 		Sender->ReleaseCurrentAction();
 		return;
 	} else if (target->Type == ST_CONTAINER) {
-		Container* cont = (Container*) target;
+		Container* cont = static_cast<Container*>(target);
 		if(cont->Flags & CONT_LOCKED) {
 			cont->TryBashLock(actor);
 		}
@@ -1865,7 +1876,8 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 {
 	Point p;
 
-	if (Sender->Type != ST_ACTOR) {
+	Actor* mover = Scriptable::As<Actor>(Sender);
+	if (!mover) {
 		Log(ERROR, "GameScript", "MoveNearerTo only works with actors");
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1873,7 +1885,6 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 
 	const Map *myarea = Sender->GetCurrentArea();
 	const Map *hisarea = target->GetCurrentArea();
-	Actor* mover = Scriptable::As<Actor>(Sender);
 	if (hisarea && hisarea!=myarea) {
 		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptName());
 
@@ -1896,7 +1907,7 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 		distance += mover->size * 10;
 	}
 	if (distance && target->Type == ST_ACTOR) {
-		distance += ((const Actor *) target)->size * 10;
+		distance += static_cast<const Actor*>(target)->size * 10;
 	}
 
 	MoveNearerTo(Sender, p, distance, dont_release);
@@ -1907,7 +1918,8 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 //i hacked only this low level function, didn't need the higher ones so far
 int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_release)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!actor) {
 		Log(ERROR, "GameScript", "MoveNearerTo only works with actors");
 		Sender->ReleaseCurrentAction();
 		return 0;
@@ -1916,8 +1928,6 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 	// chasing is not unbreakable
 	// would prevent smart ai from dropping a target that's running away
 	//Sender->CurrentActionInterruptable = false;
-
-	Actor *actor = (Actor *)Sender;
 
 	if (!actor->InMove() || actor->Destination != p) {
 		ieDword flags = core->GetGameControl()->ShouldRun(actor) ? IF_RUNNING : 0;
@@ -2383,7 +2393,7 @@ Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
 			}
 		}
 	}
-	ac = (Actor *) tgts->GetTarget(0, ST_ACTOR);
+	ac = static_cast<Actor*>(tgts->GetTarget(0, ST_ACTOR));
 	delete tgts;
 	return ac;
 }
@@ -2412,7 +2422,7 @@ Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
 		int distance = Distance(ac, origin);
 		tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	}
-	ac = (Actor *) tgts->GetTarget(0, ST_ACTOR);
+	ac = static_cast<Actor*>(tgts->GetTarget(0, ST_ACTOR));
 	delete tgts;
 	return ac;
 }
@@ -2595,8 +2605,8 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 }
 
 static bool InterruptSpellcasting(Scriptable* Sender) {
-	if (Sender->Type != ST_ACTOR) return false;
-	Actor *caster = (Actor *) Sender;
+	Actor* caster = Scriptable::As<Actor>(Sender);
+	if (!caster) return false;
 
 	// ouch, we got hit
 	if (Sender->InterruptCasting) {
@@ -2923,9 +2933,9 @@ int NumItemsCore(Scriptable *Sender, const Trigger *parameters)
 
 	const Inventory *inventory = nullptr;
 	if (target->Type == ST_ACTOR) {
-		inventory = &(((const Actor *) target)->inventory);
+		inventory = &(static_cast<const Actor*>(target)->inventory);
 	} else if (target->Type == ST_CONTAINER) {
-		inventory = &(((const Container *) target)->inventory);
+		inventory = &(static_cast<const Container*>(target)->inventory);
 	}
 	if (!inventory) {
 		return 0;
@@ -2939,10 +2949,10 @@ static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
 unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!target || target->Type != ST_ACTOR) {
+	const Actor* actor = Scriptable::As<Actor>(target);
+	if (!actor) {
 		return 0;
 	}
-	const Actor *actor = (const Actor *) target;
 
 	unsigned int bounceCount = 0;
 	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
@@ -2962,10 +2972,10 @@ static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
 int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!target || target->Type != ST_ACTOR) {
+	const Actor* actor = Scriptable::As<Actor>(target);
+	if (!actor) {
 		return 0;
 	}
-	const Actor *actor = (const Actor *) target;
 
 	unsigned int bounceCount = 0;
 	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
