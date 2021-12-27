@@ -160,9 +160,9 @@ Targets *GameScript::LastTrigger(const Scriptable *Sender, Targets *parameters, 
 
 Targets *GameScript::LastMarkedObject(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -176,9 +176,9 @@ Targets *GameScript::LastMarkedObject(const Scriptable *Sender, Targets *paramet
 
 Targets *GameScript::SpellTarget(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -193,9 +193,9 @@ Targets *GameScript::SpellTarget(const Scriptable *Sender, Targets *parameters, 
 //actions should always use LastMarkedObject, because LastSeen could be deleted
 Targets *GameScript::LastSeenBy(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -209,9 +209,9 @@ Targets *GameScript::LastSeenBy(const Scriptable *Sender, Targets *parameters, i
 
 Targets *GameScript::LastHelp(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -225,9 +225,9 @@ Targets *GameScript::LastHelp(const Scriptable *Sender, Targets *parameters, int
 
 Targets *GameScript::LastHeardBy(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -243,9 +243,9 @@ Targets *GameScript::LastHeardBy(const Scriptable *Sender, Targets *parameters, 
 //object selector for everyone with the same specifics as the current object
 Targets *GameScript::GroupOf(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -265,9 +265,9 @@ Targets *GameScript::GroupOf(const Scriptable *Sender, Targets *parameters, int 
 /*this one is tough, but done */
 Targets *GameScript::ProtectorOf(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 
@@ -282,9 +282,9 @@ Targets *GameScript::ProtectorOf(const Scriptable *Sender, Targets *parameters, 
 
 Targets *GameScript::ProtectedBy(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -298,9 +298,9 @@ Targets *GameScript::ProtectedBy(const Scriptable *Sender, Targets *parameters, 
 
 Targets *GameScript::LastCommandedBy(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -332,15 +332,15 @@ Targets *GameScript::MyTarget(const Scriptable *Sender, Targets *parameters, int
 
 Targets *GameScript::LastTargetedBy(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	return GetMyTarget(Sender, actor, parameters, ga_flags);
 }
 
 Targets *GameScript::LastAttackerOf(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -354,9 +354,9 @@ Targets *GameScript::LastAttackerOf(const Scriptable *Sender, Targets *parameter
 
 Targets *GameScript::LastHitter(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -370,9 +370,9 @@ Targets *GameScript::LastHitter(const Scriptable *Sender, Targets *parameters, i
 
 Targets *GameScript::LeaderOf(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -386,9 +386,9 @@ Targets *GameScript::LeaderOf(const Scriptable *Sender, Targets *parameters, int
 
 Targets *GameScript::LastTalkedToBy(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -402,9 +402,9 @@ Targets *GameScript::LastTalkedToBy(const Scriptable *Sender, Targets *parameter
 
 Targets *GameScript::LastSummonerOf(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {

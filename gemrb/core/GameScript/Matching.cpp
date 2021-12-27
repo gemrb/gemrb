@@ -65,7 +65,7 @@ static inline Targets *DoObjectFiltering(const Scriptable *Sender, Targets *tgts
 	targetlist::iterator m;
 	const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 	while (tt) {
-		const Actor *target = (const Actor *) tt->actor;
+		const Actor *target = static_cast<const Actor*>(tt->actor);
 		if (oC->objectName[0] || target->ValidTarget(GA_NO_DEAD)) {
 			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		} else {
@@ -107,7 +107,7 @@ static inline bool DoObjectChecks(const Map *map, const Scriptable *Sender, cons
 	if (Sender->Type != ST_ACTOR) return true;
 
 	// Detect() ignores invisibility completely
-	const Actor *source = (const Actor *) Sender;
+	const Actor *source = static_cast<const Actor*>(Sender);
 	if (!ignoreinvis && target->IsInvisibleTo(source)) {
 		return false;
 	}
@@ -431,7 +431,7 @@ bool MatchActor(const Scriptable *Sender, ieDword actorID, const Object *oC)
 		targetlist::iterator m;
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
-			const Actor *actor = (const Actor *) tt->actor;
+			const Actor *actor = static_cast<const Actor*>(tt->actor);
 			if (actor->GetGlobalID() == actorID) {
 				ret = true;
 				break;
@@ -493,7 +493,7 @@ int GetObjectLevelCount(Scriptable *Sender, const Object *oC)
 Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *parameters, int ga_flags)
 {
 	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = (const Actor *) Sender;
+		actor = static_cast<const Actor*>(Sender);
 	}
 	parameters->Clear();
 	if (actor) {
@@ -570,7 +570,7 @@ Targets *XthNearestMyGroupOfType(const Scriptable *origin, Targets *parameters, 
 	if (!t) {
 		return parameters;
 	}
-	const Actor *actor = (const Actor *) origin;
+	const Actor *actor = static_cast<const Actor*>(origin);
 	//determining the specifics of origin
 	ieDword type = actor->GetStat(IE_SPECIFIC); //my group
 
@@ -579,7 +579,7 @@ Targets *XthNearestMyGroupOfType(const Scriptable *origin, Targets *parameters, 
 			t=parameters->RemoveTargetAt(m);
 			continue;
 		}
-		actor = (const Actor *) (t->actor);
+		actor = static_cast<const Actor*>(t->actor);
 		if (actor->GetStat(IE_SPECIFIC) != type) {
 			t=parameters->RemoveTargetAt(m);
 			continue;
@@ -601,7 +601,7 @@ Targets *ClosestEnemySummoned(const Scriptable *origin, Targets *parameters, int
 	if (!t) {
 		return parameters;
 	}
-	const Actor *sender = (const Actor *) origin;
+	const Actor *sender = static_cast<const Actor*>(origin);
 	//determining the allegiance of the origin
 	int type = GetGroup(sender);
 
@@ -653,7 +653,7 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 	if (!t) {
 		return parameters;
 	}
-	const Actor *actor = (const Actor *) origin;
+	const Actor *actor = static_cast<const Actor*>(origin);
 	//determining the allegiance of the origin
 	int type = GetGroup(actor);
 
@@ -668,7 +668,7 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 			t=parameters->RemoveTargetAt(m);
 			continue;
 		}
-		actor = (const Actor *) (t->actor);
+		actor = static_cast<const Actor*>(t->actor);
 		// IDS targeting already did object checks (unless we need to override Detect?)
 		if (!actor->Schedule(gametime, true)) {
 			t = parameters->RemoveTargetAt(m);
