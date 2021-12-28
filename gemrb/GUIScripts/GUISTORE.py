@@ -39,7 +39,6 @@ StoreWindow = None
 RentConfirmWindow = None
 LeftButton = None
 RightButton = None
-CureTable = None
 
 ITEM_PC    = 0
 ITEM_STORE = 1
@@ -54,13 +53,12 @@ Bag = None
 inventory_slots = ()
 total_price = 0
 total_income = 0
-if GameCheck.IsIWD2():
-	ItemButtonCount = 6
-else:
-	ItemButtonCount = 4
-RepModTable = None
-SpellTable = None
 BarteringPC = 0
+
+ItemButtonCount = 4 if GameCheck.IsIWD2() else 6
+CureTable = GemRB.LoadTable("speldesc", True) # additional info not supported by core (PST)
+RepModTable = GemRB.LoadTable ("repmodst", True) # all but PST; FIXME: does IWD2 sufffer a 10x price increase?
+SpellTable = GemRB.LoadTable ("storespl", True) # all but PST
 
 # 0 - Store
 # 1 - Tavern
@@ -112,7 +110,7 @@ if ResolutionH < 600 or (GameCheck.IsIWD2 () and ResolutionH < 934):
 
 def CloseStoreWindow ():
 	import GUIINV
-	global StoreWindow, CureTable
+	global StoreWindow
 	
 	if StoreWindow:
 		StoreWindow.Close ()
@@ -124,8 +122,6 @@ def CloseStoreWindow ():
 		Bag = None
 
 	GemRB.LeaveStore ()
-
-	CureTable = None
 	
 	if GemRB.GetVar ("Inventory"):
 		GemRB.SetVar ("Inventory", 0)
@@ -162,9 +158,7 @@ def OpenStoreWindow ():
 	global Store
 	global StoreWindow
 	global store_funcs
-	global SpellTable, RepModTable
 	global Inventory, BarteringPC
-	global CureTable
 	
 	def ChangeStoreView(func):
 		# WIN_TOP needs to be focused for us to change it (see CreateTopWinLoader)
@@ -190,13 +184,6 @@ def OpenStoreWindow ():
 	# the code doesn't permit a "normal win" to sit between 2 "top win"
 	# normal windows are considered children of the "top win" below them
 	topwin = store_funcs[store_buttons[0]] ()
-
-	if GameCheck.IsPST():
-		CureTable = GemRB.LoadTable("speldesc") #additional info not supported by core
-	else:
-		if not GameCheck.IsIWD2(): # present from before, resulting in a 10x price increase
-			RepModTable = GemRB.LoadTable ("repmodst")
-		SpellTable = GemRB.LoadTable ("storespl", 1)
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1
