@@ -272,7 +272,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		maxvalue = SkillsTable.GetRowCount() - SkillsNumButtons - 2
 		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, maxvalue)
 		Button = SkillsWindow.GetControl(SkillsOffsetPress)
-		AddScrollbarProxy(SkillsWindow, ScrollBar, Button)
+		AddScrollbarProxy(SkillsWindow, ScrollBar, Button.GetFrame()['x'])
 	elif len(SkillsIndices) and SkillsAssignable:
 		#autoscroll to the first valid skill; luckily all three monk ones are adjacent
 		GemRB.SetVar ("SkillsTopIndex", SkillsIndices[0])

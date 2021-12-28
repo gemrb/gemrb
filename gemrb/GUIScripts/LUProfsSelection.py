@@ -322,7 +322,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 		# proficiencies scrollbar
 		ProfsScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, lambda sb, val: ProfsRedraw (val))
 		Button = ProfsWindow.GetControl(ProfsOffsetPress)
-		AddScrollbarProxy(ProfsWindow, ProfsScrollBar, Button)
+		AddScrollbarProxy(ProfsWindow, ProfsScrollBar, Button.GetFrame()['x'])
 		ProfsScrollBar.SetVarAssoc ("ProfsTopIndex", value, 0, ProfCount)
 	return
 
