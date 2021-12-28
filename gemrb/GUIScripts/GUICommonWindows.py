@@ -1639,7 +1639,9 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			
 			Button.SetFont (fontref)
 			# label for status flags (dialog, store, level up)
-			align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
+			align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT | IE_FONT_SINGLE_LINE
+			if GameCheck.IsBG2():
+				align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
 			label = Button.CreateLabel(200 + i, fontref, "", align) #level up icon is on the right
 			label.SetFrame(Button.GetInsetFrame(4))
 
@@ -1740,10 +1742,13 @@ def UpdatePortraitWindow ():
 		Button.SetPicture (pic, "NOPORTSM")
 		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 
-		# character - 1 == bam cycle
-		talk = store = flag = blank = bytearray([32])
+		# character - 1 == bam cycle, sometimes
+		# only frames have all the glyphs
+		# only bg2 and iwds have a proper blank glyph
+		# so avoid using blanks except in bg2
+		talk = store = flag = blank = bytearray([33])
 		if GameCheck.IsBG2():
-			# as far as I can tell only BG2 has icons for talk or store
+			# only BG2 has icons for talk or store
 			flag = blank = bytearray([238])
 			talk = bytearray([154]) # dialog icon
 			store = bytearray([155]) # shopping icon
@@ -1755,9 +1760,15 @@ def UpdatePortraitWindow ():
 				flag = talk
 
 		if LUCommon.CanLevelUp (pcID):
-			flag = flag + blank + bytearray([255])
+			if GameCheck.IsBG2():
+				flag = flag + blank + bytearray([255])
+			else:
+				flag = bytearray([255])
 		else:
-			flag = flag + blank + blank
+			if GameCheck.IsBG2():
+				flag = flag + blank + blank
+			else:
+				flag = ""
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				HPLabel = Window.GetControl (100+i)
 				HPLabel.SetText (ratio_str)
