@@ -318,7 +318,7 @@ Scriptable *GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int g
 		}
 		return NULL; // target invalid/gone
 	}
-	tar = GetActorFromObject(Sender, oC, ga_flags);
+	tar = GetScriptableFromObject(Sender, oC, ga_flags);
 	target = Scriptable::As<Actor>(tar);
 	// maybe store the target if it's an actor..
 	// .. but we only want objects created via objectFilters
@@ -328,9 +328,9 @@ Scriptable *GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int g
 	return tar;
 }
 
-Scriptable *GetActorFromObject(Scriptable *Sender, const Object *oC, int ga_flags)
+Scriptable *GetScriptableFromObject(Scriptable *Sender, const Object *oC, int ga_flags)
 {
-	Scriptable *aC = NULL;
+	Scriptable *aC = nullptr;
 
 	const Game *game = core->GetGame();
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, ga_flags);

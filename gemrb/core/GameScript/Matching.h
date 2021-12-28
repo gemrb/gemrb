@@ -30,7 +30,7 @@ class TileMap;
 
 GEM_EXPORT Targets *GetAllObjects(const Map *map, Scriptable *Sender, const Object *oC, int ga_flags);
 Targets* GetAllActors(Scriptable* Sender, int ga_flags);
-Scriptable* GetActorFromObject(Scriptable* Sender, const Object* oC, int ga_flags = 0);
+Scriptable* GetScriptableFromObject(Scriptable* Sender, const Object* oC, int ga_flags = 0);
 Scriptable* GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int ga_flags = 0);
 Scriptable *GetActorObject(const TileMap *TMap, const char *name);
 

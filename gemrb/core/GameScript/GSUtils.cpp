@@ -332,7 +332,7 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, ieDword valu
 	Scriptable* tar;
 
 	if (parameters->objects[1]) {
-		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		tar = GetScriptableFromObject(Sender, parameters->objects[1]);
 		if (!tar) {
 			//could be an animation
 			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName);
@@ -585,7 +585,7 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 	} else {
 		flags |= GA_NO_DEAD;
 	}
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter, flags);
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter, flags);
 	/* don't set LastSeen if this isn't an actor */
 	if (!tar) {
 		return 0;
@@ -813,7 +813,7 @@ static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatur
 
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 {
-	Scriptable *tmp = GetActorFromObject(Sender, parameters->objects[1]);
+	Scriptable* tmp = GetScriptableFromObject(Sender, parameters->objects[1]);
 	//if there is nothing to copy, don't spawn anything
 	if (flags & CC_COPY && (!tmp || tmp->Type != ST_ACTOR)) {
 		return;
@@ -2926,7 +2926,7 @@ void AddXPCore(const Action *parameters, bool divide)
 
 int NumItemsCore(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
 	if (!target) {
 		return 0;
 	}
@@ -2948,7 +2948,7 @@ static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
 static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
 unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(target);
 	if (!actor) {
 		return 0;
@@ -2971,7 +2971,7 @@ static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
 static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
 int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(target);
 	if (!actor) {
 		return 0;
