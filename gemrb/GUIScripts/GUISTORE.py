@@ -458,7 +458,6 @@ def UpdateStoreShoppingWindow (Window):
 	ScrollBar = Window.GetControlAlias ('STOSBARR')
 	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, RightCount)
 
-	RedrawStoreShoppingWindow (Window)
 	return
 
 ToggleStoreShoppingWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["shop"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreShoppingWindow, UpdateStoreShoppingWindow, StoreWindowPlacement)
@@ -530,7 +529,6 @@ def UpdateStoreIdentifyWindow (Window):
 	Count = len(inventory_slots)
 	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, max(0, Count - ItemButtonCount))
-	RedrawStoreIdentifyWindow (Window)
 	return
 
 ToggleStoreIdentifyWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["ident"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreIdentifyWindow, UpdateStoreIdentifyWindow, StoreWindowPlacement)
@@ -632,7 +630,6 @@ def UpdateStoreStealWindow (Window):
 	ScrollBar = Window.GetControlAlias ('SWRSBAR')
 	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, max(0, RightCount - ItemButtonCount))
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
-	RedrawStoreStealWindow (Window)
 	return
 
 ToggleStoreStealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["steal"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreStealWindow, UpdateStoreStealWindow, StoreWindowPlacement)
