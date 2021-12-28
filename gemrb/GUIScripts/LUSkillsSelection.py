@@ -80,6 +80,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	SkillPointsLeft = 0
 	GemRB.SetVar ("SkillPointsLeft", 0)
 	SkillsNullify ()
+	ScrollBar = None
 
 	#make sure we're within ranges
 	if not window or not callback or len(level1)!=len(level2):
@@ -146,7 +147,8 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	else:
 		return
 
-	ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, 0)
+	if ScrollBar:
+		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, 0)
 	#get our class id and name
 	IsDual = GUICommon.IsDualClassed (pc, 1)
 	IsMulti = GUICommon.IsMultiClassed (pc, 1)
