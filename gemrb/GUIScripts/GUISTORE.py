@@ -60,7 +60,6 @@ else:
 	ItemButtonCount = 4
 RepModTable = None
 SpellTable = None
-PreviousPC = 0
 BarteringPC = 0
 
 # 0 - Store
@@ -1019,20 +1018,19 @@ def UpdateStoreCommon (Window, title, name, gold):
 	return
 
 def GetPC():
-	global PreviousPC
-
-	if PreviousPC:
+	if GetPC.PreviousPC:
 		pc = GemRB.GameGetSelectedPCSingle ()
-		if PreviousPC != pc:
-			PreviousPC = pc
+		if GetPC.PreviousPC != pc:
+			GetPC.PreviousPC = pc
 			UnselectBag ()
 			GemRB.CloseRighthandStore ()
 			UnselectNoRedraw ()
 	else:
-		PreviousPC = GemRB.GameGetSelectedPCSingle ()
-		pc = PreviousPC
+		GetPC.PreviousPC = GemRB.GameGetSelectedPCSingle ()
+		pc = GetPC.PreviousPC
 
 	return pc
+GetPC.PreviousPC = None
 
 # Unselects all the selected buttons, so they are not preselected in other windows
 def UnselectNoRedraw ():
