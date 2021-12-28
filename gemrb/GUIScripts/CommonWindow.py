@@ -31,12 +31,13 @@ def IsGameGUIHidden():
 def ToggleGUIHidden():
 	SetGameGUIHidden(not IsGameGUIHidden())
 	
-def AddScrollbarProxy(win, sbar, leftctl):
+def AddScrollbarProxy(win, sbar, xcoord):
 	frame = sbar.GetFrame()
 	
-	ctlFrame = leftctl.GetFrame()
-	frame['w'] = frame['x'] - ctlFrame['x']
-	frame['x'] = ctlFrame['x']
+	# FIXME: PST seems to have scrollbars on the left occasionally, but we dont handle that here
+	# This proxy function wont work for those cases
+	frame['w'] = frame['x'] - xcoord
+	frame['x'] = xcoord
 	
 	scrollview = GemRB.CreateView(AddScrollbarProxy.proxyID, IE_GUI_VIEW, frame)
 	AddScrollbarProxy.proxyID += 1

@@ -300,12 +300,12 @@ def InitStoreShoppingWindow (Window):
 	# left scrollbar
 	ScrollBarLeft = Window.GetControlAlias ('STOSBARL')
 	ScrollBarLeft.OnChange (lambda: RedrawStoreShoppingWindow(Window))
-	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('LBTN0'))
+	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('LBTN0').GetFrame()['x'])
 
 	# right scrollbar
 	ScrollBarRight = Window.GetControlAlias ('STOSBARR')
 	ScrollBarRight.OnChange (lambda: RedrawStoreShoppingWindow(Window))
-	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('RBTN0'))
+	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('RBTN0').GetFrame()['x'])
 
 	if GemRB.GetVar ("Inventory"):
 		Inventory = 1
@@ -489,7 +489,7 @@ def InitStoreIdentifyWindow (Window):
 
 	ScrollBar = Window.GetControlAlias ('IDSBAR')
 	ScrollBar.OnChange (lambda: RedrawStoreIdentifyWindow(Window))
-	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('IDBTN0'))
+	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('IDBTN0').GetFrame()['x'])
 
 	TextArea = Window.GetControlAlias ('IDTA')
 	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -575,12 +575,12 @@ def InitStoreStealWindow (Window):
 	# left scrollbar
 	ScrollBarLeft = Window.GetControlAlias ('SWLSBAR')
 	ScrollBarLeft.OnChange (lambda: RedrawStoreStealWindow(Window))
-	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('SWLBTN0'))
+	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('SWLBTN0').GetFrame()['x'])
 
 	# right scrollbar
 	ScrollBarRight = Window.GetControlAlias ('SWRSBAR')
 	ScrollBarRight.OnChange (lambda: RedrawStoreStealWindow(Window))
-	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('SWRBTN0'))
+	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('SWRBTN0').GetFrame()['x'])
 
 	for i in range (ItemButtonCount):
 		if GameCheck.IsBG2():
@@ -741,7 +741,7 @@ def InitStoreHealWindow (Window):
 
 	ScrollBar = Window.GetControlAlias ('HWSBAR')
 	ScrollBar.OnChange (lambda: UpdateStoreHealWindow(Window))
-	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('HWLBTN0'))
+	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('HWLBTN0').GetFrame()['x'])
 
 	#spell buttons
 	for i in range (ItemButtonCount):
