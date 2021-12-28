@@ -34,11 +34,7 @@ Cache::Cache(int nBlockSize, int nHashTableSize)
 	assert( nBlockSize > 0 );
 	assert( nHashTableSize > 16 );
 
-	m_pHashTable = NULL;
 	m_nHashTableSize = nHashTableSize; // default size
-	m_nCount = 0;
-	m_pFreeList = NULL;
-	m_pBlocks = NULL;
 	m_nBlockSize = nBlockSize;
 }
 

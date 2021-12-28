@@ -41,7 +41,7 @@ namespace GemRB {
 
 class GEM_EXPORT Ambient {
 public:
-	Ambient();
+	Ambient() = default;
 	
 	const char *getName() const { return name; }
 	const Point &getOrigin() const { return origin; }
@@ -64,17 +64,17 @@ public:
 	void setInactive();
 
 public:
-	char name[32];
+	char name[32]{};
 	Point origin;
 	std::vector<ResRef> sounds;
-	ieWord radius;
-	ieWord gain;	// percent
-	ieWord gainVariance;
-	tick_t interval;	// no pauses if zero
-	tick_t intervalVariance;
-	ieDword pitchVariance;
-	ieDword appearance;
-	ieDword flags;
+	ieWord radius = 0;
+	ieWord gain = 0;	// percent
+	ieWord gainVariance = 0;
+	tick_t interval = 0;	// no pauses if zero
+	tick_t intervalVariance = 0;
+	ieDword pitchVariance = 0;
+	ieDword appearance = 0;
+	ieDword flags = 0;
 };
 
 }

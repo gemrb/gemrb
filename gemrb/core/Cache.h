@@ -72,11 +72,11 @@ public:
 
 	// Implementation
 protected:
-	MyAssoc** m_pHashTable;
+	MyAssoc** m_pHashTable = nullptr;
 	unsigned int m_nHashTableSize;
-	int m_nCount;
-	MyAssoc* m_pFreeList;
-	MemBlock* m_pBlocks;
+	int m_nCount = 0;
+	MyAssoc* m_pFreeList = nullptr;
+	MemBlock* m_pBlocks = nullptr;
 	int m_nBlockSize;
 
 	Cache::MyAssoc* NewAssoc();

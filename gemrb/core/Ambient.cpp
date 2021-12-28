@@ -25,14 +25,6 @@
 
 namespace GemRB {
 
-Ambient::Ambient()
-{
-	name[0] = 0;
-	radius = 0;
-	gain = gainVariance = interval = intervalVariance = 0;
-	pitchVariance = appearance = flags = 0;
-}
-
 ieWord Ambient::getTotalGain() const
 {
 	ieWord g = gain;

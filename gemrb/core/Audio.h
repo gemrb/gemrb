@@ -78,7 +78,7 @@ public:
 
 class GEM_EXPORT Channel {
 public:
-	explicit Channel(const char *label) : volume(100), reverb(0.0f)
+	explicit Channel(const char *label)
 		{ strlcpy(name, label, sizeof(name)); }
 
 	const char *getName() const { return name; }
@@ -89,8 +89,8 @@ public:
 
 private:
 	char name[10];
-	int volume; // 1-100
-	float reverb;
+	int volume = 100; // 1-100
+	float reverb = 0.0f;
 };
 
 class GEM_EXPORT Audio : public Plugin {
@@ -135,7 +135,7 @@ public:
 	int GetVolume(unsigned int channel) const;
 	float GetReverb(unsigned int channel) const;
 protected:
-	AmbientMgr* ambim;
+	AmbientMgr* ambim = nullptr;
 	std::vector<Channel> channels;
 };
 

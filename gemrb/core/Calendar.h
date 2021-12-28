@@ -27,10 +27,10 @@ namespace GemRB {
 
 class GEM_EXPORT Calendar {
 private:
-	int daysinyear;
-	int monthnamecount;
-	int *days;
-	int *monthnames;
+	int daysinyear = 0;
+	int monthnamecount = -1;
+	int *days = nullptr;
+	int *monthnames = nullptr;
 
 public:
 	Calendar(void);

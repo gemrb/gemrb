@@ -35,14 +35,8 @@ Animation::Animation(std::vector<frame_t> fr)
 	assert(count > 0);
 	indicesCount = count;
 	frameIdx = RAND<index_t>(0, count-1);
-	starttime = 0;
 	Flags = A_ANI_ACTIVE;
-	fps = ANI_DEFAULT_FRAMERATE;
-	endReached = false;
-	//behaviour flags
-	playReversed = false;
-	gameAnimation = false;
-	
+
 	for (const frame_t& frame : frames) {
 		if (!frame) continue;
 		Region r = frame->Frame;

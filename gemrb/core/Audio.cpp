@@ -29,7 +29,6 @@ const TypeID Audio::ID = { "Audio" };
 
 Audio::Audio(void)
 {
-	ambim = NULL;
 	// create the built-in default channels
 	CreateChannel("NARRATIO");
 	CreateChannel("AREA_AMB");

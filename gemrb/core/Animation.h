@@ -40,12 +40,12 @@ public:
 	using index_t = uint16_t;
 	using frame_t = Holder<Sprite2D>;
 
-	bool endReached;
+	bool endReached = false;
 	index_t frameIdx;
 	Point pos;
-	unsigned char fps;
-	bool playReversed;
-	bool gameAnimation;
+	unsigned char fps = ANI_DEFAULT_FRAMERATE;
+	bool playReversed = false;
+	bool gameAnimation = false;
 	Region animArea;
 	ieDword Flags;
 
@@ -73,7 +73,7 @@ public:
 private:
 	std::vector<frame_t> frames;
 	index_t indicesCount;
-	tick_t starttime;
+	tick_t starttime = 0;
 };
 
 }
