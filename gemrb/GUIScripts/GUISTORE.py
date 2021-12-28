@@ -34,8 +34,6 @@ from ie_sounds import *
 from ie_feats import FEAT_MERCANTILE_BACKGROUND
 import CommonTables
 
-StoreWindow = None
-
 RentConfirmWindow = None
 LeftButton = None
 RightButton = None
@@ -110,8 +108,8 @@ if ResolutionH < 600 or (GameCheck.IsIWD2 () and ResolutionH < 934):
 
 def CloseStoreWindow ():
 	import GUIINV
-	global StoreWindow
-	
+
+	StoreWindow = GemRB.GetView("WIN_STORE")
 	if StoreWindow:
 		StoreWindow.Close ()
 
@@ -156,7 +154,6 @@ def PositionStoreWinRelativeTo(win):
 
 def OpenStoreWindow ():
 	global Store
-	global StoreWindow
 	global store_funcs
 	global Inventory, BarteringPC
 	
@@ -194,11 +191,11 @@ def OpenStoreWindow ():
 
 	GemRB.SetVar ("Action", 0)
 
-	StoreWindow = Window = GemRB.LoadWindow (3, "GUISTORE", StoreWindowPlacement)
-	StoreWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	Window = GemRB.LoadWindow (3, "GUISTORE", StoreWindowPlacement)
+	Window.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	if GameCheck.IsIWD2():
 		# IWD2 has weird overlay windows
-		StoreWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
+		Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	Window.AddAlias("WIN_STORE")
 
 	PositionStoreWinRelativeTo(topwin)
