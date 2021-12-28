@@ -1620,16 +1620,15 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		//For each Actor present
 		//This must go AFTER the fog!
 		//(maybe we should be using the queue?)
-		Actor* actor = actors[i];
-		actor->DrawOverheadText();
+		actors[i]->DrawOverheadText();
 	}
 
 	oldGameTime = gametime;
 
 	// Show wallpolygons
 	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
-		const auto& viewportWalls = WallsIntersectingRegion(viewport, true);
-		for (const auto& poly : viewportWalls.first) {
+		const auto& viewportWallsAll = WallsIntersectingRegion(viewport, true);
+		for (const auto& poly : viewportWallsAll.first) {
 			const Point& origin = poly->BBox.origin - viewport.origin;
 
 			if (poly->wall_flag&WF_DISABLED) {
@@ -3624,8 +3623,8 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 			int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
 			if (slot == -1) continue;
 			// containers don't really care about position, so every new item is placed at the last spot
-			CREItem *item = othercontainer->RemoveItem(slot, 0);
-			othercontainer->AddItem(item);
+			CREItem *newItem = othercontainer->RemoveItem(slot, 0);
+			othercontainer->AddItem(newItem);
 		}
 	}
 }
@@ -4015,9 +4014,9 @@ void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) co
 	size_t ac = animation.size();
 	while (ac--) {
 		Animation &anim = animation[ac];
-		Holder<Sprite2D> frame = anim.NextFrame();
+		Holder<Sprite2D> nextFrame = anim.NextFrame();
 		
-		video->BlitGameSpriteWithPalette(frame, palette, Pos - viewport.origin, flags, tint);
+		video->BlitGameSpriteWithPalette(nextFrame, palette, Pos - viewport.origin, flags, tint);
 	}
 }
 

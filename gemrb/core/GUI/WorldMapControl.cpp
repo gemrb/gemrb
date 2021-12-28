@@ -63,8 +63,8 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 		
 	ControlEventHandler handler = [this](const Control* /*this*/) {
 		//this also updates visible locations
-		WorldMap* worldmap = core->GetWorldMap();
-		worldmap->CalculateDistances(currentArea, GetValue());
+		WorldMap* map = core->GetWorldMap();
+		map->CalculateDistances(currentArea, GetValue());
 	};
 	
 	SetAction(handler, Control::ValueChange);

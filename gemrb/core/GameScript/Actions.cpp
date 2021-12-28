@@ -4550,7 +4550,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	int tgt = scr->GetStat(IE_PICKPOCKET);
 	int check;
 	if (core->HasFeature(GF_3ED_RULES)) {
-		int skill = snd->GetSkill(IE_PICKPOCKET);
+		skill = snd->GetSkill(IE_PICKPOCKET);
 		int roll = core->Roll(1, 20, 0);
 		int level = scr->GetXPLevel(true);
 		int wismod = scr->GetAbilityBonus(IE_WIS);

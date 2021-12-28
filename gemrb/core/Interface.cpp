@@ -1400,9 +1400,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 	if (strings->HasAltTLK()) {
 		strings2 = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
-		char strpath[_MAX_PATH];
 		PathJoin(strpath, config.GamePath, "dialogf.tlk", nullptr);
-		FileStream* fs = FileStream::OpenFile(strpath);
+		fs = FileStream::OpenFile(strpath);
 		if (!fs) {
 			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
 			Log(ERROR, "Core", "Falling back to main TLK file, so female text may be wrong!");
@@ -1510,7 +1509,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIparty[_MAX_PATH];
 		PathJoin(tINIparty, config.GamePath, "Party.ini", nullptr);
-		FileStream* fs = FileStream::OpenFile( tINIparty );
+		fs = FileStream::OpenFile(tINIparty);
 		if (!INIparty->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load precreated teams.");
 		}
@@ -1525,7 +1524,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
 		PathJoin(tINIbeasts, config.GamePath, "beast.ini", nullptr);
-		FileStream* fs = FileStream::OpenFile( tINIbeasts );
+		fs = FileStream::OpenFile(tINIbeasts);
 		if (!INIbeasts->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
 		}
@@ -2918,12 +2917,11 @@ bool Interface::InCutSceneMode() const
 }
 
 /** Updates the Game Script Engine State */
-bool Interface::GSUpdate(bool update_scripts)
+bool Interface::GSUpdate(bool update)
 {
-	if(update_scripts) {
+	if (update) {
 		return timer.Update();
-	}
-	else {
+	} else {
 		timer.Freeze();
 		return false;
 	}

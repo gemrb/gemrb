@@ -59,16 +59,16 @@ bool TTFFontManager::Import(DataStream* stream)
 		FT_Error error;
 
 		ftStream = new std::remove_pointer<FT_Stream>::type{};
-		ftStream->read = [](FT_Stream stream, unsigned long	offset, unsigned char* buffer, unsigned long count)
+		ftStream->read = [](FT_Stream TTFStream, unsigned long	offset, unsigned char* buffer, unsigned long count)
 		-> unsigned long {
-			DataStream* dstream = (DataStream*)stream->descriptor.pointer;
+			DataStream* dstream = static_cast<DataStream*>(TTFStream->descriptor.pointer);
 			dstream->Seek(offset, GEM_STREAM_START);
 			return dstream->Read(buffer, count);
 		};
 
-		ftStream->close = [](FT_Stream stream){
-			delete static_cast<DataStream*>(stream->descriptor.pointer);
-			delete stream;
+		ftStream->close = [](FT_Stream TTFStream){
+			delete static_cast<DataStream*>(TTFStream->descriptor.pointer);
+			delete TTFStream;
 		};
 		ftStream->descriptor.pointer = stream->Clone();
 		ftStream->pos = stream->GetPos();
