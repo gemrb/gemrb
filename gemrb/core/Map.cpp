@@ -3887,8 +3887,8 @@ AreaAnimation::AreaAnimation(const AreaAnimation &src)
 
 void AreaAnimation::InitAnimation()
 {
-	AnimationFactory* af = ( AnimationFactory* )
-		gamedata->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
+	const AnimationFactory* af = static_cast<const AnimationFactory*>(
+		gamedata->GetFactoryResource(BAM, IE_BAM_CLASS_ID));
 	if (!af) {
 		print("Cannot load animation: %s", BAM.CString());
 		return;

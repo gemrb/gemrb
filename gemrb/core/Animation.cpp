@@ -178,7 +178,7 @@ Animation::frame_t Animation::GetFrame(index_t i) const
 void Animation::MirrorAnimation(BlitFlags flags)
 {
 	for (size_t i = 0; i < indicesCount; i++) {
-		frame_t& sprite = frames[i];
+		const frame_t& sprite = frames[i];
 		sprite->renderFlags ^= flags & (BlitFlags::MIRRORX | BlitFlags::MIRRORY);
 		
 		if (flags & BlitFlags::MIRRORX) {

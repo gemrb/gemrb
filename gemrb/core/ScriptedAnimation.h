@@ -169,7 +169,7 @@ public:
 	/* returns possible twin after altering it to become underlay */
 	ScriptedAnimation *DetachTwin();
 private:
-	Animation *PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false) const;
+	Animation *PrepareAnimation(const AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false) const;
 	bool UpdatePhase();
 	void GetPaletteCopy();
 	void IncrementPhase();

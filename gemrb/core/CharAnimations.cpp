@@ -1036,8 +1036,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			NewResRef[8] = 0;
 		}
 
-		AnimationFactory* af = ( AnimationFactory* )
-			gamedata->GetFactoryResource(NewResRef.c_str(), IE_BAM_CLASS_ID);
+		const AnimationFactory* af = static_cast<const AnimationFactory*>(
+			gamedata->GetFactoryResource(NewResRef.c_str(), IE_BAM_CLASS_ID));
 
 		if (!af) {
 			if (part < actorPartCount) {
@@ -1287,7 +1287,7 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 		AddMHRSuffix(shadowName, newStanceID, cycle, orientation, dummy);
 		delete dummy;
 
-		AnimationFactory* af = static_cast<AnimationFactory*>(
+		const AnimationFactory* af = static_cast<const AnimationFactory*>(
 			gamedata->GetFactoryResource(shadowName.c_str(), IE_BAM_CLASS_ID));
 
 		if (!af) {

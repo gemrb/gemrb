@@ -92,7 +92,7 @@ void ScriptedAnimation::Init()
 	starttime = 0;
 }
 
-Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop) const
+Animation *ScriptedAnimation::PrepareAnimation(const AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop) const
 {
 	int c = cycle;
 
@@ -314,8 +314,8 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	}
 
 	if (SequenceFlags & IE_VVC_BAM) {
-		AnimationFactory *af = (AnimationFactory *)
-			gamedata->GetFactoryResource(Anim1ResRef, IE_BAM_CLASS_ID);
+		const AnimationFactory* af = static_cast<const AnimationFactory*>(
+			gamedata->GetFactoryResource(Anim1ResRef, IE_BAM_CLASS_ID));
 		if (!af) {
 			Log(ERROR, "ScriptedAnimation", "Failed to load animation: %s!", Anim1ResRef.CString());
 			return;

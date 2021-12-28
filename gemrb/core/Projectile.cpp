@@ -76,8 +76,8 @@ Projectile::~Projectile()
 
 void Projectile::CreateAnimations(Animation **anims, const ResRef& bamres, int Seq)
 {
-	AnimationFactory* af = ( AnimationFactory* )
-		gamedata->GetFactoryResource(bamres, IE_BAM_CLASS_ID);
+	const AnimationFactory* af = static_cast<const AnimationFactory*>(
+		gamedata->GetFactoryResource(bamres, IE_BAM_CLASS_ID));
 
 	if (!af) {
 		return;
@@ -106,7 +106,7 @@ void Projectile::CreateAnimations(Animation **anims, const ResRef& bamres, int S
 
 //Seq is the first cycle to use in the composite
 //Aim is the number of cycles
-void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq) const
+void Projectile::CreateCompositeAnimation(Animation **anims, const AnimationFactory *af, int Seq) const
 {
 	for (int Cycle = 0; Cycle<Aim; Cycle++) {
 		int c = Cycle+Seq;
@@ -126,7 +126,7 @@ void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *a
 //Seq is the cycle to use in case of single orientations
 //Aim is the number of Orientations
 // FIXME: seems inefficient that we load up MAX_ORIENT animations even for those with a single orientation (default case)
-void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq) const
+void Projectile::CreateOrientedAnimations(Animation **anims, const AnimationFactory *af, int Seq) const
 {
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
 		BlitFlags mirrorFlags = BlitFlags::NONE;

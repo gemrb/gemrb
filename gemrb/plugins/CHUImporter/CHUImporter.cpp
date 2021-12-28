@@ -231,8 +231,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 
 				if( KnobStepsCount ) {
 					/* getting the bam */
-					AnimationFactory *af = (AnimationFactory *)
-						gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID );
+					const AnimationFactory* af = static_cast<const AnimationFactory*>(
+						gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID));
 					/* Getting the Cycle of the bam */
 					if (af) {
 						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
