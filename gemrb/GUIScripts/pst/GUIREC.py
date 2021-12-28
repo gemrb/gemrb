@@ -860,7 +860,7 @@ def AcceptLevelUp():
 	LevelUp.SaveNewSpells()
 
 	LevelUpWindow.Close()
-	NewLife.OpenLUStatsWindow()
+	NewLife.OpenLUStatsWindow(True, sum(LevelDiff))
 
 def RedrawSkills():
 	DoneButton = LevelUpWindow.GetControl(0)

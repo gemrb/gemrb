@@ -54,7 +54,7 @@ def OnLoad():
 	OpenLUStatsWindow (0)
 	return
 
-def OpenLUStatsWindow(Type = 1):
+def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 	global NewLifeWindow, StatTable
 	global TotPoints, AcPoints, HpPoints
 	global TotLabel, AcLabel, HpLabel
@@ -82,7 +82,7 @@ def OpenLUStatsWindow(Type = 1):
 		Wis = GemRB.GetPlayerStat(1, IE_WIS, 1)
 		Int = GemRB.GetPlayerStat(1, IE_INT, 1)
 		Cha = GemRB.GetPlayerStat(1, IE_CHR, 1)
-		TotPoints = 1 # FIXME: actually LevelDiff
+		TotPoints = LevelDiff
 		Stats = [ Str, Int, Wis, Dex, Con, Cha ]
 		StatLowerLimit = list(Stats) # so we copy the values or the lower limit would increase with them
 		StatLimit = [ 25 ] * 6
