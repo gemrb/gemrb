@@ -4446,7 +4446,7 @@ void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
 
 void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*/)
 {
-	Actor* scr = Scriptable::As<Actor>(Sender);
+	const Actor* scr = Scriptable::As<Actor>(Sender);
 	if (!scr) {
 		return;
 	}
@@ -4791,7 +4791,7 @@ void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
 	if (!damagee) {
 		return;
 	}
-	Actor* damager = Scriptable::As<Actor>(Sender);;
+	Actor* damager = Scriptable::As<Actor>(Sender);
 	if (!damager) {
 		damager=damagee;
 	}
@@ -5875,8 +5875,8 @@ void GameScript::PolymorphCopy(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	Actor* target = Scriptable::As<Actor>(tar);
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	const Actor* target = Scriptable::As<Actor>(tar);
 	if (!target) {
 		return;
 	}
@@ -7236,8 +7236,8 @@ void GameScript::SetupWish(Scriptable* Sender, Action* parameters)
 //the target object's wisdom directly (this action is not used in the original)
 void GameScript::SetupWishObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	Actor* target = Scriptable::As<Actor>(tar);
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	const Actor* target = Scriptable::As<Actor>(tar);
 	if (!target) {
 		return;
 	}

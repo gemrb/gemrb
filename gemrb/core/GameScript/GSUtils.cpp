@@ -1445,6 +1445,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 {
 	Actor *actor = Scriptable::As<Actor>(Sender);
 	assert(actor);
+	assert(target);
 
 	// if held or disabled, etc, then cannot start or continue attacking
 	if (actor->Immobile()) {
@@ -2690,7 +2691,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 	}
 
-	Actor* act = Scriptable::As<Actor>(Sender);;
+	Actor* act = Scriptable::As<Actor>(Sender);
 
 	//parse target
 	int seeflag = 0;

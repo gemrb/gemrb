@@ -3663,9 +3663,9 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 		// Tyrant's dictum for clerics of Bane
 		const Actor* cleric = Scriptable::As<Actor>(caster);
-		if (cleric) {
-			if (cleric->GetClericLevel() && BaseStats[IE_KIT] & 0x200000) saveDC += 1;
+		if (cleric && cleric->GetClericLevel() && BaseStats[IE_KIT] & 0x200000) {
 			// the original limited this to domain spells, but that's pretty lame
+			saveDC += 1;
 		}
 	}
 
@@ -5296,6 +5296,7 @@ int Actor::CalculateSpeedFromINI(bool feedback) const
 //receive turning
 void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 {
+	assert(cleric);
 	bool evilcleric = false;
 
 	if (!turnlevel) {
@@ -9528,6 +9529,7 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 
 bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDword flags, int damage)
 {
+	assert(target);
 	const Actor *tar = Scriptable::As<Actor>(target);
 	if (!tar) {
 		return UseItemPoint(slot, header, target->Pos, flags);

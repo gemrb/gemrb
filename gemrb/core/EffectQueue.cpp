@@ -314,11 +314,6 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), compare_effects);
 }
 
-EffectQueue::EffectQueue()
-{
-	Owner = NULL;
-}
-
 EffectQueue::~EffectQueue()
 {
 	for (const auto& fx : effects) {
@@ -1145,7 +1140,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		const Actor* OwnerActor = Scriptable::As<Actor>(Owner);
 		if (fx->ProbabilityRangeMin == 100 && OwnerActor) {
 			fx->ProbabilityRangeMin = 0;
-			fx->ProbabilityRangeMax = OwnerActor->GetSafeStat(fx->ProbabilityRangeMax);
+			fx->ProbabilityRangeMax = static_cast<ieWord>(OwnerActor->GetSafeStat(fx->ProbabilityRangeMax));
 		}
 
 		if (resistance) {

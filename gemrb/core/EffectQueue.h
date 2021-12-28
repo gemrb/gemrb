@@ -245,10 +245,10 @@ private:
 	/** List of Effects applied on the Actor */
 	std::list< Effect* > effects;
 	/** Actor which is target of the Effects */
-	Scriptable* Owner;
+	Scriptable* Owner = nullptr;
 
 public:
-	EffectQueue();
+	EffectQueue() = default;
 	virtual ~EffectQueue();
 
 	/** Sets Actor which is affected by these effects */
