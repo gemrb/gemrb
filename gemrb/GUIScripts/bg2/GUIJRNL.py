@@ -133,27 +133,27 @@ def UpdateLogWindow (JournalWindow):
 	Text = JournalWindow.GetControl (1)
 
 	Text.Clear ()
-	list = []
+	EntryList = []
 	for i in range (GemRB.GetJournalSize (Chapter, Section)):
 		je = GemRB.GetJournalEntry (Chapter, i, Section)
 		if je == None:
 			continue
-		list.append(je)
+		EntryList.append(je)
 	#sorting method
 	Label = JournalWindow.GetControl (0x1000000a)
 	if Order:
 		Label.SetText (45228)
-		list.sort(key=SortByName)
+		EntryList.sort(key = SortByName)
 	else:
 		Label.SetText (45202)
-		list.sort(key=SortByDate)
+		EntryList.sort(key = SortByDate)
 
 	Color = "800000"
 	# only the personal journal section used a different title color
 	if Section == 4:
 		Color = "003d00"
-	for i in range(len(list)):
-		je = list[i]
+	for i in range(len(EntryList)):
+		je = EntryList[i]
 		hours = je['GameTime'] // 4500
 		days = int(hours/24)
 		year = str (StartYear + int(days/365))
