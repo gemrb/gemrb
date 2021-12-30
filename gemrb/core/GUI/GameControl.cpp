@@ -1146,7 +1146,6 @@ String GameControl::TooltipText() const {
 		name = actor->GetName(1);
 	}
 
-	// FIME: make the actor name a String instead
 	String* wname = StringFromCString(name);
 	if (wname) {
 		tip = *wname;
