@@ -2073,6 +2073,14 @@ void GameControl::InitFormation(const Point &clickPoint)
 	SetCursor(core->Cursors[IE_CURSOR_USE]);
 }
 
+void GameControl::TryDefaultTalk() const
+{
+	Actor* targetActor = GetLastActor();
+	if (targetActor) {
+		targetActor->PlaySelectionSound(true);
+	}
+}
+
 /** Mouse Button Down */
 bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
@@ -2081,6 +2089,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 
 	switch(me.button) {
 	case GEM_MB_MENU: //right click.
+		TryDefaultTalk();
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
 		}

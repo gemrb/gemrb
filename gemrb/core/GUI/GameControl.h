@@ -241,7 +241,8 @@ public:
 	void SetupCasting(const ResRef& spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
 	void ToggleAlwaysRun();
 	int GetOverheadOffset() const;
-	
+	void TryDefaultTalk() const;
+
 protected:
 	//Events
 	/** Key Press Event */

@@ -583,7 +583,7 @@ public:
 	/* receives undead turning message */
 	void Turn(Scriptable *cleric, ieDword turnlevel);
 	/* call this on gui selects */
-	void PlaySelectionSound();
+	void PlaySelectionSound(bool force = false);
 	/* play a roar if the setting isn't disabled */
 	bool PlayWarCry(int range) const;
 	/* call this when adding actions via gui */

@@ -4088,12 +4088,12 @@ bool Actor::GetPartyComment()
 }
 
 //call this only from gui selects
-void Actor::PlaySelectionSound()
+void Actor::PlaySelectionSound(bool force)
 {
 	playedCommandSound = false;
 	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
 	unsigned int frequency = sel_snd_freq + pstflags;
-	if (!pstflags && frequency > 2) frequency = 5;
+	if (force || (!pstflags && frequency > 2)) frequency = 5;
 	switch (frequency) {
 		case 1:
 			return;
