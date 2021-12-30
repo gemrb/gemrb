@@ -187,6 +187,16 @@ void Scriptable::FixHeadTextPos()
 	overHeadTextPos = Pos;
 }
 
+int Scriptable::GetOverheadOffset() const
+{
+	int offset = 100;
+	if (Type == ST_ACTOR) {
+		offset = static_cast<const Selectable*>(this)->size * 50;
+	}
+
+	return offset;
+};
+
 #define MAX_DELAY  6000
 void Scriptable::DrawOverheadText()
 {
@@ -208,11 +218,7 @@ void Scriptable::DrawOverheadText()
 		}
 	}
 
-	int cs = 100;
-	if (Type == ST_ACTOR) {
-		cs = ((Selectable *) this)->size*50;
-	}
-
+	int cs = GetOverheadOffset();
 	Point p = (overHeadTextPos.IsInvalid()) ? Pos : overHeadTextPos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));

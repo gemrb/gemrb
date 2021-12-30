@@ -385,6 +385,7 @@ public:
 	void SendTriggerToAll(TriggerEntry entry);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText();
+	int GetOverheadOffset() const;
 	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
 	int CanCast(const ResRef& SpellRef, bool verbose = true);
