@@ -77,12 +77,13 @@ void Console::UpdateTextArea()
 
 bool Console::Execute(const String& text)
 {
-	bool ret = false;
+	bool success = false;
 	if (text.length()) {
-		ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", MBStringFromString(text));
+		auto ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", MBStringFromString(text));
+		success = !ret.IsNull();
 		HistoryAdd();
 	}
-	return ret;
+	return success;
 }
 
 /** Key Press Event */

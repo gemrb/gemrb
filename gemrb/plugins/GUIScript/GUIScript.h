@@ -57,7 +57,7 @@ public:
 	/** Load Script */
 	bool LoadScript(const std::string& filename) override;
 	/** Run Function */
-	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
+	Parameter RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
 
 	PyObject *RunPyFunction(const char* moduleName, const char* fname, const FunctionParameters& params, bool report_error = true);
 	PyObject *RunPyFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);

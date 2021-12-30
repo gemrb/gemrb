@@ -181,6 +181,10 @@ public:
 		const std::type_info& Type() const {
 			return ptr ? ptr->Type() : typeid(void);
 		}
+		
+		bool IsNull() const noexcept {
+			return ptr == nullptr;
+		}
 
 		template <typename T>
 		const T& Value() const {
@@ -205,12 +209,12 @@ public:
 	/** Load Script */
 	virtual bool LoadScript(const std::string& filename) = 0;
 	/** Run Function */
-	virtual bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) = 0;
+	virtual Parameter RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) = 0;
 	
-	bool RunFunction(const char* ModuleName, const char* FunctionName, bool report_error = true);
+	Parameter RunFunction(const char* ModuleName, const char* FunctionName, bool report_error = true);
 	
 	template<typename ARG>
-	std::enable_if_t<!std::is_same<std::remove_reference_t<ARG>, FunctionParameters>::value, bool>
+	std::enable_if_t<!std::is_same<std::remove_reference_t<ARG>, FunctionParameters>::value, Parameter>
 	RunFunction(const char* ModuleName, const char* FunctionName, ARG&& arg, bool report_error = true) {
 		FunctionParameters params {Parameter(std::forward<ARG>(arg))};
 		return RunFunction(ModuleName, FunctionName, params, report_error);
