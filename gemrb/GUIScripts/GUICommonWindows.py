@@ -1706,9 +1706,8 @@ def UpdatePortraitWindow ():
 			Hide = True
 
 		if pic and GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD:
-			import GUISTORE
 			# dead pcs are hidden in all stores but temples
-			if GUISTORE.StoreWindow and not GUISTORE.StoreHealWindow:
+			if GemRB.GetView("WIN_STORE") and not GemRB.GetView("WINHEAL"):
 				Hide = True
 
 		if Hide or (not pic and not Portrait["ResRef"]):
