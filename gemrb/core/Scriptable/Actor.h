@@ -441,7 +441,7 @@ private:
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsIWD2();
 	/* Gets the given ISCLASS level */
-	ieDword GetClassLevel(ieDword isclass) const;
+	ieDword GetClassLevel(ieDword isClass) const;
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
 	/* returns the weapon proficiency stat of the actor */
@@ -771,7 +771,7 @@ public:
 	Region DrawingRegion() const override;
 	int GetElevation() const;
 	bool ShouldDrawReticle() const;
-	void DoStep(unsigned int walkScale, ieDword time = 0) override;
+	void DoStep(unsigned int newWalkScale, ieDword time = 0) override;
 	void Draw(const Region &screen, Color baseTint, Color tint, BlitFlags flags) const;
 
 	/* add mobile vvc (spell effects) to actor's list */
@@ -872,7 +872,7 @@ public:
 	bool IsDualClassed() const;
 	/* Returns an exact copy of this actor */
 	Actor *CopySelf(bool mislead) const;
-	static ieDword GetClassID(ieDword isclass);
+	static ieDword GetClassID(ieDword isClass);
 	const char *GetClassName(ieDword classID) const;
 	const char *GetKitName(ieDword kitID) const;
 	/* Returns the actor's level of the given class */

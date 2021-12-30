@@ -643,20 +643,20 @@ void Scriptable::AddTrigger(TriggerEntry trigger)
 }
 
 // plenty of triggers in svitrobj don't send trigger messages and so never see the code in AddTrigger
-void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
+void Scriptable::SetLastTrigger(ieDword triggerID, ieDword scriptableID)
 {
 	assert(triggerID < MAX_TRIGGERS);
 	if (triggerflags[triggerID] & TF_SAVED) {
 		//TODO: if LastTrigger is still overwritten by script action blocks, store this in a separate field and copy it back when the block ends
 		const char *name = "none";
 		if (area) {
-			const Scriptable *scr = area->GetScriptableByGlobalID(globalID);
+			const Scriptable* scr = area->GetScriptableByGlobalID(scriptableID);
 			if (scr) {
 				name = scr->GetScriptName();
 			}
 		}
-		ScriptDebugLog(ID_TRIGGERS, "Scriptable", "%s: Added LastTrigger: %d (%s) for trigger %d\n", scriptName.CString(), globalID, name, triggerID);
-		LastTrigger = globalID;
+		ScriptDebugLog(ID_TRIGGERS, "Scriptable", "%s: Added LastTrigger: %d (%s) for trigger %d\n", scriptName.CString(), scriptableID, name, triggerID);
+		LastTrigger = scriptableID;
 	}
 }
 
@@ -696,9 +696,9 @@ const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned i
 	return NULL;
 }
 
-void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int level, bool fake)
+void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int level, bool fake)
 {
-	Spell* spl = gamedata->GetSpell( SpellResRef );
+	Spell* spl = gamedata->GetSpell(spellResRef);
 	Actor* caster = Scriptable::As<Actor>(this);
 
 	//PST has a weird effect, called Enoll Eva's duplication
@@ -859,7 +859,7 @@ void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int le
 		}
 	}
 
-	ieDword spellnum=ResolveSpellNumber( SpellResRef );
+	ieDword spellnum = ResolveSpellNumber(spellResRef);
 	if (spellnum!=0xffffffff) {
 		area->SeeSpellCast(this, spellnum);
 
@@ -874,7 +874,7 @@ void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int le
 		core->Autopause(AP_SPELLCAST, this);
 	}
 
-	gamedata->FreeSpell(spl, SpellResRef, false);
+	gamedata->FreeSpell(spl, spellResRef, false);
 }
 
 void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)

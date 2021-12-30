@@ -378,7 +378,7 @@ public:
 	//true condition (whole triggerblock returned true)
 	void ClearTriggers();
 	void AddTrigger(TriggerEntry trigger);
-	void SetLastTrigger(ieDword triggerID, ieDword globalID);
+	void SetLastTrigger(ieDword triggerID, ieDword scriptableID);
 	bool MatchTrigger(unsigned short id, ieDword param = 0) const;
 	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0) const;
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
@@ -412,7 +412,7 @@ private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant, Scriptable *target = NULL);
 	/* also part of the spellcasting process, creating the projectile */
-	void CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int level, bool fake);
+	void CreateProjectile(const ResRef& spellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
 	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster);
 	void ResetCastingState(Actor* caster);

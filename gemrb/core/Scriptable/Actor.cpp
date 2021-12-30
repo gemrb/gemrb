@@ -3060,7 +3060,6 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	ieDword previous[MAX_STATS];
 
 	//put all special cleanup calls here
-	CharAnimations* anims = GetAnims();
 	if (anims) {
 		anims->CheckColorMod();
 	}
@@ -6600,12 +6599,12 @@ int Actor::Immobile() const
 	return 0;
 }
 
-void Actor::DoStep(unsigned int walkScale, ieDword time)
+void Actor::DoStep(unsigned int newWalkScale, ieDword time)
 {
 	if (Immobile()) {
 		return;
 	}
-	Movable::DoStep(walkScale, time);
+	Movable::DoStep(newWalkScale, time);
 }
 
 ieDword Actor::GetNumberOfAttacks()
@@ -8307,9 +8306,9 @@ bool Actor::AdvanceAnimations()
 		}
 		
 		if (shadows) {
-			Animation* anim = shadows[partnum];
-			if (anim) {
-				currentStance.shadow.emplace_back(anim, anims->GetShadowPalette());
+			Animation* shadowAnim = shadows[partnum];
+			if (shadowAnim) {
+				currentStance.shadow.emplace_back(shadowAnim, anims->GetShadowPalette());
 			}
 		}
 	}
@@ -10412,14 +10411,14 @@ ieDword Actor::GetLevelInClass(ieDword classid) const
 }
 
 //lowlevel internal function, isclass is NOT the class id, but an internal index
-ieDword Actor::GetClassLevel(const ieDword isclass) const
+ieDword Actor::GetClassLevel(const ieDword isClass) const
 {
-	if (isclass>=ISCLASSES)
+	if (isClass >= ISCLASSES)
 		return 0;
 
 	//return iwd2 value if appropriate
 	if (version==22)
-		return BaseStats[levelslotsiwd2[isclass]];
+		return BaseStats[levelslotsiwd2[isClass]];
 
 	//houston, we got a problem!
 	if (!levelslots || !dualswap)
@@ -10431,12 +10430,12 @@ ieDword Actor::GetClassLevel(const ieDword isclass) const
 		return 0;
 
 	//handle barbarians specially, since they're kits and not in levelslots
-	if ((isclass == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (BaseStats[IE_KIT] == KIT_BARBARIAN)) {
+	if ((isClass == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (BaseStats[IE_KIT] == KIT_BARBARIAN)) {
 		return BaseStats[IE_LEVEL];
 	}
 
 	//get the levelid (IE_LEVEL,*2,*3)
-	ieDword levelid = levelslots[classid][isclass];
+	ieDword levelid = levelslots[classid][isClass];
 	if (!levelid)
 		return 0;
 
@@ -10444,7 +10443,7 @@ ieDword Actor::GetClassLevel(const ieDword isclass) const
 	if (IsDualClassed()) {
 		//if the old class is inactive, and it is the class
 		//being searched for, return 0
-		if (IsDualInactive() && ((Modified[IE_MC_FLAGS]&MC_WAS_ANY)==(ieDword)mcwasflags[isclass]))
+		if (IsDualInactive() && ((Modified[IE_MC_FLAGS] & MC_WAS_ANY) == (ieDword) mcwasflags[isClass]))
 			return 0;
 	}
 	return BaseStats[levelid];
@@ -11318,9 +11317,9 @@ ieDword Actor::GetActiveClass() const
 
 	int mcwas = Modified[IE_MC_FLAGS] & MC_WAS_ANY;
 	int oldclass;
-	for (int isclass = 0; isclass < ISCLASSES; isclass++) {
-		oldclass = classesiwd2[isclass];
-		if (mcwas == mcwasflags[isclass]) break;
+	for (int isClass = 0; isClass < ISCLASSES; isClass++) {
+		oldclass = classesiwd2[isClass];
+		if (mcwas == mcwasflags[isClass]) break;
 	}
 	if (!oldclass) {
 		error("Actor", "Actor %s has incorrect MC_WAS flags (%x)!", GetName(1), mcwas);
@@ -11366,8 +11365,8 @@ tick_t Actor::GetAdjustedTime(tick_t time) const
 	return time;
 }
 
-ieDword Actor::GetClassID (const ieDword isclass) {
-	return classesiwd2[isclass];
+ieDword Actor::GetClassID(const ieDword isClass) {
+	return classesiwd2[isClass];
 }
 
 const char *Actor::GetClassName(ieDword classID) const
