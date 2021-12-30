@@ -862,7 +862,6 @@ def OpenItemWindow ():
 	"""Displays information about the item."""
 
 	#close inventory
-	GemRB.SetVar ("Inventory", 1)
 	slot = GemRB.GetVar ("ItemButton") #get this before closing win
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()

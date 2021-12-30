@@ -1327,7 +1327,7 @@ def TopWindowClosed(window):
 	GemRB.SetVar ("Travel", -1)
 
 	#don't go back to multi selection mode when going to the store screen
-	if not GemRB.GetVar ("Inventory"):
+	if not GemRB.GetView("WIN_INV"):
 		SetSelectionChangeHandler (None)
 
 	SelectionChanged()
@@ -1681,7 +1681,6 @@ def UpdatePortraitWindow ():
 	Window.Focus(None)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Inventory = GemRB.GetVar ("Inventory")
 	GSFlags = GemRB.GetGUIFlags()
 	indialog = GSFlags & GS_DIALOG
 
@@ -1703,7 +1702,7 @@ def UpdatePortraitWindow ():
 		Portrait = GemRB.GetPlayerPortrait (pcID, 1)
 		pic = Portrait["Sprite"]
 		Hide = False
-		if Inventory and pc != pcID:
+		if GemRB.GetView("WIN_INV") and pc != pcID:
 			Hide = True
 
 		if pic and GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD:

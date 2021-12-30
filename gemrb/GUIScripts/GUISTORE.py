@@ -45,7 +45,6 @@ ITEM_BAG   = 2
 STORE_MAIN = 0
 STORE_BAG  = 1
 
-Inventory = None
 Store = None
 Bag = None
 inventory_slots = ()
@@ -107,8 +106,6 @@ if ResolutionH < 600 or (GameCheck.IsIWD2 () and ResolutionH < 934):
 	StoreWindowPlacement = WINDOW_HCENTER | WINDOW_TOP
 
 def CloseStoreWindow ():
-	import GUIINV
-
 	StoreWindow = GemRB.GetView("WIN_STORE")
 	if StoreWindow:
 		StoreWindow.Close ()
@@ -121,12 +118,9 @@ def CloseStoreWindow ():
 
 	GemRB.LeaveStore ()
 	
-	if GemRB.GetVar ("Inventory"):
-		GemRB.SetVar ("Inventory", 0)
-		GUIINV.OpenInventoryWindow ()
-	else:
+	if GemRB.GetView("WIN_INV") == None:
 		GemRB.GamePause (0, 3)
-		GUICommonWindows.SetSelectionChangeHandler( None )
+	else:
 		GUICommonWindows.CloseTopWindow()
 	return
 
@@ -182,10 +176,7 @@ def OpenStoreWindow ():
 	# normal windows are considered children of the "top win" below them
 	topwin = store_funcs[store_buttons[0]] ()
 
-	if GemRB.GetVar ("Inventory"):
-		Inventory = 1
-	else:
-		Inventory = None
+	if GemRB.GetView("WIN_INV") == None:
 		# pause the game, so we don't get interrupted
 		GemRB.GamePause (1, 3)
 
@@ -286,10 +277,7 @@ def InitStoreShoppingWindow (Window):
 	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreShoppingWindow(Window))
 	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('RBTN0').GetFrame()['x'])
 
-	if GemRB.GetVar ("Inventory"):
-		Inventory = 1
-	else:
-		Inventory = None
+	Inventory = GemRB.GetView("WIN_INV")
 	if Inventory:
 		# Title
 		Label = Window.GetControl (0xfffffff)
