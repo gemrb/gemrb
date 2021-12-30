@@ -195,7 +195,7 @@ int Scriptable::GetOverheadOffset() const
 	}
 
 	return offset;
-};
+}
 
 #define MAX_DELAY  6000
 void Scriptable::DrawOverheadText()
