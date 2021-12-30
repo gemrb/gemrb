@@ -231,7 +231,7 @@ public:
 	void DisplayString(const Scriptable* target) const;
 	/** Displays a string on screen */
 	void DisplayString(const Point &p, const char *Text);
-	Actor *GetLastActor();
+	Actor *GetLastActor() const;
 	void SetLastActor(Actor* lastActor);
 	/** changes map to the current PC */
 	void ChangeMap(const Actor *pc, bool forced);

@@ -2612,9 +2612,9 @@ Map* GameControl::CurrentArea() const
 	return NULL;
 }
 
-Actor *GameControl::GetLastActor()
+Actor *GameControl::GetLastActor() const
 {
-	Actor* actor = NULL;
+	Actor* actor = nullptr;
 	const Map* area = CurrentArea();
 	if (area) {
 		actor = area->GetActorByGlobalID(lastActorID);
