@@ -2156,24 +2156,19 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 	// right click
 	if (me.button == GEM_MB_MENU) {
-		if (target_mode != TARGET_MODE_NONE) {
+		ieDword actionLevel;
+		core->GetDictionary()->Lookup("ActionLevel", actionLevel);
+		if (target_mode != TARGET_MODE_NONE || actionLevel) {
 			if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
 				SetTargetMode(TARGET_MODE_NONE);
 			}
 			// update the action bar
+			core->GetDictionary()->SetAt("ActionLevel", 0, false);
 			core->SetEventFlag(EF_ACTION);
 			ClearMouseState();
 			return true;
 		} else {
 			p = gameClickPoint;
-
-			ieDword actionLevel = core->GetDictionary()->Lookup("ActionLevel", actionLevel);
-			if (actionLevel) {
-				// update the action bar
-				core->GetDictionary()->SetAt("ActionLevel", 0, false);
-				core->SetEventFlag(EF_ACTION);
-				ClearMouseState();
-			}
 		}
 	} else if (me.button == GEM_MB_MIDDLE) {
 		// do nothing, so middle button panning doesn't trigger a move
