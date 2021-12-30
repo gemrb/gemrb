@@ -38,7 +38,7 @@ public:
 		ResponderCallback callback = nullptr;
 
 	public:
-		Responder() {}
+		Responder() = default;
 		
 		Responder(ResponderCallback cb){
 			callback = std::move(cb);

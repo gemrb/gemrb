@@ -392,7 +392,7 @@ std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 		str->ReadWord(index);
 		str->ReadWord(count);
 
-		polygonGroups.emplace_back(WallPolygonGroup());
+		polygonGroups.emplace_back();
 		WallPolygonGroup& group = polygonGroups.back();
 
 		for (ieWord i = index; i < index + count; ++i) {

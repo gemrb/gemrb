@@ -144,7 +144,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	// int modstate = GetModState(event.key.keysym.mod);
 	int modstate = GetModState(SDL_GetModState());
 	SDLKey sym = event.key.keysym.sym;
-	SDL_Keycode key = sym;
+	SDL_Keycode key;
 	Event e;
 
 	/* Loop until there are no events left on the queue */

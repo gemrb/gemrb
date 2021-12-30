@@ -99,8 +99,9 @@ private:
 		Capsule(CAP_T ptr)
 		: ptr(std::move(ptr))
 		{}
-	} *cap = nullptr;
-	
+	};
+	Capsule* cap = nullptr;
+
 	PyObject* pycap = nullptr;
 };
 

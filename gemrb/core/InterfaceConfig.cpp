@@ -156,9 +156,6 @@ done:
 	delete config;
 }
 
-CFGConfig::~CFGConfig()
-{}
-
 bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 {
 	if (cfgStream == NULL) {
