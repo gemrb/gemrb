@@ -80,15 +80,16 @@ void Console::UpdateTextArea()
 
 bool Console::Execute(const String& text)
 {
-	bool ret = false;
+	bool success = false;
 	if (text.length()) {
 		std::string mbstr = MBStringFromString(text);
 		ScriptEngine::FunctionParameters params;
 		params.push_back(ScriptEngine::Parameter(mbstr.c_str()));
-		ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
+		auto ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
+		success = !ret.IsNull();
 		HistoryAdd();
 	}
-	return ret;
+	return success;
 }
 
 /** Key Press Event */

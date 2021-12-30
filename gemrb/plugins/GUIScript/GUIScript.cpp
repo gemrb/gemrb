@@ -10308,7 +10308,6 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 		
 		PyObject* pValue = gs->RunPyFunction("Feats", fname.c_str(), params);
 		if (pValue) {
-			/* don't think we need any incref */
 			return pValue;
 		}
 		return RuntimeError( "Callback failed" );
@@ -13689,9 +13688,33 @@ PyObject* ParamToPython(const GUIScript::Parameter& p)
 	}
 }
 
-bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error)
+GUIScript::Parameter GUIScript::RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error)
 {
-	return RunPyFunction(Modulename, FunctionName, params, report_error);
+	// convert PyObject to C++ object
+	PyObject* pyret = RunPyFunction(Modulename, FunctionName, params, report_error);
+	Parameter ret; // failure state
+	
+	if (pyret) {
+		if (PyBool_Check(pyret)) {
+			ret = Parameter(bool(PyObject_IsTrue(pyret)));
+		} else if (PyLong_Check(pyret)) {
+			ret = Parameter(PyLong_AsLong(pyret));
+		} else if (PyUnicode_Check(pyret)) {
+			// FIXME: copy of a copy
+			ret = Parameter(*PyString_AsStringObj(pyret));
+		} else if (Py_IsNone(pyret)) {
+			// any python function that doesnt return a value returns None
+			ret = Parameter(pyret);
+		} else {
+			Log(ERROR, "GUIScript", "Unhandled return type in {}::{}", Modulename, FunctionName);
+			// this is a success, but we dont know how to convert it
+			// still needs a value of some kind
+			ret = Parameter(pyret);
+		}
+		Py_DecRef(pyret);
+	}
+
+	return ret;
 }
 
 /* Similar to RunFunction, but with parameters, and doesn't necessarily fail */
