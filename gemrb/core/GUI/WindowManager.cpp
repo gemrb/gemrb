@@ -22,6 +22,8 @@
 #include "Interface.h"
 #include "ImageMgr.h"
 #include "Window.h"
+#include "GUI/GameControl.h"
+#include "Scriptable/Actor.h"
 
 #include "defsounds.h"
 
@@ -442,11 +444,22 @@ void WindowManager::DrawMouse() const
 	if (cursorFeedback == MOUSE_NONE)
 		return;
 
-	Point pos = eventMgr.MousePos();
-	if (tooltip.tt.TextSize().IsZero() || core->HasFeature(GF_ONSCREEN_TEXT)) {
-		DrawCursor(pos);
+	Point cursorPos = eventMgr.MousePos();
+	Point tooltipPos = cursorPos;
+
+	// pst displays actor name tooltips overhead, not at the mouse position
+	const GameControl* gc = core->GetGameControl();
+	if (core->HasFeature(GF_ONSCREEN_TEXT) && gc) {
+		const Actor* actor = gc->GetLastActor();
+		if (actor) {
+			tooltipPos.y -= actor->GetOverheadOffset();
+		}
 	}
-	DrawTooltip(pos);
+
+	if (tooltip.tt.TextSize().IsZero() || core->HasFeature(GF_ONSCREEN_TEXT)) {
+		DrawCursor(cursorPos);
+	}
+	DrawTooltip(tooltipPos);
 }
 
 void WindowManager::DrawCursor(const Point& pos) const
