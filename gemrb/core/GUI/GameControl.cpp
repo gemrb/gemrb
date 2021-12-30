@@ -1200,60 +1200,60 @@ String GameControl::TooltipText() const {
 }
 
 //returns the appropriate cursor over an active region (trap, infopoint, travel region)
-int GameControl::GetCursorOverInfoPoint(const InfoPoint *overInfoPoint) const
+int GameControl::GetCursorOverInfoPoint(const InfoPoint *over) const
 {
 	if (target_mode == TARGET_MODE_PICK) {
-		if (overInfoPoint->VisibleTrap(0)) {
+		if (over->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
 		}
 
 		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
 	}
 	// traps always display a walk cursor?
-	if (overInfoPoint->Type == ST_PROXIMITY) {
+	if (over->Type == ST_PROXIMITY) {
 		return IE_CURSOR_WALK;
 	}
-	return overInfoPoint->Cursor;
+	return over->Cursor;
 }
 
 //returns the appropriate cursor over a door
-int GameControl::GetCursorOverDoor(const Door *overDoor) const
+int GameControl::GetCursorOverDoor(const Door *over) const
 {
-	if (!overDoor->Visible()) {
+	if (!over->Visible()) {
 		if (target_mode == TARGET_MODE_NONE) {
 			// most secret doors are in walls, so default to the blocked cursor to not give them away
 			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
-			const Map *area = overDoor->GetCurrentArea();
-			return area->GetCursor(overDoor->Pos);
+			const Map* area = over->GetCurrentArea();
+			return area->GetCursor(over->Pos);
 		} else {
 			return lastCursor|IE_CURSOR_GRAY;
 		}
 	}
 	if (target_mode == TARGET_MODE_PICK) {
-		if (overDoor->VisibleTrap(0)) {
+		if (over->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
 		}
-		if (overDoor->Flags & DOOR_LOCKED) {
+		if (over->Flags & DOOR_LOCKED) {
 			return IE_CURSOR_LOCK;
 		}
 
 		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
 	}
-	return overDoor->Cursor;
+	return over->Cursor;
 }
 
 //returns the appropriate cursor over a container (or pile)
-int GameControl::GetCursorOverContainer(const Container *overContainer) const
+int GameControl::GetCursorOverContainer(const Container *over) const
 {
-	if (overContainer->Flags & CONT_DISABLED) {
+	if (over->Flags & CONT_DISABLED) {
 		return lastCursor;
 	}
 
 	if (target_mode == TARGET_MODE_PICK) {
-		if (overContainer->VisibleTrap(0)) {
+		if (over->VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
 		}
-		if (overContainer->Flags & CONT_LOCKED) {
+		if (over->Flags & CONT_LOCKED) {
 			return IE_CURSOR_LOCK2;
 		}
 
@@ -1557,12 +1557,12 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 	} else if (gesture.numFingers == 3) { // keyboard/console
 		Video* video = core->GetVideoDriver();
 
-		enum SWIPE {DOWN = -1, NONE = 0, UP = 1};
-		SWIPE swipe = NONE;
+		enum class SWIPE { DOWN = -1, NONE = 0, UP = 1 };
+		SWIPE swipe = SWIPE::NONE;
 		if (gesture.deltaY < -EventMgr::mouseDragRadius) {
-			swipe = UP;
+			swipe = SWIPE::UP;
 		} else if (gesture.deltaY > EventMgr::mouseDragRadius) {
-			swipe = DOWN;
+			swipe = SWIPE::DOWN;
 		}
 
 		Window* consoleWin = GemRB::GetWindow(0, "WIN_CON");
@@ -1572,18 +1572,18 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 		// if the kwyboard is showing swipe up to access console
 		// swipe down to hide both keyboard and console
 		switch (swipe) {
-			case DOWN:
+			case SWIPE::DOWN:
 				consoleWin->Close();
 				video->StopTextInput();
 				consoleWin->Close();
 				break;
-			case UP:
+			case SWIPE::UP:
 				if (video->InTextInput()) {
 					consoleWin->Focus();
 				}
 				video->StartTextInput();
 				break;
-			case NONE:
+			case SWIPE::NONE:
 				break;
 		}
 	}
