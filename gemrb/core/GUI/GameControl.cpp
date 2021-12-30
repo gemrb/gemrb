@@ -2698,4 +2698,13 @@ void GameControl::ToggleAlwaysRun()
 	core->GetDictionary()->SetAt("Always Run", AlwaysRun);
 }
 
+int GameControl::GetOverheadOffset() const
+{
+	const Actor* actor = GetLastActor();
+	if (actor) {
+		return actor->GetOverheadOffset();
+	}
+	return 0;
+}
+
 }

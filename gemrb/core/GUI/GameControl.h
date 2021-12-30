@@ -240,6 +240,7 @@ public:
 	/** Page is the spell type + spell level info */
 	void SetupCasting(const ResRef& spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
 	void ToggleAlwaysRun();
+	int GetOverheadOffset() const;
 	
 protected:
 	//Events

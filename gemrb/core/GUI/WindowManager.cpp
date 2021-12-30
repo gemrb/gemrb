@@ -23,7 +23,6 @@
 #include "ImageMgr.h"
 #include "Window.h"
 #include "GUI/GameControl.h"
-#include "Scriptable/Actor.h"
 
 #include "defsounds.h"
 
@@ -450,10 +449,7 @@ void WindowManager::DrawMouse() const
 	// pst displays actor name tooltips overhead, not at the mouse position
 	const GameControl* gc = core->GetGameControl();
 	if (core->HasFeature(GF_ONSCREEN_TEXT) && gc) {
-		const Actor* actor = gc->GetLastActor();
-		if (actor) {
-			tooltipPos.y -= actor->GetOverheadOffset();
-		}
+		tooltipPos.y -= gc->GetOverheadOffset();
 	}
 
 	if (tooltip.tt.TextSize().IsZero() || core->HasFeature(GF_ONSCREEN_TEXT)) {
