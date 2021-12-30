@@ -443,7 +443,9 @@ void WindowManager::DrawMouse() const
 		return;
 
 	Point pos = eventMgr.MousePos();
-	DrawCursor(pos);
+	if (tooltip.tt.TextSize().IsZero() || core->HasFeature(GF_ONSCREEN_TEXT)) {
+		DrawCursor(pos);
+	}
 	DrawTooltip(pos);
 }
 
@@ -515,6 +517,8 @@ void WindowManager::DrawTooltip(Point pos) const
 		pos.y = Clamp<int>(pos.y, halfW, screen.h - halfH);
 
 		tooltip.tt.Draw(pos);
+	} else {
+		tooltip.tt.SetText(L"");
 	}
 }
 
