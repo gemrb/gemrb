@@ -24,15 +24,17 @@ from GUIDefines import *
 PartySelectWindow = 0
 TextArea = 0
 PartyCount = 0
-ScrollBar = 0
 
 def OnLoad():
-	global PartySelectWindow, TextArea, PartyCount, ScrollBar
+	global PartySelectWindow, TextArea, PartyCount
 	
 	PartyCount = GemRB.GetINIPartyCount()
 	
 	PartySelectWindow = GemRB.LoadWindow(10, "GUISP")
 	TextArea = PartySelectWindow.GetControl(6)
+	
+	ScrollBar = GemRB.GetControl(PartySelectWindow, 8)
+	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
 	
 	ModifyButton = PartySelectWindow.GetControl(12)
 	ModifyButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ModifyPress)
@@ -48,24 +50,21 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
 	
-	GemRB.SetVar("PartyIdx",0)
-	GemRB.SetVar("TopIndex",0)
-	
 	for i in range(0, min(6, MAX_PARTY_SIZE)):
 		Button = PartySelectWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, PartyButtonPress)
 	
-	ScrollBarPress()
+	ScrollBarPress(ScrollBar, 0)
 	PartyButtonPress()
 	
 	PartySelectWindow.Focus()
 	
 	return
 
-def ScrollBarPress():
+def ScrollBarPress(sb, Pos):
 	global PartySelectWindow, PartyCount
-	Pos = GemRB.GetVar("TopIndex")
+
 	for i in range(0, min(6, MAX_PARTY_SIZE)):
 		ActPos = Pos + i
 		Button = PartySelectWindow.GetControl(i)
@@ -87,26 +86,21 @@ def ScrollBarPress():
 	return
 
 def ModifyPress():
-	Pos = GemRB.GetVar("PartyIdx")
+	Pos = PartySelectWindow.GetVar("PartyIdx")
 	if Pos == 0: # first entry - behaves same as pressing on done
-		if PartySelectWindow:
-			PartySelectWindow.Unload()
+		PartySelectWindow.Unload()
 		GemRB.LoadGame(None, 22)
 		GemRB.SetNextScript("SPPartyFormation")
 	#else: # here come the real modifications
 
 def DonePress():
-	global PartySelectWindow
-	Pos = GemRB.GetVar("PartyIdx")
+	Pos = PartySelectWindow.GetVar("PartyIdx")
+	PartySelectWindow.Close()
+	GemRB.LoadGame(None, 22)
+
 	if Pos == 0:
-		if PartySelectWindow:
-			PartySelectWindow.Unload()
-		GemRB.LoadGame(None, 22)
 		GemRB.SetNextScript("SPPartyFormation")
 	else:
-		if PartySelectWindow:
-			PartySelectWindow.Unload()
-		GemRB.LoadGame(None, 22)
 		#here we should load the party characters
 		#but gemrb engine limitations require us to
 		#return to the main engine (loadscreen)
@@ -114,8 +108,7 @@ def DonePress():
 	return
 	
 def PartyButtonPress():
-	global PartySelectWindow, TextArea
-	i = GemRB.GetVar("PartyIdx")
+	i = PartySelectWindow.GetVar("PartyIdx")
 	Tag = "Party " + str(i)
 	PartyDesc = ""
 	for j in range(1, 9):
@@ -130,7 +123,7 @@ def PartyButtonPress():
 
 #loading characters from party.ini
 def LoadPartyCharacters():
-	i = GemRB.GetVar("PartyIdx")
+	i = PartySelectWindow.GetVar("PartyIdx")
 	Tag = "Party " + str(i)
 	for j in range(1, min(6, MAX_PARTY_SIZE)+1):
 		Key = "Char"+str(j)
