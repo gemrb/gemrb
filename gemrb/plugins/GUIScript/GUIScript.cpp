@@ -13917,6 +13917,8 @@ void GUIScript::AssignViewAttributes(PyObject* obj, View* view) const
 	static PyObject* controlClass = PyDict_GetItemString(pGUIClasses, "GControl");
 	static PyObject* windowClass = PyDict_GetItemString(pGUIClasses, "GWindow");
 	
+	PyObject_SetAttrString(obj, "Flags", DecRef(PyInt_FromLong, view->Flags()));
+	
 	if (PyObject_IsInstance(obj, controlClass)) {
 		const Control* ctl = static_cast<Control*>(view);
 		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
@@ -13952,11 +13954,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 
 static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref)
 {
-	PyObject* pyView = gs->ConstructObjectForScriptable(ref);
-	if (pyView) {
-		PyObject_SetAttrString(pyView, "Flags", DecRef(PyInt_FromLong, ref->GetObject()->Flags()));
-	}
-	return pyView;
+	return gs->ConstructObjectForScriptable(ref);
 }
 
 PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)
