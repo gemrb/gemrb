@@ -4053,9 +4053,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 // see 8cff52b3c8 if this needs to be resurrected at some point
 void Interface::WaitForDisc(int disc_number, const path_t& path)
 {
-	vars.Set("WaitForDisc", disc_number);
-
-	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
+	GetGUIScriptEngine()->RunFunction("GUICommonWindows", "OpenWaitForDiscWindow", disc_number);
 	do {
 		winmgr->DrawWindows();
 		for (const auto& cd : config.CD[disc_number - 1]) {
