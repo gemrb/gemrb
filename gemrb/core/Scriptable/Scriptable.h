@@ -224,11 +224,6 @@ struct TriggerEntry {
 	unsigned int flags;
 };
 
-//using TriggerObjects = std::list<ieDword *>;
-
-//#define SEA_RESET		0x00000002
-//#define SEA_PARTY_REQUIRED	0x00000004
-
 class GEM_EXPORT Scriptable {
 public:
 	explicit Scriptable(ScriptableType type);
@@ -263,9 +258,9 @@ public:
 	ieDword Ticks = 0;
 	// The same, after adjustment for being slowed/hasted.
 	ieDword AdjustedTicks = 0;
-	// The number of times UpdateActions() was run.
+	// The number of times TickScripting() was run.
 	ieDword ScriptTicks = 0;
-	// The number of times since UpdateActions() tried to do anything.
+	// The number of times since TickScripting() tried to do anything.
 	ieDword IdleTicks = 0;
 	// The number of ticks since the last spellcast
 	ieDword AuraTicks = 0;
