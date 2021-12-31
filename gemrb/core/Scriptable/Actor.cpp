@@ -5367,6 +5367,7 @@ void Actor::Resurrect(const Point &destPoint)
 	InternalFlags&=IF_FROMGAME; //keep these flags (what about IF_INITIALIZED)
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
+	BaseStats[IE_GENERAL] = GEN_HUMANOID;
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_AVATARREMOVAL, 0);
 	if (!destPoint.IsZero()) {
@@ -5503,6 +5504,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	if (GetStance() != IE_ANI_DIE) {
 		SetStance(IE_ANI_DIE);
 	}
+	BaseStats[IE_GENERAL] = GEN_DEAD;
 	AddTrigger(TriggerEntry(trigger_die));
 	SendDiedTrigger();
 	if (pstflags) {

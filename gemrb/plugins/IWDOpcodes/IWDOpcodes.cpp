@@ -1621,6 +1621,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 	target->Damage(damage, DAMAGE_SOULEATER, Owner, fx->IsVariable, fx->SavingThrowType);
 	//the state is not set soon enough!
 	//if (STATE_GET(STATE_DEAD) ) {
+	// the original checked IE_GENERAL for GEN_DEAD, but we set both at the same time
 	if (target->GetInternalFlag() & IF_REALLYDIED) {
 		ResRef monster;
 		ResRef hit;
