@@ -1980,7 +1980,7 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 		Button.OnPress (None)
 		Button.OnRightPress (None)
 
-def OpenWaitForDiscWindow ():
+def OpenWaitForDiscWindow (disc_num):
 	global DiscWindow
 
 	if DiscWindow:
@@ -1991,7 +1991,6 @@ def OpenWaitForDiscWindow ():
 	DiscWindow = GemRB.LoadWindow (0, "GUIID")
 	label = DiscWindow.GetControl (0)
 
-	disc_num = GemRB.GetVar ("WaitForDisc")
 	disc_path = 'XX:'
 
 	text = GemRB.GetString (31483) + " " + str (disc_num) + " " + GemRB.GetString (31569) + " " + disc_path + "\n" + GemRB.GetString (49152)
