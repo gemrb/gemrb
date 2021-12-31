@@ -37,7 +37,7 @@ def InitMapWindow (Window):
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenTravelWindow())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenTravelWindow(None))
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -82,10 +82,8 @@ def InitMapWindow (Window):
 
 	return
 
-def OpenTravelWindow ():
+def OpenTravelWindow (Travel):
 	global WorldMapControl
-
-	Travel = GemRB.GetVar ("Travel")
 
 	Window = GemRB.LoadWindow (0, "GUIWMAP")
 	Window.AddAlias ("WIN_PSTWMAP")
@@ -96,7 +94,7 @@ def OpenTravelWindow ():
 	#center on current area
 	WMap.Scroll (0,0)
 	WMap.Focus()
-	if Travel != -1:
+	if Travel is not None:
 		WMap.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
 	# Done

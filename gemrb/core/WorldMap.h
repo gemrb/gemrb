@@ -39,8 +39,8 @@
 namespace GemRB {
 
 /** this is the physical order the links appear in WMPAreaEntry */
-enum class WMPDirection {
-	NONE = -1,
+enum class WMPDirection : ieDword {
+	NONE = ieDword(-1),
 	NORTH = 0,
 	WEST = 1,
 	SOUTH = 2,

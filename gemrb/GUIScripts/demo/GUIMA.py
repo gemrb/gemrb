@@ -59,7 +59,6 @@ def InitMapWindow (Window, WorldMap = False):
 			WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, "floattxt", "WMDAG")
 			WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
-		WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
 		# center on current area
 		WorldMapControl.Scroll (0, 0, False)
 		WorldMapControl.Focus ()
@@ -100,7 +99,8 @@ def CloseMapWindow ():
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
 
-def OpenTravelWindow ():
+def OpenTravelWindow (Travel):
 	Window = OpenMapWindow ()
 	InitMapWindow (Window, True)
+	WorldMapControl.SetVarAssoc("Travel", Travel)
 	return
