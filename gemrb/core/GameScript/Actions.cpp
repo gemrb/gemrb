@@ -2286,8 +2286,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	if (direction == WMPDirection::NONE && keyAreaVisited) {
 		direction = WMPDirection::WEST;
 	}
-	core->GetDictionary().SetAs("Travel", direction);
-	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );
+	core->GetGUIScriptEngine()->RunFunction("GUIMA", "OpenTravelWindow", direction);
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
 }

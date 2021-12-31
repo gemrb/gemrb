@@ -1358,9 +1358,6 @@ def TopWindowClosed(window):
 		if GemRB.IsDraggingItem () == 1:
 			GemRB.DropDraggedItem (pc, -2)
 
-	# for worldmap purposes
-	GemRB.SetVar ("Travel", None)
-
 	#don't go back to multi selection mode when going to the store screen
 	if not GemRB.GetVar ("Inventory"):
 		SetSelectionChangeHandler (None)
