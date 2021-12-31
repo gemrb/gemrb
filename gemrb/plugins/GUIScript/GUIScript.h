@@ -72,14 +72,12 @@ public:
 	bool LoadScript(const char* filename) override;
 	/** Run Function */
 	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
-	// TODO: eliminate these RunFunction variants.
-	bool RunFunction(const char *moduleName, const char* fname, bool report_error=true, int intparam=-1) override;
-	bool RunFunction(const char *moduleName, const char* fname, bool report_error, Point param) override;
+	PyObject *RunPyFunction(const char* moduleName, const char* fname, const FunctionParameters& params, bool report_error = true);
+	PyObject *RunPyFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 	/** Exec a single File */
 	bool ExecFile(const char* file);
 	/** Exec a single String */
 	bool ExecString(const std::string &string, bool feedback=false) override;
-	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
 	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);
 	PyObject* ConstructObject(const char* pyclassname, ScriptingId id);

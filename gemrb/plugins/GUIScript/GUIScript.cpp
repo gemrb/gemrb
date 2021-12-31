@@ -10341,18 +10341,14 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	/* see if the special function exists */
 	if (callback) {
 		char fname[32];
-
 		snprintf(fname, 32, "Check_%s", callback);
-		PyObject* param = PyTuple_New( 11 );
-		PyTuple_SetItem( param, 0, PyInt_FromLong(v[0]) );
+
+		ScriptEngine::FunctionParameters params;
 		for (int i = 3; i < 13; i++) {
-			PyTuple_SetItem( param, i-2, PyInt_FromLong( v[i] ) );
+			params.push_back(ScriptEngine::Parameter(v[i]));
 		}
-
-		PyObject *pValue = gs->RunFunction("Feats", fname, param);
-
-		/* we created this parameter, now we don't need it*/
-		Py_DECREF( param );
+		
+		PyObject *pValue = gs->RunPyFunction("Feats", fname, params);
 		if (pValue) {
 			/* don't think we need any incref */
 			return pValue;
@@ -13740,35 +13736,67 @@ bool GUIScript::LoadScript(const char* filename)
 	return true;
 }
 
+PyObject* ParamToPython(const GUIScript::Parameter& p)
+{
+	const std::type_info& type = p.Type();
+	
+	if (type == typeid(char*)) {
+		return PyString_FromString(p.Value<char*>());
+	} else if (type == typeid(String&)) {
+		return PyString_FromStringObj(p.Value<String>());
+	} else if (type == typeid(std::string&)) {
+		return PyString_FromStringObj(p.Value<std::string>());
+	} else if (type == typeid(int)) {
+		return PyInt_FromLong(p.Value<int>());
+	} else if (type == typeid(ieDword)) {
+		ieDword val = p.Value<ieDword>();
+		if (val == ieDword(-1)) {
+			Py_RETURN_NONE;
+		} else {
+			return PyInt_FromLong(val);
+		}
+	} else if (type == typeid(bool)) {
+		return PyBool_FromLong(p.Value<bool>());
+	} else if (type == typeid(Point)) {
+		const Point& point = p.Value<Point>();
+		return Py_BuildValue("{s:i,s:i}", "x", point.x, "y", point.y);
+	} else if (type == typeid(Region)) {
+		const Region& rgn = p.Value<Region>();
+		return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", rgn.x, "y", rgn.y, "w", rgn.w, "h", rgn.h);
+	} else if (type == typeid(View*)) {
+		const View* view = p.Value<View*>();
+		return ConstructObjectForScriptableView(view->GetScriptingRef());
+	} else {
+		Log(ERROR, "GUIScript", "Unknown parameter type: %s", type.name());
+		// need to insert a None placeholder so remaining parameters are correct
+		Py_RETURN_NONE;
+	}
+}
+
 bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error)
 {
+	return RunPyFunction(Modulename, FunctionName, params, report_error);
+}
+
+PyObject *GUIScript::RunPyFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error)
+{
 	size_t size = params.size();
-	PyObject* pyParams = PyTuple_New(size);
+	
+	if (size) {
+		auto pyParams = DecRef(PyTuple_New, size);
 
-	for (size_t i = 0; i < size; ++i) {
-		const Parameter& p = params[i];
-		const std::type_info& type = p.Type();
-		PyObject* pyParam = NULL; // a "stolen" reference for PyTuple_SetItem
-
-		// FIXME: we can have any type of parameter, not just char*
-		if (type == typeid(char*)) {
-			const char* cstring = p.Value<char*>();
-			pyParam = PyString_FromStringAndSize(cstring, strlen(cstring));
-		} else {
-			Log(ERROR, "GUIScript", "Unknown parameter type: %s", type.name());
-			// need to insert a None placeholder so remaining parameters are correct
-			pyParam = Py_None;
-			Py_IncRef(pyParam);
+		for (size_t i = 0; i < size; ++i) {
+			PyObject* pyParam = ParamToPython(params[i]); // a "stolen" reference for PyTuple_SetItem
+			PyTuple_SetItem(pyParams, i, pyParam);
 		}
-		PyTuple_SetItem(pyParams, i, pyParam);
+		return RunPyFunction(Modulename, FunctionName, pyParams, report_error);
+	} else {
+		return RunPyFunction(Modulename, FunctionName, nullptr, report_error);
 	}
-	bool ret = RunFunction(Modulename, FunctionName, pyParams, report_error);
-	Py_DecRef(pyParams);
-	return ret;
 }
 
 /* Similar to RunFunction, but with parameters, and doesn't necessarily fail */
-PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionName, PyObject* pArgs, bool report_error)
+PyObject *GUIScript::RunPyFunction(const char* moduleName, const char* functionName, PyObject* pArgs, bool report_error)
 {
 	if (!Py_IsInitialized()) {
 		return NULL;
@@ -13805,41 +13833,6 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 	}
 	Py_DECREF(pyModule);
 	return pValue;
-}
-
-bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bool report_error, int intparam)
-{
-	PyObject *pArgs;
-	if (intparam == -1) {
-		pArgs = NULL;
-	} else {
-		pArgs = Py_BuildValue("(i)", intparam);
-	}
-	PyObject *pValue = RunFunction(moduleName, functionName, pArgs, report_error);
-	Py_XDECREF(pArgs);
-	if (pValue == NULL) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
-		return false;
-	}
-	Py_DECREF(pValue);
-	return true;
-}
-
-bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bool report_error, Point param)
-{
-	PyObject *pArgs = Py_BuildValue("(ii)", param.x, param.y);
-	PyObject *pValue = RunFunction(moduleName, functionName, pArgs, report_error);
-	Py_XDECREF(pArgs);
-	if (pValue == NULL) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
-		return false;
-	}
-	Py_DECREF(pValue);
-	return true;
 }
 
 bool GUIScript::ExecFile(const char* file)

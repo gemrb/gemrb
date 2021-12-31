@@ -2078,7 +2078,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 	switch(me.button) {
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
-			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
+			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", p, false);
 		}
 		break;
 	case GEM_MB_ACTION:

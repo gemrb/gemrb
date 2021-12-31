@@ -79,9 +79,7 @@ bool Console::Execute(const String& text)
 	if (text.length()) {
 		char* cBuf = MBCStringFromString(text);
 		assert(cBuf);
-		ScriptEngine::FunctionParameters params;
-		params.push_back(ScriptEngine::Parameter(cBuf));
-		ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
+		ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", {ScriptEngine::Parameter(cBuf)});
 		free(cBuf);
 		HistoryAdd();
 	}
