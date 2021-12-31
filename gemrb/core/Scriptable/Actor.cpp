@@ -1266,7 +1266,7 @@ static void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	// check if we reached a new level
-	ieByte pc = actor->InParty;
+	ieDword pc = actor->InParty;
 	if (pc && !actor->GotLUFeedback) {
 		auto ret = core->GetGUIScriptEngine()->RunFunction("LUCommon", "CanLevelUp", pc, true);
 		if (ret.Value<bool>()) {
@@ -5968,7 +5968,7 @@ void Actor::ApplyFeats()
 {
 	//apply scripted feats
 	if (InParty) {
-		core->GetGUIScriptEngine()->RunFunction("LUCommon", "ApplyFeats", InParty, true);
+		core->GetGUIScriptEngine()->RunFunction("LUCommon", "ApplyFeats", ieDword(InParty), true);
 	} else {
 		core->GetGUIScriptEngine()->RunFunction("LUCommon", "ApplyFeats", GetGlobalID(), true);
 	}
