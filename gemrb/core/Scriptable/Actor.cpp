@@ -6058,7 +6058,7 @@ void Actor::ApplyFeats()
 	}
 	//apply scripted feats
 	if (InParty) {
-		core->GetGUIScriptEngine()->RunFunction("LUCommon", "ApplyFeats", bool(InParty), true);
+		core->GetGUIScriptEngine()->RunFunction("LUCommon", "ApplyFeats", ieDword(InParty), true);
 	} else {
 		core->GetGUIScriptEngine()->RunFunction("LUCommon", "ApplyFeats", GetGlobalID(), true);
 	}
