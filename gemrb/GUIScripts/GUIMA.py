@@ -78,8 +78,7 @@ def InitMapWindow (Window):
 
 	# World Map
 	def OpenWorldMap():
-		GemRB.SetVar("Travel", -1)
-		OpenTravelWindow()
+		OpenTravelWindow(None)
 
 	Button = Window.GetControl (1)
 	Button.OnPress (OpenWorldMap)
@@ -126,7 +125,6 @@ def InitWorldMapWindow (Window):
 	else:
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont", "WMDAG")
 
-	WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
 	WorldMapControl.OnPress (GUIMACommon.MoveToNewArea)
 	WorldMapControl.SetAction(ChangeTooltip, IE_ACT_MOUSE_ENTER)
 	# center on current area
@@ -178,24 +176,26 @@ def InitWorldMapWindow (Window):
 		Button = Window.GetControl (14)
 		Button.OnPress (MapSE)
 		Button.SetActionInterval (200)
-
+		
 	# Done
 	Button = Window.GetControl (0)
-	if GemRB.GetVar ("Travel") == -1:
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.OnPress (OpenMapWindow)
-	else:
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-	Button.SetHotKey('m')
-
+	Button.SetState (IE_GUI_BUTTON_ENABLED)
+	Button.OnPress (lambda: OpenMapWindow ())
 	return
 
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
 
 WMWID = 2 if GameCheck.IsIWD2 () else 0
-OpenTravelWindow = GUICommonWindows.CreateTopWinLoader(WMWID, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
+OpenTravelMapWindow = GUICommonWindows.CreateTopWinLoader(WMWID, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
+
+def OpenTravelWindow(Travel):
+	Window = OpenTravelMapWindow()
+	WorldMapControl.SetVarAssoc("Travel", Travel)
+	
+	if Travel is not None:
+		Button = Window.GetControl (0)
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
