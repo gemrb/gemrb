@@ -52,7 +52,7 @@ total_price = 0
 total_income = 0
 BarteringPC = 0
 
-ItemButtonCount = 4 if GameCheck.IsIWD2() else 6
+ItemButtonCount = 6 if GameCheck.IsIWD2() else 4
 CureTable = GemRB.LoadTable("speldesc", True) # additional info not supported by core (PST)
 RepModTable = GemRB.LoadTable ("repmodst", True) # all but PST; FIXME: does IWD2 sufffer a 10x price increase?
 SpellTable = GemRB.LoadTable ("storespl", True) # all but PST
