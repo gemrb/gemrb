@@ -3132,8 +3132,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	fxqueue.ApplyAllEffects( this );
 
+	const Game* game = core->GetGame();
 	if (previous[IE_PUPPETID]) {
-		CheckPuppet(core->GetGame()->GetActorByGlobalID(previous[IE_PUPPETID]), previous[IE_PUPPETTYPE]);
+		CheckPuppet(game->GetActorByGlobalID(previous[IE_PUPPETID]), previous[IE_PUPPETTYPE]);
 	}
 
 	//move this further down if needed
@@ -3144,7 +3145,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 		// snap out of charm if the charmer hurt us
 		if (trigger.triggerID == trigger_attackedby) {
-			const Actor *attacker = core->GetGame()->GetActorByGlobalID(LastAttacker);
+			const Actor* attacker = game->GetActorByGlobalID(LastAttacker);
 			if (attacker) {
 				int revertToEA = 0;
 				if (Modified[IE_EA] == EA_CHARMED && attacker->GetStat(IE_EA) <= EA_GOODCUTOFF) {
@@ -3178,7 +3179,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	// but not if pst is playing disguise tricks (GameScript::SetNamelessDisguise)
 	ieDword pst_appearance = 0;
 	if (pstflags) {
-		core->GetGame()->locals->Lookup("APPEARANCE", pst_appearance);
+		game->locals->Lookup("APPEARANCE", pst_appearance);
 	}
 	if (Modified[IE_SEX] != BaseStats[IE_SEX] && pst_appearance == 0) {
 		UpdateAnimationID(true);
@@ -3188,8 +3189,8 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//as it's triggered by PCFs from the previous tick, it should probably run before current PCFs
 	if (first && checkHP == 2) {
 		//could not set this in the constructor
-		checkHPTime = core->GetGame()->GameTime;
-	} else if (checkHP && checkHPTime != core->GetGame()->GameTime) {
+		checkHPTime = game->GameTime;
+	} else if (checkHP && checkHPTime != game->GameTime) {
 		checkHP = 0;
 		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
@@ -3243,7 +3244,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		previousStates = PCStats->States;
 	}
 	if (Immobile()) {
-		timeStartStep = core->GetGame()->Ticks;
+		timeStartStep = game->Ticks;
 	}
 }
 
