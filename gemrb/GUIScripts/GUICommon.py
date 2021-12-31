@@ -75,10 +75,10 @@ def LocationPressed ():
 
 	return
 
-def OpenFloatMenuWindow (p):
+def OpenFloatMenuWindow (point):
 	if GameCheck.IsPST():
 		import FloatMenuWindow
-		FloatMenuWindow.OpenFloatMenuWindow(p['x'], p['y'])
+		FloatMenuWindow.OpenFloatMenuWindow(**point)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 

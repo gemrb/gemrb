@@ -58,11 +58,13 @@ public:
 	bool LoadScript(const std::string& filename) override;
 	/** Run Function */
 	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
+
+	PyObject *RunPyFunction(const char* moduleName, const char* fname, const FunctionParameters& params, bool report_error = true);
+	PyObject *RunPyFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 	/** Exec a single File */
 	bool ExecFile(const char* file);
 	/** Exec a single String */
 	bool ExecString(const std::string &string, bool feedback=false) override;
-	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
 	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*) const;
 	PyObject* ConstructObject(const std::string& pyclassname, ScriptingId id) const;
