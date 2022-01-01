@@ -192,8 +192,6 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 		}
 
 		wm->FadeColor.a = 255 * (double( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
-		//bug/patch #1837747 made this unneeded
-		//goto end; //hmm, freeze gametime?
 	}
 	//i think this 'else' is needed now because of the 'goto' cut above
 	else if (fadeFromCounter!=fadeFromMax) {
@@ -203,7 +201,6 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 				fadeFromCounter=fadeFromMax;
 				fadeFromFactor = 1;
 			}
-			//don't freeze gametime when already dark
 		} else {
 			fadeFromCounter+=count;
 			if (fadeToCounter>fadeFromMax) {
@@ -211,8 +208,6 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 				fadeToFactor = 1;
 			}
 			wm->FadeColor.a = 255 * (double( fadeFromMax - fadeFromCounter ) / fadeFromMax / fadeFromFactor);
-			//bug/patch #1837747 made this unneeded
-			//goto end; //freeze gametime?
 		}
 	}
 	if (fadeFromCounter==fadeFromMax) {
