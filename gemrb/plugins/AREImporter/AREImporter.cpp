@@ -531,6 +531,8 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
 	map->SetScriptName(resRef);
+	// reset MasterArea, since the script name wasn't available in the constructor
+	map->MasterArea = core->GetGame()->MasterArea(map->GetScriptName());
 	int idx = GetTrackString(resRef);
 	if (idx>=0) {
 		map->SetTrackString(tracks[idx].text, tracks[idx].trackFlag, tracks[idx].difficulty);
