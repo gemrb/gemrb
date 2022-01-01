@@ -222,21 +222,21 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 
 void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 {
-	if(!Count) {
-		Count = 64;
+	if (!Count) {
+		Count = 2 * AI_UPDATE_TIME;
 	}
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
 	//stay black for a while
-	fadeFromCounter = 128;
+	fadeFromCounter = 4 * AI_UPDATE_TIME;
 	fadeFromMax = 0;
 	fadeToFactor = factor;
 }
 
 void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 {
-	if(!Count) {
-		Count = 64;
+	if (!Count) {
+		Count = 2 * AI_UPDATE_TIME;
 	}
 	fadeFromCounter = 0;
 	fadeFromMax = Count;
