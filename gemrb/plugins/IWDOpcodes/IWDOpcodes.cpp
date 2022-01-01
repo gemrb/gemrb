@@ -591,9 +591,11 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	Projectile *pro;
-	if (fx->Parameter4) {
+	if (fx->Parameter4 && fx->Parameter2 > 200) {
 		// SpellHitEffectPoint is used with sheffect.ids, so the indices are smaller
 		// we don't just check for both, since there's some overlap
+		// so far tested: acid storm needs this at 210
+		//   these don't: 46 66 104
 		pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
 	} else {
 		pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001+fx->Parameter2);
