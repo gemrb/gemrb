@@ -7077,15 +7077,25 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_CASTING,
 				Sender->Pos, 0);
 
+	const Actor* caster = Scriptable::As<Actor>(Sender);
+	int adjustedDuration = 0;
+	if (caster) {
+		adjustedDuration = parameters->int1Parameter - caster->GetStat(IE_MENTALSPEED);
+		if (adjustedDuration < 0) adjustedDuration = 0;
+	}
+	adjustedDuration *= 10; // it's really not AI_UPDATE_TIME
+
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->Parameter2 = sparkle; //animation type
-	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	fx->Duration = parameters->int1Parameter * 15;
+	fx->TimingMode = FX_DURATION_INSTANT_LIMITED_TICKS;
+	fx->Duration = adjustedDuration;
 	fx->Target = FX_TARGET_PRESET;
 	//int2param isn't actually used in the original engine
 
 	core->ApplyEffect(fx, actor, src);
+	// SpellCastEffect tries to keep the action alive until the effect is over
+	Sender->SetWait(adjustedDuration);
 }
 
 //this action plays a vvc animation over target
