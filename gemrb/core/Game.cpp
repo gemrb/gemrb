@@ -733,19 +733,11 @@ int Game::DelMap(unsigned int index, int forced)
 		return -1;
 	}
 	Map *map = Maps[index];
+	assert(map);
 
 	if (MapIndex == (int) index) { //can't remove current map in any case
 		AnotherArea = map->GetScriptName();
 		return -1;
-	}
-
-	if (!map) { //this shouldn't happen, i guess
-		Log(WARNING, "Game", "Erased NULL Map");
-		Maps.erase(Maps.begin() + index);
-		if (MapIndex > (int) index) {
-			MapIndex--;
-		}
-		return 1;
 	}
 
 	// this was not used in the originals and may be in the wrong place
