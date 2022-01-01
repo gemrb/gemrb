@@ -5203,6 +5203,11 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 	AttackCore(Sender, tar, flags);
 	parameters->int2Parameter = 1;
 
+	// we are trying to move between areas, so stop the normal flow
+	if (Sender->GetInternalFlag() & IF_USEEXIT) {
+		return;
+	}
+
 	Sender->CurrentActionState--;
 	if (Sender->CurrentActionState <= 0) {
 		Sender->CurrentActionState = 0;
