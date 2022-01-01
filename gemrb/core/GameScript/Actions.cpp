@@ -2616,8 +2616,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters) {
 			return;
 		}
 	}
-	//if not an actor opens, it don't play sound
-	door->SetDoorOpen(true, actor != nullptr, gid, false);
+	door->SetDoorOpen(true, false, gid, false);
 	Sender->ReleaseCurrentAction();
 }
 
