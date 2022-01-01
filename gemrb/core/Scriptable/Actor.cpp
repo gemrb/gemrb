@@ -423,43 +423,8 @@ void ReleaseMemoryActor()
 Actor::Actor()
 	: Movable( ST_ACTOR )
 {
-	for (int i = 0; i < MAX_STATS; i++) {
-		BaseStats[i] = 0;
-		Modified[i] = 0;
-	}
-	PrevStats = NULL;
-
-	anims = NULL;
-	ShieldRef[0]=0;
-	HelmetRef[0]=0;
-	WeaponRef[0]=0;
-
-	LongStrRef = ieStrRef(-1);
-	ShortStrRef = ieStrRef(-1);
-
-	playedCommandSound = false;
-
-	PCStats = NULL;
-	LastDamage = 0;
-	LastDamageType = 0;
-	LastExit = 0;
-	attackcount = 0;
-	secondround = false;
-	//AttackStance = IE_ANI_ATTACK;
-	attacksperround = 0;
-	nextattack = 0;
-	nextWalk = 0;
-	lastattack = 0;
-	InTrap = 0;
 	ResetPathTries();
-	TargetDoor = 0;
-	attackProjectile = NULL;
-	lastInit = 0;
-	roundTime = 0;
-	panicMode = PANIC_NONE;
 	nextComment = 100 + RAND(0, 350); // 7-30s delay
-	nextBored = 0;
-	FatigueComplaintDelay = 0;
 
 	inventory.SetInventoryType(ieInventoryType::CREATURE);
 
@@ -479,44 +444,16 @@ Actor::Actor()
 			ProjectileSize=32;
 		}
 	}
-	multiclass = 0;
 	projectileImmunity = (ieDword *) calloc(ProjectileSize,sizeof(ieDword));
-	AppearanceFlags = 0;
-	SetDeathVar = IncKillCount = UnknownField = 0;
-	memset( DeathCounters, 0, sizeof(DeathCounters) );
-	InParty = 0;
-	TalkCount = 0;
-	InteractCount = 0; //numtimesinteracted depends on this
-	appearance = 0xffffff; //might be important for created creatures
-	RemovalTime = ~0;
-	Spawned = false;
-	version = 0;
+
 	//these are used only in iwd2 so we have to default them
 	for (int i = 0; i < 7; i++) {
 		BaseStats[IE_HATEDRACE2+i]=0xff;
 	}
-	//this one is saved only for PC's
-	Modal.State = MS_NONE;
-	//set it to a neutral value
-	Modal.LastApplyTime = 0;
-	Modal.LingeringCount = 0;
-	Modal.FirstApply = true;
-	//this one is not saved
-	GotLUFeedback = false;
-	RollSaves();
-	WMLevelMod = 0;
-	TicksLastRested = LastFatigueCheck = 0;
-	remainingTalkSoundTime = lastTalkTimeCheckAt = 0;
-	WeaponType = AttackStance = 0;
-	DifficultyMargin = disarmTrap = 0;
-	spellStates = (ieDword *) calloc(SpellStatesSize, sizeof(ieDword));
-	weapSlotCount = 4;
-	// delay all maxhp checks until we completely load all effects
-	checkHP = 2;
-	checkHPTime = 0;
 
-	polymorphCache = NULL;
-	memset(&wildSurgeMods, 0, sizeof(wildSurgeMods));
+	RollSaves();
+	spellStates = (ieDword *) calloc(SpellStatesSize, sizeof(ieDword));
+
 	AC.SetOwner(this);
 	ToHit.SetOwner(this);
 }

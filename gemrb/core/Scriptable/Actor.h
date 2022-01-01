@@ -281,12 +281,12 @@ struct ModalStatesStruct {
 };
 
 struct ModalState {
-	ieDword State;
-	ResRef Spell;               //apply this spell once per round
-	ResRef LingeringSpell;      //apply this spell once per round if the effects are lingering
-	char LingeringCount;        //the count of rounds for which the modal spell will be reapplied after the state ends
-	ieDword LastApplyTime;      //last time the modal effect used
-	bool FirstApply;            //running for the first time?
+	ieDword State = MS_NONE;
+	ResRef Spell; // apply this (modal) spell once per round
+	ResRef LingeringSpell; // apply this spell once per round if the effects are lingering
+	char LingeringCount = 0; // the count of rounds for which the modal spell will be reapplied after the state ends
+	ieDword LastApplyTime = 0; // last time the modal spell was applied
+	bool FirstApply = true; // running for the first time?
 };
 
 extern void ReleaseMemoryActor();
@@ -299,89 +299,94 @@ using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
 class GEM_EXPORT Actor : public Movable {
 public:
 	//CRE DATA FIELDS
-	ieDword BaseStats[MAX_STATS];
-	ieDword Modified[MAX_STATS];
-	ieDword *PrevStats;
-	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
+	ieDword BaseStats[MAX_STATS]{};
+	ieDword Modified[MAX_STATS]{};
+	ieDword* PrevStats = nullptr;
+	ieByteSigned DeathCounters[4]{}; // PST specific (good, law, lady, murder)
 
 	ResRef BardSong;               //custom bard song (updated by fx)
 	ResRef BackstabResRef = "*";         //apply on successful backstab
 
-	PCStatsStruct*  PCStats;
+	PCStatsStruct* PCStats = nullptr;
 	PCStatsStruct::StateArray previousStates;
 	ResRef SmallPortrait;
 	ResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
-	ieByte InParty;
+	ieByte InParty = 0;
 	//32 is the maximum possible length of the actor name in the original games
 	ieVariable LongName{};
 	ieVariable ShortName{};
-	ieStrRef ShortStrRef, LongStrRef;
-	ieStrRef StrRefs[VCONST_COUNT];
+	ieStrRef ShortStrRef = ieStrRef(-1);
+	ieStrRef LongStrRef = ieStrRef(-1);
+	ieStrRef StrRefs[VCONST_COUNT]{};
 
-	ieDword AppearanceFlags;
+	ieDword AppearanceFlags = 0;
 
 	ieVariable KillVar; //this second field is present in pst, iwd1 and iwd2
 	ieVariable IncKillVar; // iwd1, iwd2
 
-	ieByte SetDeathVar, IncKillCount, UnknownField; // boolean fields from iwd1 and iwd2
+	// boolean fields from iwd1 and iwd2
+	ieByte SetDeathVar = 0;
+	ieByte IncKillCount = 0;
+	ieByte UnknownField = 0;
 
 	Inventory inventory;
 	Spellbook spellbook;
 	//savefile version (creatures embedded in area)
-	int version;
+	int version = 0;
 	//in game or area actor header
-	ieDword TalkCount;
-	ieDword RemovalTime;
+	ieDword TalkCount = 0;
+	ieDword RemovalTime = 0;
 	//FIXME: this is definitely not the same in bg2, in bg2 there are joinable npcs
 	//which keep a matrix of counters
-	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
-	ieDword appearance;
+	ieDword InteractCount = 0; // this is accessible in iwd2, probably exists in other games too
+	ieDword appearance = 0xffffff; // schedule
 	ArmorClass AC;
 	ToHitStats ToHit;
-	ModalState Modal;
+	ModalState Modal{};
 
-	ieDword LastExit;    //the global ID of the exit to be used
+	ieDword LastExit = 0;    // the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ResRef LastArea;
-	char ShieldRef[2];
-	char HelmetRef[2];
-	char WeaponRef[2];
-	unsigned char WeaponType;
-	ieDword multiclass;
-	bool GotLUFeedback;
-	int WMLevelMod;
+	char ShieldRef[2]{};
+	char HelmetRef[2]{};
+	char WeaponRef[2]{};
+	unsigned char WeaponType = 0;
+	ieDword multiclass = 0;
+	bool GotLUFeedback = false;
+	int WMLevelMod = 0;
 
-	int LastDamageType;
-	int LastDamage;
+	int LastDamageType = 0;
+	int LastDamage = 0;
 	Point FollowOffset;//follow lastfollowed at this offset
-	bool Spawned;      //has been created by a spawn point
+	bool Spawned = false; // has been created by a spawn point
 
-	ieDword TargetDoor;
+	ieDword TargetDoor = 0;
 
 	EffectQueue fxqueue;
 	
 	vvcDict vfxDict;
 	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
-	ieDword *projectileImmunity; //classic bitfield
+	ieDword* projectileImmunity = nullptr; // classic bitfield
 	Holder<SoundHandle> casting_sound;
-	ieDword roundTime;           //these are timers for attack rounds
-	ieDword panicMode;           //runaway, berserk or randomwalk
-	ieDword nextComment;         //do something random (area comment, interaction)
-	ieDword nextBored;           //do something when bored
-	int FatigueComplaintDelay;   // stagger tired messages
-	ieDword lastInit;
+	ieDword roundTime = 0;           // these are timers for attack rounds
+	ieDword panicMode = PANIC_NONE;  // runaway, berserk or randomwalk
+	ieDword nextComment = 0;         // do something random (area comment, interaction)
+	ieDword nextBored = 0;           // do something when bored
+	int FatigueComplaintDelay = 0;   // stagger tired messages
+	ieDword lastInit = 0;
 	//how many attacks left in this round, must be public for cleave opcode
-	int attackcount;
+	int attackcount = 0;
 
-	PolymorphCache *polymorphCache; // fx_polymorph etc
-	WildSurgeSpellMods wildSurgeMods;
-	ieByte DifficultyMargin;
-	ieDword *spellStates;
+	PolymorphCache* polymorphCache = nullptr; // fx_polymorph etc
+	WildSurgeSpellMods wildSurgeMods{};
+	ieByte DifficultyMargin = 0;
+	ieDword* spellStates = nullptr;
+	// delay all maxhp checks until we completely load all effects
 	// set after modifying maxhp, adjusts hp next tick
-	int checkHP;
+	int checkHP = 2;
 	// to determine that a tick has passed
-	ieDword checkHPTime;
+	ieDword checkHPTime = 0;
 	/**
 	 * We don't know how to profit of them, but PST needs them saved.
 	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
@@ -389,12 +394,12 @@ public:
 	 * bit 1 is for enabling pulsating for the particular color range (we store them in IE_COLOR*)
 	 *   it periodically reduces brightness to ~50% and back to full
 	 */
-	ieByte pstColorBytes[10];
+	ieByte pstColorBytes[10]{};
 	
 	Region drawingRegion;
 private:
 	//this stuff doesn't get saved
-	CharAnimations* anims;
+	CharAnimations* anims = nullptr;
 	
 	using AnimationPart = std::pair<Animation*, PaletteHolder>;
 	struct {
@@ -402,28 +407,28 @@ private:
 		std::vector<AnimationPart> shadow;
 	} currentStance;
 
-	ieByte SavingThrow[5];
-	ieByte weapSlotCount;
+	ieByte SavingThrow[5]{};
+	ieByte weapSlotCount = 4;
 	int walkScale = 0;
 	// true when command has been played after select
-	bool playedCommandSound;
+	bool playedCommandSound = false;
 	//true every second round of attack
-	bool secondround;
-	int attacksperround;
+	bool secondround = false;
+	int attacksperround = 0;
 	//time of our next attack
-	ieDword nextattack;
-	ieDword nextWalk;
-	ieDword lastattack;
+	ieDword nextattack = 0;
+	ieDword nextWalk = 0;
+	ieDword lastattack = 0;
 	//trap we're trying to disarm
-	ieDword disarmTrap;
-	ieDword InTrap;
-	char AttackStance;
+	ieDword disarmTrap = 0;
+	ieDword InTrap = 0;
+	char AttackStance = 0;
 	/*The projectile bringing the current attack*/
-	Projectile* attackProjectile ;
-	tick_t TicksLastRested;
-	tick_t LastFatigueCheck;
-	tick_t remainingTalkSoundTime;
-	tick_t lastTalkTimeCheckAt;
+	Projectile* attackProjectile = nullptr;
+	tick_t TicksLastRested = 0;
+	tick_t LastFatigueCheck = 0;
+	tick_t remainingTalkSoundTime = 0;
+	tick_t lastTalkTimeCheckAt = 0;
 	ieDword lastScriptCheck = 0;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Point& p, BlitFlags flags,
