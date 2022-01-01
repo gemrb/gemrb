@@ -2634,8 +2634,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters) {
 			return;
 		}
 	}
-	//if not an actor closes, it don't play sound
-	door->SetDoorOpen(false, actor != nullptr, 0);
+	door->SetDoorOpen(false, false, 0);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2671,7 +2670,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 		}
 
 		//trap scripts are triggered by SetDoorOpen
-		door->SetDoorOpen( !door->IsOpen(), true, actor->GetGlobalID() );
+		door->SetDoorOpen(!door->IsOpen(), false, actor->GetGlobalID());
 	} else {
 		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
 		return;
