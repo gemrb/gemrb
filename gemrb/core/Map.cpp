@@ -406,31 +406,8 @@ SmallMap(std::move(sm)),
 ExploredBitmap(FogMapSize(), '\0'), VisibleBitmap(FogMapSize(), '\0'),
 reverb(*this)
 {
-	area=this;
-	queue[PR_SCRIPT] = NULL;
-	queue[PR_DISPLAY] = NULL;
-	INISpawn = NULL;
-	//no one needs this queue
-	//queue[PR_IGNORE] = NULL;
-	Qcount[PR_SCRIPT] = 0;
-	Qcount[PR_DISPLAY] = 0;
-	//no one needs this queue
-	//Qcount[PR_IGNORE] = 0;
-	lastActorCount[PR_SCRIPT] = 0;
-	lastActorCount[PR_DISPLAY] = 0;
-	//no one needs this
-	//lastActorCount[PR_IGNORE] = 0;
-	version = 0;
+	area = this;
 	MasterArea = core->GetGame()->MasterArea(scriptName.CString());
-	Background = NULL;
-	BgDuration = 0;
-	LastGoCloser = 0;
-	AreaFlags = AreaDifficulty = 0;
-	trackString = trackFlag = trackDiff = 0;
-	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
-	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
-	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
-	wallStencil = NULL;
 }
 
 Map::~Map(void)

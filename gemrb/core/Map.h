@@ -401,8 +401,8 @@ public:
 	TileProps tileProps;
 
 	Holder<Sprite2D> SmallMap;
-	IniSpawn *INISpawn;
-	ieDword AreaFlags;
+	IniSpawn* INISpawn = nullptr;
+	ieDword AreaFlags = 0;
 	MapEnv AreaType = AT_UNINITIALIZED;
 	ieWord Rain = 0;
 	ieWord Snow = 0;
@@ -410,23 +410,23 @@ public:
 	ieWord Lightning = 0;
 	Bitmap ExploredBitmap;
 	Bitmap VisibleBitmap;
-	int version;
+	int version = 0;
 	ResRef WEDResRef;
 	bool MasterArea;
 	//this is set by the importer (not stored in the file)
 	bool DayNight = false;
 	//movies for day/night (only in ToB)
 	ResRef Dream[2];
-	Holder<Sprite2D> Background;
-	ieDword BgDuration;
-	ieDword LastGoCloser;
+	Holder<Sprite2D> Background = nullptr;
+	ieDword BgDuration = 0;
+	ieDword LastGoCloser = 0;
 	MapReverb reverb;
 
 private:
 	uint32_t debugFlags = 0;
-	ieStrRef trackString;
-	int trackFlag;
-	ieWord trackDiff;
+	ieStrRef trackString = 0;
+	int trackFlag = 0;
+	ieWord trackDiff = 0;
 
 	std::list<AreaAnimation> animations;
 	std::vector< Actor*> actors;
@@ -438,12 +438,12 @@ private:
 	std::vector< Ambient*> ambients;
 	std::vector<MapNote> mapnotes;
 	std::vector< Spawn*> spawns;
-	Actor** queue[QUEUE_COUNT];
-	int Qcount[QUEUE_COUNT];
-	unsigned int lastActorCount[QUEUE_COUNT];
+	Actor** queue[QUEUE_COUNT]{};
+	int Qcount[QUEUE_COUNT]{};
+	unsigned int lastActorCount[QUEUE_COUNT]{};
 	bool hostiles_visible = false;
 
-	VideoBufferPtr wallStencil;
+	VideoBufferPtr wallStencil = nullptr;
 	Region stencilViewport;
 
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
@@ -548,10 +548,10 @@ public:
 	//if items == true, remove noncritical items from ground piles too
 	void PurgeArea(bool items);
 
-	ieDword SongList[MAX_RESCOUNT];
-	SongHeaderType SongHeader;
-	RestHeaderType RestHeader;
-	int AreaDifficulty;
+	ieDword SongList[MAX_RESCOUNT]{};
+	SongHeaderType SongHeader{};
+	RestHeaderType RestHeader{};
+	int AreaDifficulty = 0;
 
 	//count of all projectiles that are saved
 	size_t GetProjectileCount(proIterator &iter) const;
