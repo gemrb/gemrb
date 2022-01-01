@@ -503,24 +503,25 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 
 void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer.SetFadeToColor( parameters->pointParameter.x );
-//	Sender->SetWait( parameters->pointParameter.x );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+	core->timer.SetFadeToColor(parameters->pointParameter.x);
+	// fallback matches SetFadeToColor fallback
+	Sender->SetWait(parameters->pointParameter.x ? parameters->pointParameter.x : 30);
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::FadeFromColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer.SetFadeFromColor( parameters->pointParameter.x );
-//	Sender->SetWait( parameters->pointParameter.x );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+	core->timer.SetFadeFromColor(parameters->pointParameter.x);
+	Sender->SetWait(parameters->pointParameter.x ? parameters->pointParameter.x : 30);
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::FadeToAndFromColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer.SetFadeToColor( parameters->pointParameter.x );
-	core->timer.SetFadeFromColor( parameters->pointParameter.x );
-//	Sender->SetWait( parameters->pointParameter.x<<1 ); //multiply by 2
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+	core->timer.SetFadeToColor(parameters->pointParameter.x);
+	core->timer.SetFadeFromColor(parameters->pointParameter.x);
+	Sender->SetWait(parameters->pointParameter.x ? 2 * parameters->pointParameter.x : 60);
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
