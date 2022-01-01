@@ -2951,7 +2951,14 @@ bool Map::CanFree()
 		}
 
 		const Action *current = actor->GetCurrentAction();
+		// maybe we should also catch non-interruptible actions (!actor->CurrentActionInterruptable)
+		// but it has not been needed yet
 		if (current && actionflags[current->actionID] & AF_CHASE) {
+			return false;
+		}
+
+		// dirty estimate if we're a cutscene runner (at least one action queued)
+		if (actor->GetNextAction()) {
 			return false;
 		}
 	}
