@@ -2779,13 +2779,14 @@ void Map::GenerateQueues()
 
 		ieDword stance = actor->GetStance();
 		ieDword internalFlag = actor->GetInternalFlag();
+		bool scheduled = actor->Schedule(gametime, false);
 
 		if (internalFlag&IF_ACTIVE) {
 			if ((stance == IE_ANI_TWITCH) && (internalFlag&IF_IDLE) ) {
 				priority = PR_DISPLAY; //display
 			} else {
 				//if actor is unscheduled, don't run its scripts
-				if (actor->Schedule(gametime, false) ) {
+				if (scheduled) {
 					priority = PR_SCRIPT; //run scripts and display
 				} else {
 					priority = PR_IGNORE; //don't run scripts for out of schedule actors
@@ -2801,7 +2802,9 @@ void Map::GenerateQueues()
 				//isvisible flag is false (visibilitymap) here,
 				//coz we want to reactivate creatures that
 				//just became visible
-				if (IsVisible(actor->Pos) && actor->Schedule(gametime, false) ) {
+				bool visible = IsVisible(actor->Pos);
+				// even if a creature is offscreen, they should still get an AI update every 3 ticks
+				if (scheduled && (visible || actor->ForceScriptCheck()))  {
 					priority = PR_SCRIPT; //run scripts and display, activated now
 					//more like activate!
 					actor->Activate();

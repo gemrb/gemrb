@@ -8276,6 +8276,19 @@ bool Actor::HibernateIfAble()
 	return true;
 }
 
+// even if a creature is offscreen, they should still get an AI update every 3 ticks
+bool Actor::ForceScriptCheck()
+{
+	if (!lastScriptCheck) lastScriptCheck = Ticks;
+
+	lastScriptCheck++;
+	if (lastScriptCheck - Ticks >= 3) {
+		lastScriptCheck = Ticks;
+		return true;
+	}
+	return false;
+}
+
 bool Actor::AdvanceAnimations()
 {
 	if (!anims) {

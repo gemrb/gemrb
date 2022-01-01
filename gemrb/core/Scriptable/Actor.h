@@ -424,6 +424,7 @@ private:
 	tick_t LastFatigueCheck;
 	tick_t remainingTalkSoundTime;
 	tick_t lastTalkTimeCheckAt;
+	ieDword lastScriptCheck = 0;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Point& p, BlitFlags flags,
 						 const std::vector<AnimationPart>& anims, const Color& tint) const;
@@ -977,6 +978,7 @@ public:
 	void PlayArmorSound() const;
 	bool ShouldModifyMorale() const;
 	bool HibernateIfAble();
+	bool ForceScriptCheck();
 };
 }
 
