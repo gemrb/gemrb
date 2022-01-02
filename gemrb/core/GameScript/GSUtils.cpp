@@ -1379,6 +1379,7 @@ void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flag
 	if (untilsee && CanSee(actor, target, true, 0) ) {
 		Sender->LastSeen = target->GetGlobalID();
 		Sender->ReleaseCurrentAction();
+		actor->ClearPath(true);
 		return;
 	} else {
 		if (PersonalDistance(actor, target)<MAX_OPERATING_DISTANCE) {
