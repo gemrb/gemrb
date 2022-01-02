@@ -632,7 +632,7 @@ void Projectile::ChangePhase()
 			if(ExtFlags&PEF_DEFSPELL) {
 				ApplyDefault();
 			}
-			StopSound();
+			if (!ArrivalSound.IsEmpty()) StopSound();
 			Payload();
 			phase = P_TRAVEL2;
 		}
