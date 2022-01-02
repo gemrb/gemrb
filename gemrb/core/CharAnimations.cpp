@@ -985,7 +985,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	if (partCount <= 0) return nullptr;
 	anims = new Animation*[partCount];
 
-	EquipResRefData* equipdat = nullptr;
+	EquipResRefData* equipment = nullptr;
 	for (int part = 0; part < partCount; ++part)
 	{
 		anims[part] = nullptr;
@@ -997,11 +997,11 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		if (part < actorPartCount) {
 			// Character animation parts
 
-			if (equipdat) delete equipdat;
+			if (equipment) delete equipment;
 
 			//we need this long for special anims
 			NewResRef = ResRefBase;
-			GetAnimResRef(stanceID, Orient, NewResRef, Cycle, part, equipdat);
+			GetAnimResRef(stanceID, Orient, NewResRef, Cycle, part, equipment);
 		} else {
 			// Equipment animation parts
 
@@ -1011,22 +1011,20 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			if (part == actorPartCount) {
 				if (WeaponRef[0] == 0) continue;
 				// weapon
-				GetEquipmentResRef(WeaponRef,false,NewResRef,Cycle,equipdat);
+				GetEquipmentResRef(WeaponRef, false, NewResRef, Cycle, equipment);
 			} else if (part == actorPartCount+1) {
 				if (OffhandRef[0] == 0) continue;
 				if (WeaponType == IE_ANI_WEAPON_2H) continue;
 				// off-hand
 				if (WeaponType == IE_ANI_WEAPON_1H) {
-					GetEquipmentResRef(OffhandRef,false,NewResRef,Cycle,
-										 equipdat);
+					GetEquipmentResRef(OffhandRef, false, NewResRef, Cycle, equipment);
 				} else { // IE_ANI_WEAPON_2W
-					GetEquipmentResRef(OffhandRef,true,NewResRef,Cycle,
-										 equipdat);
+					GetEquipmentResRef(OffhandRef, true, NewResRef, Cycle, equipment);
 				}
 			} else if (part == actorPartCount+2) {
 				if (HelmetRef[0] == 0) continue;
 				// helmet
-				GetEquipmentResRef(HelmetRef,false,NewResRef,Cycle,equipdat);
+				GetEquipmentResRef(HelmetRef, false, NewResRef, Cycle, equipment);
 			}
 		}
 
@@ -1046,7 +1044,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
 				delete[] anims;
-				delete equipdat;
+				delete equipment;
 				return nullptr;
 			} else {
 				// not fatal if animation for equipment is missing
@@ -1064,7 +1062,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
 				delete[] anims;
-				delete equipdat;
+				delete equipment;
 				return nullptr;
 			} else {
 				// not fatal if animation for equipment is missing
@@ -1234,7 +1232,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		default:
 			error("CharAnimations", "Unknown animation type\n");
 	}
-	delete equipdat;
+	delete equipment;
 	previousStanceID = stanceID;
 
 	return Anims[stanceID][Orient];
