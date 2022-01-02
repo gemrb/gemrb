@@ -2759,35 +2759,27 @@ void Map::GenerateQueues()
 		if (internalFlag&IF_ACTIVE) {
 			if ((stance == IE_ANI_TWITCH) && (internalFlag&IF_IDLE) ) {
 				priority = PR_DISPLAY; //display
+			} else if (scheduled) {
+				priority = PR_SCRIPT; // run scripts and display
 			} else {
-				//if actor is unscheduled, don't run its scripts
-				if (scheduled) {
-					priority = PR_SCRIPT; //run scripts and display
-				} else {
-					priority = PR_IGNORE; //don't run scripts for out of schedule actors
-				}
+				priority = PR_IGNORE; // don't run scripts for out of schedule actors
 			}
 			if (IsVisible(actor->Pos))
 				hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
+		// dead actors are always visible on the map, but run no scripts
+		} else if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
+			priority = PR_DISPLAY;
 		} else {
-			//dead actors are always visible on the map, but run no scripts
-			if ((stance == IE_ANI_TWITCH) || (stance == IE_ANI_DIE) ) {
-				priority = PR_DISPLAY;
+			bool visible = IsVisible(actor->Pos);
+			// even if a creature is offscreen, they should still get an AI update every 3 ticks
+			if (scheduled && (visible || actor->ForceScriptCheck()))  {
+				priority = PR_SCRIPT; // run scripts and display, activated now
+				// more like activate!
+				actor->Activate();
+				ActorSpottedByPlayer(actor);
+				hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
 			} else {
-				//isvisible flag is false (visibilitymap) here,
-				//coz we want to reactivate creatures that
-				//just became visible
-				bool visible = IsVisible(actor->Pos);
-				// even if a creature is offscreen, they should still get an AI update every 3 ticks
-				if (scheduled && (visible || actor->ForceScriptCheck()))  {
-					priority = PR_SCRIPT; //run scripts and display, activated now
-					//more like activate!
-					actor->Activate();
-					ActorSpottedByPlayer(actor);
-					hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
-				} else {
-					priority = PR_IGNORE;
-				}
+				priority = PR_IGNORE;
 			}
 		}
 
