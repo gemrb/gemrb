@@ -20,7 +20,6 @@
 #include "Scriptable/Scriptable.h"
 
 #include "strrefs.h"
-#include "ie_cursors.h"
 #include "voodooconst.h"
 
 #include "DialogHandler.h"
@@ -1646,19 +1645,6 @@ void Scriptable::StartTimer(ieDword ID, ieDword expiration)
  * Selectable Class *
  ********************/
 
-Selectable::Selectable(ScriptableType type)
-	: Scriptable( type )
-{
-	Selected = false;
-	Over = false;
-	size = 0;
-	sizeFactor = 1.0f;
-	circleBitmap[0] = NULL;
-	circleBitmap[1] = NULL;
-	selectedColor = ColorBlack;
-	overColor = ColorBlack;
-}
-
 void Selectable::SetBBox(const Region &newBBox)
 {
 	BBox = newBBox;
@@ -1760,16 +1746,6 @@ void Selectable::SetCircle(int circlesize, float factor, const Color &color, Hol
 /***********************
  * Highlightable Class *
  ***********************/
-
-Highlightable::Highlightable(ScriptableType type)
-	: Scriptable( type )
-{
-	outline = NULL;
-	Highlight = false;
-	Cursor = IE_CURSOR_NORMAL;
-	outlineColor = ColorBlack;
-	TrapDetectionDiff = TrapRemovalDiff = Trapped = TrapDetected = 0;
-}
 
 bool Highlightable::IsOver(const Point &Place) const
 {
@@ -1895,31 +1871,6 @@ bool Highlightable::PossibleToSeeTrap() const
 /*****************
  * Movable Class *
  *****************/
-
-Movable::Movable(ScriptableType type)
-	: Selectable( type )
-{
-	bumpBackTries = 0;
-	bumped = false;
-	oldPos = Pos;
-	Destination = Pos;
-	Orientation = 0;
-	NewOrientation = 0;
-	StanceID = 0;
-	path = NULL;
-	step = NULL;
-	timeStartStep = 0;
-	AttackMovements[0] = 100;
-	AttackMovements[1] = 0;
-	AttackMovements[2] = 0;
-	maxWalkDistance = 0;
-	prevTicks = 0;
-	pathTries = 0;
-	randomBackoff = 0;
-	pathfindingDistance = size;
-	randomWalkCounter = 0;
-	pathAbandoned = false;
-}
 
 Movable::~Movable(void)
 {
@@ -2414,15 +2365,6 @@ void Movable::ClearPath(bool resetDestination)
 /**********************
  * Tiled Object Class *
  **********************/
-
-TileObject::TileObject()
-{
-	opentiles = NULL;
-	opencount = 0;
-	closedtiles = NULL;
-	closedcount = 0;
-	Flags = 0;
-}
 
 TileObject::~TileObject()
 {

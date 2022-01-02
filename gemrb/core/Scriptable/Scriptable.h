@@ -22,6 +22,7 @@
 #define SCRIPTABLE_H
 
 #include "exports.h"
+#include "ie_cursors.h"
 
 #include "CharAnimations.h"
 #include "Variables.h"
@@ -416,15 +417,15 @@ private:
 
 class GEM_EXPORT Selectable : public Scriptable {
 public:
-	explicit Selectable(ScriptableType type);
+	explicit Selectable(ScriptableType type) : Scriptable(type) {};
 public:
-	ieWord Selected; //could be 0x80 for unselectable
-	bool Over;
-	Color selectedColor;
-	Color overColor;
-	Holder<Sprite2D> circleBitmap[2];
-	int size;
-	float sizeFactor;
+	ieWord Selected = 0; // could be 0x80 for unselectable
+	bool Over = false;
+	Color selectedColor = ColorBlack;
+	Color overColor = ColorBlack;
+	Holder<Sprite2D> circleBitmap[2] = {};
+	int size = 0;
+	float sizeFactor = 1.0f;
 public:
 	void SetBBox(const Region &newBBox);
 	void DrawCircle(const Point& p) const;
@@ -437,20 +438,20 @@ public:
 
 class GEM_EXPORT Highlightable : public Scriptable {
 public:
-	explicit Highlightable(ScriptableType type);
+	explicit Highlightable(ScriptableType type) : Scriptable(type) {};
 	virtual int TrapResets() const = 0;
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
 public:
-	std::shared_ptr<Gem_Polygon> outline;
-	Color outlineColor;
-	ieDword Cursor;
-	bool Highlight;
+	std::shared_ptr<Gem_Polygon> outline = nullptr;
+	Color outlineColor = ColorBlack;
+	ieDword Cursor = IE_CURSOR_NORMAL;
+	bool Highlight = false;
 	Point TrapLaunch = Point(-1, -1);
-	ieWord TrapDetectionDiff;
-	ieWord TrapRemovalDiff;
-	ieWord Trapped;
-	ieWord TrapDetected;
+	ieWord TrapDetectionDiff = 0;
+	ieWord TrapRemovalDiff = 0;
+	ieWord Trapped = 0;
+	ieWord TrapDetected = 0;
 	ResRef KeyResRef;
 	//play this wav file when stepping on the trap (on PST)
 	ResRef EnterWav;
@@ -480,24 +481,25 @@ public:
 
 class GEM_EXPORT Movable : public Selectable {
 private: //these seem to be sensitive, so get protection
-	unsigned char StanceID;
-	unsigned char Orientation, NewOrientation;
-	ieWord AttackMovements[3];
+	unsigned char StanceID = 0;
+	unsigned char Orientation = 0;
+	unsigned char NewOrientation = 0;
+	ieWord AttackMovements[3] = { 100, 0 , 0 };
 
-	PathNode* path; //whole path
-	PathNode* step; //actual step
-	unsigned int prevTicks;
-	int bumpBackTries;
-	bool pathAbandoned;
+	PathNode* path = nullptr; // whole path
+	PathNode* step = nullptr; // actual step
+	unsigned int prevTicks = 0;
+	int bumpBackTries = 0;
+	bool pathAbandoned = false;
 protected:
-	ieDword timeStartStep;
+	ieDword timeStartStep = 0;
 	//the # of previous tries to pick up a new walkpath
-	int pathTries;
-	int randomBackoff;
-	Point oldPos;
-	bool bumped;
-	int pathfindingDistance;
-	int randomWalkCounter;
+	int pathTries = 0;
+	int randomBackoff = 0;
+	Point oldPos = Pos;
+	bool bumped = false;
+	int pathfindingDistance = size;
+	int randomWalkCounter = 0;
 public:
 	inline int GetRandomBackoff() const
 	{
@@ -508,12 +510,13 @@ public:
 	{
 		randomBackoff--;
 	}
-	explicit Movable(ScriptableType type);
+	explicit Movable(ScriptableType type) : Selectable(type) {};
 	~Movable(void) override;
-	Point Destination;
+
+	Point Destination = Pos;
 	ResRef Area;
 	Point HomeLocation;//spawnpoint, return here after rest
-	ieWord maxWalkDistance;//maximum random walk distance from home
+	ieWord maxWalkDistance = 0; // maximum random walk distance from home
 public:
 	inline void ImpedeBumping() { oldPos = Pos; bumped = false; }
 	void AdjustPosition();
@@ -572,7 +575,7 @@ public:
 //are they scriptable?
 class GEM_EXPORT TileObject {
 public:
-	TileObject(void);
+	TileObject(void) = default;
 	~TileObject(void);
 	void SetOpenTiles(unsigned short *indices, int count);
 	void SetClosedTiles(unsigned short *indices, int count);
@@ -580,11 +583,11 @@ public:
 public:
 	ieVariable Name;
 	ResRef Tileset; //or wed door ID?
-	ieDword Flags;
-	unsigned short* opentiles;
-	ieDword opencount;
-	unsigned short* closedtiles;
-	ieDword closedcount;
+	ieDword Flags = 0;
+	unsigned short* opentiles = nullptr;
+	ieDword opencount = 0;
+	unsigned short* closedtiles = nullptr;
+	ieDword closedcount = 0;
 };
 
 }
