@@ -417,7 +417,7 @@ private:
 
 class GEM_EXPORT Selectable : public Scriptable {
 public:
-	explicit Selectable(ScriptableType type) : Scriptable(type) {};
+	using Scriptable::Scriptable;
 public:
 	ieWord Selected = 0; // could be 0x80 for unselectable
 	bool Over = false;
@@ -438,7 +438,7 @@ public:
 
 class GEM_EXPORT Highlightable : public Scriptable {
 public:
-	explicit Highlightable(ScriptableType type) : Scriptable(type) {};
+	using Scriptable::Scriptable;
 	virtual int TrapResets() const = 0;
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
@@ -510,7 +510,7 @@ public:
 	{
 		randomBackoff--;
 	}
-	explicit Movable(ScriptableType type) : Selectable(type) {};
+	using Selectable::Selectable;
 	~Movable(void) override;
 
 	Point Destination = Pos;

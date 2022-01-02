@@ -1746,7 +1746,7 @@ def UpdatePortraitWindow ():
 		# only frames have all the glyphs
 		# only bg2 and iwds have a proper blank glyph
 		# so avoid using blanks except in bg2
-		talk = store = flag = blank = bytearray([33])
+		flag = blank = bytearray([33])
 		if GameCheck.IsBG2():
 			# only BG2 has icons for talk or store
 			flag = blank = bytearray([238])

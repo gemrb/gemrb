@@ -34,9 +34,9 @@ namespace GemRB {
 
 template<typename T>
 struct HashKey {
-	static inline unsigned int hash(const T &key);
-	static inline bool equals(const T &a, const T &b);
-	static inline void copy(T &a, const T &b);
+	static unsigned int hash(const T &key);
+	static bool equals(const T &a, const T &b);
+	static void copy(T &a, const T &b);
 };
 
 #define HASHMAP_DEFINE_TRIVIAL_HASHKEY(T)			\
