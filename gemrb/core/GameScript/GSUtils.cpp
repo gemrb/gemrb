@@ -354,7 +354,10 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, ieDword valu
 	if (!actor) {
 		return;
 	}
+	// it should play out the sequence once and stop
 	actor->SetStance( value );
+	// it's a blocking action family, but the original didn't actually block
+	// TODO: reset the stance back once done
 }
 
 void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone)
