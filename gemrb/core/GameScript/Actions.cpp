@@ -7162,6 +7162,8 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	}
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
+	// it should probably wait until projectile payload, but a single tick works well for the use in 41cnatew
+	Sender->SetWait(1);
 }
 
 
