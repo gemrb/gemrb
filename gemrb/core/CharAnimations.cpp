@@ -1986,7 +1986,8 @@ void CharAnimations::GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
 
 	dest = "wq";
 	dest += GetSize();
-	dest += equipRef;
+	dest += equipRef[0];
+	dest += equipRef[1];
 	if (offhand) {
 		dest += "o";
 	}
@@ -2235,13 +2236,15 @@ void CharAnimations::GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
 		//i think there is no offhand stuff for bg1, lets use the bg2 equivalent here?
 		dest = "wq";
 		dest += GetSize();
-		dest += equipRef;
+		dest += equipRef[0];
+		dest += equipRef[1];
 		dest += "o";
 		dest += equip->Suffix;
 	} else {
 		dest = "wp";
 		dest += GetSize();
-		dest += equipRef;
+		dest += equipRef[0];
+		dest += equipRef[1];
 		dest += equip->Suffix;
 	}
 }
