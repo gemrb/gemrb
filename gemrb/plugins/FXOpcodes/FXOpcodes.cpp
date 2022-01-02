@@ -4339,8 +4339,15 @@ static const int xpos_by_direction[16]={0,-10,-12,-14,-16,-14,-12,-10,0,10,12,14
 int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_casting_glow(%2d): Type: %d", fx->Opcode, fx->Parameter2);
+
 	if (fx->Parameter2 < gamedata->castingGlows.size()) {
-		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(gamedata->castingGlows[fx->Parameter2], false);
+		// check if we're in SpellCastEffect mode for iwd2
+		ResRef& animRef = gamedata->castingGlows[fx->Parameter2];
+		if (fx->Parameter4) {
+			animRef = gamedata->castingHits[fx->Parameter2];
+		}
+
+		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(animRef, false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;

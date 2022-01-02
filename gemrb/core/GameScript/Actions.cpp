@@ -7083,6 +7083,8 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	}
 	adjustedDuration *= 10; // it's really not AI_UPDATE_TIME
 
+	// tell the effect to not use the main casting glow
+	fx->Parameter4 = 1;
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->Parameter2 = sparkle; //animation type
