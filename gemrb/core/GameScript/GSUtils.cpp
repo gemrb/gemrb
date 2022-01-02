@@ -556,7 +556,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 		bool los = true;
 		if (Sender->Type == ST_ACTOR) {
 			const Actor *snd = static_cast<const Actor*>(Sender);
-			dist = snd->Modified[IE_VISUALRANGE];
+			dist = snd->Modified[IE_VISUALRANGE] / 2;
 		} else {
 			dist = VOODOO_VISUAL_RANGE;
 			los = false;
