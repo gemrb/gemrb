@@ -160,6 +160,7 @@ private:
 public:
 	std::vector<ResRef> defaultSounds;
 	std::vector<ResRef> castingGlows;
+	std::vector<ResRef> castingHits;
 	std::vector<int> castingSounds;
 	std::vector<ResRef> spellHits;
 };

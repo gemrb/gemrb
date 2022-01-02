@@ -38,13 +38,18 @@ static void Initializer()
 
 	size_t count = tm->GetRowCount();
 	gamedata->castingGlows.resize(count);
+	gamedata->castingHits.resize(count);
 	gamedata->castingSounds.resize(count);
 	for (size_t i = 0; i < count; i++) {
 		gamedata->castingGlows[i] = tm->QueryField(i, 0);
 		gamedata->castingSounds[i] = atoi(tm->QueryField(i, 1));
+		gamedata->castingHits[i] = tm->QueryField(i, 2);
 		// * marks an empty resource
 		if (IsStar(gamedata->castingGlows[i])) {
 			gamedata->castingGlows[i].Reset();
+		}
+		if (IsStar(gamedata->castingHits[i])) {
+			gamedata->castingHits[i].Reset();
 		}
 	}
 
