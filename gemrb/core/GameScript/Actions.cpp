@@ -7072,8 +7072,21 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_CASTING,
-				Sender->Pos, 0);
+	unsigned int channel = SFX_CHAN_DIALOG;
+	if (actor->InParty > 0) {
+		channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
+	} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		channel = SFX_CHAN_MONSTER;
+	}
+
+	// voice
+	core->GetAudioDrv()->Play(parameters->string0Parameter, channel, Sender->Pos, GEM_SND_SPEECH | GEM_SND_QUEUE);
+	// starting sound, played at the same time, but on a different channel
+	core->GetAudioDrv()->Play(parameters->string1Parameter, SFX_CHAN_CASTING, Sender->Pos, GEM_SND_QUEUE);
+	// NOTE: only a few uses have also an ending sound that plays when the effect ends (also stopping Sound1)
+	// but we don't even read all three string parameters, as Action stores just two
+	// seems like a waste of memory to impose it on everyone, just for these few users
+	// if it happens at some point, fx->Resource = parameters->string2Parameter and deal with it in the effect
 
 	const Actor* caster = Scriptable::As<Actor>(Sender);
 	int adjustedDuration = 0;
