@@ -74,8 +74,8 @@ public:
 	ResRef ID; //WED ID
 	Holder<TileOverlay> overlay;
 	std::vector<ieWord> tiles;
-	ieDword Flags;
-	int closedIndex;
+	ieDword Flags = 0;
+	int closedIndex = 0;
 	//trigger areas
 	DoorTrigger doorTrigger;
 	Region& OpenBBox = BBox; // an alias for the base class BBox
@@ -89,11 +89,13 @@ public:
 	ResRef CloseSound;
 	ResRef LockSound;
 	ResRef UnLockSound;
-	ieDword DiscoveryDiff;
-	ieDword LockDifficulty; //this is a dword?
-	ieStrRef OpenStrRef;
-	ieStrRef NameStrRef;
-	ieWord hp, ac;          //unused???, but learned from IE DEV info
+	ieDword DiscoveryDiff = 0;
+	ieDword LockDifficulty = 0; //this is a dword?
+	ieStrRef OpenStrRef = (ieDword) -1;
+	ieStrRef NameStrRef = 0;
+	// unused, but learned from IE DEV info
+	ieWord hp = 0;
+	ieWord ac = 0;
 private:
 	void ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const;
 	void UpdateDoor();

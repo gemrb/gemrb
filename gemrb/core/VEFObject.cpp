@@ -34,11 +34,6 @@
 
 namespace GemRB {
 
-VEFObject::VEFObject()
-{
-	SingleObject=false;
-}
-
 VEFObject::VEFObject(ScriptedAnimation *sca)
 {
 	Pos = sca->Pos;

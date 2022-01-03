@@ -62,13 +62,10 @@ public:
 		UpdateAlpha();
 	}
 
-	Palette() {
-		named = false;
-		version = 0;
-	}
+	Palette() = default;
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
-	bool named; //< true if the palette comes from a bmp and cached
+	bool named = false; //< true if the palette comes from a bmp and cached
 
 	unsigned short GetVersion() const { return version; }
 
@@ -88,7 +85,7 @@ public:
 	bool operator==(const Palette&) const;
 	bool operator!=(const Palette&) const;
 private:
-	unsigned short version;
+	unsigned short version = 0;
 	bool alpha = false; // true if any colors in the palette have an alpha < 255
 	// FIXME: version is not enough since `col` is public
 	// must make it private to fully capture changes to it

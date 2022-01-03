@@ -38,15 +38,7 @@ namespace GemRB {
 Container::Container(void)
 	: Highlightable( ST_CONTAINER )
 {
-	containerType = 0;
-	LockDifficulty = 0;
-	Flags = 0;
-	TrapDetectionDiff = 0;
-	TrapRemovalDiff = 0;
-	Trapped = 0;
-	TrapDetected = 0;
 	inventory.SetInventoryType(ieInventoryType::HEAP);
-	OpenFail = 0;
 }
 
 Region Container::DrawingRegion() const

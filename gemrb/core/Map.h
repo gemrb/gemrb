@@ -282,28 +282,28 @@ public:
 	mutable std::vector<Animation> animation; // FIXME: we need an "update" step, currently we do it in Draw() wich should remian const
 	//dwords, or stuff combining to a dword
 	Point Pos;
-	ieDword appearance;
-	ieDword Flags;
+	ieDword appearance = 0;
+	ieDword Flags = 0;
 	// flags that must be touched by PST a bit only
-	ieDword originalFlags;
+	ieDword originalFlags = 0;
 	//these are on one dword
-	ieWord sequence;
-	ieWord frame;
+	ieWord sequence = 0;
+	ieWord frame = 0;
 	//these are on one dword
-	ieWord transparency;
-	ieWordSigned height;
+	ieWord transparency = 0;
+	ieWordSigned height = 0;
 	//these are on one dword
-	ieWord startFrameRange;
-	ieByte skipcycle;
-	ieByte startchance;
-	ieDword unknown48;
+	ieWord startFrameRange = 0;
+	ieByte skipcycle = 0;
+	ieByte startchance = 0;
+	ieDword unknown48 = 0;
 	//string values, not in any particular order
 	ieVariable Name;
 	ResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ResRef PaletteRef;
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
-	AreaAnimation();
+	AreaAnimation() = default;
 	AreaAnimation(const AreaAnimation& src);
 
 	void InitAnimation();

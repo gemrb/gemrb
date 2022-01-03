@@ -42,10 +42,6 @@ static bool inited = false;
 InfoPoint::InfoPoint(void)
 	: Highlightable( ST_TRIGGER )
 {
-	Flags = 0;
-	TrapDetectionDiff = 0;
-	TrapRemovalDiff = 0;
-	TrapDetected = 0;
 	if (!inited) {
 		inited = true;
 		//TRAP_USEPOINT may have three values
@@ -56,7 +52,6 @@ InfoPoint::InfoPoint(void)
 		else if (core->HasFeature(GF_USEPOINT_200)) TRAP_USEPOINT = _TRAVEL_NONPC;
 		else TRAP_USEPOINT = 0;
 	}
-	StrRef = 0;
 }
 
 void InfoPoint::SetEnter(const char *resref)

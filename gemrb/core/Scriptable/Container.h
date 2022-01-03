@@ -62,11 +62,11 @@ private:
 	void RefreshGroundIcons();
 public:
 	Point toOpen;
-	ieWord containerType;
-	ieDword Flags;
-	ieWord LockDifficulty;
+	ieWord containerType = 0;
+	ieDword Flags = 0;
+	ieWord LockDifficulty = 0;
 	Inventory inventory;
-	ieStrRef OpenFail;
+	ieStrRef OpenFail = 0;
 	//these are not saved
 	std::array<Holder<Sprite2D>, 3> groundicons;
 	//keyresref is stored in Highlightable

@@ -3828,13 +3828,6 @@ unsigned int Map::GetLightLevel(const Point &p) const
 ////////////////////AreaAnimation//////////////////
 //Area animation
 
-AreaAnimation::AreaAnimation()
-{
-	appearance = sequence = frame = transparency = height = 0;
-	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
-	unknown48 = 0;
-}
-
 AreaAnimation::AreaAnimation(const AreaAnimation &src)
 {
 	animation = src.animation;

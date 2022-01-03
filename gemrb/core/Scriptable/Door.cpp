@@ -65,10 +65,6 @@ std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon(bool open) const
 Door::Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger)
 : Highlightable( ST_DOOR ), overlay(std::move(Overlay)), doorTrigger(std::move(trigger))
 {
-	Flags = 0;
-	OpenStrRef = (ieDword) -1;
-	closedIndex = NameStrRef = hp = ac = 0;
-	DiscoveryDiff = LockDifficulty = 0;
 }
 
 void Door::ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const

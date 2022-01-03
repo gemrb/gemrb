@@ -52,13 +52,13 @@ public:
 	ResRef ResName;
 	Point Pos; // position of the effect in game coordinates
 
-	VEFObject();
+	VEFObject() = default;
 	explicit VEFObject(ScriptedAnimation *sca);
 	~VEFObject();
 private:
 	std::vector<ScheduleEntry> entries;
 	std::vector<ScheduleEntry> drawQueue;
-	bool SingleObject;
+	bool SingleObject = false;
 public:
 	//adds a new entry (use when loading)
 	void AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, VEFTypes type, ieDword gtime);
