@@ -60,38 +60,6 @@ static const ieByte SixteenToFive[3*MAX_ORIENT]={
 	10,10,11,11,12,12,13,13,14,14,13,13,12,12,11,11
 };
 
-ScriptedAnimation::ScriptedAnimation()
-{
-	Init();
-}
-
-void ScriptedAnimation::Init()
-{
-	memset(anims,0,sizeof(anims));
-	Transparency = 0;
-	Fade = 0;
-	SequenceFlags = 0;
-	XOffset = YOffset = ZOffset = 0;
-	FrameRate = ANI_DEFAULT_FRAMERATE;
-	NumOrientations = 0;
-	Orientation = 0;
-	OrientationFlags = 0;
-	Dither = 0;
-	Duration = 0xffffffff;
-	justCreated = true;
-	twin = NULL;
-	Phase = P_NOTINITED;
-	SoundPhase = P_NOTINITED;
-	effect_owned = false;
-	active = true;
-	Delay = 0;
-	light = NULL;
-	LightX = 0;
-	LightY = 0;
-	LightZ = 0;
-	starttime = 0;
-}
-
 Animation *ScriptedAnimation::PrepareAnimation(const AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop) const
 {
 	int c = cycle;
@@ -229,7 +197,6 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 /* Creating animation from VVC */
 ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 {
-	Init();
 	if (!stream) {
 		return;
 	}

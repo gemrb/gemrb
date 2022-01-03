@@ -96,43 +96,42 @@ class Sprite2D;
 
 class GEM_EXPORT ScriptedAnimation {
 public:
-	ScriptedAnimation();
+	ScriptedAnimation() = default;
 	~ScriptedAnimation(void);
 	explicit ScriptedAnimation(DataStream* stream);
-	void Init();
 	void LoadAnimationFactory(AnimationFactory *af, int gettwin = 0);
 	//there are 3 phases: start, hold, release
 	//it will usually cycle in the 2. phase
 	//the anims could also be used 'orientation based' if NumOrientations is
 	//set to 5, 9, 16
-	Animation* anims[3*MAX_ORIENT];
+	Animation* anims[3 * MAX_ORIENT]{};
 	//there is only one palette
 	Holder<Palette> palette;
 	ResRef sounds[3];
 	Color Tint = ColorWhite;
-	int Fade;
-	ieDword Transparency;
-	ieDword SequenceFlags;
-	int Dither;
+	int Fade = 0;
+	ieDword Transparency = 0;
+	ieDword SequenceFlags = 0;
+	int Dither = 0;
 	Point Pos; // position of the effect in game coordinates
-	int XOffset, YOffset, ZOffset; // orientation relative to Pos
-	ieDword LightX, LightY, LightZ;
-	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
-	ieDword FrameRate;
-	ieDword NumOrientations;
-	ieDword Orientation;
-	ieDword OrientationFlags;
-	ieDword Duration;
-	ieDword Delay;
-	bool justCreated;
+	int XOffset = 0, YOffset = 0, ZOffset = 0; // orientation relative to Pos
+	ieDword LightX = 0, LightY = 0, LightZ = 0;
+	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation
+	ieDword FrameRate = ANI_DEFAULT_FRAMERATE;
+	ieDword NumOrientations = 0;
+	ieDword Orientation = 0;
+	ieDword OrientationFlags = 0;
+	ieDword Duration = 0xffffffff;
+	ieDword Delay = 0;
+	bool justCreated = true;
 	ResRef ResName;
-	int Phase;
-	int SoundPhase;
-	ScriptedAnimation *twin;
-	bool active;
-	bool effect_owned;
+	int Phase = P_NOTINITED;
+	int SoundPhase = P_NOTINITED;
+	ScriptedAnimation* twin = nullptr;
+	bool active = true;
+	bool effect_owned = false;
 	Holder<SoundHandle> sound_handle;
-	tick_t starttime;
+	tick_t starttime = 0;
 public:
 	//draws the next frame of the videocell
 	bool UpdateDrawingState(int orientation);
