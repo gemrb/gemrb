@@ -121,7 +121,7 @@ public:
 	void Rewind();
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
-	void ReadDecrypted(void* buf, strpos_t size) const;
+	void ReadDecrypted(void* buf, strpos_t encSize) const;
 	strret_t ReadLine(void* buf, strpos_t maxlen);
 	/** Endian Switch setup */
 	static void SetBigEndian(bool be);

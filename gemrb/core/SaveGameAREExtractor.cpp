@@ -164,14 +164,14 @@ void SaveGameAREExtractor::registerLocation(const char *name, unsigned long pos)
 	areLocations.emplace(std::make_pair(std::move(key), pos));
 }
 
-void SaveGameAREExtractor::changeSaveGame(SaveGame *saveGame) {
-	if (this->saveGame != nullptr) {
-		this->saveGame->release();
+void SaveGameAREExtractor::changeSaveGame(SaveGame* newSave) {
+	if (saveGame != nullptr) {
+		saveGame->release();
 	}
 
-	this->saveGame = saveGame;
-	if (this->saveGame != nullptr) {
-		this->saveGame->acquire();
+	saveGame = newSave;
+	if (saveGame != nullptr) {
+		saveGame->acquire();
 	}
 
 	areLocations.clear();

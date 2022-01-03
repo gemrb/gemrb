@@ -9570,8 +9570,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if ((Slottype!=-1) && (Slottype & SLOT_WEAPON)) {
-		const CREItem *item = actor->inventory.GetUsedWeapon(false, Effect); //recycled variable
-		if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
+		const CREItem* weapon = actor->inventory.GetUsedWeapon(false, Effect);
+		if (weapon && (weapon->Flags & IE_INV_ITEM_CURSED)) {
 			displaymsg->DisplayConstantString(STR_CURSED, DMC_WHITE);
 			return PyInt_FromLong(ASI_FAILED);
 		}

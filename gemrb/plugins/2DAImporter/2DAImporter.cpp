@@ -87,20 +87,22 @@ bool p2DAImporter::Open(DataStream* str)
 		ptrs.push_back( line );
 		if (colHead) {
 			colHead = false;
-			char* str = strtok( line, " " );
-			while (str != NULL) {
-				colNames.push_back( str );
-				str = strtok( NULL, " " );
+			char* cell = strtok(line, " ");
+			while (cell != nullptr) {
+				colNames.push_back(cell);
+				cell = strtok(nullptr, " ");
 			}
 		} else {
-			char* str = strtok( line, " " );
-			if (str == NULL)
-				continue;
-			rowNames.push_back( str );
+			char* cell = strtok(line, " ");
+			if (cell == nullptr) continue;
+
+			rowNames.push_back(cell);
 			rows.emplace_back();
 			rows[row].reserve(10);
-			while (( str = strtok( NULL, " " ) ) != NULL) {
-				rows[row].push_back( str );
+			cell = strtok(nullptr, " ");
+			while (cell != nullptr) {
+				rows[row].push_back(cell);
+				cell = strtok(nullptr, " ");
 			}
 			row++;
 		}

@@ -62,12 +62,12 @@ bool IDSImporter::Open(DataStream* str)
 		}
 		if (len < 256)
 			line = ( char * ) realloc( line, len + 1 );
-		char* str = strtok( line, " " );
+		char* cell = strtok(line, " ");
 		Pair p;
-		p.val = strtosigned<int>(str, nullptr, 0);
-		str = strtok( NULL, " " );
-		p.str = str;
-		if (str != NULL) {
+		p.val = strtosigned<int>(cell, nullptr, 0);
+		cell = strtok(nullptr, " ");
+		p.str = cell;
+		if (cell != nullptr) {
 			ptrs.push_back( line );
 			pairs.push_back( p );
 		} else {

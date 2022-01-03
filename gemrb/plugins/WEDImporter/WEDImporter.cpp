@@ -90,11 +90,11 @@ bool WEDImporter::Open(DataStream* stream)
 	return true;
 }
 
-int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const
+int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) const
 {
 	int usedoverlays = 0;
 
-	ResRef res = overlays->TilesetResRef;
+	ResRef res = newOverlays->TilesetResRef;
 	uint8_t len = res.CStrLen();
 	// in BG1 extended night WEDs alway reference the day TIS instead of the matching night TIS
 	if (ExtendedNight && len == 6) {
@@ -118,12 +118,11 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 	}
 	PluginHolder<TileSetMgr> tis = MakePluginHolder<TileSetMgr>(IE_TIS_CLASS_ID);
 	tis->Open( tisfile );
-	auto over = MakeHolder<TileOverlay>(Size(overlays->Width, overlays->Height));
-	for (int y = 0; y < overlays->Height; y++) {
-		for (int x = 0; x < overlays->Width; x++) {
-			str->Seek( overlays->TilemapOffset +
-				( y * overlays->Width + x) * 10,
-				GEM_STREAM_START );
+	auto over = MakeHolder<TileOverlay>(Size(newOverlays->Width, newOverlays->Height));
+	for (int y = 0; y < newOverlays->Height; y++) {
+		for (int x = 0; x < newOverlays->Width; x++) {
+			str->Seek(newOverlays->TilemapOffset + (y * newOverlays->Width + x) * 10, GEM_STREAM_START);
+
 			ieWord startindex, count, secondary;
 			ieByte overlaymask, animspeed;
 			str->ReadWord(startindex);
@@ -135,8 +134,7 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 			if (animspeed == 0) {
 				animspeed = ANI_DEFAULT_FRAMERATE;
 			}
-			str->Seek( overlays->TILOffset + ( startindex * 2 ),
-				GEM_STREAM_START );
+			str->Seek(newOverlays->TILOffset + startindex * 2, GEM_STREAM_START);
 			std::vector<ieWord> indices(count);
 			str->Read(&indices[0], count * sizeof(ieWord));
 			if( DataStream::BigEndian()) {
@@ -395,8 +393,8 @@ std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 		polygonGroups.emplace_back();
 		WallPolygonGroup& group = polygonGroups.back();
 
-		for (ieWord i = index; i < index + count; ++i) {
-			ieWord polyIndex = PLT[i];
+		for (ieWord j = index; j < index + count; ++j) {
+			ieWord polyIndex = PLT[j];
 			auto wp = polygonTable[polyIndex];
 			if (wp) {
 				group.push_back(wp);

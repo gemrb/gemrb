@@ -65,9 +65,9 @@ bool DataStream::CheckEncrypted()
 	return false;
 }
 /** No descriptions */
-void DataStream::ReadDecrypted(void* buf, strpos_t size) const
+void DataStream::ReadDecrypted(void* buf, strpos_t encSize) const
 {
-	for (unsigned int i = 0; i < size; i++)
+	for (unsigned int i = 0; i < encSize; i++)
 		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
 }
 

@@ -63,7 +63,7 @@ private:
 
 private:
 	void GetDoorPolygonCount(ieWord count, ieDword offset);
-	int AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const;
+	int AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) const;
 	void ReadWallPolygons();
 	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const override;
 
