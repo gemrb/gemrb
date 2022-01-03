@@ -2497,7 +2497,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		}
 		func( Sender, aC );
 	} else {
-		actions[actionID] = NoActionAtAll;
+		actions[actionID] = NoAction;
 		StringBuffer buffer;
 		buffer.append("Unknown ");
 		PrintAction(buffer, actionID);

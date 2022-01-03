@@ -110,20 +110,9 @@ void GameScript::RemoveAreaType(Scriptable* Sender, Action* parameters)
 	map->AreaType &= ~MapEnv(parameters->int0Parameter);
 }
 
-void GameScript::NoActionAtAll(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::NoAction(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	//thats all :)
-}
-
-// this action stops modal actions, so...
-void GameScript::NoAction(Scriptable* Sender, Action* /*parameters*/)
-{
-	Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
-		return;
-	}
-
-	actor->SetModal( MS_NONE);
 }
 
 void GameScript::SG(Scriptable* Sender, Action* parameters)

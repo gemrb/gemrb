@@ -1179,7 +1179,6 @@ public: //Script Functions
 	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
 	static void NIDSpecial2(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
-	static void NoActionAtAll(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void Panic(Scriptable* Sender, Action* parameters);
 	static void PauseGame(Scriptable *Sender, Action* parameters);
