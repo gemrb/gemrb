@@ -695,6 +695,115 @@ const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned i
 	return NULL;
 }
 
+// handle wild surge projectile modifiers
+void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int level)
+{
+	Actor* caster = Scriptable::As<Actor>(this);
+	assert(caster);
+
+	int count;
+	const Actor *newact = nullptr;
+	const SPLExtHeader* seh = nullptr;
+	Effect* fx = nullptr;
+	// check for target (type) change
+	switch (caster->wildSurgeMods.target_change_type) {
+		case WSTC_SETTYPE:
+			seh = &spl->ext_headers[SpellHeader];
+			for (Effect* feature : seh->features) {
+				feature->Target = caster->wildSurgeMods.target_type;
+			}
+			// we need to fetch the projectile, so the effect queue is created
+			// (skipped above)
+			delete pro;
+			pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+			pro->SetCaster(GetGlobalID(), level);
+			break;
+		case WSTC_ADDTYPE:
+			// TODO: unhardcode to allow for mixing all the target types
+			// caster gets selftargeting fx when the projectile is fetched above
+			seh = &spl->ext_headers[SpellHeader];
+			for (Effect* feature : seh->features) {
+				if (feature->Target == FX_TARGET_SELF) {
+					feature->Target = caster->wildSurgeMods.target_type;
+				} else {
+					// also apply to the caster
+					fx = feature;
+					core->ApplyEffect(fx, caster, caster);
+				}
+			}
+			// we need to refetch the projectile, so the effect queue is created
+			delete pro; // don't leak the original one
+			pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+			pro->SetCaster(GetGlobalID(), level);
+			break;
+		case WSTC_RANDOMIZE:
+			count = area->GetActorCount(false);
+			newact = area->GetActor(core->Roll(1, count, -1), false);
+			if (count > 1 && newact == caster) {
+				while (newact == caster) {
+					newact = area->GetActor(core->Roll(1, count, -1), false);
+				}
+			}
+			if (tgt) {
+				LastSpellTarget = newact->GetGlobalID();
+				LastTargetPos = newact->Pos;
+			} else {
+				// no better idea; I wonder if the original randomized point targets at all
+				LastTargetPos = newact->Pos;
+			}
+
+			// make it also work for self-targeting spells:
+			// change the payload or this was all in vain
+			seh = &spl->ext_headers[SpellHeader];
+			for (Effect* feature : seh->features) {
+				if (feature->Target == FX_TARGET_SELF) {
+					feature->Target = FX_TARGET_PRESET;
+				}
+			}
+			// we need to fetch the projectile, so the effect queue is created
+			// (skipped above)
+			delete pro;
+			pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+			pro->SetCaster(GetGlobalID(), level);
+			break;
+		default: //0 - do nothing
+			break;
+	}
+
+	// apply the saving throw mod
+	if (caster->wildSurgeMods.saving_throw_mod) {
+		seh = &spl->ext_headers[SpellHeader];
+		for (Effect* feature : seh->features) {
+			feature->SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
+		}
+	}
+
+	// change the projectile
+	if (caster->wildSurgeMods.projectile_id) {
+		spl->ext_headers[SpellHeader].ProjectileAnimation = caster->wildSurgeMods.projectile_id;
+		// make it also work for self-targeting spells:
+		// change the payload or this was all in vain
+		seh = &spl->ext_headers[SpellHeader];
+		for (Effect* feature : seh->features) {
+			if (feature->Target == FX_TARGET_SELF) {
+				feature->Target = FX_TARGET_PRESET;
+			}
+		}
+		// we need to refetch the projectile, so the new one is used
+		delete pro; // don't leak the original one
+		pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+		pro->SetCaster(GetGlobalID(), level);
+	}
+
+	// check for the speed mod
+	if (caster->wildSurgeMods.projectile_speed_mod) {
+		pro->Speed = (pro->Speed * caster->wildSurgeMods.projectile_speed_mod) / 100;
+		if (!pro->Speed) {
+			pro->Speed = 1;
+		}
+	}
+}
+
 void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int level, bool fake)
 {
 	Spell* spl = gamedata->GetSpell(spellResRef);
@@ -748,107 +857,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		}
 
 		if (caster) {
-			// check for target (type) change
-			int count;
-			const Actor *newact = nullptr;
-			const SPLExtHeader *seh = NULL;
-			Effect *fx = NULL;
-			switch (caster->wildSurgeMods.target_change_type) {
-				case WSTC_SETTYPE:
-					seh = &spl->ext_headers[SpellHeader];
-					for (Effect* feature : seh->features) {
-						feature->Target = caster->wildSurgeMods.target_type;
-					}
-					// we need to fetch the projectile, so the effect queue is created
-					// (skipped above)
-					delete pro;
-					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
-					pro->SetCaster(GetGlobalID(), level);
-					break;
-				case WSTC_ADDTYPE:
-					// TODO: unhardcode to allow for mixing all the target types
-					// caster gets selftargeting fx when the projectile is fetched above
-					seh = &spl->ext_headers[SpellHeader];
-					for (Effect* feature : seh->features) {
-						if (feature->Target == FX_TARGET_SELF) {
-							feature->Target = caster->wildSurgeMods.target_type;
-						} else {
-							// also apply to the caster
-							fx = feature;
-							core->ApplyEffect(fx, caster, caster);
-						}
-					}
-					// we need to refetch the projectile, so the effect queue is created
-					delete pro; // don't leak the original one
-					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
-					pro->SetCaster(GetGlobalID(), level);
-					break;
-				case WSTC_RANDOMIZE:
-					count = area->GetActorCount(false);
-					newact = area->GetActor(core->Roll(1,count,-1), false);
-					if (count > 1 && newact == caster) {
-						while (newact == caster) {
-							newact = area->GetActor(core->Roll(1,count,-1), false);
-						}
-					}
-					if (tgt) {
-						LastSpellTarget = newact->GetGlobalID();
-						LastTargetPos = newact->Pos;
-					} else {
-						// no better idea; I wonder if the original randomized point targets at all
-						LastTargetPos = newact->Pos;
-					}
-
-					// make it also work for self-targeting spells:
-					// change the payload or this was all in vain
-					seh = &spl->ext_headers[SpellHeader];
-					for (Effect* feature : seh->features) {
-						if (feature->Target == FX_TARGET_SELF) {
-							feature->Target = FX_TARGET_PRESET;
-						}
-					}
-					// we need to fetch the projectile, so the effect queue is created
-					// (skipped above)
-					delete pro;
-					pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
-					pro->SetCaster(GetGlobalID(), level);
-					break;
-				default: //0 - do nothing
-					break;
-			}
-
-			// apply the saving throw mod
-			if (caster->wildSurgeMods.saving_throw_mod) {
-				seh = &spl->ext_headers[SpellHeader];
-				for (Effect* feature : seh->features) {
-					feature->SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
-				}
-			}
-
-			// change the projectile
-			if (caster->wildSurgeMods.projectile_id) {
-				spl->ext_headers[SpellHeader].ProjectileAnimation = caster->wildSurgeMods.projectile_id;
-				// make it also work for self-targeting spells:
-				// change the payload or this was all in vain
-				seh = &spl->ext_headers[SpellHeader];
-				for (Effect* feature : seh->features) {
-					if (feature->Target == FX_TARGET_SELF) {
-						feature->Target = FX_TARGET_PRESET;
-					}
-				}
-				// we need to refetch the projectile, so the new one is used
-				delete pro; // don't leak the original one
-				pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
-				pro->SetCaster(GetGlobalID(), level);
-			}
-
-			// check for the speed mod
-			if (caster->wildSurgeMods.projectile_speed_mod) {
-				pro->Speed = (pro->Speed * caster->wildSurgeMods.projectile_speed_mod) / 100;
-				if (!pro->Speed) {
-					pro->Speed = 1;
-				}
-			}
+			ModifyProjectile(pro, spl, tgt, level);
 		}
 
 		if (tgt) {

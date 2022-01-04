@@ -45,6 +45,7 @@ class Map;
 class Movable;
 class Object;
 struct PathNode;
+class Projectile;
 class Scriptable;
 class Selectable;
 class Spell;
@@ -411,6 +412,7 @@ private:
 	void CreateProjectile(const ResRef& spellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
 	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster);
+	void ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int level);
 	void ResetCastingState(Actor* caster);
 	void DisplaySpellCastMessage(ieDword tgt, const Spell *spl);
 };
