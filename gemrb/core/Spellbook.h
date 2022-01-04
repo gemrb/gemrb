@@ -136,7 +136,7 @@ class GEM_EXPORT Spellbook {
 private:
 	std::vector<CRESpellMemorization*> *spells;
 	std::vector<SpellExtHeader*> spellinfo;
-	int sorcerer;
+	int sorcerer = 0;
 	int innate;
 
 	/** Sets spell from memorized as 'already-cast' */

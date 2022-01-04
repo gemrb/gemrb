@@ -32,17 +32,6 @@
 
 namespace GemRB {
 
-WMPAreaEntry::WMPAreaEntry()
-{
-	MapIcon = NULL;
-	StrCaption = NULL;
-	StrTooltip = NULL;
-	SingleFrame = false;
-	LocCaptionName = LocTooltipName = 0;
-	AreaLinksCount[0] = AreaLinksIndex[0] = 0;
-	IconSeq = AreaStatus = 0;
-}
-
 WMPAreaEntry::~WMPAreaEntry()
 {
 	delete StrCaption;
@@ -107,19 +96,6 @@ ieDword WMPAreaEntry::GetAreaStatus() const
 		tmp |=WMP_ENTRY_VISITED;
 	}
 	return tmp;
-}
-
-WorldMap::WorldMap(void)
-{
-	MapMOS = NULL;
-	Distances = NULL;
-	GotHereFrom = NULL;
-	bam = NULL;
-	encounterArea = -1;
-	Width = Height = 0;
-	MapNumber = AreaName = 0;
-	Flags = 0;
-	unknown1 = unknown2 = 0;
 }
 
 //Allocate AE and AL only in Core, otherwise Win32 will

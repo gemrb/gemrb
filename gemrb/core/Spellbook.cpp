@@ -50,7 +50,7 @@ Spellbook::Spellbook()
 		InitializeSpellbook();
 	}
 	spells = new std::vector<CRESpellMemorization*> [NUM_BOOK_TYPES];
-	sorcerer = 0;
+
 	if (IWD2Style) {
 		innate = 1<<IE_IWD2_SPELL_INNATE;
 	} else {

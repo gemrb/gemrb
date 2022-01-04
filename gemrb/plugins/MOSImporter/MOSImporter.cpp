@@ -28,11 +28,6 @@
 
 using namespace GemRB;
 
-MOSImporter::MOSImporter(void)
-{
-	Cols = Rows = BlockSize = PalOffset = 0;
-}
-
 bool MOSImporter::Import(DataStream* str)
 {
 	char Signature[8];

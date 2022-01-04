@@ -27,10 +27,11 @@ namespace GemRB {
 
 class PLTImporter : public PalettedImageMgr {
 private:
-	ieDword Width, Height;
-	void* pixels;
+	ieDword Width = 0;
+	ieDword Height = 0;
+	void* pixels = nullptr;
 public:
-	PLTImporter(void);
+	PLTImporter(void) = default;
 	~PLTImporter(void) override;
 	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D(unsigned int type, ieDword col[8]) override;

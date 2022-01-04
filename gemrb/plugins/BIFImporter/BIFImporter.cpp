@@ -32,14 +32,6 @@
 
 using namespace GemRB;
 
-BIFImporter::BIFImporter(void)
-{
-	stream = NULL;
-	fentries = NULL;
-	tentries = NULL;
-	fentcount = tentcount = 0;
-}
-
 BIFImporter::~BIFImporter(void)
 {
 	delete stream;

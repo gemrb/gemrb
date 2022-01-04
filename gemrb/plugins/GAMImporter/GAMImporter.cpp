@@ -39,15 +39,6 @@ using namespace GemRB;
 // if your compiler chokes on this, use -1 or 0xff whichever works for you
 #define UNINITIALIZED_CHAR '\xff'
 
-GAMImporter::GAMImporter(void)
-{
-	version = PCSize = PCOffset = PCCount = 0;
-	MazeOffset = NPCOffset = NPCCount = GlobalOffset = GlobalCount = 0;
-	JournalOffset = JournalCount = KillVarsOffset = KillVarsCount = 0;
-	FamiliarsOffset = SavedLocOffset = SavedLocCount = 0;
-	PPLocOffset = PPLocCount = 0;
-}
-
 bool GAMImporter::Import(DataStream* str)
 {
 	char Signature[8];

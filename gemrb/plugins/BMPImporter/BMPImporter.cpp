@@ -29,13 +29,6 @@ using namespace GemRB;
 
 #define BMP_HEADER_SIZE  54
 
-BMPImporter::BMPImporter(void)
-{
-	pixels = NULL;
-	Size = Compression = ImageSize = Planes = 0;
-	BitCount = PaddedRowLength = NumColors = 0;
-}
-
 BMPImporter::~BMPImporter(void)
 {
 	free(PaletteColors);

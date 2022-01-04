@@ -60,7 +60,7 @@ public:
 	char filename[16]; //8+1+3+1 padded to dword
 	char originalfile[_MAX_PATH];
 public:
-	DataStream(void);
+	DataStream(void) = default;
 	virtual ~DataStream() = default;
 	virtual strret_t Read(void* dest, strpos_t len) = 0;
 	virtual strret_t Write(const void* src, strpos_t len) = 0;
@@ -132,9 +132,9 @@ public:
 	 **/
 	virtual DataStream* Clone();
 protected:
-	strpos_t Pos;
-	strpos_t size;
-	bool Encrypted;
+	strpos_t Pos = 0;
+	strpos_t size = 0;
+	bool Encrypted = false;
 
 	static bool IsBigEndian;
 private:

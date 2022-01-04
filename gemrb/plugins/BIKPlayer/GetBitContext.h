@@ -29,9 +29,10 @@
 class VLC
 {
 public:
-	int bits;
-	int16_t (*table)[2]; ///< code, bits
-	int table_size, table_allocated;
+	int bits = 0;
+	int16_t (*table)[2] = nullptr; ///< code, bits
+	int table_size = 0;
+	int table_allocated = 0;
 public:
 	int init_vlc(int nb_bits, int nb_codes,
 		const void *bits, int bits_wrap, int bits_size,

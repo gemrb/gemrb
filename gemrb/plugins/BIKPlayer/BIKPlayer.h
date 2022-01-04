@@ -190,29 +190,29 @@ typedef struct Bundle {
 
 class BIKPlayer : public MoviePlayer {
 private:
-	bool validVideo;
-	binkheader header;
+	bool validVideo = false;
+	binkheader header{};
 	std::vector<binkframe> frames;
-	ieByte *inbuff;
+	ieByte* inbuff = nullptr;
 	
 	//audio context (consider packing it in a struct)
-	unsigned int s_frame_len;
-	unsigned int s_channels;
-	int s_overlap_len;
-	int s_block_size;
-	unsigned int *s_bands;
-	float s_root;
-	unsigned int s_num_bands;
-	int s_first;
-	bool s_audio;
-	int s_stream;  //openal stream handle
+	unsigned int s_frame_len = 0;
+	unsigned int s_channels = 0;
+	int s_overlap_len = 0;
+	int s_block_size = 0;
+	unsigned int* s_bands = nullptr;
+	float s_root = 0;
+	unsigned int s_num_bands = 0;
+	int s_first = 0;
+	bool s_audio = false;
+	int s_stream = 0; // openal stream handle
 
 #pragma pack(push,16)
 	FFTSample s_coeffs[BINK_BLOCK_MAX_SIZE];
 	short s_previous[BINK_BLOCK_MAX_SIZE / 16];  ///< coeffs from previous audio block
 #pragma pack(pop)
 
-	float *s_coeffs_ptr[MAX_CHANNELS]; ///< pointers to the coeffs arrays for float_to_int16_interleave
+	float* s_coeffs_ptr[MAX_CHANNELS]{}; ///< pointers to the coeffs arrays for float_to_int16_interleave
 
 	union {
 	      RDFTContext rdft;
@@ -221,23 +221,23 @@ private:
 	GetBitContext s_gb;
 
 	//video context (consider packing it in a struct)
-	AVRational v_timebase;
-	bool video_rendered_frame;
+	AVRational v_timebase{};
+	bool video_rendered_frame = false;
 
 	//bink specific
-	ScanTable c_scantable;
-	Bundle c_bundle[BINK_NB_SRC];  ///< bundles for decoding all data types
-	Tree c_col_high[16];         ///< trees for decoding high nibble in "colours" data type
-	int  c_col_lastval;          ///< value of last decoded high nibble in "colours" data type 
+	ScanTable c_scantable{};
+	Bundle c_bundle[BINK_NB_SRC]{};  ///< bundles for decoding all data types
+	Tree c_col_high[16]{};         ///< trees for decoding high nibble in "colours" data type
+	int  c_col_lastval = 0;          ///< value of last decoded high nibble in "colours" data type 
 
 	//huffman trees for video decoding
 	VLC bink_trees[16];
-	int16_t table[16 * 128][2];
+	int16_t table[16 * 128][2]{};
 	GetBitContext v_gb;
 	
 	AVFrame c_frames[2];
-	AVFrame *c_pic;
-	AVFrame *c_last;
+	AVFrame* c_pic = nullptr;
+	AVFrame* c_last = nullptr;
 
 private:
 	void segment_video_play();

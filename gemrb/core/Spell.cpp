@@ -71,25 +71,6 @@ private:
 	}
 };
 
-SPLExtHeader::SPLExtHeader(void)
-{
-	SpellForm = unknown2 = Target = TargetNumber = Hostile = 0;
-	RequiredLevel = CastingTime = ProjectileAnimation = Location = 0;
-	DiceSides = DiceThrown = DamageBonus = DamageType = Range = 0;
-	FeatureOffset = Charges = ChargeDepletion = 0;
-}
-
-Spell::Spell(void)
-{
-	SpellLevel = PrimaryType = SecondaryType = SpellDesc = SpellDescIdentified = 0;
-	CastingGraphics = CastingSound = ExtHeaderOffset = 0;
-	unknown1 = unknown2 = unknown3 = unknown4 = unknown5 = unknown6 = 0;
-	unknown7 = unknown8 = unknown9 = unknown10 = unknown11 = unknown12 = 0;
-	FeatureBlockOffset = CastingFeatureOffset = CastingFeatureCount = 0;
-	TimePerLevel = TimeConstant = 0;
-	SpellName = SpellNameIdentified = Flags = SpellType = ExclusionSchool = PriestType = 0;
-}
-
 int Spell::GetHeaderIndexFromLevel(int level) const
 {
 	if (level < 0 || ext_headers.empty()) return -1;

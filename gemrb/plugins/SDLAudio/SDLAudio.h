@@ -98,13 +98,13 @@ private:
 	Point listenerPos;
 	std::shared_ptr<SoundMgr> MusicReader;
 
-	bool MusicPlaying;
-	unsigned int curr_buffer_offset;
+	bool MusicPlaying = false;
+	unsigned int curr_buffer_offset = 0;
 	std::vector<BufferedData> buffers;
 
-	int audio_rate;
-	unsigned short audio_format;
-	int audio_channels;
+	int audio_rate = 0;
+	unsigned short audio_format = 0;
+	int audio_channels = 0;
 
 	std::recursive_mutex MusicMutex;
 	LRUCache buffercache;

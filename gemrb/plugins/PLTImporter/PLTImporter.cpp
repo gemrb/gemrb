@@ -27,12 +27,6 @@
 
 using namespace GemRB;
 
-PLTImporter::PLTImporter(void)
-{
-	Width = Height = 0;
-	pixels = NULL;
-}
-
 PLTImporter::~PLTImporter(void)
 {
 	if (pixels) {

@@ -26,13 +26,6 @@
 
 using namespace GemRB;
 
-DLGImporter::DLGImporter(void)
-{
-	Version = Flags = 0;
-	StatesCount = TransitionsCount = StateTriggersCount = TransitionTriggersCount = ActionsCount = 0;
-	StatesOffset = TransitionsOffset = StateTriggersOffset = TransitionTriggersOffset = ActionsOffset = 0;
-}
-
 bool DLGImporter::Import(DataStream* str)
 {
 	char Signature[8];

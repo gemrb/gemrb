@@ -37,19 +37,26 @@ namespace GemRB {
 
 class GAMImporter : public SaveGameMgr {
 private:
-	int version;
-	unsigned int PCSize;
-	ieDword PCOffset, PCCount;
-	ieDword MazeOffset;
-	ieDword NPCOffset, NPCCount;
-	ieDword GlobalOffset, GlobalCount;
-	ieDword JournalOffset, JournalCount;
-	ieDword KillVarsOffset, KillVarsCount;
-	ieDword FamiliarsOffset;
-	ieDword SavedLocOffset, SavedLocCount;
-	ieDword PPLocOffset, PPLocCount;
+	int version = 0;
+	unsigned int PCSize = 0;
+	ieDword PCOffset = 0;
+	ieDword PCCount = 0;
+	ieDword MazeOffset = 0;
+	ieDword NPCOffset = 0;
+	ieDword NPCCount = 0;
+	ieDword GlobalOffset = 0;
+	ieDword GlobalCount = 0;
+	ieDword JournalOffset = 0;
+	ieDword JournalCount = 0;
+	ieDword KillVarsOffset = 0;
+	ieDword KillVarsCount = 0;
+	ieDword FamiliarsOffset = 0;
+	ieDword SavedLocOffset = 0;
+	ieDword SavedLocCount = 0;
+	ieDword PPLocOffset = 0;
+	ieDword PPLocCount = 0;
 public:
-	GAMImporter(void);
+	GAMImporter(void) = default;
 
 	Game* LoadGame(Game *newGame, int ver_override = 0) override;
 

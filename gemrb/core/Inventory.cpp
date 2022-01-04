@@ -117,16 +117,6 @@ void Inventory::Init()
 	IWD2 = false;
 }
 
-Inventory::Inventory()
-{
-	Owner = NULL;
-	Weight = 0;
-	Equipped = IW_NO_EQUIPPED;
-	EquippedHeader = 0;
-	ItemExcl = 0;
-	memset(ItemTypes, 0, sizeof(ItemTypes));
-}
-
 Inventory::~Inventory()
 {
 	for (auto& slot : Slots) {

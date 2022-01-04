@@ -32,12 +32,6 @@ static const char* const GEM_ENCRYPTION_KEY = "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\
 const static ieWord endiantest = 1;
 bool DataStream::IsBigEndian = ((char *)&endiantest)[1] == 1;
 
-DataStream::DataStream(void)
-{
-	Pos = size = 0;
-	Encrypted = false;
-}
-
 void DataStream::SetBigEndian(bool be)
 {
 	DataStream::IsBigEndian = be;

@@ -131,16 +131,16 @@ struct DMGOpcodeInfo {
 
 class GEM_EXPORT ITMExtHeader {
 public:
-	ITMExtHeader();
-	ieByte AttackType;
-	ieByte IDReq;
-	ieByte Location;
+	ITMExtHeader() = default;
+	ieByte AttackType = 0;
+	ieByte IDReq = 0;
+	ieByte Location = 0;
 	ieByte AltDiceSides = 0;
 	ResRef UseIcon;
-	ieStrRef Tooltip;
-	ieByte Target;
-	ieByte TargetNumber;
-	ieWord Range;
+	ieStrRef Tooltip = 0;
+	ieByte Target = 0;
+	ieByte TargetNumber = 0;
+	ieWord Range = 0;
 	//this is partially redundant, but the original engine uses this value to
 	//determine projectile type (ProjectileQualifier is almost always set too)
 	//We use this field only when really needed, and resolve the redundancy
@@ -149,19 +149,19 @@ public:
 	ieByte AltDiceThrown = 0;
 	ieByte Speed = 0;
 	ieByte AltDamageBonus = 0;
-	ieWord THAC0Bonus;
-	ieWord DiceSides;
-	ieWord DiceThrown;
-	ieWordSigned DamageBonus; //this must be signed!!!
-	ieWord DamageType;
-	ieWord FeatureOffset;
-	ieWord Charges;
-	ieWord ChargeDepletion;
-	ieDword RechargeFlags; //this is a bitfield with many bits
-	ieWord ProjectileAnimation;
-	ieWord MeleeAnimation[3];
+	ieWord THAC0Bonus = 0;
+	ieWord DiceSides = 0;
+	ieWord DiceThrown = 0;
+	ieWordSigned DamageBonus = 0; // this must be signed!!!
+	ieWord DamageType = 0;
+	ieWord FeatureOffset = 0;
+	ieWord Charges = 0;
+	ieWord ChargeDepletion = 0;
+	ieDword RechargeFlags = 0; // this is a bitfield with many bits
+	ieWord ProjectileAnimation = 0;
+	ieWord MeleeAnimation[3]{};
 	//this value is set in projectiles and launchers too
-	int ProjectileQualifier; //this is a derived value determined on load time
+	int ProjectileQualifier = 0; // this is a derived value determined on load time
 	std::vector<Effect*> features;
 };
 
@@ -172,62 +172,62 @@ public:
 
 class GEM_EXPORT Item {
 public:
-	Item();
+	Item() = default;
 
 	std::vector<ITMExtHeader> ext_headers;
 	std::vector<Effect*> equipping_features;
 	ResRef Name; //the resref of the item itself!
 
-	ieStrRef ItemName;
-	ieStrRef ItemNameIdentified;
+	ieStrRef ItemName = 0;
+	ieStrRef ItemNameIdentified = 0;
 	ResRef ReplacementItem;
-	ieDword Flags;
-	ieWord ItemType;
-	ieDword UsabilityBitmask;
-	char AnimationType[2];
-	ieByte MinLevel;
-	ieByte unknown1; // ee docs say it's part of MinLevel read as a word, so useless
-	ieByte MinStrength;
-	ieByte unknown2; // ee docs say it's part of MinStrength read as a word, so useless
-	ieByte MinStrengthBonus;
+	ieDword Flags = 0;
+	ieWord ItemType = 0;
+	ieDword UsabilityBitmask = 0;
+	char AnimationType[2]{};
+	ieByte MinLevel = 0;
+	ieByte unknown1 = 0; // ee docs say it's part of MinLevel read as a word, so useless
+	ieByte MinStrength = 0;
+	ieByte unknown2 = 0; // ee docs say it's part of MinStrength read as a word, so useless
+	ieByte MinStrengthBonus = 0;
 	//kit1
-	ieByte MinIntelligence;
+	ieByte MinIntelligence = 0;
 	//kit2
-	ieByte MinDexterity;
+	ieByte MinDexterity = 0;
 	//kit3
-	ieByte MinWisdom;
+	ieByte MinWisdom = 0;
 	//kit4
-	ieByte MinConstitution;
-	ieByte WeaProf;
-	ieByte MinCharisma;
-	ieByte unknown3; // ee docs say it's part of MinCharisma read as a word, so useless
-	ieDword KitUsability;
-	ieDword Price;
-	ieWord MaxStackAmount;
+	ieByte MinConstitution = 0;
+	ieByte WeaProf = 0;
+	ieByte MinCharisma = 0;
+	ieByte unknown3 = 0; // ee docs say it's part of MinCharisma read as a word, so useless
+	ieDword KitUsability = 0;
+	ieDword Price = 0;
+	ieWord MaxStackAmount = 0;
 	ResRef ItemIcon;
-	ieWord LoreToID;
+	ieWord LoreToID = 0;
 	ResRef GroundIcon;
-	ieDword Weight;
-	ieStrRef ItemDesc;
-	ieStrRef ItemDescIdentified;
+	ieDword Weight = 0;
+	ieStrRef ItemDesc = 0;
+	ieStrRef ItemDescIdentified = 0;
 	ResRef DescriptionIcon;
-	ieDword Enchantment;
-	ieDword ExtHeaderOffset;
-	ieDword FeatureBlockOffset;
-	ieWord EquippingFeatureOffset;
-	ieWord EquippingFeatureCount;
+	ieDword Enchantment = 0;
+	ieDword ExtHeaderOffset = 0;
+	ieDword FeatureBlockOffset = 0;
+	ieWord EquippingFeatureOffset = 0;
+	ieWord EquippingFeatureCount = 0;
 
 	// PST and BG2 only
 	ResRef Dialog;
-	ieStrRef DialogName;
+	ieStrRef DialogName = 0;
 
 	// PST only
-	ieWord WieldColor;
+	ieWord WieldColor = 0;
 
 	// PST and IWD2 only
-	char unknown[26];
+	char unknown[26]{};
 	// flag items to mutually exclusive to equip
-	ieDword ItemExcl;
+	ieDword ItemExcl = 0;
 public:
 	ieStrRef GetItemName(bool identified) const
 	{

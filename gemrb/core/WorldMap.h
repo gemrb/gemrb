@@ -68,7 +68,7 @@ enum class WMPDirection {
 
 class GEM_EXPORT WMPAreaEntry {
 public:
-	WMPAreaEntry();
+	WMPAreaEntry() = default;
 	~WMPAreaEntry();
 	ieDword GetAreaStatus() const;
 	void SetAreaStatus(ieDword status, BitOp op);
@@ -80,23 +80,23 @@ public:
 	const String* GetCaption();
 	const char* GetTooltip();
 private:
-	ieDword AreaStatus;
-	Holder<Sprite2D> MapIcon;
-	String* StrCaption;
-	char *StrTooltip;
-	bool SingleFrame;
+	ieDword AreaStatus = 0;
+	Holder<Sprite2D> MapIcon = nullptr;
+	String* StrCaption = nullptr;
+	char *StrTooltip = nullptr;
+	bool SingleFrame = false;
 
 public:
 	ResRef AreaName;
 	ResRef AreaResRef;
 	ieVariable AreaLongName;
-	ieDword IconSeq;
+	ieDword IconSeq = 0;
 	Point pos;
-	ieStrRef LocCaptionName;
-	ieStrRef LocTooltipName;
+	ieStrRef LocCaptionName = 0;
+	ieStrRef LocTooltipName = 0;
 	ResRef LoadScreenResRef;
-	ieDword AreaLinksIndex[4];
-	ieDword AreaLinksCount[4];
+	ieDword AreaLinksIndex[4]{};
+	ieDword AreaLinksCount[4]{};
 };
 
 /**
@@ -121,27 +121,27 @@ struct WMPAreaLink {
 
 class GEM_EXPORT WorldMap {
 public:
-	WorldMap();
+	WorldMap() = default;
 	~WorldMap();
 public: //struct members
 	ResRef MapResRef;
-	ieDword Width;
-	ieDword Height;
-	ieDword MapNumber;
-	ieStrRef AreaName;
-	ieDword unknown1;
-	ieDword unknown2;
+	ieDword Width = 0;
+	ieDword Height = 0;
+	ieDword MapNumber = 0;
+	ieStrRef AreaName = 0;
+	ieDword unknown1 = 0;
+	ieDword unknown2 = 0;
 	ResRef MapIconResRef;
-	ieDword Flags;
+	ieDword Flags = 0;
 
-	AnimationFactory *bam;
+	AnimationFactory* bam = nullptr;
 private: //non-struct members
-	Holder<Sprite2D> MapMOS;
+	Holder<Sprite2D> MapMOS = nullptr;
 	std::vector< WMPAreaEntry*> area_entries;
 	std::vector< WMPAreaLink*> area_links;
-	int *Distances;
-	int *GotHereFrom;
-	size_t encounterArea;
+	int* Distances = nullptr;
+	int* GotHereFrom = nullptr;
+	size_t encounterArea = -1;
 public:
 	void SetMapIcons(AnimationFactory *bam);
 	Holder<Sprite2D> GetMapMOS() const { return MapMOS; }

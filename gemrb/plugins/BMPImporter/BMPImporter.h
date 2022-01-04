@@ -28,20 +28,24 @@ namespace GemRB {
 class BMPImporter : public ImageMgr {
 private:
 	//BITMAPINFOHEADER
-	ieDword Size, Compression, ImageSize/*, ColorsUsed, ColorsImportant*/;
-	ieWord Planes, BitCount;
+	ieDword Size = 0;
+	ieDword Compression = 0;
+	ieDword ImageSize = 0;
+	/*, ColorsUsed, ColorsImportant*/
+	ieWord Planes = 0;
+	ieWord BitCount = 0;
 
 	//COLORTABLE
-	ieDword NumColors;
+	ieDword NumColors = 0;
 	Color* PaletteColors = nullptr;
 
 	//RASTERDATA
-	void* pixels;
+	void* pixels = nullptr;
 
 	//OTHER
-	unsigned int PaddedRowLength;
+	unsigned int PaddedRowLength = 0;
 public:
-	BMPImporter(void);
+	BMPImporter(void) = default;
 	~BMPImporter(void) override;
 	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;

@@ -57,11 +57,11 @@ private:
 #ifdef CACHE_TLK_OVERRIDE
 	StringMapType stringmap;
 #endif
-	DataStream *tot_str;
-	DataStream *toh_str;
-	ieDword AuxCount;
-	strpos_t FreeOffset;
-	ieDword NextStrRef;
+	DataStream* tot_str = nullptr;
+	DataStream* toh_str = nullptr;
+	ieDword AuxCount = 0;
+	strpos_t FreeOffset = 0;
+	ieDword NextStrRef = 0;
 
 	void CloseResources();
 	DataStream *GetAuxHdr(bool create);
@@ -74,7 +74,7 @@ private:
 	char *GetString(ieDword offset);
 	ieDword GetLength(ieDword offset);
 public:
-	CTlkOverride();
+	CTlkOverride() = default;
 	virtual ~CTlkOverride();
 
 	bool Init();

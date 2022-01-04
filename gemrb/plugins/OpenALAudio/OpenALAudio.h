@@ -127,33 +127,35 @@ private:
 	int QueueALBuffer(ALuint source, ALuint buffer) const;
 
 private:
-	ALCcontext *alutContext;
-	ALuint MusicSource;
-	bool MusicPlaying;
+	ALCcontext* alutContext = nullptr;
+	ALuint MusicSource = 0;
+	bool MusicPlaying = false;
 	std::recursive_mutex musicMutex;
-	ALuint MusicBuffer[MUSICBUFFERS];
+	ALuint MusicBuffer[MUSICBUFFERS]{};
 	std::shared_ptr<SoundMgr> MusicReader;
 	LRUCache buffercache;
 	AudioStream speech;
 	AudioStream streams[MAX_STREAMS];
+	int num_streams = 0;
+
+	std::atomic_bool stayAlive {true};
+	short* music_memory;
+	std::thread musicThread;
+
+	bool hasReverbProperties = false;
+	bool hasEFX = false;
+	ALuint efxEffectSlot = 0;
+	ALuint efxEffect = 0;
+	MapReverbProperties reverbProperties;
+
 	ALuint loadSound(const char* ResRef, tick_t &time_length);
-	int num_streams;
 	int CountAvailableSources(int limit);
 	bool evictBuffer();
 	void clearBufferCache(bool force);
 	ALenum GetFormatEnum(int channels, int bits) const;
 	static int MusicManager(void* args);
-	std::atomic_bool stayAlive {true};
-	short* music_memory;
-	std::thread musicThread;
 
 	bool InitEFX(void);
-	bool hasReverbProperties;
-
-	bool hasEFX = false;
-	ALuint efxEffectSlot = 0;
-	ALuint efxEffect = 0;
-	MapReverbProperties reverbProperties;
 };
 
 }

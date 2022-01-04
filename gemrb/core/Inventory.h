@@ -175,22 +175,16 @@ public:
 	ResRef ItemResRef;
 	//recent research showed that this field is used by the create item
 	//for days effect. This field shows the expiration in gametime hours
-	ieWord Expired;
-	ieWord Usages[CHARGE_COUNTERS];
-	uint32_t Flags;
+	ieWord Expired = 0;
+	ieWord Usages[CHARGE_COUNTERS]{};
+	uint32_t Flags = 0;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
 	/** Weight of each item in the stack */
-	int Weight;
+	int Weight = -1; // invalid weight
 	/** Maximum amount of items in this stack */
-	int MaxStackAmount;
+	int MaxStackAmount = 0;
 
-	CREItem()
-	{
-		Weight=-1; //invalid weight
-		MaxStackAmount=0;
-		Flags = 0;
-		Expired = 0;
-	};
+	CREItem() = default;
 	explicit CREItem(const STOItem *item)
 	{
 		CopySTOItem(item);
@@ -216,18 +210,18 @@ public:
 class GEM_EXPORT Inventory {
 private:
 	std::vector<CREItem*> Slots;
-	Actor* Owner;
+	Actor* Owner = nullptr;
 	ieInventoryType InventoryType = ieInventoryType::HEAP;
 	/** Total weight of all items in Inventory */
-	int Weight;
+	int Weight = 0;
 
-	ieWordSigned Equipped;
-	ieWord EquippedHeader;
+	ieWordSigned Equipped = IW_NO_EQUIPPED;
+	ieWord EquippedHeader = 0;
 	/** this isn't saved */
-	ieDword ItemExcl;
-	ieDword ItemTypes[8]; //256 bits
+	ieDword ItemExcl = 0;
+	ieDword ItemTypes[8]{}; // 256 bits
 public: 
-	Inventory();
+	Inventory() = default;
 	virtual ~Inventory();
 
 	/** duplicates the source inventory into the current one, marking items as undroppable */

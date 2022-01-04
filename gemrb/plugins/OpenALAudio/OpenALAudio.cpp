@@ -175,13 +175,7 @@ void AudioStream::ForceClear()
 
 OpenALAudioDriver::OpenALAudioDriver(void)
 {
-	alutContext = NULL;
-	MusicPlaying = false;
 	music_memory = (short*) malloc(ACM_BUFFERSIZE);
-	MusicSource = num_streams = 0;
-	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
-	ambim = NULL;
-	hasReverbProperties = false;
 	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));
 	reverbProperties.reverbDisabled = true;
 }

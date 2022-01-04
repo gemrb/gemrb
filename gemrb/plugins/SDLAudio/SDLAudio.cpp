@@ -72,9 +72,6 @@ void SDLAudioSoundHandle::StopLooping()
 SDLAudio::SDLAudio(void)
 {
 	ambim = new AmbientMgr();
-	MusicPlaying = false;
-	curr_buffer_offset = 0;
-	audio_rate = audio_format = audio_channels = 0;
 }
 
 SDLAudio::~SDLAudio(void)

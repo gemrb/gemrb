@@ -32,26 +32,6 @@
 
 namespace GemRB {
 
-ITMExtHeader::ITMExtHeader(void)
-{
-	Location = Range = RechargeFlags = IDReq = 0;
-	Charges = ChargeDepletion = Tooltip = Target = TargetNumber = 0;
-	AttackType = THAC0Bonus = DiceSides = DiceThrown = DamageBonus = DamageType = 0;
-	ProjectileAnimation = ProjectileQualifier = FeatureOffset = 0;
-}
-
-Item::Item(void)
-{
-	MinStrength = MinStrengthBonus = MinLevel = Weight = MaxStackAmount = ItemType = 0;
-	MinIntelligence = MinDexterity = MinWisdom = MinConstitution = MinCharisma = 0;
-	WeaProf = WieldColor = Enchantment = KitUsability = Flags = UsabilityBitmask = 0;
-	Price = LoreToID = ItemDesc = ItemDescIdentified = ItemNameIdentified = ItemName = 0;
-	ExtHeaderOffset = FeatureBlockOffset = 0;
-	EquippingFeatureOffset = EquippingFeatureCount = 0;
-	unknown1 = unknown2 = unknown3 = 0;
-	ItemExcl = DialogName = 0;
-}
-
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
 EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, ieDwordSigned invslot, ieDword pro) const

@@ -32,15 +32,17 @@ namespace GemRB {
 
 class WMPImporter : public WorldMapMgr {
 private:
-	DataStream* str1;
-	DataStream* str2;
+	DataStream* str1 = nullptr;
+	DataStream* str2 = nullptr;
 
-	ieDword WorldMapsCount;
-	ieDword WorldMapsCount1, WorldMapsCount2;
-	ieDword WorldMapsOffset1, WorldMapsOffset2;
+	ieDword WorldMapsCount = 0;
+	ieDword WorldMapsCount1 = 0;
+	ieDword WorldMapsCount2 = 0;
+	ieDword WorldMapsOffset1 = 0;
+	ieDword WorldMapsOffset2 = 0;
 
 public:
-	WMPImporter(void);
+	WMPImporter(void) = default;
 	~WMPImporter(void) override;
 	bool Open(DataStream* stream1, DataStream* stream2) override;
 	WorldMapArray *GetWorldMapArray() const override;

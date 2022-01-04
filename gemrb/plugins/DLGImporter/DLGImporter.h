@@ -29,21 +29,21 @@ namespace GemRB {
 
 class DLGImporter : public DialogMgr {
 private:
-	ieDword StatesCount;
-	ieDword StatesOffset;
-	ieDword TransitionsCount;
-	ieDword TransitionsOffset;
-	ieDword StateTriggersCount;
-	ieDword StateTriggersOffset;
-	ieDword TransitionTriggersCount;
-	ieDword TransitionTriggersOffset;
-	ieDword ActionsCount;
-	ieDword ActionsOffset;
-	ieDword Flags;
-	ieDword Version;
+	ieDword StatesCount = 0;
+	ieDword StatesOffset = 0;
+	ieDword TransitionsCount = 0;
+	ieDword TransitionsOffset = 0;
+	ieDword StateTriggersCount = 0;
+	ieDword StateTriggersOffset = 0;
+	ieDword TransitionTriggersCount = 0;
+	ieDword TransitionTriggersOffset = 0;
+	ieDword ActionsCount = 0;
+	ieDword ActionsOffset = 0;
+	ieDword Flags = 0;
+	ieDword Version = 0;
 
 public:
-	DLGImporter(void);
+	DLGImporter(void) = default;
 	
 	Dialog* GetDialog() const override;
 	Condition* GetCondition(char *string) const override;

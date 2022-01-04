@@ -48,12 +48,13 @@ struct TileEntry {
 
 class BIFImporter : public IndexedArchive {
 private:
-	FileEntry* fentries;
-	TileEntry* tentries;
-	ieDword fentcount, tentcount;
-	DataStream* stream;
+	FileEntry* fentries = nullptr;
+	TileEntry* tentries = nullptr;
+	ieDword fentcount = 0;
+	ieDword tentcount = 0;
+	DataStream* stream = nullptr;
 public:
-	BIFImporter(void);
+	BIFImporter(void) = default;
 	~BIFImporter(void) override;
 	int OpenArchive(const char* filename) override;
 	DataStream* GetStream(unsigned long Resource, unsigned long Type) override;

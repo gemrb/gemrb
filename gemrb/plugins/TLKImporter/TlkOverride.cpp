@@ -30,13 +30,6 @@
 
 using namespace GemRB;
 
-CTlkOverride::CTlkOverride()
-{
-	tot_str=NULL;
-	toh_str=NULL;
-	AuxCount = FreeOffset = NextStrRef = 0;
-}
-
 CTlkOverride::~CTlkOverride()
 {
 	CloseResources();

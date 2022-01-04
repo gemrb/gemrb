@@ -75,26 +75,26 @@ class Projectile;
 
 class GEM_EXPORT SPLExtHeader {
 public:
-	SPLExtHeader();
+	SPLExtHeader() = default;
 
-	ieByte SpellForm;
-	ieByte Hostile;
-	ieByte Location;
-	ieByte unknown2;
+	ieByte SpellForm = 0;
+	ieByte Hostile = 0;
+	ieByte Location = 0;
+	ieByte unknown2 = 0;
 	ResRef memorisedIcon;
-	ieByte Target;
-	ieByte TargetNumber;
-	ieWord Range;
-	ieWord RequiredLevel;
-	ieDword CastingTime;
-	ieWord DiceSides;
-	ieWord DiceThrown;
-	ieWord DamageBonus;
-	ieWord DamageType;
-	ieWord FeatureOffset;
-	ieWord Charges;
-	ieWord ChargeDepletion;
-	ieWord ProjectileAnimation;
+	ieByte Target = 0;
+	ieByte TargetNumber = 0;
+	ieWord Range = 0;
+	ieWord RequiredLevel = 0;
+	ieDword CastingTime = 0;
+	ieWord DiceSides = 0;
+	ieWord DiceThrown = 0;
+	ieWord DamageBonus = 0;
+	ieWord DamageType = 0;
+	ieWord FeatureOffset = 0;
+	ieWord Charges = 0;
+	ieWord ChargeDepletion = 0;
+	ieWord ProjectileAnimation = 0;
 	std::vector<Effect*> features;
 };
 
@@ -106,50 +106,50 @@ public:
 
 class GEM_EXPORT Spell {
 public:
-	Spell();
+	Spell() = default;
 
 	std::vector<SPLExtHeader> ext_headers;
 	std::vector<Effect*> casting_features;
 
 	/** Resref of the spell itself */
 	ResRef Name;
-	ieStrRef SpellName;
-	ieStrRef SpellNameIdentified;
+	ieStrRef SpellName = 0;
+	ieStrRef SpellNameIdentified = 0;
 	ResRef CompletionSound;
-	ieDword Flags;
-	ieWord SpellType;
-	ieWord ExclusionSchool;
-	ieWord PriestType;
-	ieWord CastingGraphics;
-	ieByte unknown1;
-	ieWord PrimaryType;
-	ieByte SecondaryType;
-	ieDword unknown2;
-	ieDword unknown3;
-	ieDword unknown4;
-	ieDword SpellLevel;
-	ieWord unknown5;
+	ieDword Flags = 0;
+	ieWord SpellType = 0;
+	ieWord ExclusionSchool = 0;
+	ieWord PriestType = 0;
+	ieWord CastingGraphics = 0;
+	ieByte unknown1 = 0;
+	ieWord PrimaryType = 0;
+	ieByte SecondaryType = 0;
+	ieDword unknown2 = 0;
+	ieDword unknown3 = 0;
+	ieDword unknown4 = 0;
+	ieDword SpellLevel = 0;
+	ieWord unknown5 = 0;
 	ResRef SpellbookIcon;
-	ieWord unknown6;
-	ieDword unknown7;
-	ieDword unknown8;
-	ieDword unknown9;
-	ieStrRef SpellDesc;
-	ieStrRef SpellDescIdentified;
-	ieDword unknown10;
-	ieDword unknown11;
-	ieDword unknown12;
-	ieDword ExtHeaderOffset;
-	ieDword FeatureBlockOffset;
-	ieWord CastingFeatureOffset;
-	ieWord CastingFeatureCount;
+	ieWord unknown6 = 0;
+	ieDword unknown7 = 0;
+	ieDword unknown8 = 0;
+	ieDword unknown9 = 0;
+	ieStrRef SpellDesc = 0;
+	ieStrRef SpellDescIdentified = 0;
+	ieDword unknown10 = 0;
+	ieDword unknown11 = 0;
+	ieDword unknown12 = 0;
+	ieDword ExtHeaderOffset = 0;
+	ieDword FeatureBlockOffset = 0;
+	ieWord CastingFeatureOffset = 0;
+	ieWord CastingFeatureCount = 0;
 
 	// IWD2 only
-	ieByte TimePerLevel;
-	ieByte TimeConstant;
+	ieByte TimePerLevel = 0;
+	ieByte TimeConstant = 0;
 	char unknown13[14];
 	//derived values
-	int CastingSound;
+	int CastingSound = 0;
 
 public:
 	//returns the requested extended header

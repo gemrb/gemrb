@@ -59,24 +59,6 @@ static const int ff_wma_critical_freqs[25] = {
 BIKPlayer::BIKPlayer(void)
 {
 	movieFormat = Video::BufferFormat::YV12;
-	inbuff = NULL;
-
-	//force initialisation of static tables
-	memset(bink_trees, 0, sizeof(bink_trees));
-	memset(table, 0, sizeof(table));
-
-	memset(&v_timebase, 0, sizeof(v_timebase));
-	memset(&c_scantable, 0, sizeof(c_scantable));
-	memset(&c_bundle, 0, sizeof(c_bundle));
-	memset(&c_col_high, 0, sizeof(c_col_high));
-	memset(&header, 0, sizeof(header));
-	memset(s_coeffs_ptr, 0, sizeof(s_coeffs_ptr));
-	c_col_lastval = 0;
-	s_frame_len = s_overlap_len = s_num_bands = s_block_size = 0;
-	video_rendered_frame = validVideo = s_audio = false;
-	s_channels = s_first = s_stream = s_root = 0;
-	s_bands = NULL;
-	c_pic = c_last = NULL;
 }
 
 BIKPlayer::~BIKPlayer(void)
