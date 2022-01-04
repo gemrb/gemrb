@@ -3386,7 +3386,7 @@ void Map::FillExplored(bool explored)
 	ExploredBitmap.fill(explored ? 0xff : 0x00);
 }
 
-void Map::ExploreTile(const Point &p)
+void Map::ExploreTile(const Point &p, bool fogOnly)
 {
 	Point fogP = ConvertPointToFog(p);
 
@@ -3396,7 +3396,9 @@ void Map::ExploreTile(const Point &p)
 	}
 	
 	ExploredBitmap[fogP] = true;
-	VisibleBitmap[fogP] = true;
+	if (!fogOnly) {
+		VisibleBitmap[fogP] = true;
+	}
 }
 
 void Map::ExploreMapChunk(const Point &Pos, int range, int los)

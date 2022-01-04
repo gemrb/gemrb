@@ -593,7 +593,7 @@ public:
 	Size GetSize() const;
 	void FillExplored(bool explored);
 	/* set one fog tile as visible. x, y are tile coordinates */
-	void ExploreTile(const Point&);
+	void ExploreTile(const Point&, bool fogOnly = false);
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(const Point &Pos, int range, int los);
 	void BlockSearchMapFor(const Movable *actor) const;
