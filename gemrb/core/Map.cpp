@@ -3413,7 +3413,8 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 	while (p--) {
 		int Pass = 2;
 		bool block = false;
-		bool sidewall = false ;
+		bool sidewall = false;
+		bool fogOnly = false;
 		for (int i=0;i<range;i++) {
 			Tile.x = Pos.x + explore.VisibilityMasks[i][p].x;
 			Tile.y = Pos.y + explore.VisibilityMasks[i][p].y;
@@ -3425,9 +3426,12 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 						block=true;
 					} else if (bool(type & PathMapFlags::SIDEWALL)) {
 						sidewall = true;
-					} else if (sidewall)
-					{
-						block=true ;
+					} else if (sidewall) {
+						block = true;
+					// outdoor doors are automatically transparent (DOOR_TRANSPARENT)
+					// as a heuristic, exclude cities to avoid unnecessary shrouding
+					} else if (bool(type & PathMapFlags::DOOR_IMPASSABLE) && AreaType & AT_OUTDOOR && !(AreaType & AT_CITY)) {
+						fogOnly = true;
 					}
 				}
 				if (block) {
@@ -3435,7 +3439,7 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 					if (!Pass) break;
 				}
 			}
-			ExploreTile(Tile);
+			ExploreTile(Tile, fogOnly);
 		}
 	}
 }
