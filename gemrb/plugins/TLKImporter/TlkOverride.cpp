@@ -339,19 +339,21 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 
 	PathJoin(nPath, core->config.CachePath, "default.toh", nullptr);
 	FileStream* fs = new FileStream();
-retry:
-	if (fs->Modify(nPath)) {
-		return fs;
+
+	while (true) {
+		if (fs->Modify(nPath)) {
+			return fs;
+		}
+		if (create) {
+			fs->Create("default", IE_TOH_CLASS_ID);
+			strncpy(Signature, "TLK ", TOH_HEADER_SIZE - 1);
+			fs->Write(Signature, sizeof(Signature));
+			create = false;
+			continue;
+		}
+		delete fs;
+		return nullptr;
 	}
-	if (create) {
-		fs->Create( "default", IE_TOH_CLASS_ID);
-		strncpy(Signature, "TLK ", TOH_HEADER_SIZE - 1);
-		fs->Write(Signature, sizeof(Signature));
-		create = false;
-		goto retry;
-	}
-	delete fs;
-	return NULL;
 }
 
 DataStream* CTlkOverride::GetAuxTlk(bool create)
@@ -359,9 +361,13 @@ DataStream* CTlkOverride::GetAuxTlk(bool create)
 	char nPath[_MAX_PATH];
 	PathJoin(nPath, core->config.CachePath, "default.tot", nullptr);
 	FileStream* fs = new FileStream();
-retry:
-	if (fs->Modify(nPath)) {
-		if (fs->Size() % (SEGMENT_SIZE + 12)) {
+
+	while (true) {
+		if (fs->Modify(nPath)) {
+			if (fs->Size() % (SEGMENT_SIZE + 12) == 0) {
+				return fs;
+			}
+
 			Log(ERROR, "TLKImporter", "Defective default.tot detected. Discarding.");
 			// if this happens we also need to account for the TOH file
 			AuxCount = 0;
@@ -369,16 +375,15 @@ retry:
 				toh_str->WriteDword(AuxCount);
 			}
 			toh_str->Rewind();
-		} else {
-			return fs;
 		}
+
+		if (create) {
+			fs->Create("default", IE_TOT_CLASS_ID);
+			create = false;
+			continue;
+		}
+		delete fs;
+		return nullptr;
 	}
-	if (create) {
-		fs->Create( "default", IE_TOT_CLASS_ID);
-		create = false;
-		goto retry;
-	}
-	delete fs;
-	return NULL;
 }
 

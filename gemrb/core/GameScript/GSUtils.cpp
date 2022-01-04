@@ -2528,12 +2528,15 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	} else {
 		for (int i = 0; i < picks; i++) {
 			selects[i]=RAND(0, count-1);
-retry:
-			for (int j = 0; j < i; j++) {
-				if(selects[i]==selects[j]) {
+
+			int j = 0;
+			while (j < i) {
+				if (selects[i] == selects[j]) {
 					selects[i]++;
-					goto retry;
+					j = 0; // retry from the start
+					continue;
 				}
+				j++;
 			}
 		}
 	}
