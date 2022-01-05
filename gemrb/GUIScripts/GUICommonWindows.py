@@ -1430,40 +1430,36 @@ def ToggleWindow(id, pack, pos=WINDOW_CENTER):
 	else:
 		return GemRB.LoadWindow(id, pack, pos)
 
-# returns buttons and a numerical index
 # does nothing new in pst, iwd2 due to layout
 # in the rest, it will enable extra button generation for higher resolutions
 # Mode determines arrangment direction, horizontal being for party reform and potentially save/load
-def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
-	pairs = {}
-
-	if not Window:
-		return pairs
+def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
+	list = []
 
 	oldSlotCount = 6 + ExtraSlots
 
 	for i in range(min(oldSlotCount, MAX_PARTY_SIZE + ExtraSlots)): # the default chu/game limit or less
 		Portrait = Window.GetControl (i)
 		Portrait.SetVarAssoc("PC", i + 1)
-		pairs[i] = Portrait
+		list.append(Portrait)
 
 	# nothing left to do
 	PartySize = GemRB.GetPartySize ()
 	if PartySize <= oldSlotCount:
-		return pairs
+		return list
 
 	if GameCheck.IsIWD2() or GameCheck.IsPST():
 		# set Mode = "horizontal" once we can create enough space
-		GemRB.Log(LOG_ERROR, "GetPortraitButtonPairs", "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ...")
-		return pairs
+		GemRB.Log(LOG_ERROR, "GetPortraitButtons", "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ...")
+		return list
 
 	# GUIWORLD doesn't have a separate portraits window, so we need to skip
 	# all this magic when reforming an overflowing party
 	if PartySize > MAX_PARTY_SIZE:
-		return pairs
+		return list
 
 	# generate new buttons by copying from existing ones
-	firstButton = pairs[0]
+	firstButton = list[0]
 	firstRect = firstButton.GetFrame ()
 	buttonHeight = firstRect["h"]
 	buttonWidth = firstRect["w"]
@@ -1497,13 +1493,13 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 			limit = windowHeight - buttonHeight*6 + unused
 		limitStep = buttonHeight
 
-	for i in range(len(pairs), PartySize):
+	for i in range(len(list), PartySize):
 		if limitStep > limit:
 			raise SystemExit("Not enough window space for so many party members (portraits), bailing out! %d vs width/height of %d/%d" %(limit, buttonWidth, buttonHeight))
 		nextID = 1000 + i
 		control = Window.GetControl (nextID)
 		if control:
-			pairs[i] = control
+			list[i] = control
 			continue
 		if Mode ==  "horizontal":
 			button = Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
@@ -1524,13 +1520,13 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
-		pairs[i] = button
+		list[i] = button
 		limit -= limitStep
 
 	# move the buttons back up, to combine the freed space
 	if scale:
 		for i in range(oldSlotCount):
-			button = pairs[i]
+			button = list[i]
 			button.SetSize (buttonWidth, buttonHeight)
 			if i == 0:
 				continue # don't move the first portrait
@@ -1539,7 +1535,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 			y = rect["Y"]
 			button.SetPos (x, y-portraitGap*i)
 
-	return pairs
+	return list
 
 def OpenInventoryWindowClick (btn):
 	import GUIINV
@@ -1666,9 +1662,9 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 				Button.SetTooltip (11942)
 				Button.OnPress (RestPress)
 
-	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i, Button in PortraitButtons.items():
-		pcID = i + 1
+	PortraitButtons = GetPortraitButtons (Window)
+	for Button in PortraitButtons:
+		pcID = Button.Value
 		
 		Button.SetVarAssoc("portrait", pcID)
 		
@@ -1771,10 +1767,6 @@ def UpdatePortraitWindow ():
 			pcID = Button.Value
 			Portrait = GemRB.GetPlayerPortrait (pcID, 1)
 
-			if GameCheck.IsIWD2():
-				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenInventoryWindowClick)
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
-
 			Button.SetFlags (IE_GUI_BUTTON_PORTRAIT | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			
@@ -1789,8 +1781,8 @@ def UpdatePortraitWindow ():
 		Button.SetText ("")
 		Button.SetTooltip ("")
 
-	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i, Button in PortraitButtons.items():
+	PortraitButtons = GetPortraitButtons (Window)
+	for Button in PortraitButtons:
 		SetHotKey(Button)
 		
 		pcID = Button.Value
@@ -1917,18 +1909,18 @@ def SelectionChanged ():
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
-		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-		for i, Button in PortraitButtons.items():
-			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
+		PortraitButtons = GetPortraitButtons (PortraitWindow)
+		for Button in PortraitButtons:
+			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (Button.Value))
 		if SelectionChangeMultiHandler:
 			SelectionChangeMultiHandler ()
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
 		GUICommon.UpdateMageSchool (sel)
 
-		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-		for i, Button in PortraitButtons.items():
-			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
+		PortraitButtons = GetPortraitButtons (PortraitWindow)
+		for Button in PortraitButtons:
+			Button.EnableBorder (FRAME_PC_SELECTED, Button.Value == sel)
 
 	Container.CloseContainerWindow()
 	if SelectionChangeHandler:
