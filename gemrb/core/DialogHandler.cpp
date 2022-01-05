@@ -138,11 +138,6 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	}
 	if (oldTarget) oldTarget->SetCircleSize();
 
-	GameControl *gc = core->GetGameControl();
-
-	if (!gc)
-		return false;
-
 	// iwd2 ignores conditions when following external references and
 	// also just goes directly for the referenced state
 	// look at 41cmolb1 and 41cmolb2 for an example
@@ -163,8 +158,20 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 		Log(DEBUG, "DialogHandler", "Could not find a proper state");
 		return false;
 	}
+	
+	Actor* dialogPC = GetSpeaker();
+	if (dialogPC && dialogPC->InParty) {
+		core->GetDictionary()->SetAt("DIALOG_PC", dialogPC->InParty);
+	} else if (tgt->Type == ST_ACTOR) {
+		core->GetDictionary()->SetAt("DIALOG_PC", static_cast<Actor*>(tgt)->InParty);
+	}
 
 	core->ToggleViewsEnabled(false, "NOT_DLG");
+	
+	GameControl *gc = core->GetGameControl();
+	if (!gc)
+		return false;
+	
 	prevViewPortLoc = gc->Viewport().origin;
 	gc->MoveViewportTo(tgt->Pos, true, DIALOG_MOVE_SPEED);
 
@@ -218,6 +225,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 	delete dlg;
 	dlg = nullptr;
 
+	core->GetDictionary()->SetAt("DIALOG_PC", ieDword(-1));
 	core->ToggleViewsEnabled(true, "NOT_DLG");
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
