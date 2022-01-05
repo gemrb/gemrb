@@ -1443,7 +1443,9 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	oldSlotCount = 6 + ExtraSlots
 
 	for i in range(min(oldSlotCount, MAX_PARTY_SIZE + ExtraSlots)): # the default chu/game limit or less
-		pairs[i] = Window.GetControl (i)
+		Portrait = Window.GetControl (i)
+		Portrait.SetVarAssoc("PC", i + 1)
+		pairs[i] = Portrait
 
 	# nothing left to do
 	PartySize = GemRB.GetPartySize ()
@@ -1504,12 +1506,12 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 			pairs[i] = control
 			continue
 		if Mode ==  "horizontal":
-			Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
+			button = Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
 		else:
 			# vertical
-			Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset+i*2*scale, buttonWidth, buttonHeight)
+			button = Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset+i*2*scale, buttonWidth, buttonHeight)
 
-		button = Window.GetControl (nextID)
+		button.SetVarAssoc("PC", i + 1)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
 		button.SetVarAssoc ("portrait", i + 1)
 		SetupButtonBorders (Window, button, i)
