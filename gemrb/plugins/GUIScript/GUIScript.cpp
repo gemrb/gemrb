@@ -6855,8 +6855,13 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	//so better just switch to the requested store silently
 	//the core will be intelligent enough to not do excess work
 	core->SetCurrentStore( StoreResRef, 0 );
-
 	core->SetEventFlag(EF_OPENSTORE);
+	
+	const Actor *actor = core->GetFirstSelectedPC(false);
+	if (actor) {
+		core->GetDictionary()->SetAt("BARTER_PC", actor->InParty);
+	}
+	
 	Py_RETURN_NONE;
 }
 
@@ -6880,6 +6885,7 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	core->CloseCurrentStore();
 	core->ResetEventFlag(EF_OPENSTORE);
 	core->SetEventFlag(EF_PORTRAIT);
+	core->GetDictionary()->SetAt("BARTER_PC", ieDword(-1));
 	Py_RETURN_NONE;
 }
 

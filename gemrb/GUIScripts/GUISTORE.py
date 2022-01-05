@@ -50,7 +50,6 @@ Bag = None
 inventory_slots = ()
 total_price = 0
 total_income = 0
-BarteringPC = 0
 
 ItemButtonCount = 6 if GameCheck.IsIWD2() else 4
 CureTable = GemRB.LoadTable("speldesc", True) # additional info not supported by core (PST)
@@ -149,7 +148,6 @@ def PositionStoreWinRelativeTo(win):
 def OpenStoreWindow ():
 	global Store
 	global store_funcs
-	global Inventory, BarteringPC
 	
 	def ChangeStoreView(func):
 		# WIN_TOP needs to be focused for us to change it (see CreateTopWinLoader)
@@ -169,7 +167,6 @@ def OpenStoreWindow ():
 	Store = GemRB.GetStore ()
 	#based on shop type, these buttons will change
 	store_buttons = Store['StoreButtons']
-	BarteringPC = GemRB.GameGetFirstSelectedPC ()
 	
 	# we have to load the "top win" first
 	# the code doesn't permit a "normal win" to sit between 2 "top win"
@@ -1746,7 +1743,7 @@ def GetRealPrice (pc, mode, Item, Slot):
 			mod = max(mod, 20)
 	else:
 		# charisma modifier (in percent)
-		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
+		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (GemRB.GetVar ("BARTER_PC"), IE_CHR) - 1, 0)
 
 		# reputation modifier (in percent, but absolute)
 		if RepModTable and not (Store['StoreFlags'] & SHOP_NOREPADJ):
