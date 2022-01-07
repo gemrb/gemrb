@@ -55,7 +55,7 @@ ItemButtonCount = 6 if GameCheck.IsIWD2() else 4
 CureTable = GemRB.LoadTable("speldesc", True) # additional info not supported by core (PST)
 RepModTable = GemRB.LoadTable ("repmodst", True) # all but PST; FIXME: does IWD2 sufffer a 10x price increase?
 SpellTable = GemRB.LoadTable ("storespl", True) # all but PST
-
+Inventory = GemRB.GetView("WIN_INV") is not None
 # 0 - Store
 # 1 - Tavern
 # 2 - Inn
@@ -336,8 +336,6 @@ def OpenStoreWindow (Actions):
 	return Window
 
 def InitStoreShoppingWindow (Window):
-	global LeftButton, RightButton, Inventory
-
 	Window.AddAlias('WINSHOP')
 	PositionStoreWinRelativeTo(Window)
 
@@ -1168,7 +1166,6 @@ def RedrawStoreShoppingWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	Inventory = GemRB.GetView("WIN_INV") is not None
 	LeftTopIndex = Window.GetVar ("LeftTopIndex")
 	LeftIndex = Window.GetVar ("LeftSelIndex")
 	RightTopIndex = Window.GetVar ("RightTopIndex")
@@ -1630,8 +1627,6 @@ def RedrawStoreStealWindow (Window):
 	return
 
 def SetupItems (pc, Slot, Button, Label, i, storetype, idx, steal=0):
-	Inventory = GemRB.GetView("WIN_INV") is not None
-
 	if Slot == None:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
