@@ -150,20 +150,8 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 		//We want the object by its name...
 		Scriptable* aC = map->GetActor( oC->objectName, ga_flags );
 
-		/*if (!aC && (ga_flags&GA_GLOBAL) ) {
-			aC = FindActorNearby(oC->objectName, map, ga_flags );
-		}*/
-
-		//This order is the same as in GetActorObject
-		//TODO:merge them
 		if (!aC) {
-			aC = map->GetTileMap()->GetDoor(oC->objectName);
-		}
-		if (!aC) {
-			aC = map->GetTileMap()->GetContainer(oC->objectName);
-		}
-		if (!aC) {
-			aC = map->GetTileMap()->GetInfoPoint(oC->objectName);
+			aC = GetActorObject(map->GetTileMap(), oC->objectName);
 		}
 
 		//return here because object name/IDS targeting are mutually exclusive
