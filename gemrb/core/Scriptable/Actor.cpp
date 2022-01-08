@@ -5533,7 +5533,6 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 			snprintf(varname, 32, "EXTRACOUNT%d", 2 + (Modified[IE_SEX] - SEX_EXTRA2));
 		}
 
-		Map *area = GetCurrentArea();
 		if (area) {
 			ieDword value = 0;
 			area->locals->Lookup(varname, value);
