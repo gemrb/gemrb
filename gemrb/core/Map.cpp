@@ -1241,6 +1241,7 @@ Actor *Map::GetNextActor(int &q, int &index) const
 					return queue[q][index];
 				q--;
 				index = Qcount[q];
+				break;
 			default:
 				return nullptr;
 		}
