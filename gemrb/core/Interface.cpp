@@ -1199,91 +1199,87 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 	SetInfoTextColor(ColorWhite);
 
-	{
-		Log(MESSAGE, "Core", "Initializing Search Path...");
-		if (!IsAvailable( PLUGIN_RESOURCE_DIRECTORY )) {
-			Log(FATAL, "Core", "no DirectoryImporter!");
-			return GEM_ERROR;
-		}
-
-		char path[_MAX_PATH];
-
-		PathJoin(path, config.CachePath, nullptr);
-		if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
-			Log(FATAL, "Core", "The cache path couldn't be registered, please check!");
-			return GEM_ERROR;
-		}
-
-		size_t i;
-		for (i = 0; i < config.ModPath.size(); ++i)
-			gamedata->AddSource(config.ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		PathJoin(path, config.GemRBOverridePath, "override", config.GameType, nullptr);
-		if (!strcmp(config.GameType, "auto"))
-			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
-		else
-			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		PathJoin(path, config.GemRBOverridePath, "override", "shared", nullptr);
-		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		PathJoin(path, config.GamePath, config.GameOverridePath, nullptr);
-		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		//GAME sounds are intentionally not cached, in IWD there are directory structures,
-		//that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
-		PathJoin(path, config.GamePath, config.GameSoundsPath, nullptr);
-		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
-
-		PathJoin(path, config.GamePath, config.GameScriptsPath, nullptr);
-		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		PathJoin(path, config.GamePath, config.GamePortraitsPath, nullptr);
-		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		PathJoin(path, config.GamePath, config.GameDataPath, nullptr);
-		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		// accomodating silly installers that create a data/Data/.* structure
-		PathJoin(path, config.GamePath, config.GameDataPath, "Data", nullptr);
-		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-		//IWD2 movies are on the CD but not in the BIF
-		char *description = strdup("CD1/data");
-		for (i = 0; i < MAX_CD; i++) {
-			for (size_t j = 0; j < config.CD[i].size(); j++) {
-				description[2]='1'+i;
-				PathJoin(path, config.CD[i][j].c_str(), config.GameDataPath, nullptr);
-				gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
-			}
-		}
-		free(description);
-
-		// most of the old gemrb override files can be found here,
-		// so they have a lower priority than the game files and can more easily be modded
-		PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType, nullptr);
-		if (!strcmp(config.GameType, "auto")) {
-			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
-		} else {
-			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-		}
-		PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", "shared", nullptr);
-		gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	Log(MESSAGE, "Core", "Initializing search path...");
+	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {
+		Log(FATAL, "Core", "no DirectoryImporter!");
+		return GEM_ERROR;
 	}
 
-	{
-		Log(MESSAGE, "Core", "Initializing KEY Importer...");
-		char ChitinPath[_MAX_PATH];
-		PathJoin(ChitinPath, config.GamePath, "chitin.key", nullptr);
-		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
-			Log(FATAL, "Core", "Failed to load \"chitin.key\"");
-			Log(ERROR, "Core", "This means:\n- you set the GamePath config variable incorrectly,\n\
+	char path[_MAX_PATH];
+	PathJoin(path, config.CachePath, nullptr);
+	if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
+		Log(FATAL, "Core", "The cache path couldn't be registered, please check!");
+		return GEM_ERROR;
+	}
+
+	for (size_t i = 0; i < config.ModPath.size(); ++i) {
+		gamedata->AddSource(config.ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	}
+
+	PathJoin(path, config.GemRBOverridePath, "override", config.GameType, nullptr);
+	if (!strcmp(config.GameType, "auto")) {
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
+	} else {
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	}
+
+	PathJoin(path, config.GemRBOverridePath, "override", "shared", nullptr);
+	gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	PathJoin(path, config.GamePath, config.GameOverridePath, nullptr);
+	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	// GAME sounds are intentionally not cached, in IWD there are directory structures,
+	// that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
+	PathJoin(path, config.GamePath, config.GameSoundsPath, nullptr);
+	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
+
+	PathJoin(path, config.GamePath, config.GameScriptsPath, nullptr);
+	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	PathJoin(path, config.GamePath, config.GamePortraitsPath, nullptr);
+	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	PathJoin(path, config.GamePath, config.GameDataPath, nullptr);
+	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	// accomodating silly installers that create a data/Data/.* structure
+	PathJoin(path, config.GamePath, config.GameDataPath, "Data", nullptr);
+	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	// IWD2 movies are on the CD but not in the BIF
+	char* description = strdup("CD1/data");
+	for (size_t i = 0; i < MAX_CD; i++) {
+		for (size_t j = 0; j < config.CD[i].size(); j++) {
+			description[2] = '1' + i;
+			PathJoin(path, config.CD[i][j].c_str(), config.GameDataPath, nullptr);
+			gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		}
+	}
+	free(description);
+
+	// most of the old gemrb override files can be found here,
+	// so they have a lower priority than the game files and can more easily be modded
+	PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType, nullptr);
+	if (!strcmp(config.GameType, "auto")) {
+		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
+	} else {
+		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	}
+	PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", "shared", nullptr);
+	gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	Log(MESSAGE, "Core", "Initializing KEY Importer...");
+	char ChitinPath[_MAX_PATH];
+	PathJoin(ChitinPath, config.GamePath, "chitin.key", nullptr);
+	if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
+		Log(FATAL, "Core", "Failed to load \"chitin.key\"");
+		Log(ERROR, "Core", "This means:\n- you set the GamePath config variable incorrectly,\n\
 - you passed a bad game path to GemRB on the command line,\n\
 - you are not running GemRB from within a game dir,\n\
 - or the game is running (Windows only).");
-			Log(ERROR, "Core", "The path must point to a game directory with a readable chitin.key file.");
-			return GEM_ERROR;
-		}
+		Log(ERROR, "Core", "The path must point to a game directory with a readable chitin.key file.");
+		return GEM_ERROR;
 	}
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
@@ -1299,7 +1295,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
-	char path[_MAX_PATH];
 	PathJoin(path, config.GemRBOverridePath, "override", config.GameType, nullptr);
 	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 	char unhardcodedTypePath[_MAX_PATH * 2];
@@ -1411,13 +1406,11 @@ int Interface::Init(const InterfaceConfig* cfg)
 		}
 	}
 
-	{
-		Log(MESSAGE, "Core", "Loading Palettes...");
-		LoadPalette<16>(Palette16, palettes16);
-		LoadPalette<32>(Palette32, palettes32);
-		LoadPalette<256>(Palette256, palettes256);
-		Log(MESSAGE, "Core", "Palettes Loaded");
-	}
+	Log(MESSAGE, "Core", "Loading palettes...");
+	LoadPalette<16>(Palette16, palettes16);
+	LoadPalette<32>(Palette32, palettes32);
+	LoadPalette<256>(Palette256, palettes256);
+	Log(MESSAGE, "Core", "Palettes loaded.");
 
 	if (!IsAvailable( IE_BAM_CLASS_ID )) {
 		Log(FATAL, "Core", "No BAM Importer Available.");
@@ -4175,21 +4168,15 @@ int Interface::WriteCharacter(const char *name, const Actor *actor)
 		return -1;
 	}
 
-	//str is freed
-	{
-		FileStream str;
-
-		if (!str.Create( Path, name, IE_CHR_CLASS_ID )
-			|| (gm->PutActor(&str, actor, true) < 0)) {
-			Log(WARNING, "Core", "Character cannot be saved: %s", name);
-			return -1;
-		}
+	FileStream str;
+	if (!str.Create(Path, name, IE_CHR_CLASS_ID)
+		|| gm->PutActor(&str, actor, true) < 0) {
+		Log(WARNING, "Core", "Character cannot be saved: %s", name);
+		return -1;
 	}
 
 	//write the BIO string
 	if (!HasFeature(GF_NO_BIOGRAPHY)) {
-		FileStream str;
-
 		str.Create( Path, name, IE_BIO_CLASS_ID );
 		//never write the string reference into this string
 		char *tmp = GetCString(actor->GetVerbalConstant(VB_BIO),IE_STR_STRREFOFF);

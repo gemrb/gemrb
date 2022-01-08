@@ -91,7 +91,6 @@ Gem_Polygon **polygons;
 void InitScriptTables()
 {
 	//initializing the happiness table
-	{
 	AutoTable tab = gamedata->LoadTable("happy");
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
@@ -99,7 +98,6 @@ void InitScriptTables()
 				happiness[alignment][reputation] = strtosigned<int>(tab->QueryField(reputation,alignment));
 			}
 		}
-	}
 	}
 
 	//initializing the reaction mod. reputation table
