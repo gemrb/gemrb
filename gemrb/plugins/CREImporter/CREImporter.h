@@ -38,30 +38,30 @@ struct Effect;
 
 class CREImporter : public ActorMgr {
 private:
-	unsigned char CREVersion;
-	ieDword KnownSpellsOffset;
-	ieDword KnownSpellsCount;
-	ieDword SpellMemorizationOffset;
-	ieDword SpellMemorizationCount;
-	ieDword MemorizedSpellsOffset;
-	ieDword MemorizedSpellsCount;
-	ieDword MemorizedIndex;
-	ieDword MemorizedCount;
-	ieDword ItemSlotsOffset;
-	ieDword ItemsOffset;
-	ieDword ItemsCount;
-	ieDword EffectsOffset;
-	ieDword EffectsCount;
-	ieByte TotSCEFF;
-	ieByte IsCharacter;
-	ieDword CREOffset;
-	ieDword VariablesCount;
-	ieDword OverlayOffset;
-	ieDword OverlayMemorySize;
+	unsigned char CREVersion = 0xff;
+	ieDword KnownSpellsOffset = 0;
+	ieDword KnownSpellsCount = 0;
+	ieDword SpellMemorizationOffset = 0;
+	ieDword SpellMemorizationCount = 0;
+	ieDword MemorizedSpellsOffset = 0;
+	ieDword MemorizedSpellsCount = 0;
+	ieDword MemorizedIndex = 0;
+	ieDword MemorizedCount = 0;
+	ieDword ItemSlotsOffset = 0;
+	ieDword ItemsOffset = 0;
+	ieDword ItemsCount = 0;
+	ieDword EffectsOffset = 0;
+	ieDword EffectsCount = 0;
+	ieByte TotSCEFF = 0xff;
+	ieByte IsCharacter = 0;
+	ieDword CREOffset = 0;
+	ieDword VariablesCount = 0;
+	ieDword OverlayOffset = 0;
+	ieDword OverlayMemorySize = 0;
 	//used in CHR header
-	int QWPCount; //weapons
-	int QSPCount; //spells
-	int QITCount; //items
+	int QWPCount = 0; // weapons
+	int QSPCount = 0; // spells
+	int QITCount = 0; // items
 public:
 	CREImporter(void);
 

@@ -453,16 +453,7 @@ static void InitSpellbook()
 
 CREImporter::CREImporter(void)
 {
-	TotSCEFF = 0xff;
-	CREVersion = 0xff;
 	InitSpellbook();
-
-	KnownSpellsOffset = SpellMemorizationOffset = MemorizedSpellsOffset = 0;
-	KnownSpellsCount = SpellMemorizationCount = MemorizedSpellsCount = 0;
-	MemorizedIndex = MemorizedCount = EffectsOffset = EffectsCount = 0;
-	CREOffset = ItemSlotsOffset = ItemsOffset = ItemsCount = VariablesCount = 0;
-	OverlayOffset = OverlayMemorySize = QWPCount = QSPCount = QITCount = 0;
-	IsCharacter = false;
 }
 
 bool CREImporter::Import(DataStream* str)
