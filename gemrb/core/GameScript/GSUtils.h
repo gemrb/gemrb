@@ -120,7 +120,7 @@ GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, ieDword val
 GEM_EXPORT void SetPointVariable(Scriptable* Sender, const char* VarName, const Point &point, const char* Context = nullptr);
 Point GetEntryPoint(const char *areaname, const char *entryname);
 //these are used from other plugins
-GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead);
+GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead, bool halveRange = false);
 GEM_EXPORT int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos);
 GEM_EXPORT bool DiffCore(ieDword a, ieDword b, int diffMode);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, int Strref, int flags);

@@ -537,7 +537,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	}
 }
 
-int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int seeflag)
+int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int seeflag, bool halveRange)
 {
 	if (target->Type==ST_ACTOR) {
 		const Actor *tar = static_cast<const Actor*>(target);
@@ -559,7 +559,8 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 		bool los = true;
 		if (Sender->Type == ST_ACTOR) {
 			const Actor *snd = static_cast<const Actor*>(Sender);
-			dist = snd->Modified[IE_VISUALRANGE] / 2;
+			dist = snd->Modified[IE_VISUALRANGE];
+			if (halveRange) dist /= 2;
 		} else {
 			dist = VOODOO_VISUAL_RANGE;
 			los = false;
@@ -1379,7 +1380,7 @@ void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flag
 	if (target->Type == ST_TRIGGER && static_cast<const InfoPoint*>(target)->GetUsePoint()) {
 		dest = static_cast<const InfoPoint*>(target)->UsePoint;
 	}
-	if (untilsee && CanSee(actor, target, true, 0) ) {
+	if (untilsee && CanSee(actor, target, true, 0, true)) {
 		Sender->LastSeen = target->GetGlobalID();
 		Sender->ReleaseCurrentAction();
 		actor->ClearPath(true);
