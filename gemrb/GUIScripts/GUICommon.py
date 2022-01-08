@@ -24,6 +24,7 @@ import GameCheck
 import GUIClasses
 import collections
 import CommonTables
+import Spellbook
 from ie_restype import RES_CHU, RES_2DA, RES_BAM, RES_WAV
 from ie_spells import LS_MEMO
 from GUIDefines import *
@@ -164,7 +165,6 @@ def ResolveClassAbilities (pc, ClassName):
 # Adds class/kit abilities
 def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 	TmpTable = GemRB.LoadTable (table)
-	import Spellbook
 
 	# gotta stay positive
 	if Level-LevelDiff < 0:
@@ -189,29 +189,33 @@ def AddClassAbilities (pc, table, Level=1, LevelDiff=1, align=-1):
 		# apply each spell from each new class
 		for j in range (jMin, jMax):
 			ab = TmpTable.GetValue (i, j, GTV_STR)
-			if ab and ab != "****":
-				# seems all SPINs act like GA_*
-				if ab[:4] == "SPIN":
-					ab = "GA_" + ab
+			AddClassAbility(pc, ab)
 
-				# apply spell (AP_) or gain spell (GA_)
-				if ab[:3] == "AP_":
-					GemRB.ApplySpell (pc, ab[3:])
-				elif ab[:3] == "GA_":
-					Spellbook.LearnSpell (pc, ab[3:], IE_SPELL_TYPE_INNATE, 0, 1, LS_MEMO)
-				elif ab[:3] == "FS_":
-					Gain(26320, ab[3:])
-				elif ab[:3] == "FA_":
-					Gain(10514, ab[3:])
-				else:
-					GemRB.Log (LOG_ERROR, "AddClassAbilities", "Unknown class ability (type): " + ab)
+def AddClassAbility (pc, ab):
+	if not ab or ab == "****":
+		return
+
+	# seems all SPINs act like GA_*
+	if ab[:4] == "SPIN":
+		ab = "GA_" + ab
+
+	# apply spell (AP_) or gain spell (GA_)
+	if ab[:3] == "AP_":
+		GemRB.ApplySpell (pc, ab[3:])
+	elif ab[:3] == "GA_":
+		Spellbook.LearnSpell (pc, ab[3:], IE_SPELL_TYPE_INNATE, 0, 1, LS_MEMO)
+	elif ab[:3] == "FS_":
+		Gain(26320, ab[3:])
+	elif ab[:3] == "FA_":
+		Gain(10514, ab[3:])
+	else:
+		GemRB.Log (LOG_ERROR, "AddClassAbilities", "Unknown class ability (type): " + ab)
 
 def MakeSpellCount (pc, spell, count):
 	have = GemRB.CountSpells (pc, spell, 1)
 	if count<=have:
 		return
 	# only used for innates, which are all level 1
-	import Spellbook
 	Spellbook.LearnSpell (pc, spell, IE_IWD2_SPELL_INNATE, 0, count-have, LS_MEMO)
 	return
 
@@ -219,7 +223,6 @@ def MakeSpellCount (pc, spell, count):
 # for dual-classing mainly
 def RemoveClassAbilities (pc, table, Level):
 	TmpTable = GemRB.LoadTable (table)
-	import Spellbook
 
 	# gotta stay positive
 	if Level < 0:
@@ -233,25 +236,30 @@ def RemoveClassAbilities (pc, table, Level):
 	for i in range(TmpTable.GetRowCount ()):
 		for j in range (jMax):
 			ab = TmpTable.GetValue (i, j, GTV_STR)
-			if ab and ab != "****":
-				# get the index
-				SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
+			RemoveClassAbility (pc, ab)
 
-				# seems all SPINs act like GA_*
-				if ab[:4] == "SPIN":
-					ab = "GA_" + ab
+def RemoveClassAbility (pc, ab):
+	if not ab or ab == "****":
+		return
 
-				# apply spell (AP_) or gain spell (GA_)?
-				if ab[:3] == "AP_":
-					GemRB.RemoveEffects (pc, ab[3:])
-				elif ab[:3] == "GA_":
-					if SpellIndex >= 0:
-						# TODO: get the correct counts to avoid removing an innate ability
-						# given by more than one thing?
-						# RemoveSpell will unmemorize them all too
-						GemRB.RemoveSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
-				elif ab[:3] != "FA_" and ab[:3] != "FS_":
-					GemRB.Log (LOG_ERROR, "RemoveClassAbilities", "Unknown class ability (type): " + ab)
+	# get the index
+	SpellIndex = Spellbook.HasSpell (pc, IE_SPELL_TYPE_INNATE, 0, ab[3:])
+
+	# seems all SPINs act like GA_*
+	if ab[:4] == "SPIN":
+		ab = "GA_" + ab
+
+	# apply spell (AP_) or gain spell (GA_)?
+	if ab[:3] == "AP_":
+		GemRB.RemoveEffects (pc, ab[3:])
+	elif ab[:3] == "GA_":
+		if SpellIndex >= 0:
+			# TODO: get the correct counts to avoid removing an innate ability
+			# given by more than one thing?
+			# RemoveSpell will unmemorize them all too
+			GemRB.RemoveSpell (pc, IE_SPELL_TYPE_INNATE, 0, SpellIndex)
+	elif ab[:3] != "FA_" and ab[:3] != "FS_":
+		GemRB.Log (LOG_ERROR, "RemoveClassAbilities", "Unknown class ability (type): " + ab)
 
 # PST uses a button, IWD2 two types, the rest are the same with two labels
 def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
@@ -301,51 +309,46 @@ def GetActorClassTitle (actor):
 	"""Returns the string representation of the actors class."""
 
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
-
-	if ClassTitle == 0:
-		ClassName = GetClassRowName (actor)
-		KitIndex = GetKitIndex (actor)
-		Multi = HasMultiClassBits (actor)
-		Dual = IsDualClassed (actor, 1)
-		MCFlags = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
-
-		if Multi and Dual[0] == 0: # true multi class
-			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
-		else:
-			if Dual[0]: # dual class
-				# first (previous) kit or class of the dual class
-				if Dual[0] == 1:
-					ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2)
-				else:
-					ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
-				if ClassTitle != "*":
-					ClassTitle = GemRB.GetString (ClassTitle)
-				ClassTitle += " / "
-				if Dual[0] == 3:
-					ClassTitle += CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
-				else:
-					ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
-			elif MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER): # fallen
-				ClassTitle = 10369
-				if MCFlags & MC_FALLEN_PALADIN:
-					ClassTitle = 10371
-				ClassTitle = GemRB.GetString (ClassTitle)
-			else: # ordinary class or kit
-				if KitIndex:
-					ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)
-				else:
-					ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
-				if ClassTitle != "*":
-					ClassTitle = GemRB.GetString (ClassTitle)
-	else:
+	if ClassTitle != 0:
 		ClassTitle = GemRB.GetString (ClassTitle)
+		return ClassTitle
 
-	#GetActorClassTitle returns string now...
-	#if ClassTitle == "*":
-	#	return 0
+	ClassName = GetClassRowName (actor)
+	KitIndex = GetKitIndex (actor)
+	Multi = HasMultiClassBits (actor)
+	Dual = IsDualClassed (actor, 1)
+	MCFlags = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
+
+	if Multi and Dual[0] == 0: # true multi class
+		ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
+	else:
+		if Dual[0]: # dual class
+			# first (previous) kit or class of the dual class
+			if Dual[0] == 1:
+				ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2)
+			else:
+				ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
+			if ClassTitle != "*":
+				ClassTitle = GemRB.GetString (ClassTitle)
+			ClassTitle += " / "
+			if Dual[0] == 3:
+				ClassTitle += CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
+			else:
+				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
+		elif MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER): # fallen
+			ClassTitle = 10369
+			if MCFlags & MC_FALLEN_PALADIN:
+				ClassTitle = 10371
+			ClassTitle = GemRB.GetString (ClassTitle)
+		else: # ordinary class or kit
+			if KitIndex:
+				ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)
+			else:
+				ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
+			if ClassTitle != "*":
+				ClassTitle = GemRB.GetString (ClassTitle)
 
 	return ClassTitle
-
 
 def GetKitIndex (actor):
 	"""Return the index of the actors kit from KITLIST.2da.
@@ -411,45 +414,42 @@ def IsDualClassed(actor, verbose):
 		return (0, -1, -1)
 
 	DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
+	if DualedFrom == 0:
+		return (0, -1, -1)
 
-	if verbose:
-		KitIndex = GetKitIndex (actor)
-		if KitIndex:
-			KittedClass = CommonTables.KitList.GetValue (KitIndex, 7)
-			KittedClassIndex = CommonTables.Classes.FindValue ("ID", KittedClass)
-		else:
-			KittedClassIndex = 0
+	if not verbose:
+		return (1, -1, -1)
 
-		if DualedFrom > 0: # first (previous) class of the dual class
-			FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
-
-			# use the first class of the multiclass bunch that isn't the same as the first class
-			for i in range (1,16):
-				Mask = 1 << (i - 1)
-				if Multi & Mask:
-					ClassIndex = CommonTables.Classes.FindValue ("ID", i)
-					if ClassIndex == FirstClassIndex:
-						continue
-					SecondClassIndex = ClassIndex
-					break
-			else:
-				GemRB.Log (LOG_WARNING, "IsDualClassed", "Invalid dualclass combination, treating as a single class!")
-				print(DualedFrom, Multi, KitIndex, FirstClassIndex)
-				return (0,-1,-1)
-
-			if KittedClassIndex == FirstClassIndex and KitIndex:
-				return (1, KitIndex, SecondClassIndex)
-			elif KittedClassIndex == SecondClassIndex:
-				return (3, FirstClassIndex, KitIndex)
-			else:
-				return (2, FirstClassIndex, SecondClassIndex)
-		else:
-			return (0,-1,-1)
+	KitIndex = GetKitIndex (actor)
+	if KitIndex:
+		KittedClass = CommonTables.KitList.GetValue (KitIndex, 7)
+		KittedClassIndex = CommonTables.Classes.FindValue ("ID", KittedClass)
 	else:
-		if DualedFrom > 0:
-			return (1,-1,-1)
-		else:
-			return (0,-1,-1)
+		KittedClassIndex = 0
+
+	# first (previous) class of the dual class
+	FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
+
+	# use the first class of the multiclass bunch that isn't the same as the first class
+	for i in range (1,16):
+		Mask = 1 << (i - 1)
+		if Multi & Mask:
+			ClassIndex = CommonTables.Classes.FindValue ("ID", i)
+			if ClassIndex == FirstClassIndex:
+				continue
+			SecondClassIndex = ClassIndex
+			break
+	else:
+		GemRB.Log (LOG_WARNING, "IsDualClassed", "Invalid dualclass combination, treating as a single class!")
+		print(DualedFrom, Multi, KitIndex, FirstClassIndex)
+		return (0, -1, -1)
+
+	if KittedClassIndex == FirstClassIndex and KitIndex:
+		return (1, KitIndex, SecondClassIndex)
+	elif KittedClassIndex == SecondClassIndex:
+		return (3, FirstClassIndex, KitIndex)
+	else:
+		return (2, FirstClassIndex, SecondClassIndex)
 
 def IsDualSwap (actor, override=None):
 	"""Returns true if the dualed classes are reverse of expection.
@@ -522,18 +522,21 @@ def IsMultiClassed (actor, verbose):
 	# loop through each class and test it as a mask
 	ClassCount = CommonTables.Classes.GetRowCount()
 	for i in range (1, ClassCount):
-		if IsMulti&Mask: # it's part of this class
-			#we need to place the classes in the array based on their order in the name,
-			#NOT the order they are detected in
-			CurrentName = GetClassRowName (i, "class")
-			if CurrentName == "*":
-				# we read too far, as the upper range limit is greater than the number of "single" classes
-				break
-			for j in range(len(ClassNames)):
-				if ClassNames[j] == CurrentName:
-					Classes[j] = i # mask is (i-1)^2 where i is class id
-			NumClasses = NumClasses+1
-		Mask = 1 << i # shift to the next multiple of 2 for testing
+		if IsMulti & Mask == 0:
+			Mask = 1 << i
+			continue
+
+		# we need to place the classes in the array based on their order in the name,
+		# NOT the order they are detected in
+		CurrentName = GetClassRowName (i, "class")
+		if CurrentName == "*":
+			# we read too far, as the upper range limit is greater than the number of "single" classes
+			break
+		for j in range(len(ClassNames)):
+			if ClassNames[j] == CurrentName:
+				Classes[j] = i # mask is (i-1)^2 where i is class id
+		NumClasses = NumClasses + 1
+		Mask = 1 << i
 
 	# in case we couldn't figure out to which classes the multi belonged
 	if NumClasses < 2:
