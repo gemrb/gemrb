@@ -129,7 +129,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				Button* btn = new Button(ctrlFrame);
 				ctrl = btn;
 				ResRef BAMFile;
-				ieByte Cycle, tmp;
+				ieByte Cycle;
+				ieByte flagsByte;
 				ieDword Flags;
 				ieByte UnpressedIndex, x1;
 				ieByte PressedIndex, x2;
@@ -137,8 +138,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				ieByte DisabledIndex, y2;
 				str->ReadResRef( BAMFile );
 				str->Read( &Cycle, 1 );
-				str->Read( &tmp, 1 );
-				Flags = ((ieDword) tmp)<<8;
+				str->Read(&flagsByte, 1);
+				Flags = static_cast<ieDword>(flagsByte) << 8;
 				str->Read( &UnpressedIndex, 1 );
 				str->Read( &x1, 1 );
 				str->Read( &PressedIndex, 1 );

@@ -131,10 +131,10 @@ public:
 	}
 
 	bool RenderOnDisplay(void* display) const override {
-		SDL_Renderer* renderer = static_cast<SDL_Renderer*>(display);
+		SDL_Renderer* targetRenderer = static_cast<SDL_Renderer*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-		int ret = SDL_RenderCopy(renderer, texture, NULL, &dst);
+		int ret = SDL_RenderCopy(targetRenderer, texture, nullptr, &dst);
 		if (ret != 0) {
 			Log(ERROR, "SDLVideo", "%s", SDL_GetError());
 		}

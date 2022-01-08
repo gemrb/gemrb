@@ -383,9 +383,9 @@ void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Poi
 		size_t j = 1;
 		for (size_t i = 1; i < poly->Count(); ++i, j+=2) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
-			const Point& p = poly->vertices[i] - poly->BBox.origin + origin;
-			s_points[j].x = p.x;
-			s_points[j].y = p.y;
+			const Point& v = poly->vertices[i] - poly->BBox.origin + origin;
+			s_points[j].x = v.x;
+			s_points[j].y = v.y;
 			s_points[j+1] = s_points[j];
 		}
 		// reconnect with start point

@@ -865,7 +865,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	return 0;
 }
 
-int GAMImporter::PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version) const
+int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, ieDword GAMVersion) const
 {
 	ieDword tmpDword;
 	ieWord tmpWord;
@@ -910,7 +910,7 @@ int GAMImporter::PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, 
 	}
 
 	//quickweapons
-	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		for (int i = 0; i < 4; i++) {
 			stream->WriteWord(ac->PCStats->QuickWeaponSlots[i]);
 			stream->WriteWord(ac->PCStats->QuickWeaponSlots[4 + i]);
@@ -929,7 +929,7 @@ int GAMImporter::PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, 
 	}
 
 	//quickspells
-	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellClass[i] >= 0xfe) {
 				stream->Write(filling,8);
@@ -940,7 +940,7 @@ int GAMImporter::PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, 
 		//quick spell classes, clear the field for iwd2 if it is
 		//a bard song/innate slot (0xfe or 0xff)
 		memcpy(filling, ac->PCStats->QuickSpellClass, MAX_QSLOTS);
-		if (version==GAM_VER_IWD2) {
+		if (GAMVersion == GAM_VER_IWD2) {
 			for (int i = 0; i < MAX_QSLOTS; i++) {
 				if((ieByte) filling[i]>=0xfe) {
 					filling[i]=0;
@@ -956,7 +956,7 @@ int GAMImporter::PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, 
 	}
 
 	//quick items
-	switch (version) {
+	switch (GAMVersion) {
 	case GAM_VER_PST: case GAM_VER_GEMRB:
 		for (unsigned short& quickItemSlot : ac->PCStats->QuickItemSlots) {
 			stream->WriteWord(quickItemSlot);
@@ -976,7 +976,7 @@ int GAMImporter::PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, 
 	}
 
 	//innates, bard songs and quick slots are saved only in iwd2
-	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellClass[i] == 0xff) {
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
@@ -1032,7 +1032,7 @@ int GAMImporter::PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, 
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
 		stream->Write(ac->PCStats->SoundFolder, 32);
 	}
-	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		//I don't know how many fields are actually used in IWD2 saved game
 		//but we got at least 8 (and only 5 of those are actually used)
 		for (unsigned int& extraSetting : ac->PCStats->ExtraSettings) {

@@ -157,7 +157,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_KEYUP:
 			key = TranslateKeycode(sym);
 			if (key != 0) {
-				Event e = EvntManager->CreateKeyEvent(key, false, modstate);
+				e = EvntManager->CreateKeyEvent(key, false, modstate);
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;

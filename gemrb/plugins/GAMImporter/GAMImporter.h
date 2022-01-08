@@ -71,7 +71,7 @@ private:
 	GAMJournalEntry* GetJournalEntry();
 
 	int PutHeader(DataStream *stream, const Game *game) const;
-	int PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version) const;
+	int PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, ieDword GAMVersion) const;
 	int PutPCs(DataStream *stream, const Game *game) const;
 	int PutNPCs(DataStream *stream, const Game *game) const;
 	int PutJournals(DataStream *stream, const Game *game) const;
