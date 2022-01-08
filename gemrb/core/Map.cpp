@@ -1229,39 +1229,41 @@ Container *Map::GetNextPile(int &index) const
 
 Actor *Map::GetNextActor(int &q, int &index) const
 {
-retry:
-	switch(q) {
-		case PR_SCRIPT:
-			if (index--)
-				return queue[q][index];
-			q--;
-			return NULL;
-		case PR_DISPLAY:
-			if (index--)
-				return queue[q][index];
-			q--;
-			index = Qcount[q];
-			goto retry;
-		default:
-			return NULL;
+	while (true) {
+		switch(q) {
+			case PR_SCRIPT:
+				if (index--)
+					return queue[q][index];
+				q--;
+				return nullptr;
+			case PR_DISPLAY:
+				if (index--)
+					return queue[q][index];
+				q--;
+				index = Qcount[q];
+			default:
+				return nullptr;
+		}
 	}
 }
 
 const AreaAnimation *Map::GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const
 {
-retry:
-	if (iter==animations.end()) {
-		return NULL;
-	}
-	const AreaAnimation &a = *(iter++);
-	if (!a.Schedule(gametime) ) {
-		goto retry;
-	}
-	if ((a.Flags & A_ANI_NOT_IN_FOG) ? !IsVisible(a.Pos) : !IsExplored(a.Pos)) {
-		goto retry;
-	}
 
-	return &a;
+	while (true) {
+		if (iter == animations.end()) {
+			return nullptr;
+		}
+		const AreaAnimation &a = *(iter++);
+		if (!a.Schedule(gametime)) {
+			continue;
+		}
+		if ((a.Flags & A_ANI_NOT_IN_FOG) ? !IsVisible(a.Pos) : !IsExplored(a.Pos)) {
+			continue;
+		}
+
+		return &a;
+	}
 }
 
 Particles *Map::GetNextSpark(const spaIterator &iter) const
