@@ -53,7 +53,7 @@ private:
 	ieDword EffectsOffset = 0;
 	ieDword EffectsCount = 0;
 	ieByte TotSCEFF = 0xff;
-	ieByte IsCharacter = 0;
+	bool IsCharacter = false;
 	ieDword CREOffset = 0;
 	ieDword VariablesCount = 0;
 	ieDword OverlayOffset = 0;
