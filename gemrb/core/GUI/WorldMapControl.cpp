@@ -96,6 +96,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	Video* video = core->GetVideoDriver();
 	video->BlitSprite( worldmap->GetMapMOS(), MapToScreen(Point()));
 
+	std::vector<Point> potentialIndicators;
 	unsigned int ec = worldmap->GetEntryCount();
 	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
@@ -112,7 +113,9 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			} else {
 				video->BlitGameSprite(icon, offset, flags, gamedata->GetColor("MAPICNBG"));
 			}
-			
+
+			// intro and late-chapter candlekeep share the same entry, so we need to check both names
+			// but bg2 ar1700 has bad data (ar1800), causing two indicators to be displayed, so defer
 			if (areaIndicator && (m->AreaResRef == currentArea || m->AreaName == currentArea)) {
 				Point indicatorPos = offset - icon->Frame.origin;
 				indicatorPos.x += areaIndicator->Frame.x + icon->Frame.w / 2 - areaIndicator->Frame.w / 2;
@@ -120,9 +123,18 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
 					indicatorPos.y += areaIndicator->Frame.y + icon->Frame.h / 2 - areaIndicator->Frame.h / 2;
 				}
-				video->BlitSprite(areaIndicator, indicatorPos);
+				potentialIndicators.push_back(indicatorPos);
 			}
 		}
+	}
+
+	// ensure good indicator placement, if any
+	// so far only one bad example is known, hence the simple logic
+	size_t indicatorCount = potentialIndicators.size();
+	if (indicatorCount == 1) {
+		video->BlitSprite(areaIndicator, potentialIndicators[0]);
+	} else if (indicatorCount > 1) {
+		video->BlitSprite(areaIndicator, potentialIndicators[1]);
 	}
 
 	// draw labels in separate pass, so icons don't overlap them
