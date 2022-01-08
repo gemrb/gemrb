@@ -265,7 +265,7 @@ public:
 	// The number of times since TickScripting() tried to do anything.
 	ieDword IdleTicks = 0;
 	// The number of ticks since the last spellcast
-	ieDword AuraTicks = 0;
+	ieDword AuraCooldown = 0;
 	// The countdown for forced activation by triggers.
 	ieDword TriggerCountdown = 0;
 

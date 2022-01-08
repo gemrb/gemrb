@@ -6528,19 +6528,20 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	int Slot;
-	ieDword header, flags;
+	ieDword header;
+	ieDword flags = 0; // aura pollution is on for everyone
 	ResRef itemres;
 
 	if (parameters->string0Parameter[0]) {
 		Slot = act->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;
-		flags = parameters->int1Parameter;
+		flags |= parameters->int1Parameter;
 	} else {
 		Slot = parameters->int0Parameter;
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
-		flags = parameters->int2Parameter;
+		flags |= parameters->int2Parameter;
 	}
 
 	if (Slot == -1) {

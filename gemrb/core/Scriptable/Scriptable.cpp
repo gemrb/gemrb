@@ -244,7 +244,7 @@ void Scriptable::Update()
 {
 	Ticks++;
 	AdjustedTicks++;
-	AuraTicks++;
+	if (AuraCooldown) AuraCooldown--;
 
 	if (UnselectableTimer) {
 		UnselectableTimer--;
@@ -1267,6 +1267,9 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 		Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
 		return -1;
 	}
+	if (!instant && !nointerrupt) {
+		AuraCooldown = core->Time.attack_round_size;
+	}
 	if(!nointerrupt && !CanCast(SpellResRef)) {
 		SpellResRef.Reset();
 		if (actor) {
@@ -1302,6 +1305,9 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 
 	assert(target);
 
+	if (!instant && !nointerrupt) {
+		AuraCooldown = core->Time.attack_round_size;
+	}
 	if(!nointerrupt && !CanCast(SpellResRef)) {
 		SpellResRef.Reset();
 		if (actor) {
@@ -1589,31 +1595,24 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 	return true;
 }
 
+// aura pollution happens on cast or item use
+// aura cleansing automatically or magically
 bool Scriptable::AuraPolluted()
 {
-	if (Type != ST_ACTOR) {
+	if (Type != ST_ACTOR || AuraCooldown == 0) {
 		return false;
 	}
 
-	// aura pollution happens automatically
-	// aura cleansing the usual and magical way
-	if (AuraTicks >= core->Time.attack_round_size) {
-		AuraTicks = -1;
+	// check for improved alacrity
+	const Actor *actor = static_cast<const Actor*>(this);
+	if (actor->GetStat(IE_AURACLEANSING)) {
+		AuraCooldown = 0;
+		if (core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
 		return false;
-	} else if (CurrentActionTicks == 0 && AuraTicks != 1) {
-		const Actor *act = (const Actor *) this;
-		if (act->GetStat(IE_AURACLEANSING)) {
-			AuraTicks = -1;
-			if (core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
-			return false;
-		}
 	}
 
-	if (AuraTicks > 0) {
-		// sorry, you'll have to recover first
-		return true;
-	}
-	return false;
+	// sorry, you'll have to recover first
+	return true;
 }
 
 bool Scriptable::TimerActive(ieDword ID)

@@ -9299,6 +9299,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 
 	if (!TryUsingMagicDevice(itm, header)) {
 		ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
+		AuraCooldown = core->Time.attack_round_size;
 		return false;
 	}
 
@@ -9309,6 +9310,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 
 	Projectile *pro = itm->GetProjectile(this, header, target, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
+	AuraCooldown = core->Time.attack_round_size;
 	ResetCommentTime();
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
@@ -9510,6 +9512,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 
 	if (!TryUsingMagicDevice(itm, header)) {
 		ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
+		AuraCooldown = core->Time.attack_round_size;
 		return false;
 	}
 
@@ -9520,6 +9523,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 
 	Projectile *pro = itm->GetProjectile(this, header, target->Pos, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
+	AuraCooldown = core->Time.attack_round_size;
 
 	ResetCommentTime();
 	if (pro) {
