@@ -96,7 +96,7 @@ static inline Targets *DoObjectFiltering(const Scriptable *Sender, Targets *tgts
 
 static EffectRef fx_protection_creature_ref = { "Protection:Creature", -1 };
 
-static inline bool DoObjectChecks(const Map *map, const Scriptable *Sender, const Actor *target, int &dist, bool ignoreinvis = false)
+static inline bool DoObjectChecks(const Map* map, const Scriptable* Sender, const Actor* target, int &dist, bool ignoreinvis = false, const Object* oC = nullptr)
 {
 	dist = SquaredMapDistance(Sender, target);
 
@@ -112,9 +112,15 @@ static inline bool DoObjectChecks(const Map *map, const Scriptable *Sender, cons
 		return false;
 	}
 
-	// visual range check
+	// visual range or objectRect check (if it's a valid objectRect)
 	int visualrange = source->Modified[IE_VISUALRANGE];
-	if (dist > visualrange*visualrange) return false;
+	if (HasAdditionalRect && oC && oC->objectRect.size.Area() > 0) {
+		if (!IsInObjectRect(target->Pos, oC->objectRect)) {
+			return false;
+		}
+	} else if (dist > visualrange * visualrange) {
+		return false;
+	}
 
 	// line of sight check
 	if (!map->IsVisibleLOS(Sender->Pos, target->Pos)) return false;
@@ -212,7 +218,7 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 			return nullptr;
 		}
 		int dist;
-		if (DoObjectChecks(map, Sender, ac, dist, (ga_flags & GA_DETECT) != 0)) {
+		if (DoObjectChecks(map, Sender, ac, dist, (ga_flags & GA_DETECT) != 0, oC)) {
 			if (!tgts) tgts = new Targets();
 			tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
 		}

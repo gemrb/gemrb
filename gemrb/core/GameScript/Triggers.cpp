@@ -355,6 +355,7 @@ int GameScript::InPartySlot(Scriptable *Sender, const Trigger *parameters)
 	return MatchActor(Sender, actor->GetGlobalID(), parameters->objectParameter);
 }
 
+// ignores range, but object matching like [PC] can still limit it
 int GameScript::Exists(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
