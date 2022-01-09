@@ -1821,7 +1821,8 @@ void Game::CastOnRest() const
 
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
-	size_t specialCount = core->GetSpecialSpellsCount();
+	const auto& special_spells = core->GetSpecialSpells();
+	size_t specialCount = special_spells.size();
 	if (!tmp || !specialCount) {
 		return;
 	}
@@ -1842,7 +1843,6 @@ void Game::CastOnRest() const
 	// - cast party members' all heal-all spells
 	// - repeat:
 	//       cast the most potent healing spell on the most injured member
-	const auto& special_spells = core->GetSpecialSpells();
 	std::sort(wholeparty.begin(), wholeparty.end());
 	RestSpells healingspells;
 	RestSpells nonhealingspells;

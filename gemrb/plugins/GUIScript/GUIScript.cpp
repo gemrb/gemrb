@@ -12100,11 +12100,11 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	size_t i = core->GetSpecialSpellsCount();
+	const auto& special_spells = core->GetSpecialSpells();
+	size_t i = special_spells.size();
 	if (i == 0) {
 		return RuntimeError( "Game has no splspec.2da table!" );
 	}
-	const auto& special_spells = core->GetSpecialSpells();
 	bool found = false;
 	while(i--) {
 		if (specialtype & special_spells[i].flags) {

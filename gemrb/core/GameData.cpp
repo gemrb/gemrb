@@ -805,4 +805,6 @@ int GameData::GetAreaAlias(const ResRef &areaName)
 	return -1;
 }
 
+
+
 }
