@@ -7969,7 +7969,8 @@ void Actor::SetLeader(const Actor *actor, int xoffset, int yoffset)
 void Actor::Heal(int hp)
 {
 	if (hp > 0) {
-		SetBase(IE_HITPOINTS, BaseStats[IE_HITPOINTS] + hp);
+		ieDword newHp = BaseStats[IE_HITPOINTS] + hp;
+		SetBase(IE_HITPOINTS, std::min(newHp, Modified[IE_MAXHITPOINTS]));
 	} else {
 		SetBase(IE_HITPOINTS, Modified[IE_MAXHITPOINTS]);
 	}
