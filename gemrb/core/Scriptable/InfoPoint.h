@@ -41,6 +41,7 @@ public:
 	bool CanDetectTrap() const override;
 	bool PossibleToSeeTrap() const override;
 	bool IsPortal() const;
+	int GetCursor(int targetMode) const;
 
 public:
 	ResRef Destination;

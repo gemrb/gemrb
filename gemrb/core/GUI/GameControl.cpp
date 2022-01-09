@@ -1199,69 +1199,6 @@ String GameControl::TooltipText() const {
 	return tip;
 }
 
-//returns the appropriate cursor over an active region (trap, infopoint, travel region)
-int GameControl::GetCursorOverInfoPoint(const InfoPoint *over) const
-{
-	if (target_mode == TARGET_MODE_PICK) {
-		if (over->VisibleTrap(0)) {
-			return IE_CURSOR_TRAP;
-		}
-
-		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
-	}
-	// traps always display a walk cursor?
-	if (over->Type == ST_PROXIMITY) {
-		return IE_CURSOR_WALK;
-	}
-	return over->Cursor;
-}
-
-//returns the appropriate cursor over a door
-int GameControl::GetCursorOverDoor(const Door *over) const
-{
-	if (!over->Visible()) {
-		if (target_mode == TARGET_MODE_NONE) {
-			// most secret doors are in walls, so default to the blocked cursor to not give them away
-			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
-			const Map* area = over->GetCurrentArea();
-			return area->GetCursor(over->Pos);
-		} else {
-			return lastCursor|IE_CURSOR_GRAY;
-		}
-	}
-	if (target_mode == TARGET_MODE_PICK) {
-		if (over->VisibleTrap(0)) {
-			return IE_CURSOR_TRAP;
-		}
-		if (over->Flags & DOOR_LOCKED) {
-			return IE_CURSOR_LOCK;
-		}
-
-		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
-	}
-	return over->Cursor;
-}
-
-//returns the appropriate cursor over a container (or pile)
-int GameControl::GetCursorOverContainer(const Container *over) const
-{
-	if (over->Flags & CONT_DISABLED) {
-		return lastCursor;
-	}
-
-	if (target_mode == TARGET_MODE_PICK) {
-		if (over->VisibleTrap(0)) {
-			return IE_CURSOR_TRAP;
-		}
-		if (over->Flags & CONT_LOCKED) {
-			return IE_CURSOR_LOCK2;
-		}
-
-		return IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
-	}
-	return IE_CURSOR_TAKE;
-}
-
 Holder<Sprite2D> GameControl::GetTargetActionCursor() const
 {
 	int curIdx = -1;
@@ -1361,14 +1298,14 @@ void GameControl::UpdateCursor()
 	// ignore infopoints and containers beneath doors
 	if (overDoor) {
 		if (overDoor->Visible()) {
-			nextCursor = GetCursorOverDoor(overDoor);
+			nextCursor = overDoor->GetCursor(target_mode, lastCursor);
 		} else {
 			overDoor = nullptr;
 		}
 	} else {
 		overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, false);
 		if (overInfoPoint) {
-			nextCursor = GetCursorOverInfoPoint(overInfoPoint);
+			nextCursor = overInfoPoint->GetCursor(target_mode);
 		}
 		// recheck in case the position was different, resulting in a new isVisible check
 		if (nextCursor == IE_CURSOR_INVALID) {
@@ -1386,7 +1323,7 @@ void GameControl::UpdateCursor()
 	}
 
 	if (overContainer) {
-		nextCursor = GetCursorOverContainer(overContainer);
+		nextCursor = overContainer->GetCursor(target_mode, lastCursor);
 	}
 	// recheck in case the position was different, resulting in a new isVisible check
 	// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)

@@ -143,21 +143,15 @@ private:
 	
 	void Scroll(const Point& amt);
 
-	//containers
-	int GetCursorOverContainer(const Container *over) const;
 	void HandleContainer(Container *container, Actor *actor);
-	//doors
-	int GetCursorOverDoor(const Door *over) const;
 	void HandleDoor(Door *door, Actor *actor);
-	
+
 	void UpdateCursor();
 	bool IsDisabledCursor() const override;
 
 	void PerformSelectedAction(const Point& p);
 	void CommandSelectedMovement(const Point& p, bool append = false, bool tryToRun = false) const;
 
-	//infopoints
-	int GetCursorOverInfoPoint(const InfoPoint *over) const;
 	bool OnGlobalMouseMove(const Event&);
 
 	/** Draws the Control on the Output Display */

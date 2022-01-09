@@ -114,6 +114,7 @@ public:
 	bool TryUnlock(Actor *actor) const;
 	void TryDetectSecret(int skill, ieDword actorID);
 	bool Visible() const;
+	int GetCursor(int targetMode, int lastCursor) const;
 	void dump() const;
 	int TrapResets() const override { return Flags & DOOR_RESET; }
 	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }

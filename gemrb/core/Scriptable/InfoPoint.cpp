@@ -118,6 +118,23 @@ bool InfoPoint::IsPortal() const
 	return core->HasFeature(GF_REVERSE_DOOR);
 }
 
+// returns the appropriate cursor over an active region (trap, infopoint, travel region)
+int InfoPoint::GetCursor(int targetMode) const
+{
+	if (targetMode == TARGET_MODE_PICK) {
+		if (VisibleTrap(0)) {
+			return IE_CURSOR_TRAP;
+		}
+		return IE_CURSOR_STEALTH | IE_CURSOR_GRAY;
+	}
+
+	// traps always display a walk cursor
+	if (Type == ST_PROXIMITY) {
+		return IE_CURSOR_WALK;
+	}
+	return Cursor;
+}
+
 //trap that is visible on screen (marked by red)
 //if TrapDetected is a bitflag, we could show traps selectively for
 //players, really nice for multiplayer
