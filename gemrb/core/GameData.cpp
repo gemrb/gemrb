@@ -805,6 +805,61 @@ int GameData::GetAreaAlias(const ResRef &areaName)
 	return -1;
 }
 
+int GameData::GetSpecialSpell(const ResRef& resref)
+{
+	static bool ignore = false;
+	if (ignore) {
+		return -1;
+	}
 
+	if (SpecialSpells.empty()) {
+		AutoTable table = gamedata->LoadTable("splspec");
+		if (!table) {
+			ignore = true;
+			return 0;
+		}
+
+		unsigned int specialSpellsCount = table->GetRowCount();
+		SpecialSpells.resize(specialSpellsCount);
+		for (unsigned int i = 0; i < specialSpellsCount; i++) {
+			SpecialSpells[i].resref = table->GetRowName(i);
+			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
+			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
+			SpecialSpells[i].bonus_limit = atoi(table->QueryField(i, 2));
+		}
+	}
+
+	for (const auto& spell : SpecialSpells) {
+		if (resref == spell.resref) {
+			return spell.flags;
+		}
+	}
+	return 0;
+}
+
+// disable spells based on some circumstances
+int GameData::CheckSpecialSpell(const ResRef& resRef, const Actor* actor)
+{
+	int sp = GetSpecialSpell(resRef);
+
+	// the identify spell is always disabled on the menu
+	if (sp & SP_IDENTIFY) {
+		return SP_IDENTIFY;
+	}
+
+	// if actor is silenced, and spell cannot be cast in silence, disable it
+	if (actor->GetStat(IE_STATE_ID) & STATE_SILENCED ) {
+		if (!(sp & SP_SILENCE)) {
+			return SP_SILENCE;
+		}
+	}
+
+	// disable spells causing surges to be cast while in a surge (prevents nesting)
+	if (sp & SP_SURGE) {
+		return SP_SURGE;
+	}
+
+	return 0;
+}
 
 }

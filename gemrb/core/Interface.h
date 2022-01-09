@@ -148,18 +148,6 @@ struct SpellDescType {
 	// pst also has a SOUND_EFFECT column, but we use it from GUISTORE.py directly
 };
 
-struct SpecialSpellType {
-	ResRef resref;
-	int flags;
-	int amount;
-	int bonus_limit;
-};
-#define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
-#define SP_SILENCE   2      //any spell that can be cast in silence
-#define SP_SURGE     4      //any spell that cannot be cast during a wild surge
-#define SP_REST      8      //any spell that is cast upon rest if memorized
-#define SP_HEAL_ALL  16     //any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
-
 struct SurgeSpell {
 	ResRef spell;
 	ieStrRef message;
@@ -441,7 +429,6 @@ private:
 	char NextScript[64];
 
 	std::deque<Timer> timers;
-	std::vector<SpecialSpellType> SpecialSpells;
 	KeyMap *keymap = nullptr;
 	Scriptable *CutSceneRunner = nullptr;
 
@@ -731,9 +718,6 @@ public:
 	char *GetMusicPlaylist(int SongType) const;
 	/** Returns the DeathVarFormat of the day */
 	static const char *GetDeathVarFormat();
-	int CheckSpecialSpell(const ResRef& resRef, const Actor *actor) const;
-	int GetSpecialSpell(const ResRef& resref) const;
-	const std::vector<SpecialSpellType>& GetSpecialSpells() const { return SpecialSpells; }
 	/** Saves config variables to a file */
 	bool SaveConfig();
 private:

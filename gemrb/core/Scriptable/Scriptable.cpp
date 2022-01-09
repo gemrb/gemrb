@@ -1114,7 +1114,7 @@ int Scriptable::CanCast(const ResRef& SpellRef, bool verbose) {
 	// the original hardcoded vocalize and a few more
 	// we (also) ignore tobex modded spells
 	if (actor->CheckSilenced()) {
-		if (!(core->GetSpecialSpell(spl->Name)&SP_SILENCE) && !(spl->Flags&SF_IGNORES_SILENCE)) {
+		if (!(gamedata->GetSpecialSpell(spl->Name) & SP_SILENCE) && !(spl->Flags & SF_IGNORES_SILENCE)) {
 			Log(WARNING, "Scriptable", "Tried to cast while silenced!");
 			return 0;
 		}

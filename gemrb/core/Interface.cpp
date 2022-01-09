@@ -276,7 +276,6 @@ Interface::~Interface(void)
 	delete worldmap;
 	delete keymap;
 
-	SpecialSpells.clear();
 	SurgeSpells.clear();
 
 	std::map<ResRef, Font*>::iterator fit = fonts.begin();
@@ -542,22 +541,7 @@ bool Interface::ReadSpecialSpells()
 {
 	bool result = true;
 
-	AutoTable table = gamedata->LoadTable("splspec");
-	if (table) {
-		ieDword SpecialSpellsCount = table->GetRowCount();
-		SpecialSpells.resize(SpecialSpellsCount);
-		for (ieDword i = 0; i < SpecialSpellsCount; i++) {
-			SpecialSpells[i].resref = table->GetRowName(i);
-			//if there are more flags, compose this value into a bitfield
-			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
-			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
-			SpecialSpells[i].bonus_limit = atoi(table->QueryField(i, 2));
-		}
-	} else {
-		result = false;
-	}
-
-	table = gamedata->LoadTable("wildmag");
+	AutoTable table = gamedata->LoadTable("wildmag");
 	if (table) {
 		SurgeSpell ss;
 		for (ieDword i = 0; i < table->GetRowCount(); i++) {
@@ -571,41 +555,6 @@ bool Interface::ReadSpecialSpells()
 	}
 
 	return result;
-}
-
-int Interface::GetSpecialSpell(const ResRef& resref) const
-{
-	for (const auto& spell : SpecialSpells) {
-		if (resref == spell.resref) {
-			return spell.flags;
-		}
-	}
-	return 0;
-}
-
-//disable spells based on some circumstances
-int Interface::CheckSpecialSpell(const ResRef& resRef, const Actor *actor) const
-{
-	int sp = GetSpecialSpell(resRef);
-
-	//the identify spell is always disabled on the menu
-	if (sp&SP_IDENTIFY) {
-		return SP_IDENTIFY;
-	}
-
-	//if actor is silenced, and spell cannot be cast in silence, disable it
-	if (actor->GetStat(IE_STATE_ID) & STATE_SILENCED ) {
-		if (!(sp&SP_SILENCE)) {
-			return SP_SILENCE;
-		}
-	}
-
-	// disable spells causing surges to be cast while in a surge (prevents nesting)
-	if (sp&SP_SURGE) {
-		return SP_SURGE;
-	}
-
-	return 0;
 }
 
 //Static

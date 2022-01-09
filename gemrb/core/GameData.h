@@ -57,6 +57,18 @@ struct IWDIDSEntry {
 	ieWord relation;
 };
 
+struct SpecialSpellType {
+	ResRef resref;
+	int flags;
+	int amount;
+	int bonus_limit;
+};
+#define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
+#define SP_SILENCE   2      //any spell that can be cast in silence
+#define SP_SURGE     4      //any spell that cannot be cast during a wild surge
+#define SP_REST      8      //any spell that is cast upon rest if memorized
+#define SP_HEAL_ALL  16     //any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
+
 class GEM_EXPORT GameData : public ResourceManager
 {
 public:
@@ -128,6 +140,9 @@ public:
 	int GetReputationMod(int column);
 	/** Returns the virtual worldmap entry of a sub-area (pst-only) */
 	int GetAreaAlias(const ResRef &areaName);
+	int GetSpecialSpell(const ResRef& resref);
+	const std::vector<SpecialSpellType>& GetSpecialSpells() const { return SpecialSpells; }
+	int CheckSpecialSpell(const ResRef& resRef, const Actor* actor);
 	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	inline int GetStepTime() const { return stepTime; }
@@ -158,6 +173,7 @@ private:
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;
 	std::vector<IWDIDSEntry> spellProt;
+	std::vector<SpecialSpellType> SpecialSpells;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};
