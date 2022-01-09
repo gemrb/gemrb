@@ -1849,7 +1849,7 @@ void Game::CastOnRest() const
 	while (specialCount--) {
 		const SpecialSpellType &specialSpell = special_spells[specialCount];
 		// Cast multi-target healing spells
-		if ((specialSpell.flags & (SP_REST|SP_HEAL_ALL)) == (SP_REST|SP_HEAL_ALL)) {
+		if ((specialSpell.flags & (SpecialSpell::Rest | SpecialSpell::HealAll)) == (SpecialSpell::Rest | SpecialSpell::HealAll)) {
 			while (ps-- && wholeparty.back().hpneeded > 0) {
 				Actor *tar = GetPC(ps, true);
 				while (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0) && wholeparty.back().hpneeded > 0) {
@@ -1862,7 +1862,7 @@ void Game::CastOnRest() const
 			}
 			ps = ps2;
 		// Gather rest of the spells
-		} else if (specialSpell.flags & SP_REST) {
+		} else if (specialSpell.flags & SpecialSpell::Rest) {
 			while (ps--) {
 				Actor *tar = GetPC(ps, true);
 				if (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0)) {
