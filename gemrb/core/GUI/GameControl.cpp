@@ -2090,6 +2090,10 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 	Point p = ConvertPointFromScreen(me.Pos()) + vpOrigin;
 	bool isDoubleClick = me.repeats == 2;
+	bool tryToRun = isDoubleClick;
+	if (core->HasFeature(GF_HAS_FLOAT_MENU)) {
+		tryToRun |= Mod & GEM_MOD_SHIFT;
+	}
 
 	// right click
 	if (me.button == GEM_MB_MENU) {
@@ -2152,9 +2156,9 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			// move to the object before trying to interact with it
 			Actor* mainActor = GetMainSelectedActor();
 			if (mainActor && overContainer) {
-				CreateMovement(mainActor, p, false, isDoubleClick);	// let one actor handle loot and containers
+				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle loot and containers
 			} else {
-				CommandSelectedMovement(p, false, isDoubleClick);
+				CommandSelectedMovement(p, false, tryToRun);
 			}
 		}
 		
@@ -2171,7 +2175,10 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 	// handle movement/travel, but not if we just opened the float window
 	if ((!core->HasFeature(GF_HAS_FLOAT_MENU) || me.button != GEM_MB_MENU) && lastCursor != IE_CURSOR_BLOCKED && lastCursor != IE_CURSOR_NORMAL) {
-		CommandSelectedMovement(p, Mod & GEM_MOD_SHIFT, isDoubleClick);
+		// pst has different mod keys
+		int modKey = GEM_MOD_SHIFT;
+		if (core->HasFeature(GF_HAS_FLOAT_MENU)) modKey = GEM_MOD_CTRL;
+		CommandSelectedMovement(p, Mod & modKey, tryToRun);
 	}
 	ClearMouseState();
 	return true;
