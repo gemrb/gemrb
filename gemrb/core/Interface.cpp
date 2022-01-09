@@ -186,7 +186,6 @@ private:
 
 static std::unique_ptr<AbilityTables> abilityTables;
 
-static int **reputationmod = NULL;
 static const char* const IWD2DeathVarFormat = "_DEAD%s";
 static const char* DeathVarFormat = "SPRITE_IS_DEAD%s";
 static int NumRareSelectSounds = 2;
@@ -276,16 +275,6 @@ Interface::~Interface(void)
 	delete calendar;
 	delete worldmap;
 	delete keymap;
-
-	if (reputationmod) {
-		for (unsigned int i=0; i<20; i++) {
-			if (reputationmod[i]) {
-				free(reputationmod[i]);
-			}
-		}
-		free(reputationmod);
-		reputationmod=NULL;
-	}
 
 	SpecialSpells.clear();
 	SurgeSpells.clear();
@@ -677,24 +666,6 @@ bool Interface::ReadDamageTypeTable() {
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
 		di.reduction = atoi(tm->QueryField(i, 4));
 		DamageInfoMap.insert(std::make_pair(di.value, di));
-	}
-
-	return true;
-}
-
-bool Interface::ReadReputationModTable() const
-{
-	AutoTable tm = gamedata->LoadTable("reputati");
-	if (!tm)
-		return false;
-
-	reputationmod = (int **) calloc(21, sizeof(int *));
-	int cols = tm->GetColumnCount();
-	for (unsigned int i=0; i<20; i++) {
-		reputationmod[i] = (int *) calloc(cols, sizeof(int));
-		for (int j=0; j<cols; j++) {
-			reputationmod[i][j] = atoi(tm->QueryField(i, j));
-		}
 	}
 
 	return true;
@@ -1563,12 +1534,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 	
 	abilityTables = GemRB::make_unique<AbilityTables>(MaximumAbility);
-
-	Log(MESSAGE, "Core", "Reading reputation mod table...");
-	ret = ReadReputationModTable();
-	if (!ret) {
-		Log(WARNING, "Core", "Failed to read reputation mod table.");
-	}
 
 	if ( gamedata->Exists("WMAPLAY", IE_2DA_CLASS_ID) ) {
 		Log(MESSAGE, "Core", "Initializing area aliases...");
@@ -4416,23 +4381,6 @@ int Interface::GetWisdomBonus(int column, int value) const
 		return -9999;
 
 	return abilityTables->wisbon[value];
-}
-
-int Interface::GetReputationMod(int column) const
-{
-	int reputation = game->Reputation / 10 - 1;
-
-	if (column<0 || column>8) {
-		return -9999;
-	}
-	if (reputation > 19) {
-		reputation = 19;
-	}
-	if (reputation < 0) {
-		reputation = 0;
-	}
-
-	return reputationmod[reputation][column];
 }
 
 PauseSetting Interface::TogglePause() const

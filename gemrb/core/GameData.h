@@ -125,6 +125,7 @@ public:
 	int GetSummoningLimit(ieDword sex);
 	const Color& GetColor(const char *row);
 	int GetWeaponStyleAPRBonus(int row, int col);
+	int GetReputationMod(int column);
 	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	inline int GetStepTime() const { return stepTime; }
@@ -150,6 +151,7 @@ private:
 	AutoTable trapSaveBonus;
 	AutoTable trapLimit;
 	AutoTable summoningLimit;
+	AutoTable reputationMod;
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;
 	std::vector<IWDIDSEntry> spellProt;

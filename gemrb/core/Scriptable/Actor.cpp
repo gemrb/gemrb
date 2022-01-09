@@ -4538,7 +4538,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	// also apply reputation damage if we hurt (but not killed) an innocent
 	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
 		if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
-			core->GetGame()->SetReputation(core->GetGame()->Reputation + core->GetReputationMod(1));
+			core->GetGame()->SetReputation(core->GetGame()->Reputation + gamedata->GetReputationMod(1));
 		}
 	}
 
@@ -5500,12 +5500,12 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 			// an innocent, a member of the Flaming Fist or something evil
 			int repmod = 0;
 			if (Modified[IE_CLASS] == CLASS_INNOCENT) {
-				repmod = core->GetReputationMod(0);
+				repmod = gamedata->GetReputationMod(0);
 			} else if (Modified[IE_CLASS] == CLASS_FLAMINGFIST) {
-				repmod = core->GetReputationMod(3);
+				repmod = gamedata->GetReputationMod(3);
 			}
 			if (GameScript::ID_Alignment(this,AL_EVIL) ) {
-				repmod += core->GetReputationMod(7);
+				repmod += gamedata->GetReputationMod(7);
 			}
 			if (repmod) {
 				game->SetReputation(game->Reputation + repmod);

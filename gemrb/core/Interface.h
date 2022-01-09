@@ -684,7 +684,6 @@ public:
 	int GetCharismaBonus(int column, int value) const;
 	int GetLoreBonus(int column, int value) const;
 	int GetWisdomBonus(int column, int value) const;
-	int GetReputationMod(int column) const;
 
 	/** applies the spell on the target */
 	void ApplySpell(const ResRef& spellRef, Actor *target, Scriptable *caster, int level) const;
@@ -775,7 +774,6 @@ private:
 	bool ReadItemTable(const ResRef& item, const char *Prefix);
 	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
-	bool ReadReputationModTable() const;
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
 	bool ReadSoundChannelsTable() const;

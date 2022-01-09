@@ -758,4 +758,23 @@ const IWDIDSEntry& GameData::GetSpellProt(index_t idx)
 	return spellProt[idx];
 }
 
+int GameData::GetReputationMod(int column)
+{
+	assert(column > 0 && column <= 8);
+	if (!reputationMod) {
+		reputationMod = LoadTable("reputati", true);
+	}
+	if (!reputationMod) return false;
+
+	int reputation = core->GetGame()->Reputation / 10 - 1;
+	if (reputation > 19) {
+		reputation = 19;
+	} else if (reputation < 0) {
+		reputation = 0;
+	}
+
+	return atoi(reputationMod->QueryField(reputation, column));
+}
+
+
 }

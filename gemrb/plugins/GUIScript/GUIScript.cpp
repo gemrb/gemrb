@@ -5069,11 +5069,11 @@ static PyObject* GemRB_IncreaseReputation(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	int Limit = core->GetReputationMod(8);
+	int Limit = gamedata->GetReputationMod(8);
 	if (Limit > Donation) {
 		return PyInt_FromLong (0);
 	}
-	Increase = core->GetReputationMod(4);
+	Increase = gamedata->GetReputationMod(4);
 	if (Increase) {
 		game->SetReputation( game->Reputation + Increase );
 	}
@@ -12313,7 +12313,7 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	}
 
 	// apply the reputation penalty
-	int repmod = core->GetReputationMod(2);
+	int repmod = gamedata->GetReputationMod(2);
 	if (repmod) {
 		game->SetReputation(game->Reputation + repmod);
 	}
