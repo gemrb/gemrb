@@ -1,7 +1,7 @@
-GemRB git (2419729):
+GemRB git (4cb38cf):
   New features:
     - 
-    - iwd2 can be progressed past the battle square challenge
+    - iwd2 can be progressed to well into chapter 5
     - faster loading and saving
     - Use magic device skill, precise shot
     - console history is now preserved
