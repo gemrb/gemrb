@@ -4074,7 +4074,7 @@ bool Actor::PlayWarCry(int range) const
 //call this when a PC receives a command from GUI
 void Actor::CommandActor(Action* action, bool clearPath)
 {
-	Movable::Stop(); // stop what you were doing
+	ClearActions(); // stop what you were doing
 	if (clearPath) ClearPath(true);
 	AddAction(action); // now do this new thing
 
