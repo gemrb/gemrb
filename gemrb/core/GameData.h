@@ -126,6 +126,8 @@ public:
 	const Color& GetColor(const char *row);
 	int GetWeaponStyleAPRBonus(int row, int col);
 	int GetReputationMod(int column);
+	/** Returns the virtual worldmap entry of a sub-area (pst-only) */
+	int GetAreaAlias(const ResRef &areaName);
 	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	inline int GetStepTime() const { return stepTime; }
@@ -152,6 +154,7 @@ private:
 	AutoTable trapLimit;
 	AutoTable summoningLimit;
 	AutoTable reputationMod;
+	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;
 	std::vector<IWDIDSEntry> spellProt;

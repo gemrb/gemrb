@@ -614,33 +614,6 @@ const char *Interface::GetDeathVarFormat()
 	return DeathVarFormat;
 }
 
-bool Interface::ReadAreaAliasTable(const ResRef& tablename)
-{
-	AreaAliasTable.clear();
-
-	AutoTable aa = gamedata->LoadTable(tablename);
-	if (!aa) {
-		//don't report error when the file doesn't exist
-		return true;
-	}
-
-	int idx = aa->GetRowCount();
-	while (idx--) {
-		ResRef key = MakeLowerCaseResRef(aa->GetRowName(idx));
-		ieDword value = atoi(aa->QueryField(idx,0));
-		AreaAliasTable[key] = value;
-	}
-	return true;
-}
-
-int Interface::GetAreaAlias(const ResRef &areaname) const
-{
-	if (AreaAliasTable.count(areaname)) {
-		return AreaAliasTable.at(areaname);
-	}
-	return -1;
-}
-
 bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 	AutoTable tm = gamedata->LoadTable(tablename);
 	if (!tm)
@@ -1534,14 +1507,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 	
 	abilityTables = GemRB::make_unique<AbilityTables>(MaximumAbility);
-
-	if ( gamedata->Exists("WMAPLAY", IE_2DA_CLASS_ID) ) {
-		Log(MESSAGE, "Core", "Initializing area aliases...");
-		ret = ReadAreaAliasTable( "WMAPLAY" );
-		if (!ret) {
-			Log(WARNING, "Core", "Failed to load area aliases...");
-		}
-	}
 
 	Log(MESSAGE, "Core", "Reading game time table...");
 	ret = ReadGameTimeTable();

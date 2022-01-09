@@ -462,7 +462,7 @@ public:
 	unsigned int SlotTypes = 0; // this is the same as the inventory size
 	ResRef GlobalScript = "BALDUR";
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
-	ResRefMap<ieDword> AreaAliasTable;
+
 	std::vector<Holder<Sprite2D> > Cursors;
 	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
@@ -715,8 +715,6 @@ public:
 	void RegisterOpcodes(int count, const EffectDesc *opcodes) const;
 	/** reads a list of resrefs into an array, returns array size */
 	bool ReadResRefTable(const ResRef& tablename, std::vector<ResRef>& data);
-	/** Returns the virtual worldmap entry of a sub-area */
-	int GetAreaAlias(const ResRef &areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly
 	unwanted return variables could be omitted */
 	void GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const;
@@ -777,8 +775,7 @@ private:
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
 	bool ReadSoundChannelsTable() const;
-	/** Reads table of area name mappings for WorldMap (PST only) */
-	bool ReadAreaAliasTable(const ResRef& name);
+
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
 	/** handles the EventFlag bits (conditional events) */

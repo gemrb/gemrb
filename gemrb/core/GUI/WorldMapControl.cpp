@@ -46,7 +46,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 	const Game* game = core->GetGame();
 	const WorldMap* worldmap = core->GetWorldMap();
 	currentArea = game->CurrentArea;
-	int entry = core->GetAreaAlias(currentArea);
+	int entry = gamedata->GetAreaAlias(currentArea);
 	if (entry >= 0) {
 		const WMPAreaEntry *m = worldmap->GetEntry(entry);
 		currentArea = m->AreaResRef;

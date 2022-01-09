@@ -776,5 +776,33 @@ int GameData::GetReputationMod(int column)
 	return atoi(reputationMod->QueryField(reputation, column));
 }
 
+// reads to and from table of area name mappings for the pst worldmap
+int GameData::GetAreaAlias(const ResRef &areaName)
+{
+	static bool ignore = false;
+	if (ignore) {
+		return -1;
+	}
+
+	if (AreaAliasTable.empty()) {
+		AutoTable table = gamedata->LoadTable("WMAPLAY", true);
+		if (!table) {
+			ignore = true;
+			return -1;
+		}
+
+		int idx = table->GetRowCount();
+		while (idx--) {
+			ResRef key = MakeLowerCaseResRef(table->GetRowName(idx));
+			ieDword value = atoi(table->QueryField(idx, 0));
+			AreaAliasTable[key] = value;
+		}
+	}
+
+	if (AreaAliasTable.count(areaName)) {
+		return AreaAliasTable.at(areaName);
+	}
+	return -1;
+}
 
 }
