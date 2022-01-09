@@ -862,4 +862,23 @@ int GameData::CheckSpecialSpell(const ResRef& resRef, const Actor* actor)
 	return 0;
 }
 
+const SurgeSpell& GameData::GetSurgeSpell(unsigned int idx)
+{
+	if (SurgeSpells.empty()) {
+		AutoTable table = gamedata->LoadTable("wildmag");
+		assert(table);
+
+		SurgeSpell ss;
+		for (ieDword i = 0; i < table->GetRowCount(); i++) {
+			ss.spell = table->QueryField(i, 0);
+			ss.message = strtounsigned<ieStrRef>(table->QueryField(i, 1));
+			// comment ignored
+			SurgeSpells.push_back(ss);
+		}
+	}
+	assert(idx < SurgeSpells.size());
+
+	return SurgeSpells[idx];
+}
+
 }

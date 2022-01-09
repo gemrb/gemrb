@@ -148,11 +148,6 @@ struct SpellDescType {
 	// pst also has a SOUND_EFFECT column, but we use it from GUISTORE.py directly
 };
 
-struct SurgeSpell {
-	ResRef spell;
-	ieStrRef message;
-};
-
 class ItemList {
 public:
 	std::vector<ResRef> ResRefs;
@@ -456,7 +451,6 @@ public:
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	TimeStruct Time{};
-	std::vector<SurgeSpell> SurgeSpells;
 public:
 	Interface();
 	~Interface(void);
@@ -756,7 +750,6 @@ private:
 	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
 	bool ReadGameTimeTable();
-	bool ReadSpecialSpells();
 	bool ReadSoundChannelsTable() const;
 
 	/** handles the QuitFlag bits (main loop events) */

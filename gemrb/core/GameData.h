@@ -71,6 +71,11 @@ enum SpecialSpell : int8_t {
 	HealAll = 16 // any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
 };
 
+struct SurgeSpell {
+	ResRef spell;
+	ieStrRef message;
+};
+
 class GEM_EXPORT GameData : public ResourceManager
 {
 public:
@@ -145,6 +150,7 @@ public:
 	int GetSpecialSpell(const ResRef& resref);
 	const std::vector<SpecialSpellType>& GetSpecialSpells() const { return SpecialSpells; }
 	int CheckSpecialSpell(const ResRef& resRef, const Actor* actor);
+	const SurgeSpell& GetSurgeSpell(unsigned int idx);
 	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	inline int GetStepTime() const { return stepTime; }
@@ -176,6 +182,7 @@ private:
 	std::map<std::string, Color> colors;
 	std::vector<IWDIDSEntry> spellProt;
 	std::vector<SpecialSpellType> SpecialSpells;
+	std::vector<SurgeSpell> SurgeSpells;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};

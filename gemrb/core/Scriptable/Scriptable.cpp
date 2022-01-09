@@ -1448,17 +1448,17 @@ int Scriptable::CheckWildSurge()
 		// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
 		if ((check > 0) && (check < 100) ) {
 			// display feedback: Wild Surge: bla bla
+			// look up the spell in the "check" row of wildmag.2da
+			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
 			String* s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
-			String* s2 = core->GetString(core->SurgeSpells[check-1].message, 0);
+			String* s2 = core->GetString(surgeSpell.message, 0);
 			displaymsg->DisplayStringName(*s1 + L" " + *s2, DMC_WHITE, this);
 			delete s1;
 			delete s2;
 
-			// lookup the spell in the "check" row of wildmag.2da
-			ResRef surgeSpellRef = core->SurgeSpells[check-1].spell;
-			if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
+			if (!gamedata->Exists(surgeSpell.spell, IE_SPL_CLASS_ID)) {
 				// handle the hardcoded cases - they'll also fail here
-				if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
+				if (!HandleHardcodedSurge(surgeSpell.spell, spl, caster)) {
 					//free the spell handle because we need to return
 					gamedata->FreeSpell(spl, oldSpellResRef, false);
 					return 0;
@@ -1466,7 +1466,7 @@ int Scriptable::CheckWildSurge()
 			} else {
 				// finally change the spell
 				// the hardcoded bunch does it on its own when needed
-				SpellResRef = surgeSpellRef;
+				SpellResRef = surgeSpell.spell;
 			}
 		}
 

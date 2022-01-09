@@ -276,8 +276,6 @@ Interface::~Interface(void)
 	delete worldmap;
 	delete keymap;
 
-	SurgeSpells.clear();
-
 	std::map<ResRef, Font*>::iterator fit = fonts.begin();
 	for (; fit != fonts.end(); ++fit)
 		delete (*fit).second;
@@ -535,26 +533,6 @@ bool Interface::ReadGameTimeTable()
 	Time.day_size = Time.day_sec * AI_UPDATE_TIME;
 
 	return true;
-}
-
-bool Interface::ReadSpecialSpells()
-{
-	bool result = true;
-
-	AutoTable table = gamedata->LoadTable("wildmag");
-	if (table) {
-		SurgeSpell ss;
-		for (ieDword i = 0; i < table->GetRowCount(); i++) {
-			ss.spell = table->QueryField(i, 0);
-			ss.message = strtounsigned<ieStrRef>(table->QueryField(i, 1));
-			// comment ignored
-			SurgeSpells.push_back(ss);
-		}
-	} else {
-		result = false;
-	}
-
-	return result;
 }
 
 //Static
@@ -1462,12 +1440,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	if (!ret) {
 		Log(FATAL, "Core", "Failed to read game time table...");
 		return GEM_ERROR;
-	}
-
-	Log(MESSAGE, "Core", "Reading special spells table...");
-	ret = ReadSpecialSpells();
-	if (!ret) {
-		Log(WARNING, "Core", "Failed to load special spells.");
 	}
 
 	ret = ReadDamageTypeTable();
