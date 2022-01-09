@@ -818,16 +818,11 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		}
 
 		// check if a wild surge ordered us to replicate the projectile
-		projectileCount = caster->wildSurgeMods.num_castings;
-		if (!projectileCount) {
-			projectileCount = 1;
-		}
-	}
+		projectileCount = std::max(1U, caster->wildSurgeMods.num_castings);
 
-	if (pst_flags && caster) {
-		if (caster->GetStat(IE_STATE_ID)&STATE_EE_DUPL) {
-			//seriously, wild surges and EE in the same game?
-			//anyway, it would be too many duplications
+		if (pst_flags && caster->GetStat(IE_STATE_ID) & STATE_EE_DUPL) {
+			// seriously, wild surges and EE in the same game?
+			// anyway, it would be too many duplications
 			projectileCount = 2;
 		}
 	}
