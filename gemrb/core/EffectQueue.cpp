@@ -2375,7 +2375,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 				// alignment.ids check - see below
 				idx = IE_ALIGNMENT;
 			}
-			// fall-through and explict values for extra EE modes, so it's clearer we implemented them
+			// fall through
 		case STI_EA:
 		case STI_GENERAL:
 		case STI_RACE:
