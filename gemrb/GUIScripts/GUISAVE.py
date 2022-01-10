@@ -32,7 +32,6 @@ from GUIDefines import *
 
 SaveWindow = None
 ConfirmWindow = None
-NameField = 0
 SaveButton = 0
 Games = ()
 ScrollBar = 0
@@ -171,16 +170,12 @@ def CloseConfirmWindow():
 	SaveWindow.Focus()
 	return
 
-def AbortedSaveGame():
-	CloseConfirmWindow ()
-	return
-
 # User entered save name and pressed save/overwrite.
 # Display progress bar screen and save the game, close the save windows
-def ConfirmedSaveGame():
+def ConfirmedSaveGame (saveIdx):
 	global ConfirmWindow
 
-	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
+	Pos = GemRB.GetVar ("TopIndex") + saveIdx
 	Label = ConfirmWindow.GetControl (ctrl_offset[7])
 	Slotname = Label.QueryText ()
 	Slotname = Slotname.replace ("/", "|") # can't have path separators in the name
@@ -190,7 +185,7 @@ def ConfirmedSaveGame():
 		return
 
 	# We have to close floating window first
-	OpenConfirmWindow ()
+	CloseConfirmWindow ()
 	#FIXME: make this work
 	#LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
 
@@ -203,15 +198,10 @@ def ConfirmedSaveGame():
 		GemRB.SaveGame (None, Slotname, sav_version)
 	return
 
-def OpenConfirmWindow ():
-	global ConfirmWindow, NameField, SaveButton
+def OpenConfirmWindow (btn, val):
+	global ConfirmWindow, SaveButton
 
-	if ConfirmWindow != None:
-		ConfirmWindow.Unload ()
-		ConfirmWindow = None
-		return
-
-	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
+	Pos = GemRB.GetVar ("TopIndex") + val
 	ConfirmWindow = GemRB.LoadWindow (1)
 
 	# Slot name
@@ -257,7 +247,7 @@ def OpenConfirmWindow ():
 	# Save/Overwrite
 	SaveButton = ConfirmWindow.GetControl (ctrl_offset[10])
 	SaveButton.SetText (save_strref)
-	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConfirmedSaveGame)
+	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ConfirmedSaveGame (val))
 	SaveButton.MakeDefault()
 
 	if Slotname == "":
@@ -266,7 +256,7 @@ def OpenConfirmWindow ():
 	# Cancel
 	CancelButton = ConfirmWindow.GetControl (ctrl_offset[11])
 	CancelButton.SetText (strs['cancel'])
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbortedSaveGame)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseConfirmWindow)
 	CancelButton.MakeEscape()
 
 	ConfirmWindow.Focus()
@@ -276,7 +266,7 @@ def OpenConfirmWindow ():
 
 # Disable Save/Overwrite button if the save slotname is empty,
 # else enable it
-def EditChange():
+def EditChange (NameField):
 	Name = NameField.QueryText ()
 	if len(Name) == 0:
 		SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -284,17 +274,17 @@ def EditChange():
 		SaveButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
-def DeleteGameConfirm():
+def DeleteGameConfirm (delIndex):
 	global Games
 
 	TopIndex = GemRB.GetVar ("TopIndex")
-	Pos = TopIndex + GemRB.GetVar ("SaveIdx")
+	Pos = TopIndex + delIndex
 	GemRB.DeleteSaveGame (Games[Pos])
 	del Games[Pos]
-	if TopIndex>0:
-		GemRB.SetVar ("TopIndex",TopIndex-1)
+	if TopIndex > 0:
+		GemRB.SetVar ("TopIndex", TopIndex - 1)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
-	ScrollBarPress()
+	ScrollBarPress ()
 
 	CloseConfirmWindow ()
 	return
@@ -303,22 +293,22 @@ def DeleteGameCancel():
 	CloseConfirmWindow ()
 	return
 
-def DeleteGamePress():
+def DeleteGamePress (btn, val):
 	global ConfirmWindow
 
-	ConfirmWindow=GemRB.LoadWindow (ctrl_offset[12])
+	ConfirmWindow = GemRB.LoadWindow (ctrl_offset[12])
 	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)
 
-	Text=ConfirmWindow.GetControl (0)
+	Text = ConfirmWindow.GetControl (0)
 	Text.SetText (strs['yousure'])
 
-	DeleteButton=ConfirmWindow.GetControl (1)
+	DeleteButton = ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (strs['delete'])
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
+	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DeleteGameConfirm (val))
 	DeleteButton.MakeDefault ()
 
-	CancelButton=ConfirmWindow.GetControl (2)
+	CancelButton = ConfirmWindow.GetControl (2)
 	CancelButton.SetText (strs['cancel'])
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
 	CancelButton.MakeEscape()
@@ -337,6 +327,5 @@ def CloseSaveWindow ():
 	if GemRB.GetVar ("QuitAfterSave"):
 		GemRB.QuitGame ()
 		GemRB.SetNextScript ("Start")
-		return
 
 	return

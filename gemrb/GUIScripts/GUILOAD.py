@@ -184,11 +184,11 @@ def QuickLoadPressed():
 		GemRB.EnterGame ()
 	return
 
-def DeleteGameConfirm():
+def DeleteGameConfirm (delIdx):
 	global Games
 
 	TopIndex = GemRB.GetVar ("TopIndex")
-	Pos = TopIndex +GemRB.GetVar ("LoadIdx")
+	Pos = TopIndex + delIdx
 	GemRB.DeleteSaveGame(Games[Pos])
 
 	del Games[Pos]
@@ -208,7 +208,7 @@ def DeleteGameCancel ():
 	LoadWindow.Focus()
 	return
 
-def DeleteGamePress ():
+def DeleteGamePress (btn, val):
 	global ConfirmWindow
 
 	ConfirmWindow=GemRB.LoadWindow (1)
@@ -217,7 +217,7 @@ def DeleteGamePress ():
 	Text.SetText (15305)
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (13957)
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
+	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DeleteGameConfirm (val))
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
