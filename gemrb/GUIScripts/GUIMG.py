@@ -48,7 +48,7 @@ FlashResRef = "FLASHBR" if GameCheck.IsBG2() else "FLASH"
 def ToggleSpellWindow (btn):
 	global Sorcerer
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
 	
 	ToggleSpellWindow.Args = btn
@@ -108,7 +108,7 @@ def UpdateMageWindow (MageWindow):
 	MageMemorizedSpellList = []
 	MageKnownSpellList = []
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	spelltype = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, spelltype, level, 1)
@@ -204,7 +204,7 @@ def MageSelectionChanged (oldwin):
 	
 	UpdateMageWindow(oldwin)
 	
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
 
 	if Sorcerer:
@@ -279,7 +279,7 @@ def OpenMageSpellInfoWindow ():
 	return
 
 def OnMageMemorizeSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
@@ -358,7 +358,7 @@ def OpenMageSpellUnmemorizeWindow (btn):
 	return
 
 def OnMageUnmemorizeSpell (btn):
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 	index = btn.Value
@@ -371,7 +371,7 @@ def OnMageUnmemorizeSpell (btn):
 	return
 
 def OnMageRemoveSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 

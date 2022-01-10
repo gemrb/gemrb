@@ -775,7 +775,7 @@ def UpdateStoreHealWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", None, "STOGOLD")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index") + TopIndex
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	labelOffset = 0x1000000c
 	if GameCheck.IsIWD2():
 		labelOffset += 1 # grrr
@@ -1004,7 +1004,7 @@ def UpdateStoreCommon (Window, title, name, gold):
 		if Bag:
 			Label.SetText (Bag['StoreName'])
 		else:
-			pc = GemRB.GameGetSelectedPCSingle ()
+			pc = GemRB.GetVar("SELECTED_PC")
 			Label.SetText (GemRB.GetPlayerName (pc, 0))
 
 	Label = Window.GetControlAlias (gold)
@@ -1015,7 +1015,7 @@ def GetPC():
 	global PreviousPC
 
 	if PreviousPC:
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		if PreviousPC != pc:
 			PreviousPC = pc
 			# reset the store indices, to prevent overscrolling
@@ -1027,14 +1027,14 @@ def GetPC():
 			GemRB.CloseRighthandStore ()
 			UnselectNoRedraw ()
 	else:
-		PreviousPC = GemRB.GameGetSelectedPCSingle ()
+		PreviousPC = GemRB.GetVar("SELECTED_PC")
 		pc = PreviousPC
 
 	return pc
 
 # Unselects all the selected buttons, so they are not preselected in other windows
 def UnselectNoRedraw ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	LeftCount = Store['StoreItemCount']
 	for i in range (LeftCount, 0, -1):
 		Flags = GemRB.IsValidStoreItem (pc, i-1, ITEM_STORE)&SHOP_SELECT
@@ -1049,21 +1049,21 @@ def UnselectNoRedraw ():
 			# same code for ID, so no repeat needed
 
 def SelectID (Window):
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Index = GemRB.GetVar ("Index")
 	GemRB.ChangeStoreItem (pc, inventory_slots[Index], SHOP_ID|SHOP_SELECT)
 	RedrawStoreIdentifyWindow (Window)
 	return
 
 def SelectBuy ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_BUY|SHOP_SELECT)
 	RedrawStoreShoppingWindow (GemRB.GetView('WINSHOP'))
 	return
 
 def ToBackpackPressed ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	LeftCount = Store['StoreItemCount']
 	#going backwards because removed items shift the slots
 	for i in range (LeftCount, 0, -1):
@@ -1079,7 +1079,7 @@ def BuyPressed ():
 		ErrorWindow (strrefs["itemstoocostly"])
 		return
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	LeftCount = Store['StoreItemCount']
 	#going backwards because removed items shift the slots
 	for i in range (LeftCount, 0, -1):
@@ -1098,7 +1098,7 @@ def BuyPressed ():
 	return
 
 def SelectSell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	RightIndex = GemRB.GetVar ("RightIndex")
 	if not Bag:
 		RightIndex = inventory_slots[RightIndex]
@@ -1110,7 +1110,7 @@ def SelectSell ():
 	return
 
 def ToBagPressed ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	RightCount = len (inventory_slots)
 	#no need to go reverse
 	for Slot in range (RightCount):
@@ -1122,7 +1122,7 @@ def ToBagPressed ():
 	return
 
 def SellPressed ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	if Bag:
 		RightCount = Bag['StoreItemCount']
 		#going backwards because removed items shift the slots
@@ -1152,7 +1152,7 @@ def OpenBag (Window):
 		return
 	if Inventory:
 		return
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	RightIndex = GemRB.GetVar ("RightIndex")
 	Slot = GemRB.GetSlotItem (pc, inventory_slots[RightIndex])
 	Item = GemRB.GetItem (Slot['ItemResRef'])
@@ -1182,7 +1182,7 @@ def CloseBag (Window):
 def UnselectBag ():
 	if not Bag:
 		return
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	RightCount = Bag['StoreItemCount']
 	for Slot in range (RightCount):
 		Flags = GemRB.IsValidStoreItem (pc, Slot, ITEM_BAG)
@@ -1194,7 +1194,7 @@ def RedrawStoreShoppingWindow (Window):
 	global BuySum, SellSum
 
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	LeftIndex = GemRB.GetVar ("LeftIndex")
@@ -1405,7 +1405,7 @@ def ConfirmItemAmount (Number, store = STORE_MAIN):
 def RedrawStoreIdentifyWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
 	TopIndex = GemRB.GetVar ("TopIndex")
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Count = len(inventory_slots)
 	IDPrice = Store['IDPrice']
 
@@ -1473,7 +1473,7 @@ def RedrawStoreIdentifyWindow (Window):
 	return
 
 def IdentifyPressed (Window):
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Count = len(inventory_slots)
 
 	# get all the selected items
@@ -1507,7 +1507,7 @@ def IdentifyPressed (Window):
 
 def InfoIdentifyWindow ():
 	Index = GemRB.GetVar ("Index")
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Count = len(inventory_slots)
 	if Index >= Count:
 		return
@@ -1529,7 +1529,7 @@ def InfoRightWindow ():
 		Slot = GemRB.GetStoreItem (Index, STORE_BAG)
 		Item = GemRB.GetItem (Slot['ItemResRef'])
 	else:
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		Count = len(inventory_slots)
 		if Index >= Count:
 			return
@@ -1601,7 +1601,7 @@ def InfoWindow (Slot, Item):
 
 def StealPressed (Window):
 	LeftIndex = GemRB.GetVar ("LeftIndex")
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	#percentage skill check, if fails, trigger StealFailed
 	#if difficulty = 0 and skill=100, automatic success
 	#if difficulty = 0 and skill=50, 50% success
@@ -1624,7 +1624,7 @@ def RedrawStoreStealWindow (Window):
 	RightIndex = GemRB.GetVar ("RightIndex")
 	idx = [ LeftTopIndex, RightTopIndex, LeftIndex, RightIndex ]
 	LeftCount = Store['StoreItemCount']
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	RightCount = len(inventory_slots)
 	for i in range (ItemButtonCount):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
@@ -1781,7 +1781,7 @@ def GetRealCurePrice (cure):
 
 	if not RaiseDeadTable:
 		RaiseDeadTable = GemRB.LoadTable ("raisdead")
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	raisingPrice = RaiseDeadTable.GetValue (str(GemRB.GetPlayerStat(pc, IE_CLASSLEVELSUM)), "VALUE")
 	if cure['CureResRef'].lower() == "sppr504":
 		return raisingPrice
@@ -1925,7 +1925,7 @@ def BuyHeal ():
 		return
 
 	GemRB.GameSetPartyGold (gold - price)
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 	# for anything but raise/resurrect, the talker should be the caster, so
 	# self-targeting spells work properly. Raise dead is an exception as
@@ -1952,7 +1952,7 @@ def GulpDrink ():
 
 	TextArea = Window.GetControl (13)
 	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	intox = GemRB.GetPlayerStat (pc, IE_INTOXICATION)
 	if intox > 80:
 		TextArea.Append (strrefs["toodrunk"])

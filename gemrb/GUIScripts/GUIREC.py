@@ -87,7 +87,7 @@ def InitRecordsWindow (Window):
 def UpdateRecordsWindow (Window):
 	global alignment_help
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	GUICommon.UpdateMageSchool (pc)
 
 	# exportable
@@ -843,7 +843,7 @@ def OpenInformationWindow ():
 		ChapterCount = ChapterCount + stat['KillsChapterCount']
 
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	stat = GemRB.GetPCStats (pc)
 
 	Label = Window.GetControl (0x10000000)
@@ -933,7 +933,7 @@ def OpenKitInfoWindow ():
 	#kit or class description
 	TextArea = KitInfoWindow.GetControl (0)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	ClassName = GUICommon.GetClassRowName (pc)
 	Multi = GUICommon.HasMultiClassBits (pc)
 	Dual = GUICommon.IsDualClassed (pc, 1)

@@ -76,7 +76,7 @@ def OpenEnemyWindow(chargen=0):
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	else:
 		RaceWindow = GemRB.LoadWindow (16, "GUIREC")
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		Class = GemRB.GetVar ("LUClass") + 1
 		LevelDiff = GemRB.GetVar ("LevelDiff")
 		rangerLevel = GemRB.GetPlayerStat (pc, IE_LEVELRANGER)
@@ -170,7 +170,7 @@ def NextPress(save=1):
 		last = RacialEnemies.index (0)
 
 		# save, but note that racial enemies are stored in many stats
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		newHated = GemRB.GetVar ("HatedRace")
 		GemRB.SetPlayerStat (pc, RacialStats[last], newHated)
 

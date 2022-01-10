@@ -544,7 +544,7 @@ def HasSorcererBook (pc, cls=-1):
 	return IsSorcererBook (SorcererBook)
 
 def CannotLearnSlotSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# disqualify sorcerers immediately
 	if HasSorcererBook (pc):

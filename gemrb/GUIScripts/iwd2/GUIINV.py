@@ -60,7 +60,7 @@ def InitInventoryWindow (Window):
 		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 		
 	def SelectColor(stat):
-		pc = GemRB.GameGetSelectedPCSingle()
+		pc = GemRB.GetVar("SELECTED_PC")
 		Picker = PaperDoll.SelectColorForPC(stat, pc, "GUIINV")
 		Picker.SetAction (lambda: GemRB.SetPlayerStat(pc, stat, Picker.GetVar("PickedColor")), ACTION_WINDOW_CLOSED)
 
@@ -141,7 +141,7 @@ def InitInventoryWindow (Window):
 	return
 
 def ChangeWeaponPressed ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Equipped = GemRB.GetVar ("Equipped")
 	GemRB.SetEquippedQuickSlot (pc, Equipped, -1)
 	return
@@ -151,7 +151,7 @@ def UpdateInventoryWindow (Window = None):
 	if Window == None:
 		Window = GemRB.GetView("WIN_INV")
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
 	Count = Container['ItemCount']
@@ -177,7 +177,7 @@ OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommon
 def RefreshInventoryWindow ():
 	Window = InventoryWindow
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# name
 	Label = Window.GetControl (0x10000032)

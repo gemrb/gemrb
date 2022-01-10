@@ -69,7 +69,7 @@ def IsFeatUsable(feat):
 	if CharGen:
 		slot = GemRB.GetVar ("Slot")
 	else:
-		slot = GemRB.GameGetSelectedPCSingle ()
+		slot = GemRB.GetVar("SELECTED_PC")
 
 	# feint a level increase
 	if LUStat > 0:
@@ -102,7 +102,7 @@ def GetBaseValue(feat):
 		else:
 			Val = Val2
 	else:
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		Val = GemRB.HasFeat (pc, feat) # actually returns count
 
 	Val3 = 0
@@ -219,7 +219,7 @@ def OpenFeatsWindow(chargen=0):
 		ButtonCount = 10
 		LUStat = 0
 	else:
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		Race = IDLUCommon.GetRace (pc)
 		# instead of the base class, lookup its kit if any
 		# luckily you can only have one kit per class
@@ -406,7 +406,7 @@ def NextPress(save=1):
 		if CharGen:
 			pc = GemRB.GetVar ("Slot")
 		else:
-			pc = GemRB.GameGetSelectedPCSingle ()
+			pc = GemRB.GetVar("SELECTED_PC")
 		for i in range (featCount):
 			GemRB.SetFeat (pc, i, GemRB.GetVar ("Feat "+str(i)))
 
@@ -416,7 +416,7 @@ def NextPress(save=1):
 		# handle toughness first, since hp is tricky
 		ToughnessDiff = GemRB.GetVar ("Feat 69") - GemRB.GetVar ("BaseFeatValue 69")
 		if ToughnessDiff > 0:
-			pc = GemRB.GameGetSelectedPCSingle ()
+			pc = GemRB.GetVar("SELECTED_PC")
 			GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1) + ToughnessDiff * 3, 0)
 			GemRB.SetPlayerStat (pc, IE_HITPOINTS, GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1) + ToughnessDiff * 3, 0)
 

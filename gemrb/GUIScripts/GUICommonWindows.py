@@ -1170,7 +1170,7 @@ def UpdateAnimation ():
 		# this is a callback from the core on EF_UPDATEANIM!
 		return
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	disguise = GemRB.GetGameVar ("APPEARANCE")
 	if disguise == 2: #dustman
@@ -1303,7 +1303,7 @@ def TopWindowClosed(window):
 
 	GemRB.LeaveContainer()
 	if GemRB.IsDraggingItem () == 1:
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		#store the item in the inventory before window is closed
 		GemRB.DropDraggedItem (pc, -3)
 		#dropping on ground if cannot store in inventory
@@ -1378,7 +1378,7 @@ def SetTopWindow (window, selectionHandler = None):
 	if topwin == window:
 		return
 		
-	pc = GemRB.GameGetSelectedPCSingle()
+	pc = GemRB.GetVar("SELECTED_PC")
 	
 	if topwin:
 		topwin.Close() # invalidates topwin so must use a different variable
@@ -1906,7 +1906,7 @@ def SelectionChanged ():
 		if SelectionChangeMultiHandler:
 			SelectionChangeMultiHandler ()
 	else:
-		sel = GemRB.GameGetSelectedPCSingle ()
+		sel = GemRB.GetVar("SELECTED_PC")
 		GUICommon.UpdateMageSchool (sel)
 
 		PortraitButtons = GetPortraitButtons (PortraitWindow)

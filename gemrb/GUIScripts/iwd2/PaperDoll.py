@@ -165,7 +165,7 @@ def OpenColorPicker(row, PickedColor, pack = "GUICG"):
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		
-	pc = GemRB.GameGetSelectedPCSingle() or GemRB.GetVar("Slot")
+	pc = GemRB.GetVar("SELECTED_PC") or GemRB.GetVar("Slot")
 	Race = IDLUCommon.GetRace (pc)
 	RaceName = CommonTables.Races.GetRowName (Race)
 	HairTable = GemRB.LoadTable(CommonTables.Races.GetValue(RaceName, "HAIR"))

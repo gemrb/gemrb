@@ -45,7 +45,7 @@ UpdateInventoryWindow = None
 def OnDragItemGround (btn):
 	"""Drops and item to the ground."""
 	
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = btn.Value
 
 	GemRB.GetView ("MsgSys").SetText ("")
@@ -68,7 +68,7 @@ def OnAutoEquip ():
 	if GemRB.IsDraggingItem ()!=1:
 		return
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	#-1 : drop stuff in equipable slots (but not inventory)
 	GemRB.DropDraggedItem (pc, -1)
@@ -87,7 +87,7 @@ def OnDragItem (btn):
 		return
 
 	slot = btn.Value
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 
 	GemRB.GetView ("MsgSys").SetText ("")
@@ -183,7 +183,7 @@ def IncreaseStackAmount ():
 def DragItemAmount (slot_item, location = "inventory"):
 	"""Drag a split item."""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	#emergency dropping
 	if GemRB.IsDraggingItem()==1:
@@ -200,7 +200,7 @@ def DragItemAmount (slot_item, location = "inventory"):
 	return
 
 def MouseEnterSlot (Button):
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	if GemRB.IsDraggingItem ()==1:
 		drag_item = GemRB.GetSlotItem (0, 0)
@@ -214,7 +214,7 @@ def MouseEnterSlot (Button):
 	return
 
 def MouseLeaveSlot (Button):
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	UpdateSlot (pc, Button.Value - 1)
 	return
@@ -340,7 +340,7 @@ def DisplayItem (slotItem, itemtype):
 	drink = (itemtype & 1) and (item["Function"]&ITM_F_DRINK)
 	read = (itemtype & 1) and (item["Function"]&ITM_F_READ)
 	# only mages and bards can learn spells
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	ClassName = GUICommon.GetClassRowName (pc)
 	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
 	if SpellBookType == "*" or SpellBookType == "MXSPLSRC":
@@ -434,7 +434,7 @@ def CycleDisplayItem(direction):
 
 	slot = int(GemRB.GetVar('ItemButton'))
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	slot_item = None
 	
@@ -455,7 +455,7 @@ def CycleDisplayItem(direction):
 		OpenItemInfoWindow (slot)
 
 def OpenItemInfoWindow (slot):
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	slotItem = GemRB.GetSlotItem (pc, slot)
 	slotType = GemRB.GetSlotType (slot, pc)
@@ -488,7 +488,7 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled=0):
 def OpenGroundItemInfoWindow (btn):
 	global ItemInfoWindow
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = btn.Value
 	slot_item = GemRB.GetContainerItem (pc, slot)
 
@@ -516,7 +516,7 @@ def OpenItemAmountWindow (btn, location = "inventory"):
 	global UsedSlot, OverSlot
 	global ItemAmountWindow, StackAmount
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	UsedSlot = btn.Value
 	if GemRB.IsDraggingItem ()==1:
@@ -695,7 +695,7 @@ def UpdateSlot (pc, slot):
 def ReleaseFamiliar ():
 	"""Simple Use Item"""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = GemRB.GetVar ("ItemButton")
 	# the header is always the first, target is always self
 	GemRB.UseItem (pc, slot, 0, 5)
@@ -705,7 +705,7 @@ def ReleaseFamiliar ():
 def ConsumeItem ():
 	"""Drink the potion"""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = GemRB.GetVar ("ItemButton")
 	# the drink item header is always the first
 	# pst also requires forcing the target (eg. clot charms), which doesn't hurt elsewhere
@@ -741,7 +741,7 @@ def CloseErrorWindow ():
 def ReadItemWindow ():
 	"""Tries to learn the mage scroll."""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = GemRB.GetVar ("ItemButton")
 	ret = Spellbook.CannotLearnSlotSpell()
 
@@ -808,7 +808,7 @@ def OpenItemWindow ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Close ()
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	ResRef = slot_item['ItemResRef']
 	#the store will have to reopen the inventory
@@ -818,7 +818,7 @@ def OpenItemWindow ():
 def DialogItemWindow ():
 	"""Converse with an item."""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
@@ -837,7 +837,7 @@ def IdentifyUseSpell ():
 
 	global ItemIdentifyWindow
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Close ()
@@ -858,7 +858,7 @@ def IdentifyUseScroll ():
 
 	global ItemIdentifyWindow
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Close ()
@@ -887,7 +887,7 @@ def CloseIdentifyItemWindow ():
 def IdentifyItemWindow ():
 	global ItemIdentifyWindow
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
 	Button = Window.GetControl (0)
@@ -925,7 +925,7 @@ def IdentifyItemWindow ():
 	return
 
 def DoneAbilitiesItemWindow ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = GemRB.GetVar ("ItemButton")
 	GemRB.SetupQuickSlot (pc, 0, slot, GemRB.GetVar ("Ability") )
 	CloseAbilitiesItemWindow ()
@@ -946,7 +946,7 @@ def AbilitiesItemWindow ():
 
 	ItemAbilitiesWindow = Window = GemRB.LoadWindow (6)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	item = GemRB.GetItem (slot_item["ItemResRef"])

@@ -39,7 +39,7 @@ def SetupSpellsWindow(chargen=0):
 		LevelDiff = 1
 		KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	else:
-		MyChar = GemRB.GameGetSelectedPCSingle ()
+		MyChar = GemRB.GetVar("SELECTED_PC")
 		ClassIndex = GemRB.GetVar ("LUClass")
 		ClassName = GUICommon.GetClassRowName (ClassIndex, "index")
 		LevelDiff = GemRB.GetVar ("LevelDiff")

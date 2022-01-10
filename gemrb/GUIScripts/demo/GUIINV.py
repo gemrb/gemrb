@@ -133,7 +133,7 @@ def InitInventoryWindow (Window):
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 def ChangeWeaponPressed ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Equipped = GemRB.GetVar ("Equipped")
 	GemRB.SetEquippedQuickSlot (pc, Equipped, -1)
 	return
@@ -143,7 +143,7 @@ def UpdateInventoryWindow (Window = None):
 	if Window == None:
 		Window = GemRB.GetView("WIN_INV")
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
 	Count = Container['ItemCount']
@@ -170,7 +170,7 @@ OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommon
 def RefreshInventoryWindow ():
 	Window = InventoryWindow
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# name
 	Label = Window.GetControl (0x10000032)
