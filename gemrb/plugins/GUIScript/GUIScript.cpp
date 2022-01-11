@@ -1989,6 +1989,42 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_Control_SetValue__doc,
+"===== Control_SetValue =====\n\
+\n\
+**Prototype:** GemRB.Control_SetValue (WindowIndex, ControlIndex, LongValue)\n\
+\n\
+**Metaclass Prototype:** SetValue (LongValue)\n\
+\n\
+**Description:** Set the value of a control. \n\
+\n\
+**Parameters:**\n\
+  * WindowIndex, ControlIndex  - the control's reference\n\
+  * LongValue - numeric, a value associated with the control\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:Control_SetVarAssoc]], [[guiscript:data_exchange]], [[guiscript:accessing_gui_controls]]"
+);
+
+static PyObject* GemRB_Control_SetValue(PyObject* self, PyObject* args)
+{
+	PyObject* Value;
+	PARSE_ARGS(args, "OO", &self, &Value);
+
+	Control* ctrl = GetView<Control>(self);
+	ABORT_IF_NULL(ctrl);
+	
+	Control::value_t val = Control::INVALID_VALUE;
+	if (PyNumber_Check(Value))
+	{
+		val = static_cast<Control::value_t>(PyInt_AsUnsignedLongMask(Value));
+	}
+	ctrl->SetValue(val);
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_Control_SetVarAssoc__doc,
 "===== Control_SetVarAssoc =====\n\
 \n\
@@ -13362,6 +13398,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetColor, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),
+	METHOD(Control_SetValue, METH_VARARGS),
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
 	METHOD(SaveGame_GetDate, METH_VARARGS),

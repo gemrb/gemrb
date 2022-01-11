@@ -247,7 +247,8 @@ class GControl(GView):
 		'SetAction': _GemRB.Control_SetAction,
 		'SetActionInterval': _GemRB.Control_SetActionInterval,
 		'SetColor': _GemRB.Control_SetColor,
-		'SetStatus': _GemRB.Control_SetStatus
+		'SetStatus': _GemRB.Control_SetStatus,
+		'SetValue': _GemRB.Control_SetValue
 	}
 
 	__slots__ = ['ControlID', 'VarName', 'Value']
