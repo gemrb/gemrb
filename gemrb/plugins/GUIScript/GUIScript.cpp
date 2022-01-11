@@ -4676,10 +4676,15 @@ PyDoc_STRVAR( GemRB_SaveGame_GetName__doc,
 static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Slot;
-	PARSE_ARGS( args,  "O", &Slot );
+	PARSE_ARGS(args, "O", &Slot);
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
+#if PY_MAJOR_VERSION >= 3
+	const char* name = save->GetName();
+	return PyUnicode_Decode(name, strlen(name), core->SystemEncoding, "strict");
+#else
 	return PyString_FromString(save->GetName());
+#endif
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,

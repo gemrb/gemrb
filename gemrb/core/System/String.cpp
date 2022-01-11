@@ -48,7 +48,7 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 	for(size_t i=0; i<len; ++i) {
 		ieWord currentChr = string[i];
 		// we are assuming that every multibyte encoding uses single bytes for chars 32 - 127
-		if(convert && (i+1 < len) && (currentChr >= 128 || currentChr < 32)) {
+		if(convert && (i+1 < len) && (currentChr >= 128 || currentChr < 32) && (currentChr != '\n')) {
 			// this is a double byte char, or a multibyte sequence
 			ieWord ch = 0;
 			if (encoded.encoding == "UTF-8") {

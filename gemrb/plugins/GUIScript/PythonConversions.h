@@ -144,6 +144,7 @@ public:
 	}
 };
 PyStringWrapper PyString_AsString(PyObject* obj);
+PyObject* PyString_FromString(const char* s);
 #endif
 
 /*
