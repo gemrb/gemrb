@@ -48,19 +48,18 @@ def OnLoad ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: LoadWindow.Close())
 	CancelButton.MakeEscape()
 
-	GemRB.SetVar ("LoadIdx",0)
 	for i in range (4):
 		Button = LoadWindow.GetControl (26+i)
 		Button.SetText (15590)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetVarAssoc ("LoadIdx",i)
+		Button.SetValue (i)
 
 		Button = LoadWindow.GetControl (30+i)
 		Button.SetText (13957)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetVarAssoc ("LoadIdx",i)
+		Button.SetValue (i)
 
 		#area previews
 		Button = LoadWindow.GetControl (1+i)
@@ -73,19 +72,19 @@ def OnLoad ():
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
-	ScrollBar=LoadWindow.GetControl (25)
+	ScrollBar = LoadWindow.GetControl (25)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarUpdated)
-	Games=GemRB.GetSaveGames ()
+	Games = GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - 4)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
-	LoadWindow.SetEventProxy(ScrollBar)
-	LoadWindow.Focus()
+	LoadWindow.SetEventProxy (ScrollBar)
+	LoadWindow.Focus ()
 	return
 
-def ScrollBarUpdated (sb, Pos):
+def ScrollBarUpdated (sb):
 	#draw load game portraits
 	for i in range (4):
-		ActPos = Pos + i
+		ActPos = sb.Value + i
 
 		Button1 = LoadWindow.GetControl (26+i)
 		Button2 = LoadWindow.GetControl (30+i)
@@ -111,32 +110,32 @@ def ScrollBarUpdated (sb, Pos):
 
 		for j in range (min(6, MAX_PARTY_SIZE)):
 			Button = LoadWindow.GetControl (40 + i*min(6, MAX_PARTY_SIZE) + j)
-			if ActPos<len(Games):
-				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
+			if ActPos < len(Games):
+				Button.SetSprite2D (Games[ActPos].GetPortrait (j))
 			else:
 				Button.SetPicture (None)
 	return
 	
-def OpenLoadMsgWindow (btn, val):
+def OpenLoadMsgWindow (btn):
 	from GUIOPTControls import STR_OPT_CANCEL
 	LoadMsgWindow = Window = GemRB.LoadWindow (4, "GUIOPT")
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	
 	def AbandonGame():
 		GemRB.QuitGame()
-		GemRB.SetTimer(lambda: LoadGamePress(btn, val), 0, 0)
+		GemRB.SetTimer(lambda: LoadGamePress(btn), 0, 0)
 
 	# Load
 	Button = Window.GetControl (0)
 	Button.SetText (15590)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbandonGame)
-	Button.MakeDefault()
+	Button.MakeDefault ()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (STR_OPT_CANCEL)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: LoadMsgWindow.Close())
-	Button.MakeEscape()
+	Button.MakeEscape ()
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)
@@ -145,18 +144,18 @@ def OpenLoadMsgWindow (btn, val):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def LoadGamePress (btn, val):
-	if GemRB.GetView("GC"): # FIXME: is this the best way to know if we are ingame?
-		OpenLoadMsgWindow(btn, val)
+def LoadGamePress (btn):
+	if GemRB.GetView ("GC"): # FIXME: is this the best way to know if we are ingame?
+		OpenLoadMsgWindow (btn)
 		return
 	
-	Pos = GemRB.GetVar ("TopIndex") + val
-	LoadScreen.StartLoadScreen()
+	Pos = GemRB.GetVar ("TopIndex") + btn.Value
+	LoadScreen.StartLoadScreen ()
 	#loads savegame
 	GemRB.LoadGame (Games[Pos])
 
 	#enters game
-	if GameCheck.IsIWD1():
+	if GameCheck.IsIWD1 ():
 		GemRB.SetNextScript ("PartyFormation")
 	else:
 		# it will close windows, including the loadscreen
@@ -166,10 +165,10 @@ def LoadGamePress (btn, val):
 def GetQuickLoadSlot():
 	global Games
 
-	Games=GemRB.GetSaveGames()
+	Games = GemRB.GetSaveGames()
 	QuickLoadSlot = None
 	for Game in Games:
-		Slotname = Game.GetSaveID()
+		Slotname = Game.GetSaveID ()
 		# quick save is 1
 		if Slotname == 1:
 			QuickLoadSlot = Game
@@ -177,25 +176,25 @@ def GetQuickLoadSlot():
 	return QuickLoadSlot
 
 def QuickLoadPressed():
-	QuickLoadSlot = GetQuickLoadSlot()
-	if QuickLoadSlot!=None:
-		LoadScreen.StartLoadScreen()
-		GemRB.LoadGame(QuickLoadSlot)
+	QuickLoadSlot = GetQuickLoadSlot ()
+	if QuickLoadSlot != None:
+		LoadScreen.StartLoadScreen ()
+		GemRB.LoadGame (QuickLoadSlot)
 		GemRB.EnterGame ()
 	return
 
-def DeleteGameConfirm (delIdx):
+def DeleteGameConfirm (btn):
 	global Games
 
 	TopIndex = GemRB.GetVar ("TopIndex")
-	Pos = TopIndex + delIdx
+	Pos = TopIndex + btn.Value
 	GemRB.DeleteSaveGame(Games[Pos])
 
 	del Games[Pos]
 	if TopIndex > 0:
 		ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, len(Games) - 4)
 	else:
-		ScrollBarUpdated(ScrollBar, TopIndex)
+		ScrollBarUpdated (ScrollBar)
 
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
@@ -208,20 +207,21 @@ def DeleteGameCancel ():
 	LoadWindow.Focus()
 	return
 
-def DeleteGamePress (btn, val):
+def DeleteGamePress (btn):
 	global ConfirmWindow
 
-	ConfirmWindow=GemRB.LoadWindow (1)
+	ConfirmWindow = GemRB.LoadWindow (1)
 	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (15305)
-	DeleteButton=ConfirmWindow.GetControl (1)
+	DeleteButton = ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (13957)
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DeleteGameConfirm (val))
-	CancelButton=ConfirmWindow.GetControl (2)
+	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
+	DeleteButton.SetValue (btn.Value)
+	CancelButton = ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
-	CancelButton.MakeEscape()
+	CancelButton.MakeEscape ()
 
-	ConfirmWindow.ShowModal(MODAL_SHADOW_GRAY)
+	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

@@ -46,12 +46,12 @@ def OpenSaveWindow ():
 	global SaveWindow, Games, ScrollBar
 	global num_rows, ctrl_offset, sav_version, strs
 
-	if GameCheck.IsIWD2():
+	if GameCheck.IsIWD2 ():
 		num_rows = 5
 		ctrl_offset = (55, 60, 25, 0x10000005, 0x1000000a, 23, 22, 3, 0x10000004, 40, 7, 8, 2)
 		sav_version = 22
 	else:
-		if GameCheck.IsPST():
+		if GameCheck.IsPST ():
 			ctrl_offset = (14, 18, 22, 0x10000004, 0x10000008, 13, 46, 1, 0x10000002, 6, 4, 5, 3)
 			strs = { 'cancel' : 4196, 'save' : 28645, 'delete' : 28640, 'empty' : 28647, 'overwrite' : 28644, 'yousure' : 28639 }
 
@@ -61,21 +61,20 @@ def OpenSaveWindow ():
 	CancelButton = Window.GetControl (ctrl_offset[6])
 	CancelButton.SetText (strs['cancel'])
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSaveWindow)
-	CancelButton.MakeEscape()
-	GemRB.SetVar ("SaveIdx", 0)
+	CancelButton.MakeEscape ()
 
 	for i in range(num_rows):
 		Button = Window.GetControl (ctrl_offset[0]+i)
 		Button.SetText (strs['save'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenConfirmWindow)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetVarAssoc ("SaveIdx", i)
+		Button.SetValue (i)
 
 		Button = Window.GetControl (ctrl_offset[1]+i)
 		Button.SetText (strs['delete'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetVarAssoc ("SaveIdx", i)
+		Button.SetValue (i)
 
 		# area previews
 		Button = Window.GetControl (1+i)
@@ -95,14 +94,13 @@ def OpenSaveWindow ():
 	GUICommon.SetSaveDir ()
 	Games = GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - num_rows + 1) #one more for the 'new game'
-	GemRB.SetVar ("TopIndex",TopIndex)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
-	Window.SetEventProxy(ScrollBar)
+	Window.SetEventProxy (ScrollBar)
 	ScrollBarPress ()
-	Window.Focus()
+	Window.Focus ()
 	return
 
-def ScrollBarPress():
+def ScrollBarPress ():
 	Window = SaveWindow
 
 	# draw load game portraits
@@ -118,7 +116,7 @@ def ScrollBarPress():
 			Button1.SetState (IE_GUI_BUTTON_DISABLED)
 
 		if ActPos < len(Games):
-			Slotname = Games[ActPos].GetName()
+			Slotname = Games[ActPos].GetName ()
 			Slottime = Games[ActPos].GetGameDate ()
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		elif ActPos == len(Games):
@@ -138,19 +136,19 @@ def ScrollBarPress():
 
 		Button = Window.GetControl (1+i)
 		if ActPos < len(Games):
-			Button.SetSprite2D(Games[ActPos].GetPreview())
+			Button.SetSprite2D (Games[ActPos].GetPreview())
 		else:
 			Button.SetPicture (None)
 
 		for j in range(min(6, MAX_PARTY_SIZE)):
 			Button = Window.GetControl (ctrl_offset[2] + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos < len(Games):
-				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
+				Button.SetSprite2D (Games[ActPos].GetPortrait(j))
 			else:
 				Button.SetPicture (None)
 	return
 
-def QuickSavePressed():
+def QuickSavePressed ():
 	Slot = 1
 	GUICommon.SetSaveDir ()
 
@@ -167,15 +165,14 @@ def CloseConfirmWindow():
 		ConfirmWindow.Unload ()
 		ConfirmWindow = None
 
-	SaveWindow.Focus()
+	SaveWindow.Focus ()
 	return
 
 # User entered save name and pressed save/overwrite.
 # Display progress bar screen and save the game, close the save windows
-def ConfirmedSaveGame (saveIdx):
+def ConfirmedSaveGame (Pos):
 	global ConfirmWindow
 
-	Pos = GemRB.GetVar ("TopIndex") + saveIdx
 	Label = ConfirmWindow.GetControl (ctrl_offset[7])
 	Slotname = Label.QueryText ()
 	Slotname = Slotname.replace ("/", "|") # can't have path separators in the name
@@ -198,10 +195,10 @@ def ConfirmedSaveGame (saveIdx):
 		GemRB.SaveGame (None, Slotname, sav_version)
 	return
 
-def OpenConfirmWindow (btn, val):
+def OpenConfirmWindow (btn):
 	global ConfirmWindow, SaveButton
 
-	Pos = GemRB.GetVar ("TopIndex") + val
+	Pos = GemRB.GetVar ("TopIndex") + btn.Value
 	ConfirmWindow = GemRB.LoadWindow (1)
 
 	# Slot name
@@ -218,28 +215,28 @@ def OpenConfirmWindow (btn, val):
 
 	#game hours (should be generated from game)
 	if Pos < len(Games):
-		if GameCheck.IsBG2():
+		if GameCheck.IsBG2 ():
 			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
-			Slotname = GemRB.GetString(str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
+			Slotname = GemRB.GetString (str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
 		else:
-			Slotname = Games[Pos].GetGameDate()
+			Slotname = Games[Pos].GetGameDate ()
 	else:
 		Slotname = ""
 	Label = ConfirmWindow.GetControl (ctrl_offset[8])
 	Label.SetText (Slotname)
 
 	# Areapreview
-	if not GameCheck.IsIWD2():
+	if not GameCheck.IsIWD2 ():
 		Button = ConfirmWindow.GetControl (0)
-		if Pos<len(Games):
-			Button.SetSprite2D(Games[Pos].GetPreview())
+		if Pos < len(Games):
+			Button.SetSprite2D (Games[Pos].GetPreview())
 		else:
-			Button.SetPicture(None)
+			Button.SetPicture (None)
 
 		# PC portraits
 		for j in range(min(6, MAX_PARTY_SIZE)):
 			Button = ConfirmWindow.GetControl (ctrl_offset[9]+j)
-			if Pos<len(Games):
+			if Pos < len(Games):
 				Button.SetSprite2D(Games[Pos].GetPortrait(j))
 			else:
 				Button.SetPicture(None)
@@ -247,8 +244,8 @@ def OpenConfirmWindow (btn, val):
 	# Save/Overwrite
 	SaveButton = ConfirmWindow.GetControl (ctrl_offset[10])
 	SaveButton.SetText (save_strref)
-	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ConfirmedSaveGame (val))
-	SaveButton.MakeDefault()
+	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ConfirmedSaveGame (Pos))
+	SaveButton.MakeDefault ()
 
 	if Slotname == "":
 		SaveButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -257,11 +254,11 @@ def OpenConfirmWindow (btn, val):
 	CancelButton = ConfirmWindow.GetControl (ctrl_offset[11])
 	CancelButton.SetText (strs['cancel'])
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseConfirmWindow)
-	CancelButton.MakeEscape()
+	CancelButton.MakeEscape ()
 
-	ConfirmWindow.Focus()
+	ConfirmWindow.Focus ()
 	ConfirmWindow.ShowModal (MODAL_SHADOW_NONE)
-	NameField.Focus() # ShowModal will happily reset this..
+	NameField.Focus () # ShowModal will happily reset this..
 	return
 
 # Disable Save/Overwrite button if the save slotname is empty,
@@ -282,18 +279,14 @@ def DeleteGameConfirm (delIndex):
 	GemRB.DeleteSaveGame (Games[Pos])
 	del Games[Pos]
 	if TopIndex > 0:
-		GemRB.SetVar ("TopIndex", TopIndex - 1)
+		TopIndex = TopIndex - 1
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
 	ScrollBarPress ()
 
 	CloseConfirmWindow ()
 	return
 
-def DeleteGameCancel():
-	CloseConfirmWindow ()
-	return
-
-def DeleteGamePress (btn, val):
+def DeleteGamePress (btn):
 	global ConfirmWindow
 
 	ConfirmWindow = GemRB.LoadWindow (ctrl_offset[12])
@@ -305,12 +298,12 @@ def DeleteGamePress (btn, val):
 
 	DeleteButton = ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (strs['delete'])
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DeleteGameConfirm (val))
+	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DeleteGameConfirm (btn.Value))
 	DeleteButton.MakeDefault ()
 
 	CancelButton = ConfirmWindow.GetControl (2)
 	CancelButton.SetText (strs['cancel'])
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseConfirmWindow)
 	CancelButton.MakeEscape()
 
 	ConfirmWindow.Focus()
