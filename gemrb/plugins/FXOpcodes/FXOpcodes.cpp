@@ -7500,6 +7500,8 @@ int fx_critical_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_critical_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	STAT_MOD( IE_CRITICALHITBONUS );
+	// TODO: EE makes this more complicated: https://gibberlings3.github.io/iesdp/opcodes/bgee.htm#op301
+
 	return FX_APPLIED;
 }
 // 0x12e CanUseAnyItem
