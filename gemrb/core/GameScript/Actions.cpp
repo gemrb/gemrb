@@ -2852,6 +2852,28 @@ void GameScript::MakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 	core->GetGame()->AddNPC( act );
 }
 
+// will replace a global creature that has the same scriptname as the sender
+void GameScript::MakeGlobalOverride(Scriptable* Sender, Action* /*parameters*/)
+{
+	Actor* act = Scriptable::As<Actor>(Sender);
+	if (!act) {
+		return;
+	}
+
+	Game* game = core->GetGame();
+	bool alreadyGlobal = game->InStore(act) != -1;
+	if (alreadyGlobal) return;
+
+	// remove any previous global actor with the same script name first
+	Actor* target = game->FindNPC(act->GetScriptName());
+	if (target) {
+		int slot = game->InStore(target);
+		game->DelNPC(slot);
+		target->SetPersistent(-1);
+	}
+	game->AddNPC(act);
+}
+
 void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 {
 	Actor* act = Scriptable::As<Actor>(Sender);

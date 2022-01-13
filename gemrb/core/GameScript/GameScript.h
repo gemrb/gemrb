@@ -1147,6 +1147,7 @@ public: //Script Functions
 	static void Lock(Scriptable* Sender, Action* parameters);
 	static void LockScroll(Scriptable* Sender, Action* parameters);
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
+	static void MakeGlobalOverride(Scriptable* Sender, Action* parameters);
 	static void MakeUnselectable(Scriptable* Sender, Action* parameters);
 	static void MarkObject(Scriptable* Sender, Action* parameters);
 	static void MarkSpellAndObject(Scriptable* Sender, Action* parameters);
