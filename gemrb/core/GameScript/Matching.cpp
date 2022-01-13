@@ -173,22 +173,15 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 			}
 			return ReturnScriptableAsTarget(aC);
 		}
-		Door *door = map->GetDoorByGlobalID( (ieDword) oC->objectFields[1]);
-		if (door) {
-			return ReturnScriptableAsTarget(door);
-		}
 
-		Container* cont = map->GetContainerByGlobalID((ieDword) oC->objectFields[1]);
-		if (cont) {
-			return ReturnScriptableAsTarget(cont);
+		// meh, preserving constness
+		Map* map2 = core->GetGame()->GetMap(map->GetScriptName(), false);
+		Scriptable* target = map2->GetScriptableByGlobalID(static_cast<ieDword>(oC->objectFields[1]));
+		if (target != map2) {
+			return ReturnScriptableAsTarget(target);
+		} else {
+			return nullptr;
 		}
-
-		InfoPoint* trap = map->GetInfoPointByGlobalID((ieDword) oC->objectFields[1]);
-		if (trap) {
-			return ReturnScriptableAsTarget(trap);
-		}
-
-		return NULL;
 	}
 
 	Targets *tgts = NULL;
