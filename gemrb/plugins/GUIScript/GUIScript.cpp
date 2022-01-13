@@ -1380,9 +1380,9 @@ static PyObject* GemRB_Control_SetColor(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  "===== Control_QueryText =====\n\
  \n\
-**Prototype:** GemRB.QueryText (WindowIndex, ControlIndex[, UseSystemEncoding])\n\
+**Prototype:** GemRB.QueryText (WindowIndex, ControlIndex)\n\
  \n\
-**Metaclass Prototype:** QueryText (UseSystemEncoding=False)\n\
+**Metaclass Prototype:** QueryText ()\n\
  \n\
  **Description:** Returns the Text of a TextEdit/TextArea/Label control. \n\
  In case of a TextArea, it will return the selected row, not the entire \n\
@@ -1390,7 +1390,6 @@ PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  \n\
  **Parameters:**\n\
  * WindowIndex, ControlIndex - the control's reference\n\
-  * UseSystemEncoding - whether returned text should use OS encoding, False by default\n\
  \n\
  **Return value:** string, may be empty\n\
  \n\
@@ -1401,35 +1400,19 @@ PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  \n\
  GemRB.SetToken ('VoiceSet', TextAreaControl.QueryText ())\n\
  The above example sets the VoiceSet token to the value of the selected string in a TextArea control. Later this voiceset could be stored in the character sheet.\n\
-If returned string will be used to e.g. as filename, string should be using system encoding, or file might be not found if it contains non-ASCII letters.\n\
-**Example**\n\
-  Filename = CharImportList.QueryText (True)\n\
-  GemRB.CreatePlayer (Filename, MyChar|0x8000, 1)\n\
  \n\
  **See also:** [[guiscript:Control_SetText]], [[guiscript:SetToken]], [[guiscript:accessing_gui_controls]]"
  );
 
 static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
 {
-	int useSystemEncoding = 0;
-	PARSE_ARGS(args, "O|i", &self, &useSystemEncoding);
+	PARSE_ARGS(args, "O", &self);
 	const Control *ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 
 	String wstring = ctrl->QueryText();
 	std::string nstring(wstring.begin(), wstring.end());
-	if (useSystemEncoding) {
-		char* cStr = ConvertCharEncoding(nstring.c_str(),
-		core->TLKEncoding.encoding.c_str(), core->SystemEncoding);
-		if (cStr) {
-		    PyObject* pyStr = PyString_FromString(cStr);
-		    free(cStr);
-		    return pyStr;
-		}
-	} else {
-	    return PyString_FromString(nstring.c_str());
-	}
-	Py_RETURN_NONE;
+	return PyString_FromString(nstring.c_str());
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,
@@ -5510,7 +5493,8 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 	// ensure it can be converted to unicode
 	// FIXME: English party.ini is encoded in cp-1252, not iso-8859-1, the tlk encoding
 	// but we don't display its 0x92 single quote / apostrophe correctly either way (see The Winter Rose description: father Di'Arnos)
-	return PyString_FromString(ConvertCharEncoding(desc, core->TLKEncoding.encoding.c_str(), "UTF-8"));}
+	return PyString_FromString(desc);
+}
 
 PyDoc_STRVAR( GemRB_CreatePlayer__doc,
 "===== CreatePlayer =====\n\
@@ -5573,7 +5557,9 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 		}
 	}
 	if (CreResRef[0]) {
-		PlayerSlot = gamedata->LoadCreature( CreResRef, Slot, (bool) Import, VersionOverride );
+		char* encoded = ConvertCharEncoding(CreResRef, "UTF-8", core->SystemEncoding);
+		PlayerSlot = gamedata->LoadCreature(encoded, Slot, (bool) Import, VersionOverride);
+		free(encoded);
 	} else {
 		//just destroyed the previous actor, not going to create one
 		PlayerSlot = 0;

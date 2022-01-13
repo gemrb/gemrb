@@ -451,15 +451,11 @@ Event EventMgr::CreateTouchGesture(const TouchEvent& touch, float rotation, floa
 Event EventMgr::CreateTextEvent(const char* text)
 {
 	Event e = {};
-	char *str = ConvertCharEncoding(text, "UTF-8", core->TLKEncoding.encoding.c_str());
-	String* string = StringFromCString(str);
-
+	String* string = StringFromUtf8(str);
 	if (string) {
 		e = EventMgr::CreateTextEvent(*string);
+		delete string;
 	}
-	delete string;
-	free(str);
-
 	return e;
 }
 
