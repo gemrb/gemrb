@@ -314,6 +314,19 @@ bool Variables::Lookup(const char* key, char *&dest) const
 	return true;
 }
 
+bool Variables::Lookup(const char* key, String& dest) const
+{
+	char buff[1024];
+	bool ret = Lookup(key, buff, 1024);
+	if (ret) {
+		String* tmp = StringFromCString(buff);
+		assert(tmp);
+		dest = *tmp;
+		delete tmp;
+	}
+	return ret;
+}
+
 bool Variables::Lookup(const char* key, void *&dest) const
 {
 	unsigned int nHash;
@@ -397,6 +410,13 @@ void Variables::SetAt(const char* key, char* value)
 	} else {
 		free(value);
 	}
+}
+
+void Variables::SetAt(const char* key, const String& newValue)
+{
+	char* cstr = MBCStringFromString(newValue);
+	assert(cstr);
+	SetAt(key, cstr);
 }
 
 void Variables::SetAt(const char* key, void* value)
