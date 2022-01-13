@@ -272,7 +272,7 @@ def EditChange (NameField):
 	return
 
 def DeleteGameConfirm (delIndex):
-	global Games
+	global Games, num_rows
 
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Pos = TopIndex + delIndex
@@ -280,7 +280,7 @@ def DeleteGameConfirm (delIndex):
 	del Games[Pos]
 	if TopIndex > 0:
 		TopIndex = TopIndex - 1
-	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, max (0, len(Games) - num_rows + 1))
 	ScrollBarPress ()
 
 	CloseConfirmWindow ()
