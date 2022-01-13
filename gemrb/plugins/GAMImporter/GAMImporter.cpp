@@ -454,7 +454,10 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 
 		//torment has them as 0 or -1
 		if (pcInfo.Name[0]!=0 && pcInfo.Name[0]!=UNINITIALIZED_CHAR) {
-			actor->SetName(pcInfo.Name,0); //setting both names
+			String* name = StringFromCString(pcInfo.Name);
+			assert(name);
+			actor->SetName(*name, 0);
+			delete name;
 		}
 		actor->TalkCount = pcInfo.TalkCount;
 	} else {
@@ -1000,7 +1003,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	if (ac->LongStrRef==0xffffffff) {
-		strncpy(filling, ac->LongName.CString(), 33);
+		strncpy(filling, ac->GetNameAsVariable(1).CString(), 33);
 	} else {
 		char *tmpstr = core->GetCString(ac->LongStrRef, IE_STR_STRREFOFF);
 		strncpy(filling, tmpstr, 32);

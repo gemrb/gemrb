@@ -313,9 +313,7 @@ public:
 	ResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
 	ieByte InParty = 0;
-	//32 is the maximum possible length of the actor name in the original games
-	ieVariable LongName{};
-	ieVariable ShortName{};
+	
 	ieStrRef ShortStrRef = ieStrRef(-1);
 	ieStrRef LongStrRef = ieStrRef(-1);
 	ieStrRef StrRefs[VCONST_COUNT]{};
@@ -398,7 +396,9 @@ public:
 	
 	Region drawingRegion;
 private:
-	//this stuff doesn't get saved
+	String LongName;
+	String ShortName;
+
 	CharAnimations* anims = nullptr;
 	
 	using AnimationPart = std::pair<Animation*, PaletteHolder>;
@@ -540,14 +540,22 @@ public:
 	/* Use overrideSet to replace PCStats->SoundSet */
 	void GetSoundFolder(char *soundset, int flag, const ResRef& overrideSet) const;
 	/** Gets the Character Long Name/Short Name */
-	const char* GetName(int which) const override
+	const String& GetName(int which) const
 	{
 		if(which==-1) which=TalkCount;
 		if (which) {
-			return LongName.CString();
+			return LongName;
 		}
-		return ShortName.CString();
+		return ShortName;
 	}
+	
+	//32 is the maximum possible length of the actor name in the original games
+	ieVariable GetNameAsVariable(int which) const
+	{
+		const String& name = GetName(which);
+		return ieVariable(MBCStringFromString(name));
+	}
+	
 	/** Gets the DeathVariable */
 	const char* GetScriptName(void) const
 	{
@@ -576,7 +584,7 @@ public:
 	{
 		return attackProjectile;
 	}
-	void SetName(const char* ptr, unsigned char type);
+	void SetName(const String& str, unsigned char type);
 	void SetName(int strref, unsigned char type);
 	/* Returns by how much movement speed should be divided to account for loot weight */
 	int GetEncumbranceFactor(bool feedback) const;

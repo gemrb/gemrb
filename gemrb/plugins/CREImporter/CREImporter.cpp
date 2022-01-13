@@ -525,7 +525,6 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 {
 	char Signature[8];
 	char filling[10];
-	ieVariable name;
 	ieDword tmpDword, CRESize;
 	ieWord tmpWord;
 
@@ -567,8 +566,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 	}
 	stream->Write( Signature, 8);
 	memset( Signature,0,sizeof(Signature));
-	memset( name,0,sizeof(name));
-	strlcpy(name, act->GetName(0), sizeof(name));
+	ieVariable name = act->GetNameAsVariable(0);
 	stream->WriteVariable(name);
 
 	stream->WriteDword(tmpDword); //cre offset (chr header size)
@@ -663,7 +661,10 @@ void CREImporter::ReadChrHeader(Actor *act)
 	str->Read (Signature, 8);
 	str->ReadVariable(name);
 	if (name[0]) {
-		act->SetName( name, 0 ); //setting longname
+		String* str = StringFromCString(name);
+		assert(str);
+		act->SetName(*str, 0); //setting longname
+		delete str;
 	}
 	str->ReadDword(offset);
 	str->ReadDword(size);
@@ -853,16 +854,18 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	act->InParty = is_in_party;
 	str->ReadDword(act->LongStrRef);
 	//Beetle name in IWD needs the allow zero flag
-	char* poi = core->GetCString( act->LongStrRef, IE_STR_ALLOW_ZERO );
-	act->SetName( poi, 1 ); //setting longname
-	free( poi );
+	String* poi = core->GetString( act->LongStrRef, IE_STR_ALLOW_ZERO );
+	assert(poi);
+	act->SetName(*poi, 1); //setting longname
+	delete poi;
 	str->ReadDword(act->ShortStrRef);
 	if (act->ShortStrRef == (ieStrRef) -1) {
 		act->ShortStrRef = act->LongStrRef;
 	}
-	poi = core->GetCString( act->ShortStrRef );
-	act->SetName( poi, 2 ); //setting shortname (for tooltips)
-	free( poi );
+	poi = core->GetString(act->ShortStrRef);
+	assert(poi);
+	act->SetName(*poi, 2); //setting shortname (for tooltips)
+	delete poi;
 	act->BaseStats[IE_VISUALRANGE] = VOODOO_VISUAL_RANGE; // not stored anywhere
 	act->BaseStats[IE_DIALOGRANGE] = VOODOO_DIALOG_RANGE;
 	str->ReadDword(act->BaseStats[IE_MC_FLAGS]);

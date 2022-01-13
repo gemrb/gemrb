@@ -5624,8 +5624,8 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	if (Which == 2) {
 		return PyString_FromString( actor->GetScriptName() );
 	}
-
-	return PyString_FromString( actor->GetName(Which) );
+	
+	return PyString_FromStringObj(actor->GetName(Which));
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerName__doc,
@@ -5652,15 +5652,17 @@ In the above example we set the player's name to a previously set Token (global 
 
 static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 {
-	const char *Name=NULL;
+	PyObject* pyName = nullptr;
 	int globalID, Which;
 
 	Which = 0;
-	PARSE_ARGS( args,  "is|i", &globalID, &Name, &Which );
+	PARSE_ARGS( args,  "iO|i", &globalID, &pyName, &Which );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-
-	actor->SetName(Name, Which);
+	
+	String* name = PyString_AsStringObj(pyName);
+	assert(name);
+	actor->SetName(*name, Which);
 	actor->SetMCFlag(MC_EXPORTABLE, BitOp::OR);
 	Py_RETURN_NONE;
 }
@@ -12475,7 +12477,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
 	}
 	if (!wield) {
-		Log(WARNING, "Actor", "Invalid weapon wielded by %s!", actor->GetName(1));
+		Log(WARNING, "Actor", "Invalid weapon wielded by %ls!", actor->GetName(1).c_str());
 		return dict;
 	}
 	const Item *item = gamedata->GetItem(wield->ItemResRef, true);

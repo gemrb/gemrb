@@ -1244,7 +1244,7 @@ bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 			return false;
 		}
 		if (Distance(p, pc) > MAX_TRAVELING_DISTANCE) {
-			Log(MESSAGE, "Game", "Actor %s is not near!", pc->LongName.CString());
+			Log(MESSAGE, "Game", "Actor %ls is not near!", pc->GetName(1).c_str());
 			return false;
 		}
 	}
@@ -2190,12 +2190,12 @@ void Game::dump() const
 
 	buffer.appendFormatted("Party size: %d\n", (int) PCs.size());
 	for (auto actor : PCs) {
-		buffer.appendFormatted("Name: %s Order %d %s\n",actor->ShortName.CString(), actor->InParty, actor->Selected?"x":"-");
+		buffer.appendFormatted("Name: %ls Order %d %s\n", actor->GetName(0).c_str(), actor->InParty, actor->Selected?"x":"-");
 	}
 
 	buffer.appendFormatted("\nNPC count: %d\n", (int) NPCs.size());
 	for (auto actor : NPCs) {
-		buffer.appendFormatted("Name: %s\tSelected: %s\n", actor->ShortName.CString(), actor->Selected ? "x ": "-");
+		buffer.appendFormatted("Name: %ls\tSelected: %s\n", actor->GetName(0).c_str(), actor->Selected ? "x ": "-");
 	}
 	Log(DEBUG, "Game", buffer);
 }

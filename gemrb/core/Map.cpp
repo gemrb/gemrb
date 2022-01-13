@@ -2986,7 +2986,7 @@ void Map::dump(bool show_actors) const
 		buffer.append("\n");
 		for (const auto actor : actors) {
 			if (actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
-				buffer.appendFormatted("Actor: %s (%d %s) at %d.%d\n", actor->GetName(1), actor->GetGlobalID(), actor->GetScriptName(), actor->Pos.x, actor->Pos.y);
+				buffer.appendFormatted("Actor: %ls (%d %s) at %d.%d\n", actor->GetName(1).c_str(), actor->GetGlobalID(), actor->GetScriptName(), actor->Pos.x, actor->Pos.y);
 			}
 		}
 	}

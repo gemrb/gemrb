@@ -3202,10 +3202,11 @@ void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 void GameScript::SetTokenObject(Scriptable* Sender, Action* parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	if (!tar || tar->Type != ST_ACTOR) {
+	const Actor* actor = Scriptable::As<const Actor>(tar);
+	if (!actor) {
 		return;
 	}
-	core->GetTokenDictionary()->SetAtCopy(parameters->string0Parameter, tar->GetName(0));
+	core->GetTokenDictionary()->SetAt(parameters->string0Parameter, actor->GetName(0));
 }
 
 void GameScript::PlayDead(Scriptable* Sender, Action* parameters)

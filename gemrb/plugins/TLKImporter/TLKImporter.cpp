@@ -154,22 +154,23 @@ static inline Actor *GetActorFromSlot(int slot)
 	return game->FindPC(slot);
 }
 
-char *TLKImporter::Gabber() const
+static String unknown(L"?");
+const String& TLKImporter::Gabber() const
 {
 	const Actor *act = core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
-		return strdup(act->LongName.CString());
+		return act->GetName(1);
 	}
-	return strdup("?");
+	return unknown;
 }
 
-char *TLKImporter::CharName(int slot) const
+const String& TLKImporter::CharName(int slot) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
-		return strdup(act->LongName.CString());
+		return act->GetName(1);
 	}
-	return strdup("?");
+	return unknown;
 }
 
 int TLKImporter::ClassStrRef(int slot) const
@@ -214,15 +215,13 @@ int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref) const
 }
 
 //if this function returns -1 then it is not a built in token, dest may be NULL
-int TLKImporter::BuiltinToken(const char* Token, char* dest)
+String* TLKImporter::BuiltinToken(const char* Token)
 {
-	char* Decoded = NULL;
 	gt_type *entry = NULL;
 
 	//these are gender specific tokens, they are customisable by gender.2da
 	if (gtmap.Lookup(Token, (void *&) entry) ) {
-		Decoded = GetCString( GenderStrRef(entry->type, entry->male, entry->female) );
-		goto exit_function;
+		return GetString(GenderStrRef(entry->type, entry->male, entry->female));
 	}
 
 	//these are hardcoded, all engines are the same or don't use them
@@ -231,52 +230,41 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
 		//preparing sub-tokens
 		core->GetCalendar()->GetMonthName((int) dayandmonth);
-		Decoded = GetCString( 15981, 0 );
-		goto exit_function;
+		return GetString(15981, 0);
 	}
 
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
-		Decoded = GetCString( 10174, 0 );
-		goto exit_function;
+		return GetString(10174, 0);
 	}
 	if (!strcmp( Token, "CLASS" )) {
 		//allow this to be used by direct setting of the token
 		int strref = ClassStrRef(-1);
-		if (strref<=0) return -1;
-		Decoded = GetCString( strref, 0);
-		goto exit_function;
+		return GetString(strref, 0);
 	}
 
 	if (!strcmp( Token, "RACE" )) {
-		Decoded = GetCString( RaceStrRef(-1), 0);
-		goto exit_function;
+		return GetString(RaceStrRef(-1), 0);
 	}
 
 	// handle Player10 (max for MaxPartySize), then the rest
 	if (!strncmp(Token, "PLAYER10", 8)) {
-		Decoded = CharName(10);
-		goto exit_function;
+		return new String(CharName(10));
 	}
 	if (!strncmp( Token, "PLAYER", 6 )) {
-		Decoded = CharName(Token[strlen(Token)-1]-'1');
-		goto exit_function;
+		return new String(CharName(Token[strlen(Token)-1]-'1'));
 	}
 
 	if (!strcmp( Token, "GABBER" )) {
-		Decoded = Gabber();
-		goto exit_function;
+		return new String(Gabber());
 	}
 	if (!strcmp( Token, "CHARNAME" )) {
-		Decoded = CharName(charname);
-		goto exit_function;
+		return new String(CharName(charname));
 	}
 	if (!strcmp( Token, "PRO_CLASS" )) {
-		Decoded = GetCString( ClassStrRef(0), 0);
-		goto exit_function;
+		return GetString(ClassStrRef(0), 0);
 	}
 	if (!strcmp( Token, "PRO_RACE" )) {
-		Decoded = GetCString( RaceStrRef(0), 0);
-		goto exit_function;
+		return GetString(RaceStrRef(0), 0);
 	}
 	if (!strcmp( Token, "MAGESCHOOL" )) {
 		ieDword row = 0; //default value is 0 (generalist)
@@ -285,28 +273,34 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
 			const char* value = tm->QueryField( row, 2 );
-			Decoded = GetCString( atoi( value ), 0 );
-			goto exit_function;
+			return GetString(atoi( value ), 0);
 		}
 	}
 	if (!strcmp( Token, "TM" )) {
-		Decoded = strdup("\x99");
-		goto exit_function;
+		return new String(L"\x99");
 	}
 
-	return -1;	//not decided
+	return nullptr;
+}
 
-	exit_function:
-	if (Decoded) {
-		size_t TokenLength = strlen(Decoded);
-		if (dest) {
-			memcpy(dest, Decoded, TokenLength);
-		}
-		//Decoded is always a copy
-		free( Decoded );
-		return static_cast<int>(TokenLength);
+size_t TLKImporter::BuiltinToken(const char* Token, char* dest)
+{
+	String* resolved = BuiltinToken(Token);
+	if (resolved == nullptr) {
+		return size_t(-1);
 	}
-	return -1;
+	
+	char* cstr = MBCStringFromString(*resolved);
+	assert(cstr);
+	delete resolved;
+	
+	size_t TokenLength = strlen(cstr);
+	if (dest) {
+		memcpy(dest, cstr, TokenLength);
+	}
+	free(cstr);
+
+	return TokenLength;
 }
 
 bool TLKImporter::ResolveTags(char* dest, const char* source, size_t Length)
@@ -350,8 +344,8 @@ bool TLKImporter::GetNewStringLength(const char* string, size_t& Length)
 			// token
 			lChange = true;
 			i = (int) (mystrncpy( Token, string + i + 1, MAX_VARIABLE_LENGTH, '>' ) - string);
-			int TokenLength = BuiltinToken( Token, NULL );
-			if (TokenLength == -1) {
+			size_t TokenLength = BuiltinToken( Token, NULL );
+			if (TokenLength == size_t(-1)) {
 				NewLength += core->GetTokenDictionary()->GetValueLength( Token );
 			} else {
 				NewLength += TokenLength;
