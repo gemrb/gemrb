@@ -25,12 +25,8 @@
 
 #include <cstdint>
 #include <utility>
-
-
-#if HAVE_ICONV
 #include <iconv.h>
 #include <cerrno>
-#endif
 
 namespace GemRB {
 
@@ -42,7 +38,6 @@ const Glyph& TTFFont::AliasBlank(ieWord chr) const
 
 const Glyph& TTFFont::GetGlyph(ieWord chr) const
 {
-#if HAVE_ICONV
 	if (!core->TLKEncoding.multibyte) {
 		char* oldchar = (char*)&chr;
 		ieWord unicodeChr = 0;
@@ -61,7 +56,6 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		iconv_close(cd);
 		chr = unicodeChr;
 	}
-#endif
 	// first check if the glyph already exists
 	const Glyph& g = Font::GetGlyph(chr);
 	if (g.pixels) {

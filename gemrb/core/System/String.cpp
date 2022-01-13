@@ -26,9 +26,7 @@
 #include <cctype>
 #include <cwctype>
 
-#if HAVE_ICONV
 #include <iconv.h>
-#endif
 
 namespace GemRB {
 
@@ -100,7 +98,6 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 	return dbString;
 }
 
-#if HAVE_ICONV
 // returns new string converted to given encoding
 // in case iconv is not available, requested encoding is the same as string encoding,
 // or there is encoding error, copy of original string is returned.
@@ -136,13 +133,6 @@ char* ConvertCharEncoding(const char* string, const char* from, const char* to) 
 	buf[used] = '\0';
 	return buf;
 }
-#else
-char* ConvertCharEncoding(const char* string,
-        IGNORE_UNUSED const char* from, IGNORE_UNUSED const char* to) {
-	return strdup(string);
-}
-#endif
-
 
 String* StringFromCString(const char* string)
 {

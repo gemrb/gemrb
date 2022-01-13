@@ -25,7 +25,6 @@
 #cmakedefine HAS_WSTRING 1
 #cmakedefine HAVE_OPENAL_EFX_H 1
 #cmakedefine WIN32_USE_STDIO 1
-#cmakedefine HAVE_ICONV 1
 #cmakedefine RPI 1
 #cmakedefine HAVE_MMAP ${HAVE_MMAP}
 #cmakedefine SUPPORTS_MEMSTREAM ${SUPPORTS_MEMSTREAM}
