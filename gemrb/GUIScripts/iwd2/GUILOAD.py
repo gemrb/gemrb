@@ -43,19 +43,18 @@ def OnLoad ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: LoadWindow.Close())
 	CancelButton.MakeEscape()
 
-	GemRB.SetVar ("LoadIdx",0)
 	for i in range (5):
 		Button = LoadWindow.GetControl (55+i)
 		Button.SetText (15590)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetVarAssoc ("LoadIdx",i)
+		Button.SetValue (i)
 
 		Button = LoadWindow.GetControl (60+i)
 		Button.SetText (13957)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetVarAssoc ("LoadIdx",i)
+		Button.SetValue (i)
 
 		#area previews
 		Button = LoadWindow.GetControl (1+i)
@@ -130,25 +129,25 @@ def ScrollBarPress ():
 				Button.SetPicture (None)
 	return
 
-def LoadGamePress ():
+def LoadGamePress (btn):
 	if LoadWindow:
 		LoadWindow.Unload ()
-	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
+	Pos = GemRB.GetVar ("TopIndex") + btn.Value
 	LoadScreen.StartLoadScreen()
 	GemRB.LoadGame(Games[Pos]) #loads and enters savegame
 	GemRB.EnterGame ()
 	return
 
-def DeleteGameConfirm():
+def DeleteGameConfirm (btn):
 	global Games
 
 	TopIndex = GemRB.GetVar ("TopIndex")
-	Pos = TopIndex +GemRB.GetVar ("LoadIdx")
+	Pos = TopIndex + btn.Value
 	GemRB.DeleteSaveGame(Games[Pos])
-	if TopIndex>0:
-		GemRB.SetVar ("TopIndex",TopIndex-1)
 	del Games[Pos]
-	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
+	if TopIndex > 0:
+		TopIndex = TopIndex - 1
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, len(Games) - 5)
 	ScrollBarPress ()
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
@@ -161,7 +160,7 @@ def DeleteGameCancel ():
 	LoadWindow.Focus()
 	return
 
-def DeleteGamePress ():
+def DeleteGamePress (btn):
 	global ConfirmWindow
 
 	ConfirmWindow=GemRB.LoadWindow (1)
@@ -172,6 +171,7 @@ def DeleteGamePress ():
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (13957)
 	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
+	DeleteButton.SetValue (btn.Value)
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
