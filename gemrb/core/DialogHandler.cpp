@@ -112,7 +112,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dialogRef.CString(), spk->GetName(1), tgt->GetName(1));
+		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %ls with %ls", dialogRef.CString(), spk->GetName().c_str(), tgt->GetName().c_str());
 		return false;
 	}
 

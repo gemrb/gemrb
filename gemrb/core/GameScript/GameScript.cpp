@@ -1356,7 +1356,7 @@ void Targets::dump() const
 	targetlist::const_iterator m;
 	for (m = objects.begin(); m != objects.end(); ++m) {
 		if ((*m).actor->Type == ST_ACTOR) {
-			print("%s", (*m).actor->GetName(1));
+			print("%ls", (*m).actor->GetName().c_str());
 		}
 	}
 }
@@ -2350,7 +2350,7 @@ int Trigger::Evaluate(Scriptable *Sender) const
 			triggerID, tmpstr );
 		return 0;
 	}
-	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s (Sender: %s / %s)", triggerID, tmpstr, Sender->GetScriptName(), Sender->GetName(1));
+	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s (Sender: %s / %ls)", triggerID, tmpstr, Sender->GetScriptName(), Sender->GetName().c_str());
 
 	int ret = func( Sender, this );
 	if (flags & TF_NEGATE) {

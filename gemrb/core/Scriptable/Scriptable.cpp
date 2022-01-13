@@ -900,10 +900,10 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
 
 		if (target) {
 			const String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName(-1));
+			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName().c_str());
 			delete msg;
 		} else {
-			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls : %s", spell->c_str(), GetName(-1));
+			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls : %s", spell->c_str(), GetName().c_str());
 		}
 		displaymsg->DisplayStringName(str, DMC_WHITE, this);
 	}
@@ -1590,6 +1590,21 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 	return true;
 }
 
+String Scriptable::GetName() const
+{
+	switch (Type) {
+		case ST_PROXIMITY:	return L"Proximity";
+		case ST_TRIGGER:	return L"Trigger";
+		case ST_TRAVEL:		return L"Travel";
+		case ST_DOOR:		return L"Door";
+		case ST_CONTAINER:	return L"Container";
+		case ST_AREA:		return L"Area";
+		case ST_GLOBAL:		return L"Global";
+		case ST_ACTOR:		return As<const Actor>()->GetName(1);
+	}
+	return L"NONE";
+}
+
 // aura pollution happens on cast or item use
 // aura cleansing automatically or magically
 bool Scriptable::AuraPolluted()
@@ -2215,7 +2230,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	prevTicks = Ticks;
 	Destination = Des;
 	if (pathAbandoned) {
-		Log(DEBUG, "WalkTo", "%s: Path was just abandoned", GetName(0));
+		Log(DEBUG, "WalkTo", "%ls: Path was just abandoned", actor->GetName(0).c_str());
 		ClearPath(true);
 		return;
 	}
@@ -2228,7 +2243,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
 	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
 	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
-		Log(DEBUG, "WalkTo", "%s re-pathing ignoring actors", GetName(0));
+		Log(DEBUG, "WalkTo", "%ls re-pathing ignoring actors", actor->GetName(0).c_str());
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, actor);
 	}
 

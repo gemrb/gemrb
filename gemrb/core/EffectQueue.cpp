@@ -1043,11 +1043,11 @@ static int check_resistance(Actor* actor, Effect* fx)
 	//opcode immunity
 	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
-		Log(MESSAGE, "EffectQueue", "%s is immune to effect: %s", actor->GetName(1), Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "%ls is immune to effect: %s", actor->GetName(1).c_str(), Opcodes[fx->Opcode].Name);
 		return FX_NOT_APPLIED;
 	}
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
-		Log(MESSAGE, "EffectQueue", "%s is immune2 to effect: %s", actor->GetName(1), Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "%ls is immune2 to effect: %s", actor->GetName(1).c_str(), Opcodes[fx->Opcode].Name);
 		// totlm's spin166 should be wholly blocked by spwi210, but only blocks its third effect, so make it fatal
 		return FX_ABORT;
 	}
@@ -1115,7 +1115,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 				fx->Parameter1 /= 2;
 			}
 		} else {
-			Log(MESSAGE, "EffectQueue", "%s saved against effect: %s", actor->GetName(1), Opcodes[fx->Opcode].Name);
+			Log(MESSAGE, "EffectQueue", "%ls saved against effect: %s", actor->GetName(1).c_str(), Opcodes[fx->Opcode].Name);
 			return FX_NOT_APPLIED;
 		}
 	} else {

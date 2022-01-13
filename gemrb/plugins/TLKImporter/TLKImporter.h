@@ -65,12 +65,13 @@ private:
 	bool GetNewStringLength(const char* string, size_t& Length);
 	/**returns the decoded length of the built-in token
 		 if dest is not NULL it also returns the decoded value */
-	int BuiltinToken(const char* Token, char* dest);
+	size_t BuiltinToken(const char* Token, char* dest);
+	String* BuiltinToken(const char* Token);
 	int ClassStrRef(int slot) const;
 	int RaceStrRef(int slot) const;
 	int GenderStrRef(int slot, int malestrref, int femalestrref) const;
-	char *Gabber() const;
-	char *CharName(int slot) const;
+	const String& Gabber() const;
+	const String& CharName(int slot) const;
 };
 
 }

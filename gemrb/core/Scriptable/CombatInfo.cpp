@@ -183,7 +183,7 @@ void ArmorClass::HandleFxBonus(int mod, bool permanent)
 void ArmorClass::dump() const
 {
 	StringBuffer buffer;
-	buffer.appendFormatted("Debugdump of ArmorClass of %s:\n", Owner->GetName(1));
+	buffer.appendFormatted("Debugdump of ArmorClass of %ls:\n", Owner->GetName(1).c_str());
 	buffer.appendFormatted("TOTAL: %d\n", total);
 	buffer.appendFormatted("Natural: %d\tGeneric: %d\tDeflection: %d\n", natural, genericBonus, deflectionBonus);
 	buffer.appendFormatted("Armor: %d\tShield: %d\n", armorBonus, shieldBonus);
@@ -320,7 +320,7 @@ int ToHitStats::GetTotalForAttackNum(unsigned int number) const
 void ToHitStats::dump() const
 {
 	StringBuffer buffer;
-	buffer.appendFormatted("Debugdump of ToHit of %s:\n", Owner->GetName(1));
+	buffer.appendFormatted("Debugdump of ToHit of %ls:\n", Owner->GetName(1).c_str());
 	buffer.appendFormatted("TOTAL: %d\n", total);
 	buffer.appendFormatted("Base: %2d\tGeneric: %d\tEffect: %d\n", base, genericBonus, fxBonus);
 	buffer.appendFormatted("Armor: %d\tShield: %d\n", armorBonus, shieldBonus);

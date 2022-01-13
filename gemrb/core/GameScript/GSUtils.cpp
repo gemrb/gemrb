@@ -1220,7 +1220,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	const Action *curact = target->GetCurrentAction();
 	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && \
 	  (!curact && target->GetNextAction())) {
-		core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
+		core->GetTokenDictionary()->SetAt("TARGET", target->GetName(1));
 		displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1234,7 +1234,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		} else if (!(Flags & BD_INTERRUPT)) {
 			// added CurrentAction as part of blocking action fixes
 			if (tar->GetCurrentAction() || tar->GetNextAction()) {
-				core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
+				core->GetTokenDictionary()->SetAt("TARGET", target->GetName(1));
 				displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 				Sender->ReleaseCurrentAction();
 				return;
@@ -1316,8 +1316,8 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 
 void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust)
 {
-	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %s to %s [%d.%d] face: %d",
-		actor->GetName(0), area.CString(), position.x, position.y, face);
+	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %ls to %s [%d.%d] face: %d",
+		actor->GetName(0).c_str(), area.CString(), position.x, position.y, face);
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
@@ -1456,7 +1456,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	// mislead and projected images can't attack
 	int puppet = actor->GetStat(IE_PUPPETMASTERTYPE);
 	if (puppet && puppet < 3) {
-		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: %s!", actor->GetName(1));
+		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: %ls!", actor->GetName(1).c_str());
 		return;
 	}
 
@@ -1467,14 +1467,14 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			actor->StopAttack();
 			Sender->ReleaseCurrentAction();
 			actor->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
-			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: %s!", tar->GetName(1));
+			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: %ls!", tar->GetName(1).c_str());
 			return;
 		}
 	}
 
 	if (actor == tar) {
 		Sender->ReleaseCurrentAction();
-		Log(WARNING, "AttackCore", "Tried attacking itself: %s!", tar->GetName(1));
+		Log(WARNING, "AttackCore", "Tried attacking itself: %ls!", tar->GetName(1).c_str());
 		return;
 	}
 
@@ -1487,7 +1487,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		Sender->ReleaseCurrentAction();
 		assert(tar);
 		actor->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
-		Log(WARNING, "AttackCore", "Weapon unusable: %s!", actor->GetName(1));
+		Log(WARNING, "AttackCore", "Weapon unusable: %ls!", actor->GetName(1).c_str());
 		return;
 	}
 

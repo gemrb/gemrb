@@ -1380,7 +1380,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->LastHitter=caster->GetGlobalID();
 		} else {
 			//Maybe it should be something impossible like 0xffff, and use 'Someone'
-			Log(ERROR, "Actor", "LastHitter (type %d) falling back to target: %s.", caster ? caster->Type : -1, target->GetName(1));
+			Log(ERROR, "Actor", "LastHitter (type %d) falling back to target: %ls.", caster ? caster->Type : -1, target->GetName(1).c_str());
 			target->LastHitter=target->GetGlobalID();
 		}
 	}
