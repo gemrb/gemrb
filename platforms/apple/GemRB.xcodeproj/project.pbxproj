@@ -11763,7 +11763,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
-					"-DHAVE_ICONV=1",
 					"-g",
 					"-D_DEBUG",
 					"-isystem",

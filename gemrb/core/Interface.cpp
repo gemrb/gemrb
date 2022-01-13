@@ -232,7 +232,7 @@ Interface::Interface()
 #endif
 
 	SystemEncoding = DefaultSystemEncoding;
-#if defined(WIN32) && defined(HAVE_ICONV)
+#if defined(WIN32)
 	const uint32_t codepage = GetACP();
 	const char* iconvCode = GetIconvNameForCodepage(codepage);
 
