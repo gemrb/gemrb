@@ -88,6 +88,7 @@ public:
 	int GetValueLength(const char* key) const;
 	bool Lookup(const char* key, char* dest, size_t MaxLength) const;
 	bool Lookup(const char* key, ieDword& rValue) const;
+	bool Lookup(const char* key, String& dest) const;
 	bool Lookup(const char* key, char*& dest) const;
 	bool Lookup(const char* key, void*& dest) const;
 	bool HasKey(const char* key) const;
@@ -95,6 +96,7 @@ public:
 	// Operations
 	void SetAtCopy(const char* key, const char* newValue);
 	void SetAtCopy(const char* key, int newValue);
+	void SetAt(const char* key, const String& newValue);
 	void SetAt(const char* key, char* newValue);
 	void SetAt(const char* key, void* newValue);
 	void SetAt(const char* key, ieDword newValue, bool nocreate=false);
