@@ -467,7 +467,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(ta);
 
 	ta->ClearText();
-	String* chapText = StringFromCString(text);
+	String* chapText = StringFromUtf8(text);
 	if (chapText) {
 		// insert enough newlines to push the text offscreen
 		auto margins = ta->GetMargins();
@@ -1506,11 +1506,11 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 		ctrl->SetText(NULL);
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
 		const char *tmp = PyByteArray_AS_STRING(str);
-		const String* string = StringFromCString(tmp);
+		const String* string = StringFromUtf8(tmp);
 		ctrl->SetText(string);
 		delete string;
 	} else { // string value of the object
-		const String* string = StringFromCString( PyString_AsString( str ) );
+		const String* string = PyString_AsStringObj(str);
 		ctrl->SetText(string);
 		delete string;
 	}
@@ -1555,11 +1555,9 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 
 	String* str = NULL;
 	if (PyObject_TypeCheck( pystr, &PyString_Type )) {
-		str = StringFromCString(PyString_AsString( pystr ));
+		str = PyString_AsStringObj(pystr);
 	} else if (PyObject_TypeCheck( pystr, &PyInt_Type )) {
 		str = core->GetString( ieStrRef(PyInt_AsLong( pystr )), flags );
-	} else {
-		return NULL;
 	}
 	if (str) {
 		ta->AppendText( *str );
@@ -1614,8 +1612,7 @@ static PyObject* GemRB_View_SetTooltip(PyObject* self, PyObject* args)
 	}
 
 	if (PyObject_TypeCheck( str, &PyString_Type )) {
-		const char* cstring = PyString_AsString(str);
-		String* string = StringFromCString(cstring);
+		String* string = PyString_AsStringObj(str);
 		if (string) {
 			view->SetTooltip(*string);
 			delete string;
@@ -2196,7 +2193,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 
 			TextEdit* edit = new TextEdit(rgn, 500, Point());
 			edit->SetFont( core->GetFont( font ) );
-			String* text = StringFromCString(cstr);
+			String* text = StringFromUtf8(cstr);
 			edit->Control::SetText( text );
 			delete text;
 
@@ -2214,10 +2211,9 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		{
 			int align;
 			char *font, *text;
-			PARSE_ARGS( constructArgs,
-						"ssi", &font, &text, &align );
+			PARSE_ARGS(constructArgs, "ssi", &font, &text, &align);
 
-			String* string = StringFromCString(text);
+			String* string = StringFromUtf8(text);
 			Label* lbl = new Label(rgn, core->GetFont(font), string ? *string : L"");
 			delete string;
 
@@ -4981,7 +4977,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 				return NULL;
 			}
 		} else {
-			string = StringFromCString(PyString_AsString(item));
+			string = PyString_AsStringObj(item);
 		}
 		TAOptions.emplace_back(i, *string);
 		delete string;
@@ -9911,7 +9907,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	GET_MAP();
 
 	if (txt && txt[0]) {
-		String* str = StringFromCString(txt);
+		String* str = StringFromUtf8(txt);
 		MapNote mn(std::move(*str), color, false);
 		map->AddMapNote(point, mn);
 		delete str;
@@ -13838,7 +13834,7 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 			PyObject* catcher = PyObject_GetAttrString(pyGUI, "outputFunnel");
 			if (catcher) {
 				PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
-				String* msg = StringFromCString(PyString_AsString(output));
+				String* msg = PyString_AsStringObj(output);
 				displaymsg->DisplayString(*msg, DMC_WHITE, nullptr);
 				delete msg;
 				Py_DECREF(catcher);

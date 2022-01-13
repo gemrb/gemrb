@@ -151,6 +151,14 @@ String* StringFromCString(const char* string)
 	return StringFromEncodedData((const ieByte*) string, core->TLKEncoding);
 }
 
+String* StringFromUtf8(const char* string)
+{
+	EncodingStruct enc;
+	enc.encoding = "UTF-8";
+	enc.multibyte = true;
+	return StringFromEncodedData((const ieByte*) string, enc);
+}
+
 char* MBCStringFromString(const String& string)
 {
 	size_t allocatedBytes = string.length() * sizeof(String::value_type);

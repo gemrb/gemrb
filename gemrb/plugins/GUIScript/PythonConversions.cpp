@@ -154,4 +154,14 @@ PyObject* PyString_FromStringObj(const String& s)
 	return pyStr;
 }
 
+String* PyString_AsStringObj(PyObject* obj)
+{
+	const char *s;
+#if PY_MAJOR_VERSION >= 3
+	s = PyStringWrapper(obj, core->TLKEncoding.encoding.c_str());
+#else
+	s = PyString_AsString(obj);
+#endif
+	return StringFromCString(s);
+}
 }

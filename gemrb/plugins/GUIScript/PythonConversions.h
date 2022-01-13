@@ -174,6 +174,8 @@ PyObject* PyString_FromAnimID(const char* AnimID);
 	
 PyObject* PyString_FromStringObj(const std::string&);
 PyObject* PyString_FromStringObj(const String&);
+
+String* PyString_AsStringObj(PyObject *obj);
 	
 template <typename T>
 PyObject* PyObject_FromPtr(T* p)
