@@ -573,19 +573,8 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 {
 	const Game *game = core->GetGame();
-	int i = game->GetPartySize(false);
-	while (i--) {
-		Actor *tar = game->GetPC(i, false);
-		MoveBetweenAreasCore(tar, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
-	}
-
-	//move familiars with the party
-	i = game->GetNPCCount();
-	while (i--) {
-		Actor *tar = game->GetNPC(i);
-		if (tar->GetBase(IE_EA)==EA_FAMILIAR)
-			MoveBetweenAreasCore(tar, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
-	}
+	game->MovePCs(ResRef(parameters->string0Parameter), parameters->pointParameter, parameters->int0Parameter);
+	game->MoveFamiliars(ResRef(parameters->string0Parameter), parameters->pointParameter, parameters->int0Parameter);
 }
 
 //5 is the ToB value, but it might be useful to have multiple expansions
@@ -627,13 +616,8 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 	}
 	
 	// move familiars
-	cnt = game->GetNPCCount();
-	for (int i = 0; i < cnt; i++) {
-		Actor* act = game->GetNPC( i );
-		if (act->GetBase(IE_EA)==EA_FAMILIAR) {
-			MoveBetweenAreasCore(act, area.CString(), pos, -1, true);
-		}
-	}
+	game->MoveFamiliars(area.CString(), pos, -1);
+
 	// don't clear locations!
 }
 

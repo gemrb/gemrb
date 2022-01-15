@@ -2261,5 +2261,20 @@ bool Game::OnlyNPCsSelected() const
 	return !hasPC;
 }
 
+void Game::MovePCs(const ResRef& targetArea, const Point& targetPoint, int orientation) const
+{
+	for (auto pc : PCs) {
+		MoveBetweenAreasCore(pc, targetArea, targetPoint, orientation, true);
+	}
+}
+
+void Game::MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int orientation) const
+{
+	for (auto npc : NPCs) {
+		if (npc->GetBase(IE_EA) == EA_FAMILIAR) {
+			MoveBetweenAreasCore(npc, targetArea, targetPoint, orientation, true);
+		}
+	}
+}
 
 }

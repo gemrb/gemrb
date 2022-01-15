@@ -513,6 +513,8 @@ public:
 	void ResetPartyCommentTimes() const;
 	void ReversePCs() const;
 	bool OnlyNPCsSelected() const;
+	void MovePCs(const ResRef& targetArea, const Point& targetPoint, int orientation) const;
+	void MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int orientation) const;
 private:
 	bool DetermineStartPosType(const TableMgr *strta) const;
 	ResRef *GetDream(Map *area);
