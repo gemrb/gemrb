@@ -4726,7 +4726,18 @@ void GameScript::EndCredits(Scriptable* Sender, Action* parameters)
 void GameScript::ExpansionEndCredits(Scriptable *Sender, Action *parameters)
 {
 	core->PlayMovie("ecredit");
-	QuitGame(Sender, parameters);
+
+	// end the game for HoW-only runs, but teleport back to Kuldahar for full iwd runs
+	bool howOnly = CheckVariable(Sender, "EXPANSION_DOOR", "GLOBAL") == 1; // 1 how only, 0/2 for full run
+	if (howOnly) {
+		QuitGame(Sender, parameters);
+	} else {
+		const char* area = "ar2109";
+		Point dest(275, 235);
+		const Game* game = core->GetGame();
+		game->MovePCs(area, dest, -1);
+		game->MoveFamiliars(area, dest, -1);
+	}
 }
 
 //always quits game, but based on game it can play end animation, or display
