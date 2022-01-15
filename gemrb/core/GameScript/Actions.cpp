@@ -576,7 +576,7 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
-		MoveBetweenAreasCore( tar, parameters->string0Parameter, parameters->pointParameter, -1, true);
+		MoveBetweenAreasCore(tar, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 
 	//move familiars with the party
@@ -584,7 +584,7 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetNPC(i);
 		if (tar->GetBase(IE_EA)==EA_FAMILIAR)
-			MoveBetweenAreasCore( tar, parameters->string0Parameter, parameters->pointParameter, -1, true);
+			MoveBetweenAreasCore(tar, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
 
