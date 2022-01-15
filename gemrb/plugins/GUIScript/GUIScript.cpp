@@ -1413,9 +1413,7 @@ static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
 	const Control *ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 
-	String wstring = ctrl->QueryText();
-	std::string nstring(wstring.begin(), wstring.end());
-	return PyString_FromString(nstring.c_str());
+	return PyString_FromStringObj(ctrl->QueryText());
 }
 
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,
