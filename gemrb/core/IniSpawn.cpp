@@ -621,9 +621,7 @@ void IniSpawn::RespawnNameless()
 		nameless->SetStance(IE_ANI_PST_START);
 	}
 
-	for (int i = 0; i < game->GetPartySize(false); i++) {
-		MoveBetweenAreasCore(game->GetPC(i, false),NamelessSpawnArea,NamelessSpawnPoint,-1, true);
-	}
+	game->MovePCs(NamelessSpawnArea, NamelessSpawnPoint, -1);
 
 	//certain variables are set when nameless dies
 	for (const auto& var : NamelessVar) {
