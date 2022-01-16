@@ -61,9 +61,9 @@ public:
 	/** Sets the Foreground Font Color */
 	void SetColors(const Color& col, const Color& bg);
 	/** Set the font being used */
-	void SetFont(Font *font) { this->font = font; }
+	void SetFont(Font* newFont) { font = newFont; }
 	/** Sets the Alignment of Text */
-	void SetAlignment(unsigned char Alignment);
+	void SetAlignment(unsigned char newAlignment);
 	/** Simply returns the pointer to the text, don't modify it! */
 	String QueryText() const override;
 

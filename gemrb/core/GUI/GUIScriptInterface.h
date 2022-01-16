@@ -41,8 +41,8 @@ public:
 		return {"View"};
 	};
 
-	virtual ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const {
-		return new ViewScriptingRef(this->GetObject(), id, group);
+	virtual ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t scriptingGroup) const {
+		return new ViewScriptingRef(this->GetObject(), id, scriptingGroup);
 	}
 
 	// TODO: perhapps in the future the GUI script implementation for view methods should be moved here

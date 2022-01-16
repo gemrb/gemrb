@@ -171,8 +171,8 @@ protected:
 		}
 
 		bool PointInside(const Point& p) const {
-			for (const auto& layout : regions) {
-				const Region r = layout->region;
+			for (const auto& layoutRegion : regions) {
+				const Region r = layoutRegion->region;
 				if (r.PointInside(p)) {
 					return true;
 				}
@@ -225,7 +225,7 @@ protected:
 	const Layout* LayoutAtPoint(const Point& p) const;
 
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
-	virtual void DrawContents(const Layout& layout, Point point);
+	virtual void DrawContents(const Layout& contentLayout, Point point);
 	
 	void SizeChanged(const Size& oldSize) override;
 

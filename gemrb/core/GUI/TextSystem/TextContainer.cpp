@@ -377,9 +377,9 @@ void ContentContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 	}
 }
 
-void ContentContainer::DrawContents(const Layout& layout, Point point)
+void ContentContainer::DrawContents(const Layout& contentLayout, Point point)
 {
-	layout.content->DrawContentsInRegions(layout.regions, point);
+	contentLayout.content->DrawContentsInRegions(contentLayout.regions, point);
 }
 
 void ContentContainer::AppendContent(Content* content)
@@ -477,11 +477,11 @@ ContentContainer::EraseContent(ContentList::iterator beg, ContentList::iterator 
 
 Content* ContentContainer::ContentAtPoint(const Point& p) const
 {
-	const Layout* layout = LayoutAtPoint(p);
-	if (layout) {
+	const Layout* contentLayout = LayoutAtPoint(p);
+	if (contentLayout) {
 		// i know we are casting away const.
 		// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
-		return (Content*)(layout->content);
+		return (Content*)(contentLayout->content);
 	}
 	return NULL;
 }
@@ -785,9 +785,9 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 
 	const TextSpan* ts = (const TextSpan*)layout.content;
 	const String& text = ts->Text();
-	size_t textLen = ts->Text().length();
+	size_t textLength = ts->Text().length();
 
-	if (Editable() && printPos <= cursorPos && printPos + textLen >= cursorPos) {
+	if (Editable() && printPos <= cursorPos && printPos + textLength >= cursorPos) {
 		const Font* printFont = ts->LayoutFont();
 		
 		auto it = FindCursorRegion(layout);
@@ -804,7 +804,7 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 		dp.y += cursor->Frame.y;
 		core->GetVideoDriver()->BlitSprite(cursor, cursorPoint + dp);
 	}
-	printPos += textLen;
+	printPos += textLength;
 }
 
 void TextContainer::SizeChanged(const Size& oldSize)
@@ -1004,11 +1004,11 @@ TextContainer::ContentIndex TextContainer::FindContentForChar(size_t idx)
 	ContentList::iterator it = contents.begin();
 	while (it != contents.end()) {
 		const TextSpan* ts = static_cast<const TextSpan*>(*it);
-		size_t textLen = ts->Text().length();
-		if (charCount + textLen >= idx) {
+		size_t textLength = ts->Text().length();
+		if (charCount + textLength >= idx) {
 			break;
 		}
-		charCount += textLen;
+		charCount += textLength;
 		++it;
 	}
 	return std::make_pair(charCount, it);

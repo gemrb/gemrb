@@ -68,16 +68,16 @@ void Label::SetColors(const Color& col, const Color& bg)
 	MarkDirty();
 }
 
-void Label::SetAlignment(unsigned char Alignment)
+void Label::SetAlignment(unsigned char newAlignment)
 {
 	if (!font || frame.h <= font->LineHeight) {
 		// FIXME: is this a poor way of determinine if we are single line?
-		Alignment |= IE_FONT_SINGLE_LINE;
+		newAlignment |= IE_FONT_SINGLE_LINE;
 	} else if (frame.h < font->LineHeight * 2) {
-		Alignment |= IE_FONT_NO_CALC;
+		newAlignment |= IE_FONT_NO_CALC;
 	}
-	this->Alignment = Alignment;
-	if (Alignment == IE_FONT_ALIGN_CENTER && core->HasFeature(GF_LOWER_LABEL_TEXT)) {
+	Alignment = newAlignment;
+	if (newAlignment == IE_FONT_ALIGN_CENTER && core->HasFeature(GF_LOWER_LABEL_TEXT)) {
 		StringToLower(Text);
 	}
 	MarkDirty();

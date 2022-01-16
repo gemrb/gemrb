@@ -52,11 +52,11 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	r.w = std::max(r.w - margin.left - margin.right, 0);
 	r.h = std::max(r.h - margin.top - margin.bottom, 0);
 	
-	Font::PrintColors colors {ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]};
+	Font::PrintColors optionColors {ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]};
 	Font::PrintColors selectedCol {ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]};
 
 	for (size_t i = 0; i < opts.size(); i++) {
-		TextContainer* selOption = new OptSpan(r, ta.ftext, colors.fg, colors.bg);
+		TextContainer* selOption = new OptSpan(r, ta.ftext, optionColors.fg, optionColors.bg);
 		selOption->SetAutoResizeFlags(ResizeHorizontal, BitOp::SET);
 
 		if (numbered) {

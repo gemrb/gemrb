@@ -680,9 +680,9 @@ void Button::ClearPictureList()
 }
 
 /** Add picture to the end of the list of Pictures */
-void Button::StackPicture(const Holder<Sprite2D>& Picture)
+void Button::StackPicture(const Holder<Sprite2D>& newPicture)
 {
-	PictureList.push_back(Picture);
+	PictureList.push_back(newPicture);
 	MarkDirty();
 	flags |= IE_GUI_BUTTON_PICTURE;
 }

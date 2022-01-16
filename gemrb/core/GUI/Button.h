@@ -133,7 +133,7 @@ public:
 	/** Clears the list of Pictures */
 	void ClearPictureList();
 	/** Add picture to the end of the list of Pictures */
-	void StackPicture(const Holder<Sprite2D>& Picture);
+	void StackPicture(const Holder<Sprite2D>& newPicture);
 	/** Sets border/frame parameters */
 	void SetBorder(int index, const Region&, const Color &color, bool enabled = false, bool filled = false);
 	/** Sets horizontal overlay, used in portrait hp overlay */

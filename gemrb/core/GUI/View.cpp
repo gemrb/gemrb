@@ -189,10 +189,10 @@ void View::DirtyBGRect(const Region& r, bool force)
 	// do we want to intersect this too?
 	//Region bgRgn = Region(background->Frame.x, background->Frame.y, background->Frame.w, background->Height);
 	Region clip(Point(), Dimensions());
-	Region dirty = r.Intersect(clip);
-	dirtyBGRects.push_back(dirty);
+	Region dirtyRect = r.Intersect(clip);
+	dirtyBGRects.push_back(dirtyRect);
 	
-	MarkDirty(&dirty);
+	MarkDirty(&dirtyRect);
 }
 
 void View::DrawSubviews()
@@ -580,32 +580,32 @@ void View::ResizeSubviews(const Size& oldSize)
 	std::list<View*>::iterator it;
 	for (it = subViews.begin(); it != subViews.end(); ++it) {
 		View* subview = *it;
-		unsigned short flags = subview->AutoResizeFlags();
+		unsigned short arFlags = subview->AutoResizeFlags();
 
-		if (flags == ResizeNone)
+		if (arFlags == ResizeNone)
 			continue;
 
 		Region newSubFrame = subview->Frame();
 		int delta = frame.w - oldSize.w;
 
-		if (flags&ResizeRight) {
-			if (flags&ResizeLeft) {
+		if (arFlags & ResizeRight) {
+			if (arFlags & ResizeLeft) {
 				newSubFrame.w += delta;
 			} else {
 				newSubFrame.x += delta;
 			}
-		} else if (flags&ResizeLeft) {
+		} else if (arFlags & ResizeLeft) {
 			newSubFrame.x += delta;
 		}
 
 		delta = frame.h - oldSize.h;
-		if (flags&ResizeBottom) {
-			if (flags&ResizeTop) {
+		if (arFlags & ResizeBottom) {
+			if (arFlags & ResizeTop) {
 				newSubFrame.h += delta;
 			} else {
 				newSubFrame.y += delta;
 			}
-		} else if (flags&ResizeTop) {
+		} else if (arFlags & ResizeTop) {
 			newSubFrame.y += delta;
 		}
 

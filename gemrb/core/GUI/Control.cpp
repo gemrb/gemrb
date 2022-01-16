@@ -189,12 +189,12 @@ void Control::UpdateDictValue() noexcept
 	}
 }
 
-void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange range) noexcept
+void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange valRange) noexcept
 {
 	// blank out any old varname so we can set the control value without setting the old variable
 	VarName[0] = '\0';
-	if (range.first != Control::INVALID_VALUE) {
-		SetValueRange(range);
+	if (valRange.first != Control::INVALID_VALUE) {
+		SetValueRange(valRange);
 	}
 	SetValue(val);
 	// now that the value range is setup, we can change the dictionary variable
