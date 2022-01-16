@@ -87,7 +87,6 @@ def InitMageWindow (window):
 			color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 64}
 			Button.SetBorder (0,color,0,1)
 			Button.SetSprites ("SPELFRAM",0,0,0,0,0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetAnimation (None)
 			Button.SetVarAssoc ("SpellButton", i)
@@ -95,7 +94,7 @@ def InitMageWindow (window):
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = MageWindow.GetControl (27 + i)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetVarAssoc ("SpellButton", 100 + i)
 
@@ -138,8 +137,7 @@ def UpdateMageWindow (MageWindow):
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, spelltype, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
-				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-				Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
+				Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 				if ms['Flags']:
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellUnmemorizeWindow)
 				else:
@@ -156,7 +154,7 @@ def UpdateMageWindow (MageWindow):
 				if i < max_mem_cnt:
 					Button.SetFlags (IE_GUI_BUTTON_NORMAL | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 				else:
-					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 				Button.SetTooltip ('')
@@ -196,7 +194,6 @@ def UpdateMageWindow (MageWindow):
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetTooltip ('')
 		Button.EnableBorder (0, 0)
-
 	
 	return
 
