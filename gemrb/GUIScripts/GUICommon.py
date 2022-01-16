@@ -69,8 +69,8 @@ def LocationPressed ():
 
 	return
 
-def SelectFormation (btn, val):
-	GemRB.GameSetFormation (val)
+def SelectFormation (btn):
+	GemRB.GameSetFormation (btn.Value)
 	return
 
 def OpenFloatMenuWindow (x, y):

@@ -4195,9 +4195,8 @@ The above lines set up some windows of the main game screen.\n\
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
 	char *Variable;
-	//this should be 32 bits, always, but i cannot tell that to Python
 	unsigned long value;
-	PARSE_ARGS( args,  "sl", &Variable, &value );
+	PARSE_ARGS( args, "sk", &Variable, &value );
 
 	core->GetDictionary()->SetAt( Variable, (ieDword) value );
 

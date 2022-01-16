@@ -237,11 +237,11 @@ def OpenReformPartyWindow ():
 		color = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
 		Button.SetBorder (FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame(1,1,2,2))
 		if j < len(removable_pcs):
-			Button.SetVarAssoc ("Selected", removable_pcs[j])
+			Button.SetValue (removable_pcs[j])
 		else:
-			Button.SetVarAssoc ("Selected", None)
+			Button.SetValue (None)
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn, val: UpdateReformWindow(Window, val))
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn: UpdateReformWindow(Window, btn.Value))
 
 	# Done
 	Button = Window.GetControl (8)

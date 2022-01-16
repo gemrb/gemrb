@@ -41,11 +41,11 @@ SlotMap = None
 
 UpdateInventoryWindow = None
 
-def OnDragItemGround (btn, slot):
+def OnDragItemGround (btn):
 	"""Drops and item to the ground."""
 	
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = slot + GemRB.GetVar ("TopIndex") - (47 if GameCheck.IsPST () else 68)
+	slot = btn.Value + GemRB.GetVar ("TopIndex") - (47 if GameCheck.IsPST () else 68)
 
 	if GemRB.IsDraggingItem ()==0:
 		slot_item = GemRB.GetContainerItem (pc, slot)
@@ -76,13 +76,14 @@ def OnAutoEquip ():
 	UpdateInventoryWindow ()
 	return
 
-def OnDragItem (btn, slot):
+def OnDragItem (btn):
 	"""Updates dragging."""
 
 	#don't call when splitting items
 	if ItemAmountWindow != None:
 		return
 
+	slot = btn.Value
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	
@@ -175,30 +176,30 @@ def DragItemAmount ():
 	#if dropping didn't help, don't die if slot_item isn't here
 	if slot_item:
 		Text = ItemAmountWindow.GetControl (6)
-		Amount = Text.QueryText ()
+		Amount = Text.QueryInteger ()
 		item = GemRB.GetItem (slot_item["ItemResRef"])
-		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], int ("0"+Amount), 0)
+		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], Amount, 0)
 	ItemAmountWindow.Close()
 	return
 
-def MouseEnterSlot (btn, slot):
+def MouseEnterSlot (Button):
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if GemRB.IsDraggingItem ()==1:
-		drag_item = GemRB.GetSlotItem (0,0)
-		SlotType = UpdateSlot (pc, slot-1)
+		drag_item = GemRB.GetSlotItem (0, 0)
+		SlotType = UpdateSlot (pc, Button.Value - 1)
 
 		if GemRB.CanUseItemType (SlotType["Type"], drag_item["ItemResRef"]):
-			btn.SetState (IE_GUI_BUTTON_SELECTED)
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
 		else:
-			btn.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		
 	return
 
-def MouseLeaveSlot (btn, slot):
+def MouseLeaveSlot (Button):
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	UpdateSlot (pc, slot-1)
+	UpdateSlot (pc, Button.Value - 1)
 	return
 
 def MouseEnterGround (Button):
@@ -478,7 +479,7 @@ def ItemAmountWindowClosed(win):
 	UpdateInventoryWindow()
 
 # TODO: can the GUISTORE be consolidate with this one?
-def OpenItemAmountWindow (btn, slot):
+def OpenItemAmountWindow (btn):
 	"""Open the split window."""
 
 	global UsedSlot, OverSlot
@@ -486,7 +487,7 @@ def OpenItemAmountWindow (btn, slot):
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	UsedSlot = slot
+	UsedSlot = btn.Value
 	if GemRB.IsDraggingItem ()==1:
 		GemRB.DropDraggedItem (pc, UsedSlot)
 		#redraw slot

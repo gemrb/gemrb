@@ -44,18 +44,18 @@ ContTarg = None
 SpellType = None
 Level = 1
 
-def ToggleSpellWindow(btn, val):
+def ToggleSpellWindow (btn):
 	global Sorcerer
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
 	
-	ToggleSpellWindow.Args = (btn, val)
+	ToggleSpellWindow.Args = btn
 	
 	if Sorcerer:
-		ToggleSorcererWindow(btn, val)
+		ToggleSorcererWindow (btn)
 	else:
-		ToggleMageWindow(btn, val)
+		ToggleMageWindow (btn)
 
 def InitMageWindow (window):
 	global MageWindow
@@ -210,9 +210,9 @@ def MageSelectionChanged (oldwin):
 	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
 
 	if Sorcerer:
-		OpenSorcererWindow(*ToggleSpellWindow.Args)
+		OpenSorcererWindow (ToggleSpellWindow.Args)
 	else:
-		OpenMageWindow(*ToggleSpellWindow.Args)
+		OpenMageWindow (ToggleSpellWindow.Args)
 
 ToggleMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, MageSelectionChanged)
 OpenMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, MageSelectionChanged)
@@ -331,7 +331,7 @@ def OpenMageSpellRemoveWindow (parentWin):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def OpenMageSpellUnmemorizeWindow (btn, val):
+def OpenMageSpellUnmemorizeWindow (btn):
 	if GameCheck.IsBG2():
 		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
@@ -345,11 +345,12 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	
-	def Unmemorize(btn, val):
-		OnMageUnmemorizeSpell(btn, val)
+	def Unmemorize (btn):
+		OnMageUnmemorizeSpell (btn)
 		Window.Close()
-			 
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Unmemorize(btn, val))
+
+	Button.SetValue (btn.Value)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Unmemorize)
 	Button.MakeDefault()
 
 	# Cancel
@@ -361,10 +362,11 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def OnMageUnmemorizeSpell (btn, index):
+def OnMageUnmemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
+	index = btn.Value
 
 	blend = 1
 	if GameCheck.IsBG2():

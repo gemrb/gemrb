@@ -378,7 +378,7 @@ def ShowKnownSpells ():
 		# fill in the button with the spell data
 		Spell = GemRB.GetSpell (Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetTooltip(Spell['SpellName'])
-		SpellButton.SetVarAssoc("MemorizePressed", i)
+		SpellButton.SetValue (i)
 		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MemorizePress)
 		if GameCheck.IsBG2():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
@@ -406,14 +406,14 @@ def ShowKnownSpells ():
 
 	return
 
-def MemorizePress (btn, val):
+def MemorizePress (btn):
 	"""Toggles the memorisation of the given spell."""
 
 	global SpellsSelectPointsLeft, Spells, SpellBook, MemoBook
 
 	# get our variables
 	j = RowIndex()
-	i = val + j
+	i = btn.Value + j
 
 	# get the spell that's been pushed
 	Spell = GemRB.GetSpell (Spells[SpellLevel][i][0], 1)
@@ -501,14 +501,14 @@ def ShowSpells ():
 
 	return
 
-def SpellsSelectPress (btn, val):
+def SpellsSelectPress (btn):
 	"""Toggles the selection of the given spell."""
 
 	global SpellsSelectPointsLeft, Spells, SpellBook
 
 	# get our variables
 	j = RowIndex()
-	i = val + j
+	i = btn.Value + j
 
 	# get the spell that's been pushed
 	Spell = GemRB.GetSpell (Spells[SpellLevel][i][0], 1)

@@ -188,7 +188,7 @@ def UpdateSpellBookWindow ():
 			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depleted)
 			if ms['MemoCount'] < ms['KnownCount']:
 				# already depleted, just remove
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn, val, mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell(btn, val, mc))
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn, mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell(mc))
 			else:
 				# deplete and remove
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellRemoveWindow)
@@ -372,7 +372,7 @@ def OpenSpellBookSpellRemoveWindow ():
 	return
 
 # since we can have semidepleted stacks, first make sure we unmemorize the depleted ones, only then unmemorize
-def OnSpellBookUnmemorizeSpell (btn, val, mem_cnt):
+def OnSpellBookUnmemorizeSpell (mem_cnt):
 	if mem_cnt == 0:
 		# everything is depleted, so just remove
 		OnSpellBookRemoveSpell ()

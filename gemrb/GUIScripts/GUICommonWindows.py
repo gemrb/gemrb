@@ -1345,7 +1345,7 @@ else:
 	DefaultWinPos = WINDOW_CENTER
 
 def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = DefaultWinPos, pause = False):
-	def ret (btn = None, val = None):
+	def ret (btn = None):
 		topwin = GemRB.GetView("WIN_TOP")
 		if topwin and topwin.HasFocus == False:
 			return None # we cannot close the current WIN_TOP unless it has focus
@@ -1382,7 +1382,7 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 				rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
 			if btn:
 				btn.SetState(IE_GUI_BUTTON_SELECTED)
-				GemRB.SetVar("OPTBTN", val) # cant use btn.ID because it is "too large to convert to C long"
+				GemRB.SetVar ("OPTBTN", btn.ID)
 			
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
@@ -1545,20 +1545,21 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	return pairs
 
-def OpenInventoryWindowClick (btn, pcID):
+def OpenInventoryWindowClick (btn):
 	import GUIINV
-	GemRB.GameSelectPC (pcID, True, SELECT_REPLACE)
+	GemRB.GameSelectPC (btn.Value, True, SELECT_REPLACE)
 	GUIINV.OpenInventoryWindow ()
 	return
 
 DragButton = None
-def ButtonDragSourceHandler(btn):
+def ButtonDragSourceHandler (btn):
 	global DragButton
 	DragButton = btn;
 	
-def ButtonDragDestHandler(btn, pcID):
+def ButtonDragDestHandler (btn):
 	global DragButton
 	
+	pcID = btn.Value
 	# So far this is only used for portrait buttons
 	if DragButton: # DragButton will be none for item drags instantiated by clicking (not sragging) an inventory item
 		if DragButton.VarName == "portrait" and btn.VarName == "portrait":
@@ -1652,8 +1653,8 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
-		Button.SetAction(ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
-		Button.SetAction(ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
+		Button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
+		Button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
@@ -1700,7 +1701,7 @@ def UpdatePortraitWindow ():
 		if indialog:
 			Button.SetHotKey(None)
 		if (pcID <= GemRB.GetPartySize()):
-			Button.SetAction(lambda btn, val, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER);
+			Button.SetAction(lambda btn, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER);
 			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
 			if (i < 6 and not indialog):
 				Button.SetHotKey(chr(ord('1') + i), 0, True)
@@ -1856,8 +1857,9 @@ def UpdateAnimatedPortrait (Window,i):
 
 	return
 
-def PortraitButtonOnPress (btn, pcID):
+def PortraitButtonOnPress (btn):
 	"""Selects the portrait individually."""
+	pcID = btn.Value
 
 	if GemRB.GameControlGetTargetMode() != TARGET_MODE_NONE:
 		GemRB.ActOnPC (pcID)

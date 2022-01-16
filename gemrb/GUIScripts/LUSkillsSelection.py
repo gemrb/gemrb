@@ -351,15 +351,15 @@ def SkillsRedraw (direction=0):
 	SkillsClickCount = 0
 	return
 
-def SkillJustPress(btn, val):
-	Pos = val + GemRB.GetVar ("SkillsTopIndex")
+def SkillJustPress (btn):
+	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	return
 
-def SkillDecreasePress(btn, val):
+def SkillDecreasePress (btn):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
-	Pos = val + GemRB.GetVar ("SkillsTopIndex")
+	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
@@ -376,10 +376,10 @@ def SkillDecreasePress(btn, val):
 	SkillsCallback ()
 	return
 
-def SkillIncreasePress(btn, val):
+def SkillIncreasePress (btn):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
-	Pos = val + GemRB.GetVar ("SkillsTopIndex")
+	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	if SkillPointsLeft == 0:
 		return
