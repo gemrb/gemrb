@@ -131,8 +131,7 @@ void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation && animation->HasEnded()) {
-		delete animation;
-		animation = nullptr;
+		SetAnimation(nullptr);
 	}
 }
 

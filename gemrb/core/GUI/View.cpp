@@ -275,8 +275,8 @@ void View::Draw()
 
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
-	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
 	dirty = false;
+	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
 
 	if (core->InDebugMode(ID_VIEWS)) {
 		const Window* win = GetWindow();
