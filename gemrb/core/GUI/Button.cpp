@@ -634,9 +634,7 @@ void Button::UpdateState(value_t Sum)
 
 void Button::DoToggle()
 {
-	if (flags & (IE_GUI_BUTTON_CHECKBOX | IE_GUI_BUTTON_RADIOBUTTON)) {
-		UpdateDictValue();
-	}
+	UpdateDictValue();
 }
 
 /** Sets the Picture */
