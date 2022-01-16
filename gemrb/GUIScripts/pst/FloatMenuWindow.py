@@ -254,24 +254,17 @@ def UpdateFloatMenuWindow ():
 	Button = Window.GetControl (CID_NEXT)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
+	updaterFunc = None
 	if float_menu_mode == MENU_MODE_SINGLE:
-		for i in range (SLOT_COUNT):
-			UpdateFloatMenuSingleAction (i)
-
+		updaterFunc = UpdateFloatMenuSingleAction
 	elif float_menu_mode == MENU_MODE_GROUP:
-		for i in range (SLOT_COUNT):
-			UpdateFloatMenuGroupAction (i)
-
+		updaterFunc = UpdateFloatMenuGroupAction
 	elif float_menu_mode == MENU_MODE_WEAPONS:
 		# weapons
-		for i in range (SLOT_COUNT):
-			UpdateFloatMenuItem (pc, i, 1)
-
+		updaterFunc = lambda i: UpdateFloatMenuItem (pc, i, 1)
 	elif float_menu_mode == MENU_MODE_ITEMS:
 		# items
-		for i in range (SLOT_COUNT):
-			UpdateFloatMenuItem (pc, i, 0)
-
+		updaterFunc = lambda i: UpdateFloatMenuItem (pc, i, 0)
 	elif float_menu_mode == MENU_MODE_SPELLS:
 		# spells
 		RefreshSpellList(pc, False)
@@ -279,9 +272,7 @@ def UpdateFloatMenuWindow ():
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button = Window.GetControl (CID_NEXT)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		for i in range (SLOT_COUNT):
-			UpdateFloatMenuSpell (pc, i)
-
+		updaterFunc = lambda i: UpdateFloatMenuSpell (pc, i)
 	elif float_menu_mode == MENU_MODE_ABILITIES:
 		# abilities
 		RefreshSpellList(pc, True)
@@ -291,12 +282,14 @@ def UpdateFloatMenuWindow ():
 		if float_menu_index+3<len(spell_list):
 			Button = Window.GetControl (CID_NEXT)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		for i in range (SLOT_COUNT):
-			UpdateFloatMenuSpell (pc, i)
-
+		updaterFunc = lambda i: UpdateFloatMenuSpell (pc, i)
 	elif float_menu_mode == MENU_MODE_DIALOG:
-		for i in range (SLOT_COUNT):
-			ClearSlot (i)
+		updaterFunc = ClearSlot
+
+	if not updaterFunc:
+		return
+	for i in range (SLOT_COUNT):
+		updaterFunc (i)
 
 	return
 
