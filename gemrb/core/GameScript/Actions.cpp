@@ -3062,7 +3062,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		ResRef resRef;
 		//set dialog only if we got a row
 		if (pdtable->GetRowIndex( scriptname ) != -1) {
-			if (game->Expansion==5) {
+			if (game->Expansion == GAME_TOB) {
 				resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "25JOIN_DIALOG_FILE"));
 			} else {
 				resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "JOIN_DIALOG_FILE"));
@@ -3595,7 +3595,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	if (pdtable->GetRowIndex( scriptname ) != -1) {
 		ResRef resRef;
 
-		if (core->GetGame()->Expansion==5) {
+		if (core->GetGame()->Expansion == GAME_TOB) {
 			resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "25POST_DIALOG_FILE"));
 		} else {
 			resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "POST_DIALOG_FILE"));

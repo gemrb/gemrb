@@ -235,7 +235,7 @@ static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
 	if (!pdtable) return nullptr;
 
 	int col;
-	if (core->GetGame()->Expansion == 5) {
+	if (core->GetGame()->Expansion == GAME_TOB) {
 		col = pdtable->GetColumnIndex("25FILE");
 	} else {
 		col = pdtable->GetColumnIndex("FILE");

@@ -11939,7 +11939,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 
 	AutoTable pdtable = gamedata->LoadTable("pdialog");
 	int ii = game->GetPartySize(true); // party size, only alive
-	bool bg2expansion = core->GetGame()->Expansion == 5;
+	bool bg2expansion = core->GetGame()->Expansion == GAME_TOB;
 	while (ii--) {
 		Actor *tar = game->GetPC(ii, true);
 		const char* scriptname = tar->GetScriptName();

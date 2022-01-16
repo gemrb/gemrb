@@ -108,7 +108,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 
 	//loading npc starting levels
 	ResRef tn = "npclevel";
-	if (Expansion == 5) { // tob is special
+	if (Expansion == GAME_TOB) {
 		tn = "npclvl25";
 	}
 	table = gamedata->LoadTable(tn);

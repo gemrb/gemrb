@@ -239,6 +239,9 @@ struct maze_header {
 
 #define MAX_CRLEVEL 32
 
+// expansion types
+constexpr unsigned int GAME_TOB = 5;
+
 using CRRow = int[MAX_CRLEVEL];
 
 /**

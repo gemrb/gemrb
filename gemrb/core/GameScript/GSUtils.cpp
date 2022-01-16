@@ -1205,8 +1205,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			/* banter dialogue */
 			pdtable = gamedata->LoadTable("interdia");
 			if (pdtable) {
-				//5 is the magic number for the ToB expansion
-				if (game->Expansion==5) {
+				if (game->Expansion == GAME_TOB) {
 					Dialog = pdtable->QueryField( scriptingname, "25FILE" );
 				} else {
 					Dialog = pdtable->QueryField( scriptingname, "FILE" );

@@ -5348,7 +5348,7 @@ static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *
 
 	//the familiar marker needs to be set to 2 in case of ToB
 	ieDword fm = 0;
-	if (game->Expansion==5) {
+	if (game->Expansion == GAME_TOB) {
 		fm = 2;
 	}
 	newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, fm, 0, FX_DURATION_INSTANT_PERMANENT);
@@ -5417,7 +5417,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 
 		//ToB familiars
-		if (game->Expansion==5) {
+		if (game->Expansion == GAME_TOB) {
 			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
 			fx->Resource.SNPrintF("%.6s25", game->GetFamiliar(alignment).CString());
 		} else {
@@ -5485,7 +5485,7 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Game *game = core->GetGame();
 
 	//upgrade familiar to ToB version
-	if ((fx->Parameter1!=2) && (game->Expansion == 5) ) {
+	if (fx->Parameter1 != 2 && game->Expansion == GAME_TOB) {
 		ResRef resource;
 		resource.SNPrintF("%.6s25", target->GetScriptName());
 		//set this field, so the upgrade is triggered only once
