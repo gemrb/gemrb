@@ -1102,7 +1102,7 @@ void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->WalkTo( parameters->pointParameter, IF_NORETICLE, 0 );
+		actor->WalkTo(parameters->pointParameter, IF_NORETICLE);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
@@ -1119,7 +1119,7 @@ void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->WalkTo( parameters->pointParameter, IF_NOINT, 0 );
+		actor->WalkTo(parameters->pointParameter, IF_NOINT);
 	}
 	// should we always force IF_NOINT here?
 	if (!actor->InMove()) {
@@ -1139,7 +1139,7 @@ void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
-		actor->WalkTo( parameters->pointParameter, IF_NORETICLE|IF_RUNNING, 0 );
+		actor->WalkTo(parameters->pointParameter, IF_NORETICLE | IF_RUNNING);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
@@ -1157,7 +1157,7 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 	}
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
 		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
-		actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
+		actor->WalkTo(parameters->pointParameter, IF_RUNNING);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
@@ -1266,7 +1266,7 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo( p, 0, 0 );
+		actor->WalkTo(p, 0);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
@@ -1293,7 +1293,7 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo( p, IF_RUNNING, 0 );
+		actor->WalkTo(p, IF_RUNNING);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
@@ -1322,7 +1322,7 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo( p, 0, 0 );
+		actor->WalkTo(p, 0);
 	}
 	//what else?
 	if (!actor->InMove()) {
@@ -1455,7 +1455,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	Region vp = core->GetGameControl()->Viewport();
 	Point p = vp.Center();
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo( p, IF_NOINT, 0 );
+		actor->WalkTo(p, IF_NOINT);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest
@@ -1474,7 +1474,7 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 	}
 	Point p = Sender->Pos + parameters->pointParameter;
 	if (!actor->InMove() || actor->Destination != p) {
-		actor->WalkTo( p, 0, 0 );
+		actor->WalkTo(p, 0);
 	}
 	if (!actor->InMove()) {
 		// we should probably instead keep retrying until we reach dest

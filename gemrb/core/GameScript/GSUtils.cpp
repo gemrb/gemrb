@@ -1390,7 +1390,7 @@ void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flag
 		}
 	}
 	if (!actor->InMove() || actor->Destination != dest) {
-		actor->WalkTo( dest, flags, 0 );
+		actor->WalkTo(dest, flags);
 	}
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
