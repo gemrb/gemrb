@@ -392,7 +392,7 @@ bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword fla
 		if (!item)
 			continue;
 		bool ret = false;
-		if (core->CanUseItemType(SLOT_BAG,item,NULL) ) {
+		if (core->CanUseItemType(SLOT_BAG, item)) {
 			//the store is the same as the item's name
 			ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
 		}
@@ -416,7 +416,7 @@ static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, con
 		const Item *item = gamedata->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
-		bool ret = core->CanUseItemType(SLOT_BAG,item,NULL);
+		bool ret = core->CanUseItemType(SLOT_BAG, item);
 		gamedata->FreeItem(item, itemslot->ItemResRef);
 		if (!ret)
 			continue;

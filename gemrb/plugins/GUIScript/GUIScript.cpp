@@ -9207,10 +9207,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 
 	int function=0;
 
-	if (core->CanUseItemType(SLOT_POTION, item, actor, false) ) {
+	if (core->CanUseItemType(SLOT_POTION, item, actor)) {
 			function|=CAN_DRINK;
 	}
-	if (core->CanUseItemType(SLOT_SCROLL, item, actor, false) ) {
+	if (core->CanUseItemType(SLOT_SCROLL, item, actor)) {
 		//determining if this is a copyable scroll
 		if (ehc<2) {
 			goto not_a_scroll;
@@ -9234,7 +9234,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		function|=CAN_SELECT;
 	}
 not_a_scroll:
-	if (core->CanUseItemType(SLOT_BAG, item, NULL, false) ) {
+	if (core->CanUseItemType(SLOT_BAG, item)) {
 		//allow the open container flag only if there is
 		//a store file (this fixes pst eye items, which
 		//got the same item type as bags)
