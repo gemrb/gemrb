@@ -1361,7 +1361,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 
 //repeat movement, until goal isn't reached
 //if int0parameter is !=0, then it will try only x times
-void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flags, bool untilsee)
+void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (!actor) {
@@ -1392,6 +1392,9 @@ void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flag
 	if (!actor->InMove() || actor->Destination != dest) {
 		actor->WalkTo(dest, flags);
 	}
+
+	Sender->CurrentActionInterruptable = false;
+
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
 		if (flags&IF_NOINT) {
@@ -1401,20 +1404,14 @@ void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flag
 		return;
 	}
 
-	//repeat movement...
-	Action *newaction = ParamCopyNoOverride(parameters);
-	if (newaction->int0Parameter!=1) {
-		if (newaction->int0Parameter) {
-			newaction->int0Parameter--;
+	// try just a few times (unused in original data)
+	if (parameters->int0Parameter) {
+		parameters->int0Parameter--;
+		if (!parameters->int0Parameter) {
+			actor->Interrupt();
+			Sender->ReleaseCurrentAction();
 		}
-		actor->AddActionInFront(newaction);
-		actor->SetWait(1);
-	} else {
-		delete newaction;
-		actor->Interrupt();
 	}
-
-	Sender->ReleaseCurrentAction();
 }
 
 bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c)
