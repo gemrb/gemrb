@@ -1567,8 +1567,8 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x11 CurrentHPModifier
 static int GetSpecialHealAmount(int type, const Scriptable *caster)
 {
-	const Actor* actor = caster->As<const Actor>();
 	if (!caster) return 0;
+	const Actor* actor = caster->As<const Actor>();
 
 	switch(type) {
 		case 3: //paladin's lay on hands, the amount is already calculated in a compatible way
