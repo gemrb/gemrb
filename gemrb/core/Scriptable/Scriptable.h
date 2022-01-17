@@ -310,19 +310,23 @@ public:
 	ResRef SpellResRef;
 	bool InterruptCasting = false;
 public:
-
-	template <class RETURN>
-	static RETURN* As(Scriptable* obj) {
+	
+	template <class RETURN, class PARAM>
+	static constexpr auto As(PARAM* obj)
+	-> typename std::conditional<std::is_const<PARAM>::value, const RETURN*, RETURN*>::type {
 		static_assert(std::is_base_of<Scriptable, RETURN>::value, "Attempted bad Scriptable cast!");
 		// dynamic_cast will return nullptr if the cast is invalid
-		return dynamic_cast<RETURN*>(obj);
+		return dynamic_cast<decltype(As<RETURN, PARAM>(obj))>(obj);
 	}
 
 	template <class RETURN>
-	static const RETURN* As(const Scriptable* obj) {
-		static_assert(std::is_base_of<Scriptable, RETURN>::value, "Attempted bad Scriptable cast!");
-		// dynamic_cast will return nullptr if the cast is invalid
-		return dynamic_cast<const RETURN*>(obj);
+	RETURN* As() {
+		return Scriptable::As<RETURN>(this);
+	}
+	
+	template <class RETURN>
+	constexpr RETURN* As() const {
+		return Scriptable::As<RETURN>(this);
 	}
 
 	/** Gets the Dialog ResRef */

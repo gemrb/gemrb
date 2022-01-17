@@ -199,7 +199,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 	}
 
 	Actor *tmp = GetSpeaker();
-	Actor *target = Scriptable::As<Actor>(GetTarget());
+	Actor *target = GetTarget()->As<Actor>();
 	speakerID = 0;
 	targetID = 0;
 	originalTargetID = 0;

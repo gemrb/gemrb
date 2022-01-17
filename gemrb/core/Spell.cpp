@@ -150,7 +150,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	Effect *const *features;
 	size_t count;
 	const auto& tables = SpellTables::Get();
-	Actor *caster = Scriptable::As<Actor>(self);
+	Actor *caster = self->As<Actor>();
 
 	//iwd2 has this hack
 	if (block_index>=0) {
@@ -271,7 +271,7 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 {
 	int level = 0;
 	unsigned int limit = VOODOO_VISUAL_RANGE;
-	Actor* actor = Scriptable::As<Actor>(Sender);
+	Actor* actor = Sender->As<Actor>();
 	if (actor) {
 		level = actor->GetCasterLevel(SpellType);
 		limit = actor->GetStat(IE_VISUALRANGE);

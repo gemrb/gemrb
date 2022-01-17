@@ -1177,7 +1177,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 
 		Scriptable *caster = GetCasterObject();
 		if (!caster) caster = Owner;
-		const Actor* casterActor = Scriptable::As<Actor>(caster);
+		const Actor* casterActor = caster->As<const Actor>();
 		if (casterActor) {
 			casterenemy = casterActor->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
 		} else {
@@ -1567,7 +1567,7 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x11 CurrentHPModifier
 static int GetSpecialHealAmount(int type, const Scriptable *caster)
 {
-	const Actor* actor = Scriptable::As<Actor>(caster);
+	const Actor* actor = caster->As<const Actor>();
 	if (!caster) return 0;
 
 	switch(type) {
@@ -3495,7 +3495,7 @@ int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter1) {
 		target->Turn(Owner, fx->Parameter1);
 	} else {
-		const Actor* actor = Scriptable::As<Actor>(Owner);
+		const Actor* actor = Owner->As<const Actor>();
 		if (!actor) {
 			return FX_NOT_APPLIED;
 		}
@@ -6741,7 +6741,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	const Actor* caster = Scriptable::As<Actor>(Owner);
+	const Actor* caster = Owner->As<const Actor>();
 	if (caster) {
 		skill = caster->GetStat(IE_SETTRAPS);
 		roll = target->LuckyRoll(1,100,0,LR_NEGATIVE);
@@ -6863,7 +6863,7 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_activate_spell_sequencer(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_activate_spell_sequencer(%2d): Resource: %s", fx->Opcode, fx->Resource);
-	const Actor* actor = Scriptable::As<Actor>(Owner);
+	const Actor* actor = Owner->As<const Actor>();
 	if (!actor) {
 		return FX_NOT_APPLIED;
 	}

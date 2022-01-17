@@ -293,7 +293,7 @@ bool WithinPersonalRange(const Scriptable *actor, const Point &dest, int distanc
 int EARelation(const Scriptable* Owner, const Actor* target)
 {
 	ieDword eao = EA_ENEMY;
-	const Actor* actor = Scriptable::As<Actor>(Owner);
+	const Actor* actor = Owner->As<const Actor>();
 	if (actor) {
 		eao = actor->GetStat(IE_EA);
 	}

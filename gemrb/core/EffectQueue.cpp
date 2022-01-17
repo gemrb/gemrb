@@ -501,7 +501,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	const Map *map;
 	int flg;
 	ieDword spec = 0;
-	Actor *st = Scriptable::As<Actor>(self);
+	Actor *st = self->As<Actor>();
 	// HACK: 00p2229.baf in ar1006 does this silly thing, crashing later
 	if (!st && self && (self->Type==ST_CONTAINER) && (fx->Target == FX_TARGET_SELF)) {
 		fx->Target = FX_TARGET_PRESET;
@@ -1020,7 +1020,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 	if (!actor) return -1;
 
 	const Scriptable *cob = GetCasterObject();
-	const Actor* caster = Scriptable::As<Actor>(cob);
+	const Actor* caster = cob->As<const Actor>();
 
 	//opcode immunity
 	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
@@ -1137,7 +1137,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		if (target) fx->SetPosition(target->Pos);
 
 		//gemrb specific, stat based chance
-		const Actor* OwnerActor = Scriptable::As<Actor>(Owner);
+		const Actor* OwnerActor = Owner->As<Actor>();
 		if (fx->ProbabilityRangeMin == 100 && OwnerActor) {
 			fx->ProbabilityRangeMin = 0;
 			fx->ProbabilityRangeMax = static_cast<ieWord>(OwnerActor->GetSafeStat(fx->ProbabilityRangeMax));
@@ -1347,7 +1347,7 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed) const
 		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 
-	Actor* OwnerActor = Scriptable::As<Actor>(Owner);
+	Actor* OwnerActor = Owner->As<Actor>();
 	if (!OwnerActor) return;
 
 	// we didn't catch effects that don't persist — they still need to be undone
@@ -2308,7 +2308,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 		case STI_AREATYPE:
 			return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, rel);
 		case STI_MORAL_ALIGNMENT:
-			OwnerActor = Scriptable::As<Actor>(Owner);
+			OwnerActor = Owner->As<Actor>();
 			if (OwnerActor) {
 				return DiffCore(OwnerActor->GetStat(IE_ALIGNMENT) & AL_GE_MASK, STAT_GET(IE_ALIGNMENT) & AL_GE_MASK, rel);
 			} else {
