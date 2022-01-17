@@ -123,7 +123,10 @@ private:
 	virtual void FlagsChanged(unsigned int /*oldflags*/) {}
 	virtual void SizeChanged(const Size&) {}
 	virtual void OriginChanged(const Point&) {}
+	
+	// See Draw() for restrictions
 	virtual void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) {}
+	// See Draw() for restrictions
 	virtual void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) {}
 	
 	virtual bool IsPerPixelScrollable() const { return true; }
@@ -165,6 +168,9 @@ public:
 	explicit View(const Region& frame);
 	virtual ~View();
 
+	// IMPORTANT: when Draw() is being executed MarkDirty() is a no-op.
+	// this includes methods invoked prior to and following the actual drawing such as WillDraw() and DidDraw()
+	// continually drawing Views should use an IsAnimated() override
 	void Draw();
 
 	void MarkDirty();
