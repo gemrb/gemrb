@@ -119,19 +119,19 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 
 void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
+	if (animation && animation->HasEnded()) {
+		SetAnimation(nullptr);
+	}
+}
+
+void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
 	tick_t time = GetTicks();
 	if (overlayAnim) {
 		overlayAnim.Next(time);
 	}
 	if (animation) {
 		animation->Next(time);
-	}
-}
-
-void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
-{
-	if (animation && animation->HasEnded()) {
-		SetAnimation(nullptr);
 	}
 }
 
