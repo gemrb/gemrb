@@ -172,13 +172,15 @@ Animation::frame_t Animation::GetFrame(index_t i) const
 void Animation::MirrorAnimation(BlitFlags flags)
 {
 	for (size_t i = 0; i < indicesCount; i++) {
-		const frame_t& sprite = frames[i];
-		sprite->renderFlags ^= flags & (BlitFlags::MIRRORX | BlitFlags::MIRRORY);
-		
+		const frame_t& sprite = frames[i]->copy();
+		frames[i] = sprite;
+
 		if (flags & BlitFlags::MIRRORX) {
+			sprite->renderFlags ^= BlitFlags::MIRRORX;
 			sprite->Frame.x = sprite->Frame.w - sprite->Frame.x;
 		}
 		if (flags & BlitFlags::MIRRORY) {
+			sprite->renderFlags ^= BlitFlags::MIRRORY;
 			sprite->Frame.y = sprite->Frame.h - sprite->Frame.y;
 		}
 	}
