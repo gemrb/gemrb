@@ -1120,6 +1120,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 		int symi = PyInt_AsLong( sym );
 
 		const char* str = sm->GetValue( symi );
+		ABORT_IF_NULL(str);
 		return PyString_FromString( str );
 	}
 
