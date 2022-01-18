@@ -27,34 +27,35 @@ Classes = KitList = ClassSkills = Races = NextLevel = None
 Pdolls = SpellDisplay = Aligns = ItemType = None
 WeapProfs = CharProfs = None
 
+Loaded = False
+
 def Load():
 	global Classes, KitList, ClassSkills, Races, NextLevel
 	global Pdolls, StrModEx, StrMod, SpellDisplay, Aligns
 	global ItemType, WeapProfs, CharProfs
+	global Loaded
+
+	if Loaded:
+		return
 
 	print() # so the following output isn't appended to an existing line
-	if not Classes:
-		Classes = GemRB.LoadTable ("classes")
-	if not KitList and GemRB.HasResource("kitlist", RES_2DA):
+	Classes = GemRB.LoadTable ("classes")
+	if GemRB.HasResource ("kitlist", RES_2DA):
 		KitList = GemRB.LoadTable ("kitlist")
-	if not ClassSkills:
-		ClassSkills= GemRB.LoadTable ("clskills")
-	if not Races:
-		Races = GemRB.LoadTable ("races")
-	if not NextLevel:
-		NextLevel = GemRB.LoadTable ("xplevel")
-	if not Pdolls and GemRB.HasResource("pdolls", RES_2DA):
+	ClassSkills = GemRB.LoadTable ("clskills")
+	Races = GemRB.LoadTable ("races")
+	NextLevel = GemRB.LoadTable ("xplevel")
+	if GemRB.HasResource ("pdolls", RES_2DA):
 		Pdolls = GemRB.LoadTable ("pdolls")
-	if not StrMod:
-		StrMod = GemRB.LoadTable ("strmod")
-		StrModEx = GemRB.LoadTable ("strmodex")
-	if not SpellDisplay:
-		SpellDisplay = GemRB.LoadTable ("spldisp")
-	if not Aligns and GemRB.HasResource("aligns", RES_2DA):
+	StrMod = GemRB.LoadTable ("strmod")
+	StrModEx = GemRB.LoadTable ("strmodex")
+	SpellDisplay = GemRB.LoadTable ("spldisp")
+	if GemRB.HasResource ("aligns", RES_2DA):
 		Aligns = GemRB.LoadTable ("aligns")
-	if not ItemType:
-		ItemType = GemRB.LoadTable ("itemtype")
-	if not WeapProfs and  GemRB.HasResource("weapprof", RES_2DA):
+	ItemType = GemRB.LoadTable ("itemtype")
+	if GemRB.HasResource ("weapprof", RES_2DA):
 		WeapProfs = GemRB.LoadTable ("weapprof")
-	if not CharProfs and  GemRB.HasResource("charprof", RES_2DA):
+	if GemRB.HasResource ("charprof", RES_2DA):
 		CharProfs = GemRB.LoadTable ("charprof")
+
+	Loaded = True
