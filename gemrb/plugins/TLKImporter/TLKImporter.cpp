@@ -119,18 +119,6 @@ bool TLKImporter::Open(DataStream* stream)
 	return true;
 }
 
-//when copying the token, skip spaces
-inline const char* mystrncpy(char* dest, const char* source, int maxlength,
-	char delim)
-{
-	while (*source && ( *source != delim ) && maxlength--) {
-		char chr = *source++;
-		if (chr!=' ') *dest++ = chr;
-	}
-	*dest = 0;
-	return source;
-}
-
 /* -1	 - GABBER
 		0	 - PROTAGONIST
 		1-9 - PLAYERx
@@ -214,7 +202,7 @@ int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref) const
 	return malestrref;
 }
 
-//if this function returns -1 then it is not a built in token, dest may be NULL
+//if this function returns nullptr then it is not a built in token
 String* TLKImporter::BuiltinToken(const char* Token)
 {
 	gt_type *entry = NULL;
@@ -283,85 +271,49 @@ String* TLKImporter::BuiltinToken(const char* Token)
 	return nullptr;
 }
 
-size_t TLKImporter::BuiltinToken(const char* Token, char* dest)
+String TLKImporter::ResolveTags(const String& source)
 {
-	String* resolved = BuiltinToken(Token);
-	if (resolved == nullptr) {
-		return size_t(-1);
-	}
+	auto mystrncpy = [&source](char* dest, size_t idx, int maxlength,
+		char delim)
+	{
+		while (idx < source.length() && (source[idx] != delim) && maxlength--) {
+			char chr = source[idx++];
+			if (chr != ' ') *dest++ = chr;
+		}
+		*dest = '\0';
+		return idx;
+	};
 	
-	char* cstr = MBCStringFromString(*resolved);
-	assert(cstr);
-	delete resolved;
-	
-	size_t TokenLength = strlen(cstr);
-	if (dest) {
-		memcpy(dest, cstr, TokenLength);
-	}
-	free(cstr);
-
-	return TokenLength;
-}
-
-bool TLKImporter::ResolveTags(char* dest, const char* source, size_t Length)
-{
 	char Token[MAX_VARIABLE_LENGTH + 1];
-	size_t NewLength = 0;
-	for (int i = 0; source[i]; i++) {
-		if (source[i] == '<') {
-			i = (int) (mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) - source);
-			size_t TokenLength = BuiltinToken( Token, dest + NewLength );
-			if (TokenLength == size_t(-1)) {
-				TokenLength = core->GetTokenDictionary()->GetValueLength( Token );
+	String dest;
+	for (size_t i = 0; source[i]; i++) {
+		auto srcch = source[i];
+		if (srcch == L'<') {
+			i = mystrncpy(Token, i + 1, MAX_VARIABLE_LENGTH, '>');
+			String* str = BuiltinToken(Token);
+			if (str == nullptr) {
+				int TokenLength = core->GetTokenDictionary()->GetValueLength(Token);
 				if (TokenLength) {
-					if (TokenLength + NewLength > Length) return false;
-					core->GetTokenDictionary()->Lookup( Token, dest + NewLength, TokenLength );
+					char* tokVal = new char[TokenLength + 1];
+					core->GetTokenDictionary()->Lookup(Token, tokVal, TokenLength);
+					String* tmp = StringFromCString(tokVal);
+					assert(tmp);
+					dest.append(*tmp);
+					delete tmp;
 				}
-			}
-			NewLength += TokenLength;
-		} else if (source[i] == '[') {
-			// voice actor directives
-			const char* tmppoi = strchr(source + i + 1, ']');
-			if (!tmppoi) break;
-			i = (int) (tmppoi - source);
-			if (NewLength > Length) return false;
-		} else {
-			dest[NewLength++] = source[i];
-			if (NewLength > Length) return false;
-		}
-	}
-	dest[NewLength] = 0;
-	return true;
-}
-
-bool TLKImporter::GetNewStringLength(const char* string, size_t& Length)
-{
-	char Token[MAX_VARIABLE_LENGTH + 1];
-	bool lChange = false;
-	size_t NewLength = 0;
-	for (size_t i = 0; i < Length; i++) {
-		if (string[i] == '<') {
-			// token
-			lChange = true;
-			i = (int) (mystrncpy( Token, string + i + 1, MAX_VARIABLE_LENGTH, '>' ) - string);
-			size_t TokenLength = BuiltinToken( Token, NULL );
-			if (TokenLength == size_t(-1)) {
-				NewLength += core->GetTokenDictionary()->GetValueLength( Token );
 			} else {
-				NewLength += TokenLength;
+				dest.append(*str);
+				delete str;
 			}
-		} else if (string[i] == '[') {
+		} else if (srcch == L'[') {
 			// voice actor directives
-			lChange = true;
-			const char* tmppoi = strchr(string + i + 1, ']');
-			if (!tmppoi) break;
-			i += (int) (tmppoi - string) - i;
+			i = source.find_first_of(L']', i + 1);
+			if (i == String::npos) break;
 		} else {
-			NewLength++;
+			dest.push_back(srcch);
 		}
 	}
-	Length = NewLength;
-	return lChange;
+	return dest;
 }
 
 ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
@@ -376,15 +328,7 @@ ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 
 String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
 {
-	char* cstr = GetCString(strref, flags);
-	String* string = StringFromCString(cstr);
-	free(cstr);
-	return string;
-}
-
-char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
-{
-	char* string;
+	String* string = nullptr;
 	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
 	ieWord type;
 	size_t Length;
@@ -392,11 +336,9 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 
 	if (empty || strref >= STRREF_START || (strref >= BIO_START && strref <= BIO_END)) {
 		if (OverrideTLK) {
-			string = OverrideTLK->ResolveAuxString(strref, Length);
+			string = StringFromCString(OverrideTLK->ResolveAuxString(strref, Length));
 		} else {
-			string = (char *) malloc(1);
 			Length = 0;
-			string[0] = 0;
 		}
 		type = 0;
 		SoundResRef.Reset();
@@ -404,7 +346,7 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 		ieDword Volume, Pitch, StrOffset;
 		ieDword l;
 		if (str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START ) == GEM_ERROR) {
-			return strdup("");
+			return new String;
 		}
 		str->ReadWord(type);
 		str->ReadResRef( SoundResRef );
@@ -418,27 +360,20 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 		
 		if (type & 1) {
 			str->Seek( StrOffset + Offset, GEM_STREAM_START );
-			string = ( char * ) malloc( Length + 1 );
-			str->Read( string, Length );
+			char* cstr = (char *)malloc(Length + 1);
+			cstr[Length] = '\0';
+			str->Read(cstr, Length);
+			string = StringFromCString(cstr);
+			free(cstr);
 		} else {
 			Length = 0;
-			string = ( char * ) malloc( 1 );
+			string = new String;
 		}
-		string[Length] = 0; 
 	}
 
 	//tagged text, bg1 and iwd don't mark them specifically, all entries are tagged
 	if (core->HasFeature( GF_ALL_STRINGS_TAGGED ) || ( type & 4 )) {
-		//GetNewStringLength will look in string and return true
-		//if the new Length will change due to tokens
-		//if there is no new length, we are done
-		while (GetNewStringLength( string, Length )) {
-			char* string2 = ( char* ) malloc( Length + 1 );
-			//ResolveTags will copy string to string2
-			ResolveTags( string2, string, Length );
-			free( string );
-			string = string2;
-		}
+		*string = ResolveTags(*string);
 	}
 	if (type & 2 && flags & IE_STR_SOUND && !SoundResRef.IsEmpty()) {
 		// GEM_SND_SPEECH will stop the previous sound source
@@ -446,13 +381,15 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
 	}
 	if (flags & IE_STR_STRREFON) {
-		char* string2 = ( char* ) malloc( Length + 13 );
-		snprintf(string2, Length + 13, "%u: %s", strref, string);
-		free( string );
-		return string2;
+		*string = std::to_wstring(strref) + L": " + *string;
 	}
-
 	return string;
+}
+
+char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
+{
+	String* string = GetString(strref, flags);
+	return string ? MBCStringFromString(*string) : nullptr;
 }
 
 bool TLKImporter::HasAltTLK() const
