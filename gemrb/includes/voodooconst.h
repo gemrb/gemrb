@@ -32,9 +32,6 @@
 
 namespace GemRB {
 
-// ... similarly for items
-static const int VOODOO_ITM_RANGE_F = 15;
-
 // fx_casting_glow has hardcoded height offsets, while they should be avatar based
 // ypos_by_direction and xpos_by_direction
 

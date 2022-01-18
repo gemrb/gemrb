@@ -132,7 +132,7 @@ GEM_EXPORT bool VariableExists(const Scriptable *Sender, const char *VarName, co
 Action* GenerateActionCore(const char *src, const char *str, unsigned short actionID);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 GEM_EXPORT unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const Point& target = Point());
-unsigned int GetItemDistance(const ResRef& itemres, int header);
+unsigned int GetItemDistance(const ResRef& itemres, int header, double angle);
 void SetupWishCore(Scriptable *Sender, int column, int picks);
 void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, bool flag);
 void SpellCore(Scriptable *Sender, Action *parameters, int flags);

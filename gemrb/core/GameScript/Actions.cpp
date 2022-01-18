@@ -6571,8 +6571,8 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	unsigned int dist = GetItemDistance(itemres, header);
-
+	double angle = AngleFromPoints(Sender->Pos, tar->Pos);
+	unsigned int dist = GetItemDistance(itemres, header, angle);
 	if (PersonalDistance(Sender, tar) > dist) {
 		MoveNearerTo(Sender, tar, dist);
 		return;
@@ -6616,8 +6616,8 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	unsigned int dist = GetItemDistance(itemres, header);
-
+	double angle = AngleFromPoints(Sender->Pos, parameters->pointParameter);
+	unsigned int dist = GetItemDistance(itemres, header, angle);
 	if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
 		MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
 		return;

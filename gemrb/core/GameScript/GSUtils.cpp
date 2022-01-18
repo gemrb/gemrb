@@ -2470,7 +2470,7 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
  the used header is explictly given */
-unsigned int GetItemDistance(const ResRef& itemres, int header)
+unsigned int GetItemDistance(const ResRef& itemres, int header, double angle)
 {
 	const Item* itm = gamedata->GetItem(itemres);
 	if (!itm) {
@@ -2485,7 +2485,8 @@ unsigned int GetItemDistance(const ResRef& itemres, int header)
 	if (dist>0xff000000) {
 		return 0xffffffff;
 	}
-	return dist*VOODOO_ITM_RANGE_F;
+
+	return Feet2Pixels(dist, angle);
 }
 
 //read the wish 2da
