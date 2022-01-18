@@ -401,12 +401,8 @@ def IsDualClassed(actor, verbose):
 	Return[2] contains the class index of the new class.
 	If verbose is false, only Return[0] contains useable data."""
 
-	if GameCheck.IsIWD2():
-		return (0,-1,-1)
-
 	Multi = HasMultiClassBits (actor)
-
-	if Multi == 0:
+	if Multi == 0: # also catches iwd2
 		return (0, -1, -1)
 
 	DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
@@ -440,7 +436,7 @@ def IsDualClassed(actor, verbose):
 		print(DualedFrom, Multi, KitIndex, FirstClassIndex)
 		return (0, -1, -1)
 
-	if KittedClassIndex == FirstClassIndex and KitIndex:
+	if KittedClassIndex == FirstClassIndex:
 		return (1, KitIndex, SecondClassIndex)
 	elif KittedClassIndex == SecondClassIndex:
 		return (3, FirstClassIndex, KitIndex)
