@@ -1061,46 +1061,49 @@ def SpellShiftPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	ClassRowName = GUICommon.GetClassRowName (pc)
 	SponCastTableName = CommonTables.ClassSkills.GetValue (ClassRowName, "SPONCAST")
-	if SponCastTableName != "*":
-		SponCastTable = GemRB.LoadTable (SponCastTableName, 1)
-		if not SponCastTable:
-			print("SpellShiftPressed: skipping, non-existent spontaneous casting table used! ResRef:", SponCastTableName)
-			SpellPressed ()
-			return
+	if SponCastTableName == "*":
+		# proceed as if nothing happened
+		SpellPressed ()
+		return
 
-		# determine the column number (spell variety) depending on alignment
-		CureOrHarm = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
-		if CureOrHarm % 16 == 3: # evil
-			CureOrHarm = 1
-		else:
-			CureOrHarm = 0
+	SponCastTable = GemRB.LoadTable (SponCastTableName, True, True)
+	if not SponCastTable:
+		print("SpellShiftPressed: skipping, non-existent spontaneous casting table used! ResRef:", SponCastTableName)
+		SpellPressed ()
+		return
 
-		# get the unshifted booktype
-		BaseType = 0
-		tmp = Type
-		while tmp > 1:
-			tmp = tmp>>1
-			BaseType += 1
+	# determine the column number (spell variety) depending on alignment
+	CureOrHarm = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)
+	if CureOrHarm % 16 == 3: # evil
+		CureOrHarm = 1
+	else:
+		CureOrHarm = 0
 
-		# figure out the spell's details
-		# TODO: find a simpler way
-		Spell = None
-		MemorisedSpells = Spellbook.GetSpellinfoSpells (pc, BaseType)
-		for spell in MemorisedSpells:
-			if spell['SpellIndex']%(255000) == SpellIndex: # 255 is the engine value of Type
-				Spell = spell
-				break
+	# get the unshifted booktype
+	BaseType = 0
+	tmp = Type
+	while tmp > 1:
+		tmp = tmp >> 1
+		BaseType += 1
 
-		# rownames==level; col1: good+neutral; col2: evil resref
-		Level = Spell['SpellLevel']
-		ReplacementSpell = SponCastTable.GetValue (Level-1, CureOrHarm).upper()
-		if ReplacementSpell != Spell['SpellResRef'].upper():
-			SpellIndex = GemRB.PrepareSpontaneousCast (pc, Spell['SpellResRef'], Spell['BookType'], Level, ReplacementSpell)
-			GemRB.SetVar ("Spell", SpellIndex+1000*Type)
-			if GameCheck.IsIWD2():
-				GemRB.DisplayString (39742, ColorWhite, pc) # Spontaneous Casting
+	# figure out the spell's details
+	# TODO: find a simpler way
+	Spell = None
+	MemorisedSpells = Spellbook.GetSpellinfoSpells (pc, BaseType)
+	for spell in MemorisedSpells:
+		if spell['SpellIndex'] % (255000) == SpellIndex: # 255 is the engine value of Type
+			Spell = spell
+			break
 
-	# proceed as if nothing happened
+	# rownames==level; col1: good+neutral; col2: evil resref
+	Level = Spell['SpellLevel']
+	ReplacementSpell = SponCastTable.GetValue (Level - 1, CureOrHarm).upper()
+	if ReplacementSpell != Spell['SpellResRef'].upper():
+		SpellIndex = GemRB.PrepareSpontaneousCast (pc, Spell['SpellResRef'], Spell['BookType'], Level, ReplacementSpell)
+		GemRB.SetVar ("Spell", SpellIndex + 1000 * Type)
+		if GameCheck.IsIWD2 ():
+			GemRB.DisplayString (39742, ColorWhite, pc) # Spontaneous Casting
+
 	SpellPressed ()
 
 # This is the endpoint for spellcasting, finally calling SpellCast. This always happens at least
