@@ -29,7 +29,7 @@ DefaultScrollbars = { "bg1" : "GUIWSBR", "bg2" : "GUISCRCW", "pst" : "CGSCRL1", 
 
 def CreateScrollbarARGs(bam = None):
 	bamframes = list(range(6))
-	if GameCheck.IsBG2() or GameCheck.IsGemRBDemo():
+	if GameCheck.IsBG2():
 		bamframes = [0,1,2,3,5,4]
 	elif GameCheck.IsBG1():
 		bamframes = [0,1,2,3,6,7]
