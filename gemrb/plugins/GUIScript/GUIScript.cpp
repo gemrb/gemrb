@@ -3205,16 +3205,11 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 
 	if (arg1 == Py_None) {
 		btn = GetView<Button>(PyTuple_GetItem(args, 0));
-	} // work around a bug in cpython where PyArg_ParseTuple doesn't return as expected when 'c' format doesn't match
-#if PY_MAJOR_VERSION >= 3
-	else if (PyObject_TypeCheck(arg1, &PyString_Type) && PyUnicode_GetLength(arg1) == 1) {
+	// work around a bug in cpython where PyArg_ParseTuple doesn't return as expected when 'c' format doesn't match
+	} else if (PyObject_TypeCheck(arg1, &PyString_Type) && PyUnicode_GetLength(arg1) == 1) {
 		int ch = 0;
 		PARSE_ARGS(args, "OC|Ii", &self, &ch, &mods, &global);
 		hotkey = ch;
-#else
-	else if (PyObject_TypeCheck(arg1, &PyString_Type) && PyString_Size(arg1) == 1) {
-		PARSE_ARGS(args, "Oc|Ii", &self, &hotkey, &mods, &global);
-#endif
 		btn = GetView<Button>(self);
 		assert(btn);
 	} else {
@@ -4660,12 +4655,8 @@ static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS(args, "O", &Slot);
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-#if PY_MAJOR_VERSION >= 3
 	const char* name = save->GetName();
 	return PyUnicode_Decode(name, strlen(name), core->SystemEncoding, "strict");
-#else
-	return PyString_FromString(save->GetName());
-#endif
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
@@ -13475,7 +13466,6 @@ PyDoc_STRVAR( GemRB_internal__doc,
 
 /** Initialization Routine */
 
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit__GemRB();
 PyMODINIT_FUNC PyInit_GemRB();
 
@@ -13512,11 +13502,9 @@ PyInit_GemRB()
 	};
 	return PyModule_Create(&moddef);
 }
-#endif
 
 bool GUIScript::Init(void)
 {
-#if PY_MAJOR_VERSION >= 3
 	// Add built-in modules, before Py_Initialize
 	if (PyImport_AppendInittab("GemRB", PyInit_GemRB) == -1) {
 		return false;
@@ -13524,26 +13512,13 @@ bool GUIScript::Init(void)
 	if (PyImport_AppendInittab("_GemRB", PyInit__GemRB) == -1) {
 		return false;
 	}
-#endif
 	
 	Py_Initialize();
 	if (!Py_IsInitialized()) {
 		return false;
 	}
 	
-#if PY_MAJOR_VERSION >= 3
 	PyObject *pGemRB = PyImport_ImportModule("GemRB");
-#else
-	PyObject* pGemRB = Py_InitModule3("GemRB", GemRBMethods, GemRB__doc);
-	if (!pGemRB) {
-		return false;
-	}
-	const PyObject* p_GemRB = Py_InitModule3("_GemRB", GemRBInternalMethods, GemRB_internal__doc);
-	if (!p_GemRB) {
-		return false;
-	}
-#endif
-
 	PyObject *pMainMod = PyImport_AddModule( "__main__" );
 	/* pMainMod is a borrowed reference */
 	pMainDic = PyModule_GetDict( pMainMod );
@@ -13591,11 +13566,6 @@ bool GUIScript::Init(void)
 	// the generic one, so insert it before it
 	PyList_Insert(sysPath, -1, PyString_FromString(path2));
 	PyModule_AddStringConstant(pGemRB, "GameType", core->config.GameType);
-
-#if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION > 5
-	// warn about python stuff that will go away in 3.0
-	Py_Py3kWarningFlag = true;
-#endif
 
 	PyObject *pClassesMod = PyImport_AddModule( "GUIClasses" );
 	/* pClassesMod is a borrowed reference */

@@ -108,7 +108,6 @@ private:
 // Python 3 forward compatibility
 // WARNING: dont use these for new code
 // they are temporary while we compete the transition to Python 3
-#if PY_MAJOR_VERSION >= 3
 class PyStringWrapper {
 	wchar_t* buffer = nullptr;
 	const char* str = nullptr;
@@ -143,7 +142,6 @@ public:
 };
 PyStringWrapper PyString_AsString(PyObject* obj);
 PyObject* PyString_FromString(const char* s);
-#endif
 
 /*
  Conversions from PyObject

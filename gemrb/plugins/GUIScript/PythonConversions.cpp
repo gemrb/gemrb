@@ -115,7 +115,6 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 	return pic;
 }
 
-#if PY_MAJOR_VERSION >= 3
 PyStringWrapper PyString_AsString(PyObject* obj)
 {
 	return PyStringWrapper(obj, core->SystemEncoding);
@@ -125,7 +124,6 @@ PyObject* PyString_FromString(const char* s)
 {
 	return PyUnicode_Decode(s, strlen(s), core->TLKEncoding.encoding.c_str(), "strict");
 }
-#endif
 
 // Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromResRef(const ResRef& resRef)
@@ -157,11 +155,7 @@ PyObject* PyString_FromStringObj(const String& s)
 String* PyString_AsStringObj(PyObject* obj)
 {
 	const char *s;
-#if PY_MAJOR_VERSION >= 3
 	s = PyStringWrapper(obj, core->TLKEncoding.encoding.c_str());
-#else
-	s = PyString_AsString(obj);
-#endif
 	return StringFromCString(s);
 }
 }

@@ -24,7 +24,6 @@
 // NOTE: Python.h has to be included first.
 #include <Python.h>
 
-#if PY_MAJOR_VERSION >= 3
 // ints
 #define PyInt_FromLong PyLong_FromLong
 #define PyInt_AsLong PyLong_AsLong
@@ -37,7 +36,6 @@
 #define PyString_Check PyUnicode_Check
 #define PyString_FromFormat PyUnicode_FromFormat
 #define PyString_FromStringAndSize PyUnicode_FromStringAndSize
-#endif
 
 #include "ScriptEngine.h"
 
