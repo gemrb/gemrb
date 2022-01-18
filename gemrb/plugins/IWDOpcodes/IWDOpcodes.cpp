@@ -2910,7 +2910,7 @@ int fx_effects_on_struck (Scriptable* Owner, Actor* target, Effect* fx)
 
 	const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
 	if (entry) {
-		ieDword dist = GetSpellDistance(fx->Resource, target);
+		ieDword dist = GetSpellDistance(fx->Resource, target, actor->Pos);
 		if (!dist) return FX_APPLIED;
 		if (PersonalDistance(target, actor) > dist) return FX_APPLIED;
 		core->ApplySpell(fx->Resource, actor, Owner, fx->Power);

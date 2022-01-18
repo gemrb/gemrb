@@ -2441,7 +2441,7 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 
 /* returns a spell's casting distance, it depends on the caster (level), and targeting mode too
  the used header is calculated from the caster level */
-unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable *Sender)
+unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const Point& target)
 {
 	unsigned int dist;
 
@@ -2458,7 +2458,14 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable *Sender)
 	if (dist>0xff000000) {
 		return 0xffffffff;
 	}
-	return dist * VOODOO_SPL_RANGE_F;
+
+	if (!target.IsZero()) {
+		double angle = AngleFromPoints(Sender->Pos, target);
+		return Feet2Pixels(dist, angle);
+	}
+
+	// none of the callers not passing a target care about this
+	return 0;
 }
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
@@ -2711,6 +2718,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 		return;
 	}
+	dist = GetSpellDistance(spellResRef, Sender, tar->Pos);
 
 	if (act) {
 		//move near to target
@@ -2825,7 +2833,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 
 	Actor* act = Scriptable::As<Actor>(Sender);
 	if (act) {
-		unsigned int dist = GetSpellDistance(spellResRef, Sender);
+		unsigned int dist = GetSpellDistance(spellResRef, Sender, parameters->pointParameter);
 
 		//move near to target
 		if (flags&SC_RANGE_CHECK) {

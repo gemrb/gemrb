@@ -10902,7 +10902,7 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 
 	if (!range) return false;
 
-	int srange = GetSpellDistance(spellRes, caster);
+	int srange = GetSpellDistance(spellRes, caster, Pos);
 	return srange<range;
 }
 

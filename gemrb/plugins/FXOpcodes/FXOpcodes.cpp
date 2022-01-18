@@ -6335,7 +6335,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 			}
 			// Actually, atleast fire shields also have a range check
 			if (fx->Parameter2 == COND_GOTHIT) {
-				unsigned int dist = GetSpellDistance(refs[i], target);
+				unsigned int dist = GetSpellDistance(refs[i], target, actor->Pos);
 				if (!dist) {
 					displaymsg->DisplayConstantStringName(STR_CONTFAIL, DMC_RED, target);
 					continue;

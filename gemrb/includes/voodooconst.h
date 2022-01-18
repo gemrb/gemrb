@@ -32,12 +32,6 @@
 
 namespace GemRB {
 
-// Constant to convert from points to (feet) for spell distance calculation
-// completely empirical, 9 seems to work fine for iwd and bgs
-// but it is either too small for iwd2 or there are other bugs
-// (fireball to the door in the targos attack is a good test case)
-static const int VOODOO_SPL_RANGE_F = 15;
-
 // ... similarly for items
 static const int VOODOO_ITM_RANGE_F = 15;
 
