@@ -8,7 +8,7 @@ Tools you will need to build GemRB:
 
 Required dependencies:
   - ZLib
-  - Python 2.3 or better, compiled with shared libraries
+  - Python 3.3 or better, compiled with shared libraries
   - SDL 1.2 or SDL 2.0+ (2.0.12 has a palette issue causing piles to have black outlines)
 
 Optional dependencies:
