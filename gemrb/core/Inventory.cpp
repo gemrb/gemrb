@@ -921,6 +921,7 @@ bool Inventory::EquipItem(ieDword slot)
 	
 	Owner->ClearCurrentStanceAnims();
 	
+	int armorLevel = itm->AnimationType[0] - '1';
 	switch (effect) {
 	case SLOT_EFFECT_FIST:
 		SetEquippedSlot(IW_NO_EQUIPPED, 0);
@@ -981,13 +982,10 @@ bool Inventory::EquipItem(ieDword slot)
 		break;
 	case SLOT_EFFECT_ITEM:
 		//adjusting armour level if needed
-		{
-			int l = itm->AnimationType[0]-'1';
-			if (l >= IE_ANI_NO_ARMOR && l <= IE_ANI_HEAVY_ARMOR) {
-				Owner->SetBase(IE_ARMOR_TYPE, l);
-			} else {
-				UpdateShieldAnimation(itm);
-			}
+		if (armorLevel >= IE_ANI_NO_ARMOR && armorLevel <= IE_ANI_HEAVY_ARMOR) {
+			Owner->SetBase(IE_ARMOR_TYPE, armorLevel);
+		} else {
+			UpdateShieldAnimation(itm);
 		}
 		break;
 	}
