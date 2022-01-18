@@ -18,30 +18,27 @@
 
 
 import _GemRB
+import GemRB
 import GameCheck
 
 from GUIDefines import *
 from MetaClasses import metaIDWrapper, add_metaclass
 from GemRB import GetView, CreateView, RemoveView, RemoveScriptingRef
 
+DefaultScrollbars = { "bg1" : "GUIWSBR", "bg2" : "GUISCRCW", "pst" : "CGSCRL1", "iwd" : "GUISBR", "how" : "GUISBR", "iwd2" : "GBTNSCRL", "demo" : "scrlbar1" }
+
 def CreateScrollbarARGs(bam = None):
 	bamframes = list(range(6))
-
-	if GameCheck.IsBG2():
-		bam = bam if bam else 'GUISCRCW'
+	if GameCheck.IsBG2() or GameCheck.IsGemRBDemo():
 		bamframes = [0,1,2,3,5,4]
-	elif GameCheck.IsPST():
-		bam = bam if bam else 'CGSCRL1'
-	elif GameCheck.IsIWD2():
-		bam = bam if bam else 'GBTNSCRL'
 	elif GameCheck.IsBG1():
-		bam = bam if bam else 'GUIWSBR'
 		bamframes = [0,1,2,3,6,7]
-	elif GameCheck.IsIWD1():
-		bam = bam if bam else 'GUISBR'
-	else: # demo
-		bam = bam if bam else 'scrlbar1'
-		bamframes = [0,1,2,3,5,4]
+
+	if not bam:
+		fallbackBAM = "scrlbar1"
+		if GemRB.GameType in DefaultScrollbars:
+			fallbackBAM = DefaultScrollbars[GemRB.GameType]
+		bam = fallbackBAM
 
 	return (bam, bamframes)
 
