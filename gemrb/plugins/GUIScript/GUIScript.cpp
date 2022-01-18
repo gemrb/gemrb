@@ -671,7 +671,7 @@ static PyObject* GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_LoadTable__doc,
 "===== LoadTable =====\n\
 \n\
-**Prototype:** GemRB.LoadTable (2DAResRef[, ignore_error=0])\n\
+**Prototype:** GemRB.LoadTable (2DAResRef[, ignore_error=0, silent=0])\n\
 \n\
 **Description:** Loads a 2DA Table. In case it was already loaded, it \n\
 will return the table's existing reference (won't load it again).\n\
@@ -679,6 +679,7 @@ will return the table's existing reference (won't load it again).\n\
 **Parameters:** \n\
   * 2DAResRef    - the table's name (.2da resref)\n\
   * ignore_error - boolean, if set, handle missing files gracefully\n\
+  * silent - boolean, if set, don't print lookup messages\n\
 \n\
 **Return value:** GTable\n\
 \n\
@@ -689,9 +690,10 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 {
 	char* tablename;
 	int noerror = 0;
-	PARSE_ARGS( args, "s|i", &tablename, &noerror );
+	int silent = 0;
+	PARSE_ARGS(args, "s|ii", &tablename, &noerror, &silent);
 
-	auto tab = gamedata->LoadTable(tablename);
+	auto tab = gamedata->LoadTable(tablename, silent > 0);
 	if (tab == nullptr) {
 		if (noerror) {
 			Py_RETURN_NONE;
