@@ -38,24 +38,25 @@ def Load():
 	if Loaded:
 		return
 
-	print() # so the following output isn't appended to an existing line
-	Classes = GemRB.LoadTable ("classes")
+	Classes = GemRB.LoadTable ("classes", False, True)
+	ClassSkills = GemRB.LoadTable ("clskills", False, True)
+	Races = GemRB.LoadTable ("races", False, True)
+	NextLevel = GemRB.LoadTable ("xplevel", False, True)
+	StrMod = GemRB.LoadTable ("strmod", False, True)
+	StrModEx = GemRB.LoadTable ("strmodex", False, True)
+	SpellDisplay = GemRB.LoadTable ("spldisp", False, True)
+	ItemType = GemRB.LoadTable ("itemtype", False, True)
+
+	# tables that are only in some games, but not optional there
 	if GemRB.HasResource ("kitlist", RES_2DA):
-		KitList = GemRB.LoadTable ("kitlist")
-	ClassSkills = GemRB.LoadTable ("clskills")
-	Races = GemRB.LoadTable ("races")
-	NextLevel = GemRB.LoadTable ("xplevel")
+		KitList = GemRB.LoadTable ("kitlist", False, True)
 	if GemRB.HasResource ("pdolls", RES_2DA):
-		Pdolls = GemRB.LoadTable ("pdolls")
-	StrMod = GemRB.LoadTable ("strmod")
-	StrModEx = GemRB.LoadTable ("strmodex")
-	SpellDisplay = GemRB.LoadTable ("spldisp")
+		Pdolls = GemRB.LoadTable ("pdolls", False, True)
 	if GemRB.HasResource ("aligns", RES_2DA):
-		Aligns = GemRB.LoadTable ("aligns")
-	ItemType = GemRB.LoadTable ("itemtype")
+		Aligns = GemRB.LoadTable ("aligns", False, True)
 	if GemRB.HasResource ("weapprof", RES_2DA):
-		WeapProfs = GemRB.LoadTable ("weapprof")
+		WeapProfs = GemRB.LoadTable ("weapprof", False, True)
 	if GemRB.HasResource ("charprof", RES_2DA):
-		CharProfs = GemRB.LoadTable ("charprof")
+		CharProfs = GemRB.LoadTable ("charprof", False, True)
 
 	Loaded = True
