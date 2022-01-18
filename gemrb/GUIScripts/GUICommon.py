@@ -321,32 +321,28 @@ def GetActorClassTitle (actor):
 
 	if Multi and Dual[0] == 0: # true multi class
 		ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
-	else:
-		if Dual[0]: # dual class
-			# first (previous) kit or class of the dual class
-			if Dual[0] == 1:
-				ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2)
-			else:
-				ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF")
-			if ClassTitle != "*":
-				ClassTitle = GemRB.GetString (ClassTitle)
-			ClassTitle += " / "
-			if Dual[0] == 3:
-				ClassTitle += CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
-			else:
-				ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
-		elif MCFlags & (MC_FALLEN_PALADIN|MC_FALLEN_RANGER): # fallen
-			ClassTitle = 10369
-			if MCFlags & MC_FALLEN_PALADIN:
-				ClassTitle = 10371
-			ClassTitle = GemRB.GetString (ClassTitle)
-		else: # ordinary class or kit
-			if KitIndex:
-				ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2)
-			else:
-				ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
-			if ClassTitle != "*":
-				ClassTitle = GemRB.GetString (ClassTitle)
+		return ClassTitle
+
+	if Dual[0]: # dual class
+		# first (previous) kit or class of the dual class
+		if Dual[0] == 1:
+			ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2, GTV_REF)
+		else:
+			ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF", GTV_REF)
+		ClassTitle += " / "
+		if Dual[0] == 3:
+			ClassTitle += CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
+		else:
+			ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
+	elif MCFlags & (MC_FALLEN_PALADIN | MC_FALLEN_RANGER): # fallen
+		ClassTitle = 10369
+		if MCFlags & MC_FALLEN_PALADIN:
+			ClassTitle = 10371
+		ClassTitle = GemRB.GetString (ClassTitle)
+	elif KitIndex: # ordinary kit
+		ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2, GTV_REF)
+	else: # ordinary class
+		ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
 
 	return ClassTitle
 
