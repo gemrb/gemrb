@@ -611,7 +611,7 @@ void Interface::Main()
 	const Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	Region fpsRgn(0, config.Height - 30, 80, 30);
-	wchar_t fpsstring[20] = {L"???.??? fps"};
+	String fpsstring = L"???.??? fps";
 	// set for printing
 	fpsRgn.x = 5;
 	fpsRgn.y = 0;
@@ -657,7 +657,7 @@ void Interface::Main()
 				frames = ( frame * 1000.0 / ( time - timebase ) );
 				timebase = time;
 				frame = 0;
-				swprintf(fpsstring, sizeof(fpsstring)/sizeof(fpsstring[0]), L"%.3f fps", frames);
+				fpsstring = fmt::format(L"{:.3f} fps", frames);
 			}
 			auto lock = winmgr->DrawHUD();
 			video->DrawRect( fpsRgn, ColorBlack );

@@ -4662,8 +4662,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
 			String msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
-			wchar_t dmg[10];
-			swprintf(dmg, sizeof(dmg)/sizeof(dmg[0]), L" (%d)", damage);
+			String dmg = fmt::format(L" ({})", damage);
 			displaymsg->DisplayStringName(msg + dmg, DMC_WHITE, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
@@ -7405,8 +7404,6 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (core->HasFeedback(FT_TOHIT)) {
 		// log the roll
-		wchar_t rollLog[100];
-		const wchar_t *fmt = L"%ls %d %ls %d = %d : %ls";
 		String leftRight, hitMiss;
 		if (leftorright && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
 			leftRight = core->GetString(displaymsg->GetStringReference(STR_ATTACK_ROLL_L));
@@ -7418,7 +7415,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		} else {
 			hitMiss = core->GetString(displaymsg->GetStringReference(STR_MISS));
 		}
-		swprintf(rollLog, 100, fmt, leftRight.c_str(), roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss.c_str());
+		String rollLog = fmt::format(L"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss);
 		displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
 	}
 
@@ -11167,9 +11164,8 @@ void Actor::DisplayHeadHPRatio()
 {
 	if (!HasVisibleHP()) return;
 
-	wchar_t tmpstr[20];
-	swprintf(tmpstr, 20, L"%d/%d", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
-	SetOverheadText(tmpstr);
+	String hpstr = fmt::format(L"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
+	SetOverheadText(hpstr);
 }
 
 void Actor::ReleaseCurrentAction()
