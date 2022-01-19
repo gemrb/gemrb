@@ -25,7 +25,6 @@
 
 #include "ie_types.h"
 
-#include "System/String.h"
 #include "HashMap.h"
 
 namespace GemRB {

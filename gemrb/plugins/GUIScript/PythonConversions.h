@@ -28,6 +28,7 @@
 #include "TableMgr.h"
 #include "SymbolMgr.h"
 #include "System/Logging.h"
+#include "System/String.h"
 
 namespace GemRB {
 

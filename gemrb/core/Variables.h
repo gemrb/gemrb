@@ -24,6 +24,8 @@
 #include "exports.h"
 #include "globals.h"
 
+#include "System/String.h"
+
 #include <cassert>
 
 namespace GemRB {

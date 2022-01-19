@@ -36,6 +36,7 @@
 #include "exports.h"
 
 #include "SpriteSheet.h"
+#include "System/String.h"
 
 #include <deque>
 #include <map>

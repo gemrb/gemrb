@@ -22,6 +22,7 @@
 #include "exports.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cctype>
 #include <cstdarg>
 #include <cstdint>
