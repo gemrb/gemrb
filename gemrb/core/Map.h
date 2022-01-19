@@ -198,14 +198,7 @@ public:
 	{
 		color = Clamp<ieWord>(c, 0, 8);
 		//update custom strref
-		char* mbstring = MBCStringFromString(text);
-		if (mbstring) {
-			strref = core->UpdateString(-1, mbstring);
-			free(mbstring);
-		} else {
-			strref = core->UpdateString(-1, "?");
-			Log(WARNING, "Map", "Failed to update string from map note, possibly an encoding issue.");
-		}
+		strref = core->UpdateString(-1, text);
 	}
 
 	MapNote(ieStrRef ref, ieWord c, bool readonly)

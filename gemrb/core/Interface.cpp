@@ -1656,15 +1656,6 @@ const char* Interface::TypeExt(SClass_ID type) const
 	return NULL;
 }
 
-ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
-{
-	String* str = StringFromCString(text);
-	if (str) {
-		return UpdateString(strref, *str);
-	}
-	return -1;
-}
-
 ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
 {
 	String current = GetString(strref, 0);
@@ -1672,20 +1663,6 @@ ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
 		return strings->UpdateString( strref, text );
 	} else {
 		return strref;
-	}
-}
-
-char* Interface::GetCString(ieStrRef strref, ieDword options) const
-{
-	ieDword flags = 0;
-
-	if (!(options & IE_STR_STRREFOFF)) {
-		vars->Lookup( "Strref On", flags );
-	}
-	if (strings2 && (signed)strref != -1 && strref & IE_STR_ALTREF) {
-		return strings2->GetCString(strref, flags | options);
-	} else {
-		return strings->GetCString(strref, flags | options);
 	}
 }
 
@@ -4040,9 +4017,10 @@ int Interface::WriteCharacter(const char *name, const Actor *actor)
 	if (!HasFeature(GF_NO_BIOGRAPHY)) {
 		str.Create( Path, name, IE_BIO_CLASS_ID );
 		//never write the string reference into this string
-		char *tmp = GetCString(actor->GetVerbalConstant(VB_BIO),IE_STR_STRREFOFF);
-		str.Write (tmp, strlen(tmp));
-		free(tmp);
+		String tmp = GetString(actor->GetVerbalConstant(VB_BIO), IE_STR_STRREFOFF);
+		char* cstr = MBCStringFromString(tmp);
+		str.Write (cstr, strlen(cstr));
+		free(cstr);
 	}
 	return 0;
 }

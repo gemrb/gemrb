@@ -117,7 +117,7 @@ class Projectile;
 #define ITEM_CASTERLEVEL   10
 
 struct DMGOpcodeInfo {
-	const char *TypeName;
+	String TypeName;
 	int DiceThrown;
 	int DiceSides;
 	int DiceBonus;

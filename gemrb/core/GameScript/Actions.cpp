@@ -3186,7 +3186,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
 	//SetAt takes a newly created reference (no need of free/copy)
-	char * str = core->GetCString( parameters->int0Parameter);
+	String str = core->GetString(parameters->int0Parameter);
 	core->GetTokenDictionary()->SetAt(parameters->string0Parameter, str);
 }
 
@@ -5944,10 +5944,9 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		if (tab) {
 			basename = tab->QueryDefault();
 		}
-		char * str = core->GetCString( parameters->int0Parameter, IE_STR_STRREFOFF);
+		String str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
 		char FolderName[_MAX_PATH];
-		snprintf (FolderName, sizeof(FolderName), "%s - %s", basename, str);
-		free(str);
+		snprintf (FolderName, sizeof(FolderName), "%s - %ls", basename, str.c_str());
 
 		core->GetSaveGameIterator()->CreateSaveGame(core->GetSaveGameIterator()->GetSaveGame(FolderName), FolderName, true);
 	} else {

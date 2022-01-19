@@ -4614,25 +4614,25 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 	if (damage == 0 && resisted == 0) return;
 
 	bool detailed = false;
-	const char *type_name = "unknown";
+	String type_name = L"unknown";
 	if (DisplayMessage::HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
-			type_name = core->GetCString(it->second.strref, 0);
+			type_name = core->GetString(it->second.strref, 0);
 		}
 		detailed = true;
 	}
 
 	if (damage > 0 && resisted != DR_IMMUNE) {
-		Log(COMBAT, "Actor", "%d %s damage taken.\n", damage, type_name);
+		Log(COMBAT, "Actor", "%d %ls damage taken.\n", damage, type_name.c_str());
 
 		if (!core->HasFeedback(FT_STATES)) goto hitsound;
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
-			core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name);
+			core->GetTokenDictionary()->SetAt( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
 
 			int strref;
@@ -4678,12 +4678,12 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		}
 	} else {
 		if (resisted == DR_IMMUNE) {
-			Log(COMBAT, "Actor", "is immune to damage type: %s.\n", type_name);
+			Log(COMBAT, "Actor", "is immune to damage type: %ls.\n", type_name.c_str());
 			if (hitter && hitter->Type == ST_ACTOR) {
 				if (detailed) {
 					//<DAMAGEE> was immune to my <TYPE> damage
 					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName(1));
-					core->GetTokenDictionary()->SetAtCopy( "TYPE", type_name );
+					core->GetTokenDictionary()->SetAt("TYPE", type_name);
 					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, DMC_WHITE, hitter);
 				} else if (displaymsg->HasStringReference(STR_DAMAGE_IMMUNITY) && displaymsg->HasStringReference(STR_DAMAGE1)) {
 					// bg2
@@ -6298,7 +6298,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
 	int tmp = spell->SpellName;
 	if (flags&LS_LEARN) {
-		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetCString(tmp));
+		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
 		switch (spell->SpellType) {
 		case IE_SPL_INNATE:
 			tmp = STR_GOTABILITY;

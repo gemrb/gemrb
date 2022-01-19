@@ -467,10 +467,7 @@ public:
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
 	/* create or change a custom string */
-	ieStrRef UpdateString(ieStrRef strref, const char *text) const;
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;
-	/* returns a newly created c string */
-	char* GetCString(ieStrRef strref, ieDword options = 0) const;
 	/* returns a newly created string */
 	String GetString(ieStrRef strref, ieDword options = 0) const;
 	std::string GetMBCString(ieStrRef strref, ieDword options = 0) const;

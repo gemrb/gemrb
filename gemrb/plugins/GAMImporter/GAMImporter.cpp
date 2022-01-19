@@ -1005,7 +1005,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (ac->LongStrRef==0xffffffff) {
 		strncpy(filling, ac->GetNameAsVariable(1).CString(), 33);
 	} else {
-		char *tmpstr = core->GetCString(ac->LongStrRef, IE_STR_STRREFOFF);
+		char *tmpstr = MBCStringFromString(core->GetString(ac->LongStrRef, IE_STR_STRREFOFF));
 		strncpy(filling, tmpstr, 32);
 		free(tmpstr);
 	}
