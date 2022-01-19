@@ -80,4 +80,25 @@ GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
 }
 
+namespace fmt {
+
+struct WideToChar {
+	const GemRB::String& string;
+};
+
+template <>
+struct fmt::formatter<WideToChar> {
+	// FIXME: parser doesnt do anything
+	static constexpr auto parse(const format_parse_context& ctx) -> decltype(ctx.begin()) { return ctx.begin(); }
+
+	template <typename FormatContext>
+	auto format(const WideToChar& wstr, FormatContext& ctx) -> decltype(ctx.out()) {
+		// TODO: must call upon iconv here
+		const char* cstr = GemRB::MBCStringFromString(wstr.string);
+		return format_to(ctx.out(), "{}", cstr);
+	}
+};
+
+}
+
 #endif

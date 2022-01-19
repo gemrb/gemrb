@@ -23,6 +23,9 @@
 
 #include <string>
 
+#define FMT_HEADER_ONLY
+#include <fmt/format.h>
+
 #define WHITESPACE_STRING L"\n\t\r "
 
 namespace GemRB {
@@ -38,6 +41,12 @@ inline wchar_t tolower(wchar_t c) { return ::towlower(c); }
 inline wchar_t toupper(wchar_t c) { return ::towupper(c); }
 
 GEM_EXPORT void TrimString(String& string);
+
+template<typename ...ARGS>
+std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&& ...args) {
+	std::string formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
+	return str += formatted;
+}
 
 }
 
