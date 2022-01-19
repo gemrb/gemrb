@@ -177,8 +177,9 @@ void Console::LoadHistory()
 		while (histFile->Remains()) {
 			if (histFile->ReadLine(line, _MAX_PATH) == -1) break;
 
-			String tmp = *StringFromCString(line);
-			History.Append(std::make_pair(-1, tmp));
+			String* tmp = StringFromCString(line);
+			History.Append(std::make_pair(-1, std::move(*tmp)));
+			delete tmp;
 		}
 	}
 	delete histFile;
