@@ -177,9 +177,7 @@ void Console::LoadHistory()
 		while (histFile->Remains()) {
 			if (histFile->ReadLine(line, _MAX_PATH) == -1) break;
 
-			// set history
-			wchar_t tmp[100];
-			swprintf(tmp, 100, L"%s", line);
+			String tmp = *StringFromCString(line);
 			History.Append(std::make_pair(-1, tmp));
 		}
 	}

@@ -6625,11 +6625,9 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 {
 	if (!btn) return;
 
-	wchar_t usagestr[10];
+	String usagestr;
 	if (charges && (charges>1 || !oneisnone) ) {
-		swprintf(usagestr, sizeof(usagestr)/sizeof(usagestr[0]), L"%d", charges);
-	} else {
-		usagestr[0] = 0;
+		usagestr = std::to_wstring(charges);
 	}
 	btn->SetText(usagestr);
 }
