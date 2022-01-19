@@ -52,7 +52,6 @@ public:
 	ieStrRef UpdateString(ieStrRef strref, const String& newvalue) override;
 	/** resolve a string reference */
 	String GetString(ieStrRef strref, ieDword flags = 0) override;
-	char* GetCString(ieStrRef strref, ieDword flags = 0) override;
 	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) override;
 	bool HasAltTLK() const override;
 private:

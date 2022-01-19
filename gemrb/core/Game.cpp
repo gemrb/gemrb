@@ -1796,18 +1796,14 @@ bool Game::RestParty(int checks, int dream, int hp)
 	//pst just has "Hours", so this works for both
 	int restindex = displaymsg->GetStringReference(STR_REST);
 	int hrsindex = displaymsg->GetStringReference(STR_HOURS);
-	char* tmpstr = NULL;
 
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 
 	//this would be bad
 	if (hrsindex == -1 || restindex == -1) return cutscene;
-	tmpstr = core->GetCString(hrsindex, 0);
-	//as would this
-	if (!tmpstr) return cutscene;
-
-	core->GetTokenDictionary()->SetAtCopy("DURATION", tmpstr);
-	free(tmpstr);
+	
+	String tmpstr = core->GetString(hrsindex, 0);
+	core->GetTokenDictionary()->SetAt("DURATION", tmpstr);
 	displaymsg->DisplayString(restindex, DMC_WHITE, 0);
 	return cutscene;
 }

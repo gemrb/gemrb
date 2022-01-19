@@ -532,21 +532,15 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 {
 	ieStrRef Strref;
 	int X, Y;
-	PyObject* ret;
 	PARSE_ARGS( args, "iii", &Strref, &X, &Y );
 
-	char* text = core->GetCString( Strref );
-	size_t bufflen = strlen( text ) + 12;
-	if (bufflen<12) {
-		return NULL;
-	}
-	char* newtext = ( char* ) malloc( bufflen );
+	String fmt = core->GetString(Strref);
+	size_t bufflen = fmt.length() + 12;
+
+	wchar_t* newtext = new wchar_t[bufflen];
 	//this could be DANGEROUS, not anymore (snprintf is your friend)
-	snprintf( newtext, bufflen, text, X, Y );
-	free(text);
-	ret = PyString_FromString( newtext );
-	free( newtext );
-	return ret;
+	swprintf(newtext, bufflen, fmt.c_str(), X, Y);
+	return PyString_FromStringObj(String(newtext));
 }
 
 PyDoc_STRVAR( GemRB_GetString__doc,
@@ -583,13 +577,10 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
 	ieStrRef strref = -1;
 	int flags = 0;
-	PARSE_ARGS(args, "l|i", &strref, &flags);
-	if (strref >= INT_MAX) return PyString_FromString("");
+	PARSE_ARGS(args, "i|i", &strref, &flags);
 
-	char *text = core->GetCString( strref, flags );
-	PyObject* ret = text ? PyString_FromString(text) : PyString_FromString("");
-	free( text );
-	return ret;
+	String text = core->GetString(strref, flags);
+	return PyString_FromStringObj(text);
 }
 
 PyDoc_STRVAR( GemRB_EndCutSceneMode__doc,
@@ -767,10 +758,8 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 			long val;
 			bool valid = valid_signednumber(ret, val);
 			if (type == 3) {
-				char* cstr = core->GetCString(ieStrRef(val));
-				PyObject* pystr = PyString_FromString(cstr);
-				free(cstr);
-				return pystr;
+				String str = core->GetString(ieStrRef(val));
+				return PyString_FromStringObj(str);
 			}
 			if (valid || type == 1) {
 				return PyLong_FromLong(val);
@@ -5677,12 +5666,15 @@ PyDoc_STRVAR( GemRB_CreateString__doc,
 
 static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 {
-	const char *Text;
-	ieStrRef strref;
-	PARSE_ARGS( args,  "is", &strref, &Text );
+	PyObject *Text = nullptr;
+	ieStrRef strref = -1;
+	PARSE_ARGS( args,  "iO", &strref, &Text );
 	GET_GAME();
-
-	strref = core->UpdateString(strref, Text);
+	
+	String* str = PyString_AsStringObj(Text);
+	if (str) {
+		strref = core->UpdateString(strref, *str);
+	}
 	return PyLong_FromLong(strref);
 }
 
@@ -11608,9 +11600,8 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	print("Slot: %d", spelldata.slot);
 	print("Type: %d (%d vs %d)", spelldata.type, 1<<spelldata.type, type);
 	//cannot make this const, because it will be freed
-	char *tmp = core->GetCString(spelldata.strref);
-	print("Spellname: %s", tmp);
-	free(tmp);
+	String tmp = core->GetString(spelldata.strref);
+	print("Spellname: %ls", tmp.c_str());
 	print("Target: %d", spelldata.Target);
 	print("Range: %d", spelldata.Range);
 	if (type > 0 && !((1<<spelldata.type) & type)) {
@@ -12487,7 +12478,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyObject *alldos = PyTuple_New(damage_opcodes.size());
 	for (unsigned int i = 0; i < damage_opcodes.size(); i++) {
 		PyObject *dos = PyDict_New();
-		PyDict_SetItemString(dos, "TypeName", PyString_FromString (damage_opcodes[i].TypeName));
+		PyDict_SetItemString(dos, "TypeName", PyString_FromStringObj(damage_opcodes[i].TypeName));
 		PyDict_SetItemString(dos, "NumDice", PyLong_FromLong(damage_opcodes[i].DiceThrown));
 		PyDict_SetItemString(dos, "DiceSides", PyLong_FromLong(damage_opcodes[i].DiceSides));
 		PyDict_SetItemString(dos, "DiceBonus", PyLong_FromLong(damage_opcodes[i].DiceBonus));

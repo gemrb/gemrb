@@ -384,12 +384,6 @@ String TLKImporter::GetString(ieStrRef strref, ieDword flags)
 	return string;
 }
 
-char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
-{
-	String string = GetString(strref, flags);
-	return MBCStringFromString(string);
-}
-
 bool TLKImporter::HasAltTLK() const
 {
 	// only English (language id 0) has no alt files
