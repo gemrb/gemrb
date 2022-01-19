@@ -38,7 +38,6 @@ namespace GemRB {
 
 class Actor;
 class Spell;
-class StringBuffer;
 
 #define MAX_SPELL_LEVEL 16
 
@@ -254,9 +253,7 @@ public:
 	int FindSpellInfo(SpellExtHeader *array, const ResRef& spellName, unsigned int type);
 
 	/** Dumps spellbook to stdout for debugging */
-	void dump() const;
-	/// Dumps spellbook to given buffer
-	void dump(StringBuffer&) const;
+	std::string dump() const;
 };
 
 }

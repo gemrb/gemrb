@@ -49,7 +49,6 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 #include "ScriptedAnimation.h"
-#include "System/StringBuffer.h"
 
 #include <cstdio>
 
@@ -1082,10 +1081,9 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		if (Sender->Type == ST_ACTOR) {
 			static_cast<Actor*>(Sender)->dump();
 		}
-		StringBuffer buffer;
-		buffer.append("Target object: ");
+		std::string buffer("Target object: ");
 		if (parameters->objects[1]) {
-			parameters->objects[1]->dump(buffer);
+			buffer.append(parameters->objects[1]->dump());
 		} else {
 			buffer.append("<NULL>\n");
 		}
@@ -1099,10 +1097,9 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	bool swap = false;
 	if (speaker) {
 		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
-			StringBuffer buffer;
-			buffer.append("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
-			speaker->dump(buffer);
-			target->dump(buffer);
+			std::string buffer("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
+			buffer.append(speaker->dump());
+			buffer.append(target->dump());
 			Log(ERROR, "GameScript", buffer);
 			Sender->ReleaseCurrentAction();
 			return;

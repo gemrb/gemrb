@@ -36,8 +36,6 @@ namespace GemRB {
 class Action;
 class GameScript;
 
-class StringBuffer;
-
 //escapearea flags
 #define EA_DESTROY 1        //destroy actor at the exit (otherwise move to new place)
 #define EA_NOSEE   2        //no need to see the exit
@@ -200,8 +198,7 @@ public:
 public:
 	Object() = default;
 
-	void dump() const;
-	void dump(StringBuffer&) const;
+	std::string dump() const;
 	void Release()
 	{
 		delete this;
@@ -231,8 +228,7 @@ public:
 	char string1Parameter[65]{};
 	Object* objectParameter = nullptr;
 
-	void dump() const;
-	void dump(StringBuffer&) const;
+	std::string dump() const;
 
 	void Release()
 	{
@@ -297,8 +293,7 @@ public:
 		return RefCount;
 	}
 
-	void dump() const;
-	void dump(StringBuffer&) const;
+	std::string dump() const;
 
 	void Release()
 	{

@@ -34,7 +34,6 @@
 #include "Region.h"
 
 #include "System/Logging.h"
-#include "System/StringBuffer.h"
 
 #include <cstdlib>
 #include <list>
@@ -44,7 +43,6 @@ namespace GemRB {
 class Actor;
 class Map;
 class Scriptable;
-class StringBuffer;
 
 /** Maximum number of different Effect opcodes */
 #define MAX_EFFECTS 512
@@ -355,8 +353,7 @@ public:
 	// from pos, in range (no cone size yet)
 	void AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, const Actor *except) const;
 	/** Lists contents of the queue on a terminal for debugging */
-	void dump() const;
-	void dump(StringBuffer&) const;
+	std::string dump() const;
 	//resolve effect
 	static int ResolveEffect(EffectRef &effect_reference);
 	static bool match_ids(const Actor *target, int table, ieDword value);

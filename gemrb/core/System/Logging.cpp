@@ -19,7 +19,6 @@
 #include "System/Logging.h"
 #include "System/FileStream.h"
 #include "System/Logger/Stdio.h"
-#include "System/StringBuffer.h"
 
 #include "Interface.h"
 #include "GUI/GUIScriptInterface.h"
@@ -168,9 +167,9 @@ void LogVA(log_level level, const char* owner, const char* message, va_list args
 	vLog(level, owner, message, WHITE, args);
 }
 
-void Log(log_level level, const char* owner, StringBuffer const& buffer)
+void Log(log_level level, const char* owner, std::string const& buffer)
 {
-	LogMsg(LogMessage(level, owner, buffer.get().c_str(), WHITE));
+	LogMsg(LogMessage(level, owner, buffer.c_str(), WHITE));
 }
 
 static void addGemRBLog()

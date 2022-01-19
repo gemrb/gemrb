@@ -39,7 +39,6 @@
 namespace GemRB {
 
 class Map;
-class StringBuffer;
 
 //AddSlotItem return values
 #define ASI_FAILED     0
@@ -327,9 +326,7 @@ public:
 	/** breaks the item (weapon) in slot */
 	void BreakItemSlot(ieDword slot);
 	/** Lists all items in the Inventory on terminal for debugging */
-	void dump() const;
-	/// List all items in the Inventory to the given buffer */
-	void dump(StringBuffer&) const;
+	std::string dump() const;
 	/** Equips best weapon */
 	void EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */

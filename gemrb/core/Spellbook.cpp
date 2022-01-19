@@ -28,7 +28,6 @@
 #include "Spell.h"
 #include "TableMgr.h"
 #include "Scriptable/Actor.h"
-#include "System/StringBuffer.h"
 
 #include <cstdio>
 
@@ -1143,15 +1142,9 @@ void Spellbook::GenerateSpellInfo()
 	}
 }
 
-void Spellbook::dump() const
+std::string Spellbook::dump() const
 {
-	StringBuffer buffer;
-	dump(buffer);
-	Log(DEBUG, "Spellbook", buffer);
-}
-
-void Spellbook::dump(StringBuffer& buffer) const
-{
+	std::string buffer;
 	buffer.append( "SPELLBOOK:\n" );
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (const auto spellMemo : spells[i]) {
@@ -1161,7 +1154,7 @@ void Spellbook::dump(StringBuffer& buffer) const
 			int idx = 0;
 			for (const auto& knownSpell : spellMemo->known_spells) {
 				if (!knownSpell) continue;
-				buffer.appendFormatted(" %2d: %8s L: %d T: %d\n", idx, knownSpell->SpellResRef.CString(), knownSpell->Level, knownSpell->Type);
+				AppendFormat(buffer, " {:2d}: {} L: {} T: {}\n", idx, knownSpell->SpellResRef, knownSpell->Level, knownSpell->Type);
 				idx++;
 			}
 
@@ -1170,11 +1163,12 @@ void Spellbook::dump(StringBuffer& buffer) const
 			idx = 0;
 			for (const auto& memorizedSpell : spellMemo->memorized_spells) {
 				if (!memorizedSpell) continue;
-				buffer.appendFormatted(" %2u: %8s %x\n", idx, memorizedSpell->SpellResRef.CString(), memorizedSpell->Flags);
+				AppendFormat(buffer, " {:2d}: {} {:x}\n", idx, memorizedSpell->SpellResRef, memorizedSpell->Flags);
 				idx++;
 			}
 		}
 	}
+	return buffer;
 }
 
 }

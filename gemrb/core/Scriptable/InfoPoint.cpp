@@ -29,7 +29,6 @@
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "GUI/TextSystem/TextContainer.h"
-#include "System/StringBuffer.h"
 
 namespace GemRB {
 
@@ -232,38 +231,37 @@ check:
 	return false;
 }
 
-void InfoPoint::dump() const
+std::string InfoPoint::dump() const
 {
-	StringBuffer buffer;
+	std::string buffer;
 	switch (Type) {
 		case ST_TRIGGER:
-			buffer.appendFormatted( "Debugdump of InfoPoint Region %s:\n", GetScriptName() );
+			AppendFormat(buffer, "Debugdump of InfoPoint Region {}:\n", GetScriptName());
 			break;
 		case ST_PROXIMITY:
-			buffer.appendFormatted( "Debugdump of Trap Region %s:\n", GetScriptName() );
+			AppendFormat(buffer, "Debugdump of Trap Region {}:\n", GetScriptName());
 			break;
 		case ST_TRAVEL:
-			buffer.appendFormatted( "Debugdump of Travel Region %s:\n", GetScriptName() );
+			AppendFormat(buffer, "Debugdump of Travel Region {}:\n", GetScriptName());
 			break;
 		default:
-			buffer.appendFormatted( "Debugdump of Unsupported Region %s:\n", GetScriptName() );
+			AppendFormat(buffer, "Debugdump of Unsupported Region {}:\n", GetScriptName());
 			break;
 	}
-	buffer.appendFormatted( "Region Global ID: %d\n", GetGlobalID());
-	buffer.appendFormatted( "Position: %d.%d\n", Pos.x, Pos.y);
-	buffer.appendFormatted( "TalkPos: %d.%d\n", TalkPos.x, TalkPos.y);
-	buffer.appendFormatted( "UsePoint: %d.%d  (on: %s)\n", UsePoint.x, UsePoint.y, YESNO(GetUsePoint()));
+	AppendFormat(buffer, "Region Global ID: {}\n", GetGlobalID());
+	AppendFormat(buffer, "Position: {}.{}\n", Pos.x, Pos.y);
+	AppendFormat(buffer, "TalkPos: {}.{}\n", TalkPos.x, TalkPos.y);
+	AppendFormat(buffer, "UsePoint: {}.{}  (on: {})\n", UsePoint.x, UsePoint.y, YESNO(GetUsePoint()));
 	switch(Type) {
 	case ST_TRAVEL:
-		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination.CString(), EntranceName.CString());
+		AppendFormat(buffer, "Destination Area: {} Entrance: {}\n", Destination, EntranceName);
 		break;
 	case ST_PROXIMITY:
-		buffer.appendFormatted( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
-		buffer.appendFormatted( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
-			TrapRemovalDiff );
+		AppendFormat(buffer, "TrapDetected: {}, Trapped: {}\n", TrapDetected, YESNO(Trapped));
+		AppendFormat(buffer, "Trap detection: {}%, Trap removal: {}%\n", TrapDetectionDiff, TrapRemovalDiff);
 		break;
 	case ST_TRIGGER:
-		buffer.appendFormatted ( "InfoString: %ls\n", OverheadText.c_str() );
+			AppendFormat(buffer, "InfoString: {}\n", fmt::WideToChar{OverheadText});
 		break;
 	default:;
 	}
@@ -271,10 +269,11 @@ void InfoPoint::dump() const
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted("Script: %s, Key: %s, Dialog: %s\n", name.CString(), KeyResRef.CString(), Dialog.CString());
-	buffer.appendFormatted( "Deactivated: %s\n", YESNO(Flags&TRAP_DEACTIVATED));
-	buffer.appendFormatted( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
+	AppendFormat(buffer, "Script: {}, Key: {}, Dialog: {}\n", name, KeyResRef, Dialog);
+	AppendFormat(buffer, "Deactivated: {}\n", YESNO(Flags&TRAP_DEACTIVATED));
+	AppendFormat(buffer, "Active: {}\n", YESNO(InternalFlags&IF_ACTIVE));
 	Log(DEBUG, "InfoPoint", buffer);
+	return buffer;
 }
 
 

@@ -29,7 +29,6 @@
 #include "TileMap.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
-#include "System/StringBuffer.h"
 
 namespace GemRB {
 
@@ -247,23 +246,24 @@ void Container::TryBashLock(Actor *actor)
 	ImmediateEvent();
 }
 
-void Container::dump() const
+std::string Container::dump() const
 {
-	StringBuffer buffer;
-	buffer.appendFormatted( "Debugdump of Container %s\n", GetScriptName() );
-	buffer.appendFormatted( "Container Global ID: %d\n", GetGlobalID());
-	buffer.appendFormatted( "Position: %d.%d\n", Pos.x, Pos.y);
-	buffer.appendFormatted("Type: %d, Locked: %s, LockDifficulty: %d\n", containerType, YESNO(Flags&CONT_LOCKED), LockDifficulty);
-	buffer.appendFormatted( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
-	buffer.appendFormatted( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
+	std::string buffer;
+	AppendFormat(buffer, "Debugdump of Container {}\n", GetScriptName() );
+	AppendFormat(buffer, "Container Global ID: {}\n", GetGlobalID());
+	AppendFormat(buffer, "Position: {}.{}\n", Pos.x, Pos.y);
+	AppendFormat(buffer, "Type: {}, Locked: {}, LockDifficulty: {}\n", containerType, YESNO(Flags&CONT_LOCKED), LockDifficulty);
+	AppendFormat(buffer, "Flags: {}, Trapped: {}, Detected: {}\n", Flags, YESNO(Trapped), TrapDetected );
+	AppendFormat(buffer, "Trap detection: {}%, Trap removal: {}%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
 	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted("Script: %s, Key: %s\n", name.CString(), KeyResRef.CString());
-	inventory.dump(buffer);
+	AppendFormat(buffer, "Script: {}, Key: {}\n", name, KeyResRef);
+	buffer.append(inventory.dump());
 	Log(DEBUG, "Container", buffer);
+	return buffer;
 }
 
 bool Container::TryUnlock(Actor *actor) const

@@ -41,7 +41,6 @@
 #include "GUI/GameControl.h"
 #include "Video/Pixels.h"
 #include "System/DataStream.h"
-#include "System/StringBuffer.h"
 #include "MapReverb.h"
 
 #include <algorithm>
@@ -2168,32 +2167,33 @@ void Game::SetExpansion(ieDword value)
 	}
 }
 
-void Game::dump() const
+std::string Game::dump() const
 {
-	StringBuffer buffer;
+	std::string buffer("Currently loaded areas:\n");
 
-	buffer.append("Currently loaded areas:\n");
 	for (auto map : Maps) {
 		print("%s", map->GetScriptName());
 	}
-	buffer.appendFormatted("Current area: %s   Previous area: %s\n", CurrentArea.CString(), PreviousArea.CString());
+	AppendFormat(buffer, "Current area: {}   Previous area: {}\n", CurrentArea, PreviousArea);
 	if (Scripts[0]) {
-		buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName().CString());
+		AppendFormat(buffer, "Global script: {}\n", Scripts[0]->GetName());
 	}
 	int hours = GameTime/core->Time.hour_size;
-	buffer.appendFormatted("Game time: %d (%d days, %d hours)\n", GameTime.load(), hours/24, hours%24);
-	buffer.appendFormatted("CombatCounter: %d\n", (int) CombatCounter);
+	AppendFormat(buffer, "Game time: {} ({} days, {} hours)\n", GameTime.load(), hours/24, hours%24);
+	AppendFormat(buffer, "CombatCounter: {}\n", CombatCounter);
 
-	buffer.appendFormatted("Party size: %d\n", (int) PCs.size());
+	AppendFormat(buffer, "Party size: {}\n", PCs.size());
 	for (auto actor : PCs) {
-		buffer.appendFormatted("Name: %ls Order %d %s\n", actor->GetName(0).c_str(), actor->InParty, actor->Selected?"x":"-");
+		AppendFormat(buffer, "Name: {} Order {} {}\n", fmt::WideToChar{actor->GetName(0)}, actor->InParty, actor->Selected?"x":"-");
 	}
 
-	buffer.appendFormatted("\nNPC count: %d\n", (int) NPCs.size());
+	AppendFormat(buffer, "\nNPC count: {}\n", NPCs.size());
 	for (auto actor : NPCs) {
-		buffer.appendFormatted("Name: %ls\tSelected: %s\n", actor->GetName(0).c_str(), actor->Selected ? "x ": "-");
+		AppendFormat(buffer, "Name: {}\tSelected: {}\n", fmt::WideToChar{actor->GetName(0)}, actor->Selected ? "x ": "-");
 	}
 	Log(DEBUG, "Game", buffer);
+	
+	return buffer;
 }
 
 Actor *Game::GetActorByGlobalID(ieDword globalID) const

@@ -34,8 +34,6 @@
 
 namespace GemRB {
 
-class StringBuffer;
-
 GEM_EXPORT void ToggleLogging(bool);
 GEM_EXPORT void AddLogWriter(Logger::WriterPtr&&);
 GEM_EXPORT void SetConsoleWindowLogLevel(log_level level);
@@ -60,7 +58,7 @@ GEM_EXPORT void Log(log_level, const char* owner, const char* message, ...)
 
 GEM_EXPORT void LogVA(log_level level, const char* owner, const char* message, va_list args);
 
-GEM_EXPORT void Log(log_level, const char* owner, StringBuffer const&);
+GEM_EXPORT void Log(log_level, const char* owner, std::string const&);
 
 #undef PRINTF_FORMAT
 

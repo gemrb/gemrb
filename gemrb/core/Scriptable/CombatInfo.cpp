@@ -21,7 +21,6 @@
 #include "CombatInfo.h"
 
 #include "Interface.h"
-#include "System/StringBuffer.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -180,15 +179,16 @@ void ArmorClass::HandleFxBonus(int mod, bool permanent)
 	}
 }
 
-void ArmorClass::dump() const
+std::string ArmorClass::dump() const
 {
-	StringBuffer buffer;
-	buffer.appendFormatted("Debugdump of ArmorClass of %ls:\n", Owner->GetName(1).c_str());
-	buffer.appendFormatted("TOTAL: %d\n", total);
-	buffer.appendFormatted("Natural: %d\tGeneric: %d\tDeflection: %d\n", natural, genericBonus, deflectionBonus);
-	buffer.appendFormatted("Armor: %d\tShield: %d\n", armorBonus, shieldBonus);
-	buffer.appendFormatted("Dexterity: %d\tWisdom: %d\n\n", dexterityBonus, wisdomBonus);
+	std::string buffer;
+	AppendFormat(buffer, "Debugdump of ArmorClass of {}:\n", fmt::WideToChar{Owner->GetName(1)});
+	AppendFormat(buffer, "TOTAL: {}\n", total);
+	AppendFormat(buffer, "Natural: {}\tGeneric: {}\tDeflection: {}\n", natural, genericBonus, deflectionBonus);
+	AppendFormat(buffer, "Armor: {}\tShield: {}\n", armorBonus, shieldBonus);
+	AppendFormat(buffer, "Dexterity: {}\tWisdom: {}\n\n", dexterityBonus, wisdomBonus);
 	Log(DEBUG, "ArmorClass", buffer);
+	return buffer;
 }
 
 /*
@@ -317,15 +317,16 @@ int ToHitStats::GetTotalForAttackNum(unsigned int number) const
 	return total-number*babDecrement;
 }
 
-void ToHitStats::dump() const
+std::string ToHitStats::dump() const
 {
-	StringBuffer buffer;
-	buffer.appendFormatted("Debugdump of ToHit of %ls:\n", Owner->GetName(1).c_str());
-	buffer.appendFormatted("TOTAL: %d\n", total);
-	buffer.appendFormatted("Base: %2d\tGeneric: %d\tEffect: %d\n", base, genericBonus, fxBonus);
-	buffer.appendFormatted("Armor: %d\tShield: %d\n", armorBonus, shieldBonus);
-	buffer.appendFormatted("Weapon: %d\tProficiency: %d\tAbility: %d\n\n", weaponBonus, proficiencyBonus, abilityBonus);
+	std::string buffer;
+	AppendFormat(buffer, "Debugdump of ToHit of {}:\n", fmt::WideToChar{Owner->GetName(1)});
+	AppendFormat(buffer, "TOTAL: {}\n", total);
+	AppendFormat(buffer, "Base: {:2d}\tGeneric: {}\tEffect: {}\n", base, genericBonus, fxBonus);
+	AppendFormat(buffer, "Armor: {}\tShield: {}\n", armorBonus, shieldBonus);
+	AppendFormat(buffer, "Weapon: {}\tProficiency: {}\tAbility: {}\n\n", weaponBonus, proficiencyBonus, abilityBonus);
 	Log(DEBUG, "ToHit", buffer);
+	return buffer;
 }
 
 
