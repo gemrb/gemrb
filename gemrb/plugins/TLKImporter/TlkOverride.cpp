@@ -136,7 +136,7 @@ char* CTlkOverride::GetString(ieDword offset)
 	return ret;
 }
 
-ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
+ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 {
 	ieDword memoffset = 0;
 	ieDword offset = LocateString(strref);
@@ -148,6 +148,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 	}
 
 	// FIXME: newvalue could be a multibyte string in an encoding incompatible with ASCII
+	char* newvalue = MBCStringFromString(string);
 	size_t length = strlen(newvalue);
 	if(length>65535) length=65535;
 	length++;

@@ -61,7 +61,7 @@ public:
 	virtual char* GetCString(ieStrRef strref, unsigned int flags = 0) = 0;
 	virtual String GetString(ieStrRef strref, unsigned int flags = 0) = 0;
 	virtual StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) = 0;
-	virtual ieStrRef UpdateString(ieStrRef strref, const char *text) = 0;
+	virtual ieStrRef UpdateString(ieStrRef strref, const String& text) = 0;
 	virtual bool HasAltTLK() const = 0;
 };
 

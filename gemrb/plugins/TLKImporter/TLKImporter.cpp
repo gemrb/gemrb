@@ -315,7 +315,7 @@ String TLKImporter::ResolveTags(const String& source)
 	return dest;
 }
 
-ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
+ieStrRef TLKImporter::UpdateString(ieStrRef strref, const String& newvalue)
 {
 	if (!OverrideTLK) {
 		Log(ERROR, "TLKImporter", "Custom string is not supported by this game format.");
