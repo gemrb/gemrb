@@ -844,7 +844,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			// f
 			case 'g'://shows loaded areas and other game information
-				game->dump();
+				Log(DEBUG, "Game", game->dump());
 				break;
 			// h
 			case 'i'://interact trigger (from the original game)
@@ -912,30 +912,30 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					while (count--) {
 						const Actor *actor = area->GetActor(count, true);
 						if (actor->IsOver(gameMousePos)) {
-							actor->dump();
+							Log(DEBUG, "Actor", actor->dump());
 						}
 					}
 				}
 				if (lastActor) {
-					lastActor->dump();
+					Log(DEBUG, "Actor", lastActor->dump());
 					break;
 				}
 				if (overDoor) {
-					overDoor->dump();
+					Log(DEBUG, "Door", overDoor->dump());
 					break;
 				}
 				if (overContainer) {
-					overContainer->dump();
+					Log(DEBUG, "Container", overContainer->dump());
 					break;
 				}
 				if (overInfoPoint) {
-					overInfoPoint->dump();
+					Log(DEBUG, "InfoPoint", overInfoPoint->dump());
 					break;
 				}
-				core->GetGame()->GetCurrentArea()->dump(false);
+				Log(DEBUG, "Map", core->GetGame()->GetCurrentArea()->dump(false));
 				break;
 			case 'n': //prints a list of all the live actors in the area
-				core->GetGame()->GetCurrentArea()->dump(true);
+				Log(DEBUG, "Map", core->GetGame()->GetCurrentArea()->dump(true));
 				break;
 			// o
 			case 'p': //center on actor

@@ -262,7 +262,6 @@ std::string Container::dump() const
 	}
 	AppendFormat(buffer, "Script: {}, Key: {}\n", name, KeyResRef);
 	buffer.append(inventory.dump());
-	Log(DEBUG, "Container", buffer);
 	return buffer;
 }
 

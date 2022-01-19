@@ -4462,7 +4462,7 @@ static PyObject* GemRB_DumpActor(PyObject * /*self*/, PyObject * args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	actor->dump();
+	Log(DEBUG, "Game", actor->dump());
 	Py_RETURN_NONE;
 }
 

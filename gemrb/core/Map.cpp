@@ -2987,7 +2987,6 @@ std::string Map::dump(bool show_actors) const
 			}
 		}
 	}
-	Log(DEBUG, "Map", buffer);
 	return buffer;;
 }
 

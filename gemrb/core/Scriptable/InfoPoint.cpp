@@ -272,7 +272,6 @@ std::string InfoPoint::dump() const
 	AppendFormat(buffer, "Script: {}, Key: {}, Dialog: {}\n", name, KeyResRef, Dialog);
 	AppendFormat(buffer, "Deactivated: {}\n", YESNO(Flags&TRAP_DEACTIVATED));
 	AppendFormat(buffer, "Active: {}\n", YESNO(InternalFlags&IF_ACTIVE));
-	Log(DEBUG, "InfoPoint", buffer);
 	return buffer;
 }
 

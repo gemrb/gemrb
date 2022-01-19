@@ -2191,7 +2191,6 @@ std::string Game::dump() const
 	for (auto actor : NPCs) {
 		AppendFormat(buffer, "Name: {}\tSelected: {}\n", fmt::WideToChar{actor->GetName(0)}, actor->Selected ? "x ": "-");
 	}
-	Log(DEBUG, "Game", buffer);
 	
 	return buffer;
 }

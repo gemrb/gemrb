@@ -470,7 +470,7 @@ int Door::GetCursor(int targetMode, int lastCursor) const
 	return Cursor;
 }
 
-void Door::dump() const
+std::string Door::dump() const
 {
 	std::string buffer;
 	AppendFormat(buffer, "Debugdump of Door {}:\n", GetScriptName() );
@@ -489,8 +489,7 @@ void Door::dump() const
 		name = Scripts[0]->GetName();
 	}
 	AppendFormat(buffer, "Script: {}, Key ({}) removed: {}, Dialog: {}\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog);
-
-	Log(DEBUG, "Door", buffer);
+	return buffer;
 }
 
 
