@@ -249,9 +249,9 @@ std::string InfoPoint::dump() const
 			break;
 	}
 	AppendFormat(buffer, "Region Global ID: {}\n", GetGlobalID());
-	AppendFormat(buffer, "Position: {}.{}\n", Pos.x, Pos.y);
-	AppendFormat(buffer, "TalkPos: {}.{}\n", TalkPos.x, TalkPos.y);
-	AppendFormat(buffer, "UsePoint: {}.{}  (on: {})\n", UsePoint.x, UsePoint.y, YESNO(GetUsePoint()));
+	AppendFormat(buffer, "Position: {}\n", Pos);
+	AppendFormat(buffer, "TalkPos: {}\n", TalkPos);
+	AppendFormat(buffer, "UsePoint: {}  (on: {})\n", UsePoint, YESNO(GetUsePoint()));
 	switch(Type) {
 	case ST_TRAVEL:
 		AppendFormat(buffer, "Destination Area: {} Entrance: {}\n", Destination, EntranceName);
