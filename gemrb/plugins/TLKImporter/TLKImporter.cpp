@@ -334,7 +334,9 @@ String TLKImporter::GetString(ieStrRef strref, ieDword flags)
 
 	if (empty || strref >= STRREF_START || (strref >= BIO_START && strref <= BIO_END)) {
 		if (OverrideTLK) {
-			string = *StringFromCString(OverrideTLK->ResolveAuxString(strref, Length));
+			String* tmp = StringFromCString(OverrideTLK->ResolveAuxString(strref, Length));
+			std::swap(string, *tmp);
+			delete tmp;
 		} else {
 			Length = 0;
 		}
@@ -361,7 +363,9 @@ String TLKImporter::GetString(ieStrRef strref, ieDword flags)
 			char* cstr = (char *)malloc(Length + 1);
 			cstr[Length] = '\0';
 			str->Read(cstr, Length);
-			string = *StringFromCString(cstr);
+			String* tmp = StringFromCString(cstr);
+			std::swap(string, *tmp);
+			delete tmp;
 			free(cstr);
 		} else {
 			Length = 0;
