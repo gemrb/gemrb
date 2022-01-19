@@ -133,14 +133,6 @@ struct TimeStruct {
 	int GetHour(unsigned int time) const { return (time / AI_UPDATE_TIME ) % day_sec / hour_sec; }
 };
 
-struct EncodingStruct
-{
-	std::string encoding = "ISO-8859-1";
-	bool widechar = false;
-	bool multibyte = false;
-	bool zerospace = false;
-};
-
 // cache of speldesc.2da entries
 struct SpellDescType {
 	ResRef resref;
