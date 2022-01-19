@@ -1704,6 +1704,15 @@ String Interface::GetString(ieStrRef strref, ieDword options) const
 	}
 }
 
+std::string Interface::GetMBCString(ieStrRef strref, ieDword options) const
+{
+	String string = GetString(strref, options);
+	char* cstr = MBCStringFromString(string);
+	std::string ret = cstr;
+	free(cstr);
+	return ret;
+}
+
 void Interface::SetFeature(int flag, int position)
 {
 	if (flag) {

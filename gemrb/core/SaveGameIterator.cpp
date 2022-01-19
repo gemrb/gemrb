@@ -52,24 +52,21 @@ namespace GemRB {
 const TypeID SaveGame::ID = { "SaveGame" };
 
 /** Extract date from save game ds into Date. */
-static void ParseGameDate(DataStream *ds, char *Date)
+static std::string ParseGameDate(DataStream *ds)
 {
-	Date[0] = '\0';
-
 	char Signature[8];
 	ieDword GameTime;
 	ds->Read(Signature, 8);
 	ds->ReadDword(GameTime);
 	delete ds;
 	if (memcmp(Signature, "GAME", 4) != 0) {
-		strcpy(Date, "ERROR");
-		return;
+		return "ERROR";
 	}
 
 	int hours = ((int)GameTime)/core->Time.hour_sec;
 	int days = hours/24;
 	hours -= days*24;
-	char *a=NULL,*b=NULL,*c=NULL;
+	std::string a, b, c;
 
 	// pst has a nice single string for everything 41277 (individual ones lack tokens)
 	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
@@ -77,35 +74,24 @@ static void ParseGameDate(DataStream *ds, char *Date)
 	int dayref = displaymsg->GetStringReference(STR_DAY);
 	int daysref = displaymsg->GetStringReference(STR_DAYS);
 	if (dayref == daysref) {
-		strcat(Date, core->GetCString(41277));
-		return;
+		return core->GetMBCString(41277);
 	}
 
 	if (days) {
-		if (days==1) a = core->GetCString(dayref, 0);
-		else a = core->GetCString(daysref, 0);
+		if (days==1) a = core->GetMBCString(dayref, 0);
+		else a = core->GetMBCString(daysref, 0);
 	}
-	if (hours || !a) {
-		if (a) b=core->GetCString(10699); // and
-		if (hours==1) c = core->GetCString(displaymsg->GetStringReference(STR_HOUR), 0);
-		else c = core->GetCString(displaymsg->GetStringReference(STR_HOURS), 0);
+	if (hours || a.empty()) {
+		if (!a.empty()) b=core->GetMBCString(10699); // and
+		if (hours==1) c = core->GetMBCString(displaymsg->GetStringReference(STR_HOUR), 0);
+		else c = core->GetMBCString(displaymsg->GetStringReference(STR_HOURS), 0);
 	}
-	if (b) {
-		strcat(Date, a);
-		strcat(Date, " ");
-		strcat(Date, b);
-		strcat(Date, " ");
-		if (c)
-			strcat(Date, c);
+	
+	if (!b.empty()) {
+		return a + " " + b + " " + c;
 	} else {
-		if (a)
-			strcat(Date, a);
-		if (c)
-			strcat(Date, c);
+		return a + c;
 	}
-	free(a);
-	free(b);
-	free(c);
 }
 
 SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID)
@@ -169,7 +155,7 @@ DataStream* SaveGame::GetSave() const
 const char* SaveGame::GetGameDate() const
 {
 	if (GameDate[0] == '\0')
-		ParseGameDate(GetGame(), GameDate);
+		strcpy(GameDate, ParseGameDate(GetGame()).c_str());
 	return GameDate;
 }
 
