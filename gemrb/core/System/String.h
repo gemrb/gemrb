@@ -24,6 +24,7 @@
 #include <string>
 
 #define FMT_HEADER_ONLY
+#define FMT_EXCEPTIONS 0
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
