@@ -373,6 +373,10 @@
 		A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FCE1395FF62006ADC12 /* Matching.cpp */; };
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
+		A2A05CD92797BEAA000FB625 /* StringConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CD72797BEAA000FB625 /* StringConversion.cpp */; };
+		A2A05CDA2797BEAA000FB625 /* StringConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CD82797BEAA000FB625 /* StringConversion.h */; };
+		A2A05CDD2797C1A5000FB625 /* CString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CDB2797C1A5000FB625 /* CString.cpp */; };
+		A2A05CDE2797C1A5000FB625 /* CString.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CDC2797C1A5000FB625 /* CString.h */; };
 		A2A2DE91274CCB54005842A6 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */; };
 		A2A2DE97274CCE28005842A6 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
@@ -1475,6 +1479,10 @@
 		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2A05CD72797BEAA000FB625 /* StringConversion.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringConversion.cpp; sourceTree = "<group>"; };
+		A2A05CD82797BEAA000FB625 /* StringConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringConversion.h; sourceTree = "<group>"; };
+		A2A05CDB2797C1A5000FB625 /* CString.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CString.cpp; sourceTree = "<group>"; };
+		A2A05CDC2797C1A5000FB625 /* CString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CString.h; sourceTree = "<group>"; };
 		A2A2DE87274CC871005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/homebrew/Cellar/freetype/2.11.0/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2A2DE95274CCCF1005842A6 /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
@@ -5354,6 +5362,8 @@
 		A2BFA0571395FF62006ADC12 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				A2A05CDB2797C1A5000FB625 /* CString.cpp */,
+				A2A05CDC2797C1A5000FB625 /* CString.h */,
 				A2BFA05C1395FF62006ADC12 /* DataStream.cpp */,
 				A2BFA05D1395FF62006ADC12 /* DataStream.h */,
 				A2CE96891B70596100E189C4 /* FileFilters.h */,
@@ -5374,6 +5384,8 @@
 				A22A6B171994390D00488985 /* String.h */,
 				A2C76D2814F196E900961680 /* StringBuffer.cpp */,
 				A2C76D2914F196E900961680 /* StringBuffer.h */,
+				A2A05CD72797BEAA000FB625 /* StringConversion.cpp */,
+				A2A05CD82797BEAA000FB625 /* StringConversion.h */,
 				A2BFA0641395FF62006ADC12 /* swab.cpp */,
 				A2BFA0651395FF62006ADC12 /* swab.h */,
 				A2BFA0661395FF62006ADC12 /* VFS.cpp */,
@@ -7883,6 +7895,7 @@
 				A2E66378139E883100310FC8 /* DisplayMessage.h in Headers */,
 				A25F91FC269CE6440045F07A /* EnumFlags.h in Headers */,
 				A2E66379139E883100310FC8 /* Effect.h in Headers */,
+				A2A05CDE2797C1A5000FB625 /* CString.h in Headers */,
 				A2111CCA1D0A49650044939E /* Timer.h in Headers */,
 				A27E5D6018106384009434E5 /* PluginLoader.h in Headers */,
 				A2E6637B139E883100310FC8 /* EffectMgr.h in Headers */,
@@ -7974,6 +7987,7 @@
 				A2E6640B139E885A00310FC8 /* Container.h in Headers */,
 				A2E6640D139E885A00310FC8 /* Door.h in Headers */,
 				A27217051CAE2678005F3976 /* Tooltip.h in Headers */,
+				A2A05CDA2797BEAA000FB625 /* StringConversion.h in Headers */,
 				A2F5F06A246102D70073802C /* CodepageToIconv.h in Headers */,
 				A2E6640F139E885A00310FC8 /* InfoPoint.h in Headers */,
 				A27E5D6218106384009434E5 /* VEFObject.h in Headers */,
@@ -9712,6 +9726,7 @@
 				A2D33FED24C2035A0081AC31 /* PathFinder.cpp in Sources */,
 				A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */,
 				A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */,
+				A2A05CDD2797C1A5000FB625 /* CString.cpp in Sources */,
 				A2E663EA139E884B00310FC8 /* TileOverlay.cpp in Sources */,
 				A2D672DD1B30F24400264D16 /* GUIFactory.cpp in Sources */,
 				A2E663EF139E884B00310FC8 /* Variables.cpp in Sources */,
@@ -9753,6 +9768,7 @@
 				A2DE329914EB071200117503 /* Logger.cpp in Sources */,
 				A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */,
 				A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */,
+				A2A05CD92797BEAA000FB625 /* StringConversion.cpp in Sources */,
 				A27E5D6118106384009434E5 /* VEFObject.cpp in Sources */,
 				A2969F0F168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
 				A2E27EF716EEA7B00079E104 /* InterfaceConfig.cpp in Sources */,

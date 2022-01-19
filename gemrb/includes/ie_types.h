@@ -29,7 +29,7 @@
 #define IE_TYPES_H
 
 #include "Platform.h"
-#include "System/String.h"
+#include "System/CString.h"
 
 namespace GemRB {
 
