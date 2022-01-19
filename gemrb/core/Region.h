@@ -176,8 +176,10 @@ using Regions = std::vector<Region>;
 
 }
 
+namespace fmt {
+
 template <>
-struct fmt::formatter<GemRB::Point> {
+struct formatter<GemRB::Point> {
 	char presentation = 'd';
 	
 	auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
@@ -203,5 +205,7 @@ struct fmt::formatter<GemRB::Point> {
 		return format_to(ctx.out(), "({:d}, {:d})", p.x, p.y);
 	}
 };
+
+}
 
 #endif  // ! REGION_H
