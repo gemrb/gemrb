@@ -22,7 +22,6 @@
 #cmakedefine HAVE_UNISTD_H 1
 #cmakedefine HAVE_LANGINFO_H 1
 #cmakedefine HAVE_DLFCN_H 1
-#cmakedefine HAS_WSTRING 1
 #cmakedefine HAVE_OPENAL_EFX_H 1
 #cmakedefine WIN32_USE_STDIO 1
 #cmakedefine RPI 1
