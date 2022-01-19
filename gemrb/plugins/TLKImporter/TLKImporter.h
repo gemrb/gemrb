@@ -62,8 +62,8 @@ private:
 	int ClassStrRef(int slot) const;
 	int RaceStrRef(int slot) const;
 	int GenderStrRef(int slot, int malestrref, int femalestrref) const;
-	const String& Gabber() const;
-	const String& CharName(int slot) const;
+	String Gabber() const;
+	String CharName(int slot) const;
 };
 
 }

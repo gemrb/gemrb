@@ -142,23 +142,22 @@ static inline Actor *GetActorFromSlot(int slot)
 	return game->FindPC(slot);
 }
 
-static String unknown(L"?");
-const String& TLKImporter::Gabber() const
+String TLKImporter::Gabber() const
 {
 	const Actor *act = core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
 		return act->GetName(1);
 	}
-	return unknown;
+	return L"?";
 }
 
-const String& TLKImporter::CharName(int slot) const
+String TLKImporter::CharName(int slot) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
 		return act->GetName(1);
 	}
-	return unknown;
+	return L"?";
 }
 
 int TLKImporter::ClassStrRef(int slot) const
