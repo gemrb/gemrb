@@ -32,11 +32,6 @@
 
 namespace GemRB {
 
-WMPAreaEntry::~WMPAreaEntry()
-{
-	free(StrTooltip);
-}
-
 void WMPAreaEntry::SetAreaStatus(ieDword arg, BitOp op)
 {
 	SetBits(AreaStatus, arg, op);
@@ -51,10 +46,10 @@ String WMPAreaEntry::GetCaption()
 	return StrCaption;
 }
 
-const char* WMPAreaEntry::GetTooltip()
+String WMPAreaEntry::GetTooltip()
 {
-	if (!StrTooltip) {
-		StrTooltip = core->GetCString(LocTooltipName);
+	if (StrTooltip.empty()) {
+		StrTooltip = core->GetString(LocTooltipName);
 	}
 	return StrTooltip;
 }

@@ -69,7 +69,6 @@ enum class WMPDirection {
 class GEM_EXPORT WMPAreaEntry {
 public:
 	WMPAreaEntry() = default;
-	~WMPAreaEntry();
 	ieDword GetAreaStatus() const;
 	void SetAreaStatus(ieDword status, BitOp op);
 
@@ -78,12 +77,12 @@ public:
 	// note that this is only valid after GetMapIcon has been called
 	bool HighlightSelected() const { return SingleFrame; }
 	String GetCaption();
-	const char* GetTooltip();
+	String GetTooltip();
 private:
 	ieDword AreaStatus = 0;
 	Holder<Sprite2D> MapIcon = nullptr;
 	String StrCaption;
-	char *StrTooltip = nullptr;
+	String StrTooltip;
 	bool SingleFrame = false;
 
 public:
