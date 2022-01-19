@@ -251,7 +251,7 @@ std::string Container::dump() const
 	std::string buffer;
 	AppendFormat(buffer, "Debugdump of Container {}\n", GetScriptName() );
 	AppendFormat(buffer, "Container Global ID: {}\n", GetGlobalID());
-	AppendFormat(buffer, "Position: {}.{}\n", Pos.x, Pos.y);
+	AppendFormat(buffer, "Position: {}\n", Pos);
 	AppendFormat(buffer, "Type: {}, Locked: {}, LockDifficulty: {}\n", containerType, YESNO(Flags&CONT_LOCKED), LockDifficulty);
 	AppendFormat(buffer, "Flags: {}, Trapped: {}, Detected: {}\n", Flags, YESNO(Trapped), TrapDetected );
 	AppendFormat(buffer, "Trap detection: {}%, Trap removal: {}%\n", TrapDetectionDiff,

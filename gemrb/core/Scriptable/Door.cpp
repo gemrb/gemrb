@@ -475,7 +475,7 @@ void Door::dump() const
 	std::string buffer;
 	AppendFormat(buffer, "Debugdump of Door {}:\n", GetScriptName() );
 	AppendFormat(buffer, "Door Global ID: {}\n", GetGlobalID());
-	AppendFormat(buffer, "Position: {}.{}\n", Pos.x, Pos.y);
+	AppendFormat(buffer, "Position: {}\n", Pos);
 	AppendFormat(buffer, "Door Open: {}\n", YESNO(IsOpen()));
 	AppendFormat(buffer, "Door Locked: {}	Difficulty: {}\n", YESNO(Flags&DOOR_LOCKED), LockDifficulty);
 	AppendFormat(buffer, "Door Trapped: {}	Difficulty: {}\n", YESNO(Trapped), TrapRemovalDiff);

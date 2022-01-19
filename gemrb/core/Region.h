@@ -176,4 +176,32 @@ using Regions = std::vector<Region>;
 
 }
 
+template <>
+struct fmt::formatter<GemRB::Point> {
+	char presentation = 'd';
+	
+	auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+		// [ctx.begin(), ctx.end()) is a character range that contains a part of
+		// the format string starting from the format specifications to be parsed,
+		// e.g. in
+		//
+		//   fmt::format("{:f} - point of interest", point{1, 2});
+		//
+		// the range will contain "f} - point of interest". The formatter should
+		// parse specifiers until '}' or the end of the range. In this example
+		// the formatter should parse the 'f' specifier and return an iterator
+		// pointing to '}'.
+
+		// Parse the presentation format and store it in the formatter:
+		auto it = ctx.end();
+		// TODO: implement parsing
+		return it;
+	}
+	
+	template <typename FormatContext>
+	auto format(const GemRB::Point& p, FormatContext &ctx) -> decltype(ctx.out()) {
+		return format_to(ctx.out(), "({:d}, {:d})", p.x, p.y);
+	}
+};
+
 #endif  // ! REGION_H
