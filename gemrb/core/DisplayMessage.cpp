@@ -28,16 +28,18 @@
 
 #include <cstdarg>
 
+#include <fmt/xchar.h>
+
 namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = NULL;
 
-static const wchar_t* const DisplayFormatName = L"[color=%08X]%ls - [/color][p][color=%08X]%ls[/color][/p]";
-static const wchar_t* const DisplayFormatAction = L"[color=%08X]%ls - [/color][p][color=%08X]%ls %ls[/color][/p]";
-static const wchar_t* const DisplayFormat = L"[p][color=%08X]%ls[/color][/p]";
-static const wchar_t* const DisplayFormatValue = L"[p][color=%08X]%ls: %d[/color][/p]";
-static const wchar_t* const DisplayFormatNameString = L"[color=%08X]%ls - [/color][p][color=%08X]%ls: %ls[/color][/p]";
-static const wchar_t* const DisplayFormatSimple = L"[p]%ls[/p]";
+static const auto DisplayFormatName = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{}[/color][/p]");
+static const auto DisplayFormatAction = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{} {}[/color][/p]");
+static const auto DisplayFormat = FMT_STRING(L"[p][color={:08X}]{}[/color][/p]");
+static const auto DisplayFormatValue = FMT_STRING(L"[p][color={:08X}]{}: {}[/color][/p]");
+static const auto DisplayFormatNameString = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{}: {}[/color][/p]");
+static const auto DisplayFormatSimple = FMT_STRING(L"[p]{}[/p]");
 
 DisplayMessage::StrRefs DisplayMessage::SRefs;
 
@@ -103,11 +105,8 @@ void DisplayMessage::DisplayMarkupString(const String& Text) const
 
 void DisplayMessage::DisplayString(const String& text) const
 {
-	size_t newlen = wcslen(DisplayFormatSimple) + text.length() + 1;
-	wchar_t *newstr = (wchar_t *) malloc(newlen * sizeof(wchar_t));
-	swprintf(newstr, newlen, DisplayFormatSimple, text.c_str());
-	DisplayMarkupString(newstr);
-	free(newstr);
+	String formatted = fmt::format(DisplayFormatSimple, text);
+	DisplayMarkupString(formatted);
 }
 
 Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) const
@@ -177,11 +176,8 @@ void DisplayMessage::DisplayString(const String& text, const Color &color, Scrip
 
 	const TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
-		size_t newlen = wcslen( DisplayFormat) + text.length() + 12;
-		wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
-		swprintf(newstr, newlen, DisplayFormat, color.Packed(), text.c_str());
-		DisplayMarkupString( newstr );
-		free( newstr );
+		String formatted = fmt::format(DisplayFormat, color.Packed(), text);
+		DisplayMarkupString(formatted);
 	}
 
 	if (target && l == NULL && ta == NULL) {
@@ -196,13 +192,8 @@ void DisplayMessage::DisplayConstantStringValue(int stridx, const Color &color, 
 {
 	if (stridx<0) return;
 	String text = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND);
-
-	size_t newlen = wcslen( DisplayFormatValue ) + text.length() + 10;
-	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
-	swprintf( newstr, newlen, DisplayFormatValue, color.Packed(), text.c_str(), value);
-
-	DisplayMarkupString( newstr );
-	free( newstr );
+	String formatted = fmt::format(DisplayFormatValue, color.Packed(), text, value);
+	DisplayMarkupString(formatted);
 }
 
 // String format is
@@ -216,16 +207,13 @@ void DisplayMessage::DisplayConstantStringNameString(int stridx, const Color &co
 	String text = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND);
 	String text2 = core->GetString(DisplayMessage::SRefs[stridx2], IE_STR_SOUND);
 
-	size_t newlen = text.length() + name.length() + text2.length();
-	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
 	if (!text2.empty()) {
-		swprintf( newstr, newlen, DisplayFormatNameString, actor_color.Packed(), name.c_str(), color.Packed(), text.c_str(), text2.c_str() );
+		String formated = fmt::format(DisplayFormatNameString, actor_color.Packed(), name, color.Packed(), text, text2);
+		DisplayMarkupString(formated);
 	} else {
-		swprintf( newstr, newlen, DisplayFormatName, color.Packed(), name.c_str(), color.Packed(), text.c_str() );
+		String formated = fmt::format(DisplayFormatName, color.Packed(), name, color.Packed(), text);
+		DisplayMarkupString(formated);
 	}
-
-	DisplayMarkupString( newstr );
-	free( newstr );
 }
 
 // String format is
@@ -266,11 +254,8 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, const Color &color,
 	GetSpeakerColor(name2, target);
 
 	String text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH );
-	size_t newlen = wcslen( DisplayFormatAction ) + name1.length() + name2.length() + text.length() + 18;
-	wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t));
-	swprintf( newstr, newlen, DisplayFormatAction, attacker_color.Packed(), name1.c_str(), color.Packed(), text.c_str(), name2.c_str());
-	DisplayMarkupString( newstr );
-	free( newstr );
+	String formatted = fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, color.Packed(), text, name2);
+	DisplayMarkupString(formatted);
 }
 
 // display tokenized strings like ~Open lock check. Open lock skill %d vs. lock difficulty %d (%d DEX bonus).~
@@ -308,11 +293,8 @@ void DisplayMessage::DisplayStringName(const String& text, const Color &color, c
 	if (name.length() == 0) {
 		DisplayString(text, color, NULL);
 	} else {
-		size_t newlen = wcslen(DisplayFormatName) + name.length() + text.length() + 18;
-		wchar_t* newstr = (wchar_t *) malloc(newlen * sizeof(wchar_t));
-		swprintf(newstr, newlen, DisplayFormatName, speaker_color.Packed(), name.c_str(), color, text.c_str());
-		DisplayMarkupString(newstr);
-		free(newstr);
+		String formatted = fmt::format(DisplayFormatName, speaker_color.Packed(), name, color.Packed(), text);
+		DisplayMarkupString(formatted);
 	}
 }
 }
