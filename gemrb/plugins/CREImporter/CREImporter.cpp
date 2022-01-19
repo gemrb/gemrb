@@ -854,18 +854,14 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	act->InParty = is_in_party;
 	str->ReadDword(act->LongStrRef);
 	//Beetle name in IWD needs the allow zero flag
-	String* poi = core->GetString( act->LongStrRef, IE_STR_ALLOW_ZERO );
-	assert(poi);
-	act->SetName(*poi, 1); //setting longname
-	delete poi;
+	String poi = core->GetString( act->LongStrRef, IE_STR_ALLOW_ZERO );
+	act->SetName(poi, 1); //setting longname
 	str->ReadDword(act->ShortStrRef);
 	if (act->ShortStrRef == (ieStrRef) -1) {
 		act->ShortStrRef = act->LongStrRef;
 	}
 	poi = core->GetString(act->ShortStrRef);
-	assert(poi);
-	act->SetName(*poi, 2); //setting shortname (for tooltips)
-	delete poi;
+	act->SetName(poi, 2); //setting shortname (for tooltips)
 	act->BaseStats[IE_VISUALRANGE] = VOODOO_VISUAL_RANGE; // not stored anywhere
 	act->BaseStats[IE_DIALOGRANGE] = VOODOO_DIALOG_RANGE;
 	str->ReadDword(act->BaseStats[IE_MC_FLAGS]);

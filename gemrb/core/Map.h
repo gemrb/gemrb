@@ -212,11 +212,7 @@ public:
 	: strref(ref), readonly(readonly)
 	{
 		color = Clamp<ieWord>(c, 0, 8);
-		String* tmp = core->GetString(ref);
-		if (tmp) {
-			text = std::move(*tmp);
-			delete tmp;
-		}
+		text = core->GetString(ref);
 	}
 
 	const Color& GetColor() const {

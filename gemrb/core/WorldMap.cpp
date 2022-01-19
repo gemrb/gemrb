@@ -34,7 +34,6 @@ namespace GemRB {
 
 WMPAreaEntry::~WMPAreaEntry()
 {
-	delete StrCaption;
 	free(StrTooltip);
 }
 
@@ -44,9 +43,9 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, BitOp op)
 	MapIcon = nullptr;
 }
 
-const String* WMPAreaEntry::GetCaption()
+String WMPAreaEntry::GetCaption()
 {
-	if (!StrCaption) {
+	if (StrCaption.empty()) {
 		StrCaption = core->GetString(LocCaptionName);
 	}
 	return StrCaption;

@@ -395,9 +395,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				textCol.a = bgCol.a = 0xff;
 
 				str->ReadWord(alignment);
-				String* str = core->GetString( StrRef );
-				Label* lab = new Label(ctrlFrame, fnt, *str);
-				delete str;
+				String str = core->GetString( StrRef );
+				Label* lab = new Label(ctrlFrame, fnt, str);
 
 				if (alignment & 1) {
 					lab->SetFlags(Label::UseColor, BitOp::OR);

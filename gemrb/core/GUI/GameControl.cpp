@@ -138,7 +138,6 @@ GameControl::~GameControl()
 	}
 
 	delete dialoghandler;
-	delete DisplayText;
 }
 
 //returns a single point offset for a formation
@@ -620,12 +619,12 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		}
 	}
 
-	if (core->HasFeature(GF_ONSCREEN_TEXT) && DisplayText) {
-		core->GetTextFont()->Print(screen, *DisplayText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, {core->InfoTextColor, ColorBlack});
+	if (core->HasFeature(GF_ONSCREEN_TEXT) && !DisplayText.empty()) {
+		core->GetTextFont()->Print(screen, DisplayText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, {core->InfoTextColor, ColorBlack});
 		if (!(DialogueFlags & DF_FREEZE_SCRIPTS)) {
 			// just replicating original engine behaviour
 			if (DisplayTextTime == 0) {
-				SetDisplayText((String*)NULL, 0);
+				SetDisplayText(L"", 0);
 			} else {
 				DisplayTextTime--;
 			}
@@ -1184,10 +1183,8 @@ String GameControl::TooltipText() const {
 				strindex = STR_INJURED4;
 			}
 			strindex = displaymsg->GetStringReference(strindex);
-			String* injuredstring = core->GetString(strindex, 0);
-			assert(injuredstring); // we just "checked" for these (by checking for STR_UNINJURED)
-			tip += L"\n" + *injuredstring;
-			delete injuredstring;
+			String injuredstring = core->GetString(strindex, 0);
+			tip += L"\n" + injuredstring;
 		}
 	}
 
@@ -2623,9 +2620,8 @@ void GameControl::SetupCasting(const ResRef& spellname, int type, int level, int
 	spellCount = cnt;
 }
 
-void GameControl::SetDisplayText(String* text, unsigned int time)
+void GameControl::SetDisplayText(const String& text, unsigned int time)
 {
-	delete DisplayText;
 	DisplayTextTime = time;
 	DisplayText = text;
 }

@@ -894,20 +894,18 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
 		}
 	}
 
-	const String* spell = core->GetString(spl->SpellName);
-	if (spell->length() && Type == ST_ACTOR) {
+	const String spell = core->GetString(spl->SpellName);
+	if (!spell.empty() && Type == ST_ACTOR) {
 		wchar_t str[256];
 
 		if (target) {
-			const String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName().c_str());
-			delete msg;
+			const String msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg.c_str(), spell.c_str(), target->GetName().c_str());
 		} else {
-			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls : %s", spell->c_str(), GetName().c_str());
+			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls : %s", spell.c_str(), GetName().c_str());
 		}
 		displaymsg->DisplayStringName(str, DMC_WHITE, this);
 	}
-	delete spell;
 }
 
 // NOTE: currently includes the sender
@@ -1192,11 +1190,9 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
 			wchar_t tmpstr[100];
 			// eg. .:Casts Word of Recall:.
-			const String* castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
-			const String* spellname = core->GetString(spl->SpellName);
-			swprintf(tmpstr, sizeof(tmpstr)/sizeof(tmpstr[0]), L".:%ls %ls:.", castmsg->c_str(), spellname->c_str());
-			delete castmsg;
-			delete spellname;
+			const String castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
+			const String spellname = core->GetString(spl->SpellName);
+			swprintf(tmpstr, sizeof(tmpstr)/sizeof(tmpstr[0]), L".:%ls %ls:.", castmsg.c_str(), spellname.c_str());
 
 			SetOverheadText(tmpstr);
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
@@ -1450,11 +1446,9 @@ int Scriptable::CheckWildSurge()
 			// display feedback: Wild Surge: bla bla
 			// look up the spell in the "check" row of wildmag.2da
 			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
-			String* s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
-			String* s2 = core->GetString(surgeSpell.message, 0);
-			displaymsg->DisplayStringName(*s1 + L" " + *s2, DMC_WHITE, this);
-			delete s1;
-			delete s2;
+			const String s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
+			const String s2 = core->GetString(surgeSpell.message, 0);
+			displaymsg->DisplayStringName(s1 + L" " + s2, DMC_WHITE, this);
 
 			if (!gamedata->Exists(surgeSpell.spell, IE_SPL_CLASS_ID)) {
 				// handle the hardcoded cases - they'll also fail here

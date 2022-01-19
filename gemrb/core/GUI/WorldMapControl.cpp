@@ -141,8 +141,8 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
-		const String* caption = m->GetCaption();
-		if (ftext == nullptr || caption == nullptr)
+		const String caption = m->GetCaption();
+		if (ftext == nullptr || caption.empty())
 			continue;
 
 		const Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
@@ -162,10 +162,10 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		
 		colors.bg = gamedata->GetColor("MAPTXTBG");
 
-		Size ts = ftext->StringSize(*caption);
+		Size ts = ftext->StringSize(caption);
 		ts.w += 10;
 		ftext->Print(Region(Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts),
-					 *caption, 0, colors);
+					 caption, 0, colors);
 	}
 }
 
@@ -229,8 +229,8 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			rgn.w = icon->Frame.w;
 			rgn.h = icon->Frame.h;
 		}
-		if (ftext && ae->GetCaption()) {
-			Size ts = ftext->StringSize(*ae->GetCaption());
+		if (ftext) {
+			Size ts = ftext->StringSize(ae->GetCaption());
 			ts.w += 10;
 			if (rgn.h < ts.h)
 				rgn.h = ts.h;
@@ -242,13 +242,10 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 		SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
 		Area = ae;
 		if (oldArea != ae) {
-			const String* str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
+			const String str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
 			int hours = worldmap->GetDistance(Area->AreaName);
-			if (str && !str->empty() && hours >= 0) {
-				wchar_t dist[10];
-				swprintf(dist, 10, L": %d", hours);
-				SetTooltip(*str + dist);
-				delete str;
+			if (!str.empty() && hours >= 0) {
+				SetTooltip(str + L": " + std::to_wstring(hours));
 			}
 		}
 		break;

@@ -102,7 +102,7 @@ private:
 	PathNode* drawPath = nullptr;
 	unsigned int ScreenFlags = SF_CENTERONACTOR;
 	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
-	String* DisplayText = nullptr;
+	String DisplayText;
 	unsigned int DisplayTextTime = 0;
 	bool AlwaysRun = false;
 	Actor *user = nullptr; //the user of item or spell
@@ -183,7 +183,7 @@ public:
 	void SetDialogueFlags(unsigned int value, BitOp mode);
 	int GetScreenFlags() const { return ScreenFlags; }
 	int GetDialogueFlags() const { return DialogueFlags; }
-	void SetDisplayText(String* text, unsigned int time);
+	void SetDisplayText(const String& text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	void ClearMouseState();
 	Point GameMousePos() const;

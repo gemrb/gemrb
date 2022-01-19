@@ -1481,10 +1481,9 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 	}
 
 	if (PyObject_TypeCheck(str, &PyLong_Type)) { // strref
-		ieStrRef StrRef = ieStrRef(PyLong_AsLong(str));
-		String* string = core->GetString( StrRef );
+		ieStrRef StrRef = ieStrRef(PyLong_AsLong( str ));
+		String string = core->GetString(StrRef);
 		ctrl->SetText(string);
-		delete string;
 	} else if (str == Py_None) {
 		// clear the text
 		ctrl->SetText(NULL);
@@ -1537,15 +1536,15 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 	TextArea* ta = GetView<TextArea>(self);
 	ABORT_IF_NULL(ta);
 
-	String* str = NULL;
 	if (PyObject_TypeCheck(pystr, &PyUnicode_Type)) {
-		str = PyString_AsStringObj(pystr);
+		String* str = PyString_AsStringObj(pystr);
+		if (str) {
+			ta->AppendText(*str);
+			delete str;
+		}
 	} else if (PyObject_TypeCheck(pystr, &PyLong_Type)) {
-		str = core->GetString(ieStrRef(PyLong_AsLong(pystr)), flags);
-	}
-	if (str) {
-		ta->AppendText( *str );
-		delete str;
+		String str = core->GetString(ieStrRef(PyLong_AsLong(pystr)), flags);
+		ta->AppendText(str);
 	}
 
 	Py_RETURN_NONE;
@@ -1553,11 +1552,10 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 
 static inline void SetViewTooltipFromRef(View* view, ieStrRef ref)
 {
-	String* string = core->GetString(ref);
-	if (string && view) {
-		view->SetTooltip(*string);
+	String string = core->GetString(ref);
+	if (view) {
+		view->SetTooltip(string);
 	}
-	delete string;
 }
 
 PyDoc_STRVAR( GemRB_View_SetTooltip__doc,
@@ -4944,7 +4942,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 		String* string = NULL;
 		if(!PyUnicode_Check(item)) {
 			if (PyLong_Check(item)) {
-				string = core->GetString(ieStrRef(PyLong_AsLong(item)));
+				string = new String(core->GetString(ieStrRef(PyLong_AsLong(item))));
 			} else {
 				return NULL;
 			}

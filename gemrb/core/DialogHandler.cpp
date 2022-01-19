@@ -75,21 +75,18 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr)
 	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
 		String msg(L"\n[color=bcefbc]");
 		ieStrRef strJournalChange = displaymsg->GetStringReference(STR_JOURNALCHANGE);
-		String* str = core->GetString(strJournalChange);
-		msg += *str;
-		delete str;
-		str = core->GetString(tr->journalStrRef);
-		if (str && str->length()) {
+		msg += core->GetString(strJournalChange);
+		String str = core->GetString(tr->journalStrRef);
+		if (!str.empty()) {
 			//cutting off the strings at the first crlf
-			size_t newlinePos = str->find_first_of(L'\n');
+			size_t newlinePos = str.find_first_of(L'\n');
 			if (newlinePos != String::npos) {
-				str->resize( newlinePos );
+				str.resize( newlinePos );
 			}
-			msg += L" - [/color][p][color=ffd4a9]" + *str + L"[/color][/p]";
+			msg += L" - [/color][p][color=ffd4a9]" + str + L"[/color][/p]";
 		} else {
 			msg += L"[/color]\n";
 		}
-		delete str;
 		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayMarkupString(msg);
 		// pst also has a sound attached to the base string, so play it manually
 		// NOTE: this doesn't display the string anywhere
@@ -271,9 +268,8 @@ static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& op
 			core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BitOp::OR);
 			break;
 		} else {
-			String* string = core->GetString(ds->transitions[x]->textStrRef);
-			options.emplace_back(x, *string);
-			delete string;
+			String string = core->GetString(ds->transitions[x]->textStrRef);
+			options.emplace_back(x, string);
 		}
 	}
 
