@@ -43,7 +43,6 @@
 
 #include "Region.h"
 #include "System/DataStream.h"
-#include "System/String.h"
 
 #include <algorithm>
 #include <bitset>

@@ -20,8 +20,6 @@
 
 #include "FactoryObject.h"
 
-#include "System/String.h"
-
 namespace GemRB {
 
 FactoryObject::FactoryObject(const ResRef &name, SClass_ID SuperClassID)

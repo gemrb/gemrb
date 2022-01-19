@@ -23,7 +23,6 @@
 #include <string>
 
 #include "exports.h"
-#include "System/String.h"
 #include "SaveGame.h"
 
 namespace GemRB {
