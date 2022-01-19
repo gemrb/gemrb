@@ -49,7 +49,7 @@ public:
 	void CloseAux() final;
 	bool Open(DataStream* stream) override;
 	/** construct a new custom string */
-	ieStrRef UpdateString(ieStrRef strref, const char *newvalue) override;
+	ieStrRef UpdateString(ieStrRef strref, const String& newvalue) override;
 	/** resolve a string reference */
 	String GetString(ieStrRef strref, ieDword flags = 0) override;
 	char* GetCString(ieStrRef strref, ieDword flags = 0) override;

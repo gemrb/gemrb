@@ -1658,10 +1658,17 @@ const char* Interface::TypeExt(SClass_ID type) const
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
 {
-	char *current = GetCString(strref, 0);
-	bool changed = strcmp(text, current) != 0;
-	free(current);
-	if (changed) {
+	String* str = StringFromCString(text);
+	if (str) {
+		return UpdateString(strref, *str);
+	}
+	return -1;
+}
+
+ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
+{
+	String current = GetString(strref, 0);
+	if (current != text) {
 		return strings->UpdateString( strref, text );
 	} else {
 		return strref;
