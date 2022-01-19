@@ -30,11 +30,7 @@
 
 namespace GemRB {
 
-#ifdef HAS_WSTRING
-using String = std::wstring;
-#else
 using String = std::basic_string<wchar_t>;
-#endif
 
 // char manipulators
 inline wchar_t tolower(wchar_t c) { return ::towlower(c); }

@@ -30,10 +30,6 @@ IF(HAVE_MMAP OR WIN32)
 	SET(SUPPORTS_MEMSTREAM 1)
 ENDIF()
 
-INCLUDE (CheckCXXSourceCompiles)
-check_cxx_source_compiles("#include <string>
-	std::wstring a; int main(void) {return 0;}" HAS_WSTRING)
-
 #Unneeded on windows
 IF(NOT WIN32)
 	INCLUDE (CheckCXXSourceCompiles)
