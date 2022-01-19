@@ -87,7 +87,7 @@ struct WideToChar {
 };
 
 template <>
-struct fmt::formatter<WideToChar> {
+struct formatter<WideToChar> {
 	// FIXME: parser doesnt do anything
 	static constexpr auto parse(const format_parse_context& ctx) -> decltype(ctx.begin()) { return ctx.begin(); }
 
