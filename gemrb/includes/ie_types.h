@@ -30,6 +30,7 @@
 
 #include "Platform.h"
 #include "System/CString.h"
+#include "System/String.h"
 
 namespace GemRB {
 
@@ -95,6 +96,26 @@ public:
 };
 
 using ResRef = FixedSizeString<8, strnicmp>;
+
+}
+
+namespace fmt {
+
+template <>
+struct fmt::formatter<GemRB::ResRef> : formatter<const char*> {
+	template <typename FormatContext>
+	auto format(const GemRB::ResRef& resref, FormatContext &ctx) -> decltype(ctx.out()) {
+		return format_to(ctx.out(), resref.CString());
+	}
+};
+
+template <>
+struct fmt::formatter<GemRB::ieVariable> : formatter<const char*> {
+	template <typename FormatContext>
+	auto format(const GemRB::ieVariable& var, FormatContext &ctx) -> decltype(ctx.out()) {
+		return format_to(ctx.out(), var.CString());
+	}
+};
 
 }
 
