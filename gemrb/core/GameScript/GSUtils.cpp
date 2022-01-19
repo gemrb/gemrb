@@ -490,18 +490,18 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		if (!sb.Sound.IsEmpty()) {
 			strlcpy(Sound, sb.Sound, sizeof(Sound));
 		}
-		if (sb.text) {
+		if (!sb.text.empty()) {
 			if (flags & DS_CONSOLE) {
 				//can't play the sound here, we have to delay action
 				//and for that, we have to know how long the text takes
 				if(flags&DS_NONAME) {
-					displaymsg->DisplayString(*sb.text);
+					displaymsg->DisplayString(sb.text);
 				} else {
 					displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
 				}
 			}
 			if (flags & (DS_HEAD | DS_AREA)) {
-				Sender->SetOverheadText( *sb.text );
+				Sender->SetOverheadText(sb.text);
 				if (flags & DS_AREA) {
 					Sender->FixHeadTextPos();
 				}

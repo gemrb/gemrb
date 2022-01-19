@@ -203,7 +203,7 @@ int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref) const
 }
 
 //if this function returns nullptr then it is not a built in token
-String* TLKImporter::BuiltinToken(const char* Token)
+String TLKImporter::BuiltinToken(const char* Token)
 {
 	gt_type *entry = NULL;
 
@@ -236,17 +236,17 @@ String* TLKImporter::BuiltinToken(const char* Token)
 
 	// handle Player10 (max for MaxPartySize), then the rest
 	if (!strncmp(Token, "PLAYER10", 8)) {
-		return new String(CharName(10));
+		return CharName(10);
 	}
 	if (!strncmp( Token, "PLAYER", 6 )) {
-		return new String(CharName(Token[strlen(Token)-1]-'1'));
+		return CharName(Token[strlen(Token)-1]-'1');
 	}
 
 	if (!strcmp( Token, "GABBER" )) {
-		return new String(Gabber());
+		return Gabber();
 	}
 	if (!strcmp( Token, "CHARNAME" )) {
-		return new String(CharName(charname));
+		return CharName(charname);
 	}
 	if (!strcmp( Token, "PRO_CLASS" )) {
 		return GetString(ClassStrRef(0), 0);
@@ -265,10 +265,10 @@ String* TLKImporter::BuiltinToken(const char* Token)
 		}
 	}
 	if (!strcmp( Token, "TM" )) {
-		return new String(L"\x99");
+		return L"\x99";
 	}
 
-	return nullptr;
+	return L"";
 }
 
 String TLKImporter::ResolveTags(const String& source)
@@ -290,8 +290,8 @@ String TLKImporter::ResolveTags(const String& source)
 		auto srcch = source[i];
 		if (srcch == L'<') {
 			i = mystrncpy(Token, i + 1, MAX_VARIABLE_LENGTH, '>');
-			String* str = BuiltinToken(Token);
-			if (str == nullptr) {
+			String str = BuiltinToken(Token);
+			if (str.empty()) {
 				int TokenLength = core->GetTokenDictionary()->GetValueLength(Token);
 				if (TokenLength) {
 					char* tokVal = new char[TokenLength + 1];
@@ -302,8 +302,7 @@ String TLKImporter::ResolveTags(const String& source)
 					delete tmp;
 				}
 			} else {
-				dest.append(*str);
-				delete str;
+				dest.append(str);
 			}
 		} else if (srcch == L'[') {
 			// voice actor directives
@@ -326,9 +325,9 @@ ieStrRef TLKImporter::UpdateString(ieStrRef strref, const char *newvalue)
 	return OverrideTLK->UpdateString(strref, newvalue);
 }
 
-String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
+String TLKImporter::GetString(ieStrRef strref, ieDword flags)
 {
-	String* string = nullptr;
+	String string;
 	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
 	ieWord type;
 	size_t Length;
@@ -336,7 +335,7 @@ String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
 
 	if (empty || strref >= STRREF_START || (strref >= BIO_START && strref <= BIO_END)) {
 		if (OverrideTLK) {
-			string = StringFromCString(OverrideTLK->ResolveAuxString(strref, Length));
+			string = *StringFromCString(OverrideTLK->ResolveAuxString(strref, Length));
 		} else {
 			Length = 0;
 		}
@@ -346,7 +345,7 @@ String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
 		ieDword Volume, Pitch, StrOffset;
 		ieDword l;
 		if (str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START ) == GEM_ERROR) {
-			return new String;
+			return L"";
 		}
 		str->ReadWord(type);
 		str->ReadResRef( SoundResRef );
@@ -363,17 +362,16 @@ String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
 			char* cstr = (char *)malloc(Length + 1);
 			cstr[Length] = '\0';
 			str->Read(cstr, Length);
-			string = StringFromCString(cstr);
+			string = *StringFromCString(cstr);
 			free(cstr);
 		} else {
 			Length = 0;
-			string = new String;
 		}
 	}
 
 	//tagged text, bg1 and iwd don't mark them specifically, all entries are tagged
 	if (core->HasFeature( GF_ALL_STRINGS_TAGGED ) || ( type & 4 )) {
-		*string = ResolveTags(*string);
+		string = ResolveTags(string);
 	}
 	if (type & 2 && flags & IE_STR_SOUND && !SoundResRef.IsEmpty()) {
 		// GEM_SND_SPEECH will stop the previous sound source
@@ -381,15 +379,15 @@ String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
 		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
 	}
 	if (flags & IE_STR_STRREFON) {
-		*string = std::to_wstring(strref) + L": " + *string;
+		string = std::to_wstring(strref) + L": " + string;
 	}
 	return string;
 }
 
 char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 {
-	String* string = GetString(strref, flags);
-	return string ? MBCStringFromString(*string) : nullptr;
+	String string = GetString(strref, flags);
+	return MBCStringFromString(string);
 }
 
 bool TLKImporter::HasAltTLK() const

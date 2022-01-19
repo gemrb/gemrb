@@ -1682,7 +1682,7 @@ char* Interface::GetCString(ieStrRef strref, ieDword options) const
 	}
 }
 
-String* Interface::GetString(ieStrRef strref, ieDword options) const
+String Interface::GetString(ieStrRef strref, ieDword options) const
 {
 	ieDword flags = 0;
 
@@ -2454,7 +2454,7 @@ int Interface::PlayMovie(const char* resref)
 		using FrameMap = std::map<size_t, ieStrRef>;
 		FrameMap subs;
 		mutable size_t nextSubFrame;
-		mutable String* cachedSub;
+		mutable String cachedSub;
 
 	public:
 		// default color taken from BGEE.lua
@@ -2462,7 +2462,6 @@ int Interface::PlayMovie(const char* resref)
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
 			AutoTable sttable = gamedata->LoadTable(resref);
-			cachedSub = NULL;
 			nextSubFrame = 0;
 
 			for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
@@ -2472,10 +2471,6 @@ int Interface::PlayMovie(const char* resref)
 					subs[atoi(frameField)] = atoi(strField);
 				}
 			}
-		}
-
-		~IESubtitles() override {
-			delete cachedSub;
 		}
 
 		size_t NextSubtitleFrame() const override {
@@ -2491,12 +2486,10 @@ int Interface::PlayMovie(const char* resref)
 				if (it != subs.begin()) {
 					--it;
 				}
-				delete cachedSub;
 				cachedSub = core->GetString(it->second);
 			}
 
-			assert(cachedSub);
-			return *cachedSub;
+			return cachedSub;
 		}
 	};
 

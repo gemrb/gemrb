@@ -40,16 +40,12 @@ namespace GemRB {
  */
 
 struct StringBlock {
-	const String* text = nullptr;
+	const String text;
 	ResRef Sound;
 
 	StringBlock() = default;
-	StringBlock(const String* text, const ResRef& soundRef)
-	: text(text), Sound(soundRef) {}
-
-	~StringBlock() {
-		delete text;
-	}
+	StringBlock(String text, const ResRef& soundRef)
+	: text(std::move(text)), Sound(soundRef) {}
 };
 
 /**
@@ -63,7 +59,7 @@ public:
 	virtual void CloseAux() = 0;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual char* GetCString(ieStrRef strref, unsigned int flags = 0) = 0;
-	virtual String* GetString(ieStrRef strref, unsigned int flags = 0) = 0;
+	virtual String GetString(ieStrRef strref, unsigned int flags = 0) = 0;
 	virtual StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) = 0;
 	virtual ieStrRef UpdateString(ieStrRef strref, const char *text) = 0;
 	virtual bool HasAltTLK() const = 0;

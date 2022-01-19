@@ -505,7 +505,7 @@ void Actor::SetName(const String& str, unsigned char type)
 
 void Actor::SetName(int strref, unsigned char type)
 {
-	String* name = nullptr;
+	String name;
 	if (type <= 1) {
 		name = core->GetString(strref);
 		LongStrRef = strref;
@@ -515,8 +515,7 @@ void Actor::SetName(int strref, unsigned char type)
 		name = core->GetString(strref);
 		ShortStrRef = strref;
 	}
-	SetName(*name, type);
-	free(name);
+	SetName(name, type);
 }
 
 void Actor::SetAnimationID(unsigned int AnimID)
@@ -3373,10 +3372,8 @@ void Actor::RefreshPCStats() {
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
-				String* text = core->GetString(28895);
-				text->push_back(L'1');
-				displaymsg->DisplayString(*text, DMC_BG2XPGREEN, this);
-				delete text;
+				String text = core->GetString(28895) + L'1';
+				displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
 			}
 		} else{
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
@@ -3539,11 +3536,8 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		static const Actor *prevActor = nullptr;
 		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
-			String *str = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
-			wchar_t tmp[20];
-			swprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), L" %d", ret);
-			String msg = *str + tmp;
-			delete str;
+			String msg = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
+			msg += L" " + std::to_wstring(ret);
 			displaymsg->DisplayStringName(msg, DMC_WHITE, this);
 		}
 		prevType = type;
@@ -4670,11 +4664,10 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
-			String* msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
+			String msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
 			wchar_t dmg[10];
 			swprintf(dmg, sizeof(dmg)/sizeof(dmg[0]), L" (%d)", damage);
-			displaymsg->DisplayStringName(*msg + dmg, DMC_WHITE, this);
-			delete msg;
+			displaymsg->DisplayStringName(msg + dmg, DMC_WHITE, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
 			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName(1));
@@ -7421,7 +7414,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		// log the roll
 		wchar_t rollLog[100];
 		const wchar_t *fmt = L"%ls %d %ls %d = %d : %ls";
-		String *leftRight, *hitMiss;
+		String leftRight, hitMiss;
 		if (leftorright && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
 			leftRight = core->GetString(displaymsg->GetStringReference(STR_ATTACK_ROLL_L));
 		} else {
@@ -7432,10 +7425,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		} else {
 			hitMiss = core->GetString(displaymsg->GetStringReference(STR_MISS));
 		}
-		swprintf(rollLog, 100, fmt, leftRight->c_str(), roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss->c_str());
+		swprintf(rollLog, 100, fmt, leftRight.c_str(), roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss.c_str());
 		displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
-		delete leftRight;
-		delete hitMiss;
 	}
 
 	if (roll == 1) {
@@ -9256,16 +9247,16 @@ bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
 
 	if (success) {
 		if (core->HasFeedback(FT_CASTING)) {
-			const String *txt = core->GetString(24198);
-			displaymsg->DisplayStringName(*txt, DMC_WHITE, this);
+			const String txt = core->GetString(24198);
+			displaymsg->DisplayStringName(txt, DMC_WHITE, this);
 		}
 		return true;
 	}
 
 	// don't play with powers you don't comprehend!
 	if (core->HasFeedback(FT_CASTING)) {
-		const String *txt = core->GetString(24197);
-		displaymsg->DisplayStringName(*txt, DMC_WHITE, this);
+		const String txt = core->GetString(24197);
+		displaymsg->DisplayStringName(txt, DMC_WHITE, this);
 	}
 	Damage(core->Roll(level, 6, 0), DAMAGE_MAGIC, nullptr);
 	return false;

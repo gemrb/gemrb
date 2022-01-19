@@ -51,7 +51,7 @@ public:
 	/** construct a new custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *newvalue) override;
 	/** resolve a string reference */
-	String* GetString(ieStrRef strref, ieDword flags = 0) override;
+	String GetString(ieStrRef strref, ieDword flags = 0) override;
 	char* GetCString(ieStrRef strref, ieDword flags = 0) override;
 	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) override;
 	bool HasAltTLK() const override;
@@ -59,9 +59,7 @@ private:
 	/** resolves day and monthname tokens */
 	void GetMonthName(int dayandmonth);
 	String ResolveTags(const String& source);
-	/**returns the decoded length of the built-in token
-		 if dest is not NULL it also returns the decoded value */
-	String* BuiltinToken(const char* Token);
+	String BuiltinToken(const char* Token);
 	int ClassStrRef(int slot) const;
 	int RaceStrRef(int slot) const;
 	int GenderStrRef(int slot, int malestrref, int femalestrref) const;

@@ -77,12 +77,12 @@ public:
 	Holder<Sprite2D> GetMapIcon(const AnimationFactory *bam);
 	// note that this is only valid after GetMapIcon has been called
 	bool HighlightSelected() const { return SingleFrame; }
-	const String* GetCaption();
+	String GetCaption();
 	const char* GetTooltip();
 private:
 	ieDword AreaStatus = 0;
 	Holder<Sprite2D> MapIcon = nullptr;
-	String* StrCaption = nullptr;
+	String StrCaption;
 	char *StrTooltip = nullptr;
 	bool SingleFrame = false;
 
