@@ -4657,9 +4657,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			displaymsg->DisplayConstantStringName(strref, DMC_WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
 			//TODO: handle pst properly (decay, queueing, color)
-			wchar_t dmg[10];
-			swprintf(dmg, sizeof(dmg)/sizeof(dmg[0]), L"%d", damage);
-			SetOverheadText(dmg, true);
+			SetOverheadText(std::to_wstring(damage), true);
 		} else if (!displaymsg->HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
