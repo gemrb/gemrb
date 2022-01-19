@@ -78,7 +78,6 @@
 #include "Scriptable/Container.h"
 #include "System/FileStream.h"
 #include "System/FileFilters.h"
-#include "System/StringBuffer.h"
 
 #include <utility>
 #include <vector>
@@ -2690,21 +2689,21 @@ bool Interface::SaveConfig()
 
 	if (INIStream && defaultsINI->Open(INIStream)) {
 		// dump the formatted default config options to the file
-		StringBuffer contents;
+		std::string contents;
 		for (int i = 0; i < defaultsINI->GetTagsCount(); i++) {
 			const char* tag = defaultsINI->GetTagNameByIndex(i);
 			// write section header
-			contents.appendFormatted("[%s]\n", tag);
+			AppendFormat(contents, "[{}]\n", tag);
 			for (int j = 0; j < defaultsINI->GetKeysCount(tag); j++) {
 				const char* key = defaultsINI->GetKeyNameByIndex(tag, j);
 				ieDword value = 0;
 				bool found = vars->Lookup(key, value);
 				assert(found);
-				contents.appendFormatted("%s = %d\n", key, value);
+				AppendFormat(contents, "{} = {}\n", key, value);
 			}
 		}
 
-		fs->Write(contents.get().c_str(), contents.get().size());
+		fs->Write(contents.c_str(), contents.size());
 	} else {
 		Log(ERROR, "Core", "Unable to open GemRB defaults. Cannot determine what values to write to %s.", ini_path);
 	}

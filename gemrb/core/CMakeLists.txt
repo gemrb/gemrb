@@ -108,7 +108,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/CString.cpp
 	System/String.cpp
 	System/StringConversion.cpp
-	System/StringBuffer.cpp
 	System/swab.cpp
 	System/VFS.cpp
 	Video/Pixels.cpp

@@ -35,7 +35,6 @@
 #include "Scriptable/Actor.h"
 #include "Spell.h" //needs for the source flags bitfield
 #include "TableMgr.h"
-#include "System/StringBuffer.h"
 
 #include <cstdio>
 #include "GameData.h"
@@ -2047,24 +2046,19 @@ bool EffectQueue::HasAnyDispellableEffect() const
 	return false;
 }
 
-void EffectQueue::dump() const
+std::string EffectQueue::dump() const
 {
-	StringBuffer buffer;
-	dump(buffer);
-	Log(DEBUG, "EffectQueue", buffer);
-}
-
-void EffectQueue::dump(StringBuffer& buffer) const
-{
-	buffer.append("EFFECT QUEUE:\n");
+	std::string buffer("EFFECT QUEUE:\n");
 	int i = 0;
 	for (const Effect *fx : effects) {
 		if (fx->Opcode >= MAX_EFFECTS) {
 			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: %d! Report this immediately!", fx->Opcode);
-			return;
+			return buffer;
 		}
-		buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->SourceRef.CString());
+		AppendFormat(buffer, " {:2d}: 0x{:02x}: {} ({}, {}) S:{}\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->SourceRef);
 	}
+	Log(DEBUG, "EffectQueue", buffer);
+	return buffer;
 }
 
 //returns true if the effect supports simplified duration

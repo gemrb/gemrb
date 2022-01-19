@@ -51,7 +51,6 @@
 #include "PluginMgr.h"
 #include "TableMgr.h"
 #include "RNG.h"
-#include "System/StringBuffer.h"
 
 #include <cstdarg>
 
@@ -1386,16 +1385,16 @@ static void CleanupIEScript()
 	overrideTriggersTable.reset();
 }
 
-static void printFunction(StringBuffer& buffer, const std::shared_ptr<SymbolMgr>& table, int index)
+static void printFunction(std::string& buffer, const std::shared_ptr<SymbolMgr>& table, int index)
 {
 	const char *str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
 
 	int len = strchr(str,'(')-str;
 	if (len<0) {
-		buffer.appendFormatted("%d %s", value, str);
+		AppendFormat(buffer, "{} {}", value, str);
 	} else {
-		buffer.appendFormatted("%d %.*s", value, len, str);
+		AppendFormat(buffer, "{} {:*^{}}", value, str, len);
 	}
 }
 
@@ -1513,15 +1512,13 @@ void InitializeIEScript()
 
 		if (triggers[i]) {
 			if (poi && triggers[i]!=poi->Function) {
-				StringBuffer buffer;
-				buffer.appendFormatted("%s is in collision with ",
+				std::string buffer = fmt::format("{} is in collision with ",
 					triggersTable->GetStringIndex( j ) );
 				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", buffer);
 			} else {
 				if (core->InDebugMode(ID_TRIGGERS)) {
-					StringBuffer buffer;
-					buffer.appendFormatted("%s is a synonym of ",
+					std::string buffer = fmt::format("{} is a synonym of ",
 						triggersTable->GetStringIndex( j ) );
 					printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
 					Log(DEBUG, "GameScript", buffer);
@@ -1562,8 +1559,7 @@ void InitializeIEScript()
 			continue;
 		}
 
-		StringBuffer buffer;
-		buffer.append("Couldn't assign function to trigger: ");
+		std::string buffer("Couldn't assign function to trigger: ");
 		printFunction(buffer, triggersTable, j);
 		Log(WARNING, "GameScript", buffer);
 	}
@@ -1579,17 +1575,13 @@ void InitializeIEScript()
 		const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ));
 		if (actions[i]) {
 			if (poi && actions[i]!=poi->Function) {
-				StringBuffer buffer;
-
-				buffer.appendFormatted("%s is in collision with ",
+				std::string buffer = fmt::format("{} is in collision with ",
 					actionsTable->GetStringIndex( j ) );
 				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", buffer);
 			} else {
 				if (core->InDebugMode(ID_ACTIONS)) {
-					StringBuffer buffer;
-
-					buffer.appendFormatted("%s is a synonym of ",
+					std::string buffer = fmt::format("{} is a synonym of ",
 						actionsTable->GetStringIndex( j ) );
 					printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
 					Log(DEBUG, "GameScript", buffer);
@@ -1622,16 +1614,12 @@ void InitializeIEScript()
 			}
 			const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ));
 			if (!poi) {
-				StringBuffer buffer;
-
-				buffer.append("Couldn't assign function to override action: ");
+				std::string buffer("Couldn't assign function to override action: ");
 				printFunction(buffer, overrideActionsTable, static_cast<int>(j));
 				continue;
 			}
 			if (actions[i] && (actions[i]!=poi->Function || actionflags[i]!=poi->Flags) ) {
-				StringBuffer buffer;
-
-				buffer.appendFormatted("%s overrides existing action ",
+				std::string buffer = fmt::format("{} overrides existing action ",
 					overrideActionsTable->GetStringIndex( j ) );
 				int x = actionsTable->FindValue(i);
 				if (x>=0) {
@@ -1666,17 +1654,13 @@ void InitializeIEScript()
 			}
 			const TriggerLink *poi = FindTrigger(trName);
 			if (!poi) {
-				StringBuffer buffer;
-
-				buffer.append("Couldn't assign function to override trigger: ");
+				std::string buffer("Couldn't assign function to override trigger: ");
 				printFunction(buffer, overrideTriggersTable, static_cast<int>(j));
 				continue;
 			}
 			int tf = poi->Flags | (was_condition?TF_CONDITION:0);
 			if (triggers[i] && ( (triggers[i]!=poi->Function) || (triggerflags[i]!=tf) ) ) {
-				StringBuffer buffer;
-
-				buffer.appendFormatted("%s overrides existing trigger ", trName);
+				std::string buffer = fmt::format("{} overrides existing trigger ", trName);
 				int x = triggersTable->FindValue(i);
 				if (x<0) x = triggersTable->FindValue(i|0x4000);
 				if (x>=0) {
@@ -1711,8 +1695,7 @@ void InitializeIEScript()
 			}
 			continue;
 		}
-		StringBuffer buffer;
-		buffer.append("Couldn't assign function to action: ");
+		std::string buffer("Couldn't assign function to action: ");
 		printFunction(buffer, actionsTable, j);
 		Log(WARNING, "GameScript", buffer);
 	}
@@ -1728,14 +1711,12 @@ void InitializeIEScript()
 		const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ));
 		if (objects[i]) {
 			if (poi && objects[i]!=poi->Function) {
-				StringBuffer buffer;
-				buffer.appendFormatted("%s is in collision with ",
+				std::string buffer = fmt::format("{} is in collision with ",
 					objectsTable->GetStringIndex( j ) );
 				printFunction(buffer, objectsTable, objectsTable->FindValue(objectsTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", buffer);
 			} else {
-				StringBuffer buffer;
-				buffer.appendFormatted("%s is a synonym of ",
+				std::string buffer = fmt::format("{} is a synonym of ",
 					objectsTable->GetStringIndex( j ) );
 				printFunction(buffer, objectsTable, objectsTable->FindValue(objectsTable->GetValueIndex(j)));
 				Log(DEBUG, "GameScript", buffer);
@@ -1769,8 +1750,7 @@ void InitializeIEScript()
 			}
 			continue;
 		}
-		StringBuffer buffer;
-		buffer.append("Couldn't assign function to object: ");
+		std::string buffer("Couldn't assign function to object: ");
 		printFunction(buffer, objectsTable, static_cast<int>(j));
 		Log(WARNING, "GameScript", buffer);
 	}
@@ -2416,9 +2396,9 @@ int Response::Execute(Scriptable* Sender)
 	return ret;
 }
 
-static void PrintAction(StringBuffer& buffer, int actionID)
+static void PrintAction(std::string& buffer, int actionID)
 {
-	buffer.appendFormatted("Action: %d %s\n", actionID, actionsTable->GetValue(actionID));
+	AppendFormat(buffer, "Action: {} {}\n", actionID, actionsTable->GetValue(actionID));
 }
 
 static void HandleActionOverride(Scriptable* target, const Action* aC)
@@ -2478,9 +2458,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		return;
 	}
 	if (core->InDebugMode(ID_ACTIONS)) {
-		StringBuffer buffer;
+		std::string buffer;
 		PrintAction(buffer, actionID);
-		buffer.appendFormatted("Sender: %s\n", Sender->GetScriptName());
+		AppendFormat(buffer, "Sender: {}\n", Sender->GetScriptName());
 		Log(WARNING, "GameScript", buffer);
 	}
 	ActionFunction func = actions[actionID];
@@ -2498,8 +2478,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		func( Sender, aC );
 	} else {
 		actions[actionID] = NoAction;
-		StringBuffer buffer;
-		buffer.append("Unknown ");
+		std::string buffer("Unknown ");
 		PrintAction(buffer, actionID);
 		Log(WARNING, "GameScript", buffer);
 		Sender->ReleaseCurrentAction();
@@ -2510,8 +2489,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	if (actionflags[actionID] & AF_IMMEDIATE) {
 		//this action never entered the action queue, therefore shouldn't be freed
 		if (aC->GetRef()!=1) {
-			StringBuffer buffer;
-			buffer.append("Immediate action got queued!\n");
+			std::string buffer("Immediate action got queued!\n");
 			PrintAction(buffer, actionID);
 			Log(ERROR, "GameScript", buffer);
 			error("GameScript", "aborting...\n");
@@ -2603,30 +2581,26 @@ Action *GenerateActionDirect(const char *String, const Scriptable *object)
 	return action;
 }
 
-void Object::dump() const
-{
-	StringBuffer buffer;
-	dump(buffer);
-	Log(DEBUG, "GameScript", buffer);
-}
-
-void Object::dump(StringBuffer& buffer) const
+std::string Object::dump() const
 {
 	AssertCanary(__func__);
+	std::string buffer;
 	if(objectName[0]) {
-		buffer.appendFormatted("Object: %s\n",objectName);
-		return;
+		AppendFormat(buffer, "Object: {}\n",objectName);
+		return buffer;
 	}
-	buffer.appendFormatted("IDS Targeting: ");
+	AppendFormat(buffer, "IDS Targeting: ");
 	for (auto objectField : objectFields) {
-		buffer.appendFormatted("%d ", objectField);
+		AppendFormat(buffer, "{} ", objectField);
 	}
 	buffer.append("\n");
 	buffer.append("Filters: ");
 	for (auto objectFilter : objectFilters) {
-		buffer.appendFormatted("%d ", objectFilter);
+		AppendFormat(buffer, "{} ", objectFilter);
 	}
 	buffer.append("\n");
+	Log(DEBUG, "GameScript", buffer);
+	return buffer;
 }
 
 /** Return true if object is null */
@@ -2646,52 +2620,43 @@ bool Object::isNull() const
 	return true;
 }
 
-void Trigger::dump() const
-{
-	StringBuffer buffer;
-	dump(buffer);
-	Log(DEBUG, "GameScript", buffer);
-}
-
-void Trigger::dump(StringBuffer& buffer) const
+std::string Trigger::dump() const
 {
 	AssertCanary(__func__);
-	buffer.appendFormatted("Trigger: %d\n", triggerID);
-	buffer.appendFormatted("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
-	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
-	buffer.appendFormatted("String0: %s\n", string0Parameter);
-	buffer.appendFormatted("String1: %s\n", string1Parameter);
+	std::string buffer;
+	AppendFormat(buffer, "Trigger: {}\n", triggerID);
+	AppendFormat(buffer, "Int parameters: {} {} {}\n", int0Parameter, int1Parameter, int2Parameter);
+	AppendFormat(buffer, "Point: [{}.{}]\n", pointParameter.x, pointParameter.y);
+	AppendFormat(buffer, "String0: {}\n", string0Parameter);
+	AppendFormat(buffer, "String1: {}\n", string1Parameter);
 	if (objectParameter) {
-		objectParameter->dump(buffer);
+		buffer.append(objectParameter->dump());
 	} else {
-		buffer.appendFormatted("No object\n");
+		AppendFormat(buffer, "No object\n");
 	}
-	buffer.appendFormatted("\n");
-}
-
-void Action::dump() const
-{
-	StringBuffer buffer;
-	dump(buffer);
+	AppendFormat(buffer, "\n");
 	Log(DEBUG, "GameScript", buffer);
+	return buffer;
 }
 
-void Action::dump(StringBuffer& buffer) const
+std::string Action::dump() const
 {
 	AssertCanary(__func__);
-	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
-	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
-	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
+	std::string buffer;
+	AppendFormat(buffer, "Int0: {}, Int1: {}, Int2: {}\n",int0Parameter, int1Parameter, int2Parameter);
+	AppendFormat(buffer, "String0: {}, String1: {}\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
+	AppendFormat(buffer, "Point: [{}.{}]\n", pointParameter.x, pointParameter.y);
 	for (int i = 0; i < 3; i++) {
 		if (objects[i]) {
-			buffer.appendFormatted( "%d. ",i+1);
-			objects[i]->dump(buffer);
+			AppendFormat(buffer, "{}. ",i+1);
+			buffer.append(objects[i]->dump());
 		} else {
-			buffer.appendFormatted( "%d. Object - NULL\n",i+1);
+			AppendFormat(buffer, "{}. Object - NULL\n",i+1);
 		}
 	}
 
-	buffer.appendFormatted("RefCount: %d\tactionID: %d\n", RefCount, actionID);
+	AppendFormat(buffer, "RefCount: {}\tactionID: {}\n", RefCount, actionID);
+	return buffer;
 }
 
 }

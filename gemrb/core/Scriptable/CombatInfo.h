@@ -25,6 +25,8 @@
 
 #include "exports.h"
 
+#include <string>
+
 namespace GemRB {
 
 class Actor;
@@ -54,7 +56,7 @@ public:
 	void SetGenericBonus(int bonus, int mod=1);
 
 	void HandleFxBonus(int mod, bool permanent);
-	void dump() const;
+	std::string dump() const;
 
 private:
 	Actor *Owner = nullptr;
@@ -107,7 +109,7 @@ public:
 
 	void SetBABDecrement(int decrement);
 	void HandleFxBonus(int mod, bool permanent);
-	void dump() const;
+	std::string dump() const;
 
 private:
 	Actor *Owner = nullptr;

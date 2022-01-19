@@ -50,7 +50,6 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
-#include "System/StringBuffer.h"
 
 #include <array>
 #include <cassert>
@@ -2960,37 +2959,36 @@ bool Map::CanFree()
 	return true;
 }
 
-void Map::dump(bool show_actors) const
+std::string Map::dump(bool show_actors) const
 {
-	StringBuffer buffer;
-	buffer.appendFormatted( "Debugdump of Area %s:\n", scriptName.CString());
-	buffer.append("Scripts:");
+	std::string buffer = fmt::format("Debugdump of Area {}:\nScripts:", scriptName);
 
 	for (const auto script : Scripts) {
 		ResRef poi = "<none>";
 		if (script) {
 			poi = script->GetName();
 		}
-		buffer.appendFormatted(" %.8s", poi.CString());
+		AppendFormat(buffer, " {}", poi);
 	}
 	buffer.append("\n");
-	buffer.appendFormatted( "Area Global ID:  %d\n", GetGlobalID());
-	buffer.appendFormatted( "OutDoor: %s\n", YESNO(AreaType & AT_OUTDOOR ) );
-	buffer.appendFormatted( "Day/Night: %s\n", YESNO(AreaType & AT_DAYNIGHT ) );
-	buffer.appendFormatted( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
-	buffer.appendFormatted( "Weather: %s\n", YESNO(AreaType & AT_WEATHER ) );
-	buffer.appendFormatted( "Area Type: %d\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
-	buffer.appendFormatted("Can rest: %s\n", YESNO(!core->GetGame()->CanPartyRest(REST_AREA)));
+	AppendFormat(buffer, "Area Global ID:  {}\n", GetGlobalID());
+	AppendFormat(buffer, "OutDoor: {}\n", YESNO(AreaType & AT_OUTDOOR ) );
+	AppendFormat(buffer, "Day/Night: {}\n", YESNO(AreaType & AT_DAYNIGHT ) );
+	AppendFormat(buffer, "Extended night: {}\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
+	AppendFormat(buffer, "Weather: {}\n", YESNO(AreaType & AT_WEATHER ) );
+	AppendFormat(buffer, "Area Type: {}\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
+	AppendFormat(buffer, "Can rest: {}\n", YESNO(!core->GetGame()->CanPartyRest(REST_AREA)));
 
 	if (show_actors) {
 		buffer.append("\n");
 		for (const auto actor : actors) {
 			if (actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
-				buffer.appendFormatted("Actor: %ls (%d %s) at %d.%d\n", actor->GetName(1).c_str(), actor->GetGlobalID(), actor->GetScriptName(), actor->Pos.x, actor->Pos.y);
+				AppendFormat(buffer, "Actor: {} ({} {}) at {}.{}\n", fmt::WideToChar{actor->GetName(1)}, actor->GetGlobalID(), actor->GetScriptName(), actor->Pos.x, actor->Pos.y);
 			}
 		}
 	}
 	Log(DEBUG, "Map", buffer);
+	return buffer;;
 }
 
 bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const

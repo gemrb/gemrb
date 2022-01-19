@@ -500,7 +500,7 @@ public:
 	/** sets expansion mode */
 	void SetExpansion(ieDword value);
 	/** Dumps information about the object */
-	void dump() const;
+	std::string dump() const;
 	/** Finds an actor by global ID */
 	Actor *GetActorByGlobalID(ieDword objectID) const;
 	/** Allocates maze data */

@@ -35,7 +35,6 @@
 #include "Map.h"
 #include "ScriptEngine.h"
 #include "Scriptable/Actor.h"
-#include "System/StringBuffer.h"
 
 #include <cstdio>
 
@@ -1497,16 +1496,9 @@ void Inventory::BreakItemSlot(ieDword slot)
 	SetSlotItemRes(newItem, slot, 0,0,0);
 }
 
-void Inventory::dump() const
+std::string Inventory::dump() const
 {
-	StringBuffer buffer;
-	dump(buffer);
-	Log(DEBUG, "Inventory", buffer);
-}
-
-void Inventory::dump(StringBuffer& buffer) const
-{
-	buffer.append( "INVENTORY:\n" );
+	std::string buffer("INVENTORY:\n");
 	for (unsigned int i = 0; i < Slots.size(); i++) {
 		const CREItem* itm = Slots[i];
 
@@ -1514,11 +1506,13 @@ void Inventory::dump(StringBuffer& buffer) const
 			continue;
 		}
 
-		buffer.appendFormatted("%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef.CString(), itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight);
+		AppendFormat(buffer, "{}: {} - ({} {} {}) Fl:0x{:x} Wt: {} x {}Lb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight);
 	}
 
-	buffer.appendFormatted("Equipped: %d       EquippedHeader: %d\n", Equipped, EquippedHeader);
-	buffer.appendFormatted( "Total weight: %d\n", Weight );
+	AppendFormat(buffer, "Equipped: {}       EquippedHeader: {}\n", Equipped, EquippedHeader);
+	AppendFormat(buffer, "Total weight: {}\n", Weight);
+	
+	return buffer;
 }
 
 void Inventory::EquipBestWeapon(int flags)

@@ -29,7 +29,6 @@
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "Scriptable/InfoPoint.h"
-#include "System/StringBuffer.h"
 
 namespace GemRB {
 
@@ -473,23 +472,23 @@ int Door::GetCursor(int targetMode, int lastCursor) const
 
 void Door::dump() const
 {
-	StringBuffer buffer;
-	buffer.appendFormatted( "Debugdump of Door %s:\n", GetScriptName() );
-	buffer.appendFormatted( "Door Global ID: %d\n", GetGlobalID());
-	buffer.appendFormatted( "Position: %d.%d\n", Pos.x, Pos.y);
-	buffer.appendFormatted( "Door Open: %s\n", YESNO(IsOpen()));
-	buffer.appendFormatted( "Door Locked: %s	Difficulty: %d\n", YESNO(Flags&DOOR_LOCKED), LockDifficulty);
-	buffer.appendFormatted( "Door Trapped: %s	Difficulty: %d\n", YESNO(Trapped), TrapRemovalDiff);
+	std::string buffer;
+	AppendFormat(buffer, "Debugdump of Door {}:\n", GetScriptName() );
+	AppendFormat(buffer, "Door Global ID: {}\n", GetGlobalID());
+	AppendFormat(buffer, "Position: {}.{}\n", Pos.x, Pos.y);
+	AppendFormat(buffer, "Door Open: {}\n", YESNO(IsOpen()));
+	AppendFormat(buffer, "Door Locked: {}	Difficulty: {}\n", YESNO(Flags&DOOR_LOCKED), LockDifficulty);
+	AppendFormat(buffer, "Door Trapped: {}	Difficulty: {}\n", YESNO(Trapped), TrapRemovalDiff);
 	if (Trapped) {
-		buffer.appendFormatted( "Trap Permanent: %s Detectable: %s\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
+		AppendFormat(buffer, "Trap Permanent: {} Detectable: {}\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
 	}
-	buffer.appendFormatted( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
+	AppendFormat(buffer, "Secret door: {} (Found: {})\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
 	const char *Key = GetKey();
 	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted("Script: %s, Key (%s) removed: %s, Dialog: %s\n", name.CString(), Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog.CString());
+	AppendFormat(buffer, "Script: {}, Key ({}) removed: {}, Dialog: {}\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog);
 
 	Log(DEBUG, "Door", buffer);
 }

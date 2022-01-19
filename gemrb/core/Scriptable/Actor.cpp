@@ -53,7 +53,6 @@
 #include "Scriptable/InfoPoint.h"
 #include "ScriptedAnimation.h"
 #include "System/FileFilters.h"
-#include "System/StringBuffer.h"
 #include "StringMgr.h"
 
 #include <cmath>
@@ -2151,12 +2150,12 @@ static void InitActorTables()
 				IWD2HitTable.insert(std::make_pair (BABClassMap[classis], btv));
 			}
 
-			StringBuffer buffer;
-			buffer.appendFormatted("\tID: %d, ", classID);
-			buffer.appendFormatted("Name: %s, ", classname);
-			buffer.appendFormatted("Classis: %d, ", classis);
-			buffer.appendFormatted("ToHit: %s ", tohit);
-			buffer.appendFormatted("XPCap: %d", xpcap[classis]);
+			std::string buffer;
+			AppendFormat(buffer, "\tID: {}, ", classID);
+			AppendFormat(buffer, "Name: {}, ", classname);
+			AppendFormat(buffer, "Classis: {}, ", classis);
+			AppendFormat(buffer, "ToHit: {} ", tohit);
+			AppendFormat(buffer, "XPCap: {}", xpcap[classis]);
 
 			Log(DEBUG, "Actor", buffer);
 		}
@@ -2182,20 +2181,20 @@ static void InitActorTables()
 			className2ID[classname] = tmpindex;
 			tmpindex--;
 
-			StringBuffer buffer;
-			buffer.appendFormatted("\tID: %d ", tmpindex);
+			std::string buffer;
+			AppendFormat(buffer, "\tID: {} ", tmpindex);
 			//only create the array if it isn't yet made
 			//i.e. barbarians would overwrite fighters in bg2
 			if (levelslots[tmpindex]) {
-				buffer.appendFormatted("Already Found!");
+				AppendFormat(buffer, "Already Found!");
 				Log(DEBUG, "Actor", buffer);
 				continue;
 			}
 
-			buffer.appendFormatted("Name: %s ", classname);
+			AppendFormat(buffer, "Name: {} ", classname);
 
 			xpcap[tmpindex] = atoi(xpcapt->QueryField(classname, "VALUE"));
-			buffer.appendFormatted("XPCAP: %d ", xpcap[tmpindex]);
+			AppendFormat(buffer, "XPCAP: {} ", xpcap[tmpindex]);
 
 			int classis = 0;
 			//default all levelslots to 0
@@ -2211,7 +2210,7 @@ static void InitActorTables()
 					//store the original class ID as iwd2 compatible ISCLASS (internal class number)
 					classesiwd2[classis] = tmpindex+1;
 
-					buffer.appendFormatted("Classis: %d ", classis);
+					AppendFormat(buffer, "Classis: {} ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
 					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP"), true);
@@ -2220,7 +2219,7 @@ static void InitActorTables()
 						int rollscolumn = hptm->GetColumnIndex("ROLLS");
 						while (atoi(hptm->QueryField(tmphp, rollscolumn)))
 							tmphp++;
-						buffer.appendFormatted("HPROLLMAXLVL: %d", tmphp);
+						AppendFormat(buffer, "HPROLLMAXLVL: {}", tmphp);
 						if (tmphp) maxLevelForHpRoll[tmpindex] = tmphp;
 					}
 				}
@@ -2261,7 +2260,7 @@ static void InitActorTables()
 								levelslots[tmpindex][classis] = tmplevel;
 							}
 						}
-						buffer.appendFormatted("Classis: %d ", classis);
+						AppendFormat(buffer, "Classis: {} ", classis);
 
 						//warrior take precedence
 						if (!foundwarrior) {
@@ -2299,9 +2298,9 @@ static void InitActorTables()
 			}
 			free(classnames);
 
-			buffer.appendFormatted("HPROLLMAXLVL: %d ", maxLevelForHpRoll[tmpindex]);
-			buffer.appendFormatted("DS: %d ", dualswap[tmpindex]);
-			buffer.appendFormatted("MULTI: %d", multi[tmpindex]);
+			AppendFormat(buffer, "HPROLLMAXLVL: {} ", maxLevelForHpRoll[tmpindex]);
+			AppendFormat(buffer, "DS: {} ", dualswap[tmpindex]);
+			AppendFormat(buffer, "MULTI: {}", multi[tmpindex]);
 			Log(DEBUG, "Actor", buffer);
 		}
 		/*this could be enabled to ensure all levelslots are filled with at least 0's;
@@ -4848,74 +4847,70 @@ void Actor::dumpMaxValues()
 }
 #endif
 
-void Actor::dump() const
+std::string Actor::dump() const
 {
-	StringBuffer buffer;
-	dump(buffer);
-	Log(DEBUG, "Actor", buffer);
-}
-
-void Actor::dump(StringBuffer& buffer) const
-{
-	buffer.appendFormatted("Debugdump of Actor %ls (%ls, %ls):\n", GetName(1).c_str(), GetName(0).c_str(), GetName(-1).c_str());
+	std::string buffer;
+	AppendFormat(buffer, "Debugdump of Actor {} ({}, {}):\n", fmt::WideToChar{GetName(1)}, fmt::WideToChar{GetName(0)}, fmt::WideToChar{GetName(-1)});
 	buffer.append("Scripts:");
 	for (const auto script : Scripts) {
 		ResRef poi = "<none>";
 		if (script) {
 			poi = script->GetName();
 		}
-		buffer.appendFormatted(" %.8s", poi.CString());
+		AppendFormat(buffer, " {}", poi);
 	}
 	buffer.append("\n");
-	buffer.appendFormatted("Area:       %.8s ([%d.%d])\n", Area.CString(), Pos.x, Pos.y);
-	buffer.appendFormatted("Dialog:     %.8s    TalkCount:  %d\n", Dialog.CString(), TalkCount);
-	buffer.appendFormatted("Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
-	buffer.appendFormatted("Script name:%.32s    Current action: %d    Total: %ld\n", scriptName.CString(), CurrentAction ? CurrentAction->actionID : -1, (long) actionQueue.size());
-	buffer.appendFormatted("Int. Flags: 0x%x    ", InternalFlags);
-	buffer.appendFormatted("MC Flags: 0x%x    ", Modified[IE_MC_FLAGS]);
-	buffer.appendFormatted("Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
-	buffer.appendFormatted("Class:      %d   current class:%d    Kit: %d (base: %d)\n", BaseStats[IE_CLASS], Modified[IE_CLASS], Modified[IE_KIT], BaseStats[IE_KIT] );
-	buffer.appendFormatted("Race:       %d   current race:%d\n", BaseStats[IE_RACE], Modified[IE_RACE] );
-	buffer.appendFormatted("Gender:     %d   current gender:%d\n", BaseStats[IE_SEX], Modified[IE_SEX] );
-	buffer.appendFormatted("Specifics:  %d   current specifics:%d\n", BaseStats[IE_SPECIFIC], Modified[IE_SPECIFIC] );
-	buffer.appendFormatted("Alignment:  %x   current alignment:%x\n", BaseStats[IE_ALIGNMENT], Modified[IE_ALIGNMENT] );
-	buffer.appendFormatted("Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
-	buffer.appendFormatted("Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
-	buffer.appendFormatted("Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
-	buffer.appendFormatted("Fatigue: %d (current: %d)   Luck: %d\n", BaseStats[IE_FATIGUE], Modified[IE_FATIGUE], Modified[IE_LUCK]);
-	buffer.appendFormatted("Movement rate: %d (current: %d)\n\n", BaseStats[IE_MOVEMENTRATE], Modified[IE_MOVEMENTRATE]);
+	AppendFormat(buffer, "Area:       {} ([{}.{}])\n", Area.CString(), Pos.x, Pos.y);
+	AppendFormat(buffer, "Dialog:     {}    TalkCount:  {}\n", Dialog.CString(), TalkCount);
+	AppendFormat(buffer, "Global ID:  {}   PartySlot: {}\n", GetGlobalID(), InParty);
+	AppendFormat(buffer, "Script name:{:<32}    Current action: {}    Total: {}\n", scriptName.CString(), CurrentAction ? CurrentAction->actionID : -1, actionQueue.size());
+	AppendFormat(buffer, "Int. Flags: 0x{:x}    ", InternalFlags);
+	AppendFormat(buffer, "MC Flags: 0x{:x}    ", Modified[IE_MC_FLAGS]);
+	AppendFormat(buffer, "Allegiance: {}   current allegiance:{}\n", BaseStats[IE_EA], Modified[IE_EA] );
+	AppendFormat(buffer, "Class:      {}   current class:{}    Kit: {} (base: {})\n", BaseStats[IE_CLASS], Modified[IE_CLASS], Modified[IE_KIT], BaseStats[IE_KIT] );
+	AppendFormat(buffer, "Race:       {}   current race:{}\n", BaseStats[IE_RACE], Modified[IE_RACE] );
+	AppendFormat(buffer, "Gender:     {}   current gender:{}\n", BaseStats[IE_SEX], Modified[IE_SEX] );
+	AppendFormat(buffer, "Specifics:  {}   current specifics:{}\n", BaseStats[IE_SPECIFIC], Modified[IE_SPECIFIC] );
+	AppendFormat(buffer, "Alignment:  {:x}   current alignment:{:x}\n", BaseStats[IE_ALIGNMENT], Modified[IE_ALIGNMENT] );
+	AppendFormat(buffer, "Morale:     {}   current morale:{}\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
+	AppendFormat(buffer, "Moralebreak:{}   Morale recovery:{}\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
+	AppendFormat(buffer, "Visualrange:{} (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
+	AppendFormat(buffer, "Fatigue: {} (current: {})   Luck: {}\n", BaseStats[IE_FATIGUE], Modified[IE_FATIGUE], Modified[IE_LUCK]);
+	AppendFormat(buffer, "Movement rate: {} (current: {})\n\n", BaseStats[IE_MOVEMENTRATE], Modified[IE_MOVEMENTRATE]);
 
 	//this works for both level slot style
-	buffer.appendFormatted("Levels (average: %d):\n", GetXPLevel(true));
+	AppendFormat(buffer, "Levels (average: {}):\n", GetXPLevel(true));
 	for (unsigned int i = 0; i < ISCLASSES; i++) {
 		int level = GetClassLevel(i);
 		if (level) {
-			buffer.appendFormatted("%s: %d    ", isclassnames[i], level);
-		}
-	}
-	buffer.appendFormatted("\n");
-
-	buffer.appendFormatted("current HP:%d\n", BaseStats[IE_HITPOINTS] );
-	buffer.appendFormatted("Mod[IE_ANIMATION_ID]: 0x%04X ResRef:%.8s Stance: %d\n", Modified[IE_ANIMATION_ID], anims->ResRefBase.CString(), GetStance());
-	buffer.appendFormatted("TURNUNDEADLEVEL: %d current: %d\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
-	buffer.appendFormatted("Colors:    ");
-	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
-		for(unsigned int i = 0; i < Modified[IE_COLORCOUNT]; i++) {
-			buffer.appendFormatted("   %d", Modified[IE_COLORS+i]);
-		}
-	} else {
-		for(unsigned int i = 0; i < 7; i++) {
-			buffer.appendFormatted("   %d", Modified[IE_COLORS+i]);
+			AppendFormat(buffer, "{}: {}    ", isclassnames[i], level);
 		}
 	}
 	buffer.append("\n");
-	buffer.appendFormatted("WaitCounter: %d\n", (int) GetWait());
-	buffer.appendFormatted("LastTarget: %d %s    ", LastTarget, GetActorNameByID(LastTarget));
-	buffer.appendFormatted("LastSpellTarget: %d %s\n", LastSpellTarget, GetActorNameByID(LastSpellTarget));
-	buffer.appendFormatted("LastTalked: %d %s\n", LastTalker, GetActorNameByID(LastTalker));
-	inventory.dump(buffer);
-	spellbook.dump(buffer);
-	fxqueue.dump(buffer);
+
+	AppendFormat(buffer, "current HP:{}\n", BaseStats[IE_HITPOINTS] );
+	AppendFormat(buffer, "Mod[IE_ANIMATION_ID]: 0x{:^4X} ResRef:{} Stance: {}\n", Modified[IE_ANIMATION_ID], anims->ResRefBase, GetStance());
+	AppendFormat(buffer, "TURNUNDEADLEVEL: {} current: {}\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
+	AppendFormat(buffer, "Colors:    ");
+	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
+		for(unsigned int i = 0; i < Modified[IE_COLORCOUNT]; i++) {
+			AppendFormat(buffer, "   {}", Modified[IE_COLORS+i]);
+		}
+	} else {
+		for(unsigned int i = 0; i < 7; i++) {
+			AppendFormat(buffer, "   {}", Modified[IE_COLORS+i]);
+		}
+	}
+	buffer.append("\n");
+	AppendFormat(buffer, "WaitCounter: {}\n", GetWait());
+	AppendFormat(buffer, "LastTarget: {} {}    ", LastTarget, GetActorNameByID(LastTarget));
+	AppendFormat(buffer, "LastSpellTarget: {} {}\n", LastSpellTarget, GetActorNameByID(LastSpellTarget));
+	AppendFormat(buffer, "LastTalked: {} {}\n", LastTalker, GetActorNameByID(LastTalker));
+	buffer.append(inventory.dump());
+	buffer.append(spellbook.dump());
+	buffer.append(fxqueue.dump());
+	
+	return buffer;;
 }
 
 const char* Actor::GetActorNameByID(ieDword ID) const
@@ -7310,7 +7305,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	nextattack += (core->Time.round_size/attacksperround);
 	lastattack = gameTime;
 
-	StringBuffer buffer;
+	std::string buffer;
 	//debug messages
 	if (leftorright && IsDualWielding()) {
 		buffer.append("(Off) ");
@@ -7318,8 +7313,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("(Main) ");
 	}
 	if (attacksperround) {
-		buffer.appendFormatted("Left: %d | ", attackcount);
-		buffer.appendFormatted("Next: %d ", nextattack);
+		AppendFormat(buffer, "Left: {} | ", attackcount);
+		AppendFormat(buffer, "Next: {} ", nextattack);
 	}
 	if (fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 1) || fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 2)) { // illusions can't hit
 		ResetState();
@@ -8913,18 +8908,18 @@ void Actor::dumpQSlots() const
 {
 	ActionButtonRow r;
 	memcpy(&r, GUIBTDefaults + GetActiveClass(), sizeof(ActionButtonRow));
-	StringBuffer buffer, buffer2, buffer3;
+	std::string buffer, buffer2, buffer3;
 
 	buffer.append("Current  default: ");
 	buffer2.append("IWD2gem  default: ");
 	buffer3.append("gem2IWD2 default: ");
 	for(int i=0; i<GUIBT_COUNT; i++) {
 		ieByte tmp = r[i];
-		buffer.appendFormatted("%3d ", tmp);
-		buffer2.appendFormatted("%3d ", IWD2GemrbQslot(tmp));
-		buffer3.appendFormatted("%3d ", Gemrb2IWD2Qslot(tmp, i));
+		AppendFormat(buffer, "{:3d} ", tmp);
+		AppendFormat(buffer2, "{:3d} ", IWD2GemrbQslot(tmp));
+		AppendFormat(buffer3, "{:3d} ", Gemrb2IWD2Qslot(tmp, i));
 	}
-	buffer.appendFormatted("(class: %d)", GetStat(IE_CLASS));
+	AppendFormat(buffer, "(class: {})", GetStat(IE_CLASS));
 	Log(DEBUG, "Actor", buffer);
 //	Log(DEBUG, "Actor", buffer2);
 //	Log(DEBUG, "Actor", buffer3);
@@ -8937,9 +8932,9 @@ void Actor::dumpQSlots() const
 	buffer3.append("gem2IWD2 QSlots:  ");
 	for(int i=0; i<GUIBT_COUNT; i++) {
 		ieByte tmp = PCStats->QSlots[i];
-		buffer.appendFormatted("%3d ", tmp);
-		buffer2.appendFormatted("%3d ", IWD2GemrbQslot(tmp));
-		buffer3.appendFormatted("%3d ", Gemrb2IWD2Qslot(tmp, i));
+		AppendFormat(buffer, "{:3d} ", tmp);
+		AppendFormat(buffer2, "{:3d} ", IWD2GemrbQslot(tmp));
+		AppendFormat(buffer3, "{:3d} ", Gemrb2IWD2Qslot(tmp, i));
 	}
 	Log(DEBUG, "Actor", buffer);
 	Log(DEBUG, "Actor", buffer2);

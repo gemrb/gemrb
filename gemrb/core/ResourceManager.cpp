@@ -24,7 +24,6 @@
 #include "PluginMgr.h"
 #include "Resource.h"
 #include "ResourceDesc.h"
-#include "System/StringBuffer.h"
 
 namespace GemRB {
 
@@ -49,11 +48,11 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 	return true;
 }
 
-static void PrintPossibleFiles(StringBuffer& buffer, const char* ResRef, const TypeID *type)
+static void PrintPossibleFiles(std::string& buffer, const char* ResRef, const TypeID *type)
 {
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
 	for (const auto& type2 : types) {
-		buffer.appendFormatted("%s.%s ", ResRef, type2.GetExt());
+		AppendFormat(buffer, "{}.{} ", ResRef, type2.GetExt());
 	}
 }
 
@@ -88,9 +87,7 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 		}
 	}
 	if (!silent) {
-		StringBuffer buffer;
-		buffer.appendFormatted("Couldn't find '%s'... ", ResRef);
-		buffer.append("Tried ");
+		std::string buffer = fmt::format("Couldn't find '{}'... Tried ", ResRef);
 		PrintPossibleFiles(buffer, ResRef,type);
 		Log(WARNING, "ResourceManager", buffer);
 	}
@@ -168,10 +165,8 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 		}
 	}
 	if (!silent) {
-		StringBuffer buffer;
-		buffer.appendFormatted("Couldn't find '%s'... ", ResRef);
-		buffer.append("Tried ");
-		PrintPossibleFiles(buffer, ResRef,type);
+		std::string buffer = fmt::format("Couldn't find '{}'... Tried ", ResRef);
+		PrintPossibleFiles(buffer, ResRef, type);
 		Log(WARNING, "ResourceManager", buffer);
 	}
 	return NULL;
