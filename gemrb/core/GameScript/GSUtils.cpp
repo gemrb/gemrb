@@ -1079,7 +1079,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		Log(ERROR, "GameScript", "Target for dialog couldn't be found (Sender: %s, Type: %d).",
 			Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
-			static_cast<Actor*>(Sender)->dump();
+			Log(DEBUG, "Actor", Sender->As<const Actor>()->dump());
 		}
 		std::string buffer("Target object: ");
 		if (parameters->objects[1]) {

@@ -2057,7 +2057,6 @@ std::string EffectQueue::dump() const
 		}
 		AppendFormat(buffer, " {:2d}: 0x{:02x}: {} ({}, {}) S:{}\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->SourceRef);
 	}
-	Log(DEBUG, "EffectQueue", buffer);
 	return buffer;
 }
 

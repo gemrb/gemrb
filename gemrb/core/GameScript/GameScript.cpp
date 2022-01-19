@@ -2141,7 +2141,7 @@ void GameScript::EvaluateAllBlocks()
 		} else {
 			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
 			if (core->InDebugMode(ID_CUTSCENE) && action->objects[1]) {
-				action->objects[1]->dump();
+				Log(DEBUG, "GameScript", action->objects[1]->dump());
 			}
 		}
 	}
@@ -2451,8 +2451,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			HandleActionOverride(scr, aC);
 		} else {
 			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
-			aC->objects[0]->dump();
-			aC->dump();
+			Log(DEBUG, "GameScript", aC->objects[0]->dump() + " " + aC->dump());
 		}
 		aC->Release();
 		return;
@@ -2599,7 +2598,6 @@ std::string Object::dump() const
 		AppendFormat(buffer, "{} ", objectFilter);
 	}
 	buffer.append("\n");
-	Log(DEBUG, "GameScript", buffer);
 	return buffer;
 }
 
@@ -2635,7 +2633,6 @@ std::string Trigger::dump() const
 		AppendFormat(buffer, "No object\n");
 	}
 	AppendFormat(buffer, "\n");
-	Log(DEBUG, "GameScript", buffer);
 	return buffer;
 }
 
