@@ -28,8 +28,6 @@
 
 #include <cstdarg>
 
-#include <fmt/xchar.h>
-
 namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = NULL;

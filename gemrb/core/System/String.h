@@ -25,6 +25,7 @@
 
 #define FMT_HEADER_ONLY
 #include <fmt/format.h>
+#include <fmt/xchar.h>
 
 #define WHITESPACE_STRING L"\n\t\r "
 

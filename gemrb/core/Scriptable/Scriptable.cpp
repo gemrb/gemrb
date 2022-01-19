@@ -896,15 +896,14 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
 
 	const String spell = core->GetString(spl->SpellName);
 	if (!spell.empty() && Type == ST_ACTOR) {
-		wchar_t str[256];
-
 		if (target) {
 			const String msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
-			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg.c_str(), spell.c_str(), target->GetName().c_str());
+			String str = fmt::format(L"{} {} : {}", msg, spell, target->GetName());
+			displaymsg->DisplayStringName(str, DMC_WHITE, this);
 		} else {
-			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls : %s", spell.c_str(), GetName().c_str());
+			String str = fmt::format(L"{} : {}", spell, GetName());
+			displaymsg->DisplayStringName(str, DMC_WHITE, this);
 		}
-		displaymsg->DisplayStringName(str, DMC_WHITE, this);
 	}
 }
 
@@ -1188,13 +1187,12 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 		int IntMod = detective->GetAbilityBonus(IE_INT);
 
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
-			wchar_t tmpstr[100];
 			// eg. .:Casts Word of Recall:.
 			const String castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
 			const String spellname = core->GetString(spl->SpellName);
-			swprintf(tmpstr, sizeof(tmpstr)/sizeof(tmpstr[0]), L".:%ls %ls:.", castmsg.c_str(), spellname.c_str());
+			String formatted = fmt::format(L".:{} {}:.", castmsg, spellname);
 
-			SetOverheadText(tmpstr);
+			SetOverheadText(formatted);
 			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}

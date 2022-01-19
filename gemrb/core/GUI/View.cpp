@@ -297,18 +297,19 @@ void View::Draw()
 				ScriptingId id = ref->Id;
 				id &= 0x00000000ffffffff; // control id is lower 32bits
 
-				wchar_t string[256];
-				swprintf(string, 255, L"id: %lu  grp: %s  \nflgs: %u\ntype:%s",
-					 id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
+				std::string formatted = fmt::format("id: {}  grp: {}  \nflgs: {}\ntype:{}", id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
+				String* string = StringFromCString(formatted.c_str());
+				assert(string);
+				
 				Region r = drawFrame;
 				r.w = win ? win->Frame().w - r.x : Frame().w - r.x;
 				Font::StringSizeMetrics metrics = {r.size, 0, 0, true};
-				fnt->StringSize(string, &metrics);
+				fnt->StringSize(*string, &metrics);
 				r.h = metrics.size.h;
 				r.w = metrics.size.w;
 				video->SetScreenClip(nullptr);
 				video->DrawRect(r, ColorBlack, true);
-				fnt->Print(r, string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT, {ColorWhite, ColorBlack});
+				fnt->Print(r, *string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT, {ColorWhite, ColorBlack});
 			}
 		}
 	}

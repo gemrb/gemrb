@@ -1157,9 +1157,7 @@ String GameControl::TooltipText() const {
 		}
 
 		if (actor->HasVisibleHP()) {
-			wchar_t hpstring[20];
-			swprintf(hpstring, 20, L"%d/%d", hp, maxhp);
-			tip += hpstring;
+			tip += fmt::format(L"{}/{}", hp, maxhp);
 		} else {
 			tip += L"?";
 		}
