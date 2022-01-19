@@ -46,7 +46,7 @@ public:
 	DLGImporter(void) = default;
 	
 	Dialog* GetDialog() const override;
-	Condition* GetCondition(char *string) const override;
+	Condition* GetCondition(const char *string) const override;
 private:
 	bool Import(DataStream* stream) override;
 	DialogState* GetDialogState(Dialog *d, unsigned int index) const;
