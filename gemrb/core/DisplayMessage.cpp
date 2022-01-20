@@ -26,8 +26,6 @@
 #include "GUI/TextArea.h"
 #include "Scriptable/Actor.h"
 
-#include <cstdarg>
-
 namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = NULL;
@@ -40,6 +38,18 @@ static const auto DisplayFormatNameString = FMT_STRING(L"[color={:08X}]{} - [/co
 static const auto DisplayFormatSimple = FMT_STRING(L"[p]{}[/p]");
 
 DisplayMessage::StrRefs DisplayMessage::SRefs;
+
+bool DisplayMessage::EnableRollFeedback()
+{
+	ieDword feedback = 0;
+	core->GetDictionary()->Lookup("EnableRollFeedback", feedback);
+	return bool(feedback);
+}
+
+String DisplayMessage::ResolveStringRef(int stridx)
+{
+	return core->GetString(stridx);
+}
 
 DisplayMessage::StrRefs::StrRefs()
 {
@@ -231,13 +241,8 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, const Color &col
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	String text = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH);
-	//allow for a number
-	size_t bufflen = text.length() + 6;
-	wchar_t* newtext = ( wchar_t* ) malloc( bufflen * sizeof(wchar_t));
-	swprintf( newtext, bufflen, text.c_str(), value );
-	DisplayStringName(newtext, color, speaker);
-	free(newtext);
+	String fmt = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH);
+	DisplayStringName(fmt::format(fmt, value), color, speaker);
 }
 
 // String format is
@@ -254,23 +259,6 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, const Color &color,
 	String text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	String formatted = fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, color.Packed(), text, name2);
 	DisplayMarkupString(formatted);
-}
-
-// display tokenized strings like ~Open lock check. Open lock skill %d vs. lock difficulty %d (%d DEX bonus).~
-void DisplayMessage::DisplayRollStringName(int stridx, const Color &color, const Scriptable *speaker, ...) const
-{
-	ieDword feedback = 0;
-	core->GetDictionary()->Lookup("EnableRollFeedback", feedback);
-	if (feedback) {
-		wchar_t tmp[200];
-		va_list numbers;
-		va_start(numbers, speaker);
-		// fill it out
-		String str = core->GetString(stridx);
-		vswprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), str.c_str(), numbers);
-		displaymsg->DisplayStringName(tmp, color, speaker);
-		va_end(numbers);
-	}
 }
 
 void DisplayMessage::DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const

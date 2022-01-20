@@ -60,6 +60,15 @@ private:
 	};
 	static StrRefs SRefs;
 	static void LoadStringRefs();
+	
+	static bool EnableRollFeedback();
+	static String ResolveStringRef(int);
+	
+	template<typename ...ARGS>
+	void DisplayRollStringName(const String& fmt, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {
+		String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
+		DisplayStringName(formatted, color, speaker);
+	}
 public:
 	static ieStrRef GetStringReference(size_t);
 	static bool HasStringReference(size_t);
@@ -90,7 +99,13 @@ public:
 	void DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const;
 	void DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const;
 	/** iwd2 hidden roll debugger */
-	void DisplayRollStringName(int stridx, const Color &color, const Scriptable *speaker, ...) const;
+	template<typename ...ARGS>
+	void DisplayRollStringName(int stridx, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {
+		if (EnableRollFeedback()) {
+			String fmt = ResolveStringRef(stridx);
+			DisplayRollStringName(fmt, color, speaker, std::forward<ARGS>(args)...);
+		}
+	}
 };
 
 extern GEM_EXPORT DisplayMessage * displaymsg;
