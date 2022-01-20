@@ -49,6 +49,7 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 #include "ScriptedAnimation.h"
+#include "StringMgr.h"
 
 namespace GemRB {
 
@@ -5944,7 +5945,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		if (tab) {
 			basename = tab->QueryDefault();
 		}
-		String str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
+		String str = core->GetString(parameters->int0Parameter, STRING_FLAGS::STRREFOFF);
 		char FolderName[_MAX_PATH];
 		snprintf (FolderName, sizeof(FolderName), "%s - %ls", basename, str.c_str());
 

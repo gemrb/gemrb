@@ -78,13 +78,13 @@ static std::string ParseGameDate(DataStream *ds)
 	}
 
 	if (days) {
-		if (days==1) a = core->GetMBCString(dayref, 0);
-		else a = core->GetMBCString(daysref, 0);
+		if (days==1) a = core->GetMBCString(dayref, STRING_FLAGS::NONE);
+		else a = core->GetMBCString(daysref, STRING_FLAGS::NONE);
 	}
 	if (hours || a.empty()) {
 		if (!a.empty()) b=core->GetMBCString(10699); // and
-		if (hours==1) c = core->GetMBCString(displaymsg->GetStringReference(STR_HOUR), 0);
-		else c = core->GetMBCString(displaymsg->GetStringReference(STR_HOURS), 0);
+		if (hours==1) c = core->GetMBCString(displaymsg->GetStringReference(STR_HOUR), STRING_FLAGS::NONE);
+		else c = core->GetMBCString(displaymsg->GetStringReference(STR_HOURS), STRING_FLAGS::NONE);
 	}
 	
 	if (!b.empty()) {

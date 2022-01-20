@@ -524,7 +524,7 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 	int flags = 0;
 	PARSE_ARGS(args, "i|i", &strref, &flags);
 
-	String text = core->GetString(strref, flags);
+	String text = core->GetString(strref, STRING_FLAGS(flags));
 	return PyString_FromStringObj(text);
 }
 
@@ -1477,7 +1477,7 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 			delete str;
 		}
 	} else if (PyObject_TypeCheck(pystr, &PyLong_Type)) {
-		String str = core->GetString(ieStrRef(PyLong_AsLong(pystr)), flags);
+		String str = core->GetString(ieStrRef(PyLong_AsLong(pystr)), STRING_FLAGS(flags));
 		ta->AppendText(str);
 	}
 
@@ -9230,7 +9230,7 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 			break;
 		}
 
-		displaymsg->DisplayString(usedItem.value, DMC_WHITE, IE_STR_SOUND);
+		displaymsg->DisplayString(usedItem.value, DMC_WHITE, STRING_FLAGS::SOUND);
 		return 1;
 	}
 	return 0;
@@ -12302,9 +12302,9 @@ static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 		GET_GAME();
 		GET_ACTOR_GLOBAL();
 
-		displaymsg->DisplayStringName(strref, ColorFromPy(pycol), actor, IE_STR_SOUND);
+		displaymsg->DisplayStringName(strref, ColorFromPy(pycol), actor, STRING_FLAGS::SOUND);
 	} else {
-		displaymsg->DisplayString(strref, ColorFromPy(pycol), IE_STR_SOUND);
+		displaymsg->DisplayString(strref, ColorFromPy(pycol), STRING_FLAGS::SOUND);
 	}
 	Py_RETURN_NONE;
 }

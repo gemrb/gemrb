@@ -32,7 +32,7 @@ namespace GemRB {
 
 #define GEM_SND_RELATIVE 1
 #define GEM_SND_LOOPING 2
-#define GEM_SND_SPEECH   IE_STR_SPEECH // 4
+#define GEM_SND_SPEECH  4 // STRING_FLAGS::SPEECH
 #define GEM_SND_QUEUE	8
 
 #define GEM_SND_VOL_MUSIC    1

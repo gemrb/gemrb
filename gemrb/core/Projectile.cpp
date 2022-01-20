@@ -265,7 +265,7 @@ void Projectile::Setup()
 	if(ExtFlags&PEF_TEXT) {
 		const Actor *act = area->GetActorByGlobalID(Caster);
 		if(act) {
-			displaymsg->DisplayStringName(StrRef, DMC_LIGHTGREY, act,0);
+			displaymsg->DisplayStringName(StrRef, DMC_LIGHTGREY, act, STRING_FLAGS::NONE);
 		}
 	}
 

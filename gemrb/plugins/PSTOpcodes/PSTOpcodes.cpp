@@ -1018,7 +1018,7 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//gemrb lets you specify the strref in P#1
 		ieStrRef tmp = fx->Parameter1;
 		if (!tmp) tmp = 46633;
-		String tmpstr = core->GetString(tmp, IE_STR_SPEECH|IE_STR_SOUND);
+		String tmpstr = core->GetString(tmp, STRING_FLAGS::SPEECH | STRING_FLAGS::SOUND);
 		target->SetOverheadText(tmpstr);
 		target->GetHit();
 	}

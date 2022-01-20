@@ -28,9 +28,8 @@
 #define DISPLAYMESSAGE_H
 
 #include "exports.h"
-#include "ie_types.h"
 #include "strrefs.h"
-#include "System/String.h"
+#include "StringMgr.h"
 #include "RGBAColor.h"
 
 #include <string>
@@ -93,10 +92,10 @@ public:
 	void DisplayConstantStringAction(int stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
-	void DisplayString(int stridx, const Color &color, ieDword flags) const;
+	void DisplayString(int stridx, const Color &color, STRING_FLAGS flags) const;
 	void DisplayString(const String& text, const Color &color, Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const;
+	void DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	void DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const;
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>

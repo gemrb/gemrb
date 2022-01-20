@@ -217,20 +217,20 @@ String TLKImporter::BuiltinToken(const char* Token)
 		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
 		//preparing sub-tokens
 		core->GetCalendar()->GetMonthName((int) dayandmonth);
-		return GetString(15981, 0);
+		return GetString(15981, STRING_FLAGS::NONE);
 	}
 
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
-		return GetString(10174, 0);
+		return GetString(10174, STRING_FLAGS::NONE);
 	}
 	if (!strcmp( Token, "CLASS" )) {
 		//allow this to be used by direct setting of the token
 		int strref = ClassStrRef(-1);
-		return GetString(strref, 0);
+		return GetString(strref, STRING_FLAGS::NONE);
 	}
 
 	if (!strcmp( Token, "RACE" )) {
-		return GetString(RaceStrRef(-1), 0);
+		return GetString(RaceStrRef(-1), STRING_FLAGS::NONE);
 	}
 
 	// handle Player10 (max for MaxPartySize), then the rest
@@ -248,10 +248,10 @@ String TLKImporter::BuiltinToken(const char* Token)
 		return CharName(charname);
 	}
 	if (!strcmp( Token, "PRO_CLASS" )) {
-		return GetString(ClassStrRef(0), 0);
+		return GetString(ClassStrRef(0), STRING_FLAGS::NONE);
 	}
 	if (!strcmp( Token, "PRO_RACE" )) {
-		return GetString(RaceStrRef(0), 0);
+		return GetString(RaceStrRef(0), STRING_FLAGS::NONE);
 	}
 	if (!strcmp( Token, "MAGESCHOOL" )) {
 		ieDword row = 0; //default value is 0 (generalist)
@@ -260,7 +260,7 @@ String TLKImporter::BuiltinToken(const char* Token)
 		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
 			const char* value = tm->QueryField( row, 2 );
-			return GetString(atoi( value ), 0);
+			return GetString(atoi( value ), STRING_FLAGS::NONE);
 		}
 	}
 	if (!strcmp( Token, "TM" )) {
@@ -324,10 +324,10 @@ ieStrRef TLKImporter::UpdateString(ieStrRef strref, const String& newvalue)
 	return OverrideTLK->UpdateString(strref, newvalue);
 }
 
-String TLKImporter::GetString(ieStrRef strref, ieDword flags)
+String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 {
 	String string;
-	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
+	bool empty = !(flags & STRING_FLAGS::ALLOW_ZERO) && !strref;
 	ieWord type;
 	size_t Length;
 	ResRef SoundResRef;
@@ -376,12 +376,12 @@ String TLKImporter::GetString(ieStrRef strref, ieDword flags)
 	if (core->HasFeature( GF_ALL_STRINGS_TAGGED ) || ( type & 4 )) {
 		string = ResolveTags(string);
 	}
-	if (type & 2 && flags & IE_STR_SOUND && !SoundResRef.IsEmpty()) {
+	if (type & 2 && bool(flags & STRING_FLAGS::SOUND) && !SoundResRef.IsEmpty()) {
 		// GEM_SND_SPEECH will stop the previous sound source
-		unsigned int flag = GEM_SND_RELATIVE | (flags & (GEM_SND_SPEECH | GEM_SND_QUEUE));
+		unsigned int flag = GEM_SND_RELATIVE | (uint32_t(flags) & (GEM_SND_SPEECH | GEM_SND_QUEUE));
 		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
 	}
-	if (flags & IE_STR_STRREFON) {
+	if (bool(flags & STRING_FLAGS::STRREFON)) {
 		string = std::to_wstring(strref) + L": " + string;
 	}
 	return string;
@@ -393,9 +393,9 @@ bool TLKImporter::HasAltTLK() const
 	return Language;
 }
 
-StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
+StringBlock TLKImporter::GetStringBlock(ieStrRef strref, STRING_FLAGS flags)
 {
-	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
+	bool empty = !(flags & STRING_FLAGS::ALLOW_ZERO) && !strref;
 	if (empty || strref >= StrRefCount) {
 		return StringBlock();
 	}

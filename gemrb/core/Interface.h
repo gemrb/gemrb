@@ -45,6 +45,7 @@
 #include "Timer.h"
 #include "Variables.h"
 #include "SaveGameAREExtractor.h"
+#include "StringMgr.h"
 #include "System/VFS.h"
 
 #include <map>
@@ -85,7 +86,6 @@ class ScriptedAnimation;
 class Spell;
 class Sprite2D;
 class Store;
-class StringMgr;
 class SymbolMgr;
 class TableMgr;
 class TextArea;
@@ -461,8 +461,8 @@ public:
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;
 	/* returns a newly created string */
-	String GetString(ieStrRef strref, ieDword options = 0) const;
-	std::string GetMBCString(ieStrRef strref, ieDword options = 0) const;
+	String GetString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
+	std::string GetMBCString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
 	/* sets the floattext color */
 	void SetInfoTextColor(const Color &color);
 	/** returns a gradient set */

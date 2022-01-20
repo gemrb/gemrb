@@ -161,11 +161,11 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 void DisplayMessage::DisplayConstantString(int stridx, const Color &color, Scriptable *target) const
 {
 	if (stridx<0) return;
-	String text = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND);
+	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
 	DisplayString(text, color, target);
 }
 
-void DisplayMessage::DisplayString(int stridx, const Color &color, ieDword flags) const
+void DisplayMessage::DisplayString(int stridx, const Color &color, STRING_FLAGS flags) const
 {
 	if (stridx<0) return;
 	String text = core->GetString(stridx, flags);
@@ -199,7 +199,7 @@ void DisplayMessage::DisplayString(const String& text, const Color &color, Scrip
 void DisplayMessage::DisplayConstantStringValue(int stridx, const Color &color, ieDword value) const
 {
 	if (stridx<0) return;
-	String text = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND);
+	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
 	String formatted = fmt::format(DisplayFormatValue, color.Packed(), text, value);
 	DisplayMarkupString(formatted);
 }
@@ -212,8 +212,8 @@ void DisplayMessage::DisplayConstantStringNameString(int stridx, const Color &co
 
 	String name;
 	Color actor_color = GetSpeakerColor(name, actor);
-	String text = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND);
-	String text2 = core->GetString(DisplayMessage::SRefs[stridx2], IE_STR_SOUND);
+	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
+	String text2 = core->GetString(DisplayMessage::SRefs[stridx2], STRING_FLAGS::SOUND);
 
 	if (!text2.empty()) {
 		String formated = fmt::format(DisplayFormatNameString, actor_color.Packed(), name, color.Packed(), text, text2);
@@ -231,7 +231,7 @@ void DisplayMessage::DisplayConstantStringName(int stridx, const Color &color, c
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	String text = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH);
+	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	DisplayStringName(text, color, speaker);
 }
 
@@ -241,7 +241,7 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, const Color &col
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	String fmt = core->GetString(DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH);
+	String fmt = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	DisplayStringName(fmt::format(fmt, value), color, speaker);
 }
 
@@ -256,12 +256,12 @@ void DisplayMessage::DisplayConstantStringAction(int stridx, const Color &color,
 	Color attacker_color = GetSpeakerColor(name1, attacker);
 	GetSpeakerColor(name2, target);
 
-	String text = core->GetString( DisplayMessage::SRefs[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	String text = core->GetString( DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH );
 	String formatted = fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, color.Packed(), text, name2);
 	DisplayMarkupString(formatted);
 }
 
-void DisplayMessage::DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const
+void DisplayMessage::DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const
 {
 	if (stridx<0) return;
 

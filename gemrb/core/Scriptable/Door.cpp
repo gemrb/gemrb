@@ -372,7 +372,7 @@ void Door::TryPickLock(const Actor *actor)
 {
 	if (LockDifficulty == 100) {
 		if (OpenStrRef != (ieDword)-1) {
-			displaymsg->DisplayStringName(OpenStrRef, DMC_BG2XPGREEN, actor, IE_STR_SOUND|IE_STR_SPEECH);
+			displaymsg->DisplayStringName(OpenStrRef, DMC_BG2XPGREEN, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
 			displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, DMC_BG2XPGREEN, actor);
 		}

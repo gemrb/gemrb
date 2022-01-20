@@ -54,15 +54,6 @@ namespace GemRB {
 
 //Global Variables
 
-#define IE_STR_STRREFON   1
-#define IE_STR_SOUND      2
-#define IE_STR_SPEECH     4
-#define IE_STR_ALLOW_ZERO 8     //0 strref is allowed
-#define IE_STR_STRREFOFF  256
-
-// checked against the strref itself
-#define IE_STR_ALTREF 0x0100000 // use alternate tlk file: dialogf.tlk
-
 /////feature flags
 enum GameFeatureFlags : uint32_t {
 	GF_HAS_KAPUTZ,          			//pst

@@ -897,7 +897,7 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
 	const String spell = core->GetString(spl->SpellName);
 	if (!spell.empty() && Type == ST_ACTOR) {
 		if (target) {
-			const String msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+			const String msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), STRING_FLAGS::NONE);
 			String str = fmt::format(L"{} {} : {}", msg, spell, target->GetName());
 			displaymsg->DisplayStringName(str, DMC_WHITE, this);
 		} else {
@@ -1444,8 +1444,8 @@ int Scriptable::CheckWildSurge()
 			// display feedback: Wild Surge: bla bla
 			// look up the spell in the "check" row of wildmag.2da
 			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
-			const String s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), 0);
-			const String s2 = core->GetString(surgeSpell.message, 0);
+			const String s1 = core->GetString(displaymsg->GetStringReference(STR_WILDSURGE), STRING_FLAGS::NONE);
+			const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
 			displaymsg->DisplayStringName(s1 + L" " + s2, DMC_WHITE, this);
 
 			if (!gamedata->Exists(surgeSpell.spell, IE_SPL_CLASS_ID)) {

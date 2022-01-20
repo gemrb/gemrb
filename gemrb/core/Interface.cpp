@@ -58,7 +58,6 @@
 #include "SoundMgr.h"
 #include "SpellMgr.h"
 #include "StoreMgr.h"
-#include "StringMgr.h"
 #include "SymbolMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
@@ -1657,7 +1656,7 @@ const char* Interface::TypeExt(SClass_ID type) const
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
 {
-	String current = GetString(strref, 0);
+	String current = GetString(strref, STRING_FLAGS::NONE);
 	if (current != text) {
 		return strings->UpdateString( strref, text );
 	} else {
@@ -1665,11 +1664,11 @@ ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
 	}
 }
 
-String Interface::GetString(ieStrRef strref, ieDword options) const
+String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 {
-	ieDword flags = 0;
+	STRING_FLAGS flags = STRING_FLAGS::NONE;
 
-	if (!(options & IE_STR_STRREFOFF)) {
+	if (!(options & STRING_FLAGS::STRREFOFF)) {
 		vars->Lookup( "Strref On", flags );
 	}
 
@@ -1680,7 +1679,7 @@ String Interface::GetString(ieStrRef strref, ieDword options) const
 	}
 }
 
-std::string Interface::GetMBCString(ieStrRef strref, ieDword options) const
+std::string Interface::GetMBCString(ieStrRef strref, STRING_FLAGS options) const
 {
 	String string = GetString(strref, options);
 	char* cstr = MBCStringFromString(string);
@@ -3247,7 +3246,7 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 		//custom strings
 		ieStrRef str = actor->Disabled(item->Name, item->ItemType);
 		if (str && !equipped) {
-			if (feedback) displaymsg->DisplayString(str, DMC_WHITE, 0);
+			if (feedback) displaymsg->DisplayString(str, DMC_WHITE, STRING_FLAGS::NONE);
 			return 0;
 		}
 	}
@@ -4016,7 +4015,7 @@ int Interface::WriteCharacter(const char *name, const Actor *actor)
 	if (!HasFeature(GF_NO_BIOGRAPHY)) {
 		str.Create( Path, name, IE_BIO_CLASS_ID );
 		//never write the string reference into this string
-		String tmp = GetString(actor->GetVerbalConstant(VB_BIO), IE_STR_STRREFOFF);
+		String tmp = GetString(actor->GetVerbalConstant(VB_BIO), STRING_FLAGS::STRREFOFF);
 		char* cstr = MBCStringFromString(tmp);
 		str.Write (cstr, strlen(cstr));
 		free(cstr);

@@ -48,6 +48,18 @@ struct StringBlock {
 	: text(std::move(text)), Sound(soundRef) {}
 };
 
+enum class STRING_FLAGS : uint32_t {
+	NONE			= 0,
+	STRREFON		= 1,
+	SOUND 			= 2,
+	SPEECH			= 4,
+	ALLOW_ZERO		= 8, // 0 strref is allowed
+	STRREFOFF		= 256,
+};
+
+// checked against the strref itself
+#define IE_STR_ALTREF 0x0100000 // use alternate tlk file: dialogf.tlk
+
 /**
  * @class StringMgr
  * Abstract loader for StringBlock objects (strings in .TLK files)
@@ -58,8 +70,8 @@ public:
 	virtual void OpenAux() = 0;
 	virtual void CloseAux() = 0;
 	virtual bool Open(DataStream* stream) = 0;
-	virtual String GetString(ieStrRef strref, unsigned int flags = 0) = 0;
-	virtual StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) = 0;
+	virtual String GetString(ieStrRef strref, STRING_FLAGS flags = STRING_FLAGS::NONE) = 0;
+	virtual StringBlock GetStringBlock(ieStrRef strref, STRING_FLAGS flags = STRING_FLAGS::NONE) = 0;
 	virtual ieStrRef UpdateString(ieStrRef strref, const String& text) = 0;
 	virtual bool HasAltTLK() const = 0;
 };

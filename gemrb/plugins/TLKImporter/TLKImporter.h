@@ -51,8 +51,8 @@ public:
 	/** construct a new custom string */
 	ieStrRef UpdateString(ieStrRef strref, const String& newvalue) override;
 	/** resolve a string reference */
-	String GetString(ieStrRef strref, ieDword flags = 0) override;
-	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) override;
+	String GetString(ieStrRef strref, STRING_FLAGS flags = STRING_FLAGS::NONE) override;
+	StringBlock GetStringBlock(ieStrRef strref, STRING_FLAGS flags = STRING_FLAGS::NONE) override;
 	bool HasAltTLK() const override;
 private:
 	/** resolves day and monthname tokens */

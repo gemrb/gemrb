@@ -3362,7 +3362,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 				continue;
 			}
 
-			displaymsg->DisplayString( RestHeader.Strref[idx], DMC_GOLD, IE_STR_SOUND );
+			displaymsg->DisplayString(RestHeader.Strref[idx], DMC_GOLD, STRING_FLAGS::SOUND);
 			while (spawnamount > 0 && spawncount < RestHeader.Maximum) {
 				if (!SpawnCreature(pos, RestHeader.CreResRef[idx], 20, 20, RestHeader.rwdist, &spawnamount, &spawncount)) {
 					break;
@@ -3814,7 +3814,7 @@ bool Map::DisplayTrackString(const Actor *target) const
 			displaymsg->DisplayConstantStringName(STR_TRACKING, DMC_LIGHTGREY, target);
 			return false;
 	}
-	displaymsg->DisplayStringName(trackString, DMC_LIGHTGREY, target, 0);
+	displaymsg->DisplayStringName(trackString, DMC_LIGHTGREY, target, STRING_FLAGS::NONE);
 	return false;
 }
 
