@@ -59,23 +59,23 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 	TextArea* ta = GetControl<TextArea>("CONSOLE", 1);
 	
 	if (ta) {
-		static const char* colors[] = {
-			"[color=FFFFFF]",	// DEFAULT
-			"[color=000000]",	// BLACK
-			"[color=FF0000]",	// RED
-			"[color=00FF00]",	// GREEN
-			"[color=603311]",	// BROWN
-			"[color=0000FF]",	// BLUE
-			"[color=8B008B]",	// MAGENTA
-			"[color=00CDCD]",	// CYAN
-			"[color=FFFFFF]",	// WHITE
-			"[color=CD5555]",	// LIGHT_RED
-			"[color=90EE90]",	// LIGHT_GREEN
-			"[color=FFFF00]",	// YELLOW
-			"[color=BFEFFF]",	// LIGHT_BLUE
-			"[color=FF00FF]",	// LIGHT_MAGENTA
-			"[color=B4CDCD]",	// LIGHT_CYAN
-			"[color=CDCDCD]"	// LIGHT_WHITE
+		static const wchar_t* colors[] = {
+			L"[color=FFFFFF]",	// DEFAULT
+			L"[color=000000]",	// BLACK
+			L"[color=FF0000]",	// RED
+			L"[color=00FF00]",	// GREEN
+			L"[color=603311]",	// BROWN
+			L"[color=0000FF]",	// BLUE
+			L"[color=8B008B]",	// MAGENTA
+			L"[color=00CDCD]",	// CYAN
+			L"[color=FFFFFF]",	// WHITE
+			L"[color=CD5555]",	// LIGHT_RED
+			L"[color=90EE90]",	// LIGHT_GREEN
+			L"[color=FFFF00]",	// YELLOW
+			L"[color=BFEFFF]",	// LIGHT_BLUE
+			L"[color=FF00FF]",	// LIGHT_MAGENTA
+			L"[color=B4CDCD]",	// LIGHT_CYAN
+			L"[color=CDCDCD]"	// LIGHT_WHITE
 		};
 		static constexpr log_color log_level_color[] = {
 			RED,
@@ -86,12 +86,12 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 			BLUE
 		};
 
-		const wchar_t* fmt = L"%s%s: [/color]%s%s[/color]\n";
-		size_t len = msg.message.length() + msg.owner.length() + wcslen(fmt) + 2 * strlen(colors[0]);
-		String text(len, L'\0');
 		int level = msg.level == INTERNAL ? 0 : msg.level;
-		swprintf(&text[0], len, fmt, colors[msg.color], msg.owner.c_str(), colors[log_level_color[level]], msg.message.c_str());
-		ta->AppendText(text);
+		String* decodedMsg = StringFromCString(msg.message.c_str());
+		String* decodedOwner = StringFromCString(msg.owner.c_str());
+		ta->AppendText(fmt::format(L"{}{}: [/color]{}{}[/color]\n", colors[msg.color], *decodedOwner, colors[log_level_color[level]], *decodedMsg));
+		delete decodedMsg;
+		delete decodedOwner;
 	}
 }
 
