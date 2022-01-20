@@ -48,7 +48,7 @@ bool DisplayMessage::EnableRollFeedback()
 
 String DisplayMessage::ResolveStringRef(int stridx)
 {
-	return core->GetString(stridx);
+	return core->GetString(stridx, STRING_FLAGS::RESOLVE_TAGS);
 }
 
 DisplayMessage::StrRefs::StrRefs()
@@ -241,7 +241,7 @@ void DisplayMessage::DisplayConstantStringNameValue(int stridx, const Color &col
 	if (stridx<0) return;
 	if(!speaker) return;
 
-	String fmt = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+	String fmt = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::RESOLVE_TAGS);
 	DisplayStringName(fmt::format(fmt, value), color, speaker);
 }
 
