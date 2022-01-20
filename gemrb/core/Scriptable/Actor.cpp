@@ -4597,10 +4597,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	if (InParty) {
 		if (chp < (signed) Modified[IE_MAXHITPOINTS]/10) {
-			core->Autopause(AP_WOUNDED, this);
+			core->Autopause(AUTOPAUSE::WOUNDED, this);
 		}
 		if (damage > 0) {
-			core->Autopause(AP_HIT, this);
+			core->Autopause(AUTOPAUSE::HIT, this);
 			core->SetEventFlag(EF_PORTRAIT);
 		}
 	}
@@ -5452,7 +5452,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 
 	if (InParty) {
 		game->PartyMemberDied(this);
-		core->Autopause(AP_DEAD, this);
+		core->Autopause(AUTOPAUSE::DEAD, this);
 	} else {
 		// sometimes we want to skip xp giving and favourite registration
 		if (grantXP && act) {
@@ -6481,7 +6481,7 @@ void Actor::AttackedBy(const Actor *attacker)
 		LastAttacker = attacker->GetGlobalID();
 	}
 	if (InParty) {
-		core->Autopause(AP_ATTACKED, this);
+		core->Autopause(AUTOPAUSE::ATTACKED, this);
 	}
 }
 
@@ -6499,7 +6499,7 @@ void Actor::StopAttack()
 	secondround = false;
 	//InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
-		core->Autopause(AP_NOTARGET, this);
+		core->Autopause(AUTOPAUSE::NOTARGET, this);
 	}
 }
 
@@ -6691,7 +6691,7 @@ void Actor::InitRound(ieDword gameTime)
 
 	// this might not be the right place, but let's give it a go
 	if (attacksperround && InParty) {
-		core->Autopause(AP_ENDROUND, this);
+		core->Autopause(AUTOPAUSE::ENDROUND, this);
 	}
 }
 
@@ -7628,7 +7628,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			if (core->HasFeedback(FT_COMBAT)) {
 				attacker->DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
 			}
-			core->Autopause(AP_UNUSABLE, this);
+			core->Autopause(AUTOPAUSE::UNUSABLE, this);
 		}
 	}
 }
@@ -9326,7 +9326,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		critical = false;
 		if (InParty) {
 			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
-			core->Autopause(AP_UNUSABLE, this);
+			core->Autopause(AUTOPAUSE::UNUSABLE, this);
 		}
 		return;
 	}

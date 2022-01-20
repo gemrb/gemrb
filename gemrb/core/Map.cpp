@@ -2042,7 +2042,7 @@ bool Map::HandleAutopauseForVisible(Actor *actor, bool doPause) const
 {
 	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK)) {
 		if (doPause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
-			core->Autopause(AP_ENEMY, actor);
+			core->Autopause(AUTOPAUSE::ENEMY, actor);
 		actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::OR);
 		return true;
 	}
