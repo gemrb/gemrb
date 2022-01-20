@@ -87,6 +87,15 @@ public:
 		return len;
 	}
 	
+	template <typename ENUM>
+	typename std::enable_if<std::is_enum<ENUM>::value, strret_t>::type
+	ReadEnum(ENUM& dest) {
+		typename std::underlying_type<ENUM>::type scalar;
+		strret_t ret = ReadScalar(scalar);
+		dest = static_cast<ENUM>(scalar);
+		return ret;
+	}
+	
 	template <typename T>
 	strret_t WriteScalar(const T& src) {
 		strret_t len;
@@ -105,6 +114,12 @@ public:
 		static_assert(sizeof(SRC) >= sizeof(DST), "This flavor of WriteScalar requires SRC to be >= DST.");
 		DST dst = static_cast<DST>(src);
 		return WriteScalar<DST>(dst);
+	}
+	
+	template <typename ENUM>
+	typename std::enable_if<std::is_enum<ENUM>::value, strret_t>::type
+	WriteEnum(const ENUM& dest) {
+		return WriteScalar(static_cast<typename std::underlying_type<ENUM>::type>(dest));
 	}
 
 	strret_t ReadResRef(ResRef& dest);
