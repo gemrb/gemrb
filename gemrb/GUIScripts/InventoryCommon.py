@@ -419,9 +419,9 @@ def CycleDisplayItem(direction):
 		GemRB.SetVar('ItemButton', slot)
 
 	if slot_item:
-		OpenItemInfoWindow (None, slot)
+		OpenItemInfoWindow (slot)
 
-def OpenItemInfoWindow (btn, slot):
+def OpenItemInfoWindow (slot):
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	slotItem = GemRB.GetSlotItem (pc, slot)
@@ -452,11 +452,11 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled=0):
 		return True
 	return False
 
-def OpenGroundItemInfoWindow (btn, slot):
+def OpenGroundItemInfoWindow (btn):
 	global ItemInfoWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = slot + GemRB.GetVar ("TopIndex") - (47 if GameCheck.IsPST () else 68)
+	slot = btn.Value + GemRB.GetVar ("TopIndex") - (47 if GameCheck.IsPST () else 68)
 	slot_item = GemRB.GetContainerItem (pc, slot)
 
 	#the ground items are only displayable
@@ -616,7 +616,7 @@ def UpdateSlot (pc, slot):
 	if slot_item:
 		Button.SetAction(OnDragItem, IE_ACT_DRAG_DROP_CRT)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenItemInfoWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: OpenItemInfoWindow (slot))
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
 		#If the slot is being used to display the 'default' weapon, disable dragging.
 		if SlotType["ID"] == 10 and using_fists:
@@ -906,7 +906,7 @@ def IdentifyUseSpell ():
 		ItemInfoWindow.Unload ()
 	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	GemRB.PlaySound(DEF_IDENTIFY)
-	OpenItemInfoWindow(None, slot)
+	OpenItemInfoWindow(slot)
 	return
 
 def IdentifyUseScroll ():
@@ -923,7 +923,7 @@ def IdentifyUseScroll ():
 	if GemRB.HasSpecialItem (pc, 1, 1):
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	GemRB.PlaySound(DEF_IDENTIFY)
-	OpenItemInfoWindow(None, slot)
+	OpenItemInfoWindow(slot)
 	return
 
 def CloseIdentifyItemWindow ():

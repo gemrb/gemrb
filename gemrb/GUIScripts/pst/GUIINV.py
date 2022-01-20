@@ -247,6 +247,7 @@ def RefreshInventoryWindow (Window):
 				Button.SetTooltip (item["ItemNameIdentified"])
 				Button.EnableBorder (0, 0)
 			
+			Button.SetValue (Slot)
 			Button.SetAction(InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
