@@ -184,17 +184,19 @@ public:
 #define EF_TEXTSCREEN    8192     //start a textscreen
 
 //autopause
-#define AP_UNUSABLE      0
-#define AP_ATTACKED      1
-#define AP_HIT           2
-#define AP_WOUNDED       3
-#define AP_DEAD          4
-#define AP_NOTARGET      5
-#define AP_ENDROUND      6
-#define AP_ENEMY         7
-#define AP_TRAP          8
-#define AP_SPELLCAST     9
-#define AP_GENERIC       10  //needed for Android stuff
+enum class AUTOPAUSE : ieDword {
+	UNUSABLE     = 0,
+	ATTACKED     = 1,
+	HIT          = 2,
+	WOUNDED      = 3,
+	DEAD         = 4,
+	NOTARGET     = 5,
+	ENDROUND     = 6,
+	ENEMY        = 7,
+	TRAP         = 8,
+	SPELLCAST    = 9,
+	GENERIC      = 10  //needed for Android stuff
+};
 
 //pause flags
 #define PF_QUIET  1        //no feedback
@@ -682,7 +684,7 @@ public:
 	/** returns true the passed pause setting was applied. false otherwise. */
 	bool SetPause(PauseSetting pause, int flags = 0) const;
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
-	bool Autopause(ieDword flag, Scriptable *target) const;
+	bool Autopause(AUTOPAUSE flag, Scriptable *target) const;
 	/** registers engine opcodes */
 	void RegisterOpcodes(int count, const EffectDesc *opcodes) const;
 	/** reads a list of resrefs into an array, returns array size */

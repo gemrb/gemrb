@@ -315,7 +315,7 @@ void Highlightable::SetTrapDetected(int x)
 	TrapDetected = x;
 	if(TrapDetected) {
 		core->PlaySound(DS_FOUNDSECRET, SFX_CHAN_HITS);
-		core->Autopause(AP_TRAP, this);
+		core->Autopause(AUTOPAUSE::TRAP, this);
 	}
 }
 

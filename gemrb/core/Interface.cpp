@@ -4294,12 +4294,12 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 	return false;
 }
 
-bool Interface::Autopause(ieDword flag, Scriptable* target) const
+bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 {
-	ieDword autopause_flags = 0;
+	AUTOPAUSE autopause_flags = AUTOPAUSE::UNUSABLE;
 	vars->Lookup("Auto Pause State", autopause_flags);
 
-	if (!(autopause_flags & (1 << flag))) {
+	if (!(autopause_flags & AUTOPAUSE(1 << ieDword(flag)))) {
 		return false;
 	}
 
@@ -4307,7 +4307,7 @@ bool Interface::Autopause(ieDword flag, Scriptable* target) const
 		return false;
 	}
 
-	displaymsg->DisplayConstantString(STR_AP_UNUSABLE + flag, DMC_RED);
+	displaymsg->DisplayConstantString(STR_AP_UNUSABLE + ieDword(flag), DMC_RED);
 
 	ieDword centerOnAutoPause = 0;
 	vars->Lookup("Auto Pause Center", centerOnAutoPause);

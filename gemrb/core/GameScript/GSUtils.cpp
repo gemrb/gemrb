@@ -2647,7 +2647,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 		if (!invalidTarget) return false;
 
 		if (caster->InParty) {
-			core->Autopause(AP_NOTARGET, caster);
+			core->Autopause(AUTOPAUSE::NOTARGET, caster);
 		}
 		caster->SetStance(IE_ANI_READY);
 		return true;

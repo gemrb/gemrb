@@ -874,7 +874,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 	}
 	// only trigger the autopause when in combat or buffing gets very annoying
 	if (core->GetGame()->CombatCounter && caster && caster->IsPartyMember()) {
-		core->Autopause(AP_SPELLCAST, this);
+		core->Autopause(AUTOPAUSE::SPELLCAST, this);
 	}
 
 	gamedata->FreeSpell(spl, spellResRef, false);
