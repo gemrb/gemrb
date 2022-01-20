@@ -305,6 +305,19 @@ String TLKImporter::ResolveTags(const String& source)
 			} else {
 				dest.append(str);
 			}
+		} else if (srcch == L'%' && i + 1 < strLen - 1) {
+			// also resolve format strings
+			// we assume they are % followed by a single character
+			auto nextch = source[i + 1];
+			// we are going to only work with %d
+			// the originals dont seem to use anything else so we will play it safe
+			//if (isspace(nextch) || ispunct(nextch)) {
+			if (nextch != L'd') {
+				dest.push_back(srcch);
+			} else {
+				dest.append(L"{}");
+				++i;
+			}
 		} else if (srcch == L'[') {
 			// voice actor directives
 			i = source.find_first_of(L']', i + 1);
