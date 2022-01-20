@@ -321,6 +321,19 @@ void DisplayMessage::DisplayRollStringName(int stridx, const Color &color, const
 	}
 }
 
+void DisplayMessage::DisplayStringName(int stridx, const int colorId, const Scriptable *speaker, ieDword flags) const
+{
+	Color aux;
+	switch(colorId) {
+		case DMC_DIALOG:
+			aux = gamedata->GetColor("DMC_DIALOG");
+			break;
+		default :
+			aux = gamedata->GetColor("DMC_WHITE");
+	}
+	DisplayStringName(stridx, aux, speaker, flags);
+}
+
 void DisplayMessage::DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const
 {
 	if (stridx<0) return;
