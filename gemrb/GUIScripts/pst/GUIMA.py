@@ -57,7 +57,7 @@ def InitMapWindow (Window):
 	Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, SetMapNote)
-	Map.SetAction(Window.Close, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
+	Map.SetAction(lambda: Window.Close (), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
 	MapName = MapTable.GetValue (GemRB.GetCurrentArea (), "STRING")
