@@ -272,9 +272,11 @@ String TLKImporter::BuiltinToken(const char* Token)
 
 String TLKImporter::ResolveTags(const String& source)
 {
-	auto mystrncpy = [&source](char* dest, size_t idx, int maxlength,
+	const size_t strLen = source.length();
+	auto mystrncpy = [&source, &strLen](char* dest, size_t idx, size_t maxlength,
 		char delim)
 	{
+		maxlength = std::min(maxlength, strLen);
 		while (idx < source.length() && (source[idx] != delim) && maxlength--) {
 			char chr = source[idx++];
 			if (chr != ' ') *dest++ = chr;
