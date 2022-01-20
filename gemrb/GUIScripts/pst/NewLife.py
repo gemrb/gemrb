@@ -301,36 +301,36 @@ def StrPress():
 
 	if e>60:
 		s=19
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(s,0),x,y) )
+	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(s,0)).format(x,y))
 	return
 
 def IntPress():
 	TextArea.SetText(18488)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Stats[1],1),0,0) )
+	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[1],1)).format(0,0))
 	return
 
 def WisPress():
 	TextArea.SetText(18490)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Stats[2],2),0,0) )
+	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[2],2)).format(0,0))
 	return
 
 def DexPress():
 	Table = GemRB.LoadTable("dexmod")
 	x = -Table.GetValue (Stats[3], 2)
 	TextArea.SetText(18487)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Stats[3],3),x,0) )
+	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[3],3)).format(x,0))
 	return
 
 def ConPress():
 	Table = GemRB.LoadTable("hpconbon")
 	x = Table.GetValue (Stats[4]-1, 1)
 	TextArea.SetText(18491)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Stats[4],4),x,0) )
+	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[4],4)).format(x,0))
 	return
 
 def ChaPress():
 	TextArea.SetText(1903)
-	TextArea.Append("\n\n"+GemRB.StatComment(StatTable.GetValue(Stats[5],5),0,0) )
+	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[5],5)).format(0,0))
 	return
 
 StatPress = [ StrPress, IntPress, WisPress, DexPress, ConPress, ChaPress ]

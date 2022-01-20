@@ -489,57 +489,6 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_StatComment__doc,
-"===== StatComment =====\n\
-\n\
-**Prototype:** GemRB.StatComment (Strref, X, Y)\n\
-\n\
-**Description:**\n\
-Replaces %%d's with the values of X and Y in a string referenced by strref.\n\
-\n\
-PST uses %%d values in place of tokens, thus it requires a special command. \n\
-In other engines use GetString after setting the needed tokens with \n\
-SetToken (if you need to set them at all).\n\
-\n\
-**Parameters:**\n\
-  * Strref - a string reference from the dialog.tlk table.\n\
-  * X, Y   - two numerical values to be replaced in place of %%d's.\n\
-\n\
-**Return value:** A string with resolved %%d's.\n\
-\n\
-**Example:**\n\
-def IntPress():\n\
-    global Int, StatTable, TextArea\n\
-    TextArea.SetText (18488)\n\
-    intComment = StatTable.GetValue (Int, 1)\n\
-    TextArea.Append (GemRB.StatComment (intComment, 0, 0))\n\
-\n\
-The above example comes directly from our PST script, it will display the \n\
-description of the intelligence stat (strref==18488), adding a comment \n\
-based on the current Int variable. StatTable (a 2da table) contains the \n\
-comment strref values associated with an intelligence value.\n\
-\n\
-**See also:** [[guiscript:GetString]], [[guiscript:SetToken]],\n\
-[[guiscript:Table_GetValue]], [[guiscript:Control_SetText]],[[guiscript:LoadTable]],\n\
-[[guiscript:TextArea_Append]]\n\
-"
-);
-
-static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
-{
-	ieStrRef Strref;
-	int X, Y;
-	PARSE_ARGS( args, "iii", &Strref, &X, &Y );
-
-	String fmt = core->GetString(Strref);
-	size_t bufflen = fmt.length() + 12;
-
-	wchar_t* newtext = new wchar_t[bufflen];
-	//this could be DANGEROUS, not anymore (snprintf is your friend)
-	swprintf(newtext, bufflen, fmt.c_str(), X, Y);
-	return PyString_FromStringObj(String(newtext));
-}
-
 PyDoc_STRVAR( GemRB_GetString__doc,
 "===== GetString =====\n\
 \n\
@@ -558,15 +507,14 @@ level value without a token, you'll need this.\n\
     * 4   - speech (stop previous sound)\n\
     * 256 - strref off (overrides cfg)\n\
 \n\
-**Return value:** A string with resolved tokens. To resolve %d's, you must\n\
-either use StatComment or do it manually.\n\
+**Return value:** A string with resolved tokens.\
 \n\
 **Example:**\n\
    Level = GemRB.GetPlayerStat (pc, IE_LEVEL) # 1 at character generation\n\
    Label.SetText (GemRB.GetString(12137) + str(Level)) \n\
 The above example will display 'Level: 1' in the addressed label.\n\
 \n\
-**See also:** [[guiscript:StatComment]], [[guiscript:Control_SetText]]\n\
+**See also:** [[guiscript:Control_SetText]]\n\
 "
 );
 
@@ -13322,7 +13270,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetVar, METH_VARARGS),
 	METHOD(SoftEndPL, METH_NOARGS),
 	METHOD(SpellCast, METH_VARARGS),
-	METHOD(StatComment, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
