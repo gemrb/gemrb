@@ -581,7 +581,7 @@ public:
 	{
 		return attackProjectile;
 	}
-	void SetName(const String& str, unsigned char type);
+	void SetName(String str, unsigned char type);
 	void SetName(int strref, unsigned char type);
 	/* Returns by how much movement speed should be divided to account for loot weight */
 	int GetEncumbranceFactor(bool feedback) const;

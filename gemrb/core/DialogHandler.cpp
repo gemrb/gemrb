@@ -268,8 +268,7 @@ static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& op
 			core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, BitOp::OR);
 			break;
 		} else {
-			String string = core->GetString(ds->transitions[x]->textStrRef);
-			options.emplace_back(x, string);
+			options.emplace_back(x, core->GetString(ds->transitions[x]->textStrRef));
 		}
 	}
 

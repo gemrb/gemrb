@@ -486,7 +486,7 @@ void Actor::SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot
 	DefaultButtons[2]=slot3;
 }
 
-void Actor::SetName(const String& str, unsigned char type)
+void Actor::SetName(String str, unsigned char type)
 {
 	String* name = nullptr;
 	if (type == 1) {
@@ -494,11 +494,11 @@ void Actor::SetName(const String& str, unsigned char type)
 	} else {
 		name = &ShortName;
 	}
-	*name = str;
+	std::swap(*name, str);
 	TrimString(*name);
 
 	if (type == 0) {
-		SetName(str, 1);
+		LongName = ShortName;
 	}
 }
 
@@ -514,7 +514,7 @@ void Actor::SetName(int strref, unsigned char type)
 		name = core->GetString(strref);
 		ShortStrRef = strref;
 	}
-	SetName(name, type);
+	SetName(std::move(name), type);
 }
 
 void Actor::SetAnimationID(unsigned int AnimID)

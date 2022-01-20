@@ -297,7 +297,7 @@ String TLKImporter::ResolveTags(const String& source)
 					core->GetTokenDictionary()->Lookup(Token, tokVal, TokenLength);
 					String* tmp = StringFromCString(tokVal);
 					assert(tmp);
-					dest.append(*tmp);
+					dest.append(std::move(*tmp));
 					delete tmp;
 				}
 			} else {

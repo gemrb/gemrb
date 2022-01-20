@@ -321,7 +321,7 @@ bool Variables::Lookup(const char* key, String& dest) const
 	if (ret) {
 		String* tmp = StringFromCString(buff);
 		assert(tmp);
-		dest = *tmp;
+		std::swap(dest, *tmp);
 		delete tmp;
 	}
 	return ret;
