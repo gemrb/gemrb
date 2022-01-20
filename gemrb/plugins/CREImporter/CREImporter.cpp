@@ -854,7 +854,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	act->InParty = is_in_party;
 	str->ReadDword(act->LongStrRef);
 	//Beetle name in IWD needs the allow zero flag
-	String poi = core->GetString( act->LongStrRef, IE_STR_ALLOW_ZERO );
+	String poi = core->GetString( act->LongStrRef, STRING_FLAGS::ALLOW_ZERO );
 	act->SetName(std::move(poi), 1); //setting longname
 	str->ReadDword(act->ShortStrRef);
 	if (act->ShortStrRef == (ieStrRef) -1) {

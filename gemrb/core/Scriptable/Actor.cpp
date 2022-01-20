@@ -4618,7 +4618,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
-			type_name = core->GetString(it->second.strref, 0);
+			type_name = core->GetString(it->second.strref, STRING_FLAGS::NONE);
 		}
 		detailed = true;
 	}
@@ -4661,7 +4661,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
-			String msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), 0);
+			String msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), STRING_FLAGS::NONE);
 			String dmg = fmt::format(L" ({})", damage);
 			displaymsg->DisplayStringName(msg + dmg, DMC_WHITE, this);
 		} else { //bg2
@@ -6409,7 +6409,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 	if (IsSelected()) {
 		// display the turning-off message
 		if (Modal.State != MS_NONE && core->HasFeedback(FT_MISC)) {
-			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, DMC_WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		}
 
 		//update the action bar
@@ -7830,11 +7830,11 @@ void Actor::UpdateModalState(ieDword gameTime)
 				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
 				Modal.FirstApply = false;
 				if (InParty && feedback && core->HasFeedback(FT_MISC)) {
-					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, DMC_WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
 			} else {
 				if (InParty && core->HasFeedback(FT_MISC)) {
-					displaymsg->DisplayStringName(ModalStates[Modal.State].failed_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
+					displaymsg->DisplayStringName(ModalStates[Modal.State].failed_str, DMC_WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
 				Modal.State = MS_NONE;
 			}

@@ -496,7 +496,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 				if(flags&DS_NONAME) {
 					displaymsg->DisplayString(sb.text);
 				} else {
-					displaymsg->DisplayStringName( Strref, DMC_WHITE, Sender, 0);
+					displaymsg->DisplayStringName(Strref, DMC_WHITE, Sender, STRING_FLAGS::NONE);
 				}
 			}
 			if (flags & (DS_HEAD | DS_AREA)) {
@@ -2912,7 +2912,7 @@ void AddXPCore(const Action *parameters, bool divide)
 	}
 
 	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, IE_STR_SOUND);
+		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, STRING_FLAGS::SOUND);
 	}
 	if (!xptable) {
 		Log(ERROR, "GameScript", "Can't perform AddXP2DA/AddXPVar!");

@@ -1257,7 +1257,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 	if (target && fx->FirstApply) {
 		if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0)) {
-			displaymsg->DisplayStringName(Opcodes[fx->Opcode].Strref, DMC_WHITE, target, IE_STR_SOUND);
+			displaymsg->DisplayStringName(Opcodes[fx->Opcode].Strref, DMC_WHITE, target, STRING_FLAGS::SOUND);
 		}
 	}
 

@@ -1181,7 +1181,7 @@ String GameControl::TooltipText() const {
 				strindex = STR_INJURED4;
 			}
 			strindex = displaymsg->GetStringReference(strindex);
-			String injuredstring = core->GetString(strindex, 0);
+			String injuredstring = core->GetString(strindex, STRING_FLAGS::NONE);
 			tip += L"\n" + injuredstring;
 		}
 	}
@@ -2626,7 +2626,7 @@ void GameControl::SetDisplayText(const String& text, unsigned int time)
 
 void GameControl::SetDisplayText(ieStrRef text, unsigned int time)
 {
-	SetDisplayText(core->GetString(displaymsg->GetStringReference(text), 0), time);
+	SetDisplayText(core->GetString(displaymsg->GetStringReference(text), STRING_FLAGS::NONE), time);
 }
 
 void GameControl::ToggleAlwaysRun()

@@ -4327,7 +4327,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-		displaymsg->DisplayStringName(fx->Parameter1, DMC_WHITE, target, IE_STR_SOUND|IE_STR_SPEECH);
+		displaymsg->DisplayStringName(fx->Parameter1, DMC_WHITE, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -7851,7 +7851,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 	}
 
 	if (sourceNameRef != ieStrRef(-1)) {
-		String sourceName = core->GetString(sourceNameRef, 0);
+		String sourceName = core->GetString(sourceNameRef, STRING_FLAGS::NONE);
 		core->GetTokenDictionary()->SetAt("RESOURCE", sourceName);
 		displaymsg->DisplayConstantStringName(STR_RES_RESISTED, DMC_WHITE, target);
 	}

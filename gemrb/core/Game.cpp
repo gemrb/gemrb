@@ -1801,9 +1801,9 @@ bool Game::RestParty(int checks, int dream, int hp)
 	//this would be bad
 	if (hrsindex == -1 || restindex == -1) return cutscene;
 	
-	String tmpstr = core->GetString(hrsindex, 0);
+	String tmpstr = core->GetString(hrsindex, STRING_FLAGS::NONE);
 	core->GetTokenDictionary()->SetAt("DURATION", tmpstr);
-	displaymsg->DisplayString(restindex, DMC_WHITE, 0);
+	displaymsg->DisplayString(restindex, DMC_WHITE, STRING_FLAGS::NONE);
 	return cutscene;
 }
 
