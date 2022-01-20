@@ -456,7 +456,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		if (pcInfo.Name[0]!=0 && pcInfo.Name[0]!=UNINITIALIZED_CHAR) {
 			String* name = StringFromCString(pcInfo.Name);
 			assert(name);
-			actor->SetName(*name, 0);
+			actor->SetName(std::move(*name), 0);
 			delete name;
 		}
 		actor->TalkCount = pcInfo.TalkCount;

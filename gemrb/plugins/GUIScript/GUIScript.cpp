@@ -4935,7 +4935,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 		} else {
 			string = PyString_AsStringObj(item);
 		}
-		TAOptions.emplace_back(i, *string);
+		TAOptions.emplace_back(i, std::move(*string));
 		delete string;
 	}
 	ta->SetSelectOptions(TAOptions, false);

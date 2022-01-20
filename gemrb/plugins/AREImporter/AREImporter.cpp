@@ -1444,9 +1444,9 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 				ieDword readonly;
 				str->ReadDword(readonly); //readonly == 1
 				if (readonly) {
-					map->AddMapNote(point, 0, *text, true);
+					map->AddMapNote(point, 0, std::move(*text), true);
 				} else {
-					map->AddMapNote(point, 1, *text, false);
+					map->AddMapNote(point, 1, std::move(*text), false);
 				}
 				delete text;
 				str->Seek(20, GEM_CURRENT_POS);
