@@ -11919,18 +11919,19 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	// - resting outside: popup an error window with the reason in pst, print it to message window elsewhere
 	// - resting in inns: popup a GUISTORE error window with the reason
 	PyObject* dict = PyDict_New();
-	int cannotRest = game->CanPartyRest(noareacheck);
+	ieStrRef err = -1;
+	bool cannotRest = !game->CanPartyRest(noareacheck, &err);
 	// fall back to the generic: you may not rest at this time
-	if (cannotRest == -1) {
+	if (err == -1) {
 		if (core->HasFeature(GF_AREA_OVERRIDE)) {
-			cannotRest = displaymsg->GetStringReference(STR_MAYNOTREST);
+			err = displaymsg->GetStringReference(STR_MAYNOTREST);
 		} else {
-			cannotRest = 10309;
+			err = 10309;
 		}
 	}
-	PyDict_SetItemString(dict, "Error", PyBool_FromLong(cannotRest != 0));
+	PyDict_SetItemString(dict, "Error", PyBool_FromLong(cannotRest));
 	if (cannotRest) {
-		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromLong(cannotRest));
+		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromLong(err));
 		PyDict_SetItemString(dict, "Cutscene", PyBool_FromLong(0));
 	} else {
 		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromLong(-1));

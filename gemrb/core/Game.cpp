@@ -1612,17 +1612,21 @@ void Game::TextDream()
 	}
 }
 
-// returns 0 if it can
-// returns strref or -1 if it can't
-int Game::CanPartyRest(int checks) const
+bool Game::CanPartyRest(int checks, ieStrRef* err) const
 {
 	if (checks == REST_NOCHECKS) return 0;
+	
+	if (!err) {
+		static ieStrRef noerr = -1;
+		err = &noerr;
+	}
 
 	if (checks & REST_CONTROL) {
 		for (auto pc : PCs) {
 			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS) {
 				// You cannot rest at this time because you do not have control of all your party members
-				return displaymsg->GetStringReference(STR_CANTTRESTNOCONTROL);
+				*err = displaymsg->GetStringReference(STR_CANTTRESTNOCONTROL);
+				return false;
 			}
 		}
 	}
@@ -1634,18 +1638,21 @@ int Game::CanPartyRest(int checks) const
 	if (checks & REST_SCATTER) {
 		if (!EveryoneNearPoint(area, leader->Pos, 0)) {
 			//party too scattered
-			return displaymsg->GetStringReference(STR_SCATTERED);
+			*err = displaymsg->GetStringReference(STR_SCATTERED);
+			return false;
 		}
 	}
 
 	if (checks & REST_CRITTER) {
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
-			return displaymsg->GetStringReference(STR_CANTRESTMONS);
+			*err = displaymsg->GetStringReference(STR_CANTRESTMONS);
+			return false;
 		}
 		//don't allow resting if hostiles are nearby
 		if (area->AnyEnemyNearPoint(leader->Pos)) {
-			return displaymsg->GetStringReference(STR_CANTRESTMONS);
+			*err = displaymsg->GetStringReference(STR_CANTRESTMONS);
+			return false;
 		}
 	}
 
@@ -1653,7 +1660,8 @@ int Game::CanPartyRest(int checks) const
 	if (checks & REST_AREA) {
 		//you cannot rest here
 		if (area->AreaFlags & AF_NOSAVE) {
-			return displaymsg->GetStringReference(STR_MAYNOTREST);
+			*err = displaymsg->GetStringReference(STR_MAYNOTREST);
+			return false;
 		}
 
 		if (core->HasFeature(GF_AREA_OVERRIDE)) {
@@ -1661,27 +1669,31 @@ int Game::CanPartyRest(int checks) const
 			// and repurposes these area flags!
 			if ((area->AreaFlags & (AF_TUTORIAL|AF_DEADMAGIC)) == (AF_TUTORIAL|AF_DEADMAGIC)) {
 				// you must obtain permission
-				return 38587;
+				*err = 38587;
+				return false;
 			} else if (area->AreaFlags&AF_TUTORIAL) {
 				// you cannot rest in this area
-				return 34601;
+				*err = 34601;
+				return false;
 			} else if (area->AreaFlags&AF_DEADMAGIC) {
 				// you cannot rest right now
-				return displaymsg->GetStringReference(STR_MAYNOTREST);
+				*err = displaymsg->GetStringReference(STR_MAYNOTREST);
+				return false;
 			}
 		} else {
 			// you may not rest here, find an inn
 			if (!(area->AreaType & (AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS))) {
 				// at least in iwd1, the outdoor bit is not enough
 				if (area->AreaType & AT_OUTDOOR && !core->HasFeature(GF_AREA_VISITED_VAR)) {
-					return 0;
+					return true;
 				}
-				return displaymsg->GetStringReference(STR_MAYNOTREST);
+				*err = displaymsg->GetStringReference(STR_MAYNOTREST);
+				return false;
 			}
 		}
 	}
 
-	return 0;
+	return true;
 }
 
 // checks: can anything prevent us from resting?
@@ -1693,7 +1705,7 @@ int Game::CanPartyRest(int checks) const
 // returns true if a cutscene dream is about to be played
 bool Game::RestParty(int checks, int dream, int hp)
 {
-	if (CanPartyRest(checks)) {
+	if (!CanPartyRest(checks)) {
 		return false;
 	}
 
