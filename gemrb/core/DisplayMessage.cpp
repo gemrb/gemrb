@@ -259,7 +259,20 @@ void DisplayMessage::DisplayStringName(ieStrRef str, const Color &color, const S
 	DisplayStringName(core->GetString(str, flags), color, speaker);
 }
 
-void DisplayMessage::DisplayStringName(String text, const Color &color, const Scriptable *speaker) const
+void DisplayMessage::DisplayStringName(int stridx, const int colorId, const Scriptable *speaker, ieDword flags) const
+{
+	Color aux;
+	switch(colorId) {
+		case DMC_DIALOG:
+			aux = gamedata->GetColor("DMC_DIALOG");
+			break;
+		default :
+			aux = gamedata->GetColor("DMC_WHITE");
+	}
+	DisplayStringName(stridx, aux, speaker, flags);
+}
+
+void DisplayMessage::DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const
 {
 	if (!text.length() || !text.compare(L" ")) return;
 
