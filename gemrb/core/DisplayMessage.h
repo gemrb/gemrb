@@ -61,7 +61,7 @@ private:
 	static void LoadStringRefs();
 	
 	static bool EnableRollFeedback();
-	static String ResolveStringRef(int);
+	static String ResolveStringRef(ieStrRef);
 	
 	template<typename ...ARGS>
 	void DisplayRollStringName(const String& fmt, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {
@@ -79,27 +79,27 @@ public:
 	/** displays any string in the textarea */
 	void DisplayMarkupString(const String& txt) const;
 	/** displays a string constant in the textarea */
-	void DisplayConstantString(int stridx, const Color &color, Scriptable *speaker=NULL) const;
+	void DisplayConstantString(ieStrRef stridx, const Color &color, Scriptable *speaker=NULL) const;
 	/** displays actor name - action : parameter */
-	void DisplayConstantStringNameString(int stridx, const Color &color, int stridx2, const Scriptable *actor) const;
+	void DisplayConstantStringNameString(ieStrRef stridx, const Color &color, ieStrRef stridx2, const Scriptable *actor) const;
 	/** displays a string constant followed by a number in the textarea */
-	void DisplayConstantStringValue(int stridx, const Color &color, ieDword value) const;
+	void DisplayConstantStringValue(ieStrRef stridx, const Color &color, ieDword value) const;
 	/** displays a string constant in the textarea, starting with speaker's name */
-	void DisplayConstantStringName(int stridx, const Color &color, const Scriptable *speaker) const;
+	void DisplayConstantStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker) const;
 	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
-	void DisplayConstantStringNameValue(int stridx, const Color &color, const Scriptable *speaker, int value) const;
+	void DisplayConstantStringNameValue(ieStrRef stridx, const Color &color, const Scriptable *speaker, int value) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(int stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
+	void DisplayConstantStringAction(ieStrRef stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
-	void DisplayString(int stridx, const Color &color, STRING_FLAGS flags) const;
+	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;
 	void DisplayString(const String& text, const Color &color, Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
+	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	void DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const;
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>
-	void DisplayRollStringName(int stridx, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {
+	void DisplayRollStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {
 		if (EnableRollFeedback()) {
 			String fmt = ResolveStringRef(stridx);
 			DisplayRollStringName(fmt, color, speaker, std::forward<ARGS>(args)...);
