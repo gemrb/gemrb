@@ -1671,6 +1671,11 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 	if (!(options & STRING_FLAGS::STRREFOFF)) {
 		vars->Lookup( "Strref On", flags );
 	}
+	
+	if (core->HasFeature(GF_ALL_STRINGS_TAGGED)) {
+		//tagged text, bg1 and iwd don't mark them specifically, all entries are tagged
+		options |= STRING_FLAGS::RESOLVE_TAGS;
+	}
 
 	if (strings2 && (signed)strref != -1 && strref & IE_STR_ALTREF) {
 		return strings2->GetString(strref, flags | options);

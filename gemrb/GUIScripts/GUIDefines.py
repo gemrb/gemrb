@@ -240,6 +240,8 @@ GA_NO_SELF    = 2048
 # Defined in globals.h
 GF_ALL_STRINGS_TAGGED = 1
 
+STRING_FLAGS_RESOLVE_TAGS = 16
+
 # Shadow color for ShowModal()
 # !!! Keep these synchronized with Interface.h !!!
 MODAL_SHADOW_NONE = 0

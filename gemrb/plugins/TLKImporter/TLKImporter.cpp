@@ -372,8 +372,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		}
 	}
 
-	//tagged text, bg1 and iwd don't mark them specifically, all entries are tagged
-	if (core->HasFeature( GF_ALL_STRINGS_TAGGED ) || ( type & 4 )) {
+	if (bool(flags & STRING_FLAGS::RESOLVE_TAGS) || (type & 4)) {
 		string = ResolveTags(string);
 	}
 	if (type & 2 && bool(flags & STRING_FLAGS::SOUND) && !SoundResRef.IsEmpty()) {

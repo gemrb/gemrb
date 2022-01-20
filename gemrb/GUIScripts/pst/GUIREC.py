@@ -326,7 +326,7 @@ def OnRecordsHelpStat (row, col, strref, bon1=0, bon2=0):
 	TextArea = RecordsWindow.GetControl (0)
 	TextArea.SetText (strref)
 	if row != -1:
-		TextArea.Append ("\n\n" + GemRB.GetString(StatTable.GetValue(str(row),col)).format(bon1, bon2))
+		TextArea.Append ("\n\n" + GemRB.GetString(StatTable.GetValue(str(row),col), STRING_FLAGS_RESOLVE_TAGS).format(bon1, bon2))
 	return
 
 def OnRecordsHelpStrength ():

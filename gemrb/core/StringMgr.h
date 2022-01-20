@@ -54,6 +54,7 @@ enum class STRING_FLAGS : uint32_t {
 	SOUND 			= 2,
 	SPEECH			= 4,
 	ALLOW_ZERO		= 8, // 0 strref is allowed
+	RESOLVE_TAGS	= 16,
 	STRREFOFF		= 256,
 };
 
