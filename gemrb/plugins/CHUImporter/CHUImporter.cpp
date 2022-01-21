@@ -384,7 +384,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				ResRef FontResRef;
 				ieStrRef StrRef;
 				ieWord alignment;
-				str->ReadDword(StrRef);
+				str->ReadStrRef(StrRef);
 				str->ReadResRef( FontResRef );
 				Font* fnt = core->GetFont( FontResRef );
 

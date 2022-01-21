@@ -48,7 +48,7 @@ public:
 	ieVariable EntranceName;
 	ieDword Flags = 0;
 	//overheadtext contains the string, but we have to save this
-	ieStrRef StrRef = 0;
+	ieStrRef StrRef = ieStrRef::INVALID;
 	Point UsePoint = Point(-1, -1);
 	Point TalkPos = Point(-1, -1);
 };

@@ -3399,7 +3399,7 @@ int fx_change_name (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_change_name_modifier(%2d): StrRef: %d", fx->Opcode, fx->Parameter1);
 	//this also changes the base stat
-	target->SetName(fx->Parameter1, 0);
+	target->SetName(ieStrRef(fx->Parameter1), 0);
 	return FX_NOT_APPLIED;
 }
 
@@ -4311,9 +4311,10 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//TODO: create a single list reader that handles src and 2da too
 		const SrcVector *rndstr = LoadSrc(fx->Resource);
 		if (rndstr) {
-			fx->Parameter1 = rndstr->at(RAND<size_t>(size_t(0), rndstr->size() - 1));
+			ieStrRef str = rndstr->at(RAND<size_t>(size_t(0), rndstr->size() - 1));
+			fx->Parameter1 = ieDword(str);
 			FreeSrc(rndstr, fx->Resource);
-			DisplayStringCore(target, fx->Parameter1, DS_HEAD);
+			DisplayStringCore(target, str, DS_HEAD);
 			target->overColor = Color(fx->Parameter2);
 			return FX_NOT_APPLIED;
 		}
@@ -4327,7 +4328,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-		displaymsg->DisplayStringName(fx->Parameter1, DMC_WHITE, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+		displaymsg->DisplayStringName(ieStrRef(fx->Parameter1), DMC_WHITE, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -6780,7 +6781,7 @@ int fx_set_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 	const Scriptable *marker = target ? target : Owner;
 	Map *map = marker->GetCurrentArea();
 	if (!map) return FX_APPLIED; //delay effect
-	map->AddMapNote(fx->Pos, fx->Parameter2, fx->Parameter1);
+	map->AddMapNote(fx->Pos, fx->Parameter2, ieStrRef(fx->Parameter1));
 	return FX_NOT_APPLIED;
 }
 
@@ -7829,7 +7830,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 		return FX_APPLIED;
 	}
 	//display message too
-	ieStrRef sourceNameRef = -1;
+	ieStrRef sourceNameRef = ieStrRef::INVALID;
 
 	if(gamedata->Exists(fx->Resource, IE_ITM_CLASS_ID)) {
 		const Item *poi = gamedata->GetItem(fx->Resource);

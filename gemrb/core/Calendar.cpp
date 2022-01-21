@@ -33,19 +33,19 @@ Calendar::Calendar(void)
 		return;
 	}
 	monthnamecount = tab->GetRowCount();
-	monthnames = (int *) malloc(sizeof(int) * monthnamecount);
-	days = (int *) malloc(sizeof(int) * monthnamecount);
+	monthnames = new ieStrRef[monthnamecount];
+	days = new int[monthnamecount];
 	for (int i = 0; i < monthnamecount; i++) {
-		days[i]=atoi(tab->QueryField(i,0));
+		days[i] = atoi(tab->QueryField(i,0));
 		daysinyear+=days[i];
-		monthnames[i]=atoi(tab->QueryField(i,1));
+		monthnames[i] = ieStrRef(atoi(tab->QueryField(i,1)));
 	}
 }
 
 Calendar::~Calendar(void)
 {
-	if (monthnames) free(monthnames);
-	if (days) free(days);
+	delete[] monthnames;
+	delete[] days;
 }
 
 void Calendar::GetMonthName(int dayandmonth) const

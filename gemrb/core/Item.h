@@ -138,7 +138,7 @@ public:
 	ieByte Location = 0;
 	ieByte AltDiceSides = 0;
 	ResRef UseIcon;
-	ieStrRef Tooltip = 0;
+	ieStrRef Tooltip = ieStrRef::INVALID;
 	ieByte Target = 0;
 	ieByte TargetNumber = 0;
 	ieWord Range = 0;
@@ -180,8 +180,8 @@ public:
 	std::vector<Effect*> equipping_features;
 	ResRef Name; //the resref of the item itself!
 
-	ieStrRef ItemName = 0;
-	ieStrRef ItemNameIdentified = 0;
+	ieStrRef ItemName = ieStrRef::INVALID;
+	ieStrRef ItemNameIdentified = ieStrRef::INVALID;
 	ResRef ReplacementItem;
 	ieDword Flags = 0;
 	ieWord ItemType = 0;
@@ -210,8 +210,8 @@ public:
 	ieWord LoreToID = 0;
 	ResRef GroundIcon;
 	ieDword Weight = 0;
-	ieStrRef ItemDesc = 0;
-	ieStrRef ItemDescIdentified = 0;
+	ieStrRef ItemDesc = ieStrRef::INVALID;
+	ieStrRef ItemDescIdentified = ieStrRef::INVALID;
 	ResRef DescriptionIcon;
 	ieDword Enchantment = 0;
 	ieDword ExtHeaderOffset = 0;
@@ -221,7 +221,7 @@ public:
 
 	// PST and BG2 only
 	ResRef Dialog;
-	ieStrRef DialogName = 0;
+	ieStrRef DialogName = ieStrRef::INVALID;
 
 	// PST only
 	ieWord WieldColor = 0;

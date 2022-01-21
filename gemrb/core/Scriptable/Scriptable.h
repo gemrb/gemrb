@@ -273,7 +273,7 @@ public:
 	ScriptableType Type = ST_ACTOR;
 	Point Pos;
 
-	ieStrRef DialogName = 0;
+	ieStrRef DialogName = ieStrRef::INVALID;
 
 	GameScript* Scripts[MAX_SCRIPTS] = {};
 	int scriptlevel = 0;

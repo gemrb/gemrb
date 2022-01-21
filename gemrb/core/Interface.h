@@ -111,7 +111,7 @@ struct SlotType {
 };
 
 struct DamageInfoStruct {
-	unsigned int strref;
+	ieStrRef strref;
 	unsigned int resist_stat;
 	unsigned int value;
 	int iwd_mod_type;

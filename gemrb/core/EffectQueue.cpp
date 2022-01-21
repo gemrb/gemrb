@@ -288,9 +288,9 @@ bool Init_EffectQueue()
 				const char* ret = efftextTable->GetRowName( row );
 				int val;
 				if(valid_signednumber(ret, val) && (i == val)) {
-					Opcodes[i].Strref = atoi( efftextTable->QueryField( row, 1 ) );
+					Opcodes[i].Strref = ieStrRef(atoi( efftextTable->QueryField( row, 1 ) ));
 				} else {
-					Opcodes[i].Strref = -1;
+					Opcodes[i].Strref = ieStrRef::INVALID;
 				}
 			}
 		}
@@ -1017,7 +1017,7 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 		check += penetration;
 		resisted = (signed) check < (signed) val;
 		// ~Spell Resistance check (Spell resistance:) %d vs. (d20 + caster level + spell resistance mod)  = %d + %d + %d.~
-		displaymsg->DisplayRollStringName(39673, DMC_LIGHTGREY, actor, val, roll, fx->CasterLevel, penetration);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL16, DMC_LIGHTGREY, actor, val, roll, fx->CasterLevel, penetration);
 	} else {
 		// 2.5 style check
 		resisted = (signed) fx->random_value < (signed) val;

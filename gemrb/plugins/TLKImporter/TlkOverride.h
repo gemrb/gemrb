@@ -37,13 +37,8 @@ using StringMapType = std::map<ieStrRef, char *>;
 
 namespace GemRB {
 
-#define STRREF_START  450000
 constexpr strret_t SEGMENT_SIZE = 512;
 #define TOH_HEADER_SIZE 20
-
-//the original games used these strings for custom biography (another quirk of the IE)
-#define BIO_START 62016                 //first BIO string
-#define BIO_END   (BIO_START+5)         //last BIO string
 
 struct EntryType
 {

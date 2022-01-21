@@ -123,7 +123,7 @@ struct SpellExtHeader {
 	ieWord CastingTime;
 	//other data
 	ResRef spellName;
-	ieDword strref; //the spell's name
+	ieStrRef strref; //the spell's name
 };
 
 /**

@@ -74,7 +74,7 @@ Store* STOImporter::GetStore(Store *s)
 	ieDword shopType;
 	str->ReadDword(shopType);
 	s->Type = static_cast<StoreType>(shopType);
-	str->ReadDword(s->StoreName);
+	str->ReadStrRef(s->StoreName);
 	str->ReadDword(s->Flags);
 	str->ReadDword(s->SellMarkup);
 	str->ReadDword(s->BuyMarkup);
@@ -209,7 +209,7 @@ void STOImporter::GetItem(STOItem *it, const Store *s)
 void STOImporter::GetDrink(STODrink *dr)
 {
 	str->ReadResRef(dr->RumourResRef);
-	str->ReadDword(dr->DrinkName);
+	str->ReadStrRef(dr->DrinkName);
 	str->ReadDword(dr->Price);
 	str->ReadDword(dr->Strength);
 }
@@ -284,7 +284,7 @@ void STOImporter::PutHeader(DataStream *stream, const Store *s)
 	Signature[7]+=version%10;
 	stream->Write( Signature, 8);
 	stream->WriteDword(static_cast<ieDword>(s->Type));
-	stream->WriteDword(s->StoreName);
+	stream->WriteStrRef(s->StoreName);
 	stream->WriteDword(s->Flags);
 	stream->WriteDword(s->SellMarkup);
 	stream->WriteDword(s->BuyMarkup);
@@ -358,7 +358,7 @@ void STOImporter::PutDrinks(DataStream *stream, const Store *s) const
 {
 	for (const auto& d : s->drinks) {
 		stream->WriteResRef(d->RumourResRef);
-		stream->WriteDword(d->DrinkName);
+		stream->WriteStrRef(d->DrinkName);
 		stream->WriteDword(d->Price);
 		stream->WriteDword(d->Strength);
 	}

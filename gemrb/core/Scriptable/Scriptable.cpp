@@ -1144,7 +1144,7 @@ int Scriptable::CanCast(const ResRef& SpellRef, bool verbose) {
 	}
 	if (verbose && chance && third) {
 		// ~Spell Failure check: Roll d100 %d vs. Spell failure chance %d~
-		displaymsg->DisplayRollStringName(40955, DMC_LIGHTGREY, actor, roll, chance);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL21, DMC_LIGHTGREY, actor, roll, chance);
 	}
 	if (failed) {
 		displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, DMC_WHITE, this);
@@ -1193,7 +1193,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 			String formatted = fmt::format(L".:{} {}:.", castmsg, spellname);
 
 			SetOverheadText(formatted);
-			displaymsg->DisplayRollStringName(39306, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL15, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}
 	}
@@ -1861,7 +1861,7 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 		int bonus = 0;
 		if (detective) {
 			bonus = detective->GetAbilityBonus(IE_INT);
-			displaymsg->DisplayRollStringName(39303, DMC_LIGHTGREY, detective, skill-bonus, TrapDetectionDiff, bonus);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL13, DMC_LIGHTGREY, detective, skill-bonus, TrapDetectionDiff, bonus);
 		}
 		check = (skill + bonus)*7;
 	} else {

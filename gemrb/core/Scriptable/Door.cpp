@@ -348,7 +348,7 @@ void Highlightable::TryDisarm(const Actor *actor)
 		Trapped = 0;
 		if (core->HasFeature(GF_3ED_RULES)) {
 			// ~Successful Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
-			displaymsg->DisplayRollStringName(39266, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
 		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, DMC_LIGHTGREY, actor);
 		int xp = actor->CalculateExperience(XP_DISARM, actor->GetXPLevel(1));
@@ -360,7 +360,7 @@ void Highlightable::TryDisarm(const Actor *actor)
 		AddTrigger(TriggerEntry(trigger_disarmfailed, actor->GetGlobalID()));
 		if (core->HasFeature(GF_3ED_RULES)) {
 			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
-			displaymsg->DisplayRollStringName(39266, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
 		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, DMC_LIGHTGREY, actor);
 		TriggerTrap(skill, actor->GetGlobalID());
@@ -371,7 +371,7 @@ void Highlightable::TryDisarm(const Actor *actor)
 void Door::TryPickLock(const Actor *actor)
 {
 	if (LockDifficulty == 100) {
-		if (OpenStrRef != (ieDword)-1) {
+		if (OpenStrRef != ieStrRef::INVALID) {
 			displaymsg->DisplayStringName(OpenStrRef, DMC_BG2XPGREEN, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
 			displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, DMC_BG2XPGREEN, actor);
@@ -387,7 +387,7 @@ void Door::TryPickLock(const Actor *actor)
 			stat *= 7; // convert to percent (magic 7 is from RE)
 			int dexmod = actor->GetAbilityBonus(IE_DEX);
 			stat += dexmod; // the original didn't use it, so let's not multiply it
-			displaymsg->DisplayRollStringName(39301, DMC_LIGHTGREY, actor, stat-dexmod, LockDifficulty, dexmod);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL11, DMC_LIGHTGREY, actor, stat-dexmod, LockDifficulty, dexmod);
 		}
 	}
 	if (stat < (signed)LockDifficulty) {
@@ -426,7 +426,7 @@ void Door::TryBashLock(Actor *actor)
 	actor->FaceTarget(this);
 	if (core->HasFeature(GF_3ED_RULES)) {
 		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~
-		displaymsg->DisplayRollStringName(20460, DMC_LIGHTGREY, actor, roll, bonus, LockDifficulty);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, DMC_LIGHTGREY, actor, roll, bonus, LockDifficulty);
 	}
 
 	if(roll < LockDifficulty || LockDifficulty == 100) {

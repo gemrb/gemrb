@@ -112,7 +112,7 @@ public:
 	
 	using StateArray = std::array<State, MAX_PORTRAIT_ICONS>;
 
-	ieStrRef  BestKilledName = -1;
+	ieStrRef  BestKilledName = ieStrRef::INVALID;
 	ieDword   BestKilledXP = 0;
 	ieDword   AwayTime = 0;
 	ieDword   JoinDate = 0;

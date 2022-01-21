@@ -508,7 +508,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 
 void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
 {
-	str->ReadDword(ps->BestKilledName);
+	str->ReadStrRef(ps->BestKilledName);
 	str->ReadDword(ps->BestKilledXP);
 	str->ReadDword(ps->AwayTime);
 	str->ReadDword(ps->JoinDate);
@@ -552,7 +552,7 @@ GAMJournalEntry* GAMImporter::GetJournalEntry()
 {
 	GAMJournalEntry* j = new GAMJournalEntry();
 
-	str->ReadDword(j->Text);
+	str->ReadStrRef(j->Text);
 	str->ReadDword(j->GameTime);
 	//this could be wrong, most likely these are 2 words, or a dword
 	str->Read( &j->Chapter, 1 );
@@ -672,7 +672,7 @@ int GAMImporter::PutJournals(DataStream *stream, const Game *game) const
 	for (unsigned int i=0;i<JournalCount;i++) {
 		const GAMJournalEntry *j = game->GetJournalEntry(i);
 
-		stream->WriteDword(j->Text);
+		stream->WriteStrRef(j->Text);
 		stream->WriteDword(j->GameTime);
 		//this could be wrong, most likely these are 2 words, or a dword
 		stream->Write( &j->Chapter, 1 );
@@ -1002,7 +1002,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 		}
 	}
 
-	if (ac->LongStrRef==0xffffffff) {
+	if (ac->LongStrRef == ieStrRef::INVALID) {
 		strncpy(filling, ac->GetNameAsVariable(1).CString(), 33);
 	} else {
 		char *tmpstr = MBCStringFromString(core->GetString(ac->LongStrRef, STRING_FLAGS::STRREFOFF));
@@ -1012,7 +1012,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	stream->Write( filling, 32);
 	memset(filling,0,32);
 	stream->WriteDword(ac->TalkCount);
-	stream->WriteDword(ac->PCStats->BestKilledName);
+	stream->WriteStrRef(ac->PCStats->BestKilledName);
 	stream->WriteDword(ac->PCStats->BestKilledXP);
 	stream->WriteDword(ac->PCStats->AwayTime);
 	stream->WriteDword(ac->PCStats->JoinDate);

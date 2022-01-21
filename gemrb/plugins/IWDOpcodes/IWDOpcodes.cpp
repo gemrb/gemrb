@@ -1906,15 +1906,15 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			const ieDword *CynicismList = core->GetListFrom2DA(fx->Resource);
 			ieDword i = CynicismList[0];
 			if (i) {
-				DisplayStringCore(target, CynicismList[core->Roll(1,i,0)], DS_HEAD);
+				DisplayStringCore(target, ieStrRef(CynicismList[core->Roll(1,i,0)]), DS_HEAD);
 			}
 		}
 		return FX_APPLIED;
 	default:
-		DisplayStringCore(target, fx->Parameter1, DS_HEAD);
+		DisplayStringCore(target, ieStrRef(fx->Parameter1), DS_HEAD);
 		break;
 	case 3: //gemrb extension, displays verbalconstant
-		DisplayStringCore(target, fx->Parameter1, DS_CONST|DS_HEAD);
+		DisplayStringCore(target, ieStrRef(fx->Parameter1), DS_CONST|DS_HEAD);
 		break;
 	}
 	return FX_NOT_APPLIED;

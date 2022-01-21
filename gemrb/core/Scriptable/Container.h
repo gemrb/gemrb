@@ -67,7 +67,7 @@ public:
 	ieDword Flags = 0;
 	ieWord LockDifficulty = 0;
 	Inventory inventory;
-	ieStrRef OpenFail = 0;
+	ieStrRef OpenFail = ieStrRef::INVALID;
 	//these are not saved
 	std::array<Holder<Sprite2D>, 3> groundicons;
 	//keyresref is stored in Highlightable

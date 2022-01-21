@@ -502,7 +502,7 @@ void Actor::SetName(String str, unsigned char type)
 	}
 }
 
-void Actor::SetName(int strref, unsigned char type)
+void Actor::SetName(ieStrRef strref, unsigned char type)
 {
 	String name;
 	if (type <= 1) {
@@ -1754,9 +1754,9 @@ static void ReadModalStates()
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
 		ms.spell = table->QueryField(i, 0);
 		strlcpy(ms.action, table->QueryField(i, 1), 16);
-		ms.entering_str = atoi(table->QueryField(i, 2));
-		ms.leaving_str = atoi(table->QueryField(i, 3));
-		ms.failed_str = atoi(table->QueryField(i, 4));
+		ms.entering_str = ieStrRef(atoi(table->QueryField(i, 2)));
+		ms.leaving_str = ieStrRef(atoi(table->QueryField(i, 3)));
+		ms.failed_str = ieStrRef(atoi(table->QueryField(i, 4)));
 		ms.aoe_spell = atoi(table->QueryField(i, 5));
 		ms.repeat_msg = atoi(table->QueryField(i, 6));
 		ModalStates.push_back(ms);
@@ -3371,7 +3371,7 @@ void Actor::RefreshPCStats() {
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
-				String text = core->GetString(28895) + L'1';
+				String text = core->GetString(ieStrRef::HEAL) + L'1';
 				displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
 			}
 		} else{
@@ -3623,11 +3623,11 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	if (ret > saveDC) {
 		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Success!~
-		displaymsg->DisplayRollStringName(40974, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL22, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
 		return true;
 	} else {
 		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Failed!~
-		displaymsg->DisplayRollStringName(40975, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL23, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
 		return false;
 	}
 }
@@ -3771,16 +3771,15 @@ void Actor::Interact(int type) const
 	VerbalConstant(start, count, queue ? DS_QUEUE : 0);
 }
 
-ieStrRef Actor::GetVerbalConstant(int index) const
+ieStrRef Actor::GetVerbalConstant(size_t index) const
 {
-	if (index<0 || index>=VCONST_COUNT) {
-		return ieStrRef(-1);
+	if (index >= VCONST_COUNT) {
+		return ieStrRef::INVALID;
 	}
 
 	int idx = VCMap[index];
-
-	if (idx<0 || idx>=VCONST_COUNT) {
-		return ieStrRef(-1);
+	if (idx >= VCONST_COUNT) {
+		return ieStrRef::INVALID;
 	}
 	return StrRefs[idx];
 }
@@ -3834,9 +3833,9 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 	return found;
 }
 
-void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) const {
-	int strref = displaymsg->GetStringReference(str);
-	if (strref != -1) {
+void Actor::DisplayStringOrVerbalConstant(size_t str, int vcstat, int vccount) const {
+	ieStrRef strref = displaymsg->GetStringReference(str);
+	if (strref != ieStrRef::INVALID) {
 		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE|DS_CIRCLE);
 	} else {
 		VerbalConstant(vcstat, vccount);
@@ -4361,7 +4360,7 @@ bool Actor::CheckSpellDisruption(int damage, int spellLevel) const
 	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~
 	if (GameScript::ID_ClassMask(this, 0x6ee)) { // 0x6ee == CLASSMASK_GROUP_CASTERS
 		// no spam for noncasters
-		displaymsg->DisplayRollStringName(39842, DMC_LIGHTGREY, this, roll, concentration, bonus, damage, spellLevel);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL19, DMC_LIGHTGREY, this, roll, concentration, bonus, damage, spellLevel);
 	}
 	int chance = (roll + concentration + bonus) > (10 + damage + spellLevel);
 	if (chance) {
@@ -4413,7 +4412,7 @@ void Actor::CheckCleave()
 			core->ApplyEffect(fx, this, this);
 			// ~Cleave feat adds another level %d attack.~
 			// uses the max tohit bonus (tested), but game always displayed "level 1"
-			displaymsg->DisplayRollStringName(39846, DMC_LIGHTGREY, this, ToHit.GetTotal());
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL20, DMC_LIGHTGREY, this, ToHit.GetTotal());
 		}
 	}
 }
@@ -6288,9 +6287,9 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		bookmask = GetBookMask();
 	}
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
-	int tmp = spell->SpellName;
+	size_t tmp = 0;
 	if (flags&LS_LEARN) {
-		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
+		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(spell->SpellName));
 		switch (spell->SpellType) {
 		case IE_SPL_INNATE:
 			tmp = STR_GOTABILITY;
@@ -6302,7 +6301,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 			tmp = STR_GOTSPELL;
 			break;
 		}
-	} else tmp = 0;
+	}
 	gamedata->FreeSpell(spell, spellname, false);
 	if (!explev) {
 		return LSR_INVALID;
@@ -8784,7 +8783,7 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 	return true;
 }
 
-void Actor::GetVerbalConstantSound(ResRef& Sound, unsigned int index) const
+void Actor::GetVerbalConstantSound(ResRef& Sound, size_t index) const
 {
 	if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 		//resolving soundset (bg1/bg2 style)
@@ -9233,11 +9232,11 @@ bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
 	// but the string seems to be true in the original, which is also much more lenient
 	bool success = (skill + roll) >= (level + 20);
 	// 39304 = ~Use magic device check. Use magic device (skill + d20 roll + CHA modifier) = %d vs. (device's spell level + 20) = %d ( Spell level = %d ).~
-	displaymsg->DisplayRollStringName(39304, DMC_LIGHTGREY, this, skill + roll, level + 20, level);
+	displaymsg->DisplayRollStringName(ieStrRef::ROLL14, DMC_LIGHTGREY, this, skill + roll, level + 20, level);
 
 	if (success) {
 		if (core->HasFeedback(FT_CASTING)) {
-			const String txt = core->GetString(24198);
+			const String txt = core->GetString(ieStrRef::MD_SUCCESS);
 			displaymsg->DisplayStringName(txt, DMC_WHITE, this);
 		}
 		return true;
@@ -9245,7 +9244,7 @@ bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
 
 	// don't play with powers you don't comprehend!
 	if (core->HasFeedback(FT_CASTING)) {
-		const String txt = core->GetString(24197);
+		const String txt = core->GetString(ieStrRef::MD_FAIL);
 		displaymsg->DisplayStringName(txt, DMC_WHITE, this);
 	}
 	Damage(core->Roll(level, 6, 0), DAMAGE_MAGIC, nullptr);
@@ -9399,12 +9398,12 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 			// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
 			multiplier -= 2;
 			sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-			displaymsg->DisplayRollStringName(39829, DMC_LIGHTGREY, this, sneakAttackDamage);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL18, DMC_LIGHTGREY, this, sneakAttackDamage);
 		} else {
 			// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
 			multiplier--;
 			sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-			displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, sneakAttackDamage);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL17, DMC_LIGHTGREY, this, sneakAttackDamage);
 		}
 
 		core->ApplySpell(BackstabResRef, target, this, multiplier);
@@ -9884,14 +9883,14 @@ ieStrRef Actor::Disabled(const ResRef& name, ieDword type) const
 {
 	const Effect *fx = fxqueue.HasEffectWithResource(fx_cant_use_item_ref, name);
 	if (fx) {
-		return fx->Parameter1;
+		return ieStrRef(fx->Parameter1);
 	}
 
 	fx = fxqueue.HasEffectWithParam(fx_cant_use_item_type_ref, type);
 	if (fx) {
-		return fx->Parameter1;
+		return ieStrRef(fx->Parameter1);
 	}
-	return 0;
+	return ieStrRef::INVALID;
 }
 
 //checks usability only
@@ -10663,15 +10662,15 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 	switch (reason) {
 		case 0:
 			// ~Failed hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
-			displaymsg->DisplayRollStringName(39300, DMC_LIGHTGREY, actor, skill-bonus, roll, bonus);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL10, DMC_LIGHTGREY, actor, skill-bonus, roll, bonus);
 			break;
 		case 1:
 			// ~Failed hide in shadows because you were seen by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(39298, DMC_LIGHTGREY, actor, skill, targetDC, roll);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL8, DMC_LIGHTGREY, actor, skill, targetDC, roll);
 			break;
 		case 2:
 			// ~Failed hide in shadows because you were heard by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(39297, DMC_LIGHTGREY, actor, skill, targetDC, roll);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL7, DMC_LIGHTGREY, actor, skill, targetDC, roll);
 			break;
 		default:
 			// no message
@@ -10772,7 +10771,7 @@ bool Actor::TryToHide()
 	if (!third) return true;
 
 	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
-	displaymsg->DisplayRollStringName(39299, DMC_LIGHTGREY, this, skill/7, roll, GetAbilityBonus(IE_DEX));
+	displaymsg->DisplayRollStringName(ieStrRef::ROLL9, DMC_LIGHTGREY, this, skill/7, roll, GetAbilityBonus(IE_DEX));
 	return true;
 }
 
@@ -10810,7 +10809,7 @@ bool Actor::TryToHideIWD2()
 			return false;
 		} else {
 			// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(28379, DMC_LIGHTGREY, this, skill, targetDC, roll);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL2, DMC_LIGHTGREY, this, skill, targetDC, roll);
 		}
 	}
 
@@ -10837,7 +10836,7 @@ bool Actor::TryToHideIWD2()
 			return false;
 		} else {
 			// ~You were not heard by creature! Move silently check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(112, DMC_LIGHTGREY, this, skill, targetDC, roll);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL0, DMC_LIGHTGREY, this, skill, targetDC, roll);
 		}
 	}
 
@@ -11202,15 +11201,15 @@ bool Actor::ConcentrationCheck() const
 
 	if (roll + concentration + bonus < 15 + spellLevel) {
 		if (InParty) {
-			displaymsg->DisplayRollStringName(39258, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL4, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
 		} else {
-			displaymsg->DisplayRollStringName(39265, DMC_LIGHTGREY, this);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL5, DMC_LIGHTGREY, this);
 		}
 		return false;
 	} else {
 		if (InParty) {
 			// ~Successful spell casting concentration check! Check roll %d vs. difficulty %d (%d bonus)~
-			displaymsg->DisplayRollStringName(39257, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL3, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
 		}
 	}
 	return true;

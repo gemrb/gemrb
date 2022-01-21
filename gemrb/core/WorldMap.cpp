@@ -434,8 +434,8 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	ae->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, BitOp::SET);
 	ae->AreaName = area;
 	ae->AreaResRef = area;
-	ae->LocCaptionName = -1;
-	ae->LocTooltipName = -1;
+	ae->LocCaptionName = ieStrRef::INVALID;
+	ae->LocTooltipName = ieStrRef::INVALID;
 	ae->IconSeq = -1;
 	ae->LoadScreenResRef.Reset();
 

@@ -598,7 +598,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 
 	str->Seek(RestHeader + 32, GEM_STREAM_START); // skip the name
 	for (auto& ref : map->RestHeader.Strref) {
-		str->ReadDword(ref);
+		str->ReadStrRef(ref);
 	}
 	for (auto& ref : map->RestHeader.CreResRef) {
 		str->ReadResRef(ref);
@@ -657,7 +657,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadVariable(Entrance);
 		str->ReadDword(Flags);
 		ieStrRef StrRef;
-		str->ReadDword(StrRef);
+		str->ReadStrRef(StrRef);
 		str->ReadWord(TrapDetDiff);
 		str->ReadWord(TrapRemDiff);
 		str->ReadWord(Trapped);
@@ -687,11 +687,11 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		if (core->HasFeature(GF_INFOPOINT_DIALOGS)) {
 			str->ReadResRef( WavResRef );
 			str->ReadPoint(talkPos);
-			str->ReadDword(DialogName);
+			str->ReadStrRef(DialogName);
 			str->ReadResRef( DialogResRef );
 		} else {
 			WavResRef.Reset();
-			DialogName = -1;
+			DialogName = ieStrRef::INVALID;
 			DialogResRef.Reset();
 		}
 
@@ -825,7 +825,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->Seek( 32, GEM_CURRENT_POS);
 		str->ReadResRef( KeyResRef);
 		str->Seek( 4, GEM_CURRENT_POS); //break difficulty
-		str->ReadDword(OpenFail);
+		str->ReadStrRef(OpenFail);
 		// 14 reserved dwords
 
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
@@ -960,7 +960,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		toOpen[1].x = maxX;
 		str->ReadWord(maxY);
 		toOpen[1].y = maxY;
-		str->ReadDword(OpenStrRef);
+		str->ReadStrRef(OpenStrRef);
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			char tmp[25];
 			str->Read(tmp, 24);
@@ -969,7 +969,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		} else {
 			str->ReadVariable(LinkedInfo);
 		}
-		str->ReadDword(NameStrRef); // trigger name
+		str->ReadStrRef(NameStrRef); // trigger name
 		str->ReadResRef( Dialog );
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			// maybe this is important? but seems not
@@ -1420,7 +1420,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 					point.y = value;
 					snprintf(key, sizeof(key), "text%d",count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
-					map->AddMapNote(point, 0, value, true);
+					map->AddMapNote(point, 0, ieStrRef(value), true);
 					count--;
 				}
 			}
@@ -1460,8 +1460,8 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			str->ReadWord(py);
 			point.x=px;
 			point.y=py;
-			ieStrRef strref = 0;
-			str->ReadDword(strref);
+			ieStrRef strref = ieStrRef::INVALID;
+			str->ReadStrRef(strref);
 			ieWord location; // (0=Extenal (TOH/TOT), 1=Internal (TLK)
 			str->ReadWord(location);
 			ieWord color;
@@ -1922,13 +1922,13 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		//opening locations
 		stream->WritePoint(d->toOpen[0]);
 		stream->WritePoint(d->toOpen[1]);
-		stream->WriteDword(d->OpenStrRef);
+		stream->WriteStrRef(d->OpenStrRef);
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			stream->Write( d->LinkedInfo, 24);
 		} else {
 			stream->WriteVariable(d->LinkedInfo);
 		}
-		stream->WriteDword(d->NameStrRef);
+		stream->WriteStrRef(d->NameStrRef);
 		stream->WriteResRef( d->GetDialog());
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			stream->Write( filling, 8);
@@ -2057,7 +2057,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		stream->Write( c->GetScriptName(), 32);
 		stream->WriteResRefLC(c->KeyResRef);
 		stream->WriteDword(tmpDword); //unknown80
-		stream->WriteDword(c->OpenFail);
+		stream->WriteStrRef(c->OpenFail);
 		stream->Write( filling, 56); //unknown or unused stuff
 	}
 	return 0;
@@ -2097,7 +2097,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		stream->WriteResRef( ip->Destination);
 		stream->WriteVariable(ip->EntranceName);
 		stream->WriteDword(ip->Flags);
-		stream->WriteDword(ip->StrRef);
+		stream->WriteStrRef(ip->StrRef);
 		stream->WriteWord(ip->TrapDetectionDiff);
 		stream->WriteWord(ip->TrapRemovalDiff);
 		stream->WriteWord(ip->Trapped); //unknown???
@@ -2132,7 +2132,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) ip->TalkPos.y;
 		stream->WriteWord(tmpWord);
-		stream->WriteDword(ip->DialogName);
+		stream->WriteStrRef(ip->DialogName);
 		stream->WriteResRef( ip->GetDialog());
 	}
 	return 0;
@@ -2432,7 +2432,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 			stream->WriteWord(tmpWord);
 			tmpWord = (ieWord) mn.Pos.y;
 			stream->WriteWord(tmpWord);
-			stream->WriteDword(mn.strref);
+			stream->WriteStrRef(mn.strref);
 			stream->WriteWord(tmpWord);
 			stream->WriteWord(mn.color);
 			tmpDword = 1;
@@ -2580,7 +2580,7 @@ int AREImporter::PutRestHeader(DataStream *stream, const Map *map) const
 	memset(filling,0,sizeof(filling) );
 	stream->Write( filling, 32); //empty label
 	for (const auto& ref : map->RestHeader.Strref) {
-		stream->WriteDword(ref);
+		stream->WriteStrRef(ref);
 	}
 	for (const auto& ref : map->RestHeader.CreResRef) {
 		stream->WriteResRef(ref);

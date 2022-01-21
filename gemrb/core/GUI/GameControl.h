@@ -184,7 +184,7 @@ public:
 	int GetScreenFlags() const { return ScreenFlags; }
 	int GetDialogueFlags() const { return DialogueFlags; }
 	void SetDisplayText(const String& text, unsigned int time);
-	void SetDisplayText(ieStrRef text, unsigned int time);
+	void SetDisplayText(size_t text, unsigned int time);
 	void ClearMouseState();
 	Point GameMousePos() const;
 

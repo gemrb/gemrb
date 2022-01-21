@@ -110,7 +110,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 	str->ReadDword(m->Width);
 	str->ReadDword(m->Height);
 	str->ReadDword(m->MapNumber);
-	str->ReadDword(m->AreaName);
+	str->ReadStrRef(m->AreaName);
 	str->ReadDword(m->unknown1);
 	str->ReadDword(m->unknown2);
 	str->ReadDword(AreaEntriesCount);
@@ -173,8 +173,8 @@ WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str) const
 	ae->pos.x = coord;
 	str->ReadDword(coord);
 	ae->pos.y = coord;
-	str->ReadDword(ae->LocCaptionName);
-	str->ReadDword(ae->LocTooltipName);
+	str->ReadStrRef(ae->LocCaptionName);
+	str->ReadStrRef(ae->LocTooltipName);
 	str->ReadResRef( ae->LoadScreenResRef );
 
 	for (unsigned int dir = 0; dir < 4; dir++) {
@@ -307,8 +307,8 @@ int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
 		stream->WriteDword(coord);
 		coord = ae->pos.y;
 		stream->WriteDword(coord);
-		stream->WriteDword(ae->LocCaptionName);
-		stream->WriteDword(ae->LocTooltipName);
+		stream->WriteStrRef(ae->LocCaptionName);
+		stream->WriteStrRef(ae->LocTooltipName);
 		stream->WriteResRef( ae->LoadScreenResRef );
 
 		for (unsigned int dir = 0; dir < 4; dir++) {
@@ -372,7 +372,7 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 		stream->WriteDword(map->Width);
 		stream->WriteDword(map->Height);
 		stream->WriteDword(map->MapNumber);
-		stream->WriteDword(map->AreaName);
+		stream->WriteStrRef(map->AreaName);
 		stream->WriteDword(map->unknown1);
 		stream->WriteDword(map->unknown2);
 		//???

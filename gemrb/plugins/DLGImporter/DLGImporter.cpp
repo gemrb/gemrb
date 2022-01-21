@@ -89,7 +89,7 @@ DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index) const
 	str->Seek( StatesOffset + ( index * 16 ), GEM_STREAM_START );
 	ieDword  FirstTransitionIndex;
 	ieDword  TriggerIndex;
-	str->ReadDword(ds->StrRef);
+	str->ReadStrRef(ds->StrRef);
 	str->ReadDword(FirstTransitionIndex);
 	str->ReadDword(ds->transitionsCount);
 	str->ReadDword(TriggerIndex);
@@ -119,13 +119,13 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 	str->Seek( TransitionsOffset + ( index * 32 ), GEM_STREAM_START );
 	DialogTransition* dt = new DialogTransition();
 	str->ReadDword(dt->Flags);
-	str->ReadDword(dt->textStrRef);
+	str->ReadStrRef(dt->textStrRef);
 	if (!(dt->Flags & IE_DLG_TR_TEXT)) {
-		dt->textStrRef = 0xffffffff;
+		dt->textStrRef = ieStrRef::INVALID;
 	}
-	str->ReadDword(dt->journalStrRef);
+	str->ReadStrRef(dt->journalStrRef);
 	if (!(dt->Flags & IE_DLG_TR_JOURNAL)) {
-		dt->journalStrRef = 0xffffffff;
+		dt->journalStrRef = ieStrRef::INVALID;
 	}
 	ieDword TriggerIndex;
 	ieDword ActionIndex;
