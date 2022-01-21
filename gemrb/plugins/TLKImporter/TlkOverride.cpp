@@ -58,10 +58,10 @@ bool CTlkOverride::Init()
 	}
 	toh_str->Seek( 8, GEM_CURRENT_POS );
 	toh_str->ReadDword(AuxCount);
-	if (tot_str->ReadScalar<strpos_t, ieDword>(FreeOffset) != 4) {
-		FreeOffset = 0xffffffff;
+	if (tot_str->ReadScalar<strpos_t, int32_t>(FreeOffset) != 4) {
+		FreeOffset = DataStream::InvalidPos;
 	}
-	NextStrRef = 0xffffffff;
+	NextStrRef = DataStream::InvalidPos;
 
 	return true;
 }
@@ -82,16 +82,16 @@ void CTlkOverride::CloseResources()
 }
 
 //gets the length of a stored string which might span more than one segment
-ieDword CTlkOverride::GetLength(ieDword offset)
+strret_t CTlkOverride::GetLength(strpos_t offset)
 {
-	ieDword tmp = offset;
+	strpos_t tmp = offset;
 	char buffer[SEGMENT_SIZE];
 
 	if (tot_str->Seek(offset+8, GEM_STREAM_START) != GEM_OK) {
 		return 0;
 	}
 
-	ieDword length = 0;
+	strret_t length = 0;
 	do
 	{
 		if (tot_str->Seek(tmp+8, GEM_STREAM_START) != GEM_OK) {
@@ -99,23 +99,23 @@ ieDword CTlkOverride::GetLength(ieDword offset)
 		}
 		memset(buffer,0,sizeof(buffer));
 		tot_str->Read(buffer, SEGMENT_SIZE);
-		tot_str->ReadDword(tmp);
-		if (tmp != 0xffffffff) {
+		tot_str->ReadScalar<strpos_t, int32_t>(tmp);
+		if (tmp != DataStream::InvalidPos) {
 			length += SEGMENT_SIZE;
 		}
-	} while (tmp != 0xffffffff);
+	} while (tmp != DataStream::InvalidPos);
 	length += strlen(buffer);
 	return length;
 }
 
 //returns a string stored at a given offset of the .tot file
-char* CTlkOverride::GetString(ieDword offset)
+char* CTlkOverride::GetString(strpos_t offset)
 {
 	if (!tot_str) {
 		return NULL;
 	}
 
-	ieDword length = GetLength(offset);
+	strret_t length = GetLength(offset);
 	if (length == 0) {
 		return NULL;
 	}
@@ -126,10 +126,10 @@ char* CTlkOverride::GetString(ieDword offset)
 	ret[length]=0;
 	while(length) {
 		tot_str->Seek(offset+8, GEM_STREAM_START);
-		ieDword tmp = std::min<ieDword>(length, SEGMENT_SIZE);
+		strret_t tmp = std::min<strret_t>(length, SEGMENT_SIZE);
 		tot_str->Read(pos, tmp);
 		tot_str->Seek(SEGMENT_SIZE-tmp, GEM_CURRENT_POS);
-		tot_str->ReadDword(offset);
+		tot_str->ReadScalar<strpos_t, int32_t>(offset);
 		length-=tmp;
 		pos+=tmp;
 	}
@@ -139,9 +139,9 @@ char* CTlkOverride::GetString(ieDword offset)
 ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 {
 	ieDword memoffset = 0;
-	ieDword offset = LocateString(strref);
+	strpos_t offset = LocateString(strref);
 
-	if (offset == 0xffffffff) {
+	if (offset == DataStream::InvalidPos) {
 		strref = GetNewStrRef(strref);
 		offset = LocateString(strref);
 		assert(strref!=0xffffffff);
@@ -154,55 +154,55 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 	length++;
 
 	//set the backpointer of the first string segment
-	ieDword backp = 0xffffffff;
+	strpos_t backp = DataStream::InvalidPos;
 
 	do
 	{
 		//fill the backpointer
 		tot_str->Seek(offset + 4, GEM_STREAM_START);
-		tot_str->WriteDword(backp);
+		tot_str->WriteScalar<strpos_t, int32_t>(backp);
 		size_t seglen = std::min<size_t>(SEGMENT_SIZE, length);
 		tot_str->Write(newvalue + memoffset, seglen);
 		length -= seglen;
 		memoffset += seglen;
 		backp = offset;
 		tot_str->Seek(SEGMENT_SIZE - seglen, GEM_CURRENT_POS);
-		tot_str->ReadDword(offset);
+		tot_str->ReadScalar<strpos_t, int32_t>(offset);
 
 		//end of string
 		if (!length) {
-			if (offset != 0xffffffff) {
-				ieDword freep = offset;
-				offset = 0xffffffff;
+			if (offset != DataStream::InvalidPos) {
+				strpos_t freep = offset;
+				offset = DataStream::InvalidPos;
 				tot_str->Seek(-4,GEM_CURRENT_POS);
-				tot_str->WriteDword(offset);
+				tot_str->WriteScalar<strpos_t, int32_t>(offset);
 				ReleaseSegment(freep);
 			}
 			break;
 		}
 
-		if (offset==0xffffffff) {
+		if (offset == DataStream::InvalidPos) {
 			//no more space, but we need some
 			offset = ClaimFreeSegment();
 			tot_str->Seek(-4,GEM_CURRENT_POS);
-			tot_str->WriteDword(offset);
+			tot_str->WriteScalar<strpos_t, int32_t>(offset);
 		}
 	} while(length);
 
 	return strref;
 }
 
-ieDword CTlkOverride::ClaimFreeSegment()
+strpos_t CTlkOverride::ClaimFreeSegment()
 {
 	strpos_t offset = FreeOffset;
 	strpos_t pos = tot_str->GetPos();
 	
-	if (offset == 0xffffffff) {
+	if (offset == DataStream::InvalidPos) {
 		offset = tot_str->Size();
 	} else {
 		tot_str->Seek(offset, GEM_STREAM_START);
-		if (tot_str->ReadScalar<strpos_t, ieDword>(FreeOffset) != 4) {
-			FreeOffset = 0xffffffff;
+		if (tot_str->ReadScalar<strpos_t, int32_t>(FreeOffset) != 4) {
+			FreeOffset = DataStream::InvalidPos;
 		}
 	}
 	ieDword tmp = 0;
@@ -217,37 +217,35 @@ ieDword CTlkOverride::ClaimFreeSegment()
 
 	//update free segment pointer
 	tot_str->Seek(0, GEM_STREAM_START);
-	tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
+	tot_str->WriteScalar<strpos_t, int32_t>(FreeOffset);
 	tot_str->Seek(pos, GEM_STREAM_START);
-	return static_cast<ieDword>(offset);
+	return offset;
 }
 
-void CTlkOverride::ReleaseSegment(ieDword offset)
+void CTlkOverride::ReleaseSegment(strpos_t offset)
 {
 	// also release linked segments, if any
 	do {
 		tot_str->Seek(offset, GEM_STREAM_START);
-		tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
+		tot_str->WriteScalar<strpos_t, int32_t>(FreeOffset);
 		FreeOffset = offset;
 		tot_str->Seek(SEGMENT_SIZE + 4, GEM_CURRENT_POS);
-		tot_str->ReadDword(offset);
-	} while (offset != 0xffffffff);
+		tot_str->ReadScalar<strpos_t, int32_t>(offset);
+	} while (offset != DataStream::InvalidPos);
 	tot_str->Seek(0, GEM_STREAM_START);
-	tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
+	tot_str->WriteScalar<strpos_t, int32_t>(FreeOffset);
 }
 
 ieStrRef CTlkOverride::GetNextStrRef()
 {
-	ieStrRef ref;
-	
-	if (NextStrRef == 0xffffffff) {
+	if (NextStrRef == DataStream::InvalidPos) {
 		// find the largest entry; should be the last - unless we
 		// overwrote internal strings, or biographies
 		ieDword last = 0;
 		int cnt = AuxCount;
 
 		while (--cnt >= 0 && last < STRREF_START) {
-			if (toh_str->Seek(TOH_HEADER_SIZE + sizeof(EntryType) * cnt, GEM_STREAM_START) != GEM_OK) {
+			if (toh_str->Seek(TOH_HEADER_SIZE + EntryType::FileSize * cnt, GEM_STREAM_START) != GEM_OK) {
 				// looks like the file is damaged
 				AuxCount--;
 				continue;
@@ -256,8 +254,7 @@ ieStrRef CTlkOverride::GetNextStrRef()
 		}
 		NextStrRef = std::max<ieDword>(STRREF_START, ++last);
 	}
-	ref = NextStrRef++;
-	return ref;
+	return ieStrRef(NextStrRef++);
 }
 
 ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
@@ -273,22 +270,22 @@ ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
 	}
 	entry.offset = ClaimFreeSegment();
 
-	toh_str->Seek(TOH_HEADER_SIZE + AuxCount * sizeof(EntryType), GEM_STREAM_START);
+	toh_str->Seek(TOH_HEADER_SIZE + AuxCount * EntryType::FileSize, GEM_STREAM_START);
 	toh_str->WriteDword(entry.strref);
 	toh_str->Write(entry.dummy, 20);
-	toh_str->WriteDword(entry.offset);
+	toh_str->WriteScalar<strpos_t, int32_t>(entry.offset);
 	AuxCount++;
 	toh_str->Seek(12,GEM_STREAM_START);
 	toh_str->WriteDword(AuxCount);
 	return entry.strref;
 }
 
-ieDword CTlkOverride::LocateString(ieStrRef strref)
+strpos_t CTlkOverride::LocateString(ieStrRef strref)
 {
-	ieDword strref2;
+	ieStrRef strref2;
 	ieDword offset;
 
-	if (!toh_str) return 0xffffffff;
+	if (!toh_str) return DataStream::InvalidPos;
 	toh_str->Seek(TOH_HEADER_SIZE,GEM_STREAM_START);
 	for(ieDword i=0;i<AuxCount;i++) {
 		toh_str->ReadDword(strref2);
@@ -298,7 +295,7 @@ ieDword CTlkOverride::LocateString(ieStrRef strref)
 			return offset;
 		}
 	}
-	return 0xffffffff;
+	return DataStream::InvalidPos;
 }
 
 //this function handles all of the .tlk override mechanism with caching
@@ -316,8 +313,8 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
 #endif
 
 	string = NULL;
-	ieDword offset = LocateString(strref);
-	if (offset!=0xffffffff) {
+	strpos_t offset = LocateString(strref);
+	if (offset != DataStream::InvalidPos) {
 		string = GetString(offset);
 	}
 	if (string != NULL) {

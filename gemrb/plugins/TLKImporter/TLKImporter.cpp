@@ -58,8 +58,8 @@ TLKImporter::TLKImporter(void)
 		strnuprcpy(key, tm->GetRowName(i), sizeof(ieVariable)-1 );
 		gt_type *entry = new gt_type;
 		entry->type = atoi(tm->QueryField(i,0));
-		entry->male = atoi(tm->QueryField(i,1));
-		entry->female = atoi(tm->QueryField(i,2));
+		entry->male = ieStrRef(atoi(tm->QueryField(i,1)));
+		entry->female = ieStrRef(atoi(tm->QueryField(i,2)));
 		gtmap.SetAt(key, (void *) entry);
 	}
 }
@@ -160,7 +160,7 @@ String TLKImporter::CharName(int slot) const
 	return L"?";
 }
 
-int TLKImporter::ClassStrRef(int slot) const
+ieStrRef TLKImporter::ClassStrRef(int slot) const
 {
 	int clss = 0;
 	const Actor *act = GetActorFromSlot(slot);
@@ -173,10 +173,10 @@ int TLKImporter::ClassStrRef(int slot) const
 		return -1;
 	}
 	int row = tab->FindTableValue("ID", clss, 0);
-	return atoi(tab->QueryField(row,0) );
+	return ieStrRef(atoi(tab->QueryField(row,0)));
 }
 
-int TLKImporter::RaceStrRef(int slot) const
+ieStrRef TLKImporter::RaceStrRef(int slot) const
 {
 	int race = 0;
 	const Actor *act = GetActorFromSlot(slot);
@@ -189,10 +189,10 @@ int TLKImporter::RaceStrRef(int slot) const
 		return -1;
 	}
 	int row = tab->FindTableValue(3, race, 0);
-	return atoi(tab->QueryField(row,0) );
+	return ieStrRef(atoi(tab->QueryField(row,0)));
 }
 
-int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref) const
+ieStrRef TLKImporter::GenderStrRef(int slot, ieStrRef malestrref, ieStrRef femalestrref) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act && (act->GetStat(IE_SEX)==SEX_FEMALE) ) {
@@ -225,7 +225,7 @@ String TLKImporter::BuiltinToken(const char* Token)
 	}
 	if (!strcmp( Token, "CLASS" )) {
 		//allow this to be used by direct setting of the token
-		int strref = ClassStrRef(-1);
+		ieStrRef strref = ClassStrRef(-1);
 		return GetString(strref, STRING_FLAGS::NONE);
 	}
 
@@ -260,7 +260,7 @@ String TLKImporter::BuiltinToken(const char* Token)
 		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
 			const char* value = tm->QueryField( row, 2 );
-			return GetString(atoi( value ), STRING_FLAGS::NONE);
+			return GetString(ieStrRef(atoi(value)), STRING_FLAGS::NONE);
 		}
 	}
 	if (!strcmp( Token, "TM" )) {

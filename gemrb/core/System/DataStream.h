@@ -60,6 +60,8 @@ public:
 	char filename[16]; //8+1+3+1 padded to dword
 	char originalfile[_MAX_PATH];
 public:
+	static constexpr strpos_t InvalidPos = strpos_t(-1);
+
 	DataStream(void) = default;
 	virtual ~DataStream() = default;
 	

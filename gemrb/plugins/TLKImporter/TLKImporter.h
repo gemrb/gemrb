@@ -59,9 +59,9 @@ private:
 	void GetMonthName(int dayandmonth);
 	String ResolveTags(const String& source);
 	String BuiltinToken(const char* Token);
-	int ClassStrRef(int slot) const;
-	int RaceStrRef(int slot) const;
-	int GenderStrRef(int slot, int malestrref, int femalestrref) const;
+	ieStrRef ClassStrRef(int slot) const;
+	ieStrRef RaceStrRef(int slot) const;
+	ieStrRef GenderStrRef(int slot, ieStrRef malestrref, ieStrRef femalestrref) const;
 	String Gabber() const;
 	String CharName(int slot) const;
 };
