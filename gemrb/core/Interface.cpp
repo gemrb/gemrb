@@ -2463,7 +2463,7 @@ int Interface::PlayMovie(const char* resref)
 			for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
 				const char* frameField = sttable->QueryField(i, 0);
 				ieStrRef strField = sttable->QueryFieldAsStrRef(i, 1);
-				if (frameField && strField != ieStrRef::INVALID) { // this skips the initial palette rows
+				if (frameField && strField != ieStrRef::NOT_A_SUB) { // this skips the initial palette rows
 					subs[atoi(frameField)] = strField;
 				}
 			}
