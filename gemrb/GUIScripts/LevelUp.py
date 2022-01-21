@@ -730,7 +730,4 @@ def SaveNewSpells():
 					else: # cleric spells
 						ClassFlag = 0x4000
 
-					Learnable = Spellbook.GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
-					for k in range(len(Learnable)): # loop through all the learnable spells
-						if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
-							GemRB.LearnSpell(pc, Learnable[k])
+					Spellbook.LearnPriestSpells (pc, i + 1, ClassFlag)

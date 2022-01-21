@@ -278,22 +278,16 @@ def setDivineSpells():
 	DruidTable = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
 	ClericTable = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
 	
-	
-	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-	
 	if ClericTable != "*":
-		learnDivine(MyChar,0x4000,ClericTable,AllignID)
+		learnDivine (MyChar, 0x4000, ClericTable)
 	if DruidTable != "*":
-		learnDivine(MyChar,0x8000,DruidTable,AllignID)
+		learnDivine (MyChar, 0x8000, DruidTable)
 		
 	return False
 
-def learnDivine(MyChar,ClassFlag,TableName,AllignID):
+def learnDivine(MyChar, ClassFlag, TableName):
 	Spellbook.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-	Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, AllignID, 1)
-	for i in range(len(Learnable) ):
-		if -1 == Spellbook.HasSpell(MyChar,IE_SPELL_TYPE_PRIEST,1,Learnable[i]):
-			GemRB.LearnSpell (MyChar, Learnable[i], 0)
+	Spellbook.LearnPriestSpells (MyChar, 1, ClassFlag)
 
 def unsetDivineSpells():
 	print("unsetDivineSpells")
