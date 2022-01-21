@@ -54,6 +54,7 @@ using ieDwordSigned = signed long int;
 // obviously we will define any hardcoded strrefs we use here
 enum class ieStrRef : ieDword {
 	INVALID = ieDword(-1),
+	NOT_A_SUB = 0, // subtitle 2das contain 0 insstead of -1
 	NO_REST = 10309,
 	DATE1 = 10699,
 	DATE2 = 41277,
