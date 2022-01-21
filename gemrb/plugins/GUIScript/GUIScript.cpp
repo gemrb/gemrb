@@ -7803,7 +7803,7 @@ static void ReadUsedItems()
 				UsedItems[i].username = nullptr;
 			}
 			//this is an strref
-			UsedItems[i].value = ieStrRef(atoi(table->QueryField(i, 1)));
+			UsedItems[i].value = table->QueryFieldAsStrRef(i, 1);
 			//1 - named actor cannot remove it
 			//2 - anyone else cannot equip it
 			//4 - can only swap it for something else
@@ -7823,7 +7823,7 @@ static void ReadSpecialItems()
 		for (ieDword i = 0; i < SpecialItemsCount; i++) {
 			SpecialItems[i].resref = tab->GetRowName(i);
 			//if there are more flags, compose this value into a bitfield
-			SpecialItems[i].value = ieStrRef(atoi(tab->QueryField(i, 0)));
+			SpecialItems[i].value = tab->QueryFieldAsStrRef(i, 0);
 		}
 	}
 }
@@ -7837,7 +7837,7 @@ static ieStrRef GetSpellDesc(const ResRef& CureResRef)
 			StoreSpells.resize(StoreSpellsCount);
 			for (ieDword i = 0; i < StoreSpellsCount; i++) {
 				StoreSpells[i].resref = tab->GetRowName(i);
-				StoreSpells[i].value = ieStrRef(atoi(tab->QueryField(i, 0)));
+				StoreSpells[i].value = tab->QueryFieldAsStrRef(i, 0);
 			}
 		}
 	}
@@ -10464,7 +10464,7 @@ static void ReadActionButtons()
 		row.bytes[2] = (ieByte) atoi( tab->QueryField(i,2) );
 		row.bytes[3] = (ieByte) atoi( tab->QueryField(i,3) );
 		GUIAction[i] = row.data;
-		GUITooltip[i] = ieStrRef(atoi(tab->QueryField(i,4)));
+		GUITooltip[i] = tab->QueryFieldAsStrRef(i,4);
 		GUIResRef[i] = tab->QueryField(i, 5);
 		strncpy(GUIEvent[i], tab->GetRowName(i), 16);
 	}

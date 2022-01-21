@@ -879,7 +879,7 @@ const SurgeSpell& GameData::GetSurgeSpell(unsigned int idx)
 		SurgeSpell ss;
 		for (ieDword i = 0; i < table->GetRowCount(); i++) {
 			ss.spell = table->QueryField(i, 0);
-			ss.message = ieStrRef(strtounsigned<ieDword>(table->QueryField(i, 1)));
+			ss.message = table->QueryFieldAsStrRef(i, 1);
 			// comment ignored
 			SurgeSpells.push_back(ss);
 		}

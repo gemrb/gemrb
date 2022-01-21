@@ -58,8 +58,8 @@ TLKImporter::TLKImporter(void)
 		strnuprcpy(key, tm->GetRowName(i), sizeof(ieVariable)-1 );
 		gt_type *entry = new gt_type;
 		entry->type = atoi(tm->QueryField(i,0));
-		entry->male = ieStrRef(atoi(tm->QueryField(i,1)));
-		entry->female = ieStrRef(atoi(tm->QueryField(i,2)));
+		entry->male = tm->QueryFieldAsStrRef(i,1);
+		entry->female = tm->QueryFieldAsStrRef(i,2);
 		gtmap.SetAt(key, (void *) entry);
 	}
 }
@@ -173,7 +173,7 @@ ieStrRef TLKImporter::ClassStrRef(int slot) const
 		return ieStrRef::INVALID;
 	}
 	int row = tab->FindTableValue("ID", clss, 0);
-	return ieStrRef(atoi(tab->QueryField(row,0)));
+	return tab->QueryFieldAsStrRef(row, 0);
 }
 
 ieStrRef TLKImporter::RaceStrRef(int slot) const
@@ -189,7 +189,7 @@ ieStrRef TLKImporter::RaceStrRef(int slot) const
 		return ieStrRef::INVALID;
 	}
 	int row = tab->FindTableValue(3, race, 0);
-	return ieStrRef(atoi(tab->QueryField(row,0)));
+	return tab->QueryFieldAsStrRef(row,0);
 }
 
 ieStrRef TLKImporter::GenderStrRef(int slot, ieStrRef malestrref, ieStrRef femalestrref) const
@@ -259,8 +259,8 @@ String TLKImporter::BuiltinToken(const char* Token)
 		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
 		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
-			const char* value = tm->QueryField( row, 2 );
-			return GetString(ieStrRef(atoi(value)), STRING_FLAGS::NONE);
+			ieStrRef value = tm->QueryFieldAsStrRef(row, 2);
+			return GetString(value, STRING_FLAGS::NONE);
 		}
 	}
 	if (!strcmp( Token, "TM" )) {
