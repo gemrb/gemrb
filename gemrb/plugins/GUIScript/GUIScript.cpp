@@ -1415,7 +1415,7 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 	}
 
 	if (PyObject_TypeCheck(str, &PyLong_Type)) { // strref
-		ieStrRef StrRef = ieStrRef(PyLong_AsLong( str ));
+		ieStrRef StrRef = StrRefFromPy(str);
 		String string = core->GetString(StrRef);
 		ctrl->SetText(string);
 	} else if (str == Py_None) {
@@ -1477,7 +1477,7 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 			delete str;
 		}
 	} else if (PyObject_TypeCheck(pystr, &PyLong_Type)) {
-		String str = core->GetString(ieStrRef(PyLong_AsLong(pystr)), STRING_FLAGS(flags));
+		String str = core->GetString(StrRefFromPy(pystr), STRING_FLAGS(flags));
 		ta->AppendText(str);
 	}
 
@@ -1534,7 +1534,7 @@ static PyObject* GemRB_View_SetTooltip(PyObject* self, PyObject* args)
 			delete string;
 		}
 	} else {
-		ieStrRef StrRef = ieStrRef(PyLong_AsLong(str));
+		ieStrRef StrRef = StrRefFromPy(str);
 		SetViewTooltipFromRef(view, StrRef);
 	}
 
@@ -4876,7 +4876,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 		String* string = NULL;
 		if(!PyUnicode_Check(item)) {
 			if (PyLong_Check(item)) {
-				string = new String(core->GetString(ieStrRef(PyLong_AsLong(item))));
+				string = new String(core->GetString(StrRefFromPy(item)));
 			} else {
 				return NULL;
 			}
@@ -5249,27 +5249,26 @@ strref is -1, then it will delete the whole journal.\n\
 
 static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
-	int section=-1, strref;
-	ieStrRef chapter = ieStrRef::INVALID;
+	ieStrRef strref = ieStrRef::INVALID;
+	ieDword chapter = -1;
+	int section = -1;
 	PARSE_ARGS( args,  "i|ii", &strref, &section, &chapter );
 
 	GET_GAME();
 
-	if (strref == -1) {
+	if (strref == ieStrRef::INVALID) {
 		//delete the whole journal
 		section = -1;
 	}
 
 	if (section==-1) {
 		//delete one or all entries
-		game->DeleteJournalEntry(ieStrRef(strref));
+		game->DeleteJournalEntry(strref);
 	} else {
-		if (chapter == ieStrRef::INVALID) {
-			ieDword tmp = -1;
-			game->locals->Lookup("CHAPTER", tmp);
-			chapter = ieStrRef(tmp);
+		if (chapter == ieDword(-1)) {
+			game->locals->Lookup("CHAPTER", chapter);
 		}
-		game->AddJournalEntry(chapter, section, strref);
+		game->AddJournalEntry(strref, chapter, section);
 	}
 
 	Py_RETURN_NONE;
@@ -5621,7 +5620,7 @@ static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 	if (str) {
 		strref = core->UpdateString(strref, *str);
 	}
-	return PyLong_FromLong(ieDword(strref));
+	return PyLong_FromStrRef(strref);
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerString__doc,
@@ -5823,7 +5822,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PCStatsStruct* ps = MyActor->PCStats;
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "BestKilledName", DecRef(PyLong_FromLong, ieDword(ps->BestKilledName)));
+	PyDict_SetItemString(dict, "BestKilledName", DecRef(PyLong_FromStrRef, ps->BestKilledName));
 	PyDict_SetItemString(dict, "BestKilledXP", DecRef(PyLong_FromLong, ps->BestKilledXP));
 	PyDict_SetItemString(dict, "AwayTime", DecRef(PyLong_FromLong, ps->AwayTime));
 	PyDict_SetItemString(dict, "JoinDate", DecRef(PyLong_FromLong, ps->JoinDate));
@@ -5847,7 +5846,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 
-		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromLong, ieDword(spell->SpellName)));
+		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromStrRef, spell->SpellName));
 
 		gamedata->FreeSpell( spell, ps->FavouriteSpells[largest], false );
 	} else {
@@ -5868,7 +5867,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "Item not found!\n" );
 		}
 
-		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromLong, ieDword(item->GetItemName(true))));
+		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromStrRef, item->GetItemName(true)));
 
 		gamedata->FreeItem( item, ps->FavouriteWeapons[largest], false );
 	} else {
@@ -6197,7 +6196,7 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 	}
 
 	ieStrRef StatValue = GetCreatureStrRef( actor, Index );
-	return PyLong_FromLong(ieDword(StatValue));
+	return PyLong_FromStrRef(StatValue);
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
@@ -6953,8 +6952,8 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	bool identified = ci->Flags & IE_INV_ITEM_IDENTIFIED;
-	PyDict_SetItemString(dict, "ItemName", DecRef(PyLong_FromLong, ieDword(item->GetItemName(identified))));
-	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromLong, ieDword(item->GetItemDesc(identified))));
+	PyDict_SetItemString(dict, "ItemName", DecRef(PyLong_FromStrRef, item->GetItemName(identified)));
+	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromStrRef, item->GetItemDesc(identified)));
 	gamedata->FreeItem( item, ci->ItemResRef, false );
 	return dict;
 }
@@ -7175,7 +7174,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "StoreType", DecRef(PyLong_FromLong, static_cast<int>(store->Type)));
-	PyDict_SetItemString(dict, "StoreName", DecRef(PyLong_FromLong, ieDword(store->StoreName)));
+	PyDict_SetItemString(dict, "StoreName", DecRef(PyLong_FromStrRef, store->StoreName));
 	PyDict_SetItemString(dict, "StoreDrinkCount", DecRef(PyLong_FromLong, store->DrinksCount ));
 	PyDict_SetItemString(dict, "StoreCureCount", DecRef(PyLong_FromLong, store->CuresCount ));
 	PyDict_SetItemString(dict, "StoreItemCount", DecRef(PyLong_FromLong, store->GetRealStockSize() ));
@@ -7735,8 +7734,8 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	int identified = !!(si->Flags & IE_INV_ITEM_IDENTIFIED);
-	PyDict_SetItemString(dict, "ItemName", DecRef(PyLong_FromLong, ieDword(item->GetItemName(identified))));
-	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromLong, ieDword(item->GetItemDesc(identified))));
+	PyDict_SetItemString(dict, "ItemName", DecRef(PyLong_FromStrRef, item->GetItemName(identified)));
+	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromStrRef, item->GetItemDesc(identified)));
 
 	int price = item->Price * store->SellMarkup / 100;
 	//calculate depreciation too
@@ -9121,7 +9120,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyObject* locationtuple = PyTuple_New(ehc);
 	for (size_t i = 0; i < ehc; ++i) {
 		const ITMExtHeader *eh = &item->ext_headers[i];
-		PyTuple_SetItem(tooltiptuple, i, PyLong_FromLong(ieDword(eh->Tooltip)));
+		PyTuple_SetItem(tooltiptuple, i, PyLong_FromStrRef(eh->Tooltip));
 		PyTuple_SetItem(locationtuple, i, PyLong_FromLong(eh->Location));
 		PyDict_SetItemString(dict, "MaxCharge", DecRef(PyLong_FromLong, eh->Charges));
 	}
@@ -10082,7 +10081,7 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 	}
 
 	ieStrRef strref = core->GetRumour(ResRef(rumourRef));
-	return PyLong_FromLong(ieDword(strref));
+	return PyLong_FromStrRef(strref);
 }
 
 PyDoc_STRVAR( GemRB_GamePause__doc,
@@ -11934,7 +11933,7 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	}
 	PyDict_SetItemString(dict, "Error", PyBool_FromLong(cannotRest));
 	if (cannotRest) {
-		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromLong(ieDword(err)));
+		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromStrRef(err));
 		PyDict_SetItemString(dict, "Cutscene", PyBool_FromLong(0));
 	} else {
 		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromLong(-1));

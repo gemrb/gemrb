@@ -167,6 +167,8 @@ Region RectFromPy(PyObject* obj);
 
 ResRef ResRefFromPy(PyObject* obj);
 
+ieStrRef StrRefFromPy(PyObject* obj);
+
 std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj);
 
 Holder<Sprite2D> SpriteFromPy(PyObject* obj);
@@ -174,6 +176,8 @@ Holder<Sprite2D> SpriteFromPy(PyObject* obj);
 /*
  Conversions to PyObject
 */
+
+PyObject* PyLong_FromStrRef(ieStrRef);
 
 // Like PyString_FromString(), but for (ie)ResRef
 PyObject* PyString_FromResRef(const ResRef& resRef);
