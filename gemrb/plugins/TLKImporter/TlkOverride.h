@@ -38,19 +38,21 @@ using StringMapType = std::map<ieStrRef, char *>;
 namespace GemRB {
 
 #define STRREF_START  450000
-#define SEGMENT_SIZE  512
+constexpr strret_t SEGMENT_SIZE = 512;
 #define TOH_HEADER_SIZE 20
 
 //the original games used these strings for custom biography (another quirk of the IE)
 #define BIO_START 62016                 //first BIO string
 #define BIO_END   (BIO_START+5)         //last BIO string
 
-typedef struct
+struct EntryType
 {
-	ieDword strref;
+	ieStrRef strref;
 	ieByte dummy[20];
-	ieDword offset;
-} EntryType;
+	strpos_t offset;
+	
+	static constexpr strpos_t FileSize = 28; // size in bytes for this structure in the TLK file
+};
 
 class CTlkOverride  
 {
@@ -61,19 +63,19 @@ private:
 	DataStream* tot_str = nullptr;
 	DataStream* toh_str = nullptr;
 	ieDword AuxCount = 0;
-	strpos_t FreeOffset = 0;
-	ieDword NextStrRef = 0;
+	strpos_t FreeOffset = DataStream::InvalidPos;
+	strpos_t NextStrRef = DataStream::InvalidPos;
 
 	void CloseResources();
 	DataStream *GetAuxHdr(bool create);
 	DataStream *GetAuxTlk(bool create);
 	ieStrRef GetNewStrRef(ieStrRef strref);
-	ieDword LocateString(ieStrRef strref);
-	ieDword GetNextStrRef();
-	ieDword ClaimFreeSegment();
-	void ReleaseSegment(ieDword offset);
-	char *GetString(ieDword offset);
-	ieDword GetLength(ieDword offset);
+	strpos_t LocateString(ieStrRef strref);
+	ieStrRef GetNextStrRef();
+	strpos_t ClaimFreeSegment();
+	void ReleaseSegment(strpos_t offset);
+	char *GetString(strpos_t offset);
+	strret_t GetLength(strpos_t offset);
 public:
 	CTlkOverride() = default;
 	virtual ~CTlkOverride();
