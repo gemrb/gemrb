@@ -72,6 +72,7 @@ protected:
 
 public:
 	bool Open(DataStream* stream) noexcept {
+		delete str;
 		str = stream;
 		return Import(str);
 	}
