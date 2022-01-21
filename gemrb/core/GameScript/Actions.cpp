@@ -4627,7 +4627,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, DMC_WHITE);
-	DisplayStringCore(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
+	DisplayStringCoreVC(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
 	if (ret == MIC_FULL && snd->InParty) {
 		snd->VerbalConstant(VB_INVENTORY_FULL);
 		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
