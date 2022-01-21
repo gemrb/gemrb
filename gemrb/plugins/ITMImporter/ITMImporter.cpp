@@ -222,7 +222,7 @@ Item* ITMImporter::GetItem(Item *s)
 	} else if (dialogTable) {
 		//all non pst
 		int row = dialogTable->GetRowIndex(s->Name);
-		s->DialogName = ieStrRef(atoi(dialogTable->QueryField(row, 0)));
+		s->DialogName = dialogTable->QueryFieldAsStrRef(row, 0);
 		s->Dialog = dialogTable->QueryField(row, 1);
 	} else {
 		s->DialogName = ieStrRef::INVALID;
@@ -245,7 +245,7 @@ Item* ITMImporter::GetItem(Item *s)
 		// set the tooltip
 		if (tooltipTable) {
 			int row = tooltipTable->GetRowIndex(s->Name);
-			eh->Tooltip = ieStrRef(atoi(tooltipTable->QueryField(row, i)));
+			eh->Tooltip = tooltipTable->QueryFieldAsStrRef(row, i);
 		}
 	}
 

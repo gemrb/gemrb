@@ -288,7 +288,7 @@ bool Init_EffectQueue()
 				const char* ret = efftextTable->GetRowName( row );
 				int val;
 				if(valid_signednumber(ret, val) && (i == val)) {
-					Opcodes[i].Strref = ieStrRef(atoi( efftextTable->QueryField( row, 1 ) ));
+					Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);
 				} else {
 					Opcodes[i].Strref = ieStrRef::INVALID;
 				}

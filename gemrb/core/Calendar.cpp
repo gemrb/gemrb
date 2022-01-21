@@ -38,7 +38,7 @@ Calendar::Calendar(void)
 	for (int i = 0; i < monthnamecount; i++) {
 		days[i] = atoi(tab->QueryField(i,0));
 		daysinyear+=days[i];
-		monthnames[i] = ieStrRef(atoi(tab->QueryField(i,1)));
+		monthnames[i] = tab->QueryFieldAsStrRef(i,1);
 	}
 }
 

@@ -55,10 +55,20 @@ public:
 	/** Returns a pointer to a zero terminated 2da element,
 	 * 0,0 returns the default value, it may return NULL */
 	virtual const char* QueryField(size_t row = 0, size_t column = 0) const = 0;
+	
+	ieStrRef QueryFieldAsStrRef(size_t row = 0, size_t column = 0) const {
+		auto field = QueryField(row, column);
+		return static_cast<ieStrRef>(strtounsigned<ieDword>(field));
+	}
 	/** Returns a pointer to a zero terminated 2da element,
 	 * uses column name and row name to search the field,
 	 * may return NULL */
 	virtual const char* QueryField(const char* row, const char* column) const = 0;
+	
+	ieStrRef QueryFieldAsStrRef(const char* row, const char* column) const {
+		auto field = QueryField(row, column);
+		return static_cast<ieStrRef>(strtounsigned<ieDword>(field));
+	}
 	/** Returns default value of table. */
 	virtual const char* QueryDefault() const = 0;
 	virtual int GetColumnIndex(const char* colname) const = 0;

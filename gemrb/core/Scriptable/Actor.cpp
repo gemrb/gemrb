@@ -1754,9 +1754,9 @@ static void ReadModalStates()
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
 		ms.spell = table->QueryField(i, 0);
 		strlcpy(ms.action, table->QueryField(i, 1), 16);
-		ms.entering_str = ieStrRef(atoi(table->QueryField(i, 2)));
-		ms.leaving_str = ieStrRef(atoi(table->QueryField(i, 3)));
-		ms.failed_str = ieStrRef(atoi(table->QueryField(i, 4)));
+		ms.entering_str = table->QueryFieldAsStrRef(i, 2);
+		ms.leaving_str = table->QueryFieldAsStrRef(i, 3);
+		ms.failed_str = table->QueryFieldAsStrRef(i, 4);
 		ms.aoe_spell = atoi(table->QueryField(i, 5));
 		ms.repeat_msg = atoi(table->QueryField(i, 6));
 		ModalStates.push_back(ms);
