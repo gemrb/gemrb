@@ -446,9 +446,9 @@ def OpenScriptWindow ():
 
 	SelectedTextArea = SubCustomizeWindow.GetControl (4)
 
-	def UpdateScriptSelection(ta, val):
-		name = FindScriptFile (val)
-		SelectedTextArea.SetText (options[(name, val)])
+	def UpdateScriptSelection(ta):
+		name = FindScriptFile (ta.Value)
+		SelectedTextArea.SetText (options[(name, ta.Value)])
 		return
 	
 	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, UpdateScriptSelection)
