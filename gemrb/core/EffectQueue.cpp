@@ -532,6 +532,8 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		flg = ApplyEffect( st, fx, 1 );
 		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && st) {
 			st->fxqueue.AddEffect(fx, flg == FX_INSERT);
+		} else {
+			delete fx;
 		}
 		break;
 	case FX_TARGET_SELF:
@@ -540,6 +542,8 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		flg = ApplyEffect( st, fx, 1 );
 		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && st) {
 			st->fxqueue.AddEffect(fx, flg == FX_INSERT);
+		} else {
+			delete fx;
 		}
 		break;
 
@@ -559,6 +563,8 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			flg = ApplyEffect( actor, new_fx, 1 );
 			if( new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
+			} else {
+				delete new_fx;
 			}
 		}
 		delete fx;
@@ -585,6 +591,8 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			flg = ApplyEffect( actor, new_fx, 1 );
 			if( new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
+			} else {
+				delete new_fx;
 			}
 		}
 		delete fx;
@@ -612,6 +620,8 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			//GetActorCount can now return all nonparty critters
 			if( new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
+			} else {
+				delete new_fx;
 			}
 		}
 		delete fx;
@@ -625,6 +635,8 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		flg = ApplyEffect( pretarget, fx, 1 );
 		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && pretarget) {
 			pretarget->fxqueue.AddEffect(fx, flg == FX_INSERT);
+		} else {
+			delete fx;
 		}
 		break;
 
@@ -640,6 +652,8 @@ all_party:
 			flg = ApplyEffect( actor, new_fx, 1 );
 			if( new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
+			} else {
+				delete new_fx;
 			}
 		}
 		delete fx;
@@ -658,6 +672,8 @@ all_party:
 			flg = ApplyEffect( actor, new_fx, 1 );
 			if( new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
+			} else {
+				delete new_fx;
 			}
 		}
 		delete fx;
@@ -677,6 +693,8 @@ all_party:
 			//GetActorCount can now return all nonparty critters
 			if( new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
+			} else {
+				delete new_fx;
 			}
 		}
 		delete fx;
