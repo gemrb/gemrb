@@ -133,6 +133,15 @@ public:
 		}
 	}
 	
+	PyStringWrapper(const PyStringWrapper&) = delete;
+	PyStringWrapper& operator=(const PyStringWrapper&) = delete;
+	
+	PyStringWrapper(PyStringWrapper&& wrap) {
+		std::swap(wrap.buffer, buffer);
+		std::swap(wrap.str, str);
+		std::swap(wrap.object, object);
+	}
+	
 	operator const char*() const noexcept {
 		return str;
 	}
