@@ -62,6 +62,10 @@ public:
 public:
 	DataStream(void) = default;
 	virtual ~DataStream() = default;
+	
+	DataStream(const DataStream&) = delete;
+	DataStream& operator=(const DataStream&) = delete;
+	
 	virtual strret_t Read(void* dest, strpos_t len) = 0;
 	virtual strret_t Write(const void* src, strpos_t len) = 0;
 	
@@ -137,8 +141,6 @@ protected:
 	bool Encrypted = false;
 
 	static bool IsBigEndian;
-private:
-	DataStream(const DataStream&);
 };
 
 }
