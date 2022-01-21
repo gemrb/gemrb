@@ -196,7 +196,7 @@ def OnPriestMemorizeSpell ():
 	# FIXME: use FLASH.bam
 
 
-def OpenPriestSpellUnmemorizeWindow (btn, val):
+def OpenPriestSpellUnmemorizeWindow (btn):
 	Window = GemRB.LoadWindow (6)
 
 	# "Are you sure you want to ....?"
@@ -206,10 +206,11 @@ def OpenPriestSpellUnmemorizeWindow (btn, val):
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (42514)
-	def Unmemorize(btn, val):
-		OnPriestUnmemorizeSpell(btn, val)
+	def Unmemorize(btn):
+		OnPriestUnmemorizeSpell(btn)
 		Window.Close()
-	
+
+	Button.SetValue (btn.Value)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Unmemorize)
 	Button.MakeDefault()
 
@@ -222,12 +223,12 @@ def OpenPriestSpellUnmemorizeWindow (btn, val):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
-def OnPriestUnmemorizeSpell (btn, index):
+def OnPriestUnmemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 
-	if GemRB.UnmemorizeSpell (pc, spelltype, level, index):
+	if GemRB.UnmemorizeSpell (pc, spelltype, level, btn.Value):
 		UpdatePriestWindow (PriestSpellWindow)
 
 

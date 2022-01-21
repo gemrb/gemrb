@@ -195,7 +195,7 @@ def OnMageMemorizeSpell ():
 	# FIXME: use FLASH.bam
 
 
-def OpenMageSpellUnmemorizeWindow (btn, val):
+def OpenMageSpellUnmemorizeWindow (btn):
 	Window = GemRB.LoadWindow (6)
 
 	# "Are you sure you want to ....?"
@@ -205,9 +205,10 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (42514)
-	def Unmemorize(btn, val):
-		OnMageUnmemorizeSpell(btn, val)
+	def Unmemorize(btn):
+		OnMageUnmemorizeSpell(btn)
 		Window.Close()
+	Button.SetValue (btn.Value)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Unmemorize)
 	Button.MakeDefault()
 
@@ -219,12 +220,12 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
-def OnMageUnmemorizeSpell (btn, index):
+def OnMageUnmemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	if GemRB.UnmemorizeSpell (pc, spelltype, level, index):
+	if GemRB.UnmemorizeSpell (pc, spelltype, level, btn.Value):
 		UpdateMageWindow ()
 
 ###################################################
