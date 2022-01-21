@@ -850,8 +850,6 @@ void CREImporter::ReadDialog(Actor *act)
 Actor* CREImporter::GetActor(unsigned char is_in_party)
 {
 	Actor* act = new Actor();
-	if (!act)
-		return NULL;
 	act->InParty = is_in_party;
 	str->ReadDword(act->LongStrRef);
 	//Beetle name in IWD needs the allow zero flag
