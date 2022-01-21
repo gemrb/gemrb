@@ -422,7 +422,7 @@ def OpenScriptWindow ():
 		if scriptindex == -1:
 			# custom
 			GemRB.SetToken ("script", script)
-			options[(script, idx)] = GemRB.GetString (17167)
+			options[(script, idx)] = GemRB.GetString (17167) + "\n"
 		else:
 			title = ScriptsTable.GetValue (scriptindex, 0, GTV_REF)
 			if title:
@@ -430,7 +430,7 @@ def OpenScriptWindow ():
 				txt = title
 				if desc:
 					txt += " " + desc.rstrip()
-				options[(script, idx)] = txt + "\n"*1
+				options[(script, idx)] = txt + "\n"*2
 			else:
 				# none
 				idx = idx - 1
