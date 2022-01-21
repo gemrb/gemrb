@@ -285,32 +285,5 @@ def OnAutoEquip ():
 	UpdateInventoryWindow ()
 	return
 
-def OnDragItem (btn, slot):
-	"""Updates dragging."""
-
-	#don't call when splitting items
-	if ItemAmountWindow != None:
-		return
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot_item = GemRB.GetSlotItem (pc, slot)
-
-	if not GemRB.IsDraggingItem ():
-		item = GemRB.GetItem (slot_item["ItemResRef"])
-		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
-		if slot == 2:
-			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
-	else:
-		item = GemRB.GetSlotItem (0,0)
-		itemdata = GemRB.GetItem(item['ItemResRef'])
-		GemRB.DropDraggedItem (pc, slot)
-		if slot == 2 and item['ItemResRef'] == 'dustrobe':
-			GemRB.SetGlobal("APPEARANCE","GLOBAL",2)
-		elif slot < 21 and itemdata['AnimationType'] != '':
-			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
-
-	UpdateInventoryWindow ()
-	return
-
 ###################################################
 # End of file GUIINV.py

@@ -90,6 +90,8 @@ def OnDragItem (btn):
 	if not GemRB.IsDraggingItem ():
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
+		if slot == 2: # reset disguise
+			GemRB.SetGlobal ("APPEARANCE", "GLOBAL", 0)
 	else:
 		SlotType = GemRB.GetSlotType (slot, pc)
 		#special monk check
@@ -121,7 +123,16 @@ def OnDragItem (btn):
 					#leave (save) store
 					GemRB.LeaveStore()
 
+			item = GemRB.GetSlotItem (0, 0)
+			itemData = GemRB.GetItem (item['ItemResRef'])
 			GemRB.DropDraggedItem (pc, slot)
+
+			# handle pst disguises
+			if slot == 2 and item['ItemResRef'] == 'dustrobe':
+				GemRB.SetGlobal ("APPEARANCE", "GLOBAL", 2)
+			elif slot < 21 and itemData['AnimationType'] != '':
+				GemRB.SetGlobal ("APPEARANCE", "GLOBAL", 0)
+
 			# drop item if it caused us to disable the inventory view (example: cursed berserking sword)
 			if GemRB.GetPlayerStat (pc, IE_STATE_ID) & (STATE_BERSERK) and GemRB.IsDraggingItem ():
 				GemRB.DropDraggedItem (pc, -3)
