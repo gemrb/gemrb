@@ -88,6 +88,16 @@ ResRef ResRefFromPy(PyObject* obj) {
 	return ResRef();
 }
 
+ieStrRef StrRefFromPy(PyObject* str)
+{
+	return ieStrRef(PyLong_AsLong(str));
+}
+
+PyObject* PyLong_FromStrRef(ieStrRef str)
+{
+	return PyLong_FromLong(ieDword(str));
+}
+
 std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj)
 {
 	std::shared_ptr<SymbolMgr> sm;
