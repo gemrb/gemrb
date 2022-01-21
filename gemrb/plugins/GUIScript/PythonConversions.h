@@ -111,6 +111,7 @@ private:
 class PyStringWrapper {
 	wchar_t* buffer = nullptr;
 	const char* str = nullptr;
+	PyObject* object = nullptr;
 	
 public:
 	PyStringWrapper(PyObject* obj, const char* encoding) noexcept {
@@ -118,7 +119,7 @@ public:
 			PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, encoding, "strict"); // Owned reference
 			if (temp_bytes != NULL) {
 				str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-				obj = temp_bytes; // needs to outlive our use of str
+				object = temp_bytes; // needs to outlive our use of wrap.str
 			} else { // raw data...
 				PyErr_Clear();
 				Py_ssize_t buflen = PyUnicode_GET_LENGTH(obj);
@@ -137,6 +138,7 @@ public:
 	}
 	
 	~PyStringWrapper() noexcept {
+		Py_XDECREF(object);
 		delete[] buffer;
 	}
 };
