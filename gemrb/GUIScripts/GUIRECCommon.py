@@ -442,7 +442,11 @@ def OpenScriptWindow ():
 	if script == None:
 		script = "None"
 
-	scriptindex = ScriptsTable.GetRowIndex (script)
+	scriptindex = 0
+	for (filename, idx) in options:
+		if filename == script:
+			scriptindex = idx
+			break
 
 	SelectedTextArea = SubCustomizeWindow.GetControl (4)
 
