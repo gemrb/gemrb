@@ -1677,7 +1677,7 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 		options |= STRING_FLAGS::RESOLVE_TAGS;
 	}
 
-	if (strings2 && strref != ieStrRef::INVALID && bool(strref & IE_STR_ALTREF)) {
+	if (strings2 && strref != ieStrRef::INVALID && bool(strref & ieStrRef::ALTREF)) {
 		return strings2->GetString(strref, flags | options);
 	} else {
 		return strings->GetString(strref, flags | options);

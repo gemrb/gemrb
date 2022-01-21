@@ -58,9 +58,6 @@ enum class STRING_FLAGS : uint32_t {
 	STRREFOFF		= 256,
 };
 
-// checked against the strref itself
-#define IE_STR_ALTREF ieStrRef(0x0100000) // use alternate tlk file: dialogf.tlk
-
 /**
  * @class StringMgr
  * Abstract loader for StringBlock objects (strings in .TLK files)

@@ -90,6 +90,8 @@ enum class ieStrRef : ieDword {
 	BIO_START = 62016,            //first BIO string
 	BIO_END   = (BIO_START + 5),  //last BIO string
 	OVERRIDE_START = 450000,
+	// not actually an ieStrRef, but can be &'ded with an ieStrRef to detrmine which TLK (eg dialogf.tlk) to use
+	ALTREF = 0x0100000
 };
 
 class ieVariable
