@@ -33,7 +33,7 @@ class GEM_EXPORT MappedFileMemoryStream : public MemoryStream {
 		strret_t Read(void* dest, strpos_t len) override;
 		strret_t Seek(stroff_t pos, strpos_t startPos) override;
 		strret_t Write(const void* src, strpos_t len) override;
-		DataStream* Clone() override;
+		DataStream* Clone() const noexcept override;
 
 	private:
 		void *fileHandle;

@@ -34,7 +34,7 @@ protected:
 public:
 	MemoryStream(const char *name, void* data, strpos_t size);
 	~MemoryStream() override;
-	DataStream* Clone() override;
+	DataStream* Clone() const noexcept override;
 
 	strret_t Read(void* dest, strpos_t length) override;
 	strret_t Write(const void* src, strpos_t length) override;

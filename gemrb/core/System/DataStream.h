@@ -134,7 +134,7 @@ public:
 	 *
 	 *  Returns NULL on failure.
 	 **/
-	virtual DataStream* Clone();
+	virtual DataStream* Clone() const noexcept;
 protected:
 	strpos_t Pos = 0;
 	strpos_t size = 0;

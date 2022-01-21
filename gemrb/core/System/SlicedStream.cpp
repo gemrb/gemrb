@@ -44,7 +44,7 @@ SlicedStream::~SlicedStream()
 	delete str;
 }
 
-DataStream* SlicedStream::Clone()
+DataStream* SlicedStream::Clone() const noexcept
 {
 	return new SlicedStream(str, startpos, size);
 }

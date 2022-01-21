@@ -107,7 +107,7 @@ public:
 	explicit FileStream(File&&);
 	FileStream(void);
 
-	DataStream* Clone() override;
+	DataStream* Clone() const noexcept override;
 
 	bool Open(const char* filename);
 	bool Modify(const char* filename);

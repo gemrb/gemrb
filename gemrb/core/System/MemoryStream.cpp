@@ -39,7 +39,7 @@ MemoryStream::~MemoryStream()
 	free(data);
 }
 
-DataStream* MemoryStream::Clone()
+DataStream* MemoryStream::Clone() const noexcept
 {
 	void *copy = malloc(size);
 	memcpy(copy, data, size);

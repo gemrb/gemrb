@@ -186,7 +186,7 @@ strret_t DataStream::ReadLine(void* buf, strpos_t maxlen)
 	return i;
 }
 
-DataStream* DataStream::Clone()
+DataStream* DataStream::Clone() const noexcept
 {
 	return NULL;
 }

@@ -42,7 +42,7 @@ FileStream::FileStream(void)
 	created = false;
 }
 
-DataStream* FileStream::Clone()
+DataStream* FileStream::Clone() const noexcept
 {
 	return OpenFile(originalfile);
 }

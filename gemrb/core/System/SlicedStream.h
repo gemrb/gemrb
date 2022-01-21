@@ -36,7 +36,7 @@ private:
 public:
 	SlicedStream(DataStream* cfs, strpos_t startpos, strpos_t size);
 	~SlicedStream() override;
-	DataStream* Clone() override;
+	DataStream* Clone() const noexcept override;
 
 	strret_t Read(void* dest, strpos_t length) override;
 	strret_t Write(const void* src, strpos_t length) override;

@@ -75,7 +75,7 @@ bool MappedFileMemoryStream::isOk() const {
 	return fileOpened && fileMapped;
 }
 
-DataStream* MappedFileMemoryStream::Clone() {
+DataStream* MappedFileMemoryStream::Clone() const noexcept {
 	return new MappedFileMemoryStream(originalfile);
 }
 
