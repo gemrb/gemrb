@@ -79,17 +79,17 @@ public:
 	/** displays any string in the textarea */
 	void DisplayMarkupString(const String& txt) const;
 	/** displays a string constant in the textarea */
-	void DisplayConstantString(ieStrRef stridx, const Color &color, Scriptable *speaker=NULL) const;
+	void DisplayConstantString(size_t stridx, const Color &color, Scriptable *speaker=NULL) const;
 	/** displays actor name - action : parameter */
-	void DisplayConstantStringNameString(ieStrRef stridx, const Color &color, ieStrRef stridx2, const Scriptable *actor) const;
+	void DisplayConstantStringNameString(size_t stridx, const Color &color, size_t stridx2, const Scriptable *actor) const;
 	/** displays a string constant followed by a number in the textarea */
-	void DisplayConstantStringValue(ieStrRef stridx, const Color &color, ieDword value) const;
+	void DisplayConstantStringValue(size_t stridx, const Color &color, ieDword value) const;
 	/** displays a string constant in the textarea, starting with speaker's name */
-	void DisplayConstantStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker) const;
+	void DisplayConstantStringName(size_t stridx, const Color &color, const Scriptable *speaker) const;
 	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
-	void DisplayConstantStringNameValue(ieStrRef stridx, const Color &color, const Scriptable *speaker, int value) const;
+	void DisplayConstantStringNameValue(size_t stridx, const Color &color, const Scriptable *speaker, int value) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(ieStrRef stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
+	void DisplayConstantStringAction(size_t stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
 	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;

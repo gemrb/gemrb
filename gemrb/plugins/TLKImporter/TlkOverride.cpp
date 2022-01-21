@@ -144,7 +144,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 	if (offset == DataStream::InvalidPos) {
 		strref = GetNewStrRef(strref);
 		offset = LocateString(strref);
-		assert(strref!=0xffffffff);
+		assert(strref != ieStrRef::INVALID);
 	}
 
 	// FIXME: newvalue could be a multibyte string in an encoding incompatible with ASCII
@@ -242,9 +242,10 @@ ieStrRef CTlkOverride::GetNextStrRef()
 		// find the largest entry; should be the last - unless we
 		// overwrote internal strings, or biographies
 		ieDword last = 0;
+		ieDword end = ieDword(ieStrRef::OVERRIDE_START);
 		int cnt = AuxCount;
 
-		while (--cnt >= 0 && last < STRREF_START) {
+		while (--cnt >= 0 && last < end) {
 			if (toh_str->Seek(TOH_HEADER_SIZE + EntryType::FileSize * cnt, GEM_STREAM_START) != GEM_OK) {
 				// looks like the file is damaged
 				AuxCount--;
@@ -252,7 +253,7 @@ ieStrRef CTlkOverride::GetNextStrRef()
 			}
 			toh_str->ReadDword(last);
 		}
-		NextStrRef = std::max<ieDword>(STRREF_START, ++last);
+		NextStrRef = std::max<ieDword>(end, ++last);
 	}
 	return ieStrRef(NextStrRef++);
 }
@@ -263,7 +264,7 @@ ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
 
 	memset(&entry,0,sizeof(entry));
 
-	if (strref >= BIO_START && strref <= BIO_END) {
+	if (strref >= ieStrRef::BIO_START && strref <= ieStrRef::BIO_END) {
 		entry.strref = strref;
 	} else {
 		entry.strref = GetNextStrRef();
@@ -271,7 +272,7 @@ ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
 	entry.offset = ClaimFreeSegment();
 
 	toh_str->Seek(TOH_HEADER_SIZE + AuxCount * EntryType::FileSize, GEM_STREAM_START);
-	toh_str->WriteDword(entry.strref);
+	toh_str->WriteStrRef(entry.strref);
 	toh_str->Write(entry.dummy, 20);
 	toh_str->WriteScalar<strpos_t, int32_t>(entry.offset);
 	AuxCount++;
@@ -288,7 +289,7 @@ strpos_t CTlkOverride::LocateString(ieStrRef strref)
 	if (!toh_str) return DataStream::InvalidPos;
 	toh_str->Seek(TOH_HEADER_SIZE,GEM_STREAM_START);
 	for(ieDword i=0;i<AuxCount;i++) {
-		toh_str->ReadDword(strref2);
+		toh_str->ReadStrRef(strref2);
 		toh_str->Seek(20,GEM_CURRENT_POS);
 		toh_str->ReadDword(offset);
 		if (strref2==strref) {

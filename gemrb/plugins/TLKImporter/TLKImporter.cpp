@@ -112,8 +112,8 @@ bool TLKImporter::Open(DataStream* stream)
 	str->ReadWord(Language); // English is 0
 	str->ReadDword(StrRefCount);
 	str->ReadDword(Offset);
-	if (StrRefCount >= STRREF_START) {
-		Log(ERROR, "TLKImporter", "Too many strings (%d), increase STRREF_START.", StrRefCount);
+	if (StrRefCount >= ieDword(ieStrRef::OVERRIDE_START)) {
+		Log(ERROR, "TLKImporter", "Too many strings (%d), increase OVERRIDE_START.", StrRefCount);
 		return false;
 	}
 	return true;
@@ -170,7 +170,7 @@ ieStrRef TLKImporter::ClassStrRef(int slot) const
 
 	AutoTable tab = gamedata->LoadTable("classes");
 	if (!tab) {
-		return -1;
+		return ieStrRef::INVALID;
 	}
 	int row = tab->FindTableValue("ID", clss, 0);
 	return ieStrRef(atoi(tab->QueryField(row,0)));
@@ -186,7 +186,7 @@ ieStrRef TLKImporter::RaceStrRef(int slot) const
 
 	AutoTable tab = gamedata->LoadTable("races");
 	if (!tab) {
-		return -1;
+		return ieStrRef::INVALID;
 	}
 	int row = tab->FindTableValue(3, race, 0);
 	return ieStrRef(atoi(tab->QueryField(row,0)));
@@ -217,11 +217,11 @@ String TLKImporter::BuiltinToken(const char* Token)
 		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
 		//preparing sub-tokens
 		core->GetCalendar()->GetMonthName((int) dayandmonth);
-		return GetString(15981, STRING_FLAGS::NONE);
+		return GetString(ieStrRef::DAYANDMONTH, STRING_FLAGS::NONE);
 	}
 
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
-		return GetString(10174, STRING_FLAGS::NONE);
+		return GetString(ieStrRef::FIGHTERTYPE, STRING_FLAGS::NONE);
 	}
 	if (!strcmp( Token, "CLASS" )) {
 		//allow this to be used by direct setting of the token
@@ -333,7 +333,7 @@ ieStrRef TLKImporter::UpdateString(ieStrRef strref, const String& newvalue)
 {
 	if (!OverrideTLK) {
 		Log(ERROR, "TLKImporter", "Custom string is not supported by this game format.");
-		return 0xffffffff;
+		return ieStrRef::INVALID;
 	}
 
 	return OverrideTLK->UpdateString(strref, newvalue);
@@ -347,7 +347,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 	size_t Length;
 	ResRef SoundResRef;
 
-	if (empty || strref >= STRREF_START || (strref >= BIO_START && strref <= BIO_END)) {
+	if (empty || strref >= ieStrRef::OVERRIDE_START || (strref >= ieStrRef::BIO_START && strref <= ieStrRef::BIO_END)) {
 		if (OverrideTLK) {
 			String* tmp = StringFromCString(OverrideTLK->ResolveAuxString(strref, Length));
 			std::swap(string, *tmp);
@@ -360,7 +360,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 	} else {
 		ieDword Volume, Pitch, StrOffset;
 		ieDword l;
-		if (str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START ) == GEM_ERROR) {
+		if (str->Seek( 18 + (ieDword(strref) * 0x1A), GEM_STREAM_START ) == GEM_ERROR) {
 			return L"";
 		}
 		str->ReadWord(type);
@@ -396,7 +396,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
 	}
 	if (bool(flags & STRING_FLAGS::STRREFON)) {
-		string = std::to_wstring(strref) + L": " + string;
+		string = std::to_wstring(ieDword(strref)) + L": " + string;
 	}
 	return string;
 }
@@ -410,11 +410,11 @@ bool TLKImporter::HasAltTLK() const
 StringBlock TLKImporter::GetStringBlock(ieStrRef strref, STRING_FLAGS flags)
 {
 	bool empty = !(flags & STRING_FLAGS::ALLOW_ZERO) && !strref;
-	if (empty || strref >= StrRefCount) {
+	if (empty) {
 		return StringBlock();
 	}
 	ieWord type;
-	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
+	str->Seek( 18 + (ieDword(strref) * 0x1A), GEM_STREAM_START );
 	str->ReadWord(type);
 	ResRef soundRef;
 	str->ReadResRef( soundRef );

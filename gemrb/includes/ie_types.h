@@ -50,8 +50,47 @@ using ieDword = unsigned long int;
 using ieDwordSigned = signed long int;
 #endif
 
-/** string reference into TLK file */
-using ieStrRef = ieDword;
+// it is perfectly valid to create an ieStrRef for any value, but -1 is invalid
+// obviously we will define any hardcoded strrefs we use here
+enum class ieStrRef : ieDword {
+	INVALID = ieDword(-1),
+	NO_REST = 10309,
+	DATE1 = 10699,
+	DATE2 = 41277,
+	DAYANDMONTH = 15981,
+	FIGHTERTYPE = 10174,
+	MD_FAIL = 24197,
+	MD_SUCCESS = 24198,
+	HEAL = 28895,
+	ROLL0 = 112,
+	ROLL1 = 20460,
+	ROLL2 = 28379,
+	ROLL3 = 39257,
+	ROLL4 = 39258,
+	ROLL5 = 39265,
+	ROLL6 = 39266,
+	ROLL7 = 39297,
+	ROLL8 = 39298,
+	ROLL9 = 39299,
+	ROLL10 = 39300,
+	ROLL11 = 39301,
+	ROLL12 = 39302,
+	ROLL13 = 39303,
+	ROLL14 = 39304,
+	ROLL15 = 39306,
+	ROLL16 = 39673,
+	ROLL17 = 39828,
+	ROLL18 = 39829,
+	ROLL19 = 39842,
+	ROLL20 = 39846,
+	ROLL21 = 40955,
+	ROLL22 = 40974,
+	ROLL23 = 40975,
+	//the original games used these strings for custom biography (another quirk of the IE)
+	BIO_START = 62016,            //first BIO string
+	BIO_END   = (BIO_START + 5),  //last BIO string
+	OVERRIDE_START = 450000,
+};
 
 class ieVariable
 {

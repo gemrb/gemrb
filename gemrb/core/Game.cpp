@@ -1617,7 +1617,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	if (checks == REST_NOCHECKS) return 0;
 	
 	if (!err) {
-		static ieStrRef noerr = -1;
+		static ieStrRef noerr = ieStrRef::INVALID;
 		err = &noerr;
 	}
 
@@ -1669,11 +1669,11 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 			// and repurposes these area flags!
 			if ((area->AreaFlags & (AF_TUTORIAL|AF_DEADMAGIC)) == (AF_TUTORIAL|AF_DEADMAGIC)) {
 				// you must obtain permission
-				*err = 38587;
+				*err = ieStrRef(38587);
 				return false;
 			} else if (area->AreaFlags&AF_TUTORIAL) {
 				// you cannot rest in this area
-				*err = 34601;
+				*err = ieStrRef(34601);
 				return false;
 			} else if (area->AreaFlags&AF_DEADMAGIC) {
 				// you cannot rest right now
@@ -1805,13 +1805,13 @@ bool Game::RestParty(int checks, int dream, int hp)
 	//bg1 has "You have rested for <DURATION>" while pst has "You have
 	//rested for <HOUR> <DURATION>" and then bg1 has "<HOUR> hours" while
 	//pst just has "Hours", so this works for both
-	int restindex = displaymsg->GetStringReference(STR_REST);
-	int hrsindex = displaymsg->GetStringReference(STR_HOURS);
+	ieStrRef restindex = displaymsg->GetStringReference(STR_REST);
+	ieStrRef hrsindex = displaymsg->GetStringReference(STR_HOURS);
 
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 
 	//this would be bad
-	if (hrsindex == -1 || restindex == -1) return cutscene;
+	if (hrsindex == ieStrRef::INVALID || restindex == ieStrRef::INVALID) return cutscene;
 	
 	String tmpstr = core->GetString(hrsindex, STRING_FLAGS::NONE);
 	core->GetTokenDictionary()->SetAt("DURATION", tmpstr);

@@ -91,8 +91,8 @@ public:
 	ieVariable AreaLongName;
 	ieDword IconSeq = 0;
 	Point pos;
-	ieStrRef LocCaptionName = 0;
-	ieStrRef LocTooltipName = 0;
+	ieStrRef LocCaptionName = ieStrRef::INVALID;
+	ieStrRef LocTooltipName = ieStrRef::INVALID;
 	ResRef LoadScreenResRef;
 	ieDword AreaLinksIndex[4]{};
 	ieDword AreaLinksCount[4]{};
@@ -127,7 +127,7 @@ public: //struct members
 	ieDword Width = 0;
 	ieDword Height = 0;
 	ieDword MapNumber = 0;
-	ieStrRef AreaName = 0;
+	ieStrRef AreaName = ieStrRef::INVALID;
 	ieDword unknown1 = 0;
 	ieDword unknown2 = 0;
 	ResRef MapIconResRef;

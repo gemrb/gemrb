@@ -272,9 +272,9 @@ struct BABTable {
 struct ModalStatesStruct {
 	ResRef spell;
 	char action[16];
-	unsigned int entering_str;
-	unsigned int leaving_str;
-	unsigned int failed_str;
+	ieStrRef entering_str;
+	ieStrRef leaving_str;
+	ieStrRef failed_str;
 	unsigned int aoe_spell;
 	unsigned int repeat_msg;
 };
@@ -582,7 +582,7 @@ public:
 		return attackProjectile;
 	}
 	void SetName(String str, unsigned char type);
-	void SetName(int strref, unsigned char type);
+	void SetName(ieStrRef strref, unsigned char type);
 	/* Returns by how much movement speed should be divided to account for loot weight */
 	int GetEncumbranceFactor(bool feedback) const;
 	/* calculates speed, encumbrance etc */
@@ -610,13 +610,13 @@ public:
 	/* inlined dialogue start */
 	void Interact(int type) const;
 	/* returns a remapped verbal constant strref */
-	ieStrRef GetVerbalConstant(int index) const;
+	ieStrRef GetVerbalConstant(size_t index) const;
 	/* returns a random remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int start, int count) const;
 	/* displaying a random verbal constant */
 	bool VerbalConstant(int start, int count=1, int flags=0) const;
 	/* display string or verbal constant depending on what is available */
-	void DisplayStringOrVerbalConstant(int str, int vcstat, int vccount=1) const;
+	void DisplayStringOrVerbalConstant(size_t str, int vcstat, int vccount=1) const;
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
@@ -753,7 +753,7 @@ public:
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
-	void GetVerbalConstantSound(ResRef& sound, unsigned int index) const;
+	void GetVerbalConstantSound(ResRef& sound, size_t index) const;
 	bool GetSoundFromFile(ResRef &Sound, unsigned int index) const;
 	bool GetSoundFromINI(ResRef &Sound, unsigned int index) const;
 	bool GetSoundFrom2DA(ResRef &Sound, unsigned int index) const;

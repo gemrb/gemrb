@@ -204,7 +204,7 @@ public:
 	ResRef TravelVVC;
 	ieDword SparkColor = 0;
 	ieDword ExtFlags = 0;
-	ieDword StrRef = 0;
+	ieStrRef StrRef = ieStrRef::INVALID;
 	Color RGB;
 	ieWord ColorSpeed = 0;
 	ieWord Shake = 0;

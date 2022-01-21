@@ -59,7 +59,7 @@ enum class STRING_FLAGS : uint32_t {
 };
 
 // checked against the strref itself
-#define IE_STR_ALTREF 0x0100000 // use alternate tlk file: dialogf.tlk
+#define IE_STR_ALTREF ieStrRef(0x0100000) // use alternate tlk file: dialogf.tlk
 
 /**
  * @class StringMgr

@@ -174,7 +174,7 @@ int Container::IsOpen() const
 void Container::TryPickLock(const Actor *actor)
 {
 	if (LockDifficulty == 100) {
-		if (OpenFail != (ieDword)-1) {
+		if (OpenFail != ieStrRef::INVALID) {
 			displaymsg->DisplayStringName(OpenFail, DMC_BG2XPGREEN, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
 			displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, DMC_BG2XPGREEN, actor);
@@ -190,7 +190,7 @@ void Container::TryPickLock(const Actor *actor)
 			stat *= 7; // convert to percent (magic 7 is from RE)
 			int dexmod = actor->GetAbilityBonus(IE_DEX);
 			stat += dexmod; // the original didn't use it, so let's not multiply it
-			displaymsg->DisplayRollStringName(39301, DMC_LIGHTGREY, actor, stat-dexmod, LockDifficulty, dexmod);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL11, DMC_LIGHTGREY, actor, stat-dexmod, LockDifficulty, dexmod);
 		}
 	}
 	if (stat < LockDifficulty) {
@@ -229,7 +229,7 @@ void Container::TryBashLock(Actor *actor)
 	if (core->HasFeature(GF_3ED_RULES)) {
 		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~
 		// there is no separate string for non-doors
-		displaymsg->DisplayRollStringName(20460, DMC_LIGHTGREY, actor, roll, bonus, LockDifficulty);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, DMC_LIGHTGREY, actor, roll, bonus, LockDifficulty);
 	}
 
 	actor->FaceTarget(this);

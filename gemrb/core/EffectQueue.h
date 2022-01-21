@@ -157,7 +157,7 @@ public:
 	
 	union {
 		int opcode;
-		int Strref;
+		ieStrRef Strref;
 	};
 	
 	EffectDesc() {

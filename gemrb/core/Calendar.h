@@ -22,6 +22,7 @@
 #define CALENDAR_H
 
 #include "exports.h"
+#include "ie_types.h"
 
 namespace GemRB {
 
@@ -30,7 +31,7 @@ private:
 	int daysinyear = 0;
 	int monthnamecount = -1;
 	int *days = nullptr;
-	int *monthnames = nullptr;
+	ieStrRef *monthnames = nullptr;
 
 public:
 	Calendar(void);

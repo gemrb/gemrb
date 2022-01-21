@@ -114,8 +114,8 @@ public:
 
 	/** Resref of the spell itself */
 	ResRef Name;
-	ieStrRef SpellName = 0;
-	ieStrRef SpellNameIdentified = 0;
+	ieStrRef SpellName = ieStrRef::INVALID;
+	ieStrRef SpellNameIdentified = ieStrRef::INVALID;
 	ResRef CompletionSound;
 	ieDword Flags = 0;
 	ieWord SpellType = 0;
@@ -135,8 +135,8 @@ public:
 	ieDword unknown7 = 0;
 	ieDword unknown8 = 0;
 	ieDword unknown9 = 0;
-	ieStrRef SpellDesc = 0;
-	ieStrRef SpellDescIdentified = 0;
+	ieStrRef SpellDesc = ieStrRef::INVALID;
+	ieStrRef SpellDescIdentified = ieStrRef::INVALID;
 	ieDword unknown10 = 0;
 	ieDword unknown11 = 0;
 	ieDword unknown12 = 0;

@@ -1016,8 +1016,8 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//hiccups
 		//PST has this hardcoded deep in the engine
 		//gemrb lets you specify the strref in P#1
-		ieStrRef tmp = fx->Parameter1;
-		if (!tmp) tmp = 46633;
+		ieStrRef tmp = ieStrRef(fx->Parameter1);
+		if (!tmp) tmp = ieStrRef(46633);
 		String tmpstr = core->GetString(tmp, STRING_FLAGS::SPEECH | STRING_FLAGS::SOUND);
 		target->SetOverheadText(tmpstr);
 		target->GetHit();

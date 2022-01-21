@@ -110,8 +110,8 @@ bool SPLImporter::Open(DataStream* stream)
 
 Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 {
-	str->ReadDword(s->SpellName);
-	str->ReadDword(s->SpellNameIdentified);
+	str->ReadStrRef(s->SpellName);
+	str->ReadStrRef(s->SpellNameIdentified);
 	str->ReadResRef( s->CompletionSound );
 	str->ReadDword(s->Flags);
 	str->ReadWord(s->SpellType);
@@ -138,8 +138,8 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadDword(s->unknown7);
 	str->ReadDword(s->unknown8);
 	str->ReadDword(s->unknown9);
-	str->ReadDword(s->SpellDesc);
-	str->ReadDword(s->SpellDescIdentified);
+	str->ReadStrRef(s->SpellDesc);
+	str->ReadStrRef(s->SpellDescIdentified);
 	str->ReadDword(s->unknown10);
 	str->ReadDword(s->unknown11);
 	str->ReadDword(s->unknown12);

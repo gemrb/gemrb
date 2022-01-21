@@ -113,7 +113,7 @@ static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
 //4 action button indices are packed on a single ieDword, there are 32 actions max.
 //there are additional fake action buttons
 static ieDword GUIAction[MAX_ACT_COUNT]={UNINIT_IEDWORD};
-static ieDword GUITooltip[MAX_ACT_COUNT]={UNINIT_IEDWORD};
+static ieStrRef GUITooltip[MAX_ACT_COUNT]={ieStrRef::INVALID};
 static ResRef GUIResRef[MAX_ACT_COUNT];
 static EventNameType GUIEvent[MAX_ACT_COUNT];
 static Store *rhstore = NULL;
@@ -196,7 +196,7 @@ static RETURN* GetView(PyObject* obj) {
 
 static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref);
 
-static int GetCreatureStrRef(const Actor *actor, unsigned int Str)
+static ieStrRef GetCreatureStrRef(const Actor *actor, size_t Str)
 {
 	return actor->StrRefs[Str];
 }
@@ -520,7 +520,7 @@ The above example will display 'Level: 1' in the addressed label.\n\
 
 static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
-	ieStrRef strref = -1;
+	ieStrRef strref = ieStrRef::INVALID;
 	int flags = 0;
 	PARSE_ARGS(args, "i|i", &strref, &flags);
 
@@ -2838,8 +2838,8 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		entry->IconSeq = icon;
 		entry->pos.x = locx;
 		entry->pos.y = locy;
-		entry->LocCaptionName = label;
-		entry->LocTooltipName = name;
+		entry->LocCaptionName = ieStrRef(label);
+		entry->LocTooltipName = ieStrRef(name);
 		entry->LoadScreenResRef.Reset();
 		memcpy(entry->AreaLinksIndex, indices, sizeof(entry->AreaLinksIndex) );
 		memcpy(entry->AreaLinksCount, links, sizeof(entry->AreaLinksCount) );
@@ -5249,7 +5249,8 @@ strref is -1, then it will delete the whole journal.\n\
 
 static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
-	int section=-1, chapter = -1, strref;
+	int section=-1, strref;
+	ieStrRef chapter = ieStrRef::INVALID;
 	PARSE_ARGS( args,  "i|ii", &strref, &section, &chapter );
 
 	GET_GAME();
@@ -5261,14 +5262,14 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 
 	if (section==-1) {
 		//delete one or all entries
-		game->DeleteJournalEntry( strref);
+		game->DeleteJournalEntry(ieStrRef(strref));
 	} else {
-		if (chapter == -1) {
+		if (chapter == ieStrRef::INVALID) {
 			ieDword tmp = -1;
 			game->locals->Lookup("CHAPTER", tmp);
-			chapter = (int) tmp;
+			chapter = ieStrRef(tmp);
 		}
-		game->AddJournalEntry( chapter, section, strref);
+		game->AddJournalEntry(chapter, section, strref);
 	}
 
 	Py_RETURN_NONE;
@@ -5612,7 +5613,7 @@ PyDoc_STRVAR( GemRB_CreateString__doc,
 static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 {
 	PyObject *Text = nullptr;
-	ieStrRef strref = -1;
+	ieStrRef strref = ieStrRef::INVALID;
 	PARSE_ARGS( args,  "iO", &strref, &Text );
 	GET_GAME();
 	
@@ -5620,7 +5621,7 @@ static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 	if (str) {
 		strref = core->UpdateString(strref, *str);
 	}
-	return PyLong_FromLong(strref);
+	return PyLong_FromLong(ieDword(strref));
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerString__doc,
@@ -5642,7 +5643,8 @@ Mostly useful for setting the biography.\n\
 
 static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, StringSlot, StrRef;
+	int globalID, StringSlot;
+	ieStrRef StrRef = ieStrRef::INVALID;
 	PARSE_ARGS( args,  "iii", &globalID, &StringSlot, &StrRef );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -5821,7 +5823,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PCStatsStruct* ps = MyActor->PCStats;
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "BestKilledName", DecRef(PyLong_FromLong, ps->BestKilledName));
+	PyDict_SetItemString(dict, "BestKilledName", DecRef(PyLong_FromLong, ieDword(ps->BestKilledName)));
 	PyDict_SetItemString(dict, "BestKilledXP", DecRef(PyLong_FromLong, ps->BestKilledXP));
 	PyDict_SetItemString(dict, "AwayTime", DecRef(PyLong_FromLong, ps->AwayTime));
 	PyDict_SetItemString(dict, "JoinDate", DecRef(PyLong_FromLong, ps->JoinDate));
@@ -5845,7 +5847,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 
-		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromLong, spell->SpellName));
+		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromLong, ieDword(spell->SpellName)));
 
 		gamedata->FreeSpell( spell, ps->FavouriteSpells[largest], false );
 	} else {
@@ -5866,7 +5868,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "Item not found!\n" );
 		}
 
-		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromLong, item->GetItemName(true)));
+		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromLong, ieDword(item->GetItemName(true))));
 
 		gamedata->FreeItem( item, ps->FavouriteWeapons[largest], false );
 	} else {
@@ -6185,7 +6187,7 @@ The biography string is an example of such a string.\n\
 
 static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, Index, StatValue;
+	int globalID, Index;
 	PARSE_ARGS( args,  "ii", &globalID, &Index);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -6193,8 +6195,9 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 	if (Index>=VCONST_COUNT) {
 		return RuntimeError("String reference is too high!\n");
 	}
-	StatValue = GetCreatureStrRef( actor, Index );
-	return PyLong_FromLong(StatValue);
+
+	ieStrRef StatValue = GetCreatureStrRef( actor, Index );
+	return PyLong_FromLong(ieDword(StatValue));
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
@@ -6950,8 +6953,8 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	bool identified = ci->Flags & IE_INV_ITEM_IDENTIFIED;
-	PyDict_SetItemString(dict, "ItemName", DecRef(PyLong_FromLong, item->GetItemName( identified )) );
-	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromLong, item->GetItemDesc( identified )) );
+	PyDict_SetItemString(dict, "ItemName", DecRef(PyLong_FromLong, ieDword(item->GetItemName(identified))));
+	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromLong, ieDword(item->GetItemDesc(identified))));
 	gamedata->FreeItem( item, ci->ItemResRef, false );
 	return dict;
 }
@@ -7172,7 +7175,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "StoreType", DecRef(PyLong_FromLong, static_cast<int>(store->Type)));
-	PyDict_SetItemString(dict, "StoreName", DecRef(PyLong_FromLong, store->StoreName ));
+	PyDict_SetItemString(dict, "StoreName", DecRef(PyLong_FromLong, ieDword(store->StoreName)));
 	PyDict_SetItemString(dict, "StoreDrinkCount", DecRef(PyLong_FromLong, store->DrinksCount ));
 	PyDict_SetItemString(dict, "StoreCureCount", DecRef(PyLong_FromLong, store->CuresCount ));
 	PyDict_SetItemString(dict, "StoreItemCount", DecRef(PyLong_FromLong, store->GetRealStockSize() ));
@@ -7732,8 +7735,8 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	int identified = !!(si->Flags & IE_INV_ITEM_IDENTIFIED);
-	PyDict_SetItemString(dict, "ItemName", DecRef(PyLong_FromLong, item->GetItemName(identified)));
-	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromLong, item->GetItemDesc(identified)));
+	PyDict_SetItemString(dict, "ItemName", DecRef(PyLong_FromLong, ieDword(item->GetItemName(identified))));
+	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromLong, ieDword(item->GetItemDesc(identified))));
 
 	int price = item->Price * store->SellMarkup / 100;
 	//calculate depreciation too
@@ -7801,7 +7804,7 @@ static void ReadUsedItems()
 				UsedItems[i].username = nullptr;
 			}
 			//this is an strref
-			UsedItems[i].value = atoi(table->QueryField(i, 1));
+			UsedItems[i].value = ieStrRef(atoi(table->QueryField(i, 1)));
 			//1 - named actor cannot remove it
 			//2 - anyone else cannot equip it
 			//4 - can only swap it for something else
@@ -7821,7 +7824,7 @@ static void ReadSpecialItems()
 		for (ieDword i = 0; i < SpecialItemsCount; i++) {
 			SpecialItems[i].resref = tab->GetRowName(i);
 			//if there are more flags, compose this value into a bitfield
-			SpecialItems[i].value = atoi(tab->QueryField(i, 0));
+			SpecialItems[i].value = ieStrRef(atoi(tab->QueryField(i, 0)));
 		}
 	}
 }
@@ -7835,7 +7838,7 @@ static ieStrRef GetSpellDesc(const ResRef& CureResRef)
 			StoreSpells.resize(StoreSpellsCount);
 			for (ieDword i = 0; i < StoreSpellsCount; i++) {
 				StoreSpells[i].resref = tab->GetRowName(i);
-				StoreSpells[i].value = atoi(tab->QueryField(i, 0));
+				StoreSpells[i].value = ieStrRef(atoi(tab->QueryField(i, 0)));
 			}
 		}
 	}
@@ -7845,7 +7848,7 @@ static ieStrRef GetSpellDesc(const ResRef& CureResRef)
 			return spell.value;
 		}
 	}
-	return 0;
+	return ieStrRef::INVALID;
 }
 
 PyDoc_STRVAR( GemRB_GetStoreCure__doc,
@@ -9118,7 +9121,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyObject* locationtuple = PyTuple_New(ehc);
 	for (size_t i = 0; i < ehc; ++i) {
 		const ITMExtHeader *eh = &item->ext_headers[i];
-		PyTuple_SetItem(tooltiptuple, i, PyLong_FromLong(eh->Tooltip));
+		PyTuple_SetItem(tooltiptuple, i, PyLong_FromLong(ieDword(eh->Tooltip)));
 		PyTuple_SetItem(locationtuple, i, PyLong_FromLong(eh->Location));
 		PyDict_SetItemString(dict, "MaxCharge", DecRef(PyLong_FromLong, eh->Charges));
 	}
@@ -10079,7 +10082,7 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 	}
 
 	ieStrRef strref = core->GetRumour(ResRef(rumourRef));
-	return PyLong_FromLong(strref);
+	return PyLong_FromLong(ieDword(strref));
 }
 
 PyDoc_STRVAR( GemRB_GamePause__doc,
@@ -10462,7 +10465,7 @@ static void ReadActionButtons()
 		row.bytes[2] = (ieByte) atoi( tab->QueryField(i,2) );
 		row.bytes[3] = (ieByte) atoi( tab->QueryField(i,3) );
 		GUIAction[i] = row.data;
-		GUITooltip[i] = atoi( tab->QueryField(i,4) );
+		GUITooltip[i] = ieStrRef(atoi(tab->QueryField(i,4)));
 		GUIResRef[i] = tab->QueryField(i, 5);
 		strncpy(GUIEvent[i], tab->GetRowName(i), 16);
 	}
@@ -10541,7 +10544,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	btn->SetAction(PythonControlCallback(func2), Control::Click, GEM_MB_MENU, 0, 1);
 
 	//cannot make this const, because it will be freed
-	if (GUITooltip[Index] != (ieDword) -1) {
+	if (GUITooltip[Index] != ieStrRef::INVALID) {
 		SetViewTooltipFromRef(btn, GUITooltip[Index]);
 	}
 
@@ -11919,19 +11922,19 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	// - resting outside: popup an error window with the reason in pst, print it to message window elsewhere
 	// - resting in inns: popup a GUISTORE error window with the reason
 	PyObject* dict = PyDict_New();
-	ieStrRef err = -1;
+	ieStrRef err = ieStrRef::INVALID;
 	bool cannotRest = !game->CanPartyRest(noareacheck, &err);
 	// fall back to the generic: you may not rest at this time
-	if (err == -1) {
+	if (err == ieStrRef::INVALID) {
 		if (core->HasFeature(GF_AREA_OVERRIDE)) {
 			err = displaymsg->GetStringReference(STR_MAYNOTREST);
 		} else {
-			err = 10309;
+			err = ieStrRef::NO_REST;
 		}
 	}
 	PyDict_SetItemString(dict, "Error", PyBool_FromLong(cannotRest));
 	if (cannotRest) {
-		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromLong(err));
+		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromLong(ieDword(err)));
 		PyDict_SetItemString(dict, "Cutscene", PyBool_FromLong(0));
 	} else {
 		PyDict_SetItemString(dict, "ErrorMsg", PyLong_FromLong(-1));
@@ -11998,7 +12001,7 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 	size_t i = SpecialItems.size();
 	int slot = -1;
 	while(i--) {
-		if (itemtype&SpecialItems[i].value) {
+		if (itemtype & ieDword(SpecialItems[i].value)) {
 			slot = actor->inventory.FindItem(SpecialItems[i].resref, 0);
 			if (slot>=0) {
 				break;
@@ -12295,7 +12298,7 @@ character whose name will be displayed (as saying the string).\n\
 
 static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 {
-	int strref = -1;
+	ieStrRef strref = ieStrRef::INVALID;
 	PyObject* pycol;
 	int globalID = 0;
 	PARSE_ARGS( args,  "iO|i", &strref, &pycol, &globalID);

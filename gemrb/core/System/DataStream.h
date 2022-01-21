@@ -45,8 +45,10 @@ namespace GemRB {
 
 #define ReadWord ReadScalar<ieWord>
 #define ReadDword ReadScalar<ieDword>
+#define ReadStrRef ReadEnum<ieStrRef>
 #define WriteWord WriteScalar<ieWord>
 #define WriteDword WriteScalar<ieDword>
+#define WriteStrRef WriteEnum<ieStrRef>
 
 // represents the byte position of the stream
 using strpos_t = size_t;

@@ -66,7 +66,7 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	str->ReadDword(s->SparkColor);//enabled by PSF_SPARK
 	// in the original bg2, there was just a 2 byte padding and 212 byte reserve left
 	str->ReadDword(s->ExtFlags) ; //gemrb extension flags
-	str->ReadDword(s->StrRef);    //gemrb extension strref
+	str->ReadStrRef(s->StrRef);    //gemrb extension strref
 	ieDword c;
 	str->ReadDword(c);       //gemrb extension rgb pulse
 	s->RGB = Color::FromABGR(c);

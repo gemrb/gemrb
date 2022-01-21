@@ -152,7 +152,7 @@ struct SongHeaderType {
 };
 
 struct RestHeaderType {
-	ieDword Strref[MAX_RESCOUNT];
+	ieStrRef Strref[MAX_RESCOUNT];
 	ResRef CreResRef[MAX_RESCOUNT];
 	ieWord Difficulty;
 	ieWord CreatureNum;
@@ -180,7 +180,7 @@ class MapNote {
 	}
 public:
 	// FIXME: things can get messed up by exposing these (specifically strref and text)
-	ieStrRef strref;
+	ieStrRef strref = ieStrRef::INVALID;
 	ieWord color;
 	String text;
 	Point Pos;
@@ -194,11 +194,11 @@ public:
 	MapNote(const MapNote &rhs) = default;
 
 	MapNote(String txt, ieWord c, bool readonly)
-	: strref(-1), text(std::move(txt)), readonly(readonly)
+	: text(std::move(txt)), readonly(readonly)
 	{
 		color = Clamp<ieWord>(c, 0, 8);
 		//update custom strref
-		strref = core->UpdateString(-1, text);
+		strref = core->UpdateString(ieStrRef::INVALID, text);
 	}
 
 	MapNote(ieStrRef ref, ieWord c, bool readonly)
@@ -413,7 +413,7 @@ public:
 
 private:
 	uint32_t debugFlags = 0;
-	ieStrRef trackString = 0;
+	ieStrRef trackString = ieStrRef::INVALID;
 	int trackFlag = 0;
 	ieWord trackDiff = 0;
 

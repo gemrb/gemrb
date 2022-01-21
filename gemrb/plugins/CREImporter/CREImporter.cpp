@@ -852,11 +852,11 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 {
 	Actor* act = new Actor();
 	act->InParty = is_in_party;
-	str->ReadDword(act->LongStrRef);
+	str->ReadStrRef(act->LongStrRef);
 	//Beetle name in IWD needs the allow zero flag
 	String poi = core->GetString( act->LongStrRef, STRING_FLAGS::ALLOW_ZERO );
 	act->SetName(std::move(poi), 1); //setting longname
-	str->ReadDword(act->ShortStrRef);
+	str->ReadStrRef(act->ShortStrRef);
 	if (act->ShortStrRef == (ieStrRef) -1) {
 		act->ShortStrRef = act->LongStrRef;
 	}
@@ -1046,7 +1046,7 @@ void CREImporter::GetActorPST(Actor *act)
 	//scriptname of tracked creature (according to IE dev info)
 	str->Seek( 32, GEM_CURRENT_POS );
 	for (auto& ref : act->StrRefs) {
-		str->ReadDword(ref);
+		str->ReadStrRef(ref);
 	}
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL]=tmpByte;
@@ -1387,8 +1387,8 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	//these could be used to save iwd2 skills
 	//TODO: gemrb format
 	act->BaseStats[IE_TRACKING]=tmpByte;
-	for (unsigned int& StrRef : act->StrRefs) {
-		str->ReadDword(StrRef);
+	for (ieStrRef& StrRef : act->StrRefs) {
+		str->ReadStrRef(StrRef);
 	}
 	return 0;
 }
@@ -1481,7 +1481,7 @@ void CREImporter::GetActorBG(Actor *act)
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
 	for (auto& ref : act->StrRefs) {
-		str->ReadDword(ref);
+		str->ReadStrRef(ref);
 	}
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL]=tmpByte;
@@ -1711,7 +1711,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_LEVELMAGE]=tmpByte;
 	str->Seek( 22, GEM_CURRENT_POS ); //levels for classes
 	for (int i = 0; i < 64; i++) {
-		str->ReadDword(act->StrRefs[i]);
+		str->ReadStrRef(act->StrRefs[i]);
 	}
 	ReadScript( act, SCR_SPECIFICS);
 	ReadScript( act, SCR_AREA);
@@ -2007,7 +2007,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
 	for (auto& ref : act->StrRefs) {
-		str->ReadDword(ref);
+		str->ReadStrRef(ref);
 	}
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL]=tmpByte;
@@ -2278,8 +2278,8 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		Signature[7]+=CREVersion%10;
 	}
 	stream->Write( Signature, 8);
-	stream->WriteDword(actor->LongStrRef);
-	stream->WriteDword(actor->ShortStrRef);
+	stream->WriteStrRef(actor->LongStrRef);
+	stream->WriteStrRef(actor->ShortStrRef);
 	stream->WriteDword(actor->BaseStats[IE_MC_FLAGS]);
 	stream->WriteDword(actor->BaseStats[IE_XPVALUE]);
 	stream->WriteDword(actor->BaseStats[IE_XP]);
@@ -2434,7 +2434,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		stream->Write( filling, 22);
 		//string references
 		for (int i = 0; i < 64; i++) {
-			stream->WriteDword(actor->StrRefs[i]);
+			stream->WriteStrRef(actor->StrRefs[i]);
 		}
 		stream->WriteResRef( actor->GetScript(SCR_AREA) );
 		stream->WriteResRef( actor->GetScript(SCR_RESERVED) );
@@ -2549,7 +2549,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		stream->Write( &tmpByte, 1);
 		stream->Write( filling, 32);
 		for (const auto& ref : actor->StrRefs) {
-			stream->WriteDword(ref);
+			stream->WriteStrRef(ref);
 		}
 		tmpByte = actor->BaseStats[IE_LEVEL];
 		stream->Write( &tmpByte, 1);

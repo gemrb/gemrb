@@ -144,8 +144,8 @@ Item* ITMImporter::GetItem(Item *s)
 	if( !s) {
 		return NULL;
 	}
-	str->ReadDword(s->ItemName);
-	str->ReadDword(s->ItemNameIdentified);
+	str->ReadStrRef(s->ItemName);
+	str->ReadStrRef(s->ItemNameIdentified);
 	str->ReadResRef( s->ReplacementItem );
 	str->ReadDword(s->Flags);
 	str->ReadWord(s->ItemType);
@@ -191,8 +191,8 @@ Item* ITMImporter::GetItem(Item *s)
 	str->ReadWord(s->LoreToID);
 	str->ReadResRef( s->GroundIcon );
 	str->ReadDword(s->Weight);
-	str->ReadDword(s->ItemDesc);
-	str->ReadDword(s->ItemDescIdentified);
+	str->ReadStrRef(s->ItemDesc);
+	str->ReadStrRef(s->ItemDescIdentified);
 	str->ReadResRef( s->DescriptionIcon );
 	str->ReadDword(s->Enchantment);
 	str->ReadDword(s->ExtHeaderOffset);
@@ -212,7 +212,7 @@ Item* ITMImporter::GetItem(Item *s)
 	if (version == ITM_VER_PST) {
 		//pst data
 		str->ReadResRef( s->Dialog );
-		str->ReadDword(s->DialogName);
+		str->ReadStrRef(s->DialogName);
 		ieWord WieldColor;
 		str->ReadWord(WieldColor);
 		if (s->AnimationType[0]) {
@@ -222,10 +222,10 @@ Item* ITMImporter::GetItem(Item *s)
 	} else if (dialogTable) {
 		//all non pst
 		int row = dialogTable->GetRowIndex(s->Name);
-		s->DialogName = atoi(dialogTable->QueryField(row, 0));
+		s->DialogName = ieStrRef(atoi(dialogTable->QueryField(row, 0)));
 		s->Dialog = dialogTable->QueryField(row, 1);
 	} else {
-		s->DialogName = -1;
+		s->DialogName = ieStrRef::INVALID;
 		s->Dialog.Reset();
 	}
 
@@ -245,7 +245,7 @@ Item* ITMImporter::GetItem(Item *s)
 		// set the tooltip
 		if (tooltipTable) {
 			int row = tooltipTable->GetRowIndex(s->Name);
-			eh->Tooltip = atoi(tooltipTable->QueryField(row, i));
+			eh->Tooltip = ieStrRef(atoi(tooltipTable->QueryField(row, i)));
 		}
 	}
 

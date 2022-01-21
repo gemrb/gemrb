@@ -137,7 +137,7 @@ class GameScript;
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING		5
 
-using SrcVector = std::vector<ieDword>;
+using SrcVector = std::vector<ieStrRef>;
 
 struct targettype {
 	Scriptable *actor; //hmm, could be door

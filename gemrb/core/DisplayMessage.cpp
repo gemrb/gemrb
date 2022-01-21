@@ -61,7 +61,7 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 	AutoTable tab = gamedata->LoadTable(name.c_str());
 	if (tab) {
 		for(int i=0;i<STRREF_COUNT;i++) {
-			table[i]=atoi(tab->QueryField(i,0));
+			table[i] = ieStrRef(atoi(tab->QueryField(i,0)));
 		}
 		loadedTable = name;
 		return true;
@@ -76,7 +76,7 @@ ieStrRef DisplayMessage::StrRefs::operator[](size_t idx) const
 	if (idx < STRREF_COUNT) {
 		return table[idx];
 	}
-	return -1;
+	return ieStrRef::INVALID;
 }
 
 void DisplayMessage::LoadStringRefs()
@@ -158,16 +158,16 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 }
 
 //simply displaying a constant string
-void DisplayMessage::DisplayConstantString(ieStrRef stridx, const Color &color, Scriptable *target) const
+void DisplayMessage::DisplayConstantString(size_t stridx, const Color &color, Scriptable *target) const
 {
-	if (stridx<0) return;
+	if (stridx > STRREF_COUNT) return;
 	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
 	DisplayString(text, color, target);
 }
 
 void DisplayMessage::DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const
 {
-	if (stridx<0) return;
+	if (stridx == ieStrRef::INVALID) return;
 	String text = core->GetString(stridx, flags);
 	DisplayString(text, color, NULL);
 }
@@ -196,9 +196,9 @@ void DisplayMessage::DisplayString(const String& text, const Color &color, Scrip
 
 // String format is
 // blah : whatever
-void DisplayMessage::DisplayConstantStringValue(ieStrRef stridx, const Color &color, ieDword value) const
+void DisplayMessage::DisplayConstantStringValue(size_t stridx, const Color &color, ieDword value) const
 {
-	if (stridx<0) return;
+	if (stridx > STRREF_COUNT) return;
 	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
 	String formatted = fmt::format(DisplayFormatValue, color.Packed(), text, value);
 	DisplayMarkupString(formatted);
@@ -206,9 +206,9 @@ void DisplayMessage::DisplayConstantStringValue(ieStrRef stridx, const Color &co
 
 // String format is
 // <charname> - blah blah : whatever
-void DisplayMessage::DisplayConstantStringNameString(ieStrRef stridx, const Color &color, ieStrRef stridx2, const Scriptable *actor) const
+void DisplayMessage::DisplayConstantStringNameString(size_t stridx, const Color &color, size_t stridx2, const Scriptable *actor) const
 {
-	if (stridx<0) return;
+	if (stridx > STRREF_COUNT) return;
 
 	String name;
 	Color actor_color = GetSpeakerColor(name, actor);
@@ -226,9 +226,9 @@ void DisplayMessage::DisplayConstantStringNameString(ieStrRef stridx, const Colo
 
 // String format is
 // <charname> - blah blah
-void DisplayMessage::DisplayConstantStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker) const
+void DisplayMessage::DisplayConstantStringName(size_t stridx, const Color &color, const Scriptable *speaker) const
 {
-	if (stridx<0) return;
+	if (stridx > STRREF_COUNT) return;
 	if(!speaker) return;
 
 	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
@@ -236,9 +236,9 @@ void DisplayMessage::DisplayConstantStringName(ieStrRef stridx, const Color &col
 }
 
 //Treats the constant string as a numeric format string, otherwise like the previous method
-void DisplayMessage::DisplayConstantStringNameValue(ieStrRef stridx, const Color &color, const Scriptable *speaker, int value) const
+void DisplayMessage::DisplayConstantStringNameValue(size_t stridx, const Color &color, const Scriptable *speaker, int value) const
 {
-	if (stridx<0) return;
+	if (stridx > STRREF_COUNT) return;
 	if(!speaker) return;
 
 	String fmt = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::RESOLVE_TAGS);
@@ -247,9 +247,9 @@ void DisplayMessage::DisplayConstantStringNameValue(ieStrRef stridx, const Color
 
 // String format is
 // <charname> - blah blah <someoneelse>
-void DisplayMessage::DisplayConstantStringAction(ieStrRef stridx, const Color &color, const Scriptable *attacker, const Scriptable *target) const
+void DisplayMessage::DisplayConstantStringAction(size_t stridx, const Color &color, const Scriptable *attacker, const Scriptable *target) const
 {
-	if (stridx<0) return;
+	if (stridx > STRREF_COUNT) return;
 
 	String name1, name2;
 
@@ -261,11 +261,11 @@ void DisplayMessage::DisplayConstantStringAction(ieStrRef stridx, const Color &c
 	DisplayMarkupString(formatted);
 }
 
-void DisplayMessage::DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const
+void DisplayMessage::DisplayStringName(ieStrRef str, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const
 {
-	if (stridx<0) return;
+	if (str == ieStrRef::INVALID) return;
 
-	String text = core->GetString( stridx, flags);
+	String text = core->GetString(str, flags);
 	DisplayStringName(text, color, speaker);
 }
 

@@ -1677,7 +1677,7 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 		options |= STRING_FLAGS::RESOLVE_TAGS;
 	}
 
-	if (strings2 && (signed)strref != -1 && strref & IE_STR_ALTREF) {
+	if (strings2 && strref != ieStrRef::INVALID && bool(strref & IE_STR_ALTREF)) {
 		return strings2->GetString(strref, flags | options);
 	} else {
 		return strings->GetString(strref, flags | options);
@@ -2464,7 +2464,7 @@ int Interface::PlayMovie(const char* resref)
 				const char* frameField = sttable->QueryField(i, 0);
 				const char* strField = sttable->QueryField(i, 1);
 				if (frameField && strField) { // this skips the initial palette rows
-					subs[atoi(frameField)] = atoi(strField);
+					subs[atoi(frameField)] = ieStrRef(atoi(strField));
 				}
 			}
 		}
@@ -3250,7 +3250,7 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 		}
 		//custom strings
 		ieStrRef str = actor->Disabled(item->Name, item->ItemType);
-		if (str && !equipped) {
+		if (str != ieStrRef::INVALID && !equipped) {
 			if (feedback) displaymsg->DisplayString(str, DMC_WHITE, STRING_FLAGS::NONE);
 			return 0;
 		}

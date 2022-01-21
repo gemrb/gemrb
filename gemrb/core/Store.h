@@ -130,7 +130,7 @@ public:
 
 	ResRef Name;
 	StoreType Type = StoreType::STORE;
-	ieStrRef StoreName = 0;
+	ieStrRef StoreName = ieStrRef::INVALID;
 	ieDword Flags = 0;
 	ieDword SellMarkup = 0;
 	ieDword BuyMarkup = 0;

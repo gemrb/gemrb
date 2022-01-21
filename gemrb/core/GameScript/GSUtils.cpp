@@ -427,7 +427,7 @@ static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, con
 	return false;
 }
 
-void DisplayStringCoreVC(Scriptable* Sender, int vc, int flags)
+void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 {
 	//no one hears you when you are in the Limbo!
 	if (!Sender || !Sender->GetCurrentArea()) {
@@ -436,7 +436,7 @@ void DisplayStringCoreVC(Scriptable* Sender, int vc, int flags)
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
 	
-	ieStrRef Strref = -1;
+	ieStrRef Strref = ieStrRef::INVALID;
 	if (flags & DS_CONST) {
 		const Actor* actor = Scriptable::As<Actor>(Sender);
 		if (!actor) {
@@ -450,7 +450,7 @@ void DisplayStringCoreVC(Scriptable* Sender, int vc, int flags)
 		}
 
 		Strref = actor->GetVerbalConstant(vc);
-		if (Strref == -1 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
+		if (Strref == ieStrRef::INVALID || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 			//get soundset based string constant
 			ResRef soundRef;
 			actor->GetVerbalConstantSound(soundRef, vc);
@@ -469,7 +469,7 @@ void DisplayStringCoreVC(Scriptable* Sender, int vc, int flags)
 
 void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, const char* soundpath)
 {
-	if (Strref == -1) return;
+	if (Strref == ieStrRef::INVALID) return;
 
 	// Check if subtitles are not enabled
 	ieDword charactersubtitles = 0;
@@ -1985,10 +1985,8 @@ SrcVector *LoadSrc(const ResRef& resname)
 	src = new SrcVector(size);
 	SrcCache.SetAt( resname, (void *) src );
 	while (size--) {
-		ieDword tmp;
-		str->ReadDword(tmp);
-		src->at(size)=tmp;
-		str->ReadDword(tmp);
+		str->ReadStrRef(src->at(size));
+		str->Seek(4, GEM_CURRENT_POS);
 	}
 	delete str;
 	return src;
@@ -2928,7 +2926,7 @@ void AddXPCore(const Action *parameters, bool divide)
 	}
 
 	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayString(parameters->int0Parameter, DMC_BG2XPGREEN, STRING_FLAGS::SOUND);
+		displaymsg->DisplayString(ieStrRef(parameters->int0Parameter), DMC_BG2XPGREEN, STRING_FLAGS::SOUND);
 	}
 	if (!xptable) {
 		Log(ERROR, "GameScript", "Can't perform AddXP2DA/AddXPVar!");

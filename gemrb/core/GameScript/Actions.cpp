@@ -889,7 +889,7 @@ void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	actor->StrRefs[parameters->int0Parameter]=parameters->int1Parameter;
+	actor->StrRefs[parameters->int0Parameter] = ieStrRef(parameters->int1Parameter);
 }
 
 //this one works only on real actors, they got constants
@@ -899,7 +899,7 @@ void GameScript::VerbalConstantHead(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	DisplayStringCore( tar, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_CONST);
+	DisplayStringCore(tar, ieStrRef(parameters->int0Parameter), DS_HEAD|DS_CONSOLE|DS_CONST);
 }
 
 void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
@@ -908,7 +908,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	DisplayStringCore( tar, parameters->int0Parameter, DS_CONSOLE|DS_CONST);
+	DisplayStringCore(tar, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_CONST);
 }
 
 //bg2 - variable
@@ -1627,12 +1627,12 @@ void GameScript::DisplayStringNoName(Scriptable* Sender, Action* parameters)
 		target=Sender;
 	}
 	if (Sender->Type==ST_ACTOR) {
-		DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_NONAME);
+		DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_NONAME);
 	} else {
 		// Virtue calls this from the global script, but maybe Pos is ok for areas
 		// set DS_CONSOLE only for ST_GLOBAL if it turns out areas don't care;
 		// could also be dependent on the subtitle setting, see DisplayStringCore
-		DisplayStringCore(target, parameters->int0Parameter, DS_AREA|DS_CONSOLE|DS_NONAME);
+		DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_AREA|DS_CONSOLE|DS_NONAME);
 	}
 }
 
@@ -1643,12 +1643,12 @@ void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 		target=Sender;
 	}
 
-	DisplayStringCore( target, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_NONAME);
+	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_HEAD|DS_CONSOLE|DS_NONAME);
 }
 
 void GameScript::DisplayMessage(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE|DS_NONAME);
+	DisplayStringCore(Sender, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_NONAME);
 }
 
 //float message over target
@@ -1660,7 +1660,7 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
 
-	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD|DS_SPEECH );
+	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_HEAD|DS_SPEECH );
 }
 
 void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
@@ -1680,7 +1680,7 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 	while(i--) {
 		Actor *actor = game->GetPC(i, true);
 		if (actor->inventory.HasItem(parameters->string0Parameter, 0)) {
-			DisplayStringCore(actor, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
+			DisplayStringCore(actor, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_HEAD );
 		}
 	}
 }
@@ -1694,7 +1694,7 @@ void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 		Log(ERROR, "GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
 
-	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD);
+	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_HEAD);
 }
 
 void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
@@ -1740,9 +1740,9 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 		target=Sender;
 	}
 	if (Sender->Type==ST_ACTOR) {
-		DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE);
+		DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_CONSOLE);
 	} else {
-		DisplayStringCore( target, parameters->int0Parameter, DS_AREA);
+		DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_AREA);
 	}
 }
 
@@ -1760,7 +1760,7 @@ void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		target=Sender;
 	}
-	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
+	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_WAIT|DS_SPEECH|DS_HEAD);
 	Sender->CurrentActionState = 1;
 	// parameters->int2Parameter is unused here so hijack it to store the wait time
 	// and make sure we wait at least one round, so strings without audio have some time to display
@@ -3187,7 +3187,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
 	//SetAt takes a newly created reference (no need of free/copy)
-	String str = core->GetString(parameters->int0Parameter);
+	String str = core->GetString(ieStrRef(parameters->int0Parameter));
 	core->GetTokenDictionary()->SetAt(parameters->string0Parameter, str);
 }
 
@@ -3759,20 +3759,20 @@ void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameter
 //the third parameter is a GemRB extension
 void GameScript::AddJournalEntry(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->AddJournalEntry(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+	core->GetGame()->AddJournalEntry(ieStrRef(parameters->int0Parameter), parameters->int1Parameter, parameters->int2Parameter);
 }
 
 void GameScript::SetQuestDone(Scriptable* /*Sender*/, Action* parameters)
 {
 	Game *game = core->GetGame();
-	game->DeleteJournalEntry(parameters->int0Parameter);
-	game->AddJournalEntry(parameters->int0Parameter, IE_GAM_QUEST_DONE, parameters->int2Parameter);
+	game->DeleteJournalEntry(ieStrRef(parameters->int0Parameter));
+	game->AddJournalEntry(ieStrRef(parameters->int0Parameter), IE_GAM_QUEST_DONE, parameters->int2Parameter);
 
 }
 
 void GameScript::RemoveJournalEntry(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->DeleteJournalEntry(parameters->int0Parameter);
+	core->GetGame()->DeleteJournalEntry(ieStrRef(parameters->int0Parameter));
 }
 
 void GameScript::SetInternal(Scriptable* Sender, Action* parameters)
@@ -3917,7 +3917,7 @@ void GameScript::SetApparentName(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		return;
 	}
-	target->SetName(parameters->int0Parameter,1);
+	target->SetName(ieStrRef(parameters->int0Parameter), 1);
 }
 
 void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
@@ -3927,7 +3927,7 @@ void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		return;
 	}
-	target->SetName(parameters->int0Parameter,2);
+	target->SetName(ieStrRef(parameters->int0Parameter), 2);
 }
 
 /** this is a gemrb extension */
@@ -4559,7 +4559,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		int level = scr->GetXPLevel(true);
 		int wismod = scr->GetAbilityBonus(IE_WIS);
 		// ~Pick pocket check. (10 + skill w/Dex bonus) %d vs. ((d20 + target's level) + Wisdom modifier) %d + %d.~
-		displaymsg->DisplayRollStringName(39302, DMC_LIGHTGREY, snd, 10+skill, roll+level, wismod);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL12, DMC_LIGHTGREY, snd, 10+skill, roll+level, wismod);
 		check = (10 + skill) > (roll + level + wismod);
 		if (skill == 0) { // a trained skill, make sure we fail
 			check = 1;
@@ -5031,7 +5031,7 @@ void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
 void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, parameters->int0Parameter);
+	map->AddMapNote(parameters->pointParameter, parameters->int1Parameter, ieStrRef(parameters->int0Parameter));
 }
 
 void GameScript::RemoveMapnote( Scriptable* Sender, Action* parameters)
@@ -5945,7 +5945,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		if (tab) {
 			basename = tab->QueryDefault();
 		}
-		String str = core->GetString(parameters->int0Parameter, STRING_FLAGS::STRREFOFF);
+		String str = core->GetString(ieStrRef(parameters->int0Parameter), STRING_FLAGS::STRREFOFF);
 		char FolderName[_MAX_PATH];
 		snprintf (FolderName, sizeof(FolderName), "%s - %ls", basename, str.c_str());
 
@@ -7321,7 +7321,7 @@ void GameScript::SetTrackString(Scriptable* Sender, Action* parameters)
 {
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
-	map->SetTrackString(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+	map->SetTrackString(ieStrRef(parameters->int0Parameter), parameters->int1Parameter, parameters->int2Parameter);
 }
 
 void GameScript::StateOverrideFlag(Scriptable* /*Sender*/, Action* parameters)

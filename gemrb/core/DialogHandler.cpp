@@ -253,7 +253,7 @@ static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& op
 		}
 
 		idx++;
-		if (ds->transitions[x]->textStrRef == 0xffffffff) {
+		if (ds->transitions[x]->textStrRef == ieStrRef::INVALID) {
 			// dialogchoose should be set to x
 			// it isn't important which END option was chosen, as it ends
 			core->GetDictionary()->SetAt("DialogOption", x);
@@ -339,7 +339,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 		DialogTransition* tr = ds->transitions[choose];
 		UpdateJournalForTransition(tr);
-		if (tr->textStrRef != 0xffffffff) {
+		if (tr->textStrRef != ieStrRef::INVALID) {
 			//allow_zero is for PST (deionarra's text)
 			ta->AppendText(L"\n");
 			displaymsg->DisplayStringName( tr->textStrRef, DMC_DIALOGPARTY, speaker, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::ALLOW_ZERO);
