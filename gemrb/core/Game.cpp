@@ -1669,11 +1669,11 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 			// and repurposes these area flags!
 			if ((area->AreaFlags & (AF_TUTORIAL|AF_DEADMAGIC)) == (AF_TUTORIAL|AF_DEADMAGIC)) {
 				// you must obtain permission
-				*err = ieStrRef(38587);
+				*err = ieStrRef::PST_REST_PERM;
 				return false;
 			} else if (area->AreaFlags&AF_TUTORIAL) {
 				// you cannot rest in this area
-				*err = ieStrRef(34601);
+				*err = ieStrRef::PST_REST_NOT_HERE;
 				return false;
 			} else if (area->AreaFlags&AF_DEADMAGIC) {
 				// you cannot rest right now

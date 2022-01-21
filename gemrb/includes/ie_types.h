@@ -54,6 +54,23 @@ using ieDwordSigned = signed long int;
 // obviously we will define any hardcoded strrefs we use here
 enum class ieStrRef : ieDword {
 	INVALID = ieDword(-1),
+	//the original games used these strings for custom biography (another quirk of the IE)
+	BIO_START = 62016,            //first BIO string
+	BIO_END   = (BIO_START + 5),  //last BIO string
+	OVERRIDE_START = 450000,
+	// not actually an ieStrRef, but can be &'ded with an ieStrRef to detrmine which TLK (eg dialogf.tlk) to use
+	ALTREF = 0x0100000,
+	
+	// NOTE: all strrefs below this point are contextual
+	// the names given match our hardcoded usage and shouldn't be expected to resolve to something sensical in all games
+	// consider adding trailing comments for which games they apply to
+	// consider grouping definitions by game
+	
+	// PST strrefs
+	PST_REST_PERM = 38587,
+	PST_REST_NOT_HERE = 34601,
+	PST_HICCUP = 46633,
+	
 	NOT_A_SUB = 0, // subtitle 2das contain 0 insstead of -1
 	NO_REST = 10309,
 	DATE1 = 10699,
@@ -63,6 +80,8 @@ enum class ieStrRef : ieDword {
 	MD_FAIL = 24197,
 	MD_SUCCESS = 24198,
 	HEAL = 28895,
+	
+	// params to DisplayRollStringName
 	ROLL0 = 112,
 	ROLL1 = 20460,
 	ROLL2 = 28379,
@@ -86,13 +105,7 @@ enum class ieStrRef : ieDword {
 	ROLL20 = 39846,
 	ROLL21 = 40955,
 	ROLL22 = 40974,
-	ROLL23 = 40975,
-	//the original games used these strings for custom biography (another quirk of the IE)
-	BIO_START = 62016,            //first BIO string
-	BIO_END   = (BIO_START + 5),  //last BIO string
-	OVERRIDE_START = 450000,
-	// not actually an ieStrRef, but can be &'ded with an ieStrRef to detrmine which TLK (eg dialogf.tlk) to use
-	ALTREF = 0x0100000
+	ROLL23 = 40975
 };
 
 class ieVariable
