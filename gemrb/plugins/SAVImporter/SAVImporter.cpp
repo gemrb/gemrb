@@ -60,11 +60,12 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 		} else {
 			Log(MESSAGE, "SAVImporter", "Decompressing %s", fname);
 			DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
-			free( fname );
+			
 			if (!cached)
 				return GEM_ERROR;
 			delete cached;
 		}
+		free(fname);
 
 		Current = compressed->Remains();
 		//starting at 20% going up to 70%
