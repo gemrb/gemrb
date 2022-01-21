@@ -427,21 +427,16 @@ static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, con
 	return false;
 }
 
-void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
+void DisplayStringCoreVC(Scriptable* Sender, int vc, int flags)
 {
 	//no one hears you when you are in the Limbo!
 	if (!Sender || !Sender->GetCurrentArea()) {
 		return;
 	}
 
-	char Sound[_MAX_PATH] = {};
-	ResRef soundRef;
-	unsigned int channel = SFX_CHAN_DIALOG;
-
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
-	// Check if subtitles are not enabled
-	ieDword charactersubtitles = 0;
-	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
+	
+	ieStrRef Strref = -1;
 	if (flags & DS_CONST) {
 		const Actor* actor = Scriptable::As<Actor>(Sender);
 		if (!actor) {
@@ -449,34 +444,42 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			return;
 		}
 
-		if ((ieDword) Strref>=VCONST_COUNT) {
+		if (vc >= VCONST_COUNT) {
 			Log(ERROR, "GameScript", "Invalid verbal constant!");
 			return;
 		}
 
-		int tmp=(int) actor->GetVerbalConstant(Strref);
-		if (tmp <= 0 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
+		Strref = actor->GetVerbalConstant(vc);
+		if (Strref == -1 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 			//get soundset based string constant
-			actor->GetVerbalConstantSound(soundRef, static_cast<unsigned int>(Strref));
+			ResRef soundRef;
+			actor->GetVerbalConstantSound(soundRef, vc);
+			char Sound[_MAX_PATH];
 			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
 				snprintf(Sound, _MAX_PATH, "%s/%s",actor->PCStats->SoundFolder, soundRef.CString());
 			} else {
 				strlcpy(Sound, soundRef.CString(), sizeof(Sound));
 			}
-		}
-		Strref = tmp;
-
-		//display the verbal constants in the console
-		if (charactersubtitles) {
-			flags |= DS_CONSOLE;
-		}
-
-		if (actor->InParty > 0) {
-			channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
-		} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-			channel = SFX_CHAN_MONSTER;
+			return DisplayStringCore(Sender, Strref, flags, Sound);
 		}
 	}
+	
+	DisplayStringCore(Sender, Strref, flags);
+}
+
+void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, const char* soundpath)
+{
+	if (Strref == -1) return;
+
+	// Check if subtitles are not enabled
+	ieDword charactersubtitles = 0;
+	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
+	
+	//display the verbal constants in the console
+	if (charactersubtitles) {
+		flags |= DS_CONSOLE;
+	}
+	
 	// PST does not echo verbal constants in the console, their strings
 	// actually contain development related identifying comments
 	// thus the console flag is unset.
@@ -484,10 +487,12 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		flags &= ~DS_CONSOLE;
 	}
 
-	if (Strref != -1 && soundRef.IsEmpty()) {
+	char buffer[_MAX_PATH];
+	if (soundpath == nullptr || soundpath[0] == '\0') {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
 		if (!sb.Sound.IsEmpty()) {
-			strlcpy(Sound, sb.Sound, sizeof(Sound));
+			strlcpy(buffer, sb.Sound, sizeof(buffer));
+			soundpath = buffer;
 		}
 		if (!sb.text.empty()) {
 			if (flags & DS_CONSOLE) {
@@ -507,7 +512,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			}
 		}
 	}
-	if (Sound[0] && !(flags & DS_SILENT)) {
+
+	if (soundpath && soundpath[0] && !(flags & DS_SILENT)) {
 		ieDword speech = 0;
 		Point pos = Sender->Pos;
 		if (flags&DS_SPEECH) {
@@ -521,8 +527,18 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			pos.reset();
 		}
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
+		
+		unsigned int channel = SFX_CHAN_DIALOG;
+		if (flags & DS_CONST) {
+			if (actor->InParty > 0) {
+				channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
+			} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				channel = SFX_CHAN_MONSTER;
+			}
+		}
+		
 		tick_t len = 0;
-		core->GetAudioDrv()->Play(Sound, channel, pos, speech, &len);
+		core->GetAudioDrv()->Play(soundpath, channel, pos, speech, &len);
 		tick_t counter = ( AI_UPDATE_TIME * len ) / 1000;
 
 		if (actor && len > 0 && flags & DS_CIRCLE) {
@@ -2623,7 +2639,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 		} else {
 			displaymsg->DisplayConstantStringName(STR_SPELL_FAILED, DMC_WHITE, Sender);
 		}
-		DisplayStringCore(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
+		DisplayStringCoreVC(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
 		return true;
 	}
 
