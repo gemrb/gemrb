@@ -34,6 +34,13 @@ from ie_restype import RES_BAM
 
 InventoryWindow = None
 
+# ground slots are transposed with one outlier, so map them to something normal
+# 68 71 -> 68 69
+# 69 72 -> 70 71
+# 70 81 -> 72 81
+# the original seems to have stored the order in the Cycle field (0-5)
+HorizontalSlots = { 68: 68,  69: 70, 70: 72, 71: 69, 72: 71, 81: 81 }
+
 def InitInventoryWindow (Window):
 	global InventoryWindow
 
@@ -45,16 +52,11 @@ def InitInventoryWindow (Window):
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshInventoryWindow)
 
 	# Ground Items (6)
-	for i in range (5):
-		Button = Window.GetControl (i+68)
+	for cid in HorizontalSlots:
+		Button = Window.GetControl (cid)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
 
-	# the last ground button is outside the main range
-	Button = Window.GetControl (81)
-	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
-	
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
@@ -226,11 +228,11 @@ def RefreshInventoryWindow ():
 
 	# update ground inventory slots
 	TopIndex = GemRB.GetVar ("TopIndex") * 2
-	for i in range (6):
-		if i<5:
-			Button = Window.GetControl (i+68)
-		else:
-			Button = Window.GetControl (i+76)
+	for (i, cid) in enumerate(HorizontalSlots):
+		Button = Window.GetControl (cid)
+		# use a different item, so the order is LTR
+		i = min(5, HorizontalSlots[cid] - 68)
+		slotID = i + TopIndex
 
 		if GemRB.IsDraggingItem ()==1:
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
@@ -238,13 +240,13 @@ def RefreshInventoryWindow ():
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
 
-		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
+		Slot = GemRB.GetContainerItem (pc, slotID)
 		if Slot == None:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 		else:
-			Button.SetValue (i + TopIndex)
+			Button.SetValue (slotID)
 			Button.SetAction(InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
