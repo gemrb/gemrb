@@ -3659,6 +3659,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 				return false;
 			}
 			// try detecting malformed / placeholder items, present in iwd2
+			gamedata->FreeItem(item, itm->ItemResRef, false);
 			return item->ItemName != (ieStrRef) -1 || item->ItemNameIdentified != (ieStrRef) -1 || item->ItemType;
 		}
 		const ItemList& itemlist = RtRows.at(itm->ItemResRef);
