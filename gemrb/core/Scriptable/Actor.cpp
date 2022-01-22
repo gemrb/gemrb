@@ -1674,8 +1674,11 @@ void Actor::ReleaseMemory()
 		skilldex.clear();
 		skillrac.clear();
 		IWD2HitTable.clear();
-		BABClassMap.clear();
 		ModalStates.clear();
+		for (const auto& str : BABClassMap) {
+			free(str.second);
+		}
+		BABClassMap.clear();
 		for (const auto& clskit : class2kits) {
 			free(clskit.second.clab);
 			free(clskit.second.className);
