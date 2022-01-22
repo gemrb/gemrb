@@ -4481,15 +4481,11 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//IWD2 Style spellbook
 	if (target->spellbook.IsIWDSpellBook()) {
-		switch(fx->Parameter2) {
-			case 0: // all
-			case 1: // mage and cleric
-			case 2: // mage
-				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_BARD, 0)) display_warning = true;
-				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_SORCERER, 0)) display_warning = true;
-				if (target->spellbook.GetKnownSpellsCount(IE_IWD2_SPELL_WIZARD, 0)) display_warning = true;
-				break;
-			// TODO case 3: // EE, like 4 (Innate), but only 'magical' abilities (SPL flags SF_HLA unset)
+		int bookMask = target->GetBookMask();
+		if (fx->Parameter2 <= 2 && bookMask) { // is there a potential mage spellbook involved?
+			if (bookMask & 1 << IE_IWD2_SPELL_BARD) display_warning = true;
+			if (bookMask & 1 << IE_IWD2_SPELL_SORCERER ) display_warning = true;
+			if (bookMask & 1 << IE_IWD2_SPELL_WIZARD) display_warning = true;
 		}
 		if (tmp<7) {
 			STAT_BIT_OR(IE_CASTING, dsc_bits_iwd2[tmp] );
@@ -4503,6 +4499,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//1 ->  2 (cleric)
 		//2 ->  8 (innate)
 		//3 ->  16 (class)
+		//TODO: EE 3 ->  8 (innate, but only 'magical' abilities (SPL flags SF_HLA unset))
 		if (tmp<7) {
 			STAT_BIT_OR(IE_CASTING, dsc_bits_bg2[tmp] );
 		}
