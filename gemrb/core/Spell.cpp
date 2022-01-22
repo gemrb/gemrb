@@ -71,6 +71,15 @@ private:
 	}
 };
 
+Spell::~Spell()
+{
+	for (const auto& eh : ext_headers) {
+		for (const auto& feature : eh.features) {
+			delete feature;
+		}
+	}
+}
+
 int Spell::GetHeaderIndexFromLevel(int level) const
 {
 	if (level < 0 || ext_headers.empty()) return -1;

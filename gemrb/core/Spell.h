@@ -107,6 +107,7 @@ public:
 class GEM_EXPORT Spell {
 public:
 	Spell() = default;
+	~Spell();
 
 	std::vector<SPLExtHeader> ext_headers;
 	std::vector<Effect*> casting_features;

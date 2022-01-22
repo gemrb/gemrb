@@ -173,6 +173,7 @@ public:
 class GEM_EXPORT Item {
 public:
 	Item() = default;
+	~Item();
 
 	std::vector<ITMExtHeader> ext_headers;
 	std::vector<Effect*> equipping_features;

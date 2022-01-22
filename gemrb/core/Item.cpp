@@ -32,6 +32,18 @@
 
 namespace GemRB {
 
+Item::~Item()
+{
+	for (const auto& eh : ext_headers) {
+		for (const auto& feature : eh.features) {
+			delete feature;
+		}
+	}
+	for (const auto& feature : equipping_features) {
+		delete feature;
+	}
+}
+
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
 EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, ieDwordSigned invslot, ieDword pro) const
