@@ -272,7 +272,11 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		specialSpell = (specialSpell & SP_IDENTIFY) or ((specialSpell & SP_SURGE) and actionLevel == UAW_ALLMAGE)
 		if specialSpell & SP_SILENCE and Spell['HeaderFlags'] & 0x2000000: # SF_IGNORES_SILENCE
 			specialSpell ^= SP_SILENCE
-		if specialSpell or (disabled_spellcasting&spellType):
+
+		disabled = disabled_spellcasting & spellType
+		if disabled_spellcasting == 16: # ignore type
+			disabled = not (Spell["HeaderFlags"] & 0x4000) # SF_HLA
+		if specialSpell or disabled:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.EnableBorder(1, 0)
 		else:

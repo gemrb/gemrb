@@ -4460,7 +4460,7 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0x91 DisableSpellCasting
 //bg2:  (-1 item), 0 - mage, 1 - cleric, 2 - innate, 3 - class
 //iwd2: (-1 item), 0 - all, 1 - mage+cleric, 2 - mage, 3 - cleric , 4 - innate,( 5 - class)
-//EE: Innate (4), but only 'magical' abilities (SPL flags bit 14 "Ignore dead/wild magic" unset)
+// class spells here are only 'magical' abilities (flags bit SF_HLA "Ignore dead/wild magic" unset)
 
 /*internal representation of disabled spells in IE_CASTING (bitfield):
 1 - items (SPIT)
@@ -4499,7 +4499,6 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//1 ->  2 (cleric)
 		//2 ->  8 (innate)
 		//3 ->  16 (class)
-		//TODO: EE 3 ->  8 (innate, but only 'magical' abilities (SPL flags SF_HLA unset))
 		if (tmp<7) {
 			STAT_BIT_OR(IE_CASTING, dsc_bits_bg2[tmp] );
 		}
