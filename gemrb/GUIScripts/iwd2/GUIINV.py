@@ -49,13 +49,11 @@ def InitInventoryWindow (Window):
 		Button = Window.GetControl (i+68)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
-		Button.SetFont ("NUMFONT")
 
 	# the last ground button is outside the main range
 	Button = Window.GetControl (81)
-	Button.SetTooltip (12011)
-	Button.SetFont ("NUMFONT")
-	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
+	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
+	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
 	
 	#major & minor clothing color
 	Button = Window.GetControl (62)
