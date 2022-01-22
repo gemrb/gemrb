@@ -34,7 +34,7 @@ private:
 	strpos_t startpos;
 	DataStream* str;
 public:
-	SlicedStream(DataStream* cfs, strpos_t startpos, strpos_t size);
+	SlicedStream(const DataStream* cfs, strpos_t startPos, strpos_t streamSize);
 	~SlicedStream() override;
 	DataStream* Clone() const noexcept override;
 

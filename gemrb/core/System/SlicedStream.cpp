@@ -28,15 +28,15 @@
 
 namespace GemRB {
 
-SlicedStream::SlicedStream(DataStream* str, strpos_t startpos, strpos_t size)
+SlicedStream::SlicedStream(const DataStream* cfs, strpos_t startPos, strpos_t streamSize)
 {
-	this->str = str->Clone();
-	assert(this->str);
-	this->size = size;
-	this->startpos = startpos;
-	strlcpy(originalfile, str->originalfile, _MAX_PATH);
-	strlcpy(filename, str->filename, sizeof(filename));
-	this->str->Seek(this->startpos, GEM_STREAM_START);
+	str = cfs->Clone();
+	assert(str);
+	size = streamSize;
+	startpos = startPos;
+	strlcpy(originalfile, cfs->originalfile, _MAX_PATH);
+	strlcpy(filename, cfs->filename, sizeof(filename));
+	str->Seek(startpos, GEM_STREAM_START);
 }
 
 SlicedStream::~SlicedStream()
