@@ -132,6 +132,7 @@ struct DMGOpcodeInfo {
 class GEM_EXPORT ITMExtHeader {
 public:
 	ITMExtHeader() = default;
+	~ITMExtHeader();
 	ieByte AttackType = 0;
 	ieByte IDReq = 0;
 	ieByte Location = 0;

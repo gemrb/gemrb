@@ -76,6 +76,7 @@ class Projectile;
 class GEM_EXPORT SPLExtHeader {
 public:
 	SPLExtHeader() = default;
+	~SPLExtHeader();
 
 	ieByte SpellForm = 0;
 	ieByte Hostile = 0;
@@ -107,7 +108,6 @@ public:
 class GEM_EXPORT Spell {
 public:
 	Spell() = default;
-	~Spell();
 
 	std::vector<SPLExtHeader> ext_headers;
 	std::vector<Effect*> casting_features;

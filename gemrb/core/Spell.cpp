@@ -71,12 +71,10 @@ private:
 	}
 };
 
-Spell::~Spell()
+SPLExtHeader::~SPLExtHeader()
 {
-	for (const auto& eh : ext_headers) {
-		for (const auto& feature : eh.features) {
-			delete feature;
-		}
+	for (const auto& feature : features) {
+		delete feature;
 	}
 }
 

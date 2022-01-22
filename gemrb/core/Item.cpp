@@ -32,13 +32,15 @@
 
 namespace GemRB {
 
+ITMExtHeader::~ITMExtHeader()
+{
+	for (const auto& feature : features) {
+		delete feature;
+	}
+}
+
 Item::~Item()
 {
-	for (const auto& eh : ext_headers) {
-		for (const auto& feature : eh.features) {
-			delete feature;
-		}
-	}
 	for (const auto& feature : equipping_features) {
 		delete feature;
 	}
