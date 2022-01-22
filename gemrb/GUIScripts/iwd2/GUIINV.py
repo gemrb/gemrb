@@ -146,9 +146,8 @@ def UpdateInventoryWindow (Window = None):
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
 	Count = Container['ItemCount']
-	if Count<1:
-		Count=1
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	# account for two columns
+	ScrollBar.SetVarAssoc ("TopIndex", max(0, (Count - 6 + 1) // 2))
 	Equipped = GemRB.GetEquippedQuickSlot (pc, 1)
 	GemRB.SetVar ("Equipped", Equipped)
 	for i in range (4):
@@ -226,7 +225,7 @@ def RefreshInventoryWindow ():
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = GemRB.GetVar ("TopIndex") * 2
 	for i in range (6):
 		if i<5:
 			Button = Window.GetControl (i+68)
