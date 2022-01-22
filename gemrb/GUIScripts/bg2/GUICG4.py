@@ -194,7 +194,7 @@ def OnLoad():
 		Button = AbilityWindow.GetControl(i+30)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
 		Button.SetEvent(IE_GUI_MOUSE_LEAVE_BUTTON, EmptyPress)
-		Button.SetVarAssoc("Ability", i)
+		Button.SetValue (i)
 		# delete the labels and use the buttons instead
 		AbilityWindow.DeleteControl (i+0x10000009)
 		Button.SetText (AbilityTable.GetValue (i, 0))
@@ -203,12 +203,12 @@ def OnLoad():
 
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
-		Button.SetVarAssoc("Ability", i )
+		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
-		Button.SetVarAssoc("Ability", i )
+		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
@@ -222,9 +222,10 @@ def OnLoad():
 	AbilityWindow.Focus()
 	return
 
-def RightPress(btn, Abidx):
+def RightPress(btn):
 	global PointsLeft
 
+	Abidx = btn.Value
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
@@ -245,16 +246,18 @@ def RightPress(btn, Abidx):
 		Label.SetText(str(Ability-1) )
 	return
 
-def JustPress(btn, Abidx):
+def JustPress(btn):
+	Abidx = btn.Value
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
 	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	return
 
-def LeftPress(btn, Abidx):
+def LeftPress(btn):
 	global PointsLeft
 
+	Abidx = btn.Value
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
