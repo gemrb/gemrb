@@ -340,7 +340,6 @@ void Projectile::Setup()
 			//the explosion consists of a pop in/hold/pop out of the travel projectile (dimension door)
 			if(travel[0] && shadow[0]) {
 				extension_delay = travel[0]->GetFrameCount()*2+shadow[0]->GetFrameCount();
-				//SetDelay( travel[0]->GetFrameCount()*2+shadow[0]->GetFrameCount());
 				travel[0]->Flags|=A_ANI_PLAYONCE;
 				shadow[0]->Flags|=A_ANI_PLAYONCE;
 			}
@@ -348,7 +347,6 @@ void Projectile::Setup()
 			if(travel[0]) {
 				extension_delay = travel[0]->GetFrameCount();
 				travel[0]->Flags|=A_ANI_PLAYONCE;
-				//SetDelay(travel[0]->GetFrameCount() );
 			}
 		}
 	}
@@ -707,15 +705,10 @@ void Projectile::EndTravel()
 //Note: trails couldn't be higher than VVC, but this shouldn't be a problem
 int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 {
-/*
-	VEFObject *vef=gamedata->GetVEFObject(BAM,0);
+	VEFObject* vef = gamedata->GetVEFObject(BAM, false);
 	if (!vef) return 0;
-	ScriptedAnimation *sca=vef->GetSingleObject();
+	ScriptedAnimation* sca = vef->GetSingleObject();
 	if (!sca) return 0;
-*/
-	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(BAM, false);
-	if (!sca) return 0;
-	VEFObject *vef = new VEFObject(sca);
 
 	if(pal) {
 		if (ExtFlags & PEF_TINT) {
@@ -784,7 +777,6 @@ void Projectile::DoStep(unsigned int walk_speed)
 		} else {
 			if(!(ExtFlags&PEF_FREEZE) && travel[0]) {
 				//switch to 'fading' phase
-				//SetDelay(travel[0]->GetFrameCount());
 				SetDelay(100);
 			}
 			ChangePhase();
@@ -1272,13 +1264,9 @@ void Projectile::Draw(const Region& viewport)
 			//This extension flag is to enable the travel projectile at
 			//trigger/explosion time
 			if (Extension->AFlags&PAF_VISIBLE) {
-			//if (!Extension || (Extension->AFlags&PAF_VISIBLE)) {
 				DrawTravel(viewport);
 			}
-			/*
-			if (!Extension) {
-				return;
-			}*/
+
 			CheckTrigger(Extension->TriggerRadius);
 			if (phase == P_EXPLODING1 || phase == P_EXPLODING2) {
 				DrawExplosion(viewport);
