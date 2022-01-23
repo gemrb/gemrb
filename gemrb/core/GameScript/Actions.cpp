@@ -4027,6 +4027,10 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	if (!act) {
 		return;
 	}
+	// prevent refalling on next rep update (the originals did the same)
+	if (core->GetGame()->Reputation < 100) {
+		core->GetGame()->SetReputation(100);
+	}
 	act->SetMCFlag(MC_FALLEN_PALADIN, BitOp::NAND);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_CAST);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_TURN);
@@ -4038,6 +4042,10 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	Actor* act = Scriptable::As<Actor>(Sender);
 	if (!act) {
 		return;
+	}
+	// prevent refalling on next rep update (the originals did the same)
+	if (core->GetGame()->Reputation < 100) {
+		core->GetGame()->SetReputation(100);
 	}
 	act->SetMCFlag(MC_FALLEN_RANGER, BitOp::NAND);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_CAST);
