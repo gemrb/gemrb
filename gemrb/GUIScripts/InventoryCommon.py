@@ -540,8 +540,6 @@ def OpenItemAmountWindow (btn):
 
 	# item amount
 	Text = Window.GetControl (6)
-	# FIXME: use a proper size
-	# FIXME: fix it for all the games
 	if GameCheck.IsIWD2():
 		Text.SetSize (40, 40)
 	Text.SetText (str (StackAmount//2))
