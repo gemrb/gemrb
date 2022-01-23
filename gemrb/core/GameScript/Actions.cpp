@@ -5739,15 +5739,19 @@ void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 	map->CopyGroundPiles( othermap, parameters->pointParameter );
 }
 
-//iwd specific
-void GameScript::PlayBardSong(Scriptable* Sender, Action* /*parameters*/)
+// iwd specific, but unused in original data
+// bardsong.ids mapping clearly does not follow regular spell naming:
+const ResRef songs[6] = { "SPIN151", "SPIN144", "SPIN145", "SPIN146", "SPIN147", "SPIN148" };
+void GameScript::PlayBardSong(Scriptable* Sender, Action* parameters)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
+	int songIdx = parameters->int0Parameter;
+	if (!actor || songIdx < 0 || songIdx > 5) {
 		return;
 	}
-	//actually this one must use int0Parameter to set a bardsong
-	actor->SetModal( MS_BATTLESONG);
+
+	actor->SetModalSpell(MS_BATTLESONG, songs[songIdx]);
+	actor->SetModal(MS_BATTLESONG);
 }
 
 void GameScript::BattleSong(Scriptable* Sender, Action* /*parameters*/)
