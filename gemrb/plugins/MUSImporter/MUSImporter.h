@@ -44,14 +44,15 @@ struct PLString {
 
 class MUSImporter : public MusicMgr {
 private:
-	bool Initialized;
-	bool Playing;
-	char PLName[32];
-	char PLNameNew[32];
-	int PLpos, PLnext;
+	bool Initialized = false;
+	bool Playing = false;
+	char PLName[32]{};
+	char PLNameNew[32]{};
+	int PLpos = 0;
+	int PLnext = -1;
 	FileStream* str;
 	std::vector< PLString> playlist;
-	unsigned int lastSound;
+	unsigned int lastSound = 0xffffffff;
 	ResourceManager manager;
 private:
 	void PlayMusic(int pos);

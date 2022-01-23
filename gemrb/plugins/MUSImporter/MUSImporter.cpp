@@ -31,14 +31,7 @@ static char musicsubfolder[6] = "music";
 
 MUSImporter::MUSImporter()
 {
-	Initialized = false;
-	Playing = false;
 	str = new FileStream();
-	PLpos = 0;
-	PLnext = -1;
-	PLName[0] = '\0';
-	PLNameNew[0] = '\0';
-	lastSound = 0xffffffff;
 	char path[_MAX_PATH];
 	PathJoin(path, core->config.GamePath, musicsubfolder, nullptr);
 	manager.AddSource(path, "Music", PLUGIN_RESOURCE_DIRECTORY);
