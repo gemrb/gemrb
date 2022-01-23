@@ -193,6 +193,12 @@ def SortUsableSpells(memorizedSpells):
 def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	actor = GemRB.GameGetFirstSelectedActor ()
 
+	# bardsongs weren't saved in iwd1, so learn them now if needed
+	if BookType == (1 << IE_SPELL_TYPE_SONG) and HasSpell (actor, IE_SPELL_TYPE_SONG, 0, "SPIN151") == -1:
+		import GUICommon
+		level = GemRB.GetPlayerStat (actor, IE_LEVEL)
+		GUICommon.AddClassAbilities (actor, "clabbard", level, level)
+
 	# check if we're dealing with a temporary spellbook
 	if GemRB.GetVar("ActionLevel") == UAW_2DASPELLS:
 		allSpells = GetSpellinfoSpells (actor, BookType)
