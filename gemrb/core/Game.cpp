@@ -1289,8 +1289,7 @@ void Game::IncrementChapter() const
 
 void Game::SetReputation(ieDword r)
 {
-	if (r<10) r=10;
-	else if (r>200) r=200;
+	r = Clamp<ieDword>(r, 10, 200);
 	if (Reputation > r && core->HasFeedback(FT_MISC)) {
 		displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation - r) / 10);
 	} else if (Reputation < r && core->HasFeedback(FT_MISC)) {
