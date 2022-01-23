@@ -393,7 +393,9 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		//QuickSlots are customisable in iwd2 and GemRB
 		//thus we adopt the iwd2 style actor info
 		//the first 3 slots are hardcoded anyway
-		pcInfo.QSlots[0] = ACT_TALK;
+		// in iwd2 0 is guard, bg2 talk
+		// in iwd1 and bg1 0 is guard, 1 talk, everything shifted one further
+		pcInfo.QSlots[0] = ACT_DEFEND;
 		pcInfo.QSlots[1] = ACT_WEAPON1;
 		pcInfo.QSlots[2] = ACT_WEAPON2;
 		for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
