@@ -67,6 +67,7 @@ void Spellbook::InitializeSpellbook()
 			IWD2Style = true;
 		} else {
 			NUM_BOOK_TYPES=NUM_SPELLTYPES; //bg/pst/iwd1 spell types
+			if (core->HasFeature(GF_IWD_MAP_DIMENSIONS)) NUM_BOOK_TYPES++; // make iwd songs full members
 			IWD2Style = false;
 		}
 	}
@@ -559,7 +560,7 @@ bool Spellbook::AddKnownSpell(CREKnownSpell *spl, int flg)
 	}
 
 	spells[type][level]->known_spells.push_back(spl);
-	if (1<<type == innate || 1<<type == 1<<IE_IWD2_SPELL_SONG) {
+	if (1 << type == innate || 1 << type == 1 << IE_IWD2_SPELL_SONG || 1 << type == 1 << IE_SPELL_TYPE_SONG) {
 		spells[type][level]->SlotCount++;
 		spells[type][level]->SlotCountWithBonus++;
 	}
