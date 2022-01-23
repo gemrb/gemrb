@@ -6703,8 +6703,10 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_change_bardsong(%2d): %s", fx->Opcode, fx->Resource);
 	// remove any previous song effects, as they are used with permanent timing
+	unsigned int songType = IE_SPL_SONG;
+	if (core->HasFeature(GF_3ED_RULES)) songType = IE_IWD2_SPELL_SONG;
 	unsigned int count = target->fxqueue.CountEffects(fx_change_bardsong_ref, -1, -1);
-	unsigned int songCount = target->spellbook.GetSpellInfoSize(1<<IE_IWD2_SPELL_SONG);
+	unsigned int songCount = target->spellbook.GetSpellInfoSize(1 << songType);
 	if (count > 0 && songCount > 0) {
 		for (unsigned int i=0; i<songCount; i++) {
 			if (i == fx->Parameter2) continue;
