@@ -1,4 +1,3 @@
-# -*-python-*-
 # GemRB - Infinity Engine Emulator
 # Copyright (C) 2003-2005 The GemRB Project
 #

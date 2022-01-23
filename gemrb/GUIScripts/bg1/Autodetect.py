@@ -1,5 +1,3 @@
-# -*-python-*-
-# vim: set ts=4 sw=4 expandtab:
 # GemRB - Infinity Engine Emulator
 # Copyright (C) 2010 The GemRB Project
 #

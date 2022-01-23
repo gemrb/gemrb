@@ -1,6 +1,3 @@
-# -*-python-*-
-# vim: set ts=4 sw=4 expandtab:
-
 import GemRB
 from ie_restype import *
 from AutodetectCommon import CheckFiles

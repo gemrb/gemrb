@@ -1,5 +1,3 @@
-# vim:ts=4:sw=4:expandtab:autoindent:
-#
 # The MIT License
 #
 # Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
