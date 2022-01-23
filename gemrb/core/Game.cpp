@@ -320,13 +320,16 @@ void Game::ConsolidateParty() const
 {
 	int max = (int) PCs.size();
 	for (int i=1;i<=max;) {
-		if (FindPlayer(i)==-1) {
-			for (auto pc : PCs) {
-				if (pc->InParty > i) {
-					pc->InParty--;
-				}
+		if (FindPlayer(i) != -1) {
+			i++;
+			continue;
+		}
+
+		for (auto pc : PCs) {
+			if (pc->InParty > i) {
+				pc->InParty--;
 			}
-		} else i++;
+		}
 	}
 	for (auto pc : PCs) {
 		pc->RefreshEffects(nullptr);
