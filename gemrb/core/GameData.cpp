@@ -205,6 +205,10 @@ PaletteHolder GameData::GetPalette(const ResRef& resname)
 
 Item* GameData::GetItem(const ResRef &resname, bool silent)
 {
+	if (resname.IsEmpty()) {
+		return nullptr;
+	}
+
 	Item *item = (Item *) ItemCache.GetResource(resname);
 	if (item) {
 		return item;
@@ -238,6 +242,10 @@ void GameData::FreeItem(Item const *itm, const ResRef &name, bool free)
 
 Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 {
+	if (resname.IsEmpty()) {
+		return nullptr;
+	}
+
 	Spell *spell = (Spell *) SpellCache.GetResource(resname);
 	if (spell) {
 		return spell;
