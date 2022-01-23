@@ -1,14 +1,14 @@
-GemRB git (4cb38cf):
+GemRB git (84f7e39):
   New features:
     - 
     - iwd2 can be progressed to well into chapter 5
     - faster loading and saving
-    - Use magic device skill, precise shot
+    - Use magic device skill, precise shot, iwd1 bard song choice
     - console history is now preserved
 
   Improved features:
     - 
-    - python3 support
+    - python3 support (now the only option)
     - spellcaster ai, effects, scripting
     - audio, drawing, appimage, ini spawns
     - bugfixes
