@@ -533,36 +533,40 @@ void Projectile::Payload()
 		}
 	}
 
-	if (target) {
-		Owner = area->GetScriptableByGlobalID(Caster);
-		if (!Owner) {
-			Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
-			Owner = target;
+	if (!target) {
+		delete effects;
+		effects = nullptr;
+		return;
+	}
+
+	Owner = area->GetScriptableByGlobalID(Caster);
+	if (!Owner) {
+		Log(WARNING, "Projectile", "Payload: Caster not found, using target!");
+		Owner = target;
+	}
+	// apply this spell on target when the projectile fails
+	if (FailedIDS(target)) {
+		if (!failureSpell.IsEmpty()) {
+			if (Target) {
+				core->ApplySpell(failureSpell, target, Owner, Level);
+			} else {
+				// no Target, using the fake target as owner
+				core->ApplySpellPoint(failureSpell, area, Destination, target, Level);
+			}
 		}
-		//apply this spell on target when the projectile fails
-		if (FailedIDS(target)) {
-			if (!failureSpell.IsEmpty()) {
-				if (Target) {
-					core->ApplySpell(failureSpell, target, Owner, Level);
-				} else {
-					//no Target, using the fake target as owner
-					core->ApplySpellPoint(failureSpell, area, Destination, target, Level);
-				}
-			}
-		} else {
-			//apply this spell on the target when the projectile succeeds
-			if (!successSpell.IsEmpty()) {
-				core->ApplySpell(successSpell, target, Owner, Level);
-			}
+	} else {
+		// apply this spell on the target when the projectile succeeds
+		if (!successSpell.IsEmpty()) {
+			core->ApplySpell(successSpell, target, Owner, Level);
+		}
 
-			if(ExtFlags&PEF_RGB) {
-				target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed, RGB);
-			}
+		if(ExtFlags & PEF_RGB) {
+			target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed, RGB);
+		}
 
-			if (effects) {
-				effects->SetOwner(Owner);
-				effects->AddAllEffects(target, Destination);
-			}
+		if (effects) {
+			effects->SetOwner(Owner);
+			effects->AddAllEffects(target, Destination);
 		}
 	}
 
@@ -621,38 +625,42 @@ void Projectile::ChangePhase()
 	}
 
 	//reached target, and explodes now
-	if (!Extension) {
-		//there are no-effect projectiles, like missed arrows
-		//Payload can redirect the projectile in case of projectile reflection
-		if (phase == P_TRAVEL) {
-			if(ExtFlags&PEF_DEFSPELL) {
-				ApplyDefault();
-			}
-			if (!ArrivalSound.IsEmpty()) StopSound();
-			Payload();
-			phase = P_TRAVEL2;
+	if (Extension) {
+		EndTravel();
+		return;
+	}
+
+	// there are no-effect projectiles, like missed arrows
+	// Payload can redirect the projectile in case of projectile reflection
+	if (phase == P_TRAVEL) {
+		if (ExtFlags & PEF_DEFSPELL) {
+			ApplyDefault();
 		}
-		//freeze on target, this is recommended only for child projectiles
-		//as the projectile won't go away on its own
-		if (ExtFlags & PEF_FREEZE && extension_delay) {
-			if (extension_delay > 0) {
-				extension_delay--;
-				UpdateSound();
-			}
+		if (!ArrivalSound.IsEmpty()) StopSound();
+		Payload();
+		phase = P_TRAVEL2;
+	}
+
+	// freeze on target, this is recommended only for child projectiles
+	// as the projectile won't go away on its own
+	if (ExtFlags & PEF_FREEZE && extension_delay) {
+		if (extension_delay > 0) {
+			extension_delay--;
+			UpdateSound();
+		}
+		return;
+	}
+
+	if (phase == P_TRAVEL2 && extension_delay) {
+			extension_delay--;
 			return;
-		}
+	}
 
-		if (phase == P_TRAVEL2 && extension_delay) {
-			 extension_delay--;
-			 return;
-		}
-
-		if(ExtFlags&PEF_FADE) {
-			TFlags &= ~PTF_TINT; //turn off area tint
-			tint.a--;
-			if(tint.a>0) {
-				return;
-			}
+	if (ExtFlags & PEF_FADE) {
+		TFlags &= ~PTF_TINT; // turn off area tint
+		tint.a--;
+		if (tint.a > 0) {
+			return;
 		}
 	}
 
