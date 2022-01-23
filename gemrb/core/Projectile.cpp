@@ -132,9 +132,6 @@ void Projectile::CreateOrientedAnimations(Animation **anims, const AnimationFact
 		BlitFlags mirrorFlags = BlitFlags::NONE;
 		int c;
 		switch(Aim) {
-		default:
-			c = Seq;
-			break;
 		case 5:
 			c = SixteenToFive[Cycle];
 			// orientations go counter-clockwise, starting south
@@ -155,6 +152,9 @@ void Projectile::CreateOrientedAnimations(Animation **anims, const AnimationFact
 			break;
 		case 16:
 			c=Cycle;
+			break;
+		default:
+			c = Seq;
 			break;
 		}
 		Animation* a = af->GetCycle( c );
