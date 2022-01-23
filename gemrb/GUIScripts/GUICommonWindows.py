@@ -683,6 +683,8 @@ def UpdateActionsWindow ():
 		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_QSONGS: # songs selection
 		spelltype = 1<<IE_IWD2_SPELL_SONG
+		if GameCheck.IsIWD1():
+			spelltype = 1 << IE_SPELL_TYPE_SONG
 		GemRB.SetVar ("Type", spelltype)
 		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_BOOK: # spellbook selection
@@ -863,10 +865,13 @@ def ActionShapeChangePressed ():
 	return
 
 def SelectBardSong (which):
+	songType = IE_IWD2_SPELL_SONG
+	if GameCheck.IsIWD1 ():
+		songType = IE_SPELL_TYPE_SONG
 	pc = GemRB.GameGetFirstSelectedActor ()
-	songs = Spellbook.GetKnownSpells (pc, IE_IWD2_SPELL_SONG)
+	songs = Spellbook.GetKnownSpells (pc, songType)
 	# "which" is a mashup of the spell index with it's type
-	idx = which % ((1<<IE_IWD2_SPELL_SHAPE)*100)
+	idx = which % ((1 << songType) * 100)
 	qsong = songs[idx]['SpellResRef']
 	# the effect needs to be set each tick, so we use FX_DURATION_INSTANT_PERMANENT==1 timing mode
 	# GemRB.SetModalState can also set the spell, but it wouldn't persist
@@ -1118,7 +1123,7 @@ def SpellPressed ():
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
 
-	if Type == 1<<IE_IWD2_SPELL_SONG:
+	if Type == 1 << IE_IWD2_SPELL_SONG or Type == 1 << IE_SPELL_TYPE_SONG:
 		SelectBardSong (Spell)
 		ActionBardSongPressed()
 		return
