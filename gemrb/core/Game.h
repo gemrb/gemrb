@@ -467,7 +467,7 @@ public:
 	void SetTimedEvent(EventHandler func, int count);
 	/** Sets protagonist mode to 0-none,1-protagonist,2-team */
 	void SetProtagonistMode(int value);
-	void StartRainOrSnow(bool conditional, int weather);
+	void StartRainOrSnow(bool conditional, ieWord weather);
 	size_t GetLoadedMapCount() const { return Maps.size(); }
 	/** Adds or removes gold */
 	void AddGold(int add);

@@ -54,8 +54,8 @@ namespace GemRB {
 struct HealingResource {
 	ResRef resRef;
 	Actor *caster = nullptr;
-	ieWord amounthealed = 0;
-	ieWord amount = 0;
+	int amounthealed = 0;
+	int amount = 0;
 	HealingResource(const ResRef& ref, Actor *cha, ieWord ah, ieWord a)
 	: resRef(ref), caster(cha), amounthealed(ah), amount(a) {}
 	HealingResource() = default;
@@ -180,7 +180,7 @@ static bool IsAlive(const Actor *pc)
 void Game::ReversePCs() const
 {
 	for (auto pc : PCs) {
-		pc->InParty = PCs.size() - pc->InParty + 1;
+		pc->InParty = static_cast<ieByte>(PCs.size()) - pc->InParty + 1;
 	}
 	core->SetEventFlag(EF_PORTRAIT|EF_SELECTION);
 }
@@ -893,7 +893,7 @@ bool Game::CheckForReplacementActor(size_t i)
 	for (auto nl : npclevels) {
 		if (!stricmp(nl[0], act->GetScriptName()) && (level > 2)) {
 			// the tables have entries only up to level 24
-			ieDword safeLevel = npclevels[0].size();
+			ieDword safeLevel = static_cast<ieDword>(npclevels[0].size());
 			if (level < safeLevel) {
 				safeLevel = level;
 			}
@@ -960,7 +960,7 @@ void Game::SwapPCs(unsigned int pc1, unsigned int pc2) const
 		return;
 	}
 
-	int tmp = PCs[idx1]->InParty;
+	ieByte tmp = PCs[idx1]->InParty;
 	PCs[idx1]->InParty = PCs[idx2]->InParty;
 	PCs[idx2]->InParty = tmp;
 	//signal a change of the portrait window
@@ -1259,7 +1259,7 @@ void Game::PartyMemberDied(const Actor *actor)
 
 	size_t size = PCs.size();
 	Actor *react = NULL;
-	for (size_t i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
+	for (size_t i = core->Roll(1, static_cast<int>(size), 0), n = 0; n < size; i++, n++) {
 		Actor *pc = PCs[i%size];
 		if (pc == actor) {
 			continue;
@@ -1845,7 +1845,7 @@ void Game::CastOnRest() const
 	for (int idx = 1; idx <= ps; idx++) {
 		Actor *tar = FindPC(idx);
 		if (tar) {
-			ieWord hpneeded = tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS);
+			int hpneeded = static_cast<int>(tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS));
 			wholeparty.push_back(Injured(hpneeded, tar));
 		}
 	}
@@ -2109,7 +2109,7 @@ void Game::DrawWeather(bool update)
 }
 
 /* sets the weather type */
-void Game::StartRainOrSnow(bool conditional, int w)
+void Game::StartRainOrSnow(bool conditional, ieWord w)
 {
 	if (conditional && (w & (WB_RAIN|WB_SNOW)) ) {
 		if (WeatherBits & (WB_RAIN | WB_SNOW) )
