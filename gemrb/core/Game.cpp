@@ -2248,7 +2248,8 @@ bool Game::RandomEncounter(ResRef &BaseArea)
 	int rep = Reputation/10;
 	if (rep>=bntrows) return false;
 	if (core->Roll(1, 100, 0)>bntchnc[rep]) return false;
-	//TODO: unhardcode this
+	// there are non-encounter areas matching the pattern, but they are
+	// not reachable via the worldmap
 	ResRef tmp = BaseArea;
 	BaseArea.SNPrintF("%.4s10", tmp.CString());
 	return gamedata->Exists(BaseArea, IE_ARE_CLASS_ID);
