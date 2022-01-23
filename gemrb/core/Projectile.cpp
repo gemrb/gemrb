@@ -614,12 +614,10 @@ void Projectile::ChangePhase()
 		}
 	}
 
-	if (phase == P_TRAVEL) {
-		if ((ExtFlags&PEF_DELAY) && extension_delay) {
-			 extension_delay--;
-			 UpdateSound();
-			 return;
-		}
+	if (phase == P_TRAVEL && (ExtFlags & PEF_DELAY) && extension_delay) {
+		 extension_delay--;
+		 UpdateSound();
+		 return;
 	}
 
 	//reached target, and explodes now
@@ -636,21 +634,17 @@ void Projectile::ChangePhase()
 		}
 		//freeze on target, this is recommended only for child projectiles
 		//as the projectile won't go away on its own
-		if(ExtFlags&PEF_FREEZE) {
-			if(extension_delay) {
-				if (extension_delay>0) {
-					extension_delay--;
-					UpdateSound();
-				}
-				return;
+		if (ExtFlags & PEF_FREEZE && extension_delay) {
+			if (extension_delay > 0) {
+				extension_delay--;
+				UpdateSound();
 			}
+			return;
 		}
 
-		if (phase == P_TRAVEL2) {
-			if (extension_delay) {
-				 extension_delay--;
-				 return;
-			}
+		if (phase == P_TRAVEL2 && extension_delay) {
+			 extension_delay--;
+			 return;
 		}
 
 		if(ExtFlags&PEF_FADE) {
@@ -758,10 +752,8 @@ void Projectile::DoStep(unsigned int walk_speed)
 	}
 
 	//don't bug out on 0 smoke frequency like the original IE
-	if ((TFlags&PTF_SMOKE) && SmokeSpeed) {
-		if(!(pathcounter%SmokeSpeed)) {
-			AddTrail(smokebam, SmokeGrad);
-		}
+	if ((TFlags & PTF_SMOKE) && SmokeSpeed && !(pathcounter % SmokeSpeed)) {
+		AddTrail(smokebam, SmokeGrad);
 	}
 
 	for(int i=0;i<3;i++) {
@@ -1024,11 +1016,9 @@ void Projectile::CheckTrigger(unsigned int radius)
 			phase = P_EXPLODING1;
 			extension_delay = Extension->Delay;
 		}
-	} else if (phase == P_EXPLODING1) {
+	} else if (phase == P_EXPLODING1 && Extension->AFlags & PAF_SYNC) {
 		//the explosion is revoked
-		if (Extension->AFlags&PAF_SYNC) {
-			phase = P_TRIGGER;
-		}
+		phase = P_TRIGGER;
 	}
 }
 
