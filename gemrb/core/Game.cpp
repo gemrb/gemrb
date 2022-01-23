@@ -34,6 +34,7 @@
 #include "Particles.h"
 #include "PluginMgr.h"
 #include "ScriptEngine.h"
+#include "Spell.h"
 #include "TableMgr.h"
 #include "GameScript/GameScript.h"
 #include "GameScript/GSUtils.h"
@@ -329,8 +330,17 @@ void Game::ConsolidateParty() const
 	}
 	for (auto pc : PCs) {
 		pc->RefreshEffects(nullptr);
-		//TODO: how to set up bardsongs
-		pc->SetModalSpell(pc->Modal.State, 0);
+
+		// restore modal spell, including the main bardsong
+		// but iwds offer multiple bardsongs to choose from, stored as the first quickspell
+		const ResRef& spellRef = pc->PCStats->QuickSpells[0];
+		const Spell* spell = gamedata->GetSpell(spellRef);
+		if (spell && spell->SpellType == IE_SPL_SONG) {
+			pc->SetModalSpell(pc->Modal.State, spell->Name);
+			gamedata->FreeSpell(spell, spellRef, false);
+		} else {
+			pc->SetModalSpell(pc->Modal.State, nullptr);
+		}
 	}
 }
 
