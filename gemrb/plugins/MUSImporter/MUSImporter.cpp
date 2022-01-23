@@ -70,7 +70,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 	}
 	strret_t c = str->ReadLine( PLName, 32 );
 	while (c > 0) {
-		if (( PLName[c - 1] == ' ' ) || ( PLName[c - 1] == '\t' ))
+		if (isblank(PLName[c - 1]))
 			PLName[c - 1] = 0;
 		else
 			break;
@@ -86,11 +86,11 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		int p = 0;
 		PLString pls;
 		while (i < len) {
-			if (( line[i] != ' ' ) && ( line[i] != '\t' ))
+			if (!isblank(line[i]))
 				pls.PLFile[p++] = line[i++];
 			else {
 				while (i < len) {
-					if (( line[i] == ' ' ) || ( line[i] == '\t' ))
+					if (isblank(line[i]))
 						i++;
 					else
 						break;
@@ -102,7 +102,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		p = 0;
 		if (i < len && line[i] != '@') {
 			while (i < len) {
-				if (( line[i] != ' ' ) && ( line[i] != '\t' ))
+				if (!isblank(line[i]))
 					pls.PLTag[p++] = line[i++];
 				else
 					break;
@@ -114,7 +114,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 			}
 			p = 0;
 			while (i < len) {
-				if (( line[i] == ' ' ) || ( line[i] == '\t' ))
+				if (isblank(line[i]))
 					i++;
 				else {
 					break;
@@ -124,7 +124,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 				strcpy( pls.PLLoop, pls.PLTag );
 			else {
 				while (i < len) {
-					if (( line[i] != ' ' ) && ( line[i] != '\t' ))
+					if (!isblank(line[i]))
 						pls.PLLoop[p++] = line[i++];
 					else
 						break;
@@ -132,7 +132,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 				pls.PLLoop[p] = 0;
 			}
 			while (i < len) {
-				if (( line[i] == ' ' ) || ( line[i] == '\t' ))
+				if (isblank(line[i]))
 					i++;
 				else
 					break;
@@ -143,11 +143,11 @@ bool MUSImporter::OpenPlaylist(const char* name)
 			pls.PLLoop[0] = 0;
 		}
 		while (i < len) {
-			if (( line[i] != ' ' ) && ( line[i] != '\t' ))
+			if (!isblank(line[i]))
 				i++;
 			else {
 				while (i < len) {
-					if (( line[i] == ' ' ) || ( line[i] == '\t' ))
+					if (isblank(line[i]))
 						i++;
 					else
 						break;
@@ -156,7 +156,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 			}
 		}
 		while (i < len) {
-			if (( line[i] != ' ' ) && ( line[i] != '\t' ))
+			if (!isblank(line[i]))
 				pls.PLEnd[p++] = line[i++];
 			else
 				break;
