@@ -278,7 +278,7 @@ bool AREImporter::Import(DataStream* str)
 	str->ReadDword(AreaFlags);
 	//skipping bg1 area connection fields
 	str->Seek( 0x48, GEM_STREAM_START );
-	str->ReadScalar<MapEnv, ieWord>(AreaType);
+	str->ReadEnum<MapEnv>(AreaType);
 	str->ReadWord(WRain);
 	str->ReadWord(WSnow);
 	str->ReadWord(WFog);
