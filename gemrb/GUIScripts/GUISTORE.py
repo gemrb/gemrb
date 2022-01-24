@@ -428,7 +428,7 @@ def InitStoreShoppingWindow (Window):
 	return
 
 def UpdateStoreShoppingWindow (Window):
-	global Store, inventory_slots
+	global Bag, Store, inventory_slots
 
 	#reget store in case of a change
 	Store = GemRB.GetStore ()

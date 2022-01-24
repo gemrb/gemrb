@@ -583,7 +583,7 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
 	ieStrRef strref = -1;
 	int flags = 0;
-	PARSE_ARGS(args, "i|i", &strref, &flags);
+	PARSE_ARGS(args, "l|i", &strref, &flags);
 	if (strref >= INT_MAX) return PyString_FromString("");
 
 	char *text = core->GetCString( strref, flags );
