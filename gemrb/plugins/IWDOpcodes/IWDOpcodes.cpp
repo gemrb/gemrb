@@ -1914,7 +1914,7 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		DisplayStringCore(target, ieStrRef(fx->Parameter1), DS_HEAD);
 		break;
 	case 3: //gemrb extension, displays verbalconstant
-		DisplayStringCore(target, ieStrRef(fx->Parameter1), DS_CONST|DS_HEAD);
+		DisplayStringCoreVC(target, fx->Parameter1, DS_HEAD);
 		break;
 	}
 	return FX_NOT_APPLIED;
