@@ -437,34 +437,32 @@ void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
 	
 	ieStrRef Strref = ieStrRef::INVALID;
-	if (flags & DS_CONST) {
-		const Actor* actor = Scriptable::As<Actor>(Sender);
-		if (!actor) {
-			Log(ERROR, "GameScript", "Verbal constant not supported for non actors!");
-			return;
-		}
+	flags |= DS_CONST;
 
-		if (vc >= VCONST_COUNT) {
-			Log(ERROR, "GameScript", "Invalid verbal constant!");
-			return;
-		}
-
-		Strref = actor->GetVerbalConstant(vc);
-		if (Strref == ieStrRef::INVALID || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
-			//get soundset based string constant
-			ResRef soundRef;
-			actor->GetVerbalConstantSound(soundRef, vc);
-			char Sound[_MAX_PATH];
-			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
-				snprintf(Sound, _MAX_PATH, "%s/%s",actor->PCStats->SoundFolder, soundRef.CString());
-			} else {
-				strlcpy(Sound, soundRef.CString(), sizeof(Sound));
-			}
-			return DisplayStringCore(Sender, Strref, flags, Sound);
-		}
+	const Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!actor) {
+		Log(ERROR, "GameScript", "Verbal constant not supported for non actors!");
+		return;
 	}
-	
-	DisplayStringCore(Sender, Strref, flags);
+
+	if (vc >= VCONST_COUNT) {
+		Log(ERROR, "GameScript", "Invalid verbal constant!");
+		return;
+	}
+
+	Strref = actor->GetVerbalConstant(vc);
+	if (Strref == ieStrRef::INVALID || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
+		//get soundset based string constant
+		ResRef soundRef;
+		actor->GetVerbalConstantSound(soundRef, vc);
+		char Sound[_MAX_PATH];
+		if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
+			snprintf(Sound, _MAX_PATH, "%s/%s",actor->PCStats->SoundFolder, soundRef.CString());
+		} else {
+			strlcpy(Sound, soundRef.CString(), sizeof(Sound));
+		}
+		return DisplayStringCore(Sender, Strref, flags, Sound);
+	}
 }
 
 void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, const char* soundpath)
@@ -2637,7 +2635,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 		} else {
 			displaymsg->DisplayConstantStringName(STR_SPELL_FAILED, DMC_WHITE, Sender);
 		}
-		DisplayStringCoreVC(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE|DS_CONST );
+		DisplayStringCoreVC(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE);
 		return true;
 	}
 

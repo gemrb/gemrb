@@ -899,7 +899,7 @@ void GameScript::VerbalConstantHead(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	DisplayStringCore(tar, ieStrRef(parameters->int0Parameter), DS_HEAD|DS_CONSOLE|DS_CONST);
+	DisplayStringCoreVC(tar, parameters->int0Parameter, DS_HEAD|DS_CONSOLE);
 }
 
 void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
@@ -908,7 +908,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	DisplayStringCore(tar, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_CONST);
+	DisplayStringCoreVC(tar, parameters->int0Parameter, DS_CONSOLE);
 }
 
 //bg2 - variable
@@ -4627,7 +4627,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, DMC_WHITE);
-	DisplayStringCoreVC(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
+	DisplayStringCoreVC(snd, VB_PP_SUCC, DS_CONSOLE);
 	if (ret == MIC_FULL && snd->InParty) {
 		snd->VerbalConstant(VB_INVENTORY_FULL);
 		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
