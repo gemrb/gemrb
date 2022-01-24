@@ -83,7 +83,7 @@ public:
 		static_assert(sizeof(DST) >= sizeof(SRC), "This flavor of ReadScalar requires DST to be >= SRC.");
 		SRC src;
 		strret_t len = ReadScalar(src);
-		dest = static_cast<DST>(src);
+		dest = src; // preserve sign extension
 		return len;
 	}
 	
