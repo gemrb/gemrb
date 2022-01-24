@@ -102,7 +102,7 @@ struct PythonComplexCallback : public PythonCallback {
 		if (!func_code) return nullptr;
 		
 		PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
-		const long count = PyInt_AsLong(co_argcount);
+		const long count = PyLong_AsLong(co_argcount);
 		PyObject* args = nullptr;
 		if (count) {
 			PyObject* obj = gs->ConstructObjectForScriptable(arg->GetScriptingRef());

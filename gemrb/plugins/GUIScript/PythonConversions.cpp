@@ -32,17 +32,17 @@ namespace GemRB {
 Color ColorFromPy(PyObject* obj) {
 	if (obj && PyDict_Check(obj)) {
 		Color c;
-		// PyInt_AsLong may return -1 on error and we would like this to = 0
-		long pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "r"));
+		// PyLong_AsLong may return -1 on error and we would like this to = 0
+		long pyVal = PyLong_AsLong(PyDict_GetItemString(obj, "r"));
 		c.r = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
-		pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "g"));
+		pyVal = PyLong_AsLong(PyDict_GetItemString(obj, "g"));
 		c.g = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
-		pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "b"));
+		pyVal = PyLong_AsLong(PyDict_GetItemString(obj, "b"));
 		c.b = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
 
 		PyObject* alpha = PyDict_GetItemString(obj, "a");
 		if (alpha) {
-			pyVal = PyInt_AsLong(alpha);
+			pyVal = PyLong_AsLong(alpha);
 			c.a = Clamp<unsigned char>(pyVal == -1 ? 0 : pyVal, 0, 255);
 		} else {
 			c.a = 0xff;
@@ -57,9 +57,9 @@ Point PointFromPy(PyObject* obj) {
 	if (PyDict_Check(obj)) {
 		Point p;
 		PyObject* pyVal = PyDict_GetItemString(obj, "x");
-		p.x = PyInt_AsLong(pyVal);
+		p.x = PyLong_AsLong(pyVal);
 		pyVal = PyDict_GetItemString(obj, "y");
-		p.y = PyInt_AsLong(pyVal);
+		p.y = PyLong_AsLong(pyVal);
 		return p;
 	}
 	return Point();
@@ -69,20 +69,20 @@ Region RectFromPy(PyObject* obj) {
 	if (PyDict_Check(obj)) {
 		Region r;
 		PyObject* pyVal = PyDict_GetItemString(obj, "x");
-		r.x = int(PyInt_AsLong(pyVal));
+		r.x = int(PyLong_AsLong(pyVal));
 		pyVal = PyDict_GetItemString(obj, "y");
-		r.y = int(PyInt_AsLong(pyVal));
+		r.y = int(PyLong_AsLong(pyVal));
 		pyVal = PyDict_GetItemString(obj, "w");
-		r.w = int(PyInt_AsLong(pyVal));
+		r.w = int(PyLong_AsLong(pyVal));
 		pyVal = PyDict_GetItemString(obj, "h");
-		r.h = int(PyInt_AsLong(pyVal));
+		r.h = int(PyLong_AsLong(pyVal));
 		return r;
 	}
 	return Region();
 }
 
 ResRef ResRefFromPy(PyObject* obj) {
-	if (obj && PyString_Check(obj)) {
+	if (obj && PyUnicode_Check(obj)) {
 		return ResRef(PyString_AsString(obj));
 	}
 	return ResRef();
@@ -96,7 +96,7 @@ std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj)
 	if (!id) {
 		RuntimeError("Invalid Table reference, no ID attribute.");
 	} else {
-		sm = core->GetSymbol( PyInt_AsLong( id ) );
+		sm = core->GetSymbol(PyLong_AsLong(id));
 	}
 	return sm;
 }
@@ -104,7 +104,7 @@ std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj)
 Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 {
 	Holder<Sprite2D> pic;
-	if (PyObject_TypeCheck( pypic, &PyString_Type )) {
+	if (PyObject_TypeCheck( pypic, &PyUnicode_Type )) {
 		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(PyString_AsString(pypic));
 		if (im) {
 			pic = im->GetSprite2D();
@@ -129,13 +129,13 @@ PyObject* PyString_FromString(const char* s)
 PyObject* PyString_FromResRef(const ResRef& resRef)
 {
 	size_t i = strnlen(resRef.CString(), 9);
-	return PyString_FromStringAndSize(resRef.CString(), i);
+	return PyUnicode_FromStringAndSize(resRef.CString(), i);
 }
 
 PyObject* PyString_FromAnimID(const char* AnimID)
 {
 	unsigned int i = strnlen(AnimID,2);
-	return PyString_FromStringAndSize( AnimID, i );
+	return PyUnicode_FromStringAndSize( AnimID, i );
 }
 	
 PyObject* PyString_FromStringObj(const std::string& s)
