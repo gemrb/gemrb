@@ -217,7 +217,7 @@ String TLKImporter::BuiltinToken(const char* Token)
 		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
 		//preparing sub-tokens
 		core->GetCalendar()->GetMonthName((int) dayandmonth);
-		return GetString(ieStrRef::DAYANDMONTH, STRING_FLAGS::NONE);
+		return GetString(ieStrRef::DAYANDMONTH, STRING_FLAGS::RESOLVE_TAGS);
 	}
 
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
