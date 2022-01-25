@@ -520,11 +520,11 @@ The above example will display 'Level: 1' in the addressed label.\n\
 
 static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
-	ieStrRef strref = ieStrRef::INVALID;
+	PyObject* strref = nullptr;
 	int flags = 0;
-	PARSE_ARGS(args, "i|i", &strref, &flags);
+	PARSE_ARGS(args, "O|i", &strref, &flags);
 
-	String text = core->GetString(strref, STRING_FLAGS(flags));
+	String text = core->GetString(StrRefFromPy(strref), STRING_FLAGS(flags));
 	return PyString_FromStringObj(text);
 }
 
@@ -5249,13 +5249,14 @@ strref is -1, then it will delete the whole journal.\n\
 
 static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 {
-	ieStrRef strref = ieStrRef::INVALID;
+	PyObject* pyref = nullptr;
 	ieDword chapter = -1;
 	int section = -1;
-	PARSE_ARGS( args,  "i|ii", &strref, &section, &chapter );
+	PARSE_ARGS( args,  "O|ii", &pyref, &section, &chapter );
 
 	GET_GAME();
 
+	ieStrRef strref = StrRefFromPy(pyref);
 	if (strref == ieStrRef::INVALID) {
 		//delete the whole journal
 		section = -1;
@@ -5612,14 +5613,16 @@ PyDoc_STRVAR( GemRB_CreateString__doc,
 static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 {
 	PyObject *Text = nullptr;
-	ieStrRef strref = ieStrRef::INVALID;
-	PARSE_ARGS( args,  "iO", &strref, &Text );
+	PyObject* pyref = nullptr;
+	PARSE_ARGS( args,  "OO", &pyref, &Text );
 	GET_GAME();
 	
+	ieStrRef strref = ieStrRef::INVALID;
 	String* str = PyString_AsStringObj(Text);
 	if (str) {
-		strref = core->UpdateString(strref, *str);
+		strref = core->UpdateString(StrRefFromPy(pyref), *str);
 	}
+	
 	return PyLong_FromStrRef(strref);
 }
 
@@ -5643,8 +5646,8 @@ Mostly useful for setting the biography.\n\
 static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, StringSlot;
-	ieStrRef StrRef = ieStrRef::INVALID;
-	PARSE_ARGS( args,  "iii", &globalID, &StringSlot, &StrRef );
+	PyObject* pyref = nullptr;
+	PARSE_ARGS(args,  "iiO", &globalID, &StringSlot, &pyref);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -5652,7 +5655,7 @@ static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 		return AttributeError( "StringSlot is out of range!\n" );
 	}
 
-	actor->StrRefs[StringSlot]=StrRef;
+	actor->StrRefs[StringSlot] = StrRefFromPy(pyref);
 
 	Py_RETURN_NONE;
 }
