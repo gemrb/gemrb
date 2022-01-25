@@ -42,7 +42,8 @@ static constexpr Color DMC_RED = ColorRed;
 static constexpr Color DMC_LIGHTGREY {0xd7, 0xd7, 0xbe, 0xff};
 static constexpr Color DMC_BG2XPGREEN {0xbc, 0xef, 0xbc, 0xff};
 static constexpr Color DMC_GOLD {0xc0, 0xc0, 0x00, 0xff};
-static constexpr int DMC_DIALOG = 1;
+static const char* DMC_DIALOG = "DMC_DIALOG";
+
 static constexpr Color DMC_DIALOGPARTY = {0x80, 0x80, 0xff, 0xff};
 
 class Scriptable;
@@ -90,7 +91,7 @@ public:
 	void DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const;
 	void DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const;
 	/** This is the new method that takes color as an int */
-	void DisplayStringName(int stridx, const int colorId, const Scriptable *speaker, ieDword flags) const;
+	void DisplayStringName(int stridx, const char* color, const Scriptable *speaker, ieDword flags) const;
 	/** iwd2 hidden roll debugger */
 	void DisplayRollStringName(int stridx, const Color &color, const Scriptable *speaker, ...) const;
 };
