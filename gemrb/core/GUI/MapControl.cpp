@@ -33,7 +33,8 @@ namespace GemRB {
 MapControl::MapControl(const Region& frame, AnimationFactory* af)
 : Control(frame), mapFlags(af)
 {
-	ControlType = IE_GUI_MAP;	
+	ControlType = IE_GUI_MAP;
+	SetValueRange({NO_NOTES, EDIT_NOTE});
 	UpdateMap();
 }
 
