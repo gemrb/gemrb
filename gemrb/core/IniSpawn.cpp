@@ -391,6 +391,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 		critter.CreFile = GetElements<ResRef>(s);
 	} else {
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);
+		return;
 	}
 
 	PrepareSpawnPoints(inifile, crittername, critter);
