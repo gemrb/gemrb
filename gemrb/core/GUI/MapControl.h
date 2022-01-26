@@ -68,6 +68,8 @@ public:
 	MapControl(const Region& frame, AnimationFactory* af);
 
 	bool IsAnimated() const override { return true; } // map must constantly update actor positions
+	
+	void UpdateState(value_t) override;
 
 private:
 	/** Call event handler on click */

@@ -104,6 +104,11 @@ Point MapControl::ConvertPointFromGame(Point p) const
 	// mos is centered... convert p from mos coordinates
 	return p + mosRgn.origin;
 }
+
+void MapControl::UpdateState(value_t val)
+{
+	SetValue(val);
+}
 	
 void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
