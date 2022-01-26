@@ -32,6 +32,7 @@ bool INIImporter::Open(DataStream* str)
 	strret_t cnt = 0;
 	char strbuf[4097];
 	INITag* lastTag = NULL;
+	bool startedSection = false;
 	do {
 		cnt = str->ReadLine( strbuf, 4096 );
 		if (cnt == -1)
@@ -51,13 +52,34 @@ bool INIImporter::Open(DataStream* str)
 				}
 				sbptr++;
 			}
+
+			// ignore empty sections
+			// pst ar0502.ini has this garbage:
+			// [guard4]
+			// /.../
+			// [guard5] <-- bad, but harmless
+			//
+			// [guard5]
+			// /.../
+			// [guard5] <-- bad and overrides contentful section
+			//
+			// [guard6]
+			// /.../
+			if (startedSection) {
+				Log(WARNING, "INIImporter", "Skipping empty section in '%s', entry: '%s'", str->filename, lastTag->GetTagName());
+				tags.pop_back();
+			}
+
+			startedSection = true;
 			tags.emplace_back(TagName);
 			lastTag = &tags[tags.size() - 1];
 			continue;
 		}
 		if (lastTag == NULL)
 			continue;
-		if (!lastTag->AddLine(strbuf)) {
+		if (lastTag->AddLine(strbuf)) {
+			startedSection = false;
+		} else {
 			Log(ERROR, "INIImporter", "Bad Line in file: %s, Section: [%s], Entry: '%s'",
 				str->filename, lastTag->GetTagName(), strbuf);
 		}
