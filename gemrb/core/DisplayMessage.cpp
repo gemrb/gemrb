@@ -189,6 +189,16 @@ void DisplayMessage::DisplayString(String text, const Color &color, Scriptable *
 	}
 }
 
+void DisplayMessage::DisplayString(int stridx, unsigned char color, ieDword flags) const
+{
+	DisplayString(stridx, gamedata->GetColor(GUIColors[color]), flags);
+}
+
+void DisplayMessage::DisplayString(const String& text, unsigned char color, Scriptable *target) const
+{
+	DisplayString(text, gamedata->GetColor(GUIColors[color]), target);
+}
+
 // String format is
 // blah : whatever
 void DisplayMessage::DisplayConstantStringValue(size_t stridx, const Color &color, ieDword value) const
@@ -261,8 +271,19 @@ void DisplayMessage::DisplayStringName(ieStrRef str, const Color &color, const S
 
 void DisplayMessage::DisplayStringName(int stridx, const char* color, const Scriptable *speaker, ieDword flags) const
 {
+	DisplayRollStringName(stridx, gamedata->GetColor(GUIColors[color]), speaker);
+}
 
 	DisplayStringName(stridx, gamedata->GetColor(color), speaker, flags);
+}
+
+void DisplayMessage::DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const
+{
+	if (stridx<0) return;
+
+	String* text = core->GetString( stridx, flags);
+	DisplayStringName(*text, color, speaker);
+	delete text;
 }
 
 void DisplayMessage::DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const

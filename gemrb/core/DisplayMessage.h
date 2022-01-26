@@ -69,6 +69,23 @@ private:
 		String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
 		DisplayStringName(std::move(formatted), color, speaker);
 	}
+	/** displays a string constant in the textarea */
+	void DisplayConstantString(int stridx, const Color &color, Scriptable *speaker=NULL) const;
+	/** displays actor name - action : parameter */
+	void DisplayConstantStringNameString(int stridx, const Color &color, int stridx2, const Scriptable *actor) const;
+	/** displays a string constant followed by a number in the textarea */
+	void DisplayConstantStringValue(int stridx, const Color &color, ieDword value) const;
+	/** displays a string constant in the textarea, starting with speaker's name */
+	void DisplayConstantStringName(int stridx, const Color &color, const Scriptable *speaker) const;
+	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
+	void DisplayConstantStringNameValue(int stridx, const Color &color, const Scriptable *speaker, int value) const;
+	/** displays a string constant in the textarea, starting with actor, and ending with target */
+	void DisplayConstantStringAction(int stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
+	/** displays a string in the textarea, starting with speaker's name */
+	void DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const;
+	void DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const;
+	/** iwd2 hidden roll debugger */
+	void DisplayRollStringName(int stridx, const Color &color, const Scriptable *speaker, ...) const;	
 public:
 	static ieStrRef GetStringReference(size_t);
 	static bool HasStringReference(size_t);

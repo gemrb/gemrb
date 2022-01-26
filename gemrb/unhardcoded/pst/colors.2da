@@ -7,3 +7,10 @@ MAPICNBG		0x1e0800ff
 MAPTXTBG		0xa1754eff
 ALTDOOR			0xff00ffff
 HOVERDOOR		0xff00ffff
+WHITE			0xf0f0f0ff
+RED				0xff0000ff
+LIGHT_GREY		0xd7d7beff
+GOT_XP			0xbcefbcff
+GOT_GOLD		0xc0c000ff
+DIALOG			0xf0f0f0ff
+DIALOG_PARTY	0x8080ffff
