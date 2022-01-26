@@ -37,14 +37,7 @@
 
 namespace GemRB {
 
-static constexpr Color DMC_WHITE {0xf0, 0xf0, 0xf0, 0xff};
-static constexpr Color DMC_RED = ColorRed;
-static constexpr Color DMC_LIGHTGREY {0xd7, 0xd7, 0xbe, 0xff};
-static constexpr Color DMC_BG2XPGREEN {0xbc, 0xef, 0xbc, 0xff};
-static constexpr Color DMC_GOLD {0xc0, 0xc0, 0x00, 0xff};
-static const char* DMC_DIALOG = "DMC_DIALOG";
-
-static constexpr Color DMC_DIALOGPARTY = {0x80, 0x80, 0xff, 0xff};
+enum { DMC_DIALOG, DMC_DIALOGPARTY, DMC_GOLD, DMC_RED, DMC_BG2XPGREEN, DMC_LIGHTGREY, DMC_WHITE };
 
 class Scriptable;
 
@@ -61,16 +54,6 @@ private:
 	};
 	static StrRefs SRefs;
 	static void LoadStringRefs();
-public:
-	static ieStrRef GetStringReference(size_t);
-	static bool HasStringReference(size_t);
-
-public:
-	DisplayMessage();
-	/** returns the speaker's color and name */
-	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
-	/** displays any string in the textarea */
-	void DisplayMarkupString(const String& txt) const;
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(int stridx, const Color &color, Scriptable *speaker=NULL) const;
 	/** displays actor name - action : parameter */
@@ -83,17 +66,40 @@ public:
 	void DisplayConstantStringNameValue(int stridx, const Color &color, const Scriptable *speaker, int value) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
 	void DisplayConstantStringAction(int stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
+	/** displays a string in the textarea, starting with speaker's name */
+	void DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const;
+	void DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const;
+	/** iwd2 hidden roll debugger */
+	void DisplayRollStringName(int stridx, const Color &color, const Scriptable *speaker, ...) const;	
+public:
+	static ieStrRef GetStringReference(size_t);
+	static bool HasStringReference(size_t);
+
+public:
+	DisplayMessage();
+	/** returns the speaker's color and name */
+	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
+	/** displays any string in the textarea */
+	void DisplayMarkupString(const String& txt) const;
+	/** displays a string constant in the textarea */
+	void DisplayConstantString(int stridx, unsigned char color, Scriptable *speaker=NULL) const;
+	/** displays a string constant followed by a number in the textarea that takes color as an enum */
+	void DisplayConstantStringValue(int stridx,  unsigned char color, ieDword value) const;	
+	/** displays a string constant in the textarea, starting with speaker's name */
+	void DisplayConstantStringName(int stridx, unsigned char color, const Scriptable *speaker) const;
+	/** displays a string constant in the textarea, starting with actor, and ending with target */
+	void DisplayConstantStringAction(int stridx, unsigned char color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
 	void DisplayString(int stridx, const Color &color, ieDword flags) const;
 	void DisplayString(const String& text, const Color &color, Scriptable *target) const;
+	void DisplayString(int stridx, unsigned char color, ieDword flags) const;
+	void DisplayString(const String& text, unsigned char color, Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const;
-	void DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const;
-	/** This is the new method that takes color as an int */
-	void DisplayStringName(int stridx, const char* color, const Scriptable *speaker, ieDword flags) const;
+	void DisplayStringName(const String& text, unsigned char color, const Scriptable *speaker) const;
+	void DisplayStringName(int stridx, unsigned char color, const Scriptable *speaker, ieDword flags) const;
 	/** iwd2 hidden roll debugger */
-	void DisplayRollStringName(int stridx, const Color &color, const Scriptable *speaker, ...) const;
+	void DisplayRollStringName(int stridx, unsigned char color, const Scriptable *speaker, ...) const;
 };
 
 extern GEM_EXPORT DisplayMessage * displaymsg;
