@@ -66,7 +66,7 @@ private:
 	template<typename ...ARGS>
 	void DisplayRollStringName(const String& fmt, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {
 		String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
-		DisplayStringName(formatted, color, speaker);
+		DisplayStringName(std::move(formatted), color, speaker);
 	}
 public:
 	static ieStrRef GetStringReference(size_t);
@@ -93,10 +93,10 @@ public:
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
 	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;
-	void DisplayString(const String& text, const Color &color, Scriptable *target) const;
+	void DisplayString(String text, const Color &color, Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
-	void DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const;
+	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>
 	void DisplayRollStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {

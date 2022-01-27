@@ -899,10 +899,10 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
 		if (target) {
 			const String msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), STRING_FLAGS::NONE);
 			String str = fmt::format(L"{} {} : {}", msg, spell, target->GetName());
-			displaymsg->DisplayStringName(str, DMC_WHITE, this);
+			displaymsg->DisplayStringName(std::move(str), DMC_WHITE, this);
 		} else {
 			String str = fmt::format(L"{} : {}", spell, GetName());
-			displaymsg->DisplayStringName(str, DMC_WHITE, this);
+			displaymsg->DisplayStringName(std::move(str), DMC_WHITE, this);
 		}
 	}
 }

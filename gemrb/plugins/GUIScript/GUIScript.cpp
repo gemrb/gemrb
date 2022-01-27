@@ -13727,7 +13727,7 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 			if (catcher) {
 				PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
 				String* msg = PyString_AsStringObj(output);
-				displaymsg->DisplayString(*msg, DMC_WHITE, nullptr);
+				displaymsg->DisplayString(std::move(*msg), DMC_WHITE, nullptr);
 				delete msg;
 				Py_DECREF(catcher);
 			}

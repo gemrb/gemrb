@@ -3537,7 +3537,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String msg = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
 			msg += L" " + std::to_wstring(ret);
-			displaymsg->DisplayStringName(msg, DMC_WHITE, this);
+			displaymsg->DisplayStringName(std::move(msg), DMC_WHITE, this);
 		}
 		prevType = type;
 		prevActor = this;
@@ -7415,7 +7415,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			hitMiss = core->GetString(displaymsg->GetStringReference(STR_MISS));
 		}
 		String rollLog = fmt::format(L"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss);
-		displaymsg->DisplayStringName(rollLog, DMC_WHITE, this);
+		displaymsg->DisplayStringName(std::move(rollLog), DMC_WHITE, this);
 	}
 
 	if (roll == 1) {
@@ -9236,16 +9236,14 @@ bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
 
 	if (success) {
 		if (core->HasFeedback(FT_CASTING)) {
-			const String txt = core->GetString(ieStrRef::MD_SUCCESS);
-			displaymsg->DisplayStringName(txt, DMC_WHITE, this);
+			displaymsg->DisplayStringName(core->GetString(ieStrRef::MD_SUCCESS), DMC_WHITE, this);
 		}
 		return true;
 	}
 
 	// don't play with powers you don't comprehend!
 	if (core->HasFeedback(FT_CASTING)) {
-		const String txt = core->GetString(ieStrRef::MD_FAIL);
-		displaymsg->DisplayStringName(txt, DMC_WHITE, this);
+		displaymsg->DisplayStringName(core->GetString(ieStrRef::MD_FAIL), DMC_WHITE, this);
 	}
 	Damage(core->Roll(level, 6, 0), DAMAGE_MAGIC, nullptr);
 	return false;
