@@ -745,8 +745,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		// translate door cursor on infopoint to correct cursor
 		if (Cursor == IE_CURSOR_DOOR) Cursor = IE_CURSOR_PASS;
 		ip->Cursor = Cursor;
-		String str = core->GetString( StrRef );
-		ip->SetOverheadText(str, false);
+		ip->SetOverheadText(core->GetString(StrRef), false);
 		ip->StrRef = StrRef; //we need this when saving area
 		ip->SetMap(map);
 		ip->Flags = Flags;

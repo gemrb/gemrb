@@ -155,11 +155,11 @@ void Scriptable::SetSpellResRef(const ResRef& resref) {
 	SpellResRef = resref;
 }
 
-void Scriptable::SetOverheadText(const String& text, bool display)
+void Scriptable::SetOverheadText(String text, bool display)
 {
 	overHeadTextPos = Point(-1, -1);
 	if (!text.empty()) {
-		OverheadText = text;
+		OverheadText = std::move(text);
 		DisplayOverheadText(display);
 	} else {
 		DisplayOverheadText(false);
@@ -1190,9 +1190,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 			// eg. .:Casts Word of Recall:.
 			const String castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
 			const String spellname = core->GetString(spl->SpellName);
-			String formatted = fmt::format(L".:{} {}:.", castmsg, spellname);
-
-			SetOverheadText(formatted);
+			SetOverheadText(fmt::format(L".:{} {}:.", castmsg, spellname));
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL15, DMC_LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}

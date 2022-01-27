@@ -11163,8 +11163,7 @@ void Actor::DisplayHeadHPRatio()
 {
 	if (!HasVisibleHP()) return;
 
-	String hpstr = fmt::format(L"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
-	SetOverheadText(hpstr);
+	SetOverheadText(fmt::format(L"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]));
 }
 
 void Actor::ReleaseCurrentAction()
