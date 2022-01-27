@@ -473,11 +473,11 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 		int w = ta->Frame().w - (margins.left + margins.right);
 		int newlines = CeilDiv(h, rowHeight);
 		ta->AppendText(String(newlines - 1, L'\n'));
-		ta->AppendText(*chapText);
+		ta->AppendText(std::move(*chapText));
+		delete chapText;
 		// append again (+1 since there may not be a trailing newline) after the chtext so it will scroll out of view
 		ta->AppendText(String(newlines + 1, L'\n'));
 
-		delete chapText;
 		ta->SetFlags(View::IgnoreEvents, BitOp::OR);
 		int lines = ta->ContentHeight() / rowHeight;
 		float heightScale = 12.0f / rowHeight; // scale based on text size so smaller text scrolls more slowly
@@ -1472,12 +1472,11 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 	if (PyObject_TypeCheck(pystr, &PyUnicode_Type)) {
 		String* str = PyString_AsStringObj(pystr);
 		if (str) {
-			ta->AppendText(*str);
+			ta->AppendText(std::move(*str));
 			delete str;
 		}
 	} else if (PyObject_TypeCheck(pystr, &PyLong_Type)) {
-		String str = core->GetString(StrRefFromPy(pystr), STRING_FLAGS(flags));
-		ta->AppendText(str);
+		ta->AppendText(core->GetString(StrRefFromPy(pystr), STRING_FLAGS(flags)));
 	}
 
 	Py_RETURN_NONE;

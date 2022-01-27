@@ -445,7 +445,7 @@ void TextArea::TrimHistory(size_t lines)
 	ClearHistoryTimer();
 }
 
-void TextArea::AppendText(const String& text)
+void TextArea::AppendText(String text)
 {
 	if (flags & ClearHistory) {
 		ClearHistoryTimer();
@@ -496,7 +496,7 @@ void TextArea::AppendText(const String& text)
 			}
 			textContainer->AppendText(text.substr(textpos));
 		} else {
-			textContainer->AppendText(text);
+			textContainer->AppendText(std::move(text));
 		}
 	}
 

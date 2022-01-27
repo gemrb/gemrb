@@ -147,7 +147,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						if (token.length() && token != L"\n") {
 							// FIXME: lazy hack.
 							// we ought to ignore all white space between markup unless it contains other text
-							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextColor(), &frame));
+							container.AppendContent(new TextSpan(std::move(token), attributes.TextFont, attributes.TextColor(), &frame));
 						}
 						token.clear();
 						continue;
@@ -183,7 +183,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 
 	if (token.length()) {
 		// there was some text at the end without markup
-		container.AppendText(token);
+		container.AppendText(std::move(token));
 	}
 	return state;
 }

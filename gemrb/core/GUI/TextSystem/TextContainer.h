@@ -88,8 +88,8 @@ private:
 public:
 	// make a "block" of text that always occupies the area of "size", or autosizes if size in NULL
 	// TODO: we should probably be able to align the text in the frame
-	TextSpan(const String& string, const Font* font, const Size* = nullptr);
-	TextSpan(const String& string, const Font* font, Font::PrintColors cols, const Size* = nullptr);
+	TextSpan(String string, const Font* font, const Size* = nullptr);
+	TextSpan(String string, const Font* font, Font::PrintColors cols, const Size* = nullptr);
 	~TextSpan() final;
 	
 	void ClearColors();
@@ -275,8 +275,8 @@ public:
 	void InsertText(const String& text);
 	void DeleteText(size_t len);
 
-	void AppendText(const String& text);
-	void AppendText(const String& text, const Font* fnt, const Font::PrintColors* = nullptr);
+	void AppendText(String text);
+	void AppendText(String text, const Font* fnt, const Font::PrintColors* = nullptr);
 	String TextFrom(const Content*) const;
 	String Text() const;
 
