@@ -353,7 +353,7 @@ public:
 	const char* GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
-	void SetOverheadText(const String& text, bool display = true);
+	void SetOverheadText(String text, bool display = true);
 	const String& GetOverheadText() const { return OverheadText; };
 	bool DisplayOverheadText(bool);
 	bool OverheadTextIsDisplaying() const { return overheadTextDisplaying; }
