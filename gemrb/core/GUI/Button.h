@@ -126,7 +126,7 @@ public:
 	/** Sets the Button State */
 	void SetState(State state);
 	/** Sets the Text of the current control */
-	void SetText(const String& string) override;
+	void SetText(String string) override;
 	/** Sets the Picture */
 	void SetPicture(Holder<Sprite2D> Picture);
 	void SetAnimation(SpriteAnimation* anim);

@@ -141,9 +141,7 @@ public:
 	explicit Control(const Region& frame);
 	~Control() override;
 
-	/** Sets the Text of the current control */
-	void SetText(const String*);
-	virtual void SetText(const String&) {};
+	virtual void SetText(String) {};
 
 	/** Update the control if it's tied to a GUI variable */
 	void UpdateState(const varname_t&, value_t);

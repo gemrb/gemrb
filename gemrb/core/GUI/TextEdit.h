@@ -77,7 +77,7 @@ public:
 	void SetFont(Font* f);
 
 	/** Sets the Text of the current control */
-	void SetText(const String& string) override;
+	void SetText(String string) override;
 	/** Gets the Text of the current control */
 	String QueryText() const override;
 	/** Sets the buffer length */

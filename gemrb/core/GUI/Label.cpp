@@ -51,9 +51,9 @@ void Label::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 }
 /** This function sets the actual Label Text */
-void Label::SetText(const String& string)
+void Label::SetText(String string)
 {
-	Text = string;
+	Text = std::move(string);
 	if (Alignment == IE_FONT_ALIGN_CENTER
 		&& core->HasFeature( GF_LOWER_LABEL_TEXT )) {
 		StringToLower(Text);

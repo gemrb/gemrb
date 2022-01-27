@@ -1416,19 +1416,18 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 
 	if (PyObject_TypeCheck(str, &PyLong_Type)) { // strref
 		ieStrRef StrRef = StrRefFromPy(str);
-		String string = core->GetString(StrRef);
-		ctrl->SetText(string);
+		ctrl->SetText(core->GetString(StrRef));
 	} else if (str == Py_None) {
 		// clear the text
-		ctrl->SetText(NULL);
+		ctrl->SetText(L"");
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
 		const char *tmp = PyByteArray_AS_STRING(str);
-		const String* string = StringFromUtf8(tmp);
-		ctrl->SetText(string);
+		String* string = StringFromUtf8(tmp);
+		ctrl->SetText(std::move(*string));
 		delete string;
 	} else { // string value of the object
-		const String* string = PyString_AsStringObj(str);
-		ctrl->SetText(string);
+		String* string = PyString_AsStringObj(str);
+		ctrl->SetText(std::move(*string));
 		delete string;
 	}
 
@@ -2110,7 +2109,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			TextEdit* edit = new TextEdit(rgn, 500, Point());
 			edit->SetFont( core->GetFont( font ) );
 			String* text = StringFromUtf8(cstr);
-			edit->Control::SetText( text );
+			edit->Control::SetText(std::move(*text));
 			delete text;
 
 			view = edit;
@@ -6577,11 +6576,11 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 {
 	if (!btn) return;
 
-	String usagestr;
 	if (charges && (charges>1 || !oneisnone) ) {
-		usagestr = std::to_wstring(charges);
+		btn->SetText(std::to_wstring(charges));
+	} else {
+		btn->SetText(L"");
 	}
-	btn->SetText(usagestr);
 }
 
 PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
