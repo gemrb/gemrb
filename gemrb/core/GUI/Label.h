@@ -56,8 +56,7 @@ public:
 	Label(const Region& frame, Font* font, const String& string);
 
 	/** This function sets the actual Label Text */
-	using Control::SetText;
-	void SetText(const String& string) override;
+	void SetText(String string) override;
 	/** Sets the Foreground Font Color */
 	void SetColors(const Color& col, const Color& bg);
 	/** Set the font being used */

@@ -285,15 +285,13 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 	if (val == VIEW_NOTES) {
 		Point p = ConvertPointFromScreen(me.Pos());
 
-		const String* text = nullptr;
 		const MapNote* mn = MapNoteAtPoint(p);
 		if (mn) {
-			text = &mn->text;
 			notePos = mn->Pos;
-		}
-
-		if (LinkedLabel) {
-			LinkedLabel->SetText(text);
+			
+			if (LinkedLabel) {
+				LinkedLabel->SetText(mn->text);
+			}
 		}
 	}
 

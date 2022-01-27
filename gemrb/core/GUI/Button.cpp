@@ -584,10 +584,10 @@ void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 }
 
 /** Sets the Text of the current control */
-void Button::SetText(const String& string)
+void Button::SetText(String string)
 {
-	Text = string;
-	if (string.length()) {
+	Text = std::move(string);
+	if (Text.length()) {
 		if (flags&IE_GUI_BUTTON_LOWERCASE)
 			StringToLower( Text );
 		else if (flags&IE_GUI_BUTTON_CAPS)

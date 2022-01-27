@@ -105,7 +105,7 @@ void TextEdit::OnTextInput(const TextEvent& te)
 }
 
 /** Sets the Text of the current control */
-void TextEdit::SetText(const String& string)
+void TextEdit::SetText(String string)
 {
 	Region rect(Point(), Dimensions());
 	textContainer.DeleteContentsInRect(rect);
@@ -113,7 +113,7 @@ void TextEdit::SetText(const String& string)
 	if (string.length() > max) {
 		textContainer.AppendText(string.substr(0, max));
 	} else {
-		textContainer.AppendText(string);
+		textContainer.AppendText(std::move(string));
 	}
 	textContainer.CursorEnd();
 }

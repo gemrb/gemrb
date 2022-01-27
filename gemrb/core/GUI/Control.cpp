@@ -52,11 +52,6 @@ Control::~Control()
 	ClearActionTimer();
 }
 
-void Control::SetText(const String* string)
-{
-	SetText(string ? *string : L"");
-}
-
 void Control::SetAction(ControlEventHandler handler, Control::Action type, EventButton button,
 						Event::EventMods mod, short count)
 {

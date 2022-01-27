@@ -396,10 +396,10 @@ void TextArea::FlagsChanged(unsigned int oldflags)
 }
 
 /** Sets the Actual Text */
-void TextArea::SetText(const String& text)
+void TextArea::SetText(String text)
 {
 	ClearText();
-	AppendText(text);
+	AppendText(std::move(text));
 }
 
 void TextArea::SetColor(const Color& color, COLOR_TYPE idx)

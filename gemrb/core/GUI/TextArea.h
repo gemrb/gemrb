@@ -123,7 +123,7 @@ public:
 	void SetColor(const Color&, COLOR_TYPE);
 
 	/** Sets the Actual Text */
-	void SetText(const String& text) override;
+	void SetText(String text) override;
 	/** Clears the textarea */
 	void ClearText();
 
