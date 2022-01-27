@@ -128,7 +128,7 @@ public:
 	void ClearText();
 
 	/** Appends a String to the current Text */
-	void AppendText(const String& text);
+	void AppendText(String text);
 	/** Inserts a String into the current Text at pos */
 	// int InsertText(const char* text, int pos);
 

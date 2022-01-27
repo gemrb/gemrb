@@ -40,14 +40,14 @@ LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 	return { std::make_shared<LayoutRegion>(Region(rgn.origin + p, frame.size)) };
 }
 
-TextSpan::TextSpan(const String& string, const Font* fnt, const Size* frame)
-	: Content(frame ? *frame : Size()), text(string), font(fnt)
+TextSpan::TextSpan(String string, const Font* fnt, const Size* frame)
+	: Content(frame ? *frame : Size()), text(std::move(string)), font(fnt)
 {
 	Alignment = IE_FONT_ALIGN_LEFT;
 }
 
-TextSpan::TextSpan(const String& string, const Font* fnt, Font::PrintColors cols, const Size* frame)
-	: Content(frame ? *frame : Size()), text(string), font(fnt), colors(new Font::PrintColors(cols))
+TextSpan::TextSpan(String string, const Font* fnt, Font::PrintColors cols, const Size* frame)
+	: Content(frame ? *frame : Size()), text(std::move(string)), font(fnt), colors(new Font::PrintColors(cols))
 {
 	Alignment = IE_FONT_ALIGN_LEFT;
 }
@@ -689,21 +689,22 @@ TextContainer::~TextContainer()
 	delete colors;
 }
 
-void TextContainer::AppendText(const String& text)
+void TextContainer::AppendText(String text)
 {
-	AppendText(text, nullptr, colors);
+	AppendText(std::move(text), nullptr, colors);
 }
 
-void TextContainer::AppendText(const String& text, const Font* fnt, const Font::PrintColors* cols)
+void TextContainer::AppendText(String text, const Font* fnt, const Font::PrintColors* cols)
 {
-	if (text.length()) {
-		TextSpan* span = new TextSpan(text, fnt);
+	size_t len = text.length();
+	if (len) {
+		TextSpan* span = new TextSpan(std::move(text), fnt);
 		if (cols) {
 			span->SetColors(cols->fg, cols->bg);
 		}
 		span->Alignment = alignment;
 		AppendContent(span);
-		textLen += text.length();
+		textLen += len;
 
 		MarkDirty();
 	}
@@ -1027,7 +1028,7 @@ void TextContainer::InsertText(const String& text)
 	}
 
 	EraseContent(idx.second, contents.end());
-	AppendText(newtext);
+	AppendText(std::move(newtext));
 	AdvanceCursor(int(text.length()));
 
 	if (callback) {
@@ -1045,7 +1046,7 @@ void TextContainer::DeleteText(size_t len)
 	}
 
 	EraseContent(idx.second, contents.end());
-	AppendText(newtext);
+	AppendText(std::move(newtext));
 	AdvanceCursor(-int(len));
 
 	if (callback) {
