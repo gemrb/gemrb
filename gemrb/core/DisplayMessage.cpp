@@ -104,17 +104,16 @@ DisplayMessage::DisplayMessage()
 	LoadStringRefs();
 }
 
-void DisplayMessage::DisplayMarkupString(const String& Text) const
+void DisplayMessage::DisplayMarkupString(String Text) const
 {
 	TextArea *ta = core->GetMessageTextArea();
 	if (ta)
-		ta->AppendText( Text );
+		ta->AppendText(std::move(Text));
 }
 
 void DisplayMessage::DisplayString(const String& text) const
 {
-	String formatted = fmt::format(DisplayFormatSimple, text);
-	DisplayMarkupString(formatted);
+	DisplayMarkupString(fmt::format(DisplayFormatSimple, text));
 }
 
 Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) const
@@ -184,8 +183,7 @@ void DisplayMessage::DisplayString(const String& text, const Color &color, Scrip
 
 	const TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
-		String formatted = fmt::format(DisplayFormat, color.Packed(), text);
-		DisplayMarkupString(formatted);
+		DisplayMarkupString(fmt::format(DisplayFormat, color.Packed(), text));
 	}
 
 	if (target && l == NULL && ta == NULL) {
@@ -200,8 +198,7 @@ void DisplayMessage::DisplayConstantStringValue(size_t stridx, const Color &colo
 {
 	if (stridx > STRREF_COUNT) return;
 	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
-	String formatted = fmt::format(DisplayFormatValue, color.Packed(), text, value);
-	DisplayMarkupString(formatted);
+	DisplayMarkupString(fmt::format(DisplayFormatValue, color.Packed(), text, value));
 }
 
 // String format is
@@ -216,11 +213,9 @@ void DisplayMessage::DisplayConstantStringNameString(size_t stridx, const Color 
 	String text2 = core->GetString(DisplayMessage::SRefs[stridx2], STRING_FLAGS::SOUND);
 
 	if (!text2.empty()) {
-		String formated = fmt::format(DisplayFormatNameString, actor_color.Packed(), name, color.Packed(), text, text2);
-		DisplayMarkupString(formated);
+		DisplayMarkupString(fmt::format(DisplayFormatNameString, actor_color.Packed(), name, color.Packed(), text, text2));
 	} else {
-		String formated = fmt::format(DisplayFormatName, color.Packed(), name, color.Packed(), text);
-		DisplayMarkupString(formated);
+		DisplayMarkupString(fmt::format(DisplayFormatName, color.Packed(), name, color.Packed(), text));
 	}
 }
 
@@ -257,8 +252,7 @@ void DisplayMessage::DisplayConstantStringAction(size_t stridx, const Color &col
 	GetSpeakerColor(name2, target);
 
 	String text = core->GetString( DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH );
-	String formatted = fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, color.Packed(), text, name2);
-	DisplayMarkupString(formatted);
+	DisplayMarkupString(fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, color.Packed(), text, name2));
 }
 
 void DisplayMessage::DisplayStringName(ieStrRef str, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const
@@ -279,8 +273,7 @@ void DisplayMessage::DisplayStringName(const String& text, const Color &color, c
 	if (name.length() == 0) {
 		DisplayString(text, color, NULL);
 	} else {
-		String formatted = fmt::format(DisplayFormatName, speaker_color.Packed(), name, color.Packed(), text);
-		DisplayMarkupString(formatted);
+		DisplayMarkupString(fmt::format(DisplayFormatName, speaker_color.Packed(), name, color.Packed(), text));
 	}
 }
 }
