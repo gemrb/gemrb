@@ -188,6 +188,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 			tot_str->WriteScalar<strpos_t, int32_t>(offset);
 		}
 	} while(length);
+	free(newvalue);
 
 	return strref;
 }

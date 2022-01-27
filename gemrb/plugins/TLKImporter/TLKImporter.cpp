@@ -301,6 +301,7 @@ String TLKImporter::ResolveTags(const String& source)
 					assert(tmp);
 					dest.append(std::move(*tmp));
 					delete tmp;
+					delete[] tokVal;
 				}
 			} else {
 				dest.append(str);
@@ -349,8 +350,10 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 
 	if (empty || strref >= ieStrRef::OVERRIDE_START || (strref >= ieStrRef::BIO_START && strref <= ieStrRef::BIO_END)) {
 		if (OverrideTLK) {
-			String* tmp = StringFromCString(OverrideTLK->ResolveAuxString(strref, Length));
+			char* cstr = OverrideTLK->ResolveAuxString(strref, Length);
+			String* tmp = StringFromCString(cstr);
 			std::swap(string, *tmp);
+			free(cstr);
 			delete tmp;
 		} else {
 			Length = 0;

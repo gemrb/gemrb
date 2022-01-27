@@ -5593,8 +5593,9 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	
 	String* name = PyString_AsStringObj(pyName);
 	assert(name);
-	actor->SetName(*name, Which);
+	actor->SetName(std::move(*name), Which);
 	actor->SetMCFlag(MC_EXPORTABLE, BitOp::OR);
+	delete name;
 	Py_RETURN_NONE;
 }
 
@@ -5621,6 +5622,7 @@ static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 	String* str = PyString_AsStringObj(Text);
 	if (str) {
 		strref = core->UpdateString(StrRefFromPy(pyref), *str);
+		delete str;
 	}
 	
 	return PyLong_FromStrRef(strref);
