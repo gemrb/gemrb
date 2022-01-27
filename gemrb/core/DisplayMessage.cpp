@@ -167,28 +167,25 @@ void DisplayMessage::DisplayConstantString(size_t stridx, const Color &color, Sc
 void DisplayMessage::DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const
 {
 	if (stridx == ieStrRef::INVALID) return;
-	String text = core->GetString(stridx, flags);
-	DisplayString(text, color, NULL);
+	DisplayString(core->GetString(stridx, flags), color, NULL);
 }
 
-void DisplayMessage::DisplayString(const String& text, const Color &color, Scriptable *target) const
+void DisplayMessage::DisplayString(String text, const Color &color, Scriptable *target) const
 {
-	if (!text.length()) return;
-
-	Label *l = core->GetMessageLabel();
-	if (l) {
-		l->SetColors(color, ColorBlack);
-		l->SetText(text);
-	}
-
 	const TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
 		DisplayMarkupString(fmt::format(DisplayFormat, color.Packed(), text));
 	}
+	
+	Label *l = core->GetMessageLabel();
+	if (l) {
+		l->SetColors(color, ColorBlack);
+		l->SetText(std::move(text));
+	}
 
 	if (target && l == NULL && ta == NULL) {
 		// overhead text only if we dont have somewhere else for the message
-		target->SetOverheadText( text );
+		target->SetOverheadText(std::move(text));
 	}
 }
 
@@ -227,7 +224,7 @@ void DisplayMessage::DisplayConstantStringName(size_t stridx, const Color &color
 	if(!speaker) return;
 
 	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
-	DisplayStringName(text, color, speaker);
+	DisplayStringName(std::move(text), color, speaker);
 }
 
 //Treats the constant string as a numeric format string, otherwise like the previous method
@@ -259,11 +256,10 @@ void DisplayMessage::DisplayStringName(ieStrRef str, const Color &color, const S
 {
 	if (str == ieStrRef::INVALID) return;
 
-	String text = core->GetString(str, flags);
-	DisplayStringName(text, color, speaker);
+	DisplayStringName(core->GetString(str, flags), color, speaker);
 }
 
-void DisplayMessage::DisplayStringName(const String& text, const Color &color, const Scriptable *speaker) const
+void DisplayMessage::DisplayStringName(String text, const Color &color, const Scriptable *speaker) const
 {
 	if (!text.length() || !text.compare(L" ")) return;
 
@@ -271,7 +267,7 @@ void DisplayMessage::DisplayStringName(const String& text, const Color &color, c
 	Color speaker_color = GetSpeakerColor(name, speaker);
 
 	if (name.length() == 0) {
-		DisplayString(text, color, NULL);
+		DisplayString(std::move(text), color, NULL);
 	} else {
 		DisplayMarkupString(fmt::format(DisplayFormatName, speaker_color.Packed(), name, color.Packed(), text));
 	}
