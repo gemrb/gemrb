@@ -150,14 +150,14 @@ PyObject* PyString_FromAnimID(const char* AnimID)
 	
 PyObject* PyString_FromStringObj(const std::string& s)
 {
-	return PyString_FromString(s.c_str());
+	return PyUnicode_Decode(s.c_str(), s.length(), core->TLKEncoding.encoding.c_str(), "strict");
 }
 	
 PyObject* PyString_FromStringObj(const String& s)
 {
 	// FIXME: this is wrong, python needs to know the encoding
 	std::string mbstr = MBStringFromString(s);
-	return PyString_FromString(mbstr.c_str());
+	return PyString_FromStringObj(mbstr);
 }
 
 String* PyString_AsStringObj(PyObject* obj)
