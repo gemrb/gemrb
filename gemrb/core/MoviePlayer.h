@@ -34,7 +34,7 @@
 
 #include "GUI/TextSystem/Font.h"
 #include "GUI/Window.h"
-#include "System/String.h"
+#include "Strings/String.h"
 #include "Video/Video.h"
 
 #include <chrono>

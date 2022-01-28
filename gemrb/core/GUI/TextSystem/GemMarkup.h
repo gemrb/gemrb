@@ -20,7 +20,7 @@
 #define GEMMARKUP_H
 
 #include "TextContainer.h"
-#include "System/String.h"
+#include "Strings/String.h"
 
 #include <map>
 #include <stack>

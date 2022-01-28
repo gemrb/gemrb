@@ -27,7 +27,7 @@
 #include "globals.h"
 
 #include "System/FileStream.h"
-#include "System/String.h"
+#include "Strings/String.h"
 
 #ifdef CACHE_TLK_OVERRIDE
 #include <map>

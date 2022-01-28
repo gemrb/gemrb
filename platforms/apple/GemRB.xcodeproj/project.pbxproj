@@ -34,7 +34,6 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A2042A7919DB4A6800011F05 /* TTFImporter.so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = A29504771609721300BB22AA /* TTFImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A20574FB19994979007FF22C /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; };
-		A208210D1419712F002CD244 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEC13A8669700C6DF12 /* String.cpp */; };
 		A20821111419712F002CD244 /* MemoryStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0601395FF62006ADC12 /* MemoryStream.cpp */; };
 		A20A278B1A71E3200077077C /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20A27891A71E3200077077C /* View.cpp */; };
 		A20A278C1A71E3200077077C /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20A27891A71E3200077077C /* View.cpp */; };
@@ -98,7 +97,6 @@
 		A228D24916A86FA00053375D /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A228D24816A86FA00053375D /* libiconv.dylib */; };
 		A22A6B181994390D00488985 /* Logging.h in Headers */ = {isa = PBXBuildFile; fileRef = A22A6B151994390D00488985 /* Logging.h */; };
 		A22A6B191994390D00488985 /* SlicedStream.h in Headers */ = {isa = PBXBuildFile; fileRef = A22A6B161994390D00488985 /* SlicedStream.h */; };
-		A22A6B1A1994390D00488985 /* String.h in Headers */ = {isa = PBXBuildFile; fileRef = A22A6B171994390D00488985 /* String.h */; };
 		A22B5D611583D816007B4AA4 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5D1583D816007B4AA4 /* libFreetype2.a */; };
 		A22B5D621583D816007B4AA4 /* libPython.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5E1583D816007B4AA4 /* libPython.a */; };
 		A22B5D641583D816007B4AA4 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D601583D816007B4AA4 /* libSDL2.a */; };
@@ -145,7 +143,6 @@
 		A265ECDF13A8661600C6DF12 /* PluginLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDB13A8661600C6DF12 /* PluginLoader.cpp */; };
 		A265ECED13A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A265ECEE13A8669700C6DF12 /* SlicedStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */; };
-		A265ECEF13A8669700C6DF12 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEC13A8669700C6DF12 /* String.cpp */; };
 		A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A26ECB4623A61CDC00D3DD59 /* GLSLProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */; };
 		A26ECB4A23A6212400D3DD59 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */; };
@@ -373,10 +370,12 @@
 		A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FCE1395FF62006ADC12 /* Matching.cpp */; };
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
-		A2A05CD92797BEAA000FB625 /* StringConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CD72797BEAA000FB625 /* StringConversion.cpp */; };
-		A2A05CDA2797BEAA000FB625 /* StringConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CD82797BEAA000FB625 /* StringConversion.h */; };
-		A2A05CDD2797C1A5000FB625 /* CString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CDB2797C1A5000FB625 /* CString.cpp */; };
-		A2A05CDE2797C1A5000FB625 /* CString.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CDC2797C1A5000FB625 /* CString.h */; };
+		A2A05CE627A47E29000FB625 /* StringConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CE027A47E29000FB625 /* StringConversion.cpp */; };
+		A2A05CE727A47E29000FB625 /* CString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CE127A47E29000FB625 /* CString.cpp */; };
+		A2A05CE827A47E29000FB625 /* StringConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CE227A47E29000FB625 /* StringConversion.h */; };
+		A2A05CE927A47E29000FB625 /* String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CE327A47E29000FB625 /* String.cpp */; };
+		A2A05CEA27A47E29000FB625 /* CString.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CE427A47E29000FB625 /* CString.h */; };
+		A2A05CEB27A47E29000FB625 /* String.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CE527A47E29000FB625 /* String.h */; };
 		A2A2DE91274CCB54005842A6 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */; };
 		A2A2DE97274CCE28005842A6 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
@@ -1231,7 +1230,6 @@
 		A228D24816A86FA00053375D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
 		A22A6B151994390D00488985 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		A22A6B161994390D00488985 /* SlicedStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SlicedStream.h; sourceTree = "<group>"; };
-		A22A6B171994390D00488985 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = String.h; sourceTree = "<group>"; };
 		A22B5D5D1583D816007B4AA4 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = ios/lib/iphonesimulator/libFreetype2.a; sourceTree = "<group>"; };
 		A22B5D5E1583D816007B4AA4 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = ios/lib/iphonesimulator/libPython.a; sourceTree = "<group>"; };
 		A22B5D601583D816007B4AA4 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = ios/lib/iphonesimulator/libSDL2.a; sourceTree = "<group>"; };
@@ -1273,7 +1271,6 @@
 		A265ECDB13A8661600C6DF12 /* PluginLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PluginLoader.cpp; path = ../gemrb/core/PluginLoader.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEA13A8669700C6DF12 /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logging.cpp; path = ../../gemrb/core/System/Logging.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SlicedStream.cpp; path = ../gemrb/core/System/SlicedStream.cpp; sourceTree = SOURCE_ROOT; };
-		A265ECEC13A8669700C6DF12 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = String.cpp; path = ../../gemrb/core/System/String.cpp; sourceTree = SOURCE_ROOT; };
 		A26ECB4B23A6903700D3DD59 /* SDLTextureV.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SDLTextureV.glsl; sourceTree = "<group>"; };
 		A26ECB4C23A6903800D3DD59 /* StencilF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = StencilF.glsl; sourceTree = "<group>"; };
 		A27217011CAE2678005F3976 /* Tooltip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tooltip.cpp; sourceTree = "<group>"; };
@@ -1473,10 +1470,12 @@
 		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2A05CD72797BEAA000FB625 /* StringConversion.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringConversion.cpp; sourceTree = "<group>"; };
-		A2A05CD82797BEAA000FB625 /* StringConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringConversion.h; sourceTree = "<group>"; };
-		A2A05CDB2797C1A5000FB625 /* CString.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CString.cpp; sourceTree = "<group>"; };
-		A2A05CDC2797C1A5000FB625 /* CString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CString.h; sourceTree = "<group>"; };
+		A2A05CE027A47E29000FB625 /* StringConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringConversion.cpp; sourceTree = "<group>"; };
+		A2A05CE127A47E29000FB625 /* CString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CString.cpp; sourceTree = "<group>"; };
+		A2A05CE227A47E29000FB625 /* StringConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringConversion.h; sourceTree = "<group>"; };
+		A2A05CE327A47E29000FB625 /* String.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = String.cpp; sourceTree = "<group>"; };
+		A2A05CE427A47E29000FB625 /* CString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CString.h; sourceTree = "<group>"; };
+		A2A05CE527A47E29000FB625 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = String.h; sourceTree = "<group>"; };
 		A2A2DE87274CC871005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/homebrew/Cellar/freetype/2.11.0/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2A2DE95274CCCF1005842A6 /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
@@ -5026,6 +5025,19 @@
 			name = "Resources-iOS";
 			sourceTree = "<group>";
 		};
+		A2A05CDF27A47E29000FB625 /* Strings */ = {
+			isa = PBXGroup;
+			children = (
+				A2A05CE027A47E29000FB625 /* StringConversion.cpp */,
+				A2A05CE127A47E29000FB625 /* CString.cpp */,
+				A2A05CE227A47E29000FB625 /* StringConversion.h */,
+				A2A05CE327A47E29000FB625 /* String.cpp */,
+				A2A05CE427A47E29000FB625 /* CString.h */,
+				A2A05CE527A47E29000FB625 /* String.h */,
+			);
+			path = Strings;
+			sourceTree = "<group>";
+		};
 		A2A3A7D614A5030600F705CF /* mac */ = {
 			isa = PBXGroup;
 			children = (
@@ -5227,6 +5239,7 @@
 				A2BFA0501395FF62006ADC12 /* Store.h */,
 				A2BFA0521395FF62006ADC12 /* StoreMgr.h */,
 				A2BFA0541395FF62006ADC12 /* StringMgr.h */,
+				A2A05CDF27A47E29000FB625 /* Strings */,
 				A2BFA0561395FF62006ADC12 /* SymbolMgr.h */,
 				A2BFA0571395FF62006ADC12 /* System */,
 				A2BFA0691395FF62006ADC12 /* TableMgr.h */,
@@ -5348,8 +5361,6 @@
 		A2BFA0571395FF62006ADC12 /* System */ = {
 			isa = PBXGroup;
 			children = (
-				A2A05CDB2797C1A5000FB625 /* CString.cpp */,
-				A2A05CDC2797C1A5000FB625 /* CString.h */,
 				A2BFA05C1395FF62006ADC12 /* DataStream.cpp */,
 				A2BFA05D1395FF62006ADC12 /* DataStream.h */,
 				A2CE96891B70596100E189C4 /* FileFilters.h */,
@@ -5366,10 +5377,6 @@
 				A2BFA0611395FF62006ADC12 /* MemoryStream.h */,
 				A2E7E199266897C30064423F /* SlicedStream.cpp */,
 				A22A6B161994390D00488985 /* SlicedStream.h */,
-				A265ECEC13A8669700C6DF12 /* String.cpp */,
-				A22A6B171994390D00488985 /* String.h */,
-				A2A05CD72797BEAA000FB625 /* StringConversion.cpp */,
-				A2A05CD82797BEAA000FB625 /* StringConversion.h */,
 				A2BFA0641395FF62006ADC12 /* swab.cpp */,
 				A2BFA0651395FF62006ADC12 /* swab.h */,
 				A2BFA0661395FF62006ADC12 /* VFS.cpp */,
@@ -7879,7 +7886,6 @@
 				A2E66378139E883100310FC8 /* DisplayMessage.h in Headers */,
 				A25F91FC269CE6440045F07A /* EnumFlags.h in Headers */,
 				A2E66379139E883100310FC8 /* Effect.h in Headers */,
-				A2A05CDE2797C1A5000FB625 /* CString.h in Headers */,
 				A2111CCA1D0A49650044939E /* Timer.h in Headers */,
 				A27E5D6018106384009434E5 /* PluginLoader.h in Headers */,
 				A2E6637B139E883100310FC8 /* EffectMgr.h in Headers */,
@@ -7901,6 +7907,7 @@
 				A2E66394139E883E00310FC8 /* IniSpawn.h in Headers */,
 				A2E66396139E883E00310FC8 /* Interface.h in Headers */,
 				A2E66398139E883E00310FC8 /* Inventory.h in Headers */,
+				A2A05CEB27A47E29000FB625 /* String.h in Headers */,
 				A2E6639A139E883E00310FC8 /* Item.h in Headers */,
 				A2E6639C139E883E00310FC8 /* ItemMgr.h in Headers */,
 				A2E6639E139E883E00310FC8 /* LRUCache.h in Headers */,
@@ -7913,9 +7920,11 @@
 				A2E663AA139E883E00310FC8 /* PalettedImageMgr.h in Headers */,
 				A2E663AC139E883E00310FC8 /* Particles.h in Headers */,
 				A2E663AD139E883E00310FC8 /* PathFinder.h in Headers */,
+				A2A05CEA27A47E29000FB625 /* CString.h in Headers */,
 				A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */,
 				A2E663AF139E883E00310FC8 /* Plugin.h in Headers */,
 				A2CD07B21CE2E0AB008CE1D0 /* ScrollView.h in Headers */,
+				A2A05CE827A47E29000FB625 /* StringConversion.h in Headers */,
 				A2E663B1139E883E00310FC8 /* PluginMgr.h in Headers */,
 				A2E663B3139E883E00310FC8 /* Polygon.h in Headers */,
 				A2E663B4139E883E00310FC8 /* PolymorphCache.h in Headers */,
@@ -7924,7 +7933,6 @@
 				A2E663BA139E883E00310FC8 /* ProjectileServer.h in Headers */,
 				A2E663BC139E883E00310FC8 /* Region.h in Headers */,
 				A2E663BE139E883E00310FC8 /* Resource.h in Headers */,
-				A22A6B1A1994390D00488985 /* String.h in Headers */,
 				A22A6B191994390D00488985 /* SlicedStream.h in Headers */,
 				A2E663C0139E883E00310FC8 /* ResourceDesc.h in Headers */,
 				A2E663C2139E883E00310FC8 /* ResourceManager.h in Headers */,
@@ -7971,7 +7979,6 @@
 				A2E6640B139E885A00310FC8 /* Container.h in Headers */,
 				A2E6640D139E885A00310FC8 /* Door.h in Headers */,
 				A27217051CAE2678005F3976 /* Tooltip.h in Headers */,
-				A2A05CDA2797BEAA000FB625 /* StringConversion.h in Headers */,
 				A2E6640F139E885A00310FC8 /* InfoPoint.h in Headers */,
 				A27E5D6218106384009434E5 /* VEFObject.h in Headers */,
 				A2E66411139E885A00310FC8 /* PCStatStruct.h in Headers */,
@@ -9602,7 +9609,6 @@
 				A265ECDF13A8661600C6DF12 /* PluginLoader.cpp in Sources */,
 				A265ECED13A8669700C6DF12 /* Logging.cpp in Sources */,
 				A265ECEE13A8669700C6DF12 /* SlicedStream.cpp in Sources */,
-				A265ECEF13A8669700C6DF12 /* String.cpp in Sources */,
 				A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */,
 				A27217041CAE2678005F3976 /* Tooltip.cpp in Sources */,
 				A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */,
@@ -9639,8 +9645,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */,
-				A208210D1419712F002CD244 /* String.cpp in Sources */,
 				A2D672E11B30F40C00264D16 /* WindowManager.cpp in Sources */,
+				A2A05CE927A47E29000FB625 /* String.cpp in Sources */,
 				A20821111419712F002CD244 /* MemoryStream.cpp in Sources */,
 				A2E66350139E882900310FC8 /* Ambient.cpp in Sources */,
 				A2E66352139E882900310FC8 /* AmbientMgr.cpp in Sources */,
@@ -9668,6 +9674,7 @@
 				A25F91F8269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */,
 				A2E6638F139E883E00310FC8 /* ImageMgr.cpp in Sources */,
 				A2E66393139E883E00310FC8 /* IniSpawn.cpp in Sources */,
+				A2A05CE727A47E29000FB625 /* CString.cpp in Sources */,
 				A2E66395139E883E00310FC8 /* Interface.cpp in Sources */,
 				A2E7E1982668977F0064423F /* PluginLoader.cpp in Sources */,
 				A2E66397139E883E00310FC8 /* Inventory.cpp in Sources */,
@@ -9706,7 +9713,6 @@
 				A2D33FED24C2035A0081AC31 /* PathFinder.cpp in Sources */,
 				A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */,
 				A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */,
-				A2A05CDD2797C1A5000FB625 /* CString.cpp in Sources */,
 				A2E663EA139E884B00310FC8 /* TileOverlay.cpp in Sources */,
 				A2D672DD1B30F24400264D16 /* GUIFactory.cpp in Sources */,
 				A2E663EF139E884B00310FC8 /* Variables.cpp in Sources */,
@@ -9732,6 +9738,7 @@
 				A2E66423139E886100310FC8 /* Progressbar.cpp in Sources */,
 				A2E66425139E886100310FC8 /* ScrollBar.cpp in Sources */,
 				A2E66427139E886100310FC8 /* Slider.cpp in Sources */,
+				A2A05CE627A47E29000FB625 /* StringConversion.cpp in Sources */,
 				A2E66429139E886100310FC8 /* TextArea.cpp in Sources */,
 				A2E6642B139E886100310FC8 /* TextEdit.cpp in Sources */,
 				A2E6642D139E886100310FC8 /* Window.cpp in Sources */,
@@ -9746,7 +9753,6 @@
 				A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */,
 				A2DE329914EB071200117503 /* Logger.cpp in Sources */,
 				A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */,
-				A2A05CD92797BEAA000FB625 /* StringConversion.cpp in Sources */,
 				A27E5D6118106384009434E5 /* VEFObject.cpp in Sources */,
 				A2969F0F168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
 				A2E27EF716EEA7B00079E104 /* InterfaceConfig.cpp in Sources */,

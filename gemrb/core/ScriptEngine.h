@@ -22,7 +22,7 @@
 #define SCRIPTENGINE_H
 
 #include "Plugin.h"
-#include "System/CString.h"
+#include "Strings/CString.h"
 
 #include <cstdint>
 #include <map>

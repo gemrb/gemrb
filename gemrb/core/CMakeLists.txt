@@ -98,6 +98,9 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/InfoPoint.cpp
 	Scriptable/Scriptable.cpp
 	Scriptable/PCStatStruct.cpp
+	Strings/CString.cpp
+	Strings/String.cpp
+	Strings/StringConversion.cpp
 	System/DataStream.cpp
 	System/FileStream.cpp
 	System/MemoryStream.cpp
@@ -105,9 +108,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/Logger/Stdio.cpp
 	System/Logging.cpp
 	System/SlicedStream.cpp
-	System/CString.cpp
-	System/String.cpp
-	System/StringConversion.cpp
 	System/swab.cpp
 	System/VFS.cpp
 	Video/Pixels.cpp

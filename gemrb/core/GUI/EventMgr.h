@@ -34,7 +34,7 @@
 
 #include "Callback.h"
 #include "Region.h"
-#include "System/String.h"
+#include "Strings/String.h"
 
 #include <bitset>
 #include <climits>
