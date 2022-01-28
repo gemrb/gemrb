@@ -39,10 +39,8 @@
 namespace GemRB {
 
 #ifdef WIN32
-#define TCHAR_FORMAT "%ls"
 using LibHandle = HMODULE;
 #else
-#define TCHAR_FORMAT "%s"
 using LibHandle = void*;
 #endif
 
