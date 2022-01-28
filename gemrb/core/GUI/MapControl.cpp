@@ -292,6 +292,8 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 			if (LinkedLabel) {
 				LinkedLabel->SetText(mn->text);
 			}
+		} else if (LinkedLabel) {
+			LinkedLabel->SetText(L"");
 		}
 	}
 
