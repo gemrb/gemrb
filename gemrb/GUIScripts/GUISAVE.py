@@ -200,45 +200,42 @@ def OpenConfirmWindow (btn):
 	Pos = GemRB.GetVar ("TopIndex") + btn.Value
 	ConfirmWindow = GemRB.LoadWindow (1)
 
-	# Slot name
+	AreaPreview = ConfirmWindow.GetControl (0)
 	if Pos < len(Games):
 		Slotname = Games[Pos].GetName()
 		save_strref = strs['overwrite']
+
+		if GameCheck.IsBG2 ():
+			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
+			GameDate = GemRB.GetString (str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
+		else:
+			GameDate = Games[Pos].GetGameDate ()
+
+		if AreaPreview:
+			AreaPreview.SetSprite2D (Games[Pos].GetPreview())
 	else:
 		Slotname = ""
+		GameDate = ""
 		save_strref = strs['save']
+		if AreaPreview:
+			AreaPreview.SetPicture (None)
 
 	NameField = ConfirmWindow.GetControl (ctrl_offset[7])
 	NameField.SetText (Slotname)
 	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, EditChange)
 
-	#game hours (should be generated from game)
-	if Pos < len(Games):
-		if GameCheck.IsBG2 ():
-			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
-			Slotname = GemRB.GetString (str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
-		else:
-			Slotname = Games[Pos].GetGameDate ()
-	else:
-		Slotname = ""
 	Label = ConfirmWindow.GetControl (ctrl_offset[8])
-	Label.SetText (Slotname)
+	Label.SetText (GameDate)
 
-	# Areapreview
-	if not GameCheck.IsIWD2 ():
-		Button = ConfirmWindow.GetControl (0)
+	# PC portraits
+	for j in range(min(6, MAX_PARTY_SIZE)):
+		Portrait = ConfirmWindow.GetControl (ctrl_offset[9] + j)
+		if not Portrait:
+			continue
 		if Pos < len(Games):
-			Button.SetSprite2D (Games[Pos].GetPreview())
+			Portrait.SetSprite2D (Games[Pos].GetPortrait(j))
 		else:
-			Button.SetPicture (None)
-
-		# PC portraits
-		for j in range(min(6, MAX_PARTY_SIZE)):
-			Button = ConfirmWindow.GetControl (ctrl_offset[9]+j)
-			if Pos < len(Games):
-				Button.SetSprite2D(Games[Pos].GetPortrait(j))
-			else:
-				Button.SetPicture(None)
+			Portrait.SetPicture (None)
 
 	# Save/Overwrite
 	SaveButton = ConfirmWindow.GetControl (ctrl_offset[10])
