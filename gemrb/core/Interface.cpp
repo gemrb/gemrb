@@ -1081,8 +1081,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 		return GEM_ERROR;
 	}
 
-	for (size_t i = 0; i < config.ModPath.size(); ++i) {
-		gamedata->AddSource(config.ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	for (const auto& modPath : config.ModPath) {
+		gamedata->AddSource(modPath.c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
 	PathJoin(path, config.GemRBOverridePath, "override", config.GameType, nullptr);

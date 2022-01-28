@@ -132,7 +132,9 @@ struct DMGOpcodeInfo {
 class GEM_EXPORT ITMExtHeader {
 public:
 	ITMExtHeader() = default;
+	ITMExtHeader(const ITMExtHeader&) = delete;
 	~ITMExtHeader();
+	ITMExtHeader& operator=(const ITMExtHeader&) = delete;
 	ieByte AttackType = 0;
 	ieByte IDReq = 0;
 	ieByte Location = 0;
@@ -174,7 +176,9 @@ public:
 class GEM_EXPORT Item {
 public:
 	Item() = default;
+	Item(const Item&) = delete;
 	~Item();
+	Item& operator=(const Item&) = delete;
 
 	std::vector<ITMExtHeader> ext_headers;
 	std::vector<Effect*> equipping_features;
@@ -290,7 +294,6 @@ public:
 	unsigned int GetCastingDistance(int header) const;
 	// returns  a vector with details about any extended headers containing fx_damage with a 100% probability
 	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(const ITMExtHeader *header) const;
-private:
 };
 
 }

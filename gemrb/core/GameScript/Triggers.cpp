@@ -3138,7 +3138,7 @@ int GameScript::CharName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	
-	String* str = StringFromCString(parameters->string0Parameter);
+	const String* str = StringFromCString(parameters->string0Parameter);
 	if (str && actor->GetName(0) == *str) {
 		return 1;
 	}

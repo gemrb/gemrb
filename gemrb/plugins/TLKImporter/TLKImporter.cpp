@@ -291,8 +291,8 @@ String TLKImporter::ResolveTags(const String& source)
 		auto srcch = source[i];
 		if (srcch == L'<') {
 			i = mystrncpy(Token, i + 1, MAX_VARIABLE_LENGTH, '>');
-			String str = BuiltinToken(Token);
-			if (str.empty()) {
+			String resolvedToken = BuiltinToken(Token);
+			if (resolvedToken.empty()) {
 				int TokenLength = core->GetTokenDictionary()->GetValueLength(Token);
 				if (TokenLength) {
 					char* tokVal = new char[TokenLength + 1];
@@ -304,7 +304,7 @@ String TLKImporter::ResolveTags(const String& source)
 					delete[] tokVal;
 				}
 			} else {
-				dest.append(str);
+				dest.append(resolvedToken);
 			}
 		} else if (srcch == L'%' && i + 1 < strLen - 1) {
 			// also resolve format strings
@@ -312,7 +312,6 @@ String TLKImporter::ResolveTags(const String& source)
 			auto nextch = source[i + 1];
 			// we are going to only work with %d
 			// the originals dont seem to use anything else so we will play it safe
-			//if (isspace(nextch) || ispunct(nextch)) {
 			if (nextch != L'd') {
 				dest.push_back(srcch);
 			} else {

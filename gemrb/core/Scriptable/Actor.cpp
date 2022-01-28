@@ -4908,7 +4908,7 @@ std::string Actor::dump() const
 	buffer.append(spellbook.dump());
 	buffer.append(fxqueue.dump());
 	
-	return buffer;;
+	return buffer;
 }
 
 const char* Actor::GetActorNameByID(ieDword ID) const

@@ -856,10 +856,8 @@ int GameData::CheckSpecialSpell(const ResRef& resRef, const Actor* actor)
 	}
 
 	// if actor is silenced, and spell cannot be cast in silence, disable it
-	if (actor->GetStat(IE_STATE_ID) & STATE_SILENCED ) {
-		if (!(sp & SpecialSpell::Silence)) {
-			return SpecialSpell::Silence;
-		}
+	if (!(sp & SpecialSpell::Silence) && actor->GetStat(IE_STATE_ID) & STATE_SILENCED) {
+		return SpecialSpell::Silence;
 	}
 
 	// disable spells causing surges to be cast while in a surge (prevents nesting)

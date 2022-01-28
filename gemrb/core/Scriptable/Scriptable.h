@@ -407,7 +407,7 @@ public:
 	bool TimerActive(ieDword ID);
 	bool TimerExpired(ieDword ID);
 	void StartTimer(ieDword ID, ieDword expiration);
-	String GetName() const;
+	virtual String GetName() const;
 	bool AuraPolluted();
 private:
 	/* used internally to handle start of spellcasting */
@@ -418,7 +418,7 @@ private:
 	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster);
 	void ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int level);
 	void ResetCastingState(Actor* caster);
-	void DisplaySpellCastMessage(ieDword tgt, const Spell *spl);
+	void DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const;
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

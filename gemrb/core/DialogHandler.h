@@ -50,7 +50,7 @@ public:
 private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetLocalActorByGlobalID(ieDword ID);
-	void UpdateJournalForTransition(const DialogTransition *tr);
+	void UpdateJournalForTransition(const DialogTransition* tr) const;
 
 	DialogState* ds = nullptr;
 	Dialog* dlg = nullptr;

@@ -76,7 +76,9 @@ class Projectile;
 class GEM_EXPORT SPLExtHeader {
 public:
 	SPLExtHeader() = default;
+	SPLExtHeader(const SPLExtHeader&) = delete;
 	~SPLExtHeader();
+	SPLExtHeader& operator=(const SPLExtHeader&) = delete;
 
 	ieByte SpellForm = 0;
 	ieByte Hostile = 0;

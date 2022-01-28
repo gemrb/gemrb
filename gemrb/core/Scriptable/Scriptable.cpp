@@ -880,7 +880,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 	gamedata->FreeSpell(spl, spellResRef, false);
 }
 
-void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
+void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
 {
 	if (!core->HasFeedback(FT_CASTING)) return;
 
@@ -1591,8 +1591,8 @@ String Scriptable::GetName() const
 		case ST_AREA:		return L"Area";
 		case ST_GLOBAL:		return L"Global";
 		case ST_ACTOR:		return As<const Actor>()->GetName(1);
+		default:	return L"NONE";
 	}
-	return L"NONE";
 }
 
 // aura pollution happens on cast or item use
