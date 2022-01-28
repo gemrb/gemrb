@@ -3786,13 +3786,13 @@ ieStrRef Actor::GetVerbalConstant(size_t index) const
 
 ieStrRef Actor::GetVerbalConstant(int start, int count) const
 {
-	while (count > 0 && GetVerbalConstant(start+count-1) == (ieStrRef) -1) {
+	while (count > 0 && GetVerbalConstant(start+count-1) == ieStrRef::INVALID) {
 		count--;
 	}
 	if (count > 0) {
 		return GetVerbalConstant(start+RAND(0, count-1));
 	}
-	return (ieStrRef) -1;
+	return ieStrRef::INVALID;
 }
 
 bool Actor::VerbalConstant(int start, int count, int flags) const
@@ -4192,7 +4192,7 @@ void Actor::PlayExistenceSounds()
 	if (nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
 		//setup as an ambient
 		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
-		if (strref == (ieStrRef) -1) {
+		if (strref == ieStrRef::INVALID) {
 			nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
 			return;
 		}
