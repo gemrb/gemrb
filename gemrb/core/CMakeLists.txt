@@ -131,8 +131,8 @@ ENDIF()
 IF(WIN32)
 	SET(gemrb_core_LIB_SRCS
 		${gemrb_core_LIB_SRCS}
-		CodepageToIconv.cpp
-		CodepageToIconvMap.cpp
+		../../platforms/windows/CodepageToIconv.cpp
+		../../platforms/windows/CodepageToIconvMap.cpp
 	)
 	INCLUDE_DIRECTORIES(${ICONV_INCLUDE_DIR})
 ENDIF()

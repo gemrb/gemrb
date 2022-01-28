@@ -475,7 +475,7 @@ if (STATIC_LINK)
 	endif (NOT WIN32)
 endif (STATIC_LINK)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} gemrb/includes gemrb/core)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} gemrb/includes gemrb/core platforms/${CMAKE_SYSTEM_NAME})
 
 # generate config.h
 INCLUDE (config)

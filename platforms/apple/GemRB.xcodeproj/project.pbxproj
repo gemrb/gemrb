@@ -677,11 +677,8 @@
 		A2EC8067146056B40033754A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8066146056B40033754A /* CoreGraphics.framework */; };
 		A2F0505613ABB82D0023B7EB /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A2F0505B13ABB84C0023B7EB /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
-		A2F5F069246102D70073802C /* CodepageToIconv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F062246102D60073802C /* CodepageToIconv.cpp */; };
-		A2F5F06A246102D70073802C /* CodepageToIconv.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F5F063246102D60073802C /* CodepageToIconv.h */; };
 		A2F5F06B246102D70073802C /* RNG.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F5F064246102D70073802C /* RNG.h */; };
 		A2F5F06C246102D70073802C /* RNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F065246102D70073802C /* RNG.cpp */; };
-		A2F5F06E246102D70073802C /* CodepageToIconvMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */; };
 		A2F5F070246103C30073802C /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2F7538A266A1DA800C3A764 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */; };
 		A2F7538B266A1DA800C3A764 /* SDL2_mixer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -3898,11 +3895,8 @@
 		A2EC8066146056B40033754A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		A2EDA0451F99B39600F0866A /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		A2F0505113ABB80B0023B7EB /* SAVImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SAVImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2F5F062246102D60073802C /* CodepageToIconv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CodepageToIconv.cpp; sourceTree = "<group>"; };
-		A2F5F063246102D60073802C /* CodepageToIconv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CodepageToIconv.h; sourceTree = "<group>"; };
 		A2F5F064246102D70073802C /* RNG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNG.h; sourceTree = "<group>"; };
 		A2F5F065246102D70073802C /* RNG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RNG.cpp; sourceTree = "<group>"; };
-		A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CodepageToIconvMap.cpp; sourceTree = "<group>"; };
 		A2F5F06F246103B90073802C /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
 		A2F94A1426C73E2D00928E46 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = ../../../../../../Library/Frameworks/Python.framework; sourceTree = "<group>"; };
@@ -5113,9 +5107,6 @@
 				A2BF9FA51395FF61006ADC12 /* Callback.h */,
 				A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */,
 				A2BF9FA71395FF61006ADC12 /* CharAnimations.h */,
-				A2F5F062246102D60073802C /* CodepageToIconv.cpp */,
-				A2F5F063246102D60073802C /* CodepageToIconv.h */,
-				A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */,
 				A2BF9FAA1395FF61006ADC12 /* Compressor.h */,
 				A2BF9FAD1395FF61006ADC12 /* Core.cpp */,
 				A2BF9FAE1395FF61006ADC12 /* damages.h */,
@@ -7981,7 +7972,6 @@
 				A2E6640D139E885A00310FC8 /* Door.h in Headers */,
 				A27217051CAE2678005F3976 /* Tooltip.h in Headers */,
 				A2A05CDA2797BEAA000FB625 /* StringConversion.h in Headers */,
-				A2F5F06A246102D70073802C /* CodepageToIconv.h in Headers */,
 				A2E6640F139E885A00310FC8 /* InfoPoint.h in Headers */,
 				A27E5D6218106384009434E5 /* VEFObject.h in Headers */,
 				A2E66411139E885A00310FC8 /* PCStatStruct.h in Headers */,
@@ -9658,7 +9648,6 @@
 				A2E66356139E882900310FC8 /* AnimationFactory.cpp in Sources */,
 				A2CD07B11CE2E0AB008CE1D0 /* ScrollView.cpp in Sources */,
 				A2E6635D139E883100310FC8 /* Audio.cpp in Sources */,
-				A2F5F069246102D70073802C /* CodepageToIconv.cpp in Sources */,
 				A2E66361139E883100310FC8 /* Cache.cpp in Sources */,
 				A2E66363139E883100310FC8 /* Calendar.cpp in Sources */,
 				A2E66367139E883100310FC8 /* CharAnimations.cpp in Sources */,
@@ -9732,7 +9721,6 @@
 				A2E6640E139E885A00310FC8 /* InfoPoint.cpp in Sources */,
 				A20A278B1A71E3200077077C /* View.cpp in Sources */,
 				A2E66410139E885A00310FC8 /* PCStatStruct.cpp in Sources */,
-				A2F5F06E246102D70073802C /* CodepageToIconvMap.cpp in Sources */,
 				A2E66412139E885A00310FC8 /* Scriptable.cpp in Sources */,
 				A2E66414139E886100310FC8 /* Button.cpp in Sources */,
 				A2E66416139E886100310FC8 /* Console.cpp in Sources */,
