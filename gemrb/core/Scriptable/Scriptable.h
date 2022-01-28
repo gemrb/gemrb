@@ -407,7 +407,7 @@ public:
 	bool TimerActive(ieDword ID);
 	bool TimerExpired(ieDword ID);
 	void StartTimer(ieDword ID, ieDword expiration);
-	virtual String GetName() const;
+	String GetName() const;
 	bool AuraPolluted();
 private:
 	/* used internally to handle start of spellcasting */
