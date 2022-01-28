@@ -41,11 +41,16 @@ namespace GemRB {
 
 struct StringBlock {
 	const String text;
-	ResRef Sound;
+	const ResRef Sound;
 
-	StringBlock() = default;
-	StringBlock(String text, const ResRef& soundRef)
+	StringBlock() noexcept
+	: text() {}
+
+	StringBlock(String text, const ResRef& soundRef) noexcept
 	: text(std::move(text)), Sound(soundRef) {}
+	
+	StringBlock(StringBlock&&) noexcept = default;
+	StringBlock(const StringBlock&) = delete;
 };
 
 enum class STRING_FLAGS : uint32_t {
