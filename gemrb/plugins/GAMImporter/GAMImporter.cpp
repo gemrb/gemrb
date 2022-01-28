@@ -997,7 +997,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
 		stream->WriteVariable(ac->GetNameAsVariable(1));
 	} else {
-		std::string tmpstr = MBStringFromString(core->GetString(ac->LongStrRef, STRING_FLAGS::STRREFOFF));
+		std::string tmpstr = core->GetMBString(ac->LongStrRef, STRING_FLAGS::STRREFOFF);
 		size_t len = std::min<size_t>(tmpstr.length(), 32);
 		stream->Write(tmpstr.data(), len);
 		if (len < 32) stream->WriteFilling(32 - len);
