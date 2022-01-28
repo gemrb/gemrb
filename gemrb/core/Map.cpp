@@ -2987,7 +2987,7 @@ std::string Map::dump(bool show_actors) const
 			}
 		}
 	}
-	return buffer;;
+	return buffer;
 }
 
 bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
