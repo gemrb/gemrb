@@ -30,7 +30,7 @@
 
 #include "Effect.h"
 #include "Plugin.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

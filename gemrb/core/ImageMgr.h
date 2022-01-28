@@ -25,7 +25,7 @@
 
 #include "Resource.h"
 #include "Sprite2D.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

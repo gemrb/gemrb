@@ -40,7 +40,7 @@
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "Video/Pixels.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 #include "MapReverb.h"
 
 #include <algorithm>

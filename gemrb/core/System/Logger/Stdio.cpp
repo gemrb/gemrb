@@ -17,7 +17,7 @@
  */
 
 #include "System/Logger/Stdio.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 #include <cstdio>
 

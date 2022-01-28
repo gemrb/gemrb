@@ -18,7 +18,7 @@
  *
  */
 
-#include "System/DataStream.h"
+#include "DataStream.h"
 
 #include "errors.h"
 #include "Resource.h"

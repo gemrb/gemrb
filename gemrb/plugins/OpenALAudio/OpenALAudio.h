@@ -30,7 +30,7 @@
 #include "LRUCache.h"
 #include "MusicMgr.h"
 #include "SoundMgr.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 #include "MapReverb.h"
 
 #include <mutex>

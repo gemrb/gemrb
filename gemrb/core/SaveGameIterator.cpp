@@ -33,7 +33,7 @@
 #include "TableMgr.h"
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 #ifndef R_OK
 #define R_OK 04

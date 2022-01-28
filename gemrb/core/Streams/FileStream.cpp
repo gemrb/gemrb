@@ -18,7 +18,7 @@
  *
  */
 
-#include "System/FileStream.h"
+#include "FileStream.h"
 
 #include "Interface.h"
 

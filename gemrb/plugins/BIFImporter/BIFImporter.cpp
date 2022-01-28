@@ -24,10 +24,10 @@
 #include "FileCache.h"
 #include "Interface.h"
 #include "PluginMgr.h"
-#include "System/SlicedStream.h"
-#include "System/FileStream.h"
+#include "Streams/SlicedStream.h"
+#include "Streams/FileStream.h"
 #if defined(SUPPORTS_MEMSTREAM)
-#include "System/MappedFileMemoryStream.h"
+#include "Streams/MappedFileMemoryStream.h"
 #endif
 
 using namespace GemRB;

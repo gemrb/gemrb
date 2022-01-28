@@ -22,7 +22,7 @@
 
 #include "InterfaceConfig.h"
 
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 #include "System/VFS.h"
 
 namespace GemRB {

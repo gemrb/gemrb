@@ -30,7 +30,7 @@
 
 #include "Plugin.h"
 #include "Resource.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

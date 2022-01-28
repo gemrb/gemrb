@@ -18,32 +18,28 @@
  *
  */
 
-#ifndef SLICEDSTREAM_H
-#define SLICEDSTREAM_H
+#ifndef MEMORYSTREAM_H
+#define MEMORYSTREAM_H
 
-#include "System/DataStream.h"
+#include "DataStream.h"
 
 #include "exports.h"
 
 namespace GemRB {
 
-class GEM_EXPORT SlicedStream : public DataStream
+class GEM_EXPORT MemoryStream : public DataStream
 {
-private:
-//	bool autoFree;
-	strpos_t startpos;
-	DataStream* str;
+protected:
+	char *data;
 public:
-	SlicedStream(const DataStream* cfs, strpos_t startPos, strpos_t streamSize);
-	~SlicedStream() override;
+	MemoryStream(const char *name, void* data, strpos_t size);
+	~MemoryStream() override;
 	DataStream* Clone() const noexcept override;
 
 	strret_t Read(void* dest, strpos_t length) override;
 	strret_t Write(const void* src, strpos_t length) override;
-	stroff_t Seek(stroff_t pos, strpos_t startpos) override;
+	strret_t Seek(stroff_t pos, strpos_t startpos) override;
 };
-
-GEM_EXPORT DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool preservepos = false);
 
 }
 

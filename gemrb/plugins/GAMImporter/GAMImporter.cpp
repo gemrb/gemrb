@@ -29,7 +29,7 @@
 #include "PluginMgr.h"
 #include "TableMgr.h"
 #include "Scriptable/Actor.h"
-#include "System/SlicedStream.h"
+#include "Streams/SlicedStream.h"
 
 #include <cassert>
 

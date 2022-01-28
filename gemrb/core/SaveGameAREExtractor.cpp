@@ -17,7 +17,7 @@
  */
 #include "Interface.h"
 #include "FileCache.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 #include "SaveGameAREExtractor.h"
 
 namespace GemRB {

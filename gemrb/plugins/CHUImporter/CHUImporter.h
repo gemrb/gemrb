@@ -23,7 +23,7 @@
 
 #include "GUI/GUIFactory.h"
 
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

@@ -25,7 +25,7 @@
 #include "general.h"
 #include "unpacker.h"
 
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 #include <cstdio>
 #include <cstring>

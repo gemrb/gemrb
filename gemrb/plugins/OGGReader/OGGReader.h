@@ -20,7 +20,7 @@
 #define OGGREADER_H
 
 #include "SoundMgr.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 #include <cstdio>
 #include <cstdlib>

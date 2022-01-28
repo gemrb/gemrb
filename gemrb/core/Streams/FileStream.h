@@ -28,7 +28,7 @@
 #ifndef FILESTREAM_H
 #define FILESTREAM_H
 
-#include "System/DataStream.h"
+#include "DataStream.h"
 
 #include "exports.h"
 #include "globals.h"

@@ -43,8 +43,8 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
-#include "System/FileStream.h"
-#include "System/SlicedStream.h"
+#include "Streams/FileStream.h"
+#include "Streams/SlicedStream.h"
 
 #include <cstdlib>
 

@@ -17,7 +17,7 @@
  */
 
 #include "System/Logging.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 #include "System/Logger/Stdio.h"
 
 #include "Interface.h"

@@ -18,9 +18,9 @@
  *
  */
 
-#include "System/SlicedStream.h"
+#include "SlicedStream.h"
 
-#include "System/MemoryStream.h"
+#include "MemoryStream.h"
 
 #include "errors.h"
 

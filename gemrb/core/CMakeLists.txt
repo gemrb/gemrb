@@ -98,16 +98,16 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/InfoPoint.cpp
 	Scriptable/Scriptable.cpp
 	Scriptable/PCStatStruct.cpp
+	Streams/DataStream.cpp
+	Streams/FileStream.cpp
+	Streams/MemoryStream.cpp
+	Streams/SlicedStream.cpp
 	Strings/CString.cpp
 	Strings/String.cpp
 	Strings/StringConversion.cpp
-	System/DataStream.cpp
-	System/FileStream.cpp
-	System/MemoryStream.cpp
 	System/Logger.cpp
 	System/Logger/Stdio.cpp
 	System/Logging.cpp
-	System/SlicedStream.cpp
 	System/swab.cpp
 	System/VFS.cpp
 	Video/Pixels.cpp
@@ -117,7 +117,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 IF(SUPPORTS_MEMSTREAM)
 	SET(gemrb_core_LIB_SRCS
 		${gemrb_core_LIB_SRCS}
-		System/MappedFileMemoryStream.cpp
+		Streams/MappedFileMemoryStream.cpp
 	)
 ENDIF()
 

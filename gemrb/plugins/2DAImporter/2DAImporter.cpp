@@ -21,7 +21,7 @@
 #include "2DAImporter.h"
 
 #include "Interface.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 using namespace GemRB;
 

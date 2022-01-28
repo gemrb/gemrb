@@ -23,7 +23,7 @@
 
 #include "Plugin.h"
 #include "TileMap.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

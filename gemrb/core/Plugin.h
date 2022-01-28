@@ -32,7 +32,7 @@
 #include "TypeID.h"
 
 #include "FileCache.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 #include <memory>
 #include <stdexcept>
