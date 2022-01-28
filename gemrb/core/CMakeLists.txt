@@ -30,6 +30,9 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Item.cpp
 	ItemMgr.cpp
 	KeyMap.cpp
+	Logging/Logger.cpp
+	Logging/Loggers/Stdio.cpp
+	Logging/Logging.cpp
 	LRUCache.cpp
 	Map.cpp
 	MapReverb.cpp
@@ -105,9 +108,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Strings/CString.cpp
 	Strings/String.cpp
 	Strings/StringConversion.cpp
-	System/Logger.cpp
-	System/Logger/Stdio.cpp
-	System/Logging.cpp
 	System/swab.cpp
 	System/VFS.cpp
 	Video/Pixels.cpp

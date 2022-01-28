@@ -22,7 +22,7 @@
 
 #include "ie_types.h"
 #include "Interface.h"
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

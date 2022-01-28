@@ -21,7 +21,7 @@
 #include "Pixels.h"
 
 #include "RLE.h"
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

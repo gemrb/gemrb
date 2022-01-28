@@ -25,7 +25,7 @@
 // Copyright (c) 2009 Daniel Verkamp (daniel@drv.nu) 
 
 #include "GetBitContext.h"
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 //don't return more than 25 bits this way
 unsigned int GetBitContext::get_bits(int n) {

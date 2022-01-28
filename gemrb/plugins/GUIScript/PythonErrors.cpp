@@ -18,7 +18,7 @@
 
 #include "PythonErrors.h"
 
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

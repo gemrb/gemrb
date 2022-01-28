@@ -19,7 +19,7 @@
 #ifndef LOGGER_STDIO_H
 #define LOGGER_STDIO_H
 
-#include "System/Logger.h" // for log_color
+#include "Logging/Logger.h" // for log_color
 
 namespace GemRB {
 

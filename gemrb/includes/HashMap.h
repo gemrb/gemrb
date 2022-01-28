@@ -25,7 +25,7 @@
 #include <cstring>
 #include <deque>
 
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

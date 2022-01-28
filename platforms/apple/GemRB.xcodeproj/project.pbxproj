@@ -94,7 +94,6 @@
 		A226F44B13A11AC3009CE75E /* WMPImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8781139F0A7D0002DC13 /* WMPImporter.cpp */; };
 		A226F44C13A11AC8009CE75E /* ZLibManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8786139F0A7D0002DC13 /* ZLibManager.cpp */; };
 		A228D24916A86FA00053375D /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A228D24816A86FA00053375D /* libiconv.dylib */; };
-		A22A6B181994390D00488985 /* Logging.h in Headers */ = {isa = PBXBuildFile; fileRef = A22A6B151994390D00488985 /* Logging.h */; };
 		A22B5D611583D816007B4AA4 /* libFreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5D1583D816007B4AA4 /* libFreetype2.a */; };
 		A22B5D621583D816007B4AA4 /* libPython.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D5E1583D816007B4AA4 /* libPython.a */; };
 		A22B5D641583D816007B4AA4 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A22B5D601583D816007B4AA4 /* libSDL2.a */; };
@@ -137,9 +136,7 @@
 		A265ECDD13A8661600C6DF12 /* IndexedArchive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */; };
 		A265ECDE13A8661600C6DF12 /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDA13A8661600C6DF12 /* KeyMap.cpp */; };
 		A265ECDF13A8661600C6DF12 /* PluginLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECDB13A8661600C6DF12 /* PluginLoader.cpp */; };
-		A265ECED13A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A265ECEE13A8669700C6DF12 /* SlicedStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */; };
-		A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A265ECEA13A8669700C6DF12 /* Logging.cpp */; };
 		A26ECB4623A61CDC00D3DD59 /* GLSLProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */; };
 		A26ECB4A23A6212400D3DD59 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */; };
 		A27217031CAE2678005F3976 /* Tooltip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27217011CAE2678005F3976 /* Tooltip.cpp */; };
@@ -276,9 +273,6 @@
 		A298DD1614EB4EDE00F59F56 /* SDL12Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */; };
 		A298DD1914EB4EEB00F59F56 /* SDL20Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */; };
 		A298DD1A14EB4EEB00F59F56 /* SDL20Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */; };
-		A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */ = {isa = PBXBuildFile; fileRef = A298DD1B14EB61C100F59F56 /* Stdio.h */; };
-		A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
-		A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
 		A29BF81313A03C2600C812DD /* AREImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86A8139F0A7D0002DC13 /* AREImporter.cpp */; };
 		A29BF85213A0420300C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A29BF85513A0420A00C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -379,6 +373,12 @@
 		A2A05CFE27A48093000FB625 /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CF427A48093000FB625 /* FileStream.h */; };
 		A2A05CFF27A48093000FB625 /* DataStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CF527A48093000FB625 /* DataStream.cpp */; };
 		A2A05D0027A48093000FB625 /* MappedFileMemoryStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CF627A48093000FB625 /* MappedFileMemoryStream.cpp */; };
+		A2A05D0927A4826C000FB625 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05D0327A4826C000FB625 /* Stdio.cpp */; };
+		A2A05D0A27A4826C000FB625 /* Stdio.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05D0427A4826C000FB625 /* Stdio.h */; };
+		A2A05D0B27A4826C000FB625 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05D0527A4826C000FB625 /* Logging.cpp */; };
+		A2A05D0C27A4826C000FB625 /* Logging.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05D0627A4826C000FB625 /* Logging.h */; };
+		A2A05D0D27A4826C000FB625 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05D0727A4826C000FB625 /* Logger.cpp */; };
+		A2A05D0E27A4826C000FB625 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05D0827A4826C000FB625 /* Logger.h */; };
 		A2A2DE91274CCB54005842A6 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */; };
 		A2A2DE97274CCE28005842A6 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
@@ -420,9 +420,6 @@
 		A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D672E01B30F40C00264D16 /* WindowManager.h */; };
 		A2D72B191B671329009F4D33 /* SpriteSheet.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D72B181B671329009F4D33 /* SpriteSheet.h */; };
 		A2DBE468186C862F00B39AF8 /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
-		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
-		A2DE329A14EB071200117503 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DE329814EB071200117503 /* Logger.h */; };
-		A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
 		A2DE880918106615007B8CC5 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2DE880818106615007B8CC5 /* libbz2.dylib */; };
 		A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2E1583014D1D8DA0044F3C5 /* GEM_AppDelegate.mm */; };
 		A2E27EF716EEA7B00079E104 /* InterfaceConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E27EF516EEA7B00079E104 /* InterfaceConfig.cpp */; };
@@ -1224,7 +1221,6 @@
 		A218A75114A8F3DB001142CF /* gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = gemrb.icns; path = ../../artwork/gemrb.icns; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
 		A228D24816A86FA00053375D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
-		A22A6B151994390D00488985 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		A22B5D5D1583D816007B4AA4 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = ios/lib/iphonesimulator/libFreetype2.a; sourceTree = "<group>"; };
 		A22B5D5E1583D816007B4AA4 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = ios/lib/iphonesimulator/libPython.a; sourceTree = "<group>"; };
 		A22B5D601583D816007B4AA4 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = ios/lib/iphonesimulator/libSDL2.a; sourceTree = "<group>"; };
@@ -1262,7 +1258,6 @@
 		A265ECD913A8661600C6DF12 /* IndexedArchive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IndexedArchive.cpp; path = ../gemrb/core/IndexedArchive.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECDA13A8661600C6DF12 /* KeyMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KeyMap.cpp; path = ../gemrb/core/KeyMap.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECDB13A8661600C6DF12 /* PluginLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PluginLoader.cpp; path = ../gemrb/core/PluginLoader.cpp; sourceTree = SOURCE_ROOT; };
-		A265ECEA13A8669700C6DF12 /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logging.cpp; path = ../../gemrb/core/System/Logging.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SlicedStream.cpp; path = ../gemrb/core/System/SlicedStream.cpp; sourceTree = SOURCE_ROOT; };
 		A26ECB4B23A6903700D3DD59 /* SDLTextureV.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SDLTextureV.glsl; sourceTree = "<group>"; };
 		A26ECB4C23A6903800D3DD59 /* StencilF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = StencilF.glsl; sourceTree = "<group>"; };
@@ -1459,8 +1454,6 @@
 		A298DD1414EB4EDE00F59F56 /* SDL12Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL12Video.h; sourceTree = "<group>"; };
 		A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL20Video.cpp; sourceTree = "<group>"; };
 		A298DD1814EB4EEB00F59F56 /* SDL20Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL20Video.h; sourceTree = "<group>"; };
-		A298DD1B14EB61C100F59F56 /* Stdio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stdio.h; sourceTree = "<group>"; };
-		A298DD2114EB61D300F59F56 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2A05CE027A47E29000FB625 /* StringConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringConversion.cpp; sourceTree = "<group>"; };
@@ -1479,6 +1472,12 @@
 		A2A05CF427A48093000FB625 /* FileStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileStream.h; sourceTree = "<group>"; };
 		A2A05CF527A48093000FB625 /* DataStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataStream.cpp; sourceTree = "<group>"; };
 		A2A05CF627A48093000FB625 /* MappedFileMemoryStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MappedFileMemoryStream.cpp; sourceTree = "<group>"; };
+		A2A05D0327A4826C000FB625 /* Stdio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stdio.cpp; sourceTree = "<group>"; };
+		A2A05D0427A4826C000FB625 /* Stdio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stdio.h; sourceTree = "<group>"; };
+		A2A05D0527A4826C000FB625 /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logging.cpp; sourceTree = "<group>"; };
+		A2A05D0627A4826C000FB625 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
+		A2A05D0727A4826C000FB625 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
+		A2A05D0827A4826C000FB625 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		A2A2DE87274CC871005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/homebrew/Cellar/freetype/2.11.0/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2A2DE95274CCCF1005842A6 /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
@@ -1726,8 +1725,6 @@
 		A2D672DF1B30F40C00264D16 /* WindowManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WindowManager.cpp; sourceTree = "<group>"; };
 		A2D672E01B30F40C00264D16 /* WindowManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowManager.h; sourceTree = "<group>"; };
 		A2D72B181B671329009F4D33 /* SpriteSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteSheet.h; sourceTree = "<group>"; };
-		A2DE329714EB071200117503 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
-		A2DE329814EB071200117503 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		A2DE8806181064DF007B8CC5 /* libvlc.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlc.5.dylib; path = /Applications/VLC.app/Contents/MacOS/lib/libvlc.5.dylib; sourceTree = "<absolute>"; };
 		A2DE880818106615007B8CC5 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/lib/libbz2.dylib; sourceTree = DEVELOPER_DIR; };
 		A2E1582F14D1D8DA0044F3C5 /* GEM_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GEM_AppDelegate.h; sourceTree = "<group>"; };
@@ -5051,6 +5048,27 @@
 			path = Streams;
 			sourceTree = "<group>";
 		};
+		A2A05D0127A4826C000FB625 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				A2A05D0227A4826C000FB625 /* Loggers */,
+				A2A05D0527A4826C000FB625 /* Logging.cpp */,
+				A2A05D0627A4826C000FB625 /* Logging.h */,
+				A2A05D0727A4826C000FB625 /* Logger.cpp */,
+				A2A05D0827A4826C000FB625 /* Logger.h */,
+			);
+			path = Logging;
+			sourceTree = "<group>";
+		};
+		A2A05D0227A4826C000FB625 /* Loggers */ = {
+			isa = PBXGroup;
+			children = (
+				A2A05D0327A4826C000FB625 /* Stdio.cpp */,
+				A2A05D0427A4826C000FB625 /* Stdio.h */,
+			);
+			path = Loggers;
+			sourceTree = "<group>";
+		};
 		A2A3A7D614A5030600F705CF /* mac */ = {
 			isa = PBXGroup;
 			children = (
@@ -5186,6 +5204,7 @@
 				A2BFA0031395FF62006ADC12 /* ItemMgr.h */,
 				A2E7E193266897060064423F /* KeyMap.cpp */,
 				A27E5D5A18106384009434E5 /* KeyMap.h */,
+				A2A05D0127A4826C000FB625 /* Logging */,
 				A2BFA0041395FF62006ADC12 /* LRUCache.cpp */,
 				A2BFA0051395FF62006ADC12 /* LRUCache.h */,
 				A2BFA0071395FF62006ADC12 /* Map.cpp */,
@@ -5376,11 +5395,6 @@
 			isa = PBXGroup;
 			children = (
 				A2CE96891B70596100E189C4 /* FileFilters.h */,
-				A2DE329B14EB078200117503 /* Logger */,
-				A2DE329714EB071200117503 /* Logger.cpp */,
-				A2DE329814EB071200117503 /* Logger.h */,
-				A265ECEA13A8669700C6DF12 /* Logging.cpp */,
-				A22A6B151994390D00488985 /* Logging.h */,
 				A2BFA0641395FF62006ADC12 /* swab.cpp */,
 				A2BFA0651395FF62006ADC12 /* swab.h */,
 				A2BFA0661395FF62006ADC12 /* VFS.cpp */,
@@ -5417,15 +5431,6 @@
 			name = includes;
 			path = ../../gemrb/includes;
 			sourceTree = SOURCE_ROOT;
-		};
-		A2DE329B14EB078200117503 /* Logger */ = {
-			isa = PBXGroup;
-			children = (
-				A298DD2114EB61D300F59F56 /* Stdio.cpp */,
-				A298DD1B14EB61C100F59F56 /* Stdio.h */,
-			);
-			path = Logger;
-			sourceTree = "<group>";
 		};
 		A2E27EFD16F12B6C0079E104 /* nibs */ = {
 			isa = PBXGroup;
@@ -7871,7 +7876,6 @@
 				A2E66359139E883100310FC8 /* AnimationMgr.h in Headers */,
 				A2E6635C139E883100310FC8 /* ArchiveImporter.h in Headers */,
 				A2E6635E139E883100310FC8 /* Audio.h in Headers */,
-				A22A6B181994390D00488985 /* Logging.h in Headers */,
 				A2E66360139E883100310FC8 /* Bitmap.h in Headers */,
 				A2E66362139E883100310FC8 /* Cache.h in Headers */,
 				A28062861878D1BC009E577D /* TextContainer.h in Headers */,
@@ -7893,6 +7897,7 @@
 				A2111CCA1D0A49650044939E /* Timer.h in Headers */,
 				A27E5D6018106384009434E5 /* PluginLoader.h in Headers */,
 				A2E6637B139E883100310FC8 /* EffectMgr.h in Headers */,
+				A2A05D0E27A4826C000FB625 /* Logger.h in Headers */,
 				A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */,
 				A2E6637D139E883100310FC8 /* EffectQueue.h in Headers */,
 				A2E6637F139E883100310FC8 /* Factory.h in Headers */,
@@ -7941,6 +7946,7 @@
 				A2E663BC139E883E00310FC8 /* Region.h in Headers */,
 				A2E663BE139E883E00310FC8 /* Resource.h in Headers */,
 				A2E663C0139E883E00310FC8 /* ResourceDesc.h in Headers */,
+				A2A05D0C27A4826C000FB625 /* Logging.h in Headers */,
 				A2E663C2139E883E00310FC8 /* ResourceManager.h in Headers */,
 				A2E663C4139E883E00310FC8 /* ResourceSource.h in Headers */,
 				A2E663C5139E883E00310FC8 /* SaveGame.h in Headers */,
@@ -7974,6 +7980,7 @@
 				A2E663F9139E884B00310FC8 /* WorldMapMgr.h in Headers */,
 				A2A05CFB27A48093000FB625 /* DataStream.h in Headers */,
 				A20A278D1A71E3200077077C /* View.h in Headers */,
+				A2A05D0A27A4826C000FB625 /* Stdio.h in Headers */,
 				A25F91FA269BBF290045F07A /* SaveGameAREExtractor.h in Headers */,
 				A2E66405139E885300310FC8 /* swab.h in Headers */,
 				A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */,
@@ -8007,8 +8014,6 @@
 				A2E66433139E886700310FC8 /* GameScript.h in Headers */,
 				A2E66435139E886700310FC8 /* GSUtils.h in Headers */,
 				A2E66437139E886700310FC8 /* Matching.h in Headers */,
-				A2DE329A14EB071200117503 /* Logger.h in Headers */,
-				A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */,
 				A2969F11168CDC0D00D9C6FC /* CombatInfo.h in Headers */,
 				A2E27EF916EEA7B00079E104 /* InterfaceConfig.h in Headers */,
 			);
@@ -9607,7 +9612,6 @@
 				A265ECDE13A8661600C6DF12 /* KeyMap.cpp in Sources */,
 				A25F91F9269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */,
 				A265ECDF13A8661600C6DF12 /* PluginLoader.cpp in Sources */,
-				A265ECED13A8669700C6DF12 /* Logging.cpp in Sources */,
 				A265ECEE13A8669700C6DF12 /* SlicedStream.cpp in Sources */,
 				A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */,
 				A27217041CAE2678005F3976 /* Tooltip.cpp in Sources */,
@@ -9621,9 +9625,7 @@
 				A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */,
 				A2E1583114D1D8DA0044F3C5 /* GEM_AppDelegate.mm in Sources */,
 				A2806287187B7C89009E577D /* TextContainer.cpp in Sources */,
-				A2DE32AD14EB0C6900117503 /* Logger.cpp in Sources */,
 				A298DD1914EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
-				A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */,
 				A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */,
 				A2969F10168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
 				A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */,
@@ -9666,6 +9668,7 @@
 				A2E6637C139E883100310FC8 /* EffectQueue.cpp in Sources */,
 				A2E6637E139E883100310FC8 /* Factory.cpp in Sources */,
 				A2E66380139E883100310FC8 /* FactoryObject.cpp in Sources */,
+				A2A05D0B27A4826C000FB625 /* Logging.cpp in Sources */,
 				A2E66382139E883100310FC8 /* Font.cpp in Sources */,
 				A2A05D0027A48093000FB625 /* MappedFileMemoryStream.cpp in Sources */,
 				A2A05CFA27A48093000FB625 /* MemoryStream.cpp in Sources */,
@@ -9686,6 +9689,7 @@
 				A2E6639B139E883E00310FC8 /* ItemMgr.cpp in Sources */,
 				A2E6639D139E883E00310FC8 /* LRUCache.cpp in Sources */,
 				A2E7E19C2668980D0064423F /* FileCache.cpp in Sources */,
+				A2A05D0D27A4826C000FB625 /* Logger.cpp in Sources */,
 				A2E6639F139E883E00310FC8 /* Map.cpp in Sources */,
 				A2E663A3139E883E00310FC8 /* MoviePlayer.cpp in Sources */,
 				A2E663A7139E883E00310FC8 /* Palette.cpp in Sources */,
@@ -9750,10 +9754,8 @@
 				A2E66436139E886700310FC8 /* Matching.cpp in Sources */,
 				A2E66438139E886700310FC8 /* Objects.cpp in Sources */,
 				A2E66439139E886700310FC8 /* Triggers.cpp in Sources */,
-				A265ECF013A8669700C6DF12 /* Logging.cpp in Sources */,
-				A2DE329914EB071200117503 /* Logger.cpp in Sources */,
-				A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */,
 				A27E5D6118106384009434E5 /* VEFObject.cpp in Sources */,
+				A2A05D0927A4826C000FB625 /* Stdio.cpp in Sources */,
 				A2969F0F168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
 				A2E27EF716EEA7B00079E104 /* InterfaceConfig.cpp in Sources */,
 			);

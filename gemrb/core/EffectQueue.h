@@ -33,7 +33,7 @@
 #include "Effect.h"
 #include "Region.h"
 
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 #include <cstdlib>
 #include <list>

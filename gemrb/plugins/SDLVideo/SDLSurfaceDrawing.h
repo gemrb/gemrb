@@ -27,7 +27,7 @@
 
 #include "SDLPixelIterator.h"
 
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 #include "Polygon.h"
 
 namespace GemRB {
