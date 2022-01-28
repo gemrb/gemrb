@@ -1614,7 +1614,7 @@ void Game::TextDream()
 
 bool Game::CanPartyRest(int checks, ieStrRef* err) const
 {
-	if (checks == REST_NOCHECKS) return 0;
+	if (checks == REST_NOCHECKS) return true;
 	
 	if (!err) {
 		static ieStrRef noerr = ieStrRef::INVALID;
