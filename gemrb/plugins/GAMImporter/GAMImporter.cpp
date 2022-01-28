@@ -729,35 +729,31 @@ int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game) const
 //only in PST
 int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 {
-	char filling[40];
 	ieVariable tmpname;
 	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword value;
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<KillVarsCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
 		strnspccpy(tmpname, name, 32, core->HasFeature(GF_NO_NEW_VARIABLES));
 		stream->WriteVariable(tmpname);
-		stream->Write( filling, 8);
+		stream->WriteFilling(8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
-		stream->Write( filling, 40);
+		stream->WriteFilling(40);
 	}
 	return 0;
 }
 
 int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 {
-	char filling[40];
 	ieVariable tmpname;
 	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword value;
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<GlobalCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->locals->GetNextAssoc( pos, name, value);
@@ -775,10 +771,10 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 		}
 
 		stream->WriteVariable(tmpname);
-		stream->Write( filling, 8);
+		stream->WriteFilling(8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
-		stream->Write( filling, 40);
+		stream->WriteFilling(40);
 	}
 	return 0;
 }
@@ -859,9 +855,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	stream->WriteDword(game->RealTime); //this isn't correct, this field is the realtime
 	stream->WriteDword(PPLocOffset);
 	stream->WriteDword(PPLocCount);
-	char filling[52];
-	memset( filling, 0, sizeof(filling) );
-	stream->Write( &filling, 52); //unknown
+	stream->WriteFilling(52); //unknown
 
 	//save failed, but it is not our fault, returning now before the asserts kill us
 	if (stream->GetPos()==0) {
@@ -874,9 +868,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 {
 	ieDword tmpDword;
 	ieWord tmpWord;
-	char filling[130];
 
-	memset(filling,0,sizeof(filling) );
 	if (ac->Selected) {
 		tmpWord=1;
 	} else {
@@ -892,7 +884,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	//creature resref is always unused in saved games
 	//BG1 doesn't even like the * in there, zero fill
 	//seems to be accepted by all
-	stream->Write( filling, 8);
+	stream->WriteFilling(8);
 	tmpDword = ac->GetOrientation();
 	stream->WriteDword(tmpDword);
 	stream->WriteResRef(ac->Area);
@@ -937,13 +929,14 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellClass[i] >= 0xfe) {
-				stream->Write(filling,8);
+				stream->WriteFilling(8);
 			} else {
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			}
 		}
 		//quick spell classes, clear the field for iwd2 if it is
 		//a bard song/innate slot (0xfe or 0xff)
+		char filling[10] = {};
 		memcpy(filling, ac->PCStats->QuickSpellClass, MAX_QSLOTS);
 		if (GAMVersion == GAM_VER_IWD2) {
 			for (int i = 0; i < MAX_QSLOTS; i++) {
@@ -953,7 +946,6 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 			}
 		}
 		stream->Write(filling,10);
-		memset(filling,0,sizeof(filling) );
 	} else {
 		for (int i = 0; i < 3; i++) {
 			stream->WriteResRef(ac->PCStats->QuickSpells[i]);
@@ -986,14 +978,14 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 			if (ac->PCStats->QuickSpellClass[i] == 0xff) {
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			} else {
-				stream->Write(filling,8);
+				stream->WriteFilling(8);
 			}
 		}
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellClass[i] == 0xfe) {
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			} else {
-				stream->Write(filling,8);
+				stream->WriteFilling(8);
 			}
 		}
 		for (int i = 0; i < MAX_QSLOTS; i++) {
@@ -1003,13 +995,13 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
-		strncpy(filling, ac->GetNameAsVariable(1).CString(), 33);
+		stream->WriteVariable(ac->GetNameAsVariable(1));
 	} else {
 		std::string tmpstr = MBStringFromString(core->GetString(ac->LongStrRef, STRING_FLAGS::STRREFOFF));
-		strncpy(filling, tmpstr.c_str(), 32);
+		size_t len = std::min<size_t>(tmpstr.length(), 32);
+		stream->Write(tmpstr.data(), len);
+		if (len < 32) stream->WriteFilling(32 - len);
 	}
-	stream->Write( filling, 32);
-	memset(filling,0,32);
 	stream->WriteDword(ac->TalkCount);
 	stream->WriteStrRef(ac->PCStats->BestKilledName);
 	stream->WriteDword(ac->PCStats->BestKilledXP);
@@ -1042,7 +1034,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 		for (unsigned int& extraSetting : ac->PCStats->ExtraSettings) {
 			stream->WriteDword(extraSetting);
 		}
-		stream->Write(filling, 130);
+		stream->WriteFilling(130);
 	}
 
 	return 0;
@@ -1186,9 +1178,6 @@ int GAMImporter::PutFamiliars(DataStream *stream, const Game *game) const
 		}
 	}
 
-	char filling[FAMILIAR_FILL_SIZE];
-
-	memset( filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<9;i++) {
 		stream->WriteResRef( game->GetFamiliar(i) );
 	}
@@ -1196,7 +1185,7 @@ int GAMImporter::PutFamiliars(DataStream *stream, const Game *game) const
 	if (len) {
 		stream->Write(game->beasts.data(), len);
 	}
-	stream->Write( filling, FAMILIAR_FILL_SIZE - len);
+	stream->WriteFilling(FAMILIAR_FILL_SIZE - len);
 	return 0;
 }
 

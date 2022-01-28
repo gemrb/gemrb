@@ -189,11 +189,8 @@ Effect* EFFImporter::GetEffectV20()
 
 void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	ieDword tmpDword1,tmpDword2;
-	char filling[60];
 
-	memset(filling,0,sizeof(filling) );
-
-	stream->Write( filling,8 ); //signature
+	stream->WriteFilling(8); //signature
 	stream->WriteDword(fx->Opcode);
 	stream->WriteDword(fx->Target);
 	stream->WriteDword(fx->Power);
@@ -205,7 +202,7 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	stream->WriteWord(fx->ProbabilityRangeMax);
 	stream->WriteWord(fx->ProbabilityRangeMin);
 	if (fx->IsVariable) {
-		stream->Write( filling,8 );
+		stream->WriteFilling(8);
 	} else {
 		stream->WriteResRef(fx->Resource);
 	}
@@ -214,16 +211,16 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	stream->WriteDword(fx->SavingThrowType);
 	stream->WriteDword(fx->SavingThrowBonus);
 	stream->WriteWord(fx->IsVariable);
-	stream->Write( filling,2 ); // SaveForHalfDamage
+	stream->WriteFilling(2); // SaveForHalfDamage
 	stream->WriteDword(fx->PrimaryType);
-	stream->Write( filling,12 ); // MinAffectedLevel, MaxAffectedLevel, Resistance
+	stream->WriteFilling(12); // MinAffectedLevel, MaxAffectedLevel, Resistance
 	stream->WriteDword(fx->Resistance);
 	stream->WriteDword(fx->Parameter3);
 	stream->WriteDword(fx->Parameter4);
 	stream->WriteDword(fx->Parameter5);
 	stream->WriteDword(fx->Parameter6);
 	if (fx->IsVariable) {
-		stream->Write( filling,16 );
+		stream->WriteFilling(16);
 	} else {
 		stream->WriteResRef(fx->Resource2);
 		stream->WriteResRef(fx->Resource3);
@@ -246,12 +243,12 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 		//resource1-4 are used as a continuous memory
 		stream->WriteVariable(fx->VariableName);
 	} else {
-		stream->Write( filling,32 );
+		stream->WriteFilling(32);
 	}
 	stream->WriteDword(fx->CasterLevel);
-	stream->Write( filling,4);
+	stream->WriteFilling(4);
 	stream->WriteDword(fx->SecondaryType);
-	stream->Write( filling,60 );
+	stream->WriteFilling(60);
 }
 
 #include "plugindef.h"

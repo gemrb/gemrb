@@ -125,6 +125,8 @@ public:
 	WriteEnum(const ENUM& dest) {
 		return WriteScalar(static_cast<typename std::underlying_type<ENUM>::type>(dest));
 	}
+	
+	strret_t WriteFilling(strpos_t len);
 
 	strret_t ReadResRef(ResRef& dest);
 	strret_t WriteResRef(const ResRef& src);
