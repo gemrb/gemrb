@@ -11929,7 +11929,7 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	// fall back to the generic: you may not rest at this time
 	if (err == ieStrRef::INVALID) {
 		if (core->HasFeature(GF_AREA_OVERRIDE)) {
-			err = displaymsg->GetStringReference(STR_MAYNOTREST);
+			err = DisplayMessage::GetStringReference(STR_MAYNOTREST);
 		} else {
 			err = ieStrRef::NO_REST;
 		}

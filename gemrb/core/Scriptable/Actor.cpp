@@ -3535,7 +3535,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		static const Actor *prevActor = nullptr;
 		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
-			String msg = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
+			String msg = core->GetString(DisplayMessage::GetStringReference(STR_SAVE_SPELL + type));
 			msg += L" " + std::to_wstring(ret);
 			displaymsg->DisplayStringName(std::move(msg), DMC_WHITE, this);
 		}
@@ -3834,7 +3834,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 }
 
 void Actor::DisplayStringOrVerbalConstant(size_t str, int vcstat, int vccount) const {
-	ieStrRef strref = displaymsg->GetStringReference(str);
+	ieStrRef strref = DisplayMessage::GetStringReference(str);
 	if (strref != ieStrRef::INVALID) {
 		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE|DS_CIRCLE);
 	} else {
@@ -4660,7 +4660,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
-			String msg = core->GetString(displaymsg->GetStringReference(STR_DAMAGE1), STRING_FLAGS::NONE);
+			String msg = core->GetString(DisplayMessage::GetStringReference(STR_DAMAGE1), STRING_FLAGS::NONE);
 			String dmg = fmt::format(L" ({})", damage);
 			displaymsg->DisplayStringName(msg + dmg, DMC_WHITE, this);
 		} else { //bg2
@@ -7405,14 +7405,14 @@ void Actor::PerformAttack(ieDword gameTime)
 		// log the roll
 		String leftRight, hitMiss;
 		if (leftorright && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
-			leftRight = core->GetString(displaymsg->GetStringReference(STR_ATTACK_ROLL_L));
+			leftRight = core->GetString(DisplayMessage::GetStringReference(STR_ATTACK_ROLL_L));
 		} else {
-			leftRight = core->GetString(displaymsg->GetStringReference(STR_ATTACK_ROLL));
+			leftRight = core->GetString(DisplayMessage::GetStringReference(STR_ATTACK_ROLL));
 		}
 		if (success) {
-			hitMiss = core->GetString(displaymsg->GetStringReference(STR_HIT));
+			hitMiss = core->GetString(DisplayMessage::GetStringReference(STR_HIT));
 		} else {
-			hitMiss = core->GetString(displaymsg->GetStringReference(STR_MISS));
+			hitMiss = core->GetString(DisplayMessage::GetStringReference(STR_MISS));
 		}
 		String rollLog = fmt::format(L"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss);
 		displaymsg->DisplayStringName(std::move(rollLog), DMC_WHITE, this);

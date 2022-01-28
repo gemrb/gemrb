@@ -71,8 +71,8 @@ static std::string ParseGameDate(DataStream *ds)
 	// pst has a nice single string for everything 41277 (individual ones lack tokens)
 	core->GetTokenDictionary()->SetAtCopy("GAMEDAYS", days);
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
-	ieStrRef dayref = displaymsg->GetStringReference(STR_DAY);
-	ieStrRef daysref = displaymsg->GetStringReference(STR_DAYS);
+	ieStrRef dayref = DisplayMessage::GetStringReference(STR_DAY);
+	ieStrRef daysref = DisplayMessage::GetStringReference(STR_DAYS);
 	if (dayref == daysref) {
 		return core->GetMBString(ieStrRef::DATE2);
 	}
@@ -83,8 +83,8 @@ static std::string ParseGameDate(DataStream *ds)
 	}
 	if (hours || a.empty()) {
 		if (!a.empty()) b=core->GetMBString(ieStrRef::DATE1); // and
-		if (hours==1) c = core->GetMBString(displaymsg->GetStringReference(STR_HOUR), STRING_FLAGS::NONE);
-		else c = core->GetMBString(displaymsg->GetStringReference(STR_HOURS), STRING_FLAGS::NONE);
+		if (hours==1) c = core->GetMBString(DisplayMessage::GetStringReference(STR_HOUR), STRING_FLAGS::NONE);
+		else c = core->GetMBString(DisplayMessage::GetStringReference(STR_HOURS), STRING_FLAGS::NONE);
 	}
 	
 	if (!b.empty()) {

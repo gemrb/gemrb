@@ -1625,7 +1625,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 		for (auto pc : PCs) {
 			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS) {
 				// You cannot rest at this time because you do not have control of all your party members
-				*err = displaymsg->GetStringReference(STR_CANTTRESTNOCONTROL);
+				*err = DisplayMessage::GetStringReference(STR_CANTTRESTNOCONTROL);
 				return false;
 			}
 		}
@@ -1638,7 +1638,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	if (checks & REST_SCATTER) {
 		if (!EveryoneNearPoint(area, leader->Pos, 0)) {
 			//party too scattered
-			*err = displaymsg->GetStringReference(STR_SCATTERED);
+			*err = DisplayMessage::GetStringReference(STR_SCATTERED);
 			return false;
 		}
 	}
@@ -1646,12 +1646,12 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	if (checks & REST_CRITTER) {
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
-			*err = displaymsg->GetStringReference(STR_CANTRESTMONS);
+			*err = DisplayMessage::GetStringReference(STR_CANTRESTMONS);
 			return false;
 		}
 		//don't allow resting if hostiles are nearby
 		if (area->AnyEnemyNearPoint(leader->Pos)) {
-			*err = displaymsg->GetStringReference(STR_CANTRESTMONS);
+			*err = DisplayMessage::GetStringReference(STR_CANTRESTMONS);
 			return false;
 		}
 	}
@@ -1660,7 +1660,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	if (checks & REST_AREA) {
 		//you cannot rest here
 		if (area->AreaFlags & AF_NOSAVE) {
-			*err = displaymsg->GetStringReference(STR_MAYNOTREST);
+			*err = DisplayMessage::GetStringReference(STR_MAYNOTREST);
 			return false;
 		}
 
@@ -1677,7 +1677,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 				return false;
 			} else if (area->AreaFlags&AF_DEADMAGIC) {
 				// you cannot rest right now
-				*err = displaymsg->GetStringReference(STR_MAYNOTREST);
+				*err = DisplayMessage::GetStringReference(STR_MAYNOTREST);
 				return false;
 			}
 		} else {
@@ -1687,7 +1687,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 				if (area->AreaType & AT_OUTDOOR && !core->HasFeature(GF_AREA_VISITED_VAR)) {
 					return true;
 				}
-				*err = displaymsg->GetStringReference(STR_MAYNOTREST);
+				*err = DisplayMessage::GetStringReference(STR_MAYNOTREST);
 				return false;
 			}
 		}
@@ -1805,8 +1805,8 @@ bool Game::RestParty(int checks, int dream, int hp)
 	//bg1 has "You have rested for <DURATION>" while pst has "You have
 	//rested for <HOUR> <DURATION>" and then bg1 has "<HOUR> hours" while
 	//pst just has "Hours", so this works for both
-	ieStrRef restindex = displaymsg->GetStringReference(STR_REST);
-	ieStrRef hrsindex = displaymsg->GetStringReference(STR_HOURS);
+	ieStrRef restindex = DisplayMessage::GetStringReference(STR_REST);
+	ieStrRef hrsindex = DisplayMessage::GetStringReference(STR_HOURS);
 
 	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
 

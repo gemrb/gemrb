@@ -558,7 +558,7 @@ bool Interface::ReadDamageTypeTable() {
 
 	DamageInfoStruct di;
 	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
-		di.strref = displaymsg->GetStringReference(atoi(tm->QueryField(i, 0)));
+		di.strref = DisplayMessage::GetStringReference(atoi(tm->QueryField(i, 0)));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2), nullptr, 16);
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));

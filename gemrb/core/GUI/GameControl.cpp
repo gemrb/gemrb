@@ -1165,7 +1165,7 @@ String GameControl::TooltipText() const {
 		// a guess at a neutral check
 		bool enemy = actor->GetStat(IE_EA) != EA_NEUTRAL;
 		// test for an injured string being present for this game
-		ieStrRef strref = displaymsg->GetStringReference(STR_UNINJURED);
+		ieStrRef strref = DisplayMessage::GetStringReference(STR_UNINJURED);
 		if (enemy && strref != ieStrRef::INVALID) {
 			// non-neutral, not in party: display injured string
 			// these boundaries are just a guess
@@ -1179,7 +1179,7 @@ String GameControl::TooltipText() const {
 			} else if (hp > maxhp/3) {
 				strindex = STR_INJURED3;
 			}
-			strref = displaymsg->GetStringReference(strindex);
+			strref = DisplayMessage::GetStringReference(strindex);
 			String injuredstring = core->GetString(strref, STRING_FLAGS::NONE);
 			tip += L"\n" + injuredstring;
 		}
@@ -2625,7 +2625,7 @@ void GameControl::SetDisplayText(const String& text, unsigned int time)
 
 void GameControl::SetDisplayText(size_t text, unsigned int time)
 {
-	SetDisplayText(core->GetString(displaymsg->GetStringReference(text), STRING_FLAGS::NONE), time);
+	SetDisplayText(core->GetString(DisplayMessage::GetStringReference(text), STRING_FLAGS::NONE), time);
 }
 
 void GameControl::ToggleAlwaysRun()
