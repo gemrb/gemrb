@@ -345,18 +345,16 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 	String string;
 	bool empty = !(flags & STRING_FLAGS::ALLOW_ZERO) && !strref;
 	ieWord type;
-	size_t Length;
 	ResRef SoundResRef;
 
 	if (empty || strref >= ieStrRef::OVERRIDE_START || (strref >= ieStrRef::BIO_START && strref <= ieStrRef::BIO_END)) {
 		if (OverrideTLK) {
+			size_t Length;
 			char* cstr = OverrideTLK->ResolveAuxString(strref, Length);
 			String* tmp = StringFromCString(cstr);
 			std::swap(string, *tmp);
 			free(cstr);
 			delete tmp;
-		} else {
-			Length = 0;
 		}
 		type = 0;
 		SoundResRef.Reset();
@@ -373,20 +371,16 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		str->ReadDword(Pitch);
 		str->ReadDword(StrOffset);
 		str->ReadDword(l);
-		
-		Length = l;
-		
+				
 		if (type & 1) {
 			str->Seek( StrOffset + Offset, GEM_STREAM_START );
-			char* cstr = (char *)malloc(Length + 1);
-			cstr[Length] = '\0';
-			str->Read(cstr, Length);
+			char* cstr = (char *)malloc(l + 1);
+			cstr[l] = '\0';
+			str->Read(cstr, l);
 			String* tmp = StringFromCString(cstr);
 			std::swap(string, *tmp);
 			delete tmp;
 			free(cstr);
-		} else {
-			Length = 0;
 		}
 	}
 
