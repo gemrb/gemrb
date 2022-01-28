@@ -26,6 +26,7 @@
 #include <cctype>
 #include <cstdarg>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 
 #ifndef WIN32
