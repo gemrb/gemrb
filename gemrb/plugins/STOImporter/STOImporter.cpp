@@ -131,7 +131,7 @@ Store* STOImporter::GetStore(Store *s)
 		}
 		//it is important to handle this field as signed
 		if (item->InfiniteSupply>0) {
-			std::string TriggerCode = core->GetMBCString( (ieStrRef) item->InfiniteSupply );
+			std::string TriggerCode = core->GetMBString( (ieStrRef) item->InfiniteSupply );
 			// there can be multiple triggers, so we use a Condition to handle them
 			// all and avoid the need for custom parsing
 			PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID);

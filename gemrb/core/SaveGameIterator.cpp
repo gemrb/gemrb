@@ -74,17 +74,17 @@ static std::string ParseGameDate(DataStream *ds)
 	ieStrRef dayref = displaymsg->GetStringReference(STR_DAY);
 	ieStrRef daysref = displaymsg->GetStringReference(STR_DAYS);
 	if (dayref == daysref) {
-		return core->GetMBCString(ieStrRef::DATE2);
+		return core->GetMBString(ieStrRef::DATE2);
 	}
 
 	if (days) {
-		if (days==1) a = core->GetMBCString(dayref, STRING_FLAGS::NONE);
-		else a = core->GetMBCString(daysref, STRING_FLAGS::NONE);
+		if (days==1) a = core->GetMBString(dayref, STRING_FLAGS::NONE);
+		else a = core->GetMBString(daysref, STRING_FLAGS::NONE);
 	}
 	if (hours || a.empty()) {
-		if (!a.empty()) b=core->GetMBCString(ieStrRef::DATE1); // and
-		if (hours==1) c = core->GetMBCString(displaymsg->GetStringReference(STR_HOUR), STRING_FLAGS::NONE);
-		else c = core->GetMBCString(displaymsg->GetStringReference(STR_HOURS), STRING_FLAGS::NONE);
+		if (!a.empty()) b=core->GetMBString(ieStrRef::DATE1); // and
+		if (hours==1) c = core->GetMBString(displaymsg->GetStringReference(STR_HOUR), STRING_FLAGS::NONE);
+		else c = core->GetMBString(displaymsg->GetStringReference(STR_HOURS), STRING_FLAGS::NONE);
 	}
 	
 	if (!b.empty()) {

@@ -464,7 +464,7 @@ public:
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;
 	/* returns a newly created string */
 	String GetString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
-	std::string GetMBCString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
+	std::string GetMBString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
 	/* sets the floattext color */
 	void SetInfoTextColor(const Color &color);
 	/** returns a gradient set */
