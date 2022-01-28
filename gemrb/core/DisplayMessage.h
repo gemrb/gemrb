@@ -79,7 +79,7 @@ public:
 	/** displays any string in the textarea */
 	void DisplayMarkupString(String txt) const;
 	/** displays a string constant in the textarea */
-	void DisplayConstantString(size_t stridx, const Color &color, Scriptable *speaker=NULL) const;
+	void DisplayConstantString(size_t stridx, const Color &color, Scriptable *speaker = nullptr) const;
 	/** displays actor name - action : parameter */
 	void DisplayConstantStringNameString(size_t stridx, const Color &color, size_t stridx2, const Scriptable *actor) const;
 	/** displays a string constant followed by a number in the textarea */

@@ -28,7 +28,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT DisplayMessage * displaymsg = NULL;
+GEM_EXPORT DisplayMessage * displaymsg = nullptr;
 
 static const auto DisplayFormatName = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{}[/color][/p]");
 static const auto DisplayFormatAction = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{} {}[/color][/p]");
@@ -167,7 +167,7 @@ void DisplayMessage::DisplayConstantString(size_t stridx, const Color &color, Sc
 void DisplayMessage::DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const
 {
 	if (stridx == ieStrRef::INVALID) return;
-	DisplayString(core->GetString(stridx, flags), color, NULL);
+	DisplayString(core->GetString(stridx, flags), color, nullptr);
 }
 
 void DisplayMessage::DisplayString(String text, const Color &color, Scriptable *target) const
@@ -183,7 +183,7 @@ void DisplayMessage::DisplayString(String text, const Color &color, Scriptable *
 		l->SetText(std::move(text));
 	}
 
-	if (target && l == NULL && ta == NULL) {
+	if (target && l == nullptr && ta == nullptr) {
 		// overhead text only if we dont have somewhere else for the message
 		target->SetOverheadText(std::move(text));
 	}
@@ -267,7 +267,7 @@ void DisplayMessage::DisplayStringName(String text, const Color &color, const Sc
 	Color speaker_color = GetSpeakerColor(name, speaker);
 
 	if (name.length() == 0) {
-		DisplayString(std::move(text), color, NULL);
+		DisplayString(std::move(text), color, nullptr);
 	} else {
 		DisplayMarkupString(fmt::format(DisplayFormatName, speaker_color.Packed(), name, color.Packed(), text));
 	}
