@@ -32,23 +32,16 @@
 #include "System/CString.h"
 #include "System/String.h"
 
+#include <cstdint>
+
 namespace GemRB {
 
 using ieByte = unsigned char;
 using ieByteSigned = signed char;
-using ieWord = unsigned short;
-using ieWordSigned = signed short;
-
-#if (SIZEOF_INT == 4)
-using ieDword = unsigned int;
-using ieDwordSigned = signed int;
-#elif (SIZE_LONG_INT == 4)
-using ieDword = unsigned long int;
-using ieDwordSigned = signed long int;
-#else
-using ieDword = unsigned long int;
-using ieDwordSigned = signed long int;
-#endif
+using ieWord = uint16_t;
+using ieWordSigned = int16_t;
+using ieDword = uint32_t;
+using ieDwordSigned = int32_t;
 
 // it is perfectly valid to create an ieStrRef for any value, but -1 is invalid
 // obviously we will define any hardcoded strrefs we use here

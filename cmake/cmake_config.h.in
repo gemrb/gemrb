@@ -3,8 +3,6 @@
 
 // automatically generated file from cmake!
 
-#cmakedefine SIZEOF_INT ${SIZEOF_INT}
-#cmakedefine SIZEOF_LONG_INT ${SIZEOF_LONG_INT}
 #cmakedefine HAVE_STRNDUP 1
 #cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_REALPATH 1

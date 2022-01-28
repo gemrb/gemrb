@@ -5,8 +5,6 @@ ADD_DEFINITIONS("-DHAVE_CONFIG_H")
 
 #Platform checks
 INCLUDE (CheckTypeSize)
-CHECK_TYPE_SIZE("int" SIZEOF_INT)
-CHECK_TYPE_SIZE("long int" SIZEOF_LONG_INT)
 CHECK_TYPE_SIZE("uint64_t" HAVE_UINT64_T)
 
 INCLUDE (CheckFunctionExists)
