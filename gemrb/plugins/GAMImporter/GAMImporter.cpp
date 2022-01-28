@@ -1005,9 +1005,8 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
 		strncpy(filling, ac->GetNameAsVariable(1).CString(), 33);
 	} else {
-		char *tmpstr = MBCStringFromString(core->GetString(ac->LongStrRef, STRING_FLAGS::STRREFOFF));
-		strncpy(filling, tmpstr, 32);
-		free(tmpstr);
+		std::string tmpstr = MBStringFromString(core->GetString(ac->LongStrRef, STRING_FLAGS::STRREFOFF));
+		strncpy(filling, tmpstr.c_str(), 32);
 	}
 	stream->Write( filling, 32);
 	memset(filling,0,32);

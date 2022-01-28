@@ -148,10 +148,8 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 	}
 
 	// FIXME: newvalue could be a multibyte string in an encoding incompatible with ASCII
-	char* newvalue = MBCStringFromString(string);
-	size_t length = strlen(newvalue);
-	if(length>65535) length=65535;
-	length++;
+	std::string newvalue = MBStringFromString(string);
+	size_t length = std::min<size_t>(newvalue.length(), std::numeric_limits<uint16_t>::max());
 
 	//set the backpointer of the first string segment
 	strpos_t backp = DataStream::InvalidPos;
@@ -162,7 +160,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 		tot_str->Seek(offset + 4, GEM_STREAM_START);
 		tot_str->WriteScalar<strpos_t, int32_t>(backp);
 		size_t seglen = std::min<size_t>(SEGMENT_SIZE, length);
-		tot_str->Write(newvalue + memoffset, seglen);
+		tot_str->Write(newvalue.data() + memoffset, seglen);
 		length -= seglen;
 		memoffset += seglen;
 		backp = offset;
@@ -188,7 +186,6 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 			tot_str->WriteScalar<strpos_t, int32_t>(offset);
 		}
 	} while(length);
-	free(newvalue);
 
 	return strref;
 }
