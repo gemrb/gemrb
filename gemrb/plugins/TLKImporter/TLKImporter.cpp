@@ -146,7 +146,7 @@ String TLKImporter::Gabber() const
 {
 	const Actor *act = core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
-		return act->GetName(1);
+		return act->GetName();
 	}
 	return L"?";
 }
@@ -155,7 +155,7 @@ String TLKImporter::CharName(int slot) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
-		return act->GetName(1);
+		return act->GetName();
 	}
 	return L"?";
 }

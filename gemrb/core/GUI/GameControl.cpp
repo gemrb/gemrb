@@ -1141,9 +1141,9 @@ String GameControl::TooltipText() const {
 	static String tip; // only one game control and we return a const& so cant be temporary.
 	// pst ignores TalkCount
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		tip = actor->GetName(1);
+		tip = actor->GetName();
 	} else {
-		tip = actor->GetName(-1);
+		tip = actor->GetActorName(-1);
 	}
 
 	int hp = actor->GetStat(IE_HITPOINTS);

@@ -1590,7 +1590,7 @@ String Scriptable::GetName() const
 		case ST_CONTAINER:	return L"Container";
 		case ST_AREA:		return L"Area";
 		case ST_GLOBAL:		return L"Global";
-		case ST_ACTOR:		return As<const Actor>()->GetName(1);
+		case ST_ACTOR:		return As<const Actor>()->GetName();
 		default:	return L"NONE";
 	}
 }
@@ -2220,7 +2220,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	prevTicks = Ticks;
 	Destination = Des;
 	if (pathAbandoned) {
-		Log(DEBUG, "WalkTo", "%ls: Path was just abandoned", actor->GetName(0).c_str());
+		Log(DEBUG, "WalkTo", "%ls: Path was just abandoned", actor->GetActorName(0).c_str());
 		ClearPath(true);
 		return;
 	}
@@ -2233,7 +2233,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
 	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
 	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
-		Log(DEBUG, "WalkTo", "%ls re-pathing ignoring actors", actor->GetName(0).c_str());
+		Log(DEBUG, "WalkTo", "%ls re-pathing ignoring actors", actor->GetActorName(0).c_str());
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, actor);
 	}
 

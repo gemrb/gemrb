@@ -40,11 +40,10 @@ namespace GemRB {
  */
 
 struct StringBlock {
-	const String text;
-	const ResRef Sound;
+	String text;
+	ResRef Sound;
 
-	StringBlock() noexcept
-	: text() {}
+	StringBlock() noexcept = default;
 
 	StringBlock(String text, const ResRef& soundRef) noexcept
 	: text(std::move(text)), Sound(soundRef) {}

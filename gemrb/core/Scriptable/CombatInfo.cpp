@@ -182,7 +182,7 @@ void ArmorClass::HandleFxBonus(int mod, bool permanent)
 std::string ArmorClass::dump() const
 {
 	std::string buffer;
-	AppendFormat(buffer, "Debugdump of ArmorClass of {}:\n", fmt::WideToChar{Owner->GetName(1)});
+	AppendFormat(buffer, "Debugdump of ArmorClass of {}:\n", fmt::WideToChar{Owner->GetName()});
 	AppendFormat(buffer, "TOTAL: {}\n", total);
 	AppendFormat(buffer, "Natural: {}\tGeneric: {}\tDeflection: {}\n", natural, genericBonus, deflectionBonus);
 	AppendFormat(buffer, "Armor: {}\tShield: {}\n", armorBonus, shieldBonus);
@@ -319,7 +319,7 @@ int ToHitStats::GetTotalForAttackNum(unsigned int number) const
 std::string ToHitStats::dump() const
 {
 	std::string buffer;
-	AppendFormat(buffer, "Debugdump of ToHit of {}:\n", fmt::WideToChar{Owner->GetName(1)});
+	AppendFormat(buffer, "Debugdump of ToHit of {}:\n", fmt::WideToChar{Owner->GetName()});
 	AppendFormat(buffer, "TOTAL: {}\n", total);
 	AppendFormat(buffer, "Base: {:2d}\tGeneric: {}\tEffect: {}\n", base, genericBonus, fxBonus);
 	AppendFormat(buffer, "Armor: {}\tShield: {}\n", armorBonus, shieldBonus);

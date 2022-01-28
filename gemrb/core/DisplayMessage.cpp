@@ -130,7 +130,7 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 	// We just generate a colour by looking at the existing palette instead.
 	switch (speaker->Type) {
 		case ST_ACTOR:
-			string = Scriptable::As<Actor>(speaker)->GetName(-1);
+			string = Scriptable::As<Actor>(speaker)->GetActorName(-1);
 			{
 				auto pal16 = core->GetPalette16(((const Actor *) speaker)->GetStat(IE_MAJOR_COLOR));
 				// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results

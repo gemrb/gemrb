@@ -2983,7 +2983,7 @@ std::string Map::dump(bool show_actors) const
 		buffer.append("\n");
 		for (const auto actor : actors) {
 			if (actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
-				AppendFormat(buffer, "Actor: {} ({} {}) at {}\n", fmt::WideToChar{actor->GetName(1)}, actor->GetGlobalID(), actor->GetScriptName(), actor->Pos);
+				AppendFormat(buffer, "Actor: {} ({} {}) at {}\n", fmt::WideToChar{actor->GetName()}, actor->GetGlobalID(), actor->GetScriptName(), actor->Pos);
 			}
 		}
 	}

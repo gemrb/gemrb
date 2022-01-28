@@ -3207,7 +3207,7 @@ void GameScript::SetTokenObject(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	core->GetTokenDictionary()->SetAt(parameters->string0Parameter, actor->GetName(0));
+	core->GetTokenDictionary()->SetAt(parameters->string0Parameter, actor->GetActorName(0));
 }
 
 void GameScript::PlayDead(Scriptable* Sender, Action* parameters)

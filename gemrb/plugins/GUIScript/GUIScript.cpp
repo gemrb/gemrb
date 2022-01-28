@@ -5554,7 +5554,7 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 		return PyString_FromString( actor->GetScriptName() );
 	}
 	
-	return PyString_FromStringObj(actor->GetName(Which));
+	return PyString_FromStringObj(actor->GetActorName(Which));
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerName__doc,
@@ -12413,7 +12413,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
 	}
 	if (!wield) {
-		Log(WARNING, "Actor", "Invalid weapon wielded by %ls!", actor->GetName(1).c_str());
+		Log(WARNING, "Actor", "Invalid weapon wielded by %ls!", actor->GetName().c_str());
 		return dict;
 	}
 	const Item *item = gamedata->GetItem(wield->ItemResRef, true);

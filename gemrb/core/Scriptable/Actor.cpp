@@ -549,7 +549,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (anims->ResRefBase.IsEmpty()) {
 		delete anims;
 		anims = NULL;
-		Log(ERROR, "Actor", "Missing animation for %ls", GetName(1).c_str());
+		Log(ERROR, "Actor", "Missing animation for %ls", GetName().c_str());
 		return;
 	}
 	anims->SetOffhandRef(ShieldRef);
@@ -3657,14 +3657,14 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 		case MOD_DIVISIVE:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%ls)!", ModifierType, GetName(1).c_str());
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%ls)!", ModifierType, GetName().c_str());
 				break;
 			}
 			SetStat(StatIndex, BaseStats[StatIndex] / ModifierValue, 1);
 			break;
 		case MOD_MODULUS:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%ls)!", ModifierType, GetName(1).c_str());
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%ls)!", ModifierType, GetName().c_str());
 				break;
 			}
 			SetStat(StatIndex, BaseStats[StatIndex] % ModifierValue, 1);
@@ -3685,7 +3685,7 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetStat(StatIndex, !BaseStats[StatIndex], 1);
 			break;
 		default:
-			Log(ERROR, "Actor", "Invalid modifier type passed to NewStat: %d (%ls)!", ModifierType, GetName(1).c_str());
+			Log(ERROR, "Actor", "Invalid modifier type passed to NewStat: %d (%ls)!", ModifierType, GetName().c_str());
 	}
 	return Modified[StatIndex] - oldmod;
 }
@@ -3712,14 +3712,14 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 		case MOD_DIVISIVE:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%ls)!", ModifierType, GetName(1).c_str());
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%ls)!", ModifierType, GetName().c_str());
 				break;
 			}
 			SetBase(StatIndex, BaseStats[StatIndex] / ModifierValue);
 			break;
 		case MOD_MODULUS:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%ls)!", ModifierType, GetName(1).c_str());
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%ls)!", ModifierType, GetName().c_str());
 				break;
 			}
 			SetBase(StatIndex, BaseStats[StatIndex] % ModifierValue);
@@ -3740,7 +3740,7 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetBase(StatIndex, !BaseStats[StatIndex]);
 			break;
 		default:
-			Log(ERROR, "Actor", "Invalid modifier type passed to NewBase: %d (%ls)!", ModifierType, GetName(1).c_str());
+			Log(ERROR, "Actor", "Invalid modifier type passed to NewBase: %d (%ls)!", ModifierType, GetName().c_str());
 	}
 	return BaseStats[StatIndex] - oldmod;
 }
@@ -4665,7 +4665,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			displaymsg->DisplayStringName(msg + dmg, DMC_WHITE, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
-			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName(1));
+			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "" );
 			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
@@ -4677,13 +4677,13 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			if (hitter && hitter->Type == ST_ACTOR) {
 				if (detailed) {
 					//<DAMAGEE> was immune to my <TYPE> damage
-					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName(1));
+					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 					core->GetTokenDictionary()->SetAt("TYPE", type_name);
 					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, DMC_WHITE, hitter);
 				} else if (displaymsg->HasStringReference(STR_DAMAGE_IMMUNITY) && displaymsg->HasStringReference(STR_DAMAGE1)) {
 					// bg2
 					//<DAMAGEE> was immune to my damage.
-					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName(1));
+					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, DMC_WHITE, hitter);
 				} // else: other games don't display anything
 			}
@@ -4848,7 +4848,7 @@ void Actor::dumpMaxValues()
 std::string Actor::dump() const
 {
 	std::string buffer;
-	AppendFormat(buffer, "Debugdump of Actor {} ({}, {}):\n", fmt::WideToChar{GetName(1)}, fmt::WideToChar{GetName(0)}, fmt::WideToChar{GetName(-1)});
+	AppendFormat(buffer, "Debugdump of Actor {} ({}, {}):\n", fmt::WideToChar{GetName()}, fmt::WideToChar{GetActorName(0)}, fmt::WideToChar{GetActorName(-1)});
 	buffer.append("Scripts:");
 	for (const auto script : Scripts) {
 		ResRef poi = "<none>";
@@ -5307,7 +5307,7 @@ void Actor::Resurrect(const Point &destPoint)
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
 		const size_t len = snprintf(DeathVar, sizeof(ieVariable), "%s_DEAD", scriptName.CString());
 		if (len > sizeof(ieVariable)) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", scriptName.CString(), GetName(1).c_str());
+			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", scriptName.CString(), GetName().c_str());
 		}
 		ieDword value=0;
 
@@ -5319,7 +5319,7 @@ void Actor::Resurrect(const Point &destPoint)
 	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
 		size_t len = snprintf(DeathVar, 32, core->GetDeathVarFormat(), scriptName);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals (on resurrect)!", scriptName.CString(), GetName(1).c_str());
+			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals (on resurrect)!", scriptName.CString(), GetName().c_str());
 		}
 		game->locals->SetAt(DeathVar, 0, true);
 	}
@@ -5647,7 +5647,7 @@ bool Actor::CheckOnDeath()
 		game->locals->Lookup(varname, value);
 		game->locals->SetAt(varname, 1, nocreate);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", scriptName.CString(), GetName(1).c_str());
+			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", scriptName.CString(), GetName().c_str());
 		}
 		if (value) {
 			IncrementDeathVariable(game->locals, "%s_KILL_CNT", scriptName, 1);
@@ -5711,7 +5711,7 @@ ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, const
 		vars->Lookup(varname, start);
 		vars->SetAt(varname, start + 1, nocreate);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", name, GetName(1).c_str());
+			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", name, GetName().c_str());
 		}
 	}
 	return start;
@@ -7232,7 +7232,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		BaseStats[IE_CHECKFORBERSERK]=3;
 	}
 
-	Log(DEBUG, "Actor", "Performattack for %ls, target is: %ls", GetName(0).c_str(), target->GetName(0).c_str());
+	Log(DEBUG, "Actor", "Performattack for %ls, target is: %ls", GetActorName(0).c_str(), target->GetActorName(0).c_str());
 
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
@@ -7332,7 +7332,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		// can we retry?
 		if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
 			// Missed <TARGETNAME> due to concealment.
-			core->GetTokenDictionary()->SetAt("TARGETNAME", target->GetName(-1));
+			core->GetTokenDictionary()->SetAt("TARGETNAME", target->GetActorName(-1));
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
 			buffer.append("[Concealment Miss]");
 			Log(COMBAT, "Attack", buffer);
@@ -10279,8 +10279,8 @@ Actor *Actor::CopySelf(bool mislead) const
 {
 	Actor *newActor = new Actor();
 
-	newActor->SetName(GetName(0),0);
-	newActor->SetName(GetName(1),1);
+	newActor->SetName(GetActorName(0),0);
+	newActor->SetName(GetName(),1);
 	newActor->version = version;
 	memcpy(newActor->BaseStats, BaseStats, sizeof(BaseStats) );
 	// illusions aren't worth any xp and don't explore
@@ -11219,7 +11219,7 @@ void Actor::ApplyEffectCopy(const Effect *oldfx, EffectRef &newref, Scriptable *
 	if (newfx) {
 		core->ApplyEffect(newfx, this, Owner);
 	} else {
-		Log(ERROR, "Actor", "Failed to create effect copy for %s! Target: %ls, Owner: %ls", newref.Name, GetName(1).c_str(), Owner->GetName().c_str());
+		Log(ERROR, "Actor", "Failed to create effect copy for %s! Target: %ls, Owner: %ls", newref.Name, GetName().c_str(), Owner->GetName().c_str());
 	}
 }
 
@@ -11255,7 +11255,7 @@ ieDword Actor::GetActiveClass() const
 		if (mcwas == mcwasflags[isClass]) break;
 	}
 	if (!oldclass) {
-		error("Actor", "Actor %ls has incorrect MC_WAS flags (%x)!", GetName(1).c_str(), mcwas);
+		error("Actor", "Actor %ls has incorrect MC_WAS flags (%x)!", GetName().c_str(), mcwas);
 	}
 
 	int newclassmask = multiclass & ~(1 << (oldclass - 1));
@@ -11264,7 +11264,7 @@ ieDword Actor::GetActiveClass() const
 	}
 
 	// can be hit when starting a dual class
-	Log(ERROR, "Actor", "Dual-classed actor %ls (old class %d) has wrong multiclass bits (%d), using old class!", GetName(1).c_str(), oldclass, multiclass);
+	Log(ERROR, "Actor", "Dual-classed actor %ls (old class %d) has wrong multiclass bits (%d), using old class!", GetName().c_str(), oldclass, multiclass);
 	return oldclass;
 }
 
