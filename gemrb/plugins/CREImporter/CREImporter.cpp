@@ -524,7 +524,6 @@ void CREImporter::SetupSlotCounts()
 void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 {
 	char Signature[8];
-	char filling[10];
 	ieDword tmpDword, CRESize;
 	ieWord tmpWord;
 
@@ -588,7 +587,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 	if (QSPCount==9) {
 		//NOTE: the gemrb internal format stores
 		//0xff or 0xfe in case of innates and bardsongs
-		memset(filling,0,sizeof(filling));
+		char filling[10] = {};
 		memcpy(filling,act->PCStats->QuickSpellClass,MAX_QSLOTS);
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if ( (ieByte) filling[i]>=0xfe) filling[i]=0;
@@ -2269,9 +2268,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	ieByte tmpByte;
 	ieWord tmpWord;
 	ieDword tmpDword;
-	char filling[51];
 
-	memset(filling,0,sizeof(filling));
 	memcpy( Signature, "CRE V0.0", 8);
 	Signature[5]+=CREVersion/10;
 	if (actor->version!=IE_CRE_V1_1) {
@@ -2404,7 +2401,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		//turnundead level, + 33 bytes of zero
 		tmpByte = actor->BaseStats[IE_TURNUNDEADLEVEL];
 		stream->Write(&tmpByte, 1);
-		stream->Write( filling,33);
+		stream->WriteFilling(33);
 		//total levels
 		tmpByte = actor->BaseStats[IE_CLASSLEVELSUM];
 		stream->Write( &tmpByte, 1);
@@ -2431,7 +2428,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		tmpByte = actor->BaseStats[IE_LEVELMAGE];
 		stream->Write( &tmpByte, 1);
 		//some stuffing
-		stream->Write( filling, 22);
+		stream->WriteFilling(22);
 		//string references
 		for (int i = 0; i < 64; i++) {
 			stream->WriteStrRef(actor->StrRefs[i]);
@@ -2439,18 +2436,18 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		stream->WriteResRef( actor->GetScript(SCR_AREA) );
 		stream->WriteResRef( actor->GetScript(SCR_RESERVED) );
 		//unknowns before feats
-		stream->Write( filling,4);
+		stream->WriteFilling(4);
 		//feats
 		stream->WriteDword(actor->BaseStats[IE_FEATS1]);
 		stream->WriteDword(actor->BaseStats[IE_FEATS2]);
 		stream->WriteDword(actor->BaseStats[IE_FEATS3]);
-		stream->Write( filling, 12);
+		stream->WriteFilling(12);
 		//proficiencies
 		for (int i = 0; i < 26; i++) {
 			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
 			stream->Write( &tmpByte, 1);
 		}
-		stream->Write( filling, 38);
+		stream->WriteFilling(38);
 		//alchemy
 		tmpByte = actor->BaseStats[IE_ALCHEMY];
 		stream->Write( &tmpByte, 1);
@@ -2499,7 +2496,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		//tracking
 		tmpByte = actor->BaseStats[IE_TRACKING];
 		stream->Write( &tmpByte, 1);
-		stream->Write( filling, 50);
+		stream->WriteFilling(50);
 		tmpByte = actor->BaseStats[IE_CR];
 		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_HATEDRACE];
@@ -2510,7 +2507,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		}
 		tmpByte = actor->BaseStats[IE_SUBRACE];
 		stream->Write( &tmpByte, 1);
-		stream->Write( filling, 1); //unknown
+		stream->WriteFilling(1); //unknown
 		tmpByte = actor->BaseStats[IE_SEX]; //
 		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_STR];
@@ -2532,7 +2529,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
 		stream->Write( &tmpByte, 1);
 		// unknown byte
-		stream->Write( &filling,1);
+		stream->WriteFilling(1);
 		// no kit word order magic for iwd2
 		stream->WriteDword(actor->BaseStats[IE_KIT]);
 		stream->WriteResRef( actor->GetScript(SCR_OVERRIDE) );
@@ -2547,7 +2544,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		}
 		tmpByte = actor->BaseStats[IE_TRACKING];
 		stream->Write( &tmpByte, 1);
-		stream->Write( filling, 32);
+		stream->WriteFilling(32);
 		for (const auto& ref : actor->StrRefs) {
 			stream->WriteStrRef(ref);
 		}
@@ -2582,7 +2579,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
 		stream->Write( &tmpByte, 1);
 		// unknown byte
-		stream->Write( &filling, 1);
+		stream->WriteFilling(1);
 		tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
 			((actor->BaseStats[IE_KIT] & 0xffff0000) >> 16);
 		stream->WriteDword(tmpDword);
@@ -2599,9 +2596,6 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize) const
 {
 	ieByte tmpByte;
-	char filling[5];
-
-	memset(filling,0,sizeof(filling));
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
 	stream->Write( &tmpByte, 1);
@@ -2615,7 +2609,7 @@ int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword I
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling, 5); //unknown bytes
+	stream->WriteFilling(5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
 	stream->WriteDword(InvSize); //saving the inventory size to this unused part
@@ -2626,9 +2620,6 @@ int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword I
 int CREImporter::PutActorBG(DataStream *stream, const Actor *actor) const
 {
 	ieByte tmpByte;
-	char filling[5];
-
-	memset(filling,0,sizeof(filling));
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
 	stream->Write( &tmpByte, 1);
@@ -2642,10 +2633,10 @@ int CREImporter::PutActorBG(DataStream *stream, const Actor *actor) const
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling, 5); //unknown bytes
+	stream->WriteFilling(5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
@@ -2654,10 +2645,8 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
-	char filling[44];
 
-	memset(filling,0,sizeof(filling));
-	stream->Write(filling, 44); //11*4 totally unknown
+	stream->WriteFilling(44); //11*4 totally unknown
 	stream->WriteDword(actor->BaseStats[IE_XP_MAGE]);
 	stream->WriteDword(actor->BaseStats[IE_XP_THIEF]);
 	for (int i = 0; i < 10; i++) {
@@ -2669,7 +2658,7 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 		stream->Write( &tmpByte, 1);
 	}
 	stream->WriteVariable(actor->KillVar);
-	stream->Write( filling,3); //unknown
+	stream->WriteFilling(3); //unknown
 	tmpByte=actor->BaseStats[IE_COLORCOUNT];
 	stream->Write( &tmpByte, 1);
 	stream->WriteDword(actor->AppearanceFlags);
@@ -2679,7 +2668,7 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 		stream->WriteWord(tmpWord);
 	}
 	stream->Write(actor->pstColorBytes, 10);
-	stream->Write(filling, 21);
+	stream->WriteFilling(21);
 	tmpByte = actor->BaseStats[IE_SPECIES];
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_TEAM];
@@ -2699,10 +2688,10 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling, 5); //unknown bytes
+	stream->WriteFilling(5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
@@ -2711,9 +2700,7 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor) const
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
-	char filling[52];
 
-	memset(filling,0,sizeof(filling));
 	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
 	stream->Write( &tmpByte, 1);
 	stream->Write( &actor->SetDeathVar, 1);
@@ -2725,14 +2712,14 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor) const
 	}
 	stream->WriteVariable(actor->KillVar); // some variable names in iwd
 	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
-	stream->Write( filling, 2);
+	stream->WriteFilling(2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord(tmpWord);
 	tmpWord = actor->BaseStats[IE_SAVEDYPOS];
 	stream->WriteWord(tmpWord);
 	tmpWord = actor->BaseStats[IE_SAVEDFACE];
 	stream->WriteWord(tmpWord);
-	stream->Write( filling, 18);
+	stream->WriteFilling(18);
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
 	stream->Write( &tmpByte, 1);
@@ -2746,10 +2733,10 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor) const
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling, 5); //unknown bytes
+	stream->WriteFilling(5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
@@ -2759,9 +2746,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor) const
 	ieByte tmpByte;
 	ieWord tmpWord;
 	ieDword tmpDword;
-	char filling[124];
 
-	memset(filling,0,sizeof(filling));
 	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
 	stream->Write( &tmpByte, 1);
 	stream->Write( &actor->SetDeathVar, 1);
@@ -2773,23 +2758,23 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor) const
 	}
 	stream->WriteVariable(actor->KillVar); // some variable names in iwd
 	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
-	stream->Write( filling, 2);
+	stream->WriteFilling(2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord(tmpWord);
 	tmpWord = actor->BaseStats[IE_SAVEDYPOS];
 	stream->WriteWord(tmpWord);
 	tmpWord = actor->BaseStats[IE_SAVEDFACE];
 	stream->WriteWord(tmpWord);
-	stream->Write( filling, 15);
+	stream->WriteFilling(15);
 	tmpByte = actor->BaseStats[IE_TRANSLUCENT];
 	stream->Write(&tmpByte, 1);
-	stream->Write(filling, 1); //fade speed
+	stream->WriteFilling(1); //fade speed
 	tmpByte = actor->BaseStats[IE_SPECFLAGS];
 	stream->Write(&tmpByte, 1);
-	stream->Write(filling, 3); //invisible, 2 unknowns
+	stream->WriteFilling(3); //invisible, 2 unknowns
 	tmpByte = actor->BaseStats[IE_UNUSED_SKILLPTS];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling, 124);
+	stream->WriteFilling(124);
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
 	stream->Write( &tmpByte, 1);
@@ -2803,14 +2788,14 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor) const
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling, 5); //unknown bytes
+	stream->WriteFilling(5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
-	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
 	tmpByte = actor->BaseStats[IE_CLASS];
 	stream->Write(&tmpByte, 1);
-	stream->Write(filling, 1);
+	stream->WriteFilling(1);
 	tmpDword = actor->GetClassMask();
 	stream->WriteDword(tmpDword);
 	return 0;
@@ -2896,9 +2881,6 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 		} else {
 			ieWord tmpWord;
 			ieByte tmpByte;
-			char filling[60];
-
-			memset(filling,0,sizeof(filling) );
 
 			tmpWord = (ieWord) fx->Opcode;
 			stream->WriteWord(tmpWord);
@@ -2923,7 +2905,7 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 			stream->WriteDword(fx->SavingThrowType);
 			stream->WriteDword(fx->SavingThrowBonus);
 			//isvariable
-			stream->Write( filling,4 );
+			stream->WriteFilling(4);
 		}
 	}
 	return 0;
@@ -2932,30 +2914,30 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 //add as effect!
 int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 {
-	char filling[104];
 	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword tmpDword, value;
 
 	for (unsigned int i=0;i<VariablesCount;i++) {
-		memset(filling,0,sizeof(filling) );
 		pos = actor->locals->GetNextAssoc( pos, name, value);
-		stream->Write(filling,8);
+		stream->WriteFilling(8);
 		tmpDword = FAKE_VARIABLE_OPCODE;
 		stream->WriteDword(tmpDword);
-		stream->Write(filling,8); //type, power
+		stream->WriteFilling(8); //type, power
 		stream->WriteDword(value); //param #1
-		stream->Write(filling,4); //param #2
+		stream->WriteFilling(4); //param #2
 		//HoW has an assertion to ensure timing is nonzero (even for variables)
 		value = 1;
 		stream->WriteDword(value); //timing
 		//duration, chance, resource, dices, saves
-		stream->Write( filling, 32);
+		stream->WriteFilling(32);
 		tmpDword = FAKE_VARIABLE_MARKER;
 		stream->WriteDword(tmpDword); //variable marker
-		stream->Write( filling, 92); //23 * 4
-		strnspccpy(filling, name, 32);
-		stream->Write( filling, 104); //32 + 72
+		stream->WriteFilling(92); //23 * 4
+		char buff[33] = {};
+		strnspccpy(buff, name, 32);
+		stream->Write(buff, 32);
+		stream->WriteFilling(72); //32 + 72
 	}
 	return 0;
 }

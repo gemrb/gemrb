@@ -267,9 +267,6 @@ int WMPImporter::PutWorldMap(DataStream *stream1, DataStream *stream2, WorldMapA
 
 int WMPImporter::PutLinks(DataStream *stream, const WorldMap *wmap) const
 {
-	char filling[128];
-
-	memset (filling,0,sizeof(filling));
 	unsigned int cnt = wmap->GetLinkCount();
 	for (unsigned i = 0; i < cnt; i++) {
 		const WMPAreaLink *al = wmap->GetLink(i);
@@ -282,18 +279,16 @@ int WMPImporter::PutLinks(DataStream *stream, const WorldMap *wmap) const
 			stream->WriteResRef(ref);
 		}
 		stream->WriteDword(al->EncounterChance);
-		stream->Write(filling,128);
+		stream->WriteFilling(128);
 	}
 	return 0;
 }
 
 int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
 {
-	char filling[128];
 	ieDword tmpDword;
 	unsigned int cnt = wmap->GetEntryCount();
 
-	memset (filling,0,sizeof(filling));
 	for(unsigned i=0;i<cnt;i++) {
 		const WMPAreaEntry *ae = wmap->GetEntry(i);
 
@@ -315,7 +310,7 @@ int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
 			stream->WriteDword(ae->AreaLinksIndex[dir]);
 			stream->WriteDword(ae->AreaLinksCount[dir]);
 		}
-		stream->Write(filling,128);
+		stream->WriteFilling(128);
 	}
 	return 0;
 }
@@ -336,7 +331,6 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 	unsigned int WorldMapsOffset;
 	unsigned int count;
 	int ret;
-	char filling[128];
 
 	assert(!index || !wmap->IsSingle());
 
@@ -348,7 +342,6 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 		count = WorldMapsCount1;
 	}
 
-	memset (filling,0,sizeof(filling));
 	ieDword AreaEntriesOffset = WorldMapsOffset + count * 184;
 	ieDword AreaLinksOffset = AreaEntriesOffset;
 	for (unsigned int i = index; i < WorldMapsCount; i++) {
@@ -386,7 +379,7 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 		AreaEntriesOffset += AreaEntriesCount * 240;
 		AreaLinksOffset += AreaLinksCount * 216;
 
-		stream->Write(filling, 124);
+		stream->WriteFilling(124);
 
 		if (!wmap->IsSingle() && !index) {
 			break;

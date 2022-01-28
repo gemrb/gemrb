@@ -1848,10 +1848,8 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 
 int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex) const
 {
-	char filling[8];
 	ieWord tmpWord = 0;
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<DoorsCount;i++) {
 		Door *d = map->TMap->GetDoor(i);
 
@@ -1913,7 +1911,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		if (s) {
 			stream->WriteResRefLC(s->GetName());
 		} else {
-			stream->Write( filling, 8);
+			stream->WriteFilling(8);
 		}
 		stream->WriteDword(d->DiscoveryDiff);
 		//lock difficulty field
@@ -1930,7 +1928,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteStrRef(d->NameStrRef);
 		stream->WriteResRef( d->GetDialog());
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
-			stream->Write( filling, 8);
+			stream->WriteFilling(8);
 		}
 	}
 	return 0;
@@ -1999,12 +1997,10 @@ int AREImporter::PutItems(DataStream *stream, const Map *map) const
 
 int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex) const
 {
-	char filling[56];
 	ieDword ItemIndex = 0;
 	ieDword tmpDword;
 	ieWord tmpWord;
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<ContainersCount;i++) {
 		const Container *c = map->TMap->GetContainer(i);
 
@@ -2043,7 +2039,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		if (s) {
 			stream->WriteResRefLC(s->GetName() );
 		} else {
-			stream->Write( filling, 8);
+			stream->WriteFilling(8);
 		}
 		//outline polygon index and count
 		tmpWord = (c->outline) ? c->outline->Count() : 0;
@@ -2057,7 +2053,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		stream->WriteResRefLC(c->KeyResRef);
 		stream->WriteDword(tmpDword); //unknown80
 		stream->WriteStrRef(c->OpenFail);
-		stream->Write( filling, 56); //unknown or unused stuff
+		stream->WriteFilling(56); //unknown or unused stuff
 	}
 	return 0;
 }
@@ -2066,9 +2062,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
-	char filling[36];
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<InfoPointsCount;i++) {
 		const InfoPoint *ip = map->TMap->GetInfoPoint(i);
 
@@ -2110,7 +2104,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		if (s) {
 			stream->WriteResRefLC(s->GetName());
 		} else {
-			stream->Write( filling, 8);
+			stream->WriteFilling(8);
 		}
 		tmpWord = (ieWord) ip->UsePoint.x;
 		ieDword tmpDword2 = ip->UsePoint.x;
@@ -2121,9 +2115,9 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		if (16 == map->version) {
 			stream->WriteDword(tmpDword2);
 			stream->WriteDword(tmpDword);
-			stream->Write(filling, 28); //unknown
+			stream->WriteFilling(28); //unknown
 		} else {
-			stream->Write(filling, 36); //unknown
+			stream->WriteFilling(36); //unknown
 		}
 		//these are probably only in PST
 		stream->WriteResRef( ip->EnterWav);
@@ -2140,9 +2134,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 int AREImporter::PutSpawns(DataStream *stream, const Map *map) const
 {
 	ieWord tmpWord;
-	char filling[56];
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<SpawnCount;i++) {
 		const Spawn *sp = map->GetSpawn(i);
 
@@ -2157,7 +2149,7 @@ int AREImporter::PutSpawns(DataStream *stream, const Map *map) const
 			stream->WriteResRef( sp->Creatures[j] );
 		}
 		while( j++<MAX_RESCOUNT) {
-			stream->Write( filling, 8);
+			stream->WriteFilling(8);
 		}
 		stream->WriteWord(tmpWord);
 		stream->WriteWord(sp->Difficulty);
@@ -2171,21 +2163,18 @@ int AREImporter::PutSpawns(DataStream *stream, const Map *map) const
 		stream->WriteDword(sp->appearance);
 		stream->WriteWord(sp->DayChance);
 		stream->WriteWord(sp->NightChance);
-		stream->Write( filling, 56); //most likely unused crap
+		stream->WriteFilling(56); //most likely unused crap
 	}
 	return 0;
 }
 
 void AREImporter::PutScript(DataStream *stream, const Actor *ac, unsigned int index) const
 {
-	char filling[8];
-
 	const GameScript *s = ac->Scripts[index];
 	if (s) {
 		stream->WriteResRefLC(s->GetName());
 	} else {
-		memset(filling,0,sizeof(filling));
-		stream->Write( filling, 8);
+		stream->WriteFilling(8);
 	}
 }
 
@@ -2195,10 +2184,8 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 	ieWord tmpWord;
 	ieByte tmpByte;
 	ieDword CreatureOffset = EmbeddedCreOffset;
-	char filling[120];
 
 	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i = 0; i < ActorCount; i++) {
 		const Actor *ac = map->GetActor(i, false);
 
@@ -2215,7 +2202,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 		stream->WriteDword(tmpDword); //used fields flag always 0 for saved areas
 		tmpWord = ac->Spawned;
 		stream->WriteWord(tmpWord);
-		stream->Write(filling, 1); // letter
+		stream->WriteFilling(1); // letter
 		tmpByte = ac->DifficultyMargin;
 		stream->Write( &tmpByte, 1 );
 		stream->WriteDword(tmpDword); //actor animation, unused
@@ -2237,13 +2224,13 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 		PutScript(stream, ac, SCR_SPECIFICS);
 		//creature reference is empty because we are embedding it
 		//the original engine used a '*'
-		stream->Write( filling, 8);
+		stream->WriteFilling(8);
 		stream->WriteDword(CreatureOffset);
 		ieDword CreatureSize = am->GetStoredFileSize(ac);
 		stream->WriteDword(CreatureSize);
 		CreatureOffset += CreatureSize;
 		PutScript(stream, ac, SCR_AREA);
-		stream->Write( filling, 120);
+		stream->WriteFilling(120);
 	}
 
 	CreatureOffset = EmbeddedCreOffset;
@@ -2298,9 +2285,7 @@ int AREImporter::PutAnimations(DataStream *stream, const Map *map) const
 int AREImporter::PutEntrances(DataStream *stream, const Map *map) const
 {
 	ieWord tmpWord;
-	char filling[66];
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<EntrancesCount;i++) {
 		const Entrance *e = map->GetEntrance(i);
 
@@ -2311,39 +2296,34 @@ int AREImporter::PutEntrances(DataStream *stream, const Map *map) const
 		stream->WriteWord(tmpWord);
 		stream->WriteWord(e->Face);
 		//a large empty piece of crap
-		stream->Write( filling, 66);
+		stream->WriteFilling(66);
 	}
 	return 0;
 }
 
 int AREImporter::PutVariables(DataStream *stream, const Map *map) const
 {
-	char filling[40];
 	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword value;
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<VariablesCount;i++) {
 		pos=map->locals->GetNextAssoc( pos, name, value);
 		//name isn't necessarily 32 bytes long, so we play safe
-		strncpy(filling, name, 32);
-		stream->Write( filling, 40);
-		//clearing up after the strncpy so we'll write 0's next
-		memset(filling,0,sizeof(filling) );
+		char buff[40] = {};
+		strncpy(buff, name, 32);
+		stream->Write(buff, 40);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
-		stream->Write( filling, 40);
+		stream->WriteFilling(40);
 	}
 	return 0;
 }
 
 int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 {
-	char filling[64];
 	ieWord tmpWord;
 
-	memset(filling,0,sizeof(filling) );
 	ieWord realCount = map->GetAmbientCount();
 	for (ieWord i = 0; i < realCount; i++) {
 		const Ambient *am = map->GetAmbient(i);
@@ -2354,7 +2334,7 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 		tmpWord = (ieWord) am->origin.y;
 		stream->WriteWord(tmpWord);
 		stream->WriteWord(am->radius);
-		stream->Write( filling, 2 );
+		stream->WriteFilling(2);
 		stream->WriteDword(am->pitchVariance);
 		stream->WriteWord(am->gainVariance);
 		stream->WriteWord(am->gain);
@@ -2364,29 +2344,27 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 			stream->WriteResRef( am->sounds[j] );
 		}
 		while( j++<MAX_RESCOUNT) {
-			stream->Write( filling, 8);
+			stream->WriteFilling(8);
 		}
 		stream->WriteWord(tmpWord);
-		stream->Write( filling, 2 );
+		stream->WriteFilling(2);
 		stream->WriteDword(ieDword(am->interval / 1000));
 		stream->WriteDword(ieDword(am->intervalVariance / 1000));
 		stream->WriteDword(am->appearance);
 		stream->WriteDword(am->flags);
-		stream->Write( filling, 64);
+		stream->WriteFilling(64);
 	}
 	return 0;
 }
 
 int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 {
-	char filling[8];
 	ieDword tmpDword;
 	ieWord tmpWord;
 
 	//different format
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<NoteCount;i++) {
 		const MapNote& mn = map->GetMapNote(i);
 
@@ -2410,16 +2388,16 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 			// pad the remaining space
 			size_t x = 500 - len;
 			for (size_t j = 0; j < x / 8; ++j) {
-				stream->Write( filling, 8);
+				stream->WriteFilling(8);
 			}
 			x = x%8;
 			if (x) {
-				stream->Write( filling, x);
+				stream->WriteFilling(x);
 			}
 			tmpDword = (ieDword) mn.readonly;
 			stream->WriteDword(tmpDword);
 			for (x=0;x<5;x++) { //5 empty dwords
-				stream->Write( filling, 4);
+				stream->WriteFilling(4);
 			}
 		} else {
 			tmpWord = (ieWord) mn.Pos.x;
@@ -2432,7 +2410,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 			tmpDword = 1;
 			stream->WriteDword(tmpDword);
 			for (int x = 0; x < 9; ++x) { //9 empty dwords
-				stream->Write( filling, 4);
+				stream->WriteFilling(4);
 			}
 		}
 	}
@@ -2520,10 +2498,8 @@ int AREImporter::PutExplored(DataStream *stream, const Map *map) const
 
 int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 {
-	char filling[48];
 	ieDword tmpDword = 0;
 
-	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<TileCount;i++) {
 		const TileObject *am = map->TMap->GetTile(i);
 		stream->WriteVariable(am->Name);
@@ -2535,17 +2511,15 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 		stream->WriteDword(am->closedcount);
 		//can't write tiles otherwise now we should write a tile index
 		stream->WriteDword(tmpDword);
-		stream->Write( filling, 48);
+		stream->WriteFilling(48);
 	}
 	return 0;
 }
 
 int AREImporter::PutSongHeader(DataStream *stream, const Map *map) const
 {
-	char filling[8];
 	ieDword tmpDword = 0;
 
-	memset(filling,0,sizeof(filling) );
 	for (const auto& list : map->SongList) {
 		stream->WriteDword(list);
 	}
@@ -2570,9 +2544,7 @@ int AREImporter::PutRestHeader(DataStream *stream, const Map *map) const
 {
 	ieDword tmpDword = 0;
 
-	char filling[32];
-	memset(filling,0,sizeof(filling) );
-	stream->Write( filling, 32); //empty label
+	stream->WriteFilling(32); //empty label
 	for (const auto& ref : map->RestHeader.Strref) {
 		stream->WriteStrRef(ref);
 	}

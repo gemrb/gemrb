@@ -117,6 +117,20 @@ strret_t DataStream::WriteResRefUC(const ResRef& src)
 	return WriteResRef(MakeUpperCaseResRef(src.CString()));
 }
 
+strret_t DataStream::WriteFilling(strpos_t len)
+{
+	const static char zerobuf[256] = {};
+	
+	strret_t ret = 0;
+	while (len >= sizeof(zerobuf)) {
+		ret += Write(zerobuf, sizeof(zerobuf));
+		len -= sizeof(zerobuf);
+	}
+	
+	ret += Write(zerobuf, len);
+	return ret;
+}
+
 strret_t DataStream::ReadVariable(ieVariable& dest)
 {
 	char ref[33];
