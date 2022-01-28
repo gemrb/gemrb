@@ -1687,10 +1687,7 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 std::string Interface::GetMBCString(ieStrRef strref, STRING_FLAGS options) const
 {
 	String string = GetString(strref, options);
-	char* cstr = MBCStringFromString(string);
-	std::string ret = cstr;
-	free(cstr);
-	return ret;
+	return MBStringFromString(string);
 }
 
 void Interface::SetFeature(int flag, int position)
@@ -4021,9 +4018,8 @@ int Interface::WriteCharacter(const char *name, const Actor *actor)
 		str.Create( Path, name, IE_BIO_CLASS_ID );
 		//never write the string reference into this string
 		String tmp = GetString(actor->GetVerbalConstant(VB_BIO), STRING_FLAGS::STRREFOFF);
-		char* cstr = MBCStringFromString(tmp);
-		str.Write (cstr, strlen(cstr));
-		free(cstr);
+		std::string mbstr = MBStringFromString(tmp);
+		str.Write(mbstr.data(), mbstr.length());
 	}
 	return 0;
 }

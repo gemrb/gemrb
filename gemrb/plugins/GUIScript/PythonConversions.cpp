@@ -156,10 +156,8 @@ PyObject* PyString_FromStringObj(const std::string& s)
 PyObject* PyString_FromStringObj(const String& s)
 {
 	// FIXME: this is wrong, python needs to know the encoding
-	char* cstr = MBCStringFromString(s);
-	PyObject* pyStr = PyString_FromString(cstr);
-	free(cstr);
-	return pyStr;
+	std::string mbstr = MBStringFromString(s);
+	return PyString_FromString(mbstr.c_str());
 }
 
 String* PyString_AsStringObj(PyObject* obj)

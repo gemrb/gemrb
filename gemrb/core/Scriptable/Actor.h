@@ -550,7 +550,7 @@ public:
 	ieVariable GetNameAsVariable(int which) const
 	{
 		const String& name = GetName(which);
-		return ieVariable(MBCStringFromString(name));
+		return ieVariable(MBStringFromString(name).c_str());
 	}
 	
 	/** Gets the DeathVariable */

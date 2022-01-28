@@ -39,7 +39,7 @@ extern GEM_EXPORT unsigned char pl_lowercase[256];
 GEM_EXPORT char* ConvertCharEncoding(const char * string, const char * from, const char* to);
 GEM_EXPORT String* StringFromCString(const char* string);
 GEM_EXPORT String* StringFromUtf8(const char* string);
-GEM_EXPORT char* MBCStringFromString(const String& string);
+GEM_EXPORT std::string MBStringFromString(const String& string);
 
 template <typename T>
 GEM_EXPORT_T T ToLower(T c) {
@@ -94,8 +94,8 @@ struct formatter<WideToChar> {
 	template <typename FormatContext>
 	auto format(const WideToChar& wstr, FormatContext& ctx) -> decltype(ctx.out()) {
 		// TODO: must call upon iconv here
-		const char* cstr = GemRB::MBCStringFromString(wstr.string);
-		return format_to(ctx.out(), "{}", cstr);
+		const auto mbstr = GemRB::MBStringFromString(wstr.string);
+		return format_to(ctx.out(), "{}", mbstr);
 	}
 };
 

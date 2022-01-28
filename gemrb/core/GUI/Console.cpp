@@ -77,12 +77,10 @@ bool Console::Execute(const String& text)
 {
 	bool ret = false;
 	if (text.length()) {
-		char* cBuf = MBCStringFromString(text);
-		assert(cBuf);
+		std::string mbstr = MBStringFromString(text);
 		ScriptEngine::FunctionParameters params;
-		params.push_back(ScriptEngine::Parameter(cBuf));
+		params.push_back(ScriptEngine::Parameter(mbstr.c_str()));
 		ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
-		free(cBuf);
 		HistoryAdd();
 	}
 	return ret;

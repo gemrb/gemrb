@@ -145,26 +145,23 @@ String* StringFromUtf8(const char* string)
 	return StringFromEncodedData((const ieByte*) string, enc);
 }
 
-char* MBCStringFromString(const String& string)
+std::string MBStringFromString(const String& string)
 {
-	size_t allocatedBytes = string.length() * sizeof(String::value_type);
-	char *cStr = (char*)malloc(allocatedBytes);
+	std::string ret(string.length() * 2, '\0');
 
 	// FIXME: depends on locale setting
 	// FIXME: currently assumes a character-character mapping (Unicode -> ASCII)
-	size_t newlen = wcstombs(cStr, string.c_str(), allocatedBytes);
+	size_t newlen = wcstombs(&ret[0], string.c_str(), ret.capacity());
 
 	if (newlen == static_cast<size_t>(-1)) {
 		// invalid multibyte sequence
 		Log(ERROR, "String", "wcstombs failed to covert string %ls with error: %s", string.c_str(), strerror(errno));
-		free(cStr);
-		return NULL;
+		return ret;
 	}
-	// FIXME: assuming compatibility with NTMBS
-	cStr = (char*)realloc(cStr, newlen+1);
-	cStr[newlen] = '\0';
+	assert(newlen <= ret.length());
+	ret.resize(newlen);
 
-	return cStr;
+	return ret;
 }
 
 unsigned char pl_uppercase[256];

@@ -414,9 +414,8 @@ void Variables::SetAt(const char* key, char* value)
 
 void Variables::SetAt(const char* key, const String& newValue)
 {
-	char* cstr = MBCStringFromString(newValue);
-	assert(cstr);
-	SetAt(key, cstr);
+	const std::string& mbstr = MBStringFromString(newValue);
+	SetAtCopy(key, mbstr.c_str());
 }
 
 void Variables::SetAt(const char* key, void* value)
