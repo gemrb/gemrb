@@ -274,7 +274,14 @@ void DisplayMessage::DisplayStringName(int stridx, const char* color, const Scri
 	DisplayRollStringName(stridx, gamedata->GetColor(GUIColors[color]), speaker);
 }
 
-	DisplayStringName(stridx, gamedata->GetColor(color), speaker, flags);
+void DisplayMessage::DisplayStringName(int stridx, unsigned char color, const Scriptable *speaker, ieDword flags) const
+{
+	DisplayStringName(stridx, gamedata->GetColor(GUIColors[color]), speaker, flags);
+}
+
+void DisplayMessage::DisplayStringName(const String& text, unsigned char color, const Scriptable *speaker) const
+{
+	DisplayStringName(text, gamedata->GetColor(GUIColors[color]), speaker);
 }
 
 void DisplayMessage::DisplayStringName(int stridx, const Color &color, const Scriptable *speaker, ieDword flags) const

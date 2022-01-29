@@ -112,6 +112,8 @@ public:
 	void DisplayString(const String& text) const;
 	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;
 	void DisplayString(String text, const Color &color, Scriptable *target) const;
+	void DisplayString(int stridx, unsigned char color, ieDword flags) const;
+	void DisplayString(const String& text, unsigned char color, Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
