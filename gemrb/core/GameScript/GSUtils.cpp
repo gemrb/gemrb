@@ -196,7 +196,7 @@ static const char* const spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "S
 bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
 {
 	if (parameters->string0Parameter[0]) {
-		spellRes = MakeLowerCaseResRef(parameters->string0Parameter);
+		spellRes = ResRef::MakeLowerCase(parameters->string0Parameter);
 	} else {
 		//resolve spell
 		int type = parameters->int0Parameter/1000;
@@ -1320,7 +1320,7 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 	Effect *fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;
 	fx->SetPosition(position);
-	fx->Resource = MakeUpperCaseResRef(area);
+	fx->Resource = ResRef::MakeUpperCase(area);
 	core->ApplyEffect(fx, actor, actor);
 	return true;
 }

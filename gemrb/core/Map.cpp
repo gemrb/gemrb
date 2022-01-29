@@ -225,7 +225,7 @@ private:
 				for (;j;j--) {
 					resrefs[j - 1] = tab->QueryField(j, i);
 				}
-				ResRef GroupName = MakeLowerCaseResRef(tab->GetColumnName(i));
+				ResRef GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
 				vars.insert(std::make_pair(GroupName, SpawnGroup(std::move(resrefs), level)));
 			}
 		}
@@ -2076,7 +2076,7 @@ void Map::MarkVisited(const Actor *actor) const
 void Map::AddActor(Actor* actor, bool init)
 {
 	//setting the current area for the actor as this one
-	actor->Area = MakeLowerCaseResRef(scriptName);
+	actor->Area = ResRef::MakeLowerCase(scriptName);
 	if (!HasActor(actor)) {
 		actors.push_back( actor );
 	}

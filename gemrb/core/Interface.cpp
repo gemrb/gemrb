@@ -3455,7 +3455,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 		if (Prefix) {
 			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
 		} else {
-			ItemName = MakeUpperCaseResRef(tab->GetRowName(j));
+			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j));
 		}
 
 		int l=tab->GetColumnCount(j);
@@ -3463,7 +3463,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 		int cl = atoi(tab->GetColumnName(0));
 		std::vector<ResRef> refs;
 		for(int k=0;k<l;k++) {
-			refs.push_back(MakeLowerCaseResRef(tab->QueryField(j, k)));
+			refs.push_back(ResRef::MakeLowerCase(tab->QueryField(j, k)));
 		}
 		RtRows.insert(std::make_pair(ItemName, ItemList(std::move(refs), cl)));
 	}
@@ -3644,7 +3644,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 			diceThrows = 1;
 		}
 		if (*endptr) {
-			itm->ItemResRef = MakeLowerCaseResRef(NewItem);
+			itm->ItemResRef = ResRef::MakeLowerCase(NewItem);
 		} else {
 			itm->ItemResRef = GoldResRef;
 		}
@@ -4310,12 +4310,12 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	if (tab) {
 		unsigned int cols = tab->GetColumnCount();
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
-		resource1 = MakeUpperCaseResRef(tab->QueryField(row, 0));
+		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0));
 		if (cols > 1) {
-			resource2 = MakeUpperCaseResRef(tab->QueryField(row, 1));
+			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1));
 		}
 		if (cols > 2) {
-			resource3 = MakeUpperCaseResRef(tab->QueryField(row, 2));
+			resource3 = ResRef::MakeUpperCase(tab->QueryField(row, 2));
 		}
 	}
 }

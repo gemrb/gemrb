@@ -37,25 +37,6 @@ namespace GemRB {
 /** Resource reference */
 class DataStream;
 
-// ResRef is case insensitive, but the originals weren't always
-// in some cases we need lower/upper case for save compatibility with originals
-// so we provide factories the create ResRef with the required case
-inline ResRef MakeLowerCaseResRef(const char* str) {
-	if (!str) return ResRef();
-
-	char ref[9];
-	strnlwrcpy(ref, str, sizeof(ref) - 1);
-	return ResRef(ref);
-}
-
-inline ResRef MakeUpperCaseResRef(const char* str) {
-	if (!str) return ResRef();
-
-	char ref[9];
-	strnuprcpy(ref, str, sizeof(ref) - 1);
-	return ResRef(ref);
-}
-
 inline bool IsStar(const ResRef& resref) {
 	return resref[0] == '*';
 }

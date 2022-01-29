@@ -8714,7 +8714,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 	}
 	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(index));
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
-	Sound = MakeLowerCaseResRef(tab->QueryField(index, col));
+	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col));
 	return true;
 }
 

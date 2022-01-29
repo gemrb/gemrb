@@ -1467,7 +1467,7 @@ void InitializeIEScript()
 		else {
 			idtargets[i]=poi->Function;
 		}
-		ObjectIDSTableNames[i] = MakeLowerCaseResRef(idsname);
+		ObjectIDSTableNames[i] = ResRef::MakeLowerCase(idsname);
 	}
 	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {

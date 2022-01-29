@@ -56,7 +56,7 @@ InfoPoint::InfoPoint(void)
 void InfoPoint::SetEnter(const char *resref)
 {
 	if (gamedata->Exists(resref, IE_WAV_CLASS_ID) ) {
-		EnterWav = MakeUpperCaseResRef(resref);
+		EnterWav = ResRef::MakeUpperCase(resref);
 	}
 }
 

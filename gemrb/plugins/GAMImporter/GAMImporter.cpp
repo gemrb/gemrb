@@ -179,7 +179,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			playmode *= 3;
 		}
 
-		newGame->CurrentArea = MakeLowerCaseResRef(tm->QueryField(playmode));
+		newGame->CurrentArea = ResRef::MakeLowerCase(tm->QueryField(playmode));
 	}
 
 	//Loading PCs
