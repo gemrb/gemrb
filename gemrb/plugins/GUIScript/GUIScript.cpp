@@ -5549,12 +5549,18 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "i|i", &globalID, &Which );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-
-	if (Which == 2) {
-		return PyString_FromString( actor->GetScriptName() );
-	}
 	
-	return PyString_FromStringObj(actor->GetActorName(Which));
+	switch (Which) {
+		case 0:
+			return PyString_FromStringObj(actor->GetShortName());
+		case 1:
+			return PyString_FromStringObj(actor->GetLongName());
+		case 2:
+			return PyString_FromString(actor->GetScriptName());
+		case -1:
+		default:
+			return PyString_FromStringObj(actor->GetDefaultName());
+	}
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerName__doc,

@@ -536,21 +536,21 @@ public:
 	void SetSoundFolder(const char *soundset) const;
 	/* Use overrideSet to replace PCStats->SoundSet */
 	void GetSoundFolder(char *soundset, int flag, const ResRef& overrideSet) const;
+	
 	/** Gets the Character Long Name/Short Name */
-	const String& GetActorName(int which) const
+	const String& GetShortName() const
 	{
-		if(which==-1) which=TalkCount;
-		if (which) {
-			return LongName;
-		}
 		return ShortName;
 	}
 	
-	//32 is the maximum possible length of the actor name in the original games
-	ieVariable GetNameAsVariable(int which) const
+	const String& GetLongName() const
 	{
-		const String& name = GetActorName(which);
-		return ieVariable(MBStringFromString(name).c_str());
+		return LongName;
+	}
+	
+	const String& GetDefaultName() const
+	{
+		return TalkCount ? GetLongName() : GetShortName();
 	}
 	
 	/** Gets the DeathVariable */

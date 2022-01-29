@@ -722,7 +722,7 @@ void PolymorphCopyCore(const Actor *src, Actor *tar)
 		tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
 	}
 
-	tar->SetName(src->GetActorName(0),0);
+	tar->SetName(src->GetShortName(), 0);
 	tar->SetName(src->GetName(),1);
 	//add more attribute copying
 }
@@ -1328,7 +1328,7 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust)
 {
 	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %ls to %s [%d.%d] face: %d",
-		actor->GetActorName(0).c_str(), area.CString(), position.x, position.y, face);
+		actor->GetShortName().c_str(), area.CString(), position.x, position.y, face);
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();

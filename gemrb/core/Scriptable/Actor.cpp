@@ -4848,7 +4848,7 @@ void Actor::dumpMaxValues()
 std::string Actor::dump() const
 {
 	std::string buffer;
-	AppendFormat(buffer, "Debugdump of Actor {} ({}, {}):\n", fmt::WideToChar{GetName()}, fmt::WideToChar{GetActorName(0)}, fmt::WideToChar{GetActorName(-1)});
+	AppendFormat(buffer, "Debugdump of Actor {} ({}, {}):\n", fmt::WideToChar{GetName()}, fmt::WideToChar{GetShortName()}, fmt::WideToChar{GetDefaultName()});
 	buffer.append("Scripts:");
 	for (const auto script : Scripts) {
 		ResRef poi = "<none>";
@@ -7232,7 +7232,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		BaseStats[IE_CHECKFORBERSERK]=3;
 	}
 
-	Log(DEBUG, "Actor", "Performattack for %ls, target is: %ls", GetActorName(0).c_str(), target->GetActorName(0).c_str());
+	Log(DEBUG, "Actor", "Performattack for %ls, target is: %ls", GetShortName().c_str(), target->GetShortName().c_str());
 
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
@@ -7332,7 +7332,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		// can we retry?
 		if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
 			// Missed <TARGETNAME> due to concealment.
-			core->GetTokenDictionary()->SetAt("TARGETNAME", target->GetActorName(-1));
+			core->GetTokenDictionary()->SetAt("TARGETNAME", target->GetDefaultName());
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
 			buffer.append("[Concealment Miss]");
 			Log(COMBAT, "Attack", buffer);
@@ -10279,7 +10279,7 @@ Actor *Actor::CopySelf(bool mislead) const
 {
 	Actor *newActor = new Actor();
 
-	newActor->SetName(GetActorName(0),0);
+	newActor->SetName(GetShortName(), 0);
 	newActor->SetName(GetName(),1);
 	newActor->version = version;
 	memcpy(newActor->BaseStats, BaseStats, sizeof(BaseStats) );

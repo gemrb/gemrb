@@ -124,13 +124,12 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 	}
 
 	Color speaker_color {0x80, 0, 0, 0xff};
-	String string;
 	// NOTE: name color was hardcoded to a limited list in the originals;
 	// the 1PP mod tackled this restriction by altering the exe to use a bigger list.
 	// We just generate a colour by looking at the existing palette instead.
 	switch (speaker->Type) {
 		case ST_ACTOR:
-			string = Scriptable::As<Actor>(speaker)->GetActorName(-1);
+			name = Scriptable::As<Actor>(speaker)->GetDefaultName();
 			{
 				auto pal16 = core->GetPalette16(((const Actor *) speaker)->GetStat(IE_MAJOR_COLOR));
 				// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results
@@ -145,14 +144,14 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 		case ST_TRIGGER:
 		case ST_PROXIMITY:
 		case ST_TRAVEL:
-			string = core->GetString( speaker->DialogName );
+			name = core->GetString( speaker->DialogName );
 			speaker_color = Color(0xc0, 0xc0, 0xc0, 0xff);
 			break;
 		default:
+			name = L"";
 			break;
 	}
 	
-	name = string;
 	return speaker_color;
 }
 

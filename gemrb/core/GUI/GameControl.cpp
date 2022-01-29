@@ -1143,7 +1143,7 @@ String GameControl::TooltipText() const {
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 		tip = actor->GetName();
 	} else {
-		tip = actor->GetActorName(-1);
+		tip = actor->GetDefaultName();
 	}
 
 	int hp = actor->GetStat(IE_HITPOINTS);

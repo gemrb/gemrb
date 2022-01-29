@@ -2196,12 +2196,12 @@ std::string Game::dump() const
 
 	AppendFormat(buffer, "Party size: {}\n", PCs.size());
 	for (auto actor : PCs) {
-		AppendFormat(buffer, "Name: {} Order {} {}\n", fmt::WideToChar{actor->GetActorName(0)}, actor->InParty, actor->Selected?"x":"-");
+		AppendFormat(buffer, "Name: {} Order {} {}\n", fmt::WideToChar{actor->GetShortName()}, actor->InParty, actor->Selected?"x":"-");
 	}
 
 	AppendFormat(buffer, "\nNPC count: {}\n", NPCs.size());
 	for (auto actor : NPCs) {
-		AppendFormat(buffer, "Name: {}\tSelected: {}\n", fmt::WideToChar{actor->GetActorName(0)}, actor->Selected ? "x ": "-");
+		AppendFormat(buffer, "Name: {}\tSelected: {}\n", fmt::WideToChar{actor->GetShortName()}, actor->Selected ? "x ": "-");
 	}
 	
 	return buffer;
