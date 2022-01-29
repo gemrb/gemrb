@@ -77,6 +77,25 @@ class FixedSizeString {
 	char str[LEN + 1] {'\0'};
 	
 public:
+	// ResRef is case insensitive, but the originals weren't always
+	// in some cases we need lower/upper case for save compatibility with originals
+	// so we provide factories the create ResRef with the required case
+	static FixedSizeString MakeLowerCase(const char* str) {
+		if (!str) return FixedSizeString();
+
+		FixedSizeString fss;
+		strnlwrcpy(fss.str, str, sizeof(fss.str) - 1);
+		return fss;
+	}
+
+	static FixedSizeString MakeUpperCase(const char* str) {
+		if (!str) return FixedSizeString();
+
+		FixedSizeString fss;
+		strnuprcpy(fss.str, str, sizeof(fss.str) - 1);
+		return fss;
+	}
+	
 	FixedSizeString() noexcept = default;
 	FixedSizeString(std::nullptr_t) noexcept = delete;
 	FixedSizeString& operator=(std::nullptr_t) noexcept = delete;

@@ -652,7 +652,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 			map->RemoveActor(tar);
 		}
 		//update the target's area to the destination
-		tar->Area = MakeUpperCaseResRef(parameters->string1Parameter);
+		tar->Area = ResRef::MakeUpperCase(parameters->string1Parameter);
 		//if the destination area is currently loaded, move the actor there now
 		if (game->FindMap(tar->Area)) {
 			MoveBetweenAreasCore( tar, parameters->string1Parameter, parameters->pointParameter, -1, true);
@@ -3063,9 +3063,9 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		//set dialog only if we got a row
 		if (pdtable->GetRowIndex( scriptname ) != -1) {
 			if (game->Expansion == GAME_TOB) {
-				resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "25JOIN_DIALOG_FILE"));
+				resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "25JOIN_DIALOG_FILE"));
 			} else {
-				resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "JOIN_DIALOG_FILE"));
+				resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "JOIN_DIALOG_FILE"));
 			}
 			act->SetDialog(resRef);
 		}
@@ -3597,9 +3597,9 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 		ResRef resRef;
 
 		if (core->GetGame()->Expansion == GAME_TOB) {
-			resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "25POST_DIALOG_FILE"));
+			resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "25POST_DIALOG_FILE"));
 		} else {
-			resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "POST_DIALOG_FILE"));
+			resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "POST_DIALOG_FILE"));
 		}
 		act->SetDialog(resRef);
 	}
@@ -6421,7 +6421,7 @@ void GameScript::ChangeDestination(Scriptable* Sender, Action* parameters)
 	InfoPoint *ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	if (ip && (ip->Type==ST_TRAVEL) ) {
 		//alter the destination area, don't touch the entrance variable link
-		ip->Destination = MakeLowerCaseResRef(parameters->string0Parameter);
+		ip->Destination = ResRef::MakeLowerCase(parameters->string0Parameter);
 	}
 }
 
