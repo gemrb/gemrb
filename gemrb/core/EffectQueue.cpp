@@ -1915,7 +1915,7 @@ bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 	return WeaponImmunity(fx_weapon_immunity_ref.opcode, enchantment, weapontype);
 }
 
-void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) const
+void EffectQueue::AddWeaponEffects(EffectQueue* fxqueue, EffectRef& fx_ref, ieDword param2) const
 {
 	ResolveEffectRef(fx_ref);
 	if( fx_ref.opcode<0) {
@@ -1928,7 +1928,8 @@ void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) cons
 	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		//
+		if (!param2 && fx->Parameter2 != param2) continue;
+
 		Effect *fx2 = core->GetEffect(fx->Resource, fx->Power, p);
 		if (!fx2) continue;
 		fx2->Target = FX_TARGET_PRESET;
