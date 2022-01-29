@@ -11196,9 +11196,8 @@ bool Actor::ConcentrationCheck() const
 
 	// so there is someone out to get us and we should do the real concentration check
 	int roll = LuckyRoll(1, 20, 0);
-	// TODO: the manual replaces the con bonus with an int one (verify!)
-	int concentration = GetStat(IE_CONCENTRATION);
-	int bonus = GetAbilityBonus(IE_INT);
+	int concentration = GetSkill(IE_CONCENTRATION);
+	int bonus = 0;
 	if (HasFeat(FEAT_COMBAT_CASTING)) {
 		bonus += 4;
 	}
