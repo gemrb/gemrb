@@ -234,7 +234,7 @@ void GameData::FreeItem(Item const *itm, const ResRef &name, bool free)
 
 	res = ItemCache.DecRef((const void *) itm, name, free);
 	if (res<0) {
-		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", name.CString());
+		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: {}", name);
 	}
 	if (res) return;
 	if (free) delete itm;
@@ -272,7 +272,7 @@ void GameData::FreeSpell(const Spell *spl, const ResRef &name, bool free)
 {
 	int res = SpellCache.DecRef((const void *) spl, name, free);
 	if (res<0) {
-		error("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: %.8s or %.8s\n",
+		error("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: {} or {}",
 			name.CString(), spl->Name.CString());
 	}
 	if (res) return;
@@ -308,7 +308,7 @@ void GameData::FreeEffect(const Effect *eff, const ResRef &name, bool free)
 {
 	int res = EffectCache.DecRef((const void *) eff, name, free);
 	if (res<0) {
-		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", name.CString());
+		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: {}", name);
 	}
 	if (res) return;
 	if (free) delete eff;

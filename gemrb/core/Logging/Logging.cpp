@@ -107,7 +107,7 @@ void SetConsoleWindowLogLevel(log_level level)
 	CWLL = level;
 }
 
-static void LogMsg(LogMessage&& msg)
+void LogMsg(LogMessage&& msg)
 {
 	ConsoleWinLogMsg(msg);
 	if (logger) {
@@ -134,16 +134,6 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 	vsnprintf(buf, len + 1, message, ap);
 	LogMsg(LogMessage(level, owner, buf, color));
 	delete[] buf;
-}
-
-void error(const char* owner, const char* message, ...)
-{
-	va_list ap;
-	va_start(ap, message);
-	vLog(FATAL, owner, message, LIGHT_RED, ap);
-	va_end(ap);
-
-	exit(1);
 }
 
 void Log(log_level level, const char* owner, const char* message, ...)

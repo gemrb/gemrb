@@ -235,7 +235,7 @@ Interface::Interface()
 	const char* iconvCode = GetIconvNameForCodepage(codepage);
 
 	if (nullptr == iconvCode) {
-		error("Interface", "Mapping of codepage %u unknown to iconv.", codepage);
+		error("Interface", "Mapping of codepage {} unknown to iconv.", codepage);
 	}
 	SystemEncoding = iconvCode;
 #elif defined(HAVE_LANGINFO_H)
@@ -777,7 +777,7 @@ int Interface::LoadFonts()
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, background);
 
 		if (!fnt) {
-			error("Core", "Unable to load font resource: %s for ResRef %s (check fonts.2da)", font_name, resref.CString());
+			error("Core", "Unable to load font resource: {} for ResRef {} (check fonts.2da)", font_name, resref);
 		} else {
 			fonts[resref] = fnt;
 			Log(MESSAGE, "Core", "Loaded Font: %s for ResRef %s", font_name, resref.CString());
@@ -1009,7 +1009,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 
 	if (!MakeDirectories(config.CachePath)) {
-		error("Core", "Unable to create cache directory '%s'", config.CachePath);
+		error("Core", "Unable to create cache directory '{}'", config.CachePath);
 	}
 
 	if (StupidityDetector(config.CachePath)) {
@@ -1883,7 +1883,7 @@ bool Interface::LoadGemRBINI()
 
 	for (uint32_t i = 0; i < GF_COUNT; i++) {
 		if (!game_flags[i]) {
-			error("Core", "Fix the game flags!\n");
+			error("Core", "Fix the game flags!");
 		}
 		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
 	}
@@ -2583,7 +2583,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			filter = new OrPredicate<const char*>(filter, new ExtFilter("BCS"));
 			break;
 		default:
-			error("Interface", "Unknown resource directory type: %d!", dir);
+			error("Interface", "Unknown resource directory type: {}!", dir);
 	}
 
 	PathJoin(Path, config.GamePath, resourcePath, nullptr);
@@ -4390,7 +4390,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	int symbol = LoadSymbol( "stats" );
 	auto sym = GetSymbol( symbol );
 	if (!sym) {
-		error("Core", "Cannot load statistic name mappings.\n");
+		error("Core", "Cannot load statistic name mappings.");
 	}
 	ieDword stat = (ieDword) sym->GetValue( stat_name );
 	if (stat==(ieDword) ~0) {
@@ -4478,7 +4478,7 @@ void Interface::SetNextScript(const char *script)
 
 void Interface::SanityCheck(const char *ver) {
 	if (strcmp(ver, VERSION_GEMRB) != 0) {
-		error("Core", "version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
+		error("Core", "Version check failed: core version {} doesn't match caller's version {}!", VERSION_GEMRB, ver);
 	}
 }
 

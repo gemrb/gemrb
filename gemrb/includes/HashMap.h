@@ -179,7 +179,7 @@ template<typename Key, typename Value, typename Hash>
 bool HashMap<Key, Value, Hash>::set(const Key &key, const Value &value)
 {
 	if (!isInitialized())
-		error("HashMap", "Not initialized\n");
+		error("HashMap", "Not initialized!");
 
 	unsigned int p = getMapPosByKey(key);
 	Entry *e;

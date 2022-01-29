@@ -2136,7 +2136,7 @@ static void InitActorTables()
 			if (it == IWD2HitTable.end()) {
 				tht = gamedata->LoadTable(tohit, true);
 				if (!tht || !tohit[0]) {
-					error("Actor", "TOHIT table for %s does not exist!", classname);
+					error("Actor", "TOHIT table for {} does not exist!", classname);
 				}
 
 				BABTable bt;
@@ -11266,7 +11266,7 @@ ieDword Actor::GetActiveClass() const
 		if (mcwas == mcwasflags[isClass]) break;
 	}
 	if (!oldclass) {
-		error("Actor", "Actor %ls has incorrect MC_WAS flags (%x)!", GetName().c_str(), mcwas);
+		error("Actor", "Actor {} has incorrect MC_WAS flags ({:#x})!", fmt::WideToChar{GetName()}, mcwas);
 	}
 
 	int newclassmask = multiclass & ~(1 << (oldclass - 1));

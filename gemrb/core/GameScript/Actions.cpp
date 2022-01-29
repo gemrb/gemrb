@@ -4291,7 +4291,7 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 			CREItem *si2 = actor->inventory.RemoveItem(slot2);
 			if (actor->inventory.AddSlotItem(si, slot2) != ASI_SUCCESS) {
 				// should never happen, since we just made room
-				error("Actions", "XEquip: suddenly no slots left!\n");
+				error("Actions", "XEquip: suddenly no slots left!");
 			}
 			if (si2) {
 				actor->inventory.AddSlotItem(si2, slot);
@@ -4616,7 +4616,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		CREItem *item = new CREItem();
 		if (!CreateItemCore(item, core->GoldResRef, money, 0, 0)) {
-			error("GameScript", "Failed to create pick-pocketed gold '%s' %dg.\n", core->GoldResRef.CString(), money);
+			error("GameScript", "Failed to create {} of pick-pocketed gold '{}'!", money, core->GoldResRef);
 		}
 		scr->SetBase(IE_GOLD, scr->GetBase(IE_GOLD) - money);
 		if (ASI_SUCCESS != snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY)) {
@@ -4935,7 +4935,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 {
 	const WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
-		error("GameScript", "Can't find worldmap!\n");
+		error("GameScript", "Can't find worldmap!");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
 	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BitOp::OR);
@@ -4946,7 +4946,7 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 {
 	const WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
-		error("GameScript", "Can't find worldmap!\n");
+		error("GameScript", "Can't find worldmap!");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
 	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BitOp::NAND);
@@ -4956,7 +4956,7 @@ void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 {
 	const WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
-		error("GameScript", "Can't find worldmap!\n");
+		error("GameScript", "Can't find worldmap!");
 	}
 	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, BitOp::OR);
 }
@@ -4965,7 +4965,7 @@ void GameScript::RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* paramete
 {
 	const WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
-		error("GameScript", "Can't find worldmap!\n");
+		error("GameScript", "Can't find worldmap!");
 	}
 	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, BitOp::NAND);
 }

@@ -29,6 +29,7 @@
 #include "exports.h"
 
 #include "Logging/Logger.h"
+#include "Strings/String.h"
 
 #include <cstdarg>
 
@@ -37,6 +38,7 @@ namespace GemRB {
 GEM_EXPORT void ToggleLogging(bool);
 GEM_EXPORT void AddLogWriter(Logger::WriterPtr&&);
 GEM_EXPORT void SetConsoleWindowLogLevel(log_level level);
+GEM_EXPORT void LogMsg(Logger::LogMessage&& msg);
 
 #if defined(__GNUC__)
 # define PRINTF_FORMAT(x, y) \
@@ -45,10 +47,15 @@ GEM_EXPORT void SetConsoleWindowLogLevel(log_level level);
 # define PRINTF_FORMAT(x, y)
 #endif
 
-/// Log an error, and exit.
-[[noreturn]]
-GEM_EXPORT void error(const char* owner, const char* message, ...)
-	PRINTF_FORMAT(2, 3);
+/// Log an error and exit.
+template<typename... ARGS> [[noreturn]]
+GEM_EXPORT void error(const char* owner, const char* format, ARGS&&... args)
+{
+	auto formattedMsg = fmt::format(format, std::forward<ARGS>(args)...);
+	LogMsg(Logger::LogMessage(FATAL, owner, formattedMsg, LIGHT_RED));
+
+	exit(1);
+}
 
 GEM_EXPORT void Log(log_level, const char* owner, const char* message, ...)
 	PRINTF_FORMAT(3, 4);

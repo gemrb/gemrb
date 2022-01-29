@@ -60,7 +60,7 @@ static bool IWD2 = false;
 [[noreturn]]
 static void InvalidSlot(int slot)
 {
-	error("Inventory", "Invalid slot: %d!\n", slot);
+	error("Inventory", "Invalid slot: {}!", slot);
 }
 
 void ItemExtHeader::CopyITMExtHeader(const ITMExtHeader &src)
@@ -265,7 +265,7 @@ void Inventory::SetInventoryType(ieInventoryType arg)
 void Inventory::SetSlotCount(unsigned int size)
 {
 	if (!Slots.empty()) {
-		error("Core", "Inventory size changed???\n");
+		error("Core", "Inventory size changed???");
 		//we don't allow reassignment,
 		//if you want this, delete the previous Slots here
 	}
@@ -372,7 +372,7 @@ void Inventory::KillSlot(unsigned int index)
 	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	//this cannot happen, but stuff happens!
 	if (!itm) {
-		error("Inventory", "Invalid item: %s!", item->ItemResRef.CString());
+		error("Inventory", "Invalid item: {}!", item->ItemResRef);
 	}
 	ItemExcl &= ~itm->ItemExcl;
 	int eqslot = GetEquippedSlot();

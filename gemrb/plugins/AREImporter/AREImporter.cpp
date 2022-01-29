@@ -719,7 +719,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			ip = tm->AddInfoPoint( Name, Type, nullptr );
 			ip->BBox = bbox;
 		} else if (VertexCount == 2) {
-#define MSG "Encounted a bogus polygon with 2 vertices"
+#define MSG "Encountered a bogus polygon with 2 vertices!"
 #if NDEBUG
 			Log(ERROR, "AREImporter", MSG);
 			continue;
