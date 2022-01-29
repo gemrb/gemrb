@@ -423,7 +423,7 @@ int fx_avatar_removal_modifier (Scriptable* Owner, Actor* target, Effect* fx);//
 int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
 int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only)
-//13f Usability:ItemUsability
+int fx_item_usability(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 13f (tobex and ee)
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
 int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
 
@@ -778,6 +778,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Unknown", fx_unknown, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("Unlock", fx_knock, EFFECT_NO_ACTOR, -1 ), //open doors/containers
 	EffectDesc("UnsummonCreature", fx_unsummon_creature, EFFECT_NO_LEVEL_CHECK, -1 ),
+	EffectDesc("Usability:ItemUsability", fx_item_usability, EFFECT_NO_LEVEL_CHECK, -1 ),
 	EffectDesc("Variable:StoreLocalVariable", fx_local_variable, 0, -1 ),
 	EffectDesc("VisualAnimationEffect", fx_visual_animation_effect, 0, -1 ), //unknown
 	EffectDesc("VisualRangeModifier", fx_visual_range_modifier, 0, -1 ),
@@ -7802,6 +7803,44 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 
 	target->NewStat(stat, fx->Parameter1, type);
 
+	return FX_APPLIED;
+}
+
+// tobex/ee extension to overcome the limited amount of bits in the ITM usability / kit exclusion field
+// the actual string display is done in core when appropriate
+int fx_item_usability(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	ieDword value = fx->Parameter1;
+	ieDword type = fx->Parameter2;
+	bool match = false;
+
+	// NOTE: move this to match_ids if it turns out others need it as well
+	if (type == 10) { // actor name
+		if (ieStrRef(value) == ieStrRef::INVALID) {
+			// targeting player created characters
+			match = target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE;
+		} else {
+			match = target->GetLongName() == core->GetString(ieStrRef(value));
+		}
+	} else if (type == 11) { // actor scripting name
+		if (fx->Resource.IsEmpty()) {
+			// targeting player created characters
+			match = target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE;
+		} else {
+			match = fx->Resource == target->GetScriptName();
+		}
+	} else {
+		// regular IDS check
+		match = EffectQueue::match_ids(target, type, value);
+	}
+
+	// when Power is 0, matching creature(s) cannot use the item.
+	// when Power is 1, restrict the item to matching creature(s)
+	if (match && fx->Power == 0) {
+		fx->Parameter3 = 1; // internal marker
+	} else if (!match && fx->Power == 1) {
+		fx->Parameter3 = 1;
+	}
 	return FX_APPLIED;
 }
 

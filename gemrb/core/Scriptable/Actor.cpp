@@ -357,6 +357,7 @@ static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
 static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
 static EffectRef fx_cant_use_item_ref = { "CantUseItem", -1 };
 static EffectRef fx_cant_use_item_type_ref = { "CantUseItemType", -1 };
+static EffectRef fx_item_usability_ref = { "Usability:ItemUsability", -1 };
 static EffectRef fx_remove_invisible_state_ref = { "ForceVisible", -1 };
 static EffectRef fx_remove_sanctuary_ref = { "Cure:Sanctuary", -1 };
 static EffectRef fx_disable_button_ref = { "DisableButton", -1 };
@@ -9888,18 +9889,29 @@ ieStrRef Actor::Disabled(const ResRef& name, ieDword type) const
 	if (fx) {
 		return ieStrRef(fx->Parameter1);
 	}
+
+	fx = fxqueue.HasEffectWithSource(fx_item_usability_ref, name);
+	if (fx && fx->Parameter3 == 1) {
+		return ieStrRef(fx->IsVariable);
+	}
 	return ieStrRef::INVALID;
 }
 
 //checks usability only
 int Actor::Unusable(const Item *item) const
 {
-	if (!GetStat(IE_CANUSEANYITEM)) {
+	// skip regular usability check if permission is granted by effect or HLA
+	const Effect* fx = fxqueue.HasEffectWithSource(fx_item_usability_ref, item->Name);
+	if (fx && fx->Parameter3 == 1) {
+		return STR_CANNOT_USE_ITEM;
+	}
+	if (!GetStat(IE_CANUSEANYITEM) && !fx) {
 		int unusable = CheckUsability(item);
 		if (unusable) {
 			return unusable;
 		}
 	}
+
 	// iesdp says this is always checked?
 	if (item->MinLevel>GetXPLevel(true)) {
 		return STR_CANNOT_USE_ITEM;
