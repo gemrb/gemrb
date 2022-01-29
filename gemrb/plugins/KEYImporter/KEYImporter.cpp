@@ -203,14 +203,14 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 	unsigned int bifnum = ( *ResLocator & 0xFFF00000 ) >> 20;
 
 	if (!biffiles[bifnum].found) {
-		print("Cannot find %s... Resource unavailable.",
+		Log(ERROR, "KEYImporter", "Cannot find %s... Resource unavailable.",
 				biffiles[bifnum].name.c_str());
 		return NULL;
 	}
 
 	PluginHolder<IndexedArchive> ai = MakePluginHolder<IndexedArchive>(IE_BIF_CLASS_ID);
 	if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
-		print("Cannot open archive %s", biffiles[bifnum].path);
+		Log(ERROR, "KEYImporter", "Cannot open archive %s", biffiles[bifnum].path);
 		return NULL;
 	}
 

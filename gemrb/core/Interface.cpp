@@ -1886,8 +1886,6 @@ bool Interface::LoadGemRBINI()
 			error("Core", "Fix the game flags!\n");
 		}
 		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
-		//printMessage("Option", "", GREEN);
-		//print("%s = %s", game_flags[i], HasFeature(i)?"yes":"no");
 	}
 
 	// fix the resolution default if needed
@@ -3382,7 +3380,7 @@ bool Interface::StupidityDetector(const char* Pt) const
 	dir.SetFlags(DirectoryIterator::All, true);
 
 	if (!dir) {
-		print("\n**cannot open**");
+		Log(ERROR, "Interface", "**cannot open**");
 		return true;
 	}
 	do {
@@ -3395,11 +3393,11 @@ bool Interface::StupidityDetector(const char* Pt) const
 			if (name[0] == '.' && name[1] == '.' && name[2] == '\0') {
 					continue;
 			}
-			print("\n**contains another dir**");
+			Log(ERROR, "Interface", "**contains another dir**");
 			return true; //a directory in there???
 		}
 		if (ProtectedExtension(name) ) {
-			print("\n**contains alien files**");
+			Log(ERROR, "Interface", "**contains alien files**");
 			return true; //an executable file in there???
 		}
 	} while (++dir);

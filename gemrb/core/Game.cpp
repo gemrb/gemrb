@@ -2184,7 +2184,7 @@ std::string Game::dump() const
 	std::string buffer("Currently loaded areas:\n");
 
 	for (auto map : Maps) {
-		print("%s", map->GetScriptName());
+		Log(DEBUG, "Game", "%s", map->GetScriptName());
 	}
 	AppendFormat(buffer, "Current area: {}   Previous area: {}\n", CurrentArea, PreviousArea);
 	if (Scripts[0]) {

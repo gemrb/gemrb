@@ -1928,7 +1928,7 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		while (step) {
 			block.x = (step->x+64) - vp.x;
 			block.y = (step->y+6) - vp.y;
-			print("Waypoint %d at (%d, %d)", i, step->x, step->y);
+			Log(DEBUG, "Map", "Waypoint %d at (%d, %d)", i, step->x, step->y);
 			vid->DrawRect(block, waypoint);
 			step = step->Next;
 			i++;
@@ -3865,7 +3865,7 @@ void AreaAnimation::InitAnimation()
 	const AnimationFactory* af = static_cast<const AnimationFactory*>(
 		gamedata->GetFactoryResource(BAM, IE_BAM_CLASS_ID));
 	if (!af) {
-		print("Cannot load animation: %s", BAM.CString());
+		Log(ERROR, "Map", "Cannot load animation: %s", BAM.CString());
 		return;
 	}
 	

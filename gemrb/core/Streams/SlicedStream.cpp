@@ -91,7 +91,7 @@ stroff_t SlicedStream::Seek(stroff_t newpos, strpos_t type)
 	str->Seek(startpos + Pos /*+ (Encrypted ? 2 : 0)*/, GEM_STREAM_START);
 	//we went past the buffer
 	if (Pos>size) {
-		print("[Streams]: Invalid seek position: %lu (limit: %lu)", static_cast<unsigned long>(Pos), static_cast<unsigned long>(size));
+		Log(ERROR, "Streams", "Invalid seek position: %lu (limit: %lu)", static_cast<unsigned long>(Pos), static_cast<unsigned long>(size));
 		return GEM_ERROR;
 	}
 	return GEM_OK;

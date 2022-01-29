@@ -7964,9 +7964,9 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (GameScript::EvaluateString( game->GetCurrentArea( ), String )) {
-		print("%s returned True", String);
+		Log(DEBUG, "GUIScript", "%s returned True", String);
 	} else {
-		print("%s returned False", String);
+		Log(DEBUG, "GUIScript", "%s returned False", String);
 	}
 	Py_RETURN_NONE;
 }
@@ -11550,14 +11550,14 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 	}
 
-	print("Cast spell: %s", spelldata.spellName.CString());
-	print("Slot: %d", spelldata.slot);
-	print("Type: %d (%d vs %d)", spelldata.type, 1<<spelldata.type, type);
+	Log(MESSAGE, "GUIScript", "Cast spell: %s", spelldata.spellName.CString());
+	Log(MESSAGE, "GUIScript", "Slot: %d", spelldata.slot);
+	Log(MESSAGE, "GUIScript", "Type: %d (%d vs %d)", spelldata.type, 1<<spelldata.type, type);
 	//cannot make this const, because it will be freed
 	String tmp = core->GetString(spelldata.strref);
-	print("Spellname: %ls", tmp.c_str());
-	print("Target: %d", spelldata.Target);
-	print("Range: %d", spelldata.Range);
+	Log(MESSAGE, "GUIScript", "Spellname: %ls", tmp.c_str());
+	Log(MESSAGE, "GUIScript", "Target: %d", spelldata.Target);
+	Log(MESSAGE, "GUIScript", "Range: %d", spelldata.Range);
 	if (type > 0 && !((1<<spelldata.type) & type)) {
 		return RuntimeError( "Wrong type of spell!");
 	}
@@ -11589,7 +11589,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			//bring up inventory in the end???
 			//break;
 		default:
-			print("Unhandled target type: %d", spelldata.Target);
+			Log(ERROR, "GUIScript", "Unhandled target type: %d", spelldata.Target);
 			break;
 	}
 	Py_RETURN_NONE;
@@ -11706,12 +11706,12 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	/// remove this after projectile is done
-	print("Use item: %s", itemdata.itemName.CString());
-	print("Extended header: %lu", static_cast<unsigned long>(itemdata.headerindex));
-	print("Attacktype: %d", itemdata.AttackType);
-	print("Range: %d", itemdata.Range);
-	print("Target: %d", forcetarget);
-	print("Projectile: %d", itemdata.ProjectileAnimation);
+	Log(MESSAGE, "GUIScript", "Use item: %s", itemdata.itemName.CString());
+	Log(MESSAGE, "GUIScript", "Extended header: %lu", static_cast<unsigned long>(itemdata.headerindex));
+	Log(MESSAGE, "GUIScript", "Attacktype: %d", itemdata.AttackType);
+	Log(MESSAGE, "GUIScript", "Range: %d", itemdata.Range);
+	Log(MESSAGE, "GUIScript", "Target: %d", forcetarget);
+	Log(MESSAGE, "GUIScript", "Projectile: %d", itemdata.ProjectileAnimation);
 	int count = 1;
 	switch (forcetarget) {
 		case TARGET_SELF:

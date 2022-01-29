@@ -2535,7 +2535,7 @@ int GameScript::OpenState(Scriptable *Sender, const Trigger *parameters)
 		if (core->InDebugMode(ID_TRIGGERS)) {
 			Log(ERROR, "GameScript", "Couldn't find door/container:%s",
 				parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-			print("Sender: %s", Sender->GetScriptName());
+			Log(DEBUG, "GameScript", "Sender: %s", Sender->GetScriptName());
 		}
 		return 0;
 	}
@@ -2562,7 +2562,7 @@ int GameScript::IsLocked(Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		Log(ERROR, "GameScript", "Couldn't find door/container:%s",
 			parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-		print("Sender: %s", Sender->GetScriptName());
+		Log(DEBUG, "GameScript", "Sender: %s", Sender->GetScriptName());
 		return 0;
 	}
 	switch(tar->Type) {

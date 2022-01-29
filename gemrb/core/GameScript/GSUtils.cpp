@@ -980,7 +980,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 			//MoveNearerTo will return 0, if the actor is in move
 			//it will return 1 (the fourth parameter) if the target is unreachable
 			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
-				if(!Sender->InMove()) print("At least it said so...");
+				if (!Sender->InMove()) Log(WARNING, "GSUtils", "At least it said so...");
 				// ensure the action doesn't get interrupted
 				// fixes Nalia starting a second dialog in the Coronet, if she gets a chance #253
 				Sender->CurrentActionInterruptable = false;
@@ -1001,7 +1001,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 	//between the arrival and the final escape, there should be a wait time
 	//that wait time could be handled here
 	if (wait) {
-		print("But wait a bit...(%d)", wait);
+		Log(WARNING, "GSUtils", "But wait a bit... (%d)", wait);
 		Sender->SetWait(wait);
 	}
 	Sender->ReleaseCurrentAction();

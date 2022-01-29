@@ -328,7 +328,7 @@ public:
 		for (auto& action : actions) {
 			if (action) {
 				if (action->GetRef() > 2) {
-					print("Residue action %d with refcount %d", action->actionID, action->GetRef());
+					Log(DEBUG, "GameScript", "Residue action %d with refcount %d", action->actionID, action->GetRef());
 				}
 				action->Release();
 				action = nullptr;

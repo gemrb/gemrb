@@ -29,7 +29,7 @@
 #define CHECK_STREAM(l, n) \
 	do { \
 		if (G_UNLIKELY (*(l) < (n))) { \
-			GST_ERROR ("wanted to read %d bytes from stream, %d available", (n), *(l)); \
+			GST_ERROR2("wanted to read %d bytes from stream, %d available", (n), *(l)); \
 			return -1; \
 		} \
 		*(l) -= (n); \
@@ -43,10 +43,10 @@ ipvideo_copy_block (const GstMveDemuxStream * s, unsigned short *frame,
 	ptrdiff_t frame_offset = frame - s->back_buf1 + offset;
 
 	if (G_UNLIKELY (frame_offset < 0)) {
-		GST_ERROR ("frame offset < 0 (%ld)", static_cast<long>(frame_offset));
+		GST_ERROR("frame offset < 0 (%ld)", static_cast<long>(frame_offset));
 		return -1;
 	} else if (G_UNLIKELY ((guint32)frame_offset > s->max_block_offset)) {
-		GST_ERROR ("frame offset above limit (%ld > %u)",
+		GST_ERROR2("frame offset above limit (%ld > %u)",
 				static_cast<long>(frame_offset), s->max_block_offset);
 		return -1;
 	}

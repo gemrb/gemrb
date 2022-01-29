@@ -4254,7 +4254,7 @@ bool Actor::OverrideActions()
 void Actor::Panic(const Scriptable *attacker, int panicmode)
 {
 	if (GetStat(IE_STATE_ID)&STATE_PANIC) {
-		print("Already panicked");
+		Log(DEBUG, "Actor", "Already panicked!");
 		//already in panic
 		return;
 	}
@@ -4840,7 +4840,7 @@ void Actor::dumpMaxValues()
 		SymbolMgr *sym = core->GetSymbol( symbol );
 
 		for(int i=0;i<MAX_STATS;i++) {
-			print("%d(%s) %d", i, sym->GetValue(i), maximum_values[i]);
+			Log(DEBUG, "Actor", "%d(%s) %d", i, sym->GetValue(i), maximum_values[i]);
 		}
 	}
 }
@@ -5247,7 +5247,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
 					core->ApplySpell(ResRef("panic"), this, cleric, level);
 				} else {
-					print("Panic from turning!");
+					Log(DEBUG, "Actor", "Panic from turning!");
 					Panic(cleric, PANIC_RUNAWAY);
 				}
 			}
@@ -5277,7 +5277,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		}
 		Die(cleric);
 	} else if (turnlevel >= level+TURN_PANIC_LVL_MOD) {
-		print("Panic from turning!");
+		Log(DEBUG, "Actor", "Panic from turning!");
 		Panic(cleric, PANIC_RUNAWAY);
 	}
 }
@@ -6104,7 +6104,7 @@ void Actor::GetNextAnimation()
 	if (RowNum >= CharAnimations::GetAvatarsCount())
 		RowNum = CharAnimations::GetAvatarsCount() - 1;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
-	print("AnimID: %04X", NewAnimID);
+	Log(DEBUG, "Actor", "AnimID: %04X", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }
 
@@ -6114,7 +6114,7 @@ void Actor::GetPrevAnimation()
 	if (RowNum >= CharAnimations::GetAvatarsCount())
 		RowNum = 0;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
-	print("AnimID: %04X", NewAnimID);
+	Log(DEBUG, "Actor", "AnimID: %04X", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }
 
@@ -6241,7 +6241,7 @@ void Actor::GetNextStance()
 	static int Stance = IE_ANI_AWAKE;
 
 	if (--Stance < 0) Stance = MAX_ANIMS-1;
-	print("StanceID: %d", Stance);
+	Log(DEBUG, "Actor", "StanceID: %d", Stance);
 	SetStance( Stance );
 }
 
@@ -7763,7 +7763,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 			if (action) {
 				ReleaseCurrentAction();
 				AddActionInFront(action);
-				print("Confusion: added %s at %d (%d)", actionString, gameTime-roundTime, roundTime);
+				Log(DEBUG, "Actor", "Confusion: added %s at %d (%d)", actionString, gameTime-roundTime, roundTime);
 			}
 			return;
 		}
@@ -9869,7 +9869,7 @@ int Actor::CheckUsability(const Item *item) const
 
 no_resolve:
 		if (stat&itemvalue) {
-			//print("failed usability: itemvalue %d, stat %d, stat value %d", itemvalue, itemuse[i].stat, stat);
+			//Log(DEBUG, "Actor", "failed usability: itemvalue %d, stat %d, stat value %d", itemvalue, itemuse[i].stat, stat);
 			return STR_CANNOT_USE_ITEM;
 		}
 	}

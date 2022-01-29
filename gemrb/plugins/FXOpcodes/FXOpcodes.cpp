@@ -4412,7 +4412,7 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		sca->PlayOnce();
 		map->AddVVCell( new VEFObject(sca));
 	} else {
-		print("fx_visual_spell_hit: Unhandled Type: %d", fx->Parameter2);
+		Log(ERROR, "FXOpcodes", "fx_visual_spell_hit: Unhandled Type: %d", fx->Parameter2);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -4563,7 +4563,7 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//parameter2 is used in bg1 and pst to specify the spell type; bg2 and iwd2 figure it out from the resource
 	//LS_STATS is on by default (int check)
 	int x= target->LearnSpell(fx->Resource, fx->Parameter1^LS_STATS);
-	print("Learnspell returned: %d", x);
+	Log(DEBUG, "FXOpcodes", "Learnspell returned: %d", x);
 	return FX_NOT_APPLIED;
 }
 // 0x94 Spell:CastSpellPoint
@@ -7710,7 +7710,7 @@ int fx_magical_rest (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 // 3 fog
 int fx_change_weather (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	print("fx_change_weather(%2d): P1: %d", fx->Opcode, fx->Parameter1);
+	// print("fx_change_weather(%2d): P1: %d", fx->Opcode, fx->Parameter1);
 
 	core->GetGame()->StartRainOrSnow(false, fx->Parameter1 & WB_TYPEMASK);
 
@@ -7722,7 +7722,7 @@ int fx_change_weather (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 // not safe for negative values!
 int fx_set_concealment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	print("fx_set_concealment(%2d): P1: %d P2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// print("fx_set_concealment(%2d): P1: %d P2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	int concealment = fx->Parameter1 & 0x64;
 	if (fx->Parameter2 == 0) {
 		STAT_ADD(IE_ETHEREALNESS, concealment);
@@ -7914,7 +7914,7 @@ int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
 // unknown
 int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	print("fx_unknown(%2d): P1: %d P2: %d ResRef: %s", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource.CString());
+	Log(ERROR, "FXOpcodes", "fx_unknown(%2d): P1: %d P2: %d ResRef: %s", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource.CString());
 	return FX_NOT_APPLIED;
 }
 

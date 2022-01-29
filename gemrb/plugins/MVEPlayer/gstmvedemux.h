@@ -29,8 +29,9 @@
 using namespace GemRB;
 
 #define G_UNLIKELY(x) (x)
-#define GST_WARNING print
-#define GST_ERROR print
+#define GST_WARNING(msg) Log(WARNING, "MVEPlayer", msg)
+#define GST_ERROR(msg, p1) Log(ERROR, "MVEPlayer", msg, p1)
+#define GST_ERROR2(msg, p1, p2) Log(ERROR, "MVEPlayer", msg, p1, p2)
 
 /* Define GET function for unaligned memory */
 #define _GST_GET(__data, __idx, __size, __shift) \

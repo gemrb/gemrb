@@ -45,9 +45,6 @@ GEM_EXPORT void SetConsoleWindowLogLevel(log_level level);
 # define PRINTF_FORMAT(x, y)
 #endif
 
-GEM_EXPORT void print(const char* message, ...)
-	PRINTF_FORMAT(1, 2);
-
 /// Log an error, and exit.
 [[noreturn]]
 GEM_EXPORT void error(const char* owner, const char* message, ...)

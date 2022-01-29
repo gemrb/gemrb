@@ -237,7 +237,7 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, tick_t &time_length)
 
 	ResourceHolder<SoundMgr> acm = GetResourceHolder<SoundMgr>(ResRef);
 	if (!acm) {
-		print("failed acm load");
+		Log(ERROR, "SDLAudio", "Failed acm load!");
 		return chunk;
 	}
 	int cnt = acm->get_length();
@@ -265,7 +265,7 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, tick_t &time_length)
 	// make SDL_mixer chunk
 	chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len*cvt.len_ratio);
 	if (!chunk) {
-		print("error loading chunk");
+		Log(ERROR, "SDLAudio", "Error loading chunk!");
 		free(cvt.buf);
 		return chunk;
 	}
@@ -325,7 +325,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 
 	chan = Mix_PlayChannel(chan, chunk, loop);
 	if (chan < 0) {
-		print("error playing channel");
+		Log(ERROR, "SDLAudio", "Error playing channel!");
 		return Holder<SoundHandle>();
 	}
 
@@ -341,7 +341,7 @@ int SDLAudio::CreateStream(std::shared_ptr<SoundMgr> newMusic)
 {
 	std::lock_guard<std::recursive_mutex> l(MusicMutex);
 
-	print("SDLAudio setting new music");
+	Log(MESSAGE, "SDLAudio", "SDLAudio setting new music");
 	MusicReader = std::move(newMusic);
 
 	return 0;
@@ -449,7 +449,7 @@ int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
 	(void)gain;
 	(void)point;
 
-	print("SDLAudio allocating stream");
+	Log(MESSAGE, "SDLAudio", "SDLAudio allocating stream...");
 
 	// TODO: buggy
 	MusicPlaying = false;
@@ -470,7 +470,7 @@ bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 		return false;
 	}
 
-	print("SDLAudio releasing stream");
+	Log(MESSAGE, "SDLAudio", "Releasing stream...");
 
 	(void)HardStop;
 

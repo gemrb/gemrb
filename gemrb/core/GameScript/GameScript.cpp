@@ -1351,11 +1351,11 @@ void Targets::Clear()
 
 void Targets::dump() const
 {
-	print("Target dump (actors only):");
+	Log(DEBUG, "GameScript", "Target dump (actors only):");
 	targetlist::const_iterator m;
 	for (m = objects.begin(); m != objects.end(); ++m) {
 		if ((*m).actor->Type == ST_ACTOR) {
-			print("%ls", (*m).actor->GetName().c_str());
+			Log(DEBUG, "GameScript", "%ls", (*m).actor->GetName().c_str());
 		}
 	}
 }

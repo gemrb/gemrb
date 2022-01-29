@@ -157,7 +157,7 @@ void GetBitContext::merge(uint8_t *dst, const uint8_t *src, int size)
 
 void GetBitContext::debug(const char *prefix) const
 {
-	GemRB::print("%s: %d", prefix, index);
+	Log(GemRB::ERROR, "BIKPlayer", "%s: %d", prefix, index);
 }
 
 //VLC specific code from bitstream.c

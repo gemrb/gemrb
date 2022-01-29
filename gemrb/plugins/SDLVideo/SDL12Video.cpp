@@ -291,7 +291,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const Region
 	// not handling the following effects at all:
 	// palettealpha
 
-	//		print("Unoptimized blit: %04X", flags);
+	//		Log(DEBUG, "SDL12Video", "Unoptimized blit: %04X", flags);
 
 	// remove already handled flags and incompatible combinations
 	if (flags & BlitFlags::GREY) flags &= ~BlitFlags::SEPIA;

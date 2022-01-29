@@ -103,7 +103,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 		size_t l = strlen(value);
 		if (l > 1 || keymap.HasKey(value)) {
-			print("Ignoring key %s", value);
+			Log(WARNING, "KeyMap", "Ignoring key %s", value);
 			continue;
 		}
 
@@ -119,7 +119,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			moduleName = kmtable->QueryField("Default","MODULE");
 			function = kmtable->QueryField("Default","FUNCTION");
 			group = kmtable->QueryField("Default","GROUP");
-			print("Adding key %s with function %s::%s", value, moduleName, function);
+			Log(MESSAGE, "KeyMap", "Adding key %s with function %s::%s", value, moduleName, function);
 		}
 		Function *fun = new Function(moduleName, function, atoi(group), tolower(value[0]));
 

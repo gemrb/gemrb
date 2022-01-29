@@ -81,7 +81,7 @@ MVEPlayer::~MVEPlayer() {
 	if (audio_stream != -1) host->freeAudioStream(audio_stream);
 
 	if (host->video_skippedframes) {
-		print("Warning: Had to drop %d video frame(s).", host->video_skippedframes);
+		Log(WARNING, "MVEPlayer", "Had to drop %d video frame(s).", host->video_skippedframes);
 	}
 }
 
@@ -96,7 +96,7 @@ bool MVEPlayer::start_playback() {
 	 * The first two chunks contain audio and video initialisation, hopefully.
 	 */
 	if (!process_chunk() || !process_chunk()) {
-		print("Error: Failed to read initial movie chunks.");
+		Log(ERROR, "MVEPlayer", "Failed to read initial movie chunks!");
 		return false;
 	}
 
@@ -140,7 +140,7 @@ bool MVEPlayer::request_data(unsigned int len) {
 bool MVEPlayer::verify_header() {
 	if (!request_data(MVE_PREAMBLE_SIZE)) return false;
 	if (memcmp(buffer, MVE_PREAMBLE, MVE_PREAMBLE_SIZE) != 0) {
-		print("Error: MVE preamble didn't match");
+		Log(ERROR, "MVEPlayer", "MVE preamble didn't match!");
 		return false;
 	}
 	return true;
@@ -166,7 +166,7 @@ bool MVEPlayer::process_chunk() {
 	}
 
 	if (chunk_offset != chunk_size) {
-		print("Error: Decoded past the end of an MVE chunk");
+		Log(ERROR, "MVEPlayer", "Decoded past the end of an MVE chunk!");
 		return false;
 	}
 
@@ -347,7 +347,7 @@ void MVEPlayer::segment_audio_init(unsigned char version) {
 
 	audio_stream = host->setAudioStream();
 	if (audio_stream == -1) {
-		print("Error: MVE player couldn't open audio. Will play silently.");
+		Log(ERROR, "MVEPlayer", "MVE player couldn't open audio. Will play silently.");
 		playsound = false;
 		return;
 	}
@@ -370,7 +370,7 @@ void MVEPlayer::segment_audio_init(unsigned char version) {
 	if (audio_buffer) free(audio_buffer);
 	audio_buffer = (short *)malloc(min_buffer_len);
 
-/*	print("Movie audio: Sample rate %d, %d channels, %d bit, requested buffer size 0x%02x, %s",
+/*	Log(DEBUG, "MVEPlayer", "Movie audio: Sample rate %d, %d channels, %d bit, requested buffer size 0x%02x, %s",
 		audio_sample_rate, audio_num_channels, audio_sample_size, min_buffer_len, audio_compressed ? "compressed" : "uncompressed");*/
 }
 

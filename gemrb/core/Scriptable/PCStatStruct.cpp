@@ -245,8 +245,7 @@ void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
 			cntpoi = FavouriteWeaponsCount;
 			break;
 		default:
-			print("Illegal RegisterFavourite call...");
-			abort();
+			error("PCStatsStruct", "Illegal RegisterFavourite call...");
 	}
 	//least favourite candidate position and count
 	int minpos = 0;

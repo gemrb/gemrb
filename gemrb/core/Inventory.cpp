@@ -914,7 +914,7 @@ bool Inventory::EquipItem(ieDword slot)
 	int effect = core->QuerySlotEffects( slot );
 	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (!itm) {
-		print("Invalid item Equipped: %s Slot: %d", item->ItemResRef.CString(), slot);
+		Log(ERROR, "Inventory", "Invalid item Equipped: %s Slot: %d", item->ItemResRef.CString(), slot);
 		return false;
 	}
 	
