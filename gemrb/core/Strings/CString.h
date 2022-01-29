@@ -43,10 +43,6 @@ GEM_EXPORT int strnlen(const char* string, int maxlen);
 GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
 #endif
 
-#ifndef WIN32
-GEM_EXPORT char* strlwr(char* string);
-#endif
-
 GEM_EXPORT int strlench(const char* string, char ch);
 
 GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);

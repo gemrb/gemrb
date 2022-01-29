@@ -114,19 +114,4 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
 }
 #endif
 
-#ifdef WIN32
-
-#else
-
-char* strlwr(char* string)
-{
-	if (string) {
-		for (char* s = string; *s; ++s)
-			*s = tolower( *s );
-	}
-	return string;
-}
-
-#endif // ! WIN32
-
 } // namespace GemRB

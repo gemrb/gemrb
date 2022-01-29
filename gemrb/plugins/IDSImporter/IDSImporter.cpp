@@ -51,7 +51,7 @@ bool IDSImporter::Open(DataStream* str)
 	while (true) {
 		char* line = ( char* ) malloc( 256 );
 		strret_t len = str->ReadLine( line, 256 );
-		strlwr( line );
+		StringToLower(line);
 		if (len == -1) {
 			free( line );
 			break;

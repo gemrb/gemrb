@@ -53,6 +53,18 @@ GEM_EXPORT_T void StringToUpper(T& string) {
 	}
 }
 
+GEM_EXPORT_T inline void StringToLower(char* string) {
+	for (char* ch = string; *string; ++ch) {
+		*ch = std::towlower(*ch);
+	}
+}
+
+GEM_EXPORT_T inline void StringToUpper(char* string) {
+	for (char* ch = string; *string; ++ch) {
+		*ch = std::towupper(*ch);
+	}
+}
+
 }
 
 namespace fmt {
