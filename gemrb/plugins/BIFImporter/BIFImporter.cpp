@@ -45,7 +45,7 @@ BIFImporter::~BIFImporter(void)
 
 DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path)
 {
-	print("Decompressing");
+	Log(MESSAGE, "BIFImporter", "Decompressing %s ...", compressed->filename);
 	if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
 		return NULL;
 	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
@@ -88,7 +88,7 @@ DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*pat
 	compressed->Seek(fnlen, GEM_CURRENT_POS);
 	compressed->ReadDword(declen);
 	compressed->ReadDword(complen);
-	print("Decompressing");
+	Log(MESSAGE, "BIFImporter", "Decompressing %s ...", compressed->filename);
 	return CacheCompressedStream(compressed, compressed->filename, complen);
 }
 
