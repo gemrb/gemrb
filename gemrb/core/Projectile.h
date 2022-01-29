@@ -195,7 +195,9 @@ class GEM_EXPORT Projectile
 {
 public:
 	Projectile();
+	Projectile(const Projectile&) = default;
 	~Projectile();
+	Projectile& operator=(const Projectile&) = delete;
 
 	ieWord Speed = 20;
 	ieDword SFlags = PSF_FLYING;

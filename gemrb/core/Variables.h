@@ -61,6 +61,9 @@ public:
 public:
 	// Construction
 	explicit Variables(int nBlockSize = 10, int nHashTableSize = 2049);
+	Variables(const Variables&) = delete;
+	~Variables();
+	Variables& operator=(const Variables&) = delete;
 	void LoadInitialValues(const char* name);
 
 	// Attributes
@@ -137,9 +140,6 @@ protected:
 	inline bool MyCopyKey(char*& dest, const char* key) const;
 	inline unsigned int MyCompareKey(const char* key, const char *str) const;
 	inline unsigned int MyHashKey(const char*) const;
-
-public:
-	~Variables();
 };
 
 }

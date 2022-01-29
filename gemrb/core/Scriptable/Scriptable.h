@@ -229,7 +229,9 @@ struct TriggerEntry {
 class GEM_EXPORT Scriptable {
 public:
 	explicit Scriptable(ScriptableType type);
-	virtual ~Scriptable(void);
+	Scriptable(const Scriptable&) = delete;
+	virtual ~Scriptable();
+	Scriptable& operator=(const Scriptable&) = delete;
 private:
 	tick_t WaitCounter = 0;
 	std::map<ieDword,ieDword> script_timers;
@@ -517,7 +519,9 @@ public:
 		randomBackoff--;
 	}
 	using Selectable::Selectable;
-	~Movable(void) override;
+	Movable(const Movable&) = delete;
+	~Movable() override;
+	Movable& operator=(const Movable&) = delete;
 
 	Point Destination = Pos;
 	ResRef Area;
@@ -582,7 +586,9 @@ public:
 class GEM_EXPORT TileObject {
 public:
 	TileObject(void) = default;
-	~TileObject(void);
+	TileObject(const TileObject&) = delete;
+	~TileObject();
+	TileObject& operator=(const TileObject&) = delete;
 	void SetOpenTiles(unsigned short *indices, int count);
 	void SetClosedTiles(unsigned short *indices, int count);
 

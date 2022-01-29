@@ -71,7 +71,9 @@ public:
 	};
 
 	TextEdit(const Region& frame, unsigned short maxLength, Point p);
+	TextEdit(const TextEdit&) = delete;
 	~TextEdit() override;
+	TextEdit& operator=(const TextEdit&) = delete;
 
 	// these all forward to the underlying TextContainer
 	void SetFont(Font* f);

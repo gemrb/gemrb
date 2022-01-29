@@ -477,7 +477,9 @@ private:
 
 public:
 	Actor(void);
-	~Actor(void) override;
+	Actor(const Actor&) = delete;
+	~Actor() override;
+	Actor& operator=(const Actor&) = delete;
 	/** releases memory */
 	static void ReleaseMemory();
 	/** sets game specific parameter (which stat should determine the fist weapon type */

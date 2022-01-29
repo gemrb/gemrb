@@ -97,7 +97,9 @@ class Sprite2D;
 class GEM_EXPORT ScriptedAnimation {
 public:
 	ScriptedAnimation() = default;
-	~ScriptedAnimation(void);
+	ScriptedAnimation(const ScriptedAnimation&) = delete;
+	~ScriptedAnimation();
+	ScriptedAnimation& operator=(const ScriptedAnimation&) = delete;
 	explicit ScriptedAnimation(DataStream* stream);
 	void LoadAnimationFactory(AnimationFactory *af, int gettwin = 0);
 	//there are 3 phases: start, hold, release

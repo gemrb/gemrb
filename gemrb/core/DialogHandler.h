@@ -33,7 +33,9 @@ class Control;
 class GEM_EXPORT DialogHandler {
 public:
 	DialogHandler();
+	DialogHandler(const DialogHandler&) = delete;
 	~DialogHandler();
+	DialogHandler& operator=(const DialogHandler&) = delete;
 
 	Scriptable *GetTarget() const;
 	Actor *GetSpeaker();

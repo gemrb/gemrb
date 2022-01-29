@@ -47,6 +47,9 @@ protected:
 public:
 	// Construction
 	explicit Cache(int nBlockSize = 10, int nHashTableSize = 129);
+	Cache(const Cache&) = delete;
+	~Cache();
+	Cache& operator=(const Cache&) = delete;
 
 	// Attributes
 	// number of elements
@@ -83,9 +86,6 @@ protected:
 	void FreeAssoc(Cache::MyAssoc*);
 	Cache::MyAssoc* GetAssocAt(const ResRef&) const;
 	Cache::MyAssoc *GetNextAssoc(Cache::MyAssoc * rNextPosition) const;
-
-public:
-	~Cache();
 };
 
 }

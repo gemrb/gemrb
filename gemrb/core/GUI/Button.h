@@ -116,7 +116,9 @@ public:
 	};
 	
 	explicit Button(const Region& frame);
+	Button(const Button&) = delete;
 	~Button() override;
+	Button& operator=(const Button&) = delete;
 
 	bool IsAnimated() const override;
 	bool IsOpaque() const override;

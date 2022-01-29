@@ -54,7 +54,9 @@ public:
 
 	VEFObject() = default;
 	explicit VEFObject(ScriptedAnimation *sca);
+	VEFObject(const VEFObject&) = delete;
 	~VEFObject();
+	VEFObject& operator=(const VEFObject&) = delete;
 private:
 	std::vector<ScheduleEntry> entries;
 	std::vector<ScheduleEntry> drawQueue;

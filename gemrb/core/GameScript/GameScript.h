@@ -171,6 +171,8 @@ protected:
 	{
 		canary = (unsigned long) 0xdeadbeef;
 	}
+	Canary(const Canary&) = delete;
+	Canary& operator=(const Canary&) = delete;
 	virtual ~Canary() // protected destructor
 	{
 		AssertCanary("Destroying Canary");
@@ -497,7 +499,9 @@ class GEM_EXPORT GameScript {
 public:
 	GameScript(const ResRef& ResRef, Scriptable* Myself,
 		int ScriptLevel = 0, bool AIScript = false);
+	GameScript(const GameScript&) = delete;
 	~GameScript();
+	GameScript& operator=(const GameScript&) = delete;
 
 	bool dead = false;      // Script replaced itself with another and should be deleted when done running
 	bool running = false;   // Script is currently running so defer any deletion to caller

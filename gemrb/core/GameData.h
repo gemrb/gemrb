@@ -80,7 +80,9 @@ class GEM_EXPORT GameData : public ResourceManager
 {
 public:
 	GameData();
+	GameData(const GameData&) = delete;
 	~GameData();
+	GameData& operator=(const GameData&) = delete;
 
 	using index_t = uint16_t;
 	void ClearCaches();

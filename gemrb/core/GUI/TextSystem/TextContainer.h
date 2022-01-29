@@ -90,7 +90,9 @@ public:
 	// TODO: we should probably be able to align the text in the frame
 	TextSpan(String string, const Font* font, const Size* = nullptr);
 	TextSpan(String string, const Font* font, Font::PrintColors cols, const Size* = nullptr);
+	TextSpan(const TextSpan&) = delete;
 	~TextSpan() final;
+	TextSpan& operator=(const TextSpan&) = delete;
 	
 	void ClearColors();
 	void SetColors(const Color& fg, const Color& bg);
@@ -269,7 +271,9 @@ private:
 
 public:
 	TextContainer(const Region& frame, Font* font);
+	TextContainer(const TextContainer&) = delete;
 	~TextContainer() override;
+	TextContainer& operator=(const TextContainer&) = delete;
 	
 	// relative to cursor pos
 	void InsertText(const String& text);

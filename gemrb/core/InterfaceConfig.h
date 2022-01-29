@@ -36,7 +36,9 @@ private:
 
 public:
 	InterfaceConfig(int argc, char *argv[]);
+	InterfaceConfig(const InterfaceConfig&) = delete;
 	virtual ~InterfaceConfig();
+	InterfaceConfig& operator=(const InterfaceConfig&) = delete;
 
 	void SetKeyValuePair(const char* key, const char* value);
 	const char* GetValueForKey(const char* key) const;

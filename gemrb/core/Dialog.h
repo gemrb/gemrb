@@ -68,7 +68,9 @@ struct DialogState {
 class GEM_EXPORT Dialog {
 public:
 	Dialog(void);
-	~Dialog(void);
+	Dialog(const Dialog&) = delete;
+	~Dialog();
+	Dialog& operator=(const Dialog&) = delete;
 private:
 	void FreeDialogState(DialogState* ds);
 public:

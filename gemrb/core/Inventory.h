@@ -221,7 +221,9 @@ private:
 	ieDword ItemTypes[8]{}; // 256 bits
 public: 
 	Inventory() = default;
+	Inventory(const Inventory&) = delete;
 	virtual ~Inventory();
+	Inventory& operator=(const Inventory&) = delete;
 
 	/** duplicates the source inventory into the current one, marking items as undroppable */
 	void CopyFrom(const Actor *source);

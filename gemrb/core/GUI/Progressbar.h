@@ -52,7 +52,9 @@ public:
 	};
 
 	Progressbar(const Region& frame, unsigned short KnobStepsCount);
+	Progressbar(const Progressbar&) = delete;
 	~Progressbar() override;
+	Progressbar& operator=(const Progressbar&) = delete;
 
 	bool IsOpaque() const override;
 

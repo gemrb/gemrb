@@ -121,7 +121,8 @@ private:
 			Holder<Sprite2D> invertedSheet;
 		public:
 			GlyphAtlasPage(Size pageSize, Font* font);
-
+			GlyphAtlasPage(const GlyphAtlasPage&) = delete;
+			GlyphAtlasPage& operator=(const GlyphAtlasPage&) = delete;
 			~GlyphAtlasPage() override {
 				if (Sheet == NULL) {
 					free(pageData);
@@ -175,7 +176,9 @@ private:
 
 public:
 	Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg);
+	Font(const Font&) = delete;
 	virtual ~Font();
+	Font& operator=(const Font&) = delete;
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>&);
 	// BAM fonts use alisases a lot so this saves quite a bit of space

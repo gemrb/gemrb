@@ -160,7 +160,9 @@ private:
 	void RemoveSpell(int spellid, int type);
 public: 
 	Spellbook();
+	Spellbook(const Spellbook&) = delete;
 	~Spellbook();
+	Spellbook& operator=(const Spellbook&) = delete;
 	static void InitializeSpellbook();
 	static void ReleaseMemory();
 

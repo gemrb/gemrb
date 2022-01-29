@@ -33,7 +33,10 @@ class GEM_EXPORT Factory {
 private:
 	std::vector< FactoryObject*> fobjects;
 public:
-	~Factory(void);
+	Factory() = default;
+	Factory(const Factory&) = delete;
+	~Factory();
+	Factory& operator=(const Factory&) = delete;
 	void AddFactoryObject(FactoryObject* fobject);
 	int IsLoaded(const ResRef& resRef, SClass_ID type) const;
 	FactoryObject* GetFactoryObject(int pos) const;

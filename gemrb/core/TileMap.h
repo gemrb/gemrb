@@ -40,7 +40,9 @@ public:
 	using TileOverlayPtr = TileOverlay::TileOverlayPtr;
 	
 	TileMap() = default;
-	~TileMap(void);
+	TileMap(const TileMap&) = delete;
+	~TileMap();
+	TileMap& operator=(const TileMap&) = delete;
 
 	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,
 				  int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt);

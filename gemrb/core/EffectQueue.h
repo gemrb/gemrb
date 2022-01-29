@@ -247,7 +247,9 @@ private:
 
 public:
 	EffectQueue() = default;
+	EffectQueue(const EffectQueue&) = delete;
 	virtual ~EffectQueue();
+	EffectQueue& operator=(const EffectQueue&) = delete;
 
 	/** Sets Actor which is affected by these effects */
 	void SetOwner(Scriptable* act) { Owner = act; }

@@ -201,7 +201,9 @@ public:
 	bool lockPalette = false;
 public:
 	CharAnimations(unsigned int AnimID, ieDword ArmourLevel);
-	~CharAnimations(void);
+	CharAnimations(const CharAnimations&) = delete;
+	~CharAnimations();
+	CharAnimations& operator=(const CharAnimations&) = delete;
 
 	void SetArmourLevel(int ArmourLevel);
 	void SetRangedType(int Ranged);

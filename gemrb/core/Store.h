@@ -85,7 +85,9 @@ struct GEM_EXPORT STOItem {
 
 	STOItem() = default;
 	explicit STOItem(const CREItem *item);
+	STOItem(const STOItem&) = delete;
 	~STOItem();
+	STOItem& operator=(const STOItem&) = delete;
 	void CopyCREItem(const CREItem *item);
 };
 
@@ -121,7 +123,9 @@ struct STOCure {
 class GEM_EXPORT Store {
 public:
 	Store() = default;
+	Store(const Store&) = delete;
 	~Store();
+	Store& operator=(const Store&) = delete;
 
 	std::vector<STOItem*> items;
 	std::vector<STODrink*> drinks;

@@ -35,7 +35,9 @@ private:
 
 public:
 	Calendar(void);
+	Calendar(const Calendar&) = delete;
 	~Calendar(void);
+	Calendar& operator=(const Calendar&) = delete;
 	void GetMonthName(int dayandmonth) const;
 	int GetCalendarDay(int date) const;
 };
