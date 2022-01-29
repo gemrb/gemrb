@@ -118,6 +118,9 @@ public:
 	std::vector<CritterEntry> critters;
 	char *name = nullptr;
 	SpawnEntry() = default;
+	SpawnEntry(const SpawnEntry&) = delete;
+	SpawnEntry(SpawnEntry&&) = default;
+	SpawnEntry& operator=(const SpawnEntry&) = delete;
 	~SpawnEntry() {
 		free(name);
 	}

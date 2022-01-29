@@ -121,7 +121,10 @@ struct WMPAreaLink {
 class GEM_EXPORT WorldMap {
 public:
 	WorldMap() = default;
+	WorldMap(const WorldMap&) = delete;
+	WorldMap(WorldMap&&) = default;
 	~WorldMap();
+	WorldMap& operator=(const WorldMap&) = delete;
 public: //struct members
 	ResRef MapResRef;
 	ieDword Width = 0;

@@ -294,6 +294,8 @@ public:
 	PaletteHolder palette;
 	AreaAnimation() = default;
 	AreaAnimation(const AreaAnimation& src);
+	~AreaAnimation() = default;
+	AreaAnimation& operator=(const AreaAnimation&) = delete;
 
 	void InitAnimation();
 	void SetPalette(const ResRef &PaletteRef);

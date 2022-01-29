@@ -134,7 +134,10 @@ public:
 	 * of DirectoryIterator.
 	 */
 	explicit DirectoryIterator(const char *path);
+	DirectoryIterator(const DirectoryIterator&) = delete;
+	DirectoryIterator(DirectoryIterator&&) = default;
 	~DirectoryIterator();
+	DirectoryIterator& operator=(const DirectoryIterator&) = delete;
 
 	void SetFilterPredicate(FileFilterPredicate* p, bool chain = false);
 	bool IsDirectory();
