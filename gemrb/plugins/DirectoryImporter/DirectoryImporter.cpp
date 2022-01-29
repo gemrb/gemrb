@@ -46,7 +46,7 @@ static bool FindIn(const char *Path, const char *ResRef, const char *Type)
 		Log(ERROR, "DirectoryImporter", "Too long filename: {}!", ResRef);
 		return false;
 	}
-	strlwr(f);
+	StringToLower(f);
 
 	return PathJoinExt(p, Path, f, Type);
 }
@@ -58,7 +58,7 @@ static FileStream *SearchIn(const char * Path,const char * ResRef, const char *T
 		Log(ERROR, "DirectoryImporter", "Too long filename2: {}!", ResRef);
 		return NULL;
 	}
-	strlwr(f);
+	StringToLower(f);
 
 	if (!PathJoinExt(p, Path, f, Type))
 		return NULL;

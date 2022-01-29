@@ -1946,8 +1946,8 @@ static Trigger* ReadTrigger(DataStream* stream)
 			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter,
 			tR->string1Parameter );
 	}
-	strlwr(tR->string0Parameter);
-	strlwr(tR->string1Parameter);
+	StringToLower(tR->string0Parameter);
+	StringToLower(tR->string1Parameter);
 	tR->triggerID &= 0x3fff;
 	stream->ReadLine( line, 1024 );
 	tR->objectParameter = DecodeObject( line );
@@ -2202,8 +2202,8 @@ Response* GameScript::ReadResponse(DataStream* stream)
 			&aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
 			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter,
 			aC->string1Parameter );
-		strlwr(aC->string0Parameter);
-		strlwr(aC->string1Parameter);
+		StringToLower(aC->string0Parameter);
+		StringToLower(aC->string1Parameter);
 		if (aC->actionID>=MAX_ACTIONS) {
 			aC->actionID=0;
 			Log(ERROR, "GameScript", "Invalid script action ID!");
@@ -2491,7 +2491,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 Trigger* GenerateTrigger(char* String)
 {
-	strlwr( String );
+	StringToLower(String);
 	ScriptDebugLog(ID_TRIGGERS, "Compiling: {}", String);
 
 	int negate = 0;
@@ -2520,7 +2520,7 @@ Action* GenerateAction(const char* String)
 	Action* action = NULL;
 	char* actionString = strdup(String);
 	// the only thing we seem to need a copy for is the call to strlwr...
-	strlwr( actionString );
+	StringToLower(actionString);
 	ScriptDebugLog(ID_ACTIONS, "Compiling: {}", String);
 
 	int len = strlench(String,'(')+1; //including (

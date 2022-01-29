@@ -163,7 +163,7 @@ bool KeyMap::ResolveName(const char* name, int group) const
 Function* KeyMap::LookupFunction(const char* name)
 {
 	char* key = strdup(name);
-	strlwr(key);
+	StringToLower(key);
 
 	void *tmp;
 	if (!keymap.Lookup(name, tmp) ) {
