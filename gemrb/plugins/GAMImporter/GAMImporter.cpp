@@ -332,7 +332,7 @@ struct PCStruct {
 	ResRef QuickSpellResRef[MAX_QSLOTS];
 	ieWord   QuickItemSlot[MAX_QUICKITEMSLOT];
 	ieWord   QuickItemHeader[MAX_QUICKITEMSLOT];
-	char Name[32];
+	ieVariable Name;
 	ieDword  TalkCount;
 	ieByte QSlots[GUIBT_COUNT];
 	ieByte QuickSpellClass[MAX_QSLOTS];
@@ -463,7 +463,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		}
 		pcInfo.QSlots[0] = 0xff; //(invalid, will be regenerated)
 	}
-	str->Read( &pcInfo.Name, 32 );
+	str->ReadVariable(pcInfo.Name);
 	str->ReadDword(pcInfo.TalkCount);
 
 	size_t pos = str->GetPos();
@@ -479,8 +479,8 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		}
 
 		//torment has them as 0 or -1
-		if (pcInfo.Name[0]!=0 && pcInfo.Name[0]!=UNINITIALIZED_CHAR) {
-			String* name = StringFromCString(pcInfo.Name);
+		if (pcInfo.Name[0] != 0) {
+			String* name = StringFromCString(pcInfo.Name.CString());
 			assert(name);
 			actor->SetName(std::move(*name), 0);
 			delete name;
@@ -755,7 +755,6 @@ int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game) const
 //only in PST
 int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 {
-	ieVariable tmpname;
 	Variables::iterator pos=NULL;
 	const char *name;
 	ieDword value;
@@ -763,8 +762,7 @@ int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 	for (unsigned int i=0;i<KillVarsCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
-		strnspccpy(tmpname, name, 32, core->HasFeature(GF_NO_NEW_VARIABLES));
-		stream->WriteVariable(tmpname);
+		stream->WriteVariable(ieVariable(name));
 		stream->WriteFilling(8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
@@ -1021,13 +1019,10 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
-		ieVariable name(MBStringFromString(ac->GetLongName()).c_str());
-		stream->WriteVariable(name);
+		stream->WriteVariable(ieVariable(ac->GetLongName()));
 	} else {
 		std::string tmpstr = core->GetMBString(ac->LongStrRef, STRING_FLAGS::STRREFOFF);
-		size_t len = std::min<size_t>(tmpstr.length(), 32);
-		stream->Write(tmpstr.data(), len);
-		if (len < 32) stream->WriteFilling(32 - len);
+		stream->WriteVariable(ieVariable(tmpstr));
 	}
 	stream->WriteDword(ac->TalkCount);
 	stream->WriteStrRef(ac->PCStats->BestKilledName);

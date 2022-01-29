@@ -29,8 +29,7 @@
 #define IE_TYPES_H
 
 #include "Platform.h"
-#include "Strings/CString.h"
-#include "Strings/String.h"
+#include "Strings/StringConversion.h"
 
 #include <cstdint>
 
@@ -108,6 +107,14 @@ class ieVariable
 public:
 	ieVariable() = default;
 	ieVariable(std::nullptr_t) = delete;
+	
+	explicit ieVariable(const std::string& str)
+	: ieVariable(str.c_str())
+	{}
+	
+	explicit ieVariable(const String& str)
+	: ieVariable(MBStringFromString(str))
+	{}
 
 	explicit ieVariable(const char* c) noexcept {
 		operator=(c);
