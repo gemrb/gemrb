@@ -154,8 +154,7 @@ int BIFImporter::OpenArchive(const char* path)
 		return GEM_ERROR;
 	}
 
-	ReadBIF();
-	return GEM_OK;
+	return ReadBIF();
 }
 
 DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
@@ -180,7 +179,7 @@ DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
 	return NULL;
 }
 
-void BIFImporter::ReadBIF(void)
+int BIFImporter::ReadBIF()
 {
 	ieDword foffset;
 	stream->ReadDword(fentcount);
@@ -190,15 +189,9 @@ void BIFImporter::ReadBIF(void)
 	fentries = new FileEntry[fentcount];
 	tentries = new TileEntry[tentcount];
 	if (!fentries || !tentries) {
-		if (fentries) {
-			delete fentries;
-			fentries = NULL;
-		}
-		if (tentries) {
-			delete tentries;
-			tentries = NULL;
-		}
-		return;
+		delete fentries;
+		delete tentries;
+		return GEM_ERROR;
 	}
 
 	for (unsigned int i = 0; i < fentcount; i++) {
@@ -216,6 +209,7 @@ void BIFImporter::ReadBIF(void)
 		stream->ReadWord(tentries[i].type);
 		stream->ReadWord(tentries[i].u1);
 	}
+	return GEM_OK;
 }
 
 #include "plugindef.h"

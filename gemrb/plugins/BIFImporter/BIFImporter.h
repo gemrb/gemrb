@@ -61,7 +61,7 @@ public:
 private:
 	static DataStream* DecompressBIF(DataStream* compressed, const char* path);
 	static DataStream* DecompressBIFC(DataStream* compressed, const char* path);
-	void ReadBIF(void);
+	int ReadBIF();
 };
 
 }
