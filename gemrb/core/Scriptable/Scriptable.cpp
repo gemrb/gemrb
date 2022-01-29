@@ -1590,7 +1590,7 @@ String Scriptable::GetName() const
 		case ST_CONTAINER:	return L"Container";
 		case ST_AREA:		return L"Area";
 		case ST_GLOBAL:		return L"Global";
-		case ST_ACTOR:		return As<const Actor>()->GetName();
+		case ST_ACTOR:		return As<const Actor>()->GetActorName(1);
 		default:	return L"NONE";
 	}
 }
