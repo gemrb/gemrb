@@ -3139,8 +3139,10 @@ int GameScript::CharName(Scriptable *Sender, const Trigger *parameters)
 	}
 	
 	const String* str = StringFromCString(parameters->string0Parameter);
-	if (str && actor->GetShortName() == *str) {
-		return 1;
+	if (str) {
+		int ret = actor->GetShortName() == *str;
+		delete str;
+		return ret;
 	}
 	return 0;
 }
