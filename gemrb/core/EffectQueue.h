@@ -345,7 +345,7 @@ public:
 	bool WeaponImmunity(int enchantment, ieDword weapontype) const;
 	int SumDamageReduction(EffectRef &effect_reference, ieDword weaponEnchantment, int &total) const;
 	//melee and ranged effects
-	void AddWeaponEffects(EffectQueue* fxqueue, EffectRef& fx_ref, ieDword param2 = 0) const;
+	void AddWeaponEffects(EffectQueue* fxqueue, EffectRef& fx_ref, ieDword param2 = 1) const;
 
 	// returns -1 if bounced, 0 if resisted, 1 if accepted spell
 	int CheckImmunity(Actor *target) const;
