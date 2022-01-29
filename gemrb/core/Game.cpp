@@ -408,7 +408,7 @@ void Game::InitActorPos(Actor *actor) const
 	AutoTable strta = gamedata->LoadTable("startpos");
 
 	if (!start || !strta) {
-		error("Game", "Game is missing character start data.\n");
+		error("Game", "Game is missing character start data.");
 	}
 	// 0 - single player, 1 - tutorial, 2 - expansion
 	ieDword playmode = 0;
@@ -904,11 +904,11 @@ bool Game::CheckForReplacementActor(size_t i)
 	if (newcre != "****") {
 		int pos = gamedata->LoadCreature(newcre, 0, false, act->version);
 		if (pos < 0) {
-			error("Game::CheckForReplacementActor", "LoadCreature failed: pos is negative!\n");
+			error("Game::CheckForReplacementActor", "LoadCreature failed: pos is negative!");
 		} else {
 			Actor *newact = GetNPC(pos);
 			if (!newact) {
-				error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!\n");
+				error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!");
 			} else {
 				newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
 				newact->TalkCount = act->TalkCount;

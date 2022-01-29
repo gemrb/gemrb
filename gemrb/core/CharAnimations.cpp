@@ -75,7 +75,7 @@ struct EquipResRefData {
 CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 	AutoTable Avatars = gamedata->LoadTable("avatars");
 	if (!Avatars) {
-		error("CharAnimations", "A critical animation file is missing!\n");
+		error("CharAnimations", "A critical animation file is missing!");
 	}
 	int AvatarsCount = Avatars->GetRowCount();
 	table.resize(AvatarsCount);
@@ -885,7 +885,7 @@ WSW 003      |      013 ESE
 Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Orient)
 {
 	if (Stance >= MAX_ANIMS) {
-		error("CharAnimation", "Illegal stance ID\n");
+		error("CharAnimation", "Illegal stance ID");
 	}
 
 	//for paletted dragon animations, we need the stance id
@@ -1230,7 +1230,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			}
 			break;
 		default:
-			error("CharAnimations", "Unknown animation type\n");
+			error("CharAnimations", "Unknown animation type");
 	}
 	delete equipment;
 	previousStanceID = stanceID;
@@ -1458,7 +1458,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			NewResRef = AvatarTable[AvatarsRowNum].Prefixes[Part];
 			break;
 		default:
-			error("CharAnimations", "Unknown animation type in avatars.2da row: %lu\n", static_cast<unsigned long>(AvatarsRowNum));
+			error("CharAnimations", "Unknown animation type in avatars.2da row: {}", AvatarsRowNum);
 	}
 }
 
@@ -1477,7 +1477,7 @@ void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
 			GetMHREquipmentRef(dest, Cycle, equipRef, offhand, equip);
 			break;
 		default:
-			error("CharAnimations", "Unsupported animation type for equipment animation.\n");
+			error("CharAnimations", "Unsupported animation type for equipment animation.");
 	}
 }
 
@@ -1640,7 +1640,7 @@ void CharAnimations::AddVHR2Suffix(std::string& dest, unsigned char StanceID,
 			dest += "g22";
 			break;
 		default:
-			error("CharAnimation", "VHR2 Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "VHR2 Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 }
 
@@ -1711,7 +1711,7 @@ void CharAnimations::AddVHR3Suffix(std::string& dest, unsigned char StanceID,
 			dest += "g11";
 			break;
 		default:
-			error("CharAnimation", "VHR3 Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "VHR3 Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 }
 
@@ -1774,7 +1774,7 @@ void CharAnimations::AddFFSuffix(std::string& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "Four frames Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "Four frames Animation: unhandled stance: {} {}", dest, StanceID);
 
 	}
 	dest += static_cast<char>(Part + '1');
@@ -1835,7 +1835,7 @@ void CharAnimations::AddFF2Suffix(std::string& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "Four frames 2 Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "Four frames 2 Animation: unhandled stance: {} {}", dest, StanceID);
 
 	}
 	dest += static_cast<char>(Part + '1');
@@ -1971,7 +1971,7 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "VHR Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "VHR Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	EquipData->Cycle = Cycle;
 }
@@ -2051,7 +2051,7 @@ void CharAnimations::AddSixSuffix(std::string& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "Six Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "Six Animation: unhandled stance: {} {}", dest, StanceID);
 
 	}
 	if (Orient>9) {
@@ -2099,7 +2099,7 @@ void CharAnimations::AddLR2Suffix(std::string& dest, unsigned char StanceID,
 			Cycle = 32 + Orient;
 			break;
 		default:
-			error("CharAnimation", "LR2 Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "LR2 Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (Orient>=4) {
 		dest += "g1e";
@@ -2212,7 +2212,7 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 			Cycle = Orient;
 			break;
 		default:
-			error("CharAnimation", "MHR Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "MHR Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (Orient>=5) {
 		dest += "e";
@@ -2413,7 +2413,7 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
-			error("CharAnimation", "LRSuffix2 Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "LRSuffix2 Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (Orient > 9) {
 		dest += "e";
@@ -2473,7 +2473,7 @@ void CharAnimations::AddTwoPieceSuffix(std::string& dest, unsigned char StanceID
 			Cycle = 8 + Orient / 2;
 			break;
 		default:
-			error("CharAnimation", "Two-piece Animation: unhandled stance: %s %d", dest.c_str(), StanceID);
+			error("CharAnimation", "Two-piece Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (Orient > 9) {
 		dest += "e";
@@ -2542,7 +2542,7 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
-			error("CharAnimation", "LR Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "LR Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (Orient > 9) {
 		dest += "e";
@@ -2613,7 +2613,7 @@ void CharAnimations::AddLR3Suffix( std::string& dest, unsigned char StanceID,
 			Cycle = 24 + Orient / 2;
 			break;
 		default:
-			error("CharAnimation", "LR3 Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "LR3 Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (Orient > 9) {
 		dest += "e";
@@ -2686,7 +2686,7 @@ void CharAnimations::AddMMR2Suffix(std::string& dest, unsigned char StanceID,
 			Cycle = ( Orient / 2 );
 			break;
 		default:
-			error("CharAnimation", "MMR Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "MMR Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (Orient > 9) {
 		dest += "e";
@@ -2763,7 +2763,7 @@ void CharAnimations::AddMMRSuffix(std::string& dest, unsigned char StanceID,
 			dest += "wk";
 			break;
 		default:
-			error("CharAnimation", "MMR Animation: unhandled stance: %s %d\n", dest.c_str(), StanceID);
+			error("CharAnimation", "MMR Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (!mirror && Orient > 9) {
 		dest += "e";
@@ -2820,7 +2820,7 @@ void CharAnimations::AddHLSuffix(std::string& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "HL Animation: unhandled stance: %s %d", dest.c_str(), StanceID);
+			error("CharAnimation", "HL Animation: unhandled stance: {} {}", dest, StanceID);
 	}
 	if (offset) {
 		dest += "hg1";

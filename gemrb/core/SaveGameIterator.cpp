@@ -382,7 +382,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder) const
 		FormatQuickSavePath(to, myslots[i]+1);
 		int errnum = rename(from, to);
 		if (errnum) {
-			error("SaveGameIterator", "Rename error %d when pruning quicksaves!\n", errnum);
+			error("SaveGameIterator", "Rename error {} when pruning quicksaves!", errnum);
 		}
 	}
 }

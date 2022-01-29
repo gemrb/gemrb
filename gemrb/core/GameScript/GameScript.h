@@ -181,7 +181,7 @@ protected:
 	void AssertCanary(const char* msg) const
 	{
 		if (!CheckCanary()) {
-			error("Canary Died", "Canary([0x%08lX]) != 0xdeadbeef. Message: %s\n", canary, msg);
+			error("Canary Died", "Canary([{:#10x}]) != 0xdeadbeef. Message: {}", canary, msg);
 		}
 	}
 	bool CheckCanary() const
@@ -301,7 +301,7 @@ public:
 	{
 		AssertCanary(__func__);
 		if (!RefCount) {
-			error("GameScript", "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
+			error("GameScript", "WARNING!!! Double Freeing in {}: Line {}", __FILE__,
 				__LINE__);
 		}
 		RefCount--;
@@ -314,7 +314,7 @@ public:
 		AssertCanary(__func__);
 		RefCount++;
 		if (RefCount >= 65536) {
-			error("GameScript", "Refcount increased to: %d in action %d\n", RefCount,
+			error("GameScript", "Refcount increased to: {} in action {}", RefCount,
 				actionID);
 		}
 	}

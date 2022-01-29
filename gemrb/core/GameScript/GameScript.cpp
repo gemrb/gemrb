@@ -1403,14 +1403,14 @@ static void LoadActionFlags(const char *tableName, int flag, bool critical)
 	int tableIndex = core->LoadSymbol(tableName);
 	if (tableIndex < 0) {
 		if (critical) {
-			error("GameScript", "Couldn't find %s symbols!\n",tableName);
+			error("GameScript", "Couldn't find {} symbols!", tableName);
 		} else {
 			return;
 		}
 	}
 	auto table = core->GetSymbol(tableIndex);
 	if (!table) {
-		error("GameScript", "Couldn't load %s symbols!\n",tableName);
+		error("GameScript", "Couldn't load {} symbols!", tableName);
 	}
 	size_t j = table->GetSize();
 	while (j--) {
@@ -1449,7 +1449,7 @@ void InitializeIEScript()
 	int gtT = core->LoadSymbol( "gemtrig" );
 	AutoTable objNameTable = gamedata->LoadTable("script");
 	if (tT < 0 || aT < 0 || oT < 0 || !objNameTable) {
-		error("GameScript", "A critical scripting file is missing!\n");
+		error("GameScript", "A critical scripting file is missing!");
 	}
 	triggersTable = core->GetSymbol( tT );
 	actionsTable = core->GetSymbol( aT );
@@ -1457,14 +1457,14 @@ void InitializeIEScript()
 	overrideActionsTable = core->GetSymbol( gaT );
 	overrideTriggersTable = core->GetSymbol( gtT );
 	if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
-		error("GameScript", "A critical scripting file is damaged!\n");
+		error("GameScript", "A critical scripting file is damaged!");
 	}
 
 	/* Loading Script Configuration Parameters */
 
 	ObjectIDSCount = atoi( objNameTable->QueryField() );
 	if (ObjectIDSCount<0 || ObjectIDSCount>MAX_OBJECT_FIELDS) {
-		error("GameScript", "The IDS Count shouldn't be more than 10!\n");
+		error("GameScript", "The IDS Count shouldn't be more than 10!");
 	}
 
 	ObjectIDSTableNames.resize(ObjectIDSCount);
@@ -1482,7 +1482,7 @@ void InitializeIEScript()
 	}
 	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
-		error("GameScript", "The Object Nesting Count shouldn't be more than 5!\n");
+		error("GameScript", "The Object Nesting Count shouldn't be more than 5!");
 	}
 	HasAdditionalRect = ( atoi( objNameTable->QueryField( 2 ) ) != 0 );
 	ExtraParametersCount = atoi( objNameTable->QueryField( 3 ) );
@@ -1771,7 +1771,7 @@ void InitializeIEScript()
 	} else {
 		auto savedTriggersTable = core->GetSymbol(savedTriggersIndex);
 		if (!savedTriggersTable) {
-			error("GameScript", "Couldn't load saved trigger symbols!\n");
+			error("GameScript", "Couldn't load saved trigger symbols!");
 		}
 		j = savedTriggersTable->GetSize();
 		while (j--) {
@@ -1809,7 +1809,7 @@ GameScript::~GameScript(void)
 		int res = BcsCache.DecRef(script, Name, true);
 
 		if (res<0) {
-			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name.CString());
+			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: {}", Name);
 		}
 		if (!res) {
 			script->Release();
@@ -2491,7 +2491,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			std::string buffer("Immediate action got queued!\n");
 			PrintAction(buffer, actionID);
 			Log(ERROR, "GameScript", buffer);
-			error("GameScript", "aborting...\n");
+			error("GameScript", "aborting...");
 		}
 		return;
 	}

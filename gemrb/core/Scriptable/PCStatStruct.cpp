@@ -201,7 +201,7 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 	case ACT_IWDQITEM+9:*/
 		idx = which - ACT_IWDQITEM;
 		break;
-	default: error("Core", "Unknown Quickslot accessed '%d'.\n", which);
+	default: error("Core", "Unknown Quickslot accessed '{}'.", which);
 	}
 	slot=QuickItemSlots[idx];
 	headerindex=QuickItemHeaders[idx];

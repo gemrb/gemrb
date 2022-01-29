@@ -124,7 +124,7 @@ void Scriptable::SetMap(Map *map)
 {
 	if (map && (map->GetCurrentArea()!=map)) {
 		//a map always points to itself (if it is a real map)
-		error("Scriptable", "Invalid map set!\n");
+		error("Scriptable", "Invalid map set!");
 	}
 	area = map;
 }
@@ -135,7 +135,7 @@ void Scriptable::SetMap(Map *map)
 void Scriptable::SetScript(const ResRef &aScript, int idx, bool ai)
 {
 	if (idx >= MAX_SCRIPTS) {
-		error("Scriptable", "Invalid script index!\n");
+		error("Scriptable", "Invalid script index!");
 	}
 	if (Scripts[idx] && Scripts[idx]->running) {
 		Scripts[idx]->dead = true;
@@ -330,7 +330,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if (!CurrentActionInterruptable) {
 		// sanity check
 		if (!CurrentAction && !GetNextAction()) {
-			error("Scriptable", "No current action and no next action.\n");
+			error("Scriptable", "No current action and no next action.");
 		}
 		return;
 	}

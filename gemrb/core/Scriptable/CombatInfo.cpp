@@ -67,7 +67,7 @@ static void SetBonusInternal(int& current, int bonus, int mod)
 			newBonus = current * bonus / 100;
 			break;
 		default:
-			error("CombatInfo", "Bad bonus mod type: %d", mod);
+			error("CombatInfo", "Bad bonus mod type: {}", mod);
 	}
 
 	current = newBonus;

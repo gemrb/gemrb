@@ -1549,7 +1549,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			spark = GetNextSpark(spaidx);
 			break;
 		default:
-			error("Map", "Trying to draw unknown animation type.\n");
+			error("Map", "Trying to draw unknown animation type.");
 		}
 	}
 
@@ -2451,7 +2451,7 @@ Actor *Map::GetItemByDialog(const ResRef &resref) const
 		// the cre file is set up to be invisible, invincible and immune to several things
 		Actor *surrogate = gamedata->GetCreature(resref);
 		if (!surrogate) {
-			error("Map", "GetItemByDialog found the right item, but creature is missing: %s!", resref.CString());
+			error("Map", "GetItemByDialog found the right item, but creature is missing: {}!", resref);
 			// error is fatal
 		}
 		Map *map = pc->GetCurrentArea();

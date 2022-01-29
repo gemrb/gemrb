@@ -1579,7 +1579,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		str->ReadDword(tmpDword);
 		const ResRef& tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
 		if (tmp.IsEmpty()) {
-			error("CREImporter", "Unresolved spell index: %d level:%d, type: %d",
+			error("CREImporter", "Unresolved spell index: {} level:{}, type: {}",
 				spellindex, level+1, type);
 		}
 

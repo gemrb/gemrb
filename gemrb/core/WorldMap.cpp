@@ -108,7 +108,7 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
 {
 	//if index is too large, we break
 	if (x>area_entries.size()) {
-		error("WorldMap", "Trying to set invalid entry (%d/%d)\n", x, (int)area_entries.size());
+		error("WorldMap", "Trying to set invalid entry ({}/{})", x, area_entries.size());
 	}
 	//altering an existing entry
 	if (x<area_entries.size()) {
@@ -150,7 +150,7 @@ void WorldMap::SetAreaLink(unsigned int x, const WMPAreaLink *arealink)
 
 	//if index is too large, we break
 	if (x>area_links.size()) {
-		error("WorldMap", "Trying to set invalid link (%d/%d)", x, (int)area_links.size());
+		error("WorldMap", "Trying to set invalid link ({}/{})", x, area_links.size());
 	}
 	//altering an existing link
 	if (x<area_links.size()) {
@@ -384,7 +384,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 		walkpath.push_back(area_links[GotHereFrom[i]]);
 		i = WhoseLinkAmI(GotHereFrom[i]);
 		if (i==(ieDword) -1) {
-			error("WorldMap", "Something has been screwed up here (incorrect path)!\n");
+			error("WorldMap", "Something has been screwed up here (incorrect path)!");
 		}
 	}
 
