@@ -564,9 +564,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 			return;
 	}
 	stream->Write( Signature, 8);
-	ieVariable name(MBStringFromString(act->GetShortName()).c_str());
-	stream->WriteVariable(name);
-
+	stream->WriteVariable(ieVariable(act->GetShortName()));
 	stream->WriteDword(tmpDword); //cre offset (chr header size)
 	stream->WriteDword(CRESize);  //cre size
 
@@ -2931,9 +2929,7 @@ int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 		tmpDword = FAKE_VARIABLE_MARKER;
 		stream->WriteDword(tmpDword); //variable marker
 		stream->WriteFilling(92); //23 * 4
-		char buff[33] = {};
-		strnspccpy(buff, name, 32);
-		stream->Write(buff, 32);
+		stream->WriteVariable(ieVariable(name));
 		stream->WriteFilling(72); //32 + 72
 	}
 	return 0;
