@@ -727,6 +727,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("SpellFocus",fx_generic_effect , 0, -1 ), //to implement school specific saving throw penalty to opponent
 	EffectDesc("SpellResistance",fx_generic_effect , 0, -1 ), //to implement school specific saving throw bonus
 	EffectDesc("Spelltrap",fx_spelltrap , 0, -1 ), //overlay: spmagglo
+	EffectDesc("Stat:SetStat", fx_set_stat, 0, -1),
 	EffectDesc("State:Berserk", fx_set_berserk_state, 0, -1 ),
 	EffectDesc("State:Blind", fx_set_blind_state, 0, -1 ),
 	EffectDesc("State:Blur", fx_set_blur_state, 0, -1 ),
