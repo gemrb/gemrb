@@ -1155,13 +1155,19 @@ int GameScript::HasItemEquipped(Scriptable * Sender, const Trigger *parameters)
 	if (!actor) {
 		return 0;
 	}
-
-	// HACK: temporarily look at all items, since we now set the bit only for weapons
-	// bg2/ddguard7.baf is the only user with something else - the strohm mask helmet
-	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_EQUIPPED*0) ) {
-		return 1;
+	int slot = actor->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
+	if (slot == -1) {
+		return 0;
 	}
-	return 0;
+
+	// instead of looking for IE_INV_ITEM_EQUIPPED, which we set only on weapons,
+	// just inspect in which part of the inventory the slot is
+	// bg2/ddguard7.baf needs it (strohm mask) and the bg1re (Branwen) girdle of gender banter
+	if (actor->inventory.InBackpack(slot)) {
+		return 0;
+	}
+
+	return 1;
 }
 
 int GameScript::Acquired(Scriptable * Sender, const Trigger *parameters)

@@ -1917,4 +1917,12 @@ int Inventory::MergeItems(int slot, CREItem *item)
 	return ASI_FAILED;
 }
 
+int Inventory::InBackpack(int slot) const
+{
+	if (static_cast<size_t>(slot) >= Slots.size()) {
+		InvalidSlot(slot);
+	}
+	return slot >= SLOT_INV && slot <= LAST_INV;
+}
+
 }

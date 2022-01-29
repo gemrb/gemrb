@@ -370,6 +370,7 @@ public:
 	static int GetRangedSlot();
 	static int GetQuickSlot();
 	static int GetInventorySlot();
+	int InBackpack(int slot) const;
 private:
 	void CalculateWeight(void);
 	int FindRangedProjectile(unsigned int type) const;
