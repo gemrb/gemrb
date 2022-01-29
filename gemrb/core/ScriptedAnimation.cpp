@@ -552,8 +552,9 @@ void ScriptedAnimation::UpdateSound()
 		}
 
 		if (SoundPhase <= P_RELEASE) {
+			bool loop = SoundPhase == P_HOLD && (SequenceFlags & IE_VVC_LOOP);
 			sound_handle = core->GetAudioDrv()->Play(sounds[SoundPhase], SFX_CHAN_HITS, soundpos,
-						   (SoundPhase == P_HOLD && (SequenceFlags & IE_VVC_LOOP)) ? GEM_SND_LOOPING : 0);
+						   loop ? GEM_SND_LOOPING : 0);
 			SoundPhase++;
 		}
 	} else {
