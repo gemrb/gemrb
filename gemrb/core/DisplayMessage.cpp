@@ -159,8 +159,7 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 void DisplayMessage::DisplayConstantString(size_t stridx, const Color &color, Scriptable *target) const
 {
 	if (stridx > STRREF_COUNT) return;
-	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
-	DisplayString(text, color, target);
+	DisplayString(core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND), color, target);
 }
 
 void DisplayMessage::DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const
