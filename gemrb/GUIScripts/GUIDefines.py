@@ -358,7 +358,7 @@ GE_TRY_IDENTIFY_ON_TRANSFER = 2
 GE_ALWAYS_OPEN_CONTAINER_ITEMS = 4
 
 # Log Levels
-# !!! Keep this synchronized with System/Logging.h !!!
+# !!! Keep this synchronized with Logging/Logging.h !!!
 # no need for LOG_INTERNAL here since its internal to the logger class
 LOG_NONE = -1 # here just for the scripts, not needed in core
 LOG_FATAL = 0

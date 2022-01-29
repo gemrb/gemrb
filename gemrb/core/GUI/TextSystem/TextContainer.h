@@ -23,7 +23,7 @@
 #include "Region.h"
 
 #include "GUI/View.h"
-#include "System/String.h"
+#include "Strings/String.h"
 
 #include <deque>
 #include <utility>

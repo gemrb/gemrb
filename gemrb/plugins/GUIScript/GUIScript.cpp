@@ -62,7 +62,7 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 #include "System/FileFilters.h"
 
 #include <algorithm>

@@ -14,37 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- *
- *
  */
 
-#ifndef SLICEDSTREAM_H
-#define SLICEDSTREAM_H
-
-#include "System/DataStream.h"
-
-#include "exports.h"
+#include "String.h"
 
 namespace GemRB {
 
-class GEM_EXPORT SlicedStream : public DataStream
+void TrimString(String& string)
 {
-private:
-//	bool autoFree;
-	strpos_t startpos;
-	DataStream* str;
-public:
-	SlicedStream(const DataStream* cfs, strpos_t startPos, strpos_t streamSize);
-	~SlicedStream() override;
-	DataStream* Clone() const noexcept override;
-
-	strret_t Read(void* dest, strpos_t length) override;
-	strret_t Write(const void* src, strpos_t length) override;
-	stroff_t Seek(stroff_t pos, strpos_t startpos) override;
-};
-
-GEM_EXPORT DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool preservepos = false);
-
+	string.erase(0, string.find_first_not_of(WHITESPACE_STRING));
+	string.erase(string.find_last_not_of(WHITESPACE_STRING) + 1);
 }
 
-#endif
+}

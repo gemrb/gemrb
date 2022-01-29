@@ -18,7 +18,7 @@
  *
  */
 
-#include "System/MemoryStream.h"
+#include "MemoryStream.h"
 
 #include "errors.h"
 

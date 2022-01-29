@@ -21,7 +21,7 @@
 #include "GUI/Console.h"
 
 #include "Interface.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 namespace GemRB {
 

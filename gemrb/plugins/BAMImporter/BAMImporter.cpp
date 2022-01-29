@@ -26,7 +26,7 @@
 #include "Palette.h"
 #include "Video/Video.h"
 #include "Video/RLE.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 #include "System/swab.h"
 

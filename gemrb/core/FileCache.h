@@ -19,7 +19,7 @@
 #ifndef FILECACHE_H
 #define FILECACHE_H
 
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

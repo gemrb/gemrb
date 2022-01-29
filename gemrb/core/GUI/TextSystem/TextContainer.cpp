@@ -21,7 +21,7 @@
 #include "Interface.h"
 #include "Palette.h"
 #include "Sprite2D.h"
-#include "System/String.h"
+#include "Strings/String.h"
 #include "Video/Video.h"
 
 #include <algorithm>

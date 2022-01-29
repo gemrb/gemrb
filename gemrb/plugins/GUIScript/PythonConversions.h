@@ -27,8 +27,8 @@
 #include "Sprite2D.h"
 #include "TableMgr.h"
 #include "SymbolMgr.h"
-#include "System/Logging.h"
-#include "System/String.h"
+#include "Logging/Logging.h"
+#include "Strings/String.h"
 
 namespace GemRB {
 

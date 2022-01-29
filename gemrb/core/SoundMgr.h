@@ -24,7 +24,7 @@
 #include "ie_types.h"
 
 #include "Resource.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

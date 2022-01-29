@@ -14,16 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ *
  */
 
-#include "System/String.h"
+#ifndef MEMORYSTREAM_H
+#define MEMORYSTREAM_H
+
+#include "DataStream.h"
+
+#include "exports.h"
 
 namespace GemRB {
 
-void TrimString(String& string)
+class GEM_EXPORT MemoryStream : public DataStream
 {
-	string.erase(0, string.find_first_not_of(WHITESPACE_STRING));
-	string.erase(string.find_last_not_of(WHITESPACE_STRING) + 1);
-}
+protected:
+	char *data;
+public:
+	MemoryStream(const char *name, void* data, strpos_t size);
+	~MemoryStream() override;
+	DataStream* Clone() const noexcept override;
+
+	strret_t Read(void* dest, strpos_t length) override;
+	strret_t Write(const void* src, strpos_t length) override;
+	strret_t Seek(stroff_t pos, strpos_t startpos) override;
+};
 
 }
+
+#endif

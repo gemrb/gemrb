@@ -19,7 +19,7 @@
 #ifndef LOGGER_APPLE_H
 #define LOGGER_APPLE_H
 
-#include "System/Logger/Stdio.h"
+#include "Logging/Loggers/Stdio.h"
 
 namespace GemRB {
 

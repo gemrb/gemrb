@@ -16,13 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/StringConversion.h"
+#include "StringConversion.h"
 
 #include <iconv.h>
 
 #include "ie_types.h"
 #include "Interface.h"
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

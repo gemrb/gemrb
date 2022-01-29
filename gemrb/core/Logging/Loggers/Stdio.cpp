@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/Logger/Stdio.h"
-#include "System/FileStream.h"
+#include "Logging/Loggers/Stdio.h"
+#include "Streams/FileStream.h"
 
 #include <cstdio>
 

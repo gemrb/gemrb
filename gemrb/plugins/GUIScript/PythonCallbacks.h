@@ -27,7 +27,7 @@
 
 #include "GUI/Control.h"
 #include "GUI/GUIScriptInterface.h"
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

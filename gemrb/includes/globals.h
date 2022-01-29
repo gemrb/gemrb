@@ -42,7 +42,7 @@
 #include "errors.h"
 
 #include "Region.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 #include <algorithm>
 #include <bitset>

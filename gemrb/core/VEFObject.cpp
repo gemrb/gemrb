@@ -30,7 +30,7 @@
 #include "ScriptedAnimation.h"
 #include "TableMgr.h"
 #include "Video/Video.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

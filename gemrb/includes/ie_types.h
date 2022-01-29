@@ -29,8 +29,8 @@
 #define IE_TYPES_H
 
 #include "Platform.h"
-#include "System/CString.h"
-#include "System/String.h"
+#include "Strings/CString.h"
+#include "Strings/String.h"
 
 #include <cstdint>
 

@@ -18,8 +18,8 @@
 #ifndef MAPPED_FILE_MEMORY_STREAM_H
 #define MAPPED_FILE_MEMORY_STREAM_H
 
-#include "System/FileStream.h"
-#include "System/MemoryStream.h"
+#include "FileStream.h"
+#include "MemoryStream.h"
 
 namespace GemRB {
 

@@ -22,7 +22,7 @@
 
 #include "Interface.h"
 #include "GameScript/GameScript.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 using namespace GemRB;
 

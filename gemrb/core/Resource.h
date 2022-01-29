@@ -28,7 +28,7 @@
 #define RESOURCE_H
 
 #include "Plugin.h"
-#include "System/StringConversion.h"
+#include "Strings/StringConversion.h"
 
 #include <unordered_map>
 

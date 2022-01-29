@@ -30,6 +30,9 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Item.cpp
 	ItemMgr.cpp
 	KeyMap.cpp
+	Logging/Logger.cpp
+	Logging/Loggers/Stdio.cpp
+	Logging/Logging.cpp
 	LRUCache.cpp
 	Map.cpp
 	MapReverb.cpp
@@ -98,16 +101,13 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/InfoPoint.cpp
 	Scriptable/Scriptable.cpp
 	Scriptable/PCStatStruct.cpp
-	System/DataStream.cpp
-	System/FileStream.cpp
-	System/MemoryStream.cpp
-	System/Logger.cpp
-	System/Logger/Stdio.cpp
-	System/Logging.cpp
-	System/SlicedStream.cpp
-	System/CString.cpp
-	System/String.cpp
-	System/StringConversion.cpp
+	Streams/DataStream.cpp
+	Streams/FileStream.cpp
+	Streams/MemoryStream.cpp
+	Streams/SlicedStream.cpp
+	Strings/CString.cpp
+	Strings/String.cpp
+	Strings/StringConversion.cpp
 	System/swab.cpp
 	System/VFS.cpp
 	Video/Pixels.cpp
@@ -117,7 +117,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 IF(SUPPORTS_MEMSTREAM)
 	SET(gemrb_core_LIB_SRCS
 		${gemrb_core_LIB_SRCS}
-		System/MappedFileMemoryStream.cpp
+		Streams/MappedFileMemoryStream.cpp
 	)
 ENDIF()
 
@@ -131,8 +131,8 @@ ENDIF()
 IF(WIN32)
 	SET(gemrb_core_LIB_SRCS
 		${gemrb_core_LIB_SRCS}
-		CodepageToIconv.cpp
-		CodepageToIconvMap.cpp
+		../../platforms/windows/CodepageToIconv.cpp
+		../../platforms/windows/CodepageToIconvMap.cpp
 	)
 	INCLUDE_DIRECTORIES(${ICONV_INCLUDE_DIR})
 ENDIF()

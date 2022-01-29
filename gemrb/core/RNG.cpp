@@ -21,7 +21,7 @@
 #include <ctime>
 
 #include "RNG.h"
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

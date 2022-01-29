@@ -22,7 +22,7 @@
 #include "Interface.h"
 #include "TableMgr.h"
 #include "ScriptEngine.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 namespace GemRB {
 

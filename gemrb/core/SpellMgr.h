@@ -29,7 +29,7 @@
 
 #include "Plugin.h"
 #include "Spell.h"
-#include "System/DataStream.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 

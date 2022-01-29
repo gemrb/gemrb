@@ -19,7 +19,7 @@
 #ifndef LOGGER_VITA_H
 #define LOGGER_VITA_H
 
-#include "System/Logger.h"
+#include "Logging/Logger.h"
 
 namespace GemRB {
 

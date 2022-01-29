@@ -19,7 +19,7 @@
 #ifndef LOGGER_ANDROID_H
 #define LOGGER_ANDROID_H
 
-#include "System/Logger.h"
+#include "Logging/Logger.h"
 
 namespace GemRB {
 

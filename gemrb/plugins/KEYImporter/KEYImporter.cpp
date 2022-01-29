@@ -25,7 +25,7 @@
 #include "IndexedArchive.h"
 #include "Interface.h"
 #include "ResourceDesc.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 using namespace GemRB;
 

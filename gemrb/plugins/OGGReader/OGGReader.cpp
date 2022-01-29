@@ -18,7 +18,7 @@
 
 #include "OGGReader.h"
 
-#include "System/Logging.h"
+#include "Logging/Logging.h"
 
 using namespace GemRB;
 

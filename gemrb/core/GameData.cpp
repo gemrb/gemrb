@@ -43,7 +43,7 @@
 #include "StoreMgr.h"
 #include "VEFObject.h"
 #include "Scriptable/Actor.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 
 #include <cstdio>
 

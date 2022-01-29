@@ -75,7 +75,7 @@
 #include "GUI/WorldMapControl.h"
 #include "RNG.h"
 #include "Scriptable/Container.h"
-#include "System/FileStream.h"
+#include "Streams/FileStream.h"
 #include "System/FileFilters.h"
 
 #include <utility>
