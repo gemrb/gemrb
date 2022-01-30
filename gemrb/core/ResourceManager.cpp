@@ -31,7 +31,7 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 {
 	PluginHolder<ResourceSource> source = MakePluginHolder<ResourceSource>(type);
 	if (!source->Open(path, description)) {
-		Log(WARNING, "ResourceManager", "Invalid path given: %s (%s)", path, description);
+		Log(WARNING, "ResourceManager", "Invalid path given: {} ({})", path, description);
 		return false;
 	}
 
@@ -67,7 +67,7 @@ bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent) co
 		}
 	}
 	if (!silent) {
-		Log(WARNING, "ResourceManager", "'%s.%s' not found...",
+		Log(WARNING, "ResourceManager", "'{}.{}' not found...",
 			ResRef, core->TypeExt(type));
 	}
 	return false;
@@ -89,7 +89,7 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 	if (!silent) {
 		std::string buffer = fmt::format("Couldn't find '{}'... Tried ", ResRef);
 		PrintPossibleFiles(buffer, ResRef,type);
-		Log(WARNING, "ResourceManager", buffer);
+		Log(WARNING, "ResourceManager", "{}", buffer);
 	}
 	return false;
 }
@@ -122,15 +122,13 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 		DataStream *ds = path->GetResource(ResRef, type);
 		if (ds) {
 			if (!silent) {
-				Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
-					ResRef, core->TypeExt(type), path->GetDescription().c_str());
+				Log(MESSAGE, "ResourceManager", "Found '{}.{}' in '{}'.", ResRef, core->TypeExt(type), path->GetDescription());
 			}
 			return ds;
 		}
 	}
 	if (!silent) {
-		Log(ERROR, "ResourceManager", "Couldn't find '%s.%s'.",
-			ResRef, core->TypeExt(type));
+		Log(ERROR, "ResourceManager", "Couldn't find '{}.{}'.", ResRef, core->TypeExt(type));
 	}
 	return NULL;
 }
@@ -140,7 +138,7 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 	if (!ResRef || ResRef[0] == '\0')
 		return NULL;
 	if (!silent) {
-		Log(MESSAGE, "ResourceManager", "Searching for '%s'...", ResRef);
+		Log(MESSAGE, "ResourceManager", "Searching for '{}'...", ResRef);
 	}
 	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
 	for (const auto& type2 : types) {
@@ -156,8 +154,8 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 				Resource *res = type2.Create(str);
 				if (res) {
 					if (!silent) {
-						Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
-							ResRef, type2.GetExt(), path->GetDescription().c_str());
+						Log(MESSAGE, "ResourceManager", "Found '{}.{}' in '{}'.",
+							ResRef, type2.GetExt(), path->GetDescription());
 					}
 					return res;
 				}
@@ -167,7 +165,7 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 	if (!silent) {
 		std::string buffer = fmt::format("Couldn't find '{}'... Tried ", ResRef);
 		PrintPossibleFiles(buffer, ResRef, type);
-		Log(WARNING, "ResourceManager", buffer);
+		Log(WARNING, "ResourceManager", "{}", buffer);
 	}
 	return NULL;
 }

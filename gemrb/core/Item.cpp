@@ -244,7 +244,7 @@ unsigned int Item::GetCastingDistance(int idx) const
 {
 	const ITMExtHeader *seh = GetExtHeader(idx);
 	if (!seh) {
-		Log(ERROR, "Item", "Cannot retrieve item header!!! required header: %d, maximum: %d",
+		Log(ERROR, "Item", "Cannot retrieve item header!!! required header: {}, maximum: {}",
 			idx, (int) ext_headers.size());
 		return 0;
 	}
@@ -271,7 +271,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(const ITMExtHeader *hea
 			ieDword damagetype = fx->Parameter2 >> 16;
 			it = core->DamageInfoMap.find(damagetype);
 			if (it == core->DamageInfoMap.end()) {
-				Log(ERROR, "Combat", "Unhandled damagetype: %u", damagetype);
+				Log(ERROR, "Combat", "Unhandled damagetype: {}", damagetype);
 				continue;
 			}
 			DMGOpcodeInfo damage;

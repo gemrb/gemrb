@@ -222,7 +222,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	if (cnt != 2) {
 		//The matcher didn't match: either this is not a valid dir
 		//or the SAVEGAME_DIRECTORY_MATCHER needs updating.
-		Log(ERROR, "SaveGameIterator", "Invalid savegame directory '%s' in %s.",
+		Log(ERROR, "SaveGameIterator", "Invalid savegame directory '{}' in {}.",
 			slotname, Path);
 		return false;
 	}
@@ -235,7 +235,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	PathJoinExt(ftmp, dtmp, core->GameNameResRef, "bmp");
 
 	if (access( ftmp, R_OK )) {
-		Log(WARNING, "SaveGameIterator", "Ignoring slot %s because of no appropriate preview!", dtmp);
+		Log(WARNING, "SaveGameIterator", "Ignoring slot {} because of no appropriate preview!", dtmp);
 		return false;
 	}
 
@@ -247,7 +247,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	if (core->WorldMapName[1]) {
 		PathJoinExt(ftmp, dtmp, core->WorldMapName[1], "wmp");
 		if (access(ftmp, R_OK)) {
-			Log(WARNING, "SaveGameIterator", "Ignoring slot %s because of no appropriate second worldmap!", dtmp);
+			Log(WARNING, "SaveGameIterator", "Ignoring slot {} because of no appropriate second worldmap!", dtmp);
 			return false;
 		}
 	}
@@ -267,7 +267,7 @@ bool SaveGameIterator::RescanSaveGames()
 	// create the save game directory at first access
 	if (!dir) {
 		if (!MakeDirectories(Path)) {
-			Log(ERROR, "SaveGameIterator", "Unable to create save game directory '%s'", Path);
+			Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", Path);
 			return false;
 		}
 		dir.Rewind();
@@ -327,7 +327,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
 	//maximum pathlength == 240, without 8+3 filenames
 	if ( (cnt != 2) || (strlen(Path)>240) ) {
-		Log(WARNING, "SaveGame", "Invalid savegame directory '%s' in %s.", slotname, Path );
+		Log(WARNING, "SaveGame", "Invalid savegame directory '{}' in {}.", slotname, Path);
 		return NULL;
 	}
 
@@ -552,7 +552,7 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 
 	//if the path exists in different case, don't make it again
 	if (!MakeDirectory(Path)) {
-		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '%s'", Path);
+		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", Path);
 		return false;
 	}
 	//keep the first part we already determined existing
@@ -563,7 +563,7 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
 	if (!MakeDirectory(Path)) {
-		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '%s'", Path);
+		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", Path);
 		return false;
 	}
 	return true;

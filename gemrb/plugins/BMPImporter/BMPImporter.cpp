@@ -81,7 +81,7 @@ bool BMPImporter::Import(DataStream* str)
 	//str->ReadDword(ColorsUsed);
 	//str->ReadDword(ColorsImportant);
 	if (Compression != 0) {
-		Log(ERROR, "BMPImporter", "Compressed %d-bits Image, not supported.", BitCount);
+		Log(ERROR, "BMPImporter", "Compressed {}-bits Image, not supported.", BitCount);
 		return false;
 	}
 	//COLORTABLE
@@ -124,7 +124,7 @@ bool BMPImporter::Import(DataStream* str)
 			PaddedRowLength = (size.w >> 1);
 			break;
 		default:
-			Log(ERROR, "BMPImporter", "BitCount %d is not supported.", BitCount);
+			Log(ERROR, "BMPImporter", "BitCount {} is not supported.", BitCount);
 			return false;
 	}
 	//if(BitCount!=4)

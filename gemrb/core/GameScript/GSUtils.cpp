@@ -434,7 +434,7 @@ void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 		return;
 	}
 
-	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
+	Log(MESSAGE, "GameScript", "Displaying string on: {}", Sender->GetScriptName());
 	
 	ieStrRef Strref = ieStrRef::INVALID;
 	flags |= DS_CONST;
@@ -842,7 +842,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	if (!ab) {
-		Log(ERROR, "GameScript", "Failed to create creature! (missing creature file %s?)",
+		Log(ERROR, "GameScript", "Failed to create creature! (missing creature file {}?)",
 			parameters->string0Parameter);
 		// maybe this should abort()?
 		return;
@@ -996,12 +996,12 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 		// last parameter is 'face', which should be passed from relevant action parameter..
 		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%d.%d],%d)", area, enter.x, enter.y, 0 );
 	}
-	Log(MESSAGE, "GSUtils", "Executing %s in EscapeAreaCore", Tmp);
+	Log(MESSAGE, "GSUtils", "Executing {} in EscapeAreaCore", Tmp);
 	//drop this action, but add another (destroyself or movebetweenareas)
 	//between the arrival and the final escape, there should be a wait time
 	//that wait time could be handled here
 	if (wait) {
-		Log(WARNING, "GSUtils", "But wait a bit... (%d)", wait);
+		Log(WARNING, "GSUtils", "But wait a bit... ({})", wait);
 		Sender->SetWait(wait);
 	}
 	Sender->ReleaseCurrentAction();
@@ -1078,7 +1078,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	}
 	if (!scr) {
 		assert(Sender);
-		Log(ERROR, "GameScript", "Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.",
+		Log(ERROR, "GameScript", "Speaker for dialog couldn't be found (Sender: {}, Type: {}) Flags:{}.",
 			Sender->GetScriptName(), Sender->Type, Flags);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1090,10 +1090,10 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	}
 
 	if (!tar || tar->Type!=ST_ACTOR) {
-		Log(ERROR, "GameScript", "Target for dialog couldn't be found (Sender: %s, Type: %d).",
+		Log(ERROR, "GameScript", "Target for dialog couldn't be found (Sender: {}, Type: {}).",
 			Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
-			Log(DEBUG, "Actor", Sender->As<const Actor>()->dump());
+			Log(DEBUG, "Actor", "{}", Sender->As<const Actor>()->dump());
 		}
 		std::string buffer("Target object: ");
 		if (parameters->objects[1]) {
@@ -1101,7 +1101,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		} else {
 			buffer.append("<NULL>\n");
 		}
-		Log(ERROR, "GameScript", buffer);
+		Log(ERROR, "GameScript", "{}", buffer);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1114,7 +1114,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			std::string buffer("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
 			buffer.append(speaker->dump());
 			buffer.append(target->dump());
-			Log(ERROR, "GameScript", buffer);
+			Log(ERROR, "GameScript", "{}", buffer);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -1327,8 +1327,8 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 
 void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust)
 {
-	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %ls to %s [%d.%d] face: %d",
-		actor->GetShortName().c_str(), area.CString(), position.x, position.y, face);
+	Log(MESSAGE, "GameScript", "MoveBetweenAreas: {} to {} [{}.{}] face: {}",
+			fmt::WideToChar{actor->GetShortName()}, area, position.x, position.y, face);
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
@@ -1467,7 +1467,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	// mislead and projected images can't attack
 	int puppet = actor->GetStat(IE_PUPPETMASTERTYPE);
 	if (puppet && puppet < 3) {
-		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: %ls!", actor->GetName().c_str());
+		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: {}!", fmt::WideToChar{actor->GetName()});
 		return;
 	}
 
@@ -1478,14 +1478,14 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			actor->StopAttack();
 			Sender->ReleaseCurrentAction();
 			actor->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
-			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: %ls!", tar->GetName().c_str());
+			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: {}!", fmt::WideToChar{tar->GetName()});
 			return;
 		}
 	}
 
 	if (actor == tar) {
 		Sender->ReleaseCurrentAction();
-		Log(WARNING, "AttackCore", "Tried attacking itself: %ls!", tar->GetName().c_str());
+		Log(WARNING, "AttackCore", "Tried attacking itself: {}!", fmt::WideToChar{tar->GetName()});
 		return;
 	}
 
@@ -1498,7 +1498,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		Sender->ReleaseCurrentAction();
 		assert(tar);
 		actor->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
-		Log(WARNING, "AttackCore", "Weapon unusable: %ls!", actor->GetName().c_str());
+		Log(WARNING, "AttackCore", "Weapon unusable: {}!", fmt::WideToChar{actor->GetName()});
 		return;
 	}
 
@@ -1581,7 +1581,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	int idsfile = core->LoadSymbol(idsname);
 	auto valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
-		Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!", idsname, symbol);
+		Log(ERROR, "GameScript", "Missing IDS file {} for symbol {}!", idsname, symbol);
 		return -1;
 	}
 
@@ -1716,11 +1716,11 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 	//Here is the Action; Now we need to evaluate the parameters, if any
 	if (*str!=')') while (*str) {
 		if (*(str+1)!=':') {
-			Log(WARNING, "GSUtils", "parser was sidetracked: %s", str);
+			Log(WARNING, "GSUtils", "parser was sidetracked: {}", str);
 		}
 		switch (*str) {
 			default:
-				Log(WARNING, "GSUtils", "Invalid type: %s", str);
+				Log(WARNING, "GSUtils", "Invalid type: {}", str);
 				delete newAction;
 				return NULL;
 
@@ -1843,7 +1843,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				if (mergestrings) {
 					str++;
 					if (*str!='s') {
-						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
+						Log(ERROR, "GSUtils", "Invalid mergestrings: {}", str);
 						delete newAction;
 						return NULL;
 					}
@@ -2072,11 +2072,11 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 	//Here is the Trigger; Now we need to evaluate the parameters
 	if (*str!=')') while (*str) {
 		if (*(str+1)!=':') {
-			Log(WARNING, "GSUtils", "parser was sidetracked: %s",str);
+			Log(WARNING, "GSUtils", "parser was sidetracked: {}",str);
 		}
 		switch (*str) {
 			default:
-				Log(ERROR, "GSUtils", "Invalid type: %s", str);
+				Log(ERROR, "GSUtils", "Invalid type: {}", str);
 				delete newTrigger;
 				return NULL;
 
@@ -2148,7 +2148,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				if (mergestrings) {
 					str++;
 					if (*str!='s') {
-						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
+						Log(ERROR, "GSUtils", "Invalid mergestrings 2: {}", str);
 						delete newTrigger;
 						return NULL;
 					}
@@ -2224,8 +2224,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
 		} else if (core->InDebugMode(ID_VARIABLES)) {
-			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
-				Context, VarName);
+			Log(WARNING, "GameScript", "Invalid variable {} {} in SetVariable", Context, VarName);
 		}
 	} else {
 		game->locals->SetAt(poi, value, NoCreate);
@@ -2456,7 +2455,7 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 
 	const Spell* spl = gamedata->GetSpell(spellRes);
 	if (!spl) {
-		Log(ERROR, "GameScript", "Spell couldn't be found:%.8s.", spellRes.CString());
+		Log(ERROR, "GameScript", "Spell couldn't be found: {}.", spellRes);
 		return 0;
 	}
 	dist = spl->GetCastingDistance(Sender);
@@ -2483,7 +2482,7 @@ unsigned int GetItemDistance(const ResRef& itemres, int header, double angle)
 {
 	const Item* itm = gamedata->GetItem(itemres);
 	if (!itm) {
-		Log(ERROR, "GameScript", "Item couldn't be found:%.8s.", itemres.CString());
+		Log(ERROR, "GameScript", "Item couldn't be found: {}.", itemres);
 		return 0;
 	}
 	unsigned int dist = itm->GetCastingDistance(header);
@@ -2691,7 +2690,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	} else {
 		if (Sender->SpellResRef.IsEmpty() || Sender->SpellResRef != spellResRef) {
 			if (Sender->CurrentActionTicks) {
-				Log(WARNING, "GameScript", "SpellCore: Action (%d) lost spell somewhere!", parameters->actionID);
+				Log(WARNING, "GameScript", "SpellCore: Action ({}) lost spell somewhere!", parameters->actionID);
 			}
 			Sender->SetSpellResRef(spellResRef);
 		}
@@ -2802,7 +2801,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		//the target was converted to a point
 		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {
-		Log(ERROR, "GameScript", "SpellCore: Action (%d) lost target somewhere!", parameters->actionID);
+		Log(ERROR, "GameScript", "SpellCore: Action ({}) lost target somewhere!", parameters->actionID);
 	}
 	parameters->int2Parameter = 0;
 	Sender->ReleaseCurrentAction();
@@ -2822,7 +2821,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	} else {
 		if (Sender->SpellResRef.IsEmpty() || Sender->SpellResRef != spellResRef) {
 			if (Sender->CurrentActionTicks) {
-				Log(WARNING, "GameScript", "SpellPointCore: Action (%d) lost spell somewhere!", parameters->actionID);
+				Log(WARNING, "GameScript", "SpellPointCore: Action ({}) lost spell somewhere!", parameters->actionID);
 			}
 			Sender->SetSpellResRef(spellResRef);
 		}
@@ -2907,7 +2906,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		//if target was set, fire spell
 		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {
-		Log(ERROR, "GameScript", "SpellPointCore: Action (%d) lost target somewhere!", parameters->actionID);
+		Log(ERROR, "GameScript", "SpellPointCore: Action ({}) lost target somewhere!", parameters->actionID);
 	}
 	Sender->ReleaseCurrentAction();
 }

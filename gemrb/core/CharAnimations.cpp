@@ -145,7 +145,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			valid_unsignednumber(blood->QueryField(i,2), rmax);
 			valid_unsignednumber(blood->QueryField(i,3), flags);
 			if (rmin > rmax || rmax > 0xffff) {
-				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ", value, rmin, rmax);
+				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: {:#x} {:#x}-{:#x} ", value, rmin, rmax);
 				continue;
 			}
 			for (auto& row : table) {
@@ -175,7 +175,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 				range = 0;
 			}
 			if (rmin > rmax || rmax > 0xffff) {
-				Log(ERROR, "CharAnimations", "Invalid walksnd entry: %02x %04x-%04x ", range, rmin, rmax);
+				Log(ERROR, "CharAnimations", "Invalid walksnd entry: {:#x} {:#x}-{:#x} ", range, rmin, rmax);
 				continue;
 			}
 			for (auto& row : table) {
@@ -199,7 +199,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			valid_unsignednumber(stances->QueryField(i, 1), s2);
 
 			if (s1 >= MAX_ANIMS || s2 >= MAX_ANIMS) {
-				Log(ERROR, "CharAnimations", "Invalid stances entry: %04x %d %d", id, s1, s2);
+				Log(ERROR, "CharAnimations", "Invalid stances entry: {:#x} {} {}", id, s1, s2);
 				continue;
 			}
 
@@ -674,7 +674,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 			return;
 		}
 	}
-	Log(ERROR, "CharAnimations", "Invalid or nonexistent avatar entry:%04X", AnimID);
+	Log(ERROR, "CharAnimations", "Invalid or nonexistent avatar entry: {:#x}", AnimID);
 }
 
 //we have to drop them when armourlevel changes
@@ -954,7 +954,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			autoSwitchOnEnd = true;
 			break;
 		default:
-			Log(MESSAGE, "CharAnimation", "Invalid Stance: %d", stanceID);
+			Log(MESSAGE, "CharAnimation", "Invalid Stance: {}", stanceID);
 			break;
 	}
 
@@ -1030,7 +1030,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 		// why do we bother with a bigger buffer if we truncate in the end? Let's see if it even happens in practice
 		if (NewResRef.size() > 8) {
-			Log(DEBUG, "CharAnimations", "Truncating animation ref (%s) to size.", NewResRef.c_str());
+			Log(DEBUG, "CharAnimations", "Truncating animation ref ({}) to size.", NewResRef);
 			NewResRef[8] = 0;
 		}
 
@@ -1039,7 +1039,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 		if (!af) {
 			if (part < actorPartCount) {
-				Log(ERROR, "CharAnimations", "Couldn't create animationfactory: %s (%04x)",
+				Log(ERROR, "CharAnimations", "Couldn't create animationfactory: {} ({:#x})",
 						NewResRef.c_str(), GetAnimationID());
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
@@ -1057,8 +1057,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 		if (!a) {
 			if (part < actorPartCount) {
-				Log(ERROR, "CharAnimations", "Couldn't load animation: %s, cycle %d",
-						NewResRef.c_str(), Cycle);
+				Log(ERROR, "CharAnimations", "Couldn't load animation: {}, cycle {}", NewResRef, Cycle);
 				for (int i = 0; i < part; ++i)
 					delete anims[i];
 				delete[] anims;
@@ -2887,9 +2886,9 @@ void CharAnimations::PulseRGBModifiers()
 
 void CharAnimations::DebugDump() const
 {
-	Log (DEBUG, "CharAnimations", "Anim ID   : %04x", GetAnimationID() );
-	Log (DEBUG, "CharAnimations", "BloodColor: %d", GetBloodColor() );
-	Log (DEBUG, "CharAnimations", "Flags     : %04x", GetFlags() );
+	Log (DEBUG, "CharAnimations", "Anim ID   : {:#x}", GetAnimationID());
+	Log (DEBUG, "CharAnimations", "BloodColor: {}", GetBloodColor());
+	Log (DEBUG, "CharAnimations", "Flags     : {:#x}", GetFlags());
 }
 
 }

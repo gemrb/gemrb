@@ -123,7 +123,7 @@ void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
 	level--; // convert to 0-based for internal use
 	for (const auto& entry : levels) {
 		if (entry.kit == kit && entry.level == level) {
-			Log(WARNING, "CREImporter", "Skipping duplicate spell list table entry for: %s", spell.CString());
+			Log(WARNING, "CREImporter", "Skipping duplicate spell list table entry for: {}", spell);
 			return;
 		}
 	}
@@ -223,7 +223,7 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 
 			int level2 = spell->FindSpell(type);
 			if (level2 == -1) {
-				Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name.CString(), type);
+				Log(ERROR, "CREImporter", "Spell ({} of type {}) found without a level set! Using 1!", name, type);
 				level2 = 0; // internal 0-indexed level
 			}
 			level = level2;
@@ -232,7 +232,7 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 		}
 	}
 
-	Log(ERROR, "CREImporter", "Could not find spell (%s) booktype! %d, %d!", name.CString(), clsMask, kit);
+	Log(ERROR, "CREImporter", "Could not find spell ({}) booktype! {}, {}!", name, clsMask, kit);
 	// pseudorandom fallback
 	return IE_IWD2_SPELL_WIZARD;
 }
@@ -339,16 +339,16 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 	if (ret.IsEmpty()) {
 		// some npcs have spells at odd levels, so the lookup just failed
 		// eg. slayer knights of xvim with sppr325 at level 2 instead of 3
-		Log(ERROR, "CREImporter", "Spell (%d of type %d) found at unexpected level (%d)!", index, type, level);
+		Log(ERROR, "CREImporter", "Spell ({} of type {}) found at unexpected level ({})!", index, type, level);
 		int level2 = splList[index]->FindSpell(type);
 		// grrr, some rows have no levels set - they're all 0, but with a valid resref, so just return that
 		if (level2 == -1) {
-			Log(DEBUG, "CREImporter", "Spell entry (%d) without any levels set!", index);
+			Log(DEBUG, "CREImporter", "Spell entry ({}) without any levels set!", index);
 			return splList[index]->GetSpell();
 		}
 		const ResRef& ret2 = splList[index]->FindSpell(level2, type);
 		if (!ret2.IsEmpty()) {
-			Log(DEBUG, "CREImporter", "The spell was found at level %d!", level2);
+			Log(DEBUG, "CREImporter", "The spell was found at level {}!", level2);
 			return ret2;
 		}
 	}
@@ -491,7 +491,7 @@ bool CREImporter::Import(DataStream* str)
 		return true;
 	}
 
-	Log(ERROR, "CREImporter", "Not a CRE File or File Version not supported: %8.8s", Signature);
+	Log(ERROR, "CREImporter", "Not a CRE File or File Version not supported: {}", Signature);
 	return false;
 }
 
@@ -931,7 +931,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 			GetActorIWD1(act);
 			break;
 		default:
-			Log(ERROR, "CREImporter", "Unknown creature signature: %d\n", CREVersion);
+			Log(ERROR, "CREImporter", "Unknown creature signature: {}\n", CREVersion);
 			delete act;
 			return NULL;
 	}
@@ -1194,7 +1194,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		ieWord index = indices[i++];
 		if (index != 0xffff) {
 			if (index >= ItemsCount) {
-				Log(ERROR, "CREImporter", "Invalid item index (%d) in creature!", index);
+				Log(ERROR, "CREImporter", "Invalid item index ({}) in creature!", index);
 				continue;
 			}
 			//20 is the size of CREItem on disc (8+2+3x2+4)
@@ -1205,7 +1205,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			if (item) {
 				act->inventory.SetSlotItem(item, Slot);
 			} else {
-				Log(ERROR, "CREImporter", "Invalid item index (%d) in creature!", index);
+				Log(ERROR, "CREImporter", "Invalid item index ({}) in creature!", index);
 			}
 		}
 	}
@@ -1261,13 +1261,13 @@ void CREImporter::ReadSpellbook(Actor *act)
 				memorizedSpells[k] = nullptr;
 				continue;
 			}
-			Log(WARNING, "CREImporter", "Duplicate memorized spell(%d) in creature!", k);
+			Log(WARNING, "CREImporter", "Duplicate memorized spell({}) in creature!", k);
 		}
 	}
 
 	for (auto knownSpell : knownSpells) {
 		if (knownSpell) {
-			Log(WARNING, "CREImporter", "Dangling known spell in creature: %s!",
+			Log(WARNING, "CREImporter", "Dangling known spell in creature: {}!",
 				knownSpell->SpellResRef.CString());
 			delete knownSpell;
 		}
@@ -1276,7 +1276,7 @@ void CREImporter::ReadSpellbook(Actor *act)
 
 	for (auto memorizedSpell : memorizedSpells) {
 		if (memorizedSpell) {
-			Log(WARNING, "CREImporter", "Dangling spell in creature: %s!",
+			Log(WARNING, "CREImporter", "Dangling spell in creature: {}!",
 				memorizedSpell->SpellResRef.CString());
 			delete memorizedSpell;
 		}

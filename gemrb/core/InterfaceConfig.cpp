@@ -75,7 +75,7 @@ CFGConfig::CFGConfig(int argc, char *argv[])
 
 			if (!config->Open(filename)) {
 				// Explicitly specified cfg file HAS to be present
-				Log(FATAL, "Config", "Failed to open config file \"%s\".", filename);
+				Log(FATAL, "Config", "Failed to open config file \"{}\".", filename);
 			}
 			isValid = InitWithINIData(config);
 		} else if (stricmp(argv[i], "-q") == 0) {
@@ -163,11 +163,11 @@ bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 	}
 
 	if (isValid) {
-		Log(WARNING, "Config", "attempting to replace config values with contents of %s", cfgStream->filename);
+		Log(WARNING, "Config", "attempting to replace config values with contents of {}", cfgStream->filename);
 	} else {
-		Log(MESSAGE, "Config", "attempting to initialize config with %s found at:", cfgStream->filename);
+		Log(MESSAGE, "Config", "attempting to initialize config with {} found at:", cfgStream->filename);
 	}
-	Log(MESSAGE, "Config", "%s", cfgStream->originalfile);
+	Log(MESSAGE, "Config", "{}", cfgStream->originalfile);
 
 	isValid = false;
 	int lineno = 0;
@@ -191,7 +191,7 @@ bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 
 		value = strchr( key, '=' );
 		if (!value || value == key) {
-			Log(WARNING, "Config", "Invalid line %d", lineno);
+			Log(WARNING, "Config", "Invalid line {}", lineno);
 			continue;
 		}
 

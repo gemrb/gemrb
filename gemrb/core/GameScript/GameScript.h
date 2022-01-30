@@ -329,7 +329,7 @@ public:
 		for (auto& action : actions) {
 			if (action) {
 				if (action->GetRef() > 2) {
-					Log(DEBUG, "GameScript", "Residue action %d with refcount %d", action->actionID, action->GetRef());
+					Log(DEBUG, "GameScript", "Residue action {} with refcount {}", action->actionID, action->GetRef());
 				}
 				action->Release();
 				action = nullptr;
@@ -498,7 +498,7 @@ extern void ScriptDebugLog(int bit, const char* message, ARGS&&... args)
 {
 	if (!core->InDebugMode(bit)) return;
 
-	LogVA(DEBUG, "GameScript", message, std::forward<ARGS>(args)...);
+	Log(DEBUG, "GameScript", message, std::forward<ARGS>(args)...);
 }
 extern int RandomNumValue;
 

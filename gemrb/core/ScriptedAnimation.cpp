@@ -284,7 +284,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 		const AnimationFactory* af = static_cast<const AnimationFactory*>(
 			gamedata->GetFactoryResource(Anim1ResRef, IE_BAM_CLASS_ID));
 		if (!af) {
-			Log(ERROR, "ScriptedAnimation", "Failed to load animation: %s!", Anim1ResRef.CString());
+			Log(ERROR, "ScriptedAnimation", "Failed to load animation: {}!", Anim1ResRef);
 			return;
 		}
 		for (unsigned int i = 0; i < MAX_ORIENT; i++) {

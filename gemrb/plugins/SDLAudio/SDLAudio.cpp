@@ -101,7 +101,7 @@ bool SDLAudio::Init(void)
 
 	int result = Mix_AllocateChannels(MIXER_CHANNELS);
 	if (result < 0) {
-		Log(ERROR, "SDLAudio", "Unable to allocate mixing channels: %s\n", SDL_GetError());
+		Log(ERROR, "SDLAudio", "Unable to allocate mixing channels: {}\n", SDL_GetError());
 		return false;
 	}
 
@@ -517,7 +517,7 @@ void SDLAudio::QueueBuffer(int stream, unsigned short bits,
 		SDL_AudioCVT cvt;
 		if (SDL_BuildAudioCVT(&cvt, (bits == 8 ? AUDIO_S8 : AUDIO_S16SYS), channels, samplerate,
 				audio_format, audio_channels, audio_rate) == 0) {
-			Log(ERROR, "SDLAudio", "Couldn't convert video stream! trying to convert %d bits, %d channels, %d rate",
+			Log(ERROR, "SDLAudio", "Couldn't convert video stream! trying to convert {} bits, {} channels, {} rate",
 				bits, channels, samplerate);
 			return;
 		}

@@ -2592,7 +2592,7 @@ int fx_overlay_iwd (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->SetOverlay(OV_SEVENEYES2);
 			break;
 		default:
-			Log(ERROR, "IWDOpcodes", "fx_overlay_iwd called with unknown mode: %d", type);
+			Log(ERROR, "IWDOpcodes", "fx_overlay_iwd called with unknown mode: {}", type);
 			break;
 	}
 	return FX_APPLIED;
@@ -2659,7 +2659,7 @@ int fx_bleeding_wounds (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	default:
 		tmp = core->Time.round_sec;
-		Log(GemRB::ERROR, "IWDOpcodes", "Unknown type in fx_bleeding_wounds: %d!", fx->Parameter2);
+		Log(ERROR, "IWDOpcodes", "Unknown type in fx_bleeding_wounds: {}!", fx->Parameter2);
 		break;
 	}
 

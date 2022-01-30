@@ -166,7 +166,7 @@ inline bool ParsePointDef(const char* pointString, Point& destPoint, int& orient
 {
 	int parsed = sscanf(pointString, "[%d%*[,.]%d:%d]", &destPoint.x, &destPoint.y, &orient);
 	if (parsed != 3 && sscanf(pointString, "[%d%*[,.]%d]", &destPoint.x, &destPoint.y) != 2) {
-		Log(ERROR, "IniSpawn", "Malformed spawn point definition: %s", pointString);
+		Log(ERROR, "IniSpawn", "Malformed spawn point definition: {}", pointString);
 		return false;
 	}
 	return true;
@@ -257,7 +257,7 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 
 	const char *spawnPoints = iniFile->GetKeyAsString(critterName, "spawn_point", nullptr);
 	if (!spawnPoints) {
-		Log(ERROR, "IniSpawn", "No spawn points defined, skipping creature: %s", critterName);
+		Log(ERROR, "IniSpawn", "No spawn points defined, skipping creature: {}", critterName);
 		return;
 	}
 	critter.SpawnPointsDef = spawnPoints;
@@ -390,7 +390,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 	if (s) {
 		critter.CreFile = GetElements<ResRef>(s);
 	} else {
-		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);
+		Log(ERROR, "IniSpawn", "Invalid spawn entry: {}", crittername);
 		return;
 	}
 

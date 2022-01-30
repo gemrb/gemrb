@@ -123,32 +123,6 @@ void AddLogWriter(Logger::WriterPtr&& writer)
 	}
 }
 
-static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)
-{
-	va_list ap_copy;
-	va_copy(ap_copy, ap);
-	const size_t len = vsnprintf(nullptr, 0, message, ap_copy);
-	va_end(ap_copy);
-
-	char *buf = new char[len+1];
-	vsnprintf(buf, len + 1, message, ap);
-	LogMsg(LogMessage(level, owner, buf, color));
-	delete[] buf;
-}
-
-void Log(log_level level, const char* owner, const char* message, ...)
-{
-	va_list ap;
-	va_start(ap, message);
-	vLog(level, owner, message, WHITE, ap);
-	va_end(ap);
-}
-
-void Log(log_level level, const char* owner, std::string const& buffer)
-{
-	LogMsg(LogMessage(level, owner, buffer.c_str(), WHITE));
-}
-
 static void addGemRBLog()
 {
 	char log_path[_MAX_PATH];

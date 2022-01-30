@@ -191,7 +191,7 @@ strret_t FileStream::Seek(stroff_t newpos, strpos_t type)
 			return GEM_ERROR;
 	}
 	if (Pos>size) {
-		Log(ERROR, "Streams", "Invalid seek position %lu in file %s (limit: %lu)", static_cast<unsigned long>(Pos), filename, static_cast<unsigned long>(size));
+		Log(ERROR, "Streams", "Invalid seek position {} in file {} (limit: {})", Pos, filename, size);
 		return GEM_ERROR;
 	}
 	return GEM_OK;

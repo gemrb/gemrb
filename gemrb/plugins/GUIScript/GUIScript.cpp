@@ -3651,20 +3651,20 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 		// the PLT doesn't exist or is bad, so try BAM
 		const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID);
 		if (!af) {
-			Log(WARNING, "GUISCript", "BAM/PLT not found for ref: %s", ResRef);
+			Log(WARNING, "GUISCript", "BAM/PLT not found for ref: {}", ResRef);
 			Py_RETURN_NONE;
 		}
 
 		Picture = af->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
 		if (Picture == NULL) {
-			Log(ERROR, "Button_SetPLT", "Paperdoll picture == NULL (%s)", ResRef);
+			Log(ERROR, "Button_SetPLT", "Paperdoll picture is null ({})", ResRef);
 			Py_RETURN_NONE;
 		}
 	} else {
 		// use PLT
 		Picture = im->GetSprite2D(type, col);
 		if (Picture == NULL) {
-			Log(ERROR, "Button_SetPLT", "Picture == NULL (%s)", ResRef);
+			Log(ERROR, "Button_SetPLT", "Picture is null ({})", ResRef);
 		}
 	}
 
@@ -4264,7 +4264,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	long value =(long) CheckVariable(Sender, Variable, Context);
-	Log(DEBUG, "GUISCript", "%s %s=%ld", Context, Variable, value);
+	Log(DEBUG, "GUISCript", "{} {}={}", Context, Variable, value);
 	return PyLong_FromLong(value);
 }
 
@@ -4408,7 +4408,7 @@ static PyObject* GemRB_DumpActor(PyObject * /*self*/, PyObject * args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	Log(DEBUG, "Game", actor->dump());
+	Log(DEBUG, "Game", "{}", actor->dump());
 	Py_RETURN_NONE;
 }
 
@@ -6511,7 +6511,7 @@ static PyObject *SetSpellIcon(Button* btn, const ResRef& SpellResRef, int type, 
 	const Spell* spell = gamedata->GetSpell(SpellResRef, true);
 	if (!spell) {
 		btn->SetPicture(nullptr);
-		Log(ERROR, "GUIScript", "Spell not found :%.8s", SpellResRef.CString());
+		Log(ERROR, "GUIScript", "Spell not found: {}", SpellResRef);
 		//no incref here!
 		return Py_None;
 	}
@@ -6956,7 +6956,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 
 	const Item *item = gamedata->GetItem(ci->ItemResRef, true);
 	if (!item) {
-		Log(MESSAGE, "GUIScript", "Cannot find container (%s) item %s!", container->GetScriptName(), ci->ItemResRef.CString());
+		Log(MESSAGE, "GUIScript", "Cannot find container ({}) item {}!", container->GetScriptName(), ci->ItemResRef);
 		Py_RETURN_NONE;
 	}
 
@@ -7299,7 +7299,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	const Item *item = gamedata->GetItem(ItemResRef, true);
 	if (!item) {
-		Log(ERROR, "GUIScript", "Invalid resource reference: %s",
+		Log(ERROR, "GUIScript", "Invalid resource reference: {}",
 			ItemResRef.CString());
 		return PyLong_FromLong(0);
 	}
@@ -7964,9 +7964,9 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (GameScript::EvaluateString( game->GetCurrentArea( ), String )) {
-		Log(DEBUG, "GUIScript", "%s returned True", String);
+		Log(DEBUG, "GUIScript", "{} returned True", String);
 	} else {
-		Log(DEBUG, "GUIScript", "%s returned False", String);
+		Log(DEBUG, "GUIScript", "{} returned False", String);
 	}
 	Py_RETURN_NONE;
 }
@@ -8915,7 +8915,7 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 	}
 	const Item *item = gamedata->GetItem(ItemName, true);
 	if (!item) {
-		Log(MESSAGE, "GUIScript", "Cannot find item %s to check!", ItemName);
+		Log(MESSAGE, "GUIScript", "Cannot find item {} to check!", ItemName);
 		return PyLong_FromLong(0);
 	}
 	const Actor* actor = nullptr;
@@ -9100,7 +9100,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 
 	const Item* item = gamedata->GetItem(ResRef, true);
 	if (item == NULL) {
-		Log(MESSAGE, "GUIScript", "Cannot get item %s!", ResRef);
+		Log(MESSAGE, "GUIScript", "Cannot get item {}!", ResRef);
 		Py_RETURN_NONE;
 	}
 
@@ -10659,7 +10659,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
 		Button* btn = GetControl<Button>(i+Offset+(Start?1:0), win);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
-			Log(ERROR, "GUIScript", "Button %d not found!", i+Offset+(Start?1:0));
+			Log(ERROR, "GUIScript", "Button {} not found!", i + Offset + (Start ? 1 : 0));
 			continue;
 		}
 		PyObject *Function = PyDict_GetItemString(dict, "EquipmentPressed");
@@ -10729,7 +10729,7 @@ static bool CanUseActionButton(const Actor *pcc, int type)
 			capability = 1; // everyone can try to search
 			break;
 		default:
-			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
+			Log(WARNING, "GUIScript", "Unknown action (button) type: {}", type);
 		}
 	} else {
 		// use levels instead, so inactive dualclasses work as expected
@@ -10744,7 +10744,7 @@ static bool CanUseActionButton(const Actor *pcc, int type)
 			capability = pcc->GetThiefLevel();
 			break;
 		default:
-			Log(WARNING, "GUIScript", "Unknown action (button) type: %d", type);
+			Log(WARNING, "GUIScript", "Unknown action (button) type: {}", type);
 		}
 	}
 	return capability > 0;
@@ -11550,14 +11550,14 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 	}
 
-	Log(MESSAGE, "GUIScript", "Cast spell: %s", spelldata.spellName.CString());
-	Log(MESSAGE, "GUIScript", "Slot: %d", spelldata.slot);
-	Log(MESSAGE, "GUIScript", "Type: %d (%d vs %d)", spelldata.type, 1<<spelldata.type, type);
+	Log(MESSAGE, "GUIScript", "Cast spell: {}", spelldata.spellName);
+	Log(MESSAGE, "GUIScript", "Slot: {}", spelldata.slot);
+	Log(MESSAGE, "GUIScript", "Type: {} ({} vs {})", spelldata.type, 1 << spelldata.type, type);
 	//cannot make this const, because it will be freed
 	String tmp = core->GetString(spelldata.strref);
-	Log(MESSAGE, "GUIScript", "Spellname: %ls", tmp.c_str());
-	Log(MESSAGE, "GUIScript", "Target: %d", spelldata.Target);
-	Log(MESSAGE, "GUIScript", "Range: %d", spelldata.Range);
+	Log(MESSAGE, "GUIScript", "Spellname: {}", fmt::WideToChar{tmp});
+	Log(MESSAGE, "GUIScript", "Target: {}", spelldata.Target);
+	Log(MESSAGE, "GUIScript", "Range: {}", spelldata.Range);
 	if (type > 0 && !((1<<spelldata.type) & type)) {
 		return RuntimeError( "Wrong type of spell!");
 	}
@@ -11589,7 +11589,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			//bring up inventory in the end???
 			//break;
 		default:
-			Log(ERROR, "GUIScript", "Unhandled target type: %d", spelldata.Target);
+			Log(ERROR, "GUIScript", "Unhandled target type: {}", spelldata.Target);
 			break;
 	}
 	Py_RETURN_NONE;
@@ -11706,12 +11706,12 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	/// remove this after projectile is done
-	Log(MESSAGE, "GUIScript", "Use item: %s", itemdata.itemName.CString());
-	Log(MESSAGE, "GUIScript", "Extended header: %lu", static_cast<unsigned long>(itemdata.headerindex));
-	Log(MESSAGE, "GUIScript", "Attacktype: %d", itemdata.AttackType);
-	Log(MESSAGE, "GUIScript", "Range: %d", itemdata.Range);
-	Log(MESSAGE, "GUIScript", "Target: %d", forcetarget);
-	Log(MESSAGE, "GUIScript", "Projectile: %d", itemdata.ProjectileAnimation);
+	Log(MESSAGE, "GUIScript", "Use item: {}", itemdata.itemName);
+	Log(MESSAGE, "GUIScript", "Extended header: {}", itemdata.headerindex);
+	Log(MESSAGE, "GUIScript", "Attacktype: {}", itemdata.AttackType);
+	Log(MESSAGE, "GUIScript", "Range: {}", itemdata.Range);
+	Log(MESSAGE, "GUIScript", "Target: {}", forcetarget);
+	Log(MESSAGE, "GUIScript", "Projectile: {}", itemdata.ProjectileAnimation);
 	int count = 1;
 	switch (forcetarget) {
 		case TARGET_SELF:
@@ -12419,12 +12419,12 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
 	}
 	if (!wield) {
-		Log(WARNING, "Actor", "Invalid weapon wielded by %ls!", actor->GetName().c_str());
+		Log(WARNING, "Actor", "Invalid weapon wielded by {}!", fmt::WideToChar{actor->GetName()});
 		return dict;
 	}
 	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef.CString());
+		Log(WARNING, "Actor", "Missing or invalid weapon item: {}!", wield->ItemResRef);
 		return dict;
 	}
 
@@ -13015,7 +13015,7 @@ static PyObject* GemRB_Log(PyObject* /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Log(level, owner, "%s", message);
+	Log(level, owner, "{}", message);
 	Py_RETURN_NONE;
 }
 
@@ -13482,7 +13482,7 @@ bool GUIScript::Init(void)
 	char main[_MAX_PATH];
 	PathJoin(main, path, "Main.py", nullptr);
 	if (!ExecFile(main)) {
-		Log(ERROR, "GUIScript", "Failed to execute %s", main);
+		Log(ERROR, "GUIScript", "Failed to execute {}", main);
 		return false;
 	}
 
@@ -13514,7 +13514,7 @@ bool GUIScript::Init(void)
 
 	PyObject *pFunc = PyDict_GetItemString(pMainDic, "Init");
 	if (PyObject_CallObject( pFunc, NULL ) == NULL) {
-		Log(ERROR, "GUIScript", "Failed to execute Init() in %s", main);
+		Log(ERROR, "GUIScript", "Failed to execute Init() in {}", main);
 		PyErr_Print();
 		return false;
 	}
@@ -13551,7 +13551,7 @@ bool GUIScript::Autodetect(void)
 	} while (++iter);
 
 	if (gametype_hint[0]) {
-		Log(MESSAGE, "GUIScript", "Detected GameType: %s", gametype_hint);
+		Log(MESSAGE, "GUIScript", "Detected GameType: {}", gametype_hint);
 		strlcpy(core->config.GameType, gametype_hint, sizeof(core->config.GameType));
 		return true;
 	}
@@ -13566,12 +13566,12 @@ bool GUIScript::LoadScript(const char* filename)
 	if (!Py_IsInitialized()) {
 		return false;
 	}
-	Log(MESSAGE, "GUIScript", "Loading Script %s.", filename);
+	Log(MESSAGE, "GUIScript", "Loading Script {}.", filename);
 
 	PyObject *pName = PyString_FromString( filename );
 	/* Error checking of pName left out */
 	if (pName == NULL) {
-		Log(ERROR, "GUIScript", "Failed to create filename for script \"%s\".", filename);
+		Log(ERROR, "GUIScript", "Failed to create filename for script \"{}\".", filename);
 		return false;
 	}
 
@@ -13589,7 +13589,7 @@ bool GUIScript::LoadScript(const char* filename)
 		/* pDict is a borrowed reference */
 	} else {
 		PyErr_Print();
-		Log(ERROR, "GUIScript", "Failed to load script \"%s\".", filename);
+		Log(ERROR, "GUIScript", "Failed to load script \"{}\".", filename);
 		return false;
 	}
 	return true;
@@ -13610,7 +13610,7 @@ bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, co
 			const char* cstring = p.Value<char*>();
 			pyParam = PyUnicode_FromStringAndSize(cstring, strlen(cstring));
 		} else {
-			Log(ERROR, "GUIScript", "Unknown parameter type: %s", type.name());
+			Log(ERROR, "GUIScript", "Unknown parameter type: {}", type.name());
 			// need to insert a None placeholder so remaining parameters are correct
 			pyParam = Py_None;
 			Py_IncRef(pyParam);
@@ -13647,7 +13647,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 	/* pFunc: Borrowed reference */
 	if (!PyCallable_Check(pFunc)) {
 		if (report_error) {
-			Log(ERROR, "GUIScript", "Missing function: %s from %s", functionName, moduleName);
+			Log(ERROR, "GUIScript", "Missing function: {} from {}", functionName, moduleName);
 		}
 		Py_DECREF(pyModule);
 		return NULL;
@@ -13755,7 +13755,7 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 				displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
 				delete error;
 			} else {
-				Log(ERROR, "GUIScript", "%s", errorString);
+				Log(ERROR, "GUIScript", "{}", errorString);
 			}
 		}
 

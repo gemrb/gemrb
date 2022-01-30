@@ -1382,7 +1382,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->LastHitter=caster->GetGlobalID();
 		} else {
 			//Maybe it should be something impossible like 0xffff, and use 'Someone'
-			Log(ERROR, "Actor", "LastHitter (type %d) falling back to target: %ls.", caster ? caster->Type : -1, target->GetName().c_str());
+			Log(ERROR, "Actor", "LastHitter (type {}) falling back to target: {}.", caster ? caster->Type : -1, fmt::WideToChar{target->GetName()});
 			target->LastHitter=target->GetGlobalID();
 		}
 	}
@@ -4412,7 +4412,7 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		sca->PlayOnce();
 		map->AddVVCell( new VEFObject(sca));
 	} else {
-		Log(ERROR, "FXOpcodes", "fx_visual_spell_hit: Unhandled Type: %d", fx->Parameter2);
+		Log(ERROR, "FXOpcodes", "fx_visual_spell_hit: Unhandled Type: {}", fx->Parameter2);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -4563,7 +4563,7 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//parameter2 is used in bg1 and pst to specify the spell type; bg2 and iwd2 figure it out from the resource
 	//LS_STATS is on by default (int check)
 	int x= target->LearnSpell(fx->Resource, fx->Parameter1^LS_STATS);
-	Log(DEBUG, "FXOpcodes", "Learnspell returned: %d", x);
+	Log(DEBUG, "FXOpcodes", "Learnspell returned: {}", x);
 	return FX_NOT_APPLIED;
 }
 // 0x94 Spell:CastSpellPoint
@@ -7914,7 +7914,7 @@ int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
 // unknown
 int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	Log(ERROR, "FXOpcodes", "fx_unknown(%2d): P1: %d P2: %d ResRef: %s", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource.CString());
+	Log(ERROR, "FXOpcodes", "fx_unknown({}): P1: {} P2: {} ResRef: {}", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource);
 	return FX_NOT_APPLIED;
 }
 

@@ -93,7 +93,7 @@ stroff_t MemoryStream::Seek(stroff_t newpos, strpos_t type)
 	}
 	//we went past the buffer
 	if (Pos>size) {
-		Log(ERROR, "Streams", "Invalid seek position: %lu (limit: %lu)", static_cast<unsigned long>(Pos), static_cast<unsigned long>(size));
+		Log(ERROR, "Streams", "Invalid seek position: {} (limit: {})", Pos, size);
 		return GEM_ERROR;
 	}
 	return GEM_OK;

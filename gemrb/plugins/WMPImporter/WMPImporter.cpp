@@ -47,7 +47,7 @@ bool WMPImporter::Open(DataStream* stream1, DataStream* stream2)
 	if (str1) {
 		str1->Read( Signature, 8 );
 		if (strncmp( Signature, "WMAPV1.0", 8 ) != 0) {
-			Log(ERROR, "WMPImporter", "'%s' is not a valid WMP File",
+			Log(ERROR, "WMPImporter", "'{}' is not a valid WMP File",
 				stream1->filename);
 			return false;
 		}
@@ -61,7 +61,7 @@ bool WMPImporter::Open(DataStream* stream1, DataStream* stream2)
 	if (str2) {
 		str2->Read( Signature, 8 );
 		if (strncmp( Signature, "WMAPV1.0", 8 ) != 0) {
-			Log(ERROR, "WMPImporter", "'%s' is not a valid WMP File",
+			Log(ERROR, "WMPImporter", "'{}' is not a valid WMP File",
 				stream2->filename);
 			return false;
 		}

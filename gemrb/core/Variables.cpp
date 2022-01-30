@@ -459,7 +459,7 @@ void Variables::SetAt(const char* key, ieDword value, bool nocreate)
 	assert( m_type == GEM_VARIABLES_INT );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
 		if (nocreate) {
-			Log(WARNING, "Variables", "Cannot create new variable: %s", key);
+			Log(WARNING, "Variables", "Cannot create new variable: {}", key);
 			return;
 		}
 
@@ -555,17 +555,17 @@ void Variables::DebugDump() const
 	default:
 		poi = "invalid";
 	}
-	Log (DEBUG, "Variables", "Item type: %s", poi);
-	Log (DEBUG, "Variables", "Item count: %d", m_nCount);
-	Log (DEBUG, "Variables", "HashTableSize: %d\n", m_nHashTableSize);
+	Log (DEBUG, "Variables", "Item type: {}", poi);
+	Log (DEBUG, "Variables", "Item count: {}", m_nCount);
+	Log (DEBUG, "Variables", "HashTableSize: {}", m_nHashTableSize);
 	for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++) {
 		for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 			switch(m_type) {
 			case GEM_VARIABLES_STRING:
-				Log (DEBUG, "Variables", "%s = %s", pAssoc->key, pAssoc->Value.sValue);
+				Log (DEBUG, "Variables", "{} = {}", pAssoc->key, pAssoc->Value.sValue);
 				break;
 			default:
-				Log (DEBUG, "Variables", "%s = %d", pAssoc->key, pAssoc->Value.nValue);
+				Log (DEBUG, "Variables", "{} = {}", pAssoc->key, pAssoc->Value.nValue);
 				break;
 			}
 		}
