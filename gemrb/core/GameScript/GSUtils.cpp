@@ -2204,7 +2204,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 	} else {
 		strlcpy(newVarName, Context, 7);
 	}
-	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s%s\", %d)", Context, VarName, value);
+	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", Context, VarName, value);
 	
 	if (strnicmp( newVarName, "MYAREA", 6) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( poi, value, NoCreate );
@@ -2256,20 +2256,20 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 	
 	if (stricmp(newVarName, "MYAREA") == 0) {
 		Sender->GetCurrentArea()->locals->Lookup(poi, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
 		Sender->locals->Lookup(poi, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
 	const Game *game = core->GetGame();
 	if (HasKaputz && !stricmp(newVarName,"KAPUTZ")) {
 		game->kaputz->Lookup(poi, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
@@ -2279,12 +2279,12 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 			map->locals->Lookup(poi, value);
 		} else {
 			if (valid) *valid = false;
-			ScriptDebugLog(ID_VARIABLES, "Invalid variable %s %s in checkvariable", Context, VarName);
+			ScriptDebugLog(ID_VARIABLES, "Invalid variable {} {} in checkvariable", Context, VarName);
 		}
 	} else {
 		game->locals->Lookup(poi, value);
 	}
-	ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
+	ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 	return value;
 }
 

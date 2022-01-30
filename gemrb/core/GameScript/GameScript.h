@@ -23,6 +23,7 @@
 
 #include "exports.h"
 
+#include "Interface.h"
 #include "SymbolMgr.h"
 #include "Variables.h"
 #include "Scriptable/Actor.h"
@@ -492,7 +493,13 @@ struct IDSLink {
 #define MAX_OBJECTS			256
 #define AI_SCRIPT_LEVEL 4             //the script level of special ai scripts
 
-extern void ScriptDebugLog(int bit, const char* message, ...);
+template<typename... ARGS>
+extern void ScriptDebugLog(int bit, const char* message, ARGS&&... args)
+{
+	if (!core->InDebugMode(bit)) return;
+
+	LogVA(DEBUG, "GameScript", message, std::forward<ARGS>(args)...);
+}
 extern int RandomNumValue;
 
 class GEM_EXPORT GameScript {
