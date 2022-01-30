@@ -144,11 +144,6 @@ void Log(log_level level, const char* owner, const char* message, ...)
 	va_end(ap);
 }
 
-void LogVA(log_level level, const char* owner, const char* message, va_list args)
-{
-	vLog(level, owner, message, WHITE, args);
-}
-
 void Log(log_level level, const char* owner, std::string const& buffer)
 {
 	LogMsg(LogMessage(level, owner, buffer.c_str(), WHITE));

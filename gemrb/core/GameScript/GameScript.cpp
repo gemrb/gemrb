@@ -1234,16 +1234,6 @@ static const IDSLink* FindIdentifier(const char* idsname)
 	return NULL;
 }
 
-void ScriptDebugLog(int bit, const char *message, ...)
-{
-	if (!core->InDebugMode(bit)) return;
-
-	va_list ap;
-	va_start(ap, message);
-	LogVA(DEBUG, "GameScript", message, ap);
-	va_end(ap);
-}
-
 /********************** Targets **********************************/
 
 int Targets::Count() const
@@ -1552,7 +1542,7 @@ void InitializeIEScript()
 		if (f) {
 			for (int i = 0; triggernames[i].Name; i++) {
 				if (f == triggernames[i].Function) {
-					ScriptDebugLog(ID_TRIGGERS, "%s is a synonym of %s", triggersTable->GetStringIndex(j), triggernames[i].Name);
+					ScriptDebugLog(ID_TRIGGERS, "{} is a synonym of {}", triggersTable->GetStringIndex(j), triggernames[i].Name);
 					break;
 				}
 			}
@@ -1689,7 +1679,7 @@ void InitializeIEScript()
 		if (f) {
 			for (int i = 0; actionnames[i].Name; i++) {
 				if (f == actionnames[i].Function) {
-					ScriptDebugLog(ID_ACTIONS, "%s is a synonym of %s", actionsTable->GetStringIndex(j), actionnames[i].Name);
+					ScriptDebugLog(ID_ACTIONS, "{} is a synonym of {}", actionsTable->GetStringIndex(j), actionnames[i].Name);
 					break;
 				}
 			}
@@ -1805,7 +1795,7 @@ GameScript::~GameScript(void)
 	if (script) {
 		//set 3. parameter to true if you want instant free
 		//and possible death
-		ScriptDebugLog(ID_REFERENCE, "One instance of %s is dropped from %d.", Name.CString(), BcsCache.RefCount(Name));
+		ScriptDebugLog(ID_REFERENCE, "One instance of {} is dropped from {}.", Name, BcsCache.RefCount(Name));
 		int res = BcsCache.DecRef(script, Name, true);
 
 		if (res<0) {
@@ -1826,7 +1816,7 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 
 	Script *newScript = (Script *) BcsCache.GetResource(resRef);
 	if ( newScript ) {
-		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", resRef.CString(), BcsCache.RefCount(resRef));
+		ScriptDebugLog(ID_REFERENCE, "Caching {} for the {}-th time", resRef, BcsCache.RefCount(resRef));
 		return newScript;
 	}
 
@@ -1842,7 +1832,7 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 	}
 	newScript = new Script( );
 	BcsCache.SetAt(resRef, (void *) newScript);
-	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", resRef.CString(), BcsCache.RefCount(resRef));
+	ScriptDebugLog(ID_REFERENCE, "Caching {} for the {}-th time", resRef, BcsCache.RefCount(resRef));
 
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );
@@ -2330,7 +2320,7 @@ int Trigger::Evaluate(Scriptable *Sender) const
 			triggerID, tmpstr );
 		return 0;
 	}
-	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s (Sender: %s / %ls)", triggerID, tmpstr, Sender->GetScriptName(), Sender->GetName().c_str());
+	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: {:#x} {} (Sender: {} / {})", triggerID, tmpstr, Sender->GetScriptName(), fmt::WideToChar{Sender->GetName()});
 
 	int ret = func( Sender, this );
 	if (flags & TF_NEGATE) {
@@ -2447,7 +2437,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		Sender->ReleaseCurrentAction();
 
 		if (scr) {
-			ScriptDebugLog(ID_ACTIONS, "Sender %s ran ActionOverride on %s", Sender->GetScriptName(), scr->GetScriptName());
+			ScriptDebugLog(ID_ACTIONS, "Sender {} ran ActionOverride on {}", Sender->GetScriptName(), scr->GetScriptName());
 			HandleActionOverride(scr, aC);
 		} else {
 			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
@@ -2507,7 +2497,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 Trigger* GenerateTrigger(char* String)
 {
 	strlwr( String );
-	ScriptDebugLog(ID_TRIGGERS, "Compiling: %s", String);
+	ScriptDebugLog(ID_TRIGGERS, "Compiling: {}", String);
 
 	int negate = 0;
 	if (*String == '!') {
@@ -2536,7 +2526,7 @@ Action* GenerateAction(const char* String)
 	char* actionString = strdup(String);
 	// the only thing we seem to need a copy for is the call to strlwr...
 	strlwr( actionString );
-	ScriptDebugLog(ID_ACTIONS, "Compiling: %s", String);
+	ScriptDebugLog(ID_ACTIONS, "Compiling: {}", String);
 
 	int len = strlench(String,'(')+1; //including (
 	const char *src = actionString + len;
