@@ -476,7 +476,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 		ip = GetScriptableFromObject(Sender, parameters->objects[1]);
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		Log(WARNING, "Actions", "Script error: No Trigger Named \"%s\"", parameters->objects[1]->objectName);
+		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
 	InfoPoint *trigger = static_cast<InfoPoint*>(ip);
@@ -825,7 +825,7 @@ void GameScript::StartCutSceneEx(Scriptable* Sender, Action* parameters)
 void GameScript::CutSceneID(Scriptable *Sender, Action* /*parameters*/)
 {
 	// shouldn't get called
-	Log(DEBUG, "GameScript", "CutSceneID was called by %s!", Sender->GetScriptName());
+	Log(DEBUG, "GameScript", "CutSceneID was called by {}!", Sender->GetScriptName());
 }
 
 static EffectRef fx_charm_ref = { "State:Charmed", -1 };
@@ -885,7 +885,7 @@ void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (((ieDword) parameters->int0Parameter)>=100) {
-		Log(WARNING, "GameScript", "Invalid index %d in SetPlayerSound.", parameters->int0Parameter);
+		Log(WARNING, "GameScript", "Invalid index {} in SetPlayerSound.", parameters->int0Parameter);
 		return;
 	}
 
@@ -1908,20 +1908,20 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 //optional integer parameter (isSpeech)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
-	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
+	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
 	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_CHAR0, Sender->Pos, parameters->int0Parameter ? GEM_SND_SPEECH : 0);
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
-	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
+	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
 	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS,
 		parameters->pointParameter);
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
-	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
+	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
 	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, Point(), GEM_SND_RELATIVE);
 }
 
@@ -2059,8 +2059,7 @@ void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		Log(WARNING, "Actions", "Script error: No Animation Named \"%s\"",
-			parameters->objects[1]->objectName );
+		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
 	anim->Flags &=~A_ANI_PLAYONCE;
@@ -2070,8 +2069,7 @@ void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		Log(WARNING, "Actions", "Script error: No Animation Named \"%s\"",
-			parameters->objects[1]->objectName );
+		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
 	anim->Flags |= A_ANI_PLAYONCE;
@@ -2081,8 +2079,7 @@ void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
-		Log(WARNING, "Actions", "Script error: No Animation Named \"%s\"",
-			parameters->objects[1]->objectName );
+		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
 	anim->SetPalette( parameters->string0Parameter );
@@ -2241,7 +2238,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 
 	//travel direction passed to guiscript
 	WMPDirection direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
-	Log(MESSAGE, "Actions", "Travel direction returned: %d", static_cast<int>(direction));
+	Log(MESSAGE, "Actions", "Travel direction returned: {}", static_cast<int>(direction));
 	//this is notoriously flaky
 	//if it doesn't work for the sender try other party members, too
 	if (direction == WMPDirection::NONE) {
@@ -2264,7 +2261,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		if (directions[best] != -1) {
 			direction = static_cast<WMPDirection>(best);
 		}
-		Log(DEBUG, "Actions", "Travel direction determined by party: %d", static_cast<int>(direction));
+		Log(DEBUG, "Actions", "Travel direction determined by party: {}", static_cast<int>(direction));
 	}
 
 	// pst enables worldmap travel only after visiting the lower ward
@@ -3558,7 +3555,7 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 		tar = GetScriptableFromObject(Sender, parameters->objects[1]);
 		if (!tar) {
 			Log(WARNING, "GameScript", "Couldn't find target for ClearActions!");
-			Log(DEBUG, "GameScript", parameters->objects[1]->dump());
+			Log(DEBUG, "GameScript", "{}", parameters->objects[1]->dump());
 			return;
 		}
 	}
@@ -3727,7 +3724,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->SetDebugMode(parameters->int0Parameter);
-	Log(WARNING, "GameScript", "DEBUG: %s", parameters->string0Parameter);
+	Log(WARNING, "GameScript", "DEBUG: {}", parameters->string0Parameter);
 }
 
 void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)
@@ -4235,7 +4232,7 @@ void GameScript::SetItemFlags(Scriptable *Sender, Action* parameters)
 
 	int slot = myinv->FindItem(parameters->string0Parameter, 0);
 	if (slot == -1) {
-		Log(ERROR, "GameScript", "Item %s not found in inventory of %s", parameters->string0Parameter, tar->GetScriptName());
+		Log(ERROR, "GameScript", "Item {} not found in inventory of {}", parameters->string0Parameter, tar->GetScriptName());
 		return;
 	}
 
@@ -6284,7 +6281,7 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		Log(WARNING, "Actions", "Script error: No Trigger Named \"%s\"", parameters->objects[1]->objectName);
+		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
 
@@ -7302,7 +7299,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 {
 	AutoTable tm = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tm) {
-		Log(ERROR, "Actions", "Cannot find %s.2da.", parameters->string0Parameter);
+		Log(ERROR, "Actions", "Cannot find {}.2da.", parameters->string0Parameter);
 		return;
 	}
 

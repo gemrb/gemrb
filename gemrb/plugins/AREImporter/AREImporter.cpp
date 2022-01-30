@@ -406,7 +406,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		
 		map->SetTileMapProps(std::move(props));
 	} catch (const std::exception& e) {
-		Log(ERROR, "AREImporter", "%s", e.what());
+		Log(ERROR, "AREImporter", "{}", e.what());
 		return false;
 	}
 
@@ -508,7 +508,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	try {
 		map = new Map(tm, MakeTileProps(tm, WEDResRef, day_or_night), sm ? sm->GetSprite2D() : nullptr);
 	} catch (const std::exception& e) {
-		Log(ERROR, "AREImporter", "%s", e.what());
+		Log(ERROR, "AREImporter", "{}", e.what());
 		return nullptr;
 	}
 	
@@ -1206,7 +1206,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			creFile = gamedata->GetResource(creResRef, IE_CRE_CLASS_ID);
 		}
 		if(!actmgr->Open(creFile)) {
-			Log(ERROR, "AREImporter", "Couldn't read actor: %s!", creResRef.CString());
+			Log(ERROR, "AREImporter", "Couldn't read actor: {}!", creResRef);
 			continue;
 		}
 		act = actmgr->GetActor(0);
@@ -1498,7 +1498,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->Read(&Owner, 1); // party member index that created this projectile (0-5)
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
-			Log(ERROR, "AREImporter", "TrapEffectSize in game: %d != %d. Clearing it",
+			Log(ERROR, "AREImporter", "TrapEffectSize in game: {} != {}. Clearing it",
 				TrapSize, TrapEffectCount*0x108);
 				continue;
 		}

@@ -56,7 +56,7 @@ int SDL12VideoDriver::Init(void)
 		setenv("SDL_HAS3BUTTONMOUSE", "SDL_HAS3BUTTONMOUSE", 1);
 #endif
 		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1) {
-			Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
+			Log(ERROR, "SDLJoystick", "InitSubSystem failed: {}", SDL_GetError());
 		} else {
 			if (SDL_NumJoysticks() > 0) {
 				gameController = SDL_JoystickOpen(0);
@@ -65,7 +65,7 @@ int SDL12VideoDriver::Init(void)
 	}
 
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1) {
-		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
+		Log(ERROR, "SDLJoystick", "InitSubSystem failed: {}", SDL_GetError());
 	} else {
 		if (SDL_NumJoysticks() > 0) {
 			gameController = SDL_JoystickOpen(0);
@@ -84,7 +84,7 @@ int SDL12VideoDriver::CreateSDLDisplay(const char* title)
 	disp = SDL_SetVideoMode(screenSize.w, screenSize.h, bpp, flags );
 	SDL_WM_SetCaption( title, 0 );
 	if (disp == NULL) {
-		Log(ERROR, "SDL 1.2 Driver", "%s", SDL_GetError());
+		Log(ERROR, "SDL 1.2 Driver", "{}", SDL_GetError());
 		return GEM_ERROR;
 	}
 	Log(MESSAGE, "SDL 1.2 Driver", "Checking for HardWare Acceleration...");
@@ -117,7 +117,7 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		}
 		
 		if (buf == nullptr) {
-			Log(ERROR, "SDL 1.2", "%s", SDL_GetError());
+			Log(ERROR, "SDL 1.2", "{}", SDL_GetError());
 			return nullptr;
 		}
 
@@ -291,7 +291,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const Region
 	// not handling the following effects at all:
 	// palettealpha
 
-	//		Log(DEBUG, "SDL12Video", "Unoptimized blit: %04X", flags);
+	//		Log(DEBUG, "SDL12Video", "Unoptimized blit: {:#x}", flags);
 
 	// remove already handled flags and incompatible combinations
 	if (flags & BlitFlags::GREY) flags &= ~BlitFlags::SEPIA;

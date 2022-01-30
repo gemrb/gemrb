@@ -101,7 +101,7 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 		// try to only report error once per file
 		static const TISImporter *last_corrupt = nullptr;
 		if (last_corrupt != this) {
-			Log(ERROR, "TISImporter", "Corrupt WED file encountered; couldn't find any more tiles at tile %d", index);
+			Log(ERROR, "TISImporter", "Corrupt WED file encountered; couldn't find any more tiles at tile {}", index);
 			last_corrupt = this;
 		}
 	

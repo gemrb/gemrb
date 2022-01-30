@@ -65,7 +65,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 	FileStream* config = FileStream::OpenFile( tINIkeymap );
 
 	if (config == NULL) {
-		Log(WARNING, "KeyMap", "There is no '%s' file...", inifile);
+		Log(WARNING, "KeyMap", "There is no '{}' file...", inifile);
 		return false;
 	}
 	char name[KEYLENGTH+1], value[_MAX_PATH + 3];
@@ -103,7 +103,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 		size_t l = strlen(value);
 		if (l > 1 || keymap.HasKey(value)) {
-			Log(WARNING, "KeyMap", "Ignoring key %s", value);
+			Log(WARNING, "KeyMap", "Ignoring key {}", value);
 			continue;
 		}
 
@@ -119,7 +119,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			moduleName = kmtable->QueryField("Default","MODULE");
 			function = kmtable->QueryField("Default","FUNCTION");
 			group = kmtable->QueryField("Default","GROUP");
-			Log(MESSAGE, "KeyMap", "Adding key %s with function %s::%s", value, moduleName, function);
+			Log(MESSAGE, "KeyMap", "Adding key {} with function {}::{}", value, moduleName, function);
 		}
 		Function *fun = new Function(moduleName, function, atoi(group), tolower(value[0]));
 
@@ -137,7 +137,7 @@ bool KeyMap::ResolveKey(unsigned short key, int group) const
 {
 	// FIXME: key is 2 bytes, but we ignore one. Some non english keyboards won't like this.
 	char keystr[2] = {(char)key, 0};
-	Log(MESSAGE, "KeyMap", "Looking up key: %c(%s) ", key, keystr);
+	Log(MESSAGE, "KeyMap", "Looking up key: {}({}) ", key, keystr);
 
 	return ResolveName(keystr, group);
 }
@@ -155,7 +155,7 @@ bool KeyMap::ResolveName(const char* name, int group) const
 		return false;
 	}
 
-	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->moduleName.CString(), fun->function.CString());
+	Log(MESSAGE, "KeyMap", "RunFunction({}::{})", fun->moduleName, fun->function);
 	core->GetGUIScriptEngine()->RunFunction(fun->moduleName, fun->function);
 	return true;
 }

@@ -135,10 +135,10 @@ using namespace GemRB;
 	FileStream *fs = new FileStream();
 	if (fs->Create(cLogFile)) {
 		AddLogWriter(createStreamLogWriter(fs));
-		Log(MESSAGE, "Cocoa Wrapper", "Started a log file at %s", cLogFile);
+		Log(MESSAGE, "Cocoa Wrapper", "Started a log file at {}", cLogFile);
 	} else {
 		delete fs;
-		Log(ERROR, "Cocoa Wrapper", "Unable to start log file at %s", cLogFile);
+		Log(ERROR, "Cocoa Wrapper", "Unable to start log file at {}", cLogFile);
 	}
 }
 

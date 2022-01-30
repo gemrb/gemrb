@@ -386,7 +386,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {
-		Log(WARNING, "Scriptable", "AA: NULL action encountered for %s!", scriptName.CString());
+		Log(WARNING, "Scriptable", "AA: NULL action encountered for {}!", scriptName);
 		return;
 	}
 
@@ -423,7 +423,7 @@ void Scriptable::AddAction(Action* aC)
 void Scriptable::AddActionInFront(Action* aC)
 {
 	if (!aC) {
-		Log(WARNING, "Scriptable", "AAIF: NULL action encountered for %s!", scriptName.CString());
+		Log(WARNING, "Scriptable", "AAIF: null action encountered for {}!", scriptName);
 		return;
 	}
 	InternalFlags|=IF_ACTIVE;
@@ -520,7 +520,7 @@ void Scriptable::ProcessActions()
 		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
 			if (! (CurrentActionTicks == 0 && CurrentActionState == 0)) {
-				Log(ERROR, "Scriptable", "Last action: %d", lastAction);
+				Log(ERROR, "Scriptable", "Last action: {}", lastAction);
 			}
 			assert(CurrentActionTicks == 0 && CurrentActionState == 0);
 			CurrentAction = PopNextAction();
@@ -964,7 +964,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		return;
 	}
 	if (!area) {
-		Log(ERROR, "Scriptable", "CastSpellPointEnd: lost area, skipping %s!", SpellResRef.CString());
+		Log(ERROR, "Scriptable", "CastSpellPointEnd: lost area, skipping {}!", SpellResRef);
 		ResetCastingState(caster);
 		return;
 	}
@@ -1039,7 +1039,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		return;
 	}
 	if (!area) {
-		Log(ERROR, "Scriptable", "CastSpellEnd: lost area, skipping %s!", SpellResRef.CString());
+		Log(ERROR, "Scriptable", "CastSpellEnd: lost area, skipping {}!", SpellResRef);
 		ResetCastingState(caster);
 		return;
 	}
@@ -1251,7 +1251,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 	LastTargetPos = Point(-1, -1);
 	Actor* actor = Scriptable::As<Actor>(this);
 	if (actor && actor->HandleCastingStance(SpellResRef, deplete, instant)) {
-		Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
+		Log(ERROR, "Scriptable", "Spell {} not known or memorized, aborting cast!", SpellResRef);
 		return -1;
 	}
 	if (!instant && !nointerrupt) {
@@ -1286,7 +1286,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	LastTargetPos = Point(-1, -1);
 	Actor* actor = Scriptable::As<Actor>(this);
 	if (actor && actor->HandleCastingStance(SpellResRef, deplete, instant)) {
-		Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
+		Log(ERROR, "Scriptable", "Spell {} not known or memorized, aborting cast!", SpellResRef);
 		return -1;
 	}
 
@@ -1940,7 +1940,7 @@ void Movable::SetStance(unsigned int arg)
 
 	if (arg >= MAX_ANIMS) {
 		StanceID = IE_ANI_AWAKE;
-		Log(ERROR, "Movable", "Tried to set invalid stance id(%u)", arg);
+		Log(ERROR, "Movable", "Tried to set invalid stance id({})", arg);
 		return;
 	}
 
@@ -2220,7 +2220,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	prevTicks = Ticks;
 	Destination = Des;
 	if (pathAbandoned) {
-		Log(DEBUG, "WalkTo", "%ls: Path was just abandoned", actor->GetShortName().c_str());
+		Log(DEBUG, "WalkTo", "{}: Path was just abandoned", fmt::WideToChar{actor->GetShortName()});
 		ClearPath(true);
 		return;
 	}
@@ -2233,7 +2233,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
 	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
 	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
-		Log(DEBUG, "WalkTo", "%ls re-pathing ignoring actors", actor->GetShortName().c_str());
+		Log(DEBUG, "WalkTo", "{} re-pathing ignoring actors", fmt::WideToChar{actor->GetShortName()});
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, actor);
 	}
 

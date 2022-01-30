@@ -541,7 +541,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
 		if ((AnimID&0xf000)==0xe000) {
 			if (BaseStats[IE_COLORCOUNT]) {
-				Log(WARNING, "Actor", "Animation ID %x is supposed to be real colored (no recoloring), patched creature", AnimID);
+				Log(WARNING, "Actor", "Animation ID {:#x} is supposed to be real colored (no recoloring), patched creature", AnimID);
 			}
 			BaseStats[IE_COLORCOUNT]=0;
 		}
@@ -550,7 +550,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (anims->ResRefBase.IsEmpty()) {
 		delete anims;
 		anims = NULL;
-		Log(ERROR, "Actor", "Missing animation for %ls", GetName().c_str());
+		Log(ERROR, "Actor", "Missing animation for {}", fmt::WideToChar{GetName()});
 		return;
 	}
 	anims->SetOffhandRef(ShieldRef);
@@ -588,14 +588,14 @@ void Actor::SetAnimationID(unsigned int AnimID)
 				SetBase(IE_MOVEMENTRATE, rate);
 			}
 		} else {
-			Log(MESSAGE, "Actor", "No moverate.2da found, using animation (0x%04X) for speed fallback!", AnimID);
+			Log(MESSAGE, "Actor", "No moverate.2da found, using animation ({:#x}) for speed fallback!", AnimID);
 		}
 		if (row == -1) {
 			Animation **anim = anims->GetAnimation(IE_ANI_WALK, 0);
 			if (anim && anim[0]) {
 				SetBase(IE_MOVEMENTRATE, anim[0]->GetFrameCount());
 			} else {
-				Log(WARNING, "Actor", "Unable to determine movement rate for animation 0x%04X!", AnimID);
+				Log(WARNING, "Actor", "Unable to determine movement rate for animation {:#x}!", AnimID);
 			}
 		}
 	}
@@ -767,7 +767,7 @@ static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 		}
 		if (strict) return -1;
 		// this is also hit for kitted multiclasses like illusionist/thieves, who we take care of in the second loop
-		if (iwd2class) Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit %d at expected class %d, recalculating!", kit, baseclass);
+		if (iwd2class) Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit {} at expected class {}, recalculating!", kit, baseclass);
 	}
 
 	// no class info passed or dc/mc, so infer the kit's parent single class
@@ -782,7 +782,7 @@ static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 		}
 	}
 
-	Log(ERROR, "Actor", "GetIWD2KitIndex: didn't find kit %d for any class, ignoring!", kit);
+	Log(ERROR, "Actor", "GetIWD2KitIndex: didn't find kit {} for any class, ignoring!", kit);
 	return -1;
 }
 
@@ -871,7 +871,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 			}
 		}
 		if (!found) {
-			Log(ERROR, "Actor", "ApplyKit: could not look up the requested kit (%d), skipping!", kit);
+			Log(ERROR, "Actor", "ApplyKit: could not look up the requested kit ({}), skipping!", kit);
 			return false;
 		}
 	}
@@ -2158,7 +2158,7 @@ static void InitActorTables()
 			AppendFormat(buffer, "ToHit: {} ", tohit);
 			AppendFormat(buffer, "XPCap: {}", xpcap[classis]);
 
-			Log(DEBUG, "Actor", buffer);
+			Log(DEBUG, "Actor", "{}", buffer);
 		}
 	} else {
 		AutoTable hptm;
@@ -2188,7 +2188,7 @@ static void InitActorTables()
 			//i.e. barbarians would overwrite fighters in bg2
 			if (levelslots[tmpindex]) {
 				AppendFormat(buffer, "Already Found!");
-				Log(DEBUG, "Actor", buffer);
+				Log(DEBUG, "Actor", "{}", buffer);
 				continue;
 			}
 
@@ -2224,7 +2224,7 @@ static void InitActorTables()
 						if (tmphp) maxLevelForHpRoll[tmpindex] = tmphp;
 					}
 				}
-				Log(DEBUG, "Actor", buffer);
+				Log(DEBUG, "Actor", "{}", buffer);
 				continue;
 			}
 
@@ -2302,7 +2302,7 @@ static void InitActorTables()
 			AppendFormat(buffer, "HPROLLMAXLVL: {} ", maxLevelForHpRoll[tmpindex]);
 			AppendFormat(buffer, "DS: {} ", dualswap[tmpindex]);
 			AppendFormat(buffer, "MULTI: {}", multi[tmpindex]);
-			Log(DEBUG, "Actor", buffer);
+			Log(DEBUG, "Actor", "{}", buffer);
 		}
 		/*this could be enabled to ensure all levelslots are filled with at least 0's;
 		*however, the access code should ensure this never happens
@@ -2767,7 +2767,7 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 		height = 45; // empirical like in fx_visual_spell_hit
 	}
 
-	Log(COMBAT, "Actor", "Damage animation type: %d", type);
+	Log(COMBAT, "Actor", "Damage animation type: {}", type);
 
 	switch(type&255) {
 		case 0:
@@ -3658,14 +3658,14 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 		case MOD_DIVISIVE:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%ls)!", ModifierType, GetName().c_str());
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: {} ({})!", ModifierType, fmt::WideToChar{GetName()});
 				break;
 			}
 			SetStat(StatIndex, BaseStats[StatIndex] / ModifierValue, 1);
 			break;
 		case MOD_MODULUS:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%ls)!", ModifierType, GetName().c_str());
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: {} ({})!", ModifierType, fmt::WideToChar{GetName()});
 				break;
 			}
 			SetStat(StatIndex, BaseStats[StatIndex] % ModifierValue, 1);
@@ -3686,7 +3686,7 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetStat(StatIndex, !BaseStats[StatIndex], 1);
 			break;
 		default:
-			Log(ERROR, "Actor", "Invalid modifier type passed to NewStat: %d (%ls)!", ModifierType, GetName().c_str());
+			Log(ERROR, "Actor", "Invalid modifier type passed to NewStat: {} ({})!", ModifierType, fmt::WideToChar{GetName()});
 	}
 	return Modified[StatIndex] - oldmod;
 }
@@ -3713,14 +3713,14 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 		case MOD_DIVISIVE:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%ls)!", ModifierType, GetName().c_str());
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: {} ({})!", ModifierType, fmt::WideToChar{GetName()});
 				break;
 			}
 			SetBase(StatIndex, BaseStats[StatIndex] / ModifierValue);
 			break;
 		case MOD_MODULUS:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%ls)!", ModifierType, GetName().c_str());
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: {} ({})!", ModifierType, fmt::WideToChar{GetName()});
 				break;
 			}
 			SetBase(StatIndex, BaseStats[StatIndex] % ModifierValue);
@@ -3741,7 +3741,7 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetBase(StatIndex, !BaseStats[StatIndex]);
 			break;
 		default:
-			Log(ERROR, "Actor", "Invalid modifier type passed to NewBase: %d (%ls)!", ModifierType, GetName().c_str());
+			Log(ERROR, "Actor", "Invalid modifier type passed to NewBase: {} ({})!", ModifierType, fmt::WideToChar{GetName()});
 	}
 	return BaseStats[StatIndex] - oldmod;
 }
@@ -4624,7 +4624,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 	}
 
 	if (damage > 0 && resisted != DR_IMMUNE) {
-		Log(COMBAT, "Actor", "%d %ls damage taken.\n", damage, type_name.c_str());
+		Log(COMBAT, "Actor", "{} {} damage taken.\n", damage, fmt::WideToChar{type_name});
 
 		if (!core->HasFeedback(FT_STATES)) goto hitsound;
 
@@ -4674,7 +4674,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		}
 	} else {
 		if (resisted == DR_IMMUNE) {
-			Log(COMBAT, "Actor", "is immune to damage type: %ls.\n", type_name.c_str());
+			Log(COMBAT, "Actor", "is immune to damage type: {}.\n", fmt::WideToChar{type_name});
 			if (hitter && hitter->Type == ST_ACTOR) {
 				if (detailed) {
 					//<DAMAGEE> was immune to my <TYPE> damage
@@ -4840,7 +4840,7 @@ void Actor::dumpMaxValues()
 		SymbolMgr *sym = core->GetSymbol( symbol );
 
 		for(int i=0;i<MAX_STATS;i++) {
-			Log(DEBUG, "Actor", "%d(%s) %d", i, sym->GetValue(i), maximum_values[i]);
+			Log(DEBUG, "Actor", "{}({}) {}", i, sym->GetValue(i), maximum_values[i]);
 		}
 	}
 }
@@ -5073,7 +5073,7 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 	default:
 		// checking if anyone uses the psion, item and song types
 		if (spelltype != IE_SPL_INNATE) {
-			Log(WARNING, "Actor", "Unhandled SPL type %d, using average casting level!", spelltype);
+			Log(WARNING, "Actor", "Unhandled SPL type {}, using average casting level!", spelltype);
 		}
 		break;
 	}
@@ -5308,7 +5308,7 @@ void Actor::Resurrect(const Point &destPoint)
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
 		const size_t len = snprintf(DeathVar, sizeof(ieVariable), "%s_DEAD", scriptName.CString());
 		if (len > sizeof(ieVariable)) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", scriptName.CString(), GetName().c_str());
+			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", scriptName, fmt::WideToChar{GetName()});
 		}
 		ieDword value=0;
 
@@ -5320,7 +5320,7 @@ void Actor::Resurrect(const Point &destPoint)
 	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
 		size_t len = snprintf(DeathVar, 32, core->GetDeathVarFormat(), scriptName);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals (on resurrect)!", scriptName.CString(), GetName().c_str());
+			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals (on resurrect)!", scriptName, fmt::WideToChar{GetName()});
 		}
 		game->locals->SetAt(DeathVar, 0, true);
 	}
@@ -5648,7 +5648,7 @@ bool Actor::CheckOnDeath()
 		game->locals->Lookup(varname, value);
 		game->locals->SetAt(varname, 1, nocreate);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", scriptName.CString(), GetName().c_str());
+			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", scriptName, fmt::WideToChar{GetName()});
 		}
 		if (value) {
 			IncrementDeathVariable(game->locals, "%s_KILL_CNT", scriptName, 1);
@@ -5712,7 +5712,7 @@ ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, const
 		vars->Lookup(varname, start);
 		vars->SetAt(varname, start + 1, nocreate);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %ls) is too long for generating death globals!", name, GetName().c_str());
+			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", name, fmt::WideToChar{GetName()});
 		}
 	}
 	return start;
@@ -5754,7 +5754,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	if (!slot) return; //quick item slot is empty
 	const Item *itm = gamedata->GetItem(slot->ItemResRef, true);
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: %s!", slot->ItemResRef.CString());
+		Log(WARNING, "Actor", "Invalid quick slot item: {}!", slot->ItemResRef);
 		return; //quick item slot contains invalid item resref
 	}
 	const ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
@@ -6104,7 +6104,7 @@ void Actor::GetNextAnimation()
 	if (RowNum >= CharAnimations::GetAvatarsCount())
 		RowNum = CharAnimations::GetAvatarsCount() - 1;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
-	Log(DEBUG, "Actor", "AnimID: %04X", NewAnimID);
+	Log(DEBUG, "Actor", "AnimID: {:#X}", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }
 
@@ -6114,7 +6114,7 @@ void Actor::GetPrevAnimation()
 	if (RowNum >= CharAnimations::GetAvatarsCount())
 		RowNum = 0;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
-	Log(DEBUG, "Actor", "AnimID: %04X", NewAnimID);
+	Log(DEBUG, "Actor", "AnimID: {:#X}", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }
 
@@ -6130,7 +6130,7 @@ const ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 	}
 	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: %s!", wield->ItemResRef.CString());
+		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: {}!", wield->ItemResRef);
 		return NULL;
 	}
 	//The magic of the bow and the arrow do not add up
@@ -6157,7 +6157,7 @@ int Actor::IsDualWielding() const
 
 	const Item *itm = gamedata->GetItem(wield->ItemResRef, true);
 	if (!itm) {
-		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: %s!", wield->ItemResRef.CString());
+		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: {}!", wield->ItemResRef);
 		return 0;
 	}
 
@@ -6181,7 +6181,7 @@ const ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	}
 	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef.CString());
+		Log(WARNING, "Actor", "Missing or invalid weapon item: {}!", wield->ItemResRef);
 		return 0;
 	}
 
@@ -6241,7 +6241,7 @@ void Actor::GetNextStance()
 	static int Stance = IE_ANI_AWAKE;
 
 	if (--Stance < 0) Stance = MAX_ANIMS-1;
-	Log(DEBUG, "Actor", "StanceID: %d", Stance);
+	Log(DEBUG, "Actor", "StanceID: {}", Stance);
 	SetStance( Stance );
 }
 
@@ -6686,8 +6686,7 @@ void Actor::InitRound(ieDword gameTime)
 	roundTime = gameTime;
 
 	//print a little message :)
-	Log(MESSAGE, "InitRound", "Name: %ls | Attacks: %d | Start: %d",
-		ShortName.c_str(), attacksperround, gameTime);
+	Log(MESSAGE, "InitRound", "Name: {} | Attacks: {} | Start: {}", fmt::WideToChar{ShortName}, attacksperround, gameTime);
 
 	// this might not be the right place, but let's give it a go
 	if (attacksperround && InParty) {
@@ -7232,7 +7231,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		BaseStats[IE_CHECKFORBERSERK]=3;
 	}
 
-	Log(DEBUG, "Actor", "Performattack for %ls, target is: %ls", GetShortName().c_str(), target->GetShortName().c_str());
+	Log(DEBUG, "Actor", "Performattack for {}, target is: {}", fmt::WideToChar{GetShortName()}, fmt::WideToChar{target->GetShortName()});
 
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
@@ -7317,7 +7316,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 1) || fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 2)) { // illusions can't hit
 		ResetState();
 		buffer.append("[Missed (puppet)]");
-		Log(COMBAT, "Attack", buffer);
+		Log(COMBAT, "Attack", "{}", buffer);
 		return;
 	}
 
@@ -7335,7 +7334,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			core->GetTokenDictionary()->SetAt("TARGETNAME", target->GetDefaultName());
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
 			buffer.append("[Concealment Miss]");
-			Log(COMBAT, "Attack", buffer);
+			Log(COMBAT, "Attack", "{}", buffer);
 			ResetState();
 			return;
 		}
@@ -7421,7 +7420,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (roll == 1) {
 		//critical failure
 		buffer.append("[Critical Miss]");
-		Log(COMBAT, "Attack", buffer);
+		Log(COMBAT, "Attack", "{}", buffer);
 		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
 		VerbalConstant(VB_CRITMISS);
 		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
@@ -7446,7 +7445,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 		ResetState();
 		buffer.append("[Missed]");
-		Log(COMBAT, "Attack", buffer);
+		Log(COMBAT, "Attack", "{}", buffer);
 		return;
 	}
 
@@ -7460,13 +7459,13 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (critical) {
 		//critical success
 		buffer.append("[Critical Hit]");
-		Log(COMBAT, "Attack", buffer);
+		Log(COMBAT, "Attack", "{}", buffer);
 		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
 		VerbalConstant(VB_CRITHIT);
 	} else {
 		//normal success
 		buffer.append("[Hit]");
-		Log(COMBAT, "Attack", buffer);
+		Log(COMBAT, "Attack", "{}", buffer);
 	}
 	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, (critical?UI_CRITICAL:0)|UI_NOAURA, damage);
 	ResetState();
@@ -7517,14 +7516,14 @@ int Actor::GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const
 		return resisted;
 	}
 	if (remaining == resisted) {
-		Log(COMBAT, "DamageReduction", "Damage resistance (%d) is completely from damage reduction.", resisted);
+		Log(COMBAT, "DamageReduction", "Damage resistance ({}) is completely from damage reduction.", resisted);
 		return resisted;
 	}
 	if (remaining == total) {
 		Log(COMBAT, "DamageReduction", "No weapon enchantment breach — full damage reduction and resistance used.");
 		return resisted;
 	} else {
-		Log(COMBAT, "DamageReduction", "Ignoring %d of %d damage reduction due to weapon enchantment breach.", total-remaining, total);
+		Log(COMBAT, "DamageReduction", "Ignoring {} of {} damage reduction due to weapon enchantment breach.", total-remaining, total);
 		return resisted - (total-remaining);
 	}
 }
@@ -7576,14 +7575,14 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it == core->DamageInfoMap.end()) {
-			Log(ERROR, "ModifyDamage", "Unhandled damagetype:%d", damagetype);
+			Log(ERROR, "ModifyDamage", "Unhandled damagetype: {}", damagetype);
 		} else if (it->second.resist_stat) {
 			// check for bonuses for specific damage types
 			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && attacker) {
 				int bonus = attacker->fxqueue.BonusForParam2(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
 				if (bonus) {
 					resisted -= int (damage * bonus / 100.0);
-					Log(COMBAT, "ModifyDamage", "Bonus damage of %d(%+d%%), neto: %d", int(damage * bonus / 100.0), bonus, -resisted);
+					Log(COMBAT, "ModifyDamage", "Bonus damage of {}({:+d}%), neto: {}", int(damage * bonus / 100.0), bonus, -resisted);
 				}
 			}
 			// damage type with a resistance stat
@@ -7605,12 +7604,12 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				// avoid buggy data
 				if ((unsigned)abs(resistance) > maximum_values[it->second.resist_stat]) {
 					resistance = 0;
-					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value (%d).", resistance);
+					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value ({}).", resistance);
 				}
 				resisted += (int) (damage * resistance/100.0);
 				damage -= resisted;
 			}
-			Log(COMBAT, "ModifyDamage", "Resisted %d of %d at %d%% resistance to %d", resisted, damage+resisted, GetSafeStat(it->second.resist_stat), damagetype);
+			Log(COMBAT, "ModifyDamage", "Resisted {} of {} at {}% resistance to {}", resisted, damage + resisted, GetSafeStat(it->second.resist_stat), damagetype);
 			// PST and BG1 may actually heal on negative damage
 			if (!core->HasFeature(GF_HEAL_ON_100PLUS)) {
 				if (damage <= 0) {
@@ -7763,7 +7762,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 			if (action) {
 				ReleaseCurrentAction();
 				AddActionInFront(action);
-				Log(DEBUG, "Actor", "Confusion: added %s at %d (%d)", actionString, gameTime-roundTime, roundTime);
+				Log(DEBUG, "Actor", "Confusion: added {} at {} ({})", actionString, gameTime - roundTime, roundTime);
 			}
 			return;
 		}
@@ -8706,11 +8705,10 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 			index = 34; // Battle_Cry
 			break;
 		default:
-			Log(WARNING, "Actor", "TODO:Cannot determine 2DA rowcount for index: %d", index);
+			Log(WARNING, "Actor", "TODO: Cannot determine 2DA rowcount for index: {}", index);
 			return false;
 	}
-	Log(MESSAGE, "Actor", "Getting sound 2da %.8s entry: %s",
-		anims->ResRefBase.CString(), tab->GetRowName(index));
+	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(index));
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
 	Sound = MakeLowerCaseResRef(tab->QueryField(index, col));
 	return true;
@@ -8916,7 +8914,7 @@ void Actor::dumpQSlots() const
 		AppendFormat(buffer3, "{:3d} ", Gemrb2IWD2Qslot(tmp, i));
 	}
 	AppendFormat(buffer, "(class: {})", GetStat(IE_CLASS));
-	Log(DEBUG, "Actor", buffer);
+	Log(DEBUG, "Actor", "{}", buffer);
 //	Log(DEBUG, "Actor", buffer2);
 //	Log(DEBUG, "Actor", buffer3);
 
@@ -8932,9 +8930,9 @@ void Actor::dumpQSlots() const
 		AppendFormat(buffer2, "{:3d} ", IWD2GemrbQslot(tmp));
 		AppendFormat(buffer3, "{:3d} ", Gemrb2IWD2Qslot(tmp, i));
 	}
-	Log(DEBUG, "Actor", buffer);
-	Log(DEBUG, "Actor", buffer2);
-	Log(DEBUG, "Actor", buffer3);
+	Log(DEBUG, "Actor", "{}", buffer);
+	Log(DEBUG, "Actor", "{}", buffer2);
+	Log(DEBUG, "Actor", "{}", buffer3);
 }
 
 void Actor::SetPortrait(const char* portraitRef, int Which)
@@ -9270,7 +9268,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	ResRef tmp = item->ItemResRef;
 	const Item *itm = gamedata->GetItem(tmp, true);
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmp.CString());
+		Log(WARNING, "Actor", "Invalid quick slot item: {}!", tmp);
 		return false; //quick item slot contains invalid item resref
 	}
 	gamedata->FreeItem(itm, tmp, false);
@@ -9483,7 +9481,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	ResRef tmp = item->ItemResRef;
 	const Item *itm = gamedata->GetItem(tmp);
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmp.CString());
+		Log(WARNING, "Actor", "Invalid quick slot item: {}!", tmp);
 		return false; //quick item slot contains invalid item resref
 	}
 	gamedata->FreeItem(itm, tmp, false);
@@ -9547,7 +9545,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, const Item *
 		itm = gamedata->GetItem(item->ItemResRef, true);
 	}
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: %s!", item->ItemResRef.CString());
+		Log(WARNING, "Actor", "Invalid quick slot item: {}!", item->ItemResRef);
 		return; //quick item slot contains invalid item resref
 	}
 
@@ -9869,7 +9867,7 @@ int Actor::CheckUsability(const Item *item) const
 
 no_resolve:
 		if (stat&itemvalue) {
-			//Log(DEBUG, "Actor", "failed usability: itemvalue %d, stat %d, stat value %d", itemvalue, itemuse[i].stat, stat);
+			//Log(DEBUG, "Actor", "failed usability: itemvalue {}, stat {}, stat value {}", itemvalue, itemuse[i].stat, stat);
 			return STR_CANNOT_USE_ITEM;
 		}
 	}
@@ -11230,7 +11228,7 @@ void Actor::ApplyEffectCopy(const Effect *oldfx, EffectRef &newref, Scriptable *
 	if (newfx) {
 		core->ApplyEffect(newfx, this, Owner);
 	} else {
-		Log(ERROR, "Actor", "Failed to create effect copy for %s! Target: %ls, Owner: %ls", newref.Name, GetName().c_str(), Owner->GetName().c_str());
+		Log(ERROR, "Actor", "Failed to create effect copy for {}! Target: {}, Owner: {}", newref.Name, fmt::WideToChar{GetName()}, fmt::WideToChar{Owner->GetName()});
 	}
 }
 
@@ -11275,7 +11273,7 @@ ieDword Actor::GetActiveClass() const
 	}
 
 	// can be hit when starting a dual class
-	Log(ERROR, "Actor", "Dual-classed actor %ls (old class %d) has wrong multiclass bits (%d), using old class!", GetName().c_str(), oldclass, multiclass);
+	Log(ERROR, "Actor", "Dual-classed actor {} (old class {}) has wrong multiclass bits ({}), using old class!", fmt::WideToChar{GetName()}, oldclass, multiclass);
 	return oldclass;
 }
 

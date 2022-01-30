@@ -51,7 +51,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		size_t ret = iconv(cd, &oldchar, &in, &newchar, &out);
 
 		if (ret != GEM_OK) {
-			Log(ERROR, "FONT", "iconv error: %d", errno);
+			Log(ERROR, "FONT", "iconv error: {}", errno);
 		}
 		iconv_close(cd);
 		chr = unicodeChr;

@@ -296,7 +296,7 @@ bool PathJoinExt (char* target, const char* dir, const char* base, const char* e
 	char file[_MAX_PATH];
 	assert(strnlen(ext, 5) < 5);
 	if (strlcpy(file, base, _MAX_PATH-5) >= _MAX_PATH-5) {
-		Log(ERROR, "VFS", "Too long base path: %s!", base);
+		Log(ERROR, "VFS", "Too long base path: {}!", base);
 		return false;
 	}
 	strcat(file, ".");
@@ -344,7 +344,7 @@ void ResolveFilePath(char* FilePath)
 		return;
 	}
 	if (strlcpy(TempFilePath, FilePath, _MAX_PATH-1) >= _MAX_PATH-1) {
-		Log(ERROR, "VFS", "Too long path to resolve: %s!", FilePath);
+		Log(ERROR, "VFS", "Too long path to resolve: {}!", FilePath);
 		return;
 	}
 	PathJoin(FilePath, TempFilePath[0] == PathDelimiter ? SPathDelimiter : "", TempFilePath, nullptr);
@@ -599,7 +599,7 @@ DirectoryIterator& DirectoryIterator::operator++()
 				cont = !(*predicate)(name);
 			}
 		} else if (errno) {
-			//Log(WARNING, "DirectoryIterator", "Cannot readdir: %s\nError: %s", Path, strerror(errno));
+			//Log(WARNING, "DirectoryIterator", "Cannot readdir: {}\nError: {}", Path, strerror(errno));
 		}
 	} while (cont);
 
@@ -613,7 +613,7 @@ void DirectoryIterator::Rewind()
 	Directory = opendir(Path);
 	if (Directory == NULL) {
 		Entry = NULL;
-		//Log(WARNING, "DirectoryIterator", "Cannot open directory: %s\nError: %s", Path, strerror(errno));
+		//Log(WARNING, "DirectoryIterator", "Cannot open directory: {}\nError: {}", Path, strerror(errno));
 	} else {
 		this->operator++();
 	}

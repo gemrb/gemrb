@@ -40,13 +40,6 @@ GEM_EXPORT void AddLogWriter(Logger::WriterPtr&&);
 GEM_EXPORT void SetConsoleWindowLogLevel(log_level level);
 GEM_EXPORT void LogMsg(Logger::LogMessage&& msg);
 
-#if defined(__GNUC__)
-# define PRINTF_FORMAT(x, y) \
-    __attribute__ ((format(printf, x, y)))
-#else
-# define PRINTF_FORMAT(x, y)
-#endif
-
 /// Log an error and exit.
 template<typename... ARGS> [[noreturn]]
 GEM_EXPORT void error(const char* owner, const char* format, ARGS&&... args)
@@ -57,20 +50,12 @@ GEM_EXPORT void error(const char* owner, const char* format, ARGS&&... args)
 	exit(1);
 }
 
-// TODO: merge back to Log once that's converted
 template<typename... ARGS>
-GEM_EXPORT void LogVA(log_level level, const char* owner, const char* message, ARGS&&... args)
+GEM_EXPORT void Log(log_level level, const char* owner, const char* message, ARGS&&... args)
 {
 	auto formattedMsg = fmt::format(message, std::forward<ARGS>(args)...);
 	LogMsg(Logger::LogMessage(level, owner, formattedMsg, WHITE));
 }
-
-GEM_EXPORT void Log(log_level, const char* owner, const char* message, ...)
-	PRINTF_FORMAT(3, 4);
-
-GEM_EXPORT void Log(log_level, const char* owner, std::string const&);
-
-#undef PRINTF_FORMAT
 
 }
 

@@ -81,7 +81,7 @@ MVEPlayer::~MVEPlayer() {
 	if (audio_stream != -1) host->freeAudioStream(audio_stream);
 
 	if (host->video_skippedframes) {
-		Log(WARNING, "MVEPlayer", "Had to drop %d video frame(s).", host->video_skippedframes);
+		Log(WARNING, "MVEPlayer", "Had to drop {} video frame(s).", host->video_skippedframes);
 	}
 }
 
@@ -221,7 +221,7 @@ bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned
 			/* ignore these */
 			break;
 		default:
-			Log(WARNING, "MVEPlayer", "Skipping unknown segment type 0x%02x", type);
+			Log(WARNING, "MVEPlayer", "Skipping unknown segment type {:#x}", type);
 	}
 
 	return true;
@@ -370,7 +370,7 @@ void MVEPlayer::segment_audio_init(unsigned char version) {
 	if (audio_buffer) free(audio_buffer);
 	audio_buffer = (short *)malloc(min_buffer_len);
 
-/*	Log(DEBUG, "MVEPlayer", "Movie audio: Sample rate %d, %d channels, %d bit, requested buffer size 0x%02x, %s",
+/*	Log(DEBUG, "MVEPlayer", "Movie audio: Sample rate {}, {} channels, {} bit, requested buffer size {:#x}, {}",
 		audio_sample_rate, audio_num_channels, audio_sample_size, min_buffer_len, audio_compressed ? "compressed" : "uncompressed");*/
 }
 

@@ -228,7 +228,7 @@ static EffectDesc* FindEffect(const char* effectname)
 	}
 	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), find_effect);
 	if( !tmp) {
-		Log(WARNING, "EffectQueue", "Couldn't assign effect: %s", effectname);
+		Log(WARNING, "EffectQueue", "Couldn't assign effect: {}", effectname);
 	}
 	return (EffectDesc *) tmp;
 }
@@ -702,7 +702,7 @@ all_party:
 
 	case FX_TARGET_UNKNOWN:
 	default:
-		Log(MESSAGE, "EffectQueue", "Unknown FX target type: %d", fx->Target);
+		Log(MESSAGE, "EffectQueue", "Unknown FX target type: {}", fx->Target);
 		flg = FX_ABORT;
 		delete fx;
 		break;
@@ -840,12 +840,12 @@ static int check_type(const Actor *actor, const Effect *fx)
 	//if source is unspecified, don't resist it
 	if(!fx->SourceRef.IsEmpty()) {
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->SourceRef) ) {
-			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (%s)", fx->SourceRef.CString());
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity ({})", fx->SourceRef);
 			return 0;
 		}
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->SourceRef) ) {
 			if (fx->SourceRef != "detect") { // our secret door pervasive effect
-				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->SourceRef.CString());
+				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 ({})", fx->SourceRef);
 			}
 			return 0;
 		}
@@ -1025,7 +1025,7 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 	if (resisted) {
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
 		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
-		Log(MESSAGE, "EffectQueue", "effect resisted: %s", Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "effect resisted: {}", Opcodes[fx->Opcode].Name);
 		return FX_NOT_APPLIED;
 	}
 	return -1;
@@ -1042,11 +1042,11 @@ static int check_resistance(Actor* actor, Effect* fx)
 	//opcode immunity
 	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
-		Log(MESSAGE, "EffectQueue", "%ls is immune to effect: %s", actor->GetName().c_str(), Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "{} is immune to effect: {}", fmt::WideToChar{actor->GetName()}, Opcodes[fx->Opcode].Name);
 		return FX_NOT_APPLIED;
 	}
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
-		Log(MESSAGE, "EffectQueue", "%ls is immune2 to effect: %s", actor->GetName().c_str(), Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "{} is immune2 to effect: {}", fmt::WideToChar{actor->GetName()}, Opcodes[fx->Opcode].Name);
 		// totlm's spin166 should be wholly blocked by spwi210, but only blocks its third effect, so make it fatal
 		return FX_ABORT;
 	}
@@ -1114,7 +1114,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 				fx->Parameter1 /= 2;
 			}
 		} else {
-			Log(MESSAGE, "EffectQueue", "%ls saved against effect: %s", actor->GetName().c_str(), Opcodes[fx->Opcode].Name);
+			Log(MESSAGE, "EffectQueue", "{} saved against effect: {}", fmt::WideToChar{actor->GetName()}, Opcodes[fx->Opcode].Name);
 			return FX_NOT_APPLIED;
 		}
 	} else {
@@ -1246,7 +1246,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	}
 
 	if (!target && !(Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR)) {
-		Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: %d, skipping", fx->Opcode);
+		Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: {}, skipping", fx->Opcode);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1373,7 +1373,7 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed) const
 	const Spell *spell = gamedata->GetSpell(removed, true);
 	if (!spell) return; // can be hit until all the iwd2 clabs are implemented
 	if (spell->ext_headers.size() > 1) {
-		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", removed.CString());
+		Log(WARNING, "EffectQueue", "Spell {} has more than one extended header, removing only first!", removed);
 	}
 	const SPLExtHeader *sph = spell->GetExtHeader(0);
 	if (!sph) return; // some iwd2 clabs are only markers
@@ -1397,7 +1397,7 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed) const
 
 		fx->Parameter1 = -fx->Parameter1;
 
-		Log(DEBUG, "EffectQueue", "Manually removing effect %d (from %s)", fx->Opcode, removed.CString());
+		Log(DEBUG, "EffectQueue", "Manually removing effect {} (from {})", fx->Opcode, removed);
 		ApplyEffect(OwnerActor, fx, 1, 0);
 		delete fx;
 	}
@@ -2053,7 +2053,7 @@ std::string EffectQueue::dump() const
 	int i = 0;
 	for (const Effect *fx : effects) {
 		if (fx->Opcode >= MAX_EFFECTS) {
-			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: %d! Report this immediately!", fx->Opcode);
+			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: {}! Report this immediately!", fx->Opcode);
 			return buffer;
 		}
 		AppendFormat(buffer, " {:2d}: 0x{:02x}: {} ({}, {}) S:{}\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->SourceRef);

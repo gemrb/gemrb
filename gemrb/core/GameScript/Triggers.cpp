@@ -58,7 +58,7 @@ int GameScript::Reaction(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(scr);
 	if (!actor) {
-		Log(DEBUG, "GameScript", parameters->dump());
+		Log(DEBUG, "GameScript", "{}", parameters->dump());
 		return 0;
 	}
 
@@ -75,7 +75,7 @@ int GameScript::ReactionGT(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(scr);
 	if (!actor) {
-		Log(DEBUG, "GameScript", parameters->dump());
+		Log(DEBUG, "GameScript", "{}", parameters->dump());
 		return 0;
 	}
 
@@ -92,7 +92,7 @@ int GameScript::ReactionLT(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(scr);
 	if (!actor) {
-		Log(DEBUG, "GameScript", parameters->dump());
+		Log(DEBUG, "GameScript", "{}", parameters->dump());
 		return 0;
 	}
 
@@ -1762,7 +1762,7 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
 		}
 		if (len > sizeof(ieVariable)) {
-			Log(ERROR, "GameScript", "Scriptname %s (sender: %s) is too long for generating death globals!", parameters->string0Parameter, Sender->GetScriptName());
+			Log(ERROR, "GameScript", "Scriptname {} (sender: {}) is too long for generating death globals!", parameters->string0Parameter, Sender->GetScriptName());
 		}
 		if (value>0) {
 			return 1;
@@ -2539,9 +2539,9 @@ int GameScript::OpenState(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
 	if (!tar) {
 		if (core->InDebugMode(ID_TRIGGERS)) {
-			Log(ERROR, "GameScript", "Couldn't find door/container:%s",
+			Log(ERROR, "GameScript", "Couldn't find door/container: {}",
 				parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-			Log(DEBUG, "GameScript", "Sender: %s", Sender->GetScriptName());
+			Log(DEBUG, "GameScript", "Sender: {}", Sender->GetScriptName());
 		}
 		return 0;
 	}
@@ -2558,7 +2558,7 @@ int GameScript::OpenState(Scriptable *Sender, const Trigger *parameters)
 		}
 		default:; //to remove a warning
 	}
-	Log(ERROR, "GameScript", "OpenState: Not a door/container: %s", tar->GetScriptName());
+	Log(ERROR, "GameScript", "OpenState: Not a door/container: {}", tar->GetScriptName());
 	return 0;
 }
 
@@ -2566,9 +2566,9 @@ int GameScript::IsLocked(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
 	if (!tar) {
-		Log(ERROR, "GameScript", "Couldn't find door/container:%s",
+		Log(ERROR, "GameScript", "Couldn't find door/container 2: {}",
 			parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-		Log(DEBUG, "GameScript", "Sender: %s", Sender->GetScriptName());
+		Log(DEBUG, "GameScript", "Sender: {}", Sender->GetScriptName());
 		return 0;
 	}
 	switch(tar->Type) {
@@ -2584,7 +2584,7 @@ int GameScript::IsLocked(Scriptable *Sender, const Trigger *parameters)
 		}
 		default:; //to remove a warning
 	}
-	Log(ERROR, "GameScript", "IsLocked: Not a door/container: %s", tar->GetScriptName());
+	Log(ERROR, "GameScript", "IsLocked: Not a door/container: {}", tar->GetScriptName());
 	return 0;
 }
 
@@ -3916,7 +3916,7 @@ int GameScript::RandomStatCheck(Scriptable *Sender, const Trigger *parameters)
 				return 1;
 			break;
 		default:
-			Log(ERROR, "GameScript", "RandomStatCheck: unknown int parameter 1 passed: %d, ignoring!", parameters->int1Parameter);
+			Log(ERROR, "GameScript", "RandomStatCheck: unknown int parameter 1 passed: {}, ignoring!", parameters->int1Parameter);
 			break;
 	}
 	return 0;

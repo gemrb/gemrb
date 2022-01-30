@@ -68,7 +68,7 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 					/* fc 80-83 are noncanonical */
 					nb = 6;
 				} else {
-					Log(WARNING, "String", "Invalid UTF-8 character: %x", currentChr);
+					Log(WARNING, "String", "Invalid UTF-8 character: {:x}", currentChr);
 					continue;
 				}
 
@@ -104,7 +104,7 @@ char* ConvertCharEncoding(const char* string, const char* from, const char* to) 
 
 	iconv_t cd = iconv_open(to, from);
 	if (cd == (iconv_t)-1) {
-		Log(ERROR, "String", "iconv_open(%s, %s) failed with error: %s", to, from, strerror(errno));
+		Log(ERROR, "String", "iconv_open({}, {}) failed with error: {}", to, from, strerror(errno));
 		return strdup(string);
 	}
 
@@ -119,7 +119,7 @@ char* ConvertCharEncoding(const char* string, const char* from, const char* to) 
 	iconv_close(cd);
 
 	if (ret == (size_t)-1) {
-		Log(ERROR, "String", "iconv failed to convert string %s from %s to %s with error: %s", string, from, to, strerror(errno));
+		Log(ERROR, "String", "iconv failed to convert string {} from {} to {} with error: {}", string, from, to, strerror(errno));
 		free(buf);
 		return strdup(string);
 	}
@@ -155,7 +155,7 @@ std::string MBStringFromString(const String& string)
 
 	if (newlen == static_cast<size_t>(-1)) {
 		// invalid multibyte sequence
-		Log(ERROR, "String", "wcstombs failed to covert string %ls with error: %s", string.c_str(), strerror(errno));
+		Log(ERROR, "String", "wcstombs failed to covert string {} with error: {}", fmt::WideToChar{string}, strerror(errno));
 		return ret;
 	}
 	assert(newlen <= ret.length());

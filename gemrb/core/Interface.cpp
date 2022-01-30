@@ -699,7 +699,7 @@ int Interface::LoadSprites()
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
-		Log(ERROR, "Core", "Failed to load enough cursors (%ld < %d).", long(CursorCount), IE_CURSOR_WAY);
+		Log(ERROR, "Core", "Failed to load enough cursors ({} < {}).", CursorCount, IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}
 	WindowManager::CursorMouseUp = Cursors[0];
@@ -780,7 +780,7 @@ int Interface::LoadFonts()
 			error("Core", "Unable to load font resource: {} for ResRef {} (check fonts.2da)", font_name, resref);
 		} else {
 			fonts[resref] = fnt;
-			Log(MESSAGE, "Core", "Loaded Font: %s for ResRef %s", font_name, resref.CString());
+			Log(MESSAGE, "Core", "Loaded Font: {} for ResRef {}", font_name, resref);
 		}
 	}
 
@@ -903,8 +903,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 	const char* appDir = getenv("APPDIR");
 	const char* appImageFile = getenv("ARGV0");
 	if (appDir) {
-		Log(DEBUG, "Interface", "Found APPDIR: %s", appDir);
-		Log(DEBUG, "Interface", "Found AppImage/ARGV0: %s", appImageFile);
+		Log(DEBUG, "Interface", "Found APPDIR: {}", appDir);
+		Log(DEBUG, "Interface", "Found AppImage/ARGV0: {}", appImageFile);
 	}
 	if (appDir && appImageFile && strcasestr(appImageFile, "gemrb") != nullptr) {
 		assert(strnlen(appDir, _MAX_PATH/2) < _MAX_PATH/2);
@@ -1013,7 +1013,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 
 	if (StupidityDetector(config.CachePath)) {
-		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", config.CachePath);
+		Log(ERROR, "Core", "Cache path {} doesn't exist, not a folder or contains alien files!", config.CachePath);
 		return GEM_ERROR;
 	}
 	if (!config.KeepCache) DelTree((const char *) config.CachePath, false);
@@ -1215,7 +1215,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 		strlcpy(INIConfig, gemrbINI, sizeof(INIConfig));
 	} else {
 		PathJoin(ini_path, config.GamePath, INIConfig, nullptr);
-		Log(MESSAGE,"Core", "Loading original game options from %s", ini_path);
+		Log(MESSAGE,"Core", "Loading original game options from {}", ini_path);
 	}
 	if (!InitializeVarsWithINI(ini_path)) {
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
@@ -1649,7 +1649,7 @@ const char* Interface::TypeExt(SClass_ID type) const
 			return "wmp";
 
 		default:
-			Log(ERROR, "Interface", "No extension associated to class ID: %lu", type);
+			Log(ERROR, "Interface", "No extension associated to class ID: {}", type);
 	}
 	return NULL;
 }
@@ -1799,7 +1799,7 @@ bool Interface::LoadGemRBINI()
 		return false;
 	}
 
-	Log(MESSAGE, "Core", "Loading game type-specific GemRB setup '%s'",
+	Log(MESSAGE, "Core", "Loading game type-specific GemRB setup '{}'",
 		inifile->originalfile);
 
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
@@ -1903,7 +1903,7 @@ bool Interface::LoadEncoding()
 		return false;
 	}
 
-	Log(MESSAGE, "Core", "Loading encoding definition for %s: '%s'", config.Encoding.c_str(),
+	Log(MESSAGE, "Core", "Loading encoding definition for {}: '{}'", config.Encoding,
 		inifile->originalfile);
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
@@ -2605,7 +2605,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	// if filename is not set we assume we are creating defaults without an INI
 	bool opened = ini->Open(iniStream);
 	if (iniFileName[0] && !opened) {
-		Log(WARNING, "Core", "Unable to read defaults from '%s'. Using GemRB default values.", iniFileName);
+		Log(WARNING, "Core", "Unable to read defaults from '{}'. Using GemRB default values.", iniFileName);
 	} else {
 		overrides = ini.get();
 	}
@@ -2704,7 +2704,7 @@ bool Interface::SaveConfig()
 
 		fs->Write(contents.c_str(), contents.size());
 	} else {
-		Log(ERROR, "Core", "Unable to open GemRB defaults. Cannot determine what values to write to %s.", ini_path);
+		Log(ERROR, "Core", "Unable to open GemRB defaults. Cannot determine what values to write to {}.", ini_path);
 	}
 
 	delete fs;
@@ -2916,7 +2916,7 @@ void Interface::UpdateWorldMap(const ResRef& wmResRef)
 	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_SAV_CLASS_ID);
 
 	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, NULL)) {
-		Log(ERROR, "Core", "Could not update world map %s", wmResRef.CString());
+		Log(ERROR, "Core", "Could not update world map {}", wmResRef);
 		return;
 	}
 
@@ -3372,7 +3372,7 @@ bool Interface::StupidityDetector(const char* Pt) const
 {
 	char Path[_MAX_PATH];
 	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
-		Log(ERROR, "Interface", "Trying to check too long path: %s!", Pt);
+		Log(ERROR, "Interface", "Trying to check too long path: {}!", Pt);
 		return true;
 	}
 	DirectoryIterator dir(Path);
@@ -3411,7 +3411,7 @@ void Interface::DelTree(const char* Pt, bool onlysave) const
 
 	if (!Pt[0]) return; //Don't delete the root filesystem :)
 	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
-		Log(ERROR, "Interface", "Trying to delete too long path: %s!", Pt);
+		Log(ERROR, "Interface", "Trying to delete too long path: {}!", Pt);
 		return;
 	}
 	DirectoryIterator dir(Path);
@@ -3640,7 +3640,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		if (RtRows.count(itm->ItemResRef) == 0) {
 			const Item* item = gamedata->GetItem(itm->ItemResRef, true);
 			if (!item) {
-				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef.CString());
+				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: {}", itm->ItemResRef);
 				return false;
 			}
 			// try detecting malformed / placeholder items, present in iwd2
@@ -3681,8 +3681,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		}
 		itm->Usages[0] = (ieWord) Roll(diceThrows, diceSides, 0);
 	}
-	Log(ERROR, "Interface", "Loop detected while generating random item:%s",
-		itm->ItemResRef.CString());
+	Log(ERROR, "Interface", "Loop detected while generating random item: {}", itm->ItemResRef);
 	return false;
 }
 
@@ -3773,7 +3772,7 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref.CString());
+		Log(ERROR, "Interface", "Cannot load dialog: {}", dlgref);
 		return ieStrRef(-1);
 	}
 	Scriptable *pc = game->GetSelectedPCSingle(false);
@@ -3960,7 +3959,7 @@ int Interface::SwapoutArea(Map *map) const
 {
 	//refuse to save ambush areas, for example
 	if (map->AreaFlags & AF_NOSAVE) {
-		Log(DEBUG, "Core", "Not saving area %s",
+		Log(DEBUG, "Core", "Not saving area {}",
 			map->GetScriptName());
 		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 		return 0;
@@ -3979,12 +3978,12 @@ int Interface::SwapoutArea(Map *map) const
 		str.Create( map->GetScriptName(), IE_ARE_CLASS_ID );
 		int ret = mm->PutArea (&str, map);
 		if (ret <0) {
-			Log(WARNING, "Core", "Area removed: %s",
+			Log(WARNING, "Core", "Area removed: {}",
 				map->GetScriptName());
 			RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 		}
 	} else {
-		Log(WARNING, "Core", "Area removed: %s",
+		Log(WARNING, "Core", "Area removed: {}",
 			map->GetScriptName());
 		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 	}
@@ -4008,7 +4007,7 @@ int Interface::WriteCharacter(const char *name, const Actor *actor)
 	FileStream str;
 	if (!str.Create(Path, name, IE_CHR_CLASS_ID)
 		|| gm->PutActor(&str, actor, true) < 0) {
-		Log(WARNING, "Core", "Character cannot be saved: %s", name);
+		Log(WARNING, "Core", "Character cannot be saved: {}", name);
 		return -1;
 	}
 
@@ -4038,11 +4037,11 @@ int Interface::WriteGame(const char *folder)
 		str.Create( folder, GameNameResRef, IE_GAM_CLASS_ID );
 		int ret = gm->PutGame (&str, game);
 		if (ret <0) {
-			Log(WARNING, "Core", "Game cannot be saved: %s", folder);
+			Log(WARNING, "Core", "Game cannot be saved: {}", folder);
 			return -1;
 		}
 	} else {
-		Log(WARNING, "Core", "Internal error, game cannot be saved: %s", folder);
+		Log(WARNING, "Core", "Internal error, game cannot be saved: {}", folder);
 		return -1;
 	}
 	return 0;
@@ -4083,7 +4082,7 @@ int Interface::WriteWorldMap(const char *folder)
 		ret = wmm->PutWorldMap (&str1, &str2, worldmap);
 	}
 	if (ret <0) {
-		Log(WARNING, "Core", "Internal error, worldmap cannot be saved: %s", folder);
+		Log(WARNING, "Core", "Internal error, worldmap cannot be saved: {}", folder);
 		return -1;
 	}
 	return 0;
@@ -4130,7 +4129,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 				dir.GetFullPath(dtmp);
 				FileStream fs;
 				if (!fs.Open(dtmp)) {
-					Log(ERROR, "Interface", "Failed to open \"%s\".", dtmp);
+					Log(ERROR, "Interface", "Failed to open \"{}\".", dtmp);
 				}
 
 				if (IsBlobSaveItem(dtmp)) {
@@ -4151,7 +4150,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 	}
 
 	tick_t endTime = GetTicks();
-	Log(WARNING, "Core", "%lu ms (compressing SAV file)", endTime - startTime);
+	Log(WARNING, "Core", "{} ms (compressing SAV file)", endTime - startTime);
 	return GEM_OK;
 }
 
@@ -4394,7 +4393,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	}
 	ieDword stat = (ieDword) sym->GetValue( stat_name );
 	if (stat==(ieDword) ~0) {
-		Log(WARNING, "Core", "Cannot translate symbol: %s", stat_name);
+		Log(WARNING, "Core", "Cannot translate symbol: {}", stat_name);
 	}
 	return stat;
 }

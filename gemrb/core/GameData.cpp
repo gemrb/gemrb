@@ -426,9 +426,8 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 		return NULL;
 	}
 	default:
-		Log(MESSAGE, "KEYImporter", "%s files are not supported.",
-			core->TypeExt(type));
-		return NULL;
+		Log(MESSAGE, "KEYImporter", "{} files are not supported!", core->TypeExt(type));
+		return nullptr;
 	}
 }
 
@@ -721,7 +720,7 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 	}
 	AutoTable tm = LoadTable(tableName);
 	if (!tm) {
-		Log(ERROR, "GameData", "Cannot find %s.2da.", tableName.CString());
+		Log(ERROR, "GameData", "Cannot find {}.2da.", tableName);
 		return false;
 	}
 

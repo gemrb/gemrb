@@ -136,7 +136,7 @@ public:
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 		int ret = SDL_RenderCopy(targetRenderer, texture, nullptr, &dst);
 		if (ret != 0) {
-			Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+			Log(ERROR, "SDLVideo", "{}", SDL_GetError());
 		}
 		return true;
 	}
@@ -188,7 +188,7 @@ public:
 
 			int ret = SDL_UpdateTexture(texture, &dest, conversionBuffer->pixels, sdlpitch);
 			if (ret != 0) {
-				Log(ERROR, "SDL20Video", "%s", SDL_GetError());
+				Log(ERROR, "SDL20Video", "{}", SDL_GetError());
 			}
 		} else {
 			int ret = SDL_ConvertPixels(bufDest.w, bufDest.h, inputFormat, pixelBuf, pitch ? *pitch : sdlpitch, nativeFormat, conversionBuffer->pixels, sdlpitch);
@@ -197,7 +197,7 @@ public:
 			}
 
 			if (ret != 0) {
-				Log(ERROR, "SDL20Video", "%s", SDL_GetError());
+				Log(ERROR, "SDL20Video", "{}", SDL_GetError());
 			}
 		}
 	}

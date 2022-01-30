@@ -66,7 +66,7 @@ bool INIImporter::Open(DataStream* str)
 			// [guard6]
 			// /.../
 			if (startedSection) {
-				Log(WARNING, "INIImporter", "Skipping empty section in '%s', entry: '%s'", str->filename, lastTag->GetTagName());
+				Log(WARNING, "INIImporter", "Skipping empty section in '{}', entry: '{}'", str->filename, lastTag->GetTagName());
 				tags.pop_back();
 			}
 
@@ -80,7 +80,7 @@ bool INIImporter::Open(DataStream* str)
 		if (lastTag->AddLine(strbuf)) {
 			startedSection = false;
 		} else {
-			Log(ERROR, "INIImporter", "Bad Line in file: %s, Section: [%s], Entry: '%s'",
+			Log(ERROR, "INIImporter", "Bad Line in file: {}, Section: [{}], Entry: '{}'",
 				str->filename, lastTag->GetTagName(), strbuf);
 		}
 

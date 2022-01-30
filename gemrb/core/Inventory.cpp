@@ -185,7 +185,7 @@ void Inventory::CalculateWeight()
 		if (slot->Weight == -1) {
 			const Item *itm = gamedata->GetItem(slot->ItemResRef, true);
 			if (!itm) {
-				Log(ERROR, "Inventory", "Invalid item: %s!", slot->ItemResRef.CString());
+				Log(ERROR, "Inventory", "Invalid item: {}!", slot->ItemResRef);
 				slot->Weight = 0;
 				continue;
 			}
@@ -741,7 +741,7 @@ int Inventory::DepleteItem(ieDword flags) const
 		if (!flags) {
 			const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 			if (!itm) {
-				Log(WARNING, "Inventory", "Invalid item to deplete: %s!", item->ItemResRef.CString());
+				Log(WARNING, "Inventory", "Invalid item to deplete: {}!", item->ItemResRef);
 				continue;
 			}
 			//if the item is usable in weapon slot, then it is weapon
@@ -914,7 +914,7 @@ bool Inventory::EquipItem(ieDword slot)
 	int effect = core->QuerySlotEffects( slot );
 	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (!itm) {
-		Log(ERROR, "Inventory", "Invalid item Equipped: %s Slot: %d", item->ItemResRef.CString(), slot);
+		Log(ERROR, "Inventory", "Invalid item Equipped: {} Slot: {}", item->ItemResRef, slot);
 		return false;
 	}
 	
@@ -1839,7 +1839,7 @@ int Inventory::FindStealableItem()
 	unsigned int start = core->Roll(1, slotcnt, -1);
 	int inc = start & 1 ? 1 : -1;
 
-	Log(DEBUG, "Inventory", "Start Slot: %d, increment: %d", start, inc);
+	Log(DEBUG, "Inventory", "Start Slot: {}, increment: {}", start, inc);
 	for (unsigned int i = 0; i < slotcnt; ++i) {
 		int slot = (slotcnt - 1 + start + i * inc) % slotcnt;
 		const CREItem *item = Slots[slot];

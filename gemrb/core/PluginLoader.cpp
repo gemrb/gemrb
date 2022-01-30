@@ -89,12 +89,12 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 #ifdef WIN32
 static void PrintDLError()
 {
-	Log(DEBUG, "PluginLoader", "Error code: %lu", GetLastError());
+	Log(DEBUG, "PluginLoader", "Error code: {}", GetLastError());
 }
 #else
 static void PrintDLError()
 {
-	Log(DEBUG, "PluginLoader", "Error: %s", dlerror());
+	Log(DEBUG, "PluginLoader", "Error: {}", dlerror());
 }
 #endif
 
@@ -116,7 +116,7 @@ static bool LoadPlugin(const char* pluginpath)
 #endif
 
 	if (hMod == NULL) {
-		Log(ERROR, "PluginLoader", "Cannot Load \"%s\", skipping...", pluginpath);
+		Log(ERROR, "PluginLoader", "Cannot Load \"{}\", skipping...", pluginpath);
 		PrintDLError();
 		return false;
 	}
@@ -125,12 +125,12 @@ static bool LoadPlugin(const char* pluginpath)
 	//with the symbol name
 	Version_t LibVersion = ( Version_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
 	if (LibVersion==NULL) {
-		Log(ERROR, "PluginLoader", "Skipping invalid plugin \"%s\".", pluginpath);
+		Log(ERROR, "PluginLoader", "Skipping invalid plugin \"{}\".", pluginpath);
 		FREE_PLUGIN( hMod );
 		return false;
 	}
 	if (strcmp(LibVersion(), VERSION_GEMRB) ) {
-		Log(ERROR, "PluginLoader", "Skipping plugin \"%s\" with version mistmatch.", pluginpath);
+		Log(ERROR, "PluginLoader", "Skipping plugin \"{}\" with version mistmatch.", pluginpath);
 		FREE_PLUGIN( hMod );
 		return false;
 	}
@@ -143,7 +143,7 @@ static bool LoadPlugin(const char* pluginpath)
 	PluginDesc desc = { hMod, ID(), Description(), Register };
 
 	if (libs.find(desc.ID) != libs.end()) {
-		Log(WARNING, "PluginLoader", "Plug-in \"%s\" already loaded!", pluginpath);
+		Log(WARNING, "PluginLoader", "Plug-in \"{}\" already loaded!", pluginpath);
 		FREE_PLUGIN( hMod );
 		return false;
 	}
@@ -154,17 +154,17 @@ static bool LoadPlugin(const char* pluginpath)
 		}
 	}
 	libs.insert(desc.ID);
-	Log(MESSAGE, "PluginLoader", "Loaded plugin \"%s\" (%s).", desc.Description, pluginpath);
+	Log(MESSAGE, "PluginLoader", "Loaded plugin \"{}\" ({}).", desc.Description, pluginpath);
 	return true;
 }
 
 void LoadPlugins(const char* pluginpath)
 {
-	Log(MESSAGE, "PluginMgr", "Loading Plugins from %s", pluginpath);
+	Log(MESSAGE, "PluginMgr", "Loading Plugins from {}", pluginpath);
 
 	DirectoryIterator dirIt(pluginpath);
 	if (!dirIt) {
-		Log(ERROR, "PluginMgr", "Plugin Directory (%s) does not exist!", pluginpath);
+		Log(ERROR, "PluginMgr", "Plugin Directory ({}) does not exist!", pluginpath);
 		return;
 	}
 
@@ -192,14 +192,14 @@ void LoadPlugins(const char* pluginpath)
 
 		// module is sent to the back
 		if (flags == PLF_DELAY) {
-			Log(MESSAGE, "PluginLoader", "Loading \"%s\" delayed.", name);
+			Log(MESSAGE, "PluginLoader", "Loading \"{}\" delayed.", name);
 			delayedPlugins.emplace(name);
 			continue;
 		}
 
 		// module is skipped
 		if (flags == PLF_SKIP) {
-			Log(MESSAGE, "PluginLoader", "Loading \"%s\" skipped.", name);
+			Log(MESSAGE, "PluginLoader", "Loading \"{}\" skipped.", name);
 			continue;
 		}
 

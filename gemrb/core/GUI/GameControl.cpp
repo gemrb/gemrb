@@ -844,7 +844,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			// f
 			case 'g'://shows loaded areas and other game information
-				Log(DEBUG, "Game", game->dump());
+				Log(DEBUG, "Game", "{}", game->dump());
 				break;
 			// h
 			case 'i'://interact trigger (from the original game)
@@ -912,30 +912,30 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					while (count--) {
 						const Actor *actor = area->GetActor(count, true);
 						if (actor->IsOver(gameMousePos)) {
-							Log(DEBUG, "Actor", actor->dump());
+							Log(DEBUG, "Actor", "{}", actor->dump());
 						}
 					}
 				}
 				if (lastActor) {
-					Log(DEBUG, "Actor", lastActor->dump());
+					Log(DEBUG, "Actor", "{}", lastActor->dump());
 					break;
 				}
 				if (overDoor) {
-					Log(DEBUG, "Door", overDoor->dump());
+					Log(DEBUG, "Door", "{}", overDoor->dump());
 					break;
 				}
 				if (overContainer) {
-					Log(DEBUG, "Container", overContainer->dump());
+					Log(DEBUG, "Container", "{}", overContainer->dump());
 					break;
 				}
 				if (overInfoPoint) {
-					Log(DEBUG, "InfoPoint", overInfoPoint->dump());
+					Log(DEBUG, "InfoPoint", "{}", overInfoPoint->dump());
 					break;
 				}
-				Log(DEBUG, "Map", core->GetGame()->GetCurrentArea()->dump(false));
+				Log(DEBUG, "Map", "{}", core->GetGame()->GetCurrentArea()->dump(false));
 				break;
 			case 'n': //prints a list of all the live actors in the area
-				Log(DEBUG, "Map", core->GetGame()->GetCurrentArea()->dump(true));
+				Log(DEBUG, "Map", "{}", core->GetGame()->GetCurrentArea()->dump(true));
 				break;
 			// o
 			case 'p': //center on actor
@@ -984,7 +984,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				area->MoveVisibleGroundPiles(gameMousePos);
 				break;
 			case 'x': // shows coordinates on the map
-				Log(MESSAGE, "GameControl", "Position: %s [%d.%d]", area->GetScriptName(), gameMousePos.x, gameMousePos.y );
+				Log(MESSAGE, "GameControl", "Position: {} [{}.{}]", area->GetScriptName(), gameMousePos.x, gameMousePos.y);
 				break;
 			case 'Y': // damages all enemies by 300 (resistances apply)
 				// mwahaha!
@@ -1032,7 +1032,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			case '4': //show all traps and infopoints
 				DebugFlags ^= DEBUG_SHOW_INFOPOINTS;
-				Log(MESSAGE, "GameControl", "Show traps and infopoints %s", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
+				Log(MESSAGE, "GameControl", "Show traps and infopoints {}", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
 				break;
 			case '5':
 				{
@@ -1681,7 +1681,7 @@ void GameControl::TryToPick(Actor *source, const Scriptable *tgt) const
 			}
 			break;
 		default:
-			Log(ERROR, "GameControl", "Invalid pick target of type %d", tgt->Type);
+			Log(ERROR, "GameControl", "Invalid pick target of type {}", tgt->Type);
 			return;
 	}
 	source->CommandActor(GenerateActionDirect(cmdString, tgt));

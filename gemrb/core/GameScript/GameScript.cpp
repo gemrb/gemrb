@@ -1229,9 +1229,8 @@ static const IDSLink* FindIdentifier(const char* idsname)
 		}
 	}
 	
-	Log(WARNING, "GameScript", "Couldn't assign ids target: %.*s",
-		len, idsname );
-	return NULL;
+	Log(WARNING, "GameScript", "Couldn't assign ids target: {}", idsname);
+	return nullptr;
 }
 
 /********************** Targets **********************************/
@@ -1345,7 +1344,7 @@ void Targets::dump() const
 	targetlist::const_iterator m;
 	for (m = objects.begin(); m != objects.end(); ++m) {
 		if ((*m).actor->Type == ST_ACTOR) {
-			Log(DEBUG, "GameScript", "%ls", (*m).actor->GetName().c_str());
+			Log(DEBUG, "GameScript", "{}", fmt::WideToChar{(*m).actor->GetName()});
 		}
 	}
 }
@@ -1406,12 +1405,12 @@ static void LoadActionFlags(const char *tableName, int flag, bool critical)
 	while (j--) {
 		int i = table->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
-			Log(ERROR, "GameScript", "%s action %d (%s) is too high, ignoring",
+			Log(ERROR, "GameScript", "{} action {} ({}) is too high, ignoring",
 				tableName, i, table->GetStringIndex( j ) );
 			continue;
 		}
 		if (!actions[i]) {
-			Log(WARNING, "GameScript", "%s action %d (%s) doesn't exist, ignoring",
+			Log(WARNING, "GameScript", "{} action {} ({}) doesn't exist, ignoring",
 				tableName, i, table->GetStringIndex( j ) );
 			continue;
 		}
@@ -1495,23 +1494,20 @@ void InitializeIEScript()
 		bool was_condition = (i & 0x4000);
 		i &= 0x3fff;
 		if (i >= MAX_TRIGGERS) {
-			Log(ERROR, "GameScript", "trigger %d (%s) is too high, ignoring",
-				i, triggersTable->GetStringIndex( j ) );
+			Log(ERROR, "GameScript", "Trigger {} ({}) is too high, ignoring", i, triggersTable->GetStringIndex(j));
 			continue;
 		}
 
 		if (triggers[i]) {
 			if (poi && triggers[i]!=poi->Function) {
-				std::string buffer = fmt::format("{} is in collision with ",
-					triggersTable->GetStringIndex( j ) );
+				std::string buffer = fmt::format("{} is in collision with ", triggersTable->GetStringIndex(j));
 				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
-				Log(WARNING, "GameScript", buffer);
+				Log(WARNING, "GameScript", "{}", buffer);
 			} else {
 				if (core->InDebugMode(ID_TRIGGERS)) {
-					std::string buffer = fmt::format("{} is a synonym of ",
-						triggersTable->GetStringIndex( j ) );
+					std::string buffer = fmt::format("{} is a synonym of ", triggersTable->GetStringIndex(j));
 					printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
-					Log(DEBUG, "GameScript", buffer);
+					Log(DEBUG, "GameScript", "{}", buffer);
 				}
 			}
 			continue; //we already found an alternative
@@ -1551,14 +1547,14 @@ void InitializeIEScript()
 
 		std::string buffer("Couldn't assign function to trigger: ");
 		printFunction(buffer, triggersTable, j);
-		Log(WARNING, "GameScript", buffer);
+		Log(WARNING, "GameScript", "{}", buffer);
 	}
 
 	max = actionsTable->GetSize();
 	for (size_t j = 0; j < max; j++) {
 		int i = actionsTable->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
-			Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
+			Log(ERROR, "GameScript", "action {} ({}) is too high, ignoring",
 				i, actionsTable->GetStringIndex( j ) );
 			continue;
 		}
@@ -1568,13 +1564,13 @@ void InitializeIEScript()
 				std::string buffer = fmt::format("{} is in collision with ",
 					actionsTable->GetStringIndex( j ) );
 				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
-				Log(WARNING, "GameScript", buffer);
+				Log(WARNING, "GameScript", "{}", buffer);
 			} else {
 				if (core->InDebugMode(ID_ACTIONS)) {
 					std::string buffer = fmt::format("{} is a synonym of ",
 						actionsTable->GetStringIndex( j ) );
 					printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
-					Log(DEBUG, "GameScript", buffer);
+					Log(DEBUG, "GameScript", "{}", buffer);
 				}
 			}
 			continue; //we already found an alternative
@@ -1598,7 +1594,7 @@ void InitializeIEScript()
 		for (size_t j = 0; j < max; j++) {
 			int i = overrideActionsTable->GetValueIndex(j);
 			if (i >= MAX_ACTIONS) {
-				Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
+				Log(ERROR, "GameScript", "action {} ({}) is too high, ignoring",
 					i, overrideActionsTable->GetStringIndex( j ) );
 				continue;
 			}
@@ -1617,7 +1613,7 @@ void InitializeIEScript()
 				} else {
 					printFunction(buffer, overrideActionsTable, overrideActionsTable->FindValue(overrideActionsTable->GetValueIndex(j)));
 				}
-				Log(MESSAGE, "GameScript", buffer);
+				Log(MESSAGE, "GameScript", "{}", buffer);
 			}
 			actions[i] = poi->Function;
 			actionflags[i] = poi->Flags;
@@ -1636,7 +1632,7 @@ void InitializeIEScript()
 			i &= 0x3fff;
 			const char *trName = overrideTriggersTable->GetStringIndex(j);
 			if (i >= MAX_TRIGGERS) {
-				Log(ERROR, "GameScript", "Trigger %d (%s) is too high, ignoring", i, trName);
+				Log(ERROR, "GameScript", "Trigger {} ({}) is too high, ignoring", i, trName);
 				continue;
 			}
 			if (!NextTriggerObjectID && !stricmp(trName, "NextTriggerObject(O:Object*)")) {
@@ -1660,7 +1656,7 @@ void InitializeIEScript()
 					if (x < 0 || size_t(x) >= j) x = overrideTriggersTable->FindValue(i|0x4000);
 					printFunction(buffer, overrideTriggersTable, x);
 				}
-				Log(MESSAGE, "GameScript", buffer);
+				Log(MESSAGE, "GameScript", "{}", buffer);
 			}
 			triggers[i] = poi->Function;
 			triggerflags[i] = tf;
@@ -1687,15 +1683,14 @@ void InitializeIEScript()
 		}
 		std::string buffer("Couldn't assign function to action: ");
 		printFunction(buffer, actionsTable, j);
-		Log(WARNING, "GameScript", buffer);
+		Log(WARNING, "GameScript", "{}", buffer);
 	}
 
 	size_t j = objectsTable->GetSize();
 	while (j--) {
 		int i = objectsTable->GetValueIndex(j);
 		if (i >= MAX_OBJECTS) {
-			Log(ERROR, "GameScript", "object %d (%s) is too high, ignoring",
-				i, objectsTable->GetStringIndex( j ) );
+			Log(ERROR, "GameScript", "object {} ({}) is too high, ignoring", i, objectsTable->GetStringIndex(j));
 			continue;
 		}
 		const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ));
@@ -1704,12 +1699,12 @@ void InitializeIEScript()
 				std::string buffer = fmt::format("{} is in collision with ",
 					objectsTable->GetStringIndex( j ) );
 				printFunction(buffer, objectsTable, objectsTable->FindValue(objectsTable->GetValueIndex(j)));
-				Log(WARNING, "GameScript", buffer);
+				Log(WARNING, "GameScript", "{}", buffer);
 			} else {
 				std::string buffer = fmt::format("{} is a synonym of ",
 					objectsTable->GetStringIndex( j ) );
 				printFunction(buffer, objectsTable, objectsTable->FindValue(objectsTable->GetValueIndex(j)));
-				Log(DEBUG, "GameScript", buffer);
+				Log(DEBUG, "GameScript", "{}", buffer);
 			}
 			continue;
 		}
@@ -1733,7 +1728,7 @@ void InitializeIEScript()
 		if (f) {
 			for (int i = 0; objectnames[i].Name; i++) {
 				if (f == objectnames[i].Function) {
-					Log(MESSAGE, "GameScript", "%s is a synonym of %s",
+					Log(MESSAGE, "GameScript", "{} is a synonym of {}",
 						objectsTable->GetStringIndex( j ), objectnames[i].Name );
 					break;
 				}
@@ -1742,7 +1737,7 @@ void InitializeIEScript()
 		}
 		std::string buffer("Couldn't assign function to object: ");
 		printFunction(buffer, objectsTable, static_cast<int>(j));
-		Log(WARNING, "GameScript", buffer);
+		Log(WARNING, "GameScript", "{}", buffer);
 	}
 
 	if (gamedata->Exists("dlginst", IE_IDS_CLASS_ID, true)) {
@@ -1768,12 +1763,12 @@ void InitializeIEScript()
 			int i = savedTriggersTable->GetValueIndex(j);
 			i &= 0x3fff;
 			if (i >= MAX_TRIGGERS) {
-				Log(ERROR, "GameScript", "saved trigger %d (%s) is too high, ignoring",
+				Log(ERROR, "GameScript", "saved trigger {} ({}) is too high, ignoring",
 					i, savedTriggersTable->GetStringIndex( j ) );
 				continue;
 			}
 			if (!triggers[i]) {
-				Log(WARNING, "GameScript", "saved trigger %d (%s) doesn't exist, ignoring",
+				Log(WARNING, "GameScript", "saved trigger {} ({}) doesn't exist, ignoring",
 					i, savedTriggersTable->GetStringIndex( j ) );
 				continue;
 			}
@@ -1907,7 +1902,7 @@ static Object* DecodeObject(const char* line)
 	// HACK for iwd2 AddExperiencePartyCR
 	if (!stricmp(oB->objectName, "0.0.0.0 ")) {
 		strlcpy(oB->objectName, "", sizeof(oB->objectName));
-		Log(DEBUG, "asda", "overriding: +%s+", oB->objectName);
+		Log(DEBUG, "GameScript", "overriding: +{}+", oB->objectName);
 	}
 	if (*line == '"')
 		line++; //Skip " (the same as above)
@@ -1919,7 +1914,7 @@ static Object* DecodeObject(const char* line)
 		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
 	}
 	if (*line != 'O' || *(line + 1) != 'B') {
-		Log(WARNING, "GameScript", "Got confused parsing object line: %s", origline);
+		Log(WARNING, "GameScript", "Got confused parsing object line: {}", origline);
 	}
 	//let the object realize it has no future (in case of null objects)
 	if (oB->isNull()) {
@@ -2131,7 +2126,7 @@ void GameScript::EvaluateAllBlocks()
 		} else {
 			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
 			if (core->InDebugMode(ID_CUTSCENE) && action->objects[1]) {
-				Log(DEBUG, "GameScript", action->objects[1]->dump());
+				Log(DEBUG, "GameScript", "{}", action->objects[1]->dump());
 			}
 		}
 	}
@@ -2306,7 +2301,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 int Trigger::Evaluate(Scriptable *Sender) const
 {
 	if (triggerID >= MAX_TRIGGERS) {
-		Log(ERROR, "GameScript", "Corrupted (too high) trigger code: %d", triggerID);
+		Log(ERROR, "GameScript", "Corrupted (too high) trigger code: {}", triggerID);
 		return 0;
 	}
 	TriggerFunction func = triggers[triggerID];
@@ -2316,7 +2311,7 @@ int Trigger::Evaluate(Scriptable *Sender) const
 	}
 	if (!func) {
 		triggers[triggerID] = GameScript::False;
-		Log(WARNING, "GameScript", "Unhandled trigger code: 0x%04x %s",
+		Log(WARNING, "GameScript", "Unhandled trigger code: {:#x} {}",
 			triggerID, tmpstr );
 		return 0;
 	}
@@ -2441,7 +2436,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			HandleActionOverride(scr, aC);
 		} else {
 			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
-			Log(DEBUG, "GameScript", aC->objects[0]->dump() + " " + aC->dump());
+			Log(DEBUG, "GameScript", "{}", aC->objects[0]->dump() + " " + aC->dump());
 		}
 		aC->Release();
 		return;
@@ -2450,7 +2445,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		std::string buffer;
 		PrintAction(buffer, actionID);
 		AppendFormat(buffer, "Sender: {}\n", Sender->GetScriptName());
-		Log(WARNING, "GameScript", buffer);
+		Log(WARNING, "GameScript", "{}", buffer);
 	}
 	ActionFunction func = actions[actionID];
 	if (func) {
@@ -2459,7 +2454,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		if (Sender->Type==ST_ACTOR) {
 			Sender->Activate();
 			if (actionflags[actionID] & AF_ALIVE && Sender->GetInternalFlag() & IF_STOPATTACK) {
-				Log(WARNING, "GameScript", "Aborted action due to death!");
+				Log(WARNING, "GameScript", "{}", "Aborted action due to death!");
 				Sender->ReleaseCurrentAction();
 				return;
 			}
@@ -2469,7 +2464,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		actions[actionID] = NoAction;
 		std::string buffer("Unknown ");
 		PrintAction(buffer, actionID);
-		Log(WARNING, "GameScript", buffer);
+		Log(WARNING, "GameScript", "{}", buffer);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2480,7 +2475,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		if (aC->GetRef()!=1) {
 			std::string buffer("Immediate action got queued!\n");
 			PrintAction(buffer, actionID);
-			Log(ERROR, "GameScript", buffer);
+			Log(ERROR, "GameScript", "{}", buffer);
 			error("GameScript", "aborting...");
 		}
 		return;
@@ -2507,14 +2502,14 @@ Trigger* GenerateTrigger(char* String)
 	int len = strlench(String,'(')+1; //including (
 	int i = triggersTable->FindString(String, len);
 	if (i<0) {
-		Log(ERROR, "GameScript", "Invalid scripting trigger: %s", String);
+		Log(ERROR, "GameScript", "Invalid scripting trigger: {}", String);
 		return NULL;
 	}
 	const char *src = String + len;
 	const char *str = triggersTable->GetStringIndex(i) + len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
-		Log(ERROR, "GameScript", "Malformed scripting trigger: %s", String);
+		Log(ERROR, "GameScript", "Malformed scripting trigger: {}", String);
 		return NULL;
 	}
 	return trigger;
@@ -2543,7 +2538,7 @@ Action* GenerateAction(const char* String)
 	if (i<0) {
 		i = actionsTable->FindString(actionString, len);
 		if (i < 0) {
-			Log(ERROR, "GameScript", "Invalid scripting action: %s", String);
+			Log(ERROR, "GameScript", "Invalid scripting action: {}", String);
 			goto done;
 		}
 		str = actionsTable->GetStringIndex( i )+len;
@@ -2551,7 +2546,7 @@ Action* GenerateAction(const char* String)
 	}
 	action = GenerateActionCore( src, str, actionID);
 	if (!action) {
-		Log(ERROR, "GameScript", "Malformed scripting action: %s", String);
+		Log(ERROR, "GameScript", "Malformed scripting action: {}", String);
 	}
 	done:
 	free(actionString);

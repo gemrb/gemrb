@@ -251,7 +251,7 @@ void VEFObject::LoadVEF(DataStream *stream)
 
 	stream->Read(Signature, 8);
 	if (memcmp( Signature, "VEF V1.0", 8 ) != 0) {
-		Log(ERROR, "VEFObject", "Not a valid VEF File: %s", ResName.CString());
+		Log(ERROR, "VEFObject", "Not a valid VEF File: {}", ResName);
 		delete stream;
 		return;
 	}

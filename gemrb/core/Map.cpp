@@ -493,7 +493,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 		}
 	}
 	if (!map) {
-		Log(ERROR, "Map", "Invalid map: %s", area.CString());
+		Log(ERROR, "Map", "Invalid map: {}", area);
 		command[0]=0;
 		return;
 	}
@@ -501,7 +501,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 	if (entrance[0]) {
 		ent = map->GetEntrance( entrance );
 		if (!ent) {
-			Log(ERROR, "Map", "Invalid entrance '%s' for area %s", entrance, area.CString());
+			Log(ERROR, "Map", "Invalid entrance '{}' for area {}", entrance, area);
 		}
 	}
 	int X,Y, face;
@@ -529,7 +529,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 			Y = map->TMap->YCellCount * 32;
 		} else {
 			// crashes in original engine
-			Log(WARNING, "Map", "WARNING!!! EntryPoint '%s' does not exist and direction %d is invalid",
+			Log(WARNING, "Map", "WARNING!!! EntryPoint '{}' does not exist and direction {} is invalid",
 				entrance, direction);
 			X = map->TMap->XCellCount * 64;
 			Y = map->TMap->YCellCount * 64;
@@ -1928,7 +1928,7 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		while (step) {
 			block.x = (step->x+64) - vp.x;
 			block.y = (step->y+6) - vp.y;
-			Log(DEBUG, "Map", "Waypoint %d at (%d, %d)", i, step->x, step->y);
+			Log(DEBUG, "Map", "Waypoint {} at ({}, {})", i, step->x, step->y);
 			vid->DrawRect(block, waypoint);
 			step = step->Next;
 			i++;
@@ -2067,7 +2067,7 @@ void Map::MarkVisited(const Actor *actor) const
 		char key[32];
 		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName.CString());
 		if (len > sizeof(key)) {
-			Log(ERROR, "Map", "Area %s has a too long script name for generating _visited globals!", scriptName.CString());
+			Log(ERROR, "Map", "Area {} has a too long script name for generating _visited globals!", scriptName);
 		}
 		core->GetGame()->locals->SetAt(key, 1);
 	}
@@ -2431,7 +2431,7 @@ Actor *Map::GetItemByDialog(const ResRef &resref) const
 	const Game *game = core->GetGame();
 	// choose the owner of the dialog via passed dialog ref
 	if (resref != ResRef("dmhead")) {
-		Log(WARNING, "Map", "Encountered new candidate item for GetItemByDialog? %s", resref.CString());
+		Log(WARNING, "Map", "Encountered new candidate item for GetItemByDialog? {}", resref);
 		return NULL;
 	}
 	ResRef itemref = "mertwyn";
@@ -3118,8 +3118,7 @@ bool Map::IsExplored(const Point &pos) const
 WMPDirection Map::WhichEdge(const Point &s) const
 {
 	if (!(GetBlocked(s) & PathMapFlags::TRAVEL)) {
-		Log(DEBUG, "Map", "This isn't a travel region [%d.%d]?",
-			s.x, s.y);
+		Log(DEBUG, "Map", "Not a travel region [{}.{}]?", s.x, s.y);
 		return WMPDirection::NONE;
 	}
 	// FIXME: is this backwards?
@@ -3549,7 +3548,7 @@ static void MergePiles(Container *donorPile, Container *pile)
 			int slot = pile->inventory.FindItem(item->ItemResRef, 0, --count);
 			if (slot == -1) {
 				// probably an inventory bug, shouldn't happen
-				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef.CString());
+				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: {}", item->ItemResRef);
 				skipped--;
 				continue;
 			}
@@ -3865,7 +3864,7 @@ void AreaAnimation::InitAnimation()
 	const AnimationFactory* af = static_cast<const AnimationFactory*>(
 		gamedata->GetFactoryResource(BAM, IE_BAM_CLASS_ID));
 	if (!af) {
-		Log(ERROR, "Map", "Cannot load animation: %s", BAM.CString());
+		Log(ERROR, "Map", "Cannot load animation: {}", BAM);
 		return;
 	}
 	

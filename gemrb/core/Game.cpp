@@ -1166,7 +1166,7 @@ int Game::GetXPFromCR(int cr) const
 	} else if (cr-1 < 0) {
 		cr = 1;
 	}
-	Log(MESSAGE, "Game", "Challenge Rating: %d, party level: %d", cr, level);
+	Log(MESSAGE, "Game", "Challenge Rating: {}, party level: {}", cr, level);
 	// it also has a column for cr 0.25 and 0.5, so let's treat cr as a 1-based index
 	// but testing shows something else affects it further, so we divide by 2 to match
 	// the net is full of claims of halved values, so perhaps just a quick final rebalancing tweak
@@ -1243,7 +1243,7 @@ bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 			return false;
 		}
 		if (Distance(p, pc) > MAX_TRAVELING_DISTANCE) {
-			Log(MESSAGE, "Game", "Actor %ls is not near!", pc->GetName().c_str());
+			Log(MESSAGE, "Game", "Actor {} is not near!", fmt::WideToChar{pc->GetName()});
 			return false;
 		}
 	}
@@ -2184,7 +2184,7 @@ std::string Game::dump() const
 	std::string buffer("Currently loaded areas:\n");
 
 	for (auto map : Maps) {
-		Log(DEBUG, "Game", "%s", map->GetScriptName());
+		Log(DEBUG, "Game", "{}", map->GetScriptName());
 	}
 	AppendFormat(buffer, "Current area: {}   Previous area: {}\n", CurrentArea, PreviousArea);
 	if (Scripts[0]) {

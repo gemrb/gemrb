@@ -69,7 +69,7 @@ int SDL20VideoDriver::Init()
 	int ret = SDLVideoDriver::Init();
 
 	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
-		Log(ERROR, "SDL2", "InitSubSystem failed: %s", SDL_GetError());
+		Log(ERROR, "SDL2", "InitSubSystem failed: {}", SDL_GetError());
 		return ret;
 	}
 
@@ -130,7 +130,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenSize.w, screenSize.h, winFlags);
 	if (window == NULL) {
-		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
+		Log(ERROR, "SDL 2 Driver", "couldnt create window: {}", SDL_GetError());
 		return GEM_ERROR;
 	}
 
@@ -141,19 +141,19 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
 	SDL_RendererInfo info;
 	SDL_GetRendererInfo(renderer, &info);
-	Log(DEBUG, "SDL20Video", "Renderer: %s", info.name);
+	Log(DEBUG, "SDL20Video", "Renderer: {}", info.name);
 
 	if (renderer == NULL) {
-		Log(ERROR, "SDL 2 Driver", "couldnt create renderer:%s", SDL_GetError());
+		Log(ERROR, "SDL 2 Driver", "couldnt create renderer: {}", SDL_GetError());
 		return GEM_ERROR;
 	}
 
 #if USE_OPENGL_BACKEND
-	Log(MESSAGE, "SDL 2 GL Driver", "OpenGL version: %s, renderer: %s, vendor: %s", glGetString(GL_VERSION), glGetString(GL_RENDERER), glGetString(GL_VENDOR));
-	Log(MESSAGE, "SDL 2 GL Driver", "  GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+Log(MESSAGE, "SDL 2 GL Driver", "OpenGL version: {}, renderer: {}, vendor: {}", (char*) glGetString(GL_VERSION), (char*) glGetString(GL_RENDERER), (char*) glGetString(GL_VENDOR));
+Log(MESSAGE, "SDL 2 GL Driver", "  GLSL version: {}", (char*) glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	if (strcmp(info.name, driverName) != 0) {
-		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of %s", info.name);
+		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of {}", info.name);
 		return GEM_ERROR;
 	}
 
@@ -166,7 +166,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	if (!stencilShader)
 	{
 		std::string msg = GLSLProgram::GetLastError();
-		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: {}", msg);
 		return GEM_ERROR;
 	}
 
@@ -174,7 +174,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	if (!spriteShader)
 	{
 		std::string msg = GLSLProgram::GetLastError();
-		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: {}", msg);
 		return GEM_ERROR;
 	}
 #endif
@@ -198,7 +198,7 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	
 	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
 	if (tex == nullptr) {
-		Log(ERROR, "SDL 2", "%s", SDL_GetError());
+		Log(ERROR, "SDL 2", "{}", SDL_GetError());
 		return nullptr;
 	}
 	return new SDLTextureVideoBuffer(r.origin, tex, fmt, renderer);
@@ -272,7 +272,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 	assert(target);
 	int ret = SDL_SetRenderTarget(renderer, target);
 	if (ret != 0) {
-		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+		Log(ERROR, "SDLVideo", "{}", SDL_GetError());
 		return ret;
 	}
 
@@ -389,7 +389,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 	}
 
 	if (ret != 0) {
-		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+		Log(ERROR, "SDLVideo", "{}", SDL_GetError());
 	}
 }
 

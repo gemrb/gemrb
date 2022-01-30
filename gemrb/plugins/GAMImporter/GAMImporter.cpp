@@ -77,7 +77,7 @@ bool GAMImporter::Import(DataStream* str)
 			version=GAM_VER_BG;
 		}
 	} else {
-		Log(ERROR, "GAMImporter", "This file is not a valid GAM File! Actual signature: %s", Signature);
+		Log(ERROR, "GAMImporter", "This file is not a valid GAM File! Actual signature: {}", Signature);
 		return false;
 	}
 
@@ -307,7 +307,7 @@ static void SanityCheck(ieWord a,ieWord &b,const char *message)
 		return;
 	}
 	if (b==0xffff) {
-		Log(ERROR, "GAMImporter", "Invalid Slot Enabler caught: %s!", message);
+		Log(ERROR, "GAMImporter", "Invalid Slot Enabler caught: {}!", message);
 		b=0;
 	}
 }

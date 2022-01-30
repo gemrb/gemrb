@@ -59,7 +59,7 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 			compressed->Seek(complen, GEM_CURRENT_POS);
 			free(fname);
 		} else {
-			Log(MESSAGE, "SAVImporter", "Decompressing %s", fname);
+			Log(MESSAGE, "SAVImporter", "Decompressing {}", fname);
 			DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
 			free(fname);
 
@@ -79,7 +79,7 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 	while(Current);
 
 	tick_t endTime = GetTicks();
-	Log(WARNING, "Core", "%lu ms (extracting the SAV)", endTime - startTime);
+	Log(WARNING, "Core", "{} ms (extracting the SAV)", endTime - startTime);
 	return GEM_OK;
 }
 

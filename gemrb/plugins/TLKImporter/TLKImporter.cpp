@@ -113,7 +113,7 @@ bool TLKImporter::Open(DataStream* stream)
 	str->ReadDword(StrRefCount);
 	str->ReadDword(Offset);
 	if (StrRefCount >= ieDword(ieStrRef::OVERRIDE_START)) {
-		Log(ERROR, "TLKImporter", "Too many strings (%d), increase OVERRIDE_START.", StrRefCount);
+		Log(ERROR, "TLKImporter", "Too many strings ({}), increase OVERRIDE_START.", StrRefCount);
 		return false;
 	}
 	return true;

@@ -58,7 +58,7 @@ static LPALAUXILIARYEFFECTSLOTI alAuxiliaryEffectSloti = NULL;
 static bool checkALError(const char* msg, log_level level) {
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
-		Log(level, "OpenAL", "%s: 0x%x - %s", msg, error, alGetString(error));
+		Log(level, "OpenAL", "{}: {:#x} - {}", msg, error, alGetString(error));
 		return true;
 	}
 	return false;
@@ -67,9 +67,9 @@ static bool checkALError(const char* msg, log_level level) {
 static void showALCError(const char* msg, log_level level, ALCdevice *device) {
 	int error = alcGetError(device);
 	if (error != AL_NO_ERROR) {
-		Log(level, "OpenAL", "%s: 0x%x", msg, error);
+		Log(level, "OpenAL", "{}: {:#x}", msg, error);
 	} else {
-		Log(level, "OpenAL", "%s", msg);
+		Log(level, "OpenAL", "{}", msg);
 	}
 }
 
@@ -189,7 +189,7 @@ void OpenALAudioDriver::PrintDeviceList() const
 		deviceList = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
 
 		while(deviceList && *deviceList) {
-			Log(MESSAGE,"OpenAL", "Devices: %s", deviceList);
+			Log(MESSAGE,"OpenAL", "Devices: {}", deviceList);
 			deviceList+=strlen(deviceList)+1;
 		}
 		return;
@@ -199,8 +199,11 @@ void OpenALAudioDriver::PrintDeviceList() const
 
 bool OpenALAudioDriver::Init(void)
 {
-	Log(MESSAGE, "OpenAL", "Initializing OpenAL driver:\nAL Version:%s\nAL Renderer:%s\nAL Vendor:%s",
-		alGetString(AL_VERSION), alGetString(AL_RENDERER), alGetString(AL_VENDOR));
+	const char* version = alGetString(AL_VERSION);
+	const char* renderer = alGetString(AL_RENDERER);
+	const char* vendor = alGetString(AL_VENDOR);
+	Log(MESSAGE, "OpenAL", "Initializing OpenAL driver:\nAL Version: {}\nAL Renderer: {}\nAL Vendor: {}",
+		version ? version : "", renderer ? renderer : "", vendor ? vendor : "");
 
 	ALCdevice *device;
 	ALCcontext *context;
@@ -231,7 +234,7 @@ bool OpenALAudioDriver::Init(void)
 	int sources = CountAvailableSources(MAX_STREAMS+1);
 	num_streams = sources - 1;
 
-	Log(MESSAGE, "OpenAL", "Allocated %d streams.%s",
+	Log(MESSAGE, "OpenAL", "Allocated {} streams.{}",
 		num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ));
 
 	musicThread = std::thread(&OpenALAudioDriver::MusicManager, this);
@@ -733,7 +736,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 		}
 	}
 	if (stream == -1) {
-		Log(ERROR, "OpenAL", "No available audio streams out of %d", num_streams);
+		Log(ERROR, "OpenAL", "No available audio streams out of {}", num_streams);
 		return -1;
 	}
 
@@ -893,7 +896,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 			}
 			switch (state) {
 				default:
-					Log(ERROR, "OpenAL", "Unhandled Music state '%d'.", state);
+					Log(ERROR, "OpenAL", "Unhandled Music state '{}'.", state);
 				// intentional fallthrough
 				case AL_PAUSED:
 					driver->MusicPlaying = false;
@@ -1023,7 +1026,7 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer) const
 	alGetBufferi(buffer, AL_BITS, &bits);
 	alGetBufferi(buffer, AL_CHANNELS, &channels);
 	checkALError("Error querying buffer properties.", WARNING);
-	Log(DEBUG, "OpenAL", "Attempting to buffer audio source:%d\nFrequency:%d\nBits:%d\nChannels:%d",
+	Log(DEBUG, "OpenAL", "Attempting to buffer audio source: {}\nFrequency: {}\nBits: {}\nChannels: {}",
 		source, frequency, bits, channels);
 #endif
 	ALint type;

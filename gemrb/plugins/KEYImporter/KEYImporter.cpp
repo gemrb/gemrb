@@ -92,7 +92,7 @@ static void FindBIF(BIFEntry *entry)
 		}
 	}
 
-	Log(ERROR, "KEYImporter", "Cannot find %s...", entry->name.c_str());
+	Log(ERROR, "KEYImporter", "Cannot find {}...", entry->name);
 }
 
 bool KEYImporter::Open(const char *resfile, const char *desc)
@@ -104,7 +104,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	}
 
 	// NOTE: Interface::Init has already resolved resfile.
-	Log(MESSAGE, "KEYImporter", "Opening %s...", resfile);
+	Log(MESSAGE, "KEYImporter", "Opening {}...", resfile);
 	FileStream* f = FileStream::OpenFile(resfile);
 	if (!f) {
 		// Check for backslashes (false escape characters)
@@ -131,9 +131,9 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	f->ReadDword(ResCount);
 	f->ReadDword(BifOffset);
 	f->ReadDword(ResOffset);
-	Log(MESSAGE, "KEYImporter", "BIF Files Count: %d (Starting at %d Bytes)",
+	Log(MESSAGE, "KEYImporter", "BIF Files Count: {} (Starting at {} Bytes)",
 			BifCount, BifOffset );
-	Log(MESSAGE, "KEYImporter", "RES Count: %d (Starting at %d Bytes)",
+	Log(MESSAGE, "KEYImporter", "RES Count: {} (Starting at {} Bytes)",
 		ResCount, ResOffset);
 	f->Seek( BifOffset, GEM_STREAM_START );
 
@@ -203,14 +203,14 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 	unsigned int bifnum = ( *ResLocator & 0xFFF00000 ) >> 20;
 
 	if (!biffiles[bifnum].found) {
-		Log(ERROR, "KEYImporter", "Cannot find %s... Resource unavailable.",
+		Log(ERROR, "KEYImporter", "Cannot find {}... Resource unavailable.",
 				biffiles[bifnum].name.c_str());
 		return NULL;
 	}
 
 	PluginHolder<IndexedArchive> ai = MakePluginHolder<IndexedArchive>(IE_BIF_CLASS_ID);
 	if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
-		Log(ERROR, "KEYImporter", "Cannot open archive %s", biffiles[bifnum].path);
+		Log(ERROR, "KEYImporter", "Cannot open archive {}", biffiles[bifnum].path);
 		return NULL;
 	}
 

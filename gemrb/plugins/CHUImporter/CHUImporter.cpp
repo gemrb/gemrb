@@ -238,7 +238,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					if (af) {
 						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
 					} else {
-						Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: %s", BAMFile.CString());
+						Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: {}", BAMFile);
 					}
 				}
 				else {
@@ -441,7 +441,7 @@ endalign:
 				const AnimationFactory* bam = (const AnimationFactory *)
 				gamedata->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
 				if (!bam) {
-					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef.CString());
+					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: {}", BAMResRef);
 					break;
 				}
 				Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
@@ -498,11 +498,11 @@ bool CHUImporter::LoadWindowPack(const ScriptingGroup_t& ref)
 
 	DataStream* stream = gamedata->GetResource( ref, IE_CHU_CLASS_ID );
 	if (stream == NULL) {
-		Log(ERROR, "CHUImporter", "Error: Cannot find %s.chu", ref.CString() );
+		Log(ERROR, "CHUImporter", "Error: Cannot find {}.chu!", ref);
 		return false;
 	}
 	if (!Open(stream)) {
-		Log(ERROR, "CHUImporter", "Error: Cannot Load %s.chu", ref.CString() );
+		Log(ERROR, "CHUImporter", "Error: Cannot load {}.chu!", ref);
 		return false;
 	}
 

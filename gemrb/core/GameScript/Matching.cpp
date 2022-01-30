@@ -50,7 +50,7 @@ static inline bool DoObjectIDSCheck(const Object *oC, const Actor *ac, bool *fil
 		*filtered = true;
 		IDSFunction func = idtargets[j];
 		if (!func) {
-			Log(WARNING, "GameScript", "Unimplemented IDS targeting opcode: %d", j);
+			Log(WARNING, "GameScript", "Unimplemented IDS targeting opcode: {}", j);
 			continue;
 		}
 		if (!func( ac, oC->objectFields[j] ) ) {
@@ -80,7 +80,7 @@ static inline Targets *DoObjectFiltering(const Scriptable *Sender, Targets *tgts
 
 		ObjectFunction func = objects[filterid];
 		if (!func) {
-			Log(WARNING, "GameScript", "Unknown object filter: %d %s",
+			Log(WARNING, "GameScript", "Unknown object filter: {} {}",
 				filterid, objectsTable->GetValue(filterid));
 			continue;
 		}

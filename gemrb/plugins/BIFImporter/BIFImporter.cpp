@@ -45,7 +45,7 @@ BIFImporter::~BIFImporter(void)
 
 DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path)
 {
-	Log(MESSAGE, "BIFImporter", "Decompressing %s ...", compressed->filename);
+	Log(MESSAGE, "BIFImporter", "Decompressing {} ...", compressed->filename);
 	if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
 		return NULL;
 	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
@@ -56,7 +56,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 #endif
 	FileStream out;
 	if (!out.Create(path)) {
-		Log(ERROR, "BIFImporter", "Cannot write %s.", path);
+		Log(ERROR, "BIFImporter", "Cannot write {}.", path);
 		return NULL;
 	}
 	size_t finalsize = 0;
@@ -88,7 +88,7 @@ DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*pat
 	compressed->Seek(fnlen, GEM_CURRENT_POS);
 	compressed->ReadDword(declen);
 	compressed->ReadDword(complen);
-	Log(MESSAGE, "BIFImporter", "Decompressing %s ...", compressed->filename);
+	Log(MESSAGE, "BIFImporter", "Decompressing {} ...", compressed->filename);
 	return CacheCompressedStream(compressed, compressed->filename, complen);
 }
 

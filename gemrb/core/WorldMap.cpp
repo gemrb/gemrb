@@ -76,7 +76,7 @@ Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam)
 		}
 		MapIcon = bam->GetFrame((ieWord) frame, (ieByte) IconSeq);
 		if (!MapIcon) {
-			Log(ERROR, "WMPAreaEntry", "GetMapIcon failed for frame %d, seq %d", frame, IconSeq);
+			Log(ERROR, "WMPAreaEntry", "GetMapIcon failed for frame {}, seq {}", frame, IconSeq);
 			return NULL;
 		}
 	}
@@ -245,13 +245,13 @@ int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 	}
 
 	if (direction<0 || direction>3) {
-		Log(ERROR, "WorldMap", "CalculateDistances for invalid direction: %s", areaName.CString());
+		Log(ERROR, "WorldMap", "CalculateDistances for invalid direction: {}", areaName);
 		return -1;
 	}
 
 	unsigned int i;
 	if (!GetArea(areaName, i)) {
-		Log(ERROR, "WorldMap", "CalculateDistances for invalid Area: %s", areaName.CString());
+		Log(ERROR, "WorldMap", "CalculateDistances for invalid Area: {}", areaName);
 		return -1;
 	}
 	if (Distances) {
@@ -261,7 +261,7 @@ int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 		free(GotHereFrom);
 	}
 
-	Log(MESSAGE, "WorldMap", "CalculateDistances for Area: %s", areaName.CString());
+	Log(MESSAGE, "WorldMap", "CalculateDistances for Area: {}", areaName);
 
 	size_t memsize =sizeof(int) * area_entries.size();
 	Distances = (int *) malloc( memsize );
@@ -285,7 +285,7 @@ int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 			int j=ae->AreaLinksIndex[d];
 			int k=j+ae->AreaLinksCount[d];
 			if ((size_t) k>area_links.size()) {
-				Log(ERROR, "WorldMap", "The worldmap file is corrupted... and it would crash right now! Entry #: %d Direction: %d",
+				Log(ERROR, "WorldMap", "The worldmap file is corrupted... and it would crash right now! Entry #: {} Direction: {}",
 					i, d);
 				break;
 			}
@@ -374,13 +374,13 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 	unsigned int i;
 	const WMPAreaEntry *ae = GetArea(areaName, i); //target area
 	if (!ae) {
-		Log(ERROR, "WorldMap", "No such area: %s", areaName.CString());
+		Log(ERROR, "WorldMap", "No such area: {}", areaName);
 		return NULL;
 	}
 	std::list<WMPAreaLink*> walkpath;
-	Log(DEBUG, "WorldMap", "Gathering path information for: %s", areaName.CString());
+	Log(DEBUG, "WorldMap", "Gathering path information for: {}", areaName);
 	while (GotHereFrom[i]!=-1) {
-		Log(DEBUG, "WorldMap", "Adding path to %d", i);
+		Log(DEBUG, "WorldMap", "Adding path to {}", i);
 		walkpath.push_back(area_links[GotHereFrom[i]]);
 		i = WhoseLinkAmI(GotHereFrom[i]);
 		if (i==(ieDword) -1) {
@@ -388,7 +388,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 		}
 	}
 
-	Log(DEBUG, "WorldMap", "Walkpath size is: %d", (int) walkpath.size());
+	Log(DEBUG, "WorldMap", "Walkpath size is: {}", walkpath.size());
 	if (walkpath.empty()) {
 		return NULL;
 	}
@@ -451,7 +451,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 
 	link = GetLink(dest->AreaName, src->AreaName);
 	if (!link) {
-		Log(ERROR, "WorldMap", "Could not find link from %s to %s",
+		Log(ERROR, "WorldMap", "Could not find link from {} to {}",
 			dest->AreaName.CString(), src->AreaName.CString());
 		delete ae;
 		delete ldest;
@@ -519,7 +519,7 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 	if (!ae)
 		return;
 	//we are here, so we visited and it is visible too (i guess)
-	Log(DEBUG, "WorldMap", "Updated Area visibility: %s (visited, accessible and visible)", areaName.CString());
+	Log(DEBUG, "WorldMap", "Updated Area visibility: {} (visited, accessible and visible)", areaName);
 
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 	if (direction<0 || direction>3)
@@ -529,7 +529,7 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 		const WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction] + i];
 		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 		if (ae2->GetAreaStatus()&WMP_ENTRY_ADJACENT) {
-			Log(DEBUG, "WorldMap", "Updated Area visibility: %s (accessible and visible)", ae2->AreaName.CString());
+			Log(DEBUG, "WorldMap", "Updated Area visibility: {} (accessible and visible)", ae2->AreaName);
 			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 		}
 	}
