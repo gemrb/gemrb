@@ -29,7 +29,7 @@
 
 namespace GemRB {
 
-DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int length, bool overwrite)
+DataStream* CacheCompressedStream(DataStream *stream, const std::string& filename, int length, bool overwrite)
 {
 	if (!core->IsAvailable(PLUGIN_COMPRESSION_ZLIB)) {
 		Log(ERROR, "FileCache", "No Compression Manager Available. Cannot Load Compressed File.");
@@ -37,7 +37,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	}
 
 	char fname[_MAX_PATH];
-	ExtractFileFromPath(fname, filename);
+	ExtractFileFromPath(fname, filename.c_str());
 	char path[_MAX_PATH];
 	PathJoin(path, core->config.CachePath, fname, nullptr);
 

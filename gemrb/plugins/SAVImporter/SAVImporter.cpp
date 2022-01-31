@@ -45,22 +45,20 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 			Log(ERROR, "SAVImporter", "Corrupt Save Detected");
 			return GEM_ERROR;
 		}
-		char* fname = ( char* ) malloc( fnlen );
-		compressed->Read( fname, fnlen );
-		strlwr(fname);
+		std::string fname(fnlen, '\0');
+		compressed->Read(&fname[0], fnlen);
+		StringToLower(fname);
 		auto position = compressed->GetPos();
 		compressed->ReadDword(declen);
 		compressed->ReadDword(complen);
 
-		auto areExt = strstr(fname, ".are");
-		if (areExt != nullptr && fname + fnlen - 5 == areExt) {
-			areExtractor.registerLocation(fname, position);
+		strpos_t pos = fname.find(".are");
+		if (pos != std::string::npos && pos == fname.length() - 4) {
+			areExtractor.registerLocation(fname.c_str(), position);
 			compressed->Seek(complen, GEM_CURRENT_POS);
-			free(fname);
 		} else {
-			Log(MESSAGE, "SAVImporter", "Decompressing %s", fname);
+			Log(MESSAGE, "SAVImporter", "Decompressing %s", fname.c_str());
 			DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
-			free(fname);
 
 			if (!cached)
 				return GEM_ERROR;

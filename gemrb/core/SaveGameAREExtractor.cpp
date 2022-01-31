@@ -133,7 +133,7 @@ int32_t SaveGameAREExtractor::extractByEntry(const std::string& key, RegistryT::
 	saveGameStream->ReadDword(declen);
 	saveGameStream->ReadDword(complen);
 
-	DataStream* cached = CacheCompressedStream(saveGameStream, key.c_str(), complen, true);
+	DataStream* cached = CacheCompressedStream(saveGameStream, key, complen, true);
 
 	int32_t returnValue = GEM_OK;
 	if (cached != nullptr) {
