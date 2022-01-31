@@ -95,37 +95,33 @@ def ScrollBarPress():
 	for i in range (4):
 		ActPos = Pos + i
 
-		Button1 = Window.GetControl (14 + i)
-		Button2 = Window.GetControl (18 + i)
-		if ActPos <= len(Games):
-			Button1.SetState (IE_GUI_BUTTON_ENABLED)
-		else:
-			Button1.SetState (IE_GUI_BUTTON_DISABLED)
-
+		Button1 = Window.GetControl (14 + i) # save
+		Button2 = Window.GetControl (18 + i) # delete
+		PreviewButton = Window.GetControl (1 + i)
 		if ActPos < len(Games):
 			Slotname = Games[ActPos].GetName ()
 			Slottime = Games[ActPos].GetDate ()
+			Button1.SetState (IE_GUI_BUTTON_ENABLED)
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
+			PreviewButton.SetSprite2D(Games[ActPos].GetPreview())
 		elif ActPos == len(Games):
 			Slotname = 28647 # "Empty"
 			Slottime = ""
+			Button1.SetState (IE_GUI_BUTTON_ENABLED)
 			Button2.SetState (IE_GUI_BUTTON_DISABLED)
+			PreviewButton.SetPicture (None)
 		else:
 			Slotname = ""
 			Slottime = ""
+			Button1.SetState (IE_GUI_BUTTON_DISABLED)
 			Button2.SetState (IE_GUI_BUTTON_DISABLED)
+			PreviewButton.SetPicture (None)
 
 		Label = Window.GetControl (0x10000004+i)
 		Label.SetText (Slotname)
 
 		Label = Window.GetControl (0x10000008 + i)
 		Label.SetText (Slottime)
-
-		Button = Window.GetControl (1 + i)
-		if ActPos < len(Games):
-			Button.SetSprite2D(Games[ActPos].GetPreview())
-		else:
-			Button.SetPicture (None)
 
 		for j in range (6):
 			Button = Window.GetControl (22 + i*6 + j)
