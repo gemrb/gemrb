@@ -218,11 +218,6 @@ ItemDragOp::ItemDragOp(CREItem* item)
 
 Interface::Interface()
 {
-	for (unsigned int i = 0; i < 256; i++) {
-		pl_uppercase[i]=(ieByte) toupper(i);
-		pl_lowercase[i]=(ieByte) tolower(i);
-	}
-
 	displaymsg = nullptr;
 
 #ifdef WIN32
@@ -1943,24 +1938,6 @@ bool Interface::LoadEncoding()
 		if (TLKEncoding.encoding == multibyteEncodings[i]) {
 			TLKEncoding.multibyte = true;
 			break;
-		}
-	}
-
-	const char *s;
-	unsigned int cc = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
-	if (cc>99) cc=99;
-	while(cc--) {
-		char key[10];
-		snprintf(key,9,"Letter%d", cc+1);
-		s = ini->GetKeyAsString( "charset", key, NULL );
-		if (s) {
-			const char *s2 = strchr(s,',');
-			if (s2) {
-				unsigned char upper = atoi(s);
-				unsigned char lower = atoi(s2+1);
-				pl_uppercase[lower] = upper;
-				pl_lowercase[upper] = lower;
-			}
 		}
 	}
 

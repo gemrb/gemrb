@@ -164,14 +164,11 @@ std::string MBStringFromString(const String& string)
 	return ret;
 }
 
-unsigned char pl_uppercase[256];
-unsigned char pl_lowercase[256];
-
 // these 3 functions will copy a string to a zero terminated string with a maximum length
 void strnlwrcpy(char *dest, const char *source, int count, bool pad)
 {
 	while(count--) {
-		*dest++ = pl_lowercase[(unsigned char) *source];
+		*dest++ = std::towlower(*source);
 		if(!*source++) {
 			if (!pad)
 				return;
@@ -185,7 +182,7 @@ void strnlwrcpy(char *dest, const char *source, int count, bool pad)
 void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
-		*dest++ = pl_uppercase[(unsigned char) *source];
+		*dest++ = std::towupper(*source);
 		if(!*source++) {
 			while(count--) *dest++=0;
 			break;
@@ -201,9 +198,9 @@ void strnspccpy(char* dest, const char *source, int count, bool upper)
 	while(count--) {
 		char c;
 		if (upper)
-			c = pl_uppercase[(unsigned char) *source];
+			c = std::towupper(*source);
 		else
-			c = pl_lowercase[(unsigned char) *source];
+			c = std::towlower(*source);
 		if (c!=' ') {
 			*dest++=c;
 		}

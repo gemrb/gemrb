@@ -393,7 +393,7 @@ Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 		// probably need to lookup what encoding we are currently using
 		character = key;
 		if (mod & GEM_MOD_SHIFT) {
-			character = toupper(character);
+			character = towupper(character);
 		}
 	}
 	e.keyboard.character = character;

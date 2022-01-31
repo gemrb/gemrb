@@ -109,7 +109,7 @@ bool ITMImporter::Import(DataStream* str)
 static void AddZZFeatures(Item *s)
 {
 	// the targeting code (3rd char) is: digit = align(ment), letter = race
-	char targetIDS = toupper(s->Name.CString()[2]);
+	char targetIDS = towupper(s->Name.CString()[2]);
 	ieByte IDSval = zzmap[targetIDS];
 	ieByte IDSfile = 4;
 	if (targetIDS <= '9') {
