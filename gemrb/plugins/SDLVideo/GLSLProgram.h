@@ -18,7 +18,7 @@ namespace GemRB
 
 		~GLSLProgram();
 		void Use() const;
-		void UnUse();
+		void UnUse() const;
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLfloat value1, GLfloat value2 = 0.0f, GLfloat value3 = 0.0f, GLfloat value4 = 0.0f);
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLint value1, GLint value2 = 0, GLint value3 = 0, GLint value4 = 0);
 		bool SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value);
@@ -31,7 +31,7 @@ namespace GemRB
 		GLuint program;
 		std::map<std::string, GLint> uniforms;
 		bool buildProgram(std::string vertexSource, const std::string& fragmentSource);
-		GLuint buildShader(GLenum type, std::string source);
+		GLuint buildShader(GLenum type, std::string source) const;
 		GLint getUniformLocation(std::string uniformName);
 		bool storeUniformLocation(std::string uniformName);
 	};

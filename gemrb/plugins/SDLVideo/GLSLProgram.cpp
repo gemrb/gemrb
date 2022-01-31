@@ -99,7 +99,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	return GLSLProgram::Create(vertexContent, fragmentContent);
 }
 
-GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source)
+GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source) const
 {
 #if USE_OPENGL_API
 	// for GLSL 1.X (GL 2.0)
@@ -326,7 +326,7 @@ void GLSLProgram::Use() const
 	glUseProgram(program);
 }
 
-void GLSLProgram::UnUse()
+void GLSLProgram::UnUse() const
 {
 	glUseProgram(0);
 }
