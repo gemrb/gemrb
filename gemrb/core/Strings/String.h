@@ -21,6 +21,7 @@
 
 #include "exports.h"
 
+#include <cwctype>
 #include <string>
 
 #define FMT_HEADER_ONLY
@@ -33,10 +34,6 @@
 namespace GemRB {
 
 using String = std::basic_string<wchar_t>;
-
-// char manipulators
-inline wchar_t tolower(wchar_t c) { return ::towlower(c); }
-inline wchar_t toupper(wchar_t c) { return ::towupper(c); }
 
 GEM_EXPORT void TrimString(String& string);
 

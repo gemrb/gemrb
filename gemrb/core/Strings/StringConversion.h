@@ -32,45 +32,24 @@ struct EncodingStruct
 	bool zerospace = false;
 };
 
-extern GEM_EXPORT unsigned char pl_uppercase[256];
-extern GEM_EXPORT unsigned char pl_lowercase[256];
-
 // String creators
 GEM_EXPORT char* ConvertCharEncoding(const char * string, const char * from, const char* to);
 GEM_EXPORT String* StringFromCString(const char* string);
 GEM_EXPORT String* StringFromUtf8(const char* string);
 GEM_EXPORT std::string MBStringFromString(const String& string);
 
-template <typename T>
-GEM_EXPORT_T T ToLower(T c) {
-	if (c < 256) {
-		return pl_lowercase[static_cast<unsigned char>(c)];
-	} else {
-		return tolower(c);
-	}
-}
-
-template <typename T>
-GEM_EXPORT_T T ToUpper(T c) {
-	if (c < 256) {
-		return pl_uppercase[static_cast<unsigned char>(c)];
-	} else {
-		return towupper(c);
-	}
-}
-
 // String manipulators
 template <typename T>
 GEM_EXPORT_T void StringToLower(T& string) {
 	for (size_t i = 0; i < string.length(); i++) {
-		string[i] = ToLower(string[i]);
+		string[i] = std::towlower(string[i]);
 	}
 }
 
 template <typename T>
 GEM_EXPORT_T void StringToUpper(T& string) {
 	for (size_t i = 0; i < string.length(); i++) {
-		string[i] = ToUpper(string[i]);
+		string[i] = std::towupper(string[i]);
 	}
 }
 

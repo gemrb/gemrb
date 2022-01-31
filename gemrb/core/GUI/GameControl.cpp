@@ -673,7 +673,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				// eg. ctrl-j should be ignored for keymap.ini handling and
 				// passed straight on
 				if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
-					game->SendHotKey(toupper(Key.character));
+					game->SendHotKey(towupper(Key.character));
 					return View::OnKeyPress(Key, mod);
 				}
 				break;
@@ -742,7 +742,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 					break;
 				default:
 					if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
-						game->SendHotKey(toupper(Key.character));
+						game->SendHotKey(towupper(Key.character));
 						return View::OnKeyPress(Key, 0);
 					}
 					break;
