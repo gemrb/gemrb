@@ -31,10 +31,12 @@ class PNGImporter : public ImageMgr {
 private:
 	PNGInternal* inf;
 
-	bool hasPalette;
+	bool hasPalette = false;
 public:
 	PNGImporter(void);
-	~PNGImporter(void) override;
+	PNGImporter(const PNGImporter&) = delete;
+	~PNGImporter() override;
+	PNGImporter& operator=(const PNGImporter&) = delete;
 	void Close();
 	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;

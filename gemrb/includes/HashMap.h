@@ -73,7 +73,9 @@ template<typename Key, typename Value, typename Hash = HashKey<Key> >
 class HashMap {
 public:
 	HashMap();
+	HashMap(const HashMap&) = delete;
 	~HashMap();
+	HashMap& operator=(const HashMap&) = delete;
 
 	void init(unsigned int tableSize, unsigned int blockSize);
 

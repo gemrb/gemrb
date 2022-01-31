@@ -32,19 +32,11 @@ const TypeID Video::ID = { "Video" };
 
 Video::Video(void)
 {
-	drawingBuffer = NULL;
-	EvntManager = NULL;
-
 	// Initialize gamma correction tables
 	for (int i = 0; i < 256; i++) {
 		Gamma22toGamma10[i] = (unsigned char)(0.5 + (pow (i/255.0, 2.2/1.0) * 255.0));
 		Gamma10toGamma22[i] = (unsigned char)(0.5 + (pow (i/255.0, 1.0/2.2) * 255.0));
 	}
-
-	// boring inits just to be extra clean
-	bpp = 0;
-	fullscreen = false;
-	lastTime = 0;
 }
 
 Video::~Video(void)

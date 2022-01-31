@@ -275,7 +275,9 @@ protected:
 
 public:
 	BIKPlayer(void);
-	~BIKPlayer(void) override;
+	BIKPlayer(const BIKPlayer&) = delete;
+	~BIKPlayer() override;
+	BIKPlayer& operator=(const BIKPlayer&) = delete;
 	bool Import(DataStream* stream) override;
 
 	void Stop();

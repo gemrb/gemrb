@@ -41,7 +41,9 @@ private:
 	char defVal[32];
 public:
 	p2DAImporter(void);
-	~p2DAImporter(void) override;
+	p2DAImporter(const p2DAImporter&) = delete;
+	~p2DAImporter() override;
+	p2DAImporter& operator=(const p2DAImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	/** Returns the actual number of Rows in the Table */
 	inline ieDword GetRowCount() const override

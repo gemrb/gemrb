@@ -46,7 +46,9 @@ private:
 	unsigned int PaddedRowLength = 0;
 public:
 	BMPImporter(void) = default;
-	~BMPImporter(void) override;
+	BMPImporter(const BMPImporter&) = delete;
+	~BMPImporter() override;
+	BMPImporter& operator=(const BMPImporter&) = delete;
 	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
 	int GetPalette(int colors, Color* pal) override;

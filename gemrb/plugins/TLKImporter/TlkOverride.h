@@ -73,7 +73,9 @@ private:
 	strret_t GetLength(strpos_t offset);
 public:
 	CTlkOverride() = default;
+	CTlkOverride(const CTlkOverride&) = delete;
 	virtual ~CTlkOverride();
+	CTlkOverride& operator=(const CTlkOverride&) = delete;
 
 	bool Init();
 	char *ResolveAuxString(ieStrRef strref, size_t &Length);

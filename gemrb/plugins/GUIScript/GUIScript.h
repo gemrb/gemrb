@@ -40,13 +40,16 @@ enum {
 
 class GUIScript : public ScriptEngine {
 private:
-	PyObject* pModule, * pDict;
-	PyObject* pMainDic;
-	PyObject* pGUIClasses;
+	PyObject* pModule = nullptr; // should decref it
+	PyObject* pDict = nullptr; // borrowed, but used outside a function
+	PyObject* pMainDic = nullptr; // borrowed, but used outside a function
+	PyObject* pGUIClasses = nullptr;
 
 public:
 	GUIScript(void);
-	~GUIScript(void) override;
+	GUIScript(const GUIScript&) = delete;
+	~GUIScript() override;
+	GUIScript& operator=(const GUIScript&) = delete;
 	/** Initialization Routine */
 	bool Init(void) override;
 	/** Autodetect GameType */

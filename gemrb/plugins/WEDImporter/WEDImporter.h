@@ -69,7 +69,9 @@ private:
 
 public:
 	WEDImporter() = default;
-	~WEDImporter(void) override;
+	WEDImporter(const WEDImporter&) = delete;
+	~WEDImporter() override;
+	WEDImporter& operator=(const WEDImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	//if tilemap already exists, don't create it
 	TileMap* GetTileMap(TileMap *tm) const override;

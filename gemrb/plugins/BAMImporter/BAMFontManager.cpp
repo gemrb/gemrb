@@ -31,7 +31,6 @@ BAMFontManager::~BAMFontManager(void)
 
 BAMFontManager::BAMFontManager(void)
 {
-	isStateFont = false;
 	bamImp = new BAMImporter();
 }
 

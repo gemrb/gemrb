@@ -24,13 +24,6 @@
 
 using namespace GemRB;
 
-EFFImporter::EFFImporter(void)
-{
-	str = NULL;
-	autoFree = false;
-	version = 0;
-}
-
 EFFImporter::~EFFImporter(void)
 {
 	if (autoFree) {

@@ -39,7 +39,9 @@ private:
 
 public:
 	IDSImporter() = default;
-	~IDSImporter(void) override;
+	IDSImporter(const IDSImporter&) = delete;
+	~IDSImporter() override;
+	IDSImporter& operator=(const IDSImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	int GetValue(const char* txt) const override;
 	char* GetValue(int val) const override;

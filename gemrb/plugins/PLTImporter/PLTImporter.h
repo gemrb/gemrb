@@ -32,7 +32,9 @@ private:
 	void* pixels = nullptr;
 public:
 	PLTImporter(void) = default;
-	~PLTImporter(void) override;
+	PLTImporter(const PLTImporter&) = delete;
+	~PLTImporter() override;
+	PLTImporter& operator=(const PLTImporter&) = delete;
 	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D(unsigned int type, ieDword col[8]) override;
 };

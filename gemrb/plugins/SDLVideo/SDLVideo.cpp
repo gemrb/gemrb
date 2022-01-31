@@ -26,11 +26,6 @@
 
 using namespace GemRB;
 
-SDLVideoDriver::SDLVideoDriver(void)
-{
-	lastTime = 0;
-}
-
 SDLVideoDriver::~SDLVideoDriver(void)
 {
 	SDL_Quit();

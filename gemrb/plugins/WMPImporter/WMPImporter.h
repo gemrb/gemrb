@@ -43,7 +43,9 @@ private:
 
 public:
 	WMPImporter(void) = default;
-	~WMPImporter(void) override;
+	WMPImporter(const WMPImporter&) = delete;
+	~WMPImporter() override;
+	WMPImporter& operator=(const WMPImporter&) = delete;
 	bool Open(DataStream* stream1, DataStream* stream2) override;
 	WorldMapArray *GetWorldMapArray() const override;
 

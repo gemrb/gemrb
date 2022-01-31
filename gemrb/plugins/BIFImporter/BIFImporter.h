@@ -55,7 +55,9 @@ private:
 	DataStream* stream = nullptr;
 public:
 	BIFImporter(void) = default;
-	~BIFImporter(void) override;
+	BIFImporter(const BIFImporter&) = delete;
+	~BIFImporter() override;
+	BIFImporter& operator=(const BIFImporter&) = delete;
 	int OpenArchive(const char* filename) override;
 	DataStream* GetStream(unsigned long Resource, unsigned long Type) override;
 private:

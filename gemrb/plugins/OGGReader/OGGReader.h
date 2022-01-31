@@ -41,6 +41,8 @@ public:
 	{
 		memset(&OggStream, 0, sizeof(OggStream) );
 	}
+	OGGReader(const OGGReader&) = delete;
+	OGGReader& operator=(const OGGReader&) = delete;
 	~OGGReader() override
 	{
 		Close();

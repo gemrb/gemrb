@@ -63,8 +63,10 @@ inline int GetModState(int modstate)
 
 class SDLVideoDriver : public Video {
 public:
-	SDLVideoDriver(void);
-	~SDLVideoDriver(void) override;
+	SDLVideoDriver() = default;
+	SDLVideoDriver(const SDLVideoDriver&) = delete;
+	~SDLVideoDriver() override;
+	SDLVideoDriver& operator=(const SDLVideoDriver&) = delete;
 	int Init(void) override;
 
 	Holder<Sprite2D> CreateSprite(const Region& rgn, void* pixels, const PixelFormat&) override;

@@ -52,18 +52,20 @@ private:
 	
 	class AmbientSource {
 	public:
-		explicit AmbientSource(const Ambient *a);
+		explicit AmbientSource(const Ambient *a) : ambient(a) {};
+		AmbientSource(const AmbientSource&) = delete;
 		~AmbientSource();
+		AmbientSource& operator=(const AmbientSource&) = delete;
 		tick_t tick(tick_t ticks, Point listener, ieDword timeslice);
 		void hardStop();
 		void SetVolume(unsigned short volume) const;
 	private:
-		int stream;
+		int stream = -1;
 		const Ambient* ambient;
-		tick_t lastticks;
-		tick_t nextdelay;
-		size_t nextref;
-		unsigned int totalgain;
+		tick_t lastticks = 0;
+		tick_t nextdelay = 0;
+		size_t nextref = 0;
+		unsigned int totalgain = 0;
 
 		bool isHeard(const Point &listener) const;
 		tick_t enqueue() const;

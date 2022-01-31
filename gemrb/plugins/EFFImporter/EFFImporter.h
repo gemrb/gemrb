@@ -31,13 +31,15 @@ namespace GemRB {
 
 class EFFImporter : public EffectMgr {
 private:
-	DataStream* str;
-	bool autoFree;
-	int version;
+	DataStream* str = nullptr;
+	bool autoFree = false;
+	int version = 0;
 
 public:
-	EFFImporter(void);
-	~EFFImporter(void) override;
+	EFFImporter() = default;
+	EFFImporter(const EFFImporter&) = delete;
+	~EFFImporter() override;
+	EFFImporter& operator=(const EFFImporter&) = delete;
 	// We need this autoFree, since Effects are included inline
 	// in other file types, without a size header.
 	bool Open(DataStream* stream, bool autoFree = true) override;

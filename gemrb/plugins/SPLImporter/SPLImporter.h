@@ -32,12 +32,14 @@ namespace GemRB {
 
 class SPLImporter : public SpellMgr {
 private:
-	DataStream* str;
-	int version;
+	DataStream* str = nullptr;
+	int version = 0;
 
 public:
-	SPLImporter(void);
-	~SPLImporter(void) override;
+	SPLImporter() = default;
+	SPLImporter(const SPLImporter&) = delete;
+	~SPLImporter() override;
+	SPLImporter& operator=(const SPLImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	Spell* GetSpell(Spell *spl, bool silent=false) override;
 private:

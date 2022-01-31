@@ -13366,10 +13366,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 GUIScript::GUIScript(void)
 {
 	gs = this;
-	pDict = NULL; //borrowed, but used outside a function
-	pModule = NULL; //should decref it
-	pMainDic = NULL; //borrowed, but used outside a function
-	pGUIClasses = NULL;
 }
 
 GUIScript::~GUIScript(void)

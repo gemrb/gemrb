@@ -29,9 +29,7 @@ using namespace GemRB;
 
 PLTImporter::~PLTImporter(void)
 {
-	if (pixels) {
-		free( pixels );
-	}
+	free(pixels);
 }
 
 bool PLTImporter::Import(DataStream* str)

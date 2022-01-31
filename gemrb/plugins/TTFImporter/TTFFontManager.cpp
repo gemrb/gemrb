@@ -48,10 +48,6 @@ TTFFontManager::~TTFFontManager(void)
 	Close();
 }
 
-TTFFontManager::TTFFontManager(void)
-: ftStream(NULL), face(NULL)
-{}
-
 bool TTFFontManager::Import(DataStream* stream)
 {
 	Close();

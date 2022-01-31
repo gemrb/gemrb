@@ -37,7 +37,9 @@ private:
 
 public:
 	STOImporter() = default;
-	~STOImporter(void) override;
+	STOImporter(const STOImporter&) = delete;
+	~STOImporter() override;
+	STOImporter& operator=(const STOImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	Store* GetStore(Store *store) override;
 

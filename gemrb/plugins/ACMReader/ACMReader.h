@@ -49,6 +49,8 @@ private:
 	int make_new_samples();
 public:
 	ACMReader() = default;
+	ACMReader(const ACMReader&) = delete;
+	ACMReader& operator=(const ACMReader&) = delete;
 	~ACMReader() override
 	{
 		Close();

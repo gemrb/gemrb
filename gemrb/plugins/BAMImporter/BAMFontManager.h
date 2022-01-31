@@ -31,11 +31,13 @@ class BAMFontManager : public FontManager
 private:
 	/** private data members */
 	BAMImporter* bamImp;
-	bool isStateFont;
+	bool isStateFont = false;
 	ResRef resRef;
 public:
 	/** public methods */
-	~BAMFontManager(void) override;
+	BAMFontManager(const BAMFontManager&) = delete;
+	~BAMFontManager() override;
+	BAMFontManager& operator=(const BAMFontManager&) = delete;
 	BAMFontManager();
 
 	bool Import(DataStream* stream) override;

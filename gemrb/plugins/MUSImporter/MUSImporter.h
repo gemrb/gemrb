@@ -59,7 +59,9 @@ private:
 	void PlayMusic(char* name);
 public:
 	MUSImporter();
+	MUSImporter(const MUSImporter&) = delete;
 	~MUSImporter() override;
+	MUSImporter& operator=(const MUSImporter&) = delete;
 	/** Loads a PlayList for playing */
 	bool OpenPlaylist(const char* name) override;
 	/** Initializes the PlayList Manager */

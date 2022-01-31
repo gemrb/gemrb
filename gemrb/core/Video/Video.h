@@ -87,12 +87,12 @@ public:
 	};
 
 protected:
-	tick_t lastTime;
-	EventMgr* EvntManager;
+	tick_t lastTime = 0;
+	EventMgr* EvntManager = nullptr;
 	Region screenClip;
 	Size screenSize;
-	int bpp;
-	bool fullscreen;
+	int bpp = 0;
+	bool fullscreen = false;
 
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
@@ -106,7 +106,7 @@ protected:
 	// Note: we can add the same buffer more than once to drawingBuffers!
 	VideoBuffers drawingBuffers;
 	// the current top of drawingBuffers that draw operations occur on
-	VideoBuffer* drawingBuffer;
+	VideoBuffer* drawingBuffer = nullptr;
 	VideoBufferPtr stencilBuffer = nullptr;
 
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;

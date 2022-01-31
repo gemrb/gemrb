@@ -145,12 +145,6 @@ void AmbientMgrAL::UpdateVolume(unsigned short volume)
 	}
 }
 
-
-AmbientMgrAL::AmbientSource::AmbientSource(const Ambient *a)
-: stream(-1), ambient(a), lastticks(0), nextdelay(0), nextref(0), totalgain(0)
-{
-}
-
 AmbientMgrAL::AmbientSource::~AmbientSource()
 {
 	if (stream >= 0) {

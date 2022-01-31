@@ -36,7 +36,9 @@ private:
 	Holder<Sprite2D> badTile; // blank tile to use to fill in bad data
 public:
 	TISImporter() = default;
-	~TISImporter(void) override;
+	TISImporter(const TISImporter&) = delete;
+	~TISImporter() override;
+	TISImporter& operator=(const TISImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	Tile* GetTile(const std::vector<ieWord>& indexes,
 		unsigned short* secondary = NULL) override;

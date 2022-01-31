@@ -48,10 +48,12 @@ public:
 		pred1 = p1;
 		pred2 = p2;
 	}
+	CompoundPredicate(const CompoundPredicate&) = delete;
 	~CompoundPredicate() override {
 		delete pred1;
 		delete pred2;
 	}
+	CompoundPredicate& operator=(const CompoundPredicate&) = delete;
 };
 
 template<typename PT>

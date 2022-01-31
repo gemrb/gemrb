@@ -37,7 +37,9 @@ private:
 
 public:
 	PROImporter() = default;
-	~PROImporter(void) override;
+	PROImporter(const PROImporter&) = delete;
+	~PROImporter() override;
+	PROImporter& operator=(const PROImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	Projectile* GetProjectile(Projectile *s) override;
 private:

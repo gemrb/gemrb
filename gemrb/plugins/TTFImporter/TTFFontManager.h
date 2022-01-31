@@ -29,12 +29,14 @@ namespace GemRB {
 
 class TTFFontManager : public FontManager {
 private:
-	FT_Stream ftStream;
-	FT_Face face;
+	FT_Stream ftStream = nullptr;
+	FT_Face face = nullptr;
 
 public:
-	~TTFFontManager(void) override;
-	TTFFontManager(void);
+	TTFFontManager() = default;
+	TTFFontManager(const TTFFontManager&) = delete;
+	~TTFFontManager() override;
+	TTFFontManager& operator=(const TTFFontManager&) = delete;
 
 	bool Import(DataStream* stream) override;
 	void Close();
