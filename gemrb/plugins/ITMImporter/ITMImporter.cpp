@@ -35,7 +35,7 @@ static std::vector<int> profs;
 static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
 static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
 static EffectRef zzRefs[] = { fx_tohit_vs_creature_ref, fx_damage_vs_creature_ref };
-std::map<char,int> zzmap;
+std::map<wchar_t,int> zzmap;
 
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
@@ -109,7 +109,7 @@ bool ITMImporter::Import(DataStream* str)
 static void AddZZFeatures(Item *s)
 {
 	// the targeting code (3rd char) is: digit = align(ment), letter = race
-	char targetIDS = towupper(s->Name.CString()[2]);
+	wchar_t targetIDS = towupper(s->Name.CString()[2]);
 	ieByte IDSval = zzmap[targetIDS];
 	ieByte IDSfile = 4;
 	if (targetIDS <= '9') {
