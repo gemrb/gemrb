@@ -2511,7 +2511,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 		return;
 	}
 
-	int *selects = (int *) malloc(picks*sizeof(int));
+	std::vector<int> selects(picks);
 	int count = tm->GetRowCount();
 	// handle the unused SetupWishObject, which passes WIS instead of a column
 	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
@@ -2560,7 +2560,6 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 		snprintf(varname,32,"wishpower%02d", spnum);
 		SetVariable(Sender, varname, 1, "GLOBAL");
 	}
-	free(selects);
 }
 
 void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, bool flag)
