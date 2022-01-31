@@ -22,7 +22,6 @@
 
 #include "RGBAColor.h"
 
-#include "FileCache.h"
 #include "Interface.h"
 #include "Video/Video.h"
 

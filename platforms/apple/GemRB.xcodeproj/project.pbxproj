@@ -39,7 +39,6 @@
 		A20A278D1A71E3200077077C /* View.h in Headers */ = {isa = PBXBuildFile; fileRef = A20A278A1A71E3200077077C /* View.h */; };
 		A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */; };
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
-		A20E4ADC197344BD00A6BC96 /* FileCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A20E4ACF197344BD00A6BC96 /* FileCache.h */; };
 		A2111CCA1D0A49650044939E /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2111CC81D0A49650044939E /* Timer.h */; };
 		A218A75214A8F3DB001142CF /* gemrb.icns in Resources */ = {isa = PBXBuildFile; fileRef = A218A75114A8F3DB001142CF /* gemrb.icns */; };
 		A22693791422934E004468E8 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
@@ -379,6 +378,8 @@
 		A2A05D0C27A4826C000FB625 /* Logging.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05D0627A4826C000FB625 /* Logging.h */; };
 		A2A05D0D27A4826C000FB625 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05D0727A4826C000FB625 /* Logger.cpp */; };
 		A2A05D0E27A4826C000FB625 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05D0827A4826C000FB625 /* Logger.h */; };
+		A2A05D1127A7CBD9000FB625 /* FileCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05D0F27A7CBD9000FB625 /* FileCache.h */; };
+		A2A05D1227A7CBD9000FB625 /* FileCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05D1027A7CBD9000FB625 /* FileCache.cpp */; };
 		A2A2DE91274CCB54005842A6 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */; };
 		A2A2DE97274CCE28005842A6 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A2EA3216A5EB630092B903 /* TTFFont.cpp */; };
@@ -616,7 +617,6 @@
 		A2E66486139E907000310FC8 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2E7E194266897060064423F /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E7E193266897060064423F /* KeyMap.cpp */; };
 		A2E7E1982668977F0064423F /* PluginLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E7E1962668977F0064423F /* PluginLoader.cpp */; };
-		A2E7E19C2668980D0064423F /* FileCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E7E19B2668980D0064423F /* FileCache.cpp */; };
 		A2E7EA1E266947160064423F /* StencilF.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2E7EA19266946AA0064423F /* StencilF.glsl */; };
 		A2E7EA1F266947160064423F /* GameSpriteF.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2E7EA1A266946AA0064423F /* GameSpriteF.glsl */; };
 		A2E7EA20266947160064423F /* SDLTextureV.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2E7EA1B266946AA0064423F /* SDLTextureV.glsl */; };
@@ -1216,7 +1216,6 @@
 		A20574F919994967007FF22C /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		A20A27891A71E3200077077C /* View.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = View.cpp; sourceTree = "<group>"; };
 		A20A278A1A71E3200077077C /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
-		A20E4ACF197344BD00A6BC96 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCache.h; sourceTree = "<group>"; };
 		A2111CC81D0A49650044939E /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
 		A218A75114A8F3DB001142CF /* gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = gemrb.icns; path = ../../artwork/gemrb.icns; sourceTree = "<group>"; };
 		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
@@ -1478,6 +1477,8 @@
 		A2A05D0627A4826C000FB625 /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		A2A05D0727A4826C000FB625 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
 		A2A05D0827A4826C000FB625 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
+		A2A05D0F27A7CBD9000FB625 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCache.h; sourceTree = "<group>"; };
+		A2A05D1027A7CBD9000FB625 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileCache.cpp; sourceTree = "<group>"; };
 		A2A2DE87274CC871005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2A2DE8B274CCAAF005842A6 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../../opt/homebrew/Cellar/freetype/2.11.0/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2A2DE95274CCCF1005842A6 /* libiconv.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.tbd; path = usr/lib/libiconv.2.tbd; sourceTree = SDKROOT; };
@@ -1738,7 +1739,6 @@
 		A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libgemrb_core.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2E7E193266897060064423F /* KeyMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyMap.cpp; sourceTree = "<group>"; };
 		A2E7E1962668977F0064423F /* PluginLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PluginLoader.cpp; sourceTree = "<group>"; };
-		A2E7E19B2668980D0064423F /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileCache.cpp; sourceTree = "<group>"; };
 		A2E7E1AB266946650064423F /* area4np.pro */ = {isa = PBXFileReference; lastKnownFileType = file; path = area4np.pro; sourceTree = "<group>"; };
 		A2E7E1AC266946650064423F /* hold.pro */ = {isa = PBXFileReference; lastKnownFileType = file; path = hold.pro; sourceTree = "<group>"; };
 		A2E7E1AD266946650064423F /* bscloud.pro */ = {isa = PBXFileReference; lastKnownFileType = file; path = bscloud.pro; sourceTree = "<group>"; };
@@ -5034,16 +5034,18 @@
 		A2A05CEC27A48093000FB625 /* Streams */ = {
 			isa = PBXGroup;
 			children = (
+				A2A05CF527A48093000FB625 /* DataStream.cpp */,
+				A2A05CF127A48093000FB625 /* DataStream.h */,
+				A2A05D1027A7CBD9000FB625 /* FileCache.cpp */,
+				A2A05D0F27A7CBD9000FB625 /* FileCache.h */,
+				A2A05CF227A48093000FB625 /* FileStream.cpp */,
+				A2A05CF427A48093000FB625 /* FileStream.h */,
+				A2A05CF627A48093000FB625 /* MappedFileMemoryStream.cpp */,
+				A2A05CF327A48093000FB625 /* MappedFileMemoryStream.h */,
+				A2A05CF027A48093000FB625 /* MemoryStream.cpp */,
 				A2A05CED27A48093000FB625 /* MemoryStream.h */,
 				A2A05CEE27A48093000FB625 /* SlicedStream.cpp */,
 				A2A05CEF27A48093000FB625 /* SlicedStream.h */,
-				A2A05CF027A48093000FB625 /* MemoryStream.cpp */,
-				A2A05CF127A48093000FB625 /* DataStream.h */,
-				A2A05CF227A48093000FB625 /* FileStream.cpp */,
-				A2A05CF327A48093000FB625 /* MappedFileMemoryStream.h */,
-				A2A05CF427A48093000FB625 /* FileStream.h */,
-				A2A05CF527A48093000FB625 /* DataStream.cpp */,
-				A2A05CF627A48093000FB625 /* MappedFileMemoryStream.cpp */,
 			);
 			path = Streams;
 			sourceTree = "<group>";
@@ -5171,8 +5173,6 @@
 				A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */,
 				A2BF9FC11395FF61006ADC12 /* FactoryObject.h */,
 				A2D33FEA24C203110081AC31 /* FibonacciHeap.h */,
-				A2E7E19B2668980D0064423F /* FileCache.cpp */,
-				A20E4ACF197344BD00A6BC96 /* FileCache.h */,
 				A28D2498143BEA4200A27897 /* FontManager.cpp */,
 				A28D249B143BEA5800A27897 /* FontManager.h */,
 				A2BF9FC41395FF61006ADC12 /* Game.cpp */,
@@ -7910,7 +7910,6 @@
 				A2E66389139E883700310FC8 /* GlobalTimer.h in Headers */,
 				A2E6638A139E883E00310FC8 /* Holder.h in Headers */,
 				A2A05CF727A48093000FB625 /* MemoryStream.h in Headers */,
-				A20E4ADC197344BD00A6BC96 /* FileCache.h in Headers */,
 				A2E6638E139E883E00310FC8 /* ImageFactory.h in Headers */,
 				A2E66390139E883E00310FC8 /* ImageMgr.h in Headers */,
 				A2E66392139E883E00310FC8 /* ImageWriter.h in Headers */,
@@ -7995,6 +7994,7 @@
 				A2E66411139E885A00310FC8 /* PCStatStruct.h in Headers */,
 				A27E5D5F18106384009434E5 /* KeyMap.h in Headers */,
 				A2E66413139E885A00310FC8 /* Scriptable.h in Headers */,
+				A2A05D1127A7CBD9000FB625 /* FileCache.h in Headers */,
 				A2E66415139E886100310FC8 /* Button.h in Headers */,
 				A24454821F09BFF8008D5B5E /* GUIAnimation.h in Headers */,
 				A2E66417139E886100310FC8 /* Console.h in Headers */,
@@ -9688,7 +9688,6 @@
 				A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */,
 				A2E6639B139E883E00310FC8 /* ItemMgr.cpp in Sources */,
 				A2E6639D139E883E00310FC8 /* LRUCache.cpp in Sources */,
-				A2E7E19C2668980D0064423F /* FileCache.cpp in Sources */,
 				A2A05D0D27A4826C000FB625 /* Logger.cpp in Sources */,
 				A2E6639F139E883E00310FC8 /* Map.cpp in Sources */,
 				A2E663A3139E883E00310FC8 /* MoviePlayer.cpp in Sources */,
@@ -9697,6 +9696,7 @@
 				A2E663AB139E883E00310FC8 /* Particles.cpp in Sources */,
 				A2806288187B7C8A009E577D /* TextContainer.cpp in Sources */,
 				A2FA8E4E1FB8C483004AAEF9 /* MapReverb.cpp in Sources */,
+				A2A05D1227A7CBD9000FB625 /* FileCache.cpp in Sources */,
 				A2E663B0139E883E00310FC8 /* PluginMgr.cpp in Sources */,
 				A2E663B2139E883E00310FC8 /* Polygon.cpp in Sources */,
 				A25F91EF269936A10045F07A /* Pixels.cpp in Sources */,

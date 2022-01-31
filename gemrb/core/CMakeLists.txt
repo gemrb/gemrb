@@ -16,7 +16,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	EffectQueue.cpp
 	Factory.cpp
 	FactoryObject.cpp
-	FileCache.cpp
 	FontManager.cpp
 	Game.cpp
 	GameData.cpp
@@ -102,6 +101,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/Scriptable.cpp
 	Scriptable/PCStatStruct.cpp
 	Streams/DataStream.cpp
+	Streams/FileCache.cpp
 	Streams/FileStream.cpp
 	Streams/MemoryStream.cpp
 	Streams/SlicedStream.cpp

@@ -31,7 +31,7 @@
 
 #include "TypeID.h"
 
-#include "FileCache.h"
+#include "Streams/FileCache.h"
 #include "Streams/DataStream.h"
 
 #include <memory>

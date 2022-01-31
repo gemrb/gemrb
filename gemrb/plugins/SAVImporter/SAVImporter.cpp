@@ -19,7 +19,6 @@
 #include "SAVImporter.h"
 
 #include "Compressor.h"
-#include "FileCache.h"
 #include "Interface.h"
 #include "PluginMgr.h"
 

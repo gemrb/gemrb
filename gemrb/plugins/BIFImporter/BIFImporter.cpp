@@ -21,10 +21,10 @@
 #include "BIFImporter.h"
 
 #include "Compressor.h"
-#include "FileCache.h"
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "Streams/SlicedStream.h"
+#include "Streams/FileCache.h"
 #include "Streams/FileStream.h"
 #if defined(SUPPORTS_MEMSTREAM)
 #include "Streams/MappedFileMemoryStream.h"
