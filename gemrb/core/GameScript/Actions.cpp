@@ -471,12 +471,14 @@ void GameScript::SetTeamBit(Scriptable* Sender, Action* parameters)
 void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* ip = Sender;
+	const char* name = "null";
 
 	if (parameters->objects[1]) {
 		ip = GetScriptableFromObject(Sender, parameters->objects[1]);
+		name = parameters->objects[1]->objectName;
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", parameters->objects[1]->objectName);
+		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", name);
 		return;
 	}
 	InfoPoint *trigger = static_cast<InfoPoint*>(ip);
@@ -6275,13 +6277,15 @@ void GameScript::PauseGame(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* ip;
-	if (!parameters->objects[1]) {
-		ip=Sender;
+	const char* name = "null";
+	if (parameters->objects[1]) {
+		name = parameters->objects[1]->objectName;
+		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(name);
 	} else {
-		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
+		ip = Sender;
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", parameters->objects[1]->objectName);
+		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", name);
 		return;
 	}
 
