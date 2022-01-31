@@ -373,13 +373,11 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 				
 		if (type & 1) {
 			str->Seek( StrOffset + Offset, GEM_STREAM_START );
-			char* cstr = (char *)malloc(l + 1);
-			cstr[l] = '\0';
-			str->Read(cstr, l);
-			String* tmp = StringFromCString(cstr);
+			std::string mbstr(l, '\0');
+			str->Read(&mbstr[0], l);
+			String* tmp = StringFromCString(mbstr.c_str());
 			std::swap(string, *tmp);
 			delete tmp;
-			free(cstr);
 		}
 	}
 
