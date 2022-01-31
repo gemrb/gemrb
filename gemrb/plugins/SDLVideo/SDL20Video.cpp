@@ -149,8 +149,15 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	}
 
 #if USE_OPENGL_BACKEND
-Log(MESSAGE, "SDL 2 GL Driver", "OpenGL version: {}, renderer: {}, vendor: {}", (char*) glGetString(GL_VERSION), (char*) glGetString(GL_RENDERER), (char*) glGetString(GL_VENDOR));
-Log(MESSAGE, "SDL 2 GL Driver", "  GLSL version: {}", (char*) glGetString(GL_SHADING_LANGUAGE_VERSION));
+	// glGetString can return null, fmt doesn't support const unsigned char* and std::string can handle neither
+	std::string tmp[4] = { "/" };
+	const int strings[4] = { GL_VERSION, GL_RENDERER, GL_VENDOR, GL_SHADING_LANGUAGE_VERSION };
+	for (int i = 0; i < 4; i++) {
+		auto glString = glGetString(strings[i]);
+		if (glString) tmp[i] = reinterpret_cast<const char*>(glString);
+	}
+	Log(MESSAGE, "SDL 2 GL Driver", "OpenGL version: {}, renderer: {}, vendor: {}", tmp[0], tmp[1], tmp[2]);
+	Log(MESSAGE, "SDL 2 GL Driver", "  GLSL version: {}", tmp[3]);
 
 	if (strcmp(info.name, driverName) != 0) {
 		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of {}", info.name);
