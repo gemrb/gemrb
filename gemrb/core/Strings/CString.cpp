@@ -58,15 +58,11 @@ void strnuprcpy(char* dest, const char *source, int count)
 }
 
 // this one also filters spaces, used to copy resrefs and variables
-void strnspccpy(char* dest, const char *source, int count, bool upper)
+void strnspccpy(char* dest, const char *source, int count)
 {
 	memset(dest,0,count);
 	while(count--) {
-		char c;
-		if (upper)
-			c = std::towupper(*source);
-		else
-			c = std::towlower(*source);
+		char c = std::towlower(*source);
 		if (c!=' ') {
 			*dest++=c;
 		}

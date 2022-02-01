@@ -148,6 +148,10 @@ public:
 	const char* CString() const noexcept {
 		return var;
 	}
+	
+	char* begin() noexcept {
+		return var;
+	}
 };
 
 using ResRef = FixedSizeString<8, strnicmp>;

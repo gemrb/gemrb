@@ -47,7 +47,7 @@ GEM_EXPORT int strlench(const char* string, char ch);
 
 GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
 GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
-GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
+GEM_EXPORT void strnspccpy(char* d, const char *s, int l);
 
 constexpr int NoTransform(int c) { return c; }
 
