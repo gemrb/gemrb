@@ -50,4 +50,9 @@ bool ScriptEngine::UnregisterScriptingRef(const ScriptingRefBase* ref)
 	return (it->second.erase(ref->Id) > 0) ? true : false;
 }
 
+bool ScriptEngine::RunFunction(const char* Modulename, const char* FunctionName, bool report_error)
+{
+	return RunFunction(Modulename, FunctionName, FunctionParameters{}, report_error);
+}
+
 }
