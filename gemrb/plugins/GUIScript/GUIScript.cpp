@@ -13602,8 +13602,8 @@ bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, co
 		PyObject* pyParam = NULL; // a "stolen" reference for PyTuple_SetItem
 
 		// FIXME: we can have any type of parameter, not just char*
-		if (type == typeid(char*)) {
-			const char* cstring = p.Value<char*>();
+		if (type == typeid(const char*)) {
+			const char* cstring = p.Value<const char*>();
 			pyParam = PyUnicode_FromStringAndSize(cstring, strlen(cstring));
 		} else {
 			Log(ERROR, "GUIScript", "Unknown parameter type: {}", type.name());
