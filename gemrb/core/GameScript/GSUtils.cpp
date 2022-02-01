@@ -2193,12 +2193,12 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 {
 	ResRef context;
 
-	const char *poi = VarName;
+	const char *varName = VarName;
 	if (Context == nullptr) {
-		poi = &VarName[6];
+		varName = &VarName[6];
 		//some HoW triggers use a : to separate the scope from the variable name
-		if (*poi==':') {
-			poi++;
+		if (*varName == ':') {
+			varName++;
 		}
 		context.SNPrintF("%.6s", VarName);
 	} else {
@@ -2207,25 +2207,25 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", Context, VarName, value);
 	
 	if (context == "MYAREA") {
-		Sender->GetCurrentArea()->locals->SetAt( poi, value, NoCreate );
+		Sender->GetCurrentArea()->locals->SetAt(varName, value, NoCreate);
 		return;
 	}
 	if (context == "LOCALS") {
-		Sender->locals->SetAt( poi, value, NoCreate );
+		Sender->locals->SetAt(varName, value, NoCreate);
 		return;
 	}
 	Game *game = core->GetGame();
 	if (HasKaputz && context == "KAPUTZ") {
-		game->kaputz->SetAt( poi, value, NoCreate );
+		game->kaputz->SetAt(varName, value, NoCreate);
 		return;
 	}
 	if (context == "GLOBAL") {
-		game->locals->SetAt(poi, value, NoCreate);
+		game->locals->SetAt(varName, value, NoCreate);
 	} else {
 		// map name context, eg. AR1324
 		Map* map = game->GetMap(game->FindMap(context));
 		if (map) {
-			map->locals->SetAt( poi, value, NoCreate);
+			map->locals->SetAt(varName, value, NoCreate);
 		} else if (core->InDebugMode(ID_VARIABLES)) {
 			Log(WARNING, "GameScript", "Invalid variable {} {} in SetVariable", Context, VarName);
 		}
@@ -2240,46 +2240,46 @@ void SetPointVariable(Scriptable *Sender, const char *VarName, const Point &p, c
 ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
 {
 	ResRef context;
-	const char *poi = VarName;
+	const char *varName = VarName;
 	ieDword value = 0;
 
 	if (Context == nullptr) {
 		context.SNPrintF("%.6s", VarName);
-		poi = &VarName[6];
+		varName = &VarName[6];
 		//some HoW triggers use a : to separate the scope from the variable name
-		if (*poi==':') {
-			poi++;
+		if (*varName == ':') {
+			varName++;
 		}
 	} else {
 		context.SNPrintF("%.6s", Context);
 	}
 	
 	if (context == "MYAREA") {
-		Sender->GetCurrentArea()->locals->Lookup(poi, value);
+		Sender->GetCurrentArea()->locals->Lookup(varName, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
 	if (context == "LOCALS") {
-		Sender->locals->Lookup(poi, value);
+		Sender->locals->Lookup(varName, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
 	const Game *game = core->GetGame();
 	if (HasKaputz && context == "KAPUTZ") {
-		game->kaputz->Lookup(poi, value);
+		game->kaputz->Lookup(varName, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
 	if (context == "GLOBAL") {
-		game->locals->Lookup(poi, value);
+		game->locals->Lookup(varName, value);
 	} else {
 		// map name context, eg. AR1324
 		const Map* map = game->GetMap(game->FindMap(context));
 		if (map) {
-			map->locals->Lookup(poi, value);
+			map->locals->Lookup(varName, value);
 		} else {
 			if (valid) *valid = false;
 			ScriptDebugLog(ID_VARIABLES, "Invalid variable {} {} in checkvariable", Context, VarName);
