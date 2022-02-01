@@ -146,13 +146,11 @@ void Console::HistoryAdd(bool force)
 void Console::SaveHistory() const
 {
 	std::string commands;
-	char command[100];
 
 	size_t histSize = std::min(History.Size(), HistoryMaxSize);
 	for (size_t i = histSize - 1; signed(i) >= 0; i--) {
 		const String& cmd = History.Retrieve(i).second;
-		snprintf(command, sizeof(command), "%ls\n", cmd.c_str());
-		commands += command;
+		commands += fmt::format("{}\n", fmt::WideToChar{cmd});
 	}
 
 	char filePath[_MAX_PATH + 20];
