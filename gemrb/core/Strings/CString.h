@@ -49,6 +49,10 @@ GEM_EXPORT char* strlwr(char* string);
 
 GEM_EXPORT int strlench(const char* string, char ch);
 
+GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
+GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
+GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
+
 constexpr int NoTransform(int c) { return c; }
 
 template <typename STR_T, int(*TRANS)(int) = NoTransform>

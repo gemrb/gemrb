@@ -53,10 +53,6 @@ GEM_EXPORT_T void StringToUpper(T& string) {
 	}
 }
 
-/* these functions will work with pl/cz special characters */
-GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l, bool pad = true);
-GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
-GEM_EXPORT void strnspccpy(char* d, const char *s, int l, bool upper = false);
 }
 
 namespace fmt {
