@@ -158,7 +158,7 @@ public:
 				return type->value;
 			}
 			// default
-			static T t;
+			static T t {};
 			return t;
 		}
 	};
@@ -175,8 +175,6 @@ public:
 	virtual bool LoadScript(const char* filename) = 0;
 	/** Run Function */
 	virtual bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) = 0;
-	// TODO: eleminate these RunFunction variants.
-	virtual bool RunFunction(const char *ModuleName, const char* FunctionName, bool report_error=true, int intparam=-1) = 0;
 	bool RunFunction(const char* Modulename, const char* FunctionName, bool report_error = true);
 	/** Exec a single String */
 	virtual bool ExecString(const std::string &string, bool feedback) = 0;

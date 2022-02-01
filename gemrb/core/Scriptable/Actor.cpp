@@ -1289,11 +1289,13 @@ static void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	// check if we reached a new level
-	unsigned int pc = actor->InParty;
+	ieByte pc = actor->InParty;
 	if (pc && !actor->GotLUFeedback) {
 		char varname[16];
 		snprintf(varname, sizeof(varname), "CheckLevelUp%d", pc);
-		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", true, pc);
+		ScriptEngine::FunctionParameters params;
+		params.push_back(ScriptEngine::Parameter(pc));
+		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", params, true);
 		ieDword NeedsLevelUp = 0;
 		core->GetDictionary()->Lookup(varname, NeedsLevelUp);
 		if (NeedsLevelUp == 1) {
@@ -5978,11 +5980,13 @@ void Actor::ApplyFeats()
 		}
 	}
 	//apply scripted feats
+	ScriptEngine::FunctionParameters params;
 	if (InParty) {
-		core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", true, InParty);
+		params.push_back(ScriptEngine::Parameter(InParty));
 	} else {
-		core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", true, GetGlobalID());
+		params.push_back(ScriptEngine::Parameter(GetGlobalID()));
 	}
+	core->GetGUIScriptEngine()->RunFunction("LUCommon","ApplyFeats", params, true);
 }
 
 void Actor::ApplyExtraSettings()

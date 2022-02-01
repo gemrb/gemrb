@@ -13608,6 +13608,12 @@ bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, co
 		} else if (type == typeid(const Point)) {
 			const Point& point = p.Value<const Point>();
 			pyParam = Py_BuildValue("{s:i,s:i}", "x", point.x, "y", point.y);
+		} else if (type == typeid(const ieByte)) {
+			pyParam = PyLong_FromLong(p.Value<const ieByte>());
+		} else if (type == typeid(const int)) {
+			pyParam = PyLong_FromLong(p.Value<const int>());
+		} else if (type == typeid(const ieDword)) {
+			pyParam = PyLong_FromUnsignedLong(p.Value<const ieDword>());
 		} else {
 			Log(ERROR, "GUIScript", "Unknown parameter type: {}", type.name());
 			// need to insert a None placeholder so remaining parameters are correct
@@ -13659,26 +13665,6 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 	}
 	Py_DECREF(pyModule);
 	return pValue;
-}
-
-bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bool report_error, int intparam)
-{
-	PyObject *pArgs;
-	if (intparam == -1) {
-		pArgs = NULL;
-	} else {
-		pArgs = Py_BuildValue("(i)", intparam);
-	}
-	PyObject *pValue = RunFunction(moduleName, functionName, pArgs, report_error);
-	Py_XDECREF(pArgs);
-	if (pValue == NULL) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
-		return false;
-	}
-	Py_DECREF(pValue);
-	return true;
 }
 
 bool GUIScript::ExecFile(const char* file)
