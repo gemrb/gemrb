@@ -23,7 +23,7 @@
 
 #include "Audio.h"
 
-#include "AmbientMgrAL.h"
+#include "AmbientMgr.h"
 
 #include "ie_types.h"
 

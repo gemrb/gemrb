@@ -80,7 +80,6 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/plugins/CREImporter/CREImporter.cpp \
 		    main/gemrb/plugins/OpenALAudio/OpenALAudio.cpp \
 		    main/gemrb/plugins/OpenALAudio/StackLock.cpp \
-		    main/gemrb/plugins/OpenALAudio/AmbientMgrAL.cpp \
 		    main/gemrb/plugins/PROImporter/PROImporter.cpp \
 		    main/gemrb/plugins/ACMReader/decoder.cpp \
 		    main/gemrb/plugins/ACMReader/ACMReader.cpp \

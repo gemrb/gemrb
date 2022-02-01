@@ -243,7 +243,7 @@ bool OpenALAudioDriver::Init(void)
 		Log(MESSAGE, "OpenAL", "EFX not available.");
 	}
 
-	ambim = new AmbientMgrAL;
+	ambim = new AmbientMgr;
 	speech.free = true;
 	speech.ambient = false;
 	return true;
@@ -563,7 +563,7 @@ void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 
 	if (flags & GEM_SND_VOL_AMBIENTS) {
 		core->GetDictionary()->Lookup("Volume Ambients", volume);
-		((AmbientMgrAL*) ambim)->UpdateVolume(volume);
+		ambim->UpdateVolume(volume);
 	}
 }
 
@@ -626,7 +626,7 @@ bool OpenALAudioDriver::Pause()
 	alSourcePause(MusicSource);
 	checkALError("Unable to pause music source", WARNING);
 	MusicPlaying = false;
-	((AmbientMgrAL*) ambim)->deactivate();
+	ambim->deactivate();
 
 	return true;
 }
@@ -642,7 +642,7 @@ bool OpenALAudioDriver::Resume()
 		checkALError("Unable to resume music source", WARNING);
 		MusicPlaying = true;
 	}
-	((AmbientMgrAL*) ambim)->activate();
+	ambim->activate();
 	return true;
 }
 
