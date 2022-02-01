@@ -116,10 +116,10 @@ void CachedDirectoryImporter::Refresh()
 
 	it.Rewind();
 
-	char buf[_MAX_PATH];
 	do {
 		const char *name = it.GetName();
-		strnlwrcpy(buf, name, _MAX_PATH);
+		std::string buf = name;
+		StringToLower(buf);
 		if (cache.set(buf, name)) {
 			Log(ERROR, "CachedDirectoryImporter", "Duplicate '{}' files in '{}' directory", buf, path);
 		}
@@ -128,11 +128,11 @@ void CachedDirectoryImporter::Refresh()
 
 static std::string ConstructFilename(const char* resname, const char* ext)
 {
-	char buf[_MAX_PATH];
 	assert(strnlen(ext, 5) < 5);
-	strnlwrcpy(buf, resname, _MAX_PATH-6);
-	strcat(buf, ".");
-	strcat(buf, ext);
+	std::string buf = resname;
+	StringToLower(buf);
+	buf.push_back('.');
+	buf += ext;
 	return buf;
 }
 
