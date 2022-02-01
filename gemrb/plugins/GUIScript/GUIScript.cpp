@@ -13605,6 +13605,9 @@ bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, co
 		if (type == typeid(const char*)) {
 			const char* cstring = p.Value<const char*>();
 			pyParam = PyUnicode_FromStringAndSize(cstring, strlen(cstring));
+		} else if (type == typeid(const Point)) {
+			const Point& point = p.Value<const Point>();
+			pyParam = Py_BuildValue("{s:i,s:i}", "x", point.x, "y", point.y);
 		} else {
 			Log(ERROR, "GUIScript", "Unknown parameter type: {}", type.name());
 			// need to insert a None placeholder so remaining parameters are correct
@@ -13666,21 +13669,6 @@ bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bo
 	} else {
 		pArgs = Py_BuildValue("(i)", intparam);
 	}
-	PyObject *pValue = RunFunction(moduleName, functionName, pArgs, report_error);
-	Py_XDECREF(pArgs);
-	if (pValue == NULL) {
-		if (PyErr_Occurred()) {
-			PyErr_Print();
-		}
-		return false;
-	}
-	Py_DECREF(pValue);
-	return true;
-}
-
-bool GUIScript::RunFunction(const char *moduleName, const char* functionName, bool report_error, Point param)
-{
-	PyObject *pArgs = Py_BuildValue("(ii)", param.x, param.y);
 	PyObject *pValue = RunFunction(moduleName, functionName, pArgs, report_error);
 	Py_XDECREF(pArgs);
 	if (pValue == NULL) {

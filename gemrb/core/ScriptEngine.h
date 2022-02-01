@@ -117,11 +117,14 @@ public:
 		};
 
 		TypeInterface* ptr;
+		
+		template<typename T>
+		using Concrete_t = ConcreteType<typename std::add_const<T>::type>;
 
 	public:
 		template <typename T>
 		explicit Parameter(T value) {
-			ptr = new ConcreteType<T>(value);
+			ptr = new Concrete_t<T>(value);
 		}
 
 		Parameter() : ptr(NULL) {}
@@ -150,7 +153,7 @@ public:
 
 		template <typename T>
 		const T& Value() const {
-			ConcreteType<T>* type = dynamic_cast<ConcreteType<T>*>(ptr);
+			Concrete_t<T>* type = dynamic_cast<Concrete_t<T>*>(ptr);
 			if (type) {
 				return type->value;
 			}
@@ -174,7 +177,6 @@ public:
 	virtual bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) = 0;
 	// TODO: eleminate these RunFunction variants.
 	virtual bool RunFunction(const char *ModuleName, const char* FunctionName, bool report_error=true, int intparam=-1) = 0;
-	virtual bool RunFunction(const char* Modulename, const char* FunctionName, bool report_error, Point) = 0;
 	/** Exec a single String */
 	virtual bool ExecString(const std::string &string, bool feedback) = 0;
 };

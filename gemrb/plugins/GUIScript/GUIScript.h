@@ -60,7 +60,6 @@ public:
 	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
 	// TODO: eliminate these RunFunction variants.
 	bool RunFunction(const char *moduleName, const char* fname, bool report_error=true, int intparam=-1) override;
-	bool RunFunction(const char *moduleName, const char* fname, bool report_error, Point param) override;
 	/** Exec a single File */
 	bool ExecFile(const char* file);
 	/** Exec a single String */

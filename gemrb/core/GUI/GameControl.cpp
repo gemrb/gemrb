@@ -2017,7 +2017,9 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 	case GEM_MB_MENU: //right click.
 		TryDefaultTalk();
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
-			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
+			ScriptEngine::FunctionParameters params;
+			params.push_back(ScriptEngine::Parameter(p));
+			core->GetGUIScriptEngine()->RunFunction("GUICommon", "OpenFloatMenuWindow", params, false);
 		}
 		break;
 	case GEM_MB_ACTION:
