@@ -42,7 +42,7 @@ GEM_EXPORT void LogMsg(Logger::LogMessage&& msg);
 
 /// Log an error and exit.
 template<typename... ARGS> [[noreturn]]
-GEM_EXPORT void error(const char* owner, const char* format, ARGS&&... args)
+void error(const char* owner, const char* format, ARGS&&... args)
 {
 	auto formattedMsg = fmt::format(format, std::forward<ARGS>(args)...);
 	LogMsg(Logger::LogMessage(FATAL, owner, formattedMsg, LIGHT_RED));
@@ -51,7 +51,7 @@ GEM_EXPORT void error(const char* owner, const char* format, ARGS&&... args)
 }
 
 template<typename... ARGS>
-GEM_EXPORT void Log(log_level level, const char* owner, const char* message, ARGS&&... args)
+void Log(log_level level, const char* owner, const char* message, ARGS&&... args)
 {
 	auto formattedMsg = fmt::format(message, std::forward<ARGS>(args)...);
 	LogMsg(Logger::LogMessage(level, owner, formattedMsg, WHITE));
