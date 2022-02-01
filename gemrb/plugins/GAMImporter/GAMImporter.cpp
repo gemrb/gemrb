@@ -312,6 +312,32 @@ static void SanityCheck(ieWord a,ieWord &b,const char *message)
 	}
 }
 
+struct PCStruct {
+	ieWord   Selected;
+	ieWord   PartyOrder;
+	ieDword  OffsetToCRE;
+	ieDword  CRESize;
+	ResRef CREResRef;
+	ieDword  Orientation;
+	ResRef Area;
+	ieWord   XPos;
+	ieWord   YPos;
+	ieWord   ViewXPos;
+	ieWord   ViewYPos;
+	ieWord   ModalState;
+	ieWordSigned   Happiness;
+	ieDword  Interact[MAX_INTERACT];
+	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
+	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
+	ResRef QuickSpellResRef[MAX_QSLOTS];
+	ieWord   QuickItemSlot[MAX_QUICKITEMSLOT];
+	ieWord   QuickItemHeader[MAX_QUICKITEMSLOT];
+	char Name[32];
+	ieDword  TalkCount;
+	ieByte QSlots[GUIBT_COUNT];
+	ieByte QuickSpellClass[MAX_QSLOTS];
+};
+
 Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_party)
 {
 	PCStruct pcInfo{};

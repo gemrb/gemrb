@@ -123,37 +123,6 @@ class TableMgr;
 #define SONG_NIGHT      1
 #define SONG_BATTLE     3
 
-/**
- * @struct PCStruct
- * Information about party member.
- */
-
-struct PCStruct {
-	ieWord   Selected;
-	ieWord   PartyOrder;
-	ieDword  OffsetToCRE;
-	ieDword  CRESize;
-	ResRef CREResRef;
-	ieDword  Orientation;
-	ResRef Area;
-	ieWord   XPos;
-	ieWord   YPos;
-	ieWord   ViewXPos;
-	ieWord   ViewYPos;
-	ieWord   ModalState;
-	ieWordSigned   Happiness;
-	ieDword  Interact[MAX_INTERACT];
-	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
-	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
-	ResRef QuickSpellResRef[MAX_QSLOTS];
-	ieWord   QuickItemSlot[MAX_QUICKITEMSLOT];
-	ieWord   QuickItemHeader[MAX_QUICKITEMSLOT];
-	char Name[32];
-	ieDword  TalkCount;
-	ieByte QSlots[GUIBT_COUNT];
-	ieByte QuickSpellClass[MAX_QSLOTS];
-};
-
 #define IE_GAM_JOURNAL 0
 #define IE_GAM_QUEST_UNSOLVED 1
 #define IE_GAM_QUEST_DONE  2
