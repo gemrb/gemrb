@@ -31,13 +31,11 @@ GEM_EXPORT int strlench(const char* string, char ch)
 	return i;
 }
 
-void strnlwrcpy(char *dest, const char *source, int count, bool pad)
+void strnlwrcpy(char *dest, const char *source, int count)
 {
 	while(count--) {
 		*dest++ = std::towlower(*source);
 		if(!*source++) {
-			if (!pad)
-				return;
 			while(count--) *dest++=0;
 			break;
 		}
