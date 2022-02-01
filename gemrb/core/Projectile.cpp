@@ -709,8 +709,12 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 {
 	VEFObject* vef = gamedata->GetVEFObject(BAM, false);
 	if (!vef) return 0;
+
 	ScriptedAnimation* sca = vef->GetSingleObject();
-	if (!sca) return 0;
+	if (!sca) {
+		delete vef;
+		return 0;
+	}
 
 	if(pal) {
 		if (ExtFlags & PEF_TINT) {
