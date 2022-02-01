@@ -37,7 +37,6 @@
 		A20A278B1A71E3200077077C /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20A27891A71E3200077077C /* View.cpp */; };
 		A20A278C1A71E3200077077C /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20A27891A71E3200077077C /* View.cpp */; };
 		A20A278D1A71E3200077077C /* View.h in Headers */ = {isa = PBXBuildFile; fileRef = A20A278A1A71E3200077077C /* View.h */; };
-		A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */; };
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A2111CCA1D0A49650044939E /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2111CC81D0A49650044939E /* Timer.h */; };
 		A218A75214A8F3DB001142CF /* gemrb.icns in Resources */ = {isa = PBXBuildFile; fileRef = A218A75114A8F3DB001142CF /* gemrb.icns */; };
@@ -176,7 +175,6 @@
 		A276B4E413A28B9F00D41A8A /* mvevideodec8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B872B139F0A7D0002DC13 /* mvevideodec8.cpp */; };
 		A276B4E513A28BA500D41A8A /* NullSound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B872F139F0A7D0002DC13 /* NullSound.cpp */; };
 		A276B4E613A28BAC00D41A8A /* OGGReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8734139F0A7D0002DC13 /* OGGReader.cpp */; };
-		A276B4E713A28BB400D41A8A /* AmbientMgrAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */; };
 		A276B4E813A28BB400D41A8A /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A276B4EA13A28BBC00D41A8A /* PLTImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8742139F0A7D0002DC13 /* PLTImporter.cpp */; };
 		A276B4EB13A28BC500D41A8A /* PNGImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8747139F0A7D0002DC13 /* PNGImporter.cpp */; };
@@ -1382,8 +1380,6 @@
 		A27B8730139F0A7D0002DC13 /* NullSound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NullSound.h; sourceTree = "<group>"; };
 		A27B8734139F0A7D0002DC13 /* OGGReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OGGReader.cpp; sourceTree = "<group>"; };
 		A27B8735139F0A7D0002DC13 /* OGGReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OGGReader.h; sourceTree = "<group>"; };
-		A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AmbientMgrAL.cpp; sourceTree = "<group>"; };
-		A27B8738139F0A7D0002DC13 /* AmbientMgrAL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmbientMgrAL.h; sourceTree = "<group>"; };
 		A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenALAudio.cpp; sourceTree = "<group>"; };
 		A27B873C139F0A7D0002DC13 /* OpenALAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenALAudio.h; sourceTree = "<group>"; };
 		A27B8742139F0A7D0002DC13 /* PLTImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PLTImporter.cpp; sourceTree = "<group>"; };
@@ -4855,8 +4851,6 @@
 		A27B8736139F0A7D0002DC13 /* OpenALAudio */ = {
 			isa = PBXGroup;
 			children = (
-				A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */,
-				A27B8738139F0A7D0002DC13 /* AmbientMgrAL.h */,
 				A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */,
 				A27B873C139F0A7D0002DC13 /* OpenALAudio.h */,
 			);
@@ -8880,7 +8874,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1310;
+				LastUpgradeCheck = 1320;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "GemRB" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -9295,7 +9289,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A276B4E713A28BB400D41A8A /* AmbientMgrAL.cpp in Sources */,
 				A276B4E813A28BB400D41A8A /* OpenALAudio.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -9615,7 +9608,6 @@
 				A265ECEE13A8669700C6DF12 /* SlicedStream.cpp in Sources */,
 				A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */,
 				A27217041CAE2678005F3976 /* Tooltip.cpp in Sources */,
-				A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */,
 				A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */,
 				A28D249A143BEA4200A27897 /* FontManager.cpp in Sources */,
 				A2A6A45C146893CC000F1688 /* TTFFontManager.cpp in Sources */,
