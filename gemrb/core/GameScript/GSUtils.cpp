@@ -2571,9 +2571,9 @@ void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, boo
 		// iwd2 expects this behaviour in ar6001 by (de)activating sound_portal
 		AmbientMgr *ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
 		if (flag) {
-			ambientmgr->activate(parameters->objects[1]->objectName);
+			ambientmgr->Activate(parameters->objects[1]->objectName);
 		} else {
-			ambientmgr->deactivate(parameters->objects[1]->objectName);
+			ambientmgr->Deactivate(parameters->objects[1]->objectName);
 		}
 		return;
 	}

@@ -2479,7 +2479,7 @@ int Interface::PlayMovie(const char* resref)
 	if (music)
 		music->HardEnd();
 	AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
-	if (ambim) ambim->deactivate();
+	if (ambim) ambim->Deactivate();
 
 	Holder<SoundHandle> sound_override;
 	if (sound_resref) {
@@ -2507,7 +2507,7 @@ int Interface::PlayMovie(const char* resref)
 	//restarting music
 	if (music)
 		music->Start();
-	if (ambim) ambim->activate();
+	if (ambim) ambim->Activate();
 
 	//Setting the movie name to 1
 	vars->SetAt( resref, 1 );
@@ -2744,7 +2744,7 @@ void Interface::QuitGame(int BackToMain)
 	// stop any ambients which are still enqueued
 	if (AudioDriver) {
 		AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
-		if (ambim) ambim->deactivate();
+		if (ambim) ambim->Deactivate();
 		AudioDriver->Stop(); // also kill sounds
 	}
 	//delete game, worldmap
@@ -2862,7 +2862,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	// rarely caused crashes while loading, so stop the ambients
 	if (ambim) {
-		ambim->reset();
+		ambim->Reset();
 	}
 
 	// Let's assume that now is everything loaded OK and swap the objects

@@ -43,25 +43,25 @@ class GEM_EXPORT Ambient {
 public:
 	Ambient() = default;
 	
-	const char *getName() const { return name; }
-	const Point &getOrigin() const { return origin; }
-	ieWord getRadius() const { return radius; }
-	ieWord getGain() const { return gain; }
-	ieWord getTotalGain() const;
-	ResRef getSound(size_t i) const
+	const char* GetName() const { return name; }
+	const Point& GetOrigin() const { return origin; }
+	ieWord GetRadius() const { return radius; }
+	ieWord GetGain() const { return gain; }
+	ieWord GetTotalGain() const;
+	ResRef GetSound(size_t i) const
 	{
 		if (i < sounds.size()) return sounds[i];
 		return ResRef();
 	}
-	tick_t getInterval() const { return interval; }
-	tick_t getIntervalVariance() const { return intervalVariance; }
-	tick_t getTotalInterval() const;
-	ieDword getTotalPitch() const;
-	ieDword getAppearance() const { return appearance; }
-	ieDword getFlags() const { return flags; }
+	tick_t GetInterval() const { return interval; }
+	tick_t GetIntervalVariance() const { return intervalVariance; }
+	tick_t GetTotalInterval() const;
+	ieDword GetTotalPitch() const;
+	ieDword GetAppearance() const { return appearance; }
+	ieDword GetFlags() const { return flags; }
 	
-	void setActive();
-	void setInactive();
+	void SetActive() { flags |= IE_AMBI_ENABLED; };
+	void SetInactive() { flags &= ~IE_AMBI_ENABLED; };
 
 public:
 	char name[32]{};

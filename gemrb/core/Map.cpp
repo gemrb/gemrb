@@ -452,7 +452,7 @@ Map::~Map(void)
 	}
 
 	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
-	ambim->reset();
+	ambim->Reset();
 	for (auto ambient : ambients) {
 		delete ambient;
 	}
@@ -3144,8 +3144,8 @@ void Map::SetupAmbients() const
 {
 	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
 	if (!ambim) return;
-	ambim->reset();
-	ambim->setAmbients( ambients );
+	ambim->Reset();
+	ambim->SetAmbients(ambients);
 }
 
 ieWord Map::GetAmbientCount(bool toSave) const

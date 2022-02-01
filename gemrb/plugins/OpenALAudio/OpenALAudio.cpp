@@ -626,7 +626,7 @@ bool OpenALAudioDriver::Pause()
 	alSourcePause(MusicSource);
 	checkALError("Unable to pause music source", WARNING);
 	MusicPlaying = false;
-	ambim->deactivate();
+	ambim->Deactivate();
 
 	return true;
 }
@@ -642,7 +642,7 @@ bool OpenALAudioDriver::Resume()
 		checkALError("Unable to resume music source", WARNING);
 		MusicPlaying = true;
 	}
-	ambim->activate();
+	ambim->Activate();
 	return true;
 }
 

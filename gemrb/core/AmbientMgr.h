@@ -42,18 +42,18 @@ public:
 	AmbientMgr();
 	~AmbientMgr();
 
-	void reset();
+	void Reset();
 	void UpdateVolume(unsigned short value);
-	void setAmbients(const std::vector<Ambient *> &a);
+	void SetAmbients(const std::vector<Ambient*> &a);
 
-	void activate(const std::string &name); // hard play ;-)
-	void activate();
-	void deactivate(const std::string &name); // hard stop
-	void deactivate();
-	bool isActive(const std::string &name) const;
+	void Activate(const std::string& name); // hard play ;-)
+	void Activate();
+	void Deactivate(const std::string& name); // hard stop
+	void Deactivate();
+	bool IsActive(const std::string& name) const;
 
 private:
-	void ambientsSet(const std::vector<Ambient *>&);
+	void AmbientsSet(const std::vector<Ambient*>&);
 
 private:
 	mutable std::mutex ambientsMutex;
@@ -71,8 +71,8 @@ private:
 		AmbientSource(const AmbientSource&) = delete;
 		~AmbientSource();
 		AmbientSource& operator=(const AmbientSource&) = delete;
-		tick_t tick(tick_t ticks, Point listener, ieDword timeslice);
-		void hardStop();
+		tick_t Tick(tick_t ticks, Point listener, ieDword timeslice);
+		void HardStop();
 		void SetVolume(unsigned short volume) const;
 	private:
 		int stream = -1;
@@ -82,14 +82,14 @@ private:
 		size_t nextref = 0;
 		unsigned int totalgain = 0;
 
-		bool isHeard(const Point &listener) const;
-		tick_t enqueue() const;
+		bool IsHeard(const Point &listener) const;
+		tick_t Enqueue() const;
 	};
 	std::vector<AmbientSource*> ambientSources;
 
-	int play();
-	tick_t tick(tick_t ticks) const;
-	void hardStop() const;
+	int Play();
+	tick_t Tick(tick_t ticks) const;
+	void HardStop() const;
 };
 
 }

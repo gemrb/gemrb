@@ -33,7 +33,7 @@ namespace GemRB {
 
 AmbientMgr::AmbientMgr()
 {
-	player = std::thread(&AmbientMgr::play, this);
+	player = std::thread(&AmbientMgr::Play, this);
 }
 
 AmbientMgr::~AmbientMgr()
@@ -44,18 +44,18 @@ AmbientMgr::~AmbientMgr()
 		delete ambientSource;
 	}
 	ambientSources.clear();
-	reset();
+	Reset();
 	mutex.unlock();
 
 	cond.notify_all();
 	player.join();
 }
 
-void AmbientMgr::reset()
+void AmbientMgr::Reset()
 {
 	std::lock_guard<std::mutex> l(ambientsMutex);
 	ambients.clear();
-	ambientsSet(ambients);
+	AmbientsSet(ambients);
 }
 
 void AmbientMgr::UpdateVolume(unsigned short volume)
@@ -66,7 +66,7 @@ void AmbientMgr::UpdateVolume(unsigned short volume)
 	}
 }
 
-void AmbientMgr::ambientsSet(const std::vector<Ambient *>& a)
+void AmbientMgr::AmbientsSet(const std::vector<Ambient*>& a)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto ambientSource : ambientSources) {
@@ -78,87 +78,87 @@ void AmbientMgr::ambientsSet(const std::vector<Ambient *>& a)
 	}
 }
 
-void AmbientMgr::setAmbients(const std::vector<Ambient *> &a)
+void AmbientMgr::SetAmbients(const std::vector<Ambient*> &a)
 {
 	std::lock_guard<std::mutex> l(ambientsMutex);
 	ambients = a;
-	ambientsSet(ambients);
+	AmbientsSet(ambients);
 
 	core->GetAudioDrv()->UpdateVolume(GEM_SND_VOL_AMBIENTS);
-	activate();
+	Activate();
 }
 
-void AmbientMgr::activate(const std::string &name)
+void AmbientMgr::Activate(const std::string& name)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	//std::lock_guard<std::mutex> l(ambientsMutex);
 	for (auto ambient : ambients) {
-		if (ambient->getName() == name) {
-			ambient->setActive();
+		if (ambient->GetName() == name) {
+			ambient->SetActive();
 			break;
 		}
 	}
 	cond.notify_all();
 }
 
-void AmbientMgr::activate()
+void AmbientMgr::Activate()
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	active = true;
 	cond.notify_all();
 }
 
-void AmbientMgr::deactivate(const std::string &name)
+void AmbientMgr::Deactivate(const std::string& name)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	//std::lock_guard<std::mutex> l(ambientsMutex);
 	for (auto ambient : ambients) {
-		if (ambient->getName() == name) {
-			ambient->setInactive();
+		if (ambient->GetName() == name) {
+			ambient->SetInactive();
 			break;
 		}
 	}
 	cond.notify_all();
 }
 
-void AmbientMgr::deactivate()
+void AmbientMgr::Deactivate()
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	active = false;
-	hardStop();
+	HardStop();
 }
 
-bool AmbientMgr::isActive(const std::string &name) const
+bool AmbientMgr::IsActive(const std::string& name) const
 {
 	std::lock_guard<std::mutex> l(ambientsMutex);
 	for (auto ambient : ambients) {
-		if (ambient->getName() == name) {
-			return ambient->getFlags() & IE_AMBI_ENABLED;
+		if (ambient->GetName() == name) {
+			return ambient->GetFlags() & IE_AMBI_ENABLED;
 		}
 	}
 	return false;
 }
 
-void AmbientMgr::hardStop() const
+void AmbientMgr::HardStop() const
 {
 	for (auto source : ambientSources) {
-		source->hardStop();
+		source->HardStop();
 	}
 }
 
-int AmbientMgr::play()
+int AmbientMgr::Play()
 {
 	while (playing) {
 		std::unique_lock<std::recursive_mutex> l(mutex);
 		tick_t time = GetTicks();
-		tick_t delay = tick(time);
+		tick_t delay = Tick(time);
 		assert(delay > 0);
 		cond.wait_for(l, std::chrono::milliseconds(delay));
 	}
 	return 0;
 }
 
-tick_t AmbientMgr::tick(tick_t ticks) const
+tick_t AmbientMgr::Tick(tick_t ticks) const
 {
 	tick_t delay = 60000; // wait one minute if all sources are off
 
@@ -176,7 +176,7 @@ tick_t AmbientMgr::tick(tick_t ticks) const
 
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto source : ambientSources) {
-		tick_t newdelay = source->tick(ticks, listener, timeslice);
+		tick_t newdelay = source->Tick(ticks, listener, timeslice);
 		if (newdelay < delay) delay = newdelay;
 	}
 	return delay;
@@ -192,14 +192,14 @@ AmbientMgr::AmbientSource::~AmbientSource()
 	}
 }
 
-tick_t AmbientMgr::AmbientSource::tick(tick_t ticks, Point listener, ieDword timeslice)
+tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword timeslice)
 {
 	// if we are out of sounds do nothing
 	if (ambient->sounds.empty()) {
 		return std::numeric_limits<tick_t>::max();
 	}
 
-	if (!(ambient->getFlags() & IE_AMBI_ENABLED) || !(ambient->getAppearance() & timeslice)) {
+	if (!(ambient->GetFlags() & IE_AMBI_ENABLED) || !(ambient->GetAppearance() & timeslice)) {
 		// disabled
 
 		if (stream >= 0) {
@@ -210,12 +210,12 @@ tick_t AmbientMgr::AmbientSource::tick(tick_t ticks, Point listener, ieDword tim
 		return std::numeric_limits<tick_t>::max();
 	}
 
-	tick_t interval = ambient->getInterval();
+	tick_t interval = ambient->GetInterval();
 	if (lastticks == 0) {
 		// initialize
 		lastticks = ticks;
 		if (interval > 0) {
-			nextdelay = ambient->getTotalInterval();
+			nextdelay = ambient->GetTotalInterval();
 		}
 	}
 
@@ -225,35 +225,35 @@ tick_t AmbientMgr::AmbientSource::tick(tick_t ticks, Point listener, ieDword tim
 
 	lastticks = ticks;
 
-	if (ambient->getFlags() & IE_AMBI_RANDOM) {
+	if (ambient->GetFlags() & IE_AMBI_RANDOM) {
 		nextref = RAND<size_t>(0, ambient->sounds.size() - 1);
 	} else if (++nextref >= ambient->sounds.size()) {
 		nextref = 0;
 	}
 
 	if (interval > 0) {
-		nextdelay = ambient->getTotalInterval();
+		nextdelay = ambient->GetTotalInterval();
 	} else {
 		// let's wait a second by default if anything goes wrong
 		nextdelay = 1000;
 	}
 
-	if (!(ambient->getFlags() & IE_AMBI_MAIN) && !isHeard(listener)) { // we are out of range
+	if (!(ambient->GetFlags() & IE_AMBI_MAIN) && !IsHeard(listener)) { // we are out of range
 		// release stream if we're inactive for a while
 		core->GetAudioDrv()->ReleaseStream(stream);
 		stream = -1;
 		return nextdelay;
 	}
 
-	unsigned int channel = ambient->getFlags() & IE_AMBI_LOOPING ? (ambient->getFlags() & IE_AMBI_MAIN ? SFX_CHAN_AREA_AMB : SFX_CHAN_AMB_LOOP) : SFX_CHAN_AMB_OTHER;
-	totalgain = ambient->getTotalGain() * core->GetAudioDrv()->GetVolume(channel) / 100;
+	unsigned int channel = ambient->GetFlags() & IE_AMBI_LOOPING ? (ambient->GetFlags() & IE_AMBI_MAIN ? SFX_CHAN_AREA_AMB : SFX_CHAN_AMB_LOOP) : SFX_CHAN_AMB_OTHER;
+	totalgain = ambient->GetTotalGain() * core->GetAudioDrv()->GetVolume(channel) / 100;
 
 	unsigned int v = 100;
 	core->GetDictionary()->Lookup("Volume Ambients", v);
 
 	if (stream < 0) {
 		// we need to allocate a stream
-		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, 0, v * totalgain / 100, !(ambient->getFlags() & IE_AMBI_MAIN), ambient->radius);
+		stream = core->GetAudioDrv()->SetupNewStream(ambient->GetOrigin().x, ambient->GetOrigin().y, 0, v * totalgain / 100, !(ambient->GetFlags() & IE_AMBI_MAIN), ambient->radius);
 
 		if (stream == -1) {
 			// no streams available...
@@ -264,10 +264,10 @@ tick_t AmbientMgr::AmbientSource::tick(tick_t ticks, Point listener, ieDword tim
 		SetVolume(v);
 	}
 	if (ambient->pitchVariance != 0) {
-		core->GetAudioDrv()->SetAmbientStreamPitch(stream, ambient->getTotalPitch());
+		core->GetAudioDrv()->SetAmbientStreamPitch(stream, ambient->GetTotalPitch());
 	}
 
-	tick_t length = enqueue();
+	tick_t length = Enqueue();
 
 	if (interval == 0) { // continuous ambient
 		nextdelay = length;
@@ -277,19 +277,19 @@ tick_t AmbientMgr::AmbientSource::tick(tick_t ticks, Point listener, ieDword tim
 }
 
 // enqueues a random sound and returns its length
-tick_t AmbientMgr::AmbientSource::enqueue() const
+tick_t AmbientMgr::AmbientSource::Enqueue() const
 {
 	if (stream < 0) return -1;
 	// print("Playing ambient %s, %d/%ld on stream %d", ambient->sounds[nextref], nextref, ambient->sounds.size(), stream);
 	return core->GetAudioDrv()->QueueAmbient(stream, ambient->sounds[nextref]);
 }
 
-bool AmbientMgr::AmbientSource::isHeard(const Point &listener) const
+bool AmbientMgr::AmbientSource::IsHeard(const Point &listener) const
 {
-	return Distance(listener, ambient->getOrigin()) <= ambient->getRadius();
+	return Distance(listener, ambient->GetOrigin()) <= ambient->GetRadius();
 }
 
-void AmbientMgr::AmbientSource::hardStop()
+void AmbientMgr::AmbientSource::HardStop()
 {
 	if (stream >= 0) {
 		core->GetAudioDrv()->ReleaseStream(stream, true);

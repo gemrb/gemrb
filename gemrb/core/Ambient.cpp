@@ -25,7 +25,7 @@
 
 namespace GemRB {
 
-ieWord Ambient::getTotalGain() const
+ieWord Ambient::GetTotalGain() const
 {
 	ieWord g = gain;
 	if (gainVariance != 0) {
@@ -35,7 +35,7 @@ ieWord Ambient::getTotalGain() const
 	return g;
 }
 
-tick_t Ambient::getTotalInterval() const
+tick_t Ambient::GetTotalInterval() const
 {
 	tick_t i = interval;
 	if (intervalVariance != 0) {
@@ -45,7 +45,7 @@ tick_t Ambient::getTotalInterval() const
 	return i;
 }
 
-ieDword Ambient::getTotalPitch() const
+ieDword Ambient::GetTotalPitch() const
 {
 	ieDword p = 100;
 	if (pitchVariance != 0) {
@@ -53,8 +53,5 @@ ieDword Ambient::getTotalPitch() const
 	}
 	return p;
 }
-
-void Ambient::setActive() { flags |= IE_AMBI_ENABLED; }
-void Ambient::setInactive() { flags &= ~IE_AMBI_ENABLED; }
 
 }

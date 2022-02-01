@@ -395,7 +395,7 @@ int GameScript::IsActive(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
 	if (!scr) {
 		const AmbientMgr *ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
-		if (ambientmgr->isActive(parameters->objectParameter->objectName)) {
+		if (ambientmgr->IsActive(parameters->objectParameter->objectName)) {
 			return 1;
 		}
 		return 0;
