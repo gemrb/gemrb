@@ -788,7 +788,8 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 			if (strcmp("dictionary_githzerai_hjacknir", name) == 0) {
 				strncpy(tmpname, "DICTIONARY_GITHZERAI_ HJACKNIR", sizeof(ieVariable));
 			} else {
-				strnspccpy(tmpname, name, 32, true);
+				strnspccpy(tmpname, name, 32);
+				StringToUpper(tmpname.begin());
 			}
 		} else {
 			strnspccpy(tmpname, name, 32);

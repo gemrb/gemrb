@@ -533,7 +533,8 @@ void Variables::LoadInitialValues(const char* name)
 		if (strnicmp(buffer, name, 6) != 0) continue;
 		// copy variable (types got 2 extra spaces, and the name is padded too)
 		// (true = uppercase, needed for original engine save compat, see 315b8f2e)
-		strnspccpy(varname,buffer+8,32, true);
+		strnspccpy(varname,buffer+8,32);
+		StringToUpper(varname.begin());
 		SetAt(varname, value);
 	}  
 }
