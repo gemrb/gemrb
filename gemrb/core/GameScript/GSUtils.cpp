@@ -2191,8 +2191,8 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const char* Context)
 {
-	char newVarName[8+33];
-	
+	ResRef context;
+
 	const char *poi = VarName;
 	if (Context == nullptr) {
 		poi = &VarName[6];
@@ -2200,34 +2200,35 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 		if (*poi==':') {
 			poi++;
 		}
-		strlcpy(newVarName, VarName, 7);
+		context.SNPrintF("%.6s", VarName);
 	} else {
-		strlcpy(newVarName, Context, 7);
+		context.SNPrintF("%.6s", Context);
 	}
 	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", Context, VarName, value);
 	
-	if (strnicmp( newVarName, "MYAREA", 6) == 0) {
+	if (context == "MYAREA") {
 		Sender->GetCurrentArea()->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (strnicmp( newVarName, "LOCALS", 6) == 0) {
+	if (context == "LOCALS") {
 		Sender->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
 	Game *game = core->GetGame();
-	if (HasKaputz && !strnicmp(newVarName, "KAPUTZ", 6)) {
+	if (HasKaputz && context == "KAPUTZ") {
 		game->kaputz->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (strnicmp(newVarName, "GLOBAL", 6) != 0) {
-		Map *map=game->GetMap(game->FindMap(newVarName));
+	if (context == "GLOBAL") {
+		game->locals->SetAt(poi, value, NoCreate);
+	} else {
+		// map name context, eg. AR1324
+		Map* map = game->GetMap(game->FindMap(context));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
 		} else if (core->InDebugMode(ID_VARIABLES)) {
 			Log(WARNING, "GameScript", "Invalid variable {} {} in SetVariable", Context, VarName);
 		}
-	} else {
-		game->locals->SetAt(poi, value, NoCreate);
 	}
 }
 
@@ -2238,50 +2239,51 @@ void SetPointVariable(Scriptable *Sender, const char *VarName, const Point &p, c
 
 ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
 {
-	char newVarName[8];
+	ResRef context;
 	const char *poi = VarName;
 	ieDword value = 0;
 
 	if (Context == nullptr) {
-		strlcpy(newVarName, VarName, 7);
+		context.SNPrintF("%.6s", VarName);
 		poi = &VarName[6];
 		//some HoW triggers use a : to separate the scope from the variable name
 		if (*poi==':') {
 			poi++;
 		}
 	} else {
-		strlcpy(newVarName, Context, 7);
+		context.SNPrintF("%.6s", Context);
 	}
 	
-	if (stricmp(newVarName, "MYAREA") == 0) {
+	if (context == "MYAREA") {
 		Sender->GetCurrentArea()->locals->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
-	if (stricmp( newVarName, "LOCALS" ) == 0) {
+	if (context == "LOCALS") {
 		Sender->locals->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
 	const Game *game = core->GetGame();
-	if (HasKaputz && !stricmp(newVarName,"KAPUTZ")) {
+	if (HasKaputz && context == "KAPUTZ") {
 		game->kaputz->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 		return value;
 	}
 	
-	if (stricmp(newVarName, "GLOBAL") != 0) {
-		const Map *map = game->GetMap(game->FindMap(newVarName));
+	if (context == "GLOBAL") {
+		game->locals->Lookup(poi, value);
+	} else {
+		// map name context, eg. AR1324
+		const Map* map = game->GetMap(game->FindMap(context));
 		if (map) {
 			map->locals->Lookup(poi, value);
 		} else {
 			if (valid) *valid = false;
 			ScriptDebugLog(ID_VARIABLES, "Invalid variable {} {} in checkvariable", Context, VarName);
 		}
-	} else {
-		game->locals->Lookup(poi, value);
 	}
 	ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
 	return value;
@@ -2297,8 +2299,8 @@ Point CheckPointVariable(const Scriptable *Sender, const char *VarName, const ch
 bool VariableExists(const Scriptable *Sender, const char *VarName, const char *Context)
 {
 	ieDword value = 0;
-	char newVarName[8];
-	strlcpy(newVarName, Context, 7);
+	ResRef context;
+	context.SNPrintF("%.6s", Context);
 	const Game *game = core->GetGame();
 
 	if (Sender->GetCurrentArea()->locals->Lookup(VarName, value)) {
@@ -2310,7 +2312,7 @@ bool VariableExists(const Scriptable *Sender, const char *VarName, const char *C
 	} else if (game->locals->Lookup(VarName, value)) {
 		return true;
 	} else {
-		const Map *map = game->GetMap(game->FindMap(newVarName));
+		const Map* map = game->GetMap(game->FindMap(context));
 		if (map && map->locals->Lookup(VarName, value)) {
 			return true;
 		}
