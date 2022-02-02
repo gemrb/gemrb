@@ -45,6 +45,7 @@ public:
 	void Reset();
 	void UpdateVolume(unsigned short value);
 	void SetAmbients(const std::vector<Ambient*> &a);
+	void RemoveAmbients(const std::vector<Ambient*>& oldAmbients);
 
 	void Activate(const std::string& name); // hard play ;-)
 	void Activate();
@@ -74,6 +75,7 @@ private:
 		tick_t Tick(tick_t ticks, Point listener, ieDword timeslice);
 		void HardStop();
 		void SetVolume(unsigned short volume) const;
+		const Ambient* GetAmbient() const { return ambient; };
 	private:
 		int stream = -1;
 		const Ambient* ambient;

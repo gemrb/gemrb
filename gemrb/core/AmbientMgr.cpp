@@ -78,6 +78,39 @@ void AmbientMgr::AmbientsSet(const std::vector<Ambient*>& a)
 	}
 }
 
+void AmbientMgr::RemoveAmbients(const std::vector<Ambient*> &oldAmbients)
+{
+	std::lock_guard<std::recursive_mutex> l(mutex);
+	// manually deleting ambientSources as regenerating them causes a several second pause
+	for (auto it = ambientSources.begin(); it != ambientSources.end(); ) {
+		auto ambientSource = *it;
+		bool deleted = false;
+		for (auto ambient : oldAmbients) {
+			if (ambientSource->GetAmbient() == ambient) {
+				delete ambientSource;
+				it = ambientSources.erase(it);
+				deleted = true;
+				break;
+			}
+		}
+		if (!deleted) ++it;
+	}
+
+	for (auto it = ambients.begin(); it != ambients.end(); ) {
+		bool deleted = false;
+		for (auto ambient : oldAmbients) {
+			if (*it == ambient) {
+				// memory freeing is left to the user if needed
+				it = ambients.erase(it);
+				deleted = true;
+				break;
+			}
+		}
+		if (!deleted) ++it;
+	}
+}
+
+
 void AmbientMgr::SetAmbients(const std::vector<Ambient*> &a)
 {
 	std::lock_guard<std::mutex> l(ambientsMutex);

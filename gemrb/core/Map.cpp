@@ -452,7 +452,7 @@ Map::~Map(void)
 	}
 
 	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
-	ambim->Reset();
+	ambim->RemoveAmbients(ambients);
 	for (auto ambient : ambients) {
 		delete ambient;
 	}
