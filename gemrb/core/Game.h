@@ -118,10 +118,13 @@ class TableMgr;
 #define REST_CONTROL  4 // control check
 #define REST_CRITTER  8 // hostiles check
 
-//Song types (hardcoded)
+// Song types (hardcoded and in musics.ids for scripts (iwd))
 #define SONG_DAY        0
 #define SONG_NIGHT      1
+// SONG_BATTLE_WIN
 #define SONG_BATTLE     3
+// SONG_BATTLE_LOSE
+// SONG_MISC0-4
 
 #define IE_GAM_JOURNAL 0
 #define IE_GAM_QUEST_UNSOLVED 1
