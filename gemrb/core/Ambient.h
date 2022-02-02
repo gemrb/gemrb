@@ -42,7 +42,8 @@ namespace GemRB {
 class GEM_EXPORT Ambient {
 public:
 	Ambient() = default;
-	
+	bool operator==(const Ambient& b) const { return origin == b.origin && !strncmp(name, b.name, 31); }
+
 	const char* GetName() const { return name; }
 	const Point& GetOrigin() const { return origin; }
 	ieWord GetRadius() const { return radius; }
