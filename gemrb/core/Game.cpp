@@ -2068,8 +2068,10 @@ void Game::ChangeSong(bool always, bool force) const
 		BattleSong++;
 	} else {
 		//will select SONG_DAY or SONG_NIGHT
-		// TODO: should this take time of day into account?
-		Song = core->Time.GetHour(GameTime)/12;
+		Trigger* parameters = new Trigger;
+		parameters->int0Parameter = 0; // TIMEOFDAY_DAY, while dusk, dawn and night we treat as night
+		Song = int(GameScript::TimeOfDay(nullptr, parameters) != 1);
+		delete parameters;
 		BattleSong = 0;
 	}
 	//area may override the song played (stick in battlemusic)
