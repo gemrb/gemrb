@@ -274,7 +274,7 @@ String TLKImporter::ResolveTags(const String& source)
 {
 	const size_t strLen = source.length();
 	auto mystrncpy = [&source, &strLen](char* dest, size_t idx, size_t maxlength,
-		char delim)
+		wchar_t delim)
 	{
 		maxlength = std::min(maxlength, strLen);
 		while (idx < source.length() && (source[idx] != delim) && maxlength--) {
@@ -290,7 +290,7 @@ String TLKImporter::ResolveTags(const String& source)
 	for (size_t i = 0; source[i]; i++) {
 		auto srcch = source[i];
 		if (srcch == L'<') {
-			i = mystrncpy(Token, i + 1, MAX_VARIABLE_LENGTH, '>');
+			i = mystrncpy(Token, i + 1, MAX_VARIABLE_LENGTH, L'>');
 			String resolvedToken = BuiltinToken(Token);
 			if (resolvedToken.empty()) {
 				int TokenLength = core->GetTokenDictionary()->GetValueLength(Token);
