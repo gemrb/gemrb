@@ -2515,41 +2515,39 @@ Trigger* GenerateTrigger(char* String)
 	return trigger;
 }
 
-Action* GenerateAction(const char* String)
+Action* GenerateAction(std::string actionString)
 {
 	Action* action = NULL;
-	char* actionString = strdup(String);
-	// the only thing we seem to need a copy for is the call to strlwr...
+	
 	StringToLower(actionString);
-	ScriptDebugLog(ID_ACTIONS, "Compiling: {}", String);
+	ScriptDebugLog(ID_ACTIONS, "Compiling: {}", actionString);
 
-	int len = strlench(String,'(')+1; //including (
-	const char *src = actionString + len;
+	int len = strlench(actionString.c_str(),'(')+1; //including (
+	const char *src = &actionString[len];
 	int i = -1;
 	const char *str;
 	unsigned short actionID;
 	if (overrideActionsTable) {
-		i = overrideActionsTable->FindString(actionString, len);
+		i = overrideActionsTable->FindString(actionString.c_str(), len);
 		if (i >= 0) {
 			str = overrideActionsTable->GetStringIndex( i )+len;
 			actionID = overrideActionsTable->GetValueIndex(i);
 		}
 	}
 	if (i<0) {
-		i = actionsTable->FindString(actionString, len);
+		i = actionsTable->FindString(actionString.c_str(), len);
 		if (i < 0) {
-			Log(ERROR, "GameScript", "Invalid scripting action: {}", String);
-			goto done;
+			Log(ERROR, "GameScript", "Invalid scripting action: {}", actionString);
+			return action;
 		}
 		str = actionsTable->GetStringIndex( i )+len;
 		actionID = actionsTable->GetValueIndex(i);
 	}
 	action = GenerateActionCore( src, str, actionID);
 	if (!action) {
-		Log(ERROR, "GameScript", "Malformed scripting action: {}", String);
+		Log(ERROR, "GameScript", "Malformed scripting action: {}", actionString);
 	}
-	done:
-	free(actionString);
+
 	return action;
 }
 
