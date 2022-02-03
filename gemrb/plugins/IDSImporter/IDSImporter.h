@@ -47,7 +47,7 @@ public:
 	char* GetValue(int val) const override;
 	char* GetStringIndex(size_t Index) const override;
 	int GetValueIndex(size_t Index) const override;
-	int FindString(char *str, int len) const override;
+	int FindString(const char *str, int len) const override;
 	int FindValue(int val) const override;
 	size_t GetSize() const override { return pairs.size(); }
 	int GetHighestValue() const override;
