@@ -2831,7 +2831,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		WMPAreaEntry entry;
 		entry.AreaName = ResRef::MakeUpperCase(area);
 		entry.AreaResRef = ResRef::MakeUpperCase(area);
-		strnuprcpy(entry.AreaLongName, script, 32);
+		strnuprcpy(entry.AreaLongName.begin(), script, 32);
 		entry.SetAreaStatus(flags, BitOp::SET);
 		entry.IconSeq = icon;
 		entry.pos.x = locx;
@@ -2862,7 +2862,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				return RuntimeError("cannot establish area link!");
 			}
 			WMPAreaLink link;
-			strnuprcpy(link.DestEntryPoint, ename, 32);
+			strnuprcpy(link.DestEntryPoint.begin(), ename, 32);
 			link.DistanceScale = distance;
 			link.DirectionFlags = lflags;
 			link.EncounterChance = encprob;
@@ -7806,9 +7806,9 @@ static void ReadUsedItems()
 		UsedItems.resize(UsedItemsCount);
 		for (size_t i = 0; i < UsedItemsCount; i++) {
 			UsedItems[i].itemname = table->GetRowName(i);
-			strnlwrcpy(UsedItems[i].username, table->QueryField(i, 0), 32);
+			strnlwrcpy(UsedItems[i].username.begin(), table->QueryField(i, 0), 32);
 			if (UsedItems[i].username[0] == '*') {
-				UsedItems[i].username = nullptr;
+				UsedItems[i].username.Reset();
 			}
 			//this is an strref
 			UsedItems[i].value = table->QueryFieldAsStrRef(i, 1);
@@ -9786,7 +9786,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	GET_MAP();
 
 	anim.appearance=0xffffffff; //scheduled for every hour
-	strnlwrcpy(anim.Name, ResRef, 8);
+	strnlwrcpy(anim.Name.begin(), ResRef, 8);
 	anim.BAM = ResRef;
 	anim.Flags=Flags;
 	anim.sequence=Cycle;
@@ -9915,7 +9915,7 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 		ip->Destination = ResRef::MakeUpperCase(NewArea);
 		//change entrance only if supplied
 		if (NewEntrance) {
-			strnuprcpy(ip->EntranceName, NewEntrance, sizeof(ieVariable)-1 );
+			strnuprcpy(ip->EntranceName.begin(), NewEntrance, sizeof(ieVariable)-1 );
 		}
 	}
 

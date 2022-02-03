@@ -564,7 +564,8 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 			return;
 	}
 	stream->Write( Signature, 8);
-	stream->WriteVariable(ieVariable(act->GetShortName()));
+	std::string tmpstr = MBStringFromString(act->GetShortName());
+	stream->WriteVariable(ieVariable(tmpstr.c_str()));
 	stream->WriteDword(tmpDword); //cre offset (chr header size)
 	stream->WriteDword(CRESize);  //cre size
 
@@ -1139,8 +1140,8 @@ void CREImporter::GetActorPST(Actor *act)
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
-	strnspccpy(act->KillVar, KillVar, 32);
-	act->IncKillVar = nullptr;
+	strnspccpy(act->KillVar.begin(), KillVar, 32);
+	act->IncKillVar.Reset();
 
 	str->ReadDword(KnownSpellsOffset);
 	str->ReadDword(KnownSpellsCount);
@@ -1538,8 +1539,8 @@ void CREImporter::GetActorBG(Actor *act)
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
-	act->KillVar = nullptr;
-	act->IncKillVar = nullptr;
+	act->KillVar.Reset();
+	act->IncKillVar.Reset();
 
 	str->ReadDword(KnownSpellsOffset);
 	str->ReadDword(KnownSpellsCount);
@@ -1809,9 +1810,9 @@ void CREImporter::GetActorIWD2(Actor *act)
 	}
 	ieVariable KillVar;
 	str->ReadVariable(KillVar);
-	strnspccpy(act->KillVar, KillVar, 32);
+	strnspccpy(act->KillVar.begin(), KillVar, 32);
 	str->ReadVariable(KillVar);
-	strnspccpy(act->IncKillVar, KillVar, 32);
+	strnspccpy(act->IncKillVar.begin(), KillVar, 32);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord(tmpWord);
 	act->BaseStats[IE_SAVEDXPOS] = tmpWord;
@@ -2058,9 +2059,9 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	}
 	ieVariable KillVar;
 	str->ReadVariable(KillVar); // use these as needed
-	strnspccpy(act->KillVar, KillVar, 32);
+	strnspccpy(act->KillVar.begin(), KillVar, 32);
 	str->ReadVariable(KillVar);
-	strnspccpy(act->IncKillVar, KillVar, 32);
+	strnspccpy(act->IncKillVar.begin(), KillVar, 32);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord(tmpWord);
 	act->BaseStats[IE_SAVEDXPOS] = tmpWord;

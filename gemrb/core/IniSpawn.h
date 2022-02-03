@@ -138,7 +138,7 @@ struct VariableSpec {
 	VariableSpec(const char* name, ieDword val)
 	: Value(val)
 	{
-		strnlwrcpy(Name, name, sizeof(ieVariable) - 1);
+		strnlwrcpy(Name.begin(), name, sizeof(ieVariable) - 1);
 	}
 };
 

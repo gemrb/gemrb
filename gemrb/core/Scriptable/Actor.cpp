@@ -5308,7 +5308,7 @@ void Actor::Resurrect(const Point &destPoint)
 	//readjust death variable on resurrection
 	ieVariable DeathVar;
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
-		const size_t len = snprintf(DeathVar, sizeof(ieVariable), "%s_DEAD", scriptName.CString());
+		const size_t len = DeathVar.SNPrintF("%s_DEAD", scriptName.CString());
 		if (len > sizeof(ieVariable)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", scriptName, fmt::WideToChar{GetName()});
 		}
@@ -5320,7 +5320,7 @@ void Actor::Resurrect(const Point &destPoint)
 		}
 	// not bothering with checking actor->SetDeathVar, since the SetAt nocreate parameter is true
 	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
-		size_t len = snprintf(DeathVar, 32, core->GetDeathVarFormat(), scriptName);
+		const size_t len = DeathVar.SNPrintF(core->GetDeathVarFormat(), scriptName.CString());
 		if (len > 32) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals (on resurrect)!", scriptName, fmt::WideToChar{GetName()});
 		}
@@ -5515,9 +5515,9 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		// of this extra id are still alive (for example, see the ToB challenge scripts)
 		ieVariable varname;
 		if (Modified[IE_SEX] == SEX_EXTRA) {
-			snprintf(varname, 32, "EXTRACOUNT");
+			varname = "EXTRACOUNT";
 		} else {
-			snprintf(varname, 32, "EXTRACOUNT%d", 2 + (Modified[IE_SEX] - SEX_EXTRA2));
+			varname.SNPrintF("EXTRACOUNT%d", 2 + (Modified[IE_SEX] - SEX_EXTRA2));
 		}
 
 		if (area) {
@@ -5646,7 +5646,7 @@ bool Actor::CheckOnDeath()
 	if (scriptName[0] && SetDeathVar) {
 		ieVariable varname;
 		value = 0;
-		size_t len = snprintf(varname, 32, "%s_DEAD", scriptName.CString());
+		size_t len = varname.SNPrintF("%s_DEAD", scriptName.CString());
 		game->locals->Lookup(varname, value);
 		game->locals->SetAt(varname, 1, nocreate);
 		if (len > 32) {
@@ -5710,7 +5710,7 @@ bool Actor::CheckOnDeath()
 ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, const char *name, ieDword start) const {
 	if (name && name[0]) {
 		ieVariable varname;
-		size_t len = snprintf(varname, 32, format, name);
+		size_t len = varname.SNPrintF(format, name);
 		vars->Lookup(varname, start);
 		vars->SetAt(varname, start + 1, nocreate);
 		if (len > 32) {
@@ -10469,13 +10469,13 @@ void Actor::UseExit(ieDword exitID) {
 	} else {
 		InternalFlags&=~IF_USEEXIT;
 		LastArea = Area;
-		UsedExit = nullptr;
+		UsedExit.Reset();
 		if (LastExit) {
 			const char *ipName = NULL;
 			const Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);
 			if (ip) ipName = ip->GetScriptName();
 			if (ipName && ipName[0]) {
-				snprintf(UsedExit, sizeof(ieVariable), "%s", ipName);
+				UsedExit.SNPrintF("%s", ipName);
 			}
 		}
 	}

@@ -98,7 +98,7 @@ void Scriptable::SetScriptName(const char* text)
 	//if (text && text[0]) { //this leaves some uninitialized bytes
 	//lets hope this won't break anything
 	if (text) {
-		strnspccpy( scriptName, text, 32 );
+		strnspccpy(scriptName.begin(), text, 32);
 	}
 }
 
