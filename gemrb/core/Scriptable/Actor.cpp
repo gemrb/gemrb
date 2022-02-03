@@ -308,8 +308,8 @@ std::map<unsigned int, int> favoredMap;
 std::map<unsigned int, std::string> raceID2Name;
 
 // iwd2 class to-hit and apr tables read into a single object
-std::map<char *, std::vector<BABTable> > IWD2HitTable;
-std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
+std::map<std::string, std::vector<BABTable>> IWD2HitTable;
+std::map<int, std::string> BABClassMap; // maps classis (not id!) to the BAB table
 
 std::vector<ModalStatesStruct> ModalStates;
 std::map<int, int> numWeaponSlots;
@@ -1673,9 +1673,7 @@ void Actor::ReleaseMemory()
 		skillrac.clear();
 		IWD2HitTable.clear();
 		ModalStates.clear();
-		for (const auto& str : BABClassMap) {
-			free(str.second);
-		}
+
 		BABClassMap.clear();
 		for (const auto& clskit : class2kits) {
 			free(clskit.second.clab);
@@ -2129,14 +2127,13 @@ static void InitActorTables()
 			xpcap[classis] = atoi(xpcapt->QueryField(classname, "VALUE"));
 
 			// set up the tohit/apr tables
-			char tohit[9];
-			strnuprcpy(tohit, tm->QueryField(classname, "TOHIT"), 8);
-			BABClassMap[classis] = strdup(tohit);
+			std::string tohit = tm->QueryField(classname, "TOHIT");
+			BABClassMap[classis] = tohit;
 			// the tables repeat, but we need to only load one copy
 			// FIXME: the attempt at skipping doesn't work!
 			const auto& it = IWD2HitTable.find(tohit);
 			if (it == IWD2HitTable.end()) {
-				tht = gamedata->LoadTable(tohit, true);
+				tht = gamedata->LoadTable(tohit.c_str(), true);
 				if (!tht || !tohit[0]) {
 					error("Actor", "TOHIT table for {} does not exist!", classname);
 				}
@@ -2150,7 +2147,7 @@ static void InitActorTables()
 					bt.apr = atoi(tht->QueryField(row, 1));
 					btv.push_back(bt);
 				}
-				IWD2HitTable.insert(std::make_pair (BABClassMap[classis], btv));
+				IWD2HitTable.emplace(BABClassMap[classis], btv);
 			}
 
 			std::string buffer;
