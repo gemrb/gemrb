@@ -39,6 +39,7 @@ struct ProjectileEntry
 	ProjectileEntry(const ProjectileEntry&) = delete;
 	ProjectileEntry(ProjectileEntry&&) = default;
 	ProjectileEntry& operator=(const ProjectileEntry&) = delete;
+	ProjectileEntry& operator=(ProjectileEntry&&) = default;
 	~ProjectileEntry()
 	{
 		delete projectile;

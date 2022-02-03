@@ -79,6 +79,7 @@ public:
 	SPLExtHeader(const SPLExtHeader&) = delete;
 	~SPLExtHeader();
 	SPLExtHeader& operator=(const SPLExtHeader&) = delete;
+	SPLExtHeader& operator=(SPLExtHeader&&) = default;
 
 	ieByte SpellForm = 0;
 	ieByte Hostile = 0;

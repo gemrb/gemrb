@@ -125,6 +125,7 @@ public:
 	WorldMap(WorldMap&&) = default;
 	~WorldMap();
 	WorldMap& operator=(const WorldMap&) = delete;
+	WorldMap& operator=(WorldMap&&) = default;
 public: //struct members
 	ResRef MapResRef;
 	ieDword Width = 0;
