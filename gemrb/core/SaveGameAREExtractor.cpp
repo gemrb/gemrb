@@ -109,8 +109,7 @@ int32_t SaveGameAREExtractor::createCacheBlob() {
 	return areEntries;
 }
 
-int32_t SaveGameAREExtractor::extractARE(const char *name) {
-	std::string key{name};
+int32_t SaveGameAREExtractor::extractARE(std::string key) {
 	StringToLower(key);
 	key.append(".are");
 
