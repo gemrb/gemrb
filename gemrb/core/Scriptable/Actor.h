@@ -537,7 +537,7 @@ public:
 	void SetPortrait(const char* ResRef, int Which=0);
 	void SetSoundFolder(const char *soundset) const;
 	/* Use overrideSet to replace PCStats->SoundSet */
-	void GetSoundFolder(char *soundset, int flag, const ResRef& overrideSet) const;
+	std::string GetSoundFolder(int flag, const ResRef& overrideSet) const;
 	
 	/** Gets the Character Long Name/Short Name */
 	const String& GetShortName() const

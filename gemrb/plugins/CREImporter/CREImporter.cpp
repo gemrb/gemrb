@@ -715,7 +715,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 			act->PCStats->QSlots[i+3] = (ieByte) tmpDword;
 		}
 		str->Seek(26, GEM_CURRENT_POS);
-		str->Read( act->PCStats->SoundFolder, 32);
+		str->ReadVariable(act->PCStats->SoundFolder);
 		str->ReadResRef(act->PCStats->SoundSet);
 		for (auto& setting : act->PCStats->ExtraSettings) {
 			str->ReadDword(setting);

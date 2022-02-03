@@ -3865,7 +3865,6 @@ PyDoc_STRVAR( GemRB_VerbalConstant__doc,
 static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, str;
-	char Sound[_MAX_PATH];
 	unsigned int channel;
 
 	if (!PyArg_ParseTuple( args, "ii", &globalID, &str )) {
@@ -3880,10 +3879,9 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	}
 
 	//get soundset based string constant
-	snprintf(Sound, _MAX_PATH, "%s/%s%02d",
-		actor->PCStats->SoundFolder, actor->PCStats->SoundSet.CString(), str);
+	std::string sound = fmt::format("{}/{}{:02d}", actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
 	channel = actor->InParty ? SFX_CHAN_CHAR0 + actor->InParty - 1 : SFX_CHAN_DIALOG;
-	core->GetAudioDrv()->Play(Sound, channel, Point(), GEM_SND_RELATIVE|GEM_SND_SPEECH);
+	core->GetAudioDrv()->Play(sound.c_str(), channel, Point(), GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	Py_RETURN_NONE;
 }
 
@@ -5717,10 +5715,9 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	char Sound[42];
 	ResRef ignore;
-	actor->GetSoundFolder(Sound, flag, ignore);
-	return PyString_FromString(Sound);
+	std::string sound = actor->GetSoundFolder(flag, ignore);
+	return PyString_FromStringObj(sound);
 }
 
 PyDoc_STRVAR( GemRB_GetSlotType__doc,
@@ -6458,7 +6455,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		newstats.Happiness = oldstats.Happiness;
 		newstats.LastLeft = oldstats.LastLeft;
 		newstats.LastJoined = oldstats.LastJoined;
-		std::copy(std::begin(oldstats.SoundFolder), std::end(oldstats.SoundFolder), newstats.SoundFolder);
+		newstats.SoundFolder = oldstats.SoundFolder;
 		newstats.States = oldstats.States;
 		
 		oldstats = newstats;
