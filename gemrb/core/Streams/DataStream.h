@@ -139,13 +139,7 @@ public:
 	template <typename STR>
 	strret_t ReadRTrimString(STR& dest, size_t len) {
 		strret_t read = Read(dest.begin(), len);
-
-		// remove trailing spaces
-		for (strret_t i = read - 1; i >= 0; --i) {
-			if (dest[i] == ' ') dest[i] = '\0';
-			else break;
-		}
-
+		dest.RTrim();
 		return read;
 	}
 	

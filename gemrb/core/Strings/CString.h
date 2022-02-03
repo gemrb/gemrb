@@ -95,6 +95,18 @@ public:
 		return fss;
 	}
 	
+	// remove trailing spaces
+	uint8_t RTrim() {
+		int8_t len = CStrLen();
+		int8_t i = len;
+		for (; i - 1 >= 0; --i) {
+			if (std::isspace(str[i])) str[i] = '\0';
+			else break;
+		}
+
+		return len - i;
+	}
+	
 	FixedSizeString() noexcept = default;
 	FixedSizeString(std::nullptr_t) noexcept = delete;
 	FixedSizeString& operator=(std::nullptr_t) noexcept = delete;
