@@ -2831,7 +2831,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		WMPAreaEntry entry;
 		entry.AreaName = ResRef::MakeUpperCase(area);
 		entry.AreaResRef = ResRef::MakeUpperCase(area);
-		strnuprcpy(entry.AreaLongName.begin(), script, 32);
+		entry.AreaLongName = ieVariable::MakeUpperCase(script);
 		entry.SetAreaStatus(flags, BitOp::SET);
 		entry.IconSeq = icon;
 		entry.pos.x = locx;
@@ -2862,7 +2862,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				return RuntimeError("cannot establish area link!");
 			}
 			WMPAreaLink link;
-			strnuprcpy(link.DestEntryPoint.begin(), ename, 32);
+			link.DestEntryPoint = ieVariable::MakeUpperCase(ename);
 			link.DistanceScale = distance;
 			link.DirectionFlags = lflags;
 			link.EncounterChance = encprob;
@@ -9912,7 +9912,7 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 		ip->Destination = ResRef::MakeUpperCase(NewArea);
 		//change entrance only if supplied
 		if (NewEntrance) {
-			strnuprcpy(ip->EntranceName.begin(), NewEntrance, sizeof(ieVariable)-1 );
+			ip->EntranceName = ieVariable::MakeUpperCase(NewEntrance);
 		}
 	}
 

@@ -7308,12 +7308,11 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 		return;
 	}
 
-	ieVariable tokenname;
 	int count = tm->GetRowCount();
 	for (int i = 0; i < count; i++) {
 		//roll a random number between 0 and column #
 		int j = core->Roll(1, tm->GetColumnCount(i), -1);
-		strnuprcpy(tokenname.begin(), tm->GetRowName(i), 32);
+		ieVariable tokenname = ieVariable::MakeUpperCase(tm->GetRowName(i));
 		core->GetTokenDictionary()->SetAtCopy( tokenname, tm->QueryField(i, j) );
 	}
 }

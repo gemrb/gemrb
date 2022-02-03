@@ -46,7 +46,6 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
 
 GEM_EXPORT int strlench(const char* string, char ch);
 
-GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnspccpy(char* d, const char *s, int l);
 
 constexpr int NoTransform(int c) { return c; }
@@ -97,9 +96,16 @@ public:
 
 	static FixedSizeString MakeUpperCase(const char* str) {
 		if (!str) return FixedSizeString();
-
+		
 		FixedSizeString fss;
-		strnuprcpy(fss.str, str, sizeof(fss.str) - 1);
+		uint8_t count = LEN;
+		auto dest = fss.begin();
+		while(count--) {
+			*dest++ = std::towupper(*str);
+			if(!*str++) {
+				break;
+			}
+		}
 		return fss;
 	}
 	

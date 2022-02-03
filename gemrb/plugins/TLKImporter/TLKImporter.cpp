@@ -53,9 +53,8 @@ TLKImporter::TLKImporter(void)
 		gtcount = tm->GetRowCount();
 	}
 	for(int i=0;i<gtcount;i++) {
-		ieVariable key;
+		ieVariable key = ieVariable::MakeUpperCase(tm->GetRowName(i));
 
-		strnuprcpy(key.begin(), tm->GetRowName(i), sizeof(ieVariable)-1 );
 		gt_type *entry = new gt_type;
 		entry->type = atoi(tm->QueryField(i,0));
 		entry->male = tm->QueryFieldAsStrRef(i,1);
