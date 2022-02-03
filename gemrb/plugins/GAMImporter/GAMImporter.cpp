@@ -558,7 +558,7 @@ void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
 	str->ReadResRef( ps->SoundSet );
 
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
-		str->Read( ps->SoundFolder, 32);
+		str->ReadVariable(ps->SoundFolder);
 	}
 	
 	//iwd2 has some PC only stats that the player can set (this can be done via a guiscript interface)

@@ -455,13 +455,13 @@ void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 		//get soundset based string constant
 		ResRef soundRef;
 		actor->GetVerbalConstantSound(soundRef, vc);
-		char Sound[_MAX_PATH];
+		std::string sound;
 		if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
-			snprintf(Sound, _MAX_PATH, "%s/%s",actor->PCStats->SoundFolder, soundRef.CString());
+			sound = fmt::format("{}/{}", actor->PCStats->SoundFolder, soundRef);
 		} else {
-			strlcpy(Sound, soundRef.CString(), sizeof(Sound));
+			sound = soundRef.CString();
 		}
-		return DisplayStringCore(Sender, Strref, flags, Sound);
+		return DisplayStringCore(Sender, Strref, flags, sound.c_str());
 	}
 }
 

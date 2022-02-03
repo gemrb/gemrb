@@ -59,7 +59,7 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	unknown10 = source.unknown10;
 	Happiness = source.Happiness;
 	SoundSet = source.SoundSet;
-	strlcpy(SoundFolder, source.SoundFolder, SOUNDFOLDERSIZE-1);
+	SoundFolder = source.SoundFolder;
 	States = source.States;
 	LastLeft = source.LastLeft;
 	LastJoined = source.LastJoined;

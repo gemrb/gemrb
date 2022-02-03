@@ -3815,12 +3815,11 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 	bool found = false;
 	if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 		ResRef soundRef;
-		char chrsound[256];
 		do {
 			count--;
 			GetVerbalConstantSound(soundRef, start + count);
-			GetSoundFolder(chrsound, 1, soundRef);
-			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound, IE_OGG_CLASS_ID, true)) {
+			std::string chrsound = GetSoundFolder(1, soundRef);
+			if (gamedata->Exists(chrsound.c_str(), IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound.c_str(), IE_OGG_CLASS_ID, true)) {
 				DisplayStringCoreVC((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
 				found = true;
 				break;
@@ -8971,7 +8970,7 @@ void Actor::SetSoundFolder(const char *soundset) const
 
 	char filepath[_MAX_PATH];
 
-	strnlwrcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE-1);
+	PCStats->SoundFolder = ieVariable::MakeLowerCase(soundset);
 	PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder, nullptr);
 
 	DirectoryIterator dirIt(filepath);
@@ -8991,7 +8990,7 @@ void Actor::SetSoundFolder(const char *soundset) const
 	}
 }
 
-void Actor::GetSoundFolder(char *soundset, int full, const ResRef& overrideSet) const
+std::string Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
 {
 	ResRef set;
 	if (overrideSet.IsEmpty()) {
@@ -9000,15 +8999,17 @@ void Actor::GetSoundFolder(char *soundset, int full, const ResRef& overrideSet) 
 		set = overrideSet;
 	}
 
+	std::string soundset;
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		if (full) {
-			snprintf(soundset, sizeof(PCStats->SoundFolder) + 9, "%s/%s", PCStats->SoundFolder, set.CString());
+			soundset = fmt::format("{}/{}", PCStats->SoundFolder, set);
 		} else {
-			snprintf(soundset, sizeof(PCStats->SoundFolder), "%s", PCStats->SoundFolder);
+			soundset = fmt::format("{}", PCStats->SoundFolder);
 		}
 	} else {
-		strlcpy(soundset, set.CString(), 9);
+		soundset = set.CString();
 	}
+	return soundset;
 }
 
 bool Actor::HasVVCCell(const ResRef &resource) const

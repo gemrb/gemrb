@@ -35,7 +35,6 @@ namespace GemRB {
 #define MAX_QSLOTS          9   //iwd2 has 9
 #define MAX_PORTRAIT_ICONS 12
 #define MAX_FAVOURITES     4
-#define SOUNDFOLDERSIZE    32+1
 #define MAX_INTERACT       24
 
 //action buttons
@@ -126,7 +125,7 @@ public:
 	ResRef  FavouriteWeapons[MAX_FAVOURITES];
 	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES] {0};
 	ResRef  SoundSet;
-	char      SoundFolder[SOUNDFOLDERSIZE] {0};
+	ieVariable SoundFolder;
 	ieDword   ExtraSettings[ES_COUNT] {0};     //iwd2 - expertise, hamstring, arterial strike, etc
 	ResRef    QuickSpells[MAX_QSLOTS]; //iwd2 uses 9, others use only 3
 	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT] {0xffff}; //iwd2 uses 8, others use only 4
