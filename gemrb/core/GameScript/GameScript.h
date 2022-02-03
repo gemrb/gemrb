@@ -1517,7 +1517,7 @@ public: //Script Functions
 	static Targets *Player10Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
 };
 
-GEM_EXPORT Action* GenerateAction(const char* String);
+GEM_EXPORT Action* GenerateAction(std::string String);
 Action *GenerateActionDirect(const char *String, const Scriptable *object);
 GEM_EXPORT Trigger* GenerateTrigger(char* String);
 
