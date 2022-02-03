@@ -830,7 +830,7 @@ int Game::LoadMap(const ResRef &resRef, bool loadscreen)
 		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
 
-	if (core->saveGameAREExtractor.extractARE(resRef) != GEM_OK) {
+	if (core->saveGameAREExtractor.extractARE(resRef.CString()) != GEM_OK) {
 		core->LoadProgress(100);
 		return GEM_ERROR;
 	}

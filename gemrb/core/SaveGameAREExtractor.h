@@ -50,7 +50,7 @@ class GEM_EXPORT SaveGameAREExtractor {
 		void changeSaveGame(SaveGame*);
 		int32_t copyRetainedAREs(DataStream*, bool trackLocations = false);
 		int32_t createCacheBlob();
-		int32_t extractARE(const char*);
+		int32_t extractARE(std::string);
 		bool isRunningSaveGame(const SaveGame&) const;
 		void registerLocation(const char*, unsigned long);
 		void registerNewLocation(const char*, unsigned long);
