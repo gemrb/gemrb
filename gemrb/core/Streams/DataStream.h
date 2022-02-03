@@ -156,13 +156,13 @@ public:
 	
 	template <typename STR>
 	strret_t WriteStringLC(STR src, size_t len) {
-		StringToLower(src.begin(), src.begin() + len);
+		StringToLower(src.begin(), src.begin() + len, src.begin());
 		return WriteString<STR>(src, len);
 	}
 	
 	template <typename STR>
 	strret_t WriteStringUC(STR src, size_t len) {
-		StringToUpper(src.begin(), src.begin() + len);
+		StringToUpper(src.begin(), src.begin() + len, src.begin());
 		return WriteString<STR>(src, len);
 	}
 
