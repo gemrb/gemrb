@@ -156,11 +156,10 @@ bool SaveGameAREExtractor::isRunningSaveGame(const SaveGame& otherGame) const
 	return saveGame->GetSaveID() == otherGame.GetSaveID();
 }
 
-void SaveGameAREExtractor::registerLocation(const char *name, unsigned long pos) {
-	std::string key{name};
+void SaveGameAREExtractor::registerLocation(std::string key, unsigned long pos) {
 	StringToLower(key);
 
-	areLocations.emplace(std::make_pair(std::move(key), pos));
+	areLocations.emplace(std::move(key), pos);
 }
 
 void SaveGameAREExtractor::changeSaveGame(SaveGame* newSave) {

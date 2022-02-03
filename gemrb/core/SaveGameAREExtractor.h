@@ -52,7 +52,7 @@ class GEM_EXPORT SaveGameAREExtractor {
 		int32_t createCacheBlob();
 		int32_t extractARE(std::string);
 		bool isRunningSaveGame(const SaveGame&) const;
-		void registerLocation(const char*, unsigned long);
+		void registerLocation(std::string, unsigned long);
 		void registerNewLocation(const char*, unsigned long);
 		void updateSaveGame(size_t offset);
 
