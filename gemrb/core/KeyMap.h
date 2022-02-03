@@ -50,7 +50,7 @@ public:
 	bool ResolveKey(unsigned short key, int group) const;
 	bool ResolveName(const char* name, int group) const;
 
-	Function* LookupFunction(const char* name);
+	Function* LookupFunction(std::string name);
 };
 }
 

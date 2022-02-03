@@ -160,18 +160,16 @@ bool KeyMap::ResolveName(const char* name, int group) const
 	return true;
 }
 
-Function* KeyMap::LookupFunction(const char* name)
+Function* KeyMap::LookupFunction(std::string key)
 {
-	char* key = strdup(name);
+	// FIXME: Variables::MyCompareKey is already case insensitive AFICT
 	StringToLower(key);
 
 	void *tmp;
-	if (!keymap.Lookup(name, tmp) ) {
-		free(key);
-		return NULL;
+	if (!keymap.Lookup(key.c_str(), tmp) ) {
+		return nullptr;
 	}
 
-	free(key);
 	return (Function *)tmp;
 }
 
