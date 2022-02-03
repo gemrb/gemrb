@@ -62,7 +62,7 @@ bool IDSImporter::Open(DataStream* str)
 		if (len < 256)
 			line = ( char * ) realloc( line, len + 1 );
 		
-		StringToLower(line, line + len);
+		StringToLower(line, line + len, line);
 		char* cell = strtok(line, " ");
 		Pair p;
 		p.val = strtosigned<int>(cell, nullptr, 0);
