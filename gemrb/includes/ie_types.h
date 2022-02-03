@@ -100,60 +100,7 @@ enum class ieStrRef : ieDword {
 	ROLL23 = 40975
 };
 
-class ieVariable
-{
-	char var[33] {'\0'};
-	
-public:
-	ieVariable() = default;
-	ieVariable(std::nullptr_t) = delete;
-	
-	explicit ieVariable(const std::string& str)
-	: ieVariable(str.c_str())
-	{}
-	
-	explicit ieVariable(const String& str)
-	: ieVariable(MBStringFromString(str))
-	{}
-
-	explicit ieVariable(const char* c) noexcept {
-		operator=(c);
-	}
-	
-	ieVariable& operator=(const char* c) noexcept {
-		if (c) {
-			strncpy(var, c, sizeof(var) - 1);
-		} else {
-			memset(var, 0, sizeof(var));
-		}
-		return *this;
-	}
-	
-	explicit operator const char*() const noexcept {
-		return var;
-	}
-
-	char operator[](size_t i) const noexcept {
-		return var[i];
-	}
-	
-	char& operator[](size_t i) noexcept {
-		return var[i];
-	}
-
-	operator char*() noexcept {
-		return var;
-	}
-	
-	const char* CString() const noexcept {
-		return var;
-	}
-	
-	char* begin() noexcept {
-		return var;
-	}
-};
-
+using ieVariable = FixedSizeString<32, strnicmp>;
 using ResRef = FixedSizeString<8, strnicmp>;
 
 }

@@ -364,10 +364,10 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 	if (s) {
 		if (VarHasContext(s)) {
 			critter.SpecContext.SNPrintF("%.6s", s);
-			strnlwrcpy(critter.SpecVar, s+8, 32);
+			strnlwrcpy(critter.SpecVar.begin(), s+8, 32);
 		} else {
 			critter.SpecContext = "GLOBAL";
-			strnlwrcpy(critter.SpecVar, s, 32);
+			strnlwrcpy(critter.SpecVar.begin(), s, 32);
 		}
 	}
 
@@ -431,7 +431,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 		ps = sscanf(s,"[%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu]", x, x+1, x+2, x+3, x+4, x+5,
 			x+6, x+7, x+8);
 		if (ps == 0) {
-			strnuprcpy(critter.ScriptName, s, 32);
+			strnuprcpy(critter.ScriptName.begin(), s, 32);
 			critter.Flags|=CF_CHECK_NAME;
 			memset(critter.Spec,-1,sizeof(critter.Spec));
 		} else {
@@ -443,7 +443,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 
 	s = inifile->GetKeyAsString(crittername,"script_name",NULL);
 	if (s) {
-		strnuprcpy(critter.ScriptName, s, 32);
+		strnuprcpy(critter.ScriptName.begin(), s, 32);
 	}
 
 	//iwd2 script names (override remains the same)

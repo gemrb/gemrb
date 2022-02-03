@@ -167,8 +167,8 @@ Effect* EFFImporter::GetEffectV20()
 	//They have to be continuous
 	if (fx->IsVariable) {
 		ieVariable tmpVar;
-		str->Read(tmpVar, 32);
-		strnlwrcpy(fx->VariableName, tmpVar, 32);
+		str->ReadVariable(tmpVar);
+		strnlwrcpy(fx->VariableName.begin(), tmpVar, 32);
 	} else {
 		str->Seek( 32, GEM_CURRENT_POS);
 	}

@@ -786,13 +786,13 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 		if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
 			if (strcmp("dictionary_githzerai_hjacknir", name) == 0) {
-				strncpy(tmpname, "DICTIONARY_GITHZERAI_ HJACKNIR", sizeof(ieVariable));
+				strncpy(tmpname.begin(), "DICTIONARY_GITHZERAI_ HJACKNIR", sizeof(ieVariable));
 			} else {
-				strnspccpy(tmpname, name, 32);
+				strnspccpy(tmpname.begin(), name, 32);
 				StringToUpper(tmpname.begin());
 			}
 		} else {
-			strnspccpy(tmpname, name, 32);
+			strnspccpy(tmpname.begin(), name, 32);
 		}
 
 		stream->WriteVariable(tmpname);
@@ -1020,10 +1020,11 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
-		stream->WriteVariable(ieVariable(ac->GetLongName()));
+		std::string tmpstr = MBStringFromString(ac->GetLongName());
+		stream->WriteVariable(ieVariable(tmpstr.c_str()));
 	} else {
 		std::string tmpstr = core->GetMBString(ac->LongStrRef, STRING_FLAGS::STRREFOFF);
-		stream->WriteVariable(ieVariable(tmpstr));
+		stream->WriteVariable(ieVariable(tmpstr.c_str()));
 	}
 	stream->WriteDword(ac->TalkCount);
 	stream->WriteStrRef(ac->PCStats->BestKilledName);

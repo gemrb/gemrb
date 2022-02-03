@@ -5861,7 +5861,7 @@ void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	strnspccpy(door->LinkedInfo, parameters->string0Parameter, 32);
+	strnspccpy(door->LinkedInfo.begin(), parameters->string0Parameter, 32);
 }
 
 /*getting a handle of a temporary actor resource to copy its selected attributes*/
@@ -7313,7 +7313,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 	for (int i = 0; i < count; i++) {
 		//roll a random number between 0 and column #
 		int j = core->Roll(1, tm->GetColumnCount(i), -1);
-		strnuprcpy(tokenname, tm->GetRowName(i), 32);
+		strnuprcpy(tokenname.begin(), tm->GetRowName(i), 32);
 		core->GetTokenDictionary()->SetAtCopy( tokenname, tm->QueryField(i, j) );
 	}
 }
