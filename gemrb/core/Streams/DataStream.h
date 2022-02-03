@@ -46,9 +46,17 @@ namespace GemRB {
 #define ReadWord ReadScalar<ieWord>
 #define ReadDword ReadScalar<ieDword>
 #define ReadStrRef ReadEnum<ieStrRef>
+#define ReadResRef(str) ReadRTrimString(str, str.Size)
+#define ReadVariable(str) ReadRTrimString(str, str.Size)
 #define WriteWord WriteScalar<ieWord>
 #define WriteDword WriteScalar<ieDword>
 #define WriteStrRef WriteEnum<ieStrRef>
+#define WriteResRef(str) WriteString(str, str.Size)
+#define WriteResRefLC(str) WriteStringLC(str, str.Size)
+#define WriteResRefUC(str) WriteStringUC(str, str.Size)
+#define WriteVariable(str) WriteString(str, str.Size)
+#define WriteVariableLC(str) WriteStringLC(str, str.Size)
+#define WriteVariableUC(str) WriteStringUC(str, str.Size)
 
 // represents the byte position of the stream
 using strpos_t = size_t;
@@ -127,14 +135,34 @@ public:
 	}
 	
 	strret_t WriteFilling(strpos_t len);
+	
+	template <typename STR>
+	strret_t ReadRTrimString(STR& dest, size_t len) {
+		strret_t read = Read(dest.begin(), len);
 
-	strret_t ReadResRef(ResRef& dest);
-	strret_t WriteResRef(const ResRef& src);
-	strret_t WriteResRefLC(const ResRef& src);
-	strret_t WriteResRefUC(const ResRef& src);
+		// remove trailing spaces
+		for (strret_t i = read - 1; i >= 0; --i) {
+			if (dest[i] == ' ') dest[i] = '\0';
+			else break;
+		}
 
-	strret_t ReadVariable(ieVariable& dest);
-	strret_t WriteVariable(const ieVariable& src);
+		return read;
+	}
+	
+	template <typename STR>
+	strret_t WriteString(const STR& src, size_t len) {
+		return Write(src.begin(), len);
+	}
+	
+	template <typename STR>
+	strret_t WriteStringLC(const STR& src, size_t len) {
+		return WriteString<STR>(STR::MakeLowerCase(src), len);
+	}
+	
+	template <typename STR>
+	strret_t WriteStringUC(const STR& src, size_t len) {
+		return WriteString<STR>(STR::MakeUpperCase(src), len);
+	}
 
 	strret_t ReadPoint(Point&);
 	strret_t WritePoint(const Point&);
