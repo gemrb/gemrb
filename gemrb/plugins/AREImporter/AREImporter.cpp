@@ -1078,7 +1078,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		door->LockDifficulty=LockRemoval;
 		if (!OpenStrRef) OpenStrRef = ieStrRef(-1); // rewrite 0 to -1
 		door->OpenStrRef=OpenStrRef;
-		strnspccpy(door->LinkedInfo.begin(), LinkedInfo, 32);
+		door->LinkedInfo = MakeVariable(LinkedInfo);
 		//these 2 fields are not sure
 		door->NameStrRef=NameStrRef;
 		door->SetDialog(Dialog);

@@ -786,13 +786,13 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 		if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
 			if (strcmp("dictionary_githzerai_hjacknir", name) == 0) {
-				strncpy(tmpname.begin(), "DICTIONARY_GITHZERAI_ HJACKNIR", sizeof(ieVariable));
+				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
 			} else {
-				strnspccpy(tmpname.begin(), name, 32);
+				tmpname = MakeVariable(name);
 				StringToUpper(tmpname);
 			}
 		} else {
-			strnspccpy(tmpname.begin(), name, 32);
+			tmpname = MakeVariable(name);
 		}
 
 		stream->WriteVariable(tmpname);

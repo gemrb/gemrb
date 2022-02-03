@@ -53,7 +53,7 @@ TileObject* TileMap::AddTile(const char *ID, const char* Name, unsigned int Flag
 {
 	TileObject* tile = new TileObject();
 	tile->Flags=Flags;
-	strnspccpy(tile->Name.begin(), Name, 32);
+	tile->Name = MakeVariable(Name);
 	tile->Tileset = ID;
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );

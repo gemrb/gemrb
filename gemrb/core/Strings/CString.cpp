@@ -29,21 +29,6 @@ GEM_EXPORT int strlench(const char* string, char ch)
 	return i;
 }
 
-// this one also filters spaces, used to copy resrefs and variables
-void strnspccpy(char* dest, const char *source, int count)
-{
-	memset(dest,0,count);
-	while(count--) {
-		char c = std::towlower(*source);
-		if (c!=' ') {
-			*dest++=c;
-		}
-		if(!*source++) {
-			return;
-		}
-	}
-}
-
 #ifndef HAVE_STRNLEN
 int strnlen(const char* string, int maxlen)
 {
