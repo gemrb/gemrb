@@ -131,7 +131,7 @@ private:
 	KEYImpMap resources;
 
 	/** Gets the stream assoicated to a RESKey */
-	DataStream *GetStream(const char *resname, ieWord type);
+	DataStream *GetStream(const ResRef&, ieWord type);
 public:
 	bool Open(const char *file, const char *desc) override;
 	/* predicts the availability of a resource */
