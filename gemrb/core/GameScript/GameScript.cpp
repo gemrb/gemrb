@@ -2491,7 +2491,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 Trigger* GenerateTrigger(char* String)
 {
-	StringToLower(String);
+	StringToLower(String, String + strlen(String));
 	ScriptDebugLog(ID_TRIGGERS, "Compiling: {}", String);
 
 	int negate = 0;

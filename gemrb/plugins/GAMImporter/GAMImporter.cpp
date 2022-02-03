@@ -789,7 +789,7 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 				strncpy(tmpname.begin(), "DICTIONARY_GITHZERAI_ HJACKNIR", sizeof(ieVariable));
 			} else {
 				strnspccpy(tmpname.begin(), name, 32);
-				StringToUpper(tmpname.begin());
+				StringToUpper(tmpname);
 			}
 		} else {
 			strnspccpy(tmpname.begin(), name, 32);
