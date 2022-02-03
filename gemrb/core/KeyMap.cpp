@@ -26,8 +26,6 @@
 
 namespace GemRB {
 
-#define KEYLENGTH 64
-
 Function::Function(const char *m, const char *f, int g, int k)
 {
 	// make sure the module and function names are no longer than 32 characters, or they will be truncated
@@ -68,7 +66,9 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 		Log(WARNING, "KeyMap", "There is no '{}' file...", inifile);
 		return false;
 	}
-	char name[KEYLENGTH+1], value[_MAX_PATH + 3];
+	
+	FixedSizeString<64> name;
+	char value[_MAX_PATH + 3];
 	while (config->Remains()) {
 		char line[_MAX_PATH];
 
@@ -83,23 +83,18 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			continue;
 		}
 
-		name[0] = 0;
 		value[0] = 0;
 
 		//ignore possible space after the =, sadly we cannot do the same with
 		//spaces before it
-		if (sscanf( line, "%[^=]= %[^\r\n]", name, value )!=2)
+		if (sscanf( line, "%[^=]= %[^\r\n]", name.begin(), value )!=2)
 			continue;
 
-		strnlwrcpy(name,name,KEYLENGTH);
-		//remove trailing spaces (bg1 ini file contains them)
-		char *nameend = name + strlen( name ) - 1;
-		while (nameend >= name && strchr( " \t\r\n", *nameend )) {
-			*nameend-- = '\0';
-		}
+		StringToLower(name);
+		name.RTrim();
 
 		//change internal spaces to underscore
-		for(int c=0;c<KEYLENGTH;c++) if (name[c]==' ') name[c]='_';
+		std::replace(name.begin(), name.end(), ' ', '_');
 
 		size_t l = strlen(value);
 		if (l > 1 || keymap.HasKey(value)) {
