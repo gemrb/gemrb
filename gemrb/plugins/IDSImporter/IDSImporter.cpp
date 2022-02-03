@@ -115,7 +115,7 @@ int IDSImporter::GetValueIndex(size_t Index) const
 	return pairs[Index].val;
 }
 
-int IDSImporter::FindString(char *str, int len) const
+int IDSImporter::FindString(const char *str, int len) const
 {
 	int i = static_cast<int>(pairs.size());
 	while(i--) {
