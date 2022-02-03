@@ -166,9 +166,7 @@ Effect* EFFImporter::GetEffectV20()
 	//Variable simply overwrites the resource fields (Keep them grouped)
 	//They have to be continuous
 	if (fx->IsVariable) {
-		ieVariable tmpVar;
-		str->ReadVariable(tmpVar);
-		strnlwrcpy(fx->VariableName.begin(), tmpVar, 32);
+		str->ReadVariable(fx->VariableName);
 	} else {
 		str->Seek( 32, GEM_CURRENT_POS);
 	}
@@ -234,7 +232,7 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	stream->WriteDword(tmpDword1);
 	if (fx->IsVariable) {
 		//resource1-4 are used as a continuous memory
-		stream->WriteVariable(fx->VariableName);
+		stream->WriteVariableLC(fx->VariableName);
 	} else {
 		stream->WriteFilling(32);
 	}

@@ -135,11 +135,9 @@ struct VariableSpec {
 	ieVariable Name {};
 	ieDword Value = 0;
 	
-	VariableSpec(const char* name, ieDword val)
-	: Value(val)
-	{
-		strnlwrcpy(Name.begin(), name, sizeof(ieVariable) - 1);
-	}
+	VariableSpec(const ieVariable& name, ieDword val)
+	: Name(name), Value(val)
+	{}
 };
 
 class GEM_EXPORT IniSpawn {
