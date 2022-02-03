@@ -175,13 +175,15 @@ bool GLSLProgram::buildProgram(std::string vertexSource, const std::string& frag
 	return program != 0;
 }
 
-GLint GLSLProgram::getUniformLocation(std::string uniformName)
+GLint GLSLProgram::getUniformLocation(const std::string& uniformName) const
 {
-	if (uniforms.find(uniformName) == uniforms.end()) {
+	const auto it = uniforms.find(uniformName);
+	if (it == uniforms.end()) {
 		GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform location";
 		return -1;
 	}
-	return uniforms.at(uniformName);
+
+	return it->second;
 }
 
 const std::string GLSLProgram::GetLastError()
