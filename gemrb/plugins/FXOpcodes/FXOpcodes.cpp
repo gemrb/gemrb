@@ -6972,7 +6972,7 @@ int fx_modify_global_variable (Scriptable* /*Owner*/, Actor* /*target*/, Effect*
 
 	//hack for IWD
 	if (fx->Resource.IsEmpty()) {
-		strnuprcpy(fx->VariableName.begin(), "RETURN_TO_LONELYWOOD", 32);
+		fx->VariableName = "RETURN_TO_LONELYWOOD";
 	}
 
 	// print("fx_modify_global_variable(%2d): Variable: %s Value: %d Type: %d", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2);

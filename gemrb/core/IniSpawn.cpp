@@ -431,7 +431,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 		ps = sscanf(s,"[%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu]", x, x+1, x+2, x+3, x+4, x+5,
 			x+6, x+7, x+8);
 		if (ps == 0) {
-			strnuprcpy(critter.ScriptName.begin(), s, 32);
+			critter.ScriptName = ieVariable::MakeUpperCase(s);
 			critter.Flags|=CF_CHECK_NAME;
 			memset(critter.Spec,-1,sizeof(critter.Spec));
 		} else {
@@ -443,7 +443,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 
 	s = inifile->GetKeyAsString(crittername,"script_name",NULL);
 	if (s) {
-		strnuprcpy(critter.ScriptName.begin(), s, 32);
+		critter.ScriptName = ieVariable::MakeUpperCase(s);
 	}
 
 	//iwd2 script names (override remains the same)

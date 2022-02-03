@@ -29,18 +29,6 @@ GEM_EXPORT int strlench(const char* string, char ch)
 	return i;
 }
 
-void strnuprcpy(char* dest, const char *source, int count)
-{
-	while(count--) {
-		*dest++ = std::towupper(*source);
-		if(!*source++) {
-			while(count--) *dest++=0;
-			break;
-		}
-	}
-	*dest=0;
-}
-
 // this one also filters spaces, used to copy resrefs and variables
 void strnspccpy(char* dest, const char *source, int count)
 {
