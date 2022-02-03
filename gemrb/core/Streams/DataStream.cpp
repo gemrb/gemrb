@@ -86,37 +86,6 @@ strpos_t DataStream::Remains() const
 	return size-Pos;
 }
 
-strret_t DataStream::ReadResRef(ResRef& dest)
-{
-	char ref[9];
-	strret_t len = Read(ref, 8);
-	ref[len] = '\0';
-	
-	// remove trailing spaces
-	for (strret_t i = len - 1; i >= 0; --i) {
-		if (ref[i] == ' ') ref[i] = '\0';
-		else break;
-	}
-	
-	dest = ResRef::MakeLowerCase(ref);
-	return len;
-}
-
-strret_t DataStream::WriteResRef(const ResRef& src)
-{
-	return Write(src.CString(), 8);
-}
-
-strret_t DataStream::WriteResRefLC(const ResRef& src)
-{
-	return WriteResRef(ResRef::MakeLowerCase(src.CString()));
-}
-
-strret_t DataStream::WriteResRefUC(const ResRef& src)
-{
-	return WriteResRef(ResRef::MakeUpperCase(src.CString()));
-}
-
 strret_t DataStream::WriteFilling(strpos_t len)
 {
 	const static char zerobuf[256] = {};
@@ -129,27 +98,6 @@ strret_t DataStream::WriteFilling(strpos_t len)
 	
 	ret += Write(zerobuf, len);
 	return ret;
-}
-
-strret_t DataStream::ReadVariable(ieVariable& dest)
-{
-	char ref[33];
-	strret_t len = Read(ref, 32);
-	ref[len] = '\0';
-
-	// remove trailing spaces
-	for (strret_t i = len - 1; i >= 0; --i) {
-		if (ref[i] == ' ') ref[i] = '\0';
-		else break;
-	}
-
-	dest = ref;
-	return len;
-}
-
-strret_t DataStream::WriteVariable(const ieVariable& src)
-{
-	return Write(src.CString(), 32);
 }
 
 strret_t DataStream::ReadPoint(Point &p)

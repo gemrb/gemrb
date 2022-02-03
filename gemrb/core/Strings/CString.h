@@ -73,6 +73,7 @@ class FixedSizeString {
 	char str[LEN + 1] {'\0'};
 	
 public:
+	static constexpr size_t Size = LEN;
 	// ResRef is case insensitive, but the originals weren't always
 	// in some cases we need lower/upper case for save compatibility with originals
 	// so we provide factories the create ResRef with the required case
