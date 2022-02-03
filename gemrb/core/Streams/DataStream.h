@@ -155,13 +155,15 @@ public:
 	}
 	
 	template <typename STR>
-	strret_t WriteStringLC(const STR& src, size_t len) {
-		return WriteString<STR>(STR::MakeLowerCase(src), len);
+	strret_t WriteStringLC(STR src, size_t len) {
+		StringToLower(src.begin(), src.begin() + len);
+		return WriteString<STR>(src, len);
 	}
 	
 	template <typename STR>
-	strret_t WriteStringUC(const STR& src, size_t len) {
-		return WriteString<STR>(STR::MakeUpperCase(src), len);
+	strret_t WriteStringUC(STR src, size_t len) {
+		StringToUpper(src.begin(), src.begin() + len);
+		return WriteString<STR>(src, len);
 	}
 
 	strret_t ReadPoint(Point&);
