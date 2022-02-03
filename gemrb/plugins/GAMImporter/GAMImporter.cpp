@@ -762,7 +762,7 @@ int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 	for (unsigned int i=0;i<KillVarsCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
-		stream->WriteVariable(ieVariable(name));
+		stream->WriteVariableUC(ieVariable(name));
 		stream->WriteFilling(8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
