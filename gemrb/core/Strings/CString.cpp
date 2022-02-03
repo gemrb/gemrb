@@ -18,8 +18,6 @@
 
 #include "CString.h"
 
-#include <cwctype>
-
 namespace GemRB {
 
 /** Returns the length of string (up to a delimiter) */
@@ -29,18 +27,6 @@ GEM_EXPORT int strlench(const char* string, char ch)
 	for (i = 0; string[i] && string[i] != ch; i++)
 		;
 	return i;
-}
-
-void strnlwrcpy(char *dest, const char *source, int count)
-{
-	while(count--) {
-		*dest++ = std::towlower(*source);
-		if(!*source++) {
-			while(count--) *dest++=0;
-			break;
-		}
-	}
-	*dest=0;
 }
 
 void strnuprcpy(char* dest, const char *source, int count)

@@ -7803,7 +7803,7 @@ static void ReadUsedItems()
 		UsedItems.resize(UsedItemsCount);
 		for (size_t i = 0; i < UsedItemsCount; i++) {
 			UsedItems[i].itemname = table->GetRowName(i);
-			strnlwrcpy(UsedItems[i].username.begin(), table->QueryField(i, 0), 32);
+			UsedItems[i].username = ieVariable::MakeLowerCase(table->QueryField(i, 0));
 			if (UsedItems[i].username[0] == '*') {
 				UsedItems[i].username.Reset();
 			}
@@ -9783,7 +9783,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	GET_MAP();
 
 	anim.appearance=0xffffffff; //scheduled for every hour
-	strnlwrcpy(anim.Name.begin(), ResRef, 8);
+	anim.Name = ieVariable::MakeLowerCase(ResRef);
 	anim.BAM = ResRef;
 	anim.Flags=Flags;
 	anim.sequence=Cycle;

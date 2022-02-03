@@ -364,10 +364,10 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 	if (s) {
 		if (VarHasContext(s)) {
 			critter.SpecContext.SNPrintF("%.6s", s);
-			strnlwrcpy(critter.SpecVar.begin(), s+8, 32);
+			critter.SpecVar = ieVariable::MakeLowerCase(s + 8);
 		} else {
 			critter.SpecContext = "GLOBAL";
-			strnlwrcpy(critter.SpecVar.begin(), s, 32);
+			critter.SpecVar = ieVariable::MakeLowerCase(s);
 		}
 	}
 

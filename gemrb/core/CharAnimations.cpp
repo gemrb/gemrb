@@ -1843,14 +1843,13 @@ void CharAnimations::AddFF2Suffix(std::string& dest, unsigned char StanceID,
 void CharAnimations::AddNFSuffix(std::string& dest, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient, int Part) const
 {
-	char prefix[10];
-	char prefix2[10];
-
 	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%c%d%c%d", dest.c_str(), StancePrefix[StanceID], (Part + 1) % 100,
-			 CyclePrefix[StanceID], Cycle);
-	strnlwrcpy(prefix2, prefix, 8);
-	dest = prefix2;
+	
+	std::string prefix = fmt::format("{}{}{}{}{}", dest, StancePrefix[StanceID], (Part + 1) % 100, CyclePrefix[StanceID], Cycle);
+	if (prefix.length() > 8) {
+		prefix.resize(8);
+	}
+	StringToLower(prefix.begin(), prefix.end(), dest.begin());
 	Cycle=(ieByte) (Cycle+CycleOffset[StanceID]);
 }
 
