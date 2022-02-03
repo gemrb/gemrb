@@ -43,23 +43,23 @@ unsigned char MapReverb::loadProperties (unsigned char profileNumber) {
 		return EFX_PROFILE_REVERB_INVALID;
 	}
 
-	char efxProfileName[16] = {0};
-	strnuprcpy(efxProfileName, reverbs->QueryField(profileNumber, 0), 15);
+	std::string efxProfileName = reverbs->QueryField(profileNumber, 0);
+	StringToUpper(efxProfileName);
 
 	/* Limited to values seemingly used. */
-	if (0 == strcmp(efxProfileName, "ARENA")) {
+	if (efxProfileName == "ARENA") {
 		MapReverbProperties _properties = {EFX_REVERB_ARENA, false};
 		properties = _properties;
-	} else if (0 == strcmp(efxProfileName, "AUDITORIUM")) {
+	} else if (efxProfileName == "AUDITORIUM") {
 		MapReverbProperties _properties = {EFX_REVERB_AUDITORIUM, false};
 		properties = _properties;
-	} else if (0 == strcmp(efxProfileName, "CITY")) {
+	} else if (efxProfileName == "CITY") {
 		MapReverbProperties _properties = {EFX_REVERB_CITY, false};
 		properties = _properties;
-	} else if (0 == strcmp(efxProfileName, "FOREST")) {
+	} else if (efxProfileName == "FOREST") {
 		MapReverbProperties _properties = {EFX_REVERB_FOREST, false};
 		properties = _properties;
-	} else if (0 == strcmp(efxProfileName, "ROOM")) {
+	} else if (efxProfileName == "ROOM") {
 		MapReverbProperties _properties = {EFX_REVERB_ROOM, false};
 		properties = _properties;
 	}
