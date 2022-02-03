@@ -191,12 +191,12 @@ bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
 	return HasResource(resname, type.GetKeyType());
 }
 
-DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
+DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 {
 	if (type == 0)
 		return NULL;
 
-	const ieDword *ResLocator = resources.get(ResRef(resname), type);
+	const ieDword *ResLocator = resources.get(resname, type);
 	if (!ResLocator)
 		return 0;
 
