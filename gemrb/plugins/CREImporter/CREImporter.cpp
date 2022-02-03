@@ -1140,7 +1140,7 @@ void CREImporter::GetActorPST(Actor *act)
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
-	strnspccpy(act->KillVar.begin(), KillVar, 32);
+	act->KillVar = MakeVariable(KillVar);
 	act->IncKillVar.Reset();
 
 	str->ReadDword(KnownSpellsOffset);
@@ -1810,9 +1810,9 @@ void CREImporter::GetActorIWD2(Actor *act)
 	}
 	ieVariable KillVar;
 	str->ReadVariable(KillVar);
-	strnspccpy(act->KillVar.begin(), KillVar, 32);
+	act->KillVar = MakeVariable(KillVar);
 	str->ReadVariable(KillVar);
-	strnspccpy(act->IncKillVar.begin(), KillVar, 32);
+	act->IncKillVar = MakeVariable(KillVar);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord(tmpWord);
 	act->BaseStats[IE_SAVEDXPOS] = tmpWord;
@@ -2059,9 +2059,9 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	}
 	ieVariable KillVar;
 	str->ReadVariable(KillVar); // use these as needed
-	strnspccpy(act->KillVar.begin(), KillVar, 32);
+	act->KillVar = MakeVariable(KillVar);
 	str->ReadVariable(KillVar);
-	strnspccpy(act->IncKillVar.begin(), KillVar, 32);
+	act->IncKillVar = MakeVariable(KillVar);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord(tmpWord);
 	act->BaseStats[IE_SAVEDXPOS] = tmpWord;

@@ -103,6 +103,25 @@ enum class ieStrRef : ieDword {
 using ieVariable = FixedSizeString<32, strnicmp>;
 using ResRef = FixedSizeString<8, strnicmp>;
 
+inline ieVariable MakeVariable(const char* source) {
+	ieVariable var;
+	uint8_t count = var.Size;
+	auto dest = var.begin();
+	
+	while(count--) {
+		// TODO: we shouldnt call towlower here. ieVariable is case insensitive
+		// we probably should be calling WriteVariableLC in the writers instead
+		char c = std::towlower(*source);
+		if (c!=' ') {
+			*dest++ = c;
+		}
+		if(!*source++) {
+			break;
+		}
+	}
+	return var;
+}
+
 }
 
 namespace fmt {
