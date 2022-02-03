@@ -564,7 +564,6 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 			return;
 	}
 	stream->Write( Signature, 8);
-	memset( Signature,0,sizeof(Signature));
 	ieVariable name(MBStringFromString(act->GetShortName()).c_str());
 	stream->WriteVariable(name);
 
@@ -609,16 +608,14 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 			if (act->PCStats->QuickSpellClass[i]==0xff) {
 				stream->WriteResRef (act->PCStats->QuickSpells[i]);
 			} else {
-				//empty field
-				stream->Write( Signature, 8);
+				stream->WriteFilling(8);
 			}
 		}
 		for (int i = 0; i < QSPCount; i++) {
 			if (act->PCStats->QuickSpellClass[i]==0xfe) {
 				stream->WriteResRef (act->PCStats->QuickSpells[i]);
 			} else {
-				//empty field
-				stream->Write( Signature, 8);
+				stream->WriteFilling(8);
 			}
 		}
 		//fallthrough
