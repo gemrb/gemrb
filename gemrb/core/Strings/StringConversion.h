@@ -39,18 +39,28 @@ GEM_EXPORT String* StringFromUtf8(const char* string);
 GEM_EXPORT std::string MBStringFromString(const String& string);
 
 // String manipulators
-template <typename T>
-GEM_EXPORT_T void StringToLower(T& string) {
-	for (size_t i = 0; i < string.length(); i++) {
-		string[i] = std::towlower(string[i]);
+template <typename IT>
+GEM_EXPORT_T void StringToLower(IT it, IT end) {
+	for (; it != end; ++it) {
+		*it = std::towlower(*it);
 	}
 }
 
 template <typename T>
-GEM_EXPORT_T void StringToUpper(T& string) {
-	for (size_t i = 0; i < string.length(); i++) {
-		string[i] = std::towupper(string[i]);
+GEM_EXPORT_T void StringToLower(T& str) {
+	StringToLower(std::begin(str), std::end(str));
+}
+
+template <typename IT>
+GEM_EXPORT_T void StringToUpper(IT it, IT end) {
+	for (; it != end; ++it) {
+		*it = std::towupper(*it);
 	}
+}
+
+template <typename T>
+GEM_EXPORT_T void StringToUpper(T& str) {
+	StringToUpper(std::begin(str), std::end(str));
 }
 
 GEM_EXPORT_T inline void StringToLower(char* string) {

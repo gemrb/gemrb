@@ -74,6 +74,8 @@ class FixedSizeString {
 	
 public:
 	static constexpr size_t Size = LEN;
+	using iterator = char*;
+	using const_iterator = const char*;
 	// ResRef is case insensitive, but the originals weren't always
 	// in some cases we need lower/upper case for save compatibility with originals
 	// so we provide factories the create ResRef with the required case
@@ -187,19 +189,19 @@ public:
 		return str[0] != '\0';
 	}
 	
-	const char* begin() const noexcept {
+	const_iterator begin() const noexcept {
 		return str;
 	}
 	
-	const char* end() const noexcept {
+	const_iterator end() const noexcept {
 		return &str[LEN + 1];
 	}
 	
-	char* begin() noexcept {
+	iterator begin() noexcept {
 		return str;
 	}
 	
-	char* end() noexcept {
+	iterator end() noexcept {
 		return &str[LEN + 1];
 	}
 };
