@@ -22,97 +22,97 @@
 
 namespace GemRB {
 
-bool Point::operator==(const Point& pnt) const
+bool Point::operator==(const Point& pnt) const noexcept
 {
 	return (x == pnt.x) && (y == pnt.y);
 }
 
-bool Point::operator!=(const Point& pnt) const
+bool Point::operator!=(const Point& pnt) const noexcept
 {
 	return !(*this == pnt);
 }
 
-Point Point::operator+(const Point& p) const
+Point Point::operator+(const Point& p) const noexcept
 {
 	return Point(x + p.x, y + p.y);
 }
 
-Point Point::operator-(const Point& p) const
+Point Point::operator-(const Point& p) const noexcept
 {
 	return Point(x - p.x, y - p.y);
 }
 
-Point& Point::operator+=(const Point& rhs)
+Point& Point::operator+=(const Point& rhs) noexcept
 {
 	x += rhs.x;
 	y += rhs.y;
 	return *this;
 }
 
-Point& Point::operator-=(const Point& rhs)
+Point& Point::operator-=(const Point& rhs) noexcept
 {
 	x -= rhs.x;
 	y -= rhs.y;
 	return *this;
 }
 
-Point& Point::operator/(int div)
+Point& Point::operator/(int div) noexcept
 {
 	x /= div;
 	y /= div;
 	return *this;
 }
 
-Point::Point(int x, int y)
+Point::Point(int x, int y) noexcept
 {
 	this->x = x;
 	this->y = y;
 }
 
-bool Point::IsZero() const
+bool Point::IsZero() const noexcept
 {
 	return (x == 0) && (y == 0);
 }
 
-bool Point::IsInvalid() const
+bool Point::IsInvalid() const noexcept
 {
 	return (x == -1) && (y == -1);
 }
 
-bool Point::isWithinRadius(int r, const Point& p) const
+bool Point::isWithinRadius(int r, const Point& p) const noexcept
 {
 	Point d = operator-(p);
 	// sqrt is slow, just check a^2 + b^2 = c^2 <= r^2
 	return (d.x * d.x) + (d.y * d.y) <= r * r;
 }
 
-Size::Size(int w, int h)
+Size::Size(int w, int h) noexcept
 {
 	this->w = w;
 	this->h = h;
 }
 
-bool Size::operator==(const Size& size) const
+bool Size::operator==(const Size& size) const noexcept
 {
 	return (w == size.w &&  h == size.h);
 }
 
-bool Size::operator!=(const Size& size) const
+bool Size::operator!=(const Size& size) const noexcept
 {
 	return !(*this == size);
 }
 
-bool Region::operator==(const Region& rgn) const
+bool Region::operator==(const Region& rgn) const noexcept
 {
 	return (x == rgn.x) && (y == rgn.y) && (w == rgn.w) && (h == rgn.h);
 }
 
-bool Region::operator!=(const Region& rgn) const
+bool Region::operator!=(const Region& rgn) const noexcept
 {
 	return !(*this == rgn);
 }
 
-Region::Region(int x, int y, int w, int h)
+Region::Region(int x, int y, int w, int h) noexcept
 {
 	this->x = x;
 	this->y = y;
@@ -120,13 +120,13 @@ Region::Region(int x, int y, int w, int h)
 	this->h = h;
 }
 
-Region::Region(const Point &p, const Size& s)
+Region::Region(const Point &p, const Size& s) noexcept
 {
 	origin = p;
 	size = s;
 }
 
-Region::Region(const Region &r)
+Region::Region(const Region &r) noexcept
 : origin(r.origin), size(r.size)
 {}
 
@@ -134,7 +134,7 @@ Region::Region(Region&& r) noexcept
 : origin(r.origin), size(r.size)
 {}
 
-Region& Region::operator=(const Region &rhs)
+Region& Region::operator=(const Region &rhs) noexcept
 {
 	if (&rhs != this) {
 		origin = rhs.origin;
@@ -143,7 +143,7 @@ Region& Region::operator=(const Region &rhs)
 	return *this;
 }
 
-bool Region::PointInside(const Point &p) const
+bool Region::PointInside(const Point &p) const noexcept
 {
 	if ((p.x < x) || (p.x >= (x + w))) {
 		return false;
@@ -154,7 +154,7 @@ bool Region::PointInside(const Point &p) const
 	return true;
 }
 
-bool Region::RectInside(const Region& r) const
+bool Region::RectInside(const Region& r) const noexcept
 {
 	// top-left not covered
 	if (r.x < x || r.y < y) return false;
@@ -165,7 +165,7 @@ bool Region::RectInside(const Region& r) const
 	return true;
 }
 
-bool Region::IntersectsRegion(const Region& rgn) const
+bool Region::IntersectsRegion(const Region& rgn) const noexcept
 {
 	if (x >= ( rgn.x + rgn.w )) {
 		return false; // entirely to the right of rgn
@@ -182,7 +182,7 @@ bool Region::IntersectsRegion(const Region& rgn) const
 	return true;
 }
 
-Region Region::Intersect(const Region& rgn) const
+Region Region::Intersect(const Region& rgn) const noexcept
 {
 	int ix1 = (x >= rgn.x) ? x : rgn.x;
 	int ix2 = (x + w <= rgn.x + rgn.w) ? x + w : rgn.x + rgn.w;
@@ -192,7 +192,7 @@ Region Region::Intersect(const Region& rgn) const
 	return Region(ix1, iy1, ix2 - ix1, iy2 - iy1);
 }
 
-void Region::ExpandToPoint(const Point& p)
+void Region::ExpandToPoint(const Point& p) noexcept
 {
 	if (p.x < x) {
 		w += x - p.x;
@@ -209,7 +209,7 @@ void Region::ExpandToPoint(const Point& p)
 	}
 }
 
-void Region::ExpandToRegion(const Region& r)
+void Region::ExpandToRegion(const Region& r) noexcept
 {
 	ExpandToPoint(r.origin);
 	ExpandToPoint(r.origin + Point(r.w, 0));
@@ -217,7 +217,7 @@ void Region::ExpandToRegion(const Region& r)
 	ExpandToPoint(r.Maximum() - Point(r.w, 0));
 }
 
-void Region::ExpandAllSides(int amt)
+void Region::ExpandAllSides(int amt) noexcept
 {
 	x -= amt;
 	w += amt * 2;

@@ -44,28 +44,28 @@ namespace GemRB {
 class GEM_EXPORT Point {
 public:
 	Point() noexcept = default;
-	Point(int x, int y);
+	Point(int x, int y) noexcept;
 
-	bool operator==(const Point &pnt) const;
-	bool operator!=(const Point &pnt) const;
+	bool operator==(const Point &pnt) const noexcept;
+	bool operator!=(const Point &pnt) const noexcept;
 
-	Point operator+(const Point& p) const;
-	Point operator-(const Point& p) const;
+	Point operator+(const Point& p) const noexcept;
+	Point operator-(const Point& p) const noexcept;
 	
-	Point& operator+=(const Point& rhs);
-	Point& operator-=(const Point& rhs);
+	Point& operator+=(const Point& rhs) noexcept;
+	Point& operator-=(const Point& rhs) noexcept;
 
-	Point& operator/(int div);
+	Point& operator/(int div) noexcept;
 
-	bool IsZero() const; // (0, 0)
-	bool IsInvalid() const; // (-1, -1)
+	bool IsZero() const noexcept; // (0, 0)
+	bool IsInvalid() const noexcept; // (-1, -1)
 
-	inline void reset() {
+	inline void reset() noexcept {
 		x = y = 0;
 	}
 
 	// true if p is within the circle of radius r centered at p
-	bool isWithinRadius(int r, const Point& p) const;
+	bool isWithinRadius(int r, const Point& p) const noexcept;
 
 	int x = 0;
 	int y = 0;
@@ -76,19 +76,19 @@ public:
 	int w = 0;
 	int h = 0;
 	Size() noexcept = default;
-	Size(int, int);
+	Size(int, int) noexcept;
 	
-	inline void reset() {
+	inline void reset() noexcept {
 		w = h = 0;
 	}
 
-	bool operator==(const Size& size) const;
-	bool operator!=(const Size& size) const;
-	int Area() const { return w * h; }
-	bool IsZero() const { return w == 0 && h == 0; }
-	bool IsInvalid() const { return w <= 0 || h <= 0; }
+	bool operator==(const Size& size) const noexcept;
+	bool operator!=(const Size& size) const noexcept;
+	int Area() const noexcept { return w * h; }
+	bool IsZero() const noexcept { return w == 0 && h == 0; }
+	bool IsInvalid() const noexcept { return w <= 0 || h <= 0; }
 	
-	bool PointInside(const Point& p) const { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
+	bool PointInside(const Point& p) const noexcept { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
 };
 
 /**
@@ -110,28 +110,28 @@ public:
 	int& h = size.h;
 
 	Region() noexcept = default;
-	Region(int x, int y, int w, int h);
-	Region(const Point& p, const Size& s);
-	Region(const Region&);
+	Region(int x, int y, int w, int h) noexcept;
+	Region(const Point& p, const Size& s) noexcept;
+	Region(const Region&) noexcept;
 	Region(Region&&) noexcept;
 	
-	Region& operator=(const Region&);
+	Region& operator=(const Region&) noexcept;
 
-	bool operator==(const Region& rgn) const;
-	bool operator!=(const Region& rgn) const;
+	bool operator==(const Region& rgn) const noexcept;
+	bool operator!=(const Region& rgn) const noexcept;
 
-	bool PointInside(const Point &p) const;
-	bool RectInside(const Region& r) const;
+	bool PointInside(const Point &p) const noexcept;
+	bool RectInside(const Region& r) const noexcept;
 
-	bool IntersectsRegion(const Region& rgn) const;
-	Region Intersect(const Region& rgn) const;
+	bool IntersectsRegion(const Region& rgn) const noexcept;
+	Region Intersect(const Region& rgn) const noexcept;
 
-	Point Center() const { return Point(x + w / 2, y + h / 2); }
-	Point Maximum() const { return Point(x + w, y + h); }
+	Point Center() const noexcept { return Point(x + w / 2, y + h / 2); }
+	Point Maximum() const noexcept { return Point(x + w, y + h); }
 	
-	void ExpandToPoint(const Point& p);
-	void ExpandToRegion(const Region& r);
-	void ExpandAllSides(int amt);
+	void ExpandToPoint(const Point& p) noexcept;
+	void ExpandToRegion(const Region& r) noexcept;
+	void ExpandAllSides(int amt) noexcept;
 	
 	static Region RegionEnclosingRegions(const Region& r1, const Region& r2) {
 		Point min;
