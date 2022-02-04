@@ -5391,7 +5391,7 @@ void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Action* /*parameters*
 	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
-		const Actor *tar = game->GetPC(i, false);
+		Actor *tar = game->GetPC(i, false);
 		tar->fxqueue.RemoveExpiredEffects(0xffffffff);
 	}
 }
@@ -5399,8 +5399,8 @@ void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Action* /*parameters*
 //iwd2 removes effects from a single sprite
 void GameScript::ClearSpriteEffects(Scriptable* Sender, Action* parameters)
 {
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	const Actor* actor = Scriptable::As<Actor>(tar);
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return;
 	}
@@ -6496,8 +6496,8 @@ void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)
 
 void GameScript::FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters)
 {
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	const Actor* target = Scriptable::As<Actor>(tar);
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* target = Scriptable::As<Actor>(tar);
 	if (!target) {
 		return;
 	}

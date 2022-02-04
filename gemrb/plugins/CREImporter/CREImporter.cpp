@@ -2867,7 +2867,7 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
 
-	std::list< Effect* >::const_iterator f=actor->fxqueue.GetFirstEffect();
+	auto f = actor->fxqueue.GetFirstEffect();
 	for(unsigned int i=0;i<EffectsCount;i++) {
 		const Effect *fx = actor->fxqueue.GetNextSavedEffect(f);
 

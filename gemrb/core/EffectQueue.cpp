@@ -313,13 +313,6 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), compare_effects);
 }
 
-EffectQueue::~EffectQueue()
-{
-	for (const auto& fx : effects) {
-		delete fx;
-	}
-}
-
 Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing)
 {
 	if( opcode==0xffffffff) {
@@ -354,7 +347,7 @@ ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, i
 //Change the location of an existing effect
 //this is used when some external code needs to adjust the effect's location
 //used when the gui sets the effect's final target
-void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const
+void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y)
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -363,10 +356,10 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 	ModifyEffectPoint(effect_reference.opcode, x, y);
 }
 
-void EffectQueue::ModifyAllEffectSources(const Point &source) const
+void EffectQueue::ModifyAllEffectSources(const Point &source)
 {
-	for (const auto& fx : effects) {
-		fx->Source = source;
+	for (auto& fx : effects) {
+		fx.Source = source;
 	}
 }
 
@@ -382,10 +375,8 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 //copies the whole effectqueue (area projectiles use it)
 EffectQueue *EffectQueue::CopySelf() const
 {
-	EffectQueue *newQueue;
-
-	newQueue = new EffectQueue();
-	std::list< Effect* >::const_iterator fxit = GetFirstEffect();
+	EffectQueue *newQueue = new EffectQueue();
+	std::list<Effect>::const_iterator fxit = GetFirstEffect();
 	const Effect *fx;
 
 	while( (fx = GetNextEffect(fxit))) {
@@ -442,20 +433,20 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 void EffectQueue::AddEffect(Effect* fx, bool insert)
 {
 	if (insert) {
-		effects.push_front(fx);
+		effects.push_front(std::move(*fx));
 	} else {
-		effects.push_back(fx);
+		effects.push_back(std::move(*fx));
 	}
+	delete fx;
 }
 
 //This method can remove an effect described by a pointer to it, or
 //an exact matching effect
 bool EffectQueue::RemoveEffect(const Effect* fx)
 {
-	for (std::list<Effect*>::iterator f = effects.begin(); f != effects.end(); ++f) {
-		Effect* fx2 = *f;
-		if (*fx == *fx2) {
-			delete fx2;
+	for (auto f = effects.begin(); f != effects.end(); ++f) {
+		Effect& fx2 = *f;
+		if (*fx == fx2) {
 			effects.erase( f );
 			return true;
 		}
@@ -466,25 +457,22 @@ bool EffectQueue::RemoveEffect(const Effect* fx)
 //this is where we reapply all effects when loading a saved game
 //The effects are already in the fxqueue of the target
 //... but some require reinitialisation
-void EffectQueue::ApplyAllEffects(Actor* target) const
+void EffectQueue::ApplyAllEffects(Actor* target)
 {
-	for (auto fx : effects) {
-		if (Opcodes[fx->Opcode].Flags & EFFECT_REINIT_ON_LOAD) {
+	for (auto& fx : effects) {
+		if (Opcodes[fx.Opcode].Flags & EFFECT_REINIT_ON_LOAD) {
 			// pretend to be the first application (FirstApply==1)
-			ApplyEffect(target, fx, 1);
+			ApplyEffect(target, &fx, 1);
 		} else {
-			ApplyEffect(target, fx, 0);
+			ApplyEffect(target, &fx, 0);
 		}
 	}
 }
 
 void EffectQueue::Cleanup()
 {
-	std::list< Effect* >::iterator f;
-
-	for ( f = effects.begin(); f != effects.end(); ) {
-		if( (*f)->TimingMode == FX_DURATION_JUST_EXPIRED) {
-			delete *f;
+	for (auto f = effects.begin(); f != effects.end(); ) {
+		if (f->TimingMode == FX_DURATION_JUST_EXPIRED) {
 			effects.erase(f++);
 		} else {
 			++f;
@@ -716,7 +704,7 @@ all_party:
 //will get copied (hence the fxqueue.AddEffect call)
 //if this returns FX_NOT_APPLIED, then the whole stack was resisted
 //or expired
-int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
+int EffectQueue::AddAllEffects(Actor* target, const Point &destination)
 {
 	int res = FX_NOT_APPLIED;
 	// pre-roll dice for fx needing them and stow them in the effect
@@ -725,13 +713,13 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 	if( target) {
 		target->RollSaves();
 	}
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		//handle resistances and saving throws here
-		fx->random_value = random_value;
+		fx.random_value = random_value;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
 
-		int tmp = AddEffect(new Effect(*fx), Owner, target, destination);
+		int tmp = AddEffect(new Effect(fx), Owner, target, destination);
 		//lets try without Owner, any crash?
 		//If yes, then try to fix the individual effect
 		//If you use target for Owner here, the wand in chateau irenicus will work
@@ -809,17 +797,17 @@ static inline bool check_probability(const Effect* fx)
 }
 
 //this is for whole spell immunity/bounce
-static inline int DecreaseEffect(Effect *efx)
+static bool DecreaseEffect(Effect* fx)
 {
-	if (efx->Parameter1) {
-		efx->Parameter1--;
+	if (fx->Parameter1) {
+		fx->Parameter1--;
 		return true;
 	}
 	return false;
 }
 
 //lower decreasing immunities/bounces
-static int check_type(const Actor *actor, const Effect *fx)
+static int check_type(Actor *actor, const Effect& fx)
 {
 	//the protective effect (if any)
 	Effect *efx;
@@ -828,9 +816,9 @@ static int check_type(const Actor *actor, const Effect *fx)
 
 	//spell level immunity
 	// but ignore it if we're casting beneficial stuff on ourselves
-	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
-		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
-		if (caster != actor || (fx->SourceFlags & SF_HOSTILE)) {
+	if(fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0) ) {
+		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
+		if (caster != actor || (fx.SourceFlags & SF_HOSTILE)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity");
 			return 0;
 		}
@@ -838,30 +826,30 @@ static int check_type(const Actor *actor, const Effect *fx)
 
 	//source immunity (spell name)
 	//if source is unspecified, don't resist it
-	if(!fx->SourceRef.IsEmpty()) {
-		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->SourceRef) ) {
-			Log(DEBUG, "EffectQueue", "Resisted by spell immunity ({})", fx->SourceRef);
+	if(!fx.SourceRef.IsEmpty()) {
+		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx.SourceRef) ) {
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity ({})", fx.SourceRef);
 			return 0;
 		}
-		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->SourceRef) ) {
-			if (fx->SourceRef != "detect") { // our secret door pervasive effect
-				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 ({})", fx->SourceRef);
+		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx.SourceRef) ) {
+			if (fx.SourceRef != "detect") { // our secret door pervasive effect
+				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 ({})", fx.SourceRef);
 			}
 			return 0;
 		}
 	}
 
 	//primary type immunity (school)
-	if( fx->PrimaryType) {
-		if( actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx->PrimaryType)) {
+	if( fx.PrimaryType) {
+		if( actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school/primary type");
 			return 0;
 		}
 	}
 
 	//secondary type immunity (usage)
-	if( fx->SecondaryType) {
-		if( actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx->SecondaryType) ) {
+	if( fx.SecondaryType) {
+		if( actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx.SecondaryType) ) {
 			Log(DEBUG, "EffectQueue", "Resisted by usage/secondary type");
 			return 0;
 		}
@@ -869,8 +857,8 @@ static int check_type(const Actor *actor, const Effect *fx)
 
 	//decrementing immunity checks
 	//decrementing level immunity
-	if (fx->Power) {
-		efx = actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx->Power);
+	if (fx.Power) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx.Power));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
 			return 0;
@@ -878,16 +866,16 @@ static int check_type(const Actor *actor, const Effect *fx)
 	}
 
 	//decrementing spell immunity
-	if(!fx->SourceRef.IsEmpty()) {
-		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->SourceRef);
+	if(!fx.SourceRef.IsEmpty()) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx.SourceRef));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (decrementing)");
 			return 0;
 		}
 	}
 	//decrementing primary type immunity (school)
-	if( fx->PrimaryType) {
-		efx = actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx->PrimaryType);
+	if( fx.PrimaryType) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
 			return 0;
@@ -895,8 +883,8 @@ static int check_type(const Actor *actor, const Effect *fx)
 	}
 
 	//decrementing secondary type immunity (usage)
-	if( fx->SecondaryType) {
-		efx = actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx->SecondaryType);
+	if( fx.SecondaryType) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx.SecondaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by usage/sectype immunity (decrementing)");
 			return 0;
@@ -908,48 +896,49 @@ static int check_type(const Actor *actor, const Effect *fx)
 	//if the spelltrap effect already absorbed enough levels
 	//but still didn't get removed, it will absorb levels it shouldn't
 	//it will also absorb multiple spells in a single round
-	if (fx->Power) {
-		efx=actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx->Power);
+	if (fx.Power) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx.Power));
 		if( efx) {
 			//storing the absorbed spell level
-			efx->Parameter3+=fx->Power;
+			efx->Parameter3 += fx.Power;
+			
 			//instead of a single effect, they had to create an effect for each level
 			//HOW DAMN LAME
-			//if decrease needs the spell level, use fx->Power here
+			//if decrease needs the spell level, use fx.Power here
 			actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, 1);
-			//efx->Parameter1--;
+			//efx.Parameter1--;
 			Log(DEBUG, "EffectQueue", "Absorbed by spelltrap");
 			return 0;
 		}
 	}
 
 	//bounce checks
-	if (fx->Power) {
-		if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx->Power) ) {
+	if (fx.Power) {
+		if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx.Power) ) {
 			Log(DEBUG, "EffectQueue", "Bounced by level");
 			return -1;
 		}
 	}
 
-	if((bounce&BNC_PROJECTILE) && actor->fxqueue.HasEffectWithParam(fx_projectile_bounce_ref, fx->Projectile)) {
+	if((bounce&BNC_PROJECTILE) && actor->fxqueue.HasEffectWithParam(fx_projectile_bounce_ref, fx.Projectile)) {
 		Log(DEBUG, "EffectQueue", "Bounced by projectile");
 		return -1;
 	}
 
-	if(!fx->SourceRef.IsEmpty() && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->SourceRef) ) {
+	if(!fx.SourceRef.IsEmpty() && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx.SourceRef) ) {
 		Log(DEBUG, "EffectQueue", "Bounced by resource");
 		return -1;
 	}
 
-	if( fx->PrimaryType && (bounce&BNC_SCHOOL) ) {
-		if( actor->fxqueue.HasEffectWithParam(fx_school_bounce_ref, fx->PrimaryType)) {
+	if( fx.PrimaryType && (bounce&BNC_SCHOOL) ) {
+		if( actor->fxqueue.HasEffectWithParam(fx_school_bounce_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Bounced by school");
 			return -1;
 		}
 	}
 
-	if( fx->SecondaryType && (bounce&BNC_SECTYPE) ) {
-		if( actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_ref, fx->SecondaryType)) {
+	if( fx.SecondaryType && (bounce&BNC_SECTYPE) ) {
+		if( actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_ref, fx.SecondaryType)) {
 			Log(DEBUG, "EffectQueue", "Bounced by usage/sectype");
 			return -1;
 		}
@@ -957,32 +946,32 @@ static int check_type(const Actor *actor, const Effect *fx)
 	//decrementing bounce checks
 
 	//level decrementing bounce check
-	if (fx->Power && bounce & BNC_LEVEL_DEC) {
-		efx = actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
+	if (fx.Power && bounce & BNC_LEVEL_DEC) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx.Power));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
 			return -1;
 		}
 	}
 
-	if(!fx->SourceRef.IsEmpty() && (bounce&BNC_RESOURCE_DEC)) {
-		efx=actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx->Resource);
+	if(!fx.SourceRef.IsEmpty() && (bounce&BNC_RESOURCE_DEC)) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx.Resource));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by resource (decrementing)");
 			return -1;
 		}
 	}
 
-	if( fx->PrimaryType && (bounce&BNC_SCHOOL_DEC) ) {
-		efx=actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx->PrimaryType);
+	if( fx.PrimaryType && (bounce&BNC_SCHOOL_DEC) ) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by school (decrementing)");
 			return -1;
 		}
 	}
 
-	if( fx->SecondaryType && (bounce&BNC_SECTYPE_DEC) ) {
-		efx=actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_dec_ref, fx->SecondaryType);
+	if( fx.SecondaryType && (bounce&BNC_SECTYPE_DEC) ) {
+		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_dec_ref, fx.SecondaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by usage (decrementing)");
 			return -1;
@@ -1296,13 +1285,13 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 // looks for opcode with param2
 
-#define MATCH_OPCODE() if (fx->Opcode != opcode) { continue; }
+#define MATCH_OPCODE() if (fx.Opcode != opcode) { continue; }
 
 // useful for: remove equipped item
-#define MATCH_SLOTCODE() if (fx->InventorySlot != slotcode) { continue; }
+#define MATCH_SLOTCODE() if (fx.InventorySlot != slotcode) { continue; }
 
 // useful for: remove projectile type
-#define MATCH_PROJECTILE() if (fx->Projectile != projectile) { continue; }
+#define MATCH_PROJECTILE() if (fx.Projectile != projectile) { continue; }
 
 static const bool fx_live[MAX_TIMING_MODE] = { true, true, true, false, false, false, false, false, true, true, true, false };
 static inline bool IsLive(ieByte timingmode)
@@ -1311,57 +1300,57 @@ static inline bool IsLive(ieByte timingmode)
 	return fx_live[timingmode];
 }
 
-#define MATCH_LIVE_FX() if (!IsLive(fx->TimingMode)) { continue; }
-#define MATCH_PARAM1() if (fx->Parameter1 != param1) { continue; }
-#define MATCH_PARAM2() if (fx->Parameter2 != param2) { continue; }
-#define MATCH_TIMING() if (fx->TimingMode != timing) { continue; }
+#define MATCH_LIVE_FX() if (!IsLive(fx.TimingMode)) { continue; }
+#define MATCH_PARAM1() if (fx.Parameter1 != param1) { continue; }
+#define MATCH_PARAM2() if (fx.Parameter2 != param2) { continue; }
+#define MATCH_TIMING() if (fx.TimingMode != timing) { continue; }
 
 //call this from an applied effect, after it returns, these effects
 //will be killed along with it
-void EffectQueue::RemoveAllEffects(ieDword opcode) const
+void EffectQueue::RemoveAllEffects(ieDword opcode)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //removes all equipping effects that match slotcode
-bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
+bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode)
 {
 	bool removed = false;
-	for (const auto& fx : effects) {
-		if (!IsEquipped(fx->TimingMode)) continue;
+	for (auto& fx : effects) {
+		if (!IsEquipped(fx.TimingMode)) continue;
 		MATCH_SLOTCODE()
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		removed = true;
 	}
 	return removed;
 }
 
 //removes all effects that match projectile
-void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile) const
+void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_PROJECTILE()
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //remove effects belonging to a given spell
-void EffectQueue::RemoveAllEffects(const ResRef &removed) const
+void EffectQueue::RemoveAllEffects(const ResRef &removed)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_LIVE_FX()
-		if (removed != fx->SourceRef) {
+		if (removed != fx.SourceRef) {
 			continue;
 		}
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 
 	Actor* OwnerActor = Owner->As<Actor>();
@@ -1405,20 +1394,20 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed) const
 }
 
 //remove effects belonging to a given spell, but only if they match timing method x
-void EffectQueue::RemoveAllEffects(const ResRef &removed, ieByte timing) const
+void EffectQueue::RemoveAllEffects(const ResRef &removed, ieByte timing)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_TIMING()
-		if (removed != fx->SourceRef) {
+		if (removed != fx.SourceRef) {
 			continue;
 		}
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //this will modify effect reference
-void EffectQueue::RemoveAllEffects(EffectRef &effect_reference) const
+void EffectQueue::RemoveAllEffects(EffectRef &effect_reference)
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -1428,49 +1417,49 @@ void EffectQueue::RemoveAllEffects(EffectRef &effect_reference) const
 }
 
 //Removes all effects with a matching resource field
-void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ResRef &resource) const
+void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ResRef &resource)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if (fx->Resource != resource) { continue; }
+		if (fx.Resource != resource) { continue; }
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //this will modify effect reference
-void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource) const
+void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource)
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithResource(effect_reference.opcode, resource);
 }
 
 //Removes all effects with a matching resource field
-void EffectQueue::RemoveAllEffectsWithSource(ieDword opcode, const ResRef &source, int mode) const
+void EffectQueue::RemoveAllEffectsWithSource(ieDword opcode, const ResRef &source, int mode)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
-		if (fx->SourceRef != source) continue;
+		if (fx.SourceRef != source) continue;
 
 		// equipping effects only
 		// IsEquipped excludes to many to match ee's opcode 321
-		if (mode == 1 && fx->TimingMode != FX_DURATION_INSTANT_WHILE_EQUIPPED) {
+		if (mode == 1 && fx.TimingMode != FX_DURATION_INSTANT_WHILE_EQUIPPED) {
 			continue;
 		}
 
 		// "timed" effects only
-		if (mode == 2 && (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED || fx->TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
+		if (mode == 2 && (fx.TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED || fx.TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
 			continue;
 		}
 
 		// mode 0 or anything else means remove all effects that match
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
-void EffectQueue::RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode) const
+void EffectQueue::RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode)
 {
 	ResolveEffectRef(effectReference);
 	RemoveAllEffectsWithSource(effectReference.opcode, source, mode);
@@ -1478,31 +1467,31 @@ void EffectQueue::RemoveAllEffectsWithSource(EffectRef &effectReference, const R
 
 //This method could be used to remove stat modifiers that would lower a stat
 //(works only if a higher stat means good for the target)
-void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const
+void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		switch (fx->Parameter2) {
+		switch (fx.Parameter2) {
 		case 0:case 3:
-			if ((signed) fx->Parameter1 >= 0) continue;
+			if ((signed) fx.Parameter1 >= 0) continue;
 			break;
 		case 1:case 4:
-			if ((signed) fx->Parameter1 >= (signed) current) continue;
+			if ((signed) fx.Parameter1 >= (signed) current) continue;
 			break;
 		case 2:case 5:
-			if ((signed) fx->Parameter1 >= 100) continue;
+			if ((signed) fx.Parameter1 >= 100) continue;
 			break;
 		default:
 			break;
 		}
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //this will modify effect reference
-void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const
+void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current)
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllDetrimentalEffects(effect_reference.opcode, current);
@@ -1512,40 +1501,40 @@ void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDwo
 //param2 is usually an effect's subclass (quality) while param1 is more like quantity.
 //So opcode+param2 usually pinpoints an effect better when not all effects of a given
 //opcode need to be removed (see removal of portrait icon)
-void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const
+void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //this will modify effect reference
-void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const
+void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2)
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithParam(effect_reference.opcode, param2);
 }
 
 //Removes all effects with a matching resource field
-void EffectQueue::RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ResRef &resource) const
+void EffectQueue::RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ResRef &resource)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
 		
-		if (!resource.IsEmpty() && fx->Resource != resource) continue;
+		if (!resource.IsEmpty() && fx.Resource != resource) continue;
 
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
 
 //this will modify effect reference
-void EffectQueue::RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource) const
+void EffectQueue::RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource)
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithParamAndResource(effect_reference.opcode, param2, resource);
@@ -1553,7 +1542,7 @@ void EffectQueue::RemoveAllEffectsWithParamAndResource(EffectRef &effect_referen
 
 //this function is called by FakeEffectExpiryCheck
 //probably also called by rest
-void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
+void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 {
 	ieDword GameTime = core->GetGame()->GameTime;
 	// prevent overflows, since we pass the max futuretime for guaranteed expiry
@@ -1563,22 +1552,22 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 		GameTime += futuretime;
 	}
 
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		//FIXME: how this method handles delayed effects???
 		//it should remove them as well, i think
-		if (DelayType(fx->TimingMode) != TIMING_PERMANENT && fx->Duration <= GameTime) {
-			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		if (DelayType(fx.TimingMode) != TIMING_PERMANENT && fx.Duration <= GameTime) {
+			fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
 }
 
 //this effect will expire all effects that are not truly permanent
 //which i call permanent after death (iesdp calls it permanent after bonuses)
-void EffectQueue::RemoveAllNonPermanentEffects() const
+void EffectQueue::RemoveAllNonPermanentEffects()
 {
-	for (const auto& fx : effects) {
-		if (IsRemovable(fx->TimingMode)) {
-			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+	for (auto& fx : effects) {
+		if (IsRemovable(fx.TimingMode)) {
+			fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
 }
@@ -1586,48 +1575,48 @@ void EffectQueue::RemoveAllNonPermanentEffects() const
 //remove certain levels of effects, possibly matching school/secondary type
 //this method removes whole spells (tied together by their source)
 //FIXME: probably this isn't perfect
-void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match) const
+void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match)
 {
 	ResRef removed;
-	for (const auto& fx : effects) {
-		if (fx->Power > level) {
+	for (auto& fx : effects) {
+		if (fx.Power > level) {
 			continue;
 		}
 
-		if (removed != fx->SourceRef) {
+		if (removed != fx.SourceRef) {
 			continue;
 		}
-		if (Flags & RL_MATCHSCHOOL && fx->PrimaryType != match) {
+		if (Flags & RL_MATCHSCHOOL && fx.PrimaryType != match) {
 			continue;
 		}
-		if (Flags & RL_MATCHSECTYPE && fx->SecondaryType != match) {
+		if (Flags & RL_MATCHSECTYPE && fx.SecondaryType != match) {
 			continue;
 		}
 		//if dispellable was not set, or the effect is dispellable
 		//then remove it
-		if (Flags & RL_DISPELLABLE && !(fx->Resistance & FX_CAN_DISPEL)) {
+		if (Flags & RL_DISPELLABLE && !(fx.Resistance & FX_CAN_DISPEL)) {
 			continue;
 		}
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		if (Flags & RL_REMOVEFIRST) {
-			removed = fx->SourceRef;
+			removed = fx.SourceRef;
 		}
 	}
 }
 
-void EffectQueue::DispelEffects(const Effect *dispeller, ieDword level) const
+void EffectQueue::DispelEffects(const Effect *dispeller, ieDword level)
 {
-	for (Effect *fx : effects) {
-		if (fx == dispeller) continue;
+	for (auto& fx : effects) {
+		if (&fx == dispeller) continue; // FIXME: is this the comparison we mean to use? or do we mean operator==?
 
 		// this should also ignore all equipping effects
-		if(!(fx->Resistance & FX_CAN_DISPEL)) {
+		if(!(fx.Resistance & FX_CAN_DISPEL)) {
 			continue;
 		}
 
 		// 50% base chance of success; always at least 1% chance of failure or success
 		// positive level diff modifies the base chance by 5%, negative by -10%
-		int diff = level - fx->CasterLevel;
+		int diff = level - fx.CasterLevel;
 		if (diff > 0) {
 			diff *= 5;
 		} else if (diff < 0) {
@@ -1639,23 +1628,23 @@ void EffectQueue::DispelEffects(const Effect *dispeller, ieDword level) const
 		if (roll == 1) continue;
 		if (roll == 100 || roll < diff) {
 			// finally dispel
-			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+			fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
 }
 
-Effect *EffectQueue::HasOpcode(ieDword opcode) const
+const Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
 	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		return fx;
+		return &fx;
 	}
 	return nullptr;
 }
 
-Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
+const Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -1664,20 +1653,40 @@ Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
 	return HasOpcode(effect_reference.opcode);
 }
 
-Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
+Effect *EffectQueue::HasOpcode(ieDword opcode)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+
+		return &fx;
+	}
+	return nullptr;
+}
+
+Effect *EffectQueue::HasEffect(EffectRef &effect_reference)
+{
+	ResolveEffectRef(effect_reference);
+	if( effect_reference.opcode<0) {
+		return NULL;
+	}
+	return HasOpcode(effect_reference.opcode);
+}
+
+const Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
+{
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
 
-		return fx;
+		return &fx;
 	}
 	return nullptr;
 }
 
 //this will modify effect reference
-Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const
+const Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -1689,9 +1698,9 @@ Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword par
 //looks for opcode with pairs of parameters (useful for protection against creature, extra damage or extra thac0 against creature)
 //generally an IDS targeting
 
-Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const
+const Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
@@ -1700,13 +1709,13 @@ Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDw
 			MATCH_PARAM1()
 		}
 
-		return fx;
+		return &fx;
 	}
 	return nullptr;
 }
 
 //this will modify effect reference
-Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const
+const Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -1716,12 +1725,12 @@ Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword
 }
 
 //this could be used for stoneskins and mirror images as well
-void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
+void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		ieDword value = fx->Parameter1;
+		ieDword value = fx.Parameter1;
 		if( value>amount) {
 			value -= amount;
 			amount = 0;
@@ -1729,14 +1738,14 @@ void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
 			amount -= value;
 			value = 0;
 		}
-		fx->Parameter1 = value;
+		fx.Parameter1 = value;
 		if (value) {
 			return;
 		}
 	}
 }
 
-void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount) const
+void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount)
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -1747,13 +1756,13 @@ void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword am
 
 //this is only used for Cloak of Warding Overlay in PST
 //returns the damage amount NOT soaked
-int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2) const
+int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
-		ieDword value = fx->Parameter3;
+		ieDword value = fx.Parameter3;
 		if( value>amount) {
 			value -= amount;
 			amount = 0;
@@ -1761,7 +1770,7 @@ int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword 
 			amount -= value;
 			value = 0;
 		}
-		fx->Parameter3 = value;
+		fx.Parameter3 = value;
 		if (value) {
 			return 0;
 		}
@@ -1771,7 +1780,7 @@ int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword 
 
 //this is only used for Cloak of Warding Overlay in PST
 //returns the damage amount NOT soaked
-int EffectQueue::DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2) const
+int EffectQueue::DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2)
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
@@ -1791,9 +1800,9 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if (fx->Parameter1) {
+		if (fx.Parameter1) {
 			ieDword param1;
-			ieDword ids = fx->Parameter2;
+			ieDword ids = fx.Parameter2;
 			switch(ids) {
 			case 0:
 			case 1:
@@ -1812,14 +1821,14 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 				break;
 			case 9:
 				//pseudo stat/classmask
-				param1 = actor->GetClassMask() & fx->Parameter1;
+				param1 = actor->GetClassMask() & fx.Parameter1;
 				if (!param1) continue;
 				break;
 			default:
 				break;
 			}
 		}
-		ieDword val = fx->Parameter3;
+		ieDword val = fx.Parameter3;
 		//we are really lucky with this, most of these boni are using +2 (including fiendslayer feat)
 		//it would be much more inconvenient if we had to use v2 effect files
 		if (!val) val = 2;
@@ -1844,7 +1853,7 @@ int EffectQueue::BonusForParam2(ieDword opcode, ieDword param2) const
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		MATCH_PARAM2()
-		sum += fx->Parameter1;
+		sum += fx.Parameter1;
 	}
 	return sum;
 }
@@ -1866,7 +1875,7 @@ int EffectQueue::MaxParam1(ieDword opcode, bool positive) const
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		param1 = signed(fx->Parameter1);
+		param1 = signed(fx.Parameter1);
 		if ((positive && param1 > max) || (!positive && param1 < max)) {
 			max = param1;
 		}
@@ -1889,9 +1898,9 @@ bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapon
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 
-		int magic = (int) fx->Parameter1;
-		ieDword mask = fx->Parameter3;
-		ieDword value = fx->Parameter4;
+		int magic = (int) fx.Parameter1;
+		ieDword mask = fx.Parameter3;
+		ieDword value = fx.Parameter4;
 		if (magic == 0 && enchantment) {
 			continue;
 		} else if (magic > 0 && enchantment > magic) {
@@ -1928,9 +1937,9 @@ void EffectQueue::AddWeaponEffects(EffectQueue* fxqueue, EffectRef& fx_ref, ieDw
 	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if (!param2 && fx->Parameter2 != param2) continue;
+		if (!param2 && fx.Parameter2 != param2) continue;
 
-		Effect *fx2 = core->GetEffect(fx->Resource, fx->Power, p);
+		Effect *fx2 = core->GetEffect(fx.Resource, fx.Power, p);
 		if (!fx2) continue;
 		fx2->Target = FX_TARGET_PRESET;
 		fxqueue->AddEffect(fx2, true);
@@ -1951,10 +1960,10 @@ int EffectQueue::SumDamageReduction(EffectRef &effect_reference, ieDword weaponE
 
 		count++;
 		// add up if the effect has enough enchantment (or ignores it)
-		if (!fx->Parameter2 || fx->Parameter2 > weaponEnchantment) {
-			remaining += fx->Parameter1;
+		if (!fx.Parameter2 || fx.Parameter2 > weaponEnchantment) {
+			remaining += fx.Parameter1;
 		}
-		total += fx->Parameter1;
+		total += fx.Parameter1;
 	}
 	if (count) {
 		return remaining;
@@ -1964,74 +1973,74 @@ int EffectQueue::SumDamageReduction(EffectRef &effect_reference, ieDword weaponE
 }
 
 //useful for immunity vs spell, can't use item, etc.
-Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ResRef &resource) const
+const Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ResRef &resource) const
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if (fx->Resource != resource) continue;
+		if (fx.Resource != resource) continue;
 
-		return fx;
+		return &fx;
 	}
 	return nullptr;
 }
 
-Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ResRef &resource) const
+const Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ResRef &resource) const
 {
 	ResolveEffectRef(effect_reference);
 	return HasOpcodeWithResource(effect_reference.opcode, resource);
 }
 
 // for tobex bounce triggers
-Effect *EffectQueue::HasEffectWithPower(EffectRef &effect_reference, ieDword power) const
+const Effect *EffectQueue::HasEffectWithPower(EffectRef &effect_reference, ieDword power) const
 {
 	ResolveEffectRef(effect_reference);
 	return HasOpcodeWithPower(effect_reference.opcode, power);
 }
 
-Effect *EffectQueue::HasOpcodeWithPower(ieDword opcode, ieDword power) const
+const Effect *EffectQueue::HasOpcodeWithPower(ieDword opcode, ieDword power) const
 {
 	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		// NOTE: matching greater or equals!
-		if (fx->Power < power) continue;
+		if (fx.Power < power) continue;
 
-		return fx;
+		return &fx;
 	}
 	return nullptr;
 }
 
 //returns the first effect with source 'Removed'
-Effect *EffectQueue::HasSource(const ResRef &removed) const
+const Effect *EffectQueue::HasSource(const ResRef &removed) const
 {
 	for (const auto& fx : effects) {
 		MATCH_LIVE_FX()
-		if (removed != fx->SourceRef) {
+		if (removed != fx.SourceRef) {
 			continue;
 		}
 
-		return fx;
+		return &fx;
 	}
 	return nullptr;
 }
 
 //used in contingency/sequencer code (cannot have the same contingency twice)
-Effect *EffectQueue::HasOpcodeWithSource(ieDword opcode, const ResRef &removed) const
+const Effect *EffectQueue::HasOpcodeWithSource(ieDword opcode, const ResRef &removed) const
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if (removed != fx->SourceRef) {
+		if (removed != fx.SourceRef) {
 			continue;
 		}
 
-		return fx;
+		return &fx;
 	}
 	return nullptr;
 }
 
-Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ResRef &resource) const
+const Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ResRef &resource) const
 {
 	ResolveEffectRef(effect_reference);
 	return HasOpcodeWithSource(effect_reference.opcode, resource);
@@ -2039,8 +2048,8 @@ Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ResR
 
 bool EffectQueue::HasAnyDispellableEffect() const
 {
-	for (const Effect *fx : effects) {
-		if (fx->Resistance & FX_CAN_DISPEL) {
+	for (const Effect& fx : effects) {
+		if (fx.Resistance & FX_CAN_DISPEL) {
 			return true;
 		}
 	}
@@ -2051,12 +2060,12 @@ std::string EffectQueue::dump() const
 {
 	std::string buffer("EFFECT QUEUE:\n");
 	int i = 0;
-	for (const Effect *fx : effects) {
-		if (fx->Opcode >= MAX_EFFECTS) {
-			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: {}! Report this immediately!", fx->Opcode);
+	for (const Effect& fx : effects) {
+		if (fx.Opcode >= MAX_EFFECTS) {
+			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: {}! Report this immediately!", fx.Opcode);
 			return buffer;
 		}
-		AppendFormat(buffer, " {:2d}: 0x{:02x}: {} ({}, {}) S:{}\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->SourceRef);
+		AppendFormat(buffer, " {:2d}: 0x{:02x}: {} ({}, {}) S:{}\n", i++, fx.Opcode, Opcodes[fx.Opcode].Name, fx.Parameter1, fx.Parameter2, fx.SourceRef);
 	}
 	return buffer;
 }
@@ -2075,16 +2084,16 @@ bool EffectQueue::HasDuration(const Effect *fx)
 }
 
 //returns true if the effect must be saved
-bool EffectQueue::Persistent(const Effect* fx)
+bool EffectQueue::Persistent(const Effect& fx)
 {
 	// local variable effects self-destruct if they were processed already
 	// but if they weren't processed, e.g. in a global actor, we must save them
 	// TODO: do we really need to special-case this? leaving it for now - fuzzie
-	if( fx->Opcode==(ieDword) ResolveEffect(fx_variable_ref)) {
+	if( fx.Opcode==(ieDword) ResolveEffect(fx_variable_ref)) {
 		return true;
 	}
 
-	switch (fx->TimingMode) {
+	switch (fx.TimingMode) {
 		//normal equipping fx of items
 		case FX_DURATION_INSTANT_WHILE_EQUIPPED:
 		//delayed effect not saved
@@ -2112,22 +2121,28 @@ void EffectQueue::HackColorEffects(const Actor *Owner, Effect *fx)
 }
 
 //iterate through saved effects
-const Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator &f) const
+const Effect *EffectQueue::GetNextSavedEffect(queue_t::const_iterator &f) const
 {
 	while(f!=effects.end()) {
-		const Effect *effect = *f;
+		const Effect& effect = *f;
 		f++;
-		if( Persistent(effect)) {
-			return effect;
+		if (Persistent(effect)) {
+			return &effect;
 		}
 	}
 	return NULL;
 }
 
-Effect *EffectQueue::GetNextEffect(std::list< Effect* >::const_iterator &f) const
+const Effect *EffectQueue::GetNextEffect(queue_t::const_iterator &f) const
 {
-	if( f!=effects.end()) return *f++;
-	return NULL;
+	if( f!=effects.end()) return &(*f++);
+	return nullptr;
+}
+
+Effect *EffectQueue::GetNextEffect(queue_t::iterator &f)
+{
+	if( f!=effects.end()) return &(*f++);
+	return nullptr;
 }
 
 ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef &resource) const
@@ -2140,7 +2155,7 @@ ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2
 			MATCH_PARAM1()
 		if( param2!=0xffffffff)
 			MATCH_PARAM2()
-		if (!resource.IsEmpty() && fx->Resource != resource) continue;
+		if (!resource.IsEmpty() && fx.Resource != resource) continue;
 		cnt++;
 	}
 	return cnt;
@@ -2154,18 +2169,18 @@ unsigned int EffectQueue::GetEffectOrder(EffectRef& effect_reference, const Effe
 	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if (fx == fx2) break;
+		if (&fx == fx2) break;// FIXME: is this the comparison we mean to use? or do we mean operator==?
 		cnt++;
 	}
 	return cnt;
 }
 
-void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const
+void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y)
 {
-	for (const auto& fx : effects) {
+	for (auto& fx : effects) {
 		MATCH_OPCODE()
-		fx->Pos = Point(x, y);
-		fx->Parameter3 = 0;
+		fx.Pos = Point(x, y);
+		fx.Parameter3 = 0;
 		return;
 	}
 }
@@ -2175,7 +2190,7 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 {
 	ieDword cnt = 0;
 
-	for (const Effect *fx : effects) {
+	for (const auto& fx : effects) {
 		if (Persistent(fx)) cnt++;
 	}
 	return cnt;
@@ -2201,10 +2216,10 @@ int EffectQueue::CheckImmunity(Actor *target) const
 	}
 
 	if (!effects.empty()) {
-		const Effect* fx = *effects.begin();
+		const Effect& fx = *effects.begin();
 
 		//projectile immunity
-		if( target->ImmuneToProjectile(fx->Projectile)) return 0;
+		if( target->ImmuneToProjectile(fx.Projectile)) return 0;
 
 		//Allegedly, the book of infinite spells needed this, but irresistable by level
 		//spells got fx->Power = 0, so i added those exceptions and removed returning here for fx->InventorySlot
@@ -2222,7 +2237,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 }
 
 void EffectQueue::AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue,
-		unsigned int range, const Actor *except) const
+		unsigned int range, const Actor *except)
 {
 	int cnt = map->GetActorCount(true);
 	while(cnt--) {
@@ -2256,8 +2271,8 @@ bool EffectQueue::HasHostileEffects() const
 {
 	bool hostile = false;
 
-	for (const Effect* fx : effects) {
-		if (fx->SourceFlags&SF_HOSTILE) {
+	for (const Effect& fx : effects) {
+		if (fx.SourceFlags&SF_HOSTILE) {
 			hostile = true;
 			break;
 		}

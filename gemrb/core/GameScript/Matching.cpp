@@ -96,7 +96,7 @@ static inline Targets *DoObjectFiltering(const Scriptable *Sender, Targets *tgts
 
 static EffectRef fx_protection_creature_ref = { "Protection:Creature", -1 };
 
-static inline bool DoObjectChecks(const Map* map, const Scriptable* Sender, const Actor* target, int &dist, bool ignoreinvis = false, const Object* oC = nullptr)
+static inline bool DoObjectChecks(const Map* map, const Scriptable* Sender, Actor* target, int &dist, bool ignoreinvis = false, const Object* oC = nullptr)
 {
 	dist = SquaredMapDistance(Sender, target);
 

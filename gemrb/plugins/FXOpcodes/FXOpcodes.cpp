@@ -4261,7 +4261,7 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 		target->Modified[IE_PUPPETTYPE]=0;
 
 		//go after the original puppetmarker in the puppet too
-		const Actor *puppet = core->GetGame()->GetActorByGlobalID(target->GetSafeStat(IE_PUPPETID) );
+		Actor *puppet = core->GetGame()->GetActorByGlobalID(target->GetSafeStat(IE_PUPPETID) );
 		if (puppet) {
 			Effect *puppetmarker = puppet->fxqueue.HasEffect(fx_puppetmarker_ref);
 
@@ -6864,7 +6864,7 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_activate_spell_sequencer(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_activate_spell_sequencer(%2d): Resource: %s", fx->Opcode, fx->Resource);
-	const Actor* actor = Owner->As<const Actor>();
+	Actor* actor = Owner->As<Actor>();
 	if (!actor) {
 		return FX_NOT_APPLIED;
 	}

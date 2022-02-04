@@ -2422,7 +2422,7 @@ int AREImporter::PutEffects(DataStream *stream, const EffectQueue *fxqueue) cons
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
 
-	std::list< Effect* >::const_iterator f=fxqueue->GetFirstEffect();
+	auto f = fxqueue->GetFirstEffect();
 	ieDword EffectsCount = fxqueue->GetSavedEffectsCount();
 	for(unsigned int i=0;i<EffectsCount;i++) {
 		const Effect *fx = fxqueue->GetNextSavedEffect(f);

@@ -688,7 +688,7 @@ int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2) my_opcode = EffectQueue::ResolveEffect(fx_wound_ref);
 	else my_opcode = EffectQueue::ResolveEffect(fx_poison_ref);
 	// print("fx_slow_poison(%2d): Damage %d", fx->Opcode, fx->Parameter1);
-	std::list< Effect* >::const_iterator f=target->fxqueue.GetFirstEffect();
+	auto f = target->fxqueue.GetFirstEffect();
 	Effect *poison;
 	//this is intentionally an assignment
 	while( (poison = target->fxqueue.GetNextEffect(f)) ) {
