@@ -78,7 +78,9 @@ public:
 	SPLExtHeader() = default;
 	SPLExtHeader(const SPLExtHeader&) = delete;
 	~SPLExtHeader();
+#ifndef WIN32
 	SPLExtHeader& operator=(const SPLExtHeader&) = delete;
+#endif
 	SPLExtHeader& operator=(SPLExtHeader&&) = default;
 
 	ieByte SpellForm = 0;

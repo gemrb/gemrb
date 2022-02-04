@@ -124,7 +124,9 @@ public:
 	WorldMap(const WorldMap&) = delete;
 	WorldMap(WorldMap&&) = default;
 	~WorldMap();
+#ifndef WIN32
 	WorldMap& operator=(const WorldMap&) = delete;
+#endif
 	WorldMap& operator=(WorldMap&&) = default;
 public: //struct members
 	ResRef MapResRef;

@@ -38,7 +38,9 @@ struct ProjectileEntry
 	ProjectileEntry() = default;
 	ProjectileEntry(const ProjectileEntry&) = delete;
 	ProjectileEntry(ProjectileEntry&&) = default;
+#ifndef WIN32
 	ProjectileEntry& operator=(const ProjectileEntry&) = delete;
+#endif
 	ProjectileEntry& operator=(ProjectileEntry&&) = default;
 	~ProjectileEntry()
 	{
