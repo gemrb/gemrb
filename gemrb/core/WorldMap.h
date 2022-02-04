@@ -122,10 +122,10 @@ class GEM_EXPORT WorldMap {
 public:
 	WorldMap() = default;
 	WorldMap(const WorldMap&) = delete;
-	WorldMap(WorldMap&&) = default;
+	WorldMap(WorldMap&&) noexcept = default;
 	~WorldMap();
 	WorldMap& operator=(const WorldMap&) = delete;
-	WorldMap& operator=(WorldMap&&) = default;
+	WorldMap& operator=(WorldMap&&) noexcept = default;
 public: //struct members
 	ResRef MapResRef;
 	ieDword Width = 0;
@@ -193,13 +193,6 @@ private:
 	bool single = true;
 public:
 	explicit WorldMapArray(size_t count);
-	
-	// implicitly deleted due to WorldMap
-	WorldMapArray(const WorldMapArray&) = delete;
-	WorldMapArray& operator=(const WorldMapArray&) = delete;
-	
-	WorldMapArray(WorldMapArray&&) = default;
-	WorldMapArray& operator=(WorldMapArray&&) = default;
 
 	bool IsSingle() const { return single; }
 	void SetSingle(bool arg) { single = arg; }

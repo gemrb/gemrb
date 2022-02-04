@@ -50,8 +50,8 @@ private:
 public:
 	GlobalTimer(void);
 	
-	GlobalTimer(GlobalTimer&&) = default;
-	GlobalTimer& operator=(GlobalTimer&&) = default;
+	GlobalTimer(GlobalTimer&&) noexcept = default;
+	GlobalTimer& operator=(GlobalTimer&&) noexcept = default;
 
 	void Freeze();
 	bool Update();

@@ -135,7 +135,7 @@ public:
 	 */
 	explicit DirectoryIterator(const char *path);
 	DirectoryIterator(const DirectoryIterator&) = delete;
-	DirectoryIterator(DirectoryIterator&&) = default;
+	DirectoryIterator(DirectoryIterator&&) noexcept = default;
 	~DirectoryIterator();
 	DirectoryIterator& operator=(const DirectoryIterator&) = delete;
 
