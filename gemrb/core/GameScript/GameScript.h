@@ -168,13 +168,13 @@ class Canary {
 private:
 	volatile unsigned long canary;
 protected:
-	Canary() // protected constructor
+	Canary() noexcept // protected constructor
 	{
 		canary = (unsigned long) 0xdeadbeef;
 	}
 	Canary(const Canary&) = delete;
 	Canary& operator=(const Canary&) = delete;
-	virtual ~Canary() // protected destructor
+	virtual ~Canary() noexcept // protected destructor
 	{
 		AssertCanary("Destroying Canary");
 		canary = 0xdddddddd;
@@ -241,7 +241,7 @@ public:
 
 class GEM_EXPORT Condition final : protected Canary {
 public:
-	~Condition() final
+	~Condition() noexcept
 	{
 		for (auto& trigger : triggers) {
 			if (trigger) {
@@ -261,7 +261,7 @@ public:
 
 class GEM_EXPORT Action final : protected Canary {
 public:
-	explicit Action(bool autoFree)
+	explicit Action(bool autoFree) noexcept
 	{
 		//changed now
 		if (autoFree) {
@@ -270,7 +270,7 @@ public:
 			RefCount = 1; //one reference held by the script
 		}
 	}
-	~Action() final
+	~Action() noexcept
 	{
 		for (auto& object : objects) {
 			if (object) {
@@ -324,7 +324,7 @@ public:
 class GEM_EXPORT Response final : protected Canary {
 public:
 	Response() noexcept = default;
-	~Response() final
+	~Response() noexcept
 	{
 		for (auto& action : actions) {
 			if (action) {
@@ -367,7 +367,7 @@ public:
 class GEM_EXPORT ResponseBlock final : protected Canary {
 public:
 	ResponseBlock() noexcept = default;
-	~ResponseBlock() final
+	~ResponseBlock() noexcept
 	{
 		if (condition) {
 			condition->Release();
@@ -389,7 +389,7 @@ public:
 
 class GEM_EXPORT Script final : protected Canary {
 public:
-	~Script() final
+	~Script() noexcept
 	{
 		for (auto& responseBlock : responseBlocks) {
 			if (responseBlock) {
