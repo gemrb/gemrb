@@ -30,33 +30,33 @@ struct Color {
 
 	constexpr Color() noexcept = default;
 
-	constexpr Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+	constexpr Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) noexcept
 	: r(r), g(g), b(b), a(a) {}
 	
-	constexpr explicit Color(uint32_t px)
+	constexpr explicit Color(uint32_t px) noexcept
 	: r(px >> 24), g(px >> 16), b(px >> 8), a(px) {}
 
-	constexpr bool operator==(const Color& rhs) const {
+	constexpr bool operator==(const Color& rhs) const noexcept {
 		return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
 	}
 	
-	constexpr bool operator!=(const Color& rhs) const {
+	constexpr bool operator!=(const Color& rhs) const noexcept {
 		return !operator==(rhs);
 	}
 	
-	constexpr uint32_t Packed() const {
+	constexpr uint32_t Packed() const noexcept {
 		return (r << 24) | (g << 16) | (b << 8) | a;
 	}
 	
-	constexpr static Color FromBGRA(uint32_t px) {
+	constexpr static Color FromBGRA(uint32_t px) noexcept {
 		return Color(px >> 8, px >> 16, px >> 24, px);
 	}
 	
-	constexpr static Color FromARGB(uint32_t px) {
+	constexpr static Color FromARGB(uint32_t px) noexcept {
 		return Color(px >> 16, px >> 8, px, px >> 24);
 	}
 	
-	constexpr static Color FromABGR(uint32_t px) {
+	constexpr static Color FromABGR(uint32_t px) noexcept {
 		return Color(px, px >> 8, px >> 16, px >> 24);
 	}
 }; // close of Color struct
