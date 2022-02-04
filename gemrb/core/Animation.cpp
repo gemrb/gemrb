@@ -28,7 +28,7 @@
 
 namespace GemRB {
 
-Animation::Animation(std::vector<frame_t> fr)
+Animation::Animation(std::vector<frame_t> fr) noexcept
 : frames(std::move(fr))
 {
 	size_t count = frames.size();

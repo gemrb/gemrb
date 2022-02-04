@@ -49,7 +49,12 @@ public:
 	Region animArea;
 	ieDword Flags;
 
-	explicit Animation(std::vector<frame_t>);
+	explicit Animation(std::vector<frame_t>) noexcept;
+	Animation() noexcept = default;
+	
+	operator bool() const {
+		return GetFrameCount();
+	}
 
 	frame_t CurrentFrame() const;
 	frame_t LastFrame();
@@ -72,7 +77,7 @@ public:
 	void AddAnimArea(const Animation* slave);
 private:
 	std::vector<frame_t> frames;
-	index_t indicesCount;
+	index_t indicesCount = 0;
 	tick_t starttime = 0;
 };
 
