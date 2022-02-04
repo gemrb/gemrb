@@ -458,7 +458,7 @@ public:
 	ieDword HasFeature(int position) const;
 	bool IsAvailable(SClass_ID filetype) const;
 	const char * TypeExt(SClass_ID type) const;
-	ProjectileServer* GetProjectileServer() const;
+	ProjectileServer* GetProjectileServer() const noexcept;
 	Video * GetVideoDriver() const;
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;

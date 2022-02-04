@@ -1503,7 +1503,7 @@ WorldMap *Interface::GetWorldMap(const ResRef& area) const
 	return worldmap->GetWorldMap(index);
 }
 
-ProjectileServer* Interface::GetProjectileServer() const
+ProjectileServer* Interface::GetProjectileServer() const noexcept
 {
 	return projserv;
 }
