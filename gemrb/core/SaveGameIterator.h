@@ -37,8 +37,8 @@ private:
 	charlist save_slots;
 
 public:
-	SaveGameIterator() = default;
-	~SaveGameIterator() = default;
+	SaveGameIterator() noexcept = default;
+	~SaveGameIterator() noexcept = default;
 	const charlist& GetSaveGames();
 	void DeleteSaveGame(const Holder<SaveGame>&) const;
 	int CreateSaveGame(Holder<SaveGame>, const char *slotname, bool force = false) const;

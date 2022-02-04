@@ -96,7 +96,7 @@ class Sprite2D;
 
 class GEM_EXPORT ScriptedAnimation {
 public:
-	ScriptedAnimation() = default;
+	ScriptedAnimation() noexcept = default;
 	ScriptedAnimation(const ScriptedAnimation&) = delete;
 	~ScriptedAnimation();
 	ScriptedAnimation& operator=(const ScriptedAnimation&) = delete;

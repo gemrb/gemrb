@@ -195,7 +195,7 @@ class GEM_EXPORT Projectile
 {
 public:
 	Projectile();
-	Projectile(const Projectile&) = default;
+	Projectile(const Projectile&) noexcept = default;
 	~Projectile();
 	Projectile& operator=(const Projectile&) = delete;
 

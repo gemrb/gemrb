@@ -183,7 +183,7 @@ public:
 	/** Maximum amount of items in this stack */
 	int MaxStackAmount = 0;
 
-	CREItem() = default;
+	CREItem() noexcept = default;
 	explicit CREItem(const STOItem *item)
 	{
 		CopySTOItem(item);
@@ -220,7 +220,7 @@ private:
 	ieDword ItemExcl = 0;
 	ieDword ItemTypes[8]{}; // 256 bits
 public: 
-	Inventory() = default;
+	Inventory() noexcept = default;
 	Inventory(const Inventory&) = delete;
 	virtual ~Inventory();
 	Inventory& operator=(const Inventory&) = delete;

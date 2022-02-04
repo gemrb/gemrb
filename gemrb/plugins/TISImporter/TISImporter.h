@@ -35,7 +35,7 @@ private:
 	
 	Holder<Sprite2D> badTile; // blank tile to use to fill in bad data
 public:
-	TISImporter() = default;
+	TISImporter() noexcept = default;
 	TISImporter(const TISImporter&) = delete;
 	~TISImporter() override;
 	TISImporter& operator=(const TISImporter&) = delete;

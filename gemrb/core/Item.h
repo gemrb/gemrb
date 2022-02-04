@@ -131,7 +131,7 @@ struct DMGOpcodeInfo {
 
 class GEM_EXPORT ITMExtHeader {
 public:
-	ITMExtHeader() = default;
+	ITMExtHeader() noexcept = default;
 	ITMExtHeader(const ITMExtHeader&) = delete;
 	~ITMExtHeader();
 	ITMExtHeader& operator=(const ITMExtHeader&) = delete;
@@ -175,7 +175,7 @@ public:
 
 class GEM_EXPORT Item {
 public:
-	Item() = default;
+	Item() noexcept = default;
 	Item(const Item&) = delete;
 	~Item();
 	Item& operator=(const Item&) = delete;

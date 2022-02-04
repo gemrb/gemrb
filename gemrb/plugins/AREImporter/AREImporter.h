@@ -61,7 +61,7 @@ private:
 	ResRef Dream2; // only in ToB
 	ieByte AreaDifficulty = 0;
 public:
-	AREImporter() = default;
+	AREImporter() noexcept = default;
 	bool Import(DataStream* stream) override;
 	bool ChangeMap(Map *map, bool day_or_night) override;
 	Map* GetMap(const char* resRef, bool day_or_night) override;

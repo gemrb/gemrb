@@ -42,7 +42,7 @@ private:
 	ieDword WorldMapsOffset2 = 0;
 
 public:
-	WMPImporter(void) = default;
+	WMPImporter() noexcept = default;
 	WMPImporter(const WMPImporter&) = delete;
 	~WMPImporter() override;
 	WMPImporter& operator=(const WMPImporter&) = delete;

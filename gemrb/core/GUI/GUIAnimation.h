@@ -38,7 +38,7 @@ public:
 		begintime = GetTicks();
 	}
 	
-	virtual ~GUIAnimation() = default;
+	virtual ~GUIAnimation() noexcept = default;
 	
 	explicit operator bool() const {
 		return !HasEnded();

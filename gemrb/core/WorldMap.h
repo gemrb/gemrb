@@ -68,7 +68,7 @@ enum class WMPDirection {
 
 class GEM_EXPORT WMPAreaEntry {
 public:
-	WMPAreaEntry() = default;
+	WMPAreaEntry() noexcept = default;
 	ieDword GetAreaStatus() const;
 	void SetAreaStatus(ieDword status, BitOp op);
 
@@ -120,7 +120,7 @@ struct WMPAreaLink {
 
 class GEM_EXPORT WorldMap {
 public:
-	WorldMap() = default;
+	WorldMap() noexcept = default;
 	WorldMap(const WorldMap&) = delete;
 	WorldMap(WorldMap&&) noexcept = default;
 	~WorldMap() noexcept;

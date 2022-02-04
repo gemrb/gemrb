@@ -142,7 +142,7 @@ private:
 		ieWord pageIdx = -1;
 		const Glyph* glyph = nullptr;
 
-		GlyphIndexEntry() = default;
+		GlyphIndexEntry() noexcept = default;
 		GlyphIndexEntry(ieWord c, ieWord p, const Glyph* g) : chr(c), pageIdx(p), glyph(g) {}
 	};
 

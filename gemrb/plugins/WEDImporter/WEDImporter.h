@@ -68,7 +68,7 @@ private:
 	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const override;
 
 public:
-	WEDImporter() = default;
+	WEDImporter() noexcept = default;
 	WEDImporter(const WEDImporter&) = delete;
 	~WEDImporter() override;
 	WEDImporter& operator=(const WEDImporter&) = delete;

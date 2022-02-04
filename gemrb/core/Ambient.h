@@ -41,7 +41,7 @@ namespace GemRB {
 
 class GEM_EXPORT Ambient {
 public:
-	Ambient() = default;
+	Ambient() noexcept = default;
 	bool operator==(const Ambient& b) const { return origin == b.origin && !strncmp(name, b.name, 31); }
 
 	const char* GetName() const { return name; }

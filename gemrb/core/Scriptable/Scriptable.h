@@ -585,7 +585,7 @@ public:
 //are they scriptable?
 class GEM_EXPORT TileObject {
 public:
-	TileObject(void) = default;
+	TileObject() noexcept = default;
 	TileObject(const TileObject&) = delete;
 	~TileObject();
 	TileObject& operator=(const TileObject&) = delete;

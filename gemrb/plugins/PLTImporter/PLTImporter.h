@@ -31,7 +31,7 @@ private:
 	ieDword Height = 0;
 	void* pixels = nullptr;
 public:
-	PLTImporter(void) = default;
+	PLTImporter() noexcept = default;
 	PLTImporter(const PLTImporter&) = delete;
 	~PLTImporter() override;
 	PLTImporter& operator=(const PLTImporter&) = delete;

@@ -36,7 +36,7 @@ private:
 	int version = 0;
 
 public:
-	STOImporter() = default;
+	STOImporter() noexcept = default;
 	STOImporter(const STOImporter&) = delete;
 	~STOImporter() override;
 	STOImporter& operator=(const STOImporter&) = delete;

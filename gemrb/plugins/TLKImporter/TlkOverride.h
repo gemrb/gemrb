@@ -72,7 +72,7 @@ private:
 	char *GetString(strpos_t offset);
 	strret_t GetLength(strpos_t offset);
 public:
-	CTlkOverride() = default;
+	CTlkOverride() noexcept = default;
 	CTlkOverride(const CTlkOverride&) = delete;
 	virtual ~CTlkOverride();
 	CTlkOverride& operator=(const CTlkOverride&) = delete;

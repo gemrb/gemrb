@@ -33,7 +33,7 @@ private:
 	FT_Face face = nullptr;
 
 public:
-	TTFFontManager() = default;
+	TTFFontManager() noexcept = default;
 	TTFFontManager(const TTFFontManager&) = delete;
 	~TTFFontManager() override;
 	TTFFontManager& operator=(const TTFFontManager&) = delete;

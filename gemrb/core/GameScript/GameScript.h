@@ -150,7 +150,7 @@ using targetlist = std::list<targettype>;
 class GEM_EXPORT Targets {
 	targetlist objects;
 public:
-	Targets() = default;
+	Targets() noexcept = default;
 	
 	int Count() const;
 	void dump() const;
@@ -199,7 +199,7 @@ public:
 	char objectName[65]{};
 
 public:
-	Object() = default;
+	Object() noexcept = default;
 
 	std::string dump() const;
 	void Release()
@@ -211,7 +211,7 @@ public:
 
 class GEM_EXPORT Trigger final : protected Canary {
 public:
-	Trigger() = default;
+	Trigger() noexcept = default;
 	~Trigger() final
 	{
 		if (objectParameter) {
@@ -323,7 +323,7 @@ public:
 
 class GEM_EXPORT Response final : protected Canary {
 public:
-	Response() = default;
+	Response() noexcept = default;
 	~Response() final
 	{
 		for (auto& action : actions) {
@@ -366,7 +366,7 @@ public:
 
 class GEM_EXPORT ResponseBlock final : protected Canary {
 public:
-	ResponseBlock() = default;
+	ResponseBlock() noexcept = default;
 	~ResponseBlock() final
 	{
 		if (condition) {

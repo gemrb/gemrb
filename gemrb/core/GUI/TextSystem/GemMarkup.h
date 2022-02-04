@@ -40,7 +40,7 @@ public:
 	GemMarkupParser();
 	GemMarkupParser(const Font* ftext, Font::PrintColors textCols,
 					const Font* finit, Font::PrintColors initCols);
-	~GemMarkupParser() = default;
+	~GemMarkupParser() noexcept = default;
 
 	void ResetAttributes(const Font *ftext, Font::PrintColors textCols,
 						 const Font *finit, Font::PrintColors initCols);

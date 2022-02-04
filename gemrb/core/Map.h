@@ -292,9 +292,9 @@ public:
 	ResRef PaletteRef;
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
-	AreaAnimation() = default;
+	AreaAnimation() noexcept = default;
 	AreaAnimation(const AreaAnimation& src);
-	~AreaAnimation() = default;
+	~AreaAnimation() noexcept = default;
 	AreaAnimation& operator=(const AreaAnimation&) = delete;
 
 	void InitAnimation();

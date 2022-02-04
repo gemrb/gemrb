@@ -64,8 +64,8 @@ public:
 public:
 	static constexpr strpos_t InvalidPos = strpos_t(-1);
 
-	DataStream(void) = default;
-	virtual ~DataStream() = default;
+	DataStream() noexcept = default;
+	virtual ~DataStream() noexcept = default;
 	
 	DataStream(const DataStream&) = delete;
 	DataStream& operator=(const DataStream&) = delete;

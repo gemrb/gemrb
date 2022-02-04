@@ -56,7 +56,7 @@ private:
 	ieDword PPLocOffset = 0;
 	ieDword PPLocCount = 0;
 public:
-	GAMImporter(void) = default;
+	GAMImporter() noexcept = default;
 
 	Game* LoadGame(Game *newGame, int ver_override = 0) override;
 

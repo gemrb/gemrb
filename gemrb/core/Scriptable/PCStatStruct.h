@@ -144,10 +144,10 @@ public:
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
-	PCStatsStruct() = default;
+	PCStatsStruct() noexcept = default;
 	explicit PCStatsStruct(const std::list<int>& levels);
 	PCStatsStruct(const PCStatsStruct&) = delete;
-	~PCStatsStruct() = default;
+	~PCStatsStruct() noexcept = default;
 	PCStatsStruct& operator=(const PCStatsStruct &source);
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);

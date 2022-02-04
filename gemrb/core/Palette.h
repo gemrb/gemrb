@@ -62,7 +62,7 @@ public:
 		UpdateAlpha();
 	}
 
-	Palette() = default;
+	Palette() noexcept = default;
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
 	bool named = false; //< true if the palette comes from a bmp and cached

@@ -50,7 +50,7 @@ protected:
 
 public:
 	explicit VideoBuffer(const Region& r) : rect(r) {}
-	virtual ~VideoBuffer() = default;
+	virtual ~VideoBuffer() noexcept = default;
 	
 	::GemRB::Size Size() const { return rect.size; }
 	Point Origin() const { return rect.origin; }

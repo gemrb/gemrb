@@ -33,7 +33,7 @@ class GEM_EXPORT Factory {
 private:
 	std::vector< FactoryObject*> fobjects;
 public:
-	Factory() = default;
+	Factory() noexcept = default;
 	Factory(const Factory&) = delete;
 	~Factory();
 	Factory& operator=(const Factory&) = delete;

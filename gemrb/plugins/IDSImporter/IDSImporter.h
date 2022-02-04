@@ -38,7 +38,7 @@ private:
 	std::vector< char*> ptrs;
 
 public:
-	IDSImporter() = default;
+	IDSImporter() noexcept = default;
 	IDSImporter(const IDSImporter&) = delete;
 	~IDSImporter() override;
 	IDSImporter& operator=(const IDSImporter&) = delete;

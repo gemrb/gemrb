@@ -43,7 +43,7 @@ namespace GemRB {
 
 class GEM_EXPORT Point {
 public:
-	Point() = default;
+	Point() noexcept = default;
 	Point(int x, int y);
 
 	bool operator==(const Point &pnt) const;
@@ -75,7 +75,7 @@ class GEM_EXPORT Size {
 public:
 	int w = 0;
 	int h = 0;
-	Size() = default;
+	Size() noexcept = default;
 	Size(int, int);
 	
 	inline void reset() {
@@ -109,7 +109,7 @@ public:
 	int& w = size.w;
 	int& h = size.h;
 
-	Region() = default;
+	Region() noexcept = default;
 	Region(int x, int y, int w, int h);
 	Region(const Point& p, const Size& s);
 	Region(const Region&);

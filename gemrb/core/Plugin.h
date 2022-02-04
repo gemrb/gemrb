@@ -47,7 +47,7 @@ namespace GemRB {
 class GEM_EXPORT Plugin
 {
 public:
-	virtual ~Plugin() = default;
+	virtual ~Plugin() noexcept = default;
 };
 
 class GEM_EXPORT ImporterBase

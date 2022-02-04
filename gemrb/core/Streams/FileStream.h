@@ -46,7 +46,7 @@ private:
 	FILE* file = nullptr;
 public:
 	explicit File(FILE* f) : file(f) {}
-	File() = default;
+	File() noexcept = default;
 	File(const File&) = delete;
 	File(File&& f) noexcept {
 		file = f.file;

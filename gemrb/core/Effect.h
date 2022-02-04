@@ -220,7 +220,7 @@ public:
 		}
 	}
 
-	~Effect() = default;
+	~Effect() noexcept = default;
 
 	bool operator==(const Effect& rhs) const noexcept {
 		if (this == &rhs) return true;

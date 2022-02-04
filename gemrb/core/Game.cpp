@@ -57,7 +57,7 @@ struct HealingResource {
 	int amount = 0;
 	HealingResource(const ResRef& ref, Actor *cha, ieWord ah, ieWord a)
 	: resRef(ref), caster(cha), amounthealed(ah), amount(a) {}
-	HealingResource() = default;
+	HealingResource() noexcept = default;
 	bool operator < (const HealingResource &str) const {
 		return (amounthealed < str.amounthealed);
 	}

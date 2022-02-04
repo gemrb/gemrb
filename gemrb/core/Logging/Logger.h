@@ -84,7 +84,7 @@ public:
 		std::atomic<log_level> level;
 		
 		explicit LogWriter(log_level level) : level(level) {}
-		virtual ~LogWriter() = default;
+		virtual ~LogWriter() noexcept = default;
 		
 		void WriteLogMessage(log_level level, const char* owner, const char* message, log_color color) {
 			WriteLogMessage(LogMessage(level, owner, message, color));

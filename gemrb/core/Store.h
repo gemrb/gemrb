@@ -83,7 +83,7 @@ struct GEM_EXPORT STOItem {
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
 
-	STOItem() = default;
+	STOItem() noexcept = default;
 	explicit STOItem(const CREItem *item);
 	STOItem(const STOItem&) = delete;
 	~STOItem();
@@ -122,7 +122,7 @@ struct STOCure {
 
 class GEM_EXPORT Store {
 public:
-	Store() = default;
+	Store() noexcept = default;
 	Store(const Store&) = delete;
 	~Store();
 	Store& operator=(const Store&) = delete;

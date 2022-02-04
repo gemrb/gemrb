@@ -52,7 +52,7 @@ public:
 	ResRef ResName;
 	Point Pos; // position of the effect in game coordinates
 
-	VEFObject() = default;
+	VEFObject() noexcept = default;
 	explicit VEFObject(ScriptedAnimation *sca);
 	VEFObject(const VEFObject&) = delete;
 	~VEFObject();

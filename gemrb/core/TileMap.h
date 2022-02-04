@@ -39,7 +39,7 @@ class GEM_EXPORT TileMap {
 public:
 	using TileOverlayPtr = TileOverlay::TileOverlayPtr;
 	
-	TileMap() = default;
+	TileMap() noexcept = default;
 	TileMap(const TileMap&) = delete;
 	~TileMap();
 	TileMap& operator=(const TileMap&) = delete;

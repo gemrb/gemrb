@@ -36,7 +36,7 @@ private:
 	int version = 0;
 
 public:
-	EFFImporter() = default;
+	EFFImporter() noexcept = default;
 	EFFImporter(const EFFImporter&) = delete;
 	~EFFImporter() override;
 	EFFImporter& operator=(const EFFImporter&) = delete;

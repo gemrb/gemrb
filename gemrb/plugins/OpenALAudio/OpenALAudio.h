@@ -63,7 +63,6 @@ protected:
 
 public:
 	explicit OpenALSoundHandle(AudioStream *p) : parent(p) { }
-	~OpenALSoundHandle() override = default;
 	void SetPos(const Point&) override;
 	bool Playing() override;
 	void Stop() override;

@@ -43,7 +43,7 @@ private:
 	ieDword Version = 0;
 
 public:
-	DLGImporter(void) = default;
+	DLGImporter() noexcept = default;
 	
 	Dialog* GetDialog() const override;
 	Condition* GetCondition(const char *string) const override;

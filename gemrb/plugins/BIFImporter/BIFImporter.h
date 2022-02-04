@@ -54,7 +54,7 @@ private:
 	ieDword tentcount = 0;
 	DataStream* stream = nullptr;
 public:
-	BIFImporter(void) = default;
+	BIFImporter() noexcept = default;
 	BIFImporter(const BIFImporter&) = delete;
 	~BIFImporter() override;
 	BIFImporter& operator=(const BIFImporter&) = delete;

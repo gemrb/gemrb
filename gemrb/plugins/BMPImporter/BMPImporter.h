@@ -45,7 +45,7 @@ private:
 	//OTHER
 	unsigned int PaddedRowLength = 0;
 public:
-	BMPImporter(void) = default;
+	BMPImporter() noexcept = default;
 	BMPImporter(const BMPImporter&) = delete;
 	~BMPImporter() override;
 	BMPImporter& operator=(const BMPImporter&) = delete;

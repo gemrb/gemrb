@@ -25,7 +25,7 @@ public:
 	virtual void ScrollDelta(const Point& p) = 0;
 	virtual void ScrollTo(const Point& p) = 0;
 	
-	virtual ~Scrollable() = default;
+	virtual ~Scrollable() noexcept = default;
 };
 
 template <typename T>
@@ -38,7 +38,7 @@ public:
 		ResponderCallback callback = nullptr;
 
 	public:
-		Responder() = default;
+		Responder() noexcept = default;
 		
 		Responder(ResponderCallback cb){
 			callback = std::move(cb);

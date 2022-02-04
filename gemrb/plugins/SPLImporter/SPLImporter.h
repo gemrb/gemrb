@@ -36,7 +36,7 @@ private:
 	int version = 0;
 
 public:
-	SPLImporter() = default;
+	SPLImporter() noexcept = default;
 	SPLImporter(const SPLImporter&) = delete;
 	~SPLImporter() override;
 	SPLImporter& operator=(const SPLImporter&) = delete;

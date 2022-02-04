@@ -35,7 +35,7 @@ class SymbolMgr;
 //this represents a line of projectl.ids
 struct ProjectileEntry
 {
-	ProjectileEntry() = default;
+	ProjectileEntry() noexcept = default;
 	ProjectileEntry(const ProjectileEntry&) = delete;
 	ProjectileEntry(ProjectileEntry&&) noexcept = default;
 	ProjectileEntry& operator=(const ProjectileEntry&) = delete;

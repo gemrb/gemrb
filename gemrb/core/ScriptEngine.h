@@ -45,7 +45,7 @@ public:
 	explicit ScriptingRefBase(ScriptingId id)
 	: Id(id) {}
 
-	virtual ~ScriptingRefBase() = default;
+	virtual ~ScriptingRefBase() noexcept = default;
 
 	// key to separate groups of objects for faster searching and id collision prevention
 	virtual const ScriptingGroup_t& ScriptingGroup() const=0;
@@ -96,7 +96,7 @@ public:
 
 	class Parameter {
 		struct TypeInterface {
-			virtual ~TypeInterface() = default;
+			virtual ~TypeInterface() noexcept = default;
 			virtual TypeInterface* Clone() const = 0;
 			virtual const std::type_info& Type() const = 0;
 		};
@@ -168,7 +168,7 @@ public:
 	static const ScriptingId InvalidId = static_cast<ScriptingId>(-1);
 
 public:
-	ScriptEngine() = default;
+	ScriptEngine() noexcept = default;
 	/** Initialization Routine */
 	virtual bool Init(void) = 0;
 	/** Load Script */

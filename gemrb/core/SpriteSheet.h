@@ -49,7 +49,7 @@ public:
 		SheetRegion = Sheet->Frame;
 	};
 
-	virtual ~SpriteSheet() = default;
+	virtual ~SpriteSheet() noexcept = default;
 
 	const Region& operator[](KeyType key) {
 		return RegionMap[key];

@@ -63,7 +63,7 @@ inline int GetModState(int modstate)
 
 class SDLVideoDriver : public Video {
 public:
-	SDLVideoDriver() = default;
+	SDLVideoDriver() noexcept = default;
 	SDLVideoDriver(const SDLVideoDriver&) = delete;
 	~SDLVideoDriver() override;
 	SDLVideoDriver& operator=(const SDLVideoDriver&) = delete;

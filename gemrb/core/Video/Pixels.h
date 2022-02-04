@@ -120,7 +120,7 @@ static_assert(sizeof(Pixel24Bit) == 3, "24bit pixel should be 3 bytes.");
 
 struct GEM_EXPORT RGBBlender {
 	virtual void operator()(const Color& src, Color& dst, uint8_t mask) const=0;
-	virtual ~RGBBlender() = default;
+	virtual ~RGBBlender() noexcept = default;
 };
 
 inline void ShaderTint(const Color& tint, Color& c) {
@@ -433,7 +433,7 @@ public:
 
 struct GEM_EXPORT IAlphaIterator
 {
-	virtual ~IAlphaIterator() = default;
+	virtual ~IAlphaIterator() noexcept = default;
 	
 	virtual uint8_t operator*() const=0;
 	virtual void Advance(int)=0;

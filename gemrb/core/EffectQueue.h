@@ -246,7 +246,7 @@ private:
 	Scriptable* Owner = nullptr;
 
 public:
-	EffectQueue() = default;
+	EffectQueue() noexcept = default;
 	EffectQueue(const EffectQueue&) = delete;
 	virtual ~EffectQueue();
 	EffectQueue& operator=(const EffectQueue&) = delete;

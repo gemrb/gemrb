@@ -57,7 +57,7 @@ protected:
 
 public:
 	explicit Content(const Size& size);
-	virtual ~Content() = default;
+	virtual ~Content() noexcept = default;
 
 	virtual Size ContentFrame() const { return frame.size; };
 

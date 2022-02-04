@@ -117,7 +117,7 @@ public:
 	ieDword lastSpawndate = 0;
 	std::vector<CritterEntry> critters;
 	char *name = nullptr;
-	SpawnEntry() = default;
+	SpawnEntry() noexcept = default;
 	SpawnEntry(const SpawnEntry&) = delete;
 	SpawnEntry(SpawnEntry&&) noexcept = default;
 	SpawnEntry& operator=(const SpawnEntry&) = delete;

@@ -36,7 +36,7 @@ private:
 	int version = 0;
 
 public:
-	PROImporter() = default;
+	PROImporter() noexcept = default;
 	PROImporter(const PROImporter&) = delete;
 	~PROImporter() override;
 	PROImporter& operator=(const PROImporter&) = delete;

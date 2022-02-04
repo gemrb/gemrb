@@ -75,7 +75,7 @@ class Projectile;
 
 class GEM_EXPORT SPLExtHeader {
 public:
-	SPLExtHeader() = default;
+	SPLExtHeader() noexcept = default;
 	SPLExtHeader(const SPLExtHeader&) = delete;
 	~SPLExtHeader() noexcept;
 	SPLExtHeader& operator=(const SPLExtHeader&) = delete;
@@ -110,7 +110,7 @@ public:
 
 class GEM_EXPORT Spell {
 public:
-	Spell() = default;
+	Spell() noexcept = default;
 	~Spell();
 
 	std::vector<SPLExtHeader> ext_headers;
