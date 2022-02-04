@@ -219,7 +219,8 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 		usage = GetWeaponHeaderNumber(header==-2);
 	if (!miss) {
 		EffectQueue *fx = GetEffectBlock(self, target, usage, invslot, idx);
-		pro->SetEffects(fx);
+		pro->SetEffects(std::move(*fx));
+		delete fx;
 	}
 	pro->Range = eh->Range;
 	return pro;

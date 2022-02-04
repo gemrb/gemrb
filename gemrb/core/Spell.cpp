@@ -272,7 +272,9 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->features.size()) {
-		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
+		EffectQueue* queue = GetEffectBlock(self, target, header, level, seh->ProjectileAnimation);
+		pro->SetEffects(std::move(*queue));
+		delete queue;
 	}
 	pro->Range = GetCastingDistance(self);
 	return pro;

@@ -87,7 +87,7 @@ private:
 	int PutVariables(DataStream *stream, const Map *map) const;
 	int PutAmbients(DataStream *stream, const Map *map) const;
 	int PutMapnotes(DataStream *stream, const Map *map) const;
-	int PutEffects(DataStream *stream, const EffectQueue *fxqueue) const;
+	int PutEffects(DataStream *stream, const EffectQueue& fxqueue) const;
 	int PutTraps(DataStream *stream, const Map *map) const;
 	int PutExplored(DataStream *stream, const Map *map) const;
 	int PutTiles(DataStream *stream, const Map *map) const;

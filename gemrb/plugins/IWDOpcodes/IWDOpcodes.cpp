@@ -2938,7 +2938,9 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	if (pro) {
 		Point origin = fx->Pos;
 
-		pro->SetEffects(spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2));
+		EffectQueue* queue = spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2);
+		pro->SetEffects(std::move(*queue));
+		delete queue;
 		pro->SetCaster(fx->CasterID, fx->CasterLevel);
 		if (target) {
 			map->AddProjectile( pro, origin, target->GetGlobalID(), false);

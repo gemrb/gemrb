@@ -1509,12 +1509,12 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ProID-1);
 
 		//This could be wrong on msvc7 with its separate memory managers
-		EffectQueue *fxqueue = new EffectQueue();
+		EffectQueue fxqueue = EffectQueue();
 		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 
-		ReadEffects(fs, fxqueue, TrapEffectCount);
+		ReadEffects(fs, &fxqueue, TrapEffectCount);
 		const Actor *caster = core->GetGame()->FindPC(Owner + 1);
-		pro->SetEffects(fxqueue);
+		pro->SetEffects(std::move(fxqueue));
 		if (caster) {
 			// Since the level info isn't stored, we assume it's the same as if the trap was just placed.
 			// It matters for the normal thief traps (they scale with level 4 times), while the rest don't scale.
@@ -1716,9 +1716,9 @@ int AREImporter::GetStoredFileSize(Map *map)
 	for (unsigned int i = 0; i < TrapCount; i++) {
 		const Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
-			const EffectQueue *fxqueue = pro->GetEffects();
+			const EffectQueue& fxqueue = pro->GetEffects();
 			if (fxqueue) {
-				headersize += fxqueue->GetSavedEffectsCount() * 0x108;
+				headersize += fxqueue.GetSavedEffectsCount() * 0x108;
 			}
 		}
 	}
@@ -2417,15 +2417,15 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 	return 0;
 }
 
-int AREImporter::PutEffects(DataStream *stream, const EffectQueue *fxqueue) const
+int AREImporter::PutEffects(DataStream *stream, const EffectQueue& fxqueue) const
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
 
-	auto f = fxqueue->GetFirstEffect();
-	ieDword EffectsCount = fxqueue->GetSavedEffectsCount();
+	auto f = fxqueue.GetFirstEffect();
+	ieDword EffectsCount = fxqueue.GetSavedEffectsCount();
 	for(unsigned int i=0;i<EffectsCount;i++) {
-		const Effect *fx = fxqueue->GetNextSavedEffect(f);
+		const Effect *fx = fxqueue.GetNextSavedEffect(f);
 
 		assert(fx!=NULL);
 
@@ -2456,9 +2456,9 @@ int AREImporter::PutTraps(DataStream *stream, const Map *map) const
 			dest = pro->GetDestination();
 			const ResRef& proName = pro->GetName();
 			name = proName;
-			const EffectQueue *fxqueue = pro->GetEffects();
+			const EffectQueue& fxqueue = pro->GetEffects();
 			if (fxqueue) {
-				tmpWord = fxqueue->GetSavedEffectsCount();
+				tmpWord = fxqueue.GetSavedEffectsCount();
 			}
 			ieDword ID = pro->GetCaster();
 			// lookup caster via Game, since the the current map can already be empty when switching them
@@ -2654,7 +2654,7 @@ int AREImporter::PutArea(DataStream *stream, const Map *map) const
 			continue;
 		}
 
-		const EffectQueue *fxqueue = trap->GetEffects();
+		const EffectQueue& fxqueue = trap->GetEffects();
 
 		if (!fxqueue) {
 			continue;
