@@ -16,6 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
+import re
+
 import GemRB
 import GameCheck
 import GUICommon
@@ -235,6 +237,22 @@ def CloseItemInfoWindow ():
 	UpdateInventoryWindow ()
 	return
 
+def GetItemDescription (item, itemtype):
+	text = item["ItemDescIdentified"]
+	if (itemtype & 2):
+		text = item["ItemDesc"]
+
+	if not GameCheck.IsPST ():
+		return text
+
+	# PST had "NOTE:" handling hardcoded, see string 49156 for explanation
+	# we support translated versions visible at least in Czech as well (POZN)
+	text = GemRB.GetString (text)
+	searchRE = re.compile(r'^([A-Z][A-Z][A-Z][A-Z][: ]..[a-z"].*?($|\r?\n(\r?\n)?))', re.MULTILINE | re.DOTALL)
+	replacement = r"[color=ffffff]\1[/color]"
+	text = searchRE.sub(replacement, text)
+	return text
+
 def DisplayItem (slotItem, itemtype):
 	global ItemInfoWindow
 
@@ -285,13 +303,8 @@ def DisplayItem (slotItem, itemtype):
 	Text = Window.GetControl (5)
 	if GameCheck.IsBG2(): # I believe only BG2 has special initials
 		Text.SetColor (ColorWhitish, TA_COLOR_INITIALS)
-	if (itemtype & 2):
-		text = item["ItemDesc"]
-	else:
-		text = item["ItemDescIdentified"]
-
-	Text.Clear ()
-	Text.Append (text)
+	text = GetItemDescription (item, itemtype)
+	Text.SetText (text)
 	
 	Window.SetEventProxy(Text)
 

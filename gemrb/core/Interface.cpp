@@ -1907,8 +1907,6 @@ bool Interface::LoadEncoding()
 	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
 	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", false);
 
-	//TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
-
 	// TODO: lists are incomplete
 	// maybe want to externalize this
 	// list compiled form wiki: https://gemrb.org/Text-encodings.html
