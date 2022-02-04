@@ -30,7 +30,8 @@ namespace GemRB {
 class GEM_EXPORT GlobalTimer {
 private:
 	tick_t startTime = 0; //forcing an update;
-	tick_t interval;
+	//AI_UPDATE_TIME: how many AI updates in a second
+	tick_t interval = (1000 / AI_UPDATE_TIME);
 
 	tick_t fadeToCounter = 0;
 	tick_t fadeToMax = 0;
@@ -48,7 +49,7 @@ private:
 	void DoFadeStep(ieDword count);
 	bool UpdateViewport(tick_t time);
 public:
-	GlobalTimer(void);
+	GlobalTimer() noexcept = default;
 	
 	GlobalTimer(GlobalTimer&&) noexcept = default;
 	GlobalTimer& operator=(GlobalTimer&&) noexcept = default;

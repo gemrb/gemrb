@@ -28,12 +28,6 @@
 
 namespace GemRB {
 
-GlobalTimer::GlobalTimer(void)
-{
-	//AI_UPDATE_TIME: how many AI updates in a second
-	interval = ( 1000 / AI_UPDATE_TIME );
-}
-
 void GlobalTimer::Freeze()
 {
 	tick_t thisTime = GetTicks();
