@@ -124,9 +124,7 @@ public:
 	WorldMap(const WorldMap&) = delete;
 	WorldMap(WorldMap&&) = default;
 	~WorldMap();
-#ifndef WIN32
 	WorldMap& operator=(const WorldMap&) = delete;
-#endif
 	WorldMap& operator=(WorldMap&&) = default;
 public: //struct members
 	ResRef MapResRef;
@@ -195,6 +193,13 @@ private:
 	bool single = true;
 public:
 	explicit WorldMapArray(size_t count);
+	
+	// implicitly deleted due to WorldMap
+	WorldMapArray(const WorldMapArray&) = delete;
+	WorldMapArray& operator=(const WorldMapArray&) = delete;
+	
+	WorldMapArray(WorldMapArray&&) = default;
+	WorldMapArray& operator=(WorldMapArray&&) = default;
 
 	bool IsSingle() const { return single; }
 	void SetSingle(bool arg) { single = arg; }

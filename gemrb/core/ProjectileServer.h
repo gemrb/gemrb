@@ -38,9 +38,7 @@ struct ProjectileEntry
 	ProjectileEntry() = default;
 	ProjectileEntry(const ProjectileEntry&) = delete;
 	ProjectileEntry(ProjectileEntry&&) = default;
-#ifndef WIN32
 	ProjectileEntry& operator=(const ProjectileEntry&) = delete;
-#endif
 	ProjectileEntry& operator=(ProjectileEntry&&) = default;
 	~ProjectileEntry()
 	{
@@ -62,6 +60,13 @@ class GEM_EXPORT ProjectileServer
 {
 public:
 	ProjectileServer();
+	
+	// implicitly deleted due to ProjectileEntry
+	ProjectileServer(const ProjectileServer&) = delete;
+	ProjectileServer& operator=(const ProjectileServer&) = delete;
+	
+	ProjectileServer(ProjectileServer&&) = default;
+	ProjectileServer& operator=(ProjectileServer&&) = default;
 
 	Projectile *GetProjectileByIndex(size_t idx);
 	//it is highly unlikely we need this function

@@ -78,9 +78,7 @@ public:
 	SPLExtHeader() = default;
 	SPLExtHeader(const SPLExtHeader&) = delete;
 	~SPLExtHeader();
-#ifndef WIN32
 	SPLExtHeader& operator=(const SPLExtHeader&) = delete;
-#endif
 	SPLExtHeader& operator=(SPLExtHeader&&) = default;
 
 	ieByte SpellForm = 0;
@@ -113,6 +111,13 @@ public:
 class GEM_EXPORT Spell {
 public:
 	Spell() = default;
+	
+	// implicitly deleted due to SPLExtHeader
+	Spell(const Spell&) = delete;
+	Spell& operator=(const Spell&) = delete;
+	
+	Spell(Spell&&) = default;
+	Spell& operator=(Spell&&) = default;
 
 	std::vector<SPLExtHeader> ext_headers;
 	std::vector<Effect*> casting_features;
