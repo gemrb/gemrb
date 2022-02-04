@@ -446,8 +446,8 @@ public:
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	TimeStruct Time{};
 public:
-	Interface();
-	~Interface(void);
+	Interface() noexcept;
+	~Interface() noexcept;
 	
 	Interface(const Interface&) = delete;
 	
@@ -746,7 +746,7 @@ private:
 	bool ReadSoundChannelsTable() const;
 
 	/** handles the QuitFlag bits (main loop events) */
-	void HandleFlags();
+	void HandleFlags() noexcept;
 	/** handles the EventFlag bits (conditional events) */
 	void HandleEvents();
 	/** handles hardcoded gui behaviour */

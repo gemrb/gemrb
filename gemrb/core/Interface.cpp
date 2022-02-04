@@ -216,7 +216,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	dragDummy.BindDictVariable("itembutton", Control::INVALID_VALUE);
 }
 
-Interface::Interface()
+Interface::Interface() noexcept
 {
 	displaymsg = nullptr;
 
@@ -255,7 +255,7 @@ Interface::Interface()
 	tokens->SetType( GEM_VARIABLES_STRING );
 }
 
-Interface::~Interface(void)
+Interface::~Interface() noexcept
 {
 	WindowManager::CursorMouseUp = NULL;
 	WindowManager::CursorMouseDown = NULL;
@@ -428,7 +428,7 @@ void Interface::HandleEvents()
 /* handle main loop events that might destroy or create windows
 thus cannot be called from DrawWindows directly
 */
-void Interface::HandleFlags()
+void Interface::HandleFlags() noexcept
 {
 	//clear events because the context changed
 	EventFlag = EF_CONTROL;
