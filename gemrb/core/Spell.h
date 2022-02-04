@@ -111,6 +111,7 @@ public:
 class GEM_EXPORT Spell {
 public:
 	Spell() = default;
+	~Spell();
 	
 	// implicitly deleted due to SPLExtHeader
 	Spell(const Spell&) = delete;

@@ -78,6 +78,13 @@ SPLExtHeader::~SPLExtHeader()
 	}
 }
 
+Spell::~Spell()
+{
+	for (auto fx : casting_features) {
+		delete fx;
+	}
+}
+
 int Spell::GetHeaderIndexFromLevel(int level) const
 {
 	if (level < 0 || ext_headers.empty()) return -1;
