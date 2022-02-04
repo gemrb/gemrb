@@ -45,6 +45,8 @@ class GEM_EXPORT Point {
 public:
 	Point() noexcept = default;
 	Point(int x, int y) noexcept;
+	
+	Point(const Point&) noexcept = default;
 
 	bool operator==(const Point &pnt) const noexcept;
 	bool operator!=(const Point &pnt) const noexcept;
@@ -77,6 +79,8 @@ public:
 	int h = 0;
 	Size() noexcept = default;
 	Size(int, int) noexcept;
+	
+	Size(const Size&) noexcept = default;
 	
 	inline void reset() noexcept {
 		w = h = 0;
