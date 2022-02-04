@@ -44,14 +44,14 @@ static const ieByte SixteenToFive[MAX_ORIENT]={0,1,2,3,4,3,2,1,0,1,2,3,4,3,2,1};
 
 static ProjectileServer *server = NULL;
 
-Projectile::Projectile()
+Projectile::Projectile() noexcept
 {
 	if (!server) {
 		server = core->GetProjectileServer();
 	}
 }
 
-Projectile::~Projectile()
+Projectile::~Projectile() noexcept
 {
 	delete effects;
 

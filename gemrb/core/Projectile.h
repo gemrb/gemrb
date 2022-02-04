@@ -194,9 +194,10 @@ struct ProjectileExtension : Held<ProjectileExtension>
 class GEM_EXPORT Projectile
 {
 public:
-	Projectile();
+	Projectile() noexcept;
+	~Projectile() noexcept;
+	
 	Projectile(const Projectile&) noexcept = default;
-	~Projectile();
 	Projectile& operator=(const Projectile&) = delete;
 
 	ieWord Speed = 20;
