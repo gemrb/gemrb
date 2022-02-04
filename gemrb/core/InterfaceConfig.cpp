@@ -34,7 +34,7 @@ InterfaceConfig::InterfaceConfig(int /*argc*/, char** /**argv[]*/)
 	configVars->init(50, 10);
 }
 
-InterfaceConfig::~InterfaceConfig()
+InterfaceConfig::~InterfaceConfig() noexcept
 {
 	delete configVars;
 }

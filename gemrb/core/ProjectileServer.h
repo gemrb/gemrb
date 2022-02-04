@@ -40,7 +40,7 @@ struct ProjectileEntry
 	ProjectileEntry(ProjectileEntry&&) noexcept = default;
 	ProjectileEntry& operator=(const ProjectileEntry&) = delete;
 	ProjectileEntry& operator=(ProjectileEntry&&) noexcept = default;
-	~ProjectileEntry()
+	~ProjectileEntry() noexcept
 	{
 		delete projectile;
 	}

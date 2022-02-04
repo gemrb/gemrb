@@ -164,7 +164,7 @@ void WorldMap::SetAreaLink(unsigned int x, const WMPAreaLink *arealink)
 	area_links.push_back(al);
 }
 
-WorldMap::~WorldMap(void)
+WorldMap::~WorldMap() noexcept
 {
 	for (auto entry : area_entries) {
 		delete entry;

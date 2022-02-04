@@ -71,7 +71,7 @@ private:
 	}
 };
 
-SPLExtHeader::~SPLExtHeader()
+SPLExtHeader::~SPLExtHeader() noexcept
 {
 	for (const auto& feature : features) {
 		delete feature;

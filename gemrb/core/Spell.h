@@ -77,7 +77,7 @@ class GEM_EXPORT SPLExtHeader {
 public:
 	SPLExtHeader() = default;
 	SPLExtHeader(const SPLExtHeader&) = delete;
-	~SPLExtHeader();
+	~SPLExtHeader() noexcept;
 	SPLExtHeader& operator=(const SPLExtHeader&) = delete;
 	SPLExtHeader& operator=(SPLExtHeader&&) noexcept = default;
 

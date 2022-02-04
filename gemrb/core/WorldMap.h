@@ -123,7 +123,7 @@ public:
 	WorldMap() = default;
 	WorldMap(const WorldMap&) = delete;
 	WorldMap(WorldMap&&) noexcept = default;
-	~WorldMap();
+	~WorldMap() noexcept;
 	WorldMap& operator=(const WorldMap&) = delete;
 	WorldMap& operator=(WorldMap&&) noexcept = default;
 public: //struct members
