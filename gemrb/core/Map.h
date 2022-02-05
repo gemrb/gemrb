@@ -293,9 +293,9 @@ public:
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
 	AreaAnimation() noexcept = default;
-	AreaAnimation(const AreaAnimation& src);
+	AreaAnimation(const AreaAnimation& src) noexcept;
 	~AreaAnimation() noexcept = default;
-	AreaAnimation& operator=(const AreaAnimation&) = delete;
+	AreaAnimation& operator=(const AreaAnimation&) noexcept;
 
 	void InitAnimation();
 	void SetPalette(const ResRef &PaletteRef);

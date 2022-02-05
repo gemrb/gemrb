@@ -3833,30 +3833,38 @@ unsigned int Map::GetLightLevel(const Point &p) const
 ////////////////////AreaAnimation//////////////////
 //Area animation
 
-AreaAnimation::AreaAnimation(const AreaAnimation &src)
+AreaAnimation& AreaAnimation::operator=(const AreaAnimation& src) noexcept
 {
-	animation = src.animation;
-	sequence = src.sequence;
-	Flags = src.Flags;
-	originalFlags = src.originalFlags;
-	Pos = src.Pos;
-	appearance = src.appearance;
-	frame = src.frame;
-	transparency = src.transparency;
-	height = src.height;
-	startFrameRange = src.startFrameRange;
-	skipcycle = src.skipcycle;
-	startchance = src.startchance;
-	unknown48 = 0;
+	if (this != &src) {
+		animation = src.animation;
+		sequence = src.sequence;
+		Flags = src.Flags;
+		originalFlags = src.originalFlags;
+		Pos = src.Pos;
+		appearance = src.appearance;
+		frame = src.frame;
+		transparency = src.transparency;
+		height = src.height;
+		startFrameRange = src.startFrameRange;
+		skipcycle = src.skipcycle;
+		startchance = src.startchance;
+		unknown48 = 0;
 
-	PaletteRef = src.PaletteRef;
-	Name = src.Name;
-	BAM = src.BAM;
+		PaletteRef = src.PaletteRef;
+		Name = src.Name;
+		BAM = src.BAM;
 
-	palette = src.palette ? src.palette->Copy() : NULL;
+		palette = src.palette ? src.palette->Copy() : NULL;
 
-	// handles the rest: animation, resets animcount
-	InitAnimation();
+		// handles the rest: animation, resets animcount
+		InitAnimation();
+	}
+	return *this;
+}
+
+AreaAnimation::AreaAnimation(const AreaAnimation &src) noexcept
+{
+	operator=(src);
 }
 
 void AreaAnimation::InitAnimation()
