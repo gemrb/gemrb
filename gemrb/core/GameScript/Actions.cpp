@@ -4932,7 +4932,7 @@ void GameScript::Calm(Scriptable* Sender, Action* /*parameters*/)
 
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *worldmap = core->GetWorldMap();
+	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
@@ -4943,7 +4943,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *worldmap = core->GetWorldMap();
+	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
@@ -4953,7 +4953,7 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *worldmap = core->GetWorldMap();
+	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
@@ -4962,7 +4962,7 @@ void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *worldmap = core->GetWorldMap();
+	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
@@ -6158,7 +6158,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *wmap = core->GetWorldMap(ResRef(parameters->string0Parameter));
+	WorldMap *wmap = core->GetWorldMap(ResRef(parameters->string0Parameter));
 	if (!wmap) {
 		//no such starting area
 		return;

@@ -44,7 +44,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 	ControlType = IE_GUI_WORLDMAP;
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	const Game* game = core->GetGame();
-	const WorldMap* worldmap = core->GetWorldMap();
+	WorldMap* worldmap = core->GetWorldMap();
 	currentArea = game->CurrentArea;
 	int entry = gamedata->GetAreaAlias(currentArea);
 	if (entry >= 0) {
@@ -91,7 +91,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		return rgn.origin - Pos + p;
 	};
 	
-	const WorldMap* worldmap = core->GetWorldMap();
+	WorldMap* worldmap = core->GetWorldMap();
 
 	Video* video = core->GetVideoDriver();
 	video->BlitSprite( worldmap->GetMapMOS(), MapToScreen(Point()));
@@ -206,7 +206,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 	}
 
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
-	const WorldMap* worldmap = core->GetWorldMap();
+	WorldMap* worldmap = core->GetWorldMap();
 	Point p = ConvertPointFromScreen(me.Pos());
 	Point mapOff = p + Pos;
 

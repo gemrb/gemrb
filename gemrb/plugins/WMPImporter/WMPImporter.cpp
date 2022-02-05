@@ -156,30 +156,30 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 
 }
 
-WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str) const
+WMPAreaEntry WMPImporter::GetAreaEntry(DataStream *str) const
 {
-	WMPAreaEntry *ae = new WMPAreaEntry();
+	WMPAreaEntry ae;
 
-	str->ReadResRef( ae->AreaName );
-	str->ReadResRef( ae->AreaResRef );
-	str->ReadVariable(ae->AreaLongName);
+	str->ReadResRef(ae.AreaName);
+	str->ReadResRef(ae.AreaResRef);
+	str->ReadVariable(ae.AreaLongName);
 	ieDword tmpDword;
 	str->ReadDword(tmpDword);
-	str->ReadDword(ae->IconSeq);
+	str->ReadDword(ae.IconSeq);
 	//this should be set after iconseq is known
-	ae->SetAreaStatus(tmpDword, BitOp::SET);
+	ae.SetAreaStatus(tmpDword, BitOp::SET);
 	ieDword coord;
 	str->ReadDword(coord);
-	ae->pos.x = coord;
+	ae.pos.x = coord;
 	str->ReadDword(coord);
-	ae->pos.y = coord;
-	str->ReadStrRef(ae->LocCaptionName);
-	str->ReadStrRef(ae->LocTooltipName);
-	str->ReadResRef( ae->LoadScreenResRef );
+	ae.pos.y = coord;
+	str->ReadStrRef(ae.LocCaptionName);
+	str->ReadStrRef(ae.LocTooltipName);
+	str->ReadResRef(ae.LoadScreenResRef);
 
 	for (unsigned int dir = 0; dir < 4; dir++) {
-		str->ReadDword(ae->AreaLinksIndex[dir]);
-		str->ReadDword(ae->AreaLinksCount[dir]);
+		str->ReadDword(ae.AreaLinksIndex[dir]);
+		str->ReadDword(ae.AreaLinksCount[dir]);
 	}
 	str->Seek( 128, GEM_CURRENT_POS );
 

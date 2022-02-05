@@ -2828,22 +2828,22 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "invalid links 2da!");
 		}
 
-		WMPAreaEntry *entry = new WMPAreaEntry();
-		entry->AreaName = MakeUpperCaseResRef(area);
-		entry->AreaResRef = MakeUpperCaseResRef(area);
-		strnuprcpy(entry->AreaLongName, script, 32);
-		entry->SetAreaStatus(flags, BitOp::SET);
-		entry->IconSeq = icon;
-		entry->pos.x = locx;
-		entry->pos.y = locy;
-		entry->LocCaptionName = ieStrRef(label);
-		entry->LocTooltipName = ieStrRef(name);
-		entry->LoadScreenResRef.Reset();
-		memcpy(entry->AreaLinksIndex, indices, sizeof(entry->AreaLinksIndex) );
-		memcpy(entry->AreaLinksCount, links, sizeof(entry->AreaLinksCount) );
+		WMPAreaEntry entry;
+		entry.AreaName = MakeUpperCaseResRef(area);
+		entry.AreaResRef = MakeUpperCaseResRef(area);
+		strnuprcpy(entry.AreaLongName, script, 32);
+		entry.SetAreaStatus(flags, BitOp::SET);
+		entry.IconSeq = icon;
+		entry.pos.x = locx;
+		entry.pos.y = locy;
+		entry.LocCaptionName = ieStrRef(label);
+		entry.LocTooltipName = ieStrRef(name);
+		entry.LoadScreenResRef.Reset();
+		memcpy(entry.AreaLinksIndex, indices, sizeof(entry.AreaLinksIndex) );
+		memcpy(entry.AreaLinksCount, links, sizeof(entry.AreaLinksCount) );
 
 		int thisarea = wmap->GetEntryCount();
-		wmap->AddAreaEntry(entry);
+		wmap->AddAreaEntry(std::move(entry));
 		for (unsigned int j=0;j<total;j++) {
 			const char *larea = newlinks->QueryField(j,0);
 			int lflags        = atoi(newlinks->QueryField(j,1));
@@ -2861,29 +2861,28 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				//blabla
 				return RuntimeError("cannot establish area link!");
 			}
-			WMPAreaLink *link = new WMPAreaLink();
-			strnuprcpy(link->DestEntryPoint, ename, 32);
-			link->DistanceScale = distance;
-			link->DirectionFlags = lflags;
-			link->EncounterChance = encprob;
+			WMPAreaLink link;
+			strnuprcpy(link.DestEntryPoint, ename, 32);
+			link.DistanceScale = distance;
+			link.DirectionFlags = lflags;
+			link.EncounterChance = encprob;
 			for(k=0;k<5;k++) {
 				if (enc[k][0]=='*') {
-					link->EncounterAreaResRef[k].Reset();
+					link.EncounterAreaResRef[k].Reset();
 				} else {
-					link->EncounterAreaResRef[k] = MakeUpperCaseResRef(enc[k]);
+					link.EncounterAreaResRef[k] = MakeUpperCaseResRef(enc[k]);
 				}
 			}
 
 			//first come the local links, then 'links to' this area
 			//local is total-linksto
 			if (j<local) {
-				link->AreaIndex = thisarea;
+				link.AreaIndex = thisarea;
 				//linktodir may need translation
-				wmap->InsertAreaLink(areaindex, linktodir, link);
-				delete link;
+				wmap->InsertAreaLink(areaindex, linktodir, std::move(link));
 			} else {
-				link->AreaIndex = areaindex;
-				wmap->AddAreaLink(link);
+				link.AreaIndex = areaindex;
+				wmap->AddAreaLink(std::move(link));
 			}
 		}
 	}

@@ -2896,8 +2896,8 @@ void Interface::UpdateWorldMap(const ResRef& wmResRef)
 	}
 
 	WorldMapArray *new_worldmap = wmp_mgr->GetWorldMapArray();
-	const WorldMap *wm = worldmap->GetWorldMap(0);
-	const WorldMap *nwm = new_worldmap->GetWorldMap(0);
+	WorldMap *wm = worldmap->GetWorldMap(0);
+	WorldMap *nwm = new_worldmap->GetWorldMap(0);
 
 	unsigned int ni;
 	unsigned int ec = wm->GetEntryCount();
