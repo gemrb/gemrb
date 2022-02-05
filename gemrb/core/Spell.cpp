@@ -190,7 +190,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 
 		if ((Flags & SF_SIMPLIFIED_DURATION) && (block_index>=0)) {
 			//hack the effect according to Level
-			if (EffectQueue::HasDuration(features[i])) {
+			if (features[i]->HasDuration()) {
 				fx->Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
 			}
 		}

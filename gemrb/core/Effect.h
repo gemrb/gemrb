@@ -275,6 +275,19 @@ public:
 		else return Resource == rhs.Resource && Resource2 == rhs.Resource2 && Resource3 == rhs.Resource3 && Resource4 == rhs.Resource4;
 		
 	}
+	
+	//returns true if the effect supports simplified duration
+	bool HasDuration() const
+	{
+		switch(TimingMode) {
+		case FX_DURATION_INSTANT_LIMITED: //simple duration
+		case FX_DURATION_DELAY_LIMITED:   //delayed duration
+		case FX_DURATION_DELAY_PERMANENT: //simple delayed
+		// not supporting FX_DURATION_INSTANT_LIMITED_TICKS, since it's in ticks
+			return true;
+		}
+		return false;
+	}
 };
 
 }

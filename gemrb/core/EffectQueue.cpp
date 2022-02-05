@@ -2056,19 +2056,6 @@ std::string EffectQueue::dump() const
 	return buffer;
 }
 
-//returns true if the effect supports simplified duration
-bool EffectQueue::HasDuration(const Effect *fx)
-{
-	switch(fx->TimingMode) {
-	case FX_DURATION_INSTANT_LIMITED: //simple duration
-	case FX_DURATION_DELAY_LIMITED:   //delayed duration
-	case FX_DURATION_DELAY_PERMANENT: //simple delayed
-	// not supporting FX_DURATION_INSTANT_LIMITED_TICKS, since it's in ticks
-		return true;
-	}
-	return false;
-}
-
 //returns true if the effect must be saved
 bool EffectQueue::Persistent(const Effect& fx)
 {

@@ -306,8 +306,6 @@ public:
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
 	void DispelEffects(const Effect *dispeller, ieDword level);
 
-	/* returns true if the timing method supports simplified duration */
-	static bool HasDuration(const Effect *fx);
 	/* returns true if the effect should be saved */
 	static bool Persistent(const Effect& fx);
 	/* returns next saved effect, increases index */
