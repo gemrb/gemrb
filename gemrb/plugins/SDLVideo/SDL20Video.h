@@ -222,8 +222,8 @@ private:
 	SDL_GameController* gameController = nullptr;
 
 public:
-	SDL20VideoDriver(void);
-	~SDL20VideoDriver(void) override;
+	SDL20VideoDriver() noexcept;
+	~SDL20VideoDriver() noexcept override;
 
 	int Init() override;
 

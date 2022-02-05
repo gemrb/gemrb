@@ -30,7 +30,7 @@ namespace GemRB {
 
 const TypeID Video::ID = { "Video" };
 
-Video::Video(void)
+Video::Video() noexcept
 {
 	// Initialize gamma correction tables
 	for (int i = 0; i < 256; i++) {
@@ -39,7 +39,7 @@ Video::Video(void)
 	}
 }
 
-Video::~Video(void)
+Video::~Video() noexcept
 {
 	DestroyBuffers();
 }

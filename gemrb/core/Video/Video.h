@@ -132,8 +132,8 @@ private:
 	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)=0;
 
 public:
-	Video(void);
-	~Video(void) override;
+	Video() noexcept;
+	~Video() noexcept override;
 
 	virtual int Init(void) = 0;
 
