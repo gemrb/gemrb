@@ -70,14 +70,13 @@ public:
 	/** Sets ScriptName for area animation */
 	void SetScriptName(const char *name);
 	/** returns the frame count */
-	index_t GetFrameCount() const { return indicesCount; }
+	index_t GetFrameCount() const { return frames.size(); }
 	/** returns the current frame's index */
 	index_t GetCurrentFrameIndex() const;
 	/** add other animation's animarea to self */
 	void AddAnimArea(const Animation* slave);
 private:
 	std::vector<frame_t> frames;
-	index_t indicesCount = 0;
 	tick_t starttime = 0;
 };
 
