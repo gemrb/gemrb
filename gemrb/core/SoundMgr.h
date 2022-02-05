@@ -34,8 +34,8 @@ namespace GemRB {
 class GEM_EXPORT SoundMgr : public Resource {
 public:
 	static const TypeID ID;
-public:
-	SoundMgr(void);
+
+	SoundMgr() noexcept = default;
 	/**
 	 * Read up to cnt samples into memory
 	 *
@@ -57,9 +57,9 @@ public:
 		return samples;
 	} // returns the total samples count
 protected:
-	int samples; // total count of sound samples
-	int channels;
-	int samplerate;
+	int samples = 0; // total count of sound samples
+	int channels = 0;
+	int samplerate = 0;
 };
 
 }
