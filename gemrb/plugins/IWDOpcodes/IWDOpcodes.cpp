@@ -2710,7 +2710,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	fx->Parameter4 = game->GameTime+fx->Parameter3;
 
-	const Spell *spell = gamedata->GetSpell(fx->Resource);
+	Spell *spell = gamedata->GetSpell(fx->Resource);
 	if (!spell) {
 		return FX_NOT_APPLIED;
 	}
@@ -2930,7 +2930,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	const Spell* spl = gamedata->GetSpell(fx->Resource);
+	Spell* spl = gamedata->GetSpell(fx->Resource);
 	//create projectile from known spellheader
 	//cannot get the projectile from the spell
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);

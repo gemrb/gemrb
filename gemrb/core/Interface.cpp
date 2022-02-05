@@ -3844,7 +3844,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 // dealing with applying effects
 void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level) const
 {
-	const Spell *spell = gamedata->GetSpell(spellRef);
+	Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
@@ -3858,7 +3858,7 @@ void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *cas
 
 void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level) const
 {
-	const Spell *spell = gamedata->GetSpell(spellRef);
+	Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}

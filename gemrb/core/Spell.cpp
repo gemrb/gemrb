@@ -71,20 +71,6 @@ private:
 	}
 };
 
-SPLExtHeader::~SPLExtHeader() noexcept
-{
-	for (const auto& feature : features) {
-		delete feature;
-	}
-}
-
-Spell::~Spell()
-{
-	for (auto fx : casting_features) {
-		delete fx;
-	}
-}
-
 int Spell::GetHeaderIndexFromLevel(int level) const
 {
 	if (level < 0 || ext_headers.empty()) return -1;
@@ -158,10 +144,10 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 	fxqueue->AddEffect(fx);
 }
 
-EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro) const
+EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro)
 {
 	bool pst_hostile = false;
-	Effect *const *features;
+	std::vector<Effect>* features;
 	size_t count;
 	const auto& tables = SpellTables::Get();
 	Actor *caster = self->As<Actor>();
@@ -169,90 +155,90 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	//iwd2 has this hack
 	if (block_index>=0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
-			features = ext_headers[0].features.data();
+			features = &ext_headers[0].features;
 			count = ext_headers[0].features.size();
 		} else {
-			features = ext_headers[block_index].features.data();
+			features = &ext_headers[block_index].features;
 			count = ext_headers[block_index].features.size();
 			if (tables.pstflags && !(ext_headers[block_index].Hostile&4)) {
 				pst_hostile = true;
 			}
 		}
 	} else {
-		features = casting_features.data();
+		features = &casting_features;
 		count = CastingFeatureCount;
 	}
 	EffectQueue *fxqueue = new EffectQueue();
 	EffectQueue *selfqueue = NULL;
 
 	for (size_t i = 0; i < count; ++i) {
-		Effect *fx = features[i];
+		Effect& fx = features->at(i);
 
 		if ((Flags & SF_SIMPLIFIED_DURATION) && (block_index>=0)) {
 			//hack the effect according to Level
-			if (features[i]->HasDuration()) {
-				fx->Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
+			if (fx.HasDuration()) {
+				fx.Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
 			}
 		}
 		//fill these for completeness, inventoryslot is a good way
 		//to discern a spell from an item effect
 
-		fx->InventorySlot = 0xffff;
+		fx.InventorySlot = 0xffff;
 		//the hostile flag is used to determine if this was an attack
-		fx->SourceFlags = Flags;
+		fx.SourceFlags = Flags;
 		//pst spells contain a friendly flag in the spell header
 		// while iwd spells never set this bit
-		if (pst_hostile || fx->Opcode == tables.damageOpcode) {
-			fx->SourceFlags|=SF_HOSTILE;
+		if (pst_hostile || fx.Opcode == tables.damageOpcode) {
+			fx.SourceFlags|=SF_HOSTILE;
 		}
-		fx->CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later
-		fx->CasterLevel = level;
-		fx->SpellLevel = SpellLevel;
+		fx.CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later
+		fx.CasterLevel = level;
+		fx.SpellLevel = SpellLevel;
 
 		// apply the stat-based spell duration modifier
 		if (caster) {
 			if (caster->Modified[IE_SPELLDURATIONMODMAGE] && SpellType == IE_SPL_WIZARD) {
-				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
+				fx.Duration = (fx.Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
 			} else if (caster->Modified[IE_SPELLDURATIONMODPRIEST] && SpellType == IE_SPL_PRIEST) {
-				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODPRIEST]) / 100;
+				fx.Duration = (fx.Duration * caster->Modified[IE_SPELLDURATIONMODPRIEST]) / 100;
 			}
 
 			//evaluate spell focus feats
 			//TODO: the usual problem: which saving throw is better? Easy fix in the data file.
-			if (fx->PrimaryType < tables.spellfocus.size()) {
-				ieDword stat = tables.spellfocus[fx->PrimaryType].stat;
+			if (fx.PrimaryType < tables.spellfocus.size()) {
+				ieDword stat = tables.spellfocus[fx.PrimaryType].stat;
 				if (stat>0) {
 					switch (caster->Modified[stat]) {
 						case 0: break;
-						case 1: fx->SavingThrowBonus += tables.spellfocus[fx->PrimaryType].val1; break;
-						default: fx->SavingThrowBonus += tables.spellfocus[fx->PrimaryType].val2; break;
+						case 1: fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val1; break;
+						default: fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val2; break;
 					}
 				}
 			}
 		}
 
 		// item revisions uses a bunch of fx_cast_spell with spells that have effects with no target set
-		if (fx->Target == FX_TARGET_UNKNOWN) {
-			fx->Target = FX_TARGET_PRESET;
+		if (fx.Target == FX_TARGET_UNKNOWN) {
+			fx.Target = FX_TARGET_PRESET;
 		}
 
-		if (fx->Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(fx)) {
-			fx->Target = FX_TARGET_PRESET;
+		if (fx.Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(&fx)) {
+			fx.Target = FX_TARGET_PRESET;
 		}
 
-		if (fx->Target != FX_TARGET_SELF) {
-			fx->Projectile = pro;
-			fxqueue->AddEffect(new Effect(*fx));
+		if (fx.Target != FX_TARGET_SELF) {
+			fx.Projectile = pro;
+			fxqueue->AddEffect(new Effect(fx));
 		} else {
-			fx->Projectile = 0;
-			fx->Pos = pos;
+			fx.Projectile = 0;
+			fx.Pos = pos;
 			if (!selfqueue) {
 				selfqueue = new EffectQueue();
 			}
 			// effects should be able to affect non living targets
 			//This is done by NULL target, the position should be enough
 			//to tell which non-actor object is affected
-			selfqueue->AddEffect(new Effect(*fx));
+			selfqueue->AddEffect(new Effect(fx));
 		}
 	}
 	if (self && selfqueue) {
@@ -262,7 +248,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	return fxqueue;
 }
 
-Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const Point &target) const
+Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const Point &target)
 {
 	const SPLExtHeader *seh = GetExtHeader(header);
 	if (!seh) {
@@ -314,8 +300,8 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 bool Spell::ContainsDamageOpcode() const
 {
 	for (const SPLExtHeader& header : ext_headers) {
-		for (const Effect *fx : header.features) {
-			if (fx->Opcode == SpellTables::Get().damageOpcode) {
+		for (const Effect& fx : header.features) {
+			if (fx.Opcode == SpellTables::Get().damageOpcode) {
 				return true;
 			}
 		}

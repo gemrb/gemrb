@@ -1352,13 +1352,13 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed)
 	}
 	const SPLExtHeader *sph = spell->GetExtHeader(0);
 	if (!sph) return; // some iwd2 clabs are only markers
-	for (const Effect *origfx : sph->features) {
-		if (origfx->TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
-		if (!(Opcodes[origfx->Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;
+	for (const Effect& origfx : sph->features) {
+		if (origfx.TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
+		if (!(Opcodes[origfx.Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;
 
 		// unapply the effect by applying the reverse — if feasible
 		// but don't alter the spell itself or other users won't get what they asked for
-		Effect *fx = CreateEffectCopy(origfx, origfx->Opcode, origfx->Parameter1, origfx->Parameter2);
+		Effect *fx = CreateEffectCopy(&origfx, origfx.Opcode, origfx.Parameter1, origfx.Parameter2);
 
 		// state setting effects are idempotent, so wouldn't cause problems during clab reapplication
 		// ...they would during disabled dualclass levels, but it would be too annoying to try, since
