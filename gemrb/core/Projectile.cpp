@@ -1080,14 +1080,13 @@ void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end) 
 			}
 
 			if (effects.CheckImmunity(target) > 0) {
-				EffectQueue *eff = effects.CopySelf();
-				eff->SetOwner(original);
+				EffectQueue eff = effects;
+				eff.SetOwner(original);
 				if (ExtFlags & PEF_RGB) {
 					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed, RGB);
 				}
 
-				eff->AddAllEffects(target, target->Pos);
-				delete eff;
+				eff.AddAllEffects(target, target->Pos);
 			}
 		}
 	} while (iter != end);

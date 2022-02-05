@@ -10327,7 +10327,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->CreateDerivedStats();
 
 	//copy the running effects
-	EffectQueue *newFXQueue = fxqueue.CopySelf();
+	EffectQueue* newFXQueue = new EffectQueue(fxqueue);
 
 	area->AddActor(newActor, true);
 	newActor->SetPosition( Pos, CC_CHECK_IMPASSABLE, 0 );

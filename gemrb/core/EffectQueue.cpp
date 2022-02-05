@@ -372,20 +372,6 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 	return CreateEffect(effect_reference.opcode, param1, param2, timing);
 }
 
-//copies the whole effectqueue (area projectiles use it)
-EffectQueue *EffectQueue::CopySelf() const
-{
-	EffectQueue *newQueue = new EffectQueue();
-	std::list<Effect>::const_iterator fxit = GetFirstEffect();
-	const Effect *fx;
-
-	while( (fx = GetNextEffect(fxit))) {
-		newQueue->AddEffect(new Effect(*fx), false);
-	}
-	newQueue->SetOwner(GetOwner());
-	return newQueue;
-}
-
 //create a new effect with most of the characteristics of the old effect
 //only opcode and parameters are changed
 //This is used mostly inside effects, when an effect needs to spawn

@@ -334,7 +334,6 @@ public:
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(const Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing);
-	EffectQueue *CopySelf() const;
 	static Effect *CreateEffectCopy(const Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
 	static Effect *CreateUnsummonEffect(const Effect *fx);
 	//locating opcodes
