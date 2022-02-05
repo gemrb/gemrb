@@ -28,7 +28,7 @@ class ResourceDesc;
 
 class DirectoryImporter : public ResourceSource {
 protected:
-	char path[_MAX_PATH];
+	char path[_MAX_PATH] {};
 
 public:
 	DirectoryImporter() noexcept = default;

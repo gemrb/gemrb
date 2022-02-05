@@ -72,9 +72,10 @@ HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned long)
 template<typename Key, typename Value, typename Hash = HashKey<Key> >
 class HashMap {
 public:
-	HashMap();
+	HashMap() noexcept;
+	~HashMap() noexcept;
+	
 	HashMap(const HashMap&) = delete;
-	~HashMap();
 	HashMap& operator=(const HashMap&) = delete;
 
 	void init(unsigned int tableSize, unsigned int blockSize);
@@ -131,7 +132,8 @@ public:
 };
 
 template<typename Key, typename Value, typename HashKey>
-HashMap<Key, Value, HashKey>::HashMap() :
+HashMap<Key, Value, HashKey>::HashMap() noexcept
+:
 		_tableSize(0),
 		_blockSize(0),
 		_blocks(),
@@ -144,7 +146,7 @@ HashMap<Key, Value, HashKey>::HashMap() :
 }
 
 template<typename Key, typename Value, typename HashKey>
-HashMap<Key, Value, HashKey>::~HashMap()
+HashMap<Key, Value, HashKey>::~HashMap() noexcept
 {
 	clear();
 }
