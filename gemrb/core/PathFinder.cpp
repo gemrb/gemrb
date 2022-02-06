@@ -239,6 +239,56 @@ PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int
 	return Return;
 }
 
+Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, int Orientation, int flags) const
+{
+	int Count = 0;
+	int Max = Distance(start, dest);
+	Path path;
+	path.reserve(Max);
+	path.push_back(PathNode {start, Orientation});
+	auto StartNode = path.begin();
+	for (int Steps = 0; Steps < Max; Steps++) {
+		Point p;
+		p.x = start.x + ((dest.x - start.x) * Steps / Max);
+		p.y = start.y + ((dest.y - start.y) * Steps / Max);
+
+		//the path ends here as it would go off the screen, causing problems
+		//maybe there is a better way, but i needed a quick hack to fix
+		//the crash in projectiles
+		if (p.x < 0 || p.y < 0) {
+			return path;
+		}
+		
+		const Size& mapSize = PropsSize();
+		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
+			return path;
+		}
+
+		if (!Count) {
+			StartNode = path.insert(path.end(), {p, Orientation});
+			Count = Speed;
+		} else {
+			Count--;
+			StartNode->point = p;
+			StartNode->orient = Orientation;
+		}
+
+		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
+		if (wall) switch (flags) {
+			case GL_REBOUND:
+				Orientation = (Orientation + 8) & 15;
+				// TODO: recalculate dest (mirror it)
+				break;
+			case GL_PASS:
+				break;
+			default: //premature end
+				return path;
+		}
+	}
+
+	return path;
+}
+
 PathListNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 {
 	PathListNode *step = new PathListNode;
