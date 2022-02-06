@@ -752,7 +752,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 		}
 	}
 
-	if (!path) {
+	if (path.empty()) {
 		ChangePhase();
 		return;
 	}
@@ -792,15 +792,17 @@ void Projectile::DoStep(unsigned int walk_speed)
 	//path won't be calculated if speed==0
 	walk_speed=1500/walk_speed;
 	ieDword time = core->GetGame()->Ticks;
-	if (!step) {
-		step = path;
+	auto step = path.begin();
+	if (stepIdx) {
+		step += stepIdx;
 	}
 
-	const PathListNode *start = step;
-	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
+	auto start = step;
+	auto last = --path.end();
+	while (step != last && (( time - timeStartStep ) >= walk_speed)) {
 		unsigned int count = Speed;
-		while (step->Next && count) {
-			step = step->Next;
+		while (step != last && count) {
+			++step;
 			--count;
 		}
 		timeStartStep = timeStartStep + walk_speed;
@@ -813,17 +815,18 @@ void Projectile::DoStep(unsigned int walk_speed)
 	if (ExtFlags & PEF_CONTINUE) {
 		// check for every step along the way
 		// the test case is lightning bolt, its a long projectile,
-		LineTarget(start, step->Next);
+		LineTarget(start, std::next(step));
 	}
 
 	SetOrientation (step->orient, false);
+	Pos = step->point;
+	stepIdx = step - path.begin();
 
-	Pos.x=step->x;
-	Pos.y=step->y;
 	if (travel_handle) {
 		travel_handle->SetPos(Pos);
 	}
-	if (!step->Next) {
+	
+	if (step == last) {
 		ClearPath();
 		NewOrientation = Orientation;
 		ChangePhase();
@@ -836,15 +839,16 @@ void Projectile::DoStep(unsigned int walk_speed)
 	if (SFlags&PSF_SPARKS) {
 		drawSpark = 1;
 	}
-
-	if (step->Next->x > step->x)
-		Pos.x += ((step->Next->x - Pos.x) * (time - timeStartStep) / walk_speed);
+	
+	auto next = std::next(step);
+	if (next->point.x > step->point.x)
+		Pos.x += ((next->point.x - Pos.x) * (time - timeStartStep) / walk_speed);
 	else
-		Pos.x -= ((Pos.x - step->Next->x) * (time - timeStartStep) / walk_speed);
-	if (step->Next->y > step->y)
-		Pos.y += ((step->Next->y - Pos.y) * (time - timeStartStep) / walk_speed);
+		Pos.x -= ((Pos.x - next->point.x) * (time - timeStartStep) / walk_speed);
+	if (next->point.y > step->point.y)
+		Pos.y += ((next->point.y - Pos.y) * (time - timeStartStep) / walk_speed);
 	else
-		Pos.y -= ((Pos.y - step->Next->y) * (time - timeStartStep) / walk_speed);
+		Pos.y -= ((Pos.y - next->point.y) * (time - timeStartStep) / walk_speed);
 
 }
 
@@ -880,7 +884,7 @@ void Projectile::NextTarget(const Point &p)
 
 	int flags = (ExtFlags&PEF_BOUNCE) ? GL_REBOUND : GL_PASS;
 	int stepping = (ExtFlags & PEF_LINE) ? Speed : 1;
-	path = area->GetLine(Pos, Destination, stepping, Orientation, flags);
+	path = area->GetLinePath(Pos, Destination, stepping, Orientation, flags);
 }
 
 void Projectile::SetTarget(const Point &p)
@@ -942,14 +946,8 @@ void Projectile::MoveTo(Map *map, const Point &Des)
 
 void Projectile::ClearPath()
 {
-	PathListNode* thisNode = path;
-	while (thisNode) {
-		PathListNode* nextNode = thisNode->Next;
-		delete thisNode;
-		thisNode = nextNode;
-	}
-	path = nullptr;
-	step = nullptr;
+	path.clear();
+	stepIdx = 0;
 }
 
 int Projectile::CalculateTargetFlag() const
@@ -1047,10 +1045,10 @@ void Projectile::SetEffectsCopy(const EffectQueue *eq, const Point &source)
 
 void Projectile::LineTarget() const
 {
-	LineTarget(path, nullptr);
+	LineTarget(path.begin(), path.end());
 }
 
-void Projectile::LineTarget(const PathListNode *beg, const PathListNode *end) const
+void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end) const
 {
 	if (!effects) {
 		return;
@@ -1058,19 +1056,19 @@ void Projectile::LineTarget(const PathListNode *beg, const PathListNode *end) co
 
 	Actor *original = area->GetActorByGlobalID(Caster);
 	int targetFlags = CalculateTargetFlag();
-	const PathListNode *iter = beg;
+	auto iter = beg;
 
 	do {
-		const PathListNode *first = iter;
-		const PathListNode *last = iter;
-		unsigned int orient = first->orient;
-		while (iter && iter != end && iter->orient == orient) {
+		auto first = iter;
+		auto last = iter;
+		int orient = first->orient;
+		while (iter != end && iter->orient == orient) {
 			last = iter;
-			iter = iter->Next;
+			++iter;
 		}
 
-		const Point s(first->x, first->y);
-		const Point d(last->x, last->y);
+		const Point s = first->point;
+		const Point d = last->point;
 		const std::vector<Actor *> &actors = area->GetAllActors();
 
 		for (Actor *target : actors) {
@@ -1084,10 +1082,12 @@ void Projectile::LineTarget(const PathListNode *beg, const PathListNode *end) co
 			if (PersonalLineDistance(s, d, target, &t) > 1) {
 				continue;
 			}
-			if (t < 0.0 && first->Parent != nullptr && first->Parent->orient == orient) {
+			auto prev = std::prev(first);
+			auto next = std::next(last);
+			if (t < 0.0 && first != path.begin() && prev->orient == orient) {
 				// skip; assume we've hit the target before
 				continue;
-			} else if (t > 1.0 && last->Next != nullptr && last->Next->orient == orient) {
+			} else if (t > 1.0 && last != --path.end() && next->orient == orient) {
 				// skip; assume we'll hit it after
 				continue;
 			}
@@ -1103,7 +1103,7 @@ void Projectile::LineTarget(const PathListNode *beg, const PathListNode *end) co
 				delete eff;
 			}
 		}
-	} while (iter && iter != end);
+	} while (iter != end);
 }
 
 //secondary projectiles target all in the explosion radius
@@ -1620,7 +1620,7 @@ void Projectile::SetupWall()
 void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 {
 	const Game *game = core->GetGame();
-	PathListNode *iter = path;
+	auto iter = path.begin();
 	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 		frame = travel[face]->LastFrame();
@@ -1631,15 +1631,15 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 
 	Color tint2 = tint;
 	if (game) game->ApplyGlobalTint(tint2, flag);
-	while(iter) {
-		Point pos(iter->x - vp.x, iter->y - vp.y);
+	while(iter != path.end()) {
+		Point pos = iter->point - vp.origin;
 
 		if (SFlags&PSF_FLYING) {
 			pos.y-=FLY_HEIGHT;
 		}
 
 		Draw(frame, pos, flag, tint2);
-		iter = iter->Next;
+		++iter;
 	}
 }
 

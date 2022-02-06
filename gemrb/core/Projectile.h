@@ -245,8 +245,8 @@ private:
 	//attributes from moveable object
 	unsigned char Orientation = 0;
 	unsigned char NewOrientation = 0;
-	PathListNode* path = nullptr; // whole path
-	PathListNode* step = nullptr; // actual step
+	Path path; // whole path
+	size_t stepIdx = 0; // actual step in path
 	//similar to normal actors
 	Map *area = nullptr;
 	Point Pos = Point(-1, -1);
@@ -390,7 +390,7 @@ private:
 	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
 	void DoStep(unsigned int walk_speed);
 	void LineTarget() const;      //line projectiles (walls, scorchers)
-	void LineTarget(const PathListNode *beg, const PathListNode *end) const;
+	void LineTarget(Path::const_iterator beg, Path::const_iterator end) const;
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall
