@@ -201,7 +201,7 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 		}
 
 		//fill the explosion/spread animation flags
-		pro->Extension->APFlags = explosions[idx].flags;
+		pro->Extension->APFlags = explosions[Type].flags;
 	}
 
 	return ReturnCopy(idx);
