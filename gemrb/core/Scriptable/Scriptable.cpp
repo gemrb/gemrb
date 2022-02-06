@@ -1889,7 +1889,7 @@ Movable::~Movable(void)
 
 int Movable::GetPathLength() const
 {
-	const PathNode *node = GetNextStep(0);
+	const PathListNode *node = GetNextStep(0);
 	if (!node) return 0;
 
 	int i = 0;
@@ -1900,12 +1900,12 @@ int Movable::GetPathLength() const
 	return i;
 }
 
-PathNode *Movable::GetNextStep(int x) const
+PathListNode *Movable::GetNextStep(int x) const
 {
 	if (!step) {
 		error("GetNextStep", "Hit with step = null");
 	}
-	PathNode *node = step;
+	PathListNode *node = step;
 	while(node && x--) {
 		node = node->Next;
 	}
@@ -1921,7 +1921,7 @@ Point Movable::GetMostLikelyPosition() const
 //actually, sometimes middle path would be better, if
 //we stand in Destination already
 	int halfway = GetPathLength()/2;
-	const PathNode *node = GetNextStep(halfway);
+	const PathListNode *node = GetNextStep(halfway);
 	if (node) {
 		return Point((ieWord) ((node->x*16)+8), (ieWord) ((node->y*12)+6) );
 	}
@@ -2187,13 +2187,13 @@ void Movable::AddWayPoint(const Point &Des)
 	Destination = Des;
 	//it is tempting to use 'step' here, as it could
 	//be about half of the current path already
-	PathNode *endNode = path;
+	PathListNode *endNode = path;
 	while(endNode->Next) {
 		endNode = endNode->Next;
 	}
 	Point p(endNode->x, endNode->y);
 	area->ClearSearchMapFor(this);
-	PathNode *path2 = area->FindPath(p, Des, size);
+	PathListNode *path2 = area->FindPath(p, Des, size);
 	// if the waypoint is too close to the current position, no path is generated
 	if (!path2) {
 		if (BlocksSearchMap()) {
@@ -2231,7 +2231,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}
 
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
-	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
+	PathListNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
 	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
 		Log(DEBUG, "WalkTo", "{} re-pathing ignoring actors", fmt::WideToChar{actor->GetShortName()});
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, actor);
@@ -2359,9 +2359,9 @@ void Movable::ClearPath(bool resetDestination)
 		}
 		InternalFlags &= ~IF_NORETICLE;
 	}
-	PathNode* thisNode = path;
+	PathListNode* thisNode = path;
 	while (thisNode) {
-		PathNode* nextNode = thisNode->Next;
+		PathListNode* nextNode = thisNode->Next;
 		delete thisNode;
 		thisNode = nextNode;
 	}

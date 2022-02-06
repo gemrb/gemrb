@@ -44,7 +44,7 @@ class InfoPoint;
 class Map;
 class Movable;
 class Object;
-struct PathNode;
+struct PathListNode;
 class Projectile;
 class Scriptable;
 class Selectable;
@@ -494,8 +494,8 @@ private: //these seem to be sensitive, so get protection
 	unsigned char NewOrientation = 0;
 	ieWord AttackMovements[3] = { 100, 0 , 0 };
 
-	PathNode* path = nullptr; // whole path
-	PathNode* step = nullptr; // actual step
+	PathListNode* path = nullptr; // whole path
+	PathListNode* step = nullptr; // actual step
 	unsigned int prevTicks = 0;
 	int bumpBackTries = 0;
 	bool pathAbandoned = false;
@@ -533,14 +533,14 @@ public:
 	void BumpAway();
 	void BumpBack();
 	inline bool IsBumped() const { return bumped; }
-	PathNode *GetNextStep(int x) const;
-	inline PathNode *GetPath() const { return path; };
+	PathListNode *GetNextStep(int x) const;
+	inline PathListNode *GetPath() const { return path; };
 	inline int GetPathTries() const	{ return pathTries; }
 	inline void IncrementPathTries() { pathTries++; }
 	inline void ResetPathTries() { pathTries = 0; }
 	int GetPathLength() const;
 //inliners to protect data consistency
-	inline PathNode * GetStep() {
+	inline PathListNode * GetStep() {
 		if (!step) {
 			DoStep((unsigned int) ~0);
 		}

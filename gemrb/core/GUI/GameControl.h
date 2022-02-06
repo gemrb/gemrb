@@ -99,7 +99,7 @@ private:
 	int lastCursor = 0;
 	Point vpVector;
 	int numScrollCursor = 0;
-	PathNode* drawPath = nullptr;
+	PathListNode* drawPath = nullptr;
 	unsigned int ScreenFlags = SF_CENTERONACTOR;
 	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
 	String DisplayText;

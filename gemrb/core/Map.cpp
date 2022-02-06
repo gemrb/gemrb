@@ -1918,9 +1918,9 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		// draw also pathfinding waypoints
 		const Actor *act = core->GetFirstSelectedActor();
 		if (!act) return;
-		const PathNode *path = act->GetPath();
+		const PathListNode *path = act->GetPath();
 		if (!path) return;
-		const PathNode *step = path->Next;
+		const PathListNode *step = path->Next;
 		Color waypoint(0, 64, 128, 128); // darker blue-ish
 		int i = 0;
 		block.w = 8;

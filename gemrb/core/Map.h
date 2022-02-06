@@ -49,7 +49,7 @@ class IniSpawn;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 class Particles;
-struct PathNode;
+struct PathListNode;
 class Projectile;
 class ScriptedAnimation;
 class TileMap;
@@ -596,19 +596,19 @@ public:
 	void AdjustPosition(Point &goal, int radiusx = 0, int radiusy = 0, int size = -1) const;
 	void AdjustPositionNavmap(Point &goal, int radiusx = 0, int radiusy = 0) const;
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const;
-	PathNode* RandomWalk(const Point &s, int size, int radius, const Actor *caller) const;
+	PathListNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const;
+	PathListNode* RandomWalk(const Point &s, int size, int radius, const Actor *caller) const;
 	/* Returns true if there is no path to d */
 	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking = false) const;
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy() const;
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
-	PathNode* GetLine(const Point &start, const Point &dest, int flags) const;
-	PathNode* GetLine(const Point &start, int steps, unsigned int orient) const;
-	PathNode* GetLine(const Point &start, int Steps, int Orientation, int flags) const;
-	PathNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags) const;
+	PathListNode* GetLine(const Point &start, const Point &dest, int flags) const;
+	PathListNode* GetLine(const Point &start, int steps, unsigned int orient) const;
+	PathListNode* GetLine(const Point &start, int Steps, int Orientation, int flags) const;
+	PathListNode* GetLine(const Point &start, const Point &dest, int speed, int Orientation, int flags) const;
 	/* Finds the path which leads to near d */
-	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL) const;
+	PathListNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL) const;
 
 	bool IsVisible(const Point &p) const;
 	bool IsExplored(const Point &p) const;

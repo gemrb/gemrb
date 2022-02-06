@@ -58,7 +58,7 @@ constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dxRand{{0.000, -0.383, -0.
 constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
-PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
+PathListNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
 {
 	if (!caller || !caller->GetSpeed()) return nullptr;
 	Point p = s;
@@ -86,7 +86,7 @@ PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 	return FindPath(s, p, size, size, flags, caller);
 }
 
-PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *caller) const
+PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *caller) const
 {
 	if (!caller || !caller->GetSpeed()) return nullptr;
 	NavmapPoint p = s;
@@ -118,7 +118,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 		p.x -= dx;
 		p.y -= dy;
 	}
-	PathNode *step = new PathNode;
+	PathListNode *step = new PathListNode;
 	step->x = p.x;
 	step->y = p.y;
 	const Size& mapSize = PropsSize();
@@ -134,12 +134,12 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 {
 	int flags = PF_SIGHT;
 	if (actorsAreBlocking) flags |= PF_ACTORS_ARE_BLOCKING;
-	PathNode *path = FindPath(s, d, size, 0, flags);
+	PathListNode *path = FindPath(s, d, size, 0, flags);
 	bool targetUnreachable = path == nullptr;
 	if (!targetUnreachable) {
-		PathNode *thisNode = path;
+		PathListNode *thisNode = path;
 		while (thisNode) {
-			PathNode *nextNode = thisNode->Next;
+			PathListNode *nextNode = thisNode->Next;
 			delete thisNode;
 			thisNode = nextNode;
 		}
@@ -148,13 +148,13 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 }
 
 // Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
-PathNode *Map::GetLine(const Point &start, const Point &dest, int flags) const
+PathListNode *Map::GetLine(const Point &start, const Point &dest, int flags) const
 {
 	int Orientation = GetOrient(start, dest);
 	return GetLine(start, dest, 1, Orientation, flags);
 }
 
-PathNode *Map::GetLine(const Point &start, int Steps, int Orientation, int flags) const
+PathListNode *Map::GetLine(const Point &start, int Steps, int Orientation, int flags) const
 {
 	Point dest = start;
 
@@ -181,10 +181,10 @@ PathNode *Map::GetLine(const Point &start, int Steps, int Orientation, int flags
 	return GetLine(start, dest, 2, Orientation, flags);
 }
 
-PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags) const
+PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags) const
 {
-	PathNode *StartNode = new PathNode;
-	PathNode *Return = StartNode;
+	PathListNode *StartNode = new PathListNode;
+	PathListNode *Return = StartNode;
 	StartNode->Next = nullptr;
 	StartNode->Parent = nullptr;
 	StartNode->x = start.x;
@@ -211,7 +211,7 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		}
 
 		if (!Count) {
-			StartNode->Next = new PathNode;
+			StartNode->Next = new PathListNode;
 			StartNode->Next->Parent = StartNode;
 			StartNode = StartNode->Next;
 			StartNode->Next = nullptr;
@@ -239,9 +239,9 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 	return Return;
 }
 
-PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
+PathListNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 {
-	PathNode *step = new PathNode;
+	PathListNode *step = new PathListNode;
 	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
 	step->y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
 	const Size& mapSize = PropsSize();
@@ -255,7 +255,7 @@ PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
+PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
 	Log(DEBUG, "FindPath", "s = ({}, {}), d = ({}, {}), caller = {}, dist = {}, size = {}", s.x, s.y, d.x, d.y, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
 	NavmapPoint nmptDest = d;
@@ -370,13 +370,13 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	}
 
 	if (foundPath) {
-		PathNode *resultPath = nullptr;
+		PathListNode *resultPath = nullptr;
 		NavmapPoint nmptCurrent = nmptDest;
 		NavmapPoint nmptParent;
 		SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
 		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
 			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
-			PathNode *newStep = new PathNode;
+			PathListNode *newStep = new PathListNode;
 			newStep->x = nmptCurrent.x;
 			newStep->y = nmptCurrent.y;
 			newStep->Next = resultPath;

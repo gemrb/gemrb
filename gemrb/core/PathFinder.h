@@ -50,9 +50,9 @@ enum class PathMapFlags : uint8_t {
 	NOTACTOR = (DOOR | AREAMASK)
 };
 
-struct PathNode {
-	PathNode* Parent;
-	PathNode* Next;
+struct PathListNode {
+	PathListNode* Parent;
+	PathListNode* Next;
 	unsigned int x;
 	unsigned int y;
 	unsigned int orient;

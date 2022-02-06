@@ -602,7 +602,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 
 	// Draw path
 	if (drawPath) {
-		PathNode* node = drawPath;
+		PathListNode* node = drawPath;
 		while (true) {
 			Point p( ( node-> x*16) + 8, ( node->y*12 ) + 6 );
 			if (!node->Parent) {

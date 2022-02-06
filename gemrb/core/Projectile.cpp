@@ -796,7 +796,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 		step = path;
 	}
 
-	const PathNode *start = step;
+	const PathListNode *start = step;
 	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
 		unsigned int count = Speed;
 		while (step->Next && count) {
@@ -942,9 +942,9 @@ void Projectile::MoveTo(Map *map, const Point &Des)
 
 void Projectile::ClearPath()
 {
-	PathNode* thisNode = path;
+	PathListNode* thisNode = path;
 	while (thisNode) {
-		PathNode* nextNode = thisNode->Next;
+		PathListNode* nextNode = thisNode->Next;
 		delete thisNode;
 		thisNode = nextNode;
 	}
@@ -1050,7 +1050,7 @@ void Projectile::LineTarget() const
 	LineTarget(path, nullptr);
 }
 
-void Projectile::LineTarget(const PathNode *beg, const PathNode *end) const
+void Projectile::LineTarget(const PathListNode *beg, const PathListNode *end) const
 {
 	if (!effects) {
 		return;
@@ -1058,11 +1058,11 @@ void Projectile::LineTarget(const PathNode *beg, const PathNode *end) const
 
 	Actor *original = area->GetActorByGlobalID(Caster);
 	int targetFlags = CalculateTargetFlag();
-	const PathNode *iter = beg;
+	const PathListNode *iter = beg;
 
 	do {
-		const PathNode *first = iter;
-		const PathNode *last = iter;
+		const PathListNode *first = iter;
+		const PathListNode *last = iter;
 		unsigned int orient = first->orient;
 		while (iter && iter != end && iter->orient == orient) {
 			last = iter;
@@ -1620,7 +1620,7 @@ void Projectile::SetupWall()
 void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 {
 	const Game *game = core->GetGame();
-	PathNode *iter = path;
+	PathListNode *iter = path;
 	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 		frame = travel[face]->LastFrame();
