@@ -197,7 +197,6 @@ class GEM_EXPORT Projectile
 {
 public:
 	Projectile() noexcept;
-	~Projectile() noexcept;
 
 	ieWord Speed = 20;
 	ieDword SFlags = PSF_FLYING;
@@ -279,7 +278,49 @@ private:
 	int pathcounter = 0x7fff;
 	int bend = 0;
 	int drawSpark = 0;
-	Holder<SoundHandle> travel_handle;
+	
+	struct LoopStop {
+		Holder<SoundHandle> sound;
+		
+		~LoopStop() noexcept {
+			if (sound) {
+				//allow an explosion sound to finish completely
+				sound->StopLooping();
+			}
+		}
+		
+		LoopStop() noexcept = default;
+		
+		LoopStop(const LoopStop& ls) noexcept
+		: sound(ls.sound) {}
+		
+		LoopStop(LoopStop&& ls) noexcept
+		{
+			std::swap(sound, ls.sound);
+		}
+		
+		LoopStop& operator=(const LoopStop& ls) noexcept {
+			if (this != &ls) {
+				sound = ls.sound;
+			}
+			return *this;
+		}
+		
+		LoopStop& operator=(LoopStop&& ls) noexcept {
+			if (this != &ls) {
+				std::swap(sound, ls.sound);
+			}
+			return *this;
+		}
+		
+		SoundHandle* operator->() noexcept {
+			return sound.get();
+		}
+		
+		operator bool() const noexcept {
+			return bool(sound);
+		}
+	} travel_handle;
 public:
 	void SetCaster(ieDword t, int level);
 	ieDword GetCaster() const;

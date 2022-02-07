@@ -53,16 +53,6 @@ Projectile::Projectile() noexcept
 	shadow.resize(MAX_ORIENT);
 }
 
-Projectile::~Projectile() noexcept
-{
-	ClearPath();
-
-	if (travel_handle) {
-		//allow an explosion sound to finish completely
-		travel_handle->StopLooping();
-	}
-}
-
 Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bamres, int Seq)
 {
 	const AnimationFactory* af = static_cast<const AnimationFactory*>(
@@ -362,7 +352,7 @@ void Projectile::Setup()
 		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
-	travel_handle = core->GetAudioDrv()->Play(FiringSound, SFX_CHAN_MISSILE,
+	travel_handle.sound = core->GetAudioDrv()->Play(FiringSound, SFX_CHAN_MISSILE,
 				Pos, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
 
 	//create more projectiles
@@ -579,8 +569,8 @@ void Projectile::ApplyDefault() const
 void Projectile::StopSound()
 {
 	if (travel_handle) {
-		travel_handle->Stop();
-		travel_handle.release();
+		travel_handle.sound->Stop();
+		travel_handle.sound = nullptr;
 	}
 }
 
@@ -590,7 +580,7 @@ void Projectile::UpdateSound()
 		StopSound();
 	}
 	if (!travel_handle || !travel_handle->Playing()) {
-		travel_handle = core->GetAudioDrv()->Play(ArrivalSound, SFX_CHAN_MISSILE,
+		travel_handle.sound = core->GetAudioDrv()->Play(ArrivalSound, SFX_CHAN_MISSILE,
 				Pos, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
 		SFlags|=PSF_SOUND2;
 	}
