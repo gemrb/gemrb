@@ -169,7 +169,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		count = CastingFeatureCount;
 	}
 	EffectQueue *fxqueue = new EffectQueue();
-	EffectQueue *selfqueue = NULL;
+	EffectQueue selfqueue;
 
 	for (size_t i = 0; i < count; ++i) {
 		Effect& fx = features->at(i);
@@ -232,18 +232,14 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		} else {
 			fx.Projectile = 0;
 			fx.Pos = pos;
-			if (!selfqueue) {
-				selfqueue = new EffectQueue();
-			}
 			// effects should be able to affect non living targets
 			//This is done by NULL target, the position should be enough
 			//to tell which non-actor object is affected
-			selfqueue->AddEffect(new Effect(fx));
+			selfqueue.AddEffect(new Effect(fx));
 		}
 	}
 	if (self && selfqueue) {
-		core->ApplyEffectQueue(selfqueue, caster, self);
-		delete selfqueue;
+		core->ApplyEffectQueue(&selfqueue, caster, self);
 	}
 	return fxqueue;
 }

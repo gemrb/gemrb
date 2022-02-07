@@ -991,13 +991,13 @@ int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 		if (!color) color = 0xff00ff00;
 		Effect *newfx = EffectQueue::CreateEffect(fx_single_color_pulse_ref, color, speed<<16, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
 		newfx->Target=FX_TARGET_PRESET;
-		EffectQueue *fxqueue = new EffectQueue();
-		fxqueue->SetOwner(Owner);
-		fxqueue->AddEffect(newfx);
+		
+		EffectQueue fxqueue;
+		fxqueue.SetOwner(Owner);
+		fxqueue.AddEffect(newfx);
 
 		//don't detect self? if yes, then use NULL as last parameter
-		fxqueue->AffectAllInRange(target->GetCurrentArea(), target->Pos, (type&0xff000000)>>24, (type&0xff0000)>>16, (type&0xff)*10, target);
-		delete fxqueue;
+		fxqueue.AffectAllInRange(target->GetCurrentArea(), target->Pos, (type&0xff000000)>>24, (type&0xff0000)>>16, (type&0xff)*10, target);
 	}
 	return FX_APPLIED;
 }

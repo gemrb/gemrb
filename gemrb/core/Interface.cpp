@@ -3877,10 +3877,9 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster) con
 		return 0;
 	}
 
-	EffectQueue *fxqueue = new EffectQueue();
-	fxqueue->AddEffect( effect );
-	int res = ApplyEffectQueue(fxqueue, actor, caster);
-	delete fxqueue;
+	EffectQueue fxqueue;
+	fxqueue.AddEffect(effect);
+	int res = ApplyEffectQueue(&fxqueue, actor, caster);
 	return res;
 }
 
