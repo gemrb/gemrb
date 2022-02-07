@@ -459,7 +459,7 @@ void EffectQueue::Cleanup()
 {
 	for (auto f = effects.begin(); f != effects.end(); ) {
 		if (f->TimingMode == FX_DURATION_JUST_EXPIRED) {
-			effects.erase(f++);
+			f = effects.erase(f);
 		} else {
 			++f;
 		}
