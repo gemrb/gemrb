@@ -57,11 +57,6 @@ private:
 	static bool EnableRollFeedback();
 	static String ResolveStringRef(ieStrRef);
 	
-	template<typename ...ARGS>
-	void DisplayRollStringName(const String& fmt, unsigned char color, const Scriptable *speaker, ARGS&& ...args) const {
-		String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
-		DisplayStringName(std::move(formatted), color, speaker);
-	}
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(size_t stridx, const Color &color, Scriptable *speaker = nullptr) const;
 	/** displays actor name - action : parameter */
@@ -112,7 +107,8 @@ public:
 	void DisplayRollStringName(ieStrRef stridx, unsigned char color, const Scriptable *speaker, ARGS&& ...args) const {
 		if (EnableRollFeedback()) {
 			String fmt = ResolveStringRef(stridx);
-			DisplayRollStringName(fmt, color, speaker, std::forward<ARGS>(args)...);
+			String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
+			DisplayStringName(std::move(formatted), color, speaker);
 		}
 	}
 };
