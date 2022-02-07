@@ -69,38 +69,44 @@ private:
 	void DisplayConstantStringAction(size_t stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
+
+	/** returns the speaker's color and name */
+	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
+	/** displays a string constant in the textarea, starting with speaker's name */
+	void DisplayConstantStringName(size_t stridx, const Color &color, const Scriptable *speaker) const;	
+	
+	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
+	void DisplayConstantStringNameValue(size_t stridx, unsigned char color, const Scriptable *speaker, int value) const;	
+	/** displays actor name - action : parameter */
+	void DisplayConstantStringNameString(size_t stridx, unsigned char color, size_t stridx2, const Scriptable *actor) const;
+	
+	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;
+	void DisplayString(String text, const Color &color, Scriptable *target) const;
+	
+	/** displays a string in the textarea, starting with speaker's name */
+	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
 public:
 	static ieStrRef GetStringReference(size_t);
 	static bool HasStringReference(size_t);
 
 public:
 	DisplayMessage();
-	/** returns the speaker's color and name */
-	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */
-	void DisplayMarkupString(String txt) const;
+	void DisplayMarkupString(String txt) const;	
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(size_t stridx, unsigned char color, Scriptable *speaker = nullptr) const;
 	/** displays a string constant followed by a number in the textarea */
-	void DisplayConstantStringValue(size_t stridx, unsigned char color, ieDword value) const;
-	/** displays a string constant in the textarea, starting with speaker's name */
-	void DisplayConstantStringName(size_t stridx, const Color &color, const Scriptable *speaker) const;	
-	void DisplayConstantStringName(size_t stridx, unsigned char color, const Scriptable *speaker) const;
-	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
-	void DisplayConstantStringNameValue(size_t stridx, unsigned char color, const Scriptable *speaker, int value) const;	
-	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(size_t stridx, unsigned char color, const Scriptable *actor, const Scriptable *target) const;
+	void DisplayConstantStringValue(size_t stridx, unsigned char color, ieDword value) const;	
 	/** displays actor name - action : parameter */
-	void DisplayConstantStringNameString(size_t stridx, unsigned char color, size_t stridx2, const Scriptable *actor) const;
+	void DisplayConstantStringName(size_t stridx, unsigned char color, const Scriptable *speaker) const;
+		/** displays a string constant in the textarea, starting with actor, and ending with target */
+	void DisplayConstantStringAction(size_t stridx, unsigned char color, const Scriptable *actor, const Scriptable *target) const;	
+	/** displays a string in the textarea, starting with speaker's name */
+	void DisplayStringName(ieStrRef stridx, unsigned char color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
-	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;
-	void DisplayString(String text, const Color &color, Scriptable *target) const;
 	void DisplayString(ieStrRef stridx, unsigned char color, STRING_FLAGS flags) const;
 	void DisplayString(const String& text, unsigned char color, Scriptable *target) const;
-	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
-	void DisplayStringName(ieStrRef stridx, unsigned char color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	void DisplayStringName(String text, unsigned char color, const Scriptable *speaker) const;
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>
