@@ -5136,11 +5136,10 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//apply effect, if the effect is a goner, then kill
 	//this effect too
-	const Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
-	if (!newfx)
+	Effect *myfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+	if (!myfx)
 		return FX_NOT_APPLIED;
 
-	Effect *myfx = new Effect(*newfx);
 	myfx->random_value = core->Roll(1,100,-1);
 	myfx->Target = FX_TARGET_PRESET;
 	myfx->TimingMode = fx->TimingMode;
@@ -5155,6 +5154,7 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
 			myfx->Source = fx->Source; // more?
 			target->fxqueue.AddEffect(myfx);
+			delete myfx;
 			return FX_NOT_APPLIED;
 		}
 		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
@@ -7073,15 +7073,14 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_apply_effect_repeat(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
-	//core->GetEffect is a borrowed reference, don't delete it
-	if (!newfx) {
-		return FX_NOT_APPLIED;
-	}
-
 	// don't apply the effect if a similar one is already applied with a shorter duration
 	const Effect *oldfx = target->fxqueue.HasEffect(fx_apply_effect_repeat_ref);
 	if (oldfx && oldfx->Duration < fx->Duration) {
+		return FX_NOT_APPLIED;
+	}
+	
+	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+	if (!newfx) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -7113,6 +7112,7 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			}
 			break;
 	}
+	delete newfx;
 	return FX_APPLIED;
 }
 
@@ -7283,9 +7283,8 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//apply effect, if the effect is a goner, then kill
 		//this effect too
-		const Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
-		if (newfx) {
-			Effect *myfx = new Effect(*newfx);
+		Effect *myfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+		if (myfx) {
 			myfx->random_value = fx->random_value;
 			myfx->TimingMode=fx->TimingMode;
 			myfx->Duration=fx->Duration;

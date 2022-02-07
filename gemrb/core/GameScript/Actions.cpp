@@ -7126,6 +7126,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	//int2param isn't actually used in the original engine
 
 	core->ApplyEffect(fx, actor, src);
+	delete fx;
 	// SpellCastEffect tries to keep the action alive until the effect is over
 	Sender->SetWait(adjustedDuration);
 }
@@ -7164,6 +7165,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->Pos = tar->Pos;
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, target, src);
+	delete fx;
 }
 
 void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
@@ -7196,6 +7198,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	}
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
+	delete fx;
 	// it should probably wait until projectile payload, but a single tick works well for the use in 41cnatew
 	Sender->SetWait(1);
 }

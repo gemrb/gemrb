@@ -281,9 +281,9 @@ void GameData::FreeSpell(const Spell *spl, const ResRef &name, bool free)
 
 Effect* GameData::GetEffect(const ResRef &resname)
 {
-	Effect *effect = (Effect *) EffectCache.GetResource(resname);
+	const Effect *effect = (const Effect *) EffectCache.GetResource(resname);
 	if (effect) {
-		return effect;
+		return new Effect(*effect);
 	}
 	DataStream* str = GetResource( resname, IE_EFF_CLASS_ID );
 	PluginHolder<EffectMgr> em = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
@@ -301,7 +301,7 @@ Effect* GameData::GetEffect(const ResRef &resname)
 	}
 
 	EffectCache.SetAt(resname, (void *) effect);
-	return effect;
+	return new Effect(*effect);
 }
 
 void GameData::FreeEffect(const Effect *eff, const ResRef &name, bool free)
