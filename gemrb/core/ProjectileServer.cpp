@@ -100,8 +100,8 @@ Projectile *ProjectileServer::CreateDefaultProjectile(size_t idx)
 		return pro;
 	}
 
-	pro->SetIdentifiers(projectiles[idx].first, idx);
-	projectiles[idx].second = make_unique<Projectile>(*pro);
+	pro->SetIdentifiers(projectiles[idx].resname, idx);
+	projectiles[idx].projectile = make_unique<Projectile>(*pro);
 	
 	return pro;
 }
@@ -114,7 +114,7 @@ Projectile *ProjectileServer::GetProjectileByName(const ResRef &resname)
 	}
 	size_t idx = GetHighestProjectileNumber();
 	while(idx--) {
-		if (resname == projectiles[idx].first) {
+		if (resname == projectiles[idx].resname) {
 			return GetProjectile(idx);
 		}
 	}
@@ -135,17 +135,17 @@ Projectile *ProjectileServer::GetProjectileByIndex(size_t idx)
 
 Projectile *ProjectileServer::ReturnCopy(size_t idx)
 {
-	Projectile *pro = new Projectile(*projectiles[idx].second);
-	pro->SetIdentifiers(projectiles[idx].first, idx);
+	Projectile *pro = new Projectile(*projectiles[idx].projectile);
+	pro->SetIdentifiers(projectiles[idx].resname, idx);
 	return pro;
 }
 
 Projectile *ProjectileServer::GetProjectile(size_t idx)
 {
-	if (projectiles[idx].second) {
+	if (projectiles[idx].projectile) {
 		return ReturnCopy(idx);
 	}
-	DataStream* str = gamedata->GetResource( projectiles[idx].first, IE_PRO_CLASS_ID );
+	DataStream* str = gamedata->GetResource( projectiles[idx].resname, IE_PRO_CLASS_ID );
 	PluginHolder<ProjectileMgr> sm = MakePluginHolder<ProjectileMgr>(IE_PRO_CLASS_ID);
 	if (!sm) {
 		delete str;
@@ -155,7 +155,7 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 		return CreateDefaultProjectile(idx);
 	}
 	Projectile *pro = new Projectile();
-	pro->SetIdentifiers(projectiles[idx].first, idx);
+	pro->SetIdentifiers(projectiles[idx].resname, idx);
 
 	sm->GetProjectile( pro );
 	int Type = 0xff;
@@ -203,7 +203,7 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 		pro->Extension->APFlags = explosions[Type].flags;
 	}
 
-	projectiles[idx].second = make_unique<Projectile>(*pro);
+	projectiles[idx].projectile = make_unique<Projectile>(*pro);
 	return pro;
 }
 
@@ -234,7 +234,7 @@ void ProjectileServer::AddSymbols(const std::shared_ptr<SymbolMgr>& projlist) {
 		if (value>MAX_PROJ_IDX) {
 			continue;
 		}
-		projectiles[value].first = ResRef::MakeUpperCase(projlist->GetStringIndex(rows));
+		projectiles[value].resname = ResRef::MakeUpperCase(projlist->GetStringIndex(rows));
 	}
 }
 

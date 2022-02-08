@@ -49,7 +49,11 @@ public:
 	Projectile *CreateDefaultProjectile(size_t idx);
 private:
 	//this represents a line of projectl.ids
-	using ProjectileEntry = std::pair<ResRef, std::unique_ptr<Projectile>>;
+	struct ProjectileEntry
+	{
+		ResRef resname;
+		std::unique_ptr<Projectile> projectile;
+	};
 	
 	struct ExplosionEntry
 	{
