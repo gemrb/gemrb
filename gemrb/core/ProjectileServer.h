@@ -34,24 +34,11 @@ class SymbolMgr;
 //the number of resrefs in areapro.2da (before the flags field)
 #define AP_RESCNT 5
 
-//this represents a line of projectl.ids
-struct ProjectileEntry
-{
-	ResRef resname;
-	std::unique_ptr<Projectile> projectile;
-};
-
-struct ExplosionEntry
-{
-	ResRef resources[AP_RESCNT];
-	int flags = 0;
-};
-
 //this singleton object serves the projectile objects
 class GEM_EXPORT ProjectileServer
 {
 public:
-	ProjectileServer();
+	ProjectileServer() noexcept;
 
 	Projectile *GetProjectileByIndex(size_t idx);
 	//it is highly unlikely we need this function
@@ -61,6 +48,19 @@ public:
 	//creates an empty projectile on the fly
 	Projectile *CreateDefaultProjectile(size_t idx);
 private:
+	//this represents a line of projectl.ids
+	struct ProjectileEntry
+	{
+		ResRef resname;
+		std::unique_ptr<Projectile> projectile;
+	};
+	
+	struct ExplosionEntry
+	{
+		ResRef resources[AP_RESCNT];
+		int flags = 0;
+	};
+
 	std::vector<ProjectileEntry> projectiles; //this is the list of projectiles
 	std::vector<ExplosionEntry> explosions;   //this is the list of explosion resources
 	// internal function: what is max valid projectile id?

@@ -34,7 +34,7 @@ namespace GemRB {
 
 #define MAX_PROJ_IDX  0x1fff
 
-ProjectileServer::ProjectileServer()
+ProjectileServer::ProjectileServer() noexcept
 {
 	// built-in gemrb projectiles and game/mod-provided projectiles
 	unsigned int gemresource = core->LoadSymbol("gemprjtl");
