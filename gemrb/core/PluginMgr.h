@@ -57,8 +57,7 @@ public:
 	/** Return global instance of PluginMgr */
 	static PluginMgr* Get();
 private:
-	PluginMgr() noexcept = default;
-	~PluginMgr() noexcept = default;
+	PluginMgr() noexcept {};
 private:
 	std::map< SClass_ID, PluginFunc> plugins;
 	std::map< const TypeID*, std::vector<ResourceDesc> > resources;
