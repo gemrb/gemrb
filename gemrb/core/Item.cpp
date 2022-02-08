@@ -48,13 +48,13 @@ Item::~Item()
 
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
-EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, ieDwordSigned invslot, ieDword pro) const
+EffectQueue Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, ieDwordSigned invslot, ieDword pro) const
 {
 	Effect *const *features = nullptr;
 	size_t count;
 
 	if (usage >= int(ext_headers.size())) {
-		return NULL;
+		return {};
 	}
 	if (usage>=0) {
 		features = ext_headers[usage].features.data();
@@ -65,7 +65,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 	}
 
 	//collecting all self affecting effects in a single queue, so the random value is rolled only once
-	EffectQueue *fxqueue = new EffectQueue();
+	EffectQueue fxqueue;
 	EffectQueue selfqueue;
 	Actor* target = Scriptable::As<Actor>(self);
 
@@ -87,7 +87,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 
 		if (fx->Target != FX_TARGET_SELF) {
 			fx->Projectile = pro;
-			fxqueue->AddEffect(new Effect(*fx));
+			fxqueue.AddEffect(new Effect(*fx));
 		} else {
 			fx->Projectile = 0;
 			fx->Pos = pos;
@@ -108,7 +108,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 		if (tmp) {
 			tmp->InventorySlot = invslot;
 			tmp->Projectile=pro;
-			fxqueue->AddEffect(tmp);
+			fxqueue.AddEffect(tmp);
 		}
 	}
 	return fxqueue;
@@ -217,9 +217,7 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 	else
 		usage = GetWeaponHeaderNumber(header==-2);
 	if (!miss) {
-		EffectQueue *fx = GetEffectBlock(self, target, usage, invslot, idx);
-		pro->SetEffects(std::move(*fx));
-		delete fx;
+		pro->SetEffects(GetEffectBlock(self, target, usage, invslot, idx));
 	}
 	pro->Range = eh->Range;
 	return pro;

@@ -233,12 +233,9 @@ void Inventory::AddSlotEffects(ieDword index)
 	}
 
 	//get the equipping effects
-	EffectQueue *eqfx = itm->GetEffectBlock(Owner, Owner->Pos, -1, index, 0);
-	gamedata->FreeItem( itm, slot->ItemResRef, false );
-
 	// always refresh, as even if eqfx is null, other effects may have been selfapplied from the block
-	Owner->AddEffects(std::move(*eqfx));
-	delete eqfx;
+	Owner->AddEffects(itm->GetEffectBlock(Owner, Owner->Pos, -1, index, 0));
+	gamedata->FreeItem(itm, slot->ItemResRef, false);
 	//call gui for possible paperdoll animation changes
 	if (Owner->InParty) {
 		core->SetEventFlag(EF_UPDATEANIM);
