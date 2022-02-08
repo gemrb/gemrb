@@ -135,9 +135,8 @@ Projectile *ProjectileServer::GetProjectileByIndex(size_t idx)
 
 Projectile *ProjectileServer::ReturnCopy(size_t idx)
 {
-	const ProjectileEntry& old = projectiles[idx];
-	Projectile *pro = new Projectile(*old.projectile);
-	pro->SetIdentifiers(old.resname, idx);
+	Projectile *pro = new Projectile(*projectiles[idx].projectile);
+	pro->SetIdentifiers(projectiles[idx].resname, idx);
 	return pro;
 }
 
