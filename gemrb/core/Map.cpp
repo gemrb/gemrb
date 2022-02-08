@@ -402,7 +402,7 @@ Map::Map(TileMap *tm, TileProps props, Holder<Sprite2D> sm)
 : Scriptable(ST_AREA),
 TMap(tm), tileProps(std::move(props)),
 SmallMap(std::move(sm)),
-ExploredBitmap(FogMapSize(), '\0'), VisibleBitmap(FogMapSize(), '\0'),
+ExploredBitmap(FogMapSize(), uint8_t(0x00)), VisibleBitmap(FogMapSize(), uint8_t(0x00)),
 reverb(*this)
 {
 	area = this;
