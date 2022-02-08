@@ -5154,7 +5154,6 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
 			myfx->Source = fx->Source; // more?
 			target->fxqueue.AddEffect(myfx);
-			delete myfx;
 			return FX_NOT_APPLIED;
 		}
 		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
