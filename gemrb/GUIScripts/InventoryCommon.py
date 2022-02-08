@@ -248,7 +248,7 @@ def GetItemDescription (item, itemtype):
 	# PST had "NOTE:" handling hardcoded, see string 49156 for explanation
 	# we support translated versions visible at least in Czech as well (POZN)
 	text = GemRB.GetString (text)
-	searchRE = re.compile(r'^([A-Z][A-Z][A-Z][A-Z][: ]..[a-z"].*?($|\r?\n(\r?\n)?))', re.MULTILINE | re.DOTALL)
+	searchRE = re.compile(r'^([A-Z][A-Z][A-Z][A-Z]+[: ]..[a-z"].*?($|\r?\n(\r?\n)?))', re.MULTILINE | re.DOTALL)
 	replacement = r"[color=ffffff]\1[/color]"
 	text = searchRE.sub(replacement, text)
 	return text
