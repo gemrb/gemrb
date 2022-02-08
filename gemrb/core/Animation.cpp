@@ -170,6 +170,10 @@ Animation::frame_t Animation::GetFrame(index_t i) const
 
 void Animation::MirrorAnimation(BlitFlags flags)
 {
+	if (flags == BlitFlags::NONE) {
+		return;
+	}
+
 	for (frame_t& sprite : frames) {
 		sprite = sprite->copy();
 
@@ -187,7 +191,7 @@ void Animation::MirrorAnimation(BlitFlags flags)
 		// flip animArea horizontally as well
 		animArea.x = -animArea.w - animArea.x;
 	}
-	
+
 	if (flags & BlitFlags::MIRRORY) {
 		// flip animArea vertically as well
 		animArea.y = -animArea.h - animArea.y;
