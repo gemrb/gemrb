@@ -38,6 +38,7 @@
 #include "Spellbook.h"
 #include "Video/Video.h"
 
+#include <array>
 #include <map>
 #include <set>
 #include <vector>
@@ -297,10 +298,12 @@ using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
 
 class GEM_EXPORT Actor : public Movable {
 public:
+	using stat_t = ieDword;
+	using stats_t = std::array<stat_t, MAX_STATS>;
 	//CRE DATA FIELDS
-	ieDword BaseStats[MAX_STATS]{};
-	ieDword Modified[MAX_STATS]{};
-	ieDword* PrevStats = nullptr;
+	stats_t BaseStats {};
+	stats_t Modified {};
+	stat_t* PrevStats = nullptr;
 	ieByteSigned DeathCounters[4]{}; // PST specific (good, law, lady, murder)
 
 	ResRef BardSong;               //custom bard song (updated by fx)

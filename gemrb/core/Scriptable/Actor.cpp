@@ -572,7 +572,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
 	}
 	SetCircleSize();
-	anims->SetColors(BaseStats+IE_COLORS);
+	anims->SetColors(&BaseStats[IE_COLORS]);
 
 	// PST and EE 2.0+ use an ini to define animation data, including walk and run speed
 	// the rest had it hardcoded
@@ -1470,7 +1470,7 @@ static void pcf_color(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (anims) {
-		anims->SetColors(actor->Modified+IE_COLORS);
+		anims->SetColors(&actor->Modified[IE_COLORS]);
 	}
 }
 
@@ -1482,7 +1482,7 @@ static void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 	}
 }
 
-static unsigned int maximum_values[MAX_STATS]={
+static Actor::stats_t maximum_values = {
 32767,32767,20,100,100,100,100,25,10,25,25,25,25,25,200,200,//0f
 200,200,200,200,200,100,100,100,100,100,255,255,255,255,100,100,//1f
 200,200,MAX_LEVEL,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
@@ -2641,7 +2641,7 @@ void Actor::UnlockPalette()
 {
 	if (!anims) return;
 	anims->lockPalette=false;
-	anims->SetColors(Modified+IE_COLORS);
+	anims->SetColors(&Modified[IE_COLORS]);
 }
 
 void Actor::AddAnimation(const ResRef& resource, int gradient, int height, int flags)
@@ -2992,7 +2992,7 @@ void Actor::CheckPuppet(Actor *puppet, ieDword type)
 /** call this after load, to apply effects */
 void Actor::RefreshEffects(EffectQueue *fx)
 {
-	ieDword previous[MAX_STATS];
+	stats_t previous;
 
 	//put all special cleanup calls here
 	if (anims) {
@@ -3007,13 +3007,14 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	if (first) {
 		InternalFlags|=IF_INITIALIZED;
-		memcpy( previous, BaseStats, MAX_STATS * sizeof( ieDword ) );
+		previous = BaseStats;
+		PrevStats = &BaseStats[0];
 	} else {
-		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
+		previous = Modified;
+		PrevStats = &Modified[0];
 	}
-	PrevStats = &previous[0];
 
-	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
+	Modified = BaseStats;
 	if (PCStats) {
 		PCStats->States = PCStatsStruct::StateArray();
 	}
@@ -3029,7 +3030,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		delete fx;
 		//copy back the original stats, because the effects
 		//will be reapplied in ApplyAllEffects again
-		memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
+		Modified = BaseStats;
 		if (SpellStatesSize) {
 			memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
 		}
@@ -5007,14 +5008,7 @@ void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radi
 	also with iwd2's 3rd ed rules, this is why it is a separate function */
 ieDword Actor::GetXPLevel(int modified) const
 {
-	const ieDword *stats;
-
-	if (modified) {
-		stats = Modified;
-	}
-	else {
-		stats = BaseStats;
-	}
+	const stats_t& stats = modified ? Modified : BaseStats;
 
 	size_t clscount = 0;
 	float average = 0;
@@ -5906,12 +5900,7 @@ int Actor::GetHpAdjustment(int multiplier, bool modified) const
 		return 0;
 	}
 
-	const ieDword *stats;
-	if (modified) {
-		stats = Modified;
-	} else {
-		stats = BaseStats;
-	}
+	const stats_t& stats = modified ? Modified : BaseStats;
 
 	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
@@ -5958,7 +5947,7 @@ void Actor::InitStatsOnLoad()
 
 	SetupFist();
 	//initial setup of modified stats
-	memcpy(Modified, BaseStats, sizeof(Modified));
+	Modified = BaseStats;
 }
 
 //most feats are simulated via spells (feat<xx>)
@@ -10294,7 +10283,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->SetName(GetShortName(), 0);
 	newActor->SetName(GetName(),1);
 	newActor->version = version;
-	memcpy(newActor->BaseStats, BaseStats, sizeof(BaseStats) );
+	newActor->BaseStats = BaseStats;
 	// illusions aren't worth any xp and don't explore
 	newActor->BaseStats[IE_XPVALUE] = 0;
 	newActor->BaseStats[IE_EXPLORE] = 0;
@@ -10303,7 +10292,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->SetMCFlag(MC_EXPORTABLE, BitOp::NAND);
 
 	//the creature importer does this too
-	memcpy(newActor->Modified,newActor->BaseStats, sizeof(Modified) );
+	newActor->Modified = newActor->BaseStats;
 
 	//copy the inventory, but only if it is not the Mislead illusion
 	if (mislead) {
