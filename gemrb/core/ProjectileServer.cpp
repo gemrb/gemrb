@@ -100,9 +100,10 @@ Projectile *ProjectileServer::CreateDefaultProjectile(size_t idx)
 		return pro;
 	}
 
-	projectiles[idx].projectile = pro;
 	pro->SetIdentifiers(projectiles[idx].resname, idx);
-	return ReturnCopy(idx);
+	projectiles[idx].projectile = make_unique<Projectile>(*pro);
+	
+	return pro;
 }
 
 //this function can return only projectiles listed in projectl.ids
@@ -155,7 +156,6 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 		return CreateDefaultProjectile(idx);
 	}
 	Projectile *pro = new Projectile();
-	projectiles[idx].projectile = pro;
 	pro->SetIdentifiers(projectiles[idx].resname, idx);
 
 	sm->GetProjectile( pro );
@@ -204,7 +204,8 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 		pro->Extension->APFlags = explosions[Type].flags;
 	}
 
-	return ReturnCopy(idx);
+	projectiles[idx].projectile = make_unique<Projectile>(*pro);
+	return pro;
 }
 
 size_t ProjectileServer::PrepareSymbols(const std::shared_ptr<SymbolMgr>& projlist) const

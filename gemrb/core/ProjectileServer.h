@@ -25,6 +25,8 @@
 
 #include "Projectile.h"
 
+#include <memory>
+
 namespace GemRB {
 
 class SymbolMgr;
@@ -35,18 +37,8 @@ class SymbolMgr;
 //this represents a line of projectl.ids
 struct ProjectileEntry
 {
-	ProjectileEntry() noexcept = default;
-	ProjectileEntry(const ProjectileEntry&) = delete;
-	ProjectileEntry(ProjectileEntry&&) noexcept = default;
-	ProjectileEntry& operator=(const ProjectileEntry&) = delete;
-	ProjectileEntry& operator=(ProjectileEntry&&) noexcept = default;
-	~ProjectileEntry() noexcept
-	{
-		delete projectile;
-	}
-
 	ResRef resname;
-	Projectile *projectile = nullptr;
+	std::unique_ptr<Projectile> projectile;
 };
 
 struct ExplosionEntry
