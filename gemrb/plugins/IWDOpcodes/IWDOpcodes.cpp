@@ -2715,11 +2715,10 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	EffectQueue *fxqueue = spell->GetEffectBlock(Owner, fx->Pos, 0, fx->CasterLevel);
-	fxqueue->SetOwner(Owner);
+	EffectQueue fxqueue = spell->GetEffectBlock(Owner, fx->Pos, 0, fx->CasterLevel);
+	fxqueue.SetOwner(Owner);
 	//bit 2 original target is excluded or not excluded
-	fxqueue->AffectAllInRange(map, fx->Pos, 0, 0,fx->Parameter1, fx->Parameter2&AE_TARGETEXCL?target:NULL);
-	delete fxqueue;
+	fxqueue.AffectAllInRange(map, fx->Pos, 0, 0,fx->Parameter1, fx->Parameter2&AE_TARGETEXCL?target:NULL);
 
 	//bit 1 repeat or only once
 	if (fx->Parameter2&AE_REPEAT) {
@@ -2938,9 +2937,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	if (pro) {
 		Point origin = fx->Pos;
 
-		EffectQueue* queue = spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2);
-		pro->SetEffects(std::move(*queue));
-		delete queue;
+		pro->SetEffects(spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2));
 		pro->SetCaster(fx->CasterID, fx->CasterLevel);
 		if (target) {
 			map->AddProjectile( pro, origin, target->GetGlobalID(), false);

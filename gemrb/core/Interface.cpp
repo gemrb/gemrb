@@ -3850,10 +3850,9 @@ void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *cas
 	}
 
 	int header = spell->GetHeaderIndexFromLevel(level);
-	EffectQueue *fxqueue = spell->GetEffectBlock(caster, actor->Pos, header, level);
 
-	ApplyEffectQueue(fxqueue, actor, caster, actor->Pos);
-	delete fxqueue;
+	auto block = spell->GetEffectBlock(caster, actor->Pos, header, level);
+	ApplyEffectQueue(&block, actor, caster, actor->Pos);
 }
 
 void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level) const

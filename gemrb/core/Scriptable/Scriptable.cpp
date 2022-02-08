@@ -1360,25 +1360,23 @@ int Scriptable::SpellCast(bool instant, Scriptable *target)
 	}
 	if (actor) {
 		//cfb
-		EffectQueue *fxqueue = new EffectQueue();
+		EffectQueue fxqueue;
 		// casting glow is always on the caster
 		if (!(actor->Modified[IE_AVATARREMOVAL] || instant)) {
 			ieDword gender = actor->GetCGGender();
-			fxqueue->SetOwner(actor);
-			spl->AddCastingGlow(fxqueue, duration, gender);
-			fxqueue->AddAllEffects(actor, Point());
+			fxqueue.SetOwner(actor);
+			spl->AddCastingGlow(&fxqueue, duration, gender);
+			fxqueue.AddAllEffects(actor, Point());
 		}
-		delete fxqueue;
 
 		// actual cfb
 		fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
-		fxqueue->SetOwner(actor);
+		fxqueue.SetOwner(actor);
 		if (target && target->Type == ST_ACTOR) {
-			fxqueue->AddAllEffects((Actor *)target, target->Pos);
+			fxqueue.AddAllEffects((Actor *)target, target->Pos);
 		} else {
-			fxqueue->AddAllEffects(actor, actor->Pos);
+			fxqueue.AddAllEffects(actor, actor->Pos);
 		}
-		delete fxqueue;
 		actor->WMLevelMod = 0;
 		if (actor->Modified[IE_FORCESURGE] == 1) {
 			// affects only the next spell cast, but since the timing is permanent,

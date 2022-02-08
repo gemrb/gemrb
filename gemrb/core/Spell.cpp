@@ -144,7 +144,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 	fxqueue->AddEffect(fx);
 }
 
-EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro)
+EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro)
 {
 	bool pst_hostile = false;
 	std::vector<Effect>* features;
@@ -168,7 +168,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		features = &casting_features;
 		count = CastingFeatureCount;
 	}
-	EffectQueue *fxqueue = new EffectQueue();
+	EffectQueue fxqueue;
 	EffectQueue selfqueue;
 
 	for (size_t i = 0; i < count; ++i) {
@@ -228,7 +228,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 
 		if (fx.Target != FX_TARGET_SELF) {
 			fx.Projectile = pro;
-			fxqueue->AddEffect(new Effect(fx));
+			fxqueue.AddEffect(new Effect(fx));
 		} else {
 			fx.Projectile = 0;
 			fx.Pos = pos;
@@ -254,9 +254,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->features.size()) {
-		EffectQueue* queue = GetEffectBlock(self, target, header, level, seh->ProjectileAnimation);
-		pro->SetEffects(std::move(*queue));
-		delete queue;
+		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
 	}
 	pro->Range = GetCastingDistance(self);
 	return pro;
