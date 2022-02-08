@@ -19,6 +19,7 @@
  */
 
 #include "Effect.h"
+#include "EffectQueue.h" // this is only needed for a hack in Effect::Persistent
 
 namespace GemRB {
 
@@ -152,6 +153,31 @@ bool Effect::HasDuration() const
 		return true;
 	}
 	return false;
+}
+
+//returns true if the effect must be saved
+bool Effect::Persistent() const
+{
+	// local variable effects self-destruct if they were processed already
+	// but if they weren't processed, e.g. in a global actor, we must save them
+	// TODO: do we really need to special-case this? leaving it for now - fuzzie
+	static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
+	if (Opcode == (ieDword)EffectQueue::ResolveEffect(fx_variable_ref)) {
+		return true;
+	}
+
+	switch (TimingMode) {
+		//normal equipping fx of items
+		case FX_DURATION_INSTANT_WHILE_EQUIPPED:
+		//delayed effect not saved
+		case FX_DURATION_DELAY_UNSAVED:
+		//permanent effect not saved
+		case FX_DURATION_PERMANENT_UNSAVED:
+		//just expired effect
+		case FX_DURATION_JUST_EXPIRED:
+			return false;
+	}
+	return true;
 }
 
 } // namespace GemRB

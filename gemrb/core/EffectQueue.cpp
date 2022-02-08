@@ -55,7 +55,6 @@ static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
 static EffectRef fx_spell_focus_ref = { "SpellFocus", -1 };
 static EffectRef fx_spell_resistance_ref = { "SpellResistance", -1 };
 static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
-static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
 static EffectRef fx_activate_spell_sequencer_ref = { "Sequencer:Activate", -1 };
 
 // immunity effects (setters of IE_IMMUNITY)
@@ -2057,30 +2056,6 @@ std::string EffectQueue::dump() const
 	return buffer;
 }
 
-//returns true if the effect must be saved
-bool EffectQueue::Persistent(const Effect& fx)
-{
-	// local variable effects self-destruct if they were processed already
-	// but if they weren't processed, e.g. in a global actor, we must save them
-	// TODO: do we really need to special-case this? leaving it for now - fuzzie
-	if( fx.Opcode==(ieDword) ResolveEffect(fx_variable_ref)) {
-		return true;
-	}
-
-	switch (fx.TimingMode) {
-		//normal equipping fx of items
-		case FX_DURATION_INSTANT_WHILE_EQUIPPED:
-		//delayed effect not saved
-		case FX_DURATION_DELAY_UNSAVED:
-		//permanent effect not saved
-		case FX_DURATION_PERMANENT_UNSAVED:
-		//just expired effect
-		case FX_DURATION_JUST_EXPIRED:
-			return false;
-	}
-	return true;
-}
-
 //alter the color effect in case the item is equipped in the shield slot
 void EffectQueue::HackColorEffects(const Actor *Owner, Effect *fx)
 {
@@ -2100,7 +2075,7 @@ const Effect *EffectQueue::GetNextSavedEffect(queue_t::const_iterator &f) const
 	while(f!=effects.end()) {
 		const Effect& effect = *f;
 		f++;
-		if (Persistent(effect)) {
+		if (effect.Persistent()) {
 			return &effect;
 		}
 	}
@@ -2165,7 +2140,7 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 	ieDword cnt = 0;
 
 	for (const auto& fx : effects) {
-		if (Persistent(fx)) cnt++;
+		if (fx.Persistent()) cnt++;
 	}
 	return cnt;
 }

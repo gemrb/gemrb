@@ -140,13 +140,6 @@ class Scriptable;
 /** Prototype of a function implementing a particular Effect opcode */
 using EffectFunction = int (*)(Scriptable*, Actor*, Effect*);
 
-
-/** Cached Effect -> opcode mapping */
-struct EffectRef {
-	const char* Name;
-	int opcode;
-};
-
 /** Links Effect name to a function implementing the effect */
 class EffectDesc {
 	EffectFunction Function;
@@ -306,8 +299,6 @@ public:
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
 	void DispelEffects(const Effect *dispeller, ieDword level);
 
-	/* returns true if the effect should be saved */
-	static bool Persistent(const Effect& fx);
 	/* returns next saved effect, increases index */
 	queue_t::iterator GetFirstEffect()
 	{

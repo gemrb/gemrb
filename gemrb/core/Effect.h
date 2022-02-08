@@ -85,6 +85,13 @@ namespace GemRB {
  * @class Effect
  * Structure holding information about single spell or spell-like effect.
  */
+
+/** Cached Effect -> opcode mapping */
+struct EffectRef {
+	const char* Name;
+	int opcode;
+};
+
 struct ResourceGroup {
 	//keep these four in one bunch, VariableName will
 	//spread across them
@@ -172,6 +179,9 @@ public:
 	
 	//returns true if the effect supports simplified duration
 	bool HasDuration() const;
+	
+	//returns true if the effect must be saved
+	bool Persistent() const;
 };
 
 }
