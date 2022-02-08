@@ -5336,7 +5336,7 @@ static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *
 
 	map->AddActor(fam, true);
 	fam->SetPosition(fx->Pos, true, 0);
-	fam->RefreshEffects(NULL);
+	fam->RefreshEffects();
 	//Make the familiar an NPC (MoveGlobal needs this)
 	Game *game = core->GetGame();
 	game->AddNPC(fam);

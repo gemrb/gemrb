@@ -1266,7 +1266,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		act->SetOrientation(orientation, false);
 		act->TalkCount = talkCount;
 		act->RemovalTime = removalTime;
-		act->RefreshEffects(nullptr);
+		act->RefreshEffects();
 	}
 
 	core->LoadProgress(90);

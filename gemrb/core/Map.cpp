@@ -1946,7 +1946,7 @@ void Map::UpdateEffects()
 {
 	size_t i = actors.size();
 	while (i--) {
-		actors[i]->RefreshEffects(NULL);
+		actors[i]->RefreshEffects();
 	}
 }
 
@@ -3230,7 +3230,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 			creature->HomeLocation = pos;
 			creature->maxWalkDistance = rwdist;
 			creature->Spawned = true;
-			creature->RefreshEffects(NULL);
+			creature->RefreshEffects();
 			if (difficulty && !sg) *difficulty -= cpl;
 			if (creCount) (*creCount)++;
 			spawned = true;

@@ -237,7 +237,8 @@ void Inventory::AddSlotEffects(ieDword index)
 	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
 	// always refresh, as even if eqfx is null, other effects may have been selfapplied from the block
-	Owner->RefreshEffects(eqfx);
+	Owner->AddEffects(std::move(*eqfx));
+	delete eqfx;
 	//call gui for possible paperdoll animation changes
 	if (Owner->InParty) {
 		core->SetEventFlag(EF_UPDATEANIM);
@@ -249,7 +250,7 @@ void Inventory::AddSlotEffects(ieDword index)
 void Inventory::RemoveSlotEffects(ieDword index)
 {
 	if (Owner->fxqueue.RemoveEquippingEffects(index)) {
-		Owner->RefreshEffects(NULL);
+		Owner->RefreshEffects();
 		//call gui for possible paperdoll animation changes
 		if (Owner->InParty) {
 			core->SetEventFlag(EF_UPDATEANIM);

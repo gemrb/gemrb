@@ -9367,7 +9367,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 			return AttributeError("Invalid slot");
 		}
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
-		actor->RefreshEffects(NULL);
+		actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 		core->SetEventFlag(EF_SELECTION);
 	}
@@ -9594,7 +9594,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			// switched items, not returned by normal AddSlotItem
 			res = ASI_SWAPPED;
 			//EquipItem (in AddSlotItem) already called RefreshEffects
-			actor->RefreshEffects(NULL);
+			actor->RefreshEffects();
 			actor->ReinitQuickSlots();
 			core->SetEventFlag(EF_SELECTION);
 		} else {

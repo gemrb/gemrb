@@ -508,7 +508,8 @@ public:
 	/** some hardcoded effects in puppetmaster based on puppet type */
 	void CheckPuppet(Actor *puppet, ieDword type);
 	/** Re/Inits the Modified vector */
-	void RefreshEffects(EffectQueue *eqfx);
+	void RefreshEffects();
+	void AddEffects(EffectQueue&& eqfx);
 	/** gets saving throws */
 	void RollSaves();
 	/** returns a saving throw */

@@ -331,7 +331,7 @@ void Game::ConsolidateParty() const
 		}
 	}
 	for (auto pc : PCs) {
-		pc->RefreshEffects(nullptr);
+		pc->RefreshEffects();
 
 		// restore modal spell, including the main bardsong
 		// but iwds offer multiple bardsongs to choose from, stored as the first quickspell

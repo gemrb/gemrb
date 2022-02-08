@@ -3019,28 +3019,29 @@ Actor::stats_t Actor::ResetStats(bool init)
 }
 
 /** call this after load, to apply effects */
-void Actor::RefreshEffects(EffectQueue *fx)
+void Actor::AddEffects(EffectQueue&& fx)
+{
+	fx.SetOwner(this);
+	fx.AddAllEffects(this, Pos);
+	//copy back the original stats, because the effects
+	//will be reapplied in ApplyAllEffects again
+	Modified = BaseStats;
+	if (SpellStatesSize) {
+		memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
+	}
+	//also clear the spell bonuses just given, they will be
+	//recalculated below again
+	spellbook.ClearBonus();
+	//AC.ResetAll(); // TODO: check if this is needed
+	//ToHit.ResetAll();
+	
+	RefreshEffects();
+}
+	
+void Actor::RefreshEffects()
 {
 	bool first = !(InternalFlags&IF_INITIALIZED); //initialize base stats
 	stats_t previous = ResetStats(first);
-
-	if (fx) {
-		fx->SetOwner(this);
-		fx->AddAllEffects(this, Pos);
-		delete fx;
-		//copy back the original stats, because the effects
-		//will be reapplied in ApplyAllEffects again
-		Modified = BaseStats;
-		if (SpellStatesSize) {
-			memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
-		}
-		//also clear the spell bonuses just given, they will be
-		//recalculated below again
-		spellbook.ClearBonus();
-		//AC.ResetAll(); // TODO: check if this is needed
-		//ToHit.ResetAll();
-	}
-
 	// some VVCs are controlled by stats (and so by PCFs), the rest have 'effect_owned' set
 	for (ScriptedAnimation* vvc : vfxQueue) {
 		if (vvc->effect_owned) vvc->active = false;
@@ -10313,16 +10314,13 @@ Actor *Actor::CopySelf(bool mislead) const
 
 	newActor->CreateDerivedStats();
 
-	//copy the running effects
-	EffectQueue* newFXQueue = new EffectQueue(fxqueue);
-
 	area->AddActor(newActor, true);
 	newActor->SetPosition( Pos, CC_CHECK_IMPASSABLE, 0 );
 	newActor->SetOrientation(GetOrientation(), false);
 	newActor->SetStance( IE_ANI_READY );
 
-	//and apply them
-	newActor->RefreshEffects(newFXQueue);
+	//copy the running effects
+	newActor->AddEffects(EffectQueue(fxqueue));
 	return newActor;
 }
 

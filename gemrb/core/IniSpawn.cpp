@@ -610,7 +610,7 @@ void IniSpawn::RespawnNameless()
 
 	nameless->Resurrect(NamelessSpawnPoint);
 	// resurrect leaves you at 1hp for raise dead, so manually bump it back to max
-	nameless->RefreshEffects(NULL);
+	nameless->RefreshEffects();
 	nameless->SetBase(IE_HITPOINTS, 9999);
 
 	// reselect nameless, since he didn't really 'die'
