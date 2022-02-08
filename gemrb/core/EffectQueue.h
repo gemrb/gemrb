@@ -397,6 +397,8 @@ private:
 	bool WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const;
 };
 
+static_assert(std::is_nothrow_move_constructible<EffectQueue>::value, "EffectQueue should be noexcept MoveConstructible");
+
 }
 
 #endif // ! EFFECTQUEUE_H
