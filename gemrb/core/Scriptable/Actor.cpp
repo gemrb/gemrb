@@ -2988,12 +2988,8 @@ void Actor::CheckPuppet(Actor *puppet, ieDword type)
 	Modified[IE_PUPPETID] = puppet->GetGlobalID();
 }
 
-
-/** call this after load, to apply effects */
-void Actor::RefreshEffects(EffectQueue *fx)
+Actor::stats_t Actor::ResetStats(bool init)
 {
-	stats_t previous;
-
 	//put all special cleanup calls here
 	if (anims) {
 		anims->CheckColorMod();
@@ -3001,18 +2997,6 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	spellbook.ClearBonus();
 	BardSong.Reset();
 	memset(projectileImmunity,0,ProjectileSize*sizeof(ieDword));
-
-	//initialize base stats
-	bool first = !(InternalFlags&IF_INITIALIZED);
-
-	if (first) {
-		InternalFlags|=IF_INITIALIZED;
-		previous = BaseStats;
-		PrevStats = &BaseStats[0];
-	} else {
-		previous = Modified;
-		PrevStats = &Modified[0];
-	}
 
 	Modified = BaseStats;
 	if (PCStats) {
@@ -3023,6 +3007,22 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 	AC.ResetAll();
 	ToHit.ResetAll(); // effects can result in the change of any of the boni, so we need to reset all
+	
+	if (init) {
+		InternalFlags|=IF_INITIALIZED;
+		PrevStats = &BaseStats[0];
+		return BaseStats;
+	} else {
+		PrevStats = &Modified[0];
+		return Modified;
+	}
+}
+
+/** call this after load, to apply effects */
+void Actor::RefreshEffects(EffectQueue *fx)
+{
+	bool first = !(InternalFlags&IF_INITIALIZED); //initialize base stats
+	stats_t previous = ResetStats(first);
 
 	if (fx) {
 		fx->SetOwner(this);
