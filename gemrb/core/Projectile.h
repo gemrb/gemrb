@@ -197,6 +197,13 @@ class GEM_EXPORT Projectile
 {
 public:
 	Projectile() noexcept;
+	~Projectile() noexcept = default;
+	
+	Projectile(const Projectile&) noexcept = default;
+	Projectile(Projectile&&) noexcept = default;
+	
+	Projectile& operator=(const Projectile&) noexcept = default;
+	Projectile& operator=(Projectile&&) noexcept = default;
 
 	ieWord Speed = 20;
 	ieDword SFlags = PSF_FLYING;
