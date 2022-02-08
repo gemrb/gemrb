@@ -3865,22 +3865,26 @@ void AreaAnimation::InitAnimation()
 	
 	auto GetAnimationPiece = [af, this](Animation::index_t animCycle)
 	{
+		Animation ret;
 		Animation *anim = af->GetCycle(animCycle);
 		if (!anim)
 			anim = af->GetCycle(0);
 		
 		assert(anim);
+		ret = std::move(*anim);
+		delete anim;
+		
 		//this will make the animation stop when the game is stopped
 		//a possible gemrb feature to have this flag settable in .are
-		anim->gameAnimation = true;
-		anim->SetFrame(frame); // sanity check it first
-		anim->Flags = Flags;
-		anim->pos = Pos;
-		if (anim->Flags&A_ANI_MIRROR) {
-			anim->MirrorAnimation(BlitFlags::MIRRORX);
+		ret.gameAnimation = true;
+		ret.SetFrame(frame); // sanity check it first
+		ret.Flags = Flags;
+		ret.pos = Pos;
+		if (ret.Flags & A_ANI_MIRROR) {
+			ret.MirrorAnimation(BlitFlags::MIRRORX);
 		}
 
-		return anim;
+		return ret;
 	};
 
 	size_t animcount = af->GetCycleCount();
@@ -3890,19 +3894,13 @@ void AreaAnimation::InitAnimation()
 	if (Flags & A_ANI_ALLCYCLES && animcount > 0) {
 		size_t i = 0;
 		for (; i < existingcount; ++i) {
-			Animation* anim = GetAnimationPiece(i);
-			animation[i] = std::move(*anim);
-			delete anim;
+			animation[i] = GetAnimationPiece(i);
 		}
 		for (; i < animcount; ++i) {
-			Animation* anim = GetAnimationPiece(i);
-			animation.push_back(std::move(*anim));
-			delete anim;
+			animation.push_back(GetAnimationPiece(i));
 		}
 	} else if (animcount) {
-		Animation* anim = GetAnimationPiece(sequence);
-		animation.push_back(std::move(*anim));
-		delete anim;
+		animation.push_back(GetAnimationPiece(sequence));
 	}
 	
 	if (Flags & A_ANI_PALETTE) {
