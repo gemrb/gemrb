@@ -4517,7 +4517,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		// common fists do normal damage, but cause sleeping for a round instead of death
 		if (Modified[IE_MINHITPOINTS] <= 0 && AttackIsStunning(damagetype)) {
 			// stack unconsciousness carefully to avoid replaying the stance changing
-			Effect *sleep = fxqueue.HasEffectWithParamPair(fx_sleep_ref, 0, 0);
+			Effect *sleep = const_cast<Effect*>(fxqueue.HasEffectWithParamPair(fx_sleep_ref, 0, 0)); // FIXME: const_cast
 			if (sleep) {
 				sleep->Duration += core->Time.round_sec;
 			} else {
@@ -9522,13 +9522,13 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 			} else {
 				AttackEffect->IsVariable = flags&UI_CRITICAL;
 			}
-			pro->GetEffects()->AddEffect(AttackEffect, true);
+			pro->GetEffects().AddEffect(AttackEffect, true);
 			if (ranged) {
-				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_ranged_ref);
+				fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_ranged_ref);
 			} else {
 				// EEs add a a single bit to fx_melee for only applying with monk fists
 				int param2 = (inventory.FistsEquipped() && GetMonkLevel()) ? 4 : 0;
-				fxqueue.AddWeaponEffects(pro->GetEffects(), fx_melee_ref, param2);
+				fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_melee_ref, param2);
 				// ignore timestop
 				pro->TFlags |= PTF_TIMELESS;
 			}
@@ -10327,7 +10327,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->CreateDerivedStats();
 
 	//copy the running effects
-	EffectQueue *newFXQueue = fxqueue.CopySelf();
+	EffectQueue* newFXQueue = new EffectQueue(fxqueue);
 
 	area->AddActor(newActor, true);
 	newActor->SetPosition( Pos, CC_CHECK_IMPASSABLE, 0 );

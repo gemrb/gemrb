@@ -34,8 +34,6 @@
 
 namespace GemRB {
 
-class Actor;
-
 //local variables in creatures are stored in fake opcodes
 #define FAKE_VARIABLE_OPCODE 187
 #define FAKE_VARIABLE_MARKER 1
@@ -97,7 +95,7 @@ struct ResourceGroup {
 };
 
 // the same as ITMFeature and SPLFeature
-struct Effect {
+struct GEM_EXPORT Effect {
 	ieDword Opcode = 0;
 	ieDword Target = 0;
 	ieDword Power = 0; // the effect level
@@ -154,16 +152,8 @@ struct Effect {
 	ieDword SpellLevel = 0; // Power does not always contain the Source level, which is needed in iwd2; items will be left at 0
 public:
 	//don't modify position in case it was already set
-	void SetPosition(const Point &p) {
-		if (Pos.IsInvalid()) {
-			Pos = p;
-		}
-	}
-	void SetSourcePosition(const Point &p) {
-		if (Source.IsInvalid()) {
-			Source = p;
-		}
-	}
+	void SetPosition(const Point &p);
+	void SetSourcePosition(const Point &p);
 	
 	Effect() noexcept
 	: resources()
@@ -171,103 +161,17 @@ public:
 		// must define our own empty ctor due to union type
 		// union is already 0 initialized so there is nothing else to do
 	}
+	
+	Effect(const Effect& rhs) noexcept;
 
-	Effect(const Effect& rhs) noexcept {
-		Opcode = rhs.Opcode;
-		Target = rhs.Target;
-		Power = rhs.Power;
-		Parameter1 = rhs.Parameter1;
-		Parameter2 = rhs.Parameter2;
-		TimingMode = rhs.TimingMode;
-		// skip unknown2
-		Resistance = rhs.Resistance;
-		Duration = rhs.Duration;
-		ProbabilityRangeMax = rhs.ProbabilityRangeMax;
-		ProbabilityRangeMin = rhs.ProbabilityRangeMin;
-		DiceThrown = rhs.DiceThrown;
-		DiceSides = rhs.DiceSides;
-		SavingThrowType = rhs.SavingThrowType;
-		SavingThrowBonus = rhs.SavingThrowBonus;
-		IsVariable = rhs.IsVariable;
-		IsSaveForHalfDamage = rhs.IsSaveForHalfDamage;
-		PrimaryType = rhs.PrimaryType;
-		MinAffectedLevel = rhs.MinAffectedLevel;
-		MaxAffectedLevel = rhs.MaxAffectedLevel;
-		Parameter3 = rhs.Parameter3;
-		Parameter4 = rhs.Parameter4;
-		Parameter5 = rhs.Parameter5;
-		Parameter6 = rhs.Parameter6;
-		Source = rhs.Source;
-		Pos = rhs.Pos;
-		SourceType = rhs.SourceType;
-		SourceRef = rhs.SourceRef;
-		SourceFlags = rhs.SourceFlags;
-		Projectile = rhs.Projectile;
-		InventorySlot = rhs.InventorySlot;
-		CasterLevel = rhs.CasterLevel;
-		FirstApply = rhs.FirstApply;
-		SecondaryType = rhs.SecondaryType;
-		SecondaryDelay = rhs.SecondaryDelay;
-		CasterID = rhs.CasterID;
-		random_value = rhs.random_value;
-		SpellLevel = rhs.SpellLevel;
-
-		IsVariable = rhs.IsVariable;
-		if (IsVariable) {
-			VariableName = rhs.VariableName;
-		} else {
-			resources = rhs.resources;
-		}
-	}
+	Effect& operator=(const Effect& rhs) noexcept;
 
 	~Effect() noexcept = default;
 
-	bool operator==(const Effect& rhs) const noexcept {
-		if (this == &rhs) return true;
-		
-		if (Opcode != rhs.Opcode) return false;
-		if (Target != rhs.Target) return false;
-		if (Power != rhs.Power) return false;
-		if (Parameter1 != rhs.Parameter1) return false;
-		if (Parameter2 != rhs.Parameter2) return false;
-		if (TimingMode != rhs.TimingMode) return false;
-		// skip unknown2
-		if (Resistance != rhs.Resistance) return false;
-		if (Duration != rhs.Duration) return false;
-		if (ProbabilityRangeMax != rhs.ProbabilityRangeMax) return false;
-		if (ProbabilityRangeMin != rhs.ProbabilityRangeMin) return false;
-		if (DiceThrown != rhs.DiceThrown) return false;
-		if (DiceSides != rhs.DiceSides) return false;
-		if (SavingThrowType != rhs.SavingThrowType) return false;
-		if (SavingThrowBonus != rhs.SavingThrowBonus) return false;
-		if (IsVariable != rhs.IsVariable) return false;
-		if (IsSaveForHalfDamage != rhs.IsSaveForHalfDamage) return false;
-		if (PrimaryType != rhs.PrimaryType) return false;
-		if (MinAffectedLevel != rhs.MinAffectedLevel) return false;
-		if (MaxAffectedLevel != rhs.MaxAffectedLevel) return false;
-		if (Parameter3 != rhs.Parameter3) return false;
-		if (Parameter4 != rhs.Parameter4) return false;
-		if (Parameter5 != rhs.Parameter5) return false;
-		if (Parameter6 != rhs.Parameter6) return false;
-		if (Source != rhs.Source) return false;
-		if (Pos != rhs.Pos) return false;
-		if (SourceType != rhs.SourceType) return false;
-		if (SourceRef != rhs.SourceRef) return false;
-		if (SourceFlags != rhs.SourceFlags) return false;
-		if (Projectile != rhs.Projectile) return false;
-		if (InventorySlot != rhs.InventorySlot) return false;
-		if (CasterLevel != rhs.CasterLevel) return false;
-		if (FirstApply != rhs.FirstApply) return false;
-		if (SecondaryType != rhs.SecondaryType) return false;
-		if (SecondaryDelay != rhs.SecondaryDelay) return false;
-		if (CasterID != rhs.CasterID) return false;
-		if (random_value != rhs.random_value) return false;
-		if (SpellLevel != rhs.SpellLevel) return false;
-
-		if (IsVariable && strnicmp(VariableName.CString(), rhs.VariableName.CString(), sizeof(VariableName)) != 0) return false;
-		else return Resource == rhs.Resource && Resource2 == rhs.Resource2 && Resource3 == rhs.Resource3 && Resource4 == rhs.Resource4;
-		
-	}
+	bool operator==(const Effect& rhs) const noexcept;
+	
+	//returns true if the effect supports simplified duration
+	bool HasDuration() const;
 };
 
 }

@@ -30,13 +30,13 @@
 
 using namespace GemRB;
 
-SDL12VideoDriver::SDL12VideoDriver(void)
+SDL12VideoDriver::SDL12VideoDriver() noexcept
 {
 	disp = NULL;
 	inTextInput = false;
 }
 
-SDL12VideoDriver::~SDL12VideoDriver()
+SDL12VideoDriver::~SDL12VideoDriver() noexcept
 {
 	if (gameController != nullptr) {
  		SDL_JoystickClose(gameController);

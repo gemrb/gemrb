@@ -688,7 +688,7 @@ int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2) my_opcode = EffectQueue::ResolveEffect(fx_wound_ref);
 	else my_opcode = EffectQueue::ResolveEffect(fx_poison_ref);
 	// print("fx_slow_poison(%2d): Damage %d", fx->Opcode, fx->Parameter1);
-	std::list< Effect* >::const_iterator f=target->fxqueue.GetFirstEffect();
+	auto f = target->fxqueue.GetFirstEffect();
 	Effect *poison;
 	//this is intentionally an assignment
 	while( (poison = target->fxqueue.GetNextEffect(f)) ) {
@@ -2710,7 +2710,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	fx->Parameter4 = game->GameTime+fx->Parameter3;
 
-	const Spell *spell = gamedata->GetSpell(fx->Resource);
+	Spell *spell = gamedata->GetSpell(fx->Resource);
 	if (!spell) {
 		return FX_NOT_APPLIED;
 	}
@@ -2930,7 +2930,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	const Spell* spl = gamedata->GetSpell(fx->Resource);
+	Spell* spl = gamedata->GetSpell(fx->Resource);
 	//create projectile from known spellheader
 	//cannot get the projectile from the spell
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
@@ -2938,7 +2938,9 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	if (pro) {
 		Point origin = fx->Pos;
 
-		pro->SetEffects(spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2));
+		EffectQueue* queue = spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2);
+		pro->SetEffects(std::move(*queue));
+		delete queue;
 		pro->SetCaster(fx->CasterID, fx->CasterLevel);
 		if (target) {
 			map->AddProjectile( pro, origin, target->GetGlobalID(), false);

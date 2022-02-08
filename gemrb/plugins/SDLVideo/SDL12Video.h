@@ -33,8 +33,8 @@ private:
 	DPadSoftKeyboard dPadSoftKeyboard;
 
 public:
-	SDL12VideoDriver(void);
-	~SDL12VideoDriver() override;
+	SDL12VideoDriver() noexcept;
+	~SDL12VideoDriver() noexcept override;
 	
 	int Init(void) override;
 	void SetWindowTitle(const char *title) override { SDL_WM_SetCaption(title, 0); };

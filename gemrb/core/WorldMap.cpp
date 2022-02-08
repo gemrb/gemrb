@@ -94,17 +94,17 @@ ieDword WMPAreaEntry::GetAreaStatus() const
 
 //Allocate AE and AL only in Core, otherwise Win32 will
 //be buggy
-void WorldMap::AddAreaEntry(WMPAreaEntry *ae)
+void WorldMap::AddAreaEntry(WMPAreaEntry&& ae)
 {
-	area_entries.push_back(ae);
+	area_entries.push_back(std::move(ae));
 }
 
-void WorldMap::AddAreaLink(WMPAreaLink *al)
+void WorldMap::AddAreaLink(WMPAreaLink&& al)
 {
-	area_links.push_back(al);
+	area_links.push_back(std::move(al));
 }
 
-void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
+void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry&& ae)
 {
 	//if index is too large, we break
 	if (x>area_entries.size()) {
@@ -112,33 +112,28 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
 	}
 	//altering an existing entry
 	if (x<area_entries.size()) {
-		if (area_entries[x]) {
-			delete area_entries[x];
-		}
-		area_entries[x]=ae;
-		return;
+		area_entries[x] = std::move(ae);
+	} else {
+		//adding a new entry
+		area_entries.push_back(std::move(ae));
 	}
-	//adding a new entry
-	area_entries.push_back(ae);
 }
 
-void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, const WMPAreaLink *arealink)
+void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLink&& arealink)
 {
-	WMPAreaLink *al = new WMPAreaLink(*arealink);
-	unsigned int idx = area_entries[areaidx]->AreaLinksIndex[dir];
-	area_links.insert(area_links.begin()+idx,al);
+	unsigned int idx = area_entries[areaidx].AreaLinksIndex[dir];
+	area_links.emplace(area_links.begin()+idx, std::move(arealink));
 
-	WMPAreaEntry *ae;
 	size_t max = area_entries.size();
 	for (unsigned int pos = 0; pos < max; pos++) {
-		ae = area_entries[pos];
+		WMPAreaEntry& ae = area_entries[pos];
 		for (unsigned int k=0;k<4;k++) {
 			if ((pos==areaidx) && (k==dir)) {
-				ae->AreaLinksCount[k]++;
+				ae.AreaLinksCount[k]++;
 				continue;
 			}
-			if(ae->AreaLinksIndex[k]>=idx) {
-				ae->AreaLinksIndex[k]++;
+			if(ae.AreaLinksIndex[k]>=idx) {
+				ae.AreaLinksIndex[k]++;
 			}
 		}
 	}
@@ -146,39 +141,17 @@ void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, const WMPA
 
 void WorldMap::SetAreaLink(unsigned int x, const WMPAreaLink *arealink)
 {
-	WMPAreaLink *al = new WMPAreaLink(*arealink);
-
 	//if index is too large, we break
 	if (x>area_links.size()) {
 		error("WorldMap", "Trying to set invalid link ({}/{})", x, area_links.size());
 	}
 	//altering an existing link
 	if (x<area_links.size()) {
-		if (area_links[x]) {
-			delete area_links[x];
-		}
-		area_links[x]=al;
-		return;
+		area_links[x] = WMPAreaLink(*arealink);
+	} else {
+		//adding a new link
+		area_links.emplace_back(*arealink);
 	}
-	//adding a new link
-	area_links.push_back(al);
-}
-
-WorldMap::~WorldMap() noexcept
-{
-	for (auto entry : area_entries) {
-		delete entry;
-	}
-	for (auto link : area_links) {
-		delete link;
-	}
-	if (Distances) {
-		free(Distances);
-	}
-	if (GotHereFrom) {
-		free(GotHereFrom);
-	}
-	if (bam) bam = NULL;
 }
 
 void WorldMap::SetMapIcons(AnimationFactory *newicons)
@@ -191,19 +164,37 @@ void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 	MapMOS = std::move(newmos);
 }
 
-WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
+WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i)
 {
 	i=(unsigned int) area_entries.size();
 	while (i--) {
-		if (areaName == area_entries[i]->AreaName) {
-			return area_entries[i];
+		if (areaName == area_entries[i].AreaName) {
+			return &area_entries[i];
 		}
 	}
 	// try also with the original name (needed for centering on Candlekeep)
 	i = (unsigned int) area_entries.size();
 	while (i--) {
-		if (areaName == area_entries[i]->AreaResRef) {
-			return area_entries[i];
+		if (areaName == area_entries[i].AreaResRef) {
+			return &area_entries[i];
+		}
+	}
+	return NULL;
+}
+
+const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
+{
+	i=(unsigned int) area_entries.size();
+	while (i--) {
+		if (areaName == area_entries[i].AreaName) {
+			return &area_entries[i];
+		}
+	}
+	// try also with the original name (needed for centering on Candlekeep)
+	i = (unsigned int) area_entries.size();
+	while (i--) {
+		if (areaName == area_entries[i].AreaResRef) {
+			return &area_entries[i];
 		}
 	}
 	return NULL;
@@ -213,7 +204,7 @@ WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
 //Counting backwards, stop at 1000 boundaries.
 //It is not possible to simply round to 1000, because there are 
 //WMP entries like AR8001, and we need to find the best match
-WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned int &i) const
+const WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned int &i) const
 {
 	int value = 0;
 	ResRef tmp;
@@ -221,7 +212,7 @@ WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned int &i
 	sscanf(areaName.CString() + 2, "%4d", &value);
 	do {
 		tmp.SNPrintF("%.2s%04d", areaName.CString(), value);
-		WMPAreaEntry* ret = GetArea(tmp, i);
+		const WMPAreaEntry* ret = GetArea(tmp, i);
 		if (ret) {
 			return ret;
 		}
@@ -254,68 +245,59 @@ int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 		Log(ERROR, "WorldMap", "CalculateDistances for invalid Area: {}", areaName);
 		return -1;
 	}
-	if (Distances) {
-		free(Distances);
-	}
-	if (GotHereFrom) {
-		free(GotHereFrom);
-	}
 
 	Log(MESSAGE, "WorldMap", "CalculateDistances for Area: {}", areaName);
 
-	size_t memsize =sizeof(int) * area_entries.size();
-	Distances = (int *) malloc( memsize );
-	GotHereFrom = (int *) malloc( memsize );
-	memset( Distances, -1, memsize );
-	memset( GotHereFrom, -1, memsize );
+	Distances = std::vector<int>(area_entries.size(), -1);
+	GotHereFrom = std::vector<int>(area_entries.size(), -1);
+
 	Distances[i] = 0; //setting our own distance
 	GotHereFrom[i] = -1; //we didn't move
 
-	int *seen_entry = (int *) malloc( memsize );
+	std::vector<int> seen_entry(area_entries.size());
 
 	std::list<int> pending;
 	pending.push_back(i);
 	while(!pending.empty()) {
 		i=pending.front();
 		pending.pop_front();
-		const WMPAreaEntry* ae = area_entries[i];
-		memset( seen_entry, -1, memsize );
+		const WMPAreaEntry& ae = area_entries[i];
+		std::fill(seen_entry.begin(), seen_entry.end(), -1);
 		//all directions should be used
 		for(int d=0;d<4;d++) {
-			int j=ae->AreaLinksIndex[d];
-			int k=j+ae->AreaLinksCount[d];
+			int j=ae.AreaLinksIndex[d];
+			int k=j+ae.AreaLinksCount[d];
 			if ((size_t) k>area_links.size()) {
 				Log(ERROR, "WorldMap", "The worldmap file is corrupted... and it would crash right now! Entry #: {} Direction: {}",
 					i, d);
 				break;
 			}
 			for(;j<k;j++) {
-				const WMPAreaLink* al = area_links[j];
-				const WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
+				const WMPAreaLink& al = area_links[j];
+				const WMPAreaEntry& ae2 = area_entries[al.AreaIndex];
 				unsigned int mydistance = (unsigned int) Distances[i];
 
 				// we must only process the FIRST seen link to each area from this one
-				if (seen_entry[al->AreaIndex] != -1) continue;
-				seen_entry[al->AreaIndex] = 0;
+				if (seen_entry[al.AreaIndex] != -1) continue;
+				seen_entry[al.AreaIndex] = 0;
 /*
 				if ( ( (ae->GetAreaStatus() & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
 				( (ae2->GetAreaStatus() & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
 */
-				if ( (ae2->GetAreaStatus() & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE) {
+				if ( (ae2.GetAreaStatus() & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE) {
 					// al->Flags is the entry direction
-					mydistance += al->DistanceScale * 4;
+					mydistance += al.DistanceScale * 4;
 					//nonexisting distance is the biggest!
-					if ((unsigned) Distances[al->AreaIndex] > mydistance) {
-						Distances[al->AreaIndex] = mydistance;
-						GotHereFrom[al->AreaIndex] = j;
-						pending.push_back(al->AreaIndex);
+					if ((unsigned) Distances[al.AreaIndex] > mydistance) {
+						Distances[al.AreaIndex] = mydistance;
+						GotHereFrom[al.AreaIndex] = j;
+						pending.push_back(al.AreaIndex);
 					}
 				}
 			}
 		}
 	}
 
-	free(seen_entry);
 	return 0;
 }
 
@@ -324,13 +306,13 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 {
 	unsigned int cnt = GetEntryCount();
 	for (unsigned int i = 0; i < cnt; i++) {
-		const WMPAreaEntry *ae = area_entries[i];
+		const WMPAreaEntry& ae = area_entries[i];
 		for (int direction=0;direction<4;direction++)
 		{
-			int j=ae->AreaLinksIndex[direction];
+			int j=ae.AreaLinksIndex[direction];
 			if (link_index < j) continue;
 
-			j += ae->AreaLinksCount[direction];
+			j += ae.AreaLinksCount[direction];
 			if (link_index < j) {
 				return i;
 			}
@@ -339,7 +321,7 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 	return (ieDword) -1;
 }
 
-WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
+WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B)
 {
 	unsigned int i;
 	const WMPAreaEntry *ae = GetArea(A, i);
@@ -352,11 +334,11 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 		unsigned int j = ae->AreaLinksCount[i];
 		unsigned int k = ae->AreaLinksIndex[i];
 		while(j--) {
-			WMPAreaLink *al = area_links[k++];
-			const WMPAreaEntry *ae2 = area_entries[al->AreaIndex];
+			WMPAreaLink& al = area_links[k++];
+			const WMPAreaEntry& ae2 = area_entries[al.AreaIndex];
 			//or arearesref?
-			if (ae2->AreaName == B) {
-				return al;
+			if (ae2.AreaName == B) {
+				return &al;
 			}
 		}
 	}
@@ -366,11 +348,8 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 //call this function to find out which area we fall into
 //not necessarily the target area
 //if it isn't the same, then a random encounter happened!
-WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter) const
+WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 {
-	if (!GotHereFrom) {
-		return NULL;
-	}
 	unsigned int i;
 	const WMPAreaEntry *ae = GetArea(areaName, i); //target area
 	if (!ae) {
@@ -381,7 +360,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 	Log(DEBUG, "WorldMap", "Gathering path information for: {}", areaName);
 	while (GotHereFrom[i]!=-1) {
 		Log(DEBUG, "WorldMap", "Adding path to {}", i);
-		walkpath.push_back(area_links[GotHereFrom[i]]);
+		walkpath.push_back(&area_links[GotHereFrom[i]]);
 		i = WhoseLinkAmI(GotHereFrom[i]);
 		if (i==(ieDword) -1) {
 			error("WorldMap", "Something has been screwed up here (incorrect path)!");
@@ -392,7 +371,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 	if (walkpath.empty()) {
 		return NULL;
 	}
-	std::list<WMPAreaLink*>::reverse_iterator p=walkpath.rbegin();
+	auto p = walkpath.rbegin();
 	WMPAreaLink *lastpath;
 	encounter=false;
 	do {
@@ -419,7 +398,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	//determine the area the link came from
 	unsigned int j, cnt = GetLinkCount();
 	for (j = 0; j < cnt; ++j) {
-		if (link == area_links[j]) {
+		if (link == &area_links[j]) {
 			break;
 		}
 	}
@@ -430,49 +409,48 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 		return;
 	}
 
-	WMPAreaEntry *ae = new WMPAreaEntry();
-	ae->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, BitOp::SET);
-	ae->AreaName = area;
-	ae->AreaResRef = area;
-	ae->LocCaptionName = ieStrRef::INVALID;
-	ae->LocTooltipName = ieStrRef::INVALID;
-	ae->IconSeq = -1;
-	ae->LoadScreenResRef.Reset();
+	WMPAreaEntry ae;
+	ae.SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, BitOp::SET);
+	ae.AreaName = area;
+	ae.AreaResRef = area;
+	ae.LocCaptionName = ieStrRef::INVALID;
+	ae.LocTooltipName = ieStrRef::INVALID;
+	ae.IconSeq = -1;
+	ae.LoadScreenResRef.Reset();
 
-	const WMPAreaEntry *src = area_entries[i];
-	const WMPAreaEntry *dest = area_entries[link->AreaIndex];
-	ae->pos.x = src->pos.x + (dest->pos.x - src->pos.x) / 2;
-	ae->pos.y = src->pos.y + (dest->pos.y - src->pos.y) / 2;
+	const WMPAreaEntry& src = area_entries[i];
+	const WMPAreaEntry& dest = area_entries[link->AreaIndex];
+	ae.pos.x = src.pos.x + (dest.pos.x - src.pos.x) / 2;
+	ae.pos.y = src.pos.y + (dest.pos.y - src.pos.y) / 2;
 
 	//setup the area links
-	WMPAreaLink *ldest = new WMPAreaLink(*link);
-	ldest->DistanceScale /= 2;
-	ldest->EncounterChance = 0;
 
-	link = GetLink(dest->AreaName, src->AreaName);
+	link = GetLink(dest.AreaName, src.AreaName);
 	if (!link) {
 		Log(ERROR, "WorldMap", "Could not find link from {} to {}",
-			dest->AreaName.CString(), src->AreaName.CString());
-		delete ae;
-		delete ldest;
+			dest.AreaName, src.AreaName);
 		return;
 	}
+	
+	WMPAreaLink ldest = *link;
+	ldest.DistanceScale /= 2;
+	ldest.EncounterChance = 0;
 
-	WMPAreaLink *lsrc = new WMPAreaLink(*link);
-	lsrc->DistanceScale /= 2;
-	lsrc->EncounterChance = 0;
+	WMPAreaLink lsrc = *link;
+	lsrc.DistanceScale /= 2;
+	lsrc.EncounterChance = 0;
 
 	size_t idx = area_links.size();
-	AddAreaLink(ldest);
-	AddAreaLink(lsrc);
+	AddAreaLink(std::move(ldest));
+	AddAreaLink(std::move(lsrc));
 
 	for (i = 0; i < 4; ++i) {
-		ae->AreaLinksCount[i] = 2;
-		ae->AreaLinksIndex[i] = static_cast<ieDword>(idx);
+		ae.AreaLinksCount[i] = 2;
+		ae.AreaLinksIndex[i] = static_cast<ieDword>(idx);
 	}
 	
 	encounterArea = area_entries.size();
-	AddAreaEntry(ae);
+	AddAreaEntry(std::move(ae));
 }
 
 void WorldMap::ClearEncounterArea()
@@ -481,29 +459,20 @@ void WorldMap::ClearEncounterArea()
 		return;
 	}
 
-	WMPAreaEntry *ea = area_entries[encounterArea];
-	area_entries.erase(area_entries.begin() + encounterArea);
-
-	WMPAreaLink *l = area_links[ea->AreaLinksIndex[0]];
-	delete l;
-	l = area_links[ea->AreaLinksIndex[0] + 1];
-	delete l;
+	WMPAreaEntry& ea = area_entries[encounterArea];
 
 	//NOTE: if anything else added links after us we'd have to globally
 	//update all link indices, but since ambush areas do not allow
 	//saving/loading we should be okay with this
-	area_links.erase(area_links.begin() + ea->AreaLinksIndex[0],
-		area_links.begin() + ea->AreaLinksIndex[0] + ea->AreaLinksCount[0]);
+	area_links.erase(area_links.begin() + ea.AreaLinksIndex[0],
+		area_links.begin() + ea.AreaLinksIndex[0] + ea.AreaLinksCount[0]);
 
-	delete ea;
+	area_entries.erase(area_entries.begin() + encounterArea);
 	encounterArea = -1;
 }
 
 int WorldMap::GetDistance(const ResRef& areaName) const
 {
-	if (!Distances) {
-		return -1;
-	}
 	unsigned int i;
 	if (GetArea(areaName, i)) {
 		return Distances[i];
@@ -526,16 +495,16 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 		return;
 	i=ae->AreaLinksCount[direction];
 	while (i--) {
-		const WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction] + i];
-		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
-		if (ae2->GetAreaStatus()&WMP_ENTRY_ADJACENT) {
-			Log(DEBUG, "WorldMap", "Updated Area visibility: {} (accessible and visible)", ae2->AreaName);
-			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
+		const WMPAreaLink& al = area_links[ae->AreaLinksIndex[direction] + i];
+		WMPAreaEntry& ae2 = area_entries[al.AreaIndex];
+		if (ae2.GetAreaStatus()&WMP_ENTRY_ADJACENT) {
+			Log(DEBUG, "WorldMap", "Updated Area visibility: {} (accessible and visible)", ae2.AreaName);
+			ae2.SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 		}
 	}
 }
 
-void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, BitOp Op) const
+void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, BitOp Op)
 {
 	unsigned int i;
 	WMPAreaEntry* ae = GetArea(areaName, i);
@@ -544,7 +513,7 @@ void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, BitOp Op) const
 	ae->SetAreaStatus(Bits, Op);
 }
 
-void WorldMap::UpdateReachableAreas() const
+void WorldMap::UpdateReachableAreas()
 {
 	AutoTable tab = gamedata->LoadTable("worlde", true);
 	if (!tab) {

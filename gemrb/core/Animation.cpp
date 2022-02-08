@@ -28,12 +28,11 @@
 
 namespace GemRB {
 
-Animation::Animation(std::vector<frame_t> fr)
+Animation::Animation(std::vector<frame_t> fr) noexcept
 : frames(std::move(fr))
 {
 	size_t count = frames.size();
 	assert(count > 0);
-	indicesCount = count;
 	frameIdx = RAND<index_t>(0, count-1);
 	Flags = A_ANI_ACTIVE;
 
@@ -48,7 +47,7 @@ Animation::Animation(std::vector<frame_t> fr)
 
 void Animation::SetFrame(index_t index)
 {
-	if (index<indicesCount) {
+	if (index < frames.size()) {
 		frameIdx = index;
 	}
 	starttime = 0;
@@ -58,7 +57,7 @@ void Animation::SetFrame(index_t index)
 Animation::index_t Animation::GetCurrentFrameIndex() const
 {
 	if (playReversed)
-		return indicesCount - frameIdx - 1;
+		return frames.size() - frameIdx - 1;
 	return frameIdx;
 }
 
@@ -80,7 +79,7 @@ Animation::frame_t Animation::LastFrame(void)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[indicesCount - frameIdx - 1];
+		ret = frames[frames.size() - frameIdx - 1];
 	else
 		ret = frames[frameIdx];
 	return ret;
@@ -101,7 +100,7 @@ Animation::frame_t Animation::NextFrame(void)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[indicesCount - frameIdx - 1];
+		ret = frames[frames.size() - frameIdx - 1];
 	else
 		ret = frames[frameIdx];
 
@@ -117,13 +116,13 @@ Animation::frame_t Animation::NextFrame(void)
 		frameIdx += inc;
 		starttime += inc*1000/fps;
 	}
-	if (frameIdx >= indicesCount ) {
-		if (indicesCount) {
+	if (frameIdx >= frames.size()) {
+		if (!frames.empty()) {
 			if (Flags&A_ANI_PLAYONCE) {
-				frameIdx = indicesCount-1;
+				frameIdx = frames.size() - 1;
 				endReached = true;
 			} else {
-				frameIdx %= indicesCount;
+				frameIdx %= frames.size();
 				endReached = false; //looping, there is no end
 			}
 		} else {
@@ -142,7 +141,7 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[indicesCount - frameIdx - 1];
+		ret = frames[frames.size() - frameIdx - 1];
 	else
 		ret = frames[frameIdx];
 
@@ -150,7 +149,7 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 	endReached = master->endReached;
 
 	//return a valid frame even if the master is longer (e.g. ankhegs)
-	frameIdx = master->frameIdx % indicesCount;
+	frameIdx = master->frameIdx % frames.size();
 
 	return ret;
 }
@@ -163,7 +162,7 @@ void Animation::release(void)
 /** Gets the i-th frame */
 Animation::frame_t Animation::GetFrame(index_t i) const
 {
-	if (i >= indicesCount) {
+	if (i >= frames.size()) {
 		return NULL;
 	}
 	return frames[i];
@@ -171,9 +170,8 @@ Animation::frame_t Animation::GetFrame(index_t i) const
 
 void Animation::MirrorAnimation(BlitFlags flags)
 {
-	for (size_t i = 0; i < indicesCount; i++) {
-		const frame_t& sprite = frames[i]->copy();
-		frames[i] = sprite;
+	for (frame_t& sprite : frames) {
+		sprite = sprite->copy();
 
 		if (flags & BlitFlags::MIRRORX) {
 			sprite->renderFlags ^= BlitFlags::MIRRORX;

@@ -49,7 +49,12 @@ public:
 	Region animArea;
 	ieDword Flags;
 
-	explicit Animation(std::vector<frame_t>);
+	explicit Animation(std::vector<frame_t>) noexcept;
+	Animation() noexcept = default;
+	
+	operator bool() const {
+		return GetFrameCount();
+	}
 
 	frame_t CurrentFrame() const;
 	frame_t LastFrame();
@@ -65,14 +70,13 @@ public:
 	/** Sets ScriptName for area animation */
 	void SetScriptName(const char *name);
 	/** returns the frame count */
-	index_t GetFrameCount() const { return indicesCount; }
+	index_t GetFrameCount() const { return frames.size(); }
 	/** returns the current frame's index */
 	index_t GetCurrentFrameIndex() const;
 	/** add other animation's animarea to self */
 	void AddAnimArea(const Animation* slave);
 private:
 	std::vector<frame_t> frames;
-	index_t indicesCount;
 	tick_t starttime = 0;
 };
 

@@ -24,9 +24,4 @@ namespace GemRB {
 
 const TypeID SoundMgr::ID = { "SoundMgr" };
 
-SoundMgr::SoundMgr(void)
-	: samples( 0 ), channels( 0 ), samplerate( 0 )
-{
-}
-
 }

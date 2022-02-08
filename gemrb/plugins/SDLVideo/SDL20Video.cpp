@@ -28,7 +28,7 @@
 
 using namespace GemRB;
 
-SDL20VideoDriver::SDL20VideoDriver(void)
+SDL20VideoDriver::SDL20VideoDriver() noexcept
 {
 	renderer = NULL;
 	window = NULL;
@@ -46,7 +46,7 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	sdl2_runtime_version = SDL_VERSIONNUM(ver.major, ver.minor, ver.patch);
 }
 
-SDL20VideoDriver::~SDL20VideoDriver(void)
+SDL20VideoDriver::~SDL20VideoDriver() noexcept
 {
 	if (SDL_GameControllerGetAttached(gameController)) {
 		SDL_GameControllerClose(gameController);

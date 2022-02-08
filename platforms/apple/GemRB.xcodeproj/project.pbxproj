@@ -116,6 +116,7 @@
 		A24C80AF232C9DC2004CB41A /* libvlccore.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */; };
 		A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9E1884CA8600431DEE /* CircularBuffer.h */; };
 		A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9F1884CA8600431DEE /* ie_cursors.h */; };
+		A24FB4A027B172A500C6AAC2 /* Effect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24FB49F27B172A500C6AAC2 /* Effect.cpp */; };
 		A25F91E9269931220045F07A /* RLE.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91E5269931220045F07A /* RLE.h */; };
 		A25F91EA269931220045F07A /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91E6269931220045F07A /* Video.cpp */; };
 		A25F91EB269931220045F07A /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91E6269931220045F07A /* Video.cpp */; };
@@ -1241,6 +1242,7 @@
 		A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlccore.9.dylib; path = ../../../../../Applications/VLC.app/Contents/MacOS/lib/libvlccore.9.dylib; sourceTree = "<group>"; };
 		A24E7B9E1884CA8600431DEE /* CircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircularBuffer.h; sourceTree = "<group>"; };
 		A24E7B9F1884CA8600431DEE /* ie_cursors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_cursors.h; sourceTree = "<group>"; };
+		A24FB49F27B172A500C6AAC2 /* Effect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Effect.cpp; sourceTree = "<group>"; };
 		A25F91E5269931220045F07A /* RLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLE.h; sourceTree = "<group>"; };
 		A25F91E6269931220045F07A /* Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Video.cpp; sourceTree = "<group>"; };
 		A25F91E7269931220045F07A /* Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Video.h; sourceTree = "<group>"; };
@@ -5157,6 +5159,7 @@
 				A2BF9FB61395FF61006ADC12 /* DialogMgr.h */,
 				A2BF9FB71395FF61006ADC12 /* DisplayMessage.cpp */,
 				A2BF9FB81395FF61006ADC12 /* DisplayMessage.h */,
+				A24FB49F27B172A500C6AAC2 /* Effect.cpp */,
 				A2BF9FB91395FF61006ADC12 /* Effect.h */,
 				A2BF9FBB1395FF61006ADC12 /* EffectMgr.h */,
 				A2BF9FBC1395FF61006ADC12 /* EffectQueue.cpp */,
@@ -9639,6 +9642,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */,
+				A24FB4A027B172A500C6AAC2 /* Effect.cpp in Sources */,
 				A2D672E11B30F40C00264D16 /* WindowManager.cpp in Sources */,
 				A2A05CE927A47E29000FB625 /* String.cpp in Sources */,
 				A2E66350139E882900310FC8 /* Ambient.cpp in Sources */,

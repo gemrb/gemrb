@@ -27,7 +27,7 @@ namespace GemRB {
 #define MINCOL 2
 #define MUL    2
 
-Palette::Palette(const Color &color, const Color &back)
+Palette::Palette(const Color &color, const Color &back) noexcept
 : Palette()
 {
 	col[0] = Color(0, 0xff, 0, 0);
@@ -42,7 +42,7 @@ Palette::Palette(const Color &color, const Color &back)
 	}
 }
 
-void Palette::UpdateAlpha()
+void Palette::UpdateAlpha() noexcept
 {
 	// skip index 0 which is always the color key
 	for (int i = 1; i < 256; ++i) {
@@ -55,20 +55,20 @@ void Palette::UpdateAlpha()
 	alpha = false;
 }
 
-void Palette::CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const
+void Palette::CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const noexcept
 {
 	// no update to alpha or version, hence being private
 	std::copy(srcBeg, srcEnd, dst);
 }
 
-void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst)
+void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst) noexcept
 {
 	CopyColorRangePrivate(srcBeg, srcEnd, &col[dst]);
 	UpdateAlpha();
 	version++;
 }
 
-void Palette::CreateShadedAlphaChannel()
+void Palette::CreateShadedAlphaChannel() noexcept
 {
 	for (int i = 1; i < 256; ++i) {
 		Color& c = col[i];
@@ -84,7 +84,7 @@ void Palette::CreateShadedAlphaChannel()
 	version++;
 }
 
-void Palette::Brighten()
+void Palette::Brighten() noexcept
 {
 	for (auto& c : col) {
 		c.r = (c.r + 256) / 2;
@@ -94,12 +94,12 @@ void Palette::Brighten()
 	version++;
 }
 
-PaletteHolder Palette::Copy() const
+PaletteHolder Palette::Copy() const noexcept
 {
 	return MakeHolder<Palette>(std::begin(col), std::end(col));
 }
 
-void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
+void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type) noexcept
 {
 	unsigned int s = Clamp<ieDword>(8*type, 0, 8*sizeof(ieDword)-1);
 	constexpr uint8_t numCols = 12;
@@ -151,7 +151,7 @@ void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 
 
 static inline void applyMod(const Color& src, Color& dest,
-							const RGBModifier& mod) {
+							const RGBModifier& mod) noexcept {
 	if (mod.speed == -1) {
 		if (mod.type == RGBModifier::TINT) {
 			dest.r = ((unsigned int)src.r * mod.rgb.r)>>8;
@@ -231,7 +231,7 @@ static inline void applyMod(const Color& src, Color& dest,
 }
 
 void Palette::SetupRGBModification(const PaletteHolder& src, const RGBModifier* mods,
-	unsigned int type)
+	unsigned int type) noexcept
 {
 	const RGBModifier* tmods = mods+(8*type);
 	int i;
@@ -282,7 +282,7 @@ void Palette::SetupRGBModification(const PaletteHolder& src, const RGBModifier* 
 }
 
 void Palette::SetupGlobalRGBModification(const PaletteHolder& src,
-	const RGBModifier& mod)
+	const RGBModifier& mod) noexcept
 {
 	// don't modify the transparency and shadow colour
 	for (int i = 0; i < 2; ++i) {
@@ -296,11 +296,11 @@ void Palette::SetupGlobalRGBModification(const PaletteHolder& src,
 	version++;
 }
 
-bool Palette::operator==(const Palette& other) const {
+bool Palette::operator==(const Palette& other) const noexcept {
 	return memcmp(col, other.col, sizeof(col)) == 0;
 }
 
-bool Palette::operator!=(const Palette& other) const {
+bool Palette::operator!=(const Palette& other) const noexcept {
 	return !(*this == other);
 }
 

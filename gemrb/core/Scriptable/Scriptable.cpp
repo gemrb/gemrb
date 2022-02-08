@@ -703,14 +703,13 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 
 	int count;
 	const Actor *newact = nullptr;
-	const SPLExtHeader* seh = nullptr;
-	Effect* fx = nullptr;
+	SPLExtHeader* seh = nullptr;
 	// check for target (type) change
 	switch (caster->wildSurgeMods.target_change_type) {
 		case WSTC_SETTYPE:
 			seh = &spl->ext_headers[SpellHeader];
-			for (Effect* feature : seh->features) {
-				feature->Target = caster->wildSurgeMods.target_type;
+			for (Effect& feature : seh->features) {
+				feature.Target = caster->wildSurgeMods.target_type;
 			}
 			// we need to fetch the projectile, so the effect queue is created
 			// (skipped above)
@@ -722,13 +721,12 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 			// TODO: unhardcode to allow for mixing all the target types
 			// caster gets selftargeting fx when the projectile is fetched above
 			seh = &spl->ext_headers[SpellHeader];
-			for (Effect* feature : seh->features) {
-				if (feature->Target == FX_TARGET_SELF) {
-					feature->Target = caster->wildSurgeMods.target_type;
+			for (Effect& feature : seh->features) {
+				if (feature.Target == FX_TARGET_SELF) {
+					feature.Target = caster->wildSurgeMods.target_type;
 				} else {
 					// also apply to the caster
-					fx = feature;
-					core->ApplyEffect(fx, caster, caster);
+					core->ApplyEffect(&feature, caster, caster);
 				}
 			}
 			// we need to refetch the projectile, so the effect queue is created
@@ -755,9 +753,9 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 			// make it also work for self-targeting spells:
 			// change the payload or this was all in vain
 			seh = &spl->ext_headers[SpellHeader];
-			for (Effect* feature : seh->features) {
-				if (feature->Target == FX_TARGET_SELF) {
-					feature->Target = FX_TARGET_PRESET;
+			for (Effect& feature : seh->features) {
+				if (feature.Target == FX_TARGET_SELF) {
+					feature.Target = FX_TARGET_PRESET;
 				}
 			}
 			// we need to fetch the projectile, so the effect queue is created
@@ -773,8 +771,8 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 	// apply the saving throw mod
 	if (caster->wildSurgeMods.saving_throw_mod) {
 		seh = &spl->ext_headers[SpellHeader];
-		for (Effect* feature : seh->features) {
-			feature->SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
+		for (Effect& feature : seh->features) {
+			feature.SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
 		}
 	}
 
@@ -784,9 +782,9 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 		// make it also work for self-targeting spells:
 		// change the payload or this was all in vain
 		seh = &spl->ext_headers[SpellHeader];
-		for (Effect* feature : seh->features) {
-			if (feature->Target == FX_TARGET_SELF) {
-				feature->Target = FX_TARGET_PRESET;
+		for (Effect& feature : seh->features) {
+			if (feature.Target == FX_TARGET_SELF) {
+				feature.Target = FX_TARGET_PRESET;
 			}
 		}
 		// we need to refetch the projectile, so the new one is used
@@ -1325,7 +1323,7 @@ static EffectRef fx_castingspeed_modifier_ref = { "CastingSpeedModifier", -1 };
 //start spellcasting (common part)
 int Scriptable::SpellCast(bool instant, Scriptable *target)
 {
-	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	int level = 0;
 	Actor* actor = Scriptable::As<Actor>(this);
 	if (actor) {
@@ -1889,7 +1887,7 @@ Movable::~Movable(void)
 
 int Movable::GetPathLength() const
 {
-	const PathNode *node = GetNextStep(0);
+	const PathListNode *node = GetNextStep(0);
 	if (!node) return 0;
 
 	int i = 0;
@@ -1900,12 +1898,12 @@ int Movable::GetPathLength() const
 	return i;
 }
 
-PathNode *Movable::GetNextStep(int x) const
+PathListNode *Movable::GetNextStep(int x) const
 {
 	if (!step) {
 		error("GetNextStep", "Hit with step = null");
 	}
-	PathNode *node = step;
+	PathListNode *node = step;
 	while(node && x--) {
 		node = node->Next;
 	}
@@ -1921,7 +1919,7 @@ Point Movable::GetMostLikelyPosition() const
 //actually, sometimes middle path would be better, if
 //we stand in Destination already
 	int halfway = GetPathLength()/2;
-	const PathNode *node = GetNextStep(halfway);
+	const PathListNode *node = GetNextStep(halfway);
 	if (node) {
 		return Point((ieWord) ((node->x*16)+8), (ieWord) ((node->y*12)+6) );
 	}
@@ -2187,13 +2185,13 @@ void Movable::AddWayPoint(const Point &Des)
 	Destination = Des;
 	//it is tempting to use 'step' here, as it could
 	//be about half of the current path already
-	PathNode *endNode = path;
+	PathListNode *endNode = path;
 	while(endNode->Next) {
 		endNode = endNode->Next;
 	}
 	Point p(endNode->x, endNode->y);
 	area->ClearSearchMapFor(this);
-	PathNode *path2 = area->FindPath(p, Des, size);
+	PathListNode *path2 = area->FindPath(p, Des, size);
 	// if the waypoint is too close to the current position, no path is generated
 	if (!path2) {
 		if (BlocksSearchMap()) {
@@ -2231,7 +2229,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}
 
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
-	PathNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
+	PathListNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
 	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
 		Log(DEBUG, "WalkTo", "{} re-pathing ignoring actors", fmt::WideToChar{actor->GetShortName()});
 		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, actor);
@@ -2359,9 +2357,9 @@ void Movable::ClearPath(bool resetDestination)
 		}
 		InternalFlags &= ~IF_NORETICLE;
 	}
-	PathNode* thisNode = path;
+	PathListNode* thisNode = path;
 	while (thisNode) {
-		PathNode* nextNode = thisNode->Next;
+		PathListNode* nextNode = thisNode->Next;
 		delete thisNode;
 		thisNode = nextNode;
 	}

@@ -54,13 +54,13 @@ public:
 		data = new uint8_t[bytes];
 	}
 	
-	Bitmap(const Size& s, uint8_t pattern)
+	Bitmap(const Size& s, uint8_t pattern) noexcept
 	: Bitmap(s)
 	{
 		fill(pattern);
 	}
 	
-	Bitmap(const Size& size, const uint8_t* in) noexcept
+	explicit Bitmap(const Size& size, const uint8_t* in) noexcept
 	: Bitmap(size) {
 		std::copy(in, in + bytes, data);
 	}
@@ -69,10 +69,10 @@ public:
 		delete [] data;
 	}
 	
-	Bitmap(const Bitmap& bm)
+	Bitmap(const Bitmap& bm) noexcept
 	: Bitmap(bm.size, bm.data) {}
 	
-	Bitmap& operator=(const Bitmap& bm) {
+	Bitmap& operator=(const Bitmap& bm) noexcept {
 		if (&bm != this) {
 			size = bm.size;
 			bytes = bm.bytes;

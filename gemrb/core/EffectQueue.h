@@ -241,15 +241,17 @@ bool IsColorslotEffect(int opcode);
 class GEM_EXPORT EffectQueue {
 private:
 	/** List of Effects applied on the Actor */
-	std::list< Effect* > effects;
+	using queue_t = std::list<Effect>;
+	queue_t effects;
 	/** Actor which is target of the Effects */
 	Scriptable* Owner = nullptr;
 
 public:
-	EffectQueue() noexcept = default;
-	EffectQueue(const EffectQueue&) = delete;
-	virtual ~EffectQueue();
-	EffectQueue& operator=(const EffectQueue&) = delete;
+	EffectQueue() noexcept {};
+	
+	operator bool() const {
+		return !effects.empty();
+	}
 
 	/** Sets Actor which is affected by these effects */
 	void SetOwner(Scriptable* act) { Owner = act; }
@@ -267,57 +269,62 @@ public:
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(const Effect* fx);
 
-	int AddAllEffects(Actor* target, const Point &dest) const;
-	void ApplyAllEffects(Actor* target) const;
+	int AddAllEffects(Actor* target, const Point &dest);
+	void ApplyAllEffects(Actor* target);
 	/** remove effects marked for removal */
 	void Cleanup();
 
 	/* directly removes effects with specified opcode, use effect_reference when you can */
-	void RemoveAllEffects(ieDword opcode) const;
+	void RemoveAllEffects(ieDword opcode);
 
 	/* directly removes effects with specified opcode and resource (used by IWD) */
-	void RemoveAllEffectsWithResource(ieDword opcode, const ResRef &resource) const;
+	void RemoveAllEffectsWithResource(ieDword opcode, const ResRef &resource);
 
 	/* removes any effects (delayed or not) which were using projectile */
-	void RemoveAllEffectsWithProjectile(ieDword projectile) const;
+	void RemoveAllEffectsWithProjectile(ieDword projectile);
 
 	// removes any effects with matching source and chosen mode
-	void RemoveAllEffectsWithSource(ieDword opcode, const ResRef &source, int mode) const;
+	void RemoveAllEffectsWithSource(ieDword opcode, const ResRef &source, int mode);
 
 	/* removes equipping effects with specified inventory slot code */
-	bool RemoveEquippingEffects(ieDwordSigned slotcode) const;
+	bool RemoveEquippingEffects(ieDwordSigned slotcode);
 
 	/* removes all effects of a given spell */
-	void RemoveAllEffects(const ResRef &Removed) const;
-	void RemoveAllEffects(const ResRef &Removed, ieByte timing) const;
+	void RemoveAllEffects(const ResRef &Removed);
+	void RemoveAllEffects(const ResRef &Removed, ieByte timing);
 	/* removes all effects of type */
-	void RemoveAllEffects(EffectRef &effect_reference) const;
+	void RemoveAllEffects(EffectRef &effect_reference);
 	/* removes expired or to be expired effects */
-	void RemoveExpiredEffects(ieDword futuretime) const;
+	void RemoveExpiredEffects(ieDword futuretime);
 	/* removes all effects except timing mode 9 */
-	void RemoveAllNonPermanentEffects() const;
-	void RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const;
-	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const;
-	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource) const;
-	void RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource) const;
-	void RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode) const;
-	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match) const;
-	void DispelEffects(const Effect *dispeller, ieDword level) const;
+	void RemoveAllNonPermanentEffects();
+	void RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current);
+	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
+	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource);
+	void RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource);
+	void RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode);
+	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
+	void DispelEffects(const Effect *dispeller, ieDword level);
 
-	/* returns true if the timing method supports simplified duration */
-	static bool HasDuration(const Effect *fx);
 	/* returns true if the effect should be saved */
-	static bool Persistent(const Effect* fx);
+	static bool Persistent(const Effect& fx);
 	/* returns next saved effect, increases index */
-	std::list< Effect* >::const_iterator GetFirstEffect() const
+	queue_t::iterator GetFirstEffect()
 	{
 		return effects.begin();
 	}
-	const Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator &f) const;
-	Effect *GetNextEffect(std::list< Effect* >::const_iterator &f) const;
+	
+	queue_t::const_iterator GetFirstEffect() const
+	{
+		return effects.begin();
+	}
+	
+	const Effect *GetNextSavedEffect(queue_t::const_iterator &f) const;
+	const Effect *GetNextEffect(queue_t::const_iterator &f) const;
+	Effect *GetNextEffect(queue_t::iterator &f);
 	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const ResRef& = ResRef()) const;
-	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const;
-	void ModifyAllEffectSources(const Point &source) const;
+	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y);
+	void ModifyAllEffectSources(const Point &source);
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
@@ -325,19 +332,19 @@ public:
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(const Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing);
-	EffectQueue *CopySelf() const;
 	static Effect *CreateEffectCopy(const Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
 	static Effect *CreateUnsummonEffect(const Effect *fx);
 	//locating opcodes
-	Effect *HasEffect(EffectRef &effect_reference) const;
-	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const;
-	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const;
-	Effect *HasEffectWithResource(EffectRef &effect_reference, const ResRef &resource) const;
-	Effect *HasEffectWithPower(EffectRef &effect_reference, ieDword power) const;
-	Effect *HasSource(const ResRef &source) const;
-	Effect *HasEffectWithSource(EffectRef &effect_reference, const ResRef &source) const;
-	void DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount) const;
-	int DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2) const;
+	Effect *HasEffect(EffectRef &effect_reference);
+	const Effect *HasEffect(EffectRef &effect_reference) const;
+	const Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const;
+	const Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const;
+	const Effect *HasEffectWithResource(EffectRef &effect_reference, const ResRef &resource) const;
+	const Effect *HasEffectWithPower(EffectRef &effect_reference, ieDword power) const;
+	const Effect *HasSource(const ResRef &source) const;
+	const Effect *HasEffectWithSource(EffectRef &effect_reference, const ResRef &source) const;
+	void DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount);
+	int DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2);
 	int BonusForParam2(EffectRef &effect_reference, ieDword param2) const;
 	int MaxParam1(EffectRef &effect_reference, bool positive) const;
 	bool HasAnyDispellableEffect() const;
@@ -353,7 +360,7 @@ public:
 	int CheckImmunity(Actor *target) const;
 	// apply this effectqueue on all actors matching ids targeting
 	// from pos, in range (no cone size yet)
-	void AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, const Actor *except) const;
+	void AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, const Actor *except);
 	/** Lists contents of the queue on a terminal for debugging */
 	std::string dump() const;
 	//resolve effect
@@ -368,21 +375,22 @@ public:
 private:
 	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef& = ResRef()) const;
-	void ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const;
+	void ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y);
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing);
 	static Effect *CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
-	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const;
-	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const;
-	void RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ResRef &resource) const;
-	Effect *HasOpcode(ieDword opcode) const;
-	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
-	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
-	Effect *HasOpcodeWithResource(ieDword opcode, const ResRef &resource) const;
-	Effect *HasOpcodeWithPower(ieDword opcode, ieDword power) const;
-	Effect *HasOpcodeWithSource(ieDword opcode, const ResRef &source) const;
-	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const;
-	int DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2) const;
+	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current);
+	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
+	void RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ResRef &resource);
+	Effect *HasOpcode(ieDword opcode);
+	const Effect *HasOpcode(ieDword opcode) const;
+	const Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
+	const Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
+	const Effect *HasOpcodeWithResource(ieDword opcode, const ResRef &resource) const;
+	const Effect *HasOpcodeWithPower(ieDword opcode, ieDword power) const;
+	const Effect *HasOpcodeWithSource(ieDword opcode, const ResRef &source) const;
+	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount);
+	int DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2);
 	int BonusForParam2(ieDword opcode, ieDword param2) const;
 	int MaxParam1(ieDword opcode, bool positive) const;
 	int BonusAgainstCreature(ieDword opcode, const Actor *actor) const;

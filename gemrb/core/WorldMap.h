@@ -119,13 +119,6 @@ struct WMPAreaLink {
  */
 
 class GEM_EXPORT WorldMap {
-public:
-	WorldMap() noexcept = default;
-	WorldMap(const WorldMap&) = delete;
-	WorldMap(WorldMap&&) noexcept = default;
-	~WorldMap() noexcept;
-	WorldMap& operator=(const WorldMap&) = delete;
-	WorldMap& operator=(WorldMap&&) noexcept = default;
 public: //struct members
 	ResRef MapResRef;
 	ieDword Width = 0;
@@ -140,40 +133,44 @@ public: //struct members
 	AnimationFactory* bam = nullptr;
 private: //non-struct members
 	Holder<Sprite2D> MapMOS = nullptr;
-	std::vector< WMPAreaEntry*> area_entries;
-	std::vector< WMPAreaLink*> area_links;
-	int* Distances = nullptr;
-	int* GotHereFrom = nullptr;
+	std::vector<WMPAreaEntry> area_entries;
+	std::vector<WMPAreaLink> area_links;
+	std::vector<int> Distances;
+	std::vector<int> GotHereFrom;
 	size_t encounterArea = -1;
 public:
+	WorldMap() noexcept = default;
+
 	void SetMapIcons(AnimationFactory *bam);
 	Holder<Sprite2D> GetMapMOS() const { return MapMOS; }
 	void SetMapMOS(Holder<Sprite2D> newmos);
 	int GetEntryCount() const { return (int) area_entries.size(); }
-	WMPAreaEntry *GetEntry(unsigned int index) const { return area_entries[index]; }
+	WMPAreaEntry *GetEntry(unsigned int index) { return &area_entries[index]; }
+	const WMPAreaEntry *GetEntry(unsigned int index) const { return &area_entries[index]; }
 	int GetLinkCount() const { return (int) area_links.size(); }
-	WMPAreaLink *GetLink(unsigned int index) const { return area_links[index]; }
-	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
-	void InsertAreaLink(unsigned int idx, unsigned int dir, const WMPAreaLink *arealink);
+	const WMPAreaLink *GetLink(unsigned int index) const { return &area_links[index]; }
+	void SetAreaEntry(unsigned int index, WMPAreaEntry&& areaentry);
+	void InsertAreaLink(unsigned int idx, unsigned int dir, WMPAreaLink&& arealink);
 	void SetAreaLink(unsigned int index, const WMPAreaLink *arealink);
-	void AddAreaEntry(WMPAreaEntry *ae);
-	void AddAreaLink(WMPAreaLink *al);
+	void AddAreaEntry(WMPAreaEntry&& ae);
+	void AddAreaLink(WMPAreaLink&& al);
 	/** Calculates the distances from A, call this when first on an area */
 	int CalculateDistances(const ResRef& A, int direction);
 	/** Returns the precalculated distance to area B */
 	int GetDistance(const ResRef& A) const;
 	/** Returns the link between area A and area B */
-	WMPAreaLink *GetLink(const ResRef& A, const ResRef& B) const;
+	WMPAreaLink *GetLink(const ResRef& A, const ResRef& B);
 	/** Returns the area link we will fall into if we head in B direction */
 	/** If the area name differs it means we are in a random encounter */
-	WMPAreaLink *GetEncounterLink(const ResRef& B, bool &encounter) const;
+	WMPAreaLink *GetEncounterLink(const ResRef& B, bool &encounter);
 	/** Sets area status */
-	void SetAreaStatus(const ResRef&, int Bits, BitOp Op) const;
+	void SetAreaStatus(const ResRef&, int Bits, BitOp Op);
 	/** Gets area pointer and index from area name.
 	 * also called from WorldMapArray to find the right map	*/
-	WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i) const;
+	WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i);
+	const WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i) const;
 	/** Finds an area name closest to the given area */
-	WMPAreaEntry* FindNearestEntry(const ResRef& areaName, unsigned int &i) const;
+	const WMPAreaEntry* FindNearestEntry(const ResRef& areaName, unsigned int &i) const;
 	void SetEncounterArea(const ResRef& area, const WMPAreaLink *link);
 	void ClearEncounterArea();
 private:
@@ -183,7 +180,7 @@ private:
 	void CalculateDistance(int areaindex, int direction);
 	unsigned int WhoseLinkAmI(int link_index) const;
 	/** update reachable areas from worlde.2da */
-	void UpdateReachableAreas() const;
+	void UpdateReachableAreas();
 };
 
 class GEM_EXPORT WorldMapArray {

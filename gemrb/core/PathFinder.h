@@ -26,6 +26,7 @@
 #include "Resource.h"
 
 #include <cstdint>
+#include <vector>
 
 namespace GemRB {
 
@@ -50,16 +51,29 @@ enum class PathMapFlags : uint8_t {
 	NOTACTOR = (DOOR | AREAMASK)
 };
 
+using NavmapPoint = Point;
+using SearchmapPoint = Point;
+
 struct PathNode {
-	PathNode* Parent;
-	PathNode* Next;
+	Point point;
+	int orient;
+};
+
+// FIXME: does Path have to be a linked list?
+// its meant to replace PathListNode which is a linked list
+// however, Projectile (and presumably other future users)
+// needs to keep track of which PathNode it is currently in
+// list iterators get invalidated during copy/move
+// nor are they randomly accessible so indexing isn't a good option
+using Path = std::vector<PathNode>;
+
+struct PathListNode {
+	PathListNode* Parent;
+	PathListNode* Next;
 	unsigned int x;
 	unsigned int y;
 	unsigned int orient;
 };
-
-using NavmapPoint = Point;
-using SearchmapPoint = Point;
 
 enum {
 	PF_SIGHT = 1,

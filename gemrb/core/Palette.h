@@ -51,12 +51,12 @@ using PaletteHolder = Holder<Palette>;
 class GEM_EXPORT Palette : public Held<Palette>
 {
 private:
-	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const;
-	void UpdateAlpha();
+	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const noexcept;
+	void UpdateAlpha() noexcept;
 public:
-	Palette(const Color &color, const Color &back);
+	Palette(const Color &color, const Color &back) noexcept;
 
-	Palette(const Color* begin, const Color* end)
+	Palette(const Color* begin, const Color* end) noexcept
 	: Palette() {
 		std::copy(begin, end, col);
 		UpdateAlpha();
@@ -67,23 +67,23 @@ public:
 	Color col[256]; //< RGB or RGBA 8 bit palette
 	bool named = false; //< true if the palette comes from a bmp and cached
 
-	unsigned short GetVersion() const { return version; }
+	unsigned short GetVersion() const noexcept { return version; }
 
-	bool HasAlpha() const { return alpha; }
-	void CreateShadedAlphaChannel();
-	void Brighten();
+	bool HasAlpha() const noexcept { return alpha; }
+	void CreateShadedAlphaChannel() noexcept;
+	void Brighten() noexcept;
 
-	void SetupPaperdollColours(const ieDword* Colors, unsigned int type);
+	void SetupPaperdollColours(const ieDword* Colors, unsigned int type) noexcept;
 	void SetupRGBModification(const PaletteHolder& src, const RGBModifier* mods,
-		unsigned int type);
+		unsigned int type) noexcept;
 	void SetupGlobalRGBModification(const PaletteHolder& src,
-		const RGBModifier& mod);
+		const RGBModifier& mod) noexcept;
 
-	PaletteHolder Copy() const;
+	PaletteHolder Copy() const noexcept;
 
-	void CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst);
-	bool operator==(const Palette&) const;
-	bool operator!=(const Palette&) const;
+	void CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst) noexcept;
+	bool operator==(const Palette&) const noexcept;
+	bool operator!=(const Palette&) const noexcept;
 private:
 	unsigned short version = 0;
 	bool alpha = false; // true if any colors in the palette have an alpha < 255

@@ -76,10 +76,6 @@ class Projectile;
 class GEM_EXPORT SPLExtHeader {
 public:
 	SPLExtHeader() noexcept = default;
-	SPLExtHeader(const SPLExtHeader&) = delete;
-	~SPLExtHeader() noexcept;
-	SPLExtHeader& operator=(const SPLExtHeader&) = delete;
-	SPLExtHeader& operator=(SPLExtHeader&&) noexcept = default;
 
 	ieByte SpellForm = 0;
 	ieByte Hostile = 0;
@@ -99,7 +95,7 @@ public:
 	ieWord Charges = 0;
 	ieWord ChargeDepletion = 0;
 	ieWord ProjectileAnimation = 0;
-	std::vector<Effect*> features;
+	std::vector<Effect> features;
 };
 
 /**
@@ -111,10 +107,9 @@ public:
 class GEM_EXPORT Spell {
 public:
 	Spell() noexcept = default;
-	~Spell();
 
 	std::vector<SPLExtHeader> ext_headers;
-	std::vector<Effect*> casting_features;
+	std::vector<Effect> casting_features;
 
 	/** Resref of the spell itself */
 	ResRef Name;
@@ -172,11 +167,11 @@ public:
 	//converts a wanted level to block index count
 	int GetHeaderIndexFromLevel(int level) const;
 	//-1 will return the cfb
-	EffectQueue *GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro=0) const;
+	EffectQueue *GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro=0);
 	// add appropriate casting glow effect
 	void AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) const;
 	//returns a projectile created from an extended header
-	Projectile *GetProjectile(Scriptable *self, int headerindex, int level, const Point &pos) const;
+	Projectile *GetProjectile(Scriptable *self, int headerindex, int level, const Point &pos);
 	unsigned int GetCastingDistance(Scriptable *Sender) const;
 	bool ContainsDamageOpcode() const;
 };

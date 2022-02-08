@@ -177,7 +177,9 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->Seek( s->FeatureBlockOffset + 48*s->CastingFeatureOffset,
 			GEM_STREAM_START );
 	for (int i = 0; i < s->CastingFeatureCount; i++) {
-		s->casting_features.push_back(GetFeature(s));
+		Effect* fx = GetFeature(s);
+		s->casting_features.push_back(std::move(*fx));
+		delete fx;
 	}
 
 	return s;
@@ -227,7 +229,9 @@ void SPLImporter::GetExtHeader(const Spell *s, SPLExtHeader* eh)
 	eh->features.reserve(featureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (ieWord i = 0; i < featureCount; ++i) {
-		eh->features.push_back(GetFeature(s));
+		Effect* fx = GetFeature(s);
+		eh->features.push_back(std::move(*fx));
+		delete fx;
 	}
 }
 

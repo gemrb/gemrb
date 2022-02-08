@@ -39,7 +39,7 @@ protected:
 	int samples_left; // count of unread samples
 	int is16bit; // 1 - if 16 bit file, 0 - otherwise
 public:
-	explicit RawPCMReader(int bits)
+	explicit RawPCMReader(int bits) noexcept
 		: samples_left(0), is16bit( bits == 16 )
 	{
 	}

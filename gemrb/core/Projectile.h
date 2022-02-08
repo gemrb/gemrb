@@ -39,6 +39,8 @@
 #include "Audio.h"
 #include "Video/Video.h"
 
+#include <list>
+
 namespace GemRB {
 
 //this is the height of the projectile when Spark Flag Fly = 1
@@ -195,10 +197,6 @@ class GEM_EXPORT Projectile
 {
 public:
 	Projectile() noexcept;
-	~Projectile() noexcept;
-	
-	Projectile(const Projectile&) noexcept = default;
-	Projectile& operator=(const Projectile&) = delete;
 
 	ieWord Speed = 20;
 	ieDword SFlags = PSF_FLYING;
@@ -245,8 +243,8 @@ private:
 	//attributes from moveable object
 	unsigned char Orientation = 0;
 	unsigned char NewOrientation = 0;
-	PathNode* path = nullptr; // whole path
-	PathNode* step = nullptr; // actual step
+	Path path; // whole path
+	size_t stepIdx = 0; // actual step in path
 	//similar to normal actors
 	Map *area = nullptr;
 	Point Pos = Point(-1, -1);
@@ -267,16 +265,62 @@ private:
 	int extension_targetcount = 0;
 	Color tint;
 
-	//special (not using char animations)
-	Animation* travel[MAX_ORIENT]{};
-	Animation* shadow[MAX_ORIENT]{};
+	// special (not using char animations)
+	// using std::vector over std::array for better movability
+	// the array will always be MAX_ORIENT in size
+	using AnimArray = std::vector<Animation>;
+	AnimArray travel;
+	AnimArray shadow;
+
 	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation
-	EffectQueue* effects = nullptr;
-	std::vector<Projectile*> children;
+	EffectQueue effects;
+	std::list<Projectile> children;
 	int pathcounter = 0x7fff;
 	int bend = 0;
 	int drawSpark = 0;
-	Holder<SoundHandle> travel_handle;
+	
+	struct LoopStop {
+		Holder<SoundHandle> sound;
+		
+		~LoopStop() noexcept {
+			if (sound) {
+				//allow an explosion sound to finish completely
+				sound->StopLooping();
+			}
+		}
+		
+		LoopStop() noexcept = default;
+		
+		LoopStop(const LoopStop& ls) noexcept
+		: sound(ls.sound) {}
+		
+		LoopStop(LoopStop&& ls) noexcept
+		{
+			std::swap(sound, ls.sound);
+		}
+		
+		LoopStop& operator=(const LoopStop& ls) noexcept {
+			if (this != &ls) {
+				sound = ls.sound;
+			}
+			return *this;
+		}
+		
+		LoopStop& operator=(LoopStop&& ls) noexcept {
+			if (this != &ls) {
+				std::swap(sound, ls.sound);
+			}
+			return *this;
+		}
+		
+		SoundHandle* operator->() noexcept {
+			return sound.get();
+		}
+		
+		operator bool() const noexcept {
+			return bool(sound);
+		}
+	} travel_handle;
 public:
 	void SetCaster(ieDword t, int level);
 	ieDword GetCaster() const;
@@ -292,7 +336,11 @@ public:
 	inline ieWord GetType() const { return type; }
 	//This assumes that the effect queue cannot be bigger than 65535
 	//which is a sane expectation
-	inline EffectQueue *GetEffects() const {
+	EffectQueue& GetEffects() {
+		return effects;
+	}
+	
+	const EffectQueue& GetEffects() const {
 		return effects;
 	}
 
@@ -319,13 +367,13 @@ public:
 
 	void SetIdentifiers(const ResRef &name, size_t idx);
 
-	void SetEffectsCopy(const EffectQueue *eq, const Point &source);
+	void SetEffectsCopy(const EffectQueue& eq, const Point &source);
 
 	//don't forget to set effects to NULL when the projectile discharges
 	//unexploded projectiles are responsible to destruct their payload
 
-	inline void SetEffects(EffectQueue *fx) {
-		effects = fx;
+	inline void SetEffects(EffectQueue&& fx) {
+		effects = std::move(fx);
 	}
 
 	inline unsigned char GetNextFace() {
@@ -365,12 +413,12 @@ public:
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
-	void CreateAnimations(Animation **anims, const ResRef& bam, int Seq);
+	AnimArray CreateAnimations(const ResRef& bam, int Seq);
 	//pillar type animations
-	void CreateCompositeAnimation(Animation **anims, const AnimationFactory *af, int Seq) const;
+	AnimArray CreateCompositeAnimation(const AnimationFactory *af, int Seq) const;
 	//oriented animations (also simple ones)
-	void CreateOrientedAnimations(Animation **anims, const AnimationFactory *af, int Seq) const;
-	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal) const;
+	AnimArray CreateOrientedAnimations(const AnimationFactory *af, int Seq) const;
+	void GetPaletteCopy(const AnimArray&, PaletteHolder &pal) const;
 	void GetSmokeAnim();
 	void SetBlend(int brighten);
 	//apply spells and effects on the target, only in single travel mode
@@ -390,7 +438,7 @@ private:
 	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
 	void DoStep(unsigned int walk_speed);
 	void LineTarget() const;      //line projectiles (walls, scorchers)
-	void LineTarget(const PathNode *beg, const PathNode *end) const;
+	void LineTarget(Path::const_iterator beg, Path::const_iterator end) const;
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall
@@ -403,7 +451,7 @@ private:
 	void DrawExploded(const Region &screen);
 	int GetTravelPos(int face) const;
 	int GetShadowPos(int face) const;
-	void SetPos(int face, int frame1, int frame2) const;
+	void SetPos(int face, int frame1, int frame2);
 	inline int GetZPos() const;
 
 	//logic to resolve target when single projectile hit destination
@@ -413,7 +461,7 @@ private:
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
-	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients) const;
+	void SetupPalette(const AnimArray&, PaletteHolder &pal, const ieByte *gradients) const;
 
 private:
 	void Draw(const Holder<Sprite2D>& spr, const Point& p,

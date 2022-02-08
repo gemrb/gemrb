@@ -150,7 +150,7 @@ using targetlist = std::list<targettype>;
 class GEM_EXPORT Targets {
 	targetlist objects;
 public:
-	Targets() noexcept = default;
+	Targets() noexcept {};
 	
 	int Count() const;
 	void dump() const;

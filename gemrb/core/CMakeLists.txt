@@ -13,6 +13,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Dialog.cpp
 	DialogHandler.cpp
 	DisplayMessage.cpp
+	Effect.cpp
 	EffectQueue.cpp
 	Factory.cpp
 	FactoryObject.cpp

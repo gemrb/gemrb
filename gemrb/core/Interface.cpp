@@ -2896,8 +2896,8 @@ void Interface::UpdateWorldMap(const ResRef& wmResRef)
 	}
 
 	WorldMapArray *new_worldmap = wmp_mgr->GetWorldMapArray();
-	const WorldMap *wm = worldmap->GetWorldMap(0);
-	const WorldMap *nwm = new_worldmap->GetWorldMap(0);
+	WorldMap *wm = worldmap->GetWorldMap(0);
+	WorldMap *nwm = new_worldmap->GetWorldMap(0);
 
 	unsigned int ni;
 	unsigned int ec = wm->GetEntryCount();
@@ -3844,7 +3844,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 // dealing with applying effects
 void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level) const
 {
-	const Spell *spell = gamedata->GetSpell(spellRef);
+	Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
@@ -3858,7 +3858,7 @@ void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *cas
 
 void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level) const
 {
-	const Spell *spell = gamedata->GetSpell(spellRef);
+	Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
@@ -3877,10 +3877,9 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster) con
 		return 0;
 	}
 
-	EffectQueue *fxqueue = new EffectQueue();
-	fxqueue->AddEffect( effect );
-	int res = ApplyEffectQueue(fxqueue, actor, caster);
-	delete fxqueue;
+	EffectQueue fxqueue;
+	fxqueue.AddEffect(effect);
+	int res = ApplyEffectQueue(&fxqueue, actor, caster);
 	return res;
 }
 

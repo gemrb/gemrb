@@ -4932,7 +4932,7 @@ void GameScript::Calm(Scriptable* Sender, Action* /*parameters*/)
 
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *worldmap = core->GetWorldMap();
+	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
@@ -4943,7 +4943,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *worldmap = core->GetWorldMap();
+	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
@@ -4953,7 +4953,7 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *worldmap = core->GetWorldMap();
+	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
@@ -4962,7 +4962,7 @@ void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *worldmap = core->GetWorldMap();
+	WorldMap *worldmap = core->GetWorldMap();
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
@@ -5391,7 +5391,7 @@ void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Action* /*parameters*
 	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
-		const Actor *tar = game->GetPC(i, false);
+		Actor *tar = game->GetPC(i, false);
 		tar->fxqueue.RemoveExpiredEffects(0xffffffff);
 	}
 }
@@ -5399,8 +5399,8 @@ void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Action* /*parameters*
 //iwd2 removes effects from a single sprite
 void GameScript::ClearSpriteEffects(Scriptable* Sender, Action* parameters)
 {
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	const Actor* actor = Scriptable::As<Actor>(tar);
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return;
 	}
@@ -6158,7 +6158,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *wmap = core->GetWorldMap(ResRef(parameters->string0Parameter));
+	WorldMap *wmap = core->GetWorldMap(ResRef(parameters->string0Parameter));
 	if (!wmap) {
 		//no such starting area
 		return;
@@ -6496,8 +6496,8 @@ void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)
 
 void GameScript::FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters)
 {
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	const Actor* target = Scriptable::As<Actor>(tar);
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* target = Scriptable::As<Actor>(tar);
 	if (!target) {
 		return;
 	}
@@ -7126,6 +7126,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	//int2param isn't actually used in the original engine
 
 	core->ApplyEffect(fx, actor, src);
+	delete fx;
 	// SpellCastEffect tries to keep the action alive until the effect is over
 	Sender->SetWait(adjustedDuration);
 }
@@ -7164,6 +7165,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->Pos = tar->Pos;
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, target, src);
+	delete fx;
 }
 
 void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
@@ -7196,6 +7198,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	}
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
+	delete fx;
 	// it should probably wait until projectile payload, but a single tick works well for the use in 41cnatew
 	Sender->SetWait(1);
 }
