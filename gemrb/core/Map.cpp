@@ -434,11 +434,6 @@ Map::~Map(void)
 		delete spawn;
 	}
 
-	for (auto& q : queue) {
-		free(q);
-		q = nullptr;
-	}
-
 	for (auto projectile : projectiles) {
 		delete projectile;
 	}
@@ -699,7 +694,7 @@ void Map::UpdateScripts()
 	ieDword time = game->Ticks; // make sure everything moves at the same time
 
 	//Run actor scripts (only for 0 priority)
-	int q = Qcount[PR_SCRIPT];
+	size_t q = queue[PR_SCRIPT].size();
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
 		//actor just moved away, don't run its script from this side
@@ -764,7 +759,7 @@ void Map::UpdateScripts()
 	}
 
 	//clean up effects on dead actors too
-	q = Qcount[PR_DISPLAY];
+	q = queue[PR_DISPLAY].size();
 	while(q--) {
 		Actor* actor = queue[PR_DISPLAY][q];
 		actor->fxqueue.Cleanup();
@@ -811,7 +806,7 @@ void Map::UpdateScripts()
 			continue;
 		}
 
-		q = Qcount[PR_SCRIPT];
+		q = queue[PR_SCRIPT].size();
 		ieDword exitID = ip->GetGlobalID();
 		while (q--) {
 			Actor *actor = queue[PR_SCRIPT][q];
@@ -1226,7 +1221,7 @@ Container *Map::GetNextPile(int &index) const
 	return NULL;
 }
 
-Actor *Map::GetNextActor(int &q, int &index) const
+Actor *Map::GetNextActor(int &q, size_t &index) const
 {
 	while (true) {
 		switch(q) {
@@ -1239,7 +1234,7 @@ Actor *Map::GetNextActor(int &q, int &index) const
 				if (index--)
 					return queue[q][index];
 				q--;
-				index = Qcount[q];
+				index = queue[q].size();
 				break;
 			default:
 				return nullptr;
@@ -1421,7 +1416,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	//starting with lower priority
 	//so displayed, but inactive actors (dead) will be drawn over
 	int q = PR_DISPLAY;
-	int index = Qcount[q];
+	size_t index = queue[q].size();
 	Actor* actor = GetNextActor(q, index);
 
 	scaIterator scaidx = vvcCells.begin();
@@ -2734,14 +2729,9 @@ void Map::GenerateQueues()
 	unsigned int i=(unsigned int) actors.size();
 	for (priority=0;priority<QUEUE_COUNT;priority++) {
 		if (lastActorCount[priority] != i) {
-			if (queue[priority]) {
-				free(queue[priority]);
-				queue[priority] = NULL;
-			}
-			queue[priority] = (Actor **) calloc( i, sizeof(Actor *) );
 			lastActorCount[priority] = i;
 		}
-		Qcount[priority] = 0;
+		queue[priority].clear();
 	}
 
 	ieDword gametime = core->GetGame()->GameTime;
@@ -2788,18 +2778,15 @@ void Map::GenerateQueues()
 		//we ignore priority 2
 		if (priority>=PR_IGNORE) continue;
 
-		queue[priority][Qcount[priority]] = actor;
-		Qcount[priority]++;
+		queue[priority].push_back(actor);
 	}
 	hostiles_visible = hostiles_new;
 }
 
-//the original qsort implementation was flawed
-void Map::SortQueues() const
+void Map::SortQueues()
 {
 	for (int q = 0; q < QUEUE_COUNT; ++q) {
-		Actor **baseline=queue[q];
-		std::sort(baseline, baseline+Qcount[q], [](const Actor* a, const Actor* b) {
+		std::sort(queue[q].begin(), queue[q].end(), [](const Actor* a, const Actor* b) {
 			return a->Pos.y < b->Pos.y;
 		});
 	}

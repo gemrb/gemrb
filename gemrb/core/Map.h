@@ -429,8 +429,7 @@ private:
 	std::vector< Ambient*> ambients;
 	std::vector<MapNote> mapnotes;
 	std::vector< Spawn*> spawns;
-	Actor** queue[QUEUE_COUNT]{};
-	int Qcount[QUEUE_COUNT]{};
+	std::vector<Actor*> queue[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT]{};
 	bool hostiles_visible = false;
 
@@ -670,7 +669,7 @@ private:
 	const AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
 	Particles *GetNextSpark(const spaIterator &iter) const;
 	VEFObject *GetNextScriptedAnimation(const scaIterator &iter) const;
-	Actor *GetNextActor(int &q, int &index) const;
+	Actor *GetNextActor(int &q, size_t &index) const;
 	Container *GetNextPile (int &index) const;
 	
 	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
@@ -692,7 +691,7 @@ private:
 	Point ConvertPointToFog(const Point &p) const;
 	
 	void GenerateQueues();
-	void SortQueues() const;
+	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);
 	//actor uses travel region
