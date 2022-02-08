@@ -3021,6 +3021,9 @@ Actor::stats_t Actor::ResetStats(bool init)
 /** call this after load, to apply effects */
 void Actor::AddEffects(EffectQueue&& fx)
 {
+	bool first = !(InternalFlags&IF_INITIALIZED); //initialize base stats
+	stats_t prev = ResetStats(first);
+	
 	fx.SetOwner(this);
 	fx.AddAllEffects(this, Pos);
 	//copy back the original stats, because the effects
@@ -3035,13 +3038,11 @@ void Actor::AddEffects(EffectQueue&& fx)
 	//AC.ResetAll(); // TODO: check if this is needed
 	//ToHit.ResetAll();
 	
-	RefreshEffects();
+	RefreshEffects(first, prev);
 }
-	
-void Actor::RefreshEffects()
+
+void Actor::RefreshEffects(bool first, const stats_t& previous)
 {
-	bool first = !(InternalFlags&IF_INITIALIZED); //initialize base stats
-	stats_t previous = ResetStats(first);
 	// some VVCs are controlled by stats (and so by PCFs), the rest have 'effect_owned' set
 	for (ScriptedAnimation* vvc : vfxQueue) {
 		if (vvc->effect_owned) vvc->active = false;
@@ -3183,6 +3184,12 @@ void Actor::RefreshEffects()
 	if (Immobile()) {
 		timeStartStep = game->Ticks;
 	}
+}
+
+void Actor::RefreshEffects()
+{
+	bool first = !(InternalFlags&IF_INITIALIZED); //initialize base stats
+	RefreshEffects(first, ResetStats(first));
 }
 
 int Actor::GetProficiency(int proftype) const

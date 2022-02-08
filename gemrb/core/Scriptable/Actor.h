@@ -478,7 +478,8 @@ private:
 	int CalculateSpeedFromINI(bool feedback) const;
 	ieDword IncrementDeathVariable(Variables *vars, const char *format, const char *name, ieDword start = 0) const;
 	
-	stats_t ResetStats(bool);
+	stats_t ResetStats(bool init);
+	void RefreshEffects(bool init, const stats_t& prev);
 
 public:
 	Actor(void);
