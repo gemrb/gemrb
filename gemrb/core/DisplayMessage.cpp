@@ -159,17 +159,11 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 }
 
 //simply displaying a constant string
-void DisplayMessage::DisplayConstantString(size_t stridx, const Color &color, Scriptable *target) const
+void DisplayMessage::DisplayConstantString(size_t stridx, unsigned char color, Scriptable *target) const
 {
 	if (stridx > STRREF_COUNT) return;
 	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
-	DisplayString(text, color, target);
-}
-
-//simply displaying a constant string
-void DisplayMessage::DisplayConstantString(size_t stridx, unsigned char color, Scriptable *target) const
-{
-	DisplayConstantString(stridx, gamedata->GetColor(GUIColors[color]), target);
+	DisplayString(text, gamedata->GetColor(GUIColors[color]), target);
 }
 
 void DisplayMessage::DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const
@@ -209,43 +203,30 @@ void DisplayMessage::DisplayString(const String& text, unsigned char color, Scri
 
 // String format is
 // blah : whatever
-void DisplayMessage::DisplayConstantStringValue(size_t stridx, const Color &color, ieDword value) const
-{
-	if (stridx > STRREF_COUNT) return;
-	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
-	DisplayMarkupString(fmt::format(DisplayFormatValue, color.Packed(), text, value));
-}
-
-// String format is
-// blah : whatever
 void DisplayMessage::DisplayConstantStringValue(size_t stridx, unsigned char color, ieDword value) const
 {
-	DisplayConstantStringValue(stridx, gamedata->GetColor(GUIColors[color]), value);
-}
-
-// String format is
-// <charname> - blah blah : whatever
-void DisplayMessage::DisplayConstantStringNameString(size_t stridx, const Color &color, size_t stridx2, const Scriptable *actor) const
-{
 	if (stridx > STRREF_COUNT) return;
-
-	String name;
-	Color actor_color = GetSpeakerColor(name, actor);
 	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
-	String text2 = core->GetString(DisplayMessage::SRefs[stridx2], STRING_FLAGS::SOUND);
-
-	if (!text2.empty()) {
-		DisplayMarkupString(fmt::format(DisplayFormatNameString, actor_color.Packed(), name, color.Packed(), text, text2));
-	} else {
-		DisplayMarkupString(fmt::format(DisplayFormatName, color.Packed(), name, color.Packed(), text));
-	}
+	DisplayMarkupString(fmt::format(DisplayFormatValue, gamedata->GetColor(GUIColors[color]).Packed(), text, value));
 }
 
 // String format is
 // <charname> - blah blah : whatever
 void DisplayMessage::DisplayConstantStringNameString(size_t stridx, unsigned char color, size_t stridx2, const Scriptable *actor) const
 {
-	DisplayConstantStringNameString(stridx, gamedata->GetColor(GUIColors[color]), stridx2, actor);
+	if (stridx > STRREF_COUNT) return;
+
+	String name;
+	Color actor_color = GetSpeakerColor(name, actor);
+	Color used_color = gamedata->GetColor(GUIColors[color]);
+	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
+	String text2 = core->GetString(DisplayMessage::SRefs[stridx2], STRING_FLAGS::SOUND);
+
+	if (!text2.empty()) {
+		DisplayMarkupString(fmt::format(DisplayFormatNameString, actor_color.Packed(), name, used_color.Packed(), text, text2));
+	} else {
+		DisplayMarkupString(fmt::format(DisplayFormatName, used_color.Packed(), name, used_color.Packed(), text));
+	}
 }
 
 // String format is
@@ -267,41 +248,28 @@ void DisplayMessage::DisplayConstantStringName(size_t stridx, unsigned char colo
 }
 
 //Treats the constant string as a numeric format string, otherwise like the previous method
-void DisplayMessage::DisplayConstantStringNameValue(size_t stridx, const Color &color, const Scriptable *speaker, int value) const
+void DisplayMessage::DisplayConstantStringNameValue(size_t stridx, unsigned char color, const Scriptable *speaker, int value) const
 {
 	if (stridx > STRREF_COUNT) return;
 	if(!speaker) return;
-
 	String fmt = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::RESOLVE_TAGS);
-	DisplayStringName(fmt::format(fmt, value), color, speaker);
-}
-
-//Treats the constant string as a numeric format string, otherwise like the previous method
-void DisplayMessage::DisplayConstantStringNameValue(size_t stridx, unsigned char color, const Scriptable *speaker, int value) const
-{
-	DisplayConstantStringNameValue(stridx, gamedata->GetColor(GUIColors[color]), speaker, value);
-}
-
-// String format is
-// <charname> - blah blah <someoneelse>
-void DisplayMessage::DisplayConstantStringAction(size_t stridx, const Color &color, const Scriptable *attacker, const Scriptable *target) const
-{
-	if (stridx > STRREF_COUNT) return;
-
-	String name1, name2;
-
-	Color attacker_color = GetSpeakerColor(name1, attacker);
-	GetSpeakerColor(name2, target);
-
-	String text = core->GetString( DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH );
-	DisplayMarkupString(fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, color.Packed(), text, name2));
+	DisplayStringName(fmt::format(fmt, value), gamedata->GetColor(GUIColors[color]), speaker);
 }
 
 // String format is
 // <charname> - blah blah <someoneelse>
 void DisplayMessage::DisplayConstantStringAction(size_t stridx, unsigned char color, const Scriptable *attacker, const Scriptable *target) const
 {
-	DisplayConstantStringAction(stridx, gamedata->GetColor(GUIColors[color]), attacker, target);
+	if (stridx > STRREF_COUNT) return;
+
+	String name1, name2;
+
+	Color attacker_color = GetSpeakerColor(name1, attacker);
+	Color used_color = gamedata->GetColor(GUIColors[color]);
+	GetSpeakerColor(name2, target);
+
+	String text = core->GetString( DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH );
+	DisplayMarkupString(fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, used_color.Packed(), text, name2));
 }
 
 
