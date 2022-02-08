@@ -2998,7 +2998,6 @@ Actor::stats_t Actor::ResetStats(bool init)
 	BardSong.Reset();
 	memset(projectileImmunity,0,ProjectileSize*sizeof(ieDword));
 
-	Modified = BaseStats;
 	if (PCStats) {
 		PCStats->States = PCStatsStruct::StateArray();
 	}
@@ -3008,14 +3007,20 @@ Actor::stats_t Actor::ResetStats(bool init)
 	AC.ResetAll();
 	ToHit.ResetAll(); // effects can result in the change of any of the boni, so we need to reset all
 	
+	stats_t prev;
 	if (init) {
 		InternalFlags|=IF_INITIALIZED;
 		PrevStats = &BaseStats[0];
-		return BaseStats;
+		prev = BaseStats;
 	} else {
 		PrevStats = &Modified[0];
-		return Modified;
+		prev = Modified;
 	}
+	
+	//copy back the original stats, because the effects
+	//will be reapplied in ApplyAllEffects again
+	Modified = BaseStats;
+	return prev;
 }
 
 /** call this after load, to apply effects */
@@ -3026,9 +3031,7 @@ void Actor::AddEffects(EffectQueue&& fx)
 	
 	fx.SetOwner(this);
 	fx.AddAllEffects(this, Pos);
-	//copy back the original stats, because the effects
-	//will be reapplied in ApplyAllEffects again
-	Modified = BaseStats;
+
 	if (SpellStatesSize) {
 		memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
 	}
