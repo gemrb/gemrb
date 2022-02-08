@@ -55,6 +55,7 @@ private:
 		std::unique_ptr<Projectile> projectile;
 		
 		ProjectileEntry() noexcept = default;
+		~ProjectileEntry() noexcept = default;
 		
 		ProjectileEntry(ProjectileEntry&&) noexcept = default;
 		ProjectileEntry& operator=(ProjectileEntry&&) noexcept = default;

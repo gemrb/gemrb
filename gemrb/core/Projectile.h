@@ -468,6 +468,8 @@ private:
 			  BlitFlags flags, Color overrideTint) const;
 };
 
+static_assert(std::is_nothrow_move_constructible<Projectile>::value, "Projectile should be noexcept MoveConstructible");
+
 }
 
 #endif // PROJECTILE_H

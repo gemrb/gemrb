@@ -80,6 +80,8 @@ private:
 	tick_t starttime = 0;
 };
 
+static_assert(std::is_nothrow_move_constructible<Animation>::value, "Animation should be noexcept MoveConstructible");
+
 }
 
 #endif
