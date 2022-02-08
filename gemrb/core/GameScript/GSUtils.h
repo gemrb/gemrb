@@ -69,7 +69,7 @@ int GetHPPercent(const Scriptable *Sender);
 bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname);
 bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword flags);
 void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed);
-void PlaySequenceCore(Scriptable *Sender, const Action *parameters, ieDword value);
+void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::index_t value);
 void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone);
 void CreateVisualEffectCore(Actor *target, const char *effect, int iterations);
 void CreateVisualEffectCore(const Scriptable *Sender, const Point &position, const char *effect, int iterations);

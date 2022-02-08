@@ -324,7 +324,7 @@ void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 	Sender->ReleaseCurrentAction();
 }
 
-void PlaySequenceCore(Scriptable *Sender, const Action *parameters, ieDword value)
+void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::index_t value)
 {
 	Scriptable* tar;
 

@@ -276,8 +276,8 @@ public:
 	// flags that must be touched by PST a bit only
 	ieDword originalFlags = 0;
 	//these are on one dword
-	ieWord sequence = 0;
-	ieWord frame = 0;
+	Animation::index_t sequence = 0;
+	Animation::index_t frame = 0;
 	//these are on one dword
 	ieWord transparency = 0;
 	ieWordSigned height = 0;
