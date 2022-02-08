@@ -518,13 +518,13 @@ public:
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags, const Scriptable *checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */
-	ieDword ClampStat(unsigned int StatIndex, ieDword Value) const;
+	stat_t ClampStat(unsigned int StatIndex, stat_t Value) const;
 	/** Returns a Stat value */
-	ieDword GetStat(unsigned int StatIndex) const;
+	stat_t GetStat(unsigned int StatIndex) const;
 	/** Returns a safe Stat value, one, that is not partially computed */
-	ieDword GetSafeStat(unsigned int StatIndex) const;
+	stat_t GetSafeStat(unsigned int StatIndex) const;
 	/** Sets a Stat Value (unsaved) */
-	bool SetStat(unsigned int StatIndex, ieDword Value, int pcf);
+	bool SetStat(unsigned int StatIndex, stat_t Value, int pcf);
 	/** Returns the difference */
 	int GetMod(unsigned int StatIndex) const;
 	/** Returns a Stat Base Value */

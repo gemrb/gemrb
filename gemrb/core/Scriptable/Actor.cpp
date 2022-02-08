@@ -610,7 +610,7 @@ CharAnimations* Actor::GetAnims() const
 }
 
 /** Returns a Stat value (Base Value + Mod) */
-ieDword Actor::GetStat(unsigned int StatIndex) const
+Actor::stat_t Actor::GetStat(unsigned int StatIndex) const
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
@@ -619,7 +619,7 @@ ieDword Actor::GetStat(unsigned int StatIndex) const
 }
 
 /** Always return a final stat value not partially calculated ones */
-ieDword Actor::GetSafeStat(unsigned int StatIndex) const
+Actor::stat_t Actor::GetSafeStat(unsigned int StatIndex) const
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
@@ -2817,14 +2817,15 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 	}
 }
 
-ieDword Actor::ClampStat(unsigned int StatIndex, ieDword Value) const
+
+Actor::stat_t Actor::ClampStat(unsigned int StatIndex, stat_t Value) const
 {
 	if (StatIndex >= MAX_STATS) {
 		return Value;
 	}
 
 	if ((signed) Value < -100) {
-		Value = (ieDword) -100;
+		Value = (stat_t) -100;
 	} else {
 		if (maximum_values[StatIndex] > 0) {
 			if ((signed) Value > 0 && Value > maximum_values[StatIndex]) {
@@ -2835,7 +2836,7 @@ ieDword Actor::ClampStat(unsigned int StatIndex, ieDword Value) const
 	return Value;
 }
 
-bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
+bool Actor::SetStat(unsigned int StatIndex, stat_t Value, int pcf)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
@@ -5027,7 +5028,7 @@ ieDword Actor::GetXPLevel(int modified) const
 		// iwd2
 		return stats[IE_CLASSLEVELSUM];
 	} else {
-		unsigned int levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
+		stat_t levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
 		average = levels[0];
 		clscount = 1;
 		if (IsDualClassed()) {
@@ -7948,7 +7949,7 @@ void Actor::SetLeader(const Actor *actor, int xoffset, int yoffset)
 void Actor::Heal(int hp)
 {
 	if (hp > 0) {
-		ieDword newHp = BaseStats[IE_HITPOINTS] + hp;
+		stat_t newHp = BaseStats[IE_HITPOINTS] + hp;
 		SetBase(IE_HITPOINTS, std::min(newHp, Modified[IE_MAXHITPOINTS]));
 	} else {
 		SetBase(IE_HITPOINTS, Modified[IE_MAXHITPOINTS]);
@@ -9806,7 +9807,7 @@ int Actor::CheckUsability(const Item *item) const
 
 	for (int i=0;i<usecount;i++) {
 		ieDword itemvalue = itembits[itemuse[i].which];
-		ieDword stat = GetStat(itemuse[i].stat);
+		stat_t stat = GetStat(itemuse[i].stat);
 		ieDword mcol = itemuse[i].mcol;
 		//if we have a kit, we just use its index for the lookup
 		if (itemuse[i].stat==IE_KIT) {
@@ -10747,7 +10748,7 @@ bool Actor::TryToHide()
 
 	bool seen = SeeAnyOne(true, true);
 
-	ieDword skill;
+	stat_t skill;
 	if (core->HasFeature(GF_HAS_HIDE_IN_SHADOWS)) {
 		skill = (GetStat(IE_HIDEINSHADOWS) + GetStat(IE_STEALTH))/2;
 	} else {
