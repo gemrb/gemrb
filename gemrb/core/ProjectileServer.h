@@ -53,6 +53,14 @@ private:
 	{
 		ResRef resname;
 		std::unique_ptr<Projectile> projectile;
+		
+		ProjectileEntry() noexcept = default;
+		
+		ProjectileEntry(ProjectileEntry&&) noexcept = default;
+		ProjectileEntry& operator=(ProjectileEntry&&) noexcept = default;
+		
+		ProjectileEntry(const ProjectileEntry&) noexcept = delete;
+		ProjectileEntry& operator=(const ProjectileEntry&) noexcept = delete;
 	};
 	
 	struct ExplosionEntry
