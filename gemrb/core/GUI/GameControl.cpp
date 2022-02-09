@@ -271,7 +271,6 @@ void GameControl::ClearMouseState()
 // only PST supports RunToPoint
 void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool tryToRun) const
 {
-	char Tmp[256];
 	Action *action = NULL;
 	tryToRun |= AlwaysRun;
 	
