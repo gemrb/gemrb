@@ -90,7 +90,7 @@ Point NullSound::GetListenerPos()
 	return pos;
 }
 
-int NullSound::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, int)
+int NullSound::SetupNewStream(int, int, int, ieWord, bool, int)
 {
 	return -1;
 }

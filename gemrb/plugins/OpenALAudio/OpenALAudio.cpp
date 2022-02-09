@@ -723,7 +723,7 @@ bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 }
 
 //This one is used for movies and ambients.
-int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
+int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 		            ieWord gain, bool point, int ambientRange)
 {
 	// Find a free (or finished) stream for this sound

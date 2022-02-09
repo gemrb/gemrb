@@ -119,7 +119,7 @@ public:
 	virtual void UpdateListenerPos(const Point&) = 0;
 	virtual Point GetListenerPos() = 0;
 	virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;
-	virtual int SetupNewStream( ieWord x, ieWord y, ieWord z,
+	virtual int SetupNewStream(int x, int y, int z,
 				ieWord gain, bool point, int ambientRange) = 0;
 	virtual tick_t QueueAmbient(int stream, const char* sound) = 0;
 	virtual void SetAmbientStreamVolume(int stream, int volume) = 0;

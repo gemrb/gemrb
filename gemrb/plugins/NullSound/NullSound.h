@@ -43,7 +43,7 @@ public:
 	Point GetListenerPos() override;
 	void UpdateVolume(unsigned int) override {}
 
-	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange) override;
+	int SetupNewStream(int x, int y, int z, ieWord gain, bool point, int ambientRange) override;
 	tick_t QueueAmbient(int stream, const char* sound) override;
 	bool ReleaseStream(int stream, bool hardstop) override;
 	void SetAmbientStreamVolume(int stream, int gain) override;

@@ -432,7 +432,7 @@ void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 	SetAudioStreamVolume(mixerStream, mixerLen, MIX_MAX_VOLUME * volume / 100);
 }
 
-int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
+int SDLAudio::SetupNewStream(int x, int y, int z,
 			ieWord gain, bool point, int ambientRange)
 {
 	std::lock_guard<std::recursive_mutex> l(MusicMutex);
