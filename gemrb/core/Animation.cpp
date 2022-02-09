@@ -47,7 +47,7 @@ Animation::Animation(std::vector<frame_t> fr) noexcept
 
 void Animation::SetFrame(index_t index)
 {
-	if (index < frames.size()) {
+	if (index < GetFrameCount()) {
 		frameIdx = index;
 	}
 	starttime = 0;
@@ -57,7 +57,7 @@ void Animation::SetFrame(index_t index)
 Animation::index_t Animation::GetCurrentFrameIndex() const
 {
 	if (playReversed)
-		return frames.size() - frameIdx - 1;
+		return GetFrameCount() - frameIdx - 1;
 	return frameIdx;
 }
 
@@ -79,7 +79,7 @@ Animation::frame_t Animation::LastFrame(void)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[frames.size() - frameIdx - 1];
+		ret = frames[GetFrameCount() - frameIdx - 1];
 	else
 		ret = frames[frameIdx];
 	return ret;
@@ -100,7 +100,7 @@ Animation::frame_t Animation::NextFrame(void)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[frames.size() - frameIdx - 1];
+		ret = frames[GetFrameCount() - frameIdx - 1];
 	else
 		ret = frames[frameIdx];
 
@@ -116,13 +116,13 @@ Animation::frame_t Animation::NextFrame(void)
 		frameIdx += inc;
 		starttime += inc*1000/fps;
 	}
-	if (frameIdx >= frames.size()) {
+	if (frameIdx >= GetFrameCount()) {
 		if (!frames.empty()) {
 			if (Flags&A_ANI_PLAYONCE) {
-				frameIdx = frames.size() - 1;
+				frameIdx = GetFrameCount() - 1;
 				endReached = true;
 			} else {
-				frameIdx %= frames.size();
+				frameIdx %= GetFrameCount();
 				endReached = false; //looping, there is no end
 			}
 		} else {
@@ -141,7 +141,7 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[frames.size() - frameIdx - 1];
+		ret = frames[GetFrameCount() - frameIdx - 1];
 	else
 		ret = frames[frameIdx];
 
@@ -149,7 +149,7 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 	endReached = master->endReached;
 
 	//return a valid frame even if the master is longer (e.g. ankhegs)
-	frameIdx = master->frameIdx % frames.size();
+	frameIdx = master->frameIdx % GetFrameCount();
 
 	return ret;
 }
@@ -162,7 +162,7 @@ void Animation::release(void)
 /** Gets the i-th frame */
 Animation::frame_t Animation::GetFrame(index_t i) const
 {
-	if (i >= frames.size()) {
+	if (i >= GetFrameCount()) {
 		return NULL;
 	}
 	return frames[i];
