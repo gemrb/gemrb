@@ -112,13 +112,10 @@ Door* TileMap::GetDoorByPosition(const Point &p) const
 	return NULL;
 }
 
-Door* TileMap::GetDoor(const char* Name) const
+Door* TileMap::GetDoor(const ieVariable& Name) const
 {
-	if (!Name) {
-		return NULL;
-	}
 	for (Door *door : doors) {
-		if (stricmp( door->GetScriptName(), Name ) == 0)
+		if (door->GetScriptName() == Name)
 			return door;
 	}
 	return NULL;
@@ -181,10 +178,10 @@ Container* TileMap::GetContainer(unsigned int idx) const
 	return containers[idx];
 }
 
-Container* TileMap::GetContainer(const char* Name) const
+Container* TileMap::GetContainer(const ieVariable& Name) const
 {
 	for (Container *container : containers) {
-		if (stricmp(container->GetScriptName(), Name) == 0) {
+		if (container->GetScriptName() == Name) {
 			return container;
 		}
 	}
@@ -328,10 +325,10 @@ InfoPoint* TileMap::GetInfoPoint(const Point &p, bool skipSilent) const
 	return NULL;
 }
 
-InfoPoint* TileMap::GetInfoPoint(const char* Name) const
+InfoPoint* TileMap::GetInfoPoint(const ieVariable& Name) const
 {
 	for (InfoPoint *infoPoint : infoPoints) {
-		if (stricmp(infoPoint->GetScriptName(), Name) == 0) {
+		if (infoPoint->GetScriptName() == Name) {
 			return infoPoint;
 		}
 	}

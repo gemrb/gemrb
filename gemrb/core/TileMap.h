@@ -51,7 +51,7 @@ public:
 	//gets door by activation position (spell target)
 	Door* GetDoorByPosition(const Point &position) const;
 	Door* GetDoor(size_t idx) const;
-	Door* GetDoor(const char* Name) const;
+	Door* GetDoor(const ieVariable& Name) const;
 	size_t GetDoorCount() const { return doors.size(); }
 	//update doors for a new overlay
 	void UpdateDoors();
@@ -63,7 +63,7 @@ public:
 	Container* GetContainer(const Point &position, int type=-1) const;
 	//gets container by activation position (spell target)
 	Container* GetContainerByPosition(const Point &position, int type=-1) const;
-	Container* GetContainer(const char* Name) const;
+	Container* GetContainer(const ieVariable& Name) const;
 	Container* GetContainer(unsigned int idx) const;
 	/* cleans up empty heaps, returns 1 if container removed*/
 	int CleanupContainer(Container *container);
@@ -71,7 +71,7 @@ public:
 
 	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline);
 	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
-	InfoPoint* GetInfoPoint(const char* Name) const;
+	InfoPoint* GetInfoPoint(const ieVariable& Name) const;
 	InfoPoint* GetInfoPoint(size_t idx) const;
 	InfoPoint* GetTravelTo(const ResRef& Destination) const;
 	InfoPoint* AdjustNearestTravel(Point &p);
