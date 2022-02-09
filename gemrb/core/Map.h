@@ -268,6 +268,8 @@ public:
 
 class GEM_EXPORT AreaAnimation {
 public:
+	using index_t = Animation::index_t;
+	
 	mutable std::vector<Animation> animation; // FIXME: we need an "update" step, currently we do it in Draw() wich should remian const
 	//dwords, or stuff combining to a dword
 	Point Pos;
@@ -276,8 +278,8 @@ public:
 	// flags that must be touched by PST a bit only
 	ieDword originalFlags = 0;
 	//these are on one dword
-	Animation::index_t sequence = 0;
-	Animation::index_t frame = 0;
+	index_t sequence = 0;
+	index_t frame = 0;
 	//these are on one dword
 	ieWord transparency = 0;
 	ieWordSigned height = 0;

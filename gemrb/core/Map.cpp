@@ -3863,7 +3863,7 @@ void AreaAnimation::InitAnimation()
 		return;
 	}
 	
-	auto GetAnimationPiece = [af, this](Animation::index_t animCycle)
+	auto GetAnimationPiece = [af, this](index_t animCycle)
 	{
 		Animation ret;
 		Animation *anim = af->GetCycle(animCycle);
@@ -3887,12 +3887,12 @@ void AreaAnimation::InitAnimation()
 		return ret;
 	};
 
-	size_t animcount = af->GetCycleCount();
+	index_t animcount = af->GetCycleCount();
 	animation.reserve(animcount);
-	size_t existingcount = std::min(animation.size(), animcount);
+	index_t existingcount = std::min<index_t>(animation.size(), animcount);
 
 	if (Flags & A_ANI_ALLCYCLES && animcount > 0) {
-		size_t i = 0;
+		index_t i = 0;
 		for (; i < existingcount; ++i) {
 			animation[i] = GetAnimationPiece(i);
 		}
