@@ -4725,7 +4725,7 @@ void Actor::PlayWalkSound()
 	char suffix = 0;
 	uint8_t l = Sound.CStrLen();
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
-	if (core->HasFeature(GF_SOUNDFOLDERS) && !strnicmp(Sound.CString(), "FS_", 3)) {
+	if (core->HasFeature(GF_SOUNDFOLDERS) && Sound.StartsWith("FS_", 3)) {
 		suffix = cnt + 0x31;
 	} else if (cnt) {
 		suffix = cnt + 0x60; // 'a'-'g'

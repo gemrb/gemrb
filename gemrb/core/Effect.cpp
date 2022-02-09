@@ -137,7 +137,7 @@ bool Effect::operator==(const Effect& rhs) const noexcept
 	if (random_value != rhs.random_value) return false;
 	if (SpellLevel != rhs.SpellLevel) return false;
 
-	if (IsVariable && strnicmp(VariableName.CString(), rhs.VariableName.CString(), sizeof(VariableName)) != 0) return false;
+	if (IsVariable && VariableName != rhs.VariableName) return false;
 	else return Resource == rhs.Resource && Resource2 == rhs.Resource2 && Resource3 == rhs.Resource3 && Resource4 == rhs.Resource4;
 	
 }

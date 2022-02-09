@@ -2179,7 +2179,7 @@ int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	aniIterator iter = map->GetFirstAnimation();
 	while(AreaAnimation *an = map->GetNextAnimation(iter) ) {
 		//Only animations with 8 letters could be used, no problem, iwd uses 8 letters
-		if (!strnicmp (an->Name, fx->Resource, 8) ) {
+		if (an->Name.StartsWith(fx->Resource, 8)) {
 			//play spell hit animation
 			Projectile *pro=core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
 			pro->SetCaster(fx->CasterID, fx->CasterLevel);
