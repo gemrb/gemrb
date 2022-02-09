@@ -1333,7 +1333,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 	Map* map2;
 	Game* game = core->GetGame();
 	bool newSong = false;
-	if (!area.IsEmpty() && (!map1 || area != map1->GetScriptName())) { //do we need to switch area?
+	if (!area.IsEmpty() && (!map1 || area != map1->GetScriptRef())) { //do we need to switch area?
 		//we have to change the pathfinder
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);

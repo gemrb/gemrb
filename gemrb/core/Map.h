@@ -503,6 +503,7 @@ public:
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p) const;
 	
+	ResRef GetScriptRef() const { return GetScriptName().CString(); }
 	
 	int GetHeight(const Point &p) const;
 	Color GetLighting(const Point &p) const;

@@ -352,7 +352,7 @@ public:
 	void PartyRested();
 	ieDword GetInternalFlag() const;
 	void SetInternalFlag(unsigned int value, BitOp mode);
-	const char* GetScriptName() const;
+	const ieVariable& GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
 	void SetOverheadText(String text, bool display = true);

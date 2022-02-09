@@ -1855,9 +1855,8 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
-		char Tmp[256];
-		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", container->GetScriptName());
-		actor->CommandActor(GenerateAction(Tmp));
+		std::string Tmp = fmt::format("BashDoor(\"{}\")", container->GetScriptName());
+		actor->CommandActor(GenerateAction(std::move(Tmp)));
 		return;
 	}
 
@@ -1889,9 +1888,8 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	core->SetEventFlag(EF_RESETTARGET);
 
 	if (target_mode == TARGET_MODE_ATTACK) {
-		char Tmp[256];
-		snprintf(Tmp, sizeof(Tmp), "BashDoor(\"%s\")", door->GetScriptName());
-		actor->CommandActor(GenerateAction(Tmp));
+		std::string Tmp = fmt::format("BashDoor(\"{}\")", door->GetScriptName());
+		actor->CommandActor(GenerateAction(std::move(Tmp)));
 		return;
 	}
 
@@ -1970,9 +1968,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			}
 
 			if (trap->GetUsePoint() ) {
-				char Tmp[256];
-				sprintf(Tmp, "TriggerWalkTo(\"%s\")", trap->GetScriptName());
-				actor->CommandActor(GenerateAction(Tmp));
+				std::string Tmp = fmt::format("TriggerWalkTo(\"{}\")", trap->GetScriptName());
+				actor->CommandActor(GenerateAction(std::move(Tmp)));
 				return true;
 			}
 			return true;
@@ -2035,7 +2032,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 }
 
 // list of allowed area and exit combinations in pst that trigger worldmap travel
-static const std::map<std::string, std::vector<std::string>> pstWMapExits {
+static const ResRefMap<std::vector<ResRef>> pstWMapExits {
 	{"ar0100", {"to0300", "to0200", "to0101"}},
 	{"ar0101", {"to0100"}},
 	{"ar0200", {"to0100", "to0301", "to0400"}},
@@ -2060,10 +2057,10 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 	if (!teamMoved) return false;
 
 	teamMoved = false;
-	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptName());
+	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptRef());
 	if (wmapExits != pstWMapExits.end()) {
-		for (const std::string& exit : wmapExits->second) {
-			if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
+		for (const auto& exit : wmapExits->second) {
+			if (exit == overInfoPoint->GetScriptName()) {
 				teamMoved = true;
 				break;
 			}

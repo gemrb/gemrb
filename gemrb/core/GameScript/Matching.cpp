@@ -175,7 +175,7 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 		}
 
 		// meh, preserving constness
-		Map* map2 = core->GetGame()->GetMap(map->GetScriptName(), false);
+		Map* map2 = core->GetGame()->GetMap(map->GetScriptRef(), false);
 		Scriptable* target = map2->GetScriptableByGlobalID(static_cast<ieDword>(oC->objectFields[1]));
 		if (target != map2) {
 			return ReturnScriptableAsTarget(target);
@@ -383,7 +383,7 @@ bool MatchActor(const Scriptable *Sender, ieDword actorID, const Object *oC)
 
 	// name matching
 	if (oC->objectName[0]) {
-		if (strnicmp(ac->GetScriptName(), oC->objectName, 32) != 0) {
+		if (ac->GetScriptName() != oC->objectName) {
 			return false;
 		}
 		filtered = true;

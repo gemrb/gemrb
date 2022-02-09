@@ -205,7 +205,7 @@ Actor* Game::FindPC(unsigned int partyID) const
 Actor* Game::FindPC(const char *scriptingname) const
 {
 	for (auto pc : PCs) {
-		if (strnicmp(pc->GetScriptName(), scriptingname, 32) == 0) {
+		if (pc->GetScriptName() == scriptingname) {
 			return pc;
 		}
 	}
@@ -223,7 +223,7 @@ Actor* Game::FindNPC(unsigned int partyID) const
 Actor* Game::FindNPC(const char *scriptingname) const
 {
 	for (auto npc : NPCs) {
-		if (strnicmp(npc->GetScriptName(), scriptingname, 32) == 0) {
+		if (npc->GetScriptName() == scriptingname) {
 			return npc;
 		}
 	}
@@ -663,7 +663,7 @@ int Game::FindMap(const ResRef &resRef) const
 	int index = (int) Maps.size();
 	while (index--) {
 		const Map *map = Maps[index];
-		if (resRef == map->GetScriptName()) {
+		if (resRef == map->GetScriptRef()) {
 			return index;
 		}
 	}
@@ -727,7 +727,7 @@ void Game::SetMasterArea(const ResRef &area)
 
 int Game::AddMap(Map* map)
 {
-	if (MasterArea(map->GetScriptName()) ) {
+	if (MasterArea(map->GetScriptRef()) ) {
 		Maps.insert(Maps.begin(), 1, map);
 		MapIndex++;
 		return 0;
@@ -748,7 +748,7 @@ int Game::DelMap(unsigned int index, int forced)
 	assert(map);
 
 	if (MapIndex == (int) index) { //can't remove current map in any case
-		AnotherArea = map->GetScriptName();
+		AnotherArea = map->GetScriptRef();
 		return -1;
 	}
 
@@ -758,7 +758,7 @@ int Game::DelMap(unsigned int index, int forced)
 
 	if (forced || Maps.size() > MAX_MAPS_LOADED) {
 		//keep at least one master
-		const char *name = map->GetScriptName();
+		const ResRef name = map->GetScriptRef();
 		if (MasterArea(name) && AnotherArea.IsEmpty()) {
 			AnotherArea = name;
 			if (!forced) {
@@ -776,7 +776,7 @@ int Game::DelMap(unsigned int index, int forced)
 		//unselect them now before they get axed
 		std::vector< Actor*>::iterator m;
 		for (m = selected.begin(); m != selected.end();) {
-			if (!(*m)->InParty && (*m)->Area == Maps[index]->GetScriptName()) {
+			if (!(*m)->InParty && (*m)->Area == Maps[index]->GetScriptRef()) {
 				m = selected.erase(m);
 			} else {
 				++m;

@@ -2781,7 +2781,7 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 	} else {
 		arearesref = "ar30"; //InWatchersKeep
 	}
-	if (arearesref == tar->GetCurrentArea()->GetScriptName()) {
+	if (arearesref == tar->GetCurrentArea()->GetScriptRef()) {
 		return 1;
 	}
 	return 0;

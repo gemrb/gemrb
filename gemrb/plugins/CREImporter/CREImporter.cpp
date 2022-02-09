@@ -2609,7 +2609,7 @@ int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword I
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
 	stream->WriteDword(InvSize); //saving the inventory size to this unused part
-	stream->Write( actor->GetScriptName(), 32);
+	stream->WriteVariable(actor->GetScriptName());
 	return 0;
 }
 
@@ -2633,7 +2633,7 @@ int CREImporter::PutActorBG(DataStream *stream, const Actor *actor) const
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
 	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
-	stream->Write( actor->GetScriptName(), 32);
+	stream->WriteVariable(actor->GetScriptName());
 	return 0;
 }
 
@@ -2688,7 +2688,7 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
 	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
-	stream->Write( actor->GetScriptName(), 32);
+	stream->WriteVariable(actor->GetScriptName());
 	return 0;
 }
 
@@ -2733,7 +2733,7 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor) const
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
 	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
-	stream->Write( actor->GetScriptName(), 32);
+	stream->WriteVariable(actor->GetScriptName());
 	return 0;
 }
 
@@ -2788,7 +2788,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor) const
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte, 1);
 	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
-	stream->Write( actor->GetScriptName(), 32);
+	stream->WriteVariable(actor->GetScriptName());
 	tmpByte = actor->BaseStats[IE_CLASS];
 	stream->Write(&tmpByte, 1);
 	stream->WriteFilling(1);

@@ -962,7 +962,7 @@ static void Resurrect(const Scriptable *Owner, Actor *target, const Effect *fx, 
 	const Map *area = caster->GetCurrentArea();
 
 	if (area && target->GetCurrentArea()!=area) {
-		MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
+		MoveBetweenAreasCore(target, area->GetScriptRef(), p, fx->Parameter2, true);
 	}
 	target->Resurrect(p);
 }
@@ -4528,14 +4528,14 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter2 == 0 || target->Type == ST_CONTAINER) {
 		// no deplete, no interrupt, caster or provided level
 		// ForceSpell doesn't have a RES variant, so there's more work
-		char tmp[60];
+		std::string tmp;
 		if (target == Owner) {
 			// charname has no scriptname ...
-			snprintf(tmp, sizeof(tmp), "ForceSpell(Myself,%d)", ResolveSpellNumber(fx->Resource));
+			tmp = fmt::format("ForceSpell(Myself,{})", ResolveSpellNumber(fx->Resource));
 		} else {
-			snprintf(tmp, sizeof(tmp), "ForceSpell(\"%s\",%d)", target->GetScriptName(), ResolveSpellNumber(fx->Resource));
+			tmp = fmt::format("ForceSpell(\"{}\",{})", target->GetScriptName(), ResolveSpellNumber(fx->Resource));
 		}
-		Action *forceSpellAction = GenerateAction(tmp);
+		Action *forceSpellAction = GenerateAction(std::move(tmp));
 		if (fx->Parameter1 != 0) {
 			// override casting level
 			forceSpellAction->int1Parameter = fx->Parameter1;
@@ -5485,7 +5485,7 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//upgrade familiar to ToB version
 	if (fx->Parameter1 != 2 && game->Expansion == GAME_TOB) {
 		ResRef resource;
-		resource.SNPrintF("%.6s25", target->GetScriptName());
+		resource.SNPrintF("%.6s25", target->GetScriptName().CString());
 		//set this field, so the upgrade is triggered only once
 		fx->Parameter1 = 2;
 

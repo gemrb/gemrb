@@ -3934,7 +3934,7 @@ int Interface::SwapoutArea(Map *map) const
 	if (map->AreaFlags & AF_NOSAVE) {
 		Log(DEBUG, "Core", "Not saving area {}",
 			map->GetScriptName());
-		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
+		RemoveFromCache(map->GetScriptRef(), IE_ARE_CLASS_ID);
 		return 0;
 	}
 
@@ -3953,12 +3953,12 @@ int Interface::SwapoutArea(Map *map) const
 		if (ret <0) {
 			Log(WARNING, "Core", "Area removed: {}",
 				map->GetScriptName());
-			RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
+			RemoveFromCache(map->GetScriptRef(), IE_ARE_CLASS_ID);
 		}
 	} else {
 		Log(WARNING, "Core", "Area removed: {}",
 			map->GetScriptName());
-		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
+		RemoveFromCache(map->GetScriptRef(), IE_ARE_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
 	return 0;

@@ -103,9 +103,9 @@ void Scriptable::SetScriptName(const char* text)
 }
 
 /** Gets the DeathVariable */
-const char* Scriptable::GetScriptName(void) const
+const ieVariable& Scriptable::GetScriptName(void) const
 {
-	return scriptName.CString();
+	return scriptName;
 }
 
 void Scriptable::SetDialog(const ResRef &resref) {

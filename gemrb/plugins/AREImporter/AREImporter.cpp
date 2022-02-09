@@ -532,7 +532,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	//current area setting here, areas' 'scriptname' is their name
 	map->SetScriptName(resRef);
 	// reset MasterArea, since the script name wasn't available in the constructor
-	map->MasterArea = core->GetGame()->MasterArea(map->GetScriptName());
+	map->MasterArea = core->GetGame()->MasterArea(map->GetScriptRef());
 	int idx = GetTrackString(resRef);
 	if (idx>=0) {
 		map->SetTrackString(tracks[idx].text, tracks[idx].trackFlag, tracks[idx].difficulty);
@@ -1853,7 +1853,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 	for (unsigned int i=0;i<DoorsCount;i++) {
 		Door *d = map->TMap->GetDoor(i);
 
-		stream->Write( d->GetScriptName(), 32);
+		stream->WriteVariable(d->GetScriptName());
 		stream->WriteResRef( d->ID);
 		if (map->version == 16) {
 			d->Flags = FixIWD2DoorFlags(d->Flags, true);
@@ -2005,7 +2005,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		const Container *c = map->TMap->GetContainer(i);
 
 		//this is the editor name
-		stream->Write( c->GetScriptName(), 32);
+		stream->WriteVariable(c->GetScriptName());
 		tmpWord = (ieWord) c->Pos.x;
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) c->Pos.y;
@@ -2049,7 +2049,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		tmpWord = 0;
 		stream->WriteWord(tmpWord); //vertex count is made short
 		//this is the real scripting name
-		stream->Write( c->GetScriptName(), 32);
+		stream->WriteVariable(c->GetScriptName());
 		stream->WriteResRefLC(c->KeyResRef);
 		stream->WriteDword(tmpDword); //unknown80
 		stream->WriteStrRef(c->OpenFail);
@@ -2066,7 +2066,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 	for (unsigned int i=0;i<InfoPointsCount;i++) {
 		const InfoPoint *ip = map->TMap->GetInfoPoint(i);
 
-		stream->Write( ip->GetScriptName(), 32);
+		stream->WriteVariable(ip->GetScriptName());
 		//this is a hack, we abuse a coincidence
 		//ST_PROXIMITY = 1, ST_TRIGGER = 2, ST_TRAVEL = 3
 		//translates to trap = 0, info = 1, travel = 2
@@ -2189,7 +2189,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 	for (unsigned int i = 0; i < ActorCount; i++) {
 		const Actor *ac = map->GetActor(i, false);
 
-		stream->Write( ac->GetScriptName(), 32);
+		stream->WriteVariable(ac->GetScriptName());
 		tmpWord = (ieWord) ac->Pos.x;
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) ac->Pos.y;

@@ -3955,9 +3955,8 @@ static int CheckInteract(const char *talker, const char *target)
 void Actor::HandleInteractV1(const Actor *target)
 {
 	LastTalker = target->GetGlobalID();
-	char tmp[50];
-	snprintf(tmp, sizeof(tmp), "Interact(\"%s\")", target->GetScriptName());
-	AddAction(GenerateAction(tmp));
+	std::string tmp = fmt::format("Interact(\"{}\")", target->GetScriptName());
+	AddAction(GenerateAction(std::move(tmp)));
 }
 
 int Actor::HandleInteract(const Actor *target) const

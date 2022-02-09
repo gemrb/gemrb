@@ -569,7 +569,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	}
 
 	if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptName(), tar->Pos, 0)) {
-		MoveBetweenAreasCore(actor, map->GetScriptName(), tar->Pos, -1, true);
+		MoveBetweenAreasCore(actor, map->GetScriptRef(), tar->Pos, -1, true);
 	}
 }
 
@@ -689,7 +689,7 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 	if (!map) return;
 
 	if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptName(), to->Pos, 0)) {
-		MoveBetweenAreasCore(actor, map->GetScriptName(), to->Pos, -1, true);
+		MoveBetweenAreasCore(actor, map->GetScriptRef(), to->Pos, -1, true);
 	}
 }
 
@@ -5178,9 +5178,7 @@ void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 			scr->AddAction(GenerateActionDirect("NIDSpecial3()", static_cast<Actor*>(tar)));
 		}
 	} else {
-		char Tmp[80];
-		snprintf(Tmp, sizeof(Tmp), "BashDoor(%s)", tar->GetScriptName());
-		scr->AddAction ( GenerateAction(Tmp) );
+		scr->AddAction(GenerateAction(fmt::format("BashDoor({})", tar->GetScriptName())));
 	}
 }
 

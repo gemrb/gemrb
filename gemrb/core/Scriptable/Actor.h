@@ -563,9 +563,9 @@ public:
 	}
 	
 	/** Gets the DeathVariable */
-	const char* GetScriptName(void) const
+	const ieVariable& GetScriptName() const
 	{
-		return scriptName.CString();
+		return scriptName;
 	}
 	ResRef GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */

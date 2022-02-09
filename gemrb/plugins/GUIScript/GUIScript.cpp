@@ -9202,7 +9202,7 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 			continue;
 		}
 		//true if names don't match
-		int nomatch = usedItem.username[0] && strnicmp(usedItem.username.CString(), actor->GetScriptName(), 32) != 0;
+		int nomatch = usedItem.username[0] && usedItem.username != actor->GetScriptName();
 
 		switch(action) {
 		//the named actor cannot remove it
