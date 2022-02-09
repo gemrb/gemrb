@@ -10466,11 +10466,12 @@ void Actor::UseExit(ieDword exitID) {
 		LastArea = Area;
 		UsedExit.Reset();
 		if (LastExit) {
-			const char *ipName = NULL;
 			const Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);
-			if (ip) ipName = ip->GetScriptName();
-			if (ipName && ipName[0]) {
-				UsedExit.SNPrintF("%s", ipName);
+			if (ip) {
+				const ieVariable& ipName = ip->GetScriptName();
+				if (!ipName.IsEmpty()) {
+					UsedExit = ipName;
+				}
 			}
 		}
 	}
