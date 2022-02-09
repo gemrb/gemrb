@@ -730,7 +730,7 @@ Holder<Sprite2D> WindowManager::WinFrameEdge(int edge) const
 		if (im) {
 			frame = im->GetSprite2D();
 		}
-		winframes.insert(std::make_pair(ref, frame));
+		winframes.emplace(ref, frame);
 	}
 
 	return frame;

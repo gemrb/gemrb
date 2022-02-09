@@ -114,7 +114,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	MapSheetSegment(chr, Region(pageXPos, (g.pos.y < 0) ? 0 : g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	const ieByte* pageLoc = pageData + pageXPos;
-	glyphs.insert(std::make_pair(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w)));
+	glyphs.emplace(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w));
 
 	pageXPos = newX;
 	

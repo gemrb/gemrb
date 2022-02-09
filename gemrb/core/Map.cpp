@@ -226,7 +226,7 @@ private:
 					resrefs[j - 1] = tab->QueryField(j, i);
 				}
 				ResRef GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
-				vars.insert(std::make_pair(GroupName, SpawnGroup(std::move(resrefs), level)));
+				vars.emplace(GroupName, SpawnGroup(std::move(resrefs), level));
 			}
 		}
 	}

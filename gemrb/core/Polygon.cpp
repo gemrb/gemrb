@@ -87,7 +87,7 @@ void Gem_Polygon::Rasterize()
 			}
 
 			if (!merged) {
-				rasterData[y].push_back(std::make_pair(Point(lt, y), Point(rt, y)));
+				rasterData[y].emplace_back(Point(lt, y), Point(rt, y));
 			}
 		}
 	}

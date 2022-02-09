@@ -2605,8 +2605,8 @@ static void InitActorTables()
 			int raceID = strtosigned<int>(tm->QueryField(i, 3));
 			int favClass = strtosigned<int>(tm->QueryField(i, 8));
 			const char *raceName = tm->GetRowName(i);
-			favoredMap.insert(std::make_pair(raceID, favClass));
-			raceID2Name.insert(std::make_pair(raceID, raceName));
+			favoredMap.emplace(raceID, favClass);
+			raceID2Name.emplace(raceID, raceName);
 		}
 	}
 
@@ -9052,7 +9052,7 @@ void Actor::AddVVCell(ScriptedAnimation* vvc)
 {
 	assert(vvc);
 	vvc->Pos = Pos;
-	vfxDict.insert(std::make_pair(vvc->ResName, vvc));
+	vfxDict.emplace(vvc->ResName, vvc);
 	vfxQueue.insert(vvc);
 	assert(vfxDict.size() == vfxQueue.size());
 }

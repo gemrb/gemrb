@@ -70,7 +70,7 @@ int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trac
 		destStream->WriteDword(complen);
 
 		if (trackLocations) {
-			newAreLocations.emplace(std::make_pair(it->first, relativeLocation));
+			newAreLocations.emplace(it->first, relativeLocation);
 			relativeLocation += 8 + complen;
 		}
 

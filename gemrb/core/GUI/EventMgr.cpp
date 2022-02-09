@@ -294,7 +294,7 @@ bool EventMgr::RegisterHotKeyCallback(const EventCallback& cb, KeyboardKey key, 
 	if (it != HotKeys.end()) {
 		it->second.push_front(cb);
 	} else {
-		HotKeys.insert(std::make_pair(flags, std::list<EventCallback>(1, cb)));
+		HotKeys.emplace(flags, std::list<EventCallback>(1, cb));
 	}
 
 	return true;

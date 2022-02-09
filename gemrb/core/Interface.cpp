@@ -558,7 +558,7 @@ bool Interface::ReadDamageTypeTable() {
 		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2), nullptr, 16);
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
 		di.reduction = atoi(tm->QueryField(i, 4));
-		DamageInfoMap.insert(std::make_pair(di.value, di));
+		DamageInfoMap.emplace(di.value, di);
 	}
 
 	return true;
@@ -3465,7 +3465,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 		for(int k=0;k<l;k++) {
 			refs.push_back(ResRef::MakeLowerCase(tab->QueryField(j, k)));
 		}
-		RtRows.insert(std::make_pair(ItemName, ItemList(std::move(refs), cl)));
+		RtRows.emplace(ItemName, ItemList(std::move(refs), cl));
 	}
 	return true;
 }

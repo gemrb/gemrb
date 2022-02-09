@@ -59,7 +59,7 @@ public:
 	const Region& MapSheetSegment(KeyType key, const Region& rgn) {
 		Region intersection = rgn.Intersect(SheetRegion);
 		if (!intersection.size.IsInvalid()) {
-			if (RegionMap.insert(std::make_pair(key, intersection)).second) {
+			if (RegionMap.emplace(key, intersection).second) {
 				return RegionMap[key];
 			}
 			// FIXME: should we return something like Region(0,0,0,0) here?
