@@ -43,12 +43,106 @@
 
 namespace GemRB {
 
-static EffectDesc Opcodes[MAX_EFFECTS];
+static int compare_effects(const void *a, const void *b)
+{
+	return stricmp(((const EffectDesc *) a)->Name,((const EffectDesc *) b)->Name);
+}
 
-static int initialized = 0;
+static int find_effect(const void *a, const void *b)
+{
+	return stricmp((const char *) a,((const EffectDesc *) b)->Name);
+}
+
 static std::vector<EffectDesc> effectnames;
-static int pstflags = false;
-static bool iwd2fx = false;
+
+void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
+{
+	size_t oldc = effectnames.size();
+	effectnames.resize(effectnames.size() + count);
+
+	std::copy(opcodes, opcodes + count, &effectnames[0] + oldc);
+
+	//if we merge two effect lists, then we need to sort their effect tables
+	//actually, we might always want to sort this list, so there is no
+	//need to do it manually (sorted table is needed if we use bsearch)
+	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), compare_effects);
+}
+
+static EffectDesc* FindEffect(const char* effectname)
+{
+	if (!effectname || effectnames.empty()) {
+		return nullptr;
+	}
+	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), find_effect);
+	if( !tmp) {
+		Log(WARNING, "EffectQueue", "Couldn't assign effect: {}", effectname);
+	}
+	return (EffectDesc *) tmp;
+}
+
+/** Initializes table of available spell Effects used by all the queues. */
+/** The available effects should already be registered by the effect plugins */
+
+struct Globals {
+	static constexpr int MAX_EFFECTS = 512;
+	EffectDesc Opcodes[MAX_EFFECTS];
+	
+	int pstflags = false;
+	bool iwd2fx = false;
+	
+	static const Globals& Get() {
+		static Globals globs;
+		return globs;
+	}
+
+private:
+	Globals()
+	{
+		pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
+		iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
+
+		AutoTable efftextTable = gamedata->LoadTable("efftext");
+
+		int eT = core->LoadSymbol( "effects" );
+		if (eT < 0) {
+			error("EffectQueue", "A critical scripting file is missing!");
+		}
+		auto effectsTable = core->GetSymbol( eT );
+		if (!effectsTable) {
+			error("EffectQueue", "A critical scripting file is damaged!");
+		}
+
+		for (int i = 0; i < MAX_EFFECTS; i++) {
+			const char* effectname = effectsTable->GetValue( i );
+
+			EffectDesc* poi = FindEffect( effectname );
+			if( poi != nullptr) {
+				Opcodes[i] = *poi;
+
+				//reverse linking opcode number
+				//using this unused field
+				if( (poi->opcode!=-1) && effectname[0]!='*') {
+					error("EffectQueue", "Clashing Opcodes FN: {} vs. {}, {}", i, poi->opcode, effectname);
+				}
+				poi->opcode = i;
+			}
+			
+			if (efftextTable) {
+				int row = efftextTable->GetRowCount();
+				while (row--) {
+					const char* ret = efftextTable->GetRowName( row );
+					int val;
+					if(valid_signednumber(ret, val) && (i == val)) {
+						Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);
+					} else {
+						Opcodes[i].Strref = ieStrRef::INVALID;
+					}
+				}
+			}
+		}
+		core->DelSymbol( eT );
+	}
+};
 
 static EffectRef fx_unsummon_creature_ref = { "UnsummonCreature", -1 };
 static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
@@ -210,28 +304,6 @@ static inline ieByte TriggeredEffect(ieByte timingmode)
 	return fx_triggered[timingmode];
 }
 
-static int compare_effects(const void *a, const void *b)
-{
-	return stricmp(((const EffectDesc *) a)->Name,((const EffectDesc *) b)->Name);
-}
-
-static int find_effect(const void *a, const void *b)
-{
-	return stricmp((const char *) a,((const EffectDesc *) b)->Name);
-}
-
-static EffectDesc* FindEffect(const char* effectname)
-{
-	if (!effectname || effectnames.empty()) {
-		return nullptr;
-	}
-	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), find_effect);
-	if( !tmp) {
-		Log(WARNING, "EffectQueue", "Couldn't assign effect: {}", effectname);
-	}
-	return (EffectDesc *) tmp;
-}
-
 static inline void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if( effect_reference.opcode==-1) {
@@ -242,74 +314,6 @@ static inline void ResolveEffectRef(EffectRef &effect_reference)
 		}
 		effect_reference.opcode = -2;
 	}
-}
-
-bool Init_EffectQueue()
-{
-	if( initialized) {
-		return true;
-	}
-	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
-	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
-	initialized = 1;
-
-	AutoTable efftextTable = gamedata->LoadTable("efftext");
-
-	int eT = core->LoadSymbol( "effects" );
-	if (eT < 0) {
-		Log(ERROR, "EffectQueue", "A critical scripting file is missing!");
-		return false;
-	}
-	auto effectsTable = core->GetSymbol( eT );
-	if (!effectsTable) {
-		Log(ERROR, "EffectQueue", "A critical scripting file is damaged!");
-		return false;
-	}
-
-	for (int i = 0; i < MAX_EFFECTS; i++) {
-		const char* effectname = effectsTable->GetValue( i );
-
-		EffectDesc* poi = FindEffect( effectname );
-		if( poi != nullptr) {
-			Opcodes[i] = *poi;
-
-			//reverse linking opcode number
-			//using this unused field
-			if( (poi->opcode!=-1) && effectname[0]!='*') {
-				error("EffectQueue", "Clashing Opcodes FN: {} vs. {}, {}", i, poi->opcode, effectname);
-			}
-			poi->opcode = i;
-		}
-		
-		if (efftextTable) {
-			int row = efftextTable->GetRowCount();
-			while (row--) {
-				const char* ret = efftextTable->GetRowName( row );
-				int val;
-				if(valid_signednumber(ret, val) && (i == val)) {
-					Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);
-				} else {
-					Opcodes[i].Strref = ieStrRef::INVALID;
-				}
-			}
-		}
-	}
-	core->DelSymbol( eT );
-
-	return true;
-}
-
-void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
-{
-	size_t oldc = effectnames.size();
-	effectnames.resize(effectnames.size() + count);
-
-	std::copy(opcodes, opcodes + count, &effectnames[0] + oldc);
-
-	//if we merge two effect lists, then we need to sort their effect tables
-	//actually, we might always want to sort this list, so there is no
-	//need to do it manually (sorted table is needed if we use bsearch)
-	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), compare_effects);
 }
 
 Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing)
@@ -443,6 +447,8 @@ bool EffectQueue::RemoveEffect(const Effect* fx)
 //... but some require reinitialisation
 void EffectQueue::ApplyAllEffects(Actor* target)
 {
+	const auto& Opcodes = Globals::Get().Opcodes;
+
 	for (auto& fx : effects) {
 		if (Opcodes[fx.Opcode].Flags & EFFECT_REINIT_ON_LOAD) {
 			// pretend to be the first application (FirstApply==1)
@@ -723,6 +729,7 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination)
 //resisted effect based on level
 static inline bool check_level(const Actor *target, Effect *fx)
 {
+	const auto& Opcodes = Globals::Get().Opcodes;
 	//skip non level based effects
 	//check if an effect has no level based resistance, but instead the dice sizes/count
 	//adjusts Parameter1 (like a damage causing effect)
@@ -968,6 +975,7 @@ static int check_type(Actor *actor, const Effect& fx)
 // pure magic resistance
 static inline int check_magic_res(const Actor *actor, const Effect *fx, const Actor *caster)
 {
+	const auto& globals = Globals::Get();
 	//don't resist self
 	bool selective_mr = core->HasFeature(GF_SELECTIVE_MAGIC_RES);
 	if (fx->CasterID == actor->GetGlobalID() && selective_mr) {
@@ -978,7 +986,7 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	bool resisted = false;
 
-	if (iwd2fx) {
+	if (globals.iwd2fx) {
 		// 3ed style check
 		int roll = core->Roll(1, 20, 0);
 		ieDword check = fx->CasterLevel + roll;
@@ -998,7 +1006,7 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 	if (resisted) {
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
 		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
-		Log(MESSAGE, "EffectQueue", "effect resisted: {}", Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "effect resisted: {}", globals.Opcodes[fx->Opcode].Name);
 		return FX_NOT_APPLIED;
 	}
 	return -1;
@@ -1011,15 +1019,17 @@ static int check_resistance(Actor* actor, Effect* fx)
 
 	const Scriptable *cob = GetCasterObject();
 	const Actor* caster = cob->As<const Actor>();
+	
+	const auto& globals = Globals::Get();
 
 	//opcode immunity
 	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
-		Log(MESSAGE, "EffectQueue", "{} is immune to effect: {}", fmt::WideToChar{actor->GetName()}, Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "{} is immune to effect: {}", fmt::WideToChar{actor->GetName()}, globals.Opcodes[fx->Opcode].Name);
 		return FX_NOT_APPLIED;
 	}
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
-		Log(MESSAGE, "EffectQueue", "{} is immune2 to effect: {}", fmt::WideToChar{actor->GetName()}, Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "{} is immune2 to effect: {}", fmt::WideToChar{actor->GetName()}, globals.Opcodes[fx->Opcode].Name);
 		// totlm's spin166 should be wholly blocked by spwi210, but only blocks its third effect, so make it fatal
 		return FX_ABORT;
 	}
@@ -1030,7 +1040,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 		return check_magic_res(actor, fx, caster);
 	}
 
-	if (pstflags && (actor->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
+	if (globals.pstflags && (actor->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
 		return -1;
 	}
 
@@ -1066,7 +1076,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 	for (int i=0;i<5;i++) {
 		if( fx->SavingThrowType&(1<<i)) {
 			// FIXME: first bonus handling for iwd2 is just a guess
-			if (iwd2fx) {
+			if (globals.iwd2fx) {
 				saved = actor->GetSavingThrow(i, bonus - fx->SavingThrowBonus, fx);
 			} else {
 				saved = actor->GetSavingThrow(i, bonus);
@@ -1080,19 +1090,19 @@ static int check_resistance(Actor* actor, Effect* fx)
 		if( fx->IsSaveForHalfDamage) {
 			// if we have evasion, we take no damage
 			// sadly there's no feat or stat for it
-			if (iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
+			if (globals.iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
 				fx->Parameter1 = 0;
 				return FX_NOT_APPLIED;
 			} else {
 				fx->Parameter1 /= 2;
 			}
 		} else {
-			Log(MESSAGE, "EffectQueue", "{} saved against effect: {}", fmt::WideToChar{actor->GetName()}, Opcodes[fx->Opcode].Name);
+			Log(MESSAGE, "EffectQueue", "{} saved against effect: {}", fmt::WideToChar{actor->GetName()}, globals.Opcodes[fx->Opcode].Name);
 			return FX_NOT_APPLIED;
 		}
 	} else {
 		// improved evasion: take only half damage even though we failed the save
-		if (iwd2fx && fx->IsSaveForHalfDamage && actor->HasFeat(FEAT_IMPROVED_EVASION)) {
+		if (globals.iwd2fx && fx->IsSaveForHalfDamage && actor->HasFeat(FEAT_IMPROVED_EVASION)) {
 			fx->Parameter1 /= 2;
 		}
 	}
@@ -1114,7 +1124,10 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	if (fx->TimingMode == FX_DURATION_JUST_EXPIRED) {
 		return FX_NOT_APPLIED;
 	}
-	if( fx->Opcode >= MAX_EFFECTS) {
+	
+	const auto& globals = Globals::Get();
+	
+	if( fx->Opcode >= Globals::MAX_EFFECTS) {
 		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		return FX_NOT_APPLIED;
 	}
@@ -1172,7 +1185,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 				fx->TimingMode = FX_DURATION_ABSOLUTE;
 				inTicks = true;
 			}
-			if (pstflags && !(fx->SourceFlags & SF_SIMPLIFIED_DURATION)) {
+			if (globals.pstflags && !(fx->SourceFlags & SF_SIMPLIFIED_DURATION)) {
 				// pst stored the delay in ticks already, so we use a variant of PrepareDuration
 				// unless it's our unhardcoded spells which use iwd2-style simplified duration in rounds per level
 				inTicks = true;
@@ -1214,23 +1227,23 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	}
 
 	int res = FX_ABORT;
-	if (fx->Opcode >= MAX_EFFECTS) {
+	if (fx->Opcode >= Globals::MAX_EFFECTS) {
 		return res;
 	}
 
-	if (!target && !(Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR)) {
+	if (!target && !(globals.Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR)) {
 		Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: {}, skipping", fx->Opcode);
 		return FX_NOT_APPLIED;
 	}
 
-	const EffectDesc& ed = Opcodes[fx->Opcode];
+	const EffectDesc& ed = globals.Opcodes[fx->Opcode];
 	if (!ed) {
 		return res;
 	}
 
 	if (target && fx->FirstApply) {
 		if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0)) {
-			displaymsg->DisplayStringName(Opcodes[fx->Opcode].Strref, DMC_WHITE, target, STRING_FLAGS::SOUND);
+			displaymsg->DisplayStringName(globals.Opcodes[fx->Opcode].Strref, DMC_WHITE, target, STRING_FLAGS::SOUND);
 		}
 	}
 
@@ -1350,6 +1363,7 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed)
 	}
 	const SPLExtHeader *sph = spell->GetExtHeader(0);
 	if (!sph) return; // some iwd2 clabs are only markers
+	const auto& Opcodes = Globals::Get().Opcodes;
 	for (const Effect& origfx : sph->features) {
 		if (origfx.TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
 		if (!(Opcodes[origfx.Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;
@@ -2044,8 +2058,9 @@ std::string EffectQueue::dump() const
 {
 	std::string buffer("EFFECT QUEUE:\n");
 	int i = 0;
+	const auto& Opcodes = Globals::Get().Opcodes;
 	for (const Effect& fx : effects) {
-		if (fx.Opcode >= MAX_EFFECTS) {
+		if (fx.Opcode >= Globals::MAX_EFFECTS) {
 			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: {}! Report this immediately!", fx.Opcode);
 			return buffer;
 		}
@@ -2211,6 +2226,8 @@ void EffectQueue::AffectAllInRange(const Map *map, const Point &pos, int idstype
 bool EffectQueue::OverrideTarget(const Effect *fx)
 {
 	if (!fx) return false;
+	
+	const auto& Opcodes = Globals::Get().Opcodes;
 	return (Opcodes[fx->Opcode].Flags & EFFECT_PRESET_TARGET);
 }
 

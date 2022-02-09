@@ -44,9 +44,6 @@ class Actor;
 class Map;
 class Scriptable;
 
-/** Maximum number of different Effect opcodes */
-#define MAX_EFFECTS 512
-
 /** if the effect returns this, stop adding any other effect */
 #define FX_ABORT 0
 /** these effects don't stick around if used as permanent,
@@ -215,10 +212,6 @@ enum STITypes {
 
 	STI_INVALID = 0xffff
 };
-
-/** Initializes table of available spell Effects used by all the queues. */
-/** The available effects should already be registered by the effect plugins */
-bool Init_EffectQueue();
 
 /** Registers opcodes implemented by an effect plugin */
 void EffectQueue_RegisterOpcodes(int count, const EffectDesc *opcodes);

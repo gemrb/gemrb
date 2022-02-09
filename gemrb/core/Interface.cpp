@@ -1399,13 +1399,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	calendar = NULL;
 	keymap = NULL;
 
-	Log(MESSAGE, "Core", "Initializing effects...");
-	ret = Init_EffectQueue();
-	if (!ret) {
-		Log(FATAL, "Core", "Failed to initialize effects.");
-		return GEM_ERROR;
-	}
-
 	Log(MESSAGE, "Core", "Initializing Inventory Management...");
 	ret = InitItemTypes();
 	if (!ret) {
