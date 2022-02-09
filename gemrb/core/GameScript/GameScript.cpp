@@ -2224,12 +2224,12 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	return rE;
 }
 
-void GameScript::ExecuteString(Scriptable* Sender, const char* String)
+void GameScript::ExecuteString(Scriptable* Sender, std::string string)
 {
-	if (String[0] == 0) {
+	if (string.empty()) {
 		return;
 	}
-	Action* act = GenerateAction( String );
+	Action* act = GenerateAction(std::move(string));
 	if (!act) {
 		return;
 	}

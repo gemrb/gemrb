@@ -514,7 +514,7 @@ public:
 	bool running = false;   // Script is currently running so defer any deletion to caller
 
 	ResRef GetName() const { return Name; }
-	static void ExecuteString(Scriptable* Sender, const char* String);
+	static void ExecuteString(Scriptable* Sender, std::string string);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 
