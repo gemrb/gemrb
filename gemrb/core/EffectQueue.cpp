@@ -1928,7 +1928,6 @@ void EffectQueue::AddWeaponEffects(EffectQueue* fxqueue, EffectRef& fx_ref, ieDw
 		if (!fx2) continue;
 		fx2->Target = FX_TARGET_PRESET;
 		fxqueue->AddEffect(fx2, true);
-		delete fx2;
 	}
 }
 
