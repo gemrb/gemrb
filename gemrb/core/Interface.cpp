@@ -253,6 +253,8 @@ Interface::Interface() noexcept
 
 	tokens = new Variables();
 	tokens->SetType( GEM_VARIABLES_STRING );
+	
+	sgiterator = new SaveGameIterator();
 }
 
 Interface::~Interface() noexcept
@@ -1315,13 +1317,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 	if (!AudioDriver->Init()) {
 		Log(FATAL, "Core", "Failed to initialize sound driver.");
-		return GEM_ERROR;
-	}
-
-	Log(MESSAGE, "Core", "Allocating SaveGameIterator...");
-	sgiterator = new SaveGameIterator();
-	if (sgiterator == NULL) {
-		Log(FATAL, "Core", "Failed to allocate SaveGameIterator.");
 		return GEM_ERROR;
 	}
 
