@@ -2489,27 +2489,28 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	}
 }
 
-Trigger* GenerateTrigger(char* String)
+Trigger* GenerateTrigger(std::string string)
 {
-	StringToLower(String, String + strlen(String), String);
-	ScriptDebugLog(ID_TRIGGERS, "Compiling: {}", String);
+	StringToLower(string);
+	ScriptDebugLog(ID_TRIGGERS, "Compiling: {}", string);
 
 	int negate = 0;
-	if (*String == '!') {
-		String++;
+	strpos_t start = 0;
+	if (string[start] == '!') {
+		++start;
 		negate = TF_NEGATE;
 	}
-	int len = strlench(String,'(')+1; //including (
-	int i = triggersTable->FindString(String, len);
+	strpos_t len = string.find_first_of('(', start) + 1; //including (
+	int i = triggersTable->FindString(string.c_str() + start, int(len));
 	if (i<0) {
-		Log(ERROR, "GameScript", "Invalid scripting trigger: {}", String);
+		Log(ERROR, "GameScript", "Invalid scripting trigger: {}", string);
 		return NULL;
 	}
-	const char *src = String + len;
+	const char *src = string.c_str() + len;
 	const char *str = triggersTable->GetStringIndex(i) + len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
-		Log(ERROR, "GameScript", "Malformed scripting trigger: {}", String);
+		Log(ERROR, "GameScript", "Malformed scripting trigger: {}", string);
 		return NULL;
 	}
 	return trigger;
