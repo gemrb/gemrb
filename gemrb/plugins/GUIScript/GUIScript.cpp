@@ -7295,8 +7295,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	const Item *item = gamedata->GetItem(ItemResRef, true);
 	if (!item) {
-		Log(ERROR, "GUIScript", "Invalid resource reference: {}",
-			ItemResRef.CString());
+		Log(ERROR, "GUIScript", "Invalid resource reference: {}", ItemResRef);
 		return PyLong_FromLong(0);
 	}
 

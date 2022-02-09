@@ -1264,7 +1264,7 @@ void CREImporter::ReadSpellbook(Actor *act)
 	for (auto knownSpell : knownSpells) {
 		if (knownSpell) {
 			Log(WARNING, "CREImporter", "Dangling known spell in creature: {}!",
-				knownSpell->SpellResRef.CString());
+				knownSpell->SpellResRef);
 			delete knownSpell;
 		}
 	}
@@ -1273,7 +1273,7 @@ void CREImporter::ReadSpellbook(Actor *act)
 	for (auto memorizedSpell : memorizedSpells) {
 		if (memorizedSpell) {
 			Log(WARNING, "CREImporter", "Dangling spell in creature: {}!",
-				memorizedSpell->SpellResRef.CString());
+				memorizedSpell->SpellResRef);
 			delete memorizedSpell;
 		}
 	}

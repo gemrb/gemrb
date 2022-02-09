@@ -4871,9 +4871,9 @@ std::string Actor::dump() const
 	}
 	buffer.append("\n");
 	AppendFormat(buffer, "Area:       {} {}\n", Area, Pos);
-	AppendFormat(buffer, "Dialog:     {}    TalkCount:  {}\n", Dialog.CString(), TalkCount);
+	AppendFormat(buffer, "Dialog:     {}    TalkCount:  {}\n", Dialog, TalkCount);
 	AppendFormat(buffer, "Global ID:  {}   PartySlot: {}\n", GetGlobalID(), InParty);
-	AppendFormat(buffer, "Script name:{:<32}    Current action: {}    Total: {}\n", scriptName.CString(), CurrentAction ? CurrentAction->actionID : -1, actionQueue.size());
+	AppendFormat(buffer, "Script name:{:<32}    Current action: {}    Total: {}\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, actionQueue.size());
 	AppendFormat(buffer, "Int. Flags: 0x{:x}    ", InternalFlags);
 	AppendFormat(buffer, "MC Flags: 0x{:x}    ", Modified[IE_MC_FLAGS]);
 	AppendFormat(buffer, "Allegiance: {}   current allegiance:{}\n", BaseStats[IE_EA], Modified[IE_EA] );
