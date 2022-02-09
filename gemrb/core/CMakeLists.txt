@@ -1,5 +1,3 @@
-ADD_DEFINITIONS(-DGEM_BUILD_DLL)
-
 FILE(GLOB gemrb_core_LIB_SRCS
 	Ambient.cpp
 	AmbientMgr.cpp
