@@ -21,18 +21,20 @@
 
 #include <Python.h>
 
+#include <string>
+
 namespace GemRB {
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'.
  */
-PyObject* RuntimeError(const char* msg);
+PyObject* RuntimeError(const std::string& msg);
 
 /* Prints error msg for invalid function parameters and also the function's
  * doc string (given as an argument). Then returns NULL, so this function
  * can be called in `return'. The exception should be set by previous
  * call to e.g. PyArg_ParseTuple()
  */
-PyObject* AttributeError(const char* doc_string);
+PyObject* AttributeError(const std::string& doc_string);
 
 }
 

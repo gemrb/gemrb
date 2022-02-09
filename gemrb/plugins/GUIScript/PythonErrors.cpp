@@ -32,10 +32,10 @@ static PyObject* PyError(PyObject* err, const char* msg)
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'.
  */
-PyObject* RuntimeError(const char* msg)
+PyObject* RuntimeError(const std::string& msg)
 {
 	Log(ERROR, "GUIScript", "Runtime Error:");
-	return PyError(PyExc_RuntimeError, msg);
+	return PyError(PyExc_RuntimeError, msg.c_str());
 }
 
 /* Prints error msg for invalid function parameters and also the function's
@@ -43,10 +43,10 @@ PyObject* RuntimeError(const char* msg)
  * can be called in `return'. The exception should be set by previous
  * call to e.g. PyArg_ParseTuple()
  */
-PyObject* AttributeError(const char* doc_string)
+PyObject* AttributeError(const std::string& doc_string)
 {
 	Log(ERROR, "GUIScript", "Attribute Error:");
-	return PyError(PyExc_AttributeError, doc_string);
+	return PyError(PyExc_AttributeError, doc_string.c_str());
 }
 
 }

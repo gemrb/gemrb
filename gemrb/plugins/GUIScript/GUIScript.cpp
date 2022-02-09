@@ -6521,10 +6521,7 @@ static PyObject *SetSpellIcon(Button* btn, const ResRef& SpellResRef, int type, 
 	}
 	const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(iconResRef, IE_BAM_CLASS_ID, true);
 	if (!af) {
-		char tmpstr[24];
-
-		snprintf(tmpstr, sizeof(tmpstr), "%s BAM not found", iconResRef.CString());
-		return RuntimeError( tmpstr );
+		return RuntimeError(fmt::format("{} BAM not found", iconResRef));
 	}
 	//small difference between pst and others
 	if (af->GetCycleSize(0)!=4) { //non-pst
@@ -10525,10 +10522,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	AnimationFactory* bam = ( AnimationFactory* )
 	gamedata->GetFactoryResource(GUIResRef[Index], IE_BAM_CLASS_ID);
 	if (!bam) {
-		char tmpstr[24];
-
-		snprintf(tmpstr, sizeof(tmpstr), "%s BAM not found", GUIResRef[Index].CString());
-		return RuntimeError( tmpstr );
+		return RuntimeError(fmt::format("{} BAM not found", GUIResRef[Index]));
 	}
 	packtype row;
 
