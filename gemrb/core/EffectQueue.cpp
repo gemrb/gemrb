@@ -223,7 +223,7 @@ static int find_effect(const void *a, const void *b)
 static EffectDesc* FindEffect(const char* effectname)
 {
 	if (!effectname || effectnames.empty()) {
-		return NULL;
+		return nullptr;
 	}
 	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), find_effect);
 	if( !tmp) {
@@ -270,7 +270,7 @@ bool Init_EffectQueue()
 		const char* effectname = effectsTable->GetValue( i );
 
 		EffectDesc* poi = FindEffect( effectname );
-		if( poi != NULL) {
+		if( poi != nullptr) {
 			Opcodes[i] = *poi;
 
 			//reverse linking opcode number
@@ -315,11 +315,11 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing)
 {
 	if( opcode==0xffffffff) {
-		return NULL;
+		return nullptr;
 	}
 	Effect *fx = new Effect();
 	if( !fx) {
-		return NULL;
+		return nullptr;
 	}
 
 	fx->Target = FX_TARGET_SELF;
@@ -366,7 +366,7 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return NULL;
+		return nullptr;
 	}
 	return CreateEffect(effect_reference.opcode, param1, param2, timing);
 }
@@ -378,7 +378,7 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2)
 {
 	if( opcode==0xffffffff) {
-		return NULL;
+		return nullptr;
 	}
 	Effect *fx = new Effect(*oldfx);
 	if (!fx) return nullptr;
@@ -393,14 +393,14 @@ Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, EffectRef &effect_ref
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return NULL;
+		return nullptr;
 	}
 	return CreateEffectCopy(oldfx, effect_reference.opcode, param1, param2);
 }
 
 Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 {
-	Effect *newfx = NULL;
+	Effect *newfx = nullptr;
 	if( (fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
 		newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
 		newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
@@ -430,9 +430,8 @@ void EffectQueue::AddEffect(Effect* fx, bool insert)
 bool EffectQueue::RemoveEffect(const Effect* fx)
 {
 	for (auto f = effects.begin(); f != effects.end(); ++f) {
-		Effect& fx2 = *f;
-		if (*fx == fx2) {
-			effects.erase( f );
+		if (*fx == *f) {
+			effects.erase(f);
 			return true;
 		}
 	}
@@ -574,7 +573,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		if( !pretarget || pretarget->InParty) {
 			goto all_party;
 		}
-		assert(self != NULL);
+		assert(self != nullptr);
 		map = self->GetCurrentArea();
 		spec = pretarget->GetStat(IE_SPECIFIC);
 
@@ -633,7 +632,7 @@ all_party:
 		break;
 
 	case FX_TARGET_ALL:
-		assert(self != NULL);
+		assert(self != nullptr);
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(true);
 		while(i--) {
@@ -653,7 +652,7 @@ all_party:
 		break;
 
 	case FX_TARGET_ALL_BUT_PARTY:
-		assert(self != NULL);
+		assert(self != nullptr);
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(false);
 		while(i--) {
@@ -1633,7 +1632,7 @@ const Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return NULL;
+		return nullptr;
 	}
 	return HasOpcode(effect_reference.opcode);
 }
@@ -1653,7 +1652,7 @@ Effect *EffectQueue::HasEffect(EffectRef &effect_reference)
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return NULL;
+		return nullptr;
 	}
 	return HasOpcode(effect_reference.opcode);
 }
@@ -1675,7 +1674,7 @@ const Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDwo
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return NULL;
+		return nullptr;
 	}
 	return HasOpcodeWithParam(effect_reference.opcode, param2);
 }
@@ -1704,7 +1703,7 @@ const Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, i
 {
 	ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return NULL;
+		return nullptr;
 	}
 	return HasOpcodeWithParamPair(effect_reference.opcode, param1, param2);
 }
@@ -2078,7 +2077,7 @@ const Effect *EffectQueue::GetNextSavedEffect(queue_t::const_iterator &f) const
 			return &effect;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 const Effect *EffectQueue::GetNextEffect(queue_t::const_iterator &f) const
