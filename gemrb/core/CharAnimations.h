@@ -30,7 +30,8 @@
 #include "Resource.h"
 #include "TableMgr.h"
 
-#include <vector>
+#include <array>
+#include <memory>
 
 namespace GemRB {
 
@@ -160,28 +161,13 @@ struct AvatarStruct {
 struct EquipResRefData;
 
 class GEM_EXPORT CharAnimations {
-private:
-	using AvatarTable_t = std::vector<AvatarStruct>;
-	struct AvatarTableLoader final {
-		AvatarTable_t table;
-		
-		static const AvatarTable_t& Get() {
-			static AvatarTableLoader loader;
-			return loader.table;
-		}
-		
-	private:
-		AvatarTableLoader() noexcept;
-	};
-	
-	const AvatarTable_t& AvatarTable = AvatarTableLoader::Get();
-	
-	Animation** Anims[MAX_ANIMS][MAX_ORIENT];
-	Animation** shadowAnimations[MAX_ANIMS][MAX_ORIENT];
-	char HelmetRef[2]{};
-	char WeaponRef[2]{};
-	char OffhandRef[2]{};
 public:
+	// using shared_ptr<Animation> because several orientations can share the same animation
+	using SharedAnim = std::shared_ptr<Animation>;
+	using PartAnim = std::vector<SharedAnim>;
+	using OrientAnim = std::array<PartAnim, MAX_ORIENT>;
+	using StanceAnim = std::array<OrientAnim, MAX_ANIMS>;
+
 	const ieDword *Colors = nullptr; // these are the custom color indices
 	RGBModifier ColorMods[PAL_MAX*8]; // color modification effects
 	tick_t lastModUpdate = 0;
@@ -200,7 +186,7 @@ public:
 	unsigned char stanceID = 0;
 	bool autoSwitchOnEnd = false;
 	bool lockPalette = false;
-public:
+
 	CharAnimations(unsigned int AnimID, ieDword ArmourLevel);
 	CharAnimations(const CharAnimations&) = delete;
 	~CharAnimations();
@@ -218,16 +204,15 @@ public:
 	void LockPalette(const ieDword *Colors);
 
 	// returns an array of animations of size GetTotalPartCount()
-	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);
+	const PartAnim* GetAnimation(unsigned char Stance, orient_t Orient);
 	int GetTotalPartCount() const;
 	const int* GetZOrder(unsigned char Orient) const;
-	Animation** GetShadowAnimation(unsigned char Stance, unsigned char Orient);
+	const PartAnim* GetShadowAnimation(unsigned char Stance, orient_t OXrient);
 
 	// returns Palette for a given part (unlocked)
 	PaletteHolder GetPartPalette(int part) const; // TODO: clean this up
 	PaletteHolder GetShadowPalette() const;
 
-public: //attribute functions
 	static size_t GetAvatarsCount();
 	static const AvatarStruct &GetAvatarStruct(size_t RowNum);
 	unsigned int GetAnimationID() const;
@@ -242,6 +227,7 @@ public: //attribute functions
 	const ResRef &GetArmourLevel(int ArmourLevel) const;
 	void PulseRGBModifiers();
 	void DebugDump() const;
+
 private:
 	void DropAnims();
 	void InitAvatarsTable() const;
@@ -295,7 +281,30 @@ private:
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
 		std::string& dest, unsigned char& Cycle, const EquipResRefData* equip) const;
 	unsigned char MaybeOverrideStance(unsigned char stance) const;
-	void MaybeUpdateMainPalette(Animation**);
+	void MaybeUpdateMainPalette(Animation&);
+	
+	using AvatarTable_t = std::vector<AvatarStruct>;
+	struct AvatarTableLoader final {
+		AvatarTable_t table;
+		
+		static const AvatarTable_t& Get() {
+			static AvatarTableLoader loader;
+			return loader.table;
+		}
+		
+	private:
+		AvatarTableLoader() noexcept;
+	};
+	
+	const AvatarTable_t& AvatarTable = AvatarTableLoader::Get();
+	
+	
+	StanceAnim Anims;
+	StanceAnim shadowAnimations;
+
+	char HelmetRef[2]{};
+	char WeaponRef[2]{};
+	char OffhandRef[2]{};
 };
 
 }

@@ -591,9 +591,9 @@ void Actor::SetAnimationID(unsigned int AnimID)
 			Log(MESSAGE, "Actor", "No moverate.2da found, using animation ({:#x}) for speed fallback!", AnimID);
 		}
 		if (row == -1) {
-			Animation **anim = anims->GetAnimation(IE_ANI_WALK, 0);
-			if (anim && anim[0]) {
-				SetBase(IE_MOVEMENTRATE, anim[0]->GetFrameCount());
+			const auto* anim = anims->GetAnimation(IE_ANI_WALK, S);
+			if (anim) {
+				SetBase(IE_MOVEMENTRATE, anim->at(0)->GetFrameCount());
 			} else {
 				Log(WARNING, "Actor", "Unable to determine movement rate for animation {:#x}!", AnimID);
 			}
@@ -8218,13 +8218,13 @@ bool Actor::AdvanceAnimations()
 
 	unsigned char stanceID = GetStance();
 	unsigned char face = GetNextFace();
-	Animation** stanceAnim = anims->GetAnimation(stanceID, face);
+	const auto* stanceAnim = anims->GetAnimation(stanceID, orient_t(face));
 	
 	if (stanceAnim == nullptr) {
 		return false;
 	}
 	
-	Animation** shadows = anims->GetShadowAnimation(stanceID, face);
+	const auto* shadows = anims->GetShadowAnimation(stanceID, orient_t(face));
 	
 	const auto count = anims->GetTotalPartCount();
 	const auto zOrder = anims->GetZOrder(face);
@@ -8233,13 +8233,13 @@ bool Actor::AdvanceAnimations()
 	for (int part = 0; part < count; ++part) {
 		int partnum = part;
 		if (zOrder) partnum = zOrder[part];
-		Animation* anim = stanceAnim[partnum];
+		Animation* anim = stanceAnim->at(partnum).get();
 		if (anim) {
 			currentStance.anim.emplace_back(anim, anims->GetPartPalette(partnum));
 		}
 		
 		if (shadows) {
-			Animation* shadowAnim = shadows[partnum];
+			Animation* shadowAnim = shadows->at(partnum).get();
 			if (shadowAnim) {
 				currentStance.shadow.emplace_back(shadowAnim, anims->GetShadowPalette());
 			}

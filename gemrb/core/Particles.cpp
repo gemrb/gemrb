@@ -165,7 +165,7 @@ void Particles::Draw(Point p)
 		p.x-=pos.x;
 		p.y-=pos.y;
 	}
-	int i = size;
+	ieWord i = size;
 	while (i--) {
 		if (points[i].state == -1) {
 			continue;
@@ -205,12 +205,12 @@ void Particles::Draw(Point p)
 			*/
 			if (fragments) {
 				//IE_ANI_CAST stance has a simple looping animation
-				Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
+				const auto* anims = fragments->GetAnimation(IE_ANI_CAST, orient_t(i));
 				if (!anims) {
 					break;
 				}
 
-				const Animation* anim = anims[0];
+				const auto anim = anims->at(0);
 				Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
 
 				BlitFlags flags = BlitFlags::NONE;
