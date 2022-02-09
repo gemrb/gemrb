@@ -1409,16 +1409,16 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 				const char *scriptName = map->GetScriptName();
 				int count = INInote->GetKeyAsInt(scriptName, "count", 0);
 				while (count) {
-					char key[32];
+					ieVariable key;
 					int value;
-					snprintf(key, sizeof(key), "xPos%d",count);
+					key.SNPrintF("xPos%d", count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					point.x = value;
-					snprintf(key, sizeof(key), "yPos%d",count);
+					key.SNPrintF("yPos%d", count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					point.y = value;
-					snprintf(key, sizeof(key), "text%d",count);
-					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					key.SNPrintF("text%d", count);
+					value = INInote->GetKeyAsInt(scriptName, key.CString(), 0);
 					map->AddMapNote(point, 0, ieStrRef(value), true);
 					count--;
 				}
