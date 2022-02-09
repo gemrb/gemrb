@@ -484,7 +484,7 @@ public:
 		return &*iter++;
 	}
 
-	AreaAnimation *GetAnimation(const char *Name);
+	AreaAnimation *GetAnimation(const ieVariable& Name);
 	size_t GetAnimationCount() const { return animations.size(); }
 
 	void SetWallGroups(std::vector<WallPolygonGroup>&& walls)
@@ -520,12 +520,12 @@ public:
 	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
 	const std::vector<Actor *> &GetAllActors() const { return actors; }
 	std::vector<Actor*> GetActorsInRect(const Region& rgn, int excludeFlags) const;
-	Actor* GetActor(const char* Name, int flags) const;
+	Actor* GetActor(const ieVariable& Name, int flags) const;
 	Actor* GetActor(int i, bool any) const;
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
 	Scriptable *GetScriptableByDialog(const ResRef& resref) const;
 	Actor *GetItemByDialog(const ResRef& resref) const;
-	Actor *GetActorByResource(const char *resref) const;
+	Actor *GetActorByResource(const ResRef& resref) const;
 	Actor *GetActorByScriptName(const char *name) const;
 	bool HasActor(const Actor *actor) const;
 	bool SpawnsAlive() const;
@@ -569,8 +569,8 @@ public:
 	void FadeSparkle(const Point &pos, bool forced) const;
 
 	//entrances
-	void AddEntrance(const char* Name, const Point &, short Face);
-	Entrance *GetEntrance(const char *Name) const;
+	void AddEntrance(const ieVariable& Name, const Point &, short Face);
+	Entrance *GetEntrance(const ieVariable& Name) const;
 	Entrance *GetEntrance(int i) const { return entrances[i]; }
 	int GetEntranceCount() const { return (int) entrances.size(); }
 

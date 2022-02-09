@@ -202,7 +202,7 @@ Actor* Game::FindPC(unsigned int partyID) const
 	return NULL;
 }
 
-Actor* Game::FindPC(const char *scriptingname) const
+Actor* Game::FindPC(const ieVariable& scriptingname) const
 {
 	for (auto pc : PCs) {
 		if (pc->GetScriptName() == scriptingname) {
@@ -220,7 +220,7 @@ Actor* Game::FindNPC(unsigned int partyID) const
 	return NULL;
 }
 
-Actor* Game::FindNPC(const char *scriptingname) const
+Actor* Game::FindNPC(const ieVariable& scriptingname) const
 {
 	for (auto npc : NPCs) {
 		if (npc->GetScriptName() == scriptingname) {

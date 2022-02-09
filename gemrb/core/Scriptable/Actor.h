@@ -439,7 +439,7 @@ private:
 	/** fixes the palette */
 	void SetupColors();
 	/** debugging function, gets the scripting name of an actor referenced by a global ID */
-	const char* GetActorNameByID(ieDword ID) const;
+	ieVariable GetActorNameByID(ieDword ID) const;
 	/* checks a weapon quick slot and resets it to fist if it is empty */
 	void CheckWeaponQuickSlot(unsigned int which) const;
 	/* helper for usability checks */
@@ -629,8 +629,8 @@ public:
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
-	bool HasSpecialDeathReaction(const char *deadname) const;
-	void ReactToDeath(const char *deadname);
+	bool HasSpecialDeathReaction(const ieVariable& deadname) const;
+	void ReactToDeath(const ieVariable& deadname);
 	/* sends trigger_died to everyone in visual range */
 	void SendDiedTrigger() const;
 	/* called when someone talks to Actor */

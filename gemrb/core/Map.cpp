@@ -2258,10 +2258,10 @@ std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsign
 }
 
 
-Actor* Map::GetActor(const char* Name, int flags) const
+Actor* Map::GetActor(const ieVariable& Name, int flags) const
 {
 	for (auto actor : actors) {
-		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
+		if (actor->GetScriptName() == Name) {
 			// there can be more with the same scripting name, see bg2/ar0014.baf
 			if (!actor->ValidTarget(flags) ) {
 				continue;
@@ -2459,10 +2459,10 @@ Actor *Map::GetItemByDialog(const ResRef &resref) const
 }
 
 //this function finds an actor by its original resref (not correct yet)
-Actor *Map::GetActorByResource(const char *resref) const
+Actor *Map::GetActorByResource(const ResRef& resref) const
 {
 	for (auto actor : actors) {
-		if (strnicmp( actor->GetScriptName(), resref, 8 ) == 0) { //temporarily!
+		if (actor->GetScriptName().StartsWith(resref, 8)) { //temporarily!
 			return actor;
 		}
 	}
@@ -2472,7 +2472,7 @@ Actor *Map::GetActorByResource(const char *resref) const
 Actor *Map::GetActorByScriptName(const char *name) const
 {
 	for (auto actor : actors) {
-		if (strnicmp( actor->GetScriptName(), name, 8 ) == 0) {
+		if (actor->GetScriptName().StartsWith(name, 8)) { // FIXME: why is this limited to 8?
 			return actor;
 		}
 	}
@@ -2849,10 +2849,10 @@ void Map::AddVVCell(VEFObject* vvc)
 	vvcCells.insert(iter, vvc);
 }
 
-AreaAnimation *Map::GetAnimation(const char *Name)
+AreaAnimation *Map::GetAnimation(const ieVariable& Name)
 {
 	for (auto& anim : animations) {
-		if (anim.Name[0] && (strnicmp(anim.Name, Name, 32) == 0)) {
+		if (anim.Name == Name) {
 			return &anim;
 		}
 	}
@@ -2870,7 +2870,7 @@ Spawn *Map::AddSpawn(const char* Name, const Point &p, std::vector<ResRef>&& cre
 	return sp;
 }
 
-void Map::AddEntrance(const char* Name, const Point &p, short Face)
+void Map::AddEntrance(const ieVariable& Name, const Point &p, short Face)
 {
 	Entrance* ent = new Entrance();
 	ent->Name = Name;
@@ -2879,10 +2879,10 @@ void Map::AddEntrance(const char* Name, const Point &p, short Face)
 	entrances.push_back( ent );
 }
 
-Entrance *Map::GetEntrance(const char *Name) const
+Entrance *Map::GetEntrance(const ieVariable& Name) const
 {
 	for (auto entrance : entrances) {
-		if (strnicmp(entrance->Name, Name, 32) == 0) {
+		if (entrance->Name == Name) {
 			return entrance;
 		}
 	}

@@ -346,7 +346,7 @@ InfoPoint* TileMap::GetInfoPoint(size_t idx) const
 	return infoPoints[idx];
 }
 
-InfoPoint* TileMap::GetTravelTo(const char* Destination) const
+InfoPoint* TileMap::GetTravelTo(const ResRef& Destination) const
 {
 	for (InfoPoint *infoPoint : infoPoints) {
 		if (infoPoint->Type != ST_TRAVEL) continue;

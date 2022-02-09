@@ -307,9 +307,9 @@ public:
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
 	int InStore(const Actor *pc) const;
 	/** Finds an actor in party by scripting name*/
-	Actor* FindPC(const char *deathvar) const;
+	Actor* FindPC(const ieVariable& deathvar) const;
 	/** Finds an actor in store by scripting name*/
-	Actor* FindNPC(const char *deathvar) const;
+	Actor* FindNPC(const ieVariable& deathvar) const;
 	/** Sets the area and position of the actor to the starting position */
 	void InitActorPos(Actor *actor) const;
 	/** Joins party */

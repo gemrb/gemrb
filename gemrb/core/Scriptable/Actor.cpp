@@ -3854,7 +3854,7 @@ void Actor::DisplayStringOrVerbalConstant(size_t str, int vcstat, int vccount) c
 	}
 }
 
-bool Actor::HasSpecialDeathReaction(const char *deadname) const
+bool Actor::HasSpecialDeathReaction(const ieVariable& deadname) const
 {
 	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return false;
@@ -3862,7 +3862,7 @@ bool Actor::HasSpecialDeathReaction(const char *deadname) const
 	return value && value[0] != '0';
 }
 
-void Actor::ReactToDeath(const char * deadname)
+void Actor::ReactToDeath(const ieVariable& deadname)
 {
 	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return;
@@ -4922,7 +4922,7 @@ std::string Actor::dump() const
 	return buffer;
 }
 
-const char* Actor::GetActorNameByID(ieDword ID) const
+ieVariable Actor::GetActorNameByID(ieDword ID) const
 {
 	const Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
 	if (!actor) {

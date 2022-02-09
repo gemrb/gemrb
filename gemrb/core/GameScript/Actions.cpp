@@ -568,7 +568,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter, 0);
 	}
 
-	if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptName(), tar->Pos, 0)) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptRef(), tar->Pos, 0)) {
 		MoveBetweenAreasCore(actor, map->GetScriptRef(), tar->Pos, -1, true);
 	}
 }
@@ -688,7 +688,7 @@ void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 	const Map *map = to->GetCurrentArea();
 	if (!map) return;
 
-	if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptName(), to->Pos, 0)) {
+	if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptRef(), to->Pos, 0)) {
 		MoveBetweenAreasCore(actor, map->GetScriptRef(), to->Pos, -1, true);
 	}
 }

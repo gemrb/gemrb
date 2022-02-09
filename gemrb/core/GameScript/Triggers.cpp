@@ -2760,7 +2760,7 @@ int GameScript::CurrentAreaIs(Scriptable *Sender, const Trigger *parameters)
 	}
 	ResRef arearesref;
 	arearesref.SNPrintF("AR%04d", parameters->int0Parameter);
-	if (arearesref == tar->GetCurrentArea()->GetScriptName()) {
+	if (arearesref == tar->GetCurrentArea()->GetScriptRef()) {
 		return 1;
 	}
 	return 0;
