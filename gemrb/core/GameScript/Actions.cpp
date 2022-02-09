@@ -6784,10 +6784,8 @@ void GameScript::Leader(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	char Tmp[256];
-
-	snprintf(Tmp, 256, "MoveToPoint([%d.%d])", parameters->pointParameter.x, parameters->pointParameter.y);
-	Action *newact = GenerateAction(Tmp);
+	std::string tmp = fmt::format("MoveToPoint([{}.{}])", parameters->pointParameter.x, parameters->pointParameter.y);
+	Action *newact = GenerateAction(std::move(tmp));
 	Sender->AddAction(newact);
 }
 
@@ -6798,10 +6796,8 @@ void GameScript::Follow(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	char Tmp[256];
-
-	snprintf(Tmp, 256, "MoveToPointNoRecticle([%d.%d])", parameters->pointParameter.x, parameters->pointParameter.y);
-	Action *newact = GenerateAction(Tmp);
+	std::string tmp = fmt::format("MoveToPointNoRecticle([{}.{}])", parameters->pointParameter.x, parameters->pointParameter.y);
+	Action *newact = GenerateAction(std::move(tmp));
 	Sender->AddAction(newact);
 }
 

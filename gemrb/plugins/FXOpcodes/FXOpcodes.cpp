@@ -4572,9 +4572,8 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	if (fx->Parameter2 == 0) {
 		// no deplete, no interrupt, caster or provided level
 		// ForceSpellPoint doesn't have a RES variant, so there's more work
-		char tmp[40];
-		snprintf(tmp, sizeof(tmp), "ForceSpellPoint([%d.%d],%d)", fx->Pos.x, fx->Pos.y, ResolveSpellNumber(fx->Resource));
-		Action *forceSpellAction = GenerateAction(tmp);
+		std::string tmp = fmt::format("ForceSpellPoint([{}.{}],{})", fx->Pos.x, fx->Pos.y, ResolveSpellNumber(fx->Resource));
+		Action *forceSpellAction = GenerateAction(std::move(tmp));
 		if (fx->Parameter1 != 0) {
 			// override casting level
 			forceSpellAction->int1Parameter = fx->Parameter1;

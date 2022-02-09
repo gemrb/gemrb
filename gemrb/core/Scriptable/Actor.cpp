@@ -7740,7 +7740,8 @@ void Actor::UpdateModalState(ieDword gameTime)
 			BaseStats[IE_CHECKFORBERSERK]--;
 		}
 		if (state & STATE_CONFUSED) {
-			const char* actionString = NULL;
+			std::string actionString;
+			actionString.reserve(32);
 			int tmp = core->Roll(1,3,0);
 			switch (tmp) {
 			case 2:
@@ -7758,7 +7759,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 				actionString = "NoAction()";
 				break;
 			}
-			Action *action = GenerateAction( actionString );
+			Action *action = GenerateAction(actionString);
 			if (action) {
 				ReleaseCurrentAction();
 				AddActionInFront(action);

@@ -973,8 +973,6 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 
 void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const Point &enter, int flags, int wait)
 {
-	char Tmp[256];
-
 	if (Sender->CurrentActionTicks<100) {
 		if (!p.IsInvalid() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
 			//MoveNearerTo will return 0, if the actor is in move
@@ -989,12 +987,13 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 		}
 	}
 
+	std::string Tmp;
 	if (flags &EA_DESTROY) {
 		//this must be put into a non-const variable
-		sprintf( Tmp, "DestroySelf()" );
+		Tmp = "DestroySelf()";
 	} else {
 		// last parameter is 'face', which should be passed from relevant action parameter..
-		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%d.%d],%d)", area, enter.x, enter.y, 0 );
+		Tmp = fmt::format("MoveBetweenAreas(\"{}\",[{}.{}],{})", area, enter.x, enter.y, 0);
 	}
 	Log(MESSAGE, "GSUtils", "Executing {} in EscapeAreaCore", Tmp);
 	//drop this action, but add another (destroyself or movebetweenareas)
@@ -1005,7 +1004,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 		Sender->SetWait(wait);
 	}
 	Sender->ReleaseCurrentAction();
-	Action * action = GenerateAction( Tmp);
+	Action * action = GenerateAction(std::move(Tmp));
 	Sender->AddActionInFront( action );
 }
 

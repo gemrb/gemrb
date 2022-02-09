@@ -276,20 +276,17 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 	tryToRun |= AlwaysRun;
 	
 	if (append) {
-		sprintf(Tmp, "AddWayPoint([%d.%d])", p.x, p.y);
-		action = GenerateAction(Tmp);
+		action = GenerateAction(fmt::format("AddWayPoint([{}.{}])", p.x, p.y));
 		assert(action);
 	} else {
 		//try running (in PST) only if not encumbered
 		if (tryToRun && CanRun(actor)) {
-			sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
-			action = GenerateAction( Tmp );
+			action = GenerateAction(fmt::format("RunToPoint([{}.{}])", p.x, p.y));
 		}
 		
 		// check again because GenerateAction can fail (non PST)
 		if (!action) {
-			sprintf(Tmp, "MoveToPoint([%d.%d])", p.x, p.y);
-			action = GenerateAction( Tmp );
+			action = GenerateAction(fmt::format("MoveToPoint([{}.{}])", p.x, p.y));
 		}
 	}
 
@@ -1699,8 +1696,6 @@ void GameControl::TryToDisarm(Actor *source, const InfoPoint *tgt) const
 //generate action code for source actor to use item/cast spell on a point
 void GameControl::TryToCast(Actor *source, const Point &tgt)
 {
-	char Tmp[40];
-
 	if ((target_types&GA_POINT) == false) {
 		return; // not allowed to target point
 	}
@@ -1712,17 +1707,19 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	source->Stop();
 
 	spellCount--;
+	std::string tmp;
+	tmp.reserve(30);
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			strlcpy(Tmp, "SpellPointNoDec(\"\",[0.0])", sizeof(Tmp));
+			tmp = "SpellPointNoDec(\"\",[0.0])";
 		} else {
-			strlcpy(Tmp, "SpellPoint(\"\",[0.0])", sizeof(Tmp));
+			tmp = "SpellPoint(\"\",[0.0])";
 		}
 	} else {
 		//using item on target
-		strlcpy(Tmp, "UseItemPoint(\"\",[0,0],0)", sizeof(Tmp));
+		tmp = "UseItemPoint(\"\",[0,0],0)";
 	}
-	Action* action = GenerateAction( Tmp );
+	Action* action = GenerateAction(std::move(tmp));
 	action->pointParameter=tgt;
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
@@ -2277,9 +2274,7 @@ void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryT
 
 	// p is a searchmap travel region or a plain travel region in pst (matching several other criteria)
 	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || doWorldMap) {
-		char Tmp[256];
-		sprintf(Tmp, "NIDSpecial2()");
-		party[0]->AddAction(GenerateAction(Tmp));
+		party[0]->AddAction(GenerateAction("NIDSpecial2()"));
 	}
 }
 bool GameControl::OnMouseWheelScroll(const Point& delta)
