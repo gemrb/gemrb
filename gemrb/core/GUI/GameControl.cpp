@@ -1664,7 +1664,8 @@ void GameControl::TryToDefend(Actor *source, const Actor *tgt) const
 void GameControl::TryToPick(Actor *source, const Scriptable *tgt) const
 {
 	source->SetModal(MS_NONE);
-	const char* cmdString = NULL;
+	std::string cmdString;
+	cmdString.reserve(20);
 	switch (tgt->Type) {
 		case ST_ACTOR:
 			cmdString = "PickPockets([-1])";
@@ -1681,7 +1682,7 @@ void GameControl::TryToPick(Actor *source, const Scriptable *tgt) const
 			Log(ERROR, "GameControl", "Invalid pick target of type {}", tgt->Type);
 			return;
 	}
-	source->CommandActor(GenerateActionDirect(cmdString, tgt));
+	source->CommandActor(GenerateActionDirect(std::move(cmdString), tgt));
 }
 
 //generate action code for source actor to try to disable trap (only trap type active regions)
@@ -1753,8 +1754,6 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 //generate action code for source actor to use item/cast spell on another actor
 void GameControl::TryToCast(Actor *source, const Actor *tgt)
 {
-	char Tmp[40];
-
 	// pst has no aura pollution
 	bool aural = true;
 	if (spellCount >= 1000) {
@@ -1777,17 +1776,19 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 	}
 
 	spellCount--;
+	std::string tmp;
+	tmp.reserve(20);
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			sprintf(Tmp, "NIDSpecial7()");
+			tmp = "NIDSpecial7()";
 		} else {
-			sprintf(Tmp, "NIDSpecial6()");
+			tmp = "NIDSpecial6()";
 		}
 	} else {
 		//using item on target
-		sprintf(Tmp, "NIDSpecial5()");
+		tmp = "NIDSpecial5()";
 	}
-	Action* action = GenerateActionDirect( Tmp, tgt);
+	Action* action = GenerateActionDirect(std::move(tmp), tgt);
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
 			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName.CString());

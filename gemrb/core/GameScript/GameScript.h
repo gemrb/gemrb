@@ -1518,7 +1518,7 @@ public: //Script Functions
 };
 
 GEM_EXPORT Action* GenerateAction(std::string String);
-Action *GenerateActionDirect(const char *String, const Scriptable *object);
+Action *GenerateActionDirect(std::string string, const Scriptable *object);
 GEM_EXPORT Trigger* GenerateTrigger(char* String);
 
 void InitializeIEScript();

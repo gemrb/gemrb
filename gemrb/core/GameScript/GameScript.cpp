@@ -2551,9 +2551,9 @@ Action* GenerateAction(std::string actionString)
 	return action;
 }
 
-Action *GenerateActionDirect(const char *String, const Scriptable *object)
+Action *GenerateActionDirect(std::string string, const Scriptable *object)
 {
-	Action* action = GenerateAction(String);
+	Action* action = GenerateAction(std::move(string));
 	if (!action) return NULL;
 	Object *tmp = action->objects[1];
 	if (tmp && tmp->objectFields[0]==-1) {
