@@ -2787,7 +2787,7 @@ void Map::SortQueues()
 {
 	for (int q = 0; q < QUEUE_COUNT; ++q) {
 		std::sort(queue[q].begin(), queue[q].end(), [](const Actor* a, const Actor* b) {
-			return a->Pos.y < b->Pos.y;
+			return b->Pos.y < a->Pos.y;
 		});
 	}
 }
