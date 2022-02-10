@@ -5843,7 +5843,7 @@ void GameScript::RandomTurn(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	actor->SetOrientation(RAND(0, MAX_ORIENT-1), true);
+	actor->SetOrientation(RandomOrientation(), true);
 	// the original waited more if the actor was offscreen, perhaps as an optimization
 	int diceSides = 40;
 	Region vp = core->GetGameControl()->Viewport();

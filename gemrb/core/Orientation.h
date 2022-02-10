@@ -1,0 +1,99 @@
+/* GemRB - Infinity Engine Emulator
+ * Copyright (C) 2022 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ *
+ */
+
+#ifndef ORIENT_H
+#define ORIENT_H
+
+#include "RNG.h"
+
+#include <cstdint>
+
+namespace GemRB {
+
+enum orient_t : uint8_t {
+	/*
+	WEST PART  |  EAST PART
+			   |
+	  NW  NNW  N  NNE  NE
+	NW 006 007 008 009 010 NE
+	WNW 005    |      011 ENE
+	W 004     xxx     012 E
+	WSW 003    |      013 ESE
+	SW 002 001 000 015 014 SE
+	  SW  SSW  S  SSE  SE
+			   |
+			   |
+	*/
+	S		= 0,
+	SSW		= 1,
+	SW		= 2,
+	WSW		= 3,
+	W		= 4,
+	WNW		= 5,
+	NW		= 6,
+	NNW		= 7,
+	N 		= 8,
+	NNE 	= 9,
+	NE 		= 10,
+	ENE 	= 11,
+	E 		= 12,
+	ESE 	= 13,
+	SE 		= 14,
+	SSE 	= 15,
+
+	// this is not a valid orientation
+	INVALID = 16,
+	MAX = 16
+};
+
+/////maximum animation orientation count (used in many places)
+#define MAX_ORIENT 0x10 // uint8_t(orient_t::MAX)
+
+inline orient_t RandomOrientation()
+{
+	return orient_t(RAND<uint8_t>(0, MAX_ORIENT - 1));
+}
+
+inline orient_t ClampToOrientation(int i)
+{
+	return orient_t(i & (MAX_ORIENT - 1));
+}
+
+// some animations are only 8 orientations
+inline orient_t ReduceToHalf(orient_t orient)
+{
+	return ClampToOrientation(orient & ~1);
+}
+
+// clockwise
+inline orient_t NextOrientation(orient_t orient)
+{
+	return ClampToOrientation(orient + 1);
+}
+
+// counter clockwise
+inline orient_t PrevOrientation(orient_t orient)
+{
+	return ClampToOrientation(orient - 1);
+}
+
+} // namespace GemRB
+
+#endif

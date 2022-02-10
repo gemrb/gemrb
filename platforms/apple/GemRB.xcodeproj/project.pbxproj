@@ -117,6 +117,7 @@
 		A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9E1884CA8600431DEE /* CircularBuffer.h */; };
 		A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9F1884CA8600431DEE /* ie_cursors.h */; };
 		A24FB4A027B172A500C6AAC2 /* Effect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24FB49F27B172A500C6AAC2 /* Effect.cpp */; };
+		A24FB4A227B4A0ED00C6AAC2 /* Orientation.h in Headers */ = {isa = PBXBuildFile; fileRef = A24FB4A127B4A0ED00C6AAC2 /* Orientation.h */; };
 		A25F91E9269931220045F07A /* RLE.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91E5269931220045F07A /* RLE.h */; };
 		A25F91EA269931220045F07A /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91E6269931220045F07A /* Video.cpp */; };
 		A25F91EB269931220045F07A /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91E6269931220045F07A /* Video.cpp */; };
@@ -1243,6 +1244,7 @@
 		A24E7B9E1884CA8600431DEE /* CircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircularBuffer.h; sourceTree = "<group>"; };
 		A24E7B9F1884CA8600431DEE /* ie_cursors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_cursors.h; sourceTree = "<group>"; };
 		A24FB49F27B172A500C6AAC2 /* Effect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Effect.cpp; sourceTree = "<group>"; };
+		A24FB4A127B4A0ED00C6AAC2 /* Orientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Orientation.h; sourceTree = "<group>"; };
 		A25F91E5269931220045F07A /* RLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLE.h; sourceTree = "<group>"; };
 		A25F91E6269931220045F07A /* Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Video.cpp; sourceTree = "<group>"; };
 		A25F91E7269931220045F07A /* Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Video.h; sourceTree = "<group>"; };
@@ -5127,6 +5129,7 @@
 		A2BF9F8C1395FF61006ADC12 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				A24FB4A127B4A0ED00C6AAC2 /* Orientation.h */,
 				A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */,
 				A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */,
 				A2BF9F901395FF61006ADC12 /* Ambient.h */,
@@ -7887,6 +7890,7 @@
 				A2E66374139E883100310FC8 /* DialogHandler.h in Headers */,
 				A2E66376139E883100310FC8 /* DialogMgr.h in Headers */,
 				A27E5D5E18106384009434E5 /* IndexedArchive.h in Headers */,
+				A24FB4A227B4A0ED00C6AAC2 /* Orientation.h in Headers */,
 				A2D72B191B671329009F4D33 /* SpriteSheet.h in Headers */,
 				A2E66378139E883100310FC8 /* DisplayMessage.h in Headers */,
 				A25F91FC269CE6440045F07A /* EnumFlags.h in Headers */,

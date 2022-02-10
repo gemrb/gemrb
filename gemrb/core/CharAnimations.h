@@ -25,6 +25,7 @@
 #include "exports.h"
 
 #include "Animation.h"
+#include "Orientation.h"
 #include "Palette.h"
 #include "Resource.h"
 #include "TableMgr.h"

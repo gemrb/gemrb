@@ -24,6 +24,7 @@
 
 #include "Audio.h"
 #include "Animation.h"
+#include "Orientation.h"
 #include "Palette.h"
 #include "Resource.h"
 #include "Video/Video.h"
