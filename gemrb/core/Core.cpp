@@ -66,27 +66,6 @@ Point RotatePoint(const Point& p, double angle)
 	return Point(newx, newy);
 }
 
-static const unsigned char orientations[25]={
-6,7,8,9,10,
-5,6,8,10,11,
-4,4,0,12,12,
-3,2,0,14,13,
-2,1,0,15,14
-};
-
-/** Calculates the orientation of a character (or projectile) facing a point */
-unsigned char GetOrient(const Point &s, const Point &d)
-{
-	int deltaX = s.x - d.x;
-	int deltaY = s.y - d.y;
-	int div = Distance(s,d);
-	if(!div) return 0; //default
-	if(div>3) div/=2;
-	int aX=deltaX/div;
-	int aY=deltaY/div;
-	return orientations[(aY+2)*5+aX+2];
-}
-
 /** Calculates distance between 2 points */
 unsigned int Distance(const Point &p, const Point &q)
 {

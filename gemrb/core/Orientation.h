@@ -21,6 +21,8 @@
 #ifndef ORIENT_H
 #define ORIENT_H
 
+#include "globals.h"
+
 #include "RNG.h"
 
 #include <cstdint>
@@ -92,6 +94,27 @@ inline orient_t NextOrientation(orient_t orient)
 inline orient_t PrevOrientation(orient_t orient)
 {
 	return ClampToOrientation(orient - 1);
+}
+
+/** Calculates the orientation of a character (or projectile) facing a point */
+inline orient_t GetOrient(const Point &s, const Point &d)
+{
+	static const orient_t orientations[25]={
+		NW, NNW, N, NNE, NE,
+		WNW, NW, N, NE, ENE,
+		W, W, S, E, E,
+		WSW, SW, S, SE, ESE,
+		SW, SSW, S, SSE, SE
+	};
+
+	int deltaX = s.x - d.x;
+	int deltaY = s.y - d.y;
+	int div = Distance(s,d);
+	if(!div) return S;
+	if(div>3) div/=2;
+	int aX=deltaX/div;
+	int aY=deltaY/div;
+	return orientations[(aY+2)*5+aX+2];
 }
 
 } // namespace GemRB
