@@ -28,6 +28,7 @@ install:
       secure-file\tools\secure-file -decrypt testing\id_travissfbot.av.enc -secret $env:SF_ACC
     }
 
+    $env:VCPKG_TARGET_TRIPLET = "x86-windows"
     vcpkg install zlib
     vcpkg install sdl2
     vcpkg install sdl2-mixer
