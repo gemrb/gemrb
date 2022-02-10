@@ -519,7 +519,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->Destination.x = actor->Pos.x = pcInfo.XPos;
 	actor->Destination.y = actor->Pos.y = pcInfo.YPos;
 	actor->Area = pcInfo.Area;
-	actor->SetOrientation(pcInfo.Orientation, false);
+	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->Modal.State = pcInfo.ModalState;
 	actor->SetModalSpell(pcInfo.ModalState, 0);

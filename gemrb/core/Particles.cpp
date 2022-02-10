@@ -205,7 +205,7 @@ void Particles::Draw(Point p)
 			*/
 			if (fragments) {
 				//IE_ANI_CAST stance has a simple looping animation
-				const auto* anims = fragments->GetAnimation(IE_ANI_CAST, orient_t(i));
+				const auto* anims = fragments->GetAnimation(IE_ANI_CAST, ClampToOrientation(i));
 				if (!anims) {
 					break;
 				}

@@ -1970,9 +1970,8 @@ void Movable::SetStance(unsigned int arg)
 	}
 }
 
-void Movable::SetOrientation(int value, bool slow) {
-	//MAX_ORIENT == 16, so we can do this
-	NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
+void Movable::SetOrientation(orient_t value, bool slow) {
+	NewOrientation = value;
 	if (NewOrientation != Orientation && Type == ST_ACTOR) {
 		const Actor *actor = (Actor *) this;
 		actor->PlayArmorSound();
@@ -1990,7 +1989,7 @@ void Movable::SetAttackMoveChances(const ieWord *amc)
 }
 
 //this could be used for WingBuffet as well
-void Movable::MoveLine(int steps, ieDword orient)
+void Movable::MoveLine(int steps, orient_t orient)
 {
 	if (path || !steps) {
 		return;
@@ -1999,7 +1998,7 @@ void Movable::MoveLine(int steps, ieDword orient)
 	path = area->GetLine(Pos, steps, orient);
 }
 
-unsigned char Movable::GetNextFace()
+orient_t Movable::GetNextFace()
 {
 	//slow turning
 	if (timeStartStep==core->GetGame()->Ticks) {
@@ -2007,11 +2006,10 @@ unsigned char Movable::GetNextFace()
 	}
 	if (Orientation != NewOrientation) {
 		if ( ( (NewOrientation-Orientation) & (MAX_ORIENT-1) ) <= MAX_ORIENT/2) {
-			Orientation++;
+			Orientation = NextOrientation(Orientation);
 		} else {
-			Orientation--;
+			Orientation = PrevOrientation(Orientation);
 		}
-		Orientation = Orientation&(MAX_ORIENT-1);
 	}
 
 	return Orientation;

@@ -241,8 +241,8 @@ private:
 	ResRef smokebam;
 	ieDword timeStartStep = 0;
 	//attributes from moveable object
-	unsigned char Orientation = 0;
-	unsigned char NewOrientation = 0;
+	orient_t Orientation = S;
+	orient_t NewOrientation = S;
 	Path path; // whole path
 	size_t stepIdx = 0; // actual step in path
 	//similar to normal actors
@@ -380,19 +380,18 @@ public:
 		//slow turning
 		if (Orientation != NewOrientation) {
 			if ( ( (NewOrientation-Orientation) & (MAX_ORIENT-1) ) <= MAX_ORIENT/2) {
-				Orientation++;
+				Orientation = NextOrientation(Orientation);
 			} else {
-				Orientation--;
+				Orientation = PrevOrientation(Orientation);
 			}
-			Orientation = Orientation&(MAX_ORIENT-1);
 		}
 
 		return Orientation;
 	}
 
-	inline void SetOrientation(int value, bool slow) {
+	inline void SetOrientation(orient_t value, bool slow) {
 		//MAX_ORIENT == 16, so we can do this
-		NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
+		NewOrientation = value;
 		if (!slow) {
 			Orientation = NewOrientation;
 		}

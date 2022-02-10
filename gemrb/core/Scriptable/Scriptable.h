@@ -490,8 +490,8 @@ public:
 class GEM_EXPORT Movable : public Selectable {
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID = 0;
-	unsigned char Orientation = 0;
-	unsigned char NewOrientation = 0;
+	orient_t Orientation = S;
+	orient_t NewOrientation = S;
 	ieWord AttackMovements[3] = { 100, 0 , 0 };
 
 	PathListNode* path = nullptr; // whole path
@@ -551,9 +551,9 @@ public:
 		return (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN);
 	}
 
-	unsigned char GetNextFace();
+	orient_t GetNextFace();
 
-	inline unsigned char GetOrientation() const {
+	inline orient_t GetOrientation() const {
 		return Orientation;
 	}
 
@@ -562,14 +562,14 @@ public:
 	}
 
 	void SetStance(unsigned int arg);
-	void SetOrientation(int value, bool slow);
+	void SetOrientation(orient_t value, bool slow);
 	void SetAttackMoveChances(const ieWord *amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, bool noBackAway);
 	void RandomWalk(bool can_stop, bool run);
 	int GetRandomWalkCounter() const { return randomWalkCounter; };
-	void MoveLine(int steps, ieDword Orient);
+	void MoveLine(int steps, orient_t Orient);
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
 	void Stop(int flags = 0) override;

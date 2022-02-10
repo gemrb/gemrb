@@ -150,11 +150,11 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 // Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
 PathListNode *Map::GetLine(const Point &start, const Point &dest, int flags) const
 {
-	int Orientation = GetOrient(start, dest);
+	orient_t Orientation = GetOrient(start, dest);
 	return GetLine(start, dest, 1, Orientation, flags);
 }
 
-PathListNode *Map::GetLine(const Point &start, int Steps, int Orientation, int flags) const
+PathListNode *Map::GetLine(const Point &start, int Steps, orient_t Orientation, int flags) const
 {
 	Point dest = start;
 
@@ -181,7 +181,7 @@ PathListNode *Map::GetLine(const Point &start, int Steps, int Orientation, int f
 	return GetLine(start, dest, 2, Orientation, flags);
 }
 
-PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Orientation, int flags) const
+PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, orient_t Orientation, int flags) const
 {
 	PathListNode *StartNode = new PathListNode;
 	PathListNode *Return = StartNode;
@@ -226,7 +226,7 @@ PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int
 		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
-				Orientation = (Orientation + 8) & 15;
+				Orientation = NextOrientation(Orientation, 8);
 				// TODO: recalculate dest (mirror it)
 				break;
 			case GL_PASS:
@@ -239,7 +239,7 @@ PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int
 	return Return;
 }
 
-Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, int Orientation, int flags) const
+Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, orient_t Orientation, int flags) const
 {
 	int Count = 0;
 	int Max = Distance(start, dest);
@@ -276,7 +276,7 @@ Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, int Orie
 		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
-				Orientation = (Orientation + 8) & 15;
+				Orientation = NextOrientation(Orientation, 8);
 				// TODO: recalculate dest (mirror it)
 				break;
 			case GL_PASS:
@@ -289,7 +289,7 @@ Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, int Orie
 	return path;
 }
 
-PathListNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
+PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 {
 	PathListNode *step = new PathListNode;
 	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];

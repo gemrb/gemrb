@@ -136,7 +136,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 	} else {
 		actor->SetStance( IE_ANI_AWAKE );
 	}
-	actor->SetOrientation( 0, false );
+	actor->SetOrientation(S, false);
 
 	if ( PartySlot != 0 ) {
 		return core->GetGame()->JoinParty( actor, JP_JOIN|JP_INITPOS );

@@ -889,7 +889,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	Map *map = Sender->GetCurrentArea();
 	map->AddActor(ab, true);
 	ab->SetPosition(pnt, flags & CC_CHECK_IMPASSABLE, 0, 0);
-	ab->SetOrientation(parameters->int0Parameter, false);
+	ab->SetOrientation(ClampToOrientation(parameters->int0Parameter), false);
 
 	// also set it as Sender's LastMarkedObject (fixes worg rider dismount killing players)
 	if (Sender->Type == ST_ACTOR) {
@@ -1356,7 +1356,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 	actor->SetPosition(position, adjust);
 	actor->SetStance(IE_ANI_READY);
 	if (face !=-1) {
-		actor->SetOrientation( face, false );
+		actor->SetOrientation(ClampToOrientation(face), false);
 	}
 	// should this perhaps be a 'selected' check or similar instead?
 	if (actor->InParty) {

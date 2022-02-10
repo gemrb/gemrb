@@ -1263,7 +1263,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 				act->SetScript(scripts[j], j);
 			}
 		}
-		act->SetOrientation(orientation, false);
+		act->SetOrientation(ClampToOrientation(orientation), false);
 		act->TalkCount = talkCount;
 		act->RemovalTime = removalTime;
 		act->RefreshEffects();

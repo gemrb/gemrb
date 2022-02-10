@@ -85,15 +85,15 @@ inline orient_t ReduceToHalf(orient_t orient)
 }
 
 // clockwise
-inline orient_t NextOrientation(orient_t orient)
+inline orient_t NextOrientation(orient_t orient, int step = 1)
 {
-	return ClampToOrientation(orient + 1);
+	return ClampToOrientation(orient + step);
 }
 
 // counter clockwise
-inline orient_t PrevOrientation(orient_t orient)
+inline orient_t PrevOrientation(orient_t orient, int step = 1)
 {
-	return ClampToOrientation(orient - 1);
+	return ClampToOrientation(orient - step);
 }
 
 /** Calculates the orientation of a character (or projectile) facing a point */

@@ -549,7 +549,7 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	Point p(actor->GetStat(IE_SAVEDXPOS), actor->GetStat(IE_SAVEDYPOS));
 	actor->SetPosition(p, true );
-	actor->SetOrientation( actor->GetStat(IE_SAVEDFACE), false );
+	actor->SetOrientation(ClampToOrientation(actor->GetStat(IE_SAVEDFACE)), false);
 }
 
 void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
@@ -1778,7 +1778,7 @@ void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->SetOrientation(parameters->int0Parameter, false);
+	actor->SetOrientation(ClampToOrientation(parameters->int0Parameter), false);
 }
 
 /* A -1 means random facing? */
@@ -1790,9 +1790,9 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->int0Parameter==-1) {
-		actor->SetOrientation(core->Roll(1,MAX_ORIENT,-1), false);
+		actor->SetOrientation(RandomOrientation(), false);
 	} else {
-		actor->SetOrientation(parameters->int0Parameter, false);
+		actor->SetOrientation(ClampToOrientation(parameters->int0Parameter), false);
 	}
 	actor->SetWait( 1 );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
@@ -5583,9 +5583,9 @@ void GameScript::RandomFly(Scriptable* Sender, Action* /*parameters*/)
 	}
 	int x = RAND(0,31);
 	if (x<10) {
-		actor->SetOrientation(actor->GetOrientation()-1, false);
+		actor->SetOrientation(PrevOrientation(actor->GetOrientation()), false);
 	} else if (x>20) {
-		actor->SetOrientation(actor->GetOrientation()+1, false);
+		actor->SetOrientation(NextOrientation(actor->GetOrientation()), false);
 	}
 	//fly in this direction for 20 steps
 	actor->MoveLine(20, actor->GetOrientation());
@@ -5824,7 +5824,7 @@ void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->SetOrientation(actor->GetOrientation()+parameters->int0Parameter, true);
+	actor->SetOrientation(ClampToOrientation(actor->GetOrientation() + parameters->int0Parameter), true);
 	actor->SetWait( 1 );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -6999,7 +6999,7 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 	if (!actor->GetCurrentArea()) {
 		core->GetGame()->GetCurrentArea()->AddActor(actor, true);
 	}
-	actor->SetOrientation(parameters->int1Parameter, false);
+	actor->SetOrientation(ClampToOrientation(parameters->int1Parameter), false);
 	actor->MoveTo(parameters->pointParameter);
 	actor->Die(nullptr);
 	actor->SetBaseBit(IE_STATE_ID, STATE_DEAD, true);

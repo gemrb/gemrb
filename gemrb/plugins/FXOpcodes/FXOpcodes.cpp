@@ -3844,7 +3844,7 @@ int fx_dimension_door (Scriptable* Owner, Actor* target, Effect* fx)
 	case 2: //target to saved location
 		p.x=STAT_GET(IE_SAVEDXPOS);
 		p.y=STAT_GET(IE_SAVEDYPOS);
-		target->SetOrientation(STAT_GET(IE_SAVEDFACE), false);
+		target->SetOrientation(ClampToOrientation(STAT_GET(IE_SAVEDFACE)), false);
 		break;
 	case 3: //owner swapped with target
 		if (Owner->Type!=ST_ACTOR) {

@@ -8217,14 +8217,14 @@ bool Actor::AdvanceAnimations()
 	ClearCurrentStanceAnims();
 
 	unsigned char stanceID = GetStance();
-	unsigned char face = GetNextFace();
-	const auto* stanceAnim = anims->GetAnimation(stanceID, orient_t(face));
+	orient_t face = GetNextFace();
+	const auto* stanceAnim = anims->GetAnimation(stanceID, face);
 	
 	if (stanceAnim == nullptr) {
 		return false;
 	}
 	
-	const auto* shadows = anims->GetShadowAnimation(stanceID, orient_t(face));
+	const auto* shadows = anims->GetShadowAnimation(stanceID, face);
 	
 	const auto count = anims->GetTotalPartCount();
 	const auto zOrder = anims->GetZOrder(face);

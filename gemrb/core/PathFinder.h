@@ -22,6 +22,7 @@
 
 #include "EnumFlags.h"
 
+#include "Orientation.h"
 #include "Region.h"
 #include "Resource.h"
 
@@ -56,7 +57,7 @@ using SearchmapPoint = Point;
 
 struct PathNode {
 	Point point;
-	int orient;
+	orient_t orient;
 };
 
 // FIXME: does Path have to be a linked list?
@@ -72,7 +73,7 @@ struct PathListNode {
 	PathListNode* Next;
 	unsigned int x;
 	unsigned int y;
-	unsigned int orient;
+	orient_t orient;
 };
 
 enum {
