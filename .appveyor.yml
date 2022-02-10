@@ -28,17 +28,16 @@ install:
       secure-file\tools\secure-file -decrypt testing\id_travissfbot.av.enc -secret $env:SF_ACC
     }
 
-    $env:VCPKG_TARGET_TRIPLET = "x86-windows"
-    vcpkg install zlib
-    vcpkg install sdl2
-    vcpkg install sdl2-mixer
-    vcpkg install python3
-    vcpkg install openal-soft
-    vcpkg install libpng
-    vcpkg install libogg
-    vcpkg install libvorbis
-    vcpkg install freetype
-    vcpkg install libiconv
+    vcpkg install zlib:x86-windows
+    vcpkg install sdl2:x86-windows
+    vcpkg install sdl2-mixer:x86-windows
+    vcpkg install python3:x86-windows
+    vcpkg install openal-soft:x86-windows
+    vcpkg install libpng:x86-windows
+    vcpkg install libogg:x86-windows
+    vcpkg install libvorbis:x86-windows
+    vcpkg install freetype:x86-windows
+    vcpkg install libiconv:x86-windows
     # (lib)vlc is missing
 
     pushd c:\tools\vcpkg
