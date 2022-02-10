@@ -11,7 +11,19 @@ SkipIntroVideos = 1
 
 ## Shortcut for running from the build dir
 
-Run: `gemrb/gemrb ../demo/`
+Create the config:
+```
+cat > demo.cfg <<KUKU
+GameType=demo
+GamePath=../demo
+GemRBPath=../gemrb
+PluginsPath=./gemrb/plugins/
+Width=800
+Height=600
+KUKU
+```
+
+Run: `gemrb/gemrb -c demo.cfg`
 
 # AUTHORS
 
