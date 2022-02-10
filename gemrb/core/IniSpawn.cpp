@@ -222,7 +222,7 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 	}
 
 	// store point and/or orientation in a global var
-	if (critter.SaveSelectedPoint.CString()[0]) {
+	if (!critter.SaveSelectedPoint.IsEmpty()) {
 		if (VarHasContext(critter.SaveSelectedPoint)) {
 			SetPointVariable(map, critter.SaveSelectedPoint + 8, critter.SpawnPoint, critter.SaveSelectedPoint);
 		} else {
@@ -230,7 +230,7 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 		}
 	}
 
-	if (critter.SaveSelectedFacing.CString()[0]) {
+	if (!critter.SaveSelectedFacing.IsEmpty()) {
 		if (VarHasContext(critter.SaveSelectedFacing)) {
 			SetVariable(map, critter.SaveSelectedFacing + 8, critter.Orientation, critter.SaveSelectedFacing);
 		} else {

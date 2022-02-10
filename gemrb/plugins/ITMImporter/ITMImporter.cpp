@@ -109,7 +109,7 @@ bool ITMImporter::Import(DataStream* str)
 static void AddZZFeatures(Item *s)
 {
 	// the targeting code (3rd char) is: digit = align(ment), letter = race
-	wchar_t targetIDS = towupper(s->Name.CString()[2]);
+	wchar_t targetIDS = towupper(s->Name[2]);
 	ieByte IDSval = zzmap[targetIDS];
 	ieByte IDSfile = 4;
 	if (targetIDS <= '9') {
@@ -120,7 +120,7 @@ static void AddZZFeatures(Item *s)
 	// 0: -5, 1: -4, 2: -3, 3: -2, 4: -1,
 	// 5: +1, 6: +2 ... 9: +5
 	// this bonus is on top of the default one, so less descriptions are wrong than it may seem
-	int bonus = atoi(&s->Name.CString()[3]);
+	int bonus = atoi(&s->Name[3]);
 	if (bonus < 5) {
 		bonus -= 5;
 	} else {

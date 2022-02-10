@@ -1394,7 +1394,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_PST_STAND:
-			NewResRef = ResRefBase.CString()[0];
+			NewResRef = ResRefBase.CString();
 			NewResRef += "STD";
 			NewResRef += *(ResRefBase.CString() + 1);
 			Cycle = SixteenToFive[Orient];
@@ -1485,7 +1485,7 @@ void CharAnimations::AddPSTSuffix(std::string& dest, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			if (RAND(0,1)) {
 				Prefix="sf2";
-				dest = ResRefBase.CString()[0];
+				dest = ResRefBase[0];
 				dest += Prefix;
 				dest += (ResRefBase.CString() + 1);
 				if (gamedata->Exists(dest.c_str(), IE_BAM_CLASS_ID)) {
@@ -1493,7 +1493,7 @@ void CharAnimations::AddPSTSuffix(std::string& dest, unsigned char StanceID,
 				}
 			}
 			Prefix="sf1";
-			dest = ResRefBase.CString()[0];
+			dest = ResRefBase[0];
 			dest += Prefix;
 			dest += (ResRefBase.CString() + 1);
 			if (gamedata->Exists(dest.c_str(), IE_BAM_CLASS_ID)) {
@@ -1508,7 +1508,7 @@ void CharAnimations::AddPSTSuffix(std::string& dest, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			Prefix="stc"; break;
 	}
-	dest = ResRefBase.CString()[0];
+	dest = ResRefBase[0];
 	dest += Prefix;
 	dest += (ResRefBase.CString() + 1);
 }
