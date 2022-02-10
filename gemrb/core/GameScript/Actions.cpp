@@ -5824,7 +5824,7 @@ void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->SetOrientation(ClampToOrientation(actor->GetOrientation() + parameters->int0Parameter), true);
+	actor->SetOrientation(NextOrientation(actor->GetOrientation(), parameters->int0Parameter), true);
 	actor->SetWait( 1 );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
