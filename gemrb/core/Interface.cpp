@@ -2419,9 +2419,12 @@ int Interface::PlayMovie(const char* resref)
 			nextSubFrame = 0;
 
 			for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
+				const char* rowName = sttable->GetRowName(i);
+				if (!std::isdigit(rowName[0])) continue; // this skips the initial palette rows (red, blue, green)
+
 				const char* frameField = sttable->QueryField(i, 0);
 				ieStrRef strField = sttable->QueryFieldAsStrRef(i, 1);
-				if (frameField && strField != ieStrRef::NOT_A_SUB) { // this skips the initial palette rows
+				if (frameField) {
 					subs[atoi(frameField)] = strField;
 				}
 			}

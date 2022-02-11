@@ -62,8 +62,7 @@ enum class ieStrRef : ieDword {
 	PST_REST_PERM = 38587,
 	PST_REST_NOT_HERE = 34601,
 	PST_HICCUP = 46633,
-	
-	NOT_A_SUB = 0, // subtitle 2das contain 0 insstead of -1
+
 	NO_REST = 10309,
 	DATE1 = 10699,
 	DATE2 = 41277,
