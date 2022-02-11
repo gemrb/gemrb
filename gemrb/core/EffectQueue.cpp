@@ -1605,7 +1605,7 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 void EffectQueue::DispelEffects(const Effect *dispeller, ieDword level)
 {
 	for (auto& fx : effects) {
-		if (&fx == dispeller) continue; // FIXME: is this the comparison we mean to use? or do we mean operator==?
+		if (&fx == dispeller) continue;
 
 		// this should also ignore all equipping effects
 		if(!(fx.Resistance & FX_CAN_DISPEL)) {
@@ -2131,7 +2131,7 @@ unsigned int EffectQueue::GetEffectOrder(EffectRef& effect_reference, const Effe
 	for (const auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		if (&fx == fx2) break;// FIXME: is this the comparison we mean to use? or do we mean operator==?
+		if (&fx == fx2) break;
 		cnt++;
 	}
 	return cnt;

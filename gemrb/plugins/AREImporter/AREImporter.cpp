@@ -1508,7 +1508,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		//It is off by one compared to projectl.ids, but the same as missile.ids
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ProID-1);
 
-		//This could be wrong on msvc7 with its separate memory managers
 		EffectQueue fxqueue = EffectQueue();
 		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 

@@ -244,9 +244,7 @@ public:
 	/** Returns Actor affected by these effects */
 	Scriptable* GetOwner() const { return Owner; }
 
-	/** adds an effect to the queue, it could also insert it if flagged so
-	 *  fx should be freed by the caller
-	 */
+	/** adds an effect to the queue, */
 	void AddEffect(Effect* fx, bool insert=false);
 	/** Adds an Effect to the queue, subject to level and other checks.
 	 * Returns FX_ABORT if unsuccessful. */
@@ -380,8 +378,6 @@ private:
 	int BonusAgainstCreature(ieDword opcode, const Actor *actor) const;
 	bool WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const;
 };
-
-static_assert(std::is_nothrow_move_constructible<EffectQueue>::value, "EffectQueue should be noexcept MoveConstructible");
 
 }
 
