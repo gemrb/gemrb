@@ -1712,15 +1712,15 @@ static int IsClassFromName (const char* name)
 
 GEM_EXPORT void UpdateActorConfig()
 {
-	unsigned int tmp = 0;
+	unsigned int effectTextLevel = 0;
 	core->GetDictionary()->Lookup("Critical Hit Screen Shake", crit_hit_scr_shake);
 	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
-	core->GetDictionary()->Lookup("Effect Text Level", tmp);
-	core->SetFeedbackLevel(tmp);
+	core->GetDictionary()->Lookup("Effect Text Level", effectTextLevel);
+	core->SetFeedbackLevel(effectTextLevel);
 	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
 	// only pst has the whole gamut for these two options
-	if (!(tmp & FT_SELECTION)) sel_snd_freq = 0;
-	if (!(tmp & FT_ACTIONS)) cmd_snd_freq = 0;
+	if (!(effectTextLevel & FT_SELECTION)) sel_snd_freq = 0;
+	if (!(effectTextLevel & FT_ACTIONS)) cmd_snd_freq = 0;
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	core->GetDictionary()->Lookup("Footsteps", footsteps);
 	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
@@ -1958,8 +1958,8 @@ static void InitActorTables()
 			if (atoi(tm->QueryField( i, 1))) {
 				hc_locations|=mask;
 			}
-			const char *tmp = tm->QueryField( i, 2 );
-			hc_flags[i] = atoi(tmp);
+			const char *flags = tm->QueryField(i, 2);
+			hc_flags[i] = atoi(flags);
 			mask<<=1;
 		}
 	}
@@ -1970,12 +1970,12 @@ static void InitActorTables()
 		tm = gamedata->LoadTable("csound");
 		if (tm) {
 			for (int i = 0; i < VCONST_COUNT; i++) {
-				const char *tmp = tm->QueryField( i, 0 );
-				switch(tmp[0]) {
+				const char *suffix = tm->QueryField(i, 0);
+				switch(suffix[0]) {
 					case '*': break;
 					//I have no idea what this ! mean
-					case '!': csound[i]=tmp[1]; break;
-					default: csound[i]=tmp[0]; break;
+					case '!': csound[i] = suffix[1]; break;
+					default: csound[i] = suffix[0]; break;
 				}
 			}
 		}
@@ -2000,9 +2000,9 @@ static void InitActorTables()
 		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
 
 		for (int i = 0; i < extraslots; i++) {
-			ieByte tmp = 0;
-			valid_unsignednumber(tm->QueryField(i,0), tmp);
-			OtherGUIButtons[i].clss = tmp;
+			ieByte cls = 0;
+			valid_unsignednumber(tm->QueryField(i, 0), cls);
+			OtherGUIButtons[i].clss = cls;
 			memcpy(OtherGUIButtons[i].buttons, &DefaultButtons, sizeof(ActionButtonRow));
 			for (int j = 0; j < GUIBT_COUNT; j++) {
 				OtherGUIButtons[i].buttons[j]=(ieByte) atoi( tm->QueryField(i,j+1) );
@@ -3921,7 +3921,7 @@ static int CheckInteract(const char *talker, const char *target)
 	if (!value)
 		return I_NONE;
 
-	int tmp = 0;
+	int offset = 0;
 	int x = 0;
 	int ln = strlen(value);
 
@@ -3930,24 +3930,26 @@ static int CheckInteract(const char *talker, const char *target)
 		x = core->Roll(1,(ln+1)/2,-1)*2;
 		//convert '1', '2' and '3' to 0x100,0x200,0x300 respectively, all the rest becomes 0
 		//it is no problem if we hit the zero terminator in case of an odd length
-		tmp = value[x+1]-'0';
-		if ((ieDword) tmp>3) tmp=0;
-		tmp <<= 8;
+		offset = value[x + 1] - '0';
+		if (offset > 3) offset = 0;
+		offset <<= 8;
 	}
 
 	switch(value[x]) {
 		case '*':
 			return I_DIALOG;
 		case 's':
-			return tmp+I_SPECIAL;
+			return offset + I_SPECIAL;
 		case 'c':
-			return tmp+I_COMPLIMENT;
+			return offset + I_COMPLIMENT;
 		case 'i':
-			return tmp+I_INSULT;
+			return offset + I_INSULT;
 		case 'I':
-			return tmp+I_INSULT_RESP;
+			return offset + I_INSULT_RESP;
 		case 'C':
-			return tmp+I_COMPL_RESP;
+			return offset + I_COMPL_RESP;
+		default:
+			break;
 	}
 	return I_NONE;
 }
@@ -3955,8 +3957,8 @@ static int CheckInteract(const char *talker, const char *target)
 void Actor::HandleInteractV1(const Actor *target)
 {
 	LastTalker = target->GetGlobalID();
-	std::string tmp = fmt::format("Interact(\"{}\")", target->GetScriptName());
-	AddAction(GenerateAction(std::move(tmp)));
+	std::string interAction = fmt::format("Interact(\"{}\")", target->GetScriptName());
+	AddAction(GenerateAction(std::move(interAction)));
 }
 
 int Actor::HandleInteract(const Actor *target) const
@@ -4302,9 +4304,9 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 
 void Actor::SetMCFlag(ieDword arg, BitOp op)
 {
-	ieDword tmp = BaseStats[IE_MC_FLAGS];
-	SetBits(tmp, arg, op);
-	SetBase(IE_MC_FLAGS, tmp);
+	ieDword flags = BaseStats[IE_MC_FLAGS];
+	SetBits(flags, arg, op);
+	SetBase(IE_MC_FLAGS, flags);
 }
 
 void Actor::DialogInterrupt() const
@@ -4721,7 +4723,7 @@ void Actor::PlayWalkSound()
 
 	if (IsStar(Sound)) return;
 
-	ResRef tmp = Sound;
+	ResRef soundBase = Sound;
 	char suffix = 0;
 	uint8_t l = Sound.CStrLen();
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
@@ -4731,7 +4733,7 @@ void Actor::PlayWalkSound()
 		suffix = cnt + 0x60; // 'a'-'g'
 	}
 	if (l < 8 && suffix != 0) {
-		Sound.SNPrintF("%.8s%c", tmp.CString(), suffix);
+		Sound.SNPrintF("%.8s%c", soundBase.CString(), suffix);
 	}
 
 	tick_t len = 0;
@@ -6287,18 +6289,18 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		bookmask = GetBookMask();
 	}
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
-	size_t tmp = 0;
+	size_t message = 0;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(spell->SpellName));
 		switch (spell->SpellType) {
 		case IE_SPL_INNATE:
-			tmp = STR_GOTABILITY;
+			message = STR_GOTABILITY;
 			break;
 		case IE_SPL_SONG:
-			tmp = STR_GOTSONG;
+			message = STR_GOTSONG;
 			break;
 		default:
-			tmp = STR_GOTSPELL;
+			message = STR_GOTSPELL;
 			break;
 		}
 	}
@@ -6306,8 +6308,8 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 	if (!explev) {
 		return LSR_INVALID;
 	}
-	if (tmp) {
-		displaymsg->DisplayConstantStringName(tmp, DMC_BG2XPGREEN, this);
+	if (message) {
+		displaymsg->DisplayConstantStringName(message, DMC_BG2XPGREEN, this);
 	}
 	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
 		int xp = CalculateExperience(XP_LEARNSPELL, explev);
@@ -7659,11 +7661,11 @@ void Actor::UpdateActorState()
 
 	// display pc hitpoints if requested
 	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("HP Over Head", tmp);
+	ieDword overheadHP = 0;
+	core->GetDictionary()->Lookup("HP Over Head", overheadHP);
 	assert(game->GameTime);
 	assert(core->Time.round_size);
-	if (tmp && Persistent() && (game->GameTime % (core->Time.round_size/2) == 0)) { // smaller delta to skip fading
+	if (overheadHP && Persistent() && (game->GameTime % (core->Time.round_size / 2) == 0)) { // smaller delta to skip fading
 		DisplayHeadHPRatio();
 	}
 
@@ -7741,8 +7743,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 		if (state & STATE_CONFUSED) {
 			std::string actionString;
 			actionString.reserve(32);
-			int tmp = core->Roll(1,3,0);
-			switch (tmp) {
+			switch (RAND(1, 3)) {
 			case 2:
 				actionString = "RandomWalk()";
 				break;
@@ -7818,8 +7819,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 
 		if (Modal.Spell.IsEmpty()) {
 			Log(WARNING, "Actor", "Modal Spell Effect was not set!");
-			ResRef tmp("*");
-			Modal.Spell = tmp;
+			Modal.Spell = "*";
 		} else if (!IsStar(Modal.Spell)) {
 			if (ModalSpellSkillCheck()) {
 				ApplyModal(Modal.Spell);
@@ -8103,13 +8103,13 @@ void Actor::NewPath()
 	if (Destination == Pos) return;
 	// WalkTo's and FindPath's first argument is passed by reference
 	// And we don't want to modify Destination so we use a temporary
-	Point tmp = Destination;
+	Point savedDest = Destination;
 	if (GetPathTries() > MAX_PATH_TRIES) {
 		ClearPath(true);
 		ResetPathTries();
 		return;
 	}
-	WalkTo(tmp, InternalFlags, pathfindingDistance);
+	WalkTo(savedDest, InternalFlags, pathfindingDistance);
 	if (!GetPath()) {
 		IncrementPathTries();
 	}
@@ -8851,50 +8851,49 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar)
 
 int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 {
-	ieByte tmp = actslot;
 	if (QslotTranslation && slotindex>2) {
-		if (tmp > ACT_IWDQSONG) { //quick songs
-			tmp = 110 + tmp%10;
-		} else if (tmp > ACT_IWDQSPEC) { //quick abilities
-			tmp = 90 + tmp%10;
-		} else if (tmp > ACT_IWDQITEM) { //quick items
-			tmp = 80 + tmp%10;
-		} else if (tmp > ACT_IWDQSPELL) { //quick spells
-			tmp = 70 + tmp%10;
-		} else if (tmp > ACT_BARD) { //spellbooks
-			tmp = 50 + tmp%10;
-		} else if (tmp >= 32) { // here be dragons
+		if (actslot > ACT_IWDQSONG) { // quick songs
+			actslot = 110 + actslot % 10;
+		} else if (actslot > ACT_IWDQSPEC) { // quick abilities
+			actslot = 90 + actslot % 10;
+		} else if (actslot > ACT_IWDQITEM) { // quick items
+			actslot = 80 + actslot % 10;
+		} else if (actslot > ACT_IWDQSPELL) { // quick spells
+			actslot = 70 + actslot % 10;
+		} else if (actslot > ACT_BARD) { // spellbooks
+			actslot = 50 + actslot % 10;
+		} else if (actslot >= 32) { // here be dragons
 			Log(ERROR, "Actor", "Bad slot index passed to SetActionButtonRow!");
 		} else {
-			tmp = gemrb2iwd[tmp];
+			actslot = gemrb2iwd[actslot];
 		}
 	}
-	return tmp;
+	return actslot;
 }
 
 int Actor::IWD2GemrbQslot (int slotindex) const
 {
-	ieByte tmp = PCStats->QSlots[slotindex];
+	ieByte qslot = PCStats->QSlots[slotindex];
 	//the first three buttons are hardcoded in gemrb
 	//don't mess with them
 	if (QslotTranslation && slotindex>2) {
-		if (tmp>=110) { //quick songs
-			tmp = ACT_IWDQSONG + tmp%10;
-		} else if (tmp>=90) { //quick abilities
-			tmp = ACT_IWDQSPEC + tmp%10;
-		} else if (tmp>=80) { //quick items
-			tmp = ACT_IWDQITEM + tmp%10;
-		} else if (tmp>=70) { //quick spells
-			tmp = ACT_IWDQSPELL + tmp%10;
-		} else if (tmp>=50) { //spellbooks
-			tmp = ACT_BARD + tmp%10;
-		} else if (tmp>=32) { // here be dragons
+		if (qslot >= 110) { //quick songs
+			qslot = ACT_IWDQSONG + qslot % 10;
+		} else if (qslot >= 90) { // quick abilities
+			qslot = ACT_IWDQSPEC + qslot % 10;
+		} else if (qslot >= 80) { // quick items
+			qslot = ACT_IWDQITEM + qslot % 10;
+		} else if (qslot >= 70) { // quick spells
+			qslot = ACT_IWDQSPELL + qslot % 10;
+		} else if (qslot >= 50) { // spellbooks
+			qslot = ACT_BARD + qslot % 10;
+		} else if (qslot >= 32) { // here be dragons
 			Log(ERROR, "Actor", "Bad slot index passed to IWD2GemrbQslot!");
 		} else {
-			tmp = iwd2gemrb[tmp];
+			qslot = iwd2gemrb[qslot];
 		}
 	}
-	return tmp;
+	return qslot;
 }
 
 // debug function; only works on pc classes
@@ -8908,10 +8907,10 @@ void Actor::dumpQSlots() const
 	buffer2.append("IWD2gem  default: ");
 	buffer3.append("gem2IWD2 default: ");
 	for(int i=0; i<GUIBT_COUNT; i++) {
-		ieByte tmp = r[i];
-		AppendFormat(buffer, "{:3d} ", tmp);
-		AppendFormat(buffer2, "{:3d} ", IWD2GemrbQslot(tmp));
-		AppendFormat(buffer3, "{:3d} ", Gemrb2IWD2Qslot(tmp, i));
+		ieByte slot = r[i];
+		AppendFormat(buffer, "{:3d} ", slot);
+		AppendFormat(buffer2, "{:3d} ", IWD2GemrbQslot(slot));
+		AppendFormat(buffer3, "{:3d} ", Gemrb2IWD2Qslot(slot, i));
 	}
 	AppendFormat(buffer, "(class: {})", GetStat(IE_CLASS));
 	Log(DEBUG, "Actor", "{}", buffer);
@@ -8925,10 +8924,10 @@ void Actor::dumpQSlots() const
 	buffer2.append("IWD2gem  QSlots:  ");
 	buffer3.append("gem2IWD2 QSlots:  ");
 	for(int i=0; i<GUIBT_COUNT; i++) {
-		ieByte tmp = PCStats->QSlots[i];
-		AppendFormat(buffer, "{:3d} ", tmp);
-		AppendFormat(buffer2, "{:3d} ", IWD2GemrbQslot(tmp));
-		AppendFormat(buffer3, "{:3d} ", Gemrb2IWD2Qslot(tmp, i));
+		ieByte slot = PCStats->QSlots[i];
+		AppendFormat(buffer, "{:3d} ", slot);
+		AppendFormat(buffer2, "{:3d} ", IWD2GemrbQslot(slot));
+		AppendFormat(buffer3, "{:3d} ", Gemrb2IWD2Qslot(slot, i));
 	}
 	Log(DEBUG, "Actor", "{}", buffer);
 	Log(DEBUG, "Actor", "{}", buffer2);
@@ -9267,13 +9266,13 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false;
 	}
 
-	ResRef tmp = item->ItemResRef;
-	const Item *itm = gamedata->GetItem(tmp, true);
+	ResRef itemRef = item->ItemResRef;
+	const Item *itm = gamedata->GetItem(itemRef, true);
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: {}!", tmp);
+		Log(WARNING, "Actor", "Invalid quick slot item: {}!", itemRef);
 		return false; //quick item slot contains invalid item resref
 	}
-	gamedata->FreeItem(itm, tmp, false);
+	gamedata->FreeItem(itm, itemRef, false);
 
 	if (!TryUsingMagicDevice(itm, header)) {
 		ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
@@ -9480,13 +9479,13 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	if (!item)
 		return false;
 
-	ResRef tmp = item->ItemResRef;
-	const Item *itm = gamedata->GetItem(tmp);
+	ResRef itemRef = item->ItemResRef;
+	const Item *itm = gamedata->GetItem(itemRef);
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: {}!", tmp);
+		Log(WARNING, "Actor", "Invalid quick slot item: {}!", itemRef);
 		return false; //quick item slot contains invalid item resref
 	}
-	gamedata->FreeItem(itm, tmp, false);
+	gamedata->FreeItem(itm, itemRef, false);
 
 	if (!TryUsingMagicDevice(itm, header)) {
 		ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
@@ -10106,16 +10105,14 @@ void Actor::CreateDerivedStatsBG()
 	}
 
 	for (int i=0;i<ISCLASSES;i++) {
-		int tmp;
-
 		if (classesiwd2[i]>=(ieDword) classcount) continue;
 		int tl = turnlevels[classesiwd2[i]];
 		if (tl) {
-			tmp = GetClassLevel(i)+1-tl;
+			int adjustedTL = GetClassLevel(i) + 1 - tl;
 			//adding up turn undead levels, but this is probably moot
 			//anyway, you will be able to create custom priest/paladin classes
-			if (tmp>0) {
-				turnundeadlevel+=tmp;
+			if (adjustedTL > 0) {
+				turnundeadlevel += adjustedTL;
 			}
 		}
 	}
@@ -10181,15 +10178,13 @@ void Actor::CreateDerivedStatsIWD2()
 
 	int turnundeadlevel = 0;
 	for (int i = 0; i < ISCLASSES; i++) {
-		int tmp;
-
 		if (classesiwd2[i]>=(ieDword) classcount) continue;
 		int tl = turnlevels[classesiwd2[i]];
 		if (tl) {
-			tmp = GetClassLevel(i)+1-tl;
-			if (tmp>0) {
+			int adjustedTL = GetClassLevel(i) + 1 - tl;
+			if (adjustedTL > 0) {
 				//the levels add up (checked)
-				turnundeadlevel+=tmp;
+				turnundeadlevel += adjustedTL;
 			}
 		}
 	}
