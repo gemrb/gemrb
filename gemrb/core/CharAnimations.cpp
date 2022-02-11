@@ -291,7 +291,7 @@ unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
  * For some actors (Arundel, FFG, fire giants) a new stance requires a
  * different palette to use. Presumably, this is relevant for PAL_MAIN only.
  */
-void CharAnimations::MaybeUpdateMainPalette(Animation& anim) {
+void CharAnimations::MaybeUpdateMainPalette(const Animation& anim) {
 	if (previousStanceID != stanceID) {
 		// Test if the palette in question is actually different to the one loaded.
 		if (*PartPalettes[PAL_MAIN] != *anim.GetFrame(0)->GetPalette()) {

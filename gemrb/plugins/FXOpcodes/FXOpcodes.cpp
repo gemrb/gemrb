@@ -6268,7 +6268,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case COND_DIED_ANY:
 		// Died([ANYONE])
-		condition = GameScript::EvaluateString(target, (char*) "Died([ANYONE])");
+		condition = GameScript::EvaluateString(target, "Died([ANYONE])");
 		per_round = false;
 		break;
 	case COND_TURNEDBY:

@@ -11,10 +11,10 @@ namespace GemRB
 	class GLSLProgram
 	{
 	public:
-		static GLSLProgram* Create(std::string vertexSource, std::string fragmentSource);
+		static GLSLProgram* Create(const std::string& vertexSource, const std::string& fragmentSource);
 		static GLSLProgram* CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName);
 
-		static const std::string GetLastError();
+		static std::string GetLastError();
 
 		GLSLProgram() = default;
 		GLSLProgram(const GLSLProgram&) = delete;
@@ -22,21 +22,21 @@ namespace GemRB
 		GLSLProgram& operator=(const GLSLProgram&) = delete;
 		void Use() const;
 		void UnUse() const;
-		bool SetUniformValue(std::string uniformName, const unsigned char size, GLfloat value1, GLfloat value2 = 0.0f, GLfloat value3 = 0.0f, GLfloat value4 = 0.0f);
-		bool SetUniformValue(std::string uniformName, const unsigned char size, GLint value1, GLint value2 = 0, GLint value3 = 0, GLint value4 = 0);
-		bool SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value);
-		bool SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLint* value);
-		bool SetUniformMatrixValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value);
-		GLint GetAttribLocation(std::string attribName) const;
+		bool SetUniformValue(const std::string& uniformName, const unsigned char size, GLfloat value1, GLfloat value2 = 0.0f, GLfloat value3 = 0.0f, GLfloat value4 = 0.0f) const;
+		bool SetUniformValue(const std::string& uniformName, const unsigned char size, GLint value1, GLint value2 = 0, GLint value3 = 0, GLint value4 = 0) const;
+		bool SetUniformValue(const std::string& uniformName, const unsigned char size, GLsizei count, const GLfloat* value) const;
+		bool SetUniformValue(const std::string& uniformName, const unsigned char size, GLsizei count, const GLint* value) const;
+		bool SetUniformMatrixValue(const std::string& uniformName, const unsigned char size, GLsizei count, const GLfloat* value) const;
+		GLint GetAttribLocation(const std::string& attribName) const;
 	private:	
 		static std::string errMessage;
 
 		GLuint program;
 		std::map<std::string, GLint> uniforms;
-		bool buildProgram(std::string vertexSource, const std::string& fragmentSource);
+		bool buildProgram(const std::string& vertexSource, const std::string& fragmentSource);
 		GLuint buildShader(GLenum type, std::string source) const;
 		GLint getUniformLocation(const std::string& uniformName) const;
-		bool storeUniformLocation(std::string uniformName);
+		bool storeUniformLocation(const std::string& uniformName);
 	};
 }
 

@@ -459,7 +459,7 @@ void WorldMap::ClearEncounterArea()
 		return;
 	}
 
-	WMPAreaEntry& ea = area_entries[encounterArea];
+	const WMPAreaEntry& ea = area_entries[encounterArea];
 
 	//NOTE: if anything else added links after us we'd have to globally
 	//update all link indices, but since ambush areas do not allow

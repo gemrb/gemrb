@@ -281,7 +281,7 @@ private:
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
 		std::string& dest, unsigned char& Cycle, const EquipResRefData* equip) const;
 	unsigned char MaybeOverrideStance(unsigned char stance) const;
-	void MaybeUpdateMainPalette(Animation&);
+	void MaybeUpdateMainPalette(const Animation&);
 	
 	using AvatarTable_t = std::vector<AvatarStruct>;
 	struct AvatarTableLoader final {

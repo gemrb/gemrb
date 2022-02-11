@@ -515,7 +515,7 @@ public:
 
 	ResRef GetName() const { return Name; }
 	static void ExecuteString(Scriptable* Sender, std::string string);
-	static int EvaluateString(Scriptable* Sender, char* String);
+	static int EvaluateString(Scriptable* Sender, const char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 
 	bool Update(bool *continuing = NULL, bool *done = NULL);

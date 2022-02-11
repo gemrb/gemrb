@@ -7951,7 +7951,7 @@ ingame debug console than from scripts.\n\
 
 static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 {
-	char* String;
+	const char* String;
 	PARSE_ARGS( args,  "s", &String );
 	GET_GAME();
 

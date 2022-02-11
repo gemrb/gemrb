@@ -18,7 +18,7 @@ GLSLProgram::~GLSLProgram()
 	if (program != 0) glDeleteProgram(program);
 }
 
-GLSLProgram* GLSLProgram::Create(std::string vertexSource, std::string fragmentSource)
+GLSLProgram* GLSLProgram::Create(const std::string& vertexSource, const std::string& fragmentSource)
 {
 	GLSLProgram* program = new GLSLProgram();
 	if (!program->buildProgram(vertexSource, fragmentSource)) {
@@ -124,7 +124,7 @@ GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source) const
 	return id;
 }
 
-bool GLSLProgram::buildProgram(std::string vertexSource, const std::string& fragmentSource)
+bool GLSLProgram::buildProgram(const std::string& vertexSource, const std::string& fragmentSource)
 {
 	program = 0;
 	program = glCreateProgram();
@@ -186,12 +186,12 @@ GLint GLSLProgram::getUniformLocation(const std::string& uniformName) const
 	return it->second;
 }
 
-const std::string GLSLProgram::GetLastError()
+std::string GLSLProgram::GetLastError()
 {
 	return GLSLProgram::errMessage;
 }
 
-bool GLSLProgram::storeUniformLocation(std::string uniformName)
+bool GLSLProgram::storeUniformLocation(const std::string& uniformName)
 {
 	if (uniforms.find(uniformName) == uniforms.end()) {
 		GLint location = glGetUniformLocation(program, uniformName.c_str());
@@ -210,7 +210,7 @@ bool GLSLProgram::storeUniformLocation(std::string uniformName)
 	}
 }
 
-bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value)
+bool GLSLProgram::SetUniformValue(const std::string& uniformName, const unsigned char size, GLsizei count, const GLfloat* value) const
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -233,7 +233,7 @@ bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char s
 	}
 }
 
-bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char size, GLsizei count, const GLint* value)
+bool GLSLProgram::SetUniformValue(const std::string& uniformName, const unsigned char size, GLsizei count, const GLint* value) const
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -256,7 +256,7 @@ bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char s
 	}
 }
 
-bool GLSLProgram::SetUniformMatrixValue(std::string uniformName, const unsigned char size, GLsizei count, const GLfloat* value)
+bool GLSLProgram::SetUniformMatrixValue(const std::string& uniformName, const unsigned char size, GLsizei count, const GLfloat* value) const
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -277,7 +277,7 @@ bool GLSLProgram::SetUniformMatrixValue(std::string uniformName, const unsigned 
 	}
 }
 
-bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char size, GLfloat value1, GLfloat value2, GLfloat value3, GLfloat value4)
+bool GLSLProgram::SetUniformValue(const std::string& uniformName, const unsigned char size, GLfloat value1, GLfloat value2, GLfloat value3, GLfloat value4) const
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -300,7 +300,7 @@ bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char s
 	}
 }
 
-bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char size, GLint value1, GLint value2, GLint value3, GLint value4)
+bool GLSLProgram::SetUniformValue(const std::string& uniformName, const unsigned char size, GLint value1, GLint value2, GLint value3, GLint value4) const
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
@@ -333,7 +333,7 @@ void GLSLProgram::UnUse() const
 	glUseProgram(0);
 }
 
-GLint GLSLProgram::GetAttribLocation(std::string attribName) const
+GLint GLSLProgram::GetAttribLocation(const std::string& attribName) const
 {
 	return glGetAttribLocation(program, attribName.c_str());
 }

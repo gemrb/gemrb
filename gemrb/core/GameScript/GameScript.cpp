@@ -2237,7 +2237,7 @@ void GameScript::ExecuteString(Scriptable* Sender, std::string string)
 }
 
 //This must return integer because Or(3) returns 3
-int GameScript::EvaluateString(Scriptable* Sender, char* String)
+int GameScript::EvaluateString(Scriptable* Sender, const char* String)
 {
 	if (String[0] == 0) {
 		return 0;
