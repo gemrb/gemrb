@@ -84,6 +84,7 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	
 	void Invalidate() const noexcept override;
 public:
+	SDLTextureSprite2D(const SDLTextureSprite2D&) noexcept;
 	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLTextureSprite2D(const Region&, const PixelFormat& fmt) noexcept;
 	~SDLTextureSprite2D() noexcept;
