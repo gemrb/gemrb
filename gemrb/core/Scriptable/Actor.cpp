@@ -9505,38 +9505,40 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	AuraCooldown = core->Time.attack_round_size;
 
 	ResetCommentTime();
-	if (pro) {
-		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
-		if (flags & UI_FAKE) {
-			delete pro;
-		} else if (((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
-			bool ranged = header == (ieDword)-2;
-			const ITMExtHeader *which = itm->GetWeaponHeader(ranged);
-			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, (weapon_damagetype[which->DamageType])<<16, FX_DURATION_INSTANT_LIMITED);
-			AttackEffect->Projectile = which->ProjectileAnimation;
-			AttackEffect->Target = FX_TARGET_PRESET;
-			AttackEffect->Parameter3 = 1;
-			if (pstflags) {
-				AttackEffect->IsVariable = GetCriticalType();
-			} else {
-				AttackEffect->IsVariable = flags&UI_CRITICAL;
-			}
-			pro->GetEffects().AddEffect(AttackEffect, true);
-			if (ranged) {
-				fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_ranged_ref);
-			} else {
-				// EEs add a a single bit to fx_melee for only applying with monk fists
-				int param2 = (inventory.FistsEquipped() && GetMonkLevel()) ? 4 : 0;
-				fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_melee_ref, param2);
-				// ignore timestop
-				pro->TFlags |= PTF_TIMELESS;
-			}
-			attackProjectile = pro;
-		} else //launch it now as we are not attacking
-			GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
-		return true;
+	if (!pro) {
+		return false;
 	}
-	return false;
+
+	pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
+	if (flags & UI_FAKE) {
+		delete pro;
+	} else if (((int) header < 0) && !(flags & UI_MISS)) { // using a weapon
+		bool ranged = header == (ieDword) -2;
+		const ITMExtHeader* which = itm->GetWeaponHeader(ranged);
+		Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[which->DamageType] << 16, FX_DURATION_INSTANT_LIMITED);
+		AttackEffect->Projectile = which->ProjectileAnimation;
+		AttackEffect->Target = FX_TARGET_PRESET;
+		AttackEffect->Parameter3 = 1;
+		if (pstflags) {
+			AttackEffect->IsVariable = GetCriticalType();
+		} else {
+			AttackEffect->IsVariable = flags & UI_CRITICAL;
+		}
+		pro->GetEffects().AddEffect(AttackEffect, true);
+		if (ranged) {
+			fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_ranged_ref);
+		} else {
+			// EEs add a a single bit to fx_melee for only applying with monk fists
+			int param2 = (inventory.FistsEquipped() && GetMonkLevel()) ? 4 : 0;
+			fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_melee_ref, param2);
+			// ignore timestop
+			pro->TFlags |= PTF_TIMELESS;
+		}
+		attackProjectile = pro;
+	} else { // launch it now as we are not attacking
+		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
+	}
+	return true;
 }
 
 void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, const Item *itm, bool silent, bool expend)
