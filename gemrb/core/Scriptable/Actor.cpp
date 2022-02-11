@@ -5098,8 +5098,7 @@ int Actor::GetWildMod(int level)
 		return 0;
 	}
 
-	if (level >= MAX_LEVEL) level = MAX_LEVEL;
-	if (level < 1) level = 1;
+	level = Clamp(level, 1, MAX_LEVEL);
 	WMLevelMod = wmlevels[core->Roll(1, 20, -1)][level - 1];
 
 	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
@@ -9770,9 +9769,7 @@ void Actor::SetupFist()
 	assert (core->QuerySlotEffects(slot)==SLOT_EFFECT_FIST);
 	int row = GetBase(fiststat);
 	int col = GetXPLevel(false);
-
-	if (col>MAX_LEVEL) col=MAX_LEVEL;
-	if (col<1) col=1;
+	col = Clamp(col, 1, MAX_LEVEL);
 
 	SetupFistData();
 
