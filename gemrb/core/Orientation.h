@@ -70,7 +70,7 @@ enum orient_t : uint8_t {
 
 inline orient_t RandomOrientation()
 {
-	return orient_t(RAND<uint8_t>(0, MAX_ORIENT - 1));
+	return orient_t(RAND(0, MAX_ORIENT - 1));
 }
 
 inline orient_t ClampToOrientation(int i)
