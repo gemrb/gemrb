@@ -9501,9 +9501,19 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	}
 
 	Projectile *pro = itm->GetProjectile(this, header, target->Pos, slot, flags&UI_MISS);
-	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
-	AuraCooldown = core->Time.attack_round_size;
 
+	// ChargeItem can break the item, now invalidating everything, so look things up in advance
+	int weaponTypeIdx = 0;
+	bool ranged = header == (ieDword) -2;
+	ieDword projectileAnim = 0;
+	if (((int) header < 0) && !(flags & UI_MISS)) { // using a weapon
+		const ITMExtHeader* which = itm->GetWeaponHeader(ranged);
+		weaponTypeIdx = which->DamageType;
+		projectileAnim = which->ProjectileAnimation;
+	}
+	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
+
+	AuraCooldown = core->Time.attack_round_size;
 	ResetCommentTime();
 	if (!pro) {
 		return false;
@@ -9513,10 +9523,8 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	if (flags & UI_FAKE) {
 		delete pro;
 	} else if (((int) header < 0) && !(flags & UI_MISS)) { // using a weapon
-		bool ranged = header == (ieDword) -2;
-		const ITMExtHeader* which = itm->GetWeaponHeader(ranged);
-		Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[which->DamageType] << 16, FX_DURATION_INSTANT_LIMITED);
-		AttackEffect->Projectile = which->ProjectileAnimation;
+		Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[weaponTypeIdx] << 16, FX_DURATION_INSTANT_LIMITED);
+		AttackEffect->Projectile = projectileAnim;
 		AttackEffect->Target = FX_TARGET_PRESET;
 		AttackEffect->Parameter3 = 1;
 		if (pstflags) {
