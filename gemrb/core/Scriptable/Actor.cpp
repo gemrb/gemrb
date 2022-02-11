@@ -537,19 +537,19 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		}
 		delete anims;
 	}
-	//hacking PST no palette
-	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
-		if ((AnimID&0xf000)==0xe000) {
-			if (BaseStats[IE_COLORCOUNT]) {
-				Log(WARNING, "Actor", "Animation ID {:#x} is supposed to be real colored (no recoloring), patched creature", AnimID);
-			}
-			BaseStats[IE_COLORCOUNT]=0;
+
+	// hacking PST no palette
+	if (core->HasFeature(GF_ONE_BYTE_ANIMID) && (AnimID & 0xf000) == 0xe000) {
+		if (BaseStats[IE_COLORCOUNT]) {
+			Log(WARNING, "Actor", "Animation ID {:#x} is supposed to be real colored (no recoloring), patched creature", AnimID);
 		}
+		BaseStats[IE_COLORCOUNT] = 0;
 	}
-	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
-	if (anims->ResRefBase.IsEmpty()) {
+
+	anims = new CharAnimations(AnimID & 0xffff, BaseStats[IE_ARMOR_TYPE]);
+	if (!anims || anims->ResRefBase.IsEmpty()) {
 		delete anims;
-		anims = NULL;
+		anims = nullptr;
 		Log(ERROR, "Actor", "Missing animation for {}", fmt::WideToChar{GetName()});
 		return;
 	}
