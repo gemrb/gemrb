@@ -94,6 +94,11 @@ struct Globals {
 		static Globals globs;
 		return globs;
 	}
+	
+	static void ResolveEffectRef(EffectRef &effect_reference)
+	{
+		Get().ResolveEffectRefImp(effect_reference);
+	}
 
 private:
 	Globals()
@@ -125,6 +130,8 @@ private:
 					error("EffectQueue", "Clashing Opcodes FN: {} vs. {}, {}", i, poi->opcode, effectname);
 				}
 				poi->opcode = i;
+			} else {
+				assert(effectname == nullptr);
 			}
 			
 			if (efftextTable) {
@@ -141,6 +148,19 @@ private:
 			}
 		}
 		core->DelSymbol( eT );
+	}
+	
+	// nonstatic, this actually depends on Globals() indirectly
+	void ResolveEffectRefImp(EffectRef &effect_reference) const
+	{
+		if (effect_reference.opcode == -1) {
+			const EffectDesc* ref = FindEffect(effect_reference.Name);
+			if( ref && ref->opcode >= 0) {
+				effect_reference.opcode = ref->opcode;
+				return;
+			}
+			effect_reference.opcode = -2;
+		}
 	}
 };
 
@@ -304,18 +324,6 @@ static inline ieByte TriggeredEffect(ieByte timingmode)
 	return fx_triggered[timingmode];
 }
 
-static inline void ResolveEffectRef(EffectRef &effect_reference)
-{
-	if( effect_reference.opcode==-1) {
-		const EffectDesc* ref = FindEffect(effect_reference.Name);
-		if( ref && ref->opcode>=0) {
-			effect_reference.opcode = ref->opcode;
-			return;
-		}
-		effect_reference.opcode = -2;
-	}
-}
-
 Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing)
 {
 	if( opcode==0xffffffff) {
@@ -340,7 +348,7 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 //useful for effects where there is no separate stat to see
 ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const ResRef &resource) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return 0;
 	}
@@ -352,7 +360,7 @@ ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, i
 //used when the gui sets the effect's final target
 void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return;
 	}
@@ -368,7 +376,7 @@ void EffectQueue::ModifyAllEffectSources(const Point &source)
 
 Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return nullptr;
 	}
@@ -395,7 +403,7 @@ Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDwo
 
 Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return nullptr;
 	}
@@ -1407,7 +1415,7 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed, ieByte timing)
 //this will modify effect reference
 void EffectQueue::RemoveAllEffects(EffectRef &effect_reference)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return;
 	}
@@ -1429,7 +1437,7 @@ void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ResRef &res
 //this will modify effect reference
 void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithResource(effect_reference.opcode, resource);
 }
 
@@ -1459,7 +1467,7 @@ void EffectQueue::RemoveAllEffectsWithSource(ieDword opcode, const ResRef &sourc
 
 void EffectQueue::RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode)
 {
-	ResolveEffectRef(effectReference);
+	Globals::ResolveEffectRef(effectReference);
 	RemoveAllEffectsWithSource(effectReference.opcode, source, mode);
 }
 
@@ -1491,7 +1499,7 @@ void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current)
 //this will modify effect reference
 void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	RemoveAllDetrimentalEffects(effect_reference.opcode, current);
 }
 
@@ -1513,7 +1521,7 @@ void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
 //this will modify effect reference
 void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithParam(effect_reference.opcode, param2);
 }
 
@@ -1534,7 +1542,7 @@ void EffectQueue::RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword p
 //this will modify effect reference
 void EffectQueue::RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithParamAndResource(effect_reference.opcode, param2, resource);
 }
 
@@ -1644,7 +1652,7 @@ const Effect *EffectQueue::HasOpcode(ieDword opcode) const
 
 const Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return nullptr;
 	}
@@ -1664,7 +1672,7 @@ Effect *EffectQueue::HasOpcode(ieDword opcode)
 
 Effect *EffectQueue::HasEffect(EffectRef &effect_reference)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return nullptr;
 	}
@@ -1686,7 +1694,7 @@ const Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) co
 //this will modify effect reference
 const Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return nullptr;
 	}
@@ -1715,7 +1723,7 @@ const Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1
 //this will modify effect reference
 const Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return nullptr;
 	}
@@ -1745,7 +1753,7 @@ void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
 
 void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return;
 	}
@@ -1780,7 +1788,7 @@ int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword 
 //returns the damage amount NOT soaked
 int EffectQueue::DecreaseParam3OfEffect(EffectRef &effect_reference, ieDword amount, ieDword param2)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return amount;
 	}
@@ -1837,7 +1845,7 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 
 int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, const Actor *actor) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return 0;
 	}
@@ -1858,7 +1866,7 @@ int EffectQueue::BonusForParam2(ieDword opcode, ieDword param2) const
 
 int EffectQueue::BonusForParam2(EffectRef &effect_reference, ieDword param2) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return 0;
 	}
@@ -1883,7 +1891,7 @@ int EffectQueue::MaxParam1(ieDword opcode, bool positive) const
 
 int EffectQueue::MaxParam1(EffectRef &effect_reference, bool positive) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
 		return 0;
 	}
@@ -1915,7 +1923,7 @@ bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapon
 
 bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 {
-	ResolveEffectRef(fx_weapon_immunity_ref);
+	Globals::ResolveEffectRef(fx_weapon_immunity_ref);
 	if (fx_weapon_immunity_ref.opcode < 0) {
 		return false;
 	}
@@ -1924,7 +1932,7 @@ bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 
 void EffectQueue::AddWeaponEffects(EffectQueue* fxqueue, EffectRef& fx_ref, ieDword param2) const
 {
-	ResolveEffectRef(fx_ref);
+	Globals::ResolveEffectRef(fx_ref);
 	if( fx_ref.opcode<0) {
 		return;
 	}
@@ -1947,7 +1955,7 @@ void EffectQueue::AddWeaponEffects(EffectQueue* fxqueue, EffectRef& fx_ref, ieDw
 // figure out how much damage reduction applies for a given weapon enchantment and damage type
 int EffectQueue::SumDamageReduction(EffectRef &effect_reference, ieDword weaponEnchantment, int &total) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	ieDword opcode = effect_reference.opcode;
 	int remaining = 0;
 	int count = 0;
@@ -1985,14 +1993,14 @@ const Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ResRef &r
 
 const Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ResRef &resource) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	return HasOpcodeWithResource(effect_reference.opcode, resource);
 }
 
 // for tobex bounce triggers
 const Effect *EffectQueue::HasEffectWithPower(EffectRef &effect_reference, ieDword power) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	return HasOpcodeWithPower(effect_reference.opcode, power);
 }
 
@@ -2040,7 +2048,7 @@ const Effect *EffectQueue::HasOpcodeWithSource(ieDword opcode, const ResRef &rem
 
 const Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ResRef &resource) const
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	return HasOpcodeWithSource(effect_reference.opcode, resource);
 }
 
@@ -2160,7 +2168,7 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 
 int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 {
-	ResolveEffectRef(effect_reference);
+	Globals::ResolveEffectRef(effect_reference);
 	return effect_reference.opcode;
 }
 
