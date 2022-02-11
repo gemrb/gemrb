@@ -291,6 +291,11 @@ SDLTextureSprite2D::~SDLTextureSprite2D() noexcept
 	SDL_DestroyTexture(texture);
 }
 
+SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& other) noexcept
+	: SDLSurfaceSprite2D(other), texFormat(other.texFormat), texture(nullptr),
+	staleTexture(false)
+{}
+
 Holder<Sprite2D> SDLTextureSprite2D::copy() const
 {
 	return Holder<Sprite2D>(new SDLTextureSprite2D(*this));
