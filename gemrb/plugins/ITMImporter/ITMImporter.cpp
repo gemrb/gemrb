@@ -31,11 +31,7 @@
 using namespace GemRB;
 
 static std::vector<int> profs;
-
-static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
-static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
-static EffectRef zzRefs[] = { fx_tohit_vs_creature_ref, fx_damage_vs_creature_ref };
-std::map<wchar_t,int> zzmap;
+std::map<wchar_t,ieByte> zzmap;
 
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
@@ -126,6 +122,8 @@ static void AddZZFeatures(Item *s)
 	} else {
 		bonus -= 4;
 	}
+
+	static EffectRef zzRefs[] = { { "ToHitVsCreature", -1 }, { "DamageVsCreature", -1 } };
 
 	// append the new equipping effects (tohit+damage)
 	for (unsigned int i=0; i < sizeof(zzRefs)/sizeof(*zzRefs); i++) {
