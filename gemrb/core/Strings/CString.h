@@ -111,10 +111,11 @@ public:
 	
 	// remove trailing spaces
 	uint8_t RTrim() {
-		int8_t len = CStrLen();
-		int8_t i = len;
-		for (; i - 1 >= 0; --i) {
-			if (std::isspace(str[i])) str[i] = '\0';
+		uint8_t len = CStrLen();
+		uint8_t i = 0;
+		for (; i < len; ++i) {
+			uint8_t idx = len - i - 1;
+			if (std::isspace(str[idx])) str[idx] = '\0';
 			else break;
 		}
 
