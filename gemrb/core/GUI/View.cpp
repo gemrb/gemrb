@@ -310,6 +310,7 @@ void View::Draw()
 				video->SetScreenClip(nullptr);
 				video->DrawRect(r, ColorBlack, true);
 				fnt->Print(r, *string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT, {ColorWhite, ColorBlack});
+				delete string;
 			}
 		}
 	}
