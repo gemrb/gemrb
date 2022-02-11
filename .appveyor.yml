@@ -32,6 +32,7 @@ install:
     }
 
     vcpkg install zlib:x86-windows
+    vcpkg remove sdl2:x86-windows --recurse
     vcpkg install sdl2:x86-windows
     vcpkg install sdl2-mixer:x86-windows
     vcpkg install python3:x86-windows
