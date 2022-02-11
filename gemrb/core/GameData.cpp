@@ -767,7 +767,7 @@ const IWDIDSEntry& GameData::GetSpellProt(index_t idx)
 
 int GameData::GetReputationMod(int column)
 {
-	assert(column > 0 && column <= 8);
+	assert(column >= 0 && column <= 8);
 	if (!reputationMod) {
 		reputationMod = LoadTable("reputati", true);
 	}
