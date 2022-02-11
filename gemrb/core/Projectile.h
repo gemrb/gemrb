@@ -377,16 +377,7 @@ public:
 	}
 
 	inline unsigned char GetNextFace() {
-		//slow turning
-		if (Orientation != NewOrientation) {
-			if (ClampToOrientation(NewOrientation - Orientation) <= MAX_ORIENT / 2) {
-				Orientation = NextOrientation(Orientation);
-			} else {
-				Orientation = PrevOrientation(Orientation);
-			}
-		}
-
-		return Orientation;
+		return GemRB::GetNextFace(Orientation, NewOrientation);
 	}
 
 	inline void SetOrientation(orient_t value, bool slow) {

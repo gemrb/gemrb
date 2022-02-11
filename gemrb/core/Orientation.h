@@ -117,6 +117,18 @@ inline orient_t GetOrient(const Point &s, const Point &d)
 	return orientations[(aY+2)*5+aX+2];
 }
 
+inline orient_t GetNextFace(orient_t old, orient_t next) {
+	if (old != next) {
+		if (ClampToOrientation(next - old) <= MAX_ORIENT / 2) {
+			old = NextOrientation(old);
+		} else {
+			old = PrevOrientation(old);
+		}
+	}
+
+	return old;
+}
+
 } // namespace GemRB
 
 #endif
