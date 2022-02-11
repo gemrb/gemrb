@@ -2424,9 +2424,7 @@ int Interface::PlayMovie(const char* resref)
 
 				const char* frameField = sttable->QueryField(i, 0);
 				ieStrRef strField = sttable->QueryFieldAsStrRef(i, 1);
-				if (frameField) {
-					subs[atoi(frameField)] = strField;
-				}
+				subs[atoi(frameField)] = strField;
 			}
 		}
 
