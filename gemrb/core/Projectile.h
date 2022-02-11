@@ -379,7 +379,7 @@ public:
 	inline unsigned char GetNextFace() {
 		//slow turning
 		if (Orientation != NewOrientation) {
-			if ( ( (NewOrientation-Orientation) & (MAX_ORIENT-1) ) <= MAX_ORIENT/2) {
+			if (ClampToOrientation(NewOrientation - Orientation) <= MAX_ORIENT / 2) {
 				Orientation = NextOrientation(Orientation);
 			} else {
 				Orientation = PrevOrientation(Orientation);
