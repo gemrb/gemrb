@@ -1,5 +1,7 @@
 # HOW TO RUN
 
+Make sure you're running a GemRB built with PNG, OGG and FreeType support.
+
 Copy either sample config from gemrb/ and set:
 GameType=demo
 GamePath to the parent of the parent dir containing this file (demo)
