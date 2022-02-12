@@ -202,11 +202,6 @@ static int **wstwohanded = NULL;
 static int **wsswordshield = NULL;
 static int **wssingle = NULL;
 
-//unhardcoded monk bonuses
-static int **monkbon = NULL;
-static unsigned int monkbon_cols = 0;
-static unsigned int monkbon_rows = 0;
-
 // reputation modifiers
 #define CLASS_PCCUTOFF 32
 #define CLASS_INNOCENT 155
@@ -1647,13 +1642,6 @@ void Actor::ReleaseMemory()
 			free(wssingle);
 			wssingle=NULL;
 		}
-		if (monkbon) {
-			for (unsigned i=0; i<monkbon_rows; i++) {
-				free(monkbon[i]);
-			}
-			free(monkbon);
-			monkbon=NULL;
-		}
 		for (auto wml : wmlevels) {
 			free(wml);
 			wml = NULL;
@@ -2391,20 +2379,6 @@ static void InitActorTables()
 			wssingle[i] = (int *) calloc(cols, sizeof(int));
 			for (int j = 0; j < cols; j++) {
 				wssingle[i][j] = atoi(tm->QueryField(i, j));
-			}
-		}
-	}
-
-	//unhardcoded monk bonus table
-	tm = gamedata->LoadTable("monkbon", true);
-	if (tm) {
-		monkbon_rows = tm->GetRowCount();
-		monkbon_cols = tm->GetColumnCount();
-		monkbon = (int **) calloc(monkbon_rows, sizeof(int *));
-		for (unsigned i=0; i<monkbon_rows; i++) {
-			monkbon[i] = (int *) calloc(monkbon_cols, sizeof(int));
-			for (unsigned j=0; j<monkbon_cols; j++) {
-				monkbon[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
 	}
@@ -6532,12 +6506,8 @@ ieDword Actor::GetNumberOfAttacks()
 		bonus = 2 * IsDualWielding();
 		return base + bonus;
 	} else {
-		if (monkbon != NULL && inventory.FistsEquipped()) {
-			unsigned int level = GetMonkLevel();
-			if (level>=monkbon_cols) level=monkbon_cols-1;
-			if (level>0) {
-				bonus = monkbon[0][level-1];
-			}
+		if (inventory.FistsEquipped()) {
+			bonus = gamedata->GetMonkBonus(0, GetMonkLevel());
 		}
 
 		return GetStat(IE_NUMBEROFATTACKS)+bonus;
@@ -10103,11 +10073,9 @@ void Actor::CreateDerivedStatsBG()
 	// monk's level dictated ac and ac vs missiles bonus
 	// attacks per round bonus will be handled elsewhere, since it only applies to fist apr
 	if (isclass[ISMONK]&(1<<classid)) {
-		unsigned int level = GetMonkLevel()-1;
-		if (level < monkbon_cols) {
-			AC.SetNatural(DEFAULTAC - monkbon[1][level]);
-			BaseStats[IE_ACMISSILEMOD] = - monkbon[2][level];
-		}
+		unsigned int level = GetMonkLevel();
+		AC.SetNatural(DEFAULTAC - gamedata->GetMonkBonus(1, level));
+		BaseStats[IE_ACMISSILEMOD] = - gamedata->GetMonkBonus(2, level);
 	}
 
 	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;

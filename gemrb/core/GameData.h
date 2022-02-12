@@ -156,6 +156,7 @@ public:
 	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	ResRef GetFist(int cls, int level);
+	int GetMonkBonus(int bonusType, int level);
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -182,6 +183,7 @@ private:
 	AutoTable summoningLimit;
 	AutoTable reputationMod;
 	AutoTable fistWeap;
+	AutoTable monkBon;
 	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;

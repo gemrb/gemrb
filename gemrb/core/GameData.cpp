@@ -915,4 +915,31 @@ ResRef GameData::GetFist(int cls, int level)
 	return fistWeap->QueryField(row, level);
 }
 
+// read from our unhardcoded monk bonus table
+int GameData::GetMonkBonus(int bonusType, int level)
+{
+	// not a monk?
+	if (level == 0) return 0;
+
+	static bool ignore = false;
+	static int cols = 0;
+	if (ignore) {
+		return 0;
+	}
+
+	if (!monkBon) {
+		monkBon = gamedata->LoadTable("monkbon");
+		if (!monkBon) {
+			ignore = true;
+			return 0;
+		}
+		cols = monkBon->GetColumnCount();
+	}
+
+	// extend the last level value to infinity
+	if (level >= cols) level = cols;
+
+	return atoi(monkBon->QueryField(bonusType, level - 1));
+}
+
 }
