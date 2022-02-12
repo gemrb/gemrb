@@ -6598,6 +6598,13 @@ bool Actor::WeaponIsUsable(bool leftorright, const ITMExtHeader *header) const
 	return true;
 }
 
+int Actor::GetStars(stat_t proficiency) const
+{
+	int stars = GetStat(proficiency) & PROFS_MASK;
+	if (stars > STYLE_MAX) stars = STYLE_MAX;
+	return stars;
+}
+
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const ITMExtHeader *&header, const ITMExtHeader *&hittingheader, \
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target)
 {
@@ -6718,16 +6725,14 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 	int styleIdx = -1;
 	if (dualwielding) {
 		//add dual wielding penalty
-		stars = GetStat(IE_PROFICIENCY2WEAPON)&PROFS_MASK;
-		if (stars > STYLE_MAX) stars = STYLE_MAX;
+		stars = GetStars(IE_PROFICIENCY2WEAPON);
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
 		styleIdx = 0;
 		prof += gamedata->GetWeaponStyleBonus(0, stars, leftorright ? 4 : 3);
 	} else if (wi.itemflags & IE_INV_ITEM_TWOHANDED && wi.wflags & WEAPON_MELEE) {
 		//add two handed profs bonus
-		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
-		if (stars > STYLE_MAX) stars = STYLE_MAX;
+		stars = GetStars(IE_PROFICIENCY2HANDED);
 
 		style = 1000*stars + IE_PROFICIENCY2HANDED;
 		styleIdx = 1;
@@ -6736,14 +6741,12 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		const CREItem *weapon = inventory.GetUsedWeapon(true, slot);
 		if (weapon == nullptr) {
 			//NULL return from GetUsedWeapon means no shield slot
-			stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
-			if (stars > STYLE_MAX) stars = STYLE_MAX;
+			stars = GetStars(IE_PROFICIENCYSINGLEWEAPON);
 
 			style = 1000*stars + IE_PROFICIENCYSINGLEWEAPON;
 			styleIdx = 3;
 		} else if (weapon) {
-			stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
-			if (stars > STYLE_MAX) stars = STYLE_MAX;
+			stars = GetStars(IE_PROFICIENCYSWORDANDSHIELD);
 
 			style = 1000*stars + IE_PROFICIENCYSWORDANDSHIELD;
 			styleIdx = 2;
@@ -7010,13 +7013,11 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 			ieDword stars;
 			if (inventory.GetUsedWeapon(true, slot) == NULL) {
 				//single-weapon style applies to all ac
-				stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
-				if (stars>STYLE_MAX) stars = STYLE_MAX;
+				stars = GetStars(IE_PROFICIENCYSINGLEWEAPON);
 				defense += gamedata->GetWeaponStyleBonus(3, stars, 0);
 			} else if (weapon_damagetype[DamageType] == DAMAGE_MISSILE) {
 				//sword-shield style applies only to missile ac
-				stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
-				if (stars>STYLE_MAX) stars = STYLE_MAX;
+				stars = GetStars(IE_PROFICIENCYSWORDANDSHIELD);
 				defense += gamedata->GetWeaponStyleBonus(2, stars, 6);
 			}
 		}

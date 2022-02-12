@@ -732,6 +732,8 @@ public:
 	int GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const;
 	/* checks if something is wrong with the weapon we are using for the attack */
 	bool WeaponIsUsable(bool leftorright, const ITMExtHeader *header=NULL) const;
+	/* returns the number of allocated proficiency points (stars) */
+	int GetStars(stat_t proficiency) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, const ITMExtHeader *&header, const ITMExtHeader *&hittingheader,\
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target);
