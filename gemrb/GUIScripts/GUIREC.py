@@ -720,8 +720,9 @@ def GetWeaponStyleBonuses(pc, cdet):
 			bonusrefs = { "THAC0BONUSRIGHT":56911, "THAC0BONUSLEFT":56910, "DAMAGEBONUS":10336, "CRITICALHITBONUS":32140, "PHYSICALSPEED":32141, "AC":10339, "ACVSMISSLE":10340 }
 			WStyleTable = GemRB.LoadTable (wstyletables[wstyle % 1000])
 			for col in range(WStyleTable.GetColumnCount()):
-				value = WStyleTable.GetValue (profcount, col)
-				stats.append ((bonusrefs[WStyleTable.GetColumnName(col)], value, ''))
+				colName = WStyleTable.GetColumnName (col);
+				value = WStyleTable.GetValue (str(profcount), colName, GTV_INT)
+				stats.append ((bonusrefs[colName], value, ''))
 		stats.append ("\n")
 	return TypeSetStats (stats, pc)
 
