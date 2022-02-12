@@ -6715,12 +6715,14 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		}
 	}
 
+	int styleIdx = -1;
 	if (dualwielding) {
 		//add dual wielding penalty
 		stars = GetStat(IE_PROFICIENCY2WEAPON)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
+		styleIdx = 0;
 		prof += gamedata->GetWeaponStyleBonus(0, stars, leftorright ? 4 : 3);
 	} else if (wi.itemflags & IE_INV_ITEM_TWOHANDED && wi.wflags & WEAPON_MELEE) {
 		//add two handed profs bonus
@@ -6728,9 +6730,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		style = 1000*stars + IE_PROFICIENCY2HANDED;
-		DamageBonus += gamedata->GetWeaponStyleBonus(1, stars, 2);
-		CriticalBonus = gamedata->GetWeaponStyleBonus(1, stars, 1);
-		speed += gamedata->GetWeaponStyleBonus(1, stars, 5);
+		styleIdx = 1;
 	} else if (wi.wflags&WEAPON_MELEE) {
 		int slot;
 		const CREItem *weapon = inventory.GetUsedWeapon(true, slot);
@@ -6740,17 +6740,28 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 			if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 			style = 1000*stars + IE_PROFICIENCYSINGLEWEAPON;
-			CriticalBonus = gamedata->GetWeaponStyleBonus(3, stars, 1);
+			styleIdx = 3;
 		} else if (weapon) {
 			stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
 			if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 			style = 1000*stars + IE_PROFICIENCYSWORDANDSHIELD;
+			styleIdx = 2;
 		} else {
 			// no bonus
 		}
 	} else {
 		// ranged - no bonus
+	}
+
+	if (styleIdx != -1) {
+		DamageBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, 2);
+		speed += gamedata->GetWeaponStyleBonus(styleIdx, stars, 5);
+		CriticalBonus = gamedata->GetWeaponStyleBonus(styleIdx, stars, 1);
+		if (styleIdx != 0) {
+			// right hand bonus; dualwielding was already considered above
+			prof += gamedata->GetWeaponStyleBonus(styleIdx, stars, 3);
+		}
 	}
 
 	// racial enemies suffer 4hp more in all games
