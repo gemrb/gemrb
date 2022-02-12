@@ -1,7 +1,0 @@
-Description: This table lists the benefits for points in single-weapon proficiency. (BG2-specific)
-
-Columns - 
-AC   - bonus to ac
-CRITICALHITBONUS - bonus to critical range
-
-Rows - number of stars

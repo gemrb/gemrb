@@ -1,7 +1,0 @@
-Description: This table lists the benefits for points in two-weapon proficiency. (BG2-specific)
-
-Columns - 
-THAC0BONUSRIGHT - penalty to the main hand
-THAC0BONUSLEFT  - penalty to the off hand
-
-Rows - number of stars

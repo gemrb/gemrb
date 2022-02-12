@@ -6805,16 +6805,16 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
-		prof += wsdualwield[stars][leftorright?1:0];
+		prof += wsdualwield[stars][leftorright ? 4 : 3];
 	} else if (wi.itemflags & IE_INV_ITEM_TWOHANDED && wi.wflags & WEAPON_MELEE && wstwohanded) {
 		//add two handed profs bonus
 		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		style = 1000*stars + IE_PROFICIENCY2HANDED;
-		DamageBonus += wstwohanded[stars][0];
+		DamageBonus += wstwohanded[stars][2];
 		CriticalBonus = wstwohanded[stars][1];
-		speed += wstwohanded[stars][2];
+		speed += wstwohanded[stars][5];
 	} else if (wi.wflags&WEAPON_MELEE) {
 		int slot;
 		const CREItem *weapon = inventory.GetUsedWeapon(true, slot);
@@ -7090,7 +7090,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 				//sword-shield style applies only to missile ac
 				stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
 				if (stars>STYLE_MAX) stars = STYLE_MAX;
-				defense += wsswordshield[stars][0];
+				defense += wsswordshield[stars][6];
 			}
 		}
 	}

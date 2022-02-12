@@ -1,6 +1,0 @@
-Description: This table lists the benefits for points in sword/shield proficiency. (BG2-specific)
-
-Columns - 
-ACVSMISSILE - bonus to ac vs missile weapons
-
-Rows - number of stars

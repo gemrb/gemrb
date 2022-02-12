@@ -1,8 +1,0 @@
-Description: This table lists the benefits for points in two-handed weapon proficiency. (BG2-specific)
-
-Columns - 
-DAMAGEBONUS   - additional damage
-CRITICALBONUS - critical roll modifier
-PHYSICALSPEED - speed modifier
-
-Rows - number of stars
