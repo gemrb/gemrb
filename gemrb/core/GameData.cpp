@@ -942,4 +942,34 @@ int GameData::GetMonkBonus(int bonusType, int level)
 	return atoi(monkBon->QueryField(bonusType, level - 1));
 }
 
+// AC  CRITICALHITBONUS   DAMAGEBONUS   THAC0BONUSRIGHT   THAC0BONUSLEFT   PHYSICALSPEED   ACVSMISSLE
+int GameData::GetWeaponStyleBonus(int style, int stars, int bonusType)
+{
+	if (stars == 0) return 0;
+
+	static std::array<ResRef, 4> weaponStyles = { "wstwowpn", "wstwohnd", "wsshield", "wssingle" };
+	static std::array<short, 4> ignore = { 0 };
+	if (ignore[style] == 1) {
+		return 0;
+	}
+
+	if (ignore[style] == 0) {
+		AutoTable styleTable = gamedata->LoadTable(weaponStyles[style]);
+		if (!styleTable) {
+			ignore[style] = 1;
+			return 0;
+		}
+
+		int cols = styleTable->GetColumnCount();
+		for (int star = 0; star < 4; star++) {
+			for (int bonus = 0; bonus < cols; bonus++) {
+				weaponStyleBoni[style][star][bonus] = atoi(styleTable->QueryField(star, bonus));
+			}
+		}
+		ignore[style] = 2;
+	}
+
+	return weaponStyleBoni[style][stars][bonusType];
+}
+
 }

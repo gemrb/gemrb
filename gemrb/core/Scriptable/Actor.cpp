@@ -197,10 +197,6 @@ static ieByte featmax[MAX_FEATS]={0
 
 //holds the weapon style bonuses
 #define STYLE_MAX 3
-static int **wsdualwield = NULL;
-static int **wstwohanded = NULL;
-static int **wsswordshield = NULL;
-static int **wssingle = NULL;
 
 // reputation modifiers
 #define CLASS_PCCUTOFF 32
@@ -1614,34 +1610,6 @@ void Actor::ReleaseMemory()
 			afcomments=NULL;
 		}
 
-		if (wsdualwield) {
-			for (int i = 0; i<= STYLE_MAX; i++) {
-				free(wsdualwield[i]);
-			}
-			free(wsdualwield);
-			wsdualwield=NULL;
-		}
-		if (wstwohanded) {
-			for (int i = 0; i<= STYLE_MAX; i++) {
-				free(wstwohanded[i]);
-			}
-			free(wstwohanded);
-			wstwohanded=NULL;
-		}
-		if (wsswordshield) {
-			for (int i = 0; i<= STYLE_MAX; i++) {
-				free(wsswordshield[i]);
-			}
-			free(wsswordshield);
-			wsswordshield=NULL;
-		}
-		if (wssingle) {
-			for (int i = 0; i<= STYLE_MAX; i++) {
-				free(wssingle[i]);
-			}
-			free(wssingle);
-			wssingle=NULL;
-		}
 		for (auto wml : wmlevels) {
 			free(wml);
 			wml = NULL;
@@ -2330,58 +2298,6 @@ static void InitActorTables()
 
 	//pre-cache hit/damage/speed bonuses for weapons
 	wspecial = gamedata->LoadTable("wspecial", true);
-
-	//dual-wielding table
-	tm = gamedata->LoadTable("wstwowpn", true);
-	if (tm) {
-		wsdualwield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
-		int cols = tm->GetColumnCount();
-		for (int i = 0; i <= STYLE_MAX; i++) {
-			wsdualwield[i] = (int *) calloc(cols, sizeof(int));
-			for (int j=0; j<cols; j++) {
-				wsdualwield[i][j] = atoi(tm->QueryField(i, j));
-			}
-		}
-	}
-
-	//two-handed table
-	tm = gamedata->LoadTable("wstwohnd", true);
-	if (tm) {
-		wstwohanded = (int **) calloc(STYLE_MAX+1, sizeof(int *));
-		int cols = tm->GetColumnCount();
-		for (int i = 0; i <= STYLE_MAX; i++) {
-			wstwohanded[i] = (int *) calloc(cols, sizeof(int));
-			for (int j = 0; j < cols; j++) {
-				wstwohanded[i][j] = atoi(tm->QueryField(i, j));
-			}
-		}
-	}
-
-	//shield table
-	tm = gamedata->LoadTable("wsshield", true);
-	if (tm) {
-		wsswordshield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
-		int cols = tm->GetColumnCount();
-		for (int i = 0; i <= STYLE_MAX; i++) {
-			wsswordshield[i] = (int *) calloc(cols, sizeof(int));
-			for (int j = 0; j < cols; j++) {
-				wsswordshield[i][j] = atoi(tm->QueryField(i, j));
-			}
-		}
-	}
-
-	//single-handed table
-	tm = gamedata->LoadTable("wssingle");
-	if (tm) {
-		wssingle = (int **) calloc(STYLE_MAX+1, sizeof(int *));
-		int cols = tm->GetColumnCount();
-		for (int i = 0; i <= STYLE_MAX; i++) {
-			wssingle[i] = (int *) calloc(cols, sizeof(int));
-			for (int j = 0; j < cols; j++) {
-				wssingle[i][j] = atoi(tm->QueryField(i, j));
-			}
-		}
-	}
 
 	//wild magic level modifiers
 	for (int i = 0; i < 20; i++) {
@@ -6799,33 +6715,33 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		}
 	}
 
-	if (dualwielding && wsdualwield) {
+	if (dualwielding) {
 		//add dual wielding penalty
 		stars = GetStat(IE_PROFICIENCY2WEAPON)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
-		prof += wsdualwield[stars][leftorright ? 4 : 3];
-	} else if (wi.itemflags & IE_INV_ITEM_TWOHANDED && wi.wflags & WEAPON_MELEE && wstwohanded) {
+		prof += gamedata->GetWeaponStyleBonus(0, stars, leftorright ? 4 : 3);
+	} else if (wi.itemflags & IE_INV_ITEM_TWOHANDED && wi.wflags & WEAPON_MELEE) {
 		//add two handed profs bonus
 		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 		style = 1000*stars + IE_PROFICIENCY2HANDED;
-		DamageBonus += wstwohanded[stars][2];
-		CriticalBonus = wstwohanded[stars][1];
-		speed += wstwohanded[stars][5];
+		DamageBonus += gamedata->GetWeaponStyleBonus(1, stars, 2);
+		CriticalBonus = gamedata->GetWeaponStyleBonus(1, stars, 1);
+		speed += gamedata->GetWeaponStyleBonus(1, stars, 5);
 	} else if (wi.wflags&WEAPON_MELEE) {
 		int slot;
 		const CREItem *weapon = inventory.GetUsedWeapon(true, slot);
-		if(wssingle && weapon == NULL) {
+		if (weapon == nullptr) {
 			//NULL return from GetUsedWeapon means no shield slot
 			stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
 			if (stars > STYLE_MAX) stars = STYLE_MAX;
 
 			style = 1000*stars + IE_PROFICIENCYSINGLEWEAPON;
-			CriticalBonus = wssingle[stars][1];
-		} else if (wsswordshield && weapon) {
+			CriticalBonus = gamedata->GetWeaponStyleBonus(3, stars, 1);
+		} else if (weapon) {
 			stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
 			if (stars > STYLE_MAX) stars = STYLE_MAX;
 
@@ -7074,7 +6990,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 
 
 	//check for s/s and single weapon ac bonuses
-	if (!IsDualWielding() && wssingle && wsswordshield) {
+	if (!IsDualWielding()) {
 		WeaponInfo wi;
 		const ITMExtHeader* header = GetWeapon(wi, false);
 		//make sure we're wielding a single melee weapon
@@ -7085,12 +7001,12 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 				//single-weapon style applies to all ac
 				stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
 				if (stars>STYLE_MAX) stars = STYLE_MAX;
-				defense += wssingle[stars][0];
+				defense += gamedata->GetWeaponStyleBonus(3, stars, 0);
 			} else if (weapon_damagetype[DamageType] == DAMAGE_MISSILE) {
 				//sword-shield style applies only to missile ac
 				stars = GetStat(IE_PROFICIENCYSWORDANDSHIELD)&PROFS_MASK;
 				if (stars>STYLE_MAX) stars = STYLE_MAX;
-				defense += wsswordshield[stars][6];
+				defense += gamedata->GetWeaponStyleBonus(2, stars, 6);
 			}
 		}
 	}

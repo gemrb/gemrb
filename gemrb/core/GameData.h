@@ -157,6 +157,7 @@ public:
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	ResRef GetFist(int cls, int level);
 	int GetMonkBonus(int bonusType, int level);
+	int GetWeaponStyleBonus(int style, int stars, int bonusType);
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -193,6 +194,8 @@ private:
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};
+	// 4 styles and 4 star levels, 7 bonus types
+	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni;
 
 public:
 	std::vector<ResRef> defaultSounds;
