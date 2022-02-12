@@ -195,9 +195,6 @@ static ieByte featstats[MAX_FEATS]={0
 static ieByte featmax[MAX_FEATS]={0
 };
 
-//holds the weapon style bonuses
-#define STYLE_MAX 3
-
 // reputation modifiers
 #define CLASS_PCCUTOFF 32
 #define CLASS_INNOCENT 155
@@ -6601,7 +6598,7 @@ bool Actor::WeaponIsUsable(bool leftorright, const ITMExtHeader *header) const
 int Actor::GetStars(stat_t proficiency) const
 {
 	int stars = GetStat(proficiency) & PROFS_MASK;
-	if (stars > STYLE_MAX) stars = STYLE_MAX;
+	if (stars > STYLE_STAR_MAX) stars = STYLE_STAR_MAX;
 	return stars;
 }
 

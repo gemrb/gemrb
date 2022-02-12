@@ -228,6 +228,8 @@ namespace GemRB {
 // used for distinguishing damage immunity from high damage resistance
 #define DR_IMMUNE 999999
 
+constexpr int STYLE_STAR_MAX = 3;
+
 // wild surge target change type
 #define WSTC_SETTYPE   1 // change to this target type
 #define WSTC_ADDTYPE   2 // affect also this target type

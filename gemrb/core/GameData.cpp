@@ -961,7 +961,7 @@ int GameData::GetWeaponStyleBonus(int style, int stars, int bonusType)
 		}
 
 		int cols = styleTable->GetColumnCount();
-		for (int star = 0; star < 4; star++) {
+		for (int star = 0; star <= STYLE_STAR_MAX; star++) {
 			for (int bonus = 0; bonus < cols; bonus++) {
 				weaponStyleBoni[style][star][bonus] = atoi(styleTable->QueryField(star, bonus));
 			}
