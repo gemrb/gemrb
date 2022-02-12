@@ -93,12 +93,7 @@ static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal,
 static int xpadjustments[6]={0, 0, 0, 0, 0, 0};
 static int luckadjustments[6]={0, 0, 0, 0, 0, 0};
 
-static int FistRows = -1;
 static int *wmlevels[20];
-using FistResType = ResRef[MAX_LEVEL + 1];
-static FistResType *fistres;
-static int *fistresclass = NULL;
-static ResRef DefaultFist = { "FIST" };
 
 //verbal constant specific data
 static int VCMap[VCONST_COUNT];
@@ -403,11 +398,6 @@ void ReleaseMemoryActor()
 		mxsplwis = NULL;
 	}
 
-	if (fistres) {
-		delete [] fistres;
-		delete [] fistresclass;
-	}
-
 	if (itemuse) {
 		delete [] itemuse;
 		itemuse = NULL;
@@ -417,7 +407,6 @@ void ReleaseMemoryActor()
 		delete [] itemanim;
 		itemanim = NULL;
 	}
-	FistRows = -1;
 }
 
 Actor::Actor()
@@ -9737,31 +9726,6 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 	}
 }
 
-// initializes the fist data the first time it is called
-void Actor::SetupFistData() const
-{
-	if (FistRows >= 0) {
-		return;
-	}
-
-	FistRows = 0;
-	AutoTable fist = gamedata->LoadTable("fistweap");
-	if (fist) {
-		DefaultFist = fist->QueryDefault();
-		FistRows = fist->GetRowCount();
-		fistres = new FistResType[FistRows];
-		fistresclass = new int[FistRows];
-		for (int i = 0; i < FistRows; i++) {
-			int maxcol = fist->GetColumnCount(i) - 1;
-			for (int cols = 0; cols < MAX_LEVEL; cols++) {
-				fistres[i][cols] = fist->QueryField(i, cols > maxcol ? maxcol : cols);
-			}
-			fistresclass[i] = atoi(fist->GetRowName(i));
-		}
-	}
-
-}
-
 void Actor::SetupFist()
 {
 	int slot = core->QuerySlot( 0 );
@@ -9770,14 +9734,8 @@ void Actor::SetupFist()
 	int col = GetXPLevel(false);
 	col = Clamp(col, 1, MAX_LEVEL);
 
-	SetupFistData();
+	ResRef ItemResRef = gamedata->GetFist(row, col);
 
-	ResRef ItemResRef = DefaultFist;
-	for (int i = 0;i<FistRows;i++) {
-		if (fistresclass[i] == row) {
-			ItemResRef = fistres[i][col];
-		}
-	}
 	const CREItem *currentFist = inventory.GetSlotItem(slot);
 	if (!currentFist || currentFist->ItemResRef != ItemResRef) {
 		inventory.SetSlotItemRes(ItemResRef, slot);

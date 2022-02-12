@@ -459,7 +459,6 @@ private:
 	void RefreshHP();
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
-	void SetupFistData() const;
 	void UpdateFatigue();
 	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
 	int GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier, int damage) const;

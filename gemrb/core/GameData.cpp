@@ -886,4 +886,33 @@ const SurgeSpell& GameData::GetSurgeSpell(unsigned int idx)
 	return SurgeSpells[idx];
 }
 
+ResRef GameData::GetFist(int cls, int level)
+{
+	static bool ignore = false;
+	static ResRef defaultFist = { "FIST" };
+	static int cols = 0;
+	if (ignore) {
+		return defaultFist;
+	}
+
+	if (!fistWeap) {
+		fistWeap = gamedata->LoadTable("fistweap");
+		if (!fistWeap) {
+			ignore = true;
+			return defaultFist;
+		}
+
+		defaultFist = fistWeap->QueryDefault();
+		cols = fistWeap->GetColumnCount();
+	}
+
+	// extend the last level value to infinity
+	if (level >= cols) level = cols - 1;
+
+	char clsStr[3];
+	snprintf(clsStr, sizeof(clsStr), "%d", cls);
+	int row = fistWeap->GetRowIndex(clsStr);
+	return fistWeap->QueryField(row, level);
+}
+
 }
