@@ -291,7 +291,6 @@ struct ModalState {
 	bool FirstApply = true; // running for the first time?
 };
 
-extern void ReleaseMemoryActor();
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
 bool VVCSort(const ScriptedAnimation* lhs, const ScriptedAnimation* rhs);

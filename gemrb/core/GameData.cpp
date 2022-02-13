@@ -1038,4 +1038,37 @@ ieByte GameData::GetItemAnimation(const ResRef& itemRef)
 	return itemIt->second;
 }
 
+const std::vector<ItemUseType>& GameData::GetItemUse()
+{
+	static bool ignore = false;
+	static const std::vector<ItemUseType> NoData{};
+	if (ignore) {
+		return NoData;
+	}
+
+	if (itemUse.empty()) {
+		AutoTable table = gamedata->LoadTable("itemuse");
+		if (!table) {
+			ignore = true;
+			return NoData;
+		}
+
+		ieDword tableCount = table->GetRowCount();
+		itemUse.resize(tableCount);
+		for (ieDword i = 0; i < tableCount; i++) {
+			itemUse[i].stat = static_cast<ieByte>(core->TranslateStat(table->QueryField(i, 0)));
+			itemUse[i].table = table->QueryField(i, 1);
+			itemUse[i].mcol = static_cast<ieByte>(atoi(table->QueryField(i, 2)));
+			itemUse[i].vcol = static_cast<ieByte>(atoi(table->QueryField(i, 3)));
+			itemUse[i].which = static_cast<ieByte>(atoi(table->QueryField(i, 4)));
+			// limiting it to 0 or 1 to avoid crashes
+			if (itemUse[i].which != 1) {
+				itemUse[i].which = 0;
+			}
+		}
+	}
+
+	return itemUse;
+}
+
 }

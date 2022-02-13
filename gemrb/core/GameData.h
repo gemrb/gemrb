@@ -76,6 +76,15 @@ struct SurgeSpell {
 	ieStrRef message;
 };
 
+// item usability array
+struct ItemUseType {
+	ResRef table; // which table contains the stat usability flags
+	ieByte stat;  // which actor stat we talk about
+	ieByte mcol;  // which column should be matched against the stat
+	ieByte vcol;  // which column has the bit value for it
+	ieByte which; // which item dword should be used (1 = kit)
+};
+
 class GEM_EXPORT GameData : public ResourceManager
 {
 public:
@@ -160,6 +169,7 @@ public:
 	int GetWeaponStyleBonus(int style, int stars, int bonusType);
 	const std::vector<int>& GetBonusSpells(int ability);
 	ieByte GetItemAnimation(const ResRef& itemRef);
+	const std::vector<ItemUseType>& GetItemUse();
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -200,6 +210,7 @@ private:
 	// 4 styles and 4 star levels, 7 bonus types
 	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni;
 	std::map<ResRef, ieByte> itemAnims;
+	std::vector<ItemUseType> itemUse;
 
 public:
 	std::vector<ResRef> defaultSounds;

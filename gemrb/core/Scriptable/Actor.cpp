@@ -114,18 +114,7 @@ static int NUM_RARE_SELECT_SOUNDS = 2; //in bg and pst it is actually 4
 
 #define MAX_FEATV 4294967295U // 1<<32-1 (used for the triple-stat feat handling)
 
-//item usability array
-struct ItemUseType {
-	ResRef table; //which table contains the stat usability flags
-	ieByte stat;	//which actor stat we talk about
-	ieByte mcol;	//which column should be matched against the stat
-	ieByte vcol;	//which column has the bit value for it
-	ieByte which;	//which item dword should be used (1 = kit)
-};
-
 static ResRef featSpells[ES_COUNT];
-static ItemUseType *itemuse = NULL;
-static int usecount = -1;
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
@@ -365,14 +354,6 @@ struct avType {
 };
 static avType *avPrefix;
 static int avCount = -1;
-
-void ReleaseMemoryActor()
-{
-	if (itemuse) {
-		delete [] itemuse;
-		itemuse = NULL;
-	}
-}
 
 Actor::Actor()
 	: Movable( ST_ACTOR )
@@ -1933,23 +1914,6 @@ static void InitActorTables()
 	if (tm) {
 		for (int i = 0; i < ES_COUNT; i++) {
 			featSpells[i] = tm->QueryField(i, 0);
-		}
-	}
-
-	tm = gamedata->LoadTable("itemuse");
-	if (tm) {
-		usecount = tm->GetRowCount();
-		itemuse = new ItemUseType[usecount];
-		for (int i = 0; i < usecount; i++) {
-			itemuse[i].stat = (ieByte) core->TranslateStat( tm->QueryField(i,0) );
-			itemuse[i].table = tm->QueryField(i, 1);
-			itemuse[i].mcol = (ieByte) atoi( tm->QueryField(i,2) );
-			itemuse[i].vcol = (ieByte) atoi( tm->QueryField(i,3) );
-			itemuse[i].which = (ieByte) atoi( tm->QueryField(i,4) );
-			//limiting it to 0 or 1 to avoid crashes
-			if (itemuse[i].which!=1) {
-				itemuse[i].which=0;
-			}
 		}
 	}
 
@@ -9605,12 +9569,13 @@ int Actor::CheckUsability(const Item *item) const
 	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
 	int kitignore = 0;
 
-	for (int i=0;i<usecount;i++) {
-		ieDword itemvalue = itembits[itemuse[i].which];
-		stat_t stat = GetStat(itemuse[i].stat);
-		ieDword mcol = itemuse[i].mcol;
+	const auto& itemUse = gamedata->GetItemUse();
+	for (size_t i = 0; i < itemUse.size(); i++) {
+		ieDword itemvalue = itembits[itemUse[i].which];
+		stat_t stat = GetStat(itemUse[i].stat);
+		ieDword mcol = itemUse[i].mcol;
 		//if we have a kit, we just use its index for the lookup
-		if (itemuse[i].stat==IE_KIT) {
+		if (itemUse[i].stat == IE_KIT) {
 			if (!iwd2class) {
 				if (IsKitInactive()) continue;
 
@@ -9625,12 +9590,12 @@ int Actor::CheckUsability(const Item *item) const
 			}
 		}
 
-		if (!iwd2class && itemuse[i].stat == IE_CLASS) {
+		if (!iwd2class && itemUse[i].stat == IE_CLASS) {
 			// account for inactive duals
 			stat = GetActiveClass();
 		}
 
-		if (iwd2class && itemuse[i].stat == IE_CLASS) {
+		if (iwd2class && itemUse[i].stat == IE_CLASS) {
 			// in iwd2 any class mixin can enable the use, but the stat only holds the first class;
 			// it also means we shouldn't check all kits (which we do last)!
 			// Eg. a paladin of Mystra/sorcerer is allowed to use wands,
@@ -9666,7 +9631,7 @@ int Actor::CheckUsability(const Item *item) const
 			continue;
 		}
 
-		stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
+		stat = ResolveTableValue(itemUse[i].table, stat, mcol, itemUse[i].vcol);
 
 no_resolve:
 		if (stat&itemvalue) {

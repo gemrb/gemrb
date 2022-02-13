@@ -277,8 +277,6 @@ Interface::~Interface() noexcept
 	// fonts need to be destroyed before TTF plugin
 	PluginMgr::Get()->RunCleanup();
 
-	ReleaseMemoryActor();
-
 	slotTypes.clear();
 	free( slotmatrix );
 	itemtypedata.clear();
