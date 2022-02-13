@@ -188,7 +188,7 @@ public:
 	unsigned int GetTotalMemorizedSpellsCount() const;
 	unsigned int GetKnownSpellsCount(int type, unsigned int level) const;
 	/** adds the priest slot bonuses from mxsplwis */
-	void BonusSpells(int type, int count, const int *bonuses);
+	void BonusSpells(int type, int abilityLevel);
 	/** clears up the spell bonuses before recalculation */
 	void ClearBonus();
 	/** removes a spell from memory/book */

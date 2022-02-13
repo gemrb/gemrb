@@ -972,4 +972,43 @@ int GameData::GetWeaponStyleBonus(int style, int stars, int bonusType)
 	return weaponStyleBoni[style][stars][bonusType];
 }
 
+const std::vector<int>& GameData::GetBonusSpells(int ability)
+{
+	static bool ignore = false;
+	static const std::vector<int> NoBonus(9, 0);
+	if (ignore) {
+		return NoBonus;
+	}
+
+	if (bonusSpells.empty()) {
+		// iwd2 has mxsplbon instead, since all casters get a bonus with high enough stats (which are not always wisdom)
+		// luckily, they both use the same format
+		AutoTable mxSplBon;
+		if (core->HasFeature(GF_3ED_RULES)) {
+			mxSplBon = gamedata->LoadTable("mxsplbon");
+		} else {
+			mxSplBon = gamedata->LoadTable("mxsplwis");
+		}
+		if (!mxSplBon) {
+			ignore = true;
+			return NoBonus;
+		}
+
+		int splLevels = mxSplBon->GetColumnCount();
+		int maxStat = core->GetMaximumAbility();
+		bonusSpells.resize(maxStat); // wastes some memory, but makes addressing easier
+		for (ieDword row = 0; row < mxSplBon->GetRowCount(); row++) {
+			int statValue = atoi(mxSplBon->GetRowName(row)) - 1;
+			assert(statValue >= 0 && statValue < maxStat);
+			std::vector<int> bonuses(splLevels);
+			for (int i = 0; i < splLevels; i++) {
+				bonuses[i] = atoi(mxSplBon->QueryField(row, i));
+			}
+			bonusSpells[statValue] = bonuses;
+		}
+	}
+
+	return bonusSpells[ability - 1];
+}
+
 }

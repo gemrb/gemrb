@@ -668,17 +668,19 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	return true;
 }
 
-//apply the wisdom bonus on all spell levels for type
-//count is optimally the count of spell levels
-void Spellbook::BonusSpells(int type, int count, const int *bonuses)
+// apply the (wisdom) bonus on all spell levels for type
+void Spellbook::BonusSpells(int type, int abilityLevel)
 {
-	int level = GetSpellLevelCount(type);
-	if (level>count) level=count;
-	for (int i = 0; i < level; i++) {
+	const auto& bonuses = gamedata->GetBonusSpells(abilityLevel);
+	if (bonuses.empty()) return;
+
+	size_t level = GetSpellLevelCount(type);
+	assert(level >= bonuses.size());
+	for (size_t i = 0; i < level; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization(type, i);
 		// don't give access to new spell levels through these boni
 		if (sm->SlotCountWithBonus) {
-			sm->SlotCountWithBonus+=bonuses[i];
+			sm->SlotCountWithBonus += bonuses[i];
 		}
 	}
 }

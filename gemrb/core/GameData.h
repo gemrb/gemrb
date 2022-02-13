@@ -158,6 +158,7 @@ public:
 	ResRef GetFist(int cls, int level);
 	int GetMonkBonus(int bonusType, int level);
 	int GetWeaponStyleBonus(int style, int stars, int bonusType);
+	const std::vector<int>& GetBonusSpells(int ability);
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -191,6 +192,7 @@ private:
 	std::vector<IWDIDSEntry> spellProt;
 	std::vector<SpecialSpellType> SpecialSpells;
 	std::vector<SurgeSpell> SurgeSpells;
+	std::vector<std::vector<int>> bonusSpells;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};
