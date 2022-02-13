@@ -34,7 +34,6 @@ from ie_stats import *
 from ie_restype import *
 from ie_feats import FEAT_ARMORED_ARCANA
 
-SelectWindow = 0
 Topic = None
 HelpTable = None
 DescTable = None
@@ -61,7 +60,7 @@ def Exportable(pc):
 	return True
 
 def InitRecordsWindow (Window):
-	global RecordsWindow, SelectWindow
+	global RecordsWindow
 	global BonusSpellTable, HateRaceTable
 
 	RecordsWindow = Window
@@ -92,8 +91,6 @@ def InitRecordsWindow (Window):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.OpenCustomizeWindow)
 
 	#general
-	GemRB.SetVar ("SelectWindow", 1)
-
 	Button = Window.GetControl (60)
 	Button.SetTooltip (40316)
 	Button.SetVarAssoc ("SelectWindow", 1)
@@ -120,6 +117,8 @@ def InitRecordsWindow (Window):
 	Button.SetVarAssoc ("SelectWindow", 4)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
+
+	GemRB.SetVar ("SelectWindow", 1)
 
 	#level up
 	Button = Window.GetControl (37)
