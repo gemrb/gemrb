@@ -159,6 +159,7 @@ public:
 	int GetMonkBonus(int bonusType, int level);
 	int GetWeaponStyleBonus(int style, int stars, int bonusType);
 	const std::vector<int>& GetBonusSpells(int ability);
+	ieByte GetItemAnimation(const ResRef& itemRef);
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -198,6 +199,7 @@ private:
 	Size weaponStyleAPRBonusMax{};
 	// 4 styles and 4 star levels, 7 bonus types
 	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni;
+	std::map<ResRef, ieByte> itemAnims;
 
 public:
 	std::vector<ResRef> defaultSounds;

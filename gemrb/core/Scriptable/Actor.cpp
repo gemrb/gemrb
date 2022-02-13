@@ -139,15 +139,6 @@ static AutoTable wspecial;
 static constexpr ieWord IT_SCROLL = 11;
 static constexpr ieWord IT_WAND = 35;
 
-//item animation override array
-struct ItemAnimType {
-	ResRef itemname;
-	ieByte animation;
-};
-
-static ItemAnimType *itemanim = NULL;
-static int animcount = -1;
-
 static int fiststat = IE_CLASS;
 
 //conversion for 3rd ed
@@ -380,11 +371,6 @@ void ReleaseMemoryActor()
 	if (itemuse) {
 		delete [] itemuse;
 		itemuse = NULL;
-	}
-
-	if (itemanim) {
-		delete [] itemanim;
-		itemanim = NULL;
 	}
 }
 
@@ -1964,16 +1950,6 @@ static void InitActorTables()
 			if (itemuse[i].which!=1) {
 				itemuse[i].which=0;
 			}
-		}
-	}
-
-	tm = gamedata->LoadTable("itemanim", true);
-	if (tm) {
-		animcount = tm->GetRowCount();
-		itemanim = new ItemAnimType[animcount];
-		for (int i = 0; i < animcount; i++) {
-			itemanim[i].itemname = tm->QueryField(i, 0);
-			itemanim[i].animation = (ieByte) atoi( tm->QueryField(i,1) );
 		}
 	}
 
@@ -9417,12 +9393,9 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, const Item *
 	}
 
 	if (!silent) {
-		ieByte stance = AttackStance;
-		for (int i=0;i<animcount;i++) {
-			if (item->ItemResRef == itemanim[i].itemname) {
-				stance = itemanim[i].animation;
-			}
-		}
+		ieByte stance = gamedata->GetItemAnimation(item->ItemResRef);
+		if (!stance) stance = AttackStance;
+
 		if (stance!=0xff) {
 			SetStance(stance);
 			//play only one cycle of animations

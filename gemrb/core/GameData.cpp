@@ -1011,4 +1011,31 @@ const std::vector<int>& GameData::GetBonusSpells(int ability)
 	return bonusSpells[ability - 1];
 }
 
+ieByte GameData::GetItemAnimation(const ResRef& itemRef)
+{
+	static bool ignore = false;
+	if (ignore) {
+		return 0;
+	}
+
+	if (itemAnims.empty()) {
+		AutoTable table = gamedata->LoadTable("itemanim");
+		if (!table) {
+			ignore = true;
+			return 0;
+		}
+
+		for (ieDword i = 0; i < table->GetRowCount(); i++) {
+			ResRef item = table->GetRowName(i);
+			itemAnims[item] = static_cast<ieByte>(atoi(table->QueryField(i, 0)));
+		}
+	}
+
+	const auto& itemIt = itemAnims.find(itemRef);
+	if (itemIt == itemAnims.end()) {
+		return 0;
+	}
+	return itemIt->second;
+}
+
 }
