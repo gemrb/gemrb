@@ -7566,6 +7566,12 @@ int fx_reveal_tracks (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 	}
+
+	// iwd tracking is just the area description
+	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		return FX_NOT_APPLIED;
+	}
+
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
 		//highlight all living creatures (not in party, but within range)
