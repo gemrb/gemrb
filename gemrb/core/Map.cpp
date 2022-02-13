@@ -2518,7 +2518,8 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	// needed eg. in bg1 ar2607 (intro candlekeep ambush south)
 	// it's not the correct music, perhaps it needs the one from the master area
 	// it would match for ar2607 and ar2600, but very annoying (see GetMasterArea)
-	if (!poi && !MasterArea && SongType == SONG_BATTLE) {
+	// ... but this is also definitely wrong for iwd
+	if (!poi && !MasterArea && SongType == SONG_BATTLE && core->HasFeature(GF_BREAKABLE_WEAPONS)) {
 		poi = core->GetMusicPlaylist(SongType);
 	}
 	if (!poi) return;
