@@ -229,7 +229,7 @@ def UpdateSpellBookWindow ():
 	if sorcerer_style:
 		available = "0"
 		if known_cnt:
-			available = str(true_mem_cnt / known_cnt)
+			available = str(true_mem_cnt // known_cnt)
 		Label.SetText (available+"/"+str(max_mem_cnt))
 	else:
 		# reset mem_cnt to take into account stacks
