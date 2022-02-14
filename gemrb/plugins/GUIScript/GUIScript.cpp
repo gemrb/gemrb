@@ -105,11 +105,8 @@ static std::vector<SpellDescType> SpecialItems;
 static std::vector<SpellDescType> StoreSpells;
 
 static std::vector<ItemExtHeader> ItemArray(GUIBT_COUNT);
-static SpellExtHeader *SpellArray = NULL;
 static std::vector<UsedItemType> UsedItems;
 
-static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
-static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
 //4 action button indices are packed on a single ieDword, there are 32 actions max.
 //there are additional fake action buttons
 static ieDword GUIAction[MAX_ACT_COUNT]={UNINIT_IEDWORD};
@@ -13366,16 +13363,10 @@ GUIScript::~GUIScript(void)
 		Py_Finalize();
 	}
 	ItemArray.clear();
-	if (SpellArray) {
-		free(SpellArray);
-		SpellArray=NULL;
-	}
 	StoreSpells.clear();
 	SpecialItems.clear();
 	UsedItems.clear();
 
-	ReputationIncrease[0]=(int) UNINIT_IEDWORD;
-	ReputationDonation[0]=(int) UNINIT_IEDWORD;
 	GUIAction[0]=UNINIT_IEDWORD;
 }
 
