@@ -104,7 +104,6 @@ using EventNameType = char[17];
 static std::vector<SpellDescType> SpecialItems;
 static std::vector<SpellDescType> StoreSpells;
 
-static std::vector<ItemExtHeader> ItemArray(GUIBT_COUNT);
 static std::vector<UsedItemType> UsedItems;
 
 //4 action button indices are packed on a single ieDword, there are 32 actions max.
@@ -10623,8 +10622,9 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	//-2 because of the left/right scroll icons
-	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
+	// -1 because of the left/right scroll icons
+	static std::vector<ItemExtHeader> ItemArray(GUIBT_COUNT);
+	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT - (Start ? 1 : 0));
 	int i;
 	if (Start||more) {
 		Button* btn = GetControl<Button>(Offset, win);
@@ -13362,7 +13362,6 @@ GUIScript::~GUIScript(void)
 		}
 		Py_Finalize();
 	}
-	ItemArray.clear();
 	StoreSpells.clear();
 	SpecialItems.clear();
 	UsedItems.clear();
