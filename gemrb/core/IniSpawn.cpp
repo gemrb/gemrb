@@ -315,6 +315,12 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 	const char *s;
 	int ps;
 
+	// does its section even exist?
+	if (!inifile->GetKeysCount(crittername)) {
+		Log(ERROR, "IniSpawn", "Missing spawn entry: {}", crittername);
+		return;
+	}
+
 	//first assume it is a simple numeric value
 	critter.TimeOfDay = (ieDword) inifile->GetKeyAsInt(crittername,"time_of_day", 0xffffffff);
 
