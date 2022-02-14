@@ -1661,9 +1661,7 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	if (PyCallable_Check(function)) {
 		handler = PythonCallback(function);
 	} else {
-		char buf[256];
-		snprintf(buf, sizeof(buf), "Can't set timed event handler %s!", PyEval_GetFuncName(function));
-		return RuntimeError(buf);
+		return RuntimeError(fmt::format("Can't set timed event handler {}!", PyEval_GetFuncName(function)));
 	}
 	Game *game = core->GetGame();
 	if (game) {
@@ -12630,9 +12628,7 @@ static PyObject* GemRB_SetTimer(PyObject* /*self*/, PyObject* args)
 		core->SetTimer(handler, interval, repeats);
 		Py_RETURN_NONE;
 	} else {
-		char buf[256];
-		snprintf(buf, sizeof(buf), "Can't set timed event handler %s!", PyEval_GetFuncName(function));
-		return RuntimeError(buf);
+		return RuntimeError(fmt::format("Can't set timed event handler {}!", PyEval_GetFuncName(function)));
 	}
 }
 
@@ -13775,16 +13771,12 @@ PyObject* GUIScript::ConstructObject(const char* pyclassname, PyObject* pArgs, P
 	char classname[_MAX_PATH] = "G";
 	strncat(classname, pyclassname, _MAX_PATH - 2);
 	if (!pGUIClasses) {
-		char buf[256];
-		snprintf(buf, sizeof(buf), "Tried to use an object (%.50s) before script compiled!", classname);
-		return RuntimeError(buf);
+		return RuntimeError(fmt::format("Tried to use an object ({}) before script compiled!", classname));
 	}
 
 	PyObject* cobj = PyDict_GetItemString( pGUIClasses, classname );
 	if (!cobj) {
-		char buf[256];
-		snprintf(buf, sizeof(buf), "Failed to lookup name '%.50s'", classname);
-		return RuntimeError(buf);
+		return RuntimeError(fmt::format("Failed to lookup name '{}'", classname));
 	}
 	if (pArgs == NULL) {
 		// PyObject_Call requires pArgs not be NULL
