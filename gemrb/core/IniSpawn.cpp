@@ -310,15 +310,16 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 
 // tags not working in originals either, see IESDP for details:
 // control_var, spec_area, check_crowd, spawn_time_of_day, check_view_port (used!) & check_by_view_port
-void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
+CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, const char* crittername) const
 {
 	const char *s;
 	int ps;
+	CritterEntry critter{};
 
 	// does its section even exist?
 	if (!inifile->GetKeysCount(crittername)) {
 		Log(ERROR, "IniSpawn", "Missing spawn entry: {}", crittername);
-		return;
+		return critter;
 	}
 
 	//first assume it is a simple numeric value
@@ -340,7 +341,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 
 	if (inifile->GetKeyAsBool(crittername,"do_not_spawn",false)) {
 		//if the do not spawn flag is true, ignore this entry
-		return;
+		return critter;
 	}
 
 	s = inifile->GetKeyAsString(crittername,"detail_level",NULL);
@@ -355,7 +356,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 		//If the detail level is lower than this creature's detail level,
 		//skip this entry, creature_count is 0, so it will be ignored at evaluation of the spawn
 		if (level>detail_level) {
-			return;
+			return critter;
 		}
 	}
 
@@ -397,7 +398,7 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 		critter.CreFile = GetElements<ResRef>(s);
 	} else {
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: {}", crittername);
-		return;
+		return critter;
 	}
 
 	PrepareSpawnPoints(inifile, crittername, critter);
@@ -563,6 +564,8 @@ void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername,
 	if (inifile->GetKeyAsBool(crittername,"area_diff_3", false)) {
 		critter.Flags|=CF_NO_DIFF_3;
 	}
+
+	return critter;
 }
 
 void IniSpawn::ReadSpawnEntry(const DataFileMgr *inifile, const char *entryname, SpawnEntry &entry) const
@@ -576,11 +579,16 @@ void IniSpawn::ReadSpawnEntry(const DataFileMgr *inifile, const char *entryname,
 	s = inifile->GetKeyAsString(entryname,"critters","");
 	auto critters = GetElements<const char*>(s);
 	size_t crittercount = critters.size();
-	entry.critters.resize(crittercount);
-	
+	entry.critters.reserve(crittercount);
+
 	while(crittercount--) {
-		ReadCreature(inifile, critters[crittercount], entry.critters[crittercount]);
+		CritterEntry critter = ReadCreature(inifile, critters[crittercount]);
+		// don't add disabled or defective entries
+		if (!critter.CreFile.empty()) {
+			entry.critters.push_back(critter);
+		}
 	}
+	entry.critters.shrink_to_fit();
 }
 
 /* set by action */

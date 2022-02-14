@@ -158,8 +158,7 @@ private:
 	std::vector<SpawnEntry> eventspawns;
 	ieDword detail_level;
 
-	void ReadCreature(const DataFileMgr *inifile,
-		const char *crittername, CritterEntry &critter) const;
+	CritterEntry ReadCreature(const DataFileMgr* inifile, const char* crittername) const;
 	void ReadSpawnEntry(const DataFileMgr *inifile,
 		const char *entryname, SpawnEntry &entry) const;
 	//spawns a single creature
