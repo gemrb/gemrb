@@ -13368,6 +13368,13 @@ GUIScript::~GUIScript(void)
 	UsedItems.clear();
 
 	GUIAction[0]=UNINIT_IEDWORD;
+
+	// free the memory from the global scrollbar template
+	const ScriptingRefBase* ref = ScriptEngine::GetScripingRef("SBGLOB", 0);
+	if (ref) {
+		const View* retView = GetView(ref);
+		delete retView;
+	}
 }
 
 PyDoc_STRVAR( GemRB__doc,
