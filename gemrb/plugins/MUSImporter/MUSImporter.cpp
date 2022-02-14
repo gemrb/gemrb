@@ -48,6 +48,23 @@ bool MUSImporter::Init()
 	Initialized = true;
 	return true;
 }
+
+#define SKIP_BLANKS while (i < len) {\
+	if (isblank(line[i])) {\
+		i++;\
+	} else {\
+		break;\
+	}\
+}
+
+#define FILL_VAR(VAR) while (i < len) {\
+	if (!isblank(line[i])) {\
+		pls.VAR[p++] = line[i++];\
+	} else {\
+		break;\
+	}\
+}
+
 /** Loads a PlayList for playing */
 bool MUSImporter::OpenPlaylist(const char* name)
 {
@@ -89,54 +106,28 @@ bool MUSImporter::OpenPlaylist(const char* name)
 			if (!isblank(line[i]))
 				pls.PLFile[p++] = line[i++];
 			else {
-				while (i < len) {
-					if (isblank(line[i]))
-						i++;
-					else
-						break;
-				}
+				SKIP_BLANKS
 				break;
 			}
 		}
 		pls.PLFile[p] = 0;
 		p = 0;
 		if (i < len && line[i] != '@') {
-			while (i < len) {
-				if (!isblank(line[i]))
-					pls.PLTag[p++] = line[i++];
-				else
-					break;
-			}
+			FILL_VAR(PLTag)
 			if (p < 9) {
 				pls.PLTag[p] = 0;
 			} else {
 				pls.PLTag[9] = 0;
 			}
 			p = 0;
-			while (i < len) {
-				if (isblank(line[i]))
-					i++;
-				else {
-					break;
-				}
-			}
+			SKIP_BLANKS
 			if (line[i] == '@')
 				strcpy( pls.PLLoop, pls.PLTag );
 			else {
-				while (i < len) {
-					if (!isblank(line[i]))
-						pls.PLLoop[p++] = line[i++];
-					else
-						break;
-				}
+				FILL_VAR(PLLoop)
 				pls.PLLoop[p] = 0;
 			}
-			while (i < len) {
-				if (isblank(line[i]))
-					i++;
-				else
-					break;
-			}
+			SKIP_BLANKS
 			p = 0;
 		} else {
 			pls.PLTag[0] = 0;
@@ -146,21 +137,11 @@ bool MUSImporter::OpenPlaylist(const char* name)
 			if (!isblank(line[i]))
 				i++;
 			else {
-				while (i < len) {
-					if (isblank(line[i]))
-						i++;
-					else
-						break;
-				}
+				SKIP_BLANKS
 				break;
 			}
 		}
-		while (i < len) {
-			if (!isblank(line[i]))
-				pls.PLEnd[p++] = line[i++];
-			else
-				break;
-		}
+		FILL_VAR(PLEnd)
 		pls.PLEnd[p] = 0;
 		playlist.push_back( pls );
 		count--;
