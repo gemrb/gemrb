@@ -462,7 +462,7 @@ IF(USE_VORBIS)
 	ENDIF()
 ENDIF()
 
-if(NOT SANITIZE STREQUAL "None")
+if(NOT SANITIZE STREQUAL "None" AND NOT SANITIZE STREQUAL "none")
 	string(APPEND CMAKE_C_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
 	string(APPEND CMAKE_CXX_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
 	string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${SANITIZE}")
