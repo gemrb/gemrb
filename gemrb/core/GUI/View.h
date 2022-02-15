@@ -38,7 +38,7 @@ class Window;
 
 class GEM_EXPORT View {
 public:
-	struct DragOp {
+	struct GEM_EXPORT DragOp {
 		View* dragView = nullptr;
 		View* dropView = nullptr;
 		

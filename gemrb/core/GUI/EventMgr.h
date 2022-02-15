@@ -110,11 +110,11 @@ using EventButton = unsigned char;
 using KeyboardKey = unsigned short;
 using ButtonMask = unsigned short;
 
-struct EventBase {
+struct GEM_EXPORT EventBase {
 	unsigned short repeats; // number of times this event has been repeated (within the repeat time interval)
 };
 
-struct ScreenEvent : public EventBase {
+struct GEM_EXPORT ScreenEvent : public EventBase {
 	// cant use Point due to non trival constructor
 	int x,y; // mouse position at time of event
 	int deltaX, deltaY; // the vector of motion/scroll

@@ -49,7 +49,7 @@ GEM_EXPORT int strlench(const char* string, char ch);
 constexpr int NoTransform(int c) { return c; }
 
 template <typename STR_T, int(*TRANS)(int) = NoTransform>
-struct CstrHash
+struct GEM_EXPORT CstrHash
 {
 	size_t operator() (const STR_T &str) const {
 		size_t nHash = 0;
@@ -66,7 +66,7 @@ template <typename STR_T>
 using CstrHashCI = CstrHash<STR_T, std::tolower>;
 
 template<size_t LEN, int(*CMP)(const char*, const char*, size_t) = strncmp>
-class FixedSizeString {
+class GEM_EXPORT FixedSizeString {
 	// we use uint8_t and an object of massive size is not wanted
 	static_assert(LEN < 255, "Cannot create FixedSizeString larger than 255 characters");
 	char str[LEN + 1] {'\0'};
