@@ -591,7 +591,13 @@ def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
 	global CurrentWindow
 	global level, TopIndex
-	
+
+	# don't do anything if the GameControl is temporarily unavailable
+	try:
+		GUICommon.GameControl.GetFrame()
+	except RuntimeError:
+		return
+
 	PortraitWindow = GemRB.GetView("PORTWIN")
 	ActionsWindow = GemRB.GetView("ACTWIN")
 
