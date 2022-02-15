@@ -55,11 +55,7 @@ public:
 	/** Returns a pointer to a zero terminated 2da element,
 	 * 0,0 returns the default value, it may return NULL */
 	virtual const char* QueryField(size_t row = 0, size_t column = 0) const = 0;
-	
-	ieStrRef QueryFieldAsStrRef(size_t row = 0, size_t column = 0) const {
-		auto field = QueryField(row, column);
-		return static_cast<ieStrRef>(strtounsigned<ieDword>(field));
-	}
+
 	/** Returns a pointer to a zero terminated 2da element,
 	 * uses column name and row name to search the field,
 	 * may return NULL */
@@ -68,7 +64,8 @@ public:
 		return QueryField(GetRowIndex(row), GetColumnIndex(column));
 	}
 	
-	ieStrRef QueryFieldAsStrRef(const char* row, const char* column) const {
+	template <typename ROW_T, typename COL_T>
+	ieStrRef QueryFieldAsStrRef(ROW_T row, COL_T column) const {
 		auto field = QueryField(row, column);
 		return static_cast<ieStrRef>(strtounsigned<ieDword>(field));
 	}
