@@ -808,7 +808,7 @@ static int check_type(Actor *actor, const Effect& fx)
 
 	//spell level immunity
 	// but ignore it if we're casting beneficial stuff on ourselves
-	if(fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0) ) {
+	if (fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0)) {
 		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
 		if (caster != actor || (fx.SourceFlags & SF_HOSTILE)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity");
@@ -818,12 +818,12 @@ static int check_type(Actor *actor, const Effect& fx)
 
 	//source immunity (spell name)
 	//if source is unspecified, don't resist it
-	if(!fx.SourceRef.IsEmpty()) {
-		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx.SourceRef) ) {
+	if (!fx.SourceRef.IsEmpty()) {
+		if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx.SourceRef)) {
 			Log(DEBUG, "EffectQueue", "Resisted by spell immunity ({})", fx.SourceRef);
 			return 0;
 		}
-		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx.SourceRef) ) {
+		if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx.SourceRef)) {
 			if (fx.SourceRef != "detect") { // our secret door pervasive effect
 				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 ({})", fx.SourceRef);
 			}
@@ -832,16 +832,16 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//primary type immunity (school)
-	if( fx.PrimaryType) {
-		if( actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx.PrimaryType)) {
+	if (fx.PrimaryType) {
+		if (actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school/primary type");
 			return 0;
 		}
 	}
 
 	//secondary type immunity (usage)
-	if( fx.SecondaryType) {
-		if( actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx.SecondaryType) ) {
+	if (fx.SecondaryType) {
+		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx.SecondaryType)) {
 			Log(DEBUG, "EffectQueue", "Resisted by usage/secondary type");
 			return 0;
 		}
@@ -858,7 +858,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//decrementing spell immunity
-	if(!fx.SourceRef.IsEmpty()) {
+	if (!fx.SourceRef.IsEmpty()) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx.SourceRef));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (decrementing)");
@@ -866,7 +866,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 	//decrementing primary type immunity (school)
-	if( fx.PrimaryType) {
+	if (fx.PrimaryType) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
@@ -875,7 +875,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//decrementing secondary type immunity (usage)
-	if( fx.SecondaryType) {
+	if (fx.SecondaryType) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx.SecondaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by usage/sectype immunity (decrementing)");
@@ -906,31 +906,31 @@ static int check_type(Actor *actor, const Effect& fx)
 
 	//bounce checks
 	if (fx.Power) {
-		if( (bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx.Power) ) {
+		if ((bounce & BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx.Power)) {
 			Log(DEBUG, "EffectQueue", "Bounced by level");
 			return -1;
 		}
 	}
 
-	if((bounce&BNC_PROJECTILE) && actor->fxqueue.HasEffectWithParam(fx_projectile_bounce_ref, fx.Projectile)) {
+	if ((bounce & BNC_PROJECTILE) && actor->fxqueue.HasEffectWithParam(fx_projectile_bounce_ref, fx.Projectile)) {
 		Log(DEBUG, "EffectQueue", "Bounced by projectile");
 		return -1;
 	}
 
-	if(!fx.SourceRef.IsEmpty() && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx.SourceRef) ) {
+	if (!fx.SourceRef.IsEmpty() && (bounce & BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx.SourceRef)) {
 		Log(DEBUG, "EffectQueue", "Bounced by resource");
 		return -1;
 	}
 
-	if( fx.PrimaryType && (bounce&BNC_SCHOOL) ) {
-		if( actor->fxqueue.HasEffectWithParam(fx_school_bounce_ref, fx.PrimaryType)) {
+	if (fx.PrimaryType && (bounce & BNC_SCHOOL)) {
+		if (actor->fxqueue.HasEffectWithParam(fx_school_bounce_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Bounced by school");
 			return -1;
 		}
 	}
 
-	if( fx.SecondaryType && (bounce&BNC_SECTYPE) ) {
-		if( actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_ref, fx.SecondaryType)) {
+	if (fx.SecondaryType && (bounce & BNC_SECTYPE)) {
+		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_ref, fx.SecondaryType)) {
 			Log(DEBUG, "EffectQueue", "Bounced by usage/sectype");
 			return -1;
 		}
@@ -946,7 +946,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 
-	if(!fx.SourceRef.IsEmpty() && (bounce&BNC_RESOURCE_DEC)) {
+	if (!fx.SourceRef.IsEmpty() && (bounce & BNC_RESOURCE_DEC)) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx.Resource));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by resource (decrementing)");
@@ -954,7 +954,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 
-	if( fx.PrimaryType && (bounce&BNC_SCHOOL_DEC) ) {
+	if (fx.PrimaryType && (bounce & BNC_SCHOOL_DEC)) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by school (decrementing)");
@@ -962,7 +962,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 
-	if( fx.SecondaryType && (bounce&BNC_SECTYPE_DEC) ) {
+	if (fx.SecondaryType && (bounce & BNC_SECTYPE_DEC)) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_dec_ref, fx.SecondaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by usage (decrementing)");

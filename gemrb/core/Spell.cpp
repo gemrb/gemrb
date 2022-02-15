@@ -174,11 +174,9 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 	for (size_t i = 0; i < count; ++i) {
 		Effect& fx = features->at(i);
 
-		if ((Flags & SF_SIMPLIFIED_DURATION) && (block_index>=0)) {
-			//hack the effect according to Level
-			if (fx.HasDuration()) {
-				fx.Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
-			}
+		// hack the effect according to Level
+		if ((Flags & SF_SIMPLIFIED_DURATION) && block_index >= 0 && fx.HasDuration()) {
+			fx.Duration = (TimePerLevel * block_index + TimeConstant) * core->Time.round_sec;
 		}
 		//fill these for completeness, inventoryslot is a good way
 		//to discern a spell from an item effect
