@@ -46,12 +46,17 @@ def GetWindowPack():
 	# 2. the originals were for 4:3 screens,
 	#    but modern screens are usually a wider aspect
 	# 3. not all games have all the window packs
-	if height >= 960 and GemRB.HasResource ("GUIW12", RES_CHU, 1):
-		return "GUIW12"
-	elif height >= 768 and GemRB.HasResource ("GUIW10", RES_CHU, 1):
+	# ... but the widescreen mod only modifies guiw08 or guiw10, not touching others
+	# luckily internally its guiw08 is in the end produced as a copy of guiw10
+	if default == "GUIW" and GameCheck.HasWideScreenMod ():
 		return "GUIW10"
-	elif height >= 600 and GemRB.HasResource ("GUIW08", RES_CHU, 1):
-		return "GUIW08"
+	else:
+		if height >= 960 and GemRB.HasResource ("GUIW12", RES_CHU, 1):
+			return "GUIW12"
+		elif height >= 768 and GemRB.HasResource ("GUIW10", RES_CHU, 1):
+			return "GUIW10"
+		elif height >= 600 and GemRB.HasResource ("GUIW08", RES_CHU, 1):
+			return "GUIW08"
 
 	# fallback to the smallest resolution
 	return default
