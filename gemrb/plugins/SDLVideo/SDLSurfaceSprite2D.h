@@ -90,6 +90,7 @@ public:
 	~SDLTextureSprite2D() noexcept;
 	
 	Holder<Sprite2D> copy() const override;
+	void UnlockSprite() const override;
 	
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
 };
