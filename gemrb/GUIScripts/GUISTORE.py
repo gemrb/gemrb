@@ -439,7 +439,7 @@ def UpdateStoreShoppingWindow (Window):
 	if LeftCount<0:
 		LeftCount=0
 	ScrollBar = Window.GetControlAlias ('STOSBARL')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", 0, 0, LeftCount)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", GemRB.GetVar ("LeftTopIndex"), 0, LeftCount)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	if LeftTopIndex>LeftCount:
 		GemRB.SetVar ("LeftTopIndex", LeftCount)
