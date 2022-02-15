@@ -672,7 +672,7 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 void Spellbook::BonusSpells(int type, int abilityLevel)
 {
 	const auto& bonuses = gamedata->GetBonusSpells(abilityLevel);
-	if (bonuses[0] == 0) return;
+	if (bonuses.empty() || bonuses[0] == 0) return;
 
 	size_t level = GetSpellLevelCount(type);
 	assert(level <= bonuses.size());
