@@ -18,8 +18,11 @@
 #
 # GameCheck.py - functions to check GameType
 
+import os
+
 import GemRB
 from ie_restype import RES_WMP, RES_ARE, RES_2DA
+from GUIDefines import SV_GAMEPATH
 
 MAX_PARTY_SIZE = GemRB.GetVar ("MaxPartySize")
 
@@ -70,3 +73,21 @@ def HasTutu ():
 
 def HasTOTSC ():
 	return GemRB.HasResource ("toscst", RES_2DA)
+
+# there are no marker files, so check weidu.log
+def HasWideScreenMod ():
+	gamePath = GemRB.GetSystemVariable (SV_GAMEPATH)
+	weiduLogPath = os.path.join (gamePath, "weidu.log")
+	try:
+		weiduLog = open (weiduLogPath)
+	except OSError:
+		return False
+
+	ret = False
+	for line in weiduLog:
+		if "~WIDESCREEN/" in line and not "Uninstalled" in line:
+			ret = True
+			break
+
+	weiduLog.close ()
+	return ret
