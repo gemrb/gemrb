@@ -105,7 +105,7 @@ private:
 	struct Capsule {
 		CAP_T ptr;
 		
-		Capsule(CAP_T ptr)
+		explicit Capsule(CAP_T ptr)
 		: ptr(std::move(ptr))
 		{}
 	};

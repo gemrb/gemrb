@@ -104,7 +104,7 @@ struct AbilityTables {
 	AbilityTable lorebon;
 	AbilityTable wisbon;
 	
-	AbilityTables(int MaximumAbility) noexcept
+	explicit AbilityTables(int MaximumAbility) noexcept
 	: tableSize(MaximumAbility + 1),
 	strmod(tableSize * 4),
 	strmodex(101 * 4),

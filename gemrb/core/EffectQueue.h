@@ -235,7 +235,7 @@ private:
 public:
 	EffectQueue() noexcept {};
 	
-	operator bool() const {
+	explicit operator bool() const {
 		return !effects.empty();
 	}
 

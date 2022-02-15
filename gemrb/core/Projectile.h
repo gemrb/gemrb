@@ -317,7 +317,7 @@ private:
 			return sound.get();
 		}
 		
-		operator bool() const noexcept {
+		explicit operator bool() const noexcept {
 			return bool(sound);
 		}
 	} travel_handle;

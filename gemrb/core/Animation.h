@@ -52,7 +52,7 @@ public:
 	explicit Animation(std::vector<frame_t>) noexcept;
 	Animation() noexcept = default;
 	
-	operator bool() const {
+	explicit operator bool() const {
 		return GetFrameCount();
 	}
 
