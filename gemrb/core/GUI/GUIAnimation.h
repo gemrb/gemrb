@@ -28,7 +28,7 @@
 namespace GemRB {
 
 template <class T>
-class GUIAnimation {
+class GEM_EXPORT GUIAnimation {
 protected:
 	tick_t begintime;
 	T current;
@@ -60,7 +60,7 @@ private:
 	virtual bool HasEnded() const=0;
 };
 
-class PointAnimation : public GUIAnimation<Point> {
+class GEM_EXPORT PointAnimation : public GUIAnimation<Point> {
 public:
 	Point begin;
 	Point end;
@@ -79,7 +79,7 @@ private:
 	bool HasEnded() const override;
 };
 
-class ColorCycle {
+class GEM_EXPORT ColorCycle {
 	uint8_t step;
 	uint8_t speed;
 
@@ -99,7 +99,7 @@ extern ColorCycle GlobalColorCycle;
 
 // This is supposed to be a fast optionally infinitely repeating transition
 // between 2 colors. We will create a global instance to syncronize many elements with the same animation.
-class ColorAnimation : public GUIAnimation<Color> {
+class GEM_EXPORT ColorAnimation : public GUIAnimation<Color> {
 public:
 	Color begin;
 	Color end;

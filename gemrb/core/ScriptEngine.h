@@ -38,7 +38,7 @@ using ScriptingClassId = std::string;
 using ScriptingGroup_t = FixedSizeString<15, strnicmp>;
 static_assert(sizeof(ScriptingGroup_t) <= 16, "Please try to keep this sensibly small. 16 bytes fits in 2 64bit registers.");
 
-class ScriptingRefBase {
+class GEM_EXPORT ScriptingRefBase {
 public:
 	const ScriptingId Id; // unique id for each object in a ScriptingGroup
 
@@ -54,7 +54,7 @@ public:
 };
 
 template <class T>
-class ScriptingRef : public ScriptingRefBase {
+class GEM_EXPORT ScriptingRef : public ScriptingRefBase {
 private:
 	T* ref;
 public:
@@ -73,7 +73,7 @@ public:
 	
 private:
 	using ScriptingDict = std::map<ScriptingGroup_t, ScriptingDefinitions>;
-	GEM_EXPORT static ScriptingDict GUIDict;
+	static ScriptingDict GUIDict;
 
 public:
 	static bool RegisterScriptingRef(const ScriptingRefBase* ref);
@@ -94,7 +94,7 @@ public:
 		return ref;
 	}
 
-	class Parameter {
+	class GEM_EXPORT Parameter {
 		struct TypeInterface {
 			virtual ~TypeInterface() noexcept = default;
 			virtual TypeInterface* Clone() const = 0;
