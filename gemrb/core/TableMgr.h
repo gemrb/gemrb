@@ -63,7 +63,10 @@ public:
 	/** Returns a pointer to a zero terminated 2da element,
 	 * uses column name and row name to search the field,
 	 * may return NULL */
-	virtual const char* QueryField(const char* row, const char* column) const = 0;
+	const char* QueryField(const char* row, const char* column) const
+	{
+		return QueryField(GetRowIndex(row), GetColumnIndex(column));
+	}
 	
 	ieStrRef QueryFieldAsStrRef(const char* row, const char* column) const {
 		auto field = QueryField(row, column);

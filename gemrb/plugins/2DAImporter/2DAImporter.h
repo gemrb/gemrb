@@ -79,22 +79,6 @@ public:
 		}
 		return rows[row][column];
 	}
-	/** Returns a pointer to a zero terminated 2da element,
-		 uses column name and row name to search the field */
-	inline const char* QueryField(const char* row, const char* column) const override
-	{
-		int rowi = GetRowIndex(row);
-		if (rowi < 0) {
-			return (const char *) defVal;
-		}
-
-		int coli = GetColumnIndex(column);
-		if (coli < 0) {
-			return (const char *) defVal;
-		}
-
-		return QueryField((unsigned int) rowi, (unsigned int) coli);
-	}
 
 	const char* QueryDefault() const override
 	{
