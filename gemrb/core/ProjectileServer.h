@@ -39,6 +39,11 @@ class GEM_EXPORT ProjectileServer
 {
 public:
 	ProjectileServer() noexcept;
+	ProjectileServer(const ProjectileServer&) = delete;
+	ProjectileServer& operator=(const ProjectileServer&) = delete;
+	
+	ProjectileServer(ProjectileServer&&) noexcept = default;
+	ProjectileServer& operator=(ProjectileServer&&) noexcept = default;
 
 	Projectile *GetProjectileByIndex(size_t idx);
 	//it is highly unlikely we need this function
@@ -63,6 +68,8 @@ private:
 		ProjectileEntry(const ProjectileEntry&) noexcept = delete;
 		ProjectileEntry& operator=(const ProjectileEntry&) noexcept = delete;
 	};
+	
+	static_assert(std::is_nothrow_move_constructible<ProjectileEntry>::value, "ProjectileEntry should be noexcept MoveConstructible");
 	
 	struct ExplosionEntry
 	{
