@@ -114,30 +114,29 @@ private:
 		}
 
 		for (int i = 0; i < MAX_EFFECTS; i++) {
-			const char* effectname = effectsTable->GetValue( i );
+			const char* effectname = effectsTable->GetValue(i);
+			if (!effectname) continue; // past the table size or undefined effect
 
-			EffectDesc* poi = FindEffect( effectname );
-			if( poi != nullptr) {
-				Opcodes[i] = *poi;
+			EffectDesc* poi = FindEffect(effectname);
+			assert(poi != nullptr);
+			Opcodes[i] = *poi;
 
-				//reverse linking opcode number
-				//using this unused field
-				if( (poi->opcode!=-1) && effectname[0]!='*') {
-					error("EffectQueue", "Clashing Opcodes FN: {} vs. {}, {}", i, poi->opcode, effectname);
-				}
-				poi->opcode = i;
+			// reverse linking opcode number
+			// using this unused field
+			if (poi->opcode != -1 && effectname[0] != '*') {
+				error("EffectQueue", "Clashing Opcodes FN: {} vs. {}, {}", i, poi->opcode, effectname);
 			}
-			
-			if (efftextTable) {
-				int row = efftextTable->GetRowCount();
-				while (row--) {
-					const char* ret = efftextTable->GetRowName( row );
-					int val;
-					if(valid_signednumber(ret, val) && (i == val)) {
-						Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);
-					} else {
-						Opcodes[i].Strref = ieStrRef::INVALID;
-					}
+			poi->opcode = i;
+
+			if (!efftextTable) continue;
+			int row = efftextTable->GetRowCount();
+			while (row--) {
+				const char* ret = efftextTable->GetRowName(row);
+				int val;
+				if (valid_signednumber(ret, val) && (i == val)) {
+					Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);
+				} else {
+					Opcodes[i].Strref = ieStrRef::INVALID;
 				}
 			}
 		}
