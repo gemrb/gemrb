@@ -229,7 +229,7 @@ BlitFlags SDLSurfaceSprite2D::RenderWithFlags(BlitFlags renderflags, const Color
 			newVersion |= tintv << 32;
 		}
 		
-		if (IsPaletteStale()) {
+		if (IsPaletteStale() || oldVersion != newVersion) {
 			SDL_Palette* pal = static_cast<SDL_Palette*>(NewVersion(newVersion));
 
 			for (size_t i = 0; i < 256; ++i) {
