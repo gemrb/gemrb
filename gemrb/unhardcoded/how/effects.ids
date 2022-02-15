@@ -250,7 +250,7 @@ IDS
 0xf8	SummonShadowMonster
 0xf9	Recitation
 0xfa	RecitationBad
-0xfb	Hold2
+0xfb	LichTouch
 0xfc	BlindingOrb
 0xfd	ACVsDamageTypeModifier2
 0xfe	RemoveEffects
