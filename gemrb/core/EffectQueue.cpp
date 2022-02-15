@@ -126,8 +126,6 @@ private:
 					error("EffectQueue", "Clashing Opcodes FN: {} vs. {}, {}", i, poi->opcode, effectname);
 				}
 				poi->opcode = i;
-			} else {
-				assert(effectname == nullptr);
 			}
 			
 			if (efftextTable) {
