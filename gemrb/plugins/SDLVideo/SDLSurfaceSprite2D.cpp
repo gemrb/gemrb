@@ -106,6 +106,7 @@ void* SDLSurfaceSprite2D::LockSprite()
 void SDLSurfaceSprite2D::UnlockSprite() const
 {
 	SDL_UnlockSurface(surface);
+	Invalidate();
 }
 
 bool SDLSurfaceSprite2D::IsPaletteStale() const noexcept
@@ -299,12 +300,6 @@ SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& other) noexcept
 Holder<Sprite2D> SDLTextureSprite2D::copy() const
 {
 	return Holder<Sprite2D>(new SDLTextureSprite2D(*this));
-}
-
-void SDLTextureSprite2D::UnlockSprite() const
-{
-	SDLSurfaceSprite2D::UnlockSprite();
-	Invalidate();
 }
 
 SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
