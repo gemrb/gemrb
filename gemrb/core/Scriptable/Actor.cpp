@@ -2948,15 +2948,11 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 				continue;
 			}
 			level = Modified[castingstat[classesiwd2[i]]];
-			if (level) {
-				spellbook.BonusSpells(booktype, level);
-			}
+			spellbook.BonusSpells(booktype, level);
 		}
 	} else {
 		int level = Modified[IE_WIS];
-		if (level) {
-			spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, level);
-		}
+		spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, level);
 	}
 
 	// iwd2 barbarian speed increase isn't handled like for monks (normal clab)!?

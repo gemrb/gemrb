@@ -976,7 +976,7 @@ const std::vector<int>& GameData::GetBonusSpells(int ability)
 {
 	static bool ignore = false;
 	static const std::vector<int> NoBonus(9, 0);
-	if (ignore) {
+	if (ignore || !ability) {
 		return NoBonus;
 	}
 
