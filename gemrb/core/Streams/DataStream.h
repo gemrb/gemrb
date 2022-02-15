@@ -185,7 +185,7 @@ protected:
 	strpos_t size = 0;
 	bool Encrypted = false;
 
-	static bool IsBigEndian;
+	static GEM_EXPORT bool IsBigEndian;
 };
 
 }

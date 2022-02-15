@@ -28,7 +28,7 @@ namespace GemRB {
 
 	class GEM_EXPORT ScrollView : public View, public View::Scrollable {
 
-		class ContentView : public View {
+		class GEM_EXPORT ContentView : public View {
 		private:
 			void SizeChanged(const Size& /* oldsize */) override;
 			

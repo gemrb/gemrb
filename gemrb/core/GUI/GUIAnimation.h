@@ -28,7 +28,7 @@
 namespace GemRB {
 
 template <class T>
-class GUIAnimation {
+class GEM_EXPORT GUIAnimation {
 protected:
 	tick_t begintime;
 	T current;
