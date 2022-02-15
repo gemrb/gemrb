@@ -1972,14 +1972,18 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 	} else {
 		map = game->GetCurrentArea();
 	}
-	if (!map) return ab;
+	if (!map) {
+		delete fx;
+		return nullptr;
+	}
 
 	summoner = Scriptable::As<Actor>(Owner);
 
 	while (cnt--) {
 		Actor *tmp = gamedata->GetCreature(resource);
 		if (!tmp) {
-			return NULL;
+			ab = nullptr;
+			break;
 		}
 
 		//if summoner is an actor, filter out opponent summons
