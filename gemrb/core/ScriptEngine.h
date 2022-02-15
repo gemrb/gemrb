@@ -73,7 +73,7 @@ public:
 	
 private:
 	using ScriptingDict = std::map<ScriptingGroup_t, ScriptingDefinitions>;
-	static ScriptingDict GUIDict;
+	GEM_EXPORT static ScriptingDict GUIDict;
 
 public:
 	static bool RegisterScriptingRef(const ScriptingRefBase* ref);

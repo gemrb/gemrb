@@ -150,7 +150,7 @@ struct GEM_EXPORT ControllerEvent : public EventBase {
 };
 
 struct GEM_EXPORT TouchEvent : public ScreenEvent {
-	struct Finger : public ScreenEvent {
+	struct GEM_EXPORT Finger : public ScreenEvent {
 		uint64_t id;
 	};
 

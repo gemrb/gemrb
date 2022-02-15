@@ -25,10 +25,18 @@
 
 template<typename ENUM_FLAGS>
 constexpr
+typename std::underlying_type<ENUM_FLAGS>::type
+UnderType(ENUM_FLAGS a) noexcept
+{
+	return static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a);
+}
+
+template<typename ENUM_FLAGS>
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
 operator |(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
-	return static_cast<ENUM_FLAGS>(static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a) | static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(b));
+	return static_cast<ENUM_FLAGS>(UnderType(a) | UnderType(b));
 }
 
 template<typename ENUM_FLAGS>
@@ -44,7 +52,7 @@ constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
 operator &(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
-	return static_cast<ENUM_FLAGS>(static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a) & static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(b));
+	return static_cast<ENUM_FLAGS>(UnderType(a) & UnderType(b));
 }
 
 template<typename ENUM_FLAGS>
@@ -60,7 +68,7 @@ constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
 operator ^(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
-	return static_cast<ENUM_FLAGS>(static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a) ^ static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(b));
+	return static_cast<ENUM_FLAGS>(UnderType(a) ^ UnderType(b));
 }
 
 template<typename ENUM_FLAGS>
@@ -76,7 +84,7 @@ constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
 operator ~(ENUM_FLAGS a) noexcept
 {
-	return static_cast<ENUM_FLAGS>(~static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a));
+	return static_cast<ENUM_FLAGS>(~UnderType(a));
 }
 
 template<typename ENUM_FLAGS>
@@ -84,7 +92,7 @@ constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, bool>::type
 operator !(ENUM_FLAGS a) noexcept
 {
-	return !static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a);
+	return !UnderType(a);
 }
 
 #endif /* EnumFlags_h */
