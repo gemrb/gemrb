@@ -43,16 +43,6 @@
 
 namespace GemRB {
 
-static int compare_effects(const void *a, const void *b)
-{
-	return stricmp(((const EffectDesc *) a)->Name,((const EffectDesc *) b)->Name);
-}
-
-static int find_effect(const void *a, const void *b)
-{
-	return stricmp((const char *) a,((const EffectDesc *) b)->Name);
-}
-
 static std::vector<EffectDesc> effectnames;
 
 void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
@@ -65,7 +55,9 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
-	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), compare_effects);
+	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), [] (const void *a, const void *b) {
+		return stricmp(((const EffectDesc *) a)->Name,((const EffectDesc *) b)->Name);
+	});
 }
 
 static EffectDesc* FindEffect(const char* effectname)
@@ -73,8 +65,12 @@ static EffectDesc* FindEffect(const char* effectname)
 	if (!effectname || effectnames.empty()) {
 		return nullptr;
 	}
-	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), find_effect);
-	if( !tmp) {
+
+	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), [] (const void *a, const void *b) {
+		return stricmp((const char *) a,((const EffectDesc *) b)->Name);
+	});
+
+	if(!tmp) {
 		Log(WARNING, "EffectQueue", "Couldn't assign effect: {}", effectname);
 	}
 	return (EffectDesc *) tmp;
