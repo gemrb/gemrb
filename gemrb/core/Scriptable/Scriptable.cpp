@@ -726,7 +726,7 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 					feature.Target = caster->wildSurgeMods.target_type;
 				} else {
 					// also apply to the caster
-					core->ApplyEffect(&feature, caster, caster);
+					core->ApplyEffect(new Effect(feature), caster, caster);
 				}
 			}
 			// we need to refetch the projectile, so the effect queue is created

@@ -7109,8 +7109,11 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				}
 			}
 			break;
+		default:
+			delete newfx;
+			break;
 	}
-	delete newfx;
+
 	return FX_APPLIED;
 }
 
