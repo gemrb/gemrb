@@ -1919,7 +1919,7 @@ Point Movable::GetMostLikelyPosition() const
 	int halfway = GetPathLength()/2;
 	const PathListNode *node = GetNextStep(halfway);
 	if (node) {
-		return Point((ieWord) ((node->x*16)+8), (ieWord) ((node->y*12)+6) );
+		return Map::ConvertCoordFromTile(node->point) + Point(8, 6);
 	}
 	return Destination;
 }
@@ -2089,7 +2089,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		return;
 	}
 
-	Point nmptStep(step->x, step->y);
+	Point nmptStep = step->point;
 	double dx = nmptStep.x - Pos.x;
 	double dy = nmptStep.y - Pos.y;
 	Map::NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / double(walkScale));
@@ -2177,7 +2177,7 @@ void Movable::AddWayPoint(const Point &Des)
 	while(endNode->Next) {
 		endNode = endNode->Next;
 	}
-	Point p(endNode->x, endNode->y);
+	Point p = endNode->point;
 	area->ClearSearchMapFor(this);
 	PathListNode *path2 = area->FindPath(p, Des, size);
 	// if the waypoint is too close to the current position, no path is generated
@@ -2304,7 +2304,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		area->BlockSearchMapFor(this);
 	}
 	if (path) {
-		Destination = Point(path->x, path->y);
+		Destination = path->point;
 	} else {
 		randomWalkCounter = 0;
 		WalkTo(HomeLocation);

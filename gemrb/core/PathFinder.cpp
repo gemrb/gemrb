@@ -119,11 +119,8 @@ PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor 
 		p.y -= dy;
 	}
 	PathListNode *step = new PathListNode;
-	step->x = p.x;
-	step->y = p.y;
 	const Size& mapSize = PropsSize();
-	step->x = Clamp<unsigned int>(step->x, 1u, (mapSize.w - 1) * 16);
-	step->y = Clamp<unsigned int>(step->y, 1u, (mapSize.h - 1) * 12);
+	step->point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
 	step->Parent = nullptr;
 	step->Next = nullptr;
 	step->orient = GetOrient(p, s);
@@ -187,8 +184,7 @@ PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, ori
 	PathListNode *Return = StartNode;
 	StartNode->Next = nullptr;
 	StartNode->Parent = nullptr;
-	StartNode->x = start.x;
-	StartNode->y = start.y;
+	StartNode->point = start;
 	StartNode->orient = Orientation;
 
 	int Count = 0;
@@ -220,8 +216,7 @@ PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, ori
 			Count--;
 		}
 
-		StartNode->x = p.x;
-		StartNode->y = p.y;
+		StartNode->point = p;
 		StartNode->orient = Orientation;
 		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
@@ -292,12 +287,11 @@ Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, orient_t
 PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 {
 	PathListNode *step = new PathListNode;
-	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
-	step->y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
+	step->point.x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
+	step->point.y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
 	const Size& mapSize = PropsSize();
-	step->x = Clamp<unsigned int>(step->x, 1u, (mapSize.w - 1) * 16);
-	step->y = Clamp<unsigned int>(step->y, 1u, (mapSize.h - 1) * 12);
-	step->orient = GetOrient(Point(step->x, step->y), p);
+	step->point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
+	step->orient = GetOrient(step->point, p);
 	step->Next = nullptr;
 	step->Parent = nullptr;
 	return step;
@@ -307,7 +301,7 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
-	Log(DEBUG, "FindPath", "s = ({}, {}), d = ({}, {}), caller = {}, dist = {}, size = {}", s.x, s.y, d.x, d.y, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
+	Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}", s, d, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
 	if (!(GetBlockedInRadius(d, size) & PathMapFlags::PASSABLE)) {
@@ -427,8 +421,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
 			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
 			PathListNode *newStep = new PathListNode;
-			newStep->x = nmptCurrent.x;
-			newStep->y = nmptCurrent.y;
+			newStep->point = nmptCurrent;
 			newStep->Next = resultPath;
 			newStep->Parent = nullptr;
 			if (flags & PF_BACKAWAY) {

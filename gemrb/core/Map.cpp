@@ -1921,9 +1921,9 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		block.w = 8;
 		block.h = 6;
 		while (step) {
-			block.x = (step->x+64) - vp.x;
-			block.y = (step->y+6) - vp.y;
-			Log(DEBUG, "Map", "Waypoint {} at ({}, {})", i, step->x, step->y);
+			block.x = (step->point.x+64) - vp.x;
+			block.y = (step->point.y+6) - vp.y;
+			Log(DEBUG, "Map", "Waypoint {} at {}", i, step->point);
 			vid->DrawRect(block, waypoint);
 			step = step->Next;
 			i++;

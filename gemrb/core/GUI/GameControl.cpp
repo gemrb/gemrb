@@ -600,12 +600,12 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	if (drawPath) {
 		PathListNode* node = drawPath;
 		while (true) {
-			Point p( ( node-> x*16) + 8, ( node->y*12 ) + 6 );
+			Point p = Map::ConvertCoordFromTile(node->point) + Point(8, 6);
 			if (!node->Parent) {
 				video->DrawCircle( p, 2, ColorRed );
 			} else {
-				short oldX = ( node->Parent-> x*16) + 8, oldY = ( node->Parent->y*12 ) + 6;
-				video->DrawLine( Point(oldX, oldY), p, ColorGreen );
+				Point old = Map::ConvertCoordFromTile(node->Parent->point) + Point(8, 6);
+				video->DrawLine(old, p, ColorGreen);
 			}
 			if (!node->Next) {
 				video->DrawCircle( p, 2, ColorGreen );

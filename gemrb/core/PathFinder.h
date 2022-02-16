@@ -71,8 +71,7 @@ using Path = std::vector<PathNode>;
 struct PathListNode {
 	PathListNode* Parent;
 	PathListNode* Next;
-	unsigned int x;
-	unsigned int y;
+	Point point;
 	orient_t orient;
 };
 
