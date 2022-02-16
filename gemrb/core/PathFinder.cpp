@@ -226,7 +226,7 @@ PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, ori
 		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
-				Orientation = NextOrientation(Orientation, 8);
+				Orientation = ReflectOrientation(Orientation);
 				// TODO: recalculate dest (mirror it)
 				break;
 			case GL_PASS:
@@ -276,7 +276,7 @@ Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, orient_t
 		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
-				Orientation = NextOrientation(Orientation, 8);
+				Orientation = ReflectOrientation(Orientation);
 				// TODO: recalculate dest (mirror it)
 				break;
 			case GL_PASS:
