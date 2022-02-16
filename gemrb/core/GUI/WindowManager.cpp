@@ -238,9 +238,9 @@ Window* WindowManager::MakeWindow(const Region& rgn)
 
 // this function won't delete the window, just queue it for deletion
 // it will be deleted when another window is opened
-// regardless, the window deleted is inaccessible for gui scripts and
+// regardless, the closed window is inaccessible for gui scripts and
 // other high level functions from now
-// thes is a necessity to prevent crashing when a control callback results
+// this is a necessity to prevent crashing when a control callback results
 // in the parent window closing which would delete the control before
 // returning from the callback
 void WindowManager::CloseWindow(Window* win)
