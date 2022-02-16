@@ -2053,8 +2053,8 @@ void Map::InitActors()
 void Map::MarkVisited(const Actor *actor) const
 {
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
-		char key[32];
-		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName.CString());
+		ieVariable key;
+		size_t len = key.SNPrintF("%s_visited", scriptName);
 		if (len > sizeof(key)) {
 			Log(ERROR, "Map", "Area {} has a too long script name for generating _visited globals!", scriptName);
 		}
@@ -3595,18 +3595,17 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 
 Container *Map::GetPile(Point position)
 {
-	char heapname[32];
-
 	//converting to search square
 	position.x=position.x/16;
 	position.y=position.y/12;
-	snprintf(heapname, sizeof(heapname), "heap_%d.%d", position.x, position.y);
+	ieVariable pileName;
+	pileName.SNPrintF("heap_%d.%d", position.x, position.y);
 	//pixel position is centered on search square
 	position.x=position.x*16+8;
 	position.y=position.y*12+6;
 	Container *container = TMap->GetContainer(position,IE_CONTAINER_PILE);
 	if (!container) {
-		container = AddContainer(heapname, IE_CONTAINER_PILE, nullptr);
+		container = AddContainer(pileName, IE_CONTAINER_PILE, nullptr);
 		container->Pos=position;
 		//bounding box covers the search square
 		container->BBox = Region::RegionFromPoints(Point(position.x-8, position.y-6), Point(position.x+8,position.y+6));

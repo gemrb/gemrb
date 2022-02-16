@@ -11125,7 +11125,7 @@ ResRef Actor::GetArmorSound() const
 		return "";
 	}
 
-	char sound[9] = {'\0'};
+	ResRef sound;
 	int maxChar = 6;
 	if (armorCode == '4') maxChar = 8;
 	if (IWDSound) {
@@ -11133,14 +11133,11 @@ ResRef Actor::GetArmorSound() const
 		const char* suffixes = "12345678";
 		int idx = RAND(0, maxChar-1);
 		if (armorCode == '2') {
-			strcpy(sound, "A_LTHR");
-			sound[6] = suffixes[idx];
+			sound.SNPrintF("A_LTHR%s", suffixes[idx]);
 		} else if (armorCode == '3') {
-			strcpy(sound, "A_CHAIN");
-			sound[7] = suffixes[idx];
+			sound.SNPrintF("A_CHAIN%s", suffixes[idx]);
 		} else { // 4
-			strcpy(sound, "A_PLATE");
-			sound[7] = suffixes[idx];
+			sound.SNPrintF("A_PLATE%s", suffixes[idx]);
 		}
 	} else {
 		// generate a 1 letter suffix or emulate an empty string
@@ -11149,12 +11146,9 @@ ResRef Actor::GetArmorSound() const
 		int idx = RAND(0, maxChar);
 		char randomASCII = '\0';
 		if (idx < maxChar) randomASCII = suffixes[idx];
-
-		strcpy(sound, "ARM_0");
-		sound[5] = armorCode;
-		sound[6] = randomASCII;
+		sound.SNPrintF("ARM_0%c%c", armorCode, randomASCII);
 	}
-	return ResRef(sound);
+	return sound;
 }
 
 void Actor::PlayArmorSound() const
