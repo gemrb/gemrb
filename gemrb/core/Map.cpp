@@ -3106,7 +3106,7 @@ bool Map::IsExplored(const Point &pos) const
 WMPDirection Map::WhichEdge(const Point &s) const
 {
 	if (!(GetBlocked(s) & PathMapFlags::TRAVEL)) {
-		Log(DEBUG, "Map", "Not a travel region [{}.{}]?", s.x, s.y);
+		Log(DEBUG, "Map", "Not a travel region {}?", s);
 		return WMPDirection::NONE;
 	}
 	// FIXME: is this backwards?
