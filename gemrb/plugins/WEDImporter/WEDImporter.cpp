@@ -27,8 +27,6 @@
 
 #include <iterator>
 
-#include "System/swab.h"
-
 using namespace GemRB;
 
 //the net sizeof(wed_polygon) is 0x12 but not all compilers know that
@@ -137,9 +135,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 			str->Seek(newOverlays->TILOffset + startindex * 2, GEM_STREAM_START);
 			std::vector<ieWord> indices(count);
 			str->Read(&indices[0], count * sizeof(ieWord));
-			if( DataStream::BigEndian()) {
-				swabs(&indices[0], count * sizeof(ieWord));
-			}
+
 			Tile* tile;
 			if (secondary == 0xffff) {
 				tile = tis->GetTile(indices);
@@ -262,9 +258,7 @@ std::vector<ieWord> WEDImporter::GetDoorIndices(const ResRef& resref, bool& Base
 	str->Seek( DoorTilesOffset + ( DoorTileStart * 2 ), GEM_STREAM_START );
 	auto DoorTiles = std::vector<ieWord>(DoorTileCount);
 	str->Read(&DoorTiles[0], DoorTileCount * sizeof(ieWord));
-	if( DataStream::BigEndian()) {
-		swabs(&DoorTiles[0], DoorTileCount * sizeof(ieWord));
-	}
+
 	BaseClosed = DoorClosed != 0;
 	return DoorTiles;
 }

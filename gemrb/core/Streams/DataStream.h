@@ -72,19 +72,22 @@ public:
 public:
 	static constexpr strpos_t InvalidPos = strpos_t(-1);
 
-	DataStream() noexcept = default;
+	DataStream() noexcept;
 	virtual ~DataStream() noexcept = default;
 	
 	DataStream(const DataStream&) = delete;
 	DataStream& operator=(const DataStream&) = delete;
 	
+	// FIXME: these should wrap private implementations
+	// so that we can properly swab the read data
+	// if (NeedEndianSwap()) swabs(..., len);
 	virtual strret_t Read(void* dest, strpos_t len) = 0;
 	virtual strret_t Write(const void* src, strpos_t len) = 0;
 	
 	template <typename T>
 	strret_t ReadScalar(T& dest) {
 		strret_t len = Read(&dest, sizeof(T));
-		if (IsBigEndian) {
+		if (NeedEndianSwap()) {
 			swabs(&dest, sizeof(T));
 		}
 		return len;
@@ -111,7 +114,7 @@ public:
 	template <typename T>
 	strret_t WriteScalar(const T& src) {
 		strret_t len;
-		if (IsBigEndian) {
+		if (NeedEndianSwap()) {
 			T tmp;
 			swab_const(&src, &tmp, sizeof(T));
 			len = Write(&tmp, sizeof(T));
@@ -172,9 +175,6 @@ public:
 	bool CheckEncrypted();
 	void ReadDecrypted(void* buf, strpos_t encSize) const;
 	strret_t ReadLine(void* buf, strpos_t maxlen);
-	/** Endian Switch setup */
-	static void SetBigEndian(bool be);
-	static bool BigEndian();
 	/** Create a copy of this stream.
 	 *
 	 *  Returns NULL on failure.
@@ -184,8 +184,12 @@ protected:
 	strpos_t Pos = 0;
 	strpos_t size = 0;
 	bool Encrypted = false;
+	bool IsDataBigEndian = false;
+	
+private:
+	bool NeedEndianSwap() const noexcept;
 
-	GEM_EXPORT static bool IsBigEndian;
+	bool IsCPUBigEndian = false;
 };
 
 }

@@ -28,8 +28,6 @@
 #include "Video/RLE.h"
 #include "Streams/FileStream.h"
 
-#include "System/swab.h"
-
 using namespace GemRB;
 
 bool BAMImporter::Import(DataStream* str)
@@ -154,9 +152,6 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 	std::vector<index_t> FLT(count);
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read(&FLT[0], count * sizeof(ieWord));
-	if( DataStream::BigEndian() ) {
-		swabs(&FLT[0], count * sizeof(ieWord));
-	}
 	return FLT;
 }
 

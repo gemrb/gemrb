@@ -66,17 +66,6 @@ bool RawPCMReader::Import(DataStream* str)
 	return true;
 }
 
-inline void fix_endian(ieDword &dest)
-{
-	std::swap(((unsigned char *) &dest)[0],((unsigned char *) &dest)[3]);
-	std::swap(((unsigned char *) &dest)[1],((unsigned char *) &dest)[2]);
-}
-
-inline void fix_endian(ieWord &dest)
-{
-	std::swap(((unsigned char *) &dest)[0],((unsigned char *) &dest)[1]);
-}
-
 int RawPCMReader::read_samples(short* buffer, int count)
 {
 	if (count > samples_left) {
@@ -96,11 +85,6 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	}
 	if(is16bit) {
 		res >>= 1;
-		if (str->BigEndian()) {
-			for (size_t i = 0; i < (size_t)count; i++) {
-				fix_endian(((ieWord *)buffer)[i]);
-			}
-		}
 	}
 	samples_left -= res;
 	return res;
@@ -143,19 +127,7 @@ bool WavPCMReader::Import(DataStream* stream)
 	}
 	memset(&fmt,0,sizeof(fmt) );
 	str->Read( &fmt, fmt_hdr.length );
-	//hmm, we should swap fmt bytes if we are on a mac
-	//but we don't know exactly how much of the structure we'll read
-	//so we have to swap the bytes after reading them
-	if (str->BigEndian()) {
-		fix_endian(fmt.wFormatTag);
-		fix_endian(fmt.nChannels);
-		fix_endian(fmt.nSamplesPerSec);
-		fix_endian(fmt.wBitsPerSample);
-		//we don't use these fields, so who cares
-		//fix_endian(fmt.nAvgBytesPerSec);
-		//fix_endian(fmt.nBlockAlign);
-		//fix_endian(fmt.cbSize);
-	}
+
 	if (fmt.wFormatTag != 1) {
 		return false;
 	}

@@ -106,10 +106,6 @@ Add or set 4 if you want to skip the item description window when opening bags.
 Enabled by default.
 
 .TP
-.BR EndianSwitch =(0|1)
-Set this to 1 if you are running GemRB on a big-endian machine. Disabled by default.
-
-.TP
 .BR MultipleQuickSaves =(0|1)
 EXPERIMENTAL. Set this to 1 if you want GemRB to keep multiple quicksaves around. Disabled by default.
 

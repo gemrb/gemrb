@@ -803,7 +803,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	CONFIG_INT("DoubleClickDelay", EventMgr::DCDelay = );
 	CONFIG_INT("DrawFPS", config.DrawFPS =);
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
-	CONFIG_INT("EndianSwitch", DataStream::SetBigEndian);
 	CONFIG_INT("GCDebug", GameControl::DebugFlags = );
 	CONFIG_INT("Height", config.Height =);
 	CONFIG_INT("KeepCache", config.KeepCache =);
