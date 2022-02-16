@@ -68,7 +68,7 @@ static const int zOrder_8[8][4] = {
 };
 
 struct EquipResRefData {
-	char Suffix[9];
+	std::string Suffix;
 	unsigned char Cycle;
 };
 
@@ -1816,50 +1816,49 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 {
 	Cycle = SixteenToNine[Orient];
 	EquipData = new EquipResRefData;
-	EquipData->Suffix[0] = 0;
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			dest += SlashPrefix[WeaponType];
-			strlcpy(EquipData->Suffix, SlashPrefix[WeaponType], sizeof(EquipData->Suffix));
+			EquipData->Suffix = SlashPrefix[WeaponType];
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest += BackPrefix[WeaponType];
-			strlcpy(EquipData->Suffix, BackPrefix[WeaponType], sizeof(EquipData->Suffix));
+			EquipData->Suffix = BackPrefix[WeaponType];
 			break;
 
 		case IE_ANI_ATTACK_JAB:
 			dest += JabPrefix[WeaponType];
-			strlcpy(EquipData->Suffix, JabPrefix[WeaponType], sizeof(EquipData->Suffix));
+			EquipData->Suffix = JabPrefix[WeaponType];
 			break;
 
 		case IE_ANI_AWAKE:
 			dest += "g17";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle += 63;
 			break;
 
 		case IE_ANI_CAST: //looping
 			dest += "ca";
-			strcpy( EquipData->Suffix, "ca" );
+			EquipData->Suffix = "ca";
 			break;
 
 		case IE_ANI_CONJURE: //ending
 			dest += "ca";
-			strcpy( EquipData->Suffix, "ca" );
+			EquipData->Suffix = "ca";
 			Cycle += 9;
 			break;
 
 		case IE_ANI_DAMAGE:
 			dest += "g14";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle += 36;
 			break;
 
 		case IE_ANI_DIE:
 			dest += "g15";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle += 45;
 			break;
 			//I cannot find an emerge animation...
@@ -1868,7 +1867,7 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 		case IE_ANI_EMERGE:
 		case IE_ANI_PST_START:
 			dest += "g19";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle += 81;
 			break;
 
@@ -1880,7 +1879,7 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 				dest += "g18";
 				Cycle += 72;
 			}
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			break;
 
 			//Unknown... maybe only a transparency effect apply
@@ -1895,24 +1894,24 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 				dest += "g1";
 				Cycle += 9;
 			}
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			break;
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
 			dest += RangedPrefix[RangedType];
-			strlcpy(EquipData->Suffix, RangedPrefix[RangedType], sizeof(EquipData->Suffix));
+			EquipData->Suffix = RangedPrefix[RangedType];
 			break;
 
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
 			dest += "g16";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle += 54;
 			break;
 
 		case IE_ANI_WALK:
 			dest += "g11";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			break;
 
 		default:
@@ -2058,31 +2057,30 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 {
 	Orient = orient_t(Orient / 2);
 	EquipData = new EquipResRefData;
-	EquipData->Suffix[0] = 0;
 
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			dest += SlashPrefix[WeaponType];
-			strlcpy(EquipData->Suffix, SlashPrefix[WeaponType], sizeof(EquipData->Suffix));
+			EquipData->Suffix = SlashPrefix[WeaponType];
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest += BackPrefix[WeaponType];
-			strlcpy(EquipData->Suffix, BackPrefix[WeaponType], sizeof(EquipData->Suffix));
+			EquipData->Suffix = BackPrefix[WeaponType];
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_JAB:
 			dest += JabPrefix[WeaponType];
-			strlcpy(EquipData->Suffix, JabPrefix[WeaponType], sizeof(EquipData->Suffix));
+			EquipData->Suffix = JabPrefix[WeaponType];
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_READY:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			if ( WeaponType == IE_ANI_WEAPON_2W ) {
 				Cycle = 24 + Orient;
 			} else {
@@ -2092,19 +2090,19 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 
 		case IE_ANI_CAST://looping
 			dest += "ca";
-			strcpy( EquipData->Suffix, "ca" );
+			EquipData->Suffix = "ca";
 			Cycle = 8 + Orient;
 			break;
 
 		case IE_ANI_CONJURE://ending
 			dest += "ca";
-			strcpy( EquipData->Suffix, "ca" );
+			EquipData->Suffix = "ca";
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_DAMAGE:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 40 + Orient;
 			break;
 
@@ -2113,12 +2111,12 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 		case IE_ANI_PST_START:
 		case IE_ANI_EMERGE: // I cannot find an emerge animation... Maybe it is Die reversed
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 48 + Orient;
 			break;
 		case IE_ANI_HEAD_TURN:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 32 + Orient;
 			break;
 
@@ -2128,32 +2126,32 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 
 		case IE_ANI_AWAKE:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 16 + Orient;
 			break;
 
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
 			dest += RangedPrefixOld[RangedType];
-			strlcpy(EquipData->Suffix, RangedPrefixOld[RangedType], sizeof(EquipData->Suffix));
+			EquipData->Suffix = RangedPrefixOld[RangedType];
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_SLEEP:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 64 + Orient;
 			break;
 
 		case IE_ANI_TWITCH:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 56 + Orient;
 			break;
 
 		case IE_ANI_WALK:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = Orient;
 			break;
 		default:
@@ -2161,7 +2159,7 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 	}
 	if (Orient>=5) {
 		dest += "e";
-		strcat( EquipData->Suffix, "e" );
+		EquipData->Suffix += "e";
 	}
 	// NOTE: the two shadow animations (cshd, sshd) also have x-suffixed files,
 	// but those are used (instead of the eastern ones) only if sprite
@@ -2311,35 +2309,35 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_JAB:
 			dest += "g2";
-			strcpy( EquipData->Suffix, "g2" );
+			EquipData->Suffix = "g2";
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
 		case IE_ANI_SHOOT:
 			dest += "g2";
-			strcpy( EquipData->Suffix, "g2" );
+			EquipData->Suffix = "g2";
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_WALK:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_READY:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_DAMAGE:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 24 + Orient / 2;
 			break;
 		case IE_ANI_GET_UP:
@@ -2347,14 +2345,14 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 		case IE_ANI_PST_START:
 		case IE_ANI_DIE:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 32 + Orient / 2;
 			break;
 		case IE_ANI_SLEEP:
 		case IE_ANI_HIDE:
 		case IE_ANI_TWITCH:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
@@ -2362,7 +2360,7 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		dest += "e";
-		strcat( EquipData->Suffix, "e");
+		EquipData->Suffix += "e";
 	}
 	EquipData->Cycle = Cycle;
 }
@@ -2434,42 +2432,42 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest += "g2";
-			strcpy( EquipData->Suffix, "g2" );
+			EquipData->Suffix = "g2";
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
 			dest += "g2";
-			strcpy( EquipData->Suffix, "g2" );
+			EquipData->Suffix = "g2";
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_ATTACK_JAB:
 		case IE_ANI_SHOOT:
 			dest += "g2";
-			strcpy( EquipData->Suffix, "g2" );
+			EquipData->Suffix = "g2";
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_WALK:
 		case IE_ANI_HIDE: // unknown, just a guess
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_AWAKE:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_READY:
 		case IE_ANI_HEAD_TURN: //could be wrong
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_DAMAGE:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 24 + Orient / 2;
 			break;
 		case IE_ANI_GET_UP:
@@ -2477,13 +2475,13 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 		case IE_ANI_PST_START:
 		case IE_ANI_DIE:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 32 + Orient / 2;
 			break;
 		case IE_ANI_TWITCH:
 		case IE_ANI_SLEEP:
 			dest += "g1";
-			strcpy( EquipData->Suffix, "g1" );
+			EquipData->Suffix = "g1";
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
@@ -2491,7 +2489,7 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		dest += "e";
-		strcat( EquipData->Suffix, "e");
+		EquipData->Suffix += "e";
 	}
 	EquipData->Cycle = Cycle;
 }
