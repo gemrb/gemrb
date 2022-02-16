@@ -3766,22 +3766,23 @@ Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel)
 
 Actor *Interface::GetFirstSelectedPC(bool forced)
 {
-	Actor *ret = NULL;
+	Actor *ret = nullptr;
 	int slot = 0;
-	int partySize = game->GetPartySize( false );
-	if (!partySize) return NULL;
+	int partySize = game->GetPartySize(false);
+	if (!partySize) return nullptr;
+
 	for (int i = 0; i < partySize; i++) {
-		Actor* actor = game->GetPC( i,false );
-		if (actor->IsSelected()) {
-			if (actor->InParty<slot || !ret) {
-				ret = actor;
-				slot = actor->InParty;
-			}
+		Actor* actor = game->GetPC(i, false);
+		if (!actor->IsSelected()) continue;
+
+		if (actor->InParty < slot || !ret) {
+			ret = actor;
+			slot = actor->InParty;
 		}
 	}
 
 	if (forced && !ret) {
-		return game->FindPC((unsigned int) 1);
+		return game->FindPC(1);
 	}
 	return ret;
 }
