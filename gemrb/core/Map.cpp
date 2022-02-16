@@ -549,9 +549,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 				npc->MovementCommand(command);
 			}
 		}
-		return;
-	}
-	if (EveryOne&CT_SELECTED) {
+	} else if (EveryOne&CT_SELECTED) {
 		int i=game->GetPartySize(false);
 		while (i--) {
 			Actor *pc = game->GetPC(i,false);
@@ -570,10 +568,9 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 				npc->MovementCommand(command);
 			}
 		}
-		return;
+	} else {
+		actor->MovementCommand(std::move(command));
 	}
-
-	actor->MovementCommand(command);
 }
 
 void Map::UseExit(Actor *actor, InfoPoint *ip)

@@ -10909,7 +10909,7 @@ void Actor::MovementCommand(std::string command)
 {
 	UseExit(0);
 	Stop();
-	AddAction(GenerateAction(command));
+	AddAction(GenerateAction(std::move(command)));
 	ProcessActions();
 }
 
