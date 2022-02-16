@@ -1105,9 +1105,9 @@ static void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 {
 	if ((oldValue^State)&EXTSTATE_SEVEN_EYES) {
-		int eyeCount = 7;
+		orient_t eyeCount = NNW;
 		for (ieDword mask = EXTSTATE_EYE_MIND; mask <= EXTSTATE_EYE_STONE; mask <<= 1) {
-			if (State & mask) --eyeCount;
+			if (State & mask) eyeCount = PrevOrientation(eyeCount);
 		}
 		ScriptedAnimation *sca = actor->FindOverlay(OV_SEVENEYES);
 		if (sca) {
@@ -8211,7 +8211,7 @@ void Actor::UpdateDrawingRegion()
 	}
 	
 	if (Modified[IE_STATE_ID] & STATE_BLUR) {
-		int face = GetOrientation();
+		orient_t face = GetOrientation();
 		int blurx = (OrientdX[face] * (int)Modified[IE_MOVEMENTRATE])/20;
 		int blury = (OrientdY[face] * (int)Modified[IE_MOVEMENTRATE])/20;
 		
@@ -8287,7 +8287,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	}
 
 	if (!currentStance.anim.empty()) {
-		unsigned char face = GetOrientation();
+		orient_t face = GetOrientation();
 		// Drawing the actor:
 		// * mirror images:
 		//     Drawn without transparency, unless fully invisible.
@@ -10349,9 +10349,9 @@ void Actor::ResetState()
 // orientation match with a +/-2 allowed difference
 bool Actor::IsBehind(const Actor* target) const
 {
-	unsigned char tar_orient = target->GetOrientation();
+	orient_t tar_orient = target->GetOrientation();
 	// computed, since we don't care where we face
-	unsigned char my_orient = GetOrient(target->Pos, Pos);
+	orient_t my_orient = GetOrient(target->Pos, Pos);
 
 	signed char diff;
 	for (int i=-2; i <= 2; i++) {

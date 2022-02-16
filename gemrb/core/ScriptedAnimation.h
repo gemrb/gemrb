@@ -122,7 +122,7 @@ public:
 	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation
 	ieDword FrameRate = ANI_DEFAULT_FRAMERATE;
 	ieDword NumOrientations = 0;
-	ieDword Orientation = 0;
+	orient_t Orientation = S;
 	ieDword OrientationFlags = 0;
 	ieDword Duration = 0xffffffff;
 	ieDword Delay = 0;
@@ -137,7 +137,7 @@ public:
 	tick_t starttime = 0;
 public:
 	//draws the next frame of the videocell
-	bool UpdateDrawingState(int orientation);
+	bool UpdateDrawingState(orient_t orientation);
 	void Draw(const Region &vp, Color tint, int height, BlitFlags flags) const;
 	Region DrawingRegion() const;
 	//sets phase (0-2)
@@ -159,7 +159,7 @@ public:
 	/* sets default duration if it wasn't set yet */
 	void SetDefaultDuration(ieDword duration);
 	/* sets up the direction of the vvc */
-	void SetOrientation(int orientation);
+	void SetOrientation(orient_t orientation);
 	/* transforms vvc to blended */
 	void SetBlend();
 	/* sets the effect owned flag */

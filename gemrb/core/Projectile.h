@@ -344,7 +344,7 @@ public:
 		return effects;
 	}
 
-	inline unsigned char GetOrientation() const {
+	inline orient_t GetOrientation() const {
 		return Orientation;
 	}
 	//no idea if projectiles got height, using y

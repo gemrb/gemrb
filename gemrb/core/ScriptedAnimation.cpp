@@ -231,7 +231,8 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	else if (FrameRate > 30) FrameRate = 30;
 
 	stream->ReadDword(NumOrientations);
-	stream->ReadDword(Orientation);
+	stream->ReadDword(tmp);
+	Orientation = ClampToOrientation(tmp);
 	stream->ReadDword(OrientationFlags);
 	stream->Seek( 8, GEM_CURRENT_POS ); // CResRef m_cNewPaletteRef in the original
 
@@ -433,15 +434,12 @@ void ScriptedAnimation::SetDefaultDuration(ieDword duration)
 	}
 }
 
-void ScriptedAnimation::SetOrientation(int orientation)
+void ScriptedAnimation::SetOrientation(orient_t orientation)
 {
-	if (orientation == -1) {
-		return;
-	}
 	if (NumOrientations > 1) {
-		Orientation = (ieByte) orientation;
+		Orientation = orientation;
 	} else {
-		Orientation = 0;
+		Orientation = S;
 	}
 	if (twin) {
 		twin->Orientation = Orientation;
@@ -571,7 +569,7 @@ void ScriptedAnimation::IncrementPhase()
 	Phase++;
 }
 
-bool ScriptedAnimation::UpdateDrawingState(int orientation)
+bool ScriptedAnimation::UpdateDrawingState(orient_t orientation)
 {
 	if (!(OrientationFlags & IE_VVC_FACE_FIXED)) {
 		SetOrientation(orientation);

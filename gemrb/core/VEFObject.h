@@ -22,6 +22,8 @@
 
 #include "exports.h"
 #include "ie_types.h"
+
+#include "Orientation.h"
 #include "Region.h"
 #include "Resource.h"
 #include "RGBAColor.h"

@@ -84,6 +84,11 @@ inline orient_t ReduceToHalf(orient_t orient)
 	return ClampToOrientation(orient & ~1);
 }
 
+inline orient_t ReflectOrientation(orient_t orient)
+{
+	return orient_t(orient ^ 8);
+}
+
 // clockwise
 inline orient_t NextOrientation(orient_t orient, int step = 1)
 {

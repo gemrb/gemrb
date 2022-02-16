@@ -6438,7 +6438,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 
 	//create movement in actor
-	ieDword dir;
+	orient_t dir;
 	switch(fx->Parameter2) {
 		case WB_AWAY:
 		default:
@@ -6448,13 +6448,13 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			dir = GetOrient(fx->Source, target->Pos);
 			break;
 		case WB_FIXDIR:
-			dir = fx->Parameter3;
+			dir = ClampToOrientation(fx->Parameter3);
 			break;
 		case WB_OWNDIR:
 			dir = target->GetOrientation();
 			break;
 		case WB_AWAYOWNDIR:
-			dir = target->GetOrientation()^8;
+			dir = ReflectOrientation(target->GetOrientation());
 			break;
 	}
 	Point newpos=target->Pos;
