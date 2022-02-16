@@ -236,11 +236,13 @@ Window* WindowManager::MakeWindow(const Region& rgn)
 	return win;
 }
 
-//this function won't delete the window, just queue it for deletion
-//it will be deleted when another window is opened
-//regardless, the window deleted is inaccessible for gui scripts and
-//other high level functions from now
-// this is a caching mechanisim in case the window is reopened
+// this function won't delete the window, just queue it for deletion
+// it will be deleted when another window is opened
+// regardless, the window deleted is inaccessible for gui scripts and
+// other high level functions from now
+// thes is a necessity to prevent crashing when a control callback results
+// in the parent window closing which would delete the control before
+// returning from the callback
 void WindowManager::CloseWindow(Window* win)
 {
 	if (win == nullptr || win == gameWin) {
