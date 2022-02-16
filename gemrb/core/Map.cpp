@@ -470,7 +470,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 	//make a random pick
 
 	Game* game = core->GetGame();
-	const Map *map = game->GetMap(area, false);
+	const Map* map = game->GetMap(area, false); // add a GUIEnhacement bit for this if anyone ever complains we only show the first loadscreen
 	if (EveryOne & CT_GO_CLOSER) {
 		//copy the area name if it exists on the worldmap
 		unsigned int index;

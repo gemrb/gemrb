@@ -3404,6 +3404,8 @@ void Interface::LoadProgress(int percent)
 	if (prog) {
 		// loadwin is NULL when LoadMap is called and passes false for the loadscreen param
 		prog->SetValue(percent);
+		// ensure the EndLoadScreen callback runs only once per each started load screen
+		if (percent == 100) prog->SetDisabled(true);
 	}
 
 	video->SwapBuffers();
