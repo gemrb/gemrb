@@ -2140,10 +2140,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 
 			const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(resRef, IE_BAM_CLASS_ID);
 			if (!af) {
-				char tmpstr[24];
-
-				snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", resRef);
-				return RuntimeError( tmpstr );
+				return RuntimeError(fmt::format("{} BAM not found!", resRef));
 			}
 
 			Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
@@ -2525,10 +2522,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 
 		const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID);
 		if (!af) {
-			char tmpstr[24];
-
-			snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", ResRef);
-			return RuntimeError( tmpstr );
+			return RuntimeError(fmt::format("{} BAM not found!", ResRef));
 		}
 		Holder<Sprite2D> tspr = af->GetFrame(unpressed, (unsigned char)cycle);
 		btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
@@ -13541,14 +13535,14 @@ bool GUIScript::Autodetect(void)
 	}
 }
 
-bool GUIScript::LoadScript(const char* filename)
+bool GUIScript::LoadScript(const std::string& filename)
 {
 	if (!Py_IsInitialized()) {
 		return false;
 	}
 	Log(MESSAGE, "GUIScript", "Loading Script {}.", filename);
 
-	PyObject *pName = PyString_FromString( filename );
+	PyObject* pName = PyString_FromString(filename.c_str());
 	/* Error checking of pName left out */
 	if (pName == NULL) {
 		Log(ERROR, "GUIScript", "Failed to create filename for script \"{}\".", filename);

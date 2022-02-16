@@ -1226,13 +1226,12 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	// check if we reached a new level
 	ieByte pc = actor->InParty;
 	if (pc && !actor->GotLUFeedback) {
-		char varname[16];
-		snprintf(varname, sizeof(varname), "CheckLevelUp%d", pc);
+		const std::string& varName = fmt::format("CheckLevelUp{}", pc);
 		ScriptEngine::FunctionParameters params;
 		params.push_back(ScriptEngine::Parameter(pc));
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", params, true);
 		ieDword NeedsLevelUp = 0;
-		core->GetDictionary()->Lookup(varname, NeedsLevelUp);
+		core->GetDictionary()->Lookup(varName.c_str(), NeedsLevelUp);
 		if (NeedsLevelUp == 1) {
 			displaymsg->DisplayConstantStringName(STR_LEVELUP, DMC_WHITE, actor);
 			actor->GotLUFeedback = true;
@@ -4547,20 +4546,17 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 
 
 	int armor = 0;
-
 	if (resdata) {
-		char section[12];
 		unsigned int animid=BaseStats[IE_ANIMATION_ID];
 		if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
 			animid&=0xff;
 		}
 
-		snprintf(section,10,"%d", animid);
-
+		const std::string& section = fmt::format("{}", animid);
 		if (type<0) {
 			type = -type;
 		} else {
-			armor = resdata->GetKeyAsInt(section, "armor",0);
+			armor = resdata->GetKeyAsInt(section.c_str(), "armor", 0);
 		}
 		if (armor<0 || armor>35) return;
 	} else {

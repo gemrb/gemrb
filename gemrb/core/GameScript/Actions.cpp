@@ -7052,9 +7052,9 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	if (!ini) {
 		return;
 	}
-	char key[40];
-	sprintf(key,"%d", parameters->int0Parameter);
-	const char *variable = ini->GetKeyAsString( key, "killvar", NULL );
+
+	const std::string& key = fmt::format("{}", parameters->int0Parameter);
+	const char* variable = ini->GetKeyAsString(key.c_str(), "killvar", nullptr);
 	if (!variable) {
 		return;
 	}

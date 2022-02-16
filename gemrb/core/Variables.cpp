@@ -369,9 +369,8 @@ void Variables::SetAtCopy(const char* key, const char* value)
 
 void Variables::SetAtCopy(const char* key, int newValue)
 {
-	char tmpstr[10]; // should be enough
-	snprintf(tmpstr, sizeof(tmpstr), "%d", newValue);
-	SetAtCopy(key, tmpstr);
+	const std::string& newStr = fmt::format("{}", newValue);
+	SetAtCopy(key, newStr.c_str());
 }
 
 void Variables::SetAt(const char* key, char* value)

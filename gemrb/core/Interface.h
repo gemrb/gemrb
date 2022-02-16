@@ -415,7 +415,7 @@ private:
 	int mousescrollspd = 10;
 	bool update_scripts = false;
 	/** Next Script Name */
-	char NextScript[64];
+	std::string nextScript;
 
 	std::deque<Timer> timers;
 	KeyMap *keymap = nullptr;

@@ -503,8 +503,8 @@ void Interface::HandleFlags() noexcept
 
 	if (QuitFlag&QF_CHANGESCRIPT) {
 		QuitFlag &= ~QF_CHANGESCRIPT;
-		guiscript->LoadScript( NextScript );
-		guiscript->RunFunction( NextScript, "OnLoad" );
+		guiscript->LoadScript(nextScript);
+		guiscript->RunFunction(nextScript.c_str(), "OnLoad");
 	}
 }
 
@@ -682,10 +682,10 @@ int Interface::LoadSprites()
 		// support non-BAM cursors
 		// load MainCursorsImage + XX until all images are exhausted
 		// same layout as in the originals, with odd indices having the pressed cursor image
-		char fileName[32];
+		std::string fileName;
 		while (CursorCount < 99) {
-			snprintf(fileName, sizeof(fileName), "%.29s%02ld", MainCursorsImage.CString(), long(CursorCount));
-			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
+			fileName = fmt::format("{}{}", MainCursorsImage, CursorCount);
+			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName.c_str(), true);
 			if (!im) break;
 			Cursors.push_back(im->GetSprite2D());
 			CursorCount++;
@@ -1837,9 +1837,8 @@ bool Interface::LoadGemRBINI()
 	// GroundCircleBAM1 = wmpickl/3
 	// to denote that the bitmap should be scaled down 3x
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		char name[30];
-		sprintf( name, "GroundCircleBAM%d", size+1 );
-		s = ini->GetKeyAsString( "resources", name, NULL );
+		const std::string& name =  fmt::format("GroundCircleBAM{}", size + 1);
+		s = ini->GetKeyAsString("resources", name.c_str(), nullptr);
 		if (s) {
 			const char *pos = strchr( s, '/' );
 			if (pos) {
@@ -4394,9 +4393,8 @@ int Interface::ResolveStatBonus(const Actor *actor, const char *tablename, ieDwo
 		int row;
 		if (checkcol == -1) {
 			// use the row names
-			char tmp[30];
-			snprintf(tmp, sizeof(tmp), "%d", value);
-			row = tm->GetRowIndex(tmp);
+			const std::string& rowName = fmt::format("{}", value);
+			row = tm->GetRowIndex(rowName.c_str());
 		} else {
 			// use the checkcol column (default of 0)
 			row = tm->FindTableValue(checkcol, value, 0);
@@ -4436,7 +4434,7 @@ Timer& Interface::SetTimer(const EventHandler& handler, tick_t interval, int rep
 
 void Interface::SetNextScript(const char *script)
 {
-	strlcpy( NextScript, script, sizeof(NextScript) );
+	nextScript = script;
 	QuitFlag |= QF_CHANGESCRIPT;
 }
 

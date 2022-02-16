@@ -55,7 +55,7 @@ public:
 	/** Autodetect GameType */
 	bool Autodetect(void);
 	/** Load Script */
-	bool LoadScript(const char* filename) override;
+	bool LoadScript(const std::string& filename) override;
 	/** Run Function */
 	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
 	/** Exec a single File */
