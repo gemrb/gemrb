@@ -10905,11 +10905,11 @@ int Actor::UpdateAnimationID(bool derived)
 	return 0;
 }
 
-void Actor::MovementCommand(const char *command)
+void Actor::MovementCommand(std::string command)
 {
 	UseExit(0);
 	Stop();
-	AddAction( GenerateAction( command ) );
+	AddAction(GenerateAction(command));
 	ProcessActions();
 }
 

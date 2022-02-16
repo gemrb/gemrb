@@ -970,7 +970,7 @@ public:
 	bool IsDead() const;
 	bool IsInvisibleTo(const Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
-	void MovementCommand(const char *command);
+	void MovementCommand(std::string command);
 	/* shows hp/maxhp as overhead text */
 	bool HasVisibleHP() const;
 	void DisplayHeadHPRatio();

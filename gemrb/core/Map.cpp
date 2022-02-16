@@ -465,8 +465,6 @@ void Map::AutoLockDoors() const
 
 void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const
 {
-	char command[256];
-
 	//change loader MOS image here
 	//check worldmap entry, if that doesn't contain anything,
 	//make a random pick
@@ -489,7 +487,6 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 	}
 	if (!map) {
 		Log(ERROR, "Map", "Invalid map: {}", area);
-		command[0]=0;
 		return;
 	}
 	const Entrance *ent = nullptr;
@@ -535,7 +532,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 		face = ent->Face;
 	}
 	//LeaveArea is the same in ALL engine versions
-	snprintf(command, sizeof(command), "LeaveArea(\"%s\",[%d.%d],%d)", area.CString(), X, Y, face);
+	std::string command = fmt::format("LeaveArea(\"{}\",[{}.{}],{})", area, X, Y, face);
 
 	if (EveryOne&CT_GO_CLOSER) {
 		int i=game->GetPartySize(false);
