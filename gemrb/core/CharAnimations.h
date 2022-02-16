@@ -233,50 +233,50 @@ private:
 	void InitAvatarsTable() const;
 	int GetActorPartCount() const;
 	void AddPSTSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void AddFFSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, int Part) const;
+		unsigned char& Cycle, orient_t Orient, int Part) const;
 	void AddFF2Suffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, int Part) const;
+		unsigned char& Cycle, orient_t Orient, int Part) const;
 	void AddHLSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void AddNFSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, int Part) const;
+		unsigned char& Cycle, orient_t Orient, int Part) const;
 	void AddVHR2Suffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void AddVHRSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
+		unsigned char& Cycle, orient_t Orient, EquipResRefData*& equip) const;
 	void AddVHR3Suffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
 		const char* equipRef, bool offhand, const EquipResRefData* equip) const;
 	void AddSixSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void AddTwoPieceSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, int Part) const;
+		unsigned char& Cycle, orient_t Orient, int Part) const;
 	void AddMHRSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
+		unsigned char& Cycle, orient_t Orient, EquipResRefData*& equip) const;
 	void GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
 		const char* equipRef, bool offhand, const EquipResRefData* equip) const;
 	void AddMMRSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, bool mirror) const;
+		unsigned char& Cycle, orient_t Orient, bool mirror) const;
 	void AddMMR2Suffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void AddTwoFileSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void AddTwoFiles5Suffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void AddLRSuffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
+		unsigned char& Cycle, orient_t Orient, EquipResRefData*& equip) const;
 	void AddLRSuffix2( std::string& dest, unsigned char StanceID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData) const;
+		unsigned char& Cycle, orient_t Orient, EquipResRefData *&EquipData) const;
 	void GetLREquipmentRef(std::string& dest, unsigned char& Cycle,
 		const char* equipRef, bool offhand, const EquipResRefData* equip) const;
 	void AddLR2Suffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
+		unsigned char& Cycle, orient_t Orient) const;
 	void AddLR3Suffix(std::string& dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient) const;
-	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
+		unsigned char& Cycle, orient_t Orient) const;
+	void GetAnimResRef(unsigned char AnimID, orient_t Orient,
 		std::string& dest, unsigned char& Cycle, int Part, EquipResRefData*& equip) const;
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
 		std::string& dest, unsigned char& Cycle, const EquipResRefData* equip) const;

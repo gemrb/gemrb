@@ -1097,8 +1097,7 @@ void Projectile::SecondaryTarget()
 		// see CharAnimations.cpp for a nice visualization of the orientation directions
 		// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
 		// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
-		char saneOrientation = 12 - Orientation;
-		if (saneOrientation < 0) saneOrientation = MAX_ORIENT + saneOrientation;
+		orient_t saneOrientation = PrevOrientation(E, Orientation);
 
 		// for cone angles (widths) bigger than 22.5 we will always have a range of values greater than 360
 		// to normalize into [0,360] we use an orientation dependent factor that is then accounted for in later calculations

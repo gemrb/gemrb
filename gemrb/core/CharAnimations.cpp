@@ -1286,12 +1286,11 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 static const int one_file[MAX_ANIMS] = {2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
 
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
-					 unsigned char Orient,
+					 orient_t Orient,
 					 std::string& NewResRef, unsigned char& Cycle,
 					 int Part, EquipResRefData*& EquipData) const
 {
 	EquipData = nullptr;
-	Orient &= 15;
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
 			AddFFSuffix( NewResRef, StanceID, Cycle, Orient, Part );
@@ -1446,7 +1445,7 @@ const int* CharAnimations::GetZOrder(unsigned char Orient) const
 
 
 void CharAnimations::AddPSTSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	const char *Prefix;
 
@@ -1514,7 +1513,7 @@ void CharAnimations::AddPSTSuffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddVHR2Suffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	Cycle=SixteenToNine[Orient];
 
@@ -1592,7 +1591,7 @@ void CharAnimations::AddVHR2Suffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddVHR3Suffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	Cycle=SixteenToNine[Orient];
 
@@ -1664,7 +1663,7 @@ void CharAnimations::AddVHR3Suffix(std::string& dest, unsigned char StanceID,
 
 // Note: almost like SixSuffix
 void CharAnimations::AddFFSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, int Part) const
+	unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	Cycle=SixteenToNine[Orient];
 	switch (StanceID) {
@@ -1728,7 +1727,7 @@ void CharAnimations::AddFFSuffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddFF2Suffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, int Part) const
+	unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	Cycle = SixteenToNine[Orient];
 	switch (StanceID) {
@@ -1789,7 +1788,7 @@ void CharAnimations::AddFF2Suffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddNFSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, int Part) const
+	unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	Cycle = SixteenToNine[Orient];
 	
@@ -1813,7 +1812,7 @@ static const char* const RangedPrefix[] = { "sa", "sx", "ss" };
 static const char* const RangedPrefixOld[] = { "sa", "sx", "a1" };
 
 void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData) const
+	unsigned char& Cycle, orient_t Orient, EquipResRefData*& EquipData) const
 {
 	Cycle = SixteenToNine[Orient];
 	EquipData = new EquipResRefData;
@@ -1939,7 +1938,7 @@ void CharAnimations::GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
 }
 
 void CharAnimations::AddSixSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	switch (StanceID) {
 		case IE_ANI_WALK:
@@ -2006,9 +2005,9 @@ void CharAnimations::AddSixSuffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddLR2Suffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
-	Orient /= 2;
+	Orient = orient_t(Orient / 2);
 
 	switch (StanceID) {
 		case IE_ANI_READY:
@@ -2055,9 +2054,9 @@ void CharAnimations::AddLR2Suffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData) const
+	unsigned char& Cycle, orient_t Orient, EquipResRefData*& EquipData) const
 {
-	Orient /= 2;
+	Orient = orient_t(Orient / 2);
 	EquipData = new EquipResRefData;
 	EquipData->Suffix[0] = 0;
 
@@ -2194,7 +2193,7 @@ void CharAnimations::GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
 }
 
 void CharAnimations::AddTwoFileSuffix( std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	switch(StanceID) {
 		case IE_ANI_HEAD_TURN:
@@ -2227,7 +2226,7 @@ void CharAnimations::AddTwoFileSuffix( std::string& dest, unsigned char StanceID
 }
 
 void CharAnimations::AddTwoFiles5Suffix( std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	const char *suffix;
 	Cycle=SixteenToNine[Orient];
@@ -2302,7 +2301,7 @@ void CharAnimations::AddTwoFiles5Suffix( std::string& dest, unsigned char Stance
 }
 
 void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData) const
+	unsigned char& Cycle, orient_t Orient, EquipResRefData *&EquipData) const
 {
 	EquipData = new EquipResRefData;
 	EquipData->Suffix[0] = 0;
@@ -2369,7 +2368,7 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddTwoPieceSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, int Part) const
+	unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	if (Part == 1) {
 		dest += "d";
@@ -2427,7 +2426,7 @@ void CharAnimations::AddTwoPieceSuffix(std::string& dest, unsigned char StanceID
 }
 
 void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData) const
+	unsigned char& Cycle, orient_t Orient, EquipResRefData *&EquipData) const
 {
 	EquipData = new EquipResRefData;
 	EquipData->Suffix[0] = 0;
@@ -2509,7 +2508,7 @@ void CharAnimations::GetLREquipmentRef(std::string& dest, unsigned char& Cycle,
 
 //Only for the ogre animation (MOGR)
 void CharAnimations::AddLR3Suffix( std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
@@ -2567,7 +2566,7 @@ void CharAnimations::AddLR3Suffix( std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddMMR2Suffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
@@ -2640,7 +2639,7 @@ void CharAnimations::AddMMR2Suffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddMMRSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, bool mirror) const
+	unsigned char& Cycle, orient_t Orient, bool mirror) const
 {
 	if (mirror) {
 		Cycle = SixteenToFive[Orient];
@@ -2717,7 +2716,7 @@ void CharAnimations::AddMMRSuffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddHLSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient) const
+	unsigned char& Cycle, orient_t Orient) const
 {
 	//even orientations in 'h', odd in 'l', and since the WALK animation
 	//with fewer orientations is first in h, all other stances in that
