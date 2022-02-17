@@ -70,7 +70,7 @@ TileObject* TileMap::GetTile(unsigned int idx)
 }
 
 //doors
-Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
+Door* TileMap::AddDoor(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
 	int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt)
 {
 	Door* door = new Door(overlays[0], std::move(dt));
@@ -260,7 +260,7 @@ int TileMap::CleanupContainer(Container *container)
 }
 
 //infopoints
-InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline)
+InfoPoint* TileMap::AddInfoPoint(const ieVariable& Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline)
 {
 	InfoPoint* ip = new InfoPoint();
 	ip->SetScriptName( Name );

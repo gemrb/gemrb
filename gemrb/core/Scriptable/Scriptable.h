@@ -360,7 +360,7 @@ public:
 	bool DisplayOverheadText(bool);
 	bool OverheadTextIsDisplaying() const { return overheadTextDisplaying; }
 	void FixHeadTextPos();
-	void SetScriptName(const char* text);
+	void SetScriptName(const ieVariable& text);
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();
 	bool IsPC() const;

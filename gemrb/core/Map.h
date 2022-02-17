@@ -578,7 +578,7 @@ public:
 
 	//containers
 	/* this function returns/creates a pile container at position */
-	Container* AddContainer(const char* Name, unsigned short Type,
+	Container* AddContainer(const ieVariable& Name, unsigned short Type,
 							const std::shared_ptr<Gem_Polygon>& outline);
 	Container *GetPile(Point position);
 	void AddItemToLocation(const Point &position, CREItem *item);

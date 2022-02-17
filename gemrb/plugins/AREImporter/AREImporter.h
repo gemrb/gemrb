@@ -64,7 +64,7 @@ public:
 	AREImporter() noexcept = default;
 	bool Import(DataStream* stream) override;
 	bool ChangeMap(Map *map, bool day_or_night) override;
-	Map* GetMap(const char* resRef, bool day_or_night) override;
+	Map* GetMap(const ResRef& resRef, bool day_or_night) override;
 	int GetStoredFileSize(Map *map) override;
 	/* stores an area in the Cache (swaps it out) */
 	int PutArea(DataStream *stream, const Map *map) const override;

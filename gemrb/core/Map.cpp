@@ -3619,7 +3619,7 @@ void Map::AddItemToLocation(const Point &position, CREItem *item)
 	container->AddItem(item);
 }
 
-Container* Map::AddContainer(const char* Name, unsigned short Type,
+Container* Map::AddContainer(const ieVariable& Name, unsigned short Type,
 							 const std::shared_ptr<Gem_Polygon>& outline)
 {
 	Container* c = new Container();

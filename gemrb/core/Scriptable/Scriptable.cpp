@@ -93,13 +93,9 @@ Scriptable::~Scriptable(void)
 	delete locals;
 }
 
-void Scriptable::SetScriptName(const char* text)
+void Scriptable::SetScriptName(const ieVariable& text)
 {
-	//if (text && text[0]) { //this leaves some uninitialized bytes
-	//lets hope this won't break anything
-	if (text) {
-		scriptName = MakeVariable(text);
-	}
+	scriptName = text;
 }
 
 /** Gets the DeathVariable */

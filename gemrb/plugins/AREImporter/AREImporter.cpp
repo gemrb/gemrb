@@ -473,7 +473,7 @@ static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
 	return ambi;
 }
 
-Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
+Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
 	if (!(AreaFlags & AT_EXTENDED_NIGHT))
@@ -530,7 +530,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
-	map->SetScriptName(resRef);
+	map->SetScriptName(resRef.CString());
 	// reset MasterArea, since the script name wasn't available in the constructor
 	map->MasterArea = core->GetGame()->MasterArea(map->GetScriptRef());
 	int idx = GetTrackString(resRef);

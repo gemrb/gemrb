@@ -44,7 +44,7 @@ public:
 	~TileMap();
 	TileMap& operator=(const TileMap&) = delete;
 
-	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,
+	Door* AddDoor(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
 				  int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt);
 	//gets door by active region (click target)
 	Door* GetDoor(const Point &position) const;
@@ -69,7 +69,7 @@ public:
 	int CleanupContainer(Container *container);
 	size_t GetContainerCount() const { return containers.size(); }
 
-	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline);
+	InfoPoint* AddInfoPoint(const ieVariable& Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline);
 	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
 	InfoPoint* GetInfoPoint(const ieVariable& Name) const;
 	InfoPoint* GetInfoPoint(size_t idx) const;
