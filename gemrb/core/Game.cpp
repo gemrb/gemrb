@@ -86,7 +86,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	//loading master areas
 	AutoTable table = gamedata->LoadTable("mastarea");
 	if (table) {
-		int i = table->GetRowCount();
+		TableMgr::index_t i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
 			mastarea.push_back(ResRef(table->GetRowName(i)));
@@ -113,13 +113,13 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	}
 	table = gamedata->LoadTable(tn);
 	if (table) {
-		int cols = table->GetColumnCount();
-		int rows = table->GetRowCount();
+		TableMgr::index_t cols = table->GetColumnCount();
+		TableMgr::index_t rows = table->GetRowCount();
 		npclevels.reserve(rows);
-		for (int i = 0; i < rows; i++) {
+		for (TableMgr::index_t i = 0; i < rows; i++) {
 			npclevels.emplace_back(cols + 1);
 			npclevels[i][0] = table->GetRowName(i);
-			for (int j = 0; j < cols; j++) {
+			for (TableMgr::index_t j = 0; j < cols; j++) {
 				npclevels[i][j + 1] = table->QueryField(i, j);
 			}
 		}
@@ -1135,15 +1135,15 @@ void Game::LoadCRTable()
 {
 	AutoTable table = gamedata->LoadTable("moncrate");
 	if (table) {
-		int maxrow = table->GetRowCount()-1;
+		TableMgr::index_t maxrow = table->GetRowCount()-1;
 		crtable = new CRRow[MAX_LEVEL];
-		for(int i=0;i<MAX_LEVEL;i++) {
+		for(TableMgr::index_t i = 0; i < MAX_LEVEL; ++i) {
 			//row shouldn't be larger than maxrow
-			int row = i<maxrow?i:maxrow;
-			int maxcol = table->GetColumnCount(row)-1;
-			for(int j=0;j<MAX_CRLEVEL;j++) {
+			TableMgr::index_t row = i<maxrow?i:maxrow;
+			TableMgr::index_t maxcol = table->GetColumnCount(row)-1;
+			for(TableMgr::index_t j = 0; j < MAX_CRLEVEL; ++j) {
 				//col shouldn't be larger than maxcol
-				int col = j<maxcol?j:maxcol;
+				TableMgr::index_t col = j<maxcol?j:maxcol;
 				crtable[i][j]=atoi(table->QueryField(row,col) );
 			}
 		}
@@ -1601,8 +1601,8 @@ void Game::TextDream()
 				repLabel = "GOOD_POWER";
 			else
 				repLabel = "BAD_POWER";
-			int row = drm->GetRowIndex(repLabel);
-			if (row != -1) {
+			TableMgr::index_t row = drm->GetRowIndex(repLabel);
+			if (row != TableMgr::npos) {
 				Actor *actor = GetPC(0, false);
 				actor->LearnSpell(ResRef(drm->QueryField(row, 0)), LS_MEMO | LS_LEARN);
 			}
@@ -2241,13 +2241,13 @@ bool Game::IsTimestopActive() const
 
 bool Game::RandomEncounter(ResRef &BaseArea)
 {
-	if (bntrows<0) {
+	if (bntrows == TableMgr::npos) {
 		AutoTable table = gamedata->LoadTable("bntychnc");
 
 		if (table) {
 			bntrows = table->GetRowCount();
 			bntchnc = (int *) calloc(sizeof(int),bntrows);
-			for(int i = 0; i<bntrows; i++) {
+			for (TableMgr::index_t i = 0; i < bntrows; ++i) {
 				bntchnc[i] = atoi(table->QueryField(i, 0));
 			}
 		} else {
@@ -2255,7 +2255,7 @@ bool Game::RandomEncounter(ResRef &BaseArea)
 		}
 	}
 
-	int rep = Reputation/10;
+	ieDword rep = Reputation / 10;
 	if (rep>=bntrows) return false;
 	if (core->Roll(1, 100, 0)>bntchnc[rep]) return false;
 	// there are non-encounter areas matching the pattern, but they are

@@ -7637,12 +7637,12 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	int max = tm->GetRowCount();
+	TableMgr::index_t max = tm->GetRowCount();
 	int tmp = core->Roll(1,max,0);
 	int i = tmp;
 	bool pass = true;
 	while(--i!=tmp && pass) {
-		if (i<0) {
+		if (i == TableMgr::npos) {
 			pass=false;
 			i=max-1;
 		}

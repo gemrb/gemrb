@@ -382,12 +382,12 @@ static void GetSpellTable(const ResRef& tableRef, std::vector<ResRef>& list)
 	AutoTable tab = gamedata->LoadTable(tableRef);
 	if (!tab) return;
 
-	int column = tab->GetColumnCount() - 1;
-	if (column < 0) return;
+	TableMgr::index_t column = tab->GetColumnCount() - 1;
+	if (column == TableMgr::npos) return;
 
-	int count = tab->GetRowCount();
+	TableMgr::index_t count = tab->GetRowCount();
 	list.resize(count);
-	for (int i = 0; i < count; i++) {
+	for (TableMgr::index_t i = 0; i < count; ++i) {
 		list[i] = ResRef::MakeLowerCase(tab->QueryField(i, column));
 	}
 }
@@ -398,12 +398,12 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 	AutoTable tab = gamedata->LoadTable(tableRef);
 	if (!tab) return;
 
-	int lastCol = tab->GetColumnCount() - 1; // the last column is not numeric, so we'll skip it
+	TableMgr::index_t lastCol = tab->GetColumnCount() - 1; // the last column is not numeric, so we'll skip it
 	if (lastCol < 1) {
 		return;
 	}
 
-	int count = tab->GetRowCount();
+	TableMgr::index_t count = tab->GetRowCount();
 	bool indexlist = false;
 	if (tableRef == "listspll") {
 		indexlist = true;
@@ -411,8 +411,8 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 	} else {
 		list.resize(splList.size()); // needs to be the same size for the simple index lookup we do!
 	}
-	int index;
-	for(int i = 0;i<count;i++) {
+	TableMgr::index_t index;
+	for (TableMgr::index_t i = 0; i < count; ++i) {
 		if (indexlist) {
 			index = i;
 		} else {
@@ -424,11 +424,11 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 				continue;
 			}
 			index = FindSpell(spellRef, splList);
-			assert (index != -1);
+			assert (index != TableMgr::npos);
 		}
 		list[index] = new SpellEntry;
 		list[index]->SetSpell(tab->QueryField(i, lastCol));
-		for(int col=0; col < lastCol; col++) {
+		for (TableMgr::index_t col = 0; col < lastCol; ++col) {
 			list[index]->AddLevel(atoi(tab->QueryField(i, col)), col);
 		}
 	}
@@ -801,10 +801,10 @@ void CREImporter::SetupColor(ieDword &stat) const
 			return;
 		}
 
-		for (int cols = RandColor - 1; cols >= 0; cols--) {
-			int color = atoi(rndcol->QueryField(static_cast<unsigned int>(0), cols));
+		for (TableMgr::index_t cols = RandColor - 1; cols != 0; cols--) {
+			int color = rndcol->QueryFieldSigned<int>(0, cols);
 			randcolors[color] = std::vector<unsigned char>(RandRows - 1);
-			for (size_t i = 1; i < RandRows; i++) {
+			for (TableMgr::index_t i = 1; i < RandRows; i++) {
 				randcolors[color][i - 1] = atoi(rndcol->QueryField(static_cast<unsigned int>(i), cols));
 			}
 		}

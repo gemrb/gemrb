@@ -502,11 +502,11 @@ void GameData::ReadItemSounds()
 		return;
 	}
 
-	int rowCount = itemsnd->GetRowCount();
-	int colCount = itemsnd->GetColumnCount();
-	for (int i = 0; i < rowCount; i++) {
+	TableMgr::index_t rowCount = itemsnd->GetRowCount();
+	TableMgr::index_t colCount = itemsnd->GetColumnCount();
+	for (TableMgr::index_t i = 0; i < rowCount; i++) {
 		ItemSounds[i] = {};
-		for (int j = 0; j < colCount; j++) {
+		for (TableMgr::index_t j = 0; j < colCount; j++) {
 			ResRef snd = ResRef::MakeLowerCase(itemsnd->QueryField(i, j));
 			if (snd == ResRef("*")) break;
 			ItemSounds[i].push_back(snd);
@@ -653,7 +653,7 @@ const Color& GameData::GetColor(const char *row)
 	if (colors.empty()) {
 		AutoTable colorTable = LoadTable("colors", true);
 		assert(colorTable);
-		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
+		for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
 			ieDword c = strtounsigned<ieDword>(colorTable->QueryField(r, 0));
 			colors[colorTable->GetRowName(r)] = Color(c);
 		}
@@ -676,13 +676,13 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 			return 0;
 		}
 
-		int rows = bonusTable->GetRowCount();
-		int cols = bonusTable->GetColumnCount();
+		TableMgr::index_t rows = bonusTable->GetRowCount();
+		TableMgr::index_t cols = bonusTable->GetColumnCount();
 		weaponStyleAPRBonusMax.h = rows;
 		weaponStyleAPRBonusMax.w = cols;
 		weaponStyleAPRBonus.resize(rows * cols);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
+		for (TableMgr::index_t i = 0; i < rows; i++) {
+			for (TableMgr::index_t j = 0; j < cols; j++) {
 				int tmp = atoi(bonusTable->QueryField(i, j));
 				// negative values relate to x/2, so we adjust them
 				// positive values relate to x, so we must times by 2
@@ -718,9 +718,9 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 		return false;
 	}
 
-	size_t count = tm->GetRowCount();
+	TableMgr::index_t count = tm->GetRowCount();
 	data.resize(count);
-	for (size_t i = 0; i < count; i++) {
+	for (TableMgr::index_t i = 0; i < count; i++) {
 		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
 		// * marks an empty resource
 		if (IsStar(data[i])) {
@@ -736,9 +736,9 @@ void GameData::ReadSpellProtTable()
 	if (!tab) {
 		return;
 	}
-	ieDword rowCount = tab->GetRowCount();
+	TableMgr::index_t rowCount = tab->GetRowCount();
 	spellProt.resize(rowCount);
-	for (ieDword i = 0; i < rowCount; i++) {
+	for (TableMgr::index_t i = 0; i < rowCount; ++i) {
 		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
 		spellProt[i].stat = (ieWord) stat;
 		spellProt[i].value = strtounsigned<ieDword>(tab->QueryField(i, 1));
@@ -792,7 +792,7 @@ int GameData::GetAreaAlias(const ResRef &areaName)
 			return -1;
 		}
 
-		int idx = table->GetRowCount();
+		TableMgr::index_t idx = table->GetRowCount();
 		while (idx--) {
 			ResRef key = ResRef::MakeLowerCase(table->GetRowName(idx));
 			ieDword value = atoi(table->QueryField(idx, 0));
@@ -820,9 +820,9 @@ int GameData::GetSpecialSpell(const ResRef& resref)
 			return 0;
 		}
 
-		unsigned int specialSpellsCount = table->GetRowCount();
+		TableMgr::index_t specialSpellsCount = table->GetRowCount();
 		SpecialSpells.resize(specialSpellsCount);
-		for (unsigned int i = 0; i < specialSpellsCount; i++) {
+		for (TableMgr::index_t i = 0; i < specialSpellsCount; ++i) {
 			SpecialSpells[i].resref = table->GetRowName(i);
 			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
 			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
@@ -868,7 +868,7 @@ const SurgeSpell& GameData::GetSurgeSpell(unsigned int idx)
 		assert(table);
 
 		SurgeSpell ss;
-		for (ieDword i = 0; i < table->GetRowCount(); i++) {
+		for (TableMgr::index_t i = 0; i < table->GetRowCount(); i++) {
 			ss.spell = table->QueryField(i, 0);
 			ss.message = table->QueryFieldAsStrRef(i, 1);
 			// comment ignored
@@ -905,7 +905,7 @@ ResRef GameData::GetFist(int cls, int level)
 
 	char clsStr[3];
 	snprintf(clsStr, sizeof(clsStr), "%d", cls);
-	int row = fistWeap->GetRowIndex(clsStr);
+	TableMgr::index_t row = fistWeap->GetRowIndex(clsStr);
 	return fistWeap->QueryField(row, level);
 }
 
@@ -954,9 +954,9 @@ int GameData::GetWeaponStyleBonus(int style, int stars, int bonusType)
 			return 0;
 		}
 
-		int cols = styleTable->GetColumnCount();
+		TableMgr::index_t cols = styleTable->GetColumnCount();
 		for (int star = 0; star <= STYLE_STAR_MAX; star++) {
-			for (int bonus = 0; bonus < cols; bonus++) {
+			for (TableMgr::index_t bonus = 0; bonus < cols; bonus++) {
 				weaponStyleBoni[style][star][bonus] = atoi(styleTable->QueryField(star, bonus));
 			}
 		}
@@ -988,14 +988,14 @@ const std::vector<int>& GameData::GetBonusSpells(int ability)
 			return NoBonus;
 		}
 
-		int splLevels = mxSplBon->GetColumnCount();
+		auto splLevels = mxSplBon->GetColumnCount();
 		int maxStat = core->GetMaximumAbility();
 		bonusSpells.resize(maxStat); // wastes some memory, but makes addressing easier
-		for (ieDword row = 0; row < mxSplBon->GetRowCount(); row++) {
+		for (TableMgr::index_t row = 0; row < mxSplBon->GetRowCount(); ++row) {
 			int statValue = atoi(mxSplBon->GetRowName(row)) - 1;
 			assert(statValue >= 0 && statValue < maxStat);
 			std::vector<int> bonuses(splLevels);
-			for (int i = 0; i < splLevels; i++) {
+			for (TableMgr::index_t i = 0; i < splLevels; i++) {
 				bonuses[i] = atoi(mxSplBon->QueryField(row, i));
 			}
 			bonusSpells[statValue] = bonuses;
@@ -1019,7 +1019,7 @@ ieByte GameData::GetItemAnimation(const ResRef& itemRef)
 			return 0;
 		}
 
-		for (ieDword i = 0; i < table->GetRowCount(); i++) {
+		for (TableMgr::index_t i = 0; i < table->GetRowCount(); ++i) {
 			ResRef item = table->GetRowName(i);
 			itemAnims[item] = static_cast<ieByte>(atoi(table->QueryField(i, 0)));
 		}
@@ -1047,9 +1047,9 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 			return NoData;
 		}
 
-		ieDword tableCount = table->GetRowCount();
+		TableMgr::index_t tableCount = table->GetRowCount();
 		itemUse.resize(tableCount);
-		for (ieDword i = 0; i < tableCount; i++) {
+		for (TableMgr::index_t i = 0; i < tableCount; i++) {
 			itemUse[i].stat = static_cast<ieByte>(core->TranslateStat(table->QueryField(i, 0)));
 			itemUse[i].table = table->QueryField(i, 1);
 			itemUse[i].mcol = static_cast<ieByte>(atoi(table->QueryField(i, 2)));

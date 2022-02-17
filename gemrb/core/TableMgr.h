@@ -44,17 +44,19 @@ class DataStream;
 class GEM_EXPORT TableMgr : public Plugin {
 public:
 	static constexpr TypeID ID = { "Table" };
+	using index_t = size_t;
+	static constexpr index_t npos = -1;
 
 	TableMgr() noexcept = default;
 	/** Returns the actual number of Rows in the Table */
-	virtual ieDword GetRowCount() const = 0;
+	virtual index_t GetRowCount() const = 0;
 	/** Returns the number of Columns in the Table */
-	virtual ieDword GetColNamesCount() const = 0;
+	virtual index_t GetColNamesCount() const = 0;
 	/** Returns the actual number of Columns in a row */
-	virtual ieDword GetColumnCount(unsigned int row = 0) const = 0;
+	virtual index_t GetColumnCount(index_t row = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
 	 * 0,0 returns the default value, it may return NULL */
-	virtual const char* QueryField(size_t row = 0, size_t column = 0) const = 0;
+	virtual const char* QueryField(index_t row = 0, index_t column = 0) const = 0;
 
 	/** Returns a pointer to a zero terminated 2da element,
 	 * uses column name and row name to search the field,
@@ -71,15 +73,15 @@ public:
 	}
 	/** Returns default value of table. */
 	virtual const char* QueryDefault() const = 0;
-	virtual int GetColumnIndex(const char* colname) const = 0;
-	virtual int GetRowIndex(const char* rowname) const = 0;
-	virtual const char* GetColumnName(unsigned int index) const = 0;
+	virtual index_t GetColumnIndex(const char* colname) const = 0;
+	virtual index_t GetRowIndex(const char* rowname) const = 0;
+	virtual const char* GetColumnName(index_t index) const = 0;
 	/** Returns a Row Name, returns NULL on error */
-	virtual const char* GetRowName(unsigned int index) const = 0;
-	virtual int FindTableValue(unsigned int column, long value, int start = 0) const = 0;
-	virtual int FindTableValue(unsigned int column, const char* value, int start = 0) const = 0;
-	virtual int FindTableValue(const char* column, long value, int start = 0) const = 0;
-	virtual int FindTableValue(const char* column, const char* value, int start = 0) const = 0;
+	virtual const char* GetRowName(index_t index) const = 0;
+	virtual index_t FindTableValue(index_t column, long value, index_t start = 0) const = 0;
+	virtual index_t FindTableValue(index_t column, const char* value, index_t start = 0) const = 0;
+	virtual index_t FindTableValue(const char* column, long value, index_t start = 0) const = 0;
+	virtual index_t FindTableValue(const char* column, const char* value, index_t start = 0) const = 0;
 
 	/** Opens a Table File */
 	virtual bool Open(DataStream* stream) = 0;

@@ -129,7 +129,7 @@ private:
 			poi->opcode = i;
 
 			if (!efftextTable) continue;
-			int row = efftextTable->GetRowCount();
+			TableMgr::index_t row = efftextTable->GetRowCount();
 			while (row--) {
 				const char* ret = efftextTable->GetRowName(row);
 				int val;

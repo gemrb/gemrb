@@ -791,7 +791,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject* self, PyObject* args)
 	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
-	int row = tm->GetRowIndex( rowname );
+	TableMgr::index_t row = tm->GetRowIndex(rowname);
 	//no error if the row doesn't exist
 	return PyLong_FromLong(row);
 }
@@ -854,7 +854,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject* self, PyObject* args)
 	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
-	int col = tm->GetColumnIndex( colname );
+	TableMgr::index_t col = tm->GetColumnIndex( colname );
 	//no error if the column doesn't exist
 	return PyLong_FromLong(col);
 }
@@ -2811,8 +2811,8 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 	int k;
 	int links[4];
 	int indices[4];
-	int rows = newarea->GetRowCount();
-	for(int i=0;i<rows;i++) {
+	TableMgr::index_t rows = newarea->GetRowCount();
+	for (TableMgr::index_t i = 0; i < rows; ++i) {
 		const char *area   = newarea->QueryField(i,0);
 		const char *script = newarea->QueryField(i,1);
 		int flags          = atoi(newarea->QueryField(i,2));
@@ -7832,9 +7832,9 @@ static void ReadUsedItems()
 {
 	AutoTable table = gamedata->LoadTable("item_use");
 	if (table) {
-		size_t UsedItemsCount = table->GetRowCount();
+		TableMgr::index_t UsedItemsCount = table->GetRowCount();
 		UsedItems.resize(UsedItemsCount);
-		for (size_t i = 0; i < UsedItemsCount; i++) {
+		for (TableMgr::index_t i = 0; i < UsedItemsCount; i++) {
 			UsedItems[i].itemname = table->GetRowName(i);
 			UsedItems[i].username = ieVariable::MakeLowerCase(table->QueryField(i, 0));
 			if (UsedItems[i].username[0] == '*') {
@@ -7856,9 +7856,9 @@ static void ReadSpecialItems()
 {
 	AutoTable tab = gamedata->LoadTable("itemspec");
 	if (tab) {
-		ieDword SpecialItemsCount = tab->GetRowCount();
+		TableMgr::index_t SpecialItemsCount = tab->GetRowCount();
 		SpecialItems.resize(SpecialItemsCount);
-		for (ieDword i = 0; i < SpecialItemsCount; i++) {
+		for (TableMgr::index_t i = 0; i < SpecialItemsCount; i++) {
 			SpecialItems[i].resref = tab->GetRowName(i);
 			//if there are more flags, compose this value into a bitfield
 			SpecialItems[i].value = tab->QueryFieldAsStrRef(i, 0);
@@ -7871,9 +7871,9 @@ static ieStrRef GetSpellDesc(const ResRef& CureResRef)
 	if (StoreSpells.empty()) {
 		AutoTable tab = gamedata->LoadTable("speldesc");
 		if (tab) {
-			ieDword StoreSpellsCount = tab->GetRowCount();
+			TableMgr::index_t StoreSpellsCount = tab->GetRowCount();
 			StoreSpells.resize(StoreSpellsCount);
-			for (ieDword i = 0; i < StoreSpellsCount; i++) {
+			for (TableMgr::index_t i = 0; i < StoreSpellsCount; i++) {
 				StoreSpells[i].resref = tab->GetRowName(i);
 				StoreSpells[i].value = tab->QueryFieldAsStrRef(i, 0);
 			}
@@ -11913,7 +11913,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 	while (ii--) {
 		Actor *tar = game->GetPC(ii, true);
 		const char* scriptname = tar->GetScriptName();
-		if (pdtable->GetRowIndex(scriptname) != -1) {
+		if (pdtable->GetRowIndex(scriptname) != TableMgr::npos) {
 			ResRef resRef;
 			if (bg2expansion) {
 				resRef = pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE");

@@ -235,7 +235,7 @@ private:
 	std::vector<ResRef> mastarea;
 	std::vector<std::vector<ResRef> > npclevels;
 	int *bntchnc = nullptr;
-	int bntrows = -1;
+	TableMgr::index_t bntrows = TableMgr::npos;
 	CRRow *crtable = nullptr;
 	ResRef restmovies[8];
 	ResRef daymovies[8];

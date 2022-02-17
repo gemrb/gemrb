@@ -46,27 +46,27 @@ public:
 	p2DAImporter& operator=(const p2DAImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	/** Returns the actual number of Rows in the Table */
-	inline ieDword GetRowCount() const override
+	inline index_t GetRowCount() const override
 	{
-		return ( ieDword ) rows.size();
+		return rows.size();
 	}
 
-	inline ieDword GetColNamesCount() const override
+	inline index_t GetColNamesCount() const override
 	{
-		return (ieDword) colNames.size();
+		return colNames.size();
 	}
 
 	/** Returns the actual number of Columns in the Table */
-	inline ieDword GetColumnCount(unsigned int row = 0) const override
+	inline index_t GetColumnCount(index_t row = 0) const override
 	{
 		if (rows.size() <= row) {
 			return 0;
 		}
-		return ( ieDword ) rows[row].size();
+		return rows[row].size();
 	}
 	/** Returns a pointer to a zero terminated 2da element,
 		if it cannot return a value, it returns the default */
-	inline const char* QueryField(size_t row = 0, size_t column = 0) const override
+	inline const char* QueryField(index_t row = 0, index_t column = 0) const override
 	{
 		if (rows.size() <= row) {
 			return (const char *) defVal;
@@ -85,27 +85,27 @@ public:
 		return defVal;
 	}
 
-	inline int GetRowIndex(const char* string) const override
+	inline index_t GetRowIndex(const char* string) const override
 	{
-		for (unsigned int index = 0; index < rowNames.size(); index++) {
+		for (index_t index = 0; index < rowNames.size(); index++) {
 			if (stricmp( rowNames[index], string ) == 0) {
-				return int(index);
+				return index;
 			}
 		}
-		return -1;
+		return npos;
 	}
 
-	inline int GetColumnIndex(const char* string) const override
+	inline index_t GetColumnIndex(const char* string) const override
 	{
-		for (unsigned int index = 0; index < colNames.size(); index++) {
+		for (index_t index = 0; index < colNames.size(); index++) {
 			if (stricmp( colNames[index], string ) == 0) {
-				return int(index);
+				return index;
 			}
 		}
-		return -1;
+		return npos;
 	}
 
-	inline const char* GetColumnName(unsigned int index) const override
+	inline const char* GetColumnName(index_t index) const override
 	{
 		if (index < colNames.size()) {
 			return colNames[index];
@@ -113,7 +113,7 @@ public:
 		return "";
 	}
 
-	inline const char* GetRowName(unsigned int index) const override
+	inline const char* GetRowName(index_t index) const override
 	{
 		if (index < rowNames.size()) {
 			return rowNames[index];
@@ -121,38 +121,38 @@ public:
 		return "";
 	}
 
-	inline int FindTableValue(unsigned int col, long val, int start) const override
+	inline index_t FindTableValue(index_t col, long val, index_t start) const override
 	{
-		ieDword max = GetRowCount();
-		for (ieDword row = start; row < max; row++) {
+		index_t max = GetRowCount();
+		for (index_t row = start; row < max; row++) {
 			const char* ret = QueryField( row, col );
 			long Value;
 			if (valid_signednumber(ret, Value) && (Value == val))
-				return int(row);
+				return row;
 		}
-		return -1;
+		return npos;
 	}
 
-	inline int FindTableValue(unsigned int col, const char* val, int start) const override
+	inline index_t FindTableValue(index_t col, const char* val, index_t start) const override
 	{
-		ieDword max = GetRowCount();
-		for (ieDword row = start; row < max; row++) {
+		index_t max = GetRowCount();
+		for (index_t row = start; row < max; row++) {
 			const char* ret = QueryField( row, col );
 			if (stricmp(ret, val) == 0)
-				return int(row);
+				return row;
 		}
-		return -1;
+		return npos;
 	}
 
-	inline int FindTableValue(const char* col, long val, int start) const override
+	inline index_t FindTableValue(const char* col, long val, index_t start) const override
 	{
-		ieDword coli = GetColumnIndex(col);
+		index_t coli = GetColumnIndex(col);
 		return FindTableValue(coli, val, start);
 	}
 
-	inline int FindTableValue(const char* col, const char* val, int start) const override
+	inline index_t FindTableValue(const char* col, const char* val, index_t start) const override
 	{
-		ieDword coli = GetColumnIndex(col);
+		index_t coli = GetColumnIndex(col);
 		return FindTableValue(coli, val, start);
 	}
 };
