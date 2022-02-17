@@ -612,7 +612,7 @@ void Interface::Main()
 	fpsRgn.y = 0;
 
 	tick_t frame = 0;
-	tick_t time = GetTicks();
+	tick_t time = GetMilliseconds();
 	tick_t timebase = time;
 	double frames = 0.0;
 
@@ -645,7 +645,7 @@ void Interface::Main()
 		// we can create a manager for them and everything can be updated at once
 		GlobalColorCycle.AdvanceTime(time);
 		winmgr->DrawWindows();
-		time = GetTicks();
+		time = GetMilliseconds();
 		if (config.DrawFPS) {
 			frame++;
 			if (time - timebase > 1000) {
@@ -4076,7 +4076,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 	PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 	ai->CreateArchive( &str);
 
-	tick_t startTime = GetTicks();
+	tick_t startTime = GetMilliseconds();
 	// If we override the savegame we are running to fetch AREs from, it has already dumped
 	// itself as "ares.blb" into the cache folder. Otherwise, just copy directly.
 	if (!overrideRunning && saveGameAREExtractor.copyRetainedAREs(&str) == GEM_ERROR) {
@@ -4115,7 +4115,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 		}
 	}
 
-	tick_t endTime = GetTicks();
+	tick_t endTime = GetMilliseconds();
 	Log(WARNING, "Core", "{} ms (compressing SAV file)", endTime - startTime);
 	return GEM_OK;
 }

@@ -30,7 +30,7 @@ namespace GemRB {
 
 void GlobalTimer::Freeze()
 {
-	tick_t thisTime = GetTicks();
+	tick_t thisTime = GetMilliseconds();
 
 	if (UpdateViewport(thisTime) == false) {
 		return;
@@ -132,7 +132,7 @@ bool GlobalTimer::Update()
 	Map *map;
 	Game *game;
 	const GameControl* gc;
-	tick_t thisTime = GetTicks();
+	tick_t thisTime = GetMilliseconds();
 
 	if (!startTime) {
 		goto end;

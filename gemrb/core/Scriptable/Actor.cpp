@@ -4489,7 +4489,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 
 void Actor::PlayWalkSound()
 {
-	tick_t thisTime = GetTicks();
+	tick_t thisTime = GetMilliseconds();
 	if (thisTime<nextWalk) return;
 	int cnt = anims->GetWalkSoundCount();
 	if (!cnt) return;
@@ -7428,7 +7428,7 @@ void Actor::UpdateActorState()
 	}
 
 	if (remainingTalkSoundTime > 0) {
-		tick_t currentTick = GetTicks();
+		tick_t currentTick = GetMilliseconds();
 		tick_t diffTime = currentTick - lastTalkTimeCheckAt;
 		lastTalkTimeCheckAt = currentTick;
 
@@ -11082,7 +11082,7 @@ const char *Actor::GetKitName(ieDword kitID) const
 
 void Actor::SetAnimatedTalking (tick_t length) {
 	remainingTalkSoundTime = std::max(remainingTalkSoundTime, length);
-	lastTalkTimeCheckAt = GetTicks();
+	lastTalkTimeCheckAt = GetMilliseconds();
 }
 
 bool Actor::HasPlayerClass() const

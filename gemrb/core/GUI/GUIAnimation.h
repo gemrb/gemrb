@@ -35,7 +35,7 @@ protected:
 	
 public:
 	GUIAnimation() {
-		begintime = GetTicks();
+		begintime = GetMilliseconds();
 	}
 	
 	virtual ~GUIAnimation() noexcept = default;
@@ -120,7 +120,7 @@ public:
 		this->begin.a = 0xff;
 		this->end.a = 0xff;
 
-		tick_t time = GetTicks();
+		tick_t time = GetMilliseconds();
 		timeOffset = (time >> 7) & 7; // we want to start at the frame that is 0
 	}
 

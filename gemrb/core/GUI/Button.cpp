@@ -126,7 +126,7 @@ void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
-	tick_t time = GetTicks();
+	tick_t time = GetMilliseconds();
 	if (overlayAnim) {
 		overlayAnim.Next(time);
 	}

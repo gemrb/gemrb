@@ -148,7 +148,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 
 	Video* video = core->GetVideoDriver();
 
-	e.time = GetTicks();
+	e.time = GetMilliseconds();
 
 	if (e.type == Event::TextInput) {
 		if (e.text.text.length() == 0) {
@@ -167,7 +167,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 				repeatCount = 1;
 			}
 			repeatKey = e.keyboard.keycode;
-			lastKeyDown = GetTicks();
+			lastKeyDown = GetMilliseconds();
 		}
 
 		e.keyboard.repeats = repeatCount;
@@ -223,7 +223,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 				}
 				repeatPos = se.Pos();
 				repeatButton = btn;
-				lastMouseDown = GetTicks();
+				lastMouseDown = GetMilliseconds();
 			} else if (e.type == Event::MouseUp && e.mouse.buttonStates == 0) {
 				core->GetVideoDriver()->CaptureMouse(false);
 			}

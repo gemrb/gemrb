@@ -403,7 +403,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 	if (windows.empty()) return false;
 
 	if (event.EventMaskFromType(event.type) & Event::AllMouseMask) {
-		TooltipTime = GetTicks();
+		TooltipTime = GetMilliseconds();
 		
 		// handle when mouse leaves the window
 		if (hoverWin && HIT_TEST(event, hoverWin) == false) {
@@ -412,7 +412,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 		}
 	// handled here instead of as a hotkey, so also gamecontrol can do its thing
 	} else if (event.type == Event::KeyDown && event.keyboard.keycode == GEM_TAB) {
-		if (TooltipTime + ToolTipDelay > GetTicks()) {
+		if (TooltipTime + ToolTipDelay > GetMilliseconds()) {
 			TooltipTime -= ToolTipDelay;
 		}
 	}
@@ -499,14 +499,14 @@ void WindowManager::DrawTooltip(Point pos) const
 	}
 
 	if (trackingWin) // if the mouse is held down we dont want tooltips
-		TooltipTime = GetTicks();
+		TooltipTime = GetMilliseconds();
 
 	if (tooltip.time != TooltipTime + ToolTipDelay) {
 		tooltip.time = TooltipTime + ToolTipDelay;
 		tooltip.reset = true;
 	}
 
-	if (hoverWin && TooltipTime && GetTicks() >= tooltip.time) {
+	if (hoverWin && TooltipTime && GetMilliseconds() >= tooltip.time) {
 		if (tooltip.reset) {
 			// reset the tooltip and restart the sound
 			const String& text = hoverWin->TooltipText();

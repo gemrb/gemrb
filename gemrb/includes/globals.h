@@ -194,7 +194,7 @@ std::vector<T> GetElements(const char *str)
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
 using tick_t = unsigned long; // milliseconds
-inline tick_t GetTicks()
+inline tick_t GetMilliseconds()
 {
 	using namespace std::chrono;
 	return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();

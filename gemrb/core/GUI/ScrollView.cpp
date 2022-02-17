@@ -211,7 +211,7 @@ void ScrollView::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation) {
 		// temporarily change the origin for drawing purposes
-		contentView.SetFrameOrigin(animation.Next(GetTicks()));
+		contentView.SetFrameOrigin(animation.Next(GetMilliseconds()));
 	}
 }
 	

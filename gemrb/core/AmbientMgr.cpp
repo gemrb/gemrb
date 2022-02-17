@@ -183,7 +183,7 @@ int AmbientMgr::Play()
 {
 	while (playing) {
 		std::unique_lock<std::recursive_mutex> l(mutex);
-		tick_t time = GetTicks();
+		tick_t time = GetMilliseconds();
 		tick_t delay = Tick(time);
 		assert(delay > 0);
 		cond.wait_for(l, std::chrono::milliseconds(delay));

@@ -75,7 +75,7 @@ Animation::frame_t Animation::LastFrame(void)
 	if (gameAnimation) {
 		starttime = core->GetGame()->Ticks;
 	} else {
-		starttime = GetTicks();
+		starttime = GetMilliseconds();
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
@@ -95,7 +95,7 @@ Animation::frame_t Animation::NextFrame(void)
 		if (gameAnimation) {
 			starttime = core->GetGame()->Ticks;
 		} else {
-			starttime = GetTicks();
+			starttime = GetMilliseconds();
 		}
 	}
 	Holder<Sprite2D> ret;
@@ -107,7 +107,7 @@ Animation::frame_t Animation::NextFrame(void)
 	if (endReached && (Flags&A_ANI_PLAYONCE))
 		return ret;
 
-	tick_t time = gameAnimation ? core->GetGame()->Ticks : GetTicks();
+	tick_t time = gameAnimation ? core->GetGame()->Ticks : GetMilliseconds();
 
 	//it could be that we skip more than one frame in case of slow rendering
 	//large, composite animations (dragons, multi-part area anims) require synchronisation

@@ -80,7 +80,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font)
 void WorldMapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (hoverAnim) {
-		hoverAnim.Next(GetTicks());
+		hoverAnim.Next(GetMilliseconds());
 	}
 }
 
