@@ -110,6 +110,117 @@ bool p2DAImporter::Open(DataStream* str)
 	return true;
 }
 
+/** Returns the actual number of Rows in the Table */
+p2DAImporter::index_t p2DAImporter::GetRowCount() const
+{
+	return rows.size();
+}
+
+p2DAImporter::index_t p2DAImporter::GetColNamesCount() const
+{
+	return colNames.size();
+}
+
+/** Returns the actual number of Columns in the Table */
+p2DAImporter::index_t p2DAImporter::GetColumnCount(index_t row) const
+{
+	if (rows.size() <= row) {
+		return 0;
+	}
+	return rows[row].size();
+}
+/** Returns a pointer to a zero terminated 2da element,
+	if it cannot return a value, it returns the default */
+const char* p2DAImporter::QueryField(index_t row, index_t column) const
+{
+	if (rows.size() <= row) {
+		return defVal.c_str();
+	}
+	if (rows[row].size() <= column) {
+		return defVal.c_str();
+	}
+	if (rows[row][column][0]=='*' && !rows[row][column][1]) {
+		return defVal.c_str();
+	}
+	return rows[row][column];
+}
+
+const char* p2DAImporter::QueryDefault() const
+{
+	return defVal.c_str();
+}
+
+p2DAImporter::index_t p2DAImporter::GetRowIndex(const char* string) const
+{
+	for (index_t index = 0; index < rowNames.size(); index++) {
+		if (stricmp( rowNames[index], string ) == 0) {
+			return index;
+		}
+	}
+	return npos;
+}
+
+p2DAImporter::index_t p2DAImporter::GetColumnIndex(const char* string) const
+{
+	for (index_t index = 0; index < colNames.size(); index++) {
+		if (stricmp( colNames[index], string ) == 0) {
+			return index;
+		}
+	}
+	return npos;
+}
+
+const char* p2DAImporter::GetColumnName(index_t index) const
+{
+	if (index < colNames.size()) {
+		return colNames[index];
+	}
+	return "";
+}
+
+const char* p2DAImporter::GetRowName(index_t index) const
+{
+	if (index < rowNames.size()) {
+		return rowNames[index];
+	}
+	return "";
+}
+
+p2DAImporter::index_t p2DAImporter::FindTableValue(index_t col, long val, index_t start) const
+{
+	index_t max = GetRowCount();
+	for (index_t row = start; row < max; row++) {
+		const char* ret = QueryField( row, col );
+		long Value;
+		if (valid_signednumber(ret, Value) && (Value == val))
+			return row;
+	}
+	return npos;
+}
+
+p2DAImporter::index_t p2DAImporter::FindTableValue(index_t col, const char* val, index_t start) const
+{
+	index_t max = GetRowCount();
+	for (index_t row = start; row < max; row++) {
+		const char* ret = QueryField( row, col );
+		if (stricmp(ret, val) == 0)
+			return row;
+	}
+	return npos;
+}
+
+p2DAImporter::index_t p2DAImporter::FindTableValue(const char* col, long val, index_t start) const
+{
+	index_t coli = GetColumnIndex(col);
+	return FindTableValue(coli, val, start);
+}
+
+p2DAImporter::index_t p2DAImporter::FindTableValue(const char* col, const char* val, index_t start) const
+{
+	index_t coli = GetColumnIndex(col);
+	return FindTableValue(coli, val, start);
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xB22F938, "2DA File Importer")
