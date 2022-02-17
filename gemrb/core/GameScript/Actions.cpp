@@ -2231,7 +2231,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		//we abort the command, everyone should be here
 		if (map->LastGoCloser < game->Ticks) {
 			displaymsg->DisplayConstantString(STR_WHOLEPARTY, DMC_WHITE);
-			map->LastGoCloser = game->Ticks + 6000;
+			map->LastGoCloser = game->Ticks + core->Time.round_size;
 		}
 		Sender->ReleaseCurrentAction();
 		return;

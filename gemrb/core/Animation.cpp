@@ -102,8 +102,9 @@ Animation::frame_t Animation::NextFrame(void)
 		return ret;
 
 	tick_t time;
+	tick_t delta = 1000 / fps; // duration per frame in ms
 	if (gameAnimation) {
-		time = core->GetGame()->Ticks;
+		time = core->GetGame()->GameTime * 1000 / core->Time.ai_update_time;
 	} else {
 		time = GetMilliseconds();
 	}
@@ -111,10 +112,10 @@ Animation::frame_t Animation::NextFrame(void)
 
 	//it could be that we skip more than one frame in case of slow rendering
 	//large, composite animations (dragons, multi-part area anims) require synchronisation
-	if ((time - starttime) >= tick_t(1000 / fps)) {
-		tick_t inc = (time-starttime) * fps / 1000;
+	if (time - starttime >= delta) {
+		tick_t inc = (time - starttime) / delta;
 		frameIdx += inc;
-		starttime += inc*1000/fps;
+		starttime = time;
 	}
 	if (frameIdx >= GetFrameCount()) {
 		if (!frames.empty()) {

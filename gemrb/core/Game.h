@@ -262,7 +262,6 @@ public:
 	int protagonist = PM_YES;
 	/** if party size exceeds this amount, a callback will be called */
 	size_t partysize = 6;
-	ieDword interval = 1000 / AI_UPDATE_TIME; // a tenth of a round in ms
 	std::atomic_uint32_t GameTime {0};
 	ieDword RealTime = 0;
 	ieWord  WhichFormation = 0;

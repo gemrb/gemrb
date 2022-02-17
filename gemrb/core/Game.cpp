@@ -1374,7 +1374,6 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		GetCurrentArea()->AutoLockDoors();
 	}
 
-	Ticks+=add*interval;
 	if (!fatigue) {
 		// update everyone in party, so they think no time has passed
 		// nobody else, including familiars, gets luck penalties from fatigue

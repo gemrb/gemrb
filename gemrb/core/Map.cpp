@@ -582,7 +582,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	case CT_GO_CLOSER:
 		if (LastGoCloser<game->Ticks) {
 			displaymsg->DisplayConstantString(STR_WHOLEPARTY, DMC_WHITE); //white
-			LastGoCloser = game->Ticks+6000;
+			LastGoCloser = game->Ticks + core->Time.round_size;
 		}
 		if (game->EveryoneStopped()) {
 			ip->Flags&=~TRAP_RESET; //exit triggered
