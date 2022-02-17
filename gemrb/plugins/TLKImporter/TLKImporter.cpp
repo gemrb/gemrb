@@ -56,7 +56,7 @@ TLKImporter::TLKImporter(void)
 		ieVariable key = ieVariable::MakeUpperCase(tm->GetRowName(i));
 
 		gt_type *entry = new gt_type;
-		entry->type = atoi(tm->QueryField(i,0));
+		entry->type = tm->QueryFieldSigned<int>(i,0);
 		entry->male = tm->QueryFieldAsStrRef(i,1);
 		entry->female = tm->QueryFieldAsStrRef(i,2);
 		gtmap.SetAt(key, (void *) entry);

@@ -2815,19 +2815,19 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
 		const char *area   = newarea->QueryField(i,0);
 		const char *script = newarea->QueryField(i,1);
-		int flags          = atoi(newarea->QueryField(i,2));
-		int icon           = atoi(newarea->QueryField(i,3));
-		int locx           = atoi(newarea->QueryField(i,4));
-		int locy           = atoi(newarea->QueryField(i,5));
-		int label          = atoi(newarea->QueryField(i,6));
-		int name           = atoi(newarea->QueryField(i,7));
+		int flags          = newarea->QueryFieldSigned<int>(i,2);
+		int icon           = newarea->QueryFieldSigned<int>(i,3);
+		int locx           = newarea->QueryFieldSigned<int>(i,4);
+		int locy           = newarea->QueryFieldSigned<int>(i,5);
+		int label          = newarea->QueryFieldSigned<int>(i,6);
+		int name           = newarea->QueryFieldSigned<int>(i,7);
 		const char *ltab   = newarea->QueryField(i,8);
-		links[static_cast<int>(WMPDirection::NORTH)] = atoi(newarea->QueryField(i, 9));
-		links[static_cast<int>(WMPDirection::EAST)] = atoi(newarea->QueryField(i, 10));
-		links[static_cast<int>(WMPDirection::SOUTH)] = atoi(newarea->QueryField(i, 11));
-		links[static_cast<int>(WMPDirection::WEST)] = atoi(newarea->QueryField(i, 12));
+		links[static_cast<int>(WMPDirection::NORTH)] = newarea->QueryFieldSigned<int>(i, 9);
+		links[static_cast<int>(WMPDirection::EAST)] = newarea->QueryFieldSigned<int>(i, 10);
+		links[static_cast<int>(WMPDirection::SOUTH)] = newarea->QueryFieldSigned<int>(i, 11);
+		links[static_cast<int>(WMPDirection::WEST)] = newarea->QueryFieldSigned<int>(i, 12);
 		//this is the number of links in the 2da, we don't need it
-		int linksto        = atoi(newarea->QueryField(i,13));
+		int linksto        = newarea->QueryFieldSigned<int>(i,13);
 
 		unsigned int local = 0;
 		int linkcnt = wmap->GetLinkCount();
@@ -2861,14 +2861,14 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		wmap->AddAreaEntry(std::move(entry));
 		for (unsigned int j=0;j<total;j++) {
 			const char *larea = newlinks->QueryField(j,0);
-			int lflags        = atoi(newlinks->QueryField(j,1));
+			int lflags        = newlinks->QueryFieldSigned<int>(j,1);
 			const char *ename = newlinks->QueryField(j,2);
-			int distance      = atoi(newlinks->QueryField(j,3));
-			int encprob       = atoi(newlinks->QueryField(j,4));
+			int distance      = newlinks->QueryFieldSigned<int>(j,3);
+			int encprob       = newlinks->QueryFieldSigned<int>(j,4);
 			for(k=0;k<5;k++) {
 				enc[k]    = newlinks->QueryField(i,5+k);
 			}
-			int linktodir     = atoi(newlinks->QueryField(j,10));
+			int linktodir     = newlinks->QueryFieldSigned<int>(j,10);
 
 			unsigned int areaindex;
 			const WMPAreaEntry *oarea = wmap->GetArea(larea, areaindex);
@@ -7847,7 +7847,7 @@ static void ReadUsedItems()
 			//4 - can only swap it for something else
 			//8 - (pst) can only be equipped in eye slots
 			//16 - (pst) can only be equipped in ear slots
-			UsedItems[i].flags = atoi(table->QueryField(i, 2));
+			UsedItems[i].flags = table->QueryFieldSigned<int>(i, 2);
 		}
 	}
 }
@@ -10502,10 +10502,10 @@ static void ReadActionButtons()
 	for (unsigned int i = 0; i < MAX_ACT_COUNT; i++) {
 		packtype row;
 
-		row.bytes[0] = (ieByte) atoi( tab->QueryField(i,0) );
-		row.bytes[1] = (ieByte) atoi( tab->QueryField(i,1) );
-		row.bytes[2] = (ieByte) atoi( tab->QueryField(i,2) );
-		row.bytes[3] = (ieByte) atoi( tab->QueryField(i,3) );
+		row.bytes[0] = tab->QueryFieldUnsigned<ieByte>(i,0);
+		row.bytes[1] = tab->QueryFieldUnsigned<ieByte>(i,1);
+		row.bytes[2] = tab->QueryFieldUnsigned<ieByte>(i,2);
+		row.bytes[3] = tab->QueryFieldUnsigned<ieByte>(i,3);
 		GUIAction[i] = row.data;
 		GUITooltip[i] = tab->QueryFieldAsStrRef(i,4);
 		GUIResRef[i] = tab->QueryField(i, 5);

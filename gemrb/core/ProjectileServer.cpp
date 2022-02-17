@@ -86,7 +86,7 @@ ProjectileServer::ProjectileServer() noexcept
 				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i));
 			}
 			//using i so the flags field will always be after the resources
-			explosions[rows].flags = atoi(explist->QueryField(rows,i));
+			explosions[rows].flags = explist->QueryFieldSigned<int>(rows,i);
 		}
 	}
 }

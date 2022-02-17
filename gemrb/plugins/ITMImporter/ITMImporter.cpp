@@ -44,7 +44,7 @@ static void Initializer()
 	TableMgr::index_t profcount = tm->GetRowCount();
 	profs.resize(profcount);
 	for (TableMgr::index_t i = 0; i < profcount; i++) {
-		profs[i] = atoi(tm->QueryField( i, 0 ) );
+		profs[i] = tm->QueryFieldSigned<int>(i, 0);
 	}
 
 	// check for iwd1 zz-weapon bonus table
@@ -229,7 +229,7 @@ Item* ITMImporter::GetItem(Item *s)
 
 	if (exclusionTable) {
 		TableMgr::index_t row = exclusionTable->GetRowIndex(s->Name);
-		s->ItemExcl = atoi(exclusionTable->QueryField(row, 0));
+		s->ItemExcl = exclusionTable->QueryFieldUnsigned<ieDword>(row, 0);
 	} else {
 		s->ItemExcl = 0;
 	}

@@ -73,7 +73,7 @@ class Formations {
 		formations.reserve(formationcount);
 		for (unsigned int i = 0; i < formationcount; i++) {
 			for (uint8_t j = 0; j < FORMATIONSIZE; j++) {
-				Point p(atoi(tab->QueryField(i, j*2)), atoi(tab->QueryField(i, j*2+1)));
+				Point p(tab->QueryFieldSigned<int>(i, j*2), tab->QueryFieldSigned<int>(i, j*2+1));
 				formations[i][j] = p;
 			}
 		}

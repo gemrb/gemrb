@@ -94,7 +94,7 @@ void InitScriptTables()
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
-				happiness[alignment][reputation] = strtosigned<int>(tab->QueryField(reputation,alignment));
+				happiness[alignment][reputation] = tab->QueryFieldSigned<int>(reputation,alignment);
 			}
 		}
 	}
@@ -103,7 +103,7 @@ void InitScriptTables()
 	AutoTable rmr = gamedata->LoadTable("rmodrep");
 	if (rmr) {
 		for (int reputation=0; reputation<MAX_REP_COLUMN; reputation++) {
-			rmodrep[reputation] = strtosigned<int>(rmr->QueryField(0, reputation));
+			rmodrep[reputation] = rmr->QueryFieldSigned<int>(0, reputation);
 		}
 	}
 
@@ -111,7 +111,7 @@ void InitScriptTables()
 	AutoTable rmc = gamedata->LoadTable("rmodchr");
 	if (rmc) {
 		for (int charisma=0; charisma<MAX_CHR_COLUMN; charisma++) {
-			rmodchr[charisma] = strtosigned<int>(rmc->QueryField(0, charisma));
+			rmodchr[charisma] = rmc->QueryFieldSigned<int>(0, charisma);
 		}
 	}
 
@@ -2611,8 +2611,8 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	
 	std::vector<Point> p(cnt);
 	while(cnt--) {
-		p[cnt].x = atoi(tm->QueryField(cnt, 0));
-		p[cnt].y = atoi(tm->QueryField(cnt, 1));
+		p[cnt].x = tm->QueryFieldSigned<int>(cnt, 0);
+		p[cnt].y = tm->QueryFieldSigned<int>(cnt, 1);
 	}
 
 	polygons[index] = new Gem_Polygon(std::move(p), nullptr);

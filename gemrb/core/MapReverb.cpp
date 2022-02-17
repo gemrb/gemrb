@@ -85,7 +85,7 @@ unsigned char MapReverb::obtainProfile () {
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
 		ResRef mapName = reverbMapping->GetRowName(i);
 		if (mapName == map.WEDResRef) {
-			uint8_t profile = strtounsigned<uint8_t>(reverbMapping->QueryField(i, 0));
+			uint8_t profile = reverbMapping->QueryFieldUnsigned<uint8_t>(i, 0);
 
 			if (profile < EFX_MAX_REVERB_PROFILE_INDEX) {
 				configValue = profile;

@@ -169,13 +169,13 @@ private:
 			fix = atoi(tmp);
 			for (int i=0;i<fix;i++) {
 				for (int j=0;j<columns;j++) {
-					table[rows*j+i] = strtosigned<ieWordSigned>(tab->QueryField(0,j));
+					table[rows*j+i] = tab->QueryFieldSigned<ieWordSigned>(0,j);
 				}
 			}
 		}
 		for (int j=0;j<columns;j++) {
 			for( int i=0;i<rows-fix;i++) {
-				table[rows*j+i+fix] = strtosigned<ieWordSigned>(tab->QueryField(i,j));
+				table[rows*j+i+fix] = tab->QueryFieldSigned<ieWordSigned>(i,j);
 			}
 		}
 		return true;
@@ -516,11 +516,11 @@ bool Interface::ReadGameTimeTable()
 	}
 
 	Time.ai_update_time = AI_UPDATE_TIME;
-	Time.round_sec = atoi(table->QueryField("ROUND_SECONDS", "DURATION"));
-	Time.turn_sec = atoi(table->QueryField("TURN_SECONDS", "DURATION"));
+	Time.round_sec = table->QueryFieldUnsigned<unsigned int>("ROUND_SECONDS", "DURATION");
+	Time.turn_sec = table->QueryFieldUnsigned<unsigned int>("TURN_SECONDS", "DURATION");
 	Time.round_size = Time.round_sec * Time.ai_update_time;
 	Time.rounds_per_turn = Time.turn_sec / Time.round_sec;
-	Time.attack_round_size = atoi(table->QueryField("ATTACK_ROUND", "DURATION"));
+	Time.attack_round_size = table->QueryFieldUnsigned<unsigned int>("ATTACK_ROUND", "DURATION");
 	Time.hour_sec = 300; // move to table if pst turns out to be different
 	Time.hour_size = Time.hour_sec * Time.ai_update_time;
 	Time.day_sec = Time.hour_sec * 24; // move to table if pst turns out to be different
@@ -554,11 +554,11 @@ bool Interface::ReadDamageTypeTable() {
 
 	DamageInfoStruct di;
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
-		di.strref = DisplayMessage::GetStringReference(atoi(tm->QueryField(i, 0)));
+		di.strref = DisplayMessage::GetStringReference(tm->QueryFieldUnsigned<size_t>(i, 0));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2), nullptr, 16);
-		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
-		di.reduction = atoi(tm->QueryField(i, 4));
+		di.iwd_mod_type = tm->QueryFieldSigned<int>(i, 3);
+		di.reduction = tm->QueryFieldSigned<int>(i, 4);
 		DamageInfoMap.emplace(di.value, di);
 	}
 
@@ -579,7 +579,7 @@ bool Interface::ReadSoundChannelsTable() const
 		// translate some alternative names for the IWDs
 		if (!strcmp(rowname, "ACTION")) rowname = "ACTIONS";
 		else if (!strcmp(rowname, "SWING")) rowname = "SWINGS";
-		AudioDriver->SetChannelVolume(rowname, atoi(tm->QueryField(i, ivol)));
+		AudioDriver->SetChannelVolume(rowname, tm->QueryFieldSigned<int>(i, ivol));
 		if (irev != TableMgr::npos) {
 			AudioDriver->SetChannelReverb(rowname, atof(tm->QueryField(i, irev)));
 		}
@@ -763,7 +763,7 @@ int Interface::LoadFonts()
 
 		ResRef resref = tab->QueryField(rowName, "RESREF");
 		const char* font_name = tab->QueryField( rowName, "FONT_NAME" );
-		ieWord font_size = atoi( tab->QueryField( rowName, "PX_SIZE" ) ); // not available in BAM fonts.
+		ieWord font_size = tab->QueryFieldUnsigned<ieWord>( rowName, "PX_SIZE" ); // not available in BAM fonts.
 		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) ); // not available in BAM fonts.
 		bool background = atoi(tab->QueryField(rowName, "BACKGRND"));
 
@@ -2451,9 +2451,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	AutoTable sttable = gamedata->LoadTable(movieRef);
 	Font* font = GetFont(MovieFontResRef);
 	if (sttable && font) {
-		int r = atoi(sttable->QueryField("red", "frame"));
-		int g = atoi(sttable->QueryField("green", "frame"));
-		int b = atoi(sttable->QueryField("blue", "frame"));
+		int r = sttable->QueryFieldSigned<int>("red", "frame");
+		int g = sttable->QueryFieldSigned<int>("green", "frame");
+		int b = sttable->QueryFieldSigned<int>("blue", "frame");
 
 		if (r || g || b) {
 			mp->SetSubtitles(new IESubtitles(font, sttable, Color(r, g, b, 0xff)));
@@ -2951,7 +2951,7 @@ bool Interface::InitItemTypes()
 			unsigned int value = 0;
 			unsigned int k = 1;
 			for (TableMgr::index_t j = 0; j < InvSlotTypes; ++j) {
-				if (strtosigned<long>(it->QueryField(i,j))) {
+				if (it->QueryFieldSigned<long>(i,j)) {
 					value |= k;
 				}
 				k <<= 1;
@@ -2978,11 +2978,11 @@ bool Interface::InitItemTypes()
 		TableMgr::index_t armcount = af->GetRowCount();
 		TableMgr::index_t colcount = af->GetColumnCount();
 		for (TableMgr::index_t i = 0; i < armcount; i++) {
-			int itemtype = (ieWord) atoi( af->QueryField(i,0) );
+			size_t itemtype = af->QueryFieldUnsigned<size_t>(i, 0);
 			if (itemtype<ItemTypes) {
 				// we don't need the itemtype column, since it is equal to the position
 				for (TableMgr::index_t j = 0; j < colcount - 1; ++j) {
-					itemtypedata[itemtype][j] = atoi(af->QueryField(i, j+1));
+					itemtypedata[itemtype][j] = af->QueryFieldSigned<int>(i, j+1);
 				}
 			}
 		}
@@ -3008,16 +3008,16 @@ bool Interface::InitItemTypes()
 				slotTypes[row].slot = i;
 				alias = false;
 			}
-			slotTypes[i].slotType = strtounsigned<ieDword>(st->QueryField(row, 0));
-			slotTypes[i].slotID = strtounsigned<ieDword>(st->QueryField(row, 1));
+			slotTypes[i].slotType = st->QueryFieldUnsigned<ieDword>(row, 0);
+			slotTypes[i].slotID = st->QueryFieldUnsigned<ieDword>(row, 1);
 			slotTypes[i].slotResRef = st->QueryField(row, 2);
-			slotTypes[i].slotTip = strtounsigned<ieDword>(st->QueryField(row, 3));
-			slotTypes[i].slotFlags = strtounsigned<ieDword>(st->QueryField(row, 5));
+			slotTypes[i].slotTip = st->QueryFieldUnsigned<ieDword>(row, 3);
+			slotTypes[i].slotFlags = st->QueryFieldUnsigned<ieDword>(row, 5);
 			//don't fill sloteffects for aliased slots (pst)
 			if (alias) {
 				continue;
 			}
-			slotTypes[i].slotEffects = strtounsigned<ieDword>(st->QueryField(row, 4));
+			slotTypes[i].slotEffects = st->QueryFieldUnsigned<ieDword>(row, 4);
 			//setting special slots
 			if (slotTypes[i].slotType & SLOT_ITEM) {
 				if (slotTypes[i].slotType & SLOT_INVENTORY) {
@@ -4377,8 +4377,8 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 	// tables for additive modifiers of bonus type
 	for (TableMgr::index_t i = 0; i < count; i++) {
 		ResRef subTableName = mtm->GetRowName(i);
-		int checkcol = strtosigned<int>(mtm->QueryField(i,1));
-		unsigned int readcol = strtounsigned<unsigned int>(mtm->QueryField(i,2));
+		int checkcol = mtm->QueryFieldSigned<int>(i,1);
+		unsigned int readcol = mtm->QueryFieldUnsigned<unsigned int>(i,2);
 		int stat = TranslateStat(mtm->QueryField(i,0) );
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
@@ -4396,7 +4396,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 			row = tm->FindTableValue(checkcol, value, 0);
 		}
 		if (row != TableMgr::npos) {
-			ret += strtosigned<int>(tm->QueryField(row, readcol));
+			ret += tm->QueryFieldSigned<int>(row, readcol);
 		}
 	}
 	return ret;

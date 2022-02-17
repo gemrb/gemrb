@@ -430,10 +430,10 @@ void Game::InitActorPos(Actor *actor) const
 	const char *area = start->QueryField(mode[playmode],"AREA");
 	const char *rot = start->QueryField(mode[playmode],"ROT");
 
-	actor->Pos.x = actor->Destination.x = atoi(strta->QueryField(strta->GetRowIndex(xpos), ip));
-	actor->Pos.y = actor->Destination.y = atoi(strta->QueryField(strta->GetRowIndex(ypos), ip));
+	actor->Pos.x = actor->Destination.x = strta->QueryFieldSigned<int>(strta->GetRowIndex(xpos), ip);
+	actor->Pos.y = actor->Destination.y = strta->QueryFieldSigned<int>(strta->GetRowIndex(ypos), ip);
 	actor->HomeLocation = actor->Pos;
-	actor->SetOrientation(ClampToOrientation(atoi(strta->QueryField(strta->GetRowIndex(rot), ip))), false);
+	actor->SetOrientation(ClampToOrientation(strta->QueryFieldSigned<int>(strta->GetRowIndex(rot), ip)), false);
 
 	strta = gamedata->LoadTable("startare");
 	if (strta) {
@@ -1144,7 +1144,7 @@ void Game::LoadCRTable()
 			for(TableMgr::index_t j = 0; j < MAX_CRLEVEL; ++j) {
 				//col shouldn't be larger than maxcol
 				TableMgr::index_t col = j<maxcol?j:maxcol;
-				crtable[i][j]=atoi(table->QueryField(row,col) );
+				crtable[i][j] = table->QueryFieldSigned<int>(row,col);
 			}
 		}
 	}
@@ -2248,7 +2248,7 @@ bool Game::RandomEncounter(ResRef &BaseArea)
 			bntrows = table->GetRowCount();
 			bntchnc = (int *) calloc(sizeof(int),bntrows);
 			for (TableMgr::index_t i = 0; i < bntrows; ++i) {
-				bntchnc[i] = atoi(table->QueryField(i, 0));
+				bntchnc[i] = table->QueryFieldSigned<int>(i, 0);
 			}
 		} else {
 			bntrows = 0;
