@@ -25,7 +25,6 @@
 
 using namespace GemRB;
 
-#define MAXLENGTH 8192      //if a 2da has longer lines, change this
 #define SIGNLENGTH 256      //if a 2da has longer default value, change this
 
 p2DAImporter::p2DAImporter(void)
@@ -70,20 +69,20 @@ bool p2DAImporter::Open(DataStream* str)
 	}
 	bool colHead = true;
 	int row = 0;
+	
+	constexpr int MAXLENGTH = 8192;
+	char buffer[MAXLENGTH]; // we can increase this if needed, but beware since it is a stack buffer
 	while (true) {
-		char* line = ( char* ) malloc( MAXLENGTH );
-		strret_t len = str->ReadLine( line, MAXLENGTH-1 );
+		strret_t len = str->ReadLine(buffer, MAXLENGTH);
 		if (len <= 0) {
-			free( line );
 			break;
 		}
-		if (line[0] == '#') { // allow comments
-			free( line );
+		if (buffer[0] == '#') { // allow comments
 			continue;
 		}
-		if (len < MAXLENGTH)
-			line = ( char * ) realloc( line, len + 1 );
-		ptrs.push_back( line );
+
+		ptrs.push_back(strdup(buffer));
+		char* line = ptrs.back();
 		if (colHead) {
 			colHead = false;
 			char* cell = strtok(line, " ");
