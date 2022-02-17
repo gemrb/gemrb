@@ -352,8 +352,8 @@ struct avType {
 	AutoTable avtable;
 	int stat;
 };
-static avType *avPrefix;
-static int avCount = -1;
+
+static std::vector<avType> avPrefix;
 
 Actor::Actor()
 	: Movable( ST_ACTOR )
@@ -2354,14 +2354,11 @@ static void InitActorTables()
 
 	//preload stat derived animation tables
 	tm = gamedata->LoadTable("avprefix");
-	delete [] avPrefix;
 	avBase = 0;
-	avCount = -1;
 	if (tm) {
 		int count = tm->GetRowCount();
 		if (count> 0 && count<8) {
-			avCount = count-1;
-			avPrefix = new avType[count];
+			avPrefix.resize(count - 1);
 			avBase = strtosigned<int>(tm->QueryField(0));
 			const char *poi = tm->QueryField(0,1);
 			if (*poi!='*') {
@@ -2369,7 +2366,7 @@ static void InitActorTables()
 			} else {
 				avStance = -1;
 			}
-			for (int i = 0; i < avCount; i++) {
+			for (size_t i = 0; i < avPrefix.size(); i++) {
 				avPrefix[i].avresref = tm->QueryField(i + 1);
 				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
@@ -10869,7 +10866,6 @@ bool Actor::IsInvisibleTo(const Scriptable *checker) const
 
 int Actor::UpdateAnimationID(bool derived)
 {
-	if (avCount<0) return 1;
 	// the base animation id
 	int AnimID = avBase;
 	int StatID = derived?GetSafeStat(IE_ANIMATION_ID):avBase;
@@ -10877,12 +10873,12 @@ int Actor::UpdateAnimationID(bool derived)
 	if (!InParty) return 1; //too many bugs caused by buggy game data, we change only PCs
 
 	// tables for additive modifiers of the animation id (race, gender, class)
-	for (int i = 0; i < avCount; i++) {
-		const AutoTable tm = avPrefix[i].avtable;
+	for (const auto& av : avPrefix) {
+		const AutoTable tm = av.avtable;
 		if (!tm) {
 			return -3;
 		}
-		StatID = avPrefix[i].stat;
+		StatID = av.stat;
 		StatID = derived?GetSafeStat(StatID):GetBase( StatID );
 
 		const char *poi = tm->QueryField( StatID );
