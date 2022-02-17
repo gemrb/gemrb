@@ -66,10 +66,20 @@ public:
 		return QueryField(GetRowIndex(row), GetColumnIndex(column));
 	}
 	
+	template <typename RET_T, typename ROW_T, typename COL_T>
+	RET_T QueryFieldUnsigned(ROW_T row, COL_T column) const {
+		return strtounsigned<RET_T>(QueryField(row, column));
+	}
+	
+	template <typename RET_T, typename ROW_T, typename COL_T>
+	RET_T QueryFieldSigned(ROW_T row, COL_T column) const {
+		return strtosigned<RET_T>(QueryField(row, column));
+	}
+	
 	template <typename ROW_T, typename COL_T>
 	ieStrRef QueryFieldAsStrRef(ROW_T row, COL_T column) const {
-		auto field = QueryField(row, column);
-		return static_cast<ieStrRef>(strtounsigned<ieDword>(field));
+		auto field = QueryFieldUnsigned<ieDword>(row, column);
+		return static_cast<ieStrRef>(field);
 	}
 	/** Returns default value of table. */
 	virtual const char* QueryDefault() const = 0;

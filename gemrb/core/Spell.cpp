@@ -61,8 +61,8 @@ private:
 			spellfocus.resize(schoolcount);
 			for (TableMgr::index_t i = 0; i < schoolcount; i++) {
 				ieDword stat = core->TranslateStat(tm->QueryField(i, 0));
-				ieDword val1 = atoi(tm->QueryField(i, 1));
-				ieDword val2 = atoi(tm->QueryField(i, 2));
+				ieDword val1 = tm->QueryFieldUnsigned<ieDword>(i, 1);
+				ieDword val2 = tm->QueryFieldUnsigned<ieDword>(i, 2);
 				spellfocus[i].stat = stat;
 				spellfocus[i].val1 = val1;
 				spellfocus[i].val2 = val2;

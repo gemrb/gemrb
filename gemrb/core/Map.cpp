@@ -221,7 +221,7 @@ private:
 			}
 			if (j>0) {
 				//difficulty
-				int level = atoi(tab->QueryField(0, i));
+				int level = tab->QueryFieldSigned<int>(0, i);
 				for (;j;j--) {
 					resrefs[j - 1] = tab->QueryField(j, i);
 				}

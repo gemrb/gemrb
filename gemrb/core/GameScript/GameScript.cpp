@@ -1450,7 +1450,7 @@ void InitializeIEScript()
 
 	/* Loading Script Configuration Parameters */
 
-	ObjectIDSCount = atoi( objNameTable->QueryField() );
+	ObjectIDSCount = objNameTable->QueryFieldSigned<int>(0, 0);
 	if (ObjectIDSCount<0 || ObjectIDSCount>MAX_OBJECT_FIELDS) {
 		error("GameScript", "The IDS Count shouldn't be more than 10!");
 	}
@@ -1468,13 +1468,13 @@ void InitializeIEScript()
 		}
 		ObjectIDSTableNames[i] = ResRef::MakeLowerCase(idsname);
 	}
-	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
+	MaxObjectNesting = objNameTable->QueryFieldSigned<int>(1, 0);
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
 		error("GameScript", "The Object Nesting Count shouldn't be more than 5!");
 	}
-	HasAdditionalRect = ( atoi( objNameTable->QueryField( 2 ) ) != 0 );
-	ExtraParametersCount = atoi( objNameTable->QueryField( 3 ) );
-	HasTriggerPoint = ( atoi( objNameTable->QueryField( 4 ) ) != 0 );
+	HasAdditionalRect = objNameTable->QueryFieldSigned<int>(2, 0) != 0;
+	ExtraParametersCount = objNameTable->QueryFieldSigned<int>(3, 0);
+	HasTriggerPoint = objNameTable->QueryFieldSigned<int>(4, 0) != 0;
 	ObjectFieldsCount = ObjectIDSCount - ExtraParametersCount;
 
 	/* Initializing the Script Engine */

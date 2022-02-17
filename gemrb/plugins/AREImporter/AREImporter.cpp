@@ -151,7 +151,7 @@ static int GetTrackString(const ResRef &areaName)
 				tracks[i].trackFlag=trackflag;
 			}
 			tracks[i].text = ieStrRef(atoi(poi));
-			tracks[i].difficulty=atoi(tm->QueryField(i,1));
+			tracks[i].difficulty = tm->QueryFieldSigned<int>(i,1);
 			tracks[i].areaName = ResRef::MakeLowerCase(tm->GetRowName(i));
 		}
 	}

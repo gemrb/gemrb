@@ -429,7 +429,7 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 		list[index] = new SpellEntry;
 		list[index]->SetSpell(tab->QueryField(i, lastCol));
 		for (TableMgr::index_t col = 0; col < lastCol; ++col) {
-			list[index]->AddLevel(atoi(tab->QueryField(i, col)), col);
+			list[index]->AddLevel(tab->QueryFieldSigned<int>(i, col), col);
 		}
 	}
 }
@@ -802,10 +802,10 @@ void CREImporter::SetupColor(ieDword &stat) const
 		}
 
 		for (TableMgr::index_t cols = RandColor - 1; cols != 0; cols--) {
-			int color = atoi(rndcol->QueryField(static_cast<unsigned int>(0), cols));
+			int color = rndcol->QueryFieldSigned<int>(0, cols);
 			randcolors[color] = std::vector<unsigned char>(RandRows - 1);
 			for (TableMgr::index_t i = 1; i < RandRows; i++) {
-				randcolors[color][i - 1] = atoi(rndcol->QueryField(static_cast<unsigned int>(i), cols));
+				randcolors[color][i - 1] = rndcol->QueryFieldUnsigned<unsigned char>(i, cols);
 			}
 		}
 	}

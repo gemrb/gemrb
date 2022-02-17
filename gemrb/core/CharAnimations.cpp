@@ -86,8 +86,8 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
 		table[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3);
 		table[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4);
-		table[i].AnimationType=(ieByte) atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
-		table[i].CircleSize=(ieByte) atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
+		table[i].AnimationType = Avatars->QueryFieldUnsigned<ieByte>(i,AV_ANIMTYPE);
+		table[i].CircleSize = Avatars->QueryFieldUnsigned<ieByte>(i,AV_CIRCLESIZE);
 		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
 		//QueryField will always return a zero terminated string
 		//so tmp[0] must exist
@@ -97,7 +97,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			strncpy( (char *) &table[i].PaletteType, tmp, 3);
 		}
 		else {
-			table[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );
+			table[i].PaletteType = Avatars->QueryFieldUnsigned<unsigned int>(i,AV_USE_PALETTE);
 		}
 		char size = Avatars->QueryField(i,AV_SIZE)[0];
 		if (size == '*') {

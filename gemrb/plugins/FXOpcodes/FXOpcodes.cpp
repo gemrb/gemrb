@@ -7646,8 +7646,8 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 			pass=false;
 			i=max-1;
 		}
-		int statMin = atoi(tm->QueryField(i, 1));
-		int statMax = atoi(tm->QueryField(i, 2));
+		int statMin = tm->QueryFieldSigned<int>(i, 1);
+		int statMax = tm->QueryFieldSigned<int>(i, 2);
 		if (stat >= statMin && stat <= statMax) break;
 	}
 

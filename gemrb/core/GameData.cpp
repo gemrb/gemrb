@@ -562,7 +562,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 
 	char profString[5];
 	snprintf(profString, sizeof(profString), "%u", proficiency);
-	return atoi(raceTHAC0Bonus->QueryField(profString, raceName));
+	return raceTHAC0Bonus->QueryFieldSigned<int>(profString, raceName);
 }
 
 bool GameData::HasInfravision(const char *raceName)
@@ -572,7 +572,7 @@ bool GameData::HasInfravision(const char *raceName)
 	}
 	if (!raceName) return false;
 
-	return atoi(racialInfravision->QueryField(raceName, "VALUE")) & 1;
+	return racialInfravision->QueryFieldSigned<int>(raceName, "VALUE") & 1;
 }
 
 int GameData::GetSpellAbilityDie(const Actor *target, int which)
@@ -589,7 +589,7 @@ int GameData::GetSpellAbilityDie(const Actor *target, int which)
 
 	ieDword cls = target->GetActiveClass();
 	if (cls >= spellAbilityDie->GetRowCount()) cls = 0;
-	return atoi(spellAbilityDie->QueryField(cls, which));
+	return spellAbilityDie->QueryFieldSigned<int>(cls, which);
 }
 
 int GameData::GetTrapSaveBonus(ieDword level, int cls)
@@ -600,7 +600,7 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 		trapSaveBonus = LoadTable("trapsave", true);
 	}
 
-	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
+	return trapSaveBonus->QueryFieldSigned<int>(level - 1, cls - 1);
 }
 
 int GameData::GetTrapLimit(Scriptable *trapper)
@@ -623,7 +623,7 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 		rowName = caster->GetClassName(cls);
 	}
 
-	return atoi(trapLimit->QueryField(rowName, "LIMIT"));
+	return trapLimit->QueryFieldSigned<int>(rowName, "LIMIT");
 }
 
 int GameData::GetSummoningLimit(ieDword sex)
@@ -644,7 +644,7 @@ int GameData::GetSummoningLimit(ieDword sex)
 		default:
 			break;
 	}
-	return atoi(summoningLimit->QueryField(row, 0));
+	return summoningLimit->QueryFieldSigned<int>(row, 0);
 }
 
 const Color& GameData::GetColor(const char *row)
@@ -654,7 +654,7 @@ const Color& GameData::GetColor(const char *row)
 		AutoTable colorTable = LoadTable("colors", true);
 		assert(colorTable);
 		for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
-			ieDword c = strtounsigned<ieDword>(colorTable->QueryField(r, 0));
+			ieDword c = colorTable->QueryFieldUnsigned<ieDword>(r, 0);
 			colors[colorTable->GetRowName(r)] = Color(c);
 		}
 	}
@@ -683,7 +683,7 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 		weaponStyleAPRBonus.resize(rows * cols);
 		for (TableMgr::index_t i = 0; i < rows; i++) {
 			for (TableMgr::index_t j = 0; j < cols; j++) {
-				int tmp = atoi(bonusTable->QueryField(i, j));
+				int tmp = bonusTable->QueryFieldSigned<int>(i, j);
 				// negative values relate to x/2, so we adjust them
 				// positive values relate to x, so we must times by 2
 				if (tmp < 0) {
@@ -741,8 +741,8 @@ void GameData::ReadSpellProtTable()
 	for (TableMgr::index_t i = 0; i < rowCount; ++i) {
 		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
 		spellProt[i].stat = (ieWord) stat;
-		spellProt[i].value = strtounsigned<ieDword>(tab->QueryField(i, 1));
-		spellProt[i].relation = strtounsigned<ieWord>(tab->QueryField(i, 2));
+		spellProt[i].value = tab->QueryFieldUnsigned<ieDword>(i, 1);
+		spellProt[i].relation = tab->QueryFieldUnsigned<ieWord>(i, 2);
 	}
 }
 
@@ -774,7 +774,7 @@ int GameData::GetReputationMod(int column)
 		reputation = 0;
 	}
 
-	return atoi(reputationMod->QueryField(reputation, column));
+	return reputationMod->QueryFieldSigned<int>(reputation, column);
 }
 
 // reads to and from table of area name mappings for the pst worldmap
@@ -795,7 +795,7 @@ int GameData::GetAreaAlias(const ResRef &areaName)
 		TableMgr::index_t idx = table->GetRowCount();
 		while (idx--) {
 			ResRef key = ResRef::MakeLowerCase(table->GetRowName(idx));
-			ieDword value = atoi(table->QueryField(idx, 0));
+			ieDword value = table->QueryFieldUnsigned<ieDword>(idx, 0);
 			AreaAliasTable[key] = value;
 		}
 	}
@@ -824,9 +824,9 @@ int GameData::GetSpecialSpell(const ResRef& resref)
 		SpecialSpells.resize(specialSpellsCount);
 		for (TableMgr::index_t i = 0; i < specialSpellsCount; ++i) {
 			SpecialSpells[i].resref = table->GetRowName(i);
-			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
-			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
-			SpecialSpells[i].bonus_limit = atoi(table->QueryField(i, 2));
+			SpecialSpells[i].flags = table->QueryFieldSigned<int>(i, 0);
+			SpecialSpells[i].amount = table->QueryFieldSigned<int>(i, 1);
+			SpecialSpells[i].bonus_limit = table->QueryFieldSigned<int>(i, 2);
 		}
 	}
 
@@ -933,7 +933,7 @@ int GameData::GetMonkBonus(int bonusType, int level)
 	// extend the last level value to infinity
 	if (level >= cols) level = cols;
 
-	return atoi(monkBon->QueryField(bonusType, level - 1));
+	return monkBon->QueryFieldSigned<int>(bonusType, level - 1);
 }
 
 // AC  CRITICALHITBONUS   DAMAGEBONUS   THAC0BONUSRIGHT   THAC0BONUSLEFT   PHYSICALSPEED   ACVSMISSLE
@@ -957,7 +957,7 @@ int GameData::GetWeaponStyleBonus(int style, int stars, int bonusType)
 		TableMgr::index_t cols = styleTable->GetColumnCount();
 		for (int star = 0; star <= STYLE_STAR_MAX; star++) {
 			for (TableMgr::index_t bonus = 0; bonus < cols; bonus++) {
-				weaponStyleBoni[style][star][bonus] = atoi(styleTable->QueryField(star, bonus));
+				weaponStyleBoni[style][star][bonus] = styleTable->QueryFieldSigned<int>(star, bonus);
 			}
 		}
 		ignore[style] = 2;
@@ -996,7 +996,7 @@ const std::vector<int>& GameData::GetBonusSpells(int ability)
 			assert(statValue >= 0 && statValue < maxStat);
 			std::vector<int> bonuses(splLevels);
 			for (TableMgr::index_t i = 0; i < splLevels; i++) {
-				bonuses[i] = atoi(mxSplBon->QueryField(row, i));
+				bonuses[i] = mxSplBon->QueryFieldSigned<int>(row, i);
 			}
 			bonusSpells[statValue] = bonuses;
 		}
@@ -1021,7 +1021,7 @@ ieByte GameData::GetItemAnimation(const ResRef& itemRef)
 
 		for (TableMgr::index_t i = 0; i < table->GetRowCount(); ++i) {
 			ResRef item = table->GetRowName(i);
-			itemAnims[item] = static_cast<ieByte>(atoi(table->QueryField(i, 0)));
+			itemAnims[item] = table->QueryFieldUnsigned<ieByte>(i, 0);
 		}
 	}
 
@@ -1052,9 +1052,9 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 		for (TableMgr::index_t i = 0; i < tableCount; i++) {
 			itemUse[i].stat = static_cast<ieByte>(core->TranslateStat(table->QueryField(i, 0)));
 			itemUse[i].table = table->QueryField(i, 1);
-			itemUse[i].mcol = static_cast<ieByte>(atoi(table->QueryField(i, 2)));
-			itemUse[i].vcol = static_cast<ieByte>(atoi(table->QueryField(i, 3)));
-			itemUse[i].which = static_cast<ieByte>(atoi(table->QueryField(i, 4)));
+			itemUse[i].mcol = table->QueryFieldUnsigned<ieByte>(i, 2);
+			itemUse[i].vcol = table->QueryFieldUnsigned<ieByte>(i, 3);
+			itemUse[i].which = table->QueryFieldUnsigned<ieByte>(i, 4);
 			// limiting it to 0 or 1 to avoid crashes
 			if (itemUse[i].which != 1) {
 				itemUse[i].which = 0;
@@ -1072,7 +1072,7 @@ int GameData::GetMiscRule(const char* rowName)
 	}
 	assert(miscRule);
 
-	return atoi(miscRule->QueryField(rowName, "VALUE"));
+	return miscRule->QueryFieldSigned<int>(rowName, "VALUE");
 }
 
 int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
@@ -1090,7 +1090,7 @@ int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
 		}
 	}
 
-	return atoi(difficultyLevels->QueryField(mod, difficulty));
+	return difficultyLevels->QueryFieldSigned<int>(mod, difficulty);
 }
 
 int GameData::GetXPBonus(ieDword bonusType, ieDword level)
@@ -1113,7 +1113,7 @@ int GameData::GetXPBonus(ieDword bonusType, ieDword level)
 		level = xpBonus->GetColumnCount();
 	}
 
-	return atoi(xpBonus->QueryField(bonusType, level - 1));
+	return xpBonus->QueryFieldSigned<int>(bonusType, level - 1);
 }
 
 }

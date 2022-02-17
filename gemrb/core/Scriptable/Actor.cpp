@@ -504,7 +504,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 			snprintf(animHex, 10, "0x%04X", AnimID);
 			row = extspeed->FindTableValue(0ul, animHex);
 			if (row != TableMgr::npos) {
-				int rate = atoi(extspeed->QueryField(row, 1));
+				int rate = extspeed->QueryFieldSigned<int>(row, 1);
 				SetBase(IE_MOVEMENTRATE, rate);
 			}
 		} else {
@@ -1640,8 +1640,8 @@ static void ReadModalStates()
 		ms.entering_str = table->QueryFieldAsStrRef(i, 2);
 		ms.leaving_str = table->QueryFieldAsStrRef(i, 3);
 		ms.failed_str = table->QueryFieldAsStrRef(i, 4);
-		ms.aoe_spell = atoi(table->QueryField(i, 5));
-		ms.repeat_msg = atoi(table->QueryField(i, 6));
+		ms.aoe_spell = table->QueryFieldUnsigned<unsigned int>(i, 5);
+		ms.repeat_msg = table->QueryFieldUnsigned<unsigned int>(i, 6);
 		ModalStates.push_back(ms);
 	}
 }
@@ -1811,7 +1811,7 @@ static void InitActorTables()
 		ieDword mask = 1;
 		for (int i =  0; i < OVERLAY_COUNT; i++) {
 			hc_overlays[i] = tm->QueryField(i, 0);
-			if (atoi(tm->QueryField( i, 1))) {
+			if (tm->QueryFieldSigned<int>( i, 1)) {
 				hc_locations|=mask;
 			}
 			const char *flags = tm->QueryField(i, 2);
@@ -1845,7 +1845,7 @@ static void InitActorTables()
 		memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
 		if (tm && i) {
 			for (int j = 0; j < MAX_QSLOTS; j++) {
-				GUIBTDefaults[i][j+3]=(ieByte) atoi( tm->QueryField(i-1,j) );
+				GUIBTDefaults[i][j+3] = tm->QueryFieldUnsigned<ieByte>(i-1,j);
 			}
 		}
 	}
@@ -1861,7 +1861,7 @@ static void InitActorTables()
 			OtherGUIButtons[i].clss = cls;
 			memcpy(OtherGUIButtons[i].buttons, &DefaultButtons, sizeof(ActionButtonRow));
 			for (int j = 0; j < GUIBT_COUNT; j++) {
-				OtherGUIButtons[i].buttons[j]=(ieByte) atoi( tm->QueryField(i,j+1) );
+				OtherGUIButtons[i].buttons[j] = tm->QueryFieldUnsigned<ieByte>(i,j+1);
 			}
 		}
 	}
@@ -1885,7 +1885,7 @@ static void InitActorTables()
 			if (stat>=MAX_STATS) {
 				Log(WARNING, "Actor", "Invalid stat value in featreq.2da");
 			}
-			max = atoi(tm->QueryField(i,1));
+			max = tm->QueryFieldUnsigned<unsigned int>(i,1);
 			//boolean feats can only be taken once, the code requires featmax for them too
 			if (stat && (max<1)) max=1;
 			featstats[i] = (ieByte) stat;
@@ -1909,8 +1909,8 @@ static void InitActorTables()
 		for (int i = 0; i < (int) tm->GetRowCount(); i++) {
 			const char *classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
-			ieDword classID = atoi(tm->QueryField(classname, "ID"));
-			ieDword classcol = atoi(tm->QueryField(classname, "CLASS")); // only real classes have this column at 0
+			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
+			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname, "CLASS"); // only real classes have this column at 0
 			const char *clab = tm->QueryField(classname, "CLAB");
 			if (classcol) {
 				// kit ids are in hex
@@ -1923,7 +1923,7 @@ static void InitActorTables()
 			} else if (i < classcount) {
 				// populate classesiwd2
 				// we need the id of the isclass name, not the current one
-				ieDword cid = atoi(tm->QueryField(isclassnames[i], "ID"));
+				ieDword cid = tm->QueryFieldUnsigned<ieDword>(isclassnames[i], "ID");
 				classesiwd2[i] = cid;
 
 				class2kits[classID].clab = strdup(clab);
@@ -1932,7 +1932,7 @@ static void InitActorTables()
 				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
 			}
 
-			xpcap[classis] = atoi(xpcapt->QueryField(classname, "VALUE"));
+			xpcap[classis] = xpcapt->QueryFieldSigned<int>(classname, "VALUE");
 
 			// set up the tohit/apr tables
 			std::string tohit = tm->QueryField(classname, "TOHIT");
@@ -1951,8 +1951,8 @@ static void InitActorTables()
 				btv.reserve(tht->GetRowCount());
 				for (TableMgr::index_t row = 0; row < tht->GetRowCount(); ++row) {
 					bt.level = atoi(tht->GetRowName(row));
-					bt.bab = atoi(tht->QueryField(row, 0));
-					bt.apr = atoi(tht->QueryField(row, 1));
+					bt.bab = tht->QueryFieldSigned<int>(row, 0);
+					bt.apr = tht->QueryFieldSigned<int>(row, 1);
 					btv.push_back(bt);
 				}
 				IWD2HitTable.emplace(BABClassMap[classis], btv);
@@ -1983,7 +1983,7 @@ static void InitActorTables()
 			const char* classname = tm->GetRowName(i);
 			//make sure we have a valid classid, then decrement
 			//it to get the correct array index
-			tmpindex = atoi(tm->QueryField(classname, "ID"));
+			tmpindex = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
 			if (!tmpindex)
 				continue;
 			className2ID[classname] = tmpindex;
@@ -2001,7 +2001,7 @@ static void InitActorTables()
 
 			AppendFormat(buffer, "Name: {} ", classname);
 
-			xpcap[tmpindex] = atoi(xpcapt->QueryField(classname, "VALUE"));
+			xpcap[tmpindex] = xpcapt->QueryFieldSigned<int>(classname, "VALUE");
 			AppendFormat(buffer, "XPCAP: {} ", xpcap[tmpindex]);
 
 			int classis = 0;
@@ -2025,7 +2025,7 @@ static void InitActorTables()
 					if (hptm) {
 						int tmphp = 0;
 						TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
-						while (atoi(hptm->QueryField(tmphp, rollscolumn)))
+						while (hptm->QueryFieldSigned<int>(tmphp, rollscolumn))
 							tmphp++;
 						AppendFormat(buffer, "HPROLLMAXLVL: {}", tmphp);
 						if (tmphp) maxLevelForHpRoll[tmpindex] = tmphp;
@@ -2078,7 +2078,7 @@ static void InitActorTables()
 							if (hptm) {
 								int tmphp = 0;
 								TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
-								while (atoi(hptm->QueryField(tmphp, rollscolumn)))
+								while (hptm->QueryFieldSigned<int>(tmphp, rollscolumn))
 									tmphp++;
 								//make sure we at least set the first class
 								if ((tmphp>maxLevelForHpRoll[tmpindex])||foundwarrior||numfound==0)
@@ -2090,10 +2090,10 @@ static void InitActorTables()
 					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
 						if (strcmp(classnames[0], currentname) == 0) {
-							dualswap[tmpindex] = strtosigned<int>(tm->QueryField(currentname, "MC_WAS_ID"));
+							dualswap[tmpindex] = tm->QueryFieldSigned<int>(currentname, "MC_WAS_ID");
 						}
 					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
-						dualswap[tmpindex] = strtosigned<int>(tm->QueryField(currentname, "MC_WAS_ID"));
+						dualswap[tmpindex] = tm->QueryFieldSigned<int>(currentname, "MC_WAS_ID");
 					}
 					numfound++;
 				}
@@ -2131,7 +2131,7 @@ static void InitActorTables()
 				auto it = className2ID.find(cls);
 				int id = 0;
 				if (it != className2ID.end()) id = it->second;
-				numWeaponSlots[id] = std::min(4, atoi(tm->QueryField(i, 0)));
+				numWeaponSlots[id] = std::min(4, tm->QueryFieldSigned<int>(i, 0));
 			}
 		}
 	}
@@ -2149,7 +2149,7 @@ static void InitActorTables()
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
-			int classID = atoi(tm->QueryField(rowName, "CLASS"));
+			int classID = tm->QueryFieldSigned<int>(rowName, "CLASS");
 			const char *clab = tm->QueryField(rowName, "ABILITIES");
 			const char *kitName = tm->QueryField(rowName, "ROWNAME");
 			class2kits[classID].indices.push_back(i);
@@ -2173,7 +2173,7 @@ static void InitActorTables()
 			for (TableMgr::index_t j = 0; j < MAX_LEVEL; j++) {
 				TableMgr::index_t row = maxrow;
 				if (j<row) row=j;
-				wmlevels[i][j] = strtosigned<int>(tm->QueryField(row,i));
+				wmlevels[i][j] = tm->QueryFieldSigned<int>(row,i);
 			}
 		}
 	}
@@ -2188,9 +2188,9 @@ static void InitActorTables()
 		TableMgr::index_t rows = tm->GetRowCount();
 
 		for (TableMgr::index_t i = 0; i < rows; i++) {
-			int row = atoi(tm->QueryField(i,0));
+			int row = tm->QueryFieldSigned<int>(i,0);
 			if (row<0 || row>=VCONST_COUNT) continue;
-			int value = atoi(tm->QueryField(i,1));
+			int value = tm->QueryFieldSigned<int>(i,1);
 			if (value<0 || value>=VCONST_COUNT) continue;
 			VCMap[row]=value;
 		}
@@ -2212,7 +2212,7 @@ static void InitActorTables()
 						stat2skill[val] = i;
 					}
 				} else {
-					val = atoi(tm->QueryField(i, j));
+					val = tm->QueryFieldSigned<int>(i, j);
 				}
 				skillstats[i].push_back (val);
 			}
@@ -2229,7 +2229,7 @@ static void InitActorTables()
 			while(rowcount--) {
 				afcomments[rowcount]=(int *) malloc(3*sizeof(int) );
 				for (int i = 0; i < 3; i++) {
-					afcomments[rowcount][i] = strtosigned<int>(tm->QueryField(rowcount,i));
+					afcomments[rowcount][i] = tm->QueryFieldSigned<int>(rowcount,i);
 				}
 			}
 		}
@@ -2247,9 +2247,9 @@ static void InitActorTables()
 			skilldex[i].reserve(skilldexNCols+1);
 			for (TableMgr::index_t j = -1; j < skilldexNCols; j++) {
 				if (j == TableMgr::npos) {
-					skilldex[i].push_back (atoi(tm->GetRowName(i)));
+					skilldex[i].push_back(tm->QueryFieldSigned<int>(i, 0));
 				} else {
-					skilldex[i].push_back (atoi(tm->QueryField(i, j)));
+					skilldex[i].push_back(tm->QueryFieldSigned<int>(i, j));
 				}
 			}
 		}
@@ -2290,7 +2290,7 @@ static void InitActorTables()
 					}
 					skillrac[i].push_back (value);
 				} else {
-					skillrac[i].push_back (atoi(tm->QueryField(i, j)));
+					skillrac[i].push_back(tm->QueryFieldSigned<int>(i, j));
 				}
 			}
 		}
@@ -2303,10 +2303,10 @@ static void InitActorTables()
 		TableMgr::index_t count = tm->GetRowCount();
 		if (count> 0 && count<8) {
 			avPrefix.resize(count - 1);
-			avBase = strtosigned<int>(tm->QueryField(0));
+			avBase = tm->QueryFieldSigned<int>(0, 0);
 			const char *poi = tm->QueryField(0,1);
 			if (*poi!='*') {
-				avStance = strtosigned<int>(tm->QueryField(0,1));
+				avStance = tm->QueryFieldSigned<int>(0,1);
 			} else {
 				avStance = -1;
 			}
@@ -2328,8 +2328,8 @@ static void InitActorTables()
 		TableMgr::index_t racesNRows = tm->GetRowCount();
 
 		for (TableMgr::index_t i = 0; i < racesNRows; i++) {
-			int raceID = strtosigned<int>(tm->QueryField(i, 3));
-			int favClass = strtosigned<int>(tm->QueryField(i, 8));
+			int raceID = tm->QueryFieldSigned<int>(i, 3);
+			int favClass = tm->QueryFieldSigned<int>(i, 8);
 			const char *raceName = tm->GetRowName(i);
 			favoredMap.emplace(raceID, favClass);
 			raceID2Name.emplace(raceID, raceName);
@@ -6545,13 +6545,13 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 	// but everyone is proficient with fists
 	// cheesily limited to party only (10gob hits it - practically can't hit you otherwise)
 	if (InParty && !inventory.FistsEquipped()) {
-		prof += atoi(wspecial->QueryField(stars, 0));
+		prof += wspecial->QueryFieldSigned<int>(stars, 0);
 	}
 
-	wi.profdmgbon = atoi(wspecial->QueryField(stars, 1));
+	wi.profdmgbon = wspecial->QueryFieldSigned<int>(stars, 1);
 	DamageBonus += wi.profdmgbon;
 	// only bg2 wspecial.2da has this column, but all have 0 as the default table value, so this lookup is fine
-	speed += atoi(wspecial->QueryField(stars, 2));
+	speed += wspecial->QueryFieldSigned<int>(stars, 2);
 	// add non-proficiency penalty, which is missing from the table in non-iwd2
 	// stored negative
 	if (stars == 0 && !third) {
@@ -9812,7 +9812,7 @@ void Actor::CreateDerivedStatsBG()
 		}
 	}
 
-	ieDword backstabdamagemultiplier=GetThiefLevel();
+	stat_t backstabdamagemultiplier = GetThiefLevel();
 	if (backstabdamagemultiplier) {
 		// swashbucklers can't backstab, but backstab.2da only has THIEF in it
 		if (BaseStats[IE_KIT] == KIT_SWASHBUCKLER) {
@@ -9826,7 +9826,7 @@ void Actor::CreateDerivedStatsBG()
 			if (tm)	{
 				TableMgr::index_t cols = tm->GetColumnCount();
 				if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
-				backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
+				backstabdamagemultiplier = tm->QueryFieldUnsigned<stat_t>(0, backstabdamagemultiplier);
 			} else {
 				backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
 			}
