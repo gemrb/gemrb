@@ -1,4 +1,4 @@
-GemRB git (f06df248):
+GemRB git (48fde65):
   New features:
     - 
     - iwd2 can be progressed to well into chapter 5
@@ -11,7 +11,7 @@ GemRB git (f06df248):
     - 
     - unicode support (iconv not optional any more!)
     - python3 support (now the only option)
-    - spellcaster ai, effects, scripting
+    - spellcaster ai, effects, scripting, weapon style customization
     - audio, drawing, appimage, ini spawns
     - bugfixes
 
