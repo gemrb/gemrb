@@ -664,9 +664,9 @@ void Spellbook::BonusSpells(int type, int abilityLevel)
 	const auto& bonuses = gamedata->GetBonusSpells(abilityLevel);
 	if (bonuses.empty() || bonuses[0] == 0) return;
 
-	size_t level = GetSpellLevelCount(type);
+	unsigned int level = GetSpellLevelCount(type);
 	assert(level <= bonuses.size());
-	for (size_t i = 0; i < level; i++) {
+	for (unsigned int i = 0; i < level; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization(type, i);
 		// don't give access to new spell levels through these boni
 		if (sm->SlotCountWithBonus) {

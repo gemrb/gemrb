@@ -35,7 +35,8 @@ Calendar::Calendar(void)
 	monthnamecount = tab->GetRowCount();
 	monthnames = new ieStrRef[monthnamecount];
 	days = new int[monthnamecount];
-	for (int i = 0; i < monthnamecount; i++) {
+
+	for (size_t i = 0; i < monthnamecount; i++) {
 		days[i] = atoi(tab->QueryField(i,0));
 		daysinyear+=days[i];
 		monthnames[i] = tab->QueryFieldAsStrRef(i,1);
@@ -52,7 +53,7 @@ void Calendar::GetMonthName(int dayandmonth) const
 {
 	int month=1;
 
-	for(int i=0;i<monthnamecount;i++) {
+	for (size_t i = 0; i < monthnamecount; ++i) {
 		if (dayandmonth<days[i]) {
 			core->GetTokenDictionary()->SetAtCopy("DAY", dayandmonth+1);
 
@@ -76,7 +77,7 @@ int Calendar::GetCalendarDay(int date) const
 
 	if (!daysinyear) return 0;
 	dayandmonth = date%daysinyear;
-	for(int i=0;i<monthnamecount;i++) {
+	for (size_t i=0; i < monthnamecount; ++i) {
 		if (dayandmonth<days[i]) {
 			break;
 		}
