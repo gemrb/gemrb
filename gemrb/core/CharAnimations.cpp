@@ -68,7 +68,7 @@ static const int zOrder_8[8][4] = {
 };
 
 struct EquipResRefData {
-	std::string Suffix;
+	ResRef Suffix;
 	unsigned char Cycle;
 };
 
@@ -2159,7 +2159,8 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 	}
 	if (Orient>=5) {
 		dest += "e";
-		EquipData->Suffix += "e";
+		ResRef& suffix = EquipData->Suffix;
+		suffix[suffix.CStrLen()] = 'e';
 	}
 	// NOTE: the two shadow animations (cshd, sshd) also have x-suffixed files,
 	// but those are used (instead of the eastern ones) only if sprite
@@ -2302,7 +2303,6 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 	unsigned char& Cycle, orient_t Orient, EquipResRefData *&EquipData) const
 {
 	EquipData = new EquipResRefData;
-	EquipData->Suffix[0] = 0;
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
@@ -2360,7 +2360,8 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		dest += "e";
-		EquipData->Suffix += "e";
+		ResRef& suffix = EquipData->Suffix;
+		suffix[suffix.CStrLen()] = 'e';
 	}
 	EquipData->Cycle = Cycle;
 }
@@ -2427,7 +2428,6 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 	unsigned char& Cycle, orient_t Orient, EquipResRefData *&EquipData) const
 {
 	EquipData = new EquipResRefData;
-	EquipData->Suffix[0] = 0;
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
@@ -2489,7 +2489,8 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		dest += "e";
-		EquipData->Suffix += "e";
+		ResRef& suffix = EquipData->Suffix;
+		suffix[suffix.CStrLen()] = 'e';
 	}
 	EquipData->Cycle = Cycle;
 }
