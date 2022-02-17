@@ -55,13 +55,13 @@ static void InitSparks()
 			color.a = 0xff;
 		}
 	}
-	int i = tab->GetRowCount();
+	TableMgr::index_t i = tab->GetRowCount();
 	if (i>MAX_SPARK_COLOR) {
 		i = MAX_SPARK_COLOR;
 	}
 	while (i--) {
 		for (int j = 0; j < MAX_SPARK_PHASE; j++) {
-			int idx;
+			TableMgr::index_t idx;
 
 			if (i < MAX_SPARK_COLOR) {
 				idx = spark_color_indices[i];

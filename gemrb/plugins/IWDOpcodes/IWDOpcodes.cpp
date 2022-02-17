@@ -1300,7 +1300,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	int cnt = tab->GetRowCount()-1;
+	TableMgr::index_t cnt = tab->GetRowCount()-1;
 	if (cnt<2) {
 		return FX_NOT_APPLIED;
 	}
@@ -1308,7 +1308,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	int real = core->Roll(1,cnt,-1);
 	ResRef resrefs[2] = { tab->QueryField(size_t(0), 0), tab->QueryField(0, 1) };
 
-	for (int i=0;i<cnt;i++) {
+	for (TableMgr::index_t i = 0; i < cnt; ++i) {
 		Point p(strtosigned<int>(tab->QueryField(i+1,0)), strtosigned<int>(tab->QueryField(i+1,1)));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
 			target, p, EAM_DEFAULT, 0, NULL, false);

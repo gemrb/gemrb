@@ -466,7 +466,7 @@ private:
 	int GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
-	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
+	TableMgr::index_t GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 	char GetArmorCode() const;
 	ResRef GetArmorSound() const;
 
@@ -766,7 +766,7 @@ public:
 	void GetVerbalConstantSound(ResRef& sound, size_t index) const;
 	bool GetSoundFromFile(ResRef &Sound, unsigned int index) const;
 	bool GetSoundFromINI(ResRef &Sound, unsigned int index) const;
-	bool GetSoundFrom2DA(ResRef &Sound, unsigned int index) const;
+	bool GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */

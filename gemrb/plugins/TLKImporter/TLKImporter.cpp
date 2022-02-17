@@ -48,11 +48,11 @@ TLKImporter::TLKImporter(void)
 	}
 
 	AutoTable tm = gamedata->LoadTable("gender");
-	int gtcount = 0;
+	TableMgr::index_t gtcount = 0;
 	if (tm) {
 		gtcount = tm->GetRowCount();
 	}
-	for(int i=0;i<gtcount;i++) {
+	for (TableMgr::index_t i = 0; i < gtcount; ++i) {
 		ieVariable key = ieVariable::MakeUpperCase(tm->GetRowName(i));
 
 		gt_type *entry = new gt_type;
@@ -171,7 +171,7 @@ ieStrRef TLKImporter::ClassStrRef(int slot) const
 	if (!tab) {
 		return ieStrRef::INVALID;
 	}
-	int row = tab->FindTableValue("ID", clss, 0);
+	TableMgr::index_t row = tab->FindTableValue("ID", clss, 0);
 	return tab->QueryFieldAsStrRef(row, 0);
 }
 
@@ -187,7 +187,7 @@ ieStrRef TLKImporter::RaceStrRef(int slot) const
 	if (!tab) {
 		return ieStrRef::INVALID;
 	}
-	int row = tab->FindTableValue(3, race, 0);
+	TableMgr::index_t row = tab->FindTableValue(3, race, 0);
 	return tab->QueryFieldAsStrRef(row,0);
 }
 

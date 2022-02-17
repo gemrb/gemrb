@@ -211,9 +211,9 @@ private:
 		if (!tab)
 			return;
 
-		int i = tab->GetColNamesCount();
+		TableMgr::index_t i = tab->GetColNamesCount();
 		while (i--) {
-			int j=tab->GetRowCount();
+			TableMgr::index_t j=tab->GetRowCount();
 			std::vector<ResRef> resrefs(j);
 			while (j--) {
 				const char *crename = tab->QueryField( j,i );
@@ -847,7 +847,7 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 		TerrainSounds() noexcept {
 			AutoTable tm = gamedata->LoadTable("terrain");
 			assert(tm);
-			int rc = tm->GetRowCount() - 2;
+			TableMgr::index_t rc = tm->GetRowCount() - 2;
 			while (rc--) {
 				ResRef group = tm->GetRowName(rc+2);
 				refs[group] = {};

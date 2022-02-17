@@ -404,7 +404,7 @@ private:
 	ieDword* slotmatrix = nullptr; // itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	std::vector<SlotType> slotTypes;
-	int ItemTypes = 0;
+	size_t ItemTypes = 0;
 
 	// Currently dragged item or NULL
 	std::unique_ptr<ItemDragOp> DraggedItem;
@@ -437,7 +437,7 @@ public:
 	Holder<SaveGame> LoadGameIndex;
 	SaveGameAREExtractor saveGameAREExtractor;
 	int VersionOverride = 0;
-	unsigned int SlotTypes = 0; // this is the same as the inventory size
+	size_t SlotTypes = 0; // this is the same as the inventory size
 	ResRef GlobalScript = "BALDUR";
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
 
@@ -584,7 +584,7 @@ public:
 
 	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY) const;
 
-	unsigned int GetInventorySize() const { return SlotTypes-1; }
+	size_t GetInventorySize() const { return SlotTypes-1; }
 	ieDword FindSlot(unsigned int idx) const;
 	ieDword QuerySlot(unsigned int idx) const;
 	ieDword QuerySlotType(unsigned int idx) const;

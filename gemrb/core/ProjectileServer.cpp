@@ -72,7 +72,7 @@ ProjectileServer::ProjectileServer() noexcept
 	
 	AutoTable explist = gamedata->LoadTable("areapro");
 	if (explist) {
-		unsigned int rows = explist->GetRowCount();
+		TableMgr::index_t rows = explist->GetRowCount();
 		//cannot handle 0xff and it is easier to set up the fields
 		//without areapro.2da anyway. So this isn't a restriction
 		if(rows>254) {

@@ -231,13 +231,13 @@ static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
 	AutoTable pdtable = gamedata->LoadTable("interdia");
 	if (!pdtable) return nullptr;
 
-	int col;
+	TableMgr::index_t col;
 	if (core->GetGame()->Expansion == GAME_TOB) {
 		col = pdtable->GetColumnIndex("25FILE");
 	} else {
 		col = pdtable->GetColumnIndex("FILE");
 	}
-	int row = pdtable->FindTableValue(col, dialog);
+	TableMgr::index_t row = pdtable->FindTableValue(col, dialog);
 	return target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 }
 

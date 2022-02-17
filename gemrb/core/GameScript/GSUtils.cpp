@@ -2498,7 +2498,7 @@ unsigned int GetItemDistance(const ResRef& itemres, int header, double angle)
 }
 
 //read the wish 2da
-void SetupWishCore(Scriptable *Sender, int column, int picks)
+void SetupWishCore(Scriptable *Sender, TableMgr::index_t column, int picks)
 {
 	// in the original, picks was at first the number of wish choices to set up,
 	// but then it was hard coded to 5 (and SetupWishObject disused)
@@ -2514,7 +2514,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	int count = tm->GetRowCount();
 	// handle the unused SetupWishObject, which passes WIS instead of a column
 	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
-	int cols = tm->GetColumnCount();
+	TableMgr::index_t cols = tm->GetColumnCount();
 	if (column > cols) {
 		column = (column-1)/6;
 		if (column == 4) column = RAND(0, 3);
@@ -2604,7 +2604,7 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	if (!tm) {
 		return NULL;
 	}
-	int cnt = tm->GetRowCount();
+	TableMgr::index_t cnt = tm->GetRowCount();
 	if (!cnt) {
 		return NULL;
 	}

@@ -523,7 +523,7 @@ void WorldMap::UpdateReachableAreas()
 	if (!game) {
 		return;
 	}
-	int idx = tab->GetRowCount();
+	TableMgr::index_t idx = tab->GetRowCount();
 	while (idx--) {
 		// 2da rows in format <name> <variable name> <area>
 		// we set the first three flags for <area> if <variable name> is set

@@ -35,7 +35,7 @@ private:
 	DataStream* str1 = nullptr;
 	DataStream* str2 = nullptr;
 
-	ieDword WorldMapsCount = 0;
+	size_t WorldMapsCount = 0;
 	ieDword WorldMapsCount1 = 0;
 	ieDword WorldMapsCount2 = 0;
 	ieDword WorldMapsOffset1 = 0;

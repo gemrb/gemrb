@@ -36,11 +36,11 @@ static void Initializer()
 		return;
 	}
 
-	size_t count = tm->GetRowCount();
+	TableMgr::index_t count = tm->GetRowCount();
 	gamedata->castingGlows.resize(count);
 	gamedata->castingHits.resize(count);
 	gamedata->castingSounds.resize(count);
-	for (size_t i = 0; i < count; i++) {
+	for (TableMgr::index_t i = 0; i < count; i++) {
 		gamedata->castingGlows[i] = tm->QueryField(i, 0);
 		gamedata->castingSounds[i] = atoi(tm->QueryField(i, 1));
 		gamedata->castingHits[i] = tm->QueryField(i, 2);

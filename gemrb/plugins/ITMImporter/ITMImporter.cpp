@@ -41,9 +41,9 @@ static void Initializer()
 		Log(ERROR, "ITMImporter", "Cannot find proftype.2da.");
 		return;
 	}
-	int profcount = tm->GetRowCount();
+	TableMgr::index_t profcount = tm->GetRowCount();
 	profs.resize(profcount);
-	for (int i = 0; i < profcount; i++) {
+	for (TableMgr::index_t i = 0; i < profcount; i++) {
 		profs[i] = atoi(tm->QueryField( i, 0 ) );
 	}
 
@@ -55,8 +55,8 @@ static void Initializer()
 		return;
 	}
 	// resolve table into directly usable form
-	int zzcount = tm2->GetRowCount();
-	for (int i = 0; i < zzcount; i++) {
+	TableMgr::index_t zzcount = tm2->GetRowCount();
+	for (TableMgr::index_t i = 0; i < zzcount; i++) {
 		const char *rowname = tm2->GetRowName(i);
 		const char *field = tm2->QueryField(i, 0);
 		int val = atoi(field);
@@ -219,7 +219,7 @@ Item* ITMImporter::GetItem(Item *s)
 		str->Read( s->unknown, 26 );
 	} else if (dialogTable) {
 		//all non pst
-		int row = dialogTable->GetRowIndex(s->Name);
+		TableMgr::index_t row = dialogTable->GetRowIndex(s->Name);
 		s->DialogName = dialogTable->QueryFieldAsStrRef(row, 0);
 		s->Dialog = dialogTable->QueryField(row, 1);
 	} else {
@@ -228,7 +228,7 @@ Item* ITMImporter::GetItem(Item *s)
 	}
 
 	if (exclusionTable) {
-		int row = exclusionTable->GetRowIndex(s->Name);
+		TableMgr::index_t row = exclusionTable->GetRowIndex(s->Name);
 		s->ItemExcl = atoi(exclusionTable->QueryField(row, 0));
 	} else {
 		s->ItemExcl = 0;
@@ -242,7 +242,7 @@ Item* ITMImporter::GetItem(Item *s)
 		GetExtHeader( s, eh );
 		// set the tooltip
 		if (tooltipTable) {
-			int row = tooltipTable->GetRowIndex(s->Name);
+			TableMgr::index_t row = tooltipTable->GetRowIndex(s->Name);
 			eh->Tooltip = tooltipTable->QueryFieldAsStrRef(row, i);
 		}
 	}

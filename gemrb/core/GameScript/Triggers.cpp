@@ -4195,8 +4195,8 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	int count = tm->GetRowCount();
-	for (int i=0;i<count;i++) {
+	TableMgr::index_t count = tm->GetRowCount();
+	for (TableMgr::index_t i = 0; i < count; ++i) {
 		const char *area = tm->QueryField( i, 0 );
 		if (actor->LastArea != area) {
 			continue;

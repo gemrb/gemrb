@@ -140,9 +140,9 @@ static int GetTrackString(const ResRef &areaName)
 		AutoTable tm = gamedata->LoadTable("tracking", true);
 		if (!tm)
 			return -1;
-		int trackcount = tm->GetRowCount();
+		TableMgr::index_t trackcount = tm->GetRowCount();
 		tracks.resize(trackcount);
-		for (int i = 0; i < trackcount; i++) {
+		for (TableMgr::index_t i = 0; i < trackcount; i++) {
 			const char *poi = tm->QueryField(i,0);
 			if (poi[0]=='O' && poi[1]=='_') {
 				tracks[i].trackFlag=false;

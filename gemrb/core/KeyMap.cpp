@@ -106,7 +106,7 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		const char *function;
 		const char *group;
 
-		if (kmtable->GetRowIndex(name)>=0 ) {
+		if (kmtable->GetRowIndex(name) != TableMgr::npos) {
 			moduleName = kmtable->QueryField(name, "MODULE");
 			function = kmtable->QueryField(name, "FUNCTION");
 			group = kmtable->QueryField(name, "GROUP");

@@ -79,10 +79,10 @@ unsigned char MapReverb::obtainProfile () {
 		return loadProperties(0);
 	}
 
-	int rows = reverbMapping->GetRowCount();
+	TableMgr::index_t rows = reverbMapping->GetRowCount();
 	unsigned char configValue = 0;
 
-	for (int i = 0; i < rows; ++i) {
+	for (TableMgr::index_t i = 0; i < rows; ++i) {
 		ResRef mapName = reverbMapping->GetRowName(i);
 		if (mapName == map.WEDResRef) {
 			uint8_t profile = strtounsigned<uint8_t>(reverbMapping->QueryField(i, 0));

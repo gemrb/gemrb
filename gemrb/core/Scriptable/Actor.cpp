@@ -75,7 +75,7 @@ static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *multi = NULL;
 static int *maxLevelForHpRoll = NULL;
-static std::map<int, std::vector<int> > skillstats;
+static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
@@ -148,7 +148,7 @@ static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 // class -> kits map
 struct ClassKits {
-	std::vector<int> indices;
+	std::vector<TableMgr::index_t> indices;
 	std::vector<ieDword> ids;
 	std::vector<char*> clabs;
 	std::vector<char*> kitNames;
@@ -498,19 +498,19 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	// the rest had it hardcoded
 	if (!core->HasFeature(GF_RESDATA_INI)) {
 		// handle default speed and per-animation overrides
-		int row = -1;
+		TableMgr::index_t row = TableMgr::npos;
 		if (extspeed) {
 			char animHex[10];
 			snprintf(animHex, 10, "0x%04X", AnimID);
-			row = extspeed->FindTableValue((unsigned int) 0, animHex);
-			if (row != -1) {
+			row = extspeed->FindTableValue(0ul, animHex);
+			if (row != TableMgr::npos) {
 				int rate = atoi(extspeed->QueryField(row, 1));
 				SetBase(IE_MOVEMENTRATE, rate);
 			}
 		} else {
 			Log(MESSAGE, "Actor", "No moverate.2da found, using animation ({:#x}) for speed fallback!", AnimID);
 		}
-		if (row == -1) {
+		if (row == TableMgr::npos) {
 			const auto* anim = anims->GetAnimation(IE_ANI_WALK, S);
 			if (anim) {
 				SetBase(IE_MOVEMENTRATE, anim->at(0)->GetFrameCount());
@@ -616,13 +616,13 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 	AutoTable table = gamedata->LoadTable(clab);
 	if (!table) return;
 
-	int row = table->GetRowCount();
+	TableMgr::index_t row = table->GetRowCount();
 	int maxLevel = level;
 	// don't remove clabs from levels we haven't attained yet, just in case they contain non-sticky
 	// permanent effects like the charisma degradation in the oozemaster
 	if (remove) maxLevel -= diff;
 	for(int i=0; i<maxLevel; i++) {
-		for (int j=0; j<row; j++) {
+		for (TableMgr::index_t j = 0; j < row; ++j) {
 			const ResRef res = table->QueryField(j,i);
 			if (IsStar(res)) continue;
 
@@ -675,7 +675,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 #define KIT_BARBARIAN KIT_BASECLASS+31
 
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
-static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
+static TableMgr::index_t GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 {
 	if (!kit) return -1;
 
@@ -706,9 +706,9 @@ static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 	return -1;
 }
 
-ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
+TableMgr::index_t Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 {
-	int kitindex = 0;
+	TableMgr::index_t kitindex = 0;
 
 	if (iwd2class) {
 		return GetIWD2KitIndex(kit, baseclass);
@@ -722,12 +722,12 @@ ieDword Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
 	if (kitindex == 0) {
 		if (!baseclass) baseclass = GetActiveClass();
 		kitindex = GetIWD2KitIndex(kit, baseclass);
-		if (kitindex < 0) {
+		if (kitindex == TableMgr::npos) {
 			kitindex = 0;
 		}
 	}
 
-	return (ieDword)kitindex;
+	return kitindex;
 }
 
 //applies a kit on the character
@@ -735,7 +735,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
-	int row = GetKitIndex(kit, baseclass);
+	TableMgr::index_t row = GetKitIndex(kit, baseclass);
 	const char *clab = NULL;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
@@ -778,8 +778,8 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 		bool found = false;
 		std::map<int, ClassKits>::iterator clskit = class2kits.begin();
 		for (int cidx=0; clskit != class2kits.end(); clskit++, cidx++) {
-			std::vector<int> kits = class2kits[cidx].indices;
-			std::vector<int>::iterator it = kits.begin();
+			std::vector<TableMgr::index_t> kits = class2kits[cidx].indices;
+			auto it = kits.begin();
 			for (int kidx=0; it != kits.end(); it++, kidx++) {
 				if (row == *it) {
 					kitclass = cidx;
@@ -1949,7 +1949,7 @@ static void InitActorTables()
 				BABTable bt;
 				std::vector<BABTable> btv;
 				btv.reserve(tht->GetRowCount());
-				for (ieDword row = 0; row < tht->GetRowCount(); row++) {
+				for (TableMgr::index_t row = 0; row < tht->GetRowCount(); ++row) {
 					bt.level = atoi(tht->GetRowName(row));
 					bt.bab = atoi(tht->QueryField(row, 0));
 					bt.apr = atoi(tht->QueryField(row, 1));
@@ -2024,7 +2024,7 @@ static void InitActorTables()
 					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP"), true);
 					if (hptm) {
 						int tmphp = 0;
-						int rollscolumn = hptm->GetColumnIndex("ROLLS");
+						TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
 						while (atoi(hptm->QueryField(tmphp, rollscolumn)))
 							tmphp++;
 						AppendFormat(buffer, "HPROLLMAXLVL: {}", tmphp);
@@ -2077,7 +2077,7 @@ static void InitActorTables()
 							hptm = gamedata->LoadTable(tm->QueryField(currentname, "HP"), true);
 							if (hptm) {
 								int tmphp = 0;
-								int rollscolumn = hptm->GetColumnIndex("ROLLS");
+								TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
 								while (atoi(hptm->QueryField(tmphp, rollscolumn)))
 									tmphp++;
 								//make sure we at least set the first class
@@ -2125,8 +2125,8 @@ static void InitActorTables()
 	if (!iwd2class) {
 		tm = gamedata->LoadTable("numwslot", true);
 		if (tm) {
-			int rowcount = tm->GetRowCount();
-			for (int i = 0; i < rowcount; i++) {
+			TableMgr::index_t rowcount = tm->GetRowCount();
+			for (TableMgr::index_t i = 0; i < rowcount; i++) {
 				const char* cls = tm->GetRowName(i);
 				auto it = className2ID.find(cls);
 				int id = 0;
@@ -2143,9 +2143,9 @@ static void InitActorTables()
 		if (!tm) {
 			error("Actor", "Missing kitlist.2da!");
 		}
-		for (unsigned int i=0; i < tm->GetRowCount(); i++) {
+		for (TableMgr::index_t i = 0; i < tm->GetRowCount(); ++i) {
 			char rowName[6];
-			snprintf(rowName, sizeof(rowName), "%d", i);
+			snprintf(rowName, sizeof(rowName), "%ld", i);
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
@@ -2168,10 +2168,10 @@ static void InitActorTables()
 	}
 	tm = gamedata->LoadTable("lvlmodwm", true);
 	if (tm) {
-		int maxrow = tm->GetRowCount();
+		TableMgr::index_t maxrow = tm->GetRowCount();
 		for (int i = 0; i < 20; i++) {
-			for (int j = 0; j < MAX_LEVEL; j++) {
-				int row = maxrow;
+			for (TableMgr::index_t j = 0; j < MAX_LEVEL; j++) {
+				TableMgr::index_t row = maxrow;
 				if (j<row) row=j;
 				wmlevels[i][j] = strtosigned<int>(tm->QueryField(row,i));
 			}
@@ -2185,9 +2185,9 @@ static void InitActorTables()
 	}
 	tm = gamedata->LoadTable("vcremap");
 	if (tm) {
-		int rows = tm->GetRowCount();
+		TableMgr::index_t rows = tm->GetRowCount();
 
-		for (int i = 0; i < rows; i++) {
+		for (TableMgr::index_t i = 0; i < rows; i++) {
 			int row = atoi(tm->QueryField(i,0));
 			if (row<0 || row>=VCONST_COUNT) continue;
 			int value = atoi(tm->QueryField(i,1));
@@ -2199,11 +2199,11 @@ static void InitActorTables()
 	//initializing the skill->stats conversion table (used in iwd2)
 	tm = gamedata->LoadTable("skillsta", true);
 	if (tm) {
-		int rowcount = tm->GetRowCount();
-		int colcount = tm->GetColumnCount();
-		for (int i = 0; i < rowcount; i++) {
+		TableMgr::index_t rowcount = tm->GetRowCount();
+		TableMgr::index_t colcount = tm->GetColumnCount();
+		for (TableMgr::index_t i = 0; i < rowcount; i++) {
 			skillstats[i] = std::vector<int>();
-			for (int j = 0; j < colcount; j++) {
+			for (TableMgr::index_t j = 0; j < colcount; j++) {
 				int val;
 				// the stat and ability columns need conversion into numbers
 				if (j < 2) {
@@ -2222,7 +2222,7 @@ static void InitActorTables()
 	//initializing area flag comments
 	tm = gamedata->LoadTable("comment");
 	if (tm) {
-		int rowcount = tm->GetRowCount();
+		TableMgr::index_t rowcount = tm->GetRowCount();
 		afcount = rowcount;
 		if (rowcount) {
 			afcomments = (int **) calloc(rowcount, sizeof(int *) );
@@ -2238,15 +2238,15 @@ static void InitActorTables()
 	// dexterity modifier for thieving skills
 	tm = gamedata->LoadTable("skilldex");
 	if (tm) {
-		int skilldexNCols = tm->GetColumnCount();
-		int skilldexNRows = tm->GetRowCount();
+		TableMgr::index_t skilldexNCols = tm->GetColumnCount();
+		TableMgr::index_t skilldexNRows = tm->GetRowCount();
 		skilldex.reserve(skilldexNRows);
 
-		for (int i = 0; i < skilldexNRows; i++) {
+		for (TableMgr::index_t i = 0; i < skilldexNRows; i++) {
 			skilldex.emplace_back();
 			skilldex[i].reserve(skilldexNCols+1);
-			for (int j = -1; j < skilldexNCols; j++) {
-				if (j == -1) {
+			for (TableMgr::index_t j = -1; j < skilldexNCols; j++) {
+				if (j == TableMgr::npos) {
 					skilldex[i].push_back (atoi(tm->GetRowName(i)));
 				} else {
 					skilldex[i].push_back (atoi(tm->QueryField(i, j)));
@@ -2269,15 +2269,15 @@ static void InitActorTables()
 		subrace = core->GetSymbol(subracetable);
 	}
 	if (tm) {
-		int cols = tm->GetColumnCount();
-		int rows = tm->GetRowCount();
+		TableMgr::index_t cols = tm->GetColumnCount();
+		TableMgr::index_t rows = tm->GetRowCount();
 		skillrac.reserve(rows);
 
-		for (int i = 0; i < rows; i++) {
+		for (TableMgr::index_t i = 0; i < rows; i++) {
 			skillrac.emplace_back();
 			skillrac[i].reserve(cols+1);
-			for (int j = -1; j < cols; j++) {
-				if (j == -1) {
+			for (TableMgr::index_t j = -1; j < cols; j++) {
+				if (j == TableMgr::npos) {
 					// figure out the value from the race name
 					if (racetable == -1) {
 						value = 0;
@@ -2300,7 +2300,7 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("avprefix");
 	avBase = 0;
 	if (tm) {
-		int count = tm->GetRowCount();
+		TableMgr::index_t count = tm->GetRowCount();
 		if (count> 0 && count<8) {
 			avPrefix.resize(count - 1);
 			avBase = strtosigned<int>(tm->QueryField(0));
@@ -2325,9 +2325,9 @@ static void InitActorTables()
 	// races table
 	tm = gamedata->LoadTable("races");
 	if (tm && !pstflags) {
-		int racesNRows = tm->GetRowCount();
+		TableMgr::index_t racesNRows = tm->GetRowCount();
 
-		for (int i = 0; i < racesNRows; i++) {
+		for (TableMgr::index_t i = 0; i < racesNRows; i++) {
 			int raceID = strtosigned<int>(tm->QueryField(i, 3));
 			int favClass = strtosigned<int>(tm->QueryField(i, 8));
 			const char *raceName = tm->GetRowName(i);
@@ -2475,8 +2475,8 @@ void Actor::PlayCritDamageAnimation(int type)
 	AutoTable tm = gamedata->LoadTable("crits");
 	if (!tm) return;
 	//the ID's are in column 1, selected by specifics by GetCriticalType
-	int row = tm->FindTableValue (1, type);
-	if (row>=0) {
+	TableMgr::index_t row = tm->FindTableValue (1, type);
+	if (row != TableMgr::npos) {
 		//the animations are listed in column 0
 		AddAnimation(ResRef(tm->QueryField(row, 0)), -1, 45, AA_PLAYONCE|AA_BLEND);
 	}
@@ -6535,7 +6535,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 	}
 
 	//hit/damage/speed bonuses from wspecial (with tohit inverted in adnd)
-	static ieDword wspecialMax = wspecial->GetRowCount() - 1;
+	static TableMgr::index_t wspecialMax = wspecial->GetRowCount() - 1;
 	if (stars > wspecialMax) {
 		stars = wspecialMax;
 	}
@@ -8387,7 +8387,7 @@ bool Actor::GetSoundFromFile(ResRef &Sound, unsigned int index) const
 	}
 }
 
-bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
+bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 {
 	if (!anims) return false;
 
@@ -8436,7 +8436,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 			return false;
 	}
 	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(index));
-	int col = core->Roll(1,tab->GetColumnCount(index),-1);
+	TableMgr::index_t col = core->Roll(1,tab->GetColumnCount(index),-1);
 	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col));
 	return true;
 }
@@ -9481,7 +9481,7 @@ static ieDword ResolveTableValue(const ResRef& resref, ieDword stat, ieDword mco
 	//don't close this table, it can mess with the guiscripts
 	auto tm = gamedata->LoadTable(resref);
 	if (tm) {
-		unsigned int row;
+		TableMgr::index_t row;
 		if (mcol == 0xff) {
 			row = stat;
 		} else {
@@ -9824,7 +9824,7 @@ void Actor::CreateDerivedStatsBG()
 			// it's just applied later
 			// stalkers work by just using the effect, since they're not thieves
 			if (tm)	{
-				ieDword cols = tm->GetColumnCount();
+				TableMgr::index_t cols = tm->GetColumnCount();
 				if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
 				backstabdamagemultiplier = atoi(tm->QueryField(0, backstabdamagemultiplier));
 			} else {

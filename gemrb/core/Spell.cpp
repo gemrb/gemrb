@@ -56,10 +56,10 @@ private:
 		pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
 		AutoTable tm = gamedata->LoadTable("splfocus", true);
 		if (tm) {
-			size_t schoolcount = tm->GetRowCount();
+			TableMgr::index_t schoolcount = tm->GetRowCount();
 
 			spellfocus.resize(schoolcount);
-			for (size_t i = 0; i < schoolcount; i++) {
+			for (TableMgr::index_t i = 0; i < schoolcount; i++) {
 				ieDword stat = core->TranslateStat(tm->QueryField(i, 0));
 				ieDword val1 = atoi(tm->QueryField(i, 1));
 				ieDword val2 = atoi(tm->QueryField(i, 2));

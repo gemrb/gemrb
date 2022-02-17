@@ -202,7 +202,7 @@ void VEFObject::Load2DA(const ResRef &resource)
 	SingleObject = false;
 	ResName = resource;
 	ieDword GameTime = core->GetGame()->GameTime;
-	int rows = tab->GetRowCount();
+	TableMgr::index_t rows = tab->GetRowCount();
 	while(rows--) {
 		Point offset;
 		int delay, duration;

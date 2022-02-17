@@ -77,10 +77,10 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 	if (!Avatars) {
 		error("CharAnimations", "A critical animation file is missing!");
 	}
-	int AvatarsCount = Avatars->GetRowCount();
+	TableMgr::index_t AvatarsCount = Avatars->GetRowCount();
 	table.resize(AvatarsCount);
 	const DataFileMgr *resdata = core->GetResDataINI();
-	for (int i = AvatarsCount - 1; i >= 0; i--) {
+	for (TableMgr::index_t i = 0; i < AvatarsCount; ++i) {
 		table[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i));
 		table[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1);
 		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
@@ -115,7 +115,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 
 		if (resdata) {
 			char section[12];
-			snprintf(section, 10, "%d", i%100000); // the mod is just to silent warnings, since we know i is small enough
+			snprintf(section, 10, "%ld", i%100000); // the mod is just to silent warnings, since we know i is small enough
 
 			if (!resdata->GetKeysCount(section)) continue;
 
@@ -133,8 +133,8 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 
 	AutoTable blood = gamedata->LoadTable("bloodclr");
 	if (blood) {
-		int rows = blood->GetRowCount();
-		for(int i=0;i<rows;i++) {
+		TableMgr::index_t rows = blood->GetRowCount();
+		for(TableMgr::index_t i = 0; i < rows; ++i) {
 			char value = 0;
 			unsigned int flags = 0;
 			unsigned int rmin = 0;
@@ -159,8 +159,8 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 
 	AutoTable walk = gamedata->LoadTable("walksnd");
 	if (walk) {
-		int rows = walk->GetRowCount();
-		for(int i=0;i<rows;i++) {
+		TableMgr::index_t rows = walk->GetRowCount();
+		for (TableMgr::index_t i = 0; i < rows; ++i) {
 			ResRef value;
 			unsigned int rmin = 0;
 			unsigned int rmax = 0xffff;
@@ -189,8 +189,8 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 
 	AutoTable stances = gamedata->LoadTable("stances", true);
 	if (stances) {
-		int rows = stances->GetRowCount();
-		for (int i = 0; i < rows; i++) {
+		TableMgr::index_t rows = stances->GetRowCount();
+		for (TableMgr::index_t i = 0; i < rows; i++) {
 			unsigned int id = 0;
 			unsigned int s1 = 0;
 			unsigned int s2 = 0;
@@ -215,8 +215,8 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 
 	AutoTable avatarShadows = gamedata->LoadTable("shadows");
 	if (avatarShadows) {
-		int rows = avatarShadows->GetRowCount();
-		for (int i = 0; i < rows; ++i) {
+		TableMgr::index_t rows = avatarShadows->GetRowCount();
+		for (TableMgr::index_t i = 0; i < rows; ++i) {
 			unsigned int id = 0;
 			valid_unsignednumber(avatarShadows->GetRowName(i), id);
 

@@ -540,7 +540,7 @@ bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 	if (!tm)
 		return false;
 
-	for (unsigned int i = 0; i < tm->GetRowCount(); i++) {
+	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
 		musiclist.push_back(strdup(tm->QueryField(i, col)));
 	}
 
@@ -553,7 +553,7 @@ bool Interface::ReadDamageTypeTable() {
 		return false;
 
 	DamageInfoStruct di;
-	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
+	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
 		di.strref = DisplayMessage::GetStringReference(atoi(tm->QueryField(i, 0)));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2), nullptr, 16);
@@ -572,15 +572,15 @@ bool Interface::ReadSoundChannelsTable() const
 		return false;
 	}
 
-	int ivol = tm->GetColumnIndex("VOLUME");
-	int irev = tm->GetColumnIndex("REVERB");
-	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
+	TableMgr::index_t ivol = tm->GetColumnIndex("VOLUME");
+	TableMgr::index_t irev = tm->GetColumnIndex("REVERB");
+	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
 		const char *rowname = tm->GetRowName(i);
 		// translate some alternative names for the IWDs
 		if (!strcmp(rowname, "ACTION")) rowname = "ACTIONS";
 		else if (!strcmp(rowname, "SWING")) rowname = "SWINGS";
 		AudioDriver->SetChannelVolume(rowname, atoi(tm->QueryField(i, ivol)));
-		if (irev != -1) {
+		if (irev != TableMgr::npos) {
 			AudioDriver->SetChannelReverb(rowname, atof(tm->QueryField(i, irev)));
 		}
 	}
@@ -756,9 +756,9 @@ int Interface::LoadFonts()
 	// it could potentially save a a few megs of space (nice for handhelds)
 	// but we should re-enable this by simply letting Font instances share their atlas data
 
-	int count = tab->GetRowCount();
+	TableMgr::index_t count = tab->GetRowCount();
 	const char* rowName = NULL;
-	for (int row = 0; row < count; row++) {
+	for (TableMgr::index_t row = 0; row < count; ++row) {
 		rowName = tab->GetRowName(row);
 
 		ResRef resref = tab->QueryField(rowName, "RESREF");
@@ -2378,14 +2378,14 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	const char *sound_resref = NULL;
 	AutoTable mvesnd = gamedata->LoadTable("mvesnd", true);
 	if (mvesnd) {
-		int row = mvesnd->GetRowIndex(movieRef);
-		if (row != -1) {
-			int mvecol = mvesnd->GetColumnIndex("override");
-			if (mvecol != -1) {
+		TableMgr::index_t row = mvesnd->GetRowIndex(movieRef);
+		if (row != TableMgr::npos) {
+			TableMgr::index_t mvecol = mvesnd->GetColumnIndex("override");
+			if (mvecol != TableMgr::npos) {
 				actualMovieRef = mvesnd->QueryField(row, mvecol);
 			}
-			int sndcol = mvesnd->GetColumnIndex("sound_override");
-			if (sndcol != -1) {
+			TableMgr::index_t sndcol = mvesnd->GetColumnIndex("sound_override");
+			if (sndcol != TableMgr::npos) {
 				sound_resref = mvesnd->QueryField(row, sndcol);
 			}
 		}
@@ -2418,7 +2418,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		{
 			nextSubFrame = 0;
 
-			for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
+			for (TableMgr::index_t i = 0; i < sttable->GetRowCount(); ++i) {
 				const char* rowName = sttable->GetRowName(i);
 				if (!std::isdigit(rowName[0])) continue; // this skips the initial palette rows (red, blue, green)
 
@@ -2940,19 +2940,17 @@ bool Interface::InitItemTypes()
 	ItemTypes = 0;
 	if (it) {
 		ItemTypes = it->GetRowCount(); //number of itemtypes
-		if (ItemTypes<0) {
-			ItemTypes = 0;
-		}
-		int InvSlotTypes = it->GetColumnCount();
+
+		TableMgr::index_t InvSlotTypes = it->GetColumnCount();
 		if (InvSlotTypes > 32) { //bit count limit
 			InvSlotTypes = 32;
 		}
 		//make sure unsigned int is 32 bits
 		slotmatrix = (ieDword *) malloc(ItemTypes * sizeof(ieDword) );
-		for (int i = 0; i < ItemTypes; i++) {
+		for (TableMgr::index_t i = 0; i < ItemTypes; i++) {
 			unsigned int value = 0;
 			unsigned int k = 1;
-			for (int j=0;j<InvSlotTypes;j++) {
+			for (TableMgr::index_t j = 0; j < InvSlotTypes; ++j) {
 				if (strtosigned<long>(it->QueryField(i,j))) {
 					value |= k;
 				}
@@ -2965,7 +2963,7 @@ bool Interface::InitItemTypes()
 
 	//itemtype data stores (armor failure and critical damage multipliers), critical range
 	itemtypedata.reserve(ItemTypes);
-	for (int i = 0; i < ItemTypes; i++) {
+	for (size_t i = 0; i < ItemTypes; i++) {
 		itemtypedata.emplace_back(4);
 		//default values in case itemdata is missing (it is needed only for iwd2)
 		if (slotmatrix[i] & SLOT_WEAPON) {
@@ -2977,13 +2975,13 @@ bool Interface::InitItemTypes()
 	}
 	AutoTable af = gamedata->LoadTable("itemdata");
 	if (af) {
-		int armcount = af->GetRowCount();
-		int colcount = af->GetColumnCount();
-		for (int i = 0; i < armcount; i++) {
+		TableMgr::index_t armcount = af->GetRowCount();
+		TableMgr::index_t colcount = af->GetColumnCount();
+		for (TableMgr::index_t i = 0; i < armcount; i++) {
 			int itemtype = (ieWord) atoi( af->QueryField(i,0) );
 			if (itemtype<ItemTypes) {
 				// we don't need the itemtype column, since it is equal to the position
-				for (int j = 0; j < colcount - 1; j++) {
+				for (TableMgr::index_t j = 0; j < colcount - 1; ++j) {
 					itemtypedata[itemtype][j] = atoi(af->QueryField(i, j+1));
 				}
 			}
@@ -3441,8 +3439,8 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 		return false;
 	}
 
-	int i = tab->GetRowCount();
-	for (int j = 0; j < i; j++) {
+	TableMgr::index_t i = tab->GetRowCount();
+	for (TableMgr::index_t j = 0; j < i; j++) {
 		ResRef ItemName;
 		if (Prefix) {
 			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
@@ -3450,11 +3448,11 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j));
 		}
 
-		int l=tab->GetColumnCount(j);
+		TableMgr::index_t l = tab->GetColumnCount(j);
 		if (l<1) continue;
 		int cl = atoi(tab->GetColumnName(0));
 		std::vector<ResRef> refs;
-		for(int k=0;k<l;k++) {
+		for(TableMgr::index_t k=0;k<l;k++) {
 			refs.push_back(ResRef::MakeLowerCase(tab->QueryField(j, k)));
 		}
 		RtRows.emplace(ItemName, ItemList(std::move(refs), cl));
@@ -4300,8 +4298,8 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 
 	AutoTable tab = gamedata->LoadTable(resref);
 	if (tab) {
-		unsigned int cols = tab->GetColumnCount();
-		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
+		TableMgr::index_t cols = tab->GetColumnCount();
+		TableMgr::index_t row = Roll(1,tab->GetRowCount(),-1);
 		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0));
 		if (cols > 1) {
 			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1));
@@ -4371,13 +4369,13 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 		Log(ERROR, "Core", "Cannot resolve stat bonus.");
 		return -1;
 	}
-	int count = mtm->GetRowCount();
+	TableMgr::index_t count = mtm->GetRowCount();
 	if (count< 1) {
 		return 0;
 	}
 	int ret = 0;
 	// tables for additive modifiers of bonus type
-	for (int i = 0; i < count; i++) {
+	for (TableMgr::index_t i = 0; i < count; i++) {
 		ResRef subTableName = mtm->GetRowName(i);
 		int checkcol = strtosigned<int>(mtm->QueryField(i,1));
 		unsigned int readcol = strtounsigned<unsigned int>(mtm->QueryField(i,2));
@@ -4388,7 +4386,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 		auto tm = gamedata->LoadTable(subTableName);
 		if (!tm) continue;
 
-		int row;
+		TableMgr::index_t row;
 		if (checkcol == -1) {
 			// use the row names
 			const std::string& rowName = fmt::format("{}", value);
@@ -4397,7 +4395,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 			// use the checkcol column (default of 0)
 			row = tm->FindTableValue(checkcol, value, 0);
 		}
-		if (row>=0) {
+		if (row != TableMgr::npos) {
 			ret += strtosigned<int>(tm->QueryField(row, readcol));
 		}
 	}

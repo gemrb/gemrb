@@ -189,7 +189,7 @@ private:
 	ResRefMap<AutoTable> tables;
 	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;
-	std::map<ieDword, std::vector<ResRef>> ItemSounds;
+	std::map<size_t, std::vector<ResRef>> ItemSounds;
 	AutoTable racialInfravision;
 	AutoTable raceTHAC0Bonus;
 	AutoTable spellAbilityDie;
