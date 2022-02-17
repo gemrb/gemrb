@@ -1903,10 +1903,9 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// fall through
 	case 2:
 		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS)) {
-			const ieDword *CynicismList = core->GetListFrom2DA(fx->Resource);
-			ieDword i = CynicismList[0];
-			if (i) {
-				DisplayStringCore(target, ieStrRef(CynicismList[core->Roll(1,i,0)]), DS_HEAD);
+			const auto CynicismList = core->GetListFrom2DA(fx->Resource);
+			if (!CynicismList->empty()) {
+				DisplayStringCore(target, ieStrRef(CynicismList->at(RAND<size_t>(0, CynicismList->size() - 1))), DS_HEAD);
 			}
 		}
 		return FX_APPLIED;
@@ -2774,12 +2773,9 @@ int fx_entropy_shield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Resource = "ENTROPY";
 	}
 	//immunity to certain projectiles
-	const ieDword *EntropyProjectileList = core->GetListFrom2DA(fx->Resource);
-	ieDword i = EntropyProjectileList[0];
-	//the index is handled differently because
-	//the list's first element is the element count
-	while(i) {
-		target->AddProjectileImmunity(EntropyProjectileList[i--]);
+	const auto EntropyProjectileList = core->GetListFrom2DA(fx->Resource);
+	for (auto pro : *EntropyProjectileList) {
+		target->AddProjectileImmunity(pro);
 	}
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_ENTROPY);

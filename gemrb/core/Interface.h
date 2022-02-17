@@ -694,7 +694,7 @@ public:
 	unwanted return variables could be omitted */
 	void GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const;
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
-	ieDword *GetListFrom2DA(const ResRef& resref);
+	std::vector<ieDword>* GetListFrom2DA(const ResRef& resref);
 	/** translates a stat symbol to numeric value */
 	ieDword TranslateStat(const char *stat_name);
 	/** resolves a stat bonus based on multiple stats */
@@ -757,7 +757,7 @@ private:
 	/** Executes everything (non graphical) in the main game loop */
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */
-	ieDword *GetListFrom2DAInternal(const ResRef& resref);
+	std::vector<ieDword>* GetListFrom2DAInternal(const ResRef& resref);
 
 public:
 	CFGConfigData config;

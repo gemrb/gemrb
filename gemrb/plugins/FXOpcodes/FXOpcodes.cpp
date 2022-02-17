@@ -4321,10 +4321,9 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 
 		//random text for other games
-		const ieDword *rndstr2 = core->GetListFrom2DA(fx->Resource);
-		int cnt = rndstr2[0];
-		if (cnt) {
-			fx->Parameter1 = rndstr2[core->Roll(1,cnt,0)];
+		const auto rndstr2 = core->GetListFrom2DA(fx->Resource);
+		if (!rndstr2->empty()) {
+			fx->Parameter1 = rndstr2->at(RAND<size_t>(0, rndstr2->size() - 1));
 		}
 	}
 
@@ -7115,36 +7114,14 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x111 RemoveProjectile
 int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	//the list is now cached by Interface, no need of freeing it
-	ieDword *projectilelist;
-
 	//instant effect
 	// print("fx_remove_projectile(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	if (!target) return FX_NOT_APPLIED;
 	const Map *area = target->GetCurrentArea();
 	if (!area) return FX_NOT_APPLIED;
-
-	switch (fx->Parameter2) {
-	case 0: //standard bg2
-		projectilelist = core->GetListFrom2DA(ResRef("clearair"));
-		break;
-	case 1: //you can give a 2da for projectile list (gemrb)
-		projectilelist = core->GetListFrom2DA(fx->Resource);
-		break;
-	case 2: //or you can give one single projectile in param1 (gemrb)
-		projectilelist = (ieDword *) malloc(2*sizeof(ieDword));
-		projectilelist[0]=1;
-		projectilelist[1]=fx->Parameter1;
-		break;
-	default:
-		return FX_NOT_APPLIED;
-	}
-	//The first element is the counter, so don't decrease the counter here
-	int i = projectilelist[0];
-
-	while(i) {
-		ieDword projectile = projectilelist[i];
+	
+	auto HandleProjectile = [&](ieDword projectile) {
 		proIterator piter;
 
 		size_t cnt = area->GetProjectileCount(piter);
@@ -7157,10 +7134,31 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (target) {
 			target->fxqueue.RemoveAllEffectsWithProjectile(projectile);
 		}
-		i--;
+	};
+
+	ResRef listref;
+	switch (fx->Parameter2) {
+	case 0: //standard bg2
+		listref = "clearair";
+		break;
+	case 1: //you can give a 2da for projectile list (gemrb)
+		listref = fx->Resource;
+		break;
+	case 2: //or you can give one single projectile in param1 (gemrb)
+		HandleProjectile(fx->Parameter1);
+			return FX_NOT_APPLIED;
+	default:
+		return FX_NOT_APPLIED;
 	}
-	//this one was constructed by us
-	if (fx->Parameter2==2) free(projectilelist);
+	
+	//the list is now cached by Interface, no need of freeing it
+	std::vector<ieDword>* projectilelist = core->GetListFrom2DA(listref);
+	assert(projectilelist);
+	
+	for (const auto projectile : *projectilelist) {
+		HandleProjectile(projectile);
+	}
+
 	return FX_NOT_APPLIED;
 }
 

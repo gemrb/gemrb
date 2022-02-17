@@ -4312,29 +4312,25 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	}
 }
 
-ieDword *Interface::GetListFrom2DAInternal(const ResRef& resref)
+std::vector<ieDword>* Interface::GetListFrom2DAInternal(const ResRef& resref)
 {
-	ieDword *ret;
+	// FIXME: this is a new/free mismatch inside Variables
+	// luckily, ieDword is trivially destructable and we use the default global allocator
+	std::vector<ieDword>* ret = new std::vector<ieDword>;
 
 	AutoTable tab = gamedata->LoadTable(resref);
 	if (tab) {
-		ieDword cnt = tab->GetRowCount();
-		ret = (ieDword *) malloc((1+cnt)*sizeof(ieDword));
-		ret[0]=cnt;
-		while(cnt) {
-			ret[cnt] = strtounsigned<ieDword>(tab->QueryField(cnt-1, 0));
-			cnt--;
+		ret->resize(tab->GetRowCount());
+		for (size_t i = 0; i < ret->size(); ++i) {
+			ret->at(i) = strtounsigned<ieDword>(tab->QueryField(i, 0));
 		}
-		return ret;
 	}
-	ret = (ieDword *) malloc(sizeof(ieDword));
-	ret[0]=0;
 	return ret;
 }
 
-ieDword* Interface::GetListFrom2DA(const ResRef& tablename)
+std::vector<ieDword>* Interface::GetListFrom2DA(const ResRef& tablename)
 {
-	ieDword *list = NULL;
+	std::vector<ieDword>* list = nullptr;
 
 	if (!lists->Lookup(tablename, (void *&) list)) {
 		list = GetListFrom2DAInternal(tablename);
