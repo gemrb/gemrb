@@ -436,7 +436,6 @@ int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 45
 
 int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 
-// FIXME: Make this an ordered list, so we could use bsearch!
 static EffectDesc effectnames[] = {
 	EffectDesc("*Crash*", fx_crash, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("AcidResistanceModifier", fx_acid_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
@@ -875,6 +874,7 @@ static void RegisterCoreOpcodes()
 
 #define STONE_GRADIENT 14 // for stoneskin, not petrification
 #define ICE_GRADIENT 71
+static const ieDword fullstone[7]= { STONE_GRADIENT, STONE_GRADIENT, STONE_GRADIENT, STONE_GRADIENT, STONE_GRADIENT, STONE_GRADIENT, STONE_GRADIENT };
 
 static inline void SetGradient(Actor *target,const ieDword *gradients)
 {
@@ -905,13 +905,13 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 	}
 }
 
-// ignoring strextra, since it won't be used
-EffectRef mainStatRefs[] = { fx_str_ref, fx_str_ref, fx_int_ref, fx_wis_ref, fx_dex_ref, fx_con_ref, fx_chr_ref };
-
 // handle 3ed's effect exclusion for main stats, where only the highest bonus counts
 // NOTE: handles only additive bonuses, since others aren't present and would only muddy matters
 static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx)
 {
+	// ignoring strextra, since it won't be used
+	EffectRef mainStatRefs[] = { fx_str_ref, fx_str_ref, fx_int_ref, fx_wis_ref, fx_dex_ref, fx_con_ref, fx_chr_ref };
+
 	int bonus = fx->Parameter1;
 	if (!core->HasFeature(GF_3ED_RULES) || fx->Parameter2 != MOD_ADDITIVE) return;
 
@@ -2463,11 +2463,12 @@ int fx_kill_creature_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 1 - switch good and evil
 // 2 - switch lawful and chaotic
 
-static const int al_switch_both[12] = { 0, 0x33, 0x32, 0x31, 0, 0x23, 0x22, 0x21, 0, 0x13, 0x12, 0x11 };
-static const int al_switch_law[12] = { 0, 0x31, 0x32, 0x33, 0, 0x21, 0x22, 0x23, 0, 0x11, 0x12, 0x13 };
-static const int al_switch_good[12] = { 0, 0x13, 0x12, 0x11, 0, 0x23, 0x22, 0x21, 0, 0x33, 0x32, 0x31 };
 int fx_alignment_invert (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
+	static const int al_switch_both[12] = { 0, 0x33, 0x32, 0x31, 0, 0x23, 0x22, 0x21, 0, 0x13, 0x12, 0x11 };
+	static const int al_switch_law[12] = { 0, 0x31, 0x32, 0x33, 0, 0x21, 0x22, 0x23, 0, 0x11, 0x12, 0x13 };
+	static const int al_switch_good[12] = { 0, 0x13, 0x12, 0x11, 0, 0x23, 0x22, 0x21, 0, 0x33, 0x32, 0x31 };
+
 	// print("fx_alignment_invert(%2d)", fx->Opcode);
 	ieDword newalign = target->GetStat( IE_ALIGNMENT );
 	if (!newalign) {
@@ -2695,12 +2696,11 @@ int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x43 SummonCreature
-
-static const int eamods[] = { EAM_ALLY, EAM_ALLY, EAM_DEFAULT, EAM_ALLY, EAM_DEFAULT, EAM_ENEMY, EAM_ALLY };
-
 int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_summon_creature(%2d): ResRef:%s Anim:%s Type: %d", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2);
+
+	static const int eamods[] = { EAM_ALLY, EAM_ALLY, EAM_DEFAULT, EAM_ALLY, EAM_DEFAULT, EAM_ENEMY, EAM_ALLY };
 
 	//summon creature (resource), play vvc (resource2)
 	//creature's lastsummoner is Owner
@@ -3921,10 +3921,6 @@ int fx_movement_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-#define FX_MS 10
-static const ResRef monster_summoning_2da[FX_MS] = { "MONSUM01", "MONSUM02", "MONSUM03",
- "ANISUM01", "ANISUM02", "MONSUM01", "MONSUM02", "MONSUM03", "ANISUM01", "ANISUM02" };
-
 // 0x7f MonsterSummoning
 int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -3944,11 +3940,13 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	ResRef areahit;
 	ResRef table;
 	int level = fx->Parameter1;
+	static const std::array<ResRef, 10> monster_summoning_2da = { "MONSUM01", "MONSUM02", "MONSUM03",
+		"ANISUM01", "ANISUM02", "MONSUM01", "MONSUM02", "MONSUM03", "ANISUM01", "ANISUM02" };
 
 	if (!fx->Resource.IsEmpty()) {
 		table = fx->Resource;
 	} else {
-		if (fx->Parameter2 >= FX_MS) {
+		if (fx->Parameter2 >= monster_summoning_2da.size()) {
 			table = "ANISUM03";
 		} else {
 			table = monster_summoning_2da[fx->Parameter2];
@@ -4336,12 +4334,12 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x8c CastingGlow
-static const int ypos_by_direction[16]={10,10,10,0,-10,-10,-10,-10,-10,-10,-10,-10,0,10,10,10};
-static const int xpos_by_direction[16]={0,-10,-12,-14,-16,-14,-12,-10,0,10,12,14,16,14,12,10};
-
 int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_casting_glow(%2d): Type: %d", fx->Opcode, fx->Parameter2);
+
+	static const int ypos_by_direction[16] = { 10, 10, 10, 0, -10, -10, -10, -10, -10, -10, -10, -10, 0, 10, 10, 10 };
+	static const int xpos_by_direction[16] = { 0, -10, -12, -14, -16, -14, -12, -10, 0, 10, 12, 14, 16, 14, 12, 10 };
 
 	if (fx->Parameter2 < gamedata->castingGlows.size()) {
 		// check if we're in SpellCastEffect mode for iwd2
@@ -4473,12 +4471,12 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 16 - class (SPCL)
 */
 
-static const ieDword dsc_bits_iwd2[7] = { 1, 14, 6, 2, 4, 8, 16 };
-static const ieDword dsc_bits_bg2[7] = { 1, 4, 2, 8, 16, 14, 6 };
 int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_disable_spellcasting(%2d): Button: %d", fx->Opcode, fx->Parameter2);
 
+	static const ieDword dsc_bits_iwd2[7] = { 1, 14, 6, 2, 4, 8, 16 };
+	static const ieDword dsc_bits_bg2[7] = { 1, 4, 2, 8, 16, 14, 6 };
 	bool display_warning = false;
 	ieDword tmp = fx->Parameter2+1;
 
@@ -4732,12 +4730,11 @@ int fx_play_movie (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x99 Overlay:Sanctuary
-static const ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
-
+// iwd and bg are a bit different, but we solve the whole stuff in a single opcode
 int fx_set_sanctuary_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	//iwd and bg are a bit different, but we solve the whole stuff in a single opcode
 	// print("fx_set_sanctuary_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	static const ieDword fullwhite[7] = { ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT };
 
 	// don't set the state twice
 	// SetSpellState will also check if it is already set first
@@ -5934,8 +5931,6 @@ int fx_power_word_sleep (Scriptable* Owner, Actor* target, Effect* fx)
 	return fx_set_unconscious_state(Owner,target,fx);
 }
 
-static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
-
 // 0xda StoneSkinModifier
 int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -6409,13 +6404,12 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define WB_OWNDIR 6
 #define WB_AWAYOWNDIR 7
 
-static const int coords[16][2]={ {0, 12}, {-4, 9}, {-8, 6}, {-12, 3}, {-16, 0}, {-12, -3}, {-8, -6}, {-4, -9},
-{0, -12}, {4, -9}, {8, -6}, {12, -3}, {16, 0}, {12, 3}, {8, 6}, {4, 9}, };
-
 // 0xeb WingBuffet
 int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_wing_buffet(%2d): Mode: %d, Strength: %d", fx->Opcode, fx->Parameter2, fx->Parameter1);
+	static const int coords[16][2]={ {0, 12}, {-4, 9}, {-8, 6}, {-12, 3}, {-16, 0}, {-12, -3}, {-8, -6}, {-4, -9},
+	{0, -12}, {4, -9}, {8, -6}, {12, -3}, {16, 0}, {12, 3}, {8, 6}, {4, 9}, };
 
 	//creature immunity is based on creature size (though the original is rather cheesy)
 	if (target->GetAnims()->GetCircleSize()>5) {
@@ -7784,10 +7778,12 @@ int fx_uncanny_dodge (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 we allow also setting the normal stats, below index 256
 */
-static EffectRef fx_damage_bonus_modifier2_ref = { "DamageBonusModifier2", -1 };
-static const int damage_mod_map[] = { 4, 2, 9, 3, 1, 8, 6, 5, 10, 7, 11, 12, 13 };
+
 int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 {
+	static EffectRef fx_damage_bonus_modifier2_ref = { "DamageBonusModifier2", -1 };
+	static const int damage_mod_map[] = { 4, 2, 9, 3, 1, 8, 6, 5, 10, 7, 11, 12, 13 };
+
 	ieWord stat = fx->Parameter2 & 0x0000ffff;
 	ieWord type = fx->Parameter2 >> 16;
 
