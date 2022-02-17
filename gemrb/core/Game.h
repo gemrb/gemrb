@@ -264,7 +264,6 @@ public:
 	size_t partysize = 6;
 	ieDword interval = 1000 / AI_UPDATE_TIME; // a tenth of a round in ms
 	std::atomic_uint32_t GameTime {0};
-	ieDword LastScriptUpdate = 0; // GameTime at which UpdateScripts last ran
 	ieDword RealTime = 0;
 	ieWord  WhichFormation = 0;
 	ieWord  Formations[5]{};
