@@ -38,7 +38,7 @@ private:
 	std::vector< char*> rowNames;
 	std::vector< char*> ptrs;
 	std::vector< RowEntry> rows;
-	char defVal[32];
+	std::string defVal;
 public:
 	p2DAImporter(void);
 	p2DAImporter(const p2DAImporter&) = delete;
@@ -69,20 +69,20 @@ public:
 	inline const char* QueryField(index_t row = 0, index_t column = 0) const override
 	{
 		if (rows.size() <= row) {
-			return (const char *) defVal;
+			return defVal.c_str();
 		}
 		if (rows[row].size() <= column) {
-			return (const char *) defVal;
+			return defVal.c_str();
 		}
 		if (rows[row][column][0]=='*' && !rows[row][column][1]) {
-			return (const char *) defVal;
+			return defVal.c_str();
 		}
 		return rows[row][column];
 	}
 
 	const char* QueryDefault() const override
 	{
-		return defVal;
+		return defVal.c_str();
 	}
 
 	inline index_t GetRowIndex(const char* string) const override
