@@ -61,13 +61,12 @@ bool p2DAImporter::Open(DataStream* str)
 		// also, certain creatures are described by 2da's without signature.
 		// return false;
 	}
-	Signature[0] = 0;
 	str->ReadLine( Signature, sizeof(Signature) );
 	const char* token = strtok(Signature, " ");
 	if (token) {
-		strlcpy(defVal, token, sizeof(defVal));
+		defVal = token;
 	} else { // no whitespace
-		strlcpy(defVal, Signature, sizeof(defVal));
+		defVal = Signature;
 	}
 	bool colHead = true;
 	int row = 0;
