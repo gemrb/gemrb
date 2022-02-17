@@ -1305,7 +1305,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	int real = core->Roll(1,cnt,-1);
+	TableMgr::index_t real = RAND<TableMgr::index_t>(0, cnt - 1);
 	ResRef resrefs[2] = { tab->QueryField(size_t(0), 0), tab->QueryField(0, 1) };
 
 	for (TableMgr::index_t i = 0; i < cnt; ++i) {

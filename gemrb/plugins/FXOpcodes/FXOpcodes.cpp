@@ -7638,8 +7638,8 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	TableMgr::index_t max = tm->GetRowCount();
-	int tmp = core->Roll(1,max,0);
-	int i = tmp;
+	TableMgr::index_t tmp = RAND<TableMgr::index_t>(1, max);
+	TableMgr::index_t i = tmp;
 	bool pass = true;
 	while(--i!=tmp && pass) {
 		if (i == TableMgr::npos) {
