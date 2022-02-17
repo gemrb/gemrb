@@ -11125,11 +11125,11 @@ ResRef Actor::GetArmorSound() const
 		const char* suffixes = "12345678";
 		int idx = RAND(0, maxChar-1);
 		if (armorCode == '2') {
-			sound.SNPrintF("A_LTHR%s", suffixes[idx]);
+			sound.SNPrintF("A_LTHR%c", suffixes[idx]);
 		} else if (armorCode == '3') {
-			sound.SNPrintF("A_CHAIN%s", suffixes[idx]);
+			sound.SNPrintF("A_CHAIN%c", suffixes[idx]);
 		} else { // 4
-			sound.SNPrintF("A_PLATE%s", suffixes[idx]);
+			sound.SNPrintF("A_PLATE%c", suffixes[idx]);
 		}
 	} else {
 		// generate a 1 letter suffix or emulate an empty string
