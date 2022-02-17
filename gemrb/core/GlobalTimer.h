@@ -30,8 +30,6 @@ namespace GemRB {
 class GEM_EXPORT GlobalTimer {
 private:
 	tick_t startTime = 0; //forcing an update;
-	//AI_UPDATE_TIME: how many AI updates in a second
-	tick_t interval = (1000 / AI_UPDATE_TIME);
 
 	tick_t fadeToCounter = 0;
 	tick_t fadeToMax = 0;

@@ -120,6 +120,7 @@ struct DamageInfoStruct {
 };
 
 struct TimeStruct {
+	unsigned int ai_update_time;
 	unsigned int round_sec;
 	unsigned int turn_sec;
 	unsigned int round_size; // in ticks
@@ -130,7 +131,7 @@ struct TimeStruct {
 	unsigned int day_sec;
 	unsigned int day_size;
 
-	int GetHour(unsigned int time) const { return (time / AI_UPDATE_TIME ) % day_sec / hour_sec; }
+	int GetHour(unsigned int time) const { return (time / ai_update_time) % day_sec / hour_sec; }
 };
 
 // cache of speldesc.2da entries

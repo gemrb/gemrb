@@ -116,6 +116,7 @@ void GlobalTimer::DoStep(int count)
 bool GlobalTimer::UpdateViewport(tick_t thisTime)
 {
 	tick_t advance = thisTime - startTime;
+	tick_t interval = 1000 / (core ? core->Time.ai_update_time : 15); // length of a tick in ms
 	if ( advance < interval) {
 		return false;
 	}
@@ -212,12 +213,12 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 {
 	if (!Count) {
-		Count = 2 * AI_UPDATE_TIME;
+		Count = 2 * core->Time.ai_update_time;
 	}
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
 	//stay black for a while
-	fadeFromCounter = 4 * AI_UPDATE_TIME;
+	fadeFromCounter = 4 * core->Time.ai_update_time;
 	fadeFromMax = 0;
 	fadeToFactor = factor;
 }
@@ -225,7 +226,7 @@ void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 {
 	if (!Count) {
-		Count = 2 * AI_UPDATE_TIME;
+		Count = 2 * core->Time.ai_update_time;
 	}
 	fadeFromCounter = 0;
 	fadeFromMax = Count;

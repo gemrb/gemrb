@@ -4917,7 +4917,7 @@ static PyObject* GemRB_GetGameTime(PyObject * /*self*/, PyObject* /*args*/)
 {
 	GET_GAME();
 
-	unsigned long GameTime = game->GameTime/AI_UPDATE_TIME;
+	unsigned long GameTime = game->GameTime / core->Time.ai_update_time;
 	return PyLong_FromLong(GameTime);
 }
 

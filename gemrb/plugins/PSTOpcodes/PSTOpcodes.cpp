@@ -196,7 +196,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	} else {
 		if (fx->Parameter2&1) {
 			//four cycles, duration is in millisecond
-			sca->SetDefaultDuration(sca->GetSequenceDuration(AI_UPDATE_TIME));
+			sca->SetDefaultDuration(sca->GetSequenceDuration(core->Time.ai_update_time));
 		} else {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 		}
@@ -570,7 +570,7 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 static inline void ConvertTiming(Effect *fx, int Duration)
 {
 	// GameTime will be added in by EffectQueue
-	fx->Duration = Duration ? Duration * AI_UPDATE_TIME : 1;
+	fx->Duration = Duration ? Duration * core->Time.ai_update_time : 1;
 	if (fx->TimingMode == FX_DURATION_ABSOLUTE) {
 		fx->Duration += core->GetGame()->GameTime;
 	}

@@ -714,7 +714,7 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 	sca->SetBlend();
 	sca->Pos = Pos;
 	area->AddVVCell(vef);
-	return sca->GetSequenceDuration(AI_UPDATE_TIME);
+	return sca->GetSequenceDuration(core->Time.ai_update_time);
 }
 
 void Projectile::DoStep(unsigned int walk_speed)

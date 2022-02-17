@@ -1632,7 +1632,7 @@ bool Scriptable::TimerExpired(ieDword ID)
 
 void Scriptable::StartTimer(ieDword ID, ieDword expiration)
 {
-	ieDword newTime = core->GetGame()->GameTime + expiration*AI_UPDATE_TIME;
+	ieDword newTime = core->GetGame()->GameTime + expiration * core->Time.ai_update_time;
 	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
 	if (tit != script_timers.end()) {
 		tit->second = newTime;
@@ -2247,7 +2247,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	if (can_stop) {
 		Region vp = core->GetGameControl()->Viewport();
 		if (!vp.PointInside(Pos)) {
-			SetWait(AI_UPDATE_TIME * core->Roll(1, 40, 0));
+			SetWait(core->Time.ai_update_time * core->Roll(1, 40, 0));
 			return;
 		}
 		// a 50/50 chance to move or do a spin (including its own wait)

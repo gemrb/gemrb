@@ -515,15 +515,16 @@ bool Interface::ReadGameTimeTable()
 		return false;
 	}
 
+	Time.ai_update_time = AI_UPDATE_TIME;
 	Time.round_sec = atoi(table->QueryField("ROUND_SECONDS", "DURATION"));
 	Time.turn_sec = atoi(table->QueryField("TURN_SECONDS", "DURATION"));
-	Time.round_size = Time.round_sec * AI_UPDATE_TIME;
+	Time.round_size = Time.round_sec * Time.ai_update_time;
 	Time.rounds_per_turn = Time.turn_sec / Time.round_sec;
 	Time.attack_round_size = atoi(table->QueryField("ATTACK_ROUND", "DURATION"));
 	Time.hour_sec = 300; // move to table if pst turns out to be different
-	Time.hour_size = Time.hour_sec * AI_UPDATE_TIME;
+	Time.hour_size = Time.hour_sec * Time.ai_update_time;
 	Time.day_sec = Time.hour_sec * 24; // move to table if pst turns out to be different
-	Time.day_size = Time.day_sec * AI_UPDATE_TIME;
+	Time.day_size = Time.day_sec * Time.ai_update_time;
 
 	return true;
 }
@@ -2081,7 +2082,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 				//set up the summon disable effect
 				Effect *newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);
 				if (newfx) {
-					newfx->Duration = vvc->GetSequenceDuration(AI_UPDATE_TIME)*9/10 + core->GetGame()->GameTime;
+					newfx->Duration = vvc->GetSequenceDuration(Time.ai_update_time) * 9 / 10 + core->GetGame()->GameTime;
 					ApplyEffect(newfx, ab, ab);
 				}
 			}

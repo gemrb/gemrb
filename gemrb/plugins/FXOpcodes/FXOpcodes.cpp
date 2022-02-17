@@ -972,7 +972,7 @@ static void Resurrect(const Scriptable *Owner, Actor *target, const Effect *fx, 
 inline void HandlePercentageDamage(Effect *fx, const Actor *target) {
 	if (fx->Parameter2 == RPD_PERCENT && fx->FirstApply) {
 		// distribute the damage to one second intervals
-		int seconds = (fx->Duration - core->GetGame()->GameTime) / AI_UPDATE_TIME;
+		int seconds = (fx->Duration - core->GetGame()->GameTime) / core->Time.ai_update_time;
 		fx->Parameter1 = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100 / seconds;
 	}
 }
@@ -1861,7 +1861,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	ieDword damage = 0;
 	tick_t tmp = fx->Parameter1;
-	tick_t timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
+	tick_t timeStep = target->GetAdjustedTime(core->Time.ai_update_time);
 
 	HandlePercentageDamage(fx, target);
 	Scriptable *caster = GetCasterObject();
@@ -2980,7 +2980,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case RPD_SECONDS:
 		damage = 1;
-		if (fx->Parameter1 && (core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
+		if (fx->Parameter1 && (core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * core->Time.ai_update_time))) {
 			return FX_APPLIED;
 		}
 		break;
@@ -2988,7 +2988,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case RPD_POINTS:
 		damage = fx->Parameter1;
 		// per second
-		if (core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME)) {
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time)) {
 			return FX_APPLIED;
 		}
 		break;
@@ -3028,7 +3028,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case RPD_MOLD: //mold touch (how)
 		EXTSTATE_SET(EXTSTATE_MOLD);
 		target->SetSpellState(SS_MOLDTOUCH);
-		if (core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME)) {
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time)) {
 			return FX_APPLIED;
 		}
 		if (fx->Parameter1<1) {
@@ -3300,7 +3300,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int damage;
 	int tmp = fx->Parameter1;
 	ieDword gameTime = core->GetGame()->GameTime;
-	tick_t timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
+	tick_t timeStep = target->GetAdjustedTime(core->Time.ai_update_time);
 
 	if (fx->FirstApply) {
 		//ensure we prepare Parameter3 now
@@ -6313,7 +6313,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 		// make sure we don't apply once per tick to the same target, potentially triggering 2 actor recursion
 		// there could be more than one tick in between successful triggers; trying with a half a round limit
-		if (entry && actor->GetGlobalID() == fx->Parameter4 && core->GetGame()->GameTime - fx->Parameter5 < AI_UPDATE_TIME/2) {
+		if (entry && actor->GetGlobalID() == fx->Parameter4 && core->GetGame()->GameTime - fx->Parameter5 < core->Time.ai_update_time / 2) {
 			condition = false;
 			fx->Parameter4 = 0;
 			fx->Parameter5 = 0;
@@ -6459,8 +6459,8 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	Point newpos=target->Pos;
 
-	newpos.x += coords[dir][0]*(signed) fx->Parameter1*ticks/16;///AI_UPDATE_TIME;
-	newpos.y += coords[dir][1]*(signed) fx->Parameter1*ticks/12;///AI_UPDATE_TIME;
+	newpos.x += coords[dir][0] * (signed) fx->Parameter1 * ticks / 16; // / core->Time.ai_update_time;
+	newpos.y += coords[dir][1] * (signed) fx->Parameter1 * ticks / 12; // / core->Time.ai_update_time;
 
 	//change is minimal, lets try later
 	if (newpos == target->Pos)
@@ -7086,24 +7086,24 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
-			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME))) {
+			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time))) {
 				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 2://param1 times every second
-			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(AI_UPDATE_TIME))) {
+			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time))) {
 				for (ieDword i=0; i < fx->Parameter1; i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}
 			}
 			break;
 		case 3: //once every Param1 second
-			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
+			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * core->Time.ai_update_time))) {
 				core->ApplyEffect(newfx, target, caster);
 			}
 			break;
 		case 4: //param3 times every Param1 second
-			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1*AI_UPDATE_TIME))) {
+			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * core->Time.ai_update_time))) {
 				for (ieDword i=0; i < fx->Parameter3; i++) {
 					core->ApplyEffect(newfx, target, caster);
 				}

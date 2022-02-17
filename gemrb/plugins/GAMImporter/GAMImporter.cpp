@@ -100,7 +100,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 
 	ieDword GameTime;
 	str->ReadDword(GameTime);
-	newGame->GameTime = GameTime*AI_UPDATE_TIME;
+	newGame->GameTime = GameTime * core->Time.ai_update_time;
 
 	str->ReadWord(newGame->WhichFormation);
 	for (unsigned short& formation : newGame->Formations) {
@@ -820,7 +820,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	stream->Write( Signature, 8);
 	//using Signature for padding
 	memset(Signature, 0, sizeof(Signature));
-	tmpDword = game->GameTime/AI_UPDATE_TIME;
+	tmpDword = game->GameTime / core->Time.ai_update_time;
 	stream->WriteDword(tmpDword);
 	//pst has a single preset of formations
 	if (game->version==GAM_VER_PST) {

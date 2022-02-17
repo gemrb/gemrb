@@ -2824,7 +2824,7 @@ ieDword Map::HasVVCCell(const ResRef &resource, const Point &p) const
 		if (resource != vvc->ResName) continue;
 		const ScriptedAnimation *sca = vvc->GetSingleObject();
 		if (sca) {
-			ieDword tmp = sca->GetSequenceDuration(AI_UPDATE_TIME)-sca->GetCurrentFrame();
+			ieDword tmp = sca->GetSequenceDuration(core->Time.ai_update_time) - sca->GetCurrentFrame();
 			if (tmp>ret) {
 				ret = tmp;
 			}
@@ -3261,7 +3261,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	int chance = RAND(0, 99);
 	if ((day && chance > spawn->DayChance) ||
 		(!day && chance > spawn->NightChance)) {
-		spawn->NextSpawn = time + spawn->Frequency * AI_UPDATE_TIME * 60;
+		spawn->NextSpawn = time + spawn->Frequency * core->Time.ai_update_time * 60;
 		spawn->Method |= SPF_WAIT;
 		return;
 	}
@@ -3282,7 +3282,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	if (spawn->Method & SPF_ONCE || !(spawn->Method & SPF_NOSPAWN)) {
 		spawn->Enabled = 0;
 	} else {
-		spawn->NextSpawn = time + spawn->Frequency * AI_UPDATE_TIME * 60;
+		spawn->NextSpawn = time + spawn->Frequency * core->Time.ai_update_time * 60;
 		spawn->Method |= SPF_WAIT;
 	}
 }
