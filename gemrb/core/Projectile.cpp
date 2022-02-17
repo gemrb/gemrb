@@ -246,8 +246,7 @@ void Projectile::Setup()
 	tint.b=128;
 	tint.a=255;
 
-	ieDword time = core->GetGame()->Ticks;
-	timeStartStep = time;
+	timeStartStep = core->GetGame()->Ticks;
 
 	if(ExtFlags&PEF_TEXT) {
 		const Actor *act = area->GetActorByGlobalID(Caster);

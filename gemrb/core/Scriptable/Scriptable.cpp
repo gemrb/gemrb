@@ -166,7 +166,7 @@ bool Scriptable::DisplayOverheadText(bool show)
 {
 	if (show) {
 		overheadTextDisplaying = true;
-		timeStartDisplaying = core->GetGame()->Ticks;
+		timeStartDisplaying = GetMilliseconds();
 		return true;
 	} else if (!show && overheadTextDisplaying) {
 		overheadTextDisplaying = false;
@@ -198,7 +198,7 @@ void Scriptable::DrawOverheadText()
 	if (!overheadTextDisplaying)
 		return;
 
-	tick_t time = core->GetGame()->Ticks;
+	tick_t time = GetMilliseconds();
 	Font::PrintColors color = {core->InfoTextColor, ColorBlack};
 
 	time -= timeStartDisplaying;

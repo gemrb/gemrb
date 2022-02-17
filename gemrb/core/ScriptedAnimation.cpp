@@ -455,7 +455,7 @@ bool ScriptedAnimation::UpdatePhase()
 			Log(ERROR, "ScriptedAnimation", "Not fully initialised VVC!");
 			return true;
 		}
-		tick_t time = game->Ticks;
+		tick_t time = GetMilliseconds();
 		if (starttime == 0) {
 			starttime = time;
 		}
