@@ -7218,7 +7218,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 	TableMgr::index_t count = tm->GetRowCount();
 	for (TableMgr::index_t i = 0; i < count; i++) {
 		//roll a random number between 0 and column #
-		int j = core->Roll(1, tm->GetColumnCount(i), -1);
+		TableMgr::index_t j = RAND<TableMgr::index_t>(0, tm->GetColumnCount(i) - 1);
 		ieVariable tokenname = ieVariable::MakeUpperCase(tm->GetRowName(i));
 		core->GetTokenDictionary()->SetAtCopy( tokenname, tm->QueryField(i, j) );
 	}

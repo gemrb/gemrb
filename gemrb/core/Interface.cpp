@@ -4299,7 +4299,7 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	AutoTable tab = gamedata->LoadTable(resref);
 	if (tab) {
 		TableMgr::index_t cols = tab->GetColumnCount();
-		TableMgr::index_t row = Roll(1,tab->GetRowCount(),-1);
+		TableMgr::index_t row = RAND<TableMgr::index_t>(0, tab->GetRowCount() - 1);
 		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0));
 		if (cols > 1) {
 			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1));

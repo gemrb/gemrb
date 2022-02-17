@@ -8436,7 +8436,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 			return false;
 	}
 	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(index));
-	TableMgr::index_t col = core->Roll(1,tab->GetColumnCount(index),-1);
+	TableMgr::index_t col = RAND<TableMgr::index_t>(0, tab->GetColumnCount(index) - 1);
 	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col));
 	return true;
 }
