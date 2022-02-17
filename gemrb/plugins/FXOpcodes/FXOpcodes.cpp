@@ -90,9 +90,6 @@ using namespace GemRB;
 #define PI_CSHIELD  162
 #define PI_CSHIELD2 163
 
-static int *polymorph_stats = NULL;
-static int polystatcount = 0;
-
 //the original engine stores the colors in sprklclr.2da in a different order
 
 static ScriptedAnimation default_spell_hit;
@@ -858,12 +855,6 @@ static EffectRef fx_wis_ref = { "WisdomModifier", -1 };
 static EffectRef fx_dex_ref = { "DexterityModifier", -1 };
 static EffectRef fx_con_ref = { "ConstitutionModifier", -1 };
 static EffectRef fx_chr_ref = { "CharismaModifier", -1 };
-
-static void Cleanup()
-{
-	if(polymorph_stats) free(polymorph_stats);
-	polymorph_stats=NULL;
-}
 
 static void RegisterCoreOpcodes()
 {
@@ -4153,31 +4144,40 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 	return FX_NOT_APPLIED;
 }
 
+class PolymorphStats {
+	PolymorphStats() {
+		AutoTable tab = gamedata->LoadTable("polystat");
+		if (!tab) {
+			return;
+		}
+		data.resize(tab->GetRowCount());
+		for (size_t i = 0; i < data.size(); ++i) {
+			data[i] = core->TranslateStat(tab->QueryField(i,0));
+		}
+	}
+	
+public:
+	static const PolymorphStats& Get() {
+		static PolymorphStats stats;
+		return stats;
+	}
+	
+	std::vector<int> data;
+};
+
 // 0x87 Polymorph
 static void CopyPolymorphStats(Actor *source, Actor *target)
 {
-	if(!polymorph_stats) {
-		AutoTable tab = gamedata->LoadTable("polystat");
-		if (!tab) {
-			polymorph_stats = NULL;
-			polystatcount=0;
-			return;
-		}
-		polystatcount = tab->GetRowCount();
-		polymorph_stats=(int *) malloc(sizeof(int)*polystatcount);
-		for (int i = 0; i < polystatcount; i++) {
-			polymorph_stats[i]=core->TranslateStat(tab->QueryField(i,0));
-		}
-	}
-
 	assert(target->polymorphCache);
+	
+	const auto& polystats = PolymorphStats::Get().data;
 
 	if (target->polymorphCache->stats.empty()) {
-		target->polymorphCache->stats.resize(polystatcount);
+		target->polymorphCache->stats.resize(polystats.size());
 	}
 
-	for (int i = 0; i < polystatcount; i++) {
-		target->polymorphCache->stats[i] = source->Modified[polymorph_stats[i]];
+	for (size_t i = 0; i < polystats.size(); ++i) {
+		target->polymorphCache->stats[i] = source->Modified[polystats[i]];
 	}
 }
 
@@ -4232,8 +4232,9 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// copy only the animation ID (line 23 in polystat.2da)
 		target->SetStat(IE_ANIMATION_ID, target->polymorphCache->stats[23], 1);
 	} else {
-		for(int i=0; i<polystatcount; i++) {
-			target->SetStat(polymorph_stats[i], target->polymorphCache->stats[i], 1);
+		const auto& polystats = PolymorphStats::Get().data;
+		for (size_t i = 0; i < polystats.size(); ++i) {
+			target->SetStat(polystats[i], target->polymorphCache->stats[i], 1);
 		}
 	}
 
@@ -7924,5 +7925,4 @@ int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 GEMRB_PLUGIN(0x1AAA040A, "Effect opcodes for core games")
 PLUGIN_INITIALIZER(RegisterCoreOpcodes)
-PLUGIN_CLEANUP(Cleanup)
 END_PLUGIN()
