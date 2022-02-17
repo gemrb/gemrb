@@ -852,7 +852,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	//but bg2 doesn't have this feature
 	//this way it works for both games
 	if ((flags & CC_SCRIPTNAME) && parameters->string1Parameter[0]) {
-		ab->SetScriptName(parameters->string1Parameter);
+		ab->SetScriptName(parameters->variable1Parameter);
 	}
 
 	Point pnt;
@@ -902,7 +902,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		CreateVisualEffectCore(ab, ab->Pos, parameters->string1Parameter, 1);
 	} else if (parameters->string1Parameter[0]) {
 		//setting the deathvariable if it exists (iwd2)
-		ab->SetScriptName(parameters->string1Parameter);
+		ab->SetScriptName(parameters->variable1Parameter);
 	}
 
 	if (flags & CC_COPY) {
@@ -1800,9 +1800,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				int i;
 				char* dst;
 				if (!stringsCount) {
-					dst = newAction->string0Parameter;
+					dst = newAction->string0Parameter.begin();
 				} else {
-					dst = newAction->string1Parameter;
+					dst = newAction->string1Parameter.begin();
 				}
 				//if there are 3 strings, the first 2 will be merged,
 				//the last one will be left alone
@@ -1848,9 +1848,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					}
 					SKIP_ARGUMENT();
 					if (!stringsCount) {
-						dst = newAction->string0Parameter;
+						dst = newAction->string0Parameter.begin();
 					} else {
-						dst = newAction->string1Parameter;
+						dst = newAction->string1Parameter.begin();
 					}
 
 					//this works only if there are no spaces
@@ -2036,8 +2036,8 @@ Action *ParamCopy(const Action *parameters)
 	newAction->int1Parameter = parameters->int1Parameter;
 	newAction->int2Parameter = parameters->int2Parameter;
 	newAction->pointParameter = parameters->pointParameter;
-	MEMCPY( newAction->string0Parameter, parameters->string0Parameter );
-	MEMCPY( newAction->string1Parameter, parameters->string1Parameter );
+	newAction->string0Parameter = parameters->string0Parameter;
+	newAction->string1Parameter = parameters->string1Parameter;
 	for (int c=0;c<3;c++) {
 		newAction->objects[c]= ObjectCopy( parameters->objects[c] );
 	}
@@ -2052,8 +2052,8 @@ Action *ParamCopyNoOverride(const Action *parameters)
 	newAction->int1Parameter = parameters->int1Parameter;
 	newAction->int2Parameter = parameters->int2Parameter;
 	newAction->pointParameter = parameters->pointParameter;
-	MEMCPY( newAction->string0Parameter, parameters->string0Parameter );
-	MEMCPY( newAction->string1Parameter, parameters->string1Parameter );
+	newAction->string0Parameter = parameters->string0Parameter;
+	newAction->string1Parameter = parameters->string1Parameter;
 	newAction->objects[0]= NULL;
 	newAction->objects[1]= ObjectCopy( parameters->objects[1] );
 	newAction->objects[2]= ObjectCopy( parameters->objects[2] );
@@ -2564,7 +2564,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 
 void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, bool flag)
 {
-	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
+	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation(parameters->variable0Parameter);
 	if (!anim) {
 		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
 	}

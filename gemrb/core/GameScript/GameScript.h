@@ -261,6 +261,8 @@ public:
 
 class GEM_EXPORT Action final : protected Canary {
 public:
+	using StringParam = FixedSizeString<64, strnicmp>; // FIXME: should this be case sensetive
+	
 	explicit Action(bool autoFree) noexcept
 	{
 		//changed now
@@ -286,8 +288,19 @@ public:
 	Point pointParameter;
 	int int1Parameter = 0;
 	int int2Parameter = 0;
-	char string0Parameter[65]{};
-	char string1Parameter[65]{};
+	
+	union {
+		StringParam string0Parameter; // keep largest type first to 0 fill everythings
+		ieVariable variable0Parameter;
+		ResRef resref0Parameter;
+	};
+	
+	union {
+		StringParam string1Parameter; // keep largest type first to 0 fill everythings
+		ieVariable variable1Parameter;
+		ResRef resref1Parameter;
+	};
+
 	uint32_t flags = 0;
 private:
 	int RefCount = 0;

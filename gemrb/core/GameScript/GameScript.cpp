@@ -2200,8 +2200,8 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		stream->ReadLine( line, 1024 );
 		sscanf( line, "%d %d %d %d %d\"%[^\"]\" \"%[^\"]\" AC",
 			&aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
-			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter,
-			aC->string1Parameter );
+			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter.begin(),
+			aC->string1Parameter.begin());
 		StringToLower(aC->string0Parameter);
 		StringToLower(aC->string1Parameter);
 		if (aC->actionID>=MAX_ACTIONS) {

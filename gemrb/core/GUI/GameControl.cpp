@@ -1723,7 +1723,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	action->pointParameter=tgt;
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName.CString());
+			action->resref0Parameter = spellName;
 		} else {
 			const CREMemorizedSpell *si;
 			//spell casting at target
@@ -1733,7 +1733,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 				delete action;
 				return;
 			}
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef.CString());
+			action->resref0Parameter = si->SpellResRef;
 		}
 	} else {
 		action->int0Parameter = spellSlot;
@@ -1790,7 +1790,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 	Action* action = GenerateActionDirect(std::move(tmp), tgt);
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName.CString());
+			action->resref0Parameter = spellName;
 		} else {
 			const CREMemorizedSpell *si;
 			//spell casting at target
@@ -1800,7 +1800,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 				delete action;
 				return;
 			}
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef.CString());
+			action->resref0Parameter = si->SpellResRef;
 		}
 	} else {
 		action->int0Parameter = spellSlot;

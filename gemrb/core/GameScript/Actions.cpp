@@ -636,8 +636,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 			continue;
 		}
 		// no need of CreateMovementEffect, party members are always moved immediately
-		MoveBetweenAreasCore( tar, parameters->string1Parameter,
-			parameters->pointParameter, -1, true);
+		MoveBetweenAreasCore(tar, parameters->resref1Parameter, parameters->pointParameter, -1, true);
 	}
 	i = game->GetNPCCount();
 	while (i--) {
@@ -655,7 +654,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 		tar->Area = ResRef::MakeUpperCase(parameters->string1Parameter);
 		//if the destination area is currently loaded, move the actor there now
 		if (game->FindMap(tar->Area)) {
-			MoveBetweenAreasCore( tar, parameters->string1Parameter, parameters->pointParameter, -1, true);
+			MoveBetweenAreasCore(tar, parameters->resref1Parameter, parameters->pointParameter, -1, true);
 		}
 	}
 }
@@ -670,8 +669,8 @@ void GameScript::MoveGlobal(Scriptable* Sender, Action* parameters)
 
 	//FIXME:CreateMovement UnMakes globals, probably this isn't what we want!!!
 	//maybe there is some flag that marks real global actors and temporary ones
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, 0) ) {
-		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, -1, true);
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, 0) ) {
+		MoveBetweenAreasCore( actor, parameters->resref0Parameter, parameters->pointParameter, -1, true);
 	}
 }
 
@@ -705,8 +704,8 @@ void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameter
 		return;
 	}
 
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->string0Parameter, to->Pos, 0) ) {
-		MoveBetweenAreasCore( actor, parameters->string0Parameter, to->Pos, -1, false);
+	if (actor->InParty || !CreateMovementEffect(actor, parameters->resref0Parameter, to->Pos, 0) ) {
+		MoveBetweenAreasCore( actor, parameters->resref0Parameter, to->Pos, -1, false);
 	}
 }
 
@@ -720,7 +719,7 @@ void GameScript::CreateCreature(Scriptable* Sender, Action* parameters)
 void GameScript::CreateCreatureDoor(Scriptable* Sender, Action* parameters)
 {
 	//we hack this to death
-	strcpy(parameters->string1Parameter, "SPDIMNDR");
+	parameters->resref1Parameter = "SPDIMNDR";
 	CreateCreatureCore( Sender, parameters, CC_CHECK_IMPASSABLE|CC_CHECK_OVERLAP | CC_PLAY_ANIM );
 }
 
@@ -728,7 +727,7 @@ void GameScript::CreateCreatureDoor(Scriptable* Sender, Action* parameters)
 void GameScript::CreateCreatureObjectDoor(Scriptable* Sender, Action* parameters)
 {
 	//we hack this to death
-	strcpy(parameters->string1Parameter, "SPDIMNDR");
+	parameters->resref1Parameter = "SPDIMNDR";
 	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE|CC_CHECK_OVERLAP | CC_PLAY_ANIM );
 }
 
@@ -861,7 +860,7 @@ void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//clearing the queue, and checking script level was intentionally removed
-	Sender->SetScript( parameters->string0Parameter, parameters->int0Parameter, false );
+	Sender->SetScript( parameters->resref0Parameter, parameters->int0Parameter, false );
 }
 
 void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
@@ -876,7 +875,7 @@ void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
 	}
 
 	//clearing the queue, and checking script level was intentionally removed
-	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter, false );
+	actor->SetScript( parameters->resref0Parameter, parameters->int0Parameter, false );
 }
 
 void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
@@ -917,7 +916,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 {
 	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+		parameters->variable0Parameter = "LOCALSsavedlocation";
 	}
 	SetPointVariable(Sender, parameters->string0Parameter, parameters->pointParameter);
 }
@@ -971,7 +970,7 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+		parameters->variable0Parameter = "LOCALSsavedlocation";
 	}
 	SetPointVariable(Sender, parameters->string0Parameter, tar->Pos);
 }
@@ -981,7 +980,7 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters)
 {
 	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+		parameters->variable0Parameter = "LOCALSsavedlocation";
 	}
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	parameters->pointParameter.y = (ieWord) (value & 0xffff);
@@ -1681,7 +1680,7 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 	int i = game->GetPartySize(true);
 	while(i--) {
 		Actor *actor = game->GetPC(i, true);
-		if (actor->inventory.HasItem(parameters->string0Parameter, 0)) {
+		if (actor->inventory.HasItem(parameters->resref0Parameter, 0)) {
 			DisplayStringCore(actor, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_HEAD );
 		}
 	}
@@ -1706,7 +1705,7 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 		target=Sender;
 		Log(ERROR, "GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
-	ResRef src = parameters->string0Parameter;
+	const ResRef& src = parameters->resref0Parameter;
 	const SrcVector *rndstr = LoadSrc(src);
 	if (!rndstr) {
 		Log(ERROR, "GameScript", "Cannot display resource!");
@@ -1724,7 +1723,7 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 		Log(ERROR, "GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
 
-	ResRef src = parameters->string0Parameter;
+	const ResRef& src = parameters->resref0Parameter;
 	const SrcVector *rndstr = LoadSrc(src);
 	if (!rndstr) {
 		Log(ERROR, "GameScript", "Cannot display resource!");
@@ -1824,7 +1823,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+		parameters->variable0Parameter = "LOCALSsavedlocation";
 	}
 	Point p = CheckPointVariable(target, parameters->string0Parameter);
 
@@ -2084,7 +2083,7 @@ void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
-	anim->SetPalette( parameters->string0Parameter );
+	anim->SetPalette(parameters->resref0Parameter);
 }
 
 //this is a special case of PlaySequence (with wait time, not for area anims)
@@ -2157,7 +2156,7 @@ void GameScript::SetDialogue(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		return;
 	}
-	target->SetDialog( parameters->string0Parameter );
+	target->SetDialog(parameters->resref0Parameter);
 }
 
 void GameScript::ChangeDialogue(Scriptable* Sender, Action* parameters)
@@ -2167,7 +2166,7 @@ void GameScript::ChangeDialogue(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		return;
 	}
-	target->SetDialog( parameters->string0Parameter );
+	target->SetDialog(parameters->resref0Parameter);
 }
 
 //string0, no interrupt, talkcount increased
@@ -2678,8 +2677,8 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string1Parameter, 0);
 	}
 
-	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
-		MoveBetweenAreasCore(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
+		MoveBetweenAreasCore(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
 
@@ -3123,8 +3122,8 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		core->GetGame()->LoadMos = parameters->string1Parameter;
 	}
-	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
-		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
+		MoveBetweenAreasCore(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
 
@@ -3138,8 +3137,8 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	if (parameters->string1Parameter[0]) {
 		core->GetGame()->LoadMos = parameters->string1Parameter;
 	}
-	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
-		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
+		MoveBetweenAreasCore(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
 	}
 }
 
@@ -3160,7 +3159,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	parameters->pointParameter=p;
-	strcpy(parameters->string1Parameter, "");
+	parameters->string1Parameter.Reset();
 	LeaveAreaLUA(Sender, parameters);
 	Sender->ReleaseCurrentAction();
 }
@@ -3932,7 +3931,7 @@ void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
 /** this is a gemrb extension */
 void GameScript::UnloadArea(Scriptable* /*Sender*/, Action* parameters)
 {
-	int map=core->GetGame()->FindMap(parameters->string0Parameter);
+	int map=core->GetGame()->FindMap(parameters->resref0Parameter);
 	if (map>=0) {
 		core->GetGame()->DelMap(map, parameters->int0Parameter);
 	}
@@ -4148,7 +4147,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 	}
 
 	CREItem *item = new CREItem();
-	if (!CreateItemCore(item, parameters->string0Parameter, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter)) {
+	if (!CreateItemCore(item, parameters->resref0Parameter, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter)) {
 		delete item;
 		return;
 	}
@@ -4187,7 +4186,7 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	}
 	int value = CheckVariable( Sender, parameters->string0Parameter );
 	CREItem *item = new CREItem();
-	if (!CreateItemCore(item, parameters->string1Parameter, value, 0, 0)) {
+	if (!CreateItemCore(item, parameters->resref1Parameter, value, 0, 0)) {
 		delete item;
 		return;
 	}
@@ -4232,7 +4231,7 @@ void GameScript::SetItemFlags(Scriptable *Sender, Action* parameters)
 			return;
 	}
 
-	int slot = myinv->FindItem(parameters->string0Parameter, 0);
+	int slot = myinv->FindItem(parameters->resref0Parameter, 0);
 	if (slot == -1) {
 		Log(ERROR, "GameScript", "Item {} not found in inventory of {}", parameters->string0Parameter, tar->GetScriptName());
 		return;
@@ -4256,7 +4255,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 	if (!item) {
 		item = new CREItem();
 	}
-	if (!CreateItemCore(item, parameters->string0Parameter, -1, 0, 0)) {
+	if (!CreateItemCore(item, parameters->resref0Parameter, -1, 0, 0)) {
 		delete item;
 		return;
 	}
@@ -4275,7 +4274,7 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	int slot = actor->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
+	int slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
 	if (slot<0) {
 		return;
 	}
@@ -4346,7 +4345,7 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	int slot = actor->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
+	int slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
 	if (slot<0) {
 		return;
 	}
@@ -4692,7 +4691,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	if (count == 1) {
 		// grant the default table item to the Sender in regular games
 		Action *params = new Action(true);
-		snprintf(params->string0Parameter, sizeof(params->string0Parameter), "%s", tab->QueryDefault());
+		params->string0Parameter = tab->QueryDefault();
 		CreateItem(Sender, params);
 		delete params;
 	}
@@ -4875,8 +4874,7 @@ void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
 {
-	ResRef area = parameters->string0Parameter;
-	core->GetGame()->SetMasterArea(area);
+	core->GetGame()->SetMasterArea(parameters->resref0Parameter);
 }
 
 void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
@@ -4937,7 +4935,7 @@ void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
 		error("GameScript", "Can't find worldmap!");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BitOp::OR);
+	worldmap->SetAreaStatus(parameters->resref0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BitOp::OR);
 	displaymsg->DisplayConstantString(STR_WORLDMAPCHANGE, DMC_BG2XPGREEN);
 }
 
@@ -4948,7 +4946,7 @@ void GameScript::HideAreaOnMap( Scriptable* /*Sender*/, Action* parameters)
 		error("GameScript", "Can't find worldmap!");
 	}
 	// WMP_ENTRY_ADJACENT because otherwise revealed bg2 areas are unreachable from city gates
-	worldmap->SetAreaStatus(parameters->string0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BitOp::NAND);
+	worldmap->SetAreaStatus(parameters->resref0Parameter, WMP_ENTRY_VISIBLE|WMP_ENTRY_ADJACENT, BitOp::NAND);
 }
 
 void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
@@ -4957,7 +4955,7 @@ void GameScript::AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
-	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, BitOp::OR);
+	worldmap->SetAreaStatus(parameters->resref0Parameter, parameters->int0Parameter, BitOp::OR);
 }
 
 void GameScript::RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters)
@@ -4966,7 +4964,7 @@ void GameScript::RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* paramete
 	if (!worldmap) {
 		error("GameScript", "Can't find worldmap!");
 	}
-	worldmap->SetAreaStatus(parameters->string0Parameter, parameters->int0Parameter, BitOp::NAND);
+	worldmap->SetAreaStatus(parameters->resref0Parameter, parameters->int0Parameter, BitOp::NAND);
 }
 
 void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
@@ -5254,7 +5252,7 @@ void GameScript::StartStore( Scriptable* Sender, Action* parameters)
 	if (core->GetCurrentStore() ) {
 		return;
 	}
-	core->SetCurrentStore( parameters->string0Parameter, Sender->GetGlobalID());
+	core->SetCurrentStore(parameters->resref0Parameter, Sender->GetGlobalID());
 	core->SetEventFlag(EF_OPENSTORE);
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
@@ -5311,7 +5309,7 @@ void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	tar->SetScriptName(parameters->string0Parameter);
+	tar->SetScriptName(parameters->variable0Parameter);
 }
 
 //iwd2
@@ -5731,7 +5729,7 @@ void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 {
 	const Map *map = Sender->GetCurrentArea();
-	Map *othermap = core->GetGame()->GetMap( parameters->string0Parameter, false );
+	Map *othermap = core->GetGame()->GetMap(parameters->resref0Parameter, false );
 	if (!othermap) {
 		return;
 	}
@@ -5928,7 +5926,7 @@ void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 	int i = game->GetPartySize(false);
 	while (i--) {
 		const Actor *actor = game->GetPC(i, false);
-		snprintf(FileName,_MAX_PATH,"%s%d",parameters->string0Parameter,i+1);
+		snprintf(FileName,_MAX_PATH,"%s%d",parameters->string0Parameter.CString(),i+1);
 		core->WriteCharacter(FileName, actor);
 	}
 	displaymsg->DisplayConstantString(STR_EXPORTED, DMC_BG2XPGREEN);
@@ -6096,7 +6094,7 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 	}
 
 	//the following part is coming from GUISCript.cpp with trivial changes
-	int Slot = c->inventory.FindItem(parameters->string0Parameter, 0);
+	int Slot = c->inventory.FindItem(parameters->resref0Parameter, 0);
 	if (Slot<0) {
 		return;
 	}
@@ -6133,7 +6131,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
-		store = core->SetCurrentStore(parameters->string0Parameter, 0);
+		store = core->SetCurrentStore(parameters->resref0Parameter, 0);
 	} else {
 		if (store->Name != parameters->string0Parameter) {
 			//not the current store, we need some dirty hack
@@ -6159,7 +6157,7 @@ void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* paramet
 		//no such starting area
 		return;
 	}
-	WMPAreaLink *link = wmap->GetLink(parameters->string0Parameter, parameters->string1Parameter);
+	WMPAreaLink *link = wmap->GetLink(parameters->resref0Parameter, parameters->resref1Parameter);
 	if (!link) {
 		return;
 	}
@@ -6558,7 +6556,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	ResRef itemres;
 
 	if (parameters->string0Parameter[0]) {
-		Slot = act->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
+		Slot = act->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;
 		flags |= parameters->int1Parameter;
@@ -6603,7 +6601,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 	ieDword flags;
 
 	if (parameters->string0Parameter[0]) {
-		Slot = act->inventory.FindItem(parameters->string0Parameter, 0);
+		Slot = act->inventory.FindItem(parameters->resref0Parameter, 0);
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;
 		flags = parameters->int1Parameter;
