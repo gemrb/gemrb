@@ -949,7 +949,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 	
 	PartAnim newparts(partCount);
 
-	EquipResRefData* equipment = nullptr;
+	EquipResRefData equipment;
 	for (int part = 0; part < partCount; ++part)
 	{
 		//newresref is based on the prefix (ResRef) and various
@@ -959,7 +959,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 		if (part < actorPartCount) {
 			// Character animation parts
 
-			if (equipment) delete equipment;
+			equipment = EquipResRefData();
 
 			//we need this long for special anims
 			NewResRef = ResRefBase;
@@ -1002,7 +1002,6 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			if (part < actorPartCount) {
 				Log(ERROR, "CharAnimations", "Couldn't create animationfactory: {} ({:#x})",
 						NewResRef, GetAnimationID());
-				delete equipment;
 				return nullptr;
 			} else {
 				// not fatal if animation for equipment is missing
@@ -1015,7 +1014,6 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 		if (!newanim) {
 			if (part < actorPartCount) {
 				Log(ERROR, "CharAnimations", "Couldn't load animation: {}, cycle {}", NewResRef, Cycle);
-				delete equipment;
 				return nullptr;
 			} else {
 				// not fatal if animation for equipment is missing
@@ -1187,7 +1185,6 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 		default:
 			error("CharAnimations", "Unknown animation type");
 	}
-	delete equipment;
 	previousStanceID = stanceID;
 
 	return &Anims[stanceID][Orient];
@@ -1232,10 +1229,9 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 
 	std::string shadowName = AvatarTable[AvatarsRowNum].ShadowAnimation.CString();
 
-	EquipResRefData *dummy = nullptr;
+	EquipResRefData dummy;
 	unsigned char cycle = 0;
 	AddMHRSuffix(shadowName, newStanceID, cycle, orientation, dummy);
-	delete dummy;
 
 	const AnimationFactory* af = static_cast<const AnimationFactory*>(
 		gamedata->GetFactoryResource(shadowName.c_str(), IE_BAM_CLASS_ID));
@@ -1288,9 +1284,8 @@ static const int one_file[MAX_ANIMS] = {2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
 					 orient_t Orient,
 					 std::string& NewResRef, unsigned char& Cycle,
-					 int Part, EquipResRefData*& EquipData) const
+					 int Part, EquipResRefData& EquipData) const
 {
-	EquipData = nullptr;
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
 			AddFFSuffix( NewResRef, StanceID, Cycle, Orient, Part );
@@ -1409,7 +1404,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 }
 
 void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
-	std::string& dest, unsigned char& Cycle, const EquipResRefData* equip) const
+	std::string& dest, unsigned char& Cycle, const EquipResRefData& equip) const
 {
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FILES:
@@ -1812,53 +1807,52 @@ static const char* const RangedPrefix[] = { "sa", "sx", "ss" };
 static const char* const RangedPrefixOld[] = { "sa", "sx", "a1" };
 
 void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, orient_t Orient, EquipResRefData*& EquipData) const
+	unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
 	Cycle = SixteenToNine[Orient];
-	EquipData = new EquipResRefData;
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			dest += SlashPrefix[WeaponType];
-			EquipData->Suffix = SlashPrefix[WeaponType];
+			EquipData.Suffix = SlashPrefix[WeaponType];
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest += BackPrefix[WeaponType];
-			EquipData->Suffix = BackPrefix[WeaponType];
+			EquipData.Suffix = BackPrefix[WeaponType];
 			break;
 
 		case IE_ANI_ATTACK_JAB:
 			dest += JabPrefix[WeaponType];
-			EquipData->Suffix = JabPrefix[WeaponType];
+			EquipData.Suffix = JabPrefix[WeaponType];
 			break;
 
 		case IE_ANI_AWAKE:
 			dest += "g17";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle += 63;
 			break;
 
 		case IE_ANI_CAST: //looping
 			dest += "ca";
-			EquipData->Suffix = "ca";
+			EquipData.Suffix = "ca";
 			break;
 
 		case IE_ANI_CONJURE: //ending
 			dest += "ca";
-			EquipData->Suffix = "ca";
+			EquipData.Suffix = "ca";
 			Cycle += 9;
 			break;
 
 		case IE_ANI_DAMAGE:
 			dest += "g14";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle += 36;
 			break;
 
 		case IE_ANI_DIE:
 			dest += "g15";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle += 45;
 			break;
 			//I cannot find an emerge animation...
@@ -1867,7 +1861,7 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 		case IE_ANI_EMERGE:
 		case IE_ANI_PST_START:
 			dest += "g19";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle += 81;
 			break;
 
@@ -1879,7 +1873,7 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 				dest += "g18";
 				Cycle += 72;
 			}
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			break;
 
 			//Unknown... maybe only a transparency effect apply
@@ -1894,37 +1888,37 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 				dest += "g1";
 				Cycle += 9;
 			}
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			break;
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
 			dest += RangedPrefix[RangedType];
-			EquipData->Suffix = RangedPrefix[RangedType];
+			EquipData.Suffix = RangedPrefix[RangedType];
 			break;
 
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
 			dest += "g16";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle += 54;
 			break;
 
 		case IE_ANI_WALK:
 			dest += "g11";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			break;
 
 		default:
 			error("CharAnimation", "VHR Animation: unhandled stance: {} {}", dest, StanceID);
 	}
-	EquipData->Cycle = Cycle;
+	EquipData.Cycle = Cycle;
 }
 
 void CharAnimations::GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
 			const char* equipRef, bool offhand,
-			const EquipResRefData* equip) const
+			const EquipResRefData& equip) const
 {
-	Cycle = equip->Cycle;
+	Cycle = equip.Cycle;
 
 	dest = "wq";
 	dest += GetSize();
@@ -1933,7 +1927,7 @@ void CharAnimations::GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
 	if (offhand) {
 		dest += "o";
 	}
-	dest += equip->Suffix;
+	dest += equip.Suffix;
 }
 
 void CharAnimations::AddSixSuffix(std::string& dest, unsigned char StanceID,
@@ -2053,34 +2047,33 @@ void CharAnimations::AddLR2Suffix(std::string& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, orient_t Orient, EquipResRefData*& EquipData) const
+	unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
 	Orient = orient_t(Orient / 2);
-	EquipData = new EquipResRefData;
 
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			dest += SlashPrefix[WeaponType];
-			EquipData->Suffix = SlashPrefix[WeaponType];
+			EquipData.Suffix = SlashPrefix[WeaponType];
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest += BackPrefix[WeaponType];
-			EquipData->Suffix = BackPrefix[WeaponType];
+			EquipData.Suffix = BackPrefix[WeaponType];
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_JAB:
 			dest += JabPrefix[WeaponType];
-			EquipData->Suffix = JabPrefix[WeaponType];
+			EquipData.Suffix = JabPrefix[WeaponType];
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_READY:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			if ( WeaponType == IE_ANI_WEAPON_2W ) {
 				Cycle = 24 + Orient;
 			} else {
@@ -2090,19 +2083,19 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 
 		case IE_ANI_CAST://looping
 			dest += "ca";
-			EquipData->Suffix = "ca";
+			EquipData.Suffix = "ca";
 			Cycle = 8 + Orient;
 			break;
 
 		case IE_ANI_CONJURE://ending
 			dest += "ca";
-			EquipData->Suffix = "ca";
+			EquipData.Suffix = "ca";
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_DAMAGE:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 40 + Orient;
 			break;
 
@@ -2111,12 +2104,12 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 		case IE_ANI_PST_START:
 		case IE_ANI_EMERGE: // I cannot find an emerge animation... Maybe it is Die reversed
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 48 + Orient;
 			break;
 		case IE_ANI_HEAD_TURN:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 32 + Orient;
 			break;
 
@@ -2126,32 +2119,32 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 
 		case IE_ANI_AWAKE:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 16 + Orient;
 			break;
 
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
 			dest += RangedPrefixOld[RangedType];
-			EquipData->Suffix = RangedPrefixOld[RangedType];
+			EquipData.Suffix = RangedPrefixOld[RangedType];
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_SLEEP:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 64 + Orient;
 			break;
 
 		case IE_ANI_TWITCH:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 56 + Orient;
 			break;
 
 		case IE_ANI_WALK:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = Orient;
 			break;
 		default:
@@ -2159,21 +2152,21 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 	}
 	if (Orient>=5) {
 		dest += "e";
-		ResRef& suffix = EquipData->Suffix;
+		ResRef& suffix = EquipData.Suffix;
 		suffix[suffix.CStrLen()] = 'e';
 	}
 	// NOTE: the two shadow animations (cshd, sshd) also have x-suffixed files,
 	// but those are used (instead of the eastern ones) only if sprite
 	// mirroring is on. "Mirror sprites" in bgee.lua, probably what was
 	// SoftMirrorBlt in the original ini. Pretty useless.
-	EquipData->Cycle = Cycle;
+	EquipData.Cycle = Cycle;
 }
 
 void CharAnimations::GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
 			const char* equipRef, bool offhand,
-			const EquipResRefData* equip) const
+			const EquipResRefData& equip) const
 {
-	Cycle = equip->Cycle;
+	Cycle = equip.Cycle;
 	if (offhand) {
 		//i think there is no offhand stuff for bg1, lets use the bg2 equivalent here?
 		dest = "wq";
@@ -2181,13 +2174,13 @@ void CharAnimations::GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
 		dest += equipRef[0];
 		dest += equipRef[1];
 		dest += "o";
-		dest += equip->Suffix;
+		dest += equip.Suffix;
 	} else {
 		dest = "wp";
 		dest += GetSize();
 		dest += equipRef[0];
 		dest += equipRef[1];
-		dest += equip->Suffix;
+		dest += equip.Suffix;
 	}
 }
 
@@ -2300,44 +2293,43 @@ void CharAnimations::AddTwoFiles5Suffix( std::string& dest, unsigned char Stance
 }
 
 void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, orient_t Orient, EquipResRefData *&EquipData) const
+	unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
-	EquipData = new EquipResRefData;
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_JAB:
 			dest += "g2";
-			EquipData->Suffix = "g2";
+			EquipData.Suffix = "g2";
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
 		case IE_ANI_SHOOT:
 			dest += "g2";
-			EquipData->Suffix = "g2";
+			EquipData.Suffix = "g2";
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_WALK:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_READY:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_DAMAGE:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 24 + Orient / 2;
 			break;
 		case IE_ANI_GET_UP:
@@ -2345,14 +2337,14 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 		case IE_ANI_PST_START:
 		case IE_ANI_DIE:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 32 + Orient / 2;
 			break;
 		case IE_ANI_SLEEP:
 		case IE_ANI_HIDE:
 		case IE_ANI_TWITCH:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
@@ -2360,10 +2352,10 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		dest += "e";
-		ResRef& suffix = EquipData->Suffix;
+		ResRef& suffix = EquipData.Suffix;
 		suffix[suffix.CStrLen()] = 'e';
 	}
-	EquipData->Cycle = Cycle;
+	EquipData.Cycle = Cycle;
 }
 
 void CharAnimations::AddTwoPieceSuffix(std::string& dest, unsigned char StanceID,
@@ -2425,49 +2417,48 @@ void CharAnimations::AddTwoPieceSuffix(std::string& dest, unsigned char StanceID
 }
 
 void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
-	unsigned char& Cycle, orient_t Orient, EquipResRefData *&EquipData) const
+	unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
-	EquipData = new EquipResRefData;
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest += "g2";
-			EquipData->Suffix = "g2";
+			EquipData.Suffix = "g2";
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
 			dest += "g2";
-			EquipData->Suffix = "g2";
+			EquipData.Suffix = "g2";
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_ATTACK_JAB:
 		case IE_ANI_SHOOT:
 			dest += "g2";
-			EquipData->Suffix = "g2";
+			EquipData.Suffix = "g2";
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_WALK:
 		case IE_ANI_HIDE: // unknown, just a guess
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_AWAKE:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_READY:
 		case IE_ANI_HEAD_TURN: //could be wrong
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_DAMAGE:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 24 + Orient / 2;
 			break;
 		case IE_ANI_GET_UP:
@@ -2475,13 +2466,13 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 		case IE_ANI_PST_START:
 		case IE_ANI_DIE:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 32 + Orient / 2;
 			break;
 		case IE_ANI_TWITCH:
 		case IE_ANI_SLEEP:
 			dest += "g1";
-			EquipData->Suffix = "g1";
+			EquipData.Suffix = "g1";
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
@@ -2489,20 +2480,20 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		dest += "e";
-		ResRef& suffix = EquipData->Suffix;
+		ResRef& suffix = EquipData.Suffix;
 		suffix[suffix.CStrLen()] = 'e';
 	}
-	EquipData->Cycle = Cycle;
+	EquipData.Cycle = Cycle;
 }
 
 void CharAnimations::GetLREquipmentRef(std::string& dest, unsigned char& Cycle,
 			const char* equipRef, bool /*offhand*/,
-			const EquipResRefData* equip) const
+			const EquipResRefData& equip) const
 {
-	Cycle = equip->Cycle;
+	Cycle = equip.Cycle;
 	dest = ResRefBase.CString();
 	dest += equipRef[0];
-	dest += equip->Suffix;
+	dest += equip.Suffix;
 }
 
 //Only for the ogre animation (MOGR)
