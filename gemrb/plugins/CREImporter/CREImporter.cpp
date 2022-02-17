@@ -786,10 +786,10 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 
 void CREImporter::SetupColor(ieDword &stat) const
 {
-	static unsigned int RandColor = 1;
+	static TableMgr::index_t RandColor = 1;
 	if (RandColor == 0) return;
 
-	ieDword RandRows = 0;
+	TableMgr::index_t RandRows = 0;
 	if (randcolors.empty()) {
 		AutoTable rndcol = gamedata->LoadTable("randcolr", true);
 		if (rndcol) {
@@ -802,7 +802,7 @@ void CREImporter::SetupColor(ieDword &stat) const
 		}
 
 		for (TableMgr::index_t cols = RandColor - 1; cols != 0; cols--) {
-			int color = rndcol->QueryFieldSigned<int>(0, cols);
+			int color = atoi(rndcol->QueryField(static_cast<unsigned int>(0), cols));
 			randcolors[color] = std::vector<unsigned char>(RandRows - 1);
 			for (TableMgr::index_t i = 1; i < RandRows; i++) {
 				randcolors[color][i - 1] = atoi(rndcol->QueryField(static_cast<unsigned int>(i), cols));
@@ -818,7 +818,7 @@ void CREImporter::SetupColor(ieDword &stat) const
 	if (colors == randcolors.end()) {
 		Log(ERROR, "CREImporter", "Missing random color index in randcolr.2da: {}", stat);
 		// fall back to browns
-		stat = randcolors.begin()->second[RAND<ieDword>(ieDword(0), RandRows - 1)];
+		stat = randcolors.begin()->second[RAND<TableMgr::index_t>(0, RandRows - 1)];
 		return;
 	}
 

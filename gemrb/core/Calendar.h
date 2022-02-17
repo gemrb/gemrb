@@ -29,7 +29,7 @@ namespace GemRB {
 class GEM_EXPORT Calendar {
 private:
 	int daysinyear = 0;
-	int monthnamecount = -1;
+	size_t monthnamecount = 0;
 	int *days = nullptr;
 	ieStrRef *monthnames = nullptr;
 
