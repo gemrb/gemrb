@@ -27,19 +27,11 @@ using namespace GemRB;
 
 #define SIGNLENGTH 256      //if a 2da has longer default value, change this
 
-p2DAImporter::p2DAImporter(void)
+p2DAImporter::p2DAImporter() noexcept
 {
 	colNames.reserve(10);
 	rowNames.reserve(10);
-	ptrs.reserve(10);
 	rows.reserve(10);
-}
-
-p2DAImporter::~p2DAImporter(void)
-{
-	for (auto& ptr : ptrs) {
-		free(ptr);
-	}
 }
 
 bool p2DAImporter::Open(DataStream* str)
@@ -81,16 +73,16 @@ bool p2DAImporter::Open(DataStream* str)
 			continue;
 		}
 
-		ptrs.push_back(strdup(buffer));
-		char* line = ptrs.back();
 		if (colHead) {
 			colHead = false;
-			char* cell = strtok(line, " ");
+			char* cell = strtok(buffer, " ");
 			while (cell != nullptr) {
 				colNames.push_back(cell);
 				cell = strtok(nullptr, " ");
 			}
 		} else {
+			char* line = buffer;
+
 			char* cell = strtok(line, " ");
 			if (cell == nullptr) continue;
 
@@ -141,7 +133,7 @@ const char* p2DAImporter::QueryField(index_t row, index_t column) const
 	if (rows[row][column][0]=='*' && !rows[row][column][1]) {
 		return defVal.c_str();
 	}
-	return rows[row][column];
+	return rows[row][column].c_str();
 }
 
 const char* p2DAImporter::QueryDefault() const
@@ -152,7 +144,7 @@ const char* p2DAImporter::QueryDefault() const
 p2DAImporter::index_t p2DAImporter::GetRowIndex(const char* string) const
 {
 	for (index_t index = 0; index < rowNames.size(); index++) {
-		if (stricmp( rowNames[index], string ) == 0) {
+		if (stricmp(rowNames[index].c_str(), string) == 0) {
 			return index;
 		}
 	}
@@ -162,7 +154,7 @@ p2DAImporter::index_t p2DAImporter::GetRowIndex(const char* string) const
 p2DAImporter::index_t p2DAImporter::GetColumnIndex(const char* string) const
 {
 	for (index_t index = 0; index < colNames.size(); index++) {
-		if (stricmp( colNames[index], string ) == 0) {
+		if (stricmp(colNames[index].c_str(), string) == 0) {
 			return index;
 		}
 	}
@@ -172,7 +164,7 @@ p2DAImporter::index_t p2DAImporter::GetColumnIndex(const char* string) const
 const char* p2DAImporter::GetColumnName(index_t index) const
 {
 	if (index < colNames.size()) {
-		return colNames[index];
+		return colNames[index].c_str();
 	}
 	return "";
 }
@@ -180,7 +172,7 @@ const char* p2DAImporter::GetColumnName(index_t index) const
 const char* p2DAImporter::GetRowName(index_t index) const
 {
 	if (index < rowNames.size()) {
-		return rowNames[index];
+		return rowNames[index].c_str();
 	}
 	return "";
 }

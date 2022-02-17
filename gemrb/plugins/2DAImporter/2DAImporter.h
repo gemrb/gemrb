@@ -30,19 +30,18 @@
 
 namespace GemRB {
 
-using RowEntry = std::vector<char*>;
-
 class p2DAImporter : public TableMgr {
 private:
-	std::vector< char*> colNames;
-	std::vector< char*> rowNames;
-	std::vector< char*> ptrs;
-	std::vector< RowEntry> rows;
+	using cell_t = std::string;
+	using row_t = std::vector<cell_t>;
+
+	std::vector<cell_t> colNames;
+	std::vector<cell_t> rowNames;
+	std::vector<row_t> rows;
 	std::string defVal;
 public:
-	p2DAImporter(void);
-	p2DAImporter(const p2DAImporter&) = delete;
-	~p2DAImporter() override;
+	p2DAImporter() noexcept;
+
 	p2DAImporter& operator=(const p2DAImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	/** Returns the actual number of Rows in the Table */
