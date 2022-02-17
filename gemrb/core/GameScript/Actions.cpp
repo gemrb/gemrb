@@ -6109,22 +6109,20 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (res!=-1 && scr->InParty) { //it is gold and we got the party pool!
-		goto item_is_gold;
+		if (scr->InParty) {
+			core->GetGame()->PartyGold += res;
+			// if you want message here then use core->GetGame()->AddGold(res);
+		} else {
+			scr->SetBase(IE_GOLD, scr->GetBase(IE_GOLD) + res);
+		}
+		delete item;
+		return;
 	}
 	res = scr->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
 	if (res !=ASI_SUCCESS) { //putting it back
 		c->AddItem(item);
 	}
 	return;
-item_is_gold: //we take gold!
-	if (scr->InParty) {
-		core->GetGame()->PartyGold += res;
-		//if you want message here then use
-		//core->GetGame()->AddGold(res);
-	} else {
-		scr->SetBase( IE_GOLD, scr->GetBase(IE_GOLD) + res );
-	}
-	delete item;
 }
 
 void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
