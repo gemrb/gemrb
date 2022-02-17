@@ -91,13 +91,7 @@ Animation::frame_t Animation::NextFrame(void)
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive2!");
 		return NULL;
 	}
-	if (starttime == 0) {
-		if (gameAnimation) {
-			starttime = core->GetGame()->Ticks;
-		} else {
-			starttime = GetMilliseconds();
-		}
-	}
+
 	Holder<Sprite2D> ret;
 	if (playReversed)
 		ret = frames[GetFrameCount() - frameIdx - 1];
@@ -107,7 +101,13 @@ Animation::frame_t Animation::NextFrame(void)
 	if (endReached && (Flags&A_ANI_PLAYONCE))
 		return ret;
 
-	tick_t time = gameAnimation ? core->GetGame()->Ticks : GetMilliseconds();
+	tick_t time;
+	if (gameAnimation) {
+		time = core->GetGame()->Ticks;
+	} else {
+		time = GetMilliseconds();
+	}
+	if (starttime == 0) starttime = time;
 
 	//it could be that we skip more than one frame in case of slow rendering
 	//large, composite animations (dragons, multi-part area anims) require synchronisation
