@@ -45,7 +45,7 @@ public:
 	Point pos;
 	unsigned char fps = ANI_DEFAULT_FRAMERATE;
 	bool playReversed = false;
-	bool gameAnimation = false;
+	bool gameAnimation = false; // is it affected by pausing?
 	Region animArea;
 	ieDword Flags;
 
