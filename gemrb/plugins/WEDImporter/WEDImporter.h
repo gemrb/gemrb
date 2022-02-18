@@ -22,7 +22,7 @@
 #define WEDIMPORTER_H
 
 #include "Polygon.h"
-#include "TileMapMgr.h"
+#include "Plugins/TileMapMgr.h"
 
 #include <vector>
 

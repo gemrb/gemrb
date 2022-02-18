@@ -66,7 +66,7 @@ template <typename STR_T>
 using CstrHashCI = CstrHash<STR_T, std::tolower>;
 
 template<size_t LEN, int(*CMP)(const char*, const char*, size_t) = strncmp>
-class GEM_EXPORT FixedSizeString {
+class FixedSizeString {
 	// we use uint8_t and an object of massive size is not wanted
 	static_assert(LEN < 255, "Cannot create FixedSizeString larger than 255 characters");
 	char str[LEN + 1] {'\0'};
