@@ -687,11 +687,11 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 	if (PyObject_TypeCheck(row, &PyUnicode_Type)) {
 		const auto rows = PyString_AsString(row);
 		const auto cols = PyString_AsString(col);
-		ret = tm->QueryField( rows, cols );
+		ret = tm->QueryField( rows, cols ).c_str();
 	} else {
 		size_t rowi = PyLong_AsLong(row);
 		size_t coli = PyLong_AsLong(col);
-		ret = tm->QueryField( rowi, coli );
+		ret = tm->QueryField( rowi, coli ).c_str();
 	}
 	ABORT_IF_NULL(ret);
 
@@ -2813,15 +2813,15 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 	int indices[4];
 	TableMgr::index_t rows = newarea->GetRowCount();
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
-		const char *area   = newarea->QueryField(i,0);
-		const char *script = newarea->QueryField(i,1);
+		const char *area   = newarea->QueryField(i,0).c_str();
+		const char *script = newarea->QueryField(i,1).c_str();
 		int flags          = newarea->QueryFieldSigned<int>(i,2);
 		int icon           = newarea->QueryFieldSigned<int>(i,3);
 		int locx           = newarea->QueryFieldSigned<int>(i,4);
 		int locy           = newarea->QueryFieldSigned<int>(i,5);
 		int label          = newarea->QueryFieldSigned<int>(i,6);
 		int name           = newarea->QueryFieldSigned<int>(i,7);
-		const char *ltab   = newarea->QueryField(i,8);
+		const char *ltab   = newarea->QueryField(i,8).c_str();
 		links[static_cast<int>(WMPDirection::NORTH)] = newarea->QueryFieldSigned<int>(i, 9);
 		links[static_cast<int>(WMPDirection::EAST)] = newarea->QueryFieldSigned<int>(i, 10);
 		links[static_cast<int>(WMPDirection::SOUTH)] = newarea->QueryFieldSigned<int>(i, 11);
@@ -2860,13 +2860,13 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		int thisarea = wmap->GetEntryCount();
 		wmap->AddAreaEntry(std::move(entry));
 		for (unsigned int j=0;j<total;j++) {
-			const char *larea = newlinks->QueryField(j,0);
+			const char *larea = newlinks->QueryField(j,0).c_str();
 			int lflags        = newlinks->QueryFieldSigned<int>(j,1);
-			const char *ename = newlinks->QueryField(j,2);
+			const char *ename = newlinks->QueryField(j,2).c_str();
 			int distance      = newlinks->QueryFieldSigned<int>(j,3);
 			int encprob       = newlinks->QueryFieldSigned<int>(j,4);
 			for(k=0;k<5;k++) {
-				enc[k]    = newlinks->QueryField(i,5+k);
+				enc[k]    = newlinks->QueryField(i,5+k).c_str();
 			}
 			int linktodir     = newlinks->QueryFieldSigned<int>(j,10);
 
@@ -7836,7 +7836,7 @@ static void ReadUsedItems()
 		UsedItems.resize(UsedItemsCount);
 		for (TableMgr::index_t i = 0; i < UsedItemsCount; i++) {
 			UsedItems[i].itemname = table->GetRowName(i);
-			UsedItems[i].username = ieVariable::MakeLowerCase(table->QueryField(i, 0));
+			UsedItems[i].username = ieVariable::MakeLowerCase(table->QueryField(i, 0).c_str());
 			if (UsedItems[i].username[0] == '*') {
 				UsedItems[i].username.Reset();
 			}
@@ -10508,7 +10508,7 @@ static void ReadActionButtons()
 		row.bytes[3] = tab->QueryFieldUnsigned<ieByte>(i,3);
 		GUIAction[i] = row.data;
 		GUITooltip[i] = tab->QueryFieldAsStrRef(i,4);
-		GUIResRef[i] = tab->QueryField(i, 5);
+		GUIResRef[i] = tab->QueryField(i, 5).c_str();
 		strncpy(GUIEvent[i], tab->GetRowName(i), 16);
 	}
 }
@@ -11916,9 +11916,9 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 		if (pdtable->GetRowIndex(scriptname) != TableMgr::npos) {
 			ResRef resRef;
 			if (bg2expansion) {
-				resRef = pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE");
+				resRef = pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE").c_str();
 			} else {
-				resRef = pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE");
+				resRef = pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE").c_str();
 			}
 			GameScript* restscript = new GameScript(resRef, tar, 0, false);
 			if (restscript->Update()) {

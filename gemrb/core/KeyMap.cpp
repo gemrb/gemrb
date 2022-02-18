@@ -107,13 +107,13 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		const char *group;
 
 		if (kmtable->GetRowIndex(name) != TableMgr::npos) {
-			moduleName = kmtable->QueryField(name, "MODULE");
-			function = kmtable->QueryField(name, "FUNCTION");
-			group = kmtable->QueryField(name, "GROUP");
+			moduleName = kmtable->QueryField(name, "MODULE").c_str();
+			function = kmtable->QueryField(name, "FUNCTION").c_str();
+			group = kmtable->QueryField(name, "GROUP").c_str();
 		} else {
-			moduleName = kmtable->QueryField("Default","MODULE");
-			function = kmtable->QueryField("Default","FUNCTION");
-			group = kmtable->QueryField("Default","GROUP");
+			moduleName = kmtable->QueryField("Default","MODULE").c_str();
+			function = kmtable->QueryField("Default","FUNCTION").c_str();
+			group = kmtable->QueryField("Default","GROUP").c_str();
 			Log(MESSAGE, "KeyMap", "Adding key {} with function {}::{}", value, moduleName, function);
 		}
 		Function *fun = new Function(moduleName, function, atoi(group), tolower(value[0]));

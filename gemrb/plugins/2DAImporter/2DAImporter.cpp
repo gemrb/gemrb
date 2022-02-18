@@ -122,18 +122,18 @@ p2DAImporter::index_t p2DAImporter::GetColumnCount(index_t row) const
 }
 /** Returns a pointer to a zero terminated 2da element,
 	if it cannot return a value, it returns the default */
-const char* p2DAImporter::QueryField(index_t row, index_t column) const
+const std::string& p2DAImporter::QueryField(index_t row, index_t column) const
 {
 	if (rows.size() <= row) {
-		return defVal.c_str();
+		return defVal;
 	}
 	if (rows[row].size() <= column) {
-		return defVal.c_str();
+		return defVal;
 	}
 	if (rows[row][column][0]=='*' && !rows[row][column][1]) {
-		return defVal.c_str();
+		return defVal;
 	}
-	return rows[row][column].c_str();
+	return rows[row][column];
 }
 
 const std::string& p2DAImporter::QueryDefault() const
@@ -181,9 +181,9 @@ p2DAImporter::index_t p2DAImporter::FindTableValue(index_t col, long val, index_
 {
 	index_t max = GetRowCount();
 	for (index_t row = start; row < max; row++) {
-		const char* ret = QueryField( row, col );
+		const std::string& ret = QueryField( row, col );
 		long Value;
-		if (valid_signednumber(ret, Value) && (Value == val))
+		if (valid_signednumber(ret.c_str(), Value) && (Value == val))
 			return row;
 	}
 	return npos;
@@ -193,8 +193,8 @@ p2DAImporter::index_t p2DAImporter::FindTableValue(index_t col, const char* val,
 {
 	index_t max = GetRowCount();
 	for (index_t row = start; row < max; row++) {
-		const char* ret = QueryField( row, col );
-		if (stricmp(ret, val) == 0)
+		const std::string& ret = QueryField( row, col );
+		if (stricmp(ret.c_str(), val) == 0)
 			return row;
 	}
 	return npos;

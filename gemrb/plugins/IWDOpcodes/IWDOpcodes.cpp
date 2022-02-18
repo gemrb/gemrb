@@ -1306,7 +1306,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	TableMgr::index_t real = RAND<TableMgr::index_t>(0, cnt - 1);
-	ResRef resrefs[2] = { tab->QueryField(size_t(0), 0), tab->QueryField(0, 1) };
+	ResRef resrefs[2] = { tab->QueryField(size_t(0), 0).c_str(), tab->QueryField(0, 1).c_str() };
 
 	for (TableMgr::index_t i = 0; i < cnt; ++i) {
 		Point p(tab->QueryFieldSigned<int>(i+1,0), tab->QueryFieldSigned<int>(i+1,1));

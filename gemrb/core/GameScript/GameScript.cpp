@@ -1458,7 +1458,7 @@ void InitializeIEScript()
 	ObjectIDSTableNames.resize(ObjectIDSCount);
 	for (int i = 0; i < ObjectIDSCount; i++) {
 		const char *idsname;
-		idsname=objNameTable->QueryField( 0, i + 1 );
+		idsname=objNameTable->QueryField( 0, i + 1 ).c_str();
 		const IDSLink *poi=FindIdentifier( idsname );
 		if (poi==NULL) {
 			idtargets[i]=NULL;

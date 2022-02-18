@@ -4197,11 +4197,11 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 
 	TableMgr::index_t count = tm->GetRowCount();
 	for (TableMgr::index_t i = 0; i < count; ++i) {
-		const char *area = tm->QueryField( i, 0 );
+		const char *area = tm->QueryField( i, 0 ).c_str();
 		if (actor->LastArea != area) {
 			continue;
 		}
-		const char *exit = tm->QueryField( i, 1 );
+		const char *exit = tm->QueryField( i, 1 ).c_str();
 		if (strnicmp(actor->UsedExit.CString(), exit, 32) != 0) {
 			continue;
 		}

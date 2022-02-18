@@ -100,9 +100,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	table = gamedata->LoadTable("restmov");
 	if (table) {
 		for(int i=0;i<8;i++) {
-			restmovies[i] = table->QueryField(i, 0);
-			daymovies[i] = table->QueryField(i, 1);
-			nightmovies[i] = table->QueryField(i, 2);
+			restmovies[i] = table->QueryField(i, 0).c_str();
+			daymovies[i] = table->QueryField(i, 1).c_str();
+			nightmovies[i] = table->QueryField(i, 2).c_str();
 		}
 	}
 
@@ -120,7 +120,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 			npclevels.emplace_back(cols + 1);
 			npclevels[i][0] = table->GetRowName(i);
 			for (TableMgr::index_t j = 0; j < cols; j++) {
-				npclevels[i][j + 1] = table->QueryField(i, j);
+				npclevels[i][j + 1] = table->QueryField(i, j).c_str();
 			}
 		}
 	}
@@ -425,10 +425,10 @@ void Game::InitActorPos(Actor *actor) const
 	if (playmode>PMODE_COUNT) {
 		playmode = 0;
 	}
-	const char *xpos = start->QueryField(mode[playmode],"XPOS");
-	const char *ypos = start->QueryField(mode[playmode],"YPOS");
-	const char *area = start->QueryField(mode[playmode],"AREA");
-	const char *rot = start->QueryField(mode[playmode],"ROT");
+	const char *xpos = start->QueryField(mode[playmode],"XPOS").c_str();
+	const char *ypos = start->QueryField(mode[playmode],"YPOS").c_str();
+	const char *area = start->QueryField(mode[playmode],"AREA").c_str();
+	const char *rot = start->QueryField(mode[playmode],"ROT").c_str();
 
 	actor->Pos.x = actor->Destination.x = strta->QueryFieldSigned<int>(strta->GetRowIndex(xpos), ip);
 	actor->Pos.y = actor->Destination.y = strta->QueryFieldSigned<int>(strta->GetRowIndex(ypos), ip);
@@ -437,7 +437,7 @@ void Game::InitActorPos(Actor *actor) const
 
 	strta = gamedata->LoadTable("startare");
 	if (strta) {
-		actor->Area = ResRef::MakeLowerCase(strta->QueryField(strta->GetRowIndex(area), 0));
+		actor->Area = ResRef::MakeLowerCase(strta->QueryField(strta->GetRowIndex(area), 0).c_str());
 	} else {
 		actor->Area = CurrentArea;
 	}
@@ -475,8 +475,8 @@ int Game::JoinParty(Actor* actor, int join)
 		if (prot && (actor->SmallPortrait == prot->SmallPortrait || actor->LargePortrait == prot->LargePortrait)) {
 			AutoTable ptab = gamedata->LoadTable("portrait");
 			if (ptab) {
-				actor->SmallPortrait = ptab->QueryField(actor->SmallPortrait, "REPLACEMENT");
-				actor->LargePortrait = ptab->QueryField(actor->LargePortrait, "REPLACEMENT");
+				actor->SmallPortrait = ptab->QueryField(actor->SmallPortrait, "REPLACEMENT").c_str();
+				actor->LargePortrait = ptab->QueryField(actor->LargePortrait, "REPLACEMENT").c_str();
 			}
 		}
 
@@ -1604,7 +1604,7 @@ void Game::TextDream()
 			TableMgr::index_t row = drm->GetRowIndex(repLabel);
 			if (row != TableMgr::npos) {
 				Actor *actor = GetPC(0, false);
-				actor->LearnSpell(ResRef(drm->QueryField(row, 0)), LS_MEMO | LS_LEARN);
+				actor->LearnSpell(ResRef(drm->QueryField(row, 0).c_str()), LS_MEMO | LS_LEARN);
 			}
 		}
 

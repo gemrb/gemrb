@@ -4152,7 +4152,7 @@ class PolymorphStats {
 		}
 		data.resize(tab->GetRowCount());
 		for (size_t i = 0; i < data.size(); ++i) {
-			data[i] = core->TranslateStat(tab->QueryField(i,0));
+			data[i] = core->TranslateStat(tab->QueryField(i,0).c_str());
 		}
 	}
 	
@@ -7652,7 +7652,7 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	ResRef spl;
-	spl = tm->QueryField(i, 0);
+	spl = tm->QueryField(i, 0).c_str();
 	core->ApplySpell(spl, target, Owner, fx->Power);
 	return FX_NOT_APPLIED;
 }
