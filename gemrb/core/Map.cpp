@@ -216,8 +216,7 @@ private:
 			TableMgr::index_t j=tab->GetRowCount();
 			std::vector<ResRef> resrefs(j);
 			while (j--) {
-				const char *crename = tab->QueryField( j,i );
-				if (strcmp(crename, tab->QueryDefault()) != 0) break;
+				if (tab->QueryField(j, i) != tab->QueryDefault()) break;
 			}
 			if (j>0) {
 				//difficulty

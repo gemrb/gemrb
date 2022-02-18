@@ -54,7 +54,7 @@ public:
 	/** Returns a pointer to a zero terminated 2da element,
 		if it cannot return a value, it returns the default */
 	const char* QueryField(index_t row = 0, index_t column = 0) const override;
-	const char* QueryDefault() const override;
+	const std::string& QueryDefault() const override;
 
 	index_t GetRowIndex(const char* string) const override;
 	index_t GetColumnIndex(const char* string) const override;

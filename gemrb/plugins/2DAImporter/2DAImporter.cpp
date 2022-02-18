@@ -136,9 +136,9 @@ const char* p2DAImporter::QueryField(index_t row, index_t column) const
 	return rows[row][column].c_str();
 }
 
-const char* p2DAImporter::QueryDefault() const
+const std::string& p2DAImporter::QueryDefault() const
 {
-	return defVal.c_str();
+	return defVal;
 }
 
 p2DAImporter::index_t p2DAImporter::GetRowIndex(const char* string) const

@@ -82,7 +82,7 @@ public:
 		return static_cast<ieStrRef>(field);
 	}
 	/** Returns default value of table. */
-	virtual const char* QueryDefault() const = 0;
+	virtual const std::string& QueryDefault() const = 0;
 	virtual index_t GetColumnIndex(const char* colname) const = 0;
 	virtual index_t GetRowIndex(const char* rowname) const = 0;
 	virtual const char* GetColumnName(index_t index) const = 0;
