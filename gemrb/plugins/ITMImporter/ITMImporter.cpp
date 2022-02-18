@@ -58,7 +58,7 @@ static void Initializer()
 	TableMgr::index_t zzcount = tm2->GetRowCount();
 	for (TableMgr::index_t i = 0; i < zzcount; i++) {
 		const char *rowname = tm2->GetRowName(i);
-		const char *field = tm2->QueryField(i, 0);
+		const char *field = tm2->QueryField(i, 0).c_str();
 		int val = atoi(field);
 		if (val == 0) {
 			// not numeric, do an IDS lookup
@@ -221,7 +221,7 @@ Item* ITMImporter::GetItem(Item *s)
 		//all non pst
 		TableMgr::index_t row = dialogTable->GetRowIndex(s->Name);
 		s->DialogName = dialogTable->QueryFieldAsStrRef(row, 0);
-		s->Dialog = dialogTable->QueryField(row, 1);
+		s->Dialog = dialogTable->QueryField(row, 1).c_str();
 	} else {
 		s->DialogName = ieStrRef::INVALID;
 		s->Dialog.Reset();

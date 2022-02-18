@@ -222,7 +222,7 @@ private:
 				//difficulty
 				int level = tab->QueryFieldSigned<int>(0, i);
 				for (;j;j--) {
-					resrefs[j - 1] = tab->QueryField(j, i);
+					resrefs[j - 1] = tab->QueryField(j, i).c_str();
 				}
 				ResRef GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
 				vars.emplace(GroupName, SpawnGroup(std::move(resrefs), level));
@@ -852,7 +852,7 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 				refs[group] = {};
 				int i = 0;
 				for (auto& ref : refs[group]) {
-					ref = tm->QueryField(rc + 2, i++);
+					ref = tm->QueryField(rc + 2, i++).c_str();
 				}
 			}
 		}

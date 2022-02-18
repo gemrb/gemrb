@@ -541,7 +541,7 @@ bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 		return false;
 
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
-		musiclist.push_back(strdup(tm->QueryField(i, col)));
+		musiclist.push_back(strdup(tm->QueryField(i, col).c_str()));
 	}
 
 	return true;
@@ -555,8 +555,8 @@ bool Interface::ReadDamageTypeTable() {
 	DamageInfoStruct di;
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
 		di.strref = DisplayMessage::GetStringReference(tm->QueryFieldUnsigned<size_t>(i, 0));
-		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
-		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2), nullptr, 16);
+		di.resist_stat = TranslateStat(tm->QueryField(i, 1).c_str());
+		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2).c_str(), nullptr, 16);
 		di.iwd_mod_type = tm->QueryFieldSigned<int>(i, 3);
 		di.reduction = tm->QueryFieldSigned<int>(i, 4);
 		DamageInfoMap.emplace(di.value, di);
@@ -581,7 +581,7 @@ bool Interface::ReadSoundChannelsTable() const
 		else if (!strcmp(rowname, "SWING")) rowname = "SWINGS";
 		AudioDriver->SetChannelVolume(rowname, tm->QueryFieldSigned<int>(i, ivol));
 		if (irev != TableMgr::npos) {
-			AudioDriver->SetChannelReverb(rowname, atof(tm->QueryField(i, irev)));
+			AudioDriver->SetChannelReverb(rowname, atof(tm->QueryField(i, irev).c_str()));
 		}
 	}
 	return true;
@@ -761,11 +761,11 @@ int Interface::LoadFonts()
 	for (TableMgr::index_t row = 0; row < count; ++row) {
 		rowName = tab->GetRowName(row);
 
-		ResRef resref = tab->QueryField(rowName, "RESREF");
-		const char* font_name = tab->QueryField( rowName, "FONT_NAME" );
+		ResRef resref = tab->QueryField(rowName, "RESREF").c_str();
+		const char* font_name = tab->QueryField( rowName, "FONT_NAME" ).c_str();
 		ieWord font_size = tab->QueryFieldUnsigned<ieWord>( rowName, "PX_SIZE" ); // not available in BAM fonts.
-		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) ); // not available in BAM fonts.
-		bool background = atoi(tab->QueryField(rowName, "BACKGRND"));
+		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ).c_str() ); // not available in BAM fonts.
+		bool background = atoi(tab->QueryField(rowName, "BACKGRND").c_str());
 
 		Font* fnt = NULL;
 		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
@@ -2382,11 +2382,11 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		if (row != TableMgr::npos) {
 			TableMgr::index_t mvecol = mvesnd->GetColumnIndex("override");
 			if (mvecol != TableMgr::npos) {
-				actualMovieRef = mvesnd->QueryField(row, mvecol);
+				actualMovieRef = mvesnd->QueryField(row, mvecol).c_str();
 			}
 			TableMgr::index_t sndcol = mvesnd->GetColumnIndex("sound_override");
 			if (sndcol != TableMgr::npos) {
-				sound_resref = mvesnd->QueryField(row, sndcol);
+				sound_resref = mvesnd->QueryField(row, sndcol).c_str();
 			}
 		}
 	}
@@ -2422,7 +2422,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 				const char* rowName = sttable->GetRowName(i);
 				if (!std::isdigit(rowName[0])) continue; // this skips the initial palette rows (red, blue, green)
 
-				const char* frameField = sttable->QueryField(i, 0);
+				const char* frameField = sttable->QueryField(i, 0).c_str();
 				ieStrRef strField = sttable->QueryFieldAsStrRef(i, 1);
 				subs[atoi(frameField)] = strField;
 			}
@@ -3010,7 +3010,7 @@ bool Interface::InitItemTypes()
 			}
 			slotTypes[i].slotType = st->QueryFieldUnsigned<ieDword>(row, 0);
 			slotTypes[i].slotID = st->QueryFieldUnsigned<ieDword>(row, 1);
-			slotTypes[i].slotResRef = st->QueryField(row, 2);
+			slotTypes[i].slotResRef = st->QueryField(row, 2).c_str();
 			slotTypes[i].slotTip = st->QueryFieldUnsigned<ieDword>(row, 3);
 			slotTypes[i].slotFlags = st->QueryFieldUnsigned<ieDword>(row, 5);
 			//don't fill sloteffects for aliased slots (pst)
@@ -3453,7 +3453,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 		int cl = atoi(tab->GetColumnName(0));
 		std::vector<ResRef> refs;
 		for(TableMgr::index_t k=0;k<l;k++) {
-			refs.push_back(ResRef::MakeLowerCase(tab->QueryField(j, k)));
+			refs.push_back(ResRef::MakeLowerCase(tab->QueryField(j, k).c_str()));
 		}
 		RtRows.emplace(ItemName, ItemList(std::move(refs), cl));
 	}
@@ -3475,12 +3475,12 @@ bool Interface::ReadRandomItems()
 	}
 
 	//the gold item
-	GoldResRef = tab->QueryField(size_t(0), size_t(0));
+	GoldResRef = tab->QueryField(size_t(0), size_t(0)).c_str();
 	if (IsStar(GoldResRef)) {
 		return false;
 	}
 	ResRef randTreasureRef;
-	randTreasureRef = tab->QueryField(1, difflev);
+	randTreasureRef = tab->QueryField(1, difflev).c_str();
 	int i = atoi(randTreasureRef);
 	if (i<1) {
 		ReadItemTable(randTreasureRef, 0); //reading the table itself
@@ -3490,7 +3490,7 @@ bool Interface::ReadRandomItems()
 		i=5;
 	}
 	while(i--) {
-		randTreasureRef = tab->QueryField(2 + i, difflev);
+		randTreasureRef = tab->QueryField(2 + i, difflev).c_str();
 		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i));
 	}
 	return true;
@@ -4300,12 +4300,12 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	if (tab) {
 		TableMgr::index_t cols = tab->GetColumnCount();
 		TableMgr::index_t row = RAND<TableMgr::index_t>(0, tab->GetRowCount() - 1);
-		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0));
+		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0).c_str());
 		if (cols > 1) {
-			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1));
+			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1).c_str());
 		}
 		if (cols > 2) {
-			resource3 = ResRef::MakeUpperCase(tab->QueryField(row, 2));
+			resource3 = ResRef::MakeUpperCase(tab->QueryField(row, 2).c_str());
 		}
 	}
 }
@@ -4320,7 +4320,7 @@ std::vector<ieDword>* Interface::GetListFrom2DAInternal(const ResRef& resref)
 	if (tab) {
 		ret->resize(tab->GetRowCount());
 		for (size_t i = 0; i < ret->size(); ++i) {
-			ret->at(i) = strtounsigned<ieDword>(tab->QueryField(i, 0));
+			ret->at(i) = strtounsigned<ieDword>(tab->QueryField(i, 0).c_str());
 		}
 	}
 	return ret;
@@ -4379,7 +4379,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 		ResRef subTableName = mtm->GetRowName(i);
 		int checkcol = mtm->QueryFieldSigned<int>(i,1);
 		unsigned int readcol = mtm->QueryFieldUnsigned<unsigned int>(i,2);
-		int stat = TranslateStat(mtm->QueryField(i,0) );
+		int stat = TranslateStat(mtm->QueryField(i,0).c_str());
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
 		}

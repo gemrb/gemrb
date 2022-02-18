@@ -507,7 +507,7 @@ void GameData::ReadItemSounds()
 	for (TableMgr::index_t i = 0; i < rowCount; i++) {
 		ItemSounds[i] = {};
 		for (TableMgr::index_t j = 0; j < colCount; j++) {
-			ResRef snd = ResRef::MakeLowerCase(itemsnd->QueryField(i, j));
+			ResRef snd = ResRef::MakeLowerCase(itemsnd->QueryField(i, j).c_str());
 			if (snd == ResRef("*")) break;
 			ItemSounds[i].push_back(snd);
 		}
@@ -721,7 +721,7 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 	TableMgr::index_t count = tm->GetRowCount();
 	data.resize(count);
 	for (TableMgr::index_t i = 0; i < count; i++) {
-		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
+		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0).c_str());
 		// * marks an empty resource
 		if (IsStar(data[i])) {
 			data[i].Reset();
@@ -739,7 +739,7 @@ void GameData::ReadSpellProtTable()
 	TableMgr::index_t rowCount = tab->GetRowCount();
 	spellProt.resize(rowCount);
 	for (TableMgr::index_t i = 0; i < rowCount; ++i) {
-		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
+		ieDword stat = core->TranslateStat(tab->QueryField(i, 0).c_str());
 		spellProt[i].stat = (ieWord) stat;
 		spellProt[i].value = tab->QueryFieldUnsigned<ieDword>(i, 1);
 		spellProt[i].relation = tab->QueryFieldUnsigned<ieWord>(i, 2);
@@ -869,7 +869,7 @@ const SurgeSpell& GameData::GetSurgeSpell(unsigned int idx)
 
 		SurgeSpell ss;
 		for (TableMgr::index_t i = 0; i < table->GetRowCount(); i++) {
-			ss.spell = table->QueryField(i, 0);
+			ss.spell = table->QueryField(i, 0).c_str();
 			ss.message = table->QueryFieldAsStrRef(i, 1);
 			// comment ignored
 			SurgeSpells.push_back(ss);
@@ -906,7 +906,7 @@ ResRef GameData::GetFist(int cls, int level)
 	char clsStr[3];
 	snprintf(clsStr, sizeof(clsStr), "%d", cls);
 	TableMgr::index_t row = fistWeap->GetRowIndex(clsStr);
-	return fistWeap->QueryField(row, level);
+	return fistWeap->QueryField(row, level).c_str();
 }
 
 // read from our unhardcoded monk bonus table
@@ -1050,8 +1050,8 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 		TableMgr::index_t tableCount = table->GetRowCount();
 		itemUse.resize(tableCount);
 		for (TableMgr::index_t i = 0; i < tableCount; i++) {
-			itemUse[i].stat = static_cast<ieByte>(core->TranslateStat(table->QueryField(i, 0)));
-			itemUse[i].table = table->QueryField(i, 1);
+			itemUse[i].stat = static_cast<ieByte>(core->TranslateStat(table->QueryField(i, 0).c_str()));
+			itemUse[i].table = table->QueryField(i, 1).c_str();
 			itemUse[i].mcol = table->QueryFieldUnsigned<ieByte>(i, 2);
 			itemUse[i].vcol = table->QueryFieldUnsigned<ieByte>(i, 3);
 			itemUse[i].which = table->QueryFieldUnsigned<ieByte>(i, 4);

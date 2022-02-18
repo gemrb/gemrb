@@ -56,24 +56,24 @@ public:
 	virtual index_t GetColumnCount(index_t row = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
 	 * 0,0 returns the default value, it may return NULL */
-	virtual const char* QueryField(index_t row = 0, index_t column = 0) const = 0;
+	virtual const std::string& QueryField(index_t row = 0, index_t column = 0) const = 0;
 
 	/** Returns a pointer to a zero terminated 2da element,
 	 * uses column name and row name to search the field,
 	 * may return NULL */
-	const char* QueryField(const char* row, const char* column) const
+	const std::string& QueryField(const char* row, const char* column) const
 	{
 		return QueryField(GetRowIndex(row), GetColumnIndex(column));
 	}
 	
 	template <typename RET_T, typename ROW_T, typename COL_T>
 	RET_T QueryFieldUnsigned(ROW_T row, COL_T column) const {
-		return strtounsigned<RET_T>(QueryField(row, column));
+		return strtounsigned<RET_T>(QueryField(row, column).c_str());
 	}
 	
 	template <typename RET_T, typename ROW_T, typename COL_T>
 	RET_T QueryFieldSigned(ROW_T row, COL_T column) const {
-		return strtosigned<RET_T>(QueryField(row, column));
+		return strtosigned<RET_T>(QueryField(row, column).c_str());
 	}
 	
 	template <typename ROW_T, typename COL_T>

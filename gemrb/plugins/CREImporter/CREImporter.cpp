@@ -388,7 +388,7 @@ static void GetSpellTable(const ResRef& tableRef, std::vector<ResRef>& list)
 	TableMgr::index_t count = tab->GetRowCount();
 	list.resize(count);
 	for (TableMgr::index_t i = 0; i < count; ++i) {
-		list[i] = ResRef::MakeLowerCase(tab->QueryField(i, column));
+		list[i] = ResRef::MakeLowerCase(tab->QueryField(i, column).c_str());
 	}
 }
 
@@ -418,7 +418,7 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 		} else {
 			// find the correct index in listspll.2da
 			ResRef spellRef;
-			spellRef = ResRef::MakeLowerCase(tab->QueryField(i, lastCol));
+			spellRef = ResRef::MakeLowerCase(tab->QueryField(i, lastCol).c_str());
 			// the table has disabled spells in it and they all have the first two chars replaced by '*'
 			if (IsStar(spellRef)) {
 				continue;
@@ -427,7 +427,7 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 			assert (index != TableMgr::npos);
 		}
 		list[index] = new SpellEntry;
-		list[index]->SetSpell(tab->QueryField(i, lastCol));
+		list[index]->SetSpell(tab->QueryField(i, lastCol).c_str());
 		for (TableMgr::index_t col = 0; col < lastCol; ++col) {
 			list[index]->AddLevel(tab->QueryFieldSigned<int>(i, col), col);
 		}

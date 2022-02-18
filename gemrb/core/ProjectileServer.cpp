@@ -83,7 +83,7 @@ ProjectileServer::ProjectileServer() noexcept
 			int i;
 
 			for(i=0;i<AP_RESCNT;i++) {
-				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i));
+				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i).c_str());
 			}
 			//using i so the flags field will always be after the resources
 			explosions[rows].flags = explist->QueryFieldSigned<int>(rows,i);

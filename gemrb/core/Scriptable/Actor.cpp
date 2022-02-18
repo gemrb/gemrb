@@ -623,7 +623,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 	if (remove) maxLevel -= diff;
 	for(int i=0; i<maxLevel; i++) {
 		for (TableMgr::index_t j = 0; j < row; ++j) {
-			const ResRef res = table->QueryField(j,i);
+			const ResRef res = table->QueryField(j,i).c_str();
 			if (IsStar(res)) continue;
 
 			ResRef clabRef(res.begin() + 3);
@@ -1635,8 +1635,8 @@ static void ReadModalStates()
 
 	ModalStatesStruct ms;
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
-		ms.spell = table->QueryField(i, 0);
-		strlcpy(ms.action, table->QueryField(i, 1), 16);
+		ms.spell = table->QueryField(i, 0).c_str();
+		strlcpy(ms.action, table->QueryField(i, 1).c_str(), 16);
 		ms.entering_str = table->QueryFieldAsStrRef(i, 2);
 		ms.leaving_str = table->QueryFieldAsStrRef(i, 3);
 		ms.failed_str = table->QueryFieldAsStrRef(i, 4);
@@ -1695,11 +1695,11 @@ static void InitActorTables()
 			const char *field;
 			const char *rowname = tm->GetRowName(i);
 
-			field = tm->QueryField(rowname, "DRUIDSPELL");
+			field = tm->QueryField(rowname, "DRUIDSPELL").c_str();
 			if (field[0]!='*') {
 				isclass[ISDRUID] |= bitmask;
 			}
-			field = tm->QueryField(rowname, "CLERICSPELL");
+			field = tm->QueryField(rowname, "CLERICSPELL").c_str();
 			if (field[0]!='*') {
 				// iwd2 has no DRUIDSPELL
 				if (third && !strnicmp(field, "MXSPLDRD", 8)) {
@@ -1709,32 +1709,32 @@ static void InitActorTables()
 				}
 			}
 
-			field = tm->QueryField(rowname, "MAGESPELL");
+			field = tm->QueryField(rowname, "MAGESPELL").c_str();
 			if (field[0]!='*') {
 				isclass[ISMAGE] |= bitmask;
 			}
 
 			// field 3 holds the starting xp
 
-			field = tm->QueryField(rowname, "BARDSKILL");
+			field = tm->QueryField(rowname, "BARDSKILL").c_str();
 			if (field[0]!='*') {
 				isclass[ISBARD] |= bitmask;
 			}
 
-			field = tm->QueryField(rowname, "THIEFSKILL");
+			field = tm->QueryField(rowname, "THIEFSKILL").c_str();
 			if (field[0]!='*') {
 				isclass[ISTHIEF] |= bitmask;
 			}
 
-			field = tm->QueryField(rowname, "LAYHANDS");
+			field = tm->QueryField(rowname, "LAYHANDS").c_str();
 			if (field[0]!='*') {
 				isclass[ISPALADIN] |= bitmask;
 			}
 
-			field = tm->QueryField(rowname, "TURNLEVEL");
+			field = tm->QueryField(rowname, "TURNLEVEL").c_str();
 			turnlevels[i]=atoi(field);
 
-			field = tm->QueryField(rowname, "BOOKTYPE");
+			field = tm->QueryField(rowname, "BOOKTYPE").c_str();
 			booktypes[i]=atoi(field);
 			//if booktype == 3 then it is a 'divine sorcerer' class
 			//we shouldn't hardcode iwd2 classes this heavily
@@ -1743,19 +1743,19 @@ static void InitActorTables()
 			}
 
 			if (third) {
-				field = tm->QueryField(rowname, "CASTING"); // COL_HATERACE but different name
+				field = tm->QueryField(rowname, "CASTING").c_str(); // COL_HATERACE but different name
 				castingstat[i] = atoi(field);
 
-				field = tm->QueryField(rowname, "SPLTYPE");
+				field = tm->QueryField(rowname, "SPLTYPE").c_str();
 				iwd2spltypes[i] = atoi(field);
 			}
 
-			field = tm->QueryField(rowname, "HATERACE");
+			field = tm->QueryField(rowname, "HATERACE").c_str();
 			if (field[0]!='*') {
 				isclass[ISRANGER] |= bitmask;
 			}
 
-			field = tm->QueryField(rowname, "ABILITIES");
+			field = tm->QueryField(rowname, "ABILITIES").c_str();
 			if (!strnicmp(field, "CLABMO", 6)) {
 				isclass[ISMONK] |= bitmask;
 			}
@@ -1763,7 +1763,7 @@ static void InitActorTables()
 			class2kits[i].clab = strdup(field);
 			class2kits[i].className = strdup(rowname);
 
-			field = tm->QueryField(rowname, "NO_PROF");
+			field = tm->QueryField(rowname, "NO_PROF").c_str();
 			defaultprof[i]=atoi(field);
 
 			bitmask <<=1;
@@ -1791,17 +1791,17 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("damage");
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
-			const char *tmp = tm->QueryField( i, COL_MAIN );
+			const char *tmp = tm->QueryField( i, COL_MAIN ).c_str();
 			d_main[i] = tmp;
 			if (IsStar(d_main[i])) {
 				d_main[i].Reset();
 			}
-			tmp = tm->QueryField( i, COL_SPARKS );
+			tmp = tm->QueryField( i, COL_SPARKS ).c_str();
 			d_splash[i] = tmp;
 			if (IsStar(d_splash[i])) {
 				d_splash[i].Reset();
 			}
-			tmp = tm->QueryField( i, COL_GRADIENT );
+			tmp = tm->QueryField( i, COL_GRADIENT ).c_str();
 			d_gradient[i]=atoi(tmp);
 		}
 	}
@@ -1810,11 +1810,11 @@ static void InitActorTables()
 	if (tm) {
 		ieDword mask = 1;
 		for (int i =  0; i < OVERLAY_COUNT; i++) {
-			hc_overlays[i] = tm->QueryField(i, 0);
+			hc_overlays[i] = tm->QueryField(i, 0).c_str();
 			if (tm->QueryFieldSigned<int>( i, 1)) {
 				hc_locations|=mask;
 			}
-			const char *flags = tm->QueryField(i, 2);
+			const char *flags = tm->QueryField(i, 2).c_str();
 			hc_flags[i] = atoi(flags);
 			mask<<=1;
 		}
@@ -1826,7 +1826,7 @@ static void InitActorTables()
 		tm = gamedata->LoadTable("csound");
 		if (tm) {
 			for (int i = 0; i < VCONST_COUNT; i++) {
-				const char *suffix = tm->QueryField(i, 0);
+				const char *suffix = tm->QueryField(i, 0).c_str();
 				switch(suffix[0]) {
 					case '*': break;
 					//I have no idea what this ! mean
@@ -1857,7 +1857,7 @@ static void InitActorTables()
 
 		for (int i = 0; i < extraslots; i++) {
 			ieByte cls = 0;
-			valid_unsignednumber(tm->QueryField(i, 0), cls);
+			valid_unsignednumber(tm->QueryField(i, 0).c_str(), cls);
 			OtherGUIButtons[i].clss = cls;
 			memcpy(OtherGUIButtons[i].buttons, &DefaultButtons, sizeof(ActionButtonRow));
 			for (int j = 0; j < GUIBT_COUNT; j++) {
@@ -1869,7 +1869,7 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("mdfeats", true);
 	if (tm) {
 		for (int i = 0; i < ES_COUNT; i++) {
-			featSpells[i] = tm->QueryField(i, 0);
+			featSpells[i] = tm->QueryField(i, 0).c_str();
 		}
 	}
 
@@ -1881,7 +1881,7 @@ static void InitActorTables()
 			//we need the MULTIPLE and MAX_LEVEL columns
 			//MULTIPLE: the FEAT_* stat index
 			//MAX_LEVEL: how many times it could be taken
-			stat = core->TranslateStat(tm->QueryField(i,0));
+			stat = core->TranslateStat(tm->QueryField(i,0).c_str());
 			if (stat>=MAX_STATS) {
 				Log(WARNING, "Actor", "Invalid stat value in featreq.2da");
 			}
@@ -1911,10 +1911,10 @@ static void InitActorTables()
 			int classis = IsClassFromName(classname);
 			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
 			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname, "CLASS"); // only real classes have this column at 0
-			const char *clab = tm->QueryField(classname, "CLAB");
+			const char *clab = tm->QueryField(classname, "CLAB").c_str();
 			if (classcol) {
 				// kit ids are in hex
-				classID = strtounsigned<ieDword>(tm->QueryField(classname, "ID"), NULL, 16);
+				classID = strtounsigned<ieDword>(tm->QueryField(classname, "ID").c_str(), NULL, 16);
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
 				class2kits[classcol].clabs.push_back(strdup(clab));
@@ -2010,7 +2010,7 @@ static void InitActorTables()
 
 			//single classes only worry about IE_LEVEL
 			ieDword tmpclass = 0;
-			valid_unsignednumber(tm->QueryField(classname, "MULTI"), tmpclass);
+			valid_unsignednumber(tm->QueryField(classname, "MULTI").c_str(), tmpclass);
 			multi[tmpindex] = tmpclass;
 			if (!tmpclass) {
 				classis = IsClassFromName(classname);
@@ -2021,7 +2021,7 @@ static void InitActorTables()
 					AppendFormat(buffer, "Classis: {} ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
-					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP"), true);
+					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP").c_str(), true);
 					if (hptm) {
 						int tmphp = 0;
 						TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2074,7 +2074,7 @@ static void InitActorTables()
 						if (!foundwarrior) {
 							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
 								classis==ISBARBARIAN);
-							hptm = gamedata->LoadTable(tm->QueryField(currentname, "HP"), true);
+							hptm = gamedata->LoadTable(tm->QueryField(currentname, "HP").c_str(), true);
 							if (hptm) {
 								int tmphp = 0;
 								TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2148,10 +2148,10 @@ static void InitActorTables()
 			snprintf(rowName, sizeof(rowName), "%ld", i);
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
-			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
+			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE").c_str(), NULL, 16);
 			int classID = tm->QueryFieldSigned<int>(rowName, "CLASS");
-			const char *clab = tm->QueryField(rowName, "ABILITIES");
-			const char *kitName = tm->QueryField(rowName, "ROWNAME");
+			const char *clab = tm->QueryField(rowName, "ABILITIES").c_str();
+			const char *kitName = tm->QueryField(rowName, "ROWNAME").c_str();
 			class2kits[classID].indices.push_back(i);
 			class2kits[classID].ids.push_back(kitUsability);
 			class2kits[classID].clabs.push_back(strdup(clab));
@@ -2207,7 +2207,7 @@ static void InitActorTables()
 				int val;
 				// the stat and ability columns need conversion into numbers
 				if (j < 2) {
-					val = core->TranslateStat(tm->QueryField(i, j));
+					val = core->TranslateStat(tm->QueryField(i, j).c_str());
 					if (j == 0) {
 						stat2skill[val] = i;
 					}
@@ -2304,17 +2304,17 @@ static void InitActorTables()
 		if (count> 0 && count<8) {
 			avPrefix.resize(count - 1);
 			avBase = tm->QueryFieldSigned<int>(0, 0);
-			const char *poi = tm->QueryField(0,1);
+			const char *poi = tm->QueryField(0,1).c_str();
 			if (*poi!='*') {
 				avStance = tm->QueryFieldSigned<int>(0,1);
 			} else {
 				avStance = -1;
 			}
 			for (size_t i = 0; i < avPrefix.size(); i++) {
-				avPrefix[i].avresref = tm->QueryField(i + 1);
+				avPrefix[i].avresref = tm->QueryField(i + 1).c_str();
 				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
-					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
+					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0).c_str());
 				} else {
 					avPrefix[i].stat = -1;
 				}
@@ -2465,7 +2465,7 @@ int Actor::GetCriticalType() const
 	int row = BaseStats[IE_SPECIFIC];
 	//defaults to 0
 	int ret;
-	valid_signednumber(tm->QueryField(row, 1), ret);
+	valid_signednumber(tm->QueryField(row, 1).c_str(), ret);
 	return ret;
 }
 
@@ -2478,7 +2478,7 @@ void Actor::PlayCritDamageAnimation(int type)
 	TableMgr::index_t row = tm->FindTableValue (1, type);
 	if (row != TableMgr::npos) {
 		//the animations are listed in column 0
-		AddAnimation(ResRef(tm->QueryField(row, 0)), -1, 45, AA_PLAYONCE|AA_BLEND);
+		AddAnimation(ResRef(tm->QueryField(row, 0).c_str()), -1, 45, AA_PLAYONCE|AA_BLEND);
 	}
 }
 
@@ -3573,7 +3573,7 @@ bool Actor::HasSpecialDeathReaction(const ieVariable& deadname) const
 {
 	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return false;
-	const char *value = tm->QueryField(scriptName.CString(), deadname);
+	const char *value = tm->QueryField(scriptName.CString(), deadname).c_str();
 	return value && value[0] != '0';
 }
 
@@ -3585,7 +3585,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	// if value is 0 - use reactdeath
 	// if value is 1 - use reactspecial
 	// if value is string - use playsound instead (pst)
-	const char *value = tm->QueryField(scriptName.CString(), deadname);
+	const char *value = tm->QueryField(scriptName.CString(), deadname).c_str();
 	if (value[0] == '0') {
 		VerbalConstant(VB_REACT, 1, DS_QUEUE);
 		return;
@@ -3632,7 +3632,7 @@ static int CheckInteract(const char *talker, const char *target)
 	AutoTable interact = gamedata->LoadTable("interact");
 	if (!interact)
 		return I_NONE;
-	const char *value = interact->QueryField(talker, target);
+	const char *value = interact->QueryField(talker, target).c_str();
 	if (!value)
 		return I_NONE;
 
@@ -8437,7 +8437,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 	}
 	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(index));
 	TableMgr::index_t col = RAND<TableMgr::index_t>(0, tab->GetColumnCount(index) - 1);
-	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col));
+	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col).c_str());
 	return true;
 }
 
@@ -9491,7 +9491,7 @@ static ieDword ResolveTableValue(const ResRef& resref, ieDword stat, ieDword mco
 			}
 		}
 		ieDword ret;
-		if (valid_unsignednumber(tm->QueryField(row, vcol), ret)) {
+		if (valid_unsignednumber(tm->QueryField(row, vcol).c_str(), ret)) {
 			return ret;
 		}
 	}
@@ -10833,7 +10833,7 @@ int Actor::UpdateAnimationID(bool derived)
 		StatID = av.stat;
 		StatID = derived?GetSafeStat(StatID):GetBase( StatID );
 
-		const char *poi = tm->QueryField( StatID );
+		const char *poi = tm->QueryField( StatID ).c_str();
 		AnimID += strtosigned<int>(poi);
 	}
 	if (BaseStats[IE_ANIMATION_ID]!=(unsigned int) AnimID) {

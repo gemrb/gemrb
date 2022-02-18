@@ -64,7 +64,7 @@ unsigned char MapReverb::loadProperties (unsigned char profileNumber) {
 		properties = _properties;
 	}
 
-	float decay = strtof(reverbs->QueryField(profileNumber, 2), NULL);
+	float decay = strtof(reverbs->QueryField(profileNumber, 2).c_str(), NULL);
 	if (decay >= 0.0f && decay <= 20.0f) {
 		properties.reverbData.flDecayTime = decay;
 	}

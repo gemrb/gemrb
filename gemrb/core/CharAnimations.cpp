@@ -82,13 +82,13 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 	const DataFileMgr *resdata = core->GetResDataINI();
 	for (TableMgr::index_t i = 0; i < AvatarsCount; ++i) {
 		table[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i));
-		table[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1);
-		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
-		table[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3);
-		table[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4);
+		table[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1).c_str();
+		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2).c_str();
+		table[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3).c_str();
+		table[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4).c_str();
 		table[i].AnimationType = Avatars->QueryFieldUnsigned<ieByte>(i,AV_ANIMTYPE);
 		table[i].CircleSize = Avatars->QueryFieldUnsigned<ieByte>(i,AV_CIRCLESIZE);
-		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
+		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE).c_str();
 		//QueryField will always return a zero terminated string
 		//so tmp[0] must exist
 		if ( isalpha (tmp[0]) ) {
@@ -140,10 +140,10 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			unsigned int rmin = 0;
 			unsigned int rmax = 0xffff;
 
-			valid_signednumber(blood->QueryField(i,0), value);
-			valid_unsignednumber(blood->QueryField(i,1), rmin);
-			valid_unsignednumber(blood->QueryField(i,2), rmax);
-			valid_unsignednumber(blood->QueryField(i,3), flags);
+			valid_signednumber(blood->QueryField(i,0).c_str(), value);
+			valid_unsignednumber(blood->QueryField(i,1).c_str(), rmin);
+			valid_unsignednumber(blood->QueryField(i,2).c_str(), rmax);
+			valid_unsignednumber(blood->QueryField(i,3).c_str(), flags);
 			if (rmin > rmax || rmax > 0xffff) {
 				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: {:#x} {:#x}-{:#x} ", value, rmin, rmax);
 				continue;
@@ -166,10 +166,10 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			unsigned int rmax = 0xffff;
 			ieByte range = 0;
 
-			value = walk->QueryField(i, 0);
-			valid_unsignednumber(walk->QueryField(i,1), rmin);
-			valid_unsignednumber(walk->QueryField(i,2), rmax);
-			valid_unsignednumber(walk->QueryField(i,3), range);
+			value = walk->QueryField(i, 0).c_str();
+			valid_unsignednumber(walk->QueryField(i,1).c_str(), rmin);
+			valid_unsignednumber(walk->QueryField(i,2).c_str(), rmax);
+			valid_unsignednumber(walk->QueryField(i,3).c_str(), range);
 			if (IsStar(value)) {
 				value.Reset();
 				range = 0;
@@ -195,8 +195,8 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			unsigned int s1 = 0;
 			unsigned int s2 = 0;
 			valid_unsignednumber(stances->GetRowName(i), id);
-			valid_unsignednumber(stances->QueryField(i, 0), s1);
-			valid_unsignednumber(stances->QueryField(i, 1), s2);
+			valid_unsignednumber(stances->QueryField(i, 0).c_str(), s1);
+			valid_unsignednumber(stances->QueryField(i, 1).c_str(), s2);
 
 			if (s1 >= MAX_ANIMS || s2 >= MAX_ANIMS) {
 				Log(ERROR, "CharAnimations", "Invalid stances entry: {:#x} {} {}", id, s1, s2);
@@ -223,7 +223,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			for (auto& row : table) {
 				if (id < row.AnimID) break;
 				if (id == row.AnimID) {
-					row.ShadowAnimation = avatarShadows->QueryField(i, 0);
+					row.ShadowAnimation = avatarShadows->QueryField(i, 0).c_str();
 					break;
 				}
 			}

@@ -68,7 +68,7 @@ static void InitSparks()
 			} else {
 				idx = i;
 			}
-			const char *value = tab->QueryField(idx,j);
+			const char *value = tab->QueryField(idx,j).c_str();
 			TranslateColor(value, sparkcolors[i][j]);
 		}
 	}

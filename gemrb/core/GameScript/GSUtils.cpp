@@ -1217,9 +1217,9 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			pdtable = gamedata->LoadTable("interdia");
 			if (pdtable) {
 				if (game->Expansion == GAME_TOB) {
-					Dialog = pdtable->QueryField( scriptingname, "25FILE" );
+					Dialog = pdtable->QueryField( scriptingname, "25FILE" ).c_str();
 				} else {
-					Dialog = pdtable->QueryField( scriptingname, "FILE" );
+					Dialog = pdtable->QueryField( scriptingname, "FILE" ).c_str();
 				}
 			}
 			break;
@@ -2441,7 +2441,7 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 	if (!tab) {
 		return {};
 	}
-	const char *tmpstr = tab->QueryField(areaname, entryname);
+	const char *tmpstr = tab->QueryField(areaname, entryname).c_str();
 	Point p;
 	sscanf(tmpstr, "%d.%d", &p.x, &p.y);
 	return p;
@@ -2930,7 +2930,7 @@ void AddXPCore(const Action *parameters, bool divide)
 		Log(ERROR, "GameScript", "Can't perform AddXP2DA/AddXPVar!");
 		return;
 	}
-	const char *xpvalue = xptable->QueryField(parameters->string0Parameter, "0"); // level is unused
+	const char *xpvalue = xptable->QueryField(parameters->string0Parameter, "0").c_str(); // level is unused
 
 	if (divide) {
 		// force divide party xp

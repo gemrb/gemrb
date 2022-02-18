@@ -116,14 +116,14 @@ private:
 		const char* poi;
 
 		for (int i = 0; i < 16; i++) {
-			poi = tm->QueryField( 0, i );
+			poi = tm->QueryField( 0, i ).c_str();
 			if (*poi != '*')
 				Passable[i] = PathMapFlags(atoi(poi));
 		}
-		poi = tm->QueryField( 1, 0 );
+		poi = tm->QueryField( 1, 0 ).c_str();
 		if (*poi != '*')
 			NormalCost = atoi( poi );
-		poi = tm->QueryField( 1, 1 );
+		poi = tm->QueryField( 1, 1 ).c_str();
 		if (*poi != '*')
 			AdditionalCost = atoi( poi );
 	}
@@ -143,7 +143,7 @@ static int GetTrackString(const ResRef &areaName)
 		TableMgr::index_t trackcount = tm->GetRowCount();
 		tracks.resize(trackcount);
 		for (TableMgr::index_t i = 0; i < trackcount; i++) {
-			const char *poi = tm->QueryField(i,0);
+			const char *poi = tm->QueryField(i,0).c_str();
 			if (poi[0]=='O' && poi[1]=='_') {
 				tracks[i].trackFlag=false;
 				poi+=2;
@@ -2209,7 +2209,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 		stream->WriteWord(tmpWord); //more unknowns
 		stream->WriteDword(ac->appearance);
 		stream->WriteDword(ac->TalkCount);
-		stream->WriteResRef( ac->GetDialog());
+		stream->WriteResRefLC(ac->GetDialog());
 		PutScript(stream, ac, SCR_OVERRIDE);
 		PutScript(stream, ac, SCR_GENERAL);
 		PutScript(stream, ac, SCR_CLASS);
