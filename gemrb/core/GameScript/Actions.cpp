@@ -4592,7 +4592,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	if (count == 1) {
 		// grant the default table item to the Sender in regular games
 		Action *params = new Action(true);
-		params->resref0Parameter = tab->QueryDefault();
+		params->resref0Parameter = tab->QueryDefault().c_str();
 		CreateItem(Sender, params);
 		delete params;
 	}
@@ -5855,7 +5855,7 @@ void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
 	if (core->HasFeature(GF_STRREF_SAVEGAME)) {
-		const char *basename = "Auto-Save";
+		std::string basename = "Auto-Save";
 		AutoTable tab = gamedata->LoadTable("savegame");
 		if (tab) {
 			basename = tab->QueryDefault();

@@ -896,7 +896,7 @@ ResRef GameData::GetFist(int cls, int level)
 			return defaultFist;
 		}
 
-		defaultFist = fistWeap->QueryDefault();
+		defaultFist = fistWeap->QueryDefault().c_str();
 		cols = fistWeap->GetColumnCount();
 	}
 
