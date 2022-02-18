@@ -794,7 +794,7 @@ int GameData::GetAreaAlias(const ResRef &areaName)
 
 		TableMgr::index_t idx = table->GetRowCount();
 		while (idx--) {
-			ResRef key = ResRef::MakeLowerCase(table->GetRowName(idx));
+			ResRef key = ResRef::MakeLowerCase(table->GetRowName(idx).c_str());
 			ieDword value = table->QueryFieldUnsigned<ieDword>(idx, 0);
 			AreaAliasTable[key] = value;
 		}
@@ -823,7 +823,7 @@ int GameData::GetSpecialSpell(const ResRef& resref)
 		TableMgr::index_t specialSpellsCount = table->GetRowCount();
 		SpecialSpells.resize(specialSpellsCount);
 		for (TableMgr::index_t i = 0; i < specialSpellsCount; ++i) {
-			SpecialSpells[i].resref = table->GetRowName(i);
+			SpecialSpells[i].resref = table->GetRowName(i).c_str();
 			SpecialSpells[i].flags = table->QueryFieldSigned<int>(i, 0);
 			SpecialSpells[i].amount = table->QueryFieldSigned<int>(i, 1);
 			SpecialSpells[i].bonus_limit = table->QueryFieldSigned<int>(i, 2);
@@ -992,7 +992,7 @@ const std::vector<int>& GameData::GetBonusSpells(int ability)
 		int maxStat = core->GetMaximumAbility();
 		bonusSpells.resize(maxStat); // wastes some memory, but makes addressing easier
 		for (TableMgr::index_t row = 0; row < mxSplBon->GetRowCount(); ++row) {
-			int statValue = atoi(mxSplBon->GetRowName(row)) - 1;
+			int statValue = atoi(mxSplBon->GetRowName(row).c_str()) - 1;
 			assert(statValue >= 0 && statValue < maxStat);
 			std::vector<int> bonuses(splLevels);
 			for (TableMgr::index_t i = 0; i < splLevels; i++) {
@@ -1020,7 +1020,7 @@ ieByte GameData::GetItemAnimation(const ResRef& itemRef)
 		}
 
 		for (TableMgr::index_t i = 0; i < table->GetRowCount(); ++i) {
-			ResRef item = table->GetRowName(i);
+			ResRef item = table->GetRowName(i).c_str();
 			itemAnims[item] = table->QueryFieldUnsigned<ieByte>(i, 0);
 		}
 	}

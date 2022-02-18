@@ -57,7 +57,7 @@ static void Initializer()
 	// resolve table into directly usable form
 	TableMgr::index_t zzcount = tm2->GetRowCount();
 	for (TableMgr::index_t i = 0; i < zzcount; i++) {
-		const char *rowname = tm2->GetRowName(i);
+		const char *rowname = tm2->GetRowName(i).c_str();
 		const char *field = tm2->QueryField(i, 0).c_str();
 		int val = atoi(field);
 		if (val == 0) {

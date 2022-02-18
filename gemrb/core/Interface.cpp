@@ -164,7 +164,7 @@ private:
 		}
 		//this is a hack for rows not starting at 0 in some cases
 		int fix = 0;
-		const char * tmp = tab->GetRowName(0);
+		const char * tmp = tab->GetRowName(0).c_str();
 		if (tmp && (tmp[0]!='0')) {
 			fix = atoi(tmp);
 			for (int i=0;i<fix;i++) {
@@ -575,7 +575,7 @@ bool Interface::ReadSoundChannelsTable() const
 	TableMgr::index_t ivol = tm->GetColumnIndex("VOLUME");
 	TableMgr::index_t irev = tm->GetColumnIndex("REVERB");
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
-		const char *rowname = tm->GetRowName(i);
+		const char *rowname = tm->GetRowName(i).c_str();
 		// translate some alternative names for the IWDs
 		if (!strcmp(rowname, "ACTION")) rowname = "ACTIONS";
 		else if (!strcmp(rowname, "SWING")) rowname = "SWINGS";
@@ -759,7 +759,7 @@ int Interface::LoadFonts()
 	TableMgr::index_t count = tab->GetRowCount();
 	const char* rowName = NULL;
 	for (TableMgr::index_t row = 0; row < count; ++row) {
-		rowName = tab->GetRowName(row);
+		rowName = tab->GetRowName(row).c_str();
 
 		ResRef resref = tab->QueryField(rowName, "RESREF").c_str();
 		const char* font_name = tab->QueryField( rowName, "FONT_NAME" ).c_str();
@@ -2419,7 +2419,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 			nextSubFrame = 0;
 
 			for (TableMgr::index_t i = 0; i < sttable->GetRowCount(); ++i) {
-				const char* rowName = sttable->GetRowName(i);
+				const char* rowName = sttable->GetRowName(i).c_str();
 				if (!std::isdigit(rowName[0])) continue; // this skips the initial palette rows (red, blue, green)
 
 				const char* frameField = sttable->QueryField(i, 0).c_str();
@@ -2998,7 +2998,7 @@ bool Interface::InitItemTypes()
 		slotTypes.resize(SlotTypes);
 		for (unsigned int row = 0; row < SlotTypes; row++) {
 			bool alias;
-			ieDword i = strtounsigned<ieDword>(st->GetRowName(row));
+			ieDword i = strtounsigned<ieDword>(st->GetRowName(row).c_str());
 			if (i>=SlotTypes) continue;
 			if (slotTypes[i].slotEffects != 100) { // SLOT_EFFECT_ALIAS
 				slotTypes[row].slot = i;
@@ -3445,12 +3445,12 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 		if (Prefix) {
 			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
 		} else {
-			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j));
+			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j).c_str());
 		}
 
 		TableMgr::index_t l = tab->GetColumnCount(j);
 		if (l<1) continue;
-		int cl = atoi(tab->GetColumnName(0));
+		int cl = atoi(tab->GetColumnName(0).c_str());
 		std::vector<ResRef> refs;
 		for(TableMgr::index_t k=0;k<l;k++) {
 			refs.push_back(ResRef::MakeLowerCase(tab->QueryField(j, k).c_str()));
@@ -3491,7 +3491,7 @@ bool Interface::ReadRandomItems()
 	}
 	while(i--) {
 		randTreasureRef = tab->QueryField(2 + i, difflev).c_str();
-		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i));
+		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i).c_str());
 	}
 	return true;
 }
@@ -4376,7 +4376,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 	int ret = 0;
 	// tables for additive modifiers of bonus type
 	for (TableMgr::index_t i = 0; i < count; i++) {
-		ResRef subTableName = mtm->GetRowName(i);
+		ResRef subTableName = mtm->GetRowName(i).c_str();
 		int checkcol = mtm->QueryFieldSigned<int>(i,1);
 		unsigned int readcol = mtm->QueryFieldUnsigned<unsigned int>(i,2);
 		int stat = TranslateStat(mtm->QueryField(i,0).c_str());

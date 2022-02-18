@@ -152,7 +152,7 @@ static int GetTrackString(const ResRef &areaName)
 			}
 			tracks[i].text = ieStrRef(atoi(poi));
 			tracks[i].difficulty = tm->QueryFieldSigned<int>(i,1);
-			tracks[i].areaName = ResRef::MakeLowerCase(tm->GetRowName(i));
+			tracks[i].areaName = ResRef::MakeLowerCase(tm->GetRowName(i).c_str());
 		}
 	}
 

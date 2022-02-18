@@ -81,7 +81,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 	table.resize(AvatarsCount);
 	const DataFileMgr *resdata = core->GetResDataINI();
 	for (TableMgr::index_t i = 0; i < AvatarsCount; ++i) {
-		table[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i));
+		table[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i).c_str());
 		table[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1).c_str();
 		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2).c_str();
 		table[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3).c_str();
@@ -194,7 +194,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			unsigned int id = 0;
 			unsigned int s1 = 0;
 			unsigned int s2 = 0;
-			valid_unsignednumber(stances->GetRowName(i), id);
+			valid_unsignednumber(stances->GetRowName(i).c_str(), id);
 			valid_unsignednumber(stances->QueryField(i, 0).c_str(), s1);
 			valid_unsignednumber(stances->QueryField(i, 1).c_str(), s2);
 
@@ -218,7 +218,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		TableMgr::index_t rows = avatarShadows->GetRowCount();
 		for (TableMgr::index_t i = 0; i < rows; ++i) {
 			unsigned int id = 0;
-			valid_unsignednumber(avatarShadows->GetRowName(i), id);
+			valid_unsignednumber(avatarShadows->GetRowName(i).c_str(), id);
 
 			for (auto& row : table) {
 				if (id < row.AnimID) break;

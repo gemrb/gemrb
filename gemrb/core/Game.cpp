@@ -89,7 +89,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		TableMgr::index_t i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
-			mastarea.push_back(ResRef(table->GetRowName(i)));
+			mastarea.push_back(ResRef(table->GetRowName(i).c_str()));
 		}
 	}
 
@@ -118,7 +118,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		npclevels.reserve(rows);
 		for (TableMgr::index_t i = 0; i < rows; i++) {
 			npclevels.emplace_back(cols + 1);
-			npclevels[i][0] = table->GetRowName(i);
+			npclevels[i][0] = table->GetRowName(i).c_str();
 			for (TableMgr::index_t j = 0; j < cols; j++) {
 				npclevels[i][j + 1] = table->QueryField(i, j).c_str();
 			}
@@ -394,7 +394,7 @@ int Game::LeaveParty (Actor* actor)
 //determines if startpos.2da has rotation rows (it cannot have tutorial line)
 bool Game::DetermineStartPosType(const TableMgr *strta) const
 {
-	if ((strta->GetRowCount()>=6) && !stricmp(strta->GetRowName(4),"START_ROT" ) )
+	if ((strta->GetRowCount()>=6) && !stricmp(strta->GetRowName(4).c_str(),"START_ROT" ) )
 	{
 		return true;
 	}

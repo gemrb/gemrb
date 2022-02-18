@@ -131,7 +131,7 @@ private:
 			if (!efftextTable) continue;
 			TableMgr::index_t row = efftextTable->GetRowCount();
 			while (row--) {
-				const char* ret = efftextTable->GetRowName(row);
+				const char* ret = efftextTable->GetRowName(row).c_str();
 				int val;
 				if (valid_signednumber(ret, val) && (i == val)) {
 					Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);

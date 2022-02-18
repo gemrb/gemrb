@@ -59,8 +59,8 @@ public:
 	index_t GetRowIndex(const char* string) const override;
 	index_t GetColumnIndex(const char* string) const override;
 
-	const char* GetColumnName(index_t index) const override;
-	const char* GetRowName(index_t index) const override;
+	const std::string& GetColumnName(index_t index) const override;
+	const std::string& GetRowName(index_t index) const override;
 
 	index_t FindTableValue(index_t col, long val, index_t start) const override;
 	index_t FindTableValue(index_t col, const char* val, index_t start) const override;

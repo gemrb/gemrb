@@ -161,20 +161,21 @@ p2DAImporter::index_t p2DAImporter::GetColumnIndex(const char* string) const
 	return npos;
 }
 
-const char* p2DAImporter::GetColumnName(index_t index) const
+const static std::string blank;
+const std::string& p2DAImporter::GetColumnName(index_t index) const
 {
 	if (index < colNames.size()) {
-		return colNames[index].c_str();
+		return colNames[index];
 	}
-	return "";
+	return blank;
 }
 
-const char* p2DAImporter::GetRowName(index_t index) const
+const std::string& p2DAImporter::GetRowName(index_t index) const
 {
 	if (index < rowNames.size()) {
-		return rowNames[index].c_str();
+		return rowNames[index];
 	}
-	return "";
+	return blank;
 }
 
 p2DAImporter::index_t p2DAImporter::FindTableValue(index_t col, long val, index_t start) const
