@@ -1800,24 +1800,23 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 }
 
 bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
-	const char *Key = GetKey();
 	Actor *haskey = NULL;
 
-	if (Key && actor->InParty) {
+	if (!KeyResRef.IsEmpty() && actor->InParty) {
 		const Game *game = core->GetGame();
 		//allow unlock when the key is on any partymember
 		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
 			Actor *pc = game->FindPC(idx + 1);
 			if (!pc) continue;
 
-			if (pc->inventory.HasItem(Key,0) ) {
+			if (pc->inventory.HasItem(KeyResRef,0)) {
 				haskey = pc;
 				break;
 			}
 		}
-	} else if (Key) {
+	} else if (!KeyResRef.IsEmpty()) {
 		//actor is not in party, check only actor
-		if (actor->inventory.HasItem(Key,0) ) {
+		if (actor->inventory.HasItem(KeyResRef,0)) {
 			haskey = actor;
 		}
 	}
@@ -1828,7 +1827,7 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 
 	if (removekey) {
 		CREItem *item = NULL;
-		haskey->inventory.RemoveItem(Key,0,&item);
+		haskey->inventory.RemoveItem(KeyResRef,0,&item);
 		//the item should always be existing!!!
 		delete item;
 	}

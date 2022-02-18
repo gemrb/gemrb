@@ -467,14 +467,7 @@ public:
 	bool IsOver(const Point &Place) const;
 	void DrawOutline(Point origin) const;
 	void SetCursor(unsigned char CursorIndex);
-	const char* GetKey(void) const
-	{
-		if (KeyResRef.IsEmpty()) {
-			return nullptr;
-		} else {
-			return KeyResRef.CString();
-		}
-	}
+
 	void SetTrapDetected(int x);
 	void TryDisarm(const Actor *actor);
 	//detect trap, set skill to 256 if you want sure fire

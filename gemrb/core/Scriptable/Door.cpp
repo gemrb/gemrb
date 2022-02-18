@@ -483,12 +483,11 @@ std::string Door::dump() const
 		AppendFormat(buffer, "Trap Permanent: {} Detectable: {}\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
 	}
 	AppendFormat(buffer, "Secret door: {} (Found: {})\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
-	const char *Key = GetKey();
 	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	AppendFormat(buffer, "Script: {}, Key ({}) removed: {}, Dialog: {}\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog);
+	AppendFormat(buffer, "Script: {}, Key ({}) removed: {}, Dialog: {}\n", name, KeyResRef, YESNO(Flags&DOOR_KEY), Dialog);
 	return buffer;
 }
 
