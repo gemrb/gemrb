@@ -83,7 +83,7 @@ unsigned char MapReverb::obtainProfile () {
 	unsigned char configValue = 0;
 
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
-		ResRef mapName = reverbMapping->GetRowName(i);
+		ResRef mapName = reverbMapping->GetRowName(i).c_str();
 		if (mapName == map.WEDResRef) {
 			uint8_t profile = reverbMapping->QueryFieldUnsigned<uint8_t>(i, 0);
 

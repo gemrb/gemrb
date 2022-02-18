@@ -224,7 +224,7 @@ private:
 				for (;j;j--) {
 					resrefs[j - 1] = tab->QueryField(j, i).c_str();
 				}
-				ResRef GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
+				ResRef GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i).c_str());
 				vars.emplace(GroupName, SpawnGroup(std::move(resrefs), level));
 			}
 		}
@@ -848,7 +848,7 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 			assert(tm);
 			TableMgr::index_t rc = tm->GetRowCount() - 2;
 			while (rc--) {
-				ResRef group = tm->GetRowName(rc+2);
+				ResRef group = tm->GetRowName(rc+2).c_str();
 				refs[group] = {};
 				int i = 0;
 				for (auto& ref : refs[group]) {

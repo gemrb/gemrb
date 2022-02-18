@@ -1693,7 +1693,7 @@ static void InitActorTables()
 
 		for (int i = 0;  i < classcount; i++) {
 			const char *field;
-			const char *rowname = tm->GetRowName(i);
+			const char *rowname = tm->GetRowName(i).c_str();
 
 			field = tm->QueryField(rowname, "DRUIDSPELL").c_str();
 			if (field[0]!='*') {
@@ -1907,7 +1907,7 @@ static void InitActorTables()
 		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
 		AutoTable tht;
 		for (int i = 0; i < (int) tm->GetRowCount(); i++) {
-			const char *classname = tm->GetRowName(i);
+			const char *classname = tm->GetRowName(i).c_str();
 			int classis = IsClassFromName(classname);
 			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
 			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname, "CLASS"); // only real classes have this column at 0
@@ -1950,7 +1950,7 @@ static void InitActorTables()
 				std::vector<BABTable> btv;
 				btv.reserve(tht->GetRowCount());
 				for (TableMgr::index_t row = 0; row < tht->GetRowCount(); ++row) {
-					bt.level = atoi(tht->GetRowName(row));
+					bt.level = atoi(tht->GetRowName(row).c_str());
 					bt.bab = tht->QueryFieldSigned<int>(row, 0);
 					bt.apr = tht->QueryFieldSigned<int>(row, 1);
 					btv.push_back(bt);
@@ -1980,7 +1980,7 @@ static void InitActorTables()
 		ieDword tmpindex;
 
 		for (int i = 0; i < classcount; i++) {
-			const char* classname = tm->GetRowName(i);
+			const char* classname = tm->GetRowName(i).c_str();
 			//make sure we have a valid classid, then decrement
 			//it to get the correct array index
 			tmpindex = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
@@ -2054,7 +2054,7 @@ static void InitActorTables()
 					break;
 				if ((1<<j)&tmpclass) {
 					//save the IE_LEVEL information
-					const char* currentname = tm->GetRowName((ieDword)(tm->FindTableValue("ID", j+1)));
+					const char* currentname = tm->GetRowName((ieDword)(tm->FindTableValue("ID", j+1))).c_str();
 					classis = IsClassFromName(currentname);
 					if (classis>=0) {
 						//search for the current class in the split of the names to get it's
@@ -2127,7 +2127,7 @@ static void InitActorTables()
 		if (tm) {
 			TableMgr::index_t rowcount = tm->GetRowCount();
 			for (TableMgr::index_t i = 0; i < rowcount; i++) {
-				const char* cls = tm->GetRowName(i);
+				const char* cls = tm->GetRowName(i).c_str();
 				auto it = className2ID.find(cls);
 				int id = 0;
 				if (it != className2ID.end()) id = it->second;
@@ -2283,9 +2283,9 @@ static void InitActorTables()
 						value = 0;
 					} else {
 						if (subracetable == -1) {
-							value = race->GetValue(tm->GetRowName(i));
+							value = race->GetValue(tm->GetRowName(i).c_str());
 						} else {
-							value = subrace->GetValue(tm->GetRowName(i));
+							value = subrace->GetValue(tm->GetRowName(i).c_str());
 						}
 					}
 					skillrac[i].push_back (value);
@@ -2330,7 +2330,7 @@ static void InitActorTables()
 		for (TableMgr::index_t i = 0; i < racesNRows; i++) {
 			int raceID = tm->QueryFieldSigned<int>(i, 3);
 			int favClass = tm->QueryFieldSigned<int>(i, 8);
-			const char *raceName = tm->GetRowName(i);
+			const char *raceName = tm->GetRowName(i).c_str();
 			favoredMap.emplace(raceID, favClass);
 			raceID2Name.emplace(raceID, raceName);
 		}

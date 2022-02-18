@@ -85,9 +85,9 @@ public:
 	virtual const std::string& QueryDefault() const = 0;
 	virtual index_t GetColumnIndex(const char* colname) const = 0;
 	virtual index_t GetRowIndex(const char* rowname) const = 0;
-	virtual const char* GetColumnName(index_t index) const = 0;
+	virtual const std::string& GetColumnName(index_t index) const = 0;
 	/** Returns a Row Name, returns NULL on error */
-	virtual const char* GetRowName(index_t index) const = 0;
+	virtual const std::string& GetRowName(index_t index) const = 0;
 	virtual index_t FindTableValue(index_t column, long value, index_t start = 0) const = 0;
 	virtual index_t FindTableValue(index_t column, const char* value, index_t start = 0) const = 0;
 	virtual index_t FindTableValue(const char* column, long value, index_t start = 0) const = 0;
