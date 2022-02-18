@@ -2029,9 +2029,9 @@ void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 {
 	AmbientMgr * ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
 	if (parameters->int0Parameter) {
-		ambientmgr->Activate(parameters->objects[1]->objectName);
+		ambientmgr->Activate(parameters->objects[1]->objectName.CString());
 	} else {
-		ambientmgr->Deactivate(parameters->objects[1]->objectName);
+		ambientmgr->Deactivate(parameters->objects[1]->objectName.CString());
 	}
 }
 
@@ -2058,7 +2058,7 @@ void GameScript::ChangeTileState(Scriptable* Sender, Action* parameters)
 
 void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 {
-	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
+	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectNameVar);
 	if (!anim) {
 		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
@@ -2068,7 +2068,7 @@ void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 
 void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 {
-	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
+	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectNameVar);
 	if (!anim) {
 		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
@@ -2078,7 +2078,7 @@ void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 
 void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 {
-	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
+	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectNameVar);
 	if (!anim) {
 		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
@@ -6370,7 +6370,7 @@ void GameScript::ActivatePortalCursor(Scriptable* Sender, Action* parameters)
 	if (!parameters->objects[1]) {
 		ip=Sender;
 	} else {
-		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
+		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectNameVar);
 	}
 	if (!ip) {
 		return;
@@ -6393,7 +6393,7 @@ void GameScript::EnablePortalTravel(Scriptable* Sender, Action* parameters)
 	if (!parameters->objects[1]) {
 		ip=Sender;
 	} else {
-		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
+		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectNameVar);
 	}
 	if (!ip) {
 		return;
@@ -6412,7 +6412,7 @@ void GameScript::EnablePortalTravel(Scriptable* Sender, Action* parameters)
 //unhardcoded iwd action (for the forge entrance change)
 void GameScript::ChangeDestination(Scriptable* Sender, Action* parameters)
 {
-	InfoPoint *ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
+	InfoPoint *ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectNameVar);
 	if (ip && (ip->Type==ST_TRAVEL) ) {
 		//alter the destination area, don't touch the entrance variable link
 		ip->Destination = ResRef::MakeLowerCase(parameters->string0Parameter);

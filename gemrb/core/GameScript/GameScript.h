@@ -139,6 +139,7 @@ class GameScript;
 #define MAX_NESTING		5
 
 using SrcVector = std::vector<ieStrRef>;
+using StringParam = FixedSizeString<64, strnicmp>; // FIXME: should this be case sensetive
 
 struct targettype {
 	Scriptable *actor; //hmm, could be door
@@ -196,10 +197,15 @@ public:
 	int objectFields[MAX_OBJECT_FIELDS]{};
 	int objectFilters[MAX_NESTING]{};
 	Region objectRect{};
-	char objectName[65]{};
+	
+	union {
+		StringParam objectName;
+		ieVariable objectNameVar;
+		ResRef objectNameRef;
+	};
 
 public:
-	Object() noexcept = default;
+	Object() noexcept : objectName() {};
 
 	std::string dump() const;
 	void Release()
@@ -211,7 +217,7 @@ public:
 
 class GEM_EXPORT Trigger final : protected Canary {
 public:
-	Trigger() noexcept = default;
+	Trigger() noexcept : string0Parameter(), string1Parameter() {};
 	~Trigger() final
 	{
 		if (objectParameter) {
@@ -227,9 +233,19 @@ public:
 	int int1Parameter = 0;
 	int int2Parameter = 0;
 	Point pointParameter;
-	char string0Parameter[65]{};
-	char string1Parameter[65]{};
 	Object* objectParameter = nullptr;
+	
+	union {
+		StringParam string0Parameter;
+		ieVariable variable0Parameter;
+		ResRef resref0Parameter;
+	};
+	
+	union {
+		StringParam string1Parameter;
+		ieVariable variable1Parameter;
+		ResRef resref1Parameter;
+	};
 
 	std::string dump() const;
 
@@ -261,9 +277,8 @@ public:
 
 class GEM_EXPORT Action final : protected Canary {
 public:
-	using StringParam = FixedSizeString<64, strnicmp>; // FIXME: should this be case sensetive
-	
 	explicit Action(bool autoFree) noexcept
+	: string0Parameter(), string1Parameter()
 	{
 		//changed now
 		if (autoFree) {

@@ -274,7 +274,7 @@ int GameScript::IsTeamBitOn(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::NearbyDialog(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *target = Sender->GetCurrentArea()->GetScriptableByDialog(parameters->string0Parameter);
+	const Scriptable *target = Sender->GetCurrentArea()->GetScriptableByDialog(parameters->resref0Parameter);
 	if ( !target ) {
 		return 0;
 	}
@@ -395,7 +395,7 @@ int GameScript::IsActive(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
 	if (!scr) {
 		const AmbientMgr *ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
-		if (ambientmgr->IsActive(parameters->objectParameter->objectName)) {
+		if (ambientmgr->IsActive(parameters->objectParameter->objectName.CString())) {
 			return 1;
 		}
 		return 0;
@@ -914,7 +914,7 @@ int GameScript::NumItemsParty(Scriptable */*Sender*/, const Trigger *parameters)
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		cnt += actor->inventory.CountItems(parameters->string0Parameter, true);
+		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true);
 	}
 	return cnt==parameters->int0Parameter;
 }
@@ -927,7 +927,7 @@ int GameScript::NumItemsPartyGT(Scriptable */*Sender*/, const Trigger *parameter
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		cnt += actor->inventory.CountItems(parameters->string0Parameter, true);
+		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true);
 	}
 	return cnt>parameters->int0Parameter;
 }
@@ -940,7 +940,7 @@ int GameScript::NumItemsPartyLT(Scriptable */*Sender*/, const Trigger *parameter
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		cnt += actor->inventory.CountItems(parameters->string0Parameter, true);
+		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true);
 	}
 	return cnt<parameters->int0Parameter;
 }
@@ -965,7 +965,7 @@ int GameScript::TotalItemCntExclude(Scriptable *Sender, const Trigger *parameter
 		return 0;
 	}
 
-	int cnt = actor->inventory.CountItems("", true) - actor->inventory.CountItems(parameters->string0Parameter, true); //shall we count heaps or not?
+	int cnt = actor->inventory.CountItems("", true) - actor->inventory.CountItems(parameters->resref0Parameter, true); //shall we count heaps or not?
 	return cnt==parameters->int0Parameter;
 }
 
@@ -1007,7 +1007,7 @@ int GameScript::TotalItemCntExcludeGT(Scriptable *Sender, const Trigger *paramet
 		return 0;
 	}
 
-	int cnt = actor->inventory.CountItems("", true) - actor->inventory.CountItems(parameters->string0Parameter, true); //shall we count heaps or not?
+	int cnt = actor->inventory.CountItems("", true) - actor->inventory.CountItems(parameters->resref0Parameter, true); //shall we count heaps or not?
 	return cnt>parameters->int0Parameter;
 }
 
@@ -1031,7 +1031,7 @@ int GameScript::TotalItemCntExcludeLT(Scriptable *Sender, const Trigger *paramet
 		return 0;
 	}
 
-	int cnt = actor->inventory.CountItems("", true) - actor->inventory.CountItems(parameters->string0Parameter, true); //shall we count heaps or not?
+	int cnt = actor->inventory.CountItems("", true) - actor->inventory.CountItems(parameters->resref0Parameter, true); //shall we count heaps or not?
 	return cnt<parameters->int0Parameter;
 }
 
@@ -1154,7 +1154,7 @@ int GameScript::HasItemEquipped(Scriptable * Sender, const Trigger *parameters)
 	if (!actor) {
 		return 0;
 	}
-	int slot = actor->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
+	int slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
 	if (slot == -1) {
 		return 0;
 	}
@@ -1176,7 +1176,7 @@ int GameScript::Acquired(Scriptable * Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_ACQUIRED) ) {
+	if (actor->inventory.HasItem(parameters->resref0Parameter, IE_INV_ITEM_ACQUIRED) ) {
 		return 1;
 	}
 	return 0;
@@ -1206,7 +1206,7 @@ int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, const Trigger *p
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		if (HasItemCore(&actor->inventory, parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
+		if (HasItemCore(&actor->inventory, parameters->resref0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
 			return 1;
 		}
 	}
@@ -1236,7 +1236,7 @@ int GameScript::HasInnateAbility(Scriptable *Sender, const Trigger *parameters)
 	}
 
 	if (parameters->string0Parameter[0]) {
-		return actor->spellbook.HaveSpell(parameters->string0Parameter, 0);
+		return actor->spellbook.HaveSpell(parameters->resref0Parameter, 0);
 	}
 	return actor->spellbook.HaveSpell(parameters->int0Parameter, 0);
 }
@@ -1253,7 +1253,7 @@ int GameScript::HaveSpell(Scriptable *Sender, const Trigger *parameters)
 	}
 
 	if (parameters->string0Parameter[0]) {
-		return actor->spellbook.HaveSpell(parameters->string0Parameter, 0);
+		return actor->spellbook.HaveSpell(parameters->resref0Parameter, 0);
 	}
 	int spellNum = parameters->int0Parameter;
 	if (!spellNum) spellNum = Sender->LastMarkedSpell;
@@ -1279,7 +1279,7 @@ int GameScript::HaveSpellParty(Scriptable */*Sender*/, const Trigger *parameters
 	if (parameters->string0Parameter[0]) {
 		while(i--) {
 			Actor *actor = game->GetPC(i, true);
-			if (actor->spellbook.HaveSpell(parameters->string0Parameter, 0) ) {
+			if (actor->spellbook.HaveSpell(parameters->resref0Parameter, 0) ) {
 				return 1;
 			}
 		}
@@ -1532,7 +1532,7 @@ int GameScript::InLine(Scriptable *Sender, const Trigger *parameters)
 	}
 
 	//looking for a scriptable by scriptname only
-	const Scriptable *scr2 = map->GetActor(parameters->string0Parameter, 0);
+	const Scriptable *scr2 = map->GetActor(parameters->variable0Parameter, 0);
 	if (!scr2) {
 		scr2 = GetActorObject(map->GetTileMap(), parameters->string0Parameter);
 	}
@@ -3711,7 +3711,7 @@ int GameScript::ChargeCount( Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	int Slot = actor->inventory.FindItem(parameters->string0Parameter,0);
+	int Slot = actor->inventory.FindItem(parameters->resref0Parameter,0);
 	if (Slot<0) {
 		return 0;
 	}
@@ -3805,7 +3805,7 @@ int GameScript::Frame( Scriptable *Sender, const Trigger *parameters)
 	if (!parameters->objectParameter) {
 		return 0;
 	}
-	const AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectName);
+	const AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectNameVar);
 	if (!anim) {
 		return 0;
 	}
@@ -3945,7 +3945,7 @@ int GameScript::Sequence(Scriptable *Sender, const Trigger *parameters)
 {
 	//to avoid a crash, check if object is NULL
 	if (parameters->objectParameter) {
-		const AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectName);
+		const AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectNameVar);
 		if (anim) {
 			//this is the cycle count for the area animation
 			//very much like stance for avatar anims
@@ -4030,7 +4030,7 @@ int GameScript::Unusable(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	const Item *item = gamedata->GetItem(parameters->string0Parameter);
+	const Item *item = gamedata->GetItem(parameters->resref0Parameter);
 	if (!item) {
 		return 0;
 	}
@@ -4040,7 +4040,7 @@ int GameScript::Unusable(Scriptable *Sender, const Trigger *parameters)
 	} else {
 		ret = 1;
 	}
-	gamedata->FreeItem(item, parameters->string0Parameter, true);
+	gamedata->FreeItem(item, parameters->resref0Parameter, true);
 	return ret;
 }
 

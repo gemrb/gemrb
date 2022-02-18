@@ -154,7 +154,7 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 
 	if (oC->objectName[0]) {
 		//We want the object by its name...
-		Scriptable* aC = map->GetActor( oC->objectName, ga_flags );
+		Scriptable* aC = map->GetActor(oC->objectNameVar, ga_flags);
 
 		if (!aC) {
 			aC = GetActorObject(map->GetTileMap(), oC->objectName);
@@ -348,11 +348,11 @@ Scriptable *GetScriptableFromObject(Scriptable *Sender, const Object *oC, int ga
 		}
 
 		//global actors are always found by scripting name!
-		aC = game->FindPC(oC->objectName);
+		aC = game->FindPC(oC->objectNameVar);
 		if (aC) {
 			return aC;
 		}
-		aC = game->FindNPC(oC->objectName);
+		aC = game->FindNPC(oC->objectNameVar);
 		if (aC) {
 			return aC;
 		}

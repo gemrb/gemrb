@@ -332,7 +332,7 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 		tar = GetScriptableFromObject(Sender, parameters->objects[1]);
 		if (!tar) {
 			//could be an animation
-			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName);
+			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectNameVar);
 			if (anim) {
 				//set animation's cycle to parameters->int0Parameter;
 				anim->sequence=value;
@@ -2024,7 +2024,7 @@ static Object *ObjectCopy(const Object *object)
 	MEMCPY( newObject->objectFields, object->objectFields );
 	MEMCPY( newObject->objectFilters, object->objectFilters );
 	newObject->objectRect = object->objectRect;
-	MEMCPY( newObject->objectName, object->objectName );
+	newObject->objectName = object->objectName;
 	return newObject;
 }
 
@@ -2113,9 +2113,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				int i;
 				char* dst;
 				if (!stringsCount) {
-					dst = newTrigger->string0Parameter;
+					dst = newTrigger->string0Parameter.begin();
 				} else {
-					dst = newTrigger->string1Parameter;
+					dst = newTrigger->string1Parameter.begin();
 				}
 				//skipping the context part, which
 				//is to be readed later
@@ -2153,9 +2153,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					}
 					SKIP_ARGUMENT();
 					if (!stringsCount) {
-						dst = newTrigger->string0Parameter;
+						dst = newTrigger->string0Parameter.begin();
 					} else {
-						dst = newTrigger->string1Parameter;
+						dst = newTrigger->string1Parameter.begin();
 					}
 
 					//this works only if there are no spaces
@@ -2566,15 +2566,15 @@ void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, boo
 {
 	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation(parameters->variable0Parameter);
 	if (!anim) {
-		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
+		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectNameVar );
 	}
 	if (!anim) {
 		// iwd2 expects this behaviour in ar6001 by (de)activating sound_portal
 		AmbientMgr *ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
 		if (flag) {
-			ambientmgr->Activate(parameters->objects[1]->objectName);
+			ambientmgr->Activate(parameters->objects[1]->objectName.CString());
 		} else {
-			ambientmgr->Deactivate(parameters->objects[1]->objectName);
+			ambientmgr->Deactivate(parameters->objects[1]->objectName.CString());
 		}
 		return;
 	}
@@ -2961,7 +2961,7 @@ int NumItemsCore(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	return inventory->CountItems(parameters->string0Parameter, true);
+	return inventory->CountItems(parameters->resref0Parameter, true);
 }
 
 static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };

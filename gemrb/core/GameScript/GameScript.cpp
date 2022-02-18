@@ -1898,10 +1898,10 @@ static Object* DecodeObject(const char* line)
 	}
 	if (*line == '"')
 		line++; //Skip "
-	ParseString( line, oB->objectName );
+	ParseString(line, oB->objectName.begin());
 	// HACK for iwd2 AddExperiencePartyCR
 	if (!stricmp(oB->objectName, "0.0.0.0 ")) {
-		strlcpy(oB->objectName, "", sizeof(oB->objectName));
+		oB->objectName.Reset();
 		Log(DEBUG, "GameScript", "overriding: +{}+", oB->objectName);
 	}
 	if (*line == '"')
@@ -1939,12 +1939,12 @@ static Trigger* ReadTrigger(DataStream* stream)
 		sscanf( line, "%hu %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, &tR->pointParameter.x,
-			&tR->pointParameter.y, tR->string0Parameter, tR->string1Parameter );
+			&tR->pointParameter.y, tR->string0Parameter.begin(), tR->string1Parameter.begin());
 	} else {
 		sscanf( line, "%hu %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
-			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter,
-			tR->string1Parameter );
+			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter.begin(),
+			tR->string1Parameter.begin());
 	}
 	StringToLower(tR->string0Parameter);
 	StringToLower(tR->string1Parameter);
