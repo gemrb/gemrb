@@ -171,10 +171,6 @@ AutoTable GameData::LoadTable(const char *tabname, bool silent)
 	return tm;
 }
 
-AutoTable GameData::LoadTable(const ResRef& resRef, bool silent)
-{
-	return LoadTable(resRef.CString(), silent);
-}
 /** Gets the index of a loaded table, returns -1 on error */
 AutoTable GameData::GetTable(const ResRef &resRef) const
 {

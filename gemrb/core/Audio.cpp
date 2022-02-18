@@ -119,14 +119,4 @@ float Audio::GetReverb(unsigned int channel) const
 	return channels[channel].getReverb();
 }
 
-Holder<SoundHandle> Audio::Play(const ResRef &resRef, unsigned int channel, const Point& p, unsigned int flags, tick_t *length)
-{
-	return Play(resRef.CString(), channel, p, flags, length);
-}
-
-Holder<SoundHandle> Audio::PlayRelative(const ResRef &resRef, unsigned int channel, tick_t *length)
-{
-	return PlayRelative(resRef.CString(), channel, length);
-}
-
 }
