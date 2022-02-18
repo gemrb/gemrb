@@ -638,23 +638,23 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 	if (remove) maxLevel -= diff;
 	for(int i=0; i<maxLevel; i++) {
 		for (int j=0; j<row; j++) {
-			const char *res = table->QueryField(j,i);
-			if (res[0]=='*') continue;
+			const ResRef res = table->QueryField(j,i);
+			if (IsStar(res)) continue;
 
-			ResRef clabRef(res + 3);
-			if (!memcmp(res,"AP_",3)) {
+			ResRef clabRef(res.begin() + 3);
+			if (res.StartsWith("AP_", 3)) {
 				if (remove) {
 					actor->fxqueue.RemoveAllEffects(clabRef);
 				} else {
 					core->ApplySpell(clabRef, actor, actor, 0);
 				}
-			} else if (!memcmp(res,"GA_",3)) {
+			} else if (res.StartsWith("GA_", 3)) {
 				if (remove) {
 					actor->spellbook.RemoveSpell(clabRef);
 				} else {
 					actor->LearnSpell(clabRef, LS_MEMO);
 				}
-			} else if (!memcmp(res,"FA_",3)) {//iwd2 only: innate name strref
+			} else if (res.StartsWith("FA_",3)) {//iwd2 only: innate name strref
 				//memorize these?
 				// we now learn them just to get the feedback string out
 				if (remove) {
@@ -664,7 +664,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 					actor->spellbook.RemoveSpell(clabRef);
 					core->ApplySpell(clabRef, actor, actor, 0);
 				}
-			} else if (!memcmp(res,"FS_",3)) {//iwd2 only: song name strref (used by unused kits)
+			} else if (res.StartsWith("FS_",3)) {//iwd2 only: song name strref (used by unused kits)
 				//don't memorize these?
 				if (remove) {
 					actor->fxqueue.RemoveAllEffects(clabRef);
@@ -673,7 +673,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 					actor->spellbook.RemoveSpell(clabRef);
 					core->ApplySpell(clabRef, actor, actor, 0);
 				}
-			} else if (!memcmp(res,"RA_",3)) {//iwd2 only
+			} else if (res.StartsWith("RA_",3)) {//iwd2 only
 				//remove ability
 				int x=atoi(res+3);
 				actor->spellbook.RemoveSpell(x);
