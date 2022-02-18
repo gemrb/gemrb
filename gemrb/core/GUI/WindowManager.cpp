@@ -698,41 +698,40 @@ Holder<Sprite2D> WindowManager::GetScreenshot(Window* win)
 
 Holder<Sprite2D> WindowManager::WinFrameEdge(int edge) const
 {
-	std::string refstr = "STON";
+	ResRef refstr = "STON";
 
 	// we probably need a HasResource("CSTON" + width + height) call
 	// to check for a custom resource
 
 	if (screen.w >= 800 && screen.w < 1024)
-		refstr += "08";
+		refstr.Append("08");
 	else if (screen.w >= 1024)
-		refstr += "10";
+		refstr.Append("10");
 
 	switch (edge) {
 		case 0:
-			refstr += "L";
+			refstr.Append("L");
 			break;
 		case 1:
-			refstr += "R";
+			refstr.Append("R");
 			break;
 		case 2:
-			refstr += "T";
+			refstr.Append("T");
 			break;
 		case 3:
-			refstr += "B";
+			refstr.Append("B");
 			break;
 	}
 
-	ResRef ref = refstr.c_str();
 	Holder<Sprite2D> frame;
-	if (winframes.find(ref) != winframes.end()) {
-		frame = winframes[ref];
+	if (winframes.find(refstr) != winframes.end()) {
+		frame = winframes[refstr];
 	} else {
-		auto im = GetResourceHolder<ImageMgr>(ref);
+		auto im = GetResourceHolder<ImageMgr>(refstr);
 		if (im) {
 			frame = im->GetSprite2D();
 		}
-		winframes.emplace(ref, frame);
+		winframes.emplace(refstr, frame);
 	}
 
 	return frame;

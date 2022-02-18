@@ -109,19 +109,6 @@ public:
 		return fss;
 	}
 	
-	// remove trailing spaces
-	uint8_t RTrim() {
-		uint8_t len = CStrLen();
-		uint8_t i = 0;
-		for (; i < len; ++i) {
-			uint8_t idx = len - i - 1;
-			if (std::isspace(str[idx])) str[idx] = '\0';
-			else break;
-		}
-
-		return len - i;
-	}
-	
 	FixedSizeString() noexcept = default;
 	FixedSizeString(std::nullptr_t) noexcept = delete;
 	FixedSizeString& operator=(std::nullptr_t) noexcept = delete;
@@ -141,6 +128,33 @@ public:
 	
 	FixedSizeString(const FixedSizeString&) noexcept = default;
 	FixedSizeString& operator=(const FixedSizeString&) noexcept = default;
+	
+	// remove trailing spaces
+	uint8_t RTrim() {
+		uint8_t len = CStrLen();
+		uint8_t i = 0;
+		for (; i < len; ++i) {
+			uint8_t idx = len - i - 1;
+			if (std::isspace(str[idx])) str[idx] = '\0';
+			else break;
+		}
+
+		return len - i;
+	}
+	
+	int SNPrintF(const char* format, ...) noexcept {
+		va_list args;
+		va_start(args, format);
+		int ret = vsnprintf(str, sizeof(str), format, args);
+		va_end(args);
+		return ret;
+	}
+	
+	template <typename STR>
+	void Append(const STR& s) {
+		uint8_t len = CStrLen();
+		strncpy(str + len, std::begin(s), LEN - len);
+	}
 	
 	template<typename T>
 	typename std::enable_if<std::is_integral<T>::value, char>::type
@@ -190,14 +204,6 @@ public:
 	
 	void Reset() noexcept {
 		std::fill(begin(), end(), '\0');
-	}
-	
-	int SNPrintF(const char* format, ...) noexcept {
-		va_list args;
-		va_start(args, format);
-		int ret = vsnprintf(str, sizeof(str), format, args);
-		va_end(args);
-		return ret;
 	}
 	
 	const char* CString() const noexcept {

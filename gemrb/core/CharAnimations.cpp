@@ -2152,8 +2152,7 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 	}
 	if (Orient>=5) {
 		dest += "e";
-		ResRef& suffix = EquipData.Suffix;
-		suffix[suffix.CStrLen()] = 'e';
+		EquipData.Suffix.Append("e");
 	}
 	// NOTE: the two shadow animations (cshd, sshd) also have x-suffixed files,
 	// but those are used (instead of the eastern ones) only if sprite
@@ -2352,8 +2351,7 @@ void CharAnimations::AddLRSuffix2( std::string& dest, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		dest += "e";
-		ResRef& suffix = EquipData.Suffix;
-		suffix[suffix.CStrLen()] = 'e';
+		EquipData.Suffix.Append("e");
 	}
 	EquipData.Cycle = Cycle;
 }
@@ -2480,8 +2478,7 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		dest += "e";
-		ResRef& suffix = EquipData.Suffix;
-		suffix[suffix.CStrLen()] = 'e';
+		EquipData.Suffix.Append("e");
 	}
 	EquipData.Cycle = Cycle;
 }
