@@ -1287,7 +1287,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 			str->ReadDword(anim.Flags);
 			anim.originalFlags = anim.Flags;
 			str->ReadScalar(anim.height);
-			if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && anim.height <= 0) {
+			if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND)) {
 				anim.height = ANI_PRI_BACKGROUND;
 				anim.Flags |= A_ANI_NO_WALL;
 			}
