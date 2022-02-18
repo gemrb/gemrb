@@ -632,7 +632,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
 		//if the actor isn't in the source area, we don't care
-		if (tar->Area != parameters->string0Parameter) {
+		if (tar->Area != parameters->resref0Parameter) {
 			continue;
 		}
 		// no need of CreateMovementEffect, party members are always moved immediately
@@ -642,7 +642,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetNPC(i);
 		//if the actor isn't in the source area, we don't care
-		if (tar->Area != parameters->string0Parameter) {
+		if (tar->Area != parameters->resref0Parameter) {
 			continue;
 		}
 		//if the actor is currently in a loaded area, remove it from there
@@ -3120,7 +3120,7 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 
 	//the LoadMos ResRef may be empty
 	if (parameters->string1Parameter[0]) {
-		core->GetGame()->LoadMos = parameters->string1Parameter;
+		core->GetGame()->LoadMos = parameters->resref1Parameter;
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
@@ -3135,7 +3135,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	}
 	//the LoadMos ResRef may be empty
 	if (parameters->string1Parameter[0]) {
-		core->GetGame()->LoadMos = parameters->string1Parameter;
+		core->GetGame()->LoadMos = parameters->resref1Parameter;
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
@@ -3151,7 +3151,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	}
 	Game *game = core->GetGame();
 	if (parameters->string1Parameter[0]) {
-		game->LoadMos = parameters->string1Parameter;
+		game->LoadMos = parameters->resref1Parameter;
 	}
 	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
 	if (p.IsInvalid()) {
@@ -3173,7 +3173,7 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->string1Parameter[0]) {
-		core->GetGame()->LoadMos = parameters->string1Parameter;
+		core->GetGame()->LoadMos = parameters->resref1Parameter;
 	}
 }
 
@@ -3610,7 +3610,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	// bg2 sometimes calls IncrementChapter("") right after a TextScreen("sometable"),
 	// so we make sure they don't cancel out
 	if (parameters->string0Parameter[0]) {
-		core->GetGame()->TextScreen = parameters->string0Parameter;
+		core->GetGame()->TextScreen = parameters->resref0Parameter;
 	}
 
 	core->SetEventFlag(EF_TEXTSCREEN);
@@ -4438,7 +4438,7 @@ void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
 	while(x--) {
 		if (parameters->string0Parameter[0]) {
 			const ResRef& itemRef = inv->GetSlotItem(x)->ItemResRef;
-			if (itemRef == parameters->string0Parameter) {
+			if (itemRef == parameters->resref0Parameter) {
 				continue;
 			}
 		}
@@ -4691,7 +4691,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	if (count == 1) {
 		// grant the default table item to the Sender in regular games
 		Action *params = new Action(true);
-		params->string0Parameter = tab->QueryDefault();
+		params->resref0Parameter = tab->QueryDefault();
 		CreateItem(Sender, params);
 		delete params;
 	}
@@ -6133,7 +6133,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 	if (!store) {
 		store = core->SetCurrentStore(parameters->resref0Parameter, 0);
 	} else {
-		if (store->Name != parameters->string0Parameter) {
+		if (store->Name != parameters->resref0Parameter) {
 			//not the current store, we need some dirty hack
 			has_current = true;
 			current = store->Name;
