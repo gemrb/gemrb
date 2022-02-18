@@ -18,32 +18,28 @@
  *
  */
 
-#ifndef TISIMPORTER_H
-#define TISIMPORTER_H
+#ifndef TILEMAPMGR_H
+#define TILEMAPMGR_H
 
-#include "Plugins/TileSetMgr.h"
+#include "Plugin.h"
+#include "TileMap.h"
+#include "Streams/DataStream.h"
+
+#include "Plugins/export.h"
 
 namespace GemRB {
 
-class TISImporter : public TileSetMgr {
-private:
-	DataStream* str = nullptr;
-	ieDword headerShift = 0;
-	ieDword TilesCount = 0;
-	ieDword TilesSectionLen = 0;
-	ieDword TileSize = 0;
-	
-	Holder<Sprite2D> badTile; // blank tile to use to fill in bad data
+class GEM_PLUGIN_EXPORT TileMapMgr : public Plugin {
 public:
-	TISImporter() noexcept = default;
-	TISImporter(const TISImporter&) = delete;
-	~TISImporter() override;
-	TISImporter& operator=(const TISImporter&) = delete;
-	bool Open(DataStream* stream) override;
-	Tile* GetTile(const std::vector<ieWord>& indexes,
-		unsigned short* secondary = NULL) override;
-	Holder<Sprite2D> GetTile(int index);
-public:
+	virtual bool Open(DataStream* stream) = 0;
+	virtual TileMap* GetTileMap(TileMap *tm) const = 0;
+	virtual std::vector<ieWord> GetDoorIndices(const ResRef&, bool& BaseClosed) = 0;
+	virtual WallPolygonGroup OpenDoorPolygons() const = 0;
+	virtual WallPolygonGroup ClosedDoorPolygons() const = 0;
+	virtual void SetExtendedNight(bool night) = 0;
+
+	virtual WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const = 0;
+	virtual std::vector<WallPolygonGroup> GetWallGroups() const = 0;
 };
 
 }

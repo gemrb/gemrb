@@ -484,8 +484,6 @@ if (STATIC_LINK)
 		unset(STATIC_LINK CACHE)
 		MESSAGE(STATUS "Static linking not (yet) supported on this platform.")
 	endif (NOT WIN32)
-else ()
-  ADD_DEFINITIONS("-DGEM_BUILD_DLL")
 endif (STATIC_LINK)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} gemrb/includes gemrb/core platforms/${CMAKE_SYSTEM_NAME})

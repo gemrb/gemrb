@@ -18,26 +18,22 @@
  *
  */
 
-#ifndef TILEMAPMGR_H
-#define TILEMAPMGR_H
+#ifndef TILESETMGR_H
+#define TILESETMGR_H
 
 #include "Plugin.h"
-#include "TileMap.h"
+#include "Tile.h"
 #include "Streams/DataStream.h"
+
+#include "Plugins/export.h"
 
 namespace GemRB {
 
-class GEM_EXPORT TileMapMgr : public Plugin {
+class GEM_PLUGIN_EXPORT TileSetMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
-	virtual TileMap* GetTileMap(TileMap *tm) const = 0;
-	virtual std::vector<ieWord> GetDoorIndices(const ResRef&, bool& BaseClosed) = 0;
-	virtual WallPolygonGroup OpenDoorPolygons() const = 0;
-	virtual WallPolygonGroup ClosedDoorPolygons() const = 0;
-	virtual void SetExtendedNight(bool night) = 0;
-
-	virtual WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const = 0;
-	virtual std::vector<WallPolygonGroup> GetWallGroups() const = 0;
+	virtual Tile* GetTile(const std::vector<ieWord>& indexes,
+		unsigned short* secondary = NULL) = 0;
 };
 
 }

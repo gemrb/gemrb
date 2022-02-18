@@ -23,7 +23,7 @@
 
 #include "ResourceSource.h"
 
-#include "IndexedArchive.h"
+#include "Plugins/IndexedArchive.h"
 #include "PluginMgr.h"
 #include "Resource.h"
 #include "StringMap.h"

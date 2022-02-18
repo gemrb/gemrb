@@ -29,7 +29,7 @@ public:
 };
 
 template <typename T>
-class GEM_EXPORT ActionResponder {
+class ActionResponder {
 public:
 	using Action = uint32_t;
 	

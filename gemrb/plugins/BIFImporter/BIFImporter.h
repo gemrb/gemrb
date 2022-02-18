@@ -21,7 +21,7 @@
 #ifndef BIFIMPORTER_H
 #define BIFIMPORTER_H
 
-#include "IndexedArchive.h"
+#include "Plugins/IndexedArchive.h"
 
 #include "globals.h"
 

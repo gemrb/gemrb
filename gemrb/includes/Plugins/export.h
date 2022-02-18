@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2022 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,21 +18,21 @@
  *
  */
 
-#ifndef INDEXEDARCHIVE_H
-#define INDEXEDARCHIVE_H
+#ifndef H_PLUGINS_EXPORT
+#define H_PLUGINS_EXPORT
 
-#include "globals.h"
+#ifndef STATIC_LINK
+#	ifdef WIN32
+#		define GEM_PLUGIN_EXPORT __declspec(dllexport)
+#	else
+#		ifdef __GNUC__
+#			define GEM_PLUGIN_EXPORT __attribute__ ((visibility("default")))
+#		endif
+#	endif
+#endif
 
-#include "Plugin.h"
-
-namespace GemRB {
-
-class GEM_EXPORT IndexedArchive : public Plugin {
-public:
-	virtual int OpenArchive(const char* filename) = 0;
-	virtual DataStream* GetStream(unsigned long Resource, unsigned long Type) = 0;
-};
-
-}
+#ifndef GEM_PLUGIN_EXPORT
+#	define GEM_PLUGIN_EXPORT
+#endif
 
 #endif
