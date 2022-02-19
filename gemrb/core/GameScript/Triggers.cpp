@@ -1302,7 +1302,7 @@ int GameScript::KnowSpell(Scriptable *Sender, const Trigger *parameters)
 	}
 
 	if (parameters->string0Parameter[0]) {
-		return actor->spellbook.KnowSpell(parameters->string0Parameter);
+		return actor->spellbook.KnowSpell(parameters->resref0Parameter);
 	}
 	return actor->spellbook.KnowSpell(parameters->int0Parameter);
 }
