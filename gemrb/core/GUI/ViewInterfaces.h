@@ -77,8 +77,8 @@ public:
 		
 		operator bool() const { return bool(callback); }
 	}* executingResponseHandler = nullptr;
-	
-	class GEM_EXPORT ActionKey {
+
+	class ActionKey {
 		uint32_t key;
 	public:
 		ActionKey(uint32_t val) : key(val) {}
