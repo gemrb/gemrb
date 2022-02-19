@@ -86,7 +86,9 @@ before_build:
     $replace = "define VERSION_GEMRB `"$git_version`""
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 build_script:
-- cmd: cmake --build . -j 2
+- ps: |-
+    pushd c:\projects\gemrb
+    cmake --build . -j 2 --config Release
 after_build:
 - ps: |-
     pushd c:\projects\gemrb
