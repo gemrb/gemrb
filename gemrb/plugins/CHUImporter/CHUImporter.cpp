@@ -52,6 +52,343 @@ bool CHUImporter::Import(DataStream* str)
 	return true;
 }
 
+static void GetButton(DataStream* str, Control*& ctrl, Region& ctrlFrame, bool noImage)
+{
+	Button* btn = new Button(ctrlFrame);
+	ctrl = btn;
+
+	ResRef bamFile;
+	ieByte cycle;
+	ieByte flagsByte;
+	ieByte unpressedIndex;
+	ieByte pressedIndex;
+	ieByte selectedIndex;
+	ieByte disabledIndex;
+	ieByte x1;
+	ieByte x2;
+	ieByte y1;
+	ieByte y2;
+
+	str->ReadResRef(bamFile);
+	str->Read(&cycle, 1 );
+	str->Read(&flagsByte, 1);
+	ieDword Flags = static_cast<ieDword>(flagsByte) << 8;
+	str->Read(&unpressedIndex, 1);
+	str->Read(&x1, 1);
+	str->Read(&pressedIndex, 1);
+	str->Read(&x2, 1);
+	str->Read(&selectedIndex, 1);
+	str->Read(&y1, 1);
+	str->Read(&disabledIndex, 1);
+	str->Read(&y2, 1);
+
+	// Justification comes from the .chu, other bits are set by script
+	if (noImage) {
+		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::OR);
+	}
+	if (core->HasFeature(GF_UPPER_BUTTON_TEXT)) {
+		btn->SetFlags(IE_GUI_BUTTON_CAPS, BitOp::OR);
+	}
+
+	btn->SetFlags(Flags, BitOp::OR);
+	if (Flags & IE_GUI_BUTTON_ANCHOR) {
+		btn->SetAnchor(x1 | (x2 << 8), y1 | (y2 << 8));
+	}
+
+	if (bamFile == "guictrl" && unpressedIndex == 0) {
+		return;
+	}
+
+	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(bamFile, IE_BAM_CLASS_ID));
+	if (!bam) {
+		Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
+		// iwd2 has fake BAM ResRefs for some Buttons, this will handle bad ResRefs
+		return;
+	}
+	// Cycle is only a byte for buttons
+	Holder<Sprite2D> tspr = bam->GetFrame(unpressedIndex, cycle);
+
+	btn->SetImage(BUTTON_IMAGE_UNPRESSED, tspr);
+	tspr = bam->GetFrame(pressedIndex, cycle);
+	btn->SetImage(BUTTON_IMAGE_PRESSED, tspr);
+	// work around several controls not setting all the indices
+	AnimationFactory::index_t cycleSize = bam->GetCycleSize(cycle);
+	bool resetIndex = false;
+	if (core->HasFeature(GF_IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
+		resetIndex = true;
+	}
+	if (resetIndex) {
+		selectedIndex = 2;
+		if (cycleSize == 4) disabledIndex = 3;
+	}
+	tspr = bam->GetFrame(selectedIndex, cycle);
+	btn->SetImage(BUTTON_IMAGE_SELECTED, tspr);
+	tspr = bam->GetFrame(disabledIndex, cycle);
+	btn->SetImage(BUTTON_IMAGE_DISABLED, tspr);
+
+	return;
+}
+
+// GemRB specific control: progressbar
+static void GetProgressbar(DataStream* str, Control*& ctrl, Region& ctrlFrame)
+{
+	ResRef mosFile;
+	ResRef mosFile2;
+	ResRef bamFile;
+	Point knobP;
+	Point capP;
+	ieWord knobStepsCount;
+	ieWord cycle;
+
+	str->ReadResRef(mosFile);
+	str->ReadResRef(mosFile2);
+	str->ReadResRef(bamFile);
+	str->ReadWord(knobStepsCount);
+	str->ReadWord(cycle);
+	str->ReadPoint(knobP);
+	str->ReadPoint(capP);
+	Progressbar* pbar = new Progressbar(ctrlFrame, knobStepsCount);
+	ctrl = pbar;
+	pbar->SetSliderPos(knobP, capP);
+
+	Holder<Sprite2D> img;
+	Holder<Sprite2D> img2;
+	Holder<Sprite2D> img3;
+	if (!mosFile.IsEmpty()) {
+		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(mosFile);
+		img = mos->GetSprite2D();
+	}
+	if (!mosFile2.IsEmpty()) {
+		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(mosFile2);
+		img2 = mos->GetSprite2D();
+	}
+
+	if (knobStepsCount) {
+		const AnimationFactory* af = static_cast<const AnimationFactory*>(
+			gamedata->GetFactoryResource(bamFile, IE_BAM_CLASS_ID));
+		if (af) {
+			pbar->SetAnimation(af->GetCycle(cycle & 0xff));
+		} else {
+			Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: {}", bamFile);
+		}
+	} else {
+		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(bamFile);
+		img3 = mos->GetSprite2D();
+	}
+	pbar->SetBackground(img);
+	pbar->SetImages(img2, img3);
+}
+
+static void GetSlider(DataStream* str, Control*& ctrl, Region& ctrlFrame)
+{
+	ResRef mosFile;
+	ResRef bamFile;
+	Point knobPos;
+	ieWord cycle;
+	ieWord knob;
+	ieWord grabbedKnob;
+	ieWord knobStep;
+	ieWord knobStepsCount;
+
+	str->ReadResRef(mosFile);
+	str->ReadResRef(bamFile);
+	str->ReadWord(cycle);
+	str->ReadWord(knob);
+	str->ReadWord(grabbedKnob);
+	str->ReadPoint(knobPos);
+	str->ReadWord(knob);
+	str->ReadWord(knobStep);
+	str->ReadWord(knobStepsCount);
+	// ee documents 4 more words: ActiveBarTop, bottom, left, right
+
+	Slider* sldr = new Slider(ctrlFrame, knobPos, knobStep, knobStepsCount);
+	ctrl = sldr;
+	ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(mosFile);
+	Holder<Sprite2D> img = mos->GetSprite2D();
+	sldr->SetImage(IE_GUI_SLIDER_BACKGROUND, img);
+
+	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(bamFile, IE_BAM_CLASS_ID));
+	if (bam) {
+		img = bam->GetFrame(knob, 0);
+		sldr->SetImage(IE_GUI_SLIDER_KNOB, img);
+		img = bam->GetFrame(grabbedKnob, 0);
+		sldr->SetImage(IE_GUI_SLIDER_GRABBEDKNOB, img);
+	} else {
+		sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
+	}
+}
+
+static void GetTextEdit(DataStream* str, Control*& ctrl, Region& ctrlFrame)
+{
+	ResRef bgMos;
+	ResRef fontResRef;
+	ResRef cursorResRef;
+	Point pos;
+	Point pos2;
+	ieWord maxInput;
+	ieWord curCycle;
+	ieWord curFrame;
+	ieVariable initial;
+
+	str->ReadResRef(bgMos);
+	// Two more MOS resrefs, probably unused, labeled EditClientFocus & EditClientNoFocus
+	str->Seek(16, GEM_CURRENT_POS);
+	str->ReadResRef(cursorResRef);
+	str->ReadWord(curCycle);
+	str->ReadWord(curFrame);
+	str->ReadPoint(pos); // "XEditClientOffset" and "YEditClientOffset" in the original
+	//FIXME: I still don't know what to do with this point
+	// Contrary to forum posts, it is definitely not a scrollbar ID
+	// ee docs call them XEditCaretOffset and YEditCaretOffset
+	str->ReadPoint(pos2);
+	str->ReadResRef(fontResRef);
+	//this field is still unknown or unused, labeled SequenceText
+	str->Seek(2, GEM_CURRENT_POS);
+	// This is really a text field, but apparently the original engine
+	// always writes it over, and never uses it (labeled DefaultString)
+	str->ReadVariable(initial);
+	str->ReadWord(maxInput);
+	// word: caseformat: 0 normal, 1 upper, 2 lower TODO (Allowed case in NI)
+	// word: typeformat, unknown
+	Font* fnt = core->GetFont(fontResRef);
+
+	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(cursorResRef, IE_BAM_CLASS_ID));
+	Holder<Sprite2D> cursor;
+	if (bam) {
+		cursor = bam->GetFrame(curCycle, curFrame);
+	}
+
+	ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(bgMos);
+	Holder<Sprite2D> img;
+	if (mos) {
+		img = mos->GetSprite2D();
+	}
+
+	TextEdit* te = new TextEdit(ctrlFrame, maxInput, pos);
+	ctrl = te;
+	te->SetFont(fnt);
+	te->SetCursor(cursor);
+	te->SetBackground(img);
+}
+
+static void GetTextArea(DataStream* str, Control*& ctrl, Region& ctrlFrame, Window*& win)
+{
+	ResRef fontResRef;
+	ResRef initResRef;
+	Color fore;
+	Color init;
+	Color back;
+	ieWord scrollbarID;
+
+	str->ReadResRef(fontResRef);
+	str->ReadResRef(initResRef);
+	Font* textFont = core->GetFont(fontResRef);
+	Font* initialsFont = core->GetFont(initResRef);
+	str->Read(&fore, 4);
+	str->Read(&init, 4);
+	str->Read(&back, 4);
+	str->ReadWord(scrollbarID);
+
+	fore.a = init.a = back.a = 0xff;
+
+	TextArea* ta = new TextArea(ctrlFrame, textFont, initialsFont);
+	ctrl = ta;
+	ta->SetColor(fore, TextArea::COLOR_NORMAL);
+	ta->SetColor(init, TextArea::COLOR_INITIALS);
+	ta->SetColor(back, TextArea::COLOR_BACKGROUND);
+	if (scrollbarID != 0xffff) {
+		ScrollBar* sb = GetControl<ScrollBar>(scrollbarID, win);
+		if (sb) {
+			ta->SetScrollbar(sb);
+		}
+	}
+}
+
+static void GetLabel(DataStream* str, Control*& ctrl, Region& ctrlFrame)
+{
+	ResRef fontResRef;
+	ieStrRef textRef;
+	ieWord alignment;
+	Color textCol;
+	Color bgCol;
+
+	str->ReadStrRef(textRef);
+	str->ReadResRef(fontResRef);
+	str->Read(&textCol, 4);
+	str->Read(&bgCol, 4);
+	str->ReadWord(alignment);
+
+	Font* fnt = core->GetFont(fontResRef);
+	textCol.a = bgCol.a = 0xff;
+	String text = core->GetString(textRef);
+	Label* lab = new Label(ctrlFrame, fnt, text);
+	ctrl = lab;
+
+	if (alignment & 1) {
+		lab->SetFlags(Label::UseColor, BitOp::OR);
+	}
+	lab->SetColors(textCol, bgCol);
+
+	unsigned char align = IE_FONT_ALIGN_CENTER;
+	if ((alignment & 0x10) != 0) {
+		align = IE_FONT_ALIGN_RIGHT;
+	} else if ((alignment & 0x04) != 0) {
+		// center, nothing to do
+	} else if ((alignment & 0x08) != 0) {
+		align = IE_FONT_ALIGN_LEFT;
+	}
+
+	if ((alignment & 0x20) != 0) {
+		align |= IE_FONT_ALIGN_TOP;
+	} else if ((alignment & 0x80) != 0) {
+		align |= IE_FONT_ALIGN_BOTTOM;
+	} else {
+		align |= IE_FONT_ALIGN_MIDDLE;
+	}
+	lab->SetAlignment(align);
+}
+
+static void GetScrollbar(DataStream* str, Control*& ctrl, Region& ctrlFrame, Window*& win, ieDword controlID)
+{
+	ResRef bamResRef;
+	ieWord cycle;
+	ieWord textareaID;
+	ieWord imgIdx;
+	str->ReadResRef(bamResRef);
+	str->ReadWord(cycle);
+
+	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(bamResRef, IE_BAM_CLASS_ID));
+	if (!bam) {
+		Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: {}", bamResRef);
+		return;
+	}
+	Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
+	for (auto& image : images) {
+		str->ReadWord(imgIdx);
+		image = bam->GetFrame(imgIdx, cycle);
+	}
+	str->ReadWord(textareaID);
+
+	ScrollBar* sb = new ScrollBar(ctrlFrame, images);
+	if (textareaID == 0xffff) {
+		// text areas produce their own scrollbars in GemRB
+		ctrl = sb;
+	} else {
+		TextArea* ta = GetControl<TextArea>(textareaID, win);
+		if (ta) {
+			ta->SetScrollbar(sb);
+		} else {
+			ctrl = sb;
+			// NOTE: we dont delete this, becuase there are at least a few instances
+			// where the CHU has this assigned to a text area even tho there isnt one! (BG1 GUISTORE:RUMORS, PST ContainerWindow)
+			// set them invisible instead, we will unhide them in the scripts that need them
+			sb->SetVisible(false);
+		}
+		// we still allow GUIScripts to get ahold of it
+		RegisterScriptableControl(sb, controlID);
+	}
+}
+
 /** Returns the i-th window in the Previously Loaded Stream */
 Window* CHUImporter::GetWindow(ScriptingId wid) const
 {
@@ -124,355 +461,27 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		str->Read(&temp, 1); // in bg2 ControlType was a word
 		switch (ControlType) {
 			case IE_GUI_BUTTON:
-			{
-				//Button
-				Button* btn = new Button(ctrlFrame);
-				ctrl = btn;
-				ResRef BAMFile;
-				ieByte Cycle;
-				ieByte flagsByte;
-				ieDword Flags;
-				ieByte UnpressedIndex, x1;
-				ieByte PressedIndex, x2;
-				ieByte SelectedIndex, y1;
-				ieByte DisabledIndex, y2;
-				str->ReadResRef( BAMFile );
-				str->Read( &Cycle, 1 );
-				str->Read(&flagsByte, 1);
-				Flags = static_cast<ieDword>(flagsByte) << 8;
-				str->Read( &UnpressedIndex, 1 );
-				str->Read( &x1, 1 );
-				str->Read( &PressedIndex, 1 );
-				str->Read( &x2, 1 );
-				str->Read( &SelectedIndex, 1 );
-				str->Read( &y1, 1 );
-				str->Read( &DisabledIndex, 1 );
-				str->Read( &y2, 1 );
-
-
-				/** Justification comes from the .chu, other bits are set by script */
-				if (!Width) {
-					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::OR);
-				}
-				if (core->HasFeature(GF_UPPER_BUTTON_TEXT)) {
-					btn->SetFlags(IE_GUI_BUTTON_CAPS, BitOp::OR);
-				}
-
-				btn->SetFlags(Flags, BitOp::OR);
-				if (Flags & IE_GUI_BUTTON_ANCHOR) {
-					btn->SetAnchor(x1 | (x2 << 8), y1 | (y2 << 8));
-				}
-
-				if (BAMFile == "guictrl" && UnpressedIndex == 0) {
-					break;
-				}
-				const AnimationFactory* bam = (const AnimationFactory *)
-					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
-				if (!bam ) {
-					Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
-					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
-					this will handle bad ResRefs */
-					break;
-				}
-				/** Cycle is only a byte for buttons */
-				Holder<Sprite2D> tspr = bam->GetFrame(UnpressedIndex, Cycle);
-
-				btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
-				tspr = bam->GetFrame( PressedIndex, Cycle );
-				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
-				// work around several controls not setting all the indices
-				AnimationFactory::index_t cycleSize = bam->GetCycleSize(Cycle);
-				bool resetIndex = false;
-				if (core->HasFeature(GF_IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
-						resetIndex = true;
-				}
-				if (resetIndex) {
-						SelectedIndex = 2;
-						if (cycleSize == 4) DisabledIndex = 3;
-				}
-				tspr = bam->GetFrame(SelectedIndex, Cycle);
-				btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
-				tspr = bam->GetFrame(DisabledIndex, Cycle);
-				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
-			}
-			break;
-
+				GetButton(str, ctrl, ctrlFrame, !Width);
+				break;
 			case IE_GUI_PROGRESSBAR:
-			{
-				//GemRB specific, progressbar
-				ResRef MOSFile;
-				ResRef MOSFile2;
-				ResRef BAMFile;
-				Point knobP;
-				Point capP;
-				ieWord KnobStepsCount;
-				ieWord Cycle;
-
-				str->ReadResRef( MOSFile );
-				str->ReadResRef( MOSFile2 );
-				str->ReadResRef( BAMFile );
-				str->ReadWord(KnobStepsCount);
-				str->ReadWord(Cycle);
-				str->ReadPoint(knobP);
-				str->ReadPoint(capP);
-				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount);
-				pbar->SetSliderPos(knobP, capP);
-
-				Holder<Sprite2D> img;
-				Holder<Sprite2D> img2;
-				Holder<Sprite2D> img3;
-				if (!MOSFile.IsEmpty()) {
-					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
-					img = mos->GetSprite2D();
-				}
-				if (!MOSFile2.IsEmpty()) {
-					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile2);
-					img2 = mos->GetSprite2D();
-				}
-
-				if( KnobStepsCount ) {
-					/* getting the bam */
-					const AnimationFactory* af = static_cast<const AnimationFactory*>(
-						gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID));
-					/* Getting the Cycle of the bam */
-					if (af) {
-						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
-					} else {
-						Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: {}", BAMFile);
-					}
-				}
-				else {
-					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BAMFile);
-					img3 = mos->GetSprite2D();
-				}
-				pbar->SetBackground(img);
-				pbar->SetImages(img2, img3);
-				ctrl = pbar;
-			}
-			break;
+				GetProgressbar(str, ctrl, ctrlFrame);
+				break;
 			case IE_GUI_SLIDER:
-			{
-				//Slider
-				ResRef MOSFile;
-				ResRef BAMFile;
-				ieWord Cycle, Knob, GrabbedKnob;
-				ieWord KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
-				str->ReadResRef( MOSFile );
-				str->ReadResRef( BAMFile );
-				str->ReadWord(Cycle);
-				str->ReadWord(Knob);
-				str->ReadWord(GrabbedKnob);
-				str->ReadWord(KnobXPos);
-				str->ReadWord(KnobYPos);
-				str->ReadWord(KnobStep);
-				str->ReadWord(KnobStepsCount);
-				// ee documents 4 more words: ActiveBarTop, bottom, left, right
-				Slider* sldr = new Slider(ctrlFrame, Point(KnobXPos, KnobYPos), KnobStep, KnobStepsCount);
-				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
-				Holder<Sprite2D> img = mos->GetSprite2D();
-				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
-
-				const AnimationFactory* bam = (const AnimationFactory *)
-					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
-				if( bam ) {
-					img = bam->GetFrame( Knob, 0 );
-					sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
-					img = bam->GetFrame( GrabbedKnob, 0 );
-					sldr->SetImage( IE_GUI_SLIDER_GRABBEDKNOB, img );
-				}
-				else {
-					sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
-				}
-				ctrl = sldr;
-			}
-			break;
-
+				GetSlider(str, ctrl, ctrlFrame);
+				break;
 			case IE_GUI_EDIT:
-			{
-				//Text Edit
-				ResRef BGMos;
-				ResRef FontResRef;
-				ResRef CursorResRef;
-				ieWord maxInput;
-				ieWord CurCycle, CurFrame;
-				ieWord PosX, PosY;
-				ieWord Pos2X, Pos2Y;
-				ieVariable Initial;
-
-				str->ReadResRef( BGMos );
-				//These are two more MOS resrefs, probably unused, labeled EditClientFocus EditClientNoFocus
-				str->Seek( 16, GEM_CURRENT_POS );
-				str->ReadResRef( CursorResRef );
-				str->ReadWord(CurCycle);
-				str->ReadWord(CurFrame);
-				str->ReadWord(PosX); // "XEditClientOffset"
-				str->ReadWord(PosY); // "YEditClientOffset"
-				//FIXME: I still don't know what to do with this point
-				//Contrary to forum posts, it is definitely not a scrollbar ID
-				// ee docs call them XEditCaretOffset and YEditCaretOffset
-				str->ReadWord(Pos2X);
-				str->ReadWord(Pos2Y);
-				str->ReadResRef( FontResRef );
-				//this field is still unknown or unused, labeled SequenceText
-				str->Seek( 2, GEM_CURRENT_POS );
-				//This is really a text field, but apparently the original engine
-				//always writes it over, and never uses it (labeled DefaultString)
-				str->ReadVariable(Initial);
-				str->ReadWord(maxInput);
-				// word: caseformat: 0 normal, 1 upper, 2 lower TODO (Allowed case in NI)
-				// word: typeformat, unknown
-				Font* fnt = core->GetFont( FontResRef );
-
-				const AnimationFactory* bam = (const AnimationFactory *)
-					gamedata->GetFactoryResource(CursorResRef, IE_BAM_CLASS_ID);
-				Holder<Sprite2D> cursor;
-				if (bam) {
-					cursor = bam->GetFrame( CurCycle, CurFrame );
-				}
-
-				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BGMos);
-				Holder<Sprite2D> img;
-				if(mos) {
-					img = mos->GetSprite2D();
-				}
-
-				TextEdit* te = new TextEdit( ctrlFrame, maxInput, Point(PosX, PosY) );
-				te->SetFont( fnt );
-				te->SetCursor( cursor );
-				te->SetBackground( img );
-				//The original engine always seems to ignore this textfield
-				//te->SetText (Initial );
-				ctrl = te;
-			}
-			break;
-
+				GetTextEdit(str, ctrl, ctrlFrame);
+				break;
 			case IE_GUI_TEXTAREA:
-			{
-				//Text Area
-				ResRef FontResRef;
-				ResRef InitResRef;
-				Color fore, init, back;
-				ieWord SBID;
-				str->ReadResRef( FontResRef );
-				str->ReadResRef( InitResRef );
-				Font* fnt = core->GetFont( FontResRef );
-				Font* ini = core->GetFont( InitResRef );
-				str->Read( &fore, 4 );
-				str->Read( &init, 4 );
-				str->Read( &back, 4 );
-				str->ReadWord(SBID);
-				
-				fore.a = init.a = back.a = 0xff;
-
-				TextArea* ta = new TextArea(ctrlFrame, fnt, ini);
-				ta->SetColor(fore, TextArea::COLOR_NORMAL);
-				ta->SetColor(init, TextArea::COLOR_INITIALS);
-				ta->SetColor(back, TextArea::COLOR_BACKGROUND);
-				if (SBID != 0xffff) {
-					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
-					if (sb) {
-						ta->SetScrollbar(sb);
-					}
-				}
-				ctrl = ta;
-			}
-			break;
-
+				GetTextArea(str, ctrl, ctrlFrame, win);
+				break;
 			case IE_GUI_LABEL:
-			{
-				//Label
-				ResRef FontResRef;
-				ieStrRef StrRef;
-				ieWord alignment;
-				str->ReadStrRef(StrRef);
-				str->ReadResRef( FontResRef );
-				Font* fnt = core->GetFont( FontResRef );
-
-				Color textCol, bgCol;
-				str->Read(&textCol, 4);
-				str->Read(&bgCol, 4);
-				
-				textCol.a = bgCol.a = 0xff;
-
-				str->ReadWord(alignment);
-				String str = core->GetString( StrRef );
-				Label* lab = new Label(ctrlFrame, fnt, str);
-
-				if (alignment & 1) {
-					lab->SetFlags(Label::UseColor, BitOp::OR);
-				}
-				lab->SetColors(textCol, bgCol);
-				unsigned char align = IE_FONT_ALIGN_CENTER;
-				if (( alignment & 0x10 ) != 0) {
-					align = IE_FONT_ALIGN_RIGHT;
-					goto endvertical;
-				}
-				if (( alignment & 0x04 ) != 0) {
-					goto endvertical;
-				}
-				if (( alignment & 0x08 ) != 0) {
-					align = IE_FONT_ALIGN_LEFT;
-					goto endvertical;
-				}
-endvertical:
-				if (( alignment & 0x20 ) != 0) {
-					align |= IE_FONT_ALIGN_TOP;
-					goto endalign;
-				}
-				if (( alignment & 0x80 ) != 0) {
-					align |= IE_FONT_ALIGN_BOTTOM;
-				} else {
-					align |= IE_FONT_ALIGN_MIDDLE;
-				}
-endalign:
-				lab->SetAlignment( align );
-				ctrl = lab;
-			}
+				GetLabel(str, ctrl, ctrlFrame);
+				break;
 			break;
-
 			case IE_GUI_SCROLLBAR:
-			{
-				//ScrollBar
-				ResRef BAMResRef;
-				ieWord Cycle, TAID, imgIdx;
-				str->ReadResRef( BAMResRef );
-				str->ReadWord(Cycle);
-
-				const AnimationFactory* bam = (const AnimationFactory *)
-				gamedata->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
-				if (!bam) {
-					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: {}", BAMResRef);
-					break;
-				}
-				Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
-				for (auto& image : images) {
-					str->ReadWord(imgIdx);
-					image = bam->GetFrame(imgIdx, Cycle);
-				}
-				str->ReadWord(TAID);
-
-				ScrollBar* sb = new ScrollBar(ctrlFrame, images);
-
-				if (TAID == 0xffff) {
-					// text areas produce their own scrollbars in GemRB
-					ctrl = sb;
-				} else {
-					TextArea* ta = GetControl<TextArea>(TAID, win);
-					if (ta) {
-						ta->SetScrollbar(sb);
-					} else {
-						ctrl = sb;
-						// NOTE: we dont delete this, becuase there are at least a few instances
-						// where the CHU has this assigned to a text area even tho there isnt one! (BG1 GUISTORE:RUMORS, PST ContainerWindow)
-						// set them invisible instead, we will unhide them in the scripts that need them
-						sb->SetVisible(false);
-					}
-					// we still allow GUIScripts to get ahold of it
-					RegisterScriptableControl(sb, ControlID);
-				}
-			}
-			break;
-
+				GetScrollbar(str, ctrl, ctrlFrame, win, ControlID);
+				break;
 			default:
 				Log(ERROR, "CHUImporter", "Control Not Supported");
 		}
@@ -483,6 +492,7 @@ endalign:
 	}
 	return win;
 }
+
 /** Returns the number of available windows */
 unsigned int CHUImporter::GetWindowsCount()
 {
