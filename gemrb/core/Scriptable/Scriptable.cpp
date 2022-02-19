@@ -714,7 +714,6 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 			pro->SetCaster(GetGlobalID(), level);
 			break;
 		case WSTC_ADDTYPE:
-			// TODO: unhardcode to allow for mixing all the target types
 			// caster gets selftargeting fx when the projectile is fetched above
 			seh = &spl->ext_headers[SpellHeader];
 			for (Effect& feature : seh->features) {
@@ -974,7 +973,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
-	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
+
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
 	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
@@ -1048,7 +1047,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 
 	//if the projectile doesn't need to follow the target, then use the target position
 	CreateProjectile(SpellResRef, LastSpellTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
-	//FIXME: this trigger affects actors whom the caster sees, not just the caster itself
+
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
 	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
@@ -1544,7 +1543,7 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 			count = strtosigned<int>(strtok(NULL,"."));
 			caster->wildSurgeMods.saving_throw_mod = count;
 			break;
-		case '7': // random spell of the same level (FIXME: make an effect out of this?)
+		case '7': // random spell of the same level
 			// change this if we ever want the surges to respect the original type
 			for (i=0; i<types; i++) {
 				unsigned int spellCount = caster->spellbook.GetKnownSpellsCount(i, lvl);
