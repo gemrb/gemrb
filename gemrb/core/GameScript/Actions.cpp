@@ -1686,32 +1686,37 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 	}
 }
 
-// TODO: fix these two actions — they actually take a point, not an object
-void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
+static void FloatMessageAtPoint(Scriptable* Sender, const Point& pos, const ieStrRef& msgRef)
 {
-	Scriptable* target = GetScriptableFromObject(Sender, parameters->objects[1]);
-	if (!target) {
-		target=Sender;
-		Log(ERROR, "GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
-	}
-
-	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_HEAD);
+	// create invisible and invicible actor to host the text (lifted from Map::GetItemByDialog)
+	// replace once we have a generic solution, so we don't crowd the area
+	Actor *surrogate = gamedata->GetCreature("dmhead");
+	Map *map = Sender->GetCurrentArea();
+	map->AddActor(surrogate, true);
+	surrogate->SetPosition(pos, 0);
+	String msg = core->GetString(msgRef);
+	surrogate->SetOverheadText(msg);
+	surrogate->FixHeadTextPos();
 }
 
+// only used three times by cranium rats
+void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
+{
+	FloatMessageAtPoint(Sender, parameters->pointParameter, ieStrRef(parameters->int0Parameter));
+}
+
+// unused in the original
 void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* target = GetScriptableFromObject(Sender, parameters->objects[1]);
-	if (!target) {
-		target=Sender;
-		Log(ERROR, "GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
-	}
 	const ResRef& src = parameters->resref0Parameter;
 	const SrcVector *rndstr = LoadSrc(src);
 	if (!rndstr) {
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;
 	}
-	DisplayStringCore(target, rndstr->at(RAND<size_t>(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
+
+	const ieStrRef& msgRef = rndstr->at(RAND<size_t>(0, rndstr->size() - 1));
+	FloatMessageAtPoint(Sender, parameters->pointParameter, msgRef);
 	FreeSrc(rndstr, src);
 }
 
