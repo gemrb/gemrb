@@ -270,10 +270,6 @@ Item* ITMImporter::GetItem(Item *s)
 		AddZZFeatures(s);
 	}
 
-	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		Log(ERROR, "ITMImporter", "No BAM Importer available!");
-		return NULL;
-	}
 	return s;
 }
 

@@ -434,10 +434,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	}
 	win->SetBackground(bg);
 
-	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");
-		return win;
-	}
 	for (unsigned int i = 0; i < ControlsCount; i++) {
 		Control* ctrl = NULL;
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );

@@ -132,13 +132,9 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 	}
 
 	// Load location icon bam
-	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		Log(ERROR, "WMPImporter", "No BAM Importer Available.");
-	} else {
-		AnimationFactory* af = ( AnimationFactory* )
-			gamedata->GetFactoryResource(m->MapIconResRef, IE_BAM_CLASS_ID);
-		if (af)
-			m->SetMapIcons( af );
+	AnimationFactory* af = static_cast<AnimationFactory*>(gamedata->GetFactoryResource(m->MapIconResRef, IE_BAM_CLASS_ID));
+	if (af) {
+		m->SetMapIcons(af);
 	}
 
 	str->Seek( AreaEntriesOffset, GEM_STREAM_START );
