@@ -52,7 +52,7 @@ bool CHUImporter::Import(DataStream* str)
 	return true;
 }
 
-static void GetButton(DataStream* str, Control*& ctrl, Region& ctrlFrame, bool noImage)
+static void GetButton(DataStream* str, Control*& ctrl, const Region& ctrlFrame, bool noImage)
 {
 	Button* btn = new Button(ctrlFrame);
 	ctrl = btn;
@@ -130,7 +130,7 @@ static void GetButton(DataStream* str, Control*& ctrl, Region& ctrlFrame, bool n
 }
 
 // GemRB specific control: progressbar
-static void GetProgressbar(DataStream* str, Control*& ctrl, Region& ctrlFrame)
+static void GetProgressbar(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 {
 	ResRef mosFile;
 	ResRef mosFile2;
@@ -179,7 +179,7 @@ static void GetProgressbar(DataStream* str, Control*& ctrl, Region& ctrlFrame)
 	pbar->SetImages(img2, img3);
 }
 
-static void GetSlider(DataStream* str, Control*& ctrl, Region& ctrlFrame)
+static void GetSlider(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 {
 	ResRef mosFile;
 	ResRef bamFile;
@@ -218,7 +218,7 @@ static void GetSlider(DataStream* str, Control*& ctrl, Region& ctrlFrame)
 	}
 }
 
-static void GetTextEdit(DataStream* str, Control*& ctrl, Region& ctrlFrame)
+static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 {
 	ResRef bgMos;
 	ResRef fontResRef;
@@ -271,7 +271,7 @@ static void GetTextEdit(DataStream* str, Control*& ctrl, Region& ctrlFrame)
 	te->SetBackground(img);
 }
 
-static void GetTextArea(DataStream* str, Control*& ctrl, Region& ctrlFrame, Window*& win)
+static void GetTextArea(DataStream* str, Control*& ctrl, const Region& ctrlFrame, Window*& win)
 {
 	ResRef fontResRef;
 	ResRef initResRef;
@@ -304,7 +304,7 @@ static void GetTextArea(DataStream* str, Control*& ctrl, Region& ctrlFrame, Wind
 	}
 }
 
-static void GetLabel(DataStream* str, Control*& ctrl, Region& ctrlFrame)
+static void GetLabel(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 {
 	ResRef fontResRef;
 	ieStrRef textRef;
@@ -348,7 +348,7 @@ static void GetLabel(DataStream* str, Control*& ctrl, Region& ctrlFrame)
 	lab->SetAlignment(align);
 }
 
-static void GetScrollbar(DataStream* str, Control*& ctrl, Region& ctrlFrame, Window*& win, ieDword controlID)
+static void GetScrollbar(DataStream* str, Control*& ctrl, const Region& ctrlFrame, Window*& win, ieDword controlID)
 {
 	ResRef bamResRef;
 	ieWord cycle;
