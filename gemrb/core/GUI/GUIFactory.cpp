@@ -26,7 +26,7 @@ Window* GUIFactory::CreateWindow(ScriptingId winId, const Region& frame) const
 {
 	assert(winmgr);
 	Window* win = winmgr->MakeWindow(frame);
-	RegisterScriptableWindow(win, winPack.CString(), winId);
+	RegisterScriptableWindow(win, winPack, winId);
 	return win;
 }
 

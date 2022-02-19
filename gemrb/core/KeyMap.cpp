@@ -26,7 +26,7 @@
 
 namespace GemRB {
 
-Function::Function(const char *m, const char *f, int g, int k)
+Function::Function(const ieVariable& m, const ieVariable& f, int g, int k)
 {
 	// make sure the module and function names are no longer than 32 characters, or they will be truncated
 	moduleName = m;
@@ -102,17 +102,17 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 			continue;
 		}
 
-		const char *moduleName;
-		const char *function;
+		ieVariable moduleName;
+		ieVariable function;
 		const char *group;
 
 		if (kmtable->GetRowIndex(name) != TableMgr::npos) {
-			moduleName = kmtable->QueryField(name, "MODULE").c_str();
-			function = kmtable->QueryField(name, "FUNCTION").c_str();
+			moduleName = kmtable->QueryField(name, "MODULE");
+			function = kmtable->QueryField(name, "FUNCTION");
 			group = kmtable->QueryField(name, "GROUP").c_str();
 		} else {
-			moduleName = kmtable->QueryField("Default","MODULE").c_str();
-			function = kmtable->QueryField("Default","FUNCTION").c_str();
+			moduleName = kmtable->QueryField("Default","MODULE");
+			function = kmtable->QueryField("Default","FUNCTION");
 			group = kmtable->QueryField("Default","GROUP").c_str();
 			Log(MESSAGE, "KeyMap", "Adding key {} with function {}::{}", value, moduleName, function);
 		}

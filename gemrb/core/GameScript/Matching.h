@@ -32,7 +32,7 @@ GEM_EXPORT Targets *GetAllObjects(const Map *map, Scriptable *Sender, const Obje
 Targets* GetAllActors(Scriptable* Sender, int ga_flags);
 Scriptable* GetScriptableFromObject(Scriptable* Sender, const Object* oC, int ga_flags = 0);
 Scriptable* GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int ga_flags = 0);
-Scriptable *GetActorObject(const TileMap *TMap, const char *name);
+Scriptable *GetActorObject(const TileMap *TMap, const ieVariable& name);
 
 Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *parameters, int ga_flags);
 Targets *XthNearestOf(Targets *parameters, int count, int ga_flags);

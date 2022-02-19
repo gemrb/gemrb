@@ -510,9 +510,9 @@ public:
 	/** Get the Music Manager */
 	MusicMgr * GetMusicMgr() const;
 	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
-	int LoadSymbol(const char * ResRef);
+	int LoadSymbol(const ResRef&);
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
-	int GetSymbolIndex(const char * ResRef) const;
+	int GetSymbolIndex(const ResRef&) const;
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
 	std::shared_ptr<SymbolMgr> GetSymbol(unsigned int index) const;
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */

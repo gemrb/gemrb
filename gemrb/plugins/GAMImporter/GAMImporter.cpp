@@ -524,7 +524,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->Modal.State = pcInfo.ModalState;
-	actor->SetModalSpell(pcInfo.ModalState, 0);
+	actor->SetModalSpell(pcInfo.ModalState, {});
 	ps->Happiness = pcInfo.Happiness;
 	memcpy(ps->Interact, pcInfo.Interact, MAX_INTERACT *sizeof(ieDword) );
 
@@ -1024,10 +1024,10 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
 		std::string tmpstr = MBStringFromString(ac->GetLongName());
-		stream->WriteVariable(ieVariable(tmpstr.c_str()));
+		stream->WriteVariable(ieVariable(tmpstr));
 	} else {
 		std::string tmpstr = core->GetMBString(ac->LongStrRef, STRING_FLAGS::STRREFOFF);
-		stream->WriteVariable(ieVariable(tmpstr.c_str()));
+		stream->WriteVariable(ieVariable(tmpstr));
 	}
 	stream->WriteDword(ac->TalkCount);
 	stream->WriteStrRef(ac->PCStats->BestKilledName);

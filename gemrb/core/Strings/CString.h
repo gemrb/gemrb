@@ -113,7 +113,7 @@ public:
 	FixedSizeString(std::nullptr_t) noexcept = delete;
 	FixedSizeString& operator=(std::nullptr_t) noexcept = delete;
 	
-	FixedSizeString(const char* cstr) noexcept {
+	explicit FixedSizeString(const char* cstr) noexcept {
 		operator=(cstr);
 	}
 	
@@ -123,6 +123,21 @@ public:
 		} else {
 			std::fill(begin(), end(), '\0');
 		}
+		return *this;
+	}
+	
+	template<typename STR,
+	// ignore the junk after STR... its just SFINAE garbage to hide the ctor from certain useages
+	typename std::enable_if<!std::is_integral<STR>::value && !std::is_same<typename std::remove_cv<STR>::type, char*>::value, int>::type = 0>
+	FixedSizeString(const STR& s) noexcept {
+		strncpy(str, &s[0], LEN);
+	}
+
+	template<typename STR,
+	// ignore the junk after STR... its just SFINAE garbage to hide assignment from certain useages
+	typename std::enable_if<!std::is_integral<STR>::value && !std::is_same<typename std::remove_cv<STR>::type, char*>::value, int>::type = 0>
+	FixedSizeString& operator=(const STR& s) noexcept {
+		strncpy(str, &s[0], LEN);
 		return *this;
 	}
 	
@@ -157,7 +172,7 @@ public:
 	}
 	
 	template<typename T>
-	typename std::enable_if<std::is_integral<T>::value, char>::type
+	typename std::enable_if<std::is_integral<T>::value, const char&>::type
 	operator[](T i) const noexcept {
 		assert(i < static_cast<T>(LEN));
 		return str[i];

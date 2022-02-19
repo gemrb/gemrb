@@ -7652,7 +7652,7 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	ResRef spl;
-	spl = tm->QueryField(i, 0).c_str();
+	spl = tm->QueryField(i, 0);
 	core->ApplySpell(spl, target, Owner, fx->Power);
 	return FX_NOT_APPLIED;
 }
@@ -7834,7 +7834,7 @@ int fx_item_usability(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			// targeting player created characters
 			match = target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE;
 		} else {
-			match = fx->Resource == target->GetScriptName();
+			match = fx->Resource == target->GetScriptName().CString();
 		}
 	} else {
 		// regular IDS check

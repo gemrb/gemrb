@@ -186,7 +186,7 @@ std::vector<T> GetElements(const char *str)
 	for (char *part = strtok((char*) str, ","); part; part = strtok(nullptr, ",")) {
 		// there is one single screwed up entry in pst ar1100.ini: cre_file = bird, outlim
 		if (*part == ' ') part++;
-		elements.emplace_back(part);
+		elements.emplace_back(T(part));
 		i++;
 	}
 	return elements;

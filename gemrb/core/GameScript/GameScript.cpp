@@ -1386,7 +1386,7 @@ static void printFunction(std::string& buffer, const std::shared_ptr<SymbolMgr>&
 	}
 }
 
-static void LoadActionFlags(const char *tableName, int flag, bool critical)
+static void LoadActionFlags(const ResRef& tableName, int flag, bool critical)
 {
 	int tableIndex = core->LoadSymbol(tableName);
 	if (tableIndex < 0) {

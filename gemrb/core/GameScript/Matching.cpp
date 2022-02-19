@@ -265,7 +265,7 @@ Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 }
 
 /* get a non-actor object from a map, by name */
-Scriptable *GetActorObject(const TileMap *TMap, const char *name)
+Scriptable *GetActorObject(const TileMap *TMap, const ieVariable& name)
 {
 	Scriptable * aC = TMap->GetDoor( name );
 	if (aC) {
@@ -383,7 +383,7 @@ bool MatchActor(const Scriptable *Sender, ieDword actorID, const Object *oC)
 
 	// name matching
 	if (oC->objectName[0]) {
-		if (ac->GetScriptName() != oC->objectName) {
+		if (ac->GetScriptName() != oC->objectNameVar) {
 			return false;
 		}
 		filtered = true;

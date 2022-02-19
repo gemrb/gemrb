@@ -761,7 +761,7 @@ int Interface::LoadFonts()
 	for (TableMgr::index_t row = 0; row < count; ++row) {
 		rowName = tab->GetRowName(row).c_str();
 
-		ResRef resref = tab->QueryField(rowName, "RESREF").c_str();
+		ResRef resref = tab->QueryField(rowName, "RESREF");
 		const char* font_name = tab->QueryField( rowName, "FONT_NAME" ).c_str();
 		ieWord font_size = tab->QueryFieldUnsigned<ieWord>( rowName, "PX_SIZE" ); // not available in BAM fonts.
 		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ).c_str() ); // not available in BAM fonts.
@@ -1795,7 +1795,7 @@ bool Interface::LoadGemRBINI()
 	// Resrefs are already initialized in Interface::Interface()
 #define ASSIGN_RESREF(resref, name) \
 	s = ini->GetKeyAsString( "resources", name, NULL ); \
-	resref = s; s = nullptr
+	resref = ResRef(s); s = nullptr
 
 	ASSIGN_RESREF(MainCursorsImage, "MainCursorsImage");
 	ASSIGN_RESREF(TextCursorBam, "TextCursorBAM"); //console cursor
@@ -1844,11 +1844,11 @@ bool Interface::LoadGemRBINI()
 			const char *pos = strchr( s, '/' );
 			if (pos) {
 				GroundCircleScale[size] = atoi( pos+1 );
-				char tmp[9];
-				strlcpy(tmp, s, pos - s + 1);
+				ResRef tmp;
+				std::copy(s, pos, tmp.begin());
 				GroundCircleBam[size] = tmp;
 			} else {
-				GroundCircleBam[size] = s;
+				GroundCircleBam[size] = ResRef(s);
 			}
 		}
 	}
@@ -2302,13 +2302,13 @@ MusicMgr* Interface::GetMusicMgr() const
 	return music.get();
 }
 /** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
-int Interface::LoadSymbol(const char* ResRef)
+int Interface::LoadSymbol(const ResRef& ref)
 {
-	int ind = GetSymbolIndex( ResRef );
+	int ind = GetSymbolIndex(ref);
 	if (ind != -1) {
 		return ind;
 	}
-	DataStream* str = gamedata->GetResource( ResRef, IE_IDS_CLASS_ID );
+	DataStream* str = gamedata->GetResource(ref, IE_IDS_CLASS_ID);
 	if (!str) {
 		return -1;
 	}
@@ -2320,7 +2320,7 @@ int Interface::LoadSymbol(const char* ResRef)
 	if (!sm->Open(str)) {
 		return -1;
 	}
-	Symbol s = { sm, ResRef };
+	Symbol s = { sm, ref };
 	ind = -1;
 	for (size_t i = 0; i < symbols.size(); i++) {
 		if (!symbols[i].sm) {
@@ -2336,12 +2336,12 @@ int Interface::LoadSymbol(const char* ResRef)
 	return ( int ) symbols.size() - 1;
 }
 /** Gets the index of a loaded Symbol Table, returns -1 on error */
-int Interface::GetSymbolIndex(const char* ResRef) const
+int Interface::GetSymbolIndex(const ResRef& ref) const
 {
 	for (size_t i = 0; i < symbols.size(); i++) {
 		if (!symbols[i].sm)
 			continue;
-		if (symbols[i].symbolName == ResRef)
+		if (symbols[i].symbolName == ref)
 			return ( int ) i;
 	}
 	return -1;
@@ -3010,7 +3010,7 @@ bool Interface::InitItemTypes()
 			}
 			slotTypes[i].slotType = st->QueryFieldUnsigned<ieDword>(row, 0);
 			slotTypes[i].slotID = st->QueryFieldUnsigned<ieDword>(row, 1);
-			slotTypes[i].slotResRef = st->QueryField(row, 2).c_str();
+			slotTypes[i].slotResRef = st->QueryField(row, 2);
 			slotTypes[i].slotTip = st->QueryFieldUnsigned<ieDword>(row, 3);
 			slotTypes[i].slotFlags = st->QueryFieldUnsigned<ieDword>(row, 5);
 			//don't fill sloteffects for aliased slots (pst)
@@ -3475,12 +3475,11 @@ bool Interface::ReadRandomItems()
 	}
 
 	//the gold item
-	GoldResRef = tab->QueryField(size_t(0), size_t(0)).c_str();
+	GoldResRef = tab->QueryField(size_t(0), size_t(0));
 	if (IsStar(GoldResRef)) {
 		return false;
 	}
-	ResRef randTreasureRef;
-	randTreasureRef = tab->QueryField(1, difflev).c_str();
+	ResRef randTreasureRef = tab->QueryField(1, difflev);
 	int i = atoi(randTreasureRef);
 	if (i<1) {
 		ReadItemTable(randTreasureRef, 0); //reading the table itself
@@ -3490,7 +3489,7 @@ bool Interface::ReadRandomItems()
 		i=5;
 	}
 	while(i--) {
-		randTreasureRef = tab->QueryField(2 + i, difflev).c_str();
+		randTreasureRef = tab->QueryField(2 + i, difflev);
 		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i).c_str());
 	}
 	return true;
@@ -4376,7 +4375,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 	int ret = 0;
 	// tables for additive modifiers of bonus type
 	for (TableMgr::index_t i = 0; i < count; i++) {
-		ResRef subTableName = mtm->GetRowName(i).c_str();
+		ResRef subTableName = mtm->GetRowName(i);
 		int checkcol = mtm->QueryFieldSigned<int>(i,1);
 		unsigned int readcol = mtm->QueryFieldUnsigned<unsigned int>(i,2);
 		int stat = TranslateStat(mtm->QueryField(i,0).c_str());

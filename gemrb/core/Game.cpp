@@ -89,7 +89,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		TableMgr::index_t i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
-			mastarea.push_back(ResRef(table->GetRowName(i).c_str()));
+			mastarea.push_back(ResRef(table->GetRowName(i)));
 		}
 	}
 
@@ -100,9 +100,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	table = gamedata->LoadTable("restmov");
 	if (table) {
 		for(int i=0;i<8;i++) {
-			restmovies[i] = table->QueryField(i, 0).c_str();
-			daymovies[i] = table->QueryField(i, 1).c_str();
-			nightmovies[i] = table->QueryField(i, 2).c_str();
+			restmovies[i] = table->QueryField(i, 0);
+			daymovies[i] = table->QueryField(i, 1);
+			nightmovies[i] = table->QueryField(i, 2);
 		}
 	}
 
@@ -118,9 +118,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		npclevels.reserve(rows);
 		for (TableMgr::index_t i = 0; i < rows; i++) {
 			npclevels.emplace_back(cols + 1);
-			npclevels[i][0] = table->GetRowName(i).c_str();
+			npclevels[i][0] = table->GetRowName(i);
 			for (TableMgr::index_t j = 0; j < cols; j++) {
-				npclevels[i][j + 1] = table->QueryField(i, j).c_str();
+				npclevels[i][j + 1] = table->QueryField(i, j);
 			}
 		}
 	}
@@ -341,7 +341,7 @@ void Game::ConsolidateParty() const
 			pc->SetModalSpell(pc->Modal.State, spell->Name);
 			gamedata->FreeSpell(spell, spellRef, false);
 		} else {
-			pc->SetModalSpell(pc->Modal.State, nullptr);
+			pc->SetModalSpell(pc->Modal.State, {});
 		}
 	}
 }
@@ -475,8 +475,8 @@ int Game::JoinParty(Actor* actor, int join)
 		if (prot && (actor->SmallPortrait == prot->SmallPortrait || actor->LargePortrait == prot->LargePortrait)) {
 			AutoTable ptab = gamedata->LoadTable("portrait");
 			if (ptab) {
-				actor->SmallPortrait = ptab->QueryField(actor->SmallPortrait, "REPLACEMENT").c_str();
-				actor->LargePortrait = ptab->QueryField(actor->LargePortrait, "REPLACEMENT").c_str();
+				actor->SmallPortrait = ptab->QueryField(actor->SmallPortrait, "REPLACEMENT");
+				actor->LargePortrait = ptab->QueryField(actor->LargePortrait, "REPLACEMENT");
 			}
 		}
 
@@ -1604,7 +1604,7 @@ void Game::TextDream()
 			TableMgr::index_t row = drm->GetRowIndex(repLabel);
 			if (row != TableMgr::npos) {
 				Actor *actor = GetPC(0, false);
-				actor->LearnSpell(ResRef(drm->QueryField(row, 0).c_str()), LS_MEMO | LS_LEARN);
+				actor->LearnSpell(drm->QueryField(row, 0), LS_MEMO | LS_LEARN);
 			}
 		}
 

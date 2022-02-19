@@ -35,7 +35,7 @@ public:
 	int group;
 	int key;
 
-	Function(const char *m, const char *f, int g, int key);
+	Function(const ieVariable& m, const ieVariable& f, int g, int key);
 };
 
 class GEM_EXPORT KeyMap {

@@ -48,7 +48,7 @@ void TileMap::ClearOverlays()
 }
 
 //tiled objects
-TileObject* TileMap::AddTile(const char *ID, const char* Name, unsigned int Flags,
+TileObject* TileMap::AddTile(const ResRef& ID, const char* Name, unsigned int Flags,
 	unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount)
 {
 	TileObject* tile = new TileObject();

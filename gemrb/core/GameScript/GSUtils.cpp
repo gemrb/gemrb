@@ -226,7 +226,7 @@ ieDword ResolveSpellNumber(const ResRef& spellRef)
 	tmp.SNPrintF("%.4s", spellRef.CString());
 	for (int i = 0; i < 5; i++) {
 		if (tmp == spell_suffices[i]) {
-			tmp = spellRef.CString() + 4;
+			tmp = ResRef(spellRef.CString() + 4);
 			ieDword n = strtounsigned<ieDword>(tmp.CString());
 			if (!n) {
 				return 0xffffffff;
@@ -365,10 +365,10 @@ void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone)
 		if (!item) {
 			continue;
 		}
-		if (item->ItemResRef != parameters->string0Parameter) {
+		if (item->ItemResRef != parameters->resref0Parameter) {
 			continue;
 		}
-		actor->inventory.SetSlotItemRes(ResRef(parameters->string1Parameter), i, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+		actor->inventory.SetSlotItemRes(parameters->resref1Parameter, i, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 		if (onlyone) {
 			break;
 		}
@@ -633,7 +633,7 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 //transfering item from Sender to target
 //if target has no inventory, the item will be destructed
 //if target can't get it, it will be dropped at its feet
-int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag, int count)
+int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, int flags, int setflag, int count)
 {
 	Inventory *myinv;
 	Map *map;
@@ -1217,9 +1217,9 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			pdtable = gamedata->LoadTable("interdia");
 			if (pdtable) {
 				if (game->Expansion == GAME_TOB) {
-					Dialog = pdtable->QueryField( scriptingname, "25FILE" ).c_str();
+					Dialog = pdtable->QueryField(scriptingname, "25FILE");
 				} else {
-					Dialog = pdtable->QueryField( scriptingname, "FILE" ).c_str();
+					Dialog = pdtable->QueryField(scriptingname, "FILE");
 				}
 			}
 			break;
@@ -1569,7 +1569,7 @@ inline bool ismysymbol(const char letter)
 
 //this function returns a value, symbol could be a numeric string or
 //a symbol from idsname
-static int GetIdsValue(const char *&symbol, const char *idsname)
+static int GetIdsValue(const char *&symbol, const ResRef& idsname)
 {
 	char *newsymbol;
 	int value = strtosigned<int>(symbol, &newsymbol);

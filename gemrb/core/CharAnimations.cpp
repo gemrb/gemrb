@@ -82,10 +82,10 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 	const DataFileMgr *resdata = core->GetResDataINI();
 	for (TableMgr::index_t i = 0; i < AvatarsCount; ++i) {
 		table[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i).c_str());
-		table[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1).c_str();
-		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2).c_str();
-		table[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3).c_str();
-		table[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4).c_str();
+		table[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1);
+		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
+		table[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3);
+		table[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4);
 		table[i].AnimationType = Avatars->QueryFieldUnsigned<ieByte>(i,AV_ANIMTYPE);
 		table[i].CircleSize = Avatars->QueryFieldUnsigned<ieByte>(i,AV_CIRCLESIZE);
 		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE).c_str();
@@ -166,7 +166,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			unsigned int rmax = 0xffff;
 			ieByte range = 0;
 
-			value = walk->QueryField(i, 0).c_str();
+			value = walk->QueryField(i, 0);
 			valid_unsignednumber(walk->QueryField(i,1).c_str(), rmin);
 			valid_unsignednumber(walk->QueryField(i,2).c_str(), rmax);
 			valid_unsignednumber(walk->QueryField(i,3).c_str(), range);
@@ -223,7 +223,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			for (auto& row : table) {
 				if (id < row.AnimID) break;
 				if (id == row.AnimID) {
-					row.ShadowAnimation = avatarShadows->QueryField(i, 0).c_str();
+					row.ShadowAnimation = avatarShadows->QueryField(i, 0);
 					break;
 				}
 			}
@@ -1806,11 +1806,12 @@ void CharAnimations::AddNFSuffix(std::string& dest, unsigned char StanceID,
 //static const char *SlashPrefix[]={"a1","a4","a7"};
 //static const char *BackPrefix[]={"a2","a5","a8"};
 //static const char *JabPrefix[]={"a3","a6","a9"};
-static const char* const SlashPrefix[] = { "a1", "a2", "a7" };
-static const char* const BackPrefix[] = { "a3", "a4", "a8" };
-static const char* const JabPrefix[] = { "a5", "a6", "a9" };
-static const char* const RangedPrefix[] = { "sa", "sx", "ss" };
-static const char* const RangedPrefixOld[] = { "sa", "sx", "a1" };
+using prefix_t = char[3];
+static const prefix_t SlashPrefix[] = { "a1", "a2", "a7" };
+static const prefix_t BackPrefix[] = { "a3", "a4", "a8" };
+static const prefix_t JabPrefix[] = { "a5", "a6", "a9" };
+static const prefix_t RangedPrefix[] = { "sa", "sx", "ss" };
+static const prefix_t RangedPrefixOld[] = { "sa", "sx", "a1" };
 
 void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 	unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
