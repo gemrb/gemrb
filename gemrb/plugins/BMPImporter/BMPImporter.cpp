@@ -105,21 +105,11 @@ bool BMPImporter::Import(DataStream* str)
 	//RASTERDATA
 	switch (BitCount) {
 		case 32:
-			PaddedRowLength = size.w * 4;
-			break;
-
 		case 24:
-			PaddedRowLength = size.w * 3;
-			break;
-
 		case 16:
-			PaddedRowLength = size.w * 2;
-			break;
-
 		case 8:
-			PaddedRowLength = size.w;
+			PaddedRowLength = size.w * BitCount / 8;
 			break;
-
 		case 4:
 			PaddedRowLength = (size.w >> 1);
 			break;
