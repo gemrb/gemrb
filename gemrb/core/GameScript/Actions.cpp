@@ -565,7 +565,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	if (!map) return;
 
 	if (parameters->string0Parameter[0]) {
-		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter, 0);
+		CreateVisualEffectCore(Sender, Sender->Pos, parameters->resref0Parameter, 0);
 	}
 
 	if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptRef(), tar->Pos, 0)) {
@@ -1942,7 +1942,7 @@ void GameScript::CreateVisualEffectObject(Scriptable* Sender, Action* parameters
 	if (!tar) {
 		return;
 	}
-	CreateVisualEffectCore(tar, tar->Pos, parameters->string0Parameter, parameters->int0Parameter);
+	CreateVisualEffectCore(tar, tar->Pos, parameters->resref0Parameter, parameters->int0Parameter);
 }
 
 // creates sticky vvc on actor or normal animation on object
@@ -1953,16 +1953,16 @@ void GameScript::CreateVisualEffectObjectSticky(Scriptable* Sender, Action* para
 		return;
 	}
 	if (tar->Type==ST_ACTOR) {
-		CreateVisualEffectCore((Actor *) tar, parameters->string0Parameter, parameters->int0Parameter);
+		CreateVisualEffectCore(static_cast<Actor*>(tar), parameters->resref0Parameter, parameters->int0Parameter);
 	} else {
-		CreateVisualEffectCore(tar, tar->Pos, parameters->string0Parameter, parameters->int0Parameter);
+		CreateVisualEffectCore(tar, tar->Pos, parameters->resref0Parameter, parameters->int0Parameter);
 	}
 }
 
 // creates area effect at point
 void GameScript::CreateVisualEffect(Scriptable* Sender, Action* parameters)
 {
-	CreateVisualEffectCore(Sender, parameters->pointParameter, parameters->string0Parameter, parameters->int0Parameter);
+	CreateVisualEffectCore(Sender, parameters->pointParameter, parameters->resref0Parameter, parameters->int0Parameter);
 }
 
 void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
@@ -2679,7 +2679,7 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->string1Parameter[0]) {
-		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string1Parameter, 0);
+		CreateVisualEffectCore(Sender, Sender->Pos, parameters->resref1Parameter, 0);
 	}
 
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {

@@ -71,8 +71,8 @@ bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword fla
 void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed);
 void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::index_t value);
 void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone);
-void CreateVisualEffectCore(Actor *target, const char *effect, int iterations);
-void CreateVisualEffectCore(const Scriptable *Sender, const Point &position, const char *effect, int iterations);
+void CreateVisualEffectCore(Actor* target, const ResRef& effect, int iterations);
+void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, const ResRef& effect, int iterations);
 void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool trap);
 void BeginDialog(Scriptable* Sender, const Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);

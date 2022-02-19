@@ -899,7 +899,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	//if string1 is animation, then we can't use it for a DV too
 	if (flags & CC_PLAY_ANIM) {
-		CreateVisualEffectCore(ab, ab->Pos, parameters->string1Parameter, 1);
+		CreateVisualEffectCore(ab, ab->Pos, parameters->resref1Parameter, 1);
 	} else if (parameters->string1Parameter[0]) {
 		//setting the deathvariable if it exists (iwd2)
 		ab->SetScriptName(parameters->variable1Parameter);
@@ -910,25 +910,26 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 }
 
-static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
+static ScriptedAnimation *GetVVCEffect(const ResRef& effect, int iterations)
 {
-	if (effect[0]) {
-		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(effect, false);
-		if (!vvc) {
-			Log(ERROR, "GameScript", "Failed to create effect.");
-			return NULL;
-		}
-		if (iterations > 1) {
-			vvc->SetDefaultDuration(vvc->GetSequenceDuration(core->Time.ai_update_time * iterations));
-		} else {
-			vvc->PlayOnce();
-		}
-		return vvc;
+	if (effect.IsEmpty()) {
+		return nullptr;
 	}
-	return NULL;
+
+	ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(effect, false);
+	if (!vvc) {
+		Log(ERROR, "GameScript", "Failed to create effect.");
+		return nullptr;
+	}
+	if (iterations > 1) {
+		vvc->SetDefaultDuration(vvc->GetSequenceDuration(core->Time.ai_update_time * iterations));
+	} else {
+		vvc->PlayOnce();
+	}
+	return vvc;
 }
 
-void CreateVisualEffectCore(Actor *target, const char *effect, int iterations)
+void CreateVisualEffectCore(Actor* target, const ResRef& effect, int iterations)
 {
 	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
@@ -936,7 +937,7 @@ void CreateVisualEffectCore(Actor *target, const char *effect, int iterations)
 	}
 }
 
-void CreateVisualEffectCore(const Scriptable *Sender, const Point &position, const char *effect, int iterations)
+void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, const ResRef& effect, int iterations)
 {
 	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
