@@ -37,7 +37,7 @@ class CHUImporter : public GUIFactory {
 	ieDword WEOffset = 0;
 public:
 	/** Returns the number of available windows */
-	unsigned int GetWindowsCount() override;
+	unsigned int GetWindowsCount() const override;
 	bool LoadWindowPack(const ScriptingGroup_t&) override;
 	/** Returns the i-th window in the Previously Loaded Stream */
 	Window* GetWindow(ScriptingId) const override;

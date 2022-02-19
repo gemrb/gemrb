@@ -487,7 +487,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 }
 
 /** Returns the number of available windows */
-unsigned int CHUImporter::GetWindowsCount()
+unsigned int CHUImporter::GetWindowsCount() const
 {
 	return WindowCount;
 }

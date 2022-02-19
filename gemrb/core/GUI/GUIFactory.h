@@ -47,7 +47,7 @@ public:
 	/** Returns the i-th window in the Previously Loaded Stream */
 	virtual Window* GetWindow(ScriptingId id) const = 0;
 	/** Returns the number of available windows */
-	virtual unsigned int GetWindowsCount() = 0;
+	virtual unsigned int GetWindowsCount() const = 0;
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
 	virtual bool LoadWindowPack(const ScriptingGroup_t&) = 0;
 	/** Creates a Window in the Window Manager */
