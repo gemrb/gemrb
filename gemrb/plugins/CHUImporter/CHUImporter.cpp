@@ -392,72 +392,69 @@ static void GetScrollbar(DataStream* str, Control*& ctrl, Region& ctrlFrame, Win
 /** Returns the i-th window in the Previously Loaded Stream */
 Window* CHUImporter::GetWindow(ScriptingId wid) const
 {
-	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
-	ieWord ControlsCount, FirstControl;
-	ResRef MosFile;
+	ieWord windowID;
+	ieWord backGround;
+	ieWord controlsCount;
+	ieWord firstControl;
+	ResRef mosFile;
+	Region rgn;
 
 	if (!str) {
 		Log(ERROR, "CHUImporter", "No data stream to read from, skipping controls");
-		return NULL;
+		return nullptr;
 	}
 
 	bool found = false;
-	for (unsigned int c = 0; c < WindowCount; c++) {
-		str->Seek( WEOffset + ( 0x1c * c ), GEM_STREAM_START );
-		str->ReadWord(WindowID);
-		if (WindowID == wid) {
+	for (ieDword c = 0; c < WindowCount; c++) {
+		str->Seek(WEOffset + 0x1c * c, GEM_STREAM_START);
+		str->ReadWord(windowID);
+		if (windowID == wid) {
 			found = true;
 			break;
 		}
 	}
 	if (!found) {
-		return NULL;
+		return nullptr;
 	}
+
 	str->Seek(2, GEM_CURRENT_POS); // windowID was a dword in bg2
-	str->ReadWord(XPos);
-	str->ReadWord(YPos);
-	str->ReadWord(Width);
-	str->ReadWord(Height);
-	str->ReadWord(BackGround);
-	str->ReadWord(ControlsCount);
-	str->ReadResRef( MosFile );
-	str->ReadWord(FirstControl);
+	str->ReadRegion(rgn);
+	str->ReadWord(backGround);
+	str->ReadWord(controlsCount);
+	str->ReadResRef(mosFile);
+	str->ReadWord(firstControl);
 	// also a word for Flags with only bit 0 relating to modal windows known ("don't dim the bg" in NI)
 
-	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height));
+	Window* win = CreateWindow(windowID, rgn);
 	Holder<Sprite2D> bg;
-	if (BackGround == 1) {
-		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MosFile);
+	if (backGround == 1) {
+		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(mosFile);
 		if (mos) {
 			bg = mos->GetSprite2D();
 		}
 	}
 	win->SetBackground(bg);
 
-	for (unsigned int i = 0; i < ControlsCount; i++) {
-		Control* ctrl = NULL;
-		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
-		ieDword COffset, CLength, ControlID;
+	for (unsigned int i = 0; i < controlsCount; i++) {
+		Control* ctrl = nullptr;
+		str->Seek(CTOffset + (firstControl + i) * 8, GEM_STREAM_START);
+		ieDword ctrlOffset;
+		ieDword ctrlLength;
+		ieDword controlID;
 		Region ctrlFrame;
-		ieWord tmp;
-		ieByte ControlType, temp;
-		str->ReadDword(COffset);
-		str->ReadDword(CLength);
-		str->Seek( COffset, GEM_STREAM_START );
-		str->ReadDword(ControlID);
-		str->ReadWord(tmp);
-		ctrlFrame.x = tmp;
-		str->ReadWord(tmp);
-		ctrlFrame.y = tmp;
-		str->ReadWord(tmp);
-		ctrlFrame.w = tmp;
-		str->ReadWord(tmp);
-		ctrlFrame.h = tmp;
-		str->Read( &ControlType, 1 );
-		str->Read(&temp, 1); // in bg2 ControlType was a word
-		switch (ControlType) {
+		ieByte controlType;
+		ieByte tmp;
+
+		str->ReadDword(ctrlOffset);
+		str->ReadDword(ctrlLength);
+		str->Seek(ctrlOffset, GEM_STREAM_START);
+		str->ReadDword(controlID);
+		str->ReadRegion(ctrlFrame);
+		str->Read(&controlType, 1);
+		str->Read(&tmp, 1); // in bg2 ControlType was a word
+		switch (controlType) {
 			case IE_GUI_BUTTON:
-				GetButton(str, ctrl, ctrlFrame, !Width);
+				GetButton(str, ctrl, ctrlFrame, !rgn.w);
 				break;
 			case IE_GUI_PROGRESSBAR:
 				GetProgressbar(str, ctrl, ctrlFrame);
@@ -476,14 +473,14 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				break;
 			break;
 			case IE_GUI_SCROLLBAR:
-				GetScrollbar(str, ctrl, ctrlFrame, win, ControlID);
+				GetScrollbar(str, ctrl, ctrlFrame, win, controlID);
 				break;
 			default:
 				Log(ERROR, "CHUImporter", "Control Not Supported");
 		}
 		if (ctrl) {
-			win->AddSubviewInFrontOfView( ctrl );
-			RegisterScriptableControl(ctrl, ControlID);
+			win->AddSubviewInFrontOfView(ctrl);
+			RegisterScriptableControl(ctrl, controlID);
 		}
 	}
 	return win;
