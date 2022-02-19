@@ -29,6 +29,12 @@ install:
       nuget install secure-file -ExcludeVersion
       choco -r install openssh
       secure-file\tools\secure-file -decrypt testing\id_travissfbot.av.enc -secret $env:SF_ACC
+
+      # chmod 400 ...
+      $path = ".\testing\id_travissfbot.av"
+      icacls.exe $path /reset
+      icacls.exe $path /GRANT:R "$($env:USERNAME):(R)"
+      icacls.exe $path /inheritance:r
     }
 
     vcpkg install zlib:x86-windows
