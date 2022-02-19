@@ -20,7 +20,7 @@
 #ifndef ViewInterfaces_h
 #define ViewInterfaces_h
 
-class Scrollable {
+class GEM_EXPORT Scrollable {
 public:
 	virtual void ScrollDelta(const Point& p) = 0;
 	virtual void ScrollTo(const Point& p) = 0;
@@ -77,7 +77,7 @@ public:
 		
 		operator bool() const { return bool(callback); }
 	}* executingResponseHandler = nullptr;
-	
+
 	class ActionKey {
 		uint32_t key;
 	public:

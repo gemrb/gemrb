@@ -49,7 +49,7 @@ GEM_EXPORT int strlench(const char* string, char ch);
 constexpr int NoTransform(int c) { return c; }
 
 template <typename STR_T, int(*TRANS)(int) = NoTransform>
-struct CstrHash
+struct GEM_EXPORT CstrHash
 {
 	size_t operator() (const STR_T &str) const {
 		size_t nHash = 0;
@@ -236,6 +236,12 @@ public:
 	
 	iterator end() noexcept {
 		return &str[LEN + 1];
+	}
+
+	template<size_t N> FixedSizeString<N, CMP> SubStr(size_t pos) {
+		static_assert(N <= LEN, "Substring must not exceed the original length.");
+		assert(pos + LEN <= N);
+		return FixedSizeString<N, CMP>{CString() + pos};
 	}
 };
 

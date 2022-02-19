@@ -23,7 +23,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
-#include "TileSetMgr.h"
+#include "Plugins/TileSetMgr.h"
 
 #include <iterator>
 

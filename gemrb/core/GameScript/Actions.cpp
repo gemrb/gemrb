@@ -5460,11 +5460,8 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		pos = 0;
 	}
 	while(len--) {
-		char spl[5];
-
-		memcpy(spl, parameters->string0Parameter+pos*4, 4);
-		spl[4]=0;
-		int splnum = atoi(spl);
+		auto spl = parameters->string0Parameter.SubStr<4>(pos * 4);
+		int splnum = atoi(spl.CString());
 
 		if (!(flags & MSO_IGNORE_HAVE) && !me->spellbook.HaveSpell(splnum, 0) ) {
 			goto end_mso_loop;

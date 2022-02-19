@@ -95,28 +95,6 @@ MakeImporter() noexcept {
 	return {};
 }
 
-template <class IMPORTER>
-class GEM_EXPORT ImporterPlugin final : public Plugin
-{
-	std::shared_ptr<IMPORTER> importer = MakeImporter<IMPORTER>();
-public:
-	std::shared_ptr<IMPORTER> GetImporter() const noexcept {
-		return importer;
-	}
-
-	std::shared_ptr<IMPORTER> GetImporter(DataStream* str) noexcept {
-		if (str == nullptr) {
-			return nullptr;
-		}
-
-		if (importer->Open(str) == false) {
-			return nullptr;
-		}
-
-		return importer;
-	}
-};
-
 }
 
 #endif

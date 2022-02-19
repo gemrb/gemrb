@@ -30,22 +30,24 @@
  */
 
 /// Symbol visibility macros
-#ifdef WIN32
-#	ifdef GEM_BUILD_DLL
-#		define GEM_EXPORT __declspec(dllexport)
-#		define GEM_EXPORT_T GEM_EXPORT
-#	else
-#		define GEM_EXPORT __declspec(dllimport)
-#		define GEM_EXPORT_T
-#	endif
-#	define GEM_EXPORT_DLL extern "C" __declspec(dllexport)
-#else
-#	ifdef __GNUC__
-#		ifdef GEM_BUILD_DLL
-#			define GEM_EXPORT __attribute__ ((visibility("default")))
-# 		define GEM_EXPORT_T GEM_EXPORT
+#ifndef STATIC_LINK
+#	ifdef WIN32
+#		ifdef GEM_BUILDING_CORE
+#			define GEM_EXPORT __declspec(dllexport)
+#			define GEM_EXPORT_T GEM_EXPORT
+#		else
+#			define GEM_EXPORT __declspec(dllimport)
+#			define GEM_EXPORT_T
 #		endif
-#		define GEM_EXPORT_DLL extern "C" __attribute__ ((visibility("default")))
+#		define GEM_EXPORT_DLL extern "C" __declspec(dllexport)
+#	else
+#		ifdef __GNUC__
+#			ifdef GEM_BUILDING_CORE
+#				define GEM_EXPORT __attribute__ ((visibility("default")))
+#	 		define GEM_EXPORT_T GEM_EXPORT
+#			endif
+#			define GEM_EXPORT_DLL extern "C" __attribute__ ((visibility("default")))
+#		endif
 #	endif
 #endif
 

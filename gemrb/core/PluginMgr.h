@@ -31,6 +31,7 @@
 #include "exports.h"
 #include "globals.h"
 #include "Plugin.h"
+#include "Plugins/ImporterPlugin.h"
 #include "ResourceDesc.h"
 
 #include <cstring>

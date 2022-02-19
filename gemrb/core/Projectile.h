@@ -197,6 +197,17 @@ class GEM_EXPORT Projectile
 {
 public:
 	Projectile() noexcept;
+#if _MSC_VER
+	// GCC doesnt like it if these are defaulted
+	// MSVC doesnt like it if they are not
+	~Projectile() noexcept = default;
+
+	Projectile(const Projectile&) noexcept = default;
+	Projectile(Projectile&&) noexcept = default;
+
+	Projectile& operator=(const Projectile&) noexcept = default;
+	Projectile& operator=(Projectile&&) noexcept = default;
+#endif
 
 	ieWord Speed = 20;
 	ieDword SFlags = PSF_FLYING;
