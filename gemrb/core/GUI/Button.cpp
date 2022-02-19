@@ -722,12 +722,12 @@ void Button::SetHorizontalOverlay(double clip, const Color& src, const Color &de
 	MarkDirty();
 }
 
-void Button::SetAnchor(ieWord x, ieWord y)
+void Button::SetAnchor(int x, int y)
 {
 	Anchor = Point(x,y);
 }
 
-void Button::SetPushOffset(ieWord x, ieWord y)
+void Button::SetPushOffset(int x, int y)
 {
 	PushOffset = Point(x,y);
 }

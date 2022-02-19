@@ -161,9 +161,9 @@ public:
 	/** Sets percent (0-1.0) of width for clipping picture */
 	void SetPictureClipping(double clip)  { Clipping = clip; }
 	/** Set explicit anchor point for text */
-	void SetAnchor(ieWord x, ieWord y);
+	void SetAnchor(int x, int y);
 	/** Set offset pictures and label move when button is pressed */
-	void SetPushOffset(ieWord x, ieWord y);
+	void SetPushOffset(int x, int y);
 
 	bool SetHotKey(KeyboardKey key, short mod = 0, bool global = false);
 	//KeyboardKey GetHotKey() { return hotKey.key; }

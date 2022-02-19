@@ -160,7 +160,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 
 				btn->SetFlags(Flags, BitOp::OR);
 				if (Flags & IE_GUI_BUTTON_ANCHOR) {
-					btn->SetAnchor(x1 | (x2<<8), y1 | (y2<<8));
+					btn->SetAnchor(x1 | (x2 << 8), y1 | (y2 << 8));
 				}
 
 				if (BAMFile == "guictrl" && UnpressedIndex == 0) {
@@ -402,7 +402,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					lab->SetFlags(Label::UseColor, BitOp::OR);
 				}
 				lab->SetColors(textCol, bgCol);
-				int align = IE_FONT_ALIGN_CENTER;
+				unsigned char align = IE_FONT_ALIGN_CENTER;
 				if (( alignment & 0x10 ) != 0) {
 					align = IE_FONT_ALIGN_RIGHT;
 					goto endvertical;
