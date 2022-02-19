@@ -50,7 +50,7 @@ KeyMap::~KeyMap()
 	keymap.RemoveAll(ReleaseFunction);
 }
 
-bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
+bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 {
 	AutoTable kmtable = gamedata->LoadTable(tablefile);
 

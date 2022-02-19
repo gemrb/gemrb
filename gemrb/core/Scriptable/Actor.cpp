@@ -8446,7 +8446,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 {
 	if (!anims) return false;
 
-	AutoTable tab = gamedata->LoadTable(anims->ResRefBase.CString());
+	AutoTable tab = gamedata->LoadTable(anims->ResRefBase);
 	if (!tab) return false;
 
 	switch (index) {
@@ -9532,7 +9532,7 @@ void Actor::SetupFist()
 	}
 }
 
-static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol, ieDword vcol) {
+static ieDword ResolveTableValue(const ResRef& resref, ieDword stat, ieDword mcol, ieDword vcol) {
 	//don't close this table, it can mess with the guiscripts
 	auto tm = gamedata->LoadTable(resref);
 	if (tm) {

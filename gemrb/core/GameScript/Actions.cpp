@@ -3585,7 +3585,7 @@ void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
 
 void GameScript::StartMovie(Scriptable* Sender, Action* parameters)
 {
-	core->PlayMovie( parameters->string0Parameter );
+	core->PlayMovie(parameters->resref0Parameter);
 	Sender->ReleaseCurrentAction(); // should this be blocking?
 }
 
@@ -4644,7 +4644,7 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->resref0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -4657,7 +4657,7 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 
 void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 {
-	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->resref0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -4674,7 +4674,7 @@ void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 
 void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 {
-	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->resref0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -7293,7 +7293,7 @@ void GameScript::SetupWishObject(Scriptable* Sender, Action* parameters)
 //the row label column sets the token names
 void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable tm = gamedata->LoadTable(parameters->string0Parameter);
+	AutoTable tm = gamedata->LoadTable(parameters->resref0Parameter);
 	if (!tm) {
 		Log(ERROR, "Actions", "Cannot find {}.2da.", parameters->string0Parameter);
 		return;

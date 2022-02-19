@@ -147,14 +147,13 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 }
 
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-AutoTable GameData::LoadTable(const char *tabname, bool silent)
+AutoTable GameData::LoadTable(const ResRef& tableRef, bool silent)
 {
-	ResRef resRef = tabname;
-	if (tables.count(resRef)) {
-		return tables.at(resRef);
+	if (tables.count(tableRef)) {
+		return tables.at(tableRef);
 	}
 
-	DataStream* str = GetResource(tabname, IE_2DA_CLASS_ID, silent);
+	DataStream* str = GetResource(tableRef, IE_2DA_CLASS_ID, silent);
 	if (!str) {
 		return nullptr;
 	}
@@ -166,8 +165,8 @@ AutoTable GameData::LoadTable(const char *tabname, bool silent)
 	if (!tm->Open(str)) {
 		return nullptr;
 	}
-	
-	tables[resRef] = tm;
+
+	tables[tableRef] = tm;
 	return tm;
 }
 

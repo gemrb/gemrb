@@ -4726,7 +4726,7 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 int fx_play_movie (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_play_movie(%2d): Resource: %s", fx->Opcode, fx->Resource);
-	core->PlayMovie (fx->Resource);
+	core->PlayMovie(fx->Resource);
 	return FX_NOT_APPLIED;
 }
 // 0x99 Overlay:Sanctuary

@@ -4190,7 +4190,7 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	AutoTable tm = gamedata->LoadTable(parameters->string0Parameter);
+	AutoTable tm = gamedata->LoadTable(parameters->resref0Parameter);
 	if (!tm) {
 		return 0;
 	}

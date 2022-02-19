@@ -378,7 +378,7 @@ static void ReleaseMemoryCRE()
 	shplist.clear();
 }
 
-static void GetSpellTable(const char* tableRef, std::vector<ResRef>& list)
+static void GetSpellTable(const ResRef& tableRef, std::vector<ResRef>& list)
 {
 	AutoTable tab = gamedata->LoadTable(tableRef);
 	if (!tab) return;

@@ -517,7 +517,7 @@ public:
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */
-	int PlayMovie(const char * ResRef);
+	int PlayMovie(const ResRef& movieRef);
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add) const;
 	/** Loads a Game Compiled Script */
@@ -698,7 +698,7 @@ public:
 	/** translates a stat symbol to numeric value */
 	ieDword TranslateStat(const char *stat_name);
 	/** resolves a stat bonus based on multiple stats */
-	int ResolveStatBonus(const Actor *actor, const char *tablename, ieDword flags = 0, int value = 0);
+	int ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieDword flags = 0, int value = 0);
 	/** Opens CD prompt window and waits for the specified disc */
 	void WaitForDisc(int disc_number, const char* path) const;
 	/** Returns the music playlist corresponding to the provided type */

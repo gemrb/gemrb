@@ -625,7 +625,7 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 	int silent = 0;
 	PARSE_ARGS(args, "s|ii", &tablename, &noerror, &silent);
 
-	auto tab = gamedata->LoadTable(tablename, silent > 0);
+	auto tab = gamedata->LoadTable(ResRef(tablename), silent > 0);
 	if (tab == nullptr) {
 		if (noerror) {
 			Py_RETURN_NONE;
@@ -2772,7 +2772,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 	const char *resref;
 	PARSE_ARGS( args,  "s", &resref);
 
-	AutoTable newarea = gamedata->LoadTable(resref);
+	AutoTable newarea = gamedata->LoadTable(ResRef(resref));
 	if (!newarea) {
 		return RuntimeError( "2da not found!\n");
 	}
@@ -2813,7 +2813,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		}
 		unsigned int total = linksto+local;
 
-		AutoTable newlinks = gamedata->LoadTable(ltab);
+		AutoTable newlinks = gamedata->LoadTable(ResRef(ltab));
 		if (!newlinks || total != newlinks->GetRowCount() ) {
 			return RuntimeError( "invalid links 2da!");
 		}
@@ -4370,7 +4370,7 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 	if (flag)
 		ind = 0;
 	if (!ind) {
-		ind = core->PlayMovie( string );
+		ind = core->PlayMovie(ResRef(string));
 	}
 	return PyLong_FromLong(ind);
 }

@@ -2370,19 +2370,19 @@ bool Interface::DelSymbol(unsigned int index)
 	return true;
 }
 /** Plays a Movie */
-int Interface::PlayMovie(const char* resref)
+int Interface::PlayMovie(const ResRef& movieRef)
 {
-	const char *realResRef = resref;
+	ResRef actualMovieRef = movieRef;
 
 	//check whether there is an override for this movie
 	const char *sound_resref = NULL;
 	AutoTable mvesnd = gamedata->LoadTable("mvesnd", true);
 	if (mvesnd) {
-		int row = mvesnd->GetRowIndex(resref);
+		int row = mvesnd->GetRowIndex(movieRef);
 		if (row != -1) {
 			int mvecol = mvesnd->GetColumnIndex("override");
 			if (mvecol != -1) {
-				realResRef = mvesnd->QueryField(row, mvecol);
+				actualMovieRef = mvesnd->QueryField(row, mvecol);
 			}
 			int sndcol = mvesnd->GetColumnIndex("sound_override");
 			if (sndcol != -1) {
@@ -2391,7 +2391,7 @@ int Interface::PlayMovie(const char* resref)
 		}
 	}
 
-	ResourceHolder<MoviePlayer> mp = GetResourceHolder<MoviePlayer>(realResRef);
+	ResourceHolder<MoviePlayer> mp = GetResourceHolder<MoviePlayer>(actualMovieRef);
 	if (!mp) {
 		return -1;
 	}
@@ -2449,7 +2449,7 @@ int Interface::PlayMovie(const char* resref)
 		}
 	};
 
-	AutoTable sttable = gamedata->LoadTable(resref);
+	AutoTable sttable = gamedata->LoadTable(movieRef);
 	Font* font = GetFont(MovieFontResRef);
 	if (sttable && font) {
 		int r = atoi(sttable->QueryField("red", "frame"));
@@ -2457,9 +2457,9 @@ int Interface::PlayMovie(const char* resref)
 		int b = atoi(sttable->QueryField("blue", "frame"));
 
 		if (r || g || b) {
-			mp->SetSubtitles(new IESubtitles(font, resref, Color(r, g, b, 0xff)));
+			mp->SetSubtitles(new IESubtitles(font, movieRef, Color(r, g, b, 0xff)));
 		} else {
-			mp->SetSubtitles(new IESubtitles(font, resref));
+			mp->SetSubtitles(new IESubtitles(font, movieRef));
 		}
 	}
 
@@ -2498,7 +2498,7 @@ int Interface::PlayMovie(const char* resref)
 	if (ambim) ambim->Activate();
 
 	//Setting the movie name to 1
-	vars->SetAt( resref, 1 );
+	vars->SetAt(movieRef, 1);
 	return 0;
 }
 
@@ -4364,9 +4364,9 @@ ieDword Interface::TranslateStat(const char *stat_name)
 // the master table contains the table names (as row names) and the used stat
 // the subtables contain stat value/bonus pairs.
 // Optionally an override stat value can be specified (needed for use in pcfs).
-int Interface::ResolveStatBonus(const Actor *actor, const char *tablename, ieDword flags, int value)
+int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieDword flags, int value)
 {
-	AutoTable mtm = gamedata->LoadTable(tablename);
+	AutoTable mtm = gamedata->LoadTable(tableName);
 	if (!mtm) {
 		Log(ERROR, "Core", "Cannot resolve stat bonus.");
 		return -1;
@@ -4378,14 +4378,14 @@ int Interface::ResolveStatBonus(const Actor *actor, const char *tablename, ieDwo
 	int ret = 0;
 	// tables for additive modifiers of bonus type
 	for (int i = 0; i < count; i++) {
-		tablename = mtm->GetRowName(i);
+		ResRef subTableName = mtm->GetRowName(i);
 		int checkcol = strtosigned<int>(mtm->QueryField(i,1));
 		unsigned int readcol = strtounsigned<unsigned int>(mtm->QueryField(i,2));
 		int stat = TranslateStat(mtm->QueryField(i,0) );
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
 		}
-		auto tm = gamedata->LoadTable(tablename);
+		auto tm = gamedata->LoadTable(subTableName);
 		if (!tm) continue;
 
 		int row;
