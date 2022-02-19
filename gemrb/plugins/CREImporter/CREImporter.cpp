@@ -1286,7 +1286,7 @@ void CREImporter::ReadEffects(Actor *act)
 	str->Seek( EffectsOffset+CREOffset, GEM_STREAM_START );
 
 	for (unsigned int i = 0; i < EffectsCount; i++) {
-		act->fxqueue.AddEffect(GetEffect()); // FIXME: don't reroll dice, time, etc!!
+		act->fxqueue.AddEffect(GetEffect());
 	}
 }
 
