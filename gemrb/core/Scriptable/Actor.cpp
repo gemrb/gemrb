@@ -675,7 +675,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 				}
 			} else if (res.StartsWith("RA_",3)) {//iwd2 only
 				//remove ability
-				int x=atoi(res+3);
+				int x = atoi(res.CString() + 3);
 				actor->spellbook.RemoveSpell(x);
 			}
 		}
