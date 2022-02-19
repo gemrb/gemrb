@@ -114,6 +114,15 @@ strret_t DataStream::WritePoint(const Point &p)
 	return ret;
 }
 
+strret_t DataStream::ReadRegion(Region& r)
+{
+	strret_t ret = ReadScalar<int, ieWord>(r.x);
+	ret += ReadScalar<int, ieWord>(r.y);
+	ret += ReadScalar<int, ieWord>(r.w);
+	ret += ReadScalar<int, ieWord>(r.h);
+	return ret;
+}
+
 strret_t DataStream::ReadLine(void* buf, strpos_t maxlen)
 {
 	// FIXME: eof?
