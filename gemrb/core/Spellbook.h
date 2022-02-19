@@ -175,7 +175,7 @@ public:
 
 	int CountSpells(const char *resref, unsigned int type, int flag) const;
 	/** Check if the spell is in the book */
-	bool KnowSpell(const char *resref) const;
+	bool KnowSpell(const ResRef& resref) const;
 	bool KnowSpell(int spellid) const;
 
 	/** returns a CRESpellMemorization pointer */

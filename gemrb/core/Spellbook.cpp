@@ -296,12 +296,12 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 }
 
 //if resref=="" then it is a knownanyspell
-bool Spellbook::KnowSpell(const char *resref) const
+bool Spellbook::KnowSpell(const ResRef& resref) const
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (const auto spellMemo : spells[i]) {
 			for (const auto knownSpell : spellMemo->known_spells) {
-				if (resref[0] && knownSpell->SpellResRef != resref) {
+				if (knownSpell->SpellResRef != resref) {
 					continue;
 				}
 				return true;
