@@ -619,7 +619,7 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 	}
 	
 	// move familiars
-	game->MoveFamiliars(area.CString(), pos, -1);
+	game->MoveFamiliars(area, pos, -1);
 
 	// don't clear locations!
 }
@@ -1439,7 +1439,7 @@ void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*paramete
 			} else {
 				gle = game->GetSavedLocationEntry(i);
 			}
-			MoveBetweenAreasCore(act, gle->AreaResRef.CString(), gle->Pos, -1, true);
+			MoveBetweenAreasCore(act, gle->AreaResRef, gle->Pos, -1, true);
 		}
 	}
 
@@ -2959,9 +2959,9 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		//set dialog only if we got a row
 		if (pdtable->GetRowIndex( scriptname ) != TableMgr::npos) {
 			if (game->Expansion == GAME_TOB) {
-				resRef = pdtable->QueryField(scriptname, "25JOIN_DIALOG_FILE").c_str();
+				resRef = pdtable->QueryField(scriptname, "25JOIN_DIALOG_FILE");
 			} else {
-				resRef = pdtable->QueryField(scriptname, "JOIN_DIALOG_FILE").c_str();
+				resRef = pdtable->QueryField(scriptname, "JOIN_DIALOG_FILE");
 			}
 			act->SetDialog(resRef);
 		}
@@ -3497,9 +3497,9 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 		ResRef resRef;
 
 		if (core->GetGame()->Expansion == GAME_TOB) {
-			resRef = pdtable->QueryField(scriptname, "25POST_DIALOG_FILE").c_str();
+			resRef = pdtable->QueryField(scriptname, "25POST_DIALOG_FILE");
 		} else {
-			resRef = pdtable->QueryField(scriptname, "POST_DIALOG_FILE").c_str();
+			resRef = pdtable->QueryField(scriptname, "POST_DIALOG_FILE");
 		}
 		act->SetDialog(resRef);
 	}
@@ -4547,7 +4547,7 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 
 	TableMgr::index_t rows = tab->GetRowCount();
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
-		MoveItemCore(tar, Sender, tab->QueryField(i,0).c_str(), 0, IE_INV_ITEM_UNSTEALABLE);
+		MoveItemCore(tar, Sender, tab->QueryField(i,0), 0, IE_INV_ITEM_UNSTEALABLE);
 	}
 }
 
@@ -4563,7 +4563,7 @@ void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 		int j = game->GetPartySize(false);
 		while (j--) {
 			Actor *tar = game->GetPC(j, false);
-			MoveItemCore(tar, Sender, tab->QueryField(i,0).c_str(), 0, IE_INV_ITEM_UNSTEALABLE);
+			MoveItemCore(tar, Sender, tab->QueryField(i,0), 0, IE_INV_ITEM_UNSTEALABLE);
 		}
 	}
 }
@@ -4581,7 +4581,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 		int j = game->GetPartySize(false);
 		while (j--) {
 			Actor *tar = game->GetPC(j, false);
-			int res=MoveItemCore(tar, Sender, tab->QueryField(i,0).c_str(), 0, IE_INV_ITEM_UNSTEALABLE);
+			int res = MoveItemCore(tar, Sender, tab->QueryField(i,0), 0, IE_INV_ITEM_UNSTEALABLE);
 			if (res==MIC_GOTITEM) {
 				j++;
 				count--;
@@ -4592,7 +4592,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	if (count == 1) {
 		// grant the default table item to the Sender in regular games
 		Action *params = new Action(true);
-		params->resref0Parameter = tab->QueryDefault().c_str();
+		params->resref0Parameter = tab->QueryDefault();
 		CreateItem(Sender, params);
 		delete params;
 	}
@@ -4641,7 +4641,7 @@ void GameScript::ExpansionEndCredits(Scriptable *Sender, Action *parameters)
 	if (howOnly) {
 		QuitGame(Sender, parameters);
 	} else {
-		const char* area = "ar2109";
+		static const ResRef area = "ar2109";
 		Point dest(275, 235);
 		const Game* game = core->GetGame();
 		game->MovePCs(area, dest, -1);
@@ -6189,7 +6189,7 @@ void GameScript::PauseGame(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* ip;
-	const char* name = "null";
+	ieVariable name = "null";
 	if (parameters->objects[1]) {
 		name = parameters->objects[1]->objectName;
 		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(name);
@@ -6906,7 +6906,7 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 	if (!pcs) {
 		return;
 	}
-	ieVariable string = pcs->GetRowName(parameters->int0Parameter).c_str();
+	ieVariable string = pcs->GetRowName(parameters->int0Parameter);
 	Actor *actor = core->GetGame()->FindNPC(string);
 	if (!actor) {
 		return;

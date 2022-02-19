@@ -32,9 +32,9 @@ int ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
 	return -1;
 }
 
-ImageFactory* ImageMgr::GetImageFactory(const char* ResRef)
+ImageFactory* ImageMgr::GetImageFactory(const ResRef& ref)
 {
-	ImageFactory* fact = new ImageFactory( ResRef, GetSprite2D() );
+	ImageFactory* fact = new ImageFactory(ref, GetSprite2D());
 	return fact;
 }
 

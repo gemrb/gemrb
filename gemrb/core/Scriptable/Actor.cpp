@@ -311,9 +311,9 @@ static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -
 static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 
 //used by iwd2
-static const ResRef CripplingStrikeRef = { "cripstr" };
-static const ResRef DirtyFightingRef = { "dirty" };
-static const ResRef ArterialStrikeRef = { "artstr" };
+static const ResRef CripplingStrikeRef = "cripstr";
+static const ResRef DirtyFightingRef = "dirty";
+static const ResRef ArterialStrikeRef = "artstr";
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
@@ -613,7 +613,7 @@ void Actor::SetCircleSize()
 
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
 {
-	AutoTable table = gamedata->LoadTable(clab);
+	AutoTable table = gamedata->LoadTable(ResRef(clab));
 	if (!table) return;
 
 	TableMgr::index_t row = table->GetRowCount();
@@ -623,10 +623,10 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 	if (remove) maxLevel -= diff;
 	for(int i=0; i<maxLevel; i++) {
 		for (TableMgr::index_t j = 0; j < row; ++j) {
-			const ResRef res = table->QueryField(j,i).c_str();
+			const ResRef res = table->QueryField(j,i);
 			if (IsStar(res)) continue;
 
-			ResRef clabRef(res.begin() + 3);
+			ResRef clabRef = ResRef(res.begin() + 3);
 			if (res.StartsWith("AP_", 3)) {
 				if (remove) {
 					actor->fxqueue.RemoveAllEffects(clabRef);
@@ -1635,7 +1635,7 @@ static void ReadModalStates()
 
 	ModalStatesStruct ms;
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
-		ms.spell = table->QueryField(i, 0).c_str();
+		ms.spell = table->QueryField(i, 0);
 		strlcpy(ms.action, table->QueryField(i, 1).c_str(), 16);
 		ms.entering_str = table->QueryFieldAsStrRef(i, 2);
 		ms.leaving_str = table->QueryFieldAsStrRef(i, 3);
@@ -1791,17 +1791,17 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("damage");
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
-			const char *tmp = tm->QueryField( i, COL_MAIN ).c_str();
+			ResRef tmp = tm->QueryField( i, COL_MAIN );
 			d_main[i] = tmp;
 			if (IsStar(d_main[i])) {
 				d_main[i].Reset();
 			}
-			tmp = tm->QueryField( i, COL_SPARKS ).c_str();
+			tmp = tm->QueryField(i, COL_SPARKS);
 			d_splash[i] = tmp;
 			if (IsStar(d_splash[i])) {
 				d_splash[i].Reset();
 			}
-			tmp = tm->QueryField( i, COL_GRADIENT ).c_str();
+			tmp = tm->QueryField(i, COL_GRADIENT);
 			d_gradient[i]=atoi(tmp);
 		}
 	}
@@ -1810,7 +1810,7 @@ static void InitActorTables()
 	if (tm) {
 		ieDword mask = 1;
 		for (int i =  0; i < OVERLAY_COUNT; i++) {
-			hc_overlays[i] = tm->QueryField(i, 0).c_str();
+			hc_overlays[i] = tm->QueryField(i, 0);
 			if (tm->QueryFieldSigned<int>( i, 1)) {
 				hc_locations|=mask;
 			}
@@ -1869,7 +1869,7 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("mdfeats", true);
 	if (tm) {
 		for (int i = 0; i < ES_COUNT; i++) {
-			featSpells[i] = tm->QueryField(i, 0).c_str();
+			featSpells[i] = tm->QueryField(i, 0);
 		}
 	}
 
@@ -1941,7 +1941,7 @@ static void InitActorTables()
 			// FIXME: the attempt at skipping doesn't work!
 			const auto& it = IWD2HitTable.find(tohit);
 			if (it == IWD2HitTable.end()) {
-				tht = gamedata->LoadTable(tohit.c_str(), true);
+				tht = gamedata->LoadTable(tohit, true);
 				if (!tht || !tohit[0]) {
 					error("Actor", "TOHIT table for {} does not exist!", classname);
 				}
@@ -2021,7 +2021,7 @@ static void InitActorTables()
 					AppendFormat(buffer, "Classis: {} ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
-					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP").c_str(), true);
+					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP"), true);
 					if (hptm) {
 						int tmphp = 0;
 						TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2074,7 +2074,7 @@ static void InitActorTables()
 						if (!foundwarrior) {
 							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
 								classis==ISBARBARIAN);
-							hptm = gamedata->LoadTable(tm->QueryField(currentname, "HP").c_str(), true);
+							hptm = gamedata->LoadTable(tm->QueryField(currentname, "HP"), true);
 							if (hptm) {
 								int tmphp = 0;
 								TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2311,7 +2311,7 @@ static void InitActorTables()
 				avStance = -1;
 			}
 			for (size_t i = 0; i < avPrefix.size(); i++) {
-				avPrefix[i].avresref = tm->QueryField(i + 1).c_str();
+				avPrefix[i].avresref = tm->QueryField(i + 1);
 				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
 					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0).c_str());
@@ -2478,7 +2478,7 @@ void Actor::PlayCritDamageAnimation(int type)
 	TableMgr::index_t row = tm->FindTableValue (1, type);
 	if (row != TableMgr::npos) {
 		//the animations are listed in column 0
-		AddAnimation(ResRef(tm->QueryField(row, 0).c_str()), -1, 45, AA_PLAYONCE|AA_BLEND);
+		AddAnimation(tm->QueryField(row, 0), -1, 45, AA_PLAYONCE|AA_BLEND);
 	}
 }
 
@@ -3595,7 +3595,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	}
 
 	// there can be several entries to choose from, eg.: NOR103,NOR104,NOR105
-	auto elements = GetElements<const char*>(value);
+	auto elements = GetElements<ResRef>(value);
 	size_t count = elements.size();
 	if (count <= 0) return;
 
@@ -5050,7 +5050,7 @@ void Actor::Resurrect(const Point &destPoint)
 	//clear effects?
 }
 
-static const char *GetVarName(const char *table, int value)
+static const char *GetVarName(const ResRef& table, int value)
 {
 	int symbol = core->LoadSymbol( table );
 	if (symbol!=-1) {
@@ -6154,7 +6154,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 	}
 }
 
-void Actor::SetModalSpell(ieDword state, const char *spell)
+void Actor::SetModalSpell(ieDword state, const ResRef& spell)
 {
 	if (spell) {
 		Modal.Spell = spell;
@@ -8498,7 +8498,7 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 			break;
 	}
 
-	auto elements = GetElements<const char*>(resource);
+	auto elements = GetElements<ResRef>(resource);
 	size_t count = elements.size();
 	if (count == 0) return false;
 
@@ -8661,7 +8661,7 @@ void Actor::dumpQSlots() const
 	Log(DEBUG, "Actor", "{}", buffer3);
 }
 
-void Actor::SetPortrait(const char* portraitRef, int Which)
+void Actor::SetPortrait(const ResRef& portraitRef, int Which)
 {
 	if (!portraitRef) {
 		return;
@@ -8683,7 +8683,7 @@ void Actor::SetPortrait(const char* portraitRef, int Which)
 	}
 }
 
-void Actor::SetSoundFolder(const char *soundset) const
+void Actor::SetSoundFolder(const ieVariable& soundset) const
 {
 	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
 		PCStats->SoundSet = soundset;

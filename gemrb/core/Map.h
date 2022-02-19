@@ -503,7 +503,7 @@ public:
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p) const;
 	
-	ResRef GetScriptRef() const { return GetScriptName().CString(); }
+	ResRef GetScriptRef() const { return GetScriptName(); }
 	
 	int GetHeight(const Point &p) const;
 	Color GetLighting(const Point &p) const;
@@ -652,7 +652,7 @@ public:
 	void TriggerSpawn(Spawn *spawn);
 
 	//move some or all players to a new area
-	void MoveToNewArea(const ResRef &area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const;
+	void MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned int direction, int EveryOne, Actor *actor) const;
 	bool HasWeather() const;
 	int GetWeather() const;
 	void ClearTrap(Actor *actor, ieDword InTrap) const;

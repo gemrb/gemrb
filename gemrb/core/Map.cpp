@@ -222,7 +222,7 @@ private:
 				//difficulty
 				int level = tab->QueryFieldSigned<int>(0, i);
 				for (;j;j--) {
-					resrefs[j - 1] = tab->QueryField(j, i).c_str();
+					resrefs[j - 1] = tab->QueryField(j, i);
 				}
 				ResRef GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i).c_str());
 				vars.emplace(GroupName, SpawnGroup(std::move(resrefs), level));
@@ -405,7 +405,7 @@ ExploredBitmap(FogMapSize(), uint8_t(0x00)), VisibleBitmap(FogMapSize(), uint8_t
 reverb(*this)
 {
 	area = this;
-	MasterArea = core->GetGame()->MasterArea(scriptName.CString());
+	MasterArea = core->GetGame()->MasterArea(scriptName);
 }
 
 Map::~Map(void)
@@ -462,7 +462,7 @@ void Map::AutoLockDoors() const
 	GetTileMap()->AutoLockDoors();
 }
 
-void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const
+void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned int direction, int EveryOne, Actor *actor) const
 {
 	//change loader MOS image here
 	//check worldmap entry, if that doesn't contain anything,
@@ -489,7 +489,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 		return;
 	}
 	const Entrance *ent = nullptr;
-	if (entrance[0]) {
+	if (!entrance.IsEmpty()) {
 		ent = map->GetEntrance( entrance );
 		if (!ent) {
 			Log(ERROR, "Map", "Invalid entrance '{}' for area {}", entrance, area);
@@ -848,11 +848,11 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 			assert(tm);
 			TableMgr::index_t rc = tm->GetRowCount() - 2;
 			while (rc--) {
-				ResRef group = tm->GetRowName(rc+2).c_str();
+				ResRef group = tm->GetRowName(rc+2);
 				refs[group] = {};
 				int i = 0;
 				for (auto& ref : refs[group]) {
-					ref = tm->QueryField(rc + 2, i++).c_str();
+					ref = tm->QueryField(rc + 2, i++);
 				}
 			}
 		}

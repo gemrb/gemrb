@@ -542,8 +542,8 @@ public:
 	void SetLeader(const Actor* actor, int offset = 0);
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
-	void SetPortrait(const char* ResRef, int Which=0);
-	void SetSoundFolder(const char *soundset) const;
+	void SetPortrait(const ResRef&, int Which=0);
+	void SetSoundFolder(const ieVariable& soundset) const;
 	/* Use overrideSet to replace PCStats->SoundSet */
 	std::string GetSoundFolder(int flag, const ResRef& overrideSet) const;
 	
@@ -710,7 +710,7 @@ public:
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate, bool force = true);
 	/* Sets the modal spell after checks */
-	void SetModalSpell(ieDword state, const char *spell);
+	void SetModalSpell(ieDword state, const ResRef& spell);
 	/* casts the modal spell if any */
 	void ApplyModal(const ResRef& modalSpell);
 	/* returns current attack style */

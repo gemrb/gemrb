@@ -530,7 +530,7 @@ void WorldMap::UpdateReachableAreas()
 		ieDword varval = 0;
 		const char *varname = tab->QueryField(idx, 0).c_str();
 		if (game->locals->Lookup(varname, varval) && varval) {
-			const char *areaname = tab->QueryField(idx, 1).c_str();
+			const ResRef areaname = tab->QueryField(idx, 1);
 			SetAreaStatus(areaname, WMP_ENTRY_VISIBLE | WMP_ENTRY_ADJACENT | WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 		}
 	}

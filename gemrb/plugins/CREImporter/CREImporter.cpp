@@ -564,7 +564,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 	}
 	stream->Write( Signature, 8);
 	std::string tmpstr = MBStringFromString(act->GetShortName());
-	stream->WriteVariable(ieVariable(tmpstr.c_str()));
+	stream->WriteVariable(ieVariable(tmpstr));
 	stream->WriteDword(tmpDword); //cre offset (chr header size)
 	stream->WriteDword(CRESize);  //cre size
 

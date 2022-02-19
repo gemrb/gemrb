@@ -530,7 +530,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
-	map->SetScriptName(resRef.CString());
+	map->SetScriptName(resRef);
 	// reset MasterArea, since the script name wasn't available in the constructor
 	map->MasterArea = core->GetGame()->MasterArea(map->GetScriptRef());
 	int idx = GetTrackString(resRef);

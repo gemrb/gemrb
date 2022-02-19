@@ -78,15 +78,13 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 		return;
 	}
 
-	const char *s = inifile->GetKeyAsString("nameless", "destare", DefaultArea);
-	NamelessSpawnArea = s;
-	s = inifile->GetKeyAsString("nameless","point","[0.0]");
+	NamelessSpawnArea = ResRef(inifile->GetKeyAsString("nameless", "destare", DefaultArea));
+	const char* s = inifile->GetKeyAsString("nameless","point","[0.0]");
 	if (sscanf(s, "[%d.%d]", &NamelessSpawnPoint.x, &NamelessSpawnPoint.y) != 2) {
 		NamelessSpawnPoint.reset();
 	}
 
-	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
-	PartySpawnArea = s;
+	PartySpawnArea = ResRef(inifile->GetKeyAsString("nameless", "partyarea", DefaultArea));
 	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
 	if (sscanf(s, "[%d.%d]", &PartySpawnPoint.x, &PartySpawnPoint.y) != 2) {
 		PartySpawnPoint = NamelessSpawnPoint;
@@ -265,7 +263,7 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 	// indexed sequential mode
 	const char *pointSelectVar = iniFile->GetKeyAsString(critterName, "point_select_var", nullptr);
 	if (pointSelectVar) {
-		critter.PointSelectVar = pointSelectVar;
+		critter.PointSelectVar = ieVariable(pointSelectVar);
 	}
 	bool incSpawnPointIndex = iniFile->GetKeyAsBool(critterName, "inc_spawn_point_index", false);
 	if (incSpawnPointIndex && critter.SpawnMode == 'i') {
@@ -405,10 +403,10 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, const char* crit
 
 	// store point and/or orientation in a global var
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
-	if (s) critter.SaveSelectedPoint = s;
+	if (s) critter.SaveSelectedPoint = ieVariable(s);
 
 	s = inifile->GetKeyAsString(crittername,"save_selected_facing",NULL);
-	if (s) critter.SaveSelectedFacing = s;
+	if (s) critter.SaveSelectedFacing = ieVariable(s);;
 
 	//sometimes only the orientation is given, the point is stored in a variable
 	ps = inifile->GetKeyAsInt(crittername,"facing",-1);
@@ -710,7 +708,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	if (critter.ScriptName[0] && (critter.Flags&CF_CHECK_NAME) ) {
 		//maybe this one needs to be using getobjectcount as well
 		//currently we cannot count objects with scriptname???
-		if (map->GetActor(critter.ScriptName.CString(), 0)) {
+		if (map->GetActor(critter.ScriptName, 0)) {
 			return;
 		}
 	} else {
@@ -758,7 +756,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	cre->SetPosition(critter.SpawnPoint, 1, 0);
 	cre->SetOrientation(ClampToOrientation(critter.Orientation), false);
 
-	cre->SetScriptName(critter.ScriptName.CString());
+	cre->SetScriptName(critter.ScriptName);
 
 	//increases death variable
 	if (critter.Flags&CF_DEATHVAR) {

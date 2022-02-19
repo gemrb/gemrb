@@ -370,7 +370,7 @@ Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int fra
 
 Holder<Sprite2D> GameData::GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent)
 {
-	Holder<Sprite2D> img = gamedata->GetBAMSprite(resRef, cycle, frame, silent);
+	Holder<Sprite2D> img = gamedata->GetBAMSprite(ResRef(resRef), cycle, frame, silent);
 	if (img) return img;
 
 	// try static image formats to support PNG
@@ -381,15 +381,17 @@ Holder<Sprite2D> GameData::GetAnySprite(const ResRef& resRef, int cycle, int fra
 	return img;
 }
 
+// FIXME: should this just take a ResRef?
 FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type, bool silent)
 {
-	int fobjindex = factory->IsLoaded(ResRef(resname), type);
+	ResRef resref = ResRef(resname);
+	int fobjindex = factory->IsLoaded(resref, type);
 	// already cached
 	if ( fobjindex != -1)
 		return factory->GetFactoryObject( fobjindex );
 
 	// empty resref
-	if (!resname || !strcmp(resname, "")) return nullptr;
+	if (resref.IsEmpty()) return nullptr;
 
 	switch (type) {
 	case IE_BAM_CLASS_ID:
@@ -401,7 +403,7 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 				return nullptr;
 			}
 
-			AnimationFactory* af = importer->GetAnimationFactory(resname);
+			AnimationFactory* af = importer->GetAnimationFactory(resref);
 			factory->AddFactoryObject( af );
 			return af;
 		}
@@ -411,7 +413,7 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	{
 		ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resname, silent);
 		if (img) {
-			ImageFactory* fact = img->GetImageFactory( resname );
+			ImageFactory* fact = img->GetImageFactory(resref);
 			factory->AddFactoryObject( fact );
 			return fact;
 		}
@@ -823,7 +825,7 @@ int GameData::GetSpecialSpell(const ResRef& resref)
 		TableMgr::index_t specialSpellsCount = table->GetRowCount();
 		SpecialSpells.resize(specialSpellsCount);
 		for (TableMgr::index_t i = 0; i < specialSpellsCount; ++i) {
-			SpecialSpells[i].resref = table->GetRowName(i).c_str();
+			SpecialSpells[i].resref = table->GetRowName(i);
 			SpecialSpells[i].flags = table->QueryFieldSigned<int>(i, 0);
 			SpecialSpells[i].amount = table->QueryFieldSigned<int>(i, 1);
 			SpecialSpells[i].bonus_limit = table->QueryFieldSigned<int>(i, 2);
@@ -869,7 +871,7 @@ const SurgeSpell& GameData::GetSurgeSpell(unsigned int idx)
 
 		SurgeSpell ss;
 		for (TableMgr::index_t i = 0; i < table->GetRowCount(); i++) {
-			ss.spell = table->QueryField(i, 0).c_str();
+			ss.spell = table->QueryField(i, 0);
 			ss.message = table->QueryFieldAsStrRef(i, 1);
 			// comment ignored
 			SurgeSpells.push_back(ss);
@@ -883,7 +885,7 @@ const SurgeSpell& GameData::GetSurgeSpell(unsigned int idx)
 ResRef GameData::GetFist(int cls, int level)
 {
 	static bool ignore = false;
-	static ResRef defaultFist = { "FIST" };
+	static ResRef defaultFist = "FIST";
 	static int cols = 0;
 	if (ignore) {
 		return defaultFist;
@@ -896,7 +898,7 @@ ResRef GameData::GetFist(int cls, int level)
 			return defaultFist;
 		}
 
-		defaultFist = fistWeap->QueryDefault().c_str();
+		defaultFist = fistWeap->QueryDefault();
 		cols = fistWeap->GetColumnCount();
 	}
 
@@ -906,7 +908,7 @@ ResRef GameData::GetFist(int cls, int level)
 	char clsStr[3];
 	snprintf(clsStr, sizeof(clsStr), "%d", cls);
 	TableMgr::index_t row = fistWeap->GetRowIndex(clsStr);
-	return fistWeap->QueryField(row, level).c_str();
+	return fistWeap->QueryField(row, level);
 }
 
 // read from our unhardcoded monk bonus table
@@ -1020,7 +1022,7 @@ ieByte GameData::GetItemAnimation(const ResRef& itemRef)
 		}
 
 		for (TableMgr::index_t i = 0; i < table->GetRowCount(); ++i) {
-			ResRef item = table->GetRowName(i).c_str();
+			ResRef item = table->GetRowName(i);
 			itemAnims[item] = table->QueryFieldUnsigned<ieByte>(i, 0);
 		}
 	}
@@ -1051,7 +1053,7 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 		itemUse.resize(tableCount);
 		for (TableMgr::index_t i = 0; i < tableCount; i++) {
 			itemUse[i].stat = static_cast<ieByte>(core->TranslateStat(table->QueryField(i, 0).c_str()));
-			itemUse[i].table = table->QueryField(i, 1).c_str();
+			itemUse[i].table = table->QueryField(i, 1);
 			itemUse[i].mcol = table->QueryFieldUnsigned<ieByte>(i, 2);
 			itemUse[i].vcol = table->QueryFieldUnsigned<ieByte>(i, 3);
 			itemUse[i].which = table->QueryFieldUnsigned<ieByte>(i, 4);

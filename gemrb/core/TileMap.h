@@ -77,7 +77,7 @@ public:
 	InfoPoint* AdjustNearestTravel(Point &p);
 	size_t GetInfoPointCount() const { return infoPoints.size(); }
 
-	TileObject* AddTile(const char* ID, const char* Name, unsigned int Flags,
+	TileObject* AddTile(const ResRef& ID, const char* Name, unsigned int Flags,
 		unsigned short* openindices, int opencount,unsigned short* closeindices, int closecount);
 	TileObject* GetTile(unsigned int idx);
 	TileObject* GetTile(const char* Name);
