@@ -94,26 +94,6 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 	return false;
 }
 
-bool ResourceManager::Exists(const ResRef &resRef, SClass_ID type, bool silent) const
-{
-	return Exists(resRef.CString(), type, silent);
-}
-
-bool ResourceManager::Exists(const ResRef &resRef, const TypeID *type, bool silent) const
-{
-	return Exists(resRef.CString(), type, silent);
-}
-
-DataStream* ResourceManager::GetResource(const ResRef &resname, SClass_ID type, bool silent) const
-{
-	return GetResource(resname.CString(), type, silent);
-}
-
-Resource* ResourceManager::GetResource(const ResRef &resname, const TypeID *type, bool silent, bool useCorrupt) const
-{
-	return GetResource(resname.CString(), type, silent, useCorrupt);
-}
-
 DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, bool silent) const
 {
 	if (!ResRef || ResRef[0] == '\0')
