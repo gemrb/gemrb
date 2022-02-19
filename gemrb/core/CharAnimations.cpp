@@ -213,7 +213,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		}
 	}
 
-	AutoTable avatarShadows = gamedata->LoadTable("avatar_shadows");
+	AutoTable avatarShadows = gamedata->LoadTable("shadows");
 	if (avatarShadows) {
 		int rows = avatarShadows->GetRowCount();
 		for (int i = 0; i < rows; ++i) {
