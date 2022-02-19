@@ -1799,9 +1799,12 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 }
 
 bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
-	Actor *haskey = NULL;
+	if (KeyResRef.IsEmpty()) {
+		return false;
+	}
 
-	if (!KeyResRef.IsEmpty() && actor->InParty) {
+	Actor* haskey = nullptr;
+	if (actor->InParty) {
 		const Game *game = core->GetGame();
 		//allow unlock when the key is on any partymember
 		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
@@ -1813,11 +1816,9 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 				break;
 			}
 		}
-	} else if (!KeyResRef.IsEmpty()) {
-		//actor is not in party, check only actor
-		if (actor->inventory.HasItem(KeyResRef,0)) {
-			haskey = actor;
-		}
+	// actor is not in party, check only actor
+	} else if (actor->inventory.HasItem(KeyResRef, 0)) {
+		haskey = actor;
 	}
 
 	if (!haskey) {
