@@ -237,6 +237,12 @@ public:
 	iterator end() noexcept {
 		return &str[LEN + 1];
 	}
+
+	template<size_t N> FixedSizeString<N, CMP> SubStr(size_t pos) {
+		static_assert(N <= LEN, "Substring must not exceed the original length.");
+		assert(pos + LEN <= N);
+		return FixedSizeString<N, CMP>{CString() + pos};
+	}
 };
 
 }
