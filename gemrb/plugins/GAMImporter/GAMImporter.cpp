@@ -510,7 +510,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	for (int i = 0; i < MAX_QSLOTS; i++) {
 		ps->QuickSpells[i] = pcInfo.QuickSpellResRef[i];
 	}
-	memcpy(ps->QuickSpellClass, pcInfo.QuickSpellClass, MAX_QSLOTS );
+	memcpy(ps->QuickSpellBookType, pcInfo.QuickSpellClass, MAX_QSLOTS);
 	memcpy(ps->QuickWeaponSlots, pcInfo.QuickWeaponSlot, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
 	memcpy(ps->QuickWeaponHeaders, pcInfo.QuickWeaponHeader, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
 	memcpy(ps->QuickItemSlots, pcInfo.QuickItemSlot, MAX_QUICKITEMSLOT*sizeof(ieWord) );
@@ -953,7 +953,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	//quickspells
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
-			if (ac->PCStats->QuickSpellClass[i] >= 0xfe) {
+			if (ac->PCStats->QuickSpellBookType[i] >= 0xfe) {
 				stream->WriteFilling(8);
 			} else {
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
@@ -962,7 +962,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 		//quick spell classes, clear the field for iwd2 if it is
 		//a bard song/innate slot (0xfe or 0xff)
 		char filling[10] = {};
-		memcpy(filling, ac->PCStats->QuickSpellClass, MAX_QSLOTS);
+		memcpy(filling, ac->PCStats->QuickSpellBookType, MAX_QSLOTS);
 		if (GAMVersion == GAM_VER_IWD2) {
 			for (int i = 0; i < MAX_QSLOTS; i++) {
 				if((ieByte) filling[i]>=0xfe) {
@@ -1000,14 +1000,14 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	//innates, bard songs and quick slots are saved only in iwd2
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
-			if (ac->PCStats->QuickSpellClass[i] == 0xff) {
+			if (ac->PCStats->QuickSpellBookType[i] == 0xff) {
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			} else {
 				stream->WriteFilling(8);
 			}
 		}
 		for (int i = 0; i < MAX_QSLOTS; i++) {
-			if (ac->PCStats->QuickSpellClass[i] == 0xfe) {
+			if (ac->PCStats->QuickSpellBookType[i] == 0xfe) {
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			} else {
 				stream->WriteFilling(8);

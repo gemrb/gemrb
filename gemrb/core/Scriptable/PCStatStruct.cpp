@@ -48,7 +48,7 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	for (int i = 0; i < MAX_QSLOTS; i++) {
 		QuickSpells[i] = source.QuickSpells[i];
 	}
-	memcpy(QuickSpellClass, source.QuickSpellClass, sizeof(QuickSpellClass));
+	memcpy(QuickSpellBookType, source.QuickSpellBookType, sizeof(QuickSpellBookType));
 	memcpy(QuickItemSlots, source.QuickItemSlots, sizeof(QuickItemSlots));
 	memcpy(QuickItemHeaders, source.QuickItemHeaders, sizeof(QuickItemHeaders));
 	memcpy(QuickWeaponSlots, source.QuickWeaponSlots, sizeof(QuickWeaponSlots));

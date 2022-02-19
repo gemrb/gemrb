@@ -133,7 +133,7 @@ public:
 	ieWord    QuickItemSlots[MAX_QUICKITEMSLOT] {0xffff};           //pst has 5, others use only 3
 	ieWord    QuickItemHeaders[MAX_QUICKITEMSLOT] {0xffff};
 	ieByte    QSlots[GUIBT_COUNT] {0xff, 0};          //iwd2 specific
-	ieByte    QuickSpellClass[MAX_QSLOTS] {0xff};
+	ieByte    QuickSpellBookType[MAX_QSLOTS] { 0xff };
 	StateArray States;
 	ieDword   LastLeft = 0;   //trigger
 	ieDword   LastJoined = 0; //trigger

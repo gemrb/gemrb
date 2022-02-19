@@ -11216,7 +11216,7 @@ static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	actor->PCStats->QuickSpells[slot] = spelldata.spellName;
-	actor->PCStats->QuickSpellClass[slot] = type;
+	actor->PCStats->QuickSpellBookType[slot] = type;
 
 	return PyLong_FromLong(spelldata.Target);
 }
@@ -11519,7 +11519,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			//return RuntimeError( "Actor has no quickslots!\n" );
 			Py_RETURN_NONE;
 		}
-		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellClass[spell]);
+		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellBookType[spell]);
 	} else {
 		ieDword ActionLevel = 0;
 		core->GetDictionary()->Lookup("ActionLevel", ActionLevel);

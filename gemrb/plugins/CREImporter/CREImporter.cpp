@@ -586,7 +586,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 		//NOTE: the gemrb internal format stores
 		//0xff or 0xfe in case of innates and bardsongs
 		char filling[10] = {};
-		memcpy(filling,act->PCStats->QuickSpellClass,MAX_QSLOTS);
+		memcpy(filling,act->PCStats->QuickSpellBookType,MAX_QSLOTS);
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if ( (ieByte) filling[i]>=0xfe) filling[i]=0;
 		}
@@ -604,14 +604,14 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 	case IE_CRE_V2_2:
 		//gemrb format doesn't save these redundantly
 		for (int i = 0; i < QSPCount; i++) {
-			if (act->PCStats->QuickSpellClass[i]==0xff) {
+			if (act->PCStats->QuickSpellBookType[i] == 0xff) {
 				stream->WriteResRef (act->PCStats->QuickSpells[i]);
 			} else {
 				stream->WriteFilling(8);
 			}
 		}
 		for (int i = 0; i < QSPCount; i++) {
-			if (act->PCStats->QuickSpellClass[i]==0xfe) {
+			if (act->PCStats->QuickSpellBookType[i] == 0xfe) {
 				stream->WriteResRef (act->PCStats->QuickSpells[i]);
 			} else {
 				stream->WriteFilling(8);
@@ -676,7 +676,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 		str->ReadResRef (act->PCStats->QuickSpells[i]);
 	}
 	if (QSPCount==9) {
-		str->Read (act->PCStats->QuickSpellClass,9);
+		str->Read(act->PCStats->QuickSpellBookType, 9);
 		str->Read (&tmpByte, 1);
 	}
 	for (int i = 0; i < QITCount; i++) {
@@ -693,18 +693,19 @@ void CREImporter::ReadChrHeader(Actor *act)
 	switch (CREVersion) {
 	case IE_CRE_V2_2:
 		//gemrb format doesn't save these redundantly
+		// quick innates and quick songs
 		for (int i = 0; i < QSPCount; i++) {
 			str->ReadResRef(spell);
-			// FIXME: why is this needed or why do we overwrite it immediately after?
+			// there's a fixed number of buttons, so we can save some space by storing both types in the same field
 			if (!spell.IsEmpty()) {
-				act->PCStats->QuickSpellClass[i]=0xff;
+				act->PCStats->QuickSpellBookType[i] = 0xff;
 				act->PCStats->QuickSpells[i] = spell;
 			}
 		}
 		for (int i = 0; i < QSPCount; i++) {
 			str->ReadResRef(spell);
 			if (!spell.IsEmpty()) {
-				act->PCStats->QuickSpellClass[i]=0xfe;
+				act->PCStats->QuickSpellBookType[i] = 0xfe;
 				act->PCStats->QuickSpells[i] = spell;
 			}
 		}
