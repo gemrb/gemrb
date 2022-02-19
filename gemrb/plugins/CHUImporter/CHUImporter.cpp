@@ -471,7 +471,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_LABEL:
 				GetLabel(str, ctrl, ctrlFrame);
 				break;
-			break;
 			case IE_GUI_SCROLLBAR:
 				GetScrollbar(str, ctrl, ctrlFrame, win, controlID);
 				break;
