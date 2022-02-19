@@ -41,8 +41,8 @@ using namespace GemRB;
 bool CHUImporter::Import(DataStream* str)
 {
 	char Signature[8];
-	str->Read( Signature, 8 );
-	if (strncmp( Signature, "CHUIV1  ", 8 ) != 0) {
+	str->Read(Signature, 8);
+	if (strncmp(Signature, "CHUIV1  ", 8) != 0) {
 		Log(ERROR, "CHUImporter", "Not a Valid CHU File");
 		return false;
 	}
@@ -499,8 +499,8 @@ bool CHUImporter::LoadWindowPack(const ScriptingGroup_t& ref)
 		return true; // already loaded
 	}
 
-	DataStream* stream = gamedata->GetResource( ref, IE_CHU_CLASS_ID );
-	if (stream == NULL) {
+	DataStream* stream = gamedata->GetResource(ref, IE_CHU_CLASS_ID);
+	if (stream == nullptr) {
 		Log(ERROR, "CHUImporter", "Error: Cannot find {}.chu!", ref);
 		return false;
 	}
