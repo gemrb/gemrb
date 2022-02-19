@@ -2015,14 +2015,12 @@ bool IsInObjectRect(const Point &pos, const Region &rect)
 	}
 }
 
-#define MEMCPY(a,b) memcpy((a),(b),sizeof(a) )
-
 static Object *ObjectCopy(const Object *object)
 {
 	if (!object) return NULL;
 	Object *newObject = new Object();
-	MEMCPY( newObject->objectFields, object->objectFields );
-	MEMCPY( newObject->objectFilters, object->objectFilters );
+	memcpy(newObject->objectFields, object->objectFields, sizeof(newObject->objectFields));
+	memcpy(newObject->objectFilters, object->objectFilters, sizeof(newObject->objectFilters));
 	newObject->objectRect = object->objectRect;
 	newObject->objectName = object->objectName;
 	return newObject;
