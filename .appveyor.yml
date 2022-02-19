@@ -125,4 +125,4 @@ artifacts:
 deploy_script:
 - cmd: |-
     cd c:\projects\gemrb
-    scp -v -oStrictHostKeyChecking=no -i testing\id_travissfbot.av gemrb*.zip gemrb-travisbot@frs.sourceforge.net:'"/home/frs/project/gemrb/Buildbot Binaries/Windows/AppVeyor/"'
+    scp -v -oStrictHostKeyChecking=no -i testing\id_travissfbot.av gemrb*.zip gemrb-travisbot@frs.sourceforge.net:'/home/frs/project/gemrb/Buildbot\ Binaries/Windows/AppVeyor/'
