@@ -836,9 +836,9 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	Actor* ab;
 	if (flags & CC_STRING1) {
-		ab = gamedata->GetCreature(parameters->string1Parameter);
+		ab = gamedata->GetCreature(parameters->resref1Parameter);
 	} else {
-		ab = gamedata->GetCreature(parameters->string0Parameter);
+		ab = gamedata->GetCreature(parameters->resref0Parameter);
 	}
 
 	if (!ab) {
@@ -953,9 +953,9 @@ void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, con
 }
 
 //this destroys the current actor and replaces it with another
-void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
+void ChangeAnimationCore(Actor* src, const ResRef& replacement, bool effect)
 {
-	Actor *tar = gamedata->GetCreature(resref);
+	Actor* tar = gamedata->GetCreature(replacement);
 	if (tar) {
 		Map *map = src->GetCurrentArea();
 		Point pos = src->Pos;

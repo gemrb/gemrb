@@ -5869,7 +5869,7 @@ void GameScript::ChangeAnimation(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	ChangeAnimationCore(actor, parameters->string0Parameter, true);
+	ChangeAnimationCore(actor, parameters->resref0Parameter, true);
 }
 
 void GameScript::ChangeAnimationNoEffect(Scriptable* Sender, Action* parameters)
@@ -5878,7 +5878,7 @@ void GameScript::ChangeAnimationNoEffect(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	ChangeAnimationCore(actor, parameters->string0Parameter, false);
+	ChangeAnimationCore(actor, parameters->resref0Parameter, false);
 }
 
 void GameScript::Polymorph(Scriptable* Sender, Action* parameters)

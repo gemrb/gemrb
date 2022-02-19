@@ -3191,7 +3191,7 @@ void Map::LoadIniSpawn()
 	}
 }
 
-bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, ieWord rwdist, int *difficulty, unsigned int *creCount)
+bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, int radiusx, int radiusy, ieWord rwdist, int* difficulty, unsigned int* creCount)
 {
 	bool spawned = false;
 	const SpawnGroup *sg = nullptr;
@@ -3209,7 +3209,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	}
 
 	while (count--) {
-		Actor *creature = gamedata->GetCreature(sg ? (*sg)[count].CString() : creResRef);
+		Actor* creature = gamedata->GetCreature(sg ? (*sg)[count] : creResRef);
 		if (!creature) {
 			continue;
 		}

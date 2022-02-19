@@ -75,7 +75,7 @@ void CreateVisualEffectCore(Actor* target, const ResRef& effect, int iterations)
 void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, const ResRef& effect, int iterations);
 void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool trap);
 void BeginDialog(Scriptable* Sender, const Action* parameters, int flags);
-void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
+void ChangeAnimationCore(Actor* src, const ResRef& replacement, bool effect);
 void PolymorphCopyCore(const Actor *src, Actor *tar);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag, int count = 0);

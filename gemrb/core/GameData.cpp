@@ -91,9 +91,9 @@ void GameData::ClearCaches()
 	}
 }
 
-Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
+Actor* GameData::GetCreature(const ResRef& creature, unsigned int PartySlot)
 {
-	DataStream* ds = GetResource( ResRef, IE_CRE_CLASS_ID );
+	DataStream* ds = GetResource(creature, IE_CRE_CLASS_ID);
 	auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, ds);
 	if (!actormgr) {
 		return 0;
@@ -102,15 +102,15 @@ Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 	return actor;
 }
 
-int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool character, int VersionOverride)
+int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool character, int VersionOverride)
 {
 	DataStream *stream;
 
 	Actor* actor;
 	if (character) {
-		char nPath[_MAX_PATH], fName[16];
-		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
-		PathJoin(nPath, core->config.GamePath, "characters", fName, nullptr);
+		char nPath[_MAX_PATH];
+		std::string file = fmt::format("{}.chr", creature);
+		PathJoin(nPath, core->config.GamePath, "characters", file.c_str(), nullptr);
 		stream = FileStream::OpenFile(nPath);
 		auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, stream);
 		if (!actormgr) {
@@ -118,7 +118,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		}
 		actor = actormgr->GetActor(PartySlot);
 	} else {
-		actor = GetCreature(ResRef, PartySlot);
+		actor = GetCreature(creature, PartySlot);
 	}
 
 	if ( !actor ) {
@@ -333,21 +333,21 @@ ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef &effect, bool dou
 	return ret;
 }
 
-VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
+VEFObject* GameData::GetVEFObject(const ResRef& vefRef, bool doublehint)
 {
-	VEFObject *ret = NULL;
+	VEFObject* ret = nullptr;
 
-	if (Exists( effect, IE_VEF_CLASS_ID, true ) ) {
-		DataStream *ds = GetResource( effect, IE_VEF_CLASS_ID );
+	if (Exists(vefRef, IE_VEF_CLASS_ID, true)) {
+		DataStream* ds = GetResource(vefRef, IE_VEF_CLASS_ID);
 		ret = new VEFObject();
-		ret->ResName = effect;
+		ret->ResName = vefRef;
 		ret->LoadVEF(ds);
 	} else {
-		if (Exists( effect, IE_2DA_CLASS_ID, true ) ) {
+		if (Exists(vefRef, IE_2DA_CLASS_ID, true)) {
 			ret = new VEFObject();
-			ret->Load2DA(effect);
+			ret->Load2DA(vefRef);
 		} else {
-			ScriptedAnimation *sca = GetScriptedAnimation(effect, doublehint);
+			ScriptedAnimation* sca = GetScriptedAnimation(vefRef, doublehint);
 			if (sca) {
 				ret = new VEFObject(sca);
 			}
@@ -371,7 +371,7 @@ Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int fra
 	return tspr;
 }
 
-Holder<Sprite2D> GameData::GetAnySprite(const char *resRef, int cycle, int frame, bool silent)
+Holder<Sprite2D> GameData::GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent)
 {
 	Holder<Sprite2D> img = gamedata->GetBAMSprite(resRef, cycle, frame, silent);
 	if (img) return img;

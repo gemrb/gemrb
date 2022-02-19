@@ -97,9 +97,9 @@ public:
 	void ClearCaches();
 
 	/** Returns actor */
-	Actor *GetCreature(const char *ResRef, unsigned int PartySlot=0);
+	Actor* GetCreature(const ResRef& creature, unsigned int PartySlot = 0);
 	/** Returns a PC index, by loading a creature */
-	int LoadCreature(const char *ResRef, unsigned int PartySlot, bool character=false, int VersionOverride=-1);
+	int LoadCreature(const ResRef& creature, unsigned int PartySlot, bool character = false, int VersionOverride = -1);
 
 
 	// 2DA table functions.
@@ -122,13 +122,13 @@ public:
 	ScriptedAnimation* GetScriptedAnimation(const ResRef &resRef, bool doublehint);
 
 	/** creates a composite vef/2da animation */
-	VEFObject* GetVEFObject( const char *ResRef, bool doublehint);
+	VEFObject* GetVEFObject(const ResRef& vefRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
 	Holder<Sprite2D> GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent=false);
 
 	/* returns a single BAM or static image sprite, checking in that order */
-	Holder<Sprite2D> GetAnySprite(const char *resRef, int cycle, int frame, bool silent = true);
+	Holder<Sprite2D> GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent = true);
 
 	/** returns factory resource, currently works only with animations */
 	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type, bool silent=false);

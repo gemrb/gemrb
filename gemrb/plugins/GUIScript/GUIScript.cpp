@@ -5464,7 +5464,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	}
 	if (CreResRef[0]) {
 		char* encoded = ConvertCharEncoding(CreResRef, "UTF-8", core->SystemEncoding);
-		PlayerSlot = gamedata->LoadCreature(encoded, Slot, (bool) Import, VersionOverride);
+		PlayerSlot = gamedata->LoadCreature(ResRef(encoded), Slot, (bool) Import, VersionOverride);
 		free(encoded);
 	} else {
 		//just destroyed the previous actor, not going to create one
@@ -9972,10 +9972,10 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 	GET_MAP();
 
 	if (PosX!=-1 && PosY!=-1) {
-		map->SpawnCreature(Point(PosX, PosY), CreResRef);
+		map->SpawnCreature(Point(PosX, PosY), ResRef(CreResRef));
 	} else {
 		GET_ACTOR_GLOBAL();
-		map->SpawnCreature(actor->Pos, CreResRef, 10, 10);
+		map->SpawnCreature(actor->Pos, ResRef(CreResRef), 10, 10);
 	}
 	Py_RETURN_NONE;
 }
