@@ -22,16 +22,16 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-    - name: Analysis and tooling cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.sonar
-        key: ${{ runner.os }}-sonar-cache-${{ github.ref }}-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-sonar-cache-${{ github.ref }}-
-          ${{ runner.os }}-sonar-cache-refs/heads/master-
-          ${{ runner.os }}-sonar-cache-
+      - name: Analysis and tooling cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.sonar
+          key: ${{ runner.os }}-sonar-cache-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-sonar-cache-${{ github.ref }}-
+            ${{ runner.os }}-sonar-cache-refs/heads/master-
+            ${{ runner.os }}-sonar-cache-
 
       - name: Download (if needed) and set up sonar-scanner
         env:
