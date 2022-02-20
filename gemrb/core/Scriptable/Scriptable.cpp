@@ -806,7 +806,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 	//it creates every projectile of the affected actor twice
 	int projectileCount = 1;
 	if (caster) {
-		if (spl->Flags&SF_HOSTILE) {
+		if (spl->Flags & (SF_HOSTILE | SF_BREAK_SANCTUARY)) {
 			caster->CureSanctuary();
 		}
 

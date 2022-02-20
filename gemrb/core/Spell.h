@@ -39,7 +39,7 @@ class Projectile;
 
 //values for Spell usability Flags
 
-#define SF_BREAK_SANCTUARY	0x200 // TODO: EE bit to force the removal of any fx_set_sanctuary_state effects
+#define SF_BREAK_SANCTUARY	0x200 // EE bit to force the removal of any fx_set_sanctuary_state effects
 #define SF_HOSTILE	0x400 // bit 18
 #define SF_NO_LOS	0x800
 // unknown Allow spotting  0x1000
