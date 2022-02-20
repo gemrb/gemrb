@@ -849,7 +849,7 @@ static int check_type(Actor *actor, const Effect& fx)
 
 	//decrementing immunity checks
 	//decrementing level immunity
-	if (fx.Power) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx.Power));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
@@ -888,7 +888,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	//if the spelltrap effect already absorbed enough levels
 	//but still didn't get removed, it will absorb levels it shouldn't
 	//it will also absorb multiple spells in a single round
-	if (fx.Power) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx.Power));
 		if( efx) {
 			//storing the absorbed spell level
@@ -904,7 +904,11 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 
-	//bounce checks
+	// bounce checks; skip all if this is set
+	if (fx.Resistance == FX_NO_RESIST_BYPASS_BOUNCE) {
+		return 1;
+	}
+
 	if (fx.Power) {
 		if ((bounce & BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx.Power)) {
 			Log(DEBUG, "EffectQueue", "Bounced by level");
