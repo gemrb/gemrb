@@ -72,7 +72,8 @@ class FixedSizeString {
 	char str[LEN + 1] {'\0'};
 	
 public:
-	static constexpr size_t Size = LEN;
+	using index_t = uint8_t;
+	static constexpr index_t Size = LEN;
 	using iterator = char*;
 	using const_iterator = const char*;
 	// ResRef is case insensitive, but the originals weren't always
@@ -82,7 +83,7 @@ public:
 		if (!str) return FixedSizeString();
 
 		FixedSizeString fss;
-		uint8_t count = LEN;
+		index_t count = LEN;
 		auto dest = fss.begin();
 		while(count--) {
 			*dest++ = std::towlower(*str);
@@ -98,7 +99,7 @@ public:
 		if (!str) return FixedSizeString();
 		
 		FixedSizeString fss;
-		uint8_t count = LEN;
+		index_t count = LEN;
 		auto dest = fss.begin();
 		while(count--) {
 			*dest++ = std::towupper(*str);
@@ -145,11 +146,11 @@ public:
 	FixedSizeString& operator=(const FixedSizeString&) noexcept = default;
 	
 	// remove trailing spaces
-	uint8_t RTrim() {
-		uint8_t len = CStrLen();
-		uint8_t i = 0;
+	index_t RTrim() {
+		index_t len = CStrLen();
+		index_t i = 0;
 		for (; i < len; ++i) {
-			uint8_t idx = len - i - 1;
+			index_t idx = len - i - 1;
 			if (std::isspace(str[idx])) str[idx] = '\0';
 			else break;
 		}
@@ -167,21 +168,19 @@ public:
 	
 	template <typename STR>
 	void Append(const STR& s) {
-		uint8_t len = CStrLen();
+		index_t len = CStrLen();
 		strncpy(str + len, std::begin(s), LEN - len);
 	}
-	
+
 	template<typename T>
 	typename std::enable_if<std::is_integral<T>::value, const char&>::type
 	operator[](T i) const noexcept {
-		assert(i < static_cast<T>(LEN));
 		return str[i];
 	}
-	
+
 	template<typename T>
 	typename std::enable_if<std::is_integral<T>::value, char&>::type
 	operator[](T i) noexcept {
-		assert(i < static_cast<T>(LEN));
 		return str[i];
 	}
 	
@@ -209,11 +208,11 @@ public:
 		return CMP(str, other.str, LEN) < 0;
 	}
 	
-	bool StartsWith(const char* cstr, size_t len) const noexcept {
+	bool StartsWith(const char* cstr, index_t len) const noexcept {
 		return CMP(str, cstr, len) == 0;
 	}
 	
-	uint8_t CStrLen() const noexcept {
+	index_t CStrLen() const noexcept {
 		return strnlen(str, sizeof(str));
 	}
 	
@@ -253,7 +252,7 @@ public:
 		return &str[LEN + 1];
 	}
 
-	template<size_t N> FixedSizeString<N, CMP> SubStr(size_t pos) {
+	template<index_t N> FixedSizeString<N, CMP> SubStr(index_t pos) {
 		static_assert(N <= LEN, "Substring must not exceed the original length.");
 		assert(pos + LEN <= N);
 		return FixedSizeString<N, CMP>{CString() + pos};
