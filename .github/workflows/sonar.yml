@@ -1,0 +1,65 @@
+name: Sonar checkup
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SONAR_SCANNER_VERSION: 4.4.0.2170
+      SONAR_SERVER_URL: "https://sonarcloud.io"
+    steps:
+      - name: Install dependencies
+        run: |
+          set -x
+          sudo apt-get update
+          sudo apt-get install libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 libvlc-dev libvorbis-dev python3-dev
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+    - name: Analysis and tooling cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.sonar
+        key: ${{ runner.os }}-sonar-cache-${{ github.ref }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-sonar-cache-${{ github.ref }}-
+          ${{ runner.os }}-sonar-cache-refs/heads/master-
+          ${{ runner.os }}-sonar-cache-
+
+      - name: Download (if needed) and set up sonar-scanner
+        env:
+          SONAR_SCANNER_DOWNLOAD_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
+        run: |
+          mkdir -p ~/.sonar/cache
+          if [[ ! -d ~/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux ]]; then
+            curl -sSLo ~/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} 
+            rm -rf ~/.sonar/sonar-scanner*
+            unzip -o ~/.sonar/sonar-scanner.zip -d ~/.sonar/
+          fi
+          echo "~/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
+
+      - name: Run CMake
+        run: cmake -DINSOURCEBUILD=1 -DDISABLE_WERROR=1 -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
+
+      - name: Run sonar-scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          sonar-scanner
+          -Dsonar.host.url="${{ env.SONAR_SERVER_URL }}"
+          -Dsonar.cfamily.compile-commands=compile_commands.json
+          -Dsonar.projectKey=gemrb_gemrb
+          -Dsonar.organization=gemrb
+          -Dsonar.sources=gemrb
+          -Dsonar.cfamily.threads=2
+          -Dsonar.cfamily.cache.enabled=true
+          -Dsonar.cfamily.cache.path=~/.sonar/cache
+          -Dsonar.python.version=3.3
