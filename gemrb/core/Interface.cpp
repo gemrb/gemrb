@@ -2383,7 +2383,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		if (row != TableMgr::npos) {
 			TableMgr::index_t mvecol = mvesnd->GetColumnIndex("override");
 			if (mvecol != TableMgr::npos) {
-				actualMovieRef = mvesnd->QueryField(row, mvecol).c_str();
+				actualMovieRef = mvesnd->QueryField(row, mvecol);
 			}
 			TableMgr::index_t sndcol = mvesnd->GetColumnIndex("sound_override");
 			if (sndcol != TableMgr::npos) {

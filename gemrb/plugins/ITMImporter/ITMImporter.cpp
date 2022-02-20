@@ -221,7 +221,7 @@ Item* ITMImporter::GetItem(Item *s)
 		//all non pst
 		TableMgr::index_t row = dialogTable->GetRowIndex(s->Name);
 		s->DialogName = dialogTable->QueryFieldAsStrRef(row, 0);
-		s->Dialog = dialogTable->QueryField(row, 1).c_str();
+		s->Dialog = dialogTable->QueryField(row, 1);
 	} else {
 		s->DialogName = ieStrRef::INVALID;
 		s->Dialog.Reset();

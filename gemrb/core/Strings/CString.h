@@ -88,16 +88,11 @@ public:
 	FixedSizeString& operator=(std::nullptr_t) noexcept = delete;
 	
 	explicit FixedSizeString(const char* cstr) noexcept {
-		operator=(cstr);
-	}
-	
-	FixedSizeString& operator=(const char* c) noexcept {
-		if (c) {
-			strncpy(str, c, LEN);
+		if (cstr) {
+			strncpy(str, cstr, LEN);
 		} else {
 			std::fill(begin(), end(), '\0');
 		}
-		return *this;
 	}
 	
 	template<typename STR, ENABLE_CHAR_RANGE>

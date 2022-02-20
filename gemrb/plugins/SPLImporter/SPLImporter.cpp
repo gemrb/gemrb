@@ -41,9 +41,9 @@ static void Initializer()
 	gamedata->castingHits.resize(count);
 	gamedata->castingSounds.resize(count);
 	for (TableMgr::index_t i = 0; i < count; i++) {
-		gamedata->castingGlows[i] = tm->QueryField(i, 0).c_str();
+		gamedata->castingGlows[i] = tm->QueryField(i, 0);
 		gamedata->castingSounds[i] = tm->QueryFieldSigned<int>(i, 1);
-		gamedata->castingHits[i] = tm->QueryField(i, 2).c_str();
+		gamedata->castingHits[i] = tm->QueryField(i, 2);
 		// * marks an empty resource
 		if (IsStar(gamedata->castingGlows[i])) {
 			gamedata->castingGlows[i].Reset();
