@@ -29,7 +29,7 @@
 #define IE_TYPES_H
 
 #include "Platform.h"
-#include "Strings/StringConversion.h"
+#include "Strings/CString.h"
 
 #include <cstdint>
 
@@ -125,26 +125,6 @@ inline ieVariable MakeVariable(const char* source) {
 	}
 	return var;
 }
-
-}
-
-namespace fmt {
-
-template <>
-struct formatter<GemRB::ResRef> : formatter<const char*> {
-	template <typename FormatContext>
-	auto format(const GemRB::ResRef& resref, FormatContext &ctx) -> decltype(ctx.out()) {
-		return format_to(ctx.out(), resref.CString());
-	}
-};
-
-template <>
-struct formatter<GemRB::ieVariable> : formatter<const char*> {
-	template <typename FormatContext>
-	auto format(const GemRB::ieVariable& var, FormatContext &ctx) -> decltype(ctx.out()) {
-		return format_to(ctx.out(), var.CString());
-	}
-};
 
 }
 

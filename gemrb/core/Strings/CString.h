@@ -30,6 +30,8 @@
 #include <cstring>
 #include <cwctype>
 
+#include "Format.h"
+
 #ifndef WIN32
 # define stricmp strcasecmp
 # define strnicmp strncasecmp

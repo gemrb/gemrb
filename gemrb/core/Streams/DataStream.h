@@ -31,6 +31,7 @@
 #include "Platform.h"
 #include "Region.h"
 #include "System/swab.h"
+#include "Strings/StringConversion.h"
 
 namespace GemRB {
 
