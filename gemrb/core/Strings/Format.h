@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2022 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,31 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef STRING_H
-#define STRING_H
+#ifndef FORMAT_H
+#define FORMAT_H
 
-#include "exports.h"
+#define FMT_HEADER_ONLY
+#define FMT_EXCEPTIONS 0
+#include <fmt/format.h>
 
-#include <cwctype>
-#include <string>
+namespace fmt {
 
-#include "Format.h"
-#include <fmt/xchar.h>
-
-#define WHITESPACE_STRING L"\n\t\r "
-
-namespace GemRB {
-
-using String = std::basic_string<wchar_t>;
-
-GEM_EXPORT void TrimString(String& string);
-
-template<typename ...ARGS>
-std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&& ...args) {
-	std::string formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
-	return str += formatted;
-}
+template <typename STR>
+struct formatter<STR, char,
+// ignore the junk after STR... its just SFINAE garbage to hide the ctor from certain useages
+enable_if_t<std::is_class<STR>::value && !std::is_same<STR, basic_string_view<char>>::value && !std::is_same<STR, std::string>::value>
+> : formatter<const char*, char> {
+	template <typename FormatContext>
+	auto format(const STR& str, FormatContext &ctx) -> decltype(ctx.out()) {
+		return format_to(ctx.out(), str.begin());
+	}
+};
 
 }
 
-#endif
+#endif /* FORMAT_H */
