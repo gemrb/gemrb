@@ -4261,8 +4261,8 @@ GetGameVar('variable') is effectively the same as CheckVar('variable','GLOBAL').
 static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 {
 	char *Variable;
-	char *Context;
-	PARSE_ARGS( args,  "ss", &Variable, &Context );
+	PyObject* pyctx = nullptr;
+	PARSE_ARGS(args,  "sO", &Variable, &pyctx);
 	GET_GAMECONTROL();
 
 	const Scriptable *Sender = (Scriptable *) gc->GetLastActor();
@@ -4276,8 +4276,9 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 		Log(ERROR, "GUIScript", "No Sender!");
 		return NULL;
 	}
-	long value =(long) CheckVariable(Sender, Variable, Context);
-	Log(DEBUG, "GUISCript", "{} {}={}", Context, Variable, value);
+	ResRef context = ResRefFromPy(pyctx);
+	long value = CheckVariable(Sender, StringParam(Variable), context);
+	Log(DEBUG, "GUISCript", "{} {}={}", context, Variable, value);
 	return PyLong_FromLong(value);
 }
 
@@ -4301,15 +4302,16 @@ PyDoc_STRVAR( GemRB_SetGlobal__doc,
 static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 {
 	char *Variable;
-	char *Context;
+	PyObject* pyctx;
 	int Value;
-	PARSE_ARGS( args,  "ssi", &Variable, &Context, &Value );
+	PARSE_ARGS(args,  "sOi", &Variable, &pyctx, &Value);
 
 	Scriptable *Sender = NULL;
 
 	GET_GAME();
 
-	if (!strnicmp(Context, "MYAREA", 6) || !strnicmp(Context, "LOCALS", 6)) {
+	ResRef context = ResRefFromPy(pyctx);
+	if (context == "MYAREA" || context == "LOCALS") {
 		GET_GAMECONTROL();
 
 		Sender = (Scriptable *) gc->GetLastActor();
@@ -4322,7 +4324,7 @@ static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 		}
 	} // else GLOBAL, area name or KAPUTZ
 
-	SetVariable(Sender, Variable, Value, Context);
+	SetVariable(Sender, StringParam(Variable), Value, context);
 	Py_RETURN_NONE;
 }
 

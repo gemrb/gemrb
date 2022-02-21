@@ -30,6 +30,8 @@
 
 namespace GemRB {
 
+using VarContext = ResRef;
+
 //whoseeswho for GetNearestEnemy:
 #define ENEMY_SEES_ORIGIN 1
 #define ORIGIN_SEES_ENEMY 2
@@ -116,8 +118,8 @@ GEM_EXPORT SrcVector *LoadSrc(const ResRef& resname);
 bool IsInObjectRect(const Point &pos, const Region &rect);
 Action *ParamCopy(const Action *parameters);
 Action *ParamCopyNoOverride(const Action *parameters);
-GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const char* Context = nullptr);
-GEM_EXPORT void SetPointVariable(Scriptable* Sender, const char* VarName, const Point &point, const char* Context = nullptr);
+GEM_EXPORT void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, VarContext Context = {});
+GEM_EXPORT void SetPointVariable(Scriptable* Sender, const StringParam& VarName, const Point &point, const VarContext& Context = {});
 Point GetEntryPoint(const char *areaname, const char *entryname);
 //these are used from other plugins
 GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead, bool halveRange = false);
@@ -127,9 +129,9 @@ GEM_EXPORT void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, ieStrRef str, int flags, const char* sound = nullptr);
 bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point &position, int face);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust);
-GEM_EXPORT ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context = nullptr, bool *valid = nullptr);
-GEM_EXPORT Point CheckPointVariable(const Scriptable *Sender, const char *VarName, const char *Context = nullptr, bool *valid = nullptr);
-GEM_EXPORT bool VariableExists(const Scriptable *Sender, const char *VarName, const char *Context);
+GEM_EXPORT ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarContext Context = {}, bool *valid = nullptr);
+GEM_EXPORT Point CheckPointVariable(const Scriptable *Sender, const StringParam& VarName, const VarContext& Context = {}, bool *valid = nullptr);
+GEM_EXPORT bool VariableExists(const Scriptable *Sender, const StringParam& VarName, const VarContext& Context);
 Action* GenerateActionCore(const char *src, const char *str, unsigned short actionID);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 GEM_EXPORT unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const Point& target = Point());
