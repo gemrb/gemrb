@@ -180,7 +180,7 @@ def IncreaseStackAmount ():
 	Text.SetText (str (number))
 	return
 
-def DragItemAmount ():
+def DragItemAmount (slot_item, location = "inventory"):
 	"""Drag a split item."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -190,14 +190,12 @@ def DragItemAmount ():
 		GemRB.DropDraggedItem (pc, UsedSlot)
 		UpdateSlot (pc, UsedSlot-1)
 
-	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
-
 	#if dropping didn't help, don't die if slot_item isn't here
 	if slot_item:
 		Text = ItemAmountWindow.GetControl (6)
 		Amount = Text.QueryInteger ()
 		item = GemRB.GetItem (slot_item["ItemResRef"])
-		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], Amount, 0)
+		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], Amount, location == "ground")
 	ItemAmountWindow.Close()
 	return
 
@@ -497,10 +495,9 @@ def OpenGroundItemInfoWindow (btn):
 	DisplayItem(slot_item, value)
 	return
 
-# TODO: implement, reuse OpenItemAmountWindow, but be careful about any other uses of ItemButton
-def OpenGroundItemAmountWindow ():
-	pass
-	
+def OpenGroundItemAmountWindow (btn):
+	OpenItemAmountWindow (btn, "ground")
+
 def ItemAmountWindowClosed(win):
 	global ItemAmountWindow, UsedSlot
 
@@ -508,7 +505,7 @@ def ItemAmountWindowClosed(win):
 	UsedSlot = None
 	UpdateInventoryWindow()
 
-def OpenItemAmountWindow (btn):
+def OpenItemAmountWindow (btn, location = "inventory"):
 	"""Open the split window."""
 
 	global UsedSlot, OverSlot
@@ -525,7 +522,10 @@ def OpenItemAmountWindow (btn):
 		if GemRB.IsDraggingItem () == 1:
 			return
 
-	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
+	if location == "inventory":
+		slot_item = GemRB.GetSlotItem (pc, UsedSlot)
+	else:
+		slot_item = GemRB.GetContainerItem (pc, UsedSlot)
 
 	if slot_item:
 		StackAmount = slot_item["Usages0"]
@@ -571,7 +571,7 @@ def OpenItemAmountWindow (btn):
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (strings['Done'])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DragItemAmount)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DragItemAmount(slot_item, location))
 	Button.MakeDefault()
 
 	# Cancel
