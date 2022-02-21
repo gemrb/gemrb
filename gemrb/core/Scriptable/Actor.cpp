@@ -1645,7 +1645,7 @@ GEM_EXPORT void UpdateActorConfig()
 	if (newMode != StoryMode) {
 		if (newMode) {
 			GameDifficulty = DIFF_EASY;
-			core->GetDictionary()->SetAt("Difficulty Level", DIFF_EASY - 1);
+			core->GetDictionary()->SetAt("Difficulty Level", DIFF_EASY - 1U);
 
 			// add all the immunities and bonuses to party
 			for (int i = 0; game && i < game->GetPartySize(false); i++) {
