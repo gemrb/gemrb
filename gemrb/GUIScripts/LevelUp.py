@@ -475,7 +475,6 @@ def LevelUpInfoPress():
 
 	if InfoCounter % 2:
 		# call GetStatOverview with the new levels, so the future overview is shown
-		# TODO: show only xp, levels, thac0, #att, lore, reputation, backstab, saving throws
 		TextAreaControl.SetText(GUIREC.GetStatOverview(pc, LevelDiff))
 	else:
 		TextAreaControl.SetText(GetLevelUpNews())

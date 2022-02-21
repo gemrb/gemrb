@@ -130,7 +130,6 @@ def HLADonePress ():
 			Spellbook.LearnSpell (pc, HLARef[3:], HLAType, HLALevel, 1, LS_MEMO)
 
 		#save the number of this HLA memorized
-		#TODO: check param2 (0 seems to work ok)
 		GemRB.ApplyEffect(pc, "HLA", HLAAbilities[i][2], 0, HLARef[3:])
 
 	# close the window

@@ -1574,7 +1574,7 @@ def ButtonDragDestHandler (btn):
 	
 	pcID = btn.Value
 	# So far this is only used for portrait buttons
-	if DragButton: # DragButton will be none for item drags instantiated by clicking (not sragging) an inventory item
+	if DragButton: # DragButton will be none for item drags instantiated by clicking (not dragging) an inventory item
 		if DragButton.VarName == "portrait" and btn.VarName == "portrait":
 			GemRB.GameSwapPCs (DragButton.Value, pcID)
 			

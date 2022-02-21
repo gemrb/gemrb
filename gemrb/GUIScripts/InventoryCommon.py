@@ -508,7 +508,6 @@ def ItemAmountWindowClosed(win):
 	UsedSlot = None
 	UpdateInventoryWindow()
 
-# TODO: can the GUISTORE be consolidate with this one?
 def OpenItemAmountWindow (btn):
 	"""Open the split window."""
 
@@ -1035,7 +1034,7 @@ def AbilitiesItemWindow ():
 	GemRB.SetVar ("Ability", slot_item["Header"])
 	for i in range(3):
 		Button = Window.GetControl (i+1)
-		if GameCheck.IsBG2(): # TODO: check pst
+		if GameCheck.IsBG2():
 			Button.SetSprites ("GUIBTBUT",i,0,1,2,0)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("Ability",i)
