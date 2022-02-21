@@ -1235,7 +1235,7 @@ int GameScript::HasInnateAbility(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		return actor->spellbook.HaveSpell(parameters->resref0Parameter, 0);
 	}
 	return actor->spellbook.HaveSpell(parameters->int0Parameter, 0);
@@ -1252,7 +1252,7 @@ int GameScript::HaveSpell(Scriptable *Sender, const Trigger *parameters)
 		return false;
 	}
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		return actor->spellbook.HaveSpell(parameters->resref0Parameter, 0);
 	}
 	int spellNum = parameters->int0Parameter;
@@ -1276,7 +1276,7 @@ int GameScript::HaveSpellParty(Scriptable */*Sender*/, const Trigger *parameters
 
 	int i = game->GetPartySize(true);
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		while(i--) {
 			Actor *actor = game->GetPC(i, true);
 			if (actor->spellbook.HaveSpell(parameters->resref0Parameter, 0) ) {
@@ -1301,7 +1301,7 @@ int GameScript::KnowSpell(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		return actor->spellbook.KnowSpell(parameters->resref0Parameter);
 	}
 	return actor->spellbook.KnowSpell(parameters->int0Parameter);
@@ -1748,7 +1748,7 @@ int GameScript::IsOverMe(Scriptable *Sender, const Trigger *parameters)
 //you can also use an object parameter (like in iwd)
 int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 {
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->variable0Parameter.IsEmpty()) {
 		ieDword value;
 		ieVariable Variable;
 		size_t len;
@@ -2776,8 +2776,8 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	ResRef arearesref;
-	if (parameters->string0Parameter[0]) {
-		arearesref = parameters->string0Parameter;
+	if (!parameters->resref0Parameter.IsEmpty()) {
+		arearesref = parameters->resref0Parameter;
 	} else {
 		arearesref = "ar30"; //InWatchersKeep
 	}
