@@ -90,7 +90,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("StopAllAction", fx_stop_all_action, EFFECT_NO_ACTOR, -1 ), //cf
 	EffectDesc("TintScreen", fx_tint_screen, EFFECT_NO_ACTOR, -1 ), //c3
 	EffectDesc("TransferHP", fx_transfer_hp, EFFECT_DICED, -1 ), //c0
-	EffectDesc( NULL, NULL, 0, 0 ),
+	EffectDesc(nullptr, nullptr, 0, 0),
 };
 
 static void RegisterTormentOpcodes()
@@ -943,9 +943,9 @@ int fx_stop_all_action (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_stop_all_action(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter2) {
-		core->GetGame()->TimeStop(NULL, 0xffffffff);
+		core->GetGame()->TimeStop(nullptr, 0xffffffff);
 	} else {
-		core->GetGame()->TimeStop(NULL, 0);
+		core->GetGame()->TimeStop(nullptr, 0);
 	}
 	return FX_NOT_APPLIED;
 }
