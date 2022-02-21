@@ -973,7 +973,7 @@ void ChangeAnimationCore(Actor* src, const ResRef& replacement, bool effect)
 	}
 }
 
-void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const Point &enter, int flags, int wait)
+void EscapeAreaCore(Scriptable* Sender, const Point &p, const ResRef& area, const Point &enter, int flags, int wait)
 {
 	if (Sender->CurrentActionTicks<100) {
 		if (!p.IsInvalid() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
