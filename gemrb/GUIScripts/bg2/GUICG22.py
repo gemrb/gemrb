@@ -137,14 +137,8 @@ def RedrawKits():
 			Button = KitWindow.GetControl(i+5)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		if not KitTable:
-			if ClassName == "MAGE":
-				# TODO: check if this is ever reached
-				Kit = GemRB.GetVar("MAGESCHOOL")
-				KitName = SchoolList.GetValue(i+TopIndex, 0)
-				Kit = SchoolList.GetValue (Kit, 3)
-			else:
-				Kit = 0
-				KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
+			Kit = 0
+			KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
 		else:
 			Kit = KitTable.GetValue (i+TopIndex,0)
 			if ClassName == "MAGE":
@@ -190,12 +184,7 @@ def KitPress():
 	ButtonPressed=GemRB.GetVar("ButtonPressed")
 	KitSelected = ButtonPressed + TopIndex
 	if not KitTable:
-		if ClassName == "MAGE":
-			# TODO: this seems to be never reached
-			Kit = GemRB.GetVar("MAGESCHOOL")
-			Kit = SchoolList.GetValue (Kit, 3)
-		else:
-			Kit = 0
+		Kit = 0
 	else:
 		Kit = KitTable.GetValue (ButtonPressed+TopIndex, 0)
 		if ClassName == "MAGE":
