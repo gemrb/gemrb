@@ -437,7 +437,7 @@ void Game::InitActorPos(Actor *actor) const
 
 	strta = gamedata->LoadTable("startare");
 	if (strta) {
-		actor->Area = ResRef::MakeLowerCase(strta->QueryField(strta->GetRowIndex(area), 0).c_str());
+		actor->Area = strta->QueryField(strta->GetRowIndex(area), 0);
 	} else {
 		actor->Area = CurrentArea;
 	}

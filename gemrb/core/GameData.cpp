@@ -509,7 +509,7 @@ void GameData::ReadItemSounds()
 	for (TableMgr::index_t i = 0; i < rowCount; i++) {
 		ItemSounds[i] = {};
 		for (TableMgr::index_t j = 0; j < colCount; j++) {
-			ResRef snd = ResRef::MakeLowerCase(itemsnd->QueryField(i, j).c_str());
+			ResRef snd = itemsnd->QueryField(i, j);
 			if (snd == ResRef("*")) break;
 			ItemSounds[i].push_back(snd);
 		}
@@ -722,7 +722,7 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 	TableMgr::index_t count = tm->GetRowCount();
 	data.resize(count);
 	for (TableMgr::index_t i = 0; i < count; i++) {
-		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0).c_str());
+		data[i] = tm->QueryField(i, 0);
 		// * marks an empty resource
 		if (IsStar(data[i])) {
 			data[i].Reset();
@@ -795,7 +795,7 @@ int GameData::GetAreaAlias(const ResRef &areaName)
 
 		TableMgr::index_t idx = table->GetRowCount();
 		while (idx--) {
-			ResRef key = ResRef::MakeLowerCase(table->GetRowName(idx).c_str());
+			ResRef key = table->GetRowName(idx);
 			ieDword value = table->QueryFieldUnsigned<ieDword>(idx, 0);
 			AreaAliasTable[key] = value;
 		}

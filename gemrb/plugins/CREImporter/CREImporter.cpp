@@ -60,7 +60,7 @@ public:
 	const ResRef& FindSpell(unsigned int level, unsigned int kit) const;
 	int FindSpell(unsigned int kit) const;
 	bool Equals(const ResRef& spl) const;
-	void SetSpell(const char *spl);
+	void SetSpell(const ResRef& spl);
 	void AddLevel(unsigned int level, unsigned int kit);
 private:
 	ResRef spell;
@@ -108,9 +108,9 @@ bool SpellEntry::Equals(const ResRef& spl) const
 	return spell == spl;
 }
 
-void SpellEntry::SetSpell(const char *spl)
+void SpellEntry::SetSpell(const ResRef& spl)
 {
-	spell = ResRef::MakeLowerCase(spl);
+	spell = spl;
 }
 
 void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
@@ -388,7 +388,7 @@ static void GetSpellTable(const ResRef& tableRef, std::vector<ResRef>& list)
 	TableMgr::index_t count = tab->GetRowCount();
 	list.resize(count);
 	for (TableMgr::index_t i = 0; i < count; ++i) {
-		list[i] = ResRef::MakeLowerCase(tab->QueryField(i, column).c_str());
+		list[i] = tab->QueryField(i, column);
 	}
 }
 
@@ -417,8 +417,7 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 			index = i;
 		} else {
 			// find the correct index in listspll.2da
-			ResRef spellRef;
-			spellRef = ResRef::MakeLowerCase(tab->QueryField(i, lastCol).c_str());
+			ResRef spellRef = tab->QueryField(i, lastCol);
 			// the table has disabled spells in it and they all have the first two chars replaced by '*'
 			if (IsStar(spellRef)) {
 				continue;
@@ -625,7 +624,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 		for (int i = 0; i < 13; i++) {
 			stream->WriteWord(tmpWord);
 		}
-		stream->Write( act->PCStats->SoundFolder, 32);
+		stream->WriteVariableLC(act->PCStats->SoundFolder);
 		stream->WriteResRef(act->PCStats->SoundSet);
 		for (const auto& setting : act->PCStats->ExtraSettings) {
 			stream->WriteDword(setting);

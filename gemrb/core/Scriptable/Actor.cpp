@@ -8434,7 +8434,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 	}
 	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(index));
 	TableMgr::index_t col = RAND<TableMgr::index_t>(0, tab->GetColumnCount(index) - 1);
-	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col).c_str());
+	Sound = tab->QueryField(index, col);
 	return true;
 }
 
@@ -8690,7 +8690,7 @@ void Actor::SetSoundFolder(const ieVariable& soundset) const
 
 	char filepath[_MAX_PATH];
 
-	PCStats->SoundFolder = ieVariable::MakeLowerCase(soundset);
+	PCStats->SoundFolder = soundset;
 	PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder, nullptr);
 
 	DirectoryIterator dirIt(filepath);
