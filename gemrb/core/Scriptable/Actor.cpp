@@ -1640,22 +1640,26 @@ GEM_EXPORT void UpdateActorConfig()
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
 		GameDifficulty++; // slider starts at 0, real levels at 1
 	}
-	core->GetDictionary()->Lookup("Story Mode", StoryMode);
-	if (StoryMode) {
-		GameDifficulty = DIFF_EASY;
-		core->GetDictionary()->SetAt("Difficulty Level", DIFF_EASY - 1);
+	ieDword newMode = 0;
+	core->GetDictionary()->Lookup("Story Mode", newMode);
+	if (newMode != StoryMode) {
+		if (newMode) {
+			GameDifficulty = DIFF_EASY;
+			core->GetDictionary()->SetAt("Difficulty Level", DIFF_EASY - 1);
 
-		// add all the immunities and bonuses to party
-		for (int i = 0; game && i < game->GetPartySize(false); i++) {
-			Actor* pc = game->GetPC(i, false);
-			core->ApplySpell("OHSMODE1", pc, pc, 0);
+			// add all the immunities and bonuses to party
+			for (int i = 0; game && i < game->GetPartySize(false); i++) {
+				Actor* pc = game->GetPC(i, false);
+				core->ApplySpell("OHSMODE1", pc, pc, 0);
+			}
+		} else {
+			// or remove them; they target OHSMODE1, so this is idempotent
+			for (int i = 0; game && i < game->GetPartySize(false); i++) {
+				Actor* pc = game->GetPC(i, false);
+				core->ApplySpell("OHSMODE2", pc, pc, 0);
+			}
 		}
-	} else {
-		// or remove them; they target OHSMODE1, so this is idempotent
-		for (int i = 0; game && i < game->GetPartySize(false); i++) {
-			Actor* pc = game->GetPC(i, false);
-			core->ApplySpell("OHSMODE2", pc, pc, 0);
-		}
+		StoryMode = newMode;
 	}
 	GameDifficulty = Clamp((int) GameDifficulty, DIFF_EASY, DIFF_INSANE);
 
