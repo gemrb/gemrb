@@ -61,5 +61,5 @@ jobs:
           -Dsonar.sources=gemrb
           -Dsonar.cfamily.threads=2
           -Dsonar.cfamily.cache.enabled=true
-          -Dsonar.cfamily.cache.path=~/.sonar/cache
+          -Dsonar.cfamily.cache.path=$HOME/.sonar/cache
           -Dsonar.python.version=3.3
