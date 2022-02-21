@@ -250,7 +250,7 @@ public:
 	//internals
 private:
 	ResRef smokebam;
-	ieDword timeStartStep = 0;
+	tick_t timeStartStep = 0;
 	//attributes from moveable object
 	orient_t Orientation = S;
 	orient_t NewOrientation = S;
