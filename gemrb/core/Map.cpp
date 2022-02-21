@@ -2054,7 +2054,7 @@ void Map::MarkVisited(const Actor *actor) const
 {
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		ieVariable key;
-		size_t len = key.SNPrintF("%s_visited", scriptName);
+		size_t len = key.SNPrintF("%s_visited", scriptName.CString());
 		if (len > sizeof(key)) {
 			Log(ERROR, "Map", "Area {} has a too long script name for generating _visited globals!", scriptName);
 		}
