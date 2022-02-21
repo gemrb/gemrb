@@ -149,7 +149,8 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			str->ReadDword(newGame->RealTime);
 			str->ReadDword(PPLocOffset);
 			str->ReadDword(PPLocCount);
-			str->Seek( 52, GEM_CURRENT_POS);
+			str->ReadDword(newGame->zoomLevel);
+			str->Seek(48, GEM_CURRENT_POS);
 			// TODO: EEs used up these bits, see https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Header
 			break;
 
@@ -880,7 +881,8 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	stream->WriteDword(game->RealTime); //this isn't correct, this field is the realtime
 	stream->WriteDword(PPLocOffset);
 	stream->WriteDword(PPLocCount);
-	stream->WriteFilling(52); //unknown
+	stream->WriteDword(game->zoomLevel);
+	stream->WriteFilling(48); //unknown
 
 	//save failed, but it is not our fault, returning now before the asserts kill us
 	if (stream->GetPos()==0) {

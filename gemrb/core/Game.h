@@ -273,6 +273,7 @@ public:
 	ieDword Reputation = 0;
 	ieDword ControlStatus = 0; // used in bg2, iwd (where you can switch panes off)
 	ieDword Expansion = 0; // mostly used by BG2. IWD games set it to 3 on newgame
+	ieDword zoomLevel = 0; // ee-style zoom
 	ResRef AnotherArea;
 	ResRef CurrentArea;
 	ResRef PreviousArea; //move here if the worldmap exit is illegal?
