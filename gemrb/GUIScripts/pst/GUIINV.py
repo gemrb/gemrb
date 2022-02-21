@@ -250,7 +250,7 @@ def RefreshInventoryWindow (Window):
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenGroundItemAmountWindow)
-
+			Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, InventoryCommon.OpenGroundItemAmountWindow)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetTooltip (4273)
@@ -259,6 +259,7 @@ def RefreshInventoryWindow (Window):
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, None)
 	return
 
 def DefaultWeapon ():
