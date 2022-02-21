@@ -780,17 +780,18 @@ void Projectile::DoStep(unsigned int walk_speed)
 
 	auto start = step;
 	auto last = --path.end();
-	while (step != last && (( time - timeStartStep ) >= walk_speed)) {
+	while (step != last && (time - timeStartStep) >= walk_speed) {
 		unsigned int count = Speed;
 		while (step != last && count) {
 			++step;
 			--count;
 		}
-		timeStartStep = timeStartStep + walk_speed;
 
 		if (!walk_speed) {
 			break;
 		}
+
+		timeStartStep += walk_speed;
 	}
 
 	if (ExtFlags & PEF_CONTINUE) {
@@ -820,16 +821,17 @@ void Projectile::DoStep(unsigned int walk_speed)
 	if (SFlags&PSF_SPARKS) {
 		drawSpark = 1;
 	}
-	
+
+	tick_t delta = time - timeStartStep;
 	auto next = std::next(step);
 	if (next->point.x > step->point.x)
-		Pos.x += ((next->point.x - Pos.x) * (time - timeStartStep) / walk_speed);
+		Pos.x += (next->point.x - Pos.x) * delta / walk_speed;
 	else
-		Pos.x -= ((Pos.x - next->point.x) * (time - timeStartStep) / walk_speed);
+		Pos.x -= (Pos.x - next->point.x) * delta / walk_speed;
 	if (next->point.y > step->point.y)
-		Pos.y += ((next->point.y - Pos.y) * (time - timeStartStep) / walk_speed);
+		Pos.y += (next->point.y - Pos.y) * delta / walk_speed;
 	else
-		Pos.y -= ((Pos.y - next->point.y) * (time - timeStartStep) / walk_speed);
+		Pos.y -= (Pos.y - next->point.y) * delta / walk_speed;
 
 }
 
