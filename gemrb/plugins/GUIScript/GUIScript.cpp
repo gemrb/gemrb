@@ -2813,14 +2813,14 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "no worldmap loaded!");
 	}
 
-	const char *enc[5];
+	ResRef enc[5];
 	int k;
 	int links[4];
 	int indices[4];
 	TableMgr::index_t rows = newarea->GetRowCount();
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
-		const char *area   = newarea->QueryField(i,0).c_str();
-		const char *script = newarea->QueryField(i,1).c_str();
+		const ResRef area  = newarea->QueryField(i,0);
+		const ieVariable script = newarea->QueryField(i,1);
 		int flags          = newarea->QueryFieldSigned<int>(i,2);
 		int icon           = newarea->QueryFieldSigned<int>(i,3);
 		int locx           = newarea->QueryFieldSigned<int>(i,4);
@@ -2850,9 +2850,9 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		}
 
 		WMPAreaEntry entry;
-		entry.AreaName = ResRef::MakeUpperCase(area);
-		entry.AreaResRef = ResRef::MakeUpperCase(area);
-		entry.AreaLongName = ieVariable::MakeUpperCase(script);
+		entry.AreaName = area;
+		entry.AreaResRef = area;
+		entry.AreaLongName = script;
 		entry.SetAreaStatus(flags, BitOp::SET);
 		entry.IconSeq = icon;
 		entry.pos.x = locx;
@@ -2868,11 +2868,11 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		for (unsigned int j=0;j<total;j++) {
 			const ResRef larea = newlinks->QueryField(j,0);
 			int lflags        = newlinks->QueryFieldSigned<int>(j,1);
-			const char *ename = newlinks->QueryField(j,2).c_str();
+			const ieVariable ename = newlinks->QueryField(j,2);
 			int distance      = newlinks->QueryFieldSigned<int>(j,3);
 			int encprob       = newlinks->QueryFieldSigned<int>(j,4);
 			for(k=0;k<5;k++) {
-				enc[k]    = newlinks->QueryField(i,5+k).c_str();
+				enc[k]    = newlinks->QueryField(i,5+k);
 			}
 			int linktodir     = newlinks->QueryFieldSigned<int>(j,10);
 
@@ -2883,15 +2883,15 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				return RuntimeError("cannot establish area link!");
 			}
 			WMPAreaLink link;
-			link.DestEntryPoint = ieVariable::MakeUpperCase(ename);
+			link.DestEntryPoint = ename;
 			link.DistanceScale = distance;
 			link.DirectionFlags = lflags;
 			link.EncounterChance = encprob;
 			for(k=0;k<5;k++) {
-				if (enc[k][0]=='*') {
+				if (IsStar(enc[k])) {
 					link.EncounterAreaResRef[k].Reset();
 				} else {
-					link.EncounterAreaResRef[k] = ResRef::MakeUpperCase(enc[k]);
+					link.EncounterAreaResRef[k] = enc[k];
 				}
 			}
 
@@ -9791,8 +9791,7 @@ static PyObject* GemRB_GetAvatarsValue(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	ResRef prefix = ResRef::MakeUpperCase(actor->GetAnims()->GetArmourLevel(col));
-	return PyString_FromResRef(prefix);
+	return PyString_FromResRef(actor->GetAnims()->GetArmourLevel(col));
 }
 
 PyDoc_STRVAR( GemRB_SetMapAnimation__doc,

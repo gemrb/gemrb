@@ -94,21 +94,6 @@ public:
 
 		return fss;
 	}
-
-	static FixedSizeString MakeUpperCase(const char* str) {
-		if (!str) return FixedSizeString();
-		
-		FixedSizeString fss;
-		index_t count = LEN;
-		auto dest = fss.begin();
-		while(count--) {
-			*dest++ = std::towupper(*str);
-			if(!*str++) {
-				break;
-			}
-		}
-		return fss;
-	}
 	
 	FixedSizeString() noexcept = default;
 	FixedSizeString(std::nullptr_t) noexcept = delete;

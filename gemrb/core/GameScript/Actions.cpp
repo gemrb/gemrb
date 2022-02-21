@@ -651,7 +651,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 			map->RemoveActor(tar);
 		}
 		//update the target's area to the destination
-		tar->Area = ResRef::MakeUpperCase(parameters->string1Parameter);
+		tar->Area = parameters->resref1Parameter;
 		//if the destination area is currently loaded, move the actor there now
 		if (game->FindMap(tar->Area)) {
 			MoveBetweenAreasCore(tar, parameters->resref1Parameter, parameters->pointParameter, -1, true);
@@ -7220,7 +7220,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 	for (TableMgr::index_t i = 0; i < count; i++) {
 		//roll a random number between 0 and column #
 		TableMgr::index_t j = RAND<TableMgr::index_t>(0, tm->GetColumnCount(i) - 1);
-		ieVariable tokenname = ieVariable::MakeUpperCase(tm->GetRowName(i).c_str());
+		ieVariable tokenname = tm->GetRowName(i);
 		core->GetTokenDictionary()->SetAtCopy(tokenname, tm->QueryField(i, j).c_str());
 	}
 }

@@ -83,7 +83,7 @@ ProjectileServer::ProjectileServer() noexcept
 			int i;
 
 			for(i=0;i<AP_RESCNT;i++) {
-				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i).c_str());
+				explosions[rows].resources[i] = explist->QueryField(rows, i);
 			}
 			//using i so the flags field will always be after the resources
 			explosions[rows].flags = explist->QueryFieldSigned<int>(rows,i);
@@ -234,7 +234,7 @@ void ProjectileServer::AddSymbols(const std::shared_ptr<SymbolMgr>& projlist) {
 		if (value>MAX_PROJ_IDX) {
 			continue;
 		}
-		projectiles[value].resname = ResRef::MakeUpperCase(projlist->GetStringIndex(rows));
+		projectiles[value].resname = ResRef(projlist->GetStringIndex(rows));
 	}
 }
 

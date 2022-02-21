@@ -915,7 +915,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	stream->WriteFilling(8);
 	tmpDword = ac->GetOrientation();
 	stream->WriteDword(tmpDword);
-	stream->WriteResRef(ac->Area);
+	stream->WriteResRefUC(ac->Area);
 	tmpWord = ac->Pos.x;
 	stream->WriteWord(tmpWord);
 	tmpWord = ac->Pos.y;

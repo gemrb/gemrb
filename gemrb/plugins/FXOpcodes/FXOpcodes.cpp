@@ -5219,7 +5219,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				map->RemoveActor( target );
 			}
 			//set the destination area
-			target->Area = ResRef::MakeUpperCase(fx->Resource);
+			target->Area = fx->Resource;
 			return FX_APPLIED;
 		}
 	}

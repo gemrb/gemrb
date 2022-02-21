@@ -3446,7 +3446,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 		if (Prefix) {
 			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
 		} else {
-			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j).c_str());
+			ItemName = tab->GetRowName(j);
 		}
 
 		TableMgr::index_t l = tab->GetColumnCount(j);
@@ -3454,7 +3454,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 		int cl = atoi(tab->GetColumnName(0).c_str());
 		std::vector<ResRef> refs;
 		for(TableMgr::index_t k=0;k<l;k++) {
-			refs.push_back(ResRef::MakeLowerCase(tab->QueryField(j, k).c_str()));
+			refs.push_back(tab->QueryField(j, k));
 		}
 		RtRows.emplace(ItemName, ItemList(std::move(refs), cl));
 	}
@@ -4300,12 +4300,12 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	if (tab) {
 		TableMgr::index_t cols = tab->GetColumnCount();
 		TableMgr::index_t row = RAND<TableMgr::index_t>(0, tab->GetRowCount() - 1);
-		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0).c_str());
+		resource1 = tab->QueryField(row, 0);
 		if (cols > 1) {
-			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1).c_str());
+			resource2 = tab->QueryField(row, 1);
 		}
 		if (cols > 2) {
-			resource3 = ResRef::MakeUpperCase(tab->QueryField(row, 2).c_str());
+			resource3 = tab->QueryField(row, 2);
 		}
 	}
 }
