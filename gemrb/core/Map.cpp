@@ -2462,14 +2462,14 @@ Actor *Map::GetActorByResource(const ResRef& resref) const
 	return NULL;
 }
 
-Actor *Map::GetActorByScriptName(const char *name) const
+Actor *Map::GetActorByScriptName(const ieVariable& name) const
 {
 	for (auto actor : actors) {
-		if (actor->GetScriptName().StartsWith(name, 8)) { // FIXME: why is this limited to 8?
+		if (actor->GetScriptName() == name) {
 			return actor;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 std::vector<Actor*> Map::GetActorsInRect(const Region& rgn, int excludeFlags) const
