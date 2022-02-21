@@ -39,8 +39,8 @@ jobs:
         run: |
           mkdir -p ~/.sonar/cache
           if [[ ! -d ~/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux ]]; then
-            curl -sSLo ~/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} 
             rm -rf ~/.sonar/sonar-scanner*
+            curl -sSLo ~/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} 
             unzip -o ~/.sonar/sonar-scanner.zip -d ~/.sonar/
           fi
           echo "~/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
