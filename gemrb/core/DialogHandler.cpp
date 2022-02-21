@@ -238,7 +238,7 @@ static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
 		col = pdtable->GetColumnIndex("FILE");
 	}
 	TableMgr::index_t row = pdtable->FindTableValue(col, dialog);
-	return target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row).c_str());
+	return target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 }
 
 static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& options, Scriptable* target)

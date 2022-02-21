@@ -526,7 +526,7 @@ public:
 	Scriptable *GetScriptableByDialog(const ResRef& resref) const;
 	Actor *GetItemByDialog(const ResRef& resref) const;
 	Actor *GetActorByResource(const ResRef& resref) const;
-	Actor *GetActorByScriptName(const char *name) const;
+	Actor *GetActorByScriptName(const ieVariable& name) const;
 	bool HasActor(const Actor *actor) const;
 	bool SpawnsAlive() const;
 	void RemoveActor(Actor* actor);
