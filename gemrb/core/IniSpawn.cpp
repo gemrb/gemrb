@@ -640,7 +640,7 @@ void IniSpawn::RespawnNameless()
 
 	//certain variables are set when nameless dies
 	for (const auto& var : NamelessVar) {
-		SetVariable(game, var.Name.CString(), var.Value, "GLOBAL");
+		SetVariable(game, var.Name, var.Value, "GLOBAL");
 	}
 	core->GetGameControl()->ChangeMap(nameless, true);
 }
@@ -658,7 +658,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 		return;
 	}
 
-	ieDword specvar = CheckVariable(map, critter.SpecVar.CString(), critter.SpecContext);
+	ieDword specvar = CheckVariable(map, critter.SpecVar, critter.SpecContext);
 
 	if (critter.SpecVar[0]) {
 		if (critter.SpecVarOperator>=0) {
@@ -743,12 +743,12 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	}
 
 	if (critter.Flags & CF_INC_INDEX) {
-		int value = CheckVariable(map, critter.PointSelectVar.CString());
+		int value = CheckVariable(map, critter.PointSelectVar);
 		// NOTE: not replicating bug where it would increment the index twice if create_qty > 1
-		SetVariable(map, critter.PointSelectVar.CString(), value + 1);
+		SetVariable(map, critter.PointSelectVar, value + 1);
 	}
 
-	SetVariable(map, critter.SpecVar.CString(), specvar + (ieDword) critter.SpecVarInc, critter.SpecContext);
+	SetVariable(map, critter.SpecVar, specvar + (ieDword) critter.SpecVarInc, critter.SpecContext);
 	map->AddActor(cre, true);
 	for (x=0;x<9;x++) {
 		if (critter.SetSpec[x]) {
@@ -845,7 +845,7 @@ void IniSpawn::InitialSpawn()
 	SpawnGroup(enterspawn);
 	//these variables are set when entering first
 	for (const auto& local : Locals) {
-		SetVariable(map, local.Name.CString(), local.Value, "LOCALS");
+		SetVariable(map, local.Name, local.Value, "LOCALS");
 	}
 
 	// move the rest of the party if needed

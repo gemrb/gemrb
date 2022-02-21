@@ -6969,11 +6969,12 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	}
 
 	const std::string& key = fmt::format("{}", parameters->int0Parameter);
-	const char* variable = ini->GetKeyAsString(key.c_str(), "killvar", nullptr);
-	if (!variable) {
+	const char* cstr = ini->GetKeyAsString(key.c_str(), "killvar", nullptr);
+	if (!cstr) {
 		return;
 	}
-	ieDword value = CheckVariable( Sender, variable, "GLOBAL" ) + 1;
+	StringParam variable(cstr);
+	ieDword value = CheckVariable(Sender, variable, "GLOBAL" ) + 1;
 	SetVariable(Sender, variable, value, "GLOBAL");
 }
 

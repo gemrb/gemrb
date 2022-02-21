@@ -2187,22 +2187,18 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 	return newTrigger;
 }
 
-void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const char* Context)
+void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, VarContext context)
 {
-	ResRef context;
-
 	const char *varName = VarName;
-	if (Context == nullptr) {
+	if (context.IsEmpty()) {
 		varName = &VarName[6];
 		//some HoW triggers use a : to separate the scope from the variable name
 		if (*varName == ':') {
 			varName++;
 		}
 		context.SNPrintF("%.6s", VarName);
-	} else {
-		context.SNPrintF("%.6s", Context);
 	}
-	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", Context, VarName, value);
+	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", context, VarName, value);
 	
 	if (context == "MYAREA") {
 		Sender->GetCurrentArea()->locals->SetAt(varName, value, NoCreate);
@@ -2225,49 +2221,46 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 		if (map) {
 			map->locals->SetAt(varName, value, NoCreate);
 		} else if (core->InDebugMode(ID_VARIABLES)) {
-			Log(WARNING, "GameScript", "Invalid variable {} {} in SetVariable", Context, VarName);
+			Log(WARNING, "GameScript", "Invalid variable {} {} in SetVariable", context, VarName);
 		}
 	}
 }
 
-void SetPointVariable(Scriptable *Sender, const char *VarName, const Point &p, const char* Context)
+void SetPointVariable(Scriptable *Sender, const StringParam& VarName, const Point &p, const VarContext& Context)
 {
 	SetVariable(Sender, VarName, ((p.y & 0xFFFF) << 16) | (p.x & 0xFFFF), Context);
 }
 
-ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
+ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarContext context, bool *valid)
 {
-	ResRef context;
 	const char *varName = VarName;
 	ieDword value = 0;
 
-	if (Context == nullptr) {
+	if (context.IsEmpty()) {
 		context.SNPrintF("%.6s", VarName);
 		varName = &VarName[6];
 		//some HoW triggers use a : to separate the scope from the variable name
 		if (*varName == ':') {
 			varName++;
 		}
-	} else {
-		context.SNPrintF("%.6s", Context);
 	}
 	
 	if (context == "MYAREA") {
 		Sender->GetCurrentArea()->locals->Lookup(varName, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, VarName, value);
 		return value;
 	}
 	
 	if (context == "LOCALS") {
 		Sender->locals->Lookup(varName, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, VarName, value);
 		return value;
 	}
 	
 	const Game *game = core->GetGame();
 	if (HasKaputz && context == "KAPUTZ") {
 		game->kaputz->Lookup(varName, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
+		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, VarName, value);
 		return value;
 	}
 	
@@ -2280,25 +2273,23 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 			map->locals->Lookup(varName, value);
 		} else {
 			if (valid) *valid = false;
-			ScriptDebugLog(ID_VARIABLES, "Invalid variable {} {} in checkvariable", Context, VarName);
+			ScriptDebugLog(ID_VARIABLES, "Invalid variable {} {} in checkvariable", context, VarName);
 		}
 	}
-	ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", Context, VarName, value);
+	ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, VarName, value);
 	return value;
 }
 
-Point CheckPointVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
+Point CheckPointVariable(const Scriptable *Sender, const StringParam& VarName, const VarContext& Context, bool *valid)
 {
 	ieDword val = CheckVariable(Sender, VarName, Context, valid);
 	return Point(val & 0xFFFF, val >> 16);
 }
 
 // checks if a variable exists in any context
-bool VariableExists(const Scriptable *Sender, const char *VarName, const char *Context)
+bool VariableExists(const Scriptable *Sender, const StringParam& VarName, const VarContext& context)
 {
 	ieDword value = 0;
-	ResRef context;
-	context.SNPrintF("%.6s", Context);
 	const Game *game = core->GetGame();
 
 	if (Sender->GetCurrentArea()->locals->Lookup(VarName, value)) {
