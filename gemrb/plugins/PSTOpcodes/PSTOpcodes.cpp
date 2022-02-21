@@ -954,18 +954,14 @@ int fx_stop_all_action (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 //GemRB extension: lets you specify not hardcoded values
 int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieDword p1,p2;
-
-	// print("fx_iron_fist(%2d): Par1: %d Par2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	switch (fx->Parameter2)
-	{
-	case 0: p1 = 3; p2 = 6; break;
-	default:
-		p1 = ieWord (fx->Parameter1&0xffff);
-		p2 = ieWord (fx->Parameter1>>16);
+	ieDword toHitBonus = 3;
+	ieDword damageBonus = 6;
+	if (fx->Parameter2 != 0) {
+		toHitBonus = fx->Parameter1 & 0xffff;
+		damageBonus = fx->Parameter1 >> 16;
 	}
-	STAT_ADD(IE_FISTHIT, p1);
-	STAT_ADD(IE_FISTDAMAGE, p2);
+	STAT_ADD(IE_FISTHIT, toHitBonus);
+	STAT_ADD(IE_FISTDAMAGE, damageBonus);
 	return FX_APPLIED;
 }
 
