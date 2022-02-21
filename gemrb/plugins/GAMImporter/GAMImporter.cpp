@@ -181,7 +181,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			playmode *= 3;
 		}
 
-		newGame->CurrentArea = ResRef::MakeLowerCase(tm->QueryField(playmode).c_str());
+		newGame->CurrentArea = tm->QueryField(playmode);
 	}
 
 	//Loading PCs
@@ -849,7 +849,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	stream->WriteDword(NPCCount);
 	stream->WriteDword(GlobalOffset);
 	stream->WriteDword(GlobalCount);
-	stream->WriteResRef( game->CurrentArea );
+	stream->WriteResRefLC(game->CurrentArea);
 	stream->WriteDword(game->CurrentLink);
 	stream->WriteDword(JournalCount);
 	stream->WriteDword(JournalOffset);
@@ -862,7 +862,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	case GAM_VER_TOB:
 	case GAM_VER_IWD2:
 		stream->WriteDword(game->Reputation);
-		stream->WriteResRef( game->CurrentArea );
+		stream->WriteResRefLC(game->CurrentArea);
 		stream->WriteDword(game->ControlStatus);
 		stream->WriteDword(game->Expansion);
 		stream->WriteDword(FamiliarsOffset);
@@ -872,11 +872,11 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	case GAM_VER_PST:
 		stream->WriteDword(MazeOffset);
 		stream->WriteDword(game->Reputation);
-		stream->WriteResRef( game->CurrentArea );
+		stream->WriteResRefLC(game->CurrentArea);
 		stream->WriteDword(KillVarsOffset);
 		stream->WriteDword(KillVarsCount);
 		stream->WriteDword(FamiliarsOffset);
-		stream->WriteResRef( game->CurrentArea ); //again
+		stream->WriteResRefLC(game->CurrentArea); //again
 		break;
 	}
 	stream->WriteDword(game->RealTime); //this isn't correct, this field is the realtime
@@ -1053,7 +1053,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 	stream->WriteResRef(ac->PCStats->SoundSet);
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
-		stream->Write(ac->PCStats->SoundFolder, 32);
+		stream->WriteVariableLC(ac->PCStats->SoundFolder);
 	}
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		//I don't know how many fields are actually used in IWD2 saved game

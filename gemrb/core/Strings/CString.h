@@ -76,24 +76,6 @@ public:
 	static constexpr index_t Size = LEN;
 	using iterator = char*;
 	using const_iterator = const char*;
-	// ResRef is case insensitive, but the originals weren't always
-	// in some cases we need lower/upper case for save compatibility with originals
-	// so we provide factories the create ResRef with the required case
-	static FixedSizeString MakeLowerCase(const char* str) {
-		if (!str) return FixedSizeString();
-
-		FixedSizeString fss;
-		index_t count = LEN;
-		auto dest = fss.begin();
-		while(count--) {
-			*dest++ = std::towlower(*str);
-			if(!*str++) {
-				break;
-			}
-		}
-
-		return fss;
-	}
 	
 	FixedSizeString() noexcept = default;
 	FixedSizeString(std::nullptr_t) noexcept = delete;

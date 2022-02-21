@@ -7847,7 +7847,7 @@ static void ReadUsedItems()
 		UsedItems.resize(UsedItemsCount);
 		for (TableMgr::index_t i = 0; i < UsedItemsCount; i++) {
 			UsedItems[i].itemname = table->GetRowName(i);
-			UsedItems[i].username = ieVariable::MakeLowerCase(table->QueryField(i, 0).c_str());
+			UsedItems[i].username = table->QueryField(i, 0);
 			if (UsedItems[i].username[0] == '*') {
 				UsedItems[i].username.Reset();
 			}
@@ -12161,11 +12161,11 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	int globalID;
 	const char *opcodename;
 	int param1, param2;
-	const char *resref1 = NULL;
-	const char *resref2 = NULL;
-	const char *resref3 = NULL;
-	const char *source = NULL;
-	if (!PyArg_ParseTuple(args, "isii|ssssH",
+	PyObject* resref1 = nullptr;
+	PyObject* resref2 = nullptr;
+	PyObject* resref3 = nullptr;
+	PyObject* source = nullptr;
+	if (!PyArg_ParseTuple( args, "isii|OOOOH",
 			   &globalID, &opcodename, &param1, &param2,
 			   &resref1, &resref2, &resref3, &source, &timing)
 	) {
@@ -12182,18 +12182,10 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 		//invalid effect name didn't resolve to opcode
 		return RuntimeError( "Invalid effect name!\n" );
 	}
-	if (resref1 && resref1[0]) {
-		fx->Resource = ResRef::MakeLowerCase(resref1);
-	}
-	if (resref2 && resref2[0]) {
-		fx->Resource2 = ResRef::MakeLowerCase(resref2);
-	}
-	if (resref3 && resref3[0]) {
-		fx->Resource3 = ResRef::MakeLowerCase(resref3);
-	}
-	if (source && source[0]) {
-		fx->SourceRef = ResRef::MakeLowerCase(source);
-	}
+	fx->Resource = ResRefFromPy(resref1);
+	fx->Resource2 = ResRefFromPy(resref2);
+	fx->Resource3 = ResRefFromPy(resref3);
+	fx->SourceRef = ResRefFromPy(source);
 	//This is a hack...
 	fx->Parameter3=1;
 

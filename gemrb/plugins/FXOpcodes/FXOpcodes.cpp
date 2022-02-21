@@ -7465,7 +7465,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	ResRef resRef;
 	//GemRB enhancement: allow a custom resource
 	if (fx->Parameter2) {
-		resRef = ResRef::MakeLowerCase(fx->Resource);
+		resRef = fx->Resource;
 	} else {
 		resRef = "cut250a";
 	}
