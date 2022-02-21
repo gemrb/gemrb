@@ -2822,6 +2822,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	new_game = gam_mgr->LoadGame(new Game(), ver_override);
 	if (!new_game)
 		goto cleanup;
+	UpdateActorConfig(); // so things that require Game can properly rerun
 
 	// Load WMP (WorldMap) file
 	if (!wmp_mgr)

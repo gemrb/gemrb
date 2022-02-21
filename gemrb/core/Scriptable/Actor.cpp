@@ -104,6 +104,7 @@ static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
 static ieDword war_cries = 1;
 static ieDword GameDifficulty = DIFF_CORE;
+static ieDword StoryMode = 0;
 static ieDword NoExtraDifficultyDmg = 0;
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
@@ -1638,6 +1639,23 @@ GEM_EXPORT void UpdateActorConfig()
 		GameDifficulty = 0;
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
 		GameDifficulty++; // slider starts at 0, real levels at 1
+	}
+	core->GetDictionary()->Lookup("Story Mode", StoryMode);
+	if (StoryMode) {
+		GameDifficulty = DIFF_EASY;
+		core->GetDictionary()->SetAt("Difficulty Level", DIFF_EASY - 1);
+
+		// add all the immunities and bonuses to party
+		for (int i = 0; game && i < game->GetPartySize(false); i++) {
+			Actor* pc = game->GetPC(i, false);
+			core->ApplySpell("OHSMODE1", pc, pc, 0);
+		}
+	} else {
+		// or remove them; they target OHSMODE1, so this is idempotent
+		for (int i = 0; game && i < game->GetPartySize(false); i++) {
+			Actor* pc = game->GetPC(i, false);
+			core->ApplySpell("OHSMODE2", pc, pc, 0);
+		}
 	}
 	GameDifficulty = Clamp((int) GameDifficulty, DIFF_EASY, DIFF_INSANE);
 
