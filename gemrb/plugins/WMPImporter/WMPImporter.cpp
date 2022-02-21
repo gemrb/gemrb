@@ -268,11 +268,11 @@ int WMPImporter::PutLinks(DataStream *stream, const WorldMap *wmap) const
 		const WMPAreaLink *al = wmap->GetLink(i);
 
 		stream->WriteDword(al->AreaIndex);
-		stream->WriteVariable(al->DestEntryPoint);
+		stream->WriteVariableUC(al->DestEntryPoint);
 		stream->WriteDword(al->DistanceScale);
 		stream->WriteDword(al->DirectionFlags);
 		for (const auto& ref : al->EncounterAreaResRef) {
-			stream->WriteResRef(ref);
+			stream->WriteResRefUC(ref);
 		}
 		stream->WriteDword(al->EncounterChance);
 		stream->WriteFilling(128);
@@ -288,9 +288,9 @@ int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
 	for(unsigned i=0;i<cnt;i++) {
 		const WMPAreaEntry *ae = wmap->GetEntry(i);
 
-		stream->WriteResRef( ae->AreaName );
-		stream->WriteResRef( ae->AreaResRef );
-		stream->WriteVariable(ae->AreaLongName);
+		stream->WriteResRefUC(ae->AreaName);
+		stream->WriteResRefUC(ae->AreaResRef);
+		stream->WriteVariableUC(ae->AreaLongName);
 		tmpDword = ae->GetAreaStatus();
 		stream->WriteDword(tmpDword);
 		stream->WriteDword(ae->IconSeq);

@@ -29,7 +29,7 @@ class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
 	//returns true if trap has been triggered, tumble skill???
-	void SetEnter(const char *resref);
+	void SetEnter(const ResRef& resref);
 	bool TriggerTrap(int skill, ieDword ID) override;
 	//call this to check if an actor entered the trigger zone
 	bool Entered(Actor *actor);

@@ -2081,8 +2081,8 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		VertIndex += tmpWord;
 		stream->WriteDword(tmpDword); //unknown30
 		stream->WriteDword(ip->Cursor);
-		stream->WriteResRef( ip->Destination);
-		stream->WriteVariable(ip->EntranceName);
+		stream->WriteResRefUC(ip->Destination);
+		stream->WriteVariableUC(ip->EntranceName);
 		stream->WriteDword(ip->Flags);
 		stream->WriteStrRef(ip->StrRef);
 		stream->WriteWord(ip->TrapDetectionDiff);

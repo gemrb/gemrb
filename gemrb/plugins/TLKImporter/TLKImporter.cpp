@@ -53,7 +53,7 @@ TLKImporter::TLKImporter(void)
 		gtcount = tm->GetRowCount();
 	}
 	for (TableMgr::index_t i = 0; i < gtcount; ++i) {
-		ieVariable key = ieVariable::MakeUpperCase(tm->GetRowName(i).c_str());
+		ieVariable key = tm->GetRowName(i);
 
 		gt_type *entry = new gt_type;
 		entry->type = tm->QueryFieldSigned<int>(i,0);
