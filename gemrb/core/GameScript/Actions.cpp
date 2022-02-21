@@ -564,7 +564,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	const Map *map = tar->GetCurrentArea();
 	if (!map) return;
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		CreateVisualEffectCore(Sender, Sender->Pos, parameters->resref0Parameter, 0);
 	}
 
@@ -915,7 +915,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 //bg2 - variable
 void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 {
-	if (!parameters->string0Parameter[0]) {
+	if (parameters->variable0Parameter.IsEmpty()) {
 		parameters->variable0Parameter = "LOCALSsavedlocation";
 	}
 	SetPointVariable(Sender, parameters->string0Parameter, parameters->pointParameter);
@@ -969,7 +969,7 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	if (!parameters->string0Parameter[0]) {
+	if (parameters->variable0Parameter.IsEmpty()) {
 		parameters->variable0Parameter = "LOCALSsavedlocation";
 	}
 	SetPointVariable(Sender, parameters->string0Parameter, tar->Pos);
@@ -979,7 +979,7 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 /** CreateCreatureAtSavedLocation */
 void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters)
 {
-	if (!parameters->string0Parameter[0]) {
+	if (parameters->variable0Parameter.IsEmpty()) {
 		parameters->variable0Parameter = "LOCALSsavedlocation";
 	}
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
@@ -1719,7 +1719,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (!parameters->string0Parameter[0]) {
+	if (parameters->variable0Parameter.IsEmpty()) {
 		parameters->variable0Parameter = "LOCALSsavedlocation";
 	}
 	Point p = CheckPointVariable(target, parameters->string0Parameter);
@@ -2570,7 +2570,7 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	if (parameters->string1Parameter[0]) {
+	if (!parameters->resref1Parameter.IsEmpty()) {
 		CreateVisualEffectCore(Sender, Sender->Pos, parameters->resref1Parameter, 0);
 	}
 
@@ -3016,7 +3016,7 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	}
 
 	//the LoadMos ResRef may be empty
-	if (parameters->string1Parameter[0]) {
+	if (!parameters->resref1Parameter.IsEmpty()) {
 		core->GetGame()->LoadMos = parameters->resref1Parameter;
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
@@ -3031,7 +3031,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//the LoadMos ResRef may be empty
-	if (parameters->string1Parameter[0]) {
+	if (!parameters->resref1Parameter.IsEmpty()) {
 		core->GetGame()->LoadMos = parameters->resref1Parameter;
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
@@ -3047,7 +3047,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Game *game = core->GetGame();
-	if (parameters->string1Parameter[0]) {
+	if (!parameters->resref1Parameter.IsEmpty()) {
 		game->LoadMos = parameters->resref1Parameter;
 	}
 	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
@@ -3071,7 +3071,7 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	if (parameters->string1Parameter[0]) {
+	if (!parameters->resref1Parameter.IsEmpty()) {
 		core->GetGame()->LoadMos = parameters->resref1Parameter;
 	}
 }
@@ -3510,7 +3510,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	core->SetPause(PAUSE_ON, PF_QUIET);
 	// bg2 sometimes calls IncrementChapter("") right after a TextScreen("sometable"),
 	// so we make sure they don't cancel out
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		core->GetGame()->TextScreen = parameters->resref0Parameter;
 	}
 
@@ -4292,9 +4292,9 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 	}
 	Map *map = Sender->GetCurrentArea();
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		//dropping location isn't exactly our place, this is why i didn't use a simple DropItem
-		scr->inventory.DropItemAtLocation(ResRef(parameters->string0Parameter),
+		scr->inventory.DropItemAtLocation(parameters->resref0Parameter,
 0, map, parameters->pointParameter);
 	} else {
 		//this should be converted from scripting slot to physical slot
@@ -4337,7 +4337,7 @@ void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
 	int x = inv->GetSlotCount();
 	Map *area = tar->GetCurrentArea();
 	while(x--) {
-		if (parameters->string0Parameter[0]) {
+		if (!parameters->resref0Parameter.IsEmpty()) {
 			const ResRef& itemRef = inv->GetSlotItem(x)->ItemResRef;
 			if (itemRef == parameters->resref0Parameter) {
 				continue;
@@ -5187,7 +5187,7 @@ void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		//the spell resref is in the string parameter
 		type = parameters->int0Parameter;
 	} else {
@@ -6474,7 +6474,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	ieDword flags = 0; // aura pollution is on for everyone
 	ResRef itemres;
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		Slot = act->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;
@@ -6519,7 +6519,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 	ResRef itemres;
 	ieDword flags;
 
-	if (parameters->string0Parameter[0]) {
+	if (!parameters->resref0Parameter.IsEmpty()) {
 		Slot = act->inventory.FindItem(parameters->resref0Parameter, 0);
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;

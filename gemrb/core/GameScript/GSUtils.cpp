@@ -195,8 +195,8 @@ static const char* const spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "S
 //it returns spellres
 bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
 {
-	if (parameters->string0Parameter[0]) {
-		spellRes = ResRef::MakeLowerCase(parameters->string0Parameter);
+	if (!parameters->resref0Parameter.IsEmpty()) {
+		spellRes = parameters->resref0Parameter;
 	} else {
 		//resolve spell
 		int type = parameters->int0Parameter/1000;
@@ -852,7 +852,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	//iwd2 allows an optional scriptname to be set
 	//but bg2 doesn't have this feature
 	//this way it works for both games
-	if ((flags & CC_SCRIPTNAME) && parameters->string1Parameter[0]) {
+	if ((flags & CC_SCRIPTNAME) && !parameters->variable1Parameter.IsEmpty()) {
 		ab->SetScriptName(parameters->variable1Parameter);
 	}
 
@@ -901,7 +901,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	//if string1 is animation, then we can't use it for a DV too
 	if (flags & CC_PLAY_ANIM) {
 		CreateVisualEffectCore(ab, ab->Pos, parameters->resref1Parameter, 1);
-	} else if (parameters->string1Parameter[0]) {
+	} else if (!parameters->variable1Parameter.IsEmpty()) {
 		//setting the deathvariable if it exists (iwd2)
 		ab->SetScriptName(parameters->variable1Parameter);
 	}
@@ -2662,7 +2662,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 	// handle iwd2 marked spell casting (MARKED_SPELL is 0)
 	// NOTE: supposedly only casting via SpellWait checks this, so refactor if needed
-	if (third && parameters->int0Parameter == 0 && !parameters->string0Parameter[0]) {
+	if (third && parameters->int0Parameter == 0 && parameters->resref0Parameter.IsEmpty()) {
 		if (!Sender->LastMarkedSpell) {
 			// otherwise we spam a lot
 			Sender->ReleaseCurrentAction();
@@ -2689,7 +2689,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 	// use the passed level instead of the caster's casting level
 	if (flags&SC_SETLEVEL) {
-		if (parameters->string0Parameter[0]) {
+		if (!parameters->resref0Parameter.IsEmpty()) {
 			level = parameters->int0Parameter;
 		} else {
 			level = parameters->int1Parameter;
@@ -2823,7 +2823,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 
 	// use the passed level instead of the caster's casting level
 	if (flags&SC_SETLEVEL) {
-		if (parameters->string0Parameter[0]) {
+		if (!parameters->resref0Parameter.IsEmpty()) {
 			level = parameters->int0Parameter;
 		} else {
 			level = parameters->int1Parameter;

@@ -2628,7 +2628,7 @@ std::string Action::dump() const
 	AssertCanary(__func__);
 	std::string buffer;
 	AppendFormat(buffer, "Int0: {}, Int1: {}, Int2: {}\n",int0Parameter, int1Parameter, int2Parameter);
-	AppendFormat(buffer, "String0: {}, String1: {}\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
+	AppendFormat(buffer, "String0: {}, String1: {}\n", string0Parameter, string1Parameter);
 	AppendFormat(buffer, "Point: {}\n", pointParameter);
 	for (int i = 0; i < 3; i++) {
 		if (objects[i]) {
