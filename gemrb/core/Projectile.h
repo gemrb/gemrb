@@ -242,7 +242,7 @@ public:
 	ieByte Aim = 0; // original bg2: m_numDirections, a list of {1, 5, 9}
 	ieWord SmokeAnimID = 0;
 	ResRef TrailBAM[3];
-	ieWord TrailSpeed[3];
+	ieWord TrailSpeed[3]{};
 	unsigned int Range = 0;
 	//these are public but not in the .pro file
 	Holder<ProjectileExtension> Extension;

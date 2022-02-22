@@ -207,7 +207,7 @@ private:
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};
 	// 4 styles and 4 star levels, 7 bonus types
-	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni;
+	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni{};
 	std::map<ResRef, ieByte> itemAnims;
 	std::vector<ItemUseType> itemUse;
 

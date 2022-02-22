@@ -41,13 +41,13 @@ public:
 	using frame_t = Holder<Sprite2D>;
 
 	bool endReached = false;
-	index_t frameIdx;
+	index_t frameIdx = 0;
 	Point pos;
 	unsigned char fps = ANI_DEFAULT_FRAMERATE;
 	bool playReversed = false;
 	bool gameAnimation = false; // is it affected by pausing?
 	Region animArea;
-	ieDword Flags;
+	ieDword Flags = 0;
 
 	explicit Animation(std::vector<frame_t>) noexcept;
 	Animation() noexcept = default;

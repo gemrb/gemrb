@@ -10447,6 +10447,7 @@ static void ReadActionButtons()
 	memset(GUITooltip, -1, sizeof(GUITooltip));
 	memset(GUIEvent, 0, sizeof(GUIEvent));
 	auto tab = gamedata->LoadTable( "guibtact" );
+	assert(tab);
 	for (unsigned int i = 0; i < MAX_ACT_COUNT; i++) {
 		packtype row;
 
@@ -11845,6 +11846,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 	static int dreamer = -2;
 	if (dreamer == -2) {
 		AutoTable pdtable = gamedata->LoadTable("pdialog");
+		assert(pdtable);
 		dreamer = pdtable->GetColumnIndex("DREAM_SCRIPT_FILE");
 	}
 	if (dreamer < 0) {

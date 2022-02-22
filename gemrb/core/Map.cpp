@@ -846,7 +846,7 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 		
 		TerrainSounds() noexcept {
 			AutoTable tm = gamedata->LoadTable("terrain");
-			
+			assert(tm);
 			int rc = tm->GetRowCount() - 2;
 			while (rc--) {
 				ResRef group = tm->GetRowName(rc+2);

@@ -173,9 +173,10 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	if (newGame->CurrentArea.IsEmpty()) {
 		// 0 - normal, 1 - tutorial, 2 - extension
 		AutoTable tm = gamedata->LoadTable("STARTARE");
+		assert(tm);
 		ieDword playmode = 0;
 		//only bg2 has 9 rows (iwd's have 6 rows - normal+extension)
-		if (tm && tm->GetRowCount()==9) {
+		if (tm->GetRowCount() == 9) {
 			core->GetDictionary()->Lookup( "PlayMode", playmode );
 			playmode *= 3;
 		}

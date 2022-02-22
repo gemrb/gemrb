@@ -1692,6 +1692,7 @@ static void FloatMessageAtPoint(Scriptable* Sender, const Point& pos, const ieSt
 	// replace once we have a generic solution, so we don't crowd the area
 	Actor *surrogate = gamedata->GetCreature("dmhead");
 	Map *map = Sender->GetCurrentArea();
+	if (!map) return;
 	map->AddActor(surrogate, true);
 	surrogate->SetPosition(pos, 0);
 	String msg = core->GetString(msgRef);
@@ -3591,11 +3592,13 @@ void GameScript::StartMovie(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameters*/)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Actor* act = Scriptable::As<Actor>(Sender);
+	if (!act) {
 		return;
 	}
 	AutoTable pdtable = gamedata->LoadTable("pdialog");
-	Actor* act = ( Actor* ) Sender;
+	if (!pdtable) return;
+
 	const char* scriptname = act->GetScriptName();
 	if (pdtable->GetRowIndex( scriptname ) != -1) {
 		ResRef resRef;

@@ -527,7 +527,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		
 		unsigned int channel = SFX_CHAN_DIALOG;
-		if (flags & DS_CONST) {
+		if (flags & DS_CONST && actor) {
 			if (actor->InParty > 0) {
 				channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
 			} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {

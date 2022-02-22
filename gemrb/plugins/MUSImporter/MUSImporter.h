@@ -35,11 +35,11 @@ namespace GemRB {
   */
 
 struct PLString {
-	char PLFile[10];
-	char PLLoop[10];
-	char PLTag[10];
-	char PLEnd[10];
-	unsigned int soundID;
+	char PLFile[10]{};
+	char PLLoop[10]{};
+	char PLTag[10]{};
+	char PLEnd[10]{};
+	unsigned int soundID = 0;
 };
 
 class MUSImporter : public MusicMgr {
