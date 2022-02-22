@@ -94,7 +94,7 @@ struct UsedItemType {
 	int flags;
 };
 
-using EventNameType = char[17];
+using EventNameType = FixedSizeString<16>;
 #define IS_DROP	0
 #define IS_GET	1
 #define IS_SWINGOFFSET 2 // offset to the swing sound columns
@@ -111,7 +111,7 @@ static std::vector<UsedItemType> UsedItems;
 static ieDword GUIAction[MAX_ACT_COUNT]={UNINIT_IEDWORD};
 static ieStrRef GUITooltip[MAX_ACT_COUNT]={ieStrRef::INVALID};
 static ResRef GUIResRef[MAX_ACT_COUNT];
-static EventNameType GUIEvent[MAX_ACT_COUNT];
+static EventNameType GUIEvent[MAX_ACT_COUNT] {};
 static Store *rhstore = NULL;
 
 static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
@@ -10507,7 +10507,6 @@ static void ReadActionButtons()
 {
 	memset(GUIAction, -1, sizeof(GUIAction));
 	memset(GUITooltip, -1, sizeof(GUITooltip));
-	memset(GUIEvent, 0, sizeof(GUIEvent));
 	auto tab = gamedata->LoadTable( "guibtact" );
 	assert(tab);
 	for (unsigned int i = 0; i < MAX_ACT_COUNT; i++) {
@@ -10520,7 +10519,7 @@ static void ReadActionButtons()
 		GUIAction[i] = row.data;
 		GUITooltip[i] = tab->QueryFieldAsStrRef(i,4);
 		GUIResRef[i] = tab->QueryField(i, 5);
-		strncpy(GUIEvent[i], tab->GetRowName(i).c_str(), 16);
+		GUIEvent[i] = tab->GetRowName(i);
 	}
 }
 
@@ -10584,11 +10583,11 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	SetButtonCycle(bam, btn, (char) row.bytes[2], Button::SELECTED);
 	SetButtonCycle(bam, btn, (char) row.bytes[3], Button::DISABLED);
 	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BitOp::NAND);
-	PyObject *Event = PyUnicode_FromFormat("Action%sPressed", GUIEvent[Index]);
+	PyObject *Event = PyUnicode_FromFormat("Action%sPressed", GUIEvent[Index].CString());
 	PyObject *func = PyDict_GetItem(dict, Event);
 	btn->SetAction(PythonControlCallback(func), Control::Click, GEM_MB_ACTION, 0, 1);
 
-	PyObject *Event2 = PyUnicode_FromFormat("Action%sRightPressed", GUIEvent[Index]);
+	PyObject *Event2 = PyUnicode_FromFormat("Action%sRightPressed", GUIEvent[Index].CString());
 	PyObject *func2 = PyDict_GetItem(dict, Event2);
 	btn->SetAction(PythonControlCallback(func2), Control::Click, GEM_MB_MENU, 0, 1);
 
