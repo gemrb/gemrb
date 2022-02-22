@@ -258,9 +258,6 @@ ELSE()
 ENDIF()
 IF(PYTHONLIBS_FOUND)
 	MESSAGE(STATUS "Looking for Python libraries and headers: found")
-ELSE()
-	MESSAGE(SEND_ERROR "Looking for Python libraries and headers: not found!")
-	MESSAGE(FATAL_ERROR "Please get them (www.python.org)")
 ENDIF()
 
 # Autodetection mechanism
@@ -377,20 +374,14 @@ IF(NOT OPENGL_BACKEND STREQUAL "None")
 
 ENDIF()
 
-INCLUDE(FindZLIB)
+find_package(ZLIB REQUIRED)
 IF(ZLIB_FOUND)
 	MESSAGE(STATUS "Looking for Zlib: found")
-ELSE()
-	MESSAGE(SEND_ERROR "Looking for Zlib: not found!")
-	MESSAGE(FATAL_ERROR "Please install the Zlib library and headers first!")
 ENDIF()
 
 find_package(Iconv REQUIRED)
 IF(Iconv_FOUND)
 	MESSAGE(STATUS "Looking for iconv: found")
-ELSE()
-	MESSAGE(SEND_ERROR "Looking for iconv: not found!")
-	MESSAGE(FATAL_ERROR "Please install the iconv library and headers first!")
 ENDIF()
 
 IF(UNIX)
