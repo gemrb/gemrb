@@ -426,7 +426,7 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 			assert (index != TableMgr::npos);
 		}
 		list[index] = new SpellEntry;
-		list[index]->SetSpell(tab->QueryField(i, lastCol).c_str());
+		list[index]->SetSpell(tab->QueryField(i, lastCol));
 		for (TableMgr::index_t col = 0; col < lastCol; ++col) {
 			list[index]->AddLevel(tab->QueryFieldSigned<int>(i, col), col);
 		}
