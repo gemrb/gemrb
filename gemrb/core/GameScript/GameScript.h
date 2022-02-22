@@ -140,6 +140,7 @@ class GameScript;
 
 using SrcVector = std::vector<ieStrRef>;
 using StringParam = FixedSizeString<64, strnicmp>; // FIXME: should this be case sensetive
+static_assert(std::is_standard_layout<StringParam>::value, "Fixed Size String must be standard layout for use in unions");
 
 struct targettype {
 	Scriptable *actor; //hmm, could be door
