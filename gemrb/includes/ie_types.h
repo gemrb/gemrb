@@ -102,6 +102,11 @@ enum class ieStrRef : ieDword {
 using ieVariable = FixedSizeString<32, strnicmp>;
 using ResRef = FixedSizeString<8, strnicmp>;
 
+template <typename STR>
+inline bool IsStar(const STR& str) {
+	return str[0] == '*';
+}
+
 inline ieVariable MakeVariable(const char* source) {
 	ieVariable var;
 	uint8_t count = var.Size;

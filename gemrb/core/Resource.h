@@ -28,7 +28,7 @@
 #define RESOURCE_H
 
 #include "Plugin.h"
-#include "Strings/StringConversion.h"
+#include "Strings/CString.h"
 
 #include <unordered_map>
 
@@ -36,10 +36,6 @@ namespace GemRB {
 
 /** Resource reference */
 class DataStream;
-
-inline bool IsStar(const ResRef& resref) {
-	return resref[0] == '*';
-}
 
 template <typename T>
 using ResRefMap = std::unordered_map<ResRef, T, CstrHashCI<ResRef>>;
