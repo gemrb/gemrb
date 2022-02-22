@@ -104,19 +104,19 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 
 		ieVariable moduleName;
 		ieVariable function;
-		const char *group;
+		int group;
 
 		if (kmtable->GetRowIndex(name) != TableMgr::npos) {
 			moduleName = kmtable->QueryField(name, "MODULE");
 			function = kmtable->QueryField(name, "FUNCTION");
-			group = kmtable->QueryField(name, "GROUP").c_str();
+			group = kmtable->QueryFieldSigned<int>(name, "GROUP");
 		} else {
 			moduleName = kmtable->QueryField("Default","MODULE");
 			function = kmtable->QueryField("Default","FUNCTION");
-			group = kmtable->QueryField("Default","GROUP").c_str();
+			group = kmtable->QueryFieldSigned<int>("Default","GROUP");
 			Log(MESSAGE, "KeyMap", "Adding key {} with function {}::{}", value, moduleName, function);
 		}
-		Function *fun = new Function(moduleName, function, atoi(group), tolower(value[0]));
+		Function *fun = new Function(moduleName, function, group, tolower(value[0]));
 
 		// lookup by either key or name
 		keymap.SetAt(value, fun);

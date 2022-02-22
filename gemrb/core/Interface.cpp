@@ -2423,9 +2423,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 				const char* rowName = sttable->GetRowName(i).c_str();
 				if (!std::isdigit(rowName[0])) continue; // this skips the initial palette rows (red, blue, green)
 
-				const char* frameField = sttable->QueryField(i, 0).c_str();
+				int frameField = sttable->QueryFieldSigned<int>(i, 0);
 				ieStrRef strField = sttable->QueryFieldAsStrRef(i, 1);
-				subs[atoi(frameField)] = strField;
+				subs[frameField] = strField;
 			}
 		}
 
@@ -4320,7 +4320,7 @@ std::vector<ieDword>* Interface::GetListFrom2DAInternal(const ResRef& resref)
 	if (tab) {
 		ret->resize(tab->GetRowCount());
 		for (size_t i = 0; i < ret->size(); ++i) {
-			ret->at(i) = strtounsigned<ieDword>(tab->QueryField(i, 0).c_str());
+			ret->at(i) = tab->QueryFieldUnsigned<ieDword>(i, 0);
 		}
 	}
 	return ret;

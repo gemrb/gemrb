@@ -58,7 +58,7 @@ DisplayMessage::StrRefs::StrRefs()
 
 bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 {
-	AutoTable tab = gamedata->LoadTable(ResRef(name.c_str()));
+	AutoTable tab = gamedata->LoadTable(name);
 	if (tab) {
 		for(int i=0;i<STRREF_COUNT;i++) {
 			table[i] = tab->QueryFieldAsStrRef(i,0);
