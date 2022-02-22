@@ -90,8 +90,11 @@ struct CritterEntry {
 	ResRef AreaScript;      //override area script
 	ResRef SpecificScript;  //override specific script
 	ResRef Dialog;          //override dialog
+	ResRef PointSelectContext;
 	ieVariable PointSelectVar; // holds spawn point index to use
+	ResRef SaveSelectedPointContext = "GLOBAL";
 	ieVariable SaveSelectedPoint; // a var to save the selected spawn point location to
+	ResRef SaveSelectedFacingContext = "GLOBAL";
 	ieVariable SaveSelectedFacing; // a var to save the selected spawn point orientation to
 	Point SpawnPoint;         //spawn point
 	std::string SpawnPointsDef; // the unparsed available spawn points

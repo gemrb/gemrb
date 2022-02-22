@@ -204,7 +204,7 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 			idx = core->Roll(1, spawnCount, -1);
 		} else if (critter.SpawnMode == 'i' && critter.PointSelectVar) {
 			// choose a point by spawn index
-			idx = CheckVariable(map, critter.PointSelectVar.CString() + 8, critter.PointSelectVar) % spawnCount;
+			idx = CheckVariable(map, critter.PointSelectVar, critter.PointSelectContext) % spawnCount;
 		} // else is 's' mode - single
 
 		ParsePointDef(spawnPointStrings[idx], chosenPoint, orient);
@@ -221,19 +221,11 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 
 	// store point and/or orientation in a global var
 	if (!critter.SaveSelectedPoint.IsEmpty()) {
-		if (VarHasContext(critter.SaveSelectedPoint)) {
-			SetPointVariable(map, critter.SaveSelectedPoint.CString() + 8, critter.SpawnPoint, critter.SaveSelectedPoint);
-		} else {
-			SetPointVariable(map, critter.SaveSelectedPoint, critter.SpawnPoint, "GLOBAL");
-		}
+		SetPointVariable(map, critter.SaveSelectedPoint, critter.SpawnPoint, critter.SaveSelectedPointContext);
 	}
 
 	if (!critter.SaveSelectedFacing.IsEmpty()) {
-		if (VarHasContext(critter.SaveSelectedFacing)) {
-			SetVariable(map, critter.SaveSelectedFacing.CString() + 8, critter.Orientation, critter.SaveSelectedFacing);
-		} else {
-			SetVariable(map, critter.SaveSelectedFacing, critter.Orientation, "GLOBAL");
-		}
+		SetVariable(map, critter.SaveSelectedFacing, critter.Orientation, critter.SaveSelectedFacingContext);
 	}
 }
 
@@ -263,7 +255,8 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 	// indexed sequential mode
 	const char *pointSelectVar = iniFile->GetKeyAsString(critterName, "point_select_var", nullptr);
 	if (pointSelectVar) {
-		critter.PointSelectVar = ieVariable(pointSelectVar);
+		critter.PointSelectContext = ResRef(pointSelectVar);
+		critter.PointSelectVar = ieVariable(pointSelectVar + 8);
 	}
 	bool incSpawnPointIndex = iniFile->GetKeyAsBool(critterName, "inc_spawn_point_index", false);
 	if (incSpawnPointIndex && critter.SpawnMode == 'i') {
@@ -403,10 +396,24 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, const char* crit
 
 	// store point and/or orientation in a global var
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
-	if (s) critter.SaveSelectedPoint = ieVariable(s);
+	if (s) {
+		if (VarHasContext(s)) {
+			critter.SaveSelectedPointContext = ResRef(s);
+			critter.SaveSelectedPoint = ieVariable(s + 8);
+		} else {
+			critter.SaveSelectedPoint = ieVariable(s);
+		}
+	}
 
 	s = inifile->GetKeyAsString(crittername,"save_selected_facing",NULL);
-	if (s) critter.SaveSelectedFacing = ieVariable(s);;
+	if (s) {
+		if (VarHasContext(s)) {
+			critter.SaveSelectedFacingContext = ResRef(s);
+			critter.SaveSelectedFacing = ieVariable(s + 8);
+		} else {
+			critter.SaveSelectedFacing = ieVariable(s);
+		}
+	}
 
 	//sometimes only the orientation is given, the point is stored in a variable
 	ps = inifile->GetKeyAsInt(crittername,"facing",-1);
@@ -741,9 +748,9 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	}
 
 	if (critter.Flags & CF_INC_INDEX) {
-		int value = CheckVariable(map, critter.PointSelectVar);
+		int value = CheckVariable(map, critter.PointSelectVar, critter.PointSelectContext);
 		// NOTE: not replicating bug where it would increment the index twice if create_qty > 1
-		SetVariable(map, critter.PointSelectVar, value + 1);
+		SetVariable(map, critter.PointSelectVar, value + 1, critter.PointSelectContext);
 	}
 
 	SetVariable(map, critter.SpecVar, specvar + (ieDword) critter.SpecVarInc, critter.SpecContext);
