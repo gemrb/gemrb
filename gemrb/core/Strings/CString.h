@@ -67,6 +67,10 @@ struct GEM_EXPORT CstrHash
 template <typename STR_T>
 using CstrHashCI = CstrHash<STR_T, std::tolower>;
 
+// SFINAE garbage to only enable funtions for strings of known size
+// i'm sure its not perfect, but it meets our needs
+#define ENABLE_CHAR_RANGE typename std::enable_if<(!std::is_fundamental<STR>::value && !std::is_pointer<STR>::value) || std::is_same<STR, decltype("")>::value, int>::type = 0
+
 template<size_t LEN, int(*CMP)(const char*, const char*, size_t) = strncmp>
 class FixedSizeString {
 	// we use uint8_t and an object of massive size is not wanted
@@ -96,16 +100,12 @@ public:
 		return *this;
 	}
 	
-	template<typename STR,
-	// ignore the junk after STR... its just SFINAE garbage to hide the ctor from certain useages
-	typename std::enable_if<!std::is_integral<STR>::value && !std::is_same<typename std::remove_cv<STR>::type, char*>::value, int>::type = 0>
+	template<typename STR, ENABLE_CHAR_RANGE>
 	FixedSizeString(const STR& s) noexcept {
 		strncpy(str, &s[0], LEN);
 	}
 
-	template<typename STR,
-	// ignore the junk after STR... its just SFINAE garbage to hide assignment from certain useages
-	typename std::enable_if<!std::is_integral<STR>::value && !std::is_same<typename std::remove_cv<STR>::type, char*>::value, int>::type = 0>
+	template<typename STR, ENABLE_CHAR_RANGE>
 	FixedSizeString& operator=(const STR& s) noexcept {
 		strncpy(str, &s[0], LEN);
 		return *this;

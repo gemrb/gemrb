@@ -279,7 +279,7 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 	// take point from variable
 	const char *spawnPointGlobal = iniFile->GetKeyAsString(critterName,"spawn_point_global", nullptr);
 	if (spawnPointGlobal && critter.SpawnMode == 'e') {
-		critter.SpawnPoint = CheckPointVariable(map, spawnPointGlobal + 8, spawnPointGlobal);
+		critter.SpawnPoint = CheckPointVariable(map, StringParam(spawnPointGlobal + 8), ResRef(spawnPointGlobal));
 	}
 
 	// take facing from variable
@@ -289,7 +289,7 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 	// However, both attributes had to be specified to work
 	const char *spawnFacingGlobal = iniFile->GetKeyAsString(critterName,"spawn_facing_global", nullptr);
 	if (spawnFacingGlobal  && critter.SpawnMode == 'e') {
-		critter.Orientation = static_cast<int>(CheckVariable(map, spawnFacingGlobal + 8, spawnFacingGlobal));
+		critter.Orientation = static_cast<int>(CheckVariable(map, StringParam(spawnFacingGlobal + 8), ResRef(spawnFacingGlobal)));
 	}
 
 	// should all create_qty spawns use the same spawn point?
