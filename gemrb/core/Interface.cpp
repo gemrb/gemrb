@@ -283,10 +283,6 @@ Interface::~Interface() noexcept
 
 	delete sgiterator;
 
-	for (auto& track : musiclist) {
-		free((void *) track);
-	}
-
 	DamageInfoMap.clear();
 
 	delete plugin_flags;
@@ -541,7 +537,7 @@ bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 		return false;
 
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
-		musiclist.push_back(strdup(tm->QueryField(i, col).c_str()));
+		musiclist.push_back(tm->QueryField(i, col));
 	}
 
 	return true;
@@ -587,12 +583,17 @@ bool Interface::ReadSoundChannelsTable() const
 	return true;
 }
 
-//Not a constant anymore, we let the caller set the entry to zero
-char *Interface::GetMusicPlaylist(int SongType) const {
-	if (SongType < 0 || (unsigned int)SongType >= musiclist.size())
-		return NULL;
-
+const static ieVariable star("*");
+const ieVariable& Interface::GetMusicPlaylist(size_t SongType) const {
+	if (SongType >= musiclist.size()) return star;
 	return musiclist[SongType];
+}
+
+void Interface::DisableMusicPlaylist(size_t SongType)
+{
+	if (SongType < musiclist.size()) {
+		musiclist[SongType] = star;
+	}
 }
 
 /** this is the main loop */

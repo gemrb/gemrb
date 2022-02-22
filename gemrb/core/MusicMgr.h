@@ -35,15 +35,15 @@ public:
 	/** Initializes the PlayList Manager */
 	virtual bool Init() = 0;
 	/** Loads a PlayList for playing */
-	virtual bool OpenPlaylist(const char* name) = 0;
+	virtual bool OpenPlaylist(const ieVariable& name) = 0;
 	/** Switches the current PlayList while playing the current one, return nonzero on error */
-	virtual int SwitchPlayList(const char* name, bool Hard) = 0;
+	virtual int SwitchPlayList(const ieVariable& name, bool Hard) = 0;
 	/** Plays the Next Entry */
 	virtual void PlayNext() = 0;
 	/** Returns whether music is currently playing */
 	virtual bool IsPlaying() = 0;
 	/** Returns whether given playlist is currently loaded */
-	virtual bool CurrentPlayList(const char* name) = 0;
+	virtual bool IsCurrentPlayList(const ieVariable& name) = 0;
 };
 
 }

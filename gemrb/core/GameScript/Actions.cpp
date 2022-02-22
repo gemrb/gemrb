@@ -1738,8 +1738,8 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 {
 	//the force play logic should be handled by SwitchPlayList
 	bool force;
-	char* poi = core->GetMusicPlaylist( parameters->int0Parameter );
-	if (!poi) return;
+	const ieVariable& poi = core->GetMusicPlaylist(parameters->int0Parameter);
+	if (IsStar(poi)) return;
 
 	//if parameter is force, force the music, otherwise just schedule it for next
 	if (parameters->int1Parameter==1) {
@@ -1749,7 +1749,7 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	}
 	int ret = core->GetMusicMgr()->SwitchPlayList( poi, force );
 	if (ret) {
-		*poi = '*';
+		core->DisableMusicPlaylist(parameters->int0Parameter);
 	}
 }
 

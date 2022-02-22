@@ -444,7 +444,7 @@ public:
 	std::vector<Holder<Sprite2D> > Cursors;
 	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
-	std::vector<char *> musiclist;
+	std::vector<ieVariable> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	TimeStruct Time{};
 public:
@@ -703,8 +703,8 @@ public:
 	/** Opens CD prompt window and waits for the specified disc */
 	void WaitForDisc(int disc_number, const char* path) const;
 	/** Returns the music playlist corresponding to the provided type */
-	/** it allows scrapping the entry, hence it isn't const */
-	char *GetMusicPlaylist(int SongType) const;
+	const ieVariable& GetMusicPlaylist(size_t SongType) const;
+	void DisableMusicPlaylist(size_t SongType);
 	/** Returns the DeathVarFormat of the day */
 	static const char *GetDeathVarFormat();
 	/** Saves config variables to a file */
