@@ -365,10 +365,7 @@ IF(NOT OPENGL_BACKEND STREQUAL "None")
 
 		# GLEW is required only for Windows
 		IF (WIN32)
-			INCLUDE(FindGLEW)
-			IF(NOT GLEW_FOUND)
-				MESSAGE(FATAL "GLEW library not found!")
-			ENDIF()
+			find_package(GLEW REQUIRED)
 		ENDIF()
 
 	ELSEIF(OPENGL_BACKEND STREQUAL "GLES")
