@@ -966,9 +966,9 @@ int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xd1 fx_hostile_image (Spell Effect: Soul Exodus)
-int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
+int fx_hostile_image(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_hostile_image(%2d): Par1: %d Par2: %d TODO: not implemented!", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	Log(ERROR, "PSTOpcodes","fx_hostile_image: not implemented! Source: {}", fx->Source);
 	return FX_NOT_APPLIED;
 }
 
@@ -1030,7 +1030,7 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xd4 fx_speak_with_dead
 //This opcode is directly employed by the speak with dead projectile in the original engine
 //In GemRB it is used in a custom spell
-int fx_speak_with_dead (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
+int fx_speak_with_dead (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_speak_with_dead(%2d)", fx->Opcode);
 	if (!STATE_GET( STATE_DEAD) ) {
@@ -1038,6 +1038,7 @@ int fx_speak_with_dead (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	}
 
 	//TODO: reverse engineer the original opcode
+	Log(ERROR, "PSTOpcodes","fx_speak_with_dead: not implemented! Source: {}", fx->Source);
 	return FX_NOT_APPLIED;
 }
 
