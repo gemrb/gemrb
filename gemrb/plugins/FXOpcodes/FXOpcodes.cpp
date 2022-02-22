@@ -7082,26 +7082,32 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 1: //crash???
 			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time))) {
 				core->ApplyEffect(newfx, target, caster);
+			} else {
+				delete newfx;
 			}
 			break;
 		case 2://param1 times every second
 			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time))) {
 				for (ieDword i=0; i < fx->Parameter1; i++) {
-					core->ApplyEffect(newfx, target, caster);
+					core->ApplyEffect(new Effect(*newfx), target, caster);
 				}
 			}
+			delete newfx;
 			break;
 		case 3: //once every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * core->Time.ai_update_time))) {
 				core->ApplyEffect(newfx, target, caster);
+			} else {
+				delete newfx;
 			}
 			break;
 		case 4: //param3 times every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * core->Time.ai_update_time))) {
 				for (ieDword i=0; i < fx->Parameter3; i++) {
-					core->ApplyEffect(newfx, target, caster);
+					core->ApplyEffect(new Effect(*newfx), target, caster);
 				}
 			}
+			delete newfx;
 			break;
 		default:
 			delete newfx;
