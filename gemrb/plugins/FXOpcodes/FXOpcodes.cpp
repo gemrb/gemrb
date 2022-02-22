@@ -4334,6 +4334,8 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x8c CastingGlow
+// the originals actually spawned a projectile to do the work
+// it was unhardcoded in bg2ee or iwdee
 int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_casting_glow(%2d): Type: %d", fx->Opcode, fx->Parameter2);
@@ -4353,12 +4355,19 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}
-		//12 is just an approximate value to set the height of the casting glow
-		//based on the avatar's size
-		int heightmod = target->GetAnims()->GetCircleSize()*12;
+		// as per the original bg2 code, should we externalize?
+		// only dragons got a different Z; anim IDs that were tested:
+		// 0x1200-0x12FF, 0x1400-0x1FFF
+		int heightmod = 0x23;
+		int animationID = target->GetStat(IE_ANIMATION_ID);
+		if ((animationID >= 0x1200 && animationID < 0x1300) || (animationID >= 0x1400 && animationID < 0x2000)) {
+			if ((animationID & 0xF00) == 0x200 && (animationID & 0xF) < 9) {
+				heightmod = 0x90;
+			}
+		}
 		sca->XOffset += xpos_by_direction[target->GetOrientation()];
 		sca->YOffset += ypos_by_direction[target->GetOrientation()];
-		sca->ZOffset += heightmod;
+		sca->ZOffset = heightmod;
 		sca->SetBlend();
 		if (fx->Duration) {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
