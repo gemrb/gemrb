@@ -66,16 +66,16 @@ bool MUSImporter::Init()
 }
 
 /** Loads a PlayList for playing */
-bool MUSImporter::OpenPlaylist(const char* name)
+bool MUSImporter::OpenPlaylist(const ieVariable& name)
 {
-	if (Playing || CurrentPlayList(name)) {
+	if (Playing || IsCurrentPlayList(name)) {
 		return true;
 	}
 	core->GetAudioDrv()->ResetMusics();
 	playlist.clear();
 	PLpos = 0;
-	PLName[0] = '\0';
-	if (name[0] == '*') {
+	PLName.Reset();
+	if (IsStar(name)) {
 		return false;
 	}
 	char path[_MAX_PATH];
@@ -85,7 +85,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		Log(ERROR, "MUSImporter", "Didn't find playlist '{}'.", path);
 		return false;
 	}
-	strret_t c = str->ReadLine( PLName, 32 );
+	strret_t c = str->ReadLine(PLName.begin(), 32);
 	while (c > 0) {
 		if (isblank(PLName[c - 1]))
 			PLName[c - 1] = 0;
@@ -196,12 +196,12 @@ void MUSImporter::HardEnd()
 }
 
 /** Switches the current PlayList while playing the current one, return nonzero on error */
-int MUSImporter::SwitchPlayList(const char* name, bool Hard)
+int MUSImporter::SwitchPlayList(const ieVariable& name, bool Hard)
 {
 	if (Playing) {
 		//don't do anything if the requested song is already playing
 		//this fixed PST's infinite song start
-		if (CurrentPlayList(name))
+		if (IsCurrentPlayList(name))
 			return 0;
 		if (Hard) {
 			HardEnd();
@@ -211,7 +211,7 @@ int MUSImporter::SwitchPlayList(const char* name, bool Hard)
 		//if still playing, then don't insist on trying to open it now
 		//either HardEnd stopped it for us, or End marked it for early ending
 		if (Playing) {
-			strlcpy(PLNameNew, name, sizeof(PLNameNew) );
+			PLNameNew = name;
 			return 0;
 		}
 	}
@@ -266,7 +266,7 @@ void MUSImporter::PlayMusic(int pos)
 	PlayMusic( playlist[pos].PLFile );
 }
 
-void MUSImporter::PlayMusic(char* name)
+void MUSImporter::PlayMusic(const ieVariable& name)
 {
 	char FName[_MAX_PATH];
 	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
@@ -275,7 +275,7 @@ void MUSImporter::PlayMusic(char* name)
 		PathJoin(FName, "mx0000", name, nullptr);
 	} else if (strnicmp( name, "SPC", 3 ) != 0) { //bg2
 		char File[_MAX_PATH];
-		snprintf(File, _MAX_PATH, "%s%s", PLName, name);
+		fmt::format_to(File, "{}{}", PLName, name);
 		PathJoin(FName, PLName, File, nullptr);
 	} else {
 		strlcpy(FName, name, _MAX_PATH);
@@ -293,8 +293,8 @@ void MUSImporter::PlayMusic(char* name)
 	Log(MESSAGE, "MUSImporter", "Playing {}...", FName);
 }
 
-bool MUSImporter::CurrentPlayList(const char* name) {
-	return stricmp(name, PLName) == 0;
+bool MUSImporter::IsCurrentPlayList(const ieVariable& name) {
+	return name == PLName;
 }
 
 #include "plugindef.h"

@@ -2503,27 +2503,26 @@ bool Map::SpawnsAlive() const
 
 void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 {
-	//Ok, we use a non constant pointer here, so it is easy to disable
-	//a faulty music list on the fly. I don't want to add a method just for that
-	//crap when we already have that pointer at hand!
-	char* poi = core->GetMusicPlaylist(SongList[SongType]);
+	size_t pl = SongList[SongType];
+	const ieVariable* poi = &core->GetMusicPlaylist(pl);
 	// for subareas fall back to the main list
 	// needed eg. in bg1 ar2607 (intro candlekeep ambush south)
 	// it's not the correct music, perhaps it needs the one from the master area
 	// it would match for ar2607 and ar2600, but very annoying (see GetMasterArea)
 	// ... but this is also definitely wrong for iwd
-	if (!poi && !MasterArea && SongType == SONG_BATTLE && core->HasFeature(GF_BREAKABLE_WEAPONS)) {
-		poi = core->GetMusicPlaylist(SongType);
+	if (IsStar(*poi) && !MasterArea && SongType == SONG_BATTLE && core->HasFeature(GF_BREAKABLE_WEAPONS)) {
+		poi = &core->GetMusicPlaylist(SongType);
+		pl = SongType;
 	}
-	if (!poi) return;
+
+	if (IsStar(*poi)) return;
 
 	//check if restart needed (either forced or the current song is different)
-	if (!restart && core->GetMusicMgr()->CurrentPlayList(poi)) return;
-	int ret = core->GetMusicMgr()->SwitchPlayList( poi, hard );
-	//Here we disable the faulty musiclist entry
+	if (!restart && core->GetMusicMgr()->IsCurrentPlayList(*poi)) return;
+	int ret = core->GetMusicMgr()->SwitchPlayList(*poi, hard);
 	if (ret) {
-		//Apparently, the playlist manager prefers a *
-		*poi='*';
+		//Here we disable the faulty musiclist entry
+		core->DisableMusicPlaylist(pl);
 		return;
 	}
 	if (SongType == SONG_BATTLE) {

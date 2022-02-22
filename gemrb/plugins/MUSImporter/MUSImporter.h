@@ -46,8 +46,8 @@ class MUSImporter : public MusicMgr {
 private:
 	bool Initialized = false;
 	bool Playing = false;
-	char PLName[32]{};
-	char PLNameNew[32]{};
+	ieVariable PLName;
+	ieVariable PLNameNew;
 	int PLpos = 0;
 	int PLnext = -1;
 	FileStream* str;
@@ -56,18 +56,18 @@ private:
 	ResourceManager manager;
 private:
 	void PlayMusic(int pos);
-	void PlayMusic(char* name);
+	void PlayMusic(const ieVariable& name);
 public:
 	MUSImporter();
 	MUSImporter(const MUSImporter&) = delete;
 	~MUSImporter() override;
 	MUSImporter& operator=(const MUSImporter&) = delete;
 	/** Loads a PlayList for playing */
-	bool OpenPlaylist(const char* name) override;
+	bool OpenPlaylist(const ieVariable& name) override;
 	/** Initializes the PlayList Manager */
 	bool Init() override;
 	/** Switches the current PlayList while playing the current one */
-	int SwitchPlayList(const char* name, bool Hard) override;
+	int SwitchPlayList(const ieVariable& name, bool Hard) override;
 	/** Ends the Current PlayList Execution */
 	void End() override;
 	void HardEnd() override;
@@ -78,7 +78,7 @@ public:
 	/** Returns whether music is currently playing */
 	bool IsPlaying() override { return Playing; }
 	/** Returns whether given playlist is currently loaded */
-	bool CurrentPlayList(const char* name) override;
+	bool IsCurrentPlayList(const ieVariable& name) override;
 };
 
 }
