@@ -152,7 +152,7 @@ INSTALL( TARGETS gemrb DESTINATION ${BIN_DIR} )
 
 # optional script to help deploy dependencies when building with windows.
 IF(VCPKG_AUTO_DEPLOY)
-	INCLUDE(vcpkg_deps.cmake)
+	INCLUDE(${CMAKE_SOURCE_DIR}/platforms/windows/vcpkg_deps.cmake)
 ENDIF()
 
 IF(VITA)
