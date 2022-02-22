@@ -1812,8 +1812,7 @@ static void InitActorTables()
 			if (tm->QueryFieldSigned<int>( i, 1)) {
 				hc_locations|=mask;
 			}
-			const char *flags = tm->QueryField(i, 2).c_str();
-			hc_flags[i] = atoi(flags);
+			hc_flags[i] = tm->QueryFieldSigned<int>(i, 2);
 			mask<<=1;
 		}
 	}
@@ -1824,7 +1823,7 @@ static void InitActorTables()
 		tm = gamedata->LoadTable("csound");
 		if (tm) {
 			for (int i = 0; i < VCONST_COUNT; i++) {
-				const char *suffix = tm->QueryField(i, 0).c_str();
+				const auto& suffix = tm->QueryField(i, 0);
 				switch(suffix[0]) {
 					case '*': break;
 					//I have no idea what this ! mean
@@ -2302,8 +2301,8 @@ static void InitActorTables()
 		if (count> 0 && count<8) {
 			avPrefix.resize(count - 1);
 			avBase = tm->QueryFieldSigned<int>(0, 0);
-			const char *poi = tm->QueryField(0,1).c_str();
-			if (*poi!='*') {
+			const auto& poi = tm->QueryField(0,1);
+			if (poi[0] != '*') {
 				avStance = tm->QueryFieldSigned<int>(0,1);
 			} else {
 				avStance = -1;
@@ -2328,7 +2327,7 @@ static void InitActorTables()
 		for (TableMgr::index_t i = 0; i < racesNRows; i++) {
 			int raceID = tm->QueryFieldSigned<int>(i, 3);
 			int favClass = tm->QueryFieldSigned<int>(i, 8);
-			const char *raceName = tm->GetRowName(i).c_str();
+			const auto& raceName = tm->GetRowName(i);
 			favoredMap.emplace(raceID, favClass);
 			raceID2Name.emplace(raceID, raceName);
 		}
@@ -3571,8 +3570,8 @@ bool Actor::HasSpecialDeathReaction(const ieVariable& deadname) const
 {
 	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return false;
-	const char *value = tm->QueryField(scriptName.CString(), deadname).c_str();
-	return value && value[0] != '0';
+	const auto& value = tm->QueryField(scriptName.CString(), deadname);
+	return value[0] != '0';
 }
 
 void Actor::ReactToDeath(const ieVariable& deadname)
@@ -10831,8 +10830,7 @@ int Actor::UpdateAnimationID(bool derived)
 		StatID = av.stat;
 		StatID = derived?GetSafeStat(StatID):GetBase( StatID );
 
-		const char *poi = tm->QueryField( StatID ).c_str();
-		AnimID += strtosigned<int>(poi);
+		AnimID += tm->QueryFieldSigned<int>(StatID, 0);
 	}
 	if (BaseStats[IE_ANIMATION_ID]!=(unsigned int) AnimID) {
 		SetBase(IE_ANIMATION_ID, (unsigned int) AnimID);
