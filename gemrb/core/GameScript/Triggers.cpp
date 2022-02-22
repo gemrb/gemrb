@@ -1754,10 +1754,10 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 		size_t len;
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
-			len = Variable.SNPrintF("%s_DEAD", parameters->string0Parameter);
+			len = Variable.SNPrintF("%s_DEAD", parameters->string0Parameter.CString());
 			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {
-			len = Variable.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter);
+			len = Variable.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter.CString());
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
 		}
 		if (len > sizeof(ieVariable)) {
