@@ -2413,10 +2413,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 
 	public:
 		// default color taken from BGEE.lua
-		IESubtitles(class Font* fnt, const ResRef& resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
+		IESubtitles(class Font* fnt, const AutoTable& sttable, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
-			AutoTable sttable = gamedata->LoadTable(resref);
 			nextSubFrame = 0;
 
 			for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
@@ -2457,9 +2456,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		int b = atoi(sttable->QueryField("blue", "frame"));
 
 		if (r || g || b) {
-			mp->SetSubtitles(new IESubtitles(font, movieRef, Color(r, g, b, 0xff)));
+			mp->SetSubtitles(new IESubtitles(font, sttable, Color(r, g, b, 0xff)));
 		} else {
-			mp->SetSubtitles(new IESubtitles(font, movieRef));
+			mp->SetSubtitles(new IESubtitles(font, sttable));
 		}
 	}
 
