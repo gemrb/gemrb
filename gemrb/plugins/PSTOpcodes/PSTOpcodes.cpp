@@ -941,11 +941,10 @@ int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xcf fx_stop_all_action
 int fx_stop_all_action (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_stop_all_action(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter2) {
-		core->GetGame()->TimeStop(nullptr, 0xffffffff);
-	} else {
 		core->GetGame()->TimeStop(nullptr, 0);
+	} else {
+		core->GetGame()->TimeStop(nullptr, 0xffffffff);
 	}
 	return FX_NOT_APPLIED;
 }
