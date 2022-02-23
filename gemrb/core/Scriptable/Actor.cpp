@@ -65,9 +65,6 @@ const ieDword ref_lightness = 43;
 static int sharexp = SX_DIVIDE|SX_COMBAT;
 static int classcount = -1;
 static int extraslots = -1;
-static char **clericspelltables = NULL;
-static char **druidspelltables = NULL;
-static char **wizardspelltables = NULL;
 static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpbonus = NULL;
@@ -1477,28 +1474,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (clericspelltables) {
-			for (int i = 0; i < classcount; i++) {
-				free (clericspelltables[i]);
-			}
-			free(clericspelltables);
-			clericspelltables=NULL;
-		}
-		if (druidspelltables) {
-			for (int i = 0; i < classcount; i++) {
-				free (druidspelltables[i]);
-			}
-			free(druidspelltables);
-			druidspelltables=NULL;
-		}
-		if (wizardspelltables) {
-			for (int i = 0; i < classcount; i++) {
-				free(wizardspelltables[i]);
-			}
-			free(wizardspelltables);
-			wizardspelltables=NULL;
-		}
-
 		if (defaultprof) {
 			free(defaultprof);
 			defaultprof=NULL;
@@ -1741,9 +1716,6 @@ static void InitActorTables()
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
-		clericspelltables = (char **) calloc(classcount, sizeof(char*));
-		druidspelltables = (char **) calloc(classcount, sizeof(char*));
-		wizardspelltables = (char **) calloc(classcount, sizeof(char*));
 		turnlevels = (int *) calloc(classcount, sizeof(int));
 		booktypes = (int *) calloc(classcount, sizeof(int));
 		defaultprof = (int *) calloc(classcount, sizeof(int));
@@ -1759,24 +1731,20 @@ static void InitActorTables()
 			field = tm->QueryField(rowname, "DRUIDSPELL");
 			if (field[0]!='*') {
 				isclass[ISDRUID] |= bitmask;
-				druidspelltables[i]=strdup(field);
 			}
 			field = tm->QueryField(rowname, "CLERICSPELL");
 			if (field[0]!='*') {
 				// iwd2 has no DRUIDSPELL
 				if (third && !strnicmp(field, "MXSPLDRD", 8)) {
 					isclass[ISDRUID] |= bitmask;
-					druidspelltables[i]=strdup(field);
 				} else {
 					isclass[ISCLERIC] |= bitmask;
-					clericspelltables[i]=strdup(field);
 				}
 			}
 
 			field = tm->QueryField(rowname, "MAGESPELL");
 			if (field[0]!='*') {
 				isclass[ISMAGE] |= bitmask;
-				wizardspelltables[i]=strdup(field);
 			}
 
 			// field 3 holds the starting xp
