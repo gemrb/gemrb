@@ -4338,11 +4338,6 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // it was unhardcoded in bg2ee or iwdee
 int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_casting_glow(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-
-	static const int ypos_by_direction[16] = { 10, 10, 10, 0, -10, -10, -10, -10, -10, -10, -10, -10, 0, 10, 10, 10 };
-	static const int xpos_by_direction[16] = { 0, -10, -12, -14, -16, -14, -12, -10, 0, 10, 12, 14, 16, 14, 12, 10 };
-
 	if (fx->Parameter2 < gamedata->castingGlows.size()) {
 		// check if we're in SpellCastEffect mode for iwd2
 		ResRef& animRef = gamedata->castingGlows[fx->Parameter2];
@@ -4361,8 +4356,9 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		if (target->ValidTarget(GA_BIGBAD)) {
 			heightmod = 0x90;
 		}
-		sca->XOffset += xpos_by_direction[target->GetOrientation()];
-		sca->YOffset += ypos_by_direction[target->GetOrientation()];
+		Point offset = Projectile::GetStartOffset(target);
+		sca->XOffset += offset.x;
+		sca->YOffset += offset.y;
 		sca->ZOffset = heightmod;
 		sca->SetBlend();
 		if (fx->Duration) {

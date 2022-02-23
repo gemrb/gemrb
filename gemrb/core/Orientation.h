@@ -84,9 +84,16 @@ inline orient_t ReduceToHalf(orient_t orient)
 	return ClampToOrientation(orient & ~1);
 }
 
+// reflects over the center
 inline orient_t ReflectOrientation(orient_t orient)
 {
 	return orient_t(orient ^ 8);
+}
+
+// reflects over the vertical axis
+inline orient_t FlipOrientation(orient_t orient)
+{
+	return orient_t(16 - orient);
 }
 
 // clockwise

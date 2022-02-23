@@ -1817,4 +1817,151 @@ void Projectile::Draw(const Holder<Sprite2D>& spr, const Point& p, BlitFlags fla
 	video->BlitGameSpriteWithPalette(spr, pal, p, flags | BlitFlags::BLENDED, overrideTint);
 }
 
+// all but a few dragons get 0,0 offset
+static Point GetCastingOffset(const Actor* actor)
+{
+	Point offset;
+	if (!actor) return offset;
+	if (!actor->ValidTarget(GA_BIGBAD)) return offset;
+
+	orient_t direction = actor->GetOrientation();
+	orient_t origDirection = direction;
+	if (direction > N) {
+		direction = FlipOrientation(direction);
+	}
+
+	switch (direction) {
+		case S:
+			offset.x = 0xc;
+			offset.y = 0xa3;
+			break;
+		case SSW:
+			offset.x = -0x60;
+			offset.y = 0x97;
+			break;
+		case SW:
+			offset.x = -0xb4;
+			offset.y = 0x73;
+			break;
+		case WSW:
+			offset.x = -0xe1;
+			offset.y = 0x3b;
+			break;
+		case W:
+			offset.x = -0xe9;
+			offset.y = 0;
+			break;
+		case WNW:
+			offset.x = -0xd4;
+			offset.y = -0x3a;
+			break;
+		case NW:
+			offset.x = -0x9f;
+			offset.y = -0x65;
+			break;
+		case NNW:
+			offset.x = -0x5d;
+			offset.y = -0x80;
+			break;
+		case N:
+			offset.x = -0xd;
+			offset.y = -0x90;
+			break;
+		default:
+			error("Projectile", "Mishandled orientation mirroring: {}!", direction);
+	}
+
+	if (origDirection > N) {
+		offset.x = -offset.x;
+	}
+
+	return offset;
+}
+
+// move these two to CharAnimations if they ever become useful elsewhere
+// and compute on animation creation (or even cache per circle size)
+static int GetEllipseOffset(const Size& ellipse)
+{
+	int a = ellipse.w * ellipse.w;
+	int b = ellipse.h * ellipse.h;
+	int c = std::max(1, a + b);
+	return 2 * static_cast<int>(std::sqrt(a * b / c));
+}
+
+// this is lifted from the EEs, just not centered, not taking existing regions and working on a Size
+static Size GetEllipseSize(int circleSize)
+{
+	Size ellipse;
+	ellipse.w = 2 * std::max(1, (circleSize - 1) * 8);
+	ellipse.h = static_cast<int>(ellipse.w * 0.6F); // NOTE: not quite 12/16!
+
+	float multiplier = EventMgr::TouchInputEnabled ? 1.4F : 1.1F;
+	ellipse.w *= multiplier;
+	ellipse.h *= multiplier;
+	return ellipse;
+}
+
+// casting glows are offset by the selection circle distance or hardcoded
+Point Projectile::GetStartOffset(const Actor* actor)
+{
+	// the original also set start to Scriptable->Pos, since this was called on all projectiles
+	Point start;
+	// check for the hardcoded offset of huge monsters
+	Point ptOffset = GetCastingOffset(actor);
+	start += ptOffset;
+	if (!ptOffset.IsZero()) return start;
+
+	// regular selection circle offset
+	Size ellipse = GetEllipseSize(actor->GetAnims()->GetCircleSize());
+
+	int offset;
+	switch (actor->GetOrientation()) {
+		case S:
+		case SSW:
+			start.y += ellipse.h / 2;
+			break;
+		case SW:
+		case WSW:
+			offset = GetEllipseOffset(ellipse);
+			start.x -= offset;
+			start.y += offset;
+			break;
+		case W:
+		case WNW:
+			start.x -= ellipse.w * 2;
+			start.y += 1;
+			break;
+		case NW:
+		case NNW:
+			offset = GetEllipseOffset(ellipse);
+			start.x -= offset;
+			start.y -= offset;
+			break;
+		case N:
+		case NNE:
+			start.y -= ellipse.h * 2;
+			break;
+		case NE:
+		case ENE:
+			offset = GetEllipseOffset(ellipse);
+			start.x += offset;
+			start.y -= offset;
+			break;
+		case E:
+		case ESE:
+			start.x += ellipse.w * 2;
+			start.y += 1;
+			break;
+		case SE:
+		case SSE:
+			offset = GetEllipseOffset(ellipse);
+			start.x += offset;
+			start.y += offset;
+			break;
+		default: // currently impossible
+			error("Projectile", "Bad orientation!");
+	}
+	return start;
+}
+
 }

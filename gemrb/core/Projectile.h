@@ -411,6 +411,7 @@ public:
 	void Draw(const Region &screen);
 	void SetGradient(int gradient, bool tinted);
 	void StaticTint(const Color &newtint);
+	static Point GetStartOffset(const Actor* actor);
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
@@ -464,7 +465,6 @@ private:
 	void NextTarget(const Point &p);
 	void SetupPalette(const AnimArray&, PaletteHolder &pal, const ieByte *gradients) const;
 
-private:
 	void Draw(const Holder<Sprite2D>& spr, const Point& p,
 			  BlitFlags flags, Color overrideTint) const;
 };

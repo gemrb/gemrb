@@ -32,9 +32,6 @@
 
 namespace GemRB {
 
-// fx_casting_glow has hardcoded height offsets, while they should be avatar based
-// ypos_by_direction and xpos_by_direction
-
 // MAX_TRAVELING_DISTANCE is our choice, only used for party travel
 // MAX_OPERATING_DISTANCE is a guess
 // test cases: tob pp summoning spirit, pst portals, pst AR0405, AR0508, ar0500 (guards through gates)
