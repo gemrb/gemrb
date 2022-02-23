@@ -4356,14 +4356,10 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 		// as per the original bg2 code, should we externalize?
-		// only dragons got a different Z; anim IDs that were tested:
-		// 0x1200-0x12FF, 0x1400-0x1FFF
+		// only dragons got a different x, y, z offset (x and y being handled in the projectile)
 		int heightmod = 0x23;
-		int animationID = target->GetStat(IE_ANIMATION_ID);
-		if ((animationID >= 0x1200 && animationID < 0x1300) || (animationID >= 0x1400 && animationID < 0x2000)) {
-			if ((animationID & 0xF00) == 0x200 && (animationID & 0xF) < 9) {
-				heightmod = 0x90;
-			}
+		if (target->ValidTarget(GA_BIGBAD)) {
+			heightmod = 0x90;
 		}
 		sca->XOffset += xpos_by_direction[target->GetOrientation()];
 		sca->YOffset += ypos_by_direction[target->GetOrientation()];

@@ -163,6 +163,7 @@ namespace GemRB {
 
 #define GA_ONLY_BUMPABLE 32768
 #define GA_CAN_BUMP 65536
+#define GA_BIGBAD 131072
 
 #define VCONST_COUNT 100
 

@@ -5846,6 +5846,13 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		if (core->GetGame()->CombatCounter) return false;
 		if (!((IsPartyMember() && GetStat(IE_EA) < EA_GOODCUTOFF) || GetStat(IE_NPCBUMP))) return false;
 	}
+	if (ga_flags & GA_BIGBAD) {
+		ieDword animID = Modified[IE_ANIMATION_ID];
+		// accept only a subset of ranges 0x1200-0x12FF and 0x1400-0x1FFF
+		if (animID < 0x1200 || (animID >= 0x1300 && animID < 0x1400)) return false;
+		if (animID >= 0x2000) return false;
+		if ((animID & 0xf00) != 0x200 || (animID & 0xf) >= 9) return false;
+	}
 	return true;
 }
 
