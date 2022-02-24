@@ -894,8 +894,8 @@ public:
 	/* Returns an exact copy of this actor */
 	Actor *CopySelf(bool mislead) const;
 	static ieDword GetClassID(ieDword isClass);
-	const char *GetClassName(ieDword classID) const;
-	const char *GetKitName(ieDword kitID) const;
+	const std::string& GetClassName(ieDword classID) const;
+	const std::string& GetKitName(ieDword kitID) const;
 	/* Returns the actor's level of the given class */
 	ieDword GetFighterLevel() const { return GetClassLevel(ISFIGHTER); }
 	ieDword GetMageLevel() const { return GetClassLevel(ISMAGE); }
@@ -988,7 +988,7 @@ public:
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;
 	bool IsKitInactive() const;
-	const char* GetRaceName() const;
+	const std::string& GetRaceName() const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
