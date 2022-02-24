@@ -271,6 +271,7 @@ void DisplayMessage::DisplayConstantStringAction(size_t stridx, unsigned char co
 	DisplayMarkupString(fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, used_color.Packed(), text, name2));
 }
 
+
 void DisplayMessage::DisplayStringName(ieStrRef str, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const
 {
 	if (str == ieStrRef::INVALID) return;
