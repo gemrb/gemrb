@@ -246,7 +246,7 @@ void Projectile::Setup()
 	tint.b=128;
 	tint.a=255;
 
-	timeStartStep = GetMilliseconds();
+	timeStartStep = core->GetGame()->Ticks * 1000 / core->Time.ai_update_time;
 
 	if(ExtFlags&PEF_TEXT) {
 		const Actor *act = area->GetActorByGlobalID(Caster);
@@ -772,7 +772,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 
 	//path won't be calculated if speed==0
 	walk_speed=1500/walk_speed;
-	tick_t time = GetMilliseconds();
+	tick_t time = core->GetGame()->Ticks * 1000 / core->Time.ai_update_time;
 	auto step = path.begin();
 	if (stepIdx) {
 		step += stepIdx;
