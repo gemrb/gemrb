@@ -770,8 +770,15 @@ void Projectile::DoStep()
 		return;
 	}
 
-	//path won't be calculated if speed==0
-	unsigned int walk_speed = 1500 / Speed;
+	// path shouldn't be calculated if Speed == 0, so this shouldn't be reached
+	assert(Speed);
+	// calculate delay between moves
+	// good enough? Path has one node per px of distance and
+	// we don't account for diagonals or perspective
+	// ... but we slow it down manually any way
+	unsigned int timePerPx = 1 * core->Time.Ticks2Ms(1) / Speed;
+	static constexpr unsigned int slowDownFactor = 2; // TODO: empirical, shouldn't be needed!
+	unsigned int timePerStep = slowDownFactor * timePerPx;
 	tick_t time =  core->Time.Ticks2Ms(core->GetGame()->Ticks);
 	auto step = path.begin();
 	if (stepIdx) {
@@ -780,18 +787,11 @@ void Projectile::DoStep()
 
 	auto start = step;
 	auto last = --path.end();
-	while (step != last && (time - timeStartStep) >= walk_speed) {
-		unsigned int count = Speed;
-		while (step != last && count) {
-			++step;
-			--count;
-		}
-
-		if (!walk_speed) {
-			break;
-		}
-
-		timeStartStep += walk_speed;
+	tick_t count = timePerStep ? (time - timeStartStep) / timePerStep : 0;
+	while (step != last && count > 0) {
+		++step;
+		--count;
+		timeStartStep += timePerStep;
 	}
 
 	if (ExtFlags & PEF_CONTINUE) {
@@ -814,7 +814,7 @@ void Projectile::DoStep()
 		ChangePhase();
 		return;
 	}
-	if (!walk_speed) {
+	if (!timePerStep) {
 		return;
 	}
 
@@ -825,13 +825,13 @@ void Projectile::DoStep()
 	tick_t delta = time - timeStartStep;
 	auto next = std::next(step);
 	if (next->point.x > step->point.x)
-		Pos.x += (next->point.x - Pos.x) * delta / walk_speed;
+		Pos.x += (next->point.x - Pos.x) * delta / timePerStep;
 	else
-		Pos.x -= (Pos.x - next->point.x) * delta / walk_speed;
+		Pos.x -= (Pos.x - next->point.x) * delta / timePerStep;
 	if (next->point.y > step->point.y)
-		Pos.y += (next->point.y - Pos.y) * delta / walk_speed;
+		Pos.y += (next->point.y - Pos.y) * delta / timePerStep;
 	else
-		Pos.y -= (Pos.y - next->point.y) * delta / walk_speed;
+		Pos.y -= (Pos.y - next->point.y) * delta / timePerStep;
 
 }
 
