@@ -209,7 +209,7 @@ public:
 	Projectile& operator=(Projectile&&) noexcept = default;
 #endif
 
-	ieWord Speed = 20;
+	ieWord Speed = 20; // (horizontal) pixels / tick
 	ieDword SFlags = PSF_FLYING;
 	ResRef FiringSound;
 	ResRef ArrivalSound;
@@ -438,7 +438,7 @@ private:
 	void ChangePhase();
 	//drop a BAM or VVC on the trail path, return the length of the animation
 	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
-	void DoStep(unsigned int walk_speed);
+	void DoStep();
 	void LineTarget() const;      //line projectiles (walls, scorchers)
 	void LineTarget(Path::const_iterator beg, Path::const_iterator end) const;
 	void SecondaryTarget(); //area projectiles (circles, cones)

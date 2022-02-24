@@ -716,7 +716,7 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 	return sca->GetSequenceDuration(core->Time.ai_update_time);
 }
 
-void Projectile::DoStep(unsigned int walk_speed)
+void Projectile::DoStep()
 {
 	if(pathcounter) {
 		pathcounter--;
@@ -771,7 +771,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 	}
 
 	//path won't be calculated if speed==0
-	walk_speed=1500/walk_speed;
+	unsigned int walk_speed = 1500 / Speed;
 	tick_t time = core->GetGame()->Ticks * 1000 / core->Time.ai_update_time;
 	auto step = path.begin();
 	if (stepIdx) {
@@ -1228,7 +1228,7 @@ int Projectile::Update()
 	}
 
 	if (phase == P_TRAVEL || phase == P_TRAVEL2) {
-		DoStep(Speed);
+		DoStep();
 	}
 	return 1;
 }
