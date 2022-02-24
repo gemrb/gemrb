@@ -1462,6 +1462,7 @@ void Projectile::DrawExplosion(const Region& vp)
 			}
 			//create a custom projectile with single traveling effect
 			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
+			// not setting Caster, so we target the ground (ZPos 0)
 			pro->BAMRes1 = tmp;
 			if (ExtFlags&PEF_TRAIL) {
 				pro->Aim = Aim;
