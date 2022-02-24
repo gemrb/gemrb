@@ -132,6 +132,7 @@ struct TimeStruct {
 	unsigned int day_size;
 
 	int GetHour(unsigned int time) const { return (time / ai_update_time) % day_sec / hour_sec; }
+	tick_t Ticks2Ms(unsigned int ticks) const { return ticks * 1000 / ai_update_time; }
 };
 
 // cache of speldesc.2da entries
