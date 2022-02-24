@@ -59,6 +59,8 @@
 
 namespace GemRB {
 
+static const std::string blank;
+
 //configurable?
 const ieDword ref_lightness = 43;
 
@@ -129,7 +131,7 @@ static int isclass[ISCLASSES]={0,0,0,0,0,0,0,0,0,0,0,0,0};
 static const int mcwasflags[ISCLASSES] = {
 	MC_WAS_FIGHTER, MC_WAS_MAGE, MC_WAS_THIEF, 0, 0, MC_WAS_CLERIC,
 	MC_WAS_DRUID, 0, 0, MC_WAS_RANGER, 0, 0, 0};
-static const char *isclassnames[ISCLASSES] = {
+static std::string isclassnames[ISCLASSES] = {
 	"FIGHTER", "MAGE", "THIEF", "BARBARIAN", "BARD", "CLERIC",
 	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER", "CLASS12", "CLASS13" };
 static const int levelslotsiwd2[ISCLASSES]={IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LEVELTHIEF,
@@ -151,9 +153,9 @@ struct ClassKits {
 	std::vector<TableMgr::index_t> indices;
 	std::vector<ieDword> ids;
 	std::vector<char*> clabs;
-	std::vector<char*> kitNames;
+	std::vector<std::string> kitNames;
 	char *clab;
-	char *className;
+	std::string className;
 };
 static std::map<int, ClassKits> class2kits;
 
@@ -1534,11 +1536,7 @@ void Actor::ReleaseMemory()
 		BABClassMap.clear();
 		for (const auto& clskit : class2kits) {
 			free(clskit.second.clab);
-			free(clskit.second.className);
 			for (auto kit : clskit.second.clabs) {
-				free(kit);
-			}
-			for (auto kit : clskit.second.kitNames) {
 				free(kit);
 			}
 		}
@@ -1558,10 +1556,10 @@ void Actor::ReleaseMemory()
 #define COL_GRADIENT   2
 
 /* returns the ISCLASS for the class based on name */
-static int IsClassFromName (const char* name)
+static int IsClassFromName (const std::string& name)
 {
 	for (int i=0; i<ISCLASSES; i++) {
-		if (strcmp(name, isclassnames[i]) == 0)
+		if (name == isclassnames[i])
 			return i;
 	}
 	return -1;
@@ -1907,23 +1905,23 @@ static void InitActorTables()
 		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
 		AutoTable tht;
 		for (int i = 0; i < (int) tm->GetRowCount(); i++) {
-			const char *classname = tm->GetRowName(i).c_str();
+			const auto& classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
-			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
-			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname, "CLASS"); // only real classes have this column at 0
-			const char *clab = tm->QueryField(classname, "CLAB").c_str();
+			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname.c_str(), "ID");
+			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname.c_str(), "CLASS"); // only real classes have this column at 0
+			const char *clab = tm->QueryField(classname.c_str(), "CLAB").c_str();
 			if (classcol) {
 				// kit ids are in hex
-				classID = strtounsigned<ieDword>(tm->QueryField(classname, "ID").c_str(), NULL, 16);
+				classID = strtounsigned<ieDword>(tm->QueryField(classname.c_str(), "ID").c_str(), nullptr, 16);
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
 				class2kits[classcol].clabs.push_back(strdup(clab));
-				class2kits[classcol].kitNames.push_back(strdup(classname));
+				class2kits[classcol].kitNames.push_back(classname);
 				continue;
 			} else if (i < classcount) {
 				// populate classesiwd2
 				// we need the id of the isclass name, not the current one
-				ieDword cid = tm->QueryFieldUnsigned<ieDword>(isclassnames[i], "ID");
+				ieDword cid = tm->QueryFieldUnsigned<ieDword>(isclassnames[i].c_str(), "ID");
 				classesiwd2[i] = cid;
 
 				class2kits[classID].clab = strdup(clab);
@@ -1932,10 +1930,10 @@ static void InitActorTables()
 				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
 			}
 
-			xpcap[classis] = xpcapt->QueryFieldSigned<int>(classname, "VALUE");
+			xpcap[classis] = xpcapt->QueryFieldSigned<int>(classname.c_str(), "VALUE");
 
 			// set up the tohit/apr tables
-			std::string tohit = tm->QueryField(classname, "TOHIT");
+			std::string tohit = tm->QueryField(classname.c_str(), "TOHIT");
 			BABClassMap[classis] = tohit;
 			// the tables repeat, but we need to only load one copy
 			// FIXME: the attempt at skipping doesn't work!
@@ -2155,7 +2153,7 @@ static void InitActorTables()
 			class2kits[classID].indices.push_back(i);
 			class2kits[classID].ids.push_back(kitUsability);
 			class2kits[classID].clabs.push_back(strdup(clab));
-			class2kits[classID].kitNames.push_back(strdup(kitName));
+			class2kits[classID].kitNames.push_back(kitName);
 		}
 	}
 
@@ -11011,13 +11009,13 @@ ieDword Actor::GetClassID(const ieDword isClass) {
 	return classesiwd2[isClass];
 }
 
-const char *Actor::GetClassName(ieDword classID) const
+const std::string& Actor::GetClassName(ieDword classID) const
 {
 	return class2kits[classID].className;
 }
 
 // NOTE: returns first kit name for multikit chars
-const char *Actor::GetKitName(ieDword kitID) const
+const std::string& Actor::GetKitName(ieDword kitID) const
 {
 	std::map<int, ClassKits>::iterator clskit = class2kits.begin();
 	for (int cidx = 0; clskit != class2kits.end(); clskit++, cidx++) {
@@ -11029,7 +11027,7 @@ const char *Actor::GetKitName(ieDword kitID) const
 			}
 		}
 	}
-	return "";
+	return blank;
 }
 
 void Actor::SetAnimatedTalking (tick_t length) {
@@ -11130,12 +11128,12 @@ bool Actor::ShouldModifyMorale() const
 	return true;
 }
 
-const char* Actor::GetRaceName() const
+const std::string& Actor::GetRaceName() const
 {
 	if (raceID2Name.count(BaseStats[IE_RACE])) {
-		return raceID2Name[BaseStats[IE_RACE]].c_str();
+		return raceID2Name[BaseStats[IE_RACE]];
 	} else {
-		return nullptr;
+		return blank;
 	}
 }
 

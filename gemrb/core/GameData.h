@@ -146,8 +146,8 @@ public:
 	bool GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
 	int GetSwingCount(ieDword ItemType);
 
-	int GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName);
-	bool HasInfravision(const char *raceName);
+	int GetRacialTHAC0Bonus(ieDword proficiency, const std::string& raceName);
+	bool HasInfravision(const std::string& raceName);
 	int GetSpellAbilityDie(const Actor *target, int which);
 	int GetTrapSaveBonus(ieDword level, int cls);
 	int GetTrapLimit(Scriptable *trapper);

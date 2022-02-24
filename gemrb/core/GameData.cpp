@@ -551,7 +551,7 @@ int GameData::GetSwingCount(ieDword ItemType)
 	return ItemSounds[ItemType].size() - 2;
 }
 
-int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
+int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const std::string& raceName)
 {
 	static bool loadedRacialTHAC0 = false;
 	if (!loadedRacialTHAC0) {
@@ -560,21 +560,20 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 	}
 
 	// not all games have the table
-	if (!raceTHAC0Bonus || !raceName) return 0;
-
+	if (!raceTHAC0Bonus) return 0;
+	
 	char profString[5];
 	snprintf(profString, sizeof(profString), "%u", proficiency);
-	return raceTHAC0Bonus->QueryFieldSigned<int>(profString, raceName);
+	return raceTHAC0Bonus->QueryFieldSigned<int>(profString, raceName.c_str());
 }
 
-bool GameData::HasInfravision(const char *raceName)
+bool GameData::HasInfravision(const std::string& raceName)
 {
 	if (!racialInfravision) {
 		racialInfravision = LoadTable("racefeat", true);
 	}
-	if (!raceName) return false;
 
-	return racialInfravision->QueryFieldSigned<int>(raceName, "VALUE") & 1;
+	return racialInfravision->QueryFieldSigned<int>(raceName.c_str(), "VALUE") & 1;
 }
 
 int GameData::GetSpellAbilityDie(const Actor *target, int which)
@@ -617,7 +616,7 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 
 	const Actor *caster = (Actor *) trapper;
 	ieDword kit = caster->GetStat(IE_KIT);
-	const char *rowName;
+	std::string rowName;
 	if (kit != 0x4000) { // KIT_BASECLASS
 		rowName = caster->GetKitName(kit);
 	} else {
@@ -625,7 +624,7 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 		rowName = caster->GetClassName(cls);
 	}
 
-	return trapLimit->QueryFieldSigned<int>(rowName, "LIMIT");
+	return trapLimit->QueryFieldSigned<int>(rowName.c_str(), "LIMIT");
 }
 
 int GameData::GetSummoningLimit(ieDword sex)
