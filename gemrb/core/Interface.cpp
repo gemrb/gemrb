@@ -685,7 +685,7 @@ int Interface::LoadSprites()
 		// same layout as in the originals, with odd indices having the pressed cursor image
 		std::string fileName;
 		while (CursorCount < 99) {
-			fileName = fmt::format("{}{}", MainCursorsImage, CursorCount);
+			fileName = fmt::format("{}{:02}", MainCursorsImage, CursorCount);
 			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName.c_str(), true);
 			if (!im) break;
 			Cursors.push_back(im->GetSprite2D());
