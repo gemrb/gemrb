@@ -43,11 +43,14 @@
 
 namespace GemRB {
 
-//this is the height of the projectile when Spark Flag Fly = 1
-#define FLY_HEIGHT 50
-#define NORMAL_HEIGHT 0x23
-#define DRAGON_HEIGHT 0x90
-//this is supposed to move the projectile to the background
+// various special heights/Zs hardcoded in the originals
+enum ProHeights {
+	Flying = 50, // this is the height of the projectile when Spark Flag Fly = 1
+	Normal = 0x23,
+	Dragon = 0x90,
+	Background = 50 // this is supposed to move the projectile to the background
+};
+
 #define BACK_DEPTH 50
 
 //projectile phases
@@ -368,7 +371,7 @@ public:
 		}
 		//if projectile is drawn behind target (not behind everyone)
 		if (ExtFlags&PEF_BACKGROUND) {
-			return Pos.y-BACK_DEPTH;
+			return Pos.y - ProHeights::Background;
 		}
 
 		return Pos.y + ZPos;

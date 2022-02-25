@@ -252,17 +252,17 @@ void Projectile::Setup()
 	if (area) act = area->GetActorByGlobalID(Caster);
 
 	if (act) {
-		ZPos = NORMAL_HEIGHT;
+		ZPos = ProHeights::Normal;
 		if (act->ValidTarget(GA_BIGBAD)) {
-			ZPos = DRAGON_HEIGHT;
+			ZPos = ProHeights::Dragon;
 		}
 
 		if (ExtFlags & PEF_TEXT) {
 			displaymsg->DisplayStringName(StrRef, DMC_LIGHTGREY, act, STRING_FLAGS::NONE);
 		}
 	}
-	if (ZPos != DRAGON_HEIGHT && SFlags & PSF_FLYING) {
-		ZPos = FLY_HEIGHT;
+	if (ZPos != ProHeights::Dragon && SFlags & PSF_FLYING) {
+		ZPos = ProHeights::Flying;
 	}
 
 	//falling = vertical
@@ -1623,7 +1623,7 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 		Point pos = iter->point - vp.origin;
 
 		if (SFlags&PSF_FLYING) {
-			pos.y-=FLY_HEIGHT;
+			pos.y -= ProHeights::Flying;
 		}
 
 		Draw(frame, pos, flag, tint2);
