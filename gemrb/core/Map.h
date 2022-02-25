@@ -641,10 +641,10 @@ public:
 
 	//spawns
 	void LoadIniSpawn();
-	Spawn *AddSpawn(const char* Name, const Point &, std::vector<ResRef>&& creatures);
+	Spawn *AddSpawn(const ieVariable& Name, const Point &, std::vector<ResRef>&& creatures);
 	Spawn *GetSpawn(int i) const { return spawns[i]; }
 	//returns spawn by name
-	Spawn *GetSpawn(const char *Name) const;
+	Spawn *GetSpawn(const ieVariable& Name) const;
 	//returns spawn inside circle, checks for schedule and other
 	//conditions as well
 	Spawn *GetSpawnRadius(const Point &point, unsigned int radius) const;

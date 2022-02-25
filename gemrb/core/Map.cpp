@@ -2854,10 +2854,10 @@ AreaAnimation *Map::GetAnimation(const ieVariable& Name)
 	return nullptr;
 }
 
-Spawn *Map::AddSpawn(const char* Name, const Point &p, std::vector<ResRef>&& creatures)
+Spawn *Map::AddSpawn(const ieVariable& Name, const Point &p, std::vector<ResRef>&& creatures)
 {
 	Spawn* sp = new Spawn();
-	sp->Name = MakeVariable(Name);
+	sp->Name = Name;
 	
 	sp->Pos = p;
 	sp->Creatures = std::move(creatures);
@@ -3452,14 +3452,14 @@ void Map::UpdateFog()
 	}
 }
 
-Spawn* Map::GetSpawn(const char *Name) const
+Spawn* Map::GetSpawn(const ieVariable& Name) const
 {
 	for (auto spawn : spawns) {
-		if (stricmp(spawn->Name, Name) == 0) {
+		if (spawn->Name == Name) {
 			return spawn;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Spawn *Map::GetSpawnRadius(const Point &point, unsigned int radius) const
