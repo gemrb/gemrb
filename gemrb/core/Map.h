@@ -705,6 +705,7 @@ private:
 	
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
+	void AddProjectile(Projectile* pro);
 
 };
 
