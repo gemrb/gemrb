@@ -248,11 +248,21 @@ void Projectile::Setup()
 
 	timeStartStep = core->Time.Ticks2Ms(core->GetGame()->Ticks);
 
-	if(ExtFlags&PEF_TEXT) {
-		const Actor *act = area->GetActorByGlobalID(Caster);
-		if(act) {
+	const Actor* act = nullptr;
+	if (area) act = area->GetActorByGlobalID(Caster);
+
+	if (act) {
+		ZPos = NORMAL_HEIGHT;
+		if (act->ValidTarget(GA_BIGBAD)) {
+			ZPos = DRAGON_HEIGHT;
+		}
+
+		if (ExtFlags & PEF_TEXT) {
 			displaymsg->DisplayStringName(StrRef, DMC_LIGHTGREY, act, STRING_FLAGS::NONE);
 		}
+	}
+	if (ZPos != DRAGON_HEIGHT && SFlags & PSF_FLYING) {
+		ZPos = FLY_HEIGHT;
 	}
 
 	//falling = vertical
@@ -346,9 +356,6 @@ void Projectile::Setup()
 	}
 	if (TFlags&PTF_TRANS) {
 		SetBlend(TFlags&PTF_BRIGHTEN);
-	}
-	if (SFlags&PSF_FLYING) {
-		ZPos = FLY_HEIGHT;
 	}
 	phase = P_TRAVEL;
 	travel_handle.sound = core->GetAudioDrv()->Play(FiringSound, SFX_CHAN_MISSILE,
@@ -712,6 +719,8 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 	sca->PlayOnce();
 	sca->SetBlend();
 	sca->Pos = Pos;
+	// oddly, there's no visible difference in setting or not setting sca->ZOffset = ZPos
+	// the heights are still fine even for the large dragon offsets
 	area->AddVVCell(vef);
 	return sca->GetSequenceDuration(core->Time.ai_update_time);
 }

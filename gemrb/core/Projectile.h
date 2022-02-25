@@ -45,6 +45,8 @@ namespace GemRB {
 
 //this is the height of the projectile when Spark Flag Fly = 1
 #define FLY_HEIGHT 50
+#define NORMAL_HEIGHT 0x23
+#define DRAGON_HEIGHT 0x90
 //this is supposed to move the projectile to the background
 #define BACK_DEPTH 50
 
@@ -369,11 +371,7 @@ public:
 			return Pos.y-BACK_DEPTH;
 		}
 
-		//if projectile is flying
-		if (SFlags&PSF_FLYING) {
-			return Pos.y+FLY_HEIGHT;
-		}
-		return Pos.y;
+		return Pos.y + ZPos;
 	}
 
 	void SetIdentifiers(const ResRef &name, size_t idx);
