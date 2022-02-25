@@ -921,7 +921,8 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 		if(ExtFlags&PEF_LINE) {
 			const Actor *c = area->GetActorByGlobalID(Caster);
 			if(c && c->Pos!=Pos) {
-				Pos=c->Pos;
+				// readd the casting offsets
+				Pos = c->Pos - Point(0, ZPos) + GetStartOffset(c);
 				NextTarget(target->Pos);
 			}
 		}
@@ -933,6 +934,13 @@ void Projectile::MoveTo(Map *map, const Point &Des)
 	area = map;
 	Origin = Des;
 	Pos = Des;
+	// handle casting glow offset — start projectiles at its position
+	// the original did this in the constructor, but we don't have caster info at that point yet
+	// magic missile and other iterators are skipped, since each iteration spawns the next
+	// and we'd apply the offset several times, changing the intended geometry
+	if (Caster > 0 && !(ExtFlags & PEF_ITERATION)) {
+		Pos += GetStartOffset(area->GetActorByGlobalID(Caster));
+	}
 	Destination = Des;
 }
 
