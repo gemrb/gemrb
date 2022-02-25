@@ -3738,7 +3738,7 @@ void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
 		default:;
 	}
 	if (inv) {
-		inv->DestroyItem(parameters->string0Parameter,0,1); //destroy one (even indestructible?)
+		inv->DestroyItem(parameters->resref0Parameter,0,1); //destroy one (even indestructible?)
 	}
 }
 
@@ -3768,7 +3768,7 @@ void GameScript::DestroyPartyItem(Scriptable* /*Sender*/, Action* parameters)
 	}
 	while (i--) {
 		Inventory *inv = &(game->GetPC( i,false )->inventory);
-		int res=inv->DestroyItem(parameters->string0Parameter,0,count);
+		int res=inv->DestroyItem(parameters->resref0Parameter,0,count);
 		if ( (count == 1) && res) {
 			break;
 		}
@@ -3784,7 +3784,7 @@ void GameScript::DestroyPartyItemNum(Scriptable* /*Sender*/, Action* parameters)
 	count = parameters->int0Parameter;
 	while (i--) {
 		Inventory *inv = &(game->GetPC( i,false )->inventory);
-		count -= inv->DestroyItem(parameters->string0Parameter,0,count);
+		count -= inv->DestroyItem(parameters->resref0Parameter,0,count);
 		if (!count ) {
 			break;
 		}

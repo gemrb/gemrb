@@ -273,7 +273,7 @@ public:
 	/** flags: see ieCREItemFlagBits */
 	/** count == ~0 means to destroy all */
 	/** returns the number of destroyed items */
-	unsigned int DestroyItem(const char *resref, ieDword flags, ieDword count);
+	unsigned int DestroyItem(const ResRef& resref, ieDword flags, ieDword count);
 	void SetSlotItem(CREItem* item, unsigned int slot);
 	int GetWeight() const {return Weight;}
 
