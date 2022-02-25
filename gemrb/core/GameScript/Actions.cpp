@@ -2835,7 +2835,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	int xp = parameters->int0Parameter;
-	core->GetTokenDictionary()->SetAtCopy("EXPERIENCEAMOUNT", xp);
+	core->GetTokenDictionary()->SetAtAsString("EXPERIENCEAMOUNT", xp);
 	if (core->HasFeedback(FT_MISC)) {
 		if (displaymsg->HasStringReference(STR_GOTQUESTXP)) {
 			displaymsg->DisplayConstantStringName(STR_GOTQUESTXP, DMC_BG2XPGREEN, actor);
@@ -3092,8 +3092,7 @@ void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
-	//using SetAtCopy because we need a copy of the value
-	core->GetTokenDictionary()->SetAtCopy( parameters->string1Parameter, value );
+	core->GetTokenDictionary()->SetAtAsString(parameters->string1Parameter, value);
 }
 
 //Assigns the target object's name (not scriptname) to the token
@@ -7221,7 +7220,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 		//roll a random number between 0 and column #
 		TableMgr::index_t j = RAND<TableMgr::index_t>(0, tm->GetColumnCount(i) - 1);
 		ieVariable tokenname = tm->GetRowName(i);
-		core->GetTokenDictionary()->SetAtCopy(tokenname, tm->QueryField(i, j).c_str());
+		core->GetTokenDictionary()->SetAt(tokenname, tm->QueryField(i, j));
 	}
 }
 

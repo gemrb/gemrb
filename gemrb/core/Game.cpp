@@ -1809,7 +1809,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	ieStrRef restindex = DisplayMessage::GetStringReference(STR_REST);
 	ieStrRef hrsindex = DisplayMessage::GetStringReference(STR_HOURS);
 
-	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
+	core->GetTokenDictionary()->SetAtAsString("HOUR", hours);
 
 	//this would be bad
 	if (hrsindex == ieStrRef::INVALID || restindex == ieStrRef::INVALID) return cutscene;

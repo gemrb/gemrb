@@ -4358,16 +4358,16 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// 3 choices depending on resistance and boni
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
 			core->GetTokenDictionary()->SetAt( "TYPE", type_name);
-			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
+			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
 
 			int strref;
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
+				core->GetTokenDictionary()->SetAtAsString("RESISTED", abs(resisted));
 				strref = STR_DAMAGE_DETAIL3;
 			} else if (resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
-				core->GetTokenDictionary()->SetAtCopy( "RESISTED", abs(resisted));
+				core->GetTokenDictionary()->SetAtAsString("RESISTED", abs(resisted));
 				strref = STR_DAMAGE_DETAIL2;
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
@@ -4395,7 +4395,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAtCopy( "DAMAGER", "" );
-			core->GetTokenDictionary()->SetAtCopy( "AMOUNT", damage);
+			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
 			displaymsg->DisplayConstantStringName(STR_DAMAGE2, DMC_WHITE, hitter);
 		}
 	} else {
@@ -4815,7 +4815,7 @@ int Actor::GetWildMod(int level)
 	level = Clamp(level, 1, MAX_LEVEL);
 	WMLevelMod = wmlevels[core->Roll(1, 20, -1)][level - 1];
 
-	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
+	core->GetTokenDictionary()->SetAtAsString("LEVELDIF", abs(WMLevelMod));
 	if (core->HasFeedback(FT_STATES)) {
 		if (WMLevelMod > 0) {
 			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
