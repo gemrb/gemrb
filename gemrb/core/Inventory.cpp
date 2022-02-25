@@ -477,7 +477,7 @@ void Inventory::KillSlot(unsigned int index)
 this function can look for stolen, equipped, identified, destructible
 etc, items. You just have to specify the flags in the bitmask
 specifying 1 in a bit signifies a requirement */
-unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword count)
+unsigned int Inventory::DestroyItem(const ResRef& resref, ieDword flags, ieDword count)
 {
 	unsigned int destructed = 0;
 	size_t slot = Slots.size();
@@ -496,7 +496,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		if ( (flags&item->Flags)!=flags) {
 			continue;
 		}
-		if (resref[0] && item->ItemResRef != resref) {
+		if (item->ItemResRef != resref) {
 			continue;
 		}
 		//we need to acknowledge that the item was destroyed
