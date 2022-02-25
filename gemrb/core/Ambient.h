@@ -42,9 +42,9 @@ namespace GemRB {
 class GEM_EXPORT Ambient {
 public:
 	Ambient() noexcept = default;
-	bool operator==(const Ambient& b) const { return origin == b.origin && !strncmp(name, b.name, 31); }
+	bool operator==(const Ambient& b) const { return origin == b.origin && name == b.name; }
 
-	const char* GetName() const { return name; }
+	const ieVariable& GetName() const { return name; }
 	const Point& GetOrigin() const { return origin; }
 	ieWord GetRadius() const { return radius; }
 	ieWord GetGain() const { return gain; }
@@ -65,7 +65,7 @@ public:
 	void SetInactive() { flags &= ~IE_AMBI_ENABLED; };
 
 public:
-	char name[32]{};
+	ieVariable name;
 	Point origin;
 	std::vector<ResRef> sounds;
 	ieWord radius = 0;
