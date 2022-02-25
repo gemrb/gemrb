@@ -467,7 +467,7 @@ static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
 	ambi->gain = vol[day_or_night];
 	// sounds and name
 	ambi->sounds.emplace_back(mainAmbient);
-	memcpy(ambi->name, mainAmbient, 9);
+	ambi->name = mainAmbient;
 	ambi->appearance = (1<<25) - 1; // default to all 24 bits enabled, one per hour
 	ambi->radius = 50; // REFERENCE_DISTANCE
 	return ambi;
