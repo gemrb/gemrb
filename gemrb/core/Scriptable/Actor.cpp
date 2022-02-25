@@ -3624,7 +3624,7 @@ void Actor::GetAreaComment(int areaflag) const
 	}
 }
 
-static int CheckInteract(const char *talker, const char *target)
+static int CheckInteract(const ieVariable& talker, const ieVariable& target)
 {
 	AutoTable interact = gamedata->LoadTable("interact");
 	if (!interact)
@@ -3675,7 +3675,7 @@ void Actor::HandleInteractV1(const Actor *target)
 
 int Actor::HandleInteract(const Actor *target) const
 {
-	int type = CheckInteract(scriptName.CString(), target->GetScriptName());
+	int type = CheckInteract(scriptName, target->GetScriptName());
 
 	//no interaction at all
 	if (type==I_NONE) return -1;
