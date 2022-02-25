@@ -561,10 +561,8 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const std::string& raceNa
 
 	// not all games have the table
 	if (!raceTHAC0Bonus) return 0;
-	
-	char profString[5];
-	snprintf(profString, sizeof(profString), "%u", proficiency);
-	return raceTHAC0Bonus->QueryFieldSigned<int>(profString, raceName.c_str());
+
+	return raceTHAC0Bonus->QueryFieldSigned<int>(std::to_string(proficiency), raceName);
 }
 
 bool GameData::HasInfravision(const std::string& raceName)
@@ -573,7 +571,7 @@ bool GameData::HasInfravision(const std::string& raceName)
 		racialInfravision = LoadTable("racefeat", true);
 	}
 
-	return racialInfravision->QueryFieldSigned<int>(raceName.c_str(), "VALUE") & 1;
+	return racialInfravision->QueryFieldSigned<int>(raceName, "VALUE") & 1;
 }
 
 int GameData::GetSpellAbilityDie(const Actor *target, int which)
@@ -624,7 +622,7 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 		rowName = caster->GetClassName(cls);
 	}
 
-	return trapLimit->QueryFieldSigned<int>(rowName.c_str(), "LIMIT");
+	return trapLimit->QueryFieldSigned<int>(rowName, "LIMIT");
 }
 
 int GameData::GetSummoningLimit(ieDword sex)
@@ -1073,7 +1071,7 @@ int GameData::GetMiscRule(const char* rowName)
 	}
 	assert(miscRule);
 
-	return miscRule->QueryFieldSigned<int>(rowName, "VALUE");
+	return miscRule->QueryFieldSigned<int>(TableMgr::QueryKey(rowName), "VALUE");
 }
 
 int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)

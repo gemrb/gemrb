@@ -255,8 +255,8 @@ std::map<unsigned int, int> favoredMap;
 std::map<unsigned int, std::string> raceID2Name;
 
 // iwd2 class to-hit and apr tables read into a single object
-std::map<std::string, std::vector<BABTable>> IWD2HitTable;
-std::map<int, std::string> BABClassMap; // maps classis (not id!) to the BAB table
+ResRefMap<std::vector<BABTable>> IWD2HitTable;
+std::map<int, ResRef> BABClassMap; // maps classis (not id!) to the BAB table
 
 std::vector<ModalStatesStruct> ModalStates;
 std::map<int, int> numWeaponSlots;
@@ -1691,7 +1691,7 @@ static void InitActorTables()
 
 		for (int i = 0;  i < classcount; i++) {
 			const char *field;
-			const char *rowname = tm->GetRowName(i).c_str();
+			const auto& rowname = tm->GetRowName(i);
 
 			field = tm->QueryField(rowname, "DRUIDSPELL").c_str();
 			if (field[0]!='*') {
@@ -1759,7 +1759,7 @@ static void InitActorTables()
 			}
 			// everyone but pst (none at all) and iwd2 (different table)
 			class2kits[i].clab = strdup(field);
-			class2kits[i].className = strdup(rowname);
+			class2kits[i].className = rowname;
 
 			field = tm->QueryField(rowname, "NO_PROF").c_str();
 			defaultprof[i]=atoi(field);
@@ -1906,12 +1906,12 @@ static void InitActorTables()
 		for (int i = 0; i < (int) tm->GetRowCount(); i++) {
 			const auto& classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
-			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname.c_str(), "ID");
-			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname.c_str(), "CLASS"); // only real classes have this column at 0
-			const char *clab = tm->QueryField(classname.c_str(), "CLAB").c_str();
+			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
+			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname, "CLASS"); // only real classes have this column at 0
+			const char *clab = tm->QueryField(classname, "CLAB").c_str();
 			if (classcol) {
 				// kit ids are in hex
-				classID = strtounsigned<ieDword>(tm->QueryField(classname.c_str(), "ID").c_str(), nullptr, 16);
+				classID = strtounsigned<ieDword>(tm->QueryField(classname, "ID").c_str(), nullptr, 16);
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
 				class2kits[classcol].clabs.push_back(strdup(clab));
@@ -1920,7 +1920,7 @@ static void InitActorTables()
 			} else if (i < classcount) {
 				// populate classesiwd2
 				// we need the id of the isclass name, not the current one
-				ieDword cid = tm->QueryFieldUnsigned<ieDword>(isclassnames[i].c_str(), "ID");
+				ieDword cid = tm->QueryFieldUnsigned<ieDword>(isclassnames[i], "ID");
 				classesiwd2[i] = cid;
 
 				class2kits[classID].clab = strdup(clab);
@@ -1929,10 +1929,10 @@ static void InitActorTables()
 				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
 			}
 
-			xpcap[classis] = xpcapt->QueryFieldSigned<int>(classname.c_str(), "VALUE");
+			xpcap[classis] = xpcapt->QueryFieldSigned<int>(classname, "VALUE");
 
 			// set up the tohit/apr tables
-			std::string tohit = tm->QueryField(classname.c_str(), "TOHIT");
+			const ResRef tohit = tm->QueryField(classname, "TOHIT");
 			BABClassMap[classis] = tohit;
 			// the tables repeat, but we need to only load one copy
 			// FIXME: the attempt at skipping doesn't work!
@@ -1977,7 +1977,7 @@ static void InitActorTables()
 		ieDword tmpindex;
 
 		for (int i = 0; i < classcount; i++) {
-			const char* classname = tm->GetRowName(i).c_str();
+			const std::string& classname = tm->GetRowName(i);
 			//make sure we have a valid classid, then decrement
 			//it to get the correct array index
 			tmpindex = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
@@ -2039,7 +2039,7 @@ static void InitActorTables()
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
 			char **classnames = (char **) calloc(tmpbits, sizeof(char *));
-			classnames[0] = strtok(strdup(classname), "_");
+			classnames[0] = strtok(strdup(classname.c_str()), "_");
 			while (numfound<tmpbits && (classnames[numfound] = strdup(strtok(NULL, "_")))) {
 				numfound++;
 			}
@@ -2051,13 +2051,13 @@ static void InitActorTables()
 					break;
 				if ((1<<j)&tmpclass) {
 					//save the IE_LEVEL information
-					const char* currentname = tm->GetRowName((ieDword)(tm->FindTableValue("ID", j+1))).c_str();
+					const std::string& currentname = tm->GetRowName((ieDword)(tm->FindTableValue("ID", j+1)));
 					classis = IsClassFromName(currentname);
 					if (classis>=0) {
 						//search for the current class in the split of the names to get it's
 						//correct order
 						for (ieDword k=0; k<tmpbits; k++) {
-							if (strcmp(classnames[k], currentname) == 0) {
+							if (strcmp(classnames[k], currentname.c_str()) == 0) {
 								int tmplevel = 0;
 								if (k==0) tmplevel = IE_LEVEL;
 								else if (k==1) tmplevel = IE_LEVEL2;
@@ -2086,7 +2086,7 @@ static void InitActorTables()
 
 					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
-						if (strcmp(classnames[0], currentname) == 0) {
+						if (strcmp(classnames[0], currentname.c_str()) == 0) {
 							dualswap[tmpindex] = tm->QueryFieldSigned<int>(currentname, "MC_WAS_ID");
 						}
 					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
@@ -3570,7 +3570,7 @@ bool Actor::HasSpecialDeathReaction(const ieVariable& deadname) const
 {
 	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return false;
-	const auto& value = tm->QueryField(scriptName.CString(), deadname);
+	const std::string& value = tm->QueryField(scriptName, deadname);
 	return value[0] != '0';
 }
 
@@ -3582,7 +3582,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	// if value is 0 - use reactdeath
 	// if value is 1 - use reactspecial
 	// if value is string - use playsound instead (pst)
-	const char *value = tm->QueryField(scriptName.CString(), deadname).c_str();
+	std::string value = tm->QueryField(scriptName, deadname);
 	if (value[0] == '0') {
 		VerbalConstant(VB_REACT, 1, DS_QUEUE);
 		return;
@@ -3592,7 +3592,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	}
 
 	// there can be several entries to choose from, eg.: NOR103,NOR104,NOR105
-	auto elements = GetElements<ResRef>(value);
+	auto elements = GetElements<ResRef>(value.c_str());
 	size_t count = elements.size();
 	if (count <= 0) return;
 
