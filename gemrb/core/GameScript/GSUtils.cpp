@@ -2426,7 +2426,7 @@ Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
 	return ac;
 }
 
-Point GetEntryPoint(const char *areaname, const char *entryname)
+Point GetEntryPoint(const ResRef& areaname, const ResRef& entryname)
 {
 	AutoTable tab = gamedata->LoadTable("entries");
 	if (!tab) {

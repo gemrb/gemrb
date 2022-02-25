@@ -120,7 +120,7 @@ Action *ParamCopy(const Action *parameters);
 Action *ParamCopyNoOverride(const Action *parameters);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, VarContext Context = {});
 GEM_EXPORT void SetPointVariable(Scriptable* Sender, const StringParam& VarName, const Point &point, const VarContext& Context = {});
-Point GetEntryPoint(const char *areaname, const char *entryname);
+Point GetEntryPoint(const ResRef& areaname, const ResRef& entryname);
 //these are used from other plugins
 GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead, bool halveRange = false);
 GEM_EXPORT int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos);
