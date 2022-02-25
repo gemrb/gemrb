@@ -367,12 +367,6 @@ void Variables::SetAtCopy(const char* key, const char* value)
 	SetAt(key, str);
 }
 
-void Variables::SetAtCopy(const char* key, int newValue)
-{
-	const std::string& newStr = fmt::format("{}", newValue);
-	SetAtCopy(key, newStr.c_str());
-}
-
 void Variables::SetAt(const char* key, char* value)
 {
 	unsigned int nHash;
@@ -409,12 +403,6 @@ void Variables::SetAt(const char* key, char* value)
 	} else {
 		free(value);
 	}
-}
-
-void Variables::SetAt(const char* key, const String& newValue)
-{
-	const std::string& mbstr = MBStringFromString(newValue);
-	SetAtCopy(key, mbstr.c_str());
 }
 
 void Variables::SetAt(const char* key, void* value)
