@@ -3050,7 +3050,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	if (!parameters->resref1Parameter.IsEmpty()) {
 		game->LoadMos = parameters->resref1Parameter;
 	}
-	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
+	Point p = GetEntryPoint(parameters->resref0Parameter, parameters->resref1Parameter);
 	if (p.IsInvalid()) {
 		Sender->ReleaseCurrentAction();
 		return;
