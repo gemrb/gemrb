@@ -758,9 +758,8 @@ int Interface::LoadFonts()
 	// but we should re-enable this by simply letting Font instances share their atlas data
 
 	TableMgr::index_t count = tab->GetRowCount();
-	const char* rowName = NULL;
 	for (TableMgr::index_t row = 0; row < count; ++row) {
-		rowName = tab->GetRowName(row).c_str();
+		const auto& rowName = tab->GetRowName(row);
 
 		ResRef resref = tab->QueryField(rowName, "RESREF");
 		const char* font_name = tab->QueryField( rowName, "FONT_NAME" ).c_str();
@@ -4389,8 +4388,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 		TableMgr::index_t row;
 		if (checkcol == -1) {
 			// use the row names
-			const std::string& rowName = fmt::format("{}", value);
-			row = tm->GetRowIndex(rowName.c_str());
+			row = tm->GetRowIndex(std::to_string(value));
 		} else {
 			// use the checkcol column (default of 0)
 			row = tm->FindTableValue(checkcol, value, 0);

@@ -405,9 +405,6 @@ bool Game::DetermineStartPosType(const TableMgr *strta) const
 
 void Game::InitActorPos(Actor *actor) const
 {
-	//start.2da row labels
-	const char *mode[PMODE_COUNT] = { "NORMAL", "TUTORIAL", "EXPANSION" };
-
 	unsigned int ip = (unsigned int) (actor->InParty-1);
 	AutoTable start = gamedata->LoadTable("start");
 	AutoTable strta = gamedata->LoadTable("startpos");
@@ -425,10 +422,13 @@ void Game::InitActorPos(Actor *actor) const
 	if (playmode>PMODE_COUNT) {
 		playmode = 0;
 	}
-	const char *xpos = start->QueryField(mode[playmode],"XPOS").c_str();
-	const char *ypos = start->QueryField(mode[playmode],"YPOS").c_str();
-	const char *area = start->QueryField(mode[playmode],"AREA").c_str();
-	const char *rot = start->QueryField(mode[playmode],"ROT").c_str();
+	
+	//start.2da row labels
+	static const std::string mode[PMODE_COUNT] = { "NORMAL", "TUTORIAL", "EXPANSION" };
+	const auto xpos = start->QueryField(mode[playmode],"XPOS");
+	const auto ypos = start->QueryField(mode[playmode],"YPOS");
+	const auto area = start->QueryField(mode[playmode],"AREA");
+	const auto rot = start->QueryField(mode[playmode],"ROT");
 
 	actor->Pos.x = actor->Destination.x = strta->QueryFieldSigned<int>(strta->GetRowIndex(xpos), ip);
 	actor->Pos.y = actor->Destination.y = strta->QueryFieldSigned<int>(strta->GetRowIndex(ypos), ip);
@@ -1596,12 +1596,12 @@ void Game::TextDream()
 		// give innate spell to protagonist
 		AutoTable drm = gamedata->LoadTable(TextScreen);
 		if (drm) {
-			const char *repLabel;
+			TableMgr::index_t row = TableMgr::npos;
 			if (Reputation >= 100)
-				repLabel = "GOOD_POWER";
+				row = drm->GetRowIndex("GOOD_POWER");
 			else
-				repLabel = "BAD_POWER";
-			TableMgr::index_t row = drm->GetRowIndex(repLabel);
+				row = drm->GetRowIndex("BAD_POWER");
+
 			if (row != TableMgr::npos) {
 				Actor *actor = GetPC(0, false);
 				actor->LearnSpell(drm->QueryField(row, 0), LS_MEMO | LS_LEARN);

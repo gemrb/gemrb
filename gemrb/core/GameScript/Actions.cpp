@@ -2954,7 +2954,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	}
 	AutoTable pdtable = gamedata->LoadTable("pdialog");
 	if (pdtable) {
-		const char* scriptname = act->GetScriptName();
+		const ieVariable& scriptname = act->GetScriptName();
 		ResRef resRef;
 		//set dialog only if we got a row
 		if (pdtable->GetRowIndex( scriptname ) != TableMgr::npos) {
@@ -3492,7 +3492,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	AutoTable pdtable = gamedata->LoadTable("pdialog");
 	if (!pdtable) return;
 
-	const char* scriptname = act->GetScriptName();
+	const ieVariable& scriptname = act->GetScriptName();
 	if (pdtable->GetRowIndex( scriptname ) != TableMgr::npos) {
 		ResRef resRef;
 

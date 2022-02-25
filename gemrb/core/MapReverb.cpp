@@ -43,9 +43,7 @@ unsigned char MapReverb::loadProperties (unsigned char profileNumber) {
 		return EFX_PROFILE_REVERB_INVALID;
 	}
 
-	std::string efxProfileName = reverbs->QueryField(profileNumber, 0);
-	StringToUpper(efxProfileName);
-
+	const ieVariable efxProfileName = reverbs->QueryField(profileNumber, 0);
 	/* Limited to values seemingly used. */
 	if (efxProfileName == "ARENA") {
 		MapReverbProperties _properties = {EFX_REVERB_ARENA, false};
