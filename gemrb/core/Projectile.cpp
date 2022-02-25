@@ -1569,7 +1569,7 @@ int Projectile::GetShadowPos(int face) const
 	return 0;
 }
 
-void Projectile::SetPos(int face, int frame1, int frame2)
+void Projectile::SetFrames(int face, int frame1, int frame2)
 {
 	if (travel[face]) {
 		travel[face].SetFrame(frame1);
@@ -1639,7 +1639,7 @@ void Projectile::DrawTravel(const Region& viewport)
 
 	unsigned int face = GetNextFace();
 	if (face!=Orientation) {
-		SetPos(face, GetTravelPos(face), GetShadowPos(face));
+		SetFrames(face, GetTravelPos(face), GetShadowPos(face));
 	}
 
 	Point pos = Pos - viewport.origin;

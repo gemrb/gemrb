@@ -453,7 +453,7 @@ private:
 	void DrawExploded(const Region &screen);
 	int GetTravelPos(int face) const;
 	int GetShadowPos(int face) const;
-	void SetPos(int face, int frame1, int frame2);
+	void SetFrames(int face, int frame1, int frame2);
 	inline int GetZPos() const;
 
 	//logic to resolve target when single projectile hit destination
