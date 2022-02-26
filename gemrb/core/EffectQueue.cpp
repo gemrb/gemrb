@@ -1237,19 +1237,19 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		return res;
 	}
 
-	if (!target && !(globals.Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR)) {
-		Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: {}, skipping", fx->Opcode);
-		return FX_NOT_APPLIED;
-	}
-
 	const EffectDesc& ed = globals.Opcodes[fx->Opcode];
 	if (!ed) {
 		return res;
 	}
 
+	if (!target && !(ed.Flags & EFFECT_NO_ACTOR)) {
+		Log(MESSAGE, "EffectQueue", "Targetless opcode without EFFECT_NO_ACTOR: {}, skipping!", fx->Opcode);
+		return FX_NOT_APPLIED;
+	}
+
 	if (target && fx->FirstApply) {
 		if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0)) {
-			displaymsg->DisplayStringName(globals.Opcodes[fx->Opcode].Strref, DMC_WHITE, target, STRING_FLAGS::SOUND);
+			displaymsg->DisplayStringName(ed.Strref, DMC_WHITE, target, STRING_FLAGS::SOUND);
 		}
 	}
 
