@@ -139,20 +139,15 @@ using EffectFunction = int (*)(Scriptable*, Actor*, Effect*);
 
 /** Links Effect name to a function implementing the effect */
 class EffectDesc {
-	EffectFunction Function;
+	EffectFunction Function = nullptr;
 
 public:
-	const char* Name; // FIXME: shouldn't we presume ownership of the name? original implementation didn't
-	int Flags;
-	int opcode;
+	const char* Name = nullptr; // FIXME: shouldn't we presume ownership of the name? original implementation didn't
+	int Flags = 0;
+	int opcode = -1;
 	ieStrRef Strref = ieStrRef::INVALID;
 	
-	EffectDesc() {
-		Function = NULL;
-		Name = NULL;
-		Flags = 0;
-		opcode = -1;
-	}
+	EffectDesc() = default;
 	
 	EffectDesc(const char* name, EffectFunction fn, int flags, int data) {
 		Function = fn;
@@ -162,7 +157,7 @@ public:
 	}
 	
 	explicit operator bool() const {
-		return Function != NULL;
+		return Function != nullptr;
 	}
 	
 	int operator()(Scriptable* s, Actor* a, Effect* fx) const {
