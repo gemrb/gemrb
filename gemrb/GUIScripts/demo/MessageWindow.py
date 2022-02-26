@@ -43,6 +43,9 @@ def OnLoad():
 	InventoryButton = MessageWindow.GetControl (5)
 	InventoryButton.SetText ("I")
 	InventoryButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
-
+	
+	PortraitWindow = GemRB.LoadWindow(10, GUICommon.GetWindowPack(), WINDOW_RIGHT|WINDOW_BOTTOM)
+	PortraitWindow.AddAlias("PORTWIN")
+	
 def UpdateControlStatus():
 	pass
