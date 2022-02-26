@@ -4352,9 +4352,9 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 		// as per the original bg2 code, should we externalize?
 		// only dragons got a different x, y, z offset (x and y being handled in the projectile)
-		int heightmod = 0x23;
+		int heightmod = ProHeights::Normal;
 		if (target->ValidTarget(GA_BIGBAD)) {
-			heightmod = 0x90;
+			heightmod = ProHeights::Dragon;
 		}
 		Point offset = Projectile::GetStartOffset(target);
 		sca->XOffset += offset.x;
