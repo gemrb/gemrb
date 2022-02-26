@@ -144,11 +144,8 @@ class EffectDesc {
 public:
 	const char* Name; // FIXME: shouldn't we presume ownership of the name? original implementation didn't
 	int Flags;
-	
-	union {
-		int opcode;
-		ieStrRef Strref;
-	};
+	int opcode;
+	ieStrRef Strref = ieStrRef::INVALID;
 	
 	EffectDesc() {
 		Function = NULL;
