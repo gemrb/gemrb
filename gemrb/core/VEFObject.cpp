@@ -155,7 +155,7 @@ bool VEFObject::UpdateDrawingState(int orientation)
 			{
 				ScriptedAnimation* anim = static_cast<ScriptedAnimation*>(entry.ptr);
 				orient_t orient = orientation == -1 ? anim->Orientation : ClampToOrientation(orientation);
-				anim->UpdateDrawingState(orient);
+				ended = anim->UpdateDrawingState(orient);
 			}
 			break;
 		case VEFTypes::_2DA:
