@@ -1494,7 +1494,7 @@ void Inventory::BreakItemSlot(ieDword slot)
 	SetSlotItemRes(newItem, slot, 0,0,0);
 }
 
-std::string Inventory::dump() const
+std::string Inventory::dump(bool print) const
 {
 	std::string buffer("INVENTORY:\n");
 	for (unsigned int i = 0; i < Slots.size(); i++) {
@@ -1509,7 +1509,7 @@ std::string Inventory::dump() const
 
 	AppendFormat(buffer, "Equipped: {}       EquippedHeader: {}\n", Equipped, EquippedHeader);
 	AppendFormat(buffer, "Total weight: {}\n", Weight);
-	
+	if (print) Log(DEBUG, "Inventory", "{}", buffer);
 	return buffer;
 }
 

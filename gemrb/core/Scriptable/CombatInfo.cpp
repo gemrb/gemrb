@@ -187,6 +187,7 @@ std::string ArmorClass::dump() const
 	AppendFormat(buffer, "Natural: {}\tGeneric: {}\tDeflection: {}\n", natural, genericBonus, deflectionBonus);
 	AppendFormat(buffer, "Armor: {}\tShield: {}\n", armorBonus, shieldBonus);
 	AppendFormat(buffer, "Dexterity: {}\tWisdom: {}\n\n", dexterityBonus, wisdomBonus);
+	Log(DEBUG, "ArmorClass", "{}", buffer);
 	return buffer;
 }
 
@@ -324,6 +325,7 @@ std::string ToHitStats::dump() const
 	AppendFormat(buffer, "Base: {:2d}\tGeneric: {}\tEffect: {}\n", base, genericBonus, fxBonus);
 	AppendFormat(buffer, "Armor: {}\tShield: {}\n", armorBonus, shieldBonus);
 	AppendFormat(buffer, "Weapon: {}\tProficiency: {}\tAbility: {}\n\n", weaponBonus, proficiencyBonus, abilityBonus);
+	Log(DEBUG, "ToHitStats", "{}", buffer);
 	return buffer;
 }
 

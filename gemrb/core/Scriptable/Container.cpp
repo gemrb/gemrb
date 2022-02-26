@@ -261,7 +261,8 @@ std::string Container::dump() const
 		name = Scripts[0]->GetName();
 	}
 	AppendFormat(buffer, "Script: {}, Key: {}\n", name, KeyResRef);
-	buffer.append(inventory.dump());
+	buffer.append(inventory.dump(false));
+	Log(DEBUG, "Container", "{}", buffer);
 	return buffer;
 }
 

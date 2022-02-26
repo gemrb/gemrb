@@ -2126,7 +2126,7 @@ void GameScript::EvaluateAllBlocks()
 		} else {
 			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
 			if (core->InDebugMode(ID_CUTSCENE) && action->objects[1]) {
-				Log(DEBUG, "GameScript", "{}", action->objects[1]->dump());
+				action->objects[1]->dump();
 			}
 		}
 	}
@@ -2436,7 +2436,8 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			HandleActionOverride(scr, aC);
 		} else {
 			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
-			Log(DEBUG, "GameScript", "{}", aC->objects[0]->dump() + " " + aC->dump());
+			aC->objects[0]->dump();
+			aC->dump();
 		}
 		aC->Release();
 		return;
@@ -2564,7 +2565,7 @@ Action *GenerateActionDirect(std::string string, const Scriptable *object)
 	return action;
 }
 
-std::string Object::dump() const
+std::string Object::dump(bool print) const
 {
 	AssertCanary(__func__);
 	std::string buffer;
@@ -2582,6 +2583,8 @@ std::string Object::dump() const
 		AppendFormat(buffer, "{} ", objectFilter);
 	}
 	buffer.append("\n");
+
+	if (print) Log(DEBUG, "GameScript", "{}", buffer);
 	return buffer;
 }
 
@@ -2612,11 +2615,12 @@ std::string Trigger::dump() const
 	AppendFormat(buffer, "String0: {}\n", string0Parameter);
 	AppendFormat(buffer, "String1: {}\n", string1Parameter);
 	if (objectParameter) {
-		buffer.append(objectParameter->dump());
+		buffer.append(objectParameter->dump(false));
 	} else {
 		AppendFormat(buffer, "No object\n");
 	}
 	AppendFormat(buffer, "\n");
+	Log(DEBUG, "GameScript", "{}", buffer);
 	return buffer;
 }
 
@@ -2630,13 +2634,14 @@ std::string Action::dump() const
 	for (int i = 0; i < 3; i++) {
 		if (objects[i]) {
 			AppendFormat(buffer, "{}. ",i+1);
-			buffer.append(objects[i]->dump());
+			buffer.append(objects[i]->dump(false));
 		} else {
 			AppendFormat(buffer, "{}. Object - NULL\n",i+1);
 		}
 	}
 
 	AppendFormat(buffer, "RefCount: {}\tactionID: {}\n", RefCount, actionID);
+	Log(DEBUG, "GameScript", "{}", buffer);
 	return buffer;
 }
 

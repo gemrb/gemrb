@@ -908,30 +908,30 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					while (count--) {
 						const Actor *actor = area->GetActor(count, true);
 						if (actor->IsOver(gameMousePos)) {
-							Log(DEBUG, "Actor", "{}", actor->dump());
+							actor->dump();
 						}
 					}
 				}
 				if (lastActor) {
-					Log(DEBUG, "Actor", "{}", lastActor->dump());
+					lastActor->dump();
 					break;
 				}
 				if (overDoor) {
-					Log(DEBUG, "Door", "{}", overDoor->dump());
+					overDoor->dump();
 					break;
 				}
 				if (overContainer) {
-					Log(DEBUG, "Container", "{}", overContainer->dump());
+					overContainer->dump();
 					break;
 				}
 				if (overInfoPoint) {
-					Log(DEBUG, "InfoPoint", "{}", overInfoPoint->dump());
+					overInfoPoint->dump();
 					break;
 				}
-				Log(DEBUG, "Map", "{}", core->GetGame()->GetCurrentArea()->dump(false));
+				core->GetGame()->GetCurrentArea()->dump(false);
 				break;
 			case 'n': //prints a list of all the live actors in the area
-				Log(DEBUG, "Map", "{}", core->GetGame()->GetCurrentArea()->dump(true));
+				core->GetGame()->GetCurrentArea()->dump(true);
 				break;
 			// o
 			case 'p': //center on actor

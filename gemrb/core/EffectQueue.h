@@ -336,7 +336,7 @@ public:
 	// from pos, in range (no cone size yet)
 	void AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, const Actor *except);
 	/** Lists contents of the queue on a terminal for debugging */
-	std::string dump() const;
+	std::string dump(bool print = true) const;
 	//resolve effect
 	static int ResolveEffect(EffectRef &effect_reference);
 	static bool match_ids(const Actor *target, int table, ieDword value);

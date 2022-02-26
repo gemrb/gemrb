@@ -207,7 +207,7 @@ public:
 public:
 	Object() noexcept : objectName() {};
 
-	std::string dump() const;
+	std::string dump(bool print = true) const;
 	void Release()
 	{
 		delete this;

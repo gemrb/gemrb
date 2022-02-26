@@ -328,7 +328,7 @@ public:
 	/** breaks the item (weapon) in slot */
 	void BreakItemSlot(ieDword slot);
 	/** Lists all items in the Inventory on terminal for debugging */
-	std::string dump() const;
+	std::string dump(bool print = true) const;
 	/** Equips best weapon */
 	void EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */

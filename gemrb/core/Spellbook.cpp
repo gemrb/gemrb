@@ -1144,7 +1144,7 @@ void Spellbook::GenerateSpellInfo()
 	}
 }
 
-std::string Spellbook::dump() const
+std::string Spellbook::dump(bool print) const
 {
 	std::string buffer;
 	buffer.append( "SPELLBOOK:\n" );
@@ -1170,6 +1170,7 @@ std::string Spellbook::dump() const
 			}
 		}
 	}
+	if (print) Log(DEBUG, "Spellbook", "{}", buffer);
 	return buffer;
 }
 

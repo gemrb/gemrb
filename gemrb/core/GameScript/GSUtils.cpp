@@ -1093,11 +1093,11 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		Log(ERROR, "GameScript", "Target for dialog couldn't be found (Sender: {}, Type: {}).",
 			Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
-			Log(DEBUG, "Actor", "{}", Sender->As<const Actor>()->dump());
+			Sender->As<const Actor>()->dump();
 		}
 		std::string buffer("Target object: ");
 		if (parameters->objects[1]) {
-			buffer.append(parameters->objects[1]->dump());
+			buffer.append(parameters->objects[1]->dump(false));
 		} else {
 			buffer.append("<NULL>\n");
 		}
@@ -1111,10 +1111,9 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	bool swap = false;
 	if (speaker) {
 		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
-			std::string buffer("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
-			buffer.append(speaker->dump());
-			buffer.append(target->dump());
-			Log(ERROR, "GameScript", "{}", buffer);
+			Log(ERROR, "GameScript", "Speaker is dead, cannot start dialogue. Speaker and target are:");
+			speaker->dump();
+			target->dump();
 			Sender->ReleaseCurrentAction();
 			return;
 		}

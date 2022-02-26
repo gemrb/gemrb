@@ -488,6 +488,7 @@ std::string Door::dump() const
 		name = Scripts[0]->GetName();
 	}
 	AppendFormat(buffer, "Script: {}, Key ({}) removed: {}, Dialog: {}\n", name, KeyResRef, YESNO(Flags&DOOR_KEY), Dialog);
+	Log(DEBUG, "Door", "{}", buffer);
 	return buffer;
 }
 

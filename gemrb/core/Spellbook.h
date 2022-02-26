@@ -255,7 +255,7 @@ public:
 	int FindSpellInfo(SpellExtHeader *array, const ResRef& spellName, unsigned int type);
 
 	/** Dumps spellbook to stdout for debugging */
-	std::string dump() const;
+	std::string dump(bool print = true) const;
 };
 
 }

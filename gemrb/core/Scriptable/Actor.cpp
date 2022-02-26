@@ -4681,10 +4681,10 @@ std::string Actor::dump() const
 	AppendFormat(buffer, "LastTarget: {} {}    ", LastTarget, GetActorNameByID(LastTarget));
 	AppendFormat(buffer, "LastSpellTarget: {} {}\n", LastSpellTarget, GetActorNameByID(LastSpellTarget));
 	AppendFormat(buffer, "LastTalked: {} {}\n", LastTalker, GetActorNameByID(LastTalker));
-	buffer.append(inventory.dump());
-	buffer.append(spellbook.dump());
-	buffer.append(fxqueue.dump());
-	
+	buffer.append(inventory.dump(false));
+	buffer.append(spellbook.dump(false));
+	buffer.append(fxqueue.dump(false));
+	Log(DEBUG, "Actor", "{}", buffer);
 	return buffer;
 }
 

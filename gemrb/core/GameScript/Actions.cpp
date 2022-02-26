@@ -3562,7 +3562,7 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 		tar = GetScriptableFromObject(Sender, parameters->objects[1]);
 		if (!tar) {
 			Log(WARNING, "GameScript", "Couldn't find target for ClearActions!");
-			Log(DEBUG, "GameScript", "{}", parameters->objects[1]->dump());
+			parameters->objects[1]->dump();
 			return;
 		}
 	}

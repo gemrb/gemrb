@@ -58,7 +58,7 @@ int GameScript::Reaction(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(scr);
 	if (!actor) {
-		Log(DEBUG, "GameScript", "{}", parameters->dump());
+		parameters->dump();
 		return 0;
 	}
 
@@ -75,7 +75,7 @@ int GameScript::ReactionGT(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(scr);
 	if (!actor) {
-		Log(DEBUG, "GameScript", "{}", parameters->dump());
+		parameters->dump();
 		return 0;
 	}
 
@@ -92,7 +92,7 @@ int GameScript::ReactionLT(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(scr);
 	if (!actor) {
-		Log(DEBUG, "GameScript", "{}", parameters->dump());
+		parameters->dump();
 		return 0;
 	}
 
