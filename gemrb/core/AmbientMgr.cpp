@@ -44,8 +44,8 @@ AmbientMgr::~AmbientMgr()
 		delete ambientSource;
 	}
 	ambientSources.clear();
-	Reset();
 	mutex.unlock();
+	Reset();
 
 	cond.notify_all();
 	player.join();
