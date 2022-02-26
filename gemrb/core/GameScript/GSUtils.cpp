@@ -2548,9 +2548,10 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	}
 
 	for (int i = 0; i < picks; i++) {
-		if (selects[i]<0)
-			continue;
-		int spnum = atoi( tm->QueryField( selects[i], column-1 ) );
+		if (selects[i] < 0) continue;
+		std::string cell = tm->QueryField(selects[i], column - 1);
+		if (cell == "*") continue;
+		int spnum = atoi(cell.c_str());
 		varname.SNPrintF("wishpower%02d", spnum);
 		SetVariable(Sender, varname, 1, "GLOBAL");
 	}

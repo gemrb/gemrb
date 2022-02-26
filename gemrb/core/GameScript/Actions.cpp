@@ -7273,7 +7273,6 @@ void GameScript::DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters)
 //Picks 5 lines from wish.2da
 //Gets the 5 values (column is int0parameter) from the table.
 //Sets the five wishpowerNN to 1, while resets the rest to 0.
-//TODO: investigate what happens with * values
 void GameScript::SetupWish(Scriptable* Sender, Action* parameters)
 {
 	SetupWishCore(Sender, parameters->int0Parameter, parameters->int1Parameter);
