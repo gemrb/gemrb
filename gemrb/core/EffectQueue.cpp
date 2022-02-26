@@ -135,6 +135,7 @@ private:
 				int val;
 				if (valid_signednumber(ret, val) && (i == val)) {
 					Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);
+					break;
 				} else {
 					Opcodes[i].Strref = ieStrRef::INVALID;
 				}
