@@ -248,8 +248,7 @@ void Projectile::Setup()
 
 	timeStartStep = core->Time.Ticks2Ms(core->GetGame()->Ticks);
 
-	const Actor* act = nullptr;
-	if (area) act = area->GetActorByGlobalID(Caster);
+	const Actor* act = area->GetActorByGlobalID(Caster);
 
 	if (act) {
 		ZPos = ProHeights::Normal;
