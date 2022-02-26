@@ -2841,10 +2841,9 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 
 	Actor* act = Scriptable::As<Actor>(Sender);
 	if (act) {
-		unsigned int dist = GetSpellDistance(spellResRef, Sender, parameters->pointParameter);
-
 		//move near to target
 		if (flags&SC_RANGE_CHECK) {
+			unsigned int dist = GetSpellDistance(spellResRef, Sender, parameters->pointParameter);
 			if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
 				MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
 				return;
