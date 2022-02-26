@@ -2744,6 +2744,9 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 				}
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 			}
+
+			// finish approach before continuing with casting
+			if (act->InMove()) return;
 		}
 
 		//face target
@@ -2857,6 +2860,9 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 				}
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 			}
+
+			// finish approach before continuing with casting
+			if (act->InMove()) return;
 		}
 
 		//face target
