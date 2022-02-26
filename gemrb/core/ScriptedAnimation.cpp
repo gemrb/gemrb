@@ -74,7 +74,7 @@ Animation *ScriptedAnimation::PrepareAnimation(const AnimationFactory *af, unsig
 
 	Animation *anim = af->GetCycle(c);
 	if (anim) {
-		anim->MirrorAnimation(BlitFlags::MIRRORX | BlitFlags::MIRRORY);
+		anim->MirrorAnimation(BlitFlags(Transparency) & (BlitFlags::MIRRORX | BlitFlags::MIRRORY));
 		//creature anims may start at random position, vvcs always start on 0
 		anim->frameIdx = 0;
 		//vvcs are always paused
