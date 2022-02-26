@@ -2509,7 +2509,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 		return;
 	}
 
-	std::vector<int> selects(picks);
+	std::vector<int> selects(picks, -1);
 	int count = tm->GetRowCount();
 	// handle the unused SetupWishObject, which passes WIS instead of a column
 	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
@@ -2528,12 +2528,8 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	}
 
 	if (count<picks) {
-		int i;
-		for (i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++) {
 			selects[i]=i;
-		}
-		while(i++<picks) {
-			selects[i]=-1;
 		}
 	} else {
 		for (int i = 0; i < picks; i++) {
