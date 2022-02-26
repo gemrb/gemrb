@@ -7421,7 +7421,8 @@ void Actor::UpdateActorState()
 
 	//make actor unselectable and unselected when it is not moving
 	//dead, petrified, frozen, paralysed or unavailable to player
-	if (!ValidTarget(GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL)) {
+	// but skip paused actors
+	if (!GetStat(IE_CASTERHOLD) && !ValidTarget(GA_SELECT | GA_NO_ENEMY | GA_NO_NEUTRAL)) {
 		game->SelectActor(this, false, SELECT_NORMAL);
 	}
 
