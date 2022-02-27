@@ -422,12 +422,12 @@ def keys_setup_page (Window, pageno):
 		else:
 			Label = Window.GetControl (0x10000005 + i)
 			Label.SetText (key)
-			Label.SetEvent (IE_GUI_LABEL_ON_PRESS, lambda: OnActionLabelPress(Window))
+			#Label.OnPress (lambda: OnActionLabelPress(Window))
 			Label.SetVarAssoc ("KeyAction", i)	
 			
 			Label = Window.GetControl (0x10000041 + i)
 			Label.SetText (label)
-			Label.SetEvent (IE_GUI_LABEL_ON_PRESS, lambda: OnActionLabelPress(Window))
+			#Label.OnPress (lambda: OnActionLabelPress(Window))
 			Label.SetVarAssoc ("KeyAction", i)	
 
 
