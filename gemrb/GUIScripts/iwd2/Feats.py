@@ -337,7 +337,7 @@ def OpenFeatsWindow(chargen=0):
 	TextAreaControl.SetText(36476)
 
 	ScrollBarControl = FeatWindow.GetControl(104)
-	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBarControl.OnChange (ScrollBarPress)
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)

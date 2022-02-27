@@ -68,7 +68,7 @@ def OnLoad ():
 			Button.SetSize (21, 21)
 
 	ScrollBar=LoadWindow.GetControl (23)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBar.OnChange (ScrollBarPress)
 	Games=GemRB.GetSaveGames()
 	TopIndex = max (0, len(Games) - 5)
 

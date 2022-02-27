@@ -260,7 +260,7 @@ def UpdateScrollBar (ScrollBar, SpellCount):
 	# that's 25 if the extra 25th spell slot is available in sorcerer level up
 	if SpellCount > ButtonCount + ExtraSpellButtons():
 		ScrollBar.SetVisible (True)
-		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
+		ScrollBar.OnChange (ShowSpells)
 
 		extraCount = SpellCount - ButtonCount
 		if chargen:
@@ -271,7 +271,7 @@ def UpdateScrollBar (ScrollBar, SpellCount):
 	else:
 		ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 		ScrollBar.SetVisible (False)
-		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, None)
+		ScrollBar.OnChange (None)
 
 def SpellsDonePress ():
 	"""Move to the next assignable level.

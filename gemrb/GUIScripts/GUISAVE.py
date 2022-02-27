@@ -89,7 +89,7 @@ def OpenSaveWindow ():
 				Button.SetSize (21, 21)
 
 	ScrollBar = Window.GetControl (ctrl_offset[5])
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBar.OnChange (ScrollBarPress)
 	GUICommon.SetSaveDir ()
 	Games = GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - num_rows + 1) #one more for the 'new game'

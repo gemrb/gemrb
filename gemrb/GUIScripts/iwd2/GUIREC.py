@@ -1098,7 +1098,7 @@ def UpdateHelpWindow ():
 
 	ScrollBar = Window.GetControl (4)
 	ScrollBar.SetVarAssoc ("TopIndex", i)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshHelpWindow)
+	ScrollBar.OnChange (RefreshHelpWindow)
 
 	RefreshHelpWindow ()
 	return

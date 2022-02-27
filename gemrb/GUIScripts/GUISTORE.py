@@ -298,12 +298,12 @@ def InitStoreShoppingWindow (Window):
 
 	# left scrollbar
 	ScrollBarLeft = Window.GetControlAlias ('STOSBARL')
-	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreShoppingWindow(Window))
+	ScrollBarLeft.OnChange (lambda: RedrawStoreShoppingWindow(Window))
 	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('LBTN0'))
 
 	# right scrollbar
 	ScrollBarRight = Window.GetControlAlias ('STOSBARR')
-	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreShoppingWindow(Window))
+	ScrollBarRight.OnChange (lambda: RedrawStoreShoppingWindow(Window))
 	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('RBTN0'))
 
 	if GemRB.GetVar ("Inventory"):
@@ -487,7 +487,7 @@ def InitStoreIdentifyWindow (Window):
 		Window.AliasControls ({'IDBTN' + str(x) : 8+x for x in range(ItemButtonCount)})
 
 	ScrollBar = Window.GetControlAlias ('IDSBAR')
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreIdentifyWindow(Window))
+	ScrollBar.OnChange (lambda: RedrawStoreIdentifyWindow(Window))
 	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('IDBTN0'))
 
 	TextArea = Window.GetControlAlias ('IDTA')
@@ -573,12 +573,12 @@ def InitStoreStealWindow (Window):
 
 	# left scrollbar
 	ScrollBarLeft = Window.GetControlAlias ('SWLSBAR')
-	ScrollBarLeft.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreStealWindow(Window))
+	ScrollBarLeft.OnChange (lambda: RedrawStoreStealWindow(Window))
 	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('SWLBTN0'))
 
 	# right scrollbar
 	ScrollBarRight = Window.GetControlAlias ('SWRSBAR')
-	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreStealWindow(Window))
+	ScrollBarRight.OnChange (lambda: RedrawStoreStealWindow(Window))
 	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('SWRBTN0'))
 
 	for i in range (ItemButtonCount):
@@ -739,7 +739,7 @@ def InitStoreHealWindow (Window):
 		Window.AliasControls ({'HWLBTN' + str(x) : x+8 for x in range(ItemButtonCount)})
 
 	ScrollBar = Window.GetControlAlias ('HWSBAR')
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: UpdateStoreHealWindow(Window))
+	ScrollBar.OnChange (lambda: UpdateStoreHealWindow(Window))
 	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('HWLBTN0'))
 
 	#spell buttons
@@ -861,7 +861,7 @@ def InitStoreRumourWindow (Window):
 	# this scrollbar must be unhidden because it is falsely linked to a TextArea
 	ScrollBar = Window.GetControl (5)
 	ScrollBar.SetVisible(True)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: UpdateStoreRumourWindow(Window))
+	ScrollBar.OnChange (lambda: UpdateStoreRumourWindow(Window))
 	Count = Store['StoreDrinkCount']
 	if Count>5:
 		Count = Count-5

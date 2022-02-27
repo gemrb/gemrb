@@ -184,12 +184,12 @@ def OpenContainerWindow ():
 	# left scrollbar (container)
 	ScrollBar = Window.GetControl (52)
 	ScrollBar.SetVisible(True) # unhide because in PST it is linked to a TextArea
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
+	ScrollBar.OnChange (RedrawContainerWindow)
 
 	# right scrollbar (inventory)
 	ScrollBar = Window.GetControl (53)
 	ScrollBar.SetVisible(True) # unhide because in PST it is linked to a TextArea
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
+	ScrollBar.OnChange (RedrawContainerWindow)
 
 	# encumbrance and inventory icon
 	# iwd has a handy button

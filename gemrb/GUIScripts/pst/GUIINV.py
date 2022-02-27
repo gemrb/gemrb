@@ -103,7 +103,7 @@ def InitInventoryWindow (Window):
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
 
 	ScrollBar = Window.GetControl (45)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RefreshInventoryWindow(Window))
+	ScrollBar.OnChange (lambda: RefreshInventoryWindow(Window))
 
 	for i in range (57, 64):
 		Label = Window.GetControl (0x10000000 + i)

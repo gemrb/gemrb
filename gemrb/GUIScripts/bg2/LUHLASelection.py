@@ -88,7 +88,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 			GemRB.SetVar("HLATopIndex", 0)
 			# setup scrollbar
 			ScrollBar = HLAWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252}, "GUISCRCW")
-			ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, HLAShowAbilities)
+			ScrollBar.OnChange (HLAShowAbilities)
 			#with enhanced GUI we have 5 rows of 5 abilities (the last one is 'the extra slot')
 			count = GUICommon.ceildiv (len(HLAAbilities) - 25, 5) + 1
 			ScrollBar.SetVarAssoc ("HLATopIndex", count, 0, count)

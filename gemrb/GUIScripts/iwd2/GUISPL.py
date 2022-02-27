@@ -89,7 +89,7 @@ def InitSpellBookWindow (Window):
 	GemRB.SetVar ("SpellBookSpellLevel", 0)
 	RefreshSpellBookLevel (False)
 	ScrollBar.SetVarAssoc ("SpellTopIndex", 0, 0, len(KnownSpellList))
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBar.OnChange (ScrollBarPress)
 
 	GemRB.SetVar ("SelectedBook", 0)
 	SelectFirstActiveBook ()

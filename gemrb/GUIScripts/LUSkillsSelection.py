@@ -268,7 +268,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 
 	#skills scrollbar
 	if len(SkillsIndices) > SkillsNumButtons:
-		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: SkillsRedraw())
+		ScrollBar.OnChange (lambda: SkillsRedraw())
 		#decrease it with the number of controls on screen (list size) and two unrelated rows
 		maxvalue = SkillsTable.GetRowCount() - SkillsNumButtons - 2
 		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, maxvalue)

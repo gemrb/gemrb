@@ -72,7 +72,7 @@ def OnLoad ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 	ScrollBar = LoadWindow.GetControl (25)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarUpdated)
+	ScrollBar.OnChange (ScrollBarUpdated)
 	Games = GemRB.GetSaveGames ()
 	TopIndex = max (0, len(Games) - 4)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)

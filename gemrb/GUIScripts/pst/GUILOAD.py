@@ -69,7 +69,7 @@ def OnLoad ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
 	ScrollBar=LoadWindow.GetControl (13)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
+	ScrollBar.OnChange (ScrollBarPress)
 	GUICommon.SetSaveDir ()
 	Games=GemRB.GetSaveGames () #count of games in save folder?
 	if len(Games)>3:

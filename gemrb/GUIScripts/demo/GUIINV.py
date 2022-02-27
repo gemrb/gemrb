@@ -41,7 +41,7 @@ def InitInventoryWindow (Window):
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshInventoryWindow)
+	ScrollBar.OnChange (RefreshInventoryWindow)
 
 	# Ground Items (6)
 	for i in range (5):
