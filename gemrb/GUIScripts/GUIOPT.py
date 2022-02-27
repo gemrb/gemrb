@@ -510,7 +510,7 @@ def CloseQuitMsgWindow ():
 	global QuitMsgWindow
 
 	if QuitMsgWindow:
-		QuitMsgWindow.Unload ()
+		QuitMsgWindow.Close ()
 	QuitMsgWindow = None
 
 	GemRB.SetVar("AskAndExit", 0)

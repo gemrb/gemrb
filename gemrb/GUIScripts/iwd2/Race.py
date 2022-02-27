@@ -76,19 +76,19 @@ def RacePress():
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 		return
 	if RaceWindow:
-		RaceWindow.Unload ()
+		RaceWindow.Close ()
 	GemRB.SetNextScript ("SubRaces")
 	return
 
 def BackPress():
 	if RaceWindow:
-		RaceWindow.Unload ()
+		RaceWindow.Close ()
 	GemRB.SetNextScript ("CharGen2")
 	GemRB.SetVar ("BaseRace",0)  #scrapping the race value
 	return
 
 def NextPress():
 	if RaceWindow:
-		RaceWindow.Unload ()
+		RaceWindow.Close ()
 	GemRB.SetNextScript ("CharGen3") #class
 	return

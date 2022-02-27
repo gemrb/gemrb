@@ -68,9 +68,9 @@ def OnLoad():
 
 def DonePress():
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	if MainWindow:
-		MainWindow.Unload()
+		MainWindow.Close ()
 	#this part is fuzzy
 	#we don't have the character as an object in the chargen
 	#but we just imported a complete object
@@ -83,9 +83,9 @@ def DonePress():
 	
 def CancelPress():
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	if MainWindow:
-		MainWindow.Unload()
+		MainWindow.Close ()
 	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
 	return
 

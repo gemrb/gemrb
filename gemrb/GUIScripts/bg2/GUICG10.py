@@ -94,14 +94,14 @@ def ClassPress():
 def BackPress():
 	GemRB.SetVar("Class",0)  # scrapping it
 	if ClassWindow:
-		ClassWindow.Unload()
+		ClassWindow.Close ()
 	GemRB.SetNextScript("GUICG2")
 	return
 
 def NextPress():
 	GUICG2.SetClass()
 	if ClassWindow:
-		ClassWindow.Unload()
+		ClassWindow.Close ()
 
 	# find the class from the class table
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")

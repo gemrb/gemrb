@@ -130,7 +130,7 @@ def ScrollBarPress ():
 
 def LoadGamePress ():
 	if LoadWindow:
-		LoadWindow.Unload ()
+		LoadWindow.Close ()
 	Pos = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("LoadIdx")
 	LoadScreen.StartLoadScreen ()
 	GemRB.LoadGame(Games[Pos]) # load & start game
@@ -149,13 +149,13 @@ def DeleteGameConfirm ():
 	ScrollBar.SetVarAssoc ("TopIndex", len(Games))
 	ScrollBarPress ()
 	if ConfirmWindow:
-		ConfirmWindow.Unload ()
+		ConfirmWindow.Close ()
 	LoadWindow.Focus()
 	return
 
 def DeleteGameCancel ():
 	if ConfirmWindow:
-		ConfirmWindow.Unload ()
+		ConfirmWindow.Close ()
 	LoadWindow.Focus()
 	return
 

@@ -99,7 +99,7 @@ def BackPress():
 	global CharSoundWindow
 
 	if CharSoundWindow:
-		CharSoundWindow.Unload()
+		CharSoundWindow.Close ()
 	GemRB.SetNextScript("GUICG13") 
 	return
 
@@ -113,6 +113,6 @@ def NextPress():
 	GemRB.SetPlayerSound (MyChar, CharSound)
 
 	if CharSoundWindow:
-		CharSoundWindow.Unload()
+		CharSoundWindow.Close ()
 	GemRB.SetNextScript("CharGen8") #name
 	return

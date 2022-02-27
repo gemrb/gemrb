@@ -58,12 +58,12 @@ def Done1Press():
 	
 def Done2Press():
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	GemRB.SetNextScript("Start")
 	return
 
 def CancelPress():
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	GemRB.SetNextScript("CharGen")
 	return

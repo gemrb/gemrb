@@ -637,14 +637,14 @@ def ContingencyOk ():
 	#set the innate
 	if GemRB.LearnSpell (pc, Source+"d", LS_MEMO):
 		GemRB.Log (LOG_ERROR, "ContingencyOk", "Failed to learn sequencer/contingency!")
-	OtherWindow.Unload()
+	OtherWindow.Close ()
 	return
 
 def ContingencyCancel ():
 	global OtherWindow
 
 	GemRB.SetPlayerStat (pc, IE_IDENTIFYMODE, 0)
-	OtherWindow.Unload()
+	OtherWindow.Close ()
 	return
 
 def ContingencyHelpSpell ():

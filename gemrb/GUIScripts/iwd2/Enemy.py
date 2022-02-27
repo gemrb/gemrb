@@ -153,14 +153,14 @@ def RacePress():
 
 def BackPress():
 	if RaceWindow:
-		RaceWindow.Unload()
+		RaceWindow.Close ()
 	GemRB.SetVar("HatedRace",0)  #scrapping the race value
 	GemRB.SetNextScript("CharGen6")
 	return
 
 def NextPress(save=1):
 	if RaceWindow:
-		RaceWindow.Unload()
+		RaceWindow.Close ()
 	if CharGen:
 		GemRB.SetNextScript("Skills")
 		return

@@ -231,7 +231,7 @@ def MouseLeaveGround (Button):
 
 def CloseItemInfoWindow ():
 	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
+		ItemInfoWindow.Close ()
 	UpdateInventoryWindow ()
 	return
 
@@ -690,7 +690,7 @@ def UpdateSlot (pc, slot):
 def CancelColor():
 	global ColorPicker
 	if ColorPicker:
-		ColorPicker.Unload ()
+		ColorPicker.Close ()
 	InventoryWindow = GemRB.GetView ("WIN_INV")
 	InventoryWindow.Focus ()
 	return
@@ -701,7 +701,7 @@ def ColorDonePress():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if ColorPicker:
-		ColorPicker.Unload ()
+		ColorPicker.Close ()
 
 	ColorTable = GemRB.LoadTable ("clowncol")
 	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
@@ -832,7 +832,7 @@ def OpenErrorWindow (strref):
 
 def CloseErrorWindow ():
 	if ErrorWindow:
-		ErrorWindow.Unload ()
+		ErrorWindow.Close ()
 	UpdateInventoryWindow ()
 	return
 
@@ -893,7 +893,7 @@ def OpenItemWindow ():
 	GemRB.SetVar ("Inventory", 1)
 	slot = GemRB.GetVar ("ItemButton") #get this before closing win
 	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
+		ItemInfoWindow.Close ()
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot_item = GemRB.GetSlotItem (pc, slot)
@@ -914,7 +914,7 @@ def DialogItemWindow ():
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
 	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
+		ItemInfoWindow.Close ()
 
 	GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
 	return
@@ -927,10 +927,10 @@ def IdentifyUseSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
-		ItemIdentifyWindow.Unload ()
+		ItemIdentifyWindow.Close ()
 	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
 	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
+		ItemInfoWindow.Close ()
 	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	GemRB.PlaySound(DEF_IDENTIFY)
 	OpenItemInfoWindow(slot)
@@ -944,9 +944,9 @@ def IdentifyUseScroll ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
-		ItemIdentifyWindow.Unload ()
+		ItemIdentifyWindow.Close ()
 	if ItemInfoWindow:
-		ItemInfoWindow.Unload ()
+		ItemInfoWindow.Close ()
 	if GemRB.HasSpecialItem (pc, 1, 1):
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	GemRB.PlaySound(DEF_IDENTIFY)
@@ -957,7 +957,7 @@ def CloseIdentifyItemWindow ():
 	global ItemIdentifyWindow, ItemInfoWindow
 
 	if ItemIdentifyWindow:
-		ItemIdentifyWindow.Unload ()
+		ItemIdentifyWindow.Close ()
 		ItemIdentifyWindow = None
 	if ItemInfoWindow:
 		ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
@@ -1014,7 +1014,7 @@ def CloseAbilitiesItemWindow ():
 	global ItemAbilitiesWindow, ItemInfoWindow
 
 	if ItemAbilitiesWindow:
-		ItemAbilitiesWindow.Unload ()
+		ItemAbilitiesWindow.Close ()
 		ItemAbilitiesWindow = None
 	if ItemInfoWindow:
 		ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)

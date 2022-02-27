@@ -83,14 +83,14 @@ def AlignmentPress():
 
 def BackPress():
 	if AlignmentWindow:
-		AlignmentWindow.Unload()
+		AlignmentWindow.Close ()
 	GemRB.SetVar("Alignment",-1)  #scrapping the alignment value
 	GemRB.SetNextScript("CharGen4")
 	return
 
 def NextPress():
 	if AlignmentWindow:
-		AlignmentWindow.Unload()
+		AlignmentWindow.Close ()
 	# save previous stats:
 	#       alignment
 	#       reputation

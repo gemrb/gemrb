@@ -259,7 +259,7 @@ def CancelPress():
 	slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer("", slot|0x8000)
 	if CharGenWindow:
-		CharGenWindow.Unload()
+		CharGenWindow.Close ()
 	GemRB.SetNextScript('SPPartyFormation')
 	return
 

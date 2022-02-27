@@ -196,13 +196,13 @@ def DeleteGameConfirm (btn):
 	ScrollBarUpdated (ScrollBar)
 
 	if ConfirmWindow:
-		ConfirmWindow.Unload ()
+		ConfirmWindow.Close ()
 	LoadWindow.Focus()
 	return
 
 def DeleteGameCancel ():
 	if ConfirmWindow:
-		ConfirmWindow.Unload ()
+		ConfirmWindow.Close ()
 	LoadWindow.Focus()
 	return
 

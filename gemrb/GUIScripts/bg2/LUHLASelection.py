@@ -134,7 +134,7 @@ def HLADonePress ():
 
 	# close the window
 	if HLAWindow:
-		HLAWindow.Unload ()
+		HLAWindow.Close ()
 
 	# so redraw skills knows we're done
 	GemRB.SetVar ("HLACount", 0)

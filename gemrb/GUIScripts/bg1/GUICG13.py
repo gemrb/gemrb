@@ -104,7 +104,7 @@ def DonePress():
 	global HairColor, SkinColor, MinorColor, MajorColor
 
 	if ColorPicker:
-		ColorPicker.Unload()
+		ColorPicker.Close ()
 	
 	ColorWindow.ShowModal(MODAL_SHADOW_NONE)
 	PickedColor=ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))

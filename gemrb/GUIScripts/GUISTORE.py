@@ -1967,7 +1967,7 @@ def RentConfirm (Window0):
 	cutscene = info["Cutscene"]
 
 	if RentConfirmWindow:
-		RentConfirmWindow.Unload ()
+		RentConfirmWindow.Close ()
 	if info["Error"]:
 		# notify why resting isn't possible
 		ErrorWindow (info["ErrorMsg"])

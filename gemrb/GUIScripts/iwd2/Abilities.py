@@ -245,7 +245,7 @@ def LeftPress(btn):
 
 def BackPress():
 	if AbilityWindow:
-		AbilityWindow.Unload()
+		AbilityWindow.Close ()
 	GemRB.SetNextScript("CharGen5")
 	for i in range(6):
 		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
@@ -253,7 +253,7 @@ def BackPress():
 
 def NextPress():
 	if AbilityWindow:
-		AbilityWindow.Unload()
+		AbilityWindow.Close ()
 	if CharGen:
 		GemRB.SetNextScript("CharGen6") #skills
 	else:

@@ -316,7 +316,7 @@ def RecallPress():
 
 def BackPress():
 	if AbilityWindow:
-		AbilityWindow.Unload()
+		AbilityWindow.Close ()
 	GemRB.SetNextScript("CharGen5")
 	GemRB.SetVar("StrExtra",0)
 	for i in range(-1,6):
@@ -325,7 +325,7 @@ def BackPress():
 
 def NextPress():
 	if AbilityWindow:
-		AbilityWindow.Unload()
+		AbilityWindow.Close ()
 	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 

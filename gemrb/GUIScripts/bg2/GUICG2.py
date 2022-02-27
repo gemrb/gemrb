@@ -114,7 +114,7 @@ def OnLoad():
 
 def BackPress():
 	if ClassWindow:
-		ClassWindow.Unload()
+		ClassWindow.Close ()
 	GemRB.SetNextScript("CharGen3")
 	GemRB.SetVar("Class",0)  #scrapping the class value
 	return
@@ -172,20 +172,20 @@ def SetClass():
 def MultiClassPress():
 	GemRB.SetVar("Class Kit",0)
 	if ClassWindow:
-		ClassWindow.Unload()
+		ClassWindow.Close ()
 	GemRB.SetNextScript("GUICG10")
 	return
 
 def ClassPress():
 	SetClass()
 	if ClassWindow:
-		ClassWindow.Unload()
+		ClassWindow.Close ()
 	GemRB.SetNextScript("GUICG22")
 	return
 
 def NextPress ():
 	SetClass()
 	if ClassWindow:
-		ClassWindow.Unload()
+		ClassWindow.Close ()
 	GemRB.SetNextScript("CharGen4") #alignment
 	return

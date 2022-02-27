@@ -1995,7 +1995,7 @@ def OpenWaitForDiscWindow ():
 	global DiscWindow
 
 	if DiscWindow:
-		DiscWindow.Unload ()
+		DiscWindow.Close ()
 		DiscWindow = None
 		return
 

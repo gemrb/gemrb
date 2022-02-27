@@ -296,7 +296,7 @@ def CancelPress():
 	global CharGenWindow
 
 	if CharGenWindow:
-		CharGenWindow.Unload ()
+		CharGenWindow.Close ()
 	GemRB.CreatePlayer ("", MyChar | 0x8000 )
 	GemRB.SetNextScript ("PartyFormation")
 	return
@@ -394,7 +394,7 @@ def AcceptPress():
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	if CharGenWindow:
-		CharGenWindow.Unload ()
+		CharGenWindow.Close ()
 	GemRB.SetNextScript ("PartyFormation")
 	return
 
@@ -605,7 +605,7 @@ def GenderDonePress():
 	global MyChar
 
 	if GenderWindow:
-		GenderWindow.Unload ()
+		GenderWindow.Close ()
 	Gender = GemRB.GetVar ("Gender")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
 
@@ -619,7 +619,7 @@ def GenderCancelPress():
 	GemRB.SetVar ("Gender", 0)
 	GemRB.SetPlayerStat (MyChar, IE_SEX, 0)
 	if GenderWindow:
-		GenderWindow.Unload ()
+		GenderWindow.Close ()
 	return
 
 def PortraitSelect():
@@ -705,10 +705,10 @@ def CustomDone():
 	PortraitName = PortraitList1.QueryText ()
 	GemRB.SetToken ("LargePortrait", PortraitName)
 	if Window:
-		Window.Unload ()
+		Window.Close ()
 
 	if PortraitWindow:
-		PortraitWindow.Unload ()
+		PortraitWindow.Close ()
 	PortraitButton.SetPicture(PortraitName)
 	GenderButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RaceButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -720,7 +720,7 @@ def CustomDone():
 
 def CustomAbort():
 	if CustomWindow:
-		CustomWindow.Unload ()
+		CustomWindow.Close ()
 	return
 
 def CGLargeCustomPortrait():
@@ -819,14 +819,14 @@ def CGPortraitDonePress():
 	CharGenState = 1
 	SetCharacterDescription()
 	if PortraitWindow:
-		PortraitWindow.Unload ()
+		PortraitWindow.Close ()
 	return
 
 def CGPortraitCancelPress():
 	global CharGenWindow, PortraitWindow
 
 	if PortraitWindow:
-		PortraitWindow.Unload ()
+		PortraitWindow.Close ()
 	return
 
 # Race Selection
@@ -878,7 +878,7 @@ def RaceDonePress():
 	global CharGenWindow, CharGenState, RaceWindow, RaceButton, ClassButton
 
 	if RaceWindow:
-		RaceWindow.Unload ()
+		RaceWindow.Close ()
 	RaceButton.SetState (IE_GUI_BUTTON_DISABLED)
 	ClassButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ClassButton.MakeDefault()
@@ -894,7 +894,7 @@ def RaceCancelPress():
 	global CharGenWindow, RaceWindow
 
 	if RaceWindow:
-		RaceWindow.Unload ()
+		RaceWindow.Close ()
 	return
 
 # Class Selection
@@ -1034,7 +1034,7 @@ def ClassMultiDonePress():
 	global ClassMultiWindow
 
 	if ClassMultiWindow:
-		ClassMultiWindow.Unload ()
+		ClassMultiWindow.Close ()
 	ClassDonePress()
 	return
 
@@ -1042,7 +1042,7 @@ def ClassMultiCancelPress():
 	global ClassWindow, ClassMultiWindow
 
 	if ClassMultiWindow:
-		ClassMultiWindow.Unload ()
+		ClassMultiWindow.Close ()
 	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
@@ -1103,7 +1103,7 @@ def KitDonePress():
 	global KitWindow
 
 	if KitWindow:
-		KitWindow.Unload ()
+		KitWindow.Close ()
 	ClassDonePress()
 	return
 
@@ -1111,7 +1111,7 @@ def KitCancelPress():
 	global ClassWindow, KitWindow
 
 	if KitWindow:
-		KitWindow.Unload ()
+		KitWindow.Close ()
 	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
@@ -1120,7 +1120,7 @@ def ClassDonePress():
 	global MyChar
 
 	if ClassWindow:
-		ClassWindow.Unload ()
+		ClassWindow.Close ()
 	ClassButton.SetState (IE_GUI_BUTTON_DISABLED)
 	AlignmentButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AlignmentButton.MakeDefault()
@@ -1143,7 +1143,7 @@ def ClassCancelPress():
 	global CharGenWindow, ClassWindow
 
 	if ClassWindow:
-		ClassWindow.Unload ()
+		ClassWindow.Close ()
 	return
 
 # Alignment Selection
@@ -1198,7 +1198,7 @@ def AlignmentDonePress():
 	global MyChar
 
 	if AlignmentWindow:
-		AlignmentWindow.Unload ()
+		AlignmentWindow.Close ()
 	AlignmentButton.SetState (IE_GUI_BUTTON_DISABLED)
 	AbilitiesButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AbilitiesButton.MakeDefault()
@@ -1214,7 +1214,7 @@ def AlignmentCancelPress():
 	global CharGenWindow, AlignmentWindow
 
 	if AlignmentWindow:
-		AlignmentWindow.Unload ()
+		AlignmentWindow.Close ()
 	return
 
 # Abilities Selection
@@ -1441,7 +1441,7 @@ def AbilitiesDonePress():
 	global CharGenWindow, CharGenState, AbilitiesWindow, AbilitiesButton, SkillsButton, SkillsState
 
 	if AbilitiesWindow:
-		AbilitiesWindow.Unload ()
+		AbilitiesWindow.Close ()
 	AbilitiesButton.SetState (IE_GUI_BUTTON_DISABLED)
 	SkillsButton.SetState (IE_GUI_BUTTON_ENABLED)
 	SkillsButton.MakeDefault()
@@ -1468,7 +1468,7 @@ def AbilitiesCancelPress():
 	global CharGenWindow, AbilitiesWindow
 
 	if AbilitiesWindow:
-		AbilitiesWindow.Unload ()
+		AbilitiesWindow.Close ()
 	return
 
 # Skills Selection
@@ -1599,7 +1599,7 @@ def SkillsDonePress():
 	LUSkillsSelection.SkillsSave (MyChar)
 
 	if SkillsWindow:
-		SkillsWindow.Unload ()
+		SkillsWindow.Close ()
 	SkillsState = 1
 	SkillsPress()
 	return
@@ -1608,7 +1608,7 @@ def SkillsCancelPress():
 	global CharGenWindow, SkillsWindow, SkillsState
 
 	if SkillsWindow:
-		SkillsWindow.Unload ()
+		SkillsWindow.Close ()
 	SkillsState = 0
 	return
 
@@ -1677,7 +1677,7 @@ def RacialEnemyDonePress():
 	global CharGenWindow, RacialEnemyWindow, SkillsState
 
 	if RacialEnemyWindow:
-		RacialEnemyWindow.Unload ()
+		RacialEnemyWindow.Close ()
 
 	SkillsState = 1
 	SkillsPress()
@@ -1687,7 +1687,7 @@ def RacialEnemyCancelPress():
 	global CharGenWindow, RacialEnemyWindow, SkillsState
 
 	if RacialEnemyWindow:
-		RacialEnemyWindow.Unload ()
+		RacialEnemyWindow.Close ()
 	SkillsState = 0
 	return
 
@@ -1864,7 +1864,7 @@ def ProficienciesDonePress():
 	global CharGenWindow, ProficienciesWindow, SkillsState
 
 	if ProficienciesWindow:
-		ProficienciesWindow.Unload ()
+		ProficienciesWindow.Close ()
 	SkillsState = 2
 	SkillsPress()
 	return
@@ -1873,7 +1873,7 @@ def ProficienciesCancelPress():
 	global CharGenWindow, ProficienciesWindow, SkillsState
 
 	if ProficienciesWindow:
-		ProficienciesWindow.Unload ()
+		ProficienciesWindow.Close ()
 	SkillsState = 0
 	return
 
@@ -1977,7 +1977,7 @@ def MageSpellsDonePress():
 	global CharGenWindow, MageSpellsWindow, SkillsState
 
 	if MageSpellsWindow:
-		MageSpellsWindow.Unload ()
+		MageSpellsWindow.Close ()
 	SkillsState = 3
 	SkillsPress()
 	return
@@ -1986,7 +1986,7 @@ def MageSpellsCancelPress():
 	global CharGenWindow, MageSpellsWindow, SkillsState
 
 	if MageSpellsWindow:
-		MageSpellsWindow.Unload ()
+		MageSpellsWindow.Close ()
 	SkillsState = 0
 	return
 
@@ -2101,7 +2101,7 @@ def MageMemorizeDonePress():
 	global CharGenWindow, MageMemorizeWindow, SkillsState, MyChar
 
 	if MageMemorizeWindow:
-		MageMemorizeWindow.Unload ()
+		MageMemorizeWindow.Close ()
 	LearnSpells (MyChar)
 	SkillsState = 4
 	SkillsPress()
@@ -2111,7 +2111,7 @@ def MageMemorizeCancelPress():
 	global CharGenWindow, MageMemorizeWindow, SkillsState
 
 	if MageMemorizeWindow:
-		MageMemorizeWindow.Unload ()
+		MageMemorizeWindow.Close ()
 	SkillsState = 0
 	return
 
@@ -2209,7 +2209,7 @@ def PriestMemorizeDonePress():
 	global CharGenWindow, PriestMemorizeWindow, SkillsState, MyChar
 
 	if PriestMemorizeWindow:
-		PriestMemorizeWindow.Unload ()
+		PriestMemorizeWindow.Close ()
 	LearnSpells (MyChar)
 	SkillsState = 5
 	SkillsPress()
@@ -2219,7 +2219,7 @@ def PriestMemorizeCancelPress():
 	global CharGenWindow, PriestMemorizeWindow, SkillsState
 
 	if PriestMemorizeWindow:
-		PriestMemorizeWindow.Unload ()
+		PriestMemorizeWindow.Close ()
 	SkillsState = 0
 	return
 
@@ -2366,7 +2366,7 @@ def AppearanceColorSelected():
 	global AppearanceMajorButton, AppearanceMinorButton
 
 	if AppearanceColorWindow:
-		AppearanceColorWindow.Unload ()
+		AppearanceColorWindow.Close ()
 	ColorType = GemRB.GetVar ("ColorType")
 	if ColorType == 0:
 		HairColor = GemRB.GetVar ("SelectedColor")
@@ -2392,7 +2392,7 @@ def AppearanceDonePress():
 	global CharGenWindow, AppearanceWindow
 
 	if AppearanceWindow:
-		AppearanceWindow.Unload ()
+		AppearanceWindow.Close ()
 	CharSoundSelect()
 	return
 
@@ -2400,7 +2400,7 @@ def AppearanceCancelPress():
 	global CharGenWindow, AppearanceWindow
 
 	if AppearanceWindow:
-		AppearanceWindow.Unload ()
+		AppearanceWindow.Close ()
 	return
 
 def CharSoundSelect():
@@ -2463,7 +2463,7 @@ def CharSoundDonePress():
 	global CharGenWindow, CharSoundWindow, AppearanceButton, BiographyButton, NameButton, CharGenState
 
 	if CharSoundWindow:
-		CharSoundWindow.Unload ()
+		CharSoundWindow.Close ()
 	AppearanceButton.SetState (IE_GUI_BUTTON_DISABLED)
 	BiographyButton.SetState (IE_GUI_BUTTON_ENABLED)
 	NameButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -2476,7 +2476,7 @@ def CharSoundCancelPress():
 	global CharGenWindow, CharSoundWindow
 
 	if CharSoundWindow:
-		CharSoundWindow.Unload ()
+		CharSoundWindow.Close ()
 	return
 
 # Biography Selection
@@ -2535,7 +2535,7 @@ def BiographyDonePress():
 		GemRB.SetPlayerString (MyChar, BioStrRefSlot, ref)
 
 	if BiographyWindow:
-		BiographyWindow.Unload ()
+		BiographyWindow.Close ()
 	return
 
 # Name Selection
@@ -2580,7 +2580,7 @@ def NameDonePress():
 
 	GemRB.SetToken ("CHARNAME", NameField.QueryText () )
 	if NameWindow:
-		NameWindow.Unload ()
+		NameWindow.Close ()
 	CharGenState = 8
 	AcceptButton.SetState (IE_GUI_BUTTON_ENABLED)
 	AcceptButton.MakeDefault()
@@ -2592,7 +2592,7 @@ def NameCancelPress():
 
 	GemRB.SetToken ("CHARNAME", "")
 	if NameWindow:
-		NameWindow.Unload ()
+		NameWindow.Close ()
 	return
 
 # Import Character
@@ -2658,12 +2658,12 @@ def ImportDonePress():
 	NameButton.SetState (IE_GUI_BUTTON_DISABLED)
 	NameButton.MakeDefault()
 	if ImportWindow:
-		ImportWindow.Unload ()
+		ImportWindow.Close ()
 	return
 
 def ImportCancelPress():
 	global CharGenWindow, ImportWindow
 
 	if ImportWindow:
-		ImportWindow.Unload ()
+		ImportWindow.Close ()
 	return

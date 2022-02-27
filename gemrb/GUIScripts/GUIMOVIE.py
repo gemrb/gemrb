@@ -67,7 +67,7 @@ def CreditsPress():
 	# arbitrary choice between custom jukebox and actual credits
 	if GameCheck.IsBG1() or GameCheck.IsBG2():
 		if MovieWindow:
-			MovieWindow.Unload ()
+			MovieWindow.Close ()
 		GemRB.SetNextScript ("GUISONGS")
 	else:
 		GemRB.PlayMovie ("CREDITS",1)

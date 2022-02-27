@@ -682,7 +682,7 @@ def OpenInformationWindow ():
 		if BiographyWindow: OpenBiographyWindow ()
 
 		if InformationWindow:
-			InformationWindow.Unload ()
+			InformationWindow.Close ()
 		InformationWindow = None
 
 		return
@@ -788,7 +788,7 @@ def OpenBiographyWindow ():
 
 	if BiographyWindow != None:
 		if BiographyWindow:
-			BiographyWindow.Unload ()
+			BiographyWindow.Close ()
 		BiographyWindow = None
 
 		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)

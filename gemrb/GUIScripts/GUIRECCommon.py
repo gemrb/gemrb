@@ -632,13 +632,13 @@ def ExportDonePress():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.SaveCharacter (pc, NameField.QueryText ())
 	if ExportWindow:
-		ExportWindow.Unload()
+		ExportWindow.Close ()
 	return
 
 def ExportCancelPress():
 	global ExportWindow
 	if ExportWindow:
-		ExportWindow.Unload()
+		ExportWindow.Close ()
 		ExportWindow = None
 	return
 

@@ -345,7 +345,7 @@ def OpenSpellBookSpellRemoveWindow ():
 
 	if SpellBookSpellUnmemorizeWindow != None:
 		if SpellBookSpellUnmemorizeWindow:
-			SpellBookSpellUnmemorizeWindow.Unload ()
+			SpellBookSpellUnmemorizeWindow.Close ()
 		SpellBookSpellUnmemorizeWindow = None
 		return
 

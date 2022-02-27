@@ -41,7 +41,7 @@ def OpenSaveWindow ():
 		if SaveDetailWindow: OpenSaveDetailWindow ()
 
 		if SaveWindow:
-			SaveWindow.Unload ()
+			SaveWindow.Close ()
 		SaveWindow = None
 		# FIXME: LOAD GUIOPT?
 
@@ -147,7 +147,7 @@ def DeleteGameConfirm():
 	ScrollBar.SetVarAssoc("TopIndex", len(Games))
 	ScrollBarPress()
 	if ConfirmWindow:
-		ConfirmWindow.Unload()
+		ConfirmWindow.Close ()
 	SaveWindow.Focus()
 	return
 
@@ -155,7 +155,7 @@ def DeleteGameCancel():
 	global ConfirmWindow
 
 	if ConfirmWindow:
-		ConfirmWindow.Unload()
+		ConfirmWindow.Close ()
 		ConfirmWindow = None
 	SaveWindow.Focus()
 	return
@@ -191,7 +191,7 @@ def OpenSaveDetailWindow ():
 
 	if SaveDetailWindow != None:
 		if SaveDetailWindow:
-			SaveDetailWindow.Unload ()
+			SaveDetailWindow.Close ()
 		SaveDetailWindow = None
 
 		return

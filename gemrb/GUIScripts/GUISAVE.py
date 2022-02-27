@@ -161,7 +161,7 @@ def CloseConfirmWindow():
 	global ConfirmWindow
 
 	if ConfirmWindow:
-		ConfirmWindow.Unload ()
+		ConfirmWindow.Close ()
 		ConfirmWindow = None
 
 	SaveWindow.Focus ()
@@ -310,7 +310,7 @@ def CloseSaveWindow ():
 	global SaveWindow
 
 	if SaveWindow:
-		SaveWindow.Unload ()
+		SaveWindow.Close ()
 		SaveWindow = None
 
 	if GemRB.GetVar ("QuitAfterSave"):

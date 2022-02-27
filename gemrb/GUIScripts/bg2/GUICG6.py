@@ -54,7 +54,7 @@ def OnLoad():
 	# can't be moved earlier as this var will be set in the setup call above
 	if not GemRB.GetVar ("SkillPointsLeft"): #skipping
 		if SkillWindow:
-			SkillWindow.Unload ()
+			SkillWindow.Close ()
 		GemRB.SetNextScript("GUICG9")
 		return
 	
@@ -75,13 +75,13 @@ def OnLoad():
 
 def BackPress():
 	if SkillWindow:
-		SkillWindow.Unload()
+		SkillWindow.Close ()
 	GemRB.SetNextScript("CharGen6")
 	return
 
 def NextPress():
 	if SkillWindow:
-		SkillWindow.Unload()
+		SkillWindow.Close ()
 	# save all skills
 
 	LUSkillsSelection.SkillsSave (MyChar)

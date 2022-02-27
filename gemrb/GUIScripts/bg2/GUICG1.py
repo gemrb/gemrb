@@ -75,14 +75,14 @@ def ClickedFemale():
 
 def BackPress():
 	if GenderWindow:
-		GenderWindow.Unload()
+		GenderWindow.Close ()
 	GemRB.SetNextScript("CharGen")
 	GemRB.SetVar("Gender",0)  #scrapping the gender value
 	return
 
 def NextPress():
 	if GenderWindow:
-		GenderWindow.Unload()
+		GenderWindow.Close ()
 
 	Gender = GemRB.GetVar ("Gender")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)

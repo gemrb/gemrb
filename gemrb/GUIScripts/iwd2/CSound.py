@@ -70,7 +70,7 @@ def OnLoad():
 
 def BackPress():
 	if SoundWindow:
-		SoundWindow.Unload()
+		SoundWindow.Close ()
 	GemRB.SetNextScript("Appearance")
 	GemRB.SetVar("Sound",0)  #scrapping the sound value
 	return
@@ -78,7 +78,7 @@ def BackPress():
 def NextPress():
 	GemRB.SetToken("VoiceSet", TextAreaControl.QueryText())
 	if SoundWindow:
-		SoundWindow.Unload()
+		SoundWindow.Close ()
 	GemRB.SetNextScript("CharGen8") #name
 	return
 

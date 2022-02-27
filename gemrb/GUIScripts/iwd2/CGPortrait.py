@@ -106,7 +106,7 @@ def LeftPress ():
 
 def BackPress ():
 	if AppearanceWindow:
-		AppearanceWindow.Unload ()
+		AppearanceWindow.Close ()
 	GemRB.SetNextScript ("CharGen")
 	GemRB.SetVar ("Gender",0) #scrapping the gender value
 	return
@@ -119,15 +119,15 @@ def CustomDone ():
 	Portrait = PortraitList2.QueryText ()
 	GemRB.SetToken ("SmallPortrait", Portrait)
 	if Window:
-		Window.Unload ()
+		Window.Close ()
 	if AppearanceWindow:
-		AppearanceWindow.Unload ()
+		AppearanceWindow.Close ()
 	GemRB.SetNextScript ("CharGen2")
 	return
 
 def CustomAbort ():
 	if CustomWindow:
-		CustomWindow.Unload ()
+		CustomWindow.Close ()
 	return
 
 def LargeCustomPortrait ():
@@ -218,7 +218,7 @@ def CustomPress ():
 
 def NextPress ():
 	if AppearanceWindow:
-		AppearanceWindow.Unload ()
+		AppearanceWindow.Close ()
 	PortraitTable = GemRB.LoadTable ("pictures")
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")

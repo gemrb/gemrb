@@ -91,13 +91,13 @@ def RevertPress():
 def BioCancelPress():
 	GemRB.SetToken("BIO",BioData)
 	if BioWindow:
-		BioWindow.Unload ()
+		BioWindow.Close ()
 	return
 
 def BioDonePress():
 	GemRB.SetToken ("BIO", EditControl.QueryText())
 	if BioWindow:
-		BioWindow.Unload ()
+		BioWindow.Close ()
 	return
 
 def BioPress():

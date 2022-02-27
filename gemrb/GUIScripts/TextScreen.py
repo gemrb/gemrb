@@ -177,7 +177,7 @@ def EndTextScreen ():
 	global TextScreen, TableName
 
 	if TextScreen:
-		TextScreen.Unload ()
+		TextScreen.Close ()
 		GemRB.HardEndPL ()
 		GemRB.PlaySound(None, CHAN_GUI, 0, 0, 4)
 

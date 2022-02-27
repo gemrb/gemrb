@@ -106,7 +106,7 @@ def DonePress():
 	global HairColor, SkinColor, MajorColor, MinorColor
 
 	if ColorPicker:
-		ColorPicker.Unload()
+		ColorPicker.Close ()
 	ColorWindow.Focus()
 	PickedColor=ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:
@@ -193,13 +193,13 @@ def MinorPress():
 
 def BackPress():
 	if ColorWindow:
-		ColorWindow.Unload()
+		ColorWindow.Close ()
 	GemRB.SetNextScript("CharGen7")
 	return
 
 def NextPress():
 	if ColorWindow:
-		ColorWindow.Unload()
+		ColorWindow.Close ()
 	GemRB.SetVar("HairColor",HairColor)
 	GemRB.SetVar("SkinColor",SkinColor)
 	GemRB.SetVar("MinorColor",MinorColor)

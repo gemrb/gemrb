@@ -257,7 +257,7 @@ def DCMainDonePress ():
 
 	# close our window
 	if DCMainWindow:
-		DCMainWindow.Unload ()
+		DCMainWindow.Close ()
 	return
 
 def DCMainCancelPress ():
@@ -270,7 +270,7 @@ def DCMainCancelPress ():
 
 	# close our window
 	if DCMainWindow:
-		DCMainWindow.Unload ()
+		DCMainWindow.Close ()
 
 	return
 
@@ -399,7 +399,7 @@ def DCClassDonePress ():
 
 	# unload our class selection window
 	if DCClassWindow:
-		DCClassWindow.Unload ()
+		DCClassWindow.Close ()
 	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	# enable the skills button and disable the class selection button
@@ -452,7 +452,7 @@ def DCClassBackPress ():
 	"""Unloads the class selection window without making any changes."""
 	# close the class window
 	if DCClassWindow:
-		DCClassWindow.Unload ()
+		DCClassWindow.Close ()
 	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -557,7 +557,7 @@ def DCProfsDonePress ():
 
 	# close out the profs window (don't assign yet!)
 	if DCProfsWindow:
-		DCProfsWindow.Unload ()
+		DCProfsWindow.Close ()
 	return
 
 def DCProfsCancelPress ():
@@ -565,7 +565,7 @@ def DCProfsCancelPress ():
 
 	# close out the profs window and go back a step
 	if DCProfsWindow:
-		DCProfsWindow.Unload ()
+		DCProfsWindow.Close ()
 	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	DCMainBackPress ()
@@ -629,7 +629,7 @@ def DCSkillsBackPress ():
 	"""Reverts all changes to this points."""
 
 	if DCSkillsWindow:
-		DCSkillsWindow.Unload ()
+		DCSkillsWindow.Close ()
 	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
 	LUSkillsSelection.SkillsNullify ()
 	DCMainBackPress ()
@@ -639,5 +639,5 @@ def DCSkillsDonePress ():
 	"""Closes the skills selection window."""
 
 	if DCSkillsWindow:
-		DCSkillsWindow.Unload ()
+		DCSkillsWindow.Close ()
 	return

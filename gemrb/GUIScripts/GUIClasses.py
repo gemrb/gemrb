@@ -234,9 +234,6 @@ class GWindow(GView, Scrollable):
 		view.SetFrame(frame)
 		return newparent.AddSubview(view, None, newID)
 
-	def Unload(self): # backwards compatibility
-		self.Close()
-
 	def Close(self):
 		RemoveView(self, False)
 

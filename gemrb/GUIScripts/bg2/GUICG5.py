@@ -54,7 +54,7 @@ def NextPress():
 	#seems like a good idea to store it here for the time being
 	GemRB.SetToken("CHARNAME",Name) 
 	if NameWindow:
-		NameWindow.Unload()
+		NameWindow.Close ()
 	GemRB.SetNextScript("CharGen9")
 	return
 

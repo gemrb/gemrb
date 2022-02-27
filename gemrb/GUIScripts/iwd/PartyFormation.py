@@ -127,9 +127,9 @@ def CreateCharCreatePress ():
 	global PartyFormationWindow, CreateCharWindow
 
 	if CreateCharWindow:
-		CreateCharWindow.Unload ()
+		CreateCharWindow.Close ()
 	if PartyFormationWindow:
-		PartyFormationWindow.Unload ()
+		PartyFormationWindow.Close ()
 	GemRB.SetNextScript ("CharGen")
 	return
 
@@ -140,7 +140,7 @@ def CreateCharCancelPress ():
 	global PartyFormationWindow, CreateCharWindow
 
 	if CreateCharWindow:
-		CreateCharWindow.Unload ()
+		CreateCharWindow.Close ()
 	PartyFormationWindow.Focus()
 	return
 
@@ -178,7 +178,7 @@ def ExitCancelPress ():
 	global PartyFormationWindow, ExitWindow
 
 	if ExitWindow:
-		ExitWindow.Unload ()
+		ExitWindow.Close ()
 	PartyFormationWindow.Focus()
 	return
 
@@ -186,8 +186,8 @@ def ExitExitPress ():
 	global PartyFormationWindow, ExitWindow
 
 	if ExitWindow:
-		ExitWindow.Unload ()
+		ExitWindow.Close ()
 	if PartyFormationWindow:
-		PartyFormationWindow.Unload ()
+		PartyFormationWindow.Close ()
 	GemRB.SetNextScript ("Start")
 	return

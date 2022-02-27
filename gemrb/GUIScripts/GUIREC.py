@@ -960,7 +960,7 @@ def OpenKitInfoWindow ():
 
 def KitDonePress():
 	if KitInfoWindow:
-		KitInfoWindow.Unload()
+		KitInfoWindow.Close ()
 	return
 
 def OpenColorWindow ():

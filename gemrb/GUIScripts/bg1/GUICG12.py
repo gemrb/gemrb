@@ -125,7 +125,7 @@ def CustomDone():
 	Portrait = PortraitList2.QueryText ()
 	GemRB.SetToken ("SmallPortrait", Portrait)
 	if Window:
-		Window.Unload ()
+		Window.Close ()
 	CharGenCommon.next()
 	return
 
@@ -133,7 +133,7 @@ def CustomAbort():
 	global CustomWindow
 
 	if CustomWindow:
-		CustomWindow.Unload ()
+		CustomWindow.Close ()
 	AppearanceWindow.ShowModal (MODAL_SHADOW_NONE) # narrower than CustomWindow, so borders will remain
 	return
 

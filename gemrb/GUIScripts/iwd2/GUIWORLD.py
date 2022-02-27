@@ -103,7 +103,7 @@ def OpenReformPartyWindow ():
 
 	if ReformPartyWindow:
 		if ReformPartyWindow:
-			ReformPartyWindow.Unload ()
+			ReformPartyWindow.Close ()
 		ReformPartyWindow = None
 
 		CommonWindow.SetGameGUIHidden(hideflag)

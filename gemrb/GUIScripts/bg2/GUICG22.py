@@ -214,13 +214,13 @@ def BackPress():
 	GemRB.SetVar("Class Kit", 0) # reverting the value so we are idempotent
 	GemRB.SetVar("MAGESCHOOL", 0)
 	if KitWindow:
-		KitWindow.Unload()
+		KitWindow.Close ()
 	GemRB.SetNextScript("GUICG2")
 	return
 
 def NextPress():
 	if KitWindow:
-		KitWindow.Unload()
+		KitWindow.Close ()
 
 	#make gnomes always kitted
 	KitIndex = GemRB.GetVar ("Class Kit")

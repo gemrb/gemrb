@@ -100,7 +100,7 @@ def ExitPress():
 def ExitCancelPress():
 	global PartyFormationWindow, ExitWindow
 	if ExitWindow:
-		ExitWindow.Unload()
+		ExitWindow.Close ()
 	PartyFormationWindow.Focus()
 	return
 
@@ -111,7 +111,7 @@ def GeneratePress():
 	if ResRef:
 		print("Already existing slot, we should drop it")
 	if PartyFormationWindow:
-		PartyFormationWindow.Unload()
+		PartyFormationWindow.Close ()
 	GemRB.SetNextScript("CharGen")
 	return
 

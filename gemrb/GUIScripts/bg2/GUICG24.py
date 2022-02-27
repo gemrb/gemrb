@@ -48,18 +48,18 @@ def OnLoad():
 
 def FilePress():
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	GemRB.SetNextScript("ImportFile")
 	return
 	
 def GamePress():
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	GemRB.SetNextScript("ImportGame")
 	return
 
 def CancelPress():
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	GemRB.SetNextScript("CharGen")
 	return

@@ -275,7 +275,7 @@ def BackPress():
 		StatID=TmpTable.GetValue (i, 0, GTV_STAT)
 		GemRB.SetPlayerStat (MyChar, StatID, 0)
 	if SkillWindow:
-		SkillWindow.Unload()
+		SkillWindow.Close ()
 	GemRB.SetNextScript("CharGen6")
 	return
 
@@ -303,7 +303,7 @@ def NextPress():
 		GemRB.SetPlayerStat (MyChar, StatID, newValue)
 
 	if SkillWindow:
-		SkillWindow.Unload()
+		SkillWindow.Close ()
 	if CharGen:
 		GemRB.SetNextScript("Feats") #feats
 	else:

@@ -174,7 +174,7 @@ def BackPress2():
 
 def BackPress():
 	if ClassWindow:
-		ClassWindow.Unload()
+		ClassWindow.Close ()
 	GemRB.SetNextScript("CharGen3")
 	GemRB.SetVar("Class",0)  #scrapping the class value
 	MyChar = GemRB.GetVar("Slot")
@@ -190,6 +190,6 @@ def NextPress():
 		ClassColumn = GemRB.GetVar("Class")
 	GemRB.SetVar("BaseClass", ClassColumn)
 	if ClassWindow:
-		ClassWindow.Unload()
+		ClassWindow.Close ()
 	GemRB.SetNextScript("CharGen4") #alignment
 	return

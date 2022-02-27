@@ -389,7 +389,7 @@ def LeftPress():
 
 def BackPress():
 	if FeatWindow:
-		FeatWindow.Unload()
+		FeatWindow.Close ()
 
 	for i in range(FeatTable.GetRowCount()):
 		GemRB.SetVar("Feat "+str(i),0)
@@ -398,7 +398,7 @@ def BackPress():
 
 def NextPress(save=1):
 	if FeatWindow:
-		FeatWindow.Unload()
+		FeatWindow.Close ()
 
 	if save:
 		# resave the feats

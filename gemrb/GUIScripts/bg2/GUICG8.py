@@ -79,14 +79,14 @@ def RacePress():
 
 def BackPress():
 	if RaceWindow:
-		RaceWindow.Unload()
+		RaceWindow.Close ()
 	GemRB.SetNextScript("CharGen2")
 	GemRB.SetVar("Race",0)  #scrapping the race value
 	return
 
 def NextPress():
 	if RaceWindow:
-		RaceWindow.Unload()
+		RaceWindow.Close ()
 
 	Race = GemRB.GetVar ("Race")
 	GemRB.SetPlayerStat (MyChar, IE_RACE, CommonTables.Races.GetValue(Race,3) )

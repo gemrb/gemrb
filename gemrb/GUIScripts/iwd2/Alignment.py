@@ -72,13 +72,13 @@ def AlignmentPress():
 
 def BackPress():
 	if AlignmentWindow:
-		AlignmentWindow.Unload()
+		AlignmentWindow.Close ()
 	GemRB.SetNextScript("CharGen4")
 	GemRB.SetVar("Alignment",-1)  #scrapping the alignment value
 	return
 
 def NextPress():
 	if AlignmentWindow:
-		AlignmentWindow.Unload()
+		AlignmentWindow.Close ()
 	GemRB.SetNextScript("CharGen5") #appearance
 	return

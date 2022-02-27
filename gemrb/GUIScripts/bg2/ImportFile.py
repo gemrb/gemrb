@@ -62,7 +62,7 @@ def DonePress():
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1, 11) # 11 = force bg2
 	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (Slot))
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	# the medium portrait isn't available, so we copy the original hack
 	SmallPortrait = GemRB.GetPlayerPortrait (Slot, 1)["ResRef"]
 	MediumPortrait = SmallPortrait[0:-1] + "M"
@@ -74,6 +74,6 @@ def DonePress():
 	
 def CancelPress():
 	if ImportWindow:
-		ImportWindow.Unload()
+		ImportWindow.Close ()
 	GemRB.SetNextScript("CharGen")
 	return 

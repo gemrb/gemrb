@@ -57,14 +57,14 @@ def OnLoad():
 
 def BackPress():
 	if SkillWindow:
-		SkillWindow.Unload()
+		SkillWindow.Close ()
 	GemRB.SetNextScript("CharGen6")
 	#scrap skills
 	return
 
 def NextPress():
 	if SkillWindow:
-		SkillWindow.Unload()
+		SkillWindow.Close ()
 
 	LUProfsSelection.ProfsSave (MyChar, LUProfsSelection.LUPROFS_TYPE_CHARGEN)
 

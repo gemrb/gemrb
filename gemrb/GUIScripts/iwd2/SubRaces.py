@@ -96,7 +96,7 @@ def SubRacePress():
 
 def BackPress():
 	if RaceWindow:
-		RaceWindow.Unload()
+		RaceWindow.Close ()
 	GemRB.SetNextScript("Race")
 	GemRB.SetVar("Race",0)  #scrapping the subrace value
 	GemRB.SetVar("BaseRace",0)  #scrapping the race value
@@ -104,6 +104,6 @@ def BackPress():
 
 def NextPress():
 	if RaceWindow:
-		RaceWindow.Unload()
+		RaceWindow.Close ()
 	GemRB.SetNextScript("CharGen3") #class
 	return

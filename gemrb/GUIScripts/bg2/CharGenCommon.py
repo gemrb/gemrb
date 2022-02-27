@@ -331,7 +331,7 @@ def BackPress():
 
 	global CharGenWindow
 	if CharGenWindow:
-		CharGenWindow.Unload ()
+		CharGenWindow.Close ()
 
 	step = GemRB.GetVar ("Step")
 	if step == 2:

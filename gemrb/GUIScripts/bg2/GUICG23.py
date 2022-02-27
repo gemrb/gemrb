@@ -70,12 +70,12 @@ def OkPress ():
 	GemRB.SetToken ("BIO", BioData)
 	
 	if BioWindow:
-		BioWindow.Unload ()
+		BioWindow.Close ()
 	GemRB.SetNextScript ("CharGen9")
 	return
 	
 def CancelPress ():
 	if BioWindow:
-		BioWindow.Unload ()
+		BioWindow.Close ()
 	GemRB.SetNextScript ("CharGen9")
 	return

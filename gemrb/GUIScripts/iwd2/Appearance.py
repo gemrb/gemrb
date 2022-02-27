@@ -152,7 +152,7 @@ def RandomDonePress():
 def DonePress():
 	global Color1, Color2, Color3, Color4, ColorWindow, ColorIndex, PickedColor, ColorPicker
 	if ColorPicker:
-		ColorPicker.Unload()
+		ColorPicker.Close ()
 	ColorWindow.Focus()
 	
 	if ColorIndex==0:
@@ -183,7 +183,7 @@ def DonePress():
 def CancelPress():
 	global ColorPicker, ColorWindow
 	if ColorPicker:
-		ColorPicker.Unload ()
+		ColorPicker.Close ()
 	ColorWindow.Focus()
 
 def GetColor():
@@ -266,13 +266,13 @@ def MinorPress():
 
 def BackPress():
 	if ColorWindow:
-		ColorWindow.Unload()
+		ColorWindow.Close ()
 	GemRB.SetNextScript("CharGen7")
 	return
 
 def NextPress():
 	if ColorWindow:
-		ColorWindow.Unload()
+		ColorWindow.Close ()
 	GemRB.SetVar("Color1",Color1)
 	GemRB.SetVar("Color2",Color2)
 	GemRB.SetVar("Color3",Color3)

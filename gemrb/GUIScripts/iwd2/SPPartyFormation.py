@@ -104,23 +104,23 @@ def ExitPress ():
 def ExitDonePress ():
 	global PartyFormationWindow, ExitWindow
 	if ExitWindow:
-		ExitWindow.Unload ()
+		ExitWindow.Close ()
 	if PartyFormationWindow:
-		PartyFormationWindow.Unload ()
+		PartyFormationWindow.Close ()
 	GemRB.SetNextScript ("Start")
 	return
 
 def ExitCancelPress ():
 	global PartyFormationWindow, ExitWindow
 	if ExitWindow:
-		ExitWindow.Unload ()
+		ExitWindow.Close ()
 	PartyFormationWindow.Focus()
 	return
 
 def GeneratePress ():
 	global PartyFormationWindow
 	if PartyFormationWindow:
-		PartyFormationWindow.Unload ()
+		PartyFormationWindow.Close ()
 	GemRB.SetNextScript ("CharGen")
 	return
 
@@ -155,7 +155,7 @@ def ReviewDonePress ():
 	global PartyFormationWindow, ReviewWindow
 
 	if ReviewWindow:
-		ReviewWindow.Unload ()
+		ReviewWindow.Close ()
 	PartyFormationWindow.Focus()
 	return
 

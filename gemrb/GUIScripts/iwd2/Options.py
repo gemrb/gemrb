@@ -30,9 +30,9 @@ def OnLoad():
 	CharactersBarWindow = GemRB.LoadWindow(1)
 
 	if MessageBarWindow:
-		MessageBarWindow.Unload()
+		MessageBarWindow.Close ()
 	if CharactersBarWindow:
-		CharactersBarWindow.Unload()
+		CharactersBarWindow.Close ()
 
 	OptionsWindow = GemRB.LoadWindow(13)
 

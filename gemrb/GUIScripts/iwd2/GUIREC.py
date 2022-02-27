@@ -1148,11 +1148,11 @@ def CloseLUWindow ():
 	global LUWindow, LUKitWindow
 
 	if LUKitWindow:
-		LUKitWindow.Unload ()
+		LUKitWindow.Close ()
 		LUKitWindow = None
 
 	if LUWindow:
-		LUWindow.Unload ()
+		LUWindow.Close ()
 		LUWindow = None
 
 def OpenLevelUpWindow ():

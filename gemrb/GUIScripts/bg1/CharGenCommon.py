@@ -162,7 +162,7 @@ class CharGen:
 
 		# if required back to main screen, otherwise reloop
 		if self.step == 0 or not self.showReset:	
-			self.window.Unload()
+			self.window.Close ()
 			self.window = None
 			GemRB.SetNextScript ("Start")
 		else:
@@ -202,7 +202,7 @@ class CharGen:
 
 	def close(self):
 		if(self.window):
-			self.window.Unload()
+			self.window.Close ()
 	
 	def jumpTo(self,to):
 		if type(to) == str:
