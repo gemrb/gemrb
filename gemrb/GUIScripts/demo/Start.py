@@ -20,8 +20,8 @@ def OnLoad():
 	QuitGameButton = StartWindow.GetControl(1)
 	NewGameButton.SetText("New demo")
 	QuitGameButton.SetText("Quit")
-	NewGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewGamePress)
-	QuitGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	NewGameButton.OnPress (NewGamePress)
+	QuitGameButton.OnPress (lambda: GemRB.Quit())
 	QuitGameButton.MakeEscape ()
 
 	VersionLabel = StartWindow.GetControl(0x10000002)

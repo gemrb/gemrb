@@ -27,22 +27,22 @@ def OnLoad():
 	TMessageTA.SetText ("[cap]D[/cap]emo " + "DEMO "*40 + "\n" + results)
 
 	PauseButton = MessageWindow.GetControl (2)
-	PauseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))
+	PauseButton.OnPress (lambda: GemRB.GamePause (2, 0))
 	PauseButton.SetAnimation ("loading")
 	PauseButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NORMAL, OP_SET)
 
 	MapButton = MessageWindow.GetControl (3)
 	MapButton.SetText ("M")
-	MapButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
+	MapButton.OnPress (GUIMA.OpenMapWindow)
 	MapButton.OnRightPress (lambda: GemRB.MoveToArea ("ar0110"))
 
 	CenterButton = MessageWindow.GetControl (4)
 	CenterButton.SetText ("C")
-	CenterButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR))
+	CenterButton.OnPress (lambda: GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR))
 
 	InventoryButton = MessageWindow.GetControl (5)
 	InventoryButton.SetText ("I")
-	InventoryButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
+	InventoryButton.OnPress (GUIINV.OpenInventoryWindow)
 
 def UpdateControlStatus():
 	pass

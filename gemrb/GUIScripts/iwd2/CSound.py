@@ -62,9 +62,9 @@ def OnLoad():
 	PlayButton = SoundWindow.GetControl(47)
 	PlayButton.SetText(17318)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PlayPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
+	PlayButton.OnPress (PlayPress)
 	SoundWindow.Focus()
 	return
 

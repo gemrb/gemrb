@@ -135,7 +135,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	#store these instead of doing 50 calls...
 	
 	EscButton = Window.CreateButton (99, 0, 0, 0, 0);
-	EscButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
+	EscButton.OnPress (CloseTopWindow)
 	EscButton.MakeEscape()
 
 	if iwd2: # IWD2 has one spellbook to rule them all
@@ -145,19 +145,19 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 		# AI
 		Button = InitOptionButton(Window, 'Toggle_AI')
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
+		Button.OnPress (AIPress)
 		AIPress (0) #this initialises the state and tooltip
 
 		# Select All
 		Button = InitOptionButton(Window, 'SelectAll', False)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
+		Button.OnPress (GUICommon.SelectAllOnPress)
 	elif pst: #pst has these three controls here instead of portrait pane
 		# (Un)Lock view on character
 		Button = InitOptionButton(Window, 'Follow', False)  # or 41648 Unlock ...
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnLockViewPress)
+		Button.OnPress (OnLockViewPress)
 		# AI
 		Button = InitOptionButton(Window, 'Toggle_AI')
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
+		Button.OnPress (AIPress)
 		AIPress(0) #this initialises the state and tooltip
 
 		# Message popup FIXME disable on non game screen...
@@ -177,7 +177,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	# Party managment / character arbitration. Distinct form reform party window.
 	if not pst:
 		Button = Window.GetControl (OptionControl['Party'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: OpenPartyWindow
+		Button.OnPress (None) #TODO: OpenPartyWindow
 		if bg1 or bg2:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
@@ -264,14 +264,14 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	Button = Window.GetControl (rb)
 	if Button:
 		Button.SetTooltip (OptionTip['Rest'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
+		Button.OnPress (RestPress)
 	elif rb == 11 and bg2:
 		#The 15 gap came from the guiw8.chu that is the network button
 		pos = ButtonOptionFrame["y"] + ButtonOptionFrame["h"] + 15
 		Button = Window.CreateButton (rb, ButtonOptionFrame["x"], pos, ButtonOptionFrame["w"], ButtonOptionFrame["h"])
 		Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 		Button.SetTooltip (OptionTip['Rest'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
+		Button.OnPress (RestPress)
 	return
 
 def OnLockViewPress ():
@@ -366,7 +366,7 @@ def SetupFormation ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%i,0,0,-1)
 		Button.SetVarAssoc ("Value", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectFormationPreset)
+		Button.OnPress (SelectFormationPreset)
 		Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 	return
 
@@ -400,7 +400,7 @@ def GroupControls ():
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%idx,0,0,-1)
 		Button.SetVarAssoc ("Formation", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
+		Button.OnPress (GUICommon.SelectFormation)
 		Button.OnRightPress (SetupFormation)
 		Button.SetTooltip (4935)
 		# 0x90 = F1 key
@@ -476,7 +476,7 @@ def SetupItemAbilities(pc, slot, only):
 					Button.SetSprites ("GUIBTBUT", 0, 0,1,3,5)
 					Button.SetItemIcon (ammoslot['ItemResRef'])
 					Button.SetText (str(ammoslot["Usages0"]))
-					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectQuiverSlot)
+					Button.OnPress (SelectQuiverSlot)
 					Button.OnRightPress (SelectQuiverSlot)
 					Button.SetVarAssoc ("Slot", ammoslots[i])
 					if Tips[0] != -1:
@@ -534,7 +534,7 @@ def SetupItemAbilities(pc, slot, only):
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
 			Button.SetText ("")
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
+			Button.OnPress (SelectItemAbility)
 			Button.OnRightPress (SelectItemAbility)
 			Button.SetVarAssoc ("Ability", i)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -1602,9 +1602,9 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			if GameCheck.IsIWD():
 				# Rest (iwd)
 				Button.SetTooltip (11942)
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
+				Button.OnPress (RestPress)
 			else:
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MinimizePortraits)
+				Button.OnPress (MinimizePortraits)
 		else:
 			if GameCheck.HasHOW():
 				# Rest (how)
@@ -1612,7 +1612,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 				Button = Window.CreateButton (8, 6, pos, 55, 37)
 				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 				Button.SetTooltip (11942)
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
+				Button.OnPress (RestPress)
 
 				pos = pos - 37
 				Window.CreateButton (6, 6, pos, 27, 36)
@@ -1631,14 +1631,14 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		else:
 			Button = Window.GetControl (7)
 		Button.SetTooltip (10485)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
+		Button.OnPress (GUICommon.SelectAllOnPress)
 	else:
 		# Rest
 		if not GameCheck.IsIWD2():
 			Button = Window.GetControl (6)
 			if Button:
 				Button.SetTooltip (11942)
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
+				Button.OnPress (RestPress)
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.items():
@@ -1664,7 +1664,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		else:
 			Button.OnRightPress (PortraitButtonOnPress)
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
+		Button.OnPress (PortraitButtonOnPress)
 		Button.OnShiftPress (PortraitButtonOnShiftPress)
 		Button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		Button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
@@ -1687,7 +1687,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(3,3,4,4))
 			Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 			ButtonHP = Window.GetControl (6 + i)
-			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
+			ButtonHP.OnPress (PortraitButtonHPOnPress)
 			ButtonHP.SetVarAssoc ("pid", i + 1) # storing so the callback knows which button it's operating on
 		else:
 			Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame(4,3,4,3))
@@ -1746,7 +1746,7 @@ def UpdatePortraitWindow ():
 
 		if GameCheck.IsIWD2():
 			Button.OnRightPress (OpenInventoryWindowClick)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
+			Button.OnPress (PortraitButtonOnPress)
 
 		Button.SetFlags (portraitFlags, OP_SET)
 
@@ -1979,7 +1979,7 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 		else:
 			Button.SetTooltip (Item['ItemNameIdentified'])
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PressHandler)
+		Button.OnPress (PressHandler)
 		Button.OnRightPress (RightPressHandler)
 
 	else:
@@ -1988,7 +1988,7 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 		Button.SetText ('')
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.OnPress (None)
 		Button.OnRightPress (None)
 
 def OpenWaitForDiscWindow ():
@@ -2043,7 +2043,7 @@ def RealRestPress ():
 			Label.SetText (info["ErrorMsg"])
 			Button = Window.GetControl (1)
 			Button.SetText (1403)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close ())
+			Button.OnPress (lambda: Window.Close ())
 			Window.ShowModal (MODAL_SHADOW_GRAY)
 		else:
 			GemRB.DisplayString (info["ErrorMsg"], ColorRed)
@@ -2066,5 +2066,5 @@ def OpenPSTDeathWindow ():
 	Label.SetText (48155)
 	Button = Window.GetControl (1)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ShowCredits)
+	Button.OnPress (ShowCredits)
 	Window.ShowModal (MODAL_SHADOW_GRAY)

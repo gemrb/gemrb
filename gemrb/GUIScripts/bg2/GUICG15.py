@@ -47,7 +47,7 @@ def DisplayRaces():
 		else:
 			Button.SetText(Val)
 			Button.SetDisabled(False)
-			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
+			Button.OnPress (RacePress)
 			Button.SetVarAssoc("HatedRace",RaceTable.GetValue(i+TopIndex,1) )
 	return
 
@@ -92,8 +92,8 @@ def OnLoad():
 	TextAreaControl = RaceWindow.GetControl(2)
 	TextAreaControl.SetText(17256)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	RaceWindow.Focus()
 	DisplayRaces()
 	return

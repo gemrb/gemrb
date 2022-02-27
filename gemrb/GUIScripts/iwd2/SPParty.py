@@ -35,16 +35,16 @@ def OnLoad():
 	TextArea = PartySelectWindow.GetControl(6)
 	
 	ModifyButton = PartySelectWindow.GetControl(12)
-	ModifyButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ModifyPress)
+	ModifyButton.OnPress (ModifyPress)
 	ModifyButton.SetText(10316)
 
 	CancelButton = PartySelectWindow.GetControl(11)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: PartySelectWindow.Close())
+	CancelButton.OnPress (lambda: PartySelectWindow.Close())
 	CancelButton.SetText(13727)
 	CancelButton.MakeEscape()
 
 	DoneButton = PartySelectWindow.GetControl(10)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
+	DoneButton.OnPress (DonePress)
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
 	
@@ -54,7 +54,7 @@ def OnLoad():
 	for i in range(0, min(6, MAX_PARTY_SIZE)):
 		Button = PartySelectWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, PartyButtonPress)
+		Button.OnPress (PartyButtonPress)
 	
 	ScrollBarPress()
 	PartyButtonPress()

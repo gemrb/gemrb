@@ -61,22 +61,22 @@ def InitJournalWindow (JournalWindow):
 	# Quests
 	Button = JournalWindow.GetControl (0)
 	Button.SetText (20430)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuestsWindow)
+	Button.OnPress (OpenQuestsWindow)
 
 	# Beasts
 	Button = JournalWindow.GetControl (1)
 	Button.SetText (20634)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBeastsWindow)
+	Button.OnPress (OpenBeastsWindow)
 
 	# Journal
 	Button = JournalWindow.GetControl (2)
 	Button.SetText (20635)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLogWindow)
+	Button.OnPress (OpenLogWindow)
 
 	# Done
 	Button = JournalWindow.GetControl (3)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: JournalWindow.Close())
+	Button.OnPress (lambda: JournalWindow.Close())
 	Button.MakeEscape()
 
 	return
@@ -117,24 +117,24 @@ def OpenQuestsWindow ():
 	# Assigned
 	Button = QuestsWindow.GetControl (8)
 	Button.SetText (39433)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnJournalAssignedPress)
+	Button.OnPress (OnJournalAssignedPress)
 
 	# Completed
 	Button = QuestsWindow.GetControl (9)
 	Button.SetText (39434)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnJournalCompletedPress)
+	Button.OnPress (OnJournalCompletedPress)
 
 	# Back
 	Button = QuestsWindow.GetControl (5)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuestsWindow.Close())
+	Button.OnPress (lambda: QuestsWindow.Close())
 	Button.MakeEscape()
 	Button.Focus()
 
 	# Done
 	Button = QuestsWindow.GetControl (0)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(QuestsWindow))
+	Button.OnPress (lambda: CloseAll(QuestsWindow))
 
 	QuestsList = List = QuestsWindow.GetControl (1)
 	List.SetVarAssoc ('SelectedQuest', -1)
@@ -241,24 +241,24 @@ def OpenBeastsWindow ():
 	# PC
 	Button = BeastsWindow.GetControl (5)
 	Button.SetText (20637)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnJournalPCPress)
+	Button.OnPress (OnJournalPCPress)
 
 	# NPC
 	Button = BeastsWindow.GetControl (6)
 	Button.SetText (20638)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnJournalNPCPress)
+	Button.OnPress (OnJournalNPCPress)
 
 	# Back
 	Button = BeastsWindow.GetControl (7)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: BeastsWindow.Close())
+	Button.OnPress (lambda: BeastsWindow.Close())
 	Button.MakeEscape()
 	Button.Focus()
 
 	# Done
 	Button = BeastsWindow.GetControl (4)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(BeastsWindow))
+	Button.OnPress (lambda: CloseAll(BeastsWindow))
 
 	BeastsList = List = BeastsWindow.GetControl (0)
 	List.SetVarAssoc ('SelectedBeast', -1)
@@ -332,14 +332,14 @@ def OpenLogWindow ():
 	# Back
 	Button = LogWindow.GetControl (1)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: LogWindow.Close())
+	Button.OnPress (lambda: LogWindow.Close())
 	Button.MakeEscape()
 	Button.Focus()
 
 	# Done
 	Button = LogWindow.GetControl (0)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(LogWindow))
+	Button.OnPress (lambda: CloseAll(LogWindow))
 
 	# text area
 	Text = LogWindow.GetControl (2)

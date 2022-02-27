@@ -49,38 +49,38 @@ def InitRecordsWindow (Window):
 	# dual class
 	Button = Window.GetControl (0)
 	Button.SetText (7174)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DualClass.DualClassWindow)
+	Button.OnPress (DualClass.DualClassWindow)
 
 	# levelup
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUp.OpenLevelUpWindow)
+	Button.OnPress (LevelUp.OpenLevelUpWindow)
 
 	# information
 	Button = Window.GetControl (1)
 	Button.SetText (11946)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInformationWindow)
+	Button.OnPress (OpenInformationWindow)
 
 	# reform party
 	Button = Window.GetControl (51)
 	Button.SetText (16559)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenRecReformPartyWindow)
+	Button.OnPress (OpenRecReformPartyWindow)
 
 	# customize
 	Button = Window.GetControl (50)
 	Button.SetText (10645)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.OpenCustomizeWindow)
+	Button.OnPress (GUIRECCommon.OpenCustomizeWindow)
 
 	# export
 	Button = Window.GetControl (36)
 	Button.SetText (13956)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.OpenExportWindow)
+	Button.OnPress (GUIRECCommon.OpenExportWindow)
 
 	# kit info
 	if GameCheck.IsBG2():
 		Button = Window.GetControl (52)
 		Button.SetText (61265)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
+		Button.OnPress (OpenKitInfoWindow)
 
 	return
 
@@ -814,12 +814,12 @@ def OpenInformationWindow ():
 	# Biography
 	Button = Window.GetControl (26)
 	Button.SetText (18003)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.OpenBiographyWindow)
+	Button.OnPress (GUIRECCommon.OpenBiographyWindow)
 
 	# Done
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InformationWindow.Close())
+	Button.OnPress (lambda: InformationWindow.Close())
 	Button.MakeEscape()
 
 	TotalPartyExp = 0
@@ -919,7 +919,7 @@ def OpenKitInfoWindow ():
 	#back button (setting first, to be less error prone)
 	DoneButton = KitInfoWindow.GetControl (2)
 	DoneButton.SetText (11973)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitDonePress)
+	DoneButton.OnPress (KitDonePress)
 
 	#kit or class description
 	TextArea = KitInfoWindow.GetControl (0)
@@ -993,12 +993,12 @@ def OpenColorWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
 
-	HairButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetHairColor)
-	SkinButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetSkinColor)
-	MajorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMajorColor)
-	MinorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMinorColor)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneColorWindow)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	HairButton.OnPress (SetHairColor)
+	SkinButton.OnPress (SetSkinColor)
+	MajorButton.OnPress (SetMajorColor)
+	MinorButton.OnPress (SetMinorColor)
+	DoneButton.OnPress (DoneColorWindow)
+	CancelButton.OnPress (lambda: Window.Close())
 	UpdatePaperDoll ()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -1078,7 +1078,7 @@ def OpenColorPicker ():
 			GemRB.SetVar ("Selected",i)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
+		Button.OnPress (DonePress)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

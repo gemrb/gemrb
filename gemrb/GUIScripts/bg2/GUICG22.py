@@ -105,7 +105,7 @@ def OnLoad():
 		else:
 			Button = KitWindow.GetControl(i+5)
 		Button.SetVarAssoc("ButtonPressed", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, KitPress)
+		Button.OnPress (KitPress)
 
 	BackButton = KitWindow.GetControl(8)
 	BackButton.SetText(15416)
@@ -117,8 +117,8 @@ def OnLoad():
 	TextAreaControl = KitWindow.GetControl(5)
 	TextAreaControl.SetText(17247)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	Init = 1
 	RedrawKits()
 	KitPress()

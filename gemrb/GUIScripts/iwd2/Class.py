@@ -102,7 +102,7 @@ def SetupClassList():
 		if Allowed==0:
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  ClassPress)
+		Button.OnPress (ClassPress)
 		Button.SetVarAssoc("Class", i)
 
 	BackButton.SetText(15416)
@@ -118,8 +118,8 @@ def SetupClassList():
 	else:
 		AdjustTextArea()
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	ClassWindow.Focus()
 	return
 
@@ -155,10 +155,10 @@ def ClassPress():
 		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
 		Button.SetText(t )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  ClassPress2)
+		Button.OnPress (ClassPress2)
 		Button.SetVarAssoc("Class", i)
 
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress2)
+	BackButton.OnPress (BackPress2)
 	return
 
 def ClassPress2():

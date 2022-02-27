@@ -37,7 +37,7 @@ def OnLoad ():
 	LoadWindow = GemRB.LoadWindow (0, "GUILOAD")
 	CancelButton=LoadWindow.GetControl (46)
 	CancelButton.SetText (4196)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: LoadWindow.Close())
+	CancelButton.OnPress (lambda: LoadWindow.Close())
 	CancelButton.MakeEscape()
 
 	GemRB.SetVar ("LoadIdx",0)
@@ -45,13 +45,13 @@ def OnLoad ():
 	for i in range (4):
 		Button = LoadWindow.GetControl (14+i)
 		Button.SetText (28648)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
+		Button.OnPress (LoadGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("LoadIdx",i)
 
 		Button = LoadWindow.GetControl (18+i)
 		Button.SetText (28640)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
+		Button.OnPress (DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetVarAssoc ("LoadIdx",i)
 
@@ -170,12 +170,12 @@ def DeleteGamePress ():
 
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (28640)
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
+	DeleteButton.OnPress (DeleteGameConfirm)
 	DeleteButton.MakeDefault()
 
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (4196)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
+	CancelButton.OnPress (DeleteGameCancel)
 	CancelButton.MakeEscape()
 	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

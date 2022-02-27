@@ -43,10 +43,10 @@ def OnLoad():
 	TextAreaControl.SetText(17236)
 
 	MaleButton = GenderWindow.GetControl(7)
-	MaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedMale)
+	MaleButton.OnPress (ClickedMale)
 	MaleButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	FemaleButton = GenderWindow.GetControl(8)
-	FemaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedFemale)
+	FemaleButton.OnPress (ClickedFemale)
 	FemaleButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	MaleButton.SetVarAssoc("Gender",1)
 	FemaleButton.SetVarAssoc("Gender",2)
@@ -62,10 +62,10 @@ def OnLoad():
 
 	MaleButton.SetVarAssoc("Gender",1)
 	FemaleButton.SetVarAssoc("Gender",2)
-	MaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedMale)
-	FemaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedFemale)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	MaleButton.OnPress (ClickedMale)
+	FemaleButton.OnPress (ClickedFemale)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	GenderWindow.Focus()
 	return

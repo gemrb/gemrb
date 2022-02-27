@@ -73,57 +73,57 @@ def InitRecordsWindow (Window):
 	#information (help files)
 	Button = Window.GetControl (1)
 	Button.SetText (11946)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenHelpWindow)
+	Button.OnPress (OpenHelpWindow)
 
 	#biography
 	Button = Window.GetControl (59)
 	Button.SetText (18003)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.OpenBiographyWindow)
+	Button.OnPress (GUIRECCommon.OpenBiographyWindow)
 
 	#export
 	Button = Window.GetControl (36)
 	Button.SetText (13956)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.OpenExportWindow)
+	Button.OnPress (GUIRECCommon.OpenExportWindow)
 
 	#customize
 	Button = Window.GetControl (50)
 	Button.SetText (10645)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIRECCommon.OpenCustomizeWindow)
+	Button.OnPress (GUIRECCommon.OpenCustomizeWindow)
 
 	#general
 	Button = Window.GetControl (60)
 	Button.SetTooltip (40316)
 	Button.SetVarAssoc ("SelectWindow", 1)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
+	Button.OnPress (lambda: UpdateRecordsWindow(Window))
 
 	#weapons and armour
 	Button = Window.GetControl (61)
 	Button.SetTooltip (40317)
 	Button.SetVarAssoc ("SelectWindow", 2)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
+	Button.OnPress (lambda: UpdateRecordsWindow(Window))
 
 	#skills and feats
 	Button = Window.GetControl (62)
 	Button.SetTooltip (40318)
 	Button.SetVarAssoc ("SelectWindow", 3)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
+	Button.OnPress (lambda: UpdateRecordsWindow(Window))
 
 	#miscellaneous
 	Button = Window.GetControl (63)
 	Button.SetTooltip (33500)
 	Button.SetVarAssoc ("SelectWindow", 4)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
+	Button.OnPress (lambda: UpdateRecordsWindow(Window))
 
 	GemRB.SetVar ("SelectWindow", 1)
 
 	#level up
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLevelUpWindow)
+	Button.OnPress (OpenLevelUpWindow)
 
 	return
 
@@ -1050,7 +1050,7 @@ def OpenHelpWindow ():
 		if title:
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateHelpWindow)
+			Button.OnPress (UpdateHelpWindow)
 		else:
 			Label.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1058,7 +1058,7 @@ def OpenHelpWindow ():
 	#done
 	Button = Window.GetControl (1)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseHelpWindow)
+	Button.OnPress (CloseHelpWindow)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	UpdateHelpWindow ()
 	return
@@ -1127,7 +1127,7 @@ def RefreshHelpWindow ():
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetVarAssoc ("Selected", i+TopIndex)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshHelpWindow)
+			Button.OnPress (RefreshHelpWindow)
 		else:
 			Label.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1173,7 +1173,7 @@ def OpenLevelUpWindow ():
 	# next
 	Button = Window.GetControl (0)
 	Button.SetText (36789)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLUKitWindow)
+	Button.OnPress (OpenLUKitWindow)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 	Button.MakeDefault ()
 
@@ -1204,7 +1204,7 @@ def OpenLevelUpWindow ():
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("LUClass", i-2)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUClassPress)
+		Button.OnPress (LUClassPress)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	# description
@@ -1218,7 +1218,7 @@ def OpenLevelUpWindow ():
 	# cancel
 	Button = Window.GetControl (27)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLUWindow)
+	Button.OnPress (CloseLUWindow)
 
 	Window.ShowModal (MODAL_SHADOW_NONE)
 
@@ -1338,7 +1338,7 @@ def OpenLUKitWindow ():
 	# next
 	Button = Window.GetControl (0)
 	Button.SetText (36789)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUNextPress)
+	Button.OnPress (LUNextPress)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 	Button.MakeDefault ()
 
@@ -1368,7 +1368,7 @@ def OpenLUKitWindow ():
 		Button.SetText (kitTitle)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("LUKit", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUKitPress)
+		Button.OnPress (LUKitPress)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_NONE)

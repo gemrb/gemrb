@@ -36,12 +36,12 @@ def OnLoad ():
 	PartyFormationWindow = GemRB.LoadWindow (0, "GUISP")
 
 	ModifyCharsButton = PartyFormationWindow.GetControl (43)
-	ModifyCharsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: ModifyPress
+	ModifyCharsButton.OnPress (None) #TODO: ModifyPress
 	ModifyCharsButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 	ModifyCharsButton.SetText (18816)
 
 	ExitButton = PartyFormationWindow.GetControl (30)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
+	ExitButton.OnPress (ExitPress)
 	ExitButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetText (13906)
 	ExitButton.MakeEscape()
@@ -66,7 +66,7 @@ def OnLoad ():
 
 		CreateCharButton = PartyFormationWindow.GetControl (i)
 		CreateCharButton.SetVarAssoc ("Slot", i-17)
-		CreateCharButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharPress)
+		CreateCharButton.OnPress (CreateCharPress)
 		CreateCharButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 		CreateCharButton.SetFont ("NORMAL")
 		if ResRef == "":
@@ -79,7 +79,7 @@ def OnLoad ():
 	else:
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 		DoneButton.MakeDefault()
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
+	DoneButton.OnPress (EnterGamePress)
 
 	if not GameCheck.HasHOW():
 		GemRB.SetVar ("PlayMode",0) #using second row??
@@ -103,18 +103,18 @@ def CreateCharPress ():
 	CreateCharWindow = GemRB.LoadWindow (3)
 
 	CreateButton = CreateCharWindow.GetControl (0)
-	CreateButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharCreatePress)
+	CreateButton.OnPress (CreateCharCreatePress)
 	CreateButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CreateButton.SetText (13954)
 	CreateButton.MakeDefault()
 
 	DeleteButton = CreateCharWindow.GetControl (3)
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharDeletePress)
+	DeleteButton.OnPress (CreateCharDeletePress)
 	DeleteButton.SetStatus (IE_GUI_BUTTON_DISABLED)
 	DeleteButton.SetText (13957)
 
 	CancelButton = CreateCharWindow.GetControl (4)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharCancelPress)
+	CancelButton.OnPress (CreateCharCancelPress)
 	CancelButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
@@ -159,12 +159,12 @@ def ExitPress ():
 	ExitWindow = GemRB.LoadWindow (7, "GUISP")
 
 	ExitButton = ExitWindow.GetControl (1)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitExitPress)
+	ExitButton.OnPress (ExitExitPress)
 	ExitButton.SetText (13906)
 	ExitButton.MakeDefault()
 
 	CancelButton = ExitWindow.GetControl (2)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
+	CancelButton.OnPress (ExitCancelPress)
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
 

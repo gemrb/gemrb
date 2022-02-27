@@ -100,17 +100,17 @@ def InitRecordsWindow (Window):
 	# Information
 	Button = Window.GetControl (7)
 	Button.SetText (4245)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInformationWindow)
+	Button.OnPress (OpenInformationWindow)
 
 	# Reform Party
 	Button = Window.GetControl (8)
 	Button.SetText (4244)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenReformPartyWindow)
+	Button.OnPress (GUIWORLD.OpenReformPartyWindow)
 
 	# Level Up
 	Button = Window.GetControl (9)
 	Button.SetText (4246)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLevelUpWindow)
+	Button.OnPress (OpenLevelUpWindow)
 
 	statevents = (OnRecordsHelpStrength, OnRecordsHelpIntelligence, OnRecordsHelpWisdom, OnRecordsHelpDexterity, OnRecordsHelpConstitution, OnRecordsHelpCharisma)
 	# stat buttons
@@ -692,12 +692,12 @@ def OpenInformationWindow ():
 	# Biography
 	Button = Window.GetControl (1)
 	Button.SetText (4247)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
+	Button.OnPress (OpenBiographyWindow)
 
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInformationWindow)
+	Button.OnPress (OpenInformationWindow)
 	Button.MakeEscape()
 
 	TotalPartyExp = 0
@@ -810,7 +810,7 @@ def OpenBiographyWindow ():
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyWindow)
+	Button.OnPress (OpenBiographyWindow)
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -884,7 +884,7 @@ def OpenLevelUpWindow ():
 	# Accept
 	Button = Window.GetControl (0)
 	Button.SetText (4192)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AcceptLevelUp)
+	Button.OnPress (AcceptLevelUp)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 

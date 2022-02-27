@@ -43,10 +43,10 @@ def InitJournalWindow (JournalWindow):
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
 	Button = JournalWindow.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalPrevSectionPress)
+	Button.OnPress (JournalPrevSectionPress)
 
 	Button = JournalWindow.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalNextSectionPress)
+	Button.OnPress (JournalNextSectionPress)
 
 	Chapter = GemRB.GetGameVar("chapter")
 	GemRB.SetVar("TopIndex", 0)

@@ -46,7 +46,7 @@ def DisplayRaces():
 		else:
 			Button.SetText(Val)
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
+			Button.OnPress (RacePress)
 			Button.SetVarAssoc("HatedRace",RacialEnemyTable.GetValue(i+TopIndex,1) )
 	return
 
@@ -85,8 +85,8 @@ def OnLoad():
 	ScrollBarControl.SetVarAssoc("TopIndex",RaceCount)
 	ScrollBarControl.OnChange (DisplayRaces)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(RaceWindow))
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (lambda: CharGenCommon.back(RaceWindow))
 	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	DisplayRaces()
 	return

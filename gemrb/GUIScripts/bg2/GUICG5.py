@@ -30,7 +30,7 @@ def OnLoad():
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: NameWindow.Close())
+	BackButton.OnPress (lambda: NameWindow.Close())
 
 	DoneButton = NameWindow.GetControl(0)
 	DoneButton.SetText(11973)
@@ -41,7 +41,7 @@ def OnLoad():
 	NameField.SetText (GemRB.GetToken ("CHARNAME"))
 	EditChange ()
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	DoneButton.OnPress (NextPress)
 	NameField.OnChange (EditChange)
 
 	NameWindow.ShowModal (MODAL_SHADOW_GRAY)

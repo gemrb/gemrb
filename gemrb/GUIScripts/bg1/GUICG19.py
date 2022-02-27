@@ -46,7 +46,7 @@ def OnLoad():
 
 	PlayButton = CharSoundWindow.GetControl (47)
 	PlayButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
+	PlayButton.OnPress (PlayPress)
 	PlayButton.SetText (17318)
 
 	TextArea = CharSoundWindow.GetControl (50)
@@ -59,8 +59,8 @@ def OnLoad():
 	DoneButton.MakeDefault()
 
 	VoiceList.OnSelect (ChangeVoice)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(CharSoundWindow))
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (lambda: CharGenCommon.back(CharSoundWindow))
 	CharSoundWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 

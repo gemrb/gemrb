@@ -55,10 +55,10 @@ def OnLoad():
 
 	MaleButton.SetVarAssoc("Gender",1)
 	FemaleButton.SetVarAssoc("Gender",2)
-	MaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedMale)
-	FemaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedFemale)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	MaleButton.OnPress (ClickedMale)
+	FemaleButton.OnPress (ClickedFemale)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	DoneButton.SetDisabled(True)
 	GenderWindow.Focus()
 	return

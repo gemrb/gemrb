@@ -31,13 +31,13 @@ def OnLoad ():
 	PartyFormationWindow = GemRB.LoadWindow (0, "GUISP")
 	ExitButton = PartyFormationWindow.GetControl (30)
 	ExitButton.SetText (13906)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
+	ExitButton.OnPress (ExitPress)
 	ExitButton.MakeEscape()
 
 	ModifyCharactersButton = PartyFormationWindow.GetControl (43)
 	ModifyCharactersButton.SetText (18816)
 	ModifyCharactersButton.SetState (IE_GUI_BUTTON_DISABLED)
-	ModifyCharactersButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: ModifyCharactersPress
+	ModifyCharactersButton.OnPress (None) #TODO: ModifyCharactersPress
 
 	DoneButton = PartyFormationWindow.GetControl (28)
 	DoneButton.SetText (11973)
@@ -53,12 +53,12 @@ def OnLoad ():
 		ResRef = GemRB.GetPlayerPortrait (i-17, 1)["ResRef"]
 		if ResRef == "":
 			Button.SetFlags (IE_GUI_BUTTON_NORMAL,OP_SET)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GeneratePress)
+			Button.OnPress (GeneratePress)
 		else:
 			Button.SetPicture (ResRef)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			Portraits = Portraits+1
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReviewPress)
+			Button.OnPress (ReviewPress)
 
 		Button.SetVarAssoc ("Slot",i-17)
 
@@ -66,17 +66,17 @@ def OnLoad ():
 		Button.SetVarAssoc ("Slot",i-17)
 		if ResRef == "":
 			Button.SetText (10264)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GeneratePress)
+			Button.OnPress (GeneratePress)
 		else:
 			Button.SetText (GemRB.GetPlayerName (i-17,0) )
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReviewPress)
+			Button.OnPress (ReviewPress)
 
 	if Portraits == 0:
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 		DoneButton.MakeDefault()
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
+	DoneButton.OnPress (EnterGamePress)
 
 	PartyFormationWindow.ShowModal (MODAL_SHADOW_NONE)
 	return
@@ -91,12 +91,12 @@ def ExitPress ():
 	CancelButton = ExitWindow.GetControl (2)
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
+	CancelButton.OnPress (ExitCancelPress)
 
 	DoneButton = ExitWindow.GetControl (1)
 	DoneButton.SetText (11973)
 	DoneButton.MakeDefault()
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitDonePress)
+	DoneButton.OnPress (ExitDonePress)
 
 	ExitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -138,7 +138,7 @@ def ReviewPress ():
 	DoneButton.SetText (11973)
 	DoneButton.MakeDefault()
 	DoneButton.MakeEscape()
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReviewDonePress)
+	DoneButton.OnPress (ReviewDonePress)
 
 	LeftTextArea = ReviewWindow.GetControl (2)
 	RightTextArea = ReviewWindow.GetControl (3)

@@ -59,9 +59,9 @@ def OnLoad():
 	
 	Button = ActionsWindow.GetControl(60)
 	if Button:
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
+		Button.OnPress (lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
 		Button = ActionsWindow.GetControl(61)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
+		Button.OnPress (lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
 
 	if GameCheck.HasHOW():
 		OptionsWindow = GemRB.LoadWindow(25, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
@@ -80,9 +80,9 @@ def OnLoad():
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)
 	if Button:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
+		Button.OnPress (lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
 		Button = PortraitWindow.GetControl (8)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
+		Button.OnPress (lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
 
 	UpdateControlStatus(True)
 
@@ -212,8 +212,8 @@ def UpdateControlStatus(init = False):
 		SetMWSize(Expand, GSFlags)
 
 	global MTARestoreSize
-	ContractButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnDecreaseSize)
-	ExpandButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnIncreaseSize)
+	ContractButton.OnPress (OnDecreaseSize)
+	ExpandButton.OnPress (OnIncreaseSize)
 
 	GSFlags, Expand = GetGSFlags()
 	if init:

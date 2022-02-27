@@ -54,7 +54,7 @@ def OnLoad():
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, AlignmentPress)
+		Button.OnPress (AlignmentPress)
 		Button.SetVarAssoc("Alignment", i)
 
 	BackButton = AlignmentWindow.GetControl(13)
@@ -67,8 +67,8 @@ def OnLoad():
 	TextAreaControl = AlignmentWindow.GetControl(11)
 	TextAreaControl.SetText(9602)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(AlignmentWindow))
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (lambda: CharGenCommon.back(AlignmentWindow))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	AlignmentWindow.ShowModal(MODAL_SHADOW_NONE)
 	return

@@ -77,11 +77,11 @@ def OnLoad():
 
 	CloseButton= MWindow.GetControl (0)
 	CloseButton.SetText(28082)
-	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Close())
+	CloseButton.OnPress (lambda: MWindow.Close())
 	CloseButton.MakeDefault()
 	
 	OpenButton = OptionsWindow.GetControl (10)
-	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Focus())
+	OpenButton.OnPress (lambda: MWindow.Focus())
 
 	SetupClockWindowControls (ActionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)
@@ -95,24 +95,24 @@ def SetupClockWindowControls (Window):
 
 	# 41627 - Return to the Game World
 	Button = Window.GetControl (2)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+	Button.OnPress (GUICommonWindows.CloseTopWindow)
 	Button.SetTooltip (41627)
 
 	# Select all characters
 	Button = Window.GetControl (1)
 	Button.SetTooltip (41659)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
+	Button.OnPress (GUICommon.SelectAllOnPress)
 
 	# Abort current action
 	Button = Window.GetControl (3)
 	Button.SetTooltip (41655)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.ActionStopPressed)
+	Button.OnPress (GUICommonWindows.ActionStopPressed)
 
 	# Formations
 	import GUIWORLD
 	Button = Window.GetControl (4)
 	Button.SetTooltip (44945)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
+	Button.OnPress (GUIWORLD.OpenFormationWindow)
 
 	return
 

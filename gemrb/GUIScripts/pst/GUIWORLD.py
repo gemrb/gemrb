@@ -68,12 +68,12 @@ def NextDialogState ():
 		return
 
 	Button = MessageWindow.MWindow.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+	Button.OnPress (None)
 
 def OpenEndMessageWindow ():
 	Button = MessageWindow.MWindow.GetControl (0)
 	Button.SetText (34602)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.OnPress (CloseContinueWindow)
 	Button.MakeDefault(True)
 	Button.SetDisabled(False)
 
@@ -81,7 +81,7 @@ def OpenContinueMessageWindow ():
 	#continue
 	Button = MessageWindow.MWindow.GetControl (0)
 	Button.SetText (34603)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.OnPress (CloseContinueWindow)
 	Button.MakeDefault(True)
 	Button.SetDisabled(False)
 
@@ -100,7 +100,7 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ReformPartyWindow.Close())
+	Button.OnPress (lambda: ReformPartyWindow.Close())
 
 
 last_formation = None
@@ -114,7 +114,7 @@ def OpenFormationWindow ():
 	# Done
 	Button = Window.GetControl (13)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: FormationWindow.Close())
+	Button.OnPress (lambda: FormationWindow.Close())
 
 	tooltips = (
 		44957,  # Follow
@@ -136,7 +136,7 @@ def OpenFormationWindow ():
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("SelectedFormation", i)
 		Button.SetTooltip (tooltips[i])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectFormation)
+		Button.OnPress (SelectFormation)
 
 	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation (0))
 	SelectFormation ()

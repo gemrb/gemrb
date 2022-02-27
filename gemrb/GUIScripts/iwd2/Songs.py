@@ -37,9 +37,9 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.MakeEscape()
 
-	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PlayPress)
-	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CreditsPress)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: MovieWindow.Close())
+	PlayButton.OnPress (PlayPress)
+	CreditsButton.OnPress (CreditsPress)
+	DoneButton.OnPress (lambda: MovieWindow.Close())
 	MovieWindow.Focus()
 	return
 	

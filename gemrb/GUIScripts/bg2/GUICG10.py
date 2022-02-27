@@ -77,8 +77,8 @@ def OnLoad():
 	TextAreaControl = ClassWindow.GetControl(12)
 	TextAreaControl.SetText(17244)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	DoneButton.SetDisabled(True)
 	RedrawMCs()
 	ClassWindow.Focus()
@@ -128,5 +128,5 @@ def RedrawMCs():
 			Button.SetState(IE_GUI_BUTTON_DISABLED)
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClassPress)
+		Button.OnPress (ClassPress)
 		Button.SetVarAssoc("Class", MCRowIndices[i - 2 + offset][0] + 1) # multiclass, actually; just a weird system

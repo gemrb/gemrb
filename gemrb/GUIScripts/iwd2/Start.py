@@ -93,12 +93,12 @@ def OnLoad():
 	OptionsButton.SetText(13905)
 	QuitGameButton.SetText(13731)
 	QuitGameButton.MakeEscape()
-	NewGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewGamePress)
-	QuitGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitPress)
-	ProtocolButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolPress)
-	OptionsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	LoadGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, LoadPress)
-	QuickLoadButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuickLoadPress)
+	NewGameButton.OnPress (NewGamePress)
+	QuitGameButton.OnPress (QuitPress)
+	ProtocolButton.OnPress (ProtocolPress)
+	OptionsButton.OnPress (OptionsPress)
+	LoadGameButton.OnPress (LoadPress)
+	QuickLoadButton.OnPress (QuickLoadPress)
 	StartWindow.Focus()
 	GemRB.LoadMusicPL("Theme.mus")
 	
@@ -141,7 +141,7 @@ def ProtocolPress():
 
 	DoneButton = ProtocolWindow.GetControl(6)
 	DoneButton.SetText(11973)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ProtocolWindow.Close())
+	DoneButton.OnPress (lambda: ProtocolWindow.Close())
 	DoneButton.MakeEscape()
 
 	ProtocolWindow.Focus()
@@ -179,11 +179,11 @@ def OptionsPress():
 def QuitPress():
 	QuitWindow = GemRB.LoadWindow(22, "GUICONN")
 	CancelButton = QuitWindow.GetControl(2)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	CancelButton.OnPress (lambda: QuitWindow.Close())
 	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl(1)
-	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	QuitButton.OnPress (lambda: GemRB.Quit())
 	QuitButton.MakeDefault()
 
 	TextArea = QuitWindow.GetControl(0)

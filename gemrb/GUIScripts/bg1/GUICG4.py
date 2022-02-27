@@ -150,27 +150,27 @@ def OnLoad():
 	StorePress()
 	for i in range(6):
 		Button = AbilityWindow.GetControl(i+30)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
+		Button.OnPress (JustPress)
 		Button.SetVarAssoc("Ability", i)
 
 		Button = AbilityWindow.GetControl(i*2+16)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.OnPress (LeftPress)
 		Button.SetVarAssoc("Ability", i )
 		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.OnPress (RightPress)
 		Button.SetVarAssoc("Ability", i )
 		Button.SetActionInterval (200)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
 
-	StoreButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, StorePress)
-	RecallButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RecallPress)
-	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RollPress)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(AbilityWindow))
+	StoreButton.OnPress (StorePress)
+	RecallButton.OnPress (RecallPress)
+	RerollButton.OnPress (RollPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (lambda: CharGenCommon.back(AbilityWindow))
 	AbilityWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 

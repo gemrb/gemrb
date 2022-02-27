@@ -83,7 +83,7 @@ def OnLoad():
 		Button.SetVarAssoc("Class Kit",Kit)
 		if i==0:
 			GemRB.SetVar("Class Kit",Kit)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, KitPress)
+		Button.OnPress (KitPress)
 
 	BackButton = KitWindow.GetControl(12)
 	BackButton.SetText(15416)
@@ -94,8 +94,8 @@ def OnLoad():
 	TextAreaControl = KitWindow.GetControl(11)
 	TextAreaControl.SetText(17245)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(KitWindow))
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (lambda: CharGenCommon.back(KitWindow))
 	#KitPress()
 	KitWindow.ShowModal(MODAL_SHADOW_NONE)
 	return

@@ -60,8 +60,8 @@ def OnLoad():
 		TmpButton = MainWindow.GetControl(i)
 		TmpButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	DoneButton.OnPress (DonePress)
+	CancelButton.OnPress (CancelPress)
 	TextAreaControl.OnSelect (SelectFile)
 	ImportWindow.Focus()
 	return

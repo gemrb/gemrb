@@ -78,34 +78,34 @@ def DualClassWindow ():
 	# done button (off)
 	DCMainDoneButton = DCMainWindow.GetControl (2)
 	DCMainDoneButton.SetText (11973)
-	DCMainDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainDonePress)
+	DCMainDoneButton.OnPress (DCMainDonePress)
 	DCMainDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# cancel button (on)
 	DCMainCancelButton = DCMainWindow.GetControl (1)
 	DCMainCancelButton.SetText (13727)
-	DCMainCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainCancelPress)
+	DCMainCancelButton.OnPress (DCMainCancelPress)
 	DCMainCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCMainCancelButton.MakeEscape ()
 
 	# class button (on)
 	DCMainClassButton = DCMainWindow.GetControl (3)
 	DCMainClassButton.SetText (11959)
-	DCMainClassButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainClassPress)
+	DCMainClassButton.OnPress (DCMainClassPress)
 	DCMainClassButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCMainClassButton.MakeDefault()
 
 	# skills button (off)
 	DCMainSkillsButton = DCMainWindow.GetControl (4)
 	DCMainSkillsButton.SetText (17372)
-	DCMainSkillsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainSkillsPress)
+	DCMainSkillsButton.OnPress (DCMainSkillsPress)
 	DCMainSkillsButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# back button (on)
 	DCMainBackButton = DCMainWindow.GetControl (5)
 	if GameCheck.IsBG2():
 		DCMainBackButton.SetText (15416)
-	DCMainBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainBackPress)
+	DCMainBackButton.OnPress (DCMainBackPress)
 	DCMainBackButton.SetState (IE_GUI_BUTTON_ENABLED)
 
 	# picture of character
@@ -324,7 +324,7 @@ def DCMainClassPress ():
 	for i in range (6):
 		# get the button and associate it with the correct var
 		DCClassButton = DCClassWindow.GetControl (i+1)
-		DCClassButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassSelect)
+		DCClassButton.OnPress (DCClassSelect)
 		DCClassButton.SetVarAssoc ("DCClass", i)
 		DCClassButton.SetText (DCClassStrings[i])
 
@@ -337,14 +337,14 @@ def DCMainClassPress ():
 	# done button (off)
 	DCClassDoneButton = DCClassWindow.GetControl (8)
 	DCClassDoneButton.SetText (11973)
-	DCClassDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassDonePress)
+	DCClassDoneButton.OnPress (DCClassDonePress)
 	DCClassDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DCClassDoneButton.MakeDefault()
 
 	# back button (on)
 	DCClassBackButton = DCClassWindow.GetControl (7)
 	DCClassBackButton.SetText (15416)
-	DCClassBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassBackPress)
+	DCClassBackButton.OnPress (DCClassBackPress)
 	DCClassBackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCClassBackButton.MakeEscape ()
 
@@ -489,13 +489,13 @@ def DCOpenProfsWindow ():
 	# setup the done and cancel
 	DCProfsDoneButton = DCProfsWindow.GetControl (76)
 	DCProfsDoneButton.SetText (11973)
-	DCProfsDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCProfsDonePress)
+	DCProfsDoneButton.OnPress (DCProfsDonePress)
 	DCProfsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DCProfsDoneButton.MakeDefault()
 
 	DCProfsCancelButton = DCProfsWindow.GetControl (77)
 	DCProfsCancelButton.SetText (13727)
-	DCProfsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCProfsCancelPress)
+	DCProfsCancelButton.OnPress (DCProfsCancelPress)
 	DCProfsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	DCProfsCancelButton.MakeEscape ()
 
@@ -597,12 +597,12 @@ def OpenSkillsWindow ():
 	BackButton = DCSkillsWindow.GetControl(24)
 	BackButton.SetText(15416)
 	BackButton.MakeEscape()
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,DCSkillsBackPress)
+	BackButton.OnPress (DCSkillsBackPress)
 
 	DCSkillsDoneButton = DCSkillsWindow.GetControl(25)
 	DCSkillsDoneButton.SetText(11973)
 	DCSkillsDoneButton.MakeDefault()
-	DCSkillsDoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DCSkillsDonePress)
+	DCSkillsDoneButton.OnPress (DCSkillsDonePress)
 	DCSkillsDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	# setup the default text area

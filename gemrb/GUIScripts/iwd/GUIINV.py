@@ -51,12 +51,12 @@ def InitInventoryWindow (Window):
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.MajorPress)
+	Button.OnPress (InventoryCommon.MajorPress)
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.MinorPress)
+	Button.OnPress (InventoryCommon.MinorPress)
 	Button.SetTooltip (12008)
 
 	#portrait
@@ -231,14 +231,14 @@ def RefreshInventoryWindow (Window):
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 
 		if Slot == None:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.OnPress (None)
 			Button.OnRightPress (None)
 			Button.OnShiftPress (None)
 			Button.OnDoublePress (None)
 		else:
 			Button.SetValue (i + TopIndex)
 			Button.SetAction(InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
+			Button.OnPress (InventoryCommon.OnDragItemGround)
 			Button.OnRightPress (InventoryCommon.OpenGroundItemInfoWindow)
 			Button.OnShiftPress (InventoryCommon.OpenGroundItemAmountWindow)
 			Button.OnDoublePress (InventoryCommon.OpenGroundItemAmountWindow)

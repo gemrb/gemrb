@@ -59,19 +59,19 @@ def OpenSaveWindow ():
 	# Cancel button
 	CancelButton = Window.GetControl (ctrl_offset[6])
 	CancelButton.SetText (strs['cancel'])
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSaveWindow)
+	CancelButton.OnPress (CloseSaveWindow)
 	CancelButton.MakeEscape ()
 
 	for i in range(num_rows):
 		Button = Window.GetControl (ctrl_offset[0]+i)
 		Button.SetText (strs['save'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenConfirmWindow)
+		Button.OnPress (OpenConfirmWindow)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetValue (i)
 
 		Button = Window.GetControl (ctrl_offset[1]+i)
 		Button.SetText (strs['delete'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
+		Button.OnPress (DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetValue (i)
 
@@ -240,7 +240,7 @@ def OpenConfirmWindow (btn):
 	# Save/Overwrite
 	SaveButton = ConfirmWindow.GetControl (ctrl_offset[10])
 	SaveButton.SetText (save_strref)
-	SaveButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ConfirmedSaveGame (Pos))
+	SaveButton.OnPress (lambda: ConfirmedSaveGame (Pos))
 	SaveButton.MakeDefault ()
 
 	if Slotname == "":
@@ -249,7 +249,7 @@ def OpenConfirmWindow (btn):
 	# Cancel
 	CancelButton = ConfirmWindow.GetControl (ctrl_offset[11])
 	CancelButton.SetText (strs['cancel'])
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseConfirmWindow)
+	CancelButton.OnPress (CloseConfirmWindow)
 	CancelButton.MakeEscape ()
 
 	ConfirmWindow.Focus ()
@@ -294,12 +294,12 @@ def DeleteGamePress (btn):
 
 	DeleteButton = ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (strs['delete'])
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DeleteGameConfirm (btn.Value))
+	DeleteButton.OnPress (lambda: DeleteGameConfirm (btn.Value))
 	DeleteButton.MakeDefault ()
 
 	CancelButton = ConfirmWindow.GetControl (2)
 	CancelButton.SetText (strs['cancel'])
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseConfirmWindow)
+	CancelButton.OnPress (CloseConfirmWindow)
 	CancelButton.MakeEscape()
 
 	ConfirmWindow.Focus()

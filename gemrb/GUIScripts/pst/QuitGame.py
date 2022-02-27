@@ -59,7 +59,7 @@ def DeathWindowEnd ():
 	#done
 	Button = Window.GetControl (1)
 	Button.SetText (17237)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
+	Button.OnPress (DonePress)
 	Button.MakeDefault()
 
 	#making the playing field gray

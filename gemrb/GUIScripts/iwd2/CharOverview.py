@@ -77,7 +77,7 @@ def UpdateOverview(CurrentStep):
 		if CurrentStep - 1 == i:
 			State = IE_GUI_BUTTON_ENABLED
 			StepButtons[Step].MakeDefault()
-			StepButtons[Step].SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+			StepButtons[Step].OnPress (NextPress)
 		StepButtons[Step].SetState(State)
 	
 	# Handle (not so) persistent buttons
@@ -127,7 +127,7 @@ def UpdateOverview(CurrentStep):
 		PersistButtons[Key].SetState(State)
 		
 		if Event:
-			PersistButtons[Key].SetEvent(IE_GUI_BUTTON_ON_PRESS, Event)
+			PersistButtons[Key].OnPress (Event)
 	
 	# Handle character overview information
 	TextAreaControl = CharGenWindow.GetControl(9)
@@ -274,11 +274,11 @@ def StartOver():
 	
 	YesButton = StartOverWindow.GetControl(0)
 	YesButton.SetText(13912)
-	YesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RestartGen)
+	YesButton.OnPress (RestartGen)
 	
 	NoButton = StartOverWindow.GetControl(1)
 	NoButton.SetText(13913)
-	NoButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: StartOverWindow.Close())
+	NoButton.OnPress (lambda: StartOverWindow.Close())
 	
 	TextAreaControl = StartOverWindow.GetControl(2)
 	TextAreaControl.SetText(40275)

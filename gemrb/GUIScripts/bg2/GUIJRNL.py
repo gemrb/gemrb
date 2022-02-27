@@ -46,11 +46,11 @@ def InitJournalWindow (JournalWindow):
 
 	# prev. chapter
 	Button = JournalWindow.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PrevChapterPress)
+	Button.OnPress (PrevChapterPress)
 
 	# next chapter
 	Button = JournalWindow.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextChapterPress)
+	Button.OnPress (NextChapterPress)
 	
 	def Update():
 		UpdateLogWindow(JournalWindow)
@@ -62,33 +62,33 @@ def InitJournalWindow (JournalWindow):
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 2)
 	Button.SetText (45486)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
+	Button.OnPress (Update)
 
 	# Journal
 	Button = JournalWindow.GetControl (8)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 4)
 	Button.SetText (15333)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
+	Button.OnPress (Update)
 
 	# User
 	Button = JournalWindow.GetControl (9)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 0)
 	Button.SetText (45487)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
+	Button.OnPress (Update)
 
 	# Quests
 	Button = JournalWindow.GetControl (6)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 1)
 	Button.SetText (45485)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
+	Button.OnPress (Update)
 
 	# Order
 	Button = JournalWindow.GetControl (10)
 	Button.SetText (4627)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToggleOrderWindow)
+	Button.OnPress (ToggleOrderWindow)
 	Chapter = GemRB.GetGameVar("chapter")
 	if Chapter > 65535:
 		Chapter = 0

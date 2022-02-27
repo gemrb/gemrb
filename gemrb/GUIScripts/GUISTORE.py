@@ -220,7 +220,7 @@ def OpenStoreWindow ():
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (strrefs["done"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseStoreWindow)
+	Button.OnPress (CloseStoreWindow)
 	Button.MakeEscape()
 
 	#Store type icon
@@ -244,12 +244,12 @@ def OpenStoreWindow ():
 			else:
 				Button.SetSprites ("GUISTBBC", Action, 0,1,2,0)
 			Button.SetTooltip (storetips[Action])
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, store_funcs[Action])
+			Button.OnPress (store_funcs[Action])
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Button.SetTooltip ("")
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.OnPress (None)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	return
@@ -352,7 +352,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 		Button.SetBorder (1, color, 0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
+		Button.OnPress (SelectBuy)
 		Button.OnDoublePress (lambda: OpenItemAmountWindow(Window))
 		Button.OnRightPress (InfoLeftWindow)
 		Button.SetFont ("NUMBER")
@@ -364,7 +364,7 @@ def InitStoreShoppingWindow (Window):
 
 		Button.SetBorder (0,color,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
+			Button.OnPress (SelectSell)
 			Button.OnDoublePress (lambda: OpenBag(Window))
 		Button.OnRightPress (InfoRightWindow)
 		Button.SetFont ("NUMBER")
@@ -381,10 +381,10 @@ def InitStoreShoppingWindow (Window):
 			Button.SetText (51882)
 		else:
 			Button.SetText ("")
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToBackpackPressed)
+		Button.OnPress (ToBackpackPressed)
 	else:
 		Button.SetText (strrefs["buy"])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyPressed)
+		Button.OnPress (BuyPressed)
 
 	# Sell
 	RightButton = Button = Window.GetControlAlias ('STORBTN')
@@ -395,18 +395,18 @@ def InitStoreShoppingWindow (Window):
 			Button.SetText (51883)
 		else:
 			Button.SetText ("")
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToBagPressed)
+		Button.OnPress (ToBagPressed)
 	else:
 		Button.SetText (strrefs["sell"])
 		if Store['StoreType'] != 3: # can't sell to temples
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SellPressed)
+			Button.OnPress (SellPressed)
 
 	# inactive button (close container)
 	if GameCheck.IsBG2():
 		Button = Window.GetControl (50)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseBag(Window))
+		Button.OnPress (lambda: CloseBag(Window))
 
 	#backpack
 	BackpackButton = Window.GetControl (44)
@@ -496,7 +496,7 @@ def InitStoreIdentifyWindow (Window):
 	# Identify
 	LeftButton = Button = Window.GetControlAlias ('IDLBTN')
 	Button.SetText (strrefs["identify"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: IdentifyPressed (Window))
+	Button.OnPress (lambda: IdentifyPressed (Window))
 	Button.OnRightPress (InfoIdentifyWindow)
 
 	# price ...
@@ -517,7 +517,7 @@ def InitStoreIdentifyWindow (Window):
 
 		Button = Window.GetControlAlias ("IDBTN" + str(i))
 		Button.SetBorder (0, color, 0, 1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SelectID (Window))
+		Button.OnPress (lambda: SelectID (Window))
 		Button.OnRightPress (InfoIdentifyWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -591,7 +591,7 @@ def InitStoreStealWindow (Window):
 
 		Button = Window.GetControlAlias ('SWLBTN' + str(i))
 		Button.SetBorder (0,color,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: RedrawStoreStealWindow(Window))
+		Button.OnPress (lambda: RedrawStoreStealWindow(Window))
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -606,7 +606,7 @@ def InitStoreStealWindow (Window):
 	# Steal
 	LeftButton = Button = Window.GetControlAlias ('STEAL')
 	Button.SetText (strrefs["steal"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: StealPressed (Window))
+	Button.OnPress (lambda: StealPressed (Window))
 
 	Button = Window.GetControl (37)
 	if Button:
@@ -672,7 +672,7 @@ def InitStoreDonateWindow (Window):
 	# Donate
 	Button = Window.GetControlAlias ('DONATE')
 	Button.SetText (strrefs["donate"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonateGold)
+	Button.OnPress (DonateGold)
 	Button.MakeDefault()
 
 	# Entry
@@ -694,11 +694,11 @@ def InitStoreDonateWindow (Window):
 
 	# +
 	Button = Window.GetControlAlias ('STOPLUS')
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetItemAmount(Field.QueryInteger()+1))
+	Button.OnPress (lambda: SetItemAmount(Field.QueryInteger() + 1))
 	Button.SetActionInterval (50)
 	# -
 	Button = Window.GetControlAlias ('STOMINUS')
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetItemAmount(Field.QueryInteger()-1))
+	Button.OnPress (lambda: SetItemAmount(Field.QueryInteger() - 1))
 	Button.SetActionInterval (50)
 	return
 
@@ -746,7 +746,7 @@ def InitStoreHealWindow (Window):
 	for i in range (ItemButtonCount):
 		Button = Window.GetControlAlias ('HWLBTN' + str(i))
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateStoreHealWindow(Window))
+		Button.OnPress (lambda: UpdateStoreHealWindow(Window))
 		Button.OnRightPress (InfoHealWindow)
 
 	UnselectNoRedraw ()
@@ -758,7 +758,7 @@ def InitStoreHealWindow (Window):
 	# Heal
 	Button = Window.GetControlAlias ('HEALBTN')
 	Button.SetText (strrefs["heal"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BuyHeal)
+	Button.OnPress (BuyHeal)
 	Button.SetDisabled (True)
 
 	Count = Store['StoreCureCount']
@@ -896,7 +896,7 @@ def UpdateStoreRumourWindow (Window):
 					CostLabel.SetText (str(Drink['Price']))
 					Button.SetText (Drink['DrinkName'])
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GulpDrink)
+			Button.OnPress (GulpDrink)
 		else:
 			Button.SetText ("")
 			Button.SetDisabled (True)
@@ -940,7 +940,7 @@ def InitStoreRentWindow (Window):
 	for i in range (4):
 		ok = Store['StoreRoomPrices'][i]
 		Button = Window.GetControl (i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateStoreRentWindow(Window))
+		Button.OnPress (lambda: UpdateStoreRentWindow(Window))
 		if ok<0:
 			Button.SetState (IE_GUI_BUTTON_DISABLED) #disabled room icons are selected, not disabled
 		else:
@@ -948,7 +948,7 @@ def InitStoreRentWindow (Window):
 
 		Button = Window.GetControl (i+4)
 		Button.SetText (roomnames[i])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateStoreRentWindow(Window))
+		Button.OnPress (lambda: UpdateStoreRentWindow(Window))
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		
 		if GameCheck.IsBG1():
@@ -964,7 +964,7 @@ def InitStoreRentWindow (Window):
 	# Rent
 	Button = Window.GetControlAlias ('RENTBTN')
 	Button.SetText (strrefs["rent"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentRoom)
+	Button.OnPress (RentRoom)
 	return
 
 def UpdateStoreRentWindow (Window):
@@ -1353,12 +1353,12 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 
 	# Decrease
 	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetItemAmount(Text.QueryInteger()-1))
+	Button.OnPress (lambda: SetItemAmount(Text.QueryInteger() - 1))
 	Button.SetActionInterval (200)
 
 	# Increase
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetItemAmount(Text.QueryInteger()+1))
+	Button.OnPress (lambda: SetItemAmount(Text.QueryInteger() + 1))
 	Button.SetActionInterval (200)
 
 	def CloseAmountWindow():
@@ -1372,13 +1372,13 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Confirm)
+	Button.OnPress (Confirm)
 	Button.MakeDefault ()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseAmountWindow)
+	Button.OnPress (CloseAmountWindow)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1586,7 +1586,7 @@ def InfoWindow (Slot, Item):
 	#Done
 	Button = Window.GetControlAlias ("INFBTN")
 	Button.SetText (strrefs["done"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	# hide the empty button
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
@@ -1890,7 +1890,7 @@ def InfoHealWindow ():
 	#Done
 	Button = Window.GetControlAlias ("HEALBTN")
 	Button.SetText (strrefs["done"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -2000,13 +2000,13 @@ def RentRoom ():
 	#confirm
 	Button = Window.GetControl (0)
 	Button.SetText (strrefs["rest"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RentConfirm)
+	Button.OnPress (RentConfirm)
 	Button.MakeDefault()
 
 	#deny
 	Button = Window.GetControl (1)
 	Button.SetText (strrefs["cancel"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	#textarea
@@ -2025,7 +2025,7 @@ def ErrorWindow (strref):
 	#done
 	Button = Window.GetControl (0)
 	Button.SetText (strrefs["done"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

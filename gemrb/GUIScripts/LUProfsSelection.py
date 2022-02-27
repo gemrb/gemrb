@@ -300,7 +300,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 		if ProfsOffsetPress != -1:
 			Button=ProfsWindow.GetControl(i+ProfsOffsetPress)
 			Button.SetVarAssoc("Prof", i)
-			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsJustPress)
+			Button.OnPress (ProfsJustPress)
 
 		cid = i*2+ProfsOffsetButton1
 		if Profs2ndOffsetButton1 != -1 and i > 7:
@@ -308,12 +308,12 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 
 		Button=ProfsWindow.GetControl(cid)
 		Button.SetVarAssoc("Prof", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsLeftPress)
+		Button.OnPress (ProfsLeftPress)
 		Button.SetActionInterval (200)
 
 		Button=ProfsWindow.GetControl(cid+1)
 		Button.SetVarAssoc("Prof", i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsRightPress)
+		Button.OnPress (ProfsRightPress)
 		Button.SetActionInterval (200)
 
 	value = ProfsRedraw (0)

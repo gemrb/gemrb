@@ -59,23 +59,23 @@ def InitInventoryWindow (Window):
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.MajorPress)
+	Button.OnPress (InventoryCommon.MajorPress)
 	Button.SetTooltip ("Major color")
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.MinorPress)
+	Button.OnPress (InventoryCommon.MinorPress)
 	Button.SetTooltip ("Minor color")
 
 	#hair & skin color
 	Button = Window.GetControl (82)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.HairPress)
+	Button.OnPress (InventoryCommon.HairPress)
 	Button.SetTooltip ("Hair color")
 
 	Button = Window.GetControl (83)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.SkinPress)
+	Button.OnPress (InventoryCommon.SkinPress)
 	Button.SetTooltip ("Skin color")
 
 	# paperdoll
@@ -88,13 +88,13 @@ def InitInventoryWindow (Window):
 	Button = Window.GetControl (84)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+	Button.OnPress (GUICommonWindows.CloseTopWindow)
 	Button.SetHotKey ('i')
 
 	# eXit
 	Button = Window.GetControl (200)
 	Button.SetText ("X")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+	Button.OnPress (GUICommonWindows.CloseTopWindow)
 
 	# armor class
 	Label = Window.GetControl (0x10000038)
@@ -126,7 +126,7 @@ def InitInventoryWindow (Window):
 
 	for i in range (0, 3, 2):
 		Button = Window.GetControl (109+i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChangeWeaponPressed)
+		Button.OnPress (ChangeWeaponPressed)
 		Button.SetVarAssoc("Equipped", i/2)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
@@ -247,13 +247,13 @@ def RefreshInventoryWindow ():
 
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 		if Slot == None:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.OnPress (None)
 			Button.OnRightPress (None)
 			Button.OnShiftPress (None)
 			Button.OnDoublePress (None)
 		else:
 			Button.SetValue (i + TopIndex)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
+			Button.OnPress (InventoryCommon.OnDragItemGround)
 			Button.OnRightPress (InventoryCommon.OpenGroundItemInfoWindow)
 			Button.OnShiftPress (InventoryCommon.OpenGroundItemAmountWindow)
 			Button.OnDoublePress (InventoryCommon.OpenGroundItemAmountWindow)

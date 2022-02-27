@@ -50,18 +50,18 @@ def OnLoad():
 	else:
 		MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 		MultiPlayerButton.SetText (15414)
-		MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MultiPlayerPress)
+		MultiPlayerButton.OnPress (MultiPlayerPress)
 
 		MoviesButton.SetState (IE_GUI_BUTTON_ENABLED)
 		MoviesButton.SetText (15415)
-		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
+		MoviesButton.OnPress (MoviesPress)
 	SinglePlayerButton.SetText (15413)
 	ExitButton.SetText (15417)
 	OptionsButton.SetText (13905)
-	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
-	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: StartWindow.Close())
+	SinglePlayerButton.OnPress (SinglePlayerPress)
+	ExitButton.OnPress (ExitPress)
+	OptionsButton.OnPress (OptionsPress)
+	BackButton.OnPress (lambda: StartWindow.Close())
 	ExitButton.MakeEscape()
 	StartWindow.Focus ()
 	
@@ -73,25 +73,25 @@ def SinglePlayerPress():
 	
 	SinglePlayerButton = StartWindow.GetControl (0)
 	SinglePlayerButton.SetText (13728)
-	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NewSingle)
+	SinglePlayerButton.OnPress (NewSingle)
 	
 	MultiPlayerButton = StartWindow.GetControl (1)
 	MultiPlayerButton.SetText (13729)
-	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadSingle)
+	MultiPlayerButton.OnPress (LoadSingle)
 	MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 
 	if not GameCheck.IsBG2Demo():
 		Button = StartWindow.GetControl (2)
 		if GemRB.GetVar("oldgame")==1:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Tutorial)
+			Button.OnPress (Tutorial)
 			Button.SetText (33093)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportGame)
+			Button.OnPress (ImportGame)
 			Button.SetText (71175)
 
 	ExitButton = StartWindow.GetControl (3)
 	ExitButton.SetText (15416)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
+	ExitButton.OnPress (Restart)
 	
 	OptionsButton = StartWindow.GetControl (4)
 	OptionsButton.SetText ("")
@@ -109,10 +109,10 @@ def MultiPlayerPress():
 	ExitButton.SetText (15416)
 	MultiPlayerButton.SetText ("")
 	MoviesButton.SetText (11825)
-	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConnectPress)
-	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PregenPress)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
+	MultiPlayerButton.OnPress (None)
+	SinglePlayerButton.OnPress (ConnectPress)
+	MoviesButton.OnPress (PregenPress)
+	ExitButton.OnPress (Restart)
 	MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
@@ -165,8 +165,8 @@ def Tutorial():
 	TextAreaControl.SetText (44200)
 	CancelButton.SetText (13727)
 	PlayButton.SetText (33093)
-	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: TutorialWindow.Close())
+	PlayButton.OnPress (PlayPress)
+	CancelButton.OnPress (lambda: TutorialWindow.Close())
 	PlayButton.MakeDefault()
 	CancelButton.MakeEscape()		
 
@@ -190,8 +190,8 @@ def ExitPress():
 	QuitTextArea.SetText (19532)
 	CancelButton.SetText (13727)
 	ConfirmButton.SetText (15417)
-	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	ConfirmButton.OnPress (lambda: GemRB.Quit())
+	CancelButton.OnPress (lambda: QuitWindow.Close())
 	ConfirmButton.MakeDefault()
 	CancelButton.MakeEscape()
 	return

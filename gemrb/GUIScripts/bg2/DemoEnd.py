@@ -37,7 +37,7 @@ def OnLoad ():
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.MakeDefault()
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
+	Button.OnPress (NextPress)
 	Button.SetPicture (resref)
 	Window.Focus()
 	return

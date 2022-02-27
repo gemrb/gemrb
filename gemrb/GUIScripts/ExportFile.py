@@ -50,8 +50,8 @@ def OnLoad():
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
 
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	DoneButton.OnPress (DonePress)
+	CancelButton.OnPress (CancelPress)
 	TextAreaControl.OnSelect (SelectPress)
 	ExportWindow.ShowModal(MODAL_SHADOW_NONE)
 	FileNameEditBox.Focus()

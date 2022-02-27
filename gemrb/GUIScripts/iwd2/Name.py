@@ -42,8 +42,8 @@ def OnLoad():
 	NameField.SetText (GemRB.GetToken ("CHARNAME"))
 	EditChange ()
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	NameField.OnChange (EditChange)
 	NameWindow.Focus()
 	NameField.Focus()

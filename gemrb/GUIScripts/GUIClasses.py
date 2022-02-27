@@ -251,15 +251,6 @@ class GControl(GView):
 
 	__slots__ = ['ControlID', 'VarName', 'Value']
 
-	# backwards compatibility
-	# map old event identifiers to new action system
-	EventMap = {
-		IE_GUI_BUTTON_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1),
-	}
-
-	def SetEvent(self, event, handler):
-		GControl.EventMap[event](self, handler)
-
 	def OnMouseEnter(self, handler):
 		self.SetAction(handler, IE_ACT_MOUSE_ENTER)
 
@@ -359,6 +350,9 @@ class GButton(GControl):
 		frame = self.GetFrame()
 		frame["x"] = frame["y"] = 0
 		return self.CreateSubview(btnid, IE_GUI_BUTTON, frame)
+
+	def OnPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1)
 
 	def OnRightPress(self, handler):
 		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)

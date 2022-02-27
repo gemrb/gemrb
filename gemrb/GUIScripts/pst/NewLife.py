@@ -124,13 +124,13 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 	# stat +/- buttons
 	for i in range(len(StatPress)):
 		Button = NewLifeWindow.GetControl (11+2*i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreasePress)
+		Button.OnPress (IncreasePress)
 		Button.OnMouseEnter (StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
 		Button.SetActionInterval (200)
 
 		Button = NewLifeWindow.GetControl (12+2*i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreasePress)
+		Button.OnPress (DecreasePress)
 		Button.OnMouseEnter (StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
 		Button.SetActionInterval (200)
@@ -159,12 +159,12 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 
 	AcceptButton = NewLifeWindow.GetControl(0)
 	AcceptButton.SetText(4192)
-	AcceptButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, AcceptPress)
+	AcceptButton.OnPress (AcceptPress)
 	AcceptButton.MakeDefault()
 
 	CancelButton = NewLifeWindow.GetControl(1)
 	CancelButton.SetText(4196)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	CancelButton.OnPress (CancelPress)
 	if LevelUp:
 		CancelButton.SetState(IE_GUI_BUTTON_DISABLED)
 
@@ -220,7 +220,7 @@ def AcceptPress():
 		Button = QuitWindow.GetControl(2)
 		Button.SetText(46783)
 		Button.MakeDefault()
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+		Button.OnPress (lambda: QuitWindow.Close())
 		QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
@@ -274,12 +274,12 @@ def CancelPress():
 	Button.SetText(23787)
 	Button.MakeDefault()
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, confirm)
+	Button.OnPress (confirm)
 
 	Button = QuitWindow.GetControl(2)
 	Button.SetText(23789)
 	Button.MakeDefault()
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	Button.OnPress (lambda: QuitWindow.Close())
 
 	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

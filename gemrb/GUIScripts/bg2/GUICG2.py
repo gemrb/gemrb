@@ -81,7 +81,7 @@ def OnLoad():
 		if Allowed==2:
 			GemRB.SetVar("MAGESCHOOL",5) #illusionist
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClassPress)
+		Button.OnPress (ClassPress)
 		Button.SetVarAssoc("Class", i)
 
 	MultiClassButton = ClassWindow.GetControl(10)
@@ -106,9 +106,9 @@ def OnLoad():
 		TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 		DoneButton.SetDisabled(False)
 
-	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	MultiClassButton.OnPress (MultiClassPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	ClassWindow.Focus()
 	return
 

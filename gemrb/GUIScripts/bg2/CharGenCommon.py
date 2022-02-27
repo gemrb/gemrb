@@ -92,7 +92,7 @@ def DisplayOverview(step):
 	BackButton = CharGenWindow.GetControl (11)
 	BackButton.SetText (15416)
 	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
+	BackButton.OnPress (BackPress)
 	BackButton.MakeEscape()
 
 	AcceptButton = CharGenWindow.GetControl (8)
@@ -103,7 +103,7 @@ def DisplayOverview(step):
 		AcceptButton.SetText (13956)
 	SetButtonStateFromStep ("AcceptButton", AcceptButton, step)
 	#AcceptButton.MakeDefault()
-	AcceptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
+	AcceptButton.OnPress (NextPress)
 
 	# now automatically ignored and added instead
 	#ScrollBar = CharGenWindow.GetControl (10)
@@ -112,7 +112,7 @@ def DisplayOverview(step):
 	ImportButton = CharGenWindow.GetControl (13)
 	ImportButton.SetText (13955)
 	ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
-	ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportPress)
+	ImportButton.OnPress (ImportPress)
 
 	CancelButton = CharGenWindow.GetControl (15)
 	if step == 1:
@@ -121,11 +121,11 @@ def DisplayOverview(step):
 		CancelButton.SetText (8159) # Start over
 		CancelButton.SetDisabled(False)
 	CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	CancelButton.OnPress (CancelPress)
 
 	BiographyButton = CharGenWindow.GetControl (16)
 	BiographyButton.SetText (18003)
-	BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BiographyPress)
+	BiographyButton.OnPress (BiographyPress)
 	if step == 9:
 		BiographyButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -294,7 +294,7 @@ def SetButtonStateFromStep (buttonName, button, step):
 
 	if state == IE_GUI_BUTTON_ENABLED:
 		button.Focus()
-		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
+		button.OnPress (NextPress)
 	return
 
 def CancelPress():

@@ -180,23 +180,23 @@ def OpenSkillsWindow(chargen, level=0):
 	for i in range(ButtonCount):
 		Button = SkillWindow.GetControl(i+93)
 		Button.SetVarAssoc("Skill",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
+		Button.OnPress (JustPress)
 
 		Button = SkillWindow.GetControl(i*2+14)
 		Button.SetVarAssoc("Skill",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.OnPress (LeftPress)
 		Button.SetActionInterval (200)
 
 		Button = SkillWindow.GetControl(i*2+15)
 		Button.SetVarAssoc("Skill",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.OnPress (RightPress)
 		Button.SetActionInterval (200)
 
 	if chargen:
 		BackButton = SkillWindow.GetControl (105)
 		BackButton.SetText (15416)
 		BackButton.MakeEscape()
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
+		BackButton.OnPress (BackPress)
 	else:
 		SkillWindow.DeleteControl (105)
 
@@ -215,7 +215,7 @@ def OpenSkillsWindow(chargen, level=0):
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10+1)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	DoneButton.OnPress (NextPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	RedrawSkills()
 

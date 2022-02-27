@@ -106,7 +106,7 @@ def OpenEndMessageWindow ():
 	if GameCheck.IsGemRBDemo ():
 		EndDLGStrref = 67
 	Button.SetText (EndDLGStrref)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.OnPress (CloseContinueWindow)
 	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
 	Button.MakeDefault(True)
 
@@ -119,7 +119,7 @@ def OpenContinueMessageWindow ():
 	if GameCheck.IsGemRBDemo ():
 		ContinueStrref = 66
 	Button.SetText (ContinueStrref)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.OnPress (CloseContinueWindow)
 	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
 	Button.MakeDefault(True)
 
@@ -142,7 +142,7 @@ def UpdateReformWindow (Window, select):
 	#remove
 	Button = Window.GetControl (15)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: RemovePlayer(select))
+	Button.OnPress (lambda: RemovePlayer(select))
 	if select:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -200,13 +200,13 @@ def RemovePlayer (select):
 
 	Button = Window.GetControl (1)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerConfirm)
+	Button.OnPress (RemovePlayerConfirm)
 	Button.MakeDefault()
 
 	#cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	CommonWindow.SetGameGUIHidden(hideflag)
@@ -240,12 +240,12 @@ def OpenReformPartyWindow ():
 		else:
 			Button.SetValue (None)
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn: UpdateReformWindow(Window, btn.Value))
+		Button.OnPress (lambda btn: UpdateReformWindow(Window, btn.Value))
 
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	# if nobody can be removed, just close the window
 	if not removable_pcs:
@@ -286,12 +286,12 @@ def DeathWindowEnd ():
 	#load
 	Button = Window.GetControl (1)
 	Button.SetText (15590)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadPress)
+	Button.OnPress (LoadPress)
 
 	#quit
 	Button = Window.GetControl (2)
 	Button.SetText (15417)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
+	Button.OnPress (QuitPress)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

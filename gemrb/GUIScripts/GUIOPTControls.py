@@ -61,7 +61,7 @@ def OptRadio (action, window, button_id, label_id, variable, value):
 
 	button = window.GetControl (button_id)
 	button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+	button.OnPress (action)
 	button.SetVarAssoc (variable, value)
 	if GameCheck.IsIWD2():
 		button.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
@@ -87,7 +87,7 @@ def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_s
 		button.SetSprites ("GMPPARBC", 3, 1, 2, 3, 5)
 
 	if handler:
-		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, handler)
+		button.OnPress (handler)
 	else:
 		def callback():
 			help_ta.SetText(ctlhelp)
@@ -102,7 +102,7 @@ def OptButton (action, window, button_id, button_strref):
 	"""Standard subwindow button for option windows"""
 
 	button = window.GetControl (button_id)
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+	button.OnPress (action)
 	button.SetText (button_strref)
 
 def OptDone (action, window, button_id):
@@ -110,7 +110,7 @@ def OptDone (action, window, button_id):
 
 	button = window.GetControl (button_id)
 	button.SetText (STR_OPT_DONE) # Done
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+	button.OnPress (action)
 	button.MakeDefault()
 
 	if GameCheck.IsPST():
@@ -121,7 +121,7 @@ def OptCancel (action, window, button_id):
 
 	button = window.GetControl (button_id)
 	button.SetText (STR_OPT_CANCEL) # Cancel
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+	button.OnPress (action)
 	button.MakeEscape()
 
 	if GameCheck.IsPST():

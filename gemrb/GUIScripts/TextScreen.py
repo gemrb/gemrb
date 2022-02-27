@@ -140,7 +140,7 @@ def StartTextScreen ():
 		Button.SetText (84)
 	else:
 		Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, EndTextScreen)
+	Button.OnPress (EndTextScreen)
 	Button.MakeDefault()
 
 	#replay
@@ -149,7 +149,7 @@ def StartTextScreen ():
 		Button.SetText (85)
 	else:
 		Button.SetText (16510)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReplayTextScreen)
+	Button.OnPress (ReplayTextScreen)
 
 	#if this was opened from somewhere other than game control close that window
 	import GUICommonWindows

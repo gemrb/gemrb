@@ -129,7 +129,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		# cancel button only applicable for chargen
 		SpellsCancelButton = SpellsWindow.GetControl(29)
 		SpellsCancelButton.SetState(IE_GUI_BUTTON_ENABLED)
-		SpellsCancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsCancelPress)
+		SpellsCancelButton.OnPress (SpellsCancelPress)
 		SpellsCancelButton.SetText(13727)
 		SpellsCancelButton.MakeEscape()
 
@@ -137,7 +137,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			# recommended spell picks
 			SpellsPickButton = SpellsWindow.GetControl(30)
 			SpellsPickButton.SetState(IE_GUI_BUTTON_ENABLED)
-			SpellsPickButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsPickPress)
+			SpellsPickButton.OnPress (SpellsPickPress)
 			SpellsPickButton.SetText(34210)
 	else:
 		SpellsWindow = GemRB.LoadWindow (8)
@@ -169,7 +169,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 	# the done button also doubles as a next button
 	DoneButton.SetDisabled(True)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsDonePress)
+	DoneButton.OnPress (SpellsDonePress)
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
 
@@ -368,7 +368,7 @@ def ShowKnownSpells ():
 		if i + j >= len (SpellBook) or not SpellBook[i+j]:
 			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
 			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, None)
+			SpellButton.OnPress (None)
 			continue
 		else:
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -378,7 +378,7 @@ def ShowKnownSpells ():
 		Spell = GemRB.GetSpell (Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetValue (i)
-		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MemorizePress)
+		SpellButton.OnPress (MemorizePress)
 		if GameCheck.IsBG2():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:
@@ -462,7 +462,7 @@ def ShowSpells ():
 		Spell = GemRB.GetSpell (Spells[SpellLevel][i+j][0], 1)
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
-		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsSelectPress)
+		SpellButton.OnPress (SpellsSelectPress)
 		if GameCheck.IsBG2():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:

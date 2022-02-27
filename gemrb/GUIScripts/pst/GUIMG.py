@@ -36,10 +36,10 @@ def InitMageWindow (Window):
 	MageWindow = Window
 
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MagePrevLevelPress)
+	Button.OnPress (MagePrevLevelPress)
 
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageNextLevelPress)
+	Button.OnPress (MageNextLevelPress)
 
 	# Setup memorized spells buttons
 	for i in range (12):
@@ -85,9 +85,9 @@ def UpdateMageWindow (Window=None):
 			Icon.SetSpellIcon (ms['SpellResRef'])
 			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			if ms['Flags']:
-				Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellUnmemorizeWindow)
+				Icon.OnPress (OpenMageSpellUnmemorizeWindow)
 			else:
-				Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageUnmemorizeSpell)
+				Icon.OnPress (OnMageUnmemorizeSpell)
 			Icon.OnRightPress (OpenMageSpellInfoWindow)
 			spell = GemRB.GetSpell (ms['SpellResRef'])
 			Icon.SetTooltip (spell['SpellName'])
@@ -99,7 +99,7 @@ def UpdateMageWindow (Window=None):
 				Icon.SetSprites ("IVSLOT", 0,  0, 0, 0, 0)
 			else:
 				Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Icon.OnPress (None)
 			Icon.OnRightPress (None)
 			Icon.SetTooltip ('')
 			Icon.EnableBorder (0, 0)
@@ -115,7 +115,7 @@ def UpdateMageWindow (Window=None):
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Icon.SetSpellIcon (ks['SpellResRef'])
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
+		Icon.OnPress (OnMageMemorizeSpell)
 		Icon.OnRightPress (OpenMageSpellInfoWindow)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
 		Icon.SetTooltip (spell['SpellName'])
@@ -125,7 +125,7 @@ def UpdateMageWindow (Window=None):
 	for i in range (i + 1, btncount):
 		Icon = Window.GetControl (14 + i)
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Icon.OnPress (None)
 		Icon.OnRightPress (None)
 		Icon.SetTooltip ('')
 		
@@ -153,7 +153,7 @@ def OpenMageSpellInfoWindow ():
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
@@ -208,12 +208,12 @@ def OpenMageSpellUnmemorizeWindow (btn):
 		OnMageUnmemorizeSpell(btn)
 		Window.Close()
 	Button.SetValue (btn.Value)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Unmemorize)
+	Button.OnPress (Unmemorize)
 	Button.MakeDefault()
 
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)

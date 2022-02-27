@@ -142,16 +142,16 @@ def OpenAbilitiesWindow(chargen, points):
 	RollPress ()
 	for i in range(0,6):
 		Button = AbilityWindow.GetControl(i+30)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
+		Button.OnPress (JustPress)
 		Button.SetValue (i)
 
 		Button = AbilityWindow.GetControl(i*2+16)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.OnPress (LeftPress)
 		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.OnPress (RightPress)
 		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
@@ -159,7 +159,7 @@ def OpenAbilitiesWindow(chargen, points):
 		BackButton = AbilityWindow.GetControl (36)
 		BackButton.SetText (15416)
 		BackButton.MakeEscape()
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
+		BackButton.OnPress (BackPress)
 	else:
 		AbilityWindow.DeleteControl (36)
 
@@ -167,7 +167,7 @@ def OpenAbilitiesWindow(chargen, points):
 	DoneButton.SetText(36789)
 	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	DoneButton.OnPress (NextPress)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)

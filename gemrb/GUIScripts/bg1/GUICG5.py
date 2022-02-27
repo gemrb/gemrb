@@ -45,8 +45,8 @@ def OnLoad():
 	NameField.SetText (GemRB.GetToken ("CHARNAME"))
 	EditChange ()
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(NameWindow))
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (lambda: CharGenCommon.back(NameWindow))
 	NameField.OnChange (EditChange)
 	NameWindow.ShowModal(MODAL_SHADOW_NONE)
 	NameField.Focus()

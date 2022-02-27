@@ -45,10 +45,10 @@ def InitJournalWindow (Window):
 	JournalWindow = Window
 	
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalPrevSectionPress)
+	Button.OnPress (JournalPrevSectionPress)
 
 	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalNextSectionPress)
+	Button.OnPress (JournalNextSectionPress)
 
 	Chapter = GemRB.GetGameVar("chapter")
 

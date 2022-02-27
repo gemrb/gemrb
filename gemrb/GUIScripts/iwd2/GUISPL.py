@@ -45,16 +45,16 @@ def InitSpellBookWindow (Window):
 	SpellBookWindow = Window
 
 	Button = Window.GetControl (92)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SpellBookPrevPress)
+	Button.OnPress (SpellBookPrevPress)
 
 	Button = Window.GetControl (93)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SpellBookNextPress)
+	Button.OnPress (SpellBookNextPress)
 
 	#setup level buttons
 	# looping backwards so the selected button gets drawn properly
 	for i in range (8, -1, -1):
 		Button = Window.GetControl (55 + i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshSpellBookLevel)
+		Button.OnPress (RefreshSpellBookLevel)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("SpellBookSpellLevel", i)
 
@@ -81,7 +81,7 @@ def InitSpellBookWindow (Window):
 		if len(ActiveSpellBooks) > i:
 			BookType = ActiveSpellBooks[i]
 			Button.SetVarAssoc ("SelectedBook", BookType)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateSpellBook)
+		Button.OnPress (UpdateSpellBook)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	# scrollbar for known spells
@@ -187,16 +187,16 @@ def UpdateSpellBookWindow ():
 			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depleted)
 			if ms['MemoCount'] < ms['KnownCount']:
 				# already depleted, just remove
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda btn, mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell(mc))
+				Button.OnPress (lambda btn, mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell(mc))
 			else:
 				# deplete and remove
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellRemoveWindow)
+				Button.OnPress (OpenSpellBookSpellRemoveWindow)
 			Button.OnRightPress (OpenSpellBookSpellInfoWindow)
 			tmp = str(ms['MemoCount'])+"/"+str(ms['KnownCount'])
 			Label.SetText (tmp)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.OnPress (None)
 			Button.OnRightPress (None)
 			Button.EnableBorder (0, 0)
 			Label.SetText ('')
@@ -212,12 +212,12 @@ def UpdateSpellBookWindow ():
 			spell = ks['SpellResRef']
 			Button.SetSpellIcon (spell)
 			if not sorcerer_style:
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnSpellBookMemorizeSpell)
+				Button.OnPress (OnSpellBookMemorizeSpell)
 			Button.OnRightPress (OpenSpellBookSpellInfoWindow)
 			Label.SetText (ks['SpellName'])
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.OnPress (None)
 			Button.OnRightPress (None)
 			Button.EnableBorder (0, 0)
 			Label.SetText ('')
@@ -294,7 +294,7 @@ def OpenSpellBookSpellInfoWindow ():
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
 	Button.MakeEscape()
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
@@ -358,13 +358,13 @@ def OpenSpellBookSpellRemoveWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnSpellBookRemoveSpell)
+	Button.OnPress (OnSpellBookRemoveSpell)
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellRemoveWindow)
+	Button.OnPress (OpenSpellBookSpellRemoveWindow)
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)

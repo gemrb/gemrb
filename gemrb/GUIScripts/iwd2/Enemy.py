@@ -54,7 +54,7 @@ def DisplayRaces():
 		else:
 			Button.SetText(Val)
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
+			Button.OnPress (RacePress)
 			Button.SetVarAssoc ("HatedRace", raceIDS)
 	return
 
@@ -109,7 +109,7 @@ def OpenEnemyWindow(chargen=0):
 		BackButton = RaceWindow.GetControl (10)
 		BackButton.SetText (15416)
 		BackButton.MakeEscape()
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
+		BackButton.OnPress (BackPress)
 	else:
 		RaceWindow.DeleteControl (10)
 
@@ -126,7 +126,7 @@ def OpenEnemyWindow(chargen=0):
 	ScrollBarControl.SetVarAssoc("TopIndex",RaceCount)
 	ScrollBarControl.OnChange (DisplayRaces)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	DoneButton.OnPress (NextPress)
 
 	if not chargen:
 		RaceWindow.ShowModal (MODAL_SHADOW_GRAY)

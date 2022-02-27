@@ -79,13 +79,13 @@ def OpenLevelUpWindow():
 	if GameCheck.IsBG2():
 		InfoButton = LevelUpWindow.GetControl (125)
 		InfoButton.SetText (13707)
-		InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpInfoPress)
+		InfoButton.OnPress (LevelUpInfoPress)
 		# hide "Character Generation"
 		LevelUpWindow.DeleteControl(0x1000007e)
 
 	DoneButton = LevelUpWindow.GetControl (0)
 	DoneButton.SetText (11962)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpDonePress)
+	DoneButton.OnPress (LevelUpDonePress)
 	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DoneButton.MakeDefault()
 	# also disable closing by ESC, so we don't stack upgrades
@@ -265,7 +265,7 @@ def OpenLevelUpWindow():
 		HLAButton = LevelUpWindow.GetControl (126)
 		if HLACount:
 			HLAButton.SetText (4954)
-			HLAButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpHLAPress)
+			HLAButton.OnPress (LevelUpHLAPress)
 		else:
 			HLAButton.SetFlags (IE_GUI_BUTTON_DISABLED, OP_OR)
 

@@ -170,7 +170,7 @@ def OnLoad():
 	CharGenCommon.PositionCharGenWin(AbilityWindow)
 
 	Button = AbilityWindow.CreateButton (2000, 0, 0, 0, 0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GiveAll18)
+	Button.OnPress (GiveAll18)
 	Button.SetHotKey ("8", GEM_MOD_CTRL, True)
 
 	RerollButton = AbilityWindow.GetControl(2)
@@ -192,7 +192,7 @@ def OnLoad():
 	StorePress()
 	for i in range(6):
 		Button = AbilityWindow.GetControl(i+30)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
+		Button.OnPress (JustPress)
 		Button.OnMouseLeave (EmptyPress)
 		Button.SetValue (i)
 		# delete the labels and use the buttons instead
@@ -202,23 +202,23 @@ def OnLoad():
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 		Button = AbilityWindow.GetControl(i*2+16)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.OnPress (LeftPress)
 		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.OnPress (RightPress)
 		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
 
-	StoreButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, StorePress)
-	RecallButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RecallPress)
-	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RollPress)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	StoreButton.OnPress (StorePress)
+	RecallButton.OnPress (RecallPress)
+	RerollButton.OnPress (RollPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	AbilityWindow.Focus()
 	return
 

@@ -286,7 +286,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.EnableBorder(1, 0)
 		else:
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.SpellPressed)
+			Button.OnPress (GUICommonWindows.SpellPressed)
 			Button.OnShiftPress (GUICommonWindows.SpellShiftPressed)
 
 		if Spell['SpellResRef']:

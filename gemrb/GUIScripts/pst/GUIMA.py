@@ -36,7 +36,7 @@ def InitMapWindow (Window):
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenTravelWindow())
+	Button.OnPress (lambda: OpenTravelWindow())
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -76,7 +76,7 @@ def InitMapWindow (Window):
 	# Done
 	Button = Window.GetControl (5)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	return
@@ -101,7 +101,7 @@ def OpenTravelWindow ():
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMA", GUICommonWindows.ToggleWindow, InitMapWindow, None, WINDOW_TOP|WINDOW_HCENTER)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMA", GUICommonWindows.OpenWindowOnce, InitMapWindow, None, WINDOW_TOP|WINDOW_HCENTER)

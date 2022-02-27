@@ -31,7 +31,7 @@ def CreateClockButton(Button):
 	Button.SetAnimation ("CGEAR")
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 	Button.SetFlags (flags, OP_SET)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))
+	Button.OnPress (lambda: GemRB.GamePause (2, 0))
 	if GameCheck.IsIWD2():
 		Button.SetState (IE_GUI_BUTTON_LOCKED) #no button depression, timer is an inset stone planet
 	elif GameCheck.IsBG2():

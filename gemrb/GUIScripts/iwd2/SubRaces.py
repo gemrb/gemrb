@@ -48,7 +48,7 @@ def OnLoad():
 	RaceStrRef = CommonTables.Races.GetValue(PureRace, "CAP_REF")
 	Button.SetText(RaceStrRef )
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SubRacePress)
+	Button.OnPress (SubRacePress)
 	RaceID = CommonTables.Races.GetValue(PureRace, "ID")
 	Button.SetVarAssoc("Race",RaceID)
 	
@@ -67,7 +67,7 @@ def OnLoad():
 			RaceStrRef = CommonTables.Races.GetValue(HasSubRace, "CAP_REF")
 			Button.SetText(RaceStrRef )
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SubRacePress)
+			Button.OnPress (SubRacePress)
 			RaceID = CommonTables.Races.GetValue(HasSubRace, "ID")
 			Button.SetVarAssoc("Race",RaceID)
 
@@ -83,8 +83,8 @@ def OnLoad():
 	TextAreaControl = RaceWindow.GetControl(6)
 	TextAreaControl.SetText(CommonTables.Races.GetValue(RaceName, "DESC_REF"))
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (BackPress)
 	RaceWindow.Focus()
 	return
 

@@ -82,7 +82,7 @@ def OpenEndMessageWindow ():
 	Button.SetVisible(True)
 	Button.SetDisabled(False)
 	Button.SetText (9371)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.OnPress (CloseContinueWindow)
 	Button.MakeDefault(True)
 	ContinueWindow.Focus()
 
@@ -92,7 +92,7 @@ def OpenContinueMessageWindow ():
 	Button.SetVisible(True)
 	Button.SetDisabled(False)
 	Button.SetText (9372)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
+	Button.OnPress (CloseContinueWindow)
 	Button.MakeDefault(True)
 	ContinueWindow.Focus()
 
@@ -120,7 +120,7 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
+	Button.OnPress (OpenReformPartyWindow)
 	
 	CommonWindow.SetGameGUIHidden(hideflag)
 
@@ -153,12 +153,12 @@ def DeathWindowEnd ():
 	#load
 	Button = Window.GetControl (1)
 	Button.SetText (15590)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadPress)
+	Button.OnPress (LoadPress)
 
 	#quit
 	Button = Window.GetControl (2)
 	Button.SetText (15417)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
+	Button.OnPress (QuitPress)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

@@ -82,7 +82,7 @@ def InitMapWindow (Window):
 		OpenTravelWindow()
 
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMap)
+	Button.OnPress (OpenWorldMap)
 
 	# Hide or Show mapnotes
 	if HasMapNotes ():
@@ -135,55 +135,55 @@ def InitWorldMapWindow (Window):
 	if not GameCheck.IsIWD2():
 		#north
 		Button = Window.GetControl (1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapN)
+		Button.OnPress (MapN)
 		Button.SetActionInterval (200)
 
 		#south
 		Button = Window.GetControl (2)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapS)
+		Button.OnPress (MapS)
 		Button.SetActionInterval (200)
 
 	if GameCheck.IsBG2():
 		#northwest
 		Button = Window.GetControl (8)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNW)
+		Button.OnPress (MapNW)
 		Button.SetActionInterval (200)
 
 		#northeast
 		Button = Window.GetControl (9)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNE)
+		Button.OnPress (MapNE)
 		Button.SetActionInterval (200)
 
 		#west
 		Button = Window.GetControl (10)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapW)
+		Button.OnPress (MapW)
 		Button.SetActionInterval (200)
 
 		#center
 		Button = Window.GetControl (11)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapC)
+		Button.OnPress (MapC)
 		Button.SetActionInterval (200)
 
 		#east
 		Button = Window.GetControl (12)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapE)
+		Button.OnPress (MapE)
 		Button.SetActionInterval (200)
 
 		#southwest
 		Button = Window.GetControl (13)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSW)
+		Button.OnPress (MapSW)
 		Button.SetActionInterval (200)
 
 		#southeast
 		Button = Window.GetControl (14)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSE)
+		Button.OnPress (MapSE)
 		Button.SetActionInterval (200)
 
 	# Done
 	Button = Window.GetControl (0)
 	if GemRB.GetVar ("Travel") == -1:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
+		Button.OnPress (lambda: OpenMapWindow ())
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -236,7 +236,7 @@ def AddNoteWindow ():
 		Label.SetSprites ("FLAG1", i,0,1,2,0)
 		Label.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		Label.SetVarAssoc ("Color", i)
-		Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: NoteLabel.Focus())
+		Label.OnPress (lambda: NoteLabel.Focus())
 		
 	def SetMapNote (Text):
 		PosX = GemRB.GetVar ("MapControlX")
@@ -248,19 +248,19 @@ def AddNoteWindow ():
 
 	#set
 	Label = NoteWindow.GetControl (0)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetMapNote(NoteLabel.QueryText()))
+	Label.OnPress (lambda: SetMapNote(NoteLabel.QueryText()))
 	Label.SetText (11973)
 	Label.MakeDefault()
 
 	#cancel
 	Label = NoteWindow.GetControl (2)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: NoteWindow.Close())
+	Label.OnPress (lambda: NoteWindow.Close())
 	Label.SetText (13727)
 	Label.MakeEscape()
 
 	#remove
 	Label = NoteWindow.GetControl (3)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetMapNote(""))
+	Label.OnPress (lambda: SetMapNote(""))
 	Label.SetText (13957)
 
 	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)

@@ -167,7 +167,7 @@ def OpenContainerWindow ():
 	for i in range (ground_size):
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("LeftIndex", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, TakeItemContainer)
+		Button.OnPress (TakeItemContainer)
 		if GameCheck.IsPST():
 			Button.SetFont ("NUMBER")
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -176,7 +176,7 @@ def OpenContainerWindow ():
 	for i in range (4):
 		Button = Window.GetControl (i+10)
 		Button.SetVarAssoc ("RightIndex", i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DropItemContainer)
+		Button.OnPress (DropItemContainer)
 		if GameCheck.IsPST():
 			Button.SetFont ("NUMBER")
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -228,7 +228,7 @@ def OpenContainerWindow ():
 		Button.SetText ("")
 
 	Button.MakeEscape()
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
+	Button.OnPress (LeaveContainer)
 
 	GemRB.SetVar ("LeftTopIndex", 0)
 	GemRB.SetVar ("RightTopIndex", 0)

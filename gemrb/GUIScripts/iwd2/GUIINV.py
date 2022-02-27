@@ -59,23 +59,23 @@ def InitInventoryWindow (Window):
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.MajorPress)
+	Button.OnPress (InventoryCommon.MajorPress)
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.MinorPress)
+	Button.OnPress (InventoryCommon.MinorPress)
 	Button.SetTooltip (12008)
 
 	#hair & skin color
 	Button = Window.GetControl (82)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.HairPress)
+	Button.OnPress (InventoryCommon.HairPress)
 	Button.SetTooltip (37560)
 
 	Button = Window.GetControl (83)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.SkinPress)
+	Button.OnPress (InventoryCommon.SkinPress)
 	Button.SetTooltip (37559)
 
 	# paperdoll
@@ -124,7 +124,7 @@ def InitInventoryWindow (Window):
 	
 	for i in range (4):
 		Button = Window.GetControl (109+i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ChangeWeaponPressed)
+		Button.OnPress (ChangeWeaponPressed)
 		Button.SetVarAssoc("Equipped", i)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		#Why they mess up .chu's i don't know
@@ -241,14 +241,14 @@ def RefreshInventoryWindow ():
 
 		Slot = GemRB.GetContainerItem (pc, slotID)
 		if Slot == None:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.OnPress (None)
 			Button.OnRightPress (None)
 			Button.OnShiftPress (None)
 			Button.OnDoublePress (None)
 		else:
 			Button.SetValue (slotID)
 			Button.SetAction(InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
+			Button.OnPress (InventoryCommon.OnDragItemGround)
 			Button.OnRightPress (InventoryCommon.OpenGroundItemInfoWindow)
 			Button.OnShiftPress (InventoryCommon.OpenGroundItemAmountWindow)
 			Button.OnDoublePress (InventoryCommon.OpenGroundItemAmountWindow)

@@ -43,7 +43,7 @@ def InitMapWindow (Window, WorldMap = False):
 		Button.SetText ("MAP")
 	else:
 		Button.SetText ("WMAP")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InitMapWindow (Window, not WorldMap))
+	Button.OnPress (lambda: InitMapWindow (Window, not WorldMap))
 
 	# Map or World Map control
 	if WorldMap:
@@ -77,14 +77,14 @@ def InitMapWindow (Window, WorldMap = False):
 
 	Button = Window.GetControl (3)
 	Button.SetText ("Close")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMapWindow)
+	Button.OnPress (CloseMapWindow)
 	Button.SetHotKey ('m')
 
 	# workaround for proper closure with ESC
 	Button = Window.GetControl (99)
 	if not Button:
 		Button = Window.CreateButton (99, 0, 0, 0, 0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMapWindow)
+	Button.OnPress (CloseMapWindow)
 	Button.MakeEscape ()
 
 	return

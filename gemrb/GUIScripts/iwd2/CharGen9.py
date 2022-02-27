@@ -107,19 +107,19 @@ def BioPress():
 	BioWindow = Window = GemRB.LoadWindow (51)
 	Button = Window.GetControl (5)
 	Button.SetText (2240)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RevertPress)
+	Button.OnPress (RevertPress)
 
 	Button = Window.GetControl (6)
 	Button.SetText (18622)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearPress)
+	Button.OnPress (ClearPress)
 
 	Button = Window.GetControl (1)
 	Button.SetText (11962)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BioDonePress)
+	Button.OnPress (BioDonePress)
 
 	Button = Window.GetControl (2)
 	Button.SetText (36788)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, BioCancelPress)
+	Button.OnPress (BioCancelPress)
 
 	EditControl = Window.GetControl (4)
 	BioData = GemRB.GetToken("BIO")

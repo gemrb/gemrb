@@ -30,14 +30,14 @@ def OnLoad():
 
 	ExitButton = PartyFormationWindow.GetControl(30)
 	ExitButton.SetText(13906)
-	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
+	ExitButton.OnPress (ExitPress)
 	ExitButton.MakeEscape()
 
 	ModifyCharactersButton = PartyFormationWindow.GetControl(43)
 	ModifyCharactersButton.SetText(18816)
 	ModifyCharactersButton.SetState(IE_GUI_BUTTON_DISABLED)
 	#TODO: implement ModifyCharacters
-	#ModifyCharactersButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ModifyCharactersPress)
+	#ModifyCharactersButton.OnPress (ModifyCharactersPress)
 
 	DoneButton = PartyFormationWindow.GetControl(28)
 	DoneButton.SetText(11973)
@@ -57,7 +57,7 @@ def OnLoad():
 			Portraits = Portraits+1
 
 		Button.SetVarAssoc("Slot",i-17)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GeneratePress)
+		Button.OnPress (GeneratePress)
 
 		Button = PartyFormationWindow.GetControl(i)
 		Button.SetVarAssoc("Slot",i-17)
@@ -66,13 +66,13 @@ def OnLoad():
 		else:
 			Button.SetText(GemRB.GetPlayerName(i-17,0) )
 
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GeneratePress)
+		Button.OnPress (GeneratePress)
 
 	if Portraits == 0:
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
+	DoneButton.OnPress (EnterGamePress)
 
 	PartyFormationWindow.Focus()
 	return
@@ -86,12 +86,12 @@ def ExitPress():
 
 	CancelButton = ExitWindow.GetControl(2)
 	CancelButton.SetText(13727)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
+	CancelButton.OnPress (ExitCancelPress)
 	CancelButton.MakeEscape()
 
 	DoneButton = ExitWindow.GetControl(1)
 	DoneButton.SetText(11973)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ExitWindow.Close())
+	DoneButton.OnPress (lambda: ExitWindow.Close())
 	DoneButton.MakeDefault()
 
 	ExitWindow.Focus()

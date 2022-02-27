@@ -74,7 +74,7 @@ def OnLoad():
 		if Allowed!=1:
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  ClassPress)
+		Button.OnPress (ClassPress)
 		Button.SetVarAssoc("Class", i)
 
 	MultiClassButton = ClassWindow.GetControl(10)
@@ -104,10 +104,10 @@ def OnLoad():
 		TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
-	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
-	SpecialistButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpecialistPress)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(ClassWindow))
+	MultiClassButton.OnPress (MultiClassPress)
+	SpecialistButton.OnPress (SpecialistPress)
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (lambda: CharGenCommon.back(ClassWindow))
 	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 

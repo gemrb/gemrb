@@ -88,7 +88,7 @@ def OpenCustomizeWindow ():
 	if not GameCheck.IsIWD2():
 		ColorButton = CustomizeWindow.GetControl (2)
 		ColorButton.SetText (10646)
-		ColorButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIREC.OpenColorWindow)
+		ColorButton.OnPress (GUIREC.OpenColorWindow)
 		if not Exportable:
 			ColorButton.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -99,7 +99,7 @@ def OpenCustomizeWindow ():
 	if not (GameCheck.IsBG1() or GameCheck.IsPST()):
 		BiographyButton = CustomizeWindow.GetControl (9)
 		BiographyButton.SetText (18003)
-		BiographyButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBiographyEditWindow)
+		BiographyButton.OnPress (OpenBiographyEditWindow)
 		if not Exportable:
 			BiographyButton.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -114,11 +114,11 @@ def OpenCustomizeWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
 
-	PortraitSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPortraitSelectWindow)
-	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSoundWindow)
-	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenScriptWindow)
-	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CustomizeWindow.Close())
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  lambda: CustomizeWindow.Close()) # FIXME: this should revert changes I assume
+	PortraitSelectButton.OnPress (OpenPortraitSelectWindow)
+	SoundButton.OnPress (OpenSoundWindow)
+	ScriptButton.OnPress (OpenScriptWindow)
+	CustomizeDoneButton.OnPress (lambda: CustomizeWindow.Close())
+	CancelButton.OnPress ( lambda: CustomizeWindow.Close()) # FIXME: this should revert changes I assume
 
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -135,27 +135,27 @@ def OpenPortraitSelectWindow ():
 
 	PortraitLeftButton = SubCustomizeWindow.GetControl (1)
 	PortraitLeftButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitLeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitLeftPress)
+	PortraitLeftButton.OnPress (PortraitLeftPress)
 
 	PortraitRightButton = SubCustomizeWindow.GetControl (2)
 	PortraitRightButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitRightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitRightPress)
+	PortraitRightButton.OnPress (PortraitRightPress)
 
 	PortraitDoneButton = SubCustomizeWindow.GetControl (3)
 	PortraitDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitDonePress)
+	PortraitDoneButton.OnPress (PortraitDonePress)
 	PortraitDoneButton.SetText (11973)
 	PortraitDoneButton.MakeDefault()
 
 	PortraitCancelButton = SubCustomizeWindow.GetControl (4)
 	PortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SubCustomizeWindow.Close())
+	PortraitCancelButton.OnPress (lambda: SubCustomizeWindow.Close())
 	PortraitCancelButton.SetText (13727)
 	PortraitCancelButton.MakeEscape()
 
 	PortraitCustomButton = SubCustomizeWindow.GetControl (5)
 	PortraitCustomButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitCustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenCustomPortraitWindow)
+	PortraitCustomButton.OnPress (OpenCustomPortraitWindow)
 	PortraitCustomButton.SetText (17545)
 
 	# get players gender and portrait
@@ -199,13 +199,13 @@ def OpenCustomPortraitWindow ():
 
 	CustomPortraitDoneButton = Window.GetControl (10)
 	CustomPortraitDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	CustomPortraitDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPortraitDonePress)
+	CustomPortraitDoneButton.OnPress (CustomPortraitDonePress)
 	CustomPortraitDoneButton.SetText (11973)
 	CustomPortraitDoneButton.MakeDefault()
 
 	CustomPortraitCancelButton = Window.GetControl (11)
 	CustomPortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	CustomPortraitCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	CustomPortraitCancelButton.OnPress (lambda: Window.Close())
 	CustomPortraitCancelButton.SetText (13727)
 	CustomPortraitCancelButton.MakeEscape()
 
@@ -328,9 +328,9 @@ def OpenSoundWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
 
-	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlaySoundPressed)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneSoundWindow)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseSoundWindow)
+	PlayButton.OnPress (PlaySoundPressed)
+	DoneButton.OnPress (DoneSoundWindow)
+	CancelButton.OnPress (CloseSoundWindow)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -465,8 +465,8 @@ def OpenScriptWindow ():
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
 
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneScriptWindow)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SubCustomizeWindow.Close())
+	DoneButton.OnPress (DoneScriptWindow)
+	CancelButton.OnPress (lambda: SubCustomizeWindow.Close())
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -540,10 +540,10 @@ def OpenBiographyEditWindow ():
 	TextArea.SetText (BioStrRef)
 	TextArea.Focus ()
 
-	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ClearBiography(TextArea))
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DoneBiographyWindow(TextArea))
-	RevertButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: RevertBiography(TextArea))
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SubCustomizeWindow.Close())
+	ClearButton.OnPress (lambda: ClearBiography(TextArea))
+	DoneButton.OnPress (lambda: DoneBiographyWindow(TextArea))
+	RevertButton.OnPress (lambda: RevertBiography(TextArea))
+	CancelButton.OnPress (lambda: SubCustomizeWindow.Close())
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -583,7 +583,7 @@ def OpenBiographyWindow ():
 	# Done
 	Button = BiographyWindow.GetControl (2)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: BiographyWindow.Close())
+	Button.OnPress (lambda: BiographyWindow.Close())
 
 	BiographyWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -620,8 +620,8 @@ def OpenExportWindow ():
 
 	NameField = ExportWindow.GetControl (6)
 
-	ExportDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportDonePress)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportCancelPress)
+	ExportDoneButton.OnPress (ExportDonePress)
+	CancelButton.OnPress (ExportCancelPress)
 	NameField.OnChange (ExportEditChanged)
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NameField.Focus()

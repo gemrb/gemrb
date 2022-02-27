@@ -58,38 +58,38 @@ def InitOptionsWindow (Window):
 	# Return to Game
 	Button = Window.GetControl (11)
 	Button.SetText (10308)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	# Quit Game
 	Button = Window.GetControl (10)
 	Button.SetText (13731)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuitMsgWindow)
+	Button.OnPress (OpenQuitMsgWindow)
 
 	# Load Game
 	Button = Window.GetControl (5)
 	Button.SetText (13729)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
+	Button.OnPress (LoadGamePress)
 
 	# Save Game
 	Button = Window.GetControl (6)
 	Button.SetText (13730)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSaveMsgWindow)
+	Button.OnPress (OpenSaveMsgWindow)
 
 	# Video Options
 	Button = Window.GetControl (7)
 	Button.SetText (17162)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenVideoOptionsWindow)
+	Button.OnPress (OpenVideoOptionsWindow)
 
 	# Audio Options
 	Button = Window.GetControl (8)
 	Button.SetText (17164)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenAudioOptionsWindow)
+	Button.OnPress (OpenAudioOptionsWindow)
 
 	# Gameplay Options
 	Button = Window.GetControl (9)
 	Button.SetText (17165)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenGameplayOptionsWindow)
+	Button.OnPress (OpenGameplayOptionsWindow)
 
 	# game version, e.g. v1.1.0000
 	VersionLabel = Window.GetControl (0x1000000b)
@@ -99,12 +99,12 @@ def InitOptionsWindow (Window):
 		# Keyboard shortcuts
 		KeyboardButton = Window.GetControl (13)
 		KeyboardButton.SetText (33468)
-		KeyboardButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenHotkeyOptionsWindow)
+		KeyboardButton.OnPress (OpenHotkeyOptionsWindow)
 
 		# Movies
 		MoviesButton = Window.GetControl (14)
 		MoviesButton.SetText (15415)
-		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMovieWindow)
+		MoviesButton.OnPress (OpenMovieWindow)
 
 	return
 
@@ -427,9 +427,9 @@ def OpenMovieWindow ():
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
-	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePlayPress)
-	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.PlayMovie("CREDITS"))
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	PlayButton.OnPress (MoviePlayPress)
+	CreditsButton.OnPress (lambda: GemRB.PlayMovie("CREDITS"))
+	DoneButton.OnPress (lambda: Window.Close())
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -481,7 +481,7 @@ def OpenQuitMsgWindow ():
 	# Save
 	Button = Window.GetControl (0)
 	Button.SetText (15589)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SaveGamePress)
+	Button.OnPress (SaveGamePress)
 	if GemRB.GetView("GC") is not None:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -490,13 +490,13 @@ def OpenQuitMsgWindow ():
 	# Quit Game
 	Button = Window.GetControl (1)
 	Button.SetText (15417)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGamePress)
+	Button.OnPress (QuitGamePress)
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
+	Button.OnPress (CloseQuitMsgWindow)
 	Button.MakeEscape()
 
 	# Do you wish to save the game ....

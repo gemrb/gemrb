@@ -284,16 +284,16 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		if SkillsOffsetPress != -1:
 			Button = SkillsWindow.GetControl(i+SkillsOffsetPress)
 			Button.SetVarAssoc("Skill",SkillsIndices[i])
-			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillJustPress)
+			Button.OnPress (SkillJustPress)
 
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillLeftPress)
+		Button.OnPress (SkillLeftPress)
 		Button.SetActionInterval(20);
 
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1+1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillRightPress)
+		Button.OnPress (SkillRightPress)
 		Button.SetActionInterval(20);
 	
 	SkillsRedraw ()

@@ -51,9 +51,9 @@ def OnLoad ():
 	CancelButton.SetText (12896)
 	CancelButton.MakeEscape()
 
-	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OkPress)
-	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearBiography)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	OkButton.OnPress (OkPress)
+	ClearButton.OnPress (ClearBiography)
+	CancelButton.OnPress (CancelPress)
 	EditTextArea.Focus ()
 	return
 

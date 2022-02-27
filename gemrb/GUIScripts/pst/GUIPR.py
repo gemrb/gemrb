@@ -37,10 +37,10 @@ def InitPriestWindow (Window):
 	PriestSpellWindow = Window
 
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
+	Button.OnPress (PriestPrevLevelPress)
 
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestNextLevelPress)
+	Button.OnPress (PriestNextLevelPress)
 
 	# Setup memorized spells buttons
 	for i in range (12):
@@ -86,9 +86,9 @@ def UpdatePriestWindow (Window):
 			Icon.SetSpellIcon (ms['SpellResRef'])
 			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			if ms['Flags']:
-				Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellUnmemorizeWindow)
+				Icon.OnPress (OpenPriestSpellUnmemorizeWindow)
 			else:
-				Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestUnmemorizeSpell)
+				Icon.OnPress (OnPriestUnmemorizeSpell)
 			Icon.OnRightPress (OpenPriestSpellInfoWindow)
 			spell = GemRB.GetSpell (ms['SpellResRef'])
 			Icon.SetTooltip (spell['SpellName'])
@@ -100,7 +100,7 @@ def UpdatePriestWindow (Window):
 				Icon.SetSprites ("IVSLOT", 0,  0, 0, 0, 0)
 			else:
 				Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Icon.OnPress (None)
 			Icon.OnRightPress (None)
 			Icon.SetTooltip ('')
 			Icon.EnableBorder (0, 0)
@@ -114,7 +114,7 @@ def UpdatePriestWindow (Window):
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Icon.SetSpellIcon (ks['SpellResRef'])
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestMemorizeSpell)
+		Icon.OnPress (OnPriestMemorizeSpell)
 		Icon.OnRightPress (OpenPriestSpellInfoWindow)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
 		Icon.SetTooltip (spell['SpellName'])
@@ -125,7 +125,7 @@ def UpdatePriestWindow (Window):
 	for i in range (i + 1, btncount):
 		Icon = Window.GetControl (14 + i)
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Icon.OnPress (None)
 		Icon.OnRightPress (None)
 		Icon.SetTooltip ('')
 
@@ -155,7 +155,7 @@ def OpenPriestSpellInfoWindow ():
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
@@ -210,13 +210,13 @@ def OpenPriestSpellUnmemorizeWindow (btn):
 		Window.Close()
 
 	Button.SetValue (btn.Value)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Unmemorize)
+	Button.OnPress (Unmemorize)
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)

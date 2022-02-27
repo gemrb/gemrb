@@ -39,19 +39,19 @@ def OnLoad ():
 
 	CancelButton=LoadWindow.GetControl (22)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: LoadWindow.Close())
+	CancelButton.OnPress (lambda: LoadWindow.Close())
 	CancelButton.MakeEscape()
 
 	for i in range (5):
 		Button = LoadWindow.GetControl (55+i)
 		Button.SetText (15590)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
+		Button.OnPress (LoadGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetValue (i)
 
 		Button = LoadWindow.GetControl (60+i)
 		Button.SetText (13957)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGamePress)
+		Button.OnPress (DeleteGamePress)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetValue (i)
 
@@ -161,11 +161,11 @@ def DeleteGamePress (btn):
 	Text.SetText (15305)
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (13957)
-	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
+	DeleteButton.OnPress (DeleteGameConfirm)
 	DeleteButton.SetValue (btn.Value)
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
+	CancelButton.OnPress (DeleteGameCancel)
 	CancelButton.MakeEscape()
 
 	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)

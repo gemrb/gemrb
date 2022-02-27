@@ -305,16 +305,16 @@ def OpenFeatsWindow(chargen=0):
 	for i in range(ButtonCount):
 		Button = FeatWindow.GetControl(i+93)
 		Button.SetVarAssoc("Feat",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
+		Button.OnPress (JustPress)
 
 		Button = FeatWindow.GetControl(i*2+14)
 		Button.SetVarAssoc("Feat",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.OnPress (LeftPress)
 		Button.SetActionInterval (200)
 
 		Button = FeatWindow.GetControl(i*2+15)
 		Button.SetVarAssoc("Feat",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.OnPress (RightPress)
 		Button.SetActionInterval (200)
 		for j in range(5):
 			Star=FeatWindow.GetControl(i*5+j+36)
@@ -325,7 +325,7 @@ def OpenFeatsWindow(chargen=0):
 		BackButton = FeatWindow.GetControl(105)
 		BackButton.SetText(15416)
 		BackButton.MakeEscape()
-		BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+		BackButton.OnPress (BackPress)
 	else:
 		FeatWindow.DeleteControl (105)
 
@@ -344,7 +344,7 @@ def OpenFeatsWindow(chargen=0):
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10)
 	FeatWindow.SetEventProxy(ScrollBarControl)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
+	DoneButton.OnPress (NextPress)
 	RedrawFeats()
 
 	if not CharGen:

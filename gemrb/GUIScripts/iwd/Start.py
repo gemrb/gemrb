@@ -81,12 +81,12 @@ def OnLoad ():
 	JoinGameButton.SetText (13964)
 	MoviesButton.SetText (15415)
 	QuitGameButton.SetText (13731)
-	QuitGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
+	QuitGameButton.OnPress (QuitPress)
 	QuitGameButton.MakeEscape ()
-	ProtocolButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProtocolPress)
-	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
-	LoadGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadPress)
-	CreateGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreatePress)
+	ProtocolButton.OnPress (ProtocolPress)
+	MoviesButton.OnPress (MoviesPress)
+	LoadGameButton.OnPress (LoadPress)
+	CreateGameButton.OnPress (CreatePress)
 	StartWindow.Focus ()
 	GemRB.LoadMusicPL("Theme.mus",1)
 	
@@ -129,7 +129,7 @@ def ProtocolPress ():
 	
 	DoneButton = ProtocolWindow.GetControl (6)
 	DoneButton.SetText (11973)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ProtocolWindow.Close())
+	DoneButton.OnPress (lambda: ProtocolWindow.Close())
 	DoneButton.MakeEscape()
 	
 	ProtocolWindow.ShowModal (1)
@@ -161,23 +161,23 @@ def CreatePress ():
 
 	CancelButton = GameTypeWindow.GetControl (1)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GameTypeWindow.Close())
+	CancelButton.OnPress (lambda: GameTypeWindow.Close())
 	CancelButton.MakeEscape()
 
 	DoneButton = GameTypeWindow.GetControl (2)
 	DoneButton.SetText (11973)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GameTypeDonePress(GameTypeWindow))
+	DoneButton.OnPress (lambda: GameTypeDonePress(GameTypeWindow))
 	DoneButton.MakeDefault()
 
 	FullGameButton = GameTypeWindow.GetControl (4)
 	FullGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	FullGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeChange)
+	FullGameButton.OnPress (GameTypeChange)
 	FullGameButton.SetText (24869)
 	FullGameButton.SetAction(GameTypeChange, IE_ACT_VALUE_CHANGE)
 
 	ExpansionGameButton = GameTypeWindow.GetControl (5)
 	ExpansionGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	ExpansionGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeChange)
+	ExpansionGameButton.OnPress (GameTypeChange)
 	ExpansionGameButton.SetText (24871)
 	ExpansionGameButton.SetAction(GameTypeChange, IE_ACT_VALUE_CHANGE)
 
@@ -215,11 +215,11 @@ def GameTypeDonePress(win):
 
 		YesButton = GameType2Window.GetControl (1)
 		YesButton.SetText (13912)
-		YesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, confirm)
+		YesButton.OnPress (confirm)
 
 		NoButton = GameType2Window.GetControl (2)
 		NoButton.SetText (13913)
-		NoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GameType2Window.Close())
+		NoButton.OnPress (lambda: GameType2Window.Close())
 		NoButton.MakeEscape()
 
 		def cancel():
@@ -228,7 +228,7 @@ def GameTypeDonePress(win):
 
 		CancelButton = GameType2Window.GetControl (3)
 		CancelButton.SetText (13727)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, cancel)
+		CancelButton.OnPress (cancel)
 		CancelButton.MakeEscape()
 
 		GameType2Window.ShowModal(1)
@@ -250,12 +250,12 @@ def QuitPress ():
 	QuitWindow = GemRB.LoadWindow (22, "GUICONN")
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	CancelButton.OnPress (lambda: QuitWindow.Close())
 	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl (1)
 	QuitButton.SetText (15417)
-	QuitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	QuitButton.OnPress (lambda: GemRB.Quit())
 	QuitButton.MakeDefault()
 
 	TextArea = QuitWindow.GetControl (0)

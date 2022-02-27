@@ -139,32 +139,32 @@ def OpenFloatMenuWindow (x=0, y=0):
 
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectNextPC)
+	Button.OnPress (FloatMenuSelectNextPC)
 	Button.OnRightPress (lambda: Window.Close ())
 
 	# Initiate Dialogue
 	Button = Window.GetControl (CID_DIALOG)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectDialog)
+	Button.OnPress (FloatMenuSelectDialog)
 	Button.SetTooltip (8191)
 
 	# Attack/Select Weapon
 	Button = Window.GetControl (CID_WEAPONS)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectWeapons)
+	Button.OnPress (FloatMenuSelectWeapons)
 	Button.SetTooltip (8192)
 
 	# Cast spell
 	Button = Window.GetControl (CID_SPELLS)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectSpells)
+	Button.OnPress (FloatMenuSelectSpells)
 	Button.SetTooltip (8193)
 
 	# Use Item
 	Button = Window.GetControl (CID_ITEMS)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectItems)
+	Button.OnPress (FloatMenuSelectItems)
 	Button.SetTooltip (8194)
 
 	# Use Special Ability
 	Button = Window.GetControl (CID_ABILITIES)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectAbilities)
+	Button.OnPress (FloatMenuSelectAbilities)
 	Button.SetTooltip (8195)
 
 	# Menu Anchors/Handles
@@ -176,12 +176,12 @@ def OpenFloatMenuWindow (x=0, y=0):
 	# Rotate Items left (to begin)
 	Button = Window.GetControl (CID_PREV)
 	Button.SetTooltip (8197)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuPreviousItem)
+	Button.OnPress (FloatMenuPreviousItem)
 
 	# Rotate Items right (to end)
 	Button = Window.GetControl (CID_NEXT)
 	Button.SetTooltip (8198)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuNextItem)
+	Button.OnPress (FloatMenuNextItem)
 
 	# 6 - 10 - items/spells/other
 	for i in range (CID_ABILITIES + 1, CID_HANDLE1):
@@ -312,7 +312,7 @@ def UpdateFloatMenuSingleAction (i):
 	Button.SetTooltip (butts[i][1])
 	Button.SetText ('')
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoSingleAction)
+	Button.OnPress (DoSingleAction)
 
 
 def UpdateFloatMenuGroupAction (i):
@@ -389,7 +389,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		else:
 			Button.SetTooltip (item['ItemNameIdentified'])
 		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItem)
+		Button.OnPress (SelectItem)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		#Button.SetVarAssoc ('ItemButton', i)
 		return
@@ -427,7 +427,7 @@ def UpdateFloatMenuSpell (pc, i):
 
 		spell = GemRB.GetSpell (SpellResRef)
 		Button.SetTooltip (spell['SpellName'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.SpellPressed)
+		Button.OnPress (GUICommonWindows.SpellPressed)
 		Button.SetVarAssoc ("Spell", spell_list[i + float_menu_index]['SpellIndex'])
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	elif i < 3 and GemRB.GetPlayerStat (pc, IE_CLASS) == 9:
@@ -435,7 +435,7 @@ def UpdateFloatMenuSpell (pc, i):
 		thieving = [ ACT_SEARCH, ACT_THIEVING, ACT_STEALTH ]
 		acts = [ GUICommonWindows.ActionSearchPressed, GUICommonWindows.ActionThievingPressed, GUICommonWindows.ActionStealthPressed ]
 		Button.SetActionIcon (globals(), thieving[i])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, acts[i])
+		Button.OnPress (acts[i])
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		ClearSlot (i)

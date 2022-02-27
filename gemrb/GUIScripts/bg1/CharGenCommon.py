@@ -78,7 +78,7 @@ class CharGen:
 				if i == step:
 					button.SetState(IE_GUI_BUTTON_ENABLED)
 					button.MakeDefault()
-					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.next())
+					button.OnPress (lambda: self.next())
 				else:
 					button.SetState(IE_GUI_BUTTON_DISABLED)
 			i = i + 1
@@ -90,7 +90,7 @@ class CharGen:
 			BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			BackButton.SetState(IE_GUI_BUTTON_DISABLED)
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.back())
+		BackButton.OnPress (lambda: self.back())
 		BackButton.MakeEscape()
 
 		AcceptButton = CharGenWindow.GetControl (8)
@@ -108,7 +108,7 @@ class CharGen:
 		ImportButton = CharGenWindow.GetControl (13)
 		ImportButton.SetText (13955)
 		ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.imprt())
+		ImportButton.OnPress (lambda: self.imprt())
 
 		#set cancel and start over
 		CancelButton = CharGenWindow.GetControl (15)
@@ -117,7 +117,7 @@ class CharGen:
 		else:
 			CancelButton.SetText (8159) # Start over
 		CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.cancel())
+		CancelButton.OnPress (lambda: self.cancel())
 
 		#set and fill overview
 		TextAreaControl = CharGenWindow.GetControl (9)

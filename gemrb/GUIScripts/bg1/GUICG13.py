@@ -70,22 +70,22 @@ def OnLoad():
 
 	HairButton = ColorWindow.GetControl(2)
 	HairButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	HairButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, HairPress)
+	HairButton.OnPress (HairPress)
 	HairButton.SetBAM("COLGRAD", 0, 0, HairColor)
 
 	SkinButton = ColorWindow.GetControl(3)
 	SkinButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	SkinButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkinPress)
+	SkinButton.OnPress (SkinPress)
 	SkinButton.SetBAM("COLGRAD", 0, 0, SkinColor)
 
 	MajorButton = ColorWindow.GetControl(5)
 	MajorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	MajorButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MajorPress)
+	MajorButton.OnPress (MajorPress)
 	MajorButton.SetBAM("COLGRAD", 0, 0, MinorColor)
 
 	MinorButton = ColorWindow.GetControl(4)
 	MinorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
-	MinorButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MinorPress)
+	MinorButton.OnPress (MinorPress)
 	MinorButton.SetBAM("COLGRAD", 0, 0, MajorColor)
 
 	BackButton = ColorWindow.GetControl(13)
@@ -94,8 +94,8 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(ColorWindow))
+	DoneButton.OnPress (NextPress)
+	BackButton.OnPress (lambda: CharGenCommon.back(ColorWindow))
 	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 	ColorWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -151,7 +151,7 @@ def GetColor():
 			GemRB.SetVar("Selected",i)
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
+		Button.OnPress (DonePress)
 	
 	ColorPicker.ShowModal(MODAL_SHADOW_NONE)
 	return

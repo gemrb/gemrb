@@ -294,7 +294,7 @@ def DisplayItem (slotItem, itemtype):
 	#middle button
 	Button = Window.GetControl (4)
 	Button.SetText (strrefs[0])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseItemInfoWindow)
+	Button.OnPress (CloseItemInfoWindow)
 	Button.MakeDefault()
 
 	#textarea
@@ -312,17 +312,17 @@ def DisplayItem (slotItem, itemtype):
 
 	if itemtype & 2:
 		Button.SetText (strrefs[1])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyItemWindow)
+		Button.OnPress (IdentifyItemWindow)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	elif select and not GameCheck.IsPST():
 		Button.SetText (strrefs[2])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesItemWindow)
+		Button.OnPress (AbilitiesItemWindow)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	else:
 		Button.SetText ("")
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.OnPress (None)
 
 	# description icon (not present in iwds)
 	if not GameCheck.IsIWD1() and not GameCheck.IsIWD2():
@@ -367,10 +367,10 @@ def DisplayItem (slotItem, itemtype):
 	if drink and not dialog:
 		# Standard consumable item
 		Button.SetText (strrefs[3])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConsumeItem)
+		Button.OnPress (ConsumeItem)
 	elif read:
 		Button.SetText (strrefs[4])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReadItemWindow)
+		Button.OnPress (ReadItemWindow)
 	elif container:
 		# Just skip the redundant info page and go directly to the container
 		if GemRB.GetVar("GUIEnhancements")&GE_ALWAYS_OPEN_CONTAINER_ITEMS:
@@ -383,7 +383,7 @@ def DisplayItem (slotItem, itemtype):
 		else:
 			# a fallback, since the originals have nothing appropriate from not having any bags
 			Button.SetText ("Open container")
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemWindow)
+		Button.OnPress (OpenItemWindow)
 	elif dialog:
 		if drink:
 			# Dialog item that is 'used'
@@ -391,17 +391,17 @@ def DisplayItem (slotItem, itemtype):
 		else:
 			# Dialog item that is 'talked to'
 			Button.SetText (strrefs[5])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DialogItemWindow)
+		Button.OnPress (DialogItemWindow)
 	elif familiar and not GameCheck.IsPST():
 		# PST earings share a type with familiars, so no
 		# mods that allow familiars would be possible in PST
 		Button.SetText (4373)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReleaseFamiliar)
+		Button.OnPress (ReleaseFamiliar)
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetText ("")
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.OnPress (None)
 
 	Label = Window.GetControl(0x1000000b)
 	if Label:
@@ -416,11 +416,11 @@ def DisplayItem (slotItem, itemtype):
 
 		#left scroll
 		Button = Window.GetControl (13)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CycleDisplayItem(-1))
+		Button.OnPress (lambda: CycleDisplayItem(-1))
 
 		#right scroll
 		Button = Window.GetControl (14)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CycleDisplayItem(1))
+		Button.OnPress (lambda: CycleDisplayItem(1))
 
 	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
@@ -560,24 +560,24 @@ def OpenItemAmountWindow (btn, location = "inventory"):
 
 	# Decrease
 	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreaseStackAmount)
+	Button.OnPress (DecreaseStackAmount)
 	Button.SetActionInterval (200)
 
 	# Increase
 	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreaseStackAmount)
+	Button.OnPress (IncreaseStackAmount)
 	Button.SetActionInterval (200)
 
 	# Done
 	Button = Window.GetControl (2)
 	Button.SetText (strings['Done'])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DragItemAmount(slot_item, location))
+	Button.OnPress (lambda: DragItemAmount(slot_item, location))
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (strings['Cancel'])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -642,12 +642,12 @@ def UpdateSlot (pc, slot):
 
 	if slot_item:
 		Button.SetAction(OnDragItem, IE_ACT_DRAG_DROP_CRT)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
+		Button.OnPress (OnDragItem)
 		Button.OnRightPress (lambda: OpenItemInfoWindow (slot + 1))
 		Button.OnShiftPress (OpenItemAmountWindow)
 		#If the slot is being used to display the 'default' weapon, disable dragging.
 		if SlotType["ID"] == 10 and using_fists:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.OnPress (None)
 			#dropping is ok, because it will drop in the quick weapon slot and not the default weapon slot.
 	else:
 		if SlotType["ResRef"]=="*":
@@ -672,7 +672,7 @@ def UpdateSlot (pc, slot):
 			Button.SetTooltip ("")
 			itemname = ""
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.OnPress (None)
 		Button.OnRightPress (None)
 		Button.OnShiftPress (None)
 		Button.OnDoublePress (OpenItemAmountWindow)
@@ -766,7 +766,7 @@ def GetColor():
 	GemRB.SetVar ("Selected",-1)
 	if GameCheck.IsIWD2 () or GameCheck.IsGemRBDemo ():
 		Button = ColorPicker.GetControl (35)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelColor)
+		Button.OnPress (CancelColor)
 		Button.SetText (103)
 		if GameCheck.IsIWD2 ():
 			Button.SetText (13727)
@@ -786,7 +786,7 @@ def GetColor():
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("Selected",i)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ColorDonePress)
+		Button.OnPress (ColorDonePress)
 	ColorPicker.Focus()
 	return
 
@@ -822,7 +822,7 @@ def OpenErrorWindow (strref):
 		Button.SetText (1403)
 	else:
 		Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseErrorWindow)
+	Button.OnPress (CloseErrorWindow)
 	Button.MakeDefault()
 
 	TextArea = Window.GetControl (3)
@@ -974,7 +974,7 @@ def IdentifyItemWindow ():
 		Button.SetText (4259)
 	else:
 		Button.SetText (17105)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyUseSpell)
+	Button.OnPress (IdentifyUseSpell)
 	if not GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -983,7 +983,7 @@ def IdentifyItemWindow ():
 		Button.SetText (4260)
 	else:
 		Button.SetText (17106)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyUseScroll)
+	Button.OnPress (IdentifyUseScroll)
 	if not GemRB.HasSpecialItem (pc, 1, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -992,7 +992,7 @@ def IdentifyItemWindow ():
 		Button.SetText (4196)
 	else:
 		Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseIdentifyItemWindow)
+	Button.OnPress (CloseIdentifyItemWindow)
 	Button.MakeEscape()
 
 	TextArea = Window.GetControl (3)
@@ -1053,12 +1053,12 @@ def AbilitiesItemWindow ():
 
 	Button = Window.GetControl (7)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DoneAbilitiesItemWindow)
+	Button.OnPress (DoneAbilitiesItemWindow)
 	Button.MakeDefault()
 
 	Button = Window.GetControl (10)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseAbilitiesItemWindow)
+	Button.OnPress (CloseAbilitiesItemWindow)
 	Button.MakeEscape()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

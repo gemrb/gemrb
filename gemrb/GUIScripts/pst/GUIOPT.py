@@ -50,7 +50,7 @@ def InitOptionsWindow (Window):
 
 	def ConfigOptButton(button, strref, action):
 		button.SetText (strref)
-		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+		button.OnPress (action)
 
 	# Return to Game
 	ConfigOptButton(Window.GetControl (0), 28638, lambda: Window.Close())
@@ -64,7 +64,7 @@ def InitOptionsWindow (Window):
 	LoadGameString = GemRB.GetString (2592)
 	NewString = " ".join(LoadGameString.split())
 	LoadButton.SetText (NewString)
-	LoadButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
+	LoadButton.OnPress (OpenLoadMsgWindow)
 
 	# Save Game
 	ConfigOptButton(Window.GetControl (3), 20639, GUISAVE.OpenSaveWindow)
@@ -289,12 +289,12 @@ def OpenLoadMsgWindow ():
 	# Load
 	Button = Window.GetControl (0)
 	Button.SetText (28648)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGame)
+	Button.OnPress (LoadGame)
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)
@@ -317,7 +317,7 @@ def OpenQuitMsgWindow ():
 	# Save
 	Button = Window.GetControl (0)
 	Button.SetText (28645)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SaveGame)
+	Button.OnPress (SaveGame)
 	if GemRB.GetView("GC") is not None:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -326,12 +326,12 @@ def OpenQuitMsgWindow ():
 	# Quit Game
 	Button = Window.GetControl (1)
 	Button.SetText (2595)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGame)
+	Button.OnPress (QuitGame)
 
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	# The game has not been saved ....
@@ -381,18 +381,18 @@ def OpenKeyboardMappingsWindow ():
 	# Default
 	Button = Window.GetControl (3)
 	Button.SetText (49051)
-	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+	#Button.OnPress (None)
 
 	# Done
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	keys_setup_page (Window, 0)
@@ -460,17 +460,17 @@ def OpenMoviesWindow ():
 	# Play Movie
 	Button = Window.GetControl (2)
 	Button.SetText (33034)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPlayMoviePress)
+	Button.OnPress (OnPlayMoviePress)
 
 	# Credits
 	Button = Window.GetControl (3)
 	Button.SetText (33078)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnCreditsPress)
+	Button.OnPress (OnCreditsPress)
 
 	# Done
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.OnPress (lambda: Window.Close())
 
 	# movie list
 	List = Window.GetControl (0)
@@ -498,7 +498,7 @@ def OnCreditsPress ():
 def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_strref, action):
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
-	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
+	button.OnPress (action)
 	button.OnMouseEnter (lambda: help_ta.SetText (ctlname))
 	button.OnMouseLeave (lambda: help_ta.SetText (winname))
 

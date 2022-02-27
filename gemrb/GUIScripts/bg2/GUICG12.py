@@ -77,11 +77,11 @@ def OnLoad():
 	DoneButton.SetText (11973)
 	DoneButton.MakeDefault()
 
-	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RightPress)
-	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeftPress)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
-	CustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPress)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
+	RightButton.OnPress (RightPress)
+	LeftButton.OnPress (LeftPress)
+	BackButton.OnPress (BackPress)
+	CustomButton.OnPress (CustomPress)
+	DoneButton.OnPress (NextPress)
 	
 	Flag = False
 	while True:
@@ -210,12 +210,12 @@ def CustomPress():
 
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomDone)
+	Button.OnPress (CustomDone)
 	Button.SetDisabled (True)
 
 	Button = Window.GetControl (7)
 	Button.SetText (15416)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomAbort)
+	Button.OnPress (CustomAbort)
 
 	Button = Window.GetControl (0)
 	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"M"

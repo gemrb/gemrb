@@ -66,7 +66,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 
 	# create the done button
 	HLADoneButton = HLAWindow.GetControl (28)
-	HLADoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, HLADonePress)
+	HLADoneButton.OnPress (HLADonePress)
 	HLADoneButton.SetText(11973)
 	HLADoneButton.MakeDefault()
 	if HLACount:
@@ -170,7 +170,7 @@ def HLAShowAbilities ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetSpellIcon(HLARef, 1)
 		SpellButton.SetVarAssoc("ButtonPressed", i)
-		SpellButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, HLASelectPress)
+		SpellButton.OnPress (HLASelectPress)
 		SpellButton.SetSprites("GUIBTBUT", 0,0,1,2,3)
 		SpellButton.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 
