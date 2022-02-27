@@ -255,7 +255,6 @@ class GControl(GView):
 	# map old event identifiers to new action system
 	EventMap = {
 		IE_GUI_BUTTON_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1),
-		IE_GUI_BUTTON_ON_SHIFT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 1, 1),
 	}
 
 	def SetEvent(self, event, handler):
@@ -363,6 +362,9 @@ class GButton(GControl):
 
 	def OnRightPress(self, handler):
 		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)
+
+	def OnShiftPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 1, 1)
 
 	def OnDoublePress(self, handler):
 		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)

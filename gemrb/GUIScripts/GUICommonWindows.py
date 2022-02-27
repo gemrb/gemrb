@@ -1665,7 +1665,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			Button.OnRightPress (PortraitButtonOnPress)
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
+		Button.OnShiftPress (PortraitButtonOnShiftPress)
 		Button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		Button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 

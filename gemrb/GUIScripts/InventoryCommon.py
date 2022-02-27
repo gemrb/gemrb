@@ -644,7 +644,7 @@ def UpdateSlot (pc, slot):
 		Button.SetAction(OnDragItem, IE_ACT_DRAG_DROP_CRT)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
 		Button.OnRightPress (lambda: OpenItemInfoWindow (slot + 1))
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
+		Button.OnShiftPress (OpenItemAmountWindow)
 		#If the slot is being used to display the 'default' weapon, disable dragging.
 		if SlotType["ID"] == 10 and using_fists:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -674,7 +674,7 @@ def UpdateSlot (pc, slot):
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.OnRightPress (None)
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		Button.OnShiftPress (None)
 		Button.OnDoublePress (OpenItemAmountWindow)
 
 	if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
