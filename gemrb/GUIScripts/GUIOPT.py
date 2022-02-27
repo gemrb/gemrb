@@ -233,9 +233,8 @@ def OpenCharacterSoundsWindow ():
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
 
-	CloseCharacterSoundsWindow = lambda: Window.Close()
-	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
-	GUIOPTControls.OptCancel (CloseCharacterSoundsWindow, Window, 25)
+	GUIOPTControls.OptDone (Window.Close, Window, 24)
+	GUIOPTControls.OptCancel (Window.Close, Window, 25)
 
 	GUIOPTControls.OptCheckbox (18041, 18015, HelpTextArea2, Window, 5, 20, 17138, 'Subtitles')
 	GUIOPTControls.OptCheckbox (18041, 18013, HelpTextArea2, Window, 6, 18, 17139, 'Attack Sounds')
@@ -334,9 +333,8 @@ def OpenFeedbackOptionsWindow ():
 
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
-	CloseFeedbackOptionsWindow = lambda: Window.Close()
-	GUIOPTControls.OptDone (CloseFeedbackOptionsWindow, Window, 26)
-	GUIOPTControls.OptCancel (CloseFeedbackOptionsWindow, Window, 27)
+	GUIOPTControls.OptDone (Window.Close, Window, 26)
+	GUIOPTControls.OptCancel (Window.Close, Window, 27)
 
 	GUIOPTControls.OptSlider (18043, 18024, HelpTextArea2, Window, 8, 30, 13688, 'Circle Feedback', DisplayHelpMarkerFeedback)
 	GUIOPTControls.OptSlider (18043, 18025, HelpTextArea2, Window, 9, 31, 17769, 'Locator Feedback Level')
@@ -375,9 +373,8 @@ def OpenAutopauseOptionsWindow ():
 
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
-	CloseAutopauseOptionsWindow = lambda: Window.Close()
-	GUIOPTControls.OptDone (CloseAutopauseOptionsWindow, Window, 11)
-	GUIOPTControls.OptCancel (CloseAutopauseOptionsWindow, Window, 14)
+	GUIOPTControls.OptDone (Window.Close, Window, 11)
+	GUIOPTControls.OptCancel (Window.Close, Window, 14)
 
 	# checkboxes OR the values if they associate to the same variable
 	GUIOPTControls.OptCheckbox (18044, 18032, HelpTextArea2, Window, 1, 17, 17155, 'Auto Pause State', None, 4) # hit
