@@ -196,7 +196,6 @@ static void GetSlider(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 	str->ReadWord(knob);
 	str->ReadWord(grabbedKnob);
 	str->ReadPoint(knobPos);
-	str->ReadWord(knob);
 	str->ReadWord(knobStep);
 	str->ReadWord(knobStepsCount);
 	// ee documents 4 more words: ActiveBarTop, bottom, left, right
