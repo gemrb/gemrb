@@ -353,7 +353,7 @@ def InitStoreShoppingWindow (Window):
 		color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 		Button.SetBorder (1, color, 0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, lambda: OpenItemAmountWindow(Window))
+		Button.OnDoublePress (lambda: OpenItemAmountWindow(Window))
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -365,7 +365,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
-			Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, lambda: OpenBag(Window))
+			Button.OnDoublePress (lambda: OpenBag(Window))
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
