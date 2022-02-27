@@ -59,7 +59,8 @@ private:
 	
 	/** returns the speaker's color and name */
 	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
-	
+	/** displays a string in the textarea, starting with speaker's name */
+	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
 public:
 	static ieStrRef GetStringReference(size_t);
 	static bool HasStringReference(size_t);
@@ -78,9 +79,8 @@ public:
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
 	void DisplayConstantStringAction(size_t stridx, unsigned char color, const Scriptable *actor, const Scriptable *target) const;	
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(ieStrRef stridx, unsigned char color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	void DisplayStringName(String text, unsigned char color, const Scriptable *speaker) const;
-	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
+	void DisplayStringName(ieStrRef stridx, unsigned char color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
 	void DisplayConstantStringNameValue(size_t stridx, unsigned char color, const Scriptable *speaker, int value) const;
