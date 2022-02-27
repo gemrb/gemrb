@@ -56,7 +56,7 @@ def InitMapWindow (Window):
 	Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 	Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
 
-	Map.SetEvent (IE_GUI_MAP_ON_PRESS, SetMapNote)
+	Map.OnPress (SetMapNote)
 	Map.SetAction(lambda: Window.Close (), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
@@ -96,7 +96,7 @@ def OpenTravelWindow ():
 	WMap.Scroll (0,0)
 	WMap.Focus()
 	if Travel != -1:
-		WMap.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
+		WMap.OnPress (GUIMACommon.MoveToNewArea)
 
 	# Done
 	Button = Window.GetControl (0)

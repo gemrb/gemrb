@@ -269,9 +269,6 @@ class GControl(GView):
 		IE_GUI_TEXTAREA_ON_SELECT: lambda control, handler: control.SetAction(handler, IE_GUI_TEXTAREA_ON_SELECT),
 		IE_GUI_LABEL_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1),
 		IE_GUI_SCROLLBAR_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
-		IE_GUI_WORLDMAP_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1),
-		IE_GUI_MAP_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1),
-		IE_GUI_MAP_ON_RIGHT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)
 	}
 
 	def SetEvent(self, event, handler):
@@ -357,6 +354,16 @@ class GWorldMap(GControl, Scrollable):
 	methods = {
 		'GetDestinationArea': _GemRB.WorldMap_GetDestinationArea
 	}
+
+	def OnPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1)
+
+class GMap(GControl):
+	def OnPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1)
+
+	def OnRightPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)
 
 @add_metaclass(metaIDWrapper)
 class GSaveGame:

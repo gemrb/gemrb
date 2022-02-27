@@ -64,7 +64,7 @@ def ShowMap ():
 	
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 
-	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
+	Map.OnPress (RevealMap)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	GemRB.GamePause (0,0)
@@ -104,7 +104,7 @@ def InitMapWindow (Window):
 
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
-		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
+		Map.OnRightPress (AddNoteWindow)
 		Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
 
 	Map.Focus()
@@ -127,7 +127,7 @@ def InitWorldMapWindow (Window):
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont", "WMDAG")
 
 	WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
-	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
+	WorldMapControl.OnPress (GUIMACommon.MoveToNewArea)
 	WorldMapControl.SetAction(ChangeTooltip, IE_ACT_MOUSE_ENTER)
 	# center on current area
 	MapC()

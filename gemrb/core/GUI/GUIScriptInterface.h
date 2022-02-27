@@ -91,6 +91,8 @@ public:
 				return "ScrollBar";
 			case IE_GUI_WORLDMAP:
 				return "WorldMap";
+			case IE_GUI_MAP:
+				return "Map";
 			default:
 				return "Control";
 		}
