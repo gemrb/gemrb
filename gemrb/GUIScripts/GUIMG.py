@@ -464,11 +464,11 @@ def OpenSequencerWindow ():
 		TargSelect.SetPos (-1,-1)
 		TargLabel.SetPos (-1,-1)
 	else:
-		CondSelect.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, ContingencyHelpCondition)
+		CondSelect.OnSelect (ContingencyHelpCondition)
 		CondSelect.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 		CondSelect.SetOptions ([elem[0] for elem in ContCond], "ContCond", 0)
 
-		TargSelect.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, ContingencyHelpTarget)
+		TargSelect.OnSelect (ContingencyHelpTarget)
 		TargSelect.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 		if Target:
 			TargSelect.SetOptions ([ContTarg[0][0]], "ContTarg", 1)

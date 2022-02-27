@@ -50,7 +50,7 @@ def OnLoad():
 	TextAreaControl.SetText(17236)
 
 	TextAreaControl = SoundWindow.GetControl(45)
-	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectSound)
+	TextAreaControl.OnSelect (SelectSound)
 
 	TextAreaControl.ListResources (CHR_SOUNDS)
 	if GemRB.GetVar ("Gender") == 2:

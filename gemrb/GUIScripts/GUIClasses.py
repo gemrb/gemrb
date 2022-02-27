@@ -263,8 +263,6 @@ class GControl(GView):
 		IE_GUI_EDIT_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
 		IE_GUI_EDIT_ON_DONE: lambda control, handler: control.SetAction(handler, IE_ACT_CUSTOM),
 		IE_GUI_EDIT_ON_CANCEL: lambda control, handler: control.SetAction(handler, IE_ACT_CUSTOM+1),
-		IE_GUI_TEXTAREA_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
-		IE_GUI_TEXTAREA_ON_SELECT: lambda control, handler: control.SetAction(handler, IE_GUI_TEXTAREA_ON_SELECT),
 	}
 
 	def SetEvent(self, event, handler):
@@ -296,6 +294,12 @@ class GTextArea(GControl, Scrollable):
 		_GemRB.TextArea_SetOptions(self, optList)
 		if varname:
 			self.SetVarAssoc(varname, val)
+
+	def OnChange(self, handler):
+		self.SetAction(handler, IE_ACT_VALUE_CHANGE)
+
+	def OnSelect(self, handler):
+		self.SetAction(handler, IE_ACT_CUSTOM)
 
 class GTextEdit(GControl):
 	methods = {

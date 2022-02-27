@@ -62,7 +62,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectFile)
+	TextAreaControl.OnSelect (SelectFile)
 	ImportWindow.Focus()
 	return
 

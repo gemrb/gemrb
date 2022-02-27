@@ -221,13 +221,13 @@ def OpenCustomPortraitWindow ():
 		RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 2))
 	else:
 		RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 1))
-	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, LargeCustomPortrait)
+	PortraitList1.OnSelect (LargeCustomPortrait)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	# Portrait List Small
 	PortraitList2 = Window.GetControl (3)
 	RowCount2 = len(PortraitList2.ListResources (CHR_PORTRAITS, 0))
-	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, SmallCustomPortrait)
+	PortraitList2.OnSelect (SmallCustomPortrait)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -454,7 +454,7 @@ def OpenScriptWindow ():
 		SelectedTextArea.SetText (options[(name, ta.Value)])
 		return
 	
-	ScriptTextArea.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, UpdateScriptSelection)
+	ScriptTextArea.OnSelect (UpdateScriptSelection)
 	ScriptTextArea.SetVarAssoc("Selected", scriptindex)
 
 	DoneButton = SubCustomizeWindow.GetControl (5)

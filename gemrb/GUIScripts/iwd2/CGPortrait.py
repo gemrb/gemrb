@@ -184,12 +184,12 @@ def CustomPress ():
 	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 2))
-	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, LargeCustomPortrait)
+	PortraitList1.OnSelect (LargeCustomPortrait)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	PortraitList2 = Window.GetControl (4)
 	RowCount2 = len(PortraitList2.ListResources (CHR_PORTRAITS, 0))
-	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, SmallCustomPortrait)
+	PortraitList2.OnSelect (SmallCustomPortrait)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
 	Button = Window.GetControl (6)
