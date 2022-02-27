@@ -183,7 +183,7 @@ def InitWorldMapWindow (Window):
 	Button = Window.GetControl (0)
 	if GemRB.GetVar ("Travel") == -1:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.OnPress (lambda: OpenMapWindow ())
+		Button.OnPress (OpenMapWindow)
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -236,7 +236,7 @@ def AddNoteWindow ():
 		Label.SetSprites ("FLAG1", i,0,1,2,0)
 		Label.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		Label.SetVarAssoc ("Color", i)
-		Label.OnPress (lambda: NoteLabel.Focus())
+		Label.OnPress (NoteLabel.Focus)
 		
 	def SetMapNote (Text):
 		PosX = GemRB.GetVar ("MapControlX")

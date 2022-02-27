@@ -81,7 +81,7 @@ def OnLoad():
 	CloseButton.MakeDefault()
 	
 	OpenButton = OptionsWindow.GetControl (10)
-	OpenButton.OnPress (lambda: MWindow.Focus())
+	OpenButton.OnPress (MWindow.Focus)
 
 	SetupClockWindowControls (ActionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)

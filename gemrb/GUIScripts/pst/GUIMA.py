@@ -36,7 +36,7 @@ def InitMapWindow (Window):
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.OnPress (lambda: OpenTravelWindow())
+	Button.OnPress (OpenTravelWindow)
 
 	# Add Note
 	Button = Window.GetControl (1)
