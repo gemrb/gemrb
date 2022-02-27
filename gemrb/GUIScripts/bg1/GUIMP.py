@@ -91,7 +91,7 @@ def ExitPress():
 
 	DoneButton = ExitWindow.GetControl(1)
 	DoneButton.SetText(11973)
-	DoneButton.OnPress (lambda: ExitWindow.Close())
+	DoneButton.OnPress (ExitWindow.Close)
 	DoneButton.MakeDefault()
 
 	ExitWindow.Focus()

@@ -39,7 +39,7 @@ def OnLoad ():
 
 	CancelButton=LoadWindow.GetControl (22)
 	CancelButton.SetText (13727)
-	CancelButton.OnPress (lambda: LoadWindow.Close())
+	CancelButton.OnPress (LoadWindow.Close)
 	CancelButton.MakeEscape()
 
 	for i in range (5):

@@ -30,7 +30,7 @@ def OnLoad():
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)
-	BackButton.OnPress (lambda: NameWindow.Close())
+	BackButton.OnPress (NameWindow.Close)
 
 	DoneButton = NameWindow.GetControl(0)
 	DoneButton.SetText(11973)

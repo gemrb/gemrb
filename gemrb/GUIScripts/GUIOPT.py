@@ -58,7 +58,7 @@ def InitOptionsWindow (Window):
 	# Return to Game
 	Button = Window.GetControl (11)
 	Button.SetText (10308)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	# Quit Game
@@ -429,7 +429,7 @@ def OpenMovieWindow ():
 	DoneButton.SetText(11973)
 	PlayButton.OnPress (MoviePlayPress)
 	CreditsButton.OnPress (lambda: GemRB.PlayMovie("CREDITS"))
-	DoneButton.OnPress (lambda: Window.Close())
+	DoneButton.OnPress (Window.Close)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 

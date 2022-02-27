@@ -140,7 +140,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)
 	Button.OnPress (FloatMenuSelectNextPC)
-	Button.OnRightPress (lambda: Window.Close ())
+	Button.OnRightPress (Window.Close)
 
 	# Initiate Dialogue
 	Button = Window.GetControl (CID_DIALOG)

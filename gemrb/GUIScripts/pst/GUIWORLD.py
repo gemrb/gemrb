@@ -100,7 +100,7 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (1403)
-	Button.OnPress (lambda: ReformPartyWindow.Close())
+	Button.OnPress (ReformPartyWindow.Close)
 
 
 last_formation = None
@@ -114,7 +114,7 @@ def OpenFormationWindow ():
 	# Done
 	Button = Window.GetControl (13)
 	Button.SetText (1403)
-	Button.OnPress (lambda: FormationWindow.Close())
+	Button.OnPress (FormationWindow.Close)
 
 	tooltips = (
 		44957,  # Follow

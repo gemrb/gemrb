@@ -76,7 +76,7 @@ def InitJournalWindow (JournalWindow):
 	# Done
 	Button = JournalWindow.GetControl (3)
 	Button.SetText (20636)
-	Button.OnPress (lambda: JournalWindow.Close())
+	Button.OnPress (JournalWindow.Close)
 	Button.MakeEscape()
 
 	return
@@ -127,7 +127,7 @@ def OpenQuestsWindow ():
 	# Back
 	Button = QuestsWindow.GetControl (5)
 	Button.SetText (46677)
-	Button.OnPress (lambda: QuestsWindow.Close())
+	Button.OnPress (QuestsWindow.Close)
 	Button.MakeEscape()
 	Button.Focus()
 
@@ -251,7 +251,7 @@ def OpenBeastsWindow ():
 	# Back
 	Button = BeastsWindow.GetControl (7)
 	Button.SetText (46677)
-	Button.OnPress (lambda: BeastsWindow.Close())
+	Button.OnPress (BeastsWindow.Close)
 	Button.MakeEscape()
 	Button.Focus()
 
@@ -332,7 +332,7 @@ def OpenLogWindow ():
 	# Back
 	Button = LogWindow.GetControl (1)
 	Button.SetText (46677)
-	Button.OnPress (lambda: LogWindow.Close())
+	Button.OnPress (LogWindow.Close)
 	Button.MakeEscape()
 	Button.Focus()
 

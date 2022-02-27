@@ -117,8 +117,8 @@ def OpenCustomizeWindow ():
 	PortraitSelectButton.OnPress (OpenPortraitSelectWindow)
 	SoundButton.OnPress (OpenSoundWindow)
 	ScriptButton.OnPress (OpenScriptWindow)
-	CustomizeDoneButton.OnPress (lambda: CustomizeWindow.Close())
-	CancelButton.OnPress ( lambda: CustomizeWindow.Close()) # FIXME: this should revert changes I assume
+	CustomizeDoneButton.OnPress (CustomizeWindow.Close)
+	CancelButton.OnPress (CustomizeWindow.Close) # FIXME: this should revert changes I assume
 
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -149,7 +149,7 @@ def OpenPortraitSelectWindow ():
 
 	PortraitCancelButton = SubCustomizeWindow.GetControl (4)
 	PortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	PortraitCancelButton.OnPress (lambda: SubCustomizeWindow.Close())
+	PortraitCancelButton.OnPress (SubCustomizeWindow.Close)
 	PortraitCancelButton.SetText (13727)
 	PortraitCancelButton.MakeEscape()
 
@@ -205,7 +205,7 @@ def OpenCustomPortraitWindow ():
 
 	CustomPortraitCancelButton = Window.GetControl (11)
 	CustomPortraitCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	CustomPortraitCancelButton.OnPress (lambda: Window.Close())
+	CustomPortraitCancelButton.OnPress (Window.Close)
 	CustomPortraitCancelButton.SetText (13727)
 	CustomPortraitCancelButton.MakeEscape()
 
@@ -466,7 +466,7 @@ def OpenScriptWindow ():
 	CancelButton.MakeEscape()
 
 	DoneButton.OnPress (DoneScriptWindow)
-	CancelButton.OnPress (lambda: SubCustomizeWindow.Close())
+	CancelButton.OnPress (SubCustomizeWindow.Close)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -543,7 +543,7 @@ def OpenBiographyEditWindow ():
 	ClearButton.OnPress (lambda: ClearBiography(TextArea))
 	DoneButton.OnPress (lambda: DoneBiographyWindow(TextArea))
 	RevertButton.OnPress (lambda: RevertBiography(TextArea))
-	CancelButton.OnPress (lambda: SubCustomizeWindow.Close())
+	CancelButton.OnPress (SubCustomizeWindow.Close)
 
 	SubCustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -583,7 +583,7 @@ def OpenBiographyWindow ():
 	# Done
 	Button = BiographyWindow.GetControl (2)
 	Button.SetText (11973)
-	Button.OnPress (lambda: BiographyWindow.Close())
+	Button.OnPress (BiographyWindow.Close)
 
 	BiographyWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

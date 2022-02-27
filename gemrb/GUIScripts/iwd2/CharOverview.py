@@ -278,7 +278,7 @@ def StartOver():
 	
 	NoButton = StartOverWindow.GetControl(1)
 	NoButton.SetText(13913)
-	NoButton.OnPress (lambda: StartOverWindow.Close())
+	NoButton.OnPress (StartOverWindow.Close)
 	
 	TextAreaControl = StartOverWindow.GetControl(2)
 	TextAreaControl.SetText(40275)

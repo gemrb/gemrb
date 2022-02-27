@@ -61,7 +61,7 @@ def OnLoad():
 	SinglePlayerButton.OnPress (SinglePlayerPress)
 	ExitButton.OnPress (ExitPress)
 	OptionsButton.OnPress (OptionsPress)
-	BackButton.OnPress (lambda: StartWindow.Close())
+	BackButton.OnPress (StartWindow.Close)
 	ExitButton.MakeEscape()
 	StartWindow.Focus ()
 	
@@ -166,7 +166,7 @@ def Tutorial():
 	CancelButton.SetText (13727)
 	PlayButton.SetText (33093)
 	PlayButton.OnPress (PlayPress)
-	CancelButton.OnPress (lambda: TutorialWindow.Close())
+	CancelButton.OnPress (TutorialWindow.Close)
 	PlayButton.MakeDefault()
 	CancelButton.MakeEscape()		
 
@@ -191,7 +191,7 @@ def ExitPress():
 	CancelButton.SetText (13727)
 	ConfirmButton.SetText (15417)
 	ConfirmButton.OnPress (lambda: GemRB.Quit())
-	CancelButton.OnPress (lambda: QuitWindow.Close())
+	CancelButton.OnPress (QuitWindow.Close)
 	ConfirmButton.MakeDefault()
 	CancelButton.MakeEscape()
 	return

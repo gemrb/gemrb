@@ -2043,7 +2043,7 @@ def RealRestPress ():
 			Label.SetText (info["ErrorMsg"])
 			Button = Window.GetControl (1)
 			Button.SetText (1403)
-			Button.OnPress (lambda: Window.Close ())
+			Button.OnPress (Window.Close)
 			Window.ShowModal (MODAL_SHADOW_GRAY)
 		else:
 			GemRB.DisplayString (info["ErrorMsg"], ColorRed)

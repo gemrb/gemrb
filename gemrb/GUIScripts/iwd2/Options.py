@@ -58,7 +58,7 @@ def OnLoad():
 	KeyboardButton.OnPress (GUIOPT.OpenHotkeyOptionsWindow)
 
 	ReturnButton.SetText(10308)
-	ReturnButton.OnPress (lambda: OptionsWindow.Close())
+	ReturnButton.OnPress (OptionsWindow.Close)
 	ReturnButton.MakeEscape()
 
 	OptionsWindow.Focus()

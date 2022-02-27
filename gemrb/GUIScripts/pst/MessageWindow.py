@@ -77,7 +77,7 @@ def OnLoad():
 
 	CloseButton= MWindow.GetControl (0)
 	CloseButton.SetText(28082)
-	CloseButton.OnPress (lambda: MWindow.Close())
+	CloseButton.OnPress (MWindow.Close)
 	CloseButton.MakeDefault()
 	
 	OpenButton = OptionsWindow.GetControl (10)

@@ -39,7 +39,7 @@ def OnLoad():
 
 	PlayButton.OnPress (PlayPress)
 	CreditsButton.OnPress (CreditsPress)
-	DoneButton.OnPress (lambda: MovieWindow.Close())
+	DoneButton.OnPress (MovieWindow.Close)
 	MovieWindow.Focus()
 	return
 	

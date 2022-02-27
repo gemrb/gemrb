@@ -234,7 +234,7 @@ class GWindow(GView, Scrollable):
 		view.SetFrame(frame)
 		return newparent.AddSubview(view, None, newID)
 
-	def Close(self):
+	def Close(self, *args):
 		RemoveView(self, False)
 
 class GControl(GView):

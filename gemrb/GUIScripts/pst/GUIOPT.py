@@ -294,7 +294,7 @@ def OpenLoadMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)
@@ -331,7 +331,7 @@ def OpenQuitMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (4196)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	# The game has not been saved ....
@@ -386,13 +386,13 @@ def OpenKeyboardMappingsWindow ():
 	# Done
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	keys_setup_page (Window, 0)
@@ -470,7 +470,7 @@ def OpenMoviesWindow ():
 	# Done
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	# movie list
 	List = Window.GetControl (0)

@@ -819,7 +819,7 @@ def OpenInformationWindow ():
 	# Done
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
-	Button.OnPress (lambda: InformationWindow.Close())
+	Button.OnPress (InformationWindow.Close)
 	Button.MakeEscape()
 
 	TotalPartyExp = 0
@@ -998,7 +998,7 @@ def OpenColorWindow ():
 	MajorButton.OnPress (SetMajorColor)
 	MinorButton.OnPress (SetMinorColor)
 	DoneButton.OnPress (DoneColorWindow)
-	CancelButton.OnPress (lambda: Window.Close())
+	CancelButton.OnPress (Window.Close)
 	UpdatePaperDoll ()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)

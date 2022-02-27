@@ -39,7 +39,7 @@ def OnLoad():
 	SoundButton.OnPress (GUIOPT.OpenAudioOptionsWindow )
 	GameButton.OnPress (GUIOPT.OpenGameplayOptionsWindow)
 	GraphicButton.OnPress (GUIOPT.OpenVideoOptionsWindow)
-	BackButton.OnPress (lambda: OptionsWindow.Close())
+	BackButton.OnPress (OptionsWindow.Close)
 	BackButton.MakeEscape()
 	OptionsWindow.Focus()
 	return

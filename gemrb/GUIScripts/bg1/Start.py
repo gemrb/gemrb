@@ -121,7 +121,7 @@ def ExitPress():
 
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.OnPress (lambda: QuitWindow.Close())
+	CancelButton.OnPress (QuitWindow.Close)
 	CancelButton.MakeEscape ()
 
 	ConfirmButton = QuitWindow.GetControl (1)

@@ -64,7 +64,7 @@ def QuitPress():
 
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetText(23789)
-	CancelButton.OnPress (lambda: QuitWindow.Close())
+	CancelButton.OnPress (QuitWindow.Close)
 	CancelButton.MakeEscape()
 	
 	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)

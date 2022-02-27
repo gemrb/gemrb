@@ -220,7 +220,7 @@ def AcceptPress():
 		Button = QuitWindow.GetControl(2)
 		Button.SetText(46783)
 		Button.MakeDefault()
-		Button.OnPress (lambda: QuitWindow.Close())
+		Button.OnPress (QuitWindow.Close)
 		QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
@@ -279,7 +279,7 @@ def CancelPress():
 	Button = QuitWindow.GetControl(2)
 	Button.SetText(23789)
 	Button.MakeDefault()
-	Button.OnPress (lambda: QuitWindow.Close())
+	Button.OnPress (QuitWindow.Close)
 
 	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

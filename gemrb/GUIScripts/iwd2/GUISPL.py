@@ -294,7 +294,7 @@ def OpenSpellBookSpellInfoWindow ():
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
 	Button.MakeEscape()
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel

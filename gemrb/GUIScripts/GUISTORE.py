@@ -1586,7 +1586,7 @@ def InfoWindow (Slot, Item):
 	#Done
 	Button = Window.GetControlAlias ("INFBTN")
 	Button.SetText (strrefs["done"])
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	# hide the empty button
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
@@ -1890,7 +1890,7 @@ def InfoHealWindow ():
 	#Done
 	Button = Window.GetControlAlias ("HEALBTN")
 	Button.SetText (strrefs["done"])
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -2006,7 +2006,7 @@ def RentRoom ():
 	#deny
 	Button = Window.GetControl (1)
 	Button.SetText (strrefs["cancel"])
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	#textarea
@@ -2025,7 +2025,7 @@ def ErrorWindow (strref):
 	#done
 	Button = Window.GetControl (0)
 	Button.SetText (strrefs["done"])
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

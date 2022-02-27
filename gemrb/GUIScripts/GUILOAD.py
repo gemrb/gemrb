@@ -44,7 +44,7 @@ def OnLoad ():
 
 	CancelButton=LoadWindow.GetControl (34)
 	CancelButton.SetText (13727)
-	CancelButton.OnPress (lambda: LoadWindow.Close())
+	CancelButton.OnPress (LoadWindow.Close)
 	CancelButton.MakeEscape()
 
 	for i in range (4):
@@ -133,7 +133,7 @@ def OpenLoadMsgWindow (btn):
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (STR_OPT_CANCEL)
-	Button.OnPress (lambda: LoadMsgWindow.Close())
+	Button.OnPress (LoadMsgWindow.Close)
 	Button.MakeEscape ()
 
 	# Loading a game will destroy ...

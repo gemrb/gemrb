@@ -206,7 +206,7 @@ def RemovePlayer (select):
 	#cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	CommonWindow.SetGameGUIHidden(hideflag)
@@ -245,7 +245,7 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (11973)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	# if nobody can be removed, just close the window
 	if not removable_pcs:

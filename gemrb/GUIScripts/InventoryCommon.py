@@ -577,7 +577,7 @@ def OpenItemAmountWindow (btn, location = "inventory"):
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (strings['Cancel'])
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)

@@ -155,7 +155,7 @@ def OpenPriestSpellInfoWindow ():
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
@@ -216,7 +216,7 @@ def OpenPriestSpellUnmemorizeWindow (btn):
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)

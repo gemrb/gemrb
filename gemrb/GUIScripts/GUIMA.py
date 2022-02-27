@@ -254,7 +254,7 @@ def AddNoteWindow ():
 
 	#cancel
 	Label = NoteWindow.GetControl (2)
-	Label.OnPress (lambda: NoteWindow.Close())
+	Label.OnPress (NoteWindow.Close)
 	Label.SetText (13727)
 	Label.MakeEscape()
 

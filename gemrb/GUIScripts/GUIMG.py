@@ -245,7 +245,7 @@ def OpenMageSpellInfoWindow ():
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
@@ -321,7 +321,7 @@ def OpenMageSpellRemoveWindow (parentWin):
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -352,7 +352,7 @@ def OpenMageSpellUnmemorizeWindow (btn):
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.OnPress (lambda: Window.Close())
+	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)

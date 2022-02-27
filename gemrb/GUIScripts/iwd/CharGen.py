@@ -2503,7 +2503,7 @@ def BiographyPress():
 
 	BiographyCancelButton = BiographyWindow.GetControl (2)
 	BiographyCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BiographyCancelButton.OnPress (lambda: BiographyWindow.Close())
+	BiographyCancelButton.OnPress (BiographyWindow.Close)
 	BiographyCancelButton.SetText (13727)
 	BiographyCancelButton.MakeEscape()
 

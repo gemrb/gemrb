@@ -129,7 +129,7 @@ def ProtocolPress ():
 	
 	DoneButton = ProtocolWindow.GetControl (6)
 	DoneButton.SetText (11973)
-	DoneButton.OnPress (lambda: ProtocolWindow.Close())
+	DoneButton.OnPress (ProtocolWindow.Close)
 	DoneButton.MakeEscape()
 	
 	ProtocolWindow.ShowModal (1)
@@ -161,7 +161,7 @@ def CreatePress ():
 
 	CancelButton = GameTypeWindow.GetControl (1)
 	CancelButton.SetText (13727)
-	CancelButton.OnPress (lambda: GameTypeWindow.Close())
+	CancelButton.OnPress (GameTypeWindow.Close)
 	CancelButton.MakeEscape()
 
 	DoneButton = GameTypeWindow.GetControl (2)
@@ -219,7 +219,7 @@ def GameTypeDonePress(win):
 
 		NoButton = GameType2Window.GetControl (2)
 		NoButton.SetText (13913)
-		NoButton.OnPress (lambda: GameType2Window.Close())
+		NoButton.OnPress (GameType2Window.Close)
 		NoButton.MakeEscape()
 
 		def cancel():
@@ -250,7 +250,7 @@ def QuitPress ():
 	QuitWindow = GemRB.LoadWindow (22, "GUICONN")
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.OnPress (lambda: QuitWindow.Close())
+	CancelButton.OnPress (QuitWindow.Close)
 	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl (1)

@@ -39,7 +39,7 @@ def OnLoad():
 	ModifyButton.SetText(10316)
 
 	CancelButton = PartySelectWindow.GetControl(11)
-	CancelButton.OnPress (lambda: PartySelectWindow.Close())
+	CancelButton.OnPress (PartySelectWindow.Close)
 	CancelButton.SetText(13727)
 	CancelButton.MakeEscape()
 

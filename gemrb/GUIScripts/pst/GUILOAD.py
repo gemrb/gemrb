@@ -37,7 +37,7 @@ def OnLoad ():
 	LoadWindow = GemRB.LoadWindow (0, "GUILOAD")
 	CancelButton=LoadWindow.GetControl (46)
 	CancelButton.SetText (4196)
-	CancelButton.OnPress (lambda: LoadWindow.Close())
+	CancelButton.OnPress (LoadWindow.Close)
 	CancelButton.MakeEscape()
 
 	GemRB.SetVar ("LoadIdx",0)

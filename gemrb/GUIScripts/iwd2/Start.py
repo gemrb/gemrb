@@ -141,7 +141,7 @@ def ProtocolPress():
 
 	DoneButton = ProtocolWindow.GetControl(6)
 	DoneButton.SetText(11973)
-	DoneButton.OnPress (lambda: ProtocolWindow.Close())
+	DoneButton.OnPress (ProtocolWindow.Close)
 	DoneButton.MakeEscape()
 
 	ProtocolWindow.Focus()
@@ -179,7 +179,7 @@ def OptionsPress():
 def QuitPress():
 	QuitWindow = GemRB.LoadWindow(22, "GUICONN")
 	CancelButton = QuitWindow.GetControl(2)
-	CancelButton.OnPress (lambda: QuitWindow.Close())
+	CancelButton.OnPress (QuitWindow.Close)
 	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl(1)
