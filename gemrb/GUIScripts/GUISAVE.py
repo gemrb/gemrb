@@ -222,7 +222,7 @@ def OpenConfirmWindow (btn):
 
 	NameField = ConfirmWindow.GetControl (ctrl_offset[7])
 	NameField.SetText (Slotname)
-	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, EditChange)
+	NameField.OnChange (EditChange)
 
 	Label = ConfirmWindow.GetControl (ctrl_offset[8])
 	Label.SetText (GameDate)

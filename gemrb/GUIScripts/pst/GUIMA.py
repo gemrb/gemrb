@@ -45,7 +45,7 @@ def InitMapWindow (Window):
 
 	# Note text
 	Edit = Window.GetControl (4)
-	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, NoteChanged)
+	Edit.OnDone (NoteChanged)
 	Edit.SetFlags(IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	# Map Control

@@ -260,9 +260,6 @@ class GControl(GView):
 		IE_GUI_BUTTON_ON_SHIFT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 1, 1),
 		IE_GUI_BUTTON_ON_RIGHT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1),
 		IE_GUI_BUTTON_ON_DOUBLE_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2),
-		IE_GUI_EDIT_ON_CHANGE: lambda control, handler: control.SetAction(handler, IE_ACT_VALUE_CHANGE),
-		IE_GUI_EDIT_ON_DONE: lambda control, handler: control.SetAction(handler, IE_ACT_CUSTOM),
-		IE_GUI_EDIT_ON_CANCEL: lambda control, handler: control.SetAction(handler, IE_ACT_CUSTOM+1),
 	}
 
 	def SetEvent(self, event, handler):
@@ -305,6 +302,15 @@ class GTextEdit(GControl):
 	methods = {
 		'SetBufferLength': _GemRB.TextEdit_SetBufferLength,
 	}
+
+	def OnChange(self, handler):
+		self.SetAction(handler, IE_ACT_VALUE_CHANGE)
+
+	def OnDone(self, handler):
+		self.SetAction(handler, IE_ACT_CUSTOM)
+
+	def OnCancel(self, handler):
+		self.SetAction(handler, IE_ACT_CUSTOM + 1)
 
 class GScrollBar(GControl, Scrollable):
 	def SetVarAssoc(self, varname, val, rangeMin = 0, rangeMax = None):

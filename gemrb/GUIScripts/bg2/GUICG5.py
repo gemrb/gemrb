@@ -42,7 +42,7 @@ def OnLoad():
 	EditChange ()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, EditChange)
+	NameField.OnChange (EditChange)
 
 	NameWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NameField.Focus()

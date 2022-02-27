@@ -226,8 +226,8 @@ def OpenSaveDetailWindow ():
 
 	Edit = Window.GetControl (1)
 	Edit.SetText (Slotname)
-	Edit.SetEvent (IE_GUI_EDIT_ON_CHANGE, CheckSaveName)
-	Edit.SetEvent (IE_GUI_EDIT_ON_DONE, ConfirmedSaveGame)
+	Edit.OnChange (CheckSaveName)
+	Edit.OnDone (ConfirmedSaveGame)
 
 	Label = Window.GetControl (0x10000002)
 	Label.SetText (Slottime)

@@ -622,7 +622,7 @@ def OpenExportWindow ():
 
 	ExportDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportDonePress)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExportCancelPress)
-	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, ExportEditChanged)
+	NameField.OnChange (ExportEditChanged)
 	ExportWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NameField.Focus()
 	return

@@ -678,7 +678,7 @@ def InitStoreDonateWindow (Window):
 	# Entry
 	Field = Window.GetControlAlias ('STOTEDIT')
 	Field.SetText ("0")
-	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, lambda: UpdateStoreDonateWindow(Window))
+	Field.OnChange (lambda: UpdateStoreDonateWindow(Window))
 	Field.SetFlags (IE_GUI_TEXTEDIT_ALPHACHARS, OP_NAND)
 	Field.Focus()
 

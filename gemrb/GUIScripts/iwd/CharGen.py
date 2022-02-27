@@ -2558,7 +2558,7 @@ def NamePress():
 	NameCancelButton.MakeEscape()
 
 	NameField = NameWindow.GetControl (2)
-	NameField.SetEvent (IE_GUI_EDIT_ON_CHANGE, NameEditChange)
+	NameField.OnChange (NameEditChange)
 	NameField.SetText (GemRB.GetToken ("CHARNAME") )
 	NameField.Focus()
 

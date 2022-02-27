@@ -39,7 +39,7 @@ def OnLoad():
 	TextAreaControl.ListResources (CHR_EXPORTS)
 
 	FileNameEditBox = ExportWindow.GetControl (7)
-	FileNameEditBox.SetEvent (IE_GUI_EDIT_ON_CHANGE, FileNameChange)
+	FileNameEditBox.OnChange (FileNameChange)
 
 	DoneButton = ExportWindow.GetControl (0)
 	DoneButton.SetText (11973)
