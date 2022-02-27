@@ -81,12 +81,17 @@ public:
 		switch (ctrl->ControlType) {
 			case IE_GUI_BUTTON:
 				return "Button";
-			case IE_GUI_LABEL:
-				return "Label";
+			case IE_GUI_PROGRESSBAR:
+				return "ProgressBar";
+			case IE_GUI_SLIDER:
+				return "Slider";
 			case IE_GUI_EDIT:
 				return "TextEdit";
+			// 4 - unused
 			case IE_GUI_TEXTAREA:
 				return "TextArea";
+			case IE_GUI_LABEL:
+				return "Label";
 			case IE_GUI_SCROLLBAR:
 				return "ScrollBar";
 			case IE_GUI_WORLDMAP:

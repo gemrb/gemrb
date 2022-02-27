@@ -366,6 +366,12 @@ class GMap(GControl):
 	def OnRightPress(self, handler):
 		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)
 
+class GProgressBar(GControl):
+	pass
+
+class GSlider(GControl):
+	pass
+
 @add_metaclass(metaIDWrapper)
 class GSaveGame:
 	methods = {
