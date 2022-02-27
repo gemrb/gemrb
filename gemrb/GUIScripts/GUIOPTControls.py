@@ -45,10 +45,10 @@ def OptSlider (winhelp, ctlhelp, help_ta, window, slider_id, label_id, label_str
 	slider = window.GetControl (slider_id)
 	slider.SetVarAssoc (variable, value)
 	if action:
-		slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, action)
+		slider.OnChange (action)
 	else:
 		# create an anonymous callback, so we don't need to create a separate function for each string
-		slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, lambda: help_ta.SetText (ctlhelp))
+		slider.OnChange (lambda: help_ta.SetText (ctlhelp))
 
 	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
 	slider.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlhelp))
