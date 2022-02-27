@@ -191,13 +191,13 @@ def UpdateSpellBookWindow ():
 			else:
 				# deplete and remove
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellRemoveWindow)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenSpellBookSpellInfoWindow)
+			Button.OnRightPress (OpenSpellBookSpellInfoWindow)
 			tmp = str(ms['MemoCount'])+"/"+str(ms['KnownCount'])
 			Label.SetText (tmp)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.OnRightPress (None)
 			Button.EnableBorder (0, 0)
 			Label.SetText ('')
 
@@ -213,12 +213,12 @@ def UpdateSpellBookWindow ():
 			Button.SetSpellIcon (spell)
 			if not sorcerer_style:
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnSpellBookMemorizeSpell)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenSpellBookSpellInfoWindow)
+			Button.OnRightPress (OpenSpellBookSpellInfoWindow)
 			Label.SetText (ks['SpellName'])
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.OnRightPress (None)
 			Button.EnableBorder (0, 0)
 			Label.SetText ('')
 

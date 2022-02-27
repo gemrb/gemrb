@@ -401,7 +401,7 @@ def GroupControls ():
 		Button.SetBAM ("FORM%x"%idx,0,0,-1)
 		Button.SetVarAssoc ("Formation", i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectFormation)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SetupFormation)
+		Button.OnRightPress (SetupFormation)
 		Button.SetTooltip (4935)
 		# 0x90 = F1 key
 		Button.SetHotKey (chr(7+i+0x90), 0, True)
@@ -477,7 +477,7 @@ def SetupItemAbilities(pc, slot, only):
 					Button.SetItemIcon (ammoslot['ItemResRef'])
 					Button.SetText (str(ammoslot["Usages0"]))
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectQuiverSlot)
-					Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectQuiverSlot)
+					Button.OnRightPress (SelectQuiverSlot)
 					Button.SetVarAssoc ("Slot", ammoslots[i])
 					if Tips[0] != -1:
 						Button.SetTooltip (Tips[0])
@@ -535,7 +535,7 @@ def SetupItemAbilities(pc, slot, only):
 			Button.SetItemIcon (slot_item['ItemResRef'], i+6)
 			Button.SetText ("")
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectItemAbility)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, SelectItemAbility)
+			Button.OnRightPress (SelectItemAbility)
 			Button.SetVarAssoc ("Ability", i)
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 			if Tips[i] != -1:
@@ -1660,9 +1660,9 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			label.SetFrame(Button.GetInsetFrame(4))
 
 		if needcontrols or GameCheck.IsIWD2():
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenInventoryWindowClick)
+			Button.OnRightPress (OpenInventoryWindowClick)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, PortraitButtonOnPress)
+			Button.OnRightPress (PortraitButtonOnPress)
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
@@ -1745,7 +1745,7 @@ def UpdatePortraitWindow ():
 		portraitFlags = IE_GUI_BUTTON_PORTRAIT | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM
 
 		if GameCheck.IsIWD2():
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenInventoryWindowClick)
+			Button.OnRightPress (OpenInventoryWindowClick)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 
 		Button.SetFlags (portraitFlags, OP_SET)
@@ -1980,7 +1980,7 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 			Button.SetTooltip (Item['ItemNameIdentified'])
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PressHandler)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
+		Button.OnRightPress (RightPressHandler)
 
 	else:
 		Button.SetItemIcon ('')
@@ -1989,7 +1989,7 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.OnRightPress (None)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow

@@ -643,7 +643,7 @@ def UpdateSlot (pc, slot):
 	if slot_item:
 		Button.SetAction(OnDragItem, IE_ACT_DRAG_DROP_CRT)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: OpenItemInfoWindow (slot + 1))
+		Button.OnRightPress (lambda: OpenItemInfoWindow (slot + 1))
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
 		#If the slot is being used to display the 'default' weapon, disable dragging.
 		if SlotType["ID"] == 10 and using_fists:
@@ -673,7 +673,7 @@ def UpdateSlot (pc, slot):
 			itemname = ""
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.OnRightPress (None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 		Button.OnDoublePress (OpenItemAmountWindow)
 

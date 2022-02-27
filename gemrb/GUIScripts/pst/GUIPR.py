@@ -89,7 +89,7 @@ def UpdatePriestWindow (Window):
 				Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellUnmemorizeWindow)
 			else:
 				Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestUnmemorizeSpell)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenPriestSpellInfoWindow)
+			Icon.OnRightPress (OpenPriestSpellInfoWindow)
 			spell = GemRB.GetSpell (ms['SpellResRef'])
 			Icon.SetTooltip (spell['SpellName'])
 			PriestMemorizedSpellList.append (ms['SpellResRef'])
@@ -101,7 +101,7 @@ def UpdatePriestWindow (Window):
 			else:
 				Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Icon.OnRightPress (None)
 			Icon.SetTooltip ('')
 			Icon.EnableBorder (0, 0)
 
@@ -115,7 +115,7 @@ def UpdatePriestWindow (Window):
 		Icon.SetSpellIcon (ks['SpellResRef'])
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestMemorizeSpell)
-		Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenPriestSpellInfoWindow)
+		Icon.OnRightPress (OpenPriestSpellInfoWindow)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
 		Icon.SetTooltip (spell['SpellName'])
 		PriestKnownSpellList.append (ks['SpellResRef'])
@@ -126,7 +126,7 @@ def UpdatePriestWindow (Window):
 		Icon = Window.GetControl (14 + i)
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-		Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Icon.OnRightPress (None)
 		Icon.SetTooltip ('')
 
 	return

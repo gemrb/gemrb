@@ -354,7 +354,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetBorder (1, color, 0,1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectBuy)
 		Button.OnDoublePress (lambda: OpenItemAmountWindow(Window))
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoLeftWindow)
+		Button.OnRightPress (InfoLeftWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -366,7 +366,7 @@ def InitStoreShoppingWindow (Window):
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectSell)
 			Button.OnDoublePress (lambda: OpenBag(Window))
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
+		Button.OnRightPress (InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -497,7 +497,7 @@ def InitStoreIdentifyWindow (Window):
 	LeftButton = Button = Window.GetControlAlias ('IDLBTN')
 	Button.SetText (strrefs["identify"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: IdentifyPressed (Window))
-	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
+	Button.OnRightPress (InfoIdentifyWindow)
 
 	# price ...
 	Label = Window.GetControlAlias ('IDPRICE')
@@ -518,7 +518,7 @@ def InitStoreIdentifyWindow (Window):
 		Button = Window.GetControlAlias ("IDBTN" + str(i))
 		Button.SetBorder (0, color, 0, 1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SelectID (Window))
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
+		Button.OnRightPress (InfoIdentifyWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -597,7 +597,7 @@ def InitStoreStealWindow (Window):
 
 		Button = Window.GetControlAlias ('SWRBTN' + str(i))
 		Button.SetBorder (0,color,0,1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoRightWindow)
+		Button.OnRightPress (InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
@@ -747,7 +747,7 @@ def InitStoreHealWindow (Window):
 		Button = Window.GetControlAlias ('HWLBTN' + str(i))
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateStoreHealWindow(Window))
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoHealWindow)
+		Button.OnRightPress (InfoHealWindow)
 
 	UnselectNoRedraw ()
 

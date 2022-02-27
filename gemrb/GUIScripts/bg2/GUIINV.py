@@ -234,14 +234,14 @@ def RefreshInventoryWindow (Window):
 
 		if Slot == None:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.OnRightPress (None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 			Button.OnDoublePress (None)
 		else:
 			Button.SetValue (i + TopIndex)
 			Button.SetAction(InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
+			Button.OnRightPress (InventoryCommon.OpenGroundItemInfoWindow)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenGroundItemAmountWindow)
 			Button.OnDoublePress (InventoryCommon.OpenGroundItemAmountWindow)
 

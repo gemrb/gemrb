@@ -256,7 +256,6 @@ class GControl(GView):
 	EventMap = {
 		IE_GUI_BUTTON_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1),
 		IE_GUI_BUTTON_ON_SHIFT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 1, 1),
-		IE_GUI_BUTTON_ON_RIGHT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1),
 	}
 
 	def SetEvent(self, event, handler):
@@ -361,6 +360,9 @@ class GButton(GControl):
 		frame = self.GetFrame()
 		frame["x"] = frame["y"] = 0
 		return self.CreateSubview(btnid, IE_GUI_BUTTON, frame)
+
+	def OnRightPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)
 
 	def OnDoublePress(self, handler):
 		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)

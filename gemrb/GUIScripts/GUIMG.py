@@ -141,7 +141,7 @@ def UpdateMageWindow (MageWindow):
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellUnmemorizeWindow)
 				else:
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageUnmemorizeSpell)
-				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
+				Button.OnRightPress (OpenMageSpellInfoWindow)
 				MageMemorizedSpellList.append (ms['SpellResRef'])
 				Button.EnableBorder (0, ms['Flags'] == 0)
 				spell = GemRB.GetSpell (ms['SpellResRef'])
@@ -155,7 +155,7 @@ def UpdateMageWindow (MageWindow):
 				else:
 					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+				Button.OnRightPress (None)
 				Button.SetTooltip ('')
 				Button.EnableBorder (0, 0)
 	else:
@@ -175,7 +175,7 @@ def UpdateMageWindow (MageWindow):
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
+		Button.OnRightPress (OpenMageSpellInfoWindow)
 		MageKnownSpellList.append (ks['SpellResRef'])
 		spell = GemRB.GetSpell (ks['SpellResRef'])
 		if not spell:
@@ -190,7 +190,7 @@ def UpdateMageWindow (MageWindow):
 		
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.OnRightPress (None)
 		Button.SetTooltip ('')
 		Button.EnableBorder (0, 0)
 	

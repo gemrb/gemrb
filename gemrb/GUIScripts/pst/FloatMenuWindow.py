@@ -140,7 +140,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectNextPC)
-	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: Window.Close ())
+	Button.OnRightPress (lambda: Window.Close ())
 
 	# Initiate Dialogue
 	Button = Window.GetControl (CID_DIALOG)

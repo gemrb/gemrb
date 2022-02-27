@@ -253,7 +253,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	buttonCount = 12 - More * 2 # GUIBT_COUNT in PCStatsStruct
 	for i in range (buttonCount):
 		Button = Window.GetControl (i+Offset+More)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.OnRightPress (None)
 
 		if i+Start >= len(memorizedSpells):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
