@@ -60,7 +60,7 @@ def StartLoadScreen ():
 		TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 
 		Skull = LoadScreen.GetControl (3)
-		Skull.SetMOS ("GTRBPSK2")
+		Skull.SetPicture ("GTRBPSK2")
 		
 		LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
 		GemRB.SetTimer(LoadScreen.Close, 500, 0)

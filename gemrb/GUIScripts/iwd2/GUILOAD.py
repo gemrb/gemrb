@@ -91,7 +91,7 @@ def ScrollBarPress ():
 		if ActPos<len(Games):
 			Button1.SetState (IE_GUI_BUTTON_ENABLED)
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
-			ScreenShotButton.SetSprite2D(Games[ActPos].GetPreview())
+			ScreenShotButton.SetPicture (Games[ActPos].GetPreview())
 			Slotname = Games[ActPos].GetName()
 			GameDate = Games[ActPos].GetGameDate()
 			SaveDate = Games[ActPos].GetDate()
@@ -115,7 +115,7 @@ def ScrollBarPress ():
 		for j in range (min(6, MAX_PARTY_SIZE)):
 			Button=LoadWindow.GetControl (25 + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos<len(Games):
-				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
+				Button.SetPicture (Games[ActPos].GetPortrait(j))
 			else:
 				Button.SetPicture (None)
 	return

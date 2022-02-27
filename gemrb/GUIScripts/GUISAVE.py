@@ -135,14 +135,14 @@ def ScrollBarPress ():
 
 		Button = Window.GetControl (1+i)
 		if ActPos < len(Games):
-			Button.SetSprite2D (Games[ActPos].GetPreview())
+			Button.SetPicture (Games[ActPos].GetPreview())
 		else:
 			Button.SetPicture (None)
 
 		for j in range(min(6, MAX_PARTY_SIZE)):
 			Button = Window.GetControl (ctrl_offset[2] + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos < len(Games):
-				Button.SetSprite2D (Games[ActPos].GetPortrait(j))
+				Button.SetPicture (Games[ActPos].GetPortrait(j))
 			else:
 				Button.SetPicture (None)
 	return
@@ -212,7 +212,7 @@ def OpenConfirmWindow (btn):
 			GameDate = Games[Pos].GetGameDate ()
 
 		if AreaPreview:
-			AreaPreview.SetSprite2D (Games[Pos].GetPreview())
+			AreaPreview.SetPicture (Games[Pos].GetPreview())
 	else:
 		Slotname = ""
 		GameDate = ""
@@ -233,7 +233,7 @@ def OpenConfirmWindow (btn):
 		if not Portrait:
 			continue
 		if Pos < len(Games):
-			Portrait.SetSprite2D (Games[Pos].GetPortrait(j))
+			Portrait.SetPicture (Games[Pos].GetPortrait(j))
 		else:
 			Portrait.SetPicture (None)
 

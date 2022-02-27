@@ -95,7 +95,7 @@ def ScrollBarUpdated (sb):
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 			SlotName = Games[ActPos].GetName ()
 			SlotDate = Games[ActPos].GetGameDate ()
-			PreviewButton.SetSprite2D (Games[ActPos].GetPreview())
+			PreviewButton.SetPicture (Games[ActPos].GetPreview())
 		else:
 			Button1.SetState (IE_GUI_BUTTON_DISABLED)
 			Button2.SetState (IE_GUI_BUTTON_DISABLED)
@@ -110,7 +110,7 @@ def ScrollBarUpdated (sb):
 		for j in range (min(6, MAX_PARTY_SIZE)):
 			Button = LoadWindow.GetControl (40 + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos < len(Games):
-				Button.SetSprite2D (Games[ActPos].GetPortrait (j))
+				Button.SetPicture (Games[ActPos].GetPortrait (j))
 			else:
 				Button.SetPicture (None)
 	return

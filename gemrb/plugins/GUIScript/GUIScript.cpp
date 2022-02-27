@@ -1736,7 +1736,7 @@ PyDoc_STRVAR( GemRB_Control_SetAction__doc,
     ...\n\
   def EndLoadScreen ():\n\
     Skull = LoadScreen.GetControl (1)\n\
-    Skull.SetMOS ('GSKULON')\n\
+    Skull.SetPicture ('GSKULON')\n\
 The above example changes the image on the loadscreen when the progressbar reaches the end.\n\
 \n\
   Button.SetAction (Buttons.YesButton, IE_GUI_MOUSE_PRESS, 1, 0, 1)\n\

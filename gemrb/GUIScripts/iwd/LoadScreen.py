@@ -33,7 +33,7 @@ def SetLoadScreen ():
 	if LoadPic == "*":
 		#HoW loadscreens are GTRSK001-GTRSK010
 		LoadPic = "GTRSK0"+str(GemRB.Roll (1, 10, 0)).zfill(2)
-	Middle.SetMOS (LoadPic)
+	Middle.SetPicture (LoadPic)
 	return
 
 def StartLoadScreen ():
@@ -52,6 +52,6 @@ def StartLoadScreen ():
 
 def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
-	Skull.SetMOS ("GTRBPSK2")
+	Skull.SetPicture ("GTRBPSK2")
 
 	GemRB.SetTimer(LoadScreen.Close, 500, 0)

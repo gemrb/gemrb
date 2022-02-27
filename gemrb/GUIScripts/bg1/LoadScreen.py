@@ -38,13 +38,13 @@ def StartLoadScreen ():
 	#LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	#if LoadPic=="":
 	LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,0))
-	Middle.SetMOS (LoadPic)
+	Middle.SetPicture (LoadPic)
 	Bar = LoadScreen.GetControl (0)
 	Bar.AddAlias("LOAD_PROG")
 	Bar.SetVarAssoc ("Progress", 0)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	Skull = LoadScreen.GetControl (3)
-	Skull.SetMOS ("GTRBPSK")
+	Skull.SetPicture ("GTRBPSK")
 
 	LoadScreen.ReparentSubview(Skull, Bar)
 	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
@@ -52,7 +52,7 @@ def StartLoadScreen ():
 
 def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
-	Skull.SetMOS ("GTRBPSK2")
+	Skull.SetPicture ("GTRBPSK2")
 
 	LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
 	GemRB.SetTimer(LoadScreen.Close, 500, 0)

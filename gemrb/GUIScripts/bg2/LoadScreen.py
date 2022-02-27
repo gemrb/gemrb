@@ -43,7 +43,7 @@ def StartLoadScreen ():
 		if LoadPic == "":
 			#the addition of 1 is not an error, bg2 loadpic resrefs are GTRSK002-GTRSK006
 			LoadPic = "GTRSK00"+str(GemRB.Roll(1,5,1) )
-		Middle.SetMOS (LoadPic)
+		Middle.SetPicture (LoadPic)
 	else:
 		# During loading, this fn is called at 0% and 70%, so take advantage of that
 		#   and display the "quiet" frame first and the "flaming" frame the second time.

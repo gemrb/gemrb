@@ -41,6 +41,9 @@ def CreateScrollbarARGs(bam = None):
 
 	return (bam, bamframes)
 
+def _ExtractFrame(args):
+	return { "x" : args[0], "y" : args[1], "w" : args[2], "h" : args[3] }
+
 @add_metaclass(metaIDWrapper)
 class GTable:
 	methods = {
@@ -143,10 +146,6 @@ class GView:
 	def SetDisabled(self, disable):
 		self.SetFlags(IE_GUI_VIEW_DISABLED, OP_OR if disable else OP_NAND)
 
-	def CreateControl(self, newID, ctype, x, y, w, h, *args): # backwards compatibility
-		frame = {"x" : x, "y" : y, "w" : w, "h" : h}
-		return self.CreateSubview(newID, ctype, frame, *args)
-
 	def ReplaceSubview(self, subview, ctype, *args):
 		if isinstance(subview, int):
 			subview = self.GetControl (subview)
@@ -166,26 +165,32 @@ class GView:
 		return RemoveView(view, delete)
 
 	def CreateWorldMapControl(self, control, *args):
-		return self.CreateControl(control, IE_GUI_WORLDMAP, args[0], args[1], args[2], args[3], args[4:])
+		frame = _ExtractFrame(args[0:4])
+		return self.CreateSubview(control, IE_GUI_WORLDMAP, frame, args[4:])
 	
 	def CreateMapControl(self, control, *args):
-		return self.CreateControl(control, IE_GUI_MAP, args[0], args[1], args[2], args[3], args[4:])
+		frame = _ExtractFrame(args[0:4])
+		return self.CreateSubview(control, IE_GUI_MAP, frame, args[4:])
   
 	def CreateLabel(self, control, *args):
-		return self.CreateControl(control, IE_GUI_LABEL, args[0], args[1], args[2], args[3], args[4:])
+		frame = _ExtractFrame(args[0:4])
+		return self.CreateSubview(control, IE_GUI_LABEL, frame, args[4:])
   
 	def CreateButton(self, control, *args):
-		return self.CreateControl(control, IE_GUI_BUTTON, args[0], args[1], args[2], args[3], args[4:])
+		frame = _ExtractFrame(args[0:4])
+		return self.CreateSubview(control, IE_GUI_BUTTON, frame, args[4:])
   
 	def CreateScrollBar(self, control, frame, bam=None):
 		view = CreateView (control, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs(bam))
 		return self.AddSubview (view)
   
-	def CreateTextArea(self, control, *args):
-		return self.CreateControl(control, IE_GUI_TEXTAREA, args[0], args[1], args[2], args[3], args[4:])
+	def CreateTextArea(self, control, args):
+		frame = _ExtractFrame(args[0:4])
+		return self.CreateSubview(control, IE_GUI_TEXTAREA, frame, args[4:])
   
 	def CreateTextEdit(self, control, *args):
-		return self.CreateControl(control, IE_GUI_EDIT, args[0], args[1], args[2], args[3], args[4:])
+		frame = _ExtractFrame(args[0:4])
+		return self.CreateSubview(control, IE_GUI_EDIT, frame, args[4:])
 
 class GWindow(GView, Scrollable):
 	methods = {
@@ -198,12 +203,12 @@ class GWindow(GView, Scrollable):
 
 	__slots__ = ['HasFocus']
 
-	def DeleteControl(self, view): # backwards compatibility
+	def DeleteControl(self, view):
 		if type(view) == int:
 			view = self.GetControl (view)
 		RemoveView (view, True)
 
-	def GetControl(self, newID): # backwards compatibility
+	def GetControl(self, newID):
 		return GetView(self, newID)
 
 	def AliasControls (self, map):
@@ -341,19 +346,15 @@ class GButton(GControl):
 		# escape key
 		return self.SetHotKey(chr(0x8c), 0, glob)
 
-	def SetMOS(self, mos):
-		self.SetPicture(mos) # backwards compatibility
-
-	def SetSprite2D(self, spr):
-		self.SetPicture(spr) # backwards compatibility
-
 	def CreateLabel(self, labelid, *args):
 		frame = self.GetFrame()
-		return self.CreateControl(labelid, IE_GUI_LABEL, 0, 0, frame['w'], frame['h'], args)
+		frame["x"] = frame["y"] = 0
+		return self.CreateSubview(labelid, IE_GUI_LABEL, frame, args)
 		
 	def CreateButton(self, btnid):
 		frame = self.GetFrame()
-		return self.CreateControl(btnid, IE_GUI_BUTTON, 0, 0, frame['w'], frame['h'])
+		frame["x"] = frame["y"] = 0
+		return self.CreateSubview(btnid, IE_GUI_BUTTON, frame)
 
 class GWorldMap(GControl, Scrollable):
 	methods = {

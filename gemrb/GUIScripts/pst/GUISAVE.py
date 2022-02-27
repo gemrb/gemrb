@@ -103,7 +103,7 @@ def ScrollBarPress():
 			Slottime = Games[ActPos].GetDate ()
 			Button1.SetState (IE_GUI_BUTTON_ENABLED)
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
-			PreviewButton.SetSprite2D(Games[ActPos].GetPreview())
+			PreviewButton.SetPicture (Games[ActPos].GetPreview())
 		elif ActPos == len(Games):
 			Slotname = 28647 # "Empty"
 			Slottime = ""
@@ -126,7 +126,7 @@ def ScrollBarPress():
 		for j in range (6):
 			Button = Window.GetControl (22 + i*6 + j)
 			if ActPos < len(Games):
-				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
+				Button.SetPicture (Games[ActPos].GetPortrait(j))
 			else:
 				Button.SetPicture (None)
 
@@ -235,14 +235,14 @@ def OpenSaveDetailWindow ():
 
 	# Areapreview
 	Button = Window.GetControl (0)
-	Button.SetSprite2D(GemRB.GetGamePreview())
+	Button.SetPicture (GemRB.GetGamePreview())
 
 	# PC portraits
 	from GameCheck import MAX_PARTY_SIZE
 	for j in range (MAX_PARTY_SIZE):
 		Button = Window.GetControl (6 + j)
 		if Button:
-			Button.SetSprite2D (GemRB.GetPlayerPortrait (j)["Sprite"])
+			Button.SetPicture (GemRB.GetPlayerPortrait (j)["Sprite"])
 
 	CheckSaveName ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)

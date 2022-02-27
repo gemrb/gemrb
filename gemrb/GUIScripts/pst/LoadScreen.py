@@ -49,7 +49,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 
 	def EndLoadScreen ():
 		Skull = Window.GetControl (1)
-		Skull.SetMOS ("GSKULON")
+		Skull.SetPicture ("GSKULON")
 		
 		LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
 		GemRB.SetTimer(LoadScreen.Close, 500, 0)
@@ -60,6 +60,6 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 	Bar.SetVarAssoc ("Progress", 0)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	Skull = Window.GetControl (1)
-	Skull.SetMOS ("GSKULOFF")
+	Skull.SetPicture ("GSKULOFF")
 
 	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
