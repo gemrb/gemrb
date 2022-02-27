@@ -367,7 +367,7 @@ def OpenLogWindow ():
 		journalText += "[color=FFFF00]" + GemRB.GetString(19310)+" "+date+":[/color]"
 		journalText += " " + GemRB.GetString (je['Text']) + "\n\n"
 			
-	Text.Append(journalText)
+	Text.SetText (journalText)
 	LogWindow.Focus()
 	
 ###################################################

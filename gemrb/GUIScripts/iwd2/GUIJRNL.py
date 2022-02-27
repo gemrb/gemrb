@@ -81,7 +81,7 @@ def UpdateJournalWindow (Window):
 		GemRB.SetToken("YEAR",year)
 		JournalText = JournalText + "[color=FFFF00]" + GemRB.GetString(15980) + "[/color]\n"
 		JournalText = JournalText + GemRB.GetString(je['Text']) + "\n\n"
-	Text.Append (JournalText)
+	Text.SetText (JournalText)
 
 ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateJournalWindow)
 OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, UpdateJournalWindow)
