@@ -499,8 +499,8 @@ def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
-	button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
-	button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
+	button.OnMouseEnter (lambda: help_ta.SetText (ctlname))
+	button.OnMouseLeave (lambda: help_ta.SetText (winname))
 
 	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, help_ta, ctlname, winname)
 

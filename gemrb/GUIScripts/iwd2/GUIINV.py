@@ -53,8 +53,8 @@ def InitInventoryWindow (Window):
 	# Ground Items (6)
 	for cid in HorizontalSlots:
 		Button = Window.GetControl (cid)
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
+		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
+		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 
 	#major & minor clothing color
 	Button = Window.GetControl (62)
@@ -115,8 +115,8 @@ def InitInventoryWindow (Window):
 		SlotType = GemRB.GetSlotType (slot+1)
 		if SlotType["ID"]:
 			Button = Window.GetControl (SlotType["ID"])
-			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterSlot)
-			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
+			Button.OnMouseEnter (InventoryCommon.MouseEnterSlot)
+			Button.OnMouseLeave (InventoryCommon.MouseLeaveSlot)
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			Button.SetFont ("NUMFONT")
 

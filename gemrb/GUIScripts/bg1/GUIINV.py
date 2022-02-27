@@ -43,8 +43,8 @@ def InitInventoryWindow (Window):
 	#Ground Item
 	for i in range (5):
 		Button = Window.GetControl (i+68)
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
+		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
+		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 		#This IS different from BG2
 		Button.SetSprites ("STONSLOT",0,0,1,2,3)
 		Button.SetFont ("NUMBER")
@@ -103,8 +103,8 @@ def InitInventoryWindow (Window):
 		SlotType = GemRB.GetSlotType (slot+1)
 		if SlotType["ID"]:
 			Button = Window.GetControl (SlotType["ID"])
-			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterSlot)
-			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
+			Button.OnMouseEnter (InventoryCommon.MouseEnterSlot)
+			Button.OnMouseLeave (InventoryCommon.MouseLeaveSlot)
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			#keeping 1 in the original place, because it is how
 			#the gui resource has it, but setting the other cycles

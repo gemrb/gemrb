@@ -98,40 +98,40 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 	for i in range(len(Stats)):
 		Button = NewLifeWindow.GetControl (i+2)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
+		Button.OnMouseEnter (StatPress[i])
 
 	Button = NewLifeWindow.GetControl(8)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5025)
-	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, AcPress)
+	Button.OnMouseEnter (AcPress)
 
 	Button = NewLifeWindow.GetControl(9)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5026)
-	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, HpPress)
+	Button.OnMouseEnter (HpPress)
 
 	Button = NewLifeWindow.GetControl(10)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5027)
-	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, PointPress)
+	Button.OnMouseEnter (PointPress)
 
 	# stat +/- buttons
 	for i in range(len(StatPress)):
 		Button = NewLifeWindow.GetControl (11+2*i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreasePress)
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
+		Button.OnMouseEnter (StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
 		Button.SetActionInterval (200)
 
 		Button = NewLifeWindow.GetControl (12+2*i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreasePress)
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
+		Button.OnMouseEnter (StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
 		Button.SetActionInterval (200)
 
@@ -154,7 +154,7 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 	PhotoButton = NewLifeWindow.GetControl(35)
 	PhotoButton.SetState(IE_GUI_BUTTON_LOCKED)
 	PhotoButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	PhotoButton.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, OverPhoto)
+	PhotoButton.OnMouseEnter (OverPhoto)
 	PhotoButton.SetPicture("STPNOC")
 
 	AcceptButton = NewLifeWindow.GetControl(0)

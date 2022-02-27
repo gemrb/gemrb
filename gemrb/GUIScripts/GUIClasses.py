@@ -255,8 +255,6 @@ class GControl(GView):
 	# map old event identifiers to new action system
 	EventMap = {
 		IE_GUI_BUTTON_ON_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1),
-		IE_GUI_MOUSE_ENTER_BUTTON: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_ENTER),
-		IE_GUI_MOUSE_LEAVE_BUTTON: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_LEAVE),
 		IE_GUI_BUTTON_ON_SHIFT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 1, 1),
 		IE_GUI_BUTTON_ON_RIGHT_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1),
 		IE_GUI_BUTTON_ON_DOUBLE_PRESS: lambda control, handler: control.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2),
@@ -264,6 +262,12 @@ class GControl(GView):
 
 	def SetEvent(self, event, handler):
 		GControl.EventMap[event](self, handler)
+
+	def OnMouseEnter(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_ENTER)
+
+	def OnMouseLeave(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_LEAVE)
 
 	def QueryInteger(self):
 		return int("0"+self.QueryText())

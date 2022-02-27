@@ -46,8 +46,8 @@ def InitInventoryWindow (Window):
 	# Ground Items (6)
 	for i in range (5):
 		Button = Window.GetControl (i+68)
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
+		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
+		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 		Button.SetFont ("NUMBER")
 
 	Button = Window.GetControl (81)
@@ -117,8 +117,8 @@ def InitInventoryWindow (Window):
 		SlotType = GemRB.GetSlotType (slot+1)
 		Button = Window.GetControl (SlotType["ID"])
 		if SlotType["ID"] and Button:
-			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterSlot)
-			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
+			Button.OnMouseEnter (InventoryCommon.MouseEnterSlot)
+			Button.OnMouseLeave (InventoryCommon.MouseLeaveSlot)
 			Button.SetVarAssoc ("ItemButton", slot+1)
 			Button.SetFont ("NUMBER")
 

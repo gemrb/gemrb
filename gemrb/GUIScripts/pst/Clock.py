@@ -25,7 +25,7 @@ def CreateClockButton(Button):
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))
-	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, UpdateClock)
+	Button.OnMouseEnter (UpdateClock)
 	SetPSTGamedaysAndHourToken ()
 	Button.SetTooltip (GemRB.GetString(65027))
 	

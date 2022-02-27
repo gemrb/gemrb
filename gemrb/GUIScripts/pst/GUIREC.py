@@ -119,16 +119,16 @@ def InitRecordsWindow (Window):
 		Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetSprites("", 0, 0, 0, 0, 0)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, statevents[i])
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
+		Button.OnMouseEnter (statevents[i])
+		Button.OnMouseLeave (OnRecordsButtonLeave)
 
 	# AC button
 	Button = Window.GetControl (37)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpArmorClass)
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
+	Button.OnMouseEnter (OnRecordsHelpArmorClass)
+	Button.OnMouseLeave (OnRecordsButtonLeave)
 
 
 	# HP button
@@ -136,8 +136,8 @@ def InitRecordsWindow (Window):
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	Button.SetSprites ("", 0, 0, 0, 0, 0)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpHitPoints)
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
+	Button.OnMouseEnter (OnRecordsHelpHitPoints)
+	Button.OnMouseLeave (OnRecordsButtonLeave)
 
 	return
 
@@ -264,8 +264,8 @@ def UpdateRecordsWindow (Window):
 	Button = Window.GetControl (5)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites ('STALIGN', 0, frame, 0, 0, 0)
-	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpAlignment)
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
+	Button.OnMouseEnter (OnRecordsHelpAlignment)
+	Button.OnMouseLeave (OnRecordsButtonLeave)
 
 
 	# faction
@@ -277,8 +277,8 @@ def UpdateRecordsWindow (Window):
 	Button = Window.GetControl (6)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites ('STFCTION', 0, frame, 0, 0, 0)
-	Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, OnRecordsHelpFaction)
-	Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, OnRecordsButtonLeave)
+	Button.OnMouseEnter (OnRecordsHelpFaction)
+	Button.OnMouseLeave (OnRecordsButtonLeave)
 
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)

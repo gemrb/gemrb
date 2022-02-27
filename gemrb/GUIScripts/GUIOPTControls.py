@@ -51,8 +51,8 @@ def OptSlider (winhelp, ctlhelp, help_ta, window, slider_id, label_id, label_str
 		slider.OnChange (lambda: help_ta.SetText (ctlhelp))
 
 	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
-	slider.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlhelp))
-	slider.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winhelp))
+	slider.OnMouseEnter (lambda: help_ta.SetText (ctlhelp))
+	slider.OnMouseLeave (lambda: help_ta.SetText (winhelp))
 
 	return slider
 
@@ -92,7 +92,7 @@ def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_s
 		def callback():
 			help_ta.SetText(ctlhelp)
 
-		button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, callback)
+		button.OnMouseEnter (callback)
 
 	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
 
@@ -140,8 +140,8 @@ def OptBuddyLabel (window, label_id, label_strref = None, help_ta = None, ctlnam
 	if label_strref and GameCheck.IsPST():
 		label.SetText (label_strref)
 	if help_ta:
-		label.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlname))
-		label.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winname))
+		label.OnMouseEnter (lambda: help_ta.SetText (ctlname))
+		label.OnMouseLeave (lambda: help_ta.SetText (winname))
 
 ###################################################
 # End of file GUIOPTControls.py

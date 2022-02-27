@@ -193,7 +193,7 @@ def OnLoad():
 	for i in range(6):
 		Button = AbilityWindow.GetControl(i+30)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
-		Button.SetEvent(IE_GUI_MOUSE_LEAVE_BUTTON, EmptyPress)
+		Button.OnMouseLeave (EmptyPress)
 		Button.SetValue (i)
 		# delete the labels and use the buttons instead
 		AbilityWindow.DeleteControl (i+0x10000009)

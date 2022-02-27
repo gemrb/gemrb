@@ -76,8 +76,8 @@ def InitInventoryWindow (Window):
 		SlotType = GemRB.GetSlotType (slot)
 		Button = Window.GetControl (SlotType["ID"])
 		if Button:
-			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterSlot)
-			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
+			Button.OnMouseEnter (InventoryCommon.MouseEnterSlot)
+			Button.OnMouseLeave (InventoryCommon.MouseLeaveSlot)
 			Button.SetVarAssoc ("ItemButton", slot)
 
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -99,8 +99,8 @@ def InitInventoryWindow (Window):
 		color['r'], color['b'] = color['b'], color['r']
 		Button.SetBorder (1,color,0,1)
 
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
+		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
+		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 
 	ScrollBar = Window.GetControl (45)
 	ScrollBar.OnChange (lambda: RefreshInventoryWindow(Window))
