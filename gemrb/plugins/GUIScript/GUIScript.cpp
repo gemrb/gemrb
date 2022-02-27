@@ -1732,7 +1732,7 @@ PyDoc_STRVAR( GemRB_Control_SetAction__doc,
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
-    Bar.SetAction (EndLoadScreen, IE_GUI_PROGRESS_END_REACHED)\n\
+    Bar.OnEndReached (EndLoadScreen)\n\
     ...\n\
   def EndLoadScreen ():\n\
     Skull = LoadScreen.GetControl (1)\n\

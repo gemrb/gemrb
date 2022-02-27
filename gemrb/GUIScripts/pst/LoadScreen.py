@@ -58,7 +58,7 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 	Bar = Window.GetControl (0)
 	Bar.AddAlias("LOAD_PROG")
 	Bar.SetVarAssoc ("Progress", 0)
-	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
+	Bar.OnEndReached (EndLoadScreen)
 	Skull = Window.GetControl (1)
 	Skull.SetPicture ("GSKULOFF")
 

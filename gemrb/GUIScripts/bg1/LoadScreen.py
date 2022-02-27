@@ -42,7 +42,7 @@ def StartLoadScreen ():
 	Bar = LoadScreen.GetControl (0)
 	Bar.AddAlias("LOAD_PROG")
 	Bar.SetVarAssoc ("Progress", 0)
-	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
+	Bar.OnEndReached (EndLoadScreen)
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetPicture ("GTRBPSK")
 
