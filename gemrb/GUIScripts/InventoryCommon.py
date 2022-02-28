@@ -1068,8 +1068,6 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 
 	color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
 	Button.SetBorder (0, color, 0,1)
-	color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 255}
-	Button.SetBorder (1, color, 0,0, Button.GetInsetFrame(2))
 	colorUnusable = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 	Button.SetBorder (2, colorUnusable, 0, 1)
 	colorUMD = {'r' : 255, 'g' : 255, 'b' : 0, 'a' : 64}
@@ -1084,7 +1082,6 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 			tooltips = { "inventory": 82, "ground": 83, "container": "" }
 		Button.SetTooltip (tooltips[Type])
 		Button.EnableBorder (0, 0)
-		Button.EnableBorder (1, 0)
 		Button.EnableBorder (2, 0)
 		return
 
@@ -1103,14 +1100,9 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	if not identified or item["ItemNameIdentified"] == -1:
 		Button.SetTooltip (item["ItemName"])
 		Button.EnableBorder (0, 1)
-		Button.EnableBorder (1, 0)
 	else:
 		Button.SetTooltip (item["ItemNameIdentified"])
 		Button.EnableBorder (0, 0)
-		if magical and not GameCheck.IsPST():
-			Button.EnableBorder (1, 1)
-		else:
-			Button.EnableBorder (1, 0)
 
 	usable = GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped)
 	if usable:
@@ -1122,6 +1114,10 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	else:
 		Button.SetBorder (2, colorUnusable, 1, 1)
 
-	Button.SetItemIcon (Slot['ItemResRef'], 0)
-
+	if magical and GameCheck.IsIWD2 ():
+		Button.SetFlags (IE_GUI_BUTTON_HORIZONTAL, OP_OR)
+		Button.SetItemIcon (Slot['ItemResRef'], 0, 0, 0, "", "STORTIN3")
+	else:
+		Button.SetFlags (IE_GUI_BUTTON_HORIZONTAL, OP_NAND)
+		Button.SetItemIcon (Slot['ItemResRef'], 0)
 	return

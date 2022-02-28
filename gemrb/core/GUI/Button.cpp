@@ -234,8 +234,12 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			offset.y = frame.h / 2 - (*iter)->Frame.h/2 + (*iter)->Frame.y;
 		}
 
+		BlitFlags blitFlags = BlitFlags::NONE;
+		if (flags & IE_GUI_BUTTON_HORIZONTAL) {
+			blitFlags = BlitFlags::HALFTRANS;
+		}
 		for (; iter != PictureList.end(); ++iter) {
-			video->BlitSprite(*iter, rgn.origin + offset);
+			video->BlitSprite(*iter, rgn.origin + offset, nullptr, blitFlags);
 		}
 	}
 
