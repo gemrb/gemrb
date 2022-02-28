@@ -6613,7 +6613,7 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
 "===== Button_SetItemIcon =====\n\
 \n\
-**Prototype:** GemRB.SetItemIcon (WindowIndex, ControlIndex, ITMResRef[, type, tooltip, Function, ITM2ResRef])\n\
+**Prototype:** GemRB.SetItemIcon (WindowIndex, ControlIndex, ITMResRef[, type, tooltip, Function, ITM2ResRef, BAM3ResRef])\n\
 \n\
 **Metaclass Prototype:** SetItemIcon (ITMResRef[, Type, Tooltip, ITM2ResRef])\n\
 \n\
@@ -6634,13 +6634,14 @@ PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
     * 8 - etc.\n\
   * Tooltip  - if set to 1, the tooltip for the item will also be set\n\
   * ITM2ResRef - if set, a second item to display in the icon. ITM2 is drawn first. The tooltip of ITM is used. Only valid for Type 4 and 5\n\
+  * BAM3ResRef - if set, a third image will be stacked on top of the others\n\
 \n\
 **Return value:** N/A\n\
 \n\
 **See also:** [Button_SetSpellIcon](Button_SetSpellIcon.md), [Button_SetActionIcon](Button_SetActionIcon.md)"
 );
 
-static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
+static PyObject *SetItemIcon(Button* btn, const char* ItemResRef, int Which, int tooltip, int Function, const char* Item2ResRef, const ResRef& bam3ResRef)
 {
 	ABORT_IF_NULL(btn);
 
@@ -6708,6 +6709,11 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 		btn->SetHotKey(GEM_FUNCTIONX(Function), 0, true);
 	}
 
+	if (!bam3ResRef.IsEmpty()) {
+		Holder<Sprite2D> Picture3 = gamedata->GetAnySprite(bam3ResRef, -1, 0);
+		if (Picture3) btn->StackPicture(Picture3);
+	}
+
 	gamedata->FreeItem( item, ItemResRef, false );
 	//no incref here!
 	return Py_None;
@@ -6719,11 +6725,12 @@ static PyObject* GemRB_Button_SetItemIcon(PyObject* self, PyObject* args)
 	int Which = 0;
 	int tooltip = 0;
 	int Function = 0;
-	const char *Item2ResRef = NULL;
-	PARSE_ARGS( args,  "Os|iiis", &self, &ItemResRef, &Which, &tooltip, &Function, &Item2ResRef );
+	const char* Item2ResRef = nullptr;
+	const char* bam3ResRef = nullptr;
+	PARSE_ARGS(args, "Os|iiiss", &self, &ItemResRef, &Which, &tooltip, &Function, &Item2ResRef, &bam3ResRef);
 
 	Button* btn = GetView<Button>(self);
-	PyObject *ret = SetItemIcon(btn, ItemResRef, Which, tooltip, Function, Item2ResRef);
+	PyObject *ret = SetItemIcon(btn, ItemResRef, Which, tooltip, Function, Item2ResRef, ResRef(bam3ResRef));
 	if (ret) {
 		Py_INCREF(ret);
 	}
@@ -11027,7 +11034,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 							break;
 						}
 					}
-					SetItemIcon(btn, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, Item2ResRef);
+					SetItemIcon(btn, item->ItemResRef, mode, (item->Flags & IE_INV_ITEM_IDENTIFIED) ? 2 : 1, i + 1, Item2ResRef, {});
 					SetItemText(btn, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]], true);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
@@ -11123,7 +11130,7 @@ jump_label:
 					//if (usages)
 					{
 						//SetItemIcon parameter needs header+6 to display extended header icons
-						SetItemIcon(btn, item->ItemResRef,header+6,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, NULL);
+						SetItemIcon(btn, item->ItemResRef, header + 6, (item->Flags & IE_INV_ITEM_IDENTIFIED) ? 2 : 1, i + 1, nullptr, {});
 						SetItemText(btn, usages, false);
 					}
 				} else {
