@@ -36,8 +36,6 @@ function dumpDocs() {
          module = index(title, "_") ? "_GemRB" : "GemRB"
          # remove old title
          sub("^=====.*=====.", "")
-         # fix See also links
-         $0 = gensub("\\[\\[guiscript:(\\w+)\\]\\]", "[\\1](\\1.md)", "g")
 
          # dump frontmatter and contents
          print "---" > filename
