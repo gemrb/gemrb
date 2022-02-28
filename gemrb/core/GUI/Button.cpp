@@ -430,7 +430,6 @@ String Button::TooltipText() const
 				s += L"PgDn";
 				break;
 			default:
-				// TODO: check if there are more possible keys
 				if (hotKey.key >= GEM_FUNCTIONX(1) && hotKey.key <= GEM_FUNCTIONX(16)) {
 					s.push_back(L'F');
 					int offset = hotKey.key - GEM_FUNCTIONX(0);
