@@ -560,7 +560,7 @@ then moved by (screen size - winpack size) / 2\n\
 \n\
 **Return value:** GWindow (index)\n\
 \n\
-**See also:** [[guiscript:LoadWindowPack]], [[guiscript:Window_GetControl]], [[guiscript:Window_ShowModal]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:LoadWindowPack]], [[guiscript:Window_GetControl]], [[guiscript:Window_ShowModal]]"
 );
 
 static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
@@ -1336,7 +1336,7 @@ PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  GemRB.SetToken ('VoiceSet', TextAreaControl.QueryText ())\n\
  The above example sets the VoiceSet token to the value of the selected string in a TextArea control. Later this voiceset could be stored in the character sheet.\n\
  \n\
- **See also:** [[guiscript:Control_SetText]], [[guiscript:SetToken]], [[guiscript:accessing_gui_controls]]"
+ **See also:** [[guiscript:Control_SetText]], [[guiscript:SetToken]]"
  );
 
 static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
@@ -1399,7 +1399,7 @@ of the running engine.\n\
 \n\
 **Return value:** 0 on success, -1 otherwise\n\
 \n\
-**See also:** [[guiscript:Control_QueryText]], [[guiscript:DisplayString]], [[guiscript:Window_GetControl]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Control_QueryText]], [[guiscript:DisplayString]], [[guiscript:Window_GetControl]]"
 );
 
 static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
@@ -1742,7 +1742,7 @@ The above example changes the image on the loadscreen when the progressbar reach
   Button.SetAction (Buttons.YesButton, IE_GUI_MOUSE_PRESS, 1, 0, 1)\n\
 The above example sets up the 'YesButton' function from the Buttons module to be called when the button is pressed with the left mouse button one time.\n\
 \n\
-**See also:** [[guiscript:Window_GetControl]], [[guiscript:Control_SetVarAssoc]], [[guiscript:SetTimedEvent]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Window_GetControl]], [[guiscript:Control_SetVarAssoc]], [[guiscript:SetTimedEvent]]"
 );
 
 static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
@@ -1911,7 +1911,7 @@ PyDoc_STRVAR( GemRB_Control_SetValue__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:Control_SetVarAssoc]], [[guiscript:data_exchange]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Control_SetVarAssoc]]"
 );
 
 static PyObject* GemRB_Control_SetValue(PyObject* self, PyObject* args)
@@ -1955,7 +1955,7 @@ control. See more about this in 'data_exchange'.\n\
 \n\
 **Special:** If the 'DialogChoose' variable was set to -1 or 0 during a dialog session, it will terminate (-1) or pick the first available option (0) from the dialog automatically. (0 is used for 'continue', -1 is used for 'end dialogue').\n\
 \n\
-**See also:** [[guiscript:Button_SetFlags]], [[guiscript:SetVar]], [[guiscript:GetVar]], [[guiscript:data_exchange]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Button_SetFlags]], [[guiscript:SetVar]], [[guiscript:GetVar]]"
 );
 
 static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
@@ -2976,7 +2976,7 @@ encounters will be evaluated too.\n\
   * Destination - The area resource reference where the player arrives (if there was a random encounter, it differs from Target)\n\
   * Entrance    - The area entrance in the Destination area, it could be empty, in this casethe player should appear in middle of the area\n\
 \n\
-**See also:** [[guiscript:Window_CreateWorldMapControl]], [[guiscript:CreateMovement]], [[guiscript:accessing_gui_controls]]"
+**See also:** [[guiscript:Window_CreateWorldMapControl]], [[guiscript:CreateMovement]]"
 );
 
 static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* args)
@@ -3290,9 +3290,7 @@ status, dialog textarea size).\n\
   * Bits - This depends on the game. The lowest 2 bits are the message window size\n\
   * Operation - The usual bit operations\n\
 \n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:bit_operation]]"
+**Return value:** N/A"
 );
 
 static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
@@ -3324,8 +3322,7 @@ Don't confuse it with the saved screen flags set by GameSetScreenFlags.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:GameSetScreenFlags]], [[guiscript:bit_operation]]\n\
-"
+**See also:** [[guiscript:GameSetScreenFlags]]"
 );
 
 static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* args)
@@ -4102,7 +4099,7 @@ core, these are described in different places:\n\
   GemRB.SetVar('MessagePosition', 4) #BottomAdded\n\
 The above lines set up some windows of the main game screen.\n\
 \n\
-**See also:** [[guiscript:Control_SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:LoadGame]], [[guiscript:HideGUI]], [[guiscript:data_exchange]]"
+**See also:** [[guiscript:Control_SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:LoadGame]], [[guiscript:HideGUI]]"
 );
 
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
@@ -4191,7 +4188,7 @@ controls could affect the same variable.\n\
 **Examples:**\n\
   selected = GemRB.GetVar ('SelectedMovie')\n\
 \n\
-**See also:** [[guiscript:SetVar]], [[guiscript:Control_SetVarAssoc]], [[guiscript:data_exchange]]\n\
+**See also:** [[guiscript:SetVar]], [[guiscript:Control_SetVarAssoc]]\n\
 "
 );
 
@@ -4269,7 +4266,7 @@ PyDoc_STRVAR( GemRB_SetGlobal__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:SetVar]], [[guiscript:Control_SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:data_exchange]]"
+**See also:** [[guiscript:SetVar]], [[guiscript:Control_SetVarAssoc]], [[guiscript:SetToken]]"
 );
 
 static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
@@ -8848,7 +8845,7 @@ identifies an item.\n\
 \n\
 **Return value:** Returns 0 if the item was not found.\n\
 \n\
-**See also:** [[guiscript:GetSlotItem]], [[guiscript:bit_operation]]"
+**See also:** [[guiscript:GetSlotItem]]"
 );
 
 static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
