@@ -357,7 +357,8 @@ The game won't be loaded before the current GUIScript function returns!\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:**\n\
+**Examples:**\n\
+\n\
     GemRB.SetVar ('PlayMode', 0)\n\
     GemRB.LoadGame (-1, 22)\n\
 \n\
@@ -442,9 +443,10 @@ to beyond the top.\n\
   * Ctrl - textarea id\n\
   * Text - The text to set in the TA\n\
 \n\
-**Example:**\n\
-  TextArea = ChapterWindow.GetControl (5)\n\
-  TextArea.SetChapterText (text)\n\
+**Examples:**\n\
+\n\
+    TextArea = ChapterWindow.GetControl (5)\n\
+    TextArea.SetChapterText (text)\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -505,9 +507,11 @@ level value without a token, you'll need this.\n\
 \n\
 **Return value:** A string with resolved tokens.\
 \n\
-**Example:**\n\
-   Level = GemRB.GetPlayerStat (pc, IE_LEVEL) # 1 at character generation\n\
-   Label.SetText (GemRB.GetString(12137) + str(Level)) \n\
+**Examples:**\n\
+\n\
+     Level = GemRB.GetPlayerStat (pc, IE_LEVEL) # 1 at character generation\n\
+     Label.SetText (GemRB.GetString(12137) + str(Level)) \n\
+\n\
 The above example will display 'Level: 1' in the addressed label.\n\
 \n\
 **See also:** [[guiscript:Control_SetText]]\n\
@@ -1019,10 +1023,12 @@ PyDoc_STRVAR( GemRB_Symbol_GetValue__doc,
   * numeric, if the symbol's name was given (the value of the symbol)\n\
   * string, if the value of the symbol was given (the symbol's name)\n\
 \n\
-**Example:**\n\
+**Examples:**\n\
+\n\
     align = GemRB.GetPlayerStat (pc, IE_ALIGNMENT)\n\
     ss = GemRB.LoadSymbol ('ALIGN')\n\
     sym = GemRB.GetSymbolValue (ss, align)\n\
+\n\
 The above example will find the symbolic name of the player's alignment.\n\
 \n\
 **See also:** [[guiscript:LoadSymbol]], [[guiscript:Table_GetValue]]"
@@ -1072,8 +1078,9 @@ PyDoc_STRVAR( GemRB_View_AddSubview__doc,
   * siblingView - View to add\n\
   * id - assign this numeric ID to the new view (useful if it's already taken)\n\
 \n\
-**Example:**\n\
-  RaceWindow.AddSubview (ScrollBarControl)\n\
+**Examples:**\n\
+\n\
+    RaceWindow.AddSubview (ScrollBarControl)\n\
 \n\
 **Return value:** the new View"
 );
@@ -1149,8 +1156,9 @@ overwriteing an existing entry.\n\
   * AliasID - force to this alias numeric ID\n\
   * Overwrite - overwrite any existing alias\n\
 \n\
-**Example:**\n\
-  PortraitWindow.AddAlias ('HIDE_CUT', 3)\n\
+**Examples:**\n\
+\n\
+    PortraitWindow.AddAlias ('HIDE_CUT', 3)\n\
 \n\
 **Return value:** N/A"
 );
@@ -1190,8 +1198,9 @@ PyDoc_STRVAR( GemRB_GetView__doc,
   * GView - the window's reference or a string with the alias\n\
   * ID - look for a view with a specific numeric ID\n\
 \n\
-**Example:**\n\
-  GemRB.GetView ('ACTWIN')\n\
+**Examples:**\n\
+\n\
+    GemRB.GetView ('ACTWIN')\n\
 \n\
 **Return value:** View"
 );
@@ -1238,8 +1247,9 @@ PyDoc_STRVAR( GemRB_Scrollable_Scroll__doc,
   * y - y coordinate of point to scroll to\n\
   * relative - optional, set if you don't want an absolute scroll\n\
 \n\
-**Example:**\n\
-  WorldMapControl.Scroll (0, 0, False)\n\
+**Examples:**\n\
+\n\
+    WorldMapControl.Scroll (0, 0, False)\n\
 \n\
 **Return value:** N/A"
 );
@@ -1328,14 +1338,17 @@ PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  \n\
  **Return value:** string, may be empty\n\
  \n\
- **Example:**\n\
- Name = NameField.QueryText ()\n\
- GemRB.SetToken ('CHARNAME', Name)\n\
- The above example retrieves the character's name typed into the TextEdit control and stores it in a Token (a string variable accessible to gamescripts, the engine core and to the guiscripts too).\n\
- \n\
- GemRB.SetToken ('VoiceSet', TextAreaControl.QueryText ())\n\
- The above example sets the VoiceSet token to the value of the selected string in a TextArea control. Later this voiceset could be stored in the character sheet.\n\
- \n\
+**Examples:**\n\
+\n\
+    Name = NameField.QueryText ()\n\
+    GemRB.SetToken ('CHARNAME', Name)\n\
+\n\
+The above example retrieves the character's name typed into the TextEdit control and stores it in a Token (a string variable accessible to gamescripts, the engine core and to the guiscripts too).\n\
+\n\
+    GemRB.SetToken ('VoiceSet', TextAreaControl.QueryText ())\n\
+\n\
+The above example sets the VoiceSet token to the value of the selected string in a TextArea control. Later this voiceset could be stored in the character sheet.\n\
+\n\
  **See also:** [[guiscript:Control_SetText]], [[guiscript:SetToken]]"
  );
 
@@ -1688,10 +1701,11 @@ PyDoc_STRVAR( GemRB_Window_SetAction__doc,
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
+\n\
     Bar.SetAction (OnWindowClose, ACTION_WINDOW_CLOSED)\n\
     ...\n\
-  def OnWindowClose (Window):\n\
-    ...\n\
+    def OnWindowClose (Window):\n\
+      ...\n\
 \n\
 **See also:** [[guiscript:Control_SetAction]]"
 );
@@ -1732,11 +1746,13 @@ PyDoc_STRVAR( GemRB_Control_SetAction__doc,
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
+\n\
     Bar.OnEndReached (EndLoadScreen)\n\
     ...\n\
-  def EndLoadScreen ():\n\
-    Skull = LoadScreen.GetControl (1)\n\
-    Skull.SetPicture ('GSKULON')\n\
+    def EndLoadScreen ():\n\
+      Skull = LoadScreen.GetControl (1)\n\
+      Skull.SetPicture ('GSKULON')\n\
+\n\
 The above example changes the image on the loadscreen when the progressbar reaches the end.\n\
 \n\
   Button.SetAction (Buttons.YesButton, IE_GUI_MOUSE_PRESS, 1, 0, 1)\n\
@@ -1782,8 +1798,6 @@ PyDoc_STRVAR( GemRB_Control_SetActionInterval__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**Examples:**\n\
-Button.SetActionInterval (50)\n\
 **See also:** [[guiscript:Control_SetEvent]]"
 );
 
@@ -1813,7 +1827,8 @@ this script has terminated.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:**\n\
+**Examples:**\n\
+\n\
     GemRB.SetNextScript ('CharGen')\n\
     return\n\
 \n\
@@ -2071,8 +2086,9 @@ PyDoc_STRVAR( GemRB_CreateView__doc,
   * FrameRect - a dict with the View's frame (origin and size)\n\
   * OtherArgs - further arguments depending on the View type\n\
 \n\
-**Example:**\n\
-  view = CreateView (control, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs(bam))\n\
+**Examples:**\n\
+\n\
+    view = CreateView (control, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs(bam))\n\
 \n\
 **See also:** [[guiscript:RemoveView]], [[guiscript:AddSubview]], [[guiscript:GetFrame]]\n\
 \n\
@@ -2243,8 +2259,9 @@ PyDoc_STRVAR( GemRB_View_SetEventProxy__doc,
   * GView - the control's reference\n\
   * ProxyView - another View\n\
 \n\
-**Example:**\n\
-  RaceWindow.SetEventProxy (ScrollBarControl)\n\
+**Examples:**\n\
+\n\
+    RaceWindow.SetEventProxy (ScrollBarControl)\n\
 \n\
 **Return value:** N/A"
 );
@@ -2277,8 +2294,9 @@ PyDoc_STRVAR( GemRB_View_GetFrame__doc,
 \n\
 **Parameters:** N/A\n\
 \n\
-**Example:**\n\
-  StartWindow.GetFrame ()\n\
+**Examples:**\n\
+\n\
+    StartWindow.GetFrame ()\n\
 \n\
 **See also:** [[guiscript:SetFrame]]\n\
 \n\
@@ -2308,8 +2326,9 @@ PyDoc_STRVAR( GemRB_View_SetFrame__doc,
   * GView - the control's reference\n\
   * frameRect - a dict with x, y, w, h keys denoting the frame origin and size\n\
 \n\
-**Example:**\n\
-  StartWindow.SetFrame ({ 'x': 0, 'y': 0, 'h': 300, 'w': 300 })\n\
+**Examples:**\n\
+\n\
+    StartWindow.SetFrame ({ 'x': 0, 'y': 0, 'h': 300, 'w': 300 })\n\
 \n\
 **See also:** [[guiscript:GetFrame]]\n\
 \n\
@@ -2346,9 +2365,10 @@ PyDoc_STRVAR( GemRB_View_SetBackground__doc,
   * None - if the None object is passed, the background is cleared\n\
 \n\
 **Examples:**\n\
-  StartWindow.SetBackground ('STARTOLD')\n\
-  consoleOut.SetBackground ({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 128})\n\
-  NoteLabel.SetBackground (None)\n\
+\n\
+    StartWindow.SetBackground ('STARTOLD')\n\
+    consoleOut.SetBackground ({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 128})\n\
+    NoteLabel.SetBackground (None)\n\
 \n\
 **Return value:** N/A"
 );
@@ -2395,8 +2415,9 @@ PyDoc_STRVAR( GemRB_View_SetFlags__doc,
   * Operation - the bit operation to use, defaults to SET\n\
 \n\
 **Examples:**\n\
-  Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OR)\n\
-  Window.SetFlags (WF_ALPHA_CHANNEL, NAND)\n\
+\n\
+    Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)\n\
+    Window.SetFlags (WF_ALPHA_CHANNEL, OP_NAND)\n\
 \n\
 **Return value:** boolean marking success or failure"
 );
@@ -2435,8 +2456,9 @@ PyDoc_STRVAR( GemRB_View_SetResizeFlags__doc,
   * Flags - the bits to enable\n\
   * Operation - the bit operation to use, defaults to SET\n\
 \n\
-**Example:**\n\
-  TextArea.SetResizeFlags (IE_GUI_VIEW_RESIZE_ALL, OR)\n\
+**Examples:**\n\
+\n\
+    TextArea.SetResizeFlags (IE_GUI_VIEW_RESIZE_ALL, OR)\n\
 \n\
 **Return value:** boolean marking success or failure"
 );
@@ -2602,7 +2624,10 @@ it with a tint (like with unusable or unidentified item's icons).\n\
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
-  GemRB.SetButtonBorder (Icon, 0, color,  0, 1, rect)\n\
+\n\
+    color = {'r' : 200, 'g' : 0, 'b' : 0, 'a' : 64}\n\
+    IconButton.SetBorder (0, color, 0, 1)\n\
+\n\
 Not known spells are drawn darkened (the whole button will be overlaid).\n\
 \n\
 **See also:** [[guiscript:Button_EnableBorder]]"
@@ -4046,11 +4071,12 @@ be avoided. The hardcoded token list:\n\
   *  VariableName - the name of the variable (shorter than 32!)\n\
   *  Value        - string, the value of the token\n\
 \n\
-**Example:**\n\
-  ClassTitle = CommonTables.Classes.GetValue (Class, 'CAP_REF', GTV_REF)\n\
-  GemRB.SetToken ('CLASS', ClassTitle)\n\
-  # force an update of the string by refetching it\n\
-  TA.SetText (GemRB.GetString (16480))\n\
+**Examples:**\n\
+\n\
+    ClassTitle = CommonTables.Classes.GetValue (Class, 'CAP_REF', GTV_REF)\n\
+    GemRB.SetToken ('CLASS', ClassTitle)\n\
+    # force an update of the string by refetching it\n\
+    TextArea.SetText (GemRB.GetString (16480))\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -4091,13 +4117,9 @@ core, these are described in different places:\n\
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
-  GemRB.SetVar('ActionsWindow', ActionsWindow)\n\
-  GemRB.SetVar('OptionsWindow', OptionsWindow)\n\
-  GemRB.SetVar('MessageWindow', MessageWindow)\n\
-  GemRB.SetVar('ActionsPosition', 4) #BottomAdded\n\
-  GemRB.SetVar('OptionsPosition', 0) #Left\n\
-  GemRB.SetVar('MessagePosition', 4) #BottomAdded\n\
-The above lines set up some windows of the main game screen.\n\
+\n\
+    GemRB.SetVar ('ActWinID', ActionsWindow.ID)\n\
+    GemRB.SetVar ('ActionsPosition', 4)\n\
 \n\
 **See also:** [[guiscript:Control_SetVarAssoc]], [[guiscript:SetToken]], [[guiscript:LoadGame]], [[guiscript:HideGUI]]"
 );
@@ -4149,8 +4171,10 @@ string values, used both by the game scripts and the GUI scripts.\n\
 \n\
 **Return value:** string, the value of the token\n\
 \n\
-**Example:**\n\
-  TextArea.Append (GemRB.GetToken ('CHARNAME'))\n\
+**Examples:**\n\
+\n\
+    TextArea.Append (GemRB.GetToken ('CHARNAME'))\n\
+\n\
 The above example will add the protagonist's name to the TextArea (if the token was set correctly).\n\
 \n\
 **See also:** [[guiscript:SetToken]], [[guiscript:Control_QueryText]]\n\
@@ -4186,7 +4210,8 @@ controls could affect the same variable.\n\
 **Return value:** numeric, 0 if the variable doesn't exist\n\
 \n\
 **Examples:**\n\
-  selected = GemRB.GetVar ('SelectedMovie')\n\
+\n\
+    selected = GemRB.GetVar ('SelectedMovie')\n\
 \n\
 **See also:** [[guiscript:SetVar]], [[guiscript:Control_SetVarAssoc]]\n\
 "
@@ -4310,7 +4335,9 @@ is what gamescripts know as GLOBAL variables. \n\
 \n\
 **Return value:**\n\
 \n\
-**Example:** Chapter = GemRB.GetGameVar ('chapter')\n\
+**Examples:**\n\
+\n\
+    Chapter = GemRB.GetGameVar ('chapter')\n\
 \n\
 **See also:** [[guiscript:GetVar]], [[guiscript:GetToken]], [[guiscript:CheckVar]]"
 );
@@ -4411,9 +4438,11 @@ CreatePlayer call.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:** \n\
-  pc = GemRB.GameGetSelectedPCSingle ()\n\
-  GemRB.SaveCharacter (pc, ExportFileName)\n\
+**Examples:** \n\
+\n\
+    pc = GemRB.GameGetSelectedPCSingle ()\n\
+    GemRB.SaveCharacter (pc, ExportFileName)\n\
+\n\
 The above example exports the currently selected character.\n\
 \n\
 **See also:** [[guiscript:CreatePlayer]]"
@@ -4468,8 +4497,9 @@ to a specific SAV version.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:** \n\
-  GemRB.SaveGame (10, 'After meeting Dhall')\n\
+**Examples:** \n\
+\n\
+    GemRB.SaveGame (10, 'After meeting Dhall')\n\
 \n\
 **See also:** [[guiscript:LoadGame]], [[guiscript:SaveCharacter]]"
 );
@@ -4721,10 +4751,12 @@ PyDoc_STRVAR( GemRB_Roll__doc,
 \n\
 **Return value:** numeric\n\
 \n\
-**Example:** \n\
-  dice = 3\n\
-  size = 5\n\
-  v = GemRB.Roll (dice, size, 3)\n\
+**Examples:** \n\
+\n\
+    dice = 3\n\
+    size = 5\n\
+    v = GemRB.Roll (dice, size, 3)\n\
+\n\
 The above example generates a 3d5+3 number."
 );
 
@@ -5420,16 +5452,19 @@ Note: if the slot is already filled, it will delete that pc instead!\n\
 **Return value:** the new player's index in the game structure\n\
 \n\
 **Examples:**\n\
-  MyChar = GemRB.GetVar ('Slot')\n\
-  GemRB.CreatePlayer ('charbase', MyChar)\n\
+\n\
+    MyChar = GemRB.GetVar ('Slot')\n\
+    GemRB.CreatePlayer ('charbase', MyChar)\n\
+\n\
 The above example will create a new player character in the slot selected\n\
 by the Slot variable.\n\
 \n\
-  MyChar = GemRB.GetVar ('Slot')\n\
-  ImportName = 'avenger'\n\
-  GemRB.CreatePlayer (ImportName, MyChar, 1)\n\
+    MyChar = GemRB.GetVar ('Slot')\n\
+    ImportName = 'avenger'\n\
+    GemRB.CreatePlayer (ImportName, MyChar, 1)\n\
+\n\
 The above example would import avenger.chr into the slot selected by the \n\
-Slot Variable. (If it exists in the Characters directory of the game).\n\
+Slot Variable. If it exists in the Characters directory of the game.\n\
 \n\
 **See also:** [[guiscript:LoadGame]], [[guiscript:EnterGame]], [[guiscript:QuitGame]], [[guiscript:FillPlayerInfo]], [[guiscript:SetPlayerStat]]"
 );
@@ -5562,8 +5597,10 @@ command can set either or both.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:**\n\
-  GemRB.SetPlayerName (MyChar, GemRB.GetToken('CHARNAME'), 0)\n\
+**Examples:**\n\
+\n\
+    GemRB.SetPlayerName (MyChar, GemRB.GetToken('CHARNAME'), 0)\n\
+\n\
 In the above example we set the player's name to a previously set Token (global string).\n\
 \n\
 **See also:** [[guiscript:Control_QueryText]], [[guiscript:GetToken]]"
@@ -5887,10 +5924,12 @@ different PC selection mechanism (dialogs and stores are not unified yet).\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:**\n\
-def SelectAllOnPress ():\n\
-  GemRB.GameSelectPC (0, 1)\n\
-  return\n\
+**Examples:**\n\
+\n\
+    def SelectAllOnPress ():\n\
+      GemRB.GameSelectPC (0, 1)\n\
+      return\n\
+\n\
 The above function is associated to the 'select all' button of the GUI screen.\n\
 \n\
 **See also:** [[guiscript:GameIsPCSelected]], [[guiscript:GameSelectPCSingle]], [[guiscript:GameGetSelectedPCSingle]], [[guiscript:GameGetFirstSelectedPC]]"
@@ -6245,9 +6284,11 @@ in ie_stats.py.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:** \n\
-  PickedColor = ColorTable.GetValue (ColorIndex, GemRB.GetVar('Selected'))\n\
-  GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)\n\
+**Examples:** \n\
+\n\
+    PickedColor = ColorTable.GetValue (ColorIndex, GemRB.GetVar('Selected'))\n\
+    GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)\n\
+\n\
 The above example sets the player's color just picked via the color customisation dialog. ColorTable holds the available colors.\n\
 \n\
 **See also:** [[guiscript:GetPlayerStat]], [[guiscript:SetPlayerName]], [[guiscript:ApplyEffect]]"
@@ -6401,7 +6442,8 @@ Based on the avatar's stat (201 == race) the animationID (0x6000) will be increa
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
-  GemRB.FillPlayerInfo (MyChar, PortraitName+'M', PortraitName+'S')\n\
+\n\
+    GemRB.FillPlayerInfo (MyChar, PortraitName + 'M', PortraitName + 'S')\n\
 \n\
 **See also:** [[guiscript:LoadGame]], [[guiscript:CreatePlayer]], [[guiscript:SetPlayerStat]], [[guiscript:EnterGame]]\n\
 "
@@ -7889,12 +7931,15 @@ numbered actor's context.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:**\n\
-  GemRB.ExecuteString('ActionOverride([PC], Attack(NearestEnemyOf(Myself)) )')\n\
+**Examples:**\n\
+\n\
+    GemRB.ExecuteString('ActionOverride([PC], Attack(NearestEnemyOf(Myself)) )')\n\
+\n\
 The above example will force a player (most likely Player1) to attack an enemy, issuing the command as it would come from the current area's script. The current gametype must support the scripting action.\n\
 \n\
 \n\
-  GemRB.ExecuteString('Attack(NearestEnemyOf(Myself))', 2)\n\
+    GemRB.ExecuteString('Attack(NearestEnemyOf(Myself))', 2)\n\
+\n\
 The above example will force Player2 to attack an enemy, as the example will run in that actor's script context.\n\
 \n\
 **See also:** [[guiscript:EvaluateString]], gamescripts\n\
@@ -11397,7 +11442,9 @@ resource associated with the state.\n\
 **Return value:** N/A\n\
 \n\
 **Examples:** \n\
-  GemRB.SetModalState (pc, MS_TURNUNDEAD)\n\
+\n\
+    GemRB.SetModalState (pc, MS_TURNUNDEAD)\n\
+\n\
 The above example makes the player start the turn undead action.\n\
 \n\
 **See also:** [[guiscript:SetPlayerStat]], [[guiscript:SetPlayerName]]\n\
@@ -12076,12 +12123,13 @@ This function cam be used to add stats that are stored in effect blocks.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:**\n\
+**Examples:**\n\
+\n\
     for i in range(ProfCount-8):\n\
-        StatID = GemRB.GetTableValue (TmpTable, i+8, 0)\n\
-        Value = GemRB.GetVar ('Prof '+str(i))\n\
-        if Value:\n\
-            GemRB.ApplyEffect (MyChar, 'Proficiency', Value, StatID)\n\
+      StatID = GemRB.GetTableValue (TmpTable, i+8, 0)\n\
+      Value = GemRB.GetVar ('Prof ' + str(i))\n\
+      if Value:\n\
+        GemRB.ApplyEffect (MyChar, 'Proficiency', Value, StatID)\n\
 \n\
 The above example sets the weapon proficiencies in a bg2's CharGen9.py script.\n\
 \n\
@@ -12153,7 +12201,8 @@ If a parameter is set to -1, it will be ignored.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**Example:**\n\
+**Examples:**\n\
+\n\
     res = GemRB.CountEffect (MyChar, 'HLA', -1, -1, AbilityName)\n\
 \n\
 The above example returns how many HLA effects were applied on the character.\n\
@@ -13011,8 +13060,10 @@ PyDoc_STRVAR( GemRB_SetFeature__doc,
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
+\n\
     GemRB.SetFeature(GF_ALL_STRINGS_TAGGED, True)\n\
-"
+\n\
+**See also:** [[guiscript:SetVar]]"
 );
 
 static PyObject* GemRB_SetFeature(PyObject* /*self*/, PyObject* args)

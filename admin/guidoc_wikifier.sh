@@ -38,9 +38,6 @@ function dumpDocs() {
          sub("^=====.*=====.", "")
          # fix See also links
          $0 = gensub("\\[\\[guiscript:(\\w+)\\]\\]", "[\\1](\\1.md)", "g")
-         # also make some examples nicer until we convert the format
-         sub("\*\*Examples*:..", "&\n")
-         gsub("  [a-zA-Z0-9#]+", "  &")
 
          # dump frontmatter and contents
          print "---" > filename
