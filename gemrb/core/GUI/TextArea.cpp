@@ -407,6 +407,7 @@ void TextArea::SetColor(const Color& color, COLOR_TYPE idx)
 	assert(idx < COLOR_TYPE_COUNT);
 	colors[idx] = color;
 	parser.ResetAttributes(ftext, {colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]}, finit, {colors[COLOR_INITIALS], colors[COLOR_BACKGROUND]});
+	textContainer->SetColors(colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]);
 }
 
 void TextArea::SetColor(const Color* color, COLOR_TYPE idx)
