@@ -7331,7 +7331,7 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 			favourite = spellRef;
 		}
 	}
-	core->GetTokenDictionary()->SetAtCopy("FAVOURITESPELL", favourite.CString());
+	core->GetTokenDictionary()->SetAt("FAVOURITESPELL", favourite);
 	core->GetTokenDictionary()->SetAt("FAVOURITESPELLNUM", maxUses);
 
 	// weapon
@@ -7347,13 +7347,13 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 			favourite = spellRef;
 		}
 	}
-	core->GetTokenDictionary()->SetAtCopy("FAVOURITEWEAPON", favourite.CString());
+	core->GetTokenDictionary()->SetAt("FAVOURITEWEAPON", favourite);
 	core->GetTokenDictionary()->SetAt("FAVOURITEWEAPONNUM", maxUses);
 
 	// kill stats
 	core->GetTokenDictionary()->SetAt("KILLCOUNT", actor->PCStats->KillsTotalCount);
 	core->GetTokenDictionary()->SetAt("KILLCOUNTCHAPTER", actor->PCStats->KillsChapterCount);
-	core->GetTokenDictionary()->SetAtCopy("BESTKILL", core->GetMBString(actor->PCStats->BestKilledName).c_str());
+	core->GetTokenDictionary()->SetAt("BESTKILL", core->GetMBString(actor->PCStats->BestKilledName));
 }
 
 }

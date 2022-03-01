@@ -359,15 +359,7 @@ bool Variables::HasKey(const char* key) const
 	return GetAssocAt(key, nHash) != nullptr;
 }
 
-void Variables::SetAtCopy(const char* key, const char* value)
-{
-	size_t len = strlen(value)+1;
-	char *str=(char *) malloc(len);
-	memcpy(str,value,len);
-	SetAt(key, str);
-}
-
-void Variables::SetAt(const char* key, char* value)
+void Variables::SetAt(const char* key, const char* str)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
@@ -398,10 +390,8 @@ void Variables::SetAt(const char* key, char* value)
 
 	//set value only if we have a key
 	if (pAssoc->key) {
-		pAssoc->Value.sValue = value;
+		pAssoc->Value.sValue = strdup(str);
 		pAssoc->nHashValue = nHash;
-	} else {
-		free(value);
 	}
 }
 

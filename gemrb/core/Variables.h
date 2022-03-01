@@ -107,30 +107,28 @@ public:
 		return ret;
 	}
 
-	// Operations
-	void SetAtCopy(const char* key, const char* newValue);
+	void SetAt(const char* key, const char* newValue);
 	
 	template<typename STR, typename T, ENABLE_CHAR_RANGE>
 	void SetAtAsString(const STR& key, T&& newValue)
 	{
 		const std::string& newStr = fmt::format("{}", std::forward<T>(newValue));
-		SetAtCopy(&key[0], newStr.c_str());
+		SetAt(&key[0], newStr.c_str());
 	}
 	
 	template<typename STR, ENABLE_CHAR_RANGE>
 	void SetAt(const STR& key, const String& newValue)
 	{
 		const std::string& mbstr = MBStringFromString(newValue);
-		SetAtCopy(&key[0], mbstr.c_str());
+		SetAt(&key[0], mbstr.c_str());
 	}
 	
 	template<typename STR, ENABLE_CHAR_RANGE>
 	void SetAt(const STR& key, const std::string& newValue)
 	{
-		SetAtCopy(&key[0], newValue.c_str());
+		SetAt(&key[0], newValue.c_str());
 	}
 	
-	void SetAt(const char* key, char* newValue);
 	void SetAt(const char* key, void* newValue);
 	void SetAt(const char* key, ieDword newValue, bool nocreate=false);
 	void Remove(const char* key);
