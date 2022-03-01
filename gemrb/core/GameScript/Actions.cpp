@@ -7396,4 +7396,50 @@ void GameScript::SetOriginalClass(Scriptable* Sender, Action* parameters)
 	actor->SetMCFlag(classBit, BitOp(parameters->int1Parameter));
 }
 
+void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
+{
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	const Actor* actor = Scriptable::As<const Actor>(tar);
+	if (!actor || !actor->PCStats) {
+		return;
+	}
+
+	// spell
+	ResRef favourite = "/";
+	ieWord maxUses = 0;
+	for (int i = 0; i < MAX_FAVOURITES; i++) {
+		const auto& spellRef = actor->PCStats->FavouriteSpells[i];
+		if (spellRef.IsEmpty()) continue;
+
+		ieWord uses = actor->PCStats->FavouriteSpellsCount[i];
+		if (uses > maxUses) {
+			maxUses = uses;
+			favourite = spellRef;
+		}
+	}
+	core->GetTokenDictionary()->SetAtCopy("FAVOURITESPELL", favourite.CString());
+	core->GetTokenDictionary()->SetAt("FAVOURITESPELLNUM", maxUses);
+
+	// weapon
+	favourite = "/";
+	maxUses = 0;
+	for (int i = 0; i < MAX_FAVOURITES; i++) {
+		const auto& spellRef = actor->PCStats->FavouriteWeapons[i];
+		if (spellRef.IsEmpty()) continue;
+
+		ieWord uses = actor->PCStats->FavouriteWeaponsCount[i];
+		if (uses > maxUses) {
+			maxUses = uses;
+			favourite = spellRef;
+		}
+	}
+	core->GetTokenDictionary()->SetAtCopy("FAVOURITEWEAPON", favourite.CString());
+	core->GetTokenDictionary()->SetAt("FAVOURITEWEAPONNUM", maxUses);
+
+	// kill stats
+	core->GetTokenDictionary()->SetAt("KILLCOUNT", actor->PCStats->KillsTotalCount);
+	core->GetTokenDictionary()->SetAt("KILLCOUNTCHAPTER", actor->PCStats->KillsChapterCount);
+	core->GetTokenDictionary()->SetAtCopy("BESTKILL", core->GetMBString(actor->PCStats->BestKilledName).c_str());
+}
+
 }

@@ -1302,6 +1302,7 @@ public: //Script Functions
 	static void SetEncounterProbability(Scriptable* Sender, Action* parameters);
 	static void SetExtendedNight(Scriptable* Sender, Action* parameters);
 	static void SetFaction(Scriptable* Sender, Action* parameters);
+	static void SetPCStatsTokens(Scriptable* Sender, Action* parameters);
 	static void SetGabber(Scriptable* Sender, Action* parameters);
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
 	static void SetGlobalRandom(Scriptable* Sender, Action* parameters);

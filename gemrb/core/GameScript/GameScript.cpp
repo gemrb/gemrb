@@ -894,6 +894,7 @@ static const ActionLink actionnames[] = {
 	{"setencounterprobability", GameScript::SetEncounterProbability,0},
 	{"setextendednight", GameScript::SetExtendedNight, 0},
 	{"setfaction", GameScript::SetFaction, 0},
+	{"setfavouritestokens", GameScript::SetPCStatsTokens, 0},
 	{"setgabber", GameScript::SetGabber, 0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobalrandom", GameScript::SetGlobalRandom, AF_MERGESTRINGS},
