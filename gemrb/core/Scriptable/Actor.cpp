@@ -1729,11 +1729,8 @@ static void InitActorTables()
 				isclass[ISPALADIN] |= bitmask;
 			}
 
-			field = tm->QueryField(rowname, "TURNLEVEL").c_str();
-			turnlevels[i]=atoi(field);
-
-			field = tm->QueryField(rowname, "BOOKTYPE").c_str();
-			booktypes[i]=atoi(field);
+			turnlevels[i] = tm->QueryFieldSigned<int>(rowname, "TURNLEVEL");
+			booktypes[i] = tm->QueryFieldSigned<int>(rowname, "BOOKTYPE");
 			//if booktype == 3 then it is a 'divine sorcerer' class
 			//we shouldn't hardcode iwd2 classes this heavily
 			if (booktypes[i]==2) {
@@ -1741,11 +1738,8 @@ static void InitActorTables()
 			}
 
 			if (third) {
-				field = tm->QueryField(rowname, "CASTING").c_str(); // COL_HATERACE but different name
-				castingstat[i] = atoi(field);
-
-				field = tm->QueryField(rowname, "SPLTYPE").c_str();
-				iwd2spltypes[i] = atoi(field);
+				castingstat[i] = tm->QueryFieldSigned<int>(rowname, "CASTING"); // COL_HATERACE but different name
+				iwd2spltypes[i] = tm->QueryFieldSigned<int>(rowname, "SPLTYPE");
 			}
 
 			field = tm->QueryField(rowname, "HATERACE").c_str();
@@ -1761,8 +1755,7 @@ static void InitActorTables()
 			class2kits[i].clab = strdup(field);
 			class2kits[i].className = rowname;
 
-			field = tm->QueryField(rowname, "NO_PROF").c_str();
-			defaultprof[i]=atoi(field);
+			defaultprof[i] = tm->QueryFieldSigned<int>(rowname, "NO_PROF");
 
 			bitmask <<=1;
 		}
