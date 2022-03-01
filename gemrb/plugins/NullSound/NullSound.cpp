@@ -95,7 +95,7 @@ int NullSound::SetupNewStream(int, int, int, ieWord, bool, int)
 	return -1;
 }
 
-tick_t NullSound::QueueAmbient(int, const char*)
+tick_t NullSound::QueueAmbient(int, const ResRef&)
 {
 	return -1;
 }

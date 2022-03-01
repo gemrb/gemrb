@@ -458,7 +458,7 @@ int SDLAudio::SetupNewStream(int x, int y, int z,
 	return 0;
 }
 
-tick_t SDLAudio::QueueAmbient(int, const char*)
+tick_t SDLAudio::QueueAmbient(int, const ResRef&)
 {
 	// TODO: ambient sounds
 	return -1;

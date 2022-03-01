@@ -765,7 +765,7 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 	return stream;
 }
 
-tick_t OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
+tick_t OpenALAudioDriver::QueueAmbient(int stream, const ResRef& sound)
 {
 	if (streams[stream].free || !streams[stream].ambient)
 		return -1;
@@ -774,9 +774,6 @@ tick_t OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 
 	// first dequeue any processed buffers
 	streams[stream].ClearProcessedBuffers();
-
-	if (sound == 0)
-		return 0;
 
 	tick_t time_length;
 	ALuint Buffer = loadSound(sound, time_length);

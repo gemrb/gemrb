@@ -115,7 +115,7 @@ public:
 	bool ReleaseStream(int stream, bool HardStop) override;
 	int SetupNewStream(int x, int y, int z,
 					ieWord gain, bool point, int ambientRange) override;
-	tick_t QueueAmbient(int stream, const char* sound) override;
+	tick_t QueueAmbient(int stream, const ResRef& sound) override;
 	void SetAmbientStreamVolume(int stream, int volume) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
 	void QueueBuffer(int stream, unsigned short bits,
