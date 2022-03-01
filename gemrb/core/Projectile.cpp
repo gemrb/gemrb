@@ -784,7 +784,7 @@ void Projectile::DoStep()
 	// good enough? Path has one node per px of distance and
 	// we don't account for diagonals or perspective
 	// ... but we slow it down manually any way
-	unsigned int timePerPx = 1 * core->Time.Ticks2Ms(1) / Speed;
+	unsigned int timePerPx = static_cast<unsigned int>(1 * core->Time.Ticks2Ms(1) / Speed);
 	static constexpr unsigned int slowDownFactor = 2; // TODO: empirical, shouldn't be needed!
 	unsigned int timePerStep = slowDownFactor * timePerPx;
 	tick_t time =  core->Time.Ticks2Ms(core->GetGame()->Ticks);

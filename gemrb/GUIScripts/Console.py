@@ -17,8 +17,7 @@ def OnLoad():
 	histLabel.SetText ("History:")
 	hist = consoleWin.GetControl(3)
 	hist.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
-	
-	console = consoleWin.GetControl(0)
+
 	console = consoleWin.ReplaceSubview (0, IE_GUI_CONSOLE, hist)
 	console.AddAlias ("CONSOLE_CTL", 1);
 	

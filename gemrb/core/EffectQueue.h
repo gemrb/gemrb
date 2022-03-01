@@ -149,13 +149,9 @@ public:
 	
 	EffectDesc() = default;
 	
-	EffectDesc(const char* name, EffectFunction fn, int flags, int data) {
-		Function = fn;
-		Name = name;
-		Flags = flags;
-		opcode = data;
-	}
-	
+	EffectDesc(const char* name, EffectFunction fn, int flags, int data) :
+		Function(fn), Name(name), Flags(flags), opcode(data) {};
+
 	explicit operator bool() const {
 		return Function != nullptr;
 	}

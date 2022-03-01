@@ -3820,7 +3820,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		Py_ssize_t min = std::min<Py_ssize_t>(8, PyList_Size(cols));
 		for (Py_ssize_t i = 0; i < min; i++) {
 			PyObject* item = PyList_GetItem(cols, i);
-			indicies[i] = PyLong_AsLong(item);
+			indicies[i] = static_cast<ieDword>(PyLong_AsLong(item));
 		}
 		anim->SetPaletteGradients(indicies);
 	}
