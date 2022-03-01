@@ -61,6 +61,8 @@ private:
 	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
+	/** displays a string in the textarea */
+	void DisplayString(String text, const Color &color, Scriptable *target) const;
 public:
 	static ieStrRef GetStringReference(size_t);
 	static bool HasStringReference(size_t);
@@ -90,9 +92,7 @@ public:
 	void DisplayString(const String& text) const;
 	void DisplayString(ieStrRef stridx, unsigned char color, STRING_FLAGS flags) const;
 	void DisplayString(const String& text, unsigned char color, Scriptable *target) const;
-	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;
-	void DisplayString(String text, const Color &color, Scriptable *target) const;
-		
+	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;	
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>
 	void DisplayRollStringName(ieStrRef stridx, unsigned char color, const Scriptable *speaker, ARGS&& ...args) const {
