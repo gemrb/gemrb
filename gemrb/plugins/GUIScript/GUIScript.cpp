@@ -6646,26 +6646,27 @@ static PyObject *SetItemIcon(Button* btn, const char* ItemResRef, int Which, int
 	ABORT_IF_NULL(btn);
 
 	if (!ItemResRef[0]) {
-		btn->SetPicture( NULL );
+		btn->SetPicture(nullptr);
 		//no incref here!
 		return Py_None;
 	}
 	const Item* item = gamedata->GetItem(ItemResRef, true);
-	if (item == NULL) {
-		btn->SetPicture(NULL);
+	if (item == nullptr) {
+		btn->SetPicture(nullptr);
 		//no incref here!
 		return Py_None;
 	}
 
 	btn->SetFlags(IE_GUI_BUTTON_PICTURE, BitOp::OR);
-	Holder<Sprite2D> Picture;
+	Holder<Sprite2D> Picture = nullptr;
 	bool setpicture = true;
+	const Item* item2;
 	switch (Which) {
 		case 0: case 1:
 			Picture = gamedata->GetAnySprite(item->ItemIcon, -1, Which);
 			break;
 		case 2:
-			btn->SetPicture( NULL ); // also calls ClearPictureList
+			btn->SetPicture(nullptr); // also calls ClearPictureList
 			for (int i = 0; i < 4; i++) {
 				Picture = gamedata->GetAnySprite(item->DescriptionIcon, -1, i);
 				if (Picture)
@@ -6674,30 +6675,29 @@ static PyObject *SetItemIcon(Button* btn, const char* ItemResRef, int Which, int
 			//fallthrough
 		case 3:
 			setpicture = false;
-			Picture = NULL;
+			Picture = nullptr;
 			break;
 		case 4: case 5:
 			Picture = GetUsedWeaponIcon(item, Which-4);
-			if (Item2ResRef) {
-				btn->SetPicture( NULL ); // also calls ClearPictureList
-				const Item* item2 = gamedata->GetItem(Item2ResRef, true);
-				if (item2) {
-					Holder<Sprite2D> Picture2;
-					Picture2 = gamedata->GetAnySprite(item2->ItemIcon, -1, Which - 4);
-					if (Picture2) btn->StackPicture(Picture2);
-					gamedata->FreeItem( item2, Item2ResRef, false );
-				}
-				if (Picture) btn->StackPicture(Picture);
-				setpicture = false;
+			if (!Item2ResRef) {
+				break;
 			}
+
+			btn->SetPicture(nullptr); // also calls ClearPictureList
+			item2 = gamedata->GetItem(Item2ResRef, true);
+			if (item2) {
+				Holder<Sprite2D> Picture2;
+				Picture2 = gamedata->GetAnySprite(item2->ItemIcon, -1, Which - 4);
+				if (Picture2) btn->StackPicture(Picture2);
+				gamedata->FreeItem(item2, Item2ResRef, false);
+			}
+			if (Picture) btn->StackPicture(Picture);
+			setpicture = false;
 			break;
 		default:
 			const ITMExtHeader *eh = item->GetExtHeader(Which - 6);
 			if (eh) {
 				Picture = gamedata->GetAnySprite(eh->UseIcon, -1, 0);
-			}
-			else {
-				Picture = NULL;
 			}
 	}
 
