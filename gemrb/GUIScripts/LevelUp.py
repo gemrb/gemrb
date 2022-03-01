@@ -708,24 +708,29 @@ def SaveNewSpells():
 				GemRB.SetMemorizableSpellsCount(pc, NewWSpells[i], IE_SPELL_TYPE_WIZARD, i)
 
 	# save our number of memorizable priest spells
-	if DeltaDSpells > 0: # druids and clerics count
-		for i in range (len(NewDSpells)):
-			# get each update
-			if NewDSpells[i] > 0:
-				GemRB.SetMemorizableSpellsCount (pc, NewDSpells[i], IE_SPELL_TYPE_PRIEST, i)
+	if DeltaDSpells <= 0: # druids and clerics count
+		return
 
-			# learn all the spells we're given, but don't have, up to our given casting level
-			# bonus spells don't count in determining if we can use this level
-			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 0) > 0: # we can memorize spells of this level
-				for j in range(NumClasses): # loop through each class
-					TmpClassName = GUICommon.GetClassRowName (Classes[j], "class")
-					IsDruid = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
-					IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
-					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
-						continue
-					elif IsCleric == "*": # druid spells
-						ClassFlag = 0x8000
-					else: # cleric spells
-						ClassFlag = 0x4000
+	for i in range (len(NewDSpells)):
+		# get each update
+		if NewDSpells[i] > 0:
+			GemRB.SetMemorizableSpellsCount (pc, NewDSpells[i], IE_SPELL_TYPE_PRIEST, i)
 
-					Spellbook.LearnPriestSpells (pc, i + 1, ClassFlag)
+		# can we memorize spells of this level?
+		# bonus spells don't count in determining if we can use this level
+		if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 0) <= 0:
+			continue
+
+		# learn all the spells we're given, but don't have, up to our given casting level
+		for j in range(NumClasses):
+			TmpClassName = GUICommon.GetClassRowName (Classes[j], "class")
+			IsDruid = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
+			IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
+			if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
+				continue
+			elif IsCleric == "*": # druid spells
+				ClassFlag = 0x8000
+			else: # cleric spells
+				ClassFlag = 0x4000
+
+			Spellbook.LearnPriestSpells (pc, i + 1, ClassFlag)
