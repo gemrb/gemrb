@@ -451,18 +451,16 @@ def ProfsSave (pc, proftype = LUPROFS_TYPE_LEVELUP):
 
 		if proftype == LUPROFS_TYPE_CHARGEN and GameCheck.IsBG2():
 			GemRB.DispelEffect (pc, "Proficiency", ProfID)
-		else:
-			if proftype != LUPROFS_TYPE_DUALCLASS:
-				OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x38
-				SaveProf = OldProf | SaveProf
-			else: # gotta move the old prof to the back for dual class
-				OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x07
-				SaveProf = (OldProf << 3) | SaveProf
+		elif proftype != LUPROFS_TYPE_DUALCLASS:
+			OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x38
+			SaveProf = OldProf | SaveProf
+		else: # gotta move the old prof to the back for dual class
+			OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x07
+			SaveProf = (OldProf << 3) | SaveProf
 
 		GemRB.SetPlayerStat (pc, ProfID, SaveProf)
-		if GameCheck.IsBG2() and (proftype == LUPROFS_TYPE_LEVELUP or proftype == LUPROFS_TYPE_CHARGEN):
-			if SaveProf:
-				GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
+		if GameCheck.IsBG2() and proftype != LUPROFS_TYPE_DUALCLASS and SaveProf:
+			GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
 	return
 
 def ProfsNullify ():
