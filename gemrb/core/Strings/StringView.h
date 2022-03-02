@@ -41,7 +41,7 @@ public:
 	StringView(const char* cstr, size_t len) noexcept
 	: data(cstr), len(len) {}
 
-	template<typename STR, ENABLE_CHAR_RANGE>
+	template<typename STR, ENABLE_CHAR_RANGE(STR)>
 	StringView(const STR& s) noexcept
 	: StringView(&s[0], std::distance(std::begin(s), std::end(s)))
 	{}

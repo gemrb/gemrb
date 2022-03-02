@@ -109,21 +109,21 @@ public:
 
 	void SetAt(const char* key, const char* newValue);
 	
-	template<typename STR, typename T, ENABLE_CHAR_RANGE>
+	template<typename STR, typename T, ENABLE_CHAR_RANGE(STR)>
 	void SetAtAsString(const STR& key, T&& newValue)
 	{
 		const std::string& newStr = fmt::format("{}", std::forward<T>(newValue));
 		SetAt(&key[0], newStr.c_str());
 	}
 	
-	template<typename STR, ENABLE_CHAR_RANGE>
+	template<typename STR, ENABLE_CHAR_RANGE(STR)>
 	void SetAt(const STR& key, const String& newValue)
 	{
 		const std::string& mbstr = MBStringFromString(newValue);
 		SetAt(&key[0], mbstr.c_str());
 	}
 	
-	template<typename STR, ENABLE_CHAR_RANGE>
+	template<typename STR, ENABLE_CHAR_RANGE(STR)>
 	void SetAt(const STR& key, const std::string& newValue)
 	{
 		SetAt(&key[0], newValue.c_str());
