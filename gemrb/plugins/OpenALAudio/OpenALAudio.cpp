@@ -381,7 +381,9 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, tick_t &time_length)
 	if (!ResRef[0]) {
 		return 0;
 	}
-	if(buffercache.Lookup(ResRef, p))
+	
+	LRUCache::key_t key(ResRef);
+	if(buffercache.Lookup(key, p))
 	{
 		e = (CacheEntry*) p;
 		time_length = e->Length;
@@ -424,7 +426,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, tick_t &time_length)
 	e->Buffer = Buffer;
 	e->Length = time_length;
 
-	buffercache.SetAt(ResRef, (void*)e);
+	buffercache.SetAt(key, (void*)e);
 	//print("LoadSound: added %s to cache: %d. Cache size now %d", ResRef, e->Buffer, buffercache.GetCount());
 
 	if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
@@ -819,7 +821,7 @@ bool OpenALAudioDriver::evictBuffer()
 
 	unsigned int n = 0;
 	void* p;
-	const char* k;
+	LRUCache::key_t k;
 	bool res;
 
 	while ((res = buffercache.getLRU(n, k, p)) == true) {
@@ -846,7 +848,7 @@ void OpenALAudioDriver::clearBufferCache(bool force)
 	// Room for optimization: any method of iterating over the buffers
 	// would suffice. It doesn't have to be in LRU-order.
 	void* p;
-	const char* k;
+	LRUCache::key_t k;
 	int n = 0;
 	while (buffercache.getLRU(n, k, p)) {
 		CacheEntry* e = (CacheEntry*)p;

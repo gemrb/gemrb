@@ -174,7 +174,7 @@ bool SDLAudio::evictBuffer()
 	// at the tail that are used. It can be O(n) if LRUCache supports it.
 	unsigned int n = 0;
 	void *p;
-	const char *k;
+	LRUCache::key_t k;
 	bool res;
 
 	while ((res = buffercache.getLRU(n, k, p)) == true && buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
@@ -208,7 +208,7 @@ void SDLAudio::clearBufferCache()
 	// Room for optimization: any method of iterating over the buffers
 	// would suffice. It doesn't have to be in LRU-order.
 	void *p;
-	const char *k;
+	LRUCache::key_t k;
 	int n = 0;
 	while (buffercache.getLRU(n, k, p)) {
 		CacheEntry *e = (CacheEntry*)p;
@@ -229,7 +229,8 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, tick_t &time_length)
 		return chunk;
 	}
 
-	if (buffercache.Lookup(ResRef, p)) {
+	LRUCache::key_t key(ResRef);
+	if (buffercache.Lookup(key, p)) {
 		e = (CacheEntry*) p;
 		time_length = e->Length;
 		return e->chunk;
@@ -278,7 +279,7 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, tick_t &time_length)
 		evictBuffer();
 	}
 
-	buffercache.SetAt(ResRef, (void*)e);
+	buffercache.SetAt(key, (void*)e);
 
 	return chunk;
 }

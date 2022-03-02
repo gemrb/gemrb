@@ -33,6 +33,8 @@ class StringView {
 	size_t len = 0;
 public:
 	using const_iterator = const char*;
+	
+	StringView() noexcept = default;
 
 	// explicit because strlen is inefficient
 	explicit StringView(const char* cstr) noexcept

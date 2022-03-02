@@ -23,6 +23,7 @@
 
 #include "exports.h"
 
+#include "Strings/StringView.h"
 #include "Variables.h"
 
 namespace GemRB {
@@ -31,20 +32,22 @@ struct VarEntry;
 
 class GEM_EXPORT LRUCache {
 public:
+	using key_t = StringView;
+	
 	LRUCache();
 
 	// set value, overwriting any previous entry
-	void SetAt(const char* key, void* value);
-	bool Lookup(const char* key, void*& value) const;
-	bool Touch(const char* key);
-	bool Remove(const char* key);
+	void SetAt(key_t, void* value);
+	bool Lookup(key_t, void*& value) const;
+	bool Touch(key_t key);
+	bool Remove(key_t key);
 
 	int GetCount() const;
 
 	// return n-th LRU entry. key remains owned by LRUCache.
 	// (n = 0 is least recently used, n = 1 the next least recently used,
 	//  etc...)
-	bool getLRU(unsigned int n, const char*& key, void*& value) const;
+	bool getLRU(unsigned int n, key_t& key, void*& value) const;
 
 private:
 	// internal storage
