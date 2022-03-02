@@ -131,7 +131,7 @@ void SDLSurfaceSprite2D::UpdateColorKey() noexcept
 	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
 #else
 	Uint32 flag = format.HasColorKey ? SDL_SRCCOLORKEY : 0;
-	SDL_SetColorKey(surface, flag | SDL_RLEACCEL, ck);
+	SDL_SetColorKey(surface, flag | SDL_RLEACCEL, format.ColorKey);
 #endif
 }
 
@@ -158,7 +158,7 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 #else
 	SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, Frame.w, Frame.h, tofmt.Depth, tofmt.Rmask, tofmt.Gmask, tofmt.Bmask, tofmt.Amask);
 	if (tmp) {
-		SDL_Surface* ns = SDL_ConvertSurface(*surface, tmp->format, 0);
+		SDL_Surface* ns = SDL_ConvertSurface(surface, tmp->format, 0);
 		SDL_FreeSurface(tmp);
 #endif
 		if (ns) {
