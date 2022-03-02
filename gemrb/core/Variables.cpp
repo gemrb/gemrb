@@ -359,7 +359,7 @@ bool Variables::HasKey(const char* key) const
 	return GetAssocAt(key, nHash) != nullptr;
 }
 
-void Variables::SetAt(const char* key, const char* str)
+void Variables::SetAtCString(const char* key, const char* str)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
