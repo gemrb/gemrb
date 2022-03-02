@@ -169,7 +169,7 @@ using namespace GemRB;
 
 	// load NSUserDefaults into config
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-	NSDictionary* userValues = [defaults persistentDomainForName:@"net.sourceforge.gemrb"];
+	NSDictionary* userValues = [defaults persistentDomainForName:@"org.gemrb.gemrb"];
 	NSDictionary* defaultValues = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
 
 	NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithDictionary:defaultValues];

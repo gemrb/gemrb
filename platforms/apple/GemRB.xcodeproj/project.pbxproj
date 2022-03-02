@@ -11425,7 +11425,7 @@
 					"-Wextra",
 					"-DTARGET_OS_MAC=0",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = org.gemrb.gemrb;
 				PRODUCT_NAME = GemRB;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -11468,7 +11468,7 @@
 					"-Wextra",
 					"-DTARGET_OS_MAC=0",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "net.sourceforge.${PRODUCT_NAME:identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = org.gemrb.gemrb;
 				PRODUCT_NAME = GemRB;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -11674,7 +11674,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.sourceforge.gemrb;
+				PRODUCT_BUNDLE_IDENTIFIER = org.gemrb.gemrb;
 				PRODUCT_NAME = GemRB;
 				WRAPPER_EXTENSION = app;
 			};
@@ -11695,7 +11695,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.sourceforge.gemrb;
+				PRODUCT_BUNDLE_IDENTIFIER = org.gemrb.gemrb;
 				PRODUCT_NAME = GemRB;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
