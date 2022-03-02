@@ -23,8 +23,7 @@ a windows install, use a compatible installer, WINE or extract it manually
 from the CDs using the unshield tool.
 
 Documentation can be found on the [website](https://gemrb.org/Documentation),
-while the sources are in gemrb/docs/en/ and the 
-[gemrb.6 man page](https://gemrb.org/Manpage.html).
+in `gemrb/docs/` and the [gemrb.6 man page](https://gemrb.org/Manpage.html).
 
 If you want to help out, start by reading this
 list of [options, tips and priorities](https://github.com/gemrb/gemrb/blob/master/CONTRIBUTING.md).
