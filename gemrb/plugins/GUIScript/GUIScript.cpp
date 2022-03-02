@@ -4189,15 +4189,14 @@ The above example will add the protagonist's name to the TextArea (if the token 
 static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 {
 	const char *Variable;
-	char *value;
 	PARSE_ARGS( args,  "s", &Variable );
 
-	//returns only the pointer
+	std::string value;
 	if (!core->GetTokenDictionary()->Lookup( Variable, value )) {
 		Py_RETURN_NONE;
 	}
 
-	return PyString_FromString( value );
+	return PyString_FromStringObj(value);
 }
 
 PyDoc_STRVAR( GemRB_GetVar__doc,
