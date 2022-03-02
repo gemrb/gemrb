@@ -292,15 +292,9 @@ String TLKImporter::ResolveTags(const String& source)
 			i = mystrncpy(Token, i + 1, MAX_VARIABLE_LENGTH, L'>');
 			String resolvedToken = BuiltinToken(Token);
 			if (resolvedToken.empty()) {
-				int TokenLength = core->GetTokenDictionary()->GetValueLength(Token);
-				if (TokenLength) {
-					char* tokVal = new char[TokenLength + 1];
-					core->GetTokenDictionary()->Lookup(Token, tokVal, TokenLength);
-					String* tmp = StringFromCString(tokVal);
-					assert(tmp);
-					dest.append(*tmp);
-					delete tmp;
-					delete[] tokVal;
+				String tokVal;
+				if (core->GetTokenDictionary()->Lookup(Token, tokVal)) {
+					dest.append(tokVal);
 				}
 			} else {
 				dest.append(resolvedToken);

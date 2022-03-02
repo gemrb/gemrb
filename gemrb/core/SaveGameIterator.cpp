@@ -160,20 +160,16 @@ const char* SaveGame::GetGameDate() const
 }
 
 // mission pack save dir or the main one?
-static char saveDir[10];
-static const char* SaveDir()
+static std::string SaveDir()
 {
-	if (core->GetTokenDictionary()->GetValueLength("SaveDir")) {
-		core->GetTokenDictionary()->Lookup("SaveDir", saveDir, 9);
-		return saveDir;
-	} else {
-		return "save";
-	}
+	std::string saveDir("save");
+	core->GetTokenDictionary()->Lookup("SaveDir", saveDir);
+	return saveDir;
 }
 
 #define FormatQuickSavePath(destination, i) \
 	 snprintf(destination,sizeof(destination),"%s%s%s%09d-%s", \
-		core->config.SavePath, SaveDir(), SPathDelimiter, i, folder)
+		core->config.SavePath, SaveDir().c_str(), SPathDelimiter, i, folder)
 
 /*
  * Returns the first 0 bit position of an integer
@@ -261,7 +257,7 @@ bool SaveGameIterator::RescanSaveGames()
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
-	PathJoin(Path, core->config.SavePath, SaveDir(), nullptr);
+	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), nullptr);
 
 	DirectoryIterator dir(Path);
 	// create the save game directory at first access
@@ -319,7 +315,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 	int prtrt = 0;
 	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	PathJoin(Path, core->config.SavePath, SaveDir(), slotname, nullptr);
+	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), slotname, nullptr);
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
@@ -547,7 +543,7 @@ static int CanSave()
 static bool CreateSavePath(char *Path, int index, const char *slotname) WARN_UNUSED;
 static bool CreateSavePath(char *Path, int index, const char *slotname)
 {
-	PathJoin(Path, core->config.SavePath, SaveDir(), nullptr);
+	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), nullptr);
 
 	//if the path exists in different case, don't make it again
 	if (!MakeDirectory(Path)) {

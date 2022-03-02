@@ -276,17 +276,6 @@ Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) 
 	return NULL;
 }
 
-int Variables::GetValueLength(const char* key) const
-{
-	unsigned int nHash;
-	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
-	if (pAssoc == NULL) {
-		return 0; // not in map
-	}
-
-	return ( int ) strlen( pAssoc->Value.sValue );
-}
-
 bool Variables::Lookup(const char* key, char* dest, size_t MaxLength) const
 {
 	unsigned int nHash;
@@ -301,7 +290,7 @@ bool Variables::Lookup(const char* key, char* dest, size_t MaxLength) const
 	return true;
 }
 
-bool Variables::Lookup(const char* key, char *&dest) const
+bool Variables::Lookup(const char* key, std::string& dest) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_STRING);

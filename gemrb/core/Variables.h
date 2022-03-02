@@ -89,12 +89,9 @@ public:
 		return m_nCount == 0;
 	}
 
-	// Lookup
-	int GetValueLength(const char* key) const;
-	bool Lookup(const char* key, char* dest, size_t MaxLength) const;
 	bool Lookup(const char* key, ieDword& rValue) const;
 	bool Lookup(const char* key, String& dest) const;
-	bool Lookup(const char* key, char*& dest) const;
+	bool Lookup(const char* key, std::string& dest) const;
 	bool Lookup(const char* key, void*& dest) const;
 	bool HasKey(const char* key) const;
 	
@@ -161,6 +158,7 @@ protected:
 	inline unsigned int MyHashKey(const char*) const;
 	
 	void SetAtCString(const char* key, const char* newValue);
+	bool Lookup(const char* key, char* dest, size_t MaxLength) const;
 };
 
 }
