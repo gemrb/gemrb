@@ -106,27 +106,29 @@ public:
 		flags = static_cast<T>(val);
 		return ret;
 	}
-
-	void SetAt(const char* key, const char* newValue);
 	
 	template<typename STR, typename T, ENABLE_CHAR_RANGE(STR)>
 	void SetAtAsString(const STR& key, T&& newValue)
 	{
 		const std::string& newStr = fmt::format("{}", std::forward<T>(newValue));
-		SetAt(&key[0], newStr.c_str());
+		SetAtCString(&key[0], newStr.c_str());
 	}
 	
 	template<typename STR, ENABLE_CHAR_RANGE(STR)>
 	void SetAt(const STR& key, const String& newValue)
 	{
 		const std::string& mbstr = MBStringFromString(newValue);
-		SetAt(&key[0], mbstr.c_str());
+		SetAtCString(&key[0], mbstr.c_str());
 	}
 	
-	template<typename STR, ENABLE_CHAR_RANGE(STR)>
-	void SetAt(const STR& key, const std::string& newValue)
+	template<typename KSTR, typename VSTR, ENABLE_CHAR_RANGE(KSTR), ENABLE_CHAR_RANGE(VSTR)>
+	void SetAt(const KSTR& key, const VSTR& newValue)
 	{
-		SetAt(&key[0], newValue.c_str());
+		SetAtCString(&key[0], &newValue[0]);
+	}
+	
+	void SetAt(const char* key, const char* val) {
+		SetAtCString(key, val);
 	}
 	
 	void SetAt(const char* key, void* newValue);
@@ -157,6 +159,8 @@ protected:
 	inline bool MyCopyKey(char*& dest, const char* key) const;
 	inline unsigned int MyCompareKey(const char* key, const char *str) const;
 	inline unsigned int MyHashKey(const char*) const;
+	
+	void SetAtCString(const char* key, const char* newValue);
 };
 
 }
