@@ -1691,6 +1691,7 @@ static void FloatMessageAtPoint(Scriptable* Sender, const Point& pos, const ieSt
 	// create invisible and invicible actor to host the text (lifted from Map::GetItemByDialog)
 	// replace once we have a generic solution, so we don't crowd the area
 	Actor *surrogate = gamedata->GetCreature("dmhead");
+	assert(surrogate);
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	map->AddActor(surrogate, true);

@@ -241,9 +241,9 @@ public:
 	ieWord LightY = 0;
 	ieWord LightZ = 0;
 	ResRef PaletteRes;
-	ieByte Gradients[7];
+	ieByte Gradients[7]{};
 	ieByte SmokeSpeed = 0;
-	ieByte SmokeGrad[7];
+	ieByte SmokeGrad[7]{};
 	ieByte Aim = 0; // original bg2: m_numDirections, a list of {1, 5, 9}
 	ieWord SmokeAnimID = 0;
 	ResRef TrailBAM[3];
