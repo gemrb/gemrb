@@ -1695,6 +1695,7 @@ static void FloatMessageAtPoint(Scriptable* Sender, const Point& pos, const ieSt
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	map->AddActor(surrogate, true);
+	surrogate->SetBase(IE_DONOTJUMP, DNJ_BIRD);
 	surrogate->SetPosition(pos, 0);
 	String msg = core->GetString(msgRef);
 	surrogate->SetOverheadText(msg);
