@@ -42,10 +42,10 @@ int LRUCache::GetCount() const
 	return v.GetCount();
 }
 
-void LRUCache::SetAt(const char* key, void* value)
+void LRUCache::SetAt(key_t key, void* value)
 {
 	void* p;
-	if (v.Lookup(key, p)) {
+	if (v.Lookup(key.c_str(), p)) {
 		VarEntry* e = (VarEntry*) p;
 		e->data = value;
 		Touch(key);
@@ -56,21 +56,21 @@ void LRUCache::SetAt(const char* key, void* value)
 	e->prev = 0;
 	e->next = head;
 	e->data = value;
-	e->key = new char[strlen(key)+1];
-	strcpy(e->key, key);
+	e->key = new char[key.length() + 1];
+	strcpy(e->key, key.c_str());
 
 	if (head)
 		head->prev = e;
 	head = e;
 	if (tail == 0) tail = head;
 
-	v.SetAt(key, (void*)e);
+	v.SetAt(key.c_str(), (void*)e);
 }
 
-bool LRUCache::Lookup(const char* key, void*& value) const
+bool LRUCache::Lookup(key_t key, void*& value) const
 {
 	void* p;
-	if (v.Lookup(key, p)) {
+	if (v.Lookup(key.c_str(), p)) {
 		VarEntry* e = (VarEntry*) p;
 		value = e->data;
 		return true;
@@ -78,10 +78,10 @@ bool LRUCache::Lookup(const char* key, void*& value) const
 	return false;
 }
 
-bool LRUCache::Touch(const char* key)
+bool LRUCache::Touch(key_t key)
 {
 	void* p;
-	if (!v.Lookup(key, p)) return false;
+	if (!v.Lookup(key.c_str(), p)) return false;
 	VarEntry* e = (VarEntry*) p;
 
 	// already head?
@@ -98,19 +98,19 @@ bool LRUCache::Touch(const char* key)
 	return true;
 }
 
-bool LRUCache::Remove(const char* key)
+bool LRUCache::Remove(key_t key)
 {
 	void* p;
-	if (!v.Lookup(key, p)) return false;
+	if (!v.Lookup(key.c_str(), p)) return false;
 	VarEntry* e = (VarEntry*) p;
-	v.Remove(key);
+	v.Remove(key.c_str());
 	removeFromList(e);
 	delete[] e->key;
 	delete e;
 	return true;
 }
 
-bool LRUCache::getLRU(unsigned int n, const char*& key, void*& value) const
+bool LRUCache::getLRU(unsigned int n, key_t& key, void*& value) const
 {
 	VarEntry* e = tail;
 	for (unsigned int i = 0; i < n; ++i) {
@@ -119,7 +119,7 @@ bool LRUCache::getLRU(unsigned int n, const char*& key, void*& value) const
 	}
 	if (!e) return false;
 
-	key = e->key;
+	key = key_t(e->key);
 	value = e->data;
 	return true;
 }
