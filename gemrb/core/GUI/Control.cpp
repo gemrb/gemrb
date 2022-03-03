@@ -25,7 +25,6 @@
 #include "ie_cursors.h"
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Variables.h"
 
 #include <cstdio>
 #include <cstring>
