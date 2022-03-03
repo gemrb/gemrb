@@ -27,9 +27,6 @@
 #include <climits>
 #include <cstdlib>
 #include <cstring>
-#if HAVE_MALLOC_H
-#include <malloc.h>
-#endif
 #include "common.h"
 
 /* You can redefine av_malloc and av_free in your project to use your
