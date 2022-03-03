@@ -201,7 +201,7 @@ ieStrRef TLKImporter::GenderStrRef(int slot, ieStrRef malestrref, ieStrRef femal
 }
 
 //if this function returns nullptr then it is not a built in token
-String TLKImporter::BuiltinToken(const char* Token)
+String TLKImporter::BuiltinToken(const ieVariable& Token)
 {
 	gt_type *entry = NULL;
 
@@ -211,7 +211,7 @@ String TLKImporter::BuiltinToken(const char* Token)
 	}
 
 	//these are hardcoded, all engines are the same or don't use them
-	if (!strcmp( Token, "DAYANDMONTH")) {
+	if (Token == "DAYANDMONTH") {
 		ieDword dayandmonth=0;
 		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
 		//preparing sub-tokens
@@ -219,40 +219,40 @@ String TLKImporter::BuiltinToken(const char* Token)
 		return GetString(ieStrRef::DAYANDMONTH, STRING_FLAGS::RESOLVE_TAGS);
 	}
 
-	if (!strcmp( Token, "FIGHTERTYPE" )) {
+	if (Token == "FIGHTERTYPE") {
 		return GetString(ieStrRef::FIGHTERTYPE, STRING_FLAGS::NONE);
 	}
-	if (!strcmp( Token, "CLASS" )) {
+	if (Token == "CLASS") {
 		//allow this to be used by direct setting of the token
 		ieStrRef strref = ClassStrRef(-1);
 		return GetString(strref, STRING_FLAGS::NONE);
 	}
 
-	if (!strcmp( Token, "RACE" )) {
+	if (Token == "RACE") {
 		return GetString(RaceStrRef(-1), STRING_FLAGS::NONE);
 	}
 
 	// handle Player10 (max for MaxPartySize), then the rest
-	if (!strncmp(Token, "PLAYER10", 8)) {
+	if (Token == "PLAYER10") {
 		return CharName(10);
 	}
-	if (!strncmp( Token, "PLAYER", 6 )) {
-		return CharName(Token[strlen(Token)-1]-'1');
+	if (Token.StartsWith("PLAYER", 6)) {
+		return CharName(Token[6] - '1');
 	}
 
-	if (!strcmp( Token, "GABBER" )) {
+	if (Token == "GABBER") {
 		return Gabber();
 	}
-	if (!strcmp( Token, "CHARNAME" )) {
+	if (Token == "CHARNAME") {
 		return CharName(charname);
 	}
-	if (!strcmp( Token, "PRO_CLASS" )) {
+	if (Token == "PRO_CLASS") {
 		return GetString(ClassStrRef(0), STRING_FLAGS::NONE);
 	}
-	if (!strcmp( Token, "PRO_RACE" )) {
+	if (Token == "PRO_RACE") {
 		return GetString(RaceStrRef(0), STRING_FLAGS::NONE);
 	}
-	if (!strcmp( Token, "MAGESCHOOL" )) {
+	if (Token == "MAGESCHOOL") {
 		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
 		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
@@ -262,7 +262,7 @@ String TLKImporter::BuiltinToken(const char* Token)
 			return GetString(value, STRING_FLAGS::NONE);
 		}
 	}
-	if (!strcmp( Token, "TM" )) {
+	if (Token == "TM") {
 		return L"\x99";
 	}
 
@@ -272,10 +272,10 @@ String TLKImporter::BuiltinToken(const char* Token)
 String TLKImporter::ResolveTags(const String& source)
 {
 	const size_t strLen = source.length();
-	auto mystrncpy = [&source, &strLen](char* dest, size_t idx, size_t maxlength,
-		wchar_t delim)
+	auto mystrncpy = [&source, &strLen](ieVariable& tok, size_t idx, wchar_t delim)
 	{
-		maxlength = std::min(maxlength, strLen);
+		char* dest = tok.begin();
+		auto maxlength = std::min(sizeof(ieVariable) - 1, strLen);
 		while (idx < source.length() && (source[idx] != delim) && maxlength--) {
 			char chr = source[idx++];
 			if (chr != ' ') *dest++ = chr;
@@ -284,12 +284,12 @@ String TLKImporter::ResolveTags(const String& source)
 		return idx;
 	};
 	
-	char Token[MAX_VARIABLE_LENGTH + 1];
+	ieVariable Token;
 	String dest;
 	for (size_t i = 0; source[i]; i++) {
 		auto srcch = source[i];
 		if (srcch == L'<') {
-			i = mystrncpy(Token, i + 1, MAX_VARIABLE_LENGTH, L'>');
+			i = mystrncpy(Token, i + 1, L'>');
 			String resolvedToken = BuiltinToken(Token);
 			if (resolvedToken.empty()) {
 				String tokVal;
