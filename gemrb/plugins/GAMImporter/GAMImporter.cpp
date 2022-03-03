@@ -790,11 +790,11 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 			if (strcmp("dictionary_githzerai_hjacknir", name) == 0) {
 				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
 			} else {
-				tmpname = MakeVariable(name);
+				tmpname = MakeVariable(StringView(name));
 				StringToUpper(tmpname);
 			}
 		} else {
-			tmpname = MakeVariable(name);
+			tmpname = MakeVariable(StringView(name));
 		}
 
 		stream->WriteVariable(tmpname);

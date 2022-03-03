@@ -100,7 +100,7 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 	for (int y = 0; y < namelessvarcount; ++y) {
 		const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
 		auto val = inifile->GetKeyAsInt("namelessvar",Key,0);
-		NamelessVar.emplace_back(MakeVariable(Key), val);
+		NamelessVar.emplace_back(MakeVariable(StringView(Key)), val);
 	}
 
 	auto localscount = inifile->GetKeysCount("locals");
@@ -108,7 +108,7 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 	for (int y = 0; y < localscount; ++y) {
 		const char* Key = inifile->GetKeyNameByIndex("locals",y);
 		auto val = inifile->GetKeyAsInt("locals",Key,0);
-		Locals.emplace_back(MakeVariable(Key), val);
+		Locals.emplace_back(MakeVariable(StringView(Key)), val);
 	}
 
 	s = inifile->GetKeyAsString("spawn_main","enter",NULL);

@@ -53,7 +53,7 @@ TileObject* TileMap::AddTile(const ResRef& ID, const char* Name, unsigned int Fl
 {
 	TileObject* tile = new TileObject();
 	tile->Flags=Flags;
-	tile->Name = MakeVariable(Name);
+	tile->Name = MakeVariable(StringView(Name));
 	tile->Tileset = ID;
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );

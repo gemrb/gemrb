@@ -30,6 +30,7 @@
 
 #include "Platform.h"
 #include "Strings/CString.h"
+#include "Strings/StringView.h"
 
 #include <cstdint>
 
@@ -107,20 +108,17 @@ inline bool IsStar(const STR& str) {
 	return str[0] == '*';
 }
 
-inline ieVariable MakeVariable(const char* source) {
+inline ieVariable MakeVariable(const StringView& sv) {
 	ieVariable var;
-	uint8_t count = var.Size;
+	uint8_t count = var.Size - 1;
 	auto dest = var.begin();
-	
-	while(count--) {
+	auto source = sv.begin();
+	while(count-- && source != sv.end()) {
 		// TODO: we shouldnt call towlower here. ieVariable is case insensitive
 		// we probably should be calling WriteVariableLC in the writers instead
-		char c = std::towlower(*source);
+		char c = std::towlower(*source++);
 		if (c!=' ') {
 			*dest++ = c;
-		}
-		if(!*source++) {
-			break;
 		}
 	}
 	return var;
