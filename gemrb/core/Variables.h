@@ -159,7 +159,6 @@ protected:
 	inline unsigned int MyHashKey(const key_t&) const;
 	
 	void SetAtCString(const key_t&, const char* newValue);
-	bool Lookup(const key_t&, char* dest, size_t MaxLength) const;
 };
 
 }

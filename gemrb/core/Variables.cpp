@@ -272,20 +272,6 @@ Variables::MyAssoc* Variables::GetAssocAt(const key_t& key, unsigned int& nHash)
 	return NULL;
 }
 
-bool Variables::Lookup(const key_t& key, char* dest, size_t MaxLength) const
-{
-	unsigned int nHash;
-	assert( m_type == GEM_VARIABLES_STRING );
-	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
-	if (pAssoc == NULL) {
-		dest[0] = 0;
-		return false; // not in map
-	}
-
-	strlcpy( dest, pAssoc->Value.sValue, MaxLength + 1 );
-	return true;
-}
-
 bool Variables::Lookup(const key_t& key, std::string& dest) const
 {
 	unsigned int nHash;
@@ -301,10 +287,10 @@ bool Variables::Lookup(const key_t& key, std::string& dest) const
 
 bool Variables::Lookup(const key_t& key, String& dest) const
 {
-	char buff[1024];
-	bool ret = Lookup(key, buff, 1024);
+	std::string mbstr;
+	bool ret = Lookup(key, mbstr);
 	if (ret) {
-		String* tmp = StringFromCString(buff);
+		String* tmp = StringFromCString(mbstr.c_str());
 		assert(tmp);
 		std::swap(dest, *tmp);
 		delete tmp;
