@@ -28,61 +28,57 @@ namespace GemRB {
 
 /////////////////////////////////////////////////////////////////////////////
 // private inlines 
-inline bool Variables::MyCopyKey(char*& dest, const char* key) const
+inline bool Variables::MyCopyKey(char*& dest, const key_t& key) const
 {
-	int j = 0;
+	size_t j = std::count(key.begin(), key.end(), ' ');
+	dest = (char *) malloc(key.length() - j + 1);
 
-	//use j
-	for (int i = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++)
-		if (key[i] != ' ') {
-			j++;
-		}
-	dest = (char *) malloc(j + 1);
-	if (!dest) {
-		return false;
-	}
 	j = 0;
-	for (int i = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++) {
-		if (key[i] != ' ') {
-			dest[j++] = (char) tolower( key[i] );
-		}
+	for (size_t i = 0; i < key.length(); ++i) {
+		if (key[i] == ' ')
+			continue;
+		dest[j++] = tolower(key[i]);
 	}
 	dest[j] = 0;
 	return true;
 }
 
-inline unsigned int Variables::MyCompareKey(const char* key, const char *str) const
+inline bool Variables::MyCompareKey(const key_t& key, key_t str) const
 {
-	int i,j;
-
-	for (i = 0, j = 0; str[j] && key[i] && i < MAX_VARIABLE_LENGTH - 1 && j < MAX_VARIABLE_LENGTH - 1;) {
-		char c1 = tolower(key[i]);
-		if (c1 == ' ') { i++; continue; }
-		char c2 = tolower(str[j]);
-		if (c2 ==' ')  { j++; continue; }
-		if (c1!=c2) return 1;
-		i++;
-		j++;
+	// we know 'key' cannot contain spaces (created via MyCopyKey)
+	// therefore str.length() cannot be < key.length()
+	if (str.length() < key.length()) {
+		return false;
 	}
-	if (str[j] || key[i]) return 1;
-	return 0;
+
+	size_t s = 0;
+	size_t end = str.length();
+	for (size_t k = 0; s < end; ++s) {
+		if (str[s] == ' ')
+			continue;
+		if (tolower(key[k++]) != tolower(str[s]))
+			return false;
+	}
+
+	return s == end;
 }
 
-inline unsigned int Variables::MyHashKey(const char* key) const
+inline unsigned int Variables::MyHashKey(const key_t& key) const
 {
-	assert(key != NULL);
+	assert(key.c_str());
 
 	unsigned int nHash = 0;
-	for (int i = 0; i < MAX_VARIABLE_LENGTH && key[i]; i++) {
+	for (size_t i = 0; i < key.length(); i++) {
 		//the original engine ignores spaces in variable names
-		if (key[i] != ' ')
-			nHash = ( nHash << 5 ) + nHash + tolower( key[i] );
+		if (key[i] == ' ')
+			continue;
+		nHash = (nHash << 5) + nHash + tolower(key[i]);
 	}
 	return nHash;
 }
 /////////////////////////////////////////////////////////////////////////////
 // functions
-Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*& rKey,
+Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, key_t& rKey,
 	ieDword& rValue) const
 {
 	assert( m_pHashTable != NULL ); // never call on empty map
@@ -107,7 +103,7 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 	}
 
 	// fill in return data
-	rKey = pAssocRet->key;
+	rKey = key_t(pAssocRet->key);
 	rValue = pAssocRet->Value.nValue;
 	return pAssocNext;
 }
@@ -191,7 +187,7 @@ Variables::~Variables()
 	RemoveAll(NULL);
 }
 
-Variables::MyAssoc* Variables::NewAssoc(const char* key)
+Variables::MyAssoc* Variables::NewAssoc(const key_t& key)
 {
 	if (m_pFreeList == NULL) {
 		// add another block
@@ -215,11 +211,10 @@ Variables::MyAssoc* Variables::NewAssoc(const char* key)
 	if (m_lParseKey) {
 		MyCopyKey( pAssoc->key, key );
 	} else {
-		int len;
-		len = strnlen( key, MAX_VARIABLE_LENGTH - 1 );
+		size_t len = key.length();
 		pAssoc->key = (char *) malloc(len + 1);
 		if (pAssoc->key) {
-			memcpy( pAssoc->key, key, len );
+			memcpy(pAssoc->key, key.begin(), len);
 			pAssoc->key[len] = 0;
 		}
 	}
@@ -247,11 +242,12 @@ void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 	}
 }
 
-Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) const
+Variables::MyAssoc* Variables::GetAssocAt(const key_t& key, unsigned int& nHash) const
 	// find association (or return NULL)
 {
-	if (key == NULL) {
-		return NULL;
+	if (key.c_str() == nullptr) {
+		nHash = 0;
+		return nullptr;
 	}
 
 	nHash = MyHashKey( key ) % m_nHashTableSize;
@@ -263,11 +259,11 @@ Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) 
 	// see if it exists
 	for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 		if (m_lParseKey) {
-			if (!MyCompareKey( pAssoc->key, key) ) {
+			if (MyCompareKey(key_t(pAssoc->key), key)) {
 				return pAssoc;
 			}
 		} else {
-			if (!strnicmp( pAssoc->key, key, MAX_VARIABLE_LENGTH )) {
+			if (!strnicmp(pAssoc->key, key.c_str(), key.length())) {
 				return pAssoc;
 			}
 		}
@@ -276,7 +272,7 @@ Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) 
 	return NULL;
 }
 
-bool Variables::Lookup(const char* key, char* dest, size_t MaxLength) const
+bool Variables::Lookup(const key_t& key, char* dest, size_t MaxLength) const
 {
 	unsigned int nHash;
 	assert( m_type == GEM_VARIABLES_STRING );
@@ -290,7 +286,7 @@ bool Variables::Lookup(const char* key, char* dest, size_t MaxLength) const
 	return true;
 }
 
-bool Variables::Lookup(const char* key, std::string& dest) const
+bool Variables::Lookup(const key_t& key, std::string& dest) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_STRING);
@@ -303,7 +299,7 @@ bool Variables::Lookup(const char* key, std::string& dest) const
 	return true;
 }
 
-bool Variables::Lookup(const char* key, String& dest) const
+bool Variables::Lookup(const key_t& key, String& dest) const
 {
 	char buff[1024];
 	bool ret = Lookup(key, buff, 1024);
@@ -316,7 +312,7 @@ bool Variables::Lookup(const char* key, String& dest) const
 	return ret;
 }
 
-bool Variables::Lookup(const char* key, void *&dest) const
+bool Variables::Lookup(const key_t& key, void *&dest) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_POINTER);
@@ -329,7 +325,7 @@ bool Variables::Lookup(const char* key, void *&dest) const
 	return true;
 }
 
-bool Variables::Lookup(const char* key, ieDword& rValue) const
+bool Variables::Lookup(const key_t& key, ieDword& rValue) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_INT);
@@ -342,18 +338,18 @@ bool Variables::Lookup(const char* key, ieDword& rValue) const
 	return true;
 }
 
-bool Variables::HasKey(const char* key) const
+bool Variables::HasKey(const key_t& key) const
 {
 	unsigned int nHash;
 	return GetAssocAt(key, nHash) != nullptr;
 }
 
-void Variables::SetAtCString(const char* key, const char* str)
+void Variables::SetAtCString(const key_t& key, const char* str)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
 
-	assert(strlen(key)<256);
+	assert(key.length() < 256);
 
 #ifdef _DEBUG
 	// for Avenger, debugging memory issues
@@ -384,7 +380,7 @@ void Variables::SetAtCString(const char* key, const char* str)
 	}
 }
 
-void Variables::SetAt(const char* key, void* value)
+void Variables::SetAt(const key_t& key, void* value)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
@@ -415,12 +411,12 @@ void Variables::SetAt(const char* key, void* value)
 }
 
 
-void Variables::SetAt(const char* key, ieDword value, bool nocreate)
+void Variables::SetAt(const key_t& key, ieDword value, bool nocreate)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
 
-	if (!key) return;
+	if (!key.c_str()) return;
 
 	assert( m_type == GEM_VARIABLES_INT );
 	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
@@ -445,7 +441,7 @@ void Variables::SetAt(const char* key, ieDword value, bool nocreate)
 	}
 }
 
-void Variables::Remove(const char* key)
+void Variables::Remove(const key_t& key)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;

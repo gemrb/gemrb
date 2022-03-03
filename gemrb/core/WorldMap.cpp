@@ -528,7 +528,7 @@ void WorldMap::UpdateReachableAreas()
 		// 2da rows in format <name> <variable name> <area>
 		// we set the first three flags for <area> if <variable name> is set
 		ieDword varval = 0;
-		const char *varname = tab->QueryField(idx, 0).c_str();
+		const std::string& varname = tab->QueryField(idx, 0);
 		if (game->locals->Lookup(varname, varval) && varval) {
 			const ResRef areaname = tab->QueryField(idx, 1);
 			SetAreaStatus(areaname, WMP_ENTRY_VISIBLE | WMP_ENTRY_ADJACENT | WMP_ENTRY_ACCESSIBLE, BitOp::OR);

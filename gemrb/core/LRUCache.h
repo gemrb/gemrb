@@ -32,7 +32,7 @@ struct VarEntry;
 
 class GEM_EXPORT LRUCache {
 public:
-	using key_t = StringView;
+	using key_t = Variables::key_t;
 	
 	LRUCache();
 

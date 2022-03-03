@@ -339,10 +339,6 @@ std::unique_ptr<T> make_unique(Args&&... args)
 	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-//we need 32+6 bytes at least, because we store 'context' in the variable
-//name too
-#define MAX_VARIABLE_LENGTH  40
-
 //the maximum supported game CD count
 #define MAX_CD               6
 

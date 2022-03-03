@@ -974,11 +974,11 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 	value = cfg->GetValueForKey("SkipPlugin");
 	if (value) {
-		plugin_flags->SetAt( value, PLF_SKIP );
+		plugin_flags->SetAt(Variables::key_t(value), PLF_SKIP);
 	}
 	value = cfg->GetValueForKey("DelayPlugin");
 	if (value) {
-		plugin_flags->SetAt( value, PLF_DELAY );
+		plugin_flags->SetAt(Variables::key_t(value), PLF_DELAY);
 	}
 
 	for (int i = 0; i < MAX_CD; i++) {
@@ -2593,11 +2593,11 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	for (int i = 0; i < defaults->GetTagsCount(); i++) {
 		const char* tag = defaults->GetTagNameByIndex(i);
 		for (int j = 0; j < defaults->GetKeysCount(tag); j++) {
-			const char* key = defaults->GetKeyNameByIndex(tag, j);
+			auto key = Variables::key_t(defaults->GetKeyNameByIndex(tag, j));
 			//skip any existing entries. GemRB.cfg has priority
 			if (!vars->HasKey(key)) {
-				ieDword defaultVal = defaults->GetKeyAsInt(tag, key, 0);
-				vars->SetAt(key, overrides->GetKeyAsInt(tag, key, defaultVal));
+				ieDword defaultVal = defaults->GetKeyAsInt(tag, key.c_str(), 0);
+				vars->SetAt(key, overrides->GetKeyAsInt(tag, key.c_str(), defaultVal));
 			}
 		}
 	}
@@ -2658,7 +2658,7 @@ bool Interface::SaveConfig()
 			// write section header
 			AppendFormat(contents, "[{}]\n", tag);
 			for (int j = 0; j < defaultsINI->GetKeysCount(tag); j++) {
-				const char* key = defaultsINI->GetKeyNameByIndex(tag, j);
+				auto key = Variables::key_t(defaultsINI->GetKeyNameByIndex(tag, j));
 				ieDword value = 0;
 				bool found = vars->Lookup(key, value);
 				assert(found);

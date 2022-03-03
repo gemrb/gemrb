@@ -25,6 +25,7 @@
 #include "globals.h"
 
 #include "Strings/String.h"
+#include "Strings/StringView.h"
 
 #include <cassert>
 
@@ -58,7 +59,8 @@ protected:
 public:
 	// abstract iteration position
 	using iterator = MyAssoc*;
-public:
+	using key_t = StringView;
+
 	// Construction
 	explicit Variables(int nBlockSize = 10, int nHashTableSize = 2049);
 	Variables(const Variables&) = delete;
@@ -89,52 +91,51 @@ public:
 		return m_nCount == 0;
 	}
 
-	bool Lookup(const char* key, ieDword& rValue) const;
-	bool Lookup(const char* key, String& dest) const;
-	bool Lookup(const char* key, std::string& dest) const;
-	bool Lookup(const char* key, void*& dest) const;
-	bool HasKey(const char* key) const;
+	bool Lookup(const key_t&, ieDword& rValue) const;
+	bool Lookup(const key_t&, String& dest) const;
+	bool Lookup(const key_t&, std::string& dest) const;
+	bool Lookup(const key_t&, void*& dest) const;
+	bool HasKey(const key_t&) const;
 	
 	template<typename T>
 	typename std::enable_if<std::is_enum<T>::value, bool>::type
-	Lookup(const char* key, T& flags) const {
+	Lookup(const key_t& key, T& flags) const {
 		ieDword val = static_cast<ieDword>(flags);
 		bool ret = Lookup(key, val);
 		flags = static_cast<T>(val);
 		return ret;
 	}
 	
-	template<typename STR, typename T, ENABLE_CHAR_RANGE(STR)>
-	void SetAtAsString(const STR& key, T&& newValue)
+	template<typename T>
+	void SetAtAsString(const key_t& key, T&& newValue)
 	{
 		const std::string& newStr = fmt::format("{}", std::forward<T>(newValue));
-		SetAtCString(&key[0], newStr.c_str());
+		SetAtCString(key, newStr.c_str());
 	}
 	
-	template<typename STR, ENABLE_CHAR_RANGE(STR)>
-	void SetAt(const STR& key, const String& newValue)
+	void SetAt(const key_t& key, const String& newValue)
 	{
 		const std::string& mbstr = MBStringFromString(newValue);
-		SetAtCString(&key[0], mbstr.c_str());
+		SetAtCString(key, mbstr.c_str());
 	}
 	
-	template<typename KSTR, typename VSTR, ENABLE_CHAR_RANGE(KSTR), ENABLE_CHAR_RANGE(VSTR)>
-	void SetAt(const KSTR& key, const VSTR& newValue)
+	template<typename VSTR, ENABLE_CHAR_RANGE(VSTR)>
+	void SetAt(const key_t& key, const VSTR& newValue)
 	{
-		SetAtCString(&key[0], &newValue[0]);
+		SetAtCString(key, &newValue[0]);
 	}
 	
-	void SetAt(const char* key, const char* val) {
+	void SetAt(const key_t& key, const char* val) {
 		SetAtCString(key, val);
 	}
-	
-	void SetAt(const char* key, void* newValue);
-	void SetAt(const char* key, ieDword newValue, bool nocreate=false);
-	void Remove(const char* key);
+
+	void SetAt(const key_t&, void* newValue);
+	void SetAt(const key_t&, ieDword newValue, bool nocreate=false);
+	void Remove(const key_t&);
 	void RemoveAll(ReleaseFun fun);
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 
-	iterator GetNextAssoc(iterator rNextPosition, const char*& rKey,
+	iterator GetNextAssoc(iterator rNextPosition, key_t& rKey,
 		ieDword& rValue) const;
 
 	// Debugging
@@ -150,15 +151,15 @@ protected:
 	int m_nBlockSize;
 	int m_type; //could be string or ieDword 
 
-	Variables::MyAssoc* NewAssoc(const char* key);
+	Variables::MyAssoc* NewAssoc(const key_t&);
 	void FreeAssoc(Variables::MyAssoc*);
-	Variables::MyAssoc* GetAssocAt(const char*, unsigned int&) const;
-	inline bool MyCopyKey(char*& dest, const char* key) const;
-	inline unsigned int MyCompareKey(const char* key, const char *str) const;
-	inline unsigned int MyHashKey(const char*) const;
+	Variables::MyAssoc* GetAssocAt(const key_t&, unsigned int&) const;
+	inline bool MyCopyKey(char*& dest, const key_t&) const;
+	inline bool MyCompareKey(const key_t&, key_t str) const;
+	inline unsigned int MyHashKey(const key_t&) const;
 	
-	void SetAtCString(const char* key, const char* newValue);
-	bool Lookup(const char* key, char* dest, size_t MaxLength) const;
+	void SetAtCString(const key_t&, const char* newValue);
+	bool Lookup(const key_t&, char* dest, size_t MaxLength) const;
 };
 
 }

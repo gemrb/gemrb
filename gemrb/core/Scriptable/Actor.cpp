@@ -81,7 +81,7 @@ static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
-static const char* const CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
+static const ResRef CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
 static int *wmlevels[20];
 
@@ -1220,7 +1220,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		params.push_back(ScriptEngine::Parameter(pc));
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", params, true);
 		ieDword NeedsLevelUp = 0;
-		core->GetDictionary()->Lookup(varName.c_str(), NeedsLevelUp);
+		core->GetDictionary()->Lookup(varName, NeedsLevelUp);
 		if (NeedsLevelUp == 1) {
 			displaymsg->DisplayConstantStringName(STR_LEVELUP, DMC_WHITE, actor);
 			actor->GotLUFeedback = true;

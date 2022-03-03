@@ -758,11 +758,11 @@ int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game) const
 int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 {
 	Variables::iterator pos=NULL;
-	const char *name;
 	ieDword value;
 
 	for (unsigned int i=0;i<KillVarsCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
+		Variables::key_t name;
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
 		stream->WriteVariableUC(ieVariable(name));
 		stream->WriteFilling(8);
@@ -777,24 +777,24 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 {
 	ieVariable tmpname;
 	Variables::iterator pos=NULL;
-	const char *name;
 	ieDword value;
 
 	for (unsigned int i=0;i<GlobalCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
+		Variables::key_t name;
 		pos=game->locals->GetNextAssoc( pos, name, value);
 
 		/* PST hates to have some variables lowercased. */
 		if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
-			if (strcmp("dictionary_githzerai_hjacknir", name) == 0) {
+			if (strcmp("dictionary_githzerai_hjacknir", name.c_str()) == 0) {
 				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
 			} else {
-				tmpname = MakeVariable(StringView(name));
+				tmpname = MakeVariable(name);
 				StringToUpper(tmpname);
 			}
 		} else {
-			tmpname = MakeVariable(StringView(name));
+			tmpname = MakeVariable(name);
 		}
 
 		stream->WriteVariable(tmpname);

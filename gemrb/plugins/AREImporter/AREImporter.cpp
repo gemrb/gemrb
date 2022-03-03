@@ -2298,15 +2298,16 @@ int AREImporter::PutEntrances(DataStream *stream, const Map *map) const
 int AREImporter::PutVariables(DataStream *stream, const Map *map) const
 {
 	Variables::iterator pos=NULL;
-	const char *name;
 	ieDword value;
 
 	for (unsigned int i=0;i<VariablesCount;i++) {
-		pos=map->locals->GetNextAssoc( pos, name, value);
-		//name isn't necessarily 32 bytes long, so we play safe
-		char buff[40] = {};
-		strncpy(buff, name, 32);
-		stream->Write(buff, 40);
+		Variables::key_t name;
+		pos = map->locals->GetNextAssoc(pos, name, value);
+		size_t len = name.length();
+		stream->Write(name.c_str(), len);
+		if (len < 40) {
+			stream->WriteFilling(40 - len);
+		}
 		stream->WriteDword(value);
 		//40 bytes of empty crap
 		stream->WriteFilling(40);
