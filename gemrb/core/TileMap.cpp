@@ -48,12 +48,12 @@ void TileMap::ClearOverlays()
 }
 
 //tiled objects
-TileObject* TileMap::AddTile(const ResRef& ID, const char* Name, unsigned int Flags,
+TileObject* TileMap::AddTile(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
 	unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount)
 {
 	TileObject* tile = new TileObject();
 	tile->Flags=Flags;
-	tile->Name = MakeVariable(StringView(Name));
+	tile->Name = Name;
 	tile->Tileset = ID;
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );
