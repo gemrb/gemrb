@@ -140,7 +140,7 @@ bool KeyMap::ResolveKey(unsigned short key, int group) const
 bool KeyMap::ResolveName(const char* name, int group) const
 {
 	void *tmp;
-	if (!keymap.Lookup(name, tmp) ) {
+	if (!keymap.Lookup(Variables::key_t(name), tmp)) {
 		return false;
 	}
 
@@ -161,7 +161,7 @@ Function* KeyMap::LookupFunction(std::string key)
 	StringToLower(key);
 
 	void *tmp;
-	if (!keymap.Lookup(key.c_str(), tmp) ) {
+	if (!keymap.Lookup(key, tmp) ) {
 		return nullptr;
 	}
 

@@ -188,7 +188,7 @@ void LoadPlugins(const char* pluginpath)
 	do {
 		const char *name = dirIt.GetName();
 		ieDword flags = 0;
-		core->plugin_flags->Lookup (name, flags);
+		core->plugin_flags->Lookup(Variables::key_t(name), flags);
 
 		// module is sent to the back
 		if (flags == PLF_DELAY) {

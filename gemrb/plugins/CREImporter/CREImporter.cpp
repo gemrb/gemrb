@@ -2903,11 +2903,11 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 {
 	Variables::iterator pos=NULL;
-	const char *name;
 	ieDword tmpDword, value;
 
 	for (unsigned int i=0;i<VariablesCount;i++) {
-		pos = actor->locals->GetNextAssoc( pos, name, value);
+		Variables::key_t name;
+		pos = actor->locals->GetNextAssoc(pos, name, value);
 		stream->WriteFilling(8);
 		tmpDword = FAKE_VARIABLE_OPCODE;
 		stream->WriteDword(tmpDword);

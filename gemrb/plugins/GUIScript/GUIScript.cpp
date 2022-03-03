@@ -4094,7 +4094,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	char *Variable;
 	char *value;
 	PARSE_ARGS( args,  "ss", &Variable, &value );
-	core->GetTokenDictionary()->SetAt(Variable, value);
+	core->GetTokenDictionary()->SetAt(Variables::key_t(Variable), value);
 
 	Py_RETURN_NONE;
 }
@@ -4135,7 +4135,7 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 	unsigned long value;
 	PARSE_ARGS( args, "sk", &Variable, &value );
 
-	core->GetDictionary()->SetAt( Variable, (ieDword) value );
+	core->GetDictionary()->SetAt(Variables::key_t(Variable), (ieDword) value);
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
@@ -4192,7 +4192,7 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "s", &Variable );
 
 	std::string value;
-	if (!core->GetTokenDictionary()->Lookup( Variable, value )) {
+	if (!core->GetTokenDictionary()->Lookup(Variables::key_t(Variable), value )) {
 		Py_RETURN_NONE;
 	}
 
@@ -4225,9 +4225,9 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
 	const char *Variable;
 	ieDword value;
-	PARSE_ARGS( args,  "s", &Variable );
+	PARSE_ARGS( args, "s", &Variable );
 
-	if (!core->GetDictionary()->Lookup( Variable, value )) {
+	if (!core->GetDictionary()->Lookup(Variables::key_t(Variable), value)) {
 		return PyLong_FromLong(0);
 	}
 
@@ -4352,11 +4352,11 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
 	const char *Variable;
 	ieDword value;
-	PARSE_ARGS( args,  "s", &Variable );
+	PARSE_ARGS( args, "s", &Variable );
 
 	GET_GAME();
 
-	if (!game->locals->Lookup( Variable, value )) {
+	if (!game->locals->Lookup(Variables::key_t(Variable), value )) {
 		return PyLong_FromLong((unsigned long) 0);
 	}
 
@@ -4389,18 +4389,18 @@ configuration variable was already set (saved in game ini).\n\
 
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
-	const char *string;
+	PyObject* pyres;
 	int flag = 0;
-	PARSE_ARGS( args,  "s|i", &string, &flag );
+	PARSE_ARGS( args,  "O|i", &pyres, &flag );
 
 	ieDword ind = 0;
-
+	ResRef resref = ResRefFromPy(pyres);
 	//Lookup will leave the flag untouched if it doesn't exist yet
-	core->GetDictionary()->Lookup(string, ind);
+	core->GetDictionary()->Lookup(resref, ind);
 	if (flag)
 		ind = 0;
 	if (!ind) {
-		ind = core->PlayMovie(ResRef(string));
+		ind = core->PlayMovie(resref);
 	}
 	return PyLong_FromLong(ind);
 }

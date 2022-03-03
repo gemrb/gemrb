@@ -45,7 +45,7 @@ int LRUCache::GetCount() const
 void LRUCache::SetAt(key_t key, void* value)
 {
 	void* p;
-	if (v.Lookup(key.c_str(), p)) {
+	if (v.Lookup(key, p)) {
 		VarEntry* e = (VarEntry*) p;
 		e->data = value;
 		Touch(key);
@@ -64,13 +64,13 @@ void LRUCache::SetAt(key_t key, void* value)
 	head = e;
 	if (tail == 0) tail = head;
 
-	v.SetAt(key.c_str(), (void*)e);
+	v.SetAt(key, (void*)e);
 }
 
 bool LRUCache::Lookup(key_t key, void*& value) const
 {
 	void* p;
-	if (v.Lookup(key.c_str(), p)) {
+	if (v.Lookup(key, p)) {
 		VarEntry* e = (VarEntry*) p;
 		value = e->data;
 		return true;
@@ -81,7 +81,7 @@ bool LRUCache::Lookup(key_t key, void*& value) const
 bool LRUCache::Touch(key_t key)
 {
 	void* p;
-	if (!v.Lookup(key.c_str(), p)) return false;
+	if (!v.Lookup(key, p)) return false;
 	VarEntry* e = (VarEntry*) p;
 
 	// already head?
@@ -101,9 +101,9 @@ bool LRUCache::Touch(key_t key)
 bool LRUCache::Remove(key_t key)
 {
 	void* p;
-	if (!v.Lookup(key.c_str(), p)) return false;
+	if (!v.Lookup(key, p)) return false;
 	VarEntry* e = (VarEntry*) p;
-	v.Remove(key.c_str());
+	v.Remove(key);
 	removeFromList(e);
 	delete[] e->key;
 	delete e;
