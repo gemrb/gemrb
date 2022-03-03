@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, "");
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
-	setenv("GEM_DATA", SDL_AndroidGetExternalStoragePath(), 1);
+	setenv("GEMRB_DATA", SDL_AndroidGetExternalStoragePath(), 1);
 
 #ifdef M_TRIM_THRESHOLD
 // Prevent fragmentation of the heap by malloc (glibc).

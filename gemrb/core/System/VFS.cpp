@@ -454,7 +454,7 @@ GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
 GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen)
 {
 	// check env var; used by the Android wrapper
-	char* dataDir = getenv("GEM_DATA");
+	char* dataDir = getenv("GEMRB_DATA");
 	if (dataDir) {
 		strlcpy(outPath, dataDir, maxLen);
 		return outPath;
