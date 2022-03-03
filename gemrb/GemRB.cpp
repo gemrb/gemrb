@@ -35,21 +35,18 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, "");
 #ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
-#endif
-
-#ifdef M_TRIM_THRESHOLD
-// Prevent fragmentation of the heap by malloc (glibc).
-//
-// The default threshold is 128*1024, which can result in a large memory usage
-// due to fragmentation since we use a lot of small objects. On the other hand
-// if the threshold is too low, free() starts to permanently ask the kernel
-// about shrinking the heap.
+	
+	// Prevent fragmentation of the heap by malloc (glibc).
+	// The default threshold is 128*1024, which can result in a large memory usage
+	// due to fragmentation since we use a lot of small objects. On the other hand
+	// if the threshold is too low, free() starts to permanently ask the kernel
+	// about shrinking the heap.
 	#if defined(HAVE_UNISTD_H)
 		int pagesize = sysconf(_SC_PAGESIZE);
 	#else
 		int pagesize = 4*1024;
 	#endif
-	mallopt(M_TRIM_THRESHOLD, 5*pagesize);
+	setenv("MALLOC_TRIM_THRESHOLD_", fmt::format("{}", 5 * pagesize), 1);
 #endif
 
 	Interface::SanityCheck(VERSION_GEMRB);
