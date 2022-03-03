@@ -21,7 +21,6 @@
 #include "GUI/Slider.h"
 
 #include "Interface.h"
-#include "Variables.h"
 #include "GUI/Window.h"
 
 namespace GemRB {

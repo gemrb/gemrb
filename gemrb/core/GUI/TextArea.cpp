@@ -21,7 +21,6 @@
 #include "TextArea.h"
 
 #include "Interface.h"
-#include "Variables.h"
 
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"

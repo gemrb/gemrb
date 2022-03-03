@@ -126,7 +126,7 @@ public: // Public attributes
 		}
 	};
 	
-	using varname_t = FixedSizeString<MAX_VARIABLE_LENGTH, strnicmp>;
+	using varname_t = ieVariable;
 	using value_t = ieDword;
 	static constexpr value_t INVALID_VALUE = -1;
 
