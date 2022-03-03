@@ -72,7 +72,7 @@
 find_path(SDL2_INCLUDE_DIR SDL.h
   HINTS
     ENV SDLDIR
-  PATH_SUFFIXES include/SDL2 include
+  PATH_SUFFIXES include/SDL2 include Headers
   PATHS
      ~/Library/Frameworks/SDL2.framework/
      /Library/Frameworks/SDL2.framework/
