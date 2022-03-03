@@ -152,7 +152,7 @@ public:
 	int GetTrapSaveBonus(ieDword level, int cls);
 	int GetTrapLimit(Scriptable *trapper);
 	int GetSummoningLimit(ieDword sex);
-	const Color& GetColor(const char *row);
+	const Color& GetColor(const TableMgr::key_t& row);
 	int GetWeaponStyleAPRBonus(int row, int col);
 	int GetReputationMod(int column);
 	/** Returns the virtual worldmap entry of a sub-area (pst-only) */
@@ -169,7 +169,7 @@ public:
 	const std::vector<int>& GetBonusSpells(int ability);
 	ieByte GetItemAnimation(const ResRef& itemRef);
 	const std::vector<ItemUseType>& GetItemUse();
-	int GetMiscRule(const char* rowName);
+	int GetMiscRule(const TableMgr::key_t& rowName);
 	int GetDifficultyMod(ieDword mod, ieDword difficulty);
 	int GetXPBonus(ieDword bonusType, ieDword level);
 

@@ -56,16 +56,16 @@ public:
 	const std::string& QueryField(index_t row = 0, index_t column = 0) const override;
 	const std::string& QueryDefault() const override;
 
-	index_t GetRowIndex(QueryKey string) const override;
-	index_t GetColumnIndex(QueryKey string) const override;
+	index_t GetRowIndex(const key_t& string) const override;
+	index_t GetColumnIndex(const key_t& string) const override;
 
 	const std::string& GetColumnName(index_t index) const override;
 	const std::string& GetRowName(index_t index) const override;
 
 	index_t FindTableValue(index_t col, long val, index_t start) const override;
-	index_t FindTableValue(index_t col, QueryKey val, index_t start) const override;
-	index_t FindTableValue(QueryKey col, long val, index_t start) const override;
-	index_t FindTableValue(QueryKey col, QueryKey val, index_t start) const override;
+	index_t FindTableValue(index_t col, const key_t& val, index_t start) const override;
+	index_t FindTableValue(const key_t& col, long val, index_t start) const override;
+	index_t FindTableValue(const key_t& col, const key_t& val, index_t start) const override;
 };
 
 }

@@ -646,7 +646,7 @@ int GameData::GetSummoningLimit(ieDword sex)
 	return summoningLimit->QueryFieldSigned<int>(row, 0);
 }
 
-const Color& GameData::GetColor(const char *row)
+const Color& GameData::GetColor(const TableMgr::key_t& row)
 {
 	// preload converted colors
 	if (colors.empty()) {
@@ -657,7 +657,7 @@ const Color& GameData::GetColor(const char *row)
 			colors[colorTable->GetRowName(r)] = Color(c);
 		}
 	}
-	const auto it = colors.find(row);
+	const auto it = colors.find(row.c_str());
 	if (it != colors.end()) {
 		return it->second;
 	}
@@ -1064,14 +1064,14 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 	return itemUse;
 }
 
-int GameData::GetMiscRule(const char* rowName)
+int GameData::GetMiscRule(const TableMgr::key_t& rowName)
 {
 	if (!miscRule) {
 		miscRule = LoadTable("miscrule", true);
 	}
 	assert(miscRule);
 
-	return miscRule->QueryFieldSigned<int>(TableMgr::QueryKey(rowName), "VALUE");
+	return miscRule->QueryFieldSigned<int>(rowName, "VALUE");
 }
 
 int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
