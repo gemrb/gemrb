@@ -166,13 +166,8 @@ elseif (${LAYOUT} MATCHES "opt")
 	SET_PATH( METAINFO_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo )
 else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	SET(CMAKE_INSTALL_RPATH @loader_path/../Frameworks)
-	SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) 
-	# most paths are irrelevant since the items will be bundled with application
+	SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 	SET_PATH( BIN_DIR /Applications )
-	# TODO: these should be copied during build and not install.
-	SET_PATH( PLUGIN_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Plugins" )
-	SET_PATH( DOC_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
-	SET_PATH( DATA_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
 	SET_PATH( LIB_DIR @loader_path/../Frameworks )
 	SET_PATH( METAINFO_DIR "" )
 endif (${LAYOUT} MATCHES "home")
@@ -539,13 +534,15 @@ MACRO(ADD_GEMRB_PLUGIN plugin_name)
 		elseif (CMAKE_SYSTEM_NAME STREQUAL "Haiku")
 			TARGET_LINK_LIBRARIES(${plugin_name} -lbsd)
 		endif (CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
-		INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
 	endif (STATIC_LINK)
 
 	IF (APPLE)
 		SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX ""
 			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/gemrb/${PROJECT_NAME}.app/Contents/PlugIns)
 	ELSE (APPLE)
+		IF (NOT STATIC_LINK)
+			INSTALL(TARGETS ${plugin_name} DESTINATION ${PLUGIN_DIR})
+		ENDIF()
 		SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX ""
 			INSTALL_RPATH ${LIB_DIR}
 			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/gemrb/plugins)
@@ -568,12 +565,10 @@ IF (NOT APPLE)
 		INSTALL( FILES platforms/linux/gemrb.desktop DESTINATION ${MENU_DIR} )
 		INSTALL( FILES platforms/linux/org.gemrb.gemrb.metainfo.xml DESTINATION ${METAINFO_DIR} )
 	ENDIF()
-ENDIF()
-INSTALL( FILES README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
-INSTALL( FILES admin/extend2da.py DESTINATION ${BIN_DIR}
+	INSTALL( FILES README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
+	INSTALL( FILES admin/extend2da.py DESTINATION ${BIN_DIR}
 		PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-
-INSTALL(DIRECTORY demo DESTINATION ${DATA_DIR})
+ENDIF()
 
 CONFIGURE_FILE(
 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
