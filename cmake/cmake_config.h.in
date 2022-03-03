@@ -16,7 +16,6 @@
 #cmakedefine NO_COLOR ${NOCOLOR}
 #cmakedefine OPENGL_BACKEND ${OPENGL_BACKEND}
 #cmakedefine NOFPSLIMIT ${NOFPSLIMIT}
-#cmakedefine HAVE_MALLOC_H 1
 #cmakedefine HAVE_UNISTD_H 1
 #cmakedefine HAVE_LANGINFO_H 1
 #cmakedefine HAVE_DLFCN_H 1

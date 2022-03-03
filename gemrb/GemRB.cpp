@@ -25,10 +25,6 @@
 #include "Interface.h"
 #include "Logging/Loggers/Stdio.h"
 
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-
 using namespace GemRB;
 
 int main(int argc, char* argv[])
