@@ -47,7 +47,7 @@ public:
 	static constexpr TypeID ID = { "Table" };
 	using index_t = size_t;
 	static constexpr index_t npos = -1;
-	using QueryKey = StringView;
+	using key_t = StringView;
 
 	TableMgr() noexcept = default;
 	/** Returns the actual number of Rows in the Table */
@@ -62,7 +62,7 @@ public:
 
 	/** Returns a pointer to a zero terminated 2da element,
 	 * uses column name and row name to search the field */
-	const std::string& QueryField(QueryKey row, QueryKey column) const
+	const std::string& QueryField(const key_t& row, const key_t& column) const
 	{
 		return QueryField(GetRowIndex(row), GetColumnIndex(column));
 	}
@@ -84,15 +84,15 @@ public:
 	}
 	/** Returns default value of table. */
 	virtual const std::string& QueryDefault() const = 0;
-	virtual index_t GetColumnIndex(QueryKey colname) const = 0;
-	virtual index_t GetRowIndex(QueryKey rowname) const = 0;
+	virtual index_t GetColumnIndex(const key_t& colname) const = 0;
+	virtual index_t GetRowIndex(const key_t& rowname) const = 0;
 	virtual const std::string& GetColumnName(index_t index) const = 0;
 	/** Returns a Row Name, returns NULL on error */
 	virtual const std::string& GetRowName(index_t index) const = 0;
 	virtual index_t FindTableValue(index_t column, long value, index_t start = 0) const = 0;
-	virtual index_t FindTableValue(index_t column, QueryKey value, index_t start = 0) const = 0;
-	virtual index_t FindTableValue(QueryKey column, long value, index_t start = 0) const = 0;
-	virtual index_t FindTableValue(QueryKey column, QueryKey value, index_t start = 0) const = 0;
+	virtual index_t FindTableValue(index_t column, const key_t& value, index_t start = 0) const = 0;
+	virtual index_t FindTableValue(const key_t& column, long value, index_t start = 0) const = 0;
+	virtual index_t FindTableValue(const key_t& column, const key_t& value, index_t start = 0) const = 0;
 
 	/** Opens a Table File */
 	virtual bool Open(DataStream* stream) = 0;
