@@ -62,6 +62,8 @@ SpellTable = None
 PreviousPC = 0
 BarteringPC = 0
 MaxAmount = 0
+BuySum = 0
+SellSum = 0
 
 # 0 - Store
 # 1 - Tavern
