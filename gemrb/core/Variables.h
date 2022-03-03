@@ -97,12 +97,12 @@ public:
 	bool Lookup(const key_t&, void*& dest) const;
 	bool HasKey(const key_t&) const;
 	
-	template<typename T>
-	typename std::enable_if<std::is_enum<T>::value, bool>::type
-	Lookup(const key_t& key, T& flags) const {
-		ieDword val = static_cast<ieDword>(flags);
+	template<typename NUM>
+	typename std::enable_if<std::is_integral<NUM>::value || std::is_enum<NUM>::value, bool>::type
+	Lookup(const key_t& key, NUM& rValue) const {
+		ieDword val;
 		bool ret = Lookup(key, val);
-		flags = static_cast<T>(val);
+		rValue = static_cast<NUM>(val);
 		return ret;
 	}
 	
