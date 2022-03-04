@@ -58,14 +58,24 @@ IF(APPLE) #application bundle generation
 					${RESOURCE_FILES})
 
 	# we already link to Cocoa and we need to modify this with the ‘dylib_file’ option for non-framework SDL builds
+	message(STATUS "Starting SDL_LIBRARY and cmake path: '${SDL_LIBRARY}' (${libdir})")
+	set(OLD_SDL_LIB ${SDL_LIBRARY})
 	STRING(REPLACE "-framework Cocoa" "" SDL_LIBRARY ${SDL_LIBRARY})
-	GET_FILENAME_COMPONENT(SDL_LIBRARY ${SDL_LIBRARY} REALPATH)
+	if(${OLD_SDL_LIB} STREQUAL ${SDL_LIBRARY})
+		execute_process(COMMAND ls "${libdir}")
+		set(SDL_BASENAME "libSDL2-2.0.0.dylib")
+		set(SDL_LIBRARY "${libdir}/${SDL_BASENAME}")
+		message(STATUS "Using path set by SDL2 itself: ${SDL_LIBRARY}")
+	else()
+		GET_FILENAME_COMPONENT(SDL_LIBRARY ${SDL_LIBRARY} REALPATH)
+		GET_FILENAME_COMPONENT(SDL_BASENAME ${SDL_LIBRARY} NAME)
+	endif()
+
 	SET(BUNDLE_FRAMEWORK_PATH "${CMAKE_BINARY_DIR}/gemrb/${PROJECT_NAME}.app/Contents/Frameworks")
 					
 	MESSAGE(STATUS "Copying SDL: ${SDL_LIBRARY}")
 	FILE(COPY ${SDL_LIBRARY} DESTINATION ${BUNDLE_FRAMEWORK_PATH} FILE_PERMISSIONS OWNER_READ OWNER_WRITE)
 
-	GET_FILENAME_COMPONENT(SDL_BASENAME ${SDL_LIBRARY} NAME)
 	SET(SDL_LIBRARY "${BUNDLE_FRAMEWORK_PATH}/${SDL_BASENAME}")
 	
 	IF(NOT SDL_BASENAME MATCHES ".framework")
