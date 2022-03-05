@@ -61,7 +61,7 @@ IF(APPLE) #application bundle generation
 	message(STATUS "Starting SDL_LIBRARY and cmake path: '${SDL_LIBRARY}' (${libdir})")
 	set(OLD_SDL_LIB ${SDL_LIBRARY})
 	STRING(REPLACE "-framework Cocoa" "" SDL_LIBRARY ${SDL_LIBRARY})
-	if(${OLD_SDL_LIB} STREQUAL ${SDL_LIBRARY})
+	if(${OLD_SDL_LIB} STREQUAL ${SDL_LIBRARY} AND SDL_BACKEND STREQUAL "SDL2")
 		set(SDL_BASENAME "libSDL2-2.0.0.dylib")
 		set(SDL_LIBRARY "${libdir}/${SDL_BASENAME}")
 		message(STATUS "Using path set by SDL2 itself: ${SDL_LIBRARY}")
