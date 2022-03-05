@@ -258,6 +258,10 @@ ENDIF()
 # Autodetection mechanism
 # Default priority to SDL
 # If both backends are found, preferring SDL2
+if(APPLE)
+	# framework version of sdl doesn't provide a working cmake config module
+	set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};platforms/apple/")
+endif()
 IF(SDL_BACKEND STREQUAL "Auto")
 	MESSAGE(STATUS "Autodetecting SDL backend...")
 	IF(WIN32 AND _VCPKG_INSTALLED_DIR)
@@ -267,7 +271,7 @@ IF(SDL_BACKEND STREQUAL "Auto")
 		GET_TARGET_PROPERTY(SDL2_LIBRARY_RELEASE SDL2::SDL2 IMPORTED_IMPLIB_RELEASE)
 		SET(SDL2_LIBRARIES debug ${SDL2_LIBRARY_DEBUG} optimized ${SDL2_LIBRARY_RELEASE})
 	ELSE()
-		find_package(SDL2 CONFIG)
+		find_package(SDL2)
 	ENDIF()
 	IF(SDL2_FOUND)
 		MESSAGE(STATUS "Found SDL 2.0, switching to SDL2 backend.")
@@ -300,7 +304,7 @@ IF(SDL_BACKEND STREQUAL "SDL2")
 		GET_TARGET_PROPERTY(SDL2_LIBRARY_RELEASE SDL2::SDL2 IMPORTED_IMPLIB_RELEASE)
 		SET(SDL2_LIBRARIES debug ${SDL2_LIBRARY_DEBUG} optimized ${SDL2_LIBRARY_RELEASE})
 	ELSE()
-		find_package(SDL2 CONFIG REQUIRED)
+		find_package(SDL2 REQUIRED)
 	ENDIF()
 	# unify SDL variables, so we don't have to differentiate later
 	UNSET(SDL_INCLUDE_DIR CACHE)
