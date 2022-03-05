@@ -125,8 +125,6 @@ def OpenVideoOptionsWindow ():
 	"""Open video options window"""
 	global HelpTextArea
 
-	#GemRB.GetView("SUB_WIN", 0).Close()
-
 	Window = GemRB.LoadWindow (6, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
@@ -189,8 +187,6 @@ def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
 	global HelpTextArea
 
-	#GemRB.GetView("SUB_WIN", 0).Close()
-
 	Window = GemRB.LoadWindow (7, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
@@ -225,8 +221,6 @@ def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
 
 	global HelpTextArea2
-
-	#GemRB.GetView("SUB_WIN", 1).Close()
 
 	Window = GemRB.LoadWindow (12, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
@@ -267,8 +261,6 @@ def CloseGameplayOptionsWindow ():
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
 	global HelpTextArea
-
-	#GemRB.GetView("SUB_WIN", 0).Close()
 
 	#gameplayoptions
 	Window = GemRB.LoadWindow (8, "GUIOPT")
@@ -322,8 +314,6 @@ def OpenFeedbackOptionsWindow ():
 
 	global HelpTextArea2
 
-	#GemRB.GetView("SUB_WIN", 1).Close()
-
 	Window = GemRB.LoadWindow (9, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
@@ -364,8 +354,6 @@ def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
 
 	global HelpTextArea2
-
-	#GemRB.GetView("SUB_WIN", 1).Close()
 
 	Window = GemRB.LoadWindow (10, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
