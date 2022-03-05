@@ -71,20 +71,20 @@ public:
 
 private: // Private attributes
 	/** Knob Image */
-	Holder<Sprite2D> Knob;
+	Holder<Sprite2D> Knob = nullptr;
 	/** Grabbed Knob Image */
-	Holder<Sprite2D> GrabbedKnob;
+	Holder<Sprite2D> GrabbedKnob = nullptr;
 	/** Knob Starting Position */
 	Point KnobPos;
 	/** Knob Step Size */
-	short KnobStep;
+	short KnobStep = 0;
 	/** Knob Steps Count */
-	unsigned short KnobStepsCount;
+	unsigned short KnobStepsCount = 0;
 
 	/** Actual Knob Status */
-	unsigned char State;
+	unsigned char State = IE_GUI_SLIDER_KNOB;
 	/** Slider Position Value */
-	unsigned int Pos;
+	unsigned int Pos = 0;
 
 protected:
 	/** Mouse Button Down */

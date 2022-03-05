@@ -33,10 +33,6 @@ Slider::Slider(const Region& frame, Point pos,
 	ControlType = IE_GUI_SLIDER;
 	this->KnobStep = KnobStep;
 	this->KnobStepsCount = KnobStepsCount;
-	Knob = NULL;
-	GrabbedKnob = NULL;
-	State = IE_GUI_SLIDER_KNOB;
-	Pos = 0;
 	SetValueRange(1);
 }
 
