@@ -99,7 +99,7 @@ void WindowManager::DestroyWindows(WindowList& list)
 	WindowList::iterator it = list.begin();
 	while (it != list.end()) {
 		Window* win = *it;
-		// IMPORTANT: ensure the window (a control subview) isnt executing a callback before deleting it
+		// IMPORTANT: ensure the window (a control subview) isn't executing a callback before deleting it
 		if (win->InActionHandler() == false) {
 			delete win;
 			it = list.erase(it);
@@ -185,7 +185,7 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 		return false;
 	}
 	// FIXME: this should probably account for modal windows
-	// shouldnt beable to move non modals in front of modals, nor one modal to infront of another
+	// shouldn't be able to move non modals in front of modals, nor one modal to in front of another
 
 	Window* oldFront = windows.front();
 	// if we only have one window, or the 2 windows are the same it is an automatic success
@@ -338,13 +338,13 @@ Window* WindowManager::GetFocusWindow() const
 Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_iterator& current)
 {
 	if (current == windows.end()) {
-		// we already we through them all and returned gameWin or modalWin once. there is no target window after gameWin
+		// we already went through them all and returned gameWin or modalWin once. There is no target window after gameWin
 		return NULL;
 	}
 
 	if (Window* mwin = ModalWindow()) {
 		// modal win is always the target for all events no matter what
-		// if the window shouldnt handle sreen events outside its bounds (ie negative coords etc)
+		// if the window shouldn't handle screen events outside its bounds (ie. negative coords)
 		// then the Window class should be responsible for bounds checking
 
 		// the NULL return is so that if this is called again after returning modalWindow there is no NextTarget
@@ -428,7 +428,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 				}
 			} else if ((target->Flags()&(View::IgnoreEvents|View::Disabled)) == View::Disabled
 					   && event.type == Event::KeyDown && event.keyboard.keycode == GEM_ESCAPE) {
-				// force close disabled windows if they arent also ignoreing events
+				// force close disabled windows if they aren't also ignoring events
 				target->Close();
 			}
 			return true;
@@ -484,7 +484,7 @@ void WindowManager::DrawCursor(const Point& pos) const
 	assert(cur); // must have a cursor
 
 	if (hoverWin && hoverWin->IsDisabledCursor()) {
-		// draw greayed cursor
+		// draw greyed cursor
 		video->BlitGameSprite(cur, pos, BlitFlags::GREY|BlitFlags::BLENDED, ColorGray);
 	} else {
 		// draw normal cursor
@@ -498,7 +498,7 @@ void WindowManager::DrawTooltip(Point pos) const
 		return;
 	}
 
-	if (trackingWin) // if the mouse is held down we dont want tooltips
+	if (trackingWin) // if the mouse is held down we don't want tooltips
 		TooltipTime = GetMilliseconds();
 
 	if (tooltip.time != TooltipTime + ToolTipDelay) {
@@ -535,7 +535,7 @@ void WindowManager::DrawTooltip(Point pos) const
 
 void WindowManager::DrawWindowFrame(BlitFlags flags) const
 {
-	// the window buffers dont have room for the frame
+	// the window buffers don't have room for the frame
 	// we also only need to draw the frame *once* (even if it applies to multiple windows)
 	// therefore, draw the frame on its own buffer (above everything else)
 	// ... I'm not 100% certain this works for all use cases.
@@ -577,7 +577,7 @@ void WindowManager::DrawWindows() const
 		return;
 	}
 
-	// draw the game window now (beneath everything else); its not part of the windows collection
+	// draw the game window now (beneath everything else); it's not part of the windows collection
 	if (gameWin->IsVisible()) {
 		gameWin->Draw();
 	} else {
@@ -624,7 +624,7 @@ void WindowManager::DrawWindows() const
 
 		if (win->IsDisabled() && win->NeedsDraw()) {
 			// Important to only draw if the window itself is dirty
-			// controls on greyed out windows shouldnt be updating anyway
+			// controls on greyed out windows shouldn't be updating anyway
 			win->Draw();
 			Region winrgn(Point(), win->Dimensions());
 			video->DrawRect(winrgn, ColorBlack, true, BlitFlags::HALFTRANS|BlitFlags::BLENDED);
@@ -652,7 +652,7 @@ void WindowManager::DrawWindows() const
 	}
 	
 	if (core->InDebugMode(ID_WINDOWS)) {
-		// ensure this is drawin over the window frames
+		// ensure this is drawing over the window frames
 		if (trackingWin) {
 			Region r = trackingWin->Frame();
 			r.ExpandAllSides(5);
@@ -680,7 +680,7 @@ void WindowManager::DrawWindows() const
 Holder<Sprite2D> WindowManager::GetScreenshot(Window* win)
 {
 	Holder<Sprite2D> screenshot;
-	if (win) { // we dont really care if we are managing the window
+	if (win) { // we don't really care if we are managing the window
 		// only a screen shot of passed win
 		auto& winBuf = win->DrawWithoutComposition();
 		screenshot = video->GetScreenshot( Region(Point(), win->Dimensions()), winBuf );
