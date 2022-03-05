@@ -69,15 +69,19 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
+find_path(SDL2_INCLUDE_DIR SDL2/SDL.h
+  HINTS
+    ENV SDLDIR
+  PATHS
+     ~/Library/Frameworks/
+     /Library/Frameworks/
+  NO_DEFAULT_PATH
+)
+# second call won't run if the first succeeded
 find_path(SDL2_INCLUDE_DIR SDL.h
   HINTS
     ENV SDLDIR
-  PATH_SUFFIXES include/SDL2 include Headers
-  PATHS
-     ~/Library/Frameworks/SDL2.framework/
-     /Library/Frameworks/SDL2.framework/
-     ~/Library/Frameworks/
-     /Library/Frameworks/
+  PATH_SUFFIXES include/SDL2 include
 )
 
 find_library(SDL2_LIBRARY_TEMP
