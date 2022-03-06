@@ -69,21 +69,16 @@ def ScrollBarPress():
 	for i in range(0, min(6, MAX_PARTY_SIZE)):
 		ActPos = Pos + i
 		Button = PartySelectWindow.GetControl(i)
-		Button.SetText("")
-		Button.SetVarAssoc("PartyIdx",-1)
 		if ActPos<PartyCount:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
-		else:
-			Button.SetState(IE_GUI_BUTTON_DISABLED)
-
-	for i in range(0, min(6, MAX_PARTY_SIZE)):
-		ActPos = Pos + i
-		Button = PartySelectWindow.GetControl(i)
-		if ActPos<PartyCount:
 			Button.SetVarAssoc("PartyIdx",ActPos)
 			Tag = "Party " + str(ActPos)
 			PartyDesc = GemRB.GetINIPartyKey(Tag, "Name", "")					
 			Button.SetText(PartyDesc)
+		else:
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetVarAssoc ("PartyIdx",-1)
+			Button.SetText ("")
 	return
 
 def ModifyPress():
