@@ -50,7 +50,7 @@ def OnLoad():
 	LeftScrollBar = PartySelectWindow.GetControl (8)
 	LeftScrollBar.SetVarAssoc ("TopIndex", 0)
 	
-	for i in range(0, min(6, MAX_PARTY_SIZE)):
+	for i in range(0, 6):
 		Button = PartySelectWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.OnPress (PartyButtonPress)
@@ -67,7 +67,7 @@ def OnLoad():
 def ScrollBarPress():
 	global PartySelectWindow, PartyCount
 	Pos = GemRB.GetVar("TopIndex")
-	for i in range(0, min(6, MAX_PARTY_SIZE)):
+	for i in range(0, 6):
 		ActPos = Pos + i
 		Button = PartySelectWindow.GetControl(i)
 		if ActPos<PartyCount:
