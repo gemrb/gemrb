@@ -878,14 +878,14 @@ def DisplayMisc (pc):
 
 	# Total Experience Value in Party
 	if TotalPartyExp:
-		val = stat['KillsTotalXP']*100/TotalPartyExp
+		val = stat['KillsTotalXP'] * 100 // TotalPartyExp
 	else:
 		val = 0
 	RecordsTextArea.Append (DelimitedText (11951, str(val) + "%", 0))
 
 	# Percentage of Total Kills in Party
 	if TotalPartyExp:
-		val = stat['KillsTotalCount']*100/TotalCount
+		val = stat['KillsTotalCount'] * 100 // TotalCount
 	else:
 		val = 0
 	RecordsTextArea.Append (DelimitedText (11952, str(val) + "%", 0))
