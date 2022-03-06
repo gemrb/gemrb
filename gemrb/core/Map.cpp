@@ -1542,8 +1542,8 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		}
 	}
 
-	video->SetStencilBuffer(NULL);
-	
+	video->UnsetStencilBuffer();
+
 	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
 	game->DrawWeather(update_scripts);
 	

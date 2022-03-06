@@ -133,6 +133,11 @@ void Video::SetStencilBuffer(const VideoBufferPtr& stencil)
 	stencilBuffer = stencil;
 }
 
+void Video::UnsetStencilBuffer()
+{
+	stencilBuffer = nullptr;
+}
+
 int Video::SwapBuffers(unsigned int fpscap)
 {
 	SwapBuffers(drawingBuffers);

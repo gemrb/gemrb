@@ -43,10 +43,7 @@ int SDLVideoDriver::Init(void)
 
 int SDLVideoDriver::CreateDriverDisplay(const char* title)
 {
-	int ret = CreateSDLDisplay(title);
-	scratchBuffer = CreateBuffer(Region(Point(), screenSize), BufferFormat::DISPLAY_ALPHA);
-	scratchBuffer->Clear();
-	return ret;
+	return CreateSDLDisplay(title);
 }
 
 int SDLVideoDriver::PollEvents()

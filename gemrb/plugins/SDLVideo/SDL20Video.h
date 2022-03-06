@@ -216,11 +216,19 @@ private:
 
 	SDL_BlendMode stencilAlphaBlender;
 
-	GLSLProgram* stencilShader = nullptr;
-	GLSLProgram* spriteShader = nullptr;
-	
 	SDL_GameController* gameController = nullptr;
 
+#if USE_OPENGL_BACKEND
+	GLSLProgram* blitRGBAShader = nullptr;
+	GLSLProgram* blitRGBShader = nullptr;
+	GLSLProgram* currentShader = nullptr;
+
+	GLint currentChannel = 0;
+	GLint currentGreyMode = 0;
+	bool isStencilMode = false;
+	GLint stencilTextureID = -1;
+	bool ditheringEnabled = false;
+#endif
 public:
 	SDL20VideoDriver() noexcept;
 	~SDL20VideoDriver() noexcept override;
@@ -243,21 +251,20 @@ public:
 
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
 						 Color tint = Color()) override;
-
+	void SetStencilBuffer(const VideoBufferPtr&) override;
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) override;
 
 	int ProcessEvent(const SDL_Event & event) override;
-	
+
 	int CreateSDLDisplay(const char* title) override;
 	void SwapBuffers(VideoBuffers& buffers) override;
 
 	SDLVideoDriver::vid_buf_t* ScratchBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
-	
-	void BeginCustomRendering();
-	void EndCustomRendering();
+
+	void BeginCustomRendering(SDL_Texture*);
 	int UpdateRenderTarget(const Color* color = NULL, BlitFlags flags = BlitFlags::NONE);
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE) override;
@@ -279,7 +286,8 @@ private:
 								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(SDL_Texture* spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL);
 
-	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* = NULL);
+	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* = nullptr);
+	int RenderCopyShadedGL(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* = nullptr, const SDL_Rect* stencilRect = nullptr);
 
 	int GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const;
 };

@@ -93,6 +93,9 @@ int SDL12VideoDriver::CreateSDLDisplay(const char* title)
 		Log(WARNING, "SDL 1.2 Driver", "No Hardware Acceleration available.");
 	}
 
+	scratchBuffer = CreateBuffer(Region(Point(), screenSize), BufferFormat::DISPLAY_ALPHA);
+	scratchBuffer->Clear();
+
 	return GEM_OK;
 }
 

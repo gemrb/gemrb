@@ -149,7 +149,8 @@ public:
 	VideoBufferPtr CreateBuffer(const Region&, BufferFormat = BufferFormat::DISPLAY);
 	void PushDrawingBuffer(const VideoBufferPtr&);
 	void PopDrawingBuffer();
-	void SetStencilBuffer(const VideoBufferPtr&);
+	virtual void SetStencilBuffer(const VideoBufferPtr&);
+	void UnsetStencilBuffer();
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	virtual void CaptureMouse(bool enabled) = 0;
