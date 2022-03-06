@@ -27,7 +27,7 @@ def OnLoad():
 	
 #loading characters from party.ini
 def LoadPartyCharacters():
-	i = GemRB.GetVar("PartyIdx")
+	i = GemRB.GetVar ("PartyIdx") + GemRB.GetVar ("TopIndex")
 	Tag = "Party " + str(i)
 	for j in range(1, min(6, MAX_PARTY_SIZE)+1):
 		Key = "Char"+str(j)
