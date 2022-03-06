@@ -44,7 +44,9 @@ def OnLoad():
 	if time.hour >= 18 or time.hour <= 6:
 		StartWindow.SetBackground ("STARTN");
 
-		AnimButton = StartWindow.CreateButton (0xfff0001, 57, 333, 100, 100);
+		AnimButton = StartWindow.GetControl (0xfff0001)
+		if not AnimButton:
+			AnimButton = StartWindow.CreateButton (0xfff0001, 57, 333, 100, 100);
 		AnimButton.SetAnimation ("MMTRCHB")
 		AnimButton.SetState (IE_GUI_BUTTON_LOCKED)
 		AnimButton.SetFlags (IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
@@ -56,7 +58,9 @@ def OnLoad():
 	JoinGameButton = StartWindow.GetControl(0x0B)
 	OptionsButton = StartWindow.GetControl(0x08)
 	QuitGameButton = StartWindow.GetControl(0x01)
-	VersionLabel = StartWindow.CreateLabel(0x0fff0000, 0,0,800,30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
+	VersionLabel = StartWindow.GetControl (0xfff0000)
+	if not VersionLabel:
+		VersionLabel = StartWindow.CreateLabel (0x0fff0000, 0,0,800,30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	VersionLabel.SetText(GemRB.Version)
 	ProtocolButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	NewGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
