@@ -544,7 +544,7 @@ public:
 		return (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN);
 	}
 
-	orient_t GetNextFace();
+	orient_t GetNextFace() const;
 
 	inline orient_t GetOrientation() const {
 		return Orientation;

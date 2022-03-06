@@ -388,7 +388,7 @@ public:
 		effects = std::move(fx);
 	}
 
-	inline unsigned char GetNextFace() {
+	inline unsigned char GetNextFace() const {
 		return GemRB::GetNextFace(Orientation, NewOrientation);
 	}
 

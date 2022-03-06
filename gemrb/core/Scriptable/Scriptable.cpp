@@ -1993,7 +1993,7 @@ void Movable::MoveLine(int steps, orient_t orient)
 	path = area->GetLine(Pos, steps, orient);
 }
 
-orient_t Movable::GetNextFace()
+orient_t Movable::GetNextFace() const
 {
 	//slow turning
 	if (timeStartStep==core->GetGame()->Ticks) {

@@ -7158,7 +7158,7 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	
 	//the list is now cached by Interface, no need of freeing it
-	std::vector<ieDword>* projectilelist = core->GetListFrom2DA(listref);
+	const std::vector<ieDword>* projectilelist = core->GetListFrom2DA(listref);
 	assert(projectilelist);
 	
 	for (const auto projectile : *projectilelist) {
