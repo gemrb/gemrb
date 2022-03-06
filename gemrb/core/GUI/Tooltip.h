@@ -28,9 +28,9 @@
 namespace GemRB {
 
 class TooltipBackground {
-	int animationSpeed;
-	mutable int animationPos;
-	int margin;
+	int animationSpeed = 0; // no animation by default
+	mutable int animationPos = 9999;
+	int margin = 5;
 
 	Holder<Sprite2D> background;
 	Holder<Sprite2D> leftbg;

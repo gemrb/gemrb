@@ -31,10 +31,6 @@ TooltipBackground::TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> left,
 	assert(background);
 	assert((leftbg && rightbg) || (!leftbg && !rightbg));
 
-	margin = 5;
-	// no animation by default
-	animationSpeed = 0;
-
 	Reset();
 }
 
