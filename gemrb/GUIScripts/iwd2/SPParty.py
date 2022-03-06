@@ -47,7 +47,6 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
 	
-	GemRB.SetVar("PartyIdx",0)
 	LeftScrollBar = PartySelectWindow.GetControl (8)
 	LeftScrollBar.SetVarAssoc ("TopIndex", 0)
 	
@@ -55,7 +54,9 @@ def OnLoad():
 		Button = PartySelectWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.OnPress (PartyButtonPress)
+		Button.SetVarAssoc ("PartyIdx", i)
 	
+	GemRB.SetVar("PartyIdx", 0) # reset back, so we don't preselect the last button
 	ScrollBarPress()
 	PartyButtonPress()
 	
@@ -70,14 +71,15 @@ def ScrollBarPress():
 		ActPos = Pos + i
 		Button = PartySelectWindow.GetControl(i)
 		if ActPos<PartyCount:
-			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.SetVarAssoc("PartyIdx", i)
+			if i == GemRB.GetVar ("PartyIdx"):
+				Button.SetState (IE_GUI_BUTTON_SELECTED)
+			else:
+				Button.SetState (IE_GUI_BUTTON_ENABLED)
 			Tag = "Party " + str(ActPos)
 			PartyDesc = GemRB.GetINIPartyKey(Tag, "Name", "")					
 			Button.SetText(PartyDesc)
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetVarAssoc ("PartyIdx",-1)
 			Button.SetText ("")
 	return
 
