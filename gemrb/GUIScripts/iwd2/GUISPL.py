@@ -76,7 +76,7 @@ def InitSpellBookWindow (Window):
 
 	# Setup book selection
 	FetchActiveSpellbooks ()
-	for i in range(4):
+	for i in range(3, -1, -1):
 		Button = Window.GetControl (88+i)
 		if len(ActiveSpellBooks) > i:
 			BookType = ActiveSpellBooks[i]
@@ -153,7 +153,11 @@ def UpdateSpellBookWindow ():
 		if len(ActiveSpellBooks)>BookTopIndex+i:
 			BookType = ActiveSpellBooks[BookTopIndex + i]
 			Button.SetText (BookNames[BookType])
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			BookButtonIdx = ActiveSpellBooks.index(GemRB.GetVar ("SelectedBook"))
+			if BookTopIndex + i == BookButtonIdx:
+				Button.SetState (IE_GUI_BUTTON_SELECTED)
+			else:
+				Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetText ("")
