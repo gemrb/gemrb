@@ -167,11 +167,11 @@ private: // Private attributes
 	const Content* dialogBeginNode;
 	Holder<Sprite2D> speakerPic;
 	// dialog options container
-	SpanSelector* selectOptions;
+	SpanSelector* selectOptions = nullptr;
 	// standard text display container
-	TextContainer* textContainer;
+	TextContainer* textContainer = nullptr;
 	ScrollView scrollview;
-	Timer* historyTimer;
+	Timer* historyTimer = nullptr;
 
 	/** Fonts */
 	Font* finit, * ftext;

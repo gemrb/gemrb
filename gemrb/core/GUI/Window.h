@@ -163,9 +163,9 @@ private: // Private attributes
 	std::set<Control*> Controls;
 	KeyMap HotKeys;
 
-	View* focusView; // keyboard focus
-	View* trackingView; // out of bounds mouse tracking
-	View* hoverView; // view the mouse was last over
+	View* focusView = nullptr; // keyboard focus
+	View* trackingView = nullptr; // out of bounds mouse tracking
+	View* hoverView = nullptr; // view the mouse was last over
 	
 	Point dragOrigin;
 	UniqueDragOp drag;

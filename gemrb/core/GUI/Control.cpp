@@ -40,11 +40,6 @@ Control::Control(const Region& frame)
 : View(frame) // dont pass superview to View constructor
 {
 	SetValueRange(MaxValueRange);
-
-	ControlType = IE_GUI_INVALID;
-
-	actionTimer = NULL;
-	repeatDelay = 0;
 }
 
 Control::~Control()

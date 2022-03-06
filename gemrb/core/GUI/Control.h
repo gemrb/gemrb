@@ -131,9 +131,9 @@ public: // Public attributes
 	static constexpr value_t INVALID_VALUE = -1;
 
 	/** Defines the Control ID Number used for GUI Scripting */
-	ieDword ControlID;
+	ieDword ControlID = 0;
 	/** Type of control */
-	ieByte ControlType;
+	ieByte ControlType = IE_GUI_INVALID;
 
 	static unsigned int ActionRepeatDelay;
 
@@ -219,9 +219,9 @@ protected:
 private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
 	// otherwise action fires on input release up only
-	unsigned int repeatDelay;
+	unsigned int repeatDelay = 0;
 	std::map<ActionKey, ControlEventHandler> actions;
-	Timer* actionTimer;
+	Timer* actionTimer = nullptr;
 
 	/** the value of the control to add to the variable */
 	value_t Value = INVALID_VALUE;

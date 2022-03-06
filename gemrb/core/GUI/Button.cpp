@@ -45,14 +45,8 @@ Button::Button(const Region& frame)
 	ControlType = IE_GUI_BUTTON;
 	HotKeyCallback = METHOD_CALLBACK(&Button::HandleHotKey, this);
 
-	hasText = false;
 	SetFont(core->GetButtonFont());
 	SetFlags(IE_GUI_BUTTON_NORMAL, BitOp::OR);
-	pulseBorder = false;
-	Picture = NULL;
-	Clipping = 1.0;
-
-	PushOffset = Point(2, 2);
 }
 
 Button::~Button()

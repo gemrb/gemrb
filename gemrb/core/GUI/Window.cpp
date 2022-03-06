@@ -32,9 +32,6 @@ namespace GemRB {
 Window::Window(const Region& frame, WindowManager& mgr)
 	: ScrollView(frame), manager(mgr)
 {
-	focusView = NULL;
-	trackingView = NULL;
-	hoverView = NULL;
 	lastMouseMoveTime = GetMilliseconds();
 
 	SetFlags(DestroyOnClose, BitOp::OR);

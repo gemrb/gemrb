@@ -170,26 +170,26 @@ public:
 
 private: // Private attributes
 	String Text;
-	bool hasText;
-	Font* font;
-	bool pulseBorder;
+	bool hasText = false;
+	Font* font = nullptr;
+	bool pulseBorder = false;
 	Color textColor = ColorWhite;
 
 	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
-	Holder<Sprite2D> Picture;
+	Holder<Sprite2D> Picture = nullptr;
 	SpriteAnimation* animation = nullptr;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
 	std::vector<Holder<Sprite2D>> PictureList;
 	/** The current state of the Button */
 	State ButtonState = UNPRESSED;
-	double Clipping;
+	double Clipping = 1.0;
 	/** HP Bar over portraits */
 	ColorAnimation overlayAnim;
 	/** Explicit text anchor point if IE_GUI_BUTTON_ANCHOR is set */
 	Point Anchor;
 	/** Offset pictures and label move when the button is pressed. */
-	Point PushOffset;
+	Point PushOffset = Point(2, 2);
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS]{};
 

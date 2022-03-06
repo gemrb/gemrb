@@ -240,10 +240,6 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps)
 
 	ControlType = IE_GUI_TEXTAREA;
 
-	selectOptions = NULL;
-	textContainer = NULL;
-	historyTimer = NULL;
-	
 	AddSubviewInFrontOfView(&scrollview);
 
 	// initialize the Text containers
