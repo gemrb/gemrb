@@ -24,6 +24,7 @@ def OnLoad():
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
 
+	GemRB.GetView ("STARTWIN").SetDisabled (True)
 	CharOverview.UpdateOverview(1)
 	return
 

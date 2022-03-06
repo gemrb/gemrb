@@ -79,6 +79,7 @@ def OnLoad ():
 	DoneButton.OnPress (EnterGamePress)
 
 	PartyFormationWindow.ShowModal (MODAL_SHADOW_NONE)
+	GemRB.GetView ("STARTWIN").SetDisabled (False)
 	return
 
 def ExitPress ():
