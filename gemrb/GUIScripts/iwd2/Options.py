@@ -58,9 +58,13 @@ def OnLoad():
 	KeyboardButton.OnPress (GUIOPT.OpenHotkeyOptionsWindow)
 
 	ReturnButton.SetText(10308)
-	ReturnButton.OnPress (OptionsWindow.Close)
+	def CloseStartOptions ():
+		GemRB.GetView ("STARTWIN").SetDisabled (False)
+		OptionsWindow.Close ()
+	ReturnButton.OnPress (CloseStartOptions)
 	ReturnButton.MakeEscape()
 
 	OptionsWindow.Focus()
+	GemRB.GetView ("STARTWIN").SetDisabled (True)
 
 	return
