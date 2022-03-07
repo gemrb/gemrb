@@ -28,7 +28,7 @@
 
 namespace GemRB {
 
-Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
+Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE]{};
 bool inited = false;
 
 static const int spark_color_indices[MAX_SPARK_COLOR] = {12, 5, 0, 6, 1, 8, 2, 7, 9, 3, 4, 10, 11};
@@ -50,10 +50,9 @@ static void InitSparks()
 	if (!tab)
 		return;
 
-	memset(sparkcolors,0,sizeof(sparkcolors));
-	for (int i = 0; i < MAX_SPARK_COLOR; i++) {
-		for (int j = 0; j < MAX_SPARK_PHASE; j++) {
-			sparkcolors[i][j].a=0xff;
+	for (auto& phase : sparkcolors) {
+		for (auto& color : phase) {
+			color.a = 0xff;
 		}
 	}
 	int i = tab->GetRowCount();
