@@ -20,13 +20,30 @@
 
 #include "SDL20Video.h"
 
-#ifdef BAKE_ICON
-#include "gemrb-icon.h"
-#endif
-
 #include "Interface.h"
 
 using namespace GemRB;
+
+#ifdef BAKE_ICON
+#include "gemrb-icon.h"
+
+static void SetWindowIcon(SDL_Window* window)
+{
+	// gemrb_icon and gemrb_icon_size are generated in gemrb-icon.h
+	SDL_RWops* const iconStream = SDL_RWFromConstMem((void *) gemrb_icon, gemrb_icon_size);
+	if (!iconStream) {
+		Log(WARNING, "SDL 2 Driver", "Failed to create icon stream.");
+		return;
+	}
+	SDL_Surface* const windowIcon = SDL_LoadBMP_RW(iconStream, 1);
+	if (!windowIcon) {
+		Log(WARNING, "SDL 2 Driver", "Failed to read icon BMP from stream.");
+		return;
+	}
+	SDL_SetWindowIcon(window, windowIcon);
+	SDL_FreeSurface(windowIcon);
+}
+#endif
 
 SDL20VideoDriver::SDL20VideoDriver() noexcept
 {
@@ -83,23 +100,6 @@ int SDL20VideoDriver::Init()
 	}
 
 	return ret;
-}
-
-static void SetWindowIcon(SDL_Window* window)
-{
-	// gemrb_icon and gemrb_icon_size are generated in gemrb-icon.h
-	SDL_RWops* const iconStream = SDL_RWFromConstMem((void *) gemrb_icon, gemrb_icon_size);
-	if (!iconStream) {
-		Log(WARNING, "SDL 2 Driver", "Failed to create icon stream.");
-		return;
-	}
-	SDL_Surface* const windowIcon = SDL_LoadBMP_RW(iconStream, 1);
-	if (!windowIcon) {
-		Log(WARNING, "SDL 2 Driver", "Failed to read icon BMP from stream.");
-		return;
-	}
-	SDL_SetWindowIcon(window, windowIcon);
-	SDL_FreeSurface(windowIcon);
 }
 
 int SDL20VideoDriver::CreateSDLDisplay(const char* title)

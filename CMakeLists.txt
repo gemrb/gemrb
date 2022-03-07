@@ -43,6 +43,9 @@ endif()
 IF(APPLE)
 	# favor mac frameworks over unix libraries
 	set(CMAKE_FIND_FRAMEWORK FIRST)
+	SET(BAKE_ICON 0)
+ELSE(APPLE)
+	SET(BAKE_ICON 1)
 ENDIF()
 
 # check for RaspberryPi
