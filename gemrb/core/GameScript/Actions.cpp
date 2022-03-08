@@ -5733,6 +5733,8 @@ void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
+// Pos could be [-1,-1] in which case it copies the ground piles to their
+// original position in the second area
 void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 {
 	const Map *map = Sender->GetCurrentArea();
@@ -5740,7 +5742,27 @@ void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 	if (!othermap) {
 		return;
 	}
-	map->CopyGroundPiles( othermap, parameters->pointParameter );
+
+	size_t containerCount = map->GetTileMap()->GetContainerCount();
+	while (containerCount--) {
+		Container* pile = map->GetTileMap()->GetContainer(containerCount);
+		if (pile->containerType != IE_CONTAINER_PILE) continue;
+
+		// creating (or grabbing) the container in the other map at the given position
+		Container *otherPile;
+		if (parameters->pointParameter.IsInvalid()) {
+			otherPile = othermap->GetPile(pile->Pos);
+		} else {
+			otherPile = othermap->GetPile(parameters->pointParameter);
+		}
+
+		// transfer the pile to the other container
+		unsigned int i = pile->inventory.GetSlotCount();
+		while (i--) {
+			CREItem* item = pile->RemoveItem(i, 0);
+			otherPile->AddItem(item);
+		}
+	}
 }
 
 // iwd specific, but unused in original data

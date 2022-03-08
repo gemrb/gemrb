@@ -3490,31 +3490,6 @@ int Map::ConsolidateContainers()
 	return itemcount;
 }
 
-//Pos could be [-1,-1] in which case it copies the ground piles to their
-//original position in the second area
-void Map::CopyGroundPiles(Map *othermap, const Point &Pos) const
-{
-	int containercount = (int) TMap->GetContainerCount();
-	while (containercount--) {
-		Container * c = TMap->GetContainer( containercount);
-		if (c->containerType == IE_CONTAINER_PILE) {
-			//creating (or grabbing) the container in the other map at the given position
-			Container *othercontainer;
-			if (Pos.IsInvalid()) {
-				othercontainer = othermap->GetPile(c->Pos);
-			} else {
-				othercontainer = othermap->GetPile(Pos);
-			}
-			//transfer the pile to the other container
-			unsigned int i=c->inventory.GetSlotCount();
-			while (i--) {
-				CREItem *item = c->RemoveItem(i, 0);
-				othercontainer->AddItem(item);
-			}
-		}
-	}
-}
-
 // merges pile 1 into pile 2
 static void MergePiles(Container *donorPile, Container *pile)
 {

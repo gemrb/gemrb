@@ -461,8 +461,6 @@ public:
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();
-	/* transfers all piles (loose items) to another map */
-	void CopyGroundPiles(Map *othermap, const Point &Pos) const;
 	/* transfers all ever visible piles (loose items) to the specified position */
 	void MoveVisibleGroundPiles(const Point &Pos);
 
