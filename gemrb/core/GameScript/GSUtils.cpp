@@ -3010,4 +3010,56 @@ int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
 	return bounceCount;
 }
 
+void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
+{
+	Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!actor) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	// Avenger: I believe being dead still interrupts RunAwayFromNoInterrupt
+	if (Sender->GetInternalFlag() & IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Point start = parameters->pointParameter;
+	if (!(flags & RunAwayFlags::UsePoint)) {
+		const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
+		if (!tar) {
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+		start = tar->Pos;
+	}
+
+	if (flags & RunAwayFlags::NoInterrupt) {
+		actor->NoInterrupt();
+	}
+
+	//TODO: actor could use travel areas (if flags & RAF_LEAVE_AREA)
+	// once implemented, copy original to RunAwayFromNoInterruptNoLeaveArea and break the alias in GameScript.cpp
+	// we should be using int0Parameter for the timing here, not distance?
+	if (!actor->InMove()) {
+		// we should make sure our existing walk is a 'run away', or fix moving/path code
+		actor->RunAwayFrom(start, parameters->int0Parameter, false);
+	}
+	// TODO: only reset morale when moving to a new area (like the original)
+	if (flags & RunAwayFlags::LeaveArea && actor->ShouldModifyMorale()) {
+		actor->NewBase(IE_MORALE, 20, MOD_ABSOLUTE);
+	}
+
+	// repeat movement...
+	if (parameters->int0Parameter > 0) {
+		Action *newaction = ParamCopyNoOverride(parameters);
+		newaction->int0Parameter--;
+		actor->AddActionInFront(newaction);
+		Sender->SetWait(1);
+	} else if (flags & RunAwayFlags::NoInterrupt) {
+		actor->Interrupt();
+	}
+
+	Sender->ReleaseCurrentAction();
+}
+
 }

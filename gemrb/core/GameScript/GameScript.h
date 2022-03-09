@@ -500,6 +500,12 @@ struct TriggerLink {
 #define AF_INSTANT      (AF_DLG_INSTANT|AF_SCR_INSTANT) //only iwd2 treats them separately; 12288
 #define AF_IWD2_OVERRIDE 16384 // marking actions that require special attention when clearing during ActionOverride
 
+enum RunAwayFlags {
+	LeaveArea = 1,
+	NoInterrupt = 2,
+	UsePoint = 4
+};
+
 struct ActionLink {
 	const char* Name;
 	ActionFunction Function;

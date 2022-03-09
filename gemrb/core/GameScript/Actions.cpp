@@ -1487,138 +1487,22 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 
 void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 {
-	Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	//TODO: actor could use travel areas
-	// we should be using int0Parameter for the timing here, not distance
-	if (!actor->InMove()) {
-		// we should make sure our existing walk is a 'run away', or fix moving/path code
-		actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
-		if (actor->ShouldModifyMorale()) {
-			actor->NewBase(IE_MORALE, 20, MOD_ABSOLUTE);
-		}
-	}
-
-	//repeat movement...
-	if (parameters->int0Parameter>0) {
-		Action *newaction = ParamCopyNoOverride(parameters);
-		newaction->int0Parameter--;
-		actor->AddActionInFront(newaction);
-		Sender->SetWait(1);
-	}
-
-	Sender->ReleaseCurrentAction();
+	RunAwayFromCore(Sender, parameters, RunAwayFlags::LeaveArea);
 }
 
 void GameScript::RunAwayFromNoLeaveArea(Scriptable* Sender, Action* parameters)
 {
-	Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	// we should be using int0Parameter for the timing here, not distance
-	if (!actor->InMove()) {
-		// we should make sure our existing walk is a 'run away', or fix moving/path code
-		actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
-	}
-
-	//repeat movement...
-	if (parameters->int0Parameter>0) {
-		Action *newaction = ParamCopyNoOverride(parameters);
-		newaction->int0Parameter--;
-		actor->AddActionInFront(newaction);
-		Sender->SetWait(1);
-	}
-
-	Sender->ReleaseCurrentAction();
+	RunAwayFromCore(Sender, parameters, 0);
 }
 
 void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 {
-	Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	//i believe being dead still interrupts this action
-	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	actor->NoInterrupt();
-	//TODO: actor could use travel areas; once implemented, copy original to RunAwayFromNoInterruptNoLeaveArea and break the alias in GameScript.cpp
-	// we should be using int0Parameter for the timing here, not distance
-	if (!actor->InMove()) {
-		// we should make sure our existing walk is a 'run away', or fix moving/path code
-		actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
-	}
-
-	//repeat movement...
-	if (parameters->int0Parameter>0) {
-		Action *newaction = ParamCopyNoOverride(parameters);
-		newaction->int0Parameter--;
-		actor->AddActionInFront(newaction);
-		Sender->SetWait(1);
-	} else {
-		actor->Interrupt();
-	}
-
-	Sender->ReleaseCurrentAction();
+	RunAwayFromCore(Sender, parameters, RunAwayFlags::NoInterrupt | RunAwayFlags::LeaveArea);
 }
 
 void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 {
-	Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	// we should be using int0Parameter for the timing here, not distance?
-	if (!actor->InMove()) {
-		// we should make sure our existing walk is a 'run away', or fix moving/path code
-		actor->RunAwayFrom( parameters->pointParameter, parameters->int0Parameter, false);
-	}
-
-	//repeat movement...
-	if (parameters->int0Parameter>0) {
-		Action *newaction = ParamCopyNoOverride(parameters);
-		newaction->int0Parameter--;
-		actor->AddActionInFront(newaction);
-		Sender->SetWait(1);
-	}
-
-	Sender->ReleaseCurrentAction();
+	RunAwayFromCore(Sender, parameters, RunAwayFlags::LeaveArea | RunAwayFlags::UsePoint);
 }
 
 void GameScript::DisplayStringNoName(Scriptable* Sender, Action* parameters)
