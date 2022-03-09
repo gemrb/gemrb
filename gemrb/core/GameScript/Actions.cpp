@@ -1500,6 +1500,11 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 	RunAwayFromCore(Sender, parameters, RunAwayFlags::NoInterrupt | RunAwayFlags::LeaveArea);
 }
 
+void GameScript::RunAwayFromNoInterruptNoLeaveArea(Scriptable* Sender, Action* parameters)
+{
+	RunAwayFromCore(Sender, parameters, RunAwayFlags::NoInterrupt);
+}
+
 void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 {
 	RunAwayFromCore(Sender, parameters, RunAwayFlags::LeaveArea | RunAwayFlags::UsePoint);

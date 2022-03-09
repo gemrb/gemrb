@@ -1278,6 +1278,7 @@ public: //Script Functions
 	static void RevealAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
+	static void RunAwayFromNoInterruptNoLeaveArea(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoLeaveArea(Scriptable* Sender, Action* parameters);
 	static void RunFollow(Scriptable* Sender, Action* parameters);
 	static void RunningAttack(Scriptable* Sender, Action* parameters);

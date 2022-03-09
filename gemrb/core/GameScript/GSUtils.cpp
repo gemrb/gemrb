@@ -3038,7 +3038,6 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 	}
 
 	//TODO: actor could use travel areas (if flags & RAF_LEAVE_AREA)
-	// once implemented, copy original to RunAwayFromNoInterruptNoLeaveArea and break the alias in GameScript.cpp
 	// we should be using int0Parameter for the timing here, not distance?
 	if (!actor->InMove()) {
 		// we should make sure our existing walk is a 'run away', or fix moving/path code
