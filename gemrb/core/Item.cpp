@@ -46,6 +46,30 @@ Item::~Item()
 	}
 }
 
+ieStrRef Item::GetItemName(bool identified) const
+{
+	if (identified) {
+		if (static_cast<int>(ItemNameIdentified) >= 0) return ItemNameIdentified;
+		return ItemName;
+	}
+	if (static_cast<int>(ItemName) >= 0) {
+		return ItemName;
+	}
+	return ItemNameIdentified;
+}
+
+ieStrRef Item::GetItemDesc(bool identified) const
+{
+	if (identified) {
+		if (static_cast<int>(ItemDescIdentified) >= 0) return ItemDescIdentified;
+		return ItemDesc;
+	}
+	if (static_cast<int>(ItemDesc) >= 0) {
+		return ItemDesc;
+	}
+	return ItemDescIdentified;
+}
+
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
 EffectQueue Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, ieDwordSigned invslot, ieDword pro) const
@@ -171,6 +195,18 @@ const ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
 {
 	//start from the beginning
 	return GetExtHeader(GetWeaponHeaderNumber(ranged)) ;
+}
+
+// returns the requested extended header
+// -1 will return melee weapon header, -2 the ranged one
+const ITMExtHeader* Item::GetExtHeader(int which) const
+{
+	if (which < 0) return GetWeaponHeader(which == -2);
+
+	if (static_cast<int>(ext_headers.size()) <= which) {
+		return nullptr;
+	}
+	return &ext_headers[which];
 }
 
 int Item::UseCharge(ieWord *Charges, int header, bool expend) const

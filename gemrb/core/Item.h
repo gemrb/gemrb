@@ -235,43 +235,12 @@ public:
 	// flag items to mutually exclusive to equip
 	ieDword ItemExcl = 0;
 public:
-	ieStrRef GetItemName(bool identified) const
-	{
-		if(identified) {
-			if((int) ItemNameIdentified>=0) return ItemNameIdentified;
-			return ItemName;
-		}
-		if((int) ItemName>=0) {
-			return ItemName;
-		}
-		return ItemNameIdentified;
-	}
-	ieStrRef GetItemDesc(bool identified) const
-	{
-		if(identified) {
-			if((int) ItemDescIdentified>=0) return ItemDescIdentified;
-			return ItemDesc;
-		}
-		if((int) ItemDesc>=0) {
-			return ItemDesc;
-		}
-		return ItemDescIdentified;
-	}
+	ieStrRef GetItemName(bool identified) const;
+	ieStrRef GetItemDesc(bool identified) const;
 
 	//returns if the item is usable, expend will also expend a charge
 	int UseCharge(ieWord *Charges, int header, bool expend) const;
 
-	//returns the requested extended header
-	//-1 will return melee weapon header, -2 the ranged one
-	const ITMExtHeader *GetExtHeader(int which) const
-	{
-		if(which < 0)
-			return GetWeaponHeader(which == -2) ;
-		if (int(ext_headers.size()) <= which) {
-			return NULL;
-		}
-		return &ext_headers[which];
-	}
 	ieDword GetWieldedGradient() const
 	{
 		return WieldColor;
@@ -291,6 +260,7 @@ public:
 	const ITMExtHeader *GetWeaponHeader(bool ranged) const;
 	int GetWeaponHeaderNumber(bool ranged) const;
 	int GetEquipmentHeaderNumber(int cnt) const;
+	const ITMExtHeader* GetExtHeader(int which) const;
 	unsigned int GetCastingDistance(int header) const;
 	// returns  a vector with details about any extended headers containing fx_damage with a 100% probability
 	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(const ITMExtHeader *header) const;
