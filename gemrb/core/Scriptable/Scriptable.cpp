@@ -2230,11 +2230,11 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}
 }
 
-void Movable::RunAwayFrom(const Point &Des, int PathLength, bool noBackAway)
+void Movable::RunAwayFrom(const Point &Source, int PathLength, bool noBackAway)
 {
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
-	path = area->RunAway(Pos, Des, size, PathLength, !noBackAway, Type == ST_ACTOR ? (Actor*)this : NULL);
+	path = area->RunAway(Pos, Source, size, PathLength, !noBackAway, As<Actor>());
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
