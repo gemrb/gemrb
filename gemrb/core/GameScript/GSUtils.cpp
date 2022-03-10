@@ -3023,6 +3023,12 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 		return;
 	}
 
+	// pst RunAwayFromEx uses int1Parameter to denote whether to run away regardless of new threats
+	// so basically RunAwayFromNoInterrupt when it's true, since pst lacked it (even though it's present in bg1)
+	if (parameters->int1Parameter) {
+		flags |= RunAwayFlags::NoInterrupt;
+	}
+
 	// already fleeing or just about to end?
 	if (Sender->CurrentActionState > 0) {
 		Sender->CurrentActionState--;

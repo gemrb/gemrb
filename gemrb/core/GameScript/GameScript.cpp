@@ -855,6 +855,7 @@ static const ActionLink actionnames[] = {
 	{"returntostartloc", GameScript::ReturnToStartLocation, AF_BLOCKING|AF_ALIVE}, // iwd2
 	{"revealareaonmap", GameScript::RevealAreaOnMap, 0},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING|AF_ALIVE},
+	{"runawayfromex", GameScript::RunAwayFrom, AF_BLOCKING | AF_ALIVE},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING|AF_ALIVE},
 	{"runawayfromnointerruptnoleavearea", GameScript::RunAwayFromNoInterruptNoLeaveArea, AF_BLOCKING | AF_ALIVE},
 	{"runawayfromnoleavearea", GameScript::RunAwayFromNoLeaveArea,AF_BLOCKING|AF_ALIVE},
