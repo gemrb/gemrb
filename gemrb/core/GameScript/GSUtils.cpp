@@ -3023,6 +3023,21 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 		return;
 	}
 
+	// already fleeing or just about to end?
+	if (Sender->CurrentActionState > 0) {
+		Sender->CurrentActionState--;
+		return;
+	} else if (Sender->CurrentActionTicks > 0) {
+		if (flags & RunAwayFlags::NoInterrupt) {
+			actor->Interrupt();
+		}
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	// start fleeing
+	Sender->CurrentActionState = parameters->int0Parameter;
+
 	Point start = parameters->pointParameter;
 	if (!(flags & RunAwayFlags::UsePoint)) {
 		const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
@@ -3033,32 +3048,24 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 		start = tar->Pos;
 	}
 
-	if (flags & RunAwayFlags::NoInterrupt) {
+	// estimate max distance with time and actor speed
+	double speed = actor->GetSpeed();
+	int maxDistance = parameters->int0Parameter;
+	if (speed) {
+		maxDistance = static_cast<int>(maxDistance * gamedata->GetStepTime() / speed);
+	}
+
+	if (flags & RunAwayFlags::NoInterrupt) { // should we just mark the action as CurrentActionInterruptable = false instead?
 		actor->NoInterrupt();
 	}
 
 	//TODO: actor could use travel areas (if flags & RAF_LEAVE_AREA)
-	// we should be using int0Parameter for the timing here, not distance?
-	if (!actor->InMove()) {
-		// we should make sure our existing walk is a 'run away', or fix moving/path code
-		actor->RunAwayFrom(start, parameters->int0Parameter, false);
-	}
+	actor->RunAwayFrom(start, maxDistance, false);
+
 	// TODO: only reset morale when moving to a new area (like the original)
 	if (flags & RunAwayFlags::LeaveArea && actor->ShouldModifyMorale()) {
 		actor->NewBase(IE_MORALE, 20, MOD_ABSOLUTE);
 	}
-
-	// repeat movement...
-	if (parameters->int0Parameter > 0) {
-		Action *newaction = ParamCopyNoOverride(parameters);
-		newaction->int0Parameter--;
-		actor->AddActionInFront(newaction);
-		Sender->SetWait(1);
-	} else if (flags & RunAwayFlags::NoInterrupt) {
-		actor->Interrupt();
-	}
-
-	Sender->ReleaseCurrentAction();
 }
 
 }
