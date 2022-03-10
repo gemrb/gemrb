@@ -432,7 +432,7 @@ public:
 	Color selectedColor = ColorBlack;
 	Color overColor = ColorBlack;
 	Holder<Sprite2D> circleBitmap[2] = {};
-	int size = 0;
+	int circleSize = 0;
 	float sizeFactor = 1.0f;
 public:
 	void SetBBox(const Region &newBBox);
@@ -499,7 +499,7 @@ protected:
 	int randomBackoff = 0;
 	Point oldPos = Pos;
 	bool bumped = false;
-	int pathfindingDistance = size;
+	int pathfindingDistance = circleSize;
 	int randomWalkCounter = 0;
 public:
 	inline int GetRandomBackoff() const

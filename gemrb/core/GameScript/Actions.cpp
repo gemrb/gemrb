@@ -6952,7 +6952,7 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 	ScriptedAnimation *vvc = gamedata->GetScriptedAnimation(RebusResRef, false);
 	if (vvc) {
 		//setting the height
-		vvc->ZOffset = actor->size * 20;
+		vvc->ZOffset = actor->circleSize * 20;
 		vvc->PlayOnce();
 		//maybe this needs setting up some time
 		vvc->SetDefaultDuration(20);

@@ -863,9 +863,9 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		case CC_OFFSCREEN:
 			// handle also the combo with CC_OBJECT, so we don't have fallthrough problems
 			if (flags & CC_OBJECT && tmp) referer = tmp;
-			pnt = FindOffScreenPoint(referer, flags, ab->size, 0);
+			pnt = FindOffScreenPoint(referer, flags, ab->circleSize, 0);
 			if (pnt.IsZero()) {
-				pnt = FindOffScreenPoint(referer, flags, ab->size, 1);
+				pnt = FindOffScreenPoint(referer, flags, ab->circleSize, 1);
 			}
 			break;
 		case CC_OBJECT://use object + offset
@@ -1914,10 +1914,10 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 
 	// account for PersonalDistance (which caller uses, but pathfinder doesn't)
 	if (distance && mover) {
-		distance += mover->size * 10;
+		distance += mover->circleSize * 10;
 	}
 	if (distance && target->Type == ST_ACTOR) {
-		distance += static_cast<const Actor*>(target)->size * 10;
+		distance += static_cast<const Actor*>(target)->circleSize * 10;
 	}
 
 	MoveNearerTo(Sender, p, distance, dont_release);

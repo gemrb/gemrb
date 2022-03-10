@@ -186,7 +186,7 @@ int Scriptable::GetOverheadOffset() const
 {
 	int offset = 100;
 	if (Type == ST_ACTOR) {
-		offset = static_cast<const Selectable*>(this)->size * 50;
+		offset = static_cast<const Selectable*>(this)->circleSize * 50;
 	}
 
 	return offset;
@@ -1661,7 +1661,7 @@ void Selectable::DrawCircle(const Point& p) const
 	flashing cyan/white for neutrals the mouse is over
 	*/
 
-	if (size<=0) {
+	if (circleSize <= 0) {
 		return;
 	}
 
@@ -1683,7 +1683,7 @@ void Selectable::DrawCircle(const Point& p) const
 	} else {
 		// for size >= 2, radii are (size-1)*16, (size-1)*12
 		// for size == 1, radii are 12, 9
-		int csize = (size - 1) * 4;
+		int csize = (circleSize - 1) * 4;
 		if (csize < 4) csize = 3;
 
 		core->GetVideoDriver()->DrawEllipse( Pos - p,
@@ -1694,7 +1694,7 @@ void Selectable::DrawCircle(const Point& p) const
 // Check if P is over our ground circle
 bool Selectable::IsOver(const Point &P) const
 {
-	int csize = size;
+	int csize = circleSize;
 	if (csize < 2) csize = 2;
 
 	int dx = P.x - Pos.x;
@@ -1731,7 +1731,7 @@ void Selectable::Select(int Value)
 
 void Selectable::SetCircle(int circlesize, float factor, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle)
 {
-	size = circlesize;
+	circleSize = circlesize;
 	sizeFactor = factor;
 	selectedColor = color;
 	overColor.r = color.r >> 1;
@@ -2035,11 +2035,11 @@ void Movable::BumpBack()
 			area->BlockSearchMapFor(this);
 			if (actor->GetStat(IE_EA) < EA_GOODCUTOFF) {
 				bumpBackTries++;
-				if (bumpBackTries > MAX_BUMP_BACK_TRIES && SquaredDistance(Pos, oldPos) < unsigned(size * 32 * size * 32)) {
+				if (bumpBackTries > MAX_BUMP_BACK_TRIES && SquaredDistance(Pos, oldPos) < unsigned(circleSize * 32 * circleSize * 32)) {
 					oldPos = Pos;
 					bumped = false;
 					bumpBackTries = 0;
-					if (SquaredDistance(Pos, Destination) < unsigned(size * 32 * size * 32)) {
+					if (SquaredDistance(Pos, Destination) < unsigned(circleSize * 32 * circleSize * 32)) {
 						ClearPath(true);
 					}
 
@@ -2092,7 +2092,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Actor *actorInTheWay = nullptr;
 		// We can't use GetActorInRadius because we want to only check directly along the way
 		// and not be blocked by actors who are on the sides
-		int collisionLookaheadRadius = ((size < 3 ? 3 : size) - 1) * 3;
+		int collisionLookaheadRadius = ((circleSize < 3 ? 3 : circleSize) - 1) * 3;
 		for (int r = collisionLookaheadRadius; r > 0 && !actorInTheWay; r--) {
 			double xCollision = Pos.x + dx * r;
 			double yCollision = Pos.y + dy * r * 0.75;
@@ -2136,7 +2136,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		oldPos = Pos;
 		if (actor && BlocksSearchMap()) {
 			auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
-			area->tileProps.BlockSearchMap(Map::ConvertCoordToTile(Pos), size, flag);
+			area->tileProps.BlockSearchMap(Map::ConvertCoordToTile(Pos), circleSize, flag);
 		}
 
 		SetOrientation(step->orient, false);
@@ -2147,7 +2147,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			} else {
 				ClearPath(true);
 				NewOrientation = Orientation;
-				pathfindingDistance = size;
+				pathfindingDistance = circleSize;
 			}
 		}
 	}
@@ -2174,7 +2174,7 @@ void Movable::AddWayPoint(const Point &Des)
 	}
 	Point p = endNode->point;
 	area->ClearSearchMapFor(this);
-	PathListNode *path2 = area->FindPath(p, Des, size);
+	PathListNode* path2 = area->FindPath(p, Des, circleSize);
 	// if the waypoint is too close to the current position, no path is generated
 	if (!path2) {
 		if (BlocksSearchMap()) {
@@ -2212,10 +2212,10 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}
 
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
-	PathListNode *newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT|PF_ACTORS_ARE_BLOCKING, actor);
+	PathListNode* newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT | PF_ACTORS_ARE_BLOCKING, actor);
 	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
 		Log(DEBUG, "WalkTo", "{} re-pathing ignoring actors", fmt::WideToChar{actor->GetShortName()});
-		newPath = area->FindPath(Pos, Des, size, distance, PF_SIGHT, actor);
+		newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT, actor);
 	}
 
 	if (newPath) {
@@ -2223,7 +2223,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		path = newPath;
 		step = path;
 	}  else {
-		pathfindingDistance = std::max(size, distance);
+		pathfindingDistance = std::max(circleSize, distance);
 		if (BlocksSearchMap()) {
 			area->BlockSearchMapFor(this);
 		}
@@ -2234,7 +2234,7 @@ void Movable::RunAwayFrom(const Point &Source, int PathLength, bool noBackAway)
 {
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
-	path = area->RunAway(Pos, Source, size, PathLength, !noBackAway, As<Actor>());
+	path = area->RunAway(Pos, Source, circleSize, PathLength, !noBackAway, As<Actor>());
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
@@ -2294,7 +2294,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
-	path = area->RandomWalk(Pos, size, maxWalkDistance ? maxWalkDistance : 5, Type == ST_ACTOR ? (Actor*)this : NULL);
+	path = area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>());
 	if (BlocksSearchMap()) {
 		area->BlockSearchMapFor(this);
 	}

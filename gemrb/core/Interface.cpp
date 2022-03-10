@@ -2061,7 +2061,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		}
 
 		map->AddActor(ab, true);
-		ab->SetPosition(position, true, 0, 0, ab->size);
+		ab->SetPosition(position, true, 0, 0, ab->circleSize);
 		ab->RefreshEffects();
 
 		// guessing, since this trigger was unused in the originals — likely duplicating LastSummoner

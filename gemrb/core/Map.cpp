@@ -885,13 +885,13 @@ void Map::DoStepForActor(Actor *actor, ieDword time) const
 void Map::BlockSearchMapFor(const Movable *actor) const
 {
 	auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
-	tileProps.BlockSearchMap(ConvertCoordToTile(actor->Pos), actor->size, flag);
+	tileProps.BlockSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, flag);
 }
 
 void Map::ClearSearchMapFor(const Movable *actor) const
 {
 	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
-	tileProps.BlockSearchMap(ConvertCoordToTile(actor->Pos), actor->size, PathMapFlags::UNMARKED);
+	tileProps.BlockSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, PathMapFlags::UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
 	// have been cleared by this BlockSearchMap(..., PathMapFlags::UNMARKED).
