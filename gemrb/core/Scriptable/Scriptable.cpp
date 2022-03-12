@@ -312,7 +312,6 @@ void Scriptable::TickScripting()
 	if (TriggerCountdown > 0) {
 		TriggerCountdown--;
 	}
-	// TODO: set TriggerCountdown once we have real triggers
 
 	ExecuteScript(MAX_SCRIPTS);
 }
