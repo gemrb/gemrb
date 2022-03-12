@@ -129,7 +129,6 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 		actor->version = VersionOverride;
 	}
 
-	//both fields are of length 9, make this sure!
 	actor->Area = core->GetGame()->CurrentArea;
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->SetStance( IE_ANI_TWITCH );
@@ -138,11 +137,10 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 	}
 	actor->SetOrientation(S, false);
 
-	if ( PartySlot != 0 ) {
-		return core->GetGame()->JoinParty( actor, JP_JOIN|JP_INITPOS );
-	}
-	else {
-		return core->GetGame()->AddNPC( actor );
+	if (PartySlot == 0) {
+		return core->GetGame()->AddNPC(actor);
+	} else {
+		return core->GetGame()->JoinParty(actor, JP_JOIN | JP_INITPOS);
 	}
 }
 
