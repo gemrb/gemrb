@@ -292,7 +292,7 @@ unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
  * different palette to use. Presumably, this is relevant for PAL_MAIN only.
  */
 void CharAnimations::MaybeUpdateMainPalette(const Animation& anim) {
-	if (previousStanceID != stanceID) {
+	if (previousStanceID != stanceID && GetAnimType() != IE_ANI_TWO_PIECE) {
 		// Test if the palette in question is actually different to the one loaded.
 		if (*PartPalettes[PAL_MAIN] != *anim.GetFrame(0)->GetPalette()) {
 			PaletteResRef[PAL_MAIN].Reset();
@@ -2380,7 +2380,7 @@ void CharAnimations::AddTwoPieceSuffix(std::string& dest, unsigned char StanceID
 			dest += "g1";
 			Cycle = 24 + Orient / 2;
 			break;
-		case IE_ANI_WALK:
+		case IE_ANI_WALK: // this is more like IE_ANI_AWAKE / IE_ANI_READY when underground
 			dest += "g2";
 			Cycle = Orient / 2;
 			break;
