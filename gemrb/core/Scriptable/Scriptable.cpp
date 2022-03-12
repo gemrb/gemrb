@@ -285,7 +285,11 @@ void Scriptable::TickScripting()
 		needsUpdate = true;
 		InternalFlags &= ~IF_FORCEUPDATE;
 	}
-	// TODO: force for all on-screen actors
+	// also force it for on-screen actors
+	Region vp = core->GetGameControl()->Viewport();
+	if (!needsUpdate && vp.PointInside(Pos)) {
+		needsUpdate = true;
+	}
 
 	// Charmed actors don't get frequent updates.
 	if ((actorState & STATE_CHARMED) && (IdleTicks < 5))
