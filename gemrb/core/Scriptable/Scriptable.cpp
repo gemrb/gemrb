@@ -264,16 +264,19 @@ void Scriptable::Update()
 void Scriptable::TickScripting()
 {
 	// Stagger script updates.
-	if (Ticks % 16 != globalID % 16)
+	if (Ticks % 16 != globalID % 16) {
 		return;
+	}
 
 	ieDword actorState = 0;
-	if (Type == ST_ACTOR)
-		actorState = ((Actor *)this)->Modified[IE_STATE_ID];
+	if (Type == ST_ACTOR) {
+		actorState = static_cast<Actor*>(this)->Modified[IE_STATE_ID];
+	}
 
 	// Dead actors only get one chance to run a new script.
-	if ( (InternalFlags& (IF_REALLYDIED|IF_JUSTDIED))==IF_REALLYDIED)
+	if ((InternalFlags & (IF_REALLYDIED | IF_JUSTDIED)) == IF_REALLYDIED) {
 		return;
+	}
 
 	ScriptTicks++;
 
@@ -292,20 +295,23 @@ void Scriptable::TickScripting()
 	}
 
 	// Charmed actors don't get frequent updates.
-	if ((actorState & STATE_CHARMED) && (IdleTicks < 5))
+	if ((actorState & STATE_CHARMED) && IdleTicks < 5) {
 		needsUpdate = false;
+	}
 
 	if (!needsUpdate) {
 		IdleTicks++;
 		return;
 	}
 
-	if (!triggers.empty())
+	if (!triggers.empty()) {
 		TriggerCountdown = 5;
+	}
 	IdleTicks = 0;
 	InternalFlags &= ~IF_JUSTDIED;
-	if (TriggerCountdown > 0)
+	if (TriggerCountdown > 0) {
 		TriggerCountdown--;
+	}
 	// TODO: set TriggerCountdown once we have real triggers
 
 	ExecuteScript(MAX_SCRIPTS);
