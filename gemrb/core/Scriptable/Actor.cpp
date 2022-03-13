@@ -1140,11 +1140,12 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 			actor->VerbalConstant(VB_HURT, 1, DS_QUEUE);
 		}
 	}
+
+	actor->BaseStats[IE_HITPOINTS] = hp;
+	actor->Modified[IE_HITPOINTS] = hp;
 	// don't fire off events if nothing changed, which can happen when called indirectly
-	if (oldValue != hp) {
-		actor->BaseStats[IE_HITPOINTS] = hp;
-		actor->Modified[IE_HITPOINTS] = hp;
-		if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
+	if (oldValue != hp && actor->InParty) {
+		core->SetEventFlag(EF_PORTRAIT);
 	}
 }
 
