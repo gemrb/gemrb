@@ -539,7 +539,7 @@ public:
 	int NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
 	/** Modifies the base stat value in different ways, returns difference */
 	int NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
-	void SetLeader(const Actor *actor, int xoffset = 0, int yoffset = 0);
+	void SetLeader(const Actor* actor, int offset = 0);
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0);

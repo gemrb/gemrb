@@ -7721,11 +7721,11 @@ void Actor::SetColorMod(ieDword location, RGBModifier::Type type, int speed,
 	}
 }
 
-void Actor::SetLeader(const Actor *actor, int xoffset, int yoffset)
+void Actor::SetLeader(const Actor* actor, int offset)
 {
 	LastFollowed = actor->GetGlobalID();
-	FollowOffset.x = xoffset;
-	FollowOffset.y = yoffset;
+	FollowOffset.x = offset;
+	FollowOffset.y = offset;
 }
 
 //if hp <= 0, it means full healing
