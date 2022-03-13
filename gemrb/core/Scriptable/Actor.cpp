@@ -2783,13 +2783,12 @@ Actor::stats_t Actor::ResetStats(bool init)
 	stats_t prev;
 	if (init) {
 		InternalFlags|=IF_INITIALIZED;
-		PrevStats = &BaseStats[0];
 		prev = BaseStats;
 	} else {
-		PrevStats = &Modified[0];
 		prev = Modified;
 	}
-	
+	PrevStats = &prev[0];
+
 	//copy back the original stats, because the effects
 	//will be reapplied in ApplyAllEffects again
 	Modified = BaseStats;
