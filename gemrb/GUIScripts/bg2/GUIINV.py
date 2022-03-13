@@ -186,6 +186,10 @@ def RefreshInventoryWindow (Window):
 	# Helmet
 	slot_item = GemRB.GetSlotItem (pc, 1)
 	if slot_item and Color1 != -1:
+		# halflings use gnome helmet files
+		# only weapons exist with H, so this is fine for everyone
+		if size == "H":
+			size = "S"
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
