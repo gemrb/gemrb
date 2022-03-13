@@ -2395,11 +2395,11 @@ void CharAnimations::AddTwoPieceSuffix(std::string& dest, unsigned char StanceID
 			break;
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_JAB:
 			dest += "g3";
 			Cycle = Orient / 2;
 			break;
-		case IE_ANI_ATTACK_SLASH:
-		case IE_ANI_ATTACK_JAB:
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
 		case IE_ANI_SHOOT:
