@@ -3622,7 +3622,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		} else {
 			i=Roll(1, itemlist.ResRefs.size(), -1);
 		}
-		strncpy(NewItem, itemlist.ResRefs[i], 8);
+		strlcpy(NewItem, itemlist.ResRefs[i], 9);
 		char *p = strchr(NewItem, '*');
 		int diceSides;
 		if (p) {
