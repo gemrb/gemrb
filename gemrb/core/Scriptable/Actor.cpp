@@ -8092,7 +8092,12 @@ bool Actor::ShouldDrawCircle() const
 			return false;
 		}
 	}
-	
+
+	// underground ankhegs
+	if (GetStance() == IE_ANI_WALK && GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
+		return false;
+	}
+
 	bool drawcircle = true; // we always show circle/target on pause
 	if (!(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
