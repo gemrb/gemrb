@@ -2231,6 +2231,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 		ClearPath(false);
 		path = newPath;
 		step = path;
+		HandleAnkhegStance(false);
 	}  else {
 		pathfindingDistance = std::max(circleSize, distance);
 		if (BlocksSearchMap()) {
@@ -2244,6 +2245,7 @@ void Movable::RunAwayFrom(const Point &Source, int PathLength, bool noBackAway)
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
 	path = area->RunAway(Pos, Source, circleSize, PathLength, !noBackAway, As<Actor>());
+	HandleAnkhegStance(false);
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
@@ -2347,6 +2349,7 @@ void Movable::ClearPath(bool resetDestination)
 		if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
 			StanceID = IE_ANI_AWAKE;
 		}
+		HandleAnkhegStance(true);
 		InternalFlags &= ~IF_NORETICLE;
 	}
 	PathListNode* thisNode = path;
@@ -2358,6 +2361,17 @@ void Movable::ClearPath(bool resetDestination)
 	path = nullptr;
 	step = nullptr;
 	//don't call ReleaseCurrentAction
+}
+
+// (un)hide ankhegs when they stop/start moving
+void Movable::HandleAnkhegStance(bool emerge)
+{
+	const Actor* actor = As<Actor>();
+	int nextStance = emerge ? IE_ANI_EMERGE : IE_ANI_HIDE;
+	if (actor && path && StanceID != nextStance && actor->GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
+		SetStance(nextStance);
+		SetWait(15); // both stances have 15 frames, at 15 fps
+	}
 }
 
 /**********************

@@ -5712,6 +5712,9 @@ void Actor::InitStatsOnLoad()
 	} else {
 		if (BaseStats[IE_STATE_ID] & STATE_SLEEP) {
 			SetStance( IE_ANI_SLEEP );
+		} else if (GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
+			SetStance(IE_ANI_EMERGE);
+			SetWait(15); // wait for it to play out
 		} else {
 			SetStance( IE_ANI_AWAKE );
 		}

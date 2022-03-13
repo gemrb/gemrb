@@ -567,6 +567,7 @@ public:
 	void MoveTo(const Point &Des);
 	void Stop(int flags = 0) override;
 	void ClearPath(bool resetDestination = true);
+	void HandleAnkhegStance(bool emerge);
 
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition() const;
