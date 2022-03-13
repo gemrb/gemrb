@@ -7564,7 +7564,8 @@ void Actor::UpdateModalState(ieDword gameTime)
 	// see also line above (search for comment containing UpdateActorState)!
 	if (LastTarget && lastattack && lastattack < (gameTime - 1)) {
 		const Actor *target = area->GetActorByGlobalID(LastTarget);
-		if (!target || target->GetStat(IE_STATE_ID)&STATE_DEAD) {
+		if (!target || target->GetStat(IE_STATE_ID) & STATE_DEAD ||
+			(target->GetStance() == IE_ANI_WALK && target->GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE)) {
 			StopAttack();
 		} else {
 			Log(COMBAT, "Attack", "(Leaving attack)");
@@ -10850,6 +10851,11 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 // checks whether the actor is visible to another scriptable
 bool Actor::IsInvisibleTo(const Scriptable *checker) const
 {
+	// consider underground ankhegs completely invisible to everyone
+	if (GetStance() == IE_ANI_WALK && GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
+		return true;
+	}
+
 	bool canSeeInvisibles = false;
 	const Actor* checker2 = Scriptable::As<Actor>(checker);
 	if (checker2) {
