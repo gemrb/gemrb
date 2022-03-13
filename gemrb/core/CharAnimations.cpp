@@ -920,6 +920,12 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			break;
 	}
 
+	// IE_ANI_RUN == IE_ANI_HIDE, so either exclude pst or limit to anim types where it matters
+	if (AnimType == IE_ANI_TWO_PIECE && stanceID == IE_ANI_HIDE) {
+		nextStanceID = IE_ANI_READY;
+		autoSwitchOnEnd = true;
+	}
+
 	stanceID = MaybeOverrideStance(stanceID);
 
 	bool lastFrameOnly = false;
