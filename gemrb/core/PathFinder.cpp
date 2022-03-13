@@ -76,6 +76,7 @@ PathListNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, in
 			// Random rotation
 			xSign = RAND(0, 1) ? -1 : 1;
 			ySign = RAND(0, 1) ? -1 : 1;
+			continue;
 		}
 		p = rad;
 	}
