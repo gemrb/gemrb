@@ -146,7 +146,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 
 EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro)
 {
-	bool pst_hostile = false;
+	bool pstFriendly = false;
 	std::vector<Effect>* features;
 	size_t count;
 	const auto& tables = SpellTables::Get();
@@ -161,7 +161,7 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 			features = &ext_headers[block_index].features;
 			count = ext_headers[block_index].features.size();
 			if (tables.pstflags && !(ext_headers[block_index].Hostile&4)) {
-				pst_hostile = true;
+				pstFriendly = true;
 			}
 		}
 	} else {
@@ -186,7 +186,7 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 		fx.SourceFlags = Flags;
 		//pst spells contain a friendly flag in the spell header
 		// while iwd spells never set this bit
-		if (pst_hostile || fx.Opcode == tables.damageOpcode) {
+		if (fx.Opcode == tables.damageOpcode && !pstFriendly) {
 			fx.SourceFlags|=SF_HOSTILE;
 		}
 		fx.CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later

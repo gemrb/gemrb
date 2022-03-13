@@ -136,7 +136,7 @@ public:
 	~ITMExtHeader();
 	ITMExtHeader& operator=(const ITMExtHeader&) = delete;
 	ieByte AttackType = 0;
-	ieByte IDReq = 0;
+	ieByte IDReq = 0; // in pst also holds the equivalent of spl friendly bit, but with only 2 senseless users
 	ieByte Location = 0;
 	ieByte AltDiceSides = 0;
 	ResRef UseIcon;
