@@ -90,12 +90,16 @@ INSTALL(FILES ${DLL_PATHS_RELEASE} CONFIGURATIONS Release RelWithDebInfo DESTINA
 #site.py is searched for by name because the vcpkg uninstall process doesn't properly purge the folder
 #so if you switch between them for any reason, it will try to copy the wrong folder
 
+message(STATUS "python include dirs: ${PYTHON_INCLUDE_DIRS}")
+message(STATUS "vcpkg data root: ${VCPKG_DATAROOT}")
 GET_FILENAME_COMPONENT(PYTHON_PARENT_DIR ${PYTHON_INCLUDE_DIR} DIRECTORY)
 
 IF(EXISTS ${PYTHON_PARENT_DIR}/Lib/site.py )
 	INSTALL(DIRECTORY ${PYTHON_PARENT_DIR}/Lib DESTINATION ${BIN_DIR})
 ELSEIF(EXISTS ${VCPKG_DATAROOT}/share/python3/Lib/site.py)
 	INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python3/Lib DESTINATION ${BIN_DIR})
+ELSEIF(EXISTS "C:\\Python310\\Lib")
+	INSTALL(DIRECTORY "C:\\Python310\\Lib" DESTINATION ${BIN_DIR})
 ENDIF()
 
 MESSAGE(STATUS "Dependency DLL's will be copied to the build and install directory")
