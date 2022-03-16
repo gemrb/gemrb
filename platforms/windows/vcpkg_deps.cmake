@@ -90,12 +90,29 @@ INSTALL(FILES ${DLL_PATHS_RELEASE} CONFIGURATIONS Release RelWithDebInfo DESTINA
 #site.py is searched for by name because the vcpkg uninstall process doesn't properly purge the folder
 #so if you switch between them for any reason, it will try to copy the wrong folder
 
-GET_FILENAME_COMPONENT(PYTHON_PARENT_DIR ${PYTHON_INCLUDE_DIR} DIRECTORY)
+message(STATUS "pypaths: ${PYTHON_INCLUDE_DIRS}")
+message(STATUS "pypath: ${PYTHON_INCLUDE_DIR}")
+message(STATUS "vcpkg data: ${VCPKG_DATAROOT}")
+GET_FILENAME_COMPONENT(PYTHON_PARENT_DIR ${PYTHON_INCLUDE_DIRS} DIRECTORY)
+
+# grr, replace this mess with Python_STDLIB once we switch to FindPython in cmake 3.12
+find_path(modDir site.py PATHS ${PYTHON_PARENT_DIR} NO_CACHE NO_DEFAULT_PATH)
+message(STATUS "PyMod1: ${modDir}")
+if (NOT modDir)
+	find_path(modDir site.py PATHS ${VCPKG_DATAROOT} NO_CACHE NO_DEFAULT_PATH)
+	message(STATUS "PyMod2: ${modDir}")
+endif()
+if (NOT modDir)
+	find_path(modDir site.py PATHS "C:\\Python310\\Lib" NO_CACHE NO_DEFAULT_PATH)
+	message(STATUS "PyMod3: C:\\Python310\\Lib")
+endif()
 
 IF(EXISTS ${PYTHON_PARENT_DIR}/Lib/site.py )
 	INSTALL(DIRECTORY ${PYTHON_PARENT_DIR}/Lib DESTINATION ${BIN_DIR})
 ELSEIF(EXISTS ${VCPKG_DATAROOT}/share/python3/Lib/site.py)
 	INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python3/Lib DESTINATION ${BIN_DIR})
+ELSEIF(EXISTS "C:\\Python310\\Lib")
+	INSTALL(DIRECTORY "C:\\Python310\\Lib" DESTINATION ${BIN_DIR})
 ENDIF()
 
 MESSAGE(STATUS "Dependency DLL's will be copied to the build and install directory")
