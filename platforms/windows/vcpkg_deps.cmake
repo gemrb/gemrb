@@ -27,7 +27,7 @@ LIST(APPEND DLL_SET_DEBUG
 	libpng16d.dll
 	ogg.dll
 	OpenAL32.dll
-	python39_d.dll
+	python310_d.dll
 	SDL.dll
 	SDL2d.dll
 	SDL2_mixer.dll
@@ -46,7 +46,7 @@ LIST(APPEND DLL_SET_RELEASE
 	libpng16.dll
 	ogg.dll
 	OpenAL32.dll
-	python39.dll
+	python310.dll
 	SDL.dll
 	SDL2.dll
 	SDL2_mixer.dll
