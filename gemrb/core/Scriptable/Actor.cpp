@@ -3258,10 +3258,10 @@ void Actor::UpdateFatigue()
 
 void Actor::RollSaves()
 {
-	static ieByte saveDiceSides = static_cast<ieByte>(gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES"));
+	static int saveDiceSides = gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES");
 	if (InternalFlags&IF_USEDSAVE) {
 		for (auto& save : SavingThrow) {
-			save = RAND<ieByte>(1, saveDiceSides);
+			save = static_cast<ieByte>(RAND(1, saveDiceSides));
 		}
 		InternalFlags&=~IF_USEDSAVE;
 	}
