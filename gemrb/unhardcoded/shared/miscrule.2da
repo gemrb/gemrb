@@ -4,5 +4,6 @@
 TURN_PANIC_LVL_MOD           3
 TURN_DEATH_LVL_MOD           7
 REPUTATION_FALL_CUT_OFF      6
+SAVING_THROW_DICE_SIDES      20
 
 # a table with assorted game logic constants

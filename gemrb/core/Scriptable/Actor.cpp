@@ -210,7 +210,6 @@ static void InitActorTables();
 
 #define DAMAGE_LEVELS 19
 #define ATTACKROLL    20
-#define SAVEROLL      20
 #define DEFAULTAC     10
 
 static ResRef d_main[DAMAGE_LEVELS] = {
@@ -3259,12 +3258,11 @@ void Actor::UpdateFatigue()
 
 void Actor::RollSaves()
 {
+	static ieByte saveDiceSides = static_cast<ieByte>(gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES"));
 	if (InternalFlags&IF_USEDSAVE) {
-		SavingThrow[0]=(ieByte) core->Roll(1, SAVEROLL, 0);
-		SavingThrow[1]=(ieByte) core->Roll(1, SAVEROLL, 0);
-		SavingThrow[2]=(ieByte) core->Roll(1, SAVEROLL, 0);
-		SavingThrow[3]=(ieByte) core->Roll(1, SAVEROLL, 0);
-		SavingThrow[4]=(ieByte) core->Roll(1, SAVEROLL, 0);
+		for (auto& save : SavingThrow) {
+			save = RAND<ieByte>(1, saveDiceSides);
+		}
 		InternalFlags&=~IF_USEDSAVE;
 	}
 }
@@ -3295,11 +3293,12 @@ static const int savingthrows[SAVECOUNT] = { IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE
 bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 {
 	assert(type<SAVECOUNT);
+	static int saveDiceSides = gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES");
 	InternalFlags|=IF_USEDSAVE;
 	int ret = SavingThrow[type];
 	// NOTE: assuming criticals apply to iwd2 too
 	if (ret == 1) return false;
-	if (ret == SAVEROLL) return true;
+	if (ret == saveDiceSides) return true;
 
 	if (!third) {
 		ret += modifier + GetStat(IE_LUCK);
