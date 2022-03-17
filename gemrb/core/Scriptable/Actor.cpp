@@ -3285,14 +3285,12 @@ void Actor::RollSaves()
 // in adnd, the stat represents the limit (DC) that the roll with all the boni has to pass
 // since it is a derived stat, we also store the direct effect bonus/malus in it, but make sure to do it negated
 // in 3ed, the stat is added to the roll and boni (not negated), then compared to some predefined value (DC)
-
-#define SAVECOUNT 5
-static const int savingthrows[SAVECOUNT] = { IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY };
+static const std::array<int, 5> savingThrows = { IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY };
 
 /** returns true if actor made the save against saving throw type */
 bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 {
-	assert(type<SAVECOUNT);
+	assert(type < savingThrows.size());
 	static int saveDiceSides = gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES");
 	InternalFlags|=IF_USEDSAVE;
 	int ret = SavingThrow[type];
@@ -3316,12 +3314,12 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		prevType = type;
 		prevActor = this;
 		prevRoll = ret;
-		return ret > (int) GetStat(savingthrows[type]);
+		return ret > (int) GetStat(savingThrows[type]);
 	}
 
 	int roll = ret;
 	// NOTE: we use GetStat, assuming the stat save bonus can never be negated like some others
-	int save = GetStat(savingthrows[type]);
+	int save = GetStat(savingThrows[type]);
 	// intentionally not adding luck, which seems to have been handled separately
 	// eg. 11hfamlk.itm uses an extra opcode for the saving throw bonus
 	ret = roll + save + modifier;
@@ -3332,7 +3330,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	// handle special bonuses (eg. vs poison, which doesn't have a separate stat any more)
 	// same hardcoded list as in the original
-	if (savingthrows[type] == IE_SAVEFORTITUDE && fx->Opcode == 25) {
+	if (savingThrows[type] == IE_SAVEFORTITUDE && fx->Opcode == 25) {
 		if (BaseStats[IE_RACE] == 4 /* DWARF */) ret += 2;
 		if (HasFeat(FEAT_SNAKE_BLOOD)) ret += 2;
 		if (HasFeat(FEAT_RESIST_POISON)) ret += 4;
@@ -3340,7 +3338,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	// the original had a sourceType == TRIGGER check, but we handle more than ST_TRIGGER
 	Scriptable *caster = area ? area->GetScriptableByGlobalID(fx->CasterID) : nullptr;
-	if (savingthrows[type] == IE_SAVEREFLEX && caster && caster->Type != ST_ACTOR) {
+	if (savingThrows[type] == IE_SAVEREFLEX && caster && caster->Type != ST_ACTOR) {
 		// loop over all classes and add TRAPSAVE.2DA values to the bonus
 		for (int cls = 0; cls < ISCLASSES; cls++) {
 			int level = GetClassLevel(cls);
@@ -3349,7 +3347,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		}
 	}
 
-	if (savingthrows[type] == IE_SAVEWILL) {
+	if (savingThrows[type] == IE_SAVEWILL) {
 		// aura of courage
 		if (Modified[IE_EA] < EA_GOODCUTOFF && fx->SourceRef != "SPWI420" && area) {
 			// look if an ally paladin of at least level 2 is near
@@ -9999,7 +9997,7 @@ void Actor::CreateDerivedStats()
 			// NOTE: this is a guess, reports vary
 			// the attribute increase already contributes +5
 			for (int i = 0; i <= IE_SAVEWILL - IE_SAVEFORTITUDE; i++) {
-				BaseStats[savingthrows[i]] += 5;
+				BaseStats[savingThrows[i]] += 5;
 			}
 		} else {
 			BaseStats[IE_NUMBEROFATTACKS] += 2; // 1 more APR
@@ -10019,8 +10017,8 @@ void Actor::CreateDerivedStats()
 			if (BaseStats[IE_LEVEL3]) {
 				BaseStats[IE_LEVEL3] += 12;
 			}
-			for (int savingthrow : savingthrows) {
-				BaseStats[savingthrow]--;
+			for (int savingThrow : savingThrows) {
+				BaseStats[savingThrow]--;
 			}
 		}
 	}
