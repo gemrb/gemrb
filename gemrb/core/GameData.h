@@ -169,6 +169,7 @@ public:
 	const std::vector<int>& GetBonusSpells(int ability);
 	ieByte GetItemAnimation(const ResRef& itemRef);
 	const std::vector<ItemUseType>& GetItemUse();
+	int GetMiscRule(const char* rowName);
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -196,6 +197,7 @@ private:
 	AutoTable reputationMod;
 	AutoTable fistWeap;
 	AutoTable monkBon;
+	AutoTable miscRule;
 	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;

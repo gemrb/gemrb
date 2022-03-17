@@ -1065,4 +1065,14 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 	return itemUse;
 }
 
+int GameData::GetMiscRule(const char* rowName)
+{
+	if (!miscRule) {
+		miscRule = LoadTable("miscrule", true);
+	}
+	assert(miscRule);
+
+	return atoi(miscRule->QueryField(rowName, "VALUE"));
+}
+
 }

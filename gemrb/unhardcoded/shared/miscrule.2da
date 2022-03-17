@@ -1,0 +1,8 @@
+2DA V1.0
+0
+                             VALUE
+TURN_PANIC_LVL_MOD           3
+TURN_DEATH_LVL_MOD           7
+REPUTATION_FALL_CUT_OFF      6
+
+# a table with assorted game logic constants

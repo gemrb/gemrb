@@ -213,11 +213,6 @@ static void InitActorTables();
 #define SAVEROLL      20
 #define DEFAULTAC     10
 
-//TODO: externalise
-#define TURN_PANIC_LVL_MOD 3
-#define TURN_DEATH_LVL_MOD 7
-#define REPUTATION_FALL 60
-
 static ResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
 	"BLOODCR","BLOODS","BLOODM","BLOODL", //blood
@@ -908,8 +903,9 @@ static void UpdateHappiness(Actor *actor) {
 // make paladins and rangers fallen if the reputations drops enough
 static void pcf_reputation(Actor *actor, ieDword oldValue, ieDword newValue)
 {
+	static ieDword reputationFallCutOff = 10 * gamedata->GetMiscRule("REPUTATION_FALL_CUT_OFF");
 	if (oldValue == newValue) return;
-	if (actor->InParty && newValue <= REPUTATION_FALL) {
+	if (actor->InParty && newValue <= reputationFallCutOff) {
 		if (actor->GetRangerLevel()) {
 			GameScript::RemoveRangerHood(actor, NULL);
 		} else if (actor->GetPaladinLevel()) {
@@ -4988,6 +4984,8 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 {
 	assert(cleric);
 	bool evilcleric = false;
+	static ieDword turnPanicLevelMod = gamedata->GetMiscRule("TURN_PANIC_LVL_MOD");
+	static ieDword turnDeathLevelMod = gamedata->GetMiscRule("TURN_DEATH_LVL_MOD");
 
 	if (!turnlevel) {
 		return;
@@ -5011,7 +5009,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		level = GetPaladinLevel();
 		if (evilcleric && level) {
 			AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
-			if (turnlevel >= level+TURN_DEATH_LVL_MOD) {
+			if (turnlevel >= level + turnDeathLevelMod) {
 				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
 					core->ApplySpell(ResRef("panic"), this, cleric, level);
 				} else {
@@ -5029,7 +5027,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 
 	//determine panic or destruction/control
 	//we get the modified level
-	if (turnlevel >= level+TURN_DEATH_LVL_MOD) {
+	if (turnlevel >= level + turnDeathLevelMod) {
 		if (evilcleric) {
 			Effect *fx = fxqueue.CreateEffect(control_creature_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			if (!fx) {
@@ -5044,7 +5042,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 			//fallthrough for bg1
 		}
 		Die(cleric);
-	} else if (turnlevel >= level+TURN_PANIC_LVL_MOD) {
+	} else if (turnlevel >= level + turnPanicLevelMod) {
 		Log(DEBUG, "Actor", "Panic from turning!");
 		Panic(cleric, PANIC_RUNAWAY);
 	}
