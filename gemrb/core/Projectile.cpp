@@ -415,12 +415,13 @@ void Projectile::SetDelay(int delay)
 }
 
 //copied from Actor.cpp
-#define ATTACKROLL    20
 #define WEAPON_FIST        0
 #define WEAPON_BYPASS      0x10000
 
 bool Projectile::FailedIDS(const Actor *target) const
 {
+	static int attackRollDiceSides = gamedata->GetMiscRule("ATTACK_ROLL_DICE_SIDES");
+
 	bool fail = !EffectQueue::match_ids( target, IDSType, IDSValue);
 	if (ExtFlags&PEF_NOTIDS) {
 		fail = !fail;
@@ -457,13 +458,13 @@ bool Projectile::FailedIDS(const Actor *target) const
 	// TODO move this to Actor
 	// TODO some projectiles use melee attack (fist), others use projectile attack
 	//this apparently depends on the spell's SpellForm (normal vs. projectile)
-	int roll = caster->LuckyRoll(1, ATTACKROLL, 0);
+	int roll = caster->LuckyRoll(1, attackRollDiceSides, 0);
 	if (roll == 1) {
 		return true; //critical failure
 	}
 	
 	if (!(target->GetStat(IE_STATE_ID) & STATE_CRIT_PROT))  {
-		if (roll >= ATTACKROLL - (int) caster->GetStat(IE_CRITICALHITBONUS)) {
+		if (roll >= attackRollDiceSides - (int) caster->GetStat(IE_CRITICALHITBONUS)) {
 			return false; // critical success
 		}
 	}

@@ -209,7 +209,6 @@ static char csound[VCONST_COUNT];
 static void InitActorTables();
 
 #define DAMAGE_LEVELS 19
-#define ATTACKROLL    20
 
 static ResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
@@ -6943,6 +6942,8 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 
 void Actor::PerformAttack(ieDword gameTime)
 {
+	static int attackRollDiceSides = gamedata->GetMiscRule("ATTACK_ROLL_DICE_SIDES");
+
 	// don't let imprisoned or otherwise missing actors continue their attack
 	if (Modified[IE_AVATARREMOVAL]) return;
 
@@ -7120,18 +7121,18 @@ void Actor::PerformAttack(ieDword gameTime)
 	// iwd2 rerolls to check for criticals (cf. manual page 45) - the second roll just needs to hit; on miss, it degrades to a normal hit
 	// CriticalBonus is negative, it is added to the minimum roll needed for a critical hit
 	// IE_CRITICALHITBONUS is positive, it is subtracted
-	int roll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
+	int roll = LuckyRoll(1, attackRollDiceSides, 0, LR_CRITICAL);
 	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus;
 	if (third) {
 		int ThreatRangeMin = wi.critrange;
 		ThreatRangeMin -= ((int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus); // TODO: move to GetCombatDetails
-		criticalroll = LuckyRoll(1, ATTACKROLL, 0, LR_CRITICAL);
+		criticalroll = LuckyRoll(1, attackRollDiceSides, 0, LR_CRITICAL);
 		if (criticalroll < ThreatRangeMin || GetStat(IE_SPECFLAGS)&SPECF_CRITIMMUNITY) {
 			// make it an ordinary hit
 			criticalroll = 1;
 		} else {
 			// make sure it will be a critical hit
-			criticalroll = ATTACKROLL;
+			criticalroll = attackRollDiceSides;
 		}
 	}
 
@@ -7154,7 +7155,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		damage = 0;
 	}
 
-	bool critical = criticalroll>=ATTACKROLL;
+	bool critical = criticalroll >= attackRollDiceSides;
 	bool success = critical;
 	int defense = target->GetDefense(damagetype, wi.wflags, this);
 	int rollMod = ReverseToHit ? defense : tohit;
