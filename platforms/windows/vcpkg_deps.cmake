@@ -98,13 +98,13 @@ IF(EXISTS ${PYTHON_PARENT_DIR}/Lib/site.py )
 	INSTALL(DIRECTORY ${PYTHON_PARENT_DIR}/Lib DESTINATION ${BIN_DIR})
 ELSEIF(EXISTS ${VCPKG_DATAROOT}/share/python3/Lib/site.py)
 	INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python3/Lib DESTINATION ${BIN_DIR})
-ELSEIF(EXISTS "C:\\Python310\\Lib")
-	INSTALL(DIRECTORY "C:\\Python310\\Lib" DESTINATION ${BIN_DIR})
-	# clean up cruft as for AppImage
-	file(REMOVE_RECURSE "${BIN_DIR}/Lib/site-packages")
-	file(REMOVE_RECURSE "${BIN_DIR}/Lib/test")
-	file(REMOVE_RECURSE "${BIN_DIR}/Lib/pydoc_data")
-	file(REMOVE_RECURSE "${BIN_DIR}/Lib/lib2to3")
+ELSEIF(EXISTS "C:/Python310/Lib")
+	INSTALL(DIRECTORY "C:/Python310/Lib" DESTINATION ${BIN_DIR}
+		# clean up cruft as for AppImage
+		PATTERN "site-packages" EXCLUDE
+		PATTERN "test" EXCLUDE
+		PATTERN "pydoc_data" EXCLUDE
+		PATTERN "lib2to3" EXCLUDE)
 ENDIF()
 
 MESSAGE(STATUS "Dependency DLL's will be copied to the build and install directory")
