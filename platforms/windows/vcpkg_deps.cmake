@@ -104,6 +104,13 @@ ELSEIF(EXISTS "C:/Python310/Lib")
 		PATTERN "site-packages" EXCLUDE
 		PATTERN "test" EXCLUDE
 		PATTERN "pydoc_data" EXCLUDE
+		PATTERN "idlelib" EXCLUDE
+		PATTERN "venv" EXCLUDE
+		PATTERN "ensurepip" EXCLUDE
+		PATTERN "distutils" EXCLUDE
+		PATTERN "asyncio" EXCLUDE
+		PATTERN "email" EXCLUDE
+		PATTERN "__pycache__" EXCLUDE
 		PATTERN "lib2to3" EXCLUDE)
 ENDIF()
 
