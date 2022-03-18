@@ -68,7 +68,7 @@ private:
 
 	class AmbientSource {
 	public:
-		explicit AmbientSource(const Ambient *a) : ambient(a) {};
+		explicit AmbientSource(const Ambient* a) noexcept : ambient(a) {};
 		AmbientSource(const AmbientSource&) = delete;
 		~AmbientSource();
 		AmbientSource& operator=(const AmbientSource&) = delete;
