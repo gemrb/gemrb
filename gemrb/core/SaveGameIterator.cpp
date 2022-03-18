@@ -533,9 +533,8 @@ static int CanSave()
 
 	Point pc1 =  game->GetPC(0, true)->Pos;
 	std::vector<Actor *> nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15);
-	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); ++neighbour) {
-		if ((*neighbour)->GetInternalFlag() & IF_NOINT) {
+	for (const auto& neighbour : nearActors) {
+		if (neighbour->GetInternalFlag() & IF_NOINT) {
 			// dialog about to start or similar
 			displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG2, DMC_BG2XPGREEN);
 			return 8;

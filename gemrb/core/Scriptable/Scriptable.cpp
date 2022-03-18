@@ -913,9 +913,8 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
 void Scriptable::SendTriggerToAll(TriggerEntry entry)
 {
 	std::vector<Actor *> nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15);
-	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = nearActors.begin(); neighbour != nearActors.end(); ++neighbour) {
-		(*neighbour)->AddTrigger(entry);
+	for (const auto& neighbour : nearActors) {
+		neighbour->AddTrigger(entry);
 	}
 	area->AddTrigger(entry);
 }
@@ -1173,9 +1172,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, caster->GetBase(IE_VISUALRANGE), this);
-	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
-		const Actor *detective = *neighbour;
+	for (const auto& detective : neighbours) {
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
 			continue;

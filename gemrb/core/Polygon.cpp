@@ -322,7 +322,6 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 	Trapezoid t;
 	ScanlineInt is;
 	is.p = this;
-	std::vector<Trapezoid>::iterator iter;
 
 	int cury = ys[0];
 
@@ -382,8 +381,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 			bool found = false;
 
 			// merge trapezoids with old one if it's just a continuation
-			for (iter = trapezoids.begin(); iter != trapezoids.end(); ++iter) {
-				Trapezoid& oldt = *iter;
+			for (auto& oldt : trapezoids) {
 				if (oldt.y2 == cury &&
 					oldt.left_edge == t.left_edge &&
 					oldt.right_edge == t.right_edge)

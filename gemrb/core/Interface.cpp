@@ -617,8 +617,7 @@ void Interface::Main()
 	double frames = 0.0;
 
 	do {
-		std::deque<Timer>::iterator it;
-		for (it = timers.begin(); it != timers.end();) {
+		for (auto it = timers.begin(); it != timers.end();) {
 			if (it->IsRunning()) {
 				it->Update(time);
 				++it;

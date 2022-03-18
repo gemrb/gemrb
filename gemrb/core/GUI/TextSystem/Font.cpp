@@ -187,9 +187,8 @@ Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)
 
 Font::~Font(void)
 {
-	GlyphAtlas::iterator it;
-	for (it = Atlas.begin(); it != Atlas.end(); ++it) {
-		delete *it;
+	for (const auto& page : Atlas) {
+		delete page;
 	}
 }
 

@@ -5083,21 +5083,20 @@ void Actor::SendDiedTrigger() const
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
 	int ea = Modified[IE_EA];
 
-	std::vector<Actor *>::iterator poi;
-	for (poi = neighbours.begin(); poi != neighbours.end(); poi++) {
+	for (auto& neighbour : neighbours) {
 		// NOTE: currently also sending the trigger to ourselves — prevent if it causes problems
-		(*poi)->AddTrigger(TriggerEntry(trigger_died, GetGlobalID()));
+		neighbour->AddTrigger(TriggerEntry(trigger_died, GetGlobalID()));
 
 		// allies take a hit on morale and nobody cares about neutrals
-		if (!(*poi)->ShouldModifyMorale()) continue;
-		int pea = (*poi)->GetStat(IE_EA);
+		if (!neighbour->ShouldModifyMorale()) continue;
+		int pea = neighbour->GetStat(IE_EA);
 		if (ea == EA_PC && pea == EA_PC) {
-			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
-		} else if (OfType(this, *poi)) {
-			(*poi)->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
-		// are we an enemy of poi, regardless if we're good or evil?
+			neighbour->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+		} else if (OfType(this, neighbour)) {
+			neighbour->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+		// are we an enemy of neighbour, regardless if we're good or evil?
 		} else if (abs(ea - pea) > 30) {
-			(*poi)->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
+			neighbour->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
 		}
 	}
 }
@@ -6081,10 +6080,9 @@ std::list<int> Actor::ListLevels() const
 {
 	std::list<int> levels (ISCLASSES, 0);
 	if (third) {
-		std::list<int>::iterator it;
 		int i = 0;
-		for (it=levels.begin(); it != levels.end(); it++) {
-			*it = GetClassLevel(i++);
+		for (auto& level : levels) {
+			level = GetClassLevel(i++);
 		}
 	}
 	return levels;
@@ -7590,9 +7588,8 @@ void Actor::ApplyModal(const ResRef& modalSpell)
 		// used for iwd2 songs, as the spells don't use an aoe projectile
 		if (!area) return;
 		std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE)/2);
-		std::vector<Actor *>::iterator neighbour;
-		for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
-			core->ApplySpell(modalSpell, *neighbour, this, 0);
+		for (const auto& neighbour : neighbours) {
+			core->ApplySpell(modalSpell, neighbour, this, 0);
 		}
 	} else {
 		core->ApplySpell(modalSpell, this, this, 0);
@@ -7783,8 +7780,7 @@ int Actor::GetFavoredPenalties() const
 
 	// finally compare adjacent levels - if they're more than 1 apart
 	int penalty = 0;
-	std::list<int>::iterator it;
-	for (it=++classLevels.begin(); it != classLevels.end(); it++) {
+	for (auto it = ++classLevels.begin(); it != classLevels.end(); ++it) {
 		int level1 = *(--it);
 		int level2 = *(++it);
 		if (level2 - level1 > 1) penalty++;

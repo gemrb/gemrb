@@ -146,10 +146,9 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				excluded = parent->ContentRegionForRect(lineSegment);
 				if (!excluded) {
 					// now check if we already used this region ourselves
-					std::vector<Region>::const_iterator it;
-					for (it = lineExclusions.begin(); it != lineExclusions.end(); ++it) {
-						if (lineSegment.IntersectsRegion(*it)) {
-							excluded = &*it;
+					for (const auto& lineEx : lineExclusions) {
+						if (lineSegment.IntersectsRegion(lineEx)) {
+							excluded = &lineEx;
 							break;
 						}
 					}

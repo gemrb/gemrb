@@ -51,11 +51,10 @@ View::~View()
 	if (superView) {
 		superView->RemoveSubview(this);
 	}
-	std::list<View*>::iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		View* view = *it;
-		view->superView = NULL;
-		delete view;
+
+	for (const auto& subView : subViews) {
+		subView->superView = nullptr;
+		delete subView;
 	}
 }
 
@@ -97,9 +96,7 @@ void View::MarkDirty(const Region* rgn)
 		superView->DirtyBGRect(frame);
 	}
 
-	std::list<View*>::iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		View* view = *it;
+	for (const auto& view : subViews) {
 		if (rgn) {
 			Region intersect = view->frame.Intersect(*rgn);
 			const Size& idims = intersect.size;
@@ -475,10 +472,8 @@ View* View::RemoveFromSuperview()
 void View::AddedToWindow(Window* newwin)
 {
 	window = newwin;
-	std::list<View*>::iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		View* subview = *it;
-		subview->AddedToWindow(newwin);
+	for (const auto& subView : subViews) {
+		subView->AddedToWindow(newwin);
 	}
 }
 
@@ -527,8 +522,7 @@ bool View::HitTest(const Point& p) const
 View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 {
 	// iterate backwards because the backmost control would be drawn on top
-	std::list<View*>::reverse_iterator it;
-	for (it = subViews.rbegin(); it != subViews.rend(); ++it) {
+	for (auto it = subViews.rbegin(); it != subViews.rend(); ++it) {
 		View* v = *it;
 		Point subP = v->ConvertPointFromSuper(p);
 		if ((ignoreTransparency && v->frame.PointInside(p)) || v->HitTest(subP)) {
@@ -552,13 +546,11 @@ bool View::ContainsView(const View* view) const
 		return true;
 	}
 
-	std::list<View*>::const_iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		const View* subview = *it;
-		if (subview == view) {
+	for (const auto& subView : subViews) {
+		if (subView == view) {
 			return true;
 		}
-		if (subview->ContainsView(view)) {
+		if (subView->ContainsView(view)) {
 			return true;
 		}
 	}
@@ -579,15 +571,13 @@ Window* View::GetWindow() const
 
 void View::ResizeSubviews(const Size& oldSize)
 {
-	std::list<View*>::iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		View* subview = *it;
-		unsigned short arFlags = subview->AutoResizeFlags();
+	for (const auto& subView : subViews) {
+		unsigned short arFlags = subView->AutoResizeFlags();
 
 		if (arFlags == ResizeNone)
 			continue;
 
-		Region newSubFrame = subview->Frame();
+		Region newSubFrame = subView->Frame();
 		int delta = frame.w - oldSize.w;
 
 		if (arFlags & ResizeRight) {
@@ -611,7 +601,7 @@ void View::ResizeSubviews(const Size& oldSize)
 			newSubFrame.y += delta;
 		}
 
-		subview->SetFrame(newSubFrame);
+		subView->SetFrame(newSubFrame);
 	}
 	MarkDirty();
 }
@@ -932,8 +922,7 @@ const ViewScriptingRef* View::RemoveScriptingRef(const ViewScriptingRef* ref)
 	
 void View::ClearScriptingRefs()
 {
-	std::vector<ViewScriptingRef*>::iterator rit;
-	for (rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
+	for (auto rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
 		ViewScriptingRef* ref = *rit;
 		assert(GetView(ref) == this);
 		bool unregistered = ScriptEngine::UnregisterScriptingRef(ref);

@@ -72,9 +72,8 @@ std::vector<View*> GetViews(const ScriptingGroup_t& group)
 	ScriptEngine::ScriptingDefinitions defs = ScriptEngine::GetScriptingGroup(group);
 	std::vector<View*> views;
 
-	ScriptEngine::ScriptingDefinitions::iterator it;
-	for (it = defs.begin(); it != defs.end(); ++it) {
-		const ViewScriptingRef* ref = static_cast<const ViewScriptingRef*>(it->second);
+	for (const auto& def : defs) {
+		const ViewScriptingRef* ref = static_cast<const ViewScriptingRef*>(def.second);
 		views.push_back(ref->GetObject());
 	}
 

@@ -1325,8 +1325,7 @@ void Targets::AddTarget(Scriptable* target, unsigned int distance, int ga_flags)
 		break;
 	}
 	targettype Target = {target, distance};
-	targetlist::iterator m;
-	for (m = objects.begin(); m != objects.end(); ++m) {
+	for (auto m = objects.begin(); m != objects.end(); ++m) {
 		if ( (*m).distance>distance) {
 			objects.insert( m, Target);
 			return;
@@ -1343,10 +1342,9 @@ void Targets::Clear()
 void Targets::dump() const
 {
 	Log(DEBUG, "GameScript", "Target dump (actors only):");
-	targetlist::const_iterator m;
-	for (m = objects.begin(); m != objects.end(); ++m) {
-		if ((*m).actor->Type == ST_ACTOR) {
-			Log(DEBUG, "GameScript", "{}", fmt::WideToChar{(*m).actor->GetName()});
+	for (const auto& object : objects) {
+		if (object.actor->Type == ST_ACTOR) {
+			Log(DEBUG, "GameScript", "{}", fmt::WideToChar{object.actor->GetName()});
 		}
 	}
 }
@@ -1356,8 +1354,7 @@ void Targets::FilterObjectRect(const Object *oC)
 	// can't match anything if the second pair of coordinates (or all of them) are unset
 	if (oC->objectRect.w <= 0 || oC->objectRect.h <= 0) return;
 
-	targetlist::const_iterator m;
-	for (m = objects.begin(); m != objects.end();) {
+	for (auto m = objects.begin(); m != objects.end();) {
 		if (!IsInObjectRect((*m).actor->Pos, oC->objectRect)) {
 			m = objects.erase(m);
 		} else {

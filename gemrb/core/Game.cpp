@@ -573,8 +573,6 @@ Actor* Game::GetSelectedPCSingle(bool onlyalive) const
 
 bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 {
-	std::vector< Actor*>::iterator m;
-
 	// actor was not specified, which means all selectables should be (de)selected
 	if (! actor) {
 		for (auto selectee : selected) {
@@ -624,7 +622,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 			// already not selected
 			return true;
 		}
-		for ( m = selected.begin(); m != selected.end(); ++m) {
+		for (auto m = selected.begin(); m != selected.end(); ++m) {
 			if ((*m) == actor) {
 				selected.erase( m );
 				break;
@@ -774,8 +772,7 @@ int Game::DelMap(unsigned int index, int forced)
 		}
 		//if there are still selected actors on the map (e.g. summons)
 		//unselect them now before they get axed
-		std::vector< Actor*>::iterator m;
-		for (m = selected.begin(); m != selected.end();) {
+		for (auto m = selected.begin(); m != selected.end();) {
 			if (!(*m)->InParty && (*m)->Area == Maps[index]->GetScriptRef()) {
 				m = selected.erase(m);
 			} else {

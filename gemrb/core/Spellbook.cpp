@@ -395,9 +395,7 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 //this one purges all instances of known spells of the same name from memory
 void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef)
 {
-	std::vector< CREMemorizedSpell* >::iterator ms;
-
-	for (ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ++ms) {
+	for (auto ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ++ms) {
 		if (resRef != (*ms)->SpellResRef) {
 			continue;
 		}
@@ -411,15 +409,13 @@ void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRe
 bool Spellbook::RemoveSpell(const CREKnownSpell* spell)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		std::vector< CRESpellMemorization* >::iterator sm;
-		for (sm = spells[i].begin(); sm != spells[i].end(); ++sm) {
-			std::vector< CREKnownSpell* >::iterator ks;
-			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
+		for (const auto& spellMemo : spells[i]) {
+			for (auto ks = spellMemo->known_spells.begin(); ks != spellMemo->known_spells.end(); ++ks) {
 				if (*ks == spell) {
 					ResRef resRef = (*ks)->SpellResRef;
 					delete *ks;
-					(*sm)->known_spells.erase(ks);
-					RemoveMemorization(*sm, resRef);
+					spellMemo->known_spells.erase(ks);
+					RemoveMemorization(spellMemo, resRef);
 					ClearSpellInfo();
 					return true;
 				}
@@ -453,16 +449,13 @@ void Spellbook::RemoveSpell(int spellid)
 
 void Spellbook::RemoveSpell(int spellid, int type)
 {
-	std::vector< CRESpellMemorization* >::iterator sm;
-	for (sm = spells[type].begin(); sm != spells[type].end(); ++sm) {
-		std::vector< CREKnownSpell* >::iterator ks;
-
-		for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
+	for (const auto& spellMemo : spells[type]) {
+		for (auto ks = spellMemo->known_spells.begin(); ks != spellMemo->known_spells.end(); ++ks) {
 			if (atoi((*ks)->SpellResRef.CString() + 4) == spellid) {
 				ResRef resRef = (*ks)->SpellResRef;
 				delete *ks;
-				ks = (*sm)->known_spells.erase(ks);
-				RemoveMemorization(*sm, resRef);
+				ks = spellMemo->known_spells.erase(ks);
+				RemoveMemorization(spellMemo, resRef);
 				--ks;
 				ClearSpellInfo();
 			}
@@ -474,17 +467,14 @@ void Spellbook::RemoveSpell(int spellid, int type)
 void Spellbook::RemoveSpell(const ResRef& resRef, bool onlyknown)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
-		std::vector< CRESpellMemorization* >::iterator sm;
-		for (sm = spells[type].begin(); sm != spells[type].end(); ++sm) {
-			std::vector< CREKnownSpell* >::iterator ks;
-
-			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
+		for (const auto& spellMemo : spells[type]) {
+			for (auto ks = spellMemo->known_spells.begin(); ks != spellMemo->known_spells.end(); ++ks) {
 				if ((*ks)->SpellResRef != resRef) {
 					continue;
 				}
 				delete *ks;
-				ks = (*sm)->known_spells.erase(ks);
-				if (!onlyknown) RemoveMemorization(*sm, resRef);
+				ks = spellMemo->known_spells.erase(ks);
+				if (!onlyknown) RemoveMemorization(spellMemo, resRef);
 				--ks;
 				ClearSpellInfo();
 			}
@@ -779,13 +769,11 @@ bool Spellbook::MemorizeSpell(const CREKnownSpell* spell, bool usable)
 bool Spellbook::UnmemorizeSpell(const CREMemorizedSpell* spell)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		std::vector< CRESpellMemorization* >::iterator sm;
-		for (sm = spells[i].begin(); sm != spells[i].end(); ++sm) {
-			std::vector< CREMemorizedSpell* >::iterator s;
-			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); ++s) {
+		for (const auto& spellMemo : spells[i]) {
+			for (auto s = spellMemo->memorized_spells.begin(); s != spellMemo->memorized_spells.end(); ++s) {
 				if (*s == spell) {
 					delete *s;
-					(*sm)->memorized_spells.erase( s );
+					spellMemo->memorized_spells.erase(s);
 					ClearSpellInfo();
 					return true;
 				}
@@ -800,8 +788,7 @@ bool Spellbook::UnmemorizeSpell(const ResRef& spellRef, bool deplete, uint8_t fl
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		for (const auto& sm : spells[type]) {
-			std::vector< CREMemorizedSpell* >::iterator s;
-			for (s = sm->memorized_spells.begin(); s != sm->memorized_spells.end(); ++s) {
+			for (auto s = sm->memorized_spells.begin(); s != sm->memorized_spells.end(); ++s) {
 				if (spellRef != (*s)->SpellResRef) {
 					continue;
 				}
