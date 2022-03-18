@@ -170,6 +170,7 @@ public:
 	ieByte GetItemAnimation(const ResRef& itemRef);
 	const std::vector<ItemUseType>& GetItemUse();
 	int GetMiscRule(const char* rowName);
+	int GetDifficultyMod(ieDword mod, ieDword difficulty);
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -198,6 +199,7 @@ private:
 	AutoTable fistWeap;
 	AutoTable monkBon;
 	AutoTable miscRule;
+	AutoTable difficultyLevels;
 	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;

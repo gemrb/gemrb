@@ -83,12 +83,6 @@ static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
 static const char* const CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
-//I keep the zero index the same as core rules (default setting)
-static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal, core rules, hard, nightmare
-//XP adjustments on easy setting (need research on the amount)
-//Seems like bg1 halves xp, bg2 doesn't have any impact
-static int xpadjustments[6]={0, 0, 0, 0, 0, 0};
-static int luckadjustments[6]={0, 0, 0, 0, 0, 0};
 
 static int *wmlevels[20];
 
@@ -103,6 +97,9 @@ static ieDword war_cries = 1;
 static ieDword GameDifficulty = DIFF_CORE;
 static ieDword StoryMode = 0;
 static ieDword NoExtraDifficultyDmg = 0;
+static int DifficultyLuckMod = 0;
+static int DifficultyDamageMod = 0;
+
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
@@ -1631,6 +1628,9 @@ GEM_EXPORT void UpdateActorConfig()
 		StoryMode = newMode;
 	}
 	GameDifficulty = Clamp((int) GameDifficulty, DIFF_EASY, DIFF_INSANE);
+	// cache hot path mods
+	DifficultyLuckMod = gamedata->GetDifficultyMod(2, GameDifficulty);
+	DifficultyDamageMod = gamedata->GetDifficultyMod(0, GameDifficulty);
 
 	// iwd has a config option for leniency
 	core->GetDictionary()->Lookup("Suppress Extra Difficulty Damage", NoExtraDifficultyDmg);
@@ -2320,19 +2320,6 @@ static void InitActorTables()
 					skillrac[i].push_back (atoi(tm->QueryField(i, j)));
 				}
 			}
-		}
-	}
-
-	//difficulty level based modifiers
-	tm = gamedata->LoadTable("difflvls");
-	if (tm) {
-		memset(xpadjustments, 0, sizeof(xpadjustments) );
-		memset(dmgadjustments, 0, sizeof(dmgadjustments) );
-		memset(luckadjustments, 0, sizeof(luckadjustments) );
-		for (int i = 0; i < 6; i++) {
-			dmgadjustments[i] = atoi(tm->QueryField(0, i) );
-			xpadjustments[i] = atoi(tm->QueryField(1, i) );
-			luckadjustments[i] = atoi(tm->QueryField(2, i) );
 		}
 	}
 
@@ -3134,7 +3121,7 @@ void Actor::RefreshPCStats() {
 	UpdateFatigue();
 
 	// add luck bonus from difficulty
-	Modified[IE_LUCK] += luckadjustments[GameDifficulty - 1];
+	Modified[IE_LUCK] += DifficultyLuckMod;
 
 	// regenerate actors with high enough constitution
 	int rate = GetConHealAmount();
@@ -4250,7 +4237,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		// adjust enemy damage according to difficulty settings:
 		// -50%, -25%, 0, 50%, 100%, 150%
 		if (act->GetStat(IE_EA) > EA_GOODCUTOFF) {
-			int adjustmentPercent = dmgadjustments[GameDifficulty - 1];
+			int adjustmentPercent = DifficultyDamageMod;
 			if (!NoExtraDifficultyDmg || adjustmentPercent < 0) {
 				damage += (damage * adjustmentPercent)/100;
 			}
@@ -7737,7 +7724,7 @@ void Actor::Heal(int hp)
 void Actor::AddExperience(int exp, int combat)
 {
 	int bonus = core->GetWisdomBonus(0, Modified[IE_WIS]);
-	int adjustmentPercent = xpadjustments[GameDifficulty - 1];
+	int adjustmentPercent = gamedata->GetDifficultyMod(1, GameDifficulty);
 	// the "Suppress Extra Difficulty Damage" also switches off the XP bonus
 	if (combat && (!NoExtraDifficultyDmg || adjustmentPercent < 0)) {
 		bonus += adjustmentPercent;
