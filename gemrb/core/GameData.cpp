@@ -1093,4 +1093,27 @@ int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
 	return atoi(difficultyLevels->QueryField(mod, difficulty));
 }
 
+int GameData::GetXPBonus(ieDword bonusType, ieDword level)
+{
+	static bool ignore = false;
+	if (ignore) {
+		return 0;
+	}
+
+	if (!xpBonus) {
+		xpBonus = gamedata->LoadTable("xpbonus");
+		if (!xpBonus) {
+			ignore = true;
+			return 0;
+		}
+	}
+
+	// use the highest bonus for levels outside table bounds
+	if (level > xpBonus->GetColumnCount()) {
+		level = xpBonus->GetColumnCount();
+	}
+
+	return atoi(xpBonus->QueryField(bonusType, level - 1));
+}
+
 }

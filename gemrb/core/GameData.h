@@ -171,6 +171,7 @@ public:
 	const std::vector<ItemUseType>& GetItemUse();
 	int GetMiscRule(const char* rowName);
 	int GetDifficultyMod(ieDword mod, ieDword difficulty);
+	int GetXPBonus(ieDword bonusType, ieDword level);
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -200,6 +201,7 @@ private:
 	AutoTable monkBon;
 	AutoTable miscRule;
 	AutoTable difficultyLevels;
+	AutoTable xpBonus;
 	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;

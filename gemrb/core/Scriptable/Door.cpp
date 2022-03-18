@@ -351,7 +351,7 @@ void Highlightable::TryDisarm(const Actor *actor)
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
 		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, DMC_LIGHTGREY, actor);
-		int xp = actor->CalculateExperience(XP_DISARM, actor->GetXPLevel(1));
+		int xp = gamedata->GetXPBonus(XP_DISARM, actor->GetXPLevel(1));
 		const Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 		core->GetGameControl()->ResetTargetMode();
@@ -402,7 +402,7 @@ void Door::TryPickLock(const Actor *actor)
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS);
 	ImmediateEvent();
-	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
+	int xp = gamedata->GetXPBonus(XP_LOCKPICK, actor->GetXPLevel(1));
 	const Game *game = core->GetGame();
 	game->ShareXP(xp, SX_DIVIDE);
 }

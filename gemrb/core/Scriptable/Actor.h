@@ -707,8 +707,6 @@ public:
 	void Heal(int hp);
 	/* Receive experience (handle dual/multi class) */
 	void AddExperience(int exp, int combat);
-	/* Calculate experience bonus */
-	int CalculateExperience(int type, int level) const;
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate, bool force = true);
 	/* Sets the modal spell after checks */

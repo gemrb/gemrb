@@ -67,13 +67,10 @@ static int classcount = -1;
 static int extraslots = -1;
 static int *turnlevels = NULL;
 static int *booktypes = NULL;
-static int *xpbonus = NULL;
 static int *xpcap = NULL;
 static int *defaultprof = NULL;
 static int *castingstat = NULL;
 static int *iwd2spltypes = NULL;
-static int xpbonustypes = -1;
-static int xpbonuslevels = -1;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *multi = NULL;
@@ -1491,13 +1488,6 @@ void Actor::ReleaseMemory()
 			iwd2spltypes = NULL;
 		}
 
-		if (xpbonus) {
-			free(xpbonus);
-			xpbonus=NULL;
-			xpbonuslevels = -1;
-			xpbonustypes = -1;
-		}
-
 		if (xpcap) {
 			free(xpcap);
 			xpcap = NULL;
@@ -1687,28 +1677,9 @@ static void InitActorTables()
 	IWDSound = core->HasFeature(GF_SOUNDS_INI);
 	NUM_RARE_SELECT_SOUNDS = core->GetRareSelectSoundCount();
 
-	//this table lists various level based xp bonuses
-	AutoTable tm = gamedata->LoadTable("xpbonus", true);
-	if (tm) {
-		xpbonustypes = tm->GetRowCount();
-		if (xpbonustypes == 0) {
-			xpbonuslevels = 0;
-		} else {
-			xpbonuslevels = tm->GetColumnCount(0);
-			xpbonus = (int *) calloc(xpbonuslevels*xpbonustypes, sizeof(int));
-			for (int i = 0; i < xpbonustypes; i++) {
-				for (int j = 0; j < xpbonuslevels; j++) {
-					xpbonus[i*xpbonuslevels+j] = atoi(tm->QueryField(i,j));
-				}
-			}
-		}
-	} else {
-		xpbonustypes = 0;
-		xpbonuslevels = 0;
-	}
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
-	tm  = gamedata->LoadTable("clskills");
+	AutoTable tm = gamedata->LoadTable("clskills");
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
@@ -6066,7 +6037,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		displaymsg->DisplayConstantStringName(message, DMC_BG2XPGREEN, this);
 	}
 	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
-		int xp = CalculateExperience(XP_LEARNSPELL, explev);
+		int xp = gamedata->GetXPBonus(XP_LEARNSPELL, explev);
 		const Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 	}
@@ -7820,19 +7791,6 @@ int Actor::GetFavoredPenalties() const
 	}
 
 	return -20*penalty;
-}
-
-int Actor::CalculateExperience(int type, int level) const
-{
-	if (type>=xpbonustypes) {
-		return 0;
-	}
-	unsigned int l = (unsigned int) (level - 1);
-
-	if (l>=(unsigned int) xpbonuslevels) {
-		l=xpbonuslevels-1;
-	}
-	return xpbonus[type*xpbonuslevels+l];
 }
 
 bool Actor::Schedule(ieDword gametime, bool checkhide) const

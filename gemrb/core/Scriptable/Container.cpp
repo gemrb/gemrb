@@ -205,7 +205,7 @@ void Container::TryPickLock(const Actor *actor)
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS); //AMB_D21D
 	ImmediateEvent();
-	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
+	int xp = gamedata->GetXPBonus(XP_LOCKPICK, actor->GetXPLevel(1));
 	const Game *game = core->GetGame();
 	game->ShareXP(xp, SX_DIVIDE);
 }
