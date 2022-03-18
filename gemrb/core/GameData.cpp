@@ -1078,7 +1078,6 @@ int GameData::GetMiscRule(const char* rowName)
 int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
 {
 	static bool ignore = false;
-	static ieDword cols = 0;
 	if (ignore) {
 		return 0;
 	}
@@ -1089,9 +1088,7 @@ int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
 			ignore = true;
 			return 0;
 		}
-		cols = difficultyLevels->GetColumnCount();
 	}
-	if (difficulty >= cols) return 0;
 
 	return atoi(difficultyLevels->QueryField(mod, difficulty));
 }
