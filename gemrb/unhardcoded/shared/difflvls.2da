@@ -4,3 +4,7 @@
 DMG      0         -50     -25         0       50         100
 XP       0         0       0           0       0          0
 LUCK     0         0       0           0       0          0
+SAVES    0         -4      -2          0       0          0
+
+
+# NOTE: the (enemy) saves malus is only used in iwd2

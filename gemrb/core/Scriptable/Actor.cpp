@@ -99,6 +99,7 @@ static ieDword StoryMode = 0;
 static ieDword NoExtraDifficultyDmg = 0;
 static int DifficultyLuckMod = 0;
 static int DifficultyDamageMod = 0;
+static int DifficultySaveMod = 0;
 
 //the chance to issue one of the rare select verbal constants
 #define RARE_SELECT_CHANCE 5
@@ -1631,6 +1632,7 @@ GEM_EXPORT void UpdateActorConfig()
 	// cache hot path mods
 	DifficultyLuckMod = gamedata->GetDifficultyMod(2, GameDifficulty);
 	DifficultyDamageMod = gamedata->GetDifficultyMod(0, GameDifficulty);
+	DifficultySaveMod = gamedata->GetDifficultyMod(3, GameDifficulty);
 
 	// iwd has a config option for leniency
 	core->GetDictionary()->Lookup("Suppress Extra Difficulty Damage", NoExtraDifficultyDmg);
@@ -3357,9 +3359,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 	}
 
 	// general bonuses
-	// FIXME: externalize these two two difflvls.2da
-	if (Modified[IE_EA] != EA_PC && GameDifficulty == DIFF_EASY) ret -= 4;
-	if (Modified[IE_EA] != EA_PC && GameDifficulty == DIFF_NORMAL) ret -= 2;
+	if (Modified[IE_EA] != EA_PC) ret += DifficultySaveMod;
 	// (half)elven resistance to enchantment, gnomish to illusions and dwarven to spells
 	if ((BaseStats[IE_RACE] == 2 || BaseStats[IE_RACE] == 3) && fx->PrimaryType == 4) ret += 2;
 	if (BaseStats[IE_RACE] == 6 && fx->PrimaryType == 5) ret += 2;
