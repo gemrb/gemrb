@@ -205,7 +205,7 @@ public:
 	};
 
 public:
-	Object() noexcept : objectName() {};
+	Object() noexcept {};
 
 	std::string dump(bool print = true) const;
 	void Release()
@@ -217,7 +217,7 @@ public:
 
 class GEM_EXPORT Trigger final : protected Canary {
 public:
-	Trigger() noexcept : string0Parameter(), string1Parameter() {};
+	Trigger() noexcept {};
 	~Trigger() final
 	{
 		if (objectParameter) {
@@ -278,7 +278,6 @@ public:
 class GEM_EXPORT Action final : protected Canary {
 public:
 	explicit Action(bool autoFree) noexcept
-	: string0Parameter(), string1Parameter()
 	{
 		//changed now
 		if (autoFree) {
