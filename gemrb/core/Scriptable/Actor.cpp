@@ -210,7 +210,6 @@ static void InitActorTables();
 
 #define DAMAGE_LEVELS 19
 #define ATTACKROLL    20
-#define DEFAULTAC     10
 
 static ResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
@@ -9843,6 +9842,7 @@ void Actor::CreateDerivedStatsBG()
 {
 	int turnundeadlevel = 0;
 	int classid = BaseStats[IE_CLASS];
+	static int defaultAC = gamedata->GetMiscRule("DEFAULT_AC");
 
 	//this works only for PC classes
 	if (classid>=CLASS_PCCUTOFF) return;
@@ -9897,7 +9897,7 @@ void Actor::CreateDerivedStatsBG()
 	// attacks per round bonus will be handled elsewhere, since it only applies to fist apr
 	if (isclass[ISMONK]&(1<<classid)) {
 		unsigned int level = GetMonkLevel();
-		AC.SetNatural(DEFAULTAC - gamedata->GetMonkBonus(1, level));
+		AC.SetNatural(defaultAC - gamedata->GetMonkBonus(1, level));
 		BaseStats[IE_ACMISSILEMOD] = - gamedata->GetMonkBonus(2, level);
 	}
 
