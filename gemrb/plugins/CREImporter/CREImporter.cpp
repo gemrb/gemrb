@@ -36,7 +36,7 @@
 using namespace GemRB;
 
 static unsigned int RandColor = 1;
-std::vector<std::vector<unsigned char>> randcolors; // it's likely not important enough, so perhaps we should just store the Autotable directly
+std::map<ieDword, std::vector<unsigned char>> randcolors;
 
 //one column, these don't have a level
 static std::vector<ResRef> innlist; //IE_IWD2_SPELL_INNATE
@@ -787,9 +787,8 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 
 void CREImporter::SetupColor(ieDword &stat) const
 {
-	if (stat < 200 || RandColor == 0) return;
+	if (RandColor == 0) return;
 
-	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
 	ieDword RandRows = 0;
 	if (randcolors.empty()) {
 		AutoTable rndcol = gamedata->LoadTable("randcolr", true);
@@ -802,35 +801,28 @@ void CREImporter::SetupColor(ieDword &stat) const
 			return;
 		}
 
-		randcolors.resize(RandColor);
 		for (int cols = RandColor - 1; cols >= 0; cols--) {
-			randcolors[cols] = std::vector<unsigned char>(RandRows);
-			for (size_t i = 0; i < RandRows; i++) {
-				randcolors[cols][i] = atoi(rndcol->QueryField(static_cast<unsigned int>(i), cols));
+			int color = atoi(rndcol->QueryField(static_cast<unsigned int>(0), cols));
+			randcolors[color] = std::vector<unsigned char>(RandRows - 1);
+			for (size_t i = 1; i < RandRows; i++) {
+				randcolors[color][i - 1] = atoi(rndcol->QueryField(static_cast<unsigned int>(i), cols));
 			}
-			randcolors[cols][0] -= 200;
 		}
 	}
 
-	RandRows = ieDword(randcolors[0].size());
-	stat -= 200;
-	// handle saves with 1pp on installs without it
-	if (stat >= RandRows) {
-		stat = RandRows - 1;
+	// random indices start at 200
+	if (stat < randcolors.begin()->first) return;
+	RandRows = ieDword(randcolors.begin()->second.size());
+
+	auto colors = randcolors.find(stat);
+	if (colors == randcolors.end()) {
+		Log(ERROR, "CREImporter", "Missing random color index in randcolr.2da: {}", stat);
+		// fall back to browns
+		stat = randcolors.begin()->second[RAND<ieDword>(ieDword(0), RandRows - 1)];
+		return;
 	}
-	// assuming an ordered list, so looking in the middle first
-	for (int i = (int) stat; i >= 0; i--) {
-		if (randcolors[i][0] == stat) {
-			stat = randcolors[i][RAND<ieDword>(ieDword(0), RandRows - 1)];
-			return;
-		}
-	}
-	for (unsigned int i = stat + 1; i < RandColor; i++) {
-		if (randcolors[i][0] == stat) {
-			stat = randcolors[i][RAND<ieDword>(ieDword(0), RandRows - 1)];
-			return;
-		}
-	}
+
+	stat = colors->second[RAND<ieDword>(ieDword(0), RandRows - 1)];
 }
 
 void CREImporter::ReadDialog(Actor *act)
