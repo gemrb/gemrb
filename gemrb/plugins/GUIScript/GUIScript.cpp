@@ -10558,7 +10558,6 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 		ReadActionButtons();
 	}
 
-	//FIXME: this is a hardcoded resource (pst has no such one)
 	AnimationFactory* bam = ( AnimationFactory* )
 	gamedata->GetFactoryResource(GUIResRef[Index], IE_BAM_CLASS_ID);
 	if (!bam) {
@@ -10680,8 +10679,8 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			return NULL;
 		}
 	}
-	//FIXME: this is a hardcoded resource (pst has no such one)
-	AnimationFactory* bam = (AnimationFactory*) gamedata->GetFactoryResource("guibtbut", IE_BAM_CLASS_ID);
+	// pst doesn't have a file, but uses the float window instead any way
+	AnimationFactory* bam = static_cast<AnimationFactory*>(gamedata->GetFactoryResource(GUIResRef[9], IE_BAM_CLASS_ID));
 	if (!bam) {
 		return RuntimeError("guibtbut BAM not found");
 	}
