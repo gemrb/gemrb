@@ -3064,6 +3064,8 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 //at this time it is unclear what the LeaveAreaLUAPanic* commands are used for
 //since they are always followed by the non-panic version of the command in all
 //games that use them (bg1 + bg2) we simply make them de-facto no-ops for now
+// Taimon: in ToB these are used in multiplayer and do something different for
+// the host than the external players
 void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
