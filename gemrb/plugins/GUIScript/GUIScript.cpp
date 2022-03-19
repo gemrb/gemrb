@@ -11598,7 +11598,6 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 
 	switch (spelldata.Target) {
 		case TARGET_SELF:
-			// FIXME: GA_NO_DEAD and such are not actually used by SetupCasting
 			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			gc->TryToCast(actor, actor);
 			break;
