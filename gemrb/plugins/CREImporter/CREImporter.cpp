@@ -35,7 +35,6 @@
 
 using namespace GemRB;
 
-static unsigned int RandColor = 1;
 std::map<ieDword, std::vector<unsigned char>> randcolors;
 
 //one column, these don't have a level
@@ -787,6 +786,7 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 
 void CREImporter::SetupColor(ieDword &stat) const
 {
+	static unsigned int RandColor = 1;
 	if (RandColor == 0) return;
 
 	ieDword RandRows = 0;
