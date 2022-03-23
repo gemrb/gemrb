@@ -40,21 +40,19 @@ GEM_EXPORT void AddLogWriter(Logger::WriterPtr&&);
 GEM_EXPORT void SetConsoleWindowLogLevel(log_level level);
 GEM_EXPORT void LogMsg(Logger::LogMessage&& msg);
 
-/// Log an error and exit.
-template<typename... ARGS> [[noreturn]]
-void error(const char* owner, const char* format, ARGS&&... args)
-{
-	auto formattedMsg = fmt::format(format, std::forward<ARGS>(args)...);
-	LogMsg(Logger::LogMessage(FATAL, owner, formattedMsg, LIGHT_RED));
-
-	exit(1);
-}
-
 template<typename... ARGS>
 void Log(log_level level, const char* owner, const char* message, ARGS&&... args)
 {
 	auto formattedMsg = fmt::format(message, std::forward<ARGS>(args)...);
-	LogMsg(Logger::LogMessage(level, owner, formattedMsg, WHITE));
+	LogMsg(Logger::LogMessage(level, owner, std::move(formattedMsg), WHITE));
+}
+
+/// Log an error and exit.
+template<typename... ARGS> [[noreturn]]
+void error(const char* owner, const char* format, ARGS&&... args)
+{
+	Log(FATAL, owner, format, std::forward<ARGS>(args)...);
+	exit(1);
 }
 
 }
