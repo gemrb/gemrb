@@ -30,8 +30,6 @@ struct Color {
 
 	constexpr Color() noexcept = default;
 	
-	constexpr Color(const Color&) noexcept = default;
-
 	constexpr Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) noexcept
 	: r(r), g(g), b(b), a(a) {}
 	
