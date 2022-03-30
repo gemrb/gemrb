@@ -85,7 +85,7 @@ public:
 	
 	Holder& operator=(const Holder& rhs) noexcept
 	{
-		if (&rhs != this) {
+		if (rhs.ptr != ptr) {
 			if (rhs.ptr) {
 				rhs.ptr->acquire();
 			}
@@ -99,7 +99,7 @@ public:
 	
 	Holder& operator=(Holder&& rhs) noexcept
 	{
-		if (&rhs != this) {
+		if (rhs.ptr != ptr) {
 			std::swap(rhs.ptr, ptr);
 		}
 		return *this;
