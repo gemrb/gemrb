@@ -74,6 +74,7 @@ public:
 	bool Open(DataStream* stream) noexcept {
 		delete str;
 		str = stream;
+		if (!str) return false;
 		return Import(str);
 	}
 
