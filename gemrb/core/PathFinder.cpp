@@ -289,7 +289,7 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 	step->point.x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
 	step->point.y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
 	const Size& mapSize = PropsSize();
-	step->point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
+	step->point = Clamp(step->point, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
 	step->orient = GetOrient(step->point, p);
 	step->Next = nullptr;
 	step->Parent = nullptr;
