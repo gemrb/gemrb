@@ -47,8 +47,8 @@ def OnLoad():
 	global HairColor, SkinColor, MinorColor, MajorColor
 	
 	ColorWindow=GemRB.LoadWindow(13, "GUICG")
+	ColorWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 	if GameCheck.IsBG2 ():
-		ColorWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 		CharGenCommon.PositionCharGenWin (ColorWindow, -6)
 
 	ColorTable = GemRB.LoadTable("clowncol")
@@ -102,10 +102,7 @@ def OnLoad():
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (BackPress)
 	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
-	if GameCheck.IsBG2 ():
-		ColorWindow.Focus ()
-	else:
-		ColorWindow.ShowModal (MODAL_SHADOW_NONE)
+	ColorWindow.ShowModal (MODAL_SHADOW_NONE)
 	return
 
 def DonePress():
@@ -114,10 +111,7 @@ def DonePress():
 	if ColorPicker:
 		ColorPicker.Close ()
 
-	if GameCheck.IsBG2 ():
-		ColorWindow.Focus ()
-	else:
-		ColorWindow.ShowModal (MODAL_SHADOW_NONE)
+	ColorWindow.ShowModal (MODAL_SHADOW_NONE)
 
 	PickedColor=ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:
@@ -168,10 +162,7 @@ def GetColor():
 		Button.SetVarAssoc("Selected",i)
 		Button.OnPress (DonePress)
 
-	if GameCheck.IsBG2 ():
-		ColorPicker.Focus ()
-	else:
-		ColorPicker.ShowModal (MODAL_SHADOW_NONE)
+	ColorPicker.ShowModal (MODAL_SHADOW_NONE)
 	return
 
 def HairPress():
@@ -224,16 +215,13 @@ def NextPress():
 		ColorWindow.Close()
 
 	MyChar = GemRB.GetVar ("Slot")
+	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, HairColor)
+	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, SkinColor)
+	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, MajorColor)
+	GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, MinorColor)
+	# ignore IE_METAL_COLOR, IE_LEATHER_COLOR, IE_ARMOR_COLOR as they're set by equipment
 	if GameCheck.IsBG1 ():
-		GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, HairColor )
-		GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, SkinColor )
-		GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, MajorColor)
-		GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, MinorColor )
 		CharGenCommon.next()
 	else:
-		GemRB.SetVar ("HairColor",HairColor)
-		GemRB.SetVar ("SkinColor",SkinColor)
-		GemRB.SetVar ("MinorColor",MinorColor)
-		GemRB.SetVar ("MajorColor",MajorColor)
 		GemRB.SetNextScript ("GUICG19") #sounds
 	return

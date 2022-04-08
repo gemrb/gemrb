@@ -76,14 +76,6 @@ def OnLoad():
 	temp = GemRB.Roll (TmpTable.GetValue (ClassName, "ROLLS"), TmpTable.GetValue (ClassName, "SIDES"), TmpTable.GetValue (ClassName, "MODIFIER"))
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, temp * TmpTable.GetValue (ClassName, "MULTIPLIER"))
 
-	# save the appearance
-	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
-	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
-	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
-	GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("MinorColor") )
-	#GUICommon.SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
-	#GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	#GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 
 	# save the name and starting xp (can level right away in game)
