@@ -57,16 +57,12 @@ def OnLoad():
 	PortraitName = GemRB.GetToken("LargePortrait")
 	PortraitName = PortraitName[0:len(PortraitName)-1]
 	PortraitIndex = PortraitTable.GetRowIndex(PortraitName)
-	if PortraitIndex<0:
-		HairColor=PortraitTable.GetValue(0,1)
-		SkinColor=PortraitTable.GetValue(0,2)
-		MinorColor=PortraitTable.GetValue(0,3)
-		MajorColor=PortraitTable.GetValue(0,4)
-	else:
-		HairColor=PortraitTable.GetValue(PortraitIndex,1)
-		SkinColor=PortraitTable.GetValue(PortraitIndex,2)
-		MinorColor=PortraitTable.GetValue(PortraitIndex,3)
-		MajorColor=PortraitTable.GetValue(PortraitIndex,4)
+	if PortraitIndex < 0:
+		PortraitIndex = 0
+	HairColor = PortraitTable.GetValue (PortraitIndex, 1)
+	SkinColor = PortraitTable.GetValue (PortraitIndex, 2)
+	MinorColor = PortraitTable.GetValue (PortraitIndex, 3)
+	MajorColor = PortraitTable.GetValue (PortraitIndex, 4)
 
 	PDollButton = ColorWindow.GetControl(1)
 	PDollButton.SetState (IE_GUI_BUTTON_LOCKED)
