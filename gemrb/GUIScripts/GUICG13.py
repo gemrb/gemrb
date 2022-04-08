@@ -162,6 +162,7 @@ def GetColor():
 		Button.SetVarAssoc("Selected",i)
 		Button.OnPress (DonePress)
 
+	ColorPicker.GetControl(0).MakeEscape ()
 	ColorPicker.ShowModal (MODAL_SHADOW_NONE)
 	return
 
