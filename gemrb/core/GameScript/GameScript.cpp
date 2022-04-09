@@ -2500,13 +2500,13 @@ Trigger* GenerateTrigger(std::string string)
 		++start;
 		negate = TF_NEGATE;
 	}
-	strpos_t len = string.find_first_of('(', start) + 1; //including (
+	strpos_t len = string.find_first_of('(', start) + 1 - start; // including (
 	int i = triggersTable->FindString(string.c_str() + start, int(len));
 	if (i<0) {
 		Log(ERROR, "GameScript", "Invalid scripting trigger: {}", string);
 		return NULL;
 	}
-	const char *src = string.c_str() + len;
+	const char *src = string.c_str() + start + len;
 	const char *str = triggersTable->GetStringIndex(i) + len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
