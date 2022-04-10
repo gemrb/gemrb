@@ -4256,10 +4256,12 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	}
 
 	// also apply reputation damage if we hurt (but not killed) an innocent
-	if (Modified[IE_CLASS] == CLASS_INNOCENT && !core->InCutSceneMode()) {
-		if (act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
-			core->GetGame()->SetReputation(core->GetGame()->Reputation + gamedata->GetReputationMod(1));
-		}
+	if (core->HasFeature(GF_DAMAGE_INNOCENT_REP) &&
+			Modified[IE_CLASS] == CLASS_INNOCENT &&
+			!core->InCutSceneMode() &&
+			act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
+
+		core->GetGame()->SetReputation(core->GetGame()->Reputation + gamedata->GetReputationMod(1));
 	}
 
 	int chp = (signed) BaseStats[IE_HITPOINTS];

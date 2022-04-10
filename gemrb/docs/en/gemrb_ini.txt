@@ -598,3 +598,8 @@ This option is 1 for original PST.
 UpperButtonText = <bool>
 - - - - - - - - - - - - -
 Set to 1 if button labels should be converted to upper-case (e.g. BG2)
+
+DamageInnocentRep = <bool>
+- - - - - - - - - - - - -
+Set to 1 if damaging INNOCENT characters should result in a reputation hit.
+Killing INNOCENT characters is not affected by this flag.
