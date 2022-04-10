@@ -1767,7 +1767,8 @@ static const char* const game_flags[GF_COUNT + 1]={
 		"Happiness",          //80GF_HAPPINESS
 		"EfficientORTrigger", //81GF_EFFICIENT_OR
 		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
-		"ClearingActionOverride", // GF_CLEARING_ACTIONOVERRIDE
+		"ClearingActionOverride", //83GF_CLEARING_ACTIONOVERRIDE
+		"DamageInnocentRep",  //84GF_DAMAGE_INNOCENT_REP
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
