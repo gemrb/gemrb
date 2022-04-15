@@ -71,7 +71,7 @@ unsigned int Distance(const Point &p, const Point &q)
 {
 	long x = ( p.x - q.x );
 	long y = ( p.y - q.y );
-	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
+	return (unsigned int) std::hypot(x, y);
 }
 
 /** Calculates squared distance between 2 points */
@@ -95,14 +95,14 @@ unsigned int Distance(const Point &p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
-	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
+	return (unsigned int) std::hypot(x, y);
 }
 
 unsigned int PersonalDistance(const Point &p, const Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
 	long y = ( p.y - b->Pos.y );
-	int ret = (int) std::sqrt( ( double ) ( x* x + y* y ) );
+	int ret = (int) std::hypot(x, y);
 	if (b->Type==ST_ACTOR) {
 		ret -= static_cast<const Actor*>(b)->circleSize * 10;
 	}
@@ -135,7 +135,7 @@ unsigned int Distance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
-	return (unsigned int) std::sqrt( ( double ) ( x* x + y* y ) );
+	return (unsigned int) std::hypot(x, y);
 }
 
 /** Calculates distance squared between 2 scriptables */
@@ -149,7 +149,7 @@ unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
-	int ret = (int) std::sqrt( ( double ) ( x* x + y* y ) );
+	int ret = (int) std::hypot(x, y);
 	if (a->Type==ST_ACTOR) {
 		ret -= static_cast<const Actor*>(a)->circleSize * 10;
 	}
