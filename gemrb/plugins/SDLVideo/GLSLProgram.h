@@ -6,13 +6,13 @@
 #include <map>
 #include <string>
 
-namespace GemRB 
+namespace GemRB
 {
 	class GLSLProgram
 	{
 	public:
-		static GLSLProgram* Create(const std::string& vertexSource, const std::string& fragmentSource);
-		static GLSLProgram* CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName);
+		static GLSLProgram* Create(const std::string& vertexSource, const std::string& fragmentSource, GLuint programID = 0);
+		static GLSLProgram* CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName, GLuint programID = 0);
 
 		static std::string GetLastError();
 
@@ -28,12 +28,13 @@ namespace GemRB
 		bool SetUniformValue(const std::string& uniformName, const unsigned char size, GLsizei count, const GLint* value) const;
 		bool SetUniformMatrixValue(const std::string& uniformName, const unsigned char size, GLsizei count, const GLfloat* value) const;
 		GLint GetAttribLocation(const std::string& attribName) const;
-	private:	
+		GLuint GetProgramID() const;
+	private:
 		static std::string errMessage;
 
 		GLuint program;
 		std::map<std::string, GLint> uniforms;
-		bool buildProgram(const std::string& vertexSource, const std::string& fragmentSource);
+		bool buildProgram(const std::string& vertexSource, const std::string& fragmentSource, GLuint programID);
 		GLuint buildShader(GLenum type, std::string source) const;
 		GLint getUniformLocation(const std::string& uniformName) const;
 		bool storeUniformLocation(const std::string& uniformName);
