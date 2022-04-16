@@ -143,8 +143,9 @@ def DeleteGameConfirm():
 	GemRB.DeleteSaveGame (Games[Pos])
 	del Games[Pos]
 	if TopIndex>0:
-		GemRB.SetVar("TopIndex",TopIndex-1)
-	ScrollBar.SetVarAssoc("TopIndex", len(Games))
+		TopIndex -= 1
+		GemRB.SetVar ("TopIndex", TopIndex)
+	ScrollBar.SetVarAssoc("TopIndex", TopIndex, 0, max (0, len(Games) - 4 + 1))
 	ScrollBarPress()
 	if ConfirmWindow:
 		ConfirmWindow.Close ()

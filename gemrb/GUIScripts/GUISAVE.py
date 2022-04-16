@@ -276,7 +276,7 @@ def DeleteGameConfirm (delIndex):
 	del Games[Pos]
 	if TopIndex > 0:
 		TopIndex = TopIndex - 1
-	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, max (0, len(Games) - num_rows + 1))
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, max (0, len(Games) - num_rows + 1))
 	ScrollBarPress ()
 
 	CloseConfirmWindow ()
