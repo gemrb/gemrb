@@ -150,7 +150,7 @@ public:
 	PCStatsStruct& operator=(const PCStatsStruct &source);
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);
-	void InitQuickSlot(unsigned int which, int slot, int headerindex);
+	void InitQuickSlot(unsigned int which, ieWord slot, ieWord headerIndex);
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex) const;
 	int GetHeaderForSlot(int slot) const;

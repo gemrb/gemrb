@@ -676,7 +676,7 @@ public:
 	/* applies the class abilities*/
 	void ApplyClab(const char *clab, ieDword max, int remove, int diff);
 	/* calls InitQuickSlot in PCStatStruct */
-	void SetupQuickSlot(unsigned int which, int slot, int headerindex) const;
+	void SetupQuickSlot(unsigned int which, ieWord slot, ieWord headerIndex) const;
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent() const;
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */

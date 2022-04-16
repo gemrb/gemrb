@@ -5717,10 +5717,10 @@ void Actor::ApplyExtraSettings()
 	}
 }
 
-void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex) const
+void Actor::SetupQuickSlot(unsigned int which, ieWord slot, ieWord headerIndex) const
 {
 	if (!PCStats) return;
-	PCStats->InitQuickSlot(which, slot, headerindex);
+	PCStats->InitQuickSlot(which, slot, headerIndex);
 	//something changed about the quick items
 	core->SetEventFlag(EF_ACTION);
 }

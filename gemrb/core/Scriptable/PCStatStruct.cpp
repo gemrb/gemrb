@@ -99,19 +99,19 @@ void PCStatsStruct::SetQuickItemSlot(int idx, int slot, int headerindex)
 	QuickItemHeaders[idx]=(ieWord) headerindex;
 }
 
-void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
+void PCStatsStruct::InitQuickSlot(unsigned int which, ieWord slot, ieWord headerIndex)
 {
 	if (!which) {
 		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
 			if (slot==QuickItemSlots[i]) {
-				QuickItemHeaders[i]=headerindex;
+				QuickItemHeaders[i] = headerIndex;
 				return;
 			}
 		}
 
 		for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
 			if (slot==QuickWeaponSlots[i]) {
-				QuickWeaponHeaders[i]=headerindex;
+				QuickWeaponHeaders[i] = headerIndex;
 				return;
 			}
 		}
@@ -121,7 +121,8 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 	//precalculate field values. Empty slots will get their ability header
 	//initialized to the invalid value of 0xffff to stay binary compatible
 	//with original
-	int slot2, header;
+	ieWord slot2;
+	ieWord header;
 
 	if (slot==0xffff) {
 		slot2 = 0xffff;
@@ -132,11 +133,11 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 		header = 0;
 	}
 	switch(which) {
-	case ACT_QSLOT1: SetQuickItemSlot(0,slot,headerindex); break;
-	case ACT_QSLOT2: SetQuickItemSlot(1,slot,headerindex); break;
-	case ACT_QSLOT3: SetQuickItemSlot(2,slot,headerindex); break;
-	case ACT_QSLOT4: SetQuickItemSlot(3,slot,headerindex); break;
-	case ACT_QSLOT5: SetQuickItemSlot(4,slot,headerindex); break;
+	case ACT_QSLOT1: SetQuickItemSlot(0, slot, headerIndex); break;
+	case ACT_QSLOT2: SetQuickItemSlot(1, slot, headerIndex); break;
+	case ACT_QSLOT3: SetQuickItemSlot(2, slot, headerIndex); break;
+	case ACT_QSLOT4: SetQuickItemSlot(3, slot, headerIndex); break;
+	case ACT_QSLOT5: SetQuickItemSlot(4, slot, headerIndex); break;
 	case ACT_IWDQITEM:
 	case ACT_IWDQITEM+1:
 	case ACT_IWDQITEM+2:
@@ -147,7 +148,7 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 	case ACT_IWDQITEM+7:
 	case ACT_IWDQITEM+8:
 	case ACT_IWDQITEM+9:*/
-		SetQuickItemSlot(which - ACT_IWDQITEM, slot, headerindex);
+		SetQuickItemSlot(which - ACT_IWDQITEM, slot, headerIndex);
 		break;
 	case ACT_WEAPON1:
 		QuickWeaponSlots[0]=slot;
@@ -249,7 +250,7 @@ void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
 	}
 	//least favourite candidate position and count
 	int minpos = 0;
-	int mincnt = cntpoi[0];
+	ieWord mincnt = cntpoi[0];
 	int pos = 0;
 	for (pos = 0; pos<MAX_FAVOURITES-1; pos++) {
 		if (fav == respoi[pos]) {
