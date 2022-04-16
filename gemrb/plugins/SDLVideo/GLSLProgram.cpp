@@ -18,17 +18,18 @@ GLSLProgram::~GLSLProgram()
 	if (program != 0) glDeleteProgram(program);
 }
 
-GLSLProgram* GLSLProgram::Create(const std::string& vertexSource, const std::string& fragmentSource)
+GLSLProgram* GLSLProgram::Create(const std::string& vertexSource, const std::string& fragmentSource, GLuint programID)
 {
 	GLSLProgram* program = new GLSLProgram();
-	if (!program->buildProgram(vertexSource, fragmentSource)) {
+	if (!program->buildProgram(vertexSource, fragmentSource, programID)) {
 		delete program;
 		return NULL;
 	}
 	return program;
 }
 
-GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName)
+GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName,
+		GLuint programID)
 {
 	std::string vertexContent;
 	std::string fragmentContent;
@@ -96,7 +97,8 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 		fragmentContent.append(line + "\n");
 	}
 	fileStream2.close();
-	return GLSLProgram::Create(vertexContent, fragmentContent);
+
+	return GLSLProgram::Create(vertexContent, fragmentContent, programID);
 }
 
 GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source) const
@@ -124,16 +126,28 @@ GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source) const
 	return id;
 }
 
-bool GLSLProgram::buildProgram(const std::string& vertexSource, const std::string& fragmentSource)
+bool GLSLProgram::buildProgram(const std::string& vertexSource, const std::string& fragmentSource, GLuint programID)
 {
-	program = 0;
-	program = glCreateProgram();
-	if (program == 0) {
-		GLSLProgram::errMessage = "GLSLProgram error: glCreateProgram failed";
-		glDeleteProgram(program);
-		return false;
+	program = programID;
+
+	if (programID == 0) {
+		program = glCreateProgram();
+		if (program == 0) {
+			GLSLProgram::errMessage = "GLSLProgram error: glCreateProgram failed";
+			glDeleteProgram(program);
+			return false;
+		}
+	} else {
+		GLsizei numAttachedShaders = 0;
+		// Assume there is nothing but VS & FS.
+		GLuint shaderIDs[2] = {0};
+		glGetAttachedShaders(program, 2, &numAttachedShaders, shaderIDs);
+
+		for (GLsizei i = 0; i < numAttachedShaders; ++i) {
+			glDetachShader(program, shaderIDs[i]);
+		}
 	}
-	
+
 	GLuint vertexId = buildShader(GL_VERTEX_SHADER, vertexSource);
 	if (vertexId == 0) {
 		glDeleteProgram(program);
@@ -336,4 +350,8 @@ void GLSLProgram::UnUse() const
 GLint GLSLProgram::GetAttribLocation(const std::string& attribName) const
 {
 	return glGetAttribLocation(program, attribName.c_str());
+}
+
+GLuint GLSLProgram::GetProgramID() const {
+	return program;
 }
