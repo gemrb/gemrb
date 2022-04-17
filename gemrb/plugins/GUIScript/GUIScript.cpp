@@ -2135,15 +2135,15 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			break;
 		case IE_GUI_LABEL:
 		{
-			int align;
+			unsigned char alignment;
 			char *font, *text;
-			PARSE_ARGS(constructArgs, "ssi", &font, &text, &align);
+			PARSE_ARGS(constructArgs, "ssb", &font, &text, &alignment);
 
 			String* string = StringFromUtf8(text);
 			Label* lbl = new Label(rgn, core->GetFont(font), string ? *string : L"");
 			delete string;
 
-			lbl->SetAlignment( align );
+			lbl->SetAlignment(alignment);
 			view = lbl;
 		}
 			break;
@@ -3140,7 +3140,7 @@ If None is passed as the key, any existing hotkey binding is cleared.\n\
 static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 {
 	unsigned char hotkey = 0;
-	unsigned int mods = 0;
+	short mods = 0;
 	int global = false;
 	Button* btn = NULL;
 	PyObject* arg1 = PyTuple_GetItem(args, 1);
@@ -3150,8 +3150,8 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 	// work around a bug in cpython where PyArg_ParseTuple doesn't return as expected when 'c' format doesn't match
 	} else if (PyObject_TypeCheck(arg1, &PyUnicode_Type) && PyUnicode_GetLength(arg1) == 1) {
 		int ch = 0;
-		PARSE_ARGS(args, "OC|Ii", &self, &ch, &mods, &global);
-		hotkey = ch;
+		PARSE_ARGS(args, "OC|hi", &self, &ch, &mods, &global);
+		hotkey = static_cast<unsigned char>(ch);
 		btn = GetView<Button>(self);
 		assert(btn);
 	} else {
@@ -3182,7 +3182,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		btn->SetAction(PythonControlCallback(pFunc));
 		Py_DECREF(moduleName);
 
-		hotkey = func->key;
+		hotkey = static_cast<unsigned char>(func->key);
 	}
 
 	btn->SetHotKey(hotkey, mods, global);
@@ -3738,7 +3738,7 @@ static PyObject* SetButtonBAM(Button* btn, const char *ResRef, int CycleIndex, i
 		Picture = Picture->copy();
 
 		PaletteHolder newpal = Picture->GetPalette()->Copy();
-		const auto& pal16 = core->GetPalette16(col1);
+		const auto& pal16 = core->GetPalette16(static_cast<uint8_t>(col1));
 		newpal->CopyColorRange(&pal16[0],&pal16[12], 4);
 		Picture->SetPalette( newpal );
 	}
@@ -5141,8 +5141,9 @@ of the preset formations.\n\
 
 static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 {
-	int Formation, Which=-1;
-	PARSE_ARGS( args,  "i|i", &Formation, &Which );
+	ieWord Formation;
+	int Which = -1;
+	PARSE_ARGS(args, "H|i", &Formation, &Which);
 	GET_GAME();
 
 	if (Which<0) {
@@ -5609,16 +5610,16 @@ In the above example we set the player's name to a previously set Token (global 
 static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* pyName = nullptr;
-	int globalID, Which;
+	int globalID;
+	unsigned char whichName = 0;
 
-	Which = 0;
-	PARSE_ARGS( args,  "iO|i", &globalID, &pyName, &Which );
+	PARSE_ARGS(args, "iO|b", &globalID, &pyName, &whichName);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 	
 	String* name = PyString_AsStringObj(pyName);
 	assert(name);
-	actor->SetName(std::move(*name), Which);
+	actor->SetName(std::move(*name), whichName);
 	actor->SetMCFlag(MC_EXPORTABLE, BitOp::OR);
 	delete name;
 	Py_RETURN_NONE;
@@ -7460,7 +7461,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 			amount=si->AmountInStock;
 		}
 	}
-	si->PurchasedAmount=amount;
+	si->PurchasedAmount = static_cast<ieWord>(amount);
 	if (amount) {
 		si->Flags |= IE_INV_ITEM_SELECTED;
 	} else {
@@ -8789,8 +8790,9 @@ resref as the provided spell).\n\
 
 static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, SpellType, Level, Index, onlydepleted=0;
-	PARSE_ARGS( args,  "iiii|i", &globalID, &SpellType, &Level, &Index, &onlydepleted );
+	int globalID, SpellType, Level, Index;
+	uint8_t onlyDepleted = 0;
+	PARSE_ARGS(args, "iiii|b", &globalID, &SpellType, &Level, &Index, &onlyDepleted);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -8798,8 +8800,8 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject * /*self*/, PyObject* args)
 	if (! ms) {
 		return RuntimeError( "Spell not found!\n" );
 	}
-	if (onlydepleted)
-		return PyLong_FromLong(actor->spellbook.UnmemorizeSpell(ms->SpellResRef, false, onlydepleted));
+	if (onlyDepleted)
+		return PyLong_FromLong(actor->spellbook.UnmemorizeSpell(ms->SpellResRef, false, onlyDepleted));
 	else
 		return PyLong_FromLong(actor->spellbook.UnmemorizeSpell(ms));
 }
@@ -9807,11 +9809,11 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	const char *ResRef;
 	int Cycle = 0;
 	int Flags = 0x19;
-	int Height = 0x1e;
+	ieWordSigned Height = 0x1e;
 	//the animation is cloned by AddAnimation, so we can keep the original on
 	//the stack
 	AreaAnimation anim;
-	PARSE_ARGS( args,  "iis|iii", &anim.Pos.x, &anim.Pos.y, &ResRef, &Flags, &Cycle, &Height);
+	PARSE_ARGS( args,  "iis|iih", &anim.Pos.x, &anim.Pos.y, &ResRef, &Flags, &Cycle, &Height);
 
 	GET_GAME();
 
@@ -9821,7 +9823,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	anim.Name = ieVariable::MakeLowerCase(ResRef);
 	anim.BAM = ResRef;
 	anim.Flags=Flags;
-	anim.sequence=Cycle;
+	anim.sequence = static_cast<AreaAnimation::index_t>(Cycle);
 	anim.height=Height;
 	if (Flags&A_ANI_ACTIVE) {
 		map->AddAnimation(std::move(anim));
@@ -10511,7 +10513,7 @@ static void ReadActionButtons()
 	}
 }
 
-static void SetButtonCycle(AnimationFactory *bam, Button *btn, int cycle, unsigned char which)
+static void SetButtonCycle(AnimationFactory *bam, Button *btn, AnimationFactory::index_t cycle, unsigned char which)
 {
 	Holder<Sprite2D> tspr = bam->GetFrame(cycle, 0);
 	btn->SetImage((BUTTON_IMAGE_TYPE)which, tspr);
@@ -11265,7 +11267,7 @@ static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	actor->PCStats->QuickSpells[slot] = spelldata.spellName;
-	actor->PCStats->QuickSpellBookType[slot] = type;
+	actor->PCStats->QuickSpellBookType[slot] = static_cast<ieByte>(type);
 
 	return PyLong_FromLong(spelldata.Target);
 }
@@ -11299,14 +11301,17 @@ usually constant and taken care by the core\n\
 
 static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, which, slot, headerindex = 0;
-	PARSE_ARGS( args, "iii|i", &globalID, &which, &slot, &headerindex);
+	int globalID;
+	int which;
+	ieWord slot;
+	ieWord headerIndex = 0;
+	PARSE_ARGS(args, "iiH|H", &globalID, &which, &slot, &headerIndex);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
 	slot = core->QuerySlot(slot);
-	actor->SetupQuickSlot(which, slot, headerindex);
+	actor->SetupQuickSlot(which, slot, headerIndex);
 	Py_RETURN_NONE;
 }
 
@@ -12143,7 +12148,7 @@ The above example sets the weapon proficiencies in a bg2's CharGen9.py script.\n
 
 static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 {
-	int timing = FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
+	ieWord timing = FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	int globalID;
 	const char *opcodename;
 	int param1, param2;
@@ -12151,7 +12156,7 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	const char *resref2 = NULL;
 	const char *resref3 = NULL;
 	const char *source = NULL;
-	if (!PyArg_ParseTuple( args, "isii|ssssi",
+	if (!PyArg_ParseTuple(args, "isii|ssssH",
 			   &globalID, &opcodename, &param1, &param2,
 			   &resref1, &resref2, &resref3, &source, &timing)
 	) {

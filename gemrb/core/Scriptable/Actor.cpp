@@ -7782,7 +7782,7 @@ int Actor::GetFavoredPenalties() const
 
 	// finally compare adjacent levels - if they're more than 1 apart
 	int penalty = 0;
-	for (auto it = ++classLevels.begin(); it != classLevels.end(); ++it) {
+	for (auto it = std::next(classLevels.begin()); it != classLevels.end(); ++it) {
 		int level1 = *(--it);
 		int level2 = *(++it);
 		if (level2 - level1 > 1) penalty++;
