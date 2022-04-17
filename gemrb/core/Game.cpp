@@ -359,6 +359,11 @@ int Game::LeaveParty (Actor* actor)
 	}
 	std::vector< Actor*>::iterator m = PCs.begin() + slot;
 	PCs.erase( m );
+	// if it was the last selected creature, select someone else
+	// fixes training with Obe.dlg in Candlekeep not moving the viewport to outside
+	if (selected.empty()) {
+		SelectActor(PCs[0], true, SELECT_NORMAL);
+	}
 
 	ieDword id = actor->GetGlobalID();
 	for (auto pc : PCs) {
