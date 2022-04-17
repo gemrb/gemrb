@@ -5515,7 +5515,7 @@ void Actor::ReinitQuickSlots() const
 
 	int i=sizeof(PCStats->QSlots);
 	while (i--) {
-		int slot;
+		ieWord slot;
 		int which = IWD2GemrbQslot(i);
 
 		switch (which) {
@@ -5553,11 +5553,11 @@ void Actor::ReinitQuickSlots() const
 			SetupQuickSlot(which, 0xffff, 0xffff);
 		} else {
 			ieWord idx;
-			ieWord headerindex;
-			PCStats->GetSlotAndIndex(which,idx,headerindex);
-			if (idx != slot || headerindex == 0xffff) {
+			ieWord headerIndex;
+			PCStats->GetSlotAndIndex(which, idx, headerIndex);
+			if (idx != slot || headerIndex == 0xffff) {
 				// If slot just became filled, set it to filled
-				SetupQuickSlot(which,slot,0);
+				SetupQuickSlot(which, slot, 0);
 			}
 		}
 	}
@@ -5566,15 +5566,15 @@ void Actor::ReinitQuickSlots() const
 	CheckWeaponQuickSlot(0);
 	CheckWeaponQuickSlot(1);
 	if (weapSlotCount > 2) {
-		for(i=2; i<weapSlotCount; i++) {
+		for (unsigned int i = 2; i < weapSlotCount; i++) {
 			CheckWeaponQuickSlot(i);
 		}
 	} else {
-	//disabling quick weapon slots for certain classes
-		for(i=0;i<2;i++) {
-			int which = ACT_WEAPON3+i;
+		// disabling quick weapon slots for certain classes
+		for (unsigned int i = 0; i < 2; i++) {
+			ieByte which = ACT_WEAPON3 + i;
 			// Assuming that ACT_WEAPON3 and 4 are always in the first two spots
-			if (PCStats->QSlots[i+3]!=which) {
+			if (PCStats->QSlots[i + 3] != which) {
 				SetupQuickSlot(which, 0xffff, 0xffff);
 			}
 		}
