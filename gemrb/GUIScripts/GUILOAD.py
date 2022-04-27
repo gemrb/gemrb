@@ -192,8 +192,7 @@ def DeleteGameConfirm (btn):
 
 	if TopIndex > 0:
 		TopIndex = TopIndex - 1
-	ScrollBar.SetVarAssoc ("TopIndex", TopIndex - 1, 0, max(0, len(Games) - 4))
-	ScrollBarUpdated (ScrollBar)
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, max(0, len(Games) - 4))
 
 	if ConfirmWindow:
 		ConfirmWindow.Close ()
