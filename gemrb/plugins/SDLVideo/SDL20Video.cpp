@@ -68,17 +68,21 @@ SDL20VideoDriver::~SDL20VideoDriver() noexcept
 	if (SDL_GameControllerGetAttached(gameController)) {
 		SDL_GameControllerClose(gameController);
 	}
-	
+
 	// we must release all buffers before SDL_DestroyRenderer
 	// we cant rely on the base destructor here
 	scratchBuffer = nullptr;
 	DestroyBuffers();
-	
+
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
-	delete stencilShader;
-	delete spriteShader;
+#if USE_OPENGL_BACKEND
+	delete blitRGBAShader;
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+	delete blitRGBShader;
+#endif
+#endif
 }
 
 int SDL20VideoDriver::Init()
@@ -168,22 +172,46 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	glewInit();
 #endif
 
-	// must follow SDL_CreateRenderer
-	stencilShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/StencilF.glsl");
-	if (!stencilShader)
-	{
-		std::string msg = GLSLProgram::GetLastError();
-		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: {}", msg);
+	scratchBuffer = CreateBuffer(Region(Point(), screenSize), BufferFormat::DISPLAY_ALPHA);
+	scratchBuffer->Clear();
+
+	// Try to grab the texture shader program of SDL
+	static const SDL_Rect r = {0, 0, 1, 1};
+	SDL_RenderCopy(renderer, ScratchBuffer(), &r, &r);
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+	SDL_RenderFlush(renderer);
+#endif
+
+	GLuint rgbaProgramID = 0;
+	glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&rgbaProgramID));
+	assert(rgbaProgramID > 0);
+
+	// Now, replace this program's shader units
+	this->blitRGBAShader =
+		GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/BlitRGBA.glsl", rgbaProgramID);
+	if (!blitRGBAShader) {
+		Log(ERROR, "SDL 2 GL Driver", "RGBA shader setup failed: {}", GLSLProgram::GetLastError());
 		return GEM_ERROR;
 	}
 
-	spriteShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/GameSpriteF.glsl");
-	if (!spriteShader)
-	{
-		std::string msg = GLSLProgram::GetLastError();
-		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: {}", msg);
+// Before v2.0.10, there is no distinction between RGB and RGBA.
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+	GLuint rgbProgramID = 0;
+	auto rgbBuffer = CreateBuffer(Region(Point(), screenSize), BufferFormat::RGB555);
+	SDL_RenderCopy(renderer, std::static_pointer_cast<SDLTextureVideoBuffer>(rgbBuffer)->GetTexture(), &r, &r);
+	SDL_RenderFlush(renderer);
+	rgbBuffer.reset();
+
+	glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&rgbProgramID));
+	assert(rgbProgramID > 0 && rgbProgramID != rgbaProgramID);
+
+	this->blitRGBShader =
+		GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/BlitRGB.glsl", rgbProgramID);
+	if (!blitRGBShader) {
+		Log(ERROR, "SDL 2 GL Driver", "RGB shader setup failed: {}", GLSLProgram::GetLastError());
 		return GEM_ERROR;
 	}
+#endif
 #endif
 
 	// we set logical size so that platforms where the window can be a diffrent size then requested
@@ -242,32 +270,6 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
 {
 	assert(stencilBuffer);
 	return std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
-}
-
-// WARNING: these are necissary hacks to combine SDL_Renderer with OpenGL (or other) native calls
-void SDL20VideoDriver::BeginCustomRendering()
-{
-	// To start we need to make sure SDL thinks it is using its texture shader
-	// so that we can change the program without it knowing
-	static const SDL_Rect r = {0, 0, 1, 1};
-	SDL_RenderCopy(renderer, ScratchBuffer(), &r, &r);
-	// if we ever call more than glUseProgram (and associates) then we will need to do more here
-	// we may want to add a 'flags' parameter to conditionally clear the other states
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-	SDL_RenderFlush(renderer);
-#endif
-}
-
-void SDL20VideoDriver::EndCustomRendering()
-{
-	// to end we need SDL to "reset" the render state to restore the textrue shader
-	// we do this by changing the state to the primitive "solid" shader
-	SDL_RenderDrawPoint(renderer, -1, -1);
-	// if we ever call more than glUseProgram (and associates) then we will need to do more here
-	// we may want to add a 'flags' parameter to conditionally clear the other states
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-	SDL_RenderFlush(renderer);
-#endif
 }
 
 int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
@@ -338,44 +340,24 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 		// 3. blend texture to scratchpad
 		// 4. copy scratchpad segment to screen
 
-		SDL_Texture* stencilTex = CurrentStencilBuffer();
-		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
-
+#if USE_OPENGL_BACKEND
+		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+		SDL_RenderFlush(renderer);
+#endif
+#else
 		std::static_pointer_cast<SDLTextureVideoBuffer>(scratchBuffer)->Clear(drect); // sets the render target to the scratch buffer
 
+		SDL_Texture* stencilTex = CurrentStencilBuffer();
+		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 		RenderCopyShaded(texSprite, &srect, &drect, flags & ~(BlitFlags::ALPHA_MOD|BlitFlags::HALFTRANS), tint);
-		
+		// alpha masking only
 		SDL_Rect stencilRect = drect;
 		stencilRect.x -= stencilBuffer->Origin().x;
 		stencilRect.y -= stencilBuffer->Origin().y;
-
-#if USE_OPENGL_BACKEND
-		BeginCustomRendering();
-		GLint channel = 3;
-		if (flags&BlitFlags::STENCIL_RED) {
-			channel = 0;
-		} else if (flags&BlitFlags::STENCIL_GREEN) {
-			channel = 1;
-		} else if (flags&BlitFlags::STENCIL_BLUE) {
-			channel = 2;
-		}
-
-		stencilShader->Use();
-		stencilShader->SetUniformValue("u_channel", 1, channel);
-		if (flags & BlitFlags::STENCIL_DITHER) {
-			stencilShader->SetUniformValue("u_dither", 1, 1);
-		} else {
-			stencilShader->SetUniformValue("u_dither", 1, 0);
-		}
-		
-		stencilShader->SetUniformValue("s_stencil", 1, 0);
-
-		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
-		EndCustomRendering();
-#else
-		// alpha masking only
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
 #endif
+
 		if (flags & (BlitFlags::ALPHA_MOD | BlitFlags::HALFTRANS)) {
 			Uint8 alpha = SDL_ALPHA_OPAQUE;
 			if (flags & BlitFlags::ALPHA_MOD) {
@@ -415,21 +397,104 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 									   const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* tint)
 {
 #if USE_OPENGL_BACKEND
-	BeginCustomRendering();
-	spriteShader->Use();
-	if (flags&BlitFlags::GREY) {
-		spriteShader->SetUniformValue("u_greyMode", 1, 1);
-	} else if (flags&BlitFlags::SEPIA) {
-		spriteShader->SetUniformValue("u_greyMode", 1, 2);
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+	SDL_RenderFlush(renderer);
+#endif
+
+	uint32_t format = 0;
+	SDL_QueryTexture(texture, &format, nullptr, nullptr, nullptr);
+	GLSLProgram* currentShader = nullptr;
+	if (SDL_ISPIXELFORMAT_ALPHA(format)) {
+		blitRGBAShader->Use();
+		currentShader = blitRGBAShader;
 	} else {
-		spriteShader->SetUniformValue("u_greyMode", 1, 0);
+		blitRGBShader->Use();
+		currentShader = blitRGBShader;
+	}
+	
+	currentShader->SetUniformValue("s_sprite", 1, 0);
+	currentShader->SetUniformValue("s_stencil", 1, 1);
+
+	GLint greyMode = 0;
+	if (flags & BlitFlags::GREY) {
+		greyMode = 1;
+	} else if (flags & BlitFlags::SEPIA) {
+		greyMode = 2;
 	}
 
-	spriteShader->SetUniformValue("s_sprite", 1, 0);
-#else
-	// "shaders" were already applied via software (SDLSurfaceSprite2D::RenderWithFlags)
-	// they had to be applied very first so we could create a texture from the software rendering
+	currentShader->SetUniformValue("u_greyMode", 1, greyMode);
+
+	GLint channel = 3;
+	if (flags & BlitFlags::STENCIL_RED) {
+		channel = 0;
+	} else if (flags & BlitFlags::STENCIL_GREEN) {
+		channel = 1;
+	} else if (flags & BlitFlags::STENCIL_BLUE) {
+		channel = 2;
+	}
+
+	currentShader->SetUniformValue("u_channel", 1, channel);
+
+	bool doStencil = flags & BLIT_STENCIL_MASK;
+	currentShader->SetUniformValue("u_stencil", 1, doStencil ? 1 : 0);
+
+	if (doStencil) {
+		assert(stencilBuffer && dstrect);
+
+		bool doDither = flags & BlitFlags::STENCIL_DITHER;
+		currentShader->SetUniformValue("u_dither", 1, doDither ? 1 : 0);
+
+		int texW = 0, texH = 0;
+		SDL_QueryTexture(CurrentStencilBuffer(), nullptr, nullptr, &texW, &texH);
+
+		GLfloat stencilTexW = 1.0f, stencilTexH = 1.0f,
+			stencilTexX = 0.0f, stencilTexY = 0.0f;
+
+		float scaleX = 0.0f, scaleY = 0.0f;
+		SDL_RenderGetScale(renderer, &scaleX, &scaleY);
+		
+		SDL_Rect stencilRect = *dstrect;
+		stencilRect.x -= stencilBuffer->Origin().x;
+		stencilRect.y -= stencilBuffer->Origin().y;
+
+		if (stencilRect.x < dstrect->x && stencilRect.y < dstrect->y) {
+			stencilTexX = -dstrect->x;
+			stencilTexY = -dstrect->y;
+		}
+
+#if !SDL_VERSION_ATLEAST(2, 0, 18)
+		// In versions earler, SDL uses a different vertex setup in case
+		// of flipping: (-w/2, -h/2) to (w/2, h/2) that are transformed by
+		// the OpenGL backend via matrices.
+		if (flags & BlitFlags::MIRRORX) {
+			stencilTexX = dstrect->w / 2.0f + stencilRect.x;
+			stencilTexY = dstrect->h / 2.0f + stencilRect.y;
+		}
 #endif
+
+		stencilTexW = 1.0f / (texW * scaleX);
+		stencilTexH = 1.0f / (texH * scaleY);
+
+		GLfloat mat[3][3] = {
+			{ stencilTexW,        0.0f, 0.0f },
+			{        0.0f, stencilTexH, 0.0f },
+			{ stencilTexX * stencilTexW, stencilTexY * stencilTexH, 1.0f }
+		};
+
+		currentShader->SetUniformMatrixValue("u_stencilMat", 3, 1, reinterpret_cast<GLfloat*>(&mat));
+		
+		// Ask OpenGL about the texture handle (that lies hidden in SDL_Texture otherwise)
+		auto texture = std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
+		SDL_GL_BindTexture(texture, nullptr, nullptr);
+		GLuint stencilTextureID;
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, reinterpret_cast<GLint*>(&stencilTextureID));
+		SDL_GL_UnbindTexture(texture);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, stencilTextureID);
+	}
+#endif
+	
 	Uint8 alpha = SDL_ALPHA_OPAQUE;
 	if (flags & BlitFlags::ALPHA_MOD) {
 		alpha = tint->a;
@@ -456,15 +521,11 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	} else {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
 	}
-	
-	SDL_RendererFlip flipflags = (flags&BlitFlags::MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
-	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BlitFlags::MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
-	int ret = SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
-#if USE_OPENGL_BACKEND
-	EndCustomRendering();
-#endif
-	return ret;
+	SDL_RendererFlip flipflags = (flags & BlitFlags::MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags & BlitFlags::MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
+
+	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, nullptr, flipflags);
 }
 
 void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)

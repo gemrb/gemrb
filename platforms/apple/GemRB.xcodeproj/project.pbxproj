@@ -102,7 +102,6 @@
 		A22E6D6F2694A74D000675E4 /* SDL2.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A22E6D702694BEC7000675E4 /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
-		A231678023AA071E00D04811 /* GameSpriteF.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A231677E23AA071E00D04811 /* GameSpriteF.glsl */; };
 		A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
 		A232B0FE1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
 		A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */ = {isa = PBXBuildFile; fileRef = A232B0FC1A15B6E600E5342E /* GemMarkup.h */; };
@@ -398,6 +397,10 @@
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A2B67A6B16B1DFC100577415 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B67A6816B1DF6500577415 /* CoreFoundation.framework */; };
+		A2BC43382822246400BD4D73 /* BlitRGB.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A2BC43362822246400BD4D73 /* BlitRGB.glsl */; };
+		A2BC43392822246400BD4D73 /* BlitRGBA.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
+		A2BC433A28224A7B00BD4D73 /* BlitRGB.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2BC43362822246400BD4D73 /* BlitRGB.glsl */; };
+		A2BC433B28224A7B00BD4D73 /* BlitRGBA.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
 		A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */; };
 		A2C1DB82261674640024D213 /* PathFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D33FEC24C2035A0081AC31 /* PathFinder.cpp */; };
@@ -617,8 +620,6 @@
 		A2E66486139E907000310FC8 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2E7E194266897060064423F /* KeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E7E193266897060064423F /* KeyMap.cpp */; };
 		A2E7E1982668977F0064423F /* PluginLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E7E1962668977F0064423F /* PluginLoader.cpp */; };
-		A2E7EA1E266947160064423F /* StencilF.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2E7EA19266946AA0064423F /* StencilF.glsl */; };
-		A2E7EA1F266947160064423F /* GameSpriteF.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2E7EA1A266946AA0064423F /* GameSpriteF.glsl */; };
 		A2E7EA20266947160064423F /* SDLTextureV.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2E7EA1B266946AA0064423F /* SDLTextureV.glsl */; };
 		A2E9965314DE05590052BABE /* 2DAImporter.so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = A27E830A13A0358200B41410 /* 2DAImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2E9965414DE05590052BABE /* ACMReader.so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = A2FCD5FB13A0366100271997 /* ACMReader.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -1130,8 +1131,8 @@
 			dstPath = Shaders;
 			dstSubfolderSpec = 7;
 			files = (
-				A2E7EA1E266947160064423F /* StencilF.glsl in Copy Shaders */,
-				A2E7EA1F266947160064423F /* GameSpriteF.glsl in Copy Shaders */,
+				A2BC433A28224A7B00BD4D73 /* BlitRGB.glsl in Copy Shaders */,
+				A2BC433B28224A7B00BD4D73 /* BlitRGBA.glsl in Copy Shaders */,
 				A2E7EA20266947160064423F /* SDLTextureV.glsl in Copy Shaders */,
 			);
 			name = "Copy Shaders";
@@ -1229,7 +1230,6 @@
 		A22EBDCC14FF18030029C9C1 /* AppleLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLogger.h; sourceTree = "<group>"; };
 		A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleLogger.mm; sourceTree = "<group>"; };
 		A231677923A7267A00D04811 /* SDLSurfaceDrawing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDLSurfaceDrawing.h; sourceTree = "<group>"; };
-		A231677E23AA071E00D04811 /* GameSpriteF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GameSpriteF.glsl; sourceTree = "<group>"; };
 		A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GemMarkup.cpp; sourceTree = "<group>"; };
 		A232B0FC1A15B6E600E5342E /* GemMarkup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GemMarkup.h; sourceTree = "<group>"; };
 		A238174914B781CC0058BFF4 /* GemRB.cfg.newinstall */ = {isa = PBXFileReference; lastKnownFileType = text; name = GemRB.cfg.newinstall; path = ios/GemRB.cfg.newinstall; sourceTree = "<group>"; };
@@ -1261,7 +1261,6 @@
 		A265ECDB13A8661600C6DF12 /* PluginLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PluginLoader.cpp; path = ../gemrb/core/PluginLoader.cpp; sourceTree = SOURCE_ROOT; };
 		A265ECEB13A8669700C6DF12 /* SlicedStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SlicedStream.cpp; path = ../gemrb/core/System/SlicedStream.cpp; sourceTree = SOURCE_ROOT; };
 		A26ECB4B23A6903700D3DD59 /* SDLTextureV.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SDLTextureV.glsl; sourceTree = "<group>"; };
-		A26ECB4C23A6903800D3DD59 /* StencilF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = StencilF.glsl; sourceTree = "<group>"; };
 		A27217011CAE2678005F3976 /* Tooltip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tooltip.cpp; sourceTree = "<group>"; };
 		A27217021CAE2678005F3976 /* Tooltip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tooltip.h; sourceTree = "<group>"; };
 		A27368CF1A338E7200A8EEB8 /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
@@ -1502,6 +1501,8 @@
 		A2AAF39313A150F900AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
 		A2B67A6816B1DF6500577415 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		A2BC43362822246400BD4D73 /* BlitRGB.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BlitRGB.glsl; sourceTree = "<group>"; };
+		A2BC43372822246400BD4D73 /* BlitRGBA.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BlitRGBA.glsl; sourceTree = "<group>"; };
 		A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = VLCPlayer.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VLCPlayer.cpp; path = ../VLCPlayer/VLCPlayer.cpp; sourceTree = "<group>"; };
 		A2BD125915A7EE61000FAB95 /* VLCPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCPlayer.h; path = ../VLCPlayer/VLCPlayer.h; sourceTree = "<group>"; };
@@ -3872,8 +3873,6 @@
 		A2E7EA15266946730064423F /* GUICommonWindows.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICommonWindows.py; sourceTree = "<group>"; };
 		A2E7EA16266946730064423F /* DualClass.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = DualClass.py; sourceTree = "<group>"; };
 		A2E7EA17266946730064423F /* MetaClasses.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = MetaClasses.py; sourceTree = "<group>"; };
-		A2E7EA19266946AA0064423F /* StencilF.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = StencilF.glsl; sourceTree = "<group>"; };
-		A2E7EA1A266946AA0064423F /* GameSpriteF.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = GameSpriteF.glsl; sourceTree = "<group>"; };
 		A2E7EA1B266946AA0064423F /* SDLTextureV.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = SDLTextureV.glsl; sourceTree = "<group>"; };
 		A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDLSurfaceSprite2D.cpp; sourceTree = "<group>"; };
 		A2EC2F93176BD44C00FD960E /* SDLSurfaceSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLSurfaceSprite2D.h; sourceTree = "<group>"; };
@@ -5443,9 +5442,9 @@
 		A2E5A4B619992CC000CCE6D8 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				A231677E23AA071E00D04811 /* GameSpriteF.glsl */,
+				A2BC43362822246400BD4D73 /* BlitRGB.glsl */,
+				A2BC43372822246400BD4D73 /* BlitRGBA.glsl */,
 				A26ECB4B23A6903700D3DD59 /* SDLTextureV.glsl */,
-				A26ECB4C23A6903800D3DD59 /* StencilF.glsl */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -7819,8 +7818,6 @@
 		A2E7EA18266946AA0064423F /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				A2E7EA19266946AA0064423F /* StencilF.glsl */,
-				A2E7EA1A266946AA0064423F /* GameSpriteF.glsl */,
 				A2E7EA1B266946AA0064423F /* SDLTextureV.glsl */,
 			);
 			name = Shaders;
@@ -8957,7 +8954,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2BC43382822246400BD4D73 /* BlitRGB.glsl in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
+				A2BC43392822246400BD4D73 /* BlitRGBA.glsl in Resources */,
 				A218A75214A8F3DB001142CF /* gemrb.icns in Resources */,
 				A2E27EFC16F12B5A0079E104 /* GemRB.xib in Resources */,
 				A2FE2C7316F21CBF00DDC6C7 /* defaults.plist in Resources */,
@@ -8972,7 +8971,6 @@
 				A2A3A7E714A5130F00F705CF /* GEM_ConfController-ipad.xib in Resources */,
 				A2A3A7E814A5130F00F705CF /* GEM_ConfController-iphone.xib in Resources */,
 				A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */,
-				A231678023AA071E00D04811 /* GameSpriteF.glsl in Resources */,
 				A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */,
 				A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */,
 				A2FE2C7416F21CBF00DDC6C7 /* defaults.plist in Resources */,
