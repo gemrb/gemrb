@@ -397,9 +397,7 @@
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A2B67A6B16B1DFC100577415 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B67A6816B1DF6500577415 /* CoreFoundation.framework */; };
-		A2BC43382822246400BD4D73 /* BlitRGB.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A2BC43362822246400BD4D73 /* BlitRGB.glsl */; };
 		A2BC43392822246400BD4D73 /* BlitRGBA.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
-		A2BC433A28224A7B00BD4D73 /* BlitRGB.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2BC43362822246400BD4D73 /* BlitRGB.glsl */; };
 		A2BC433B28224A7B00BD4D73 /* BlitRGBA.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
 		A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */; };
@@ -1131,7 +1129,6 @@
 			dstPath = Shaders;
 			dstSubfolderSpec = 7;
 			files = (
-				A2BC433A28224A7B00BD4D73 /* BlitRGB.glsl in Copy Shaders */,
 				A2BC433B28224A7B00BD4D73 /* BlitRGBA.glsl in Copy Shaders */,
 				A2E7EA20266947160064423F /* SDLTextureV.glsl in Copy Shaders */,
 			);
@@ -1501,7 +1498,6 @@
 		A2AAF39313A150F900AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
 		A2B67A6816B1DF6500577415 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
-		A2BC43362822246400BD4D73 /* BlitRGB.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BlitRGB.glsl; sourceTree = "<group>"; };
 		A2BC43372822246400BD4D73 /* BlitRGBA.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BlitRGBA.glsl; sourceTree = "<group>"; };
 		A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = VLCPlayer.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VLCPlayer.cpp; path = ../VLCPlayer/VLCPlayer.cpp; sourceTree = "<group>"; };
@@ -5442,7 +5438,6 @@
 		A2E5A4B619992CC000CCE6D8 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				A2BC43362822246400BD4D73 /* BlitRGB.glsl */,
 				A2BC43372822246400BD4D73 /* BlitRGBA.glsl */,
 				A26ECB4B23A6903700D3DD59 /* SDLTextureV.glsl */,
 			);
@@ -8954,7 +8949,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2BC43382822246400BD4D73 /* BlitRGB.glsl in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				A2BC43392822246400BD4D73 /* BlitRGBA.glsl in Resources */,
 				A218A75214A8F3DB001142CF /* gemrb.icns in Resources */,

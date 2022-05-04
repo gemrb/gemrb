@@ -10,17 +10,21 @@ uniform int u_greyMode;
 uniform int u_channel;
 uniform int u_stencil;
 uniform int u_dither;
+uniform int u_rgba;
 
 void main() {
 	vec4 color = texture2D(s_sprite, v_texCoord) * v_color;
 	gl_FragColor = color;
+	if (u_rgba == 0) {
+		gl_FragColor.a = 1.0;
+	}
 
 	if (u_greyMode == 1) {
 		float grey = (color.r + color.g + color.b)*0.333333;
 		gl_FragColor = vec4(grey, grey, grey, color.a);
 	} else if (u_greyMode == 2) {
 		float grey = (color.r + color.g + color.b)*0.333333;
-		gl_FragColor = vec4(grey + (21.0/256.0), grey, max(0.0, grey - (32.0/256.0)), color.a);
+		gl_FragColor = vec4(grey + (21.0/256.0), grey, max(0.0, grey - (32.0/256.0)), gl_FragColor.a);
 	}
 
 	if (u_stencil == 1) {

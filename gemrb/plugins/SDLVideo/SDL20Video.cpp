@@ -79,9 +79,6 @@ SDL20VideoDriver::~SDL20VideoDriver() noexcept
 
 #if USE_OPENGL_BACKEND
 	delete blitRGBAShader;
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-	delete blitRGBShader;
-#endif
 #endif
 }
 
@@ -193,25 +190,6 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 		Log(ERROR, "SDL 2 GL Driver", "RGBA shader setup failed: {}", GLSLProgram::GetLastError());
 		return GEM_ERROR;
 	}
-
-// Before v2.0.10, there is no distinction between RGB and RGBA.
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-	GLuint rgbProgramID = 0;
-	auto rgbBuffer = CreateBuffer(Region(Point(), screenSize), BufferFormat::RGB555);
-	SDL_RenderCopy(renderer, std::static_pointer_cast<SDLTextureVideoBuffer>(rgbBuffer)->GetTexture(), &r, &r);
-	SDL_RenderFlush(renderer);
-	rgbBuffer.reset();
-
-	glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&rgbProgramID));
-	assert(rgbProgramID > 0 && rgbProgramID != rgbaProgramID);
-
-	this->blitRGBShader =
-		GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/BlitRGB.glsl", rgbProgramID);
-	if (!blitRGBShader) {
-		Log(ERROR, "SDL 2 GL Driver", "RGB shader setup failed: {}", GLSLProgram::GetLastError());
-		return GEM_ERROR;
-	}
-#endif
 #endif
 
 	// we set logical size so that platforms where the window can be a diffrent size then requested
@@ -403,17 +381,13 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 
 	uint32_t format = 0;
 	SDL_QueryTexture(texture, &format, nullptr, nullptr, nullptr);
-	GLSLProgram* currentShader = nullptr;
-	if (SDL_ISPIXELFORMAT_ALPHA(format)) {
-		blitRGBAShader->Use();
-		currentShader = blitRGBAShader;
-	} else {
-		blitRGBShader->Use();
-		currentShader = blitRGBShader;
-	}
+	blitRGBAShader->Use();
 	
-	currentShader->SetUniformValue("s_sprite", 1, 0);
-	currentShader->SetUniformValue("s_stencil", 1, 1);
+	blitRGBAShader->SetUniformValue("s_sprite", 1, 0);
+	blitRGBAShader->SetUniformValue("s_stencil", 1, 1);
+	
+	bool isRGBA = SDL_ISPIXELFORMAT_ALPHA(format);
+	blitRGBAShader->SetUniformValue("u_rgba", 1, isRGBA ? 1 : 0);
 
 	GLint greyMode = 0;
 	if (flags & BlitFlags::GREY) {
@@ -422,7 +396,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		greyMode = 2;
 	}
 
-	currentShader->SetUniformValue("u_greyMode", 1, greyMode);
+	blitRGBAShader->SetUniformValue("u_greyMode", 1, greyMode);
 
 	GLint channel = 3;
 	if (flags & BlitFlags::STENCIL_RED) {
@@ -433,16 +407,16 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		channel = 2;
 	}
 
-	currentShader->SetUniformValue("u_channel", 1, channel);
+	blitRGBAShader->SetUniformValue("u_channel", 1, channel);
 
 	bool doStencil = flags & BLIT_STENCIL_MASK;
-	currentShader->SetUniformValue("u_stencil", 1, doStencil ? 1 : 0);
+	blitRGBAShader->SetUniformValue("u_stencil", 1, doStencil ? 1 : 0);
 
 	if (doStencil) {
 		assert(stencilBuffer && dstrect);
 
 		bool doDither = flags & BlitFlags::STENCIL_DITHER;
-		currentShader->SetUniformValue("u_dither", 1, doDither ? 1 : 0);
+		blitRGBAShader->SetUniformValue("u_dither", 1, doDither ? 1 : 0);
 
 		int texW = 0, texH = 0;
 		SDL_QueryTexture(CurrentStencilBuffer(), nullptr, nullptr, &texW, &texH);
@@ -481,7 +455,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 			{ stencilTexX * stencilTexW, stencilTexY * stencilTexH, 1.0f }
 		};
 
-		currentShader->SetUniformMatrixValue("u_stencilMat", 3, 1, reinterpret_cast<GLfloat*>(&mat));
+		blitRGBAShader->SetUniformMatrixValue("u_stencilMat", 3, 1, reinterpret_cast<GLfloat*>(&mat));
 		
 		// Ask OpenGL about the texture handle (that lies hidden in SDL_Texture otherwise)
 		auto texture = std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
