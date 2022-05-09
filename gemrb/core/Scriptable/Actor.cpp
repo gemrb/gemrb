@@ -2272,9 +2272,9 @@ static void InitActorTables()
 						value = 0;
 					} else {
 						if (subracetable == -1) {
-							value = race->GetValue(tm->GetRowName(i).c_str());
+							value = race->GetValue(tm->GetRowName(i));
 						} else {
-							value = subrace->GetValue(tm->GetRowName(i).c_str());
+							value = subrace->GetValue(tm->GetRowName(i));
 						}
 					}
 					skillrac[i].push_back (value);
@@ -5039,14 +5039,14 @@ void Actor::Resurrect(const Point &destPoint)
 	//clear effects?
 }
 
-static const char *GetVarName(const ResRef& table, int value)
+static const std::string& GetVarName(const ResRef& table, int value)
 {
 	int symbol = core->LoadSymbol( table );
 	if (symbol!=-1) {
 		auto sym = core->GetSymbol( symbol );
 		return sym->GetValue( value );
 	}
-	return NULL;
+	return blank;
 }
 
 // [EA.FACTION.TEAM.GENERAL.RACE.CLASS.SPECIFIC.GENDER.ALIGN] has to be the same for both creatures
@@ -5414,8 +5414,8 @@ bool Actor::CheckOnDeath()
 	return false;
 }
 
-ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, const char *name, ieDword start) const {
-	if (name && name[0]) {
+ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, StringView name, ieDword start) const {
+	if (!name.empty()) {
 		ieVariable varname;
 		size_t len = varname.SNPrintF(format, name);
 		vars->Lookup(varname, start);

@@ -1046,17 +1046,12 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 	}
 
 	if (PyObject_TypeCheck(sym, &PyUnicode_Type)) {
-		const char* syms = PyString_AsString(sym);
-
-		long val = sm->GetValue( syms );
+		long val = sm->GetValue(PyString_AsStringView(sym));
 		return PyLong_FromLong(val);
 	}
 	if (PyObject_TypeCheck(sym, &PyLong_Type)) {
 		int symi = PyLong_AsLong(sym);
-
-		const char* str = sm->GetValue( symi );
-		ABORT_IF_NULL(str);
-		return PyString_FromString( str );
+		return PyString_FromStringView(sm->GetValue(symi));
 	}
 
 	return RuntimeError("Invalid ags");
@@ -4091,10 +4086,10 @@ be avoided. The hardcoded token list:\n\
 
 static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 {
-	char *Variable;
+	PyObject* Variable;
 	char *value;
-	PARSE_ARGS( args,  "ss", &Variable, &value );
-	core->GetTokenDictionary()->SetAt(Variables::key_t(Variable), value);
+	PARSE_ARGS( args,  "Os", &Variable, &value );
+	core->GetTokenDictionary()->SetAt(PyString_AsStringView(Variable), value);
 
 	Py_RETURN_NONE;
 }
@@ -4131,11 +4126,11 @@ core, these are described in different places:\n\
 
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
-	char *Variable;
+	PyObject* Variable;
 	unsigned long value;
-	PARSE_ARGS( args, "sk", &Variable, &value );
+	PARSE_ARGS(args, "Ok", &Variable, &value);
 
-	core->GetDictionary()->SetAt(Variables::key_t(Variable), (ieDword) value);
+	core->GetDictionary()->SetAt(PyString_AsStringView(Variable), (ieDword) value);
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
@@ -4188,15 +4183,15 @@ The above example will add the protagonist's name to the TextArea (if the token 
 
 static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 {
-	const char *Variable;
-	PARSE_ARGS( args,  "s", &Variable );
+	PyObject* Variable;
+	PARSE_ARGS(args,  "O", &Variable);
 
-	std::string value;
-	if (!core->GetTokenDictionary()->Lookup(Variables::key_t(Variable), value )) {
+	std::string str;
+	if (!core->GetTokenDictionary()->Lookup(PyString_AsStringView(Variable), str)) {
 		Py_RETURN_NONE;
 	}
 
-	return PyString_FromStringObj(value);
+	return PyString_FromStringObj(str);
 }
 
 PyDoc_STRVAR( GemRB_GetVar__doc,
@@ -4223,11 +4218,11 @@ controls could affect the same variable.\n\
 
 static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
-	const char *Variable;
+	PyObject* Variable;
 	ieDword value;
-	PARSE_ARGS( args, "s", &Variable );
+	PARSE_ARGS( args,  "O", &Variable );
 
-	if (!core->GetDictionary()->Lookup(Variables::key_t(Variable), value)) {
+	if (!core->GetDictionary()->Lookup(PyString_AsStringView(Variable), value)) {
 		return PyLong_FromLong(0);
 	}
 
@@ -4350,14 +4345,14 @@ is what gamescripts know as GLOBAL variables. \n\
 
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
-	const char *Variable;
+	PyObject* Variable;
 	ieDword value;
-	PARSE_ARGS( args, "s", &Variable );
+	PARSE_ARGS( args,  "O", &Variable );
 
 	GET_GAME();
 
-	if (!game->locals->Lookup(Variables::key_t(Variable), value )) {
-		return PyLong_FromLong((unsigned long) 0);
+	if (!game->locals->Lookup(PyString_AsStringView(Variable), value)) {
+		return PyLong_FromLong(0);
 	}
 
 	return PyLong_FromLong((unsigned long) value);
@@ -4389,12 +4384,13 @@ configuration variable was already set (saved in game ini).\n\
 
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
-	PyObject* pyres;
+	PyObject* string;
 	int flag = 0;
-	PARSE_ARGS( args,  "O|i", &pyres, &flag );
+	PARSE_ARGS( args,  "O|i", &string, &flag );
 
 	ieDword ind = 0;
-	ResRef resref = ResRefFromPy(pyres);
+
+	ResRef resref = ResRefFromPy(string);
 	//Lookup will leave the flag untouched if it doesn't exist yet
 	core->GetDictionary()->Lookup(resref, ind);
 	if (flag)

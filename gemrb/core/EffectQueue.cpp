@@ -60,13 +60,13 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 	});
 }
 
-static EffectDesc* FindEffect(const char* effectname)
+static EffectDesc* FindEffect(StringView effectname)
 {
-	if (!effectname || effectnames.empty()) {
+	if (effectname.empty() || effectnames.empty()) {
 		return nullptr;
 	}
 
-	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), [] (const void *a, const void *b) {
+	void *tmp = bsearch(effectname.c_str(), effectnames.data(), effectnames.size(), sizeof(EffectDesc), [] (const void *a, const void *b) {
 		return stricmp((const char *) a,((const EffectDesc *) b)->Name);
 	});
 
@@ -114,8 +114,8 @@ private:
 		}
 
 		for (int i = 0; i < MAX_EFFECTS; i++) {
-			const char* effectname = effectsTable->GetValue(i);
-			if (!effectname) continue; // past the table size or undefined effect
+			const auto& effectname = effectsTable->GetValue(i);
+			if (effectname.empty()) continue; // past the table size or undefined effect
 
 			EffectDesc* poi = FindEffect(effectname);
 			assert(poi != nullptr);
@@ -148,7 +148,7 @@ private:
 	void ResolveEffectRefImp(EffectRef &effect_reference) const
 	{
 		if (effect_reference.opcode == -1) {
-			const EffectDesc* ref = FindEffect(effect_reference.Name);
+			const EffectDesc* ref = FindEffect(StringView(effect_reference.Name));
 			if( ref && ref->opcode >= 0) {
 				effect_reference.opcode = ref->opcode;
 				return;

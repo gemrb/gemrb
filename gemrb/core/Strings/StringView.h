@@ -67,6 +67,10 @@ public:
 	size_t length() const noexcept {
 		return len;
 	}
+	
+	bool empty() const noexcept {
+		return len == 0;
+	}
 
 	const_iterator begin() const noexcept {
 		return data;

@@ -1177,42 +1177,45 @@ static const IDSLink idsnames[] = {
 
 static int NextTriggerObjectID = 0;
 
-static const TriggerLink* FindTrigger(const char* triggername)
+static const TriggerLink* FindTrigger(StringView triggername)
 {
-	if (!triggername) {
-		return NULL;
+	if (triggername.empty()) {
+		return nullptr;
 	}
-	int len = strlench( triggername, '(' );
+
+	int len = strlench(triggername.c_str(), '(');
 	for (int i = 0; triggernames[i].Name; i++) {
-		if (!strnicmp(triggernames[i].Name, triggername, len)) {
+		if (!strnicmp(triggernames[i].Name, triggername.c_str(), len)) {
 			return triggernames + i;
 		}
 	}
 	return NULL;
 }
 
-static const ActionLink* FindAction(const char* actionname)
+static const ActionLink* FindAction(StringView actionname)
 {
-	if (!actionname) {
-		return NULL;
+	if (actionname.empty()) {
+		return nullptr;
 	}
-	int len = strlench( actionname, '(' );
+
+	int len = strlench(actionname.c_str(), '(');
 	for (int i = 0; actionnames[i].Name; i++) {
-		if (!strnicmp(actionnames[i].Name, actionname, len)) {
+		if (!strnicmp(actionnames[i].Name, actionname.c_str(), len)) {
 			return actionnames + i;
 		}
 	}
 	return NULL;
 }
 
-static const ObjectLink* FindObject(const char* objectname)
+static const ObjectLink* FindObject(StringView objectname)
 {
-	if (!objectname) {
-		return NULL;
+	if (objectname.empty()) {
+		return nullptr;
 	}
-	int len = strlench( objectname, '(' );
+
+	int len = strlench(objectname.c_str(), '(');
 	for (int i = 0; objectnames[i].Name; i++) {
-		if (!strnicmp(objectnames[i].Name, objectname, len)) {
+		if (!strnicmp(objectnames[i].Name, objectname.c_str(), len)) {
 			return objectnames + i;
 		}
 	}
@@ -1375,11 +1378,11 @@ static void CleanupIEScript()
 
 static void printFunction(std::string& buffer, const std::shared_ptr<SymbolMgr>& table, int index)
 {
-	const char *str = table->GetStringIndex(index);
+	const auto& str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
 
-	int len = strchr(str,'(')-str;
-	if (len<0) {
+	size_t len = str.find_first_of('(');
+	if (len == std::string::npos) {
 		AppendFormat(buffer, "{} {}", value, str);
 	} else {
 		AppendFormat(buffer, "{} {:*^{}}", value, str, len);
@@ -1629,12 +1632,12 @@ void InitializeIEScript()
 			int i = overrideTriggersTable->GetValueIndex( j );
 			bool was_condition = (i & 0x4000);
 			i &= 0x3fff;
-			const char *trName = overrideTriggersTable->GetStringIndex(j);
+			const auto& trName = overrideTriggersTable->GetStringIndex(j);
 			if (i >= MAX_TRIGGERS) {
 				Log(ERROR, "GameScript", "Trigger {} ({}) is too high, ignoring", i, trName);
 				continue;
 			}
-			if (!NextTriggerObjectID && !stricmp(trName, "NextTriggerObject(O:Object*)")) {
+			if (!NextTriggerObjectID && !stricmp(trName.c_str(), "NextTriggerObject(O:Object*)")) {
 				NextTriggerObjectID = i;
 			}
 			const TriggerLink *poi = FindTrigger(trName);
@@ -2304,9 +2307,9 @@ int Trigger::Evaluate(Scriptable *Sender) const
 		return 0;
 	}
 	TriggerFunction func = triggers[triggerID];
-	const char *tmpstr=triggersTable->GetValue(triggerID);
-	if (!tmpstr) {
-		tmpstr=triggersTable->GetValue(triggerID|0x4000);
+	StringView tmpstr = triggersTable->GetValue(triggerID);
+	if (tmpstr.empty()) {
+		tmpstr = triggersTable->GetValue(triggerID|0x4000);
 	}
 	if (!func) {
 		triggers[triggerID] = GameScript::False;
@@ -2501,13 +2504,13 @@ Trigger* GenerateTrigger(std::string string)
 		negate = TF_NEGATE;
 	}
 	strpos_t len = string.find_first_of('(', start) + 1 - start; // including (
-	int i = triggersTable->FindString(string.c_str() + start, int(len));
+	int i = triggersTable->FindString(StringView(string.c_str() + start, len));
 	if (i<0) {
 		Log(ERROR, "GameScript", "Invalid scripting trigger: {}", string);
 		return NULL;
 	}
 	const char *src = string.c_str() + start + len;
-	const char *str = triggersTable->GetStringIndex(i) + len;
+	const char *str = triggersTable->GetStringIndex(i).c_str() + len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
 		Log(ERROR, "GameScript", "Malformed scripting trigger: {}", string);
@@ -2528,20 +2531,21 @@ Action* GenerateAction(std::string actionString)
 	int i = -1;
 	const char *str;
 	unsigned short actionID;
+	StringView key(actionString.data(), len);
 	if (overrideActionsTable) {
-		i = overrideActionsTable->FindString(actionString.c_str(), len);
+		i = overrideActionsTable->FindString(key);
 		if (i >= 0) {
-			str = overrideActionsTable->GetStringIndex( i )+len;
+			str = overrideActionsTable->GetStringIndex(i).c_str() + len;
 			actionID = overrideActionsTable->GetValueIndex(i);
 		}
 	}
 	if (i<0) {
-		i = actionsTable->FindString(actionString.c_str(), len);
+		i = actionsTable->FindString(key);
 		if (i < 0) {
 			Log(ERROR, "GameScript", "Invalid scripting action: {}", actionString);
 			return action;
 		}
-		str = actionsTable->GetStringIndex( i )+len;
+		str = actionsTable->GetStringIndex(i).c_str() + len;
 		actionID = actionsTable->GetValueIndex(i);
 	}
 	action = GenerateActionCore( src, str, actionID);
