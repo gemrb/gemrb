@@ -316,7 +316,7 @@ public:
 	/** returns slot of launcher weapon for projectile in specified slot */
 	int FindSlotRangedWeapon(ieDword slot) const;
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
-	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL) const;
+	int FindCandidateSlot(int slottype, size_t first_slot, const ResRef& resref = ResRef()) const;
 	/** Creates an item in the slot*/
 	void SetSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** Adds item to slot*/
