@@ -119,15 +119,16 @@ private:
 // they are temporary while we compete the transition to Python 3
 class PyStringWrapper {
 	wchar_t* buffer = nullptr;
-	const char* str = nullptr;
+	char* str = nullptr;
 	PyObject* object = nullptr;
+	Py_ssize_t len = 0;
 	
 public:
 	PyStringWrapper(PyObject* obj, const char* encoding) noexcept {
 		if (PyUnicode_Check(obj)) {
 			PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, encoding, "strict"); // Owned reference
 			if (temp_bytes != NULL) {
-				str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+				PyBytes_AsStringAndSize(temp_bytes, &str, &len);
 				object = temp_bytes; // needs to outlive our use of wrap.str
 			} else { // raw data...
 				PyErr_Clear();
@@ -135,10 +136,11 @@ public:
 				buffer = new wchar_t[buflen + 1];
 				Py_ssize_t strlen = PyUnicode_AsWideChar(obj, buffer, buflen);
 				buffer[strlen] = L'\0';
-				str = reinterpret_cast<const char*>(buffer);
+				str = reinterpret_cast<char*>(buffer);
+				len = strlen * sizeof(wchar_t);
 			}
 		} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
-			str = PyBytes_AS_STRING(obj);
+			PyBytes_AsStringAndSize(obj, &str, &len);
 		}
 	}
 	
@@ -155,13 +157,17 @@ public:
 		return str;
 	}
 	
+	operator StringView() const noexcept {
+		return StringView(str, len);
+	}
+	
 	~PyStringWrapper() noexcept {
 		Py_XDECREF(object);
 		delete[] buffer;
 	}
 };
 PyStringWrapper PyString_AsString(PyObject* obj);
-PyObject* PyString_FromString(const char* s);
+PyStringWrapper PyString_AsStringView(PyObject* obj);
 
 /*
  Conversions from PyObject
@@ -191,7 +197,9 @@ PyObject* PyLong_FromStrRef(ieStrRef);
 PyObject* PyString_FromResRef(const ResRef& resRef);
 
 PyObject* PyString_FromAnimID(const char* AnimID);
-	
+
+PyObject* PyString_FromString(const char* s);
+PyObject* PyString_FromStringView(StringView sv);
 PyObject* PyString_FromStringObj(const std::string&);
 PyObject* PyString_FromStringObj(const String&);
 

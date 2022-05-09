@@ -125,14 +125,14 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 	return pic;
 }
 
-PyStringWrapper PyString_AsString(PyObject* obj)
-{
-	return PyStringWrapper(obj, core->SystemEncoding);
-}
-
 PyObject* PyString_FromString(const char* s)
 {
 	return PyUnicode_Decode(s, strlen(s), core->TLKEncoding.encoding.c_str(), "strict");
+}
+
+PyObject* PyString_FromStringView(StringView sv)
+{
+	return PyUnicode_Decode(sv.c_str(), sv.length(), core->TLKEncoding.encoding.c_str(), "strict");;
 }
 
 // Like PyString_FromString(), but for ResRef
@@ -164,4 +164,18 @@ String* PyString_AsStringObj(PyObject* obj)
 	auto wrap = PyStringWrapper(obj, core->TLKEncoding.encoding.c_str());
 	return StringFromCString(wrap);
 }
+
+PyStringWrapper PyString_AsString(PyObject* obj)
+{
+	return PyStringWrapper(obj, core->SystemEncoding);
+}
+
+PyStringWrapper PyString_AsStringView(PyObject* obj)
+{
+	// TODO: this is the same as PyString_AsString
+	// it exists to diferentiate uses so that we can weed out PyString_AsString
+	// and replace them with PyUnicode_Decode or other alternatives
+	return PyStringWrapper(obj, core->SystemEncoding);
+}
+
 }
