@@ -28,12 +28,7 @@
 
 using namespace GemRB;
 
-IDSImporter::~IDSImporter(void)
-{
-	for (auto& ptr : ptrs) {
-		free(ptr);
-	}
-}
+const std::string blank;
 
 bool IDSImporter::Open(DataStream* str)
 {
@@ -49,30 +44,21 @@ bool IDSImporter::Open(DataStream* str)
 		str->Rewind();
 	}
 	while (true) {
-		char* line = ( char* ) malloc( 256 );
+		char line[256];
 		strret_t len = str->ReadLine( line, 256 );
 		if (len == -1) {
-			free( line );
 			break;
 		}
 		if (len == 0) {
-			free( line );
 			continue;
 		}
-		if (len < 256)
-			line = ( char * ) realloc( line, len + 1 );
 		
 		StringToLower(line, line + len, line);
 		char* cell = strtok(line, " ");
-		Pair p;
-		p.val = strtosigned<int>(cell, nullptr, 0);
+		int val = strtosigned<int>(cell, nullptr, 0);
 		cell = strtok(nullptr, " ");
-		p.str = cell;
 		if (cell != nullptr) {
-			ptrs.push_back( line );
-			pairs.push_back( p );
-		} else {
-			free( line );
+			pairs.emplace_back(val, cell);
 		}
 	}
 
@@ -80,30 +66,30 @@ bool IDSImporter::Open(DataStream* str)
 	return true;
 }
 
-int IDSImporter::GetValue(const char* txt) const
+int IDSImporter::GetValue(StringView txt) const
 {
-	for (const auto pair : pairs) {
-		if (stricmp(pair.str, txt) == 0) {
+	for (const auto& pair : pairs) {
+		if (stricmp(pair.str.c_str(), txt.c_str()) == 0) {
 			return pair.val;
 		}
 	}
 	return -1;
 }
 
-char* IDSImporter::GetValue(int val) const
+const std::string& IDSImporter::GetValue(int val) const
 {
-	for (const auto pair : pairs) {
+	for (const auto& pair : pairs) {
 		if (pair.val == val) {
 			return pair.str;
 		}
 	}
-	return NULL;
+	return blank;
 }
 
-char* IDSImporter::GetStringIndex(size_t Index) const
+const std::string& IDSImporter::GetStringIndex(size_t Index) const
 {
 	if (Index >= pairs.size()) {
-		return NULL;
+		return blank;
 	}
 	return pairs[Index].str;
 }
@@ -116,11 +102,11 @@ int IDSImporter::GetValueIndex(size_t Index) const
 	return pairs[Index].val;
 }
 
-int IDSImporter::FindString(const char *str, int len) const
+int IDSImporter::FindString(StringView str) const
 {
 	int i = static_cast<int>(pairs.size());
 	while(i--) {
-		if (strnicmp(pairs[i].str, str, len) == 0) {
+		if (strnicmp(pairs[i].str.c_str(), str.c_str(), str.length()) == 0) {
 			return i;
 		}
 	}

@@ -22,32 +22,34 @@
 #define IDSIMPORTER_H
 
 #include "SymbolMgr.h"
+#include "Strings/StringView.h"
 
 #include <vector>
 
 namespace GemRB {
 
-struct Pair {
-	int val;
-	char* str;
-};
-
 class IDSImporter : public SymbolMgr {
 private:
-	std::vector< Pair> pairs;
-	std::vector< char*> ptrs;
+	struct Pair {
+		int val;
+		std::string str;
+		
+		Pair(int val, std::string str)
+		: val(val), str(std::move(str))
+		{}
+	};
+
+	std::vector<Pair> pairs;
 
 public:
 	IDSImporter() noexcept = default;
-	IDSImporter(const IDSImporter&) = delete;
-	~IDSImporter() override;
-	IDSImporter& operator=(const IDSImporter&) = delete;
+
 	bool Open(DataStream* stream) override;
-	int GetValue(const char* txt) const override;
-	char* GetValue(int val) const override;
-	char* GetStringIndex(size_t Index) const override;
+	int GetValue(StringView txt) const override;
+	const std::string& GetValue(int val) const override;
+	const std::string& GetStringIndex(size_t Index) const override;
 	int GetValueIndex(size_t Index) const override;
-	int FindString(const char *str, int len) const override;
+	int FindString(StringView str) const override;
 	int FindValue(int val) const override;
 	size_t GetSize() const override { return pairs.size(); }
 	int GetHighestValue() const override;

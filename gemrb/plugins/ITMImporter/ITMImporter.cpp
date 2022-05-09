@@ -58,8 +58,8 @@ static void Initializer()
 	TableMgr::index_t zzcount = tm2->GetRowCount();
 	for (TableMgr::index_t i = 0; i < zzcount; i++) {
 		const char *rowname = tm2->GetRowName(i).c_str();
-		const char *field = tm2->QueryField(i, 0).c_str();
-		int val = atoi(field);
+		const auto& field = tm2->QueryField(i, 0);
+		int val = atoi(field.c_str());
 		if (val == 0) {
 			// not numeric, do an IDS lookup
 			val = sm->GetValue(field);

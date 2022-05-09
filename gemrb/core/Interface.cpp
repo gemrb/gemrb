@@ -4350,7 +4350,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	if (!sym) {
 		error("Core", "Cannot load statistic name mappings.");
 	}
-	ieDword stat = (ieDword) sym->GetValue( stat_name );
+	ieDword stat = sym->GetValue(StringView(stat_name));
 	if (stat==(ieDword) ~0) {
 		Log(WARNING, "Core", "Cannot translate symbol: {}", stat_name);
 	}
