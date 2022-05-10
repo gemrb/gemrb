@@ -230,13 +230,13 @@ bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 }
 
 //returns count of memorized spells of a given name/type
-int Spellbook::CountSpells(const char *resref, unsigned int type, int flag) const
+int Spellbook::CountSpells(const ResRef& resref, unsigned int type, int flag) const
 {
 	int i = type;
 	int max = i + 1;
 	int count = 0;
 
-	if (!resref[0]) {
+	if (resref.IsEmpty()) {
 		return 0;
 	}
 

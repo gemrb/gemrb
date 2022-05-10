@@ -228,20 +228,20 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	PathJoin(dtmp, Path, slotname, nullptr);
 
 	char ftmp[_MAX_PATH];
-	PathJoinExt(ftmp, dtmp, core->GameNameResRef, "bmp");
+	PathJoinExt(ftmp, dtmp, core->GameNameResRef.CString(), "bmp");
 
 	if (access( ftmp, R_OK )) {
 		Log(WARNING, "SaveGameIterator", "Ignoring slot {} because of no appropriate preview!", dtmp);
 		return false;
 	}
 
-	PathJoinExt(ftmp, dtmp, core->WorldMapName[0], "wmp");
+	PathJoinExt(ftmp, dtmp, core->WorldMapName[0].CString(), "wmp");
 	if (access( ftmp, R_OK )) {
 		return false;
 	}
 
 	if (core->WorldMapName[1]) {
-		PathJoinExt(ftmp, dtmp, core->WorldMapName[1], "wmp");
+		PathJoinExt(ftmp, dtmp, core->WorldMapName[1].CString(), "wmp");
 		if (access(ftmp, R_OK)) {
 			Log(WARNING, "SaveGameIterator", "Ignoring slot {} because of no appropriate second worldmap!", dtmp);
 			return false;
@@ -336,7 +336,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 			prtrt++;
 	} while (++dir);
 
-	return MakeHolder<SaveGame>(Path, savegameName, core->GameNameResRef, slotname, prtrt, savegameNumber);
+	return MakeHolder<SaveGame>(Path, savegameName, core->GameNameResRef.CString(), slotname, prtrt, savegameNumber);
 }
 
 void SaveGameIterator::PruneQuickSave(const char *folder) const
@@ -446,7 +446,7 @@ static bool DoSaveGame(const char *Path, bool overrideRunning)
 	// scale down to get more of the screen and reduce the size
 	preview = core->GetVideoDriver()->SpriteScaleDown(preview, 5);
 	FileStream outfile;
-	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
+	outfile.Create( Path, core->GameNameResRef.CString(), IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
 
 	return true;

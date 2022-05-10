@@ -454,7 +454,7 @@ void Variables::Remove(const key_t& key)
 	FreeAssoc(pAssoc);
 }
 
-void Variables::LoadInitialValues(const char* name)
+void Variables::LoadInitialValues(const ResRef& name)
 {
 	char nPath[_MAX_PATH];
 	// we only support PST's var.var for now
@@ -478,7 +478,7 @@ void Variables::LoadInitialValues(const char* name)
 		if (!fs.Read(buffer, 40)) return;
 		if (fs.ReadDword(value) != 4) return;
 		// is it the type we want? if not, skip
-		if (strnicmp(buffer, name, 6) != 0) continue;
+		if (!name.StartsWith(buffer, 6)) continue;
 		// copy variable (types got 2 extra spaces, and the name is padded too)
 		// (true = uppercase, needed for original engine save compat, see 315b8f2e)
 		varname = MakeVariable(StringView(buffer + 8));

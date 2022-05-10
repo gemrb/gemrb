@@ -892,7 +892,7 @@ bool Game::CheckForReplacementActor(size_t i)
 
 	ResRef newcre = "****"; // default table value
 	for (auto nl : npclevels) {
-		if (!stricmp(nl[0], act->GetScriptName()) && (level > 2)) {
+		if (act->GetScriptName().StartsWith(nl[0].CString(), 8) && level > 2) {
 			// the tables have entries only up to level 24
 			ieDword safeLevel = static_cast<ieDword>(npclevels[0].size());
 			if (level < safeLevel) {

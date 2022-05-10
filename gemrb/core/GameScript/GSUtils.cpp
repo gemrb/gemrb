@@ -490,7 +490,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	if (soundpath == nullptr || soundpath[0] == '\0') {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
 		if (!sb.Sound.IsEmpty()) {
-			strlcpy(buffer, sb.Sound, sizeof(buffer));
+			strlcpy(buffer, sb.Sound.CString(), sizeof(buffer));
 			soundpath = buffer;
 		}
 		if (!sb.text.empty()) {

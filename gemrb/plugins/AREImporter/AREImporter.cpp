@@ -1401,19 +1401,19 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 			//add autonote.ini entries
 			if( INInote ) {
-				const char *scriptName = map->GetScriptName();
-				int count = INInote->GetKeyAsInt(scriptName, "count", 0);
+				const ieVariable& scriptName = map->GetScriptName();
+				int count = INInote->GetKeyAsInt(scriptName.CString(), "count", 0);
 				while (count) {
 					ieVariable key;
 					int value;
 					key.SNPrintF("xPos%d", count);
-					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					value = INInote->GetKeyAsInt(scriptName.CString(), key.CString(), 0);
 					point.x = value;
 					key.SNPrintF("yPos%d", count);
-					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					value = INInote->GetKeyAsInt(scriptName.CString(), key.CString(), 0);
 					point.y = value;
 					key.SNPrintF("text%d", count);
-					value = INInote->GetKeyAsInt(scriptName, key.CString(), 0);
+					value = INInote->GetKeyAsInt(scriptName.CString(), key.CString(), 0);
 					map->AddMapNote(point, 0, ieStrRef(value), true);
 					count--;
 				}
@@ -1915,7 +1915,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WritePoint(d->toOpen[1]);
 		stream->WriteStrRef(d->OpenStrRef);
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
-			stream->Write( d->LinkedInfo, 24);
+			stream->WriteString(d->LinkedInfo, 24);
 		} else {
 			stream->WriteVariable(d->LinkedInfo);
 		}
@@ -2323,7 +2323,7 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 	for (ieWord i = 0; i < realCount; i++) {
 		const Ambient *am = map->GetAmbient(i);
 		if (am->flags & IE_AMBI_NOSAVE) continue;
-		stream->Write( am->name, 32 );
+		stream->WriteVariable(am->name);
 		tmpWord = (ieWord) am->origin.x;
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) am->origin.y;

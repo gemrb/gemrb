@@ -271,7 +271,7 @@ void Inventory::SetSlotCount(unsigned int size)
 }
 
 /** if you supply a "" string, then it checks if the slot is empty */
-bool Inventory::HasItemInSlot(const char *resref, unsigned int slot) const
+bool Inventory::HasItemInSlot(const ResRef& resref, unsigned int slot) const
 {
 	if (slot >= Slots.size()) {
 		return false;
@@ -279,9 +279,6 @@ bool Inventory::HasItemInSlot(const char *resref, unsigned int slot) const
 	const CREItem *item = Slots[slot];
 	if (!item) {
 		return false;
-	}
-	if (!resref[0]) {
-		return true;
 	}
 	if (item->ItemResRef == resref) {
 		return true;

@@ -592,7 +592,7 @@ public:
 	ieDword QuerySlotID(unsigned int idx) const;
 	ieDword QuerySlotFlags(unsigned int idx) const;
 	ieDword QuerySlotEffects(unsigned int idx) const;
-	const char * QuerySlotResRef(unsigned int idx) const;
+	const ResRef& QuerySlotResRef(unsigned int idx) const;
 	int GetArmorFailure(unsigned int itemtype) const;
 	int GetShieldFailure(unsigned int itemtype) const;
 	int GetArmorPenalty(unsigned int itemtype) const;

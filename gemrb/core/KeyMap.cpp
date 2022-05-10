@@ -152,7 +152,7 @@ bool KeyMap::ResolveName(const char* name, int group) const
 	}
 
 	Log(MESSAGE, "KeyMap", "RunFunction({}::{})", fun->moduleName, fun->function);
-	core->GetGUIScriptEngine()->RunFunction(fun->moduleName, fun->function);
+	core->GetGUIScriptEngine()->RunFunction(fun->moduleName.CString(), fun->function.CString());
 	return true;
 }
 

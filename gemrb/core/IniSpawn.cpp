@@ -78,13 +78,13 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 		return;
 	}
 
-	NamelessSpawnArea = ResRef(inifile->GetKeyAsString("nameless", "destare", DefaultArea));
+	NamelessSpawnArea = ResRef(inifile->GetKeyAsString("nameless", "destare", DefaultArea.CString()));
 	const char* s = inifile->GetKeyAsString("nameless","point","[0.0]");
 	if (sscanf(s, "[%d.%d]", &NamelessSpawnPoint.x, &NamelessSpawnPoint.y) != 2) {
 		NamelessSpawnPoint.reset();
 	}
 
-	PartySpawnArea = ResRef(inifile->GetKeyAsString("nameless", "partyarea", DefaultArea));
+	PartySpawnArea = ResRef(inifile->GetKeyAsString("nameless", "partyarea", DefaultArea.CString()));
 	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
 	if (sscanf(s, "[%d.%d]", &PartySpawnPoint.x, &PartySpawnPoint.y) != 2) {
 		PartySpawnPoint = NamelessSpawnPoint;

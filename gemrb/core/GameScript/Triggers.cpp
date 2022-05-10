@@ -1111,7 +1111,7 @@ int GameScript::HasItemSlot(Scriptable *Sender, const Trigger *parameters)
 	}
 
 	//this might require a conversion of the slots
-	if (actor->inventory.HasItemInSlot(parameters->string0Parameter, parameters->int0Parameter) ) {
+	if (actor->inventory.HasItemInSlot(parameters->resref0Parameter, parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
@@ -2727,7 +2727,7 @@ int GameScript::AreaCheck(Scriptable *Sender, const Trigger *parameters)
 	const Map *area = Sender->GetCurrentArea();
 	if (!area) return 0;
 
-	if (!strnicmp(area->GetScriptName(), parameters->string0Parameter, 8)) {
+	if (area->GetScriptRef() == parameters->resref0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2744,7 +2744,7 @@ int GameScript::AreaCheckObject(Scriptable *Sender, const Trigger *parameters)
 	if (!map) {
 		return 0;
 	}
-	if (!strnicmp(map->GetScriptName(), parameters->string0Parameter, 8)) {
+	if (map->GetScriptRef() == parameters->string0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3128,7 +3128,7 @@ int GameScript::CalledByName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (stricmp(actor->GetScriptName(), parameters->string0Parameter) != 0) {
+	if (actor->GetScriptName() != parameters->variable0Parameter) {
 		return 0;
 	}
 	return 1;
@@ -3143,7 +3143,7 @@ int GameScript::CharName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	
-	const String* str = StringFromCString(parameters->string0Parameter);
+	const String* str = StringFromCString(parameters->string0Parameter.CString());
 	if (str) {
 		int ret = actor->GetShortName() == *str;
 		delete str;
@@ -4591,7 +4591,7 @@ int GameScript::CurrentAmmo(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	return actor->inventory.HasItemInSlot(parameters->string0Parameter, ammoslot);
+	return actor->inventory.HasItemInSlot(parameters->resref0Parameter, ammoslot);
 }
 
 }

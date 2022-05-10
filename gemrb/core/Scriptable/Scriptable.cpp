@@ -652,7 +652,7 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword scriptableID)
 	assert(triggerID < MAX_TRIGGERS);
 	if (triggerflags[triggerID] & TF_SAVED) {
 		//TODO: if LastTrigger is still overwritten by script action blocks, store this in a separate field and copy it back when the block ends
-		const char *name = "none";
+		ieVariable name = "none";
 		if (area) {
 			const Scriptable* scr = area->GetScriptableByGlobalID(scriptableID);
 			if (scr) {

@@ -1902,7 +1902,7 @@ static Object* DecodeObject(const char* line)
 		line++; //Skip "
 	ParseString(line, oB->objectName.begin());
 	// HACK for iwd2 AddExperiencePartyCR
-	if (!stricmp(oB->objectName, "0.0.0.0 ")) {
+	if (oB->objectName == "0.0.0.0 ") {
 		oB->objectName.Reset();
 		Log(DEBUG, "GameScript", "overriding: +{}+", oB->objectName);
 	}

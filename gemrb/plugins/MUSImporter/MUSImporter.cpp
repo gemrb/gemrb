@@ -269,16 +269,16 @@ void MUSImporter::PlayMusic(int pos)
 void MUSImporter::PlayMusic(const ieVariable& name)
 {
 	char FName[_MAX_PATH];
-	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
+	if (name.StartsWith("mx9000", 6)) { //iwd2
 		PathJoin(FName, "mx9000", name, nullptr);
-	} else if (strnicmp( name, "mx0000", 6 ) == 0) { //iwd
+	} else if (name.StartsWith("mx0000", 6)) { //iwd
 		PathJoin(FName, "mx0000", name, nullptr);
-	} else if (strnicmp( name, "SPC", 3 ) != 0) { //bg2
+	} else if (!name.StartsWith("SPC", 3)) { //bg2
 		char File[_MAX_PATH];
 		fmt::format_to(File, "{}{}", PLName, name);
-		PathJoin(FName, PLName, File, nullptr);
+		PathJoin(FName, PLName.CString(), File, nullptr);
 	} else {
-		strlcpy(FName, name, _MAX_PATH);
+		strlcpy(FName, name.CString(), _MAX_PATH);
 	}
 
 	ResourceHolder<SoundMgr> sound = GetResourceHolder<SoundMgr>(FName, manager, true);

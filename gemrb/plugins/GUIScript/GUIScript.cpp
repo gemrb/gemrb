@@ -3033,7 +3033,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 		PyDict_SetItemString(dict, "Distance", PyLong_FromLong(-1));
 		return dict;
 	}
-	PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, wal->DestEntryPoint));
+	PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromStringView, wal->DestEntryPoint));
 	PyDict_SetItemString(dict, "Direction", DecRef(PyLong_FromLong, wal->DirectionFlags));
 	distance = wm->GetDistance(wmc->Area->AreaName);
 
@@ -3059,7 +3059,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 	ResRef tmpresref = linkdest->AreaResRef;
 	if (core->GetGame()->RandomEncounter(tmpresref)) {
 		displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-		PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, tmpresref));
+		PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromStringView, tmpresref));
 		PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
 		distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
 		wm->SetEncounterArea(tmpresref, wal);
@@ -5584,7 +5584,7 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 		case 1:
 			return PyString_FromStringObj(actor->GetLongName());
 		case 2:
-			return PyString_FromString(actor->GetScriptName());
+			return PyString_FromStringView(actor->GetScriptName());
 		case -1:
 		default:
 			return PyString_FromStringObj(actor->GetDefaultName());
@@ -5816,7 +5816,7 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 		goto continue_quest;
 	}
 has_slot:
-	PyDict_SetItemString(dict, "ResRef", DecRef(PyString_FromString, core->QuerySlotResRef(tmp)));
+	PyDict_SetItemString(dict, "ResRef", DecRef(PyString_FromStringView, core->QuerySlotResRef(tmp)));
 continue_quest:
 	PyDict_SetItemString(dict, "Effects", DecRef(PyLong_FromLong, core->QuerySlotEffects(tmp)));
 	return dict;
@@ -8212,13 +8212,13 @@ in PC's spellbook. If flag is set then spent spells are also count.\n\
 static PyObject* GemRB_CountSpells(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, SpellType = -1;
-	char *SpellResRef;
+	PyObject* SpellResRef;
 	int Flag = 0;
-	PARSE_ARGS( args,  "is|ii", &globalID, &SpellResRef, &SpellType, &Flag);
+	PARSE_ARGS(args,  "iO|ii", &globalID, &SpellResRef, &SpellType, &Flag);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	return PyLong_FromLong(actor->spellbook.CountSpells( SpellResRef, SpellType, Flag));
+	return PyLong_FromLong(actor->spellbook.CountSpells(ResRefFromPy(SpellResRef), SpellType, Flag));
 }
 
 PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
@@ -13777,7 +13777,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 
 	PyObject* obj = ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
 	if (!obj) return RuntimeError("Failed to construct object");
-	PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromString, ref->ScriptingGroup()));
+	PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromStringView, ref->ScriptingGroup()));
 	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
 	
 	static PyObject* controlClass = PyDict_GetItemString(pGUIClasses, "GControl");
@@ -13786,7 +13786,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	if (PyObject_IsInstance(obj, controlClass)) {
 		const Control* ctl = ScriptingRefCast<Control>(ref);
 		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
-		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->DictVariable()));
+		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromStringView, ctl->DictVariable()));
 		Control::value_t val = ctl->GetValue();
 		if (val == Control::INVALID_VALUE) {
 			PyObject_SetAttrString(obj, "Value", Py_None);
