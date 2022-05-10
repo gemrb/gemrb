@@ -139,15 +139,11 @@ public:
 		strncpy(str + len, std::begin(s), LEN - len);
 	}
 
-	template<typename T>
-	typename std::enable_if<std::is_integral<T>::value, const char&>::type
-	operator[](T i) const noexcept {
+	const char& operator[](index_t i) const noexcept {
 		return str[i];
 	}
 
-	template<typename T>
-	typename std::enable_if<std::is_integral<T>::value, char&>::type
-	operator[](T i) noexcept {
+	char& operator[](index_t i) noexcept {
 		return str[i];
 	}
 	
