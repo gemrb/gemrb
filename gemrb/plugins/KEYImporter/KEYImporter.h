@@ -67,7 +67,7 @@ struct HashKey<MapKey> {
 	static inline uint32_t hash(const ResRef& ref, SClass_ID type)
 	{
 		unsigned long h = type;
-		const char *c = ref;
+		const char *c = ref.CString();
 
 		for (unsigned int i = 0; *c && i < 9; ++i)
 			h = (h << 5) + h + tolower(*c++);
@@ -86,7 +86,7 @@ struct HashKey<MapKey> {
 		if (a.type != type)
 			return false;
 
-		return stricmp(a.ref, ref) == 0;
+		return a.ref == ref;
 	}
 
 	static inline bool equals(const MapKey &a, const MapKey &b)

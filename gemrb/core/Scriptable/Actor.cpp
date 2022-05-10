@@ -1791,8 +1791,7 @@ static void InitActorTables()
 			if (IsStar(d_splash[i])) {
 				d_splash[i].Reset();
 			}
-			tmp = tm->QueryField(i, COL_GRADIENT);
-			d_gradient[i]=atoi(tmp);
+			d_gradient[i] = tm->QueryFieldSigned<int>(i, COL_GRADIENT);
 		}
 	}
 

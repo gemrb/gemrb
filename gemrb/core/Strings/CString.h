@@ -195,10 +195,6 @@ public:
 		return str[0] == '\0';
 	}
 	
-	operator const char*() const noexcept {
-		return str;
-	}
-	
 	explicit operator bool() const noexcept {
 		return str[0] != '\0';
 	}

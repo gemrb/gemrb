@@ -173,7 +173,7 @@ public:
 	bool HaveSpell(const ResRef &resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
 
-	int CountSpells(const char *resref, unsigned int type, int flag) const;
+	int CountSpells(const ResRef& resref, unsigned int type, int flag) const;
 	/** Check if the spell is in the book */
 	bool KnowSpell(const ResRef& resref) const;
 	bool KnowSpell(int spellid) const;

@@ -66,7 +66,7 @@ public:
 	Variables(const Variables&) = delete;
 	~Variables();
 	Variables& operator=(const Variables&) = delete;
-	void LoadInitialValues(const char* name);
+	void LoadInitialValues(const ResRef& name);
 
 	// Attributes
 	//sets the way we handle keys, no parsing for .ini file entries, parsing for game variables

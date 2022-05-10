@@ -2455,7 +2455,7 @@ Actor *Map::GetItemByDialog(const ResRef &resref) const
 Actor *Map::GetActorByResource(const ResRef& resref) const
 {
 	for (auto actor : actors) {
-		if (actor->GetScriptName().StartsWith(resref, 8)) { //temporarily!
+		if (actor->GetScriptName().StartsWith(resref.CString(), 8)) { //temporarily!
 			return actor;
 		}
 	}

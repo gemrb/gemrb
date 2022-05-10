@@ -654,7 +654,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 	str->Read (Signature, 8);
 	str->ReadVariable(name);
 	if (name[0]) {
-		String* str = StringFromCString(name);
+		String* str = StringFromCString(name.CString());
 		assert(str);
 		act->SetName(std::move(*str), 0); //setting longname
 		delete str;
@@ -2903,10 +2903,10 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 {
 	Variables::iterator pos=NULL;
+	Variables::key_t name;
 	ieDword tmpDword, value;
 
 	for (unsigned int i=0;i<VariablesCount;i++) {
-		Variables::key_t name;
 		pos = actor->locals->GetNextAssoc(pos, name, value);
 		stream->WriteFilling(8);
 		tmpDword = FAKE_VARIABLE_OPCODE;

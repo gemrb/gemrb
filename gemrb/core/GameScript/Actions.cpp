@@ -471,14 +471,12 @@ void GameScript::SetTeamBit(Scriptable* Sender, Action* parameters)
 void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* ip = Sender;
-	const char* name = "null";
 
 	if (parameters->objects[1]) {
 		ip = GetScriptableFromObject(Sender, parameters->objects[1]);
-		name = parameters->objects[1]->objectName;
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", name);
+		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
 	InfoPoint *trigger = static_cast<InfoPoint*>(ip);
@@ -5346,7 +5344,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 	if (!(flags & MSO_IGNORE_SEE) && actor && !CanSee(Sender, actor, true, 0) ) {
 		return;
 	}
-	size_t len = strlen(parameters->string0Parameter);
+	uint8_t len = parameters->string0Parameter.CStrLen();
 	//
 	if (len&3) {
 		return;
@@ -5776,7 +5774,7 @@ void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	door->LinkedInfo = MakeVariable(parameters->string0Parameter);
+	door->LinkedInfo = parameters->variable0Parameter;
 }
 
 /*getting a handle of a temporary actor resource to copy its selected attributes*/

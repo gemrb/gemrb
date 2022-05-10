@@ -968,7 +968,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			equipment = EquipResRefData();
 
 			//we need this long for special anims
-			NewResRef = ResRefBase;
+			NewResRef = ResRefBase.CString();
 			GetAnimResRef(stanceID, Orient, NewResRef, Cycle, part, equipment);
 		} else {
 			// Equipment animation parts
@@ -1402,7 +1402,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 		case IE_ANI_PST_GHOST: // pst static animations
 			//still doesn't handle the second cycle of the golem anim
 			Cycle = 0;
-			NewResRef = AvatarTable[AvatarsRowNum].Prefixes[Part];
+			NewResRef = AvatarTable[AvatarsRowNum].Prefixes[Part].CString();
 			break;
 		default:
 			error("CharAnimations", "Unknown animation type in avatars.2da row: {}", AvatarsRowNum);
@@ -1934,7 +1934,7 @@ void CharAnimations::GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
 	if (offhand) {
 		dest += "o";
 	}
-	dest += equip.Suffix;
+	dest += equip.Suffix.CString();
 }
 
 void CharAnimations::AddSixSuffix(std::string& dest, unsigned char StanceID,
@@ -2180,13 +2180,13 @@ void CharAnimations::GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
 		dest += equipRef[0];
 		dest += equipRef[1];
 		dest += "o";
-		dest += equip.Suffix;
+		dest += equip.Suffix.CString();
 	} else {
 		dest = "wp";
 		dest += GetSize();
 		dest += equipRef[0];
 		dest += equipRef[1];
-		dest += equip.Suffix;
+		dest += equip.Suffix.CString();
 	}
 }
 
@@ -2497,7 +2497,7 @@ void CharAnimations::GetLREquipmentRef(std::string& dest, unsigned char& Cycle,
 	Cycle = equip.Cycle;
 	dest = ResRefBase.CString();
 	dest += equipRef[0];
-	dest += equip.Suffix;
+	dest += equip.Suffix.CString();
 }
 
 //Only for the ogre animation (MOGR)
