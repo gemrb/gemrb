@@ -937,7 +937,7 @@ static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx
 	fx->Parameter3 = bonus;
 }
 
-static inline void PlayRemoveEffect(const char *defsound, const Actor *target, const Effect* fx)
+static inline void PlayRemoveEffect(const Actor *target, const Effect* fx, const char *defsound = nullptr)
 {
 	core->GetAudioDrv()->Play(fx->Resource.IsEmpty() ? defsound : fx->Resource.CString(),
 			SFX_CHAN_ACTIONS, target->Pos);
@@ -5535,7 +5535,7 @@ int fx_bounce_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_bounce_spellevel_dec(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1 < 1 || STATE_GET(STATE_DEAD)) {
-		PlayRemoveEffect("EFF_E02", target, fx);
+		PlayRemoveEffect(target, fx, "EFF_E02");
 		return FX_NOT_APPLIED;
 	}
 
@@ -5549,7 +5549,7 @@ int fx_protection_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* 
 {
 	// print("fx_protection_spelllevel_dec(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1<1) {
-		PlayRemoveEffect("EFF_E02", target, fx);
+		PlayRemoveEffect(target, fx, "EFF_E02");
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR( IE_IMMUNITY, IMM_LEVEL_DEC );
@@ -5623,7 +5623,7 @@ int fx_resist_spell_dec (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 	// print("fx_resist_spell_dec(%2d): Resource: %s", fx->Opcode, fx->Resource);
 
 	if (fx->Parameter1<1) {
-		PlayRemoveEffect("EFF_E02", target, fx);
+		PlayRemoveEffect(target, fx, "EFF_E02");
 		return FX_NOT_APPLIED;
 	}
 
@@ -5649,7 +5649,7 @@ int fx_bounce_spell_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_bounce_spell(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1<1) {
-		PlayRemoveEffect("EFF_E02", target, fx);
+		PlayRemoveEffect(target, fx, "EFF_E02");
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_RESOURCE_DEC );
@@ -5936,7 +5936,7 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_stoneskin_modifier(%2d): Mod: %d", fx->Opcode, fx->Parameter1);
 	if (!fx->Parameter1) {
-		PlayRemoveEffect("EFF_E02",target, fx);
+		PlayRemoveEffect(target, fx, "EFF_E02");
 		return FX_NOT_APPLIED;
 	}
 
@@ -5999,7 +5999,7 @@ int fx_protection_school_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_protection_school_dec(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1<1) {
 		//The original doesn't have anything here
-		PlayRemoveEffect(NULL, target, fx);
+		PlayRemoveEffect(target, fx);
 		return FX_NOT_APPLIED;
 	}
 
@@ -6042,7 +6042,7 @@ int fx_protection_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effe
 	// print("fx_protection_secondary_type_dec(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1<1) {
 		//The original doesn't have anything here
-		PlayRemoveEffect(NULL, target, fx);
+		PlayRemoveEffect(target, fx);
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR( IE_IMMUNITY, IMM_SECTYPE_DEC );
@@ -6055,7 +6055,7 @@ int fx_bounce_school_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_bounce_school_dec(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1<1) {
 		//The original doesn't have anything here
-		PlayRemoveEffect(NULL, target, fx);
+		PlayRemoveEffect(target, fx);
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_SCHOOL_DEC );
@@ -6069,7 +6069,7 @@ int fx_bounce_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effect* 
 	// print("fx_bounce_secondary_type_dec(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1<1) {
 		//The original doesn't have anything here
-		PlayRemoveEffect(NULL, target, fx);
+		PlayRemoveEffect(target, fx);
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR_PCF( IE_BOUNCE, BNC_SECTYPE_DEC );
@@ -7673,7 +7673,7 @@ int fx_golem_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* f
 {
 	// print("fx_golem_stoneskin_modifier(%2d): Mod: %d", fx->Opcode, fx->Parameter1);
 	if (!fx->Parameter1) {
-		PlayRemoveEffect("EFF_E02",target, fx);
+		PlayRemoveEffect(target, fx, "EFF_E02");
 		return FX_NOT_APPLIED;
 	}
 	//dead actors lose this effect
