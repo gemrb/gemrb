@@ -180,12 +180,12 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	return true;
 }
 
-bool KEYImporter::HasResource(const char* resname, SClass_ID type)
+bool KEYImporter::HasResource(StringView resname, SClass_ID type)
 {
 	return resources.has(ResRef(resname), type);
 }
 
-bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
+bool KEYImporter::HasResource(StringView resname, const ResourceDesc &type)
 {
 	return HasResource(resname, type.GetKeyType());
 }
@@ -224,13 +224,13 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 	return NULL;
 }
 
-DataStream* KEYImporter::GetResource(const char* resname, SClass_ID type)
+DataStream* KEYImporter::GetResource(StringView resname, SClass_ID type)
 {
 	//the word masking is a hack for synonyms, currently used for bcs==bs
 	return GetStream(ResRef(resname), type&0xFFFF);
 }
 
-DataStream* KEYImporter::GetResource(const char* resname, const ResourceDesc &type)
+DataStream* KEYImporter::GetResource(StringView resname, const ResourceDesc &type)
 {
 	return GetStream(ResRef(resname), type.GetKeyType());
 }

@@ -30,7 +30,7 @@ public:
 	NullSound(void);
 	~NullSound(void) override;
 	bool Init(void) override;
-	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
+	Holder<SoundHandle> Play(StringView ResRef, unsigned int channel,
 		const Point&, unsigned int flags = 0, tick_t *length = nullptr) override;
 	int CreateStream(std::shared_ptr<SoundMgr>) override;
 	bool Play() override;

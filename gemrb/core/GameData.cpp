@@ -382,7 +382,7 @@ Holder<Sprite2D> GameData::GetAnySprite(const ResRef& resRef, int cycle, int fra
 }
 
 // FIXME: should this just take a ResRef?
-FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type, bool silent)
+FactoryObject* GameData::GetFactoryResource(StringView resname, SClass_ID type, bool silent)
 {
 	ResRef resref = ResRef(resname);
 	int fobjindex = factory->IsLoaded(resref, type);
@@ -424,11 +424,6 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 		Log(MESSAGE, "KEYImporter", "{} files are not supported!", core->TypeExt(type));
 		return nullptr;
 	}
-}
-
-FactoryObject* GameData::GetFactoryResource(const ResRef& resname, SClass_ID type, bool silent)
-{
-	return GetFactoryResource(resname.CString(), type, silent);
 }
 
 void GameData::AddFactoryResource(FactoryObject* res)

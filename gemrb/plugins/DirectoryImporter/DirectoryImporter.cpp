@@ -39,49 +39,43 @@ bool DirectoryImporter::Open(const char *dir, const char *desc)
 	return true;
 }
 
-static bool FindIn(const char *Path, const char *ResRef, const char *Type)
+static bool FindIn(const char *Path, StringView ResRef, const char *Type)
 {
-	char p[_MAX_PATH], f[_MAX_PATH] = {0};
-	if (strlcpy(f, ResRef, _MAX_PATH) >= _MAX_PATH) {
-		Log(ERROR, "DirectoryImporter", "Too long filename: {}!", ResRef);
-		return false;
-	}
+	char p[_MAX_PATH] = {0};
+	std::string f(ResRef.c_str(), ResRef.length());
 	StringToLower(f);
 
-	return PathJoinExt(p, Path, f, Type);
+	return PathJoinExt(p, Path, f.c_str(), Type);
 }
 
-static FileStream *SearchIn(const char * Path,const char * ResRef, const char *Type)
+static FileStream *SearchIn(const char * Path, StringView ResRef, const char *Type)
 {
-	char p[_MAX_PATH], f[_MAX_PATH] = {0};
-	if (strlcpy(f, ResRef, _MAX_PATH) >= _MAX_PATH) {
-		Log(ERROR, "DirectoryImporter", "Too long filename2: {}!", ResRef);
-		return NULL;
-	}
+	char p[_MAX_PATH] = {0};
+	std::string f(ResRef.c_str(), ResRef.length());
 	StringToLower(f);
 
-	if (!PathJoinExt(p, Path, f, Type))
-		return NULL;
+	if (!PathJoinExt(p, Path, f.c_str(), Type))
+		return nullptr;
 
 	return FileStream::OpenFile(p);
 }
 
-bool DirectoryImporter::HasResource(const char* resname, SClass_ID type)
+bool DirectoryImporter::HasResource(StringView resname, SClass_ID type)
 {
 	return FindIn( path, resname, core->TypeExt(type) );
 }
 
-bool DirectoryImporter::HasResource(const char* resname, const ResourceDesc &type)
+bool DirectoryImporter::HasResource(StringView resname, const ResourceDesc &type)
 {
 	return FindIn( path, resname, type.GetExt() );
 }
 
-DataStream* DirectoryImporter::GetResource(const char* resname, SClass_ID type)
+DataStream* DirectoryImporter::GetResource(StringView resname, SClass_ID type)
 {
 	return SearchIn( path, resname, core->TypeExt(type) );
 }
 
-DataStream* DirectoryImporter::GetResource(const char* resname, const ResourceDesc &type)
+DataStream* DirectoryImporter::GetResource(StringView resname, const ResourceDesc &type)
 {
 	return SearchIn( path, resname, type.GetExt() );
 }
@@ -126,29 +120,29 @@ void CachedDirectoryImporter::Refresh()
 	} while (++it);
 }
 
-static std::string ConstructFilename(const char* resname, const char* ext)
+static std::string ConstructFilename(StringView resname, const char* ext)
 {
 	assert(strnlen(ext, 5) < 5);
-	std::string buf = resname;
+	std::string buf(resname.c_str(), resname.length());
 	StringToLower(buf);
 	buf.push_back('.');
 	buf += ext;
 	return buf;
 }
 
-bool CachedDirectoryImporter::HasResource(const char* resname, SClass_ID type)
+bool CachedDirectoryImporter::HasResource(StringView resname, SClass_ID type)
 {
 	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
 	return cache.has(filename.c_str());
 }
 
-bool CachedDirectoryImporter::HasResource(const char* resname, const ResourceDesc &type)
+bool CachedDirectoryImporter::HasResource(StringView resname, const ResourceDesc &type)
 {
 	const std::string& filename = ConstructFilename(resname, type.GetExt());
 	return cache.has(filename.c_str());
 }
 
-DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID type)
+DataStream* CachedDirectoryImporter::GetResource(StringView resname, SClass_ID type)
 {
 	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
 	const std::string *s = cache.get(filename.c_str());
@@ -160,7 +154,7 @@ DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID 
 	return FileStream::OpenFile(buf);
 }
 
-DataStream* CachedDirectoryImporter::GetResource(const char* resname, const ResourceDesc &type)
+DataStream* CachedDirectoryImporter::GetResource(StringView resname, const ResourceDesc &type)
 {
 	const std::string& filename = ConstructFilename(resname, type.GetExt());
 	const std::string *s = cache.get(filename.c_str());

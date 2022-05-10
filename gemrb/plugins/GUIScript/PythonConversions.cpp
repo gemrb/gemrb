@@ -115,7 +115,7 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 {
 	Holder<Sprite2D> pic;
 	if (PyObject_TypeCheck( pypic, &PyUnicode_Type )) {
-		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(PyString_AsString(pypic));
+		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(PyString_AsStringView(pypic));
 		if (im) {
 			pic = im->GetSprite2D();
 		}

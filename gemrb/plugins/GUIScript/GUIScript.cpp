@@ -2188,11 +2188,11 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		case IE_GUI_WORLDMAP:
 		{
 			PyObject* fontname = nullptr;
-			char *anim = nullptr;
+			PyObject* anim = nullptr;
 			PyObject* pyColorNormal = nullptr;
 			PyObject* pyColorSelected = nullptr;
 			PyObject* pyColorNotVisited = nullptr;
-			PARSE_ARGS(constructArgs, "|ssOOO", &fontname, &anim, &pyColorNormal, &pyColorSelected, &pyColorNotVisited);
+			PARSE_ARGS(constructArgs, "|OOOOO", &fontname, &anim, &pyColorNormal, &pyColorSelected, &pyColorNotVisited);
 			
 			Font* font = fontname ? core->GetFont(ResRefFromPy(fontname)) : nullptr;
 			WorldMapControl* wmap = nullptr;
@@ -2202,7 +2202,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 				wmap = new WorldMapControl(rgn, font);
 			}
 			
-			const AnimationFactory* bam = (AnimationFactory*) gamedata->GetFactoryResource(anim, IE_BAM_CLASS_ID);
+			const AnimationFactory* bam = (AnimationFactory*) gamedata->GetFactoryResource(PyString_AsStringView(anim), IE_BAM_CLASS_ID);
 			if (bam) {
 				wmap->areaIndicator = bam->GetFrame(0, 0);
 			}
@@ -2527,13 +2527,16 @@ setting the IE_GUI_BUTTON_NO_IMAGE flag on the control.\n\
 static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 {
 	int cycle, unpressed, pressed, selected, disabled;
-	char *ResRef;
-	if (PyArg_ParseTuple( args, "Osiiiii", &self,
-						  &ResRef, &cycle, &unpressed,
+	PyObject* pyref;
+	if (PyArg_ParseTuple( args, "OOiiiii", &self,
+						  &pyref, &cycle, &unpressed,
 						  &pressed, &selected, &disabled )
 	) {
 		Button* btn = GetView<Button>(self);
 		ABORT_IF_NULL(btn);
+		
+		auto wrapper = PyString_AsStringView(pyref);
+		StringView ResRef = wrapper;
 
 		if (ResRef[0] == 0) {
 			btn->SetImage( BUTTON_IMAGE_NONE, NULL );
@@ -3629,17 +3632,20 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 {
 	ieDword col[8];
 	int type = 0;
-	char *ResRef;
+	PyObject* pyref;
 
 	memset(col,-1,sizeof(col));
-	if (!PyArg_ParseTuple( args, "Osiiiiiiii|i", &self,
-			&ResRef, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
+	if (!PyArg_ParseTuple( args, "OOiiiiiiii|i", &self,
+			&pyref, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
 			&(col[4]), &(col[5]), &(col[6]), &(col[7]), &type) ) {
 		return NULL;
 	}
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
+	
+	auto wrapper = PyString_AsStringView(pyref);
+	StringView ResRef = wrapper;
 
 	//empty image
 	if (ResRef[0] == 0 || ResRef[0]=='*') {
@@ -3714,7 +3720,7 @@ uses 12 colors palette, it has issues in PST.\n\
 **See also:** [Button_SetPLT](Button_SetPLT.md), [Button_SetPicture](Button_SetPicture.md), [Button_SetSprites](Button_SetSprites.md)"
 );
 
-static PyObject* SetButtonBAM(Button* btn, const char *ResRef, int CycleIndex, int FrameIndex, int col1)
+static PyObject* SetButtonBAM(Button* btn, StringView ResRef, int CycleIndex, int FrameIndex, int col1)
 {
 	ABORT_IF_NULL(btn);
 
@@ -3753,12 +3759,12 @@ static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
 	int CycleIndex;
 	int FrameIndex;
 	int col1 = -1;
-	char *ResRef;
-	PARSE_ARGS( args,  "Osii|i", &self,
-			   &ResRef, &CycleIndex, &FrameIndex, &col1 );
+	PyObject* ResRef;
+	PARSE_ARGS(args,  "OOii|i", &self,
+			   &ResRef, &CycleIndex, &FrameIndex, &col1);
 
 	Button* btn = GetView<Button>(self);
-	PyObject *ret = SetButtonBAM(btn, ResRef, CycleIndex, FrameIndex,col1);
+	PyObject *ret = SetButtonBAM(btn, PyString_AsStringView(ResRef), CycleIndex, FrameIndex,col1);
 	if (ret) {
 		Py_INCREF(ret);
 	}
@@ -3893,7 +3899,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	//get soundset based string constant
 	std::string sound = fmt::format("{}/{}{:02d}", actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
 	channel = actor->InParty ? SFX_CHAN_CHAR0 + actor->InParty - 1 : SFX_CHAN_DIALOG;
-	core->GetAudioDrv()->Play(sound.c_str(), channel, Point(), GEM_SND_RELATIVE|GEM_SND_SPEECH);
+	core->GetAudioDrv()->Play(sound, channel, Point(), GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	Py_RETURN_NONE;
 }
 
@@ -3923,7 +3929,6 @@ sound as if it was said by that PC (EAX).\n\
 
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
-	char *ResRef;
 	char *channel_name = NULL;
 	Point pos;
 	unsigned int flags = GEM_SND_RELATIVE;
@@ -3937,7 +3942,8 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 		core->PlaySound(index, channel);
 	} else {
 		PyErr_Clear(); //clearing the exception
-		if (!PyArg_ParseTuple(args, "z|ziii", &ResRef, &channel_name, &pos.x, &pos.y, &flags)) {
+		PyObject* pyref = nullptr;
+		if (!PyArg_ParseTuple(args, "O|ziii", &pyref, &channel_name, &pos.x, &pos.y, &flags)) {
 			return AttributeError( GemRB_PlaySound__doc );
 		}
 
@@ -3945,7 +3951,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 			channel = core->GetAudioDrv()->GetChannel(channel_name);
 		}
 
-		core->GetAudioDrv()->Play(ResRef, channel, pos, flags);
+		core->GetAudioDrv()->Play(PyString_AsStringView(pyref), channel, pos, flags);
 	}
 
 	Py_RETURN_NONE;
@@ -10625,11 +10631,11 @@ PyDoc_STRVAR( GemRB_HasResource__doc,
 
 static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 {
-	const char *ResRef;
+	PyObject* ResRef = nullptr;
 	int ResType;
 	int silent = 0;
-	PARSE_ARGS( args,  "si|i", &ResRef, &ResType, &silent );
-	RETURN_BOOL(gamedata->Exists(ResRef, ResType, silent));
+	PARSE_ARGS( args,  "Oi|i", &ResRef, &ResType, &silent );
+	RETURN_BOOL(gamedata->Exists(PyString_AsStringView(ResRef), ResType, silent));
 }
 
 PyDoc_STRVAR( GemRB_Window_SetupEquipmentIcons__doc,

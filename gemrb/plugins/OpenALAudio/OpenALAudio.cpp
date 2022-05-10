@@ -371,14 +371,14 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	delete ambim;
 }
 
-ALuint OpenALAudioDriver::loadSound(const char *ResRef, tick_t &time_length)
+ALuint OpenALAudioDriver::loadSound(StringView ResRef, tick_t &time_length)
 {
 	ALuint Buffer = 0;
 
 	CacheEntry *e;
 	void* p;
 
-	if (!ResRef[0]) {
+	if (ResRef.empty()) {
 		return 0;
 	}
 	
@@ -435,12 +435,12 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, tick_t &time_length)
 	return Buffer;
 }
 
-Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int channel, const Point& p,
+Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int channel, const Point& p,
 	unsigned int flags, tick_t *length)
 {
 	ALuint Buffer;
 
-	if (ResRef == NULL || !ResRef[0]) {
+	if (ResRef.empty()) {
 		if((flags & GEM_SND_SPEECH) && (speech.Source && alIsSource(speech.Source))) {
 			//So we want him to be quiet...
 			alSourceStop( speech.Source );

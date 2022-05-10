@@ -32,22 +32,22 @@ bool NullSource::Open(const char *, const char *desc)
 	return true;
 }
 
-bool NullSource::HasResource(const char*, SClass_ID)
+bool NullSource::HasResource(StringView, SClass_ID)
 {
 	return false;
 }
 
-bool NullSource::HasResource(const char*, const ResourceDesc&)
+bool NullSource::HasResource(StringView, const ResourceDesc&)
 {
 	return false;
 }
 
-DataStream* NullSource::GetResource(const char*, SClass_ID)
+DataStream* NullSource::GetResource(StringView, SClass_ID)
 {
 	return NULL;
 }
 
-DataStream* NullSource::GetResource(const char*, const ResourceDesc&)
+DataStream* NullSource::GetResource(StringView, const ResourceDesc&)
 {
 	return NULL;
 }

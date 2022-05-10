@@ -99,9 +99,9 @@ public:
 public:
 	Audio(void);
 	virtual bool Init(void) = 0;
-	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
+	virtual Holder<SoundHandle> Play(StringView ResRef, unsigned int channel,
 	const Point&, unsigned int flags = 0, tick_t *length = nullptr) = 0;
-	Holder<SoundHandle> PlayRelative(const char* ResRef, unsigned int channel, tick_t *length = 0)
+	Holder<SoundHandle> PlayRelative(StringView ResRef, unsigned int channel, tick_t *length = 0)
 			{ return Play(ResRef, channel, Point(), GEM_SND_RELATIVE, length); }
 	
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }

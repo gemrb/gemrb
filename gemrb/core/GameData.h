@@ -131,8 +131,7 @@ public:
 	Holder<Sprite2D> GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent = true);
 
 	/** returns factory resource, currently works only with animations */
-	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type, bool silent=false);
-	FactoryObject* GetFactoryResource(const ResRef& resname, SClass_ID type, bool silent = false);
+	FactoryObject* GetFactoryResource(const StringView resname, SClass_ID type, bool silent=false);
 
 	void AddFactoryResource(FactoryObject* res);
 
@@ -231,13 +230,13 @@ template <class T>
 using ResourceHolder = std::shared_ptr<T>;
 
 template <class T>
-inline ResourceHolder<T> GetResourceHolder(const char* resname, bool silent = false, bool useCorrupt = false)
+inline ResourceHolder<T> GetResourceHolder(StringView resname, bool silent = false, bool useCorrupt = false)
 {
 	return ResourceHolder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
 }
 
 template <class T>
-inline ResourceHolder<T> GetResourceHolder(const char* resname, const ResourceManager& manager, bool silent = false)
+inline ResourceHolder<T> GetResourceHolder(StringView resname, const ResourceManager& manager, bool silent = false)
 {
 	return ResourceHolder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
 }

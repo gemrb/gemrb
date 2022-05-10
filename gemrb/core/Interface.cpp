@@ -686,7 +686,7 @@ int Interface::LoadSprites()
 		std::string fileName;
 		while (CursorCount < 99) {
 			fileName = fmt::format("{}{:02}", MainCursorsImage, CursorCount);
-			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName.c_str(), true);
+			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
 			if (!im) break;
 			Cursors.push_back(im->GetSprite2D());
 			CursorCount++;
@@ -762,7 +762,7 @@ int Interface::LoadFonts()
 		const auto& rowName = tab->GetRowName(row);
 
 		ResRef resref = tab->QueryField(rowName, "RESREF");
-		const char* font_name = tab->QueryField( rowName, "FONT_NAME" ).c_str();
+		const auto& font_name = tab->QueryField(rowName, "FONT_NAME");
 		ieWord font_size = tab->QueryFieldUnsigned<ieWord>( rowName, "PX_SIZE" ); // not available in BAM fonts.
 		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ).c_str() ); // not available in BAM fonts.
 		bool background = atoi(tab->QueryField(rowName, "BACKGRND").c_str());
@@ -1341,7 +1341,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 	if (resdata || HasFeature(GF_SOUNDS_INI) ) {
 		Log(MESSAGE, "Core", "Loading resource data File...");
 		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		DataStream* ds = gamedata->GetResource(resdata? "resdata":"sounds", IE_INI_CLASS_ID);
+		StringView sv(resdata ? "resdata" : "sounds");
+		DataStream* ds = gamedata->GetResource(sv, IE_INI_CLASS_ID);
 		if (!INIresdata->Open(ds)) {
 			Log(WARNING, "Core", "Failed to load resource data.");
 		}
@@ -1878,7 +1879,7 @@ bool Interface::LoadGemRBINI()
 /** Load the encoding table selected in gemrb.cfg */
 bool Interface::LoadEncoding()
 {
-	DataStream* inifile = gamedata->GetResource(config.Encoding.c_str(), IE_INI_CLASS_ID);
+	DataStream* inifile = gamedata->GetResource(config.Encoding, IE_INI_CLASS_ID);
 	if (! inifile) {
 		return false;
 	}
@@ -2375,7 +2376,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	ResRef actualMovieRef = movieRef;
 
 	//check whether there is an override for this movie
-	const char *sound_resref = NULL;
+	std::string sound_resref;
 	AutoTable mvesnd = gamedata->LoadTable("mvesnd", true);
 	if (mvesnd) {
 		TableMgr::index_t row = mvesnd->GetRowIndex(movieRef);
@@ -2386,7 +2387,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 			}
 			TableMgr::index_t sndcol = mvesnd->GetColumnIndex("sound_override");
 			if (sndcol != TableMgr::npos) {
-				sound_resref = mvesnd->QueryField(row, sndcol).c_str();
+				sound_resref = mvesnd->QueryField(row, sndcol);
 			}
 		}
 	}
@@ -2469,7 +2470,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	if (ambim) ambim->Deactivate();
 
 	Holder<SoundHandle> sound_override;
-	if (sound_resref) {
+	if (!sound_resref.empty()) {
 		sound_override = AudioDriver->PlayRelative(sound_resref, SFX_CHAN_NARRATOR);
 	}
 
