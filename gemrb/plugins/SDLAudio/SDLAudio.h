@@ -64,7 +64,7 @@ public:
 	SDLAudio(void);
 	~SDLAudio(void) override;
 	bool Init(void) override;
-	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
+	Holder<SoundHandle> Play(StringView ResRef, unsigned int channel,
 		const Point&, unsigned int flags = 0, tick_t *length = 0) override;
 	int CreateStream(std::shared_ptr<SoundMgr>) override;
 	bool Play() override;
@@ -93,7 +93,7 @@ private:
 	static void buffer_callback(void *udata, uint8_t *stream, int len);
 	bool evictBuffer();
 	void clearBufferCache();
-	Mix_Chunk* loadSound(const char *ResRef, tick_t &time_length);
+	Mix_Chunk* loadSound(StringView ResRef, tick_t &time_length);
 
 	Point listenerPos;
 	std::shared_ptr<SoundMgr> MusicReader;

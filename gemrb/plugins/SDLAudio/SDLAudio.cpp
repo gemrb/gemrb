@@ -219,13 +219,13 @@ void SDLAudio::clearBufferCache()
 	}
 }
 
-Mix_Chunk* SDLAudio::loadSound(const char *ResRef, tick_t &time_length)
+Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
 {
 	Mix_Chunk *chunk = nullptr;
 	CacheEntry *e;
 	void *p;
 
-	if (!ResRef[0]) {
+	if (ResRef.empty()) {
 		return chunk;
 	}
 
@@ -284,12 +284,12 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, tick_t &time_length)
 	return chunk;
 }
 
-Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
+Holder<SoundHandle> SDLAudio::Play(StringView ResRef, unsigned int channel,
 	const Point& p, unsigned int flags, tick_t *length)
 {
 	Mix_Chunk *chunk;
 
-	if (!ResRef) {
+	if (ResRef.empty()) {
 		if (flags & GEM_SND_SPEECH) {
 			Mix_HaltChannel(0);
 		}

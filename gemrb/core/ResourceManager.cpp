@@ -48,7 +48,7 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 	return true;
 }
 
-static void PrintPossibleFiles(std::string& buffer, const char* ResRef, const TypeID *type)
+static void PrintPossibleFiles(std::string& buffer, StringView ResRef, const TypeID *type)
 {
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
 	for (const auto& type2 : types) {
@@ -56,9 +56,9 @@ static void PrintPossibleFiles(std::string& buffer, const char* ResRef, const Ty
 	}
 }
 
-bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent) const 
+bool ResourceManager::Exists(StringView ResRef, SClass_ID type, bool silent) const
 {
-	if (!ResRef || ResRef[0] == '\0')
+	if (ResRef.empty())
 		return false;
 	// TODO: check various caches
 	for (const auto& path : searchPath) {
@@ -73,7 +73,7 @@ bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent) co
 	return false;
 }
 
-bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent) const
+bool ResourceManager::Exists(StringView ResRef, const TypeID *type, bool silent) const
 {
 	if (ResRef[0] == '\0')
 		return false;
@@ -94,10 +94,10 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 	return false;
 }
 
-DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, bool silent) const
+DataStream* ResourceManager::GetResource(StringView ResRef, SClass_ID type, bool silent) const
 {
-	if (!ResRef || ResRef[0] == '\0')
-		return NULL;
+	if (ResRef.empty())
+		return nullptr;
 	for (const auto& path : searchPath) {
 		DataStream *ds = path->GetResource(ResRef, type);
 		if (ds) {
@@ -113,10 +113,10 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 	return NULL;
 }
 
-Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, bool silent, bool useCorrupt) const
+Resource* ResourceManager::GetResource(StringView ResRef, const TypeID *type, bool silent, bool useCorrupt) const
 {
-	if (!ResRef || ResRef[0] == '\0')
-		return NULL;
+	if (ResRef.empty())
+		return nullptr;
 	if (!silent) {
 		Log(MESSAGE, "ResourceManager", "Searching for '{}'...", ResRef);
 	}

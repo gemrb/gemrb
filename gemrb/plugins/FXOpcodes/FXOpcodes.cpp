@@ -937,9 +937,9 @@ static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx
 	fx->Parameter3 = bonus;
 }
 
-static inline void PlayRemoveEffect(const Actor *target, const Effect* fx, const char *defsound = nullptr)
+static inline void PlayRemoveEffect(const Actor *target, const Effect* fx, StringView defsound = StringView())
 {
-	core->GetAudioDrv()->Play(fx->Resource.IsEmpty() ? defsound : fx->Resource.CString(),
+	core->GetAudioDrv()->Play(fx->Resource.IsEmpty() ? defsound : StringView(fx->Resource),
 			SFX_CHAN_ACTIONS, target->Pos);
 }
 

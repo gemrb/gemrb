@@ -135,11 +135,11 @@ private:
 public:
 	bool Open(const char *file, const char *desc) override;
 	/* predicts the availability of a resource */
-	bool HasResource(const char* resname, SClass_ID type) override;
-	bool HasResource(const char* resname, const ResourceDesc &type) override;
+	bool HasResource(StringView resname, SClass_ID type) override;
+	bool HasResource(StringView resname, const ResourceDesc &type) override;
 	/* returns resource */
-	DataStream* GetResource(const char* resname, SClass_ID type) override;
-	DataStream* GetResource(const char* resname, const ResourceDesc &type) override;
+	DataStream* GetResource(StringView resname, SClass_ID type) override;
+	DataStream* GetResource(StringView resname, const ResourceDesc &type) override;
 };
 
 }

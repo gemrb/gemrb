@@ -28,10 +28,10 @@ namespace GemRB {
 class NullSource : public ResourceSource {
 public:
 	bool Open(const char *filename, const char *description) override;
-	bool HasResource(const char* resname, SClass_ID type) override;
-	bool HasResource(const char* resname, const ResourceDesc &type) override;
-	DataStream* GetResource(const char* resname, SClass_ID type) override;
-	DataStream* GetResource(const char* resname, const ResourceDesc &type) override;
+	bool HasResource(StringView resname, SClass_ID type) override;
+	bool HasResource(StringView resname, const ResourceDesc &type) override;
+	DataStream* GetResource(StringView resname, SClass_ID type) override;
+	DataStream* GetResource(StringView resname, const ResourceDesc &type) override;
 };
 
 }

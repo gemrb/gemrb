@@ -99,7 +99,7 @@ public:
 	~OpenALAudioDriver(void) override;
 	void PrintDeviceList() const;
 	bool Init(void) override;
-	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
+	Holder<SoundHandle> Play(StringView ResRef, unsigned int channel,
 					const Point&, unsigned int flags = 0,
 					tick_t *length = nullptr) override;
 	void UpdateVolume(unsigned int flags) override;
@@ -147,7 +147,7 @@ private:
 	ALuint efxEffect = 0;
 	MapReverbProperties reverbProperties;
 
-	ALuint loadSound(const char* ResRef, tick_t &time_length);
+	ALuint loadSound(StringView ResRef, tick_t &time_length);
 	int CountAvailableSources(int limit);
 	bool evictBuffer();
 	void clearBufferCache(bool force);

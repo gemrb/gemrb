@@ -1002,7 +1002,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 		}
 
 		const AnimationFactory* af = static_cast<const AnimationFactory*>(
-			gamedata->GetFactoryResource(NewResRef.c_str(), IE_BAM_CLASS_ID));
+			gamedata->GetFactoryResource(NewResRef, IE_BAM_CLASS_ID));
 
 		if (!af) {
 			if (part < actorPartCount) {
@@ -1240,7 +1240,7 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 	AddMHRSuffix(shadowName, newStanceID, cycle, orientation, dummy);
 
 	const AnimationFactory* af = static_cast<const AnimationFactory*>(
-		gamedata->GetFactoryResource(shadowName.c_str(), IE_BAM_CLASS_ID));
+		gamedata->GetFactoryResource(shadowName, IE_BAM_CLASS_ID));
 
 	if (!af) {
 		return nullptr;
@@ -1488,7 +1488,7 @@ void CharAnimations::AddPSTSuffix(std::string& dest, unsigned char StanceID,
 				dest = ResRefBase[0];
 				dest += Prefix;
 				dest += (ResRefBase.CString() + 1);
-				if (gamedata->Exists(dest.c_str(), IE_BAM_CLASS_ID)) {
+				if (gamedata->Exists(dest, IE_BAM_CLASS_ID)) {
 					return;
 				}
 			}
@@ -1496,7 +1496,7 @@ void CharAnimations::AddPSTSuffix(std::string& dest, unsigned char StanceID,
 			dest = ResRefBase[0];
 			dest += Prefix;
 			dest += (ResRefBase.CString() + 1);
-			if (gamedata->Exists(dest.c_str(), IE_BAM_CLASS_ID)) {
+			if (gamedata->Exists(dest, IE_BAM_CLASS_ID)) {
 				return;
 			}
 			Prefix = "stc";

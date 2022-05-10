@@ -3533,7 +3533,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 			count--;
 			GetVerbalConstantSound(soundRef, start + count);
 			std::string chrsound = GetSoundFolder(1, soundRef);
-			if (gamedata->Exists(chrsound.c_str(), IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound.c_str(), IE_OGG_CLASS_ID, true)) {
+			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound, IE_OGG_CLASS_ID, true)) {
 				DisplayStringCoreVC((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
 				found = true;
 				break;

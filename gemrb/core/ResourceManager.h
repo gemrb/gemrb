@@ -48,14 +48,14 @@ public:
 	bool AddSource(const char *path, const char *description, PluginID type, int flags=0);
 
 	/** returns true if resource exists */
-	bool Exists(const char *resRef, SClass_ID type, bool silent=false) const;
+	bool Exists(StringView resRef, SClass_ID type, bool silent=false) const;
 	/** returns true if resource exists */
-	bool Exists(const char *resRef, const TypeID *type, bool silent=false) const;
+	bool Exists(StringView resRef, const TypeID *type, bool silent=false) const;
 
 	/** Returns stream associated to given resource */
-	DataStream* GetResource(const char* resname, SClass_ID type, bool silent = false) const;
+	DataStream* GetResource(StringView resname, SClass_ID type, bool silent = false) const;
 	/** Returns Resource object associated to given resource */
-	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
+	Resource* GetResource(StringView resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
 
 private:
 	std::vector<std::shared_ptr<ResourceSource> > searchPath;

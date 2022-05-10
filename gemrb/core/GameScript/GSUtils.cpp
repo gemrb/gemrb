@@ -537,7 +537,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 		}
 		
 		tick_t len = 0;
-		core->GetAudioDrv()->Play(soundpath, channel, pos, speech, &len);
+		core->GetAudioDrv()->Play(StringView(soundpath), channel, pos, speech, &len);
 		tick_t counter = (core->Time.ai_update_time * len) / 1000;
 
 		if (actor && len > 0 && flags & DS_CIRCLE) {
