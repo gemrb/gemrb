@@ -32,6 +32,28 @@
 
 namespace GemRB {
 
+class DecRef
+{
+	PyObject* obj = nullptr;
+public:
+	template<typename FUNC, typename... ARGS>
+	explicit DecRef(FUNC fn, ARGS&&... args) {
+		obj = fn(std::forward<ARGS>(args)...);
+	}
+	
+	~DecRef() {
+		Py_XDECREF(obj);
+	}
+	
+	operator PyObject* () const {
+		return obj;
+	}
+	
+	explicit operator bool() const noexcept {
+		return obj != nullptr;
+	}
+};
+
 template <typename T, template<class> class PTR = Holder>
 class CObject final {
 public:
@@ -179,7 +201,20 @@ Point PointFromPy(PyObject* obj);
 
 Region RectFromPy(PyObject* obj);
 
-ResRef ResRefFromPy(PyObject* obj);
+template <class STR>
+STR ASCIIStringFromPy(PyObject* obj) {
+	if (obj == nullptr) return STR();
+
+	auto ref = DecRef(PyUnicode_AsEncodedString, obj, "ascii", "strict");
+	if (ref) {
+		return STR(PyBytes_AsString(ref));
+	}
+	return STR();
+}
+
+inline ResRef ResRefFromPy(PyObject* obj) {
+	return ASCIIStringFromPy<ResRef>(obj);
+}
 
 ieStrRef StrRefFromPy(PyObject* obj);
 
@@ -236,23 +271,5 @@ PyObject* MakePyList(const Container &source)
 }
 
 }
-
-class DecRef
-{
-	PyObject* obj = nullptr;
-public:
-	template<typename FUNC, typename... ARGS>
-	explicit DecRef(FUNC fn, ARGS&&... args) {
-		obj = fn(std::forward<ARGS>(args)...);
-	}
-	
-	~DecRef() {
-		Py_DecRef(obj);
-	}
-	
-	operator PyObject* () const {
-		return obj;
-	}
-};
 
 #endif

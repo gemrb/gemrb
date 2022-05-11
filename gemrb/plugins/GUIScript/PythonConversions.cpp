@@ -81,13 +81,6 @@ Region RectFromPy(PyObject* obj) {
 	return Region();
 }
 
-ResRef ResRefFromPy(PyObject* obj) {
-	if (obj && PyUnicode_Check(obj)) {
-		return ResRef(static_cast<const char*>(PyString_AsString(obj)));
-	}
-	return ResRef();
-}
-
 ieStrRef StrRefFromPy(PyObject* str)
 {
 	return ieStrRef(PyLong_AsLong(str));
