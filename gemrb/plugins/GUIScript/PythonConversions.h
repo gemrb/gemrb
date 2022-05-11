@@ -175,7 +175,7 @@ public:
 		std::swap(wrap.object, object);
 	}
 	
-	operator const char*() const noexcept {
+	const char* CString() const noexcept {
 		return str;
 	}
 	

@@ -180,8 +180,8 @@ const ScriptingRefBase* GUIScript::GetScriptingRef(PyObject* obj)
 		RuntimeError("Invalid Scripting reference, must have SCRIPT_GROUP attribute.");
 		return nullptr;
 	}
-	const char* cstr = static_cast<const char*>(PyString_AsString(attr));
-	ScriptingGroup_t group = ScriptingGroup_t(cstr);
+	
+	ScriptingGroup_t group = ASCIIStringFromPy<ScriptingGroup_t>(attr);
 	Py_DecRef(attr);
 
 	return GetScripingRef(group, id);
@@ -1101,7 +1101,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 		
 		const ControlScriptingRef* cref = dynamic_cast<const ControlScriptingRef*>(ref);
 		
-		const char* grp = PyString_AsString(attr);
+		ScriptingGroup_t grp = ASCIIStringFromPy<ScriptingGroup_t>(attr);
 		if (cref == nullptr) {
 			// plain old view
 			if (id != ScriptingId(-1)) {
@@ -1111,7 +1111,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 			// return the ref we already have
 			Py_IncRef(pySubview);
 			return pySubview;
-		} else if (stricmp(grp, "__DEL__") == 0) {
+		} else if (grp == "__DEL__") {
 			if (id == ScriptingId(-1)) {
 				return RuntimeError("Cannot add deleted view without a valid id parameter.");
 			}
@@ -1210,7 +1210,7 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 
 	const View* view = nullptr;
 	if (PyUnicode_Check(lookup)) {
-		const ScriptingGroup_t group = ScriptingGroup_t(static_cast<const char*>(PyString_AsString(lookup)));
+		const ScriptingGroup_t group = ASCIIStringFromPy<ScriptingGroup_t>(lookup);
 		view = ScriptingRefCast<View>(ScriptEngine::GetScripingRef(group, id));
 	} else {
 		const Window* win = GetView<Window>(lookup);
@@ -10204,7 +10204,7 @@ operator is >=.\n\
 
 static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 {
-	const char *callback = NULL;
+	std::string callback;
 	PyObject* p[13];
 	int v[13];
 	for (int i = 9; i < 13; i++) {
@@ -10227,10 +10227,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 		if (!PyObject_TypeCheck(p[1], &PyUnicode_Type)) {
 			return NULL;
 		}
-		callback = PyString_AsString( p[1] ); // callback
-		if (callback == NULL) {
-			return RuntimeError("Null string received");
-		}
+		callback = ASCIIStringFromPy<std::string>(p[1]); // callback
 	}
 	v[0] = PyLong_AsLong(p[0]);
 
@@ -10258,17 +10255,15 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	}
 
 	/* see if the special function exists */
-	if (callback) {
-		char fname[32];
-
-		snprintf(fname, 32, "Check_%s", callback);
+	if (!callback.empty()) {
+		std::string fname = fmt::format("Check_{}", callback);
 		PyObject* param = PyTuple_New( 11 );
 		PyTuple_SetItem(param, 0, PyLong_FromLong(v[0]));
 		for (int i = 3; i < 13; i++) {
 			PyTuple_SetItem(param, i - 2, PyLong_FromLong(v[i]));
 		}
 
-		PyObject *pValue = gs->RunFunction("Feats", fname, param);
+		PyObject *pValue = gs->RunFunction("Feats", fname.c_str(), param);
 
 		/* we created this parameter, now we don't need it*/
 		Py_DECREF( param );
@@ -13752,15 +13747,14 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 		PyErr_Fetch(&ptype, &pvalue, &ptraceback);
 
 		//Get error message
-		const char* errorString = PyString_AsString(pvalue);
+		String* errorString = PyString_AsStringObj(pvalue);
 		if (errorString) {
 			if (displaymsg) {
-				String* error = StringFromCString(errorString);
-				displaymsg->DisplayString(L"Error: " + *error, DMC_RED, NULL);
-				delete error;
+				displaymsg->DisplayString(L"Error: " + *errorString, DMC_RED, NULL);
 			} else {
-				Log(ERROR, "GUIScript", "{}", errorString);
+				Log(ERROR, "GUIScript", "{}", fmt::WideToChar{*errorString});
 			}
+			delete errorString;
 		}
 
 		Py_DECREF(ptype);
