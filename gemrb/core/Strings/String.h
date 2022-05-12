@@ -23,21 +23,76 @@
 
 #include "StringView.h"
 
+#include <algorithm>
 #include <cwctype>
 #include <string>
 
 #include "Format.h"
 #include <fmt/xchar.h>
 
-#define WHITESPACE_STRING L"\n\t\r "
+#define WHITESPACE_STRING_W L"\n\t\r "
+#define WHITESPACE_STRING "\n\t\r "
+
+#define WHITESPACE_STRING_VIEW(StrT) \
+StringViewT<StrT>((sizeof(typename StrT::value_type) == 1) ? (const typename StrT::value_type*)WHITESPACE_STRING : (const typename StrT::value_type*)WHITESPACE_STRING_W, sizeof(WHITESPACE_STRING) - 1)
 
 namespace GemRB {
 
 using String = std::basic_string<wchar_t>;
 
-GEM_EXPORT void TrimString(String& string);
+template <typename STR>
+using StringViewT = StringViewImp<typename std::add_const<typename STR::value_type>::type>;
 
-GEM_EXPORT std::string StringFromStringView(StringView);
+template <typename STR>
+STR StringFromView(StringViewT<STR> sv)
+{
+	return STR(sv.c_str(), sv.length());
+}
+
+template <typename STR, typename IT>
+IT FindNotOf(IT first, IT last, StringViewT<STR> s) noexcept
+{
+	for (; first != last ; ++first) {
+		if (std::find(s.begin(), s.end(), *first) == s.end()) {
+			return first;
+		}
+	}
+	return last;
+}
+
+template <typename STR>
+typename STR::size_type FindFirstNotOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = 0) noexcept
+{
+	if (pos >= s.length()) {
+		return STR::npos;
+	}
+	if (s.length() == 0) {
+		return pos;
+	}
+	auto iter = FindNotOf<STR>(s.begin() + pos, s.end(), sv);
+	return iter == s.end() ? STR::npos : std::distance(s.begin(), iter);
+}
+
+template <typename STR>
+typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = STR::npos) noexcept
+{
+	if (pos >= s.length()) {
+		pos = s.length() - 1;
+	}
+	if (sv.length() == 0) {
+		return pos;
+	}
+	pos = s.length() - (pos + 1);
+	auto iter = FindNotOf<STR>(s.rbegin() + pos, s.rend(), sv);
+	return iter == s.rend() ? STR::npos : s.length() - 1 - std::distance(s.rbegin(), iter);
+}
+
+template <typename STR>
+void TrimString(STR& string)
+{
+	string.erase(0, FindFirstNotOf(string, WHITESPACE_STRING_VIEW(STR)));
+	string.erase(FindLastNotOf(string, WHITESPACE_STRING_VIEW(STR)) + 1);
+}
 
 template<typename ...ARGS>
 std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&& ...args) {

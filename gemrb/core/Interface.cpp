@@ -1827,7 +1827,7 @@ bool Interface::LoadGemRBINI()
 	}
 
 	auto sv = ini->GetKeyAsString("resources", "WindowTitle", GEMRB_STRING);
-	DefaultWindowTitle = StringFromStringView(sv);
+	DefaultWindowTitle = StringFromView<std::string>(sv);
 
 	// These are values for how long a single step is, see Movable::DoStep.
 	// They were found via trial-and-error, trying to match
@@ -1855,7 +1855,7 @@ bool Interface::LoadGemRBINI()
 
 	sv = ini->GetKeyAsString("resources", "INIConfig");
 	if (sv)
-		INIConfig = StringFromStringView(sv);
+		INIConfig = StringFromView<std::string>(sv);
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
@@ -1889,7 +1889,7 @@ bool Interface::LoadEncoding()
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
-	TLKEncoding.encoding = StringFromStringView(ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding));
+	TLKEncoding.encoding = StringFromView<std::string>(ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding));
 	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", false);
 
 	// TODO: lists are incomplete
