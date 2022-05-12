@@ -119,14 +119,7 @@ public:
 	ieDword interval = 0;
 	ieDword lastSpawndate = 0;
 	std::vector<CritterEntry> critters;
-	char *name = nullptr;
-	SpawnEntry() noexcept = default;
-	SpawnEntry(const SpawnEntry&) = delete;
-	SpawnEntry(SpawnEntry&&) noexcept = default;
-	SpawnEntry& operator=(const SpawnEntry&) = delete;
-	~SpawnEntry() {
-		free(name);
-	}
+	std::string name;
 };
 
 /**
@@ -161,15 +154,14 @@ private:
 	std::vector<SpawnEntry> eventspawns;
 	ieDword detail_level;
 
-	CritterEntry ReadCreature(const DataFileMgr* inifile, const char* crittername) const;
-	void ReadSpawnEntry(const DataFileMgr *inifile,
-		const char *entryname, SpawnEntry &entry) const;
+	CritterEntry ReadCreature(const DataFileMgr* inifile, StringView crittername) const;
+	void ReadSpawnEntry(const DataFileMgr *inifile, StringView entryname, SpawnEntry &entry) const;
 	//spawns a single creature
 	void SpawnCreature(const CritterEntry &critter) const;
 	void SpawnGroup(SpawnEntry &event) const;
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword) const;
-	void PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const;
+	void PrepareSpawnPoints(const DataFileMgr *iniFile, StringView critterName, CritterEntry &critter) const;
 	void SelectSpawnPoint(CritterEntry &critter) const;
 public:
 	/* called by action of the same name */

@@ -3583,7 +3583,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	}
 
 	// there can be several entries to choose from, eg.: NOR103,NOR104,NOR105
-	auto elements = GetElements<ResRef>(value.c_str());
+	auto elements = GetElements<ResRef>(value);
 	size_t count = elements.size();
 	if (count <= 0) return;
 
@@ -4483,7 +4483,7 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 		if (type<0) {
 			type = -type;
 		} else {
-			armor = resdata->GetKeyAsInt(section.c_str(), "armor", 0);
+			armor = resdata->GetKeyAsInt(section, "armor", 0);
 		}
 		if (armor<0 || armor>35) return;
 	} else {
@@ -8433,7 +8433,6 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
 bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 {
-	const char *resource = "";
 	char section[12];
 	unsigned int animid=BaseStats[IE_ANIMATION_ID];
 	if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
@@ -8455,20 +8454,21 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 	 *   fall
 	 *   fidget
 	 */
+	StringView resource;
 	switch(index) {
 		case VB_ATTACK:
-			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"att1":"at1sound","");
+			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "att1" : "at1sound"));
 			break;
 		case VB_DAMAGE:
-			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"damage":"hitsound","");
+			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "damage" : "hitsound"));
 			break;
 		case VB_DIE:
-			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"death":"dfbsound","");
+			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "death" : "dfbsound"));
 			break;
 		case VB_SELECT:
 			//this isn't in PST, apparently
 			if (IWDSound) {
-				resource = core->GetResDataINI()->GetKeyAsString(section, "selected","");
+				resource = core->GetResDataINI()->GetKeyAsString(section, "selected");
 			}
 			break;
 		// entries without VB equivalents
@@ -8477,11 +8477,11 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 		case 100+IE_ANI_ATTACK_BACKSLASH:
 		case 100+IE_ANI_ATTACK_JAB:
 			// FIXME: complete guess
-			resource = core->GetResDataINI()->GetKeyAsString(section, IWDSound?"att2":"at2sound","");
+			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "att2" : "at2sound"));
 			break;
 		case 200: // battle cry
 			if (IWDSound) {
-				resource = core->GetResDataINI()->GetKeyAsString(section, "btlcry", "");
+				resource = core->GetResDataINI()->GetKeyAsString(section, "btlcry");
 			}
 			break;
 	}

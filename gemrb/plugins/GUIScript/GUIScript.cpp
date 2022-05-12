@@ -5371,13 +5371,17 @@ Works only in PST.\n\
 
 static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 {
-	char *Tag, *Key, *Default;
-	PARSE_ARGS( args,  "sss", &Tag, &Key, &Default );
+	PyObject* Tag = nullptr;
+	PyObject* Key = nullptr;
+	PyObject* Default = nullptr;
+	PARSE_ARGS(args,  "OOO", &Tag, &Key, &Default);
 	if (!core->GetQuestsINI()) {
 		return RuntimeError( "INI resource not found!\n" );
 	}
-	return PyString_FromString(
-			core->GetQuestsINI()->GetKeyAsString( Tag, Key, Default ) );
+	return PyString_FromStringView(core->GetQuestsINI()->GetKeyAsString(PyString_AsStringView(Tag),
+																		PyString_AsStringView(Key),
+																		PyString_AsStringView(Default)
+																		));
 }
 
 PyDoc_STRVAR( GemRB_GetINIBeastsKey__doc,
@@ -5399,13 +5403,17 @@ Works only in PST.\n\
 );
 static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 {
-	char *Tag, *Key, *Default;
-	PARSE_ARGS( args,  "sss", &Tag, &Key, &Default );
+	PyObject* Tag = nullptr;
+	PyObject* Key = nullptr;
+	PyObject* Default = nullptr;
+	PARSE_ARGS(args,  "OOO", &Tag, &Key, &Default);
 	if (!core->GetBeastsINI()) {
 		return NULL;
 	}
-	return PyString_FromString(
-			core->GetBeastsINI()->GetKeyAsString( Tag, Key, Default ) );
+	return PyString_FromStringView(core->GetBeastsINI()->GetKeyAsString(PyString_AsStringView(Tag),
+																	PyString_AsStringView(Key),
+																	PyString_AsStringView(Default)
+																	));
 }
 
 PyDoc_STRVAR( GemRB_GetINIPartyKey__doc,
@@ -5428,16 +5436,18 @@ Works only in IWD2.\n\
 
 static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 {
-	const char *Tag, *Key, *Default;
-	PARSE_ARGS( args,  "sss", &Tag, &Key, &Default );
+	PyObject* Tag = nullptr;
+	PyObject* Key = nullptr;
+	PyObject* Default = nullptr;
+	PARSE_ARGS(args,  "OOO", &Tag, &Key, &Default);
 	if (!core->GetPartyINI()) {
 		return RuntimeError( "INI resource not found!\n" );
 	}
-	const char *desc = core->GetPartyINI()->GetKeyAsString(Tag, Key, Default);
+	const StringView desc = core->GetPartyINI()->GetKeyAsString(PyString_AsStringView(Tag), PyString_AsStringView(Key), PyString_AsStringView(Default));
 	// ensure it can be converted to unicode
 	// FIXME: English party.ini is encoded in cp-1252, not iso-8859-1, the tlk encoding
 	// but we don't display its 0x92 single quote / apostrophe correctly either way (see The Winter Rose description: father Di'Arnos)
-	return PyString_FromString(desc);
+	return PyString_FromStringView(desc);
 }
 
 PyDoc_STRVAR( GemRB_CreatePlayer__doc,

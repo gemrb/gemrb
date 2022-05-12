@@ -42,9 +42,9 @@ private:
 public:
 	explicit INITag(const char* Name) : TagName(Name) {};
 
-	const char* GetTagName() const
+	const std::string& GetTagName() const
 	{
-		return TagName.c_str();
+		return TagName;
 	}
 
 	int GetKeyCount() const
@@ -52,9 +52,9 @@ public:
 		return (int) pairs.size();
 	}
 
-	const char* GetKeyNameByIndex(int index) const
+	const std::string& GetKeyNameByIndex(int index) const
 	{
-		return pairs[index].Name.c_str();
+		return pairs[index].Name;
 	}
 
 	bool AddLine(const char* Line)
@@ -81,21 +81,21 @@ public:
 		return true;
 	}
 
-	const char* GetKeyAsString(const char* Key, const char* Default) const
+	StringView GetKeyAsString(StringView Key, StringView Default) const
 	{
 		for (const auto& pair : pairs) {
-			if (stricmp(Key, pair.Name.c_str()) == 0) {
-				return pair.Value.c_str();
+			if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
+				return pair.Value;
 			}
 		}
 		return Default;
 	}
 
-	int GetKeyAsInt(const char* Key, const int Default) const
+	int GetKeyAsInt(StringView Key, const int Default) const
 	{
 		const char* ret = NULL;
 		for (const auto& pair : pairs) {
-			if (stricmp(Key, pair.Name.c_str()) == 0) {
+			if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
 				ret = pair.Value.c_str();
 				break;
 			}
@@ -106,11 +106,11 @@ public:
 		return atoi( ret );
 	}
 
-	float GetKeyAsFloat(const char* Key, const float Default) const
+	float GetKeyAsFloat(StringView Key, const float Default) const
 	{
 		const char* ret = NULL;
 		for (const auto& pair : pairs) {
-			if (stricmp(Key, pair.Name.c_str()) == 0) {
+			if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
 				ret = pair.Value.c_str();
 				break;
 			}
@@ -121,11 +121,11 @@ public:
 		return atof( ret );
 	}
 
-	bool GetKeyAsBool(const char* Key, const bool Default) const
+	bool GetKeyAsBool(StringView Key, const bool Default) const
 	{
 		const char* ret = NULL;
 		for (const auto& pair : pairs) {
-			if (stricmp(Key, pair.Name.c_str()) == 0) {
+			if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
 				ret = pair.Value.c_str();
 				break;
 			}
@@ -155,21 +155,17 @@ public:
 	{
 		return ( int ) tags.size();
 	}
-	const char* GetTagNameByIndex(int index) const override
+	StringView GetTagNameByIndex(int index) const override
 	{
 		return tags[index].GetTagName();
 	}
 
-	int GetKeysCount(const char* Tag) const override;
-	const char* GetKeyNameByIndex(const char* Tag, int index) const override;
-	const char* GetKeyAsString(const char* Tag, const char* Key,
-		const char* Default) const override;
-	int GetKeyAsInt(const char* Tag, const char* Key, 
-		int Default) const override;
-	float GetKeyAsFloat(const char* Tag, const char* Key, 
-		float Default) const override;
-	bool GetKeyAsBool(const char* Tag, const char* Key, 
-		bool Default) const override;
+	int GetKeysCount(StringView Tag) const override;
+	StringView GetKeyNameByIndex(StringView Tag, int index) const override;
+	StringView GetKeyAsString(StringView Tag, StringView Key, StringView Default = StringView()) const override;
+	int GetKeyAsInt(StringView Tag, StringView Key, int Default) const override;
+	float GetKeyAsFloat(StringView Tag, StringView Key, float Default) const override;
+	bool GetKeyAsBool(StringView Tag, StringView Key, bool Default) const override;
 };
 
 }

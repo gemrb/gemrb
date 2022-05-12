@@ -766,7 +766,7 @@ public:
 	ResRef GoldResRef; //MISC07.itm
 	ResRefMap<ItemList> RtRows;
 
-	char INIConfig[_MAX_PATH] = "baldur.ini";
+	std::string INIConfig = "baldur.ini";
 	bool DitherSprites = true;
 	bool UseCorruptedHack = false;
 	int FeedbackLevel = 0;
