@@ -26,4 +26,9 @@ void TrimString(String& string)
 	string.erase(string.find_last_not_of(WHITESPACE_STRING) + 1);
 }
 
+std::string StringFromStringView(StringView sv)
+{
+	return std::string(sv.c_str(), sv.length());
+}
+
 }

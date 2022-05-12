@@ -1197,18 +1197,18 @@ int Interface::Init(const InterfaceConfig* cfg)
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
 	// read from our version of the config if it is present
 	char ini_path[_MAX_PATH+4] = { '\0' };
-	char gemrbINI[_MAX_PATH+4] = { '\0' };
-	char tmp[_MAX_PATH+4] = { '\0' };
-	snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
-	PathJoin(ini_path, config.SavePath, gemrbINI, nullptr);
+	std::string gemrbINI;
+	std::string tmp;
+	gemrbINI = "gem-" + INIConfig;
+	PathJoin(ini_path, config.SavePath, gemrbINI.c_str(), nullptr);
 	if (!file_exists(ini_path)) {
-		PathJoin(ini_path, config.GamePath, gemrbINI, nullptr);
+		PathJoin(ini_path, config.GamePath, gemrbINI.c_str(), nullptr);
 	}
 	if (file_exists(ini_path)) {
-		strlcpy(tmp, INIConfig, sizeof(tmp));
-		strlcpy(INIConfig, gemrbINI, sizeof(INIConfig));
+		tmp = INIConfig;
+		INIConfig = gemrbINI;
 	} else {
-		PathJoin(ini_path, config.GamePath, INIConfig, nullptr);
+		PathJoin(ini_path, config.GamePath, INIConfig.c_str(), nullptr);
 		Log(MESSAGE,"Core", "Loading original game options from {}", ini_path);
 	}
 	if (!InitializeVarsWithINI(ini_path)) {
@@ -1221,13 +1221,13 @@ int Interface::Init(const InterfaceConfig* cfg)
 	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
 
 	// restore the game config name if we read it from our version
-	if (tmp[0]) {
-		strlcpy(INIConfig, tmp, sizeof(INIConfig));
+	if (!tmp.empty()) {
+		INIConfig = tmp;
 	} else {
-		strlcpy(tmp, INIConfig, sizeof(tmp));
+		tmp = INIConfig;
 	}
 	// also store it for base GAM and SAV files
-	strtok(tmp, ".");
+	strtok(&tmp[0], ".");
 	GameNameResRef = tmp;
 
 	Log(MESSAGE, "Core", "Reading Encoding Table...");
@@ -1685,7 +1685,7 @@ ieDword Interface::HasFeature(int position) const
 	return GameFeatures[position>>5] & (1<<(position&31));
 }
 
-static const char* const game_flags[GF_COUNT + 1]={
+static const StringView game_flags[GF_COUNT + 1]={
 		"HasKaputz",          //0 GF_HAS_KAPUTZ
 		"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
 		"HasSongList",        //2 GF_HAS_SONGLIST
@@ -1770,7 +1770,7 @@ static const char* const game_flags[GF_COUNT + 1]={
 		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
 		"ClearingActionOverride", //83GF_CLEARING_ACTIONOVERRIDE
 		"DamageInnocentRep",  //84GF_DAMAGE_INNOCENT_REP
-		NULL                  //for our own safety, this marks the end of the pole
+		StringView()          //for our own safety, this marks the end of the pole
 };
 
 /** Loads gemrb.ini */
@@ -1792,11 +1792,9 @@ bool Interface::LoadGemRBINI()
 	ini->Open(inifile);
 
 	ResRef tooltipBG;
-	const char *s;
 	// Resrefs are already initialized in Interface::Interface()
 #define ASSIGN_RESREF(resref, name) \
-	s = ini->GetKeyAsString( "resources", name, NULL ); \
-	resref = ResRef(s); s = nullptr
+	resref = ini->GetKeyAsString("resources", name, ""); \
 
 	ASSIGN_RESREF(MainCursorsImage, "MainCursorsImage");
 	ASSIGN_RESREF(TextCursorBam, "TextCursorBAM"); //console cursor
@@ -1828,7 +1826,8 @@ bool Interface::LoadGemRBINI()
 		}
 	}
 
-	DefaultWindowTitle = ini->GetKeyAsString("resources", "WindowTitle", GEMRB_STRING);
+	auto sv = ini->GetKeyAsString("resources", "WindowTitle", GEMRB_STRING);
+	DefaultWindowTitle = StringFromStringView(sv);
 
 	// These are values for how long a single step is, see Movable::DoStep.
 	// They were found via trial-and-error, trying to match
@@ -1840,23 +1839,23 @@ bool Interface::LoadGemRBINI()
 	// to denote that the bitmap should be scaled down 3x
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		const std::string& name =  fmt::format("GroundCircleBAM{}", size + 1);
-		s = ini->GetKeyAsString("resources", name.c_str(), nullptr);
-		if (s) {
-			const char *pos = strchr( s, '/' );
+		sv = ini->GetKeyAsString("resources", name);
+		if (sv) {
+			const char *pos = strchr(sv.c_str(), '/');
 			if (pos) {
 				GroundCircleScale[size] = atoi( pos+1 );
 				ResRef tmp;
-				std::copy(s, pos, tmp.begin());
+				std::copy(sv.begin(), pos, tmp.begin());
 				GroundCircleBam[size] = tmp;
 			} else {
-				GroundCircleBam[size] = ResRef(s);
+				GroundCircleBam[size] = sv;
 			}
 		}
 	}
 
-	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
-	if (s)
-		strlcpy(INIConfig, s, sizeof(INIConfig));
+	sv = ini->GetKeyAsString("resources", "INIConfig");
+	if (sv)
+		INIConfig = StringFromStringView(sv);
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
@@ -1890,7 +1889,7 @@ bool Interface::LoadEncoding()
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
-	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
+	TLKEncoding.encoding = StringFromStringView(ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding));
 	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", false);
 
 	// TODO: lists are incomplete
@@ -2592,13 +2591,13 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	}
 
 	for (int i = 0; i < defaults->GetTagsCount(); i++) {
-		const char* tag = defaults->GetTagNameByIndex(i);
+		const StringView tag = defaults->GetTagNameByIndex(i);
 		for (int j = 0; j < defaults->GetKeysCount(tag); j++) {
 			auto key = Variables::key_t(defaults->GetKeyNameByIndex(tag, j));
 			//skip any existing entries. GemRB.cfg has priority
 			if (!vars->HasKey(key)) {
-				ieDword defaultVal = defaults->GetKeyAsInt(tag, key.c_str(), 0);
-				vars->SetAt(key, overrides->GetKeyAsInt(tag, key.c_str(), defaultVal));
+				ieDword defaultVal = defaults->GetKeyAsInt(tag, key, 0);
+				vars->SetAt(key, overrides->GetKeyAsInt(tag, key, defaultVal));
 			}
 		}
 	}
@@ -2634,14 +2633,14 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 bool Interface::SaveConfig()
 {
 	char ini_path[_MAX_PATH] = { '\0' };
-	char gemrbINI[_MAX_PATH+4] = { '\0' };
-	if (strncmp(INIConfig, "gem-", 4) != 0) {
-		snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
+	std::string gemrbINI;
+	if (strncmp(INIConfig.c_str(), "gem-", 4) != 0) {
+		gemrbINI = "gem-" + INIConfig;
 	}
-	PathJoin(ini_path, config.GamePath, gemrbINI, nullptr);
+	PathJoin(ini_path, config.GamePath, gemrbINI.c_str(), nullptr);
 	FileStream *fs = new FileStream();
 	if (!fs->Create(ini_path)) {
-		PathJoin(ini_path, config.SavePath, gemrbINI, nullptr);
+		PathJoin(ini_path, config.SavePath, gemrbINI.c_str(), nullptr);
 		if (!fs->Create(ini_path)) {
 			delete fs;
 			return false;
@@ -2655,7 +2654,7 @@ bool Interface::SaveConfig()
 		// dump the formatted default config options to the file
 		std::string contents;
 		for (int i = 0; i < defaultsINI->GetTagsCount(); i++) {
-			const char* tag = defaultsINI->GetTagNameByIndex(i);
+			const StringView tag = defaultsINI->GetTagNameByIndex(i);
 			// write section header
 			AppendFormat(contents, "[{}]\n", tag);
 			for (int j = 0; j < defaultsINI->GetKeysCount(tag); j++) {

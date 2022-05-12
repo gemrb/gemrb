@@ -42,17 +42,13 @@ class GEM_EXPORT DataFileMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual int GetTagsCount() const = 0;
-	virtual const char* GetTagNameByIndex(int index) const = 0;
-	virtual int GetKeysCount(const char* Tag) const = 0;
-	virtual const char* GetKeyNameByIndex(const char* Tag, int index) const = 0;
-	virtual const char* GetKeyAsString(const char* Tag, const char* Key,
-		const char* Default) const = 0;
-	virtual int GetKeyAsInt(const char* Tag, const char* Key,
-		int Default) const = 0;
-	virtual float GetKeyAsFloat(const char* Tag, const char* Key,
-		float Default) const = 0;
-	virtual bool GetKeyAsBool(const char* Tag, const char* Key,
-		bool Default) const = 0;
+	virtual StringView GetTagNameByIndex(int index) const = 0;
+	virtual int GetKeysCount(StringView Tag) const = 0;
+	virtual StringView GetKeyNameByIndex(StringView Tag, int index) const = 0;
+	virtual StringView GetKeyAsString(StringView Tag, StringView Key, StringView Default = StringView()) const = 0;
+	virtual int GetKeyAsInt(StringView Tag, StringView Key, int Default) const = 0;
+	virtual float GetKeyAsFloat(StringView Tag, StringView Key, float Default) const = 0;
+	virtual bool GetKeyAsBool(StringView Tag, StringView Key, bool Default) const = 0;
 };
 
 }

@@ -89,70 +89,66 @@ bool INIImporter::Open(DataStream* str)
 	return true;
 }
 
-int INIImporter::GetKeysCount(const char* Tag) const
+int INIImporter::GetKeysCount(StringView Tag) const
 {
 	for (const auto& tag : tags) {
-		const char* TagName = tag.GetTagName();
-		if (stricmp( TagName, Tag ) == 0) {
+		const std::string& TagName = tag.GetTagName();
+		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
 			return tag.GetKeyCount();
 		}
 	}
 	return 0;
 }
 
-const char* INIImporter::GetKeyNameByIndex(const char* Tag, int index) const
+StringView INIImporter::GetKeyNameByIndex(StringView Tag, int index) const
 {
 	for (const auto& tag : tags) {
-		const char* TagName = tag.GetTagName();
-		if (stricmp( TagName, Tag ) == 0) {
+		const std::string& TagName = tag.GetTagName();
+		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
 			return tag.GetKeyNameByIndex(index);
 		}
 	}
-	return NULL;
+	return StringView();
 }
 
-const char* INIImporter::GetKeyAsString(const char* Tag, const char* Key,
-	const char* Default) const
+StringView INIImporter::GetKeyAsString(StringView Tag, StringView Key, StringView Default) const
 {
 	for (const auto& tag : tags) {
-		const char* TagName = tag.GetTagName();
-		if (stricmp( TagName, Tag ) == 0) {
+		const std::string& TagName = tag.GetTagName();
+		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
 			return tag.GetKeyAsString(Key, Default);
 		}
 	}
 	return Default;
 }
 
-int INIImporter::GetKeyAsInt(const char* Tag, const char* Key,
-	const int Default) const
+int INIImporter::GetKeyAsInt(StringView Tag, StringView Key, const int Default) const
 {
 	for (const auto& tag : tags) {
-		const char* TagName = tag.GetTagName();
-		if (stricmp( TagName, Tag ) == 0) {
+		const std::string& TagName = tag.GetTagName();
+		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
 			return tag.GetKeyAsInt(Key, Default);
 		}
 	}
 	return Default;
 }
 
-float INIImporter::GetKeyAsFloat(const char* Tag, const char* Key,
-	const float Default) const
+float INIImporter::GetKeyAsFloat(StringView Tag, StringView Key, const float Default) const
 {
 	for (const auto& tag : tags) {
-		const char* TagName = tag.GetTagName();
-		if (stricmp( TagName, Tag ) == 0) {
+		const std::string& TagName = tag.GetTagName();
+		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
 			return tag.GetKeyAsFloat(Key, Default);
 		}
 	}
 	return Default;
 }
 
-bool INIImporter::GetKeyAsBool(const char* Tag, const char* Key,
-	const bool Default) const
+bool INIImporter::GetKeyAsBool(StringView Tag, StringView Key, const bool Default) const
 {
 	for (const auto& tag : tags) {
-		const char* TagName = tag.GetTagName();
-		if (stricmp( TagName, Tag ) == 0) {
+		const std::string& TagName = tag.GetTagName();
+		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
 			return tag.GetKeyAsBool(Key, Default);
 		}
 	}

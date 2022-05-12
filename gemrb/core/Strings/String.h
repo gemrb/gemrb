@@ -21,6 +21,8 @@
 
 #include "exports.h"
 
+#include "StringView.h"
+
 #include <cwctype>
 #include <string>
 
@@ -34,6 +36,8 @@ namespace GemRB {
 using String = std::basic_string<wchar_t>;
 
 GEM_EXPORT void TrimString(String& string);
+
+GEM_EXPORT std::string StringFromStringView(StringView);
 
 template<typename ...ARGS>
 std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&& ...args) {

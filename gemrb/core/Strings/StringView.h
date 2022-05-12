@@ -83,6 +83,10 @@ public:
 	const char& operator[](size_t i) const noexcept {
 		return *(data + i);
 	}
+
+	explicit operator bool() const noexcept {
+		return data != nullptr;
+	}
 };
 
 }

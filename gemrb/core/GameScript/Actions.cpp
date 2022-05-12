@@ -6966,7 +6966,7 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	}
 
 	const std::string& key = fmt::format("{}", parameters->int0Parameter);
-	const char* cstr = ini->GetKeyAsString(key.c_str(), "killvar", nullptr);
+	StringView cstr = ini->GetKeyAsString(key, "killvar");
 	if (!cstr) {
 		return;
 	}

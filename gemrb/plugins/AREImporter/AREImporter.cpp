@@ -1402,18 +1402,18 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 			//add autonote.ini entries
 			if( INInote ) {
 				const ieVariable& scriptName = map->GetScriptName();
-				int count = INInote->GetKeyAsInt(scriptName.CString(), "count", 0);
+				int count = INInote->GetKeyAsInt(scriptName, "count", 0);
 				while (count) {
 					ieVariable key;
 					int value;
 					key.SNPrintF("xPos%d", count);
-					value = INInote->GetKeyAsInt(scriptName.CString(), key.CString(), 0);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					point.x = value;
 					key.SNPrintF("yPos%d", count);
-					value = INInote->GetKeyAsInt(scriptName.CString(), key.CString(), 0);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					point.y = value;
 					key.SNPrintF("text%d", count);
-					value = INInote->GetKeyAsInt(scriptName.CString(), key.CString(), 0);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					map->AddMapNote(point, 0, ieStrRef(value), true);
 					count--;
 				}
