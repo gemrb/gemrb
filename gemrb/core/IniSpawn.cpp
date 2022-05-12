@@ -123,7 +123,7 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 
 	s = inifile->GetKeyAsString("spawn_main","events");
 	if (s) {
-		auto events = GetElements<StringView>(s);
+		auto events = Explode(s);
 		auto eventcount = events.size();
 		eventspawns.resize(eventcount);
 		while(eventcount--) {
@@ -160,10 +160,10 @@ inline bool VarHasContext(StringView str)
 	return str.length() > 9 && str[6] == ':' && str[7] == ':';
 }
 
-inline bool ParsePointDef(const char* pointString, Point& destPoint, int& orient)
+inline bool ParsePointDef(StringView pointString, Point& destPoint, int& orient)
 {
-	int parsed = sscanf(pointString, "[%d%*[,.]%d:%d]", &destPoint.x, &destPoint.y, &orient);
-	if (parsed != 3 && sscanf(pointString, "[%d%*[,.]%d]", &destPoint.x, &destPoint.y) != 2) {
+	int parsed = sscanf(pointString.c_str(), "[%d%*[,.]%d:%d]", &destPoint.x, &destPoint.y, &orient);
+	if (parsed != 3 && sscanf(pointString.c_str(), "[%d%*[,.]%d]", &destPoint.x, &destPoint.y) != 2) {
 		Log(ERROR, "IniSpawn", "Malformed spawn point definition: {}", pointString);
 		return false;
 	}
@@ -178,7 +178,7 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 		return;
 	}
 
-	const auto spawnPointStrings = GetElements<const char*>(critter.SpawnPointsDef);
+	const auto spawnPointStrings = Explode(critter.SpawnPointsDef);
 	int spawnCount = static_cast<int>(spawnPointStrings.size());
 	Point chosenPoint;
 	int orient = -1;
@@ -385,7 +385,7 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 	//the creature resource(s)
 	s = inifile->GetKeyAsString(crittername,"cre_file");
 	if (s) {
-		critter.CreFile = GetElements<ResRef>(s);
+		critter.CreFile = Explode<StringView, ResRef>(s);
 	} else {
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: {}", crittername);
 		return critter;
@@ -580,7 +580,7 @@ void IniSpawn::ReadSpawnEntry(const DataFileMgr *inifile, StringView entryname, 
 	//don't default to NULL here, some entries may be missing in original game
 	//an empty default string here will create an empty but consistent entry
 	StringView s = inifile->GetKeyAsString(entryname, "critters");
-	auto critters = GetElements<StringView>(s);
+	auto critters = Explode(s);
 	size_t crittercount = critters.size();
 	entry.critters.reserve(crittercount);
 

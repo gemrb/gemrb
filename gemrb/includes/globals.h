@@ -177,21 +177,6 @@ GEM_EXPORT int EARelation(const Scriptable *a, const Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 GEM_EXPORT int CountElements(const char *str, char separator);
 
-// explode a CSV resref list into separate storage
-template<typename T>
-std::vector<T> GetElements(StringView str)
-{
-	std::vector<T> elements;
-	int i = 0;
-	for (char *part = strtok((char*)str.c_str(), ","); part; part = strtok(nullptr, ",")) {
-		// there is one single screwed up entry in pst ar1100.ini: cre_file = bird, outlim
-		if (*part == ' ') part++;
-		elements.emplace_back(T(part));
-		i++;
-	}
-	return elements;
-}
-
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
 using tick_t = unsigned long; // milliseconds
