@@ -465,7 +465,7 @@ void TextArea::AppendText(String text)
 	} else if (text.length()) {
 		if (finit != ftext) {
 			// append cap spans
-			size_t textpos = text.find_first_not_of(WHITESPACE_STRING);
+			size_t textpos = text.find_first_not_of(WHITESPACE_STRING_W);
 			if (textpos != String::npos) {
 				// first append the white space as its own span
 				textContainer->AppendText(text.substr(0, textpos));

@@ -364,7 +364,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 			dp = dp + linePoint;
 			if (linePos < line.length() - 1) {
 				// ignore whitespace between current pos and next word, if any (we are wrapping... maybe)
-				linePos = line.find_first_not_of(WHITESPACE_STRING, linePos);
+				linePos = line.find_first_not_of(WHITESPACE_STRING_W, linePos);
 				if (linePos == String::npos) {
 					linePos = line.length() - 1; // newline char accounted for later
 				} else {

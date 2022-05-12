@@ -250,7 +250,7 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, StringView critter
 		Log(ERROR, "IniSpawn", "No spawn points defined, skipping creature: {}", critterName);
 		return;
 	}
-	critter.SpawnPointsDef = StringFromStringView(spawnPoints);
+	critter.SpawnPointsDef = StringFromView<std::string>(spawnPoints);
 
 	// indexed sequential mode
 	StringView pointSelectVar = iniFile->GetKeyAsString(critterName, "point_select_var");
@@ -574,7 +574,7 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 
 void IniSpawn::ReadSpawnEntry(const DataFileMgr *inifile, StringView entryname, SpawnEntry &entry) const
 {
-	entry.name = StringFromStringView(entryname);
+	entry.name = StringFromView<std::string>(entryname);
 	entry.interval = (unsigned int) inifile->GetKeyAsInt(entryname,"interval",0);
 	if (entry.interval < 15) entry.interval = 15; // lower bound from the original
 	//don't default to NULL here, some entries may be missing in original game
