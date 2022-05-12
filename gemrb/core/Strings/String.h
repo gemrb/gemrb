@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <cwctype>
 #include <string>
+#include <vector>
 
 #include "Format.h"
 #include <fmt/xchar.h>
@@ -92,6 +93,27 @@ void TrimString(STR& string)
 {
 	string.erase(0, FindFirstNotOf(string, WHITESPACE_STRING_VIEW(STR)));
 	string.erase(FindLastNotOf(string, WHITESPACE_STRING_VIEW(STR)) + 1);
+}
+
+template<typename STR, typename RET = StringViewT<STR>>
+std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',')
+{
+	std::vector<RET> elements;
+	size_t beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR));
+	size_t cur = beg;
+	for (; cur < str.length(); ++cur)
+	{
+		if (str[cur] == delim) {
+			elements.emplace_back(&str[beg], cur - beg);
+			beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR), cur + 1);
+		}
+	}
+
+	if (beg != cur) {
+		elements.emplace_back(&str[beg]);
+	}
+
+	return elements;
 }
 
 template<typename ...ARGS>

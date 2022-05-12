@@ -90,9 +90,9 @@ public:
 	FixedSizeString(std::nullptr_t) noexcept = delete;
 	FixedSizeString& operator=(std::nullptr_t) noexcept = delete;
 	
-	explicit FixedSizeString(const char* cstr) noexcept {
+	explicit FixedSizeString(const char* cstr, index_t len = LEN) noexcept {
 		if (cstr) {
-			strncpy(str, cstr, LEN);
+			strncpy(str, cstr, len);
 		} else {
 			std::fill(begin(), end(), '\0');
 		}

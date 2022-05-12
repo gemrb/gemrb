@@ -3583,7 +3583,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	}
 
 	// there can be several entries to choose from, eg.: NOR103,NOR104,NOR105
-	auto elements = GetElements<ResRef>(value);
+	auto elements = Explode<std::string>(value);
 	size_t count = elements.size();
 	if (count <= 0) return;
 
@@ -8486,7 +8486,7 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 			break;
 	}
 
-	auto elements = GetElements<ResRef>(resource);
+	auto elements = Explode(resource);
 	size_t count = elements.size();
 	if (count == 0) return false;
 
