@@ -28,43 +28,53 @@ namespace GemRB {
 // the buffer must have a lifespan beyond the view
 // the view is entirely constant and cannot be used
 // to modify the underlying buffer
-class StringView {
-	const char* data = nullptr;
-	size_t len = 0;
+template <typename CharT = const char>
+class StringViewImp {
 public:
-	using const_iterator = const char*;
+	using value_type = CharT;
+	using iterator = CharT*;
+	using const_iterator = const CharT*;
+	using size_type = size_t;
+	static constexpr size_type npos = -1;
 	
-	StringView() noexcept = default;
+	StringViewImp() noexcept = default;
 
 	// explicit because strlen is inefficient
-	explicit StringView(const char* cstr) noexcept
-	: StringView(cstr, std::strlen(cstr)) {}
+	explicit StringViewImp(CharT* cstr) noexcept
+	: StringViewImp(cstr, std::strlen(cstr)) {}
 	
-	StringView(const char* cstr, size_t len) noexcept
+	StringViewImp(CharT* cstr, size_type len) noexcept
 	: data(cstr), len(len) {}
 
-	template<typename STR, ENABLE_CHAR_RANGE(STR)>
-	StringView(const STR& s) noexcept
-	: StringView(&s[0], std::distance(std::begin(s), std::end(s)))
+	template<typename STR, typename CharT2 = CharT, ENABLE_CHAR_RANGE(STR),
+	typename std::enable_if<std::is_const<CharT2>::value && !std::is_convertible<STR, StringViewImp>::value, int>::type = 0>
+	StringViewImp(const STR& s) noexcept
+	: StringViewImp(&s[0], std::distance(std::begin(s), std::end(s)))
 	{}
 	
-	template<size_t N>
+	template<typename STR, typename CharT2 = CharT, ENABLE_CHAR_RANGE(STR),
+	typename std::enable_if<!std::is_const<CharT2>::value && !std::is_convertible<STR, StringViewImp>::value, int>::type = 0>
+	StringViewImp(STR& s) noexcept
+	: StringViewImp(&s[0], std::distance(std::begin(s), std::end(s)))
+	{}
+	
+	template<size_type N>
 	// string literals are null terminated so dont include the null byte
-	StringView(char const (&s)[N], size_t len = N - 1) noexcept
-	: StringView(&s[0], len)
+	StringViewImp(char const (&s)[N], size_t len = N - 1) noexcept
+	: StringViewImp(&s[0], len) // string literals are null terminated so dont include the null byte
 	{}
 	
-	template<size_t LEN, int(*CMP)(const char*, const char*, size_t)>
-	StringView(const FixedSizeString<LEN, CMP>& fs) noexcept
-	: StringView(fs.begin(), fs.CStrLen())
+	template<size_type LEN, int(*CMP)(const char*, const char*, size_type)>
+	StringViewImp(const FixedSizeString<LEN, CMP>& fs) noexcept
+	: StringViewImp(fs.begin(), fs.CStrLen())
 	{}
 
 	// this is mainly replacing std::string&, so i tried to keep it compatible
-	const char* c_str() const noexcept {
+	const CharT* c_str() const noexcept {
 		return data;
 	}
 
-	size_t length() const noexcept {
+	size_type length() const noexcept {
 		return len;
 	}
 	
@@ -72,22 +82,29 @@ public:
 		return len == 0;
 	}
 
-	const_iterator begin() const noexcept {
+	iterator begin() const noexcept {
 		return data;
 	}
 
-	const_iterator end() const noexcept {
+	iterator end() const noexcept {
 		return data + len;
 	}
 
-	const char& operator[](size_t i) const noexcept {
+	const CharT& operator[](size_t i) const noexcept {
 		return *(data + i);
 	}
 
 	explicit operator bool() const noexcept {
 		return data != nullptr;
 	}
+	
+private:
+	CharT* data = nullptr;
+	size_type len = 0;
 };
+
+using StringView = StringViewImp<const char>;
+using MutableStringView = StringViewImp<char>;
 
 }
 
