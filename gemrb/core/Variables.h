@@ -125,9 +125,7 @@ public:
 		SetAtCString(key, &newValue[0]);
 	}
 	
-	void SetAt(const key_t& key, const char* val) {
-		SetAtCString(key, val);
-	}
+	void SetAt(const key_t& key, const char* val) = delete;
 
 	void SetAt(const key_t&, void* newValue);
 	void SetAt(const key_t&, ieDword newValue, bool nocreate=false);

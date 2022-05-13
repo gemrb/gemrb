@@ -4095,7 +4095,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	PyObject* Variable;
 	char *value;
 	PARSE_ARGS( args,  "Os", &Variable, &value );
-	core->GetTokenDictionary()->SetAt(PyString_AsStringView(Variable), value);
+	core->GetTokenDictionary()->SetAt(PyString_AsStringView(Variable), StringView(value));
 
 	Py_RETURN_NONE;
 }
