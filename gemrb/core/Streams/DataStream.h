@@ -143,7 +143,7 @@ public:
 	template <typename STR>
 	strret_t ReadRTrimString(STR& dest, size_t len) {
 		strret_t read = Read(dest.begin(), len);
-		dest.RTrim();
+		RTrim(dest);
 		return read;
 	}
 	

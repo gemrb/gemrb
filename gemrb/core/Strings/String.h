@@ -89,10 +89,25 @@ typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typenam
 }
 
 template <typename STR>
-void TrimString(STR& string)
+void RTrim(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 {
-	string.erase(0, FindFirstNotOf(string, WHITESPACE_STRING_VIEW(STR)));
-	string.erase(FindLastNotOf(string, WHITESPACE_STRING_VIEW(STR)) + 1);
+	auto pos = FindLastNotOf(string, chars);
+	if (pos != STR::npos) {
+		string.erase(pos + 1);
+	}
+}
+
+template <typename STR>
+void LTrim(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
+{
+	string.erase(0, FindFirstNotOf(string, chars));
+}
+
+template <typename STR>
+void TrimString(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
+{
+	LTrim(string, chars);
+	RTrim(string, chars);
 }
 
 template<typename STR, typename RET = StringViewT<STR>>

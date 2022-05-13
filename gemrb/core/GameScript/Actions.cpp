@@ -5344,7 +5344,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 	if (!(flags & MSO_IGNORE_SEE) && actor && !CanSee(Sender, actor, true, 0) ) {
 		return;
 	}
-	uint8_t len = parameters->string0Parameter.CStrLen();
+	uint8_t len = parameters->string0Parameter.length();
 	//
 	if (len&3) {
 		return;
