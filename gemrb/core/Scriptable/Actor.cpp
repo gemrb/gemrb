@@ -4385,7 +4385,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
 			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 			// wipe the DAMAGER token, so we can color it
-			core->GetTokenDictionary()->SetAt("DAMAGER", "");
+			core->GetTokenDictionary()->SetAt("DAMAGER", StringView(""));
 			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
 			displaymsg->DisplayConstantStringName(STR_DAMAGE2, DMC_WHITE, hitter);
 		}
