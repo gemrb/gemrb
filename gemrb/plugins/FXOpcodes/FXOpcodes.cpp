@@ -5247,7 +5247,7 @@ int fx_local_variable (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//this is a hack, the variable name spreads across the resources
 	// print( "fx_local_variable (%2d) %s=%d", fx->Opcode, fx->Resource, fx->Parameter1 );
-	target->locals->SetAt(fx->Resource, fx->Parameter1);
+	target->locals->SetAt(fx->VariableName, fx->Parameter1);
 	//local variable effects are not applied, they will be resaved though
 	return FX_NOT_APPLIED;
 }
