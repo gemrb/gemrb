@@ -502,8 +502,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		// handle default speed and per-animation overrides
 		TableMgr::index_t row = TableMgr::npos;
 		if (extspeed) {
-			char animHex[10];
-			snprintf(animHex, 10, "0x%04X", AnimID);
+			const std::string& animHex = fmt::format("{:#04x}", AnimID);
 			row = extspeed->FindTableValue(0ul, animHex);
 			if (row != TableMgr::npos) {
 				int rate = extspeed->QueryFieldSigned<int>(row, 1);
@@ -2134,8 +2133,8 @@ static void InitActorTables()
 			error("Actor", "Missing kitlist.2da!");
 		}
 		for (TableMgr::index_t i = 0; i < tm->GetRowCount(); ++i) {
-			char rowName[6];
-			snprintf(rowName, sizeof(rowName), "%ld", i);
+			
+			const std::string& rowName = std::to_string(i);
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE").c_str(), NULL, 16);

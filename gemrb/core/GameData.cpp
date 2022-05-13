@@ -902,9 +902,7 @@ ResRef GameData::GetFist(int cls, int level)
 	// extend the last level value to infinity
 	if (level >= cols) level = cols - 1;
 
-	char clsStr[3];
-	snprintf(clsStr, sizeof(clsStr), "%d", cls);
-	TableMgr::index_t row = fistWeap->GetRowIndex(clsStr);
+	TableMgr::index_t row = fistWeap->GetRowIndex(std::to_string(cls));
 	return fistWeap->QueryField(row, level);
 }
 

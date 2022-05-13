@@ -97,7 +97,8 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		std::replace(name.begin(), name.end(), ' ', '_');
 
 		size_t l = strlen(value);
-		if (l > 1 || keymap.HasKey(value)) {
+		StringView key(value, l);
+		if (l > 1 || keymap.HasKey(key)) {
 			Log(WARNING, "KeyMap", "Ignoring key {}", value);
 			continue;
 		}
@@ -119,7 +120,7 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		Function *fun = new Function(moduleName, function, group, tolower(value[0]));
 
 		// lookup by either key or name
-		keymap.SetAt(value, fun);
+		keymap.SetAt(key, fun);
 		keymap.SetAt(name, new Function(*fun));
 	}
 	delete config;
