@@ -66,7 +66,7 @@ public:
 	
 	template<size_type LEN, int(*CMP)(const char*, const char*, size_type)>
 	StringViewImp(const FixedSizeString<LEN, CMP>& fs) noexcept
-	: StringViewImp(fs.begin(), fs.CStrLen())
+	: StringViewImp(fs.begin(), fs.length())
 	{}
 
 	// this is mainly replacing std::string&, so i tried to keep it compatible

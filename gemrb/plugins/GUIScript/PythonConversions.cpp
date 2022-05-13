@@ -131,7 +131,7 @@ PyObject* PyString_FromStringView(StringView sv)
 // Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromResRef(const ResRef& resRef)
 {
-	return PyUnicode_FromStringAndSize(resRef.CString(), resRef.CStrLen());
+	return PyUnicode_FromStringAndSize(resRef.CString(), resRef.length());
 }
 
 PyObject* PyString_FromAnimID(const char* AnimID)

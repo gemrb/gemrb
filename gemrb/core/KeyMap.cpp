@@ -90,8 +90,8 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		if (sscanf( line, "%[^=]= %[^\r\n]", name.begin(), value )!=2)
 			continue;
 
+		RTrim(name);
 		StringToLower(name);
-		name.RTrim();
 
 		//change internal spaces to underscore
 		std::replace(name.begin(), name.end(), ' ', '_');

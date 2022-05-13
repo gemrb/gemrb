@@ -5024,7 +5024,7 @@ int fx_remove_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	default:
 		// in yet another poor IE design decision ...
-		onlyknown = fx->Resource.CStrLen() == 8;
+		onlyknown = fx->Resource.length() == 8;
 		target->spellbook.RemoveSpell(fx->Resource, onlyknown);
 		break;
 	case 1: //forget all spells of Resource

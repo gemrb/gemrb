@@ -4431,7 +4431,7 @@ void Actor::PlayWalkSound()
 
 	ResRef soundBase = Sound;
 	char suffix = 0;
-	uint8_t l = Sound.CStrLen();
+	uint8_t l = Sound.length();
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
 	if (core->HasFeature(GF_SOUNDFOLDERS) && Sound.StartsWith("FS_", 3)) {
 		suffix = cnt + 0x31;

@@ -81,16 +81,19 @@ class FixedSizeString {
 	char str[LEN + 1] {'\0'};
 	
 public:
-	using index_t = uint8_t;
-	static constexpr index_t Size = LEN;
+	using size_type = uint8_t;
 	using iterator = char*;
 	using const_iterator = const char*;
+	using value_type = char;
+	
+	static constexpr size_type Size = LEN;
+	static constexpr size_type npos = -1;
 	
 	FixedSizeString() noexcept = default;
 	FixedSizeString(std::nullptr_t) noexcept = delete;
 	FixedSizeString& operator=(std::nullptr_t) noexcept = delete;
 	
-	explicit FixedSizeString(const char* cstr, index_t len = LEN) noexcept {
+	explicit FixedSizeString(const char* cstr, size_type len = LEN) noexcept {
 		if (cstr) {
 			strncpy(str, cstr, len);
 		} else {
@@ -112,17 +115,11 @@ public:
 	FixedSizeString(const FixedSizeString&) noexcept = default;
 	FixedSizeString& operator=(const FixedSizeString&) noexcept = default;
 	
-	// remove trailing spaces
-	index_t RTrim() {
-		index_t len = CStrLen();
-		index_t i = 0;
-		for (; i < len; ++i) {
-			index_t idx = len - i - 1;
-			if (std::isspace(str[idx])) str[idx] = '\0';
-			else break;
-		}
-
-		return len - i;
+	FixedSizeString& erase(size_type pos, size_type len = npos) noexcept {
+		// note that erasing from the beginning may not behave as expected
+		len = std::min<size_type>(len, LEN - pos);
+		std::fill_n(&str[pos], len, '\0');
+		return *this;
 	}
 	
 	int SNPrintF(const char* format, ...) noexcept {
@@ -135,15 +132,15 @@ public:
 	
 	template <typename STR>
 	void Append(const STR& s) {
-		index_t len = CStrLen();
+		size_type len = length();
 		strncpy(str + len, std::begin(s), LEN - len);
 	}
 
-	const char& operator[](index_t i) const noexcept {
+	const char& operator[](size_type i) const noexcept {
 		return str[i];
 	}
 
-	char& operator[](index_t i) noexcept {
+	char& operator[](size_type i) noexcept {
 		return str[i];
 	}
 	
@@ -171,11 +168,11 @@ public:
 		return CMP(str, other.str, LEN) < 0;
 	}
 	
-	bool StartsWith(const char* cstr, index_t len) const noexcept {
+	bool StartsWith(const char* cstr, size_type len) const noexcept {
 		return CMP(str, cstr, len) == 0;
 	}
 	
-	index_t CStrLen() const noexcept {
+	size_type length() const noexcept {
 		return strnlen(str, sizeof(str));
 	}
 	
@@ -200,11 +197,19 @@ public:
 	}
 	
 	const_iterator end() const noexcept {
-		return begin() + CStrLen();
+		return begin() + length();
 	}
 	
 	const_iterator bufend() const noexcept {
 		return &str[LEN + 1];
+	}
+	
+	std::reverse_iterator<const_iterator> rbegin() const noexcept {
+		return std::reverse_iterator<const_iterator>(end());
+	}
+	
+	std::reverse_iterator<const_iterator> rend() const noexcept {
+		return std::reverse_iterator<const_iterator>(begin());
 	}
 	
 	iterator begin() noexcept {
@@ -212,14 +217,22 @@ public:
 	}
 	
 	iterator end() noexcept {
-		return begin() + CStrLen();
+		return begin() + length();
 	}
 	
 	iterator bufend() noexcept {
 		return &str[LEN + 1];
 	}
+	
+	std::reverse_iterator<iterator> rbegin() noexcept {
+		return std::reverse_iterator<iterator>(end());
+	}
+	
+	std::reverse_iterator<iterator> rend() noexcept {
+		return std::reverse_iterator<iterator>(begin());
+	}
 
-	template<index_t N> FixedSizeString<N, CMP> SubStr(index_t pos) {
+	template<size_type N> FixedSizeString<N, CMP> SubStr(size_type pos) {
 		static_assert(N <= LEN, "Substring must not exceed the original length.");
 		assert(pos + LEN <= N);
 		return FixedSizeString<N, CMP>{CString() + pos};
