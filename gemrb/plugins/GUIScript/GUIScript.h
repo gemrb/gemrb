@@ -67,6 +67,8 @@ public:
 	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);
 	PyObject* ConstructObject(const char* pyclassname, ScriptingId id);
 	PyObject* ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
+	
+	const ScriptingRefBase* GetScriptingRef(PyObject* obj);
 };
 
 extern GUIScript *gs;

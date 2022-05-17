@@ -161,15 +161,16 @@ if (boolean) { \
 	Py_RETURN_FALSE; \
 }
 
-static const ScriptingRefBase* GetScriptingRef(PyObject* obj) {
+const ScriptingRefBase* GUIScript::GetScriptingRef(PyObject* obj)
+{
 	if (!obj || obj == Py_None) {
-		return NULL;
+		return nullptr;
 	}
 
 	PyObject* attr = PyObject_GetAttrString(obj, "ID");
 	if (!attr) {
 		RuntimeError("Invalid Scripting reference, must have ID attribute.");
-		return NULL;
+		return nullptr;
 	}
 	ScriptingId id = (ScriptingId) PyLong_AsUnsignedLongLong(attr);
 	Py_DecRef(attr);
@@ -177,17 +178,17 @@ static const ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 	attr = PyObject_GetAttrString(obj, "SCRIPT_GROUP");
 	if (!attr) {
 		RuntimeError("Invalid Scripting reference, must have SCRIPT_GROUP attribute.");
-		return NULL;
+		return nullptr;
 	}
 	ScriptingGroup_t group = static_cast<const char*>(PyString_AsString(attr));
 	Py_DecRef(attr);
 
-	return gs->GetScripingRef(group, id);
+	return GetScripingRef(group, id);
 }
 
 template <class RETURN>
 static RETURN* GetView(PyObject* obj) {
-	return dynamic_cast<RETURN*>(GetView(GetScriptingRef(obj)));
+	return dynamic_cast<RETURN*>(GetView(gs->GetScriptingRef(obj)));
 }
 
 static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref);
@@ -1094,7 +1095,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 
 	ScriptingId id = pyid ? (ScriptingId) PyLong_AsUnsignedLongLong(pyid) : ScriptingId(-1);
 
-	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pySubview));
+	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(gs->GetScriptingRef(pySubview));
 
 	View* superView = GetView<View>(self);
 	View* subView = GetView(ref);
@@ -2013,7 +2014,7 @@ static PyObject* GemRB_RemoveScriptingRef(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS( args, "O", &self );
 
-	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(self));
+	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(gs->GetScriptingRef(self));
 	ABORT_IF_NULL(ref);
 	auto delref = ref->GetObject()->RemoveScriptingRef(ref);
 	ABORT_IF_NULL(delref);
@@ -2042,7 +2043,7 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 	PyObject* pyView = NULL;
 	PARSE_ARGS(args, "O|i", &pyView, &del);
 
-	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pyView));
+	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(gs->GetScriptingRef(pyView));
 	View* view = GetView(ref);
 	if (view) {
 		Window* win = dynamic_cast<Window*>(view);
