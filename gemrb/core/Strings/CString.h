@@ -94,7 +94,7 @@ public:
 		if (cstr) {
 			strncpy(str, cstr, len);
 		} else {
-			std::fill(begin(), end(), '\0');
+			std::fill(begin(), bufend(), '\0');
 		}
 	}
 	
@@ -180,7 +180,7 @@ public:
 	}
 	
 	void Reset() noexcept {
-		std::fill(begin(), end(), '\0');
+		std::fill(begin(), bufend(), '\0');
 	}
 	
 	const char* CString() const noexcept {
@@ -200,6 +200,10 @@ public:
 	}
 	
 	const_iterator end() const noexcept {
+		return begin() + CStrLen();
+	}
+	
+	const_iterator bufend() const noexcept {
 		return &str[LEN + 1];
 	}
 	
@@ -208,6 +212,10 @@ public:
 	}
 	
 	iterator end() noexcept {
+		return begin() + CStrLen();
+	}
+	
+	iterator bufend() noexcept {
 		return &str[LEN + 1];
 	}
 
