@@ -186,9 +186,9 @@ const ScriptingRefBase* GUIScript::GetScriptingRef(PyObject* obj)
 	return GetScripingRef(group, id);
 }
 
-template <class RETURN>
+template <class RETURN = View>
 static RETURN* GetView(PyObject* obj) {
-	return dynamic_cast<RETURN*>(GetView(gs->GetScriptingRef(obj)));
+	return ScriptingRefCast<RETURN>(gs->GetScriptingRef(obj));
 }
 
 static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref);
@@ -1098,7 +1098,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(gs->GetScriptingRef(pySubview));
 
 	View* superView = GetView<View>(self);
-	View* subView = GetView(ref);
+	View* subView = ref->GetObject();
 	const View* siblingView = GetView<View>(pySiblingView);
 	if (superView && subView) {
 		PyObject* attr = PyObject_GetAttrString(pySubview, "SCRIPT_GROUP");
@@ -1214,21 +1214,20 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 	PyObject* lookup = NULL;
 	PARSE_ARGS( args, "O|l", &lookup, &id );
 
-	const ScriptingRefBase* ref = NULL;
+	const View* view = nullptr;
 	if (PyUnicode_Check(lookup)) {
 		const char* group = PyString_AsString(lookup);
-		ref = ScriptEngine::GetScripingRef(group, id);
+		view = ScriptingRefCast<View>(ScriptEngine::GetScripingRef(group, id));
 	} else {
 		const Window* win = GetView<Window>(lookup);
 		if (win) {
-			ref = GetControlRef(id, win);
+			view = GetControl(id, win);
 		}
 	}
 
-	if (ref) {
-		const View* retView = GetView(ref);
+	if (view) {
 		// return retView->GetScriptingRef() so that Python objects compare correctly (instread of returning the alias ref)
-		return ConstructObjectForScriptableView(retView->GetScriptingRef());
+		return ConstructObjectForScriptableView(view->GetScriptingRef());
 	}
 	Py_RETURN_NONE;
 }
@@ -2043,8 +2042,7 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 	PyObject* pyView = NULL;
 	PARSE_ARGS(args, "O|i", &pyView, &del);
 
-	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(gs->GetScriptingRef(pyView));
-	View* view = GetView(ref);
+	View* view = GetView(pyView);
 	if (view) {
 		Window* win = dynamic_cast<Window*>(view);
 		if (win) {
@@ -2064,6 +2062,7 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 			Py_RETURN_NONE;
 		} else {
 			// return a new ref for a deleted group
+			const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(gs->GetScriptingRef(pyView));
 			auto delref = view->RemoveScriptingRef(ref);
 			assert(delref);
 			view->RemoveFromSuperview();
@@ -13422,11 +13421,8 @@ GUIScript::~GUIScript(void)
 	GUIAction[0]=UNINIT_IEDWORD;
 
 	// free the memory from the global scrollbar template
-	const ScriptingRefBase* ref = ScriptEngine::GetScripingRef("SBGLOB", 0);
-	if (ref) {
-		const View* retView = GetView(ref);
-		delete retView;
-	}
+	auto view = ScriptingRefCast<View>(ScriptEngine::GetScripingRef("SBGLOB", 0));
+	delete view;
 }
 
 PyDoc_STRVAR( GemRB__doc,
@@ -13789,7 +13785,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	static PyObject* windowClass = PyDict_GetItemString(pGUIClasses, "GWindow");
 	
 	if (PyObject_IsInstance(obj, controlClass)) {
-		const Control* ctl = static_cast<Control*>(GetView(ref));
+		const Control* ctl = ScriptingRefCast<Control>(ref);
 		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
 		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->DictVariable()));
 		Control::value_t val = ctl->GetValue();
@@ -13799,7 +13795,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 			PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, val));
 		}
 	} else if (PyObject_IsInstance(obj, windowClass)) {
-		const Window* win = static_cast<Window*>(GetView(ref));
+		const Window* win = ScriptingRefCast<Window>(ref);
 		PyObject_SetAttrString(obj, "HasFocus", DecRef(PyBool_FromLong, win->HasFocus()));
 	}
 	

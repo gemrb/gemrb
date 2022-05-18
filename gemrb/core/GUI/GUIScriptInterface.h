@@ -64,6 +64,10 @@ public:
 	ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const override {
 		return new WindowScriptingRef(static_cast<Window*>(GetObject()), id, group);
 	}
+	
+	Window* GetWindow() const noexcept {
+		return static_cast<Window*>(GetObject());
+	}
 };
 
 class ControlScriptingRef : public ViewScriptingRef {
@@ -106,17 +110,28 @@ public:
 	ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const override {
 		return new ControlScriptingRef(static_cast<Control*>(GetObject()), id, group);
 	}
+	
+	Control* GetControl() const noexcept {
+		return static_cast<Control*>(GetObject());
+	}
 };
 
 
 Window* GetWindow(ScriptingId id, const ScriptingGroup_t& pack);
 const WindowScriptingRef* RegisterScriptableWindow(Window*, const ScriptingGroup_t& pack, ScriptingId id);
 
-GEM_EXPORT View* GetView(const ScriptingRefBase* base);
 GEM_EXPORT std::vector<View*> GetViews(const ScriptingGroup_t& pack);
 GEM_EXPORT Control* GetControl(ScriptingId id, const Window* win);
 GEM_EXPORT const ControlScriptingRef* GetControlRef(ScriptingId id, const Window* win);
 GEM_EXPORT const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id, const ControlScriptingRef* existing = nullptr);
+
+template <class T>
+T* GetView(const ViewScriptingRef* ref) noexcept {
+	if (ref) {
+		return dynamic_cast<T*>(ref->GetObject());
+	}
+	return nullptr;
+}
 
 template <class T>
 T* GetControl(ScriptingId id, const Window* win) {
@@ -125,11 +140,8 @@ T* GetControl(ScriptingId id, const Window* win) {
 
 template <class T>
 T* GetControl(ScriptingGroup_t group, ScriptingId id) {
-	const ControlScriptingRef* ref = static_cast<const ControlScriptingRef*>(ScriptEngine::GetScripingRef(group, id));
-	if (ref) {
-		return dynamic_cast<T*>(ref->GetObject());
-	}
-	return NULL;
+	auto ref = static_cast<const ControlScriptingRef*>(ScriptEngine::GetScripingRef(group, id));
+	return GetView<T>(ref);
 }
 
 }

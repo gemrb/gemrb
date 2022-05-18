@@ -924,7 +924,7 @@ void View::ClearScriptingRefs()
 {
 	for (auto rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
 		ViewScriptingRef* ref = *rit;
-		assert(GetView(ref) == this);
+		assert(ref->GetObject() == this);
 		bool unregistered = ScriptEngine::UnregisterScriptingRef(ref);
 		assert(unregistered);
 		delete ref;

@@ -66,6 +66,16 @@ public:
 	T* GetObject() const { return ref; }
 };
 
+template <class T>
+T* ScriptingRefCast(const ScriptingRefBase* base)
+{
+	if (base) {
+		auto ref = static_cast<const ScriptingRef<T>*>(base);
+		return ref->GetObject();
+	}
+	return nullptr;
+}
+
 
 class GEM_EXPORT ScriptEngine : public Plugin {
 public:
