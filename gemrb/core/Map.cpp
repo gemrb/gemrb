@@ -1828,7 +1828,7 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		
 		DebugPalettes() noexcept {
 			searchMapPal = MakeHolder<Palette>();
-			std::fill(&searchMapPal->col[0], &searchMapPal->col[255], Color()); // passable is transparent
+			std::fill_n(&searchMapPal->col[0], 256, Color()); // passable is transparent
 			searchMapPal->col[0] = Color(128, 64, 64, 128); // IMPASSABLE, red-ish
 			
 			for (uint8_t i = 1; i < 255; ++i) {

@@ -216,7 +216,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, con
 		Uint32 c = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
 
 		int numPx = std::min(x2 - p.x, dst->w - p.x);
-		std::fill(px, px + numPx, c);
+		std::fill_n(px, numPx, c);
 	}
 }
 

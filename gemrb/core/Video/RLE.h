@@ -33,7 +33,7 @@ inline uint8_t* DecodeRLEData(const uint8_t* p, const Size& size, colorkey_t col
 	size_t transQueue = 0;
 	for (size_t i = 0; i < pixelCount;) {
 		if (transQueue) {
-			std::fill(&buffer[i], &buffer[i + transQueue], colorKey);
+			std::fill_n(&buffer[i], transQueue, colorKey);
 			i += transQueue;
 			transQueue = 0;
 		} else {
