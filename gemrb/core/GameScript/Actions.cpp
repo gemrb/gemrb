@@ -5839,14 +5839,12 @@ void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
 
 void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 {
-	char FileName[_MAX_PATH];
-
 	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
 		const Actor *actor = game->GetPC(i, false);
-		snprintf(FileName,_MAX_PATH,"%s%d",parameters->string0Parameter.CString(),i+1);
-		core->WriteCharacter(FileName, actor);
+		std::string fname = fmt::format("{}{}", parameters->string0Parameter, i + 1);
+		core->WriteCharacter(fname, actor);
 	}
 	displaymsg->DisplayConstantString(STR_EXPORTED, DMC_BG2XPGREEN);
 }

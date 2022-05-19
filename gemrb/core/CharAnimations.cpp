@@ -114,9 +114,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		}
 
 		if (resdata) {
-			char section[12];
-			snprintf(section, 10, "%ld", i%100000); // the mod is just to silent warnings, since we know i is small enough
-
+			std::string section = fmt::to_string(i);
 			if (!resdata->GetKeysCount(section)) continue;
 
 			float walkscale = resdata->GetKeyAsFloat(section, "walkscale", 0.0f);
