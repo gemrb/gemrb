@@ -186,9 +186,9 @@ static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day
 	ResRef TmpResRef;
 
 	if (day_or_night) {
-		TmpResRef.SNPrintF("%.6sLM", wedref.CString());
+		TmpResRef.Format("{:.6}LM", wedref);
 	} else {
-		TmpResRef.SNPrintF("%.6sLN", wedref.CString());
+		TmpResRef.Format("{:.6}LN", wedref);
 	}
 
 	auto lightmap = LoadImageAs8bit(TmpResRef);
@@ -196,14 +196,14 @@ static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day
 		throw std::runtime_error("No lightmap available.");
 	}
 
-	TmpResRef.SNPrintF("%.6sSR", wedref.CString());
+	TmpResRef.Format("{:.6}SR", wedref);
 
 	auto searchmap = LoadImageAs8bit(TmpResRef);
 	if (!searchmap) {
 		throw std::runtime_error("No searchmap available.");
 	}
 
-	TmpResRef.SNPrintF("%.6sHT", wedref.CString());
+	TmpResRef.Format("{:.6}HT", wedref);
 
 	auto heightmap = LoadImageAs8bit(TmpResRef);
 	if (!heightmap) {
@@ -365,7 +365,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	if (day_or_night) {
 		TmpResRef = map->WEDResRef;
 	} else {
-		TmpResRef.SNPrintF("%.7sN", map->WEDResRef.CString());
+		TmpResRef.Format("{.7:}N", map->WEDResRef);
 	}
 	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
@@ -494,7 +494,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	if (day_or_night) {
 		TmpResRef = WEDResRef;
 	} else {
-		TmpResRef.SNPrintF("%.7sN", WEDResRef.CString());
+		TmpResRef.Format("{.7:}N", WEDResRef);
 	}
 
 	// Small map for MapControl
@@ -1406,13 +1406,13 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 				while (count) {
 					ieVariable key;
 					int value;
-					key.SNPrintF("xPos%d", count);
+					key.Format("xPos{}", count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					point.x = value;
-					key.SNPrintF("yPos%d", count);
+					key.Format("yPos{}", count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					point.y = value;
-					key.SNPrintF("text%d", count);
+					key.Format("text{}", count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					map->AddMapNote(point, 0, ieStrRef(value), true);
 					count--;

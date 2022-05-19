@@ -204,7 +204,7 @@ bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
 		if (type>4) {
 			return false;
 		}
-		spellRes.SNPrintF("%s%03d", spell_suffices[type], spellid);
+		spellRes.Format("{}{:03d}", spell_suffices[type], spellid);
 	}
 	return gamedata->Exists(spellRes, IE_SPL_CLASS_ID);
 }
@@ -217,13 +217,13 @@ void ResolveSpellName(ResRef& spellRes, ieDword number)
 	if (type>4) {
 		type=0;
 	}
-	spellRes.SNPrintF("%s%03d", spell_suffices[type], spellid);
+	spellRes.Format("{}{:03d}", spell_suffices[type], spellid);
 }
 
 ieDword ResolveSpellNumber(const ResRef& spellRef)
 {
 	ResRef tmp;
-	tmp.SNPrintF("%.4s", spellRef.CString());
+	tmp.Format("{:.4}", spellRef);
 	for (int i = 0; i < 5; i++) {
 		if (tmp == spell_suffices[i]) {
 			tmp = ResRef(spellRef.CString() + 4);
@@ -2196,7 +2196,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 		if (*varName == ':') {
 			varName++;
 		}
-		context.SNPrintF("%.6s", VarName.CString());
+		context.Format("{:.6}", VarName);
 		key = Variables::key_t(varName);
 	}
 	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", context, VarName, value);
@@ -2243,7 +2243,7 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 		if (*varName == ':') {
 			varName++;
 		}
-		context.SNPrintF("%.6s", VarName.CString());
+		context.Format("{:.6}", VarName);
 		key = Variables::key_t(varName);
 	}
 	
@@ -2515,7 +2515,7 @@ void SetupWishCore(Scriptable *Sender, TableMgr::index_t column, int picks)
 
 	ieVariable varname;
 	for (int i = 0; i < 99; i++) {
-		varname.SNPrintF("wishpower%02d", i);
+		varname.Format("wishpower{:02d}", i);
 		if(CheckVariable(Sender, varname, "GLOBAL") ) {
 			SetVariable(Sender, varname, 0, "GLOBAL");
 		}
@@ -2546,7 +2546,7 @@ void SetupWishCore(Scriptable *Sender, TableMgr::index_t column, int picks)
 		std::string cell = tm->QueryField(selects[i], column - 1);
 		if (cell == "*") continue;
 		int spnum = atoi(cell.c_str());
-		varname.SNPrintF("wishpower%02d", spnum);
+		varname.Format("wishpower{:02d}", spnum);
 		SetVariable(Sender, varname, 1, "GLOBAL");
 	}
 }
@@ -2592,7 +2592,7 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	if (polygons[index]) {
 		return polygons[index];
 	}
-	resRef.SNPrintF("ISLAND%02d", index);
+	resRef.Format("ISLAND{:02d}", index);
 	AutoTable tm = gamedata->LoadTable(resRef);
 	if (!tm) {
 		return NULL;

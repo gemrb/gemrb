@@ -1588,7 +1588,7 @@ void Game::TextDream()
 	if (!locals->Lookup("DREAM", dream)) {
 		dream = 1;
 	}
-	TextScreen.SNPrintF("drmtxt%d", dream + 1);
+	TextScreen.Format("drmtxt{}", dream + 1);
 
 	if ((chapter > dream) && (core->Roll(1, 100, 0) <= 33)
 		&& gamedata->Exists(TextScreen, IE_2DA_CLASS_ID)) {
@@ -2260,8 +2260,7 @@ bool Game::RandomEncounter(ResRef &BaseArea)
 	if (core->Roll(1, 100, 0)>bntchnc[rep]) return false;
 	// there are non-encounter areas matching the pattern, but they are
 	// not reachable via the worldmap
-	ResRef tmp = BaseArea;
-	BaseArea.SNPrintF("%.4s10", tmp.CString());
+	BaseArea.Format("{:.4}10", BaseArea);
 	return gamedata->Exists(BaseArea, IE_ARE_CLASS_ID);
 }
 

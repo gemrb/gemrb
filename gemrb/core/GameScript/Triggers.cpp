@@ -648,7 +648,7 @@ int GameScript::NumDead(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		VariableName.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value == (ieDword) parameters->int0Parameter );
@@ -662,7 +662,7 @@ int GameScript::NumDeadGT(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		VariableName.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value > (ieDword) parameters->int0Parameter );
@@ -676,7 +676,7 @@ int GameScript::NumDeadLT(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		VariableName.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value < (ieDword) parameters->int0Parameter );
@@ -1754,10 +1754,10 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 		size_t len;
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
-			len = Variable.SNPrintF("%s_DEAD", parameters->string0Parameter.CString());
+			len = Variable.Format("{}_DEAD", parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {
-			len = Variable.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter.CString());
+			len = Variable.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
 		}
 		if (len > sizeof(ieVariable)) {
@@ -2759,7 +2759,7 @@ int GameScript::CurrentAreaIs(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	ResRef arearesref;
-	arearesref.SNPrintF("AR%04d", parameters->int0Parameter);
+	arearesref.Format("AR{:04d}", parameters->int0Parameter);
 	if (arearesref == tar->GetCurrentArea()->GetScriptRef()) {
 		return 1;
 	}

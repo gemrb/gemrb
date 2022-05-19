@@ -2053,8 +2053,7 @@ void Map::MarkVisited(const Actor *actor) const
 {
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		ieVariable key;
-		size_t len = key.SNPrintF("%s_visited", scriptName.CString());
-		if (len > sizeof(key)) {
+		if (!key.Format("{}_visited", scriptName)) {
 			Log(ERROR, "Map", "Area {} has a too long script name for generating _visited globals!", scriptName);
 		}
 		core->GetGame()->locals->SetAt(key, 1);
@@ -3575,7 +3574,7 @@ Container *Map::GetPile(Point position)
 	position.x=position.x/16;
 	position.y=position.y/12;
 	ieVariable pileName;
-	pileName.SNPrintF("heap_%d.%d", position.x, position.y);
+	pileName.Format("heap_{}.{}", position.x, position.y);
 	//pixel position is centered on search square
 	position.x=position.x*16+8;
 	position.y=position.y*12+6;

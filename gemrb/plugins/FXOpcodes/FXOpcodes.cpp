@@ -5413,7 +5413,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		//ToB familiars
 		if (game->Expansion == GAME_TOB) {
 			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
-			fx->Resource.SNPrintF("%.6s25", game->GetFamiliar(alignment).CString());
+			fx->Resource.Format("{:.6}25", game->GetFamiliar(alignment));
 		} else {
 			fx->Resource = game->GetFamiliar(alignment);
 		}
@@ -5481,7 +5481,7 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//upgrade familiar to ToB version
 	if (fx->Parameter1 != 2 && game->Expansion == GAME_TOB) {
 		ResRef resource;
-		resource.SNPrintF("%.6s25", target->GetScriptName().CString());
+		resource.Format("{:.6}25", target->GetScriptName());
 		//set this field, so the upgrade is triggered only once
 		fx->Parameter1 = 2;
 
@@ -6482,7 +6482,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ResRef script;
 	//intentionally 7, to leave room for the last letter
 	// if this ever breaks, try with the CRE file name as the prefix (sources disagree)
-	script.SNPrintF("%.7sm", target->GetScript(SCR_CLASS).CString());
+	script.Format("{:.7}m", target->GetScript(SCR_CLASS));
 	//if the caster is inparty, the script is turned off by the AI disable flag
 	copy->SetScript(script, SCR_CLASS, target->InParty!=0);
 
@@ -6753,7 +6753,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, DMC_WHITE, target);
 		if (target->LuckyRoll(1,100,0)<25) {
 			ResRef spl;
-			spl.SNPrintF("%.7sF", fx->Resource.CString());
+			spl.Format("{:.7}F", fx->Resource);
 			core->ApplySpell(spl, target, Owner, fx->Power);
 		}
 		return FX_NOT_APPLIED;
@@ -7890,7 +7890,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 	} else {
 		// ees also try one char shorter resref, so eg. the sunfire child spell finds the main one
 		ResRef tmp;
-		tmp.SNPrintF("%.7s", fx->Resource.CString());
+		tmp.Format("{:.7}", fx->Resource);
 		if (gamedata->Exists(tmp, IE_SPL_CLASS_ID)) {
 			const Spell *poi = gamedata->GetSpell(tmp, true);
 			sourceNameRef = poi->SpellName;

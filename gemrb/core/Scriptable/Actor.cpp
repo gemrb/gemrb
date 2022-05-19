@@ -4439,7 +4439,7 @@ void Actor::PlayWalkSound()
 		suffix = cnt + 0x60; // 'a'-'g'
 	}
 	if (l < 8 && suffix != 0) {
-		Sound.SNPrintF("%.8s%c", soundBase.CString(), suffix);
+		Sound.Format("{:.8}{}", soundBase, suffix);
 	}
 
 	tick_t len = 0;
@@ -4509,12 +4509,12 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 			default: armor = 6; break;
 		}
 
-		Sound.SNPrintF("H_%s_%s%d", dmg_types[type-1], armor_types[armor], core->Roll(1, 3, 0));
+		Sound.Format("H_{}_{}{}", dmg_types[type-1], armor_types[armor], core->Roll(1, 3, 0));
 	} else {
 		if (levels) {
-			Sound.SNPrintF("HIT_0%d%c%c", type, armor + 'A', suffix ? '1' : 0);
+			Sound.Format("HIT_0{}{}{}", type, armor + 'A', suffix ? '1' : 0);
 		} else {
-			Sound.SNPrintF("HIT_0%d%c", type, suffix ? '1' : 0);
+			Sound.Format("HIT_0{}{}", type, suffix ? '1' : 0);
 		}
 	}
 	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos);
@@ -5015,8 +5015,7 @@ void Actor::Resurrect(const Point &destPoint)
 	//readjust death variable on resurrection
 	ieVariable DeathVar;
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
-		const size_t len = DeathVar.SNPrintF("%s_DEAD", scriptName.CString());
-		if (len > sizeof(ieVariable)) {
+		if (!DeathVar.Format("{}_DEAD", scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", scriptName, fmt::WideToChar{GetName()});
 		}
 		ieDword value=0;
@@ -5027,8 +5026,7 @@ void Actor::Resurrect(const Point &destPoint)
 		}
 	// not bothering with checking actor->SetDeathVar, since the SetAt nocreate parameter is true
 	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
-		const size_t len = DeathVar.SNPrintF(core->GetDeathVarFormat(), scriptName.CString());
-		if (len > 32) {
+		if (!DeathVar.Format(core->GetDeathVarFormat(), scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals (on resurrect)!", scriptName, fmt::WideToChar{GetName()});
 		}
 		game->locals->SetAt(DeathVar, 0, true);
@@ -5223,7 +5221,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		if (Modified[IE_SEX] == SEX_EXTRA) {
 			varname = "EXTRACOUNT";
 		} else {
-			varname.SNPrintF("EXTRACOUNT%d", 2 + (Modified[IE_SEX] - SEX_EXTRA2));
+			varname.Format("EXTRACOUNT{}", 2 + (Modified[IE_SEX] - SEX_EXTRA2));
 		}
 
 		if (area) {
@@ -5352,12 +5350,11 @@ bool Actor::CheckOnDeath()
 	if (scriptName[0] && SetDeathVar) {
 		ieVariable varname;
 		value = 0;
-		size_t len = varname.SNPrintF("%s_DEAD", scriptName.CString());
-		game->locals->Lookup(varname, value);
-		game->locals->SetAt(varname, 1, nocreate);
-		if (len > 32) {
+		if (!varname.Format("{}_DEAD", scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", scriptName, fmt::WideToChar{GetName()});
 		}
+		game->locals->Lookup(varname, value);
+		game->locals->SetAt(varname, 1, nocreate);
 		if (value) {
 			IncrementDeathVariable(game->locals, "%s_KILL_CNT", scriptName, 1);
 		}
@@ -5416,12 +5413,11 @@ bool Actor::CheckOnDeath()
 ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, StringView name, ieDword start) const {
 	if (!name.empty()) {
 		ieVariable varname;
-		size_t len = varname.SNPrintF(format, name);
-		vars->Lookup(varname, start);
-		vars->SetAt(varname, start + 1, nocreate);
-		if (len > 32) {
+		if (!varname.Format(format, name)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", name, fmt::WideToChar{GetName()});
 		}
+		vars->Lookup(varname, start);
+		vars->SetAt(varname, start + 1, nocreate);
 	}
 	return start;
 }
@@ -5676,7 +5672,7 @@ void Actor::ApplyFeats()
 
 	for(int i=0;i<MAX_FEATS;i++) {
 		int level = GetFeat(i);
-		feat.SNPrintF("FEAT%02x", i);
+		feat.Format("FEAT{:02x}", i);
 		if (level) {
 			if (gamedata->Exists(feat, IE_SPL_CLASS_ID, true)) {
 				core->ApplySpell(feat, this, this, level);
@@ -8519,15 +8515,15 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, size_t index) const
 				return;
 			}
 
-			Sound.SNPrintF("%.5s%.2s", PCStats->SoundSet.CString(), suffixes[index]);
+			Sound.Format("{:.5}{:.2}", PCStats->SoundSet, suffixes[index]);
 			return;
 		} else if (csound[index]) {
-			Sound.SNPrintF("%s%c", PCStats->SoundSet.CString(), csound[index]);
+			Sound.Format("{}{}", PCStats->SoundSet, csound[index]);
 			return;
 		}
 
 		//icewind style
-		Sound.SNPrintF("%s%02d", PCStats->SoundSet.CString(), VCMap[index]);
+		Sound.Format("{}{:02d}", PCStats->SoundSet, VCMap[index]);
 		return;
 	}
 
@@ -8666,8 +8662,8 @@ void Actor::SetPortrait(const ResRef& portraitRef, int Which)
 	}
 	if(!Which) {
 		// ensure they're properly terminated
-		SmallPortrait.SNPrintF("%.*sS", 7, SmallPortrait.CString());
-		LargePortrait.SNPrintF("%.*sM", 7, LargePortrait.CString());
+		SmallPortrait.Format("{:{}}S", 7, SmallPortrait);
+		LargePortrait.Format("{:{}}M", 7, LargePortrait);
 	}
 }
 
@@ -8694,7 +8690,7 @@ void Actor::SetSoundFolder(const ieVariable& soundset) const
 			if (end != nullptr) {
 				// need to truncate the "01" from the name, eg. HaFT_01.wav -> HaFT
 				// but also 2df_007.wav -> 2df_0, meaning the data is less diverse than it may seem
-				PCStats->SoundSet.SNPrintF("%.*s", int(end - 2 - name), name);
+				PCStats->SoundSet.Format("{:{}}", int(end - 2 - name), name);
 				break;
 			}
 		} while (++dirIt);
@@ -11064,11 +11060,11 @@ ResRef Actor::GetArmorSound() const
 		const char* suffixes = "12345678";
 		int idx = RAND(0, maxChar-1);
 		if (armorCode == '2') {
-			sound.SNPrintF("A_LTHR%c", suffixes[idx]);
+			sound.Format("A_LTHR{}", suffixes[idx]);
 		} else if (armorCode == '3') {
-			sound.SNPrintF("A_CHAIN%c", suffixes[idx]);
+			sound.Format("A_CHAIN{}", suffixes[idx]);
 		} else { // 4
-			sound.SNPrintF("A_PLATE%c", suffixes[idx]);
+			sound.Format("A_PLATE{}", suffixes[idx]);
 		}
 	} else {
 		// generate a 1 letter suffix or emulate an empty string
@@ -11077,7 +11073,7 @@ ResRef Actor::GetArmorSound() const
 		int idx = RAND(0, maxChar);
 		char randomASCII = '\0';
 		if (idx < maxChar) randomASCII = suffixes[idx];
-		sound.SNPrintF("ARM_0%c%c", armorCode, randomASCII);
+		sound.Format("ARM_0{}{}", armorCode, randomASCII);
 	}
 	return sound;
 }
