@@ -4389,7 +4389,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 		TableMgr::index_t row;
 		if (checkcol == -1) {
 			// use the row names
-			row = tm->GetRowIndex(std::to_string(value));
+			row = tm->GetRowIndex(fmt::to_string(value));
 		} else {
 			// use the checkcol column (default of 0)
 			row = tm->FindTableValue(checkcol, value, 0);
