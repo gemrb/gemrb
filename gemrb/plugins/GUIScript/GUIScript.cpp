@@ -4459,16 +4459,13 @@ The above example exports the currently selected character.\n\
 static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 {
 	int globalID;
-	const char *name;
-	PARSE_ARGS( args,  "is", &globalID, &name );
-	if(!name[0]) {
-		return NULL;
-	}
+	PyObject* name = nullptr;
+	PARSE_ARGS(args,  "iO", &globalID, &name);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	return PyLong_FromLong(core->WriteCharacter(name, actor));
+	return PyLong_FromLong(core->WriteCharacter(PyString_AsStringView(name), actor));
 }
 
 
