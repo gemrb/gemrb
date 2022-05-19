@@ -1439,8 +1439,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 
-	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
-	char pathString[_MAX_PATH * 3];
 #ifdef HAVE_REALPATH
 	if (unhardcodedTypePath[0] == '.') {
 		// canonicalize the relative path; usually from running from the build dir
@@ -1451,12 +1449,13 @@ int Interface::Init(const InterfaceConfig* cfg)
 		}
 	}
 #endif
-	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcodedTypePath);
+	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
+	std::string pathString = fmt::format("GemRB_Data_Path = {}", unhardcodedTypePath);
 	PathJoin(strpath, config.GamePath, "gemrb_path.txt", nullptr);
 	FileStream *pathFile = new FileStream();
 	// don't abort if something goes wrong, since it should never happen and it's not critical
 	if (pathFile->Create(strpath)) {
-		pathFile->Write(pathString, strlen(pathString));
+		pathFile->Write(pathString.c_str(), pathString.length());
 		pathFile->Close();
 	}
 	delete pathFile;

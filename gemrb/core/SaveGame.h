@@ -36,7 +36,7 @@ class GEM_EXPORT SaveGame : public Held<SaveGame> {
 public:
 	static const TypeID ID;
 public:
-	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
+	SaveGame(std::string path, std::string name, const ResRef& prefix, std::string slotname, int pCount, int saveID);
 	~SaveGame() override = default;
 	int GetPortraitCount() const
 	{
@@ -46,24 +46,24 @@ public:
 	{
 		return SaveID;
 	}
-	const char* GetName() const
+	const std::string& GetName() const
 	{
 		return Name;
 	}
-	const char* GetPrefix() const
+	const ResRef& GetPrefix() const
 	{
 		return Prefix;
 	}
-	const char* GetPath() const
+	const std::string& GetPath() const
 	{
 		return Path;
 	}
-	const char* GetDate() const
+	const std::string& GetDate() const
 	{
 		return Date;
 	}
-	const char* GetGameDate() const;
-	const char* GetSlotName() const
+	const std::string& GetGameDate() const;
+	const std::string& GetSlotName() const
 	{
 		return SlotName;
 	}
@@ -74,12 +74,12 @@ public:
 	DataStream* GetWmap(int idx) const;
 	DataStream* GetSave() const;
 private:
-	char Path[_MAX_PATH];
-	char Prefix[10];
-	char Name[_MAX_PATH];
-	char Date[_MAX_PATH];
-	mutable char GameDate[_MAX_PATH];
-	char SlotName[_MAX_PATH];
+	std::string Path;
+	std::string Name;
+	ResRef Prefix;
+	std::string Date;
+	mutable std::string GameDate;
+	std::string SlotName;
 	int PortraitCount;
 	int SaveID;
 	ResourceManager manager;
