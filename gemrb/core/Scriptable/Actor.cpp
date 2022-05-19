@@ -8429,13 +8429,12 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
 bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 {
-	char section[12];
 	unsigned int animid=BaseStats[IE_ANIMATION_ID];
 	if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
 		animid&=0xff;
 	}
-	snprintf(section,10,"%d", animid);
 
+	std::string section = fmt::to_string(animid);
 	/* TODO: pst also has these, but we currently ignore them:
 	 * Another form of randomization for attack animations (random pick of Attack1-3 [if defined] and this is its sound)
 	 *    1x at2sound for each at1sound
