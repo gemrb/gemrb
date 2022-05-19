@@ -3954,7 +3954,7 @@ int Interface::SwapoutArea(Map *map) const
 	return 0;
 }
 
-int Interface::WriteCharacter(const char *name, const Actor *actor)
+int Interface::WriteCharacter(StringView name, const Actor *actor)
 {
 	char Path[_MAX_PATH];
 
@@ -3968,7 +3968,7 @@ int Interface::WriteCharacter(const char *name, const Actor *actor)
 	}
 
 	FileStream str;
-	if (!str.Create(Path, name, IE_CHR_CLASS_ID)
+	if (!str.Create(Path, name.c_str(), IE_CHR_CLASS_ID)
 		|| gm->PutActor(&str, actor, true) < 0) {
 		Log(WARNING, "Core", "Character cannot be saved: {}", name);
 		return -1;
@@ -3976,7 +3976,7 @@ int Interface::WriteCharacter(const char *name, const Actor *actor)
 
 	//write the BIO string
 	if (!HasFeature(GF_NO_BIOGRAPHY)) {
-		str.Create( Path, name, IE_BIO_CLASS_ID );
+		str.Create(Path, name.c_str(), IE_BIO_CLASS_ID);
 		//never write the string reference into this string
 		std::string mbstr = GetMBString(actor->GetVerbalConstant(VB_BIO), STRING_FLAGS::STRREFOFF);
 		str.Write(mbstr.data(), mbstr.length());
