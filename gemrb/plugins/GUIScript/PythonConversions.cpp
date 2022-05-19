@@ -158,11 +158,6 @@ String* PyString_AsStringObj(PyObject* obj)
 	return StringFromCString(wrap.CString());
 }
 
-PyStringWrapper PyString_AsString(PyObject* obj)
-{
-	return PyStringWrapper(obj, core->SystemEncoding);
-}
-
 PyStringWrapper PyString_AsStringView(PyObject* obj)
 {
 	// TODO: this is the same as PyString_AsString

@@ -188,7 +188,6 @@ public:
 		delete[] buffer;
 	}
 };
-PyStringWrapper PyString_AsString(PyObject* obj);
 PyStringWrapper PyString_AsStringView(PyObject* obj);
 
 /*
