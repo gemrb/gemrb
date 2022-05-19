@@ -5861,7 +5861,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		}
 		String str = core->GetString(ieStrRef(parameters->int0Parameter), STRING_FLAGS::STRREFOFF);
 		std::string FolderName = fmt::format("{} - {}", basename, fmt::WideToChar{str});
-		core->GetSaveGameIterator()->CreateSaveGame(core->GetSaveGameIterator()->GetSaveGame(FolderName.c_str()), FolderName.c_str(), true);
+		core->GetSaveGameIterator()->CreateSaveGame(core->GetSaveGameIterator()->GetSaveGame(FolderName), FolderName, true);
 	} else {
 		core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter);
 	}

@@ -4517,9 +4517,9 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	PyObject *obj;
 	int slot = -1;
 	int Version = -1;
-	const char *folder;
+	PyObject* folder = nullptr;
 
-	if (!PyArg_ParseTuple( args, "Os|i", &obj, &folder, &Version )) {
+	if (!PyArg_ParseTuple(args, "OO|i", &obj, &folder, &Version)) {
 		PyErr_Clear();
 		PARSE_ARGS( args,  "i|i", &slot, &Version);
 	}
@@ -4537,7 +4537,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (slot == -1) {
 		CObject<SaveGame> save(obj);
 
-		return PyLong_FromLong(sgip->CreateSaveGame(save, folder));
+		return PyLong_FromLong(sgip->CreateSaveGame(save, PyString_AsStringView(folder)));
 	} else {
 		return PyLong_FromLong(sgip->CreateSaveGame(slot, core->config.MultipleQuickSaves));
 	}
@@ -4603,8 +4603,8 @@ static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS(args, "O", &Slot);
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-	const char* name = save->GetName();
-	return PyUnicode_Decode(name, strlen(name), core->SystemEncoding, "strict");
+	const std::string& name = save->GetName();
+	return PyUnicode_Decode(name.c_str(), name.length(), core->SystemEncoding, "strict");
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
@@ -4627,7 +4627,8 @@ static PyObject* GemRB_SaveGame_GetDate(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, "O", &Slot );
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-	return PyString_FromString(save->GetDate());
+	const std::string& date = save->GetDate();
+	return PyUnicode_Decode(date.c_str(), date.length(), core->SystemEncoding, "strict");
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetGameDate__doc,
@@ -4650,7 +4651,8 @@ static PyObject* GemRB_SaveGame_GetGameDate(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "O", &Slot );
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-	return PyString_FromString(save->GetGameDate());
+	const std::string& date = save->GetGameDate();
+	return PyUnicode_Decode(date.c_str(), date.length(), core->SystemEncoding, "strict");
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetSaveID__doc,

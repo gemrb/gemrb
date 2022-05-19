@@ -41,13 +41,13 @@ public:
 	~SaveGameIterator() noexcept = default;
 	const charlist& GetSaveGames();
 	void DeleteSaveGame(const Holder<SaveGame>&) const;
-	int CreateSaveGame(Holder<SaveGame>, const char *slotname, bool force = false) const;
+	int CreateSaveGame(Holder<SaveGame>, StringView slotname, bool force = false) const;
 	int CreateSaveGame(int index, bool mqs = false) const;
-	Holder<SaveGame> GetSaveGame(const char *slotname);
+	Holder<SaveGame> GetSaveGame(StringView slotname);
 private:
 	bool RescanSaveGames();
-	static Holder<SaveGame> BuildSaveGame(const char *slotname);
-	void PruneQuickSave(const char *folder) const;
+	static Holder<SaveGame> BuildSaveGame(std::string slotname);
+	void PruneQuickSave(StringView folder) const;
 };
 
 }

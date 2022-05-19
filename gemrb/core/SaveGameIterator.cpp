@@ -94,25 +94,22 @@ static std::string ParseGameDate(DataStream *ds)
 	}
 }
 
-SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID)
+SaveGame::SaveGame(std::string path, std::string name, const ResRef& prefix, std::string slotname, int pCount, int saveID)
+: Path(std::move(path)), Name(std::move(name)), Prefix(prefix), SlotName(std::move(slotname))
 {
-	strlcpy( Prefix, prefix, sizeof( Prefix ) );
-	strlcpy( Path, path, sizeof( Path ) );
-	strlcpy( Name, name, sizeof( Name ) );
-	strlcpy( SlotName, slotname, sizeof( SlotName ) );
 	PortraitCount = pCount;
 	SaveID = saveID;
 	char nPath[_MAX_PATH];
 	struct stat my_stat;
-	PathJoinExt(nPath, Path, Prefix, "bmp");
+	PathJoinExt(nPath, Path.c_str(), Prefix.CString(), "bmp");
 	memset(&my_stat,0,sizeof(my_stat));
 	if (stat(nPath, &my_stat)) {
 		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
-		strlcpy(Date, "Sun 31 Feb 00:00:01 2099", _MAX_PATH);
+		Date = "Sun 31 Feb 00:00:01 2099";
 	} else {
-		strftime(Date, _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
+		strftime(&Date[0], _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
 	}
-	manager.AddSource(Path, Name, PLUGIN_RESOURCE_DIRECTORY);
+	manager.AddSource(Path.c_str(), Name.c_str(), PLUGIN_RESOURCE_DIRECTORY);
 	GameDate[0] = '\0';
 }
 
@@ -121,8 +118,8 @@ Holder<Sprite2D> SaveGame::GetPortrait(int index) const
 	if (index > PortraitCount) {
 		return NULL;
 	}
-	char nPath[_MAX_PATH];
-	snprintf(nPath, _MAX_PATH, "PORTRT%d", index);
+
+	std::string nPath = fmt::format("PORTRT{}", index);
 	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(nPath, manager, true);
 	if (!im)
 		return NULL;
@@ -152,10 +149,10 @@ DataStream* SaveGame::GetSave() const
 	return manager.GetResource(Prefix, IE_SAV_CLASS_ID, true);
 }
 
-const char* SaveGame::GetGameDate() const
+const std::string& SaveGame::GetGameDate() const
 {
-	if (GameDate[0] == '\0')
-		strcpy(GameDate, ParseGameDate(GetGame()).c_str());
+	if (GameDate.empty())
+		GameDate = ParseGameDate(GetGame());
 	return GameDate;
 }
 
@@ -166,10 +163,6 @@ static std::string SaveDir()
 	core->GetTokenDictionary()->Lookup("SaveDir", saveDir);
 	return saveDir;
 }
-
-#define FormatQuickSavePath(destination, i) \
-	 snprintf(destination,sizeof(destination),"%s%s%s%09d-%s", \
-		core->config.SavePath, SaveDir().c_str(), SPathDelimiter, i, folder)
 
 /*
  * Returns the first 0 bit position of an integer
@@ -188,15 +181,15 @@ static int GetHole(int n)
 /*
  * Returns the age of a quickslot entry. Returns 0 if it isn't a quickslot
  */
-static int IsQuickSaveSlot(const char* match, const char* slotname)
+static int IsQuickSaveSlot(StringView match, StringView slotname)
 {
 	char savegameName[_MAX_PATH];
 	int savegameNumber = 0;
-	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
+	int cnt = sscanf(slotname.c_str(), SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName);
 	if (cnt != 2) {
 		return 0;
 	}
-	if (stricmp(savegameName, match) != 0)
+	if (stricmp(savegameName, match.c_str()) != 0)
 	{
 		return 0;
 	}
@@ -282,7 +275,7 @@ bool SaveGameIterator::RescanSaveGames()
 	} while (++dir);
 
 	for (const auto& slot : slots) {
-		save_slots.push_back(BuildSaveGame(slot.c_str()));
+		save_slots.push_back(BuildSaveGame(slot));
 	}
 
 	return true;
@@ -295,32 +288,28 @@ const std::vector<Holder<SaveGame> >& SaveGameIterator::GetSaveGames()
 	return save_slots;
 }
 
-Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *name)
+Holder<SaveGame> SaveGameIterator::GetSaveGame(StringView name)
 {
 	RescanSaveGames();
 
 	for (const auto& saveSlot : save_slots) {
-		if (strcmp(name, saveSlot->GetName()) == 0)
+		if (saveSlot->GetName().compare(name.c_str()) == 0)
 			return saveSlot;
 	}
 	return NULL;
 }
 
-Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
+Holder<SaveGame> SaveGameIterator::BuildSaveGame(std::string slotname)
 {
-	if (!slotname) {
-		return NULL;
-	}
-
 	int prtrt = 0;
 	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), slotname, nullptr);
+	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), slotname.c_str(), nullptr);
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
 
-	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
+	int cnt = sscanf(slotname.c_str(), SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName);
 	//maximum pathlength == 240, without 8+3 filenames
 	if ( (cnt != 2) || (strlen(Path)>240) ) {
 		Log(WARNING, "SaveGame", "Invalid savegame directory '{}' in {}.", slotname, Path);
@@ -336,14 +325,15 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 			prtrt++;
 	} while (++dir);
 
-	return MakeHolder<SaveGame>(Path, savegameName, core->GameNameResRef.CString(), slotname, prtrt, savegameNumber);
+	return MakeHolder<SaveGame>(Path, savegameName, core->GameNameResRef, std::move(slotname), prtrt, savegameNumber);
 }
 
-void SaveGameIterator::PruneQuickSave(const char *folder) const
+void SaveGameIterator::PruneQuickSave(StringView folder) const
 {
-	// FormatQuickSavePath needs: _MAX_PATH + 6 + 1 + 9 + 17
-	char from[_MAX_PATH + 40];
-	char to[_MAX_PATH + 40];
+	auto FormatQuickSavePath = [folder](int i)
+	{
+		return fmt::format(FMT_STRING("{}{}{}{:09d}-{}"), core->config.SavePath, SaveDir(), SPathDelimiter, i, folder);
+	};
 
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;
@@ -366,17 +356,17 @@ void SaveGameIterator::PruneQuickSave(const char *folder) const
 	size_t hole = GetHole(n);
 	if (hole<size) {
 		//prune second path
-		FormatQuickSavePath(from, myslots[hole]);
+		std::string from = FormatQuickSavePath(myslots[hole]);
 		myslots.erase(myslots.begin()+hole);
-		core->DelTree(from, false);
-		rmdir(from);
+		core->DelTree(from.c_str(), false);
+		rmdir(from.c_str());
 	}
 	//shift paths, always do this, because they are aging
 	size = myslots.size();
 	for (size_t i = size; i > 0; i--) {
-		FormatQuickSavePath(from, myslots[i]);
-		FormatQuickSavePath(to, myslots[i]+1);
-		int errnum = rename(from, to);
+		std::string from = FormatQuickSavePath(myslots[i]);
+		std::string to = FormatQuickSavePath(myslots[i]+1);
+		int errnum = rename(from.c_str(), to.c_str());
 		if (errnum) {
 			error("SaveGameIterator", "Rename error {} when pruning quicksaves!", errnum);
 		}
@@ -426,10 +416,9 @@ static bool DoSaveGame(const char *Path, bool overrideRunning)
 		Holder<Sprite2D> portrait = actor->CopyPortrait(true);
 
 		if (portrait) {
-			char FName[_MAX_PATH];
-			snprintf( FName, sizeof(FName), "PORTRT%d", i );
+			std::string fname = fmt::format("PORTRT{}", i);
 			FileStream outfile;
-			outfile.Create(Path, FName, IE_BMP_CLASS_ID);
+			outfile.Create(Path, fname.c_str(), IE_BMP_CLASS_ID);
 			// NOTE: we save the true portrait size, even tho the preview buttons arent (always) the same
 			// we do this because: 1. the GUI should be able to use whatever size it wants
 			// and 2. its more appropriate to have a flag on the buttons to do the scaling/cropping
@@ -540,8 +529,7 @@ static int CanSave()
 	return 0;
 }
 
-static bool CreateSavePath(char *Path, int index, const char *slotname) WARN_UNUSED;
-static bool CreateSavePath(char *Path, int index, const char *slotname)
+static bool CreateSavePath(char *Path, int index, StringView slotname)
 {
 	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), nullptr);
 
@@ -552,9 +540,8 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 	}
 	//keep the first part we already determined existing
 
-	char dir[_MAX_PATH];
-	snprintf( dir, _MAX_PATH, "%09d-%s", index, slotname );
-	PathJoin(Path, Path, dir, nullptr);
+	std::string dir = fmt::format("{:09d}-{}", index, slotname);
+	PathJoin(Path, Path, dir.c_str(), nullptr);
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
 	if (!MakeDirectory(Path)) {
@@ -567,11 +554,11 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 {
 	AutoTable tab = gamedata->LoadTable("savegame");
-	const char *slotname = NULL;
+	StringView slotname;
 	int qsave = 0;
 
 	if (tab) {
-		slotname = tab->QueryField(index).c_str();
+		slotname = tab->QueryField(index);
 		qsave = tab->QueryFieldSigned<int>(index, 1);
 	}
 
@@ -624,7 +611,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 	return GEM_OK;
 }
 
-int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname, bool force) const
+int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname, bool force) const
 {
 	if (!slotname) {
 		return GEM_ERROR;
@@ -689,8 +676,8 @@ void SaveGameIterator::DeleteSaveGame(const Holder<SaveGame>& game) const
 		return;
 	}
 
-	core->DelTree( game->GetPath(), false ); //remove all files from folder
-	rmdir( game->GetPath() );
+	core->DelTree(game->GetPath().c_str(), false); //remove all files from folder
+	rmdir(game->GetPath().c_str());
 }
 
 }
