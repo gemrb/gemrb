@@ -219,6 +219,14 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 
 void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
+#if USE_OPENGL_BACKEND
+	// we have coopted SDLs shader, so we need to reset uniforms to values appropriate for the render targets
+	blitRGBAShader->SetUniformValue("u_greyMode", 1, 0);
+	blitRGBAShader->SetUniformValue("u_stencil", 1, 0);
+	blitRGBAShader->SetUniformValue("u_dither", 1, 0);
+	blitRGBAShader->SetUniformValue("u_rgba", 1, 1);
+#endif
+	
 	SDL_SetRenderTarget(renderer, NULL);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
