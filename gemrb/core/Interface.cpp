@@ -184,8 +184,8 @@ private:
 
 static std::unique_ptr<AbilityTables> abilityTables;
 
-static const char* const IWD2DeathVarFormat = "_DEAD%s";
-static const char* DeathVarFormat = "SPRITE_IS_DEAD%s";
+static const char* const IWD2DeathVarFormat = "_DEAD{}";
+static const char* DeathVarFormat = "SPRITE_IS_DEAD{}";
 static int NumRareSelectSounds = 2;
 
 static const ieWord IDT_FAILURE = 0;
@@ -3444,7 +3444,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 	for (TableMgr::index_t j = 0; j < i; j++) {
 		ResRef ItemName;
 		if (Prefix) {
-			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
+			ItemName.Format("{}{:02d}", Prefix, (j + 1) % 100);
 		} else {
 			ItemName = tab->GetRowName(j);
 		}

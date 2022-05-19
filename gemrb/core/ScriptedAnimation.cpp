@@ -371,7 +371,7 @@ void ScriptedAnimation::SetFullPalette(const ResRef &PaletteResRef)
 void ScriptedAnimation::SetFullPalette(int idx)
 {
 	ResRef PaletteResRef;
-	PaletteResRef.SNPrintF("%.7s%d", ResName.CString(), idx);
+	PaletteResRef.Format("{:.7}{}", ResName, idx);
 	SetFullPalette(PaletteResRef);
 	//no need to call twin
 }

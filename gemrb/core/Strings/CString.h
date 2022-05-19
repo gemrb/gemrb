@@ -122,12 +122,14 @@ public:
 		return *this;
 	}
 	
-	int SNPrintF(const char* format, ...) noexcept {
-		va_list args;
-		va_start(args, format);
-		int ret = vsnprintf(str, sizeof(str), format, args);
-		va_end(args);
-		return ret;
+	template<typename ...ARGS>
+	bool Format(ARGS&& ...args) noexcept {
+		auto ret = fmt::format_to_n(begin(), LEN + 1, std::forward<ARGS>(args)...);
+		if (ret.size > LEN) {
+			str[LEN] = '\0';
+			return false;
+		}
+		return true;
 	}
 	
 	template <typename STR>
