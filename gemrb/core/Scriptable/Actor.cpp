@@ -2133,7 +2133,7 @@ static void InitActorTables()
 		}
 		for (TableMgr::index_t i = 0; i < tm->GetRowCount(); ++i) {
 			
-			const std::string& rowName = std::to_string(i);
+			const std::string& rowName = fmt::to_string(i);
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE").c_str(), NULL, 16);

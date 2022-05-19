@@ -557,7 +557,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const std::string& raceNa
 	// not all games have the table
 	if (!raceTHAC0Bonus) return 0;
 
-	return raceTHAC0Bonus->QueryFieldSigned<int>(std::to_string(proficiency), raceName);
+	return raceTHAC0Bonus->QueryFieldSigned<int>(fmt::to_string(proficiency), raceName);
 }
 
 bool GameData::HasInfravision(const std::string& raceName)
@@ -897,7 +897,7 @@ ResRef GameData::GetFist(int cls, int level)
 	// extend the last level value to infinity
 	if (level >= cols) level = cols - 1;
 
-	TableMgr::index_t row = fistWeap->GetRowIndex(std::to_string(cls));
+	TableMgr::index_t row = fistWeap->GetRowIndex(fmt::to_string(cls));
 	return fistWeap->QueryField(row, level);
 }
 
