@@ -896,16 +896,21 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
 		}
 	}
 
-	const String spell = core->GetString(spl->SpellName);
+	const String& spell = core->GetString(spl->SpellName);
 	if (!spell.empty() && Type == ST_ACTOR) {
+		String str;
 		if (target) {
-			const String msg = core->GetString(DisplayMessage::GetStringReference(STR_ACTION_CAST), STRING_FLAGS::NONE);
-			String str = fmt::format(L"{} {} : {}", msg, spell, target->GetName());
-			displaymsg->DisplayStringName(std::move(str), DMC_WHITE, this);
+			// no "Casts " prefix for special powers (the originals erroneously left the space in)
+			if (spl->SpellType == IE_SPL_INNATE) {
+				str = fmt::format(L"{} : {}", spell, target->GetName());
+			} else {
+				const String msg = core->GetString(DisplayMessage::GetStringReference(STR_ACTION_CAST), STRING_FLAGS::NONE);
+				str = fmt::format(L"{} {} : {}", msg, spell, target->GetName());
+			}
 		} else {
-			String str = fmt::format(L"{} : {}", spell, GetName());
-			displaymsg->DisplayStringName(std::move(str), DMC_WHITE, this);
+			str = fmt::format(L"{} : {}", spell, GetName());
 		}
+		displaymsg->DisplayStringName(std::move(str), DMC_WHITE, this);
 	}
 }
 
