@@ -537,7 +537,7 @@ bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 		return false;
 
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
-		musiclist.push_back(tm->QueryField(i, col));
+		musiclist.emplace_back(tm->QueryField(i, col));
 	}
 
 	return true;

@@ -10525,7 +10525,7 @@ static void ReadActionButtons()
 	}
 }
 
-static void SetButtonCycle(AnimationFactory *bam, Button *btn, AnimationFactory::index_t cycle, unsigned char which)
+static void SetButtonCycle(const AnimationFactory *bam, Button *btn, AnimationFactory::index_t cycle, unsigned char which)
 {
 	Holder<Sprite2D> tspr = bam->GetFrame(cycle, 0);
 	btn->SetImage((BUTTON_IMAGE_TYPE)which, tspr);

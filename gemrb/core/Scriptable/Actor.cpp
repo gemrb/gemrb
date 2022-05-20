@@ -2143,7 +2143,7 @@ static void InitActorTables()
 			class2kits[classID].indices.push_back(i);
 			class2kits[classID].ids.push_back(kitUsability);
 			class2kits[classID].clabs.push_back(strdup(clab));
-			class2kits[classID].kitNames.push_back(kitName);
+			class2kits[classID].kitNames.emplace_back(kitName);
 		}
 	}
 

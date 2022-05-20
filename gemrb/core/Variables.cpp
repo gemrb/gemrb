@@ -34,10 +34,10 @@ inline bool Variables::MyCopyKey(char*& dest, const key_t& key) const
 	dest = (char *) malloc(key.length() - j + 1);
 
 	j = 0;
-	for (size_t i = 0; i < key.length(); ++i) {
-		if (key[i] == ' ')
+	for (const auto& chr : key) {
+		if (chr == ' ')
 			continue;
-		dest[j++] = tolower(key[i]);
+		dest[j++] = tolower(chr);
 	}
 	dest[j] = 0;
 	return true;
@@ -68,11 +68,11 @@ inline unsigned int Variables::MyHashKey(const key_t& key) const
 	assert(key.c_str());
 
 	unsigned int nHash = 0;
-	for (size_t i = 0; i < key.length(); i++) {
+	for (const auto& chr : key) {
 		//the original engine ignores spaces in variable names
-		if (key[i] == ' ')
+		if (chr == ' ')
 			continue;
-		nHash = (nHash << 5) + nHash + tolower(key[i]);
+		nHash = (nHash << 5) + nHash + tolower(chr);
 	}
 	return nHash;
 }
