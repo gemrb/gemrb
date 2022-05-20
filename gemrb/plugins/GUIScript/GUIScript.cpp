@@ -2202,7 +2202,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 				wmap = new WorldMapControl(rgn, font);
 			}
 			
-			const AnimationFactory* bam = (AnimationFactory*) gamedata->GetFactoryResource(PyString_AsStringView(anim), IE_BAM_CLASS_ID);
+			const AnimationFactory* bam = (AnimationFactory*) gamedata->GetFactoryResource(ResRefFromPy(anim), IE_BAM_CLASS_ID);
 			if (bam) {
 				wmap->areaIndicator = bam->GetFrame(0, 0);
 			}

@@ -381,29 +381,25 @@ Holder<Sprite2D> GameData::GetAnySprite(const ResRef& resRef, int cycle, int fra
 	return img;
 }
 
-// FIXME: should this just take a ResRef?
-FactoryObject* GameData::GetFactoryResource(StringView resname, SClass_ID type, bool silent)
+FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID type, bool silent)
 {
-	ResRef resref = ResRef(resname);
-	int fobjindex = factory->IsLoaded(resref, type);
-	// already cached
-	if ( fobjindex != -1)
-		return factory->GetFactoryObject( fobjindex );
+	if (resName.IsEmpty()) return nullptr;
 
-	// empty resref
-	if (resref.IsEmpty()) return nullptr;
+	// already cached?
+	int objectIndex = factory->IsLoaded(resName, type);
+	if (objectIndex != -1) return factory->GetFactoryObject(objectIndex);
 
 	switch (type) {
 	case IE_BAM_CLASS_ID:
 	{
-		DataStream* str = GetResource(resname, type, silent);
+		DataStream* str = GetResource(resName, type, silent);
 		if (str) {
 			auto importer = GetImporter<AnimationMgr>(IE_BAM_CLASS_ID, str);
 			if (importer == nullptr) {
 				return nullptr;
 			}
 
-			AnimationFactory* af = importer->GetAnimationFactory(resref);
+			AnimationFactory* af = importer->GetAnimationFactory(resName);
 			factory->AddFactoryObject( af );
 			return af;
 		}
@@ -411,9 +407,9 @@ FactoryObject* GameData::GetFactoryResource(StringView resname, SClass_ID type, 
 	}
 	case IE_BMP_CLASS_ID:
 	{
-		ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resname, silent);
+		ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resName, silent);
 		if (img) {
-			ImageFactory* fact = img->GetImageFactory(resref);
+			ImageFactory* fact = img->GetImageFactory(resName);
 			factory->AddFactoryObject( fact );
 			return fact;
 		}

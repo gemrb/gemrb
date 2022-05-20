@@ -131,7 +131,7 @@ public:
 	Holder<Sprite2D> GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent = true);
 
 	/** returns factory resource, currently works only with animations */
-	FactoryObject* GetFactoryResource(const StringView resname, SClass_ID type, bool silent=false);
+	FactoryObject* GetFactoryResource(const ResRef& resName, SClass_ID type, bool silent = false);
 
 	void AddFactoryResource(FactoryObject* res);
 
