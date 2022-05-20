@@ -1794,7 +1794,7 @@ bool Interface::LoadGemRBINI()
 	ResRef tooltipBG;
 	// Resrefs are already initialized in Interface::Interface()
 #define ASSIGN_RESREF(resref, name) \
-	resref = ini->GetKeyAsString("resources", name, ""); \
+	resref = ini->GetKeyAsString("resources", name, "")
 
 	ASSIGN_RESREF(MainCursorsImage, "MainCursorsImage");
 	ASSIGN_RESREF(TextCursorBam, "TextCursorBAM"); //console cursor

@@ -125,7 +125,7 @@ PyObject* PyString_FromString(const char* s)
 
 PyObject* PyString_FromStringView(StringView sv)
 {
-	return PyUnicode_Decode(sv.c_str(), sv.length(), core->TLKEncoding.encoding.c_str(), "strict");;
+	return PyUnicode_Decode(sv.c_str(), sv.length(), core->TLKEncoding.encoding.c_str(), "strict");
 }
 
 // Like PyString_FromString(), but for ResRef
