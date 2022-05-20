@@ -472,11 +472,16 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* ip = Sender;
 
-	if (parameters->objects[1]) {
+	const auto& object = parameters->objects[1];
+	if (object) {
 		ip = GetScriptableFromObject(Sender, parameters->objects[1]);
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", parameters->objects[1]->objectName);
+		if (object) {
+			Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", object->objectName);
+		} else {
+			Log(WARNING, "Actions", "Script error: No Trigger Passed");
+		}
 		return;
 	}
 	InfoPoint *trigger = static_cast<InfoPoint*>(ip);
