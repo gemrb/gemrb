@@ -471,17 +471,14 @@ void GameScript::SetTeamBit(Scriptable* Sender, Action* parameters)
 void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* ip = Sender;
+	StringParam& name = parameters->string0Parameter;
 
-	const auto& object = parameters->objects[1];
-	if (object) {
+	if (parameters->objects[1]) {
 		ip = GetScriptableFromObject(Sender, parameters->objects[1]);
+		if (ip) name = parameters->objects[1]->objectName;
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		if (object) {
-			Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", object->objectName);
-		} else {
-			Log(WARNING, "Actions", "Script error: No Trigger Passed");
-		}
+		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", name);
 		return;
 	}
 	InfoPoint *trigger = static_cast<InfoPoint*>(ip);
