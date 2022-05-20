@@ -1,8 +1,8 @@
-GemRB git (0e1b2ce11):
+GemRB git (b9792e14c):
   New features:
     - 
     - iwd2 can be progressed to well into chapter 5
-    - faster loading and saving
+    - faster loading and saving, faster OpenGL rendering
     - Use magic device skill, precise shot, iwd1 bard song choice
     - console history is now preserved
     - logging is now done via fmt (bundled headers)
