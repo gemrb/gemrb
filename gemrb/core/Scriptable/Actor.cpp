@@ -1221,7 +1221,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		ieDword NeedsLevelUp = 0;
 		core->GetDictionary()->Lookup(varName, NeedsLevelUp);
 		if (NeedsLevelUp == 1) {
-			displaymsg->DisplayConstantStringName(STR_LEVELUP, DMC_WHITE, actor);
+			displaymsg->DisplayConstantStringName(STR_LEVELUP, colorsType::WHITE, actor);
 			actor->GotLUFeedback = true;
 			core->SetEventFlag(EF_PORTRAIT);
 		}
@@ -3092,7 +3092,7 @@ void Actor::RefreshPCStats() {
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
 				String text = core->GetString(ieStrRef::HEAL) + L'1';
-				displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
+				displaymsg->DisplayString(text, colorsType::XPCHANGE, this);
 			}
 		} else{
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
@@ -3255,7 +3255,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String msg = core->GetString(DisplayMessage::GetStringReference(STR_SAVE_SPELL + type));
 			msg += L" " + std::to_wstring(ret);
-			displaymsg->DisplayStringName(std::move(msg), DMC_WHITE, this);
+			displaymsg->DisplayStringName(std::move(msg), colorsType::WHITE, this);
 		}
 		prevType = type;
 		prevActor = this;
@@ -3339,11 +3339,11 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	if (ret > saveDC) {
 		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Success!~
-		displaymsg->DisplayRollStringName(ieStrRef::ROLL22, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL22, colorsType::LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
 		return true;
 	} else {
 		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Failed!~
-		displaymsg->DisplayRollStringName(ieStrRef::ROLL23, DMC_LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL23, colorsType::LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
 		return false;
 	}
 }
@@ -4076,7 +4076,7 @@ bool Actor::CheckSpellDisruption(int damage, int spellLevel) const
 	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~
 	if (GameScript::ID_ClassMask(this, 0x6ee)) { // 0x6ee == CLASSMASK_GROUP_CASTERS
 		// no spam for noncasters
-		displaymsg->DisplayRollStringName(ieStrRef::ROLL19, DMC_LIGHTGREY, this, roll, concentration, bonus, damage, spellLevel);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL19, colorsType::LIGHTGREY, this, roll, concentration, bonus, damage, spellLevel);
 	}
 	int chance = (roll + concentration + bonus) > (10 + damage + spellLevel);
 	if (chance) {
@@ -4128,7 +4128,7 @@ void Actor::CheckCleave()
 			core->ApplyEffect(fx, this, this);
 			// ~Cleave feat adds another level %d attack.~
 			// uses the max tohit bonus (tested), but game always displayed "level 1"
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL20, DMC_LIGHTGREY, this, ToHit.GetTotal());
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL20, colorsType::LIGHTGREY, this, ToHit.GetTotal());
 		}
 	}
 }
@@ -4370,7 +4370,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 				// variant without damager
 				strref -= (STR_DAMAGE_DETAIL1 - STR_DAMAGE1);
 			}
-			displaymsg->DisplayConstantStringName(strref, DMC_WHITE, this);
+			displaymsg->DisplayConstantStringName(strref, colorsType::WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
 			//TODO: handle pst properly (decay, queueing, color)
 			SetOverheadText(std::to_wstring(damage), true);
@@ -4380,14 +4380,14 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
 			String msg = core->GetString(DisplayMessage::GetStringReference(STR_DAMAGE1), STRING_FLAGS::NONE);
 			String dmg = fmt::format(L" ({})", damage);
-			displaymsg->DisplayStringName(msg + dmg, DMC_WHITE, this);
+			displaymsg->DisplayStringName(msg + dmg, colorsType::WHITE, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
 			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAt("DAMAGER", StringView(""));
 			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
-			displaymsg->DisplayConstantStringName(STR_DAMAGE2, DMC_WHITE, hitter);
+			displaymsg->DisplayConstantStringName(STR_DAMAGE2, colorsType::WHITE, hitter);
 		}
 	} else {
 		if (resisted == DR_IMMUNE) {
@@ -4397,12 +4397,12 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 					//<DAMAGEE> was immune to my <TYPE> damage
 					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 					core->GetTokenDictionary()->SetAt("TYPE", type_name);
-					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, DMC_WHITE, hitter);
+					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, colorsType::WHITE, hitter);
 				} else if (displaymsg->HasStringReference(STR_DAMAGE_IMMUNITY) && displaymsg->HasStringReference(STR_DAMAGE1)) {
 					// bg2
 					//<DAMAGEE> was immune to my damage.
 					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
-					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, DMC_WHITE, hitter);
+					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, colorsType::WHITE, hitter);
 				} // else: other games don't display anything
 			}
 		} else {
@@ -4809,9 +4809,9 @@ int Actor::GetWildMod(int level)
 	core->GetTokenDictionary()->SetAtAsString("LEVELDIF", abs(WMLevelMod));
 	if (core->HasFeedback(FT_STATES)) {
 		if (WMLevelMod > 0) {
-			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
+			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, colorsType::WHITE, this);
 		} else if (WMLevelMod < 0) {
-			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
+			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, colorsType::WHITE, this);
 		}
 	}
 	return WMLevelMod;
@@ -4859,12 +4859,12 @@ int Actor::GetEncumbranceFactor(bool feedback) const
 	}
 	if (encumbrance <= maxWeight * 2) {
 		if (feedback && core->HasFeedback(FT_STATES)) {
-			displaymsg->DisplayConstantStringName(STR_HALFSPEED, DMC_WHITE, this);
+			displaymsg->DisplayConstantStringName(STR_HALFSPEED, colorsType::WHITE, this);
 		}
 		return 2;
 	}
 	if (feedback && core->HasFeedback(FT_STATES)) {
-		displaymsg->DisplayConstantStringName(STR_CANTMOVE, DMC_WHITE, this);
+		displaymsg->DisplayConstantStringName(STR_CANTMOVE, colorsType::WHITE, this);
 	}
 	return 123456789; // large enough to round to 0 when used as a divisor
 }
@@ -5101,7 +5101,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	Game *game = core->GetGame();
 	game->SelectActor(this, false, SELECT_NORMAL);
 
-	displaymsg->DisplayConstantStringName(STR_DEATH, DMC_WHITE, this);
+	displaymsg->DisplayConstantStringName(STR_DEATH, colorsType::WHITE, this);
 	VerbalConstant(VB_DIE);
 
 	// remove poison, hold, casterhold, stun and its icon
@@ -6023,7 +6023,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		return LSR_INVALID;
 	}
 	if (message) {
-		displaymsg->DisplayConstantStringName(message, DMC_BG2XPGREEN, this);
+		displaymsg->DisplayConstantStringName(message, colorsType::XPCHANGE, this);
 	}
 	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
 		int xp = gamedata->GetXPBonus(XP_LEARNSPELL, explev);
@@ -6059,7 +6059,7 @@ ResRef Actor::GetDialog(int flags) const
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
 		if (flags>1) {
 			core->GetTokenDictionary()->SetAt("TARGET", ShortName);
-			displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
+			displaymsg->DisplayConstantString(STR_TARGETBUSY, colorsType::RED);
 		}
 		return ResRef();
 	}
@@ -6123,7 +6123,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 	if (IsSelected()) {
 		// display the turning-off message
 		if (Modal.State != MS_NONE && core->HasFeedback(FT_MISC)) {
-			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, DMC_WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, colorsType::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		}
 
 		//update the action bar
@@ -7056,7 +7056,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
 			// Missed <TARGETNAME> due to concealment.
 			core->GetTokenDictionary()->SetAt("TARGETNAME", target->GetDefaultName());
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, colorsType::WHITE, this);
 			buffer.append("[Concealment Miss]");
 			Log(COMBAT, "Attack", "{}", buffer);
 			ResetState();
@@ -7138,14 +7138,14 @@ void Actor::PerformAttack(ieDword gameTime)
 			hitMiss = core->GetString(DisplayMessage::GetStringReference(STR_MISS));
 		}
 		String rollLog = fmt::format(L"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss);
-		displaymsg->DisplayStringName(std::move(rollLog), DMC_WHITE, this);
+		displaymsg->DisplayStringName(std::move(rollLog), colorsType::WHITE, this);
 	}
 
 	if (roll == 1) {
 		//critical failure
 		buffer.append("[Critical Miss]");
 		Log(COMBAT, "Attack", "{}", buffer);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, DMC_WHITE, this);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, colorsType::WHITE, this);
 		VerbalConstant(VB_CRITMISS);
 		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword) -2, target, UI_MISS|UI_NOAURA);
@@ -7184,7 +7184,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		buffer.append("[Critical Hit]");
 		Log(COMBAT, "Attack", "{}", buffer);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, DMC_WHITE, this);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, colorsType::WHITE, this);
 		VerbalConstant(VB_CRITHIT);
 	} else {
 		//normal success
@@ -7553,11 +7553,11 @@ void Actor::UpdateModalState(ieDword gameTime)
 				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
 				Modal.FirstApply = false;
 				if (InParty && feedback && core->HasFeedback(FT_MISC)) {
-					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, DMC_WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, colorsType::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
 			} else {
 				if (InParty && core->HasFeedback(FT_MISC)) {
-					displaymsg->DisplayStringName(ModalStates[Modal.State].failed_str, DMC_WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+					displaymsg->DisplayStringName(ModalStates[Modal.State].failed_str, colorsType::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
 				Modal.State = MS_NONE;
 			}
@@ -8946,18 +8946,18 @@ bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
 	// but the string seems to be true in the original, which is also much more lenient
 	bool success = (skill + roll) >= (level + 20);
 	// 39304 = ~Use magic device check. Use magic device (skill + d20 roll + CHA modifier) = %d vs. (device's spell level + 20) = %d ( Spell level = %d ).~
-	displaymsg->DisplayRollStringName(ieStrRef::ROLL14, DMC_LIGHTGREY, this, skill + roll, level + 20, level);
+	displaymsg->DisplayRollStringName(ieStrRef::ROLL14, colorsType::LIGHTGREY, this, skill + roll, level + 20, level);
 
 	if (success) {
 		if (core->HasFeedback(FT_CASTING)) {
-			displaymsg->DisplayStringName(core->GetString(ieStrRef::MD_SUCCESS), DMC_WHITE, this);
+			displaymsg->DisplayStringName(core->GetString(ieStrRef::MD_SUCCESS), colorsType::WHITE, this);
 		}
 		return true;
 	}
 
 	// don't play with powers you don't comprehend!
 	if (core->HasFeedback(FT_CASTING)) {
-		displaymsg->DisplayStringName(core->GetString(ieStrRef::MD_FAIL), DMC_WHITE, this);
+		displaymsg->DisplayStringName(core->GetString(ieStrRef::MD_FAIL), colorsType::WHITE, this);
 	}
 	Damage(core->Roll(level, 6, 0), DAMAGE_MAGIC, nullptr);
 	return false;
@@ -9050,7 +9050,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	if (critical) {
 		if (target->inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, DMC_WHITE, target);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, colorsType::WHITE, target);
 			critical = false;
 		} else {
 			VerbalConstant(VB_CRITHIT);
@@ -9091,14 +9091,14 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	}
 
 	if (!target->Modified[IE_DISABLEBACKSTAB] && !weaponImmunity && !dodgy) {
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_FAIL, DMC_WHITE);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_FAIL, colorsType::WHITE);
 		wi.backstabbing = false;
 		return 0;
 	}
 
 	if (!wi.backstabbing) {
 		// weapon is unsuitable for sneak attack
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, DMC_WHITE);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, colorsType::WHITE);
 		return 0;
 	}
 
@@ -9110,12 +9110,12 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 			// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
 			multiplier -= 2;
 			sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL18, DMC_LIGHTGREY, this, sneakAttackDamage);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL18, colorsType::LIGHTGREY, this, sneakAttackDamage);
 		} else {
 			// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
 			multiplier--;
 			sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL17, DMC_LIGHTGREY, this, sneakAttackDamage);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL17, colorsType::LIGHTGREY, this, sneakAttackDamage);
 		}
 
 		core->ApplySpell(BackstabResRef, target, this, multiplier);
@@ -9129,8 +9129,8 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	if (!sneakAttackDamage) {
 		sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
 		// ~Sneak Attack for %d~
-		//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB, DMC_WHITE, sneakAttackDamage);
+		//displaymsg->DisplayRollStringName(25053, colorsType::LIGHTGREY, this, extraDamage);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB, colorsType::WHITE, sneakAttackDamage);
 	}
 
 	return sneakAttackDamage;
@@ -9157,16 +9157,16 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 
 	if (target->Modified[IE_DISABLEBACKSTAB]) {
 		// The backstab seems to have failed
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_FAIL, DMC_WHITE);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_FAIL, colorsType::WHITE);
 		wi.backstabbing = false;
 	} else {
 		if (wi.backstabbing) {
 			backstabDamage = multiplier * damage;
 			// display a simple message instead of hardcoding multiplier names
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB, DMC_WHITE, multiplier);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB, colorsType::WHITE, multiplier);
 		} else if (core->HasFeedback(FT_COMBAT)) {
 			// weapon is unsuitable for backstab
-			displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, DMC_WHITE);
+			displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, colorsType::WHITE);
 		}
 	}
 
@@ -10354,15 +10354,15 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 	switch (reason) {
 		case 0:
 			// ~Failed hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL10, DMC_LIGHTGREY, actor, skill-bonus, roll, bonus);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL10, colorsType::LIGHTGREY, actor, skill-bonus, roll, bonus);
 			break;
 		case 1:
 			// ~Failed hide in shadows because you were seen by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL8, DMC_LIGHTGREY, actor, skill, targetDC, roll);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL8, colorsType::LIGHTGREY, actor, skill, targetDC, roll);
 			break;
 		case 2:
 			// ~Failed hide in shadows because you were heard by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL7, DMC_LIGHTGREY, actor, skill, targetDC, roll);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL7, colorsType::LIGHTGREY, actor, skill, targetDC, roll);
 			break;
 		default:
 			// no message
@@ -10463,7 +10463,7 @@ bool Actor::TryToHide()
 	if (!third) return true;
 
 	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
-	displaymsg->DisplayRollStringName(ieStrRef::ROLL9, DMC_LIGHTGREY, this, skill/7, roll, GetAbilityBonus(IE_DEX));
+	displaymsg->DisplayRollStringName(ieStrRef::ROLL9, colorsType::LIGHTGREY, this, skill/7, roll, GetAbilityBonus(IE_DEX));
 	return true;
 }
 
@@ -10501,7 +10501,7 @@ bool Actor::TryToHideIWD2()
 			return false;
 		} else {
 			// ~You were not seen by creature! Hide check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL2, DMC_LIGHTGREY, this, skill, targetDC, roll);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL2, colorsType::LIGHTGREY, this, skill, targetDC, roll);
 		}
 	}
 
@@ -10528,7 +10528,7 @@ bool Actor::TryToHideIWD2()
 			return false;
 		} else {
 			// ~You were not heard by creature! Move silently check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL0, DMC_LIGHTGREY, this, skill, targetDC, roll);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL0, colorsType::LIGHTGREY, this, skill, targetDC, roll);
 		}
 	}
 
@@ -10894,15 +10894,15 @@ bool Actor::ConcentrationCheck() const
 
 	if (roll + concentration + bonus < 15 + spellLevel) {
 		if (InParty) {
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL4, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL4, colorsType::LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
 		} else {
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL5, DMC_LIGHTGREY, this);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL5, colorsType::LIGHTGREY, this);
 		}
 		return false;
 	} else {
 		if (InParty) {
 			// ~Successful spell casting concentration check! Check roll %d vs. difficulty %d (%d bonus)~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL3, DMC_LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL3, colorsType::LIGHTGREY, this, roll + concentration, 15 + spellLevel, bonus);
 		}
 	}
 	return true;

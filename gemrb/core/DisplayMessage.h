@@ -36,7 +36,16 @@
 
 namespace GemRB {
 
-enum { DMC_DIALOG, DMC_DIALOGPARTY, DMC_GOLD, DMC_RED, DMC_BG2XPGREEN, DMC_LIGHTGREY, DMC_WHITE };
+/** Inventory types */
+enum class colorsType {
+	DIALOG = 0,
+	DIALOGPARTY = 1,
+	GOLD = 2,
+	RED = 3,
+	XPCHANGE = 4,
+	LIGHTGREY = 5,
+	WHITE = 6
+};
 
 class Scriptable;
 
@@ -63,6 +72,8 @@ private:
 	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
 	/** displays a string in the textarea */
 	void DisplayString(String text, const Color &color, Scriptable *target) const;
+	char* GetColor(colorsType color);
+
 public:
 	static ieStrRef GetStringReference(size_t);
 	static bool HasStringReference(size_t);
@@ -72,30 +83,30 @@ public:
 	/** displays any string in the textarea */
 	void DisplayMarkupString(String txt) const;	
 	/** displays a string constant in the textarea */
-	void DisplayConstantString(size_t stridx, unsigned char color, Scriptable *speaker = nullptr) const;
+	void DisplayConstantString(size_t stridx, colorsType color, Scriptable *speaker = nullptr) const;
 	/** displays a string constant followed by a number in the textarea */
-	void DisplayConstantStringValue(size_t stridx, unsigned char color, ieDword value) const;	
+	void DisplayConstantStringValue(size_t stridx, colorsType color, ieDword value) const;	
 	/** displays actor name - action : parameter */
-	void DisplayConstantStringName(size_t stridx, unsigned char color, const Scriptable *speaker) const;
+	void DisplayConstantStringName(size_t stridx, colorsType color, const Scriptable *speaker) const;
 	void DisplayConstantStringName(size_t stridx, const Color &color, const Scriptable *speaker) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(size_t stridx, unsigned char color, const Scriptable *actor, const Scriptable *target) const;	
+	void DisplayConstantStringAction(size_t stridx, colorsType color, const Scriptable *actor, const Scriptable *target) const;	
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(String text, unsigned char color, const Scriptable *speaker) const;
-	void DisplayStringName(ieStrRef stridx, unsigned char color, const Scriptable *speaker, STRING_FLAGS flags) const;
+	void DisplayStringName(String text, colorsType color, const Scriptable *speaker) const;
+	void DisplayStringName(ieStrRef stridx, colorsType color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
-	void DisplayConstantStringNameValue(size_t stridx, unsigned char color, const Scriptable *speaker, int value) const;
+	void DisplayConstantStringNameValue(size_t stridx, colorsType color, const Scriptable *speaker, int value) const;
 	/** displays actor name - action : parameter */
-	void DisplayConstantStringNameString(size_t stridx, unsigned char color, size_t stridx2, const Scriptable *actor) const;
+	void DisplayConstantStringNameString(size_t stridx, colorsType color, size_t stridx2, const Scriptable *actor) const;
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
-	void DisplayString(ieStrRef stridx, unsigned char color, STRING_FLAGS flags) const;
-	void DisplayString(const String& text, unsigned char color, Scriptable *target) const;
+	void DisplayString(ieStrRef stridx, colorsType color, STRING_FLAGS flags) const;
+	void DisplayString(const String& text, colorsType color, Scriptable *target) const;
 	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;	
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>
-	void DisplayRollStringName(ieStrRef stridx, unsigned char color, const Scriptable *speaker, ARGS&& ...args) const {
+	void DisplayRollStringName(ieStrRef stridx, colorsType color, const Scriptable *speaker, ARGS&& ...args) const {
 		if (EnableRollFeedback()) {
 			String fmt = ResolveStringRef(stridx);
 			String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
