@@ -348,9 +348,9 @@ void Highlightable::TryDisarm(const Actor *actor)
 		Trapped = 0;
 		if (core->HasFeature(GF_3ED_RULES)) {
 			// ~Successful Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, colorsType::LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
-		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, DMC_LIGHTGREY, actor);
+		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, colorsType::LIGHTGREY, actor);
 		int xp = gamedata->GetXPBonus(XP_DISARM, actor->GetXPLevel(1));
 		const Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
@@ -360,9 +360,9 @@ void Highlightable::TryDisarm(const Actor *actor)
 		AddTrigger(TriggerEntry(trigger_disarmfailed, actor->GetGlobalID()));
 		if (core->HasFeature(GF_3ED_RULES)) {
 			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, DMC_LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, colorsType::LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
-		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, DMC_LIGHTGREY, actor);
+		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, colorsType::LIGHTGREY, actor);
 		TriggerTrap(skill, actor->GetGlobalID());
 	}
 	ImmediateEvent();
@@ -372,9 +372,9 @@ void Door::TryPickLock(const Actor *actor)
 {
 	if (LockDifficulty == 100) {
 		if (OpenStrRef != ieStrRef::INVALID) {
-			displaymsg->DisplayStringName(OpenStrRef, DMC_BG2XPGREEN, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+			displaymsg->DisplayStringName(OpenStrRef, colorsType::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
-			displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, DMC_BG2XPGREEN, actor);
+			displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, colorsType::XPCHANGE, actor);
 		}
 		return;
 	}
@@ -387,18 +387,18 @@ void Door::TryPickLock(const Actor *actor)
 			stat *= 7; // convert to percent (magic 7 is from RE)
 			int dexmod = actor->GetAbilityBonus(IE_DEX);
 			stat += dexmod; // the original didn't use it, so let's not multiply it
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL11, DMC_LIGHTGREY, actor, stat-dexmod, LockDifficulty, dexmod);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL11, colorsType::LIGHTGREY, actor, stat-dexmod, LockDifficulty, dexmod);
 		}
 	}
 	if (stat < (signed)LockDifficulty) {
-		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, DMC_BG2XPGREEN, actor);
+		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, colorsType::XPCHANGE, actor);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		core->PlaySound(DS_PICKFAIL, SFX_CHAN_HITS);
 		return;
 	}
 	SetDoorLocked( false, true);
 	core->GetGameControl()->ResetTargetMode();
-	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, DMC_LIGHTGREY, actor);
+	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, colorsType::LIGHTGREY, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS);
 	ImmediateEvent();
@@ -426,15 +426,15 @@ void Door::TryBashLock(Actor *actor)
 	actor->FaceTarget(this);
 	if (core->HasFeature(GF_3ED_RULES)) {
 		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~
-		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, DMC_LIGHTGREY, actor, roll, bonus, LockDifficulty);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, colorsType::LIGHTGREY, actor, roll, bonus, LockDifficulty);
 	}
 
 	if(roll < LockDifficulty || LockDifficulty == 100) {
-		displaymsg->DisplayConstantStringName(STR_DOORBASH_FAIL, DMC_BG2XPGREEN, actor);
+		displaymsg->DisplayConstantStringName(STR_DOORBASH_FAIL, colorsType::XPCHANGE, actor);
 		return;
 	}
 
-	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, DMC_LIGHTGREY, actor);
+	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, colorsType::LIGHTGREY, actor);
 	SetDoorLocked(false, true);
 	core->GetGameControl()->ResetTargetMode();
 	Flags|=DOOR_BROKEN;
