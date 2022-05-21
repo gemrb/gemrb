@@ -257,7 +257,7 @@ void Projectile::Setup()
 		}
 
 		if (ExtFlags & PEF_TEXT) {
-			displaymsg->DisplayStringName(StrRef, DMC_LIGHTGREY, act, STRING_FLAGS::NONE);
+			displaymsg->DisplayStringName(StrRef, colorsType::LIGHTGREY, act, STRING_FLAGS::NONE);
 		}
 	}
 	if (ZPos != ProHeights::Dragon && SFlags & PSF_FLYING) {

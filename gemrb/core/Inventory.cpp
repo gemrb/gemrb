@@ -519,7 +519,7 @@ unsigned int Inventory::DestroyItem(const ResRef& resref, ieDword flags, ieDword
 		if (count && (destructed>=count) )
 			break;
 	}
-	if (destructed && Owner && Owner->InParty) displaymsg->DisplayConstantString(STR_LOSTITEM, DMC_BG2XPGREEN);
+	if (destructed && Owner && Owner->InParty) displaymsg->DisplayConstantString(STR_LOSTITEM, colorsType::XPCHANGE);
 
 	return destructed;
 }
