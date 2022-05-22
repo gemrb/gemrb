@@ -342,7 +342,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		if (tr->textStrRef != ieStrRef::INVALID) {
 			//allow_zero is for PST (deionarra's text)
 			ta->AppendText(L"\n");
-			displaymsg->DisplayStringName( tr->textStrRef, colorsType::DIALOGPARTY, speaker, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::ALLOW_ZERO);
+			displaymsg->DisplayStringName( tr->textStrRef, GUIColors::DIALOGPARTY, speaker, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::ALLOW_ZERO);
 		}
 		target->ImmediateEvent();
 		target->ProcessActions(); //run the action queue now
@@ -450,7 +450,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		Holder<Sprite2D> portrait = tgta->CopyPortrait(1);
 		ta->SetSpeakerPicture(portrait);
 		ta->AppendText(L"\n");
-		displaymsg->DisplayStringName( ds->StrRef, colorsType::DIALOG, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+		displaymsg->DisplayStringName( ds->StrRef, GUIColors::DIALOG, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	}
 
 	std::vector<SelectOption> dialogOptions;

@@ -3058,7 +3058,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 	const WMPAreaEntry *linkdest = wm->GetEntry(wal->AreaIndex);
 	ResRef tmpresref = linkdest->AreaResRef;
 	if (core->GetGame()->RandomEncounter(tmpresref)) {
-		displaymsg->DisplayConstantString(STR_AMBUSH, colorsType::XPCHANGE);
+		displaymsg->DisplayConstantString(STR_AMBUSH, GUIColors::XPCHANGE);
 		PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromStringView, tmpresref));
 		PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
 		distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
@@ -3071,7 +3071,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 			ResRef &area = wal->EncounterAreaResRef[(i + j) % 5];
 
 			if (!area.IsEmpty()) {
-				displaymsg->DisplayConstantString(STR_AMBUSH, colorsType::XPCHANGE);
+				displaymsg->DisplayConstantString(STR_AMBUSH, GUIColors::XPCHANGE);
 				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromResRef, area));
 				//drop player in the middle of the map
 				PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
@@ -9295,7 +9295,7 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 			break;
 		}
 
-		displaymsg->DisplayString(usedItem.value, colorsType::WHITE, STRING_FLAGS::SOUND);
+		displaymsg->DisplayString(usedItem.value, GUIColors::WHITE, STRING_FLAGS::SOUND);
 		return 1;
 	}
 	return 0;
@@ -9348,9 +9348,9 @@ static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count
 	if (! actor->inventory.UnEquipItem( Slot, false )) {
 		// Item is currently undroppable/cursed
 		if (si->Flags&IE_INV_ITEM_CURSED) {
-			displaymsg->DisplayConstantString(STR_CURSED, colorsType::WHITE);
+			displaymsg->DisplayConstantString(STR_CURSED, GUIColors::WHITE);
 		} else {
-			displaymsg->DisplayConstantString(STR_CANT_DROP_ITEM, colorsType::WHITE);
+			displaymsg->DisplayConstantString(STR_CANT_DROP_ITEM, GUIColors::WHITE);
 		}
 		return NULL;
 	}
@@ -9555,7 +9555,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (current && current != actor &&
 		(actor->GetCurrentArea() != current->GetCurrentArea() ||
 		SquaredPersonalDistance(actor, current) > MAX_DISTANCE * MAX_DISTANCE)) {
-		displaymsg->DisplayConstantString(STR_TOOFARAWAY, colorsType::WHITE);
+		displaymsg->DisplayConstantString(STR_TOOFARAWAY, GUIColors::WHITE);
 		return PyLong_FromLong(ASI_FAILED);
 	}
 
@@ -9569,7 +9569,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	// can't equip item because of similar already equipped
 	if (Effect) {
 		if (item->ItemExcl & actor->inventory.GetEquipExclusion(Slot)) {
-			displaymsg->DisplayConstantString(STR_ITEMEXCL, colorsType::WHITE);
+			displaymsg->DisplayConstantString(STR_ITEMEXCL, GUIColors::WHITE);
 			//freeing the item before returning
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyLong_FromLong(ASI_FAILED);
@@ -9579,7 +9579,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if ((Slottype!=-1) && (Slottype & SLOT_WEAPON)) {
 		const CREItem* weapon = actor->inventory.GetUsedWeapon(false, Effect);
 		if (weapon && (weapon->Flags & IE_INV_ITEM_CURSED)) {
-			displaymsg->DisplayConstantString(STR_CURSED, colorsType::WHITE);
+			displaymsg->DisplayConstantString(STR_CURSED, GUIColors::WHITE);
 			return PyLong_FromLong(ASI_FAILED);
 		}
 	}
@@ -9588,7 +9588,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
 		const ITMExtHeader *eh = item->GetExtHeader(0);
 		if (eh && eh->IDReq) {
-			displaymsg->DisplayConstantString(STR_ITEMID, colorsType::WHITE);
+			displaymsg->DisplayConstantString(STR_ITEMID, GUIColors::WHITE);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyLong_FromLong(ASI_FAILED);
 		}
@@ -9630,12 +9630,12 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		//swapping won't cure this
 		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED, ranged);
 		if (res) {
-			displaymsg->DisplayConstantString(res, colorsType::WHITE);
+			displaymsg->DisplayConstantString(res, GUIColors::WHITE);
 			return PyLong_FromLong(ASI_FAILED);
 		}
 		// pst: also check TNO earing/eye silliness: both share the same slot type
 		if (Slottype == 1 && !CheckEyeEarMatch(slotitem, Slot)) {
-			displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, colorsType::WHITE);
+			displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, GUIColors::WHITE);
 			return PyLong_FromLong(ASI_FAILED);
 		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
@@ -9655,7 +9655,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_FAILED;
 		}
 	} else {
-		displaymsg->DisplayConstantString(STR_INVFULL, colorsType::WHITE);
+		displaymsg->DisplayConstantString(STR_INVFULL, GUIColors::WHITE);
 	}
 
 	if (Sound && Sound[0]) {
@@ -11360,11 +11360,11 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 
 	const CREItem *item = actor->inventory.GetUsedWeapon(false, dummy);
 	if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
-		displaymsg->DisplayConstantString(STR_CURSED, colorsType::WHITE);
+		displaymsg->DisplayConstantString(STR_CURSED, GUIColors::WHITE);
 	} else {
 		ret = actor->SetEquippedQuickSlot(slot, ability);
 		if (ret) {
-			displaymsg->DisplayConstantString(ret, colorsType::WHITE);
+			displaymsg->DisplayConstantString(ret, GUIColors::WHITE);
 		}
 	}
 	Py_RETURN_NONE;
@@ -13742,7 +13742,7 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 			if (catcher) {
 				PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
 				String* msg = PyString_AsStringObj(output);
-				displaymsg->DisplayString(std::move(*msg), colorsType::WHITE, nullptr);
+				displaymsg->DisplayString(std::move(*msg), GUIColors::WHITE, nullptr);
 				delete msg;
 				Py_DECREF(catcher);
 			}
@@ -13760,7 +13760,7 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 		String* errorString = PyString_AsStringObj(pvalue);
 		if (errorString) {
 			if (displaymsg) {
-				displaymsg->DisplayString(L"Error: " + *errorString, colorsType::RED, NULL);
+				displaymsg->DisplayString(L"Error: " + *errorString, GUIColors::RED, nullptr);
 			} else {
 				Log(ERROR, "GUIScript", "{}", fmt::WideToChar{*errorString});
 			}

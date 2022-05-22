@@ -1004,14 +1004,14 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 		check += penetration;
 		resisted = (signed) check < (signed) val;
 		// ~Spell Resistance check (Spell resistance:) %d vs. (d20 + caster level + spell resistance mod)  = %d + %d + %d.~
-		displaymsg->DisplayRollStringName(ieStrRef::ROLL16, colorsType::LIGHTGREY, actor, val, roll, fx->CasterLevel, penetration);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL16, GUIColors::LIGHTGREY, actor, val, roll, fx->CasterLevel, penetration);
 	} else {
 		// 2.5 style check
 		resisted = (signed) fx->random_value < (signed) val;
 	}
 	if (resisted) {
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
-		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, colorsType::WHITE, actor);
+		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, GUIColors::WHITE, actor);
 		Log(MESSAGE, "EffectQueue", "effect resisted: {}", globals.Opcodes[fx->Opcode].Name);
 		return FX_NOT_APPLIED;
 	}
@@ -1249,7 +1249,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 	if (target && fx->FirstApply) {
 		if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0)) {
-			displaymsg->DisplayStringName(ed.Strref, colorsType::WHITE, target, STRING_FLAGS::SOUND);
+			displaymsg->DisplayStringName(ed.Strref, GUIColors::WHITE, target, STRING_FLAGS::SOUND);
 		}
 	}
 
