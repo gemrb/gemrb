@@ -1769,7 +1769,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 	// cannot target spells on invisible or sanctuaried creatures
 	// invisible actors are invisible, so this is usually impossible by itself, but improved invisibility changes that
 	if (source != tgt && tgt->Untargetable(spellName)) {
-		displaymsg->DisplayConstantStringName(STR_NOSEE_NOCAST, colorsType::RED, source);
+		displaymsg->DisplayConstantStringName(STR_NOSEE_NOCAST, GUIColors::RED, source);
 		ResetTargetMode();
 		return;
 	}
