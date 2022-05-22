@@ -1200,9 +1200,9 @@ void Game::ShareXP(int xp, int flags) const
 	//you have gained/lost ... xp
 	if (core->HasFeedback(FT_MISC)) {
 		if (xp > 0) {
-			displaymsg->DisplayConstantStringValue(STR_GOTXP, colorsType::XPCHANGE, (ieDword) xp);
+			displaymsg->DisplayConstantStringValue(STR_GOTXP, GUIColors::XPCHANGE, (ieDword) xp);
 		} else {
-			displaymsg->DisplayConstantStringValue(STR_LOSTXP, colorsType::XPCHANGE, (ieDword) -xp);
+			displaymsg->DisplayConstantStringValue(STR_LOSTXP, GUIColors::XPCHANGE, (ieDword) -xp);
 		}
 	}
 	for (const auto& pc : PCs) {
@@ -1305,9 +1305,9 @@ void Game::SetReputation(ieDword r)
 {
 	r = Clamp<ieDword>(r, 10, 200);
 	if (Reputation > r && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayConstantStringValue(STR_LOSTREP, colorsType::GOLD, (Reputation - r) / 10);
+		displaymsg->DisplayConstantStringValue(STR_LOSTREP, GUIColors::GOLD, (Reputation - r) / 10);
 	} else if (Reputation < r && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayConstantStringValue(STR_GOTREP, colorsType::GOLD, (r - Reputation) / 10);
+		displaymsg->DisplayConstantStringValue(STR_GOTREP, GUIColors::GOLD, (r - Reputation) / 10);
 	}
 	Reputation = r;
 	for (const auto& pc : PCs) {
@@ -1332,9 +1332,9 @@ void Game::AddGold(int add)
 	ieDword old = PartyGold;
 	PartyGold = std::max(0, signed(PartyGold) + add);
 	if (old<PartyGold) {
-		displaymsg->DisplayConstantStringValue( STR_GOTGOLD, colorsType::GOLD, PartyGold-old);
+		displaymsg->DisplayConstantStringValue( STR_GOTGOLD, GUIColors::GOLD, PartyGold-old);
 	} else {
-		displaymsg->DisplayConstantStringValue( STR_LOSTGOLD, colorsType::GOLD, old-PartyGold);
+		displaymsg->DisplayConstantStringValue( STR_LOSTGOLD, GUIColors::GOLD, old-PartyGold);
 	}
 }
 
@@ -1816,7 +1816,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	
 	String tmpstr = core->GetString(hrsindex, STRING_FLAGS::NONE);
 	core->GetTokenDictionary()->SetAt("DURATION", tmpstr);
-	displaymsg->DisplayString(restindex, colorsType::WHITE, STRING_FLAGS::NONE);
+	displaymsg->DisplayString(restindex, GUIColors::WHITE, STRING_FLAGS::NONE);
 	return cutscene;
 }
 
