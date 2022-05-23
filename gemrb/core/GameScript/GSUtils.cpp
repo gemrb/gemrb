@@ -2196,7 +2196,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 		if (*varName == ':') {
 			varName++;
 		}
-		context.SNPrintF("%.6s", VarName);
+		context.SNPrintF("%.6s", VarName.CString());
 		key = Variables::key_t(varName);
 	}
 	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", context, VarName, value);
@@ -2243,7 +2243,7 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 		if (*varName == ':') {
 			varName++;
 		}
-		context.SNPrintF("%.6s", VarName);
+		context.SNPrintF("%.6s", VarName.CString());
 		key = Variables::key_t(varName);
 	}
 	

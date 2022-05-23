@@ -360,7 +360,7 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 	s = inifile->GetKeyAsString(crittername,"spec_var");
 	if (s) {
 		if (VarHasContext(s)) {
-			critter.SpecContext.SNPrintF("%.6s", s);
+			critter.SpecContext.SNPrintF("%.6s", s.c_str());
 			critter.SpecVar = ieVariable(s.begin() + 8);
 		} else {
 			critter.SpecContext = "GLOBAL";
