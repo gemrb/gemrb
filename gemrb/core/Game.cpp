@@ -419,7 +419,7 @@ void Game::InitActorPos(Actor *actor) const
 	//Sometimes playmode is set to -1 (in pregenerate)
 	//normally execution shouldn't ever come here, but it actually does
 	//preventing problems by defaulting to the regular entry points
-	if (playmode>PMODE_COUNT) {
+	if (playmode >= PMODE_COUNT) {
 		playmode = 0;
 	}
 	
