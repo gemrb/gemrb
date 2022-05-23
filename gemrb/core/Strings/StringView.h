@@ -63,11 +63,6 @@ public:
 	StringViewImp(char const (&s)[N], size_t len = N - 1) noexcept
 	: StringViewImp(&s[0], len) // string literals are null terminated so dont include the null byte
 	{}
-	
-	template<size_type LEN, int(*CMP)(const char*, const char*, size_type)>
-	StringViewImp(const FixedSizeString<LEN, CMP>& fs) noexcept
-	: StringViewImp(fs.begin(), fs.length())
-	{}
 
 	// this is mainly replacing std::string&, so i tried to keep it compatible
 	const CharT* c_str() const noexcept {
