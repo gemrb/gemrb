@@ -19,7 +19,16 @@
 #ifndef STRINGVIEW_H
 #define STRINGVIEW_H
 
-#include "CString.h"
+#include <cstring>
+#include <iterator>
+#include <type_traits>
+
+// SFINAE garbage to only enable funtions for strings of known size
+// i'm sure its not perfect, but it meets our needs
+#define ENABLE_CHAR_RANGE(PARAM) typename std::enable_if< \
+(!std::is_enum<PARAM>::value && !std::is_fundamental<PARAM>::value && !std::is_pointer<PARAM>::value) \
+|| std::is_same<PARAM, decltype("")>::value \
+, int>::type = 0
 
 namespace GemRB {
 
