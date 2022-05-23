@@ -38,7 +38,7 @@ bool BAMFontManager::Import(DataStream* stream)
 {
 	resRef = stream->filename;
 	// compare only first 6 chars so we can match states2 or others
-	if (resRef.StartsWith("STATES", 6)) {
+	if (resRef.BeginsWith("STATES")) {
 		isStateFont = true;
 	}
 	

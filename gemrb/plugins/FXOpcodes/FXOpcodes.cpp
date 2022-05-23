@@ -7834,7 +7834,7 @@ int fx_item_usability(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			// targeting player created characters
 			match = target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE;
 		} else {
-			match = fx->Resource == target->GetScriptName().CString();
+			match = fx->Resource == target->GetScriptName();
 		}
 	} else {
 		// regular IDS check

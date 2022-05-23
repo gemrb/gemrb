@@ -2057,7 +2057,7 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptRef());
 	if (wmapExits != pstWMapExits.end()) {
 		for (const auto& exit : wmapExits->second) {
-			if (exit == overInfoPoint->GetScriptName().CString()) {
+			if (exit == overInfoPoint->GetScriptName()) {
 				teamMoved = true;
 				break;
 			}

@@ -628,19 +628,19 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 			if (IsStar(res)) continue;
 
 			ResRef clabRef = ResRef(res.begin() + 3);
-			if (res.StartsWith("AP_", 3)) {
+			if (res.BeginsWith("AP_")) {
 				if (remove) {
 					actor->fxqueue.RemoveAllEffects(clabRef);
 				} else {
 					core->ApplySpell(clabRef, actor, actor, 0);
 				}
-			} else if (res.StartsWith("GA_", 3)) {
+			} else if (res.BeginsWith("GA_")) {
 				if (remove) {
 					actor->spellbook.RemoveSpell(clabRef);
 				} else {
 					actor->LearnSpell(clabRef, LS_MEMO);
 				}
-			} else if (res.StartsWith("FA_",3)) {//iwd2 only: innate name strref
+			} else if (res.BeginsWith("FA_")) {//iwd2 only: innate name strref
 				//memorize these?
 				// we now learn them just to get the feedback string out
 				if (remove) {
@@ -650,7 +650,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 					actor->spellbook.RemoveSpell(clabRef);
 					core->ApplySpell(clabRef, actor, actor, 0);
 				}
-			} else if (res.StartsWith("FS_",3)) {//iwd2 only: song name strref (used by unused kits)
+			} else if (res.BeginsWith("FS_")) {//iwd2 only: song name strref (used by unused kits)
 				//don't memorize these?
 				if (remove) {
 					actor->fxqueue.RemoveAllEffects(clabRef);
@@ -659,7 +659,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 					actor->spellbook.RemoveSpell(clabRef);
 					core->ApplySpell(clabRef, actor, actor, 0);
 				}
-			} else if (res.StartsWith("RA_",3)) {//iwd2 only
+			} else if (res.BeginsWith("RA_")) {//iwd2 only
 				//remove ability
 				int x = atoi(res.CString() + 3);
 				actor->spellbook.RemoveSpell(x);
@@ -4433,7 +4433,7 @@ void Actor::PlayWalkSound()
 	char suffix = 0;
 	uint8_t l = Sound.length();
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
-	if (core->HasFeature(GF_SOUNDFOLDERS) && Sound.StartsWith("FS_", 3)) {
+	if (core->HasFeature(GF_SOUNDFOLDERS) && Sound.BeginsWith("FS_")) {
 		suffix = cnt + 0x31;
 	} else if (cnt) {
 		suffix = cnt + 0x60; // 'a'-'g'

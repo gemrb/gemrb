@@ -478,7 +478,7 @@ void Variables::LoadInitialValues(const ResRef& name)
 		if (!fs.Read(buffer, 40)) return;
 		if (fs.ReadDword(value) != 4) return;
 		// is it the type we want? if not, skip
-		if (!name.StartsWith(buffer, 6)) continue;
+		if (!name.BeginsWith(StringView(buffer, 6))) continue;
 		// copy variable (types got 2 extra spaces, and the name is padded too)
 		// (true = uppercase, needed for original engine save compat, see 315b8f2e)
 		varname = MakeVariable(StringView(buffer + 8, 32));

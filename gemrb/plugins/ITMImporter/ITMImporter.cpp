@@ -250,7 +250,7 @@ Item* ITMImporter::GetItem(Item *s)
 	// handle iwd1/iwd2 weapon "peculiarity"
 	bool zzWeapon = false;
 	int extraFeatureCount = 0;
-	if (s->Name.StartsWith("ZZ", 2) && version != 11) {
+	if (s->Name.BeginsWith("ZZ") && version != 11) {
 		zzWeapon = true;
 		// reserve space in the effect array
 		extraFeatureCount = 2;

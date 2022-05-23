@@ -743,7 +743,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
 		//this is a hack for PST style diced effects
 		if( core->HasFeature(GF_SAVE_FOR_HALF) ) {
-			if (!fx->Resource.IsEmpty() && !fx->Resource.StartsWith("NEG", 4)) {
+			if (!fx->Resource.IsEmpty() && !fx->Resource.BeginsWith("NEG")) {
 				fx->IsSaveForHalfDamage=1;
 			}
 		} else {

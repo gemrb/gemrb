@@ -269,11 +269,11 @@ void MUSImporter::PlayMusic(int pos)
 void MUSImporter::PlayMusic(const ieVariable& name)
 {
 	char FName[_MAX_PATH];
-	if (name.StartsWith("mx9000", 6)) { //iwd2
+	if (name.BeginsWith("mx9000")) { //iwd2
 		PathJoin(FName, "mx9000", name, nullptr);
-	} else if (name.StartsWith("mx0000", 6)) { //iwd
+	} else if (name.BeginsWith("mx0000")) { //iwd
 		PathJoin(FName, "mx0000", name, nullptr);
-	} else if (!name.StartsWith("SPC", 3)) { //bg2
+	} else if (!name.BeginsWith("SPC")) { //bg2
 		char File[_MAX_PATH];
 		fmt::format_to(File, "{}{}", PLName, name);
 		PathJoin(FName, PLName.CString(), File, nullptr);

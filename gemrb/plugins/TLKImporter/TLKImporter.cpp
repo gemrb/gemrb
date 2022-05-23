@@ -236,7 +236,7 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 	if (Token == "PLAYER10") {
 		return CharName(10);
 	}
-	if (Token.StartsWith("PLAYER", 6)) {
+	if (Token.BeginsWith("PLAYER")) {
 		return CharName(Token[6] - '1');
 	}
 

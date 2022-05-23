@@ -140,32 +140,24 @@ public:
 		return str[i];
 	}
 	
-	bool operator==(const char* cstr) const noexcept {
-		return CMP(str, cstr, LEN) == 0;
+	bool operator==(StringView sv) const noexcept {
+		auto max = std::max(sv.length(), LEN);
+		return CMP(str, sv.begin(), max) == 0;
 	}
 	
-	bool operator==(const FixedSizeString& other) const noexcept {
-		return CMP(str, other.str, LEN) == 0;
+	bool operator!=(StringView sv) const noexcept {
+		auto max = std::max(sv.length(), LEN);
+		return CMP(str, sv.begin(), max) != 0;
 	}
 	
-	bool operator!=(const char* cstr) const noexcept {
-		return CMP(str, cstr, LEN) != 0;
+	bool operator<(StringView sv) const noexcept {
+		auto max = std::max(sv.length(), LEN);
+		return CMP(str, sv.begin(), max) < 0;
 	}
 	
-	bool operator!=(const FixedSizeString& other) const noexcept {
-		return CMP(str, other.str, LEN) != 0;
-	}
-	
-	bool operator<(const char* cstr) const noexcept {
-		return CMP(str, cstr, LEN) < 0;
-	}
-	
-	bool operator<(const FixedSizeString& other) const noexcept {
-		return CMP(str, other.str, LEN) < 0;
-	}
-	
-	bool StartsWith(const char* cstr, size_type len) const noexcept {
-		return CMP(str, cstr, len) == 0;
+	bool BeginsWith(StringView sv) const noexcept {
+		auto max = std::max(sv.length(), LEN);
+		return CMP(str, sv.begin(), max) == 0;
 	}
 	
 	size_type length() const noexcept {
