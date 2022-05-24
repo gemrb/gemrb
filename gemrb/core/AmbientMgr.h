@@ -29,7 +29,6 @@
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
-#include <string>
 #include <thread>
 #include <vector>
 
@@ -47,11 +46,11 @@ public:
 	void SetAmbients(const std::vector<Ambient*> &a);
 	void RemoveAmbients(const std::vector<Ambient*>& oldAmbients);
 
-	void Activate(const std::string& name); // hard play ;-)
+	void Activate(StringView name); // hard play ;-)
 	void Activate();
-	void Deactivate(const std::string& name); // hard stop
+	void Deactivate(StringView name); // hard stop
 	void Deactivate();
-	bool IsActive(const std::string& name) const;
+	bool IsActive(StringView name) const;
 
 private:
 	void AmbientsSet(const std::vector<Ambient*>&);

@@ -121,7 +121,7 @@ void AmbientMgr::SetAmbients(const std::vector<Ambient*> &a)
 	Activate();
 }
 
-void AmbientMgr::Activate(const std::string& name)
+void AmbientMgr::Activate(StringView name)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	//std::lock_guard<std::mutex> l(ambientsMutex);
@@ -141,7 +141,7 @@ void AmbientMgr::Activate()
 	cond.notify_all();
 }
 
-void AmbientMgr::Deactivate(const std::string& name)
+void AmbientMgr::Deactivate(StringView name)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	//std::lock_guard<std::mutex> l(ambientsMutex);
@@ -161,7 +161,7 @@ void AmbientMgr::Deactivate()
 	HardStop();
 }
 
-bool AmbientMgr::IsActive(const std::string& name) const
+bool AmbientMgr::IsActive(StringView name) const
 {
 	std::lock_guard<std::mutex> l(ambientsMutex);
 	for (auto ambient : ambients) {

@@ -1926,9 +1926,9 @@ void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 {
 	AmbientMgr * ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
 	if (parameters->int0Parameter) {
-		ambientmgr->Activate(parameters->objects[1]->objectName.CString());
+		ambientmgr->Activate(parameters->objects[1]->objectName);
 	} else {
-		ambientmgr->Deactivate(parameters->objects[1]->objectName.CString());
+		ambientmgr->Deactivate(parameters->objects[1]->objectName);
 	}
 }
 
