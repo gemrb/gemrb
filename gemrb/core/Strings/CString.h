@@ -89,6 +89,7 @@ public:
 	
 	explicit FixedSizeString(const char* cstr, size_type len = LEN) noexcept {
 		if (cstr) {
+			assert(len <= LEN);
 			strncpy(str, cstr, len);
 		} else {
 			std::fill(begin(), bufend(), '\0');
