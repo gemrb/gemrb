@@ -141,23 +141,26 @@ public:
 	}
 	
 	bool operator==(StringView sv) const noexcept {
-		auto max = std::max(sv.length(), LEN);
-		return CMP(str, sv.begin(), max) == 0;
+		if (sv.length() != length()) {
+			return false;
+		}
+		return CMP(str, sv.begin(), sv.length()) == 0;
 	}
 	
 	bool operator!=(StringView sv) const noexcept {
-		auto max = std::max(sv.length(), LEN);
-		return CMP(str, sv.begin(), max) != 0;
+		return !operator==(sv);
 	}
 	
 	bool operator<(StringView sv) const noexcept {
-		auto max = std::max(sv.length(), LEN);
+		auto max = std::min(sv.length(), LEN);
 		return CMP(str, sv.begin(), max) < 0;
 	}
 	
 	bool BeginsWith(StringView sv) const noexcept {
-		auto max = std::max(sv.length(), LEN);
-		return CMP(str, sv.begin(), max) == 0;
+		if (sv.length() > LEN) {
+			return false;
+		}
+		return CMP(str, sv.begin(), sv.length()) == 0;
 	}
 	
 	size_type length() const noexcept {
