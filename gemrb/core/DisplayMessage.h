@@ -74,9 +74,9 @@ private:
 	/** displays a string in the textarea */
 	void DisplayString(String text, const Color &color, Scriptable *target) const;
 	Color GetColor(const GUIColors color) const;
-	std::vector<Color> GetAllColors() const;
+	std::vector<std::string> GetAllColors() const;
 private:
-	const std::vector<Color> colors = DisplayMessage::GetAllColors();
+	const std::vector<std::string> GUIColorNames = DisplayMessage::GetAllColors();
 
 public:
 	static ieStrRef GetStringReference(size_t);

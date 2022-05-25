@@ -37,8 +37,6 @@ static const auto DisplayFormatValue = FMT_STRING(L"[p][color={:08X}]{}: {}[/col
 static const auto DisplayFormatNameString = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{}: {}[/color][/p]");
 static const auto DisplayFormatSimple = FMT_STRING(L"[p]{}[/p]");
 
-//const char* GUIColors[] = {};//{ "DIALOG", "DIALOG_PARTY", "GOT_GOLD", "RED", "GOT_XP", "LIGHT_GREY", "WHITE" };
-
 DisplayMessage::StrRefs DisplayMessage::SRefs;
 
 bool DisplayMessage::EnableRollFeedback()
@@ -190,28 +188,26 @@ void DisplayMessage::DisplayString(String text, const Color &color, Scriptable *
 	}
 }
 
-std::vector<Color> DisplayMessage::GetAllColors() const
+std::vector<std::string> DisplayMessage::GetAllColors() const
 {
-	std::vector<Color> auxiliaryColors;
-	if (auxiliaryColors.empty()) {
-		AutoTable colorTable = gamedata->LoadTable("colors", true);
-		assert(colorTable);
-		for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
-			ieDword c = colorTable->QueryFieldUnsigned<ieDword>(r, 0);
-			auxiliaryColors.push_back(Color(c));
-		}
+	std::vector<std::string> auxiliaryColors;
+	AutoTable colorTable = gamedata->LoadTable("colors", true);
+	assert(colorTable);
+	for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
+		auxiliaryColors.push_back(colorTable->GetRowName(r));
 	}
 	return auxiliaryColors;
 }
 
 Color DisplayMessage::GetColor(GUIColors color) const
 {
-	int colortInt = static_cast<int>(color) - 1;
-	int size = static_cast<int>(colors.size());
-	if (size < colortInt) {
-		return ColorRed;
+	
+	int colorInt = static_cast<int>(color) - 1;
+	if (static_cast<int>(GUIColorNames.size()) < colorInt) {
+		// It never should happend this, but just for been defensive.
+		colorInt = 0;
 	}
-	return colors.at(colortInt);
+	return gamedata->GetColor(GUIColorNames[colorInt]);
 }
 
 void DisplayMessage::DisplayString(ieStrRef stridx, GUIColors color, STRING_FLAGS flags) const
