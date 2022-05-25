@@ -37,7 +37,7 @@
 
 namespace GemRB {
 
-/** GUIColors options */
+/** GUIColors options. This starts at 7 because is the row in the colors.2da that corresponds to white color.*/
 enum class GUIColors {
 	WHITE = 7,
 	RED = 8,
