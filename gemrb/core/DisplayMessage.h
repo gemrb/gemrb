@@ -39,13 +39,13 @@ namespace GemRB {
 
 /** GUIColors options */
 enum class GUIColors {
-	DIALOG = 12,
-	DIALOGPARTY = 13,
-	GOLD = 11,
+	WHITE = 7,
 	RED = 8,
-	XPCHANGE = 10,
 	LIGHTGREY = 9,
-	WHITE = 7
+	XPCHANGE = 10,
+	GOLD = 11,
+	DIALOG = 12,
+	DIALOGPARTY = 13
 };
 
 class Scriptable;
