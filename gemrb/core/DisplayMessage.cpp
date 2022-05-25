@@ -287,7 +287,7 @@ void DisplayMessage::DisplayConstantStringAction(size_t stridx, GUIColors color,
 	Color used_color = GetColor(color);
 	GetSpeakerColor(name2, target);
 
-	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH );
+	String text = core->GetString( DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH );
 	DisplayMarkupString(fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, used_color.Packed(), text, name2));
 }
 
