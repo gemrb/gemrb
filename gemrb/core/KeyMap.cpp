@@ -84,8 +84,7 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		
 		StringToLower(buffer, buffer + len, buffer);
 		StringView line(buffer, len);
-		auto parts = Explode<StringView, std::string>(line, '=');
-		assert(parts.size() <= 2);
+		auto parts = Explode<StringView, std::string>(line, '=', 1);
 		if (parts.size() < 2) {
 			parts.emplace_back();
 		}

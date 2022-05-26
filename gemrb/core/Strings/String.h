@@ -111,7 +111,7 @@ void TrimString(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR
 }
 
 template<typename STR, typename RET = StringViewT<STR>>
-std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',')
+std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', size_t lim = 0)
 {
 	std::vector<RET> elements;
 	size_t beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR));
@@ -121,6 +121,9 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',')
 		if (str[cur] == delim) {
 			elements.emplace_back(&str[beg], cur - beg);
 			beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR), cur + 1);
+			if (lim && elements.size() == lim) {
+				break;
+			}
 		}
 	}
 
