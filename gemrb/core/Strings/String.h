@@ -124,7 +124,7 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',')
 		}
 	}
 
-	if (beg != cur) {
+	if (beg != STR::npos && beg != cur) {
 		elements.emplace_back(&str[beg]);
 	}
 
