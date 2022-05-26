@@ -50,6 +50,16 @@ STR StringFromView(StringViewT<STR> sv)
 	return STR(sv.c_str(), sv.length());
 }
 
+template <typename STR>
+typename STR::size_type FindFirstOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = 0) noexcept
+{
+	if (pos >= s.length() || s.empty()) {
+		return STR::npos;
+	}
+	auto iter = std::find_first_of(s.begin() + pos, s.end(), sv.begin(), sv.end());
+	return iter == s.end() ? STR::npos : std::distance(s.begin(), iter);
+}
+
 template <typename STR, typename IT>
 IT FindNotOf(IT first, IT last, StringViewT<STR> s) noexcept
 {

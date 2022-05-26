@@ -20,15 +20,6 @@
 
 namespace GemRB {
 
-/** Returns the length of string (up to a delimiter) */
-GEM_EXPORT int strlench(const char* string, char ch)
-{
-	int i;
-	for (i = 0; string[i] && string[i] != ch; i++)
-		;
-	return i;
-}
-
 #ifndef HAVE_STRNLEN
 int strnlen(const char* string, int maxlen)
 {
