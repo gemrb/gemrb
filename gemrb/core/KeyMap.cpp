@@ -67,61 +67,61 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		return false;
 	}
 	
-	FixedSizeString<64> name;
-	char value[_MAX_PATH + 3];
+	char buffer[_MAX_PATH];
 	while (config->Remains()) {
-		char line[_MAX_PATH];
-
-		if (config->ReadLine(line, _MAX_PATH) == -1)
+		strret_t len = config->ReadLine(buffer, sizeof(buffer));
+		if (len == DataStream::Error)
 			break;
 
-		if ((line[0] == '#') ||
-			( line[0] == '[' ) ||
-			( line[0] == '\r' ) ||
-			( line[0] == '\n' ) ||
-			( line[0] == ';' )) {
+		if (len == 0 ||
+			(buffer[0] == '#') ||
+			(buffer[0] == '[') ||
+			(buffer[0] == '\r') ||
+			(buffer[0] == '\n') ||
+			(buffer[0] == ';')) {
 			continue;
 		}
+		
+		StringToLower(buffer, buffer + len, buffer);
+		StringView line(buffer, len);
+		auto parts = Explode<StringView, std::string>(line, '=');
+		assert(parts.size() <= 2);
+		if (parts.size() < 2) {
+			parts.emplace_back();
+		}
+		
+		auto& val = parts[1];
+		LTrim(val);
 
-		value[0] = 0;
-
-		//ignore possible space after the =, sadly we cannot do the same with
-		//spaces before it
-		if (sscanf( line, "%[^=]= %[^\r\n]", name.begin(), value )!=2)
+		if (val.length() > 1 || keymap.HasKey(val)) {
+			Log(WARNING, "KeyMap", "Ignoring key {}", val);
 			continue;
-
-		RTrim(name);
-		StringToLower(name);
-
+		}
+		
+		auto& key = parts[0];
+		RTrim(key);
 		//change internal spaces to underscore
-		std::replace(name.begin(), name.end(), ' ', '_');
-
-		size_t l = strlen(value);
-		StringView key(value, l);
-		if (l > 1 || keymap.HasKey(key)) {
-			Log(WARNING, "KeyMap", "Ignoring key {}", value);
-			continue;
-		}
+		std::replace(key.begin(), key.end(), ' ', '_');
 
 		ieVariable moduleName;
 		ieVariable function;
 		int group;
 
-		if (kmtable->GetRowIndex(name) != TableMgr::npos) {
-			moduleName = kmtable->QueryField(name, "MODULE");
-			function = kmtable->QueryField(name, "FUNCTION");
-			group = kmtable->QueryFieldSigned<int>(name, "GROUP");
+		if (kmtable->GetRowIndex(key) != TableMgr::npos) {
+			moduleName = kmtable->QueryField(key, "MODULE");
+			function = kmtable->QueryField(key, "FUNCTION");
+			group = kmtable->QueryFieldSigned<int>(key, "GROUP");
 		} else {
 			moduleName = kmtable->QueryField("Default","MODULE");
 			function = kmtable->QueryField("Default","FUNCTION");
 			group = kmtable->QueryFieldSigned<int>("Default","GROUP");
-			Log(MESSAGE, "KeyMap", "Adding key {} with function {}::{}", value, moduleName, function);
+			Log(MESSAGE, "KeyMap", "Adding key {} with function {}::{}", key, moduleName, function);
 		}
-		Function *fun = new Function(moduleName, function, group, tolower(value[0]));
+		Function *fun = new Function(moduleName, function, group, val[0]);
 
 		// lookup by either key or name
-		keymap.SetAt(key, fun);
-		keymap.SetAt(name, new Function(*fun));
+		keymap.SetAt(val, fun);
+		keymap.SetAt(key, new Function(*fun));
 	}
 	delete config;
 	return true;
