@@ -132,7 +132,7 @@ strret_t DataStream::ReadLine(void* buf, strpos_t maxlen)
 	unsigned char * p = ( unsigned char * ) buf;
 	if (Pos >= size) {
 		p[0]=0;
-		return -1;
+		return Error;
 	}
 	unsigned int i = 0;
 	//TODO: fix this to handle any combination of \r and \n

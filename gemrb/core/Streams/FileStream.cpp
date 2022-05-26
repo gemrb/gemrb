@@ -131,16 +131,16 @@ bool FileStream::Create(const char *path)
 strret_t FileStream::Read(void* dest, strpos_t length)
 {
 	if (!opened) {
-		return GEM_ERROR;
+		return Error;
 	}
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
 	if (Pos+length>size ) {
-		return GEM_ERROR;
+		return Error;
 	}
 	size_t c = str.Read(dest, length);
 	if (c != length) {
-		return GEM_ERROR;
+		return Error;
 	}
 	if (Encrypted) {
 		ReadDecrypted( dest, c );
@@ -152,13 +152,13 @@ strret_t FileStream::Read(void* dest, strpos_t length)
 strret_t FileStream::Write(const void* src, strpos_t length)
 {
 	if (!created) {
-		return GEM_ERROR;
+		return Error;
 	}
 	// do encryption here if needed
 
 	size_t c = str.Write(src, length);
 	if (c != length) {
-		return GEM_ERROR;
+		return Error;
 	}
 	Pos += c;
 	if (Pos>size) {
@@ -170,7 +170,7 @@ strret_t FileStream::Write(const void* src, strpos_t length)
 strret_t FileStream::Seek(stroff_t newpos, strpos_t type)
 {
 	if (!opened && !created) {
-		return GEM_ERROR;
+		return Error;
 	}
 	switch (type) {
 		case GEM_STREAM_END:
@@ -188,13 +188,13 @@ strret_t FileStream::Seek(stroff_t newpos, strpos_t type)
 			break;
 
 		default:
-			return GEM_ERROR;
+			return Error;
 	}
 	if (Pos>size) {
 		Log(ERROR, "Streams", "Invalid seek position {} in file {} (limit: {})", Pos, filename, size);
-		return GEM_ERROR;
+		return Error;
 	}
-	return GEM_OK;
+	return 0;
 }
 
 FileStream* FileStream::OpenFile(const char* filename)

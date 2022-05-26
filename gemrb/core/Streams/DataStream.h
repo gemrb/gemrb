@@ -72,6 +72,7 @@ public:
 	char originalfile[_MAX_PATH];
 public:
 	static constexpr strpos_t InvalidPos = strpos_t(-1);
+	static constexpr strret_t Error = -1;
 
 	DataStream() noexcept;
 	virtual ~DataStream() noexcept = default;

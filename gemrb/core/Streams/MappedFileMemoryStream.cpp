@@ -81,7 +81,7 @@ DataStream* MappedFileMemoryStream::Clone() const noexcept {
 
 strret_t MappedFileMemoryStream::Read(void* dest, strpos_t length) {
 	if (!fileMapped) {
-		return GEM_ERROR;
+		return Error;
 	}
 
 	return MemoryStream::Read(dest, length);
@@ -89,14 +89,14 @@ strret_t MappedFileMemoryStream::Read(void* dest, strpos_t length) {
 
 stroff_t MappedFileMemoryStream::Seek(stroff_t pos, strpos_t startPos) {
 	if (!fileMapped) {
-		return GEM_ERROR;
+		return InvalidPos;
 	}
 
 	return MemoryStream::Seek(pos, startPos);
 }
 
 strret_t MappedFileMemoryStream::Write(const void*, strpos_t) {
-	return GEM_ERROR;
+	return Error;
 }
 
 MappedFileMemoryStream::~MappedFileMemoryStream() {

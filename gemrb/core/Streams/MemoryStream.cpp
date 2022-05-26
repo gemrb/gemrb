@@ -51,7 +51,7 @@ strret_t MemoryStream::Read(void* dest, strpos_t length)
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
 	if (Pos+length>size ) {
-		return GEM_ERROR;
+		return Error;
 	}
 
 	memcpy(dest, data + Pos + (Encrypted ? 2 : 0), length);
@@ -66,7 +66,7 @@ strret_t MemoryStream::Write(const void* src, strpos_t length)
 {
 	if (Pos+length>size ) {
 		//error("MemoryStream", "We don't support appending to memory streams yet.");
-		return GEM_ERROR;
+		return Error;
 	}
 	memcpy(data+Pos, src, length);
 	Pos += length;
@@ -89,14 +89,14 @@ stroff_t MemoryStream::Seek(stroff_t newpos, strpos_t type)
 			break;
 
 		default:
-			return GEM_ERROR;
+			return InvalidPos;
 	}
 	//we went past the buffer
 	if (Pos>size) {
 		Log(ERROR, "Streams", "Invalid seek position: {} (limit: {})", Pos, size);
-		return GEM_ERROR;
+		return InvalidPos;
 	}
-	return GEM_OK;
+	return 0;
 }
 
 }
