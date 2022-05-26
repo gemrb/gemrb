@@ -54,17 +54,21 @@ public:
 	
 	StringViewImp(CharT* cstr, size_type len) noexcept
 	: data(cstr), len(len) {}
+	
+	StringViewImp(CharT* cstr, size_type begpos, size_type endpos) noexcept
+	: StringViewImp(cstr + begpos, endpos - begpos)
+	{}
 
 	template<typename STR, typename CharT2 = CharT, ENABLE_CHAR_RANGE(STR),
 	typename std::enable_if<std::is_const<CharT2>::value && !std::is_convertible<STR, StringViewImp>::value, int>::type = 0>
-	StringViewImp(const STR& s) noexcept
-	: StringViewImp(&s[0], std::distance(std::begin(s), std::end(s)))
+	StringViewImp(const STR& s, size_type begpos = 0, size_type endpos = npos) noexcept
+	: StringViewImp(&s[0], begpos, endpos == npos ? std::distance(std::begin(s), std::end(s)) : endpos)
 	{}
 	
 	template<typename STR, typename CharT2 = CharT, ENABLE_CHAR_RANGE(STR),
 	typename std::enable_if<!std::is_const<CharT2>::value && !std::is_convertible<STR, StringViewImp>::value, int>::type = 0>
-	StringViewImp(STR& s) noexcept
-	: StringViewImp(&s[0], std::distance(std::begin(s), std::end(s)))
+	StringViewImp(STR& s, size_type begpos = 0, size_type endpos = npos) noexcept
+	: StringViewImp(&s[0], begpos, endpos == npos ? std::distance(std::begin(s), std::end(s)) : endpos)
 	{}
 	
 	template<size_type N>
