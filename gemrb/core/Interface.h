@@ -404,7 +404,7 @@ private:
 	ieDword* slotmatrix = nullptr; // itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	std::vector<SlotType> slotTypes;
-	size_t ItemTypes = 0;
+	TableMgr::index_t ItemTypes = 0;
 
 	// Currently dragged item or NULL
 	std::unique_ptr<ItemDragOp> DraggedItem;
