@@ -280,7 +280,7 @@ bool Inventory::HasItemInSlot(const ResRef& resref, unsigned int slot) const
 	if (!item) {
 		return false;
 	}
-	if (item->ItemResRef == resref) {
+	if (resref.IsEmpty() || item->ItemResRef == resref) {
 		return true;
 	}
 	return false;
