@@ -47,7 +47,11 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 		}
 		std::string fname(fnlen, '\0');
 		compressed->Read(&fname[0], fnlen);
+
+		// fnlen includes a terminating zero
+		fname.resize(fnlen - 1);
 		StringToLower(fname);
+
 		auto position = compressed->GetPos();
 		compressed->ReadDword(declen);
 		compressed->ReadDword(complen);
