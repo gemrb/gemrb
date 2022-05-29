@@ -224,7 +224,7 @@ public:
 
 	template<size_type N> FixedSizeString<N, CMP> SubStr(size_type pos) {
 		static_assert(N <= LEN, "Substring must not exceed the original length.");
-		assert(pos + LEN <= N);
+		assert(static_cast<size_type>(pos + N) <= LEN);
 		return FixedSizeString<N, CMP>{CString() + pos};
 	}
 };
