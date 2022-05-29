@@ -32,7 +32,7 @@ enable_if_t<std::is_class<STR>::value && !std::is_same<STR, basic_string_view<ch
 > : formatter<const char*, char> {
 	template <typename FormatContext>
 	auto format(const STR& str, FormatContext &ctx) -> decltype(ctx.out()) {
-		return format_to(ctx.out(), str.begin());
+		return formatter<const char*, char>::format(str.begin(), ctx);
 	}
 };
 
