@@ -575,6 +575,17 @@ def CannotLearnSlotSpell ():
 
 	return 0
 
+def LearnPriestSpell (pc, spell, bookType, level):
+	if GameCheck.IsIWD2():
+		if bookType == IE_IWD2_SPELL_DOMAIN:
+			GemRB.LearnSpell (pc, spell, 0, 1 << bookType, level)
+		else:
+			# perhaps forcing would be fine here too, but it's untested and
+			# iwd2 cleric schools grant certain spells at different levels
+			GemRB.LearnSpell (pc, spell, 0, 1 << bookType)
+	else:
+		GemRB.LearnSpell (pc, spell)
+
 def LearnPriestSpells (pc, level, mask, baseClassName = -1):
 	"""Learns all the priest spells through the given spell level.
 
@@ -600,15 +611,7 @@ def LearnPriestSpells (pc, level, mask, baseClassName = -1):
 		for spell in learnable:
 			# if the spell isn't learned, learn it
 			if HasSpell (pc, booktype, i, spell) < 0:
-				if GameCheck.IsIWD2():
-					if booktype == IE_IWD2_SPELL_DOMAIN:
-						GemRB.LearnSpell (pc, spell, 0, 1<<booktype, i)
-					else:
-						# perhaps forcing would be fine here too, but it's untested and
-						# iwd2 cleric schools grant certain spells at different levels
-						GemRB.LearnSpell (pc, spell, 0, 1<<booktype)
-				else:
-					GemRB.LearnSpell (pc, spell)
+				LearnPriestSpell (pc, spell, booktype, i)
 	return
 
 
