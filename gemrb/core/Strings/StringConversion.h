@@ -38,31 +38,6 @@ GEM_EXPORT String* StringFromCString(const char* string);
 GEM_EXPORT String* StringFromUtf8(const char* string);
 GEM_EXPORT std::string MBStringFromString(const String& string);
 
-// String manipulators
-template <typename CIT, typename IT>
-GEM_EXPORT_T void StringToLower(CIT it, CIT end, IT dest) {
-	for (; it != end; ++it, ++dest) {
-		*dest = std::towlower(*it);
-	}
-}
-
-template <typename T>
-GEM_EXPORT_T void StringToLower(T& str) {
-	StringToLower(std::begin(str), std::end(str), std::begin(str));
-}
-
-template <typename CIT, typename IT>
-GEM_EXPORT_T void StringToUpper(CIT it, CIT end, IT dest) {
-	for (; it != end; ++it, ++dest) {
-		*dest = std::towupper(*it);
-	}
-}
-
-template <typename T>
-GEM_EXPORT_T void StringToUpper(T& str) {
-	StringToUpper(std::begin(str), std::end(str), std::begin(str));
-}
-
 }
 
 namespace fmt {

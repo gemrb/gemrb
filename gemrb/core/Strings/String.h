@@ -144,6 +144,30 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 	return elements;
 }
 
+template <typename CIT, typename IT>
+GEM_EXPORT_T void StringToLower(CIT it, CIT end, IT dest) {
+	for (; it != end; ++it, ++dest) {
+		*dest = std::towlower(*it);
+	}
+}
+
+template <typename T>
+GEM_EXPORT_T void StringToLower(T& str) {
+	StringToLower(std::begin(str), std::end(str), std::begin(str));
+}
+
+template <typename CIT, typename IT>
+GEM_EXPORT_T void StringToUpper(CIT it, CIT end, IT dest) {
+	for (; it != end; ++it, ++dest) {
+		*dest = std::towupper(*it);
+	}
+}
+
+template <typename T>
+GEM_EXPORT_T void StringToUpper(T& str) {
+	StringToUpper(std::begin(str), std::end(str), std::begin(str));
+}
+
 template<typename ...ARGS>
 std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&& ...args) {
 	std::string formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
