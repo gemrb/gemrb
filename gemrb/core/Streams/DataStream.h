@@ -68,8 +68,8 @@ using stroff_t = typename std::make_signed<strpos_t>::type;
 
 class GEM_EXPORT DataStream {
 public:
-	char filename[16]; //8+1+3+1 padded to dword
-	char originalfile[_MAX_PATH];
+	char filename[16] {}; //8+1+3+1 padded to dword
+	char originalfile[_MAX_PATH] {};
 public:
 	static constexpr strpos_t InvalidPos = strpos_t(-1);
 	static constexpr strret_t Error = -1;
