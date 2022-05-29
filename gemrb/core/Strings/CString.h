@@ -221,12 +221,6 @@ public:
 	std::reverse_iterator<iterator> rend() noexcept {
 		return std::reverse_iterator<iterator>(begin());
 	}
-
-	template<size_type N> FixedSizeString<N, CMP> SubStr(size_type pos) {
-		static_assert(N <= LEN, "Substring must not exceed the original length.");
-		assert(static_cast<size_type>(pos + N) <= LEN);
-		return FixedSizeString<N, CMP>{CString() + pos};
-	}
 };
 
 }

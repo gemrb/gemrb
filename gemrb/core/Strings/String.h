@@ -144,6 +144,12 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 	return elements;
 }
 
+template <typename STR>
+StringViewT<STR> SubStr(const STR& str, typename STR::size_type pos, typename STR::size_type len) {
+	assert(pos + len <= str.length());
+	return StringViewT<STR>(&str[0] + pos, len);
+}
+
 template <typename CIT, typename IT>
 GEM_EXPORT_T void StringToLower(CIT it, CIT end, IT dest) {
 	for (; it != end; ++it, ++dest) {
