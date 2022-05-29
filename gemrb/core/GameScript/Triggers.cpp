@@ -1751,16 +1751,16 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 	if (!parameters->variable0Parameter.IsEmpty()) {
 		ieDword value;
 		ieVariable Variable;
-		size_t len;
+		bool valid;
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
-			len = Variable.Format("{}_DEAD", parameters->string0Parameter);
+			valid = Variable.Format("{}_DEAD", parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {
-			len = Variable.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
+			valid = Variable.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
 		}
-		if (len > sizeof(ieVariable)) {
+		if (!valid) {
 			Log(ERROR, "GameScript", "Scriptname {} (sender: {}) is too long for generating death globals!", parameters->string0Parameter, Sender->GetScriptName());
 		}
 		if (value>0) {
