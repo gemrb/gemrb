@@ -51,7 +51,7 @@ public:
 class GEM_EXPORT CFGConfig : public InterfaceConfig
 {
 private:
-	bool isValid;
+	bool isValid = false;
 
 private:
 	bool InitWithINIData(DataStream* cfgStream);

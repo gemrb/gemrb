@@ -35,9 +35,6 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 {
 	SetFlags(RESIZE_WIDTH, BitOp::NAND);
 
-	selectedSpan = NULL;
-	hoverSpan = NULL;
-
 	size = opts.size();
 
 	SetMargin(m);

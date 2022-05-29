@@ -25,14 +25,6 @@
 
 namespace GemRB {
 
-Dialog::Dialog(void)
-{
-	TopLevelCount = 0;
-	Flags = 0;
-	Order = NULL;
-	initialStates = NULL;
-}
-
 Dialog::~Dialog(void)
 {
 	if (initialStates) {

@@ -32,7 +32,7 @@ struct VarEntry {
 	char* key;
 };
 
-LRUCache::LRUCache() : v(), head(0), tail(0) {
+LRUCache::LRUCache() : v() {
 	v.SetType(GEM_VARIABLES_POINTER);
 	v.ParseKey(1);
 }

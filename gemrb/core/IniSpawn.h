@@ -148,11 +148,11 @@ private:
 	Point NamelessSpawnPoint;
 	Point PartySpawnPoint;
 	ResRef PartySpawnArea;
-	int NamelessState;
+	int NamelessState = 35;
 	SpawnEntry enterspawn;
 	SpawnEntry exitspawn;
 	std::vector<SpawnEntry> eventspawns;
-	ieDword detail_level;
+	ieDword detail_level = 2; // high detail level by default
 
 	CritterEntry ReadCreature(const DataFileMgr* inifile, StringView crittername) const;
 	void ReadSpawnEntry(const DataFileMgr *inifile, StringView entryname, SpawnEntry &entry) const;

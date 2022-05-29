@@ -79,8 +79,8 @@ private:
 
 	Region screen; // only a Region for convinience. we dont use x,y
 	Window* gameWin;
-	Window* hoverWin;
-	Window* trackingWin;
+	Window* hoverWin = nullptr;
+	Window* trackingWin = nullptr;
 
 	EventMgr eventMgr;
 

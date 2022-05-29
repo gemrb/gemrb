@@ -216,14 +216,14 @@ enum {
 };
 
 struct TriggerEntry {
-	explicit TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0), flags(0) { }
-	TriggerEntry(unsigned short id, ieDword p1) : triggerID(id), param1(p1), param2(0), flags(0) { }
-	TriggerEntry(unsigned short id, ieDword p1, ieDword p2) : triggerID(id), param1(p1), param2(p2), flags(0) { }
+	explicit TriggerEntry(unsigned short id) : triggerID(id) { }
+	TriggerEntry(unsigned short id, ieDword p1) : triggerID(id), param1(p1) { }
+	TriggerEntry(unsigned short id, ieDword p1, ieDword p2) : triggerID(id), param1(p1), param2(p2) { }
 
 	unsigned short triggerID;
-	ieDword param1;
-	ieDword param2;
-	unsigned int flags;
+	ieDword param1 = 0;
+	ieDword param2 = 0;
+	unsigned int flags = 0;
 };
 
 class GEM_EXPORT Scriptable {

@@ -126,7 +126,7 @@ public:
 			}
 		};
 
-		TypeInterface* ptr;
+		TypeInterface* ptr = nullptr;
 		
 		template<typename T>
 		using Concrete_t = ConcreteType<typename std::add_const<T>::type>;
@@ -137,10 +137,10 @@ public:
 			ptr = new Concrete_t<T>(value);
 		}
 
-		Parameter() : ptr(NULL) {}
+		Parameter() noexcept = default;
 
-		Parameter( const Parameter& s ) {
-			ptr = (s.ptr) ? s.ptr->Clone() : NULL;
+		Parameter(const Parameter& s) {
+			if (s.ptr) ptr = s.ptr->Clone();
 		}
 
 		Parameter& Swap(Parameter& rhs) {

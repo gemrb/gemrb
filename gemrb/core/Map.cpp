@@ -234,7 +234,7 @@ private:
 struct Explore {
 	int LargeFog;
 	static constexpr int MaxVisibility = 30;
-	int VisibilityPerimeter; //calculated from MaxVisibility
+	int VisibilityPerimeter = 0; // calculated from MaxVisibility
 	std::array<std::vector<Point>, MaxVisibility> VisibilityMasks;
 
 	static const Explore& Get() {
@@ -266,7 +266,6 @@ private:
 		int xc = 1 - ( 2 * MaxVisibility );
 		int yc = 1;
 		int re = 0;
-		VisibilityPerimeter = 0;
 		while (x>=y) {
 			VisibilityPerimeter+=8;
 			y++;

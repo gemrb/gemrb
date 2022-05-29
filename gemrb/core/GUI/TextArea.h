@@ -68,7 +68,8 @@ private:
 		};
 	private:
 		TextArea& ta;
-		TextContainer* hoverSpan, *selectedSpan;
+		TextContainer* hoverSpan = nullptr;
+		TextContainer* selectedSpan = nullptr;
 		size_t size;
 		EventMgr::TapMonitorId id;
 

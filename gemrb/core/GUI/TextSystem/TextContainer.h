@@ -53,10 +53,10 @@ protected:
 	// content doesn't have an x, y (-1, -1) unless we want absolute positioning
 	// same applies for the dimensions, 0x0 implies unlimited area
 	Region frame; // TODO: origin currently unused
-	ContentContainer* parent;
+	ContentContainer* parent = nullptr;
 
 public:
-	explicit Content(const Size& size);
+	explicit Content(const Size& size) : frame(Point(0, 0), size) {};
 	virtual ~Content() noexcept = default;
 
 	virtual Size ContentFrame() const { return frame.size; };
@@ -99,7 +99,7 @@ public:
 
 	const String& Text() const { return text; };
 
-	unsigned char Alignment;
+	unsigned char Alignment = IE_FONT_ALIGN_LEFT;
 
 protected:
 	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;
@@ -245,11 +245,11 @@ private:
 	// default font/palette for adding plain text
 	Font* font;
 	Font::PrintColors* colors = nullptr;
-	unsigned char alignment;
+	unsigned char alignment = IE_FONT_ALIGN_LEFT;
 
-	size_t textLen;
-	size_t cursorPos;
-	size_t printPos;
+	size_t textLen = 0;
+	size_t cursorPos = 0;
+	size_t printPos = 0;
 	Point cursorPoint;
 
 private:

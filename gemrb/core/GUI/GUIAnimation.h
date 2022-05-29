@@ -80,11 +80,11 @@ private:
 };
 
 class GEM_EXPORT ColorCycle {
-	uint8_t step;
+	uint8_t step = 0;
 	uint8_t speed;
 
 public:
-	explicit ColorCycle(uint8_t speed) : step(0), speed(speed) {}
+	explicit ColorCycle(uint8_t speed) : speed(speed) {}
 
 	void AdvanceTime(tick_t time);
 	Color Blend(const Color& c1, const Color& c2) const;

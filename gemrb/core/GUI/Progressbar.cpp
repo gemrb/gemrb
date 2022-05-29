@@ -31,12 +31,9 @@
 namespace GemRB {
 
 Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount)
-: Control(frame)
+: Control(frame), KnobStepsCount(KnobStepsCount)
 {
 	ControlType = IE_GUI_PROGRESSBAR;
-
-	this->KnobStepsCount = KnobStepsCount;
-	PBarAnim = NULL;
 
 	SetValueRange(0, 100);
 }

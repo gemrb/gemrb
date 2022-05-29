@@ -52,8 +52,8 @@ public:
 private:
 	// internal storage
 	Variables v;
-	VarEntry* head;
-	VarEntry* tail;
+	VarEntry* head = nullptr;
+	VarEntry* tail = nullptr;
 
 	void removeFromList(VarEntry* e);
 };

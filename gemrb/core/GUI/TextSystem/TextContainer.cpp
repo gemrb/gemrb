@@ -29,12 +29,6 @@
 
 namespace GemRB {
 
-Content::Content(const Size& size)
-	: frame(Point(0, 0), size)
-{
-	parent = NULL;
-}
-
 LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 {
 	return { std::make_shared<LayoutRegion>(Region(rgn.origin + p, frame.size)) };
@@ -43,13 +37,11 @@ LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 TextSpan::TextSpan(String string, const Font* fnt, const Size* frame)
 	: Content(frame ? *frame : Size()), text(std::move(string)), font(fnt)
 {
-	Alignment = IE_FONT_ALIGN_LEFT;
 }
 
 TextSpan::TextSpan(String string, const Font* fnt, Font::PrintColors cols, const Size* frame)
 	: Content(frame ? *frame : Size()), text(std::move(string)), font(fnt), colors(new Font::PrintColors(cols))
 {
-	Alignment = IE_FONT_ALIGN_LEFT;
 }
 
 TextSpan::~TextSpan()
@@ -677,10 +669,6 @@ void ContentContainer::DeleteContentsInRect(const Region& exclusion)
 TextContainer::TextContainer(const Region& frame, Font* fnt)
 	: ContentContainer(frame), font(fnt)
 {
-	alignment = IE_FONT_ALIGN_LEFT;
-	textLen = 0;
-	cursorPos = 0;
-	printPos = 0;
 }
 
 TextContainer::~TextContainer()

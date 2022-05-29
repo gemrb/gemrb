@@ -78,15 +78,15 @@ public:
 	};
 
 private:
-	bool isPlaying;
-	bool showSubtitles;
-	SubtitleSet* subtitles;
+	bool isPlaying = false;
+	bool showSubtitles = false;
+	SubtitleSet* subtitles = nullptr;
 
 protected:
 	// NOTE: make sure any new movie plugins set these!
-	Video::BufferFormat movieFormat;
+	Video::BufferFormat movieFormat = Video::BufferFormat::DISPLAY;
 	Size movieSize;
-	size_t framePos;
+	size_t framePos = 0;
 
 	microseconds lastTime = microseconds(0);
 
@@ -105,7 +105,7 @@ protected:
 	virtual bool DecodeFrame(VideoBuffer&) = 0;
 
 public:
-	MoviePlayer(void);
+	MoviePlayer() noexcept = default;
 	~MoviePlayer(void) override;
 
 	Size Dimensions() const { return movieSize; }

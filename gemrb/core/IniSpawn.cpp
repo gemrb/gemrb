@@ -67,9 +67,6 @@ static std::shared_ptr<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 {
 	map = owner;
-	NamelessState = 35;
-	//high detail level by default
-	detail_level = 2;
 	core->GetDictionary()->Lookup("Detail Level", detail_level);
 
 	const auto inifile = GetIniFile(DefaultArea);

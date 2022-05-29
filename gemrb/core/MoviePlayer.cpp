@@ -32,15 +32,6 @@ namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
 
-MoviePlayer::MoviePlayer(void)
-{
-	framePos = 0;
-	subtitles = NULL;
-	isPlaying = false;
-	showSubtitles = false;
-	movieFormat = Video::BufferFormat::DISPLAY;
-}
-
 MoviePlayer::~MoviePlayer(void)
 {
 	Stop();

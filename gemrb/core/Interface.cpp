@@ -2407,7 +2407,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	class IESubtitles : public MoviePlayer::SubtitleSet {
 		using FrameMap = std::map<size_t, ieStrRef>;
 		FrameMap subs;
-		mutable size_t nextSubFrame;
+		mutable size_t nextSubFrame = 0;
 		mutable String cachedSub;
 
 	public:
@@ -2415,8 +2415,6 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		IESubtitles(class Font* fnt, const AutoTable& sttable, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
-			nextSubFrame = 0;
-
 			for (TableMgr::index_t i = 0; i < sttable->GetRowCount(); ++i) {
 				const char* rowName = sttable->GetRowName(i).c_str();
 				if (!std::isdigit(rowName[0])) continue; // this skips the initial palette rows (red, blue, green)

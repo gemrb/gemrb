@@ -252,19 +252,18 @@ struct ActionButtonRow2 {
 };
 
 struct WeaponInfo {
-	int slot;
-	ieDword enchantment;
-	unsigned int range;
-	ieDword itemtype;
-	ieDword itemflags;
-	ieDword prof;
-	bool backstabbing;
-	ieDword wflags;
-	int critmulti; //critical hit multiplier (usually 2)
-	int critrange; // the lower value of the critical range (eg. 19 in 19-20/x3)
-	int profdmgbon;
-	int launcherdmgbon;
-	WeaponInfo(): slot(0), enchantment(0), range(0), itemtype(0), itemflags(0), prof(0), backstabbing(false), wflags(0), critmulti(0), critrange(0), profdmgbon(0), launcherdmgbon(0) {};
+	int slot = 0;
+	ieDword enchantment = 0;
+	unsigned int range = 0;
+	ieDword itemtype = 0;
+	ieDword itemflags = 0;
+	ieDword prof = 0;
+	bool backstabbing = false;
+	ieDword wflags = 0;
+	int critmulti = 0; // critical hit multiplier (usually 2)
+	int critrange = 0; // the lower value of the critical range (eg. 19 in 19-20/x3)
+	int profdmgbon = 0;
+	int launcherdmgbon = 0;
 };
 
 struct BABTable {

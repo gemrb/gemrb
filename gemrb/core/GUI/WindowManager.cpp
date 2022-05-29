@@ -49,9 +49,6 @@ WindowManager::WindowManager(const std::shared_ptr<Video>& vid)
 
 	cursorFeedback = MOUSE_ALL;
 
-	hoverWin = NULL;
-	trackingWin = NULL;
-
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&WindowManager::DispatchEvent, this);
 	eventMgr.RegisterEventMonitor(cb);
 

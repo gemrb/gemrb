@@ -67,7 +67,7 @@ struct DialogState {
 
 class GEM_EXPORT Dialog {
 public:
-	Dialog(void);
+	Dialog() noexcept = default;
 	Dialog(const Dialog&) = delete;
 	~Dialog();
 	Dialog& operator=(const Dialog&) = delete;
@@ -81,10 +81,10 @@ public:
 
 public:
 	ResRef resRef;
-	ieDword Flags; //freeze flags (bg2)
-	unsigned int TopLevelCount;
-	ieDword* Order;
-	DialogState** initialStates;
+	ieDword Flags = 0; // freeze flags (bg2)
+	unsigned int TopLevelCount = 0;
+	ieDword* Order = nullptr;
+	DialogState** initialStates = nullptr;
 };
 
 }

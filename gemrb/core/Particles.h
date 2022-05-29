@@ -46,9 +46,8 @@ class Scriptable;
 
 // this structure holds data for a single particle element
 struct Element {
-	int state;
+	int state = -1;
 	Point pos;
-	Element(): state(-1) {};
 };
 
 /**

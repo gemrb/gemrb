@@ -76,7 +76,7 @@ private: // Private attributes
 	/** The mos for the progressbar cap (linear progressbar) */
 	Holder<Sprite2D> PBarCap;
 	/** The bam cycle whose frames work as a progressbar (animated progressbar) */
-	Animation *PBarAnim;
+	Animation* PBarAnim = nullptr;
 
 };
 
