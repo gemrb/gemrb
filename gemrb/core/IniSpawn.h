@@ -77,8 +77,8 @@ class Map;
 
 struct CritterEntry {
 	std::vector<ResRef> CreFile;        //spawn one of these creatures
-	ieByte Spec[9];		  //existance check IDS qualifier
-	ieByte SetSpec[9];	  //set IDS qualifier
+	ieByte Spec[9]{};	  // existance check IDS qualifier
+	ieByte SetSpec[9]{};  // set IDS qualifier
 	ieVariable ScriptName;    //existance check scripting name
 	ieVariable SpecVar;       //condition variable
 	ResRef SpecContext;     //condition variable context
@@ -98,17 +98,17 @@ struct CritterEntry {
 	ieVariable SaveSelectedFacing; // a var to save the selected spawn point orientation to
 	Point SpawnPoint;         //spawn point
 	std::string SpawnPointsDef; // the unparsed available spawn points
-	char SpawnMode;           // the spawn point selection mode
-	int SpecVarOperator;      //operation performed on spec var
-	int SpecVarValue;         //using this value with the operation
-	int SpecVarInc;           //add this to spec var at each spawn
-	int Orientation;          //spawn orientation
-	int Orientation2;          // spawn orientation if the spawn point doesn't specify it
-	int Flags;                //CF_IGNORENOSEE, CF_DEATHVAR, etc
-	int TotalQuantity;        //total number
-	int SpawnCount;           //create quantity
-	ieDword TimeOfDay;        //spawn time of day (defaults to anytime)
-	ieByte DeathCounters[4];  //4 bytes
+	char SpawnMode = '\0';    // the spawn point selection mode
+	int SpecVarOperator = 0;  // operation performed on spec var
+	int SpecVarValue = 0;     // using this value with the operation
+	int SpecVarInc = 0;       // add this to spec var at each spawn
+	int Orientation = 0;      // spawn orientation
+	int Orientation2 = 0;     // spawn orientation if the spawn point doesn't specify it
+	int Flags = 0;            // CF_IGNORENOSEE, CF_DEATHVAR, etc
+	int TotalQuantity = 0;    // total number
+	int SpawnCount = 0;       // create quantity
+	ieDword TimeOfDay = 0;    // spawn time of day (defaults to anytime)
+	ieByte DeathCounters[4]{}; // 4 bytes
 };
 
 /**
