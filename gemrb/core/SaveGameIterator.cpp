@@ -99,15 +99,16 @@ SaveGame::SaveGame(std::string path, std::string name, const ResRef& prefix, std
 {
 	PortraitCount = pCount;
 	SaveID = saveID;
-	char nPath[_MAX_PATH];
+	char nPath[_MAX_PATH + 1] = {};
 	struct stat my_stat;
 	PathJoinExt(nPath, Path.c_str(), Prefix.CString(), "bmp");
-	memset(&my_stat,0,sizeof(my_stat));
+	memset(&my_stat, 0, sizeof(my_stat));
 	if (stat(nPath, &my_stat)) {
 		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
 		Date = "Sun 31 Feb 00:00:01 2099";
 	} else {
-		strftime(&Date[0], _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
+		strftime(nPath, _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
+		Date = nPath;
 	}
 	manager.AddSource(Path.c_str(), Name.c_str(), PLUGIN_RESOURCE_DIRECTORY);
 }
