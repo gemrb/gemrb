@@ -175,7 +175,6 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/MapReverb.cpp \
 		    main/gemrb/core/Map.cpp \
 		    main/gemrb/core/Variables.cpp \
-		    main/gemrb/core/FactoryObject.cpp \
 		    main/gemrb/core/DataFileMgr.cpp \
 		    main/gemrb/core/ResourceManager.cpp \
 		    main/gemrb/core/Video.cpp \

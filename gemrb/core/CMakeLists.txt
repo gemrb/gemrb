@@ -14,7 +14,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Effect.cpp
 	EffectQueue.cpp
 	Factory.cpp
-	FactoryObject.cpp
 	FontManager.cpp
 	Game.cpp
 	GameData.cpp

@@ -290,7 +290,6 @@
 		A29BF8B613A04A6F00C812DD /* DisplayMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FB71395FF61006ADC12 /* DisplayMessage.cpp */; };
 		A29BF8B813A04A6F00C812DD /* EffectQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FBC1395FF61006ADC12 /* EffectQueue.cpp */; };
 		A29BF8B913A04A6F00C812DD /* Factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FBE1395FF61006ADC12 /* Factory.cpp */; };
-		A29BF8BA13A04A6F00C812DD /* FactoryObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */; };
 		A29BF8BB13A04A6F00C812DD /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FC21395FF61006ADC12 /* Font.cpp */; };
 		A29BF8BC13A04A6F00C812DD /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FC41395FF61006ADC12 /* Game.cpp */; };
 		A29BF8BD13A04A6F00C812DD /* GameData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FC61395FF62006ADC12 /* GameData.cpp */; };
@@ -467,7 +466,6 @@
 		A2E6637D139E883100310FC8 /* EffectQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FBD1395FF61006ADC12 /* EffectQueue.h */; };
 		A2E6637E139E883100310FC8 /* Factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FBE1395FF61006ADC12 /* Factory.cpp */; };
 		A2E6637F139E883100310FC8 /* Factory.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FBF1395FF61006ADC12 /* Factory.h */; };
-		A2E66380139E883100310FC8 /* FactoryObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */; };
 		A2E66381139E883100310FC8 /* FactoryObject.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FC11395FF61006ADC12 /* FactoryObject.h */; };
 		A2E66382139E883100310FC8 /* Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FC21395FF61006ADC12 /* Font.cpp */; };
 		A2E66383139E883100310FC8 /* Font.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FC31395FF61006ADC12 /* Font.h */; };
@@ -1544,7 +1542,6 @@
 		A2BF9FBD1395FF61006ADC12 /* EffectQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectQueue.h; sourceTree = "<group>"; };
 		A2BF9FBE1395FF61006ADC12 /* Factory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Factory.cpp; sourceTree = "<group>"; };
 		A2BF9FBF1395FF61006ADC12 /* Factory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Factory.h; sourceTree = "<group>"; };
-		A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FactoryObject.cpp; sourceTree = "<group>"; };
 		A2BF9FC11395FF61006ADC12 /* FactoryObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FactoryObject.h; sourceTree = "<group>"; };
 		A2BF9FC21395FF61006ADC12 /* Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Font.cpp; sourceTree = "<group>"; };
 		A2BF9FC31395FF61006ADC12 /* Font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Font.h; sourceTree = "<group>"; };
@@ -5168,7 +5165,6 @@
 				A25F91FB269CE6440045F07A /* EnumFlags.h */,
 				A2BF9FBE1395FF61006ADC12 /* Factory.cpp */,
 				A2BF9FBF1395FF61006ADC12 /* Factory.h */,
-				A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */,
 				A2BF9FC11395FF61006ADC12 /* FactoryObject.h */,
 				A2D33FEA24C203110081AC31 /* FibonacciHeap.h */,
 				A28D2498143BEA4200A27897 /* FontManager.cpp */,
@@ -9479,7 +9475,6 @@
 				A29BF8B613A04A6F00C812DD /* DisplayMessage.cpp in Sources */,
 				A29BF8B813A04A6F00C812DD /* EffectQueue.cpp in Sources */,
 				A29BF8B913A04A6F00C812DD /* Factory.cpp in Sources */,
-				A29BF8BA13A04A6F00C812DD /* FactoryObject.cpp in Sources */,
 				A29BF8BB13A04A6F00C812DD /* Font.cpp in Sources */,
 				A29BF8BC13A04A6F00C812DD /* Game.cpp in Sources */,
 				A29BF8BD13A04A6F00C812DD /* GameData.cpp in Sources */,
@@ -9663,7 +9658,6 @@
 				A2E66377139E883100310FC8 /* DisplayMessage.cpp in Sources */,
 				A2E6637C139E883100310FC8 /* EffectQueue.cpp in Sources */,
 				A2E6637E139E883100310FC8 /* Factory.cpp in Sources */,
-				A2E66380139E883100310FC8 /* FactoryObject.cpp in Sources */,
 				A2A05D0B27A4826C000FB625 /* Logging.cpp in Sources */,
 				A2E66382139E883100310FC8 /* Font.cpp in Sources */,
 				A2A05D0027A48093000FB625 /* MappedFileMemoryStream.cpp in Sources */,

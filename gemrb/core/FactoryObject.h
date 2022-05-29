@@ -33,7 +33,7 @@ class GEM_EXPORT FactoryObject {
 public:
 	SClass_ID SuperClassID;
 	ResRef resRef;
-	FactoryObject(const ResRef &resRef, SClass_ID SuperClassID);
+	FactoryObject(const ResRef &name, SClass_ID superClassID) : SuperClassID(superClassID), resRef(name) {};
 	virtual ~FactoryObject() noexcept = default;
 };
 
