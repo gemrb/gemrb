@@ -245,7 +245,7 @@ void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 Variables::MyAssoc* Variables::GetAssocAt(const key_t& key, unsigned int& nHash) const
 	// find association (or return NULL)
 {
-	if (key.c_str() == nullptr) {
+	if (key.empty() || key.c_str() == nullptr) {
 		nHash = 0;
 		return nullptr;
 	}
