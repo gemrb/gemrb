@@ -161,7 +161,7 @@ if (boolean) { \
 	Py_RETURN_FALSE; \
 }
 
-const ScriptingRefBase* GUIScript::GetScriptingRef(PyObject* obj)
+const ScriptingRefBase* GUIScript::GetScriptingRef(PyObject* obj) const
 {
 	if (!obj || obj == Py_None) {
 		return nullptr;
@@ -10571,8 +10571,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 		ReadActionButtons();
 	}
 
-	AnimationFactory* bam = ( AnimationFactory* )
-	gamedata->GetFactoryResource(GUIResRef[Index], IE_BAM_CLASS_ID);
+	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(GUIResRef[Index], IE_BAM_CLASS_ID));
 	if (!bam) {
 		return RuntimeError(fmt::format("{} BAM not found", GUIResRef[Index]));
 	}
@@ -10693,7 +10692,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		}
 	}
 	// pst doesn't have a file, but uses the float window instead any way
-	AnimationFactory* bam = static_cast<AnimationFactory*>(gamedata->GetFactoryResource(GUIResRef[9], IE_BAM_CLASS_ID));
+	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(GUIResRef[9], IE_BAM_CLASS_ID));
 	if (!bam) {
 		return RuntimeError("guibtbut BAM not found");
 	}

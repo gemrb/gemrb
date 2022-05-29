@@ -80,15 +80,14 @@ bool p2DAImporter::Open(DataStream* str)
 
 		if (colHead) {
 			colHead = false;
-			char* cell = strtok(buffer, " ");
+			const char* cell = strtok(buffer, " ");
 			while (cell != nullptr) {
 				colNames.push_back(cell);
 				cell = strtok(nullptr, " ");
 			}
 		} else {
 			char* line = buffer;
-
-			char* cell = strtok(line, " ");
+			const char* cell = strtok(line, " ");
 			if (cell == nullptr) continue;
 
 			rowNames.push_back(cell);
