@@ -193,6 +193,7 @@ std::vector<std::string> DisplayMessage::GetAllColors() const
 	std::vector<std::string> auxiliaryColors;
 	AutoTable colorTable = gamedata->LoadTable("colors", true);
 	assert(colorTable);
+	auxiliaryColors.reserve(colorTable->GetRowCount());
 	for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
 		auxiliaryColors.push_back(colorTable->GetRowName(r));
 	}
