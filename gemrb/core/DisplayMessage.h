@@ -37,15 +37,18 @@
 
 namespace GemRB {
 
-/** GUIColors options. This starts at 7 because is the row in the colors.2da that corresponds to white color.*/
+/** 
+ * GUIColors options. This starts at 7 because is the row in the colors.2da that corresponds to white color.
+ * The previous six colors are not indexed because are only used on the python side.
+ **/
 enum class GUIColors {
 	WHITE = 7,
-	RED = 8,
-	LIGHTGREY = 9,
-	XPCHANGE = 10,
-	GOLD = 11,
-	DIALOG = 12,
-	DIALOGPARTY = 13
+	RED,
+	LIGHTGREY,
+	XPCHANGE,
+	GOLD,
+	DIALOG,
+	DIALOGPARTY
 };
 
 class Scriptable;
