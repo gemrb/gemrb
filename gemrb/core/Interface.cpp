@@ -550,7 +550,7 @@ bool Interface::ReadDamageTypeTable() {
 
 	DamageInfoStruct di;
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
-		di.strref = DisplayMessage::GetStringReference(tm->QueryFieldUnsigned<size_t>(i, 0));
+		di.strref = DisplayMessage::GetStringReference(tm->QueryFieldUnsigned<uint16_t>(i, 0));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1).c_str());
 		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2).c_str(), nullptr, 16);
 		di.iwd_mod_type = tm->QueryFieldSigned<int>(i, 3);
@@ -2960,7 +2960,7 @@ bool Interface::InitItemTypes()
 
 	//itemtype data stores (armor failure and critical damage multipliers), critical range
 	itemtypedata.reserve(ItemTypes);
-	for (size_t i = 0; i < ItemTypes; i++) {
+	for (TableMgr::index_t i = 0; i < ItemTypes; i++) {
 		itemtypedata.emplace_back(4);
 		//default values in case itemdata is missing (it is needed only for iwd2)
 		if (slotmatrix[i] & SLOT_WEAPON) {
@@ -2975,8 +2975,8 @@ bool Interface::InitItemTypes()
 		TableMgr::index_t armcount = af->GetRowCount();
 		TableMgr::index_t colcount = af->GetColumnCount();
 		for (TableMgr::index_t i = 0; i < armcount; i++) {
-			size_t itemtype = af->QueryFieldUnsigned<size_t>(i, 0);
-			if (itemtype<ItemTypes) {
+			uint16_t itemtype = af->QueryFieldUnsigned<uint16_t>(i, 0);
+			if (itemtype < ItemTypes) {
 				// we don't need the itemtype column, since it is equal to the position
 				for (TableMgr::index_t j = 0; j < colcount - 1; ++j) {
 					itemtypedata[itemtype][j] = af->QueryFieldSigned<int>(i, j+1);
@@ -3114,7 +3114,7 @@ const ResRef& Interface::QuerySlotResRef(unsigned int idx) const
 
 int Interface::GetArmorFailure(unsigned int itemtype) const
 {
-	if (itemtype>=(unsigned int) ItemTypes) {
+	if (itemtype >= ItemTypes) {
 		return 0;
 	}
 	if (slotmatrix[itemtype]&SLOT_ARMOUR) return itemtypedata[itemtype][IDT_FAILURE];
@@ -3123,7 +3123,7 @@ int Interface::GetArmorFailure(unsigned int itemtype) const
 
 int Interface::GetShieldFailure(unsigned int itemtype) const
 {
-	if (itemtype>=(unsigned int) ItemTypes) {
+	if (itemtype >= ItemTypes) {
 		return 0;
 	}
 	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype][IDT_FAILURE];
@@ -3132,7 +3132,7 @@ int Interface::GetShieldFailure(unsigned int itemtype) const
 
 int Interface::GetArmorPenalty(unsigned int itemtype) const
 {
-	if (itemtype>=(unsigned int) ItemTypes) {
+	if (itemtype >= ItemTypes) {
 		return 0;
 	}
 	if (slotmatrix[itemtype]&SLOT_ARMOUR) return itemtypedata[itemtype][IDT_SKILLPENALTY];
@@ -3141,7 +3141,7 @@ int Interface::GetArmorPenalty(unsigned int itemtype) const
 
 int Interface::GetShieldPenalty(unsigned int itemtype) const
 {
-	if (itemtype>=(unsigned int) ItemTypes) {
+	if (itemtype >= ItemTypes) {
 		return 0;
 	}
 	if (slotmatrix[itemtype]&SLOT_SHIELD) return itemtypedata[itemtype][IDT_SKILLPENALTY];
@@ -3150,7 +3150,7 @@ int Interface::GetShieldPenalty(unsigned int itemtype) const
 
 int Interface::GetCriticalMultiplier(unsigned int itemtype) const
 {
-	if (itemtype>=(unsigned int) ItemTypes) {
+	if (itemtype >= ItemTypes) {
 		return 2;
 	}
 	if (slotmatrix[itemtype]&SLOT_WEAPON) return itemtypedata[itemtype][IDT_CRITMULTI];
@@ -3159,7 +3159,7 @@ int Interface::GetCriticalMultiplier(unsigned int itemtype) const
 
 int Interface::GetCriticalRange(unsigned int itemtype) const
 {
-	if (itemtype>=(unsigned int) ItemTypes) {
+	if (itemtype >= ItemTypes) {
 		return 20;
 	}
 	if (slotmatrix[itemtype]&SLOT_WEAPON) return itemtypedata[itemtype][IDT_CRITRANGE];
@@ -3190,7 +3190,7 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 		}
 	}
 
-	if ( (unsigned int) item->ItemType>=(unsigned int) ItemTypes) {
+	if (item->ItemType >= ItemTypes) {
 		//invalid itemtype
 		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
 		return 0;

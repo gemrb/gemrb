@@ -101,7 +101,9 @@ bool p2DAImporter::Open(DataStream* str)
 			row++;
 		}
 	}
+
 	delete str;
+	assert(rows.size() < std::numeric_limits<index_t>::max());
 	return true;
 }
 

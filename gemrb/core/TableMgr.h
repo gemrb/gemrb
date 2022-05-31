@@ -45,7 +45,7 @@ class DataStream;
 class GEM_EXPORT TableMgr : public Plugin {
 public:
 	static constexpr TypeID ID = { "Table" };
-	using index_t = size_t;
+	using index_t = uint32_t;
 	static constexpr index_t npos = -1;
 	using key_t = StringView;
 
