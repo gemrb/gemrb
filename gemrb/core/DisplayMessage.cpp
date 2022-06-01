@@ -188,27 +188,24 @@ void DisplayMessage::DisplayString(String text, const Color &color, Scriptable *
 	}
 }
 
-std::vector<std::string> DisplayMessage::GetAllColors() const
+std::map<int, std::string> DisplayMessage::GetAllColors() const
 {
-	std::vector<std::string> auxiliaryColors;
+	std::map<int, std::string> auxiliaryColors;
 	AutoTable colorTable = gamedata->LoadTable("colors", true);
 	assert(colorTable);
-	auxiliaryColors.reserve(colorTable->GetRowCount());
 	for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
-		auxiliaryColors.push_back(colorTable->GetRowName(r));
+		auxiliaryColors[static_cast<int>(r)] = colorTable->GetRowName(r);
 	}
 	return auxiliaryColors;
 }
 
 Color DisplayMessage::GetColor(GUIColors color) const
 {
-	
-	int colorInt = static_cast<int>(color) - 1;
-	if (static_cast<int>(GUIColorNames.size()) < colorInt) {
-		// It never should happend this, but just for been defensive.
-		colorInt = 0;
+	const auto it = GUIColorNames.find(static_cast<int>(color));
+	if (it != GUIColorNames.end()) {
+		return gamedata->GetColor(it->second);
 	}
-	return gamedata->GetColor(GUIColorNames[colorInt]);
+	return gamedata->GetColor("");
 }
 
 void DisplayMessage::DisplayString(ieStrRef stridx, GUIColors color, STRING_FLAGS flags) const
