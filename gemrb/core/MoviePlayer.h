@@ -105,7 +105,7 @@ protected:
 	virtual bool DecodeFrame(VideoBuffer&) = 0;
 
 public:
-	MoviePlayer() noexcept = default;
+	MoviePlayer() noexcept {};
 	~MoviePlayer(void) override;
 
 	Size Dimensions() const { return movieSize; }
