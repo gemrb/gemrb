@@ -688,9 +688,9 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 	if (PyObject_TypeCheck(row, &PyUnicode_Type)) {
 		ret = tm->QueryField(PyString_AsStringView(row), PyString_AsStringView(col));
 	} else {
-		size_t rowi = PyLong_AsLong(row);
-		size_t coli = PyLong_AsLong(col);
-		ret = tm->QueryField( rowi, coli );
+		TableMgr::index_t rowIdx = static_cast<TableMgr::index_t>(PyLong_AsLong(row));
+		TableMgr::index_t colIdx = static_cast<TableMgr::index_t>(PyLong_AsLong(col));
+		ret = tm->QueryField(rowIdx, colIdx);
 	}
 
 	switch (type) {

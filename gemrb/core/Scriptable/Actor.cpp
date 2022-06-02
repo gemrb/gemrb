@@ -2042,7 +2042,7 @@ static void InitActorTables()
 					break;
 				if ((1<<j)&tmpclass) {
 					//save the IE_LEVEL information
-					const std::string& currentname = tm->GetRowName((ieDword)(tm->FindTableValue("ID", j+1)));
+					const std::string& currentname = tm->GetRowName(tm->FindTableValue("ID", j + 1));
 					classis = IsClassFromName(currentname);
 					if (classis>=0) {
 						//search for the current class in the split of the names to get it's

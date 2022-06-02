@@ -82,7 +82,7 @@ bool p2DAImporter::Open(DataStream* str)
 			colHead = false;
 			const char* cell = strtok(buffer, " ");
 			while (cell != nullptr) {
-				colNames.push_back(cell);
+				colNames.emplace_back(cell);
 				cell = strtok(nullptr, " ");
 			}
 		} else {
@@ -90,12 +90,12 @@ bool p2DAImporter::Open(DataStream* str)
 			const char* cell = strtok(line, " ");
 			if (cell == nullptr) continue;
 
-			rowNames.push_back(cell);
+			rowNames.emplace_back(cell);
 			rows.emplace_back();
 			rows[row].reserve(10);
 			cell = strtok(nullptr, " ");
 			while (cell != nullptr) {
-				rows[row].push_back(cell);
+				rows[row].emplace_back(cell);
 				cell = strtok(nullptr, " ");
 			}
 			row++;
@@ -110,12 +110,12 @@ bool p2DAImporter::Open(DataStream* str)
 /** Returns the actual number of Rows in the Table */
 p2DAImporter::index_t p2DAImporter::GetRowCount() const
 {
-	return rows.size();
+	return static_cast<index_t>(rows.size());
 }
 
 p2DAImporter::index_t p2DAImporter::GetColNamesCount() const
 {
-	return colNames.size();
+	return static_cast<index_t>(colNames.size());
 }
 
 /** Returns the actual number of Columns in the Table */
@@ -124,7 +124,7 @@ p2DAImporter::index_t p2DAImporter::GetColumnCount(index_t row) const
 	if (rows.size() <= row) {
 		return 0;
 	}
-	return rows[row].size();
+	return static_cast<index_t>(rows[row].size());
 }
 /** Returns a pointer to a zero terminated 2da element,
 	if it cannot return a value, it returns the default */
