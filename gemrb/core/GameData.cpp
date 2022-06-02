@@ -82,7 +82,6 @@ void GameData::ClearCaches()
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
 	PaletteCache.clear ();
-	colors.clear();
 
 	while (!stores.empty()) {
 		Store *store = stores.begin()->second;
@@ -637,17 +636,19 @@ int GameData::GetSummoningLimit(ieDword sex)
 	return summoningLimit->QueryFieldSigned<int>(row, 0);
 }
 
-const Color& GameData::GetColor(const TableMgr::key_t& row)
+// preload converted colors
+void GameData::PreloadColors()
 {
-	// preload converted colors
-	if (colors.empty()) {
-		AutoTable colorTable = LoadTable("colors", true);
-		assert(colorTable);
-		for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
-			ieDword c = colorTable->QueryFieldUnsigned<ieDword>(r, 0);
-			colors[colorTable->GetRowName(r)] = Color(c);
-		}
+	AutoTable colorTable = LoadTable("colors", true);
+	assert(colorTable);
+	for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
+		ieDword c = colorTable->QueryFieldUnsigned<ieDword>(r, 0);
+		colors[colorTable->GetRowName(r)] = Color(c);
 	}
+}
+
+const Color& GameData::GetColor(const TableMgr::key_t& row) const
+{
 	const auto it = colors.find(row.c_str());
 	if (it != colors.end()) {
 		return it->second;

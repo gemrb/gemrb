@@ -1290,6 +1290,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	if (ret) return ret;
 
 	ret = LoadFonts();
+	gamedata->PreloadColors();
 	if (ret) return ret;
 
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
