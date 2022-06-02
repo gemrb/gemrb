@@ -369,7 +369,7 @@ Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int fra
 
 Holder<Sprite2D> GameData::GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent)
 {
-	Holder<Sprite2D> img = gamedata->GetBAMSprite(ResRef(resRef), cycle, frame, silent);
+	Holder<Sprite2D> img = GetBAMSprite(ResRef(resRef), cycle, frame, silent);
 	if (img) return img;
 
 	// try static image formats to support PNG
@@ -433,7 +433,7 @@ Store* GameData::GetStore(const ResRef &resRef)
 		return it->second;
 	}
 
-	DataStream* str = gamedata->GetResource(resRef, IE_STO_CLASS_ID);
+	DataStream* str = GetResource(resRef, IE_STO_CLASS_ID);
 	PluginHolder<StoreMgr> sm = MakePluginHolder<StoreMgr>(IE_STO_CLASS_ID);
 	if (sm == nullptr) {
 		delete str;
@@ -777,7 +777,7 @@ int GameData::GetAreaAlias(const ResRef &areaName)
 	}
 
 	if (AreaAliasTable.empty()) {
-		AutoTable table = gamedata->LoadTable("WMAPLAY", true);
+		AutoTable table = LoadTable("wmaplay", true);
 		if (!table) {
 			ignore = true;
 			return -1;
@@ -805,7 +805,7 @@ int GameData::GetSpecialSpell(const ResRef& resref)
 	}
 
 	if (SpecialSpells.empty()) {
-		AutoTable table = gamedata->LoadTable("splspec");
+		AutoTable table = LoadTable("splspec");
 		if (!table) {
 			ignore = true;
 			return 0;
@@ -855,7 +855,7 @@ int GameData::CheckSpecialSpell(const ResRef& resRef, const Actor* actor)
 const SurgeSpell& GameData::GetSurgeSpell(unsigned int idx)
 {
 	if (SurgeSpells.empty()) {
-		AutoTable table = gamedata->LoadTable("wildmag");
+		AutoTable table = LoadTable("wildmag");
 		assert(table);
 
 		SurgeSpell ss;
@@ -881,7 +881,7 @@ ResRef GameData::GetFist(int cls, int level)
 	}
 
 	if (!fistWeap) {
-		fistWeap = gamedata->LoadTable("fistweap");
+		fistWeap = LoadTable("fistweap");
 		if (!fistWeap) {
 			ignore = true;
 			return defaultFist;
@@ -911,7 +911,7 @@ int GameData::GetMonkBonus(int bonusType, int level)
 	}
 
 	if (!monkBon) {
-		monkBon = gamedata->LoadTable("monkbon");
+		monkBon = LoadTable("monkbon");
 		if (!monkBon) {
 			ignore = true;
 			return 0;
@@ -937,7 +937,7 @@ int GameData::GetWeaponStyleBonus(int style, int stars, int bonusType)
 	}
 
 	if (ignore[style] == 0) {
-		AutoTable styleTable = gamedata->LoadTable(weaponStyles[style]);
+		AutoTable styleTable = LoadTable(weaponStyles[style]);
 		if (!styleTable) {
 			ignore[style] = 1;
 			return 0;
@@ -968,9 +968,9 @@ const std::vector<int>& GameData::GetBonusSpells(int ability)
 		// luckily, they both use the same format
 		AutoTable mxSplBon;
 		if (core->HasFeature(GF_3ED_RULES)) {
-			mxSplBon = gamedata->LoadTable("mxsplbon");
+			mxSplBon = LoadTable("mxsplbon");
 		} else {
-			mxSplBon = gamedata->LoadTable("mxsplwis");
+			mxSplBon = LoadTable("mxsplwis");
 		}
 		if (!mxSplBon) {
 			ignore = true;
@@ -1002,7 +1002,7 @@ ieByte GameData::GetItemAnimation(const ResRef& itemRef)
 	}
 
 	if (itemAnims.empty()) {
-		AutoTable table = gamedata->LoadTable("itemanim");
+		AutoTable table = LoadTable("itemanim");
 		if (!table) {
 			ignore = true;
 			return 0;
@@ -1030,7 +1030,7 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 	}
 
 	if (itemUse.empty()) {
-		AutoTable table = gamedata->LoadTable("itemuse");
+		AutoTable table = LoadTable("itemuse");
 		if (!table) {
 			ignore = true;
 			return NoData;
@@ -1072,7 +1072,7 @@ int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
 	}
 
 	if (!difficultyLevels) {
-		difficultyLevels = gamedata->LoadTable("difflvls");
+		difficultyLevels = LoadTable("difflvls");
 		if (!difficultyLevels) {
 			ignore = true;
 			return 0;
@@ -1090,7 +1090,7 @@ int GameData::GetXPBonus(ieDword bonusType, ieDword level)
 	}
 
 	if (!xpBonus) {
-		xpBonus = gamedata->LoadTable("xpbonus");
+		xpBonus = LoadTable("xpbonus");
 		if (!xpBonus) {
 			ignore = true;
 			return 0;
