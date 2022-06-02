@@ -274,7 +274,7 @@ protected:
 	bool DecodeFrame(VideoBuffer&) override;
 
 public:
-	BIKPlayer(void);
+	BIKPlayer() noexcept;
 	BIKPlayer(const BIKPlayer&) = delete;
 	~BIKPlayer() override;
 	BIKPlayer& operator=(const BIKPlayer&) = delete;

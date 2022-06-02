@@ -56,7 +56,7 @@ static const int ff_wma_critical_freqs[25] = {
 	24500,
 };
 
-BIKPlayer::BIKPlayer(void)
+BIKPlayer::BIKPlayer() noexcept
 {
 	movieFormat = Video::BufferFormat::YV12;
 }

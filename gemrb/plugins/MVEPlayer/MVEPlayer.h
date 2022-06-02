@@ -55,7 +55,7 @@ protected:
 	bool DecodeFrame(VideoBuffer&) override;
 
 public:
-	MVEPlay(void);
+	MVEPlay() noexcept;
 	bool Import(DataStream* stream) override;
 };
 

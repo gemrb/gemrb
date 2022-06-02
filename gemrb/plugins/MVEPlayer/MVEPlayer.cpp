@@ -36,7 +36,7 @@ using namespace GemRB;
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;
 
-MVEPlay::MVEPlay(void)
+MVEPlay::MVEPlay() noexcept
 : decoder(this)
 {
 	video = core->GetVideoDriver();
