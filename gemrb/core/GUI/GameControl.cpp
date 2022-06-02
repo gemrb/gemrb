@@ -551,7 +551,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 
 		if (actor) {
 			std::vector<Actor*> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
-			for (auto monster : monsters) {
+			for (const auto& monster : monsters) {
 				if (monster->IsPartyMember()) continue;
 				if (monster->GetStat(IE_NOTRACKING)) continue;
 				DrawArrowMarker(monster->Pos, ColorBlack);

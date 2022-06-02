@@ -308,7 +308,7 @@ bool Window::HitTest(const Point& p) const
 	bool hit = View::HitTest(p);
 	if (hit == false){
 		// check the control list. we could make View::HitTest optionally recursive, but this is cheaper
-		for (const auto ctrl : Controls) {
+		for (const auto& ctrl : Controls) {
 			if (ctrl->IsVisible() && ctrl->View::HitTest(ctrl->ConvertPointFromWindow(p))) {
 				hit = true;
 				break;
@@ -566,7 +566,7 @@ bool Window::DispatchEvent(const Event& event)
 	
 bool Window::InActionHandler() const
 {
-	for (const auto ctrl : Controls) {
+	for (const auto& ctrl : Controls) {
 		if (ctrl->IsExecutingResponseHandler()) {
 			return true;
 		}

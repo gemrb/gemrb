@@ -246,8 +246,8 @@ int Spellbook::CountSpells(const ResRef& resref, unsigned int type, int flag) co
 	}
 
 	while(i < max) {
-		for (const auto spellMemo : spells[i]) {
-			for (const auto spell : spellMemo->memorized_spells) {
+		for (const auto& spellMemo : spells[i]) {
+			for (const auto& spell : spellMemo->memorized_spells) {
 				if (spell->SpellResRef != resref) continue;
 
 				if (flag || spell->Flags) {
@@ -286,7 +286,7 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 {
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
 		const CRESpellMemorization* sm = spells[type][j];
-		for (const auto knownSpell : sm->known_spells) {
+		for (const auto& knownSpell : sm->known_spells) {
 			if (atoi(knownSpell->SpellResRef.CString() + 4) == spellid) {
 				return true;
 			}
@@ -299,8 +299,8 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 bool Spellbook::KnowSpell(const ResRef& resref) const
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (const auto spellMemo : spells[i]) {
-			for (const auto knownSpell : spellMemo->known_spells) {
+		for (const auto& spellMemo : spells[i]) {
+			for (const auto& knownSpell : spellMemo->known_spells) {
 				if (knownSpell->SpellResRef != resref) {
 					continue;
 				}
@@ -828,7 +828,7 @@ CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level) const
 			continue;
 		}
 		mask<<=1;
-		for (const auto spellMemo : spells[i]) {
+		for (const auto& spellMemo : spells[i]) {
 			if (level && (spellMemo->Level != level - 1)) {
 				continue;
 			}
@@ -870,7 +870,7 @@ void Spellbook::ChargeAllSpells()
 			continue;
 		}
 
-		for (const auto spellMemo : spells[i]) {
+		for (const auto& spellMemo : spells[i]) {
 			for (auto& memorizedSpell : spellMemo->memorized_spells) {
 				ChargeSpell(memorizedSpell);
 			}
@@ -1101,8 +1101,8 @@ void Spellbook::SetCustomSpellInfo(const std::vector<ResRef>& data, const ResRef
 	for(int i = 0; i<NUM_BOOK_TYPES; i++) {
 		if (!((1 << i) & type)) continue;
 
-		for (const auto spellMemo : spells[i]) {
-			for (const auto slot : spellMemo->known_spells) {
+		for (const auto& spellMemo : spells[i]) {
+			for (const auto& slot : spellMemo->known_spells) {
 				if (!slot) continue;
 				// skip the spell itself
 				if (slot->SpellResRef == spell) continue;
@@ -1118,7 +1118,7 @@ void Spellbook::GenerateSpellInfo()
 {
 	ClearSpellInfo(); //just in case
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (const auto spellMemo : spells[i]) {
+		for (const auto& spellMemo : spells[i]) {
 			for (unsigned int k = 0; k < spellMemo->memorized_spells.size(); k++) {
 				const CREMemorizedSpell* slot = spellMemo->memorized_spells[k];
 				if (!slot)
@@ -1136,7 +1136,7 @@ std::string Spellbook::dump(bool print) const
 	std::string buffer;
 	buffer.append( "SPELLBOOK:\n" );
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (const auto spellMemo : spells[i]) {
+		for (const auto& spellMemo : spells[i]) {
 			if (!spellMemo->known_spells.empty()) {
 				buffer.append(" Known spells:\n");
 			}

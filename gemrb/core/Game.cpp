@@ -137,10 +137,10 @@ Game::~Game(void)
 	for (auto map : Maps) {
 		delete map;
 	}
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		delete pc;
 	}
-	for (auto npc : NPCs) {
+	for (const auto& npc : NPCs) {
 		delete npc;
 	}
 
@@ -178,7 +178,7 @@ static bool IsAlive(const Actor *pc)
 
 void Game::ReversePCs() const
 {
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		pc->InParty = static_cast<ieByte>(PCs.size()) - pc->InParty + 1;
 	}
 	core->SetEventFlag(EF_PORTRAIT|EF_SELECTION);
@@ -196,7 +196,7 @@ int Game::FindPlayer(unsigned int partyID) const
 
 Actor* Game::FindPC(unsigned int partyID) const
 {
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		if (pc->InParty == partyID) return pc;
 	}
 	return NULL;
@@ -204,7 +204,7 @@ Actor* Game::FindPC(unsigned int partyID) const
 
 Actor* Game::FindPC(const ieVariable& scriptingname) const
 {
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		if (pc->GetScriptName() == scriptingname) {
 			return pc;
 		}
@@ -214,7 +214,7 @@ Actor* Game::FindPC(const ieVariable& scriptingname) const
 
 Actor* Game::FindNPC(unsigned int partyID) const
 {
-	for (auto npc : NPCs) {
+	for (const auto& npc : NPCs) {
 		if (npc->InParty == partyID) return npc;
 	}
 	return NULL;
@@ -222,7 +222,7 @@ Actor* Game::FindNPC(unsigned int partyID) const
 
 Actor* Game::FindNPC(const ieVariable& scriptingname) const
 {
-	for (auto npc : NPCs) {
+	for (const auto& npc : NPCs) {
 		if (npc->GetScriptName() == scriptingname) {
 			return npc;
 		}
@@ -232,12 +232,12 @@ Actor* Game::FindNPC(const ieVariable& scriptingname) const
 
 Actor *Game::GetGlobalActorByGlobalID(ieDword globalID) const
 {
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		if (pc->GetGlobalID() == globalID) {
 			return pc;
 		}
 	}
-	for (auto npc : NPCs) {
+	for (const auto& npc : NPCs) {
 		if (npc->GetGlobalID() == globalID) {
 			return npc;
 		}
@@ -251,7 +251,7 @@ Actor* Game::GetPC(size_t slot, bool onlyalive) const
 		return NULL;
 	}
 	if (onlyalive) {
-		for (auto pc : PCs) {
+		for (const auto& pc : PCs) {
 			if (IsAlive(pc) && !slot--) {
 				return pc;
 			}
@@ -324,13 +324,13 @@ void Game::ConsolidateParty() const
 			continue;
 		}
 
-		for (auto pc : PCs) {
+		for (const auto& pc : PCs) {
 			if (pc->InParty > i) {
 				pc->InParty--;
 			}
 		}
 	}
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		pc->RefreshEffects();
 
 		// restore modal spell, including the main bardsong
@@ -366,7 +366,7 @@ int Game::LeaveParty (Actor* actor)
 	}
 
 	ieDword id = actor->GetGlobalID();
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		pc->PCStats->LastLeft = id;
 		if (pc->InParty>actor->InParty) {
 			pc->InParty--;
@@ -515,7 +515,7 @@ int Game::GetPartySize(bool onlyalive) const
 {
 	if (onlyalive) {
 		int count = 0;
-		for (auto pc : PCs) {
+		for (const auto& pc : PCs) {
 			if (!IsAlive(pc)) {
 				continue;
 			}
@@ -650,7 +650,7 @@ int Game::GetTotalPartyLevel(bool onlyalive) const
 {
 	int amount = 0;
 
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 			if (onlyalive && pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
 				continue;
 			}
@@ -1205,7 +1205,7 @@ void Game::ShareXP(int xp, int flags) const
 			displaymsg->DisplayConstantStringValue(STR_LOSTXP, DMC_BG2XPGREEN, (ieDword) -xp);
 		}
 	}
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		if (pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
 			continue;
 		}
@@ -1215,7 +1215,7 @@ void Game::ShareXP(int xp, int flags) const
 
 bool Game::EveryoneStopped() const
 {
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		if (pc->InMove()) return false;
 	}
 	return true;
@@ -1224,7 +1224,7 @@ bool Game::EveryoneStopped() const
 //canmove=true: if some PC can't move (or hostile), then this returns false
 bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 {
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		if (flags & ENP_ONLYSELECT && !pc->Selected) {
 			continue;
 		}
@@ -1295,7 +1295,7 @@ void Game::IncrementChapter() const
 	//increment chapter only if it exists
 	locals->SetAt("CHAPTER", chapter+1, core->HasFeature(GF_NO_NEW_VARIABLES) );
 	//clear statistics
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		//all PCs must have this!
 		pc->PCStats->IncrementChapter();
 	}
@@ -1310,7 +1310,7 @@ void Game::SetReputation(ieDword r)
 		displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r - Reputation) / 10);
 	}
 	Reputation = r;
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		pc->SetBase(IE_REPUTATION, Reputation);
 	}
 }
@@ -1356,7 +1356,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 	// and delay most idle actions
 	// but only if we skip for at least an hour
 	if (add >= core->Time.hour_size) {
-		for (auto pc : PCs) {
+		for (const auto& pc : PCs) {
 			pc->ResetCommentTime();
 			int conHealRate = pc->GetConHealAmount();
 			// 1. regeneration as an effect
@@ -1379,7 +1379,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 	if (!fatigue) {
 		// update everyone in party, so they think no time has passed
 		// nobody else, including familiars, gets luck penalties from fatigue
-		for (auto pc : PCs) {
+		for (const auto& pc : PCs) {
 			pc->IncreaseLastRested(add);
 		}
 	}
@@ -1457,7 +1457,7 @@ bool Game::EveryoneDead() const
 		return false;
 	}
 	//protagonist == 2
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		if (!(pc->GetStat(IE_STATE_ID)&STATE_NOSAVE)) {
 			return false;
 		}
@@ -1623,7 +1623,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	}
 
 	if (checks & REST_CONTROL) {
-		for (auto pc : PCs) {
+		for (const auto& pc : PCs) {
 			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS) {
 				// You cannot rest at this time because you do not have control of all your party members
 				*err = DisplayMessage::GetStringReference(STR_CANTTRESTNOCONTROL);
@@ -1973,7 +1973,7 @@ void Game::Infravision()
 	bool allSelectedWithInfravision = true;
 	bool someoneSelected = false;
 
-	for (auto actor : PCs) {
+	for (const auto& actor : PCs) {
 		if (!IsAlive(actor)) continue;
 		if (actor->GetCurrentArea()!=map) continue;
 
@@ -2186,7 +2186,7 @@ std::string Game::dump() const
 {
 	std::string buffer("Currently loaded areas:\n");
 
-	for (auto map : Maps) {
+	for (const auto& map : Maps) {
 		Log(DEBUG, "Game", "{}", map->GetScriptName());
 	}
 	AppendFormat(buffer, "Current area: {}   Previous area: {}\n", CurrentArea, PreviousArea);
@@ -2198,12 +2198,12 @@ std::string Game::dump() const
 	AppendFormat(buffer, "CombatCounter: {}\n", CombatCounter);
 
 	AppendFormat(buffer, "Party size: {}\n", PCs.size());
-	for (auto actor : PCs) {
+	for (const auto& actor : PCs) {
 		AppendFormat(buffer, "Name: {} Order {} {}\n", fmt::WideToChar{actor->GetShortName()}, actor->InParty, actor->Selected?"x":"-");
 	}
 
 	AppendFormat(buffer, "\nNPC count: {}\n", NPCs.size());
-	for (auto actor : NPCs) {
+	for (const auto& actor : NPCs) {
 		AppendFormat(buffer, "Name: {}\tSelected: {}\n", fmt::WideToChar{actor->GetShortName()}, actor->Selected ? "x ": "-");
 	}
 	
@@ -2266,7 +2266,7 @@ bool Game::RandomEncounter(ResRef &BaseArea)
 
 void Game::ResetPartyCommentTimes() const
 {
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		pc->ResetCommentTime();
 	}
 }
@@ -2285,14 +2285,14 @@ bool Game::OnlyNPCsSelected() const
 
 void Game::MovePCs(const ResRef& targetArea, const Point& targetPoint, int orientation) const
 {
-	for (auto pc : PCs) {
+	for (const auto& pc : PCs) {
 		MoveBetweenAreasCore(pc, targetArea, targetPoint, orientation, true);
 	}
 }
 
 void Game::MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int orientation) const
 {
-	for (auto npc : NPCs) {
+	for (const auto& npc : NPCs) {
 		if (npc->GetBase(IE_EA) == EA_FAMILIAR) {
 			MoveBetweenAreasCore(npc, targetArea, targetPoint, orientation, true);
 		}

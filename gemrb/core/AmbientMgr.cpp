@@ -61,7 +61,7 @@ void AmbientMgr::Reset()
 void AmbientMgr::UpdateVolume(unsigned short volume)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
-	for (auto source : ambientSources) {
+	for (const auto& source : ambientSources) {
 		source->SetVolume(volume);
 	}
 }
@@ -85,7 +85,7 @@ void AmbientMgr::RemoveAmbients(const std::vector<Ambient*> &oldAmbients)
 	for (auto it = ambientSources.begin(); it != ambientSources.end(); ) {
 		auto ambientSource = *it;
 		bool deleted = false;
-		for (auto ambient : oldAmbients) {
+		for (const auto& ambient : oldAmbients) {
 			if (ambientSource->GetAmbient() == ambient) {
 				delete ambientSource;
 				it = ambientSources.erase(it);
@@ -98,7 +98,7 @@ void AmbientMgr::RemoveAmbients(const std::vector<Ambient*> &oldAmbients)
 
 	for (auto it = ambients.begin(); it != ambients.end(); ) {
 		bool deleted = false;
-		for (auto ambient : oldAmbients) {
+		for (const auto& ambient : oldAmbients) {
 			if (*it == ambient) {
 				// memory freeing is left to the user if needed
 				it = ambients.erase(it);
@@ -125,7 +125,7 @@ void AmbientMgr::Activate(StringView name)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	//std::lock_guard<std::mutex> l(ambientsMutex);
-	for (auto ambient : ambients) {
+	for (const auto& ambient : ambients) {
 		if (ambient->GetName() == name) {
 			ambient->SetActive();
 			break;
@@ -145,7 +145,7 @@ void AmbientMgr::Deactivate(StringView name)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	//std::lock_guard<std::mutex> l(ambientsMutex);
-	for (auto ambient : ambients) {
+	for (const auto& ambient : ambients) {
 		if (ambient->GetName() == name) {
 			ambient->SetInactive();
 			break;
@@ -164,7 +164,7 @@ void AmbientMgr::Deactivate()
 bool AmbientMgr::IsActive(StringView name) const
 {
 	std::lock_guard<std::mutex> l(ambientsMutex);
-	for (auto ambient : ambients) {
+	for (const auto& ambient : ambients) {
 		if (ambient->GetName() == name) {
 			return ambient->GetFlags() & IE_AMBI_ENABLED;
 		}

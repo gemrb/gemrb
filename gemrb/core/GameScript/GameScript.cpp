@@ -2109,7 +2109,7 @@ void GameScript::EvaluateAllBlocks()
 	// cutscenes don't evaluate conditions - they just choose the
 	// first response, take the object from the first action,
 	// and then add the actions to that object's queue.
-	for (const auto rB : script->responseBlocks) {
+	for (const auto& rB : script->responseBlocks) {
 		const ResponseSet *rS = rB->responseSet;
 		if (rS->responses.empty()) continue;
 

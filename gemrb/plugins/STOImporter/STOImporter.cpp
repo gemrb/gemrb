@@ -142,7 +142,7 @@ Store* STOImporter::GetStore(Store *s)
 			s->HasTriggers=true;
 		}
 	}
-	for (auto item : toDelete) {
+	for (const auto& item : toDelete) {
 		s->RemoveItem(item);
 	}
 

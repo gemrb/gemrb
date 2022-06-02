@@ -632,7 +632,7 @@ void Map::DrawPortal(const InfoPoint *ip, int enable)
 void Map::UpdateScripts()
 {
 	bool has_pcs = false;
-	for (auto actor : actors) {
+	for (const auto& actor : actors) {
 		if (actor->InParty) {
 			has_pcs = true;
 			break;
@@ -2489,7 +2489,7 @@ std::vector<Actor*> Map::GetActorsInRect(const Region& rgn, int excludeFlags) co
 
 bool Map::SpawnsAlive() const
 {
-	for (auto actor : actors) {
+	for (const auto& actor : actors) {
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED))
 			continue;
 		if (actor->Spawned) {
@@ -2913,7 +2913,7 @@ void Map::RemoveActor(Actor* actor)
 //and noone is trying to follow the party out
 bool Map::CanFree()
 {
-	for (auto actor : actors) {
+	for (const auto& actor : actors) {
 		if (actor->IsPartyMember()) {
 			return false;
 		}
