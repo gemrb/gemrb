@@ -188,20 +188,22 @@ void DisplayMessage::DisplayString(String text, const Color &color, Scriptable *
 	}
 }
 
-std::map<int, std::string> DisplayMessage::GetAllColors() const
+std::map<GUIColors, std::string> DisplayMessage::GetAllColors() const
 {
-	std::map<int, std::string> auxiliaryColors;
+	std::map<GUIColors, std::string> auxiliaryColors;
 	AutoTable colorTable = gamedata->LoadTable("colors", true);
 	assert(colorTable);
 	for (TableMgr::index_t r = 0; r < colorTable->GetRowCount(); r++) {
-		auxiliaryColors[static_cast<int>(r)] = colorTable->GetRowName(r);
+		if (static_cast<int>(r) >= static_cast<int>(GUIColors::WHITE) && static_cast<int>(r) <= static_cast<int>(GUIColors::DIALOGPARTY)) {
+			auxiliaryColors[static_cast<GUIColors>(r)] = colorTable->GetRowName(r);
+		}
 	}
 	return auxiliaryColors;
 }
 
 Color DisplayMessage::GetColor(GUIColors color) const
 {
-	const auto it = GUIColorNames.find(static_cast<int>(color));
+	const auto it = GUIColorNames.find(color);
 	if (it != GUIColorNames.end()) {
 		return gamedata->GetColor(it->second);
 	}
