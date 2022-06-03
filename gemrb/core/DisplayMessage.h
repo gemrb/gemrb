@@ -42,13 +42,15 @@ namespace GemRB {
  * The previous six colors are not indexed because are only used on the python side.
  **/
 enum class GUIColors {
-	WHITE = 7,
+	FIRST_COLOR = 6,
+	WHITE,
 	RED,
 	LIGHTGREY,
 	XPCHANGE,
 	GOLD,
 	DIALOG,
-	DIALOGPARTY
+	DIALOGPARTY,
+	LAST_COLOR
 };
 
 class Scriptable;
@@ -78,7 +80,6 @@ private:
 	void DisplayString(String text, const Color &color, Scriptable *target) const;
 	Color GetColor(const GUIColors color) const;
 	std::map<GUIColors, std::string> GetAllColors() const;
-private:
 	const std::map<GUIColors, std::string> GUIColorNames = DisplayMessage::GetAllColors();
 
 public:
