@@ -42,8 +42,8 @@ namespace GemRB {
  * The previous six colors are not indexed because are only used on the python side.
  **/
 enum class GUIColors {
-	FIRST_COLOR = 6,
-	WHITE,
+	FIRST_COLOR = 7,
+	WHITE = 7,
 	RED,
 	LIGHTGREY,
 	XPCHANGE,
