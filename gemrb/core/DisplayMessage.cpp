@@ -193,8 +193,8 @@ std::map<GUIColors, std::string> DisplayMessage::GetAllColors() const
 	std::map<GUIColors, std::string> auxiliaryColors;
 	AutoTable colorTable = gamedata->LoadTable("colors", true);
 	assert(colorTable);
-	TableMgr::index_t index = static_cast<int>(GUIColors::FIRST_COLOR);
-	TableMgr::index_t finish = static_cast<int>(GUIColors::LAST_COLOR);
+	TableMgr::index_t index = static_cast<TableMgr::index_t>(GUIColors::FIRST_COLOR);
+	TableMgr::index_t finish = static_cast<TableMgr::index_t>(GUIColors::LAST_COLOR);
 	while (index < finish) {
 		auxiliaryColors[static_cast<GUIColors>(index)] = colorTable->GetRowName(index);
 		index++;
