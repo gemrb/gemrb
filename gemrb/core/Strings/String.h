@@ -151,10 +151,11 @@ StringViewT<STR> SubStr(const STR& str, typename STR::size_type pos, typename ST
 }
 
 template <typename CIT, typename IT>
-GEM_EXPORT_T void StringToLower(CIT it, CIT end, IT dest) {
+GEM_EXPORT_T IT StringToLower(CIT it, CIT end, IT dest) {
 	for (; it != end; ++it, ++dest) {
 		*dest = std::towlower(*it);
 	}
+	return dest;
 }
 
 template <typename T>
@@ -163,10 +164,11 @@ GEM_EXPORT_T void StringToLower(T& str) {
 }
 
 template <typename CIT, typename IT>
-GEM_EXPORT_T void StringToUpper(CIT it, CIT end, IT dest) {
+GEM_EXPORT_T IT StringToUpper(CIT it, CIT end, IT dest) {
 	for (; it != end; ++it, ++dest) {
 		*dest = std::towupper(*it);
 	}
+	return dest;
 }
 
 template <typename T>
