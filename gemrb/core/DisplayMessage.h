@@ -33,16 +33,25 @@
 #include "RGBAColor.h"
 
 #include <string>
+#include <map>
 
 namespace GemRB {
 
-static constexpr Color DMC_WHITE {0xf0, 0xf0, 0xf0, 0xff};
-static constexpr Color DMC_RED = ColorRed;
-static constexpr Color DMC_LIGHTGREY {0xd7, 0xd7, 0xbe, 0xff};
-static constexpr Color DMC_BG2XPGREEN {0xbc, 0xef, 0xbc, 0xff};
-static constexpr Color DMC_GOLD {0xc0, 0xc0, 0x00, 0xff};
-static constexpr Color DMC_DIALOG = DMC_WHITE;
-static constexpr Color DMC_DIALOGPARTY = {0x80, 0x80, 0xff, 0xff};
+/** 
+ * GUIColors options. This starts at 7 because is the row in the colors.2da that corresponds to white color.
+ * The previous six colors are not indexed because are only used on the python side.
+ **/
+enum class GUIColors {
+	FIRST_COLOR = 7,
+	WHITE = 7,
+	RED,
+	LIGHTGREY,
+	XPCHANGE,
+	GOLD,
+	DIALOG,
+	DIALOGPARTY,
+	LAST_COLOR
+};
 
 class Scriptable;
 
@@ -63,46 +72,53 @@ private:
 	static bool EnableRollFeedback();
 	static String ResolveStringRef(ieStrRef);
 	
-	template<typename ...ARGS>
-	void DisplayRollStringName(const String& fmt, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {
-		String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
-		DisplayStringName(std::move(formatted), color, speaker);
-	}
+	/** returns the speaker's color and name */
+	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
+	/** displays a string in the textarea, starting with speaker's name */
+	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
+	/** displays a string in the textarea */
+	void DisplayString(String text, const Color &color, Scriptable *target) const;
+	Color GetColor(const GUIColors color) const;
+	std::map<GUIColors, std::string> GetAllColors() const;
+	const std::map<GUIColors, std::string> GUIColorNames = DisplayMessage::GetAllColors();
+
 public:
 	static ieStrRef GetStringReference(size_t);
 	static bool HasStringReference(size_t);
 
 public:
 	DisplayMessage();
-	/** returns the speaker's color and name */
-	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
 	/** displays any string in the textarea */
-	void DisplayMarkupString(String txt) const;
+	void DisplayMarkupString(String txt) const;	
 	/** displays a string constant in the textarea */
-	void DisplayConstantString(size_t stridx, const Color &color, Scriptable *speaker = nullptr) const;
-	/** displays actor name - action : parameter */
-	void DisplayConstantStringNameString(size_t stridx, const Color &color, size_t stridx2, const Scriptable *actor) const;
+	void DisplayConstantString(size_t stridx, GUIColors color, Scriptable *speaker = nullptr) const;
 	/** displays a string constant followed by a number in the textarea */
-	void DisplayConstantStringValue(size_t stridx, const Color &color, ieDword value) const;
-	/** displays a string constant in the textarea, starting with speaker's name */
+	void DisplayConstantStringValue(size_t stridx, GUIColors color, ieDword value) const;	
+	/** displays actor name - action : parameter */
+	void DisplayConstantStringName(size_t stridx, GUIColors color, const Scriptable *speaker) const;
 	void DisplayConstantStringName(size_t stridx, const Color &color, const Scriptable *speaker) const;
-	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
-	void DisplayConstantStringNameValue(size_t stridx, const Color &color, const Scriptable *speaker, int value) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(size_t stridx, const Color &color, const Scriptable *actor, const Scriptable *target) const;
+	void DisplayConstantStringAction(size_t stridx, GUIColors color, const Scriptable *actor, const Scriptable *target) const;	
+	/** displays a string in the textarea, starting with speaker's name */
+	void DisplayStringName(String text, GUIColors color, const Scriptable *speaker) const;
+	void DisplayStringName(ieStrRef stridx, GUIColors color, const Scriptable *speaker, STRING_FLAGS flags) const;
+	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
+	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
+	void DisplayConstantStringNameValue(size_t stridx, GUIColors color, const Scriptable *speaker, int value) const;
+	/** displays actor name - action : parameter */
+	void DisplayConstantStringNameString(size_t stridx, GUIColors color, size_t stridx2, const Scriptable *actor) const;
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
-	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;
-	void DisplayString(String text, const Color &color, Scriptable *target) const;
-	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
-	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
+	void DisplayString(ieStrRef stridx, GUIColors color, STRING_FLAGS flags) const;
+	void DisplayString(const String& text, GUIColors color, Scriptable *target) const;
+	void DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const;	
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>
-	void DisplayRollStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, ARGS&& ...args) const {
+	void DisplayRollStringName(ieStrRef stridx, GUIColors color, const Scriptable *speaker, ARGS&& ...args) const {
 		if (EnableRollFeedback()) {
 			String fmt = ResolveStringRef(stridx);
-			DisplayRollStringName(fmt, color, speaker, std::forward<ARGS>(args)...);
+			String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
+			DisplayStringName(std::move(formatted), color, speaker);
 		}
 	}
 };

@@ -7,3 +7,14 @@ MAPICNBG		0xf0b080ff
 MAPTXTBG		0xf0b080ff
 ALTDOOR			0xff00ffff
 HOVERDOOR		0xff00ffff
+WHITE			0xf0f0f0ff
+RED			0xff0000ff
+LIGHT_GREY		0xd7d7beff
+GOT_XP			0xbcefbcff
+GOT_GOLD		0xc0c000ff
+DIALOG			0xf0f0f0ff
+DIALOG_PARTY		0x8080ffff
+# To add a new color apart of adding it here you must add also the following changes:
+# On the file DisplayMessage.h put the name of the color at the end of the enum.
+# On the file DisplayMessage.cpp put the same name on the list GUIColors at the end as string.
+
