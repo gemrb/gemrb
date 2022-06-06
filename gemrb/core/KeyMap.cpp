@@ -90,6 +90,7 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		}
 		
 		auto& val = parts[1];
+		if (val.length() == 0) continue;
 		LTrim(val);
 
 		if (val.length() > 1 || keymap.HasKey(val)) {
