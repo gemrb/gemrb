@@ -480,7 +480,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	const Map *map;
 	int flg;
 	ieDword spec = 0;
-	Actor *st = self->As<Actor>();
+	Actor *st = Scriptable::As<Actor>(self);
 	// HACK: 00p2229.baf in ar1006 does this silly thing, crashing later
 	if (!st && self && (self->Type==ST_CONTAINER) && (fx->Target == FX_TARGET_SELF)) {
 		fx->Target = FX_TARGET_PRESET;
@@ -1024,7 +1024,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 	if (!actor) return -1;
 
 	const Scriptable *cob = GetCasterObject();
-	const Actor* caster = cob->As<const Actor>();
+	const Actor* caster = Scriptable::As<const Actor>(cob);
 	
 	const auto& globals = Globals::Get();
 
@@ -1146,7 +1146,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		if (target) fx->SetPosition(target->Pos);
 
 		//gemrb specific, stat based chance
-		const Actor* OwnerActor = Owner->As<Actor>();
+		const Actor* OwnerActor = Scriptable::As<Actor>(Owner);
 		if (fx->ProbabilityRangeMin == 100 && OwnerActor) {
 			fx->ProbabilityRangeMin = 0;
 			fx->ProbabilityRangeMax = static_cast<ieWord>(OwnerActor->GetSafeStat(fx->ProbabilityRangeMax));
@@ -1356,7 +1356,7 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed)
 		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 
-	Actor* OwnerActor = Owner->As<Actor>();
+	Actor* OwnerActor = Scriptable::As<Actor>(Owner);
 	if (!OwnerActor) return;
 
 	// we didn't catch effects that don't persist — they still need to be undone
@@ -2306,7 +2306,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 		case STI_AREATYPE:
 			return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, rel);
 		case STI_MORAL_ALIGNMENT:
-			OwnerActor = Owner->As<Actor>();
+			OwnerActor = Scriptable::As<Actor>(Owner);
 			if (OwnerActor) {
 				return DiffCore(OwnerActor->GetStat(IE_ALIGNMENT) & AL_GE_MASK, STAT_GET(IE_ALIGNMENT) & AL_GE_MASK, rel);
 			} else {
