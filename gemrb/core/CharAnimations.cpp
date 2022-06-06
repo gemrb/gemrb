@@ -551,12 +551,12 @@ void CharAnimations::SetupColors(PaletteType type)
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
-				PaletteResRef[type].Format("{:.4}_{:-.2}{}", ResRefBase, (char *) &PType, '1' + type);
+				PaletteResRef[type].Format("{:.4}_{:.2}{}", ResRefBase, (char *) &PType, '1' + type);
 			} else {
 				if (ResRefBase == "MFIE") { // hack for magic golems
-					PaletteResRef[type].Format("{:.4}{:-.2}B", ResRefBase, (char *) &PType);
+					PaletteResRef[type].Format("{:.4}{:.2}B", ResRefBase, (char *) &PType);
 				} else {
-					PaletteResRef[type].Format("{:.4}_{:-.2}", ResRefBase, (char *) &PType);
+					PaletteResRef[type].Format("{:.4}_{:.2}", ResRefBase, (char *) &PType);
 				}
 			}
 			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);
