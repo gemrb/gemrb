@@ -66,7 +66,10 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		Log(WARNING, "KeyMap", "There is no '{}' file...", inifile);
 		return false;
 	}
-	
+
+	const ieVariable defaultModuleName = kmtable->QueryField("Default", "MODULE");
+	const ieVariable defaultFunction = kmtable->QueryField("Default", "FUNCTION");
+	int defaultGroup = kmtable->QueryFieldSigned<int>("Default", "GROUP");
 	char buffer[_MAX_PATH];
 	while (config->Remains()) {
 		strret_t len = config->ReadLine(buffer, sizeof(buffer));
@@ -112,10 +115,9 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 			function = kmtable->QueryField(key, "FUNCTION");
 			group = kmtable->QueryFieldSigned<int>(key, "GROUP");
 		} else {
-			moduleName = kmtable->QueryField("Default","MODULE");
-			function = kmtable->QueryField("Default","FUNCTION");
-			group = kmtable->QueryFieldSigned<int>("Default","GROUP");
-			Log(MESSAGE, "KeyMap", "Adding key {} with function {}::{}", key, moduleName, function);
+			moduleName = defaultModuleName;
+			function = defaultFunction;
+			group = defaultGroup;
 		}
 		Function *fun = new Function(moduleName, function, group, val[0]);
 
