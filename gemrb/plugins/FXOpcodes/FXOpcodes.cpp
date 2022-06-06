@@ -1170,7 +1170,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 
 		Scriptable *caster = GetCasterObject();
 		if (!caster) caster = Owner;
-		const Actor* casterActor = caster->As<const Actor>();
+		const Actor* casterActor = Scriptable::As<const Actor>(caster);
 		if (casterActor) {
 			casterenemy = casterActor->GetStat(IE_EA) > EA_GOODCUTOFF; //or evilcutoff?
 		} else {
@@ -3488,7 +3488,7 @@ int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter1) {
 		target->Turn(Owner, fx->Parameter1);
 	} else {
-		const Actor* actor = Owner->As<const Actor>();
+		const Actor* actor = Scriptable::As<const Actor>(Owner);
 		if (!actor) {
 			return FX_NOT_APPLIED;
 		}
@@ -6735,7 +6735,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	const Actor* caster = Owner->As<const Actor>();
+	const Actor* caster = Scriptable::As<const Actor>(Owner);
 	if (caster) {
 		skill = caster->GetStat(IE_SETTRAPS);
 		roll = target->LuckyRoll(1,100,0,LR_NEGATIVE);
@@ -6857,7 +6857,7 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_activate_spell_sequencer(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_activate_spell_sequencer(%2d): Resource: %s", fx->Opcode, fx->Resource);
-	Actor* actor = Owner->As<Actor>();
+	Actor* actor = Scriptable::As<Actor>(Owner);
 	if (!actor) {
 		return FX_NOT_APPLIED;
 	}
