@@ -40,9 +40,6 @@
 
 namespace GemRB {
 
-#ifndef HAVE_STRNLEN
-GEM_EXPORT int strnlen(const char* string, int maxlen);
-#endif
 #ifndef HAVE_STRLCPY
 GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
 #endif

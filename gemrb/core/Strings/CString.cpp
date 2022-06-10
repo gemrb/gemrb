@@ -20,22 +20,6 @@
 
 namespace GemRB {
 
-#ifndef HAVE_STRNLEN
-int strnlen(const char* string, int maxlen)
-{
-	if (!string) {
-		return -1;
-	}
-	int i = 0;
-	while (maxlen-- > 0) {
-		if (!string[i])
-			break;
-		i++;
-	}
-	return i;
-}
-#endif // ! HAVE_STRNLEN
-
 //// Compatibility functions
 #ifndef HAVE_STRLCPY
 GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
