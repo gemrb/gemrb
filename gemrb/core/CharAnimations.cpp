@@ -1473,15 +1473,15 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 			Prefix="wlk"; break;
 		case IE_ANI_HEAD_TURN:
 			Cycle=SixteenToFive[Orient];
-			if (RAND(0,1)) {
-				Prefix="sf2";
-			} else {
-				Prefix="sf1";
+			
+			static const char prefixes[2][4] = {"sf2", "sf1"};
+			for (int i = RAND(0,1); i < 2; ++i) {
+				dest.Format("{}{}{}", ResRefBase[0], prefixes[i], ResRefBase.begin() + 1);
+				if (gamedata->Exists(dest, IE_BAM_CLASS_ID)) {
+					return;
+				}
 			}
-			dest.Format("{}{}{}", ResRefBase[0], Prefix, ResRefBase.begin() + 1);
-			if (gamedata->Exists(dest, IE_BAM_CLASS_ID)) {
-				return;
-			}
+
 			Prefix = "stc";
 			break;
 		case IE_ANI_PST_START:
