@@ -69,8 +69,8 @@ class GEM_EXPORT RNG {
 		return signum * randomNum;
 	}
 	
-	bool flip() noexcept {
-		std::bernoulli_distribution distribution(0.5);
+	bool randPct(double pct) noexcept {
+		std::bernoulli_distribution distribution(pct);
 		return distribution(engine);
 	}
 };
@@ -89,7 +89,7 @@ inline Point RandomPoint(int xmin = 0, int xmax = std::numeric_limits<int>::max(
 }
 
 inline bool RandomFlip() noexcept {
-	return RNG::getInstance().flip();
+	return RNG::getInstance().rand(0, 1);
 }
 
 }
