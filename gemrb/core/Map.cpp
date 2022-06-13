@@ -3056,7 +3056,7 @@ void Map::AdjustPosition(SearchmapPoint &goal, int radiusx, int radiusy, int siz
 
 	while(radiusx < mapSize.w || radiusy < mapSize.h) {
 		//lets make it slightly random where the actor will appear
-		if (RAND(0,1)) {
+		if (RandomFlip()) {
 			if (AdjustPositionX(goal, radiusx, radiusy, size)) {
 				return;
 			}

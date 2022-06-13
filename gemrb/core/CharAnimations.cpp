@@ -1475,7 +1475,7 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			
 			static const char prefixes[2][4] = {"sf2", "sf1"};
-			for (int i = RAND(0,1); i < 2; ++i) {
+			for (int i = RandomFlip(); i < 2; ++i) {
 				dest.Format("{}{}{}", ResRefBase[0], prefixes[i], ResRefBase.begin() + 1);
 				if (gamedata->Exists(dest, IE_BAM_CLASS_ID)) {
 					return;
@@ -1854,7 +1854,7 @@ void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char StanceID,
 			break;
 
 		case IE_ANI_HEAD_TURN:
-			if (RAND(0,1)) {
+			if (RandomFlip()) {
 				dest.Append("g12");
 				Cycle += 18;
 			} else {

@@ -1471,7 +1471,7 @@ void Projectile::DrawExplosion(const Region& vp)
 		ResRef tmp = Extension->Spread;
 		for (size_t i = 0; i < child_size; ++i) {
 			if(apflags&APF_BOTH) {
-				if(RAND(0,1)) {
+				if (RandomFlip()) {
 					tmp = Extension->Secondary;
 				} else {
 					tmp = Extension->Spread;

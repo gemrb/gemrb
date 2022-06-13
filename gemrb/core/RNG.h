@@ -68,6 +68,11 @@ class GEM_EXPORT RNG {
 		NUM_T randomNum = distribution(engine);
 		return signum * randomNum;
 	}
+	
+	bool flip() noexcept {
+		std::bernoulli_distribution distribution(0.5);
+		return distribution(engine);
+	}
 };
 
 template<typename NUM_T = int32_t>
@@ -81,6 +86,10 @@ inline Point RandomPoint(int xmin = 0, int xmax = std::numeric_limits<int>::max(
 	auto x = RAND(xmin, xmax);
 	auto y = RAND(ymin, ymax);
 	return Point(x, y);
+}
+
+inline bool RandomFlip() noexcept {
+	return RNG::getInstance().flip();
 }
 
 }

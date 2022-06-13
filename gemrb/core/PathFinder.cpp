@@ -74,8 +74,8 @@ PathListNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, in
 			// Give up and call the pathfinder if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) break;
 			// Random rotation
-			xSign = RAND(0, 1) ? -1 : 1;
-			ySign = RAND(0, 1) ? -1 : 1;
+			xSign = RandomFlip() ? -1 : 1;
+			ySign = RandomFlip() ? -1 : 1;
 			continue;
 		}
 		p = rad;

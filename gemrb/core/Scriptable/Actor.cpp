@@ -7469,7 +7469,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 				break;
 			case 1:
 				// HACK: replace with [0] (ANYONE) once we support that (Nearest matches Sender like in the original)
-				if (RAND(0,1)) {
+				if (RandomFlip()) {
 					actionString = "Attack(NearestEnemyOf(Myself))";
 				} else {
 					actionString = "Attack([PC])";
