@@ -626,12 +626,12 @@ will return the table's existing reference (won't load it again).\n\
 
 static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 {
-	char* tablename;
+	PyObject* tablename = nullptr;
 	int noerror = 0;
 	int silent = 0;
-	PARSE_ARGS(args, "s|ii", &tablename, &noerror, &silent);
+	PARSE_ARGS(args, "O|ii", &tablename, &noerror, &silent);
 
-	auto tab = gamedata->LoadTable(ResRef(tablename), silent > 0);
+	auto tab = gamedata->LoadTable(ResRefFromPy(tablename), silent > 0);
 	if (tab == nullptr) {
 		if (noerror) {
 			Py_RETURN_NONE;
@@ -2795,10 +2795,11 @@ Used in bg2 with xnewarea.2da for ToB.\n\
 
 static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 {
-	const char *resref;
-	PARSE_ARGS( args,  "s", &resref);
+	PyObject* pystr = nullptr;
+	PARSE_ARGS( args,  "O", &pystr);
 
-	AutoTable newarea = gamedata->LoadTable(ResRef(resref));
+	ResRef resref = ResRefFromPy(pystr);
+	AutoTable newarea = gamedata->LoadTable(resref);
 	if (!newarea) {
 		return RuntimeError( "2da not found!\n");
 	}
@@ -2822,7 +2823,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		int locy           = newarea->QueryFieldSigned<int>(i,5);
 		int label          = newarea->QueryFieldSigned<int>(i,6);
 		int name           = newarea->QueryFieldSigned<int>(i,7);
-		const char *ltab   = newarea->QueryField(i,8).c_str();
+		ResRef ltab   = newarea->QueryField(i, 8);
 		links[static_cast<int>(WMPDirection::NORTH)] = newarea->QueryFieldSigned<int>(i, 9);
 		links[static_cast<int>(WMPDirection::EAST)] = newarea->QueryFieldSigned<int>(i, 10);
 		links[static_cast<int>(WMPDirection::SOUTH)] = newarea->QueryFieldSigned<int>(i, 11);
@@ -2839,7 +2840,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		}
 		unsigned int total = linksto+local;
 
-		AutoTable newlinks = gamedata->LoadTable(ResRef(ltab));
+		AutoTable newlinks = gamedata->LoadTable(ltab);
 		if (!newlinks || total != newlinks->GetRowCount() ) {
 			return RuntimeError( "invalid links 2da!");
 		}
@@ -5489,11 +5490,11 @@ Slot Variable. If it exists in the Characters directory of the game.\n\
 
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 {
-	const char *CreResRef;
+	PyObject* pystr = nullptr;
 	int PlayerSlot, Slot;
 	int Import=0;
 	int VersionOverride = -1;
-	PARSE_ARGS( args,  "si|ii", &CreResRef, &PlayerSlot, &Import, &VersionOverride);
+	PARSE_ARGS( args,  "Oi|ii", &pystr, &PlayerSlot, &Import, &VersionOverride);
 	//PlayerSlot is zero based
 	Slot = ( PlayerSlot & 0x7fff );
 	GET_GAME();
@@ -5512,10 +5513,10 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Slot is already filled!\n");
 		}
 	}
-	if (CreResRef[0]) {
-		char* encoded = ConvertCharEncoding(CreResRef, "UTF-8", core->SystemEncoding);
-		PlayerSlot = gamedata->LoadCreature(ResRef(encoded), Slot, (bool) Import, VersionOverride);
-		free(encoded);
+	
+	ResRef CreResRef = ResRefFromPy(pystr);
+	if (!CreResRef.IsEmpty()) {
+		PlayerSlot = gamedata->LoadCreature(CreResRef, Slot, (bool) Import, VersionOverride);
 	} else {
 		//just destroyed the previous actor, not going to create one
 		PlayerSlot = 0;
@@ -10040,10 +10041,10 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 
 	ResRef CreResRef = ResRefFromPy(cstr);
 	if (PosX!=-1 && PosY!=-1) {
-		map->SpawnCreature(Point(PosX, PosY), ResRef(CreResRef));
+		map->SpawnCreature(Point(PosX, PosY), CreResRef);
 	} else {
 		GET_ACTOR_GLOBAL();
-		map->SpawnCreature(actor->Pos, ResRef(CreResRef), 10, 10);
+		map->SpawnCreature(actor->Pos, CreResRef, 10, 10);
 	}
 	Py_RETURN_NONE;
 }
