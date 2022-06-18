@@ -209,7 +209,7 @@ def DisplayFavouredEnemy (pc, RangerLevel, second, RecordsTextArea):
 		RaceID = GemRB.GetPlayerStat(pc, IE_HATEDRACE2+second)
 	if RaceID:
 		FavouredIndex = HateRaceTable.FindValue (1, RaceID)
-		if FavouredIndex == -1:
+		if FavouredIndex is None:
 			return
 		FavouredName = HateRaceTable.GetValue (FavouredIndex, 0)
 		if second == -1:
@@ -312,7 +312,7 @@ def DisplayGeneral (pc, targetTextArea):
 	Race = CommonTables.Races.GetValue (RaceIndex, 2)
 	tmp = CommonTables.Races.GetValue (RaceIndex, 8)
 
-	if tmp == -1:
+	if tmp is None:
 		tmp = highest
 	else:
 		tmp = GetFavoredClass(pc, tmp)
@@ -1320,10 +1320,10 @@ def OpenLUKitWindow ():
 	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
 	hasKits = CommonTables.Classes.FindValue ("CLASS", LUClassID)
 	kitIndex = GUICommonWindows.GetKitIndex (pc, LUClass)
-	if hasKits == -1 or kitIndex > 0:
+	if hasKits is None or kitIndex > 0:
 		kitName = CommonTables.Classes.GetRowName (kitIndex)
 		kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
-		if hasKits == -1:
+		if hasKits is None:
 			kitID = 0
 		HandleSpecFlagExclusion(pc, LUClassID, kitID)
 		LUNextPress ()

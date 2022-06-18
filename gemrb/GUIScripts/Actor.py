@@ -134,7 +134,7 @@ class Actor:
 		# since the barbarian kit id clashes with the no-kit value
 		if self.__kitindex == 0 and Kit != 0x4000:
 			self.__kitindex = CommonTables.KitList.FindValue (6, Kit)
-			if self.__kitindex == -1:
+			if self.__kitindex is None:
 				self.__kitindex = 0
 
 		return self.__kitindex

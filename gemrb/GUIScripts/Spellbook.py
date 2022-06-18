@@ -423,7 +423,7 @@ def GetLearnableDomainSpells (pc, Level, baseClassName = -1):
 	BaseClassIndex = CommonTables.Classes.GetRowIndex (baseClassName)
 	# columns correspond to kits in the same order
 	KitIndex = GUICommonWindows.GetKitIndex (pc, BaseClassIndex)
-	if KitIndex == -1:
+	if KitIndex is None:
 		print("GetLearnableDomainSpells: couldn't determine the kit, bailing out!")
 		return Learnable
 	# calculate the offset from the first cleric kit

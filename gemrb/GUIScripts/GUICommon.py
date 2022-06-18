@@ -365,7 +365,7 @@ def GetKitIndex (actor):
 	# since the barbarian kit id clashes with the no-kit value
 	if KitIndex == 0 and Kit != 0x4000:
 		KitIndex = CommonTables.KitList.FindValue (6, Kit)
-		if KitIndex == -1:
+		if KitIndex is None:
 			KitIndex = 0
 
 	return KitIndex
@@ -612,7 +612,7 @@ def CanDualClass(actor):
 	Alignment = GemRB.GetPlayerStat (actor, IE_ALIGNMENT)
 	AlignmentColName = CommonTables.Aligns.FindValue (3, Alignment)
 	AlignmentColName = CommonTables.Aligns.GetValue (AlignmentColName, 4)
-	if AlignmentColName == -1:
+	if AlignmentColName is None:
 		print("CannotDualClass: extraordinary character alignment")
 		return 1
 	Sum = 0

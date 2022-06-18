@@ -238,7 +238,7 @@ def DisplayOverview(step):
 			for i in range(ProfCount-8):
 				# 4294967296 overflows to -1 on some arches, so we use a smaller invalid strref
 				strref = TmpTable.GetValue (i+8, 1)
-				if strref == -1 or strref > 500000:
+				if strref is None or strref > 500000:
 					continue
 				Weapon = GemRB.GetString (strref)
 				StatID = TmpTable.GetValue (i+8, 0)

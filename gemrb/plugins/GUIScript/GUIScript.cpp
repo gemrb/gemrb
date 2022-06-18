@@ -729,7 +729,7 @@ Table. If StartRowis omitted, the search starts from the beginning.\n\
   * Value - value to find in the table\n\
   * StartRow - integer, starting row (offset)\n\
 \n\
-**Return value:** numeric, -1 if the value isn't to be found\n\
+**Return value:** numeric, None if the value isn't to be found\n\
 \n\
 **See also:** [LoadTable](LoadTable.md), [Table_GetValue](Table_GetValue.md)"
 );
@@ -754,13 +754,19 @@ static PyObject* GemRB_Table_FindValue(PyObject* self, PyObject* args)
 	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
+	TableMgr::index_t val = TableMgr::npos;
 	if (col == -1) {
-		return PyLong_FromLong(tm->FindTableValue(PyString_AsStringView(colname), Value, start));
+		val = tm->FindTableValue(PyString_AsStringView(colname), Value, start);
 	} else if (col == -2) {
-		return PyLong_FromLong(tm->FindTableValue(PyString_AsStringView(colname), PyString_AsStringView(strvalue), start));
+		val = tm->FindTableValue(PyString_AsStringView(colname), PyString_AsStringView(strvalue), start);
 	} else {
-		return PyLong_FromLong(tm->FindTableValue(col, Value, start));
+		val = tm->FindTableValue(col, Value, start);
 	}
+	
+	if (val == TableMgr::npos) {
+		Py_RETURN_NONE;
+	}
+	return PyLong_FromLong(val);
 }
 
 PyDoc_STRVAR( GemRB_Table_GetRowIndex__doc,
@@ -776,7 +782,7 @@ PyDoc_STRVAR( GemRB_Table_GetRowIndex__doc,
   * TableIndex - returned by a previous LoadTable command.\n\
   * RowName - a row label\n\
 \n\
-**Return value:** numeric, -1 if row doesn't exist\n\
+**Return value:** numeric, None if row doesn't exist\n\
 \n\
 **See also:** [LoadTable](LoadTable.md)"
 );
@@ -790,7 +796,9 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(tm);
 
 	TableMgr::index_t row = tm->GetRowIndex(PyString_AsStringView(rowname));
-	//no error if the row doesn't exist
+	if (row == TableMgr::npos) {
+		Py_RETURN_NONE;
+	}
 	return PyLong_FromLong(row);
 }
 
@@ -837,7 +845,7 @@ PyDoc_STRVAR( GemRB_Table_GetColumnIndex__doc,
   * TableIndex - returned by a previous LoadTable command.\n\
   * ColumnName - a column label\n\
 \n\
-**Return value:** numeric, -1 if column doesn't exist\n\
+**Return value:** numeric, None if column doesn't exist\n\
 \n\
 **See also:** [LoadTable](LoadTable.md), [Table_GetRowIndex](Table_GetRowIndex.md)"
 );
@@ -851,7 +859,9 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(tm);
 
 	TableMgr::index_t col = tm->GetColumnIndex(PyString_AsStringView(colname));
-	//no error if the column doesn't exist
+	if (col == TableMgr::npos) {
+		Py_RETURN_NONE;
+	}
 	return PyLong_FromLong(col);
 }
 

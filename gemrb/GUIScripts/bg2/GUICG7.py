@@ -42,7 +42,7 @@ def OnLoad():
 		KitValue = KitTable.GetValue(KitIndex - 21, 3)
 
 		# bards have kits too
-		if KitValue == -1:
+		if KitValue is None:
 			KitValue = 0x4000 # we only need it for the spells, so this is ok
 	else:
 		KitValue = 0x4000
