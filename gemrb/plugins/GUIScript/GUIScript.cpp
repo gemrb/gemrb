@@ -3645,11 +3645,10 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
 	
-	auto wrapper = PyString_AsStringView(pyref);
-	StringView ResRef = wrapper;
+	ResRef ResRef = ResRefFromPy(pyref);
 
 	//empty image
-	if (ResRef[0] == 0 || ResRef[0]=='*') {
+	if (ResRef.IsEmpty() || IsStar(ResRef)) {
 		btn->SetPicture( NULL );
 		Py_RETURN_NONE;
 	}
@@ -7856,7 +7855,7 @@ static void ReadUsedItems()
 		for (TableMgr::index_t i = 0; i < UsedItemsCount; i++) {
 			UsedItems[i].itemname = table->GetRowName(i);
 			UsedItems[i].username = table->QueryField(i, 0);
-			if (UsedItems[i].username[0] == '*') {
+			if (IsStar(UsedItems[i].username)) {
 				UsedItems[i].username.Reset();
 			}
 			//this is an strref
