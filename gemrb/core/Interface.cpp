@@ -571,10 +571,10 @@ bool Interface::ReadSoundChannelsTable() const
 	TableMgr::index_t ivol = tm->GetColumnIndex("VOLUME");
 	TableMgr::index_t irev = tm->GetColumnIndex("REVERB");
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
-		const char *rowname = tm->GetRowName(i).c_str();
+		auto rowname = tm->GetRowName(i);
 		// translate some alternative names for the IWDs
-		if (!strcmp(rowname, "ACTION")) rowname = "ACTIONS";
-		else if (!strcmp(rowname, "SWING")) rowname = "SWINGS";
+		if (rowname == "ACTION") rowname = "ACTIONS";
+		else if (rowname == "SWING") rowname = "SWINGS";
 		AudioDriver->SetChannelVolume(rowname, tm->QueryFieldSigned<int>(i, ivol));
 		if (irev != TableMgr::npos) {
 			AudioDriver->SetChannelReverb(rowname, atof(tm->QueryField(i, irev).c_str()));

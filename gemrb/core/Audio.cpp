@@ -57,13 +57,13 @@ Audio::Audio(void)
 	CreateChannel("ARMOR");
 }
 
-unsigned int Audio::CreateChannel(const char *name)
+unsigned int Audio::CreateChannel(const std::string& name)
 {
 	channels.emplace_back(name);
 	return channels.size() - 1;
 }
 
-void Audio::SetChannelVolume(const char *name, int volume)
+void Audio::SetChannelVolume(const std::string& name, int volume)
 {
 	if (volume > 100) {
 		volume = 100;
@@ -78,7 +78,7 @@ void Audio::SetChannelVolume(const char *name, int volume)
 	channels[channel].setVolume(volume);
 }
 
-void Audio::SetChannelReverb(const char *name, float reverb)
+void Audio::SetChannelReverb(const std::string& name, float reverb)
 {
 	if (reverb > 1.0f) {
 		reverb = 1.0f;
@@ -93,10 +93,10 @@ void Audio::SetChannelReverb(const char *name, float reverb)
 	channels[channel].setReverb(reverb);
 }
 
-unsigned int Audio::GetChannel(const char *name) const
+unsigned int Audio::GetChannel(const std::string& name) const
 {
 	for (std::vector<Channel>::const_iterator c = channels.begin(); c != channels.end(); ++c) {
-		if (strcmp((*c).getName(), name) == 0) {
+		if (c->getName() == name) {
 			return c - channels.begin();
 		}
 	}

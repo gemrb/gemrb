@@ -28,6 +28,8 @@
 #include "Plugin.h"
 #include "Holder.h"
 
+#include <string>
+
 namespace GemRB {
 
 #define GEM_SND_RELATIVE 1
@@ -78,17 +80,18 @@ public:
 
 class GEM_EXPORT Channel {
 public:
-	explicit Channel(const char *label)
-		{ strlcpy(name, label, sizeof(name)); }
+	explicit Channel(std::string str)
+	: name(std::move(str))
+	{}
 
-	const char *getName() const { return name; }
+	const std::string& getName() const { return name; }
 	int getVolume() const { return volume; }
 	void setVolume(int vol) { volume = vol; }
 	float getReverb() const { return reverb; }
 	void setReverb(float r) { reverb = r; }
 
 private:
-	char name[10];
+	std::string name;
 	int volume = 100; // 1-100
 	float reverb = 0.0f;
 };
@@ -125,10 +128,10 @@ public:
 				int channels, short* memory, int size, int samplerate) = 0;
 	virtual void UpdateMapAmbient(MapReverb&) {};
 
-	unsigned int CreateChannel(const char *name);
-	void SetChannelVolume(const char *name, int volume);
-	void SetChannelReverb(const char *name, float reverb);
-	unsigned int GetChannel(const char *name) const;
+	unsigned int CreateChannel(const std::string& name);
+	void SetChannelVolume(const std::string& name, int volume);
+	void SetChannelReverb(const std::string& name, float reverb);
+	unsigned int GetChannel(const std::string& name) const;
 	int GetVolume(unsigned int channel) const;
 	float GetReverb(unsigned int channel) const;
 protected:
