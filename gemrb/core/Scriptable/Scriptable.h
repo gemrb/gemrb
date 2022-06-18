@@ -129,6 +129,7 @@ class Sprite2D;
 #define XP_LOCKPICK   0
 #define XP_DISARM     1
 #define XP_LEARNSPELL 2
+#define XP_PICKPOCKET  3 // gemrb extension
 
 #define MAX_PATH_TRIES 8
 #define MAX_BUMP_BACK_TRIES 16

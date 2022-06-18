@@ -4526,6 +4526,10 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 
 	if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, GUIColors::WHITE);
 	DisplayStringCoreVC(snd, VB_PP_SUCC, DS_CONSOLE);
+
+	int xp = gamedata->GetXPBonus(XP_PICKPOCKET, scr->GetXPLevel(1));
+	core->GetGame()->ShareXP(xp, SX_DIVIDE);
+
 	if (ret == MIC_FULL && snd->InParty) {
 		snd->VerbalConstant(VB_INVENTORY_FULL);
 		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, GUIColors::XPCHANGE);
