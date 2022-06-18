@@ -2417,7 +2417,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
 			for (TableMgr::index_t i = 0; i < sttable->GetRowCount(); ++i) {
-				const char* rowName = sttable->GetRowName(i).c_str();
+				const auto& rowName = sttable->GetRowName(i);
 				if (!std::isdigit(rowName[0])) continue; // this skips the initial palette rows (red, blue, green)
 
 				int frameField = sttable->QueryFieldSigned<int>(i, 0);

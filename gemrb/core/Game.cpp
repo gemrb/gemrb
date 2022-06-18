@@ -394,7 +394,7 @@ int Game::LeaveParty (Actor* actor)
 //determines if startpos.2da has rotation rows (it cannot have tutorial line)
 bool Game::DetermineStartPosType(const TableMgr *strta) const
 {
-	if ((strta->GetRowCount()>=6) && !stricmp(strta->GetRowName(4).c_str(),"START_ROT" ) )
+	if ((strta->GetRowCount()>=6) && strta->GetRowName(4) == "START_ROT")
 	{
 		return true;
 	}

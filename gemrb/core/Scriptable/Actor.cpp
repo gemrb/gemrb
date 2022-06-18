@@ -2115,7 +2115,7 @@ static void InitActorTables()
 		if (tm) {
 			TableMgr::index_t rowcount = tm->GetRowCount();
 			for (TableMgr::index_t i = 0; i < rowcount; i++) {
-				const char* cls = tm->GetRowName(i).c_str();
+				const auto& cls = tm->GetRowName(i);
 				auto it = className2ID.find(cls);
 				int id = 0;
 				if (it != className2ID.end()) id = it->second;

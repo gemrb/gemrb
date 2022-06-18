@@ -820,10 +820,8 @@ static PyObject* GemRB_Table_GetRowName(PyObject* self, PyObject* args)
 	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
-	const char* str = tm->GetRowName( row ).c_str();
-	ABORT_IF_NULL(str);
-
-	return PyString_FromString( str );
+	const std::string& str = tm->GetRowName(row);
+	return PyString_FromStringObj(str);
 }
 
 PyDoc_STRVAR( GemRB_Table_GetColumnIndex__doc,
