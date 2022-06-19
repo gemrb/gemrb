@@ -108,7 +108,7 @@ private:
 	bool DispatchEvent(const Event&);
 	bool HotKey(const Event&) const;
 
-	inline void DestroyWindows(WindowList& list);
+	inline void DestroyClosedWindows();
 	void MarkAllDirty() const;
 
 public:

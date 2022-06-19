@@ -85,21 +85,21 @@ WindowManager::~WindowManager()
 {
 	CloseAllWindows();
 	
-	DestroyWindows(closedWindows);
+	DestroyClosedWindows();
 	assert(closedWindows.empty());
 
 	delete gameWin;
 }
 
-void WindowManager::DestroyWindows(WindowList& list)
+void WindowManager::DestroyClosedWindows()
 {
-	WindowList::iterator it = list.begin();
-	while (it != list.end()) {
+	WindowList::iterator it = closedWindows.begin();
+	while (it != closedWindows.end()) {
 		Window* win = *it;
 		// IMPORTANT: ensure the window (a control subview) isn't executing a callback before deleting it
 		if (win->InActionHandler() == false) {
 			delete win;
-			it = list.erase(it);
+			it = closedWindows.erase(it);
 		} else {
 			++it;
 		}
@@ -226,7 +226,7 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 
 Window* WindowManager::MakeWindow(const Region& rgn)
 {
-	DestroyWindows(closedWindows);
+	DestroyClosedWindows();
 
 	Window* win = new Window(rgn, *this);
 	windows.push_back(win);
