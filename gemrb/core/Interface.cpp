@@ -439,7 +439,7 @@ void Interface::HandleFlags() noexcept
 		// closing windows must come before tearing anything else down
 		// some window close handlers expect game/gamecontrol to be valid
 		// let them run, then start tearing things down
-		winmgr->DestroyAllWindows();
+		winmgr->CloseAllWindows();
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
 		QuitGame (QuitFlag&QF_EXITGAME);
@@ -463,7 +463,7 @@ void Interface::HandleFlags() noexcept
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
-		winmgr->DestroyAllWindows();
+		winmgr->CloseAllWindows();
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			EventFlag|=EF_EXPANSION;
