@@ -42,7 +42,7 @@ IF(APPLE) #application bundle generation
 
 	# default values
 	SET_SOURCE_FILES_PROPERTIES(
-		../apple/defaults.plist
+		../platforms/apple/defaults.plist
 		PROPERTIES MACOSX_PACKAGE_LOCATION Resources
 	)
 
