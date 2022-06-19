@@ -57,30 +57,25 @@ IF(APPLE) #application bundle generation
 					../platforms/apple/defaults.plist
 					${RESOURCE_FILES})
 
-	# we already link to Cocoa and we need to modify this with the ‘dylib_file’ option for non-framework SDL builds
-	message(STATUS "Starting SDL_LIBRARY and cmake path: '${SDL_LIBRARY}' (${libdir})")
-	set(OLD_SDL_LIB ${SDL_LIBRARY})
-	STRING(REPLACE "-framework Cocoa" "" SDL_LIBRARY ${SDL_LIBRARY})
-	if(${OLD_SDL_LIB} STREQUAL ${SDL_LIBRARY} AND SDL_BACKEND STREQUAL "SDL2")
-		set(SDL_BASENAME "libSDL2-2.0.0.dylib")
-		set(SDL_LIBRARY "${libdir}/${SDL_BASENAME}")
-		message(STATUS "Using path set by SDL2 itself: ${SDL_LIBRARY}")
-	else()
-		GET_FILENAME_COMPONENT(SDL_LIBRARY ${SDL_LIBRARY} REALPATH)
-		GET_FILENAME_COMPONENT(SDL_BASENAME ${SDL_LIBRARY} NAME)
-	endif()
-
 	SET(BUNDLE_FRAMEWORK_PATH "${CMAKE_BINARY_DIR}/gemrb/${PROJECT_NAME}.app/Contents/Frameworks")
-					
-	MESSAGE(STATUS "Copying SDL: ${SDL_LIBRARY}")
-	FILE(COPY ${SDL_LIBRARY} DESTINATION ${BUNDLE_FRAMEWORK_PATH} FILE_PERMISSIONS OWNER_READ OWNER_WRITE)
-
-	SET(SDL_LIBRARY "${BUNDLE_FRAMEWORK_PATH}/${SDL_BASENAME}")
+	
+	get_filename_component(SDL_BASENAME "${SDL2_LIBDIR}" NAME)
+	
 	
 	IF(NOT SDL_BASENAME MATCHES ".framework")
+		SET(SDL_BASENAME "libSDL2.dylib")
+		SET(SDL_LIB "${SDL2_LIBDIR}/${SDL_BASENAME}")
+		get_filename_component(SDL_FULL_PATH "${SDL_LIB}" REALPATH)
+		FILE(COPY ${SDL_FULL_PATH} DESTINATION ${BUNDLE_FRAMEWORK_PATH} FILE_PERMISSIONS OWNER_READ OWNER_WRITE)
+		
 		# change the "install name" of the copied SDL
-		ADD_CUSTOM_COMMAND(TARGET gemrb PRE_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@loader_path/../Frameworks/${SDL_BASENAME}" "${SDL_LIBRARY}")
+		ADD_CUSTOM_COMMAND(TARGET gemrb PRE_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@loader_path/../Frameworks/${SDL_BASENAME}" "${SDL_LIB}")
+	ELSE()
+		SET(SDL_LIB "${SDL2_LIBDIR}")
 	ENDIF()
+	
+	MESSAGE(STATUS "Copying SDL: ${SDL_LIB}")
+	FILE(COPY ${SDL_LIB} DESTINATION ${BUNDLE_FRAMEWORK_PATH} FILE_PERMISSIONS OWNER_READ OWNER_WRITE)
 
 	SET(BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/GemRB") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
 	STRING(APPEND CMAKE_MODULE_LINKER_FLAGS " -bundle_loader \"${BUNDLE_LOADER}\"")

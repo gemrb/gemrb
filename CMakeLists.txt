@@ -261,10 +261,6 @@ ENDIF()
 # Autodetection mechanism
 # Default priority to SDL
 # If both backends are found, preferring SDL2
-if(APPLE)
-	# framework version of sdl doesn't provide a working cmake config module
-	set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};platforms/apple/")
-endif()
 IF(SDL_BACKEND STREQUAL "Auto")
 	MESSAGE(STATUS "Autodetecting SDL backend...")
 	IF(WIN32 AND _VCPKG_INSTALLED_DIR)
