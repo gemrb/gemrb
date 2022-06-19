@@ -625,11 +625,12 @@ bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 	if (Flags() & View::IgnoreEvents) {
 		return false;
 	}
-	switch (key.keycode) {
-		case GEM_ESCAPE:
-			Close();
-			return true;
+	
+	if (key.keycode == GEM_ESCAPE && mod == 0) {
+		Close();
+		return true;
 	}
+
 	return ScrollView::OnKeyPress(key, mod);
 }
 
