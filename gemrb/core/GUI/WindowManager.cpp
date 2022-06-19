@@ -286,12 +286,9 @@ void WindowManager::CloseWindow(Window* win)
 
 void WindowManager::CloseAllWindows()
 {
-	WindowList::iterator it = windows.begin();
-	for (; it != windows.end(); ++it) {
-		Window* win = *it;
+	for (Window* win : WindowList(windows)) {
 		win->SetFlags(Window::DestroyOnClose, BitOp::OR); // force delete
 		win->Close();
-		if (windows.empty()) break;
 	}
 }
 
