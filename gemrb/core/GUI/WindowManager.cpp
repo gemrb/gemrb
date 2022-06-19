@@ -83,10 +83,10 @@ void WindowManager::MarkAllDirty() const
 
 WindowManager::~WindowManager()
 {
+	CloseAllWindows();
+	
 	DestroyWindows(closedWindows);
 	assert(closedWindows.empty());
-	DestroyWindows(windows);
-	assert(windows.empty());
 
 	delete gameWin;
 }
@@ -290,6 +290,7 @@ void WindowManager::CloseAllWindows()
 		win->SetFlags(Window::DestroyOnClose, BitOp::OR); // force delete
 		win->Close();
 	}
+	assert(windows.empty());
 }
 
 bool WindowManager::HotKey(const Event& event) const
