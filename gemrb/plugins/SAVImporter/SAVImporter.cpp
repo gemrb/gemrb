@@ -80,7 +80,7 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 	while(Current);
 
 	tick_t endTime = GetMilliseconds();
-	Log(WARNING, "Core", "{} ms (extracting the SAV)", endTime - startTime);
+	Log(MESSAGE, "Core", "{} ms (extracting the SAV)", endTime - startTime);
 	return GEM_OK;
 }
 
