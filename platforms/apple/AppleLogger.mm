@@ -22,6 +22,7 @@
 #import <Uikit/UIAlertView.h>
 #elif TARGET_OS_MAC
 #import <Cocoa/Cocoa.h>
+#import <OSLog/OSLog.h>
 #endif
 
 #include "AppleLogger.h"
@@ -39,7 +40,24 @@ AppleLogger::AppleLogger()
 
 void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 {
-	NSLog(@"%s", msg.message.c_str()); // send to OS X logging system
+	os_log_type_t type = OS_LOG_TYPE_DEBUG;
+	switch (msg.level) {
+		case FATAL:
+			type = OS_LOG_TYPE_FAULT;
+			break;
+		case ERROR:
+		case WARNING:
+			type = OS_LOG_TYPE_ERROR;
+			break;
+		case MESSAGE:
+		case COMBAT:
+			type = OS_LOG_TYPE_INFO;
+			break;
+		case DEBUG:
+		default:
+			type = OS_LOG_TYPE_DEBUG;
+	}
+	os_log_with_type(OS_LOG_DEFAULT, type, "[%s] %s", msg.owner.c_str(), msg.message.c_str());
 	if (msg.level == FATAL) {
 		// display a GUI alert for FATAL errors
 		NSString* alertTitle = [NSString stringWithFormat:@"Fatal Error in %s", msg.owner.c_str()];
