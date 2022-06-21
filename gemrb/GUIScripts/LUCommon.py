@@ -385,7 +385,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	ClassName = None
 	if Kit and not Dual[0] and Multi[0]<2:
 		KitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
-		if CommonTables.Classes.GetRowIndex (KitName) is not None:
+		if CommonTables.Classes.GetRowIndex (KitName) >= 0:
 			ClassName = KitName
 
 	# determine the minimum hp roll

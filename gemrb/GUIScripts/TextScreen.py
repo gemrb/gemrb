@@ -33,7 +33,7 @@ def FindTextRow (Table):
 
 	#this is still not the full implementation, but the original engine never used this stuff
 	Row = Table.GetRowIndex("DEFAULT")
-	if Table.GetValue (Row, 1) is None:
+	if Table.GetValue (Row, 1)== -1:
 		if GemRB.GameGetReputation() >= 100:
 			Row = Table.GetRowIndex("GOOD_REPUTATION")
 		else:

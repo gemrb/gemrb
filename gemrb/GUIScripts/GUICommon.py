@@ -612,7 +612,7 @@ def CanDualClass(actor):
 	Alignment = GemRB.GetPlayerStat (actor, IE_ALIGNMENT)
 	AlignmentColName = CommonTables.Aligns.FindValue (3, Alignment)
 	AlignmentColName = CommonTables.Aligns.GetValue (AlignmentColName, 4)
-	if AlignmentColName is None:
+	if AlignmentColName == -1:
 		print("CannotDualClass: extraordinary character alignment")
 		return 1
 	Sum = 0

@@ -180,7 +180,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 
 	# also treat most mod-introduced kits as kitless for skills.2da
 	# lookups - unless they add the required columns
-	if SkillsTable.GetValue ("OPEN_LOCKS", SkillsKitName) is None:
+	if SkillsTable.GetValue ("OPEN_LOCKS", SkillsKitName) == -1:
 		SkillsKitName = ClassName
 
 	#figure out the correct skills table

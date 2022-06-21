@@ -206,13 +206,13 @@ def getSkills(TextAreaControl):
 	else:
 		KitName = CommonTables.KitList.GetValue (KitName, 0)
 		
-	if SkillTable.GetValue ("RATE", KitName) is not None or BardSkills != "*" or RangerSkills != "*":
+	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount () - 2):
 			name = SkillTable.GetValue (skill+2, 1, GTV_REF)
 			stat = SkillTable.GetValue (skill + 2, 2)
 			available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
 			value = GemRB.GetPlayerStat (MyChar, stat)
-			if value >= 0 and available is not None:
+			if value >= 0 and available != -1:
 				info += name + ": " + str(value) + "\n"
 				
 	if info != "":

@@ -312,7 +312,7 @@ def DisplayGeneral (pc, targetTextArea):
 	Race = CommonTables.Races.GetValue (RaceIndex, 2)
 	tmp = CommonTables.Races.GetValue (RaceIndex, 8)
 
-	if tmp is None:
+	if tmp == -1:
 		tmp = highest
 	else:
 		tmp = GetFavoredClass(pc, tmp)

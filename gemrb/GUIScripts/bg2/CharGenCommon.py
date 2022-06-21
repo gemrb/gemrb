@@ -190,13 +190,13 @@ def DisplayOverview(step):
 			else:
 				KitName = CommonTables.KitList.GetValue (KitName, 0)
 
-			if SkillTable.GetValue ("RATE", KitName) is not None:
+			if SkillTable.GetValue ("RATE", KitName) != -1:
 				for skill in range(SkillTable.GetRowCount () - 2):
 					name = SkillTable.GetValue (skill+2, 1, GTV_REF)
 					available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
 					statID = SkillTable.GetValue (skill+2, 2)
 					value = GemRB.GetPlayerStat (MyChar, statID, 1)
-					if value >= 0 and available is not None:
+					if value >= 0 and available != -1:
 						info += name + ": " + str(value) + "\n"
 			elif BardSkills != "*" or RangerSkills != "*":
 				for skill in range(SkillTable.GetRowCount () - 2):
@@ -238,7 +238,7 @@ def DisplayOverview(step):
 			for i in range(ProfCount-8):
 				# 4294967296 overflows to -1 on some arches, so we use a smaller invalid strref
 				strref = TmpTable.GetValue (i+8, 1)
-				if strref is None or strref > 500000:
+				if strref == -1 or strref > 500000:
 					continue
 				Weapon = GemRB.GetString (strref)
 				StatID = TmpTable.GetValue (i+8, 0)

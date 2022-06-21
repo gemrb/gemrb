@@ -248,7 +248,7 @@ def OpenFeatsWindow(chargen=0):
 	ClassName = KitName = GUICommon.GetClassRowName (ClassIndex, "index")
 	# classcolumn is base class or 0 if it is not a kit
 	ClassColumn = CommonTables.Classes.GetValue(ClassName, "CLASS") - 1
-	if ClassColumn is None:  #it was already a base class
+	if ClassColumn < 0:  #it was already a base class
 		ClassColumn = ClassIndex
 		# feats.2da is transposed, but has the same ordering
 		FeatsClassColumn = ClassIndex + 3 # CommonTables.Classes.GetValue (ClassName, "ID") + 2

@@ -1130,7 +1130,7 @@ def ClassDonePress():
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
 	Kit = KitTable.GetValue (GemRB.GetVar ("MAGESCHOOL"), 3 )
-	if (Kit is None):
+	if (Kit == -1 ):
 		Kit = 0x4000
 
 	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
