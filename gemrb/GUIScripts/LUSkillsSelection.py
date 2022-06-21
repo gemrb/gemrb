@@ -203,7 +203,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		for i in range(SkillsTable.GetRowCount()-2):
 			# -2/+2 to compensate for the special first_level and rate rows
 			SkillName = SkillsTable.GetRowName (i+2)
-			if SkillsTable.GetValue (SkillName, SkillsKitName) != -1:
+			if SkillsTable.GetValue (SkillName, SkillsKitName) is not None:
 				SkillsIndices.append(i)
 
 		LevelDiff = []

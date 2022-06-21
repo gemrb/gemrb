@@ -498,7 +498,7 @@ def GetSkills(pc):
 	if HatedRace:
 		HateTable = GemRB.LoadTable ("haterace")
 		Racist = HateTable.FindValue (1, HatedRace)
-		if Racist != -1:
+		if Racist is not None:
 			HatedRace = HateTable.GetValue (Racist, 0, GTV_REF)
 			stats.append ( (15982, HatedRace, '') )
 

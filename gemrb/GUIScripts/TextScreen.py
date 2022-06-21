@@ -77,7 +77,7 @@ def StartTextScreen ():
 		TextTable = GemRB.LoadTable ("textscrn", 1)
 		if TextTable != None:
 			TxtRow = TextTable.GetRowIndex (TableName)
-			if TxtRow >= 0:
+			if TxtRow is not None:
 				ID = TextTable.GetValue (TxtRow, 0)
 				MusicName = TextTable.GetValue (TxtRow, 1)
 				Message = TextTable.GetValue (TxtRow, 2)
