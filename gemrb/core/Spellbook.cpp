@@ -1152,7 +1152,7 @@ std::string Spellbook::dump(bool print) const
 			idx = 0;
 			for (const auto& memorizedSpell : spellMemo->memorized_spells) {
 				if (!memorizedSpell) continue;
-				AppendFormat(buffer, " {:2d}: {} {:x}\n", idx, memorizedSpell->SpellResRef, memorizedSpell->Flags);
+				AppendFormat(buffer, " {:2d}: {} {:#x}\n", idx, memorizedSpell->SpellResRef, memorizedSpell->Flags);
 				idx++;
 			}
 		}

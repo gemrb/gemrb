@@ -4578,14 +4578,14 @@ std::string Actor::dump() const
 	AppendFormat(buffer, "Dialog:     {}    TalkCount:  {}\n", Dialog, TalkCount);
 	AppendFormat(buffer, "Global ID:  {}   PartySlot: {}\n", GetGlobalID(), InParty);
 	AppendFormat(buffer, "Script name:{:<32}    Current action: {}    Total: {}\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, actionQueue.size());
-	AppendFormat(buffer, "Int. Flags: 0x{:x}    ", InternalFlags);
-	AppendFormat(buffer, "MC Flags: 0x{:x}    ", Modified[IE_MC_FLAGS]);
+	AppendFormat(buffer, "Int. Flags: {:#x}    ", InternalFlags);
+	AppendFormat(buffer, "MC Flags: {:#x}    ", Modified[IE_MC_FLAGS]);
 	AppendFormat(buffer, "Allegiance: {}   current allegiance:{}\n", BaseStats[IE_EA], Modified[IE_EA] );
 	AppendFormat(buffer, "Class:      {}   current class:{}    Kit: {} (base: {})\n", BaseStats[IE_CLASS], Modified[IE_CLASS], Modified[IE_KIT], BaseStats[IE_KIT] );
 	AppendFormat(buffer, "Race:       {}   current race:{}\n", BaseStats[IE_RACE], Modified[IE_RACE] );
 	AppendFormat(buffer, "Gender:     {}   current gender:{}\n", BaseStats[IE_SEX], Modified[IE_SEX] );
 	AppendFormat(buffer, "Specifics:  {}   current specifics:{}\n", BaseStats[IE_SPECIFIC], Modified[IE_SPECIFIC] );
-	AppendFormat(buffer, "Alignment:  {:x}   current alignment:{:x}\n", BaseStats[IE_ALIGNMENT], Modified[IE_ALIGNMENT] );
+	AppendFormat(buffer, "Alignment:  {:#x}   current alignment:{:#x}\n", BaseStats[IE_ALIGNMENT], Modified[IE_ALIGNMENT] );
 	AppendFormat(buffer, "Morale:     {}   current morale:{}\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	AppendFormat(buffer, "Moralebreak:{}   Morale recovery:{}\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	AppendFormat(buffer, "Visualrange:{} (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );

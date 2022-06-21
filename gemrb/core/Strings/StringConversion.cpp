@@ -68,7 +68,7 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 					/* fc 80-83 are noncanonical */
 					nb = 6;
 				} else {
-					Log(WARNING, "String", "Invalid UTF-8 character: {:x}", currentChr);
+					Log(WARNING, "String", "Invalid UTF-8 character: {:#x}", currentChr);
 					continue;
 				}
 

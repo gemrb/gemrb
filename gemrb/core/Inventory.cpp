@@ -1501,7 +1501,7 @@ std::string Inventory::dump(bool print) const
 			continue;
 		}
 
-		AppendFormat(buffer, "{}: {} - ({} {} {}) Fl:0x{:x} Wt: {} x {}Lb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight);
+		AppendFormat(buffer, "{}: {} - ({} {} {}) Fl:{:#x} Wt: {} x {}Lb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight);
 	}
 
 	AppendFormat(buffer, "Equipped: {}       EquippedHeader: {}\n", Equipped, EquippedHeader);
