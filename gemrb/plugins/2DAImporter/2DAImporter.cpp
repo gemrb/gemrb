@@ -136,7 +136,7 @@ const std::string& p2DAImporter::QueryField(index_t row, index_t column) const
 	if (rows[row].size() <= column) {
 		return defVal;
 	}
-	if (rows[row][column][0]=='*' && !rows[row][column][1]) {
+	if (rows[row][column] == "*") {
 		return defVal;
 	}
 	return rows[row][column];
