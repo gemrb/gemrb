@@ -764,8 +764,8 @@ int Interface::LoadFonts()
 		ResRef resref = tab->QueryField(rowName, "RESREF");
 		const auto& font_name = tab->QueryField(rowName, "FONT_NAME");
 		ieWord font_size = tab->QueryFieldUnsigned<ieWord>( rowName, "PX_SIZE" ); // not available in BAM fonts.
-		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ).c_str() ); // not available in BAM fonts.
-		bool background = atoi(tab->QueryField(rowName, "BACKGRND").c_str());
+		FontStyle font_style = (FontStyle)tab->QueryFieldSigned<int>(rowName, "STYLE"); // not available in BAM fonts.
+		bool background = tab->QueryFieldSigned<int>(rowName, "BACKGRND") != 0;
 
 		Font* fnt = NULL;
 		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
