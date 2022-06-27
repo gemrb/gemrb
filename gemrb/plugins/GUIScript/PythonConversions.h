@@ -240,7 +240,7 @@ template <typename STR>
 PyObject* PyString_FromASCII(const STR& str)
 {
 	// PyUnicode_FromStringAndSize expects UTF-8 data, ascii is compatible with that
-	return PyUnicode_FromStringAndSize(str.CString(), str.length());
+	return PyUnicode_FromStringAndSize(str.c_str(), str.length());
 }
 	
 template <typename T>

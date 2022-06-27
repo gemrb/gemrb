@@ -469,7 +469,7 @@ void GameData::SaveStore(Store* store)
 
 	FileStream str;
 
-	if (!str.Create(store->Name.CString(), IE_STO_CLASS_ID)) {
+	if (!str.Create(store->Name.c_str(), IE_STO_CLASS_ID)) {
 		error("GameData", "Can't create file while saving store.");
 	}
 	if (!sm->PutStore(&str, store)) {

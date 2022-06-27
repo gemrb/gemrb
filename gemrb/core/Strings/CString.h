@@ -167,7 +167,7 @@ public:
 		std::fill(begin(), bufend(), '\0');
 	}
 	
-	const char* CString() const noexcept {
+	const char* c_str() const noexcept {
 		return str;
 	}
 	

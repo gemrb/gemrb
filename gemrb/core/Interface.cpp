@@ -3323,7 +3323,7 @@ void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID) const
 {
 	char filename[_MAX_PATH];
 
-	PathJoinExt(filename, config.CachePath, resref.CString(), TypeExt(ClassID));
+	PathJoinExt(filename, config.CachePath, resref.c_str(), TypeExt(ClassID));
 	unlink ( filename);
 }
 
@@ -3479,7 +3479,7 @@ bool Interface::ReadRandomItems()
 		return false;
 	}
 	ResRef randTreasureRef = tab->QueryField(1, difflev);
-	int i = atoi(randTreasureRef.CString());
+	int i = atoi(randTreasureRef.c_str());
 	if (i<1) {
 		ReadItemTable(randTreasureRef, 0); //reading the table itself
 		return true;
@@ -3618,7 +3618,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		} else {
 			i=Roll(1, itemlist.ResRefs.size(), -1);
 		}
-		strlcpy(NewItem, itemlist.ResRefs[i].CString(), 9);
+		strlcpy(NewItem, itemlist.ResRefs[i].c_str(), 9);
 		char *p = strchr(NewItem, '*');
 		int diceSides;
 		if (p) {
@@ -3937,7 +3937,7 @@ int Interface::SwapoutArea(Map *map) const
 		//this one will be destructed when we return from here
 		FileStream str;
 
-		str.Create(map->GetScriptName().CString(), IE_ARE_CLASS_ID);
+		str.Create(map->GetScriptName().c_str(), IE_ARE_CLASS_ID);
 		int ret = mm->PutArea (&str, map);
 		if (ret <0) {
 			Log(WARNING, "Core", "Area removed: {}",
@@ -3996,7 +3996,7 @@ int Interface::WriteGame(const char *folder)
 		//this one will be destructed when we return from here
 		FileStream str;
 
-		str.Create(folder, GameNameResRef.CString(), IE_GAM_CLASS_ID);
+		str.Create(folder, GameNameResRef.c_str(), IE_GAM_CLASS_ID);
 		int ret = gm->PutGame (&str, game);
 		if (ret <0) {
 			Log(WARNING, "Core", "Game cannot be saved: {}", folder);
@@ -4037,9 +4037,9 @@ int Interface::WriteWorldMap(const char *folder)
 		FileStream str1;
 		FileStream str2;
 
-		str1.Create(folder, WorldMapName[0].CString(), IE_WMP_CLASS_ID);
+		str1.Create(folder, WorldMapName[0].c_str(), IE_WMP_CLASS_ID);
 		if (!worldmap->IsSingle()) {
-			str2.Create(folder, WorldMapName[1].CString(), IE_WMP_CLASS_ID);
+			str2.Create(folder, WorldMapName[1].c_str(), IE_WMP_CLASS_ID);
 		}
 		ret = wmm->PutWorldMap (&str1, &str2, worldmap);
 	}
@@ -4064,7 +4064,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 {
 	FileStream str;
 
-	str.Create(folder, GameNameResRef.CString(), IE_SAV_CLASS_ID);
+	str.Create(folder, GameNameResRef.c_str(), IE_SAV_CLASS_ID);
 	DirectoryIterator dir(config.CachePath);
 	if (!dir) {
 		return GEM_ERROR;

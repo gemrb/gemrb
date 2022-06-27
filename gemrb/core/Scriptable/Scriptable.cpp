@@ -1479,7 +1479,7 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 	Point targetpos(-1, -1);
 	ResRef newSpell;
 	char surgeSpellRef[9];
-	strlcpy(surgeSpellRef, surgeSpell.CString(), 9);
+	strlcpy(surgeSpellRef, surgeSpell.c_str(), 9);
 	
 	int level = caster->GetCasterLevel(spl->SpellType);
 	switch (surgeSpellRef[0]) {

@@ -101,7 +101,7 @@ SaveGame::SaveGame(std::string path, std::string name, const ResRef& prefix, std
 	SaveID = saveID;
 	char nPath[_MAX_PATH + 1] = {};
 	struct stat my_stat;
-	PathJoinExt(nPath, Path.c_str(), Prefix.CString(), "bmp");
+	PathJoinExt(nPath, Path.c_str(), Prefix.c_str(), "bmp");
 	memset(&my_stat, 0, sizeof(my_stat));
 	if (stat(nPath, &my_stat)) {
 		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
@@ -221,20 +221,20 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	PathJoin(dtmp, Path, slotname, nullptr);
 
 	char ftmp[_MAX_PATH];
-	PathJoinExt(ftmp, dtmp, core->GameNameResRef.CString(), "bmp");
+	PathJoinExt(ftmp, dtmp, core->GameNameResRef.c_str(), "bmp");
 
 	if (access( ftmp, R_OK )) {
 		Log(WARNING, "SaveGameIterator", "Ignoring slot {} because of no appropriate preview!", dtmp);
 		return false;
 	}
 
-	PathJoinExt(ftmp, dtmp, core->WorldMapName[0].CString(), "wmp");
+	PathJoinExt(ftmp, dtmp, core->WorldMapName[0].c_str(), "wmp");
 	if (access( ftmp, R_OK )) {
 		return false;
 	}
 
 	if (core->WorldMapName[1]) {
-		PathJoinExt(ftmp, dtmp, core->WorldMapName[1].CString(), "wmp");
+		PathJoinExt(ftmp, dtmp, core->WorldMapName[1].c_str(), "wmp");
 		if (access(ftmp, R_OK)) {
 			Log(WARNING, "SaveGameIterator", "Ignoring slot {} because of no appropriate second worldmap!", dtmp);
 			return false;
@@ -435,7 +435,7 @@ static bool DoSaveGame(const char *Path, bool overrideRunning)
 	// scale down to get more of the screen and reduce the size
 	preview = core->GetVideoDriver()->SpriteScaleDown(preview, 5);
 	FileStream outfile;
-	outfile.Create( Path, core->GameNameResRef.CString(), IE_BMP_CLASS_ID );
+	outfile.Create( Path, core->GameNameResRef.c_str(), IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
 
 	return true;

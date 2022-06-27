@@ -661,7 +661,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 				}
 			} else if (res.BeginsWith("RA_")) {//iwd2 only
 				//remove ability
-				int x = atoi(res.CString() + 3);
+				int x = atoi(res.c_str() + 3);
 				actor->spellbook.RemoveSpell(x);
 			}
 		}
@@ -8713,7 +8713,7 @@ std::string Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
 			soundset = fmt::format("{}", PCStats->SoundFolder);
 		}
 	} else {
-		soundset = set.CString();
+		soundset = set.c_str();
 	}
 	return soundset;
 }

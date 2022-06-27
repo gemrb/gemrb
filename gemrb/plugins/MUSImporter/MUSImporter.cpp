@@ -276,9 +276,9 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 	} else if (!name.BeginsWith("SPC")) { //bg2
 		char File[_MAX_PATH];
 		fmt::format_to(File, "{}{}", PLName, name);
-		PathJoin(FName, PLName.CString(), File, nullptr);
+		PathJoin(FName, PLName.c_str(), File, nullptr);
 	} else {
-		strlcpy(FName, name.CString(), _MAX_PATH);
+		strlcpy(FName, name.c_str(), _MAX_PATH);
 	}
 
 	ResourceHolder<SoundMgr> sound = GetResourceHolder<SoundMgr>(FName, manager, true);

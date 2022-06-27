@@ -226,8 +226,8 @@ ieDword ResolveSpellNumber(const ResRef& spellRef)
 	tmp.Format("{:.4}", spellRef);
 	for (int i = 0; i < 5; i++) {
 		if (tmp == spell_suffices[i]) {
-			tmp = ResRef(spellRef.CString() + 4);
-			ieDword n = strtounsigned<ieDword>(tmp.CString());
+			tmp = ResRef(spellRef.c_str() + 4);
+			ieDword n = strtounsigned<ieDword>(tmp.c_str());
 			if (!n) {
 				return 0xffffffff;
 			}
@@ -460,7 +460,7 @@ void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 		if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
 			sound = fmt::format("{}/{}", actor->PCStats->SoundFolder, soundRef);
 		} else {
-			sound = soundRef.CString();
+			sound = soundRef.c_str();
 		}
 		return DisplayStringCore(Sender, Strref, flags, sound.c_str());
 	}
@@ -490,7 +490,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	if (soundpath == nullptr || soundpath[0] == '\0') {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
 		if (!sb.Sound.IsEmpty()) {
-			strlcpy(buffer, sb.Sound.CString(), sizeof(buffer));
+			strlcpy(buffer, sb.Sound.c_str(), sizeof(buffer));
 			soundpath = buffer;
 		}
 		if (!sb.text.empty()) {

@@ -3028,7 +3028,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 	}
 	WorldMap *wm = core->GetWorldMap();
 	//the area the user clicked on
-	PyObject* dict = Py_BuildValue("{s:s,s:s}", "Target", wmc->Area->AreaName.CString(), "Destination", wmc->Area->AreaName.CString());
+	PyObject* dict = Py_BuildValue("{s:s,s:s}", "Target", wmc->Area->AreaName.c_str(), "Destination", wmc->Area->AreaName.c_str());
 
 	if (wmc->Area->AreaName == core->GetGame()->CurrentArea) {
 		PyDict_SetItemString(dict, "Distance", PyLong_FromLong(-1));
@@ -3177,13 +3177,13 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		btn = GetView<Button>(self);
 		assert(btn);
 
-		PyObject* moduleName = PyImport_ImportModule(func->moduleName.CString());
+		PyObject* moduleName = PyImport_ImportModule(func->moduleName.c_str());
 		if (moduleName == nullptr) {
 			return RuntimeError("Hot key map referenced a moduleName that doesn't exist.");
 		}
 		PyObject* dict = PyModule_GetDict(moduleName);
 
-		PyObject* pFunc = PyDict_GetItemString(dict, func->function.CString());
+		PyObject* pFunc = PyDict_GetItemString(dict, func->function.c_str());
 		/* pFunc: Borrowed reference */
 		if (!PyCallable_Check(pFunc)) {
 			Py_DECREF(moduleName);
@@ -7945,7 +7945,7 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 	const STOCure *cure = store->GetCure(index);
-	return Py_BuildValue("{s:s,s:i,s:i}", "CureResRef", cure->CureResRef.CString(), "Price",
+	return Py_BuildValue("{s:s,s:i,s:i}", "CureResRef", cure->CureResRef.c_str(), "Price",
 						 cure->Price, "Description", (signed) GetSpellDesc(cure->CureResRef));
 }
 
@@ -8308,7 +8308,7 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Spell not found!" );
 	}
 
-	return Py_BuildValue("{s:s}", "SpellResRef", ks->SpellResRef.CString());
+	return Py_BuildValue("{s:s}", "SpellResRef", ks->SpellResRef.c_str());
 }
 
 
@@ -8384,7 +8384,7 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Spell not found!" );
 	}
 
-	return Py_BuildValue("{s:s,s:i}", "SpellResRef", ms->SpellResRef.CString(), "Flags", ms->Flags);
+	return Py_BuildValue("{s:s,s:i}", "SpellResRef", ms->SpellResRef.c_str(), "Flags", ms->Flags);
 }
 
 
@@ -10591,11 +10591,11 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	SetButtonCycle(bam, btn, (char) row.bytes[2], Button::SELECTED);
 	SetButtonCycle(bam, btn, (char) row.bytes[3], Button::DISABLED);
 	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BitOp::NAND);
-	PyObject *Event = PyUnicode_FromFormat("Action%sPressed", GUIEvent[Index].CString());
+	PyObject *Event = PyUnicode_FromFormat("Action%sPressed", GUIEvent[Index].c_str());
 	PyObject *func = PyDict_GetItem(dict, Event);
 	btn->SetAction(PythonControlCallback(func), Control::Click, GEM_MB_ACTION, 0, 1);
 
-	PyObject *Event2 = PyUnicode_FromFormat("Action%sRightPressed", GUIEvent[Index].CString());
+	PyObject *Event2 = PyUnicode_FromFormat("Action%sRightPressed", GUIEvent[Index].c_str());
 	PyObject *func2 = PyDict_GetItem(dict, Event2);
 	btn->SetAction(PythonControlCallback(func2), Control::Click, GEM_MB_MENU, 0, 1);
 

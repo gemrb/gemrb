@@ -67,7 +67,7 @@ struct HashKey<MapKey> {
 	static inline uint32_t hash(const ResRef& ref, SClass_ID type)
 	{
 		unsigned long h = type;
-		const char *c = ref.CString();
+		const char *c = ref.c_str();
 
 		for (unsigned int i = 0; *c && i < 9; ++i)
 			h = (h << 5) + h + tolower(*c++);

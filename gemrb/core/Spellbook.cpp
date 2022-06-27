@@ -216,7 +216,7 @@ bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 		const CRESpellMemorization* sm = spells[type][j];
 		for (auto& ms : sm->memorized_spells) {
 			if (!ms->Flags) continue;
-			if (atoi(ms->SpellResRef.CString() + 4) != spellid) continue;
+			if (atoi(ms->SpellResRef.c_str() + 4) != spellid) continue;
 
 			if (!(flags & HS_DEPLETE)) return true;
 
@@ -287,7 +287,7 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
 		const CRESpellMemorization* sm = spells[type][j];
 		for (const auto& knownSpell : sm->known_spells) {
-			if (atoi(knownSpell->SpellResRef.CString() + 4) == spellid) {
+			if (atoi(knownSpell->SpellResRef.c_str() + 4) == spellid) {
 				return true;
 			}
 		}
@@ -451,7 +451,7 @@ void Spellbook::RemoveSpell(int spellid, int type)
 {
 	for (const auto& spellMemo : spells[type]) {
 		for (auto ks = spellMemo->known_spells.begin(); ks != spellMemo->known_spells.end(); ++ks) {
-			if (atoi((*ks)->SpellResRef.CString() + 4) == spellid) {
+			if (atoi((*ks)->SpellResRef.c_str() + 4) == spellid) {
 				ResRef resRef = (*ks)->SpellResRef;
 				delete *ks;
 				ks = spellMemo->known_spells.erase(ks);
