@@ -245,7 +245,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			const String str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
 			int hours = worldmap->GetDistance(Area->AreaName);
 			if (!str.empty() && hours >= 0) {
-				SetTooltip(str + L": " + std::to_wstring(hours));
+				SetTooltip(str + L": " + fmt::to_wstring(hours));
 			}
 		}
 		break;

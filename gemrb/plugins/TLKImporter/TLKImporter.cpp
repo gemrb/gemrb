@@ -383,7 +383,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
 	}
 	if (bool(flags & STRING_FLAGS::STRREFON)) {
-		string = std::to_wstring(ieDword(strref)) + L": " + string;
+		string = fmt::to_wstring(ieDword(strref)) + L": " + string;
 	}
 	return string;
 }

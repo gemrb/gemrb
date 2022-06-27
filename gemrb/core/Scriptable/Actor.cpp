@@ -3254,7 +3254,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String msg = core->GetString(DisplayMessage::GetStringReference(STR_SAVE_SPELL + type));
-			msg += L" " + std::to_wstring(ret);
+			msg += L" " + fmt::to_wstring(ret);
 			displaymsg->DisplayStringName(std::move(msg), GUIColors::WHITE, this);
 		}
 		prevType = type;
@@ -4373,7 +4373,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			displaymsg->DisplayConstantStringName(strref, GUIColors::WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
 			//TODO: handle pst properly (decay, queueing, color)
-			SetOverheadText(std::to_wstring(damage), true);
+			SetOverheadText(fmt::to_wstring(damage), true);
 		} else if (!displaymsg->HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)

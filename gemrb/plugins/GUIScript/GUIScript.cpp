@@ -6631,7 +6631,7 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 	if (!btn) return;
 
 	if (charges && (charges>1 || !oneisnone) ) {
-		btn->SetText(std::to_wstring(charges));
+		btn->SetText(fmt::to_wstring(charges));
 	} else {
 		btn->SetText(L"");
 	}
