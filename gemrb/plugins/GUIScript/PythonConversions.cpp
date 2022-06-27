@@ -131,7 +131,7 @@ PyObject* PyString_FromStringView(StringView sv)
 // Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromResRef(const ResRef& resRef)
 {
-	return PyUnicode_FromStringAndSize(resRef.CString(), resRef.length());
+	return PyString_FromASCII(resRef);
 }
 	
 PyObject* PyString_FromStringObj(const std::string& s)
