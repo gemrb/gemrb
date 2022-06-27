@@ -459,7 +459,7 @@ void Inventory::KillSlot(unsigned int index)
 			UpdateWeaponAnimation();
 			break;
 		case SLOT_EFFECT_HEAD:
-			Owner->SetUsedHelmet("\0");
+			Owner->SetUsedHelmet({});
 			break;
 		case SLOT_EFFECT_ITEM:
 			//remove the armor type only if this item is responsible for it
@@ -1516,7 +1516,7 @@ void Inventory::EquipBestWeapon(int flags)
 	ieDword best_slot = SLOT_FIST;
 	const ITMExtHeader *header;
 	CREItem *Slot;
-	char AnimationType[2]={0,0};
+	AnimRef AnimationType;
 	ieWord MeleeAnimation[3]={100,0,0};
 
 	//cannot change equipment when holding magic weapons
@@ -1544,7 +1544,7 @@ void Inventory::EquipBestWeapon(int flags)
 			if (tmp>damage) {
 				best_slot = i;
 				damage = tmp;
-				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
+				AnimationType = itm->AnimationType;
 				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
 			gamedata->FreeItem( itm, Slot->ItemResRef, false );
@@ -1567,7 +1567,7 @@ void Inventory::EquipBestWeapon(int flags)
 			if (tmp>damage) {
 				best_slot = i;
 				damage = tmp;
-				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
+				AnimationType = itm->AnimationType;
 				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
 			gamedata->FreeItem( itm, Slot->ItemResRef, false );
@@ -1662,11 +1662,11 @@ ieDword Inventory::GetEquipExclusion(int index) const
 
 void Inventory::UpdateShieldAnimation(const Item *it)
 {
-	char AnimationType[2]={0,0};
+	AnimRef AnimationType;
 	unsigned char WeaponType = IE_ANI_WEAPON_1H;
 
 	if (it) {
-		memcpy(AnimationType, it->AnimationType, 2);
+		AnimationType = it->AnimationType;
 		if (core->CanUseItemType(SLOT_WEAPON, it)) {
 			WeaponType = IE_ANI_WEAPON_2W;
 		}
@@ -1684,7 +1684,7 @@ void Inventory::UpdateWeaponAnimation()
 	}
 	unsigned char WeaponType = IE_ANI_WEAPON_INVALID;
 
-	char AnimationType[2]={0,0};
+	AnimRef AnimationType;
 	ieWord MeleeAnimation[3]={100,0,0};
 	CREItem *Slot;
 
@@ -1697,7 +1697,7 @@ void Inventory::UpdateWeaponAnimation()
 	}
 
 	itm->GetDamagePotential(false, header);
-	memcpy(AnimationType, itm->AnimationType, sizeof(AnimationType));
+	AnimationType = itm->AnimationType;
 	// for twohanded flag, you don't need itm
 	if (Slot->Flags & IE_INV_ITEM_TWOHANDED) {
 		WeaponType = IE_ANI_WEAPON_2H;

@@ -9178,7 +9178,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "DialogName", DecRef(PyLong_FromLong, (signed)item->DialogName));
 	PyDict_SetItemString(dict, "Price", DecRef(PyLong_FromLong, item->Price));
 	PyDict_SetItemString(dict, "Type", DecRef(PyLong_FromLong, item->ItemType));
-	PyDict_SetItemString(dict, "AnimationType", DecRef(PyString_FromAnimID, item->AnimationType));
+	PyDict_SetItemString(dict, "AnimationType", DecRef(PyString_FromASCII<AnimRef>, item->AnimationType));
 	PyDict_SetItemString(dict, "Exclusion", DecRef(PyLong_FromLong, item->ItemExcl));
 	PyDict_SetItemString(dict, "LoreToID", DecRef(PyLong_FromLong, item->LoreToID));
 	PyDict_SetItemString(dict, "Enchantment", PyLong_FromLong(item->Enchantment));

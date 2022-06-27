@@ -4540,7 +4540,7 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 	} else {
 		// swing sounds start at column 3 (index 2)
 		int isChoice = core->Roll(1, isCount, -1) + 2;
-		if (!gamedata->GetItemSound(sound, itemType, nullptr, isChoice)) return;
+		if (!gamedata->GetItemSound(sound, itemType, AnimRef(), isChoice)) return;
 	}
 
 	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos);
@@ -9375,9 +9375,9 @@ void Actor::ClearCurrentStanceAnims()
 	currentStance.shadow.clear();
 }
 
-void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAnimation, unsigned char wt)
+void Actor::SetUsedWeapon(AnimRef AnimationType, const ieWord* MeleeAnimation, unsigned char wt)
 {
-	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
+	WeaponRef = AnimationType;
 	if (wt != IE_ANI_WEAPON_INVALID) WeaponType = wt;
 	if (!anims)
 		return;
@@ -9410,9 +9410,9 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAni
 	AttackStance = IE_ANI_ATTACK;
 }
 
-void Actor::SetUsedShield(const char (&AnimationType)[2], unsigned char wt)
+void Actor::SetUsedShield(AnimRef AnimationType, unsigned char wt)
 {
-	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
+	ShieldRef = AnimationType;
 	if (wt != IE_ANI_WEAPON_INVALID) WeaponType = wt;
 	if (AnimationType[0] == ' ' || AnimationType[0] == 0)
 		if (WeaponType == IE_ANI_WEAPON_2W)
@@ -9430,9 +9430,9 @@ void Actor::SetUsedShield(const char (&AnimationType)[2], unsigned char wt)
 	}
 }
 
-void Actor::SetUsedHelmet(const char (&AnimationType)[2])
+void Actor::SetUsedHelmet(AnimRef AnimationType)
 {
-	memcpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
+	HelmetRef = AnimationType;
 	if (!anims)
 		return;
 	

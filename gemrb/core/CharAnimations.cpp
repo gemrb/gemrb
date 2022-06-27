@@ -396,9 +396,9 @@ void CharAnimations::SetWeaponType(unsigned char wt)
 	}
 }
 
-void CharAnimations::SetHelmetRef(const char* ref)
+void CharAnimations::SetHelmetRef(AnimRef ref)
 {
-	strlcpy(HelmetRef, ref, sizeof(HelmetRef)+1);
+	HelmetRef = ref;
 
 	// Only drop helmet anims?
 	// Note: this doesn't happen "often", so this isn't a performance
@@ -408,10 +408,9 @@ void CharAnimations::SetHelmetRef(const char* ref)
 	ModPartPalettes[PAL_HELMET] = nullptr;
 }
 
-void CharAnimations::SetWeaponRef(const char* ref)
+void CharAnimations::SetWeaponRef(AnimRef ref)
 {
-	WeaponRef[0] = ref[0];
-	WeaponRef[1] = ref[1];
+	WeaponRef = ref;
 
 	// TODO: Only drop weapon anims?
 	DropAnims();
@@ -419,10 +418,9 @@ void CharAnimations::SetWeaponRef(const char* ref)
 	ModPartPalettes[PAL_WEAPON] = nullptr;
 }
 
-void CharAnimations::SetOffhandRef(const char* ref)
+void CharAnimations::SetOffhandRef(AnimRef ref)
 {
-	OffhandRef[0] = ref[0];
-	OffhandRef[1] = ref[1];
+	OffhandRef = ref;
 
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
@@ -1398,7 +1396,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 	}
 }
 
-void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
+void CharAnimations::GetEquipmentResRef(AnimRef equipRef, bool offhand,
 										ResRef& dest, unsigned char& Cycle,
 										const EquipResRefData& equip) const
 {
@@ -1903,12 +1901,12 @@ void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::GetVHREquipmentRef(ResRef& dest, unsigned char& Cycle,
-										const char* equipRef, bool offhand,
+										AnimRef equipRef, bool offhand,
 										const EquipResRefData& equip) const
 {
 	Cycle = equip.Cycle;
 
-	dest.Format("wq{}{}{}", GetSize(), equipRef[0], equipRef[1]);
+	dest.Format("wq{}{}", GetSize(), equipRef);
 	if (offhand) {
 		dest.Append("o");
 	}
@@ -2147,15 +2145,15 @@ void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::GetMHREquipmentRef(ResRef& dest, unsigned char& Cycle,
-										const char* equipRef, bool offhand,
+										AnimRef equipRef, bool offhand,
 										const EquipResRefData& equip) const
 {
 	Cycle = equip.Cycle;
 	if (offhand) {
 		//i think there is no offhand stuff for bg1, lets use the bg2 equivalent here?
-		dest.Format("wq{}{}{}o", GetSize(), equipRef[0], equipRef[1], equip.Suffix);
+		dest.Format("wq{}{}o{}", GetSize(), equipRef, equip.Suffix);
 	} else {
-		dest.Format("wp{}{}{}{}", GetSize(), equipRef[0], equipRef[1], equip.Suffix);
+		dest.Format("wp{}{}{}", GetSize(), equipRef, equip.Suffix);
 	}
 }
 
@@ -2458,11 +2456,11 @@ void CharAnimations::AddLRSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::GetLREquipmentRef(ResRef& dest, unsigned char& Cycle,
-									   const char* equipRef, bool /*offhand*/,
+									   AnimRef equipRef, bool /*offhand*/,
 									   const EquipResRefData& equip) const
 {
 	Cycle = equip.Cycle;
-	dest.Format("{}{}{}", ResRefBase, equipRef[0], equip.Suffix);
+	dest.Format("{}{}{}", ResRefBase, equipRef, equip.Suffix);
 }
 
 //Only for the ogre animation (MOGR)

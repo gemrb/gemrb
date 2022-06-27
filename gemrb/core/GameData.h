@@ -26,6 +26,7 @@
 #include "ie_types.h"
 
 #include "Cache.h"
+#include "CharAnimations.h"
 #include "Holder.h"
 #include "Palette.h"
 #include "Resource.h"
@@ -142,7 +143,7 @@ public:
 	void SaveAllStores();
 
 	// itemsnd.2da functions
-	bool GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
+	bool GetItemSound(ResRef &Sound, ieDword ItemType, AnimRef ID, ieDword Col);
 	int GetSwingCount(ieDword ItemType);
 
 	int GetRacialTHAC0Bonus(ieDword proficiency, const std::string& raceName);

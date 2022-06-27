@@ -32,6 +32,7 @@
 #include "ie_types.h"
 #include "Resource.h"
 
+#include "CharAnimations.h"
 #include "EffectQueue.h"
 
 #include <vector>
@@ -190,7 +191,7 @@ public:
 	ieDword Flags = 0;
 	ieWord ItemType = 0;
 	ieDword UsabilityBitmask = 0;
-	char AnimationType[2]{};
+	AnimRef AnimationType {};
 	ieByte MinLevel = 0;
 	ieByte unknown1 = 0; // ee docs say it's part of MinLevel read as a word, so useless
 	ieByte MinStrength = 0;

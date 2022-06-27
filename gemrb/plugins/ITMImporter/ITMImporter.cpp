@@ -148,12 +148,7 @@ Item* ITMImporter::GetItem(Item *s)
 	str->ReadDword(s->Flags);
 	str->ReadWord(s->ItemType);
 	str->ReadDword(s->UsabilityBitmask);
-	str->Read( s->AnimationType,2 ); //intentionally not reading word!
-	for (char& c : s->AnimationType) {
-		if (c == ' ') {
-			c = 0;
-		}
-	}
+	str->ReadRTrimString(s->AnimationType, 2);
 	str->Read( &s->MinLevel, 1 );
 	str->Read( &s->unknown1, 1 );
 	str->Read( &s->MinStrength,1 );

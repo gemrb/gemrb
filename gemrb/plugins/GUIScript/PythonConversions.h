@@ -229,15 +229,19 @@ PyObject* PyLong_FromStrRef(ieStrRef);
 
 // Like PyString_FromString(), but for (ie)ResRef
 PyObject* PyString_FromResRef(const ResRef& resRef);
-
-PyObject* PyString_FromAnimID(const char* AnimID);
-
 PyObject* PyString_FromString(const char* s);
 PyObject* PyString_FromStringView(StringView sv);
 PyObject* PyString_FromStringObj(const std::string&);
 PyObject* PyString_FromStringObj(const String&);
 
 String* PyString_AsStringObj(PyObject *obj);
+
+template <typename STR>
+PyObject* PyString_FromASCII(const STR& str)
+{
+	// PyUnicode_FromStringAndSize expects UTF-8 data, ascii is compatible with that
+	return PyUnicode_FromStringAndSize(str.CString(), str.length());
+}
 	
 template <typename T>
 PyObject* PyObject_FromPtr(T* p)

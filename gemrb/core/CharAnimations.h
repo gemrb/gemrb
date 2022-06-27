@@ -160,6 +160,8 @@ struct AvatarStruct {
 
 struct EquipResRefData;
 
+using AnimRef = FixedSizeString<2>;
+
 class GEM_EXPORT CharAnimations {
 public:
 	// using shared_ptr<Animation> because several orientations can share the same animation
@@ -195,9 +197,9 @@ public:
 	void SetArmourLevel(int ArmourLevel);
 	void SetRangedType(int Ranged);
 	void SetWeaponType(unsigned char WeaponType);
-	void SetHelmetRef(const char* ref);
-	void SetWeaponRef(const char* ref);
-	void SetOffhandRef(const char* ref);
+	void SetHelmetRef(AnimRef ref);
+	void SetWeaponRef(AnimRef ref);
+	void SetOffhandRef(AnimRef ref);
 	void SetColors(const ieDword *Colors);
 	void CheckColorMod();
 	void SetupColors(PaletteType type);
@@ -249,7 +251,7 @@ private:
 	void AddVHR3Suffix(ResRef& dest, unsigned char AnimID,
 		unsigned char& Cycle, orient_t Orient) const;
 	void GetVHREquipmentRef(ResRef& dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, const EquipResRefData& equip) const;
+							AnimRef equipRef, bool offhand, const EquipResRefData& equip) const;
 	void AddSixSuffix(ResRef& dest, unsigned char AnimID,
 		unsigned char& Cycle, orient_t Orient) const;
 	void AddTwoPieceSuffix(ResRef& dest, unsigned char AnimID,
@@ -257,7 +259,7 @@ private:
 	void AddMHRSuffix(ResRef& dest, unsigned char AnimID,
 		unsigned char& Cycle, orient_t Orient, EquipResRefData& equip) const;
 	void GetMHREquipmentRef(ResRef& dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, const EquipResRefData& equip) const;
+							AnimRef equipRef, bool offhand, const EquipResRefData& equip) const;
 	void AddMMRSuffix(ResRef& dest, unsigned char AnimID,
 		unsigned char& Cycle, orient_t Orient, bool mirror) const;
 	void AddMMR2Suffix(ResRef& dest, unsigned char AnimID,
@@ -271,14 +273,14 @@ private:
 	void AddLRSuffix2( ResRef& dest, unsigned char StanceID,
 		unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const;
 	void GetLREquipmentRef(ResRef& dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, const EquipResRefData& equip) const;
+						   AnimRef equipRef, bool offhand, const EquipResRefData& equip) const;
 	void AddLR2Suffix(ResRef& dest, unsigned char AnimID,
 		unsigned char& Cycle, orient_t Orient) const;
 	void AddLR3Suffix(ResRef& dest, unsigned char AnimID,
 		unsigned char& Cycle, orient_t Orient) const;
 	void GetAnimResRef(unsigned char AnimID, orient_t Orient,
 		ResRef& dest, unsigned char& Cycle, int Part, EquipResRefData& equip) const;
-	void GetEquipmentResRef(const char* equipRef, bool offhand,
+	void GetEquipmentResRef(AnimRef equipRef, bool offhand,
 		ResRef& dest, unsigned char& Cycle, const EquipResRefData& equip) const;
 	unsigned char MaybeOverrideStance(unsigned char stance) const;
 	void MaybeUpdateMainPalette(const Animation&);
@@ -302,9 +304,9 @@ private:
 	StanceAnim Anims;
 	StanceAnim shadowAnimations;
 
-	char HelmetRef[2]{};
-	char WeaponRef[2]{};
-	char OffhandRef[2]{};
+	AnimRef HelmetRef;
+	AnimRef WeaponRef;
+	AnimRef OffhandRef;
 };
 
 }

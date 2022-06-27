@@ -349,9 +349,9 @@ public:
 	ieDword LastExit = 0;    // the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ResRef LastArea;
-	char ShieldRef[2]{};
-	char HelmetRef[2]{};
-	char WeaponRef[2]{};
+	AnimRef ShieldRef;
+	AnimRef HelmetRef;
+	AnimRef WeaponRef;
 	unsigned char WeaponType = 0;
 	ieDword multiclass = 0;
 	bool GotLUFeedback = false;
@@ -853,10 +853,10 @@ public:
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, BitOp mode);
 	void SetFeatValue(unsigned int feat, int value, bool init = true);
-	void SetUsedWeapon(const char (&AnimationType)[2], const ieWord *MeleeAnimation,
+	void SetUsedWeapon(AnimRef, const ieWord *MeleeAnimation,
 		unsigned char WeaponType = IE_ANI_WEAPON_INVALID);
-	void SetUsedShield(const char (&AnimationType)[2], unsigned char WeaponType = IE_ANI_WEAPON_INVALID);
-	void SetUsedHelmet(const char (&AnimationType)[2]);
+	void SetUsedShield(AnimRef, unsigned char WeaponType = IE_ANI_WEAPON_INVALID);
+	void SetUsedHelmet(AnimRef);
 	void SetupFist();
 	/* Returns nonzero if the caster is held */
 	int Immobile() const;

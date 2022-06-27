@@ -133,12 +133,6 @@ PyObject* PyString_FromResRef(const ResRef& resRef)
 {
 	return PyUnicode_FromStringAndSize(resRef.CString(), resRef.length());
 }
-
-PyObject* PyString_FromAnimID(const char* AnimID)
-{
-	unsigned int i = strnlen(AnimID,2);
-	return PyUnicode_FromStringAndSize( AnimID, i );
-}
 	
 PyObject* PyString_FromStringObj(const std::string& s)
 {

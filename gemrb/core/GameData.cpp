@@ -506,7 +506,7 @@ void GameData::ReadItemSounds()
 	}
 }
 
-bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
+bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, AnimRef ID, ieDword Col)
 {
 	Sound.Reset();
 
@@ -518,7 +518,7 @@ bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieD
 		return false;
 	}
 
-	if (ID && ID[1] == 'A') {
+	if (!ID.IsEmpty() && ID[1] == 'A') {
 		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A' (pst)
 		//item animation types
 		ItemType = ItemSounds.size()-4 + ID[0]-'1';
