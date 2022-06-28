@@ -3522,9 +3522,6 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 {
 	if (RtRows.empty()) return true;
 	for(int loop=0;loop<MAX_LOOP;loop++) {
-		char *endptr;
-		char NewItem[9];
-
 		if (RtRows.count(itm->ItemResRef) == 0) {
 			const Item* item = gamedata->GetItem(itm->ItemResRef, true);
 			if (!item) {
@@ -3543,21 +3540,22 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		} else {
 			i=Roll(1, itemlist.ResRefs.size(), -1);
 		}
-		strlcpy(NewItem, itemlist.ResRefs[i].c_str(), 9);
-		char *p = strchr(NewItem, '*');
+		// Explode to ResRef, so that there is a null terminator for strtosigned
+		auto parts = Explode<ResRef, ResRef>(itemlist.ResRefs[i], '*', 1);
 		int diceSides;
-		if (p) {
-			*p=0; //doing this so endptr is ok
-			diceSides = strtosigned<int>(p + 1, nullptr, 10);
+		if (parts.size() > 1) {
+			diceSides = strtosigned<int>(parts[1].c_str(), nullptr, 10);
 		} else {
 			diceSides = 1;
 		}
-		int diceThrows = strtosigned<int>(NewItem, &endptr, 10);
+		
+		char *endptr;
+		int diceThrows = strtosigned<int>(parts[0].c_str(), &endptr, 10);
 		if (diceThrows < 1 || diceSides <= 1) {
 			diceThrows = 1;
 		}
 		if (*endptr) {
-			itm->ItemResRef = NewItem;
+			itm->ItemResRef = parts[0];
 		} else {
 			itm->ItemResRef = GoldResRef;
 		}
