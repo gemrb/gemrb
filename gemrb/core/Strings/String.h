@@ -127,6 +127,7 @@ template<typename STR, typename RET = StringViewT<STR>>
 std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', size_t lim = 0)
 {
 	std::vector<RET> elements;
+	elements.reserve(lim + 1);
 	size_t beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR));
 	size_t cur = beg;
 	for (; cur < str.length(); ++cur)
