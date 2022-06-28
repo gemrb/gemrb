@@ -954,8 +954,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 	EquipResRefData equipment;
 	for (int part = 0; part < partCount; ++part)
 	{
-		//newresref is based on the prefix (ResRef) and various
-		// other things, so it's longer than a typical ResRef
+		// NewResRef is based on the prefix ResRef and various suffixes
 		ResRef NewResRef;
 		unsigned char Cycle = 0;
 		if (part < actorPartCount) {
