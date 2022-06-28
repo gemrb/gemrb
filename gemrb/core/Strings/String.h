@@ -134,9 +134,10 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 		if (str[cur] == delim) {
 			elements.emplace_back(&str[beg], cur - beg);
 			beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR), cur + 1);
-			if (lim && elements.size() == lim) {
+			if (beg == STR::npos || (lim && elements.size() == lim)) {
 				break;
 			}
+			cur = beg;
 		}
 	}
 
