@@ -248,10 +248,10 @@ ResRef ProjectileServer::GetExplosion(size_t idx, int type)
 	if (idx >= explosions.size()) {
 		return ResRef();
 	}
-	ResRef const *ret = &explosions[idx].resources[type];
-	if (!ret || IsStar(*ret)) return ResRef();
+	ResRef const ret = explosions[idx].resources[type];
+	if (ret.IsEmpty() || IsStar(ret)) return ResRef();
 
-	return *ret;
+	return ret;
 }
 
 }
