@@ -1505,134 +1505,61 @@ Audio* Interface::GetAudioDrv(void) const {
 
 const char* Interface::TypeExt(SClass_ID type) const
 {
-	switch (type) {
-		case IE_2DA_CLASS_ID:
-			return "2da";
+	static const std::map<int, const char*> extensions = {
+		{ IE_2DA_CLASS_ID, "2da" },
+		{ IE_ACM_CLASS_ID, "acm" },
+		{ IE_ARE_CLASS_ID, "are" },
+		{ IE_BAM_CLASS_ID, "bam" },
+		{ IE_BCS_CLASS_ID, "bcs" },
+		{ IE_BS_CLASS_ID, "bs" },
+		{ IE_BIF_CLASS_ID, "bif" },
+		{ IE_BMP_CLASS_ID, "bmp" },
+		{ IE_PNG_CLASS_ID, "png" },
+		{ IE_CHR_CLASS_ID, "chr" },
+		{ IE_CHU_CLASS_ID, "chu" },
+		{ IE_CRE_CLASS_ID, "cre" },
+		{ IE_DLG_CLASS_ID, "dlg" },
+		{ IE_EFF_CLASS_ID, "eff" },
+		{ IE_GAM_CLASS_ID, "gam" },
+		{ IE_IDS_CLASS_ID, "ids" },
+		{ IE_INI_CLASS_ID, "ini" },
+		{ IE_ITM_CLASS_ID, "itm" },
+		{ IE_MOS_CLASS_ID, "mos" },
+		{ IE_MUS_CLASS_ID, "mus" },
+		{ IE_MVE_CLASS_ID, "mve" },
+		{ IE_OGG_CLASS_ID, "ogg" },
+		{ IE_PLT_CLASS_ID, "plt" },
+		{ IE_PRO_CLASS_ID, "pro" },
+		{ IE_SAV_CLASS_ID, "sav" },
+		{ IE_SPL_CLASS_ID, "spl" },
+		{ IE_SRC_CLASS_ID, "src" },
+		{ IE_STO_CLASS_ID, "sto" },
+		{ IE_TIS_CLASS_ID, "tis" },
+		{ IE_TLK_CLASS_ID, "tlk" },
+		{ IE_TOH_CLASS_ID, "toh" },
+		{ IE_TOT_CLASS_ID, "tot" },
+		{ IE_VAR_CLASS_ID, "var" },
+		{ IE_VEF_CLASS_ID, "vef" },
+		{ IE_VVC_CLASS_ID, "vvc" },
+		{ IE_WAV_CLASS_ID, "wav" },
+		{ IE_WED_CLASS_ID, "wed" },
+		{ IE_WFX_CLASS_ID, "wfx" },
+		{ IE_WMP_CLASS_ID, "wmp" },
+	};
 
-		case IE_ACM_CLASS_ID:
-			return "acm";
-
-		case IE_ARE_CLASS_ID:
-			return "are";
-
-		case IE_BAM_CLASS_ID:
-			return "bam";
-
-		case IE_BCS_CLASS_ID:
-			return "bcs";
-
-		case IE_BS_CLASS_ID:
-			return "bs";
-
-		case IE_BIF_CLASS_ID:
-			return "bif";
-
-		case IE_BIO_CLASS_ID:
-			if (HasFeature(GF_BIOGRAPHY_RES)) {
-				return "res";
-			}
-			return "bio";
-
-		case IE_BMP_CLASS_ID:
-			return "bmp";
-
-		case IE_PNG_CLASS_ID:
-			return "png";
-
-		case IE_CHR_CLASS_ID:
-			return "chr";
-
-		case IE_CHU_CLASS_ID:
-			return "chu";
-
-		case IE_CRE_CLASS_ID:
-			return "cre";
-
-		case IE_DLG_CLASS_ID:
-			return "dlg";
-
-		case IE_EFF_CLASS_ID:
-			return "eff";
-
-		case IE_GAM_CLASS_ID:
-			return "gam";
-
-		case IE_IDS_CLASS_ID:
-			return "ids";
-
-		case IE_INI_CLASS_ID:
-			return "ini";
-
-		case IE_ITM_CLASS_ID:
-			return "itm";
-
-		case IE_MOS_CLASS_ID:
-			return "mos";
-
-		case IE_MUS_CLASS_ID:
-			return "mus";
-
-		case IE_MVE_CLASS_ID:
-			return "mve";
-
-		case IE_OGG_CLASS_ID:
-			return "ogg";
-
-		case IE_PLT_CLASS_ID:
-			return "plt";
-
-		case IE_PRO_CLASS_ID:
-			return "pro";
-
-		case IE_SAV_CLASS_ID:
-			return "sav";
-
-		case IE_SPL_CLASS_ID:
-			return "spl";
-
-		case IE_SRC_CLASS_ID:
-			return "src";
-
-		case IE_STO_CLASS_ID:
-			return "sto";
-
-		case IE_TIS_CLASS_ID:
-			return "tis";
-
-		case IE_TLK_CLASS_ID:
-			return "tlk";
-
-		case IE_TOH_CLASS_ID:
-			return "toh";
-
-		case IE_TOT_CLASS_ID:
-			return "tot";
-
-		case IE_VAR_CLASS_ID:
-			return "var";
-
-		case IE_VEF_CLASS_ID:
-			return "vef";
-
-		case IE_VVC_CLASS_ID:
-			return "vvc";
-
-		case IE_WAV_CLASS_ID:
-			return "wav";
-
-		case IE_WED_CLASS_ID:
-			return "wed";
-
-		case IE_WFX_CLASS_ID:
-			return "wfx";
-
-		case IE_WMP_CLASS_ID:
-			return "wmp";
-
-		default:
-			Log(ERROR, "Interface", "No extension associated to class ID: {}", type);
+	if (type == IE_BIO_CLASS_ID) {
+		if (HasFeature(GF_BIOGRAPHY_RES)) {
+			return "res";
+		}
+		return "bio";
 	}
-	return NULL;
+
+	const auto extIt = extensions.find(type);
+	if (extIt == extensions.end()) {
+		Log(ERROR, "Interface", "No extension associated to class ID: {}", type);
+		return nullptr;
+	}
+	return extIt->second;
 }
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
