@@ -104,9 +104,7 @@ void RTrim(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 	auto pos = FindLastNotOf(string, chars);
 	if (pos == STR::npos) {
 		// deal with delimiter-only strings
-		if (FindFirstNotOf(string, chars) == STR::npos) {
-			string.clear();
-		}
+		string.clear();
 	} else {
 		string.erase(pos + 1);
 	}
