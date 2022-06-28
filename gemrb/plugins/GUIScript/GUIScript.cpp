@@ -2867,7 +2867,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		memcpy(entry.AreaLinksIndex, indices, sizeof(entry.AreaLinksIndex) );
 		memcpy(entry.AreaLinksCount, links, sizeof(entry.AreaLinksCount) );
 
-		int thisarea = wmap->GetEntryCount();
+		int newAreaIdx = wmap->GetEntryCount(); // once we add it in the next line
 		wmap->AddAreaEntry(std::move(entry));
 		for (unsigned int j=0;j<total;j++) {
 			const ResRef larea = newlinks->QueryField(j,0);
@@ -2900,9 +2900,9 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			}
 
 			//first come the local links, then 'links to' this area
-			//local is total-linksto
-			if (j<local) {
-				link.AreaIndex = thisarea;
+			// if the LINKTO_DIR column has a *, ignore it
+			if (j < local && linktodir != std::numeric_limits<int>::min()) {
+				link.AreaIndex = newAreaIdx;
 				//linktodir may need translation
 				wmap->InsertAreaLink(areaindex, linktodir, std::move(link));
 			} else {
