@@ -1706,6 +1706,7 @@ void CharAnimations::AddFFSuffix(ResRef& dest, unsigned char StanceID,
 	dest[dest.length()] = static_cast<char>(Part + '1');
 }
 
+// demigorgon's 4-part animation
 void CharAnimations::AddFF2Suffix(ResRef& dest, unsigned char StanceID,
 								  unsigned char& Cycle, orient_t Orient, int Part) const
 {
@@ -1764,7 +1765,9 @@ void CharAnimations::AddFF2Suffix(ResRef& dest, unsigned char StanceID,
 			error("CharAnimation", "Four frames 2 Animation: unhandled stance: {} {}", dest, StanceID);
 
 	}
-	dest[dest.length()] = static_cast<char>(Part + '1');
+
+	// change the placeholder 0 to a part number
+	dest[dest.length() - 2] = static_cast<char>(Part + '1');
 }
 
 void CharAnimations::AddNFSuffix(ResRef& dest, unsigned char StanceID,
