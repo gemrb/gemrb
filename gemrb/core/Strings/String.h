@@ -150,7 +150,8 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 }
 
 template <typename STR>
-StringViewT<STR> SubStr(const STR& str, typename STR::size_type pos, typename STR::size_type len) {
+StringViewT<STR> SubStr(const STR& str, typename STR::size_type pos, typename STR::size_type len = STR::npos) {
+	if (len == STR::npos) len = str.length() - pos;
 	assert(pos + len <= str.length());
 	return StringViewT<STR>(&str[0] + pos, len);
 }

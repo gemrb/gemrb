@@ -162,6 +162,10 @@ public:
 	size_type length() const noexcept {
 		return strnlen(str, sizeof(str));
 	}
+	
+	bool empty() const noexcept {
+		return length() == 0;
+	}
 
 	void clear() noexcept {
 		std::fill(begin(), bufend(), '\0');
@@ -192,7 +196,7 @@ public:
 	}
 	
 	const_iterator bufend() const noexcept {
-		return &str[LEN + 1];
+		return &str[LEN];
 	}
 	
 	std::reverse_iterator<const_iterator> rbegin() const noexcept {
@@ -212,7 +216,7 @@ public:
 	}
 	
 	iterator bufend() noexcept {
-		return &str[LEN + 1];
+		return &str[LEN];
 	}
 	
 	std::reverse_iterator<iterator> rbegin() noexcept {
