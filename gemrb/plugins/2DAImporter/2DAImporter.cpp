@@ -25,18 +25,9 @@
 
 using namespace GemRB;
 
-#define SIGNLENGTH 256      //if a 2da has longer default value, change this
-
 static bool StringCompKey(const std::string& str, TableMgr::key_t key)
 {
 	return stricmp(str.c_str(), key.c_str()) == 0;
-}
-
-p2DAImporter::p2DAImporter() noexcept
-{
-	colNames.reserve(10);
-	rowNames.reserve(10);
-	rows.reserve(10);
 }
 
 bool p2DAImporter::Open(DataStream* str)
@@ -44,62 +35,47 @@ bool p2DAImporter::Open(DataStream* str)
 	if (str == NULL) {
 		return false;
 	}
-	char Signature[SIGNLENGTH];
 	str->CheckEncrypted();
 
-	str->ReadLine( Signature, sizeof(Signature) );
-	const char* strp = Signature;
-	while (*strp == ' ')
-		strp++;
-	if (strncmp( strp, "2DA V1.0", 8 ) != 0) {
+	std::string line;
+	str->ReadLine(line);
+	LTrim(line);
+	if (line.compare(0, 8, "2DA V1.0") != 0) {
 		Log(WARNING, "2DAImporter", "Bad signature ({})! Complaining, but not ignoring...", str->filename);
 		// we don't care about this, so exptable.2da of iwd2 won't cause a bigger problem
 		// also, certain creatures are described by 2da's without signature.
 		// return false;
 	}
-	str->ReadLine( Signature, sizeof(Signature) );
-	const char* token = strtok(Signature, " ");
-	if (token) {
-		defVal = token;
+	str->ReadLine(line);
+	auto pos = line.find_first_of(' ');
+	if (pos != std::string::npos) {
+		defVal = line.substr(0, pos);
 	} else { // no whitespace
-		defVal = Signature;
+		defVal = line;
 	}
-	bool colHead = true;
-	int row = 0;
 	
-	constexpr int MAXLENGTH = 8192;
-	char buffer[MAXLENGTH]; // we can increase this if needed, but beware since it is a stack buffer
-	while (true) {
-		strret_t len = str->ReadLine(buffer, MAXLENGTH);
-		if (len <= 0) {
-			break;
-		}
-		if (buffer[0] == '#') { // allow comments
-			continue;
-		}
-
-		if (colHead) {
-			colHead = false;
-			const char* cell = strtok(buffer, " ");
-			while (cell != nullptr) {
-				colNames.emplace_back(cell);
-				cell = strtok(nullptr, " ");
+	auto NextLine = [&]() -> bool {
+		while (str->ReadLine(line) != DataStream::Error) {
+			if (line[0] != '#') { // allow comments
+				return true;
 			}
-		} else {
-			char* line = buffer;
-			const char* cell = strtok(line, " ");
-			if (cell == nullptr) continue;
-
-			rowNames.emplace_back(cell);
-			rows.emplace_back();
-			rows[row].reserve(10);
-			cell = strtok(nullptr, " ");
-			while (cell != nullptr) {
-				rows[row].emplace_back(cell);
-				cell = strtok(nullptr, " ");
-			}
-			row++;
 		}
+		return false;
+	};
+	
+	NextLine();
+	colNames = Explode<StringView, cell_t>(StringView(line, line.find_first_not_of(WHITESPACE_STRING)), ' ');
+	
+	rowNames.reserve(10);
+	rows.reserve(10);
+	while (NextLine()) {
+		pos = line.find_first_of(' ');
+		if (pos == std::string::npos) continue;
+		
+		rowNames.emplace_back(line.substr(0, pos));
+		
+		auto sv = StringView(&line[pos + 1], line.length() - pos);
+		rows.emplace_back(Explode<StringView, cell_t>(sv, ' ', colNames.size() - 1));
 	}
 
 	delete str;

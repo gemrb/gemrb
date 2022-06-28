@@ -29,29 +29,19 @@ bool INIImporter::Open(DataStream* str)
 	if (str == NULL) {
 		return false;
 	}
-	strret_t cnt = 0;
-	char strbuf[4097];
+
+	std::string strbuf;
 	INITag* lastTag = NULL;
 	bool startedSection = false;
-	do {
-		cnt = str->ReadLine( strbuf, 4096 );
-		if (cnt == -1)
-			break;
-		if (cnt == 0)
+	while (str->ReadLine(strbuf) != DataStream::Error) {
+		if (strbuf.length() == 0)
 			continue;
 		if (strbuf[0] == ';') //Rem
 			continue;
 		if (strbuf[0] == '[') {
 			// this is a tag
-			char* sbptr = strbuf + 1;
-			char* TagName = sbptr;
-			while (*sbptr != '\0') {
-				if (*sbptr == ']') {
-					*sbptr = 0;
-					break;
-				}
-				sbptr++;
-			}
+			auto pos = strbuf.find_first_of(']');
+			std::string tag = strbuf.substr(1, pos - 1);
 
 			// ignore empty sections
 			// pst ar0502.ini has this garbage:
@@ -71,20 +61,19 @@ bool INIImporter::Open(DataStream* str)
 			}
 
 			startedSection = true;
-			tags.emplace_back(TagName);
+			tags.emplace_back(std::move(tag));
 			lastTag = &tags[tags.size() - 1];
 			continue;
 		}
 		if (lastTag == NULL)
 			continue;
-		if (lastTag->AddLine(strbuf)) {
+		if (lastTag->AddLine(std::move(strbuf))) {
 			startedSection = false;
 		} else {
 			Log(ERROR, "INIImporter", "Bad Line in file: {}, Section: [{}], Entry: '{}'",
 				str->filename, lastTag->GetTagName(), strbuf);
 		}
-
-	} while (true);
+	}
 	delete str;
 	return true;
 }

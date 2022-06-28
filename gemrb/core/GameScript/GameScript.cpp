@@ -1807,8 +1807,6 @@ GameScript::~GameScript(void)
 
 Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 {
-	char line[10];
-
 	SClass_ID type = AIScript ? IE_BS_CLASS_ID : IE_BCS_CLASS_ID;
 
 	Script *newScript = (Script *) BcsCache.GetResource(resRef);
@@ -1821,8 +1819,10 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 	if (!stream) {
 		return NULL;
 	}
-	stream->ReadLine( line, 10 );
-	if (strncmp( line, "SC", 2 ) != 0) {
+	
+	std::string line;
+	stream->ReadLine(line, 10);
+	if (line.compare(0, 2, "SC") != 0) {
 		Log(WARNING, "GameScript", "Not a Compiled Script file");
 		delete stream;
 		return nullptr;
@@ -1876,47 +1876,47 @@ static void ParseString(const char*& src, char* tmp)
 		src++;
 }
 
-static Object* DecodeObject(const char* line)
+static Object* DecodeObject(const std::string& line)
 {
-	const char *origline = line; // for debug below
+	const char* cursor = line.c_str();
 
 	Object* oB = new Object();
 	for (int i = 0; i < ObjectFieldsCount; i++) {
-		oB->objectFields[i] = ParseInt( line );
+		oB->objectFields[i] = ParseInt(cursor);
 	}
 	for (int i = 0; i < MaxObjectNesting; i++) {
-		oB->objectFilters[i] = ParseInt( line );
+		oB->objectFilters[i] = ParseInt(cursor);
 	}
 	//iwd tolerates the missing rectangle, so we do so too
-	if (HasAdditionalRect && (*line=='[') ) {
-		line++; //Skip [
+	if (HasAdditionalRect && (*cursor == '[') ) {
+		cursor++; //Skip [
 		int tmp[4];
 		for (int& i : tmp) {
-			i = ParseInt(line);
+			i = ParseInt(cursor);
 		}
 		oB->objectRect = Region(tmp[0], tmp[1], tmp[2] - tmp[0], tmp[3] - tmp[1]);
-		if (*line == ' ')
-			line++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
+		if (*cursor == ' ')
+			cursor++; //Skip ] (not really... it skips a ' ' since the ] was skipped by the ParseInt function
 	}
-	if (*line == '"')
-		line++; //Skip "
-	ParseString(line, oB->objectName.begin());
+	if (*cursor == '"')
+		cursor++; //Skip "
+	ParseString(cursor, oB->objectName.begin());
 	// HACK for iwd2 AddExperiencePartyCR
 	if (oB->objectName == "0.0.0.0 ") {
 		oB->objectName.Reset();
 		Log(DEBUG, "GameScript", "overriding: +{}+", oB->objectName);
 	}
-	if (*line == '"')
-		line++; //Skip " (the same as above)
+	if (*cursor == '"')
+		cursor++; //Skip " (the same as above)
 	//this seems to be needed too
-	if (ExtraParametersCount && *line) {
-		line++;
+	if (ExtraParametersCount && *cursor) {
+		cursor++;
 	}
 	for (int i = 0; i < ExtraParametersCount; i++) {
-		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
+		oB->objectFields[i + ObjectFieldsCount] = ParseInt(cursor);
 	}
-	if (*line != 'O' || *(line + 1) != 'B') {
-		Log(WARNING, "GameScript", "Got confused parsing object line: {}", origline);
+	if (*cursor != 'O' || *(cursor + 1) != 'B') {
+		Log(WARNING, "GameScript", "Got confused parsing object line: {}", line);
 	}
 	//let the object realize it has no future (in case of null objects)
 	if (oB->isNull()) {
@@ -1928,22 +1928,21 @@ static Object* DecodeObject(const char* line)
 
 static Trigger* ReadTrigger(DataStream* stream)
 {
-	char* line = ( char* ) malloc( 1024 );
-	stream->ReadLine( line, 1024 );
-	if (strncmp( line, "TR", 2 ) != 0) {
-		free( line );
-		return NULL;
+	std::string line;
+	stream->ReadLine(line);
+	if (line.compare(0, 2, "TR") != 0) {
+		return nullptr;
 	}
-	stream->ReadLine( line, 1024 );
+	stream->ReadLine(line);
 	Trigger* tR = new Trigger();
 	//this exists only in PST?
 	if (HasTriggerPoint) {
-		sscanf( line, "%hu %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf(line.data(), "%hu %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, &tR->pointParameter.x,
 			&tR->pointParameter.y, tR->string0Parameter.begin(), tR->string1Parameter.begin());
 	} else {
-		sscanf( line, "%hu %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf(line.data(), "%hu %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter.begin(),
 			tR->string1Parameter.begin());
@@ -1951,10 +1950,9 @@ static Trigger* ReadTrigger(DataStream* stream)
 	StringToLower(tR->string0Parameter);
 	StringToLower(tR->string1Parameter);
 	tR->triggerID &= 0x3fff;
-	stream->ReadLine( line, 1024 );
+	stream->ReadLine(line);
 	tR->objectParameter = DecodeObject( line );
-	stream->ReadLine( line, 1024 );
-	free( line );
+	stream->ReadLine(line);
 	//discard invalid triggers, so they won't cause a crash
 	if (tR->triggerID>=MAX_TRIGGERS) {
 		delete tR;
@@ -1965,11 +1963,10 @@ static Trigger* ReadTrigger(DataStream* stream)
 
 static Condition* ReadCondition(DataStream* stream)
 {
-	char line[10];
-
-	stream->ReadLine( line, 10 );
-	if (strncmp( line, "CO", 2 ) != 0) {
-		return NULL;
+	std::string line;
+	stream->ReadLine(line, 10);
+	if (line.compare(0, 2, "CO") != 0) {
+		return nullptr;
 	}
 	Condition* cO = new Condition();
 	Object *triggerer = NULL;
@@ -2137,11 +2134,10 @@ void GameScript::EvaluateAllBlocks()
 
 ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
 {
-	char line[10];
-
-	stream->ReadLine( line, 10 );
-	if (strncmp( line, "CR", 2 ) != 0) {
-		return NULL;
+	std::string line;
+	stream->ReadLine(line, 10);
+	if (line.compare(0, 2, "CR") != 0) {
+		return nullptr;
 	}
 	ResponseBlock* rB = new ResponseBlock();
 	rB->condition = ReadCondition( stream );
@@ -2151,11 +2147,10 @@ ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
 
 ResponseSet* GameScript::ReadResponseSet(DataStream* stream)
 {
-	char line[10];
-
-	stream->ReadLine( line, 10 );
-	if (strncmp( line, "RS", 2 ) != 0) {
-		return NULL;
+	std::string line;
+	stream->ReadLine(line, 10);
+	if (line.compare(0, 2, "RS") != 0) {
+		return nullptr;
 	}
 	ResponseSet* rS = new ResponseSet();
 	while (true) {
@@ -2171,19 +2166,17 @@ ResponseSet* GameScript::ReadResponseSet(DataStream* stream)
 //we can't make this a library function, because scriptlevel is set here
 Response* GameScript::ReadResponse(DataStream* stream)
 {
-	char* line = ( char* ) malloc( 1024 );
-	stream->ReadLine( line, 1024 );
-	if (strncmp( line, "RE", 2 ) != 0) {
-		free( line );
-		return NULL;
+	std::string line;
+	stream->ReadLine(line);
+	if (line.compare(0, 2, "RE") != 0) {
+		return nullptr;
 	}
 	Response* rE = new Response();
 	rE->weight = 0;
 	stream->ReadLine( line, 1024 );
 	char *poi;
-	rE->weight = strtounsigned<uint8_t>(line,&poi,10);
+	rE->weight = strtounsigned<uint8_t>(line.c_str(), &poi, 10);
 	if (strncmp(poi, "AC", 2) != 0) {
-		free(line);
 		return rE;
 	}
 
@@ -2191,7 +2184,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		//not autofreed, because it is referenced by the Script
 		Action* aC = new Action(false);
 		stream->ReadLine( line, 1024 );
-		aC->actionID = strtounsigned<uint16_t>(line, nullptr, 10);
+		aC->actionID = strtounsigned<uint16_t>(line.c_str(), nullptr, 10);
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
 			Object* oB = DecodeObject( line );
@@ -2199,8 +2192,8 @@ Response* GameScript::ReadResponse(DataStream* stream)
 			if (i != 2)
 				stream->ReadLine( line, 1024 );
 		}
-		stream->ReadLine( line, 1024 );
-		sscanf( line, "%d %d %d %d %d\"%[^\"]\" \"%[^\"]\" AC",
+		stream->ReadLine(line);
+		sscanf(line.data(), "%d %d %d %d %d\"%[^\"]\" \"%[^\"]\" AC",
 			&aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
 			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter.begin(),
 			aC->string1Parameter.begin());
@@ -2218,11 +2211,10 @@ Response* GameScript::ReadResponse(DataStream* stream)
 			}
 		}
 		rE->actions.push_back( aC );
-		stream->ReadLine( line, 1024 );
-		if (strncmp( line, "RE", 2 ) == 0)
+		stream->ReadLine(line);
+		if (line.compare(0, 2, "RE") != 0)
 			break;
 	}
-	free( line );
 	return rE;
 }
 

@@ -123,35 +123,28 @@ strret_t DataStream::ReadRegion(Region& r)
 	return ret;
 }
 
-strret_t DataStream::ReadLine(void* buf, strpos_t maxlen)
+strret_t DataStream::ReadLine(std::string& buf, strpos_t maxlen)
 {
-	// FIXME: eof?
-	if (!maxlen) {
-		return 0;
-	}
-	unsigned char * p = ( unsigned char * ) buf;
 	if (Pos >= size) {
-		p[0]=0;
 		return Error;
 	}
-	unsigned int i = 0;
+	
+	buf.clear();
+	strpos_t i = 0;
 	//TODO: fix this to handle any combination of \r and \n
 	//Windows: \r\n
 	//Old Mac: \r
 	//otherOS: \n
-	while (i < ( maxlen - 1 )) {
+	while (Pos < size && i < (maxlen - 1)) {
 		char ch;
-		Read(&ch, 1);
+		i += Read(&ch, 1);
 		if (ch == '\n')
 			break;
 		if (ch == '\t')
 			ch = ' ';
 		if (ch != '\r')
-			p[i++] = ch;
-		if (Pos == size)
-			break;
+			buf.push_back(ch);
 	}
-	p[i] = 0;
 	return i;
 }
 

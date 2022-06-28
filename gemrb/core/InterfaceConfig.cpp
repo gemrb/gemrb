@@ -156,25 +156,19 @@ bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 
 	isValid = false;
 	int lineno = 0;
-	char buffer[1024];
-	while (cfgStream->Remains()) {
-		auto len = cfgStream->ReadLine(buffer, _MAX_PATH);
-		if (len == DataStream::Error) {
-			break;
-		}
-
+	std::string line;
+	while (cfgStream->ReadLine(line) != DataStream::Error) {
 		lineno++;
 
 		// skip leading blanks from name
-		StringView line(buffer, len);
-		auto pos = FindFirstNotOf(line, WHITESPACE_STRING);
+		auto pos = line.find_first_not_of(WHITESPACE_STRING);
 
 		// ignore empty or comment lines
-		if (pos == StringView::npos || line[pos] == '#') {
+		if (pos == std::string::npos || line[pos] == '#') {
 			continue;
 		}
 		
-		auto parts = Explode<StringView, std::string>(line, '=', 1);
+		auto parts = Explode<std::string, std::string>(line, '=', 1);
 		if (parts.size() < 2) {
 			Log(WARNING, "Config", "Invalid line {}", lineno);
 			continue;
