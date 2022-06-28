@@ -284,7 +284,7 @@ void WindowManager::CloseWindow(Window* win)
 	win->SetDisabled(true);
 }
 
-void WindowManager::CloseAllWindows()
+void WindowManager::CloseAllWindows() const
 {
 	for (Window* win : WindowList(windows)) {
 		win->SetFlags(Window::DestroyOnClose, BitOp::OR); // force delete

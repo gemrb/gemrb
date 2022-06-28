@@ -100,7 +100,6 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 	stream.zfree = Z_NULL;
 	stream.opaque = Z_NULL;
 
-	//result = deflateInit( &stream, Z_DEFAULT_COMPRESSION );
 	result = deflateInit( &stream, Z_BEST_COMPRESSION );
 	if (result != Z_OK) {
 		return GEM_ERROR;

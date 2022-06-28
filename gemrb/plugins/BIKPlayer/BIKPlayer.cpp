@@ -1006,7 +1006,6 @@ int BIKPlayer::read_colors(Bundle *b)
 int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 {
 	SET_INT_TYPE *dst = reinterpret_cast<SET_INT_TYPE*>(b->cur_dec);
-	//int16_t *dst = (int16_t*)b->cur_dec;
 
 	int len;
 	CHECK_READ_VAL(v_gb, b, len);
@@ -1019,7 +1018,7 @@ int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 		v = v_gb.get_bits(start_bits);
 	}
 	SET_INT_VALUE(dst, v);
-	//*dst++ = v;
+
 	len--;
 	for (int i = 0; i < len; i += 8) {
 		int len2 = std::min(len - i, 8);
@@ -1032,7 +1031,7 @@ int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 				}
 				v += v2;
 				SET_INT_VALUE(dst, v);
-				//*dst++ = v;
+
 				if (v < -32768 || v > 32767) {
 					return -1;
 				}
@@ -1040,7 +1039,6 @@ int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 		} else {
 			for (int j = 0; j < len2; j++) {
 				SET_INT_VALUE(dst, v);
-				//*dst++ = v;
 			}
 		}
 	}

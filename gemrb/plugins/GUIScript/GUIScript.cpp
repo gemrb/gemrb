@@ -11274,8 +11274,7 @@ static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	if (!actor->PCStats) {
-		//no quick slots for this actor, is this an error?
-		//return RuntimeError( "Actor has no quickslots!\n" );
+		//no quick slots for this actor, which is not a fatal error
 		Py_RETURN_NONE;
 	}
 

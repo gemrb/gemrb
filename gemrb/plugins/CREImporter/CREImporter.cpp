@@ -1880,7 +1880,6 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->ReadDword(SongCount);
 	str->ReadDword(ShapeOffset);
 	str->ReadDword(ShapeCount);
-	//str->Seek( 606, GEM_CURRENT_POS);
 
 	str->ReadDword(ItemSlotsOffset);
 	str->ReadDword(ItemsOffset);
