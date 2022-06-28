@@ -365,7 +365,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	if (day_or_night) {
 		TmpResRef = map->WEDResRef;
 	} else {
-		TmpResRef.Format("{.7:}N", map->WEDResRef);
+		TmpResRef.Format("{:.7}N", map->WEDResRef);
 	}
 	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
@@ -494,7 +494,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	if (day_or_night) {
 		TmpResRef = WEDResRef;
 	} else {
-		TmpResRef.Format("{.7:}N", WEDResRef);
+		TmpResRef.Format("{:.7}N", WEDResRef);
 	}
 
 	// Small map for MapControl
