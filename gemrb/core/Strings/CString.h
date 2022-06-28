@@ -162,7 +162,11 @@ public:
 	size_type length() const noexcept {
 		return strnlen(str, sizeof(str));
 	}
-	
+
+	void clear() noexcept {
+		std::fill(begin(), bufend(), '\0');
+	}
+
 	void Reset() noexcept {
 		std::fill(begin(), bufend(), '\0');
 	}
