@@ -13530,22 +13530,22 @@ bool GUIScript::Init(void)
 	PyRun_SimpleString(string);
 
 	// Detect GameType if it was set to auto
-	if (stricmp(core->config.GameType, "auto") == 0) {
+	if (core->config.GameType == "auto") {
 		Autodetect();
 	}
 
 	// use the iwd guiscripts for how, but leave its override
 	char path2[_MAX_PATH];
-	if (stricmp(core->config.GameType, "how") == 0) {
+	if (core->config.GameType == "how") {
 		PathJoin(path2, path, "iwd", nullptr);
 	} else {
-		PathJoin(path2, path, core->config.GameType, nullptr);
+		PathJoin(path2, path, core->config.GameType.c_str(), nullptr);
 	}
 
 	// GameType-specific import path must have a higher priority than
 	// the generic one, so insert it before it
 	PyList_Insert(sysPath, -1, PyString_FromString(path2));
-	PyModule_AddStringConstant(pGemRB, "GameType", core->config.GameType);
+	PyModule_AddStringConstant(pGemRB, "GameType", core->config.GameType.c_str());
 
 	PyObject *pClassesMod = PyImport_AddModule( "GUIClasses" );
 	/* pClassesMod is a borrowed reference */
@@ -13592,7 +13592,7 @@ bool GUIScript::Autodetect(void)
 
 	if (gametype_hint[0]) {
 		Log(MESSAGE, "GUIScript", "Detected GameType: {}", gametype_hint);
-		strlcpy(core->config.GameType, gametype_hint, sizeof(core->config.GameType));
+		core->config.GameType = gametype_hint;
 		return true;
 	}
 	else {

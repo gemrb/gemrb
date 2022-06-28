@@ -791,11 +791,11 @@ int Interface::Init(const InterfaceConfig* cfg)
 		return GEM_ERROR;
 	}
 
-	const char* value = NULL;
+	const InterfaceConfig::value_t* value = nullptr;
 #define CONFIG_INT(key, var) \
 		value = cfg->GetValueForKey(key); \
 		if (value) \
-			var ( atoi( value ) ); \
+			var ( atoi( value->c_str() ) ); \
 		value = nullptr
 
 	CONFIG_INT("Bpp", config.Bpp =);
@@ -829,7 +829,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 #define CONFIG_VARS_MAP(var, key) \
 		value = cfg->GetValueForKey(key); \
 		if (value) \
-			vars->SetAt(var, atoi(value)); \
+			vars->SetAt(var, atoi(value->c_str())); \
 		value = nullptr
 
 #define CONFIG_VARS(key) \
@@ -849,10 +849,10 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 #define CONFIG_STRING(key, var, default) \
 		value = cfg->GetValueForKey(key); \
-		if (value && value[0]) { \
-			strlcpy(var, value, sizeof(var)); \
+		if (value && value->length()) { \
+			var = *value; \
 		} else if (default && default[0]) { \
-			strlcpy(var, default, sizeof(var)); \
+			var = default; \
 		} else var[0] = '\0'; \
 		value = nullptr
 
@@ -864,8 +864,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 // assumes that default value does not need to be resolved or fixed in any way
 #define CONFIG_PATH(key, var, default) \
 		value = cfg->GetValueForKey(key); \
-		if (value && value[0]) { \
-			strlcpy(var, value, sizeof(var)); \
+		if (value && value->length()) { \
+			strlcpy(var, value->c_str(), sizeof(var)); \
 			ResolveFilePath(var); \
 			FixPath(var, true); \
 		} else if (default && default[0]) { \
@@ -929,12 +929,10 @@ int Interface::Init(const InterfaceConfig* cfg)
 		Log(WARNING, "Interface", "Invalid GamePath detected, looking for the GemRB demo!");
 		if (PathJoin(testPath, "..", "demo", "chitin.key", nullptr)) {
 			PathJoin(config.GamePath, "..", "demo", nullptr);
-			strlcpy(config.GameType, "demo", sizeof(config.GameType));
-		} else {
-			if (PathJoin(testPath, config.GemRBPath, "demo", "chitin.key", nullptr)) {
-				PathJoin(config.GamePath, config.GemRBPath, "demo", nullptr);
-				strlcpy(config.GameType, "demo", sizeof(config.GameType));
-			}
+			config.GameType = "demo";
+		} else if (PathJoin(testPath, config.GemRBPath, "demo", "chitin.key", nullptr)) {
+			PathJoin(config.GamePath, config.GemRBPath, "demo", nullptr);
+			config.GameType = "demo";
 		}
 	}
 
@@ -955,7 +953,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 #define CONFIG_STRING(key, var) \
 		value = cfg->GetValueForKey(key); \
 		if (value) \
-			var = value; \
+			var = *value; \
 		value = nullptr
 
 	CONFIG_STRING("AudioDriver", config.AudioDriverName);
@@ -974,11 +972,11 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 	value = cfg->GetValueForKey("SkipPlugin");
 	if (value) {
-		plugin_flags->SetAt(Variables::key_t(value), PLF_SKIP);
+		plugin_flags->SetAt(*value, PLF_SKIP);
 	}
 	value = cfg->GetValueForKey("DelayPlugin");
 	if (value) {
-		plugin_flags->SetAt(Variables::key_t(value), PLF_DELAY);
+		plugin_flags->SetAt(*value, PLF_DELAY);
 	}
 
 	for (int i = 0; i < MAX_CD; i++) {
@@ -1014,7 +1012,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 	// potentially disable logging before plugins are loaded (the log file is a plugin)
 	value = cfg->GetValueForKey("Logging");
-	if (value) ToggleLogging(atoi(value));
+	if (value) ToggleLogging(atoi(value->c_str()));
 
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");
 	const PluginMgr *plugin = PluginMgr::Get();
@@ -1079,8 +1077,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 		gamedata->AddSource(modPath.c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
-	PathJoin(path, config.GemRBOverridePath, "override", config.GameType, nullptr);
-	if (!strcmp(config.GameType, "auto")) {
+	PathJoin(path, config.GemRBOverridePath, "override", config.GameType.c_str(), nullptr);
+	if (config.GameType == "auto") {
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
 	} else {
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
@@ -1123,8 +1121,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 	// most of the old gemrb override files can be found here,
 	// so they have a lower priority than the game files and can more easily be modded
-	PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType, nullptr);
-	if (!strcmp(config.GameType, "auto")) {
+	PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType.c_str(), nullptr);
+	if (config.GameType == "auto") {
 		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
 	} else {
 		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
@@ -1158,10 +1156,10 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
-	PathJoin(path, config.GemRBOverridePath, "override", config.GameType, nullptr);
+	PathJoin(path, config.GemRBOverridePath, "override", config.GameType.c_str(), nullptr);
 	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 	char unhardcodedTypePath[_MAX_PATH * 2];
-	PathJoin(unhardcodedTypePath, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType, nullptr);
+	PathJoin(unhardcodedTypePath, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType.c_str(), nullptr);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
@@ -1177,21 +1175,21 @@ int Interface::Init(const InterfaceConfig* cfg)
 	// we also need the display to exist to create sprites using the display format
 	ieDword fullscreen = 0;
 	vars->Lookup("Full Screen", fullscreen);
-	if (video->CreateDisplay(Size(config.Width, config.Height), config.Bpp, fullscreen, config.GameName) == GEM_ERROR) {
+	if (video->CreateDisplay(Size(config.Width, config.Height), config.Bpp, fullscreen, config.GameName.c_str()) == GEM_ERROR) {
 		Log(FATAL, "Core", "Cannot initialize shaders.");
 		return GEM_ERROR;
 	}
 	video->SetGamma(brightness, contrast);
 	
 	// if unset, manually populate GameName (window title)
-	if (!stricmp(config.GameName, GEMRB_STRING)) {
-		if (stricmp(DefaultWindowTitle.c_str(), GEMRB_STRING) != 0) {
+	if (config.GameName == GEMRB_STRING) {
+		if (DefaultWindowTitle != GEMRB_STRING) {
 			std::string title = GEMRB_STRING" running " + DefaultWindowTitle;
-			strlcpy(config.GameName, title.c_str(), sizeof(config.GameName));
+			config.GameName = title;
 		} else {
-			strlcpy(config.GameName, GEMRB_STRING" running unknown game", sizeof(config.GameName));
+			config.GameName = GEMRB_STRING" running unknown game";
 		}
-		video->SetWindowTitle(config.GameName);
+		video->SetWindowTitle(config.GameName.c_str());
 	}
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)

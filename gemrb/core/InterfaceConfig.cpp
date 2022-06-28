@@ -39,28 +39,14 @@ InterfaceConfig::~InterfaceConfig() noexcept
 	delete configVars;
 }
 
-void InterfaceConfig::SetKeyValuePair(const char* key, const char* value)
+void InterfaceConfig::SetKeyValuePair(const key_t& key, const value_t& value)
 {
-	// lowercase the key so that the key is not case sensitive
-	char* keyCopy = strdup(key);
-	for (char* c = keyCopy; *c != '\0'; ++c) *c = tolower(*c);
-	configVars->set(keyCopy, value);
-	free(keyCopy);
+	configVars->set(key, value);
 }
 
-const char* InterfaceConfig::GetValueForKey(const char* key) const
+const InterfaceConfig::value_t* InterfaceConfig::GetValueForKey(const key_t& key) const
 {
-	const char* value = NULL;
-	if (key) {
-		// lowercase the key so that the key is not case sensitive
-		char* keyCopy = strdup(key);
-		for (char* c = keyCopy; *c != '\0'; ++c) *c = tolower(*c);
-		if (configVars->get(keyCopy)) {
-			value = configVars->get(keyCopy)->c_str();
-		}
-		free(keyCopy);
-	}
-	return value;
+	return configVars->get(key);
 }
 
 CFGConfig::CFGConfig(int argc, char *argv[])
@@ -170,46 +156,37 @@ bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 
 	isValid = false;
 	int lineno = 0;
-	char line[1024];
+	char buffer[1024];
 	while (cfgStream->Remains()) {
-		char *key, *keyend, *value, *valueend;
-
-		if (cfgStream->ReadLine(line, _MAX_PATH) == -1) {
+		auto len = cfgStream->ReadLine(buffer, _MAX_PATH);
+		if (len == DataStream::Error) {
 			break;
 		}
+
 		lineno++;
 
 		// skip leading blanks from name
-		key = line;
-		key += strspn( line, " \t\r\n" );
+		StringView line(buffer, len);
+		auto pos = FindFirstNotOf(line, WHITESPACE_STRING);
 
 		// ignore empty or comment lines
-		if (*key == '\0' || *key == '#') {
+		if (pos == StringView::npos || line[pos] == '#') {
 			continue;
 		}
-
-		value = strchr( key, '=' );
-		if (!value || value == key) {
+		
+		auto parts = Explode<StringView, std::string>(line, '=', 1);
+		if (parts.size() < 2) {
 			Log(WARNING, "Config", "Invalid line {}", lineno);
 			continue;
 		}
+		
+		auto& key = parts[0];
+		TrimString(key);
+		
+		auto& val = parts[1];
+		TrimString(val);
 
-		// trim trailing blanks from name
-		keyend = value;
-		while (keyend > key && strchr( "= \t", *keyend )) {
-			*keyend-- = '\0';
-		}
-
-		value++;
-		// skip leading blanks
-		value += strspn( value, " \t");
-
-		// trim trailing blanks from value
-		valueend = value + strlen( value ) - 1;
-		while (valueend >= value && strchr( " \t\r\n", *valueend )) {
-			*valueend-- = '\0';
-		}
-		SetKeyValuePair(key, value);
+		SetKeyValuePair(key, val);
 	}
 	isValid = true;
 	return true;

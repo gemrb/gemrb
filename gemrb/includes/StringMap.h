@@ -75,7 +75,7 @@ struct HashKey<std::string> {
 class StringMap : public HashMap<std::string, std::string> {
 public:
 	// lookup without std::string construction
-	const std::string *get(const char *key) const
+	const std::string *get(const std::string& key) const
 	{
 		if (!isInitialized())
 			return NULL;

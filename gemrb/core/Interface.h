@@ -319,8 +319,8 @@ struct CFGConfigData {
 	char GUIScriptsPath[_MAX_PATH]{};
 	bool CaseSensitive = true;
 
-	char GameName[_MAX_PATH]{};
-	char GameType[10]{};
+	std::string GameName;
+	std::string GameType;
 	std::string Encoding = "default";
 
 	int GamepadPointerSpeed = 10;

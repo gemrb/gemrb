@@ -35,13 +35,16 @@ private:
 	StringMap* configVars;
 
 public:
+	using key_t = std::string;
+	using value_t = std::string;
+	
 	InterfaceConfig(int argc, char *argv[]);
 	InterfaceConfig(const InterfaceConfig&) = delete;
 	virtual ~InterfaceConfig() noexcept;
 	InterfaceConfig& operator=(const InterfaceConfig&) = delete;
 
-	void SetKeyValuePair(const char* key, const char* value);
-	const char* GetValueForKey(const char* key) const;
+	void SetKeyValuePair(const key_t& key, const value_t& value);
+	const value_t* GetValueForKey(const key_t& key) const;
 	//const std::string* GetValueForKey(std::string* key) const;
 };
 
