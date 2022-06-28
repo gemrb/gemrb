@@ -40,8 +40,6 @@ private:
 	std::vector<row_t> rows;
 	std::string defVal;
 public:
-	p2DAImporter() noexcept;
-
 	p2DAImporter& operator=(const p2DAImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	/** Returns the actual number of Rows in the Table */

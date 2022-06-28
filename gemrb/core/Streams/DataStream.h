@@ -177,7 +177,7 @@ public:
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
 	void ReadDecrypted(void* buf, strpos_t encSize) const;
-	strret_t ReadLine(void* buf, strpos_t maxlen);
+	strret_t ReadLine(std::string& buf, strpos_t maxlen = 0);
 	/** Create a copy of this stream.
 	 *
 	 *  Returns NULL on failure.

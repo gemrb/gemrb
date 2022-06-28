@@ -169,11 +169,9 @@ void Console::LoadHistory()
 	PathJoin(filePath, core->config.GamePath, "gemrb_console.txt", nullptr);
 	FileStream *histFile = FileStream::OpenFile(filePath);
 	if (histFile) {
-		char line[_MAX_PATH];
-		while (histFile->Remains()) {
-			if (histFile->ReadLine(line, _MAX_PATH) == -1) break;
-
-			String* tmp = StringFromCString(line);
+		std::string line;
+		while (histFile->ReadLine(line) != DataStream::Error) {
+			String* tmp = StringFromCString(line.c_str());
 			History.Append(std::make_pair(-1, std::move(*tmp)));
 			delete tmp;
 		}

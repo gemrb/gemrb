@@ -37,29 +37,25 @@ bool IDSImporter::Open(DataStream* str)
 	}
 
 	str->CheckEncrypted();
-	char tmp[11];
-	str->ReadLine( tmp, 10 );
-	tmp[10] = 0;
-	if (tmp[0] != 'I') {
+	std::string line;
+	str->ReadLine(line, 10);
+	if (line[0] != 'I') {
 		str->Rewind();
 	}
-	while (true) {
-		char line[256];
-		strret_t len = str->ReadLine( line, 256 );
-		if (len == -1) {
-			break;
-		}
-		if (len == 0) {
+	while (str->ReadLine(line) != DataStream::Error) {
+		if (line.length() == 0) {
 			continue;
 		}
 		
-		StringToLower(line, line + len, line);
-		char* cell = strtok(line, " ");
-		int val = strtosigned<int>(cell, nullptr, 0);
-		cell = strtok(nullptr, " ");
-		if (cell != nullptr) {
-			pairs.emplace_back(val, cell);
+		auto parts = Explode(line, ' ', 1);
+		if (parts.size() < 2) {
+			continue; // bad data?
 		}
+		
+		int val = strtosigned<int>(parts[0].c_str(), nullptr, 0);
+		std::string id(parts[1].begin(), parts[1].end());
+		StringToLower(id);
+		pairs.emplace_back(val, std::move(id));
 	}
 
 	delete str;

@@ -70,24 +70,19 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 	const ieVariable defaultModuleName = kmtable->QueryField("Default", "MODULE");
 	const ieVariable defaultFunction = kmtable->QueryField("Default", "FUNCTION");
 	int defaultGroup = kmtable->QueryFieldSigned<int>("Default", "GROUP");
-	char buffer[_MAX_PATH];
-	while (config->Remains()) {
-		strret_t len = config->ReadLine(buffer, sizeof(buffer));
-		if (len == DataStream::Error)
-			break;
-
-		if (len == 0 ||
-			(buffer[0] == '#') ||
-			(buffer[0] == '[') ||
-			(buffer[0] == '\r') ||
-			(buffer[0] == '\n') ||
-			(buffer[0] == ';')) {
+	std::string line;
+	while (config->ReadLine(line) != DataStream::Error) {
+		if (line.length() == 0 ||
+			(line[0] == '#') ||
+			(line[0] == '[') ||
+			(line[0] == '\r') ||
+			(line[0] == '\n') ||
+			(line[0] == ';')) {
 			continue;
 		}
 		
-		StringToLower(buffer, buffer + len, buffer);
-		StringView line(buffer, len);
-		auto parts = Explode<StringView, std::string>(line, '=', 1);
+		StringToLower(line);
+		auto parts = Explode<std::string, std::string>(line, '=', 1);
 		if (parts.size() < 2) {
 			parts.emplace_back();
 		}

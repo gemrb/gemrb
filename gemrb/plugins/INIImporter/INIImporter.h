@@ -40,7 +40,7 @@ private:
 	std::vector< INIPair> pairs;
 	std::string TagName;
 public:
-	explicit INITag(const char* Name) : TagName(Name) {};
+	explicit INITag(std::string Name) : TagName(std::move(Name)) {};
 
 	const std::string& GetTagName() const
 	{
@@ -57,9 +57,8 @@ public:
 		return pairs[index].Name;
 	}
 
-	bool AddLine(const char* Line)
+	bool AddLine(std::string iniLine)
 	{
-		std::string iniLine = Line;
 		auto equalsPos = iniLine.find_first_of('=');
 		if (equalsPos == std::string::npos) {
 			return false;
