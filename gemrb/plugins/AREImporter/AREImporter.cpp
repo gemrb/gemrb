@@ -851,7 +851,6 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 			c = map->AddContainer( Name, Type, poly );
 		}
 
-		//c->SetMap(map);
 		c->Pos = pos;
 		c->LockDifficulty = LockDiff;
 		c->Flags = Flags;
