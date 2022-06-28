@@ -479,6 +479,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
 		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", name);
+		parameters->dump();
 		return;
 	}
 	InfoPoint *trigger = static_cast<InfoPoint*>(ip);
@@ -6198,7 +6199,8 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 		ip = Sender;
 	}
 	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
-		Log(WARNING, "Actions", "Script error: No Trigger Named \"{}\"", name);
+		Log(WARNING, "Actions", "Script error: No trigger named \"{}\"", name);
+		parameters->dump();
 		return;
 	}
 
