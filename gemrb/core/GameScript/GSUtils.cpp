@@ -1603,18 +1603,14 @@ static int ParseIntParam(const char *&src, const char *&str)
 	}
 	if (*str=='*') { //there may be an IDS table
 		str++;
-		char idsTabName[9];
-		char *cur = idsTabName;
-		const char *end = idsTabName + 9 - 1;
-		while (*str != ',' && *str != ')') {
-			// limit IDS file length to 8 characters
-			 if (cur != end) {
-				*cur = *str;
-				++cur;
-			}
+		ResRef idsTabName;
+		char *cur = idsTabName.begin();
+		const char *end = idsTabName.bufend();
+		while (cur != end && *str != ',' && *str != ')') {
+			*cur = *str;
+			++cur;
 			++str;
 		}
-		*cur = 0;
 
 		if (idsTabName[0]) {
 			return GetIdsValue(src, idsTabName);

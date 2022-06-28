@@ -1478,33 +1478,28 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 	Scriptable *target = NULL;
 	Point targetpos(-1, -1);
 	ResRef newSpell;
-	char surgeSpellRef[9];
-	strlcpy(surgeSpellRef, surgeSpell.c_str(), 9);
+	auto parts = Explode(surgeSpell, '.', 2);
 	
 	int level = caster->GetCasterLevel(spl->SpellType);
-	switch (surgeSpellRef[0]) {
+	switch (surgeSpell[0]) {
 		case '+': // cast normally, but also cast SPELLREF first
-			core->ApplySpell(ResRef(surgeSpellRef + 1), caster, caster, level);
+			core->ApplySpell(SubStr(surgeSpell, 1), caster, caster, level);
 			break;
 		case '0': // cast spell param1 times
-			strtok(surgeSpellRef,".");
-			count = strtosigned<int>(strtok(NULL,"."));
+			count = strtosigned<int>(parts[1].c_str());
 			caster->wildSurgeMods.num_castings = count;
 			break;
 		case '1': // change projectile (id) to param1
-			strtok(surgeSpellRef,".");
-			count = strtosigned<int>(strtok(NULL,"."));
+			count = strtosigned<int>(parts[1].c_str());
 			caster->wildSurgeMods.projectile_id = count;
 			break;
 		case '2': // also target target type param1
-			strtok(surgeSpellRef,".");
-			count = strtosigned<int>(strtok(NULL,"."));
+			count = strtosigned<int>(parts[1].c_str());
 			caster->wildSurgeMods.target_type = count;
 			caster->wildSurgeMods.target_change_type = WSTC_ADDTYPE;
 			break;
 		case '3': // (wild surge) roll param1 more times
-			strtok(surgeSpellRef,".");
-			count = strtosigned<int>(strtok(NULL,"."));
+			count = strtosigned<int>(parts[1].c_str());
 			// force surge and then cast
 			// force the surge roll to be < 100, so we cast a spell from the surge table
 			tmp = caster->Modified[IE_FORCESURGE];
@@ -1541,8 +1536,7 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 			caster->Modified[IE_FORCESURGE] = tmp;
 			break;
 		case '4': // change the target type to param1
-			strtok(surgeSpellRef,".");
-			count = strtosigned<int>(strtok(NULL,"."));
+			count = strtosigned<int>(parts[1].c_str());
 			caster->wildSurgeMods.target_type = count;
 			caster->wildSurgeMods.target_change_type = WSTC_SETTYPE;
 			break;
@@ -1550,8 +1544,7 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 			caster->wildSurgeMods.target_change_type = WSTC_RANDOMIZE;
 			break;
 		case '6': // change saving throw (+param1)
-			strtok(surgeSpellRef,".");
-			count = strtosigned<int>(strtok(NULL,"."));
+			count = strtosigned<int>(parts[1].c_str());
 			caster->wildSurgeMods.saving_throw_mod = count;
 			break;
 		case '7': // random spell of the same level
@@ -1568,8 +1561,7 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 			}
 			break;
 		case '8': // set projectile speed to param1 %
-			strtok(surgeSpellRef,".");
-			count = strtosigned<int>(strtok(NULL,"."));
+			count = strtosigned<int>(parts[1].c_str());
 			caster->wildSurgeMods.projectile_speed_mod = count;
 			break;
 		default:

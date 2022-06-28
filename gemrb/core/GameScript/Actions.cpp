@@ -6951,7 +6951,7 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//the PST crew apparently loved hardcoding stuff
-	static char RebusResRef[9] = { "DABUS1" };
+	static ResRef RebusResRef { "DABUS1" };
 	RebusResRef[5]=(char) core->Roll(1,5,'0');
 	ScriptedAnimation *vvc = gamedata->GetScriptedAnimation(RebusResRef, false);
 	if (vvc) {
