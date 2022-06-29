@@ -4500,9 +4500,9 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 		Sound.Format("H_{}_{}{}", dmg_types[type-1], armor_types[armor], core->Roll(1, 3, 0));
 	} else {
 		if (levels) {
-			Sound.Format("HIT_0{}{}{}", type, armor + 'A', suffix ? '1' : 0);
+			Sound.Format("HIT_0{}{:c}{:c}", type, armor + 'A', suffix ? '1' : 0);
 		} else {
-			Sound.Format("HIT_0{}{}", type, suffix ? '1' : 0);
+			Sound.Format("HIT_0{}{:c}", type, suffix ? '1' : 0);
 		}
 	}
 	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos);
