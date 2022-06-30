@@ -963,11 +963,9 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 	value = cfg->GetValueForKey("ModPath");
 	if (value) {
-		for (char *path = strtok((char*)value,SPathListSeparator);
-			 path;
-			 path = strtok(NULL,SPathListSeparator)) {
-			config.ModPath.emplace_back(path);
-			ResolveFilePath(config.ModPath.back());
+		config.ModPath = Explode<std::string, std::string>(*value, PathListSeparator);
+		for (std::string& path : config.ModPath) {
+			ResolveFilePath(path);
 		}
 	}
 	value = cfg->GetValueForKey("SkipPlugin");
@@ -983,11 +981,9 @@ int Interface::Init(const InterfaceConfig* cfg)
 		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
 		value = cfg->GetValueForKey(keyname);
 		if (value) {
-			for(char *path = strtok((char*)value, SPathListSeparator);
-				path;
-				path = strtok(NULL,SPathListSeparator)) {
-				config.CD[i].emplace_back(path);
-				ResolveFilePath(config.CD[i].back());
+			config.CD[i] = Explode<std::string, std::string>(*value, PathListSeparator);
+			for (std::string& path : config.CD[i]) {
+				ResolveFilePath(path);
 			}
 		} else {
 			// nothing in config so create our own

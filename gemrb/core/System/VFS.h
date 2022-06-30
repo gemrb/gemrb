@@ -73,7 +73,6 @@ const char PathDelimiter = '/';
 const char PathListSeparator = ':';
 #endif
 const char SPathDelimiter[] = { PathDelimiter, '\0' };
-const char SPathListSeparator[] = { PathListSeparator, '\0' };
 
 GEM_EXPORT bool dir_exists(const char* path);
 GEM_EXPORT bool file_exists(const char* path);
