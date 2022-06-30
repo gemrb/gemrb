@@ -2023,19 +2023,14 @@ static void InitActorTables()
 				continue;
 			}
 
-			//we have to account for dual-swap in the multiclass field
-			ieDword numfound = 1;
 			size_t tmpbits = CountBits (tmpclass);
 
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
-			char **classnames = (char **) calloc(tmpbits, sizeof(char *));
-			classnames[0] = strtok(strdup(classname.c_str()), "_");
-			while (numfound<tmpbits && (classnames[numfound] = strdup(strtok(NULL, "_")))) {
-				numfound++;
-			}
-			numfound = 0;
+			auto classnames = Explode(classname, '_', tmpbits);
 			bool foundwarrior = false;
+			//we have to account for dual-swap in the multiclass field
+			size_t numfound = 0;
 			for (int j = 0; j < classcount; j++) {
 				//no sense continuing if we've found all to be found
 				if (numfound==tmpbits)
@@ -2048,7 +2043,7 @@ static void InitActorTables()
 						//search for the current class in the split of the names to get it's
 						//correct order
 						for (ieDword k=0; k<tmpbits; k++) {
-							if (strcmp(classnames[k], currentname.c_str()) == 0) {
+							if (currentname.compare(classnames[k].c_str()) == 0) {
 								int tmplevel = 0;
 								if (k==0) tmplevel = IE_LEVEL;
 								else if (k==1) tmplevel = IE_LEVEL2;
@@ -2077,7 +2072,7 @@ static void InitActorTables()
 
 					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
-						if (strcmp(classnames[0], currentname.c_str()) == 0) {
+						if (currentname.compare(classnames[0].c_str()) == 0) {
 							dualswap[tmpindex] = tm->QueryFieldSigned<int>(currentname, "MC_WAS_ID");
 						}
 					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
@@ -2086,13 +2081,6 @@ static void InitActorTables()
 					numfound++;
 				}
 			}
-
-			for (int j = 0; j < (signed) tmpbits; j++) {
-				if (classnames[j]) {
-					free(classnames[j]);
-				}
-			}
-			free(classnames);
 
 			AppendFormat(buffer, "HPROLLMAXLVL: {} ", maxLevelForHpRoll[tmpindex]);
 			AppendFormat(buffer, "DS: {} ", dualswap[tmpindex]);
