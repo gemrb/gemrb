@@ -339,6 +339,10 @@ void Scriptable::ExecuteScript(int scriptCount)
 		}
 		return;
 	}
+	// don't abort ActionOverride spawned actions
+	if (CurrentAction && CurrentAction->flags & ACF_OVERRIDE) {
+		return;
+	}
 
 	bool changed = false;
 	Actor* act = Scriptable::As<Actor>(this);
