@@ -1395,6 +1395,9 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		return;
 	} else {
 		if (PersonalDistance(actor, target)<MAX_OPERATING_DISTANCE) {
+			if (flags & IF_NOINT) {
+				actor->Interrupt();
+			}
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -1402,8 +1405,6 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 	if (!actor->InMove() || actor->Destination != dest) {
 		actor->WalkTo(dest, flags);
 	}
-
-	Sender->CurrentActionInterruptable = false;
 
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
