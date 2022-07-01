@@ -2212,7 +2212,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		}
 		rE->actions.push_back( aC );
 		stream->ReadLine(line);
-		if (line.compare(0, 2, "RE") != 0)
+		if (line.compare(0, 2, "RE") == 0)
 			break;
 	}
 	return rE;
