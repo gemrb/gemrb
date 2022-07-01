@@ -1183,7 +1183,7 @@ static const TriggerLink* FindTrigger(StringView triggername)
 		return nullptr;
 	}
 
-	auto len = std::min(FindFirstOf(triggername, "("), triggername.length() - 1);
+	auto len = std::min(FindFirstOf(triggername, "("), triggername.length());
 	for (int i = 0; triggernames[i].Name; i++) {
 		if (!strnicmp(triggernames[i].Name, triggername.c_str(), len)) {
 			return triggernames + i;
@@ -1198,7 +1198,7 @@ static const ActionLink* FindAction(StringView actionname)
 		return nullptr;
 	}
 
-	auto len = std::min(FindFirstOf(actionname, "("), actionname.length() - 1);
+	auto len = std::min(FindFirstOf(actionname, "("), actionname.length());
 	for (int i = 0; actionnames[i].Name; i++) {
 		if (!strnicmp(actionnames[i].Name, actionname.c_str(), len)) {
 			return actionnames + i;
@@ -1213,7 +1213,7 @@ static const ObjectLink* FindObject(StringView objectname)
 		return nullptr;
 	}
 
-	auto len = std::min(FindFirstOf(objectname, "("), objectname.length() - 1);
+	auto len = std::min(FindFirstOf(objectname, "("), objectname.length());
 	for (int i = 0; objectnames[i].Name; i++) {
 		if (!strnicmp(objectnames[i].Name, objectname.c_str(), len)) {
 			return objectnames + i;
