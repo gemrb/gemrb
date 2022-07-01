@@ -858,7 +858,10 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 {
 	if (!actor->ShouldModifyMorale()) return;
 
-	if ((actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK]) && (actor->Modified[IE_MORALEBREAK] != 0) ) {
+	// no panic if we're doing something forcibly
+	bool overriding = actor->GetCurrentAction() && actor->GetCurrentAction()->flags & ACF_OVERRIDE;
+	bool lowMorale = actor->Modified[IE_MORALE] <= actor->Modified[IE_MORALEBREAK];
+	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
 		actor->Panic(core->GetGame()->GetActorByGlobalID(actor->LastAttacker), core->Roll(1,3,0) );
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
 		// recover from panic, since morale has risen again
@@ -7442,9 +7445,10 @@ void Actor::UpdateModalState(ieDword gameTime)
 	}
 
 	ieDword state = Modified[IE_STATE_ID];
+	bool overriding = CurrentAction && CurrentAction->flags & ACF_OVERRIDE;
 
 	// each round also re-confuse the actor
-	if (!roundFraction) {
+	if (!roundFraction && !overriding) {
 		if (BaseStats[IE_CHECKFORBERSERK]) {
 			BaseStats[IE_CHECKFORBERSERK]--;
 		}
