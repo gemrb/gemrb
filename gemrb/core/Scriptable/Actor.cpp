@@ -859,10 +859,12 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	if (!actor->ShouldModifyMorale()) return;
 
 	// no panic if we're doing something forcibly
+	const Game* game = core->GetGame();
 	bool overriding = actor->GetCurrentAction() && actor->GetCurrentAction()->flags & ACF_OVERRIDE;
+	overriding = overriding || (game->StateOverrideFlag && game->StateOverrideTime);
 	bool lowMorale = actor->Modified[IE_MORALE] <= actor->Modified[IE_MORALEBREAK];
 	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
-		actor->Panic(core->GetGame()->GetActorByGlobalID(actor->LastAttacker), core->Roll(1,3,0) );
+		actor->Panic(game->GetActorByGlobalID(actor->LastAttacker), core->Roll(1, 3, 0));
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
 		// recover from panic, since morale has risen again
 		// but only if we have really just recovered, so panic from other
@@ -7445,7 +7447,9 @@ void Actor::UpdateModalState(ieDword gameTime)
 	}
 
 	ieDword state = Modified[IE_STATE_ID];
+	const Game* game = core->GetGame();
 	bool overriding = CurrentAction && CurrentAction->flags & ACF_OVERRIDE;
+	overriding = overriding || (game->StateOverrideFlag && game->StateOverrideTime);
 
 	// each round also re-confuse the actor
 	if (!roundFraction && !overriding) {
@@ -7552,7 +7556,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 		}
 
 		// shut everyone up, so they don't whine if the actor is on a long hiding-in-shadows recon mission
-		core->GetGame()->ResetPartyCommentTimes();
+		game->ResetPartyCommentTimes();
 	}
 }
 
