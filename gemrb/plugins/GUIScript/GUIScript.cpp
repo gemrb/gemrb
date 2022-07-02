@@ -1097,6 +1097,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 	ScriptingId id = pyid ? (ScriptingId) PyLong_AsUnsignedLongLong(pyid) : ScriptingId(-1);
 
 	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(gs->GetScriptingRef(pySubview));
+	assert(ref);
 
 	View* superView = GetView<View>(self);
 	View* subView = ref->GetObject();

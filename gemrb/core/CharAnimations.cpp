@@ -1206,6 +1206,8 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 		case IE_ANI_DIE:
 		case IE_ANI_READY:
 		case IE_ANI_CONJURE:
+		case IE_ANI_DAMAGE:
+		case IE_ANI_TWITCH:
 			break;
 		default:
 			return nullptr;
