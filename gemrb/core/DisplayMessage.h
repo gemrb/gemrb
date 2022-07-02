@@ -38,12 +38,19 @@
 namespace GemRB {
 
 /** 
- * GUIColors options. This starts at 7 because is the row in the colors.2da that corresponds to white color.
- * The previous six colors are not indexed because are only used on the python side.
+ * Indices for externalized GUI colors in colors.2da
  **/
 enum class GUIColors {
-	FIRST_COLOR = 6,
-	WHITE = 6,
+	FIRST_COLOR,
+	TOOLTIP = 0,
+	TOOLTIPBG,
+	MAPICNBG,
+	MAPTXTBG,
+	ALTDOOR,
+	HOVERDOOR,
+	ALTCONTAINER,
+	HOVERCONTAINER,
+	WHITE,
 	RED,
 	LIGHTGREY,
 	XPCHANGE,
@@ -78,7 +85,6 @@ private:
 	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
 	/** displays a string in the textarea */
 	void DisplayString(String text, const Color &color, Scriptable *target) const;
-	Color GetColor(const GUIColors color) const;
 	std::map<GUIColors, std::string> GetAllColors() const;
 	const std::map<GUIColors, std::string> GUIColorNames = DisplayMessage::GetAllColors();
 
@@ -86,8 +92,8 @@ public:
 	static ieStrRef GetStringReference(size_t);
 	static bool HasStringReference(size_t);
 
-public:
 	DisplayMessage();
+	Color GetColor(const GUIColors color) const;
 	/** displays any string in the textarea */
 	void DisplayMarkupString(String txt) const;	
 	/** displays a string constant in the textarea */
