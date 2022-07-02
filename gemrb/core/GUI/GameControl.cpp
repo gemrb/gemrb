@@ -491,7 +491,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		if (d->Flags & DOOR_SECRET) {
 			if (d->Flags & DOOR_FOUND) {
 				d->Highlight = true;
-				d->outlineColor = ColorMagenta; // found hidden door
+				d->outlineColor = displaymsg->GetColor(GUIColors::HIDDENDOOR);
 			} else {
 				continue;
 			}

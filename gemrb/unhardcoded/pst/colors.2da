@@ -9,6 +9,7 @@ ALTDOOR			0xff00ffff
 HOVERDOOR		0xff00ffff
 ALTCONTAINER		0x00ffffff
 HOVERCONTAINER		0x00ffffff
+HIDDENDOOR		0xff00ffff
 WHITE			0xf0f0f0ff
 RED			0xff2c21ff
 LIGHT_GREY		0xd7d7beff
