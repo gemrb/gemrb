@@ -10,11 +10,11 @@ HOVERDOOR		0xff00ffff
 ALTCONTAINER		0x00ffffff
 HOVERCONTAINER		0x00ffffff
 WHITE			0xf0f0f0ff
-RED			0xff0000ff
+RED			0xff2c21ff
 LIGHT_GREY		0xd7d7beff
 GOT_XP			0xc6ffc6ff
 GOT_GOLD		0xc0c000ff
-DIALOG			0x70ff70ff
-DIALOG_PARTY		0x8080ffff
+DIALOG			0x8ca27bff
+DIALOG_PARTY		0x9cc7d6ff
 # To add a new color apart of adding it here you must add also the following changes:
 # On the file DisplayMessage.h put the name of the color at the end of the enum.
