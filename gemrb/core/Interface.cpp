@@ -3514,6 +3514,11 @@ void Interface::SanitizeItem(CREItem *item) const
 
 //This function generates random items based on the randitem.2da file
 //there could be a loop, but we don't want to freeze, so there is a limit
+// table entries are either:
+// - working items
+// - working items with a *N suffix, setting the stack count (eg. BOLT04*5)
+// - references to other random tables to be resolved (eg. RNDMAG02 meaning the second row of RNDMAG.2da)
+// - numbers only — gold amount
 bool Interface::ResolveRandomItem(CREItem *itm) const
 {
 	if (RtRows.empty()) return true;
@@ -3536,32 +3541,34 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		} else {
 			i=Roll(1, itemlist.ResRefs.size(), -1);
 		}
-		// Explode to ResRef, so that there is a null terminator for strtosigned
+		// Explode to ResRef, so that there is a null terminator for strtounsigned
 		auto parts = Explode<ResRef, ResRef>(itemlist.ResRefs[i], '*', 1);
-		int diceSides;
+		ieWord diceSides;
+		bool isGold = false;
 		if (parts.size() > 1) {
-			diceSides = strtosigned<int>(parts[1].c_str(), nullptr, 10);
+			// create a stack
+			diceSides = strtounsigned<ieWord>(parts[1].c_str(), nullptr, 10);
 		} else {
-			diceSides = 1;
+			// gold or regular item (can have leading digits)
+			char* endptr;
+			diceSides = strtounsigned<ieWord>(parts[0].c_str(), &endptr, 10);
+			if (*endptr) {
+				diceSides = 1;
+			} else {
+				isGold = true;
+			}
 		}
-		
-		char *endptr;
-		int diceThrows = strtosigned<int>(parts[0].c_str(), &endptr, 10);
-		if (diceThrows < 1 || diceSides <= 1) {
-			diceThrows = 1;
-		}
-		if (*endptr) {
-			itm->ItemResRef = parts[0];
-		} else {
+
+		if (isGold) {
 			itm->ItemResRef = GoldResRef;
+			itm->Usages[0] = diceSides;
+		} else {
+			itm->ItemResRef = parts[0];
+			if (itm->ItemResRef == "no_drop") {
+				return false;
+			}
+			itm->Usages[0] = static_cast<ieWord>(Roll(1, diceSides, 0));
 		}
-		if (itm->ItemResRef == "no_drop") {
-			itm->ItemResRef.Reset();
-		}
-		if (itm->ItemResRef.IsEmpty()) {
-			return false;
-		}
-		itm->Usages[0] = (ieWord) Roll(diceThrows, diceSides, 0);
 	}
 	Log(ERROR, "Interface", "Loop detected while generating random item: {}", itm->ItemResRef);
 	return false;
