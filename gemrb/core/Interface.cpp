@@ -1287,6 +1287,13 @@ int Interface::Init(const InterfaceConfig* cfg)
 	gamedata->PreloadColors();
 	if (ret) return ret;
 
+	Log(MESSAGE, "Core", "Initializing string constants...");
+	displaymsg = new DisplayMessage();
+	if (!displaymsg) {
+		Log(FATAL, "Core", "Failed to initialize string constants.");
+		return GEM_ERROR;
+	}
+
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
 	winmgr = new WindowManager(video);
 	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
@@ -1391,13 +1398,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	ret = InitItemTypes();
 	if (!ret) {
 		Log(FATAL, "Core", "Failed to initialize inventory.");
-		return GEM_ERROR;
-	}
-
-	Log(MESSAGE, "Core", "Initializing string constants...");
-	displaymsg = new DisplayMessage();
-	if (!displaymsg) {
-		Log(FATAL, "Core", "Failed to initialize string constants.");
 		return GEM_ERROR;
 	}
 
@@ -2167,8 +2167,8 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 Tooltip Interface::CreateTooltip() const
 {
 	Font::PrintColors colors;
-	colors.fg = gamedata->GetColor("TOOLTIP");
-	colors.bg = gamedata->GetColor("TOOLTIPBG");
+	colors.fg = displaymsg->GetColor(GUIColors::TOOLTIP);
+	colors.bg = displaymsg->GetColor(GUIColors::TOOLTIPBG);
 
 	TooltipBackground* bg = NULL;
 	if (TooltipBG) {

@@ -1174,10 +1174,10 @@ void Map::DrawHighlightables(const Region& viewport) const
 	i = 0;
 	while ( (d = TMap->GetDoor(i++))!=NULL ) {
 		if (d->Highlight) {
-			d->outlineColor = gamedata->GetColor("HOVERDOOR");
+			d->outlineColor = displaymsg->GetColor(GUIColors::HOVERDOOR);
 			d->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_DOORS && !(d->Flags & DOOR_SECRET)) {
-			d->outlineColor = gamedata->GetColor("ALTDOOR");
+			d->outlineColor = displaymsg->GetColor(GUIColors::ALTDOOR);
 			d->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_DOORS_SECRET && d->Flags & DOOR_FOUND) {
 			d->outlineColor = ColorMagenta;

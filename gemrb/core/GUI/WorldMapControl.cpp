@@ -39,7 +39,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 	color_selected = selected;
 	color_notvisited = notvisited;
 	
-	hoverAnim = ColorAnimation(gamedata->GetColor("MAPICNBG"), color_selected, true);
+	hoverAnim = ColorAnimation(displaymsg->GetColor(GUIColors::MAPICNBG), color_selected, true);
 	
 	ControlType = IE_GUI_WORLDMAP;
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
@@ -111,7 +111,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
 				video->BlitGameSprite(icon, offset, flags, color_notvisited);
 			} else {
-				video->BlitGameSprite(icon, offset, flags, gamedata->GetColor("MAPICNBG"));
+				video->BlitGameSprite(icon, offset, flags, displaymsg->GetColor(GUIColors::MAPICNBG));
 			}
 
 			// intro and late-chapter candlekeep share the same entry, so we need to check both names
@@ -160,7 +160,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			colors.fg = color_normal;
 		}
 		
-		colors.bg = gamedata->GetColor("MAPTXTBG");
+		colors.bg = displaymsg->GetColor(GUIColors::MAPTXTBG);
 
 		Size ts = ftext->StringSize(caption);
 		ts.w += 10;
