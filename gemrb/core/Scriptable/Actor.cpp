@@ -7085,9 +7085,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		} else {
 			damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
 		}
-		if (damage < 0) damage = 0; // bad luck, effects and/or profs on lowlevel chars
-	} else {
-		damage = 0;
+		if (damage <= 0) damage = 1; // bad luck, effects and/or profs on lowlevel chars
 	}
 
 	bool critical = criticalroll >= attackRollDiceSides;
