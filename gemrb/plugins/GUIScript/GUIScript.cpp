@@ -11567,8 +11567,8 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	unsigned int globalID;
 	int type;
 	unsigned int spell;
-	PyObject* resRef = nullptr;
-	PARSE_ARGS(args,  "iii|S", &globalID, &type, &spell, &resRef);
+	const char* resRef = nullptr;
+	PARSE_ARGS(args,  "iii|s", &globalID, &type, &spell, &resRef);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -11582,7 +11582,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	SpellExtHeader spelldata{};
 	std::vector<ResRef> data;
 	if (type == -3) {
-		data.push_back(ResRefFromPy(resRef));
+		data.push_back(ResRef(resRef));
 		actor->spellbook.SetCustomSpellInfo(data, ResRef(), 0);
 		actor->spellbook.GetSpellInfo(&spelldata, 255, 0, 1);
 	} else if (type == -2) {
