@@ -534,7 +534,7 @@ def HasSorcererBook (pc, cls=-1):
 	import GUICommon
 
 	ClassName = GUICommon.GetClassRowName (pc)
-	if cls is not None:
+	if cls != -1:
 		ClassName = GUICommon.GetClassRowName (cls, "class")
 	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 	if SorcererBook == "*" or ClassName == "":
