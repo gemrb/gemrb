@@ -3571,8 +3571,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 Container *Map::GetPile(Point position)
 {
 	//converting to search square
-	position.x=position.x/16;
-	position.y=position.y/12;
+	position = ConvertCoordToTile(position);
 	ieVariable pileName;
 	pileName.Format("heap_{}.{}", position.x, position.y);
 	//pixel position is centered on search square
