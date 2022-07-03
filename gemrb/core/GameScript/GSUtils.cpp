@@ -1454,69 +1454,69 @@ bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c)
 //It is possible to attack CONTAINERS/DOORS as well!!!
 void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 {
-	Actor *actor = Scriptable::As<Actor>(Sender);
-	assert(actor);
+	Actor* attacker = Scriptable::As<Actor>(Sender);
+	assert(attacker);
 	assert(target);
 
 	// if held or disabled, etc, then cannot start or continue attacking
-	if (actor->Immobile()) {
-		actor->roundTime = 0;
+	if (attacker->Immobile()) {
+		attacker->roundTime = 0;
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	// mislead and projected images can't attack
-	int puppet = actor->GetStat(IE_PUPPETMASTERTYPE);
+	int puppet = attacker->GetStat(IE_PUPPETMASTERTYPE);
 	if (puppet && puppet < 3) {
-		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: {}!", fmt::WideToChar{actor->GetName()});
+		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: {}!", fmt::WideToChar{attacker->GetName()});
 		return;
 	}
 
-	const Actor *tar = Scriptable::As<Actor>(target);
-	if (tar) {
-		// release if target is invisible to sender (because of death or invisbility spell)
-		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
-			actor->StopAttack();
-			Sender->ReleaseCurrentAction();
-			actor->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
-			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: {}!", fmt::WideToChar{tar->GetName()});
-			return;
-		}
-	}
-
-	if (actor == tar) {
+	const Actor* tar = Scriptable::As<Actor>(target);
+	if (attacker == tar) {
 		Sender->ReleaseCurrentAction();
 		Log(WARNING, "AttackCore", "Tried attacking itself: {}!", fmt::WideToChar{tar->GetName()});
 		return;
 	}
 
+	if (tar) {
+		// release if target is invisible to sender (because of death or invisbility spell)
+		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
+			attacker->StopAttack();
+			Sender->ReleaseCurrentAction();
+			attacker->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
+			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: {}!", fmt::WideToChar{tar->GetName()});
+			return;
+		}
+	}
+
 	WeaponInfo wi;
-	bool leftorright = false;
-	const ITMExtHeader *header = actor->GetWeapon(wi, leftorright);
+	bool leftOrRight = false;
+	const ITMExtHeader* header = attacker->GetWeapon(wi, leftOrRight);
 	//will return false on any errors (eg, unusable weapon)
-	if (!header || !actor->WeaponIsUsable(leftorright, header)) {
-		actor->StopAttack();
+	if (!header || !attacker->WeaponIsUsable(leftOrRight, header)) {
+		attacker->StopAttack();
 		Sender->ReleaseCurrentAction();
 		assert(tar);
-		actor->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
-		Log(WARNING, "AttackCore", "Weapon unusable: {}!", fmt::WideToChar{actor->GetName()});
+		attacker->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
+		Log(WARNING, "AttackCore", "Weapon unusable: {}!", fmt::WideToChar{attacker->GetName()});
 		return;
 	}
 
-	unsigned int weaponrange = actor->GetWeaponRange(wi);
-
-	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
-		weaponrange += 10;
+	unsigned int weaponRange = attacker->GetWeaponRange(wi);
+	if (target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
+		weaponRange += 10;
 	}
+
 	if (!(flags & AC_NO_SOUND) && !Sender->CurrentActionTicks) {
 		// play the battle cry
 		// pick from all 5 possible verbal constants
-		if (!actor->PlayWarCry(5)) {
+		if (!attacker->PlayWarCry(5)) {
 			// for monsters also try their 2da/ini file sounds
-			if (!actor->InParty) {
+			if (!attacker->InParty) {
 				ResRef sound;
-				actor->GetSoundFromFile(sound, 200);
-				core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos);
+				attacker->GetSoundFromFile(sound, 200);
+				core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, attacker->Pos);
 			}
 		}
 		//display attack message
@@ -1525,35 +1525,35 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 	}
 
-	double angle = AngleFromPoints(actor->Pos, target->Pos);
-	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-		!WithinPersonalRange(actor, target->Pos, weaponrange) ||
-		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
-		!CanSee(Sender, target, true, 0)) {
-		MoveNearerTo(Sender, target, Feet2Pixels(weaponrange, angle));
+	double angle = AngleFromPoints(attacker->Pos, target->Pos);
+	if (attacker->GetCurrentArea() != target->GetCurrentArea() ||
+		!WithinPersonalRange(attacker, target->Pos, weaponRange) ||
+		!attacker->GetCurrentArea()->IsVisibleLOS(attacker->Pos, target->Pos) ||
+		!CanSee(attacker, target, true, 0)) {
+		MoveNearerTo(attacker, target, Feet2Pixels(weaponRange, angle));
 		return;
 	} else if (target->Type == ST_DOOR) {
 		//Forcing a lock does not launch the trap...
 		Door* door = static_cast<Door*>(target);
 		if(door->Flags & DOOR_LOCKED) {
-			door->TryBashLock(actor);
+			door->TryBashLock(attacker);
 		}
 		Sender->ReleaseCurrentAction();
 		return;
 	} else if (target->Type == ST_CONTAINER) {
 		Container* cont = static_cast<Container*>(target);
 		if(cont->Flags & CONT_LOCKED) {
-			cont->TryBashLock(actor);
+			cont->TryBashLock(attacker);
 		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 	//action performed
-	actor->FaceTarget(target);
+	attacker->FaceTarget(target);
 
 	Sender->LastTarget = target->GetGlobalID();
 	Sender->LastTargetPersistent = Sender->LastTarget;
-	actor->PerformAttack(core->GetGame()->GameTime);
+	attacker->PerformAttack(core->GetGame()->GameTime);
 }
 
 //we need this because some special characters like _ or * are also accepted
