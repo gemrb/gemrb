@@ -1834,10 +1834,10 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 				if (i & uint8_t(PathMapFlags::SIDEWALL)) {
 					searchMapPal->col[uint8_t(PathMapFlags::SIDEWALL)] = Color(64, 64, 128, 128); // blues-ish
 				} else if (i & uint8_t(PathMapFlags::ACTOR)) {
-					searchMapPal->col[uint8_t(PathMapFlags::SIDEWALL)] = Color(128, 64, 128, 128); // actor, purple-ish
+					searchMapPal->col[i] = Color(128, 64, 128, 128); // actor, purple-ish
 				} else if ((i & uint8_t(PathMapFlags::PASSABLE)) == 0) {
 					// anything else that isnt PASSABLE
-					searchMapPal->col[uint8_t(PathMapFlags::SIDEWALL)] = ColorGray;
+					searchMapPal->col[i] = ColorGray;
 				}
 			}
 			
