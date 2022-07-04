@@ -893,17 +893,10 @@ bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, BitOp op) const
 bool Inventory::EquipItem(ieDword slot)
 {
 	const ITMExtHeader *header;
-
-	if (!Owner) {
-		//maybe assertion too?
-		return false;
-	}
 	const CREItem *item = GetSlotItem(slot);
 	if (!item) {
 		return false;
 	}
-
-	int weaponslot;
 
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
@@ -916,6 +909,7 @@ bool Inventory::EquipItem(ieDword slot)
 	Owner->ClearCurrentStanceAnims();
 	
 	int armorLevel = itm->AnimationType[0] - '1';
+	int weaponslot;
 	switch (effect) {
 	case SLOT_EFFECT_FIST:
 		SetEquippedSlot(IW_NO_EQUIPPED, 0);
