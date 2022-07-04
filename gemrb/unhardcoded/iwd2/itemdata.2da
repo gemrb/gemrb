@@ -11,6 +11,7 @@ HIDE       66         4        20         0          3
 ROBE       67         0        20         0          0
 SCALE      68         5        20         0          3
 ARROW      5          0        20         3          0
+BULLET     14         0        20         2          0
 BOW        15         0        20         3          0
 DAGGER     16         0        19         2          0
 MACE       17         0        20         2          0
