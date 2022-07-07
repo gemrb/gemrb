@@ -6364,13 +6364,11 @@ bool Actor::GetCombatDetails(int& tohit, bool leftorright, \
 
 			style = 1000*stars + IE_PROFICIENCYSINGLEWEAPON;
 			styleIdx = 3;
-		} else if (weapon) {
+		} else {
 			stars = GetStars(IE_PROFICIENCYSWORDANDSHIELD);
 
 			style = 1000*stars + IE_PROFICIENCYSWORDANDSHIELD;
 			styleIdx = 2;
-		} else {
-			// no bonus
 		}
 	} else {
 		// ranged - no bonus
