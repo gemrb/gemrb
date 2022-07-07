@@ -370,6 +370,11 @@ HasUsePointFlag = <bool>
 Detail about how infopoints react when used (iwd2).
 
 
+HasWeaponSets = <bool>
+- - - - - - - - - - - - -
+Does the game support several weapon sets, shield slots like iwd2?
+
+
 IgnoreButtonFrames = <bool>
 - - - - - - - - - - - - - -
 If set to 1, buttons will ignore frame numbers as set in button CHU

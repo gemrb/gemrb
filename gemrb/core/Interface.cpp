@@ -1691,6 +1691,7 @@ static const StringView game_flags[GF_COUNT + 1]={
 		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
 		"ClearingActionOverride", //83GF_CLEARING_ACTIONOVERRIDE
 		"DamageInnocentRep",  //84GF_DAMAGE_INNOCENT_REP
+		"HasWeaponSets", // GF_HAS_WEAPON_SETS
 		StringView()          //for our own safety, this marks the end of the pole
 };
 

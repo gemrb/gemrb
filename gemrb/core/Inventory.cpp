@@ -112,8 +112,7 @@ void Inventory::Init()
 	LAST_QUICK=-1;
 	SLOT_LEFT=-1;
 	SLOT_ARMOR=-1;
-	//TODO: set this correctly
-	IWD2 = false;
+	IWD2 = core->HasFeature(GF_HAS_WEAPON_SETS);
 }
 
 Inventory::~Inventory()
@@ -1138,7 +1137,6 @@ void Inventory::SetShieldSlot(int arg)
 {
 	if (SLOT_LEFT!=-1) {
 		assert(SLOT_MELEE+1==SLOT_LEFT);
-		IWD2=true;
 		return;
 	}
 	SLOT_LEFT=arg;

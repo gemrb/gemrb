@@ -140,6 +140,7 @@ enum GameFeatureFlags : uint32_t {
 	GF_LAYERED_WATER_TILES,				// TileOverlay for water has an extra half transparent layer (all but BG1)
 	GF_CLEARING_ACTIONOVERRIDE,         // bg2, not iwd2
 	GF_DAMAGE_INNOCENT_REP,             // not bg1
+	GF_HAS_WEAPON_SETS,             	// iwd2
 
 	GF_COUNT // sentinal count
 };
