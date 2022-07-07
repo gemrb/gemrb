@@ -277,6 +277,7 @@ struct WeaponInfo {
 	int critrange = 0; // the lower value of the critical range (eg. 19 in 19-20/x3)
 	int profdmgbon = 0;
 	int launcherDmgBonus = 0;
+	int launcherTHAC0Bonus = 0;
 	const ITMExtHeader* extHeader = nullptr;
 };
 

@@ -1369,8 +1369,10 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		wi.range = launcherHeader->Range + 1;
 		if (hittingHeader->ProjectileQualifier) { // don't add bonuses for weapons without launchers or they would be doubled
 			wi.launcherDmgBonus = launcherHeader->DamageBonus; // save the original bonus
+			wi.launcherTHAC0Bonus = launcherHeader->THAC0Bonus;
 		} else {
 			wi.launcherDmgBonus = 0;
+			wi.launcherTHAC0Bonus = 0;
 		}
 		wi.itemtype = launcherItem->ItemType;
 		wi.prof = launcherItem->WeaProf;
@@ -1384,6 +1386,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		wi.itemtype = item->ItemType;
 		wi.prof = item->WeaProf;
 		wi.launcherDmgBonus = 0;
+		wi.launcherTHAC0Bonus = 0;
 
 		// any melee weapon usable by a single class thief is game (UAI does not affect this)
 		// but also check a bit in the recharge flags (modder extension)

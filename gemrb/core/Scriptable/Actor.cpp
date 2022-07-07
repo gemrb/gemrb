@@ -6343,37 +6343,11 @@ bool Actor::GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& 
 	style = 0;
 	CriticalBonus = 0;
 	const ITMExtHeader* hittingheader = wi.extHeader;
-	const ITMExtHeader *rangedheader = nullptr;
-	int THAC0Bonus = hittingheader->THAC0Bonus;
-	DamageBonus = hittingheader->DamageBonus;
+	if (!hittingheader) return false; // item is unsuitable for a fight
 
-	switch(hittingheader->AttackType) {
-	case ITEM_AT_MELEE:
-		wi.wflags = WEAPON_MELEE;
-		break;
-	case ITEM_AT_PROJECTILE: //throwing weapon
-		wi.wflags = WEAPON_RANGED;
-		break;
-	case ITEM_AT_BOW:
-		rangedheader = GetRangedWeapon();
-		if (!rangedheader) {
-			//display out of ammo verbal constant if there were any
-			//VerbalConstant(VB_OUTOFAMMO); // FUTURE: gemrb extension
-			//SetStance(IE_ANI_READY);
-			//set some trigger?
-			return false;
-		}
-		wi.wflags = WEAPON_RANGED;
-		//The bow can give some bonuses, but the core attack is made by the arrow.
-		hittingheader = rangedheader;
-		THAC0Bonus += rangedheader->THAC0Bonus;
-		DamageBonus += rangedheader->DamageBonus;
-		break;
-	default:
-		//item is unsuitable for fight
-		wi.wflags = 0;
-		return false;
-	}//melee or ranged
+	int THAC0Bonus = hittingheader->THAC0Bonus + wi.launcherTHAC0Bonus;
+	DamageBonus = hittingheader->DamageBonus + wi.launcherDmgBonus;
+
 	if (ReverseToHit) THAC0Bonus = -THAC0Bonus;
 	ToHit.SetWeaponBonus(THAC0Bonus);
 
