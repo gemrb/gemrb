@@ -375,7 +375,7 @@ private:
 	void CalculateWeight(void);
 	int FindRangedProjectile(unsigned int type) const;
 	// called by KillSlot
-	void RemoveSlotEffects( /*CREItem* slot*/ ieDword slot );
+	void RemoveSlotEffects(ieDword slot);
 	void KillSlot(unsigned int index);
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot) const;
 	void UpdateWeaponAnimation();
