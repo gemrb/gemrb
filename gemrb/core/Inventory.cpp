@@ -370,9 +370,10 @@ void Inventory::KillSlot(unsigned int index)
 		error("Inventory", "Invalid item: {}!", item->ItemResRef);
 	}
 	ItemExcl &= ~itm->ItemExcl;
+
 	int eqslot = GetEquippedSlot();
 	ieDword equip;
-
+	bool recache = true;
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
 			UpdateShieldAnimation(nullptr);
@@ -390,6 +391,7 @@ void Inventory::KillSlot(unsigned int index)
 				} else {
 					EquipBestWeapon(EQUIP_MELEE);
 				}
+				recache = false;
 			}
 			UpdateWeaponAnimation();
 			break;
@@ -399,6 +401,7 @@ void Inventory::KillSlot(unsigned int index)
 			if (eqslot == (int)index) {
 				SetEquippedSlot(IW_NO_EQUIPPED, 0);
 				UpdateWeaponAnimation();
+				recache = false;
 				break;
 			}
 
@@ -423,6 +426,7 @@ void Inventory::KillSlot(unsigned int index)
 			if (weaponslot == SLOT_FIST) { // a ranged weapon was not found - freshly unequipped
 				EquipBestWeapon(EQUIP_MELEE);
 				UpdateWeaponAnimation();
+				recache = false;
 				break;
 			}
 
@@ -451,6 +455,7 @@ void Inventory::KillSlot(unsigned int index)
 			} else {
 				EquipBestWeapon(EQUIP_MELEE);
 			}
+			recache = false;
 			gamedata->FreeItem(itm2, item2->ItemResRef, false);
 
 			// reset Equipped if it is a ranged weapon slot
@@ -460,14 +465,17 @@ void Inventory::KillSlot(unsigned int index)
 			break;
 		case SLOT_EFFECT_HEAD:
 			Owner->SetUsedHelmet({});
+			recache = false;
 			break;
 		case SLOT_EFFECT_ITEM:
 			//remove the armor type only if this item is responsible for it
 			if ((ieDword) (itm->AnimationType[0]-'1') == Owner->GetBase(IE_ARMOR_TYPE)) {
 				Owner->SetBase(IE_ARMOR_TYPE, 0);
 			}
+			recache = false;
 			break;
 	}
+	if (recache) CacheAllWeaponInfo();
 	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 /** if resref is "", then destroy ALL items
@@ -917,6 +925,7 @@ bool Inventory::EquipItem(ieDword slot)
 	case SLOT_EFFECT_LEFT:
 		//no idea if the offhand weapon has style, or simply the right
 		//hand style is dominant
+		CacheAllWeaponInfo();
 		UpdateShieldAnimation(itm);
 		break;
 	case SLOT_EFFECT_MELEE:
@@ -1225,6 +1234,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 	//doesn't work if magic slot is used, refresh the magic slot just in case
 	if (MagicSlotEquipped() && (slotcode!=SLOT_MAGIC-SLOT_MELEE)) {
 		Equipped = SLOT_MAGIC-SLOT_MELEE;
+		CacheAllWeaponInfo();
 		UpdateWeaponAnimation();
 		return false;
 	}
@@ -1256,6 +1266,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 		Equipped = IW_NO_EQUIPPED;
 		//fist slot equipping effects
 		AddSlotEffects(SLOT_FIST);
+		CacheAllWeaponInfo();
 		UpdateWeaponAnimation();
 		return true;
 	}
@@ -1276,6 +1287,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 			}
 		}
 	}
+	CacheAllWeaponInfo();
 	UpdateWeaponAnimation();
 	return true;
 }
@@ -1305,6 +1317,106 @@ void Inventory::SetEquipped(ieWordSigned slot, ieWord header)
 {
 	Equipped = slot;
 	EquippedHeader = header;
+	// CacheAllWeaponInfo will be called later in all callers
+}
+
+void Inventory::CacheAllWeaponInfo() const
+{
+	CacheWeaponInfo(false);
+	if (Owner->IsDualWielding()) {
+		CacheWeaponInfo(true);
+	}
+}
+
+void Inventory::CacheWeaponInfo(bool leftOrRight) const
+{
+	WeaponInfo& wi = Owner->weaponInfo[leftOrRight];
+	wi.slot = GetEquippedSlot();
+	bool ranged = (core->QuerySlotEffects(wi.slot) & SLOT_EFFECT_MISSILE) == SLOT_EFFECT_MISSILE; // detect ammo slot
+	wi.extHeader = nullptr; // for the error paths; properly set at the end
+
+	const CREItem* weapon;
+	if (ranged) {
+		weapon = GetSlotItem(wi.slot); // actually the projectile
+	} else {
+		weapon = GetUsedWeapon(leftOrRight, wi.slot);
+	}
+	if (!weapon) {
+		return;
+	}
+	const Item *item = gamedata->GetItem(weapon->ItemResRef, true);
+	if (!item) {
+		Log(WARNING, "Actor", "Missing or invalid weapon item: {}!", weapon->ItemResRef);
+		return;
+	}
+
+	wi.itemflags = weapon->Flags;
+	wi.critmulti = core->GetCriticalMultiplier(item->ItemType);
+	wi.critrange = core->GetCriticalRange(item->ItemType);
+
+	// fetch info from selected weapon/ammo header
+	const ITMExtHeader* hittingHeader = item->GetExtHeader(EquippedHeader);
+	assert(hittingHeader);
+	if (hittingHeader->AttackType == ITEM_AT_PROJECTILE) ranged = true; // throwing weapon
+
+	if (ranged) {
+		if (hittingHeader) {
+			wi.backstabbing = hittingHeader->RechargeFlags & IE_ITEM_BACKSTAB;
+		} else {
+			wi.backstabbing = false;
+		}
+		wi.wflags |= WEAPON_RANGED;
+		wi.wflags &= ~WEAPON_MELEE;
+
+		// deal with data we need to use from the launcher
+		int tmpSlot = wi.slot; // GetUsedWeapon will modify it!
+		CREItem* launcher = GetUsedWeapon(false, tmpSlot);
+		const Item* launcherItem = gamedata->GetItem(launcher->ItemResRef, true);
+		const ITMExtHeader* launcherHeader = launcherItem->GetExtHeader(0);
+		// range has to be from the weapon, the projectile has no effect on it
+		wi.range = launcherHeader->Range + 1;
+		wi.itemtype = launcherItem->ItemType;
+		wi.prof = launcherItem->WeaProf;
+		// the magic of the bow and the arrow do not add up
+		wi.enchantment = std::max(item->Enchantment, launcherItem->Enchantment);
+
+		gamedata->FreeItem(launcherItem, launcher->ItemResRef, false);
+	} else {
+		wi.wflags &= ~WEAPON_RANGED;
+		wi.wflags |= WEAPON_MELEE;
+		wi.enchantment = item->Enchantment;
+		wi.itemtype = item->ItemType;
+		wi.prof = item->WeaProf;
+
+		// any melee weapon usable by a single class thief is game (UAI does not affect this)
+		// but also check a bit in the recharge flags (modder extension)
+		if (hittingHeader) {
+			wi.backstabbing = !(item->UsabilityBitmask & 0x400000) || (hittingHeader->RechargeFlags & IE_ITEM_BACKSTAB);
+			wi.range = hittingHeader->Range + 1;
+		} else {
+			wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
+		}
+		if (IWD2) {
+			// iwd2 doesn't set the usability mask
+			wi.backstabbing = true;
+		}
+	}
+
+	// make sure we use 'false' in this FreeItem
+	// so the extended header won't point into invalid memory
+	gamedata->FreeItem(item, weapon->ItemResRef, false);
+	if (!hittingHeader) {
+		return;
+	}
+
+	if (hittingHeader->RechargeFlags & IE_ITEM_KEEN) {
+		//this is correct, the threat range is only increased by one in the original engine
+		wi.critrange--;
+	}
+	if (hittingHeader->Location != ITEM_LOC_WEAPON) {
+		return;
+	}
+	wi.extHeader = hittingHeader;
 }
 
 bool Inventory::FistsEquipped() const

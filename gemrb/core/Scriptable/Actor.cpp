@@ -320,19 +320,6 @@ static const ResRef ArterialStrikeRef = "artstr";
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 
-//internal flags for calculating to hit
-#define WEAPON_FIST        0
-#define WEAPON_MELEE       1
-#define WEAPON_RANGED      2
-#define WEAPON_STYLEMASK   15
-#define WEAPON_LEFTHAND    16
-#define WEAPON_USESTRENGTH 32
-#define WEAPON_USESTRENGTH_DMG 64
-#define WEAPON_USESTRENGTH_HIT 128
-#define WEAPON_FINESSE     256
-#define WEAPON_BYPASS      0x10000
-#define WEAPON_KEEN        0x20000
-
 static int avBase, avStance;
 struct avType {
 	ResRef avresref;
@@ -3029,11 +3016,10 @@ void Actor::RefreshPCStats() {
 	}
 
 	//get the wspattack bonuses for proficiencies
-	WeaponInfo wi;
-	const ITMExtHeader *header = GetWeapon(wi, false);
+	const ITMExtHeader* header = GetWeapon(false);
 	ieDword stars;
 	int dualwielding = IsDualWielding();
-	stars = GetProficiency(wi.prof)&PROFS_MASK;
+	stars = GetProficiency(weaponInfo[0].prof) & PROFS_MASK;
 
 	// tenser's transformation ensures the actor is at least proficient with any weapon
 	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
@@ -5822,34 +5808,6 @@ void Actor::GetPrevAnimation()
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }
 
-//slot is the projectile slot
-//This will return the projectile item.
-const ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
-{
-//EquippedSlot is the projectile. To get the weapon, use inventory.GetUsedWeapon()
-	wi.slot = inventory.GetEquippedSlot();
-	const CREItem *wield = inventory.GetSlotItem(wi.slot);
-	if (!wield) {
-		return NULL;
-	}
-	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
-	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: {}!", wield->ItemResRef);
-		return NULL;
-	}
-	//The magic of the bow and the arrow do not add up
-	if (item->Enchantment > wi.enchantment) {
-		wi.enchantment = item->Enchantment;
-	}
-	wi.itemflags = wield->Flags;
-	//not resetting wi.itemtype, since we want it to remain the one of the launcher
-	//wi.range is not set, the projectile has no effect on range?
-
-	const ITMExtHeader *which = item->GetWeaponHeader(true);
-	gamedata->FreeItem(item, wield->ItemResRef, false);
-	return which;
-}
-
 int Actor::IsDualWielding() const
 {
 	int slot;
@@ -5872,72 +5830,18 @@ int Actor::IsDualWielding() const
 	return (weapon>0)?1:0;
 }
 
-//returns weapon header currently used (bow in case of bow+arrow)
-//if range is nonzero, then the returned header is valid
-const ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
+// this will return the projectile item, not launcher.
+const ITMExtHeader* Actor::GetRangedWeapon() const
+{
+	return weaponInfo[0].extHeader;
+}
+
+// returns weapon header currently used (arrow in case of bow + arrow)
+const ITMExtHeader* Actor::GetWeapon(bool leftOrRight) const
 {
 	//only use the shield slot if we are dual wielding
-	leftorright = leftorright && IsDualWielding();
-
-	const CREItem *wield = inventory.GetUsedWeapon(leftorright, wi.slot);
-	if (!wield) {
-		return 0;
-	}
-	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
-	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid weapon item: {}!", wield->ItemResRef);
-		return 0;
-	}
-
-	wi.enchantment = item->Enchantment;
-	wi.itemtype = item->ItemType;
-	wi.itemflags = wield->Flags;
-	wi.prof = item->WeaProf;
-	wi.critmulti = core->GetCriticalMultiplier(item->ItemType);
-	wi.critrange = core->GetCriticalRange(item->ItemType);
-
-	//select first weapon header
-	// except you can never dualwield two ranged (thrown) weapons
-	const ITMExtHeader *which;
-	if (!leftorright && GetAttackStyle() == WEAPON_RANGED) {
-		which = item->GetWeaponHeader(true);
-		if (which) {
-			wi.backstabbing = which->RechargeFlags & IE_ITEM_BACKSTAB;
-		} else {
-			wi.backstabbing = false;
-		}
-		wi.wflags |= WEAPON_RANGED;
-	} else {
-		which = item->GetWeaponHeader(false);
-		// any melee weapon usable by a single class thief is game (UAI does not affect this)
-		// but also check a bit in the recharge flags (modder extension)
-		if (which) {
-			wi.backstabbing = !(item->UsabilityBitmask & 0x400000) || (which->RechargeFlags & IE_ITEM_BACKSTAB);
-		} else {
-			wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
-		}
-		if (third) {
-			// iwd2 doesn't set the usability mask
-			wi.backstabbing = true;
-		}
-	}
-
-	if (which && (which->RechargeFlags&IE_ITEM_KEEN)) {
-		//this is correct, the threat range is only increased by one in the original engine
-		wi.critrange--;
-	}
-
-	//make sure we use 'false' in this freeitem
-	//so 'which' won't point into invalid memory
-	gamedata->FreeItem(item, wield->ItemResRef, false);
-	if (!which) {
-		return 0;
-	}
-	if (which->Location!=ITEM_LOC_WEAPON) {
-		return 0;
-	}
-	wi.range = which->Range+1;
-	return which;
+	leftOrRight = leftOrRight && IsDualWielding();
+	return weaponInfo[leftOrRight].extHeader;
 }
 
 void Actor::GetNextStance()
@@ -6151,11 +6055,10 @@ void Actor::SetModalSpell(ieDword state, const ResRef& spell)
 //even spells got this attack style
 int Actor::GetAttackStyle() const
 {
-	WeaponInfo wi;
 	// Some weapons have both melee and ranged capability, eg. bg2's rifthorne (ax1h09)
 	// so we check the equipped header's attack type: 2-projectile and 4-launcher
 	// It is more complicated than it seems because the equipped header is the one of the projectile for launchers
-	const ITMExtHeader *rangedheader = GetRangedWeapon(wi);
+	const ITMExtHeader* rangedheader = GetRangedWeapon();
 	if (!PCStats) {
 		// fall back to simpler logic that works most of the time
 		//Non NULL if the equipped slot is a projectile or a throwing weapon
@@ -6325,8 +6228,7 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 int Actor::BAB2APR(int pBAB, int pBABDecrement, int CheckRapidShot) const
 {
 	if (CheckRapidShot && HasSpellState(SS_RAPIDSHOT)) {
-		WeaponInfo wi;
-		const ITMExtHeader *HittingHeader = GetRangedWeapon(wi);
+		const ITMExtHeader* HittingHeader = GetRangedWeapon();
 		if (HittingHeader) {
 			ieDword AttackTypeLowBits = HittingHeader->AttackType & 0xFF; // this is done by the original; leaving in case we expand
 			if (AttackTypeLowBits == ITEM_AT_BOW || AttackTypeLowBits == ITEM_AT_PROJECTILE) {
@@ -6396,9 +6298,8 @@ void Actor::InitRound(ieDword gameTime)
 // a simplified check from GetCombatDetails for use in AttackCore
 bool Actor::WeaponIsUsable(bool leftorright, const ITMExtHeader *header) const
 {
-	WeaponInfo wi;
 	if (!header) {
-		header = GetWeapon(wi, leftorright && IsDualWielding());
+		header = GetWeapon(leftorright && IsDualWielding());
 		if (!header) {
 			return false;
 		}
@@ -6409,7 +6310,7 @@ bool Actor::WeaponIsUsable(bool leftorright, const ITMExtHeader *header) const
 		case ITEM_AT_PROJECTILE: //throwing weapon
 			break;
 		case ITEM_AT_BOW:
-			rangedheader = GetRangedWeapon(wi);
+			rangedheader = GetRangedWeapon();
 			if (!rangedheader) {
 				return false;
 			}
@@ -6428,16 +6329,17 @@ int Actor::GetStars(stat_t proficiency) const
 	return stars;
 }
 
-bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const ITMExtHeader *&header, const ITMExtHeader *&hittingheader, \
-		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target)
+bool Actor::GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& header, const ITMExtHeader*& hittingheader, \
+		int& DamageBonus, int& speed, int& CriticalBonus, int& style, const Actor* target)
 {
 	SetBaseAPRandAB(true);
 	speed = -(int)GetStat(IE_PHYSICALSPEED);
 	ieDword dualwielding = IsDualWielding();
-	header = GetWeapon(wi, leftorright && dualwielding);
+	header = GetWeapon(leftorright);
 	if (!header) {
 		return false;
 	}
+	WeaponInfo& wi = weaponInfo[leftorright && dualwielding];
 	style = 0;
 	CriticalBonus = 0;
 	hittingheader = header;
@@ -6453,7 +6355,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		wi.wflags = WEAPON_RANGED;
 		break;
 	case ITEM_AT_BOW:
-		rangedheader = GetRangedWeapon(wi);
+		rangedheader = GetRangedWeapon();
 		if (!rangedheader) {
 			//display out of ammo verbal constant if there were any
 			//VerbalConstant(VB_OUTOFAMMO); // FUTURE: gemrb extension
@@ -6605,13 +6507,12 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		// the bonus is applied to both hands
 		if (dualwielding) {
 			if (leftorright) {
-				if (wi.wflags&WEAPON_FINESSE) {
+				if (wi.wflags & WEAPON_FINESSE) {
 					prof += 2;
 				}
 			} else {
 				// lookup the offhand
-				WeaponInfo wi2;
-				const ITMExtHeader* header2 = GetWeapon(wi2, true);
+				const ITMExtHeader* header2 = GetWeapon(true);
 				if (header2->RechargeFlags&IE_ITEM_USEDEXTERITY) { // identical to the WEAPON_FINESSE check
 					prof += 2;
 				}
@@ -6828,8 +6729,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 
 	//check for s/s and single weapon ac bonuses
 	if (!IsDualWielding()) {
-		WeaponInfo wi;
-		const ITMExtHeader* header = GetWeapon(wi, false);
+		const ITMExtHeader* header = GetWeapon(false);
 		//make sure we're wielding a single melee weapon
 		if (header && (header->AttackType == ITEM_AT_MELEE)) {
 			int slot;
@@ -6960,7 +6860,12 @@ void Actor::PerformAttack(ieDword gameTime)
 		leftorright = (bool) ((attacksperround-attackcount)&1);
 	}
 
-	WeaponInfo wi;
+	WeaponInfo& wi = weaponInfo[leftorright];
+	if (!wi.extHeader && leftorright) {
+		// nothing in left hand, use right
+		wi = weaponInfo[0];
+	}
+
 	const ITMExtHeader *header = nullptr;
 	const ITMExtHeader *hittingheader = nullptr;
 	int tohit;
@@ -6968,7 +6873,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	int speed, style;
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, target)) {
+	if (!GetCombatDetails(tohit, leftorright, header, hittingheader, DamageBonus, speed, CriticalBonus, style, target)) {
 		return;
 	}
 
@@ -7000,7 +6905,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if (!WithinPersonalRange(this, target->Pos, GetWeaponRange(wi)) || GetCurrentArea() != target->GetCurrentArea()) {
+	if (!WithinPersonalRange(this, target->Pos, GetWeaponRange(leftorright)) || GetCurrentArea() != target->GetCurrentArea()) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
@@ -7182,9 +7087,9 @@ void Actor::PerformAttack(ieDword gameTime)
 	ResetState();
 }
 
-int Actor::GetWeaponRange(const WeaponInfo &wi) const
+unsigned int Actor::GetWeaponRange(bool leftOrRight) const
 {
-	return std::min(wi.range, Modified[IE_VISUALRANGE]);
+	return std::min(weaponInfo[leftOrRight].range, Modified[IE_VISUALRANGE]);
 }
 
 int Actor::WeaponDamageBonus(const WeaponInfo &wi) const
@@ -7301,9 +7206,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				// flat resistance, eg. 10/- or eg. 5/+2 for physical types
 				// for actors we need special care for damage reduction - traps (...) don't have enchanted weapons
 				if (attacker && it->second.reduction) {
-					WeaponInfo wi;
-					attacker->GetWeapon(wi, false); // FIXME: use a cheaper way to share the weaponEnchantment + this might have been the left hand
-					ieDword weaponEnchantment = wi.enchantment;
+					ieDword weaponEnchantment = attacker->weaponInfo[0].enchantment; // FIXME: this might have been the left hand
 					// disregard other resistance boni when checking whether to skip reduction
 					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
 				} else {
@@ -9384,21 +9287,18 @@ void Actor::SetUsedWeapon(AnimRef AnimationType, const ieWord* MeleeAnimation, u
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
 	}
-	WeaponInfo wi;
-	const ITMExtHeader *header = GetWeapon(wi);
 
-	if(header && ((header->AttackType == ITEM_AT_BOW) ||
-		(header->AttackType == ITEM_AT_PROJECTILE && header->ProjectileQualifier))) {
-		const ITMExtHeader* projHeader = GetRangedWeapon(wi);
-		if (projHeader->ProjectileQualifier == 0) return; /* no ammo yet? */
-		AttackStance = IE_ANI_SHOOT;
-		anims->SetRangedType(projHeader->ProjectileQualifier-1);
-		//bows ARE one handed, from an anim POV at least
-		anims->SetWeaponType(IE_ANI_WEAPON_1H);
+	const ITMExtHeader* header = GetWeapon(false);
+	if (header && header->AttackType == ITEM_AT_PROJECTILE && !header->ProjectileQualifier) {
+		AttackStance = IE_ANI_ATTACK_SLASH; // that's it, "throw" it!
 		return;
 	}
-	if(header && (header->AttackType == ITEM_AT_PROJECTILE)) {
-		AttackStance = IE_ANI_ATTACK_SLASH; //That's it!!
+	if (header && weaponInfo[0].wflags & WEAPON_RANGED) {
+		if (header->ProjectileQualifier == 0) return; // no ammo yet?
+		AttackStance = IE_ANI_SHOOT;
+		anims->SetRangedType(header->ProjectileQualifier - 1);
+		//bows ARE one handed, from an anim POV at least
+		anims->SetWeaponType(IE_ANI_WEAPON_1H);
 		return;
 	}
 	AttackStance = IE_ANI_ATTACK;

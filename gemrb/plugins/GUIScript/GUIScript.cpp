@@ -11329,6 +11329,11 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	slot = core->QuerySlot(slot);
+	// recache info for potentially changed ammo or weapon ability
+	if (!which || (which >= ACT_WEAPON1 && which <= ACT_WEAPON4)) {
+		actor->inventory.SetEquipped(actor->inventory.GetEquipped(), headerIndex); // reset EquippedHeader
+		actor->inventory.CacheAllWeaponInfo();
+	}
 	actor->SetupQuickSlot(which, slot, headerIndex);
 	Py_RETURN_NONE;
 }
@@ -12399,7 +12404,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	leftorright = leftorright&1;
-	WeaponInfo wi;
+	WeaponInfo wi = actor->weaponInfo[leftorright];
 	const ITMExtHeader *header = nullptr; // contains the weapon header
 	const ITMExtHeader *hittingheader = nullptr; // same header, except for ranged weapons it is the ammo header
 	int tohit=20;
@@ -12409,7 +12414,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	int style=0;
 
 	PyObject* dict = PyDict_New();
-	if (!actor->GetCombatDetails(tohit, leftorright, wi, header, hittingheader, DamageBonus, speed, CriticalBonus, style, NULL)) {
+	if (!actor->GetCombatDetails(tohit, leftorright, header, hittingheader, DamageBonus, speed, CriticalBonus, style, nullptr)) {
 		//TODO: handle error, so tohit will still be set correctly?
 	}
 	PyDict_SetItemString(dict, "Slot", PyLong_FromLong(wi.slot));

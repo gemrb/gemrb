@@ -1490,9 +1490,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 	}
 
-	WeaponInfo wi;
 	bool leftOrRight = false;
-	const ITMExtHeader* header = attacker->GetWeapon(wi, leftOrRight);
+	const ITMExtHeader* header = attacker->GetWeapon(leftOrRight);
 	//will return false on any errors (eg, unusable weapon)
 	if (!header || !attacker->WeaponIsUsable(leftOrRight, header)) {
 		attacker->StopAttack();
@@ -1503,7 +1502,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
-	unsigned int weaponRange = attacker->GetWeaponRange(wi);
+	unsigned int weaponRange = attacker->GetWeaponRange(leftOrRight);
 	if (target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
 		weaponRange += 10;
 	}

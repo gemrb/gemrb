@@ -371,6 +371,7 @@ public:
 	static int GetQuickSlot();
 	static int GetInventorySlot();
 	int InBackpack(int slot) const;
+	void CacheAllWeaponInfo() const;
 private:
 	void CalculateWeight(void);
 	int FindRangedProjectile(unsigned int type) const;
@@ -380,6 +381,7 @@ private:
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot) const;
 	void UpdateWeaponAnimation();
 	void UpdateShieldAnimation(const Item *it);
+	void CacheWeaponInfo(bool leftOrRight) const;
 };
 
 }

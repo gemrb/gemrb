@@ -251,6 +251,19 @@ struct ActionButtonRow2 {
 	ieByte clss;
 };
 
+// internal flags for calculating to hit and similar
+#define WEAPON_FIST        0
+#define WEAPON_MELEE       1
+#define WEAPON_RANGED      2
+#define WEAPON_STYLEMASK   15
+#define WEAPON_LEFTHAND    16
+#define WEAPON_USESTRENGTH 32
+#define WEAPON_USESTRENGTH_DMG 64
+#define WEAPON_USESTRENGTH_HIT 128
+#define WEAPON_FINESSE     256
+#define WEAPON_BYPASS      0x10000
+#define WEAPON_KEEN        0x20000
+
 struct WeaponInfo {
 	int slot = 0;
 	ieDword enchantment = 0;
@@ -264,6 +277,7 @@ struct WeaponInfo {
 	int critrange = 0; // the lower value of the critical range (eg. 19 in 19-20/x3)
 	int profdmgbon = 0;
 	int launcherdmgbon = 0;
+	const ITMExtHeader* extHeader = nullptr;
 };
 
 struct BABTable {
@@ -344,6 +358,7 @@ public:
 	ieDword appearance = 0xffffff; // schedule
 	ArmorClass AC;
 	ToHitStats ToHit;
+	WeaponInfo weaponInfo[2]{};
 	ModalState Modal{};
 
 	ieDword LastExit = 0;    // the global ID of the exit to be used
@@ -696,10 +711,10 @@ public:
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ResRef& resref, ieDword flags, int bookmask=-1, int level=-1);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
-	const ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
+	const ITMExtHeader* GetRangedWeapon() const;
 	/* Returns current weapon range and extended header
 	if range is nonzero, then which is valid */
-	const ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false) const;
+	const ITMExtHeader* GetWeapon(bool leftOrRight) const;
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor */
@@ -734,12 +749,12 @@ public:
 	/* returns the number of allocated proficiency points (stars) */
 	int GetStars(stat_t proficiency) const;
 	/* get the current hit bonus */
-	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, const ITMExtHeader *&header, const ITMExtHeader *&hittingheader,\
-		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target);
+	bool GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& header, const ITMExtHeader*& hittingheader, \
+		int& DamageBonus, int& speed, int& CriticalBonus, int& style, const Actor* target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* returns the adjusted weapon range, since items have odd values stored */
-	int GetWeaponRange(const WeaponInfo &wi) const;
+	unsigned int GetWeaponRange(bool leftOrRight) const;
 	/* filter out any damage reduction that is cancelled by high weapon enchantment and return the resulting resistance */
 	int GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const;
 	/* calculates strength (dexterity) based damage adjustment */
