@@ -1232,6 +1232,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 	//if it is an illegal code, make it fist
 	if ((size_t) (GetWeaponSlot(slotcode))>Slots.size()) {
 		slotcode=IW_NO_EQUIPPED;
+		EquippedHeader = 0;
 	}
 
 	int oldslot = GetEquippedSlot();
