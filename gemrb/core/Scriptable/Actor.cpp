@@ -6324,20 +6324,6 @@ bool Actor::GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& 
 	if (ReverseToHit) THAC0Bonus = -THAC0Bonus;
 	ToHit.SetWeaponBonus(THAC0Bonus);
 
-	//this flag is set by the bow in case of projectile launcher.
-	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) wi.wflags|=WEAPON_USESTRENGTH;
-	if (header->RechargeFlags&IE_ITEM_USESTRENGTH_DMG) wi.wflags |= WEAPON_USESTRENGTH_DMG;
-	if (header->RechargeFlags&IE_ITEM_USESTRENGTH_HIT) wi.wflags |= WEAPON_USESTRENGTH_HIT;
-	// this flag is set in dagger/shortsword by the loader
-	if (header->RechargeFlags&IE_ITEM_USEDEXTERITY) wi.wflags|=WEAPON_FINESSE;
-	//also copy these flags (they match their WEAPON_ counterparts)
-	wi.wflags|=header->RechargeFlags&(IE_ITEM_KEEN|IE_ITEM_BYPASS);
-
-	if (wi.wflags & WEAPON_RANGED && (hittingheader->RechargeFlags&IE_ITEM_KEEN)) {
-		// all the previous checks were against the launcher, but ammo can be keen too (00arow87)
-		wi.critrange--;
-	}
-
 	// get our dual wielding modifier
 	if (dualwielding) {
 		if (leftorright) {

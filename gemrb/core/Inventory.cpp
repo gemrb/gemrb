@@ -1378,6 +1378,10 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		wi.prof = launcherItem->WeaProf;
 		// the magic of the bow and the arrow do not add up
 		wi.enchantment = std::max(item->Enchantment, launcherItem->Enchantment);
+		if (launcherHeader->RechargeFlags & IE_ITEM_KEEN) {
+			// both launchers and ammo can be keen (00arow87)
+			wi.critrange--;
+		}
 
 		gamedata->FreeItem(launcherItem, launcher->ItemResRef, false);
 	} else {
@@ -1401,6 +1405,15 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	// make sure we use 'false' in this FreeItem
 	// so the extended header won't point into invalid memory
 	gamedata->FreeItem(item, weapon->ItemResRef, false);
+
+	// these flags are set by the launcher, not ammo
+	if (hittingHeader->RechargeFlags & IE_ITEM_USESTRENGTH) wi.wflags |= WEAPON_USESTRENGTH;
+	if (hittingHeader->RechargeFlags & IE_ITEM_USESTRENGTH_DMG) wi.wflags |= WEAPON_USESTRENGTH_DMG;
+	if (hittingHeader->RechargeFlags & IE_ITEM_USESTRENGTH_HIT) wi.wflags |= WEAPON_USESTRENGTH_HIT;
+	// this flag is set in dagger/shortsword by the loader
+	if (hittingHeader->RechargeFlags & IE_ITEM_USEDEXTERITY) wi.wflags |= WEAPON_FINESSE;
+	// also copy these flags (they match their WEAPON_ counterparts)
+	wi.wflags |= hittingHeader->RechargeFlags & (IE_ITEM_KEEN | IE_ITEM_BYPASS);
 
 	if (hittingHeader->RechargeFlags & IE_ITEM_KEEN) {
 		//this is correct, the threat range is only increased by one in the original engine
