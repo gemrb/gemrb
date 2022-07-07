@@ -1330,6 +1330,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	wi.slot = GetEquippedSlot();
 	bool ranged = (core->QuerySlotEffects(wi.slot) & SLOT_EFFECT_MISSILE) == SLOT_EFFECT_MISSILE; // detect ammo slot
 	wi.extHeader = nullptr; // for the error paths; properly set at the end
+	wi.wflags = 0;
 
 	const CREItem* weapon;
 	if (ranged) {
@@ -1361,8 +1362,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		} else {
 			wi.backstabbing = false;
 		}
-		wi.wflags |= WEAPON_RANGED;
-		wi.wflags &= ~WEAPON_MELEE;
+		wi.wflags = WEAPON_RANGED;
 
 		// deal with data we need to use from the launcher
 		int tmpSlot = wi.slot; // GetUsedWeapon will modify it!
@@ -1379,8 +1379,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 
 		gamedata->FreeItem(launcherItem, launcher->ItemResRef, false);
 	} else {
-		wi.wflags &= ~WEAPON_RANGED;
-		wi.wflags |= WEAPON_MELEE;
+		wi.wflags = WEAPON_MELEE;
 		wi.enchantment = item->Enchantment;
 		wi.itemtype = item->ItemType;
 		wi.prof = item->WeaProf;
