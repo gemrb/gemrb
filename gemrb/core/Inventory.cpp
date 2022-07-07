@@ -1375,6 +1375,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		const ITMExtHeader* launcherHeader = launcherItem->GetExtHeader(0);
 		// range has to be from the weapon, the projectile has no effect on it
 		wi.range = launcherHeader->Range + 1;
+		wi.launcherDmgBonus = launcherHeader->DamageBonus; // save the original bonus
 		wi.itemtype = launcherItem->ItemType;
 		wi.prof = launcherItem->WeaProf;
 		// the magic of the bow and the arrow do not add up
@@ -1387,6 +1388,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		wi.enchantment = item->Enchantment;
 		wi.itemtype = item->ItemType;
 		wi.prof = item->WeaProf;
+		wi.launcherDmgBonus = 0;
 
 		// any melee weapon usable by a single class thief is game (UAI does not affect this)
 		// but also check a bit in the recharge flags (modder extension)

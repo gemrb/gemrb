@@ -6364,7 +6364,6 @@ bool Actor::GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& 
 			return false;
 		}
 		wi.wflags = WEAPON_RANGED;
-		wi.launcherdmgbon = DamageBonus; // save the original (launcher) bonus
 		//The bow can give some bonuses, but the core attack is made by the arrow.
 		hittingheader = rangedheader;
 		THAC0Bonus += rangedheader->THAC0Bonus;

@@ -12430,7 +12430,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "CriticalMultiplier", PyLong_FromLong(wi.critmulti));
 	PyDict_SetItemString(dict, "CriticalRange", PyLong_FromLong(wi.critrange));
 	PyDict_SetItemString(dict, "ProfDmgBon", PyLong_FromLong(wi.profdmgbon));
-	PyDict_SetItemString(dict, "LauncherDmgBon", PyLong_FromLong(wi.launcherdmgbon));
+	PyDict_SetItemString(dict, "LauncherDmgBon", PyLong_FromLong(wi.launcherDmgBonus));
 	PyDict_SetItemString(dict, "WeaponStrBonus", PyLong_FromLong(actor->WeaponDamageBonus(wi)));
 	if (hittingheader) {
 		PyDict_SetItemString(dict, "HitHeaderNumDice", PyLong_FromLong(hittingheader->DiceThrown));
