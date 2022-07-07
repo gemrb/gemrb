@@ -728,8 +728,6 @@ public:
 	void SetModalSpell(ieDword state, const ResRef& spell);
 	/* casts the modal spell if any */
 	void ApplyModal(const ResRef& modalSpell);
-	/* returns current attack style */
-	int GetAttackStyle() const;
 	/* adds the combatants to the attackers list */
 	void AttackedBy(const Actor *actor);
 	/* reorients to face target (for immediate attack) */

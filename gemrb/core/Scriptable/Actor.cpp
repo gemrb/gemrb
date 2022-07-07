@@ -311,6 +311,7 @@ static EffectRef fx_disable_button_ref = { "DisableButton", -1 };
 static EffectRef fx_damage_reduction_ref = { "DamageReduction", -1 };
 static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -1 };
 static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
+static EffectRef fx_attacks_per_round_modifier_ref = { "AttacksPerRoundModifier", -1 };
 
 //used by iwd2
 static const ResRef CripplingStrikeRef = "cripstr";
@@ -3041,7 +3042,7 @@ void Actor::RefreshPCStats() {
 				int mod = Modified[IE_NUMBEROFATTACKS] - BaseStats[IE_NUMBEROFATTACKS];
 				int bonus = gamedata->GetWeaponStyleAPRBonus(stars, warriorLevel - 1);
 				BaseStats[IE_NUMBEROFATTACKS] = defaultattacks + bonus;
-				if (GetAttackStyle() == WEAPON_RANGED) { // FIXME: should actually check if a set-apr opcode variant was used
+				if (fxqueue.HasEffectWithParam(fx_attacks_per_round_modifier_ref, 1)) { // launcher sets base APR
 					Modified[IE_NUMBEROFATTACKS] += bonus; // no default
 				} else {
 					Modified[IE_NUMBEROFATTACKS] = BaseStats[IE_NUMBEROFATTACKS] + mod;
@@ -6052,34 +6053,6 @@ void Actor::SetModalSpell(ieDword state, const ResRef& spell)
 	}
 }
 
-//even spells got this attack style
-int Actor::GetAttackStyle() const
-{
-	// Some weapons have both melee and ranged capability, eg. bg2's rifthorne (ax1h09)
-	// so we check the equipped header's attack type: 2-projectile and 4-launcher
-	// It is more complicated than it seems because the equipped header is the one of the projectile for launchers
-	const ITMExtHeader* rangedheader = GetRangedWeapon();
-	if (!PCStats) {
-		// fall back to simpler logic that works most of the time
-		//Non NULL if the equipped slot is a projectile or a throwing weapon
-		if (rangedheader) return WEAPON_RANGED;
-		return WEAPON_MELEE;
-	}
-
-	const ITMExtHeader *eh;
-	if (inventory.MagicSlotEquipped()) {
-		// this should be fine, as long as we default to melee,
-		// since there are no "magic" weapons with switchable headers
-		eh = rangedheader;
-	} else {
-		int qh = PCStats->GetHeaderForSlot(inventory.GetEquippedSlot());
-		eh = inventory.GetEquippedExtHeader(qh);
-	}
-	if (!eh) return WEAPON_MELEE; // default to melee
-	if (eh->AttackType && eh->AttackType%2 == 0) return WEAPON_RANGED;
-	return WEAPON_MELEE;
-}
-
 void Actor::AttackedBy(const Actor *attacker)
 {
 	AddTrigger(TriggerEntry(trigger_attackedby, attacker->GetGlobalID()));
@@ -6588,10 +6561,8 @@ int Actor::GetToHit(ieDword Flags, const Actor *target)
 
 	if (target) {
 		// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
-		if ((Flags&WEAPON_STYLEMASK) != WEAPON_RANGED) {
-			if (target->GetAttackStyle() == WEAPON_RANGED) {
-				generic += 4;
-			}
+		if ((Flags & WEAPON_STYLEMASK) != WEAPON_RANGED && target->weaponInfo[0].wflags & WEAPON_RANGED) {
+			generic += 4;
 		}
 
 		// melee vs. unarmed
