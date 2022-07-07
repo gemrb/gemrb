@@ -918,6 +918,7 @@ bool Inventory::EquipItem(ieDword slot)
 	
 	int armorLevel = itm->AnimationType[0] - '1';
 	int weaponslot;
+	ieDword equip;
 	switch (effect) {
 	case SLOT_EFFECT_FIST:
 		SetEquippedSlot(IW_NO_EQUIPPED, 0);
@@ -939,40 +940,37 @@ bool Inventory::EquipItem(ieDword slot)
 			}
 		}
 		header = itm->GetExtHeader(EquippedHeader);
-		if (header) {
-			ieDword equip;
-			if (header->AttackType == ITEM_AT_BOW) {
-				//find the ranged projectile associated with it, this returns equipped code
-				equip = FindRangedProjectile(header->ProjectileQualifier);
-				//this is the real item slot of the quarrel
-				slot = equip + SLOT_MELEE;
-			} else {
-				//this is always 0-3
-				equip = weaponslot;
-				slot = GetWeaponSlot(weaponslot);
-			}
-			if (equip != IW_NO_EQUIPPED) {
-				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, EquippedHeader);
-			}
-			SetEquippedSlot(equip, EquippedHeader);
-			effect = 0; // SetEquippedSlot will already call AddSlotEffects
+		assert(header);
+		if (header->AttackType == ITEM_AT_BOW) {
+			// find the ranged projectile associated with it, this returns equipped code
+			equip = FindRangedProjectile(header->ProjectileQualifier);
+			// this is the real item slot of the quarrel
+			slot = equip + SLOT_MELEE;
+		} else {
+			// this is always 0-3
+			equip = weaponslot;
+			slot = GetWeaponSlot(weaponslot);
 		}
+		if (equip != IW_NO_EQUIPPED) {
+			Owner->SetupQuickSlot(ACT_WEAPON1 + weaponslot, slot, EquippedHeader);
+		}
+		SetEquippedSlot(equip, EquippedHeader);
+		effect = 0; // SetEquippedSlot will already call AddSlotEffects
 		break;
 	case SLOT_EFFECT_MISSILE:
 		//Get the ranged header of the projectile (so we theoretically allow shooting of daggers)
 		EquippedHeader = itm->GetWeaponHeaderNumber(true);
 		header = itm->GetExtHeader(EquippedHeader);
-		if (header) {
-			weaponslot = FindTypedRangedWeapon(header->ProjectileQualifier);
-			if (weaponslot != SLOT_FIST) {
-				weaponslot -= SLOT_MELEE;
-				SetEquippedSlot((ieWordSigned) (slot-SLOT_MELEE), EquippedHeader);
-				//It is unsure if we can have multiple equipping headers for bows/arrow
-				//It is unclear which item's header index should go there
-				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, 0);
-			}
-			UpdateWeaponAnimation();
+		assert(header);
+		weaponslot = FindTypedRangedWeapon(header->ProjectileQualifier);
+		if (weaponslot != SLOT_FIST) {
+			weaponslot -= SLOT_MELEE;
+			SetEquippedSlot((ieWordSigned) (slot - SLOT_MELEE), EquippedHeader);
+			// it is unsure if we can have multiple equipping headers for bows/arrow
+			// it is unclear which item's header index should go there
+			Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, 0);
 		}
+		UpdateWeaponAnimation();
 		break;
 	case SLOT_EFFECT_HEAD:
 		Owner->SetUsedHelmet(itm->AnimationType);
