@@ -1982,7 +1982,7 @@ bool Inventory::ProvidesCriticalAversion() const
 		}
 		//if the item is worn on head, toggle crits must be 0, otherwise it must be 1
 		//this flag is only stored in the item header, so we need to make some efforts
-		//to get to it (TODO convince ToBEx to move this bit into the accessible range?) - low 24 bits
+		//to get to it - low 24 bits
 		ieDword flag = itm->Flags;
 		gamedata->FreeItem( itm, item->ItemResRef, false );
 		bool togglesCrits = (flag&IE_ITEM_TOGGLE_CRITS);
