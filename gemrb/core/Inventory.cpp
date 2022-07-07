@@ -1367,7 +1367,11 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		const ITMExtHeader* launcherHeader = launcherItem->GetExtHeader(0);
 		// range has to be from the weapon, the projectile has no effect on it
 		wi.range = launcherHeader->Range + 1;
-		wi.launcherDmgBonus = launcherHeader->DamageBonus; // save the original bonus
+		if (hittingHeader->ProjectileQualifier) { // don't add bonuses for weapons without launchers or they would be doubled
+			wi.launcherDmgBonus = launcherHeader->DamageBonus; // save the original bonus
+		} else {
+			wi.launcherDmgBonus = 0;
+		}
 		wi.itemtype = launcherItem->ItemType;
 		wi.prof = launcherItem->WeaProf;
 		// the magic of the bow and the arrow do not add up
