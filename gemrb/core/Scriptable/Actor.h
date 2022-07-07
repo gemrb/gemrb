@@ -263,6 +263,7 @@ struct ActionButtonRow2 {
 #define WEAPON_FINESSE     256
 #define WEAPON_BYPASS      0x10000
 #define WEAPON_KEEN        0x20000
+#define WEAPON_BREAKABLE   0x40000
 
 struct WeaponInfo {
 	int slot = 0;
@@ -748,7 +749,7 @@ public:
 	/* returns the number of allocated proficiency points (stars) */
 	int GetStars(stat_t proficiency) const;
 	/* get the current hit bonus */
-	bool GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& header, \
+	bool GetCombatDetails(int& tohit, bool leftorright, \
 		int& DamageBonus, int& speed, int& CriticalBonus, int& style, const Actor* target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);

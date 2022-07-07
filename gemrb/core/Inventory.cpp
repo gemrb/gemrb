@@ -1412,6 +1412,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	if (hittingHeader->RechargeFlags & IE_ITEM_USESTRENGTH_HIT) wi.wflags |= WEAPON_USESTRENGTH_HIT;
 	// this flag is set in dagger/shortsword by the loader
 	if (hittingHeader->RechargeFlags & IE_ITEM_USEDEXTERITY) wi.wflags |= WEAPON_FINESSE;
+	if (hittingHeader->RechargeFlags & IE_ITEM_BREAKABLE) wi.wflags |= WEAPON_BREAKABLE;
 	// also copy these flags (they match their WEAPON_ counterparts)
 	wi.wflags |= hittingHeader->RechargeFlags & (IE_ITEM_KEEN | IE_ITEM_BYPASS);
 

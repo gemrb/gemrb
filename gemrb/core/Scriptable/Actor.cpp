@@ -6302,16 +6302,12 @@ int Actor::GetStars(stat_t proficiency) const
 	return stars;
 }
 
-bool Actor::GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& header, \
+bool Actor::GetCombatDetails(int& tohit, bool leftorright, \
 		int& DamageBonus, int& speed, int& CriticalBonus, int& style, const Actor* target)
 {
 	SetBaseAPRandAB(true);
 	speed = -(int)GetStat(IE_PHYSICALSPEED);
 	ieDword dualwielding = IsDualWielding();
-	header = GetWeapon(leftorright);
-	if (!header) {
-		return false;
-	}
 	WeaponInfo& wi = weaponInfo[leftorright && dualwielding];
 	style = 0;
 	CriticalBonus = 0;
@@ -6796,14 +6792,13 @@ void Actor::PerformAttack(ieDword gameTime)
 		wi = weaponInfo[0];
 	}
 
-	const ITMExtHeader *header = nullptr;
 	const ITMExtHeader* hittingheader = wi.extHeader;
 	int tohit;
 	int DamageBonus, CriticalBonus;
 	int speed, style;
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!GetCombatDetails(tohit, leftorright, header, DamageBonus, speed, CriticalBonus, style, target)) {
+	if (!GetCombatDetails(tohit, leftorright, DamageBonus, speed, CriticalBonus, style, target)) {
 		return;
 	}
 
@@ -6975,7 +6970,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			//break sword
 			// a random roll on-hit (perhaps critical failure too)
 			//  in 0,5% (1d20*1d10==1) cases
-			if ((header->RechargeFlags & IE_ITEM_BREAKABLE) && core->Roll(1, 10, 0) == 1) {
+			if (wi.wflags & WEAPON_BREAKABLE && core->Roll(1, 10, 0) == 1) {
 				inventory.BreakItemSlot(wi.slot);
 				inventory.EquipBestWeapon(EQUIP_MELEE);
 			}

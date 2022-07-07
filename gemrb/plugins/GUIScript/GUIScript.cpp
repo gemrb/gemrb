@@ -12405,7 +12405,6 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 
 	leftorright = leftorright&1;
 	WeaponInfo wi = actor->weaponInfo[leftorright && actor->IsDualWielding()];
-	const ITMExtHeader *header = nullptr; // contains the weapon header
 	const ITMExtHeader* hittingheader = wi.extHeader; // same header, except for ranged weapons it is the ammo header
 	int tohit=20;
 	int DamageBonus=0;
@@ -12414,7 +12413,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	int style=0;
 
 	PyObject* dict = PyDict_New();
-	if (!actor->GetCombatDetails(tohit, leftorright, header, DamageBonus, speed, CriticalBonus, style, nullptr)) {
+	if (!actor->GetCombatDetails(tohit, leftorright, DamageBonus, speed, CriticalBonus, style, nullptr)) {
 		//TODO: handle error, so tohit will still be set correctly?
 	}
 	PyDict_SetItemString(dict, "Slot", PyLong_FromLong(wi.slot));
@@ -12467,7 +12466,6 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	//FIXME: remove the need to look it up again
 	if (hittingheader && (hittingheader->AttackType&ITEM_AT_PROJECTILE)) {
 		wield = actor->inventory.GetSlotItem(actor->inventory.GetEquippedSlot());
-		header = hittingheader;
 	} else {
 		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
 	}
@@ -12482,7 +12480,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	}
 
 	// create a tuple with all the 100% probable damage opcodes' stats
-	std::vector<DMGOpcodeInfo> damage_opcodes = item->GetDamageOpcodesDetails(header) ;
+	std::vector<DMGOpcodeInfo> damage_opcodes = item->GetDamageOpcodesDetails(hittingheader) ;
 	PyObject *alldos = PyTuple_New(damage_opcodes.size());
 	for (unsigned int i = 0; i < damage_opcodes.size(); i++) {
 		PyObject *dos = PyDict_New();
