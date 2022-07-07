@@ -12404,9 +12404,9 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	leftorright = leftorright&1;
-	WeaponInfo wi = actor->weaponInfo[leftorright];
+	WeaponInfo wi = actor->weaponInfo[leftorright && actor->IsDualWielding()];
 	const ITMExtHeader *header = nullptr; // contains the weapon header
-	const ITMExtHeader *hittingheader = nullptr; // same header, except for ranged weapons it is the ammo header
+	const ITMExtHeader* hittingheader = wi.extHeader; // same header, except for ranged weapons it is the ammo header
 	int tohit=20;
 	int DamageBonus=0;
 	int CriticalBonus=0;
@@ -12414,7 +12414,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	int style=0;
 
 	PyObject* dict = PyDict_New();
-	if (!actor->GetCombatDetails(tohit, leftorright, header, hittingheader, DamageBonus, speed, CriticalBonus, style, nullptr)) {
+	if (!actor->GetCombatDetails(tohit, leftorright, header, DamageBonus, speed, CriticalBonus, style, nullptr)) {
 		//TODO: handle error, so tohit will still be set correctly?
 	}
 	PyDict_SetItemString(dict, "Slot", PyLong_FromLong(wi.slot));

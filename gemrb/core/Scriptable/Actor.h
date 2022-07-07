@@ -749,7 +749,7 @@ public:
 	/* returns the number of allocated proficiency points (stars) */
 	int GetStars(stat_t proficiency) const;
 	/* get the current hit bonus */
-	bool GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& header, const ITMExtHeader*& hittingheader, \
+	bool GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& header, \
 		int& DamageBonus, int& speed, int& CriticalBonus, int& style, const Actor* target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);

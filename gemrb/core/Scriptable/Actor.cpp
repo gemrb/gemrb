@@ -6329,7 +6329,7 @@ int Actor::GetStars(stat_t proficiency) const
 	return stars;
 }
 
-bool Actor::GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& header, const ITMExtHeader*& hittingheader, \
+bool Actor::GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& header, \
 		int& DamageBonus, int& speed, int& CriticalBonus, int& style, const Actor* target)
 {
 	SetBaseAPRandAB(true);
@@ -6342,7 +6342,7 @@ bool Actor::GetCombatDetails(int& tohit, bool leftorright, const ITMExtHeader*& 
 	WeaponInfo& wi = weaponInfo[leftorright && dualwielding];
 	style = 0;
 	CriticalBonus = 0;
-	hittingheader = header;
+	const ITMExtHeader* hittingheader = wi.extHeader;
 	const ITMExtHeader *rangedheader = nullptr;
 	int THAC0Bonus = hittingheader->THAC0Bonus;
 	DamageBonus = hittingheader->DamageBonus;
@@ -6866,13 +6866,13 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	const ITMExtHeader *header = nullptr;
-	const ITMExtHeader *hittingheader = nullptr;
+	const ITMExtHeader* hittingheader = wi.extHeader;
 	int tohit;
 	int DamageBonus, CriticalBonus;
 	int speed, style;
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!GetCombatDetails(tohit, leftorright, header, hittingheader, DamageBonus, speed, CriticalBonus, style, target)) {
+	if (!GetCombatDetails(tohit, leftorright, header, DamageBonus, speed, CriticalBonus, style, target)) {
 		return;
 	}
 
