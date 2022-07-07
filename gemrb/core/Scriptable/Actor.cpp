@@ -5834,12 +5834,6 @@ int Actor::IsDualWielding() const
 	return (weapon>0)?1:0;
 }
 
-// this will return the projectile item, not launcher.
-const ITMExtHeader* Actor::GetRangedWeapon() const
-{
-	return weaponInfo[0].extHeader;
-}
-
 // returns weapon header currently used (arrow in case of bow + arrow)
 const ITMExtHeader* Actor::GetWeapon(bool leftOrRight) const
 {
@@ -6203,15 +6197,12 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 
 int Actor::BAB2APR(int pBAB, int pBABDecrement, int CheckRapidShot) const
 {
-	if (CheckRapidShot && HasSpellState(SS_RAPIDSHOT)) {
-		const ITMExtHeader* HittingHeader = GetRangedWeapon();
-		if (HittingHeader) {
-			ieDword AttackTypeLowBits = HittingHeader->AttackType & 0xFF; // this is done by the original; leaving in case we expand
-			if (AttackTypeLowBits == ITEM_AT_BOW || AttackTypeLowBits == ITEM_AT_PROJECTILE) {
-				// rapid shot gives another attack and since it is computed from the BAB, we just increase that ...
-				// but monk get their speedy handy work only for fists, so we can't use the passed pBABDecrement
-				pBAB += BaseAttackBonusDecrement;
-			}
+	if (CheckRapidShot && HasSpellState(SS_RAPIDSHOT) && weaponInfo[0].extHeader) {
+		ieDword AttackTypeLowBits = weaponInfo[0].extHeader->AttackType & 0xFF; // this is done by the original; leaving in case we expand
+		if (AttackTypeLowBits == ITEM_AT_BOW || AttackTypeLowBits == ITEM_AT_PROJECTILE) {
+			// rapid shot gives another attack and since it is computed from the BAB, we just increase that ...
+			// but monk get their speedy handy work only for fists, so we can't use the passed pBABDecrement
+			pBAB += BaseAttackBonusDecrement;
 		}
 	}
 

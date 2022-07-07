@@ -712,8 +712,6 @@ public:
 	void ClearCurrentStanceAnims();
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ResRef& resref, ieDword flags, int bookmask=-1, int level=-1);
-	/* returns the ranged weapon header associated with the currently equipped projectile */
-	const ITMExtHeader* GetRangedWeapon() const;
 	/* Returns current weapon range and extended header
 	if range is nonzero, then which is valid */
 	const ITMExtHeader* GetWeapon(bool leftOrRight) const;
