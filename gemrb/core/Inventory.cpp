@@ -1484,6 +1484,7 @@ void Inventory::BreakItemSlot(ieDword slot)
 	gamedata->FreeItem( itm, Slot->ItemResRef, true );
 	//this depends on setslotitemres using setslotitem
 	SetSlotItemRes(newItem, slot, 0,0,0);
+	if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MELEE) EquipBestWeapon(EQUIP_MELEE);
 }
 
 std::string Inventory::dump(bool print) const
