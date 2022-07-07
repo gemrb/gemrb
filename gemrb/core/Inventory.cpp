@@ -1357,11 +1357,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	if (hittingHeader->AttackType == ITEM_AT_PROJECTILE) ranged = true; // throwing weapon
 
 	if (ranged) {
-		if (hittingHeader) {
-			wi.backstabbing = hittingHeader->RechargeFlags & IE_ITEM_BACKSTAB;
-		} else {
-			wi.backstabbing = false;
-		}
+		wi.backstabbing = hittingHeader->RechargeFlags & IE_ITEM_BACKSTAB;
 		wi.wflags = WEAPON_RANGED;
 
 		// deal with data we need to use from the launcher
@@ -1387,12 +1383,8 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 
 		// any melee weapon usable by a single class thief is game (UAI does not affect this)
 		// but also check a bit in the recharge flags (modder extension)
-		if (hittingHeader) {
-			wi.backstabbing = !(item->UsabilityBitmask & 0x400000) || (hittingHeader->RechargeFlags & IE_ITEM_BACKSTAB);
-			wi.range = hittingHeader->Range + 1;
-		} else {
-			wi.backstabbing = !(item->UsabilityBitmask & 0x400000);
-		}
+		wi.backstabbing = !(item->UsabilityBitmask & 0x400000) || (hittingHeader->RechargeFlags & IE_ITEM_BACKSTAB);
+		wi.range = hittingHeader->Range + 1;
 		if (IWD2) {
 			// iwd2 doesn't set the usability mask
 			wi.backstabbing = true;
@@ -1402,9 +1394,6 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	// make sure we use 'false' in this FreeItem
 	// so the extended header won't point into invalid memory
 	gamedata->FreeItem(item, weapon->ItemResRef, false);
-	if (!hittingHeader) {
-		return;
-	}
 
 	if (hittingHeader->RechargeFlags & IE_ITEM_KEEN) {
 		//this is correct, the threat range is only increased by one in the original engine
