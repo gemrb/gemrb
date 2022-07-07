@@ -6271,33 +6271,6 @@ void Actor::InitRound(ieDword gameTime)
 	}
 }
 
-// a simplified check from GetCombatDetails for use in AttackCore
-bool Actor::WeaponIsUsable(bool leftorright, const ITMExtHeader *header) const
-{
-	if (!header) {
-		header = GetWeapon(leftorright && IsDualWielding());
-		if (!header) {
-			return false;
-		}
-	}
-	const ITMExtHeader *rangedheader;
-	switch(header->AttackType) {
-		case ITEM_AT_MELEE:
-		case ITEM_AT_PROJECTILE: //throwing weapon
-			break;
-		case ITEM_AT_BOW:
-			rangedheader = GetRangedWeapon();
-			if (!rangedheader) {
-				return false;
-			}
-			break;
-		default:
-			//item is unsuitable for fight
-			return false;
-	}
-	return true;
-}
-
 int Actor::GetStars(stat_t proficiency) const
 {
 	int stars = GetStat(proficiency) & PROFS_MASK;

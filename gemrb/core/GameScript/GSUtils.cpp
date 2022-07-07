@@ -1493,7 +1493,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	bool leftOrRight = false;
 	const ITMExtHeader* header = attacker->GetWeapon(leftOrRight);
 	//will return false on any errors (eg, unusable weapon)
-	if (!header || !attacker->WeaponIsUsable(leftOrRight, header)) {
+	if (!header) {
 		attacker->StopAttack();
 		Sender->ReleaseCurrentAction();
 		assert(tar);

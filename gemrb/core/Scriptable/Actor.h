@@ -744,8 +744,6 @@ public:
 	void GetTHAbilityBonus(ieDword Flags);
 	/* gets the defense against an attack */
 	int GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const;
-	/* checks if something is wrong with the weapon we are using for the attack */
-	bool WeaponIsUsable(bool leftorright, const ITMExtHeader *header=NULL) const;
 	/* returns the number of allocated proficiency points (stars) */
 	int GetStars(stat_t proficiency) const;
 	/* get the current hit bonus */
