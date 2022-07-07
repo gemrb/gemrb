@@ -5811,6 +5811,9 @@ void Actor::GetPrevAnimation()
 
 int Actor::IsDualWielding() const
 {
+	// // if this function ever becomes redundant when populating WeaponInfo, it can then be simplified
+	// if (inventory.MagicSlotEquipped() || inventory.FistsEquipped()) return 0; // probably not needed, but playing it safe
+	// return (weaponInfo[0].extHeader && weaponInfo[1].extHeader) ? 1 : 0;
 	int slot;
 	//if the shield slot is a weapon, we're dual wielding
 	const CREItem *wield = inventory.GetUsedWeapon(true, slot);
@@ -6330,7 +6333,6 @@ bool Actor::GetCombatDetails(int& tohit, bool leftorright, \
 	}
 	DamageBonus += GetStat(IE_DAMAGEBONUS);
 	leftorright = leftorright && dualwielding;
-	if (leftorright) wi.wflags|=WEAPON_LEFTHAND;
 
 	//add in proficiency bonuses
 	ieDword stars = GetProficiency(wi.prof)&PROFS_MASK;

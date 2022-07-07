@@ -1386,6 +1386,9 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		gamedata->FreeItem(launcherItem, launcher->ItemResRef, false);
 	} else {
 		wi.wflags = WEAPON_MELEE;
+		if (leftOrRight && Owner->IsDualWielding()) {
+			wi.wflags |= WEAPON_LEFTHAND;
+		}
 		wi.enchantment = item->Enchantment;
 		wi.itemtype = item->ItemType;
 		wi.prof = item->WeaProf;
