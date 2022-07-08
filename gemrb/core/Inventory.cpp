@@ -1366,7 +1366,9 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		int tmpSlot = wi.slot; // GetUsedWeapon will modify it!
 		CREItem* launcher = GetUsedWeapon(false, tmpSlot);
 		const Item* launcherItem = gamedata->GetItem(launcher->ItemResRef, true);
+		assert(launcherItem);
 		const ITMExtHeader* launcherHeader = launcherItem->GetExtHeader(0);
+		assert(launcherHeader);
 		// range has to be from the weapon, the projectile has no effect on it
 		wi.range = launcherHeader->Range + 1;
 		if (hittingHeader->ProjectileQualifier) { // don't add bonuses for weapons without launchers or they would be doubled
