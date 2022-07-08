@@ -1499,7 +1499,7 @@ Audio* Interface::GetAudioDrv(void) const {
 
 const char* Interface::TypeExt(SClass_ID type) const
 {
-	static const std::map<int, const char*> extensions = {
+	static const std::map<SClass_ID, const char*> extensions = {
 		{ IE_2DA_CLASS_ID, "2da" },
 		{ IE_ACM_CLASS_ID, "acm" },
 		{ IE_ARE_CLASS_ID, "are" },
