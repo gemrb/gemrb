@@ -1263,7 +1263,8 @@ static PyObject* GemRB_Scrollable_Scroll(PyObject* self, PyObject* args)
 	Point p;
 	PARSE_ARGS( args, "Oii|i", &self, &p.x, &p.y, &relative );
 
-	View::Scrollable* scroller = GetView<View::Scrollable>(self);
+	View* view = GetView(self);
+	View::Scrollable* scroller = dynamic_cast<View::Scrollable*>(view);
 	ABORT_IF_NULL(scroller);
 
 	if (relative) {
