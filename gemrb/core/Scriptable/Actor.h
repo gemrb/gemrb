@@ -279,6 +279,7 @@ struct WeaponInfo {
 	int profdmgbon = 0;
 	int launcherDmgBonus = 0;
 	int launcherTHAC0Bonus = 0;
+	const Item* item = nullptr;
 	const ITMExtHeader* extHeader = nullptr;
 };
 

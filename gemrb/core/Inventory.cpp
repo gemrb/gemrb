@@ -1330,6 +1330,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	wi.slot = GetEquippedSlot();
 	bool ranged = (core->QuerySlotEffects(wi.slot) & SLOT_EFFECT_MISSILE) == SLOT_EFFECT_MISSILE; // detect ammo slot
 	wi.extHeader = nullptr; // for the error paths; properly set at the end
+	wi.item = nullptr;
 	wi.wflags = 0;
 
 	const CREItem* weapon;
@@ -1346,6 +1347,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		Log(WARNING, "Actor", "Missing or invalid weapon item: {}!", weapon->ItemResRef);
 		return;
 	}
+	wi.item = item;
 
 	wi.itemflags = weapon->Flags;
 	wi.critmulti = core->GetCriticalMultiplier(item->ItemType);

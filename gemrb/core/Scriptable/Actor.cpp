@@ -6757,11 +6757,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (PCStats) {
-		// make a copy of wi.slot, since GetUsedWeapon can modify it
-		int wislot = wi.slot;
-		const CREItem *slot = inventory.GetUsedWeapon(leftorright && IsDualWielding(), wislot);
-		//if slot was null, then GetCombatDetails returned false
-		PCStats->RegisterFavourite(slot->ItemResRef, FAV_WEAPON);
+		PCStats->RegisterFavourite(weaponInfo[leftorright && IsDualWielding()].item->Name, FAV_WEAPON);
 	}
 
 	//if this is the first call of the round, we need to update next attack

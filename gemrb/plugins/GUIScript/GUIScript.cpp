@@ -12461,21 +12461,9 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(tohits, "Weapon", PyLong_FromLong(actor->ToHit.GetWeaponBonus()));
 	PyDict_SetItemString(dict, "ToHitStats", tohits);
 
-	const CREItem *wield;
-	// wi.slot has the launcher, so look up the ammo
-	//FIXME: remove the need to look it up again
-	if (hittingheader && (hittingheader->AttackType&ITEM_AT_PROJECTILE)) {
-		wield = actor->inventory.GetSlotItem(actor->inventory.GetEquippedSlot());
-	} else {
-		wield = actor->inventory.GetUsedWeapon(leftorright, wi.slot);
-	}
-	if (!wield) {
-		Log(WARNING, "Actor", "Invalid weapon wielded by {}!", fmt::WideToChar{actor->GetName()});
-		return dict;
-	}
-	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
+	const Item* item = wi.item;
 	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid weapon item: {}!", wield->ItemResRef);
+		Log(WARNING, "Actor", "{} has a missing or invalid weapon item equipped!", fmt::WideToChar{actor->GetName()});
 		return dict;
 	}
 
