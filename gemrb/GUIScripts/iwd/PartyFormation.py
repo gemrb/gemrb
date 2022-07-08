@@ -189,5 +189,4 @@ def ExitExitPress ():
 		ExitWindow.Close ()
 	if PartyFormationWindow:
 		PartyFormationWindow.Close ()
-	GemRB.SetNextScript ("Start")
 	return

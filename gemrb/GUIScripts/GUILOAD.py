@@ -149,7 +149,6 @@ def LoadGamePress (btn):
 		return
 	
 	Pos = GemRB.GetVar ("TopIndex") + btn.Value
-	LoadScreen.StartLoadScreen ()
 	#loads savegame
 	GemRB.LoadGame (Games[Pos])
 
@@ -157,6 +156,7 @@ def LoadGamePress (btn):
 	if GameCheck.IsIWD1 ():
 		GemRB.SetNextScript ("PartyFormation")
 	else:
+		LoadScreen.StartLoadScreen ()
 		# it will close windows, including the loadscreen
 		GemRB.EnterGame ()
 	return
