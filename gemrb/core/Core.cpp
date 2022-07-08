@@ -267,6 +267,12 @@ bool WithinPersonalRange(const Scriptable *actor, const Point &dest, int distanc
 	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
+bool WithinPersonalRange(const Scriptable* scr1, const Scriptable* scr2, int distance)
+{
+	double angle = AngleFromPoints(scr1->Pos, scr2->Pos);
+	return PersonalDistance(scr2, scr1) <= Feet2Pixels(distance, angle);
+}
+
 // returns EA relation between two scriptables (non actors are always enemies)
 // it is used for protectile targeting/iwd ids targeting too!
 int EARelation(const Scriptable* Owner, const Actor* target)

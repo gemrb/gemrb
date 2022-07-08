@@ -6511,7 +6511,7 @@ int Actor::GetToHit(ieDword Flags, const Actor *target)
 		generic += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
 
 		// close-quarter ranged penalties; let's say roughly max 1 foot apart
-		if (third && (Flags & WEAPON_STYLEMASK) == WEAPON_RANGED && WithinPersonalRange(target, Pos, 2)) {
+		if (third && (Flags & WEAPON_STYLEMASK) == WEAPON_RANGED && WithinPersonalRange(target, this, 2)) {
 			generic -= 4;
 			if (!HasFeat(FEAT_PRECISE_SHOT)) {
 				generic -= 4;
@@ -6780,7 +6780,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if (!WithinPersonalRange(this, target->Pos, GetWeaponRange(leftorright)) || GetCurrentArea() != target->GetCurrentArea()) {
+	if (!WithinPersonalRange(this, target, GetWeaponRange(leftorright)) || GetCurrentArea() != target->GetCurrentArea()) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
