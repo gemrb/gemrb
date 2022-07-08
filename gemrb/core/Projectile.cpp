@@ -1189,6 +1189,7 @@ void Projectile::SecondaryTarget()
 		}
 		pro->SetCaster(Caster, Level);
 		//this is needed to apply the success spell on the center point
+		pro->MoveTo(area, Pos);
 		pro->SetTarget(Pos);
 		//TODO:actually some of the splash projectiles are a good example of faketarget
 		//projectiles (that don't follow the target, but still hit)
