@@ -12414,7 +12414,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	if (!actor->GetCombatDetails(tohit, leftorright, DamageBonus, speed, CriticalBonus, style, nullptr)) {
-		//TODO: handle error, so tohit will still be set correctly?
+		return RuntimeError("Serious problem in GetCombatDetails: could not find the hitting header!");
 	}
 	PyDict_SetItemString(dict, "Slot", PyLong_FromLong(wi.slot));
 	PyDict_SetItemString(dict, "Flags", PyLong_FromLong(wi.wflags));
@@ -12431,13 +12431,9 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ProfDmgBon", PyLong_FromLong(wi.profdmgbon));
 	PyDict_SetItemString(dict, "LauncherDmgBon", PyLong_FromLong(wi.launcherDmgBonus));
 	PyDict_SetItemString(dict, "WeaponStrBonus", PyLong_FromLong(actor->WeaponDamageBonus(wi)));
-	if (hittingheader) {
-		PyDict_SetItemString(dict, "HitHeaderNumDice", PyLong_FromLong(hittingheader->DiceThrown));
-		PyDict_SetItemString(dict, "HitHeaderDiceSides", PyLong_FromLong(hittingheader->DiceSides));
-		PyDict_SetItemString(dict, "HitHeaderDiceBonus", PyLong_FromLong(hittingheader->DamageBonus));
-	} else {
-		return RuntimeError("Serious problem in GetCombatDetails: could not find the hitting header!");
-	}
+	PyDict_SetItemString(dict, "HitHeaderNumDice", PyLong_FromLong(hittingheader->DiceThrown));
+	PyDict_SetItemString(dict, "HitHeaderDiceSides", PyLong_FromLong(hittingheader->DiceSides));
+	PyDict_SetItemString(dict, "HitHeaderDiceBonus", PyLong_FromLong(hittingheader->DamageBonus));
 
 	PyObject *ac = PyDict_New();
 	PyDict_SetItemString(ac, "Total", PyLong_FromLong(actor->AC.GetTotal()));
