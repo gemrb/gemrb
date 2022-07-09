@@ -899,6 +899,11 @@ bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, BitOp op) const
 //all checks have been made previously
 bool Inventory::EquipItem(ieDword slot)
 {
+	if (!Owner) {
+		// called on a pile
+		return false;
+	}
+
 	const ITMExtHeader *header;
 	const CREItem *item = GetSlotItem(slot);
 	if (!item) {
@@ -2024,7 +2029,7 @@ int Inventory::MergeItems(int slot, CREItem *item)
 		slotitem->Flags |= IE_INV_ITEM_ACQUIRED;
 		slotitem->Usages[0] = (ieWord) (slotitem->Usages[0] + chunk);
 		item->Usages[0] = (ieWord) (item->Usages[0] - chunk);
-		EquipItem(slot);
+		if (Owner) EquipItem(slot);
 		CalculateWeight();
 		if (item->Usages[0] == 0) {
 			delete item;
