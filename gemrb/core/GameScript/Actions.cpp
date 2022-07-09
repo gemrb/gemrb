@@ -678,38 +678,12 @@ void GameScript::MoveGlobal(Scriptable* Sender, Action* parameters)
 //we also allow moving to door, container
 void GameScript::MoveGlobalObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	Actor* actor = Scriptable::As<Actor>(tar);
-	if (!actor) {
-		return;
-	}
-	const Scriptable* to = GetScriptableFromObject(Sender, parameters->objects[2]);
-	if (!to) return;
-	const Map *map = to->GetCurrentArea();
-	if (!map) return;
-
-	if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptRef(), to->Pos, 0)) {
-		MoveBetweenAreasCore(actor, map->GetScriptRef(), to->Pos, -1, true);
-	}
+	MoveGlobalObjectCore(Sender, parameters, 0);
 }
 
 void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
-	Actor* actor = Scriptable::As<Actor>(tar);
-	if (!actor) {
-		return;
-	}
-	const Scriptable* to = GetScriptableFromObject(Sender, parameters->objects[2]);
-	if (!to) {
-		return;
-	}
-	const Map* map = to->GetCurrentArea();
-	if (!map) return;
-
-	if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptRef(), to->Pos, 0)) {
-		MoveBetweenAreasCore(actor, map->GetScriptRef(), to->Pos, -1, false);
-	}
+	MoveGlobalObjectCore(Sender, parameters, CC_OFFSCREEN);
 }
 
 //don't use offset from Sender

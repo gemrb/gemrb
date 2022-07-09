@@ -146,6 +146,7 @@ int NumItemsCore(Scriptable *Sender, const Trigger *parameters);
 unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters);
 int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters);
 void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags);
+void MoveGlobalObjectCore(Scriptable* Sender, Action* parameters, int flags);
 
 inline int Bones(ieDword value)
 {

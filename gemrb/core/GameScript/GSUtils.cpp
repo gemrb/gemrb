@@ -3064,4 +3064,35 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 	}
 }
 
+void MoveGlobalObjectCore(Scriptable* Sender, Action* parameters, int flags)
+{
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* actor = Scriptable::As<Actor>(tar);
+	if (!actor) {
+		return;
+	}
+	const Scriptable* to = GetScriptableFromObject(Sender, parameters->objects[2]);
+	if (!to) return;
+	const Map* map = to->GetCurrentArea();
+	if (!map) return;
+
+	Point dest = to->Pos;
+	if (flags & CC_OFFSCREEN) {
+		int minDistance = 2;
+		const Actor* actor2 = Scriptable::As<Actor>(to);
+		if (actor2) {
+			minDistance = actor2->circleSize;
+		}
+
+		dest = FindOffScreenPoint(to, CC_OBJECT, minDistance, 0);
+		if (dest.IsZero()) {
+			dest = FindOffScreenPoint(to, CC_OBJECT, minDistance, 1);
+		}
+	}
+
+	if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptRef(), dest, 0)) {
+		MoveBetweenAreasCore(actor, map->GetScriptRef(), dest, -1, true);
+	}
+}
+
 }
