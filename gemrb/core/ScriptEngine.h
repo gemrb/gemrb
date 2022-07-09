@@ -54,7 +54,7 @@ public:
 };
 
 template <class T>
-class GEM_EXPORT ScriptingRef : public ScriptingRefBase {
+class ScriptingRef : public ScriptingRefBase {
 private:
 	T* ref;
 public:
