@@ -704,9 +704,11 @@ void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameter
 	if (!to) {
 		return;
 	}
+	const Map* map = to->GetCurrentArea();
+	if (!map) return;
 
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->resref0Parameter, to->Pos, 0) ) {
-		MoveBetweenAreasCore( actor, parameters->resref0Parameter, to->Pos, -1, false);
+	if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptRef(), to->Pos, 0)) {
+		MoveBetweenAreasCore(actor, map->GetScriptRef(), to->Pos, -1, false);
 	}
 }
 
