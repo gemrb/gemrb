@@ -4040,7 +4040,11 @@ bool Actor::CheckSpellDisruption(int damage) const
 		return false;
 	}
 
-	int spellLevel = 3; // FIXME: use the correct spellLevel
+	const Spell* spl = gamedata->GetSpell(SpellResRef, true);
+	if (!spl) return false;
+	int spellLevel = spl->SpellLevel;
+	gamedata->FreeSpell(spl, SpellResRef, false);
+
 	if (core->HasFeature(GF_SIMPLE_DISRUPTION)) {
 		return LuckyRoll(1, 20, 0) < (damage + spellLevel);
 	}
