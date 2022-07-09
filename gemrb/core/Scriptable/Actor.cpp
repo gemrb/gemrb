@@ -4235,7 +4235,8 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	int chp = (signed) BaseStats[IE_HITPOINTS];
 	if (damage > 0) {
 		//if this kills us, check if attacker could cleave
-		if (act && (damage > chp)) {
+		bool killed = (damage > chp) && !Modified[IE_MINHITPOINTS];
+		if (act && killed) {
 			act->CheckCleave();
 		}
 		GetHit(damage, 3); // FIXME: carry over the correct spellLevel
