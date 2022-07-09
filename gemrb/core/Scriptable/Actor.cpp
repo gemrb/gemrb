@@ -4010,9 +4010,9 @@ void Actor::DialogInterrupt() const
 	}
 }
 
-void Actor::GetHit(int damage, int spellLevel)
+void Actor::GetHit(int damage, int spellLevel, bool killingBlow)
 {
-	if (!Immobile() && !(InternalFlags & IF_REALLYDIED)) {
+	if (!Immobile() && !(InternalFlags & IF_REALLYDIED) && !killingBlow) {
 		SetStance( IE_ANI_DAMAGE );
 		VerbalConstant(VB_DAMAGE);
 	}
@@ -4239,7 +4239,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		if (act && killed) {
 			act->CheckCleave();
 		}
-		GetHit(damage, 3); // FIXME: carry over the correct spellLevel
+		GetHit(damage, 3, killed); // FIXME: carry over the correct spellLevel
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
