@@ -45,7 +45,8 @@ namespace GemRB {
 
 #ifdef WIN32
 
-#define ResolveFilePath(p)
+// prevents warnings of unused `p`
+#define ResolveFilePath(p) (void)p
 
 #else  // ! WIN32
 
