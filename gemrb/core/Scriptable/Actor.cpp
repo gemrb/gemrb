@@ -4010,7 +4010,7 @@ void Actor::DialogInterrupt() const
 	}
 }
 
-void Actor::GetHit(int damage, int spellLevel, bool killingBlow)
+void Actor::GetHit(int damage, bool killingBlow)
 {
 	if (!Immobile() && !(InternalFlags & IF_REALLYDIED) && !killingBlow) {
 		SetStance( IE_ANI_DAMAGE );
@@ -4024,7 +4024,7 @@ void Actor::GetHit(int damage, int spellLevel, bool killingBlow)
 		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		fxqueue.AddEffect(fx);
 	}
-	if (CheckSpellDisruption(damage, spellLevel)) {
+	if (CheckSpellDisruption(damage)) {
 		InterruptCasting = true;
 	}
 }
@@ -4033,8 +4033,9 @@ void Actor::GetHit(int damage, int spellLevel, bool killingBlow)
 // iwd2 however has two mechanisms: spell disruption and concentration checks:
 // - disruption is checked when a caster is damaged while casting
 // - concentration is checked when casting is taking place <= 5' from an enemy
-bool Actor::CheckSpellDisruption(int damage, int spellLevel) const
+bool Actor::CheckSpellDisruption(int damage) const
 {
+	int spellLevel = 3; // FIXME: use the correct spellLevel
 	if (core->HasFeature(GF_SIMPLE_DISRUPTION)) {
 		return LuckyRoll(1, 20, 0) < (damage + spellLevel);
 	}
@@ -4239,7 +4240,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		if (act && killed) {
 			act->CheckCleave();
 		}
-		GetHit(damage, 3, killed); // FIXME: carry over the correct spellLevel
+		GetHit(damage, killed);
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage

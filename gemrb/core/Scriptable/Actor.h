@@ -654,9 +654,9 @@ public:
 	/* called when someone talks to Actor */
 	void DialogInterrupt() const;
 	/* called when actor was hit */
-	void GetHit(int damage = 0, int spellLevel = 0, bool killingBlow = false);
+	void GetHit(int damage = 0, bool killingBlow = false);
 	/* checks whether taking damage should disrupt spellcasting */
-	bool CheckSpellDisruption(int damage, int spellLevel) const;
+	bool CheckSpellDisruption(int damage) const;
 	/* called when actor starts to cast a spell*/
 	bool HandleCastingStance(const ResRef& spellResRef, bool deplete, bool instant);
 	/* check if the actor should be just knocked out by a lethal hit */
