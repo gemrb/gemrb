@@ -4035,6 +4035,11 @@ void Actor::GetHit(int damage, bool killingBlow)
 // - concentration is checked when casting is taking place <= 5' from an enemy
 bool Actor::CheckSpellDisruption(int damage) const
 {
+	if (!LastSpellTarget && LastTargetPos.IsInvalid()) {
+		// not casting, nothing to do
+		return false;
+	}
+
 	int spellLevel = 3; // FIXME: use the correct spellLevel
 	if (core->HasFeature(GF_SIMPLE_DISRUPTION)) {
 		return LuckyRoll(1, 20, 0) < (damage + spellLevel);
@@ -4043,10 +4048,6 @@ bool Actor::CheckSpellDisruption(int damage) const
 		return true;
 	}
 
-	if (!LastSpellTarget && LastTargetPos.IsInvalid()) {
-		// not casting, nothing to do
-		return false;
-	}
 	int roll = core->Roll(1, 20, 0);
 	int concentration = GetSkill(IE_CONCENTRATION);
 	int bonus = 0;
@@ -4059,11 +4060,8 @@ bool Actor::CheckSpellDisruption(int damage) const
 		// no spam for noncasters
 		displaymsg->DisplayRollStringName(ieStrRef::ROLL19, GUIColors::LIGHTGREY, this, roll, concentration, bonus, damage, spellLevel);
 	}
-	int chance = (roll + concentration + bonus) > (10 + damage + spellLevel);
-	if (chance) {
-		return false;
-	}
-	return true;
+	bool failed = (roll + concentration + bonus) <= (10 + damage + spellLevel);
+	return failed;
 }
 
 bool Actor::HandleCastingStance(const ResRef& spellResRef, bool deplete, bool instant)
