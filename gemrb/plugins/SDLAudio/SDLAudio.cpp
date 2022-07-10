@@ -506,7 +506,7 @@ int SDLAudio::SetupNewStream(int x, int y, int z,
 
 tick_t SDLAudio::QueueAmbient(int stream, const ResRef& sound)
 {
-	if (stream == 0 || stream > AMBIENT_CHANNELS + 1) {
+	if (stream <= 0 || stream > AMBIENT_CHANNELS) {
 		return -1;
 	}
 
