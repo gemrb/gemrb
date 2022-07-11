@@ -74,7 +74,7 @@ bool p2DAImporter::Open(DataStream* str)
 		
 		rowNames.emplace_back(line.substr(0, pos));
 		
-		auto sv = StringView(&line[pos + 1], line.length() - pos);
+		auto sv = StringView(&line[pos + 1], line.length() - pos - 1);
 		rows.emplace_back(Explode<StringView, cell_t>(sv, ' ', colNames.size() - 1));
 	}
 
