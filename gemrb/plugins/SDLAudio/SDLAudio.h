@@ -29,8 +29,11 @@
 
 #include <SDL_mixer.h>
 
+#define AMBIENT_CHANNELS 8
 #define MIXER_CHANNELS 16
 #define BUFFER_CACHE_SIZE 100
+#define AUDIO_DISTANCE_ROLLOFF_MOD 1.3
+#define AMBIENT_DISTANCE_ROLLOFF_MOD 5
 
 namespace GemRB {
 
@@ -54,6 +57,12 @@ struct BufferedData {
 	unsigned int size;
 };
 
+struct SDLAudioStream {
+	bool free = true;
+	bool point = false;
+	Point streamPos;
+};
+
 struct CacheEntry {
 	Mix_Chunk *chunk;
 	unsigned int Length;
@@ -69,13 +78,13 @@ public:
 	int CreateStream(std::shared_ptr<SoundMgr>) override;
 	bool Play() override;
 	bool Stop() override;
-	bool Pause() override { return true; } /*not implemented*/
-	bool Resume() override { return true; } /*not implemented*/
+	bool Pause() override;
+	bool Resume() override;
 	bool CanPlay() override;
 	void ResetMusics() override;
 	void UpdateListenerPos(const Point&) override;
 	Point GetListenerPos() override;
-	void UpdateVolume(unsigned int) override {}
+	void UpdateVolume(unsigned int flags) override;
 
 	int SetupNewStream(int x, int y, int z, ieWord gain, bool point, int ambientRange) override;
 	tick_t QueueAmbient(int stream, const ResRef& sound) override;
@@ -108,6 +117,7 @@ private:
 
 	std::recursive_mutex MusicMutex;
 	LRUCache buffercache;
+	SDLAudioStream ambientStreams[AMBIENT_CHANNELS];
 };
 
 }

@@ -2313,6 +2313,12 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		}
 	}
 
+	//shutting down music and ambients before movie
+	if (music)
+		music->HardEnd();
+	AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
+	if (ambim) ambim->Deactivate();
+
 	ResourceHolder<MoviePlayer> mp = GetResourceHolder<MoviePlayer>(actualMovieRef);
 	if (!mp) {
 		return -1;
@@ -2381,12 +2387,6 @@ int Interface::PlayMovie(const ResRef& movieRef)
 			mp->SetSubtitles(new IESubtitles(font, sttable));
 		}
 	}
-
-	//shutting down music and ambients before movie
-	if (music)
-		music->HardEnd();
-	AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
-	if (ambim) ambim->Deactivate();
 
 	Holder<SoundHandle> sound_override;
 	if (!sound_resref.empty()) {
