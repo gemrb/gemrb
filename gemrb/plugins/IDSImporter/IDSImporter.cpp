@@ -47,7 +47,7 @@ bool IDSImporter::Open(DataStream* str)
 			continue;
 		}
 		
-		auto parts = Explode(line, ' ', 1);
+		auto parts = Explode<std::string, std::string>(line, ' ', 1);
 		if (parts.size() < 2) {
 			continue; // bad data?
 		}
