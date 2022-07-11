@@ -38,7 +38,7 @@ static void SetChannelPosition(const Point &listenerPos, const Point &p, int cha
 		angle += 360;
 	}
 
-	uint8_t distance = std::min(static_cast<int32_t>(std::sqrt(SquaredDistance(listenerPos, p)) / rolloff), 255);
+	uint8_t distance = std::min(static_cast<int32_t>(Distance(listenerPos, p) / rolloff), 255);
 	Mix_SetPosition(channel, angle, distance);
 }
 

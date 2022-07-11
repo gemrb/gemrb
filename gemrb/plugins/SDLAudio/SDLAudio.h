@@ -58,9 +58,8 @@ struct BufferedData {
 };
 
 struct SDLAudioStream {
-	SDLAudioStream() : free(true), point(false), streamPos(0, 0) { }
-	bool free;
-	bool point;
+	bool free = true;
+	bool point = false;
 	Point streamPos;
 };
 
