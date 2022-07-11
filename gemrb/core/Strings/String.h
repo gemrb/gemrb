@@ -85,7 +85,7 @@ typename STR::size_type FindFirstNotOf(const STR& s, StringViewT<STR> sv, typena
 }
 
 template <typename STR>
-typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = STR::npos) noexcept
+typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = STR::npos, bool reverse = false) noexcept
 {
 	if (pos >= s.length()) {
 		pos = s.length() - 1;
@@ -94,7 +94,7 @@ typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typenam
 		return pos;
 	}
 	pos = s.length() - (pos + 1);
-	auto iter = FindNotOf<STR>(s.rbegin() + pos, s.rend(), sv);
+	auto iter = FindNotOf<STR>(s.rbegin() + (reverse ? 0 : pos), s.rend() + (reverse ? pos : 0), sv);
 	return iter == s.rend() ? STR::npos : s.length() - 1 - std::distance(s.rbegin(), iter);
 }
 
@@ -143,7 +143,11 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 	}
 
 	if (beg != STR::npos && beg != cur) {
-		elements.emplace_back(&str[beg]);
+		// trim any trailing spaces
+		size_t last = FindLastNotOf(str, WHITESPACE_STRING_VIEW(STR), beg, true);
+		if (last != STR::npos) {
+			elements.emplace_back(&str[beg], last - beg + 1);
+		}
 	}
 
 	return elements;

@@ -98,6 +98,14 @@ public:
 		return data + len;
 	}
 
+	std::reverse_iterator<iterator> rbegin() const noexcept {
+		return std::reverse_iterator<iterator>(end());
+	}
+
+	std::reverse_iterator<iterator> rend() const noexcept {
+		return std::reverse_iterator<iterator>(begin());
+	}
+
 	const CharT& operator[](size_t i) const noexcept {
 		return *(data + i);
 	}
