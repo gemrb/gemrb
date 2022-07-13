@@ -53,9 +53,8 @@ bool IDSImporter::Open(DataStream* str)
 		}
 		
 		int val = strtosigned<int>(parts[0].c_str(), nullptr, 0);
-		std::string id(parts[1].begin(), parts[1].end());
-		StringToLower(id);
-		pairs.emplace_back(val, std::move(id));
+		StringToLower(parts[1]);
+		pairs.emplace_back(val, std::move(parts[1]));
 	}
 
 	delete str;
