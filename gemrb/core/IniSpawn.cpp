@@ -138,17 +138,16 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 // BINARY_NOT_INTERSECT 9  //(no common bits)
 // BINARY_MORE 10          //left has more bits than right
 // BINARY_LESS 11          //left has less bits than right
-
-int IniSpawn::GetDiffMode(const char *keyword) const
+int IniSpawn::GetDiffMode(const ieVariable& keyword) const
 {
 	if (!keyword) return NO_OPERATION; //-1
 	if (keyword[0]==0) return NO_OPERATION; //-1
-	if (!stricmp(keyword,"less_or_equal_to") ) return LESS_OR_EQUALS; //0 (gemrb ext)
-	if (!stricmp(keyword,"equal_to") ) return EQUALS; // 1
-	if (!stricmp(keyword,"less_than") ) return LESS_THAN; // 2
-	if (!stricmp(keyword,"greater_than") ) return GREATER_THAN; //3
-	if (!stricmp(keyword,"greater_or_equal_to") ) return GREATER_OR_EQUALS; //4 (gemrb ext)
-	if (!stricmp(keyword,"not_equal_to") ) return NOT_EQUALS; //5
+	if (keyword == "less_or_equal_to") return LESS_OR_EQUALS; //0 (gemrb ext)
+	if (keyword == "equal_to") return EQUALS; // 1
+	if (keyword == "less_than") return LESS_THAN; // 2
+	if (keyword == "greater_than") return GREATER_THAN; //3
+	if (keyword == "greater_or_equal_to") return GREATER_OR_EQUALS; //4 (gemrb ext)
+	if (keyword == "not_equal_to") return NOT_EQUALS; //5
 	return NO_OPERATION;
 }
 
@@ -374,7 +373,7 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 	critter.SpecVarValue=ps;
 	//this operation uses DiffCore
 	s = inifile->GetKeyAsString(crittername,"spec_var_operation","");
-	critter.SpecVarOperator=GetDiffMode(s.c_str());
+	critter.SpecVarOperator = GetDiffMode(s);
 	//the amount of critters to spawn
 	critter.TotalQuantity = inifile->GetKeyAsInt(crittername,"spec_qty",1);
 	critter.SpawnCount = inifile->GetKeyAsInt(crittername,"create_qty",critter.TotalQuantity);

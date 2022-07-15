@@ -160,7 +160,7 @@ private:
 	void SpawnCreature(const CritterEntry &critter) const;
 	void SpawnGroup(SpawnEntry &event) const;
 	//gets the spec var operation code from a keyword
-	int GetDiffMode(const char *keyword) const;
+	int GetDiffMode(const ieVariable& keyword) const;
 	void PrepareSpawnPoints(const DataFileMgr *iniFile, StringView critterName, CritterEntry &critter) const;
 	void SelectSpawnPoint(CritterEntry &critter) const;
 public:
