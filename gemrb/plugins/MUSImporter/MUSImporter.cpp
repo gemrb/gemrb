@@ -115,11 +115,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 		p = 0;
 		if (i < len && line[i] != '@') {
 			FILL_VAR(PLTag)
-			if (p < 9) {
-				pls.PLTag[p] = 0;
-			} else {
-				pls.PLTag[9] = 0;
-			}
+			pls.PLTag[std::min(p, 9)] = 0;
 			p = 0;
 			SKIP_BLANKS
 			if (line[i] == '@')
