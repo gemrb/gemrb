@@ -10484,20 +10484,12 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 		}
 	}
 	if (magical) {
-		shieldPenalty -= 1;
-		if (shieldPenalty < 0) {
-			shieldPenalty = 0;
-		}
+		shieldPenalty = std::max(0, shieldPenalty - 1);
 	}
-	if (profcheck) {
-		if (HasFeat(FEAT_SHIELD_PROF)) {
-			shieldPenalty = 0;
-		} else {
-			penalty += shieldPenalty;
-		}
-	} else {
-		penalty += shieldPenalty;
+	if (profcheck && HasFeat(FEAT_SHIELD_PROF)) {
+		shieldPenalty = 0;
 	}
+	penalty += shieldPenalty;
 	shield = shieldPenalty;
 
 	return -penalty;
