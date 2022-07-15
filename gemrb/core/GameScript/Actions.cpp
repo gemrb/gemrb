@@ -5328,20 +5328,19 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	uint8_t len = parameters->string0Parameter.length();
-	//
-	if (len&3) {
+	// only allow multiples of 4
+	if (!len || len & 3) {
 		return;
 	}
 	len/=4;
 	size_t max = len;
-	size_t pos;
+	size_t pos = 0;
 	if (flags & MSO_RANDOM_SPELL) {
-		pos = core->Roll(1,len,0);
-	} else {
-		pos = 0;
+		pos = core->Roll(1, len, -1);
 	}
 	while(len--) {
-		auto spl = SubStr(parameters->string0Parameter, pos * 4, 4);
+		ResRef spl = SubStr(parameters->string0Parameter, pos * 4, 4);
+		spl[4] = '\0';
 		int splnum = atoi(spl.c_str());
 
 		if (!(flags & MSO_IGNORE_HAVE) && !me->spellbook.HaveSpell(splnum, 0) ) {
