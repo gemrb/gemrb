@@ -85,7 +85,9 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 		Log(ERROR, "MUSImporter", "Didn't find playlist '{}'.", path);
 		return false;
 	}
-	strret_t c = str->ReadVariable(PLName);
+	std::string line;
+	strret_t c = str->ReadLine(line);
+	PLName = line;
 	while (c > 0) {
 		if (isblank(PLName[c - 1]))
 			PLName[c - 1] = 0;
@@ -93,7 +95,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 			break;
 		c--;
 	}
-	std::string line;
+
 	str->ReadLine(line, 5);
 	int count = atoi(line.c_str());
 	while (count != 0) {

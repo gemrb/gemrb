@@ -140,7 +140,9 @@ public:
 	}
 	
 	strret_t WriteFilling(strpos_t len);
-	
+
+	// NOTE: RTrim doesn't cut it when reading text files, since we may accintally read more than one line
+	// so in those situations rather use ReadLine and then convert to desired string type
 	template <typename STR>
 	strret_t ReadRTrimString(STR& dest, size_t len) {
 		strret_t read = Read(dest.begin(), len);
