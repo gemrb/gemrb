@@ -2828,7 +2828,7 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 		checkHPTime = game->GameTime;
 	} else if (checkHP && checkHPTime != game->GameTime) {
 		checkHP = 0;
-		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
+		if (BaseStats[IE_STATE_ID] & STATE_DEAD) pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
 	for (int i=0; i < MAX_STATS; ++i) {
