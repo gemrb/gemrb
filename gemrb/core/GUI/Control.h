@@ -175,7 +175,7 @@ public:
 	value_t GetValue() const { return Value; }
 	ValueRange GetValueRange() const { return range; }
 	
-	void SetValue(value_t val);
+	value_t SetValue(value_t val);
 	void SetValueRange(ValueRange range = MaxValueRange);
 	void SetValueRange(value_t min, value_t max = std::numeric_limits<value_t>::max());
 	

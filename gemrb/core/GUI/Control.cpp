@@ -127,7 +127,7 @@ bool Control::IsFocused() const
 	return window->FocusedView() == this;
 }
 
-void Control::SetValue(value_t val)
+Control::value_t Control::SetValue(value_t val)
 {
 	value_t oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
@@ -139,6 +139,7 @@ void Control::SetValue(value_t val)
 		PerformAction(ValueChange);
 		MarkDirty();
 	}
+	return oldVal;
 }
 
 void Control::SetValueRange(ValueRange r)
