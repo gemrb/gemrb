@@ -552,16 +552,22 @@ void TextArea::UpdateState(value_t opt)
 	
 	size_t optIdx = std::distance(values.begin(), it);
 	
-	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
-	selectOptions->MakeSelection(optIdx);
+	struct {
+		const SpanSelector* opts = nullptr;
+		size_t idx = 0;
+	} static context;
+
+	// if either the selection, or the options have changed run the handlers
+	// note that handlers can trigger reentrancy back here
+	if (context.opts != selectOptions || context.idx != optIdx) {
+		context.opts = selectOptions;
+		context.idx = optIdx;
+
+		// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
+		selectOptions->MakeSelection(optIdx);
 	
-	static SpanSelector* context = nullptr;
-	value_t old = SetValue(values[optIdx]);
-	if (old != GetValue() && context != selectOptions) {
-		// if either the value, or the options have changed, then we also need to run Action::Select
-		context = selectOptions;
+		SetValue(values[optIdx]);
 		PerformAction(Action::Select);
-		context = nullptr;
 	}
 }
 
