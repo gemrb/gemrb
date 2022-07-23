@@ -644,7 +644,8 @@ def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
 
 	# run through each class to detect new spells
 	for i in range(len(Classes)):
-
+		if Classes[i] == 0:
+			break
 		TmpClassName = GUICommon.GetClassRowName (Classes[i], "class")
 
 		# save our current and next spell amounts
