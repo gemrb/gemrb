@@ -226,8 +226,7 @@ def NextPress():
 	KitIndex = GemRB.GetVar ("Class Kit")
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")
 	if MageSchool and not KitIndex:
-		SchoolTable = GemRB.LoadTable ("magesch")
-		KitIndex = CommonTables.KitList.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
+		KitIndex = CommonTables.KitList.FindValue (6, SchoolList.GetValue (MageSchool, 3))
 
 	#save the kit
 	KitValue = (0x4000 + KitIndex)
