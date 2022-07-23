@@ -86,8 +86,9 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 		return false;
 	}
 	std::string line;
-	strret_t c = str->ReadLine(line);
+	str->ReadLine(line);
 	PLName = line;
+	int c = line.length();
 	while (c > 0) {
 		if (isblank(PLName[c - 1]))
 			PLName[c - 1] = 0;
@@ -99,7 +100,8 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	str->ReadLine(line, 5);
 	int count = atoi(line.c_str());
 	while (count != 0) {
-		strret_t len = str->ReadLine(line);
+		str->ReadLine(line);
+		int len = line.length();
 		int i = 0;
 		int p = 0;
 		PLString pls;
@@ -272,7 +274,8 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 		PathJoin(FName, "mx0000", name, nullptr);
 	} else if (!name.BeginsWith("SPC")) { //bg2
 		char File[_MAX_PATH];
-		fmt::format_to(File, "{}{}", PLName, name);
+		auto end = fmt::format_to(File, "{}{}", PLName, name);
+		*end = '\0';
 		PathJoin(FName, PLName.c_str(), File, nullptr);
 	} else {
 		strlcpy(FName, name.c_str(), _MAX_PATH);
