@@ -1482,7 +1482,7 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 	Scriptable *target = NULL;
 	Point targetpos(-1, -1);
 	ResRef newSpell;
-	auto parts = Explode(surgeSpell, '.', 2);
+	auto parts = Explode<ResRef, ResRef>(surgeSpell, '.', 2);
 	
 	int level = caster->GetCasterLevel(spl->SpellType);
 	switch (surgeSpell[0]) {

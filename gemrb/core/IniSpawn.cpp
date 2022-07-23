@@ -120,7 +120,7 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 
 	s = inifile->GetKeyAsString("spawn_main","events");
 	if (s) {
-		auto events = Explode(s);
+		auto events = Explode<StringView, ieVariable>(s);
 		auto eventcount = events.size();
 		eventspawns.resize(eventcount);
 		while(eventcount--) {
@@ -174,7 +174,7 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 		return;
 	}
 
-	const auto spawnPointStrings = Explode(critter.SpawnPointsDef);
+	const auto spawnPointStrings = Explode<std::string, std::string>(critter.SpawnPointsDef);
 	int spawnCount = static_cast<int>(spawnPointStrings.size());
 	Point chosenPoint;
 	int orient = -1;
@@ -576,7 +576,7 @@ void IniSpawn::ReadSpawnEntry(const DataFileMgr *inifile, StringView entryname, 
 	//don't default to NULL here, some entries may be missing in original game
 	//an empty default string here will create an empty but consistent entry
 	StringView s = inifile->GetKeyAsString(entryname, "critters");
-	auto critters = Explode(s);
+	auto critters = Explode<StringView, ieVariable>(s);
 	size_t crittercount = critters.size();
 	entry.critters.reserve(crittercount);
 
