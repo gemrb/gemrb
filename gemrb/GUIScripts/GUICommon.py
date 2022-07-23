@@ -576,7 +576,6 @@ def CanDualClass(actor):
 		return 1
 
 	DualClassTable = GemRB.LoadTable ("dualclas")
-	CurrentStatTable = GemRB.LoadTable ("abdcscrq")
 	ClassName = GetClassRowName(actor)
 	KitIndex = GetKitIndex (actor)
 	if KitIndex == 0:
@@ -584,6 +583,13 @@ def CanDualClass(actor):
 	else:
 		ClassTitle = CommonTables.KitList.GetValue (KitIndex, 0)
 	Row = DualClassTable.GetRowIndex (ClassTitle)
+	if Row == None and KitIndex > 0:
+		# retry with the baseclass in case the kit/school is missing (eg. wildmages)
+		Row = DualClassTable.GetRowIndex (ClassName)
+
+	if Row == None:
+		print("CannotDualClass: inappropriate starting class")
+		return 1
 
 	# create a lookup table for the DualClassTable columns
 	classes = []
@@ -625,7 +631,11 @@ def CanDualClass(actor):
 		return 1
 
 	# check current class' stat limitations
+	CurrentStatTable = GemRB.LoadTable ("abdcscrq")
 	ClassStatIndex = CurrentStatTable.GetRowIndex (ClassTitle)
+	if ClassStatIndex == None and KitIndex > 0:
+		# retry with the baseclass in case the kit/school is missing (eg. wildmages)
+		ClassStatIndex = CurrentStatTable.GetRowIndex (ClassName)
 	for stat in range (6):
 		minimum = CurrentStatTable.GetValue (ClassStatIndex, stat)
 		name = CurrentStatTable.GetColumnName (stat)
