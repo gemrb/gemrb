@@ -732,7 +732,7 @@ def UpdateMageSchool(pc):
 	Kit = GetKitIndex (pc)
 	if Kit and CommonTables.KitList.GetValue (Kit, 7) == 1:
 		MageTable = GemRB.LoadTable ("magesch")
-		GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6)))
+		GemRB.SetVar ("MAGESCHOOL", MageTable.GetRowIndex (CommonTables.KitList.GetValue (Kit, 0, GTV_STR)))
 
 def SetCurrentDateTokens (stat, plural=False):
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
