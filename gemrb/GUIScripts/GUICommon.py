@@ -726,6 +726,14 @@ def SetupDamageInfo (pc, Button, Window):
 
 	return ratio_str, color
 
+# set MAGESCHOOL to mage school (kit) index
+def UpdateMageSchool(pc):
+	GemRB.SetVar ("MAGESCHOOL", 0)
+	Kit = GetKitIndex (pc)
+	if Kit and CommonTables.KitList.GetValue (Kit, 7) == 1:
+		MageTable = GemRB.LoadTable ("magesch")
+		GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6)))
+
 def SetCurrentDateTokens (stat, plural=False):
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
 	#   (script updates). In each case, there are 60 seconds

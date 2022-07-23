@@ -1925,13 +1925,7 @@ def SelectionChanged ():
 			SelectionChangeMultiHandler ()
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
-
-		#update mage school
-		GemRB.SetVar ("MAGESCHOOL", 0)
-		Kit = GUICommon.GetKitIndex (sel)
-		if Kit and CommonTables.KitList.GetValue (Kit, 7) == 1:
-			MageTable = GemRB.LoadTable ("magesch")
-			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6) ) )
+		GUICommon.UpdateMageSchool (sel)
 
 		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
 		for i, Button in PortraitButtons.items():
