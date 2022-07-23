@@ -2020,7 +2020,7 @@ static void InitActorTables()
 
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
-			auto classnames = Explode(classname, '_', tmpbits);
+			auto classnames = Explode<std::string, std::string>(classname, '_', tmpbits);
 			bool foundwarrior = false;
 			//we have to account for dual-swap in the multiclass field
 			size_t numfound = 0;
