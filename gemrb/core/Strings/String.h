@@ -94,7 +94,7 @@ typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typenam
 		return pos;
 	}
 	pos = s.length() - (pos + 1);
-	auto iter = FindNotOf<STR>(s.rbegin() + (reverse ? 0 : pos), s.rend() + (reverse ? pos : 0), sv);
+	auto iter = FindNotOf<STR>(s.rbegin() + (reverse ? 0 : pos), s.rend() - (reverse ? pos : 0), sv);
 	return iter == s.rend() ? STR::npos : s.length() - 1 - std::distance(s.rbegin(), iter);
 }
 
