@@ -111,11 +111,11 @@ protected:
 	inline void incAccesses() const;
 
 private:
-	unsigned int _tableSize;
-	unsigned int _blockSize;
-	std::deque<Entry *> _blocks;
-	Entry **_buckets;
-	Entry *_available;
+	unsigned int _tableSize = 0;
+	unsigned int _blockSize = 0;
+	std::deque<Entry*> _blocks;
+	Entry** _buckets = nullptr;
+	Entry* _available = nullptr;
 
 	void allocBlock();
 
@@ -133,12 +133,6 @@ public:
 
 template<typename Key, typename Value, typename HashKey>
 HashMap<Key, Value, HashKey>::HashMap() noexcept
-:
-		_tableSize(0),
-		_blockSize(0),
-		_blocks(),
-		_buckets(NULL),
-		_available(NULL)
 {
 #ifdef HASHMAP_DEBUG
 	memset(&_debug, 0, sizeof(_debug));

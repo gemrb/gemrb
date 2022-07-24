@@ -113,13 +113,12 @@ typedef struct AVFrame {
 	* - encoding: 
 	* - decoding: 
 	*/
-	uint8_t *data[3];
-	int linesize[3];
+	uint8_t* data[3]{};
+	int linesize[3]{};
 	
-	AVFrame() : data(), linesize() {}
+	AVFrame() = default;
 	
-	AVFrame(int width, int height)
-	: data(), linesize() {
+	AVFrame(int width, int height) {
 		get_buffer(width, height);
 	}
 	

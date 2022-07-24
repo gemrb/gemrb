@@ -3064,7 +3064,7 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 	}
 }
 
-void MoveGlobalObjectCore(Scriptable* Sender, Action* parameters, int flags)
+void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flags)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
 	Actor* actor = Scriptable::As<Actor>(tar);

@@ -88,7 +88,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	std::string line;
 	str->ReadLine(line);
 	PLName = line;
-	int c = line.length();
+	size_t c = line.length();
 	while (c > 0) {
 		if (isblank(PLName[c - 1]))
 			PLName[c - 1] = 0;
@@ -101,8 +101,8 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	int count = atoi(line.c_str());
 	while (count != 0) {
 		str->ReadLine(line);
-		int len = line.length();
-		int i = 0;
+		size_t len = line.length();
+		size_t i = 0;
 		int p = 0;
 		PLString pls;
 		while (i < len) {

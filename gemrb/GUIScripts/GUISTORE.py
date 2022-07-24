@@ -130,7 +130,6 @@ def CloseStoreWindow ():
 	GemRB.LeaveStore ()
 
 	CureTable = None
-	RaiseDeadTable = None
 
 	if GemRB.GetVar ("Inventory"):
 		GemRB.SetVar ("Inventory", 0)

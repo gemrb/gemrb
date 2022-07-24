@@ -11332,7 +11332,7 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 	slot = core->QuerySlot(slot);
 	// recache info for potentially changed ammo or weapon ability
 	if (!which || (which >= ACT_WEAPON1 && which <= ACT_WEAPON4)) {
-		actor->inventory.SetEquipped(actor->inventory.GetEquipped(), headerIndex); // reset EquippedHeader
+		actor->inventory.SetEquipped(static_cast<ieWordSigned>(actor->inventory.GetEquipped()), headerIndex); // reset EquippedHeader
 		actor->inventory.CacheAllWeaponInfo();
 	}
 	actor->SetupQuickSlot(which, slot, headerIndex);

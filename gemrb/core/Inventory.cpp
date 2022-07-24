@@ -1369,7 +1369,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 
 		// deal with data we need to use from the launcher
 		int tmpSlot = wi.slot; // GetUsedWeapon will modify it!
-		CREItem* launcher = GetUsedWeapon(false, tmpSlot);
+		const CREItem* launcher = GetUsedWeapon(false, tmpSlot);
 		const Item* launcherItem = gamedata->GetItem(launcher->ItemResRef, true);
 		assert(launcherItem);
 		const ITMExtHeader* launcherHeader = launcherItem->GetExtHeader(0);

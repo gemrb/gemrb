@@ -1680,8 +1680,8 @@ void Projectile::DrawTravel(const Region& viewport)
 		if (bend % 2) length_of_normal = -length_of_normal;
 
 		// adjust the to-be-rendered point by that distance
-		double x_vector = (Destination.x - Origin.x) / total_distance,
-			y_vector = (Destination.y - Origin.y) / total_distance;
+		double x_vector = (Destination.x - Origin.x) / total_distance;
+		double y_vector = (Destination.y - Origin.y) / total_distance;
 		Point newpos = pos;
 		newpos.x += y_vector * length_of_normal;
 		newpos.y -= x_vector * length_of_normal;

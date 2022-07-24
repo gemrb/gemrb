@@ -5342,7 +5342,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		pos = core->Roll(1, len, -1);
 	}
 	while(len--) {
-		ResRef spl = SubStr(parameters->string0Parameter, pos * 4, 4);
+		ResRef spl = SubStr(parameters->string0Parameter, static_cast<uint8_t>(pos * 4), 4);
 		spl[4] = '\0';
 		int splnum = atoi(spl.c_str());
 
