@@ -39,6 +39,7 @@ RentConfirmWindow = None
 LeftButton = None
 RightButton = None
 CureTable = None
+RaiseDeadTable = None
 
 ITEM_PC    = 0
 ITEM_STORE = 1
@@ -129,7 +130,8 @@ def CloseStoreWindow ():
 	GemRB.LeaveStore ()
 
 	CureTable = None
-	
+	RaiseDeadTable = None
+
 	if GemRB.GetVar ("Inventory"):
 		GemRB.SetVar ("Inventory", 0)
 		GUIINV.OpenInventoryWindow ()
@@ -807,7 +809,7 @@ def UpdateStoreHealWindow (Window):
 				Button.SetBorder (0, None, 0,0)
 
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Spell['SpellName']))
-			GemRB.SetToken ("ITEMCOST", str(Cure['Price']) )
+			GemRB.SetToken ("ITEMCOST", str(GetRealCurePrice (Cure)))
 			Label.SetText (strrefs["itemnamecost"])
 		else:
 			Button.SetDisabled (True)
@@ -820,7 +822,7 @@ def UpdateStoreHealWindow (Window):
 			TextArea = Window.GetControlAlias ("HWTA")
 			TextArea.SetText (Cure['Description'])
 			Label = Window.GetControlAlias ("HWPRICE")
-			Label.SetText (str(Cure['Price']) )
+			Label.SetText (str(GetRealCurePrice (Cure)))
 			Button = Window.GetControlAlias ("HEALBTN")
 			Button.SetDisabled (False)
 	return
@@ -1773,6 +1775,20 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, idx, steal=0):
 		Label.SetText (LabelText)
 	return
 
+# handle raisdead.2da price override for raising and resurrecting
+def GetRealCurePrice (cure):
+	global RaiseDeadTable
+
+	if not RaiseDeadTable:
+		RaiseDeadTable = GemRB.LoadTable ("raisdead")
+	pc = GemRB.GameGetSelectedPCSingle ()
+	raisingPrice = RaiseDeadTable.GetValue (str(GemRB.GetPlayerStat(pc, IE_CLASSLEVELSUM)), "VALUE")
+	if cure['CureResRef'].lower() == "sppr504":
+		return raisingPrice
+	if cure['CureResRef'].lower() == "sppr712":
+		return 150 * raisingPrice // 100
+	return cure['Price']
+
 def GetRealPrice (pc, mode, Item, Slot):
 	# get the base from the item
 	price = Item['Price']
@@ -1903,11 +1919,12 @@ def BuyHeal ():
 	Index = GemRB.GetVar ("Index")
 	Cure = GemRB.GetStoreCure (Index)
 	gold = GemRB.GameGetPartyGold ()
-	if gold < Cure['Price']:
+	price = GetRealCurePrice (Cure)
+	if gold < price:
 		ErrorWindow (strrefs["spelltoocostly"])
 		return
 
-	GemRB.GameSetPartyGold (gold-Cure['Price'])
+	GemRB.GameSetPartyGold (gold - price)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 	# for anything but raise/resurrect, the talker should be the caster, so
