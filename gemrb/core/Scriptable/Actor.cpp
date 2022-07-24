@@ -612,7 +612,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 	if (remove) maxLevel -= diff;
 	for(int i=0; i<maxLevel; i++) {
 		for (TableMgr::index_t j = 0; j < row; ++j) {
-			const ResRef res = table->QueryField(j,i);
+			const ieVariable res = table->QueryField(j, i); // not really a variable, we just need a big enough buffer
 			if (IsStar(res)) continue;
 
 			ResRef clabRef = ResRef(res.begin() + 3);
