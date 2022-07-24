@@ -236,7 +236,7 @@ static const TriggerLink triggernames[] = {
 	{"interactingwith", GameScript::InteractingWith, 0},
 	{"intrap", GameScript::InTrap, 0},
 	{"inventoryfull", GameScript::InventoryFull, 0},
-	{"inview", GameScript::LOS, 0}, //it seems the same, needs research
+	{"inview", GameScript::LOS, 0}, //it seems the same, needs research; uses eyesight.ids for int param suggesting angular checks, but is unused
 	{"inwatcherskeep", GameScript::AreaStartsWith, 0},
 	{"inweaponrange", GameScript::InWeaponRange, 0},
 	{"isaclown", GameScript::IsAClown, 0},

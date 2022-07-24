@@ -855,6 +855,7 @@ void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
 	actor->SetScript( parameters->resref0Parameter, parameters->int0Parameter, false );
 }
 
+// see sndslot.ids for strref1 meanings
 void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
@@ -870,7 +871,7 @@ void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
 	actor->StrRefs[parameters->int0Parameter] = ieStrRef(parameters->int1Parameter);
 }
 
-//this one works only on real actors, they got constants
+//this one works only on real actors, they got constants (soundoff.ids)
 void GameScript::VerbalConstantHead(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
@@ -1706,7 +1707,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
-//pst and bg2 can play a song designated by index
+// pst and bg2 can play a song designated by index (songs.ids in pst)
 //actually pst has some extra params not currently implemented (never used - always the same)
 //switchplaylist implements fade by simply scheduling the next
 //music after the currently running one
@@ -1718,7 +1719,8 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	const ieVariable& poi = core->GetMusicPlaylist(parameters->int0Parameter);
 	if (IsStar(poi)) return;
 
-	//if parameter is force, force the music, otherwise just schedule it for next
+	// if fade parameter is force, force the music, otherwise just schedule it for next
+	// NOTE: see songflag.ids for potential modes
 	if (parameters->int1Parameter==1) {
 		force = true;
 	} else {
@@ -1773,7 +1775,8 @@ void GameScript::StartCombatCounter(Scriptable* Sender, Action* /*parameters*/)
 /*iwd2 can set an areasong slot*/
 void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 {
-	//iwd2 allows setting all 10 slots, though, there is no evidence they are used
+	// iwd2 allows setting all 10 slots (musics.ids), though there is no evidence they are used
+	// int1Parameter is from music.ids or songlist.ids (ees)
 	if (parameters->int0Parameter >= 10) return;
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
@@ -6578,12 +6581,12 @@ void GameScript::ChangeColor(Scriptable* Sender, Action* parameters)
 	if (!scr) {
 		return;
 	}
-	ieDword stat = parameters->int0Parameter;
+	ieDword stat = parameters->int0Parameter; // clownrge.ids
 	if (stat<9 || stat>14) {
 		return;
 	}
 	stat += IE_COLORS - 9;
-	scr->SetBase(stat, (scr->GetBase(stat)&~255)|(parameters->int1Parameter&255));
+	scr->SetBase(stat, (scr->GetBase(stat) & ~255) | (parameters->int1Parameter & 255)); // clownclr.ids
 }
 
 //removes previous kit, adds new

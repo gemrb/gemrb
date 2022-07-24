@@ -3375,6 +3375,7 @@ int GameScript::HelpEX(Scriptable *Sender, const Trigger *parameters)
 	}
 
 	int stat;
+	// helptype.ids values
 	switch (parameters->int0Parameter) {
 		case 1: stat = IE_EA; break;
 		case 2: stat = IE_GENERAL; break;

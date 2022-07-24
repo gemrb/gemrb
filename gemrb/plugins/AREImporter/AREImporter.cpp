@@ -589,6 +589,8 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		}
 	}
 
+	// reverb to match against reverb.2da or iwd reverb.ids
+	// (if the 2da doesn't exist - which we provide for all; they use the same values)
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 		str->ReadDword(map->SongHeader.reverbID);
 	} else {
