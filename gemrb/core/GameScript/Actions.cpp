@@ -863,12 +863,12 @@ void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	if (((ieDword) parameters->int0Parameter)>=100) {
-		Log(WARNING, "GameScript", "Invalid index {} in SetPlayerSound.", parameters->int0Parameter);
+	if (parameters->int1Parameter >= 100) {
+		Log(WARNING, "GameScript", "Invalid index {} in SetPlayerSound.", parameters->int1Parameter);
 		return;
 	}
 
-	actor->StrRefs[parameters->int0Parameter] = ieStrRef(parameters->int1Parameter);
+	actor->StrRefs[parameters->int1Parameter] = ieStrRef(parameters->int0Parameter);
 }
 
 //this one works only on real actors, they got constants (soundoff.ids)
