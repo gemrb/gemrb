@@ -5366,7 +5366,7 @@ bool Actor::CheckOnDeath()
 	if (disintegrated) return true;
 
 	// party actors are never removed
-	if (Persistent()) {
+	if (Persistent() && !(LastDamageType & DAMAGE_CHUNKING)) {
 		// hide the corpse artificially
 		SetBase(IE_AVATARREMOVAL, 1);
 		return false;
