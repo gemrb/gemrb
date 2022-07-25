@@ -39,6 +39,7 @@ install:
 
     pushd c:\tools\vcpkg
     git pull
+    c:\tools\vcpkg\bootstrap-vcpkg.bat
     popd
     #vcpkg remove sdl2:x86-windows --recurse
     # (lib)vlc is missing
