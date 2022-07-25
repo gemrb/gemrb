@@ -38,7 +38,7 @@ install:
     }
 
     pushd c:\tools\vcpkg
-    git pull
+    git pull -q
     c:\tools\vcpkg\bootstrap-vcpkg.bat
     popd
     #vcpkg remove sdl2:x86-windows --recurse
@@ -86,7 +86,6 @@ before_build:
 build_script:
 - ps: |-
     pushd c:\projects\gemrb
-    exit 1
     cmake --build . -j 2 --config Release
 after_build:
 - ps: |-
