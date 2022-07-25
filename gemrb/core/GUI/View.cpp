@@ -404,8 +404,12 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 {
 	if (front == NULL) return;
 
-	std::list<View*>::iterator it;
-	it = std::find(subViews.begin(), subViews.end(), back);
+	std::list<View*>::iterator it = subViews.end();
+	if (back != nullptr) {
+		it = std::find(subViews.begin(), subViews.end(), back);
+		assert(it != subViews.end());
+		++it;
+	}
 
 	const View* super = front->superView;
 	if (super == this) {
@@ -418,7 +422,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 			front->superView->RemoveSubview(front);
 		}
 		// remember, being "in front" means coming after in the list
-		subViews.insert(++it, front);
+		subViews.insert(it, front);
 	}
 
 	front->superView = this;
