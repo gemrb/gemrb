@@ -402,9 +402,10 @@ Region View::ConvertRegionFromScreen(Region r) const
 
 void View::AddSubviewInFrontOfView(View* front, const View* back)
 {
-	if (front == NULL) return;
-
-	std::list<View*>::iterator it = subViews.end();
+	if (front == nullptr) return;
+	
+	// remember, being "in front" means coming after in the list
+	auto it = subViews.begin();
 	if (back != nullptr) {
 		it = std::find(subViews.begin(), subViews.end(), back);
 		assert(it != subViews.end());
@@ -414,14 +415,13 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	const View* super = front->superView;
 	if (super == this) {
 		// already here, but may need to move the view
-		std::list<View*>::iterator cur;
-		cur = std::find(subViews.begin(), subViews.end(), front);
+		auto cur = std::find(subViews.begin(), subViews.end(), front);
 		subViews.splice(it, subViews, cur);
 	} else {
-		if (super != NULL) {
+		if (super != nullptr) {
 			front->superView->RemoveSubview(front);
 		}
-		// remember, being "in front" means coming after in the list
+		
 		subViews.insert(it, front);
 	}
 
