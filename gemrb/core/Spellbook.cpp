@@ -395,13 +395,13 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 //this one purges all instances of known spells of the same name from memory
 void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef)
 {
-	for (auto ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ++ms) {
+	for (auto ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ) {
 		if (resRef != (*ms)->SpellResRef) {
+			ms++;
 			continue;
 		}
 		delete *ms;
 		ms = sm->memorized_spells.erase(ms);
-		--ms;
 	}
 }
 
@@ -468,14 +468,14 @@ void Spellbook::RemoveSpell(const ResRef& resRef, bool onlyknown)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		for (const auto& spellMemo : spells[type]) {
-			for (auto ks = spellMemo->known_spells.begin(); ks != spellMemo->known_spells.end(); ++ks) {
+			for (auto ks = spellMemo->known_spells.begin(); ks != spellMemo->known_spells.end(); ) {
 				if ((*ks)->SpellResRef != resRef) {
+					++ks;
 					continue;
 				}
 				delete *ks;
 				ks = spellMemo->known_spells.erase(ks);
 				if (!onlyknown) RemoveMemorization(spellMemo, resRef);
-				--ks;
 				ClearSpellInfo();
 			}
 		}
