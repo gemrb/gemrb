@@ -37,25 +37,11 @@ install:
       icacls.exe $path /inheritance:r
     }
 
-    #vcpkg install zlib:x86-windows
     #vcpkg remove sdl2:x86-windows --recurse
-    #vcpkg install sdl2:x86-windows
-    #vcpkg install sdl2-mixer:x86-windows
-    #vcpkg install python3:x86-windows
-    #vcpkg install openal-soft:x86-windows
-    #vcpkg install libpng:x86-windows
-    #vcpkg install libogg:x86-windows
-    #vcpkg install libvorbis:x86-windows
-    #vcpkg install freetype:x86-windows
-    #vcpkg install libiconv:x86-windows
     # (lib)vlc is missing
 
-    #pushd c:\tools\vcpkg
-    #vcpkg integrate install
-    #popd
-
 cache:
-  - c:\tools\vcpkg\installed\
+  #- c:\tools\vcpkg\installed\
   - C:\ProgramData\chocolatey\lib
   - C:\ProgramData\chocolatey\bin
   - '%LocalAppData%\NuGet\v3-cache'
