@@ -22,7 +22,7 @@ environment:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
   VCPKG_TARGET_TRIPLET: "x86-windows"
   VCPKG_BUILD_TYPE: "release"
-  #APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
 install:
 - ps: |-
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
@@ -45,6 +45,7 @@ install:
 
 cache:
   - c:\tools\vcpkg\installed\
+  - c:\tools\vcpkg\packages\
   - C:\ProgramData\chocolatey\lib
   - C:\ProgramData\chocolatey\bin
   - '%LocalAppData%\NuGet\v3-cache'
@@ -83,6 +84,7 @@ before_build:
 build_script:
 - ps: |-
     pushd c:\projects\gemrb
+    exit 1
     cmake --build . -j 2 --config Release
 after_build:
 - ps: |-
