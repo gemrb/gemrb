@@ -38,7 +38,7 @@ install:
     }
 
     pushd c:\tools\vcpkg
-    git pull -q 2022.07.25
+    git pull -q origin 2022.07.25
     c:\tools\vcpkg\bootstrap-vcpkg.bat
     popd
     # (lib)vlc is missing from the vcpkg package list, so we don't build the plugin
