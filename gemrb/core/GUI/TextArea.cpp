@@ -237,7 +237,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps)
 
 	ControlType = IE_GUI_TEXTAREA;
 
-	AddSubviewInFrontOfView(&scrollview);
+	Control::AddSubviewInFrontOfView(&scrollview);
 
 	// initialize the Text containers
 	ClearSelectOptions();
