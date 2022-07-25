@@ -50,6 +50,7 @@ cache:
   - C:\ProgramData\chocolatey\lib
   - C:\ProgramData\chocolatey\bin
   - '%LocalAppData%\NuGet\v3-cache'
+  - '%LocalAppData%\vcpkg'
 before_build:
 - ps: |-
     pushd c:\projects\gemrb
