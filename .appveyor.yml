@@ -17,6 +17,7 @@ only_commits:
     - .appveyor.yml
 matrix:
   fast_finish: true
+max_jobs: 3
 environment:
   SF_ACC:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
