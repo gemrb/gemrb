@@ -37,11 +37,14 @@ install:
       icacls.exe $path /inheritance:r
     }
 
+    pushd c:\tools\vcpkg
+    git pull
+    popd
     #vcpkg remove sdl2:x86-windows --recurse
     # (lib)vlc is missing
 
 cache:
-  #- c:\tools\vcpkg\installed\
+  - c:\tools\vcpkg\installed\
   - C:\ProgramData\chocolatey\lib
   - C:\ProgramData\chocolatey\bin
   - '%LocalAppData%\NuGet\v3-cache'
