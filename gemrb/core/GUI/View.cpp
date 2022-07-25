@@ -406,7 +406,9 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 
 	std::list<View*>::iterator it = subViews.end();
 	if (back != nullptr) {
-		it = std::find(subViews.begin(), subViews.end(), back)++;
+		it = std::find(subViews.begin(), subViews.end(), back);
+		assert(it != subViews.end());
+		++it;
 	}
 
 	const View* super = front->superView;
