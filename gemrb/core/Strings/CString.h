@@ -119,6 +119,7 @@ public:
 			str[LEN] = '\0';
 			return false;
 		}
+		*ret = '\0';
 		return true;
 	}
 	
