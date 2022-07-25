@@ -5380,7 +5380,8 @@ bool Actor::CheckOnDeath()
 	if (disintegrated) return true;
 
 	// party actors are never removed
-	if (Persistent() && !(LastDamageType & DAMAGE_CHUNKING)) {
+	// FIXME: even when chunking? Consider changing and adding fx_replace_creature-like handling
+	if (Persistent()) {
 		// hide the corpse artificially
 		SetBase(IE_AVATARREMOVAL, 1);
 		return false;
