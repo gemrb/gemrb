@@ -144,7 +144,7 @@ void TextArea::SpanSelector::ClearHover()
 	}
 }
 
-void TextArea::SpanSelector::MakeSelection(size_t idx)
+void TextArea::SpanSelector::MakeSelection(Option_t idx)
 {
 	TextContainer* optspan = TextAtIndex(idx);
 
@@ -162,6 +162,7 @@ void TextArea::SpanSelector::MakeSelection(size_t idx)
 		selectedSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]);
 	}
 
+	selected = idx;
 	// beware, this will recursively call this function.
 	ta.UpdateStateWithSelection(idx);
 }
@@ -172,7 +173,7 @@ TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
 	return static_cast<TextContainer*>(SubviewAt(p, true, false));
 }
 	
-TextContainer* TextArea::SpanSelector::TextAtIndex(size_t idx)
+TextContainer* TextArea::SpanSelector::TextAtIndex(Option_t idx)
 {
 	if (subViews.empty() || idx > subViews.size() - 1) {
 		return NULL;
@@ -550,18 +551,12 @@ void TextArea::UpdateState(value_t opt)
 		return;
 	}
 	
-	size_t optIdx = std::distance(values.begin(), it);
+	Option_t optIdx = std::distance(values.begin(), it);
 	
-	struct {
-		const SpanSelector* opts = nullptr;
-		size_t idx = 0;
-	} static context;
-
-	// if either the selection, or the options have changed run the handlers
+	// only run the handlers if the context has changed
 	// note that handlers can trigger reentrancy back here
-	if (context.opts != selectOptions || context.idx != optIdx) {
-		context.opts = selectOptions;
-		context.idx = optIdx;
+	if (optionContext != selectOptions->Context()) {
+		optionContext = selectOptions->Context();
 
 		// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
 		selectOptions->MakeSelection(optIdx);
@@ -571,7 +566,7 @@ void TextArea::UpdateState(value_t opt)
 	}
 }
 
-void TextArea::UpdateStateWithSelection(size_t optIdx)
+void TextArea::UpdateStateWithSelection(Option_t optIdx)
 {
 	assert(selectOptions);
 	if (optIdx < selectOptions->NumOpts()) {
@@ -639,6 +634,7 @@ void TextArea::ClearSelectOptions()
 	delete scrollview.RemoveSubview(selectOptions);
 	dialogBeginNode = NULL;
 	selectOptions = NULL;
+	optionContext = OptionContext();
 
 	if (!core->HasFeature(GF_DIALOGUE_SCROLLS)) {
 		UpdateScrollview();
@@ -688,7 +684,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	}
 
 	ContentContainer::Margin m;
-	size_t selectIdx = -1;
+	Option_t selectIdx = -1;
 	if (dialogBeginNode) {
 		if (speakerPic)
 			m = ContentContainer::Margin(10, 20);
@@ -708,7 +704,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 	UpdateScrollview();
 }
 
-void TextArea::SelectAvailableOption(size_t idx)
+void TextArea::SelectAvailableOption(Option_t idx)
 {
 	if (selectOptions) {
 		selectOptions->MakeSelection(idx);

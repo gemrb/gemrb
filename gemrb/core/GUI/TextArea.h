@@ -35,6 +35,8 @@
 namespace GemRB {
 
 using SelectOption = std::pair<int, String>;
+using OptionId_t = EventMgr::TapMonitorId;
+using Option_t = size_t;
 
 static const Color SelectOptionHover(255, 180, 0, 255);  // default hover color for SelectOption
 static const Color SelectOptionSelected(55, 100, 0, 255);// default selected color for SelectOption
@@ -49,6 +51,24 @@ class GEM_EXPORT TextArea final : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
+	
+	class OptionContext {
+		OptionId_t id = -1;
+		Option_t idx = -1;
+		
+	public:
+		OptionContext() noexcept = default;
+		OptionContext(OptionId_t id, Option_t opt) noexcept
+		: id(id), idx(opt) {}
+		
+		bool operator==(const OptionContext& rhs) const noexcept {
+			return id == rhs.id && idx == rhs.idx;
+		}
+		
+		bool operator!=(const OptionContext& rhs) const noexcept {
+			return !operator==(rhs);
+		}
+	};
 	
 	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {
@@ -71,12 +91,13 @@ private:
 		TextContainer* hoverSpan = nullptr;
 		TextContainer* selectedSpan = nullptr;
 		size_t size;
+		Option_t selected = -1;
 		EventMgr::TapMonitorId id;
 
 	private:
 		void ClearHover();
 		TextContainer* TextAtPoint(const Point&);
-		TextContainer* TextAtIndex(size_t idx);
+		TextContainer* TextAtIndex(Option_t idx);
 
 		bool OnMouseOver(const MouseEvent& /*me*/) override;
 		bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
@@ -96,8 +117,9 @@ private:
 		~SpanSelector() override;
 
 		size_t NumOpts() const { return size;};
-		void MakeSelection(size_t idx);
+		void MakeSelection(Option_t idx);
 		TextContainer* Selection() const { return selectedSpan; }
+		OptionContext Context() const { return OptionContext(id, selected); }
 		
 		bool CanLockFocus() const override { return false; }
 	};
@@ -145,7 +167,7 @@ public:
 	void SetScrollbar(ScrollBar*);
 	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered);
 	
-	void SelectAvailableOption(size_t idx);
+	void SelectAvailableOption(Option_t idx);
 	/** Set Selectable */
 	void SetSelectable(bool val);
 	void SetSpeakerPicture(Holder<Sprite2D> Picture);
@@ -169,6 +191,7 @@ private: // Private attributes
 	Holder<Sprite2D> speakerPic;
 	// dialog options container
 	SpanSelector* selectOptions = nullptr;
+	OptionContext optionContext;
 	// standard text display container
 	TextContainer* textContainer = nullptr;
 	ScrollView scrollview;
@@ -187,7 +210,7 @@ private: //internal functions
 
 	void UpdateScrollview();
 	Region UpdateTextFrame();
-	void UpdateStateWithSelection(size_t optIdx);
+	void UpdateStateWithSelection(Option_t optIdx);
 	void SizeChanged(const Size&) override { UpdateScrollview(); }
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 
