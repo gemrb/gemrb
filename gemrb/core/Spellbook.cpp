@@ -397,7 +397,7 @@ void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRe
 {
 	for (auto ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ) {
 		if (resRef != (*ms)->SpellResRef) {
-			ms++;
+			++ms;
 			continue;
 		}
 		delete *ms;
