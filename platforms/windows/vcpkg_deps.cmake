@@ -22,8 +22,8 @@ LIST(APPEND DLL_SET_DEBUG
 	bz2d.dll
 	freetyped.dll
 	glew32d.dll
-	libcharset.dll
-	libiconv.dll
+	charset-1.dll
+	iconv-2.dll
 	libpng16d.dll
 	ogg.dll
 	OpenAL32.dll
@@ -41,8 +41,8 @@ LIST(APPEND DLL_SET_RELEASE
 	bz2.dll
 	freetype.dll
 	glew32.dll
-	libcharset.dll
-	libiconv.dll
+	charset-1.dll
+	iconv-2.dll
 	libpng16.dll
 	ogg.dll
 	OpenAL32.dll
