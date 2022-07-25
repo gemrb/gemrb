@@ -4711,7 +4711,6 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 			target->SetPersistent(-1);
 		}
 		target->SetBase(IE_MC_FLAGS, target->GetBase(IE_MC_FLAGS) & ~MC_KEEP_CORPSE);
-		// CheckOnDeath will do the actual chunking
 		break;
 	case 2: //normal death
 		target->Die(Owner);
