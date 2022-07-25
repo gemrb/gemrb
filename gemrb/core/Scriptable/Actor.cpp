@@ -4116,6 +4116,16 @@ void Actor::CheckCleave()
 	}
 }
 
+// NOTE: only does the visual part of chunking
+static void ChunkActor(Actor* actor)
+{
+	ieDword gore = 0;
+	core->GetDictionary()->Lookup("Gore", gore);
+	if (!gore) return;
+
+	// TODO: play chunky animation / particles #128
+	actor->SetAnimationID(0x230); // EXPLODING_TORSO
+}
 
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical, int saveflags)
@@ -5124,6 +5134,10 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		AddTrigger(TriggerEntry(trigger_namelessbitthedust));
 	}
 
+	if (LastDamageType & DAMAGE_CHUNKING) {
+		ChunkActor(this);
+	}
+
 	if (!killer) {
 		// TODO: is this right?
 		killer = area->GetActorByGlobalID(LastHitter);
@@ -5366,7 +5380,8 @@ bool Actor::CheckOnDeath()
 	if (disintegrated) return true;
 
 	// party actors are never removed
-	if (Persistent() && !(LastDamageType & DAMAGE_CHUNKING)) {
+	// FIXME: even when chunking? Consider changing and adding fx_replace_creature-like handling
+	if (Persistent()) {
 		// hide the corpse artificially
 		SetBase(IE_AVATARREMOVAL, 1);
 		return false;
@@ -5381,13 +5396,7 @@ bool Actor::CheckOnDeath()
 	RemovalTime = time + core->Time.day_size; // keep corpse around for a day
 
 	//if chunked death, then return true
-	ieDword gore = 0;
-	core->GetDictionary()->Lookup("Gore", gore);
 	if (LastDamageType & DAMAGE_CHUNKING) {
-		if (gore) {
-			// TODO: play chunky animation #128
-			// chunks are projectiles
-		}
 		RemovalTime = time;
 		return true;
 	}
