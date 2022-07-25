@@ -84,7 +84,6 @@ before_build:
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 build_script:
 - ps: |-
-    exit 1
     pushd c:\projects\gemrb
     cmake --build . -j 2 --config Release
 after_build:
