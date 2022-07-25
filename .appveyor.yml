@@ -38,11 +38,10 @@ install:
     }
 
     pushd c:\tools\vcpkg
-    git pull -q
+    git pull -q 2022.07.25
     c:\tools\vcpkg\bootstrap-vcpkg.bat
     popd
-    #vcpkg remove sdl2:x86-windows --recurse
-    # (lib)vlc is missing
+    # (lib)vlc is missing from the vcpkg package list, so we don't build the plugin
 
 cache:
   - c:\tools\vcpkg\installed\
@@ -85,6 +84,7 @@ before_build:
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 build_script:
 - ps: |-
+    exit 1
     pushd c:\projects\gemrb
     cmake --build . -j 2 --config Release
 after_build:
