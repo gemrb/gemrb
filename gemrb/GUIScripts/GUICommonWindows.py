@@ -2011,6 +2011,8 @@ def OpenWaitForDiscWindow ():
 
 
 def CheckLevelUp(pc):
+	if GameCheck.IsGemRBDemo ():
+		return
 	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))
 
 def ToggleAlwaysRun():
