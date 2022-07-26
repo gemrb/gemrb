@@ -17,12 +17,12 @@ only_commits:
     - .appveyor.yml
 matrix:
   fast_finish: true
+max_jobs: 3
 environment:
   SF_ACC:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
   VCPKG_TARGET_TRIPLET: "x86-windows"
   VCPKG_BUILD_TYPE: "release"
-  VCPKG_DEBUG: "1"
   #APPVEYOR_SAVE_CACHE_ON_ERROR: true
 install:
 - ps: |-
