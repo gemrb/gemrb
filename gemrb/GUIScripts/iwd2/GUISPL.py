@@ -121,6 +121,7 @@ def SelectFirstActiveBook ():
 
 def SelectedNewPlayer (Window):
 	FetchActiveSpellbooks ()
+	GemRB.SetVar ("SelectedBook", 0)
 	SelectFirstActiveBook ()
 	UpdateSpellBook ()
 	return
