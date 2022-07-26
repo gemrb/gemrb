@@ -2070,7 +2070,8 @@ std::string EffectQueue::dump(bool print) const
 			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: {}! Report this immediately!", fx.Opcode);
 			return buffer;
 		}
-		AppendFormat(buffer, " {:2d}: 0x{:02x}: {} ({}, {}) S:{}\n", i++, fx.Opcode, Opcodes[fx.Opcode].Name, fx.Parameter1, fx.Parameter2, fx.SourceRef);
+		const auto& opcodeName = Opcodes[fx.Opcode].Name ? Opcodes[fx.Opcode].Name : "unknown opcode";
+		AppendFormat(buffer, " {:2d}: 0x{:02x}: {} ({}, {}) S:{}\n", i++, fx.Opcode, opcodeName, fx.Parameter1, fx.Parameter2, fx.SourceRef);
 	}
 	if (print) Log(DEBUG, "EffectQueue", "{}", buffer);
 	return buffer;
