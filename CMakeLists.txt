@@ -31,6 +31,13 @@ ELSE(DEFINED CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 ENDIF(DEFINED CMAKE_BUILD_TYPE)
 
+# VCPKG manifest file: platforms/windows/vcpkg.json
+# must be declared before PROJECT()
+IF(WIN32)
+	SET(VCPKG_MANIFEST_DIR "${CMAKE_SOURCE_DIR}/platforms/windows" )
+	message("VCPKG_MANIFEST_DIR: ${VCPKG_MANIFEST_DIR}")
+ENDIF(WIN32)
+
 PROJECT(gemrb)
 
 find_program(SCCACHE_PROGRAM "sccache")
