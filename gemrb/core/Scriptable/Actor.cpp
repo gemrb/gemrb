@@ -5124,7 +5124,10 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
 	//remove IDLE so the actor gets a chance to die properly
 	InternalFlags&=~IF_IDLE;
-	if (GetStance() != IE_ANI_DIE) {
+
+	if (LastDamageType & DAMAGE_CHUNKING) {
+		ChunkActor(this);
+	} else if (GetStance() != IE_ANI_DIE) {
 		SetStance(IE_ANI_DIE);
 	}
 	BaseStats[IE_GENERAL] = GEN_DEAD;
@@ -5132,10 +5135,6 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	SendDiedTrigger();
 	if (pstflags) {
 		AddTrigger(TriggerEntry(trigger_namelessbitthedust));
-	}
-
-	if (LastDamageType & DAMAGE_CHUNKING) {
-		ChunkActor(this);
 	}
 
 	if (!killer) {
