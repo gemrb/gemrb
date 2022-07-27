@@ -171,19 +171,18 @@ def CreatePress ():
 
 	FullGameButton = GameTypeWindow.GetControl (4)
 	FullGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	FullGameButton.OnPress (GameTypeChange)
+	FullGameButton.OnPress (lambda btn: GameTypeChange (btn, False))
 	FullGameButton.SetText (24869)
-	FullGameButton.SetAction(GameTypeChange, IE_ACT_VALUE_CHANGE)
 
 	ExpansionGameButton = GameTypeWindow.GetControl (5)
 	ExpansionGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	ExpansionGameButton.OnPress (GameTypeChange)
+	ExpansionGameButton.OnPress (lambda btn: GameTypeChange (btn, True))
 	ExpansionGameButton.SetText (24871)
-	ExpansionGameButton.SetAction(GameTypeChange, IE_ACT_VALUE_CHANGE)
 
 	ExpansionGameButton.SetVarAssoc ("ExpansionGame", 1)
 	FullGameButton.SetVarAssoc ("ExpansionGame", 0)
 
+	GameTypeChange (None, False)
 	GameTypeWindow.ShowModal (1)
 	return
 
