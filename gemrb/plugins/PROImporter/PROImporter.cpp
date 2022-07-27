@@ -140,10 +140,7 @@ Holder<ProjectileExtension> PROImporter::GetAreaExtension()
 	str->ReadResRef( e->VVCRes );
 	str->ReadWord(tmp);
 	//limit the cone width to 359 degrees (for full compatibility)
-	if (tmp>359) {
-		tmp=359;
-	}
-	e->ConeWidth = tmp;
+	e->ConeWidth = tmp > 359 ? 359 : tmp;
 	str->ReadWord(tmp); // padding
 
 	//These are GemRB specific, not used in the original engine
