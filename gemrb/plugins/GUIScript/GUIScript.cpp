@@ -1948,6 +1948,12 @@ static PyObject* GemRB_Control_SetValue(PyObject* self, PyObject* args)
 	}
 	ctrl->SetValue(val);
 
+	if (val == Control::INVALID_VALUE) {
+		PyObject_SetAttrString(self, "Value", Py_None);
+	} else {
+		PyObject_SetAttrString(self, "Value", DecRef(PyLong_FromUnsignedLong, val));
+	}
+
 	Py_RETURN_NONE;
 }
 
@@ -1996,6 +2002,14 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	
 	Control::varname_t varname = Control::varname_t(VarName);
 	ctrl->BindDictVariable(varname, val, Control::ValueRange(min, max));
+
+	// refresh python copies
+	PyObject_SetAttrString(self, "VarName", DecRef(PyString_FromStringView, ctrl->DictVariable()));
+	if (val == Control::INVALID_VALUE) {
+		PyObject_SetAttrString(self, "Value", Py_None);
+	} else {
+		PyObject_SetAttrString(self, "Value", DecRef(PyLong_FromUnsignedLong, val));
+	}
 
 	Py_RETURN_NONE;
 }
