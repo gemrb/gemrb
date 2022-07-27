@@ -1570,6 +1570,12 @@ void Projectile::DrawExplosion(const Region& vp)
 			children.push_back(std::move(*pro));
 			delete pro;
 		}
+
+		// switch fill to scatter after the first time
+		// eg. web and storm of vengeance shouldn't explode outward in subsequent applications
+		if (Extension && apflags & APF_FILL) {
+			Extension->APFlags |= APF_SCATTER;
+		}
 	}
 
 	if (extension_explosioncount) {
