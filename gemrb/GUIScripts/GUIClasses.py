@@ -184,7 +184,7 @@ class GView:
 		view = CreateView (control, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs(bam))
 		return self.AddSubview (view)
   
-	def CreateTextArea(self, control, args):
+	def CreateTextArea(self, control, *args):
 		frame = _ExtractFrame(args[0:4])
 		return self.CreateSubview(control, IE_GUI_TEXTAREA, frame, args[4:])
   
