@@ -4808,7 +4808,8 @@ int fx_set_web_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	target->SetSpellState(SS_WEB);
 	//attack penalty in IWD2
 	STAT_SET_PCF( IE_WEB, 1);
-	STAT_SET(IE_MOVEMENTRATE, 0); //
+	STAT_SET(IE_HELD, 1);
+	STATE_SET(STATE_HELPLESS);
 	return FX_APPLIED;
 }
 
