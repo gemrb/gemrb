@@ -563,9 +563,9 @@ def GetStatOverview (pc):
 	tmp = GemRB.GetCombatDetails(pc, 0)["APR"]
 
 	if (tmp&1):
-		tmp2 = str(tmp/2) + chr(189)
+		tmp2 = str(tmp // 2) + chr(189)
 	else:
-		tmp2 = str(tmp/2)
+		tmp2 = str(tmp // 2)
 
 	stats.append ((4209, tmp2, ''))
 	#   4210 Lore
