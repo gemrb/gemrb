@@ -182,7 +182,7 @@ void Control::UpdateDictValue() noexcept
 void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange valRange) noexcept
 {
 	// blank out any old varname so we can set the control value without setting the old variable
-	VarName[0] = '\0';
+	VarName.Reset();
 	if (valRange.first != Control::INVALID_VALUE) {
 		SetValueRange(valRange);
 	}
