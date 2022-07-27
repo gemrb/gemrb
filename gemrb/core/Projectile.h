@@ -291,6 +291,7 @@ private:
 	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation
 	EffectQueue effects;
 	std::list<Projectile> children;
+	std::vector<Point> childLocations; // for persistence across child generations
 	int pathcounter = 0x7fff;
 	int bend = 0;
 	int drawSpark = 0;
