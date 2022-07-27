@@ -1467,7 +1467,14 @@ void Projectile::DrawExplosion(const Region& vp)
 			if (apflags&APF_BOTH) child_size/=2; //intentionally decreases
 			if (apflags&APF_MORE) child_size*=2;
 		}
-		
+
+		// expire children, so they don't accumulate
+		// good for web, holy blight, horrid wilting and more
+		// TODO: better, but not perfect, for cloud spells and meteor swarm, where it would be better
+		// to not redraw children on repeat application, just loop them and reapply their payload
+		if (Extension && apflags & APF_FILL) {
+			children.clear();
+		}
 		//the spreading animation is in the first column
 		ResRef tmp = Extension->Spread;
 		for (size_t i = 0; i < child_size; ++i) {
@@ -1551,7 +1558,8 @@ void Projectile::DrawExplosion(const Region& vp)
 			pro->Setup();
 
 			// currently needed by bg2/how Web (less obvious in bg1)
-			// TODO: original behaviour was: play once, wait in final frame, hide, wait, repeat
+			// TODO: original behaviour was: play once, wait in final frame, hide, repeat in about 1/2-2 rounds
+			// - individually (per-child) not as a whole
 			if (pro->travel[0] && Extension->APFlags & APF_PLAYONCE) {
 				// set on all orients while we don't force one for single-orientation animations (see CreateOrientedAnimations)
 				for (auto& anim : pro->travel) {
