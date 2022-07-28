@@ -52,9 +52,6 @@ bool PROImporter::Open(DataStream* stream)
 
 Projectile* PROImporter::GetProjectile(Projectile *s)
 {
-	if( !s) {
-		return NULL;
-	}
 	ieWord AreaExtension;
 
 	str->ReadWord(AreaExtension);
