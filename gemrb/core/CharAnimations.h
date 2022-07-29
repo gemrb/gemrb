@@ -117,6 +117,7 @@ namespace GemRB {
 
 //special flags
 #define AV_NO_BODY_HEAT                 1
+#define AV_BUFFET_IMMUNITY              0x1000
 
 enum PaletteType {
 	PAL_MAIN,

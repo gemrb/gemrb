@@ -227,6 +227,25 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			}
 		}
 	}
+
+	AutoTable wingBuffet = gamedata->LoadTable("wingbuff");
+	if (wingBuffet) {
+		TableMgr::index_t rows = wingBuffet->GetRowCount();
+		for (TableMgr::index_t i = 0; i < rows; ++i) {
+			unsigned int id = 0;
+			unsigned int flags = wingBuffet->QueryFieldUnsigned<unsigned int>(i, 0);
+			valid_unsignednumber(wingBuffet->GetRowName(i).c_str(), id);
+
+			for (auto& row : table) {
+				if (id < row.AnimID) break;
+				if (id == row.AnimID) {
+					row.Flags |= flags;
+					break;
+				}
+			}
+		}
+	}
+
 }
 
 size_t CharAnimations::GetAvatarsCount()

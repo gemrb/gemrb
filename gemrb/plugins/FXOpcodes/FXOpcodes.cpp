@@ -6412,8 +6412,9 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	static const int coords[16][2]={ {0, 12}, {-4, 9}, {-8, 6}, {-12, 3}, {-16, 0}, {-12, -3}, {-8, -6}, {-4, -9},
 	{0, -12}, {4, -9}, {8, -6}, {12, -3}, {16, 0}, {12, 3}, {8, 6}, {4, 9}, };
 
-	//creature immunity is based on creature size (though the original is rather cheesy)
-	if (target->GetAnims()->GetCircleSize()>5) {
+	// creature immunity is based on creature size in gemrb, but the original is rather cheesy
+	// it hardcoded the ids and included some angels, bhaal avatars, tanarri, elementals, fire giants, melissan, ice golem
+	if (target->GetAnims()->GetCircleSize() > 5 || target->GetAnims()->GetFlags() & AV_BUFFET_IMMUNITY) {
 		return FX_NOT_APPLIED;
 	}
 	if (!target->GetCurrentArea()) {
