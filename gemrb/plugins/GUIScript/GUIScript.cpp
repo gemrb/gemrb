@@ -56,6 +56,7 @@
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
 #include "GUI/ScrollBar.h"
+#include "GUI/Slider.h"
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
 #include "GUI/WorldMapControl.h"
@@ -2001,7 +2002,15 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	}
 	
 	Control::varname_t varname = Control::varname_t(VarName);
+	Control::value_t realVal = 0;
+	core->GetDictionary()->Lookup(varname, realVal);
+
 	ctrl->BindDictVariable(varname, val, Control::ValueRange(min, max));
+	// restore variable for sliders, since it's only a multiplier for them
+	if (ctrl->ControlType == IE_GUI_SLIDER) {
+		ctrl->UpdateState(realVal);
+		core->GetDictionary()->SetAt(varname, val * static_cast<Slider*>(ctrl)->GetPosition());
+	}
 
 	// refresh python copies
 	PyObject_SetAttrString(self, "VarName", DecRef(PyString_FromStringView, ctrl->DictVariable()));
