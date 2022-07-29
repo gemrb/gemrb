@@ -52,7 +52,6 @@ public:
 	void Draw(bool highlight, const Region &screen, Color tint, BlitFlags flags) const;
 	int GetCursor(int targetMode, int lastCursor) const;
 
-	int IsOpen() const;
 	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor *actor);
 	bool TryUnlock(Actor *actor) const;

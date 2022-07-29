@@ -160,14 +160,6 @@ void Container::RefreshGroundIcons()
 	}
 }
 
-int Container::IsOpen() const
-{
-	if (Flags&CONT_LOCKED) {
-		return false;
-	}
-	return true;
-}
-
 void Container::TryPickLock(const Actor *actor)
 {
 	if (LockDifficulty == 100) {
