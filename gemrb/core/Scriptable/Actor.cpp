@@ -1103,6 +1103,7 @@ static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 {
 	if (actor->checkHP == 2) return;
+	if (actor->GetInternalFlag() & IF_REALLYDIED) return;
 
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
 	// ERWAN.CRE from Victor's Improvement Pack has a max of 0 and still survives, grrr
