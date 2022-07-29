@@ -48,8 +48,8 @@ Region Container::DrawingRegion() const
 		const Holder<Sprite2D> icon = groundicons[i];
 		if (icon) {
 			Region frame = icon->Frame;
-			frame.x = frame.x * -1 + Pos.x;
-			frame.y = frame.y * -1 + Pos.y;
+			frame.x = Pos.x - frame.x;
+			frame.y = Pos.y - frame.y;
 			r.ExpandToRegion(frame);
 		}
 	}
@@ -144,10 +144,7 @@ int Container::AddItem(CREItem *item)
 
 void Container::RefreshGroundIcons()
 {
-	int i = inventory.GetSlotCount();
-	if (i>MAX_GROUND_ICON_DRAWN)
-		i = MAX_GROUND_ICON_DRAWN;
-
+	int i = std::min(inventory.GetSlotCount(), MAX_GROUND_ICON_DRAWN);
 	int count = MAX_GROUND_ICON_DRAWN;
 	while (count > i) {
 		groundicons[--count] = nullptr;
