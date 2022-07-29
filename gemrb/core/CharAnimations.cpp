@@ -457,7 +457,7 @@ void CharAnimations::LockPalette(const ieDword *gradients)
 	}
 	//force initialisation of animation
 	SetColors( gradients );
-	GetAnimation(0, S);
+	GetAnimation(stanceID, S);
 	if (PartPalettes[PAL_MAIN]) {
 		lockPalette=true;
 	}
