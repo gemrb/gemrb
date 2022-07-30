@@ -189,8 +189,8 @@ int BIFImporter::ReadBIF()
 	fentries = new FileEntry[fentcount];
 	tentries = new TileEntry[tentcount];
 	if (!fentries || !tentries) {
-		delete fentries;
-		delete tentries;
+		delete[] fentries;
+		delete[] tentries;
 		return GEM_ERROR;
 	}
 
