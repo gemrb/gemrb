@@ -57,7 +57,7 @@ def OnLoad():
 	PortraitName = GemRB.GetToken("LargePortrait")
 	PortraitName = PortraitName[0:len(PortraitName)-1]
 	PortraitIndex = PortraitTable.GetRowIndex(PortraitName)
-	if PortraitIndex < 0:
+	if PortraitIndex == None:
 		PortraitIndex = 0
 	HairColor = PortraitTable.GetValue (PortraitIndex, 1)
 	SkinColor = PortraitTable.GetValue (PortraitIndex, 2)
