@@ -109,7 +109,7 @@ def GetBaseValue(feat):
 	# only cleric kits have feat bonuses in the original, but the column names are shortened
 	KitName = KitName.replace("CLERIC_","C_")
 	KitColumn = FeatTable.GetColumnIndex(KitName)
-	if KitColumn != 0:
+	if KitColumn != None:
 		Val3 = FeatTable.GetValue(feat, KitColumn)
 		if Val3 > Val:
 			Val = Val3
