@@ -60,7 +60,6 @@ def CalcLimits(Abidx):
 	if tmp != 0:
 		Maximum = tmp
 
-
 	Race = Abracead.GetRowIndex(RaceName)
 	Add = Abracead.GetValue(Race, Abidx)
 	Minimum += Add
@@ -72,7 +71,7 @@ def CalcLimits(Abidx):
 		Add += tmp
 
 	tmp = Abclasrq.GetValue(KitIndex, Abidx)
-	if tmp != 0 and tmp > Minimum:
+	if tmp > Minimum:
 		Minimum = tmp
 
 	if Minimum < 1:

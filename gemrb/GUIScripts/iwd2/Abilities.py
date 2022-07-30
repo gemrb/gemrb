@@ -54,17 +54,17 @@ def CalcLimits(Abidx):
 
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	tmp = Abclasrq.GetValue(KitIndex, Abidx)
-	if tmp!=0 and tmp>Minimum:
+	if tmp > Minimum:
 		Minimum = tmp
 
 	Abracerq = GemRB.LoadTable("ABRACERQ")
 	Race = Abracerq.GetRowIndex(RaceName)
 	tmp = Abracerq.GetValue(Race, Abidx*2)
-	if tmp!=0 and tmp>Minimum:
+	if tmp > Minimum:
 		Minimum = tmp
 
 	tmp = Abracerq.GetValue(Race, Abidx*2+1)
-	if tmp!=0 and tmp>Maximum:
+	if tmp > Maximum:
 		Maximum = tmp
 
 	Race = Abracead.GetRowIndex(RaceName)
