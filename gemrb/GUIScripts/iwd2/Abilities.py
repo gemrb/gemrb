@@ -131,6 +131,9 @@ def OpenAbilitiesWindow(chargen, points):
 
 		Abclasrq = GemRB.LoadTable("ABCLASRQ")
 		KitIndex = Abclasrq.GetRowIndex(KitName)
+		# iwd2 comes with an effectively empty table, but let's allow for modding
+		if KitIndex == None:
+			KitIndex = 99999999
 
 	# in a fit of clarity, they used the same ids in both windowpacks
 	if chargen:
