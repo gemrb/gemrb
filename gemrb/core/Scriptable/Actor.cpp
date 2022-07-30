@@ -4578,7 +4578,7 @@ std::string Actor::dump() const
 	AppendFormat(buffer, "Alignment:  {:#x}   current alignment:{:#x}\n", BaseStats[IE_ALIGNMENT], Modified[IE_ALIGNMENT] );
 	AppendFormat(buffer, "Morale:     {}   current morale:{}\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	AppendFormat(buffer, "Moralebreak:{}   Morale recovery:{}\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
-	AppendFormat(buffer, "Visualrange:{} (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
+	AppendFormat(buffer, "Visualrange:{} (Explorer: {})\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
 	AppendFormat(buffer, "Fatigue: {} (current: {})   Luck: {}\n", BaseStats[IE_FATIGUE], Modified[IE_FATIGUE], Modified[IE_LUCK]);
 	AppendFormat(buffer, "Movement rate: {} (current: {})\n\n", BaseStats[IE_MOVEMENTRATE], Modified[IE_MOVEMENTRATE]);
 
@@ -5316,7 +5316,7 @@ bool Actor::CheckOnDeath()
 
 	// death variables are updated at the moment of death in the original
 	if (core->HasFeature(GF_HAS_KAPUTZ)) {
-		const char *format = AppearanceFlags & APP_ADDKILL ? "KILL_%s" : "%s";
+		const char* format = AppearanceFlags & APP_ADDKILL ? "KILL_{}" : "{}";
 
 		//don't use the raw killVar here (except when the flags explicitly ask for it)
 		if (AppearanceFlags & APP_DEATHTYPE) {
@@ -5329,15 +5329,15 @@ bool Actor::CheckOnDeath()
 			IncrementDeathVariable(game->kaputz, format, GetVarName("team", BaseStats[IE_TEAM]));
 		}
 		if (AppearanceFlags & APP_DEATHVAR) {
-			IncrementDeathVariable(game->kaputz, "%s_DEAD", scriptName);
+			IncrementDeathVariable(game->kaputz, "{}_DEAD", scriptName);
 		}
 
 	} else {
-		IncrementDeathVariable(game->locals, "%s", KillVar);
+		IncrementDeathVariable(game->locals, "{}", KillVar);
 		IncrementDeathVariable(game->locals, core->GetDeathVarFormat(), scriptName);
 	}
 
-	IncrementDeathVariable(game->locals, "%s", IncKillVar);
+	IncrementDeathVariable(game->locals, "{}", IncKillVar);
 
 	ieDword value;
 	if (scriptName[0] && SetDeathVar) {
@@ -5349,7 +5349,7 @@ bool Actor::CheckOnDeath()
 		game->locals->SetAt(varname, 1, nocreate);
 		game->locals->Lookup(varname, value);
 		if (value) {
-			IncrementDeathVariable(game->locals, "%s_KILL_CNT", scriptName);
+			IncrementDeathVariable(game->locals, "{}_KILL_CNT", scriptName);
 		}
 	}
 
@@ -5358,7 +5358,7 @@ bool Actor::CheckOnDeath()
 		int racetable = core->LoadSymbol("race");
 		if (racetable != -1) {
 			auto race = core->GetSymbol(racetable);
-			IncrementDeathVariable(game->locals, "KILL_%s_CNT", race->GetValue(Modified[IE_RACE]));
+			IncrementDeathVariable(game->locals, "KILL_{}_CNT", race->GetValue(Modified[IE_RACE]));
 		}
 	}
 
