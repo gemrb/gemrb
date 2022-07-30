@@ -236,9 +236,7 @@ def UpdateOverview(CurrentStep):
 					KitIndex = GemRB.GetVar ("Class") - 1
 					KitIndex -= CommonTables.Classes.FindValue ("CLASS", GemRB.GetVar ("BaseClass"))
 					BTName = 39346 + KitIndex
-				AddText ('\n[color=FFFF00]')
-				AddText (BTName)
-				AddText ('[/color]\n')
+				AddText ('\n[color=FFFF00]' + GemRB.GetString(BTName) + '[/color]\n')
 				for ks in KnownSpells:
 					AddText (GemRB.GetString(ks['SpellName'])+"\n")
 	
