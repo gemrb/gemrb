@@ -113,6 +113,8 @@ void MoviePlayer::Play(Window* win)
 void MoviePlayer::Stop()
 {
 	isPlaying = false;
+	// update in case of early skipping
+	core->GetWindowManager()->FadeColor.a = 0;
 }
 
 microseconds MoviePlayer::get_current_time() const
