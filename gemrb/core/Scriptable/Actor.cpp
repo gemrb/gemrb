@@ -8441,8 +8441,8 @@ void Actor::SetPortrait(const ResRef& portraitRef, int Which)
 	}
 	if(!Which) {
 		// ensure they're properly terminated
-		SmallPortrait.Format("{:{}}S", 7, SmallPortrait);
-		LargePortrait.Format("{:{}}M", 7, LargePortrait);
+		SmallPortrait.Format("{:.{}}S", SmallPortrait, 7);
+		LargePortrait.Format("{:.{}}M", LargePortrait, 7);
 	}
 }
 
