@@ -2120,6 +2120,12 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 		if (fx->Parameter2) {
 			target->SetSpellState(SS_NOAWAKE);
 		}
+		if (fx->IsVariable) {
+			target->SetSpellState(SS_PRONE);
+		}
+		// else make the creature untargettable (backlisted); an original hack to avoid stunning damage
+		// knockout then death by some other (eg. script targetting or call lightning)
+
 		target->AddPortraitIcon(PI_SLEEP);
 	}
 	target->InterruptCasting = true;
