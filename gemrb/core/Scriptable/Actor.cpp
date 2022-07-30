@@ -8457,7 +8457,7 @@ void Actor::SetSoundFolder(const ieVariable& soundset) const
 	char filepath[_MAX_PATH];
 
 	PCStats->SoundFolder = soundset;
-	PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder, nullptr);
+	PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder.c_str(), nullptr);
 
 	DirectoryIterator dirIt(filepath);
 	dirIt.SetFilterPredicate(new EndsWithFilter("01"));
@@ -8469,7 +8469,7 @@ void Actor::SetSoundFolder(const ieVariable& soundset) const
 			if (end != nullptr) {
 				// need to truncate the "01" from the name, eg. HaFT_01.wav -> HaFT
 				// but also 2df_007.wav -> 2df_0, meaning the data is less diverse than it may seem
-				PCStats->SoundSet.Format("{:{}}", int(end - 2 - name), name);
+				PCStats->SoundSet.Format("{:.{}}", name, int(end - 2 - name));
 				break;
 			}
 		} while (++dirIt);
