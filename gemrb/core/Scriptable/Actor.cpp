@@ -56,6 +56,7 @@
 #include "StringMgr.h"
 
 #include <cmath>
+#include <string>
 
 namespace GemRB {
 
@@ -2215,12 +2216,9 @@ static void InitActorTables()
 		for (TableMgr::index_t i = 0; i < skilldexNRows; i++) {
 			skilldex.emplace_back();
 			skilldex[i].reserve(skilldexNCols+1);
-			for (TableMgr::index_t j = -1; j < skilldexNCols; j++) {
-				if (j == TableMgr::npos) {
-					skilldex[i].push_back(tm->QueryFieldSigned<int>(i, 0));
-				} else {
-					skilldex[i].push_back(tm->QueryFieldSigned<int>(i, j));
-				}
+			skilldex[i].push_back(std::stoi(tm->GetRowName(i)));
+			for (TableMgr::index_t j = 0; j < skilldexNCols; j++) {
+				skilldex[i].push_back(tm->QueryFieldSigned<int>(i, j));
 			}
 		}
 	}
@@ -2246,22 +2244,19 @@ static void InitActorTables()
 		for (TableMgr::index_t i = 0; i < rows; i++) {
 			skillrac.emplace_back();
 			skillrac[i].reserve(cols+1);
-			for (TableMgr::index_t j = -1; j < cols; j++) {
-				if (j == TableMgr::npos) {
-					// figure out the value from the race name
-					if (racetable == -1) {
-						value = 0;
-					} else {
-						if (subracetable == -1) {
-							value = race->GetValue(tm->GetRowName(i));
-						} else {
-							value = subrace->GetValue(tm->GetRowName(i));
-						}
-					}
-					skillrac[i].push_back (value);
+			// figure out the value from the race name
+			if (racetable == -1) {
+				value = 0;
+			} else {
+				if (subracetable == -1) {
+					value = race->GetValue(tm->GetRowName(i));
 				} else {
-					skillrac[i].push_back(tm->QueryFieldSigned<int>(i, j));
+					value = subrace->GetValue(tm->GetRowName(i));
 				}
+			}
+			skillrac[i].push_back(value);
+			for (TableMgr::index_t j = 0; j < cols; j++) {
+				skillrac[i].push_back(tm->QueryFieldSigned<int>(i, j));
 			}
 		}
 	}
