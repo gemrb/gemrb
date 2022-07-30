@@ -18,9 +18,10 @@
 #
 #character generation, alignment (GUICG3)
 import GemRB
-from GUIDefines import *
 import CharOverview
 import CommonTables
+from ie_stats import IE_ALIGNMENT
+from GUIDefines import *
 
 AlignmentWindow = 0
 TextAreaControl = 0
@@ -75,10 +76,16 @@ def BackPress():
 		AlignmentWindow.Close ()
 	GemRB.SetNextScript("CharGen4")
 	GemRB.SetVar("Alignment",-1)  #scrapping the alignment value
+	pc = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (pc, IE_ALIGNMENT, 0)
 	return
 
 def NextPress():
 	if AlignmentWindow:
 		AlignmentWindow.Close ()
 	GemRB.SetNextScript("CharGen5") #appearance
+
+	pc = GemRB.GetVar ("Slot")
+	idx = GemRB.GetVar ("Alignment")
+	GemRB.SetPlayerStat (pc, IE_ALIGNMENT, CommonTables.Aligns.GetValue (idx, 3))
 	return
