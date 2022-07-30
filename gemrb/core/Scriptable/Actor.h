@@ -494,7 +494,7 @@ private:
 
 	int CalculateSpeedFromRate(bool feedback) const;
 	int CalculateSpeedFromINI(bool feedback) const;
-	ieDword IncrementDeathVariable(Variables *vars, const char *format, StringView name, ieDword start = 0) const;
+	void IncrementDeathVariable(Variables *vars, const char *format, StringView name) const;
 	
 	stats_t ResetStats(bool init);
 	void RefreshEffects(bool init, const stats_t& prev);

@@ -5346,10 +5346,10 @@ bool Actor::CheckOnDeath()
 		if (!varname.Format("{}_DEAD", scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", scriptName, fmt::WideToChar{GetName()});
 		}
-		game->locals->Lookup(varname, value);
 		game->locals->SetAt(varname, 1, nocreate);
+		game->locals->Lookup(varname, value);
 		if (value) {
-			IncrementDeathVariable(game->locals, "%s_KILL_CNT", scriptName, 1);
+			IncrementDeathVariable(game->locals, "%s_KILL_CNT", scriptName);
 		}
 	}
 
@@ -5398,16 +5398,16 @@ bool Actor::CheckOnDeath()
 	return false;
 }
 
-ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, StringView name, ieDword start) const {
+void Actor::IncrementDeathVariable(Variables *vars, const char *format, StringView name) const {
 	if (!name.empty()) {
 		ieVariable varname;
 		if (!varname.Format(format, name)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", name, fmt::WideToChar{GetName()});
 		}
+		ieDword start = 0;
 		vars->Lookup(varname, start);
 		vars->SetAt(varname, start + 1, nocreate);
 	}
-	return start;
 }
 
 /* this will create a heap at location, and transfer the item(s) */
