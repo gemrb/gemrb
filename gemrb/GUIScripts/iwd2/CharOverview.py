@@ -193,7 +193,7 @@ def UpdateOverview(CurrentStep):
 			Abl = Tables[4].GetValue(i, 1, GTV_STR)
 			Ranks = GemRB.GetVar('Skill ' + str(i))
 			value = Ranks
-			value += (GemRB.GetVar('Ability ' + str(Lookup[Abl])) / 2 - 5)
+			value += (GemRB.GetVar('Ability ' + str(Lookup[Abl])) // 2 - 5)
 			value += Tables[5].GetValue(i, SkillColumn, GTV_INT)
 			value += Tables[5].GetValue(i, ClassColumn, GTV_INT)
 			
