@@ -667,7 +667,7 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
 static TableMgr::index_t GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 {
-	if (!kit) return -1;
+	if (!kit) return TableMgr::npos;
 
 	if (baseclass != 0) {
 		std::vector<ieDword> kits = class2kits[baseclass].ids;
@@ -675,7 +675,7 @@ static TableMgr::index_t GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool
 		for (int idx=0; it != kits.end(); it++, idx++) {
 			if (kit & (*it)) return class2kits[baseclass].indices[idx];
 		}
-		if (strict) return -1;
+		if (strict) return TableMgr::npos;
 		// this is also hit for kitted multiclasses like illusionist/thieves, who we take care of in the second loop
 		if (iwd2class) Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit {} at expected class {}, recalculating!", kit, baseclass);
 	}
@@ -693,7 +693,7 @@ static TableMgr::index_t GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool
 	}
 
 	Log(ERROR, "Actor", "GetIWD2KitIndex: didn't find kit {} for any class, ignoring!", kit);
-	return -1;
+	return TableMgr::npos;
 }
 
 TableMgr::index_t Actor::GetKitIndex (ieDword kit, ieDword baseclass) const
@@ -739,7 +739,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 		// callers always pass a baseclass (only exception are actions not present in iwd2: addkit and addsuperkit)
 		assert(baseclass != 0);
 		row = GetIWD2KitIndex(kit, baseclass, true);
-		bool kitMatchesClass = row > 0;
+		bool kitMatchesClass = row != TableMgr::npos;
 
 		if (!kit || !kitMatchesClass) {
 			// pure class
