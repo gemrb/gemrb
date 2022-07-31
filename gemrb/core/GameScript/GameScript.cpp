@@ -2487,7 +2487,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 Trigger* GenerateTrigger(std::string string)
 {
 	StringToLower(string);
-	ScriptDebugLog(ID_TRIGGERS, "Compiling: {}", string);
+	ScriptDebugLog(ID_TRIGGERS, "Compiling: '{}'", string);
 
 	int negate = 0;
 	strpos_t start = 0;
@@ -2498,14 +2498,14 @@ Trigger* GenerateTrigger(std::string string)
 	strpos_t len = string.find_first_of('(', start) + 1 - start; // including (
 	int i = triggersTable->FindString(StringView(string.c_str() + start, len));
 	if (i<0) {
-		Log(ERROR, "GameScript", "Invalid scripting trigger: {}", string);
+		Log(ERROR, "GameScript", "Invalid scripting trigger: '{}'", string);
 		return NULL;
 	}
 	const char *src = string.c_str() + start + len;
 	const char *str = triggersTable->GetStringIndex(i).c_str() + len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
-		Log(ERROR, "GameScript", "Malformed scripting trigger: {}", string);
+		Log(ERROR, "GameScript", "Malformed scripting trigger: '{}'", string);
 		return NULL;
 	}
 	return trigger;
@@ -2516,7 +2516,7 @@ Action* GenerateAction(std::string actionString)
 	Action* action = NULL;
 	
 	StringToLower(actionString);
-	ScriptDebugLog(ID_ACTIONS, "Compiling: {}", actionString);
+	ScriptDebugLog(ID_ACTIONS, "Compiling: '{}'", actionString);
 
 	auto len = actionString.find_first_of('(') + 1; //including (
 	assert(len != std::string::npos);
@@ -2535,7 +2535,7 @@ Action* GenerateAction(std::string actionString)
 	if (i<0) {
 		i = actionsTable->FindString(key);
 		if (i < 0) {
-			Log(ERROR, "GameScript", "Invalid scripting action: {}", actionString);
+			Log(ERROR, "GameScript", "Invalid scripting action: '{}'", actionString);
 			return action;
 		}
 		str = actionsTable->GetStringIndex(i).c_str() + len;
@@ -2543,7 +2543,7 @@ Action* GenerateAction(std::string actionString)
 	}
 	action = GenerateActionCore( src, str, actionID);
 	if (!action) {
-		Log(ERROR, "GameScript", "Malformed scripting action: {}", actionString);
+		Log(ERROR, "GameScript", "Malformed scripting action: '{}'", actionString);
 	}
 
 	return action;
