@@ -709,7 +709,7 @@ def LearnSpell(pc, spellref, booktype, level, count, flags=0):
 
 	if SpellIndex == -1:
 		# should never happen
-		raise RuntimeError("LearnSpell: Severe spellbook problems: %s" + str(spellref))
+		raise RuntimeError("LearnSpell: Severe spellbook problems: " + str(spellref))
 
 	for j in range(count):
 		GemRB.MemorizeSpell (pc, booktype, level, SpellIndex, flags&LS_MEMO)
