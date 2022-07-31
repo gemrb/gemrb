@@ -14,7 +14,7 @@ Required dependencies:
 
 Optional dependencies:
   - OpenAL (for sound; preferred)
-  - SDL_mixer / SDL2_mixer (for faster, but lower-quality and rarer sound)
+  - SDL_mixer / SDL2_mixer (lighter alternative sound driver)
   - (lib)PNG (for the png importer plugin)
   - libvorbis (for ogg/vorbis support)
   - FreeType 2.4.2+ (for the TTF fonts plugin)
