@@ -459,10 +459,10 @@ def OpenSequencerWindow ():
 		TypeButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	if Target == 2:
-		CondSelect.SetPos (-1,-1)
-		CondLabel.SetPos (-1,-1)
-		TargSelect.SetPos (-1,-1)
-		TargLabel.SetPos (-1,-1)
+		CondSelect.SetVisible (False)
+		CondLabel.SetVisible (False)
+		TargSelect.SetVisible (False)
+		TargLabel.SetVisible (False)
 	else:
 		CondSelect.OnSelect (ContingencyHelpCondition)
 		CondSelect.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
