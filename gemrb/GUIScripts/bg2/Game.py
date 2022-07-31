@@ -181,7 +181,7 @@ def GameExpansion():
 	PDialogTable = GemRB.LoadTable ("pdialog")
 	
 	while idx:
-		name = GemRB.GetPlayerName(idx, 2) #scripting name
+		name = GemRB.GetPlayerName(idx, 2).lower() #scripting name
 		# change the override script to the new one
 		if name != "none":
 			newScript = PDialogTable.GetValue (name.upper(), "25OVERRIDE_SCRIPT_FILE")
