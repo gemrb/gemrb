@@ -76,7 +76,7 @@ def FixProtagonist( idx):
 	XP = GemRB.GetPlayerStat (idx, IE_XP)
 	XP2 = CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2", GTV_INT)
 	Dual = GUICommon.IsDualClassed (idx, True)
-	if Dual:
+	if Dual[0] > 0:
 		OldLevel = GemRB.GetPlayerStat (idx, IE_LEVEL)
 		if GUICommon.IsDualSwap (idx):
 			OldLevel = GemRB.GetPlayerStat (idx, IE_LEVEL2)
