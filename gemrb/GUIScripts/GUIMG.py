@@ -476,7 +476,7 @@ def OpenSequencerWindow ():
 			TargSelect.SetOptions ([elem[0] for elem in ContTarg], "ContTarg", 0)
 
 	GemRB.SetVar ("SpellType", 0)
-	TypeButton.SetVarAssoc ("SpellType", 1)
+	TypeButton.SetVarAssoc ("SpellType", 0)
 	TypeButton.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	TypeButton.OnPress (ContTypePressed)
 
