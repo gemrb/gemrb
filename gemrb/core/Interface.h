@@ -130,6 +130,7 @@ struct TimeStruct {
 	unsigned int hour_size;
 	unsigned int day_sec;
 	unsigned int day_size;
+	unsigned int fade_reset;
 
 	int GetHour(unsigned int time) const { return (time / ai_update_time) % day_sec / hour_sec; }
 	tick_t Ticks2Ms(unsigned int ticks) const { return ticks * 1000 / ai_update_time; }

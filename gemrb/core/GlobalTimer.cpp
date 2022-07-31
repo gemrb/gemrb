@@ -218,7 +218,7 @@ void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
 	//stay black for a while
-	fadeFromCounter = 4 * core->Time.ai_update_time;
+	fadeFromCounter = core->Time.fade_reset;
 	fadeFromMax = 0;
 	fadeToFactor = factor;
 }
