@@ -12140,6 +12140,7 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
+	gamedata->GetSpecialSpell("noop");
 	const auto& special_spells = gamedata->GetSpecialSpells();
 	size_t i = special_spells.size();
 	if (i == 0) {
