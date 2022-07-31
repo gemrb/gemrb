@@ -580,11 +580,6 @@ public:
 		return TalkCount ? GetLongName() : GetShortName();
 	}
 	
-	/** Gets the DeathVariable */
-	const ieVariable& GetScriptName() const
-	{
-		return scriptName;
-	}
 	ResRef GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
 	ieDword GetXPLevel(int modified) const;
