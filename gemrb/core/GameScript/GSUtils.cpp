@@ -464,6 +464,7 @@ void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 		}
 		return DisplayStringCore(Sender, Strref, flags, sound.c_str());
 	}
+	DisplayStringCore(Sender, Strref, flags);
 }
 
 void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, const char* soundpath)
