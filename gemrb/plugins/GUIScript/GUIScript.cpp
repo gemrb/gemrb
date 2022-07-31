@@ -9292,7 +9292,7 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 	}
 
 	for (const auto& usedItem : UsedItems) {
-		if (!usedItem.itemname.IsEmpty() && usedItem.itemname != si->ItemResRef) {
+		if (usedItem.itemname.IsEmpty() || usedItem.itemname != si->ItemResRef) {
 			continue;
 		}
 		//true if names don't match
