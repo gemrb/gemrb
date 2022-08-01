@@ -81,18 +81,22 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 			// take remainder of parent width
 			drawRegion.w = rgn.w - p.x;
 			maxSize.w = drawRegion.w;
+			assert(drawRegion.w);
 		} else {
 			Font::StringSizeMetrics metrics = {maxSize, 0, 0, true};
 			drawRegion.w = layoutFont->StringSize(text, &metrics).w;
+			assert(drawRegion.w);
 		}
 	}
 	if (maxSize.h <= 0) {
 		if (maxSize.h == -1) {
 			// take remainder of parent height
 			drawRegion.h = rgn.w - p.y;
+			assert(drawRegion.h);
 		} else {
 			Font::StringSizeMetrics metrics = {maxSize, 0, 0, true};
 			drawRegion.h = layoutFont->StringSize(text, &metrics).h;
+			assert(drawRegion.h);
 		}
 	}
 	return drawRegion;
@@ -232,7 +236,6 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 		// then maybe another Draw method that takes an alignment argument?
 
 		Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
-		assert(drawRegion.h && drawRegion.w);
 		layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(drawRegion, 0, text.length()));
 	}
 	return layoutRegions;
