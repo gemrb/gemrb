@@ -234,9 +234,10 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 		// FIXME: we ought to be able to set an alignment for "blocks" of text
 		// probably the way to do this is have alignment on the container
 		// then maybe another Draw method that takes an alignment argument?
-
-		Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
-		layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(drawRegion, 0, text.length()));
+		if (!text.empty()) { // kachiko.dlg has a completely void response 224
+			Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
+			layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(drawRegion, 0, text.length()));
+		}
 	}
 	return layoutRegions;
 }
@@ -620,6 +621,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			assert(exContent != content);
 		}
 		const LayoutRegions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
+		if (rgns.empty()) return;
 		layout.emplace_back(content, rgns);
 		exContent = content;
 
