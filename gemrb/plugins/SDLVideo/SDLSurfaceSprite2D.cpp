@@ -167,7 +167,7 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 			}
 			freePixels = false;
 			surface = ns;
-			format.Bpp = tofmt.Bpp;
+			format = PixelFormatForSurface(ns);
 			if (ns->format->palette) {
 				UpdateSurfacePalette();
 			}
