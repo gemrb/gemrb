@@ -1161,7 +1161,6 @@ void Map::DrawHighlightables(const Region& viewport) const
 			const Door *door = TMap->GetDoor(c->BBox.Center());
 			if (door && !(door->Flags & (DOOR_OPEN|DOOR_TRANSPARENT))) continue;
 			if (c->Highlight) {
-				c->outlineColor = displaymsg->GetColor(GUIColors::HOVERCONTAINER);
 				c->DrawOutline(viewport.origin);
 			} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
 				c->outlineColor = displaymsg->GetColor(GUIColors::ALTCONTAINER);

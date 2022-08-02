@@ -532,7 +532,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 					c->outlineColor = ColorGreen;
 				}
 			} else {
-				c->outlineColor = ColorCyan;
+				c->outlineColor = displaymsg->GetColor(GUIColors::HOVERCONTAINER);
 			}
 		}
 
