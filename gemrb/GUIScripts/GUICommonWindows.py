@@ -1486,7 +1486,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	# GUIWORLD doesn't have a separate portraits window, so we need to skip
 	# all this magic when reforming an overflowing party
-	if GemRB.GetPartySize () > MAX_PARTY_SIZE:
+	if PartySize > MAX_PARTY_SIZE:
 		return pairs
 
 	# generate new buttons by copying from existing ones
