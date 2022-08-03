@@ -1540,6 +1540,19 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 		button = Window.GetControl (nextID)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
+		button.SetVarAssoc ("portrait", i + 1)
+		SetupButtonBorders (Window, button, i)
+
+		fontref = "STATES2"
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+			fontref = "STATES"
+		button.SetFont (fontref)
+
+		button.OnRightPress (OpenInventoryWindowClick)
+		button.OnPress (PortraitButtonOnPress)
+		button.OnShiftPress (PortraitButtonOnShiftPress)
+		button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
+		button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
 		pairs[i] = button
 		limit -= limitStep
@@ -1612,6 +1625,26 @@ def AddHPLabel (Window, Button, i):
 
 	label = Button.CreateLabel (100 + i, "NUMFONT", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT | IE_FONT_SINGLE_LINE)
 	return label
+
+def SetupButtonBorders (Window, Button, i):
+	# unlike other buttons, this one lacks extra frames for a selection effect
+	# so we create it and shift it to cover the grooves of the image
+	# except iwd2's second frame already has it incorporated (but we miscolor it)
+	yellow = {'r' : 255, 'g' : 255, 'b' : 0, 'a' : 255}
+	green = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
+	if GameCheck.IsIWD2 ():
+		Button.SetBorder (FRAME_PC_SELECTED, green)
+		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (2, 2, 3, 3))
+	elif GameCheck.IsPST ():
+		Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame (1, 1, 2, 2))
+		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (3, 3, 4, 4))
+		Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
+		ButtonHP = Window.GetControl (6 + i)
+		ButtonHP.OnPress (PortraitButtonHPOnPress)
+		ButtonHP.SetVarAssoc ("pid", i + 1) # storing so the callback knows which button it's operating on
+	else:
+		Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame (4, 3, 4, 3))
+		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (2, 2, 3, 3))
 
 def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	#take care, this window is different in how/iwd
@@ -1693,25 +1726,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
 		AddHPLabel (Window, Button, i)
-
-		# unlike other buttons, this one lacks extra frames for a selection effect
-		# so we create it and shift it to cover the grooves of the image
-		# except iwd2's second frame already has it incorporated (but we miscolor it)
-		yellow = {'r' : 255, 'g' : 255, 'b' : 0, 'a' : 255}
-		green = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
-		if GameCheck.IsIWD2():
-			Button.SetBorder (FRAME_PC_SELECTED, green)
-			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(2,2,3,3))
-		elif GameCheck.IsPST():
-			Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame(1,1,2,2))
-			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(3,3,4,4))
-			Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
-			ButtonHP = Window.GetControl (6 + i)
-			ButtonHP.OnPress (PortraitButtonHPOnPress)
-			ButtonHP.SetVarAssoc ("pid", i + 1) # storing so the callback knows which button it's operating on
-		else:
-			Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame(4,3,4,3))
-			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(2,2,3,3))
+		SetupButtonBorders (Window, Button, i)
 
 	UpdatePortraitWindow ()
 	SelectionChanged ()
