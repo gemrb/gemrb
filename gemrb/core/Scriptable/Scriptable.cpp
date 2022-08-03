@@ -1796,11 +1796,13 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 	AddTrigger(TriggerEntry(trigger_traptriggered, ID)); // for that one user in bg2
 
 	// the second part is a hack to deal with bg2's ar1401 lava floor trap ("muck"), which doesn't have the repeating bit set
+	// just testing TrapDetectionDiff/TrapRemovalDiff is not good enough as DeadThiefProx in the initial bg2 chamber exit is
+	// almost identical and would retrigger instead of being a one-off
 	// at the same time iwd2 Saablic_Greeting in ar6200 shouldn't repeat, while being practically identical
 	// should we always send Entered instead, also when !Trapped? Does not appear so, see history of InfoPoint::TriggerTrap
 	if (TrapResets()) {
 		AddTrigger(TriggerEntry(trigger_reset, GetGlobalID()));
-	} else if ((TrapDetectionDiff && TrapRemovalDiff) || third) {
+	} else if (third || scriptName != "muck") {
 		Trapped = false;
 	}
 	return true;
