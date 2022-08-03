@@ -300,7 +300,7 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
-	Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}", s, d, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
+	if (core->InDebugMode(ID_PATHFINDER)) Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}", s, d, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
 	if (!(GetBlockedInRadius(d, size) & PathMapFlags::PASSABLE)) {
@@ -438,10 +438,12 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			smptCurrent.y = nmptCurrent.y / 12;
 		}
 		return resultPath;
-	} else if (caller) {
-		Log(DEBUG, "FindPath", "Pathing failed for {}", fmt::WideToChar{caller->GetShortName()});
-	} else {
-		Log(DEBUG, "FindPath", "Pathing failed");
+	} else if (core->InDebugMode(ID_PATHFINDER)) {
+		if (caller) {
+			Log(DEBUG, "FindPath", "Pathing failed for {}", fmt::WideToChar{caller->GetShortName()});
+		} else {
+			Log(DEBUG, "FindPath", "Pathing failed");
+		}
 	}
 
 	return nullptr;

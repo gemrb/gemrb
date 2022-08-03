@@ -412,6 +412,9 @@ This parameter is meant for developers. It is a combination of bit values
 .IR 256
 - enable text debug mode.
 
+.IR 512
+- enable pathfinding debug mode.
+
 The default is
 .IR 0 .
 
