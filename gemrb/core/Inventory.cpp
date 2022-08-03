@@ -944,7 +944,7 @@ bool Inventory::EquipItem(ieDword slot)
 			}
 		}
 		header = itm->GetExtHeader(EquippedHeader);
-		assert(header);
+		if (!header) return false; // in case of broken saves
 		if (header->AttackType == ITEM_AT_BOW) {
 			// find the ranged projectile associated with it, this returns equipped code
 			equip = FindRangedProjectile(header->ProjectileQualifier);
@@ -965,7 +965,7 @@ bool Inventory::EquipItem(ieDword slot)
 		//Get the ranged header of the projectile (so we theoretically allow shooting of daggers)
 		EquippedHeader = itm->GetWeaponHeaderNumber(true);
 		header = itm->GetExtHeader(EquippedHeader);
-		assert(header);
+		if (!header) return false; // in case of broken saves
 		weaponslot = FindTypedRangedWeapon(header->ProjectileQualifier);
 		if (weaponslot != SLOT_FIST) {
 			weaponslot -= SLOT_MELEE;
