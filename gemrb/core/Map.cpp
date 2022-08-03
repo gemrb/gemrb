@@ -400,8 +400,7 @@ Map::Map(TileMap *tm, TileProps props, Holder<Sprite2D> sm)
 : Scriptable(ST_AREA),
 TMap(tm), tileProps(std::move(props)),
 SmallMap(std::move(sm)),
-ExploredBitmap(FogMapSize(), uint8_t(0x00)), VisibleBitmap(FogMapSize(), uint8_t(0x00)),
-reverb(*this)
+ExploredBitmap(FogMapSize(), uint8_t(0x00)), VisibleBitmap(FogMapSize(), uint8_t(0x00))
 {
 	area = this;
 	MasterArea = core->GetGame()->MasterArea(scriptName);
@@ -454,6 +453,15 @@ Map::~Map(void)
 void Map::SetTileMapProps(TileProps props)
 {
 	tileProps = std::move(props);
+}
+	
+const MapReverbProperties& Map::GetReverbProperties() const
+{
+	if (reverb) {
+		return reverb->properties;
+	}
+	static const MapReverbProperties none {EFX_REVERB_GENERIC, true};
+	return none;
 }
 
 void Map::AutoLockDoors() const
@@ -3121,23 +3129,28 @@ WMPDirection Map::WhichEdge(const Point &s) const
 }
 
 //--------ambients----------------
+void Map::SetAmbients(std::vector<Ambient*> ambs, MapReverb::id_t id)
+{
+	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
+	ambim->RemoveAmbients(ambients);
+	for (auto ambient : ambients) {
+		delete ambient;
+	}
+	ambients = std::move(ambs);
+	
+	reverbID = id;
+	if (reverbID != EFX_PROFILE_REVERB_INVALID) {
+		reverb = make_unique<MapReverb>(AreaType, reverbID);
+	} else {
+		reverb = make_unique<MapReverb>(AreaType, WEDResRef);
+	}
+}
+
 void Map::SetupAmbients() const
 {
 	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
-	if (!ambim) return;
 	ambim->Reset();
 	ambim->SetAmbients(ambients);
-}
-
-ieWord Map::GetAmbientCount(bool toSave) const
-{
-	if (!toSave) return static_cast<ieWord>(ambients.size());
-
-	ieWord ambiCount = 0;
-	for (const Ambient *ambient : ambients) {
-		if (!(ambient->flags & IE_AMBI_NOSAVE)) ambiCount++;
-	}
-	return ambiCount;
 }
 
 void Map::AddMapNote(const Point& point, ieWord color, String text, bool readonly)

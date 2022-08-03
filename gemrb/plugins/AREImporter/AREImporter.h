@@ -23,8 +23,7 @@
 
 #include "MapMgr.h"
 
-#include "Map.h" // proIterator
-#include "MapReverb.h"
+#include "Map.h"
 
 namespace GemRB {
 
@@ -69,6 +68,7 @@ public:
 	/* stores an area in the Cache (swaps it out) */
 	int PutArea(DataStream *stream, const Map *map) const override;
 private:
+	ieWord SavedAmbientCount(const Map*) const;
 	void AdjustPSTFlags(AreaAnimation&) const;
 	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount) const;
 	CREItem* GetItem();
@@ -92,7 +92,7 @@ private:
 	int PutExplored(DataStream *stream, const Map *map) const;
 	int PutTiles(DataStream *stream, const Map *map) const;
 	int PutRestHeader(DataStream *stream, const Map *map) const;
-	int PutSongHeader(DataStream *stream, const Map *map) const;
+	int PutMapAmbients(DataStream *stream, const Map *map) const;
 	
 	static Ambient* SetupMainAmbients(Map::MainAmbients& mainAmbients);
 };

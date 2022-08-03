@@ -31,7 +31,6 @@
 #include "MusicMgr.h"
 #include "SoundMgr.h"
 #include "Streams/FileStream.h"
-#include "MapReverb.h"
 
 #include <mutex>
 #include <thread>
@@ -121,7 +120,7 @@ public:
 	void QueueBuffer(int stream, unsigned short bits,
 				int channels, short* memory,
 				int size, int samplerate) override;
-	void UpdateMapAmbient(MapReverb&) override;
+	void UpdateMapAmbient(const MapReverbProperties&) override;
 private:
 	int QueueALBuffer(ALuint source, ALuint buffer) const;
 

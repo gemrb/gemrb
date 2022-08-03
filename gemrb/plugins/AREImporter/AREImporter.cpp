@@ -569,6 +569,8 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	str->ReadResRef(nightAmbients.Ambient1);
 	str->ReadResRef(nightAmbients.Ambient2);
 	str->ReadDword(nightAmbients.AmbientVol);
+	
+	std::vector<Ambient*> ambients;
 	// check for existence of main ambients (bg1)
 	#define DAY_BITS (((1<<18) - 1) ^ ((1<<6) - 1)) // day: bits 6-18 per DLTCEP
 	Ambient *ambi = SetupMainAmbients(dayAmbients);
@@ -577,7 +579,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		// if the two ambients are the same, just add one, so there's no restart
 		if (dayAmbients.Ambient2 != nightAmbients.Ambient2) {
 			ambi->appearance = DAY_BITS;
-			map->AddAmbient(ambi);
+			ambients.push_back(ambi);
 			// night
 			ambi = SetupMainAmbients(nightAmbients);
 			if (ambi) {
@@ -586,17 +588,15 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		}
 		// bgt ar7300 has a nigth ambient only in the first slot
 		if (ambi) {
-			map->AddAmbient(ambi);
+			ambients.push_back(ambi);
 		}
 	}
 
 	// reverb to match against reverb.2da or iwd reverb.ids
 	// (if the 2da doesn't exist - which we provide for all; they use the same values)
+	ieDword reverbID = EFX_PROFILE_REVERB_INVALID; // non PST data has it at 0, so we don't bother reading
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		str->ReadDword(map->reverbID);
-	} else {
-		// all data has it at 0, so we don't bother reading
-		map->reverbID = EFX_PROFILE_REVERB_INVALID;
+		str->ReadDword(reverbID);
 	}
 
 	str->Seek(RestHeader + 32, GEM_STREAM_START); // skip the name
@@ -1343,7 +1343,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading ambients");
 	str->Seek( AmbiOffset, GEM_STREAM_START );
-	for (int i = 0; i < AmbiCount; i++) {
+	for (int i = 0; i < AmbiCount; ++i) {
 		ResRef sounds[MAX_RESCOUNT];
 		ieWord tmpWord;
 
@@ -1376,8 +1376,10 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		for (int j = 0; j < tmpWord; j++) {
 			ambient->sounds.emplace_back(sounds[j]);
 		}
-		map->AddAmbient(ambient);
+		ambients.push_back(ambient);
 	}
+	
+	map->SetAmbients(std::move(ambients), reverbID);
 
 	Log(DEBUG, "AREImporter", "Loading automap notes");
 	str->Seek( NoteOffset, GEM_STREAM_START );
@@ -1687,8 +1689,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
 
-	AmbiCount = map->GetAmbientCount(true);
-	headersize += AmbiCount * 0xd4;
+	headersize += SavedAmbientCount(map) * 0xd4;
 	VariablesOffset = headersize;
 
 	VariablesCount = (ieDword) map->locals->GetCount();
@@ -1799,7 +1800,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	stream->WriteDword(ItemsOffset);
 	stream->WriteDword(VerticesOffset);
 	stream->WriteWord(VerticesCount);
-	stream->WriteWord(AmbiCount);
+	stream->WriteWord(SavedAmbientCount(map));
 	stream->WriteDword(AmbiOffset);
 	stream->WriteDword(VariablesOffset);
 	stream->WriteDword(VariablesCount);
@@ -2321,9 +2322,7 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 {
 	ieWord tmpWord;
 
-	ieWord realCount = map->GetAmbientCount();
-	for (ieWord i = 0; i < realCount; i++) {
-		const Ambient *am = map->GetAmbient(i);
+	for (const auto& am : map->GetAmbients()) {
 		if (am->flags & IE_AMBI_NOSAVE) continue;
 		stream->WriteVariable(am->name);
 		tmpWord = (ieWord) am->origin.x;
@@ -2513,13 +2512,19 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 	return 0;
 }
 
-int AREImporter::PutSongHeader(DataStream *stream, const Map *map) const
+ieWord AREImporter::SavedAmbientCount(const Map* map) const
 {
-	ieDword tmpDword = 0;
-
-	for (const auto& list : map->SongList) {
-		stream->WriteDword(list);
+	int count = 0;
+	for (const Ambient* am : map->GetAmbients())
+	{
+		if (am->flags & IE_AMBI_NOSAVE) continue;
+		++count;
 	}
+	return count;
+}
+
+int AREImporter::PutMapAmbients(DataStream *stream, const Map *map) const
+{
 	//day
 	stream->WriteResRef(map->dayAmbients.Ambient1);
 	stream->WriteResRef(map->dayAmbients.Ambient2);
@@ -2531,9 +2536,7 @@ int AREImporter::PutSongHeader(DataStream *stream, const Map *map) const
 	//song flag
 	stream->WriteDword(map->reverbID);
 	//lots of empty crap (15x4)
-	for (int i = 0; i < 15; i++) {
-		stream->WriteDword(tmpDword);
-	}
+	stream->WriteFilling(60);
 	return 0;
 }
 
@@ -2672,8 +2675,12 @@ int AREImporter::PutArea(DataStream *stream, const Map *map) const
 	if (ret) {
 		return ret;
 	}
+	
+	for (const auto& list : map->SongList) {
+		stream->WriteDword(list);
+	}
 
-	ret = PutSongHeader( stream, map);
+	ret = PutMapAmbients(stream, map);
 	if (ret) {
 		return ret;
 	}
