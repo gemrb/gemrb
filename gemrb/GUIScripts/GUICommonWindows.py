@@ -1585,6 +1585,34 @@ def ButtonDragDestHandler (btn):
 		
 	DragButton = None
 
+def AddStatusFlagLabel (Window, Button, i, fontRef = None):
+	label = Window.GetControl (200 + i)
+	if label:
+		return label
+
+	if not fontRef:
+		fontRef = "STATES2"
+		if GameCheck.IsIWD1 () or GameCheck.IsIWD2 ():
+			fontRef = "STATES"
+
+	# label for status flags (dialog, store, level up)
+	align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT | IE_FONT_SINGLE_LINE
+	if GameCheck.IsBG2 ():
+		align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
+	label = Button.CreateLabel (200 + i, fontRef, "", align) #level up icon is on the right
+	label.SetFrame (Button.GetInsetFrame (4))
+	return label
+
+# overlay a label, so we can display the hp with the correct font. Regular button label
+#   is used by effect icons
+def AddHPLabel (Window, Button, i):
+	label = Window.GetControl (100 + i)
+	if label:
+		return label
+
+	label = Button.CreateLabel (100 + i, "NUMFONT", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT | IE_FONT_SINGLE_LINE)
+	return label
+
 def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	#take care, this window is different in how/iwd
 	if GameCheck.HasHOW() and needcontrols:
@@ -1650,14 +1678,9 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			fontref = "STATES2"
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				fontref = "STATES"
-			
 			Button.SetFont (fontref)
-			# label for status flags (dialog, store, level up)
-			align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT | IE_FONT_SINGLE_LINE
-			if GameCheck.IsBG2():
-				align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
-			label = Button.CreateLabel(200 + i, fontref, "", align) #level up icon is on the right
-			label.SetFrame(Button.GetInsetFrame(4))
+
+			AddStatusFlagLabel (Window, Button, i, fontref)
 
 		if needcontrols or GameCheck.IsIWD2():
 			Button.OnRightPress (OpenInventoryWindowClick)
@@ -1669,10 +1692,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		Button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
-		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-			# overlay a label, so we can display the hp with the correct font. Regular button label
-			#   is used by effect icons
-			Button.CreateLabel(100+i, "NUMFONT", "", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT|IE_FONT_SINGLE_LINE)
+		AddHPLabel (Window, Button, i)
 
 		# unlike other buttons, this one lacks extra frames for a selection effect
 		# so we create it and shift it to cover the grooves of the image
@@ -1784,11 +1804,11 @@ def UpdatePortraitWindow ():
 			else:
 				flag = ""
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-				HPLabel = Window.GetControl (100+i)
+				HPLabel = AddHPLabel (Window, Button, i) # missing if new pc joined since the window was opened
 				HPLabel.SetText (ratio_str)
 				HPLabel.SetColor (color)
 			
-		FlagLabel = Window.GetControl (200 + i)
+		FlagLabel = AddStatusFlagLabel (Window, Button, i, None) # missing if new pc joined since the window was opened
 		FlagLabel.SetText(flag)
 
 		#add effects on the portrait
