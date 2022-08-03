@@ -5759,7 +5759,7 @@ void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	door->LinkedInfo = parameters->variable0Parameter;
+	door->LinkedInfo = MakeVariable(parameters->variable0Parameter);
 }
 
 /*getting a handle of a temporary actor resource to copy its selected attributes*/

@@ -53,7 +53,7 @@ TileObject* TileMap::AddTile(const ResRef& ID, const ieVariable& Name, unsigned 
 {
 	TileObject* tile = new TileObject();
 	tile->Flags=Flags;
-	tile->Name = Name;
+	tile->Name = Name; // would probably need MakeVariable if the whole class wasn't unused
 	tile->Tileset = ID;
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );

@@ -2855,7 +2855,7 @@ AreaAnimation *Map::GetAnimation(const ieVariable& Name)
 Spawn *Map::AddSpawn(const ieVariable& Name, const Point &p, std::vector<ResRef>&& creatures)
 {
 	Spawn* sp = new Spawn();
-	sp->Name = Name;
+	sp->Name = MakeVariable(Name);
 	
 	sp->Pos = p;
 	sp->Creatures = std::move(creatures);
