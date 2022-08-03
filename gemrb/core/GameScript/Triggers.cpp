@@ -1608,12 +1608,6 @@ int GameScript::NearSavedLocation(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (core->HasFeature(GF_HAS_KAPUTZ)) {
-		// TODO: we don't understand how this works in pst yet
-		Log(ERROR, "GameScript", "Aborting NearSavedLocation! Don't know what to do!");
-		return 1;
-	}
-
 	Point p;
 	if ((signed) actor->GetStat(IE_SAVEDXPOS) <= 0 && (signed) actor->GetStat(IE_SAVEDYPOS) <= 0) {
 		p = actor->HomeLocation;
@@ -1623,7 +1617,8 @@ int GameScript::NearSavedLocation(Scriptable *Sender, const Trigger *parameters)
 		p.x = actor->GetStat(IE_SAVEDXPOS);
 		p.y = actor->GetStat(IE_SAVEDYPOS);
 	}
-	// should this be PersonalDistance?
+
+	// pst had a bug and actually checked non-isometric range
 	if (WithinRange(Sender, p, parameters->int0Parameter)) {
 		return 1;
 	}
