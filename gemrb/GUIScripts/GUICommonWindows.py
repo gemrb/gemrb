@@ -1770,11 +1770,6 @@ def UpdatePortraitWindow ():
 			continue
 
 		portraitFlags = IE_GUI_BUTTON_PORTRAIT | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM
-
-		if GameCheck.IsIWD2():
-			Button.OnRightPress (OpenInventoryWindowClick)
-			Button.OnPress (PortraitButtonOnPress)
-
 		Button.SetFlags (portraitFlags, OP_SET)
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
