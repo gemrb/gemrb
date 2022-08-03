@@ -12,10 +12,10 @@ MapReverb::MapReverb (Map& _map) :
 	properties = _properties;
 
 	/* Map says nothing, attempt to read from 2DA. */
-	if (EFX_PROFILE_REVERB_INVALID == map.SongHeader.reverbID) {
+	if (EFX_PROFILE_REVERB_INVALID == map.reverbID) {
 		reverbProfile = obtainProfile();
 	} else {
-		reverbProfile = loadProperties(map.SongHeader.reverbID);
+		reverbProfile = loadProperties(map.reverbID);
 	}
 
 	/* If still nothing, fallback to something Ok. */

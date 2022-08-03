@@ -93,6 +93,8 @@ private:
 	int PutTiles(DataStream *stream, const Map *map) const;
 	int PutRestHeader(DataStream *stream, const Map *map) const;
 	int PutSongHeader(DataStream *stream, const Map *map) const;
+	
+	static Ambient* SetupMainAmbients(Map::MainAmbients& mainAmbients);
 };
 
 }

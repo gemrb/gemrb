@@ -446,25 +446,23 @@ inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 	return (Flags & ~maskOff) | maskOn;
 }
 
-static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
-	ResRef *main1[2] = { &map->SongHeader.MainNightAmbient1, &map->SongHeader.MainDayAmbient1 };
-	ResRef *main2[2] = { &map->SongHeader.MainNightAmbient2, &map->SongHeader.MainDayAmbient2 };
-	ieDword vol[2] = { map->SongHeader.MainNightAmbientVol, map->SongHeader.MainDayAmbientVol };
+Ambient* AREImporter::SetupMainAmbients(Map::MainAmbients& mainAmbients)
+{
 	ResRef mainAmbient;
-	if (!main1[day_or_night]->IsEmpty()) {
-		mainAmbient = *main1[day_or_night];
+	if (!mainAmbients.Ambient1.IsEmpty()) {
+		mainAmbient = mainAmbients.Ambient1;
 	}
 	// the second ambient is always longer, was meant as a memory optimisation w/ IE_AMBI_HIMEM
 	// however that was implemented only for the normal ambients
 	// nowadays we can just skip the first
-	if (!main2[day_or_night]->IsEmpty()) {
-		mainAmbient = *main2[day_or_night];
+	if (!mainAmbients.Ambient2.IsEmpty()) {
+		mainAmbient = mainAmbients.Ambient2;
 	}
 	if (mainAmbient.IsEmpty()) return nullptr;
 
 	Ambient *ambi = new Ambient();
 	ambi->flags = IE_AMBI_ENABLED | IE_AMBI_LOOPING | IE_AMBI_MAIN | IE_AMBI_NOSAVE;
-	ambi->gain = vol[day_or_night];
+	ambi->gain = mainAmbients.AmbientVol;
 	// sounds and name
 	ambi->sounds.emplace_back(mainAmbient);
 	ambi->name = mainAmbient;
@@ -559,26 +557,29 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	for (auto& list : map->SongList) {
 		str->ReadDword(list);
 	}
+	
+	Map::MainAmbients& dayAmbients = map->dayAmbients;
 
-	str->ReadResRef(map->SongHeader.MainDayAmbient1);
-	str->ReadResRef(map->SongHeader.MainDayAmbient2);
-	str->ReadDword(map->SongHeader.MainDayAmbientVol);
+	str->ReadResRef(dayAmbients.Ambient1);
+	str->ReadResRef(dayAmbients.Ambient2);
+	str->ReadDword(dayAmbients.AmbientVol);
+	
+	Map::MainAmbients& nightAmbients = map->nightAmbients;
 
-	str->ReadResRef(map->SongHeader.MainNightAmbient1);
-	str->ReadResRef(map->SongHeader.MainNightAmbient2);
-	str->ReadDword(map->SongHeader.MainNightAmbientVol);
-
+	str->ReadResRef(nightAmbients.Ambient1);
+	str->ReadResRef(nightAmbients.Ambient2);
+	str->ReadDword(nightAmbients.AmbientVol);
 	// check for existence of main ambients (bg1)
 	#define DAY_BITS (((1<<18) - 1) ^ ((1<<6) - 1)) // day: bits 6-18 per DLTCEP
-	Ambient *ambi = SetupMainAmbients(map, true);
+	Ambient *ambi = SetupMainAmbients(dayAmbients);
 	if (ambi) {
 		// schedule for day/night
 		// if the two ambients are the same, just add one, so there's no restart
-		if (map->SongHeader.MainDayAmbient2 != map->SongHeader.MainNightAmbient2) {
+		if (dayAmbients.Ambient2 != nightAmbients.Ambient2) {
 			ambi->appearance = DAY_BITS;
 			map->AddAmbient(ambi);
 			// night
-			ambi = SetupMainAmbients(map, false);
+			ambi = SetupMainAmbients(nightAmbients);
 			if (ambi) {
 				ambi->appearance ^= DAY_BITS; // night: bits 0-5 + 19-23, [dusk till dawn]
 			}
@@ -592,10 +593,10 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	// reverb to match against reverb.2da or iwd reverb.ids
 	// (if the 2da doesn't exist - which we provide for all; they use the same values)
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		str->ReadDword(map->SongHeader.reverbID);
+		str->ReadDword(map->reverbID);
 	} else {
 		// all data has it at 0, so we don't bother reading
-		map->SongHeader.reverbID = EFX_PROFILE_REVERB_INVALID;
+		map->reverbID = EFX_PROFILE_REVERB_INVALID;
 	}
 
 	str->Seek(RestHeader + 32, GEM_STREAM_START); // skip the name
@@ -2520,15 +2521,15 @@ int AREImporter::PutSongHeader(DataStream *stream, const Map *map) const
 		stream->WriteDword(list);
 	}
 	//day
-	stream->WriteResRef(map->SongHeader.MainDayAmbient1);
-	stream->WriteResRef(map->SongHeader.MainDayAmbient2);
-	stream->WriteDword(map->SongHeader.MainDayAmbientVol);
+	stream->WriteResRef(map->dayAmbients.Ambient1);
+	stream->WriteResRef(map->dayAmbients.Ambient2);
+	stream->WriteDword(map->dayAmbients.AmbientVol);
 	//night
-	stream->WriteResRef(map->SongHeader.MainNightAmbient1);
-	stream->WriteResRef(map->SongHeader.MainNightAmbient2);
-	stream->WriteDword(map->SongHeader.MainNightAmbientVol);
+	stream->WriteResRef(map->nightAmbients.Ambient1);
+	stream->WriteResRef(map->nightAmbients.Ambient2);
+	stream->WriteDword(map->nightAmbients.AmbientVol);
 	//song flag
-	stream->WriteDword(map->SongHeader.reverbID);
+	stream->WriteDword(map->reverbID);
 	//lots of empty crap (15x4)
 	for (int i = 0; i < 15; i++) {
 		stream->WriteDword(tmpDword);

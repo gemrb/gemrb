@@ -139,18 +139,6 @@ enum MapEnv : ieWord {
 //in areas 10 is a magic number for resref counts
 #define MAX_RESCOUNT 10
 
-struct SongHeaderType {
-	// used in bg1, set for a few copied areas in bg2 (but no files!)
-	// everyone else uses the normal ARE ambients instead
-	ResRef MainDayAmbient1;
-	ResRef MainDayAmbient2; // except for one case, all Ambient2 are longer versions
-	ieDword MainDayAmbientVol;
-	ResRef MainNightAmbient1;
-	ResRef MainNightAmbient2;
-	ieDword MainNightAmbientVol;
-	ieDword reverbID;
-};
-
 struct RestHeaderType {
 	ieStrRef Strref[MAX_RESCOUNT];
 	ResRef CreResRef[MAX_RESCOUNT];
@@ -414,6 +402,7 @@ public:
 	ieDword BgDuration = 0;
 	ieDword LastGoCloser = 0;
 	MapReverb reverb;
+	ieDword reverbID = EFX_PROFILE_REVERB_INVALID;
 
 private:
 	uint32_t debugFlags = 0;
@@ -439,6 +428,19 @@ private:
 	Region stencilViewport;
 
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
+	
+	struct MainAmbients {
+		// used in bg1, set for a few copied areas in bg2 (but no files!)
+		// everyone else uses the normal ARE ambients instead
+		ResRef Ambient1;
+		ResRef Ambient2; // except for one case, all Ambient2 are longer versions
+		ieDword AmbientVol = 0;
+	};
+
+	MainAmbients dayAmbients;
+	MainAmbients nightAmbients;
+	
+	friend class AREImporter;
 
 public:
 	Map(TileMap *tm, TileProps tileProps, Holder<Sprite2D> sm);
@@ -540,7 +542,6 @@ public:
 	void PurgeArea(bool items);
 
 	ieDword SongList[MAX_RESCOUNT]{};
-	SongHeaderType SongHeader{};
 	RestHeaderType RestHeader{};
 	int AreaDifficulty = 0;
 
