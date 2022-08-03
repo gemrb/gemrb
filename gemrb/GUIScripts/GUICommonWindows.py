@@ -58,6 +58,10 @@ else:
 	MageSpellsKey = 'Wizard_Spells'
 	CharacterStatsKey = 'Character_Record'
 
+StatesFont = "STATES2"
+if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+	StatesFont = "STATES"
+
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
 #the dictionary keys match entries in keymap.2da
@@ -1542,11 +1546,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
 		button.SetVarAssoc ("portrait", i + 1)
 		SetupButtonBorders (Window, button, i)
-
-		fontref = "STATES2"
-		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-			fontref = "STATES"
-		button.SetFont (fontref)
+		button.SetFont (StatesFont)
 
 		button.OnRightPress (OpenInventoryWindowClick)
 		button.OnPress (PortraitButtonOnPress)
@@ -1598,21 +1598,16 @@ def ButtonDragDestHandler (btn):
 		
 	DragButton = None
 
-def AddStatusFlagLabel (Window, Button, i, fontRef = None):
+def AddStatusFlagLabel (Window, Button, i):
 	label = Window.GetControl (200 + i)
 	if label:
 		return label
-
-	if not fontRef:
-		fontRef = "STATES2"
-		if GameCheck.IsIWD1 () or GameCheck.IsIWD2 ():
-			fontRef = "STATES"
 
 	# label for status flags (dialog, store, level up)
 	align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT | IE_FONT_SINGLE_LINE
 	if GameCheck.IsBG2 ():
 		align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
-	label = Button.CreateLabel (200 + i, fontRef, "", align) #level up icon is on the right
+	label = Button.CreateLabel (200 + i, StatesFont, "", align) #level up icon is on the right
 	label.SetFrame (Button.GetInsetFrame (4))
 	return label
 
@@ -1708,12 +1703,9 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetVarAssoc("portrait", pcID)
 		
 		if not GameCheck.IsPST():
-			fontref = "STATES2"
-			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-				fontref = "STATES"
-			Button.SetFont (fontref)
+			Button.SetFont (StatesFont)
 
-			AddStatusFlagLabel (Window, Button, i, fontref)
+			AddStatusFlagLabel (Window, Button, i)
 
 		if needcontrols or GameCheck.IsIWD2():
 			Button.OnRightPress (OpenInventoryWindowClick)
@@ -1823,7 +1815,7 @@ def UpdatePortraitWindow ():
 				HPLabel.SetText (ratio_str)
 				HPLabel.SetColor (color)
 			
-		FlagLabel = AddStatusFlagLabel (Window, Button, i, None) # missing if new pc joined since the window was opened
+		FlagLabel = AddStatusFlagLabel (Window, Button, i) # missing if new pc joined since the window was opened
 		FlagLabel.SetText(flag)
 
 		#add effects on the portrait
