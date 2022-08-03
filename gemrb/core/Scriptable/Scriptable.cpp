@@ -95,7 +95,8 @@ Scriptable::~Scriptable(void)
 
 void Scriptable::SetScriptName(const ieVariable& text)
 {
-	scriptName = text;
+	// recreate to remove internal spaces
+	scriptName = MakeVariable(text);
 }
 
 /** Gets the DeathVariable */
