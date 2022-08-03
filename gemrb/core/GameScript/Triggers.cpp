@@ -1600,9 +1600,14 @@ int GameScript::NearLocation(Scriptable *Sender, const Trigger *parameters)
 int GameScript::NearSavedLocation(Scriptable *Sender, const Trigger *parameters)
 {
 	const Actor* actor = Scriptable::As<Actor>(Sender);
+	if (parameters->objectParameter) {
+		const Scriptable* alt = GetScriptableFromObject(Sender, parameters->objectParameter);
+		actor = Scriptable::As<Actor>(alt);
+	}
 	if (!actor) {
 		return 0;
 	}
+
 	if (core->HasFeature(GF_HAS_KAPUTZ)) {
 		// TODO: we don't understand how this works in pst yet
 		Log(ERROR, "GameScript", "Aborting NearSavedLocation! Don't know what to do!");
@@ -1612,6 +1617,8 @@ int GameScript::NearSavedLocation(Scriptable *Sender, const Trigger *parameters)
 	Point p;
 	if ((signed) actor->GetStat(IE_SAVEDXPOS) <= 0 && (signed) actor->GetStat(IE_SAVEDYPOS) <= 0) {
 		p = actor->HomeLocation;
+	} else if (!parameters->string0Parameter.IsEmpty()) {
+		p = CheckPointVariable(actor, parameters->string0Parameter);
 	} else {
 		p.x = actor->GetStat(IE_SAVEDXPOS);
 		p.y = actor->GetStat(IE_SAVEDYPOS);
