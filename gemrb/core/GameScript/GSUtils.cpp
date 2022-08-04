@@ -404,6 +404,24 @@ bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword fla
 	return false;
 }
 
+bool RemoveItemOfStore(const ResRef& storename, const ResRef& itemname)
+{
+	Store* store = gamedata->GetStore(storename);
+	if (!store) {
+		Log(ERROR, "GameScript", "Store cannot be opened!");
+		return false;
+	}
+
+	//RemoveItem doesn't use trigger, and hopefully this will always run on bags (with no triggers)
+	unsigned int idx = store->FindItem(itemname, false);
+	if (idx == (unsigned int) -1) return false;
+	STOItem *si = store->GetItem(idx, false);
+	store->RemoveItem(si);
+	//store changed, save it
+	gamedata->SaveStore(store);
+	return true;
+}
+
 //finds and takes an item from a container in the given inventory
 static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, const ResRef& itemname, int count)
 {
