@@ -404,6 +404,19 @@ bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword fla
 	return false;
 }
 
+bool RemoveStoreItem(const ResRef& storename, const ResRef& itemname)
+{
+	Store* store = gamedata->GetStore(storename);
+	if (!store) {
+		Log(ERROR, "GameScript", "Store cannot be opened!");
+		return false;
+	}
+	store->RemoveItemByName(itemname);
+	//store changed, save it
+	gamedata->SaveStore(store);
+	return true;
+}
+
 //finds and takes an item from a container in the given inventory
 static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, const ResRef& itemname, int count)
 {

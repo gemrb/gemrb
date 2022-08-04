@@ -1820,14 +1820,13 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
 			Actor *pc = game->FindPC(idx + 1);
 			if (!pc) continue;
-
-			if (pc->inventory.HasItem(KeyResRef,0)) {
+			if (HasItemCore(&pc->inventory, KeyResRef, 0)) {
 				haskey = pc;
 				break;
 			}
 		}
 	// actor is not in party, check only actor
-	} else if (actor->inventory.HasItem(KeyResRef, 0)) {
+	} else if (HasItemCore(&actor->inventory, KeyResRef, 0)) {
 		haskey = actor;
 	}
 
@@ -1837,7 +1836,24 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 
 	if (removekey) {
 		CREItem *item = NULL;
-		haskey->inventory.RemoveItem(KeyResRef,0,&item);
+		int result = haskey->inventory.RemoveItem(KeyResRef,0,&item);
+		if (result == -1) {
+			int i= haskey->inventory.GetSlotCount();
+			while (i--) {
+				//maybe we could speed this up if we mark bag items with a flags bit
+				const CREItem *itemslot = haskey->inventory.GetSlotItem(i);
+				if (!itemslot)
+					continue;
+				const Item *itemStore = gamedata->GetItem(itemslot->ItemResRef);
+				if (!itemStore)
+					continue;
+				if (core->CheckItemType(itemStore, SLOT_BAG)) {
+					//the store is the same as the item's name
+					RemoveStoreItem(itemslot->ItemResRef, KeyResRef);
+				}
+				gamedata->FreeItem(itemStore, itemslot->ItemResRef);
+			}
+		}
 		//the item should always be existing!!!
 		delete item;
 	}

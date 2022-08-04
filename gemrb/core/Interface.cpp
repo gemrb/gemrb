@@ -3177,6 +3177,11 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 	return ret;
 }
 
+int Interface::CheckItemType(const Item *item, int slotType) const
+{
+	return slotmatrix[item->ItemType] & slotType;
+}
+
 Label* Interface::GetMessageLabel() const
 {
 	return GetControl<Label>("MsgSys", 1);
