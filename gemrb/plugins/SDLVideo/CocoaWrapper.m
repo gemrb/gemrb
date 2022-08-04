@@ -37,7 +37,7 @@ Mac OS X wrapper
 	NSLog(@"Received terminate request. Dispatching SDL_QUIT event...");
 	SDL_Event event;
 	event.type = SDL_QUIT;
-	if (SDL_PushEvent(&event) == 0) {
+	if (SDL_PushEvent(&event) == 1) {
 		// we deny the application request to terminate.
 		// this way we can let GemRB handle quit event so we can save before exit etc.
 		return NSTerminateCancel;
