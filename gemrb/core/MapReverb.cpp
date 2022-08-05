@@ -69,7 +69,8 @@ Map::MapReverb::profile_t Map::MapReverb::loadProperties (const AutoTable &rever
 }
 
 Map::MapReverb::id_t Map::MapReverb::obtainProfile(const ResRef& mapref) {
-	const AutoTable& reverbMapping = gamedata->LoadTable("reverbs");
+	const AutoTable& reverbMapping = gamedata->LoadTable("reverbs", true);
+	if (!reverbMapping) return EFX_PROFILE_REVERB_INVALID;
 	TableMgr::index_t rows = reverbMapping->GetRowCount();
 	id_t configValue = 0;
 
