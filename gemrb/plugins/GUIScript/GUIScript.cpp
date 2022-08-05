@@ -1438,7 +1438,7 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 		ctrl->SetText(L"");
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
 		const char *tmp = PyByteArray_AS_STRING(str);
-		String* string = StringFromUtf8(tmp);
+		String* string = StringFromCString(tmp);
 		ctrl->SetText(std::move(*string));
 		delete string;
 	} else { // string value of the object
