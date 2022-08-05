@@ -451,7 +451,12 @@ void Interface::HandleFlags() noexcept
 		winmgr->GetGameWindow()->SetVisible(false);
 		//clear cutscenes; clear fade/screenshake effects
 		timer = GlobalTimer();
-		QuitFlag &= ~(QF_QUITGAME|QF_EXITGAME);
+		QuitFlag &= ~QF_QUITGAME;
+	}
+	
+	if (QuitFlag & QF_EXITGAME) {
+		QuitFlag = QF_KILL;
+		return;
 	}
 
 	if (QuitFlag&QF_LOADGAME) {
@@ -2198,17 +2203,10 @@ void Interface::AskAndExit()
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
 		Log(MESSAGE, "Info", "Press ctrl-c (or close the window) again to quit GemRB.\n");
 	} else {
-		ExitGemRB();
+		QuitFlag |= QF_EXITGAME;
 	}
 }
 
-void Interface::ExitGemRB()
-{
-	const Console* console = GetControl<Console>("CONSOLE_CTL", 1);
-	if (console) console->SaveHistory();
-
-	QuitFlag |= QF_KILL;
-}
 /** Returns the variables dictionary */
 Variables* Interface::GetDictionary() const
 {

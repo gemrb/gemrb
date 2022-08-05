@@ -4007,8 +4007,7 @@ PyDoc_STRVAR( GemRB_Quit__doc,
 
 static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 {
-	core->ExitGemRB();
-
+	core->QuitFlag |= QF_EXITGAME;
 	Py_RETURN_NONE;
 }
 

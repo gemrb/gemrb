@@ -162,12 +162,12 @@ public:
 
 //quitflags
 #define QF_NORMAL        0
-#define QF_QUITGAME      1
-#define QF_EXITGAME      2
+#define QF_QUITGAME      1 // Quit current game
+#define QF_EXITGAME      2 // Quit current game and then set QF_KILL
 #define QF_CHANGESCRIPT  4
 #define QF_LOADGAME      8
 #define QF_ENTERGAME     16
-#define QF_KILL			32
+#define QF_KILL			32 // Exit GemRB
 
 //events that are called out of drawwindow
 //they wait until the condition is right
@@ -779,7 +779,6 @@ public:
 	/** returns true if the game is paused */
 	bool IsFreezed() const;
 	void AskAndExit();
-	void ExitGemRB(void);
 	/** CheatKey support */
 	inline void EnableCheatKeys(int Flag)
 	{
