@@ -876,6 +876,7 @@ static void UpdateHappiness(Actor *actor) {
 	if (newHappiness == actor->PCStats->Happiness) return;
 
 	actor->PCStats->Happiness = newHappiness;
+	if (!actor->Ticks) return; // skip feedback on startup
 	switch (newHappiness) {
 		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, DS_QUEUE); break;
 		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, DS_QUEUE); break;
