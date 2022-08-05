@@ -446,7 +446,7 @@ inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 	return (Flags & ~maskOff) | maskOn;
 }
 
-Ambient* AREImporter::SetupMainAmbients(Map::MainAmbients& mainAmbients)
+Ambient* AREImporter::SetupMainAmbients(const Map::MainAmbients& mainAmbients)
 {
 	ResRef mainAmbient;
 	if (!mainAmbients.Ambient1.IsEmpty()) {

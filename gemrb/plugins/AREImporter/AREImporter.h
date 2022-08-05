@@ -94,7 +94,7 @@ private:
 	int PutRestHeader(DataStream *stream, const Map *map) const;
 	int PutMapAmbients(DataStream *stream, const Map *map) const;
 	
-	static Ambient* SetupMainAmbients(Map::MainAmbients& mainAmbients);
+	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };
 
 }
