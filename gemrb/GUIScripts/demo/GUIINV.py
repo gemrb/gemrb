@@ -127,7 +127,7 @@ def InitInventoryWindow (Window):
 	for i in range (0, 3, 2):
 		Button = Window.GetControl (109+i)
 		Button.OnPress (ChangeWeaponPressed)
-		Button.SetVarAssoc("Equipped", i/2)
+		Button.SetVarAssoc("Equipped", i // 2)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 def ChangeWeaponPressed ():
@@ -152,7 +152,7 @@ def UpdateInventoryWindow (Window = None):
 	GemRB.SetVar ("Equipped", Equipped)
 	for i in range (0, 3, 2):
 		Button = Window.GetControl (109+i)
-		Button.SetVarAssoc("Equipped", i/2)
+		Button.SetVarAssoc("Equipped", i // 2)
 	RefreshInventoryWindow ()
 	# populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
