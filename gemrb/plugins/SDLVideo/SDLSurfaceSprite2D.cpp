@@ -111,7 +111,10 @@ void SDLSurfaceSprite2D::UnlockSprite() const
 
 bool SDLSurfaceSprite2D::IsPaletteStale() const noexcept
 {
-	if (version) return true; // 'version' implies tha palette was color modified
+	// a 'version' implies tha palette was color modified
+	// however, the only caller her is RenderWithFlags
+	// where we already compare the version with the requested one
+	// the version includes the color modification so for now we dont worry about it
 	
 	const PaletteHolder& pal = format.palette;
 	assert(pal);
@@ -230,7 +233,7 @@ BlitFlags SDLSurfaceSprite2D::RenderWithFlags(BlitFlags renderflags, const Color
 			newVersion |= tintv << 32;
 		}
 		
-		if (IsPaletteStale() || oldVersion != newVersion) {
+		if (oldVersion != newVersion || IsPaletteStale()) {
 			SDL_Palette* pal = static_cast<SDL_Palette*>(NewVersion(newVersion));
 
 			for (size_t i = 0; i < 256; ++i) {
