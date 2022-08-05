@@ -56,6 +56,11 @@ Console::Console(const Region& frame, TextArea* ta)
 	LoadHistory();
 }
 
+Console::~Console() noexcept
+{
+	SaveHistory();
+}
+
 void Console::UpdateTextArea()
 {
 	if (textArea) {
@@ -143,7 +148,7 @@ void Console::HistoryAdd(bool force)
 }
 
 // dump the last few commands to a file
-void Console::SaveHistory() const
+void Console::SaveHistory() const noexcept
 {
 	std::string commands;
 

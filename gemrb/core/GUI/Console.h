@@ -53,8 +53,9 @@ private:
 
 public:
 	Console(const Region& frame, TextArea* ta);
+	~Console() noexcept;
+	
 	bool Execute(const String&);
-	void SaveHistory() const;
 
 private:
 	void UpdateTextArea();
@@ -63,6 +64,7 @@ private:
 	void HistoryAdd(bool force = false);
 	void HistorySetPos(size_t);
 	void LoadHistory();
+	void SaveHistory() const noexcept;
 
 protected:
 	/** Key Press Event */
