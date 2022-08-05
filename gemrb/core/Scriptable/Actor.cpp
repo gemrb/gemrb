@@ -540,24 +540,22 @@ Actor::stat_t Actor::GetSafeStat(unsigned int StatIndex) const
 
 void Actor::SetCircleSize()
 {
-	Color color;
-	int color_index;
-
 	if (!anims)
 		return;
 
 	const GameControl *gc = core->GetGameControl();
 	float oscillationFactor = 1.0f;
-
+	Color color;
+	int normalIdx;
 	if (UnselectableTimer) {
 		color = ColorMagenta;
-		color_index = 4;
+		normalIdx = 4;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC || Modified[IE_CHECKFORBERSERK]) {
 		color = ColorYellow;
-		color_index = 5;
+		normalIdx = 5;
 	} else if (gc && (((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) || remainingTalkSoundTime > 0)) {
 		color = ColorWhite;
-		color_index = 3; //?? made up
+		normalIdx = 3; //?? made up
 
 		if (remainingTalkSoundTime > 0) {
 			/**
@@ -576,29 +574,29 @@ void Actor::SetCircleSize()
 			case EA_EVILBUTGREEN:
 			case EA_GOODCUTOFF:
 				color = ColorGreen;
-				color_index = 0;
+				normalIdx = 0;
 				break;
 			case EA_EVILCUTOFF:
 				color = ColorYellow;
-				color_index = 5;
+				normalIdx = 5;
 				break;
 			case EA_ENEMY:
 			case EA_GOODBUTRED:
 			case EA_CHARMEDPC:
 				color = ColorRed;
-				color_index = 1;
+				normalIdx = 1;
 				break;
 			default:
 				color = ColorCyan;
-				color_index = 2;
+				normalIdx = 2;
 				break;
 		}
 	}
 
 	// circle size 0 won't display, so we can ignore it when clamping
 	int csize = Clamp(anims->GetCircleSize(), 1, MAX_CIRCLE_SIZE) - 1;
-
-	SetCircle( anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
+	int selectedIdx = (normalIdx == 0) ? 3 : normalIdx;
+	SetCircle(anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][normalIdx], core->GroundCircles[csize][selectedIdx]);
 }
 
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
