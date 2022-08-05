@@ -1055,9 +1055,9 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer) const
 	return GEM_OK;
 }
 
-void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
+void OpenALAudioDriver::UpdateMapAmbient(const MapReverbProperties& props) {
 	if (hasEFX) {
-		mapReverb.getReverbProperties(reverbProperties);
+		reverbProperties = props;
 		hasReverbProperties = true;
 #ifdef HAVE_OPENAL_EFX_H
 		alDeleteEffects(1, &efxEffect);
@@ -1084,6 +1084,10 @@ void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
 		}
 
 		alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
+#else
+		// avoid warnings for unused members
+		(void)efxEffectSlot;
+		(void)efxEffect;
 #endif
 	}
 }

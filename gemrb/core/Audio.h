@@ -25,6 +25,7 @@
 
 #include "globals.h"
 
+#include "MapReverb.h"
 #include "Plugin.h"
 #include "Holder.h"
 
@@ -126,7 +127,7 @@ public:
 	virtual void SetAmbientStreamPitch(int stream, int pitch) = 0;
 	virtual void QueueBuffer(int stream, unsigned short bits,
 				int channels, short* memory, int size, int samplerate) = 0;
-	virtual void UpdateMapAmbient(MapReverb&) {};
+	virtual void UpdateMapAmbient(const MapReverbProperties&) {};
 
 	unsigned int CreateChannel(const std::string& name);
 	void SetChannelVolume(const std::string& name, int volume);

@@ -139,18 +139,6 @@ enum MapEnv : ieWord {
 //in areas 10 is a magic number for resref counts
 #define MAX_RESCOUNT 10
 
-struct SongHeaderType {
-	// used in bg1, set for a few copied areas in bg2 (but no files!)
-	// everyone else uses the normal ARE ambients instead
-	ResRef MainDayAmbient1;
-	ResRef MainDayAmbient2; // except for one case, all Ambient2 are longer versions
-	ieDword MainDayAmbientVol;
-	ResRef MainNightAmbient1;
-	ResRef MainNightAmbient2;
-	ieDword MainNightAmbientVol;
-	ieDword reverbID;
-};
-
 struct RestHeaderType {
 	ieStrRef Strref[MAX_RESCOUNT];
 	ResRef CreResRef[MAX_RESCOUNT];
@@ -413,7 +401,6 @@ public:
 	Holder<Sprite2D> Background = nullptr;
 	ieDword BgDuration = 0;
 	ieDword LastGoCloser = 0;
-	MapReverb reverb;
 
 private:
 	uint32_t debugFlags = 0;
@@ -439,6 +426,37 @@ private:
 	Region stencilViewport;
 
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
+
+	class MapReverb {
+	public:
+		using id_t = ieDword;
+
+		MapReverb(MapEnv env, id_t reverbID);
+		MapReverb(MapEnv env, const ResRef& mapref);
+
+		MapReverbProperties properties;
+
+	private:
+		using profile_t = uint8_t;
+		profile_t loadProperties(const AutoTable &reverbs, id_t reverbID);
+		static id_t obtainProfile(const ResRef& mapref);
+	};
+	
+	std::unique_ptr<MapReverb> reverb;
+	MapReverb::id_t reverbID = EFX_PROFILE_REVERB_INVALID;
+
+	struct MainAmbients {
+		// used in bg1, set for a few copied areas in bg2 (but no files!)
+		// everyone else uses the normal ARE ambients instead
+		ResRef Ambient1;
+		ResRef Ambient2; // except for one case, all Ambient2 are longer versions
+		ieDword AmbientVol = 0;
+	};
+
+	MainAmbients dayAmbients;
+	MainAmbients nightAmbients;
+	
+	friend class AREImporter;
 
 public:
 	Map(TileMap *tm, TileProps tileProps, Holder<Sprite2D> sm);
@@ -540,7 +558,6 @@ public:
 	void PurgeArea(bool items);
 
 	ieDword SongList[MAX_RESCOUNT]{};
-	SongHeaderType SongHeader{};
 	RestHeaderType RestHeader{};
 	int AreaDifficulty = 0;
 
@@ -620,10 +637,10 @@ public:
 	WMPDirection WhichEdge(const Point &s) const;
 
 	//ambients
-	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
+	void SetAmbients(std::vector<Ambient *> ambient, MapReverb::id_t reverbID = EFX_PROFILE_REVERB_INVALID);
 	void SetupAmbients() const;
-	Ambient *GetAmbient(int i) const { return ambients[i]; }
-	ieWord GetAmbientCount(bool toSave = false) const;
+	const std::vector<Ambient *> &GetAmbients() const { return ambients; };
+	const MapReverbProperties& GetReverbProperties() const;
 
 	//mapnotes
 	void AddMapNote(const Point &point, ieWord color, String text, bool readonly = false);

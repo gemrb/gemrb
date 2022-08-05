@@ -3,47 +3,43 @@
 
 namespace GemRB {
 
-MapReverb::MapReverb (Map& _map) :
-		reverbMapping(gamedata->LoadTable("reverbs"))
-	, reverbs(gamedata->LoadTable("reverb"))
-	, map(_map)
-	, reverbProfile(EFX_PROFILE_REVERB_INVALID) {
+Map::MapReverb::MapReverb (MapEnv env, id_t reverbID)
+{
+	AutoTable reverbs = gamedata->LoadTable("reverb");
+	
 	MapReverbProperties _properties = {EFX_REVERB_GENERIC, true};
 	properties = _properties;
 
-	/* Map says nothing, attempt to read from 2DA. */
-	if (EFX_PROFILE_REVERB_INVALID == map.SongHeader.reverbID) {
-		reverbProfile = obtainProfile();
-	} else {
-		reverbProfile = loadProperties(map.SongHeader.reverbID);
-	}
+	profile_t reverbProfile = EFX_PROFILE_REVERB_INVALID;
+	if (reverbID == 0) {
+		properties.reverbDisabled = true;
+	} else if (reverbs) {
+		reverbProfile = loadProperties(reverbs, reverbID);
 
-	/* If still nothing, fallback to something Ok. */
-	if (EFX_PROFILE_REVERB_INVALID == reverbProfile && reverbs) {
-		if (map.AreaType & (AT_OUTDOOR|AT_CITY|AT_FOREST)) {
-			reverbProfile = loadProperties(EFX_PROFILE_OUTSIDE);
-		} else if (map.AreaType & AT_DUNGEON) {
-			reverbProfile = loadProperties(EFX_PROFILE_DUNGEON);
-		} else {
-			reverbProfile = loadProperties(EFX_PROFILE_DEFAULT);
+		/* If still nothing, fallback to something Ok. */
+		if (EFX_PROFILE_REVERB_INVALID == reverbProfile) {
+			if (env & (AT_OUTDOOR|AT_CITY|AT_FOREST)) {
+				reverbProfile = loadProperties(reverbs, EFX_PROFILE_OUTSIDE);
+			} else if (env & AT_DUNGEON) {
+				reverbProfile = loadProperties(reverbs, EFX_PROFILE_DUNGEON);
+			} else {
+				reverbProfile = loadProperties(reverbs, EFX_PROFILE_DEFAULT);
+			}
 		}
 	}
 }
 
-void MapReverb::getReverbProperties(MapReverbProperties& props) const
-{
-	memcpy(&props, &properties, sizeof(MapReverbProperties));
-}
+Map::MapReverb::MapReverb(MapEnv env, const ResRef& mapref)
+: MapReverb(env, obtainProfile(mapref))
+{}
 
-unsigned char MapReverb::loadProperties (unsigned char profileNumber) {
-	if (0 == profileNumber) {
-		properties.reverbDisabled = true;
-		return 0;
-	} else if (profileNumber > reverbs->GetRowCount()) {
+Map::MapReverb::profile_t Map::MapReverb::loadProperties (const AutoTable &reverbs, id_t reverbID) {
+	if (reverbID > reverbs->GetRowCount()) {
 		return EFX_PROFILE_REVERB_INVALID;
 	}
 
-	const ieVariable efxProfileName = reverbs->QueryField(profileNumber, 0);
+	const ieVariable efxProfileName = reverbs->QueryField(reverbID, 0);
+
 	/* Limited to values seemingly used. */
 	if (efxProfileName == "ARENA") {
 		MapReverbProperties _properties = {EFX_REVERB_ARENA, false};
@@ -62,28 +58,25 @@ unsigned char MapReverb::loadProperties (unsigned char profileNumber) {
 		properties = _properties;
 	}
 
-	float decay = strtof(reverbs->QueryField(profileNumber, 2).c_str(), NULL);
+	float decay = strtof(reverbs->QueryField(reverbID, 2).c_str(), nullptr);
 	if (decay >= 0.0f && decay <= 20.0f) {
 		properties.reverbData.flDecayTime = decay;
 	}
 
 	/* TODO: deal with DAMPING, REVERB_LEVEL, VOLUME */
 
-	return profileNumber;
+	return reverbID;
 }
 
-unsigned char MapReverb::obtainProfile () {
-	if (!reverbMapping || !reverbs) {
-		return loadProperties(0);
-	}
-
+Map::MapReverb::id_t Map::MapReverb::obtainProfile(const ResRef& mapref) {
+	const AutoTable& reverbMapping = gamedata->LoadTable("reverbs");
 	TableMgr::index_t rows = reverbMapping->GetRowCount();
-	unsigned char configValue = 0;
+	id_t configValue = 0;
 
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
 		ResRef mapName = reverbMapping->GetRowName(i);
-		if (mapName == map.WEDResRef) {
-			uint8_t profile = reverbMapping->QueryFieldUnsigned<uint8_t>(i, 0);
+		if (mapName == mapref) {
+			id_t profile = reverbMapping->QueryFieldUnsigned<uint8_t>(i, 0);
 
 			if (profile < EFX_MAX_REVERB_PROFILE_INDEX) {
 				configValue = profile;
@@ -92,7 +85,7 @@ unsigned char MapReverb::obtainProfile () {
 		}
 	}
 
-	return loadProperties(configValue);
+	return configValue;
 }
 
 }

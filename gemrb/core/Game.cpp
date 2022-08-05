@@ -41,7 +41,6 @@
 #include "GUI/GameControl.h"
 #include "Video/Pixels.h"
 #include "Streams/DataStream.h"
-#include "MapReverb.h"
 
 #include <algorithm>
 #include <iterator>
@@ -871,7 +870,7 @@ int Game::LoadMap(const ResRef &resRef, bool loadscreen)
 		newMap->LoadIniSpawn();
 	}
 
-	core->GetAudioDrv()->UpdateMapAmbient(newMap->reverb);
+	core->GetAudioDrv()->UpdateMapAmbient(newMap->GetReverbProperties());
 
 	core->LoadProgress(100);
 	return ret;

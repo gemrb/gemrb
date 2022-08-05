@@ -446,25 +446,23 @@ inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 	return (Flags & ~maskOff) | maskOn;
 }
 
-static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
-	ResRef *main1[2] = { &map->SongHeader.MainNightAmbient1, &map->SongHeader.MainDayAmbient1 };
-	ResRef *main2[2] = { &map->SongHeader.MainNightAmbient2, &map->SongHeader.MainDayAmbient2 };
-	ieDword vol[2] = { map->SongHeader.MainNightAmbientVol, map->SongHeader.MainDayAmbientVol };
+Ambient* AREImporter::SetupMainAmbients(Map::MainAmbients& mainAmbients)
+{
 	ResRef mainAmbient;
-	if (!main1[day_or_night]->IsEmpty()) {
-		mainAmbient = *main1[day_or_night];
+	if (!mainAmbients.Ambient1.IsEmpty()) {
+		mainAmbient = mainAmbients.Ambient1;
 	}
 	// the second ambient is always longer, was meant as a memory optimisation w/ IE_AMBI_HIMEM
 	// however that was implemented only for the normal ambients
 	// nowadays we can just skip the first
-	if (!main2[day_or_night]->IsEmpty()) {
-		mainAmbient = *main2[day_or_night];
+	if (!mainAmbients.Ambient2.IsEmpty()) {
+		mainAmbient = mainAmbients.Ambient2;
 	}
 	if (mainAmbient.IsEmpty()) return nullptr;
 
 	Ambient *ambi = new Ambient();
 	ambi->flags = IE_AMBI_ENABLED | IE_AMBI_LOOPING | IE_AMBI_MAIN | IE_AMBI_NOSAVE;
-	ambi->gain = vol[day_or_night];
+	ambi->gain = mainAmbients.AmbientVol;
 	// sounds and name
 	ambi->sounds.emplace_back(mainAmbient);
 	ambi->name = mainAmbient;
@@ -559,43 +557,46 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	for (auto& list : map->SongList) {
 		str->ReadDword(list);
 	}
+	
+	Map::MainAmbients& dayAmbients = map->dayAmbients;
 
-	str->ReadResRef(map->SongHeader.MainDayAmbient1);
-	str->ReadResRef(map->SongHeader.MainDayAmbient2);
-	str->ReadDword(map->SongHeader.MainDayAmbientVol);
+	str->ReadResRef(dayAmbients.Ambient1);
+	str->ReadResRef(dayAmbients.Ambient2);
+	str->ReadDword(dayAmbients.AmbientVol);
+	
+	Map::MainAmbients& nightAmbients = map->nightAmbients;
 
-	str->ReadResRef(map->SongHeader.MainNightAmbient1);
-	str->ReadResRef(map->SongHeader.MainNightAmbient2);
-	str->ReadDword(map->SongHeader.MainNightAmbientVol);
-
+	str->ReadResRef(nightAmbients.Ambient1);
+	str->ReadResRef(nightAmbients.Ambient2);
+	str->ReadDword(nightAmbients.AmbientVol);
+	
+	std::vector<Ambient*> ambients;
 	// check for existence of main ambients (bg1)
 	#define DAY_BITS (((1<<18) - 1) ^ ((1<<6) - 1)) // day: bits 6-18 per DLTCEP
-	Ambient *ambi = SetupMainAmbients(map, true);
+	Ambient *ambi = SetupMainAmbients(dayAmbients);
 	if (ambi) {
 		// schedule for day/night
 		// if the two ambients are the same, just add one, so there's no restart
-		if (map->SongHeader.MainDayAmbient2 != map->SongHeader.MainNightAmbient2) {
+		if (dayAmbients.Ambient2 != nightAmbients.Ambient2) {
 			ambi->appearance = DAY_BITS;
-			map->AddAmbient(ambi);
+			ambients.push_back(ambi);
 			// night
-			ambi = SetupMainAmbients(map, false);
+			ambi = SetupMainAmbients(nightAmbients);
 			if (ambi) {
 				ambi->appearance ^= DAY_BITS; // night: bits 0-5 + 19-23, [dusk till dawn]
 			}
 		}
 		// bgt ar7300 has a nigth ambient only in the first slot
 		if (ambi) {
-			map->AddAmbient(ambi);
+			ambients.push_back(ambi);
 		}
 	}
 
 	// reverb to match against reverb.2da or iwd reverb.ids
 	// (if the 2da doesn't exist - which we provide for all; they use the same values)
+	ieDword reverbID = EFX_PROFILE_REVERB_INVALID; // non PST data has it at 0, so we don't bother reading
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		str->ReadDword(map->SongHeader.reverbID);
-	} else {
-		// all data has it at 0, so we don't bother reading
-		map->SongHeader.reverbID = EFX_PROFILE_REVERB_INVALID;
+		str->ReadDword(reverbID);
 	}
 
 	str->Seek(RestHeader + 32, GEM_STREAM_START); // skip the name
@@ -1342,7 +1343,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading ambients");
 	str->Seek( AmbiOffset, GEM_STREAM_START );
-	for (int i = 0; i < AmbiCount; i++) {
+	for (int i = 0; i < AmbiCount; ++i) {
 		ResRef sounds[MAX_RESCOUNT];
 		ieWord tmpWord;
 
@@ -1375,8 +1376,10 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		for (int j = 0; j < tmpWord; j++) {
 			ambient->sounds.emplace_back(sounds[j]);
 		}
-		map->AddAmbient(ambient);
+		ambients.push_back(ambient);
 	}
+	
+	map->SetAmbients(std::move(ambients), reverbID);
 
 	Log(DEBUG, "AREImporter", "Loading automap notes");
 	str->Seek( NoteOffset, GEM_STREAM_START );
@@ -1686,8 +1689,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
 
-	AmbiCount = map->GetAmbientCount(true);
-	headersize += AmbiCount * 0xd4;
+	headersize += SavedAmbientCount(map) * 0xd4;
 	VariablesOffset = headersize;
 
 	VariablesCount = (ieDword) map->locals->GetCount();
@@ -1798,7 +1800,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	stream->WriteDword(ItemsOffset);
 	stream->WriteDword(VerticesOffset);
 	stream->WriteWord(VerticesCount);
-	stream->WriteWord(AmbiCount);
+	stream->WriteWord(SavedAmbientCount(map));
 	stream->WriteDword(AmbiOffset);
 	stream->WriteDword(VariablesOffset);
 	stream->WriteDword(VariablesCount);
@@ -2320,9 +2322,7 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 {
 	ieWord tmpWord;
 
-	ieWord realCount = map->GetAmbientCount();
-	for (ieWord i = 0; i < realCount; i++) {
-		const Ambient *am = map->GetAmbient(i);
+	for (const auto& am : map->GetAmbients()) {
 		if (am->flags & IE_AMBI_NOSAVE) continue;
 		stream->WriteVariable(am->name);
 		tmpWord = (ieWord) am->origin.x;
@@ -2512,27 +2512,31 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 	return 0;
 }
 
-int AREImporter::PutSongHeader(DataStream *stream, const Map *map) const
+ieWord AREImporter::SavedAmbientCount(const Map* map) const
 {
-	ieDword tmpDword = 0;
+	int count = 0;
+	for (const Ambient* am : map->GetAmbients())
+	{
+		if (am->flags & IE_AMBI_NOSAVE) continue;
+		++count;
+	}
+	return count;
+}
 
-	for (const auto& list : map->SongList) {
-		stream->WriteDword(list);
-	}
+int AREImporter::PutMapAmbients(DataStream *stream, const Map *map) const
+{
 	//day
-	stream->WriteResRef(map->SongHeader.MainDayAmbient1);
-	stream->WriteResRef(map->SongHeader.MainDayAmbient2);
-	stream->WriteDword(map->SongHeader.MainDayAmbientVol);
+	stream->WriteResRef(map->dayAmbients.Ambient1);
+	stream->WriteResRef(map->dayAmbients.Ambient2);
+	stream->WriteDword(map->dayAmbients.AmbientVol);
 	//night
-	stream->WriteResRef(map->SongHeader.MainNightAmbient1);
-	stream->WriteResRef(map->SongHeader.MainNightAmbient2);
-	stream->WriteDword(map->SongHeader.MainNightAmbientVol);
+	stream->WriteResRef(map->nightAmbients.Ambient1);
+	stream->WriteResRef(map->nightAmbients.Ambient2);
+	stream->WriteDword(map->nightAmbients.AmbientVol);
 	//song flag
-	stream->WriteDword(map->SongHeader.reverbID);
+	stream->WriteDword(map->reverbID);
 	//lots of empty crap (15x4)
-	for (int i = 0; i < 15; i++) {
-		stream->WriteDword(tmpDword);
-	}
+	stream->WriteFilling(60);
 	return 0;
 }
 
@@ -2671,8 +2675,12 @@ int AREImporter::PutArea(DataStream *stream, const Map *map) const
 	if (ret) {
 		return ret;
 	}
+	
+	for (const auto& list : map->SongList) {
+		stream->WriteDword(list);
+	}
 
-	ret = PutSongHeader( stream, map);
+	ret = PutMapAmbients(stream, map);
 	if (ret) {
 		return ret;
 	}
