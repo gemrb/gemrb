@@ -411,12 +411,7 @@ bool RemoveItemOfStore(const ResRef& storename, const ResRef& itemname)
 		Log(ERROR, "GameScript", "Store cannot be opened!");
 		return false;
 	}
-
-	//RemoveItem doesn't use trigger, and hopefully this will always run on bags (with no triggers)
-	unsigned int idx = store->FindItem(itemname, false);
-	if (idx == (unsigned int) -1) return false;
-	STOItem *si = store->GetItem(idx, false);
-	store->RemoveItem(si);
+	store->RemoveItemByName(itemname);
 	//store changed, save it
 	gamedata->SaveStore(store);
 	return true;
