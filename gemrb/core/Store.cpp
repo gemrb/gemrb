@@ -339,6 +339,14 @@ void Store::RemoveItem(const STOItem *itm)
 	}
 }
 
+void Store::RemoveItemByName(const ResRef &itemname)
+{
+	unsigned int idx = this->FindItem(itemname, false);
+	if (idx == (unsigned int) -1) return;
+	STOItem *si = this->GetItem(idx, false);
+	this->RemoveItem(si);
+}
+
 ieDword Store::GetOwnerID() const
 {
 	return StoreOwnerID;
