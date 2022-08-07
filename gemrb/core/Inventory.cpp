@@ -1617,7 +1617,11 @@ void Inventory::BreakItemSlot(ieDword slot)
 	//this depends on setslotitemres using setslotitem
 	SetSlotItemRes(newItem, slot, 0,0,0);
 	ieDword slotEffects = core->QuerySlotEffects(slot);
-	if (slotEffects == SLOT_EFFECT_MELEE || slotEffects == SLOT_EFFECT_MISSILE) EquipBestWeapon(EQUIP_MELEE);
+	if (slotEffects == SLOT_EFFECT_MELEE) {
+		EquipBestWeapon(EQUIP_MELEE);
+	} else if (slotEffects == SLOT_EFFECT_MISSILE) {
+		EquipBestWeapon(EQUIP_RANGED);
+	}
 }
 
 std::string Inventory::dump(bool print) const
