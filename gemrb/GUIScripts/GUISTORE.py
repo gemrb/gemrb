@@ -782,6 +782,7 @@ def UpdateStoreHealWindow (Window):
 		labelOffset += 1 # grrr
 	elif GameCheck.IsPST():
 		labelOffset = 0x10000008
+
 	for i in range (ItemButtonCount):
 		Cure = GemRB.GetStoreCure (TopIndex+i)
 
@@ -807,9 +808,18 @@ def UpdateStoreHealWindow (Window):
 				Button.SetDisabled (False)
 				Button.SetBorder (0, None, 0,0)
 
+			CurePrice = str(GetRealCurePrice (Cure))
 			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Spell['SpellName']))
-			GemRB.SetToken ("ITEMCOST", str(GetRealCurePrice (Cure)))
+			GemRB.SetToken ("ITEMCOST", CurePrice)
 			Label.SetText (strrefs["itemnamecost"])
+
+			if TopIndex + i == Index:
+				TextArea = Window.GetControlAlias ("HWTA")
+				TextArea.SetText (Cure['Description'])
+				Label = Window.GetControlAlias ("HWPRICE")
+				Label.SetText (CurePrice)
+				Button = Window.GetControlAlias ("HEALBTN")
+				Button.SetDisabled (False)
 		else:
 			Button.SetDisabled (True)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
@@ -817,13 +827,6 @@ def UpdateStoreHealWindow (Window):
 			Button.SetBorder (0, None, 0,0)
 			Label.SetText ("")
 
-		if TopIndex+i==Index:
-			TextArea = Window.GetControlAlias ("HWTA")
-			TextArea.SetText (Cure['Description'])
-			Label = Window.GetControlAlias ("HWPRICE")
-			Label.SetText (str(GetRealCurePrice (Cure)))
-			Button = Window.GetControlAlias ("HEALBTN")
-			Button.SetDisabled (False)
 	return
 
 ToggleStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.ToggleWindow, InitStoreHealWindow, UpdateStoreHealWindow, StoreWindowPlacement)
