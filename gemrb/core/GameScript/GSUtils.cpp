@@ -2696,6 +2696,11 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 
 	Actor* act = Scriptable::As<Actor>(Sender);
+	// handle also held enemies, since their scripts still run
+	if (act && act->Immobile()) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 
 	//parse target
 	int seeflag = 0;
@@ -2831,6 +2836,12 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 
 	Actor* act = Scriptable::As<Actor>(Sender);
 	if (act) {
+		// handle also held enemies, since their scripts still run
+		if (act->Immobile()) {
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+
 		//move near to target
 		if (flags&SC_RANGE_CHECK) {
 			unsigned int dist = GetSpellDistance(spellResRef, Sender, parameters->pointParameter);
