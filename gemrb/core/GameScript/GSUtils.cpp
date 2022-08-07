@@ -404,7 +404,7 @@ bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword fla
 	return false;
 }
 
-bool RemoveItemOfStore(const ResRef& storename, const ResRef& itemname)
+bool RemoveStoreItem(const ResRef& storename, const ResRef& itemname)
 {
 	Store* store = gamedata->GetStore(storename);
 	if (!store) {
