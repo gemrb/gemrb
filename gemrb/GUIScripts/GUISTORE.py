@@ -751,6 +751,7 @@ def InitStoreHealWindow (Window):
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.OnPress (lambda: UpdateStoreHealWindow(Window))
 		Button.OnRightPress (InfoHealWindow)
+		Button.SetVarAssoc ("Index", i)
 
 	UnselectNoRedraw ()
 
@@ -775,7 +776,7 @@ def InitStoreHealWindow (Window):
 def UpdateStoreHealWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", None, "STOGOLD")
 	TopIndex = GemRB.GetVar ("TopIndex")
-	Index = GemRB.GetVar ("Index")
+	Index = GemRB.GetVar ("Index") + TopIndex
 	pc = GemRB.GameGetSelectedPCSingle ()
 	labelOffset = 0x1000000c
 	if GameCheck.IsIWD2():
@@ -788,7 +789,6 @@ def UpdateStoreHealWindow (Window):
 
 		Button = Window.GetControlAlias ('HWLBTN' + str(i))
 		Label = Window.GetControl (labelOffset+i)
-		Button.SetVarAssoc ("Index", TopIndex+i)
 		if Cure:
 			Spell = GemRB.GetSpell (Cure['CureResRef'])
 			Button.SetSpellIcon (Cure['CureResRef'], 1)
@@ -1885,7 +1885,7 @@ def InfoHealWindow ():
 	Window = GemRB.GetView('WINHEAL')
 
 	UpdateStoreHealWindow (Window)
-	Index = GemRB.GetVar ("Index")
+	Index = GemRB.GetVar ("Index") + GemRB.GetVar ("TopIndex")
 	Cure = GemRB.GetStoreCure (Index)
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 
@@ -1918,7 +1918,7 @@ def InfoHealWindow ():
 def BuyHeal ():
 	Window = GemRB.GetView('WINHEAL')
 
-	Index = GemRB.GetVar ("Index")
+	Index = GemRB.GetVar ("Index") + GemRB.GetVar ("TopIndex")
 	Cure = GemRB.GetStoreCure (Index)
 	gold = GemRB.GameGetPartyGold ()
 	price = GetRealCurePrice (Cure)
