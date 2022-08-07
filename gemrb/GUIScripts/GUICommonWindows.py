@@ -1909,9 +1909,10 @@ def PortraitButtonOnPress (btn):
 		SelectionChanged ()
 	return
 
-def PortraitButtonOnShiftPress (btn, pcID):
+def PortraitButtonOnShiftPress (btn):
 	"""Handles selecting multiple portaits with shift."""
-
+	
+	pcID = btn.Value
 	if (not SelectionChangeHandler):
 		sel = GemRB.GameIsPCSelected (pcID)
 		sel = not sel
