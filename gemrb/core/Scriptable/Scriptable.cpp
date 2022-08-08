@@ -1845,9 +1845,7 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 				if (!itemslot)
 					continue;
 				const Item *itemStore = gamedata->GetItem(itemslot->ItemResRef);
-				if (!itemStore)
-					continue;
-				if (core->CanUseItemType(SLOT_BAG, itemStore)) {
+				if (core->CheckItemType(itemStore, SLOT_BAG)) {
 					//the store is the same as the item's name
 					RemoveStoreItem(itemslot->ItemResRef, KeyResRef);
 				}
