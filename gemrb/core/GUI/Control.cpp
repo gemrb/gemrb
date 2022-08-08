@@ -139,20 +139,21 @@ Control::value_t Control::SetValue(value_t val)
 		PerformAction(ValueChange);
 		MarkDirty();
 	}
-	return oldVal;
+	return Value;
 }
 
-void Control::SetValueRange(ValueRange r)
+Control::value_t Control::SetValueRange(ValueRange r)
 {
 	range = r;
 	if (Value != INVALID_VALUE) {
-		SetValue(Value); // update the value if it falls outside the range
+		return SetValue(Value); // update the value if it falls outside the range
 	}
+	return INVALID_VALUE;
 }
 
-void Control::SetValueRange(value_t min, value_t max)
+Control::value_t Control::SetValueRange(value_t min, value_t max)
 {
-	SetValueRange(ValueRange(min, max));
+	return SetValueRange(ValueRange(min, max));
 }
 
 void Control::UpdateDictValue() noexcept

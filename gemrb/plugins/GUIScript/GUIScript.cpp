@@ -1947,9 +1947,8 @@ static PyObject* GemRB_Control_SetValue(PyObject* self, PyObject* args)
 	{
 		val = static_cast<Control::value_t>(PyLong_AsUnsignedLongMask(Value));
 	}
-	ctrl->SetValue(val);
+	val = ctrl->SetValue(val);
 
-	val = ctrl->GetValue();
 	if (val == Control::INVALID_VALUE) {
 		PyObject_SetAttrString(self, "Value", Py_None);
 	} else {
