@@ -107,15 +107,17 @@ after_build:
       7z a -tzip $env:archive_path $env:archive_source
     }
 test_script:
-- cmd: |-
-    if %gl%=="OpenGL" (exit /b 0)
-    cd C:/gemrb-win32*
-    cp GemRB.cfg.sample GmRB.cfg.bots
-    echo GamePath=minimal >> GemRB.cfg.bots
-    echo GameType=test >> GemRB.cfg.bots
+- ps: |-
+    if ($env:gl -ne "OpenGL") {
+      # $env:archive_source
+      cd C:/gemrb-win32*
+      cp GemRB.cfg.sample GmRB.cfg.bots
+      echo GamePath=minimal >> GemRB.cfg.bots
+      echo GameType=test >> GemRB.cfg.bots
 
-    gemrb.exe -q -c GemRB.cfg.bots
-    rm GemRB.cfg.bots
+      gemrb.exe -q -c GemRB.cfg.bots
+      rm GemRB.cfg.bots
+    }
 artifacts:
 - path: gemrb*.zip
   name: normal
