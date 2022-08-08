@@ -1,4 +1,3 @@
-#sdfsdfsd
 version: build-{build}
 branches:
   only:
