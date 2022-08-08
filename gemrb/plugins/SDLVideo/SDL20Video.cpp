@@ -115,6 +115,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	const char* driverName = "opengles2";
 #endif
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, driverName);
+	Log(MESSAGE, "SDL 2 Driver", "Creating display: {}", driverName);
 #endif
 
 #if SDL_VERSION_ATLEAST(2, 0, 10)
