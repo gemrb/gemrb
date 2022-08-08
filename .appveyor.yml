@@ -74,7 +74,11 @@ before_build:
     $replace = "GemRBPath=."
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 
-    cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DINSOURCEBUILD=1 -DWIN32_USE_STDIO=1 -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET="x86-windows" -A Win32 .
+    $env:gl = "None"
+    if ($env:APPVEYOR_REPO_TAG_NAME -Or $env:APPVEYOR_REPO_COMMIT_MESSAGE -like '*buildgl*') {
+      $env:gl = "OpenGL"
+    }
+    cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOPENGL_BACKEND="$env:gl" -DINSOURCEBUILD=1 -DWIN32_USE_STDIO=1 -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET="x86-windows" -A Win32 .
 
     # set version to tag or version + commits since tag + commit hash
     $git_version = (git describe --always) | Out-String
@@ -103,14 +107,16 @@ after_build:
       7z a -tzip $env:archive_path $env:archive_source
     }
 test_script:
-- cmd: |-
-    cd C:/gemrb-win32*
-    cp GemRB.cfg.sample GmRB.cfg.bots
-    echo GamePath=minimal >> GemRB.cfg.bots
-    echo GameType=test >> GemRB.cfg.bots
+- ps: |-
+    if ($env:gl -ne "OpenGL") {
+      cd C:/gemrb-win32*
+      cp GemRB.cfg.sample GmRB.cfg.bots
+      echo GamePath=minimal >> GemRB.cfg.bots
+      echo GameType=test >> GemRB.cfg.bots
 
-    gemrb.exe -q -c GemRB.cfg.bots
-    rm GemRB.cfg.bots
+      gemrb.exe -q -c GemRB.cfg.bots
+      rm GemRB.cfg.bots
+    }
 artifacts:
 - path: gemrb*.zip
   name: normal
