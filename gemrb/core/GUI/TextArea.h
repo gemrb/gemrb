@@ -119,6 +119,7 @@ private:
 		size_t NumOpts() const { return size;};
 		void MakeSelection(Option_t idx);
 		TextContainer* Selection() const { return selectedSpan; }
+		Option_t SelectionIdx() const { return selected; }
 		OptionContext Context() const { return OptionContext(id, selected); }
 		
 		bool CanLockFocus() const override { return false; }

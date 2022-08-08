@@ -43,8 +43,9 @@ def OnLoad():
 	VoiceList = CharSoundWindow.GetControl (45)
 	Voices = VoiceList.ListResources (CHR_SOUNDS)
 	GUICommon.AddDefaultVoiceSet (VoiceList, Voices)
+	VoiceList.OnSelect (ChangeVoice)
 	# preselect the default entry to avoid an infinite loop if Play is pressed immediately
-	VoiceList.SetVarAssoc ("Selected", 0)
+	VoiceList.SetValue (0)
 
 	PlayButton = CharSoundWindow.GetControl (47)
 	PlayButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -61,7 +62,6 @@ def OnLoad():
 	DoneButton.SetText(11973)
 	DoneButton.MakeDefault()
 
-	VoiceList.OnSelect (ChangeVoice)
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (BackPress)
 	CharSoundWindow.Focus()

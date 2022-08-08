@@ -553,9 +553,9 @@ void TextArea::UpdateState(value_t opt)
 	
 	Option_t optIdx = std::distance(values.begin(), it);
 	
-	// only run the handlers if the context has changed
+	// only run the handlers if the context has changed, or the selection is different
 	// note that handlers can trigger reentrancy back here
-	if (optionContext != selectOptions->Context()) {
+	if (optionContext != selectOptions->Context() || optIdx != selectOptions->SelectionIdx()) {
 		optionContext = selectOptions->Context();
 
 		// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
