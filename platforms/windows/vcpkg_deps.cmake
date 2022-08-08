@@ -27,6 +27,7 @@ LIST(APPEND DLL_SET_DEBUG
 	libpng16d.dll
 	ogg.dll
 	OpenAL32.dll
+	OpenGL32.dll
 	python310_d.dll
 	SDL.dll
 	SDL2d.dll
@@ -46,6 +47,7 @@ LIST(APPEND DLL_SET_RELEASE
 	libpng16.dll
 	ogg.dll
 	OpenAL32.dll
+	OpenGL32.dll
 	python310.dll
 	SDL.dll
 	SDL2.dll
