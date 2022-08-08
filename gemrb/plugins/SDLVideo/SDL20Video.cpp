@@ -327,7 +327,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 		// 4. copy scratchpad segment to screen
 
 #if USE_OPENGL_BACKEND
-		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
+		ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 #if SDL_VERSION_ATLEAST(2, 0, 10)
 		SDL_RenderFlush(renderer);
 #endif
@@ -342,7 +342,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 		stencilRect.x -= stencilBuffer->Origin().x;
 		stencilRect.y -= stencilBuffer->Origin().y;
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
-#endif
 
 		if (flags & (BlitFlags::ALPHA_MOD | BlitFlags::HALFTRANS)) {
 			Uint8 alpha = SDL_ALPHA_OPAQUE;
@@ -358,6 +357,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 		SDL_SetRenderTarget(renderer, CurrentRenderBuffer());
 		SDL_SetTextureBlendMode(ScratchBuffer(), SDL_BLENDMODE_BLEND);
 		ret = SDL_RenderCopy(renderer, ScratchBuffer(), &drect, &drect);
+#endif
 	} else {
 		UpdateRenderTarget();
 		ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
