@@ -328,9 +328,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 
 #if USE_OPENGL_BACKEND
 		ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-		SDL_RenderFlush(renderer);
-#endif
 #else
 		std::static_pointer_cast<SDLTextureVideoBuffer>(scratchBuffer)->Clear(drect); // sets the render target to the scratch buffer
 
@@ -362,6 +359,10 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 		UpdateRenderTarget();
 		ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 	}
+	
+#if USE_OPENGL_BACKEND && SDL_VERSION_ATLEAST(2, 0, 10)
+		SDL_RenderFlush(renderer);
+#endif
 
 	if (ret != 0) {
 		Log(ERROR, "SDLVideo", "{}", SDL_GetError());
