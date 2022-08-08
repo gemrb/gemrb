@@ -1949,6 +1949,7 @@ static PyObject* GemRB_Control_SetValue(PyObject* self, PyObject* args)
 	}
 	ctrl->SetValue(val);
 
+	val = ctrl->GetValue();
 	if (val == Control::INVALID_VALUE) {
 		PyObject_SetAttrString(self, "Value", Py_None);
 	} else {
@@ -2013,6 +2014,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	}
 
 	// refresh python copies
+	val = ctrl->GetValue();
 	PyObject_SetAttrString(self, "VarName", DecRef(PyString_FromStringView, ctrl->DictVariable()));
 	if (val == Control::INVALID_VALUE) {
 		PyObject_SetAttrString(self, "Value", Py_None);
