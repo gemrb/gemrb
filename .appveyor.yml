@@ -109,7 +109,7 @@ after_build:
 test_script:
 - ps: |-
     if ($env:gl -ne "OpenGL") {
-      cd C:/gemrb-win32*
+      cd $env:archive_source
       cp GemRB.cfg.sample GmRB.cfg.bots
       echo GamePath=minimal >> GemRB.cfg.bots
       echo GameType=test >> GemRB.cfg.bots
