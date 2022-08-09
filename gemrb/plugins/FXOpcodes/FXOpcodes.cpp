@@ -2398,7 +2398,12 @@ int fx_animation_id_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	case 2: //permanent animation id change
 		// also removes previous changes
-		target->SetBase(IE_ANIMATION_ID, fx->Parameter1);
+		if (fx->Parameter1) {
+			target->SetBase(IE_ANIMATION_ID, fx->Parameter1);
+		} else {
+			// avoid crashing
+			target->SetBase(IE_AVATARREMOVAL, 1);
+		}
 		target->fxqueue.RemoveAllEffects(fx_animation_id_modifier_ref);
 		return FX_NOT_APPLIED;
 	}
