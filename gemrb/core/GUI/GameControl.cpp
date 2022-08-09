@@ -1326,6 +1326,7 @@ void GameControl::UpdateCursor()
 		if (type >= EA_EVILCUTOFF || type == EA_GOODBUTRED) {
 			nextCursor = IE_CURSOR_ATTACK;
 		} else if ( type > EA_CHARMED ) {
+			if (lastActor->GetStat(IE_NOCIRCLE)) return;
 			nextCursor = IE_CURSOR_TALK;
 			//don't let the pc to talk to frozen/stoned creatures
 			ieDword state = lastActor->GetStat(IE_STATE_ID);
