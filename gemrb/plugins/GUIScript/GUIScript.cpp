@@ -9131,7 +9131,6 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 \n\
 **Parameters:**\n\
   * ResRef - the resource reference of the item\n\
-  * PartyID - the pc you want to check usability against (defaults to the selected one)\n\
 \n\
 **Return value:** dictionary\n\
   * 'ItemName'           - strref of unidentified name.\n\
@@ -9171,17 +9170,7 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* cstr = nullptr;
-	int PartyID = 0;
-	const Actor *actor = nullptr;
-	PARSE_ARGS(args,  "O|i", &cstr, &PartyID);
-	//it isn't a problem if actor not found
-	const Game *game = core->GetGame();
-	if (game) {
-		if (!PartyID) {
-			PartyID = game->GetSelectedPCSingle();
-		}
-		actor = game->FindPC( PartyID );
-	}
+	PARSE_ARGS(args, "O", &cstr);
 
 	ResRef resref = ResRefFromPy(cstr);
 	const Item* item = gamedata->GetItem(resref, true);
@@ -9228,10 +9217,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 
 	int function=0;
 
-	if (core->CanUseItemType(SLOT_POTION, item, actor)) {
+	if (core->CheckItemType(item, SLOT_POTION)) {
 			function|=CAN_DRINK;
 	}
-	if (core->CanUseItemType(SLOT_SCROLL, item, actor)) {
+	if (core->CheckItemType(item, SLOT_SCROLL)) {
 		//determining if this is a copyable scroll
 		if (ehc<2) {
 			goto not_a_scroll;
@@ -9255,16 +9244,14 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		function|=CAN_SELECT;
 	}
 not_a_scroll:
-	if (core->CanUseItemType(SLOT_BAG, item)) {
+	if (core->CheckItemType(item, SLOT_BAG) && gamedata->Exists(resref, IE_STO_CLASS_ID)) {
 		//allow the open container flag only if there is
 		//a store file (this fixes pst eye items, which
 		//got the same item type as bags)
 		//while this isn't required anymore, as bag itemtypes are customisable
 		//we still better check for the existence of the store, or we
 		//get a crash somewhere.
-		if (gamedata->Exists(resref, IE_STO_CLASS_ID)) {
-			function|=CAN_STUFF;
-		}
+		function |= CAN_STUFF;
 	}
 	PyDict_SetItemString(dict, "Function", PyLong_FromLong(function));
 	gamedata->FreeItem(item, resref, false);

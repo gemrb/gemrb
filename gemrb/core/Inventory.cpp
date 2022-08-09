@@ -747,7 +747,7 @@ int Inventory::DepleteItem(ieDword flags) const
 				continue;
 			}
 			//if the item is usable in weapon slot, then it is weapon
-			int weapon = core->CanUseItemType( SLOT_WEAPON, itm );
+			int weapon = core->CheckItemType(itm, SLOT_WEAPON);
 			gamedata->FreeItem( itm, item->ItemResRef, false );
 			if (weapon)
 				continue;
@@ -1800,7 +1800,7 @@ void Inventory::UpdateShieldAnimation(const Item *it)
 
 	if (it) {
 		AnimationType = it->AnimationType;
-		if (core->CanUseItemType(SLOT_WEAPON, it)) {
+		if (core->CheckItemType(it, SLOT_WEAPON)) {
 			WeaponType = IE_ANI_WEAPON_2W;
 		}
 	}
@@ -1815,7 +1815,6 @@ void Inventory::UpdateWeaponAnimation()
 		// ranged weapon
 		slot = FindRangedWeapon();
 	}
-	unsigned char WeaponType = IE_ANI_WEAPON_INVALID;
 
 	AnimRef AnimationType;
 	ieWord MeleeAnimation[3]={100,0,0};
@@ -1831,6 +1830,7 @@ void Inventory::UpdateWeaponAnimation()
 
 	itm->GetDamagePotential(false, header);
 	AnimationType = itm->AnimationType;
+	unsigned char WeaponType = IE_ANI_WEAPON_INVALID;
 	// for twohanded flag, you don't need itm
 	if (Slot->Flags & IE_INV_ITEM_TWOHANDED) {
 		WeaponType = IE_ANI_WEAPON_2H;
@@ -1845,7 +1845,7 @@ void Inventory::UpdateWeaponAnimation()
 		if (si) {
 			const Item* it = gamedata->GetItem(si->ItemResRef, true);
 			assert(it);
-			if (core->CanUseItemType(SLOT_WEAPON, it)) {
+			if (core->CheckItemType(it, SLOT_WEAPON)) {
 				WeaponType = IE_ANI_WEAPON_2W;
 			}
 			gamedata->FreeItem(it, si->ItemResRef, false);

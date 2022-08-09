@@ -5835,7 +5835,7 @@ int Actor::IsDualWielding() const
 	}
 
 	//if the item is usable in weapon slot, then it is weapon
-	int weapon = core->CanUseItemType( SLOT_WEAPON, itm );
+	int weapon = core->CheckItemType(itm, SLOT_WEAPON);
 	gamedata->FreeItem( itm, wield->ItemResRef, false );
 	//is just weapon>0 ok?
 	return (weapon>0)?1:0;

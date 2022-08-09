@@ -553,7 +553,7 @@ def CannotLearnSlotSpell ():
 		booktype = IE_IWD2_SPELL_WIZARD
 
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
-	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
+	spell_ref = GemRB.GetItem (slot_item['ItemResRef'])['Spell']
 	spell = GemRB.GetSpell (spell_ref)
 	level = spell['SpellLevel']
 
@@ -716,7 +716,7 @@ def LearnSpell(pc, spellref, booktype, level, count, flags=0):
 
 def LearnFromScroll (pc, slot):
 	slot_item = GemRB.GetSlotItem (pc, slot)
-	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
+	spell_ref = GemRB.GetItem (slot_item['ItemResRef'])['Spell']
 
 	ret = GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP)
 
