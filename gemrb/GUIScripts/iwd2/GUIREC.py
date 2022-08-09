@@ -750,26 +750,26 @@ def DisplayWeapons (pc):
 		failure = GemRB.GetSpellFailure (pc)
 		total = failure["Total"]
 		arcana = 5*GemRB.HasFeat(pc, FEAT_ARMORED_ARCANA)
-		other = 5*(failure["Armor"] + failure["Shield"]) - arcana
+		armor = 5 * (failure["Armor"] + failure["Shield"])
+		other = armor - arcana
 		# account for armored arcana only if it doesn't cause a negative value (eating into the misc bonus)
-		verbose = 0
 		if other < 0:
 			other = total
 		else:
 			other = total - other
-			verbose = 1
+
 		if total < 0:
 			total = 0
 		RecordsTextArea.Append (DelimitedText (41390, str (total)+"%", 0))
 		# Armor Penalty (same as for skills and everything else)
-		if verbose and failure["Armor"]:
+		if failure["Armor"]:
 			AddIndent()
 			RecordsTextArea.Append (DelimitedText (39816, PlusMinusStat(5*failure["Armor"])+"%", 0))
 		# Shield Penalty
-		if verbose and failure["Shield"]:
+		if failure["Shield"]:
 			AddIndent()
 			RecordsTextArea.Append (DelimitedText (39822, PlusMinusStat(5*failure["Shield"])+"%", 0))
-		if arcana:
+		if armor and arcana:
 			AddIndent()
 			RecordsTextArea.Append (DelimitedText (36352, PlusMinusStat(-arcana)+"%", 0))
 		# Other, just a guess to show the remainder
