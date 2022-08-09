@@ -170,7 +170,7 @@ bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 		
 		auto parts = Explode<std::string, std::string>(line, '=', 1);
 		if (parts.size() < 2) {
-			Log(WARNING, "Config", "Invalid line {}", lineno);
+			Log(WARNING, "Config", "Invalid line {}: {}", lineno, line);
 			continue;
 		}
 		
