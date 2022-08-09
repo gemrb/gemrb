@@ -110,10 +110,9 @@ test_script:
 - ps: |-
     if ($env:gl -ne "OpenGL") {
       cd $env:archive_source
-      cp GemRB.cfg.sample GmRB.cfg.bots
+      cp GemRB.cfg.sample GemRB.cfg.bots
       echo GamePath=minimal >> GemRB.cfg.bots
       echo GameType=test >> GemRB.cfg.bots
-      ls
 
       ./gemrb.exe -q -c GemRB.cfg.bots
       rm GemRB.cfg.bots
