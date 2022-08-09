@@ -404,15 +404,15 @@ bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword fla
 	return false;
 }
 
-bool RemoveStoreItem(const ResRef& storename, const ResRef& itemname)
+bool RemoveStoreItem(const ResRef& storeName, const ResRef& itemName)
 {
-	Store* store = gamedata->GetStore(storename);
+	Store* store = gamedata->GetStore(storeName);
 	if (!store) {
 		Log(ERROR, "GameScript", "Store cannot be opened!");
 		return false;
 	}
-	store->RemoveItemByName(itemname);
-	//store changed, save it
+	store->RemoveItemByName(itemName);
+	// store changed, save it
 	gamedata->SaveStore(store);
 	return true;
 }

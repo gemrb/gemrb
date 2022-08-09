@@ -339,11 +339,11 @@ void Store::RemoveItem(const STOItem *itm)
 	}
 }
 
-void Store::RemoveItemByName(const ResRef &itemName)
+void Store::RemoveItemByName(const ResRef& itemName)
 {
 	unsigned int idx = FindItem(itemName, false);
 	if (idx == (unsigned int) -1) return;
-	const STOItem *si = GetItem(idx, false);
+	const STOItem* si = GetItem(idx, false);
 	RemoveItem(si);
 }
 

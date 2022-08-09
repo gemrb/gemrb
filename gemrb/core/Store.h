@@ -181,7 +181,7 @@ public: //queries
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
 	void RemoveItem(const STOItem *itm);
-	void RemoveItemByName(const ResRef &itemName);
+	void RemoveItemByName(const ResRef& itemName);
 	/** Returns index of item */
 	unsigned int FindItem(const ResRef &item, bool usetrigger) const;
 	const char *GetOwner() const;

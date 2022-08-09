@@ -1835,23 +1835,22 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 	}
 
 	if (removekey) {
-		CREItem *item = NULL;
-		int result = haskey->inventory.RemoveItem(KeyResRef,0,&item);
+		CREItem* item = nullptr;
+		int result = haskey->inventory.RemoveItem(KeyResRef, 0, &item);
+		// check also in bags if nothing was found
 		if (result == -1) {
 			int i= haskey->inventory.GetSlotCount();
 			while (i--) {
-				//maybe we could speed this up if we mark bag items with a flags bit
-				const CREItem *itemslot = haskey->inventory.GetSlotItem(i);
-				if (!itemslot)
-					continue;
-				const Item *itemStore = gamedata->GetItem(itemslot->ItemResRef);
-				if (!itemStore)
-					continue;
+				// maybe we could speed this up if we mark bag items with a flags bit
+				const CREItem* itemSlot = haskey->inventory.GetSlotItem(i);
+				if (!itemSlot) continue;
+				const Item* itemStore = gamedata->GetItem(itemSlot->ItemResRef);
+				if (!itemStore) continue;
 				if (core->CheckItemType(itemStore, SLOT_BAG)) {
 					//the store is the same as the item's name
-					RemoveStoreItem(itemslot->ItemResRef, KeyResRef);
+					RemoveStoreItem(itemSlot->ItemResRef, KeyResRef);
 				}
-				gamedata->FreeItem(itemStore, itemslot->ItemResRef);
+				gamedata->FreeItem(itemStore, itemSlot->ItemResRef);
 			}
 		}
 		//the item should always be existing!!!
