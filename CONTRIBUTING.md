@@ -176,10 +176,9 @@ as a template to track progress in a dedicated issue.
 3. Releases are usually made when larger pieces of work land or many smaller
 fixes have accrued.
 4. Versioning is semantic, but also ad-hoc. We want 1.0 to be the classic
-polished release (feature complete or not), so we will start with 0.9.0 once
-something major happens, like full iwd2 playability (you can finish the game)
-or some of the larger refactors (see the [End of all rewrites](https://github.com/gemrb/gemrb/milestone/1)
-milestone) lands. Until then, we'll be bumping the patchlevel version number.
+polished release (feature complete or not), so we won't reach it until we
+implement full iwd2 playability (you can finish the game). Until then, we'll
+be bumping the patchlevel version number.
 
 
 ## Development priorities
