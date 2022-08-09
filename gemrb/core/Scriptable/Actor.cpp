@@ -6774,9 +6774,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		int spdfactor = hittingheader->Speed + speed;
 		if (spdfactor<0) spdfactor = 0;
 		// -3: k/2 in the original, hardcoded to 6; -1 for the difference in rolls - the original rolled 0-5
-		spdfactor += LuckyRoll(1, 6, -4, LR_NEGATIVE);
-		if (spdfactor<0) spdfactor = 0;
-		if (spdfactor>10) spdfactor = 10;
+		spdfactor = Clamp(spdfactor + LuckyRoll(1, 6, -4, LR_NEGATIVE), 0, 10);
 
 		//(round_size/attacks_per_round)*(initiative) is the first delta
 		nextattack = core->Time.round_size*spdfactor/(attacksperround*10) + gameTime;
