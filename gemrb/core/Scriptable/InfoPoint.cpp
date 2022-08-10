@@ -252,6 +252,7 @@ std::string InfoPoint::dump() const
 	AppendFormat(buffer, "Position: {}\n", Pos);
 	AppendFormat(buffer, "TalkPos: {}\n", TalkPos);
 	AppendFormat(buffer, "UsePoint: {}  (on: {})\n", UsePoint, YESNO(GetUsePoint()));
+	AppendFormat(buffer, "TrapLaunch: {}\n", TrapLaunch);
 	switch(Type) {
 	case ST_TRAVEL:
 		AppendFormat(buffer, "Destination Area: {} Entrance: {}\n", Destination, EntranceName);
