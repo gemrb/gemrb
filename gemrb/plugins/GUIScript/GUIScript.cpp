@@ -12081,8 +12081,14 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 	while(i--) {
 		if (itemtype & ieDword(SpecialItems[i].value)) {
 			slot = actor->inventory.FindItem(SpecialItems[i].resref, 0);
-			if (slot>=0) {
+			if (slot == -1) continue;
+			// check if candidate is good enough — not depleted
+			const CREItem* si = actor->inventory.GetSlotItem(slot);
+			if (!si->Usages[0]) continue;
+			if (useup) {
 				break;
+			} else {
+				return PyLong_FromLong(1);
 			}
 		}
 	}
@@ -12094,9 +12100,6 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 	if (useup) {
 		//use the found item's first usage
 		useup = actor->UseItem((ieDword) slot, 0, actor, UI_SILENT|UI_FAKE|UI_NOAURA);
-	} else {
-		const CREItem *si = actor->inventory.GetSlotItem(slot);
-		if (si->Usages[0]) useup = 1;
 	}
 	return PyLong_FromLong(useup);
 }
