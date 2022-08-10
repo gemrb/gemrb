@@ -1251,6 +1251,10 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 		}
 	}
 
+	if (lastActor && lastActor->GetStat(IE_NOCIRCLE)) {
+		lastActor = nullptr;
+	}
+
 	SetLastActor(lastActor);
 
 	return true;
@@ -2178,7 +2182,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
 	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
-	if (targetActor) {
+	if (targetActor && targetActor->GetStat(IE_NOCIRCLE) == 0) {
 		PerformActionOn(targetActor);
 		return;
 	}
