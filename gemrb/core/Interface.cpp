@@ -912,7 +912,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	char testPath[_MAX_PATH];
 	bool gameFound = true;
 	if (!PathJoin(testPath, config.GamePath, "chitin.key", nullptr)) {
-		Log(WARNING, "Interface", "Invalid GamePath detected, guessing from the current dir!");
+		Log(WARNING, "Interface", "Invalid GamePath detected ({}), guessing from the current dir!", testPath);
 		if (PathJoin(testPath, "..", "chitin.key", nullptr)) {
 			strlcpy(config.GamePath, "..", sizeof(config.GamePath));
 		} else {
