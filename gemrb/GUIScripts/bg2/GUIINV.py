@@ -121,8 +121,8 @@ def UpdateInventoryWindow (Window = None):
 		InventoryCommon.UpdateSlot (pc, i)
 	return
 
-ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
-OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
+ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow, GUICommonWindows.DefaultWinPos, True)
+OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow, GUICommonWindows.DefaultWinPos, True)
 
 InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
