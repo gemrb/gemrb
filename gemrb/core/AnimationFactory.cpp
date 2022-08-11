@@ -102,9 +102,6 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 	}
 
 	Picture2 = frames[second]->copy();
-	if (!Picture2) {
-		return NULL;
-	}
 	Picture2->Frame.x = frames[second]->Frame.x;
 	Picture2->Frame.y = frames[second]->Frame.y - 80;
 
