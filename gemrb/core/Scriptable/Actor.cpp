@@ -8994,6 +8994,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	ieDword projectileAnim = 0;
 	if (((int) header < 0) && !(flags & UI_MISS)) { // using a weapon
 		const ITMExtHeader* which = itm->GetWeaponHeader(ranged);
+		if (!which) return false; // eg. misc8u equipped by saemon havarian (ppsaem3), part of the silver sword and actually has a header, just untyped
 		weaponTypeIdx = which->DamageType;
 		projectileAnim = which->ProjectileAnimation;
 	}
