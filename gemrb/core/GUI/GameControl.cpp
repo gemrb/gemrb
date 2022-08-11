@@ -586,7 +586,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		}
 		DrawFormation(game->selected, gameClickPoint, angle);
 	} else {
-		int max = game->GetPartySize(false);
+		int max = game->GetPartySize(true);
 		for (int idx = 1; idx <= max; idx++) {
 			const Actor* actor = game->FindPC(idx);
 			assert(actor);
