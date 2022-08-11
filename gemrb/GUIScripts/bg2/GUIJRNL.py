@@ -175,8 +175,8 @@ def UpdateLogWindow (JournalWindow):
 		Text.Append (JournalTitle + GemRB.GetString(15980) + JournalText)
 	return
 
-ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateLogWindow)
-OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, UpdateLogWindow)
+ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateLogWindow, GUICommonWindows.DefaultWinPos, True)
+OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, UpdateLogWindow, GUICommonWindows.DefaultWinPos, True)
 
 ###################################################
 def PrevChapterPress ():
