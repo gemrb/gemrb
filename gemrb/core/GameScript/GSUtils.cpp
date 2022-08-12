@@ -1077,8 +1077,6 @@ void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest
 	}
 }
 
-static char PlayerDialogRes[] = "PLAYERx\0";
-
 void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 {
 	Scriptable* tar = NULL, *scr = NULL;
@@ -1215,8 +1213,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			break;
 		case BD_RESERVED:
 			//what if playerdialog was initiated from Player2?
-			PlayerDialogRes[5] = '1';
-			Dialog = PlayerDialogRes;
+			Dialog = "PLAYER1";
 			break;
 		case BD_INTERACT: //using the source for the dialog
 			const Game *game = core->GetGame();
