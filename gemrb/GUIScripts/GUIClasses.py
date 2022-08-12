@@ -259,6 +259,21 @@ class GControl(GView):
 
 	def QueryInteger(self):
 		return int("0"+self.QueryText())
+		
+	def OnPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1)
+
+	def OnRightPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)
+
+	def OnShiftPress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 1, 1)
+
+	def OnDoublePress(self, handler):
+		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
+		
+	def OnChange(self, handler):
+		self.SetAction(handler, IE_ACT_VALUE_CHANGE)
 
 class GLabel(GControl):
 	methods = {
@@ -284,9 +299,6 @@ class GTextArea(GControl, Scrollable):
 		if varname:
 			self.SetVarAssoc(varname, val)
 
-	def OnChange(self, handler):
-		self.SetAction(handler, IE_ACT_VALUE_CHANGE)
-
 	def OnSelect(self, handler):
 		self.SetAction(handler, IE_ACT_CUSTOM)
 
@@ -294,9 +306,6 @@ class GTextEdit(GControl):
 	methods = {
 		'SetBufferLength': _GemRB.TextEdit_SetBufferLength,
 	}
-
-	def OnChange(self, handler):
-		self.SetAction(handler, IE_ACT_VALUE_CHANGE)
 
 	def OnDone(self, handler):
 		self.SetAction(handler, IE_ACT_CUSTOM)
@@ -308,9 +317,6 @@ class GScrollBar(GControl, Scrollable):
 	def SetVarAssoc(self, varname, val, rangeMin = 0, rangeMax = None):
 		rangeMax = val if rangeMax is None else rangeMax
 		super(GScrollBar, self).SetVarAssoc(varname, val, rangeMin, rangeMax)
-
-	def OnChange(self, handler):
-		self.SetAction(handler, IE_ACT_VALUE_CHANGE)
 
 class GButton(GControl):
 	methods = {
@@ -351,40 +357,20 @@ class GButton(GControl):
 		frame["x"] = frame["y"] = 0
 		return self.CreateSubview(btnid, IE_GUI_BUTTON, frame)
 
-	def OnPress(self, handler):
-		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1)
-
-	def OnRightPress(self, handler):
-		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)
-
-	def OnShiftPress(self, handler):
-		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 1, 1)
-
-	def OnDoublePress(self, handler):
-		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
-
 class GWorldMap(GControl, Scrollable):
 	methods = {
 		'GetDestinationArea': _GemRB.WorldMap_GetDestinationArea
 	}
 
-	def OnPress(self, handler):
-		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1)
-
 class GMap(GControl):
-	def OnPress(self, handler):
-		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 1)
-
-	def OnRightPress(self, handler):
-		self.SetAction(handler, IE_ACT_MOUSE_PRESS, GEM_MB_MENU, 0, 1)
+	pass
 
 class GProgressBar(GControl):
 	def OnEndReached(self, handler):
 		self.SetAction(handler, IE_ACT_CUSTOM)
 
 class GSlider(GControl):
-	def OnChange(self, handler):
-		self.SetAction(handler, IE_ACT_VALUE_CHANGE)
+	pass
 
 @add_metaclass(metaIDWrapper)
 class GSaveGame:
