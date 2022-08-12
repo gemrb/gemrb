@@ -824,52 +824,6 @@ def ActionQSongRightPressed (which):
 def SetActionIconWorkaround(Button, action, function):
 	Button.SetActionIcon (globals(), action, function)
 
-#no check needed because the button wouldn't be drawn if illegal
-def ActionLeftPressed ():
-	"""Scrolls the actions window left.
-
-	Used primarily for spell selection."""
-
-	TopIndex = GemRB.GetVar ("TopIndex")
-	if TopIndex>10:
-		TopIndex -= 10
-	else:
-		TopIndex = 0
-	GemRB.SetVar ("TopIndex", TopIndex)
-	UpdateActionsWindow ()
-	return
-
-#no check needed because the button wouldn't be drawn if illegal
-def ActionRightPressed ():
-	"""Scrolls the action window right.
-
-	Used primarily for spell selection."""
-
-	pc = GemRB.GameGetFirstSelectedActor ()
-	TopIndex = GemRB.GetVar ("TopIndex")
-	Type = GemRB.GetVar ("Type")
-	print("Type:", Type)
-	#Type is a bitfield if there is no level given
-	#This is to make sure cleric/mages get all spells listed
-	if GemRB.GetVar ("ActionLevel") == UAW_ALLMAGE:
-		if Type == 3:
-			Max = len(Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_PRIEST) + Spellbook.GetKnownSpells (pc, IE_SPELL_TYPE_WIZARD))
-		else:
-			Max = GemRB.GetKnownSpellsCount (pc, Type, -1) # this can handle only one type at a time
-	else:
-		Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1)
-	print("Max:", Max)
-	TopIndex += 10
-	if TopIndex > Max - 10:
-		if Max>10:
-			if TopIndex > Max:
-				TopIndex = Max - 10
-		else:
-			TopIndex = 0
-	GemRB.SetVar ("TopIndex", TopIndex)
-	UpdateActionsWindow ()
-	return
-
 def ActionMeleePressed ():
 	""" switches to the most damaging melee weapon"""
 	#get the party Index
