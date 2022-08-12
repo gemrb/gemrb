@@ -494,11 +494,12 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	}
 }
 
+// not blocking in the originals, just sent a message
 void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
 {
 	core->timer.SetFadeToColor(parameters->pointParameter.x);
 	// fallback matches SetFadeToColor fallback
-	Sender->SetWait(parameters->pointParameter.x ? parameters->pointParameter.x : 30);
+	Sender->SetWait(parameters->pointParameter.x ? parameters->pointParameter.x * 3 / 4 : 30);
 	Sender->ReleaseCurrentAction();
 }
 

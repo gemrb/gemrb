@@ -2937,8 +2937,7 @@ bool Map::CanFree()
 			return false;
 		}
 
-		// dirty estimate if we're a cutscene runner (at least one action queued)
-		if (actor->GetNextAction()) {
+		if (actor == core->GetCutSceneRunner()) {
 			return false;
 		}
 	}
