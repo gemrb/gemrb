@@ -122,7 +122,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	Actor *oldTarget = GetLocalActorByGlobalID(targetID);
 	speakerID = spk->GetGlobalID();
 	targetID = tgt->GetGlobalID();
-	if (!originalTargetID) originalTargetID = tgt->GetGlobalID();
+	if (!originalTargetID) originalTargetID = targetID;
 	if (tgt->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) tgt;
 		// TODO: verify
@@ -168,11 +168,11 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	//Bit 0: Enemy()
 	//Bit 1: EscapeArea()
 	//Bit 2: nothing (but since the action was hostile, it behaves similar to bit 0)
-	unsigned int flags = 0;
+	unsigned int flags = DF_IN_DIALOG;
 	if (!(dlg->Flags&7) ) {
 		flags |= DF_FREEZE_SCRIPTS;
 	}
-	gc->SetDialogueFlags(DF_IN_DIALOG|flags, BitOp::OR);
+	gc->SetDialogueFlags(flags, BitOp::OR);
 	return true;
 }
 
