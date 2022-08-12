@@ -64,10 +64,12 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 	SDL_BlitSurface(obj.surface, nullptr, surface, nullptr);
 	if (obj.version & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
 		uint32_t colorbits = obj.version >> 32;
-		renderFlags = RenderWithFlags(obj.renderFlags, reinterpret_cast<Color*>(&colorbits));
-	} else if (obj.renderFlags) {
-		renderFlags = RenderWithFlags(obj.renderFlags);
+		version = RenderWithFlags(static_cast<BlitFlags>(obj.version), reinterpret_cast<Color*>(&colorbits));
+	} else if (obj.version) {
+		version = RenderWithFlags(static_cast<BlitFlags>(obj.version));
 	}
+
+	renderFlags = obj.renderFlags;
 }
 
 SDLSurfaceSprite2D::~SDLSurfaceSprite2D() noexcept
