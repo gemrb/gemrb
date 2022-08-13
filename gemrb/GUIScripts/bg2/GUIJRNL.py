@@ -130,6 +130,7 @@ def UpdateLogWindow (JournalWindow):
 	print("Chapter ", Chapter, "Section ", Section)
 
 	Text = JournalWindow.GetControl (1)
+	Text.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 
 	Text.Clear ()
 	EntryList = []
