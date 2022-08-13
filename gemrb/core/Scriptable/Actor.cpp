@@ -5624,9 +5624,9 @@ void Actor::InitStatsOnLoad()
 	//default is 9 in Tob, 6 in bg1
 	SetBase(IE_MOVEMENTRATE, VOODOO_CHAR_SPEED);
 
-	ieWord animID = ( ieWord ) BaseStats[IE_ANIMATION_ID];
+	stat_t animID = BaseStats[IE_ANIMATION_ID];
 	//this is required so the actor has animation already
-	SetAnimationID( animID );
+	SetAnimationID(animID);
 
 	// Setting up derived stats
 	if (BaseStats[IE_STATE_ID] & STATE_DEAD) {
