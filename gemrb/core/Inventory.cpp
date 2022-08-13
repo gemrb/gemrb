@@ -1359,7 +1359,22 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	wi.critrange = core->GetCriticalRange(item->ItemType);
 
 	// fetch info from selected weapon/ammo header
-	const ITMExtHeader* hittingHeader = item->GetExtHeader(EquippedHeader);
+	const ITMExtHeader* hittingHeader;
+	int headerIdx = 0; // can't use EquippedHeader because we might be dealing with the offhand in combination with a multiheader item
+	if (item->GetExtHeaderCount() > 1U) {
+		if (Owner->PCStats) {
+			headerIdx = Owner->PCStats->GetHeaderForSlot(wi.slot);
+			if (headerIdx == -1) { // not a quickslot (eg. left hand / shield slot)
+				headerIdx = 0;
+			}
+		} else {
+			headerIdx = EquippedHeader;
+			// play it absolutely safe
+			if (!item->GetExtHeader(headerIdx)) headerIdx = 0;
+		}
+	}
+	hittingHeader = item->GetExtHeader(headerIdx);
+
 	assert(hittingHeader);
 	if (hittingHeader->AttackType == ITEM_AT_PROJECTILE) ranged = true; // throwing weapon
 

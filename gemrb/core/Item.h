@@ -262,6 +262,7 @@ public:
 	int GetWeaponHeaderNumber(bool ranged) const;
 	int GetEquipmentHeaderNumber(int cnt) const;
 	const ITMExtHeader* GetExtHeader(int which) const;
+	size_t GetExtHeaderCount() const { return ext_headers.size(); };
 	unsigned int GetCastingDistance(int header) const;
 	// returns  a vector with details about any extended headers containing fx_damage with a 100% probability
 	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(const ITMExtHeader *header) const;
