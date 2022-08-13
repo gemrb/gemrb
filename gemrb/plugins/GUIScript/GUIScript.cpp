@@ -11331,21 +11331,21 @@ usually constant and taken care by the core\n\
 static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
-	int which;
+	int qslotID;
 	ieWord slot;
 	ieWord headerIndex = 0;
-	PARSE_ARGS(args, "iiH|H", &globalID, &which, &slot, &headerIndex);
+	PARSE_ARGS(args, "iiH|H", &globalID, &qslotID, &slot, &headerIndex);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
 	slot = core->QuerySlot(slot);
 	// recache info for potentially changed ammo or weapon ability
-	if (!which || (which >= ACT_WEAPON1 && which <= ACT_WEAPON4)) {
+	if (!qslotID || (qslotID >= ACT_WEAPON1 && qslotID <= ACT_WEAPON4)) {
 		actor->inventory.SetEquipped(static_cast<ieWordSigned>(actor->inventory.GetEquipped()), headerIndex); // reset EquippedHeader
 		actor->inventory.CacheAllWeaponInfo();
 	}
-	actor->SetupQuickSlot(which, slot, headerIndex);
+	actor->SetupQuickSlot(qslotID, slot, headerIndex);
 	Py_RETURN_NONE;
 }
 
