@@ -914,7 +914,7 @@ int GameScript::NumItemsParty(Scriptable */*Sender*/, const Trigger *parameters)
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true);
+		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true, true);
 	}
 	return cnt==parameters->int0Parameter;
 }
@@ -927,7 +927,7 @@ int GameScript::NumItemsPartyGT(Scriptable */*Sender*/, const Trigger *parameter
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true);
+		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true, true);
 	}
 	return cnt>parameters->int0Parameter;
 }
@@ -940,7 +940,7 @@ int GameScript::NumItemsPartyLT(Scriptable */*Sender*/, const Trigger *parameter
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true);
+		cnt += actor->inventory.CountItems(parameters->resref0Parameter, true, true);
 	}
 	return cnt<parameters->int0Parameter;
 }

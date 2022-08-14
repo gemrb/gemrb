@@ -184,6 +184,7 @@ public: //queries
 	void RemoveItemByName(const ResRef& itemName);
 	/** Returns index of item */
 	unsigned int FindItem(const ResRef &item, bool usetrigger) const;
+	unsigned int CountItems(const ResRef& itemRef) const;
 	const char *GetOwner() const;
 	ieDword GetOwnerID() const;
 	void SetOwnerID(ieDword owner);

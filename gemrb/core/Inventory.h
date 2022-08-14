@@ -233,7 +233,7 @@ public:
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
 	/** Returns number of items in the inventory */
-	int CountItems(const ResRef &resref, bool charges) const;
+	int CountItems(const ResRef &resRef, bool charges, bool checkBags = false) const;
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const ResRef& resref, unsigned int slot) const;
 	/** returns true if contains one itemtype equipped */

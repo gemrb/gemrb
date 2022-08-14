@@ -247,6 +247,18 @@ bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot)
 	return false;
 }
 
+unsigned int StoreCountItems(const ResRef& storeName, const ResRef& itemName)
+{
+	const Store* store = gamedata->GetStore(storeName);
+	if (!store) {
+		Log(ERROR, "GameScript", "Store cannot be opened!");
+		return 0;
+	}
+
+	unsigned int count = store->CountItems(itemName);
+	return count;
+}
+
 bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname)
 {
 	const Store* store = gamedata->GetStore(storename);

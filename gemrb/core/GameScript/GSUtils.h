@@ -68,6 +68,7 @@ extern Gem_Polygon **polygons;
 GEM_EXPORT int GetReaction(const Actor *target, const Scriptable *Sender);
 GEM_EXPORT int GetHappiness(const Scriptable *Sender, int reputation);
 int GetHPPercent(const Scriptable *Sender);
+unsigned int StoreCountItems(const ResRef& storeName, const ResRef& itemName);
 bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname);
 bool RemoveStoreItem(const ResRef& storeName, const ResRef& itemName);
 bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword flags);

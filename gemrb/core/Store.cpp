@@ -234,6 +234,18 @@ STOItem *Store::FindItem(const CREItem *item, bool exact) const
 	return nullptr;
 }
 
+unsigned int Store::CountItems(const ResRef& itemRef) const
+{
+	unsigned int count = 0;
+	for (unsigned int i = 0; i < ItemsCount; i++) {
+		const STOItem* storeItem = items[i];
+		if (itemRef == storeItem->ItemResRef) {
+			count += storeItem->AmountInStock;
+		}
+	}
+	return count;
+}
+
 //some stores can recharge items - in original engine apparently all stores
 //did this. In gemrb there is a flag.
 void Store::RechargeItem(CREItem *item) const
