@@ -966,15 +966,21 @@ void CreateVisualEffectCore(Actor* target, const ResRef& effect, int iterations)
 
 void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, const ResRef& effect, int iterations)
 {
-	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
-	if (vvc) {
-		vvc->Pos = position;
-		Map *area = Sender->GetCurrentArea();
-		if (area) {
+	Map *area = Sender->GetCurrentArea();
+	if (!area) {
+		Log(WARNING, "GSUtils", "Skipping visual effect positioning due to missing area!");
+		return;
+	}
+
+	if (gamedata->Exists(effect, IE_VEF_CLASS_ID, true)) {
+		VEFObject* vef = gamedata->GetVEFObject(effect, false);
+		vef->Pos = position;
+		area->AddVVCell(vef);
+	} else {
+		ScriptedAnimation* vvc = GetVVCEffect(effect, iterations);
+		if (vvc) {
+			vvc->Pos = position;
 			area->AddVVCell(new VEFObject(vvc));
-		} else {
-			Log(WARNING, "GSUtils", "Skipping visual effect positioning due to missing area!");
-			delete vvc;
 		}
 	}
 }
