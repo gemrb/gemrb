@@ -1383,7 +1383,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	}
 	hittingHeader = item->GetExtHeader(headerIdx);
 
-	assert(hittingHeader);
+	if (!hittingHeader) return; // ar2808 elf has the misc3b moonblade equipped ... and it has no headers
 	if (hittingHeader->AttackType == ITEM_AT_PROJECTILE) ranged = true; // throwing weapon
 
 	if (ranged) {
