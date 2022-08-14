@@ -295,22 +295,19 @@ bool Inventory::HasItemType(ieDword type) const
 
 /** counts the items in the inventory, if stacks == 1 then stacks are
 		accounted for their heap size */
-int Inventory::CountItems(const ResRef &resref, bool stacks) const
+int Inventory::CountItems(const ResRef &resRef, bool stacks) const
 {
 	int count = 0;
 	size_t slot = Slots.size();
-	while(slot--) {
-		const CREItem *item = Slots[slot];
-		if (!item) {
-			continue;
-		}
-		if (item->ItemResRef != resref)
-			continue;
-		if (stacks && (item->Flags&IE_INV_ITEM_STACKED) ) {
-			count+=item->Usages[0];
-			assert(count!=0);
-		}
-		else {
+	while (slot--) {
+		const CREItem* item = Slots[slot];
+		if (!item) continue;
+		if (item->ItemResRef != resRef) continue;
+
+		if (stacks && (item->Flags & IE_INV_ITEM_STACKED)) {
+			count += item->Usages[0];
+			assert(count != 0);
+		} else {
 			count++;
 		}
 	}
