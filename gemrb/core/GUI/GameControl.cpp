@@ -453,6 +453,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 	highlighted.clear();
 	for (Actor* actor : ab) {
+		if (actor->GetStat(IE_EA) > EA_CONTROLLABLE) continue;
 		actor->SetOver(true);
 		highlighted.push_back(actor);
 	}
