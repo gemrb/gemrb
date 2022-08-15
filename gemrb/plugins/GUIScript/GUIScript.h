@@ -64,9 +64,9 @@ public:
 	bool ExecString(const std::string &string, bool feedback=false) override;
 	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
-	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);
-	PyObject* ConstructObject(const std::string& pyclassname, ScriptingId id);
-	PyObject* ConstructObject(const std::string& pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
+	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*) const;
+	PyObject* ConstructObject(const std::string& pyclassname, ScriptingId id) const;
+	PyObject* ConstructObject(const std::string& pyclassname, PyObject* pArgs, PyObject* kwArgs = nullptr) const;
 	
 	const ScriptingRefBase* GetScriptingRef(PyObject* obj) const;
 	void AssignViewAttributes(PyObject* obj, View* view) const;
