@@ -4076,15 +4076,6 @@ bool Actor::HandleCastingStance(const ResRef& spellResRef, bool deplete, bool in
 	return false;
 }
 
-bool Actor::AttackIsStunning(int damagetype) const {
-	//stunning damagetype
-	if (damagetype & DAMAGE_STUNNING) {
-		return true;
-	}
-
-	return false;
-}
-
 bool Actor::CheckSilenced() const
 {
 	if (!(Modified[IE_STATE_ID] & STATE_SILENCED)) return false;
@@ -4217,7 +4208,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 
 	if (BaseStats[IE_HITPOINTS] <= (ieDword) damage) {
 		// common fists do normal damage, but cause sleeping for a round instead of death
-		if (Modified[IE_MINHITPOINTS] <= 0 && AttackIsStunning(damagetype)) {
+		if (Modified[IE_MINHITPOINTS] <= 0 && damagetype & DAMAGE_STUNNING) {
 			// stack unconsciousness carefully to avoid replaying the stance changing
 			ieDword below1hp = (ieDword) damage - BaseStats[IE_HITPOINTS] + 1;
 			Effect *sleep = const_cast<Effect*>(fxqueue.HasEffectWithParamPair(fx_sleep_ref, 0, 0)); // FIXME: const_cast

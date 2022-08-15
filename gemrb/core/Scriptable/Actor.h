@@ -654,8 +654,6 @@ public:
 	bool CheckSpellDisruption(int damage) const;
 	/* called when actor starts to cast a spell*/
 	bool HandleCastingStance(const ResRef& spellResRef, bool deplete, bool instant);
-	/* check if the actor should be just knocked out by a lethal hit */
-	bool AttackIsStunning(int damagetype) const;
 	/* check if the actor is silenced - for casting purposes */
 	bool CheckSilenced() const;
 	/* check and perform a cleave movement */
