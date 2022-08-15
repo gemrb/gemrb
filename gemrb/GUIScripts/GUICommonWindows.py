@@ -1630,8 +1630,9 @@ def OpenWaitForDiscWindow (disc_num):
 
 def CheckLevelUp(pc):
 	if GameCheck.IsGemRBDemo ():
-		return
-	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))
+		return False
+		
+	return LUCommon.CanLevelUp (pc)
 
 def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
