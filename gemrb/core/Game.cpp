@@ -713,7 +713,7 @@ Map *Game::GetMap(const ResRef &areaname, bool change)
 
 bool Game::MasterArea(const ResRef &area) const
 {
-	for (auto ma : mastarea) {
+	for (const auto& ma : mastarea) {
 		if (ma == area) {
 			return true;
 		}
@@ -890,7 +890,7 @@ bool Game::CheckForReplacementActor(size_t i)
 	}
 
 	ResRef newcre = "****"; // default table value
-	for (auto nl : npclevels) {
+	for (const auto& nl : npclevels) {
 		if (act->GetScriptName().BeginsWith(nl[0]) && level > 2) {
 			// the tables have entries only up to level 24
 			ieDword safeLevel = static_cast<ieDword>(npclevels[0].size());
@@ -1873,7 +1873,7 @@ void Game::CastOnRest() const
 				Actor *tar = GetPC(ps, true);
 				while (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0) && wholeparty.back().hpneeded > 0) {
 					tar->DirectlyCastSpell(tar, specialSpell.resref, 0, 1, true);
-					for (auto injuree : wholeparty) {
+					for (auto& injuree : wholeparty) {
 						injuree.hpneeded -= CastOnRestHealingAmount(tar, specialSpell);
 					}
 				}
