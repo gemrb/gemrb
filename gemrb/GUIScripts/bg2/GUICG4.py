@@ -163,6 +163,8 @@ def OnLoad():
 	HasStrExtra = CommonTables.Classes.GetValue(ClassName, "STREXTRA", GTV_INT)
 
 	KitIndex = Abclasrq.GetRowIndex(KitName)
+	if KitIndex == None:
+		KitIndex = 9999999 # for broken mods / installs; both tables have 0 defaults which work fine
 
 	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4, "GUICG")
