@@ -13738,6 +13738,12 @@ void GUIScript::AssignViewAttributes(PyObject* obj, View* view) const
 	static PyObject* windowClass = PyDict_GetItemString(pGUIClasses, "GWindow");
 	
 	PyObject_SetAttrString(obj, "Flags", DecRef(PyLong_FromLong, view->Flags()));
+	Window* win = view->GetWindow();
+	if (win) {
+		PyObject* pywin = ConstructObjectForScriptable(win->GetScriptingRef());
+		PyObject_SetAttrString(obj, "Window", pywin);
+		Py_DecRef(pywin);
+	}
 	
 	if (PyObject_IsInstance(obj, controlClass)) {
 		const Control* ctl = static_cast<Control*>(view);
