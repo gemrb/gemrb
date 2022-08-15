@@ -1224,11 +1224,8 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	// check if we reached a new level
 	ieDword pc = actor->InParty;
 	if (pc && !actor->GotLUFeedback) {
-		const std::string& varName = fmt::format("CheckLevelUp{}", pc);
-		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", pc, true);
-		ieDword NeedsLevelUp = 0;
-		core->GetDictionary()->Lookup(varName, NeedsLevelUp);
-		if (NeedsLevelUp == 1) {
+		auto ret = core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", pc, true);
+		if (ret.Value<bool>()) {
 			displaymsg->DisplayConstantStringName(HCStrings::LevelUp, GUIColors::WHITE, actor);
 			actor->GotLUFeedback = true;
 			core->SetEventFlag(EF_PORTRAIT);
