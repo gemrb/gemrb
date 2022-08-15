@@ -13611,7 +13611,7 @@ void GUIScript::AssignViewAttributes(PyObject* obj, View* view) const
 	}
 }
 
-PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
+PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref) const
 {
 	if (!ref) return RuntimeError("Cannot construct object with null ref.");
 
@@ -13629,7 +13629,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	return obj;
 }
 
-PyObject* GUIScript::ConstructObject(const std::string& pyclassname, ScriptingId id)
+PyObject* GUIScript::ConstructObject(const std::string& pyclassname, ScriptingId id) const
 {
 	PyObject* kwargs = Py_BuildValue("{s:K}", "ID", id);
 	PyObject* ret = gs->ConstructObject(pyclassname, NULL, kwargs);
@@ -13637,7 +13637,7 @@ PyObject* GUIScript::ConstructObject(const std::string& pyclassname, ScriptingId
 	return ret;
 }
 
-PyObject* GUIScript::ConstructObject(const std::string& pyclassname, PyObject* pArgs, PyObject* kwArgs)
+PyObject* GUIScript::ConstructObject(const std::string& pyclassname, PyObject* pArgs, PyObject* kwArgs) const
 {
 	std::string classname = "G" + pyclassname;
 	if (!pGUIClasses) {
