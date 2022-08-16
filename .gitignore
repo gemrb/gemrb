@@ -31,5 +31,6 @@ xcuserdata
 .vscode
 
 **/gemrb_path.txt
+**/gemrb_console.txt
 **/GemRB.log
 build_debug/
