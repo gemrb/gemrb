@@ -1243,12 +1243,6 @@ def GetActorClassTitle (actor, ClassIndex):
 		return 0
 	return ClassTitle
 
-# overriding the one in GUICommon, since we use a different table and animations
-def GetActorPaperDoll (actor):
-	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
-	return GemRB.GetAvatarsValue (actor, level)
-
-
 SelectionChangeHandler = None
 SelectionChangeMultiHandler = None ##relates to floatmenu
 

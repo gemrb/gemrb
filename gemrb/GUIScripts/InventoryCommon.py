@@ -35,7 +35,6 @@ ItemAmountWindow = None
 ItemIdentifyWindow = None
 ItemAbilitiesWindow = None
 ErrorWindow = None
-ColorPicker = None
 StackAmount = 0
 
  # A map that defines which inventory slots are used per character (PST)
@@ -692,109 +691,6 @@ def UpdateSlot (pc, slot):
 		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
 	return SlotType
-
-def CancelColor():
-	global ColorPicker
-	if ColorPicker:
-		ColorPicker.Close ()
-	InventoryWindow = GemRB.GetView ("WIN_INV")
-	InventoryWindow.Focus ()
-	return
-
-def ColorDonePress():
-	"""Saves the selected colors."""
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	if ColorPicker:
-		ColorPicker.Close ()
-
-	ColorTable = GemRB.LoadTable ("clowncol")
-	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
-	if ColorIndex==0:
-		GUICommon.SetColorStat (pc, IE_HAIR_COLOR, PickedColor)
-	elif ColorIndex==1:
-		GUICommon.SetColorStat (pc, IE_SKIN_COLOR, PickedColor)
-	elif ColorIndex==2:
-		GUICommon.SetColorStat (pc, IE_MAJOR_COLOR, PickedColor)
-	else:
-		GUICommon.SetColorStat (pc, IE_MINOR_COLOR, PickedColor)
-	UpdateInventoryWindow ()
-	return
-
-def HairPress():
-	global ColorIndex, PickedColor
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	ColorIndex = 0
-	PickedColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR, 1) & 0xFF
-	GetColor()
-	return
-
-def SkinPress():
-	global ColorIndex, PickedColor
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	ColorIndex = 1
-	PickedColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR, 1) & 0xFF
-	GetColor()
-	return
-
-def MajorPress():
-	"""Selects the major color."""
-	global ColorIndex, PickedColor
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	ColorIndex = 2
-	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF
-	GetColor()
-	return
-
-def MinorPress():
-	"""Selects the minor color."""
-	global ColorIndex, PickedColor
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	ColorIndex = 3
-	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
-	GetColor()
-	return
-
-def GetColor():
-	"""Opens the color selection window."""
-
-	global ColorPicker
-
-	ColorTable = GemRB.LoadTable ("clowncol")
-	InventoryWindow = GemRB.GetView ("WIN_INV")
-	InventoryWindow.SetDisabled (True) #darken it
-	ColorPicker = GemRB.LoadWindow (3)
-	GemRB.SetVar ("Selected",-1)
-	if GameCheck.IsIWD2 () or GameCheck.IsGemRBDemo ():
-		Button = ColorPicker.GetControl (35)
-		Button.OnPress (CancelColor)
-		Button.SetText (103)
-		if GameCheck.IsIWD2 ():
-			Button.SetText (13727)
-
-	for i in range (34):
-		Button = ColorPicker.GetControl (i)
-		MyColor = ColorTable.GetValue (ColorIndex, i)
-		if MyColor == "*":
-			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			continue
-		if PickedColor == MyColor:
-			GemRB.SetVar ("Selected",i)
-			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			Button.MakeEscape()
-		else:
-			Button.SetBAM ("COLGRAD", 2, 0, MyColor)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetVarAssoc ("Selected",i)
-		Button.OnPress (ColorDonePress)
-	ColorPicker.Focus()
-	return
 
 def ReleaseFamiliar ():
 	"""Simple Use Item"""

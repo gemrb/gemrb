@@ -80,20 +80,6 @@ def OpenFloatMenuWindow (point):
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
-def GetActorPaperDoll (actor):
-	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID)
-	level = GemRB.GetPlayerStat (actor, IE_ARMOR_TYPE)
-	row = "0x%04X" %anim_id
-	which = "LEVEL%d" %(level+1)
-	doll = CommonTables.Pdolls.GetValue (row, which)
-	if doll == "*":
-		# guess a name
-		import GUICommonWindows
-		doll = GUICommonWindows.GetActorPaperDoll (actor) + "INV"
-		if not GemRB.HasResource (doll, RES_BAM):
-			print("GetActorPaperDoll: Missing paper doll for animation", row, which, doll)
-	return doll
-
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
 

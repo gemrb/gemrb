@@ -26,6 +26,8 @@ import GUICommon
 import GUICommonWindows
 import CommonTables
 import InventoryCommon
+import PaperDoll
+
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -57,16 +59,21 @@ def InitInventoryWindow (Window):
 		Button.SetBorder (2, color, 0, 1)
 
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
+		
+	def SelectColor(stat):
+		pc = GemRB.GameGetSelectedPCSingle()
+		Picker = PaperDoll.SelectColorForPC(stat, pc, "GUIINV")
+		Picker.SetAction (lambda: GemRB.SetPlayerStat(pc, stat, Picker.GetVar("PickedColor")), ACTION_WINDOW_CLOSED)
 
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MajorPress)
+	Button.OnPress (lambda: SelectColor(IE_MAJOR_COLOR))
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MinorPress)
+	Button.OnPress (lambda: SelectColor(IE_MINOR_COLOR))
 	Button.SetTooltip (12008)
 
 	#portrait
@@ -166,25 +173,18 @@ def RefreshInventoryWindow (Window):
 	size = CommonTables.Pdolls.GetValue (row, "SIZE")
 
 	if size == "*":
-		Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
+		Button.SetPLT (PaperDoll.GetActorPaperDoll (pc),
 			-1, 0, 0, 0, 0, 0, 0, 0, 0)
 	else:
-		Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
-		Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-		Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-		Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
-		Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
-		Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
-		Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-		Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
-			Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
+		stats = PaperDoll.ColorStatsFromPC(pc)
+		Button.SetPLT (PaperDoll.GetActorPaperDoll (pc), stats, 0)
 
 		# Weapon
 		slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
 		if slot_item:
 			item = GemRB.GetItem (slot_item["ItemResRef"])
 			if (item['AnimationType'] != ''):
-				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
+				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 1)
 
 		# Shield
 		slot_item = GemRB.GetSlotItem (pc, 3)
@@ -194,17 +194,17 @@ def RefreshInventoryWindow (Window):
 			if (item['AnimationType'] != ''):
 				if (GemRB.CanUseItemType (SLOT_WEAPON, itemname)):
 					#off-hand weapon
-					Button.SetPLT("WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+					Button.SetPLT("WP" + size + item['AnimationType'] + "OIN", stats, 2)
 				else:
 					#shield
-					Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+					Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 2)
 
 		# Helmet
 		slot_item = GemRB.GetSlotItem (pc, 1)
 		if slot_item:
 			item = GemRB.GetItem (slot_item["ItemResRef"])
 			if (item['AnimationType'] != ''):
-				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
+				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 3)
 
 	# encumbrance
 	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)

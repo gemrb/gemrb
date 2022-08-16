@@ -25,6 +25,8 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import InventoryCommon
+import PaperDoll
+
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -59,23 +61,23 @@ def InitInventoryWindow (Window):
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MajorPress)
+	Button.OnPress (PaperDoll.PickColor)
 	Button.SetTooltip ("Major color")
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MinorPress)
+	Button.OnPress (PaperDoll.PickColor)
 	Button.SetTooltip ("Minor color")
 
 	#hair & skin color
 	Button = Window.GetControl (82)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.HairPress)
+	Button.OnPress (PaperDoll.PickColor)
 	Button.SetTooltip ("Hair color")
 
 	Button = Window.GetControl (83)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.SkinPress)
+	Button.OnPress (PaperDoll.PickColor)
 	Button.SetTooltip ("Skin color")
 
 	# paperdoll

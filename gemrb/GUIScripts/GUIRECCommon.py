@@ -21,6 +21,8 @@ import GemRB
 import GameCheck
 import GUICommon
 import Portrait
+import PaperDoll
+
 from GUIDefines import *
 from ie_stats import IE_SEX, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
 from ie_restype import RES_WAV
@@ -61,7 +63,6 @@ OldVoiceSet = None
 Gender = None
 
 def OpenCustomizeWindow ():
-	import GUIREC
 	global CustomizeWindow, ScriptsTable, Gender
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -71,7 +72,6 @@ def OpenCustomizeWindow ():
 		Exportable = 0
 
 	ScriptsTable = GemRB.LoadTable ("SCRPDESC")
-	GUIREC.ColorTable = GemRB.LoadTable ("CLOWNCOL")
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
 	CustomizeWindow = GemRB.LoadWindow (17)
 
@@ -88,7 +88,7 @@ def OpenCustomizeWindow ():
 	if not GameCheck.IsIWD2():
 		ColorButton = CustomizeWindow.GetControl (2)
 		ColorButton.SetText (10646)
-		ColorButton.OnPress (GUIREC.OpenColorWindow)
+		ColorButton.OnPress (lambda: PaperDoll.OpenPaperDollWindow(pc))
 		if not Exportable:
 			ColorButton.SetState (IE_GUI_BUTTON_DISABLED)
 
