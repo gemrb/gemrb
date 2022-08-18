@@ -677,22 +677,24 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 	PyObject* col = nullptr;
 	int type = -1;
 	PARSE_ARGS(args, "OOO|i", &self, &row, &col, &type);
-
-	if (!PyObject_TypeCheck( row, Py_TYPE(col))) {
-		return AttributeError("RowIndex/RowString and ColIndex/ColString must be the same type.");
-	}
-
+	
 	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
+	
+	auto GetIndex = [&tm](PyObject* obj, bool row) -> TableMgr::index_t {
+		if (PyUnicode_Check(obj)) {
+			auto str = PyString_AsStringView(obj);
+			return row ? tm->GetRowIndex(str) : tm->GetColumnIndex(str);
+		} else if (PyLong_Check(obj)) {
+			return static_cast<TableMgr::index_t>(PyLong_AsLong(obj));
+		}
+		return -1; // will read default value
+	};
+	
+	TableMgr::index_t rowIdx = GetIndex(row, true);
+	TableMgr::index_t colIdx = GetIndex(col, false);
 
-	std::string ret;
-	if (PyObject_TypeCheck(row, &PyUnicode_Type)) {
-		ret = tm->QueryField(PyString_AsStringView(row), PyString_AsStringView(col));
-	} else {
-		TableMgr::index_t rowIdx = static_cast<TableMgr::index_t>(PyLong_AsLong(row));
-		TableMgr::index_t colIdx = static_cast<TableMgr::index_t>(PyLong_AsLong(col));
-		ret = tm->QueryField(rowIdx, colIdx);
-	}
+	std::string ret = tm->QueryField(rowIdx, colIdx);
 
 	switch (type) {
 		case 0: // string
