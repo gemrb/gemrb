@@ -54,7 +54,7 @@ cache:
 before_build:
 - ps: |-
     pushd c:\projects\gemrb
-    exit 1
+
     $git_version = (git rev-parse --short HEAD) | Out-String
     $env:archive_file = -join("gemrb-win32-", $git_version.Trim(), ".zip")
     $env:archive_path = -join("c:\projects\gemrb\", $env:archive_file)
@@ -89,6 +89,7 @@ before_build:
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 build_script:
 - ps: |-
+    exit 1
     pushd c:\projects\gemrb
     cmake --build . -j 2 --config Release
 after_build:
