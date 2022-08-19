@@ -110,7 +110,12 @@ after_build:
 test_script:
 - ps: |-
     if ($env:gl -ne "OpenGL") {
+      pwd
+      ls
+      echo "******************************"
       cd $env:archive_source
+      pwd
+      ls
       cp GemRB.cfg.sample GemRB.cfg.bots
       echo GamePath=minimal >> GemRB.cfg.bots
       echo GameType=test >> GemRB.cfg.bots
