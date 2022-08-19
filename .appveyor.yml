@@ -105,11 +105,6 @@ after_build:
 
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
       popd
-      pushd $env:archive_source
-      cp GemRB.cfg.sample GemRB.cfg.bots0
-      Add-Content -Path GemRB.cfg.bots0 -Encoding ascii -Value "GamePath=minimal"
-      Add-Content -Path GemRB.cfg.bots0 -Encoding ascii -Value "GameType=test"
-      popd
       7z a -tzip $env:archive_path $env:archive_source
     }
 test_script:
@@ -120,7 +115,7 @@ test_script:
       Add-Content -Path GemRB.cfg.bots -Encoding ascii -Value "GamePath=minimal"
       Add-Content -Path GemRB.cfg.bots -Encoding ascii -Value "GameType=test"
 
-      #./gemrb.exe -q -c GemRB.cfg.bots
+      ./gemrb.exe -q -c GemRB.cfg.bots
       rm GemRB.cfg.bots
     }
 artifacts:
