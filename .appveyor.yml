@@ -107,8 +107,8 @@ after_build:
       popd
       pushd $env:archive_source
       cp GemRB.cfg.sample GemRB.cfg.bots0
-      echo GamePath=minimal >> GemRB.cfg.bots0
-      echo GameType=test >> GemRB.cfg.bots0
+      Add-Content -Path GemRB.cfg.bots0 -Encoding ascii -Value "GamePath=minimal"
+      Add-Content -Path GemRB.cfg.bots0 -Encoding ascii -Value "GameType=test"
       popd
       7z a -tzip $env:archive_path $env:archive_source
     }
@@ -117,8 +117,8 @@ test_script:
     if ($env:gl -ne "OpenGL") {
       cd $env:archive_source
       cp GemRB.cfg.sample GemRB.cfg.bots
-      echo GamePath=minimal >> GemRB.cfg.bots
-      echo GameType=test >> GemRB.cfg.bots
+      Add-Content -Path GemRB.cfg.bots -Encoding ascii -Value "GamePath=minimal"
+      Add-Content -Path GemRB.cfg.bots -Encoding ascii -Value "GameType=test"
 
       #./gemrb.exe -q -c GemRB.cfg.bots
       rm GemRB.cfg.bots
