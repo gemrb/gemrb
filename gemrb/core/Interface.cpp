@@ -4277,6 +4277,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	ieDword stat = sym->GetValue(StringView(stat_name));
 	if (stat==(ieDword) ~0) {
 		Log(WARNING, "Core", "Cannot translate symbol: {}", stat_name);
+		stat = 0; // dont let the overflow happen
 	}
 	return stat;
 }
