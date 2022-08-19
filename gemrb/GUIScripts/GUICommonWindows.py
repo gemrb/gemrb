@@ -1551,6 +1551,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		button.OnRightPress (OpenInventoryWindowClick)
 		button.OnPress (PortraitButtonOnPress)
 		button.OnShiftPress (PortraitButtonOnShiftPress)
+		button.SetAction (PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
 		button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
@@ -1714,6 +1715,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 
 		Button.OnPress (PortraitButtonOnPress)
 		Button.OnShiftPress (PortraitButtonOnShiftPress)
+		Button.SetAction (PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
 		Button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		Button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
