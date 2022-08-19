@@ -34,6 +34,11 @@
 
 namespace GemRB {
 
+// silence bogus warning
+#ifdef _MSC_VER
+#pragma warning(disable : 4146)
+#endif
+
 class GEM_EXPORT RNG {
 	private:
 	RNG();
@@ -93,5 +98,9 @@ inline bool RandomFlip() noexcept {
 }
 
 }
+
+#ifdef _MSC_VER
+#pragma warning(default : 4146)
+#endif
 
 #endif
