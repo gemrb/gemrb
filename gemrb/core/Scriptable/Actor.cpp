@@ -7088,10 +7088,15 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				damage -= resisted;
 			} else {
 				int resistance = (signed)GetSafeStat(it->second.resist_stat);
-				// avoid buggy data
-				if ((unsigned)abs(resistance) > maximum_values[it->second.resist_stat]) {
-					resistance = 0;
-					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value ({}).", resistance);
+				// sanity check
+				if (it->second.resist_stat <= MAX_STATS) {
+					// avoid buggy data
+					if ((unsigned)abs(resistance) > maximum_values[it->second.resist_stat]) {
+						resistance = 0;
+						Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value ({}).", resistance);
+					}
+				} else {
+					Log(ERROR, "resist_stat overflow: ", "{}", it->second.resist_stat);
 				}
 				resisted += (int) (damage * resistance/100.0);
 				damage -= resisted;
