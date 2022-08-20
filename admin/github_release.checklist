@@ -16,6 +16,7 @@ Beta testing:
 - [ ] Playthrough: bg1 prologue
 - [ ] Playthrough: iwd1 prologue
 - [ ] Playthrough: pst to exit of Mortuary
+- [ ] Playthrough: our demo
 - [ ] Ideally a full game runthrough of one of the compleatable games
 
 Release:
@@ -56,7 +57,6 @@ cp Linux/$(ls Linux/ -1rt | tail -n1) ../Releases/$version/gemrb-linux-v$version
 ```
 
   - [ ] Mark release builds as OS defaults on SourceForge as appropriate; mark the source for everyone else
-  - [ ] (optional) regenerate android build
   - [ ] Test downloads
 - [ ] Runtime tests of release packages
 - [ ] Announce on
@@ -73,3 +73,4 @@ Post-release:
 - [ ] Run `admin/restart_news.sh` to restart the NEWS cycle
 - [ ] If the manpage changed (`git log v0.8.6.. gemrb.6.in`), adapt the web copy (pandoc can convert it to markdown)
 - [ ] Close old milestone
+- [ ] update bug report template version numbers

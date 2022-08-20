@@ -1,27 +1,23 @@
 ******************* WEBSITE NEWS ***************************
 GemRB 0.9.0 released!
 
-The [url=https://gemrb.org]GemRB[/url] team is proud to announce a new (minor) release.
+The GemRB team is proud to announce a new (minor) release.
 
 (short description of major changes)
 
-Currently only the sources and some packages are available. You can get them from [url=https://gemrb.org/Install]here[/url].
+Sources and packages are available. You can get them from [here](https://gemrb.org/Install).
 
 Full changelog digest:
-[code]
-NEWS entry
-[/code]
+NEWS entry (indented to be formatted as code)
 
 Thanks to everyone that contributed their time, including:
 git shortlog -s $PREVIOUS_VERSION_TAG.. gets just the committers, so
 https://github.com/mntnr/name-your-contributors is preferred, eg.
-../node_modules/.bin/name-your-contributors -o gemrb -a 2021-06-02 | grep -B1 name
+  export GITHUB_TOKEN=<get a token first>
+  ../node_modules/.bin/name-your-contributors -o gemrb -a 2021-06-02 | grep -B1 name
 and then prefer real names to nicks, clean up and dedupe the list, sort.
 
-export GITHUB_TOKEN=<get a token first>
-node_modules/.bin/name-your-contributors -o gemrb -a 2019-11-24 | grep -B1 name | sort -u
-
-(Optionally link or copy also the release notes)
+(**Notes to packagers:**)
 
 If you want to be notified of GemRB releases via email, subscribe to the
 [gemrb-release](https://sourceforge.net/projects/gemrb/lists/gemrb-release)
@@ -29,20 +25,26 @@ mailing list.
 
 ******************* FORUM ***************************
 
-Example: https://www.gibberlings3.net/forums/topic/32780-gemrb-088-released-the-calm-before-the-storm-edition/
+The GemRB team is proud to announce a new release.
+
+Check out the details here:
+<link to news item on our page>
 
 ******************* MODDING RING ********************
-For the modding news blurb, just
-- add the short description of major changes
-- link to the website news post
 
-Example: https://www.gibberlings3.net/forums/topic/32779-gemrb-v088-released/
+The GemRB team announces the availability of GemRB a.b.c!
+
+GemRB is a portable open-source implementation of Bioware’s Infinity Engine.
+
+(short description of major changes)
+
+More in the full release announcement:
+<link to news item on our page>
 
 ******************* SOURCEFORGE *********************
-For SF, just replace the code tags with ~~~.
+For SF, just fix the syntax as needed.
 
 https://sourceforge.net/p/gemrb/news/new
-
 
 ******************* gemrb-release *********************
 
