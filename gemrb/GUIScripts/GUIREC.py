@@ -952,7 +952,7 @@ def OpenKitInfoWindow ():
 			else:
 				text = CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[1], "index"), "DESC_REF", GTV_REF)
 	
-			text += "\n"
+			text += "\n\n"
 			if Dual[0] == 3:
 				text += CommonTables.KitList.GetValue (Dual[2], 3, GTV_REF)
 			else:
