@@ -135,7 +135,7 @@ def UpdateOverview(CurrentStep):
 	for tbl in ['races', 'classes', 'aligns', 'ability', 'skillsta', 'skills', 'featreq', 'feats']:
 		Tables.append(GemRB.LoadTable(tbl))
 	
-	if GemRB.GetVar('Gender') is not None:
+	if GemRB.GetVar('Gender') > 0:
 		name = GemRB.GetToken('CHARNAME')
 		if not name:
 			TextAreaControl.SetText(12135)
@@ -147,22 +147,22 @@ def UpdateOverview(CurrentStep):
 		strref = 1049 + GemRB.GetVar('Gender')
 		AddText(strref, 1)
 	
-	if GemRB.GetVar('Race') is not None:
+	if GemRB.GetVar('Race') > 0:
 		AddText(1048)
 		AddText(': ')
 		AddText(Tables[0].GetValue(Tables[0].FindValue(3, GemRB.GetVar('Race')), 2), 1)
 	
-	if GemRB.GetVar('Class') is not None:
+	if GemRB.GetVar('Class') > 0:
 		AddText(11959)
 		AddText(': ')
 		AddText(Tables[1].GetValue(GemRB.GetVar('Class') - 1, 0), 1)
 	
-	if GemRB.GetVar('Alignment') is not None:
+	if GemRB.GetVar('Alignment') > 0:
 		AddText(11958)
 		AddText(': ')
 		AddText(Tables[2].GetValue(GemRB.GetVar('Alignment') - 1, 0), 1)
 	
-	if GemRB.GetVar('Ability 0') is not None:
+	if GemRB.GetVar('Ability 0') > 0:
 		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]', 1)
 		for i in range(0, 6):
 			strref = Tables[3].GetValue(i, 2)
