@@ -91,8 +91,9 @@ GUIScript *GemRB::gs = NULL;
 struct UsedItemType {
 	ResRef itemname;
 	ieVariable username; //death variable
-	ieStrRef value;
+	std::vector<ieStrRef> feedback;
 	int flags;
+	ieStrRef GetFeedback() const { return feedback[RAND(0UL, feedback.size() - 1)]; }
 };
 
 using EventNameType = FixedSizeString<16>;
@@ -7893,8 +7894,12 @@ static void ReadUsedItems()
 			if (IsStar(UsedItems[i].username)) {
 				UsedItems[i].username.Reset();
 			}
-			//this is an strref
-			UsedItems[i].value = table->QueryFieldAsStrRef(i, 1);
+			// this is an strref, potentially more than one
+			auto refs = Explode<StringView, std::string>(table->QueryField(i, 1));
+			for (auto& ref : refs) {
+				ieStrRef complaint = static_cast<ieStrRef>(strtounsigned<ieDword>(ref.c_str()));
+				UsedItems[i].feedback.push_back(complaint);
+			}
 			//1 - named actor cannot remove it
 			//2 - anyone else cannot equip it
 			//4 - can only swap it for something else
@@ -9316,7 +9321,7 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 			break;
 		}
 
-		displaymsg->DisplayString(usedItem.value, GUIColors::WHITE, STRING_FLAGS::SOUND);
+		displaymsg->DisplayString(usedItem.GetFeedback(), GUIColors::WHITE, STRING_FLAGS::SOUND);
 		return 1;
 	}
 	return 0;

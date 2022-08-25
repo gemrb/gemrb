@@ -2,13 +2,10 @@
 *
            USER       STRREF     FLAG
 AVEST      ANNAH      59142      7
-JER_BR     ANNAH      61795      7
-           ANNAH      61796      7
-JER_FS     ANNAH      61797      7
-           ANNAH      61798      7
+JER_BR     ANNAH      61795,61796      7
+JER_FS     ANNAH      61797,61798      7
 ZERTH      DAKKON     59143      7
-           GRACE      59144      7
-BOD_PQ     GRACE      59145      7
+BOD_PQ     GRACE      59144,59145      7
 BOD_GP     GRACE      59146      7
 CHASTITY   GRACE      59147      7
 VHAILOR    VHAILOR    59148      7
