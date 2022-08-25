@@ -558,7 +558,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 	int qsave = 0;
 
 	if (tab) {
-		slotname = tab->QueryField(index);
+		slotname = tab->QueryField(index, 0);
 		qsave = tab->QueryFieldSigned<int>(index, 1);
 	}
 

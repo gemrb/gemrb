@@ -51,7 +51,7 @@ public:
 	index_t GetColumnCount(index_t row = 0) const override;
 	/** Returns a pointer to a zero terminated 2da element,
 		if it cannot return a value, it returns the default */
-	const std::string& QueryField(index_t row = 0, index_t column = 0) const override;
+	const std::string& QueryField(index_t row, index_t column) const override;
 	const std::string& QueryDefault() const override;
 
 	index_t GetRowIndex(const key_t& string) const override;

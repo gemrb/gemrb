@@ -181,7 +181,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			playmode *= 3;
 		}
 
-		newGame->CurrentArea = tm->QueryField(playmode);
+		newGame->CurrentArea = tm->QueryField(playmode, 0);
 	}
 
 	//Loading PCs
