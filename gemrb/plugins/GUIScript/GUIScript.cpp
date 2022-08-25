@@ -93,7 +93,7 @@ struct UsedItemType {
 	ieVariable username; //death variable
 	std::vector<ieStrRef> feedback;
 	int flags;
-	ieStrRef GetFeedback() const { return feedback[RAND(0UL, feedback.size() - 1)]; }
+	ieStrRef GetFeedback() const { return feedback[RAND<size_t>(0, feedback.size() - 1)]; }
 };
 
 using EventNameType = FixedSizeString<16>;
