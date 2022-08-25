@@ -4164,7 +4164,7 @@ class PolymorphStats {
 		data.resize(tab->GetRowCount());
 		TableMgr::index_t rowCount = static_cast<TableMgr::index_t>(data.size());
 		for (TableMgr::index_t i = 0; i < rowCount; ++i) {
-			data[i] = core->TranslateStat(tab->QueryField(i, 0).c_str());
+			data[i] = core->TranslateStat(tab->QueryField(i, 0));
 		}
 	}
 	

@@ -1863,7 +1863,7 @@ static void InitActorTables()
 			//we need the MULTIPLE and MAX_LEVEL columns
 			//MULTIPLE: the FEAT_* stat index
 			//MAX_LEVEL: how many times it could be taken
-			stat = core->TranslateStat(tm->QueryField(i,0).c_str());
+			stat = core->TranslateStat(tm->QueryField(i, 0));
 			if (stat>=MAX_STATS) {
 				Log(WARNING, "Actor", "Invalid stat value in featreq.2da");
 			}
@@ -2177,7 +2177,7 @@ static void InitActorTables()
 				int val;
 				// the stat and ability columns need conversion into numbers
 				if (j < 2) {
-					val = core->TranslateStat(tm->QueryField(i, j).c_str());
+					val = core->TranslateStat(tm->QueryField(i, j));
 					if (j == 0) {
 						stat2skill[val] = i;
 					}
@@ -2278,7 +2278,7 @@ static void InitActorTables()
 				avPrefix[i].avresref = tm->QueryField(i + 1);
 				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
-					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0).c_str());
+					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
 				} else {
 					avPrefix[i].stat = -1;
 				}

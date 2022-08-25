@@ -700,7 +700,7 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 		case 0: // string
 			return PyString_FromStringObj(ret);
 		case 2:
-			return PyLong_FromLong(core->TranslateStat(ret.c_str()));
+			return PyLong_FromLong(core->TranslateStat(ret));
 		default:
 			long val;
 			bool valid = valid_signednumber(ret.c_str(), val);

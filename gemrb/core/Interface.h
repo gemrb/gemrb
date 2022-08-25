@@ -700,7 +700,7 @@ public:
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
 	std::vector<ieDword>* GetListFrom2DA(const ResRef& resref);
 	/** translates a stat symbol to numeric value */
-	ieDword TranslateStat(const char *stat_name);
+	ieDword TranslateStat(const std::string& statName);
 	/** resolves a stat bonus based on multiple stats */
 	int ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieDword flags = 0, int value = 0);
 	/** Opens CD prompt window and waits for the specified disc */

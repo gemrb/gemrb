@@ -551,7 +551,7 @@ bool Interface::ReadDamageTypeTable() {
 	DamageInfoStruct di;
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
 		di.strref = DisplayMessage::GetStringReference(tm->QueryFieldUnsigned<uint16_t>(i, 0));
-		di.resist_stat = TranslateStat(tm->QueryField(i, 1).c_str());
+		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2).c_str(), nullptr, 16);
 		di.iwd_mod_type = tm->QueryFieldSigned<int>(i, 3);
 		di.reduction = tm->QueryFieldSigned<int>(i, 4);
@@ -4262,10 +4262,10 @@ std::vector<ieDword>* Interface::GetListFrom2DA(const ResRef& tablename)
 }
 
 //returns a numeric value associated with a stat name (symbol) from stats.ids
-ieDword Interface::TranslateStat(const char *stat_name)
+ieDword Interface::TranslateStat(const std::string& statName)
 {
 	ieDword tmp;
-	if (valid_unsignednumber(stat_name, tmp)) {
+	if (valid_unsignednumber(statName.c_str(), tmp)) {
 		return tmp;
 	}
 
@@ -4274,9 +4274,9 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	if (!sym) {
 		error("Core", "Cannot load statistic name mappings.");
 	}
-	ieDword stat = sym->GetValue(StringView(stat_name));
+	ieDword stat = sym->GetValue(statName);
 	if (stat==(ieDword) ~0) {
-		Log(WARNING, "Core", "Cannot translate symbol: {}", stat_name);
+		Log(WARNING, "Core", "Cannot translate symbol: {}", statName);
 	}
 	return stat;
 }
@@ -4302,7 +4302,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 		ResRef subTableName = mtm->GetRowName(i);
 		int checkcol = mtm->QueryFieldSigned<int>(i,1);
 		unsigned int readcol = mtm->QueryFieldUnsigned<unsigned int>(i,2);
-		int stat = TranslateStat(mtm->QueryField(i,0).c_str());
+		int stat = TranslateStat(mtm->QueryField(i, 0));
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
 		}

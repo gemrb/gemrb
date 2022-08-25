@@ -730,7 +730,7 @@ void GameData::ReadSpellProtTable()
 	TableMgr::index_t rowCount = tab->GetRowCount();
 	spellProt.resize(rowCount);
 	for (TableMgr::index_t i = 0; i < rowCount; ++i) {
-		ieDword stat = core->TranslateStat(tab->QueryField(i, 0).c_str());
+		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
 		spellProt[i].stat = (ieWord) stat;
 		spellProt[i].value = tab->QueryFieldUnsigned<ieDword>(i, 1);
 		spellProt[i].relation = tab->QueryFieldUnsigned<ieWord>(i, 2);
@@ -1039,7 +1039,7 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 		TableMgr::index_t tableCount = table->GetRowCount();
 		itemUse.resize(tableCount);
 		for (TableMgr::index_t i = 0; i < tableCount; i++) {
-			itemUse[i].stat = static_cast<ieByte>(core->TranslateStat(table->QueryField(i, 0).c_str()));
+			itemUse[i].stat = static_cast<ieByte>(core->TranslateStat(table->QueryField(i, 0)));
 			itemUse[i].table = table->QueryField(i, 1);
 			itemUse[i].mcol = table->QueryFieldUnsigned<ieByte>(i, 2);
 			itemUse[i].vcol = table->QueryFieldUnsigned<ieByte>(i, 3);

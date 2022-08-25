@@ -60,7 +60,7 @@ private:
 
 			spellfocus.resize(schoolcount);
 			for (TableMgr::index_t i = 0; i < schoolcount; i++) {
-				ieDword stat = core->TranslateStat(tm->QueryField(i, 0).c_str());
+				ieDword stat = core->TranslateStat(tm->QueryField(i, 0));
 				ieDword val1 = tm->QueryFieldUnsigned<ieDword>(i, 1);
 				ieDword val2 = tm->QueryFieldUnsigned<ieDword>(i, 2);
 				spellfocus[i].stat = stat;
