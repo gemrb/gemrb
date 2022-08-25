@@ -1403,7 +1403,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_PST_STAND:
-			NewResRef.Format("{}{}{}", ResRefBase[0], "STD", ResRefBase[1]);
+			NewResRef.Format("{}STD{}{}{}{}", ResRefBase[0], ResRefBase[1], ResRefBase[2], ResRefBase[3], ResRefBase[4]);
 			Cycle = SixteenToFive[Orient];
 			break;
 		case IE_ANI_PST_GHOST: // pst static animations
