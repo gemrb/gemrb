@@ -1694,7 +1694,8 @@ void Projectile::DrawTravel(const Region& viewport)
 		// distance travelled along the line, from 0.0 to 1.0
 		double travelled = travelled_distance / total_distance;
 		if (travelled > 1.0) {
-			error("Projectile", "Travelled over full distance ({} = {} / {})! Origin: {}, Destination: {}, Pos: {}", travelled, travelled_distance, total_distance, Origin, Destination, Pos);
+			Log(WARNING, "Projectile", "Travelled over full distance ({} = {} / {})! Origin: {}, Destination: {}, Pos: {}", travelled, travelled_distance, total_distance, Origin, Destination, Pos);
+			travelled = 1.0;
 		}
 
 		// input to sin(): 0 to pi gives us an arc
