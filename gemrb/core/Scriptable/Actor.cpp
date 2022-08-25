@@ -2275,10 +2275,10 @@ static void InitActorTables()
 				avStance = -1;
 			}
 			for (size_t i = 0; i < avPrefix.size(); i++) {
-				avPrefix[i].avresref = tm->QueryField(i + 1);
+				avPrefix[i].avresref = tm->QueryField(i + 1, 0);
 				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
-					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
+					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0, 0));
 				} else {
 					avPrefix[i].stat = -1;
 				}
