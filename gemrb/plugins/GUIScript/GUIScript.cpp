@@ -5352,11 +5352,10 @@ Works only in PST.\n\
 
 static PyObject* GemRB_GameIsBeastKnown(PyObject * /*self*/, PyObject * args)
 {
-	int index;
-	PARSE_ARGS( args,  "i", &index );
+	unsigned int index;
+	PARSE_ARGS(args, "I", &index);
 
 	GET_GAME();
-
 	return PyLong_FromLong(game->IsBeastKnown(index));
 }
 
