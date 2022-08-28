@@ -1699,7 +1699,7 @@ def UpdatePortraitWindow ():
 	Window = GemRB.GetView("PORTWIN")
 	Window.Focus(None)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar ("BARTER_PC")
 	Inventory = GemRB.GetVar ("Inventory")
 	GSFlags = GemRB.GetGUIFlags()
 	indialog = GSFlags & GS_DIALOG
@@ -1758,7 +1758,7 @@ def UpdatePortraitWindow ():
 			talk = bytearray([154]) # dialog icon
 			store = bytearray([155]) # shopping icon
 
-			if pc == pcID and GemRB.GetStore() != None:
+			if pc == pcID:
 				flag = store
 			# talk icon
 			elif GemRB.GameGetSelectedPCSingle(1) == pcID:

@@ -6846,6 +6846,12 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	core->SetCurrentStore(ResRefFromPy(StoreResRef), 0);
 
 	core->SetEventFlag(EF_OPENSTORE);
+	
+	const Actor *actor = core->GetFirstSelectedPC(false);
+	if (actor) {
+		core->GetDictionary()->SetAt("BARTER_PC", actor->InParty);
+	}
+	
 	Py_RETURN_NONE;
 }
 
@@ -6869,6 +6875,7 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	core->CloseCurrentStore();
 	core->ResetEventFlag(EF_OPENSTORE);
 	core->SetEventFlag(EF_PORTRAIT);
+	core->GetDictionary()->SetAt("BARTER_PC", ieDword(-1));
 	Py_RETURN_NONE;
 }
 
