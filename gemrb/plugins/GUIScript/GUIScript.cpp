@@ -5874,9 +5874,9 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 
 	const Actor* MyActor = game->FindPC(PlayerSlot);
 	if (!MyActor) {
-		return PyLong_FromLong(0);
+		Py_RETURN_FALSE;
 	}
-	return PyLong_FromLong(MyActor->IsSelected());
+	return PyBool_FromLong(MyActor->IsSelected());
 }
 
 
