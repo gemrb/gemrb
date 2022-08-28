@@ -381,7 +381,7 @@ void Interface::HandleEvents()
 	}
 	if (EventFlag&EF_OPENSTORE) {
 		EventFlag&=~EF_OPENSTORE;
-		guiscript->RunFunction( "GUISTORE", "OpenStoreWindow" );
+		guiscript->RunFunction( "GUISTORE", "OpenStore" );
 		return;
 	}
 
