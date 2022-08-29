@@ -38,6 +38,7 @@ If applicable, add screenshots to help explain your problem.
 
 GemRB version (check as many as you know apply)
 - [ ] master as of this issue
+- [ ] 0.9.1
 - [ ] 0.9.0
 - [ ] 0.8.8
 
