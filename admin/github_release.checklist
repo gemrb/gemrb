@@ -21,20 +21,20 @@ Beta testing:
 
 Release:
 - [ ] Finalise choice of version number, eg. v1.2.3
-- [ ] Update version number in `gemrb/includes/globals.h`
-- [ ] Final `NEWS` update
 - [ ] Amend Roadmap in contributing.md
-- [ ] Create the source tarball with `make dist`
-  - [ ] Add any missing files to the cmake install targets and recreate the tarball
-  - [ ] Add any new files from fetch-demo-data to the cmake dist target
-  - [ ] Add any new extranoeus files to `.gitattributes` and recreate
-  - [ ] Build it and run the minimal test or more: `gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample`
-- [ ] Add a git tag and push it
+- [ ] Final `NEWS` update
+- [ ] Update version number in `gemrb/includes/globals.h`
+- [ ] Add a git tag and push it (make sure to push together with something else, so the build won't be skipped)
     ```
         ver=0.8.2
         git tag -a -m "GemRB $ver" v$ver
         git push origin v$ver
     ```
+- [ ] Create the source tarball with `make dist`
+  - [ ] Add any missing files to the cmake install targets and recreate the tarball
+  - [ ] Add any new files from fetch-demo-data to the cmake dist target
+  - [ ] Add any new extranoeus files to `.gitattributes` and recreate
+  - [ ] Build it and run the minimal test or more: `gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample`
 
 Deployment:
 - [ ] Promote the new tag to a release on GitHub
@@ -61,11 +61,12 @@ cp Linux/$(ls Linux/ -1rt | tail -n1) ../Releases/$version/gemrb-linux-v$version
 - [ ] Runtime tests of release packages
 - [ ] Announce on
   - [ ] homepage: _config (bump version), index, news, potentially features/status, install (recheck the new links)
-  - [ ] Gibberlings3 forums
+  - Gibberlings3 forums
     - [ ] GemRB forum
     - [ ] modding news
-  - [ ] SourceForge project news section
+  - [ ] SourceForge project news section and gemrb-release mailing list
   - [ ] #GemRB in channel and title; Discord channel if it doesn't propagate there automatically
+  - [ ] New Wikidata release entry and ref: https://www.wikidata.org/wiki/Q1988298
 
 Post-release:
 - [ ] Run `admin/guidoc_wikifier.sh` (no params needed) and upload the new docs
