@@ -1,17 +1,15 @@
-GemRB git (a0c5a385):
+GemRB v0.9.1 (2022-08-29):
   New features:
-    - 
     - iwd2 can be progressed to well into chapter 5
     - faster loading and saving, faster OpenGL rendering
     - Use magic device skill, precise shot, iwd1 bard song choice
+    - SDLAudio plugin now supports ambients
     - console history is now preserved, more text colors externalized
     - logging is now done via fmt (bundled headers)
-    - SDLAudio plugin now supports ambients
 
   Improved features:
-    - 
-    - unicode support (iconv not optional any more!)
     - python3 support (now the only option)
+    - unicode support (iconv not optional any more!)
     - spellcaster ai, effects, scripting, projectiles, weapon style customization
     - audio, drawing, appimage, ini spawns
     - bugfixes
