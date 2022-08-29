@@ -682,7 +682,7 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 	
-	if (!Py_IsNone(row) && !Py_IsNone(col) && !PyObject_TypeCheck(row, Py_TYPE(col))) {
+	if (row != Py_None && col != Py_None && !PyObject_TypeCheck(row, Py_TYPE(col))) {
 		return AttributeError("RowIndex/RowString and ColIndex/ColString must be the same type.");
 	}
 	
