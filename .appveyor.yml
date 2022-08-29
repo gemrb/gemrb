@@ -2,6 +2,8 @@ version: build-{build}
 branches:
   only:
   - master
+  - /v\d+\.\d+\.\d+/
+
 image: Visual Studio 2019
 configuration: Release
 clone_depth: 1
