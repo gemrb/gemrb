@@ -33,7 +33,7 @@
 
 #include <cmath>
 
-#define VERSION_GEMRB "0.9.0-git"
+#define VERSION_GEMRB "0.9.1"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 #define PACKAGE "GemRB"
