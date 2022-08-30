@@ -2261,7 +2261,7 @@ int fx_set_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_set_stun_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	//actually the original engine just skips this effect if the target is dead
-	if ( STATE_GET(STATE_DEAD) ) {
+	if (STATE_GET(STATE_DEAD) || core->InCutSceneMode()) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -3898,6 +3898,7 @@ int fx_movement_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//iwd2 aegis doesn't protect against grease/acid fog slowness, but that is
 	//definitely a bug
 	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
+	if (core->InCutSceneMode()) return FX_APPLIED;
 
 	// bg1 crashes on 13+, 9&10 are equal to 8 and 11 (boots of speed) equals to roughly 15.6 #129
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS) && fx->Parameter2 == MOD_ABSOLUTE) {
@@ -5777,6 +5778,8 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 		}
 	}
+
+	if (core->InCutSceneMode()) return FX_APPLIED;
 
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_MAZE);
