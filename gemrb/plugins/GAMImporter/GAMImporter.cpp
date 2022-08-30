@@ -791,13 +791,12 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
 			} else {
 				tmpname = MakeVariable(name);
-				StringToUpper(tmpname);
 			}
 		} else {
 			tmpname = MakeVariable(name);
 		}
 
-		stream->WriteVariable(tmpname);
+		stream->WriteVariableUC(tmpname);
 		stream->WriteFilling(8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
@@ -849,7 +848,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	stream->WriteDword(NPCCount);
 	stream->WriteDword(GlobalOffset);
 	stream->WriteDword(GlobalCount);
-	stream->WriteResRefLC(game->CurrentArea);
+	stream->WriteResRefUC(game->CurrentArea);
 	stream->WriteDword(game->CurrentLink);
 	stream->WriteDword(JournalCount);
 	stream->WriteDword(JournalOffset);
@@ -862,7 +861,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	case GAM_VER_TOB:
 	case GAM_VER_IWD2:
 		stream->WriteDword(game->Reputation);
-		stream->WriteResRefLC(game->CurrentArea);
+		stream->WriteResRefUC(game->CurrentArea);
 		stream->WriteDword(game->ControlStatus);
 		stream->WriteDword(game->Expansion);
 		stream->WriteDword(FamiliarsOffset);
@@ -1040,18 +1039,18 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	stream->WriteDword(ac->PCStats->KillsTotalXP);
 	stream->WriteDword(ac->PCStats->KillsTotalCount);
 	for (const auto& favouriteSpell : ac->PCStats->FavouriteSpells) {
-		stream->WriteResRef(favouriteSpell);
+		stream->WriteResRefUC(favouriteSpell);
 	}
 	for (unsigned short& favCount : ac->PCStats->FavouriteSpellsCount) {
 		stream->WriteWord(favCount);
 	}
 	for (const auto& favouriteWeapon : ac->PCStats->FavouriteWeapons) {
-		stream->WriteResRef(favouriteWeapon);
+		stream->WriteResRefUC(favouriteWeapon);
 	}
 	for (unsigned short& favCount : ac->PCStats->FavouriteWeaponsCount) {
 		stream->WriteWord(favCount);
 	}
-	stream->WriteResRef(ac->PCStats->SoundSet);
+	stream->WriteResRefUC(ac->PCStats->SoundSet);
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
 		stream->WriteVariableLC(ac->PCStats->SoundFolder);
 	}
