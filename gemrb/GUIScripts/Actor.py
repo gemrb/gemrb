@@ -115,7 +115,7 @@ class Actor:
 
 		if self.__dualswap == None:
 			self.__dualswap = (self.isdual & CommonTables.Classes.GetValue \
-				(self.ClassNames()[0], "MC_WAS_ID", 1)) > 0
+				(self.ClassNames()[0], "MC_WAS_ID", GTV_INT)) > 0
 		return self.__dualswap
 
 	def KitIndex (self):
