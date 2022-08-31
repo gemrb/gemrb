@@ -112,8 +112,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		newGame->WhichFormation = 0;
 	}
 	str->ReadDword(newGame->PartyGold);
-	//npc count in party???
-	str->ReadWord(newGame->NPCAreaViewed); //in ToB this is named 'nPCAreaViewed'
+	str->ReadWord(newGame->NPCAreaViewed); // area of selected PC (overrides stored CurrentArea); in ToB this is named 'nPCAreaViewed'
 	str->ReadWord(newGame->WeatherBits);
 	str->ReadDword(PCOffset);
 	str->ReadDword(PCCount);
@@ -834,9 +833,14 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 		}
 	}
 	stream->WriteDword(game->PartyGold);
-	// we don't need this field, since you can only save if everyone is in the same area
-	ieWord tmp = static_cast<ieWord>(PCCount) - 1;
-	stream->WriteWord(tmp);
+	ieWord NPCAreaViewed = -1;
+	for (const auto& actor : game->selected) {
+		if (actor->InParty) {
+			NPCAreaViewed = actor->InParty - 1;
+			break;
+		}
+	}
+	stream->WriteWord(NPCAreaViewed);
 	stream->WriteWord(game->WeatherBits);
 	stream->WriteDword(PCOffset);
 	stream->WriteDword(PCCount);
