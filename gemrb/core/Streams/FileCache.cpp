@@ -31,11 +31,6 @@ namespace GemRB {
 
 DataStream* CacheCompressedStream(DataStream *stream, const std::string& filename, int length, bool overwrite)
 {
-	if (!core->IsAvailable(PLUGIN_COMPRESSION_ZLIB)) {
-		Log(ERROR, "FileCache", "No Compression Manager Available. Cannot Load Compressed File.");
-		return NULL;
-	}
-
 	char fname[_MAX_PATH];
 	ExtractFileFromPath(fname, filename.c_str());
 	char path[_MAX_PATH];
