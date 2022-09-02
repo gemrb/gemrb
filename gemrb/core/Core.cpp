@@ -69,8 +69,8 @@ Point RotatePoint(const Point& p, double angle)
 /** Calculates distance between 2 points */
 unsigned int Distance(const Point &p, const Point &q)
 {
-	long x = ( p.x - q.x );
-	long y = ( p.y - q.y );
+	long x = p.x - q.x;
+	long y = p.y - q.y;
 	return (unsigned int) std::hypot(x, y);
 }
 
@@ -85,24 +85,24 @@ unsigned int SquaredDistance(const Point &p, const Point &q)
 /** Calculates distance squared from a point to a scriptable */
 unsigned int SquaredMapDistance(const Point &p, const Scriptable *b)
 {
-	long x = ( p.x/16 - b->Pos.x/16 );
-	long y = ( p.y/12 - b->Pos.y/12 );
+	long x = p.x / 16 - b->Pos.x / 16;
+	long y = p.y / 12 - b->Pos.y / 12;
 	return (unsigned int)(x*x + y*y);
 }
 
 /** Calculates distance between 2 points */
 unsigned int Distance(const Point &p, const Scriptable *b)
 {
-	long x = ( p.x - b->Pos.x );
-	long y = ( p.y - b->Pos.y );
+	long x = p.x - b->Pos.x;
+	long y = p.y - b->Pos.y;
 	return (unsigned int) std::hypot(x, y);
 }
 
 constexpr int DistanceFactor = 4; // ignore angle, go for the bigger size between [3, 4]
 unsigned int PersonalDistance(const Point &p, const Scriptable *b)
 {
-	long x = ( p.x - b->Pos.x );
-	long y = ( p.y - b->Pos.y );
+	long x = p.x - b->Pos.x;
+	long y = p.y - b->Pos.y;
 	int ret = (int) std::hypot(x, y);
 	if (b->Type==ST_ACTOR) {
 		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * DistanceFactor;
@@ -114,8 +114,8 @@ unsigned int PersonalDistance(const Point &p, const Scriptable *b)
 constexpr int SquaredDistanceFactor = 14; // ignore angle, roughly middle of an elliptic [9, 16]
 unsigned int SquaredPersonalDistance(const Point &p, const Scriptable *b)
 {
-	long x = ( p.x - b->Pos.x );
-	long y = ( p.y - b->Pos.y );
+	long x = p.x - b->Pos.x;
+	long y = p.y - b->Pos.y;
 	int ret = static_cast<int>(x * x + y * y);
 	if (b->Type==ST_ACTOR) {
 		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * SquaredDistanceFactor;
@@ -127,16 +127,16 @@ unsigned int SquaredPersonalDistance(const Point &p, const Scriptable *b)
 /** Calculates map distance between 2 scriptables */
 unsigned int SquaredMapDistance(const Scriptable *a, const Scriptable *b)
 {
-	long x = (a->Pos.x/16 - b->Pos.x/16 );
-	long y = (a->Pos.y/12 - b->Pos.y/12 );
+	long x = a->Pos.x / 16 - b->Pos.x / 16;
+	long y = a->Pos.y / 12 - b->Pos.y / 12;
 	return (unsigned int)(x*x + y*y);
 }
 
 /** Calculates distance between 2 scriptables */
 unsigned int Distance(const Scriptable *a, const Scriptable *b)
 {
-	long x = ( a->Pos.x - b->Pos.x );
-	long y = ( a->Pos.y - b->Pos.y );
+	long x = a->Pos.x - b->Pos.x;
+	long y = a->Pos.y - b->Pos.y;
 	return (unsigned int) std::hypot(x, y);
 }
 
@@ -149,8 +149,8 @@ unsigned int SquaredDistance(const Scriptable *a, const Scriptable *b)
 /** Calculates distance between 2 scriptables, including feet circle if applicable */
 unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b)
 {
-	long x = ( a->Pos.x - b->Pos.x );
-	long y = ( a->Pos.y - b->Pos.y );
+	long x = a->Pos.x - b->Pos.x;
+	long y = a->Pos.y - b->Pos.y;
 	int ret = (int) std::hypot(x, y);
 	if (a->Type==ST_ACTOR) {
 		ret -= static_cast<const Actor*>(a)->CircleSize2Radius() * DistanceFactor;
@@ -164,8 +164,8 @@ unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b)
 
 unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b)
 {
-	long x = ( a->Pos.x - b->Pos.x );
-	long y = ( a->Pos.y - b->Pos.y );
+	long x = a->Pos.x - b->Pos.x;
+	long y = a->Pos.y - b->Pos.y;
 	int ret = static_cast<int>(x * x + y * y);
 	if (a->Type==ST_ACTOR) {
 		ret -= static_cast<const Actor*>(a)->CircleSize2Radius() * SquaredDistanceFactor;
