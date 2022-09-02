@@ -6310,12 +6310,46 @@ int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, i
 	int prof = gamedata->GetRacialTHAC0Bonus(wi.prof, GetRaceName());
 
 	if (third) {
+		if (!dualWielding) return prof;
+
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
 		// it is limited to shortswords and daggers, which also have this flag set
 		// the bonus is applied to both hands
-		if (dualWielding && weaponInfo[1].wflags & WEAPON_FINESSE) {
+		if (weaponInfo[1].wflags & WEAPON_FINESSE) {
 			prof += 2;
 		}
+
+		// rangers wearing light or no armor gain ambidexterity and
+		// two-weapon-fighting feats for free
+		bool ambidextrous = HasFeat(FEAT_AMBIDEXTERITY);
+		bool twoWeaponFighting = HasFeat(FEAT_TWO_WEAPON_FIGHTING);
+		if (GetRangerLevel()) {
+			ieWord armorType = inventory.GetArmorItemType();
+			if (GetArmorWeightClass(armorType) <= 1) {
+				ambidextrous = true;
+				twoWeaponFighting = true;
+			}
+		}
+
+		// FIXME: externalise
+		// penalites and boni for both hands:
+		// -6 main, -10 off with no adjustments
+		//  0 main, +4 off with ambidexterity
+		// +2 main, +2 off with two weapon fighting
+		// +2 main, +2 off with a simple weapons in the off hand
+		// so a minimum penalty of -2, -2
+		if (twoWeaponFighting) {
+			prof += 2;
+		}
+		if (wi.wflags & WEAPON_LEFTHAND) {
+			prof -= 6;
+		} else {
+			prof -= 10;
+			if (ambidextrous) {
+				prof += 4;
+			}
+		}
+
 		return prof;
 	}
 
@@ -6457,37 +6491,6 @@ int Actor::GetToHit(ieDword Flags, const Actor *target)
 		} else {
 			generic = GetStat(IE_HITBONUSRIGHT);
 			attacknum--; // remove 1, since it is for the other hand (otherwise we would never use the max tohit for this hand)
-		}
-		if (third) {
-			// rangers wearing light or no armor gain ambidexterity and
-			//  two-weapon-fighting feats for free
-			bool ambidextrous = HasFeat(FEAT_AMBIDEXTERITY);
-			bool twoWeaponFighting = HasFeat(FEAT_TWO_WEAPON_FIGHTING);
-			if (GetRangerLevel()) {
-				ieWord armorType = inventory.GetArmorItemType();
-				if (GetArmorWeightClass(armorType) <= 1) {
-					ambidextrous = true;
-					twoWeaponFighting = true;
-				}
-			}
-
-			// FIXME: externalise
-			// penalites and boni for both hands:
-			// -6 main, -10 off with no adjustments
-			//  0 main, +4 off with ambidexterity
-			// +2 main, +2 off with two weapon fighting
-			// +2 main, +2 off with a simple weapons in the off hand (handled in GetCombatDetails)
-			if (twoWeaponFighting) {
-				prof += 2;
-			}
-			if (Flags&WEAPON_LEFTHAND) {
-				prof -= 6;
-			} else {
-				prof -= 10;
-				if (ambidextrous) {
-					prof += 4;
-				}
-			}
 		}
 	}
 	ToHit.SetProficiencyBonus(ToHit.GetProficiencyBonus()+prof);
