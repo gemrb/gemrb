@@ -694,6 +694,7 @@ Map *Game::GetMap(const ResRef &areaname, bool change)
 	MapIndex = index;
 	area = GetMap(index);
 	CurrentArea = areaname;
+	if (area->MasterArea) LastMasterArea = areaname;
 	// change the tileset if needed
 	area->ChangeMap(IsDay());
 	area->SetupAmbients();

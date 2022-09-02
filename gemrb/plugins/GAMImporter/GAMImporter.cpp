@@ -124,7 +124,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	str->ReadDword(NPCCount);
 	str->ReadDword(GlobalOffset);
 	str->ReadDword(GlobalCount);
-	str->ReadResRef( newGame->CurrentArea );
+	str->ReadResRef(newGame->LastMasterArea); // this is the 'master area', different for subareas
 	str->ReadDword(newGame->CurrentLink);//in ToB this is named 'currentLink'
 	str->ReadDword(JournalCount);
 	str->ReadDword(JournalOffset);

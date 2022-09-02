@@ -277,6 +277,7 @@ public:
 	ResRef AnotherArea;
 	ResRef CurrentArea;
 	ResRef PreviousArea; //move here if the worldmap exit is illegal?
+	ResRef LastMasterArea; // last party-visited master area
 	ResRef LoadMos;
 	ResRef TextScreen;
 	Particles *weather = nullptr;

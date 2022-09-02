@@ -2499,7 +2499,9 @@ void GameControl::ChangeMap(const Actor *pc, bool forced)
 		if (pc) {
 			game->GetMap(pc->Area, true);
 		} else {
+			ResRef oldMaster = game->LastMasterArea; // only update it for party travel
 			game->GetMap(game->CurrentArea, true);
+			game->LastMasterArea = oldMaster;
 		}
 
 		if (!core->InCutSceneMode()) {
