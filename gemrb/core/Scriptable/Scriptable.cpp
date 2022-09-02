@@ -1657,6 +1657,16 @@ void Selectable::SetBBox(const Region &newBBox)
 	BBox = newBBox;
 }
 
+// NOTE: still need to multiply by 4 or 3 to get full pixel radii
+int Selectable::CircleSize2Radius() const
+{
+	// for size >= 2, radii are (size-1)*16, (size-1)*12
+	// for size == 1, radii are 12, 9
+	int adjustedSize = (circleSize - 1) * 4;
+	if (adjustedSize < 4) adjustedSize = 3;
+	return adjustedSize;
+}
+
 void Selectable::DrawCircle(const Point& p) const
 {
 	/* BG2 colours ground circles as follows:
@@ -1689,13 +1699,8 @@ void Selectable::DrawCircle(const Point& p) const
 	if (sprite) {
 		core->GetVideoDriver()->BlitSprite(sprite, Pos - p);
 	} else {
-		// for size >= 2, radii are (size-1)*16, (size-1)*12
-		// for size == 1, radii are 12, 9
-		int csize = (circleSize - 1) * 4;
-		if (csize < 4) csize = 3;
-
-		core->GetVideoDriver()->DrawEllipse( Pos - p,
-		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col);
+		float baseSize = CircleSize2Radius() * sizeFactor;
+		core->GetVideoDriver()->DrawEllipse(Pos - p, (ieWord) (baseSize * 4), (ieWord) (baseSize * 3), *col);
 	}
 }
 

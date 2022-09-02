@@ -391,8 +391,7 @@ void GameControl::DrawTargetReticle(int size, const Color& color, const Point& p
 
 void GameControl::DrawTargetReticle(const Movable* target, const Point& p) const
 {
-	int size = std::max((target->circleSize - 1) * 4, 3);
-
+	int size = target->CircleSize2Radius();
 	const Color& green = target->selectedColor;
 	const Color& color = (target->Over) ? GlobalColorCycle.Blend(target->overColor, green) : green;
 

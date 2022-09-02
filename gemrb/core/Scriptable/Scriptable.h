@@ -443,6 +443,7 @@ public:
 	bool IsSelected() const;
 	void Select(int Value);
 	void SetCircle(int size, float, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
+	int CircleSize2Radius() const;
 };
 
 class GEM_EXPORT Highlightable : public Scriptable {
