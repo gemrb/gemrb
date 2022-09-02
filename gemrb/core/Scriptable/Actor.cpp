@@ -2888,17 +2888,19 @@ int Actor::GetProficiency(ieByte proftype) const
 	case 255: // -1, no proficiency
 		return 0;
 	default:
-		//bg1 style proficiencies
-		if(proftype>=0 && proftype<=IE_EXTRAPROFICIENCY20-IE_PROFICIENCYBASTARDSWORD) {
-			return GetStat(IE_PROFICIENCYBASTARDSWORD+proftype);
+		// bg2 actually supported both styles of proficiencies, so take whichever is better
+		// bg1 style proficiencies
+		stat_t prof = 0;
+		if (proftype >= 0 && proftype <= IE_EXTRAPROFICIENCY20 - IE_PROFICIENCYBASTARDSWORD) {
+			prof = GetStat(IE_PROFICIENCYBASTARDSWORD + proftype);
 		}
 
-		//bg2 style proficiencies
+		// bg2 style proficiencies
 		// iwd2 feat-based ones are in the same range as IE_FEAT_BOW == IE_PROFICIENCYBASTARDSWORD
-		if (proftype>=IE_PROFICIENCYBASTARDSWORD && proftype<=IE_EXTRAPROFICIENCY20) {
-			return GetStat(proftype);
+		if (proftype >= IE_PROFICIENCYBASTARDSWORD && proftype <= IE_EXTRAPROFICIENCY20) {
+			prof = std::max(prof, GetStat(proftype));
 		}
-		return 0;
+		return int(prof);
 	}
 }
 
