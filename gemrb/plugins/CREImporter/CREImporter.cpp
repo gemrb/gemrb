@@ -1023,7 +1023,7 @@ void CREImporter::GetActorPST(Actor *act)
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
-	//last byte is actually an undead level (according to IE dev info)
+	// last byte is actually an undead level (according to IE dev info) - IE_UNDEADLEVEL
 	for (int i = 0; i < 21; i++) {
 		str->Read( &tmpByte, 1 );
 		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
