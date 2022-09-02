@@ -6480,7 +6480,6 @@ int Actor::MeleePenalty() const
 int Actor::GetToHit(ieDword Flags, const Actor *target)
 {
 	int generic = 0;
-	int prof = 0;
 	int attacknum = attackcount;
 
 	//get our dual wielding modifier
@@ -6493,7 +6492,6 @@ int Actor::GetToHit(ieDword Flags, const Actor *target)
 			attacknum--; // remove 1, since it is for the other hand (otherwise we would never use the max tohit for this hand)
 		}
 	}
-	ToHit.SetProficiencyBonus(ToHit.GetProficiencyBonus()+prof);
 
 	// set up strength/dexterity boni
 	GetTHAbilityBonus(Flags);
