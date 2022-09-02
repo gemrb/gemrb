@@ -2891,7 +2891,7 @@ int Actor::GetProficiency(ieByte proftype) const
 		// bg2 actually supported both styles of proficiencies, so take whichever is better
 		// bg1 style proficiencies
 		stat_t prof = 0;
-		if (proftype >= 0 && proftype <= IE_EXTRAPROFICIENCY20 - IE_PROFICIENCYBASTARDSWORD) {
+		if (proftype <= IE_EXTRAPROFICIENCY20 - IE_PROFICIENCYBASTARDSWORD) {
 			prof = GetStat(IE_PROFICIENCYBASTARDSWORD + proftype);
 		}
 
