@@ -2880,12 +2880,12 @@ void Actor::RefreshEffects()
 	RefreshEffects(first, ResetStats(first));
 }
 
-int Actor::GetProficiency(int proftype) const
+int Actor::GetProficiency(ieByte proftype) const
 {
 	switch(proftype) {
-	case -2: //hand to hand old style
+	case 254: // -2, hand to hand old style
 		return 1;
-	case -1: //no proficiency
+	case 255: // -1, no proficiency
 		return 0;
 	default:
 		//bg1 style proficiencies
@@ -2894,6 +2894,7 @@ int Actor::GetProficiency(int proftype) const
 		}
 
 		//bg2 style proficiencies
+		// iwd2 feat-based ones are in the same range as IE_FEAT_BOW == IE_PROFICIENCYBASTARDSWORD
 		if (proftype>=IE_PROFICIENCYBASTARDSWORD && proftype<=IE_EXTRAPROFICIENCY20) {
 			return GetStat(proftype);
 		}
@@ -6275,8 +6276,7 @@ int Actor::GetNonProficiencyPenalty(int stars) const
 	int prof = 0;
 
 	// iwd2 mode ... but everyone is proficient with fists
-	// cheesily limited to party only (10gob hits it - practically can't hit you otherwise)
-	if (InParty && !inventory.FistsEquipped()) {
+	if (!inventory.FistsEquipped()) {
 		prof += wspecial->QueryFieldSigned<int>(stars, 0);
 	}
 
