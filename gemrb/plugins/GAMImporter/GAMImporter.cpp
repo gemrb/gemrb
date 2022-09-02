@@ -132,7 +132,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		default:
 			MazeOffset = 0;
 			str->ReadDword(newGame->Reputation);
-			str->ReadResRef( newGame->CurrentArea ); // FIXME: this is the 'master area'
+			str->ReadResRef(newGame->CurrentArea);
 			newGame->AnotherArea = newGame->CurrentArea;
 			str->ReadDword(newGame->ControlStatus);
 			str->ReadDword(newGame->Expansion);
@@ -189,6 +189,11 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		str->Seek( PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
 		newGame->JoinParty( actor, actor->Selected?JP_SELECT:0 );
+		// potentially override the current area, now that the pcs are loaded
+		if (newGame->version != GAM_VER_PST && static_cast<ieWord>(actor->InParty - 1) == newGame->NPCAreaViewed) {
+			newGame->CurrentArea = actor->Area;
+			newGame->AnotherArea = newGame->CurrentArea;
+		}
 	}
 
 	//Loading NPCs
@@ -852,7 +857,14 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	stream->WriteDword(NPCCount);
 	stream->WriteDword(GlobalOffset);
 	stream->WriteDword(GlobalCount);
-	stream->WriteResRefUC(game->CurrentArea);
+	ResRef masterArea = game->CurrentArea;
+	if (!game->MasterArea(game->CurrentArea)) {
+		masterArea = game->LastMasterArea; // not necessarily correct
+		if (masterArea.IsEmpty() || !game->MasterArea(masterArea)) {
+			masterArea = game->CurrentArea;
+		}
+	}
+	stream->WriteResRefUC(masterArea);
 	stream->WriteDword(game->CurrentLink);
 	stream->WriteDword(JournalCount);
 	stream->WriteDword(JournalOffset);
@@ -865,7 +877,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	case GAM_VER_TOB:
 	case GAM_VER_IWD2:
 		stream->WriteDword(game->Reputation);
-		stream->WriteResRefUC(game->CurrentArea);
+		stream->WriteResRefUC(masterArea); // current area, but usually overriden via NPCAreaViewed
 		stream->WriteDword(game->ControlStatus);
 		stream->WriteDword(game->Expansion);
 		stream->WriteDword(FamiliarsOffset);
