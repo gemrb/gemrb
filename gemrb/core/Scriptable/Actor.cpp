@@ -6269,105 +6269,68 @@ int Actor::GetStars(stat_t proficiency) const
 	return stars;
 }
 
-bool Actor::GetCombatDetails(int& tohit, bool leftorright, \
-		int& DamageBonus, int& speed, int& CriticalBonus, int& style, const Actor* target)
+// iwd2 adds a -4 nonprof penalty, while others have values that differ by class
+int Actor::GetNonProficiencyPenalty(int stars) const
 {
-	SetBaseAPRandAB(true);
-	speed = -(int)GetStat(IE_PHYSICALSPEED);
-	ieDword dualwielding = IsDualWielding();
-	WeaponInfo& wi = weaponInfo[leftorright && dualwielding];
-	style = 0;
-	CriticalBonus = 0;
-	const ITMExtHeader* hittingheader = wi.extHeader;
-	if (!hittingheader) return false; // item is unsuitable for a fight
-
-	int THAC0Bonus = hittingheader->THAC0Bonus + wi.launcherTHAC0Bonus;
-	DamageBonus = hittingheader->DamageBonus + wi.launcherDmgBonus;
-
-	if (ReverseToHit) THAC0Bonus = -THAC0Bonus;
-	ToHit.SetWeaponBonus(THAC0Bonus);
-
-	// get our dual wielding modifier
-	if (dualwielding) {
-		if (leftorright) {
-			DamageBonus += GetStat(IE_DAMAGEBONUSLEFT);
-		} else {
-			DamageBonus += GetStat(IE_DAMAGEBONUSRIGHT);
-		}
-	}
-	DamageBonus += GetStat(IE_DAMAGEBONUS);
-	leftorright = leftorright && dualwielding;
-
-	//add in proficiency bonuses
-	ieDword stars = GetProficiency(wi.prof)&PROFS_MASK;
-
-	//tenser's transformation makes the actor proficient in any weapons
-	// also conjured weapons are wielded without penalties
-	if (!stars && (HasSpellState(SS_TENSER) || inventory.MagicSlotEquipped())) {
-		stars = 1;
-	}
-
-	//hit/damage/speed bonuses from wspecial (with tohit inverted in adnd)
-	static TableMgr::index_t wspecialMax = wspecial->GetRowCount() - 1;
-	if (stars > wspecialMax) {
-		stars = wspecialMax;
-	}
-
 	int prof = 0;
-	// iwd2 adds a -4 nonprof penalty (others below, since their table is bad and actual values differ by class)
-	// but everyone is proficient with fists
+
+	// iwd2 mode ... but everyone is proficient with fists
 	// cheesily limited to party only (10gob hits it - practically can't hit you otherwise)
 	if (InParty && !inventory.FistsEquipped()) {
 		prof += wspecial->QueryFieldSigned<int>(stars, 0);
 	}
 
-	wi.profdmgbon = wspecial->QueryFieldSigned<int>(stars, 1);
-	DamageBonus += wi.profdmgbon;
-	// only bg2 wspecial.2da has this column, but all have 0 as the default table value, so this lookup is fine
-	speed += wspecial->QueryFieldSigned<int>(stars, 2);
-	// add non-proficiency penalty, which is missing from the table in non-iwd2
+	// add non-proficiency penalty for the rest of the games
 	// stored negative
 	if (stars == 0 && !third) {
 		ieDword clss = GetActiveClass();
-		//Is it a PC class?
+		// is it a PC class?
 		if (clss < (ieDword) classcount) {
 			// but skip fists, since they don't have a proficiency
 			if (!inventory.FistsEquipped()) {
 				prof += defaultprof[clss];
 			}
 		} else {
-			//it is not clear what is the penalty for non player classes
+			// it is not clear what is the penalty for non player classes
 			prof -= 4;
 		}
 	}
 
+	return prof;
+}
+
+// adds weapon style and weapon-specific proficiency bonuses
+// still ugly due to all the side-effects
+int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, int& speedBonus, int& criticalBonus) const
+{
+	int prof = 0;
 	int styleIdx = -1;
-	if (dualwielding) {
-		//add dual wielding penalty
+	int stars = 0;
+	ieDword dualWielding = IsDualWielding();
+	const WeaponInfo& wi = weaponInfo[leftOrRight && dualWielding];
+	if (dualWielding) {
+		// add dual wielding penalty
 		stars = GetStars(IE_PROFICIENCY2WEAPON);
-
-		style = 1000*stars + IE_PROFICIENCY2WEAPON;
+		style = 1000 * stars + IE_PROFICIENCY2WEAPON;
 		styleIdx = 0;
-		prof += gamedata->GetWeaponStyleBonus(0, stars, leftorright ? 4 : 3);
+		prof += gamedata->GetWeaponStyleBonus(0, stars, leftOrRight ? 4 : 3);
 	} else if (wi.itemflags & IE_INV_ITEM_TWOHANDED && wi.wflags & WEAPON_MELEE) {
-		//add two handed profs bonus
+		// add two handed profs bonus
 		stars = GetStars(IE_PROFICIENCY2HANDED);
-
-		style = 1000*stars + IE_PROFICIENCY2HANDED;
+		style = 1000 * stars + IE_PROFICIENCY2HANDED;
 		styleIdx = 1;
-	} else if (wi.wflags&WEAPON_MELEE) {
+	} else if (wi.wflags & WEAPON_MELEE) {
 		int slot;
-		const CREItem *weapon = inventory.GetUsedWeapon(true, slot);
+		const CREItem* weapon = inventory.GetUsedWeapon(true, slot);
 		if (weapon == nullptr) {
-			//NULL return from GetUsedWeapon means no shield slot
+			// no weapon means no shield slot
 			stars = GetStars(IE_PROFICIENCYSINGLEWEAPON);
-
-			style = 1000*stars + IE_PROFICIENCYSINGLEWEAPON;
+			style = 1000 * stars + IE_PROFICIENCYSINGLEWEAPON;
 			styleIdx = 3;
 		} else {
+			// sword and shield
 			stars = GetStars(IE_PROFICIENCYSWORDANDSHIELD);
-
-			style = 1000*stars + IE_PROFICIENCYSWORDANDSHIELD;
+			style = 1000 * stars + IE_PROFICIENCYSWORDANDSHIELD;
 			styleIdx = 2;
 		}
 	} else {
@@ -6375,19 +6338,13 @@ bool Actor::GetCombatDetails(int& tohit, bool leftorright, \
 	}
 
 	if (styleIdx != -1) {
-		DamageBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, 2);
-		speed += gamedata->GetWeaponStyleBonus(styleIdx, stars, 5);
-		CriticalBonus = gamedata->GetWeaponStyleBonus(styleIdx, stars, 1);
+		damageBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, 2);
+		speedBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, 5);
+		criticalBonus = gamedata->GetWeaponStyleBonus(styleIdx, stars, 1);
 		if (styleIdx != 0) {
 			// right hand bonus; dualwielding was already considered above
 			prof += gamedata->GetWeaponStyleBonus(styleIdx, stars, 3);
 		}
-	}
-
-	// racial enemies suffer 4hp more in all games
-	int favoredEnemy = GetRacialEnemyBonus(target);
-	if (GetRangerLevel() && favoredEnemy) {
-		DamageBonus += favoredEnemy;
 	}
 
 	// Elves get a racial THAC0 bonus with swords and bows, halflings with slings
@@ -6397,21 +6354,82 @@ bool Actor::GetCombatDetails(int& tohit, bool leftorright, \
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
 		// it is limited to shortswords and daggers, which also have this flag set
 		// the bonus is applied to both hands
-		if (dualwielding && weaponInfo[1].wflags & WEAPON_FINESSE) {
+		if (dualWielding && weaponInfo[1].wflags & WEAPON_FINESSE) {
 			prof += 2;
 		}
-	} else {
+	}
+
+	return prof;
+}
+
+bool Actor::GetCombatDetails(int& toHit, bool leftOrRight, int& damageBonus, \
+		int& speed, int& criticalBonus, int& style, const Actor* target)
+{
+	SetBaseAPRandAB(true);
+	ieDword dualwielding = IsDualWielding();
+	WeaponInfo& wi = weaponInfo[leftOrRight && dualwielding];
+	const ITMExtHeader* hittingheader = wi.extHeader;
+	if (!hittingheader) return false; // item is unsuitable for a fight
+
+	int THAC0Bonus = hittingheader->THAC0Bonus + wi.launcherTHAC0Bonus;
+	if (ReverseToHit) THAC0Bonus = -THAC0Bonus;
+	ToHit.SetWeaponBonus(THAC0Bonus);
+
+	damageBonus = hittingheader->DamageBonus + wi.launcherDmgBonus;
+	// get our dual wielding modifier
+	if (dualwielding) {
+		if (leftOrRight) {
+			damageBonus += GetStat(IE_DAMAGEBONUSLEFT);
+		} else {
+			damageBonus += GetStat(IE_DAMAGEBONUSRIGHT);
+		}
+	}
+	damageBonus += GetStat(IE_DAMAGEBONUS);
+
+	// add in proficiency bonuses
+	ieDword stars = GetProficiency(wi.prof)&PROFS_MASK;
+
+	// tenser's transformation makes the actor proficient in any weapons
+	// also conjured weapons are wielded without penalties
+	if (!stars && (HasSpellState(SS_TENSER) || inventory.MagicSlotEquipped())) {
+		stars = 1;
+	}
+
+	// hit/damage/speed bonuses from wspecial (with tohit inverted in adnd)
+	static TableMgr::index_t wspecialMax = wspecial->GetRowCount() - 1;
+	if (stars > wspecialMax) {
+		stars = wspecialMax;
+	}
+
+	wi.profdmgbon = wspecial->QueryFieldSigned<int>(stars, 1);
+	damageBonus += wi.profdmgbon;
+	speed = - (int) GetStat(IE_PHYSICALSPEED);
+	// only bg2 wspecial.2da has this column, but all have 0 as the default
+	// table value, so this lookup is fine
+	speed += wspecial->QueryFieldSigned<int>(stars, 2);
+
+	// racial enemies suffer 4hp more in all games
+	int favoredEnemy = GetRacialEnemyBonus(target);
+	if (GetRangerLevel() && favoredEnemy) {
+		damageBonus += favoredEnemy;
+	}
+
+	style = 0;
+	criticalBonus = 0;
+	int prof = GetNonProficiencyPenalty(stars);
+	prof += GetProficiencyBonus(style, leftOrRight, damageBonus, speed, criticalBonus);
+	if (ReverseToHit) {
 		prof = -prof;
 	}
 	ToHit.SetProficiencyBonus(prof);
 
 	// get the remaining boni
 	// FIXME: merge
-	tohit = GetToHit(wi.wflags, target);
+	toHit = GetToHit(wi.wflags, target);
 
 	//pst increased critical hits
 	if (pstflags && (Modified[IE_STATE_ID]&STATE_CRIT_ENH)) {
-		CriticalBonus--;
+		criticalBonus--;
 	}
 	return true;
 }

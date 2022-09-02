@@ -473,6 +473,8 @@ private:
 	bool IsDualSwap() const;
 	/* returns the weapon proficiency stat of the actor */
 	int GetProficiency(int proftype) const;
+	int GetNonProficiencyPenalty(int stars) const;
+	int GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, int& speedBonus, int& criticalBonus) const;
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
 	void RefreshHP();
