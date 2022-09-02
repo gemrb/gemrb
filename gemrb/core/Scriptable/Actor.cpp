@@ -6303,11 +6303,24 @@ int Actor::GetNonProficiencyPenalty(int stars) const
 // still ugly due to all the side-effects
 int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, int& speedBonus, int& criticalBonus) const
 {
-	int prof = 0;
-	int styleIdx = -1;
-	int stars = 0;
 	ieDword dualWielding = IsDualWielding();
 	const WeaponInfo& wi = weaponInfo[leftOrRight && dualWielding];
+
+	// Elves get a racial THAC0 bonus with swords and bows, halflings with slings
+	int prof = gamedata->GetRacialTHAC0Bonus(wi.prof, GetRaceName());
+
+	if (third) {
+		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
+		// it is limited to shortswords and daggers, which also have this flag set
+		// the bonus is applied to both hands
+		if (dualWielding && weaponInfo[1].wflags & WEAPON_FINESSE) {
+			prof += 2;
+		}
+		return prof;
+	}
+
+	int styleIdx = -1;
+	int stars = 0;
 	if (dualWielding) {
 		// add dual wielding penalty
 		stars = GetStars(IE_PROFICIENCY2WEAPON);
@@ -6344,18 +6357,6 @@ int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, i
 		if (styleIdx != 0) {
 			// right hand bonus; dualwielding was already considered above
 			prof += gamedata->GetWeaponStyleBonus(styleIdx, stars, 3);
-		}
-	}
-
-	// Elves get a racial THAC0 bonus with swords and bows, halflings with slings
-	prof += gamedata->GetRacialTHAC0Bonus(wi.prof, GetRaceName());
-
-	if (third) {
-		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
-		// it is limited to shortswords and daggers, which also have this flag set
-		// the bonus is applied to both hands
-		if (dualWielding && weaponInfo[1].wflags & WEAPON_FINESSE) {
-			prof += 2;
 		}
 	}
 
