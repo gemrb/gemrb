@@ -171,7 +171,7 @@ bool View::IsReceivingEvents() const
 	return getEvents;
 }
 
-void View::DirtyBGRect(const Region& r, bool force)
+void View::DirtyBGRect(const Region& r, bool force) noexcept
 {
 	// no need to draw the parent BG for opaque views
 	if (superView && !IsOpaque()) {
@@ -437,7 +437,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	front->AddedToView(this);
 }
 
-View* View::RemoveSubview(const View* view)
+View* View::RemoveSubview(const View* view) noexcept
 {
 	if (!view || view->superView != this) {
 		return NULL;
@@ -924,7 +924,7 @@ const ViewScriptingRef* View::RemoveScriptingRef(const ViewScriptingRef* ref)
 	return ReplaceScriptingRef(ref, id++, "__DEL__");
 }
 	
-void View::ClearScriptingRefs()
+void View::ClearScriptingRefs() noexcept
 {
 	for (auto rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
 		ViewScriptingRef* ref = *rit;

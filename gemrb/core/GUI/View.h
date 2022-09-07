@@ -101,7 +101,7 @@ protected:
 	unsigned short autoresizeFlags = ResizeNone; // these flags don't produce notifications
 
 private:
-	void DirtyBGRect(const Region&, bool force = false);
+	void DirtyBGRect(const Region&, bool force = false) noexcept;
 	void DrawBackground(const Region*) const;
 	void DrawSubviews();
 	void MarkDirty(const Region*);
@@ -134,7 +134,7 @@ private:
 	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group);
 
 protected:
-	void ClearScriptingRefs();
+	void ClearScriptingRefs() noexcept;
 
 	void ResizeSubviews(const Size& oldsize);
 	
@@ -203,7 +203,7 @@ public:
 	// FIXME: I don't think I like this being virtual. Currently required because ScrollView is "overriding" this
 	// we perhapps should instead have ScrollView implement SubviewAdded and move the view to its contentView there
 	virtual void AddSubviewInFrontOfView(View*, const View* = NULL);
-	View* RemoveSubview(const View*);
+	View* RemoveSubview(const View*) noexcept;
 	View* RemoveFromSuperview();
 	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 	Window* GetWindow() const;
