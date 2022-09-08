@@ -1627,7 +1627,7 @@ static void ReadModalStates()
 	ModalStatesStruct ms;
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
 		ms.spell = table->QueryField(i, 0);
-		strlcpy(ms.action, table->QueryField(i, 1).c_str(), 16);
+		ms.action = table->QueryField(i, 1);
 		ms.entering_str = table->QueryFieldAsStrRef(i, 2);
 		ms.leaving_str = table->QueryFieldAsStrRef(i, 3);
 		ms.failed_str = table->QueryFieldAsStrRef(i, 4);

@@ -291,7 +291,7 @@ struct BABTable {
 
 struct ModalStatesStruct {
 	ResRef spell;
-	char action[16];
+	ieVariable action;
 	ieStrRef entering_str;
 	ieStrRef leaving_str;
 	ieStrRef failed_str;
