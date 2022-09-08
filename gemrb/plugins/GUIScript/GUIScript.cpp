@@ -12986,8 +12986,8 @@ static PyObject* GemRB_GetMazeEntry(PyObject* /*self*/, PyObject* args)
 	return dict;
 }
 
-char gametype_hint[100];
-int gametype_hint_weight;
+std::string gameTypeHint;
+int gameTypeHintWeight = 0;
 
 PyDoc_STRVAR( GemRB_AddGameTypeHint__doc,
 "===== AddGameTypeHint =====\n\
@@ -13012,9 +13012,9 @@ static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
 	int flags = 0;
 	PARSE_ARGS( args, "si|i", &type, &weight, &flags );
 
-	if (weight > gametype_hint_weight) {
-		gametype_hint_weight = weight;
-		strlcpy(gametype_hint, type, sizeof(gametype_hint));
+	if (weight > gameTypeHintWeight) {
+		gameTypeHintWeight = weight;
+		gameTypeHint = type;
 	}
 
 	Py_RETURN_NONE;
@@ -13583,9 +13583,6 @@ bool GUIScript::Autodetect(void)
 	if (!iter)
 		return false;
 
-	gametype_hint[0] = '\0';
-	gametype_hint_weight = 0;
-
 	iter.SetFlags(DirectoryIterator::Directories);
 	do {
 		const char *dirent = iter.GetName();
@@ -13601,9 +13598,9 @@ bool GUIScript::Autodetect(void)
 		//LoadScript(module);
 	} while (++iter);
 
-	if (gametype_hint[0]) {
-		Log(MESSAGE, "GUIScript", "Detected GameType: {}", gametype_hint);
-		core->config.GameType = gametype_hint;
+	if (!gameTypeHint.empty()) {
+		Log(MESSAGE, "GUIScript", "Detected GameType: {}", gameTypeHint);
+		core->config.GameType = gameTypeHint;
 		return true;
 	}
 	else {
