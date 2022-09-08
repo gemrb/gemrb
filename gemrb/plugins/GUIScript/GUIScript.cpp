@@ -7899,7 +7899,7 @@ static void ReadUsedItems()
 			}
 			// this is an strref, potentially more than one
 			auto refs = Explode<StringView, std::string>(table->QueryField(i, 1));
-			for (auto& ref : refs) {
+			for (const auto& ref : refs) {
 				ieStrRef complaint = static_cast<ieStrRef>(strtounsigned<ieDword>(ref.c_str()));
 				UsedItems[i].feedback.push_back(complaint);
 			}
