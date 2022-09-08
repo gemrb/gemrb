@@ -1738,7 +1738,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 
 int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 {
-	char Signature[56];
+	char Signature[9];
 	ieDword tmpDword = 0;
 	ieWord tmpWord = 0;
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
@@ -1754,14 +1754,13 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	stream->WriteDword(time); //lastsaved
 	stream->WriteDword(map->AreaFlags);
 
-	memset(Signature, 0, sizeof(Signature)); //8 bytes 0
-	stream->Write( Signature, 8); //northref
+	stream->WriteFilling(8); // northref
 	stream->WriteDword(tmpDword);
-	stream->Write( Signature, 8); //westref
+	stream->WriteFilling(8); // westref
 	stream->WriteDword(tmpDword);
-	stream->Write( Signature, 8); //southref
+	stream->WriteFilling(8); // southref
 	stream->WriteDword(tmpDword);
-	stream->Write( Signature, 8); //eastref
+	stream->WriteFilling(8); // eastref
 	stream->WriteDword(tmpDword);
 
 	stream->WriteWord(map->AreaType);
@@ -1782,8 +1781,8 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 			tmp[0] = 1;
 		}
 		stream->Write( tmp, 1);
-		stream->Write( Signature, 6);
-		stream->Write( Signature, 8);
+		stream->WriteFilling(6);
+		stream->WriteFilling(8);
 	}
 
 	stream->WriteDword(ActorOffset);
@@ -1811,7 +1810,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	if (s) {
 		stream->WriteResRefLC(s->GetName());
 	} else {
-		stream->Write( Signature, 8);
+		stream->WriteFilling(8);
 	}
 	stream->WriteDword(ExploredBitmapSize);
 	stream->WriteDword(ExploredBitmapOffset);
@@ -1824,13 +1823,11 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	stream->WriteDword(SongHeader);
 	stream->WriteDword(RestHeader);
 	//an empty dword for pst
-	int i;
+	int i = 56;
 	if (pst) {
 		tmpDword = 0xffffffff;
 		stream->WriteDword(tmpDword);
 		i=52;
-	} else {
-		i=56;
 	}
 	stream->WriteDword(NoteOffset);
 	stream->WriteDword(NoteCount);
@@ -1839,7 +1836,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	stream->WriteResRef( map->Dream[0] );
 	stream->WriteResRef( map->Dream[1] );
 	//usually 56 empty bytes (but pst used up 4 elsewhere)
-	stream->Write( Signature, i);
+	stream->WriteFilling(i);
 	return 0;
 }
 

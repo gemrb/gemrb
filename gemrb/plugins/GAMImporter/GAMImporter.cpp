@@ -811,7 +811,7 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 
 int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 {
-	char Signature[10];
+	char Signature[9];
 	ieDword tmpDword;
 
 	strlcpy(Signature, "GAMEV0.0", 9);
@@ -823,14 +823,13 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 		Signature[7]+=game->version%10;
 	}
 	stream->Write( Signature, 8);
-	//using Signature for padding
-	memset(Signature, 0, sizeof(Signature));
+
 	tmpDword = game->GameTime / core->Time.ai_update_time;
 	stream->WriteDword(tmpDword);
 	//pst has a single preset of formations
 	if (game->version==GAM_VER_PST) {
 		stream->WriteWord(game->Formations[0]);
-		stream->Write( Signature, 10);
+		stream->WriteFilling(10);
 	} else {
 		stream->WriteWord(game->WhichFormation);
 		for (const unsigned short& formation : game->Formations) {
