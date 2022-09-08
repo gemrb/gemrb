@@ -512,12 +512,12 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 		flags &= ~DS_CONSOLE;
 	}
 
-	char buffer[_MAX_PATH];
+	ResRef buffer;
 	if (soundpath == nullptr || soundpath[0] == '\0') {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
 		if (!sb.Sound.IsEmpty()) {
-			strlcpy(buffer, sb.Sound.c_str(), sizeof(buffer));
-			soundpath = buffer;
+			buffer = sb.Sound;
+			soundpath = buffer.c_str();
 		}
 		if (!sb.text.empty()) {
 			if (flags & DS_CONSOLE) {
