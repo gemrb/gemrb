@@ -88,17 +88,8 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		table[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4);
 		table[i].AnimationType = Avatars->QueryFieldUnsigned<ieByte>(i,AV_ANIMTYPE);
 		table[i].CircleSize = Avatars->QueryFieldUnsigned<ieByte>(i,AV_CIRCLESIZE);
-		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE).c_str();
-		//QueryField will always return a zero terminated string
-		//so tmp[0] must exist
-		if ( isalpha (tmp[0]) ) {
-			//this is a hack, we store 2 letters on an integer
-			//it was allocated with calloc, so don't bother erasing it
-			strncpy( (char *) &table[i].PaletteType, tmp, 3);
-		}
-		else {
-			table[i].PaletteType = Avatars->QueryFieldUnsigned<unsigned int>(i,AV_USE_PALETTE);
-		}
+		table[i].PaletteType = Avatars->QueryField(i, AV_USE_PALETTE);
+
 		char size = Avatars->QueryField(i,AV_SIZE)[0];
 		if (size == '*') {
 			size = 0;
@@ -269,9 +260,11 @@ int CharAnimations::GetCircleSize() const
 	if (AvatarsRowNum==~0u) return -1;
 	return AvatarTable[AvatarsRowNum].CircleSize;
 }
-int CharAnimations::NoPalette() const
+
+static const ResRef EmptyRef;
+const ResRef& CharAnimations::GetPaletteType() const
 {
-	if (AvatarsRowNum==~0u) return -1;
+	if (AvatarsRowNum == ~0U) return EmptyRef;
 	return AvatarTable[AvatarsRowNum].PaletteType;
 }
 
@@ -320,11 +313,9 @@ void CharAnimations::MaybeUpdateMainPalette(const Animation& anim) {
 	}
 }
 
-static const ResRef EmptySound;
-
 const ResRef &CharAnimations::GetWalkSound() const
 {
-	if(AvatarsRowNum==~0u) return EmptySound;
+	if (AvatarsRowNum == ~0U) return EmptyRef;
 	return AvatarTable[AvatarsRowNum].WalkSound;
 }
 
@@ -517,7 +508,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		return;
 	}
 	
-	int PType = NoPalette();
+	const ResRef& paletteType = GetPaletteType();
 
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
 		// Only do main palette
@@ -564,16 +555,16 @@ void CharAnimations::SetupColors(PaletteType type)
 		} else {
 			ModPartPalettes[PAL_MAIN] = nullptr;
 		}
-	} else if (PType && (type <= PAL_MAIN_5)) {
+	} else if (type <= PAL_MAIN_5 && paletteType != "0" && !paletteType.IsEmpty()) {
 		//handling special palettes like MBER_BL (black bear)
-		if (PType!=1) {
+		if (paletteType != "1") {
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
-				PaletteResRef[type].Format("{:.4}_{:.2}{:c}", ResRefBase, (char *) &PType, '1' + type);
+				PaletteResRef[type].Format("{:.4}_{:.2}{:c}", ResRefBase, paletteType, '1' + type);
 			} else {
 				if (ResRefBase == "MFIE") { // hack for magic golems
-					PaletteResRef[type].Format("{:.4}{:.2}B", ResRefBase, (char *) &PType);
+					PaletteResRef[type].Format("{:.4}{:.2}B", ResRefBase, paletteType);
 				} else {
-					PaletteResRef[type].Format("{:.4}_{:.2}", ResRefBase, (char *) &PType);
+					PaletteResRef[type].Format("{:.4}_{:.2}", ResRefBase, paletteType);
 				}
 			}
 			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);

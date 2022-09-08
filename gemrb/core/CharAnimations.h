@@ -134,7 +134,7 @@ enum PaletteType {
 struct AvatarStruct {
 	/* entries from avatars.2da */
 	unsigned int AnimID;
-	unsigned int PaletteType;
+	ResRef PaletteType;
 	ResRef Prefixes[4];
 	unsigned char AnimationType;
 	unsigned char CircleSize;
@@ -220,7 +220,7 @@ public:
 	static const AvatarStruct &GetAvatarStruct(size_t RowNum);
 	unsigned int GetAnimationID() const;
 	int GetCircleSize() const;
-	int NoPalette() const;
+	const ResRef& GetPaletteType() const;
 	int GetAnimType() const;
 	char GetSize() const;
 	int GetBloodColor() const;
