@@ -519,7 +519,7 @@ void* readonly_mmap(void *vfd) {
 #endif
 
 DirectoryIterator::DirectoryIterator(const char *path)
-	: predicate(NULL), Directory(NULL), Entry(NULL)
+	: predicate(), Directory(nullptr), Entry(nullptr)
 {
 	SetFlags(Files|Directories);
 	Path = strdup(path);
@@ -544,7 +544,7 @@ void DirectoryIterator::SetFlags(int flags, bool reset)
 void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)
 {
 	if (chain && predicate) {
-		predicate = new AndPredicate<const char*>(predicate, p);
+		predicate = new AndPredicate<ResRef>(predicate, p);
 	} else {
 		delete predicate;
 		predicate = p;
@@ -592,7 +592,12 @@ DirectoryIterator& DirectoryIterator::operator++()
 				cont = name[0] == '.';
 			}
 			if (cont == false && predicate) {
-				cont = !(*predicate)(name);
+				size_t len = strnlen(name, _MAX_PATH);
+				const char* nameEnd = name; // make sure to take the end of the name, since we'll likely truncate it
+				while (--len >= 8U) {
+					nameEnd++;
+				}
+				cont = !(*predicate)(ResRef(nameEnd));
 			}
 		} else if (errno) {
 			//Log(WARNING, "DirectoryIterator", "Cannot readdir: {}\nError: {}", Path, strerror(errno));

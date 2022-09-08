@@ -169,9 +169,9 @@ void LoadPlugins(const char* pluginpath)
 	}
 
 #ifdef WIN32
-	const char* pluginExt = "dll";
+	ResRef pluginExt = "dll";
 #else
-	const char* pluginExt = "so";
+	ResRef pluginExt = "so";
 #endif
 
 	dirIt.SetFlags(DirectoryIterator::Files);

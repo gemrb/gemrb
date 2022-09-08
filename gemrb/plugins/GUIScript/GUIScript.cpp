@@ -4842,7 +4842,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 
 	DirectoryIterator dirit = core->GetResourceDirectory(type);
 	bool dirs = false;
-	const char *suffix = "S";
+	ResRef suffix = "S";
 	switch (type) {
 		case DIRECTORY_CHR_PORTRAITS:
 			if (flags&1) suffix = "M";

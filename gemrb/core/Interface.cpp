@@ -2442,7 +2442,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			filter = new ExtFilter("BMP");
 			if (IsAvailable(IE_PNG_CLASS_ID)) {
 				// chain an ORed filter for png
-				filter = new OrPredicate<const char*>(filter, new ExtFilter("PNG"));
+				filter = new OrPredicate<ResRef>(filter, new ExtFilter("PNG"));
 			}
 			break;
 		case DIRECTORY_CHR_SOUNDS:
@@ -2457,7 +2457,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 		case DIRECTORY_CHR_SCRIPTS:
 			resourcePath = config.GameScriptsPath;
 			filter = new ExtFilter("BS");
-			filter = new OrPredicate<const char*>(filter, new ExtFilter("BCS"));
+			filter = new OrPredicate<ResRef>(filter, new ExtFilter("BCS"));
 			break;
 		default:
 			error("Interface", "Unknown resource directory type: {}!", dir);

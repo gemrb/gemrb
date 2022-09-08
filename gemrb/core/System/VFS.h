@@ -29,6 +29,7 @@
 
 #include "config.h"
 #include "exports.h"
+#include "ie_types.h"
 #include "Platform.h"
 #include "Predicates.h"
 
@@ -126,7 +127,7 @@ public:
 		All = ~0
 	};
 
-	using FileFilterPredicate = Predicate<const char*>;
+	using FileFilterPredicate = Predicate<ResRef>;
 	/**
 	 * @param[in] path Path to directory to search.
 	 *

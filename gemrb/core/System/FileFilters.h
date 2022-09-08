@@ -24,35 +24,32 @@
 namespace GemRB {
 
 struct ExtFilter : DirectoryIterator::FileFilterPredicate {
-	char extension[9];
-	explicit ExtFilter(const char* ext) {
-		strncpy(extension, ext, sizeof(extension) - 1);
+	ResRef extension;
+	explicit ExtFilter(const ResRef& ext) {
+		extension = ext;
 	}
 
-	bool operator()(const char* fname) const override {
-		const char* extpos = strrchr(fname, '.');
+	bool operator()(ResRef filename) const override {
+		const char* extpos = strrchr(filename.c_str(), '.');
 		if (extpos) {
-			return stricmp(++extpos, extension) == 0;
+			return ResRef(++extpos) == extension;
 		}
 		return false;
 	}
 };
 
 struct EndsWithFilter : DirectoryIterator::FileFilterPredicate {
-	char* endMatch;
+	ResRef endMatch;
 	size_t len;
 
-	explicit EndsWithFilter(const char* endString) {
-		endMatch = strdup(endString);
-		len = strlen(endMatch);
+	explicit EndsWithFilter(const ResRef& endString) {
+		endMatch = endString;
+		len = endMatch.length();
 	}
 
-	~EndsWithFilter() override {
-		free(endMatch);
-	}
-
-	bool operator()(const char* fname) const override {
+	bool operator()(ResRef filename) const override {
 		// this filter ignores file extension
+		const char* fname = filename.c_str();
 		const char* rpos = strrchr(fname, '.');
 		if (rpos) {
 			// has an extension
@@ -67,7 +64,7 @@ struct EndsWithFilter : DirectoryIterator::FileFilterPredicate {
 			return false;
 		}
 
-		const char* cmp = endMatch;
+		const char* cmp = endMatch.c_str();
 		while (fpos <= rpos) {
 			// our fileters are case insensitive
 			if (tolower(*cmp++) != tolower(*fpos++)) {
