@@ -332,7 +332,7 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
 DataStream* CTlkOverride::GetAuxHdr(bool create)
 {
 	char nPath[_MAX_PATH];
-	char Signature[TOH_HEADER_SIZE];
+	char Signature[] = "TLK ";
 
 	PathJoin(nPath, core->config.CachePath, "default.toh", nullptr);
 	FileStream* fs = new FileStream();
@@ -343,8 +343,8 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 		}
 		if (create) {
 			fs->Create("default", IE_TOH_CLASS_ID);
-			strncpy(Signature, "TLK ", TOH_HEADER_SIZE - 1);
-			fs->Write(Signature, sizeof(Signature));
+			fs->Write(Signature, 4);
+			fs->WriteFilling(TOH_HEADER_SIZE - 4);
 			create = false;
 			continue;
 		}
