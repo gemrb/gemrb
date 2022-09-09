@@ -2092,7 +2092,6 @@ void Movable::BumpBack()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
-	const Actor* actor = Scriptable::As<Actor>(this);
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
 	if (!path) {
@@ -2114,11 +2113,11 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		return;
 	}
 
-	Point nmptStep = step->point;
-	double dx = nmptStep.x - Pos.x;
-	double dy = nmptStep.y - Pos.y;
-	Map::NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / double(walkScale));
 	if (time > timeStartStep) {
+		Point nmptStep = step->point;
+		double dx = nmptStep.x - Pos.x;
+		double dy = nmptStep.y - Pos.y;
+		Map::NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / double(walkScale));
 		Actor *actorInTheWay = nullptr;
 		// We can't use GetActorInRadius because we want to only check directly along the way
 		// and not be blocked by actors who are on the sides
@@ -2128,9 +2127,13 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			double yCollision = Pos.y + dy * r * 0.75;
 			Point nmptCollision(xCollision, yCollision);
 			actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			// cant be in the way of oneself
+			actorInTheWay = actorInTheWay == this ? nullptr : actorInTheWay;
 		}
 
-		if (BlocksSearchMap() && actorInTheWay && actorInTheWay != this && actorInTheWay->BlocksSearchMap()) {
+		const Actor* actor = Scriptable::As<Actor>(this);
+		bool blocksSearch = BlocksSearchMap();
+		if (actorInTheWay && blocksSearch && actorInTheWay->BlocksSearchMap()) {
 			// Give up instead of bumping if you are close to the goal
 			if (!(step->Next) && PersonalDistance(nmptStep, this) < MAX_OPERATING_DISTANCE) {
 				ClearPath(true);
@@ -2149,12 +2152,12 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			}
 		}
 		// Stop if there's a door in the way
-		if (BlocksSearchMap() && bool(area->GetBlocked(Pos + Point(dx, dy)) & PathMapFlags::SIDEWALL)) {
+		if (blocksSearch && bool(area->GetBlocked(Pos + Point(dx, dy)) & PathMapFlags::SIDEWALL)) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return;
 		}
-		if (BlocksSearchMap()) {
+		if (blocksSearch) {
 			area->ClearSearchMapFor(this);
 		}
 		StanceID = IE_ANI_WALK;
@@ -2164,7 +2167,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Pos.x += dx;
 		Pos.y += dy;
 		oldPos = Pos;
-		if (actor && BlocksSearchMap()) {
+		if (actor && blocksSearch) {
 			auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
 			area->tileProps.BlockSearchMap(Map::ConvertCoordToTile(Pos), circleSize, flag);
 		}
