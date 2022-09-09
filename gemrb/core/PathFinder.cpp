@@ -451,27 +451,26 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 
 void Map::NormalizeDeltas(double &dx, double &dy, const double &factor)
 {
-	const double STEP_RADIUS = 2.0;
-	double dxOrig;
-	double dyOrig;
-	char ySign;
-	char xSign;
-	ySign = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
-	xSign = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
-	dx = std::abs(dx);
-	dy = std::abs(dy);
-	dxOrig = dx;
-	dyOrig = dy;
-	if (dx == 0) {
+	constexpr double STEP_RADIUS = 2.0;
+	constexpr double STEP_RADIUS_SQ = STEP_RADIUS * STEP_RADIUS;
+
+	double ySign = std::copysign(1.0, dy);
+	double xSign = std::copysign(1.0, dx);
+	dx = std::fabs(dx);
+	dy = std::fabs(dy);
+	double dxOrig = dx;
+	double dyOrig = dy;
+	if (dx == 0.0) {
 		dy = STEP_RADIUS;
-	} else if (dy == 0) {
+	} else if (dy == 0.0) {
 		dx = STEP_RADIUS;
 	} else {
-		double squaredRadius = dx * dx + dy * dy;
-		double ratio = (STEP_RADIUS * STEP_RADIUS) / squaredRadius;
-		dx = sqrt(dx * dx * ratio);
+		double dxSq = dx * dx;
+		double dySq = dy * dy;
+		double ratio = STEP_RADIUS_SQ / (dxSq + dySq);
+		dx = sqrt(dxSq * ratio);
 		// Speed on the y axis is downscaled (12 / 16) in order to correct searchmap scaling and avoid curved paths
-		dy = sqrt(dy * dy * ratio) * 0.75;
+		dy = sqrt(dySq * ratio) * 0.75;
 	}
 	dx = std::min(dx * factor, dxOrig);
 	dy = std::min(dy * factor, dyOrig);
