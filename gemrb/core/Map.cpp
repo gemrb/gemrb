@@ -2562,7 +2562,23 @@ PathMapFlags Map::GetBlocked(const Point &p, int size) const
 // If they shouldn't be, the caller should check for PathMapFlags::PASSABLE | PathMapFlags::ACTOR
 PathMapFlags Map::GetBlocked(const Point &p) const
 {
-	PathMapFlags ret = tileProps.QuerySearchMap(ConvertCoordToTile(p));
+	return GetBlockedTile(ConvertCoordToTile(p));
+}
+
+// p is in tile coords
+PathMapFlags Map::GetBlockedTile(const Point& p, int size) const
+{
+	if (size == -1) {
+		return GetBlockedTile(p);
+	} else {
+		return GetBlockedInRadiusTile(p, size);
+	}
+}
+
+// p is in tile coords
+PathMapFlags Map::GetBlockedTile(const Point& p) const
+{
+	PathMapFlags ret = tileProps.QuerySearchMap(p);
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
@@ -2572,8 +2588,14 @@ PathMapFlags Map::GetBlocked(const Point &p) const
 	return ret;
 }
 
-// Args are in navmap coordinates
-PathMapFlags Map::GetBlockedInRadius(const Point &p, unsigned int size, bool stopOnImpassable) const
+// p is in map coords
+PathMapFlags Map::GetBlockedInRadius(const Point& p, unsigned int size, bool stopOnImpassable) const
+{
+	return GetBlockedInRadiusTile(ConvertCoordToTile(p), size, stopOnImpassable);
+}
+
+// p is in tile coords
+PathMapFlags Map::GetBlockedInRadiusTile(const Point &tp, unsigned int size, bool stopOnImpassable) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -2588,10 +2610,10 @@ PathMapFlags Map::GetBlockedInRadius(const Point &p, unsigned int size, bool sto
 	for (unsigned int i = 0; i < size - 1; i++) {
 		for (unsigned int j = 0; j < size - 1; j++) {
 			if (i * i + j * j <= r) {
-				PathMapFlags retBotRight = GetBlocked(Point(p.x + i * 16, p.y + j * 12));
-				PathMapFlags retTopRight = GetBlocked(Point(p.x + i * 16, p.y - j * 12));
-				PathMapFlags retBotLeft = GetBlocked(Point(p.x - i * 16, p.y + j * 12));
-				PathMapFlags retTopLeft = GetBlocked(Point(p.x - i * 16, p.y - j * 12));
+				PathMapFlags retBotRight = GetBlockedTile(tp + Point(i, j));
+				PathMapFlags retTopRight = GetBlockedTile(tp + Point(i, -j));
+				PathMapFlags retBotLeft = GetBlockedTile(tp + Point(-i, j));
+				PathMapFlags retTopLeft = GetBlockedTile(tp + Point(-i, -j));
 				if (stopOnImpassable) {
 					if ((retBotRight | retBotLeft | retTopRight | retTopLeft) == PathMapFlags::IMPASSABLE) {
 						return PathMapFlags::IMPASSABLE;
@@ -2992,16 +3014,16 @@ bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
 
 	for (int scanx = minx; scanx < maxx; scanx++) {
 		if (goal.y >= radiusy) {
-			const Point p(scanx * 16, (goal.y - radiusy) * 12);
-			if (bool(GetBlocked(p, size) & PathMapFlags::PASSABLE)) {
+			const Point p(scanx, (goal.y - radiusy));
+			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y - radiusy;
 				return true;
 			}
 		}
 		if (goal.y + radiusy < mapSize.h) {
-			const Point p(scanx * 16, (goal.y + radiusy) * 12);
-			if (bool(GetBlocked(p, size) & PathMapFlags::PASSABLE)) {
+			const Point p(scanx, (goal.y + radiusy));
+			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y + radiusy;
 				return true;
@@ -3023,16 +3045,16 @@ bool Map::AdjustPositionY(Point &goal, int radiusx, int radiusy, int size) const
 		maxy = mapSize.h;
 	for (int scany = miny; scany < maxy; scany++) {
 		if (goal.x >= radiusx) {
-			const Point p((goal.x - radiusx) * 16, scany * 12);
-			if (bool(GetBlocked(p, size) & PathMapFlags::PASSABLE)) {
+			const Point p((goal.x - radiusx), scany);
+			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x - radiusx;
 				goal.y = scany;
 				return true;
 			}
 		}
 		if (goal.x + radiusx < mapSize.w) {
-			const Point p((goal.x + radiusx) * 16, scany * 12);
-			if (bool(GetBlocked(p, size) & PathMapFlags::PASSABLE)) {
+			const Point p((goal.x + radiusx), scany);
+			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x + radiusx;
 				goal.y = scany;
 				return true;

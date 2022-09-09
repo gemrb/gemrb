@@ -721,7 +721,11 @@ private:
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 	void AddProjectile(Projectile* pro);
-
+	
+	// same as GetBlocked, but in TileCoords
+	PathMapFlags GetBlockedTile(const Point&) const;
+	PathMapFlags GetBlockedTile(const Point&, int size) const;
+	PathMapFlags GetBlockedInRadiusTile(const Point&, unsigned int size, bool stopOnImpassable = true) const;
 };
 
 }
