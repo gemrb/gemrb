@@ -2126,9 +2126,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			double xCollision = Pos.x + dx * r;
 			double yCollision = Pos.y + dy * r * 0.75;
 			Point nmptCollision(xCollision, yCollision);
-			actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-			// cant be in the way of oneself
-			actorInTheWay = actorInTheWay == this ? nullptr : actorInTheWay;
+			actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF, this);
 		}
 
 		const Actor* actor = Scriptable::As<Actor>(this);
