@@ -301,6 +301,8 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
 	if (core->InDebugMode(ID_PATHFINDER)) Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}", s, d, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
+	
+	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
 	if (!(GetBlockedInRadius(d, size) & PathMapFlags::PASSABLE)) {
@@ -310,13 +312,16 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
-	if (minDistance < size && !(GetBlockedInRadius(nmptDest, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
+	
+	if (nmptDest == nmptSource) return nullptr;
+	
+	SearchmapPoint smptSource = Map::ConvertCoordToTile(nmptSource);
+	SearchmapPoint smptDest = Map::ConvertCoordToTile(nmptDest);
+	
+	if (minDistance < size && !(GetBlockedInRadiusTile(smptDest, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
 		Log(DEBUG, "FindPath", "{} can't fit in destination", caller ? MBStringFromString(caller->GetShortName()) : "nullptr");
 		return nullptr;
 	}
-	SearchmapPoint smptSource = Map::ConvertCoordToTile(nmptSource);
-	SearchmapPoint smptDest = Map::ConvertCoordToTile(nmptDest);
-	if (smptDest == smptSource) return nullptr;
 
 	const Size& mapSize = PropsSize();
 	if (!mapSize.PointInside(smptSource)) return nullptr;
