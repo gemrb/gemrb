@@ -2593,7 +2593,7 @@ PathMapFlags Map::GetBlockedInRadius(const Point &p, unsigned int size, bool sto
 				PathMapFlags retBotLeft = GetBlocked(Point(p.x - i * 16, p.y + j * 12));
 				PathMapFlags retTopLeft = GetBlocked(Point(p.x - i * 16, p.y - j * 12));
 				if (stopOnImpassable) {
-					if (retBotRight == PathMapFlags::IMPASSABLE || retBotLeft == PathMapFlags::IMPASSABLE || retTopRight == PathMapFlags::IMPASSABLE || retTopLeft == PathMapFlags::IMPASSABLE) {
+					if ((retBotRight | retBotLeft | retTopRight | retTopLeft) == PathMapFlags::IMPASSABLE) {
 						return PathMapFlags::IMPASSABLE;
 					}
 				}
