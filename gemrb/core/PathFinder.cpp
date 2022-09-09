@@ -314,8 +314,8 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 		Log(DEBUG, "FindPath", "{} can't fit in destination", caller ? MBStringFromString(caller->GetShortName()) : "nullptr");
 		return nullptr;
 	}
-	SearchmapPoint smptSource(nmptSource.x / 16, nmptSource.y / 12);
-	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
+	SearchmapPoint smptSource = Map::ConvertCoordToTile(nmptSource);
+	SearchmapPoint smptDest = Map::ConvertCoordToTile(nmptDest);
 	if (smptDest == smptSource) return nullptr;
 
 	const Size& mapSize = PropsSize();
@@ -335,7 +335,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 	while (!open.empty()) {
 		NavmapPoint nmptCurrent = open.top().point;
 		open.pop();
-		SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
+		SearchmapPoint smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
 		if (parents[smptCurrent.y * mapSize.w + smptCurrent.x] == Point(0, 0)) {
 			continue;
 		}
@@ -359,7 +359,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
-			SearchmapPoint smptChild(nmptChild.x / 16, nmptChild.y / 12);
+			SearchmapPoint smptChild = Map::ConvertCoordToTile(nmptChild);
 			// Outside map
 			if (smptChild.x < 0 ||	smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
@@ -375,12 +375,12 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 			const float HEURISTIC_WEIGHT = 1.5;
-			SearchmapPoint smptCurrent2(nmptCurrent.x / 16, nmptCurrent.y / 12);
+			SearchmapPoint smptCurrent2 = Map::ConvertCoordToTile(nmptCurrent);
 			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
 			unsigned short oldDist = distFromStart[smptChild.y * mapSize.w + smptChild.x];
 			// Theta-star path if there is LOS
 			if (IsWalkableTo(nmptParent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
-				SearchmapPoint smptParent(nmptParent.x / 16, nmptParent.y / 12);
+				SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChild.y * mapSize.w + smptChild.x] = nmptParent;
@@ -416,7 +416,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 		PathListNode *resultPath = nullptr;
 		NavmapPoint nmptCurrent = nmptDest;
 		NavmapPoint nmptParent;
-		SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
+		SearchmapPoint smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
 		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
 			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
 			PathListNode *newStep = new PathListNode;
@@ -434,8 +434,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			resultPath = newStep;
 			nmptCurrent = nmptParent;
 
-			smptCurrent.x = nmptCurrent.x / 16;
-			smptCurrent.y = nmptCurrent.y / 12;
+			smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
 		}
 		return resultPath;
 	} else if (core->InDebugMode(ID_PATHFINDER)) {
