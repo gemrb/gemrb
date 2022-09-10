@@ -81,10 +81,9 @@ static std::vector<int> maxLevelForHpRoll;
 static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static std::vector<std::vector<int>> areaComments;
+static std::vector<std::vector<int>> wmLevelMods;
 static int afcount = -1;
 static const ResRef CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
-
-static int *wmlevels[20];
 
 //verbal constant specific data
 static int VCMap[VCONST_COUNT];
@@ -1459,11 +1458,6 @@ void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
 		skillstats.clear();
-
-		for (auto wml : wmlevels) {
-			free(wml);
-			wml = NULL;
-		}
 		skilldex.clear();
 		skillrac.clear();
 		IWD2HitTable.clear();
@@ -2067,17 +2061,17 @@ static void InitActorTables()
 	wspecial = gamedata->LoadTable("wspecial", true);
 
 	//wild magic level modifiers
-	for (int i = 0; i < 20; i++) {
-		wmlevels[i]=(int *) calloc(MAX_LEVEL,sizeof(int) );
-	}
 	tm = gamedata->LoadTable("lvlmodwm", true);
 	if (tm) {
+		int modRange = tm->GetColumnCount();
+		wmLevelMods.resize(modRange);
 		TableMgr::index_t maxrow = tm->GetRowCount();
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < modRange; i++) {
+			wmLevelMods[i].resize(MAX_LEVEL);
 			for (TableMgr::index_t j = 0; j < MAX_LEVEL; j++) {
 				TableMgr::index_t row = maxrow;
 				if (j<row) row=j;
-				wmlevels[i][j] = tm->QueryFieldSigned<int>(row,i);
+				wmLevelMods[i][j] = tm->QueryFieldSigned<int>(row, i);
 			}
 		}
 	}
@@ -4721,7 +4715,8 @@ int Actor::GetWildMod(int level)
 	}
 
 	level = Clamp(level, 1, MAX_LEVEL);
-	WMLevelMod = wmlevels[core->Roll(1, 20, -1)][level - 1];
+	static int modRange = wmLevelMods.size();
+	WMLevelMod = wmLevelMods[core->Roll(1, modRange, -1)][level - 1];
 
 	core->GetTokenDictionary()->SetAtAsString("LEVELDIF", abs(WMLevelMod));
 	if (core->HasFeedback(FT_STATES)) {
