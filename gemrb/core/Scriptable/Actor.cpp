@@ -82,7 +82,6 @@ static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static std::vector<std::vector<int>> areaComments;
 static std::vector<std::vector<int>> wmLevelMods;
-static int afcount = -1;
 static const ResRef CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
 //verbal constant specific data
@@ -2121,7 +2120,6 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("comment");
 	if (tm) {
 		TableMgr::index_t rowcount = tm->GetRowCount();
-		afcount = rowcount;
 		if (rowcount) {
 			areaComments.resize(rowcount);
 			while(rowcount--) {
@@ -3508,10 +3506,10 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 //issue area specific comments
 void Actor::GetAreaComment(int areaflag) const
 {
-	for(int i=0;i<afcount;i++) {
-		if (areaComments[i][0] & areaflag) {
-			int vc = areaComments[i][1];
-			if (areaComments[i][2] && !core->GetGame()->IsDay()) {
+	for (const auto& comment : areaComments) {
+		if (comment[0] & areaflag) {
+			int vc = comment[1];
+			if (comment[2] && !core->GetGame()->IsDay()) {
 				vc++;
 			}
 			VerbalConstant(vc);
