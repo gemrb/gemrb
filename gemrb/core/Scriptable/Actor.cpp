@@ -80,7 +80,7 @@ static std::vector<int> multiclassIDs;
 static std::vector<int> maxLevelForHpRoll;
 static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
-static int **afcomments = NULL;
+static std::vector<std::vector<int>> areaComments;
 static int afcount = -1;
 static const ResRef CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
@@ -1460,14 +1460,6 @@ void Actor::ReleaseMemory()
 	if (classcount>=0) {
 		skillstats.clear();
 
-		if (afcomments) {
-			for(int i = 0; i < afcount; i++) {
-				free(afcomments[i]);
-			}
-			free(afcomments);
-			afcomments=NULL;
-		}
-
 		for (auto wml : wmlevels) {
 			free(wml);
 			wml = NULL;
@@ -2137,11 +2129,11 @@ static void InitActorTables()
 		TableMgr::index_t rowcount = tm->GetRowCount();
 		afcount = rowcount;
 		if (rowcount) {
-			afcomments = (int **) calloc(rowcount, sizeof(int *) );
+			areaComments.resize(rowcount);
 			while(rowcount--) {
-				afcomments[rowcount]=(int *) malloc(3*sizeof(int) );
+				areaComments[rowcount].resize(3);
 				for (int i = 0; i < 3; i++) {
-					afcomments[rowcount][i] = tm->QueryFieldSigned<int>(rowcount,i);
+					areaComments[rowcount][i] = tm->QueryFieldSigned<int>(rowcount, i);
 				}
 			}
 		}
@@ -3523,9 +3515,9 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 void Actor::GetAreaComment(int areaflag) const
 {
 	for(int i=0;i<afcount;i++) {
-		if (afcomments[i][0]&areaflag) {
-			int vc = afcomments[i][1];
-			if (afcomments[i][2] && !core->GetGame()->IsDay()) {
+		if (areaComments[i][0] & areaflag) {
+			int vc = areaComments[i][1];
+			if (areaComments[i][2] && !core->GetGame()->IsDay()) {
 				vc++;
 			}
 			VerbalConstant(vc);
