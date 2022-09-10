@@ -73,7 +73,7 @@ static std::vector<int> bookTypes;
 static int *xpcap = NULL;
 static std::vector<int> noProfPenalty;
 static std::vector<int> castingStat;
-static int *iwd2spltypes = NULL;
+static std::vector<int> iwd2SPLTypes;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
 static int *multi = NULL;
@@ -1035,7 +1035,7 @@ void Actor::ChangeSorcererType (ieDword classIdx)
 		case 2:
 			// arcane sorcerer-style
 			if (third) {
-				sorcerer = 1 << iwd2spltypes[classIdx];
+				sorcerer = 1 << iwd2SPLTypes[classIdx];
 			} else {
 				sorcerer = 1<<IE_SPELL_TYPE_WIZARD;
 			}
@@ -1043,7 +1043,7 @@ void Actor::ChangeSorcererType (ieDword classIdx)
 		case 3:
 			// divine caster with sorc. style spells
 			if (third) {
-				sorcerer = 1 << iwd2spltypes[classIdx];
+				sorcerer = 1 << iwd2SPLTypes[classIdx];
 			} else {
 				sorcerer = 1<<IE_SPELL_TYPE_PRIEST;
 			}
@@ -1458,11 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (iwd2spltypes) {
-			free(iwd2spltypes);
-			iwd2spltypes = NULL;
-		}
-
 		if (xpcap) {
 			free(xpcap);
 			xpcap = NULL;
@@ -1658,7 +1653,7 @@ static void InitActorTables()
 		turnLevelOffset.resize(classcount);
 		bookTypes.resize(classcount);
 		castingStat.resize(classcount);
-		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
+		iwd2SPLTypes.resize(classcount);
 
 		ieDword bitmask = 1;
 
@@ -1712,7 +1707,7 @@ static void InitActorTables()
 
 			if (third) {
 				castingStat[i] = tm->QueryFieldSigned<int>(rowname, "CASTING"); // HATERACE column in other games
-				iwd2spltypes[i] = tm->QueryFieldSigned<int>(rowname, "SPLTYPE");
+				iwd2SPLTypes[i] = tm->QueryFieldSigned<int>(rowname, "SPLTYPE");
 			}
 
 			field = tm->QueryField(rowname, "HATERACE").c_str();
