@@ -71,7 +71,7 @@ static int extraslots = -1;
 static int *turnlevels = NULL;
 static int *booktypes = NULL;
 static int *xpcap = NULL;
-static int *defaultprof = NULL;
+static std::vector<int> noProfPenalty;
 static int *castingstat = NULL;
 static int *iwd2spltypes = NULL;
 static int **levelslots = NULL;
@@ -1458,11 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (defaultprof) {
-			free(defaultprof);
-			defaultprof=NULL;
-		}
-
 		if (turnlevels) {
 			free(turnlevels);
 			turnlevels=NULL;
@@ -1674,9 +1669,9 @@ static void InitActorTables()
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
+		noProfPenalty.resize(classcount);
 		turnlevels = (int *) calloc(classcount, sizeof(int));
 		booktypes = (int *) calloc(classcount, sizeof(int));
-		defaultprof = (int *) calloc(classcount, sizeof(int));
 		castingstat = (int *) calloc(classcount, sizeof(int));
 		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
 
@@ -1748,7 +1743,7 @@ static void InitActorTables()
 			class2kits[i].clab = strdup(field);
 			class2kits[i].className = rowname;
 
-			defaultprof[i] = tm->QueryFieldSigned<int>(rowname, "NO_PROF");
+			noProfPenalty[i] = tm->QueryFieldSigned<int>(rowname, "NO_PROF");
 
 			bitmask <<=1;
 		}
@@ -6290,7 +6285,7 @@ int Actor::GetNonProficiencyPenalty(int stars) const
 		if (clss < (ieDword) classcount) {
 			// but skip fists, since they don't have a proficiency
 			if (!inventory.FistsEquipped()) {
-				prof += defaultprof[clss];
+				prof += noProfPenalty[clss];
 			}
 		} else {
 			// it is not clear what is the penalty for non player classes
