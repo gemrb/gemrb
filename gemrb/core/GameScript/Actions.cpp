@@ -1529,7 +1529,7 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
 
-	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_CONSOLE|DS_HEAD|DS_SPEECH );
+	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_HEAD | DS_SPEECH);
 }
 
 void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)

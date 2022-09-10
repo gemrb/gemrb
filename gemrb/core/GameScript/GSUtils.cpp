@@ -500,11 +500,14 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	ieDword charactersubtitles = 0;
 	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
 	
-	//display the verbal constants in the console
+	// display the verbal constants in the console; some callers force this themselves
 	if (charactersubtitles) {
-		flags |= DS_CONSOLE;
+		// to avoid spam in Saradush while subtitles are enabled, skip printing to MSGWIN if too far
+		if (!(flags & DS_HEAD) || Sender->GetCurrentArea()->IsVisible(Sender->Pos)) {
+			flags |= DS_CONSOLE;
+		}
 	}
-	
+
 	// PST does not echo verbal constants in the console, their strings
 	// actually contain development related identifying comments
 	// thus the console flag is unset.
