@@ -70,7 +70,7 @@ static int classcount = -1;
 static int extraslots = -1;
 static std::vector<int> turnLevelOffset;
 static std::vector<int> bookTypes;
-static int *xpcap = NULL;
+static std::vector<int> xpCap;
 static std::vector<int> noProfPenalty;
 static std::vector<int> castingStat;
 static std::vector<int> iwd2SPLTypes;
@@ -1458,11 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (xpcap) {
-			free(xpcap);
-			xpcap = NULL;
-		}
-
 		if (levelslots) {
 			for (int i = 0; i < classcount; i++) {
 				free(levelslots[i]);
@@ -1850,7 +1845,7 @@ static void InitActorTables()
 	}
 
 	if (classcount) maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
-	xpcap = (int *) calloc(classcount, sizeof(int));
+	xpCap.resize(classcount);
 	AutoTable xpcapt = gamedata->LoadTable("xpcap");
 	std::map<std::string, int> className2ID;
 
@@ -1888,7 +1883,7 @@ static void InitActorTables()
 				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
 			}
 
-			xpcap[classis] = xpcapt->QueryFieldSigned<int>(classname, "VALUE");
+			xpCap[classis] = xpcapt->QueryFieldSigned<int>(classname, "VALUE");
 
 			// set up the tohit/apr tables
 			const ResRef tohit = tm->QueryField(classname, "TOHIT");
@@ -1919,7 +1914,7 @@ static void InitActorTables()
 			AppendFormat(buffer, "Name: {}, ", classname);
 			AppendFormat(buffer, "Classis: {}, ", classis);
 			AppendFormat(buffer, "ToHit: {} ", tohit);
-			AppendFormat(buffer, "XPCap: {}", xpcap[classis]);
+			AppendFormat(buffer, "XPCap: {}", xpCap[classis]);
 
 			Log(DEBUG, "Actor", "{}", buffer);
 		}
@@ -1957,8 +1952,8 @@ static void InitActorTables()
 
 			AppendFormat(buffer, "Name: {} ", classname);
 
-			xpcap[tmpindex] = xpcapt->QueryFieldSigned<int>(classname, "VALUE");
-			AppendFormat(buffer, "XPCAP: {} ", xpcap[tmpindex]);
+			xpCap[tmpindex] = xpcapt->QueryFieldSigned<int>(classname, "VALUE");
+			AppendFormat(buffer, "XPCAP: {} ", xpCap[tmpindex]);
 
 			int classis = 0;
 			//default all levelslots to 0
@@ -7470,10 +7465,10 @@ void Actor::AddExperience(int exp, int combat)
 	}
 
 	exp = ((exp * (100 + bonus)) / 100) + BaseStats[xpStat];
-	if (xpcap != NULL) {
-		int classid = GetActiveClass() - 1;
-		if (xpcap[classid] > 0 && exp > xpcap[classid]) {
-			exp = xpcap[classid];
+	int classID = GetActiveClass() - 1;
+	if (classID < classcount) {
+		if (xpCap[classID] > 0 && exp > xpCap[classID]) {
+			exp = xpCap[classID];
 		}
 	}
 	SetBase(xpStat, exp);
