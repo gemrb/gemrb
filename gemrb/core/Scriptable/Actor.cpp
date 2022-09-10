@@ -68,7 +68,7 @@ const ieDword ref_lightness = 43;
 static int sharexp = SX_DIVIDE|SX_COMBAT;
 static int classcount = -1;
 static int extraslots = -1;
-static int *turnlevels = NULL;
+static std::vector<int> turnLevelOffset;
 static int *booktypes = NULL;
 static int *xpcap = NULL;
 static std::vector<int> noProfPenalty;
@@ -1458,11 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (turnlevels) {
-			free(turnlevels);
-			turnlevels=NULL;
-		}
-
 		if (booktypes) {
 			free(booktypes);
 			booktypes=NULL;
@@ -1670,7 +1665,7 @@ static void InitActorTables()
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
 		noProfPenalty.resize(classcount);
-		turnlevels = (int *) calloc(classcount, sizeof(int));
+		turnLevelOffset.resize(classcount);
 		booktypes = (int *) calloc(classcount, sizeof(int));
 		castingstat = (int *) calloc(classcount, sizeof(int));
 		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
@@ -1717,7 +1712,7 @@ static void InitActorTables()
 				isclass[ISPALADIN] |= bitmask;
 			}
 
-			turnlevels[i] = tm->QueryFieldSigned<int>(rowname, "TURNLEVEL");
+			turnLevelOffset[i] = tm->QueryFieldSigned<int>(rowname, "TURNLEVEL");
 			booktypes[i] = tm->QueryFieldSigned<int>(rowname, "BOOKTYPE");
 			//if booktype == 3 then it is a 'divine sorcerer' class
 			//we shouldn't hardcode iwd2 classes this heavily
@@ -9569,7 +9564,7 @@ void Actor::CreateDerivedStatsBG()
 
 	for (int i=0;i<ISCLASSES;i++) {
 		if (classesiwd2[i]>=(ieDword) classcount) continue;
-		int tl = turnlevels[classesiwd2[i]];
+		int tl = turnLevelOffset[classesiwd2[i]];
 		if (tl) {
 			int adjustedTL = GetClassLevel(i) + 1 - tl;
 			//adding up turn undead levels, but this is probably moot
@@ -9640,7 +9635,7 @@ void Actor::CreateDerivedStatsIWD2()
 	int turnundeadlevel = 0;
 	for (int i = 0; i < ISCLASSES; i++) {
 		if (classesiwd2[i]>=(ieDword) classcount) continue;
-		int tl = turnlevels[classesiwd2[i]];
+		int tl = turnLevelOffset[classesiwd2[i]];
 		if (tl) {
 			int adjustedTL = GetClassLevel(i) + 1 - tl;
 			if (adjustedTL > 0) {
