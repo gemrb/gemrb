@@ -76,7 +76,7 @@ static std::vector<int> castingStat;
 static std::vector<int> iwd2SPLTypes;
 static std::vector<std::vector<int>> levelStats;
 static std::vector<int> dualSwap;
-static int *multi = NULL;
+static std::vector<int> multiclassIDs;
 static int *maxLevelForHpRoll = NULL;
 static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
@@ -1458,10 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (multi) {
-			free(multi);
-			multi=NULL;
-		}
 		if (maxLevelForHpRoll) {
 			free(maxLevelForHpRoll);
 			maxLevelForHpRoll=NULL;
@@ -1914,7 +1910,7 @@ static void InitActorTables()
 		// iwd2 just uses levelslotsiwd2 instead
 		levelStats.resize(classcount);
 		dualSwap.resize(classcount);
-		multi = (int *) calloc(classcount, sizeof(int));
+		multiclassIDs.resize(classcount);
 		ieDword tmpindex;
 
 		for (int i = 0; i < classcount; i++) {
@@ -1949,7 +1945,7 @@ static void InitActorTables()
 			//single classes only worry about IE_LEVEL
 			ieDword tmpclass = 0;
 			valid_unsignednumber(tm->QueryField(classname, "MULTI").c_str(), tmpclass);
-			multi[tmpindex] = tmpclass;
+			multiclassIDs[tmpindex] = tmpclass;
 			if (!tmpclass) {
 				classis = IsClassFromName(classname);
 				if (classis>=0) {
@@ -2034,7 +2030,7 @@ static void InitActorTables()
 
 			AppendFormat(buffer, "HPROLLMAXLVL: {} ", maxLevelForHpRoll[tmpindex]);
 			AppendFormat(buffer, "DS: {} ", dualSwap[tmpindex]);
-			AppendFormat(buffer, "MULTI: {}", multi[tmpindex]);
+			AppendFormat(buffer, "MULTI: {}", multiclassIDs[tmpindex]);
 			Log(DEBUG, "Actor", "{}", buffer);
 		}
 	}
@@ -9616,7 +9612,7 @@ void Actor::ResetMC()
 		if (cls >= (ieDword) classcount) {
 			multiclass = 0;
 		} else {
-			multiclass = multi[cls];
+			multiclass = multiclassIDs[cls];
 		}
 	}
 }
