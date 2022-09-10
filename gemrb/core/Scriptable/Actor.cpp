@@ -1648,7 +1648,6 @@ static void InitActorTables()
 	AutoTable tm = gamedata->LoadTable("clskills");
 	if (tm) {
 		classcount = tm->GetRowCount();
-		memset (isclass,0,sizeof(isclass));
 		noProfPenalty.resize(classcount);
 		turnLevelOffset.resize(classcount);
 		bookTypes.resize(classcount);
