@@ -77,7 +77,7 @@ static std::vector<int> iwd2SPLTypes;
 static std::vector<std::vector<int>> levelStats;
 static std::vector<int> dualSwap;
 static std::vector<int> multiclassIDs;
-static int *maxLevelForHpRoll = NULL;
+static std::vector<int> maxLevelForHpRoll;
 static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
@@ -1458,10 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (maxLevelForHpRoll) {
-			free(maxLevelForHpRoll);
-			maxLevelForHpRoll=NULL;
-		}
 		skillstats.clear();
 
 		if (afcomments) {
@@ -1829,7 +1825,7 @@ static void InitActorTables()
 		}
 	}
 
-	if (classcount) maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
+	if (classcount) maxLevelForHpRoll.resize(classcount);
 	xpCap.resize(classcount);
 	AutoTable xpcapt = gamedata->LoadTable("xpcap");
 	std::map<std::string, int> className2ID;
@@ -2010,8 +2006,9 @@ static void InitActorTables()
 								while (hptm->QueryFieldSigned<int>(tmphp, rollscolumn))
 									tmphp++;
 								//make sure we at least set the first class
-								if ((tmphp>maxLevelForHpRoll[tmpindex])||foundwarrior||numfound==0)
-									maxLevelForHpRoll[tmpindex]=tmphp;
+								if ((tmphp > maxLevelForHpRoll[tmpindex]) || foundwarrior || numfound == 0) {
+									maxLevelForHpRoll[tmpindex] = tmphp;
+								}
 							}
 						}
 					}
@@ -2870,10 +2867,8 @@ void Actor::RefreshHP() {
 	ieDword bonindex = BaseStats[IE_CLASS]-1;
 
 	//we must limit the levels to the max allowable
-	if (!third) {
-		if (bonlevel>maxLevelForHpRoll[bonindex]) {
-			bonlevel = maxLevelForHpRoll[bonindex];
-		}
+	if (!third && bonlevel > maxLevelForHpRoll[bonindex]) {
+		bonlevel = maxLevelForHpRoll[bonindex];
 	}
 	if (IsDualClassed()) {
 		int oldbonus = 0;
@@ -2888,7 +2883,7 @@ void Actor::RefreshHP() {
 			bonlevel = 0;
 		} else {
 			bonlevel -= oldlevel; // the actual number of "rolling" levels for the new bonus
-			if (bonlevel+oldlevel > maxLevelForHpRoll[bonindex]) {
+			if (bonlevel + oldlevel > maxLevelForHpRoll[bonindex]) {
 				bonlevel = maxLevelForHpRoll[bonindex] - oldlevel;
 			}
 		}
