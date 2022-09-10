@@ -75,7 +75,7 @@ static std::vector<int> noProfPenalty;
 static std::vector<int> castingStat;
 static std::vector<int> iwd2SPLTypes;
 static std::vector<std::vector<int>> levelStats;
-static int *dualswap = NULL;
+static std::vector<int> dualSwap;
 static int *multi = NULL;
 static int *maxLevelForHpRoll = NULL;
 static std::map<TableMgr::index_t, std::vector<int> > skillstats;
@@ -1458,10 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (dualswap) {
-			free(dualswap);
-			dualswap=NULL;
-		}
 		if (multi) {
 			free(multi);
 			multi=NULL;
@@ -1917,7 +1913,7 @@ static void InitActorTables()
 		Log(MESSAGE, "Actor", "Examining classes.2da");
 		// iwd2 just uses levelslotsiwd2 instead
 		levelStats.resize(classcount);
-		dualswap = (int *) calloc(classcount, sizeof(int));
+		dualSwap.resize(classcount);
 		multi = (int *) calloc(classcount, sizeof(int));
 		ieDword tmpindex;
 
@@ -2027,17 +2023,17 @@ static void InitActorTables()
 					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
 						if (currentname.compare(classnames[0].c_str()) == 0) {
-							dualswap[tmpindex] = tm->QueryFieldSigned<int>(currentname, "MC_WAS_ID");
+							dualSwap[tmpindex] = tm->QueryFieldSigned<int>(currentname, "MC_WAS_ID");
 						}
-					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
-						dualswap[tmpindex] = tm->QueryFieldSigned<int>(currentname, "MC_WAS_ID");
+					} else if (numfound == 1 && tmpbits == 2 && !dualSwap[tmpindex]) {
+						dualSwap[tmpindex] = tm->QueryFieldSigned<int>(currentname, "MC_WAS_ID");
 					}
 					numfound++;
 				}
 			}
 
 			AppendFormat(buffer, "HPROLLMAXLVL: {} ", maxLevelForHpRoll[tmpindex]);
-			AppendFormat(buffer, "DS: {} ", dualswap[tmpindex]);
+			AppendFormat(buffer, "DS: {} ", dualSwap[tmpindex]);
 			AppendFormat(buffer, "MULTI: {}", multi[tmpindex]);
 			Log(DEBUG, "Actor", "{}", buffer);
 		}
@@ -9786,10 +9782,6 @@ ieDword Actor::GetClassLevel(const ieDword isClass) const
 	if (version==22)
 		return BaseStats[levelslotsiwd2[isClass]];
 
-	//houston, we got a problem!
-	if (!dualswap)
-		return 0;
-
 	//only works with PC's
 	ieDword classID = BaseStats[IE_CLASS] - 1;
 	if (!HasPlayerClass()) return 0;
@@ -9831,7 +9823,7 @@ bool Actor::IsDualSwap() const
 	if (!IsDualClassed()) return false;
 	ieDword tmpclass = BaseStats[IE_CLASS]-1;
 	if (!HasPlayerClass()) return false;
-	return (ieDword)dualswap[tmpclass]==(Modified[IE_MC_FLAGS]&MC_WAS_ANY);
+	return (ieDword) dualSwap[tmpclass] == (Modified[IE_MC_FLAGS] & MC_WAS_ANY);
 }
 
 ieDword Actor::GetWarriorLevel() const
