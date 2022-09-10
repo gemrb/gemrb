@@ -74,7 +74,7 @@ static std::vector<int> xpCap;
 static std::vector<int> noProfPenalty;
 static std::vector<int> castingStat;
 static std::vector<int> iwd2SPLTypes;
-static int **levelslots = NULL;
+static std::vector<std::vector<int>> levelStats;
 static int *dualswap = NULL;
 static int *multi = NULL;
 static int *maxLevelForHpRoll = NULL;
@@ -1458,13 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (levelslots) {
-			for (int i = 0; i < classcount; i++) {
-				free(levelslots[i]);
-			}
-			free(levelslots);
-			levelslots=NULL;
-		}
 		if (dualswap) {
 			free(dualswap);
 			dualswap=NULL;
@@ -1920,12 +1913,10 @@ static void InitActorTables()
 		}
 	} else {
 		AutoTable hptm;
-		//iwd2 just uses levelslotsiwd2 instead
-		Log(MESSAGE, "Actor", "Examining classes.2da");
 
-		//when searching the levelslots, you must search for
-		//levelslots[BaseStats[IE_CLASS]-1] as there is no class id of 0
-		levelslots = (int **) calloc(classcount, sizeof(int*));
+		Log(MESSAGE, "Actor", "Examining classes.2da");
+		// iwd2 just uses levelslotsiwd2 instead
+		levelStats.resize(classcount);
 		dualswap = (int *) calloc(classcount, sizeof(int));
 		multi = (int *) calloc(classcount, sizeof(int));
 		ieDword tmpindex;
@@ -1944,7 +1935,7 @@ static void InitActorTables()
 			AppendFormat(buffer, "\tID: {} ", tmpindex);
 			//only create the array if it isn't yet made
 			//i.e. barbarians would overwrite fighters in bg2
-			if (levelslots[tmpindex]) {
+			if (!levelStats[tmpindex].empty()) {
 				AppendFormat(buffer, "Already Found!");
 				Log(DEBUG, "Actor", "{}", buffer);
 				continue;
@@ -1956,8 +1947,8 @@ static void InitActorTables()
 			AppendFormat(buffer, "XPCAP: {} ", xpCap[tmpindex]);
 
 			int classis = 0;
-			//default all levelslots to 0
-			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int));
+			// default all levelStats to 0
+			levelStats[tmpindex].resize(ISCLASSES);
 
 			//single classes only worry about IE_LEVEL
 			ieDword tmpclass = 0;
@@ -1970,7 +1961,7 @@ static void InitActorTables()
 					classesiwd2[classis] = tmpindex+1;
 
 					AppendFormat(buffer, "Classis: {} ", classis);
-					levelslots[tmpindex][classis] = IE_LEVEL;
+					levelStats[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
 					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP"), true);
 					if (hptm) {
@@ -2011,7 +2002,7 @@ static void InitActorTables()
 								if (k==0) tmplevel = IE_LEVEL;
 								else if (k==1) tmplevel = IE_LEVEL2;
 								else tmplevel = IE_LEVEL3;
-								levelslots[tmpindex][classis] = tmplevel;
+								levelStats[tmpindex][classis] = tmplevel;
 							}
 						}
 						AppendFormat(buffer, "Classis: {} ", classis);
@@ -2050,13 +2041,6 @@ static void InitActorTables()
 			AppendFormat(buffer, "MULTI: {}", multi[tmpindex]);
 			Log(DEBUG, "Actor", "{}", buffer);
 		}
-		/*this could be enabled to ensure all levelslots are filled with at least 0's;
-		*however, the access code should ensure this never happens
-		for (i=0; i<classcount; i++) {
-			if (!levelslots[i]) {
-				levelslots[i] = (int *) calloc(ISCLASSES, sizeof(int *));
-			}
-		}*/
 	}
 	Log(MESSAGE, "Actor", "Finished examining classes.2da");
 
@@ -9803,23 +9787,21 @@ ieDword Actor::GetClassLevel(const ieDword isClass) const
 		return BaseStats[levelslotsiwd2[isClass]];
 
 	//houston, we got a problem!
-	if (!levelslots || !dualswap)
+	if (!dualswap)
 		return 0;
 
 	//only works with PC's
-	ieDword	classid = BaseStats[IE_CLASS]-1;
-	if (!HasPlayerClass() || !levelslots[classid])
-		return 0;
+	ieDword classID = BaseStats[IE_CLASS] - 1;
+	if (!HasPlayerClass()) return 0;
 
-	//handle barbarians specially, since they're kits and not in levelslots
-	if ((isClass == ISBARBARIAN) && levelslots[classid][ISFIGHTER] && (BaseStats[IE_KIT] == KIT_BARBARIAN)) {
+	// handle barbarians specially, since they're kits and not in levelStats
+	if ((isClass == ISBARBARIAN) && levelStats[classID][ISFIGHTER] && (BaseStats[IE_KIT] == KIT_BARBARIAN)) {
 		return BaseStats[IE_LEVEL];
 	}
 
-	//get the levelid (IE_LEVEL,*2,*3)
-	ieDword levelid = levelslots[classid][isClass];
-	if (!levelid)
-		return 0;
+	// get the level stat (IE_LEVEL,*2,*3)
+	ieDword levelStat = levelStats[classID][isClass];
+	if (!levelStat) return 0;
 
 	//do dual-swap
 	if (IsDualClassed()) {
@@ -9828,7 +9810,7 @@ ieDword Actor::GetClassLevel(const ieDword isClass) const
 		if (IsDualInactive() && ((Modified[IE_MC_FLAGS] & MC_WAS_ANY) == (ieDword) mcwasflags[isClass]))
 			return 0;
 	}
-	return BaseStats[levelid];
+	return BaseStats[levelStat];
 }
 
 bool Actor::IsDualInactive() const
