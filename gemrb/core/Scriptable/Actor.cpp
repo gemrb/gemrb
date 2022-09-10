@@ -69,7 +69,7 @@ static int sharexp = SX_DIVIDE|SX_COMBAT;
 static int classcount = -1;
 static int extraslots = -1;
 static std::vector<int> turnLevelOffset;
-static int *booktypes = NULL;
+static std::vector<int> bookTypes;
 static int *xpcap = NULL;
 static std::vector<int> noProfPenalty;
 static int *castingstat = NULL;
@@ -1031,7 +1031,7 @@ void Actor::ChangeSorcererType (ieDword classIdx)
 {
 	int sorcerer = 0;
 	if (classIdx <(ieDword) classcount) {
-		switch(booktypes[classIdx]) {
+		switch (bookTypes[classIdx]) {
 		case 2:
 			// arcane sorcerer-style
 			if (third) {
@@ -1458,11 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (booktypes) {
-			free(booktypes);
-			booktypes=NULL;
-		}
-
 		if (castingstat) {
 			free(castingstat);
 			castingstat=NULL;
@@ -1666,7 +1661,7 @@ static void InitActorTables()
 		memset (isclass,0,sizeof(isclass));
 		noProfPenalty.resize(classcount);
 		turnLevelOffset.resize(classcount);
-		booktypes = (int *) calloc(classcount, sizeof(int));
+		bookTypes.resize(classcount);
 		castingstat = (int *) calloc(classcount, sizeof(int));
 		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
 
@@ -1713,10 +1708,10 @@ static void InitActorTables()
 			}
 
 			turnLevelOffset[i] = tm->QueryFieldSigned<int>(rowname, "TURNLEVEL");
-			booktypes[i] = tm->QueryFieldSigned<int>(rowname, "BOOKTYPE");
+			bookTypes[i] = tm->QueryFieldSigned<int>(rowname, "BOOKTYPE");
 			//if booktype == 3 then it is a 'divine sorcerer' class
 			//we shouldn't hardcode iwd2 classes this heavily
-			if (booktypes[i]==2) {
+			if (bookTypes[i] == 2) {
 				isclass[ISSORCERER] |= bitmask;
 			}
 
