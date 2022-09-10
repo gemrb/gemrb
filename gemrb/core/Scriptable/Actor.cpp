@@ -72,7 +72,7 @@ static std::vector<int> turnLevelOffset;
 static std::vector<int> bookTypes;
 static int *xpcap = NULL;
 static std::vector<int> noProfPenalty;
-static int *castingstat = NULL;
+static std::vector<int> castingStat;
 static int *iwd2spltypes = NULL;
 static int **levelslots = NULL;
 static int *dualswap = NULL;
@@ -1458,11 +1458,6 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	if (classcount>=0) {
-		if (castingstat) {
-			free(castingstat);
-			castingstat=NULL;
-		}
-
 		if (iwd2spltypes) {
 			free(iwd2spltypes);
 			iwd2spltypes = NULL;
@@ -1662,7 +1657,7 @@ static void InitActorTables()
 		noProfPenalty.resize(classcount);
 		turnLevelOffset.resize(classcount);
 		bookTypes.resize(classcount);
-		castingstat = (int *) calloc(classcount, sizeof(int));
+		castingStat.resize(classcount);
 		iwd2spltypes = (int *) calloc(classcount, sizeof(int));
 
 		ieDword bitmask = 1;
@@ -1716,7 +1711,7 @@ static void InitActorTables()
 			}
 
 			if (third) {
-				castingstat[i] = tm->QueryFieldSigned<int>(rowname, "CASTING"); // COL_HATERACE but different name
+				castingStat[i] = tm->QueryFieldSigned<int>(rowname, "CASTING"); // HATERACE column in other games
 				iwd2spltypes[i] = tm->QueryFieldSigned<int>(rowname, "SPLTYPE");
 			}
 
@@ -2836,7 +2831,7 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 			if (!level || booktype == -1) {
 				continue;
 			}
-			level = Modified[castingstat[classesiwd2[i]]];
+			level = Modified[castingStat[classesiwd2[i]]];
 			spellbook.BonusSpells(booktype, level);
 		}
 	} else {
