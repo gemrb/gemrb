@@ -4237,6 +4237,8 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 {
 	// shortcircuit for disintegration, which wouldn't hit any of the below
 	if (damage == 0 && resisted == 0) return;
+	// skip in dialogs to avoid Saradush spam in non-pausing ones
+	if (core->GetGameControl()->InDialog()) return;
 
 	bool detailed = false;
 	String type_name = L"unknown";
@@ -6836,7 +6838,8 @@ void Actor::PerformAttack(ieDword gameTime)
 		roll = 2; // avoid chance critical misses
 	}
 
-	if (core->HasFeedback(FT_TOHIT)) {
+	const GameControl* gc = core->GetGameControl();
+	if (core->HasFeedback(FT_TOHIT) && !gc->InDialog()) {
 		// log the roll
 		String leftRight, hitMiss;
 		if (leftorright && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
@@ -6857,8 +6860,10 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical failure
 		buffer.append("[Critical Miss]");
 		Log(COMBAT, "Attack", "{}", buffer);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, GUIColors::WHITE, this);
-		VerbalConstant(VB_CRITMISS);
+		if (!gc->InDialog()) {
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, GUIColors::WHITE, this);
+			VerbalConstant(VB_CRITMISS);
+		}
 		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword) -2, target, UI_MISS|UI_NOAURA);
 		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
@@ -6896,8 +6901,10 @@ void Actor::PerformAttack(ieDword gameTime)
 		//critical success
 		buffer.append("[Critical Hit]");
 		Log(COMBAT, "Attack", "{}", buffer);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, GUIColors::WHITE, this);
-		VerbalConstant(VB_CRITHIT);
+		if (!gc->InDialog()) {
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, GUIColors::WHITE, this);
+			VerbalConstant(VB_CRITHIT);
+		}
 	} else {
 		//normal success
 		buffer.append("[Hit]");

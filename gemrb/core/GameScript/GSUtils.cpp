@@ -1539,7 +1539,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		weaponRange += 10;
 	}
 
-	if (!(flags & AC_NO_SOUND) && !Sender->CurrentActionTicks) {
+	if (!(flags & AC_NO_SOUND) && !Sender->CurrentActionTicks && !core->GetGameControl()->InDialog()) {
 		// play the battle cry
 		// pick from all 5 possible verbal constants
 		if (!attacker->PlayWarCry(5)) {
