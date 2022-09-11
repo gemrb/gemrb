@@ -8765,7 +8765,6 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, GUIColors::WHITE, target);
 			critical = false;
 		} else {
-			VerbalConstant(VB_CRITHIT);
 			//multiply the damage with the critical multiplier
 			damage *= wi.critmulti;
 
