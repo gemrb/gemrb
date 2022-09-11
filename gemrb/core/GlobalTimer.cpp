@@ -157,7 +157,7 @@ bool GlobalTimer::Update()
 	}
 	//do spell effects expire in dialogs?
 	//if yes, then we should remove this condition
-	if (!(gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+	if (!gc->InDialog()) {
 		map->UpdateFog();
 		map->UpdateEffects();
 		if (thisTime) {

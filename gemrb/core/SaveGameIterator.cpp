@@ -461,7 +461,7 @@ static int CanSave()
 		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
 		return -1; //no gamecontrol!!!
 	}
-	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
+	if (gc->InDialog()) {
 		displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG, GUIColors::XPCHANGE);
 		return 2; //can't save while in dialog
 	}

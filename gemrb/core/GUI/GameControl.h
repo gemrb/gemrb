@@ -183,6 +183,7 @@ public:
 	void SetDialogueFlags(unsigned int value, BitOp mode);
 	int GetScreenFlags() const { return ScreenFlags; }
 	int GetDialogueFlags() const { return DialogueFlags; }
+	bool InDialog() const { return DialogueFlags & DF_IN_DIALOG; }
 	void SetDisplayText(const String& text, unsigned int time);
 	void SetDisplayText(size_t text, unsigned int time);
 	void ClearMouseState();

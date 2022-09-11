@@ -551,7 +551,7 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC || Modified[IE_CHECKFORBERSERK]) {
 		color = ColorYellow;
 		normalIdx = 5;
-	} else if (gc && (((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) || remainingTalkSoundTime > 0)) {
+	} else if (gc && ((gc->InDialog() && gc->dialoghandler->IsTarget(this)) || remainingTalkSoundTime > 0)) {
 		color = ColorWhite;
 		normalIdx = 3; //?? made up
 

@@ -355,7 +355,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	// don't run scripts if we're in dialog, regardless of DF_FREEZE_SCRIPTS
-	if ((gc->GetDialogueFlags() & DF_IN_DIALOG) && gc->dialoghandler->InDialog(this) &&
+	if (gc->InDialog() && gc->dialoghandler->InDialog(this) &&
 		(!act || act->Modified[IE_IGNOREDIALOGPAUSE] == 0)) {
 		return;
 	}
@@ -417,7 +417,7 @@ void Scriptable::AddAction(Action* aC)
 	bool ignoreQueue = !nextAction || (third && nextAction->objects[0]);
 	if (!CurrentAction && ignoreQueue && area) {
 		int instant = AF_SCR_INSTANT;
-		if (core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
+		if (core->GetGameControl()->InDialog()) {
 			instant = AF_DLG_INSTANT;
 		}
 		if (actionflags[aC->actionID] & instant) {

@@ -2463,7 +2463,7 @@ void GameControl::SetCutSceneMode(bool active)
 		ScreenFlags &= ~SF_CUTSCENE;
 		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->config.MouseFeedback));
 	}
-	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? BitOp::OR : BitOp::NAND);
+	SetFlags(IgnoreEvents, (active || InDialog()) ? BitOp::OR : BitOp::NAND);
 }
 
 //Create an overhead text over a scriptable target

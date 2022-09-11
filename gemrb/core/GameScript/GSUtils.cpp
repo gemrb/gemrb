@@ -550,7 +550,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 		// disable position, but only for party
 		Actor* actor = Scriptable::As<Actor>(Sender);
 		if (!actor || actor->InParty ||
-			core->InCutSceneMode() || core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
+			core->InCutSceneMode() || core->GetGameControl()->InDialog()) {
 			speech |= GEM_SND_RELATIVE;
 			pos.reset();
 		}
@@ -1191,13 +1191,13 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		return;
 	}
 	//can't initiate dialog, because it is already there
-	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
+	if (gc->InDialog()) {
 		if (Flags & BD_INTERRUPT) {
 			//break the current dialog if possible
 			gc->dialoghandler->EndDialog(true);
 		}
 		//check if we could manage to break it, not all dialogs are breakable!
-		if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
+		if (gc->InDialog()) {
 			Log(WARNING, "GameScript", "Dialog cannot be initiated because there is already one.");
 			Sender->ReleaseCurrentAction();
 			return;
