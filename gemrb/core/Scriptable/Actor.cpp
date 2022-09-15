@@ -1826,6 +1826,7 @@ static void InitActorTables()
 		for (int i = 0; i < (int) tm->GetRowCount(); i++) {
 			const auto& classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
+			assert(classis != -1);
 			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
 			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname, "CLASS"); // only real classes have this column at 0
 			const char *clab = tm->QueryField(classname, "CLAB").c_str();
