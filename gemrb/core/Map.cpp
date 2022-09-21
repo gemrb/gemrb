@@ -150,47 +150,39 @@ void TileProps::PaintSearchMap(const Point& p, PathMapFlags value) const noexcep
 }
 
 // Valid values are - PathMapFlags::UNMARKED, PathMapFlags::PC, PathMapFlags::NPC
-void TileProps::PaintSearchMap(const Point& Pos, unsigned int blocksize, PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const Point& Pos, uint16_t blocksize, const PathMapFlags value) const noexcept
 {
 	// We block a circle of radius size-1 around (px,py)
-	// Note that this does not exactly match BG2. BG2's approximations of
-	// these circles are slightly different for sizes 6 and up.
+	// TODO: recheck that this matches originals
+	// these circles are perhaps slightly different for sizes 6 and up.
 
 	// Note: this is a larger circle than the one tested in GetBlocked.
 	// This means that an actor can get closer to a wall than to another
 	// actor. This matches the behaviour of the original BG2.
-
-	blocksize = Clamp<unsigned int>(blocksize, 1, MAX_CIRCLESIZE);
-	unsigned int r = (blocksize - 1) * (blocksize - 1) + 1;
 	
-	for (unsigned int i = 0; i < blocksize; ++i) {
-		for (unsigned int j = 0; j < blocksize; ++j) {
-			if (i * i + j * j <= r) {
-				unsigned int ppxpi = Pos.x + i;
-				unsigned int ppypj = Pos.y + j;
-				unsigned int ppxmi = Pos.x - i;
-				unsigned int ppymj = Pos.y - j;
-				Point pos(ppxpi, ppypj);
-				PathMapFlags mapval = QuerySearchMap(pos);
-				if (mapval != PathMapFlags::IMPASSABLE) {
-					PaintSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
-				}
-				pos = Point(ppxpi, ppymj);
-				mapval = QuerySearchMap(pos);
-				if (mapval != PathMapFlags::IMPASSABLE) {
-					PaintSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
-				}
-				pos = Point(ppxmi, ppypj);
-				mapval = QuerySearchMap(pos);
-				if (mapval != PathMapFlags::IMPASSABLE) {
-					PaintSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
-				}
-				pos = Point(ppxmi, ppymj);
-				mapval = QuerySearchMap(pos);
-				if (mapval != PathMapFlags::IMPASSABLE) {
-					PaintSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
-				}
-			}
+	auto PaintIfPassable = [this, value](const Point& pos)
+	{
+		PathMapFlags mapval = QuerySearchMap(pos);
+		if (mapval != PathMapFlags::IMPASSABLE) {
+			PathMapFlags newVal = (mapval & PathMapFlags::NOTACTOR) | value;
+			uint32_t& pixel = propPtr[pos.y * size.w + pos.x];
+			pixel = (pixel & ~searchMapMask) | (uint32_t(newVal) << propImage->Format().Rshift);
+		}
+	};
+
+	blocksize = Clamp<uint16_t>(blocksize, 1, MAX_CIRCLESIZE);
+	uint16_t r = blocksize - 1;
+	
+	const auto points = PlotCircle(Pos, r);
+	for (size_t i = 0; i < points.size(); i += 2)
+	{
+		const Point& p1 = points[i];
+		const Point& p2 = points[i + 1];
+		assert(p1.y == p2.y);
+		assert(p2.x <= p1.x);
+		
+		for (int x = p2.x; x <= p1.x; ++x) {
+			PaintIfPassable(Point(x, p1.y));
 		}
 	}
 }
@@ -2596,34 +2588,33 @@ PathMapFlags Map::GetBlockedInRadius(const Point& p, unsigned int size, bool sto
 }
 
 // p is in tile coords
-PathMapFlags Map::GetBlockedInRadiusTile(const Point &tp, unsigned int size, bool stopOnImpassable) const
+PathMapFlags Map::GetBlockedInRadiusTile(const Point &tp, uint16_t size, const bool stopOnImpassable) const
 {
 	// We check a circle of radius size-2 around (px,py)
-	// Note that this does not exactly match BG2. BG2's approximations of
-	// these circles are slightly different for sizes 7 and up.
+	// TODO: recheck that this matches originals
+	// these circles are perhaps slightly different for sizes 7 and up.
 
-	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
-	if (size < 2) size = 2;
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
-
-	unsigned int r = (size - 2) * (size - 2) + 1;
-	if (size == 2) r = 0;
-	for (unsigned int i = 0; i < size - 1; i++) {
-		for (unsigned int j = 0; j < size - 1; j++) {
-			if (i * i + j * j <= r) {
-				PathMapFlags retBotRight = GetBlockedTile(tp + Point(i, j));
-				PathMapFlags retTopRight = GetBlockedTile(tp + Point(i, -j));
-				PathMapFlags retBotLeft = GetBlockedTile(tp + Point(-i, j));
-				PathMapFlags retTopLeft = GetBlockedTile(tp + Point(-i, -j));
-				if (stopOnImpassable) {
-					if ((retBotRight | retBotLeft | retTopRight | retTopLeft) == PathMapFlags::IMPASSABLE) {
-						return PathMapFlags::IMPASSABLE;
-					}
-				}
-				ret |= (retBotRight | retTopRight | retBotLeft | retTopLeft);
+	size = Clamp<uint16_t>(size, 2, MAX_CIRCLESIZE);
+	uint16_t r = size - 2;
+	
+	const auto points = PlotCircle(tp, r);
+	for (size_t i = 0; i < points.size(); i += 2)
+	{
+		const Point& p1 = points[i];
+		const Point& p2 = points[i + 1];
+		assert(p1.y == p2.y);
+		assert(p2.x <= p1.x);
+		
+		for (int x = p2.x; x <= p1.x; ++x) {
+			PathMapFlags flags = GetBlockedTile(Point(x, p1.y));
+			if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
+				return PathMapFlags::IMPASSABLE;
 			}
+			ret |= flags;
 		}
 	}
+
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR|PathMapFlags::SIDEWALL))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
