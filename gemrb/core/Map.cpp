@@ -139,7 +139,7 @@ Color TileProps::QueryLighting(const Point& p) const noexcept
 	return propImage->GetPalette()->col[val];
 }
 
-void TileProps::SetSearchMap(const Point& p, PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const Point& p, PathMapFlags value) const noexcept
 {
 	if (!size.PointInside(p)) {
 		return;
@@ -150,7 +150,7 @@ void TileProps::SetSearchMap(const Point& p, PathMapFlags value) const noexcept
 }
 
 // Valid values are - PathMapFlags::UNMARKED, PathMapFlags::PC, PathMapFlags::NPC
-void TileProps::BlockSearchMap(const Point& Pos, unsigned int blocksize, PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const Point& Pos, unsigned int blocksize, PathMapFlags value) const noexcept
 {
 	// We block a circle of radius size-1 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -173,22 +173,22 @@ void TileProps::BlockSearchMap(const Point& Pos, unsigned int blocksize, PathMap
 				Point pos(ppxpi, ppypj);
 				PathMapFlags mapval = QuerySearchMap(pos);
 				if (mapval != PathMapFlags::IMPASSABLE) {
-					SetSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
+					PaintSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
 				}
 				pos = Point(ppxpi, ppymj);
 				mapval = QuerySearchMap(pos);
 				if (mapval != PathMapFlags::IMPASSABLE) {
-					SetSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
+					PaintSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
 				}
 				pos = Point(ppxmi, ppypj);
 				mapval = QuerySearchMap(pos);
 				if (mapval != PathMapFlags::IMPASSABLE) {
-					SetSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
+					PaintSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
 				}
 				pos = Point(ppxmi, ppymj);
 				mapval = QuerySearchMap(pos);
 				if (mapval != PathMapFlags::IMPASSABLE) {
-					SetSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
+					PaintSearchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
 				}
 			}
 		}
@@ -892,13 +892,13 @@ void Map::DoStepForActor(Actor *actor, ieDword time) const
 void Map::BlockSearchMapFor(const Movable *actor) const
 {
 	auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
-	tileProps.BlockSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, flag);
+	tileProps.PaintSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, flag);
 }
 
 void Map::ClearSearchMapFor(const Movable *actor) const
 {
 	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
-	tileProps.BlockSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, PathMapFlags::UNMARKED);
+	tileProps.PaintSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, PathMapFlags::UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
 	// have been cleared by this BlockSearchMap(..., PathMapFlags::UNMARKED).

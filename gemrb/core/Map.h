@@ -372,8 +372,8 @@ public:
 	int QueryElevation(const Point& p) const noexcept;
 	Color QueryLighting(const Point& p) const noexcept;
 	
-	void SetSearchMap(const Point&, PathMapFlags value) const noexcept;
-	void BlockSearchMap(const Point& Pos, unsigned int blocksize, PathMapFlags value) const noexcept;
+	void PaintSearchMap(const Point&, PathMapFlags value) const noexcept;
+	void PaintSearchMap(const Point& Pos, unsigned int blocksize, PathMapFlags value) const noexcept;
 };
 
 class GEM_EXPORT Map : public Scriptable {

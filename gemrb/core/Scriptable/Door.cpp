@@ -70,7 +70,7 @@ void Door::ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) co
 {
 	for (const Point& point : points) {
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(point) & PathMapFlags::NOTDOOR;
-		area->tileProps.SetSearchMap(point, tmp|value);
+		area->tileProps.PaintSearchMap(point, tmp|value);
 	}
 }
 
