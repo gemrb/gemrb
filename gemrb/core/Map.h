@@ -373,7 +373,7 @@ public:
 	Color QueryLighting(const Point& p) const noexcept;
 	
 	void PaintSearchMap(const Point&, PathMapFlags value) const noexcept;
-	void PaintSearchMap(const Point& Pos, unsigned int blocksize, PathMapFlags value) const noexcept;
+	void PaintSearchMap(const Point& Pos, uint16_t blocksize, PathMapFlags value) const noexcept;
 };
 
 class GEM_EXPORT Map : public Scriptable {
@@ -725,7 +725,7 @@ private:
 	// same as GetBlocked, but in TileCoords
 	PathMapFlags GetBlockedTile(const Point&) const;
 	PathMapFlags GetBlockedTile(const Point&, int size) const;
-	PathMapFlags GetBlockedInRadiusTile(const Point&, unsigned int size, bool stopOnImpassable = true) const;
+	PathMapFlags GetBlockedInRadiusTile(const Point&, uint16_t size, bool stopOnImpassable = true) const;
 };
 
 }
