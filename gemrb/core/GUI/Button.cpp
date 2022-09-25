@@ -503,7 +503,7 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
     
 	if (me.button == GEM_MB_ACTION) {
 		if (ButtonState == LOCKED) {
-			SetState(PRESSED);
+			SetState(LOCKED_PRESSED);
 			return true;
 		}
 		SetState(PRESSED);
