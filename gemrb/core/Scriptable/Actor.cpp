@@ -9738,7 +9738,7 @@ Actor *Actor::CopySelf(bool mislead) const
 //high level function, used by scripting
 ieDword Actor::GetLevelInClass(ieDword classid) const
 {
-	if (creVersion == 22) {
+	if (creVersion == CREVersion::V2_2) {
 		//iwd2
 		for (int i=0;i<ISCLASSES;i++) {
 			if (classid==classesiwd2[i]) {
@@ -9762,7 +9762,7 @@ ieDword Actor::GetClassLevel(const ieDword isClass) const
 		return 0;
 
 	//return iwd2 value if appropriate
-	if (creVersion == 22)
+	if (creVersion == CREVersion::V2_2)
 		return BaseStats[levelslotsiwd2[isClass]];
 
 	//only works with PC's

@@ -29,13 +29,6 @@ namespace GemRB {
 class CREItem;
 struct Effect;
 
-#define IE_CRE_GEMRB            0
-#define IE_CRE_V1_0		10  //bg1
-#define IE_CRE_V1_1		11  //bg2 (still V1.0)
-#define IE_CRE_V1_2		12
-#define IE_CRE_V2_2		22
-#define IE_CRE_V9_0		90
-
 class CREImporter : public ActorMgr {
 private:
 	unsigned char CREVersion = 0xff;

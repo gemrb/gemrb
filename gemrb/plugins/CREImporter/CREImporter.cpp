@@ -469,23 +469,23 @@ bool CREImporter::Import(DataStream* str)
 		CREOffset = 0;
 	}
 	if (strncmp( Signature, "CRE V1.0", 8 ) == 0) {
-		CREVersion = IE_CRE_V1_0;
+		CREVersion = CREVersion::V1_0;
 		return true;
 	}
 	if (strncmp( Signature, "CRE V1.2", 8 ) == 0) {
-		CREVersion = IE_CRE_V1_2;
+		CREVersion = CREVersion::V1_2;
 		return true;
 	}
 	if (strncmp( Signature, "CRE V2.2", 8 ) == 0) {
-		CREVersion = IE_CRE_V2_2;
+		CREVersion = CREVersion::V2_2;
 		return true;
 	}
 	if (strncmp( Signature, "CRE V9.0", 8 ) == 0) {
-		CREVersion = IE_CRE_V9_0;
+		CREVersion = CREVersion::V9_0;
 		return true;
 	}
 	if (strncmp( Signature, "CRE V0.0", 8 ) == 0) {
-		CREVersion = IE_CRE_GEMRB;
+		CREVersion = CREVersion::GemRB;
 		return true;
 	}
 
@@ -496,17 +496,17 @@ bool CREImporter::Import(DataStream* str)
 void CREImporter::SetupSlotCounts()
 {
 	switch (CREVersion) {
-		case IE_CRE_V1_2: //pst
+		case CREVersion::V1_2: // pst
 			QWPCount=4;
 			QSPCount=3;
 			QITCount=5;
 			break;
-		case IE_CRE_GEMRB: //own
+		case CREVersion::GemRB: // own
 			QWPCount=8;
 			QSPCount=9;
 			QITCount=5;
 			break;
-		case IE_CRE_V2_2: //iwd2
+		case CREVersion::V2_2: // iwd2
 			QWPCount=8;
 			QSPCount=9;
 			QITCount=3;
@@ -527,32 +527,32 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 
 	CRESize = GetStoredFileSize (act);
 	switch (CREVersion) {
-		case IE_CRE_V9_0: //iwd/HoW
+		case CREVersion::V9_0: // iwd/HoW
 			memcpy(Signature, "CHR V1.0",8);
 			tmpDword = 0x64; //headersize
 			TotSCEFF = 1;
 			break;
-		case IE_CRE_V1_0: //bg1
+		case CREVersion::V1_0: // bg1
 			memcpy(Signature, "CHR V1.0",8);
 			tmpDword = 0x64; //headersize
 			TotSCEFF = 0;
 			break;
-		case IE_CRE_V1_1: //bg2 (fake)
+		case CREVersion::V1_1: // bg2 (fake)
 			memcpy(Signature, "CHR V2.0",8);
 			tmpDword = 0x64; //headersize
 			TotSCEFF = 1;
 			break;
-		case IE_CRE_V1_2: //pst
+		case CREVersion::V1_2: // pst
 			memcpy(Signature, "CHR V1.2",8);
 			tmpDword = 0x68; //headersize
 			TotSCEFF = 0;
 			break;
-		case IE_CRE_V2_2: //iwd2
+		case CREVersion::V2_2: // iwd2
 			memcpy(Signature, "CHR V2.2",8);
 			tmpDword = 0x21c; //headersize
 			TotSCEFF = 1;
 			break;
-		case IE_CRE_GEMRB: //own format
+		case CREVersion::GemRB: // own format
 			memcpy(Signature, "CHR V0.0",8);
 			tmpDword = 0x1dc; //headersize (iwd2-9x8+8)
 			TotSCEFF = 1;
@@ -599,7 +599,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 		stream->WriteWord(tmpWord);
 	}
 	switch (CREVersion) {
-	case IE_CRE_V2_2:
+	case CREVersion::V2_2:
 		//gemrb format doesn't save these redundantly
 		for (int i = 0; i < QSPCount; i++) {
 			if (act->PCStats->QuickSpellBookType[i] == 0xff) {
@@ -616,7 +616,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 			}
 		}
 		//fallthrough
-	case IE_CRE_GEMRB:
+	case CREVersion::GemRB:
 		for (int i = 0; i < QSPCount; i++) {
 			tmpDword = act->PCStats->QSlots[i+3];
 			stream->WriteDword(tmpDword);
@@ -689,7 +689,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 	ResRef spell;
 	//here comes the version specific read
 	switch (CREVersion) {
-	case IE_CRE_V2_2:
+	case CREVersion::V2_2:
 		//gemrb format doesn't save these redundantly
 		// quick innates and quick songs
 		for (int i = 0; i < QSPCount; i++) {
@@ -708,7 +708,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 			}
 		}
 		//fallthrough
-	case IE_CRE_GEMRB:
+	case CREVersion::GemRB:
 		for (int i = 0; i < QSPCount; i++) {
 			str->ReadDword(tmpDword);
 			act->PCStats->QSlots[i+3] = (ieByte) tmpDword;
@@ -878,8 +878,8 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 
 	str->Read( &TotSCEFF, 1 );
-	if (CREVersion==IE_CRE_V1_0 && TotSCEFF) {
-		CREVersion = IE_CRE_V1_1;
+	if (CREVersion== CREVersion::V1_0 && TotSCEFF) {
+		CREVersion = CREVersion::V1_1;
 	}
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
@@ -898,23 +898,23 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	unsigned int Inventory_Size;
 
 	switch(CREVersion) {
-		case IE_CRE_GEMRB:
+		case CREVersion::GemRB:
 			Inventory_Size = GetActorGemRB(act);
 			break;
-		case IE_CRE_V1_2:
+		case CREVersion::V1_2:
 			Inventory_Size=46;
 			GetActorPST(act);
 			break;
-		case IE_CRE_V1_1: //bg2 (fake version)
-		case IE_CRE_V1_0: //bg1 too
+		case CREVersion::V1_1: // bg2 (fake version)
+		case CREVersion::V1_0: // bg1 too
 			Inventory_Size=38;
 			GetActorBG(act);
 			break;
-		case IE_CRE_V2_2:
+		case CREVersion::V2_2:
 			Inventory_Size=50;
 			GetActorIWD2(act);
 			break;
-		case IE_CRE_V9_0:
+		case CREVersion::V9_0:
 			Inventory_Size=38;
 			GetActorIWD1(act);
 			break;
@@ -2104,34 +2104,34 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 
 	CREVersion = actor->creVersion;
 	switch (CREVersion) {
-		case IE_CRE_GEMRB:
+		case CREVersion::GemRB:
 			headersize = 0x2d4;
 			//minus fist
 			Inventory_Size=actor->inventory.GetSlotCount()-1;
 			TotSCEFF = 1;
 			break;
-		case IE_CRE_V1_1://totsc/bg2/tob (still V1.0, but large effects)
-		case IE_CRE_V1_0://bg1
+		case CREVersion::V1_1: // totsc/bg2/tob (still V1.0, but large effects)
+		case CREVersion::V1_0: // bg1
 			headersize = 0x2d4;
 			Inventory_Size=38;
 			//we should know it is bg1
-			if (actor->creVersion == IE_CRE_V1_1) {
+			if (actor->creVersion == CREVersion::V1_1) {
 				TotSCEFF = 1;
 			} else {
 				TotSCEFF = 0;
 			}
 			break;
-		case IE_CRE_V1_2: //pst
+		case CREVersion::V1_2: // pst
 			headersize = 0x378;
 			Inventory_Size=46;
 			TotSCEFF = 0;
 			break;
-		case IE_CRE_V2_2://iwd2
-			headersize = 0x62e; //with offsets
+		case CREVersion::V2_2:// iwd2
+			headersize = 0x62e; // with offsets
 			Inventory_Size=50;
 			TotSCEFF = 1;
 			break;
-		case IE_CRE_V9_0://iwd
+		case CREVersion::V9_0:// iwd
 			headersize = 0x33c;
 			Inventory_Size=38;
 			TotSCEFF = 1;
@@ -2141,7 +2141,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 	}
 	KnownSpellsOffset = headersize;
 
-	if (actor->creVersion == IE_CRE_V2_2) { // iwd2
+	if (actor->creVersion == CREVersion::V2_2) { // iwd2
 		for (int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
 			for (int level = 0; level < 9; level++) {
 				headersize += GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level) * 16 + 8;
@@ -2258,7 +2258,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 
 	memcpy( Signature, "CRE V0.0", 8);
 	Signature[5]+=CREVersion/10;
-	if (actor->creVersion != IE_CRE_V1_1) {
+	if (actor->creVersion != CREVersion::V1_1) {
 		Signature[7]+=CREVersion%10;
 	}
 	stream->Write( Signature, 8);
@@ -2294,7 +2294,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->WriteWord(tmpWord);
 	//iwd2 doesn't store this a second time,
 	//probably gemrb format shouldn't either?
-	if (actor->creVersion != IE_CRE_V2_2) {
+	if (actor->creVersion != CREVersion::V2_2) {
 		tmpWord = actor->AC.GetNatural();
 		stream->WriteWord(tmpWord);
 	}
@@ -2309,7 +2309,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	tmpByte = actor->ToHit.GetBase();
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
-	if (actor->creVersion == IE_CRE_V2_2) {
+	if (actor->creVersion == CREVersion::V2_2) {
 		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEFORTITUDE];
 		stream->Write( &tmpByte, 1);
@@ -2318,7 +2318,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		tmpByte = actor->BaseStats[IE_SAVEWILL];
 		stream->Write( &tmpByte, 1);
 	} else {
-		if (actor->creVersion != IE_CRE_GEMRB) {
+		if (actor->creVersion != CREVersion::GemRB) {
 			if (tmpByte&1) tmpByte = tmpByte/2+6;
 			else tmpByte /=2;
 		}
@@ -2356,7 +2356,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTMISSILE];
 	stream->Write( &tmpByte, 1);
-	if (actor->creVersion == IE_CRE_V2_2) {
+	if (actor->creVersion == CREVersion::V2_2) {
 		tmpByte = actor->BaseStats[IE_MAGICDAMAGERESISTANCE];
 		stream->Write( &tmpByte, 1);
 		stream->Write( Signature, 4);
@@ -2383,7 +2383,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	tmpByte = actor->BaseStats[IE_LUCK];
 	stream->Write( &tmpByte, 1);
 
-	if (actor->creVersion == IE_CRE_V2_2) {
+	if (actor->creVersion == CREVersion::V2_2) {
 		//this is rather fuzzy
 		//turnundead level, + 33 bytes of zero
 		tmpByte = actor->BaseStats[IE_TURNUNDEADLEVEL];
@@ -2984,25 +2984,25 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	ieDword Inventory_Size;
 
 	switch (CREVersion) {
-		case IE_CRE_GEMRB:
+		case CREVersion::GemRB:
 			//don't add fist
 			Inventory_Size=(ieDword) actor->inventory.GetSlotCount()-1;
 			ret = PutActorGemRB(stream, actor, Inventory_Size);
 			break;
-		case IE_CRE_V1_2:
+		case CREVersion::V1_2:
 			Inventory_Size=46;
 			ret = PutActorPST(stream, actor);
 			break;
-		case IE_CRE_V1_1:
-		case IE_CRE_V1_0: //bg1/bg2
+		case CREVersion::V1_1:
+		case CREVersion::V1_0: // bg1/bg2
 			Inventory_Size=38;
 			ret = PutActorBG(stream, actor);
 			break;
-		case IE_CRE_V2_2:
+		case CREVersion::V2_2:
 			Inventory_Size=50;
 			ret = PutActorIWD2(stream, actor);
 			break;
-		case IE_CRE_V9_0:
+		case CREVersion::V9_0:
 			Inventory_Size=38;
 			ret = PutActorIWD1(stream, actor);
 			break;
@@ -3014,7 +3014,7 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	}
 
 	//writing offsets and counts
-	if (actor->creVersion == IE_CRE_V2_2) {
+	if (actor->creVersion == CREVersion::V2_2) {
 		int type, level;
 
 		//class spells
@@ -3061,7 +3061,7 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	stream->WriteResRef( actor->GetDialog(false) );
 	//spells, spellbook etc
 
-	if (actor->creVersion == IE_CRE_V2_2) {
+	if (actor->creVersion == CREVersion::V2_2) {
 		int type, level;
 
 		//writing out spell page headers

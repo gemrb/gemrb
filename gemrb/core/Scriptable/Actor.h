@@ -58,6 +58,15 @@ struct PolymorphCache;
 
 namespace GemRB {
 
+enum CREVersion {
+	GemRB,
+	V1_0 = 10, // bg1
+	V1_1 = 11, // bg2 (still V1.0)
+	V1_2 = 12, // pst
+	V2_2 = 22, // iwd2
+	V9_0 = 90 // iwd
+};
+
 #define MAX_STATS 256
 #define MAX_LEVEL 128
 #define MAX_FEATS 96 //3*sizeof(ieDword)
