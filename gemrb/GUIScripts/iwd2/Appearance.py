@@ -134,11 +134,12 @@ def OnLoad():
 	table = GemRB.LoadTable ("avprefg")
 	AnimID = AnimID + table.GetValue (Gender, 0)
 
-	PDollResRef = PDollTable.GetValue (hex(AnimID), "AT_1") + "G11"
-	if PDollResRef == "*G11":
+	PDollResRef = PDollTable.GetValue (hex(AnimID), "AT_1", GTV_STR)
+	if PDollResRef == "*":
 		print("ERROR, couldn't find the paperdoll! AnimID is", hex(AnimID))
 		print("Falling back to an elven paperdoll.")
-		PDollResRef = "CEMB1G11"
+		PDollResRef = "CEMB1"
+	PDollResRef += "G11"
 
 	RefreshPDoll()
 	ColorWindow.Focus()
