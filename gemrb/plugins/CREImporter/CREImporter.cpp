@@ -884,7 +884,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
 	if (core->config.SaveAsOriginal) {
-		act->version = CREVersion;
+		act->creVersion = CREVersion;
 	}
 	str->ReadResRef( act->SmallPortrait );
 	if (act->SmallPortrait.IsEmpty()) {
@@ -2102,7 +2102,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 	int headersize;
 	unsigned int Inventory_Size;
 
-	CREVersion = actor->version;
+	CREVersion = actor->creVersion;
 	switch (CREVersion) {
 		case IE_CRE_GEMRB:
 			headersize = 0x2d4;
@@ -2115,7 +2115,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 			headersize = 0x2d4;
 			Inventory_Size=38;
 			//we should know it is bg1
-			if (actor->version == IE_CRE_V1_1) {
+			if (actor->creVersion == IE_CRE_V1_1) {
 				TotSCEFF = 1;
 			} else {
 				TotSCEFF = 0;
@@ -2141,7 +2141,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 	}
 	KnownSpellsOffset = headersize;
 
-	if (actor->version==IE_CRE_V2_2) { //iwd2
+	if (actor->creVersion == IE_CRE_V2_2) { // iwd2
 		for (int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
 			for (int level = 0; level < 9; level++) {
 				headersize += GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level) * 16 + 8;
@@ -2258,7 +2258,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 
 	memcpy( Signature, "CRE V0.0", 8);
 	Signature[5]+=CREVersion/10;
-	if (actor->version!=IE_CRE_V1_1) {
+	if (actor->creVersion != IE_CRE_V1_1) {
 		Signature[7]+=CREVersion%10;
 	}
 	stream->Write( Signature, 8);
@@ -2294,7 +2294,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->WriteWord(tmpWord);
 	//iwd2 doesn't store this a second time,
 	//probably gemrb format shouldn't either?
-	if (actor->version != IE_CRE_V2_2) {
+	if (actor->creVersion != IE_CRE_V2_2) {
 		tmpWord = actor->AC.GetNatural();
 		stream->WriteWord(tmpWord);
 	}
@@ -2309,7 +2309,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	tmpByte = actor->ToHit.GetBase();
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
-	if (actor->version == IE_CRE_V2_2) {
+	if (actor->creVersion == IE_CRE_V2_2) {
 		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEFORTITUDE];
 		stream->Write( &tmpByte, 1);
@@ -2318,7 +2318,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		tmpByte = actor->BaseStats[IE_SAVEWILL];
 		stream->Write( &tmpByte, 1);
 	} else {
-		if (actor->version!=IE_CRE_GEMRB) {
+		if (actor->creVersion != IE_CRE_GEMRB) {
 			if (tmpByte&1) tmpByte = tmpByte/2+6;
 			else tmpByte /=2;
 		}
@@ -2356,7 +2356,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTMISSILE];
 	stream->Write( &tmpByte, 1);
-	if (actor->version == IE_CRE_V2_2) {
+	if (actor->creVersion == IE_CRE_V2_2) {
 		tmpByte = actor->BaseStats[IE_MAGICDAMAGERESISTANCE];
 		stream->Write( &tmpByte, 1);
 		stream->Write( Signature, 4);
@@ -2383,7 +2383,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	tmpByte = actor->BaseStats[IE_LUCK];
 	stream->Write( &tmpByte, 1);
 
-	if (actor->version == IE_CRE_V2_2) {
+	if (actor->creVersion == IE_CRE_V2_2) {
 		//this is rather fuzzy
 		//turnundead level, + 33 bytes of zero
 		tmpByte = actor->BaseStats[IE_TURNUNDEADLEVEL];
@@ -3014,7 +3014,7 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	}
 
 	//writing offsets and counts
-	if (actor->version==IE_CRE_V2_2) {
+	if (actor->creVersion == IE_CRE_V2_2) {
 		int type, level;
 
 		//class spells
@@ -3061,7 +3061,7 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	stream->WriteResRef( actor->GetDialog(false) );
 	//spells, spellbook etc
 
-	if (actor->version==IE_CRE_V2_2) {
+	if (actor->creVersion == IE_CRE_V2_2) {
 		int type, level;
 
 		//writing out spell page headers

@@ -9694,7 +9694,7 @@ Actor *Actor::CopySelf(bool mislead) const
 
 	newActor->SetName(GetShortName(), 0);
 	newActor->SetName(GetName(),1);
-	newActor->version = version;
+	newActor->creVersion = creVersion;
 	newActor->BaseStats = BaseStats;
 	// illusions aren't worth any xp and don't explore
 	newActor->BaseStats[IE_XPVALUE] = 0;
@@ -9738,7 +9738,7 @@ Actor *Actor::CopySelf(bool mislead) const
 //high level function, used by scripting
 ieDword Actor::GetLevelInClass(ieDword classid) const
 {
-	if (version==22) {
+	if (creVersion == 22) {
 		//iwd2
 		for (int i=0;i<ISCLASSES;i++) {
 			if (classid==classesiwd2[i]) {
@@ -9762,7 +9762,7 @@ ieDword Actor::GetClassLevel(const ieDword isClass) const
 		return 0;
 
 	//return iwd2 value if appropriate
-	if (version==22)
+	if (creVersion == 22)
 		return BaseStats[levelslotsiwd2[isClass]];
 
 	//only works with PC's

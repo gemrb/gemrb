@@ -351,7 +351,7 @@ public:
 	Inventory inventory;
 	Spellbook spellbook;
 	//savefile version (creatures embedded in area)
-	int version = 0;
+	int creVersion = 0;
 	//in game or area actor header
 	ieDword TalkCount = 0;
 	ieDword RemovalTime = 0;

@@ -125,7 +125,7 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 	}
 
 	if (VersionOverride != -1) {
-		actor->version = VersionOverride;
+		actor->creVersion = VersionOverride;
 	}
 
 	actor->Area = core->GetGame()->CurrentArea;

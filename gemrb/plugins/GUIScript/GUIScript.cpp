@@ -11093,7 +11093,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 		break;
 		case ACT_IWDQSPELL:
 			SetButtonBAM(btn, "stonspel",0,0,-1);
-			if (actor->version==22 && i>3) {
+			if (actor->creVersion == 22 && i > 3) {
 				tmp = i-3;
 			} else {
 				tmp = 0;
@@ -11101,7 +11101,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			goto jump_label2;
 		case ACT_IWDQSONG:
 			SetButtonBAM(btn, "stonsong",0,0,-1);
-			if (actor->version==22 && i>3) {
+			if (actor->creVersion == 22 && i > 3) {
 				tmp = i-3;
 			} else {
 				tmp = 0;
@@ -11109,7 +11109,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			goto jump_label2;
 		case ACT_IWDQSPEC:
 			SetButtonBAM(btn, "stonspec",0,0,-1);
-			if (actor->version==22 && i>3) {
+			if (actor->creVersion == 22 && i > 3) {
 				tmp = i-3;
 			} else {
 				tmp = 0;
