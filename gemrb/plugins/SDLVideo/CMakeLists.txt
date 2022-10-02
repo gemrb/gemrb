@@ -3,6 +3,11 @@ INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} $<$<BOOL:${WIN32}>:${GLEW_INCLUDE_DIRS}>)
 SET(COMMON_FILES COCOA SDLVideo.cpp SDLSurfaceSprite2D.cpp DPadSoftKeyboard.cpp)
 
 IF(SDL_BACKEND STREQUAL "SDL2")
+	# With v2.24, we get libSDL2main, and that wants main() be linked here.
+	IF(SDL2_SDL2main_FOUND)
+		STRING(REPLACE "SDL2::SDL2main" "" SDL_LIBRARY "${SDL_LIBRARY}")
+	ENDIF()
+
 	IF(NOT OPENGL_BACKEND STREQUAL "None")
 		ADD_GEMRB_PLUGIN(SDLVideo ${COMMON_FILES} SDL20Video.cpp GLSLProgram.cpp)
 		target_compile_definitions(SDLVideo PRIVATE USE_OPENGL_BACKEND)

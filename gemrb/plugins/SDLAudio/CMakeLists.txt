@@ -1,4 +1,8 @@
 IF (SDL_MIXER_LIBRARIES)
+	# With v2.24, we get libSDL2main, and that wants main() be linked here.
+	IF(SDL2_SDL2main_FOUND)
+		STRING(REPLACE "SDL2::SDL2main" "" SDL_LIBRARY "${SDL_LIBRARY}")
+	ENDIF()
 	INCLUDE_DIRECTORIES( ${SDL_INCLUDE_DIR} ${SDL_MIXER_INCLUDE_DIR})
 
 	ADD_GEMRB_PLUGIN (SDLAudio SDLAudio.cpp )
