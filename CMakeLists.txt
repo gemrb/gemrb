@@ -51,6 +51,7 @@ IF(APPLE)
 	# favor mac frameworks over unix libraries
 	set(CMAKE_FIND_FRAMEWORK FIRST)
 	SET(BAKE_ICON 0)
+	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
 ELSE(APPLE)
 	SET(BAKE_ICON 1)
 ENDIF()
