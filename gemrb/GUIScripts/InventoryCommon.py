@@ -19,6 +19,7 @@
 import re
 
 import GemRB
+import CommonTables
 import GameCheck
 import GUICommon
 import Spellbook
@@ -339,9 +340,11 @@ def DisplayItem (slotItem, itemtype):
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	drink = (itemtype & 1) and (item["Function"]&ITM_F_DRINK)
 	read = (itemtype & 1) and (item["Function"]&ITM_F_READ)
-	# sorcerers cannot learn spells
+	# only mages and bards can learn spells
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if Spellbook.HasSorcererBook (pc):
+	ClassName = GUICommon.GetClassRowName (pc)
+	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
+	if SpellBookType == "*" or SpellBookType == "MXSPLSRC":
 		read = 0
 	container = (itemtype & 1) and (item["Function"]&ITM_F_CONTAINER)
 	dialog = (itemtype & 1) and (item["Dialog"]!="" and item["Dialog"]!="*")
