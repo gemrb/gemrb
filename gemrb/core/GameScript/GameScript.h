@@ -138,7 +138,6 @@ class GameScript;
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING		5
 
-using SrcVector = std::vector<ieStrRef>;
 using StringParam = FixedSizeString<64, strnicmp>; // FIXME: should this be case sensetive
 static_assert(std::is_standard_layout<StringParam>::value, "Fixed Size String must be standard layout for use in unions");
 

@@ -4322,12 +4322,10 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!fx->Resource.IsEmpty()) {
-		//TODO: create a single list reader that handles src and 2da too
-		const SrcVector *rndstr = LoadSrc(fx->Resource);
-		if (rndstr) {
-			ieStrRef str = rndstr->at(RAND<size_t>(size_t(0), rndstr->size() - 1));
+		const SrcVector* strList = gamedata->SrcManager.GetSrc(fx->Resource);
+		if (!strList->IsEmpty()) {
+			ieStrRef str = strList->RandomRef();
 			fx->Parameter1 = ieDword(str);
-			FreeSrc(rndstr, fx->Resource);
 			DisplayStringCore(target, str, DS_HEAD);
 			target->overColor = Color(fx->Parameter2);
 			return FX_NOT_APPLIED;

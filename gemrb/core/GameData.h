@@ -31,6 +31,7 @@
 #include "Palette.h"
 #include "Resource.h"
 #include "ResourceManager.h"
+#include "SrcMgr.h"
 #include "TableMgr.h"
 
 #include <map>
@@ -224,6 +225,7 @@ public:
 	std::vector<ResRef> castingHits;
 	std::vector<int> castingSounds;
 	std::vector<ResRef> spellHits;
+	SrcMgr SrcManager;
 };
 
 extern GEM_EXPORT GameData * gamedata;

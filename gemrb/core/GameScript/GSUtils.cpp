@@ -66,7 +66,6 @@ short actionflags[MAX_ACTIONS];
 short triggerflags[MAX_TRIGGERS];
 ObjectFunction objects[MAX_OBJECTS];
 IDSFunction idtargets[MAX_OBJECT_FIELDS];
-Cache SrcCache; //cache for string resources (pst)
 Cache BcsCache; //cache for scripts
 int ObjectIDSCount = 7;
 int MaxObjectNesting = 5;
@@ -1983,39 +1982,6 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 		Sender->ReleaseCurrentAction();
 	}
 	return 0;
-}
-
-void FreeSrc(const SrcVector *poi, const ResRef& key)
-{
-	int res = SrcCache.DecRef((const void *) poi, key, true);
-	if (res<0) {
-		error("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: {}", key);
-	}
-	if (!res) {
-		delete poi;
-	}
-}
-
-SrcVector *LoadSrc(const ResRef& resname)
-{
-	SrcVector *src = (SrcVector *) SrcCache.GetResource(resname);
-	if (src) {
-		return src;
-	}
-	DataStream* str = gamedata->GetResource( resname, IE_SRC_CLASS_ID );
-	if ( !str) {
-		return NULL;
-	}
-	ieDword size=0;
-	str->ReadDword(size);
-	src = new SrcVector(size);
-	SrcCache.SetAt( resname, (void *) src );
-	while (size--) {
-		str->ReadStrRef(src->at(size));
-		str->Seek(4, GEM_CURRENT_POS);
-	}
-	delete str;
-	return src;
 }
 
 // checks the odd HasAdditionalRect / ADDITIONAL_RECT matching
