@@ -2239,6 +2239,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 
 	if (Pos.x / 16 == Des.x / 16 && Pos.y / 12 == Des.y / 12) {
 		ClearPath(true);
+		SetStance(IE_ANI_HEAD_TURN);
 		return;
 	}
 
