@@ -55,7 +55,6 @@ private:
 	Cache SrcCache;
 
 public:
-	SrcMgr() noexcept = default;
 	~SrcMgr();
 
 	const SrcVector* GetSrc(const ResRef& resource);
