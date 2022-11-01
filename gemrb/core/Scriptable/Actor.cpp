@@ -5052,7 +5052,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	BaseStats[IE_GENERAL] = GEN_DEAD;
 	AddTrigger(TriggerEntry(trigger_die));
 	SendDiedTrigger();
-	if (pstflags) {
+	if (pstflags && this == game->GetPC(0, false)) {
 		AddTrigger(TriggerEntry(trigger_namelessbitthedust));
 	}
 
