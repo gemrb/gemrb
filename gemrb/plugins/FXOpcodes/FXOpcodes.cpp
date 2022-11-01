@@ -5943,7 +5943,7 @@ int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 int fx_power_word_sleep (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_power_word_sleep(%2d): HP: %d Stat: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// gemrb extension: pass a stat to check instead of hp via parameter1
 	ieDword limit = 20;
 
 	if (fx->Parameter1) {
@@ -5962,7 +5962,7 @@ int fx_power_word_sleep (Scriptable* Owner, Actor* target, Effect* fx)
 	fx->Duration = core->GetGame()->GameTime+x*core->Time.round_size;
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_set_sleep_state_ref);
-	fx->Parameter2=0;
+	fx->Parameter2 = 0; // TODO: ees preserve this
 	return fx_set_unconscious_state(Owner,target,fx);
 }
 
