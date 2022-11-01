@@ -3551,7 +3551,17 @@ int fx_remove_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//will destroy the first item
 	if (target->inventory.DestroyItem(fx->Resource,0,1)) {
 		target->ReinitQuickSlots();
+
+		// "EFF_M02" was hardcoded in the originals, but EEs added extra options
+		if (fx->Parameter1 == 0) {
+			core->PlaySound(DS_ITEM_GONE, SFX_CHAN_GUI);
+		} else if (fx->Parameter1 == 1) {
+			core->GetAudioDrv()->PlayRelative("AMB_D02B", SFX_CHAN_GUI);
+		} else if (fx->Parameter1 == 2) {
+			core->GetAudioDrv()->PlayRelative(fx->Resource2, SFX_CHAN_GUI);
+		}
 	}
+
 	return FX_NOT_APPLIED;
 }
 
