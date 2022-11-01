@@ -3660,6 +3660,7 @@ int GameScript::PCCanSeePoint( Scriptable */*Sender*/, const Trigger *parameters
 }
 
 // I'm clueless about this trigger ... but it looks fine, pst dgaoha.d is the only user
+// in the original this trigger always returns true
 int GameScript::StuffGlobalRandom( Scriptable *Sender, const Trigger *parameters)
 {
 	unsigned int max=parameters->int0Parameter+1;
@@ -3669,11 +3670,8 @@ int GameScript::StuffGlobalRandom( Scriptable *Sender, const Trigger *parameters
 	} else {
 		Value = RandomNumValue;
 	}
-	SetVariable( Sender, parameters->string0Parameter, Value );
-	if (Value) {
-		return 1;
-	}
-	return 0;
+	SetVariable(Sender, parameters->string0Parameter, Value, parameters->resref1Parameter);
+	return 1;
 }
 
 int GameScript::IsCreatureAreaFlag( Scriptable *Sender, const Trigger *parameters)
