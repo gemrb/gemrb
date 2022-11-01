@@ -3477,8 +3477,20 @@ int fx_portrait_change (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x6c ReputationModifier
 int fx_reputation_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_reputation_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_MOD(IE_REPUTATION);
+	if (fx->Parameter2 < 3) {
+		STAT_MOD(IE_REPUTATION);
+	} else {
+		// EEs: modify party reputation instead, with a lower limit of 100
+		// should it also affect individuals?
+		Game* game = core->GetGame();
+		if (fx->Parameter2 == 3) { // cumulative
+			game->SetReputation(game->Reputation + fx->Parameter1 * 10, 100);
+		} else if (fx->Parameter2 == 4) { // flat
+			game->SetReputation(fx->Parameter1 * 10, 100);
+		} else { // percentage
+			game->SetReputation(game->Reputation * fx->Parameter1 / 100, 100);
+		}
+	}
 	//needs testing and thinking, the original engine can permanently modify the basestat
 	//but it is unclear how a timed reputation change alters the global reputation stored in game
 	//our current solution immediately transfers the reputation to game (in case of pc)

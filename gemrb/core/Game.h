@@ -430,7 +430,7 @@ public:
 	/** Increments chapter variable and refreshes kill stats */
 	void IncrementChapter() const;
 	/** Sets party reputation */
-	void SetReputation(ieDword r);
+	void SetReputation(ieDword r, ieDword min = 10);
 	/** Sets the gamescreen control status (pane states, dialog textarea size) */
 	bool SetControlStatus(unsigned int value, BitOp operation);
 	/** Sets party size (1-32000) */

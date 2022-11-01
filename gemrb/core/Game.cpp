@@ -1301,9 +1301,9 @@ void Game::IncrementChapter() const
 	}
 }
 
-void Game::SetReputation(ieDword r)
+void Game::SetReputation(ieDword r, ieDword min)
 {
-	r = Clamp<ieDword>(r, 10, 200);
+	r = Clamp<ieDword>(r, min, 200);
 	if (Reputation > r && core->HasFeedback(FT_MISC)) {
 		displaymsg->DisplayConstantStringValue(STR_LOSTREP, GUIColors::GOLD, (Reputation - r) / 10);
 	} else if (Reputation < r && core->HasFeedback(FT_MISC)) {
