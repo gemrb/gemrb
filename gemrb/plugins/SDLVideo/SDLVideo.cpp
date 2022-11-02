@@ -270,164 +270,21 @@ Region SDLVideoDriver::CurrentRenderClip() const
 	return screenClip.Intersect(bufferRegion);
 }
 
-// SetPixel is in screen coordinates
-#if SDL_VERSION_ATLEAST(1,3,0)
-#define SetPixel(buffer, _x, _y) { \
-Region _r = Region(Point(0,0), buffer->Size()); \
-Point _p(_x, _y); \
-if (_r.PointInside(_p)) { SDL_Point _p2 = {_p.x,_p.y}; points.push_back(_p2); } }
-#else
-#define SetPixel(buffer, _x, _y) { \
-Region _r = Region(Point(0,0), buffer->Size()); \
-Point _p(_x, _y); \
-if (_r.PointInside(_p)) { points.push_back(_p); } }
-#endif
+// TODO: obviously, DrawEllipseImp, and DrawCircleSegmentsImp are NOT SDL implementations,
+// so they could simply be implemented in Video
+// I've opted to keep the Imp indirection in case we wish to utilize shaders in the future
 
-/** This functions Draws a Circle */
-void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color& color, BlitFlags flags)
+void SDLVideoDriver::DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags)
 {
-	//Uses the Breshenham's Circle Algorithm
-	int x = r;
-	int y = 0;
-	long xc = 1 - ( 2 * r );
-	long yc = 1;
-	long re = 0;
-
-	std::vector<SDL_Point> points;
-
-	while (x >= y) {
-		SetPixel( drawingBuffer, c.x + x, c.y + y );
-		SetPixel( drawingBuffer, c.x - x, c.y + y );
-		SetPixel( drawingBuffer, c.x - x, c.y - y );
-		SetPixel( drawingBuffer, c.x + x, c.y - y );
-		SetPixel( drawingBuffer, c.x + y, c.y + x );
-		SetPixel( drawingBuffer, c.x - y, c.y + x );
-		SetPixel( drawingBuffer, c.x - y, c.y - x );
-		SetPixel( drawingBuffer, c.x + y, c.y - x );
-
-		y++;
-		re += yc;
-		yc += 2;
-
-		if (( ( 2 * re ) + xc ) > 0) {
-			x--;
-			re += xc;
-			xc += 2;
-		}
-	}
-
-	DrawSDLPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
+	const std::vector<Point> points = PlotEllipse(rect);
+	DrawPoints(points, color, flags);
 }
 
-static double ellipseradius(unsigned short xr, unsigned short yr, double angle) {
-	double one = (xr * sin(angle));
-	double two = (yr * cos(angle));
-	return sqrt(xr*xr*yr*yr / (one*one + two*two));
-}
-
-/** This functions Draws an Ellipse Segment */
-void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
-	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, BlitFlags flags)
+void SDLVideoDriver::DrawCircleImp(const Point& origin, uint16_t r, const Color& color, BlitFlags flags)
 {
-	/* beware, dragons and clockwise angles be here! */
-	double radiusfrom = ellipseradius(xr, yr, anglefrom);
-	double radiusto = ellipseradius(xr, yr, angleto);
-	int xfrom = round(radiusfrom * cos(anglefrom));
-	int yfrom = round(radiusfrom * sin(anglefrom));
-	int xto = round(radiusto * cos(angleto));
-	int yto = round(radiusto * sin(angleto));
-	int xrl = xr;
-	int yrl = yr;
-
-	if (drawlines) {
-		DrawLine(c, Point(c.x + xfrom, c.y + yfrom), color, flags);
-		DrawLine(c, Point(c.x + xto, c.y + yto), color, flags);
-	}
-
-	// *Attempt* to calculate the correct x/y boundaries.
-	// TODO: this doesn't work very well - you can't actually bound many
-	// arcs this way (imagine a segment with a small piece cut out).
-	if (xfrom > xto) {
-		int tmp = xfrom; xfrom = xto; xto = tmp;
-	}
-	if (yfrom > yto) {
-		int tmp = yfrom; yfrom = yto; yto = tmp;
-	}
-	if (xfrom >= 0 && yto >= 0) xto = xr;
-	if (xto <= 0 && yto >= 0) xfrom = -xr;
-	if (yfrom >= 0 && xto >= 0) yto = yr;
-	if (yto <= 0 && xto >= 0) yfrom = -yr;
-
-	//Uses Bresenham's Ellipse Algorithm
-	long xc, yc, ee, tas, tbs, sx, sy;
-	int x, y;
-
-	tas = 2 * xrl * xrl;
-	tbs = 2 * yrl * yrl;
-	x = xrl;
-	y = 0;
-	xc = yrl * yrl * (1 - (2 * xrl));
-	yc = xrl * xrl;
-	ee = 0;
-	sx = tbs * xrl;
-	sy = 0;
-
-	std::vector<SDL_Point> points;
-
-	while (sx >= sy) {
-		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x + x, c.y + y );
-		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x - x, c.y + y );
-		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x - x, c.y - y );
-		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x + x, c.y - y );
-		y++;
-		sy += tas;
-		ee += yc;
-		yc += tas;
-		if (( 2 * ee + xc ) > 0) {
-			x--;
-			sx -= tbs;
-			ee += xc;
-			xc += tbs;
-		}
-	}
-
-	x = 0;
-	y = yrl;
-	xc = yrl * yrl;
-	yc = xrl * xrl * (1 - (2 * yrl));
-	ee = 0;
-	sx = 0;
-	sy = tas * yrl;
-
-	while (sx <= sy) {
-		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x + x, c.y + y );
-		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x - x, c.y + y );
-		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x - x, c.y - y );
-		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x + x, c.y - y );
-		x++;
-		sx += tbs;
-		ee += xc;
-		xc += tbs;
-		if (( 2 * ee + yc ) > 0) {
-			y--;
-			sy -= tas;
-			ee += yc;
-			yc += tas;
-		}
-	}
-
-	DrawSDLPoints(points, reinterpret_cast<const SDL_Color&>(color), flags);
+	const std::vector<Point> points = PlotCircle(origin, r, 0xff);
+	DrawPoints(points, color, flags);
 }
-
-#undef SetPixel
 
 void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
 {

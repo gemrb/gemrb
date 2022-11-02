@@ -25,6 +25,8 @@
 
 #include "Region.h"
 
+#include <vector>
+
 namespace GemRB {
 
 GEM_EXPORT double AngleFromPoints(const Point& p1, const Point& p2);
@@ -50,6 +52,24 @@ GEM_EXPORT bool intersectSegments(const Point& a, const Point& b, const Point& c
 
 // find the intersection of a segment with a horizontal scanline, if any
 GEM_EXPORT bool intersectSegmentScanline(const Point& a, const Point& b, int y, int& x);
+
+/*
+ return vector of Points composing a circle of specified radius at origin
+ since the points are ordered by octant, they are suitable for connecting as lines to create a filled circle
+
+ PlotCircle uses the laws of symetry to draw up to 8 octants (using all 8 yields a complete circle) of a circle at once
+ The octants parameter is a bitfield where each bit coresponds to an octant. See the diagram to understand how they are ordered.
+	  1   0
+   3 ⋱  ⋮  ⋰2
+  3____⋱⋮⋰___2
+  5    ⋰⋮⋱   4
+   5 ⋰  ⋮  ⋱4
+	  7  6
+ */
+GEM_EXPORT std::vector<Point> PlotCircle(const Point& origin, uint16_t radius, uint8_t octants = 0xff) noexcept;
+
+// return a vector of Points composing an ellipse bounded by rect
+GEM_EXPORT std::vector<Point> PlotEllipse(const Region& rect) noexcept;
 
 }
 

@@ -1700,7 +1700,9 @@ void Selectable::DrawCircle(const Point& p) const
 		core->GetVideoDriver()->BlitSprite(sprite, Pos - p);
 	} else {
 		float baseSize = CircleSize2Radius() * sizeFactor;
-		core->GetVideoDriver()->DrawEllipse(Pos - p, (ieWord) (baseSize * 4), (ieWord) (baseSize * 3), *col);
+		const Size s(baseSize * 8, baseSize * 6);
+		const Region r(Pos - p - s.Center(), s);
+		core->GetVideoDriver()->DrawEllipse(r, *col);
 	}
 }
 
