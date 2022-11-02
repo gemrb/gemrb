@@ -233,7 +233,6 @@
 		A276FB08199EBF7E00BD6CEF /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A276FB07199EBF7E00BD6CEF /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A27979AF13ABA509009A6FEF /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A27ABCD016F2396C00FE11EF /* NullSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FE2C7716F2313400DDC6C7 /* NullSource.cpp */; };
-		A27E5D5E18106384009434E5 /* IndexedArchive.h in Headers */ = {isa = PBXBuildFile; fileRef = A27E5D5918106384009434E5 /* IndexedArchive.h */; };
 		A27E5D5F18106384009434E5 /* KeyMap.h in Headers */ = {isa = PBXBuildFile; fileRef = A27E5D5A18106384009434E5 /* KeyMap.h */; };
 		A27E5D6018106384009434E5 /* PluginLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = A27E5D5B18106384009434E5 /* PluginLoader.h */; };
 		A27E5D6118106384009434E5 /* VEFObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27E5D5C18106384009434E5 /* VEFObject.cpp */; };
@@ -258,6 +257,10 @@
 		A289588620D6D05B002F4A97 /* MapReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */; };
 		A289588720D6D075002F4A97 /* PythonErrors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BA4BF61D5C177000889EE2 /* PythonErrors.cpp */; };
 		A289588820D6D08C002F4A97 /* GUIFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DB1B30F24400264D16 /* GUIFactory.cpp */; };
+		A28A7D2029120B9C001376C0 /* SrcMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A28A7D1E29120B9C001376C0 /* SrcMgr.h */; };
+		A28A7D2129120B9C001376C0 /* SrcMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28A7D1F29120B9C001376C0 /* SrcMgr.cpp */; };
+		A28A7D2329120BC9001376C0 /* Geometry.h in Headers */ = {isa = PBXBuildFile; fileRef = A28A7D2229120BC9001376C0 /* Geometry.h */; };
+		A28A7D2529120E02001376C0 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28A7D2429120E02001376C0 /* Geometry.cpp */; };
 		A28D249A143BEA4200A27897 /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A29504701609721300BB22AA /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A29504731609721300BB22AA /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -551,10 +554,8 @@
 		A2E663E5139E884B00310FC8 /* Tile.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA06B1395FF62006ADC12 /* Tile.h */; };
 		A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06C1395FF62006ADC12 /* TileMap.cpp */; };
 		A2E663E7139E884B00310FC8 /* TileMap.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA06D1395FF62006ADC12 /* TileMap.h */; };
-		A2E663E9139E884B00310FC8 /* TileMapMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA06F1395FF62006ADC12 /* TileMapMgr.h */; };
 		A2E663EA139E884B00310FC8 /* TileOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0701395FF62006ADC12 /* TileOverlay.cpp */; };
 		A2E663EB139E884B00310FC8 /* TileOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0711395FF62006ADC12 /* TileOverlay.h */; };
-		A2E663ED139E884B00310FC8 /* TileSetMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0731395FF62006ADC12 /* TileSetMgr.h */; };
 		A2E663EE139E884B00310FC8 /* TypeID.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0741395FF62006ADC12 /* TypeID.h */; };
 		A2E663EF139E884B00310FC8 /* Variables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0751395FF62006ADC12 /* Variables.cpp */; };
 		A2E663F0139E884B00310FC8 /* Variables.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0761395FF62006ADC12 /* Variables.h */; };
@@ -1410,7 +1411,6 @@
 		A27B8782139F0A7D0002DC13 /* WMPImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMPImporter.h; sourceTree = "<group>"; };
 		A27B8786139F0A7D0002DC13 /* ZLibManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZLibManager.cpp; sourceTree = "<group>"; };
 		A27B8787139F0A7D0002DC13 /* ZLibManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZLibManager.h; sourceTree = "<group>"; };
-		A27E5D5918106384009434E5 /* IndexedArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndexedArchive.h; sourceTree = "<group>"; };
 		A27E5D5A18106384009434E5 /* KeyMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyMap.h; sourceTree = "<group>"; };
 		A27E5D5B18106384009434E5 /* PluginLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PluginLoader.h; sourceTree = "<group>"; };
 		A27E5D5C18106384009434E5 /* VEFObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VEFObject.cpp; sourceTree = "<group>"; };
@@ -1433,6 +1433,10 @@
 		A289587E20D6CFAE002F4A97 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.4.sdk/System/Library/Frameworks/GameController.framework; sourceTree = DEVELOPER_DIR; };
 		A289588020D6CFC1002F4A97 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.4.sdk/System/Library/Frameworks/AVKit.framework; sourceTree = DEVELOPER_DIR; };
 		A289588220D6CFCF002F4A97 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.4.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		A28A7D1E29120B9C001376C0 /* SrcMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SrcMgr.h; sourceTree = "<group>"; };
+		A28A7D1F29120B9C001376C0 /* SrcMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SrcMgr.cpp; sourceTree = "<group>"; };
+		A28A7D2229120BC9001376C0 /* Geometry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
+		A28A7D2429120E02001376C0 /* Geometry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
 		A28D2498143BEA4200A27897 /* FontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontManager.cpp; sourceTree = "<group>"; };
 		A28D249B143BEA5800A27897 /* FontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontManager.h; sourceTree = "<group>"; };
 		A28D24A0143C24C100A27897 /* BAMFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMFontManager.cpp; sourceTree = "<group>"; };
@@ -1680,10 +1684,8 @@
 		A2BFA06B1395FF62006ADC12 /* Tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tile.h; sourceTree = "<group>"; };
 		A2BFA06C1395FF62006ADC12 /* TileMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TileMap.cpp; sourceTree = "<group>"; };
 		A2BFA06D1395FF62006ADC12 /* TileMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileMap.h; sourceTree = "<group>"; };
-		A2BFA06F1395FF62006ADC12 /* TileMapMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileMapMgr.h; sourceTree = "<group>"; };
 		A2BFA0701395FF62006ADC12 /* TileOverlay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TileOverlay.cpp; sourceTree = "<group>"; };
 		A2BFA0711395FF62006ADC12 /* TileOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileOverlay.h; sourceTree = "<group>"; };
-		A2BFA0731395FF62006ADC12 /* TileSetMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileSetMgr.h; sourceTree = "<group>"; };
 		A2BFA0741395FF62006ADC12 /* TypeID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypeID.h; sourceTree = "<group>"; };
 		A2BFA0751395FF62006ADC12 /* Variables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Variables.cpp; sourceTree = "<group>"; };
 		A2BFA0761395FF62006ADC12 /* Variables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Variables.h; sourceTree = "<group>"; };
@@ -5124,7 +5126,6 @@
 		A2BF9F8C1395FF61006ADC12 /* core */ = {
 			isa = PBXGroup;
 			children = (
-				A24FB4A127B4A0ED00C6AAC2 /* Orientation.h */,
 				A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */,
 				A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */,
 				A2BF9F901395FF61006ADC12 /* Ambient.h */,
@@ -5174,6 +5175,8 @@
 				A2BF9FC61395FF62006ADC12 /* GameData.cpp */,
 				A2BF9FC71395FF62006ADC12 /* GameData.h */,
 				A2BF9FC81395FF62006ADC12 /* GameScript */,
+				A28A7D2429120E02001376C0 /* Geometry.cpp */,
+				A28A7D2229120BC9001376C0 /* Geometry.h */,
 				A2BF9FD21395FF62006ADC12 /* GlobalTimer.cpp */,
 				A2BF9FD31395FF62006ADC12 /* GlobalTimer.h */,
 				A2BF9FD41395FF62006ADC12 /* GUI */,
@@ -5183,7 +5186,6 @@
 				A2BF9FF61395FF62006ADC12 /* ImageMgr.cpp */,
 				A2BF9FF71395FF62006ADC12 /* ImageMgr.h */,
 				A2BF9FF91395FF62006ADC12 /* ImageWriter.h */,
-				A27E5D5918106384009434E5 /* IndexedArchive.h */,
 				A2BF9FFA1395FF62006ADC12 /* IniSpawn.cpp */,
 				A2BF9FFB1395FF62006ADC12 /* IniSpawn.h */,
 				A2BF9FFC1395FF62006ADC12 /* Interface.cpp */,
@@ -5209,6 +5211,7 @@
 				A2BFA00B1395FF62006ADC12 /* MoviePlayer.cpp */,
 				A2BFA00C1395FF62006ADC12 /* MoviePlayer.h */,
 				A2BFA00E1395FF62006ADC12 /* MusicMgr.h */,
+				A24FB4A127B4A0ED00C6AAC2 /* Orientation.h */,
 				A2BFA00F1395FF62006ADC12 /* Palette.cpp */,
 				A2BFA0101395FF62006ADC12 /* Palette.h */,
 				A2BFA0111395FF62006ADC12 /* PalettedImageMgr.cpp */,
@@ -5261,6 +5264,8 @@
 				A2BFA04B1395FF62006ADC12 /* Sprite2D.cpp */,
 				A2BFA04C1395FF62006ADC12 /* Sprite2D.h */,
 				A2D72B181B671329009F4D33 /* SpriteSheet.h */,
+				A28A7D1F29120B9C001376C0 /* SrcMgr.cpp */,
+				A28A7D1E29120B9C001376C0 /* SrcMgr.h */,
 				A2BFA04F1395FF62006ADC12 /* Store.cpp */,
 				A2BFA0501395FF62006ADC12 /* Store.h */,
 				A2BFA0521395FF62006ADC12 /* StoreMgr.h */,
@@ -5273,10 +5278,8 @@
 				A2BFA06B1395FF62006ADC12 /* Tile.h */,
 				A2BFA06C1395FF62006ADC12 /* TileMap.cpp */,
 				A2BFA06D1395FF62006ADC12 /* TileMap.h */,
-				A2BFA06F1395FF62006ADC12 /* TileMapMgr.h */,
 				A2BFA0701395FF62006ADC12 /* TileOverlay.cpp */,
 				A2BFA0711395FF62006ADC12 /* TileOverlay.h */,
-				A2BFA0731395FF62006ADC12 /* TileSetMgr.h */,
 				A2111CC81D0A49650044939E /* Timer.h */,
 				A2BFA0741395FF62006ADC12 /* TypeID.h */,
 				A2BFA0751395FF62006ADC12 /* Variables.cpp */,
@@ -7878,9 +7881,9 @@
 				A2E6636E139E883100310FC8 /* damages.h in Headers */,
 				A2E66370139E883100310FC8 /* DataFileMgr.h in Headers */,
 				A2E66372139E883100310FC8 /* Dialog.h in Headers */,
+				A28A7D2329120BC9001376C0 /* Geometry.h in Headers */,
 				A2E66374139E883100310FC8 /* DialogHandler.h in Headers */,
 				A2E66376139E883100310FC8 /* DialogMgr.h in Headers */,
-				A27E5D5E18106384009434E5 /* IndexedArchive.h in Headers */,
 				A24FB4A227B4A0ED00C6AAC2 /* Orientation.h in Headers */,
 				A2D72B191B671329009F4D33 /* SpriteSheet.h in Headers */,
 				A2E66378139E883100310FC8 /* DisplayMessage.h in Headers */,
@@ -7911,6 +7914,7 @@
 				A2A05CEB27A47E29000FB625 /* String.h in Headers */,
 				A2E6639A139E883E00310FC8 /* Item.h in Headers */,
 				A2E6639C139E883E00310FC8 /* ItemMgr.h in Headers */,
+				A28A7D2029120B9C001376C0 /* SrcMgr.h in Headers */,
 				A2E6639E139E883E00310FC8 /* LRUCache.h in Headers */,
 				A2A05CFD27A48093000FB625 /* MappedFileMemoryStream.h in Headers */,
 				A2E663A0139E883E00310FC8 /* Map.h in Headers */,
@@ -7960,10 +7964,8 @@
 				A2E663E5139E884B00310FC8 /* Tile.h in Headers */,
 				A2E663E7139E884B00310FC8 /* TileMap.h in Headers */,
 				A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */,
-				A2E663E9139E884B00310FC8 /* TileMapMgr.h in Headers */,
 				71BA4BF91D5C177000889EE2 /* PythonErrors.h in Headers */,
 				A2E663EB139E884B00310FC8 /* TileOverlay.h in Headers */,
-				A2E663ED139E884B00310FC8 /* TileSetMgr.h in Headers */,
 				A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */,
 				A2E663EE139E884B00310FC8 /* TypeID.h in Headers */,
 				A2E663F0139E884B00310FC8 /* Variables.h in Headers */,
@@ -9713,6 +9715,7 @@
 				A2D672DD1B30F24400264D16 /* GUIFactory.cpp in Sources */,
 				A2E663EF139E884B00310FC8 /* Variables.cpp in Sources */,
 				A2E663F6139E884B00310FC8 /* WorldMap.cpp in Sources */,
+				A28A7D2529120E02001376C0 /* Geometry.cpp in Sources */,
 				A2E66404139E885300310FC8 /* swab.cpp in Sources */,
 				A2E66406139E885300310FC8 /* VFS.cpp in Sources */,
 				A2E66408139E885A00310FC8 /* Actor.cpp in Sources */,
@@ -9726,6 +9729,7 @@
 				A2A05CF827A48093000FB625 /* SlicedStream.cpp in Sources */,
 				A2E66416139E886100310FC8 /* Console.cpp in Sources */,
 				A2E66419139E886100310FC8 /* Control.cpp in Sources */,
+				A28A7D2129120B9C001376C0 /* SrcMgr.cpp in Sources */,
 				A2E6641B139E886100310FC8 /* EventMgr.cpp in Sources */,
 				A2E6641D139E886100310FC8 /* GameControl.cpp in Sources */,
 				A2E6641F139E886100310FC8 /* Label.cpp in Sources */,

@@ -28,6 +28,7 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
+#include "Geometry.h"
 #include "IniSpawn.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"

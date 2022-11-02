@@ -182,64 +182,6 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 	return false;
 }
 
-// returns twice the area of triangle a, b, c.
-// (can also be negative depending on orientation of a,b,c)
-static inline int area2(const Point& a, const Point& b, const Point& c)
-{
-	return (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y);
-}
-
-
-// return (c is to the left of a-b)
-static inline bool left(const Point& a, const Point& b, const Point& c)
-{
-	return (area2(a, b, c) > 0);
-}
-
-// { return (c is collinear with a-b)
-static inline bool collinear(const Point& a, const Point& b, const Point& c)
-{
-	return (area2(a, b, c) == 0);
-}
-
-// Find the intersection of two segments, if any.
-// If the intersection is one of the endpoints, or the lines are
-// parallel, false is returned.
-// The point returned has the actual intersection coordinates rounded down
-// to integers
-static bool intersectSegments(const Point& a, const Point& b, const Point& c, const Point& d, Point& s)
-{
-	if (collinear(a, b, c) || collinear(a, b, d) ||
-		collinear(c, d, a) || collinear(c, d, b))
-		return false;
-
-	if (!((left(a, b, c) != left(a, b, d)) &&
-		(left(c, d, a) != left(c, d, b))))
-		return false;
-
-	int64_t A1 = area2(c, d, a);
-	int64_t A2 = area2(d, c, b);
-
-	s.x = int((b.x*A1 + a.x*A2) / (A1 + A2));
-	s.y = int((b.y*A1 + a.y*A2) / (A1 + A2));
-
-	return true;
-}
-
-// find the intersection of a segment with a horizontal scanline, if any
-static bool intersectSegmentScanline(const Point& a, const Point& b, int y, int& x)
-{
-	int y1 = a.y - y;
-	int y2 = b.y - y;
-
-	if (y1 * y2 > 0) return false;
-	if (y1 == 0 && y2 == 0) return false;
-
-	x = a.x + ((b.x - a.x)*y1)/(y1-y2);
-	return true;
-}
-
-
 struct ScanlineInt {
 	int x;
 	int pi;
