@@ -322,14 +322,4 @@ bool Schedule(ieDword schedule, ieDword time)
 	return (schedule & SCHEDULE_MASK(time)) != 0;
 }
 
-int CountElements(const char *str, char separator)
-{
-	int count = 1;
-	while (*str) {
-		if (*str == separator) count++;
-		str++;
-	}
-	return count;
-}
-
 }
