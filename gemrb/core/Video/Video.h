@@ -124,9 +124,8 @@ private:
 	virtual void DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags) = 0;
 	virtual void DrawPointImp(const Point&, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) = 0;
-	virtual void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, BlitFlags flags) = 0;
-	virtual void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-									   double anglefrom, double angleto, bool drawlines, BlitFlags flags) = 0;
+	virtual void DrawCircleImp(const Point& origin, uint16_t r, const Color& color, BlitFlags flags) = 0;
+	virtual void DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) = 0;
 	virtual void DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)=0;
@@ -187,13 +186,10 @@ public:
 	void DrawPoint(const Point&, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	void DrawPoints(const std::vector<Point>& points, const Color& color, BlitFlags flags = BlitFlags::NONE);
 
-	/** Draws a circle */
-	void DrawCircle(const Point& origin, unsigned short r, const Color& color, BlitFlags flags = BlitFlags::NONE);
-	/** Draws an Ellipse Segment */
-	void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-									double anglefrom, double angleto, bool drawlines = true, BlitFlags flags = BlitFlags::NONE);
-	/** Draws an ellipse */
-	void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags = BlitFlags::NONE);
+	// draw a circle at origin with radius r
+	void DrawCircle(const Point& origin, uint16_t r, const Color& color, BlitFlags flags = BlitFlags::NONE);
+	// Draw an elipse bounded by rect
+	void DrawEllipse(const Region& rect, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	/** Draws a polygon on the screen */
 	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, BlitFlags flags = BlitFlags::NONE);
 	/** Draws a line segment */

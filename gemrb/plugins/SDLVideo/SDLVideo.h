@@ -106,9 +106,8 @@ private:
 	virtual int CreateSDLDisplay(const char* title) = 0;
 	virtual void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE)=0;
 
-	void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, BlitFlags flags) override;
-	void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-							   double anglefrom, double angleto, bool drawlines, BlitFlags flags) override;
+	void DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags) override;
+	void DrawCircleImp(const Point& origin, uint16_t r, const Color& color, BlitFlags flags) override;
 public:
 	// static functions for manipulating surfaces
 	static bool SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors = 256);

@@ -84,6 +84,8 @@ public:
 
 	bool operator==(const Size& size) const noexcept;
 	bool operator!=(const Size& size) const noexcept;
+	
+	Point Center() const noexcept { return Point(w / 2, h / 2); }
 	int Area() const noexcept { return w * h; }
 	bool IsZero() const noexcept { return w == 0 && h == 0; }
 	bool IsInvalid() const noexcept { return w <= 0 || h <= 0; }

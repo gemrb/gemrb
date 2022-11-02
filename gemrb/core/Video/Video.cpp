@@ -348,26 +348,16 @@ void Video::DrawPoints(const std::vector<Point>& points, const Color& color, Bli
 	DrawPointsImp(points, c, flags);
 }
 
-void Video::DrawCircle(const Point& origin, unsigned short r, const Color& color, BlitFlags flags)
+void Video::DrawCircle(const Point& origin, uint16_t r, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawCircleImp(origin, r, c, flags);
 }
 
-void Video::DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-								double anglefrom, double angleto, bool drawlines, BlitFlags flags)
+void Video::DrawEllipse(const Region& rect, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
-	DrawEllipseSegmentImp(origin, xr, yr, c, anglefrom, angleto, drawlines, flags);
-}
-
-void Video::DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags)
-{
-	Color c = ApplyFlagsForColor(color, flags);
-	DrawEllipseSegmentImp(origin, xr, yr, c, 0, M_PI_2, false, flags);
-	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI_2, M_PI, false, flags);
-	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI, M_PI + M_PI_2, false, flags);
-	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI + M_PI_2, 2 * M_PI, false, flags);
+	DrawEllipseImp(rect, c, flags);
 }
 
 void Video::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags)

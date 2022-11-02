@@ -364,29 +364,73 @@ void GameControl::DrawArrowMarker(Point p, const Color& color) const
 	}
 }
 
-void GameControl::DrawTargetReticle(int size, const Color& color, const Point& p) const
+void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Point& p) const
 {
-	Video* video = core->GetVideoDriver();
-	
 	uint8_t offset = GlobalColorCycle.Step() >> 1;
+	Point offsetH = Point(offset, 0);
+	Point offsetV = Point(0, offset);
 	
 	/* segments should not go outside selection radius */
-	unsigned short xradius = (size * 4) - 5;
-	unsigned short yradius = (size * 3) - 5;
+	uint16_t xradius = (size * 4) - 5;
+	uint16_t yradius = (size * 3) - 5;
+	const Size s(xradius * 2, yradius * 2);
+	const Region r(p - s.Center(), s);
 
-	// NOTE: 0.5 and 0.7 are pretty much random values
-	// right segment
-	video->DrawEllipseSegment( p + Point(offset, 0),
-							  xradius, yradius, color, -0.5, 0.5, true);
-	// top segment
-	video->DrawEllipseSegment( p - Point(0, offset),
-							  xradius, yradius, color, -0.7 - M_PI_2, 0.7 - M_PI_2, true);
-	// left segment
-	video->DrawEllipseSegment( p - Point(offset, 0),
-							  xradius, yradius, color, -0.5 - M_PI, 0.5 - M_PI, true);
-	// bottom segment
-	video->DrawEllipseSegment( p + Point(0, offset),
-							  xradius, yradius, color, -0.7 - M_PI - M_PI_2, 0.7 - M_PI - M_PI_2, true);
+	std::vector<Point> points = PlotEllipse(r);
+	assert(points.size() % 4 == 0);
+	
+	// a line bisecting the ellipse diagonally
+	const Point& b1 = r.origin;
+	const Point& b2 = r.Maximum();
+	
+	Video* video = core->GetVideoDriver();
+	
+	size_t i = 0;
+	// points are ordered per quadrant, so we can process 4 each iteration
+	// at first, 2 points will be the left segment and 2 will be the right segment
+	for (; i < points.size(); i += 4) {
+		// each point is in a different quadrant
+		const Point& q1 = points[i];
+		const Point& q2 = points[i + 1];
+		
+		if (left(b1, b2, q1)) {
+			// remaining points are top and bottom segments
+			break;
+		}
+		
+		const Point& q3 = points[i + 2];
+		const Point& q4 = points[i + 3];
+		
+		video->DrawPoint(q1 + offsetH, color);
+		video->DrawPoint(q2 - offsetH, color);
+		video->DrawPoint(q3 - offsetH, color);
+		video->DrawPoint(q4 + offsetH, color);
+	}
+	
+	assert(i < points.size() - 4);
+	
+	// the current points are the ends of all segment arcs
+	video->DrawLine(points[i] + offsetH, p + offsetH, color);   // begin right segment
+	video->DrawLine(points[i++] + offsetV, p + offsetV, color); // begin top segement
+	video->DrawLine(points[i] - offsetH, p - offsetH, color);   // begin left segment
+	video->DrawLine(points[i++] + offsetV, p + offsetV, color); // end top segment
+	video->DrawLine(points[i] - offsetH, p - offsetH, color);   // end left segment
+	video->DrawLine(points[i++] - offsetV, p - offsetV, color); // begin bottom segment
+	video->DrawLine(points[i] + offsetH, p + offsetH, color);   // end right segment
+	video->DrawLine(points[i++] - offsetV, p - offsetV, color); // end bottom segment
+	
+	// remaining points are top/bottom segments
+	for (; i < points.size(); i += 4) {
+		const Point& q1 = points[i];
+		const Point& q2 = points[i + 1];
+		const Point& q3 = points[i + 2];
+		const Point& q4 = points[i + 3];
+		
+		video->DrawPoint(q1 + offsetV, color);
+		video->DrawPoint(q2 + offsetV, color);
+		video->DrawPoint(q3 - offsetV, color);
+		video->DrawPoint(q4 - offsetV, color);
+	}
 }
 
 void GameControl::DrawTargetReticle(const Movable* target, const Point& p) const
