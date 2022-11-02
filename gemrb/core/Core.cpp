@@ -50,38 +50,6 @@ namespace GemRB {
 
 //// Globally used functions
 
-double AngleFromPoints(const Point& p1, const Point& p2)
-{
-	double xdiff = p1.x - p2.x;
-	double ydiff = p1.y - p2.y;
-
-	double angle = std::atan2(ydiff, xdiff);
-	return angle;
-}
-
-Point RotatePoint(const Point& p, double angle)
-{
-	int newx = static_cast<int>(p.x * std::cos(angle) - p.y * std::sin(angle));
-	int newy = static_cast<int>(p.x * std::sin(angle) + p.y * std::cos(angle));
-	return Point(newx, newy);
-}
-
-/** Calculates distance between 2 points */
-unsigned int Distance(const Point &p, const Point &q)
-{
-	long x = p.x - q.x;
-	long y = p.y - q.y;
-	return (unsigned int) std::hypot(x, y);
-}
-
-/** Calculates squared distance between 2 points */
-unsigned int SquaredDistance(const Point &p, const Point &q)
-{
-	long x = p.x - q.x;
-	long y = p.y - q.y;
-	return static_cast<unsigned int>(x * x + y * y);
-}
-
 /** Calculates distance squared from a point to a scriptable */
 unsigned int SquaredMapDistance(const Point &p, const Scriptable *b)
 {

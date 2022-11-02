@@ -21,8 +21,7 @@
 #ifndef ORIENT_H
 #define ORIENT_H
 
-#include "globals.h"
-
+#include "Geometry.h"
 #include "RNG.h"
 
 #include <cstdint>

@@ -17,6 +17,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	FontManager.cpp
 	Game.cpp
 	GameData.cpp
+	Geometry.cpp
 	GlobalTimer.cpp
 	ImageFactory.cpp
 	ImageMgr.cpp
