@@ -4047,7 +4047,7 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_MAXHITPOINTS, fx->Parameter2);
 	//This better happens after increasing maxhitpoints
 	if (fx->FirstApply) {
-		BASE_ADD( IE_HITPOINTS, fx->Parameter1);
+		BASE_ADD(IE_HITPOINTS, fx->Parameter2);
 	}
 	HandleBonus(target, IE_SAVEVSDEATH, fx->Parameter1, fx->TimingMode);
 	HandleBonus(target, IE_SAVEVSWANDS, fx->Parameter1, fx->TimingMode);
