@@ -3065,6 +3065,10 @@ int fx_cure_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 	target->fxqueue.RemoveAllEffects( fx_diseased_state_ref ); //this is what actually happens in bg2
 	// iwd also does this, as its mummies have permanent timing diseases
 	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_DISEASED);
+	// also cures feeblemind, duplicating fx_cure_feebleminded_state
+	BASE_STATE_CURE(STATE_FEEBLE);
+	target->fxqueue.RemoveAllEffects(fx_set_feebleminded_state_ref);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FEEBLEMIND);
 	return FX_NOT_APPLIED;
 }
 
