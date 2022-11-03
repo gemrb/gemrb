@@ -81,6 +81,8 @@ def DialogEnded ():
 	global ContinueWindow
 
 	GUICommonWindows.UpdateActionsWindow()
+	if not ContinueWindow:
+		return
 
 	# reset the global hotkey, so it doesn't interfere with console use afterwards
 	ContinueWindow.GetControl(0).SetHotKey (None, 0, True)
