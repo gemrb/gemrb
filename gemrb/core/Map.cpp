@@ -2956,7 +2956,11 @@ bool Map::CanFree()
 		// maybe we should also catch non-interruptible actions (!actor->CurrentActionInterruptable)
 		// but it has not been needed yet
 		if (current && actionflags[current->actionID] & AF_CHASE) {
-			return false;
+			// limit to situations where pcs are targets, so to not delay area unloading too much
+			// fixes initial trademeet animal attack spamming other areas after travel
+			// CurrentActionTarget is not set for all action invocations, but so far this is good enough
+			const Actor* target = GetActorByGlobalID(actor->CurrentActionTarget);
+			if (target && target->InParty) return false;
 		}
 
 		if (actor == core->GetCutSceneRunner()) {
