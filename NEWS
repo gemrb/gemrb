@@ -1,9 +1,10 @@
-GemRB git (598cd0a28):
+GemRB git (8dba39):
   New features:
     - 
 
   Improved features:
     - 
+    - combat, pathfinding
     - bugfixes
 
 GemRB v0.9.1 (2022-08-29):
