@@ -425,6 +425,7 @@ int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 Chang
 int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
 
 int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect *fx); // 0x144 (0x122) - 324
+int fx_save_bonus (Scriptable* Owner, Actor* target, Effect* fx); // 0x145 in ees, ee in iwds
 
 int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx); // 402 in iwd2, 326 in ees
 
@@ -694,6 +695,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("RestoreSpells", fx_restore_spell_level, 0, -1 ),
 	EffectDesc("RetreatFrom2", fx_turn_undead, 0, -1 ),
 	EffectDesc("RightHitModifier", fx_right_to_hit_modifier, 0, -1 ),
+	EffectDesc("SaveBonus", fx_save_bonus, 0, -1),
 	EffectDesc("SaveVsBreathModifier", fx_save_vs_breath_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("SaveVsDeathModifier", fx_save_vs_death_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("SaveVsPolyModifier", fx_save_vs_poly_modifier, EFFECT_SPECIAL_UNDO, -1 ),
@@ -7944,6 +7946,18 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 	}
 	//this has effect only on first apply, it will stop applying the spell
 	return FX_ABORT;
+}
+
+// 0xee  (238) SaveBonus in iwds
+// 0x145 (325) SaveBonus in ees
+int fx_save_bonus (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	STAT_MOD(IE_SAVEVSDEATH);
+	STAT_MOD(IE_SAVEVSWANDS);
+	STAT_MOD(IE_SAVEVSPOLY);
+	STAT_MOD(IE_SAVEVSBREATH);
+	STAT_MOD(IE_SAVEVSSPELL);
+	return FX_APPLIED;
 }
 
 // 402 in iwd2, 326 ees

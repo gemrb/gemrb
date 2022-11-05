@@ -101,7 +101,6 @@ static int fx_cold_damage (Scriptable* Owner, Actor* target, Effect* fx);//ea
 static int fx_chill_touch (Scriptable* Owner, Actor* target, Effect* fx);//ec (how)
 static int fx_chill_touch_panic (Scriptable* Owner, Actor* target, Effect* fx);//ec (iwd2)
 static int fx_crushing_damage (Scriptable* Owner, Actor* target, Effect* fx);//ed
-static int fx_save_bonus (Scriptable* Owner, Actor* target, Effect* fx); //ee
 static int fx_slow_poison (Scriptable* Owner, Actor* target, Effect* fx); //ef
 static int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx); //f0
 static int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx); //f1
@@ -247,7 +246,6 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ChillTouch", fx_chill_touch, 0, -1), //ec (how)
 	EffectDesc("ChillTouchPanic", fx_chill_touch_panic, 0, -1), //ec (iwd2)
 	EffectDesc("CrushingDamage", fx_crushing_damage, EFFECT_DICED, -1), //ed
-	EffectDesc("SaveBonus", fx_save_bonus, 0, -1), //ee
 	EffectDesc("SlowPoison", fx_slow_poison, 0, -1), //ef
 	EffectDesc("IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1), //f0
 	EffectDesc("VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1), //f1
@@ -663,19 +661,6 @@ int fx_crushing_damage (Scriptable* Owner, Actor* target, Effect* fx)
 	// print("fx_crushing_damage(%2d): Damage %d", fx->Opcode, fx->Parameter1);
 	target->Damage(fx->Parameter1, DAMAGE_CRUSHING, Owner, fx->IsVariable, fx->SavingThrowType);
 	return FX_NOT_APPLIED;
-}
-
-//0xee SaveBonus
-int fx_save_bonus (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	// print("fx_save_bonus(%2d): Bonus %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	// TODO: check that users are passing appropriate values in iwd1 and iwd2!
-	STAT_MOD( IE_SAVEVSDEATH );
-	STAT_MOD( IE_SAVEVSWANDS );
-	STAT_MOD( IE_SAVEVSPOLY );
-	STAT_MOD( IE_SAVEVSBREATH );
-	STAT_MOD( IE_SAVEVSSPELL );
-	return FX_APPLIED;
 }
 
 //0xef SlowPoison
