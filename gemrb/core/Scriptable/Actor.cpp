@@ -7795,6 +7795,14 @@ bool Actor::UpdateDrawingState()
 {
 	for (auto it = vfxQueue.cbegin(); it != vfxQueue.cend();) {
 		ScriptedAnimation* vvc = *it;
+
+		// skip two overlays if fx_disable_overlay_modifier is in effect
+		// add a flags field if this ever starts being used heavily (currently only bg2 demi-liches)
+		if (Modified[IE_DISABLEOVERLAY] && (vvc->ResName == hc_overlays[OV_BOUNCE] || vvc->ResName == hc_overlays[OV_SPELLTRAP])) {
+			++it;
+			continue;
+		}
+
 		if ((vvc->SequenceFlags & IE_VVC_STATIC) == 0) {
 			vvc->Pos = Pos;
 		}

@@ -7399,11 +7399,13 @@ int fx_title_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
+
 //0x123 DisableOverlay
-// Blocks the hardcoded animations applied by opcodes: 201, 204, 205, 223, 226, 259, 197, 198, 199, 200, 202, 203, 207, 227, 228, 299.
+// Blocks the hardcoded animations applied by opcodes:
+// - 201, 204, 205, 223, 259 (SPMAGGLO - OV_SPELLTRAP)
+// - 197, 198, 200, 202, 203, 207, 226, 227, 228, 299 (SPTURNI2 - OV_BOUNCE / pcf_bounce)
 int fx_disable_overlay_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_disable_overlay_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	STAT_SET(IE_DISABLEOVERLAY, fx->Parameter2);
 	return FX_APPLIED;
 }
