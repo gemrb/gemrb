@@ -295,6 +295,81 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr* iniFile, StringView critter
 	}
 }
 
+static void AssignScripts(const DataFileMgr* iniFile, CritterEntry& critter, StringView critterName)
+{
+	StringView keyValue = iniFile->GetKeyAsString(critterName, "script_name");
+	if (keyValue) {
+		critter.ScriptName = ieVariable(keyValue);
+	}
+
+	keyValue = iniFile->GetKeyAsString(critterName, "dialog");
+	if (keyValue) {
+		critter.Dialog = ResRef(keyValue);
+	}
+
+	// iwd2 script names (override remains the same)
+	// special 1 == area
+	keyValue = iniFile->GetKeyAsString(critterName, "script_special_1");
+	if (keyValue) {
+		critter.AreaScript = ResRef(keyValue);
+	}
+	// special 2 == class
+	keyValue = iniFile->GetKeyAsString(critterName, "script_special_2");
+	if (keyValue) {
+		critter.ClassScript = ResRef(keyValue);
+	}
+	// special 3 == general
+	keyValue = iniFile->GetKeyAsString(critterName, "script_special_3");
+	if (keyValue) {
+		critter.GeneralScript = ResRef(keyValue);
+	}
+	// team == specific
+	keyValue = iniFile->GetKeyAsString(critterName, "script_team");
+	if (keyValue) {
+		critter.SpecificScript = ResRef(keyValue);
+	}
+	// combat == race
+	keyValue = iniFile->GetKeyAsString(critterName, "script_combat");
+	if (keyValue) {
+		critter.RaceScript = ResRef(keyValue);
+	}
+	// movement == default
+	keyValue = iniFile->GetKeyAsString(critterName, "script_movement");
+	if (keyValue) {
+		critter.DefaultScript = ResRef(keyValue);
+	}
+
+	// pst script names
+	keyValue = iniFile->GetKeyAsString(critterName, "script_override");
+	if (keyValue) {
+		critter.OverrideScript = ResRef(keyValue);
+	}
+	keyValue = iniFile->GetKeyAsString(critterName, "script_class");
+	if (keyValue) {
+		critter.ClassScript = ResRef(keyValue);
+	}
+	keyValue = iniFile->GetKeyAsString(critterName, "script_race");
+	if (keyValue) {
+		critter.RaceScript = ResRef(keyValue);
+	}
+	keyValue = iniFile->GetKeyAsString(critterName, "script_general");
+	if (keyValue) {
+		critter.GeneralScript = ResRef(keyValue);
+	}
+	keyValue = iniFile->GetKeyAsString(critterName, "script_default");
+	if (keyValue) {
+		critter.DefaultScript = ResRef(keyValue);
+	}
+	keyValue = iniFile->GetKeyAsString(critterName, "script_area");
+	if (keyValue) {
+		critter.AreaScript = ResRef(keyValue);
+	}
+	keyValue = iniFile->GetKeyAsString(critterName, "script_specifics");
+	if (keyValue) {
+		critter.SpecificScript = ResRef(keyValue);
+	}
+}
+
 // tags not working in originals either, see IESDP for details:
 // control_var, spec_area, check_crowd, spawn_time_of_day, check_view_port (used!) & check_by_view_port
 CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView crittername) const
@@ -413,24 +488,11 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 	ps = inifile->GetKeyAsInt(crittername, "facing", -1);
 	critter.Orientation2 = ps;
 
-	ps = inifile->GetKeyAsInt(crittername, "ai_ea", -1);
-	if (ps!=-1) critter.SetSpec[AI_EA] = (ieByte) ps;
-	ps = inifile->GetKeyAsInt(crittername, "ai_faction", -1);
-	if (ps!=-1) critter.SetSpec[AI_FACTION] = (ieByte) ps;
-	ps = inifile->GetKeyAsInt(crittername, "ai_team", -1);
-	if (ps!=-1) critter.SetSpec[AI_TEAM] = (ieByte) ps;
-	ps = inifile->GetKeyAsInt(crittername, "ai_general", -1);
-	if (ps!=-1) critter.SetSpec[AI_GENERAL] = (ieByte) ps;
-	ps = inifile->GetKeyAsInt(crittername, "ai_race", -1);
-	if (ps!=-1) critter.SetSpec[AI_RACE] = (ieByte) ps;
-	ps = inifile->GetKeyAsInt(crittername, "ai_class", -1);
-	if (ps!=-1) critter.SetSpec[AI_CLASS] = (ieByte) ps;
-	ps = inifile->GetKeyAsInt(crittername, "ai_specifics", -1);
-	if (ps!=-1) critter.SetSpec[AI_SPECIFICS] = (ieByte) ps;
-	ps = inifile->GetKeyAsInt(crittername, "ai_gender", -1);
-	if (ps!=-1) critter.SetSpec[AI_GENDER] = (ieByte) ps;
-	ps = inifile->GetKeyAsInt(crittername, "ai_alignment", -1);
-	if (ps!=-1) critter.SetSpec[AI_ALIGNMENT] = (ieByte) ps;
+	static const std::string aiStats[] = { "ai_ea", "ai_faction", "ai_team", "ai_general", "ai_race", "ai_class", "ai_specifics", "ai_gender", "ai_alignment" };
+	for (int i = AI_EA; i <= AI_ALIGNMENT; i++)  {
+		ps = inifile->GetKeyAsInt(crittername, aiStats[i], -1);
+		if (ps != -1) critter.SetSpec[i] = static_cast<ieByte>(ps);
+	}
 
 	s = inifile->GetKeyAsString(crittername, "spec");
 	if (s) {
@@ -449,121 +511,24 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 		}
 	}
 
-	s = inifile->GetKeyAsString(crittername, "script_name");
-	if (s) {
-		critter.ScriptName = ieVariable(s);
+	AssignScripts(inifile, critter, crittername);
+
+	// remaining flag bits
+	// area diff flags disable spawns based on game difficulty in iwd2
+	static const std::map<int, std::string> flagNames = { { CF_DEATHVAR, "death_scriptname" }, { CF_FACTION, "death_faction" }, { CF_TEAM, "death_team" }, { CF_BUDDY, "auto_buddy" }, { CF_NO_DIFF_1, "area_diff_1" }, { CF_NO_DIFF_2, "area_diff_2" }, { CF_NO_DIFF_3, "area_diff_3" } };
+	for (const auto& flag : flagNames)  {
+		if (inifile->GetKeyAsBool(crittername, flag.second, false)) {
+			critter.Flags |= flag.first;
+		}
 	}
 
-	//iwd2 script names (override remains the same)
-	//special 1 == area
-	s = inifile->GetKeyAsString(crittername, "script_special_1");
-	if (s) {
-		critter.AreaScript = ResRef(s);
-	}
-	//special 2 == class
-	s = inifile->GetKeyAsString(crittername, "script_special_2");
-	if (s) {
-		critter.ClassScript = ResRef(s);
-	}
-	//special 3 == general
-	s = inifile->GetKeyAsString(crittername, "script_special_3");
-	if (s) {
-		critter.GeneralScript = ResRef(s);
-	}
-	//team == specific
-	s = inifile->GetKeyAsString(crittername, "script_team");
-	if (s) {
-		critter.SpecificScript = ResRef(s);
-	}
-
-	//combat == race
-	s = inifile->GetKeyAsString(crittername, "script_combat");
-	if (s) {
-		critter.RaceScript = ResRef(s);
-	}
-	//movement == default
-	s = inifile->GetKeyAsString(crittername, "script_movement");
-	if (s) {
-		critter.DefaultScript = ResRef(s);
-	}
-
-	//pst script names
-	s = inifile->GetKeyAsString(crittername, "script_override");
-	if (s) {
-		critter.OverrideScript = ResRef(s);
-	}
-	s = inifile->GetKeyAsString(crittername, "script_class");
-	if (s) {
-		critter.ClassScript = ResRef(s);
-	}
-	s = inifile->GetKeyAsString(crittername, "script_race");
-	if (s) {
-		critter.RaceScript = ResRef(s);
-	}
-	s = inifile->GetKeyAsString(crittername, "script_general");
-	if (s) {
-		critter.GeneralScript = ResRef(s);
-	}
-	s = inifile->GetKeyAsString(crittername, "script_default");
-	if (s) {
-		critter.DefaultScript = ResRef(s);
-	}
-	s = inifile->GetKeyAsString(crittername, "script_area");
-	if (s) {
-		critter.AreaScript = ResRef(s);
-	}
-	s = inifile->GetKeyAsString(crittername, "script_specifics");
-	if (s) {
-		critter.SpecificScript = ResRef(s);
-	}
-	s = inifile->GetKeyAsString(crittername, "dialog");
-	if (s) {
-		critter.Dialog = ResRef(s);
-	}
-
-	//flags
-	if (inifile->GetKeyAsBool(crittername, "death_scriptname", false)) {
-		critter.Flags |= CF_DEATHVAR;
-	}
-	if (inifile->GetKeyAsBool(crittername, "death_faction", false)) {
-		critter.Flags |= CF_FACTION;
-	}
-	if (inifile->GetKeyAsBool(crittername, "death_team", false)) {
-		critter.Flags |= CF_TEAM;
-	}
-	ps = inifile->GetKeyAsInt(crittername, "good_mod", 0);
-	if (ps) {
-		critter.Flags |= CF_GOOD;
-		critter.DeathCounters[DC_GOOD] = static_cast<ieByte>(ps);
-	}
-	ps = inifile->GetKeyAsInt(crittername, "law_mod", 0);
-	if (ps) {
-		critter.Flags |= CF_LAW;
-		critter.DeathCounters[DC_LAW] = static_cast<ieByte>(ps);
-	}
-	ps = inifile->GetKeyAsInt(crittername, "lady_mod", 0);
-	if (ps) {
-		critter.Flags |= CF_LADY;
-		critter.DeathCounters[DC_LADY] = static_cast<ieByte>(ps);
-	}
-	ps = inifile->GetKeyAsInt(crittername, "murder_mod", 0);
-	if (ps) {
-		critter.Flags |= CF_MURDER;
-		critter.DeathCounters[DC_MURDER] = static_cast<ieByte>(ps);
-	}
-	if(inifile->GetKeyAsBool(crittername, "auto_buddy", false)) {
-		critter.Flags |= CF_BUDDY;
-	}
-
-	// disable spawn based on game difficulty
-	if (inifile->GetKeyAsBool(crittername, "area_diff_1", false)) {
-		critter.Flags |= CF_NO_DIFF_1;
-	}
-	if (inifile->GetKeyAsBool(crittername, "area_diff_2", false)) {
-		critter.Flags |= CF_NO_DIFF_2;
-	}
-	if (inifile->GetKeyAsBool(crittername, "area_diff_3", false)) {
-		critter.Flags |= CF_NO_DIFF_3;
+	static const std::string deathCounters[] = { "good_mod", "law_mod", "lady_mod", "murder_mod" };
+	for (int i = DC_GOOD; i <= DC_MURDER; i++)  {
+		ps = inifile->GetKeyAsInt(crittername, deathCounters[i], 0);
+		if (ps) {
+			critter.Flags |= CF_GOOD << i;
+			critter.DeathCounters[i] = static_cast<ieByte>(ps);
+		}
 	}
 
 	return critter;
