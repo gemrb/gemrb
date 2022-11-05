@@ -26,6 +26,7 @@
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "Interface.h"
+#include "Light.h"
 #include "ProjectileServer.h"
 #include "Sprite2D.h"
 #include "VEFObject.h"
@@ -351,7 +352,7 @@ void Projectile::Setup()
 	}
 
 	if (TFlags&PTF_LIGHT) {
-		light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
+		light = CreateLight(Size(LightX, LightY), LightZ);
 	}
 	if (TFlags&PTF_TRANS) {
 		SetBlend(TFlags&PTF_BRIGHTEN);

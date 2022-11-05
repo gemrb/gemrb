@@ -28,6 +28,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Item.cpp
 	ItemMgr.cpp
 	KeyMap.cpp
+	Light.cpp
 	Logging/Logger.cpp
 	Logging/Loggers/Stdio.cpp
 	Logging/Logging.cpp

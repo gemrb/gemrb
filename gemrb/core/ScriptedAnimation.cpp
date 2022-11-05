@@ -28,6 +28,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Light.h"
 #include "Map.h"
 #include "Video/Pixels.h"
 #include "Sprite2D.h"
@@ -472,7 +473,7 @@ bool ScriptedAnimation::UpdatePhase()
 		Delay = 0;
 
 		if (SequenceFlags & IE_VVC_LIGHTSPOT) {
-			light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
+			light = CreateLight(Size(LightX, LightY), LightZ);
 		}
 
 		if (Duration != 0xffffffff) {
