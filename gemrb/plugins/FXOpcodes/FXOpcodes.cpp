@@ -655,7 +655,6 @@ static EffectDesc effectnames[] = {
 	EffectDesc("PowerWordStun", fx_power_word_stun, 0, -1 ),
 	EffectDesc("PriestSpellSlotsModifier", fx_bonus_priest_spells, 0, -1 ),
 	EffectDesc("Proficiency", fx_proficiency, 0, -1 ),
-//	EffectDesc("Protection:Animation", fx_protection_from_animation, 0, -1 ),
 	EffectDesc("Protection:Animation", fx_generic_effect, 0, -1 ),
 	EffectDesc("Protection:Backstab", fx_no_backstab_modifier, 0, -1 ),
 	EffectDesc("Protection:Creature", fx_generic_effect, 0, -1 ),
@@ -5866,9 +5865,8 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (! fx->FirstApply) return FX_NOT_APPLIED;
 	}
 
-	if (target->fxqueue.HasEffectWithResource(fx_protection_from_animation_ref,fx->Resource)) {
-		//effect supressed by opcode 0x128
-
+	if (target->fxqueue.HasEffectWithResource(fx_protection_from_animation_ref, fx->Resource)) {
+		// effect supressed by opcode 0x128
 		return FX_APPLIED;
 	}
 
@@ -7443,17 +7441,8 @@ int fx_disable_chunk_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET(IE_DISABLECHUNKING, fx->Parameter2);
 	return FX_APPLIED;
 }
-#if 0
-//This is done differently in the original engine, and THIS may not even work
-//0x128 Protection:Animation
-int fx_protection_from_animation (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	// print("fx_protection_from_animation(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	//remove vvc from actor if active
-	target->RemoveVVCell(fx->Resource);
-	return FX_APPLIED;
-}
-#endif
+
+//0x128 Protection:Animation - disable 0xd7 if fx->Resource matches
 
 //0x129 Protection:Turn
 int fx_protection_from_turn (Scriptable* /*Owner*/, Actor* target, Effect* fx)
