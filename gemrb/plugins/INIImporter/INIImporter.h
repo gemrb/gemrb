@@ -92,7 +92,7 @@ public:
 
 	int GetKeyAsInt(StringView Key, const int Default) const
 	{
-		const char* ret = NULL;
+		const char* ret = nullptr;
 		for (const auto& pair : pairs) {
 			if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
 				ret = pair.Value.c_str();
@@ -102,12 +102,12 @@ public:
 		if (!ret) {
 			return Default;
 		}
-		return atoi( ret );
+		return atoi(ret);
 	}
 
 	float GetKeyAsFloat(StringView Key, const float Default) const
 	{
-		const char* ret = NULL;
+		const char* ret = nullptr;
 		for (const auto& pair : pairs) {
 			if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
 				ret = pair.Value.c_str();
@@ -117,12 +117,12 @@ public:
 		if (!ret) {
 			return Default;
 		}
-		return atof( ret );
+		return atof(ret);
 	}
 
 	bool GetKeyAsBool(StringView Key, const bool Default) const
 	{
-		const char* ret = NULL;
+		const char* ret = nullptr;
 		for (const auto& pair : pairs) {
 			if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
 				ret = pair.Value.c_str();
@@ -132,13 +132,13 @@ public:
 		if (!ret) {
 			return Default;
 		}
-		if (!stricmp( ret, "true") ) {
+		if (!stricmp(ret, "true")) {
 			return true;
 		}
-		if (!stricmp( ret, "false") ) {
+		if (!stricmp(ret, "false")) {
 			return false;
 		}
-		return (atoi( ret ) )!=0;
+		return atoi(ret) != 0;
 	}
 };
 
@@ -152,7 +152,7 @@ public:
 	bool Open(DataStream* stream) override;
 	int GetTagsCount() const override
 	{
-		return ( int ) tags.size();
+		return static_cast<int>(tags.size());
 	}
 	StringView GetTagNameByIndex(int index) const override
 	{
