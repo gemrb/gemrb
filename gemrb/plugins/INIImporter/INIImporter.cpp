@@ -24,6 +24,91 @@
 
 using namespace GemRB;
 
+bool INITag::AddLine(std::string iniLine)
+{
+	auto equalsPos = iniLine.find_first_of('=');
+	if (equalsPos == std::string::npos) {
+		return false;
+	}
+
+	auto keyStart = iniLine.find_first_not_of(' ');
+	if (keyStart == std::string::npos) return true;
+	std::string key = iniLine.substr(keyStart, equalsPos - keyStart);
+	key = key.substr(0, key.find_last_not_of(' ') + 1); // right trimming
+
+	auto valueStart = iniLine.find_first_not_of(' ', equalsPos + 1);
+	auto valueEnd = iniLine.find_last_not_of(' ');
+	if (valueStart == std::string::npos) return true;
+	if (valueEnd == std::string::npos) return true;
+	std::string value = iniLine.substr(valueStart, valueEnd - valueStart + 1);
+
+	INIPair p = { key, value };
+	pairs.push_back(p);
+	return true;
+}
+
+StringView INITag::GetKeyAsString(StringView Key, StringView Default) const
+{
+	for (const auto& pair : pairs) {
+		if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
+			return pair.Value;
+		}
+	}
+	return Default;
+}
+
+int INITag::GetKeyAsInt(StringView Key, const int Default) const
+{
+	const char* ret = nullptr;
+	for (const auto& pair : pairs) {
+		if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
+			ret = pair.Value.c_str();
+			break;
+		}
+	}
+	if (!ret) {
+		return Default;
+	}
+	return atoi(ret);
+}
+
+float INITag::GetKeyAsFloat(StringView Key, const float Default) const
+{
+	const char* ret = nullptr;
+	for (const auto& pair : pairs) {
+		if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
+			ret = pair.Value.c_str();
+			break;
+		}
+	}
+	if (!ret) {
+		return Default;
+	}
+	return atof(ret);
+}
+
+bool INITag::GetKeyAsBool(StringView Key, const bool Default) const
+{
+	const char* ret = nullptr;
+	for (const auto& pair : pairs) {
+		if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
+			ret = pair.Value.c_str();
+			break;
+		}
+	}
+	if (!ret) {
+		return Default;
+	}
+	if (!stricmp(ret, "true")) {
+		return true;
+	}
+	if (!stricmp(ret, "false")) {
+		return false;
+	}
+	return atoi(ret) != 0;
+}
+
+// standard INI file importer
 bool INIImporter::Open(DataStream* str)
 {
 	if (str == NULL) {
