@@ -246,36 +246,6 @@ Holder<Sprite2D> Video::SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned
 	return small;
 }
 
-//TODO light could be elliptical in the original engine
-//is it difficult?
-Holder<Sprite2D> Video::CreateLight(int radius, int intensity)
-{
-	if(!radius) return NULL;
-	Point p, q;
-	int a;
-	void* pixels = malloc( radius * radius * 4 * 4);
-	int i = 0;
-
-	for (p.y = -radius; p.y < radius; p.y++) {
-		for (p.x = -radius; p.x < radius; p.x++) {
-			a = intensity*(radius-(signed) Distance(p,q))/radius;
-
-			if(a<0) a=0;
-			else if(a>255) a = 255;
-
-			*((unsigned int*)pixels + i++) = 0xffffff + ((a/2) << 24);
-		}
-	}
-
-	static const PixelFormat fmt(4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-	Holder<Sprite2D> light = CreateSprite(Region(0,0, radius*2, radius*2), pixels, fmt);
-
-	light->Frame.x = radius;
-	light->Frame.y = radius;
-
-	return light;
-}
-
 Color Video::SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio) const
 {
 	// TODO: turn this into one of our software "shaders"

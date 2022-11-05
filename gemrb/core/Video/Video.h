@@ -206,9 +206,6 @@ public:
 
 	/** Scales down a sprite by a ratio */
 	Holder<Sprite2D> SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned int ratio);
-	/** Creates an ellipse or circle shaped sprite with various intensity
-	 *  for projectile light spots */
-	Holder<Sprite2D> CreateLight(int radius, int intensity);
 
 	Color SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio) const;
 };
