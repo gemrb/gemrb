@@ -805,8 +805,6 @@ static int check_type(Actor *actor, const Effect& fx)
 	//the protective effect (if any)
 	Effect *efx;
 
-	ieDword bounce = actor->GetStat(IE_BOUNCE);
-
 	//spell level immunity
 	// but ignore it if we're casting beneficial stuff on ourselves
 	if (fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0)) {
@@ -910,6 +908,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		return 1;
 	}
 
+	ieDword bounce = actor->GetStat(IE_BOUNCE);
 	if (fx.Power) {
 		if ((bounce & BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, 0, fx.Power)) {
 			Log(DEBUG, "EffectQueue", "Bounced by level");
