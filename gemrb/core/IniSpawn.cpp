@@ -415,6 +415,8 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 
 	ps = inifile->GetKeyAsInt(crittername, "ai_ea", -1);
 	if (ps!=-1) critter.SetSpec[AI_EA] = (ieByte) ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_faction", -1);
+	if (ps!=-1) critter.SetSpec[AI_FACTION] = (ieByte) ps;
 	ps = inifile->GetKeyAsInt(crittername, "ai_team", -1);
 	if (ps!=-1) critter.SetSpec[AI_TEAM] = (ieByte) ps;
 	ps = inifile->GetKeyAsInt(crittername, "ai_general", -1);
