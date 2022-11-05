@@ -138,10 +138,10 @@ struct VariableSpec {
 
 class GEM_EXPORT IniSpawn {
 public:
-	IniSpawn(Map *owner, const ResRef& DefaultArea);
+	IniSpawn(Map* owner, const ResRef& defaultArea);
 
 private:
-	Map *map; //owner
+	Map* map; //owner
 	ResRef NamelessSpawnArea;
 	std::vector<VariableSpec> NamelessVar;
 	std::vector<VariableSpec> Locals;
@@ -155,17 +155,17 @@ private:
 	ieDword detail_level = 2; // high detail level by default
 
 	CritterEntry ReadCreature(const DataFileMgr* inifile, StringView crittername) const;
-	void ReadSpawnEntry(const DataFileMgr *inifile, StringView entryname, SpawnEntry &entry) const;
+	void ReadSpawnEntry(const DataFileMgr* inifile, StringView entryname, SpawnEntry& entry) const;
 	//spawns a single creature
-	void SpawnCreature(const CritterEntry &critter) const;
-	void SpawnGroup(SpawnEntry &event) const;
+	void SpawnCreature(const CritterEntry& critter) const;
+	void SpawnGroup(SpawnEntry& event) const;
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const ieVariable& keyword) const;
-	void PrepareSpawnPoints(const DataFileMgr *iniFile, StringView critterName, CritterEntry &critter) const;
-	void SelectSpawnPoint(CritterEntry &critter) const;
+	void PrepareSpawnPoints(const DataFileMgr* iniFile, StringView critterName, CritterEntry& critter) const;
+	void SelectSpawnPoint(CritterEntry& critter) const;
 public:
 	/* called by action of the same name */
-	void SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state);
+	void SetNamelessDeath(const ResRef& area, const Point& pos, ieDword state);
 	void RespawnNameless();
 	void InitialSpawn();
 	void ExitSpawn();
