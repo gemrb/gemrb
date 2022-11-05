@@ -5590,6 +5590,7 @@ int fx_protection_spelllevel_dec (Scriptable* /*Owner*/, Actor* target, Effect* 
 	}
 	STAT_BIT_OR( IE_IMMUNITY, IMM_LEVEL_DEC );
 	target->AddPortraitIcon(PI_BOUNCE2);
+	target->SetOverlay(OV_SPELLTRAP);
 	return FX_APPLIED;
 }
 
@@ -5616,6 +5617,7 @@ int fx_protection_school (Scriptable* /*Owner*/, Actor* target, Effect */*fx*/)
 {
 	// print("fx_protection_school(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_BIT_OR( IE_IMMUNITY, IMM_SCHOOL);
+	target->SetOverlay(OV_SPELLTRAP);
 	return FX_APPLIED;
 }
 
@@ -5624,6 +5626,7 @@ int fx_protection_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect *
 {
 	// print("fx_protection_secondary_type(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_BIT_OR( IE_IMMUNITY, IMM_SECTYPE);
+	target->SetOverlay(OV_SPELLTRAP);
 	return FX_APPLIED;
 }
 
@@ -6041,6 +6044,7 @@ int fx_protection_school_dec (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	STAT_BIT_OR( IE_IMMUNITY, IMM_SCHOOL_DEC );
+	target->SetOverlay(OV_SPELLTRAP);
 	return FX_APPLIED;
 }
 
@@ -6083,6 +6087,7 @@ int fx_protection_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effe
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR( IE_IMMUNITY, IMM_SECTYPE_DEC );
+	target->SetOverlay(OV_BOUNCE);
 	return FX_APPLIED;
 }
 
@@ -7503,6 +7508,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	delete gs;
 	return FX_NOT_APPLIED;
 }
+
 //0x12b ChaosShieldModifier
 int fx_chaos_shield_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -7513,8 +7519,10 @@ int fx_chaos_shield_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		target->AddPortraitIcon(PI_CSHIELD2); //163
 	}
+	target->SetOverlay(OV_BOUNCE);
 	return FX_APPLIED;
 }
+
 //0x12c NPCBump
 int fx_npc_bump (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
