@@ -95,13 +95,11 @@ static int fx_ac_vs_damage_type_modifier_iwd2 (Scriptable* Owner, Actor* target,
 static int fx_draw_upon_holy_might (Scriptable* Owner, Actor* target, Effect* fx);//84 (iwd2)
 static int fx_ironskins (Scriptable* Owner, Actor* target, Effect* fx);//da (iwd2)
 static int fx_fade_rgb (Scriptable* Owner, Actor* target, Effect* fx);//e8
-static int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx);//e9
 static int fx_cold_damage (Scriptable* Owner, Actor* target, Effect* fx);//ea
 //int fx_iwd_casting_glow (Scriptable* Owner, Actor* target, Effect* fx);//eb
 static int fx_chill_touch (Scriptable* Owner, Actor* target, Effect* fx);//ec (how)
 static int fx_chill_touch_panic (Scriptable* Owner, Actor* target, Effect* fx);//ec (iwd2)
 static int fx_crushing_damage (Scriptable* Owner, Actor* target, Effect* fx);//ed
-static int fx_slow_poison (Scriptable* Owner, Actor* target, Effect* fx); //ef
 static int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx); //f0
 static int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx); //f1
 static int fx_overlay_iwd (Scriptable* Owner, Actor* target, Effect* fx); //f2 (iwd1)
@@ -146,12 +144,10 @@ static int fx_animal_rage (Scriptable* Owner, Actor* target, Effect* fx);//117
 static int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx);//118
 static int fx_vitriolic_sphere (Scriptable* Owner, Actor* target, Effect* fx);//119
 static int fx_suppress_hp (Scriptable* Owner, Actor* target, Effect* fx);//11a
-static int fx_floattext (Scriptable* Owner, Actor* target, Effect* fx);//11b
 static int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx);//11c
 //0x11d Sleep2 ??? power word sleep?
 //0x11e Reveal:Tracks (same as bg2)
 //0x11f Protection:Backstab (same as bg2)
-static int fx_set_state (Scriptable* Owner, Actor* target, Effect* fx); //120
 static int fx_cutscene (Scriptable* Owner, Actor* target, Effect* fx);//121
 static int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* fx); //123
 //0x124 MagicalRest (same as bg2)
@@ -241,12 +237,10 @@ static EffectDesc effectnames[] = {
 	EffectDesc("DrawUponHolyMight", fx_draw_upon_holy_might, 0, -1),//84 (iwd2)
 	EffectDesc("IronSkins", fx_ironskins, 0, -1), //da (iwd2)
 	EffectDesc("Color:FadeRGB", fx_fade_rgb, 0, -1), //e8
-	EffectDesc("IWDVisualSpellHit", fx_iwd_visual_spell_hit, EFFECT_NO_ACTOR, -1), //e9
 	EffectDesc("ColdDamage", fx_cold_damage, EFFECT_DICED, -1), //ea
 	EffectDesc("ChillTouch", fx_chill_touch, 0, -1), //ec (how)
 	EffectDesc("ChillTouchPanic", fx_chill_touch_panic, 0, -1), //ec (iwd2)
 	EffectDesc("CrushingDamage", fx_crushing_damage, EFFECT_DICED, -1), //ed
-	EffectDesc("SlowPoison", fx_slow_poison, 0, -1), //ef
 	EffectDesc("IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1), //f0
 	EffectDesc("VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1), //f1
 	EffectDesc("Overlay2", fx_overlay_iwd, 0, -1), //f2
@@ -287,9 +281,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("TurnUndead2", fx_turn_undead2, 0, -1), //118 iwd2
 	EffectDesc("VitriolicSphere", fx_vitriolic_sphere, EFFECT_DICED, -1), //119
 	EffectDesc("SuppressHP", fx_suppress_hp, 0, -1), //11a -- some stat???
-	EffectDesc("FloatText", fx_floattext, 0, -1), //11b
 	EffectDesc("MaceOfDisruption", fx_mace_of_disruption, 0, -1), //11c
-	EffectDesc("State:Set", fx_set_state, 0, -1), //120
 	EffectDesc("CutScene", fx_cutscene, EFFECT_NO_ACTOR, -1), //121
 	EffectDesc("RodOfSmithing", fx_rod_of_smithing, 0, -1), //123
 	EffectDesc("BeholderDispelMagic", fx_beholder_dispel_magic, 0, -1),//125
@@ -372,7 +364,6 @@ static EffectRef fx_damage_opcode_ref = { "Damage", -1 }; //0xc
 static EffectRef fx_death_ref = { "Death", -1 }; //0xd
 static EffectRef fx_dex_ref = { "DexterityModifier", -1 }; //0xf
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 }; //0x13
-static EffectRef fx_poison_ref = { "Poison", -1 }; //0x19
 static EffectRef fx_unconscious_state_ref = { "State:Helpless", -1 }; //0x27
 static EffectRef fx_str_ref = { "StrengthModifier", -1 }; //0x2c
 static EffectRef fx_wis_ref = { "WisdomModifier", -1 }; //0x31
@@ -386,7 +377,6 @@ static EffectRef fx_resist_spell2_ref = { "Protection:Spell2", -1 }; //0xce
 static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 }; //0xe9
 static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 }; //0x100
 static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //401
-static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; //416
 static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
 static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
@@ -575,39 +565,6 @@ int fx_fade_rgb (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0xe9 IWDVisualSpellHit
-int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
-{
-	// print("fx_iwd_visual_spell_hit(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	if (!Owner) {
-		return FX_NOT_APPLIED;
-	}
-	//remove effect if there is no current area
-	Map *map = Owner->GetCurrentArea();
-	if (!map) {
-		return FX_NOT_APPLIED;
-	}
-
-	Projectile *pro;
-	if (fx->Parameter4 && fx->Parameter2 > 200) {
-		// SpellHitEffectPoint is used with sheffect.ids, so the indices are smaller
-		// we don't just check for both, since there's some overlap
-		// so far tested: acid storm needs this at 210
-		//   these don't: 46 66 104
-		pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
-	} else {
-		pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001+fx->Parameter2);
-	}
-	pro->SetCaster(fx->CasterID, fx->CasterLevel);
-	if (target) {
-		//i believe the spell hit projectiles don't follow anyone
-		map->AddProjectile(pro, target->Pos, target->GetGlobalID(), true);
-	} else {
-		map->AddProjectile(pro, fx->Pos, fx->Pos);
-	}
-	return FX_NOT_APPLIED;
-}
-
 //0xea ColdDamage (how)
 int fx_cold_damage (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -663,45 +620,6 @@ int fx_crushing_damage (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0xef SlowPoison
-//gemrb extension: can slow bleeding wounds (like bandage)
-
-int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	ieDword my_opcode;
-
-	if (fx->Parameter2) my_opcode = EffectQueue::ResolveEffect(fx_wound_ref);
-	else my_opcode = EffectQueue::ResolveEffect(fx_poison_ref);
-	// print("fx_slow_poison(%2d): Damage %d", fx->Opcode, fx->Parameter1);
-	auto f = target->fxqueue.GetFirstEffect();
-	Effect *poison;
-	//this is intentionally an assignment
-	while( (poison = target->fxqueue.GetNextEffect(f)) ) {
-		if (poison->Opcode!=my_opcode) continue;
-		switch (poison->Parameter2) {
-		case RPD_SECONDS:
-			poison->Parameter2=RPD_ROUNDS;
-			break;
-		case RPD_POINTS:
-			//i'm not sure if this is ok
-			//the hardcoded formula is supposed to be this:
-			//duration = (duration - gametime)*7+gametime;
-			//duration = duration*7 - gametime*6;
-			//but in fact it is like this.
-			//it is (duration - gametime)*8+gametime;
-			//like the damage is spread for a longer time than
-			//it should
-			poison->Duration=poison->Duration*8-core->GetGame()->GameTime*7;
-			poison->Parameter1*=7;
-			break;
-		case RPD_ROUNDS:
-			poison->Parameter2=RPD_TURNS;
-			break;
-		}
-	}
-	return FX_NOT_APPLIED;
-}
-
 #define IWD_MSC 13
 
 //this requires the FXOpcode package
@@ -713,8 +631,6 @@ const ResRef iwd_monster_2da[IWD_MSC] = { "MSUMMO1", "MSUMMO2", "MSUMMO3", "MSUM
 int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_iwd_monster_summoning(%2d): ResRef:%s Anim:%s Type: %d", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2);
-
-	//check the summoning limit?
 
 	ResRef monster;
 	ResRef hit;
@@ -1864,46 +1780,6 @@ int fx_suppress_hp (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	return FX_APPLIED;
 }
 
-//0x11b FloatText
-int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	// print("fx_floattext(%2d): StrRef:%d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	switch (fx->Parameter2)
-	{
-	case 1:
-		//in the original game this signified that a specific weapon is equipped
-		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS))
-			return FX_APPLIED;
-
-		EXTSTATE_SET(EXTSTATE_FLOATTEXTS);
-		if (fx->Resource.IsEmpty()) {
-			fx->Resource = "CYNICISM";
-		}
-		if (fx->Parameter1) {
-			fx->Parameter1--;
-			return FX_APPLIED;
-		} else {
-			fx->Parameter1=core->Roll(1,500,500);
-		}
-		// fall through
-	case 2:
-		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS)) {
-			const auto CynicismList = core->GetListFrom2DA(fx->Resource);
-			if (!CynicismList->empty()) {
-				DisplayStringCore(target, ieStrRef(CynicismList->at(RAND<size_t>(0, CynicismList->size() - 1))), DS_HEAD);
-			}
-		}
-		return FX_APPLIED;
-	default:
-		DisplayStringCore(target, ieStrRef(fx->Parameter1), DS_HEAD);
-		break;
-	case 3: //gemrb extension, displays verbalconstant
-		DisplayStringCoreVC(target, fx->Parameter1, DS_HEAD);
-		break;
-	}
-	return FX_NOT_APPLIED;
-}
-
 //0x11c MaceOfDisruption
 //death with chance based on race and level
 
@@ -1965,23 +1841,6 @@ int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 //0x11d Sleep2 ??? power word sleep?
 //0x11e Reveal:Tracks (same as bg2)
 //0x11f Protection:Backstab (same as bg2)
-
-//0x120 State:Set
-int fx_set_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	// print("fx_set_state(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	//in IWD2 we have 176 states (original had 256)
-	target->SetSpellState(fx->Parameter2);
-	//in HoW this sets only the 10 last bits of extstate (until it runs out of bits)
-	if (fx->Parameter2<11) {
-		EXTSTATE_SET(0x40000<<fx->Parameter2);
-	}
-	//maximized attacks active
-	if (fx->Parameter2==SS_KAI) {
-		target->Modified[IE_DAMAGELUCK]=255;
-	}
-	return FX_APPLIED;
-}
 
 //0x121 Cutscene (this is a very ugly hack in iwd)
 //It doesn't really start a cutscene, just sets a variable

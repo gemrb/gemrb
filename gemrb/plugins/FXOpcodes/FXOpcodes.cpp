@@ -33,6 +33,7 @@
 #include "Interface.h"
 #include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
+#include "ProjectileServer.h"
 #include "RNG.h"
 #include "ScriptedAnimation.h"
 #include "ScriptEngine.h"
@@ -425,9 +426,12 @@ int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 Chang
 int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
 
 int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect *fx); // 0x144 (0x122) - 324
-int fx_save_bonus (Scriptable* Owner, Actor* target, Effect* fx); // 0x145 in ees, ee in iwds
-
-int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx); // 402 in iwd2, 326 in ees
+int fx_save_bonus(Scriptable* Owner, Actor* target, Effect* fx); // 0x145 in ees, ee in iwds
+int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx); // 402 in iwd2, 0x146 in ees
+int fx_iwd_visual_spell_hit(Scriptable* Owner, Actor* target, Effect* fx);
+int fx_set_state(Scriptable* Owner, Actor* target, Effect* fx);
+int fx_slow_poison(Scriptable* Owner, Actor* target, Effect* fx);
+int fx_floattext(Scriptable* Owner, Actor* target, Effect* fx);
 
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
 int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 459
@@ -574,6 +578,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("FireResistanceModifier", fx_fire_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("FistDamageModifier", fx_fist_damage_modifier, 0, -1 ),
 	EffectDesc("FistHitModifier", fx_fist_to_hit_modifier, 0, -1 ),
+	EffectDesc("FloatText", fx_floattext, 0, -1),
 	EffectDesc("ForceSurgeModifier", fx_force_surge_modifier, 0, -1 ),
 	EffectDesc("ForceVisible", fx_force_visible, 0, -1 ), //not invisible but improved invisible
 	EffectDesc("FreeAction", fx_cure_slow_state, 0, -1 ),
@@ -597,6 +602,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Item:Equip", fx_equip_item, 0, -1 ), //71
 	EffectDesc("Item:Remove", fx_remove_item, 0, -1 ), //70
 	EffectDesc("Item:RemoveInventory", fx_remove_inventory_item, 0, -1 ),
+	EffectDesc("IWDVisualSpellHit", fx_iwd_visual_spell_hit, EFFECT_NO_ACTOR, -1),
 	EffectDesc("KillCreatureType", fx_kill_creature_type, 0, -1 ),
 	EffectDesc("LevelModifier", fx_level_modifier, 0, -1 ),
 	EffectDesc("LevelDrainModifier", fx_leveldrain_modifier, 0, -1 ),
@@ -715,6 +721,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("SetTrapsModifier", fx_set_traps_modifier, 0, -1 ),
 	EffectDesc("SexModifier", fx_sex_modifier, 0, -1 ),
 	EffectDesc("SlashingResistanceModifier", fx_slashing_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("SlowPoison", fx_slow_poison, 0, -1),
 	EffectDesc("Sparkle", fx_sparkle, 0, -1 ),
 	EffectDesc("SpellDurationModifier", fx_spell_duration_modifier, 0, -1 ),
 	EffectDesc("Spell:Add", fx_add_innate, 0, -1 ),
@@ -750,6 +757,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("State:Petrification", fx_set_petrified_state, 0, -1 ),
 	EffectDesc("State:Poisoned", fx_set_poisoned_state, 0, -1 ),
 	EffectDesc("State:Regenerating", fx_set_regenerating_state, 0, -1 ),
+	EffectDesc("State:Set", fx_set_state, 0, -1),
 	EffectDesc("State:Silenced", fx_set_silenced_state, 0, -1 ),
 	EffectDesc("State:Helpless", fx_set_unconscious_state, 0, -1 ),
 	EffectDesc("State:Sleep", fx_set_unconscious_state, 0, -1 ),
@@ -850,6 +858,7 @@ static EffectRef fx_eye_venom_ref = { "EyeOfVenom", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 static EffectRef fx_eye_fortitude_ref = { "EyeOfFortitude", -1 };
 static EffectRef fx_remove_effects_ref = { "RemoveEffectsByResource", -1 };
+static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; // 416
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
@@ -7903,7 +7912,7 @@ int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x122 (290) Protection:Spell3 with IWD ids targeting
 // 0x144 (324) Protection: Immunity to Resource and Message in EEs
 // this is a variant of fx_resist_spell that is used in iwd2 (different than bg2, see IWDOpcodes!)
-int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
+int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	//changed this to the opposite (cure light wounds resisted by undead)
 	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
@@ -7950,7 +7959,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 
 // 0xee  (238) SaveBonus in iwds
 // 0x145 (325) SaveBonus in ees
-int fx_save_bonus (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_save_bonus(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	STAT_MOD(IE_SAVEVSDEATH);
 	STAT_MOD(IE_SAVEVSWANDS);
@@ -7961,7 +7970,7 @@ int fx_save_bonus (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 402 in iwd2, 326 ees
-int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// after iwd2 style ids targeting, apply the spell named in the resource field
 	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
@@ -7970,6 +7979,148 @@ int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
 	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
 	return FX_NOT_APPLIED;
 }
+
+// 0xe9  (233) IWDVisualSpellHit / Graphics: Icewind Visual Spell Hit
+// 0x147 (327) Graphics: Icewind Visual Spell Hit (plays sound), ee
+int fx_iwd_visual_spell_hit(Scriptable* Owner, Actor* target, Effect* fx)
+{
+	// print("fx_iwd_visual_spell_hit(%2d): Type: %d", fx->Opcode, fx->Parameter2);
+	if (!Owner) {
+		return FX_NOT_APPLIED;
+	}
+	// remove effect if there is no current area
+	Map* map = Owner->GetCurrentArea();
+	if (!map) {
+		return FX_NOT_APPLIED;
+	}
+
+	Projectile* pro;
+	if (fx->Parameter4 && fx->Parameter2 > 200) {
+		// SpellHitEffectPoint is used with sheffect.ids, so the indices are smaller
+		// we don't just check for both, since there's some overlap
+		// so far tested: acid storm needs this at 210
+		//   these don't: 46 66 104
+		pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
+	} else {
+		pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001 + fx->Parameter2);
+	}
+	pro->SetCaster(fx->CasterID, fx->CasterLevel);
+
+	if (target) {
+		// I believe the spell hit projectiles don't follow anyone
+		map->AddProjectile(pro, target->Pos, target->GetGlobalID(), true);
+	} else {
+		map->AddProjectile(pro, fx->Pos, fx->Pos);
+	}
+	return FX_NOT_APPLIED;
+}
+
+// 0x120 (288) State:Set
+// 0x148 (328) State: Set State, ee
+int fx_set_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	// in IWD2 we have 176 states (original had 256)
+	// ees can toggle between iwd2 and HoW mode
+	if (fx->IsVariable || core->HasFeature(GF_3ED_RULES)) {
+		target->SetSpellState(fx->Parameter2);
+	} else {
+		// in HoW this sets only the 10 last bits of extstate (until it runs out of bits)
+		if (fx->Parameter2 < 11 && !fx->IsVariable) {
+			EXTSTATE_SET(0x40000 << fx->Parameter2);
+		}
+	}
+	// maximized attacks active
+	if (fx->Parameter2 == SS_KAI) {
+		target->Modified[IE_DAMAGELUCK] = 255;
+	}
+	return FX_APPLIED;
+}
+
+// 0xef  (289) SlowPoison
+// 0x149 (329) SlowPoison, ee
+// gemrb extension: can slow bleeding wounds (like bandage)
+int fx_slow_poison(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	ieDword poisonOpcode;
+	if (fx->Parameter2) {
+		poisonOpcode = EffectQueue::ResolveEffect(fx_wound_ref);
+	} else {
+		poisonOpcode = EffectQueue::ResolveEffect(fx_poisoned_state_ref);
+	}
+
+	auto f = target->fxqueue.GetFirstEffect();
+	Effect* poison = target->fxqueue.GetNextEffect(f);
+	while (poison) {
+		if (poison->Opcode != poisonOpcode) continue;
+
+		switch (poison->Parameter2) {
+			case RPD_SECONDS:
+				poison->Parameter2 = RPD_ROUNDS;
+				break;
+			case RPD_POINTS:
+				// i'm not sure if this is ok
+				// the hardcoded formula is supposed to be this:
+				// duration = (duration - gametime)*7+gametime;
+				// duration = duration*7 - gametime*6;
+				// but in fact it is like this.
+				// it is (duration - gametime)*8+gametime;
+				// like the damage is spread for a longer time than
+				// it should
+				poison->Duration = poison->Duration * 8 - core->GetGame()->GameTime * 7;
+				poison->Parameter1 *= 7;
+				break;
+			case RPD_ROUNDS:
+				poison->Parameter2 = RPD_TURNS;
+				break;
+		}
+		poison = target->fxqueue.GetNextEffect(f);
+	}
+	return FX_NOT_APPLIED;
+}
+
+// 0x11b (290) FloatText
+// 0x14a (330) Text: Float Text, ee
+int fx_floattext(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	// print("fx_floattext(%2d): StrRef:%d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	switch (fx->Parameter2) {
+	case 1:
+		// in the original game this signified that a specific weapon is equipped
+		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS)) {
+			return FX_APPLIED;
+		}
+
+		EXTSTATE_SET(EXTSTATE_FLOATTEXTS);
+		if (fx->Resource.IsEmpty()) {
+			fx->Resource = "CYNICISM";
+		}
+		if (fx->Parameter1) {
+			fx->Parameter1--;
+			return FX_APPLIED;
+		} else {
+			fx->Parameter1 = core->Roll(1, 500, 500);
+		}
+		// fall through
+	case 2:
+		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS)) {
+			const auto CynicismList = core->GetListFrom2DA(fx->Resource);
+			if (!CynicismList->empty()) {
+				DisplayStringCore(target, ieStrRef(CynicismList->at(RAND<size_t>(0, CynicismList->size() - 1))), DS_HEAD);
+			}
+		}
+		return FX_APPLIED;
+	case 3: // gemrb extension, displays verbalconstant
+		DisplayStringCoreVC(target, fx->Parameter1, DS_HEAD);
+		break;
+	default:
+		DisplayStringCore(target, ieStrRef(fx->Parameter1), DS_HEAD);
+		break;
+	}
+	return FX_NOT_APPLIED;
+}
+
+
+
 
 // 0x16f (367) MinimumBaseStats (EE-only) is implemented as a generic effect
 
