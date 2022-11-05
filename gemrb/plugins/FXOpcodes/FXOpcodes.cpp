@@ -432,6 +432,7 @@ int fx_iwd_visual_spell_hit(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_set_state(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_slow_poison(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_floattext(Scriptable* Owner, Actor* target, Effect* fx);
+int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx); // 0x14b in ees
 
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
 int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 459
@@ -602,6 +603,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Item:Equip", fx_equip_item, 0, -1 ), //71
 	EffectDesc("Item:Remove", fx_remove_item, 0, -1 ), //70
 	EffectDesc("Item:RemoveInventory", fx_remove_inventory_item, 0, -1 ),
+	EffectDesc("IWDEEMonsterSummoning", fx_iwdee_monster_summoning, EFFECT_NO_ACTOR, -1),
 	EffectDesc("IWDVisualSpellHit", fx_iwd_visual_spell_hit, EFFECT_NO_ACTOR, -1),
 	EffectDesc("KillCreatureType", fx_kill_creature_type, 0, -1 ),
 	EffectDesc("LevelModifier", fx_level_modifier, 0, -1 ),
@@ -8119,6 +8121,30 @@ int fx_floattext(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+// iwds had this opcode split into several ones just working on different hardcoded monster lists
+// 0x14b (331) Summon: Random Monster Summoning
+AutoTable smTables = gamedata->LoadTable("smtables");
+int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx)
+{
+	ResRef table = fx->Resource;
+	if (table.IsEmpty()) {
+		if (fx->Parameter2 >= ieDword(smTables->GetRowCount())) return FX_NOT_APPLIED;
+		table = smTables->QueryField(fx->Parameter2, 0);
+	}
+
+	ResRef monster;
+	ResRef hit;
+	ResRef areaHit;
+	core->GetResRefFrom2DA(table, monster, hit, areaHit);
+
+	// depending on invocation, fx->IsVariable supposedly affected fx->Parameter1
+	// see IESDP for some odd notes
+
+	// the monster should appear near the effect position
+	Effect* newFx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(monster, areaHit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newFx);
+	return FX_NOT_APPLIED;
+}
 
 
 
