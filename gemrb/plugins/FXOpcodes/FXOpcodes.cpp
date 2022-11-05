@@ -7397,15 +7397,14 @@ int fx_title_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //0x123 DisableOverlay
-//FIXME: which overlay is disabled?
-//if one of the overlays marked by sanctuary, then
-//make the bit correspond to it
+// Blocks the hardcoded animations applied by opcodes: 201, 204, 205, 223, 226, 259, 197, 198, 199, 200, 202, 203, 207, 227, 228, 299.
 int fx_disable_overlay_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_disable_overlay_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_SET( IE_DISABLEOVERLAY, fx->Parameter1 );
+	STAT_SET(IE_DISABLEOVERLAY, fx->Parameter2);
 	return FX_APPLIED;
 }
+
 //0x124 Protection:Backstab (bg2)
 //0x11f Protection:Backstab (how, iwd2)
 //3 different games, 3 different methods of flagging this
@@ -7413,35 +7412,35 @@ int fx_no_backstab_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_no_backstab_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	//bg2
-	STAT_SET( IE_DISABLEBACKSTAB, fx->Parameter1 );
+	STAT_SET(IE_DISABLEBACKSTAB, fx->Parameter2);
 	//how
 	EXTSTATE_SET(EXTSTATE_NO_BACKSTAB);
 	//iwd2
 	target->SetSpellState(SS_NOBACKSTAB);
 	return FX_APPLIED;
 }
+
 //0x125 OffscreenAIModifier
 int fx_offscreenai_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_offscreenai_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_SET( IE_ENABLEOFFSCREENAI, fx->Parameter1 );
+	STAT_SET(IE_ENABLEOFFSCREENAI, fx->Parameter2);
 	target->Activate();
 	return FX_APPLIED;
 }
+
 //0x126 ExistanceDelayModifier
 int fx_existance_delay_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_existance_delay_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_SET( IE_EXISTANCEDELAY, fx->Parameter1 );
+	STAT_SET(IE_EXISTANCEDELAY, fx->Parameter2);
 	return FX_APPLIED;
 }
+
 //0x127 DisableChunk / DisablePermanentDeath
 // protects against chunking, disintegration, permanent death from the kill opcode (causes normal death instead)
 // doesn't prevent normal petrification (from the opcode) and doesn't protect from normal freezing (eg. from Cone of Cold)
 int fx_disable_chunk_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_disable_chunk_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_SET( IE_DISABLECHUNKING, fx->Parameter1 );
+	STAT_SET(IE_DISABLECHUNKING, fx->Parameter2);
 	return FX_APPLIED;
 }
 #if 0
@@ -7459,10 +7458,10 @@ int fx_protection_from_animation (Scriptable* /*Owner*/, Actor* target, Effect* 
 //0x129 Protection:Turn
 int fx_protection_from_turn (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_non_interruptible_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_SET( IE_NOTURNABLE, fx->Parameter1 );
+	STAT_SET(IE_NOTURNABLE, fx->Parameter2);
 	return FX_APPLIED;
 }
+
 //0x12a CutScene2
 //runs a predetermined script in cutscene mode
 int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
