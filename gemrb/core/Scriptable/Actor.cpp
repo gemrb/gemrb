@@ -311,6 +311,7 @@ static EffectRef fx_damage_reduction_ref = { "DamageReduction", -1 };
 static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -1 };
 static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 static EffectRef fx_attacks_per_round_modifier_ref = { "AttacksPerRoundModifier", -1 };
+static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
 
 //used by iwd2
 static const ResRef CripplingStrikeRef = "cripstr";
@@ -1150,7 +1151,7 @@ static void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 static void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
 {
 	if ((signed) newValue<=0) {
-		if (DeathOnZeroStat) {
+		if (DeathOnZeroStat && !actor->fxqueue.HasEffectWithParam(fx_minimum_base_stats_ref, 1)) {
 			actor->Die(NULL);
 		} else {
 			actor->Modified[stat]=1;

@@ -613,6 +613,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Maze", fx_maze, 0, -1 ),
 	EffectDesc("MeleeDamageModifier", fx_melee_damage_modifier, 0, -1 ),
 	EffectDesc("MeleeHitModifier", fx_melee_to_hit_modifier, 0, -1 ),
+	EffectDesc("MinimumBaseStats", fx_generic_effect, 0, -1),
 	EffectDesc("MinimumHPModifier", fx_minimum_hp_modifier, 0, -1 ),
 	EffectDesc("MiscastMagicModifier", fx_miscast_magic_modifier, 0, -1 ),
 	EffectDesc("MissileDamageModifier", fx_missile_damage_modifier, 0, -1 ),
@@ -7955,6 +7956,8 @@ int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
 	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
 	return FX_NOT_APPLIED;
 }
+
+// 0x16f (367) MinimumBaseStats (EE-only) is implemented as a generic effect
 
 // unknown
 int fx_unknown (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)

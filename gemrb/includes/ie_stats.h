@@ -511,7 +511,7 @@ namespace GemRB {
 #define IE_XP_THIEF             177 // XP3
 //the rest are relocated at 250+
 
-#define IE_ETHEREALNESS         202
+#define IE_ETHEREALNESS         202 // also IGNOREDRAINDEATH in ees, but we don't need the stat
 #define IE_IMMUNITY             203
 #define IE_DISABLEDBUTTON       204
 #define IE_ANIMATION_ID		205 //cd
