@@ -598,7 +598,8 @@ add_custom_target(appimage
     # bundle core python modules
     # AppRun defaults PYTHONPATH to this destination
     # source is probably available in Python3_STDLIB once we switch to newer cmake
-    COMMAND cp -r /usr/lib/python3.* AppDir/usr/share/pyshared
+    COMMAND mkdir -p AppDir/usr/share/pyshared
+    COMMAND cp -r /usr/lib/python3.10 AppDir/usr/share/pyshared
     COMMAND rm -rf AppDir/usr/share/pyshared/config-*x86_64-linux-gnu
     COMMAND rm -rf AppDir/usr/share/pyshared/dist-packages
     COMMAND rm -rf AppDir/usr/share/pyshared/test
