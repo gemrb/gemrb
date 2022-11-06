@@ -501,6 +501,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("CastSpellOnCondition", fx_cast_spell_on_condition, 0, -1 ),
 	EffectDesc("ChangeBackstab", fx_change_backstab, 0, -1),
 	EffectDesc("ChangeBardSong", fx_change_bardsong, 0, -1 ),
+	EffectDesc("ChangeCritical", fx_generic_effect, 0, -1),
 	EffectDesc("ChangeName", fx_change_name, 0, -1 ),
 	EffectDesc("ChangeWeather", fx_change_weather, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("ChantBadNonCumulative", fx_set_chantbad_state, 0, -1 ),
@@ -8306,6 +8307,9 @@ int fx_change_backstab(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->BackstabResRef = fx->Resource;
 	return FX_APPLIED;
 }
+
+// 0x155 (341) Spell Effect: Change Critical Hit Effect, implemented as a generic effect
+
 
 
 

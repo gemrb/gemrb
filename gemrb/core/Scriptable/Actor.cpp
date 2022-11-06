@@ -315,6 +315,7 @@ static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -
 static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 static EffectRef fx_attacks_per_round_modifier_ref = { "AttacksPerRoundModifier", -1 };
 static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
+static EffectRef fx_change_critical_ref = { "ChangeCritical", -1 };
 
 //used by iwd2
 static const ResRef CripplingStrikeRef = "cripstr";
@@ -6610,6 +6611,25 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 	return defense;
 }
 
+static void ApplyCriticalEffect(Actor* actor, Actor* target, WeaponInfo &wi)
+{
+	const Effect* fx = actor->fxqueue.HasEffect(fx_change_critical_ref);
+	if (!fx) return;
+
+	// does it work only on the currently hitting weapon?
+	if (fx->Parameter2 == 1 && fx->SourceRef != wi.item->Name) return;
+
+	// does it work on the currently hitting weapon's category (itemcat.ids / itemtype.2da)?
+	if (fx->Parameter3 != wi.item->ItemType) return;
+
+	// does the attack type match?
+	if (fx->IsVariable == 1 && wi.extHeader->AttackType != ITEM_AT_MELEE) return;
+	if (fx->IsVariable == 2 && (wi.extHeader->AttackType != ITEM_AT_BOW && wi.extHeader->AttackType != ITEM_AT_PROJECTILE)) return;
+	if (fx->IsVariable == 3 && wi.extHeader->AttackType != ITEM_AT_MAGIC) return;
+
+	core->ApplySpell(fx->Resource, target, actor, actor->GetXPLevel(false));
+}
+
 void Actor::PerformAttack(ieDword gameTime)
 {
 	static int attackRollDiceSides = gamedata->GetMiscRule("ATTACK_ROLL_DICE_SIDES");
@@ -6911,6 +6931,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, GUIColors::WHITE, this);
 			VerbalConstant(VB_CRITHIT);
 		}
+		ApplyCriticalEffect(this, target, wi);
 	} else {
 		//normal success
 		buffer.append("[Hit]");
