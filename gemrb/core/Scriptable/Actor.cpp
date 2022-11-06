@@ -316,6 +316,7 @@ static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 static EffectRef fx_attacks_per_round_modifier_ref = { "AttacksPerRoundModifier", -1 };
 static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
 static EffectRef fx_change_critical_ref = { "ChangeCritical", -1 };
+static EffectRef fx_animation_override_data_ref = { "AnimationOverrideData", -1 };
 
 //used by iwd2
 static const ResRef CripplingStrikeRef = "cripstr";
@@ -2391,7 +2392,7 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 	}
 
 	Log(COMBAT, "Actor", "Damage animation type: {}", type);
-
+	const Effect* fx;
 	switch(type&255) {
 		case 0:
 			//PST specific personal criticals
@@ -2403,7 +2404,11 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 		case 1: case 2: case 3: //blood
 			i = anims->GetBloodColor();
 			if (!i) i = d_gradient[type];
-			if(hit) {
+			fx = fxqueue.HasEffectWithParam(fx_animation_override_data_ref, 2);
+			if (fx) {
+				i = fx->Parameter1;
+			}
+			if (hit) {
 				AddAnimation(d_main[type], i, height, flags);
 			}
 			break;
@@ -7807,6 +7812,8 @@ bool Actor::ShouldDrawReticle() const
 
 bool Actor::HasBodyHeat() const
 {
+	const Effect* fx = fxqueue.HasEffectWithParam(fx_animation_override_data_ref, 1);
+	if (fx) return bool(fx->Parameter1);
 	if (Modified[IE_STATE_ID]&(STATE_DEAD|STATE_FROZEN|STATE_PETRIFIED) ) return false;
 	if (GetAnims()->GetFlags()&AV_NO_BODY_HEAT) return false;
 	return true;

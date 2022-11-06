@@ -464,6 +464,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("AlwaysBackstab", fx_always_backstab_modifier, 0, -1 ),
 	EffectDesc("AnimationIDModifier", fx_animation_id_modifier, 0, -1 ),
 	EffectDesc("AnimationStateChange", fx_animation_stance, 0, -1 ),
+	EffectDesc("AnimationOverrideData", fx_generic_effect, 0, -1),
 	EffectDesc("ApplyEffect", fx_apply_effect, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("ApplyEffectCurse", fx_apply_effect_curse, 0, -1 ),
 	EffectDesc("ApplyEffectItem", fx_apply_effect_item, 0, -1 ),
@@ -8309,6 +8310,9 @@ int fx_change_backstab(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x155 (341) Spell Effect: Change Critical Hit Effect, implemented as a generic effect
+// 0x156 (342) Animation: Override Data, implemented as a generic effect
+// NOTE: not implemented Parameter2 == 4 ⟶ Override personal space, since it supposedly doesn't affect circle size
+// if it turns out this is needed, consider making it a stat, so also the pathfinder has quick access
 
 
 
