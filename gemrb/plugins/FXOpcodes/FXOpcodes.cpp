@@ -440,7 +440,8 @@ int fx_seven_eyes(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x14f in
 // seven eyes displayer opcode
 int fx_remove_effect(Scriptable* Owner, Actor* target, Effect* fx);
 // disable rest is a generic effect
-static int fx_alter_animation(Scriptable* Owner, Actor *target, Effect* fx); // 0x153 in ees
+int fx_alter_animation(Scriptable* Owner, Actor *target, Effect* fx); // 0x153 in ees
+int fx_change_backstab(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x154 in ees
 
 
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
@@ -498,6 +499,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("CastingLevelModifier", fx_castinglevel_modifier, 0, -1 ),
 	EffectDesc("CastingSpeedModifier", fx_castingspeed_modifier, 0, -1 ),
 	EffectDesc("CastSpellOnCondition", fx_cast_spell_on_condition, 0, -1 ),
+	EffectDesc("ChangeBackstab", fx_change_backstab, 0, -1),
 	EffectDesc("ChangeBardSong", fx_change_bardsong, 0, -1 ),
 	EffectDesc("ChangeName", fx_change_name, 0, -1 ),
 	EffectDesc("ChangeWeather", fx_change_weather, EFFECT_NO_ACTOR, -1 ),
@@ -8137,7 +8139,7 @@ int fx_floattext(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // iwds had this opcode split into several ones just working on different hardcoded monster lists
 // 0x14b (331) Summon: Random Monster Summoning
-AutoTable smTables = gamedata->LoadTable("smtables");
+const AutoTable smTables = gamedata->LoadTable("smtables", true);
 int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	ResRef table = fx->Resource;
@@ -8295,6 +8297,14 @@ int fx_alter_animation(Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		an = map->GetNextAnimation(iter);
 	}
 	return FX_NOT_APPLIED;
+}
+
+// 0x154 (340) Effect: Change Backstab Effect
+// similar to the hamstring / arterial strike in iwd2, used by the HoW 3ed sneak attack mode
+int fx_change_backstab(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	target->BackstabResRef = fx->Resource;
+	return FX_APPLIED;
 }
 
 
