@@ -583,6 +583,8 @@ static EffectDesc effectnames[] = {
 	EffectDesc("DrainSpells", fx_drain_spells, 0, -1 ),
 	EffectDesc("DropWeapon", fx_drop_weapon, 0, -1 ),
 	EffectDesc("ElectricityResistanceModifier", fx_electricity_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("EnchantmentBonus", fx_generic_effect, 0, -1),
+	EffectDesc("EnchantmentVsCreatureType", fx_generic_effect, 0, -1),
 	EffectDesc("ExistanceDelayModifier", fx_existance_delay_modifier , 0, -1 ), //unknown
 	EffectDesc("ExperienceModifier", fx_experience_modifier, 0, -1 ),
 	EffectDesc("ExploreModifier", fx_explore_modifier, 0, -1 ),
@@ -8332,6 +8334,9 @@ int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->SetBase(IE_HITPOINTS, hpA);
 	return FX_NOT_APPLIED;
 }
+
+// 0x158 (344) Enchantment vs. creature type, implemented as a generic effect
+// 0x159 (345) Enchantment bonus, implemented as a generic effect
 
 
 

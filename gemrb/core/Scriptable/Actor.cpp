@@ -317,6 +317,8 @@ static EffectRef fx_attacks_per_round_modifier_ref = { "AttacksPerRoundModifier"
 static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
 static EffectRef fx_change_critical_ref = { "ChangeCritical", -1 };
 static EffectRef fx_animation_override_data_ref = { "AnimationOverrideData", -1 };
+static EffectRef fx_enchantment_vs_creature_type_ref = { "EnchantmentVsCreatureType", -1 };
+static EffectRef fx_enchantment_bonus_ref = { "EnchantmentBonus", -1 };
 
 //used by iwd2
 static const ResRef CripplingStrikeRef = "cripstr";
@@ -8773,10 +8775,92 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	return false;
 }
 
+static bool WeaponSlotMatchesHand(ieDword slot, const WeaponInfo& wi, const Effect* fx, bool leftOrRight)
+{
+	if (slot == 0 && fx->SourceRef == wi.item->Name) { // current weapon
+		return true;
+	} else if (slot == 1 && !leftOrRight) { // main hand weapon (or its ammo)
+		return true;
+	} else if (slot == 2 && leftOrRight) { // off-hand weapon
+		return true;
+	} else if (slot == 3) { // both weapons == all weapons
+		return true;
+	}
+	return false;
+}
+
+// check Enchantment vs. creature type and plain enchantment bonuses
+static ieDword AdjustEnchantment(const Actor* wielder, const Actor* target, const WeaponInfo& wi)
+{
+	ieDword enchantment = wi.enchantment;
+
+	// reverse engineer whether this is the main or the off-hand
+	bool leftOrRight = wielder->weaponInfo[1].extHeader == wi.extHeader;
+
+	const Effect* fx = wielder->fxqueue.HasEffect(fx_enchantment_vs_creature_type_ref);
+	if (fx && EffectQueue::match_ids(target, fx->Parameter2, fx->Parameter1) &&
+		(!fx->Parameter4 || fx->Parameter4 == wi.item->ItemType) &&
+		WeaponSlotMatchesHand(fx->Parameter3, wi, fx, leftOrRight)) {
+		enchantment = fx->IsVariable;
+	}
+
+	fx = wielder->fxqueue.HasEffect(fx_enchantment_bonus_ref);
+	if (fx && (!fx->Parameter4 || fx->Parameter4 == wi.item->ItemType) &&
+		WeaponSlotMatchesHand(fx->IsVariable, wi, fx, leftOrRight)) {
+		// the same list as fx_immune_to_weapon, but just goes up to 11
+		bool match;
+		switch (fx->Parameter2) {
+			case 0: // enchantment level
+				match = wi.enchantment <= fx->Parameter1;
+				break;
+			case 1: // all magical weapons
+				match = wi.item->Flags & IE_ITEM_MAGICAL;
+				break;
+			case 2: // all non-magical weapons
+				match = !(wi.item->Flags & IE_ITEM_MAGICAL);
+				break;
+			case 3: // all silver weapons
+				match = wi.item->Flags & IE_ITEM_SILVER;
+				break;
+			case 4: // all non-silver weapons
+				match = !(wi.item->Flags & IE_ITEM_SILVER);
+				break;
+			case 5: // all non-magical non-silver weapons
+				match = !(wi.item->Flags & (IE_ITEM_MAGICAL | IE_ITEM_SILVER));
+				break;
+			case 6: // all twohanded
+				match = wi.item->Flags & IE_ITEM_TWO_HANDED;
+				break;
+			case 7: // all not twohanded
+				match = !(wi.item->Flags & IE_ITEM_TWO_HANDED);
+				break;
+			case 8: // all cursed
+				match = wi.item->Flags & IE_ITEM_CURSED;
+				break;
+			case 9: // all non-cursed
+				match = !(wi.item->Flags & IE_ITEM_CURSED);
+				break;
+			case 10: // all cold-iron
+				match = wi.item->Flags & IE_ITEM_COLD_IRON;
+				break;
+			case 11: // all non cold-iron
+				match = !(wi.item->Flags & IE_ITEM_COLD_IRON);
+				break;
+			default:
+				match = false;
+		}
+
+		if (match) enchantment += fx->Parameter1;
+	}
+
+	return enchantment;
+}
+
 void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical)
 {
 	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
-	bool weaponImmunity = target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags);
+	ieDword adjustedEnchantment = AdjustEnchantment(this, target, wi);
+	bool weaponImmunity = target->fxqueue.WeaponImmunity(adjustedEnchantment, wi.itemflags);
 	int multiplier = Modified[IE_BACKSTABDAMAGEMULTIPLIER];
 	int extraDamage = 0; // damage unaffected by the critical multiplier
 	int level = static_cast<int>(GetXPLevel(false));
