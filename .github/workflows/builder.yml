@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Homebrew
       run: |
@@ -31,7 +31,7 @@ jobs:
         grep -i openal CMakeCache.txt
 
     - name: Compiler cache (sccache)
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cache/sccache
@@ -84,7 +84,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install dependencies
       run: |
@@ -106,7 +106,7 @@ jobs:
         cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DSTATIC_LINK=1 -DAPPIMAGE=1
 
     - name: Compiler cache (sccache)
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cache/sccache
