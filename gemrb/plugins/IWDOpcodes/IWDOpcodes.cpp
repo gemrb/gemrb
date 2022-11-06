@@ -124,7 +124,6 @@ static int fx_avatar_removal (Scriptable* Owner, Actor* target, Effect* fx); //1
 //int fx_immunity_effect2 (Scriptable* Owner, Actor* target, Effect* fx); //105
 static int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx); //106
 static int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx); //107
-static int fx_static_charge (Scriptable* Owner, Actor* target, Effect* fx); //108
 static int fx_cloak_of_fear (Scriptable* Owner, Actor* target, Effect* fx); //109
 //int fx_movement_modifier (Scriptable* Owner, Actor* target, Effect* fx); //10a
 //int fx_remove_confusion (Scriptable* Owner, Actor* target, Effect* fx);//10b
@@ -263,7 +262,6 @@ static EffectDesc effectnames[] = {
 	EffectDesc("AvatarRemoval", fx_avatar_removal, 0, -1), //104
 	EffectDesc("SummonPomab", fx_summon_pomab, 0, -1), //106
 	EffectDesc("ControlUndead", fx_control_undead, 0, -1), //107
-	EffectDesc("StaticCharge", fx_static_charge, EFFECT_NO_LEVEL_CHECK, -1), //108
 	EffectDesc("CloakOfFear", fx_cloak_of_fear, 0, -1), //109 how/iwd2
 	EffectDesc("EyeOfTheMind", fx_eye_of_the_mind, 0, -1), //10c
 	EffectDesc("EyeOfTheSword", fx_eye_of_the_sword, 0, -1), //10d
@@ -1288,42 +1286,6 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	STAT_SET_PCF( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
 	//don't stick if permanent
 	return FX_PERMANENT;
-}
-
-//0x108 StaticCharge
-int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
-{
-	// print("fx_static_charge(%2d): Count: %d ", fx->Opcode, fx->Parameter1);
-
-	//if the target is dead, this effect ceases to exist
-	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
-		return FX_NOT_APPLIED;
-	}
-
-	int ret = FX_APPLIED;
-
-	if (fx->Parameter1<=1) {
-		ret = FX_NOT_APPLIED;
-		// prevent an underflow
-		if (fx->Parameter1 == 0) {
-			return ret;
-		}
-	}
-
-	//timing
-	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-	fx->Duration = core->GetGame()->GameTime + 10*core->Time.round_size;
-	fx->Parameter1--;
-
-	//iwd2 style
-	if (!fx->Resource.IsEmpty()) {
-		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
-		return ret;
-	}
-
-	//how style
-	target->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, Owner, fx->IsVariable, fx->SavingThrowType);
-	return ret;
 }
 
 //0x109 CloakOfFear (HoW/IWD2)

@@ -433,6 +433,9 @@ int fx_set_state(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_slow_poison(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_floattext(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx); // 0x14b in ees
+// remapped fx_damage_bonus_modifier2
+int fx_static_charge (Scriptable* Owner, Actor* target, Effect* fx); // 0x14d in ees
+
 
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
 int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 459
@@ -765,6 +768,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("State:Sleep", fx_set_unconscious_state, 0, -1 ),
 	EffectDesc("State:Slowed", fx_set_slowed_state, 0, -1 ),
 	EffectDesc("State:Stun", fx_set_stun_state, 0, -1 ),
+	EffectDesc("StaticCharge", fx_static_charge, EFFECT_NO_LEVEL_CHECK, -1),
 	EffectDesc("StealthModifier", fx_stealth_modifier, 0, -1 ),
 	EffectDesc("StoneSkinModifier", fx_stoneskin_modifier, 0, -1 ),
 	EffectDesc("StoneSkin2Modifier", fx_golem_stoneskin_modifier, 0, -1 ),
@@ -8145,6 +8149,60 @@ int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx)
 	core->SummonCreature(monster, areaHit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newFx);
 	return FX_NOT_APPLIED;
 }
+
+// 0x14c (332) is just a remapped DamageBonusModifier(2) - see fx_damage_bonus_modifier2
+
+// 0x108 (264) StaticCharge
+// 0x14d (333) Spell Effect: Static Charge, ee
+int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
+{
+	// if the target is dead, this effect ceases to exist
+	if (STATE_GET(STATE_DEAD | STATE_PETRIFIED | STATE_FROZEN)) {
+		return FX_NOT_APPLIED;
+	}
+
+	int ret = FX_APPLIED;
+	if (fx->Parameter1 <= 1) {
+		ret = FX_NOT_APPLIED;
+		// prevent an underflow
+		if (fx->Parameter1 == 0) {
+			return ret;
+		}
+	}
+
+	// ee level param and unhardcoded delay
+	ieDword level = std::max(1U, fx->Parameter2);
+	ieWord delay = fx->IsVariable;
+	if (!delay) delay = core->Time.round_size;
+	ResRef spell = fx->Resource;
+
+	// timing
+	fx->TimingMode = FX_DURATION_DELAY_PERMANENT;
+	fx->Duration = core->GetGame()->GameTime + 10 * delay;
+	fx->Parameter1--;
+
+	// ee style
+	if (fx->Opcode == 0x14d) {
+		if (spell.IsEmpty()) {
+			spell.Format("{:.7}B", fx->SourceRef);
+		}
+		core->ApplySpell(spell, target, Owner, level);
+		return ret;
+	}
+
+	// iwd2 style
+	if (!spell.IsEmpty()) {
+		core->ApplySpell(spell, target, Owner, fx->Power);
+		return ret;
+	}
+
+	// how style
+	target->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, Owner, MOD_ADDITIVE, fx->SavingThrowType);
+	return ret;
+}
+
+
+
 
 
 
