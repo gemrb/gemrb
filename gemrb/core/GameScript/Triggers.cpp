@@ -4608,7 +4608,7 @@ int GameScript::HasItemCategory(Scriptable* Sender, const Trigger* parameters)
 		if (!itemSlot) continue;
 
 		// different equipped status?
-		if ((itemSlot->Flags & IE_INV_ITEM_EQUIPPED) != parameters->int1Parameter) continue;
+		if (int(itemSlot->Flags & IE_INV_ITEM_EQUIPPED) != parameters->int1Parameter) continue;
 
 		const Item* item = gamedata->GetItem(itemSlot->ItemResRef);
 		if (!item) continue;
