@@ -434,7 +434,11 @@ int fx_slow_poison(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_floattext(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx); // 0x14b in ees
 // remapped fx_damage_bonus_modifier2
-int fx_static_charge (Scriptable* Owner, Actor* target, Effect* fx); // 0x14d in ees
+int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx); // 0x14d in ees
+// remapped fx_turn_undead
+int fx_seven_eyes(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x14f in ees
+// seven eyes displayer opcode
+int fx_remove_effect(Scriptable* Owner, Actor* target, Effect* fx); // 0x151 in ees
 
 
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
@@ -694,13 +698,14 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Reveal:Creatures", fx_reveal_creatures, 0, -1 ),
 	EffectDesc("Reveal:Magic", fx_reveal_magic, 0, -1 ),
 	EffectDesc("Reveal:Tracks", fx_reveal_tracks, 0, -1 ),
+	EffectDesc("RemoveCreature", fx_remove_creature, EFFECT_NO_ACTOR, -1),
 	EffectDesc("RemoveCurse", fx_remove_curse, 0, -1 ),
+	EffectDesc("RemoveEffect", fx_remove_effect, 0, -1),
 	EffectDesc("RemoveEffectsByResource", fx_remove_effects, 0, -1),
 	EffectDesc("RemoveImmunity", fx_remove_immunity, 0, -1 ),
 	EffectDesc("RemoveMapNote", fx_remove_map_note, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("RemoveProjectile", fx_remove_projectile, 0, -1 ), //removes effects from actor and area
 	EffectDesc("RenableButton", fx_renable_button, 0, -1 ), //removes disable button flag
-	EffectDesc("RemoveCreature", fx_remove_creature, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("ReplaceCreature", fx_replace_creature, 0, -1 ),
 	EffectDesc("ReputationModifier", fx_reputation_modifier, 0, -1 ),
 	EffectDesc("RestoreSpells", fx_restore_spell_level, 0, -1 ),
@@ -724,6 +729,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("SetRangedEffect", fx_generic_effect, 0, -1 ),
 	EffectDesc("SetTrap", fx_set_area_effect, 0, -1 ),
 	EffectDesc("SetTrapsModifier", fx_set_traps_modifier, 0, -1 ),
+	EffectDesc("SevenEyes", fx_seven_eyes, 0, -1),
 	EffectDesc("SexModifier", fx_sex_modifier, 0, -1 ),
 	EffectDesc("SlashingResistanceModifier", fx_slashing_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("SlowPoison", fx_slow_poison, 0, -1),
@@ -8201,8 +8207,39 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 	return ret;
 }
 
+// 0x14e (334) is just a remapped TurnUndead - see fx_turn_undead
 
+// 0x14f (335) Spell Effect: Seven Eyes - a merged opcode for the split ones present in iwds like fx_eye_of_the_mind
+int fx_seven_eyes(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (target->SetSpellState(fx->Parameter1)) return FX_APPLIED;
+	// it's unclear if ees also set the extstate bits, but we do it anyway
+	// both since it's likely and because our drawing is tied to it, not the spell states
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND << fx->IsVariable, true);
 
+	if (fx->FirstApply) {
+		target->LearnSpell(fx->Resource, LS_MEMO);
+	}
+	return FX_APPLIED;
+}
+
+// 0x150 (336) Graphics: Display Eyes Overlay
+// TODO: ee, check if we even really need it, since seven eyes are implemented in Actor
+// https://gibberlings3.github.io/iesdp/opcodes/bgee.htm#op66
+
+// 0x114 (276) RemoveEffect
+// 0x151 (337) Remove: Opcode
+int fx_remove_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (!fx->Resource.IsEmpty()) {
+		target->fxqueue.RemoveAllEffectsWithResource(fx->Parameter2, fx->Resource);
+	} else if (fx->Opcode == 0x151 && fx->Parameter1 != ieDword(-1)) {
+		target->fxqueue.RemoveAllEffectsWithParam(fx->Parameter2, fx->Parameter1);
+	} else {
+		target->fxqueue.RemoveAllEffects(fx->Parameter2);
+	}
+	return FX_NOT_APPLIED;
+}
 
 
 

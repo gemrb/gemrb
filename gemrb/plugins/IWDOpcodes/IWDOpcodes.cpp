@@ -135,7 +135,6 @@ static int fx_eye_of_the_spirit (Scriptable* Owner, Actor* target, Effect* fx);/
 static int fx_eye_of_fortitude (Scriptable* Owner, Actor* target, Effect* fx);//111
 static int fx_eye_of_stone (Scriptable* Owner, Actor* target, Effect* fx);//112
 static int fx_remove_seven_eyes (Scriptable* Owner, Actor* target, Effect* fx);//113
-static int fx_remove_effect (Scriptable* Owner, Actor* target, Effect* fx);//114
 static int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx);//115
 static int fx_shroud_of_flame (Scriptable* Owner, Actor* target, Effect* fx);//116
 static int fx_shroud_of_flame2 (Scriptable* Owner, Actor* target, Effect* fx);//116
@@ -271,7 +270,6 @@ static EffectDesc effectnames[] = {
 	EffectDesc("EyeOfFortitude", fx_eye_of_fortitude, 0, -1), //111
 	EffectDesc("EyeOfStone", fx_eye_of_stone, 0, -1), //112
 	EffectDesc("RemoveSevenEyes", fx_remove_seven_eyes, 0, -1), //113
-	EffectDesc("RemoveEffect", fx_remove_effect, 0, -1), //114
 	EffectDesc("SoulEater", fx_soul_eater, EFFECT_NO_LEVEL_CHECK, -1), //115
 	EffectDesc("ShroudOfFlame", fx_shroud_of_flame, 0, -1),//116
 	EffectDesc("ShroudOfFlame2", fx_shroud_of_flame2, 0, -1),//116
@@ -1445,21 +1443,6 @@ int fx_remove_seven_eyes (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
 	target->spellbook.RemoveSpell(SevenEyes[EYE_STONE]);
 	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_SEVEN_EYES, false);
-	return FX_NOT_APPLIED;
-}
-
-//0x114 RemoveEffect
-int fx_remove_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	// print("fx_remove_effect(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	if (!fx->Resource.IsEmpty())
-	{
-		target->fxqueue.RemoveAllEffectsWithResource(fx->Parameter2, fx->Resource);
-	}
-	else
-	{
-		target->fxqueue.RemoveAllEffects(fx->Parameter2);
-	}
 	return FX_NOT_APPLIED;
 }
 

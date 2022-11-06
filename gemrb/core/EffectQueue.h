@@ -272,6 +272,7 @@ public:
 	void RemoveAllNonPermanentEffects();
 	void RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current);
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
+	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource);
 	void RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource);
 	void RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode);
@@ -350,7 +351,6 @@ private:
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing);
 	static Effect *CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
 	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current);
-	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	void RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ResRef &resource);
 	Effect *HasOpcode(ieDword opcode);
 	const Effect *HasOpcode(ieDword opcode) const;
