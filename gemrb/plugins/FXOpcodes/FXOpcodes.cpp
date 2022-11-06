@@ -8144,9 +8144,9 @@ int fx_floattext(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // iwds had this opcode split into several ones just working on different hardcoded monster lists
 // 0x14b (331) Summon: Random Monster Summoning
-const AutoTable smTables = gamedata->LoadTable("smtables", true);
 int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx)
 {
+	static const AutoTable smTables = gamedata->LoadTable("smtables", true);
 	ResRef table = fx->Resource;
 	if (table.IsEmpty()) {
 		if (fx->Parameter2 >= ieDword(smTables->GetRowCount())) return FX_NOT_APPLIED;
