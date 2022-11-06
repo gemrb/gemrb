@@ -279,6 +279,8 @@ static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
 static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
 static EffectRef fx_set_charmed_state_ref = { "State:Charmed", -1 };
 static EffectRef fx_cure_sleep_ref = { "Cure:Sleep", -1 };
+static EffectRef fx_to_hit_modifier_ref = { "ToHitModifier", -1 };
+static EffectRef fx_damage_bonus_modifier1_ref = { "DamageBonusModifier" , -1 };
 static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier2", -1 };
 static EffectRef fx_display_portrait_icon_ref = { "Icon:Display", -1 };
 //bg2 and iwd1
@@ -8749,6 +8751,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	bool weaponImmunity = target->fxqueue.WeaponImmunity(wi.enchantment, wi.itemflags);
 	int multiplier = Modified[IE_BACKSTABDAMAGEMULTIPLIER];
 	int extraDamage = 0; // damage unaffected by the critical multiplier
+	int level = static_cast<int>(GetXPLevel(false));
 
 	if (third) {
 		// 3ed sneak attack
@@ -8756,8 +8759,42 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			extraDamage = GetSneakAttackDamage(target, wi, multiplier, weaponImmunity);
 		}
 	} else if (multiplier > 1) {
-		// aDnD backstabbing
-		damage = GetBackstabDamage(target, wi, multiplier, damage);
+		// TODO: limit sneak attack to once per enemy? EEs did it via backstab.spl, used besides any custom BackstabResRef
+		// TODO: remove requirement of being hidden for sneak attack
+		static const AutoTable sneakTable = gamedata->LoadTable("sneakatt", true);
+		if (PreferSneakAttack && sneakTable) { // ee externalization
+			std::string rowName = GetClassName(GetActiveClass());
+			int rowIdx = sneakTable->GetRowIndex(rowName);
+			int dice = sneakTable->QueryFieldSigned<int>(rowIdx, level - 1);
+			extraDamage = LuckyRoll(dice, 6, 0, 0, target);
+		} else if (PreferSneakAttack) {
+			extraDamage = LuckyRoll(int(level / 4) + 1, 6, 0, 0, target); // 1d6 + 1d6 per 4 levels
+		} else {
+			// aDnD backstabbing
+			damage = GetBackstabDamage(target, wi, multiplier, damage);
+		}
+
+		// crippling strike HoW or EE-style
+		int spellPower = level;
+		if (!BackstabResRef.IsEmpty()) { // ee externalization
+			static const AutoTable cripTable = gamedata->LoadTable("crippstr", true);
+			if (cripTable && PreferSneakAttack) {
+				std::string rowName = GetClassName(GetActiveClass());
+				int rowIdx = cripTable->GetRowIndex(rowName);
+				spellPower = cripTable->QueryFieldSigned<int>(rowIdx, level - 1) + 1;
+			}
+			// extra spell delivery via fx_change_backstab
+			core->ApplySpell(BackstabResRef, target, this, spellPower);
+		} else if (PreferSneakAttack) {
+			// Crippling Strike causes the victim to suffer a -1 to hit and damage rolls. The effect expires one turn later.
+			int malus = - int((level - 1) / 4);
+			Effect* fx = EffectQueue::CreateEffect(fx_to_hit_modifier_ref, malus, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
+			fx->Duration = core->Time.turn_sec;
+			core->ApplyEffect(fx, target, this);
+			Effect* fx2 = EffectQueue::CreateEffect(fx_damage_bonus_modifier1_ref, malus, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
+			fx2->Duration = core->Time.turn_sec;
+			core->ApplyEffect(fx2, target, this);
+		}
 	}
 
 	damage += WeaponDamageBonus(wi);
