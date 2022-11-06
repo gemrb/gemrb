@@ -560,6 +560,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("DisableChunk", fx_disable_chunk_modifier, 0, -1 ),
 	EffectDesc("DisableOverlay", fx_disable_overlay_modifier, 0, -1 ),
 	EffectDesc("DisableCasting", fx_disable_spellcasting, 0, -1 ),
+	EffectDesc("DisableRest", fx_generic_effect, 0, -1),
 	EffectDesc("Disintegrate", fx_disintegrate, 0, -1 ),
 	EffectDesc("DispelEffects", fx_dispel_effects, 0, -1 ),
 	EffectDesc("DispelSchool", fx_dispel_school, 0, -1 ),
@@ -8240,6 +8241,8 @@ int fx_remove_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
+
+// 0x152 DisableRest implemented as a generic effect
 
 
 

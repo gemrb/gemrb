@@ -441,6 +441,7 @@ static bool DoSaveGame(const char *Path, bool overrideRunning)
 	return true;
 }
 
+static EffectRef fx_disable_rest_ref = { "DisableRest", -1 };
 static int CanSave()
 {
 	//some of these restrictions might not be needed
@@ -513,6 +514,13 @@ static int CanSave()
 		if (map->AnyEnemyNearPoint(actor->Pos)) {
 			displaymsg->DisplayConstantString( STR_CANTSAVEMONS, GUIColors::XPCHANGE );
 			return 7;
+		}
+
+		// check the EE no resting/saving opcode
+		const Effect* fx = actor->fxqueue.HasEffect(fx_disable_rest_ref);
+		if (fx && fx->Parameter2 != 0) {
+			displaymsg->DisplayString(ieStrRef(fx->Parameter1), GUIColors::XPCHANGE, STRING_FLAGS::SOUND);
+			return 9;
 		}
 	}
 

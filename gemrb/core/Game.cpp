@@ -1613,6 +1613,7 @@ void Game::TextDream()
 	}
 }
 
+static EffectRef fx_disable_rest_ref = { "DisableRest", -1 };
 bool Game::CanPartyRest(int checks, ieStrRef* err) const
 {
 	if (checks == REST_NOCHECKS) return true;
@@ -1620,6 +1621,16 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	if (!err) {
 		static ieStrRef noerr = ieStrRef::INVALID;
 		err = &noerr;
+	}
+
+	// check the EE no resting/saving opcode
+	const Effect* fx;
+	for (const auto& pc : PCs) {
+		fx = pc->fxqueue.HasEffect(fx_disable_rest_ref);
+		if (fx && fx->Parameter2 != 1) {
+			*err = ieStrRef(fx->Parameter1);
+			return false;
+		}
 	}
 
 	if (checks & REST_CONTROL) {
