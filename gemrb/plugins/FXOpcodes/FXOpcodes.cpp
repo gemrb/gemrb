@@ -438,7 +438,9 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx); // 0x14d in 
 // remapped fx_turn_undead
 int fx_seven_eyes(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x14f in ees
 // seven eyes displayer opcode
-int fx_remove_effect(Scriptable* Owner, Actor* target, Effect* fx); // 0x151 in ees
+int fx_remove_effect(Scriptable* Owner, Actor* target, Effect* fx);
+// disable rest is a generic effect
+static int fx_alter_animation(Scriptable* Owner, Actor *target, Effect* fx); // 0x153 in ees
 
 
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
@@ -457,6 +459,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("AlchemyModifier", fx_alchemy_modifier, 0, -1 ),
 	EffectDesc("Alignment:Change", fx_alignment_change, 0, -1 ),
 	EffectDesc("Alignment:Invert", fx_alignment_invert, 0, -1 ),
+	EffectDesc("AlterAnimation", fx_alter_animation, EFFECT_NO_ACTOR, -1),
 	EffectDesc("AlwaysBackstab", fx_always_backstab_modifier, 0, -1 ),
 	EffectDesc("AnimationIDModifier", fx_animation_id_modifier, 0, -1 ),
 	EffectDesc("AnimationStateChange", fx_animation_stance, 0, -1 ),
@@ -8243,6 +8246,56 @@ int fx_remove_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x152 DisableRest implemented as a generic effect
+
+// 0x18f AlterAnimation unhardcoded in gemrb
+// 0x153 (339) Alter Animation in ees, adds range limit
+//
+// This code is needed for the ending cutscene in IWD (found in a projectile)
+// The effect will alter the target animation's cycle by a xor value
+// Parameter1: the value to binary xor on the initial cycle numbers of the animation(s)
+// Parameter2: an optional projectile (IWD spell hit projectiles start at 0x1001)
+// Resource: the animation's name
+//
+// Useful applications other than the HoW cutscene:
+// A fireball could affect environment by applying the effect on certain animations.
+// All you need to do:
+//  - name the area animation as 'burnable'.
+//  - create alternate cycles for the altered area object
+//  - create a spell hit animation (optionally)
+//  - create the effect which will contain the spell hit projectile and the cycle change command
+int fx_alter_animation(Scriptable* Owner, Actor* /*target*/, Effect* fx)
+{
+	Map* map = Owner->GetCurrentArea();
+	if (!map) {
+		return FX_NOT_APPLIED;
+	}
+
+	aniIterator iter = map->GetFirstAnimation();
+	AreaAnimation* an = map->GetNextAnimation(iter);
+	while (an) {
+		// Only animations with 8 letters could be used, no problem, iwd uses 8 letters
+		if (an->Name.BeginsWith(fx->Resource)) {
+			if (fx->Opcode == 0x153 && (!fx->IsVariable || Distance(fx->Pos, an->Pos) > (unsigned int) fx->IsVariable)) {
+				an = map->GetNextAnimation(iter);
+				continue;
+			}
+			// play spell hit animation
+			Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
+			pro->SetCaster(fx->CasterID, fx->CasterLevel);
+			map->AddProjectile(pro, an->Pos, an->Pos);
+			// alter animation, we need only this for the original, but in the
+			// spirit of unhardcoding, i provided the standard modifier codeset
+			// 0->4, 1->5, 2->6, 3->7
+			// 4->0, 5->1, 6->2, 7->3
+			ieWord value = fx->Parameter1 >> 16;
+			SetBits(an->sequence, value, BitOp(fx->Parameter1 & 0xffff));
+			an->frame = 0;
+			an->InitAnimation();
+		}
+		an = map->GetNextAnimation(iter);
+	}
+	return FX_NOT_APPLIED;
+}
 
 
 

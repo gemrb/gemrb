@@ -167,9 +167,6 @@ static int fx_spellcraft_modifier (Scriptable* Owner, Actor* target, Effect* fx)
 //0x132 CriticalHitModifier (same as bg2, needed for improved criticals)
 static int fx_turnlevel_modifier (Scriptable* Owner, Actor* target, Effect* fx); //133
 
-//iwd related, gemrb specific effects (IE. unhardcoded hacks)
-static int fx_alter_animation (Scriptable* Owner, Actor *target, Effect* fx); //399
-
 //iwd2 specific effects
 static int fx_hopelessness (Scriptable* Owner, Actor* target, Effect* fx);//400
 static int fx_protection_from_evil (Scriptable* Owner, Actor* target, Effect* fx);//401
@@ -293,8 +290,6 @@ static EffectDesc effectnames[] = {
 	EffectDesc("SearchModifier", fx_search_modifier, 0, -1),//130
 	EffectDesc("SpellcraftModifier", fx_spellcraft_modifier, 0, -1),//131
 	EffectDesc("TurnLevelModifier", fx_turnlevel_modifier, 0, -1),//133
-	//unhardcoded hacks for IWD
-	EffectDesc("AlterAnimation", fx_alter_animation, EFFECT_NO_ACTOR, -1), //399
 	//iwd2 effects
 	EffectDesc("Hopelessness", fx_hopelessness, 0, -1), //400
 	EffectDesc("ProtectionFromEvil", fx_protection_from_evil, 0, -1), //401
@@ -1941,49 +1936,6 @@ int fx_use_magic_device_modifier (Scriptable* /*Owner*/, Actor* target, Effect* 
 }
 
 //GemRB specific IWD related effects
-
-//This code is needed for the ending cutscene in IWD (found in a projectile)
-//The effect will alter the target animation's cycle by a xor value
-//Parameter1: the value to binary xor on the initial cycle numbers of the animation(s)
-//Parameter2: an optional projectile (IWD spell hit projectiles start at 0x1001)
-//Resource: the animation's name
-
-//Useful applications other than the HoW cutscene:
-//A fireball could affect environment by applying the effect on certain animations
-//all you need to do:
-//Name the area animation as 'burnable'.
-//Create alternate cycles for the altered area object
-//Create a spell hit animation (optionally)
-//Create the effect which will contain the spell hit projectile and the cycle change command
-//0x18f AlterAnimation
-int fx_alter_animation (Scriptable* Owner, Actor* /*target*/, Effect* fx)
-{
-	// print("fx_alter_animation(%2d) Parameter: %d  Projectile: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	Map *map = Owner->GetCurrentArea();
-	if (!map) {
-		return FX_NOT_APPLIED;
-	}
-
-	aniIterator iter = map->GetFirstAnimation();
-	while(AreaAnimation *an = map->GetNextAnimation(iter) ) {
-		//Only animations with 8 letters could be used, no problem, iwd uses 8 letters
-		if (an->Name.BeginsWith(fx->Resource)) {
-			//play spell hit animation
-			Projectile *pro=core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
-			pro->SetCaster(fx->CasterID, fx->CasterLevel);
-			map->AddProjectile(pro, an->Pos, an->Pos);
-			//alter animation, we need only this for the original, but in the
-			//spirit of unhardcoding, i provided the standard modifier codeset
-			//0->4, 1->5, 2->6, 3->7
-			//4->0, 5->1, 6->2, 7->3
-			ieWord value = fx->Parameter1>>16;
-			SetBits(an->sequence, value, BitOp(fx->Parameter1&0xffff));
-			an->frame = 0;
-			an->InitAnimation();
-		}
-	}
-	return FX_NOT_APPLIED;
-}
 
 //0x12b AnimalEmpathy (gemrb extension for iwd2)
 int fx_animal_empathy_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
