@@ -95,6 +95,7 @@ static ieDword war_cries = 1;
 static ieDword GameDifficulty = DIFF_CORE;
 static ieDword StoryMode = 0;
 static ieDword NoExtraDifficultyDmg = 0;
+static ieDword PreferSneakAttack = 0;
 static int DifficultyLuckMod = 0;
 static int DifficultyDamageMod = 0;
 static int DifficultySaveMod = 0;
@@ -1509,6 +1510,7 @@ GEM_EXPORT void UpdateActorConfig()
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	core->GetDictionary()->Lookup("Footsteps", footsteps);
 	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
+	core->GetDictionary()->Lookup("3E Thief Sneak Attack", PreferSneakAttack);
 
 	//Handle Game Difficulty and Nightmare Mode
 	// iwd2 had it saved in the GAM, iwd1 only relied on the ini value
