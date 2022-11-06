@@ -132,7 +132,7 @@ jobs:
     - name: Test 1
       uses: GabrielBB/xvfb-action@v1.6
       with:
-        run: run-or-dump.sh
+        run: ./run-or-dump.sh
         working-directory: build
 
     - name: Prepare AppImage
