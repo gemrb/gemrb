@@ -89,7 +89,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-7
+        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-8
 
         SCCACHE_VERSION="v0.2.15"
         SCCACHE_LINUX_PACKAGE="sccache-${SCCACHE_VERSION}-x86_64-unknown-linux-musl"
@@ -98,8 +98,8 @@ jobs:
 
     - name: Set up build
       env:
-        CXX: g++-7
-        CC: gcc-7
+        CXX: g++-8
+        CC: gcc-8
       run: |
         mkdir build && cd build
         cmake --version
