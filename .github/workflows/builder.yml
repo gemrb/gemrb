@@ -89,7 +89,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-8
+        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-7 gdb
 
         SCCACHE_VERSION="v0.2.15"
         SCCACHE_LINUX_PACKAGE="sccache-${SCCACHE_VERSION}-x86_64-unknown-linux-musl"
@@ -98,12 +98,12 @@ jobs:
 
     - name: Set up build
       env:
-        CXX: g++-8
-        CC: gcc-8
+        CXX: g++-7
+        CC: gcc-7
       run: |
         mkdir build && cd build
         cmake --version
-        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DSTATIC_LINK=1 -DAPPIMAGE=1
+        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DSTATIC_LINK=1 -DAPPIMAGE=1
 
     - name: Compiler cache (sccache)
       uses: actions/cache@v2
@@ -125,9 +125,13 @@ jobs:
         if grep -q '^v[01]\.[0-9].[0-9]' <<< "${GITHUB_REF}"; then make fetch-demo-data; fi
 
     - name: Test 1
-      uses: GabrielBB/xvfb-action@v1
+      uses: GabrielBB/xvfb-action@v1.6
       with:
-        run: gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
+        run: |
+          ulimit -Sc unlimited
+          sudo sysctl -w kernel.core_pattern=$PWD/core-%e
+          gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample ||
+          gdb -q -c core-* -ex bt -ex q -batch --args gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
         working-directory: build
 
     - name: Prepare AppImage
