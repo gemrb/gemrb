@@ -442,6 +442,8 @@ int fx_remove_effect(Scriptable* Owner, Actor* target, Effect* fx);
 // disable rest is a generic effect
 int fx_alter_animation(Scriptable* Owner, Actor *target, Effect* fx); // 0x153 in ees
 int fx_change_backstab(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x154 in ees
+// generic effect x2
+int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x157 in ees
 
 
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
@@ -789,6 +791,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("StrengthModifier", fx_strength_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("StrengthBonusModifier", fx_strength_bonus_modifier, 0, -1 ),
 	EffectDesc("SummonCreature", fx_summon_creature, EFFECT_NO_ACTOR, -1 ),
+	EffectDesc("SwapHP", fx_swap_hp, 0, -1),
 	EffectDesc("RandomTeleport", fx_teleport_field, 0, -1 ),
 	EffectDesc("TeleportToTarget", fx_teleport_to_target, 0, -1 ),
 	EffectDesc("TimelessState", fx_timeless_modifier, 0, -1 ),
@@ -8314,6 +8317,21 @@ int fx_change_backstab(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // NOTE: not implemented Parameter2 == 4 ⟶ Override personal space, since it supposedly doesn't affect circle size
 // if it turns out this is needed, consider making it a stat, so also the pathfinder has quick access
 
+// 0x157 (343) HP Swap
+int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	Scriptable* casterObject = GetCasterObject();
+	Actor* caster = Scriptable::As<Actor>(casterObject);
+	if (!caster) return FX_NOT_APPLIED;
+
+	ieDword hpA = caster->GetStat(IE_HITPOINTS);
+	ieDword hpB = target->GetStat(IE_HITPOINTS);
+	if (fx->Parameter2 == 0 && hpA <= hpB) return FX_NOT_APPLIED;
+
+	caster->SetBase(IE_HITPOINTS, hpB);
+	target->SetBase(IE_HITPOINTS, hpA);
+	return FX_NOT_APPLIED;
+}
 
 
 
