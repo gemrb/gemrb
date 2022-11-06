@@ -702,6 +702,7 @@ public: //Script Functions
 	static int HasImmunityEffects(Scriptable *Sender, const Trigger *parameters);
 	static int HasInnateAbility(Scriptable *Sender, const Trigger *parameters);
 	static int HasItem(Scriptable *Sender, const Trigger *parameters);
+	static int HasItemCategory(Scriptable* Sender, const Trigger* parameters);
 	static int HasItemEquipped(Scriptable *Sender, const Trigger *parameters);
 	static int HasItemSlot(Scriptable *Sender, const Trigger *parameters);
 	static int HasItemTypeSlot(Scriptable *Sender, const Trigger *parameters);

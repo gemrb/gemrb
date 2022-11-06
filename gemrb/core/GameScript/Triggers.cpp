@@ -4594,4 +4594,35 @@ int GameScript::CurrentAmmo(Scriptable *Sender, const Trigger *parameters)
 	return actor->inventory.HasItemInSlot(parameters->resref0Parameter, ammoslot);
 }
 
+// does the object have an item of the specified type? Is it equipped as well?
+int GameScript::HasItemCategory(Scriptable* Sender, const Trigger* parameters)
+{
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Actor* actor = Scriptable::As<Actor>(tar);
+	if (!actor) return 0;
+	if (!actor->inventory.HasItemType(parameters->int0Parameter)) return 0;
+
+	int i = actor->inventory.GetSlotCount();
+	while (i--) {
+		const CREItem* itemSlot = actor->inventory.GetSlotItem(i);
+		if (!itemSlot) continue;
+
+		// different equipped status?
+		if ((itemSlot->Flags & IE_INV_ITEM_EQUIPPED) != parameters->int1Parameter) continue;
+
+		const Item* item = gamedata->GetItem(itemSlot->ItemResRef);
+		if (!item) continue;
+
+		// different category?
+		if (item->ItemType != parameters->int0Parameter) {
+			gamedata->FreeItem(item, itemSlot->ItemResRef);
+			continue;
+		}
+
+		gamedata->FreeItem(item, itemSlot->ItemResRef);
+		return 1;
+	}
+	return 0;
+}
+
 }

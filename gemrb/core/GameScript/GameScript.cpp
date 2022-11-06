@@ -191,6 +191,7 @@ static const TriggerLink triggernames[] = {
 	{"hasimmunityeffects", GameScript::HasImmunityEffects, 0},
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
+	{"hasitemcategory", GameScript::HasItemCategory, 0},
 	{"hasitemequiped", GameScript::HasItemEquipped, 0}, //typo in bg2
 	{"hasitemequipedreal", GameScript::HasItemEquipped, 0}, //not sure
 	{"hasitemequipped", GameScript::HasItemEquipped, 0},
