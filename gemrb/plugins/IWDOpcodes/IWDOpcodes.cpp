@@ -2197,7 +2197,7 @@ int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (fx->Parameter3 && fx->Parameter4<game->GameTime) {
 		fx->Parameter3 = 0;
-		if (target->GetSavingThrow(IE_SAVEWILL, 0, fx)) {
+		if (target->GetSavingThrow(4, 0, fx)) {
 			return FX_NOT_APPLIED;
 		}
 	}
