@@ -36,6 +36,7 @@
 
 using namespace GemRB;
 
+// TODO: recheck 0x52 is Incite Berserk Attack and implement; currently mapped to bg1 SetAIScript in effect.ids
 int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx);//6e
 int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
 int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb
@@ -938,7 +939,9 @@ int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
+
 //0xcf fx_stop_all_action
+// FIXME: supposedly was (closer to) cutscene mode; recheck with spwi308 or any other users
 int fx_stop_all_action (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (fx->Parameter2) {

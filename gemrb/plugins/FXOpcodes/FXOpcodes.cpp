@@ -2214,7 +2214,7 @@ int fx_sparkle (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_APPLIED;
 	}
-
+	// TODO: ee, pstee (if not pst) can use fx->Resource for bitmap mode
 	map->Sparkle( fx->Duration, fx->Parameter1, fx->Parameter2, fx->Pos, fx->Parameter3);
 	return FX_NOT_APPLIED;
 }
@@ -8350,7 +8350,7 @@ int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x169 (361) Cast spell on critical miss (identical to 0x155), implemented as a generic effect
 // 0x16a (362) Critical miss bonus, implemented as a generic effect
 
-// 0x16b (363) TODO: ee, Modal state check
+// 0x16b (363) TODO: ee, Modal state check — for shaman dance (granted by clabsh01, set up like their bard song - uses spsh004)
 // 0x16c (364) unused
 // 0x16d (365) TODO: ee, Make unselectable; reuse the action?
 // 0x16e (366) TODO: ee, Spell: Apply Spell On Move
