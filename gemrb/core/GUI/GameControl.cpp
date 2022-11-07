@@ -380,8 +380,9 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	assert(points.size() % 4 == 0);
 	
 	// a line bisecting the ellipse diagonally
-	const Point& b1 = r.origin;
-	const Point& b2 = r.Maximum();
+	const Point adj(size + 1, 0);
+	Point b1 = r.origin - adj;
+	Point b2 = r.Maximum() + adj;
 	
 	Video* video = core->GetVideoDriver();
 	
@@ -392,14 +393,13 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 		// each point is in a different quadrant
 		const Point& q1 = points[i];
 		const Point& q2 = points[i + 1];
+		const Point& q3 = points[i + 2];
+		const Point& q4 = points[i + 3];
 		
 		if (left(b1, b2, q1)) {
 			// remaining points are top and bottom segments
 			break;
 		}
-		
-		const Point& q3 = points[i + 2];
-		const Point& q4 = points[i + 3];
 		
 		video->DrawPoint(q1 + offsetH, color);
 		video->DrawPoint(q2 - offsetH, color);
@@ -409,14 +409,26 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	
 	assert(i < points.size() - 4);
 	
-	// the current points are the ends of all segment arcs
-	video->DrawLine(points[i] + offsetH, p + offsetH, color);   // begin right segment
+	// the current points are the ends of the side segments
+	video->DrawLine(points[i++] + offsetH, p + offsetH, color);   // begin right segment
+	video->DrawLine(points[i++] - offsetH, p - offsetH, color);   // begin left segment
+	video->DrawLine(points[i++] - offsetH, p - offsetH, color);   // end left segment
+	video->DrawLine(points[i++] + offsetH, p + offsetH, color);   // end right segment
+	
+	b1 = r.origin + adj;
+	b2 = r.Maximum() - adj;
+	
+	// skip the void between segments
+	for (; i < points.size(); i += 4) {
+		if (left(b1, b2, points[i])) {
+			break;
+		}
+	}
+	
+	// the current points are the ends of the top/bottom segments
 	video->DrawLine(points[i++] + offsetV, p + offsetV, color); // begin top segement
-	video->DrawLine(points[i] - offsetH, p - offsetH, color);   // begin left segment
 	video->DrawLine(points[i++] + offsetV, p + offsetV, color); // end top segment
-	video->DrawLine(points[i] - offsetH, p - offsetH, color);   // end left segment
 	video->DrawLine(points[i++] - offsetV, p - offsetV, color); // begin bottom segment
-	video->DrawLine(points[i] + offsetH, p + offsetH, color);   // end right segment
 	video->DrawLine(points[i++] - offsetV, p - offsetV, color); // end bottom segment
 	
 	// remaining points are top/bottom segments
