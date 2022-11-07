@@ -6642,6 +6642,22 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 	return defense;
 }
 
+static bool IsCriticalEffectEligible(WeaponInfo& wi, const Effect* fx)
+{
+	// does it work only on the currently hitting weapon?
+	if (fx->Parameter2 == 1 && fx->SourceRef != wi.item->Name) return false;
+
+	// does it work on the currently hitting weapon's category (itemcat.ids / itemtype.2da)?
+	if (fx->Parameter3 && fx->Parameter3 != wi.item->ItemType) return false;
+
+	// does the attack type match?
+	if (fx->IsVariable == 1 && wi.extHeader->AttackType != ITEM_AT_MELEE) return false;
+	if (fx->IsVariable == 2 && (wi.extHeader->AttackType != ITEM_AT_BOW && wi.extHeader->AttackType != ITEM_AT_PROJECTILE)) return false;
+	if (fx->IsVariable == 3 && wi.extHeader->AttackType != ITEM_AT_MAGIC) return false;
+
+	return true;
+}
+
 static void ApplyCriticalEffect(Actor* actor, Actor* target, WeaponInfo& wi, bool hit)
 {
 	static EffectRef fx_cast_on_critical_hit_ref = { "CastSpellOnCriticalHit", -1 };
@@ -6654,16 +6670,7 @@ static void ApplyCriticalEffect(Actor* actor, Actor* target, WeaponInfo& wi, boo
 	}
 	if (!fx) return;
 
-	// does it work only on the currently hitting weapon?
-	if (fx->Parameter2 == 1 && fx->SourceRef != wi.item->Name) return;
-
-	// does it work on the currently hitting weapon's category (itemcat.ids / itemtype.2da)?
-	if (fx->Parameter3 != wi.item->ItemType) return;
-
-	// does the attack type match?
-	if (fx->IsVariable == 1 && wi.extHeader->AttackType != ITEM_AT_MELEE) return;
-	if (fx->IsVariable == 2 && (wi.extHeader->AttackType != ITEM_AT_BOW && wi.extHeader->AttackType != ITEM_AT_PROJECTILE)) return;
-	if (fx->IsVariable == 3 && wi.extHeader->AttackType != ITEM_AT_MAGIC) return;
+	if (!IsCriticalEffectEligible(wi, fx)) return;
 
 	core->ApplySpell(fx->Resource, target, actor, actor->GetXPLevel(false));
 }
@@ -6920,7 +6927,13 @@ void Actor::PerformAttack(ieDword gameTime)
 		displaymsg->DisplayStringName(std::move(rollLog), GUIColors::WHITE, this);
 	}
 
-	if (roll == 1) {
+	int critMissThreshold = 1;
+	static EffectRef fx_critical_miss_ref = { "CriticalMissModifier", -1 };
+	Effect* fx = fxqueue.HasEffect(fx_critical_miss_ref);
+	if (fx && IsCriticalEffectEligible(wi, fx)) {
+		critMissThreshold += fx->Parameter1;
+	}
+	if (roll <= critMissThreshold) {
 		//critical failure
 		buffer.append("[Critical Miss]");
 		Log(COMBAT, "Attack", "{}", buffer);

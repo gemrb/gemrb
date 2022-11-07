@@ -527,6 +527,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ControlCreature", fx_set_charmed_state, 0, -1 ), //0xf1 same as charm
 	EffectDesc("CreateContingency", fx_create_contingency, 0, -1 ),
 	EffectDesc("CriticalHitModifier", fx_critical_hit_modifier, 0, -1 ),
+	EffectDesc("CriticalMissModifier", fx_generic_effect, 0, -1),
 	EffectDesc("CrushingResistanceModifier", fx_crushing_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("Cure:Berserk", fx_cure_berserk_state, 0, -1 ),
 	EffectDesc("Cure:Blind", fx_cure_blind_state, 0, -1 ),
@@ -8347,6 +8348,8 @@ int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x168 (360) Stat: Ignore Reputation Breaking Point, implemented as a generic effect
 // 0x169 (361) Cast spell on critical miss (identical to 0x155), implemented as a generic effect
+// 0x16a (362) Critical miss bonus, implemented as a generic effect
+
 
 
 // 0x16f (367) MinimumBaseStats (EE-only) is implemented as a generic effect
