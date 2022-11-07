@@ -8350,7 +8350,10 @@ int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x169 (361) Cast spell on critical miss (identical to 0x155), implemented as a generic effect
 // 0x16a (362) Critical miss bonus, implemented as a generic effect
 
-
+// 0x16b (363) TODO: ee, Modal state check
+// 0x16c (364) unused
+// 0x16d (365) TODO: ee, Make unselectable; reuse the action?
+// 0x16e (366) TODO: ee, Spell: Apply Spell On Move
 
 // 0x16f (367) MinimumBaseStats (EE-only) is implemented as a generic effect
 
