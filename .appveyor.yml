@@ -25,7 +25,7 @@ environment:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
   VCPKG_TARGET_TRIPLET: "x86-windows"
   VCPKG_BUILD_TYPE: "release"
-  APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  #APPVEYOR_SAVE_CACHE_ON_ERROR: true
 install:
 - ps: |-
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
@@ -91,7 +91,7 @@ before_build:
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 build_script:
 - ps: |-
-    exit 1
+    #exit 1
     pushd c:\projects\gemrb
     cmake --build . -j 2 --config Release
 after_build:
