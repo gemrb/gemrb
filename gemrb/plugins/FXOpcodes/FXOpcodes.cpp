@@ -502,6 +502,8 @@ static EffectDesc effectnames[] = {
 	EffectDesc("CastingLevelModifier", fx_castinglevel_modifier, 0, -1 ),
 	EffectDesc("CastingSpeedModifier", fx_castingspeed_modifier, 0, -1 ),
 	EffectDesc("CastSpellOnCondition", fx_cast_spell_on_condition, 0, -1 ),
+	EffectDesc("CastSpellOnCriticalHit", fx_generic_effect, 0, -1), // aka ChangeCritical
+	EffectDesc("CastSpellOnCriticalMiss", fx_generic_effect, 0, -1),
 	EffectDesc("ChangeBackstab", fx_change_backstab, 0, -1),
 	EffectDesc("ChangeBardSong", fx_change_bardsong, 0, -1 ),
 	EffectDesc("ChangeCritical", fx_generic_effect, 0, -1),
@@ -8316,7 +8318,7 @@ int fx_change_backstab(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x155 (341) Spell Effect: Change Critical Hit Effect, implemented as a generic effect
+// 0x155 (341) Spell Effect: Change Critical Hit Effect, implemented as a generic effect CastSpellOnCriticalHit
 // 0x156 (342) Animation: Override Data, implemented as a generic effect
 // NOTE: not implemented Parameter2 == 4 ⟶ Override personal space, since it supposedly doesn't affect circle size
 // if it turns out this is needed, consider making it a stat, so also the pathfinder has quick access
@@ -8344,7 +8346,7 @@ int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 347-359 are unused in the ees
 
 // 0x168 (360) Stat: Ignore Reputation Breaking Point, implemented as a generic effect
-
+// 0x169 (361) Cast spell on critical miss (identical to 0x155), implemented as a generic effect
 
 
 // 0x16f (367) MinimumBaseStats (EE-only) is implemented as a generic effect

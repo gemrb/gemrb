@@ -315,7 +315,6 @@ static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -
 static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 static EffectRef fx_attacks_per_round_modifier_ref = { "AttacksPerRoundModifier", -1 };
 static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
-static EffectRef fx_change_critical_ref = { "ChangeCritical", -1 };
 static EffectRef fx_animation_override_data_ref = { "AnimationOverrideData", -1 };
 static EffectRef fx_enchantment_vs_creature_type_ref = { "EnchantmentVsCreatureType", -1 };
 static EffectRef fx_enchantment_bonus_ref = { "EnchantmentBonus", -1 };
@@ -6643,9 +6642,16 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 	return defense;
 }
 
-static void ApplyCriticalEffect(Actor* actor, Actor* target, WeaponInfo &wi)
+static void ApplyCriticalEffect(Actor* actor, Actor* target, WeaponInfo& wi, bool hit)
 {
-	const Effect* fx = actor->fxqueue.HasEffect(fx_change_critical_ref);
+	static EffectRef fx_cast_on_critical_hit_ref = { "CastSpellOnCriticalHit", -1 };
+	static EffectRef fx_cast_on_critical_miss_ref = { "CastSpellOnCriticalMiss", -1 };
+	const Effect* fx;
+	if (hit) {
+		fx = actor->fxqueue.HasEffect(fx_cast_on_critical_hit_ref);
+	} else {
+		fx = actor->fxqueue.HasEffect(fx_cast_on_critical_miss_ref);
+	}
 	if (!fx) return;
 
 	// does it work only on the currently hitting weapon?
@@ -6933,6 +6939,7 @@ void Actor::PerformAttack(ieDword gameTime)
 				inventory.EquipBestWeapon(EQUIP_MELEE);
 			}
 		}
+		ApplyCriticalEffect(this, target, wi, false);
 		ResetState();
 		return;
 	}
@@ -6963,7 +6970,7 @@ void Actor::PerformAttack(ieDword gameTime)
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, GUIColors::WHITE, this);
 			VerbalConstant(VB_CRITHIT);
 		}
-		ApplyCriticalEffect(this, target, wi);
+		ApplyCriticalEffect(this, target, wi, true);
 	} else {
 		//normal success
 		buffer.append("[Hit]");
