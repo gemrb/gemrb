@@ -165,7 +165,6 @@ static int fx_intimidate_modifier (Scriptable* Owner, Actor* target, Effect* fx)
 static int fx_search_modifier (Scriptable* Owner, Actor* target, Effect* fx);//130
 static int fx_spellcraft_modifier (Scriptable* Owner, Actor* target, Effect* fx);//131
 //0x132 CriticalHitModifier (same as bg2, needed for improved criticals)
-static int fx_turnlevel_modifier (Scriptable* Owner, Actor* target, Effect* fx); //133
 
 //iwd2 specific effects
 static int fx_hopelessness (Scriptable* Owner, Actor* target, Effect* fx);//400
@@ -289,7 +288,6 @@ static EffectDesc effectnames[] = {
 	EffectDesc("IntimidateModifier", fx_intimidate_modifier, 0, -1),//12f
 	EffectDesc("SearchModifier", fx_search_modifier, 0, -1),//130
 	EffectDesc("SpellcraftModifier", fx_spellcraft_modifier, 0, -1),//131
-	EffectDesc("TurnLevelModifier", fx_turnlevel_modifier, 0, -1),//133
 	//iwd2 effects
 	EffectDesc("Hopelessness", fx_hopelessness, 0, -1), //400
 	EffectDesc("ProtectionFromEvil", fx_protection_from_evil, 0, -1), //401
@@ -1994,14 +1992,6 @@ int fx_spellcraft_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x132 DamageLuck (gemrb extension for iwd2, implemented in base opcodes)
-
-//0x133 TurnLevel (gemrb extension for iwd2)
-int fx_turnlevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
-{
-	// print("fx_turnlevel_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_MOD( IE_TURNUNDEADLEVEL );
-	return FX_APPLIED;
-}
 
 //IWD2 effects
 

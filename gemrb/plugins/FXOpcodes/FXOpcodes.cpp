@@ -420,11 +420,12 @@ int fx_golem_stoneskin_modifier (Scriptable* Owner, Actor* target, Effect* fx);/
 int fx_avatar_removal_modifier (Scriptable* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 //int fx_improved_haste_state (Scriptable* Owner, Actor* target, Effect* fx);//13d same as haste
-int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only)
+int fx_set_stat(Scriptable* Owner, Actor* target, Effect* fx); // 13e (tobex only), ees have fx_resist_spell2 here
 int fx_item_usability(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 13f (tobex and ee)
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
 int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
-
+// 0x142 unused in ees
+int fx_turnlevel_modifier(Scriptable* Owner, Actor* target, Effect* fx);
 int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect *fx); // 0x144 (0x122) - 324
 int fx_save_bonus(Scriptable* Owner, Actor* target, Effect* fx); // 0x145 in ees, ee in iwds
 int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx); // 402 in iwd2, 0x146 in ees
@@ -810,6 +811,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("TrackingModifier", fx_tracking_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("TransparencyModifier", fx_transparency_modifier, 0, -1 ),
 	EffectDesc("TurnUndead", fx_turn_undead, 0, -1 ),
+	EffectDesc("TurnLevelModifier", fx_turnlevel_modifier, 0, -1),
 	EffectDesc("UncannyDodge", fx_uncanny_dodge, 0, -1 ),
 	EffectDesc("Unknown", fx_unknown, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("Unlock", fx_knock, EFFECT_NO_ACTOR, -1 ), //open doors/containers
@@ -7936,6 +7938,16 @@ int fx_item_usability(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	target->fxqueue.RemoveAllEffectsWithSource(fx_remove_effects_ref, fx->Resource, fx->Parameter2);
+	return FX_APPLIED;
+}
+
+// 0x142 (322) unused in ees
+
+// 0x133 TurnLevel (gemrb extension for iwd2)
+// 0x143 (323) Stat: Turn Undead Level
+int fx_turnlevel_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	STAT_MOD(IE_TURNUNDEADLEVEL);
 	return FX_APPLIED;
 }
 
