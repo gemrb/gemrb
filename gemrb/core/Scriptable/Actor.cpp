@@ -882,11 +882,15 @@ static void UpdateHappiness(Actor *actor) {
 
 	actor->PCStats->Happiness = newHappiness;
 	if (!actor->Ticks) return; // skip feedback on startup
+
+	const Effect* fx;
+	static EffectRef fx_ignore_breaking_point_ref = { "IgnoreReputationBreakingPoint", -1 };
 	switch (newHappiness) {
 		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, DS_QUEUE); break;
 		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, DS_QUEUE); break;
 		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, DS_QUEUE);
-			if (actor != core->GetGame()->GetPC(0, false)) core->GetGame()->LeaveParty(actor);
+			fx = actor->fxqueue.HasEffect(fx_ignore_breaking_point_ref);
+			if (!fx && actor != core->GetGame()->GetPC(0, false)) core->GetGame()->LeaveParty(actor);
 			break;
 		case 80: actor->VerbalConstant(VB_HAPPY, 1, DS_QUEUE); break;
 		default: break; // case 0

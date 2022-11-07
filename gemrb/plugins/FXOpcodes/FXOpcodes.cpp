@@ -612,6 +612,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Icon:Remove", fx_remove_portrait_icon, 0, -1 ),
 	EffectDesc("Identify", fx_identify, 0, -1 ),
 	EffectDesc("IgnoreDialogPause", fx_ignore_dialogpause_modifier, 0, -1 ),
+	EffectDesc("IgnoreReputationBreakingPoint", fx_generic_effect, 0, -1),
 	EffectDesc("IntelligenceModifier", fx_intelligence_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("IntoxicationModifier", fx_intoxication_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("InvisibleDetection", fx_see_invisible_modifier, 0, -1 ),
@@ -8341,6 +8342,8 @@ int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x15a (346) Save vs. school bonus, implemented as a generic effect
 
 // 347-359 are unused in the ees
+
+// 0x168 (360) Stat: Ignore Reputation Breaking Point, implemented as a generic effect
 
 
 
