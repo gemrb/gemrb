@@ -727,6 +727,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("SaveVsBreathModifier", fx_save_vs_breath_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("SaveVsDeathModifier", fx_save_vs_death_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("SaveVsPolyModifier", fx_save_vs_poly_modifier, EFFECT_SPECIAL_UNDO, -1 ),
+	EffectDesc("SaveVsSchoolModifier", fx_generic_effect, 0, -1),
 	EffectDesc("SaveVsSpellsModifier", fx_save_vs_spell_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("SaveVsWandsModifier", fx_save_vs_wands_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("ScreenShake", fx_screenshake, EFFECT_NO_ACTOR, -1 ),
@@ -8337,6 +8338,9 @@ int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x158 (344) Enchantment vs. creature type, implemented as a generic effect
 // 0x159 (345) Enchantment bonus, implemented as a generic effect
+// 0x15a (346) Save vs. school bonus, implemented as a generic effect
+
+// 347-359 are unused in the ees
 
 
 

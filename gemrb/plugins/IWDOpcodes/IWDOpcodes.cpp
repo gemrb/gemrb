@@ -904,7 +904,7 @@ int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		st = target->GetSavingThrow(2, 0, fx); // fortitude
 	} else {
-		st = target->GetSavingThrow(0,0); //spell
+		st = target->GetSavingThrow(0, 0, fx); // spell
 	}
 
 	if (st) {

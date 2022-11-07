@@ -319,6 +319,7 @@ static EffectRef fx_change_critical_ref = { "ChangeCritical", -1 };
 static EffectRef fx_animation_override_data_ref = { "AnimationOverrideData", -1 };
 static EffectRef fx_enchantment_vs_creature_type_ref = { "EnchantmentVsCreatureType", -1 };
 static EffectRef fx_enchantment_bonus_ref = { "EnchantmentBonus", -1 };
+static EffectRef fx_save_vs_school_bonus_ref = { "SaveVsSchoolModifier", -1 };
 
 //used by iwd2
 static const ResRef CripplingStrikeRef = "cripstr";
@@ -3130,6 +3131,20 @@ void Actor::RollSaves()
 	}
 }
 
+static int AdjustSaveVsSchool(int base, ieDword school, const Effect* fx)
+{
+	if (fx && fx->IsVariable == ieWord(school)) {
+		if (fx->Parameter2 == 1) {
+			base = fx->Parameter1;
+		} else if (fx->Parameter2 == 2) {
+			base = base * fx->Parameter1 / 100;
+		} else {
+			base += fx->Parameter1;
+		}
+	}
+	return base;
+}
+
 //saving throws:
 //type      bits in file    order in stats
 //0  spells            1    4
@@ -3160,9 +3175,13 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 	// NOTE: assuming criticals apply to iwd2 too
 	if (ret == 1) return false;
 	if (ret == saveDiceSides) return true;
+	const Effect* sfx = fxqueue.HasEffect(fx_save_vs_school_bonus_ref);
 
 	if (!third) {
 		ret += modifier + GetStat(IE_LUCK);
+
+		// also take any "vs school" bonus into account
+		ret = AdjustSaveVsSchool(ret, fx->PrimaryType, sfx);
 
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		static ieDword prevType = -1;
@@ -3253,6 +3272,8 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 			saveDC += caster->GetSkill(IE_ANIMALS);
 		}
 	}
+
+	ret = AdjustSaveVsSchool(ret, fx->PrimaryType, sfx);
 
 	if (ret > saveDC) {
 		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Success!~
@@ -7013,7 +7034,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	//guardian mantle for PST
 	if (attacker && (Modified[IE_IMMUNITY]&IMM_GUARDIAN) ) {
 		//if the hitter doesn't make the spell save, the mantle works and the damage is 0
-		if (!attacker->GetSavingThrow(0,-4) ) {
+		if (!attacker->GetSavingThrow(0, -4)) {
 			damage = 0;
 			return;
 		}

@@ -1084,7 +1084,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 			if (globals.iwd2fx) {
 				saved = actor->GetSavingThrow(i, bonus - fx->SavingThrowBonus, fx);
 			} else {
-				saved = actor->GetSavingThrow(i, bonus);
+				saved = actor->GetSavingThrow(i, bonus, fx);
 			}
 			if( saved) {
 				break;
@@ -2353,7 +2353,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 				if (target->GetThiefLevel() < 7 ) {
 					return false;
 				}
-				val = target->GetSavingThrow(1, 0); // breath
+				val = target->GetSavingThrow(1, 0, fx); // breath
 			}
 
 			return val;
