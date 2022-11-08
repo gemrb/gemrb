@@ -84,7 +84,32 @@ const Size& TileProps::GetSize() const noexcept
 	return size;
 }
 
-uint8_t TileProps::QueryTileProps(const Point& p, Property prop) const noexcept
+void TileProps::SetTileProp(const Point& p, Property prop, uint8_t val) noexcept
+{
+	if (size.PointInside(p)) {
+		uint32_t& c = propPtr[p.y * size.w + p.x];
+		switch (prop) {
+			case Property::SEARCH_MAP:
+				c &= ~searchMapMask;
+				c |= val << searchMapShift;
+				break;
+			case Property::MATERIAL:
+				c &= ~materialMapMask;
+				c |= val << materialMapShift;
+				break;
+			case Property::ELEVATION:
+				c &= ~heightMapMask;
+				c |= val << heightMapShift;
+				break;
+			case Property::LIGHTING:
+				c &= ~lightMapMask;
+				c |= val << lightMapShift;
+				break;
+		}
+	}
+}
+
+uint8_t TileProps::QueryTileProp(const Point& p, Property prop) const noexcept
 {
 	if (size.PointInside(p)) {
 		const uint32_t c = propPtr[p.y * size.w + p.x];
@@ -114,12 +139,12 @@ uint8_t TileProps::QueryTileProps(const Point& p, Property prop) const noexcept
 
 PathMapFlags TileProps::QuerySearchMap(const Point& p) const noexcept
 {
-	return static_cast<PathMapFlags>(QueryTileProps(p, Property::SEARCH_MAP));
+	return static_cast<PathMapFlags>(QueryTileProp(p, Property::SEARCH_MAP));
 }
 
 uint8_t TileProps::QueryMaterial(const Point& p) const noexcept
 {
-	return QueryTileProps(p, Property::MATERIAL);
+	return QueryTileProp(p, Property::MATERIAL);
 }
 
 int TileProps::QueryElevation(const Point& p) const noexcept
@@ -127,7 +152,7 @@ int TileProps::QueryElevation(const Point& p) const noexcept
 	// Heightmaps are greyscale images where the top of the world is white and the bottom is black.
 	// this covers the range -7 – +7
 	// since the image is grey we can use any channel for the mapping
-	int val = QueryTileProps(p, Property::ELEVATION);
+	int val = QueryTileProp(p, Property::ELEVATION);
 	constexpr int input_range = 255;
 	constexpr int output_range = 14;
 	return val * output_range / input_range - 7;
@@ -135,7 +160,7 @@ int TileProps::QueryElevation(const Point& p) const noexcept
 
 Color TileProps::QueryLighting(const Point& p) const noexcept
 {
-	uint8_t val = QueryTileProps(p, Property::LIGHTING);
+	uint8_t val = QueryTileProp(p, Property::LIGHTING);
 	return propImage->GetPalette()->col[val];
 }
 
@@ -1886,13 +1911,13 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 
 			Color col;
 			if (dFlags & DEBUG_SHOW_SEARCHMAP) {
-				auto val = tileProps.QueryTileProps(p, TileProps::Property::SEARCH_MAP);
+				auto val = tileProps.QueryTileProp(p, TileProps::Property::SEARCH_MAP);
 				col = debugPalettes.searchMapPal->col[val];
 			} else if (dFlags & DEBUG_SHOW_MATERIALMAP) {
 				auto val = tileProps.QueryMaterial(p);
 				col = debugPalettes.materialMapPal->col[val];
 			} else if (dFlags & DEBUG_SHOW_HEIGHTMAP) {
-				auto val = tileProps.QueryTileProps(p, TileProps::Property::ELEVATION);
+				auto val = tileProps.QueryTileProp(p, TileProps::Property::ELEVATION);
 				col = debugPalettes.heightMapPal->col[val];
 			} else if (dFlags & DEBUG_SHOW_LIGHTMAP) {
 				col = tileProps.QueryLighting(p);

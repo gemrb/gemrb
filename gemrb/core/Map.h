@@ -366,7 +366,9 @@ public:
 	
 	const Size& GetSize() const noexcept;
 	
-	uint8_t QueryTileProps(const Point& p, Property prop) const noexcept;
+	void SetTileProp(const Point& p, Property prop, uint8_t val) noexcept;
+	uint8_t QueryTileProp(const Point& p, Property prop) const noexcept;
+	
 	PathMapFlags QuerySearchMap(const Point& p) const noexcept;
 	uint8_t QueryMaterial(const Point& p) const noexcept;
 	int QueryElevation(const Point& p) const noexcept;
