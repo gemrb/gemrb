@@ -130,6 +130,8 @@ public:
 
 	Point Center() const noexcept { return Point(x + w / 2, y + h / 2); }
 	Point Maximum() const noexcept { return Point(x + w, y + h); }
+	// returns the point of intersection between Region and the line (extending to infinity) from the Center to p
+	Point Intercept(const Point& p) const noexcept;
 	
 	void ExpandToPoint(const Point& p) noexcept;
 	void ExpandToRegion(const Region& r) noexcept;

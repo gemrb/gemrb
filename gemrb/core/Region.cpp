@@ -192,6 +192,41 @@ Region Region::Intersect(const Region& rgn) const noexcept
 	return Region(ix1, iy1, ix2 - ix1, iy2 - iy1);
 }
 
+Point Region::Intercept(const Point& p) const noexcept
+{
+	const Point& mid = Center();
+	const Point& min = origin;
+	const Point& max = Maximum();
+	
+	if (p.x == mid.x) return Point(p.x, (p.y < min.y) ? min.y : max.y); // vert line
+	if (p.y == mid.y) return Point((p.x < min.x) ? min.x : max.x, p.y); // horiz line
+
+	float m = float(mid.y - p.y) / float(mid.x - p.x);
+
+	if (p.x <= mid.x) { // check "left" side
+		int y = m * (min.x - p.x) + p.y;
+		if (min.y <= y && y <= max.y) return Point(min.x, y);
+	}
+
+	if (p.x >= mid.x) { // check "right" side
+		int y = m * (max.x - p.x) + p.y;
+		if (min.y <= y && y <= max.y) return Point(max.x, y);
+	}
+	
+	if (p.y <= mid.y) { // check "top" side
+		int x = (min.y - p.y) / m + p.x;
+		if (min.x <= x && x <= max.x) return Point(x, min.y);
+	}
+
+	if (p.y >= mid.y) { // check "bottom" side
+		int x = (max.y - p.y) / m + p.x;
+		if (min.x <= x && x <= max.x) return Point(x, max.y);
+	}
+	
+	assert(p == mid || PointInside(p));
+	return p;
+}
+
 void Region::ExpandToPoint(const Point& p) noexcept
 {
 	if (p.x < x) {
