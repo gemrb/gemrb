@@ -27,7 +27,7 @@
 namespace GemRB {
 
 // so far everything we need uses this cycle
-static const unsigned long ColorCycleSteps[] = {6,4,2,0,2,4,6,8};
+static const uint8_t ColorCycleSteps[] = {6,4,2,0,2,4,6,8};
 ColorCycle GlobalColorCycle(7);
 
 void ColorCycle::AdvanceTime(tick_t time)
