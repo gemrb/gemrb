@@ -116,7 +116,7 @@ std::vector<Point> PlotCircle(const Point& origin, uint16_t r, uint8_t octants) 
 	// Uses the 2nd order Bresenham's Circle Algorithm: https://funloop.org/post/2021-03-15-bresenham-circle-drawing-algorithm.html
 	
 	std::vector<Point> points;
-	points.reserve(r * r); // this is more than enough for a full circle
+	points.reserve(6 * r); // 6 is 2𝜋 rounded down
 	
 	auto GenOctants = [&origin, &points, octants](int x, int y) noexcept
 	{
