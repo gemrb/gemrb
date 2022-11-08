@@ -135,7 +135,7 @@ private:
 
 	Region SelectionRect() const;
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
-	void DrawArrowMarker(Point p, const Color& color) const;
+	void DrawArrowMarker(const Point& p, const Color& color) const;
 	void DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const;
 	
 	Point GetFormationPoint(const Point& origin, size_t pos, double angle, const FormationPoints& exclude = FormationPoints()) const;

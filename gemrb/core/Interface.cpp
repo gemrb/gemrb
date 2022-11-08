@@ -3734,9 +3734,13 @@ Holder<Sprite2D> Interface::GetCursorSprite()
 	return spr;
 }
 
-Holder<Sprite2D> Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
+Holder<Sprite2D> Interface::GetScrollCursorSprite(orient_t orient, int spriteNum) const
 {
-	return gamedata->GetBAMSprite(ScrollCursorBam, frameNum, spriteNum, true);
+	// map orientation to sprite frame
+	orient = ReduceToHalf(orient); // there are only 8 valid directions instead of 16
+	uint8_t frame = 6 - (orient / 2);
+	frame = Clamp<uint8_t>(frame, 0, 7);
+	return gamedata->GetBAMSprite(ScrollCursorBam, frame, spriteNum, true);
 }
 
 /* we should return -1 if it isn't gold, otherwise return the gold value */

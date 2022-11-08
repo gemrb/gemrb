@@ -308,60 +308,20 @@ bool GameControl::ShouldRun(const Actor *actor) const
 	return CanRun(actor) && AlwaysRun;
 }
 
-// ArrowSprite cycles
-//  321
-//  4 0
-//  567
-
-#define D_LEFT   1
-#define D_UP     2
-#define D_RIGHT  4
-#define D_BOTTOM 8
-// Direction Bits
-//  326
-//  1 4
-//  98c
-
-static const int arrow_orientations[16]={
-// 0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-	-1, 4, 2, 3, 0,-1, 1,-1, 6, 5,-1,-1, 7,-1,-1,-1
-};
-
-//Draws arrow markers along the edge of the game window
-//WARNING:don't use reference for point, because it is altered
-void GameControl::DrawArrowMarker(Point p, const Color& color) const
+// Draws arrow markers along the edge of the game window
+void GameControl::DrawArrowMarker(const Point& p, const Color& color) const
 {
 	const WindowManager* wm = core->GetWindowManager();
 	auto lock = wm->DrawHUD();
 
-	ieDword draw = 0;
-	if (p.x < vpOrigin.x) {
-		p.x = vpOrigin.x;
-		draw|= D_LEFT;
-	}
-	if (p.y < vpOrigin.y) {
-		p.y = vpOrigin.y;
-		draw |= D_UP;
-	}
+	const Region& bounds = Viewport();
+	if (bounds.PointInside(p)) return;
 
-	Holder<Sprite2D> spr = core->GetScrollCursorSprite(0,0);
-	int tmp = spr->Frame.w;
-	if (p.x > vpOrigin.x + frame.w - tmp) {
-		p.x = vpOrigin.x + frame.w;
-		draw |= D_RIGHT;
-	}
-
-	tmp = spr->Frame.h;
-	if (p.y > vpOrigin.y + frame.h - tmp) {
-		p.y = vpOrigin.y + frame.h;
-		draw |= D_BOTTOM;
-	}
-
-	if (arrow_orientations[draw]>=0) {
-		Video* video = core->GetVideoDriver();
-		Holder<Sprite2D> arrow = core->GetScrollCursorSprite(arrow_orientations[draw], 0);
-		video->BlitGameSprite(arrow, p - vpOrigin, BlitFlags::COLOR_MOD | BlitFlags::BLENDED, color);
-	}
+	orient_t dir = GetOrient(p, bounds.Center());
+	Holder<Sprite2D> arrow = core->GetScrollCursorSprite(dir, 0);
+	
+	const Point& dp = bounds.Intercept(p) - bounds.origin;
+	core->GetVideoDriver()->BlitGameSprite(arrow, dp, BlitFlags::COLOR_MOD | BlitFlags::BLENDED, color);
 }
 
 void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Point& p) const
@@ -469,26 +429,12 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	}
 
 	if (!vpVector.IsZero() && MoveViewportTo(vpOrigin + vpVector, false)) {
-		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed()) {
-			int cursorFrame = 0; // right
-			if (vpVector.y < 0) {
-				cursorFrame = 2; // up
-				if (vpVector.x > 0) cursorFrame--; // +right
-				else if (vpVector.x < 0) cursorFrame++; // +left
-			} else if (vpVector.y > 0) {
-				cursorFrame = 6; // down
-				if (vpVector.x > 0) cursorFrame++; // +right
-				else if (vpVector.x < 0) cursorFrame--; // +left
-			} else if (vpVector.x < 0) {
-				cursorFrame = 4; // left
-			}
+		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed() && (ScreenFlags & SF_ALWAYSCENTER) == 0) {
+			orient_t orient = GetOrient(vpVector, Point());
+			// set these cursors on game window so they are universal
+			window->SetCursor(core->GetScrollCursorSprite(orient, numScrollCursor));
 
-			if ((ScreenFlags & SF_ALWAYSCENTER) == 0) {
-				// set these cursors on game window so they are universal
-				window->SetCursor(core->GetScrollCursorSprite(cursorFrame, numScrollCursor));
-
-				numScrollCursor = (numScrollCursor+1) % 15;
-			}
+			numScrollCursor = (numScrollCursor + 1) % 15;
 		}
 	} else if (!window->IsDisabled()) {
 		window->SetCursor(NULL);

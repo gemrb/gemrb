@@ -650,7 +650,7 @@ public:
 	/** returns a cursor sprite (not cached) */
 	Holder<Sprite2D> GetCursorSprite();
 	/** returns a scroll cursor sprite */
-	Holder<Sprite2D> GetScrollCursorSprite(int frameNum, int spriteNum);
+	Holder<Sprite2D> GetScrollCursorSprite(orient_t orient, int spriteNum) const;
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
 	int CanMoveItem(const CREItem *item) const;
