@@ -89,6 +89,7 @@ public:
 static const ResRef TestSpell = "SPWI207";
 
 uint32_t GameControl::DebugFlags = 0;
+uint8_t GameControl::DebugPropVal = 0;
 
 static Actor* GetMainSelectedActor()
 {
@@ -1073,6 +1074,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 						DebugFlags |= DEBUG_SHOW_FOG_ALL;
 					} else {
 						DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
+						DebugPropVal = 0;
 					}
 				}
 				break;
@@ -1395,8 +1397,36 @@ bool GameControl::IsDisabledCursor() const
 	return isDisabled;
 }
 
+void GameControl::DebugPaint(const Point& p, bool sample) const noexcept
+{
+	if (DebugFlags & (DEBUG_SHOW_SEARCHMAP | DEBUG_SHOW_MATERIALMAP | DEBUG_SHOW_HEIGHTMAP | DEBUG_SHOW_LIGHTMAP)) {
+		Map* map = CurrentArea();
+		Point tile = map->ConvertCoordToTile(p);
+		TileProps::Property prop = TileProps::Property::SEARCH_MAP;
+		if (DebugFlags & DEBUG_SHOW_MATERIALMAP) {
+			prop = TileProps::Property::MATERIAL;
+		} else if (DebugFlags & DEBUG_SHOW_HEIGHTMAP) {
+			prop = TileProps::Property::ELEVATION;
+		} else if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
+			prop = TileProps::Property::LIGHTING;
+		}
+		
+		if (sample) {
+			DebugPropVal = map->tileProps.QueryTileProp(tile, prop);
+		} else {
+			map->tileProps.SetTileProp(tile, prop, DebugPropVal);
+		}
+	}
+}
+
 bool GameControl::OnMouseDrag(const MouseEvent& me)
 {
+	if (EventMgr::ModState(GEM_MOD_CTRL)) {
+		Point p = ConvertPointFromScreen(me.Pos());
+		DebugPaint(p + vpOrigin, false);
+		return true;
+	}
+
 	if (me.ButtonState(GEM_MB_MIDDLE)) {
 		Scroll(me.Delta());
 		return true;
@@ -2011,6 +2041,10 @@ void GameControl::TryDefaultTalk() const
 /** Mouse Button Down */
 bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
+	if (Mod & GEM_MOD_CTRL) { // debug paint mode
+		return true;
+	}
+
 	Point p = ConvertPointFromScreen(me.Pos());
 	gameClickPoint = p + vpOrigin;
 
@@ -2078,6 +2112,12 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 /** Mouse Button Up */
 bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
+	if (Mod & GEM_MOD_CTRL) {
+		Point p = ConvertPointFromScreen(me.Pos());
+		DebugPaint(p + vpOrigin, me.button == GEM_MB_MENU);
+		return true;
+	}
+	
 	//heh, i found no better place
 	core->CloseCurrentContainer();
 

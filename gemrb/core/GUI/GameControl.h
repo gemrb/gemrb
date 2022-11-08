@@ -115,6 +115,7 @@ private:
 
 public:
 	static uint32_t DebugFlags;
+	static uint8_t DebugPropVal;
 
 	DialogHandler *dialoghandler = nullptr;
 	//the name of the spell to cast
@@ -160,6 +161,8 @@ private:
 	
 	bool CanLockFocus() const override { return true; };
 	void FlagsChanged(unsigned int /*oldflags*/) override;
+	
+	void DebugPaint(const Point& p, bool sample) const noexcept;
 
 public:
 	explicit GameControl(const Region& frame);
