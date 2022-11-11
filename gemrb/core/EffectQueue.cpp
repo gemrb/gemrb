@@ -1041,10 +1041,13 @@ static int check_resistance(Actor* actor, Effect* fx)
 		return FX_ABORT;
 	}
 
-	//not resistable (but check saves - for chromatic orb instakill)
-	// bg2 sequencer trigger spells have bad resistance set, so ignore them
-	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL && signed(fx->Opcode) != EffectQueue::ResolveEffect(fx_activate_spell_sequencer_ref)) {
-		return check_magic_res(actor, fx, caster);
+	// check magic resistance if applicable
+	// (note that no MR roll does not preclude saving throws -- see e.g. chromatic orb instakill)
+	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL && check_magic_res(actor, fx, caster) == FX_NOT_APPLIED) {
+		// bg2 sequencer trigger spells have bad resistance set, so ignore them
+		if (signed(fx->Opcode) != EffectQueue::ResolveEffect(fx_activate_spell_sequencer_ref)) {
+			return FX_NOT_APPLIED;
+		}
 	}
 
 	if (globals.pstflags && (actor->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
