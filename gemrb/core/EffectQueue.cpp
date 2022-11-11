@@ -173,6 +173,7 @@ static EffectRef fx_spell_immunity_ref = { "Protection:Spell", -1 }; //bg2
 static EffectRef fx_spell_immunity2_ref = { "Protection:Spell2", -1 };//iwd
 static EffectRef fx_school_immunity_ref = { "Protection:School", -1 };
 static EffectRef fx_secondary_type_immunity_ref = { "Protection:SecondaryType", -1 };
+static EffectRef fx_projectile_immunity_ref = { "Protection:Projectile", -1 };
 
 //decrementing immunity effects
 static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
@@ -830,6 +831,11 @@ static int check_type(Actor *actor, const Effect& fx)
 			}
 			return 0;
 		}
+	}
+
+	if (actor->fxqueue.HasEffectWithParam(fx_projectile_immunity_ref, fx.Projectile)) {
+		Log(DEBUG, "EffectQueue", "Resisted by projectile");
+		return 0;
 	}
 
 	//primary type immunity (school)
