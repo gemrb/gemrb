@@ -808,6 +808,8 @@ static int check_type(Actor *actor, const Effect& fx)
 	Actor *caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
 	// Cannot resist own spells!  This even applies to bounced hostile spells, but notably excludes source immunity.
 	bool self = (caster == actor);
+	// MagicAttack: these spells pierce most generic magical defences (because they need to be able to dispel them).
+	bool pierce = (fx.SecondaryType == 4);
 
 	//spell level immunity
 	if (fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0) && !self) {
@@ -831,7 +833,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//primary type immunity (school)
-	if (fx.PrimaryType && !self) {
+	if (fx.PrimaryType && !self && !pierce) {
 		if (actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school/primary type");
 			return 0;
@@ -848,7 +850,7 @@ static int check_type(Actor *actor, const Effect& fx)
 
 	//decrementing immunity checks
 	//decrementing level immunity
-	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx.Power));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
@@ -865,7 +867,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 	//decrementing primary type immunity (school)
-	if (fx.PrimaryType && !self) {
+	if (fx.PrimaryType && !self && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
@@ -887,7 +889,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	//if the spelltrap effect already absorbed enough levels
 	//but still didn't get removed, it will absorb levels it shouldn't
 	//it will also absorb multiple spells in a single round
-	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx.Power));
 		if( efx) {
 			//storing the absorbed spell level
@@ -926,7 +928,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		return -1;
 	}
 
-	if (fx.PrimaryType && (bounce & BNC_SCHOOL)) {
+	if (fx.PrimaryType && (bounce & BNC_SCHOOL) && !pierce) {
 		if (actor->fxqueue.HasEffectWithParam(fx_school_bounce_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Bounced by school");
 			return -1;
@@ -942,7 +944,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	//decrementing bounce checks
 
 	//level decrementing bounce check
-	if (fx.Power && bounce & BNC_LEVEL_DEC) {
+	if (fx.Power && bounce & BNC_LEVEL_DEC && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx.Power));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
@@ -958,7 +960,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 
-	if (fx.PrimaryType && (bounce & BNC_SCHOOL_DEC)) {
+	if (fx.PrimaryType && (bounce & BNC_SCHOOL_DEC) && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by school (decrementing)");
