@@ -805,14 +805,14 @@ static int check_type(Actor *actor, const Effect& fx)
 	//the protective effect (if any)
 	Effect *efx;
 
+	Actor *caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
+	// Cannot resist own spells!  This even applies to bounced hostile spells, but notably excludes source immunity.
+	bool self = (caster == actor);
+
 	//spell level immunity
-	// but ignore it if we're casting beneficial stuff on ourselves
-	if (fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0)) {
-		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
-		if (caster != actor || (fx.SourceFlags & SF_HOSTILE)) {
-			Log(DEBUG, "EffectQueue", "Resisted by level immunity");
-			return 0;
-		}
+	if (fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0) && !self) {
+		Log(DEBUG, "EffectQueue", "Resisted by level immunity");
+		return 0;
 	}
 
 	//source immunity (spell name)
@@ -831,7 +831,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//primary type immunity (school)
-	if (fx.PrimaryType) {
+	if (fx.PrimaryType && !self) {
 		if (actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school/primary type");
 			return 0;
@@ -839,7 +839,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//secondary type immunity (usage)
-	if (fx.SecondaryType) {
+	if (fx.SecondaryType && !self) {
 		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx.SecondaryType)) {
 			Log(DEBUG, "EffectQueue", "Resisted by usage/secondary type");
 			return 0;
@@ -848,7 +848,7 @@ static int check_type(Actor *actor, const Effect& fx)
 
 	//decrementing immunity checks
 	//decrementing level immunity
-	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx.Power));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
@@ -865,7 +865,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 	//decrementing primary type immunity (school)
-	if (fx.PrimaryType) {
+	if (fx.PrimaryType && !self) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
@@ -874,7 +874,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//decrementing secondary type immunity (usage)
-	if (fx.SecondaryType) {
+	if (fx.SecondaryType && !self) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx.SecondaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by usage/sectype immunity (decrementing)");
@@ -887,7 +887,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	//if the spelltrap effect already absorbed enough levels
 	//but still didn't get removed, it will absorb levels it shouldn't
 	//it will also absorb multiple spells in a single round
-	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx.Power));
 		if( efx) {
 			//storing the absorbed spell level
@@ -903,8 +903,8 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 
-	// bounce checks; skip all if this is set
-	if (fx.Resistance == FX_NO_RESIST_BYPASS_BOUNCE) {
+	// bounce checks; skip all if this is set, or if casting on oneself (obviously)
+	if (fx.Resistance == FX_NO_RESIST_BYPASS_BOUNCE || self) {
 		return 1;
 	}
 
