@@ -856,9 +856,9 @@ static int check_type(Actor *actor, const Effect& fx)
 
 	//decrementing immunity checks
 	//decrementing level immunity
-	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self && !pierce) {
-		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx.Power));
-		if (efx && DecreaseEffect(efx)) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self && !pierce
+	    && actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx.Power)) {
+		if (actor->fxqueue.DecreaseParam1OfEffect(fx_level_immunity_dec_ref, fx.Power)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
 			return 0;
 		}
@@ -891,10 +891,6 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//spelltrap (absorb)
-	//FIXME:
-	//if the spelltrap effect already absorbed enough levels
-	//but still didn't get removed, it will absorb levels it shouldn't
-	//it will also absorb multiple spells in a single round
 	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx.Power));
 		if( efx) {
@@ -903,11 +899,10 @@ static int check_type(Actor *actor, const Effect& fx)
 			
 			//instead of a single effect, they had to create an effect for each level
 			//HOW DAMN LAME
-			//if decrease needs the spell level, use fx.Power here
-			actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, 1);
-			//efx.Parameter1--;
-			Log(DEBUG, "EffectQueue", "Absorbed by spelltrap");
-			return 0;
+			if (actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, fx.Power)) {
+				Log(DEBUG, "EffectQueue", "Absorbed by spelltrap");
+				return 0;
+			}
 		}
 	}
 
@@ -950,9 +945,8 @@ static int check_type(Actor *actor, const Effect& fx)
 	//decrementing bounce checks
 
 	//level decrementing bounce check
-	if (fx.Power && bounce & BNC_LEVEL_DEC && !pierce) {
-		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx.Power));
-		if (efx && DecreaseEffect(efx)) {
+	if (fx.Power && (bounce & BNC_LEVEL_DEC) && !pierce && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx.Power)) {
+		if (actor->fxqueue.DecreaseParam1OfEffect(fx_level_bounce_dec_ref, fx.Power)) {
 			Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
 			return -1;
 		}
@@ -1736,33 +1730,31 @@ const Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, i
 }
 
 //this could be used for stoneskins and mirror images as well
-void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
+bool EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
 {
+	bool found = false;
 	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		ieDword value = fx.Parameter1;
-		if( value>amount) {
-			value -= amount;
-			amount = 0;
-		} else {
-			amount -= value;
-			value = 0;
-		}
-		fx.Parameter1 = value;
-		if (value) {
-			return;
+		ieDword& amount_left = fx.Parameter1;
+		if (amount_left > amount) {
+			amount_left -= amount;
+			found = true;
+		} else if (amount_left > 0) {
+			amount_left = 0;
+			found = true;
 		}
 	}
+	return found;
 }
 
-void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount)
+bool EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount)
 {
 	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return;
+		return false;
 	}
-	DecreaseParam1OfEffect(effect_reference.opcode, amount);
+	return DecreaseParam1OfEffect(effect_reference.opcode, amount);
 }
 
 //this is only used for Cloak of Warding Overlay in PST
