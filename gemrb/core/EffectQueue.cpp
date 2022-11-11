@@ -1732,7 +1732,7 @@ const Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, i
 	return HasOpcodeWithParamPair(effect_reference.opcode, param1, param2);
 }
 
-//this could be used for stoneskins and mirror images as well
+//decreases all eligible effects at once!  returns false if all spent already
 bool EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
 {
 	bool found = false;
