@@ -1591,7 +1591,7 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 			continue;
 		}
 
-		if (removed != fx.SourceRef) {
+		if (removed && removed != fx.SourceRef) {
 			continue;
 		}
 		if (Flags & RL_MATCHSCHOOL && fx.PrimaryType != match) {
