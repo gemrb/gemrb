@@ -2552,8 +2552,26 @@ int fx_alignment_change (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x3a DispelEffects
 int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_dispel_effects(%2d): Value: %d, IDS: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	switch (fx->Parameter2) {
+	// ees added an upper word to tweak targetting of weapons in SLOT_MAGIC
+	int slot = target->inventory.GetMagicSlot();
+	ieDword itemLevel;
+	if (fx->Parameter2 > 2 && target->inventory.HasItemInSlot("", slot)) {
+		switch (fx->Parameter2 >> 16) {
+			case 0:
+			default: // always dispel, ignore undispellable
+				if (!(target->inventory.GetItemFlag(slot) & IE_ITEM_NO_DISPEL)) target->inventory.RemoveItem(slot);
+				break;
+			case 1: // never dispel, regardless of flags
+				break;
+			case 2: // use caster level, ignore undispellable
+				if (target->inventory.GetItemFlag(slot) & IE_ITEM_NO_DISPEL) break;
+				itemLevel = std::max(1U, target->GetAnyActiveCasterLevel());
+				if (EffectQueue::RollDispelChance(fx->CasterLevel, itemLevel)) target->inventory.RemoveItem(slot);
+				break;
+		}
+	}
+
+	switch (fx->Parameter2 & 3) {
 	case 0:
 	default:
 		// dispel everything
@@ -2568,6 +2586,7 @@ int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->fxqueue.DispelEffects(fx, fx->Parameter1);
 		break;
 	}
+
 	return FX_NOT_APPLIED;
 }
 

@@ -63,7 +63,7 @@ class Projectile;
 #define IE_ITEM_INV_USABLE   0x00008000 // TODO: ee ADAMANTINE (itemflag.ids); pstee, usable in inventory
 #define IE_ITEM_ADAMANTINE   0x00010000 // RECHECK vs IE_ITEM_INV_USABLE (missing from ids)
 //tobex modder extensions, please note, these are not copied into the local slot bits
-#define IE_ITEM_NO_DISPEL    0x01000000 // TODO: disables destruction by dispelling; named BODYPART in ee - different?
+#define IE_ITEM_NO_DISPEL    0x01000000 // disables destruction by dispelling; named BODYPART in ee - different?
 #define IE_ITEM_TOGGLE_CRITS 0x02000000 //toggles critical hit avertion
 #define IE_ITEM_NO_INVIS     0x04000000 // TODO: don't target invisible
 
