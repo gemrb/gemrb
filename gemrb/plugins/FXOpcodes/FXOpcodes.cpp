@@ -7160,18 +7160,20 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	// fx->Parameter4 is an optional frequency multiplier
+	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
 	Scriptable *caster = GetCasterObject();
 	switch (fx->Parameter2) {
 		case 0: //once per second
 		case 1: //crash???
-			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time))) {
+			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(aRound))) {
 				core->ApplyEffect(newfx, target, caster);
 			} else {
 				delete newfx;
 			}
 			break;
 		case 2://param1 times every second
-			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time))) {
+			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(aRound))) {
 				for (ieDword i=0; i < fx->Parameter1; i++) {
 					core->ApplyEffect(new Effect(*newfx), target, caster);
 				}
@@ -7179,14 +7181,14 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			delete newfx;
 			break;
 		case 3: //once every Param1 second
-			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * core->Time.ai_update_time))) {
+			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * aRound))) {
 				core->ApplyEffect(newfx, target, caster);
 			} else {
 				delete newfx;
 			}
 			break;
 		case 4: //param3 times every Param1 second
-			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * core->Time.ai_update_time))) {
+			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * aRound))) {
 				for (ieDword i=0; i < fx->Parameter3; i++) {
 					core->ApplyEffect(new Effect(*newfx), target, caster);
 				}
@@ -7197,6 +7199,8 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			delete newfx;
 			break;
 	}
+
+	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable);
 
 	return FX_APPLIED;
 }
