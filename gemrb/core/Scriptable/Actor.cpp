@@ -7112,7 +7112,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				// flat resistance, eg. 10/- or eg. 5/+2 for physical types
 				// for actors we need special care for damage reduction - traps (...) don't have enchanted weapons
 				if (attacker && it->second.reduction) {
-					ieDword weaponEnchantment = attacker->weaponInfo[0].enchantment; // FIXME: this might have been the left hand
+					ieDword weaponEnchantment = attacker->weaponInfo[attacker->usedLeftHand].enchantment;
 					// disregard other resistance boni when checking whether to skip reduction
 					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
 				} else {
