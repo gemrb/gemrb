@@ -1906,7 +1906,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case RPD_ROUNDS:
 		tmp = core->Time.round_sec;
-		damage = fx->Parameter1;
+		damage = fx->Parameter1; // TODO: ee, fx->Parameter3 instead
 		break;
 	case RPD_TURNS:
 		tmp = core->Time.turn_sec;
@@ -2632,6 +2632,7 @@ int fx_miscast_magic_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x3D AlchemyModifier
 // this crashes in bg2 due to assertion failure (disabled intentionally)
 // and in iwd it doesn't really follow the stat_mod convention (quite lame)
+// TODO: ee, Creature RGB color fade
 int fx_alchemy_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_alchemy_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
@@ -5162,9 +5163,8 @@ int fx_remove_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0xad PoisonResistanceModifier
 int fx_poison_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_poison_resistance_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
 	// this is a gemrb extension, the original only supported flat setting of this resistance
+	// ... up until EE version 2.5, where it started always incrementing
 	STAT_MOD( IE_RESISTPOISON );
 	return FX_APPLIED;
 }
@@ -5289,6 +5289,7 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 // b5 can't use itemtype (resource) generic effect CantUseItemType
 
 // b6 generic effect ApplyEffectItem
+// didn't work in the originals or ees
 int fx_apply_effect_item (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_apply_effect_item(%2d)(%.8s)", fx->Opcode, fx->Resource);
@@ -5908,6 +5909,7 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->GetDictionary()->SetAt("ActionLevel", 5);
 	} else {
 		//all spells listed in 2da
+		// (ees) differentiate between 1 and 2 with some minor extra filtering, but we do that elsewhere
 		std::vector<ResRef> data;
 		gamedata->ReadResRefTable(fx->Resource, data);
 		sb->SetCustomSpellInfo(data, fx->SourceRef, 0);
