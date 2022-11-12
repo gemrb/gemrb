@@ -479,9 +479,6 @@ int GameScript::Kit(Scriptable *Sender, const Trigger *parameters)
 	if (kit == (ieDword) (parameters->int0Parameter)) {
 		return 1;
 	}
-	if (kit == (ieDword) (parameters->int0Parameter)) {
-		return 1;
-	}
 	return 0;
 }
 
@@ -638,8 +635,6 @@ int GameScript::Xor(Scriptable *Sender, const Trigger *parameters)
 	return 0;
 }
 
-//TODO:
-//no sprite is dead for iwd, they use KILL_<name>_CNT
 int GameScript::NumDead(Scriptable *Sender, const Trigger *parameters)
 {
 	ieDword value;
