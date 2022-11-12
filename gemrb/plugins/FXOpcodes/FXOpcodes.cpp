@@ -6164,17 +6164,17 @@ int fx_bounce_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effect* 
 }
 
 //0xe5 DispelSchoolOne
+// in hypothetical cases removes two Resources, not just one (see IESDP)
 int fx_dispel_school_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_dispel_school_one(%2d): Level: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
 //0xe6 DispelSecondaryTypeOne
+// in hypothetical cases removes two Resources, not just one (see IESDP)
 int fx_dispel_secondary_type_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_dispel_secondary_type_one(%2d): Level: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSECTYPE|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
@@ -6713,18 +6713,15 @@ int fx_cure_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0xf3 DrainItems (this is disabled in ToB)
+// 0xf3 DrainItems (worked in SoA, got disabled in ToB)
 int fx_drain_items (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_drain_items(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// TODO: ee, optionally use fx->Resource, different draining, add extra gameflag check below
 	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) return FX_NOT_APPLIED;
 
-	ieDword i=fx->Parameter1;
-	while (i--) {
-		//deplete magic item = 0
-		//deplete weapon = 1
-		target->inventory.DepleteItem(fx->Parameter2);
-	}
+	// deplete magic items = 0
+	// deplete also magic weapons = 1
+	target->inventory.DepleteItem(fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 // 0xf4 DrainSpells
@@ -7432,14 +7429,15 @@ int fx_fist_damage_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_MOD( IE_FISTDAMAGE );
 	return FX_APPLIED;
 }
+
 //0x122 TitleModifier
+// ees use fx->IsVariable to set which class' title to change, but the way we use titles currently makes that moot
 int fx_title_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_fist_damage_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (fx->Parameter2) {
-		STAT_SET( IE_TITLE2, fx->Parameter1 );
+		STAT_SET(IE_TITLE2, fx->Parameter1);
 	} else {
-		STAT_SET( IE_TITLE1, fx->Parameter1 );
+		STAT_SET(IE_TITLE1, fx->Parameter1);
 	}
 	return FX_APPLIED;
 }
