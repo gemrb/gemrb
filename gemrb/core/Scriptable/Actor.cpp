@@ -6078,25 +6078,28 @@ void Actor::DoStep(unsigned int newWalkScale, ieDword time)
 
 ieDword Actor::GetNumberOfAttacks()
 {
+	int base = 0;
 	int bonus = 0;
 
 	if (third) {
-		int base = SetBaseAPRandAB (true);
+		base = SetBaseAPRandAB (true);
+		// effects and everything else is stored with double values
+		int modified = GetStat(IE_NUMBEROFATTACKS);
+		if (modified != base) base = modified; // a heavyhanded approach, but should work
 		// add the offhand extra attack
-		// TODO: check effects too
 		bonus = 2 * IsDualWielding();
+		// handle special effects
 		const Effect* fx = fxqueue.HasEffectWithParam(fx_set_diseased_state_ref, RPD_SLOW);
-		if (fx) bonus--;
+		if (fx) bonus -= 2;
 		fx = fxqueue.HasEffectWithParam(fx_set_diseased_state_ref, RPD_CONTAGION);
-		if (fx) bonus--;
-		return base + bonus;
+		if (fx) bonus -= 2;
 	} else {
+		base = GetStat(IE_NUMBEROFATTACKS);
 		if (inventory.FistsEquipped()) {
 			bonus = gamedata->GetMonkBonus(0, GetMonkLevel());
 		}
-
-		return GetStat(IE_NUMBEROFATTACKS)+bonus;
 	}
+	return base + bonus;
 }
 static const int BaseAttackBonusDecrement = 5; // iwd2; number of tohit points for another attack per round
 static int SetLevelBAB(int level, ieDword index)
