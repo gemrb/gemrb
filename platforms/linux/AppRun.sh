@@ -5,9 +5,6 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 APPDIR="${APPDIR:-$SCRIPTPATH}"
 
 export PYTHONPATH="$APPDIR/usr/share/pyshared/"
-#echo ":$GITHUB_ACTIONS:"
-#if [[ -z $GITHUB_ACTIONS ]]; then
-  export PYTHONHOME="$APPDIR/usr/"
-#fi
+export PYTHONHOME="$APPDIR/usr/"
 
 "$APPDIR"/usr/bin/gemrb "$@"
