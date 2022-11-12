@@ -220,6 +220,7 @@ namespace GemRB {
 #define SS_REBUKED      179
 
 #define SS_PRONE        249 // prevented the engine from moving a creature with STATE_SLEEPING to the backlist
+#define SS_DISEASED     250
 
 }
 

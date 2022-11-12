@@ -3008,7 +3008,7 @@ int fx_cure_feebleminded_state (Scriptable* /*Owner*/, Actor* target, Effect* /*
 }
 
 // 0x4e State:Diseased
-int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_set_diseased_state(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_set_diseased_state(%2d): Damage: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
@@ -3022,6 +3022,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//setting damage to 0 because not all types do damage
 	ieDword damage = 0;
+	ieDword damageType = DAMAGE_POISON;
 	// fx->Parameter4 is an optional frequency multiplier
 	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
 
@@ -3061,30 +3062,37 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_SUB(IE_CHR, fx->Parameter1);
 		break;
 	case RPD_CONTAGION: //contagion (iwd2) - an aggregate of STR,DEX,CHR,SLOW diseases
-		STAT_SUB(IE_STR, 2);
-		STAT_SUB(IE_DEX, 2);
-		STAT_SUB(IE_CHR, 2);
+		STAT_SUB(IE_STR, fx->Parameter1 ? fx->Parameter1 : 2);
+		STAT_SUB(IE_DEX, fx->Parameter1 ? fx->Parameter1 : 2);
+		STAT_SUB(IE_CHR, fx->Parameter1 ? fx->Parameter1 : 2);
 		//fall through
 	case RPD_SLOW: //slow
-		//TODO: in iwd2
-		//-2 AC, BaB, reflex, damage
-		//-1 attack#
-		//speed halved
-		//in bg2
-		//TBD
+		if (core->HasFeature(GF_3ED_RULES)) {
+			if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
+			if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
+			STAT_SUB(IE_ARMORCLASS, 2);
+			STAT_SUB(IE_TOHIT, 2);
+			STAT_SUB(IE_DAMAGEBONUS, 2);
+			STAT_SUB(IE_SAVEREFLEX, 2);
+			STAT_MUL(IE_MOVEMENTRATE, 50);
+		} else {
+			// in bg2 normal slow
+			fx_set_slowed_state(Owner, target, fx);
+		}
 		target->AddPortraitIcon(PI_SLOWED);
 		break;
 	case RPD_MOLD2:
 	case RPD_MOLD: //mold touch (how)
 		EXTSTATE_SET(EXTSTATE_MOLD);
 		target->SetSpellState(SS_MOLDTOUCH);
-		if (core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time)) {
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(aRound)) {
 			return FX_APPLIED;
 		}
 		if (fx->Parameter1<1) {
 			return FX_NOT_APPLIED;
 		}
 		damage = core->Roll(fx->Parameter1--, 6, 0);
+		damageType = DAMAGE_MAGIC;
 		//TODO: spread to nearest (range 10) non-affected (use spell state?)
 		break;
 	case RPD_PEST:     //cloud of pestilence (iwd2)
@@ -3098,9 +3106,10 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//percent
 	Scriptable *caster = GetCasterObject();
 	if (damage) {
-		target->Damage(damage, DAMAGE_POISON, caster);
+		target->Damage(damage, damageType, caster);
 	}
 	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable);
+	target->SetSpellState(SS_DISEASED);
 
 	return FX_APPLIED;
 }

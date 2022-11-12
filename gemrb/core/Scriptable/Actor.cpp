@@ -319,6 +319,7 @@ static EffectRef fx_animation_override_data_ref = { "AnimationOverrideData", -1 
 static EffectRef fx_enchantment_vs_creature_type_ref = { "EnchantmentVsCreatureType", -1 };
 static EffectRef fx_enchantment_bonus_ref = { "EnchantmentBonus", -1 };
 static EffectRef fx_save_vs_school_bonus_ref = { "SaveVsSchoolModifier", -1 };
+static EffectRef fx_set_diseased_state_ref = { "State:Diseased", -1 };
 
 //used by iwd2
 static const ResRef CripplingStrikeRef = "cripstr";
@@ -6084,6 +6085,10 @@ ieDword Actor::GetNumberOfAttacks()
 		// add the offhand extra attack
 		// TODO: check effects too
 		bonus = 2 * IsDualWielding();
+		const Effect* fx = fxqueue.HasEffectWithParam(fx_set_diseased_state_ref, RPD_SLOW);
+		if (fx) bonus--;
+		fx = fxqueue.HasEffectWithParam(fx_set_diseased_state_ref, RPD_CONTAGION);
+		if (fx) bonus--;
 		return base + bonus;
 	} else {
 		if (inventory.FistsEquipped()) {
