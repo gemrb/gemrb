@@ -1617,23 +1617,28 @@ void EffectQueue::DispelEffects(const Effect *dispeller, ieDword level)
 			continue;
 		}
 
-		// 50% base chance of success; always at least 1% chance of failure or success
-		// positive level diff modifies the base chance by 5%, negative by -10%
-		int diff = level - fx.CasterLevel;
-		if (diff > 0) {
-			diff *= 5;
-		} else if (diff < 0) {
-			diff *= 10;
-		}
-		diff += 50;
-
-		int roll = core->Roll(1, 100, 0);
-		if (roll == 1) continue;
-		if (roll == 100 || roll < diff) {
-			// finally dispel
-			fx.TimingMode = FX_DURATION_JUST_EXPIRED;
-		}
+		if (!RollDispelChance(fx.CasterLevel, level)) continue;
+		// finally dispel
+		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
+}
+
+bool EffectQueue::RollDispelChance(ieDword casterLevel, ieDword level)
+{
+	// 50% base chance of success; always at least 1% chance of failure or success
+	// positive level diff modifies the base chance by 5%, negative by -10%
+	int diff = level - casterLevel;
+	if (diff > 0) {
+		diff *= 5;
+	} else if (diff < 0) {
+		diff *= 10;
+	}
+	diff += 50;
+
+	int roll = core->Roll(1, 100, 0);
+	if (roll == 1) return false;
+	if (roll == 100 || roll < diff) return true;
+	return false;
 }
 
 const Effect *EffectQueue::HasOpcode(ieDword opcode) const
