@@ -5959,10 +5959,12 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xd8 LevelDrainModifier
-// FIXME: BG2 level drain uses parameter3 to decrease the MaxHp, and parameter4 to decrease level. (unset)
+// BG2 level drain internally uses parameter3 to decrease the MaxHp (current hp?), and parameter4 to decrease level (max hp?). (unset)
 int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_leveldrain_modifier(%2d): Mod: %d", fx->Opcode, fx->Parameter1);
+	if (STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
 
 	//never subtract more than the maximum hitpoints
 	ieDword x = STAT_GET(IE_MAXHITPOINTS)-1;
@@ -5978,13 +5980,23 @@ int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	HandleBonus(target, IE_SAVEVSBREATH, -mod, fx->TimingMode);
 	HandleBonus(target, IE_SAVEVSSPELL, -mod, fx->TimingMode);
 
+	// to-hit gets recalculated based on class, but we just estimate it
+	STAT_SUB(IE_TOHIT, mod / 2);
+	// same for skills
+	// all are adjusted by the average amount of skill points they receive per level, capped to [0,255] before racial and/or dexterity adjustments
+	static ieDword skillStats[] = { IE_STEALTH, IE_TRAPS, IE_PICKPOCKET, IE_HIDEINSHADOWS, IE_DETECTILLUSIONS, IE_SETTRAPS };
+	for (auto& stat : skillStats) {
+		STAT_SUB(stat, 20 * mod);
+	}
+	STAT_SUB(IE_LORE, mod);
+
 	target->AddPortraitIcon(PI_LEVELDRAIN);
 	//decrease current hitpoints on first apply
 	if (fx->FirstApply) {
 		//current hitpoints don't have base/modified, only current
 		BASE_SUB(IE_HITPOINTS, x);
 	}
-	// TODO: lore, thieving
+
 	return FX_APPLIED;
 }
 
