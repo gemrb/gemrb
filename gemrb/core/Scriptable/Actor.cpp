@@ -8914,7 +8914,6 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		}
 	} else if (multiplier > 1) {
 		// TODO: limit sneak attack to once per enemy? EEs did it via backstab.spl, used besides any custom BackstabResRef
-		// TODO: remove requirement of being hidden for sneak attack
 		static const AutoTable sneakTable = gamedata->LoadTable("sneakatt", true);
 		if (PreferSneakAttack && sneakTable) { // ee externalization
 			std::string rowName = GetClassName(GetActiveClass());
