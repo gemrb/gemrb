@@ -1892,10 +1892,13 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	STATE_SET( STATE_POISONED );
+	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable ? fx->IsVariable : PI_POISONED);
 
 	ieDword damage = 0;
 	tick_t tmp = fx->Parameter1;
-	tick_t timeStep = target->GetAdjustedTime(core->Time.ai_update_time);
+	// fx->Parameter4 is an optional frequency multiplier
+	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
+	tick_t timeStep = target->GetAdjustedTime(aRound);
 
 	HandlePercentageDamage(fx, target);
 	Scriptable *caster = GetCasterObject();
@@ -3019,13 +3022,15 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//setting damage to 0 because not all types do damage
 	ieDword damage = 0;
+	// fx->Parameter4 is an optional frequency multiplier
+	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
 
 	HandlePercentageDamage(fx, target);
 
 	switch(fx->Parameter2) {
 	case RPD_SECONDS:
 		damage = 1;
-		if (fx->Parameter1 && (core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * core->Time.ai_update_time))) {
+		if (fx->Parameter1 && (core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * aRound))) {
 			return FX_APPLIED;
 		}
 		break;
@@ -3033,7 +3038,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	case RPD_POINTS:
 		damage = fx->Parameter1;
 		// per second
-		if (core->GetGame()->GameTime % target->GetAdjustedTime(core->Time.ai_update_time)) {
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(aRound)) {
 			return FX_APPLIED;
 		}
 		break;
@@ -3095,6 +3100,7 @@ int fx_set_diseased_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (damage) {
 		target->Damage(damage, DAMAGE_POISON, caster);
 	}
+	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable);
 
 	return FX_APPLIED;
 }
@@ -3349,18 +3355,21 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int damage;
 	int tmp = fx->Parameter1;
 	ieDword gameTime = core->GetGame()->GameTime;
-	tick_t timeStep = target->GetAdjustedTime(core->Time.ai_update_time);
+	// fx->Parameter4 is an optional frequency multiplier
+	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
+	tick_t timeStep = target->GetAdjustedTime(aRound);
 
 	if (fx->FirstApply) {
-		//ensure we prepare Parameter3 now
+		// ensure we prepare Parameter5 now
 	} else {
 		//we can have multiple calls at the same gameTime, so we
 		//just go to gameTime+1 to ensure one call
-		ieDword nextHeal = fx->Parameter3;
+		ieDword nextHeal = fx->Parameter5;
 		if (nextHeal>=gameTime) return FX_APPLIED;
 	}
 
 	HandlePercentageDamage(fx, target);
+	if (fx->Parameter3) damage = fx->Parameter3;
 
 	switch(fx->Parameter2) {
 	case RPD_TURNS:		//restore param3 hp every param1 turns
@@ -3370,16 +3379,16 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		tmp *= core->Time.round_sec;
 		// fall through
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
-		fx->Parameter3 = gameTime + tmp * static_cast<ieDword>(timeStep);
+		fx->Parameter5 = gameTime + tmp * static_cast<ieDword>(timeStep);
 		damage = 1;
 		break;
 	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
 		damage = fx->Parameter1;
-		fx->Parameter3 = gameTime + static_cast<ieDword>(timeStep);
+		fx->Parameter5 = gameTime + static_cast<ieDword>(timeStep);
 		break;
 	default:
-		fx->Parameter3 = gameTime + static_cast<ieDword>(timeStep);
+		fx->Parameter5 = gameTime + static_cast<ieDword>(timeStep);
 		damage = 1;
 		break;
 	}
@@ -3388,7 +3397,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// x hp per 1 round
 	if (fx->Parameter2 == RPD_ROUNDS && core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		damage = fx->Parameter1;
-		fx->Parameter3 = gameTime + core->Time.round_sec * static_cast<ieDword>(timeStep);
+		fx->Parameter5 = gameTime + core->Time.round_sec * static_cast<ieDword>(timeStep);
 	}
 
 	if (fx->FirstApply) {
@@ -3397,8 +3406,10 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	target->NewBase(IE_HITPOINTS, damage, MOD_ADDITIVE);
+	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable);
 	return FX_APPLIED;
 }
+
 // 0x63 SpellDurationModifier
 int fx_spell_duration_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
