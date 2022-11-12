@@ -6749,21 +6749,21 @@ void Actor::PerformAttack(ieDword gameTime)
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
 	// however, in 3ed, only one attack can be made by the offhand
-	bool leftorright;
 	if (third) {
-		leftorright = false;
+		usedLeftHand = false;
 		// make only the last attack with the offhand (iwd2)
 		if (attackcount == 1 && IsDualWielding()) {
-			leftorright = true;
+			usedLeftHand = true;
 		}
 	} else {
-		leftorright = (bool) ((attacksperround-attackcount)&1);
+		usedLeftHand = (bool) ((attacksperround - attackcount) & 1);
 	}
 
-	WeaponInfo& wi = weaponInfo[leftorright];
-	if (!wi.extHeader && leftorright) {
+	WeaponInfo& wi = weaponInfo[usedLeftHand];
+	if (!wi.extHeader && usedLeftHand) {
 		// nothing in left hand, use right
 		wi = weaponInfo[0];
+		usedLeftHand = false;
 	}
 
 	const ITMExtHeader* hittingheader = wi.extHeader;
@@ -6772,12 +6772,12 @@ void Actor::PerformAttack(ieDword gameTime)
 	int speed, style;
 
 	//will return false on any errors (eg, unusable weapon)
-	if (!GetCombatDetails(tohit, leftorright, DamageBonus, speed, CriticalBonus, style, target)) {
+	if (!GetCombatDetails(tohit, usedLeftHand, DamageBonus, speed, CriticalBonus, style, target)) {
 		return;
 	}
 
 	if (PCStats) {
-		PCStats->RegisterFavourite(weaponInfo[leftorright && IsDualWielding()].item->Name, FAV_WEAPON);
+		PCStats->RegisterFavourite(weaponInfo[usedLeftHand && IsDualWielding()].item->Name, FAV_WEAPON);
 	}
 
 	//if this is the first call of the round, we need to update next attack
@@ -6798,7 +6798,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if (!WithinPersonalRange(this, target, GetWeaponRange(leftorright)) || GetCurrentArea() != target->GetCurrentArea()) {
+	if (!WithinPersonalRange(this, target, GetWeaponRange(usedLeftHand)) || GetCurrentArea() != target->GetCurrentArea()) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
@@ -6815,7 +6815,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	std::string buffer;
 	//debug messages
-	if (leftorright && IsDualWielding()) {
+	if (usedLeftHand && IsDualWielding()) {
 		buffer.append("(Off) ");
 	} else {
 		buffer.append("(Main) ");
@@ -6913,7 +6913,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (core->HasFeedback(FT_TOHIT) && !gc->InDialog()) {
 		// log the roll
 		String leftRight, hitMiss;
-		if (leftorright && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
+		if (usedLeftHand && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
 			leftRight = core->GetString(DisplayMessage::GetStringReference(STR_ATTACK_ROLL_L));
 		} else {
 			leftRight = core->GetString(DisplayMessage::GetStringReference(STR_ATTACK_ROLL));
@@ -8839,19 +8839,16 @@ static ieDword AdjustEnchantment(const Actor* wielder, const Actor* target, cons
 {
 	ieDword enchantment = wi.enchantment;
 
-	// reverse engineer whether this is the main or the off-hand
-	bool leftOrRight = wielder->weaponInfo[1].extHeader == wi.extHeader;
-
 	const Effect* fx = wielder->fxqueue.HasEffect(fx_enchantment_vs_creature_type_ref);
 	if (fx && EffectQueue::match_ids(target, fx->Parameter2, fx->Parameter1) &&
 		(!fx->Parameter4 || fx->Parameter4 == wi.item->ItemType) &&
-		WeaponSlotMatchesHand(fx->Parameter3, wi, fx, leftOrRight)) {
+		WeaponSlotMatchesHand(fx->Parameter3, wi, fx, wielder->usedLeftHand)) {
 		enchantment = fx->IsVariable;
 	}
 
 	fx = wielder->fxqueue.HasEffect(fx_enchantment_bonus_ref);
 	if (fx && (!fx->Parameter4 || fx->Parameter4 == wi.item->ItemType) &&
-		WeaponSlotMatchesHand(fx->IsVariable, wi, fx, leftOrRight)) {
+		WeaponSlotMatchesHand(fx->IsVariable, wi, fx, wielder->usedLeftHand)) {
 		// the same list as fx_immune_to_weapon, but just goes up to 11
 		bool match;
 		switch (fx->Parameter2) {

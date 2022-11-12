@@ -373,6 +373,7 @@ public:
 	WeaponInfo weaponInfo[2]{};
 	ModalState Modal{};
 
+	bool usedLeftHand = false; // which weaponInfo index was used in an attack last
 	ieDword LastExit = 0;    // the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ResRef LastArea;
