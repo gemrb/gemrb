@@ -1248,8 +1248,23 @@ static void handle_overlay(Actor *actor, ieDword idx)
 {
 	if (idx >= OVERLAY_COUNT || actor->FindOverlay(idx)) return;
 
-	ieDword flag = hc_locations&(1<<idx);
-	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(hc_overlays[idx], false);
+	ResRef overlayGfx = hc_overlays[idx];
+	// ee allows overriding some overlay graphics directly via their effects
+	static EffectRef fx_overlay_sanctuary_ref = { "Overlay:Sanctuary", -1 };
+	static EffectRef fx_overlay_entangle_ref = { "Overlay:Entangle", -1 };
+	static EffectRef fx_overlay_minorglobe_ref = { "Overlay:MinorGlobe", -1 };
+	static EffectRef fx_overlay_shieldglobe_ref = { "Overlay:ShieldGlobe", -1 };
+	static EffectRef fx_overlay_web_ref = { "Overlay:Web", -1 };
+	static EffectRef fx_overlay_grease_ref = { "Overlay:Grease", -1 };
+	static std::map<int, EffectRef> overlayRefs = { { OV_SANCTUARY, fx_overlay_sanctuary_ref }, { OV_ENTANGLE, fx_overlay_entangle_ref }, { OV_MINORGLOBE, fx_overlay_minorglobe_ref }, { OV_SHIELDGLOBE, fx_overlay_shieldglobe_ref }, { OV_WEB, fx_overlay_web_ref }, { OV_GREASE, fx_overlay_grease_ref } };
+	if (idx <= OV_MINORGLOBE && idx != OV_SPELLTRAP) {
+		const Effect* fx = actor->fxqueue.HasEffectWithParam(overlayRefs[idx], 1);
+		if (fx && !fx->Resource.IsEmpty()) {
+			overlayGfx = fx->Resource;
+		}
+	}
+	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(overlayGfx, false);
+
 	if (!sca) {
 		return;
 	}
@@ -1263,6 +1278,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 		return;
 	}
 
+	ieDword flag = hc_locations & (1 << idx);
 	if (flag) {
 		sca->ZOffset = -1;
 	}
