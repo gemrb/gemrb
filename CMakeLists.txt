@@ -614,6 +614,7 @@ add_custom_target(appimage
     COMMAND rm -rf AppDir/usr/share/pyshared/test
     COMMAND rm -rf AppDir/usr/share/pyshared/pydoc_data
     COMMAND rm -rf AppDir/usr/share/pyshared/lib2to3
+    COMMAND rm -rf AppDir/usr/share/pyshared/config-3*/libpython3*.a
     COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage --custom-apprun="${CMAKE_CURRENT_SOURCE_DIR}/platforms/linux/AppRun.sh"
     WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 )
