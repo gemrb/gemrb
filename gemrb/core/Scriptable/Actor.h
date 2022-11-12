@@ -750,6 +750,7 @@ public:
 	int GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const;
 	/* returns the number of allocated proficiency points (stars) */
 	int GetStars(stat_t proficiency) const;
+	static bool IsCriticalEffectEligible(const WeaponInfo& wi, const Effect* fx);
 	/* get the current hit bonus */
 	bool GetCombatDetails(int& tohit, bool leftorright, \
 		int& DamageBonus, int& speed, int& CriticalBonus, int& style, const Actor* target);

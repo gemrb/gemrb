@@ -6642,7 +6642,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 	return defense;
 }
 
-static bool IsCriticalEffectEligible(WeaponInfo& wi, const Effect* fx)
+bool Actor::IsCriticalEffectEligible(const WeaponInfo& wi, const Effect* fx)
 {
 	// does it work only on the currently hitting weapon?
 	if (fx->Parameter2 == 1 && fx->SourceRef != wi.item->Name) return false;
@@ -6670,7 +6670,7 @@ static void ApplyCriticalEffect(Actor* actor, Actor* target, WeaponInfo& wi, boo
 	}
 	if (!fx) return;
 
-	if (!IsCriticalEffectEligible(wi, fx)) return;
+	if (!Actor::IsCriticalEffectEligible(wi, fx)) return;
 
 	core->ApplySpell(fx->Resource, target, actor, actor->GetXPLevel(false));
 }

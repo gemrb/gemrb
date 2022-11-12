@@ -7580,9 +7580,11 @@ int fx_npc_bump (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0x12d CriticalHitModifier
 int fx_critical_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_critical_hit_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	STAT_MOD( IE_CRITICALHITBONUS );
-	// TODO: EE makes this more complicated: https://gibberlings3.github.io/iesdp/opcodes/bgee.htm#op301
+	// EE use extra parameters, but they all default to 0, so we don't need to ifdef anything
+	const WeaponInfo& wi = target->weaponInfo[target->usedLeftHand];
+	if (!Actor::IsCriticalEffectEligible(wi, fx)) return FX_NOT_APPLIED;
+
+	STAT_MOD(IE_CRITICALHITBONUS);
 
 	return FX_APPLIED;
 }
