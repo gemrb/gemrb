@@ -1177,27 +1177,29 @@ void Map::DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, 
 void Map::DrawHighlightables(const Region& viewport) const
 {
 	// NOTE: piles are drawn in the main queue
-	unsigned int i = 0;
-	Container *c;
-	while ((c = TMap->GetContainer(i++)) != NULL) {
-		if (c->containerType != IE_CONTAINER_PILE) {
-			// don't highlight containers behind closed doors
-			// how's ar9103 chest has a Pos outside itself, so we check the bounding box instead
-			// FIXME: inefficient, check for overlap in AREImporter and only recheck here if a flag was set
-			const Door *door = TMap->GetDoor(c->BBox.Center());
-			if (door && !(door->Flags & (DOOR_OPEN|DOOR_TRANSPARENT))) continue;
-			if (c->Highlight) {
-				c->DrawOutline(viewport.origin);
-			} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
-				c->outlineColor = displaymsg->GetColor(GUIColors::ALTCONTAINER);
-				c->DrawOutline(viewport.origin);
-			}
+	unsigned int count = static_cast<unsigned int>(TMap->GetContainerCount());
+	for (unsigned  int idx = 0; idx < count; idx++) {
+		Container* c = TMap->GetContainer(idx);
+		if (!c || c->containerType == IE_CONTAINER_PILE) continue;
+
+		// don't highlight containers behind closed doors
+		// how's ar9103 chest has a Pos outside itself, so we check the bounding box instead
+		// FIXME: inefficient, check for overlap in AREImporter and only recheck here if a flag was set
+		const Door* door = TMap->GetDoor(c->BBox.Center());
+		if (door && !(door->Flags & (DOOR_OPEN| DOOR_TRANSPARENT))) continue;
+		if (c->Highlight) {
+			c->DrawOutline(viewport.origin);
+		} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
+			c->outlineColor = displaymsg->GetColor(GUIColors::ALTCONTAINER);
+			c->DrawOutline(viewport.origin);
 		}
 	}
 
-	Door *d;
-	i = 0;
-	while ( (d = TMap->GetDoor(i++))!=NULL ) {
+	count = TMap->GetDoorCount();
+	for (size_t idx = 0; idx < count; idx++) {
+		Door* d = TMap->GetDoor(idx);
+		if (!d) continue;
+
 		if (d->Highlight) {
 			d->outlineColor = displaymsg->GetColor(GUIColors::HOVERDOOR);
 			d->DrawOutline(viewport.origin);
@@ -1210,9 +1212,11 @@ void Map::DrawHighlightables(const Region& viewport) const
 		}
 	}
 
-	InfoPoint *p;
-	i = 0;
-	while ( (p = TMap->GetInfoPoint(i++))!=NULL ) {
+	count = TMap->GetInfoPointCount();
+	for (size_t idx = 0; idx < count; idx++) {
+		InfoPoint* p = TMap->GetInfoPoint(idx);
+		if (!p) continue;
+
 		if (p->Highlight) {
 			p->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
