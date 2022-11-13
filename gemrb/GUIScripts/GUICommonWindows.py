@@ -376,6 +376,7 @@ def SetupFormation ():
 
 def GroupControls ():
 	"""Sections that control group actions."""
+
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	Button = CurrentWindow.GetControl (ActionBarControlOffset)
 	if GameCheck.IsBG2():
@@ -394,7 +395,8 @@ def GroupControls ():
 	Button.SetActionIcon (globals(), -1, 6)
 	Button = CurrentWindow.GetControl (6+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1, 7)
-	GemRB.SetVar ("Formation", GemRB.GameGetFormation ())
+	formation = GemRB.GameGetFormation ()
+	GemRB.SetVar ("Formation", formation)
 	for i in range (5):
 		Button = CurrentWindow.GetControl (7+ActionBarControlOffset+i)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -409,6 +411,15 @@ def GroupControls ():
 		Button.SetTooltip (4935)
 		# 0x90 = F1 key
 		Button.SetHotKey (chr(7+i+0x90), 0, True)
+
+	# work around radiobutton preselection issue
+	for i in range (5):
+		Button = CurrentWindow.GetControl (7 + ActionBarControlOffset + i)
+		if i == formation:
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+
 	return
 
 def OpenActionsWindowControls (Window):
