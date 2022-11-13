@@ -58,14 +58,31 @@ static std::string ParseGameDate(DataStream *ds)
 	ieDword GameTime;
 	ds->Read(Signature, 8);
 	ds->ReadDword(GameTime);
-	delete ds;
 	if (memcmp(Signature, "GAME", 4) != 0) {
 		return "ERROR";
 	}
 	// bg1 displays 7 hours less in game, sigh
 	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
 		GameTime -= 2100;
+
+		// also read the Chapter global, since bg1 displays it
+		// we don't want to parse the whole dictionary, so just estimate it by
+		// grabbing the chapter from the last journal entry
+		ieDword journalCount;
+		ieByte chapter = 0;
+		ds->Seek(0x4c, GEM_STREAM_START);
+		ds->ReadDword(journalCount);
+		if (journalCount) {
+			ieDword journalOffset;
+			ds->ReadDword(journalOffset);
+			// seek to the last 12 byte entry and skip the text and time fields
+			ds->Seek(journalOffset + (journalCount - 1) * 12 + 8, GEM_STREAM_START);
+			ds->Read(&chapter, 1);
+		}
+
+		core->GetTokenDictionary()->SetAtAsString("CHAPTER0", chapter);
 	}
+	delete ds;
 
 	int hours = ((int)GameTime)/core->Time.hour_sec;
 	int days = hours/24;

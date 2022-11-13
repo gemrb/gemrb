@@ -95,6 +95,9 @@ def ScrollBarUpdated (sb):
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 			SlotName = Games[ActPos].GetName ()
 			SlotDate = Games[ActPos].GetGameDate ()
+			if GameCheck.IsBG1 ():
+				ChapterTitle = GemRB.GetString (16202 + int(GemRB.GetToken ("CHAPTER0")))
+				SlotDate = ChapterTitle + ". " + SlotDate
 			PreviewButton.SetPicture (Games[ActPos].GetPreview())
 		else:
 			Button1.SetState (IE_GUI_BUTTON_DISABLED)
