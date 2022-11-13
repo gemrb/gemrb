@@ -51,16 +51,17 @@ def GetUsableMemorizedSpells(actor, BookType):
 			if not Spell0["Flags"]:
 				# depleted, so skip
 				continue
-			if Spell0["SpellResRef"] in spellResRefs:
+			resref = Spell0["SpellResRef"].lower()
+			if resref in spellResRefs:
 				# add another one, so we can get the count more cheaply later
-				spellResRefs.append (Spell0["SpellResRef"])
+				spellResRefs.append (resref)
 				continue
-			spellResRefs.append (Spell0["SpellResRef"])
-			Spell = GemRB.GetSpell(Spell0["SpellResRef"])
+			spellResRefs.append (resref)
+			Spell = GemRB.GetSpell(resref)
 			Spell['BookType'] = BookType # just another sorting key
 			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], 1<<BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
-				GemRB.Log (LOG_ERROR, "GetUsableMemorizedSpells", "Memorized spell not found! " + Spell["SpellResRef"] + " of type " + 1<<BookType)
+				GemRB.Log (LOG_ERROR, "GetUsableMemorizedSpells", "Memorized spell not found! " + Spell["SpellResRef"] + " of type " + str(1<<BookType))
 			Spell['SpellIndex'] += 1000 * 1<<BookType
 			memorizedSpells.append (Spell)
 
@@ -70,10 +71,11 @@ def GetUsableMemorizedSpells(actor, BookType):
 	# count and remove the duplicates
 	memorizedSpells2 = []
 	for spell in memorizedSpells:
-		if spell["SpellResRef"] in spellResRefs:
-			spell['MemoCount'] = spellResRefs.count(spell["SpellResRef"])
-			while spell["SpellResRef"] in spellResRefs:
-				spellResRefs.remove(spell["SpellResRef"])
+		resref = spell["SpellResRef"].lower()
+		if resref in spellResRefs:
+			spell['MemoCount'] = spellResRefs.count(resref)
+			while resref in spellResRefs:
+				spellResRefs.remove(resref)
 			memorizedSpells2.append(spell)
 
 	return memorizedSpells2
