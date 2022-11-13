@@ -317,6 +317,20 @@ struct ModalState {
 	bool FirstApply = true; // running for the first time?
 };
 
+enum DamageFlags {
+	DrainFromTarget = 0,
+	DrainFromSource = 1,
+	FistOnly = 2,
+	DrainFromTargetNC = 4,
+	DrainFromSourceNC = 8,
+	NoFeedback = 0x10,
+	CapToTarget = 0x20,
+	CapToSource = 0x40,
+	SaveForHalf = 0x80,
+	FailForHalf = 0x100,
+	NoAwake = 0x200
+};
+
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
 bool VVCSort(const ScriptedAnimation* lhs, const ScriptedAnimation* rhs);
@@ -671,7 +685,7 @@ public:
 	/* check and perform a cleave movement */
 	void CheckCleave();
 	/* deals damage to this actor */
-	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE, int critical=0, int saveflags=0);
+	int Damage(int damage, int damagetype, Scriptable* hitter, int modtype = MOD_ADDITIVE, int critical = 0, int saveflags = 0, int specialFlags = 0);
 	/* displays the damage taken and other details (depends on the game type) */
 	void DisplayCombatFeedback(unsigned int damage, int resisted, int damagetype, const Scriptable *hitter);
 	/* play a random footstep sound */

@@ -1404,10 +1404,21 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//save for half damage type
 	ieDword damagetype = fx->Parameter2>>16;
 	ieDword modtype = fx->Parameter2&3;
-	if (modtype==3) {
-		modtype&=~3;
+	if (modtype == 3) {
+		// too late to set DamageFlags::SaveForHalf here
+		modtype &= ~3;
 	}
 	Scriptable *caster = GetCasterObject();
+	const Actor* source = Scriptable::As<Actor>(caster);
+
+	// immediately returns without doing anything if the source doesn't have SLOT_FIST selected
+	// it stays on the creature if the timing mode allows, waiting for SLOT_FIST to be selected
+	// if the effect is waiting for SLOT_FIST, all effects after the op12 in the list fail to
+	// be evaluated, only (potentially) being evaluated a single time on being added to the actor
+	// NOTE: add a soft FX_ABORT-like return type if this queueing is really needed
+	if (fx->IsVariable & DamageFlags::FistOnly && source && !source->inventory.HasItemInSlot("", source->inventory.GetFistSlot())) {
+		return FX_ABORT;
+	}
 
 	// gemrb extension
 	if (fx->Parameter3) {
@@ -1426,7 +1437,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	target->Damage(fx->Parameter1, damagetype, caster, modtype, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(fx->Parameter1, damagetype, caster, modtype, fx->IsVariable, fx->SavingThrowType, fx->IsVariable);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }

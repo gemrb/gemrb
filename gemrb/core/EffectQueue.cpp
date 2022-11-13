@@ -1092,7 +1092,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 		}
 	}
 	if( saved) {
-		if( fx->IsSaveForHalfDamage) {
+		if (fx->IsSaveForHalfDamage || (fx->Opcode == 12 && fx->IsVariable & DamageFlags::SaveForHalf)) {
 			// if we have evasion, we take no damage
 			// sadly there's no feat or stat for it
 			if (globals.iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
@@ -1106,6 +1106,9 @@ static int check_resistance(Actor* actor, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 	} else {
+		if (fx->Opcode == 12 && fx->IsVariable & DamageFlags::FailForHalf) {
+			fx->Parameter1 /= 2;
+		}
 		// improved evasion: take only half damage even though we failed the save
 		if (globals.iwd2fx && fx->IsSaveForHalfDamage && actor->HasFeat(FEAT_IMPROVED_EVASION)) {
 			fx->Parameter1 /= 2;

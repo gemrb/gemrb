@@ -4097,7 +4097,7 @@ static void ChunkActor(Actor* actor)
 }
 
 //returns actual damage
-int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, int critical, int saveflags)
+int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, int critical, int saveflags, int specialFlags)
 {
 	//won't get any more hurt
 	if (InternalFlags & IF_REALLYDIED) {
@@ -4143,7 +4143,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
-	if (damage && !(saveflags&SF_BYPASS_MIRROR_IMAGE)) {
+	if (damage && (damagetype == DAMAGE_POISON || !(saveflags & SF_BYPASS_MIRROR_IMAGE))) {
 		int mirrorimages = Modified[IE_MIRRORIMAGES];
 		if (mirrorimages) {
 			if (LuckyRoll(1, mirrorimages + 1, 0) != 1) {
@@ -4169,7 +4169,10 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	if (damage) {
 		ModifyDamage (hitter, damage, resisted, damagetype);
 	}
-	DisplayCombatFeedback(damage, resisted, damagetype, hitter);
+
+	if (!(specialFlags & DamageFlags::NoFeedback)) {
+		DisplayCombatFeedback(damage, resisted, damagetype, hitter);
+	}
 
 	if (damage > 0) {
 		// instant chunky death if the actor is petrified or frozen
@@ -4206,6 +4209,30 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		}
 	}
 
+	// are there any other limits on the damage?
+	bool cap2Source = specialFlags & DamageFlags::CapToSource;
+	bool cap2Target = specialFlags & DamageFlags::CapToTarget;
+	bool invertTarget = specialFlags & (DamageFlags::DrainFromSource | DamageFlags::DrainFromSourceNC);
+	int chp = (signed) BaseStats[IE_HITPOINTS];
+	int casterHP = 0;
+	if (act) {
+		casterHP = (signed) act->GetBase(IE_HITPOINTS);
+		if ((cap2Source && !invertTarget) || (cap2Target && invertTarget)) {
+			// Damage inflicted is limited to amount available by target
+			// it's repeating our later pcf_hitpoint check, but is important for use with the draining bits
+			int minHP = (signed) GetSafeStat(IE_MINHITPOINTS);
+			if (minHP && (chp - damage) < minHP) {
+				damage = chp - minHP;
+			}
+		} else if ((cap2Target && !invertTarget) || (cap2Source && invertTarget)) {
+			// Damage inflicted is limited to the caster's
+			int maxHP = (signed) act->GetSafeStat(IE_MAXHITPOINTS);
+			if (damage > (maxHP - casterHP)) {
+				damage = maxHP - casterHP;
+			}
+		}
+	}
+
 	// also apply reputation damage if we hurt (but not killed) an innocent
 	if (core->HasFeature(GF_DAMAGE_INNOCENT_REP) &&
 			Modified[IE_CLASS] == CLASS_INNOCENT &&
@@ -4215,14 +4242,21 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		core->GetGame()->SetReputation(core->GetGame()->Reputation + gamedata->GetReputationMod(1));
 	}
 
-	int chp = (signed) BaseStats[IE_HITPOINTS];
 	if (damage > 0) {
 		//if this kills us, check if attacker could cleave
 		bool killed = (damage > chp) && !Modified[IE_MINHITPOINTS];
 		if (act && killed) {
 			act->CheckCleave();
 		}
+
+		// temporarily turn on an extended state, so we don't need to pass an extra param
+		// don't bother unsetting, since it will be gone the next tick and a combination of a
+		// sleeping target and several damage payloads in the same tick are unlikely
+		if (specialFlags & DamageFlags::NoAwake) {
+			Modified[IE_EXTSTATE_ID] |= EXTSTATE_NO_WAKEUP;
+		}
 		GetHit(damage, killed);
+
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
@@ -4239,6 +4273,14 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 			} else if (currentRatio > 25 && newRatio < 25) {
 				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
 			}
+		}
+
+		 // TODO: drains currently ignore desired non-cumulativeness
+		if (act && specialFlags & (DamageFlags::DrainFromTarget | DamageFlags::DrainFromTargetNC) && !invertTarget) {
+			act->SetBase(IE_HITPOINTS, casterHP + damage);
+		} else if (act && invertTarget) {
+			BaseStats[IE_HITPOINTS] += damage; // should this mode prevent getting hit in the first place?
+			act->SetBase(IE_HITPOINTS, casterHP - damage);
 		}
 	}
 
