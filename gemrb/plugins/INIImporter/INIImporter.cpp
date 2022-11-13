@@ -84,7 +84,7 @@ float INITag::GetKeyAsFloat(StringView Key, const float Default) const
 	if (!ret) {
 		return Default;
 	}
-	return atof(ret);
+	return static_cast<float>(atof(ret));
 }
 
 bool INITag::GetKeyAsBool(StringView Key, const bool Default) const

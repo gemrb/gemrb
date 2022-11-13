@@ -3201,7 +3201,9 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		ret += modifier + GetStat(IE_LUCK);
 
 		// also take any "vs school" bonus into account
-		ret = AdjustSaveVsSchool(ret, fx->PrimaryType, sfx);
+		if (fx && sfx) {
+			ret = AdjustSaveVsSchool(ret, fx->PrimaryType, sfx);
+		}
 
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		static ieDword prevType = -1;
@@ -6724,7 +6726,7 @@ bool Actor::IsCriticalEffectEligible(const WeaponInfo& wi, const Effect* fx)
 	return true;
 }
 
-static void ApplyCriticalEffect(Actor* actor, Actor* target, WeaponInfo& wi, bool hit)
+static void ApplyCriticalEffect(Actor* actor, Actor* target, const WeaponInfo& wi, bool hit)
 {
 	static EffectRef fx_cast_on_critical_hit_ref = { "CastSpellOnCriticalHit", -1 };
 	static EffectRef fx_cast_on_critical_miss_ref = { "CastSpellOnCriticalMiss", -1 };
@@ -6979,7 +6981,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (core->HasFeedback(FT_TOHIT) && !gc->InDialog()) {
 		// log the roll
 		String leftRight, hitMiss;
-		if (usedLeftHand && displaymsg->HasStringReference(STR_ATTACK_ROLL_L)) {
+		if (usedLeftHand && DisplayMessage::HasStringReference(STR_ATTACK_ROLL_L)) {
 			leftRight = core->GetString(DisplayMessage::GetStringReference(STR_ATTACK_ROLL_L));
 		} else {
 			leftRight = core->GetString(DisplayMessage::GetStringReference(STR_ATTACK_ROLL));
@@ -6995,7 +6997,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	int critMissThreshold = 1;
 	static EffectRef fx_critical_miss_ref = { "CriticalMissModifier", -1 };
-	Effect* fx = fxqueue.HasEffect(fx_critical_miss_ref);
+	const Effect* fx = fxqueue.HasEffect(fx_critical_miss_ref);
 	if (fx && IsCriticalEffectEligible(wi, fx)) {
 		critMissThreshold += fx->Parameter1;
 	}

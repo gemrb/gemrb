@@ -1416,7 +1416,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// if the effect is waiting for SLOT_FIST, all effects after the op12 in the list fail to
 	// be evaluated, only (potentially) being evaluated a single time on being added to the actor
 	// NOTE: add a soft FX_ABORT-like return type if this queueing is really needed
-	if (fx->IsVariable & DamageFlags::FistOnly && source && !source->inventory.HasItemInSlot("", source->inventory.GetFistSlot())) {
+	if (fx->IsVariable & DamageFlags::FistOnly && source && !source->inventory.HasItemInSlot("", Inventory::GetFistSlot())) {
 		return FX_ABORT;
 	}
 
@@ -1903,7 +1903,11 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	STATE_SET( STATE_POISONED );
-	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable ? fx->IsVariable : PI_POISONED);
+	if (fx->IsVariable) {
+		target->AddPortraitIcon(static_cast<ieByte>(fx->IsVariable));
+	} else {
+		target->AddPortraitIcon(PI_POISONED);
+	}
 
 	ieDword damage = 0;
 	tick_t tmp = fx->Parameter1;
@@ -2564,7 +2568,7 @@ int fx_alignment_change (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// ees added an upper word to tweak targetting of weapons in SLOT_MAGIC
-	int slot = target->inventory.GetMagicSlot();
+	int slot = Inventory::GetMagicSlot();
 	ieDword itemLevel;
 	if (fx->Parameter2 > 2 && target->inventory.HasItemInSlot("", slot)) {
 		switch (fx->Parameter2 >> 16) {
@@ -3139,7 +3143,7 @@ int fx_set_diseased_state(Scriptable* Owner, Actor* target, Effect* fx)
 	if (damage) {
 		target->Damage(damage, damageType, caster);
 	}
-	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable);
+	if (fx->IsVariable) target->AddPortraitIcon(static_cast<ieByte>(fx->IsVariable));
 	target->SetSpellState(SS_DISEASED);
 
 	return FX_APPLIED;
@@ -3409,7 +3413,6 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	HandlePercentageDamage(fx, target);
-	if (fx->Parameter3) damage = fx->Parameter3;
 
 	switch(fx->Parameter2) {
 	case RPD_TURNS:		//restore param3 hp every param1 turns
@@ -3420,7 +3423,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// fall through
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
 		fx->Parameter5 = gameTime + tmp * static_cast<ieDword>(timeStep);
-		damage = 1;
+		damage = fx->Parameter3 ? fx->Parameter3 : 1;
 		break;
 	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
@@ -3429,7 +3432,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	default:
 		fx->Parameter5 = gameTime + static_cast<ieDword>(timeStep);
-		damage = 1;
+		damage = fx->Parameter3 ? fx->Parameter3 : 1;
 		break;
 	}
 
@@ -3446,7 +3449,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	target->NewBase(IE_HITPOINTS, damage, MOD_ADDITIVE);
-	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable);
+	if (fx->IsVariable) target->AddPortraitIcon(static_cast<ieByte>(fx->IsVariable));
 	return FX_APPLIED;
 }
 
@@ -6037,7 +6040,7 @@ int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// same for skills
 	// all are adjusted by the average amount of skill points they receive per level, capped to [0,255] before racial and/or dexterity adjustments
 	static ieDword skillStats[] = { IE_STEALTH, IE_TRAPS, IE_PICKPOCKET, IE_HIDEINSHADOWS, IE_DETECTILLUSIONS, IE_SETTRAPS };
-	for (auto& stat : skillStats) {
+	for (const auto& stat : skillStats) {
 		STAT_SUB(stat, 20 * mod);
 	}
 	STAT_SUB(IE_LORE, mod);
@@ -7264,7 +7267,7 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 	}
 
-	if (fx->IsVariable) target->AddPortraitIcon(fx->IsVariable);
+	if (fx->IsVariable) target->AddPortraitIcon(static_cast<ieByte>(fx->IsVariable));
 
 	return FX_APPLIED;
 }
@@ -8277,7 +8280,7 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 	// ee level param and unhardcoded delay
 	ieDword level = std::max(1U, fx->Parameter2);
 	ieWord delay = fx->IsVariable;
-	if (!delay) delay = core->Time.round_size;
+	if (!delay) delay = static_cast<ieWord>(core->Time.round_size);
 	ResRef spell = fx->Resource;
 
 	// timing
