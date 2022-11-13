@@ -52,7 +52,6 @@
 
 using namespace GemRB;
 
-//FIXME: find a way to handle portrait icons better
 #define PI_RIGID     2
 #define PI_CONFUSED  3
 #define PI_BERSERK   4
