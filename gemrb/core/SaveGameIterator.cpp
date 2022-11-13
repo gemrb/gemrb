@@ -62,6 +62,10 @@ static std::string ParseGameDate(DataStream *ds)
 	if (memcmp(Signature, "GAME", 4) != 0) {
 		return "ERROR";
 	}
+	// bg1 displays 7 hours less in game, sigh
+	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
+		GameTime -= 2100;
+	}
 
 	int hours = ((int)GameTime)/core->Time.hour_sec;
 	int days = hours/24;
