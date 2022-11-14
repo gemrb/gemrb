@@ -1,10 +1,11 @@
-GemRB git (8dba39):
+GemRB git (07d126c8):
   New features:
     - 
+    - 3e-style sneak attack and crippling strike from HoW/iwdee
 
   Improved features:
     - 
-    - combat, pathfinding
+    - combat, pathfinding, opcodes, ee compat
     - bugfixes
 
 GemRB v0.9.1 (2022-08-29):
