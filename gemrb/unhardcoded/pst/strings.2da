@@ -35,9 +35,9 @@ GOTITEM                 19256               0
 LOSTITEM                19258               0
 GOTREP                  19259               0
 LOSTREP                 19260               0
-GOTABILITY              19307               0
-GOTSPELL                   -1               0
-GOTSONG                    -1               0
+GOTABILITY              19307         4:37078
+GOTSPELL                19307         4:37078
+GOTSONG                 19307         4:37078
 NOTHINGTOSAY               -1               0
 JOURNALCHANGE           37096               0
 WORLDMAPCHANGE          19264               0
