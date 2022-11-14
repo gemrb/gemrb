@@ -152,9 +152,9 @@ static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 struct ClassKits {
 	std::vector<TableMgr::index_t> indices;
 	std::vector<ieDword> ids;
-	std::vector<char*> clabs;
+	std::vector<ResRef> clabs;
 	std::vector<std::string> kitNames;
-	char *clab;
+	ResRef clab;
 	std::string className;
 };
 static std::map<int, ClassKits> class2kits;
@@ -606,9 +606,9 @@ void Actor::SetCircleSize()
 	SetCircle(anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][normalIdx], core->GroundCircles[csize][selectedIdx]);
 }
 
-static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
+static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool remove, int diff)
 {
-	AutoTable table = gamedata->LoadTable(ResRef(clab));
+	AutoTable table = gamedata->LoadTable(clab);
 	if (!table) return;
 
 	TableMgr::index_t row = table->GetRowCount();
@@ -731,7 +731,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
 	TableMgr::index_t row = GetKitIndex(kit, baseclass);
-	const char *clab = NULL;
+	ResRef clab;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
 	std::shared_ptr<TableMgr> tm;
@@ -760,7 +760,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 				}
 			}
 		}
-		assert(clab != NULL);
+		assert(!clab.IsEmpty());
 		cls = baseclass;
 	} else if (row) {
 		// bg2 kit abilities
@@ -831,17 +831,15 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	return true;
 }
 
-void Actor::ApplyClab(const char *clab, ieDword max, int remove, int diff)
+void Actor::ApplyClab(const ResRef& clab, ieDword max, int remove, int diff)
 {
-	if (clab && clab[0]!='*') {
-		if (max) {
-			//singleclass
-			if (remove != 2) {
-				ApplyClab_internal(this, clab, max, true, diff);
-			}
-			if (remove != 1) {
-				ApplyClab_internal(this, clab, max, false, 0);
-			}
+	if (clab && !IsStar(clab) && max) {
+		// singleclass
+		if (remove != 2) {
+			ApplyClab_internal(this, clab, max, true, diff);
+		}
+		if (remove != 1) {
+			ApplyClab_internal(this, clab, max, false, 0);
 		}
 	}
 }
@@ -1492,12 +1490,6 @@ void Actor::ReleaseMemory()
 		ModalStates.clear();
 
 		BABClassMap.clear();
-		for (const auto& clskit : class2kits) {
-			free(clskit.second.clab);
-			for (auto kit : clskit.second.clabs) {
-				free(kit);
-			}
-		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -1710,7 +1702,7 @@ static void InitActorTables()
 				isclass[ISMONK] |= bitmask;
 			}
 			// everyone but pst (none at all) and iwd2 (different table)
-			class2kits[i].clab = strdup(field);
+			class2kits[i].clab = ResRef(field);
 			class2kits[i].className = rowname;
 
 			noProfPenalty[i] = tm->QueryFieldSigned<int>(rowname, "NO_PROF");
@@ -1858,13 +1850,13 @@ static void InitActorTables()
 			int classis = IsClassFromName(classname);
 			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
 			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname, "CLASS"); // only real classes have this column at 0
-			const char *clab = tm->QueryField(classname, "CLAB").c_str();
+			ResRef clab = tm->QueryField(classname, "CLAB");
 			if (classcol) {
 				// kit ids are in hex
 				classID = strtounsigned<ieDword>(tm->QueryField(classname, "ID").c_str(), nullptr, 16);
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
-				class2kits[classcol].clabs.push_back(strdup(clab));
+				class2kits[classcol].clabs.emplace_back(clab);
 				class2kits[classcol].kitNames.push_back(classname);
 				continue;
 			} else if (i < classcount) {
@@ -1873,7 +1865,7 @@ static void InitActorTables()
 				ieDword cid = tm->QueryFieldUnsigned<ieDword>(isclassnames[i], "ID");
 				classesiwd2[i] = cid;
 
-				class2kits[classID].clab = strdup(clab);
+				class2kits[classID].clab = clab;
 			} else {
 				// new class out of order
 				Log(FATAL, "Actor", "New classes should precede any kits in classes.2da! Aborting ...");
@@ -2078,11 +2070,11 @@ static void InitActorTables()
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE").c_str(), NULL, 16);
 			int classID = tm->QueryFieldSigned<int>(rowName, "CLASS");
-			const char *clab = tm->QueryField(rowName, "ABILITIES").c_str();
+			ResRef clab = tm->QueryField(rowName, "ABILITIES");
 			const char *kitName = tm->QueryField(rowName, "ROWNAME").c_str();
 			class2kits[classID].indices.push_back(i);
 			class2kits[classID].ids.push_back(kitUsability);
-			class2kits[classID].clabs.push_back(strdup(clab));
+			class2kits[classID].clabs.emplace_back(clab);
 			class2kits[classID].kitNames.emplace_back(kitName);
 		}
 	}
