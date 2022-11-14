@@ -173,6 +173,7 @@ static EffectRef fx_spell_immunity_ref = { "Protection:Spell", -1 }; //bg2
 static EffectRef fx_spell_immunity2_ref = { "Protection:Spell2", -1 };//iwd
 static EffectRef fx_school_immunity_ref = { "Protection:School", -1 };
 static EffectRef fx_secondary_type_immunity_ref = { "Protection:SecondaryType", -1 };
+static EffectRef fx_projectile_immunity_ref = { "Protection:Projectile", -1 };
 
 //decrementing immunity effects
 static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
@@ -805,14 +806,16 @@ static int check_type(Actor *actor, const Effect& fx)
 	//the protective effect (if any)
 	Effect *efx;
 
+	Actor *caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
+	// Cannot resist own spells!  This even applies to bounced hostile spells, but notably excludes source immunity.
+	bool self = (caster == actor);
+	// MagicAttack: these spells pierce most generic magical defences (because they need to be able to dispel them).
+	bool pierce = (fx.SecondaryType == 4);
+
 	//spell level immunity
-	// but ignore it if we're casting beneficial stuff on ourselves
-	if (fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0)) {
-		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
-		if (caster != actor || (fx.SourceFlags & SF_HOSTILE)) {
-			Log(DEBUG, "EffectQueue", "Resisted by level immunity");
-			return 0;
-		}
+	if (fx.Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx.Power, 0) && !self) {
+		Log(DEBUG, "EffectQueue", "Resisted by level immunity");
+		return 0;
 	}
 
 	//source immunity (spell name)
@@ -830,8 +833,13 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 
+	if (actor->fxqueue.HasEffectWithParam(fx_projectile_immunity_ref, fx.Projectile)) {
+		Log(DEBUG, "EffectQueue", "Resisted by projectile");
+		return 0;
+	}
+
 	//primary type immunity (school)
-	if (fx.PrimaryType) {
+	if (fx.PrimaryType && !self && !pierce) {
 		if (actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school/primary type");
 			return 0;
@@ -839,7 +847,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//secondary type immunity (usage)
-	if (fx.SecondaryType) {
+	if (fx.SecondaryType && !self) {
 		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx.SecondaryType)) {
 			Log(DEBUG, "EffectQueue", "Resisted by usage/secondary type");
 			return 0;
@@ -848,9 +856,9 @@ static int check_type(Actor *actor, const Effect& fx)
 
 	//decrementing immunity checks
 	//decrementing level immunity
-	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE) {
-		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx.Power));
-		if (efx && DecreaseEffect(efx)) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self && !pierce
+	    && actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx.Power)) {
+		if (actor->fxqueue.DecreaseParam1OfEffect(fx_level_immunity_dec_ref, fx.Power)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
 			return 0;
 		}
@@ -865,7 +873,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 	//decrementing primary type immunity (school)
-	if (fx.PrimaryType) {
+	if (fx.PrimaryType && !self && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
@@ -874,7 +882,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//decrementing secondary type immunity (usage)
-	if (fx.SecondaryType) {
+	if (fx.SecondaryType && !self) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx.SecondaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by usage/sectype immunity (decrementing)");
@@ -883,11 +891,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	}
 
 	//spelltrap (absorb)
-	//FIXME:
-	//if the spelltrap effect already absorbed enough levels
-	//but still didn't get removed, it will absorb levels it shouldn't
-	//it will also absorb multiple spells in a single round
-	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE) {
+	if (fx.Power && fx.Resistance != FX_NO_RESIST_BYPASS_BOUNCE && !self && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx.Power));
 		if( efx) {
 			//storing the absorbed spell level
@@ -895,16 +899,15 @@ static int check_type(Actor *actor, const Effect& fx)
 			
 			//instead of a single effect, they had to create an effect for each level
 			//HOW DAMN LAME
-			//if decrease needs the spell level, use fx.Power here
-			actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, 1);
-			//efx.Parameter1--;
-			Log(DEBUG, "EffectQueue", "Absorbed by spelltrap");
-			return 0;
+			if (actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, fx.Power)) {
+				Log(DEBUG, "EffectQueue", "Absorbed by spelltrap");
+				return 0;
+			}
 		}
 	}
 
-	// bounce checks; skip all if this is set
-	if (fx.Resistance == FX_NO_RESIST_BYPASS_BOUNCE) {
+	// bounce checks; skip all if this is set, or if casting on oneself (obviously)
+	if (fx.Resistance == FX_NO_RESIST_BYPASS_BOUNCE || self) {
 		return 1;
 	}
 
@@ -926,7 +929,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		return -1;
 	}
 
-	if (fx.PrimaryType && (bounce & BNC_SCHOOL)) {
+	if (fx.PrimaryType && (bounce & BNC_SCHOOL) && !pierce) {
 		if (actor->fxqueue.HasEffectWithParam(fx_school_bounce_ref, fx.PrimaryType)) {
 			Log(DEBUG, "EffectQueue", "Bounced by school");
 			return -1;
@@ -942,9 +945,8 @@ static int check_type(Actor *actor, const Effect& fx)
 	//decrementing bounce checks
 
 	//level decrementing bounce check
-	if (fx.Power && bounce & BNC_LEVEL_DEC) {
-		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx.Power));
-		if (efx && DecreaseEffect(efx)) {
+	if (fx.Power && (bounce & BNC_LEVEL_DEC) && !pierce && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx.Power)) {
+		if (actor->fxqueue.DecreaseParam1OfEffect(fx_level_bounce_dec_ref, fx.Power)) {
 			Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
 			return -1;
 		}
@@ -958,7 +960,7 @@ static int check_type(Actor *actor, const Effect& fx)
 		}
 	}
 
-	if (fx.PrimaryType && (bounce & BNC_SCHOOL_DEC)) {
+	if (fx.PrimaryType && (bounce & BNC_SCHOOL_DEC) && !pierce) {
 		efx = const_cast<Effect*>(actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx.PrimaryType));
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by school (decrementing)");
@@ -1029,20 +1031,23 @@ static int check_resistance(Actor* actor, Effect* fx)
 
 	//opcode immunity
 	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
-	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
+	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
 		Log(MESSAGE, "EffectQueue", "{} is immune to effect: {}", fmt::WideToChar{actor->GetName()}, globals.Opcodes[fx->Opcode].Name);
 		return FX_NOT_APPLIED;
 	}
-	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
+	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
 		Log(MESSAGE, "EffectQueue", "{} is immune2 to effect: {}", fmt::WideToChar{actor->GetName()}, globals.Opcodes[fx->Opcode].Name);
 		// totlm's spin166 should be wholly blocked by spwi210, but only blocks its third effect, so make it fatal
 		return FX_ABORT;
 	}
 
-	//not resistable (but check saves - for chromatic orb instakill)
-	// bg2 sequencer trigger spells have bad resistance set, so ignore them
-	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL && signed(fx->Opcode) != EffectQueue::ResolveEffect(fx_activate_spell_sequencer_ref)) {
-		return check_magic_res(actor, fx, caster);
+	// check magic resistance if applicable
+	// (note that no MR roll does not preclude saving throws -- see e.g. chromatic orb instakill)
+	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL && check_magic_res(actor, fx, caster) == FX_NOT_APPLIED) {
+		// bg2 sequencer trigger spells have bad resistance set, so ignore them
+		if (signed(fx->Opcode) != EffectQueue::ResolveEffect(fx_activate_spell_sequencer_ref)) {
+			return FX_NOT_APPLIED;
+		}
 	}
 
 	if (globals.pstflags && (actor->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
@@ -1589,7 +1594,7 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 			continue;
 		}
 
-		if (removed != fx.SourceRef) {
+		if (removed && removed != fx.SourceRef) {
 			continue;
 		}
 		if (Flags & RL_MATCHSCHOOL && fx.PrimaryType != match) {
@@ -1735,34 +1740,32 @@ const Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, i
 	return HasOpcodeWithParamPair(effect_reference.opcode, param1, param2);
 }
 
-//this could be used for stoneskins and mirror images as well
-void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
+//decreases all eligible effects at once!  returns false if all spent already
+bool EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
 {
+	bool found = false;
 	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		ieDword value = fx.Parameter1;
-		if( value>amount) {
-			value -= amount;
-			amount = 0;
-		} else {
-			amount -= value;
-			value = 0;
-		}
-		fx.Parameter1 = value;
-		if (value) {
-			return;
+		ieDword& amount_left = fx.Parameter1;
+		if (amount_left > amount) {
+			amount_left -= amount;
+			found = true;
+		} else if (amount_left > 0) {
+			amount_left = 0;
+			found = true;
 		}
 	}
+	return found;
 }
 
-void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount)
+bool EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount)
 {
 	Globals::ResolveEffectRef(effect_reference);
 	if( effect_reference.opcode<0) {
-		return;
+		return false;
 	}
-	DecreaseParam1OfEffect(effect_reference.opcode, amount);
+	return DecreaseParam1OfEffect(effect_reference.opcode, amount);
 }
 
 //this is only used for Cloak of Warding Overlay in PST
