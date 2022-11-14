@@ -2071,7 +2071,7 @@ static void InitActorTables()
 			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE").c_str(), NULL, 16);
 			int classID = tm->QueryFieldSigned<int>(rowName, "CLASS");
 			ResRef clab = tm->QueryField(rowName, "ABILITIES");
-			const char *kitName = tm->QueryField(rowName, "ROWNAME").c_str();
+			const std::string& kitName = tm->QueryField(rowName, "ROWNAME");
 			class2kits[classID].indices.push_back(i);
 			class2kits[classID].ids.push_back(kitUsability);
 			class2kits[classID].clabs.emplace_back(clab);
