@@ -4512,8 +4512,8 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
 
 	if (ret == MIC_FULL && snd->InParty) {
-		snd->VerbalConstant(VB_INVENTORY_FULL);
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, GUIColors::XPCHANGE);
+		if (!core->HasFeature(GF_PST_STATE_FLAGS)) snd->VerbalConstant(VB_INVENTORY_FULL);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_INVFUL, GUIColors::XPCHANGE);
 	}
 	Sender->ReleaseCurrentAction();
 }

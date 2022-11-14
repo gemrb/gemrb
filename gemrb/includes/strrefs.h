@@ -232,8 +232,9 @@ namespace GemRB {
 #define STR_DAMAGE_DETAIL2 197
 #define STR_DAMAGE_DETAIL3 198
 #define STR_TRAVEL_TIME 199
+#define STR_PICKPOCKET_INVFUL 200     // pst only
 
-#define STRREF_COUNT 200
+#define STRREF_COUNT 201
 }
 
 #endif //! IE_STRINGS_H
