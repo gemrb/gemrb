@@ -1269,6 +1269,10 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS));
+	// the stat above is not set by default as in iwds
+	if (p.IsZero()) {
+		p = actor->HomeLocation;
+	}
 	if (p.IsZero()) {
 		Sender->ReleaseCurrentAction();
 		return;
