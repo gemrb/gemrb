@@ -1,5 +1,13 @@
 Description: This table lists the hardcoded string constants used by the core engine.
 
-Columns - <N/A>
+Columns - (optional) flags: used by pst to handle per-pc constants (separate voice acting)
 
 Rows - string references for each slot. (The order is mandatory).
+
+Flags:
+- 0: nothing special, same as other games, one string for everyone
+- 1: use relative strref instead of main one for PCs (TNO is main, then: Morte, Annah, Dakkon, FFG, Nordom, Ignus, Vhailor)
+- 2: use relative strref instead of main one for PCs and NPCs (index just after Vhailor)
+- 3:STRREF: like 1, but use STRREF instead of main one for TNO; first entry is for Morte
+- 4:STRREF: TNO uses STRREF instead
+- STRREF:STRREF: use strrefs only for TNO (main), Annah, NPCs (-1 for none)

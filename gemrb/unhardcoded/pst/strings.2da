@@ -1,203 +1,203 @@
 2DA V1.0
    -1
-                        STRREF
-SCATTERED               55021
-WHOLEPARTY                 -1
-DOORLOCKED              19309
-MAGICTRAP               19289
-NORMALTRAP              19289
-TRAP                       -1
-CANNOTGO                   -1
-TRAPREMOVED             19287
-OVERSTOCKED             19283
-SLEEP                      -1
-AMBUSH                     -1
-CONTLOCKED              22031
-NOMONEY                    -1
-CURSED                  50538
-SPELLDISRUPT               -1
-DIED                       -1
-MAYNOTREST              34599
-CANTRESTMONS            34600
-CANTSAVEMONS            34598
-CANTSAVE                34592
-NODIALOG                   -1
-CANTSAVEDIALOG          34593
-CANTSAVEDIALOG2            -1
-CANTSAVEMOVIE           34594
-TARGETBUSY                 -1
-CANTTALKTRANS              -1
-GOTGOLD                    -1
-LOSTGOLD                   -1
-GOTXP                   19254
-LOSTXP                  19255
-GOTITEM                 19256
-LOSTITEM                19258
-GOTREP                  19259
-LOSTREP                 19260
-GOTABILITY              19307
-GOTSPELL                   -1
-GOTSONG                    -1
-NOTHINGTOSAY               -1
-JOURNALCHANGE           37096
-WORLDMAPCHANGE          19264
-PAUSED                  39436
-UNPAUSED                   -1
-SCRIPTPAUSED            39436
-AP_UNUSABLE             39436
-AP_ATTACKED             39436
-AP_HIT                  39436
-AP_WOUNDED              39436
-AP_DEAD                 39436
-AP_NOTARGET             39436
-AP_ENDROUND             39436
-AP_ENEMY                39436
-AP_TRAP                 39436
-AP_SPELLCAST            39436
-AP_GENERIC              39436
-AP_RESERVED1            39436
-AP_RESERVED2            39436
-AP_RESERVED3            39436
-CHARMED                    -1
-DIRECHARMED                -1
-CONTROLLED                 -1
-EVIL                       -1
-GNE_NEUTRAL                -1
-GOOD                       -1
-STR_LAWFUL                 -1
-LNC_NEUTRAL                -1
-CHAOTIC                    -1
-ACTION_CAST                -1
-ACTION_ATTACK              -1
-ACTION_TURN                -1
-ACTION_SONG                -1
-ACTION_FINDTRAP            -1
-MAGICWEAPON                -1
-OFFHAND_USED               -1
-TWOHANDED_USED             -1
-CANNOT_USE_ITEM         50532
-CANT_DROP_ITEM          50569
-NOT_IN_OFFHAND             -1
-ITEM_IS_CURSED          50538
-NO_CRITICAL             19273
-TRACKING                   -1
-TRACKINGFAILED             -1
-DOOR_NOPICK             23169
-CONT_NOPICK             23169
-CANTSAVECOMBAT          34592
-CANTSAVENOCTRL          34592
-LOCKPICK_DONE           19281
-LOCKPICK_FAILED         19282
-STATIC_DISSIPATE           -1
-LIGHTNING_DISSIPATE        -1
-HAS_NO_ABILITY          50545
-NEEDS_IDENTIFY          50544
-WRONG_ITEMTYPE          50537
-HAS_ITEMEXCL               -1
-PICKPOCKET_DONE            -1
-PICKPOCKET_NONE         19304
-PICKPOCKET_FAIL         19303
-PICKPOCKET_EVIL         19302
-PICKPOCKET_ARMOR        19301
-USING_FEAT                 -1
-STOPPED_FEAT               -1
-DISARM_DONE             16520
-DISARM_FAIL             1608
-DOORBASH_DONE              -1
-DOORBASH_FAIL              -1
-CONTBASH_DONE              -1
-CONTBASH_FAIL              -1
-MAYNOTSETTRAP              -1
-SNAREFAILED                -1
-SNARESUCCEED               -1
-NOMORETRAP                 -1
-DISABLEDMAGE               -1
-SAVESUCCEED             28646
-QSAVESUCCEED            50461
-UNINJURED                  -1
-INJURED1                   -1
-INJURED2                   -1
-INJURED3                   -1
-INJURED4                   -1
-HOURS                   19313
-HOUR                    19312
-DAYS                       -1
-DAY                        -1
-REST                    19262
-JOURNEY                    -1
-SUMMONINGLIMIT             -1
-INVFULL                 19257
-TOOFARAWAY              4276
-DAMAGE_IMMUNITY            -1
-DAMAGE_STR1                -1
-DAMAGE_STR2                -1
-DAMAGE_STR3                -1
-DMG_POISON                 -1
-DMG_MAGIC                  -1
-DMG_MISSILE                -1
-DMG_SLASHING               -1
-DMG_PIERCING               -1
-DMG_CRUSHING               -1
-DMG_FIRE                   -1
-DMG_ELECTRIC               -1
-DMG_COLD                   -1
-DMG_ACID                   -1
-DMG_OTHER                  -1
-GOTQUESTXP                 -1
-LEVELUP                 4246
-INVFULL_ITEMDROP        37079
-CONT_DUP                   -1
-CONT_TRIG                  -1
-CONT_FAIL                  -1
-SEQ_DUP                    -1
-CRITICAL_HIT            19272
-CRITICAL_MISS           19274
-DEATH                      -1
-BACKSTAB                12128
-BACKSTAB_BAD            19271
-BACKSTAB_FAIL              -1
-CASTER_LVL_INC             -1
-CASTER_LVL_DEC             -1
-CHARS_EXPORTED             -1
-PALADIN_FALL               -1
-RANGER_FALL                -1
-RES_RESISTED               -1
-DEADMAGIC_FAIL             -1
-MISCASTMAGIC               -1
-WILDSURGE                  -1
-FAMBLOCK                   -1
-FAMPROTAGONIST             -1
-MAGIC_RESISTED             -1
-CANTSAVESTORE              -1
-NOSEE_NOCAST               -1
-AURACLEANSED               -1
-INDOOR_FAIL                -1
-SPELL_DISRUPTED            -1
-CHAOSSHIELD                -1
-RAPIDSHOT                  -1
-HAMSTRING                  -1
-ARTERIAL                   -1
-EXPERTISE                  -1
-POWERATTACK                -1
-CLEAVE                     -1
-HELD                       -1
-SLOWED                  36999
-CANTMOVE                37007
-CASTS                      -1
-WEAPONINEFFECTIVE          -1
-CONCEALED_MISS             -1
-SAVE_SPELL              38581
-SAVE_BREATH             38580
-SAVE_POLY               38579
-SAVE_WANDS              38578
-SAVE_DEATH              38577
-ATTACK_ROLL             19275
-ATTACK_ROLL_L              -1
-HIT                     19276
-MISS                    19277
-NO_RANGED_OFFHAND          -1
-CANTTRESTNOCONTROL         -1
-DAMAGE_DETAIL1             -1
-DAMAGE_DETAIL2             -1
-DAMAGE_DETAIL3             -1
-TRAVEL_TIME                -1
+                        STRREF          FLAGS
+SCATTERED               55021               0
+WHOLEPARTY                 -1               0
+DOORLOCKED              19309               0
+MAGICTRAP               19289               0
+NORMALTRAP              19289               0
+TRAP                       -1               0
+CANNOTGO                   -1               0
+TRAPREMOVED             19287               0
+OVERSTOCKED             19283               0
+SLEEP                      -1               0
+AMBUSH                     -1               0
+CONTLOCKED              22031               0
+NOMONEY                    -1               0
+CURSED                  50538               0
+SPELLDISRUPT               -1               0
+DIED                       -1               0
+MAYNOTREST              34599               0
+CANTRESTMONS            34600               0
+CANTSAVEMONS            34598               0
+CANTSAVE                34592               0
+NODIALOG                   -1               0
+CANTSAVEDIALOG          34593               0
+CANTSAVEDIALOG2            -1               0
+CANTSAVEMOVIE           34594               0
+TARGETBUSY                 -1               0
+CANTTALKTRANS              -1               0
+GOTGOLD                    -1               0
+LOSTGOLD                   -1               0
+GOTXP                   19254               0
+LOSTXP                  19255               0
+GOTITEM                 19256               0
+LOSTITEM                19258               0
+GOTREP                  19259               0
+LOSTREP                 19260               0
+GOTABILITY              19307               0
+GOTSPELL                   -1               0
+GOTSONG                    -1               0
+NOTHINGTOSAY               -1               0
+JOURNALCHANGE           37096               0
+WORLDMAPCHANGE          19264               0
+PAUSED                  39436               0
+UNPAUSED                   -1               0
+SCRIPTPAUSED            39436               0
+AP_UNUSABLE             39436               0
+AP_ATTACKED             39436               0
+AP_HIT                  39436               0
+AP_WOUNDED              39436               0
+AP_DEAD                 39436               0
+AP_NOTARGET             39436               0
+AP_ENDROUND             39436               0
+AP_ENEMY                39436               0
+AP_TRAP                 39436               0
+AP_SPELLCAST            39436               0
+AP_GENERIC              39436               0
+AP_RESERVED1            39436               0
+AP_RESERVED2            39436               0
+AP_RESERVED3            39436               0
+CHARMED                    -1               0
+DIRECHARMED                -1               0
+CONTROLLED                 -1               0
+EVIL                       -1               0
+GNE_NEUTRAL                -1               0
+GOOD                       -1               0
+STR_LAWFUL                 -1               0
+LNC_NEUTRAL                -1               0
+CHAOTIC                    -1               0
+ACTION_CAST                -1               0
+ACTION_ATTACK              -1               0
+ACTION_TURN                -1               0
+ACTION_SONG                -1               0
+ACTION_FINDTRAP            -1               0
+MAGICWEAPON                -1               0
+OFFHAND_USED               -1               0
+TWOHANDED_USED             -1               0
+CANNOT_USE_ITEM         50532               0
+CANT_DROP_ITEM          50569               0
+NOT_IN_OFFHAND             -1               0
+ITEM_IS_CURSED          50538               0
+NO_CRITICAL             19273               0
+TRACKING                   -1               0
+TRACKINGFAILED             -1               0
+DOOR_NOPICK             23169               0
+CONT_NOPICK             23169               0
+CANTSAVECOMBAT          34592               0
+CANTSAVENOCTRL          34592               0
+LOCKPICK_DONE           19281               0
+LOCKPICK_FAILED         19282               0
+STATIC_DISSIPATE           -1               0
+LIGHTNING_DISSIPATE        -1               0
+HAS_NO_ABILITY          50545               0
+NEEDS_IDENTIFY          50544               0
+WRONG_ITEMTYPE          50537               0
+HAS_ITEMEXCL               -1               0
+PICKPOCKET_DONE            -1               0
+PICKPOCKET_NONE         19304               0
+PICKPOCKET_FAIL         19303               0
+PICKPOCKET_EVIL         19302               0
+PICKPOCKET_ARMOR        19301               0
+USING_FEAT                 -1               0
+STOPPED_FEAT               -1               0
+DISARM_DONE             16520               0
+DISARM_FAIL             1608                0
+DOORBASH_DONE              -1               0
+DOORBASH_FAIL              -1               0
+CONTBASH_DONE              -1               0
+CONTBASH_FAIL              -1               0
+MAYNOTSETTRAP              -1               0
+SNAREFAILED                -1               0
+SNARESUCCEED               -1               0
+NOMORETRAP                 -1               0
+DISABLEDMAGE               -1               0
+SAVESUCCEED             28646               0
+QSAVESUCCEED            50461               0
+UNINJURED                  -1               0
+INJURED1                   -1               0
+INJURED2                   -1               0
+INJURED3                   -1               0
+INJURED4                   -1               0
+HOURS                   19313               0
+HOUR                    19312               0
+DAYS                       -1               0
+DAY                        -1               0
+REST                    19262               0
+JOURNEY                    -1               0
+SUMMONINGLIMIT             -1               0
+INVFULL                 19257               0
+TOOFARAWAY              4276                0
+DAMAGE_IMMUNITY            -1               0
+DAMAGE_STR1                -1               0
+DAMAGE_STR2                -1               0
+DAMAGE_STR3                -1               0
+DMG_POISON                 -1               0
+DMG_MAGIC                  -1               0
+DMG_MISSILE                -1               0
+DMG_SLASHING               -1               0
+DMG_PIERCING               -1               0
+DMG_CRUSHING               -1               0
+DMG_FIRE                   -1               0
+DMG_ELECTRIC               -1               0
+DMG_COLD                   -1               0
+DMG_ACID                   -1               0
+DMG_OTHER                  -1               0
+GOTQUESTXP                 -1               0
+LEVELUP                 4246                0
+INVFULL_ITEMDROP        37079               0
+CONT_DUP                   -1               0
+CONT_TRIG                  -1               0
+CONT_FAIL                  -1               0
+SEQ_DUP                    -1               0
+CRITICAL_HIT            19272               0
+CRITICAL_MISS           19274               0
+DEATH                      -1               0
+BACKSTAB                12128               0
+BACKSTAB_BAD            19271               0
+BACKSTAB_FAIL              -1               0
+CASTER_LVL_INC             -1               0
+CASTER_LVL_DEC             -1               0
+CHARS_EXPORTED             -1               0
+PALADIN_FALL               -1               0
+RANGER_FALL                -1               0
+RES_RESISTED               -1               0
+DEADMAGIC_FAIL             -1               0
+MISCASTMAGIC               -1               0
+WILDSURGE                  -1               0
+FAMBLOCK                   -1               0
+FAMPROTAGONIST             -1               0
+MAGIC_RESISTED             -1               0
+CANTSAVESTORE              -1               0
+NOSEE_NOCAST               -1               0
+AURACLEANSED               -1               0
+INDOOR_FAIL                -1               0
+SPELL_DISRUPTED            -1               0
+CHAOSSHIELD                -1               0
+RAPIDSHOT                  -1               0
+HAMSTRING                  -1               0
+ARTERIAL                   -1               0
+EXPERTISE                  -1               0
+POWERATTACK                -1               0
+CLEAVE                     -1               0
+HELD                       -1               0
+SLOWED                  36999               0
+CANTMOVE                37007               0
+CASTS                      -1               0
+WEAPONINEFFECTIVE          -1               0
+CONCEALED_MISS             -1               0
+SAVE_SPELL              38581               0
+SAVE_BREATH             38580               0
+SAVE_POLY               38579               0
+SAVE_WANDS              38578               0
+SAVE_DEATH              38577               0
+ATTACK_ROLL             19275               0
+ATTACK_ROLL_L              -1               0
+HIT                     19276               0
+MISS                    19277               0
+NO_RANGED_OFFHAND          -1               0
+CANTTRESTNOCONTROL         -1               0
+DAMAGE_DETAIL1             -1               0
+DAMAGE_DETAIL2             -1               0
+DAMAGE_DETAIL3             -1               0
+TRAVEL_TIME                -1               0
