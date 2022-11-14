@@ -1078,6 +1078,8 @@ void CREImporter::GetActorPST(Actor *act)
 	str->Seek( 36, GEM_CURRENT_POS );
 	//the overlays are not fully decoded yet
 	//they are a kind of effect block (like our vvclist)
+	// NOTE: rendered obsolete by our implementation of pst fx_overlay
+	// no creature comes with this preset
 	str->ReadDword(OverlayOffset);
 	str->ReadDword(OverlayMemorySize);
 	str->ReadDword(act->BaseStats[IE_XP_MAGE]); // Exp for secondary class
@@ -1093,7 +1095,7 @@ void CREImporter::GetActorPST(Actor *act)
 	}
 	ieVariable KillVar; //use this as needed
 	str->ReadVariable(KillVar);
-	str->Seek( 3, GEM_CURRENT_POS ); // dialog radius, feet circle size???
+	str->Seek(3, GEM_CURRENT_POS); // TODO: dialog activation radius, circle size and an unknown byte
 
 	str->Read( &tmpByte, 1 );
 
