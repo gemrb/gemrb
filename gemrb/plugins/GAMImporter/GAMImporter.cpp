@@ -704,14 +704,11 @@ int GAMImporter::PutJournals(DataStream *stream, const Game *game) const
 //only in ToB (and iwd2)
 int GAMImporter::PutSavedLocations(DataStream *stream, Game *game) const
 {
-	ieWord tmpWord;
-	ieDword filling = 0;
-
 	//iwd2 has a single 0 dword here (at the end of the file)
 	//it could be a hacked out saved location list (inherited from SoA)
 	//if the field is missing, original engine cannot load this saved game
 	if (game->version==GAM_VER_IWD2) {
-		stream->WriteDword(filling);
+		stream->WriteDword(0);
 		return 0;
 	}
 
@@ -719,26 +716,18 @@ int GAMImporter::PutSavedLocations(DataStream *stream, Game *game) const
 			const GAMLocationEntry *j = game->GetSavedLocationEntry(i);
 
 			stream->WriteResRef(j->AreaResRef);
-			tmpWord = j->Pos.x;
-			stream->WriteWord(tmpWord);
-			tmpWord = j->Pos.y;
-			stream->WriteWord(tmpWord);
+			stream->WritePoint(j->Pos);
 	}
 	return 0;
 }
 
 int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game) const
 {
-	ieWord tmpWord;
-
 	for (unsigned int i=0;i<PPLocCount;i++) {
 			const GAMLocationEntry *j = game->GetPlaneLocationEntry(i);
 
 			stream->WriteResRef(j->AreaResRef);
-			tmpWord = j->Pos.x;
-			stream->WriteWord(tmpWord);
-			tmpWord = j->Pos.y;
-			stream->WriteWord(tmpWord);
+			stream->WritePoint(j->Pos);
 	}
 	return 0;
 }
@@ -893,18 +882,13 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 
 int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, ieDword GAMVersion) const
 {
-	ieDword tmpDword;
-	ieWord tmpWord;
-
 	if (ac->Selected) {
-		tmpWord=1;
+		stream->WriteWord(1);
 	} else {
-		tmpWord=0;
+		stream->WriteWord(0);
 	}
 
-	stream->WriteWord(tmpWord);
-	tmpWord = ac->InParty-1;
-	stream->WriteWord(tmpWord);
+	stream->WriteWord(ac->InParty - 1);
 
 	stream->WriteDword(CREOffset);
 	stream->WriteDword(CRESize);
@@ -912,22 +896,14 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	//BG1 doesn't even like the * in there, zero fill
 	//seems to be accepted by all
 	stream->WriteFilling(8);
-	tmpDword = ac->GetOrientation();
-	stream->WriteDword(tmpDword);
+	stream->WriteDword(ac->GetOrientation());
 	stream->WriteResRefUC(ac->Area);
-	tmpWord = ac->Pos.x;
-	stream->WriteWord(tmpWord);
-	tmpWord = ac->Pos.y;
-	stream->WriteWord(tmpWord);
+	stream->WritePoint(ac->Pos);
 	//no viewport, we cheat
-	tmpWord = ac->Pos.x - core->config.Width / 2;
-	stream->WriteWord(tmpWord);
-	tmpWord = ac->Pos.y - core->config.Height / 2;
-	stream->WriteWord(tmpWord);
-	tmpWord = (ieWord) ac->Modal.State;
-	stream->WriteWord(tmpWord);
-	tmpWord = ac->PCStats->Happiness;
-	stream->WriteWord(tmpWord);
+	stream->WriteWord(ac->Pos.x - core->config.Width / 2);
+	stream->WriteWord(ac->Pos.y - core->config.Height / 2);
+	stream->WriteWord(ac->Modal.State);
+	stream->WriteWord(ac->PCStats->Happiness);
 	//interact counters
 	for (unsigned int& interact : ac->PCStats->Interact) {
 		stream->WriteDword(interact);
@@ -1016,8 +992,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 			}
 		}
 		for (int i = 0; i < MAX_QSLOTS; i++) {
-			tmpDword = ac->PCStats->QSlots[i+3];
-			stream->WriteDword(tmpDword);
+			stream->WriteDword(ac->PCStats->QSlots[i+3]);
 		}
 	}
 

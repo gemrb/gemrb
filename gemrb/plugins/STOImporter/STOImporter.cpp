@@ -276,7 +276,6 @@ void STOImporter::PutPurchasedCategories(DataStream *stream, const Store* s) con
 void STOImporter::PutHeader(DataStream *stream, const Store *s)
 {
 	char Signature[9];
-	ieWord tmpWord;
 
 	version = s->version;
 	strlcpy(Signature, "STORV0.0", 9);
@@ -293,13 +292,13 @@ void STOImporter::PutHeader(DataStream *stream, const Store *s)
 
 	switch (version) {
 	case 10: case 0: // bg2, gemrb
-		tmpWord = s->Capacity;
+		stream->WriteWord(s->Capacity);
 		break;
 	default:
-		tmpWord = 0;
+		stream->WriteWord(0);
 		break;
 	}
-	stream->WriteWord(tmpWord);
+	
 
 	stream->Write( s->unknown, 8);
 	stream->WriteDword(s->PurchasedCategoriesOffset);
