@@ -169,6 +169,7 @@ public:
 
 	strret_t ReadPoint(Point&);
 	strret_t WritePoint(const Point&);
+	strret_t ReadSize(class Size&);
 	strret_t ReadRegion(Region&);
 	
 	virtual stroff_t Seek(stroff_t pos, strpos_t startpos) = 0;
