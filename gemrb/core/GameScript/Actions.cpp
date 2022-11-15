@@ -276,6 +276,47 @@ void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 	actor->SetBase( IE_SPECIFIC, parameters->int0Parameter );
 }
 
+inline void PermanentStatChangeFeedback(int stat, const Actor* actor)
+{
+	// figure out PC index (TNO, Morte, Annah, Dakkon, FFG, Nordom, Ignus, Vhailor)
+	// then use it to calculate presonalized feedback strings
+	int spec2offset[] = { 0, 7, 5, 6, 4, 3, 2, 1 };
+	int pcOffset = spec2offset[actor->GetStat(IE_SPECIFIC) - 2];
+
+	ieStrRef ref = ieStrRef(int(ieStrRef::PST_STR_MOD) + pcOffset);
+	if (stat == IE_STR) {
+		displaymsg->DisplayString(ref, GUIColors::WHITE, STRING_FLAGS::SOUND);
+		return;
+	}
+
+	// the strings follow the main stat order and are back to back (only ruined by IE_STREXTRA)
+	// "Strength increased permanently" and so on until
+	// @34889 = ~Charisma increased permanently [Nameless One]~
+	if (stat >= IE_INT && stat <= IE_CHR) {
+		ref = ieStrRef(int(ref) + 8 * (stat - IE_INT + 1));
+		displaymsg->DisplayString(ref, GUIColors::WHITE, STRING_FLAGS::SOUND);
+		return;
+	}
+
+	// these two have strrefs right after
+	// @34897 = ~MaxHP increased permanently [Nameless One]~
+	// @34905 = ~Armor Class increased permanently [Nameless One]~
+	if (stat == IE_MAXHITPOINTS || stat == IE_ARMORCLASS) {
+		ref = ieStrRef(int(ref) + 8 * (IE_CHR - IE_INT + 1 + stat - IE_MAXHITPOINTS + 1));
+		displaymsg->DisplayString(ref, GUIColors::WHITE, STRING_FLAGS::SOUND);
+		return;
+	}
+
+	// @34913 = ~Proficiency Points increased permanently [Nameless One]~
+	if (stat == IE_FREESLOTS) {
+		ref = ieStrRef(int(ref) + 8 * (IE_CHR - IE_INT + 1 + IE_ARMORCLASS + 1));
+		displaymsg->DisplayString(ref, GUIColors::WHITE, STRING_FLAGS::SOUND);
+		return;
+	}
+	// there's also this one, but there's no stat, perhaps used for level up, where you get the attribute increase window?
+	// @35621 = ~Characteristic Points increased permanently [Nameless One]~
+}
+
 void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *scr = Sender;
@@ -288,24 +329,26 @@ void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
 	}
 
 	ieDword value;
+	int stat = parameters->int0Parameter;
 	// int1Parameter is from delta.ids
 	// int2Parameter is supposed to support also bones.ids, but nothing uses it like that
 	// if we need it, take the implementation from GameScript::Damage
 	switch (parameters->int1Parameter) {
 		case DM_LOWER:
-			value = actor->GetBase(parameters->int0Parameter);
-			value-= parameters->int2Parameter;
+			value = actor->GetBase(stat);
+			value -= parameters->int2Parameter;
 			break;
 		case DM_RAISE:
-			value = actor->GetBase(parameters->int0Parameter);
-			value+= parameters->int2Parameter;
+			value = actor->GetBase(stat);
+			value += parameters->int2Parameter;
+			if (actor->InParty) PermanentStatChangeFeedback(stat, actor);
 			break;
 		case DM_SET:
 		default:
 			value = parameters->int2Parameter;
 			break;
 	}
-	actor->SetBase( parameters->int0Parameter, value);
+	actor->SetBase(stat, value);
 }
 
 void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)

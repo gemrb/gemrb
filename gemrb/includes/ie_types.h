@@ -66,6 +66,7 @@ enum class ieStrRef : ieDword {
 	PST_REST_PERM = 38587,
 	PST_REST_NOT_HERE = 34601,
 	PST_HICCUP = 46633,
+	PST_STR_MOD = 34849,
 
 	NO_REST = 10309,
 	DATE1 = 10699,
