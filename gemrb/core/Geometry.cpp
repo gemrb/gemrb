@@ -183,7 +183,7 @@ std::vector<Point> PlotEllipse(const Region& rect) noexcept
 	}
 	
 	if (rect.w == rect.h) {
-		return PlotCircle(rect.Center(), rect.w);
+		return PlotCircle(rect.Center(), (rect.w / 2) - 1);
 	}
 	
 	Point p1 = rect.origin;
