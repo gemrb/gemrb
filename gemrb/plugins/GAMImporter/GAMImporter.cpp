@@ -316,10 +316,8 @@ struct PCStruct {
 	ResRef CREResRef;
 	ieDword  Orientation;
 	ResRef Area;
-	ieWord   XPos;
-	ieWord   YPos;
-	ieWord   ViewXPos;
-	ieWord   ViewYPos;
+	Point Pos;
+	Point   ViewPos;
 	ieWord   ModalState;
 	ieWordSigned   Happiness;
 	ieDword  Interact[MAX_INTERACT];
@@ -347,10 +345,8 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	str->ReadResRef( pcInfo.CREResRef );
 	str->ReadDword(pcInfo.Orientation);
 	str->ReadResRef( pcInfo.Area );
-	str->ReadWord(pcInfo.XPos);
-	str->ReadWord(pcInfo.YPos);
-	str->ReadWord(pcInfo.ViewXPos);
-	str->ReadWord(pcInfo.ViewYPos);
+	str->ReadPoint(pcInfo.Pos);
+	str->ReadPoint(pcInfo.ViewPos);
 	str->ReadWord(pcInfo.ModalState); //see Modal.ids
 	str->ReadScalar<ieWordSigned>(pcInfo.Happiness);
 	for (unsigned int& interact : pcInfo.Interact) {
@@ -512,8 +508,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	memcpy(ps->QuickItemSlots, pcInfo.QuickItemSlot, MAX_QUICKITEMSLOT*sizeof(ieWord) );
 	memcpy(ps->QuickItemHeaders, pcInfo.QuickItemHeader, MAX_QUICKITEMSLOT*sizeof(ieWord) );
 	actor->ReinitQuickSlots();
-	actor->Destination.x = actor->Pos.x = pcInfo.XPos;
-	actor->Destination.y = actor->Pos.y = pcInfo.YPos;
+	actor->Destination = actor->Pos = pcInfo.Pos;
 	actor->Area = pcInfo.Area;
 	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;

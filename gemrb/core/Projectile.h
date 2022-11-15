@@ -194,8 +194,7 @@ struct ProjectileExtension : Held<ProjectileExtension>
 	//used for target or HD counting
 	ieWord DiceCount;
 	ieWord DiceSize;
-	ieWord TileX;
-	ieWord TileY;
+	Point tileCoord;
 };
 
 class GEM_EXPORT Projectile

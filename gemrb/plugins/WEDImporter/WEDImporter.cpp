@@ -66,8 +66,7 @@ bool WEDImporter::Open(DataStream* stream)
 	str->Seek( OverlaysOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < OverlaysCount; i++) {
 		Overlay o;
-		str->ReadWord(o.Width);
-		str->ReadWord(o.Height);
+		str->ReadSize(o.size);
 		str->ReadResRef( o.TilesetResRef );
 		str->ReadWord(o.UniqueTileCount);
 		str->ReadWord(o.MovementType);
@@ -116,10 +115,10 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 	}
 	PluginHolder<TileSetMgr> tis = MakePluginHolder<TileSetMgr>(IE_TIS_CLASS_ID);
 	tis->Open( tisfile );
-	auto over = MakeHolder<TileOverlay>(Size(newOverlays->Width, newOverlays->Height));
-	for (int y = 0; y < newOverlays->Height; y++) {
-		for (int x = 0; x < newOverlays->Width; x++) {
-			str->Seek(newOverlays->TilemapOffset + (y * newOverlays->Width + x) * 10, GEM_STREAM_START);
+	auto over = MakeHolder<TileOverlay>(newOverlays->size);
+	for (int y = 0; y < newOverlays->size.h; y++) {
+		for (int x = 0; x < newOverlays->size.w; x++) {
+			str->Seek(newOverlays->TilemapOffset + (y * newOverlays->size.w + x) * 10, GEM_STREAM_START);
 
 			ieWord startindex, count, secondary;
 			ieByte overlaymask, animspeed;
@@ -285,7 +284,7 @@ void WEDImporter::ReadWallPolygons()
 		ieDword FirstVertex;
 		ieDword CountVertex;
 		ieWord Flags; // two bytes in the original: type and height with height currently unused
-		ieWord MinX, MaxX, MinY, MaxY;
+		Region rect;
 	};
 
 	polygonTable.resize(polygonCount);
@@ -297,10 +296,7 @@ void WEDImporter::ReadWallPolygons()
 		str->ReadDword(PolygonHeaders[i].FirstVertex);
 		str->ReadDword(PolygonHeaders[i].CountVertex);
 		str->ReadWord(PolygonHeaders[i].Flags); // two bytes: mode and height in the original bg2
-		str->ReadWord(PolygonHeaders[i].MinX);
-		str->ReadWord(PolygonHeaders[i].MaxX);
-		str->ReadWord(PolygonHeaders[i].MinY);
-		str->ReadWord(PolygonHeaders[i].MaxY);
+		str->ReadRegion(PolygonHeaders[i].rect, true);
 	}
 
 	for (ieDword i=0; i < polygonCount; i++) {
@@ -333,12 +329,8 @@ void WEDImporter::ReadWallPolygons()
 				flags |= WF_BASELINE;
 			}
 		}
-		Region rgn;
-		rgn.x = PolygonHeaders[i].MinX;
-		rgn.y = PolygonHeaders[i].MinY;
-		rgn.w = PolygonHeaders[i].MaxX - PolygonHeaders[i].MinX;
-		rgn.h = PolygonHeaders[i].MaxY - PolygonHeaders[i].MinY;
-		
+
+		const Region& rgn = PolygonHeaders[i].rect;
 		if (!rgn.size.IsInvalid()) { // PST AR0600 is known to have a polygon with 0 height
 			polygonTable[i] = std::make_shared<Wall_Polygon>(std::move(points), &rgn);
 			if (flags&WF_BASELINE) {
@@ -374,7 +366,7 @@ std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 		str->ReadWord(idx);
 	}
 
-	size_t groupSize = ceilf(overlays[0].Width/10.0f) * ceilf(overlays[0].Height/7.5f);
+	size_t groupSize = ceilf(overlays[0].size.w / 10.0f) * ceilf(overlays[0].size.h / 7.5f);
 	std::vector<WallPolygonGroup> polygonGroups;
 	polygonGroups.reserve(groupSize);
 

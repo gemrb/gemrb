@@ -148,14 +148,13 @@ Holder<ProjectileExtension> PROImporter::GetAreaExtension()
 	str->ReadDword(e->APFlags);
 	str->ReadWord(e->DiceCount);
 	str->ReadWord(e->DiceSize);
-	str->ReadWord(e->TileX);
-	str->ReadWord(e->TileY);
+	str->ReadPoint(e->tileCoord);
 
-	if (!e->TileX) {
-		e->TileX=64;
+	if (!e->tileCoord.x) {
+		e->tileCoord.x = 64;
 	}
-	if (!e->TileY) {
-		e->TileY=64;
+	if (!e->tileCoord.y) {
+		e->tileCoord.y = 64;
 	}
 
 	//we skip the rest
