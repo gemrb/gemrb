@@ -121,10 +121,14 @@ strret_t DataStream::ReadSize(class Size& s)
 	return ret;
 }
 
-strret_t DataStream::ReadRegion(Region& r)
+strret_t DataStream::ReadRegion(Region& r, bool asPoints)
 {
 	strret_t ret = ReadPoint(r.origin);
 	ret += ReadSize(r.size);
+	if (asPoints) { // size is really the "max" coord
+		r.w -= r.x;
+		r.h -= r.y;
+	}
 	return ret;
 }
 
