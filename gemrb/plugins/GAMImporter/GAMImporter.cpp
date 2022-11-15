@@ -277,30 +277,20 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	}
 
 	if (SavedLocCount && SavedLocOffset) {
-		ieWord PosX, PosY;
-
 		str->Seek( SavedLocOffset, GEM_STREAM_START );
 		for (unsigned int i = 0; i < SavedLocCount; i++) {
 			GAMLocationEntry *gle = newGame->GetSavedLocationEntry(i);
 			str->ReadResRef( gle->AreaResRef );
-			str->ReadWord(PosX);
-			str->ReadWord(PosY);
-			gle->Pos.x=PosX;
-			gle->Pos.y=PosY;
+			str->ReadPoint(gle->Pos);
 		}
 	}
 
 	if (PPLocCount && PPLocOffset) {
-		ieWord PosX, PosY;
-
 		str->Seek( PPLocOffset, GEM_STREAM_START );
 		for (unsigned int i = 0; i < PPLocCount; i++) {
 			GAMLocationEntry *gle = newGame->GetPlaneLocationEntry(i);
 			str->ReadResRef( gle->AreaResRef );
-			str->ReadWord(PosX);
-			str->ReadWord(PosY);
-			gle->Pos.x=PosX;
-			gle->Pos.y=PosY;
+			str->ReadPoint(gle->Pos);
 		}
 	}
 	return newGame;
