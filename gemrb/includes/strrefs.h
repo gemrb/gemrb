@@ -236,8 +236,9 @@ namespace GemRB {
 #define STR_MORALE_BERSERK 201
 #define STR_MORALE_RUN 202
 #define STR_MORALE_PANIC 203
+#define STR_TRAP_FOUND 204
 
-#define STRREF_COUNT 204
+#define STRREF_COUNT 205
 }
 
 #endif //! IE_STRINGS_H

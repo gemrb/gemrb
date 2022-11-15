@@ -1891,6 +1891,7 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 	if (check > TrapDetectionDiff) {
 		SetTrapDetected(1); //probably could be set to the player #?
 		AddTrigger(TriggerEntry(trigger_detected, actorID));
+		displaymsg->DisplayConstantStringName(STR_TRAP_FOUND, GUIColors::WHITE, this);
 	}
 }
 
