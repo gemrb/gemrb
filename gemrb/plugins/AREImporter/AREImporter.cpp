@@ -628,7 +628,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		ieWord Type, VertexCount;
 		ieDword FirstVertex, Cursor, Flags;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
-		ieWord LaunchX, LaunchY;
+		Point launchP;
 		Point pos;
 		Point talkPos;
 		ieVariable Name, Entrance;
@@ -642,7 +642,6 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->ReadVariable(Name);
 		str->ReadWord(Type);
 		Region bbox;
-		ieWord tmp;
 		str->ReadRegion(bbox, true);
 		str->ReadWord(VertexCount);
 		str->ReadDword(FirstVertex);
@@ -658,16 +657,14 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->ReadWord(TrapRemDiff);
 		str->ReadWord(Trapped);
 		str->ReadWord(TrapDetected);
-		str->ReadWord(LaunchX);
-		str->ReadWord(LaunchY);
+		str->ReadPoint(launchP);
 		str->ReadResRef( KeyResRef );
 		str->ReadResRef(script0);
 		/* ARE 9.1: 4B per position after that. */
 		if (16 == map->version) {
 			str->ReadPoint(pos); // OverridePoint in NI
 			if (pos.IsZero()) {
-				str->ReadScalar(pos.x); // AlternatePoint in NI
-				str->ReadScalar(pos.y);
+				str->ReadPoint(pos); // AlternatePoint in NI
 			} else {
 				str->Seek(8, GEM_CURRENT_POS);
 			}
@@ -696,10 +693,9 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		if (VertexCount <= 1) {
 			// this is exactly the same as bbox.origin
 			if (VertexCount == 1) {
-				str->ReadWord(tmp);
-				assert(tmp == bbox.x);
-				str->ReadWord(tmp);
-				assert(tmp == bbox.y);
+				Point pos;
+				str->ReadPoint(pos);
+				assert(pos == bbox.origin);
 			}
 
 			if (bbox.size.IsInvalid()) {
@@ -736,8 +732,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		ip->TrapRemovalDiff = TrapRemDiff;
 		ip->Trapped = Trapped;
 		ip->TrapDetected = TrapDetected;
-		ip->TrapLaunch.x = LaunchX;
-		ip->TrapLaunch.y = LaunchY;
+		ip->TrapLaunch = launchP;
 		// translate door cursor on infopoint to correct cursor
 		if (Cursor == IE_CURSOR_DOOR) Cursor = IE_CURSOR_PASS;
 		ip->Cursor = Cursor;
@@ -881,7 +876,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		ResRef script0;
 		ieWord TrapDetect, TrapRemoval;
 		ieWord Trapped, TrapDetected;
-		ieWord LaunchX, LaunchY;
+		Point launchP;
 		ieDword DiscoveryDiff, LockRemoval;
 		Region BBClosed, BBOpen;
 		ieStrRef OpenStrRef;
@@ -916,8 +911,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->ReadWord(TrapRemoval);
 		str->ReadWord(Trapped);
 		str->ReadWord(TrapDetected);
-		str->ReadWord(LaunchX);
-		str->ReadWord(LaunchY);
+		str->ReadPoint(launchP);
 		str->ReadResRef( KeyResRef );
 		str->ReadResRef(script0);
 		str->ReadDword(DiscoveryDiff);
@@ -1004,8 +998,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		door->TrapRemovalDiff = TrapRemoval;
 		door->Trapped = Trapped;
 		door->TrapDetected = TrapDetected;
-		door->TrapLaunch.x = LaunchX;
-		door->TrapLaunch.y = LaunchY;
+		door->TrapLaunch = launchP;
 
 		door->Cursor = cursor;
 		door->KeyResRef = KeyResRef;
@@ -1410,12 +1403,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		}
 	} else {
 		for (ieDword i = 0; i < NoteCount; i++) {
-			ieWord px,py;
-
-			str->ReadWord(px);
-			str->ReadWord(py);
-			point.x=px;
-			point.y=py;
+			str->ReadPoint(point);
 			ieStrRef strref = ieStrRef::INVALID;
 			str->ReadStrRef(strref);
 			ieWord location; // (0=Extenal (TOH/TOT), 1=Internal (TLK)
@@ -1436,7 +1424,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		ResRef TrapResRef;
 		ieDword TrapEffOffset;
 		ieWord TrapSize, ProID;
-		ieWord X,Y,Z;
+		Point pos;
 		ieDword Ticks;
 		ieByte TargetType;
 		ieByte Owner;
@@ -1448,9 +1436,8 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->ReadWord(TrapSize);
 		str->ReadWord(ProID);
 		str->ReadDword(Ticks);  //actually, delaycount/repetitioncount
-		str->ReadWord(X);
-		str->ReadWord(Y);
-		str->ReadWord(Z);
+		str->ReadPoint(point);
+		str->Seek(2, GEM_CURRENT_POS); // unknown/unused 'Z'
 		str->Read(&TargetType, 1); //according to dev info, this is 'targettype'; "Enemy-ally targeting" on IESDP
 		str->Read(&Owner, 1); // party member index that created this projectile (0-5)
 		int TrapEffectCount = TrapSize/0x108;
@@ -1479,8 +1466,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 			ieDword level = caster->GetThiefLevel();
 			pro->SetCaster(caster->GetGlobalID(), level ? level : caster->GetXPLevel(false));
 		}
-		Point pos(X,Y);
-		map->AddProjectile( pro, pos, pos);
+		map->AddProjectile(pro, pos, pos);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading tiles");
