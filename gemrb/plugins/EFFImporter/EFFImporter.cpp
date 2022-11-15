@@ -110,8 +110,8 @@ Effect* EFFImporter::GetEffectV1()
 	str->ReadWord(fx->IsSaveForHalfDamage);
 	fixAffectedLevels( fx );
 
-	fx->Pos = Point(-1, -1);
-	fx->Source = Point(-1, -1);
+	fx->Pos.Invalidate();
+	fx->Source.Invalidate();
 	return fx;
 }
 

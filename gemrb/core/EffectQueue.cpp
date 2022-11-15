@@ -335,7 +335,7 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 	fx->Parameter1 = param1;
 	fx->Parameter2 = param2;
 	fx->TimingMode = timing;
-	fx->Pos = Point(-1, -1);
+	fx->Pos.Invalidate();
 	return fx;
 }
 

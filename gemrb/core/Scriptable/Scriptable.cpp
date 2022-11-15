@@ -154,7 +154,7 @@ void Scriptable::SetSpellResRef(const ResRef& resref) {
 
 void Scriptable::SetOverheadText(String text, bool display)
 {
-	overHeadTextPos = Point(-1, -1);
+	overHeadTextPos.Invalidate();
 	if (!text.empty()) {
 		OverheadText = std::move(text);
 		DisplayOverheadText(display);
@@ -489,7 +489,7 @@ void Scriptable::ClearActions(int skipFlags)
 
 	WaitCounter = 0;
 	LastTarget = 0;
-	LastTargetPos = Point(-1, -1);
+	LastTargetPos.Invalidate();
 	// intentionally not resetting LastTargetPersistent
 	LastSpellTarget = 0;
 
@@ -932,7 +932,7 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 inline void Scriptable::ResetCastingState(Actor *caster) {
 	SpellHeader = -1;
 	SpellResRef.Reset();
-	LastTargetPos = Point(-1, -1);
+	LastTargetPos.Invalidate();
 	LastSpellTarget = 0;
 	if (caster) {
 		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
@@ -962,7 +962,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	}
 
 	if (SpellHeader == -1) {
-		LastTargetPos = Point(-1, -1);
+		LastTargetPos.Invalidate();
 		return;
 	}
 
@@ -1257,7 +1257,7 @@ void Scriptable::DirectlyCastSpell(Scriptable *target, const ResRef& spellref, i
 int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant, bool nointerrupt )
 {
 	LastSpellTarget = 0;
-	LastTargetPos = Point(-1, -1);
+	LastTargetPos.Invalidate();
 	Actor* actor = Scriptable::As<Actor>(this);
 	if (actor && actor->HandleCastingStance(SpellResRef, deplete, instant)) {
 		Log(ERROR, "Scriptable", "Spell {} not known or memorized, aborting cast!", SpellResRef);
@@ -1292,7 +1292,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool nointerrupt )
 {
 	LastSpellTarget = 0;
-	LastTargetPos = Point(-1, -1);
+	LastTargetPos.Invalidate();
 	Actor* actor = Scriptable::As<Actor>(this);
 	if (actor && actor->HandleCastingStance(SpellResRef, deplete, instant)) {
 		Log(ERROR, "Scriptable", "Spell {} not known or memorized, aborting cast!", SpellResRef);

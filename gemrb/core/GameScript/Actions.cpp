@@ -6714,7 +6714,7 @@ void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 	}
 
 	scr->LastFollowed = actor->GetGlobalID();
-	scr->FollowOffset = Point(-1, -1);
+	scr->FollowOffset.Invalidate();
 	if (!scr->InMove() || scr->Destination != actor->Pos) {
 		scr->WalkTo(actor->Pos, 0, 1);
 	}
@@ -6736,7 +6736,7 @@ void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
 	}
 
 	scr->LastFollowed = actor->GetGlobalID();
-	scr->FollowOffset = Point(-1, -1);
+	scr->FollowOffset.Invalidate();
 	if (!scr->InMove() || scr->Destination != actor->Pos) {
 		scr->WalkTo(actor->Pos, IF_RUNNING, 1);
 	}

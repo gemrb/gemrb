@@ -64,6 +64,10 @@ public:
 		x = y = 0;
 	}
 
+	inline void Invalidate() noexcept {
+		x = y = -1;
+	}
+
 	// true if p is within the circle of radius r centered at p
 	bool isWithinRadius(int r, const Point& p) const noexcept;
 

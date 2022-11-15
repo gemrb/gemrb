@@ -70,7 +70,7 @@ void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 void GlobalTimer::DoStep(int count)
 {
 	if (!ViewportIsMoving()) {
-		goal = Point(-1,-1);
+		goal.Invalidate();
 		return;
 	}
 

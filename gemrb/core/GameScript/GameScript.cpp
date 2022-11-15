@@ -2558,7 +2558,7 @@ Action *GenerateActionDirect(std::string string, const Scriptable *object)
 	if (tmp && tmp->objectFields[0]==-1) {
 		tmp->objectFields[1] = object->GetGlobalID();
 	}
-	action->pointParameter = Point(-1, -1);
+	action->pointParameter.Invalidate();
 	return action;
 }
 
