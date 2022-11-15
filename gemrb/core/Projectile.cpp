@@ -1313,8 +1313,8 @@ void Projectile::SpawnFragment(Point &dest)
 //		}
 		pro->SetCaster(Caster, Level);
 		if (pro->ExtFlags&PEF_RANDOM) {
-			dest.x+=core->Roll(1,Extension->TileX, -Extension->TileX/2);
-			dest.y+=core->Roll(1,Extension->TileY, -Extension->TileY/2);
+			dest.x += core->Roll(1,Extension->tileCoord.x, -Extension->tileCoord.x / 2);
+			dest.y += core->Roll(1,Extension->tileCoord.y, -Extension->tileCoord.y / 2);
 		}
 		area->AddProjectile(pro, dest, dest);
 	}
@@ -1392,8 +1392,8 @@ void Projectile::DrawExplosion(const Region& vp)
 		if (apflags&APF_TILED) {
 			int radius = Extension->ExplosionRadius;
 
-			for (int i = -radius; i < radius; i += Extension->TileX) {
-				for (int j = -radius; j < radius; j += Extension->TileY) {
+			for (int i = -radius; i < radius; i += Extension->tileCoord.x) {
+				for (int j = -radius; j < radius; j += Extension->tileCoord.y) {
 					if (i*i+j*j<radius*radius) {
 						Point p(Pos.x+i, Pos.y+j);
 						SpawnFragment(p);
