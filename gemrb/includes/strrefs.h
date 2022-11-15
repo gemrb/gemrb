@@ -184,7 +184,7 @@ namespace GemRB {
 #define STR_CRITICAL_HIT  149
 #define STR_CRITICAL_MISS 150
 #define STR_DEATH         151
-#define STR_BACKSTAB      152
+#define STR_BACKSTAB_DAMAGE 152
 #define STR_BACKSTAB_BAD  153
 #define STR_BACKSTAB_FAIL 154
 #define STR_CASTER_LVL_INC 155 // caster level bonus (wild mages)
@@ -237,8 +237,9 @@ namespace GemRB {
 #define STR_MORALE_RUN 202
 #define STR_MORALE_PANIC 203
 #define STR_TRAP_FOUND 204
+#define STR_BACKSTAB_DOUBLE 205
 
-#define STRREF_COUNT 205
+#define STRREF_COUNT 206
 }
 
 #endif //! IE_STRINGS_H

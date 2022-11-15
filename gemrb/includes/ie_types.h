@@ -58,7 +58,10 @@ enum class ieStrRef : ieDword {
 	// the names given match our hardcoded usage and shouldn't be expected to resolve to something sensical in all games
 	// consider adding trailing comments for which games they apply to
 	// consider grouping definitions by game
-	
+
+	// ToB strrefs
+	TOB_SEPTUPLE = 74094,
+
 	// PST strrefs
 	PST_REST_PERM = 38587,
 	PST_REST_NOT_HERE = 34601,

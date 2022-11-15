@@ -206,3 +206,4 @@ STR_MORALE_BERSERK      37033               2
 STR_MORALE_RUN          37024               2
 STR_MORALE_PANIC        37015               2
 STR_TRAP_FOUND          36965               2
+STR_BACKSTAB_DOUBLE     19265     36644:36928

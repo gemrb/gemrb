@@ -9112,7 +9112,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 		sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
 		// ~Sneak Attack for %d~
 		//displaymsg->DisplayRollStringName(25053, GUIColors::LIGHTGREY, this, extraDamage);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB, GUIColors::WHITE, sneakAttackDamage);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB_DAMAGE, GUIColors::WHITE, sneakAttackDamage);
 	}
 
 	return sneakAttackDamage;
@@ -9144,8 +9144,21 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 	} else {
 		if (wi.backstabbing) {
 			backstabDamage = multiplier * damage;
-			// display a simple message instead of hardcoding multiplier names
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB, GUIColors::WHITE, multiplier);
+			if (!core->HasFeedback(FT_COMBAT)) return backstabDamage;
+
+			ieStrRef multiplierText;
+			// generate "double", "triple", up to "sextuple" strref as needed
+			if (multiplier >= 7) { // only in tob, but the strings are at a different offset
+				multiplierText = ieStrRef(int(ieStrRef::TOB_SEPTUPLE) + multiplier - 7);
+			} else {
+				multiplierText = ieStrRef(int(displaymsg->GetStringReference(STR_BACKSTAB_DOUBLE)) + multiplier - 2);
+			}
+			if (multiplier < 7 || (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) && multiplier < 10)) {
+				displaymsg->DisplayStringName(multiplierText, GUIColors::WHITE, this, STRING_FLAGS::SOUND);
+			} else {
+				// display a simple message for all other cases
+				displaymsg->DisplayConstantStringValue(STR_BACKSTAB_DAMAGE, GUIColors::WHITE, multiplier);
+			}
 		} else if (core->HasFeedback(FT_COMBAT)) {
 			// weapon is unsuitable for backstab
 			displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, GUIColors::WHITE);
