@@ -41,11 +41,7 @@ bool MOSImporter::Import(DataStream* str)
 	if (strncmp( Signature, "MOS V1  ", 8 ) != 0) {
 		return false;
 	}
-	ieWord tmp;
-	str->ReadWord(tmp);
-	size.w = tmp;
-	str->ReadWord(tmp);
-	size.h = tmp;
+	str->ReadSize(size);
 	str->ReadWord(Cols);
 	str->ReadWord(Rows);
 	str->ReadDword(BlockSize);

@@ -13,9 +13,6 @@ using namespace GemRB;
 
 void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 {
-	ieDword tmpDword;
-	ieWord tmpWord;
-
 	// FIXME
 	ieDword Width = spr->Frame.w;
 	ieDword Height = spr->Frame.h;
@@ -27,27 +24,15 @@ void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 
 	//always save in truecolor (24 bit), no palette
 	output->Write( filling, 2);
-	tmpDword = fullsize+BMP_HEADER_SIZE;  // FileSize
-	output->WriteDword(tmpDword);
-	tmpDword = 0;
-	output->WriteDword(tmpDword);       // ??
-	tmpDword = BMP_HEADER_SIZE;           // DataOffset
-	output->WriteDword(tmpDword);
-	tmpDword = 40;                        // Size
-	output->WriteDword(tmpDword);
+	output->WriteDword(fullsize + BMP_HEADER_SIZE); // FileSize
+	output->WriteDword(0);       // ??
+	output->WriteDword(BMP_HEADER_SIZE); // DataOffset
+	output->WriteDword(40);  // Size
 	output->WriteDword(Width);
 	output->WriteDword(Height);
-	tmpWord = 1;                          // Planes
-	output->WriteWord(tmpWord);
-	tmpWord = 24; //24 bits               // BitCount
-	output->WriteWord(tmpWord);
-	tmpDword = 0;                         // Compression
-	output->WriteDword(tmpDword);
-	output->WriteDword(tmpDword);       // ImageSize
-	output->WriteDword(tmpDword);
-	output->WriteDword(tmpDword);
-	output->WriteDword(tmpDword);
-	output->WriteDword(tmpDword);
+	output->WriteWord(1); // Planes
+	output->WriteWord(24); // BitCount
+	output->WriteFilling(24); // Compression
 
 	auto it = spr->GetIterator(IPixelIterator::Direction::Forward, IPixelIterator::Direction::Reverse);
 	for (unsigned int y=0;y<Height;y++) {

@@ -110,7 +110,6 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 
 Holder<ProjectileExtension> PROImporter::GetAreaExtension()
 {
-	ieWord tmp;
 	Holder<ProjectileExtension> e = MakeHolder<ProjectileExtension>();
 
 	str->ReadDword(e->AFlags);
@@ -128,17 +127,16 @@ Holder<ProjectileExtension> PROImporter::GetAreaExtension()
 	str->Read( &e->ExplType,1 );
 	str->ReadWord(e->ExplColor);
 	//this index is off by one in the .pro files, consolidating it here
-	str->ReadWord(tmp);
-	if (tmp) {
-		tmp--;
+	str->ReadWord(e->ExplProjIdx);
+	if (e->ExplProjIdx) {
+		--e->ExplProjIdx;
 	}
-	e->ExplProjIdx = tmp;
 
 	str->ReadResRef( e->VVCRes );
-	str->ReadWord(tmp);
+	str->ReadWord(e->ConeWidth);
 	//limit the cone width to 359 degrees (for full compatibility)
-	e->ConeWidth = tmp > 359 ? 359 : tmp;
-	str->ReadWord(tmp); // padding
+	e->ConeWidth = e->ConeWidth > 359 ? 359 : e->ConeWidth;
+	str->Seek(2, GEM_CURRENT_POS); // padding
 
 	//These are GemRB specific, not used in the original engine
 	// bg2 has 216 bytes of reserved space here instead

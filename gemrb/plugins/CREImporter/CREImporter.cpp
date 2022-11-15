@@ -522,39 +522,39 @@ void CREImporter::SetupSlotCounts()
 void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 {
 	char Signature[8];
-	ieDword tmpDword, CRESize;
-	ieWord tmpWord;
+	ieDword CRESize;
+	ieDword hdrSize = 0;
 
 	CRESize = GetStoredFileSize (act);
 	switch (CREVersion) {
 		case CREVersion::V9_0: // iwd/HoW
 			memcpy(Signature, "CHR V1.0",8);
-			tmpDword = 0x64; //headersize
+			hdrSize = 0x64; //headersize
 			TotSCEFF = 1;
 			break;
 		case CREVersion::V1_0: // bg1
 			memcpy(Signature, "CHR V1.0",8);
-			tmpDword = 0x64; //headersize
+			hdrSize = 0x64; //headersize
 			TotSCEFF = 0;
 			break;
 		case CREVersion::V1_1: // bg2 (fake)
 			memcpy(Signature, "CHR V2.0",8);
-			tmpDword = 0x64; //headersize
+			hdrSize = 0x64; //headersize
 			TotSCEFF = 1;
 			break;
 		case CREVersion::V1_2: // pst
 			memcpy(Signature, "CHR V1.2",8);
-			tmpDword = 0x68; //headersize
+			hdrSize = 0x68; //headersize
 			TotSCEFF = 0;
 			break;
 		case CREVersion::V2_2: // iwd2
 			memcpy(Signature, "CHR V2.2",8);
-			tmpDword = 0x21c; //headersize
+			hdrSize = 0x21c; //headersize
 			TotSCEFF = 1;
 			break;
 		case CREVersion::GemRB: // own format
 			memcpy(Signature, "CHR V0.0",8);
-			tmpDword = 0x1dc; //headersize (iwd2-9x8+8)
+			hdrSize = 0x1dc; //headersize (iwd2-9x8+8)
 			TotSCEFF = 1;
 			break;
 		default:
@@ -564,17 +564,15 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 	stream->Write( Signature, 8);
 	std::string tmpstr = MBStringFromString(act->GetShortName());
 	stream->WriteVariable(ieVariable(tmpstr));
-	stream->WriteDword(tmpDword); //cre offset (chr header size)
+	stream->WriteDword(hdrSize); //cre offset (chr header size)
 	stream->WriteDword(CRESize);  //cre size
 
 	SetupSlotCounts();
 	for (int i = 0; i < QWPCount; i++) {
-		tmpWord = act->PCStats->QuickWeaponSlots[i];
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(act->PCStats->QuickWeaponSlots[i]);
 	}
 	for (int i = 0; i < QWPCount; i++) {
-		tmpWord = act->PCStats->QuickWeaponHeaders[i];
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(act->PCStats->QuickWeaponHeaders[i]);
 	}
 	for (int i = 0; i < QSPCount; i++) {
 		stream->WriteResRef (act->PCStats->QuickSpells[i]);
@@ -591,12 +589,10 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 		stream->Write( filling, 10);
 	}
 	for (int i = 0; i < QITCount; i++) {
-		tmpWord = act->PCStats->QuickItemSlots[i];
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(act->PCStats->QuickItemSlots[i]);
 	}
 	for (int i = 0; i < QITCount; i++) {
-		tmpWord = act->PCStats->QuickItemHeaders[i];
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(act->PCStats->QuickItemHeaders[i]);
 	}
 	switch (CREVersion) {
 	case CREVersion::V2_2:
@@ -618,22 +614,16 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 		//fallthrough
 	case CREVersion::GemRB:
 		for (int i = 0; i < QSPCount; i++) {
-			tmpDword = act->PCStats->QSlots[i+3];
-			stream->WriteDword(tmpDword);
+			stream->WriteDword(act->PCStats->QSlots[i+3]);
 		}
-		for (int i = 0; i < 13; i++) {
-			stream->WriteWord(tmpWord);
-		}
+		stream->WriteFilling(26);
 		stream->WriteVariableLC(act->PCStats->SoundFolder);
 		stream->WriteResRef(act->PCStats->SoundSet);
 		for (const auto& setting : act->PCStats->ExtraSettings) {
 			stream->WriteDword(setting);
 		}
 		//Reserved
-		tmpDword = 0;
-		for (int i = 0; i < 16; i++) {
-			stream->WriteDword(tmpDword);
-		}
+		stream->WriteFilling(64);
 		break;
 	default:
 		break;
@@ -645,9 +635,6 @@ void CREImporter::ReadChrHeader(Actor *act)
 	ieVariable name;
 	char Signature[8];
 	ieDword offset, size;
-	ieDword tmpDword;
-	ieWord tmpWord;
-	ieByte tmpByte;
 
 	act->CreateStats();
 	str->Rewind();
@@ -663,27 +650,23 @@ void CREImporter::ReadChrHeader(Actor *act)
 	str->ReadDword(size);
 	SetupSlotCounts();
 	for (int i = 0; i < QWPCount; i++) {
-		str->ReadWord(tmpWord);
-		act->PCStats->QuickWeaponSlots[i]=tmpWord;
+		str->ReadScalar(act->PCStats->QuickWeaponSlots[i]);
 	}
 	for (int i = 0; i < QWPCount; i++) {
-		str->ReadWord(tmpWord);
-		act->PCStats->QuickWeaponHeaders[i]=tmpWord;
+		str->ReadScalar(act->PCStats->QuickWeaponHeaders[i]);
 	}
 	for (int i = 0; i < QSPCount; i++) {
 		str->ReadResRef (act->PCStats->QuickSpells[i]);
 	}
 	if (QSPCount==9) {
 		str->Read(act->PCStats->QuickSpellBookType, 9);
-		str->Read (&tmpByte, 1);
+		str->Seek(1, GEM_CURRENT_POS);
 	}
 	for (int i = 0; i < QITCount; i++) {
-		str->ReadWord(tmpWord);
-		act->PCStats->QuickItemSlots[i]=tmpWord;
+		str->ReadScalar(act->PCStats->QuickItemSlots[i]);
 	}
 	for (int i = 0; i < QITCount; i++) {
-		str->ReadWord(tmpWord);
-		act->PCStats->QuickItemHeaders[i]=tmpWord;
+		str->ReadScalar(act->PCStats->QuickItemHeaders[i]);
 	}
 
 	ResRef spell;
@@ -710,6 +693,9 @@ void CREImporter::ReadChrHeader(Actor *act)
 		//fallthrough
 	case CREVersion::GemRB:
 		for (int i = 0; i < QSPCount; i++) {
+			// FIXME: we are reading 4 bytes then suspiciously discarding 3 of them
+			// I wonder if those the bytes are supposed to fill in the 3 byte holes we are leaving in QSlots
+			ieDword tmpDword;
 			str->ReadDword(tmpDword);
 			act->PCStats->QSlots[i+3] = (ieByte) tmpDword;
 		}
@@ -856,15 +842,13 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	str->ReadDword(act->BaseStats[IE_XP]);
 	str->ReadDword(act->BaseStats[IE_GOLD]);
 	str->ReadDword(act->BaseStats[IE_STATE_ID]);
-	ieWord tmp;
 	ieWordSigned tmps;
 	str->ReadScalar(tmps);
 	act->BaseStats[IE_HITPOINTS]=(ieDwordSigned)tmps;
 	if (tmps <= 0 && ((ieDwordSigned) act->BaseStats[IE_XPVALUE]) < 0) {
 		act->BaseStats[IE_STATE_ID] |= STATE_DEAD;
 	}
-	str->ReadWord(tmp);
-	act->BaseStats[IE_MAXHITPOINTS]=tmp;
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_MAXHITPOINTS]);
 	str->ReadDword(act->BaseStats[IE_ANIMATION_ID]);//animID is a dword
 	ieByte tmp2[7];
 	str->Read( tmp2, 7);
@@ -945,91 +929,54 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 
 void CREImporter::GetActorPST(Actor *act)
 {
-	ieByte tmpByte;
-	ieWord tmpWord;
-
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_REPUTATION]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HIDEINSHADOWS]);
+	str->Seek(2, GEM_CURRENT_POS); // skipping a word
+	ieWordSigned tmpWord;
+	str->ReadScalar(tmpWord);
+	act->AC.SetNatural(tmpWord);
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACCRUSHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACMISSILEMOD]);
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACPIERCINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACSLASHINGMOD]);
+	ieByteSigned tmpByte;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_REPUTATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
-	str->ReadWord(tmpWord);
-	//skipping a word
-	str->ReadWord(tmpWord);
-	act->AC.SetNatural((ieWordSigned) tmpWord);
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACMISSILEMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACPIERCINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
-	str->Read( &tmpByte, 1 );
-	act->ToHit.SetBase((ieByteSigned) tmpByte);
+	act->ToHit.SetBase(tmpByte);
 	str->Read( &tmpByte, 1 );
 	tmpByte = tmpByte * 2;
 	if (tmpByte>10) tmpByte-=11;
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSWANDS]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSPOLY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSBREATH]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSSPELL]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTELECTRICITY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTACID]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGIC]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTSLASHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCRUSHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTPIERCING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMISSILE]=(ieByteSigned) tmpByte;
-	//this is used for unused prof points count
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_FREESLOTS]=tmpByte; //using another field than usually
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SETTRAPS]=tmpByte; //this is unused in pst
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LORE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LOCKPICKING]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STEALTH]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TRAPS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_PICKPOCKET]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_FATIGUE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_INTOXICATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSDEATH]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSWANDS]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSPOLY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSBREATH]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSSPELL]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTELECTRICITY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTACID]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGIC]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTSLASHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCRUSHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTPIERCING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMISSILE]); //this is used for unused prof points count
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FREESLOTS]); //using another field than usually
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SETTRAPS]); //this is unused in pst
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LORE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LOCKPICKING]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STEALTH]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRAPS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PICKPOCKET]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FATIGUE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INTOXICATION]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_LUCK]);
 	// last byte is actually an undead level (according to IE dev info) - IE_UNDEADLEVEL
 	for (int i = 0; i < 21; i++) {
-		str->Read( &tmpByte, 1 );
-		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
+		str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PROFICIENCYBASTARDSWORD + i]);
 	}
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TRACKING]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRACKING]);
 	//scriptname of tracked creature (according to IE dev info)
 	str->Seek( 32, GEM_CURRENT_POS );
 	for (auto& ref : act->StrRefs) {
@@ -1085,8 +1032,7 @@ void CREImporter::GetActorPST(Actor *act)
 	str->ReadDword(act->BaseStats[IE_XP_MAGE]); // Exp for secondary class
 	str->ReadDword(act->BaseStats[IE_XP_THIEF]); // Exp for tertiary class
 	for (int i = 0; i < 10; i++) {
-		str->ReadWord(tmpWord);
-		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
+		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_INTERNAL_0 + i]);
 	}
 	//good, law, lady, murder
 	for (auto& counter : act->DeathCounters) {
@@ -1105,8 +1051,7 @@ void CREImporter::GetActorPST(Actor *act)
 
 	// just overwrite the bg1 color stat range, since it's not used in pst
 	for (int i = 0; i < 7; i++) {
-		str->ReadWord(tmpWord);
-		act->BaseStats[IE_COLORS+i] = tmpWord;
+		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_COLORS + i]);
 	}
 	act->BaseStats[IE_COLORCOUNT] = tmpByte;
 	str->Read(act->pstColorBytes, 10); // color location in IESDP, sort of a palette index and flags
@@ -1299,85 +1244,50 @@ Effect *CREImporter::GetEffect()
 
 ieDword CREImporter::GetActorGemRB(Actor *act)
 {
-	ieByte tmpByte;
-	ieWord tmpWord;
-
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_REPUTATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_REPUTATION]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HIDEINSHADOWS]);
 	//skipping a word( useful for something)
-	str->ReadWord(tmpWord);
-	str->ReadWord(tmpWord);
-	act->AC.SetNatural((ieWordSigned) tmpWord);
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACMISSILEMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACPIERCINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
-	str->Read( &tmpByte, 1 );
-	act->ToHit.SetBase((ieByteSigned) tmpByte);
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSWANDS]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSPOLY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSBREATH]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSSPELL]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTELECTRICITY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTACID]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGIC]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTSLASHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCRUSHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTPIERCING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMISSILE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_DETECTILLUSIONS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SETTRAPS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LORE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LOCKPICKING]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STEALTH]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TRAPS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_PICKPOCKET]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_FATIGUE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_INTOXICATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
+	str->Seek(2, GEM_CURRENT_POS);
+	ieWordSigned tmpWord;
+	str->ReadScalar(tmpWord);
+	act->AC.SetNatural(tmpWord);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACCRUSHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACMISSILEMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACPIERCINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACSLASHINGMOD]);
+	ieByteSigned tmpByte;
+	str->ReadScalar(tmpByte);
+	act->ToHit.SetBase(tmpByte);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_NUMBEROFATTACKS]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSDEATH]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSWANDS]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSPOLY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSBREATH]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSSPELL]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTELECTRICITY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTACID]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGIC]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTSLASHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCRUSHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTPIERCING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMISSILE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DETECTILLUSIONS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SETTRAPS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LORE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LOCKPICKING]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STEALTH]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRAPS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PICKPOCKET]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FATIGUE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INTOXICATION]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_LUCK]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRACKING]);
 	//these could be used to save iwd2 skills
 	//TODO: gemrb format
-	act->BaseStats[IE_TRACKING]=tmpByte;
 	for (ieStrRef& StrRef : act->StrRefs) {
 		str->ReadStrRef(StrRef);
 	}
@@ -1386,128 +1296,79 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 
 void CREImporter::GetActorBG(Actor *act)
 {
-	ieByte tmpByte;
-	ieWord tmpWord;
-
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_REPUTATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
-	str->ReadWord(tmpWord);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_REPUTATION]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HIDEINSHADOWS]);
+	ieWordSigned tmpWord;
+	str->ReadScalar(tmpWord);
 	//skipping a word, labeled ArmorClass vs ArmorClassBase, so probably just the last computed value and thus useless
-	str->ReadWord(tmpWord);
-	act->AC.SetNatural((ieWordSigned) tmpWord);
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACMISSILEMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACPIERCINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
+	str->ReadScalar(tmpWord);
+	act->AC.SetNatural(tmpWord);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACCRUSHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACMISSILEMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACPIERCINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACSLASHINGMOD]);
+	ieByteSigned tmpByte;
 	str->Read( &tmpByte, 1 );
-	act->ToHit.SetBase((ieByteSigned) tmpByte);
+	act->ToHit.SetBase(tmpByte);
 	str->Read( &tmpByte, 1 );
 	tmpWord = tmpByte * 2;
 	if (tmpWord>10) tmpWord-=11;
 	act->BaseStats[IE_NUMBEROFATTACKS]=(ieByte) tmpWord;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSWANDS]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSPOLY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSBREATH]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSSPELL]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTELECTRICITY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTACID]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGIC]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTSLASHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCRUSHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTPIERCING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMISSILE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_DETECTILLUSIONS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SETTRAPS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LORE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LOCKPICKING]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STEALTH]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TRAPS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_PICKPOCKET]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_FATIGUE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_INTOXICATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSDEATH]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSWANDS]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSPOLY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSBREATH]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSSPELL]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTELECTRICITY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTACID]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGIC]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTSLASHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCRUSHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTPIERCING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMISSILE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DETECTILLUSIONS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SETTRAPS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LORE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LOCKPICKING]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STEALTH]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRAPS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PICKPOCKET]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FATIGUE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INTOXICATION]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_LUCK]);
 	for (int i = 0; i < 21; i++) {
-		str->Read( &tmpByte, 1 );
-		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
+		str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]);
 	}
 
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TRACKING]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRACKING]);
 	str->Seek( 32, GEM_CURRENT_POS );
 	for (auto& ref : act->StrRefs) {
 		str->ReadStrRef(ref);
 	}
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL2]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL3]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL2]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL3]);
 	//this is IE_SEX, but we use the gender field for this
-	str->Read( &tmpByte, 1);
+	str->ReadScalar(tmpByte);
 	//skipping a byte
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_STR]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_STREXTRA]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_INT]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_WIS]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_DEX]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_CON]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_CHR]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_MORALE]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_MORALEBREAK]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_HATEDRACE]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
-	str->Read( &tmpByte, 1);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STREXTRA]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INT]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_WIS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DEX]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CON]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CHR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALEBREAK]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HATEDRACE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALERECOVERYTIME]);
 	//skipping a byte, labeled MageSpecUpperWorld, while kit was MageSpecialization
-	str->ReadDword(act->BaseStats[IE_KIT]);
+	str->ReadScalar(tmpByte);
+	str->ReadScalar<Actor::stat_t, ieDword>(act->BaseStats[IE_KIT]);
 	act->BaseStats[IE_KIT] = ((act->BaseStats[IE_KIT] & 0xffff) << 16) +
 		((act->BaseStats[IE_KIT] & 0xffff0000) >> 16);
 	ReadScript(act, SCR_OVERRIDE);
@@ -1516,21 +1377,14 @@ void CREImporter::GetActorBG(Actor *act)
 	ReadScript(act, SCR_GENERAL);
 	ReadScript(act, SCR_DEFAULT);
 
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_EA]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_GENERAL]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_RACE]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_CLASS]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_SPECIFIC]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_SEX]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_EA]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_GENERAL]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_RACE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CLASS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECIFIC]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEX]);
 	str->Seek(5, GEM_CURRENT_POS); // 5x SpecialCase in bg2/ee
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_ALIGNMENT]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALIGNMENT]);
 	str->Seek(4, GEM_CURRENT_POS); // dword labeled Instance
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
@@ -1559,7 +1413,6 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 	ieDword spellindex;
 	ieDword totalcount;
 	ieDword memocount;
-	ieDword tmpDword;
 
 	int i = count;
 	CRESpellMemorization* sm = act->spellbook.GetSpellMemorization(type, level);
@@ -1568,7 +1421,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		str->ReadDword(spellindex);
 		str->ReadDword(totalcount);
 		str->ReadDword(memocount);
-		str->ReadDword(tmpDword);
+		str->Seek(4, GEM_CURRENT_POS);
 		const ResRef& tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
 		if (tmp.IsEmpty()) {
 			error("CREImporter", "Unresolved spell index: {} level:{}, type: {}",
@@ -1601,6 +1454,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 	}
 	// hacks for domain spells, since their count is not stored and also always 1
 	// NOTE: luckily this does not cause save game incompatibility
+	ieDword tmpDword;
 	str->ReadDword(tmpDword);
 	if (type == IE_IWD2_SPELL_DOMAIN && count > 0) {
 		sm->SlotCount = 1;
@@ -1617,89 +1471,54 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 
 void CREImporter::GetActorIWD2(Actor *act)
 {
-	ieByte tmpByte;
-	ieWord tmpWord;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_REPUTATION]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HIDEINSHADOWS]);
 
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_REPUTATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
-	str->ReadWord(tmpWord);
-	act->AC.SetNatural((ieWordSigned) tmpWord);
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACMISSILEMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACPIERCINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
-	str->Read( &tmpByte, 1 );
-	act->ToHit.SetBase((ieByteSigned) tmpByte);//Unknown in CRE V2.2
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;//Unknown in CRE V2.2
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;//Fortitude Save in V2.2
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSWANDS]=(ieByteSigned) tmpByte;//Reflex Save in V2.2
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSPOLY]=(ieByteSigned) tmpByte;// will Save in V2.2
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTELECTRICITY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTACID]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGIC]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTSLASHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCRUSHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTPIERCING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMISSILE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MAGICDAMAGERESISTANCE]=(ieByteSigned) tmpByte;
+	ieWordSigned tmpWord;
+	str->ReadScalar(tmpWord);
+	act->AC.SetNatural(tmpWord);
+	
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACCRUSHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACMISSILEMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACPIERCINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACSLASHINGMOD]);
+	
+	ieByteSigned tmpByte;
+	str->ReadScalar(tmpByte);
+	act->ToHit.SetBase(tmpByte);//Unknown in CRE V2.2
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_NUMBEROFATTACKS]); //Unknown in CRE V2.2
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSDEATH]); //Fortitude Save in V2.2
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSWANDS]); //Reflex Save in V2.2
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSPOLY]); // will Save in V2.2
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTELECTRICITY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTACID]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGIC]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTSLASHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCRUSHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTPIERCING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMISSILE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_MAGICDAMAGERESISTANCE]);
 	str->Seek( 4, GEM_CURRENT_POS );
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_FATIGUE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_INTOXICATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FATIGUE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INTOXICATION]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_LUCK]);
 	str->Seek( 34, GEM_CURRENT_POS ); //unknowns
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_CLASSLEVELSUM]=tmpByte; //total levels
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELBARBARIAN]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELBARD]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELCLERIC]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELDRUID]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELFIGHTER]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELMONK]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELPALADIN]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELRANGER]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELTHIEF]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELSORCERER]=tmpByte;
-	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELMAGE]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CLASSLEVELSUM]); //total levels
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELBARBARIAN]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELBARD]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELCLERIC]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELDRUID]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELFIGHTER]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELMONK]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELPALADIN]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELRANGER]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELTHIEF]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELSORCERER]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELMAGE]);
 	str->Seek( 22, GEM_CURRENT_POS ); //levels for classes
 	for (int i = 0; i < 64; i++) {
 		str->ReadStrRef(act->StrRefs[i]);
@@ -1713,78 +1532,49 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->Seek( 12, GEM_CURRENT_POS );
 	//proficiencies
 	for (int i = 0; i < 26; i++) {
-		str->Read( &tmpByte, 1);
-		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
+		str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PROFICIENCYBASTARDSWORD + i]);
 	}
 	//skills
 	str->Seek( 38, GEM_CURRENT_POS );
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_ALCHEMY]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_ANIMALS]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_BLUFF]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_CONCENTRATION]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_DIPLOMACY]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_TRAPS]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_INTIMIDATE]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_LORE]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_STEALTH]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_LOCKPICKING]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_PICKPOCKET]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_SEARCH]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_SPELLCRAFT]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_MAGICDEVICE]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_TRACKING]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALCHEMY]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ANIMALS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_BLUFF]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CONCENTRATION]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DIPLOMACY]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRAPS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HIDEINSHADOWS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INTIMIDATE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LORE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STEALTH]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LOCKPICKING]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PICKPOCKET]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEARCH]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPELLCRAFT]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MAGICDEVICE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRACKING]);
 	str->Seek( 50, GEM_CURRENT_POS );
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_CR]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_HATEDRACE]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HATEDRACE]);
 	//we got 7 more hated races
 	for (int i = 0; i < 7; i++) {
-		str->Read( &tmpByte, 1 );
-		act->BaseStats[IE_HATEDRACE2+i]=tmpByte;
+		str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HATEDRACE2 + i]);
 	}
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SUBRACE]=tmpByte;
-	str->ReadWord(tmpWord);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SUBRACE]);
 	//skipping 2 bytes, one is SEX (could use it for sounds)
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STR]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_INT]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_WIS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_DEX]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_CON]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_CHR]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALEBREAK]=tmpByte;
-	str->Read( &tmpByte, 1 );
+	str->ReadScalar(tmpWord);
+	
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INT]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_WIS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DEX]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CON]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CHR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALEBREAK]);
 	//HatedRace is a list of races, so this is skipped here
+	str->Seek(1, GEM_CURRENT_POS);
 	//act->BaseStats[IE_HATEDRACE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALERECOVERYTIME]);
 	//No KIT word order magic for IWD2
 	str->ReadDword(act->BaseStats[IE_KIT]);
 	ReadScript(act, SCR_OVERRIDE);
@@ -1793,16 +1583,12 @@ void CREImporter::GetActorIWD2(Actor *act)
 	ReadScript(act, SCR_GENERAL);
 	ReadScript(act, SCR_DEFAULT);
 	//new scripting flags, one on each byte
-	str->Read( &tmpByte, 1); //hidden
-	if (tmpByte) {
-		act->BaseStats[IE_AVATARREMOVAL]=tmpByte;
-	}
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_AVATARREMOVAL]); //hidden
 	str->Read( &act->SetDeathVar, 1); //set death variable
 	str->Read( &act->IncKillCount, 1); //increase kill count
 	str->Read( &act->UnknownField, 1);
 	for (int i = 0; i < 5; i++) {
-		str->ReadWord(tmpWord);
-		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
+		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_INTERNAL_0 + i]);
 	}
 	ieVariable KillVar;
 	str->ReadVariable(KillVar);
@@ -1810,39 +1596,26 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->ReadVariable(KillVar);
 	act->IncKillVar = MakeVariable(KillVar);
 	str->Seek( 2, GEM_CURRENT_POS);
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_SAVEDXPOS] = tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_SAVEDYPOS] = tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_SAVEDFACE] = tmpWord;
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDXPOS]);
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDYPOS]);
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDFACE]);
 
 	str->Seek( 15, GEM_CURRENT_POS );
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_TRANSLUCENT]=tmpByte;
-	str->Read( &tmpByte, 1); //fade speed
-	str->Read( &tmpByte, 1); //spec. flags
-	act->BaseStats[IE_SPECFLAGS] = tmpByte;
-	str->Read( &tmpByte, 1); //invisible
-	str->ReadWord(tmpWord); //unknown
-	str->Read( &tmpByte, 1); //unused skill points
-	act->BaseStats[IE_UNUSED_SKILLPTS] = tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRANSLUCENT]);
+	str->ReadScalar(tmpByte); //fade speed
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECFLAGS]); //spec. flags
+	str->ReadScalar(tmpByte); //invisible
+	str->ReadScalar(tmpWord); //unknown
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_UNUSED_SKILLPTS]); //unused skill points
 	str->Seek( 124, GEM_CURRENT_POS );
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_EA]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_GENERAL]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_RACE]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_CLASS]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_SPECIFIC]=tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_SEX]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_EA]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_GENERAL]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_RACE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CLASS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECIFIC]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEX]);
 	str->Seek( 5, GEM_CURRENT_POS ); // object.ids references that we don't save
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_ALIGNMENT]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALIGNMENT]);
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
@@ -1912,126 +1685,76 @@ void CREImporter::GetActorIWD2(Actor *act)
 
 void CREImporter::GetActorIWD1(Actor *act) //9.0
 {
-	ieByte tmpByte;
-	ieWord tmpWord;
-
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_REPUTATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
-	str->ReadWord(tmpWord);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_REPUTATION]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HIDEINSHADOWS]);
 	//skipping a word
-	str->ReadWord(tmpWord);
-	act->AC.SetNatural((ieWordSigned) tmpWord);
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACMISSILEMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACPIERCINGMOD]=(ieWordSigned) tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
+	str->Seek(2, GEM_CURRENT_POS);
+	ieWordSigned tmpWord;
+	str->ReadScalar(tmpWord);
+	act->AC.SetNatural(tmpWord);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACCRUSHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACMISSILEMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACPIERCINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACSLASHINGMOD]);
+
+	ieByteSigned tmpByte;
 	str->Read( &tmpByte, 1 );
-	act->ToHit.SetBase((ieByteSigned) tmpByte);
+	act->ToHit.SetBase(tmpByte);
 	str->Read( &tmpByte, 1 );
 	tmpByte = tmpByte * 2;
 	if (tmpByte>10) tmpByte-=11;
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSWANDS]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSPOLY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSBREATH]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SAVEVSSPELL]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTELECTRICITY]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTACID]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGIC]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICFIRE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMAGICCOLD]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTSLASHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTCRUSHING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTPIERCING]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RESISTMISSILE]=(ieByteSigned) tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_DETECTILLUSIONS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SETTRAPS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LORE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LOCKPICKING]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STEALTH]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TRAPS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_PICKPOCKET]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_FATIGUE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_INTOXICATION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LUCK]=(ieByteSigned) tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSDEATH]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSWANDS]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSPOLY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSBREATH]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSSPELL]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTELECTRICITY]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTACID]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGIC]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICFIRE]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMAGICCOLD]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTSLASHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCRUSHING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTPIERCING]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMISSILE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DETECTILLUSIONS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SETTRAPS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LORE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LOCKPICKING]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STEALTH]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRAPS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PICKPOCKET]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FATIGUE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INTOXICATION]);
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_LUCK]);
 	for (int i = 0; i < 21; i++) {
-		str->Read( &tmpByte, 1 );
-		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
+		str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PROFICIENCYBASTARDSWORD + i]);
 	}
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TRACKING]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRACKING]);
 	str->Seek( 32, GEM_CURRENT_POS );
 	for (auto& ref : act->StrRefs) {
 		str->ReadStrRef(ref);
 	}
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL2]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL3]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL2]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL3]);
 	//this is rumoured to be IE_SEX, but we use the gender field for this
-	str->Read( &tmpByte, 1 );
-	//skipping a byte
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STR]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STREXTRA]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_INT]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_WIS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_DEX]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_CON]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_CHR]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALEBREAK]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_HATEDRACE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	//skipping a byte
+	str->ReadScalar(tmpByte); //skipping a byte
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STREXTRA]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INT]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_WIS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DEX]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CON]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CHR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALEBREAK]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HATEDRACE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALERECOVERYTIME]);
+	str->ReadScalar(tmpByte); //skipping a byte
 	str->ReadDword(act->BaseStats[IE_KIT]);
 	act->BaseStats[IE_KIT] = ((act->BaseStats[IE_KIT] & 0xffff) << 16) +
 		((act->BaseStats[IE_KIT] & 0xffff0000) >> 16);
@@ -2049,8 +1772,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	str->Read( &act->IncKillCount, 1); //increase kill count
 	str->Read( &act->UnknownField, 1);
 	for (int i = 0; i < 5; i++) {
-		str->ReadWord(tmpWord);
-		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
+		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_INTERNAL_0 + i]);
 	}
 	ieVariable KillVar;
 	str->ReadVariable(KillVar); // use these as needed
@@ -2058,28 +1780,18 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	str->ReadVariable(KillVar);
 	act->IncKillVar = MakeVariable(KillVar);
 	str->Seek( 2, GEM_CURRENT_POS);
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_SAVEDXPOS] = tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_SAVEDYPOS] = tmpWord;
-	str->ReadWord(tmpWord);
-	act->BaseStats[IE_SAVEDFACE] = tmpWord;
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDXPOS]);
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDYPOS]);
+	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDFACE]);
 	str->Seek( 18, GEM_CURRENT_POS );
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_EA] = tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_GENERAL] = tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_RACE] = tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_CLASS] = tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_SPECIFIC] = tmpByte;
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_SEX] = tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_EA]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_GENERAL]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_RACE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CLASS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECIFIC]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEX]);
 	str->Seek( 5, GEM_CURRENT_POS );
-	str->Read( &tmpByte, 1);
-	act->BaseStats[IE_ALIGNMENT]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALIGNMENT]);
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
@@ -2207,8 +1919,6 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 
 int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned int size) const
 {
-	ieDword tmpDword;
-	ieWord tmpWord;
 	ieWord ItemCount = 0;
 	std::vector<ieWord> indices(size, -1);
 
@@ -2222,10 +1932,8 @@ int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned i
 		stream->WriteWord(indices[i]);
 	}
 
-	tmpWord = (ieWord) actor->inventory.GetEquipped();
-	stream->WriteWord(tmpWord);
-	tmpWord = (ieWord) actor->inventory.GetEquippedHeader();
-	stream->WriteWord(tmpWord);
+	stream->WriteWord(actor->inventory.GetEquipped());
+	stream->WriteWord(actor->inventory.GetEquippedHeader());
 
 	for (unsigned int i = 0; i < size; i++) {
 		//ignore first element, getinventorysize makes space for fist
@@ -2239,7 +1947,7 @@ int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned i
 		stream->WriteWord(it->Usages[0]);
 		stream->WriteWord(it->Usages[1]);
 		stream->WriteWord(it->Usages[2]);
-		tmpDword = it->Flags;
+		ieDword tmpDword = it->Flags;
 		//IWD uses this bit differently
 		if (core->HasFeature(GF_MAGICBIT)) {
 			if (it->Flags&IE_INV_ITEM_MAGICAL) {
@@ -2256,9 +1964,6 @@ int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned i
 int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 {
 	char Signature[8];
-	ieByte tmpByte;
-	ieWord tmpWord;
-	ieDword tmpDword;
 
 	memcpy( Signature, "CRE V0.0", 8);
 	Signature[5]+=CREVersion/10;
@@ -2273,13 +1978,12 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->WriteDword(actor->BaseStats[IE_XP]);
 	stream->WriteDword(actor->BaseStats[IE_GOLD]);
 	stream->WriteDword(actor->BaseStats[IE_STATE_ID]);
-	tmpWord = actor->BaseStats[IE_HITPOINTS];
+	ieWord tmpWord = actor->BaseStats[IE_HITPOINTS];
 	//decrease the hp back to the one without constitution bonus
 	// (but only player classes can have it)
 	tmpWord = (ieWord) (tmpWord - actor->GetHpAdjustment(actor->GetXPLevel(false), false));
 	stream->WriteWord(tmpWord);
-	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
-	stream->WriteWord(tmpWord);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_MAXHITPOINTS]);
 	stream->WriteDword(actor->BaseStats[IE_ANIMATION_ID]);
 	for (int i = 0; i < 7; i++) {
 		Signature[i] = (char) actor->BaseStats[IE_COLORS+i];
@@ -2289,10 +1993,8 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->Write( Signature, 8);
 	stream->WriteResRef( actor->SmallPortrait);
 	stream->WriteResRef( actor->LargePortrait);
-	tmpByte = actor->BaseStats[IE_REPUTATION];
-	stream->Write( &tmpByte, 1 );
-	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
-	stream->Write( &tmpByte, 1 );
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_REPUTATION]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HIDEINSHADOWS]);
 	//from here it differs, slightly
 	tmpWord = actor->AC.GetNatural();
 	stream->WriteWord(tmpWord);
@@ -2302,90 +2004,55 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		tmpWord = actor->AC.GetNatural();
 		stream->WriteWord(tmpWord);
 	}
-	tmpWord = actor->BaseStats[IE_ACCRUSHINGMOD];
-	stream->WriteWord(tmpWord);
-	tmpWord = actor->BaseStats[IE_ACMISSILEMOD];
-	stream->WriteWord(tmpWord);
-	tmpWord = actor->BaseStats[IE_ACPIERCINGMOD];
-	stream->WriteWord(tmpWord);
-	tmpWord = actor->BaseStats[IE_ACSLASHINGMOD];
-	stream->WriteWord(tmpWord);
-	tmpByte = actor->ToHit.GetBase();
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACCRUSHINGMOD]);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACMISSILEMOD]);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACPIERCINGMOD]);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACSLASHINGMOD]);
+	stream->WriteScalar<int, ieByte>(actor->ToHit.GetBase());
+	ieByte tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
 	if (actor->creVersion == CREVersion::V2_2) {
 		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SAVEFORTITUDE];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SAVEREFLEX];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SAVEWILL];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEFORTITUDE]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEREFLEX]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEWILL]);
 	} else {
 		if (actor->creVersion != CREVersion::GemRB) {
 			if (tmpByte&1) tmpByte = tmpByte/2+6;
 			else tmpByte /=2;
 		}
 		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SAVEVSDEATH];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SAVEVSWANDS];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SAVEVSPOLY];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SAVEVSBREATH];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SAVEVSSPELL];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEVSDEATH]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEVSWANDS]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEVSPOLY]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEVSBREATH]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEVSSPELL]);
 	}
-	tmpByte = actor->BaseStats[IE_RESISTFIRE];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTCOLD];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTELECTRICITY];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTACID];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTMAGIC];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTMAGICFIRE];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTMAGICCOLD];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTSLASHING];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTCRUSHING];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTPIERCING];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RESISTMISSILE];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTFIRE]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTCOLD]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTELECTRICITY]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTACID]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTMAGIC]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTMAGICFIRE]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTMAGICCOLD]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTSLASHING]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTCRUSHING]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTPIERCING]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTMISSILE]);
 	if (actor->creVersion == CREVersion::V2_2) {
-		tmpByte = actor->BaseStats[IE_MAGICDAMAGERESISTANCE];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MAGICDAMAGERESISTANCE]);
 		stream->Write( Signature, 4);
 	} else {
-		tmpByte = actor->BaseStats[IE_DETECTILLUSIONS];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SETTRAPS];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LORE];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LOCKPICKING];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_STEALTH];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_TRAPS];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_PICKPOCKET];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DETECTILLUSIONS]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SETTRAPS]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LORE]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LOCKPICKING]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STEALTH]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TRAPS]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_PICKPOCKET]);
 	}
-	tmpByte = actor->BaseStats[IE_FATIGUE];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_INTOXICATION];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_LUCK];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_FATIGUE]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_INTOXICATION]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LUCK]);
 
 	if (actor->creVersion == CREVersion::V2_2) {
 		//this is rather fuzzy
@@ -2394,30 +2061,18 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		stream->Write(&tmpByte, 1);
 		stream->WriteFilling(33);
 		//total levels
-		tmpByte = actor->BaseStats[IE_CLASSLEVELSUM];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELBARBARIAN];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELBARD];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELCLERIC];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELDRUID];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELFIGHTER];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELMONK];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELPALADIN];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELRANGER];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELTHIEF];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELSORCERER];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVELMAGE];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASSLEVELSUM]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELBARBARIAN]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELBARD]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELCLERIC]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELDRUID]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELFIGHTER]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELMONK]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELPALADIN]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELRANGER]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELTHIEF]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELSORCERER]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELMAGE]);
 		//some stuffing
 		stream->WriteFilling(22);
 		//string references
@@ -2435,90 +2090,59 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		stream->WriteFilling(12);
 		//proficiencies
 		for (int i = 0; i < 26; i++) {
-			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
-			stream->Write( &tmpByte, 1);
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_PROFICIENCYBASTARDSWORD + i]);
 		}
 		stream->WriteFilling(38);
 		//alchemy
-		tmpByte = actor->BaseStats[IE_ALCHEMY];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALCHEMY]);
 		//animals
-		tmpByte = actor->BaseStats[IE_ANIMALS];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ANIMALS]);
 		//bluff
-		tmpByte = actor->BaseStats[IE_BLUFF];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_BLUFF]);
 		//concentration
-		tmpByte = actor->BaseStats[IE_CONCENTRATION];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CONCENTRATION]);
 		//diplomacy
-		tmpByte = actor->BaseStats[IE_DIPLOMACY];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DIPLOMACY]);
 		//disarm trap
-		tmpByte = actor->BaseStats[IE_TRAPS];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TRAPS]);
 		//hide
-		tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HIDEINSHADOWS]);
 		//intimidate
-		tmpByte = actor->BaseStats[IE_INTIMIDATE];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_INTIMIDATE]);
 		//lore
-		tmpByte = actor->BaseStats[IE_LORE];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LORE]);
 		//move silently
-		tmpByte = actor->BaseStats[IE_STEALTH];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STEALTH]);
 		//open lock
-		tmpByte = actor->BaseStats[IE_LOCKPICKING];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LOCKPICKING]);
 		//pickpocket
-		tmpByte = actor->BaseStats[IE_PICKPOCKET];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_PICKPOCKET]);
 		//search
-		tmpByte = actor->BaseStats[IE_SEARCH];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEARCH]);
 		//spellcraft
-		tmpByte = actor->BaseStats[IE_SPELLCRAFT];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPELLCRAFT]);
 		//use magic device
-		tmpByte = actor->BaseStats[IE_MAGICDEVICE];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MAGICDEVICE]);
 		//tracking
-		tmpByte = actor->BaseStats[IE_TRACKING];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TRACKING]);
 		stream->WriteFilling(50);
-		tmpByte = actor->BaseStats[IE_CR];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_HATEDRACE];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CR]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HATEDRACE]);
 		for (int i = 0; i < 7; i++) {
-			tmpByte = actor->BaseStats[IE_HATEDRACE2+i];
-			stream->Write( &tmpByte, 1);
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HATEDRACE2 + i]);
 		}
-		tmpByte = actor->BaseStats[IE_SUBRACE];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SUBRACE]);
 		stream->WriteFilling(1); //unknown
-		tmpByte = actor->BaseStats[IE_SEX]; //
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_STR];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_INT];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_WIS];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_DEX];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_CON];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_CHR];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_MORALE];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_MORALEBREAK];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STR]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_INT]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_WIS]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DEX]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CON]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CHR]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALE]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALEBREAK]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALERECOVERYTIME]);
 		// unknown byte
 		stream->WriteFilling(1);
 		// no kit word order magic for iwd2
@@ -2530,48 +2154,31 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		stream->WriteResRef( actor->GetScript(SCR_DEFAULT) );
 	} else {
 		for (int i = 0; i < 21; i++) {
-			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
-			stream->Write( &tmpByte, 1);
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_PROFICIENCYBASTARDSWORD + i]);
 		}
-		tmpByte = actor->BaseStats[IE_TRACKING];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TRACKING]);
 		stream->WriteFilling(32);
 		for (const auto& ref : actor->StrRefs) {
 			stream->WriteStrRef(ref);
 		}
-		tmpByte = actor->BaseStats[IE_LEVEL];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVEL2];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_LEVEL3];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_SEX]; //
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_STR];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_STREXTRA];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_INT];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_WIS];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_DEX];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_CON];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_CHR];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_MORALE];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_MORALEBREAK];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_HATEDRACE];
-		stream->Write( &tmpByte, 1);
-		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL2]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL3]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STR]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STREXTRA]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_INT]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_WIS]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DEX]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CON]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CHR]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALE]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALEBREAK]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HATEDRACE]);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALERECOVERYTIME]);
 		// unknown byte
 		stream->WriteFilling(1);
-		tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
+		ieDword tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
 			((actor->BaseStats[IE_KIT] & 0xffff0000) >> 16);
 		stream->WriteDword(tmpDword);
 		stream->WriteResRef( actor->GetScript(SCR_OVERRIDE) );
@@ -2586,23 +2193,15 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 
 int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize) const
 {
-	ieByte tmpByte;
 	//similar in all engines
-	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_EA]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_GENERAL]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RACE]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASS]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECIFIC]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
-	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteDword(InvSize); //saving the inventory size to this unused part
 	stream->WriteVariable(actor->GetScriptName());
 	return 0;
@@ -2610,23 +2209,15 @@ int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword I
 
 int CREImporter::PutActorBG(DataStream *stream, const Actor *actor) const
 {
-	ieByte tmpByte;
 	//similar in all engines
-	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_EA]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_GENERAL]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RACE]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASS]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECIFIC]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
-	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
 	stream->WriteVariable(actor->GetScriptName());
 	return 0;
@@ -2634,54 +2225,38 @@ int CREImporter::PutActorBG(DataStream *stream, const Actor *actor) const
 
 int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 {
-	ieByte tmpByte;
-	ieWord tmpWord;
-
 	stream->WriteFilling(44); //11*4 totally unknown
 	stream->WriteDword(actor->BaseStats[IE_XP_MAGE]);
 	stream->WriteDword(actor->BaseStats[IE_XP_THIEF]);
 	for (int i = 0; i < 10; i++) {
-		tmpWord = actor->BaseStats[IE_INTERNAL_0];
-		stream->WriteWord(tmpWord);
+		// uh FIXME? shouldnt this be IE_INTERNAL_0 + i
+		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_INTERNAL_0]);
 	}
 	for (const auto& counter : actor->DeathCounters) {
-		tmpByte = (ieByte) counter;
-		stream->Write( &tmpByte, 1);
+		stream->WriteScalar(counter);
 	}
 	stream->WriteVariable(actor->KillVar);
 	stream->WriteFilling(3); //unknown
-	tmpByte=actor->BaseStats[IE_COLORCOUNT];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_COLORCOUNT]);
 	stream->WriteDword(actor->AppearanceFlags);
 
 	for (int i = 0; i < 7; i++) {
-		tmpWord = actor->BaseStats[IE_COLORS+i];
-		stream->WriteWord(tmpWord);
+		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_COLORS + i]);
 	}
 	stream->Write(actor->pstColorBytes, 10);
 	stream->WriteFilling(21);
-	tmpByte = actor->BaseStats[IE_SPECIES];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_TEAM];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_FACTION];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECIES]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TEAM]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_FACTION]);
 	//similar in all engines
-	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_EA]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_GENERAL]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RACE]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASS]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECIFIC]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
-	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
 	stream->WriteVariable(actor->GetScriptName());
 	return 0;
@@ -2689,44 +2264,29 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 
 int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor) const
 {
-	ieByte tmpByte;
-	ieWord tmpWord;
-
-	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_AVATARREMOVAL]);
 	stream->Write( &actor->SetDeathVar, 1);
 	stream->Write( &actor->IncKillCount, 1);
 	stream->Write( &actor->UnknownField, 1); //unknown
 	for (int i = 0; i < 5; i++) {
-		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
-		stream->WriteWord(tmpWord);
+		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_INTERNAL_0 + i]);
 	}
 	stream->WriteVariable(actor->KillVar); // some variable names in iwd
 	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
 	stream->WriteFilling(2);
-	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
-	stream->WriteWord(tmpWord);
-	tmpWord = actor->BaseStats[IE_SAVEDYPOS];
-	stream->WriteWord(tmpWord);
-	tmpWord = actor->BaseStats[IE_SAVEDFACE];
-	stream->WriteWord(tmpWord);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDXPOS]);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDYPOS]);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDFACE]);
 	stream->WriteFilling(18);
 	//similar in all engines
-	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_EA]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_GENERAL]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RACE]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASS]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECIFIC]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
-	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
 	stream->WriteVariable(actor->GetScriptName());
 	return 0;
@@ -2734,61 +2294,40 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor) const
 
 int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor) const
 {
-	ieByte tmpByte;
-	ieWord tmpWord;
-	ieDword tmpDword;
-
-	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
-	stream->Write( &tmpByte, 1);
-	stream->Write( &actor->SetDeathVar, 1);
-	stream->Write( &actor->IncKillCount, 1);
-	stream->Write( &actor->UnknownField, 1); //unknown
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_AVATARREMOVAL]);
+	stream->WriteScalar(actor->SetDeathVar);
+	stream->WriteScalar(actor->IncKillCount);
+	stream->WriteScalar(actor->UnknownField); //unknown
 	for (int i = 0; i < 5; i++) {
-		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
-		stream->WriteWord(tmpWord);
+		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_INTERNAL_0 + i]);
 	}
 	stream->WriteVariable(actor->KillVar); // some variable names in iwd
 	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
 	stream->WriteFilling(2);
-	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
-	stream->WriteWord(tmpWord);
-	tmpWord = actor->BaseStats[IE_SAVEDYPOS];
-	stream->WriteWord(tmpWord);
-	tmpWord = actor->BaseStats[IE_SAVEDFACE];
-	stream->WriteWord(tmpWord);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDXPOS]);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDYPOS]);
+	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDFACE]);
 	stream->WriteFilling(15);
-	tmpByte = actor->BaseStats[IE_TRANSLUCENT];
-	stream->Write(&tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TRANSLUCENT]);
 	stream->WriteFilling(1); //fade speed
-	tmpByte = actor->BaseStats[IE_SPECFLAGS];
-	stream->Write(&tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECFLAGS]);
 	stream->WriteFilling(3); //invisible, 2 unknowns
-	tmpByte = actor->BaseStats[IE_UNUSED_SKILLPTS];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_UNUSED_SKILLPTS]);
 	stream->WriteFilling(124);
 	//similar in all engines
-	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte, 1);
-	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_EA]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_GENERAL]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RACE]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASS]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECIFIC]);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
-	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
 	stream->WriteVariable(actor->GetScriptName());
-	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write(&tmpByte, 1);
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASS]);
 	stream->WriteFilling(1);
-	tmpDword = actor->GetClassMask();
-	stream->WriteDword(tmpDword);
+	stream->WriteScalar<int, ieDword>(actor->GetClassMask());
 	return 0;
 }
 
@@ -2813,24 +2352,20 @@ int CREImporter::PutKnownSpells(DataStream *stream, const Actor *actor) const
 
 int CREImporter::PutSpellPages(DataStream *stream, const Actor *actor) const
 {
-	ieWord tmpWord;
-	ieDword tmpDword;
 	ieDword SpellIndex = 0;
 
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
-		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
-		for (unsigned int j=0;j<level;j++) {
-			tmpWord = j; //+1
-			stream->WriteWord(tmpWord);
-			tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,false);
+		ieWord level = actor->spellbook.GetSpellLevelCount(i);
+		for (ieWord j = 0; j < level; ++j) {
+			stream->WriteScalar(j);
+			ieWord tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,false);
 			stream->WriteWord(tmpWord);
 			tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,true);
 			stream->WriteWord(tmpWord);
-			tmpWord = i;
-			stream->WriteWord(tmpWord);
+			stream->WriteScalar<int, ieWord>(i);
 			stream->WriteDword(SpellIndex);
-			tmpDword = actor->spellbook.GetMemorizedSpellsCount(i,j, false);
+			ieDword tmpDword = actor->spellbook.GetMemorizedSpellsCount(i,j, false);
 			stream->WriteDword(tmpDword);
 			SpellIndex += tmpDword;
 		}
@@ -2870,26 +2405,16 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 		if (TotSCEFF) {
 			eM->PutEffectV2(stream, fx);
 		} else {
-			ieWord tmpWord;
-			ieByte tmpByte;
-
-			tmpWord = (ieWord) fx->Opcode;
-			stream->WriteWord(tmpWord);
-			tmpByte = (ieByte) fx->Target;
-			stream->Write(&tmpByte, 1);
-			tmpByte = (ieByte) fx->Power;
-			stream->Write(&tmpByte, 1);
+			stream->WriteScalar<ieDword, ieWord>(fx->Opcode);
+			stream->WriteScalar<ieDword, ieByte>(fx->Target);
+			stream->WriteScalar<ieDword, ieByte>(fx->Power);
 			stream->WriteDword(fx->Parameter1);
 			stream->WriteDword(fx->Parameter2);
-			tmpByte = (ieByte) fx->TimingMode;
-			stream->Write(&tmpByte, 1);
-			tmpByte = (ieByte) fx->Resistance;
-			stream->Write(&tmpByte, 1);
+			stream->WriteScalar<ieDword, ieByte>(fx->TimingMode);
+			stream->WriteScalar<ieDword, ieByte>(fx->Resistance);
 			stream->WriteDword(fx->Duration);
-			tmpByte = (ieByte) fx->ProbabilityRangeMax;
-			stream->Write(&tmpByte, 1);
-			tmpByte = (ieByte) fx->ProbabilityRangeMin;
-			stream->Write(&tmpByte, 1);
+			stream->WriteScalar<ieDword, ieByte>(fx->ProbabilityRangeMax);
+			stream->WriteScalar<ieDword, ieByte>(fx->ProbabilityRangeMin);
 			stream->WriteResRef(fx->Resource);
 			stream->WriteDword(fx->DiceThrown);
 			stream->WriteDword(fx->DiceSides);
@@ -2965,7 +2490,6 @@ int CREImporter::PutIWD2Spellpage(DataStream *stream, const Actor *actor, ieIWD2
 /* this function expects GetStoredFileSize to be called before */
 int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 {
-	ieDword tmpDword=0;
 	int ret;
 
 	if (!stream || !actor) {
@@ -3020,7 +2544,7 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	//writing offsets and counts
 	if (actor->creVersion == CREVersion::V2_2) {
 		int type, level;
-
+		ieDword tmpDword = 0;
 		//class spells
 		for (type=IE_IWD2_SPELL_BARD;type<IE_IWD2_SPELL_DOMAIN;type++) for(level=0;level<9;level++) {
 			tmpDword = GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level);
@@ -3060,8 +2584,7 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	stream->WriteDword(ItemsOffset);
 	stream->WriteDword(ItemsCount);
 	stream->WriteDword(EffectsOffset);
-	tmpDword = EffectsCount+VariablesCount;
-	stream->WriteDword(tmpDword);
+	stream->WriteDword(EffectsCount + VariablesCount);
 	stream->WriteResRef( actor->GetDialog(false) );
 	//spells, spellbook etc
 

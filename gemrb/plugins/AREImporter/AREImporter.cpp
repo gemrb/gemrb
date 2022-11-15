@@ -1683,8 +1683,6 @@ int AREImporter::GetStoredFileSize(Map *map)
 int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 {
 	char Signature[9];
-	ieDword tmpDword = 0;
-	ieWord tmpWord = 0;
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 
 	strlcpy(Signature, "AREAV1.0", 9);
@@ -1698,21 +1696,17 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	stream->WriteDword(time); //lastsaved
 	stream->WriteDword(map->AreaFlags);
 
-	stream->WriteFilling(8); // northref
-	stream->WriteDword(tmpDword);
-	stream->WriteFilling(8); // westref
-	stream->WriteDword(tmpDword);
-	stream->WriteFilling(8); // southref
-	stream->WriteDword(tmpDword);
-	stream->WriteFilling(8); // eastref
-	stream->WriteDword(tmpDword);
+	stream->WriteFilling(12); // northref
+	stream->WriteFilling(12); // westref
+	stream->WriteFilling(12); // southref
+	stream->WriteFilling(12); // eastref
 
 	stream->WriteWord(map->AreaType);
 	stream->WriteWord(map->Rain);
 	stream->WriteWord(map->Snow);
 	stream->WriteWord(map->Fog);
 	stream->WriteWord(map->Lightning);
-	stream->WriteWord(tmpWord);
+	stream->WriteFilling(2);
 
 	if (map->version == 16) { //writing 14 bytes of 0's
 		char tmp[1] = { '0' };
@@ -1747,7 +1741,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	stream->WriteDword(AmbiOffset);
 	stream->WriteDword(VariablesOffset);
 	stream->WriteDword(VariablesCount);
-	stream->WriteDword(tmpDword);
+	stream->WriteFilling(4);
 
 	//the saved area script is in the last script slot!
 	const GameScript *s = map->Scripts[MAX_SCRIPTS - 1];
@@ -1769,8 +1763,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	//an empty dword for pst
 	int i = 56;
 	if (pst) {
-		tmpDword = 0xffffffff;
-		stream->WriteDword(tmpDword);
+		stream->WriteDword(0xffffffff);
 		i=52;
 	}
 	stream->WriteDword(NoteOffset);
@@ -1786,8 +1779,6 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 
 int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex) const
 {
-	ieWord tmpWord = 0;
-
 	for (unsigned int i=0;i<DoorsCount;i++) {
 		Door *d = map->TMap->GetDoor(i);
 
@@ -1799,7 +1790,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteDword(d->Flags);
 		stream->WriteDword(VertIndex);
 		auto open = d->OpenTriggerArea();
-		tmpWord = open ? open->Count() : 0;
+		ieWord tmpWord = open ? open->Count() : 0;
 		stream->WriteWord(tmpWord);
 		VertIndex += tmpWord;
 		auto closed = d->ClosedTriggerArea();
@@ -1808,23 +1799,15 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteDword(VertIndex);
 		VertIndex += tmpWord;
 		//open bounding box
-		tmpWord = (ieWord) d->OpenBBox.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) d->OpenBBox.y;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) (d->OpenBBox.x+d->OpenBBox.w);
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) (d->OpenBBox.y+d->OpenBBox.h);
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(d->OpenBBox.x);
+		stream->WriteWord(d->OpenBBox.y);
+		stream->WriteWord(d->OpenBBox.x + d->OpenBBox.w);
+		stream->WriteWord(d->OpenBBox.y + d->OpenBBox.h);
 		//closed bounding box
-		tmpWord = (ieWord) d->ClosedBBox.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) d->ClosedBBox.y;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) (d->ClosedBBox.x+d->ClosedBBox.w);
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) (d->ClosedBBox.y+d->ClosedBBox.h);
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(d->ClosedBBox.x);
+		stream->WriteWord(d->ClosedBBox.y);
+		stream->WriteWord(d->ClosedBBox.x + d->ClosedBBox.w);
+		stream->WriteWord(d->ClosedBBox.y + d->ClosedBBox.h);
 		//open and closed impeded blocks
 		stream->WriteDword(VertIndex);
 		tmpWord = (ieWord) d->open_ib.size();
@@ -1936,18 +1919,13 @@ int AREImporter::PutItems(DataStream *stream, const Map *map) const
 int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex) const
 {
 	ieDword ItemIndex = 0;
-	ieDword tmpDword;
-	ieWord tmpWord;
 
 	for (unsigned int i=0;i<ContainersCount;i++) {
 		const Container *c = map->TMap->GetContainer(i);
 
 		//this is the editor name
 		stream->WriteVariable(c->GetScriptName());
-		tmpWord = (ieWord) c->Pos.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) c->Pos.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(c->Pos);
 		stream->WriteWord(c->containerType);
 		stream->WriteWord(c->LockDifficulty);
 		stream->WriteDword(c->Flags);
@@ -1955,24 +1933,17 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		stream->WriteWord(c->TrapRemovalDiff);
 		stream->WriteWord(c->Trapped);
 		stream->WriteWord(c->TrapDetected);
-		tmpWord = (ieWord) c->TrapLaunch.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) c->TrapLaunch.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(c->TrapLaunch);
 		//outline bounding box
-		tmpWord = (ieWord) c->BBox.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) c->BBox.y;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) (c->BBox.x + c->BBox.w);
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) (c->BBox.y + c->BBox.h);
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(c->BBox.x);
+		stream->WriteWord(c->BBox.y);
+		stream->WriteWord(c->BBox.x + c->BBox.w);
+		stream->WriteWord(c->BBox.y + c->BBox.h);
 		//item index and offset
-		tmpDword = c->inventory.GetSlotCount();
+		ieDword tmpDword = c->inventory.GetSlotCount();
 		stream->WriteDword(ItemIndex);
 		stream->WriteDword(tmpDword);
-		ItemIndex +=tmpDword;
+		ItemIndex += tmpDword;
 		const GameScript *s = c->Scripts[0];
 		if (s) {
 			stream->WriteResRefLC(s->GetName() );
@@ -1980,7 +1951,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 			stream->WriteFilling(8);
 		}
 		//outline polygon index and count
-		tmpWord = (c->outline) ? c->outline->Count() : 0;
+		ieWord tmpWord = (c->outline) ? c->outline->Count() : 0;
 		stream->WriteDword(VertIndex);
 		stream->WriteWord(tmpWord);
 		VertIndex +=tmpWord;
@@ -1989,7 +1960,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		//this is the real scripting name
 		stream->WriteVariable(c->GetScriptName());
 		stream->WriteResRefLC(c->KeyResRef);
-		stream->WriteDword(tmpDword); //unknown80
+		stream->WriteDword(0); //unknown80
 		stream->WriteStrRef(c->OpenFail);
 		stream->WriteFilling(56); //unknown or unused stuff
 	}
@@ -1998,9 +1969,6 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 
 int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertIndex) const
 {
-	ieDword tmpDword = 0;
-	ieWord tmpWord;
-
 	for (unsigned int i=0;i<InfoPointsCount;i++) {
 		const InfoPoint *ip = map->TMap->GetInfoPoint(i);
 
@@ -2008,22 +1976,17 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		//this is a hack, we abuse a coincidence
 		//ST_PROXIMITY = 1, ST_TRIGGER = 2, ST_TRAVEL = 3
 		//translates to trap = 0, info = 1, travel = 2
-		tmpWord = ((ieWord) ip->Type) - 1;
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(((ieWord) ip->Type) - 1);
 		//outline bounding box
-		tmpWord = (ieWord) ip->BBox.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) ip->BBox.y;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) (ip->BBox.x + ip->BBox.w);
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) (ip->BBox.y + ip->BBox.h);
-		stream->WriteWord(tmpWord);
-		tmpWord = (ip->outline) ? ip->outline->Count() : 1;
+		stream->WriteWord(ip->BBox.x);
+		stream->WriteWord(ip->BBox.y);
+		stream->WriteWord(ip->BBox.x + ip->BBox.w);
+		stream->WriteWord(ip->BBox.y + ip->BBox.h);
+		ieWord tmpWord = (ip->outline) ? ip->outline->Count() : 1;
 		stream->WriteWord(tmpWord);
 		stream->WriteDword(VertIndex);
 		VertIndex += tmpWord;
-		stream->WriteDword(tmpDword); //unknown30
+		stream->WriteDword(0); //unknown30
 		stream->WriteDword(ip->Cursor);
 		stream->WriteResRefUC(ip->Destination);
 		stream->WriteVariableUC(ip->EntranceName);
@@ -2033,10 +1996,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		stream->WriteWord(ip->TrapRemovalDiff);
 		stream->WriteWord(ip->Trapped); //unknown???
 		stream->WriteWord(ip->TrapDetected);
-		tmpWord = (ieWord) ip->TrapLaunch.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) ip->TrapLaunch.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(ip->TrapLaunch);
 		stream->WriteResRefLC(ip->KeyResRef);
 		const GameScript *s = ip->Scripts[0];
 		if (s) {
@@ -2044,25 +2004,17 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		} else {
 			stream->WriteFilling(8);
 		}
-		tmpWord = (ieWord) ip->UsePoint.x;
-		ieDword tmpDword2 = ip->UsePoint.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) ip->UsePoint.y;
-		tmpDword = ip->UsePoint.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(ip->UsePoint);
 		if (16 == map->version) {
-			stream->WriteDword(tmpDword2);
-			stream->WriteDword(tmpDword);
+			stream->WriteDword(ip->UsePoint.x);
+			stream->WriteDword(ip->UsePoint.y);
 			stream->WriteFilling(28); //unknown
 		} else {
 			stream->WriteFilling(36); //unknown
 		}
 		//these are probably only in PST
 		stream->WriteResRef( ip->EnterWav);
-		tmpWord = (ieWord) ip->TalkPos.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) ip->TalkPos.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(ip->TalkPos);
 		stream->WriteStrRef(ip->DialogName);
 		stream->WriteResRef( ip->GetDialog());
 	}
@@ -2118,9 +2070,6 @@ void AREImporter::PutScript(DataStream *stream, const Actor *ac, unsigned int in
 
 int AREImporter::PutActors(DataStream *stream, const Map *map) const
 {
-	ieDword tmpDword = 0;
-	ieWord tmpWord;
-	ieByte tmpByte;
 	ieDword CreatureOffset = EmbeddedCreOffset;
 
 	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
@@ -2128,29 +2077,19 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 		const Actor *ac = map->GetActor(i, false);
 
 		stream->WriteVariable(ac->GetScriptName());
-		tmpWord = (ieWord) ac->Pos.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) ac->Pos.y;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) ac->HomeLocation.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) ac->HomeLocation.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(ac->Pos);
+		stream->WritePoint(ac->HomeLocation);
 
-		stream->WriteDword(tmpDword); //used fields flag always 0 for saved areas
-		tmpWord = ac->Spawned;
-		stream->WriteWord(tmpWord);
+		stream->WriteDword(0); //used fields flag always 0 for saved areas
+		stream->WriteWord(ac->Spawned);
 		stream->WriteFilling(1); // letter
-		tmpByte = ac->DifficultyMargin;
-		stream->Write( &tmpByte, 1 );
-		stream->WriteDword(tmpDword); //actor animation, unused
-		tmpWord = ac->GetOrientation();
-		stream->WriteWord(tmpWord);
-		tmpWord = 0;
-		stream->WriteWord(tmpWord); //unknown
+		stream->WriteScalar(ac->DifficultyMargin);
+		stream->WriteDword(0); //actor animation, unused
+		stream->WriteWord(ac->GetOrientation());
+		stream->WriteWord(0); //unknown
 		stream->WriteDword(ac->RemovalTime);
 		stream->WriteWord(ac->maxWalkDistance);
-		stream->WriteWord(tmpWord); //more unknowns
+		stream->WriteWord(0); //more unknowns
 		stream->WriteDword(ac->appearance);
 		stream->WriteDword(ac->TalkCount);
 		stream->WriteResRefLC(ac->GetDialog());
@@ -2187,15 +2126,10 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 
 int AREImporter::PutAnimations(DataStream *stream, const Map *map) const
 {
-	ieWord tmpWord;
-
 	auto iter = map->GetFirstAnimation();
 	while(const AreaAnimation *an = map->GetNextAnimation(iter)) {
 		stream->WriteVariable(an->Name);
-		tmpWord = (ieWord) an->Pos.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) an->Pos.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(an->Pos);
 		stream->WriteDword(an->appearance);
 		stream->WriteResRef( an->BAM);
 		stream->WriteWord(an->sequence);
@@ -2222,16 +2156,11 @@ int AREImporter::PutAnimations(DataStream *stream, const Map *map) const
 
 int AREImporter::PutEntrances(DataStream *stream, const Map *map) const
 {
-	ieWord tmpWord;
-
 	for (unsigned int i=0;i<EntrancesCount;i++) {
 		const Entrance *e = map->GetEntrance(i);
 
 		stream->WriteVariable(e->Name);
-		tmpWord = (ieWord) e->Pos.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) e->Pos.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(e->Pos);
 		stream->WriteWord(e->Face);
 		//a large empty piece of crap
 		stream->WriteFilling(66);
@@ -2261,29 +2190,23 @@ int AREImporter::PutVariables(DataStream *stream, const Map *map) const
 
 int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 {
-	ieWord tmpWord;
-
 	for (const auto& am : map->GetAmbients()) {
 		if (am->flags & IE_AMBI_NOSAVE) continue;
 		stream->WriteVariable(am->name);
-		tmpWord = (ieWord) am->origin.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) am->origin.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(am->origin);
 		stream->WriteWord(am->radius);
 		stream->WriteFilling(2);
 		stream->WriteDword(am->pitchVariance);
 		stream->WriteWord(am->gainVariance);
 		stream->WriteWord(am->gain);
-		tmpWord = (ieWord) am->sounds.size();
-		int j;
-		for (j = 0;j < tmpWord; j++) {
+		size_t j = 0;
+		for (; j < am->sounds.size(); j++) {
 			stream->WriteResRef( am->sounds[j] );
 		}
 		while( j++<MAX_RESCOUNT) {
 			stream->WriteFilling(8);
 		}
-		stream->WriteWord(tmpWord);
+		stream->WriteWord(am->sounds.size());
 		stream->WriteFilling(2);
 		stream->WriteDword(ieDword(am->interval / 1000));
 		stream->WriteDword(ieDword(am->intervalVariance / 1000));
@@ -2296,9 +2219,6 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 
 int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 {
-	ieDword tmpDword;
-	ieWord tmpWord;
-
 	//different format
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 
@@ -2308,10 +2228,8 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 		if (pst) {
 			// in PST the coordinates are stored in small map space
 			const Size& mapsize = map->GetSize();
-			tmpDword = mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w;
-			stream->WriteDword(tmpDword);
-			tmpDword = mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h;
-			stream->WriteDword(tmpDword);
+			stream->WriteDword(mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w);
+			stream->WriteDword(mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h);
 
 			size_t len = 0;
 			// limited to 500 *bytes* of text, convert to a multibyte encoding.
@@ -2331,21 +2249,16 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 			if (x) {
 				stream->WriteFilling(x);
 			}
-			tmpDword = (ieDword) mn.readonly;
-			stream->WriteDword(tmpDword);
+			stream->WriteDword(mn.readonly);
 			for (x=0;x<5;x++) { //5 empty dwords
 				stream->WriteFilling(4);
 			}
 		} else {
-			tmpWord = (ieWord) mn.Pos.x;
-			stream->WriteWord(tmpWord);
-			tmpWord = (ieWord) mn.Pos.y;
-			stream->WriteWord(tmpWord);
+			stream->WritePoint(mn.Pos);
 			stream->WriteStrRef(mn.strref);
-			stream->WriteWord(tmpWord);
+			stream->WriteWord(mn.Pos.y);
 			stream->WriteWord(mn.color);
-			tmpDword = 1;
-			stream->WriteDword(tmpDword);
+			stream->WriteDword(1);
 			for (int x = 0; x < 9; ++x) { //9 empty dwords
 				stream->WriteFilling(4);
 			}
@@ -2374,7 +2287,6 @@ int AREImporter::PutEffects(DataStream *stream, const EffectQueue& fxqueue) cons
 int AREImporter::PutTraps(DataStream *stream, const Map *map) const
 {
 	ieDword Offset;
-	ieDword tmpDword;
 	ResRef name;
 	ieWord type = 0;
 	Point dest(0,0);
@@ -2413,14 +2325,9 @@ int AREImporter::PutTraps(DataStream *stream, const Map *map) const
 		Offset += tmpWord;
 		stream->WriteWord(tmpWord);  //size in bytes
 		stream->WriteWord(type);     //missile.ids
-		tmpDword = 0;
-		stream->WriteDword(tmpDword); // unknown field, Ticks
-		tmpWord = (ieWord) dest.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) dest.y;
-		stream->WriteWord(tmpWord);
-		tmpWord = 0;
-		stream->WriteWord(tmpWord); // unknown field, Z
+		stream->WriteDword(0); // unknown field, Ticks
+		stream->WritePoint(dest);
+		stream->WriteWord(0); // unknown field, Z
 		stream->Write(&tmpByte, 1);   // unknown field, TargetType
 		stream->Write(&tmpByte, 1);   // Owner
 	}
@@ -2435,8 +2342,6 @@ int AREImporter::PutExplored(DataStream *stream, const Map *map) const
 
 int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 {
-	ieDword tmpDword = 0;
-
 	for (unsigned int i=0;i<TileCount;i++) {
 		const TileObject *am = map->TMap->GetTile(i);
 		stream->WriteVariable(am->Name);
@@ -2444,10 +2349,10 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 		stream->WriteDword(am->Flags);
 		stream->WriteDword(am->opencount);
 		//can't write tiles, otherwise now we should write a tile index
-		stream->WriteDword(tmpDword);
+		stream->WriteDword(0);
 		stream->WriteDword(am->closedcount);
 		//can't write tiles otherwise now we should write a tile index
-		stream->WriteDword(tmpDword);
+		stream->WriteDword(0);
 		stream->WriteFilling(48);
 	}
 	return 0;
@@ -2483,8 +2388,6 @@ int AREImporter::PutMapAmbients(DataStream *stream, const Map *map) const
 
 int AREImporter::PutRestHeader(DataStream *stream, const Map *map) const
 {
-	ieDword tmpDword = 0;
-
 	stream->WriteFilling(32); //empty label
 	for (const auto& ref : map->RestHeader.Strref) {
 		stream->WriteStrRef(ref);
@@ -2501,9 +2404,7 @@ int AREImporter::PutRestHeader(DataStream *stream, const Map *map) const
 	stream->WriteWord(map->RestHeader.Enabled);
 	stream->WriteWord(map->RestHeader.DayChance);
 	stream->WriteWord(map->RestHeader.NightChance);
-	for (int i = 0; i < 14; i++) {
-		stream->WriteDword(tmpDword);
-	}
+	stream->WriteFilling(56);
 	return 0;
 }
 
