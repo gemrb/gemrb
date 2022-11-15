@@ -1095,7 +1095,9 @@ void CREImporter::GetActorPST(Actor *act)
 	}
 	ieVariable KillVar; //use this as needed
 	str->ReadVariable(KillVar);
-	str->Seek(3, GEM_CURRENT_POS); // TODO: dialog activation radius, circle size and an unknown byte
+	str->Read(&tmpByte, 1);
+	act->BaseStats[IE_DIALOGRANGE] = tmpByte;
+	str->Seek(2, GEM_CURRENT_POS); // circle size is only here (not in resdata.ini), but we have it in our own avatars.2da; plus an unknown byte
 
 	str->Read( &tmpByte, 1 );
 
