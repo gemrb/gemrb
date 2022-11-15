@@ -643,14 +643,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->ReadWord(Type);
 		Region bbox;
 		ieWord tmp;
-		str->ReadWord(tmp);
-		bbox.x = tmp;
-		str->ReadWord(tmp);
-		bbox.y = tmp;
-		str->ReadWord(tmp);
-		bbox.w = tmp - bbox.x;
-		str->ReadWord(tmp);
-		bbox.h = tmp - bbox.y;
+		str->ReadRegion(bbox, true);
 		str->ReadWord(VertexCount);
 		str->ReadDword(FirstVertex);
 		ieDword tmp2;
@@ -804,15 +797,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->ReadWord(TrapDetected);
 		str->ReadPoint(launchPos);
 		Region bbox;
-		ieWord tmp;
-		str->ReadWord(tmp);
-		bbox.x = tmp;
-		str->ReadWord(tmp);
-		bbox.y = tmp;
-		str->ReadWord(tmp);
-		bbox.w = tmp - bbox.x;
-		str->ReadWord(tmp);
-		bbox.h = tmp - bbox.y;
+		str->ReadRegion(bbox, true);
 		str->ReadDword(ItemIndex);
 		str->ReadDword(ItemCount);
 		str->ReadResRef( Script );
@@ -891,7 +876,6 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		ieWord OpenImpededCount, ClosedImpededCount;
 		ieVariable LongName, LinkedInfo;
 		ResRef ShortName;
-		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
 		ResRef KeyResRef;
 		ResRef script0;
@@ -916,22 +900,8 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->ReadWord(OpenVerticesCount);
 		str->ReadWord(ClosedVerticesCount);
 		str->ReadDword(ClosedFirstVertex);
-		str->ReadWord(minX);
-		str->ReadWord(minY);
-		str->ReadWord(maxX);
-		str->ReadWord(maxY);
-		BBOpen.x = minX;
-		BBOpen.y = minY;
-		BBOpen.w = maxX - minX;
-		BBOpen.h = maxY - minY;
-		str->ReadWord(minX);
-		str->ReadWord(minY);
-		str->ReadWord(maxX);
-		str->ReadWord(maxY);
-		BBClosed.x = minX;
-		BBClosed.y = minY;
-		BBClosed.w = maxX - minX;
-		BBClosed.h = maxY - minY;
+		str->ReadRegion(BBOpen, true);
+		str->ReadRegion(BBClosed, true);
 		str->ReadDword(OpenFirstImpeded);
 		str->ReadWord(OpenImpededCount);
 		str->ReadWord(ClosedImpededCount);
@@ -953,14 +923,8 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->ReadDword(DiscoveryDiff);
 		str->ReadDword(LockRemoval);
 		Point toOpen[2];
-		str->ReadWord(minX);
-		toOpen[0].x = minX;
-		str->ReadWord(minY);
-		toOpen[0].y = minY;
-		str->ReadWord(maxX);
-		toOpen[1].x = maxX;
-		str->ReadWord(maxY);
-		toOpen[1].y = maxY;
+		str->ReadPoint(toOpen[0]);
+		str->ReadPoint(toOpen[1]);
 		str->ReadStrRef(OpenStrRef);
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			char tmp[25];
@@ -983,10 +947,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		if (OpenVerticesCount) {
 			std::vector<Point> points(OpenVerticesCount);
 			for (int x = 0; x < OpenVerticesCount; x++) {
-				str->ReadWord(minX);
-				points[x].x = minX;
-				str->ReadWord(minY);
-				points[x].y = minY;
+				str->ReadPoint(points[x]);
 			}
 			open = std::make_shared<Gem_Polygon>(std::move(points), &BBOpen );
 		}
@@ -998,10 +959,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		if (ClosedVerticesCount) {
 			std::vector<Point> points(ClosedVerticesCount);
 			for (int x = 0; x < ClosedVerticesCount; x++) {
-				str->ReadWord(minX);
-				points[x].x = minX;
-				str->ReadWord(minY);
-				points[x].y = minY;
+				str->ReadPoint(points[x]);
 			}
 			closed = std::make_shared<Gem_Polygon>(std::move(points), &BBClosed);
 		}
