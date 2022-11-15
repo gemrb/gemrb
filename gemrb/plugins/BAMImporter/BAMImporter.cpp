@@ -61,16 +61,10 @@ bool BAMImporter::Import(DataStream* str)
 	
 	DataStart = str->Size();
 	for (auto& frame : frames) {
-		ieWord w, h;
-		ieWordSigned x , y;
-		str->ReadScalar(w);
-		frame.bounds.w = w;
-		str->ReadScalar(h);
-		frame.bounds.h = h;
-		str->ReadScalar(x);
-		frame.bounds.x = x;
-		str->ReadScalar(y);
-		frame.bounds.y = y;
+		// ReadRegion is ordered x,y,w,h
+		// for some reason these rects are w,h,x,y
+		str->ReadSize(frame.bounds.size);
+		str->ReadPoint(frame.bounds.origin);
 		ieDword offset;
 		str->ReadScalar(offset);
 		frame.RLE = (offset & 0x80000000) == 0;
