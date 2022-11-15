@@ -8,6 +8,5 @@ Flags:
 - 0: nothing special, same as other games, one string for everyone
 - 1: use relative strref instead of main one for PCs (TNO is main, then: Morte, Annah, Dakkon, FFG, Nordom, Ignus, Vhailor)
 - 2: use relative strref instead of main one for PCs and NPCs (index just after Vhailor)
-- 3:STRREF: like 1, but use STRREF instead of main one for TNO; first entry is for Morte
 - 4:STRREF: TNO uses STRREF instead
 - STRREF:STRREF: use strrefs only for TNO (main), Annah, NPCs (-1 for none)

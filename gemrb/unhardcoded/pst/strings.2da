@@ -202,3 +202,6 @@ DAMAGE_DETAIL2             -1               0
 DAMAGE_DETAIL3             -1               0
 TRAVEL_TIME                -1               0
 PICKPOCKET_INVFUL       37076     37077:19305
+STR_MORALE_BERSERK      37033               2
+STR_MORALE_RUN          37024               2
+STR_MORALE_PANIC        37015               2

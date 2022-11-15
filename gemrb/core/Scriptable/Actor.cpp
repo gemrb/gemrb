@@ -856,7 +856,9 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	overriding = overriding || (game->StateOverrideFlag && game->StateOverrideTime);
 	bool lowMorale = actor->Modified[IE_MORALE] <= actor->Modified[IE_MORALEBREAK];
 	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
-		actor->Panic(game->GetActorByGlobalID(actor->LastAttacker), core->Roll(1, 3, 0));
+		int panicMode = RAND(0, 2); // PANIC_RANDOMWALK etc.
+		displaymsg->DisplayConstantStringName(STR_MORALE_BERSERK + panicMode, GUIColors::WHITE, actor);
+		actor->Panic(game->GetActorByGlobalID(actor->LastAttacker), panicMode + 1);
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
 		// recover from panic, since morale has risen again
 		// but only if we have really just recovered, so panic from other
