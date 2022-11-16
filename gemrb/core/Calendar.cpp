@@ -73,7 +73,6 @@ void Calendar::GetMonthName(int dayandmonth) const
 int Calendar::GetCalendarDay(int date) const
 {
 	int dayandmonth;
-	int month=1;
 
 	if (!daysinyear) return 0;
 	dayandmonth = date%daysinyear;
@@ -82,8 +81,6 @@ int Calendar::GetCalendarDay(int date) const
 			break;
 		}
 		dayandmonth-=days[i];
-		//ignoring single days (they are not months)
-		if (days[i]!=1) month++;
 	}
 	return dayandmonth+1;
 }
