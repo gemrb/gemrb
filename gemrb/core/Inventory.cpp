@@ -865,13 +865,13 @@ bool Inventory::DropItemAtLocation(const ResRef& resRef, unsigned int flags, Map
 		if (!Owner->GetBase(IE_GOLD)) {
 			return dropped;
 		}
-		Owner->BaseStats[IE_GOLD] = 0;
 		CREItem *gold = new CREItem();
 		if (CreateItemCore(gold, core->GoldResRef, static_cast<int>(Owner->BaseStats[IE_GOLD]), 0, 0)) {
 			map->AddItemToLocation(loc, gold);
 		} else {
 			delete gold;
 		}
+		Owner->BaseStats[IE_GOLD] = 0;
 	}
 	return dropped;
 }
