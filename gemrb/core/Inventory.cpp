@@ -930,7 +930,7 @@ bool Inventory::EquipItem(ieDword slot)
 	
 	int armorLevel = itm->AnimationType[0] - '1';
 	int weaponslot;
-	ieDword equip;
+	ieDword equip = IW_NO_EQUIPPED;
 	switch (effect) {
 	case SLOT_EFFECT_FIST:
 		SetEquippedSlot(IW_NO_EQUIPPED, 0);
@@ -953,12 +953,13 @@ bool Inventory::EquipItem(ieDword slot)
 		}
 		header = itm->GetExtHeader(EquippedHeader);
 		if (!header) return false; // in case of broken saves
-		if (header->AttackType == ITEM_AT_BOW) {
+		if (header->AttackType == ITEM_AT_BOW || header->AttackType == ITEM_AT_PROJECTILE) {
 			// find the ranged projectile associated with it, this returns equipped code
 			equip = FindRangedProjectile(header->ProjectileQualifier);
 			// this is the real item slot of the quarrel
 			slot = equip + SLOT_MELEE;
-		} else {
+		}
+		if (header->AttackType != ITEM_AT_BOW && equip == IW_NO_EQUIPPED) {
 			// this is always 0-3
 			equip = weaponslot;
 			slot = GetWeaponSlot(weaponslot);
@@ -1089,7 +1090,7 @@ int Inventory::FindTypedRangedWeapon(unsigned int type) const
 		//always look for a ranged header when looking for a projectile/projector
 		const ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
 		int weapontype = 0;
-		if (ext_header && (ext_header->AttackType == ITEM_AT_BOW)) {
+		if (ext_header && (ext_header->AttackType == ITEM_AT_BOW || ext_header->AttackType == ITEM_AT_PROJECTILE)) {
 			weapontype = ext_header->ProjectileQualifier;
 		}
 		gamedata->FreeItem(itm, Slot->ItemResRef, false);
@@ -1399,7 +1400,7 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 		assert(launcherHeader);
 		// range has to be from the weapon, the projectile has no effect on it
 		wi.range = launcherHeader->Range + 1;
-		if (hittingHeader->ProjectileQualifier) { // don't add bonuses for weapons without launchers or they would be doubled
+		if (launcher->ItemResRef != weapon->ItemResRef) { // don't add bonuses without both launcher and ammo or they would be doubled
 			wi.launcherDmgBonus = launcherHeader->DamageBonus; // save the original bonus
 			wi.launcherTHAC0Bonus = launcherHeader->THAC0Bonus;
 		} else {
