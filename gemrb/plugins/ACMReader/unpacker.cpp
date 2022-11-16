@@ -29,7 +29,6 @@ const char Table1[27] = {
 	34, 36, 37, 38, 40, 41, 42
 };
 //Eng: in base-4 system it is:
-//Rus: в четверичной системе это будет:
 //		000 001 002  010 011 012  020 021 022
 //		100 101 102  110 111 112  120 121 122
 //		200 201 202  210 211 212  220 221 222
@@ -44,7 +43,6 @@ const short Table2[125] = {
 	280, 281, 282, 283, 284, 288, 289, 290, 291, 292
 };
 //Eng: in base-8 system:
-//Rus: в восьмеричной системе:
 //		000 001 002 003 004  010 011 012 013 014 ...
 //		100 101 102 103 104 ...
 //		200 ...
@@ -162,7 +160,6 @@ int CValueUnpacker::return0(int /*pass*/, int /*ind*/)
 int CValueUnpacker::zero_fill(int pass, int /*ind*/)
 {
 	//Eng: used when the whole column #pass is zero-filled
-	//Rus: используетс€, когда весь столбец с номером pass заполнен нул€ми
 	int* sb_ptr = &block_ptr[pass], step = sb_size, i = subblocks;
 	do {
 		*sb_ptr = 0;
@@ -183,10 +180,8 @@ int CValueUnpacker::linear_fill(int pass, int ind)
 int CValueUnpacker::k1_3bits(int pass, int /*ind*/)
 {
 	//Eng: column with number pass is filled with zeros, and also +/-1, zeros are repeated frequently
-	//Rus: cтолбец pass заполнен нул€ми, а также +/- 1, но нули часто идут подр€д
 	// efficiency (bits per value): 3-p0-2.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
 	//Eng: it makes sense to use, when the freqnecy of paired zeros (p00) is greater than 2/3
-	//Rus: имеет смысл использовать, когда веро€тность парных нулей (p00) больше 2/3
 	for (int i = 0; i < subblocks; i++) {
 		prepare_bits( 3 );
 		if (( next_bits & 1 ) == 0) {
@@ -212,10 +207,8 @@ int CValueUnpacker::k1_3bits(int pass, int /*ind*/)
 int CValueUnpacker::k1_2bits(int pass, int /*ind*/)
 {
 	//Eng: column is filled with zero and +/-1
-	//Rus: cтолбец pass заполнен нул€ми, а также +/- 1
 	// efficiency: 2-P0. P0 - cnt of any zero (P0 = p0 + p00)
 	//Eng: use it when P0 > 1/3
-	//Rus: имеет смысл использовать, когда веро€тность нул€ больше 1/3
 	for (int i = 0; i < subblocks; i++) {
 		prepare_bits( 2 );
 		if (( next_bits & 1 ) == 0) {
@@ -235,7 +228,6 @@ int CValueUnpacker::k1_2bits(int pass, int /*ind*/)
 int CValueUnpacker::t1_5bits(int pass, int /*ind*/)
 {
 	//Eng: all the -1, 0, +1 triplets
-	//Rus: все комбинации троек -1, 0, +1.
 	// efficiency: always 5/3 bits per value
 	// use it when P0 <= 1/3
 	for (int i = 0; i < subblocks; i++) {
@@ -259,7 +251,6 @@ int CValueUnpacker::k2_4bits(int pass, int /*ind*/)
 	// -2, -1, 0, 1, 2, and repeating zeros
 	// efficiency: 4-2*p0-3.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
 	//Eng: makes sense to use when p00>2/3
-	//Rus: имеет смысл использовать, когда веро€тность парных нулей (p00) больше 2/3
 	for (int i = 0; i < subblocks; i++) {
 		prepare_bits( 4 );
 		if (( next_bits & 1 ) == 0) {
@@ -287,7 +278,6 @@ int CValueUnpacker::k2_3bits(int pass, int /*ind*/)
 	// -2, -1, 0, 1, 2
 	// efficiency: 3-2*P0, P0 - cnt of any zero (P0 = p0 + p00)
 	//Eng: use when P0>1/3
-	//Rus: имеет смысл использовать, когда веро€тность нул€ больше 1/3
 	for (int i = 0; i < subblocks; i++) {
 		prepare_bits( 3 );
 		if (( next_bits & 1 ) == 0) {
@@ -308,8 +298,6 @@ int CValueUnpacker::t2_7bits(int pass, int /*ind*/)
 {
 	//Eng: all the +/-2, +/-1, 0  triplets
 	// efficiency: always 7/3 bits per value
-	//Rus: все комбинации троек -2, -1, 0, +1, 2.
-	// эффективность: 7/3 бита на значение - всегда
 	// use it when p0 <= 1/3
 	for (int i = 0; i < subblocks; i++) {
 		int bits = get_bits(7) & 0x7f;
@@ -393,7 +381,6 @@ int CValueUnpacker::k4_5bits(int pass, int /*ind*/)
 	// fills with values: +/-4, +/-3, +/-2, +/-1, 0, and double zeros
 	// efficiency: 5-3*p0-4.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
 	//Eng: makes sense to use when p00>2/3
-	//Rus: имеет смысл использовать, когда веро€тность парных нулей (p00) больше 2/3
 	for (int i = 0; i < subblocks; i++) {
 		prepare_bits( 5 );
 		if (( next_bits & 1 ) == 0) {
@@ -442,8 +429,6 @@ int CValueUnpacker::t3_7bits(int pass, int /*ind*/)
 {
 	//Eng: all the pairs of values from -5 to +5
 	// efficiency: 7/2 bits per value
-	//Rus: все комбинации пар от -5 до +5
-	// эффективность: 7/2 бита на значение - всегда
 	for (int i = 0; i < subblocks; i++) {
 		int bits = get_bits(7) & 0x7f;
 		unsigned char val = Table3[bits];
