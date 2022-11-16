@@ -876,18 +876,29 @@ def ReadItemWindow ():
 	if ret == LSR_OK:
 		GemRB.PlaySound ("GAM_44") # success!
 		if GameCheck.IsPST():
-			strref = 4249
+			strref = GetPSTPersonalizedRef (pc, 35645) # 4249 - "You succeeded in learning this spell!" / 35645 - "Spell has been copied"
+			GemRB.GetString (strref, 2) # play the attached sound
 		else:
 			strref = 10830
 	else:
 		GemRB.PlaySound ("EFF_M10") # failure!
 		if GameCheck.IsPST():
-			strref = 4250
+			strref = GetPSTPersonalizedRef (pc, 35629) # 4250 - "You failed to learn this spell!", but 35629 - "Spell has failed to have been copied" has sounds
+			GemRB.GetString (strref, 2) # play the attached sound
 		else:
 			strref = 10831
 
 	CloseItemInfoWindow ()
 	OpenErrorWindow (strref)
+
+def GetPSTPersonalizedRef(pc, baseRef):
+	"""Calculate strref based on base strref and party member"""
+
+	# figure out PC index (TNO, Morte, Annah, Dakkon, FFG, Nordom, Ignus, Vhailor)
+	# the original compared script names, but specifics should be fine
+	spec2offset = [ 0, 7, 5, 6, 4, 3, 2, 1 ]
+	pcOffset = spec2offset[GemRB.GetPlayerStat (pc, IE_SPECIFIC) - 2]
+	return baseRef + pcOffset
 
 def OpenItemWindow ():
 	"""Displays information about the item."""
@@ -935,7 +946,11 @@ def IdentifyUseSpell ():
 	if ItemInfoWindow:
 		ItemInfoWindow.Close ()
 	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-	GemRB.PlaySound(DEF_IDENTIFY)
+	if GameCheck.IsPST ():
+		strRef = GetPSTPersonalizedRef (pc, 35685)
+		GemRB.GetString (strRef, 2) # play the attached sound
+	else:
+		GemRB.PlaySound (DEF_IDENTIFY)
 	OpenItemInfoWindow(slot)
 	return
 
@@ -952,7 +967,11 @@ def IdentifyUseScroll ():
 		ItemInfoWindow.Close ()
 	if GemRB.HasSpecialItem (pc, 1, 1):
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-	GemRB.PlaySound(DEF_IDENTIFY)
+	if GameCheck.IsPST ():
+		strRef = GetPSTPersonalizedRef (pc, 35685)
+		GemRB.GetString (strRef, 2) # play the attached sound
+	else:
+		GemRB.PlaySound (DEF_IDENTIFY)
 	OpenItemInfoWindow(slot)
 	return
 
