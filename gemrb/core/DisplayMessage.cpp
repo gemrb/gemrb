@@ -60,15 +60,32 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 {
 	AutoTable tab = gamedata->LoadTable(name);
 	if (tab) {
-		for(int i=0;i<STRREF_COUNT;i++) {
-			table[i] = tab->QueryFieldAsStrRef(i,0);
+		for (int i = 0; i < STRREF_COUNT; i++) {
+			table[i] = tab->QueryFieldAsStrRef(i, 0);
 		}
 		loadedTable = name;
-		return true;
 	} else {
 		Log(ERROR, "DisplayMessage", "Unable to initialize DisplayMessage::StrRefs");
+		return false;
 	}
-	return false;
+
+	// only pst has flags and complications
+	// they could have repurposed more verbal constants, but no, they built another layer instead
+	if (tab->QueryField(0, 1) != tab->QueryDefault()) {
+		for (int i = 0; i < STRREF_COUNT; i++) {
+			std::string flag = tab->QueryField(i, 1);
+			if (flag.length() == 1) {
+				flags[i] = atoi(flag.c_str());
+			} else {
+				flags[i] = -1;
+				const auto& parts = Explode(flag, ':');
+				// two more refs
+				extraRefs[i] = std::make_pair(ieStrRef(atoi(parts[0].c_str())), ieStrRef(atoi(parts[1].c_str())));
+			}
+		}
+	}
+
+	return true;
 }
 
 ieStrRef DisplayMessage::StrRefs::operator[](size_t idx) const

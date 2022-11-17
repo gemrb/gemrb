@@ -1,5 +1,5 @@
 2DA V1.0
-   -1
+-1
                         STRREF          FLAGS
 SCATTERED               55021               0
 WHOLEPARTY                 -1               0
@@ -35,9 +35,9 @@ GOTITEM                 19256               0
 LOSTITEM                19258               0
 GOTREP                  19259               0
 LOSTREP                 19260               0
-GOTABILITY              19307         4:37078
+GOTABILITY              19307               0
 GOTSPELL                35637               1
-GOTSONG                 19307         4:37078
+GOTSONG                 19307               0
 NOTHINGTOSAY               -1               0
 JOURNALCHANGE           37096               0
 WORLDMAPCHANGE          19264               0
