@@ -6008,6 +6008,21 @@ ResRef Actor::GetScript(int ScriptIndex) const
 	}
 }
 
+// similar manipulation as PermanentStatChangeFeedback and DisplayMessage::StrRefs::Get
+inline ieStrRef PersonalizePSTString(ieStrRef ref, const Actor* pc)
+{
+	if (pc->Modal.State != MS_STEALTH) return ref;
+	if (!core->HasFeature(GF_PST_STATE_FLAGS)) return ref;
+
+	int pcOffset = 8;
+	int specific = pc->GetStat(IE_SPECIFIC);
+	const std::array<int, 8> spec2offset = { 0, 7, 5, 6, 4, 3, 2, 1 };
+	if (specific >= 2 && specific <= 9) {
+		pcOffset = spec2offset[specific - 2];
+	}
+	return ieStrRef(int(ref) + pcOffset);
+}
+
 void Actor::SetModal(ieDword newstate, bool force)
 {
 	switch(newstate) {
@@ -6037,7 +6052,8 @@ void Actor::SetModal(ieDword newstate, bool force)
 	if (IsSelected()) {
 		// display the turning-off message
 		if (Modal.State != MS_NONE && core->HasFeedback(FT_MISC)) {
-			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+			ieStrRef leaving = PersonalizePSTString(ModalStates[Modal.State].leaving_str, this);
+			displaymsg->DisplayStringName(leaving, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		}
 
 		//update the action bar
@@ -7414,11 +7430,13 @@ void Actor::UpdateModalState(ieDword gameTime)
 				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
 				Modal.FirstApply = false;
 				if (InParty && feedback && core->HasFeedback(FT_MISC)) {
-					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+					ieStrRef entering = PersonalizePSTString(ModalStates[Modal.State].entering_str, this);
+					displaymsg->DisplayStringName(entering, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
 			} else {
 				if (InParty && core->HasFeedback(FT_MISC)) {
-					displaymsg->DisplayStringName(ModalStates[Modal.State].failed_str, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+					ieStrRef failed = PersonalizePSTString(ModalStates[Modal.State].failed_str, this);
+					displaymsg->DisplayStringName(failed, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
 				Modal.State = MS_NONE;
 			}
