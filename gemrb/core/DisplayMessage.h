@@ -74,7 +74,7 @@ private:
 
 		StrRefs();
 		bool LoadTable(const std::string& name);
-		ieStrRef operator[](size_t) const;
+		ieStrRef Get(size_t, const Scriptable*) const;
 	};
 	static StrRefs SRefs;
 	static void LoadStringRefs();
@@ -92,7 +92,7 @@ private:
 	const std::map<GUIColors, std::string> GUIColorNames = DisplayMessage::GetAllColors();
 
 public:
-	static ieStrRef GetStringReference(size_t);
+	static ieStrRef GetStringReference(size_t, const Scriptable* = nullptr);
 	static bool HasStringReference(size_t);
 
 	DisplayMessage();

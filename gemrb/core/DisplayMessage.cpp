@@ -88,10 +88,36 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 	return true;
 }
 
-ieStrRef DisplayMessage::StrRefs::operator[](size_t idx) const
+ieStrRef DisplayMessage::StrRefs::Get(size_t idx, const Scriptable* speaker) const
 {
 	if (idx < STRREF_COUNT) {
-		return table[idx];
+		if (flags[idx] == 0 || !speaker || speaker->Type != ST_ACTOR) {
+			return table[idx];
+		}
+
+		// handle PST personalized strings
+		const Actor* gabber = Scriptable::As<Actor>(speaker);
+		if (flags[idx] == -1) {
+			if (gabber->GetStat(IE_SPECIFIC) == 2) return table[idx]; // TNO
+			if (gabber->GetStat(IE_SPECIFIC) == 8) return extraRefs.at(idx).first; // Annah
+			return extraRefs.at(idx).second; // anyone else
+		}
+
+		// handle flags mode 1 and 2
+		// figure out PC index (TNO, Morte, Annah, Dakkon, FFG, Nordom, Ignus, Vhailor), anyone else
+		// then use it to calculate presonalized feedback strings
+		int pcOffset;
+		int specific = gabber->GetStat(IE_SPECIFIC);
+		const std::array<int, 8> spec2offset = { 0, 7, 5, 6, 4, 3, 2, 1 };
+		if (specific >= 2 && specific <= 9) {
+			pcOffset = spec2offset[specific - 2];
+		} else if (flags[idx] == 2) {
+			pcOffset = spec2offset.size();
+		} else { // rare, but could happen
+			pcOffset = 6; // use Ignus as fallback
+		}
+
+		return ieStrRef(int(table[idx]) + pcOffset);
 	}
 	return ieStrRef::INVALID;
 }
@@ -105,14 +131,14 @@ void DisplayMessage::LoadStringRefs()
 	}
 }
 
-ieStrRef DisplayMessage::GetStringReference(size_t idx)
+ieStrRef DisplayMessage::GetStringReference(size_t idx, const Scriptable* speaker)
 {
-	return DisplayMessage::SRefs[idx];
+	return SRefs.Get(idx, speaker);
 }
 
 bool DisplayMessage::HasStringReference(size_t idx)
 {
-	return DisplayMessage::SRefs[idx] != ieStrRef(-1);
+	return SRefs.Get(idx, nullptr) != ieStrRef(-1);
 }
 
 
@@ -176,7 +202,7 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 void DisplayMessage::DisplayConstantString(size_t stridx, GUIColors color, Scriptable *target) const
 {
 	if (stridx > STRREF_COUNT) return;
-	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
+	String text = core->GetString(SRefs.Get(stridx, target), STRING_FLAGS::SOUND);
 	DisplayString(text, DisplayMessage::GetColor(color), target);
 }
 
@@ -243,7 +269,7 @@ void DisplayMessage::DisplayString(const String& text, GUIColors color, Scriptab
 void DisplayMessage::DisplayConstantStringValue(size_t stridx, GUIColors color, ieDword value) const
 {
 	if (stridx > STRREF_COUNT) return;
-	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
+	String text = core->GetString(SRefs.Get(stridx, nullptr), STRING_FLAGS::SOUND);
 	DisplayMarkupString(fmt::format(DisplayFormatValue, GetColor(color).Packed(), text, value));
 }
 
@@ -256,8 +282,8 @@ void DisplayMessage::DisplayConstantStringNameString(size_t stridx, GUIColors co
 	String name;
 	Color actor_color = GetSpeakerColor(name, actor);
 	Color used_color = GetColor(color);
-	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND);
-	String text2 = core->GetString(DisplayMessage::SRefs[stridx2], STRING_FLAGS::SOUND);
+	String text = core->GetString(SRefs.Get(stridx, actor), STRING_FLAGS::SOUND);
+	String text2 = core->GetString(SRefs.Get(stridx2, actor), STRING_FLAGS::SOUND);
 
 	if (!text2.empty()) {
 		DisplayMarkupString(fmt::format(DisplayFormatNameString, actor_color.Packed(), name, used_color.Packed(), text, text2));
@@ -273,7 +299,7 @@ void DisplayMessage::DisplayConstantStringName(size_t stridx, const Color &color
 	if (stridx > STRREF_COUNT) return;
 	if(!speaker) return;
 
-	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+	String text = core->GetString(SRefs.Get(stridx, speaker), STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	DisplayStringName(std::move(text), color, speaker);
 }
 
@@ -289,7 +315,7 @@ void DisplayMessage::DisplayConstantStringNameValue(size_t stridx, GUIColors col
 {
 	if (stridx > STRREF_COUNT) return;
 	if(!speaker) return;
-	String fmt = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::RESOLVE_TAGS);
+	String fmt = core->GetString(SRefs.Get(stridx, speaker), STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::RESOLVE_TAGS);
 	DisplayStringName(fmt::format(fmt, value), GetColor(color), speaker);
 }
 
@@ -305,7 +331,7 @@ void DisplayMessage::DisplayConstantStringAction(size_t stridx, GUIColors color,
 	Color used_color = GetColor(color);
 	GetSpeakerColor(name2, target);
 
-	String text = core->GetString(DisplayMessage::SRefs[stridx], STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH );
+	String text = core->GetString(SRefs.Get(stridx, attacker), STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	DisplayMarkupString(fmt::format(DisplayFormatAction, attacker_color.Packed(), name1, used_color.Packed(), text, name2));
 }
 

@@ -9151,7 +9151,7 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 			if (multiplier >= 7) { // only in tob, but the strings are at a different offset
 				multiplierText = ieStrRef(int(ieStrRef::TOB_SEPTUPLE) + multiplier - 7);
 			} else {
-				multiplierText = ieStrRef(int(displaymsg->GetStringReference(STR_BACKSTAB_DOUBLE)) + multiplier - 2);
+				multiplierText = ieStrRef(int(DisplayMessage::GetStringReference(STR_BACKSTAB_DOUBLE, this)) + multiplier - 2);
 			}
 			if (multiplier < 7 || (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) && multiplier < 10)) {
 				displaymsg->DisplayStringName(multiplierText, GUIColors::WHITE, this, STRING_FLAGS::SOUND);
