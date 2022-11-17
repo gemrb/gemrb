@@ -3203,7 +3203,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		static ieDword prevType = -1;
 		static int prevRoll = -1;
 		static const Actor *prevActor = nullptr;
-		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
+		if (core->HasFeedback(FT_COMBAT) && (prevType != type || prevActor != this || prevRoll != ret)) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String msg = core->GetString(DisplayMessage::GetStringReference(STR_SAVE_SPELL + type));
 			msg += L" " + fmt::to_wstring(ret);
