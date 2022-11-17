@@ -4467,7 +4467,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	if (scr->GetStat(IE_EA)>EA_EVILCUTOFF) {
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_EVIL, GUIColors::WHITE);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_EVIL, GUIColors::WHITE, Sender);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -4500,7 +4500,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 	if (check) {
 		//noticed attempt
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_FAIL, GUIColors::WHITE);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_FAIL, GUIColors::WHITE, Sender);
 		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
 			scr->AttackedBy(snd);
 		} else {
@@ -4532,7 +4532,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		if (!money) {
 			//no stuff to steal
-			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_NONE, GUIColors::WHITE);
+			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_NONE, GUIColors::WHITE, Sender);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -4548,7 +4548,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 	}
 
-	if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_DONE, GUIColors::WHITE);
+	if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_DONE, GUIColors::WHITE, Sender);
 	DisplayStringCoreVC(snd, VB_PP_SUCC, DS_CONSOLE);
 
 	int xp = gamedata->GetXPBonus(XP_PICKPOCKET, scr->GetXPLevel(1));
@@ -4556,7 +4556,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 
 	if (ret == MIC_FULL && snd->InParty) {
 		if (!core->HasFeature(GF_PST_STATE_FLAGS)) snd->VerbalConstant(VB_INVENTORY_FULL);
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_PICKPOCKET_INVFUL, GUIColors::XPCHANGE);
+		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_INVFUL, GUIColors::WHITE, Sender);
 	}
 	Sender->ReleaseCurrentAction();
 }
