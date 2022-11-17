@@ -9222,7 +9222,9 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	}
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
 
-	AuraCooldown = core->Time.attack_round_size;
+	if (!(flags&UI_NOAURA)) {
+		AuraCooldown = core->Time.attack_round_size;
+	}
 	ResetCommentTime();
 	if (!pro) {
 		return false;
