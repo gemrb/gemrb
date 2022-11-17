@@ -39,7 +39,7 @@ namespace GemRB {
 #define STR_NORMALTRAP     4
 #define STR_TRAP           5
 #define STR_CANNOTGO       6
-#define STR_TRAPREMOVED    7
+#define STR_    7
 #define STR_OVERSTOCKED    8
 #define STR_SLEEP          9
 #define STR_AMBUSH         10
