@@ -153,7 +153,7 @@ SEQ_DUP                    -1               0
 CRITICAL_HIT            35709               2
 CRITICAL_MISS           35718               2
 DEATH                      -1               0
-BACKSTAB                12128               0
+BACKSTAB_DAMAGE         12128               0
 BACKSTAB_BAD            37067     37068:19271
 BACKSTAB_FAIL              -1               0
 CASTER_LVL_INC             -1               0
