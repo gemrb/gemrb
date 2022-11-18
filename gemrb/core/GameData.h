@@ -109,7 +109,6 @@ public:
 
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
 	AutoTable LoadTable(const ResRef& tableRef, bool silent = false);
-	AutoTable GetTable(const ResRef& resRef) const;
 
 	PaletteHolder GetPalette(const ResRef& resname);
 

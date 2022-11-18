@@ -167,15 +167,6 @@ AutoTable GameData::LoadTable(const ResRef& tableRef, bool silent)
 	return tm;
 }
 
-/** Gets the index of a loaded table, returns -1 on error */
-AutoTable GameData::GetTable(const ResRef &resRef) const
-{
-	if (tables.count(resRef)) {
-		return tables.at(resRef);
-	}
-	return nullptr;
-}
-
 PaletteHolder GameData::GetPalette(const ResRef& resname)
 {
 	auto iter = PaletteCache.find(resname);
