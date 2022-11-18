@@ -557,8 +557,7 @@ int fx_fade_rgb (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xea ColdDamage (how)
 int fx_cold_damage (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_cold_damage(%2d): Damage %d", fx->Opcode, fx->Parameter1);
-	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	return FX_NOT_APPLIED;
 }
 
@@ -569,8 +568,7 @@ int fx_cold_damage (Scriptable* Owner, Actor* target, Effect* fx)
 //it is the usual iwd/how style hack
 int fx_chill_touch (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_chill_touch(%2d)", fx->Opcode);
-	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	if (STAT_GET(IE_GENERAL)==GEN_UNDEAD) {
 		target->Panic(Owner, PANIC_RUNAWAY);
 	}
@@ -604,8 +602,7 @@ int fx_chill_touch_panic (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xed CrushingDamage (how)
 int fx_crushing_damage (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_crushing_damage(%2d): Damage %d", fx->Opcode, fx->Parameter1);
-	target->Damage(fx->Parameter1, DAMAGE_CRUSHING, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(fx->Parameter1, DAMAGE_CRUSHING, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	return FX_NOT_APPLIED;
 }
 
@@ -658,7 +655,7 @@ int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx)
 		default:
 			return FX_NOT_APPLIED;
 	}
-	int damage = donor->Damage(fx->Parameter1, DAMAGE_MAGIC, owner, fx->IsVariable, fx->SavingThrowType);
+	int damage = donor->Damage(fx->Parameter1, DAMAGE_MAGIC, owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	receiver->SetBase(IE_HITPOINTS, receiver->GetBase(IE_HITPOINTS) + damage);
 	return FX_NOT_APPLIED;
 }
@@ -772,7 +769,7 @@ int fx_burning_blood (Scriptable* Owner, Actor* target, Effect* fx)
 		damage = DAMAGE_COLD;
 	}
 
-	target->Damage(fx->Parameter1, damage, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(fx->Parameter1, damage, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	STAT_SET(IE_CHECKFORBERSERK,1);
 	return FX_NOT_APPLIED;
 }
@@ -803,7 +800,7 @@ int fx_burning_blood2 (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//this effect doesn't use Parameter1 to modify damage, it is a counter instead
-	target->Damage(DICE_ROLL(0), damage, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(DICE_ROLL(0), damage, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	STAT_SET(IE_CHECKFORBERSERK,1);
 	return FX_APPLIED;
 }
@@ -875,7 +872,7 @@ int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
 	if (STAT_GET(IE_GENERAL)==GEN_UNDEAD) {
 		return FX_NOT_APPLIED;
 	}
-	target->Damage(DICE_ROLL(0), DAMAGE_COLD, Owner, fx->IsVariable, fx->SavingThrowType );
+	target->Damage(DICE_ROLL(0), DAMAGE_COLD, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	///convert to hold creature
 	///shall we check for immunity vs. #175?
 	///if yes, then probably it is easier to apply the hold effect instead of converting to it
@@ -906,10 +903,10 @@ int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (st) {
-		target->Damage(damage/2, DAMAGE_FIRE, Owner, fx->IsVariable, fx->SavingThrowType);
+		target->Damage(damage/2, DAMAGE_FIRE, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 		return FX_NOT_APPLIED;
 	}
-	target->Damage(damage, DAMAGE_FIRE, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(damage, DAMAGE_FIRE, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 
 	//convert effect to a blind effect.
 	fx->Opcode = EffectQueue::ResolveEffect(fx_state_blind_ref);
@@ -1459,7 +1456,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		damage = core->Roll(3, 8, 0);
 	}
 
-	target->Damage(damage, DAMAGE_SOULEATER, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(damage, DAMAGE_SOULEATER, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	//the state is not set soon enough!
 	//if (STATE_GET(STATE_DEAD) ) {
 	// the original checked IE_GENERAL for GEN_DEAD, but we set both at the same time
@@ -1540,7 +1537,7 @@ int fx_shroud_of_flame (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	Actor *caster = GetCasterObject();
-	target->Damage(fx->Parameter1, damagetype, caster, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(fx->Parameter1, damagetype, caster, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	fx->Parameter1 = core->Roll(1, 4, 0);
 	ApplyDamageNearby(caster, target, fx, damagetype);
 	fx->Parameter1 = 0;
@@ -1699,7 +1696,7 @@ int fx_vitriolic_sphere (Scriptable* Owner, Actor* target, Effect* fx)
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	target->Damage(fx->Parameter1, DAMAGE_ACID, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(fx->Parameter1, DAMAGE_ACID, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	fx->DiceThrown-=2;
 	if ((signed) fx->DiceThrown<1) {
 		return FX_NOT_APPLIED;
@@ -2398,7 +2395,7 @@ int fx_bleeding_wounds (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	target->Damage(damage, DAMAGE_POISON, Owner, fx->IsVariable, fx->SavingThrowType);
+	target->Damage(damage, DAMAGE_POISON, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	target->AddPortraitIcon(PI_BLEEDING);
 	return FX_APPLIED;
 }
@@ -3109,7 +3106,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//how style
-	victim->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, target, fx->IsVariable, fx->SavingThrowType);
+	victim->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, target, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	return ret;
 }
 
