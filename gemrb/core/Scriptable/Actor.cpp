@@ -3035,6 +3035,9 @@ void Actor::RefreshPCStats() {
 	// table header is in this order:
 	// PICK_POCKETS  OPEN_LOCKS  FIND_TRAPS  MOVE_SILENTLY  HIDE_IN_SHADOWS  DETECT_ILLUSION  SET_TRAPS
 	Modified[IE_PICKPOCKET] += GetSkillBonus(1);
+	if (Modified[IE_RACE] == 153 && !third) { // sigh, tieflings had hardcoded bonuses instead of a table entry
+		Modified[IE_PICKPOCKET] += 20;
+	}
 	Modified[IE_LOCKPICKING] += GetSkillBonus(2);
 	// these are governed by other stats in iwd2 (int) or don't exist (set traps)
 	if (!third) {
