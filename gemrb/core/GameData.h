@@ -191,18 +191,6 @@ private:
 	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;
 	std::map<size_t, std::vector<ResRef>> ItemSounds;
-	AutoTable racialInfravision;
-	AutoTable raceTHAC0Bonus;
-	AutoTable spellAbilityDie;
-	AutoTable trapSaveBonus;
-	AutoTable trapLimit;
-	AutoTable summoningLimit;
-	AutoTable reputationMod;
-	AutoTable fistWeap;
-	AutoTable monkBon;
-	AutoTable miscRule;
-	AutoTable difficultyLevels;
-	AutoTable xpBonus;
 	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;

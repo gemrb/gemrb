@@ -534,37 +534,34 @@ int GameData::GetSwingCount(ieDword ItemType)
 
 int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const std::string& raceName)
 {
-	static bool loadedRacialTHAC0 = false;
-	if (!loadedRacialTHAC0) {
-		raceTHAC0Bonus = LoadTable("racethac", true);
-		loadedRacialTHAC0 = true;
+	static bool ignore = false;
+	if (ignore) {
+		return 0;
 	}
 
+	AutoTable raceTHAC0Bonus = LoadTable("racethac", true);
 	// not all games have the table
-	if (!raceTHAC0Bonus) return 0;
+	if (!raceTHAC0Bonus) {
+		ignore = true;
+		return 0;
+	}
 
 	return raceTHAC0Bonus->QueryFieldSigned<int>(fmt::to_string(proficiency), raceName);
 }
 
 bool GameData::HasInfravision(const std::string& raceName)
 {
-	if (!racialInfravision) {
-		racialInfravision = LoadTable("racefeat", true);
-	}
+	AutoTable racialInfravision = LoadTable("racefeat", true);
 
+	if (!racialInfravision) return 0;
 	return racialInfravision->QueryFieldSigned<int>(raceName, "VALUE") & 1;
 }
 
 int GameData::GetSpellAbilityDie(const Actor *target, int which)
 {
-	static bool loadedSpellAbilityDie = false;
-	if (!loadedSpellAbilityDie) {
-		spellAbilityDie = LoadTable("clssplab", true);
-		if (!spellAbilityDie) {
-			Log(ERROR, "GameData", "GetSpellAbilityDie failed loading clssplab.2da!");
-			return 6;
-		}
-		loadedSpellAbilityDie = true;
+	AutoTable spellAbilityDie = LoadTable("clssplab", true);
+	if (!spellAbilityDie) {
+		return 6;
 	}
 
 	ieDword cls = target->GetActiveClass();
@@ -576,20 +573,16 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 {
 	if (!core->HasFeature(GF_3ED_RULES)) return 0;
 
-	if (!trapSaveBonus) {
-		trapSaveBonus = LoadTable("trapsave", true);
-	}
-
+	AutoTable trapSaveBonus = LoadTable("trapsave", true);
+	if (!trapSaveBonus) return 0;
 	return trapSaveBonus->QueryFieldSigned<int>(level - 1, cls - 1);
 }
 
 int GameData::GetTrapLimit(Scriptable *trapper)
 {
-	if (!trapLimit) {
-		trapLimit = LoadTable("traplimt", true);
-	}
+	AutoTable trapLimit = LoadTable("traplimt", true);
 
-	if (trapper->Type != ST_ACTOR) {
+	if (trapper->Type != ST_ACTOR || !trapLimit) {
 		return 6; // not using table default, since EE's file has it at 0
 	}
 
@@ -608,9 +601,8 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 
 int GameData::GetSummoningLimit(ieDword sex)
 {
-	if (!summoningLimit) {
-		summoningLimit = LoadTable("summlimt", true);
-	}
+	AutoTable summoningLimit = LoadTable("summlimt", true);
+	if (!summoningLimit) return 6;
 
 	unsigned int row = 1000;
 	switch (sex) {
@@ -744,9 +736,7 @@ const IWDIDSEntry& GameData::GetSpellProt(index_t idx)
 int GameData::GetReputationMod(int column)
 {
 	assert(column >= 0 && column <= 8);
-	if (!reputationMod) {
-		reputationMod = LoadTable("reputati", true);
-	}
+	AutoTable reputationMod = LoadTable("reputati", true);
 	if (!reputationMod) return false;
 
 	int reputation = core->GetGame()->Reputation / 10 - 1;
@@ -866,23 +856,18 @@ ResRef GameData::GetFist(int cls, int level)
 {
 	static bool ignore = false;
 	static ResRef defaultFist = "FIST";
-	static int cols = 0;
 	if (ignore) {
 		return defaultFist;
 	}
 
+	AutoTable fistWeap = LoadTable("fistweap");
 	if (!fistWeap) {
-		fistWeap = LoadTable("fistweap");
-		if (!fistWeap) {
-			ignore = true;
-			return defaultFist;
-		}
-
-		defaultFist = fistWeap->QueryDefault();
-		cols = fistWeap->GetColumnCount();
+		ignore = true;
+		return defaultFist;
 	}
 
 	// extend the last level value to infinity
+	static int cols = fistWeap->GetColumnCount();
 	if (level >= cols) level = cols - 1;
 
 	TableMgr::index_t row = fistWeap->GetRowIndex(fmt::to_string(cls));
@@ -896,21 +881,18 @@ int GameData::GetMonkBonus(int bonusType, int level)
 	if (level == 0) return 0;
 
 	static bool ignore = false;
-	static int cols = 0;
 	if (ignore) {
 		return 0;
 	}
 
+	AutoTable monkBon = LoadTable("monkbon");
 	if (!monkBon) {
-		monkBon = LoadTable("monkbon");
-		if (!monkBon) {
-			ignore = true;
-			return 0;
-		}
-		cols = monkBon->GetColumnCount();
+		ignore = true;
+		return 0;
 	}
 
 	// extend the last level value to infinity
+	static int cols = monkBon->GetColumnCount();
 	if (level >= cols) level = cols;
 
 	return monkBon->QueryFieldSigned<int>(bonusType, level - 1);
@@ -1047,9 +1029,7 @@ const std::vector<ItemUseType>& GameData::GetItemUse()
 
 int GameData::GetMiscRule(const TableMgr::key_t& rowName)
 {
-	if (!miscRule) {
-		miscRule = LoadTable("miscrule", true);
-	}
+	AutoTable miscRule = LoadTable("miscrule", true);
 	assert(miscRule);
 
 	return miscRule->QueryFieldSigned<int>(rowName, "VALUE");
@@ -1062,12 +1042,10 @@ int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
 		return 0;
 	}
 
+	AutoTable difficultyLevels = LoadTable("difflvls");
 	if (!difficultyLevels) {
-		difficultyLevels = LoadTable("difflvls");
-		if (!difficultyLevels) {
-			ignore = true;
-			return 0;
-		}
+		ignore = true;
+		return 0;
 	}
 
 	return difficultyLevels->QueryFieldSigned<int>(mod, difficulty);
@@ -1080,12 +1058,10 @@ int GameData::GetXPBonus(ieDword bonusType, ieDword level)
 		return 0;
 	}
 
+	AutoTable xpBonus = LoadTable("xpbonus");
 	if (!xpBonus) {
-		xpBonus = LoadTable("xpbonus");
-		if (!xpBonus) {
-			ignore = true;
-			return 0;
-		}
+		ignore = true;
+		return 0;
 	}
 
 	// use the highest bonus for levels outside table bounds
