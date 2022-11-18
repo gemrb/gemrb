@@ -4105,6 +4105,13 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		return 0;
 	}
 
+	// only pst has special crits and they share the same storage
+	if (pstflags) {
+		specialFlags = 0;
+	} else {
+		critical = 0;
+	}
+
 	//add lastdamagetype up ? maybe
 	//FIXME: what does original do?
 	LastDamageType |= damagetype;

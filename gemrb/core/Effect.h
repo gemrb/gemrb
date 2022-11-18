@@ -129,7 +129,7 @@ struct GEM_EXPORT Effect {
 	ieDword DiceSides = 0;
 	ieDword SavingThrowType = 0;
 	ieDword SavingThrowBonus = 0;
-	ieWord IsVariable = 0;
+	ieWord IsVariable = 0; // "Special" field in EEs (use depends on opcode), personalized critical type in PST (Actor::GetCriticalType)
 	ieWord IsSaveForHalfDamage = 0;
 
 	// EFF V2.0 fields:
