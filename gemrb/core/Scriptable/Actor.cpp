@@ -8900,7 +8900,9 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 
 	Projectile *pro = itm->GetProjectile(this, header, target, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
-	AuraCooldown = core->Time.attack_round_size;
+	if (!(flags & UI_NOAURA)) {
+		AuraCooldown = core->Time.attack_round_size;
+	}
 	ResetCommentTime();
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
