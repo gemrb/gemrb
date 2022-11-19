@@ -10000,6 +10000,7 @@ Actor *Actor::CopySelf(bool mislead) const
 
 	newActor->SetName(GetShortName(), 0);
 	newActor->SetName(GetName(),1);
+	newActor->SetScriptName("COPY");
 	newActor->creVersion = creVersion;
 	newActor->BaseStats = BaseStats;
 	// illusions aren't worth any xp and don't explore
@@ -10008,6 +10009,15 @@ Actor *Actor::CopySelf(bool mislead) const
 
 	//IF_INITIALIZED shouldn't be set here, yet
 	newActor->SetMCFlag(MC_EXPORTABLE, BitOp::NAND);
+
+	// adjust EA
+	if (newActor->BaseStats[IE_EA] <= EA_GOODCUTOFF) {
+		newActor->BaseStats[IE_EA] = EA_ALLY;
+	} else if (newActor->BaseStats[IE_EA] >= EA_EVILCUTOFF) {
+		newActor->BaseStats[IE_EA] = EA_ENEMY;
+	} else {
+		newActor->BaseStats[IE_EA] = EA_NEUTRAL;
+	}
 
 	//the creature importer does this too
 	newActor->Modified = newActor->BaseStats;

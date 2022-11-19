@@ -6626,13 +6626,6 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->ApplyEffect(newfx, copy, copy);
 	}
 
-	ResRef script;
-	//intentionally 7, to leave room for the last letter
-	// if this ever breaks, try with the CRE file name as the prefix (sources disagree)
-	script.Format("{:.7}m", target->GetScript(SCR_CLASS));
-	//if the caster is inparty, the script is turned off by the AI disable flag
-	copy->SetScript(script, SCR_CLASS, target->InParty!=0);
-
 	ResRef puppetRef;
 	switch(fx->Parameter2)
 	{
@@ -6641,6 +6634,13 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//set the gender to illusionary, so ids matching will work
 		copy->SetBase(IE_SEX, SEX_ILLUSION);
 		copy->SetBase(IE_MAXHITPOINTS, copy->GetBase(IE_MAXHITPOINTS)/2);
+		if (copy->GetBase(IE_EA) != EA_ALLY) {
+			ResRef script;
+			// intentionally 7, to leave room for the last letter
+			script.Format("{:.7}m", target->GetScript(SCR_CLASS));
+			// if the caster is inparty, the script is turned off by the AI disable flag
+			copy->SetScript(script, SCR_CLASS, target->InParty != 0);
+		}
 		break;
 	case 2:
 		puppetRef = "projimg";
@@ -6648,6 +6648,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		break;
 	case 3:
 		puppetRef = "simulacr";
+		copy->SetBase(IE_SEX, SEX_ILLUSION);
 		// healable level drain
 		// second generation simulacri are supposedly at a different level, but that makes little sense:
 		// level = original caster - caster / 2; eg. lvl 32 -> 16 -> 24 -> 20 -> 22 -> 21
