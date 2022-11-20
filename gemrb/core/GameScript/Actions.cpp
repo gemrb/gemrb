@@ -6528,6 +6528,11 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	// only one use per round; skip for our internal attack projectile
+	if (!(flags & UI_NOAURA) && act->AuraPolluted()) {
+		return;
+	}
+
 	act->UseItem(Slot, header, tar, flags);
 	Sender->ReleaseCurrentAction();
 }
@@ -6570,6 +6575,11 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 	unsigned int dist = GetItemDistance(itemres, header, angle);
 	if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
 		MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
+		return;
+	}
+
+	// only one use per round; skip for our internal attack projectile
+	if (!(flags & UI_NOAURA) && act->AuraPolluted()) {
 		return;
 	}
 
