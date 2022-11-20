@@ -6311,8 +6311,9 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		actor = GetNearestEnemyOf(map, target, 0);
 		break;
 	case 3:
-		// Nearest?
-		actor = map->GetActorByGlobalID(target->LastSeen);
+	default:
+		// Nearest
+		actor = GetNearestOf(map, target, 0);
 		break;
 	}
 
@@ -6365,12 +6366,12 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	case COND_NEAR4:
 		// PersonalSpaceDistance([ANYONE], 4)
 		nearest = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
-		condition = nearest && PersonalDistance(nearest, target) < 4;
+		condition = nearest && WithinPersonalRange(target, actor, 4);
 		break;
 	case COND_NEAR10:
 		// PersonalSpaceDistance([ANYONE], 10)
 		nearest = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
-		condition = nearest && PersonalDistance(nearest, target) < 10;
+		condition = nearest && WithinPersonalRange(target, actor, 10);
 		break;
 	case COND_EVERYROUND:
 		condition = true;
@@ -6394,16 +6395,16 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		delete parameters;
 		break;
 	case COND_NEARX:
-		// Range([ANYONE], 'Extra')
+		// PersonalSpaceDistance([ANYONE], 'Extra')
 		nearest = GetNearestOf(map, target, ORIGIN_SEES_ENEMY);
-		condition = nearest && PersonalDistance(nearest, target) < fx->IsVariable;
+		condition = nearest && WithinPersonalRange(nearest, target, fx->IsVariable);
 		break;
 	case COND_STATECHECK:
 		// StateCheck(Myself, 'Extra')
 		condition = (target->GetStat(IE_STATE_ID) & fx->IsVariable) > 0;
 		break;
 	case COND_DIED_ME:
-		// Died(Myself)
+		// Die()
 		condition = target->GetMatchingTrigger(trigger_die, TEF_PROCESSED_EFFECTS);
 		per_round = false;
 		break;
@@ -6432,6 +6433,10 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	default:
 		condition = false;
 	}
+
+	// TODO: EEs have fx->IsVariable overloaded: besides acting as a parameter to some
+	// of the above conditions, it's also a bitfield for extra features (see IESDP)
+	// meaning only some combinations can work
 
 	if (per_round) {
 		// This is a 4xxx trigger which is only checked every round.
@@ -6478,7 +6483,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 					displaymsg->DisplayConstantStringName(STR_CONTFAIL, GUIColors::RED, target);
 					continue;
 				}
-				if (PersonalDistance(target, actor) > dist) {
+				if (!WithinPersonalRange(target, actor, dist)) {
 					//display 'One of the spells has failed.'
 					displaymsg->DisplayConstantStringName(STR_CONTFAIL, GUIColors::RED, target);
 					continue;
