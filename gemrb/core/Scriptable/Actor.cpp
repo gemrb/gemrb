@@ -675,25 +675,23 @@ static TableMgr::index_t GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool
 	if (!kit) return TableMgr::npos;
 
 	if (baseclass != 0) {
-		std::vector<ieDword> kits = class2kits[baseclass].ids;
-		std::vector<ieDword>::iterator it = kits.begin();
-		for (int idx=0; it != kits.end(); it++, idx++) {
-			if (kit & (*it)) return class2kits[baseclass].indices[idx];
+		int idx = 0;
+		for (const auto& aKit : class2kits[baseclass].ids) {
+			if (kit & aKit) return class2kits[baseclass].indices[idx];
+			idx++;
 		}
+
 		if (strict) return TableMgr::npos;
 		// this is also hit for kitted multiclasses like illusionist/thieves, who we take care of in the second loop
 		if (iwd2class) Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit {} at expected class {}, recalculating!", kit, baseclass);
 	}
 
 	// no class info passed or dc/mc, so infer the kit's parent single class
-	std::map<int, ClassKits>::iterator clskit = class2kits.begin();
-	for (int cidx=0; clskit != class2kits.end(); clskit++, cidx++) {
-		std::vector<ieDword> kits = class2kits[cidx].ids;
-		std::vector<ieDword>::iterator it = kits.begin();
-		for (int kidx=0; it != kits.end(); it++, kidx++) {
-			if (kit & (*it)) {
-				return class2kits[cidx].indices[kidx];
-			}
+	for (const auto& clsKitPair : class2kits) {
+		int idx = 0;
+		for (const auto& aKit : clsKitPair.second.ids) {
+			if (kit & aKit) return clsKitPair.second.indices[idx];
+			idx++;
 		}
 	}
 
@@ -751,13 +749,13 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 			clab = class2kits[baseclass].clab;
 		} else {
 			// both kit and baseclass are fine and the kit is of this baseclass
-			std::vector<ieDword> kits = class2kits[baseclass].ids;
-			std::vector<ieDword>::iterator it = kits.begin();
-			for (int idx=0; it != kits.end(); it++, idx++) {
-				if (kit & (*it)) {
+			int idx = 0;
+			for (const auto& aKit : class2kits[baseclass].ids) {
+				if (kit & aKit) {
 					clab = class2kits[baseclass].clabs[idx];
 					break;
 				}
+				idx++;
 			}
 		}
 		assert(!clab.IsEmpty());
@@ -9571,10 +9569,8 @@ int Actor::CheckUsability(const Item *item) const
 				if (Modified[levelslotsiwd2[j]] == 0) continue;
 				if ((1<<(classesiwd2[j] - 1)) & ~itemvalue) continue;
 
-				std::vector<ieDword> kits = class2kits[classesiwd2[j]].ids;
-				std::vector<ieDword>::iterator it = kits.begin();
-				for ( ; it != kits.end(); it++) {
-					kitignore |= *it;
+				for (const auto& kit : class2kits[classesiwd2[j]].ids) {
+					kitignore |= kit;
 				}
 			}
 			continue;
@@ -10994,10 +10990,8 @@ bool Actor::IsKitInactive() const
 
 	ieDword baseclass = GetActiveClass();
 	ieDword kit = GetStat(IE_KIT);
-	std::vector<ieDword> kits = class2kits[baseclass].ids;
-	std::vector<ieDword>::iterator it = kits.begin();
-	for (int idx = 0; it != kits.end(); it++, idx++) {
-		if (kit & (*it)) return false;
+	for (const auto& aKit : class2kits[baseclass].ids) {
+		if (kit & aKit) return false;
 	}
 	return true;
 }
@@ -11028,14 +11022,13 @@ const std::string& Actor::GetClassName(ieDword classID) const
 // NOTE: returns first kit name for multikit chars
 const std::string& Actor::GetKitName(ieDword kitID) const
 {
-	std::map<int, ClassKits>::iterator clskit = class2kits.begin();
-	for (int cidx = 0; clskit != class2kits.end(); clskit++, cidx++) {
-		std::vector<ieDword> kits = class2kits[cidx].ids;
-		std::vector<ieDword>::iterator it = kits.begin();
-		for (int kidx = 0; it != kits.end(); it++, kidx++) {
-			if (kitID & (*it)) {
-				return class2kits[cidx].kitNames[kidx];
+	for (const auto& clsKitPair : class2kits) {
+		int kitIdx = 0;
+		for (const auto& kit : clsKitPair.second.ids) {
+			if (kitID & kit) {
+				return clsKitPair.second.kitNames[kitIdx];
 			}
+			kitIdx++;
 		}
 	}
 	return blank;
