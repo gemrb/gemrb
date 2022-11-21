@@ -3081,7 +3081,8 @@ int Actor::GetConHealAmount() const
 void Actor::UpdateFatigue()
 {
 	const Game *game = core->GetGame();
-	if (!InParty || !game->GameTime || core->GetGameControl()->InDialog() || core->InCutSceneMode()) {
+	const GameControl* gc = core->GetGameControl();
+	if (!InParty || !game->GameTime || !gc || gc->InDialog() || core->InCutSceneMode()) {
 		return;
 	}
 
