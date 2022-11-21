@@ -23,8 +23,8 @@ MAGE_ABJURER     502        9564       0x40       11         CLABMA02   SAVEWIZ 
 MAGE_CONJURER    504        9565       0x80       11         CLABMA06   SAVEWIZ    HPWIZ      0x80        1          1          1          1          1          1          1        BAATMAG
 MAGE_DIVINER     2012       9566       0x100      11         CLABMA05   SAVEWIZ    HPWIZ     0x100        1          1          1          1          1          1          1        BAATMAG
 MAGE_ENCHANTER   2022       9567       0x200      11         CLABMA09   SAVEWIZ    HPWIZ     0x200        1          1          1          1          1          1          1        BAATMAG
-MAGE_EVOKER      12786      9569       0x800      11         CLABMA07   SAVEWIZ    HPWIZ     0x400        1          1          1          1          1          1          1        BAATMAG
-MAGE_ILLUSIONIST 12785      9568       0x400      11         CLABMA08   SAVEWIZ    HPWIZ     0x800        1          1          1          1          1          1          1        BAATMAG
+MAGE_ILLUSIONIST 12785      9568       0x400      11         CLABMA08   SAVEWIZ    HPWIZ     0x400        1          1          1          1          1          1          1        BAATMAG
+MAGE_EVOKER      12786      9569       0x800      11         CLABMA07   SAVEWIZ    HPWIZ     0x800        1          1          1          1          1          1          1        BAATMAG
 MAGE_NECROMANCER 12787      9570       0x1000     11         CLABMA03   SAVEWIZ    HPWIZ    0x1000        1          1          1          1          1          1          1        BAATMAG
 MAGE_TRANSMUTER  12788      9571       0x2000     11         CLABMA04   SAVEWIZ    HPWIZ    0x2000        1          1          1          1          1          1          1        BAATMAG
 CLERIC_ILMATER   38097      38118      0x8000     3          CLABCL01   SAVEPRS    HPPRS    0x8000        1          1          1          1          1          1          1        BAATNFG
