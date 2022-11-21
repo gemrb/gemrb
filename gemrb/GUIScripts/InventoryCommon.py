@@ -346,6 +346,9 @@ def DisplayItem (slotItem, itemtype):
 	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
 	if SpellBookType == "*" or SpellBookType == "MXSPLSRC":
 		read = 0
+	# furthermore there might be school exclusions present
+	if read:
+		read = GemRB.CanUseItemType (SLOT_ALL, slotItem['ItemResRef'], pc, False)
 	container = (itemtype & 1) and (item["Function"]&ITM_F_CONTAINER)
 	dialog = (itemtype & 1) and (item["Dialog"]!="" and item["Dialog"]!="*")
 	familiar = (itemtype & 1) and (item["Type"] == 38)
