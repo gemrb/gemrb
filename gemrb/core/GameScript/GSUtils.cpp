@@ -3099,7 +3099,7 @@ void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flag
 		}
 	}
 
-	if (actor->InParty || !CreateMovementEffect(actor, map->GetScriptRef(), dest, 0)) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptRef(), dest, 0)) {
 		MoveBetweenAreasCore(actor, map->GetScriptRef(), dest, -1, true);
 	}
 }

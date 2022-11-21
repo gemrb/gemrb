@@ -712,9 +712,7 @@ void GameScript::MoveGlobal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//FIXME:CreateMovement UnMakes globals, probably this isn't what we want!!!
-	//maybe there is some flag that marks real global actors and temporary ones
-	if (actor->InParty || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, 0) ) {
+	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, 0)) {
 		MoveBetweenAreasCore( actor, parameters->resref0Parameter, parameters->pointParameter, -1, true);
 	}
 }
