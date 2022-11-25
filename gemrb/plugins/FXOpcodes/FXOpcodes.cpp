@@ -1027,13 +1027,13 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 	if (fx->IsVariable) {
 		//has a second weapon or shield, cannot deflect arrows
 		int slot = target->inventory.GetShieldSlot();
-		if (slot>0 && target->inventory.GetItem(slot) ) return FX_APPLIED;
+		if (slot > 0 && target->inventory.HasItemInSlot("", slot)) return FX_APPLIED;
 
 		//has a twohanded weapon equipped
 		slot = target->inventory.GetWeaponSlot();
 		if (slot>0) {
-			const CREItem *item = target->inventory.GetItem(slot);
-			if (item->Flags&IE_INV_ITEM_TWOHANDED) return FX_APPLIED;
+			const CREItem* item = target->inventory.GetSlotItem(slot);
+			if (item && item->Flags & IE_INV_ITEM_TWOHANDED) return FX_APPLIED;
 		}
 	}
 
