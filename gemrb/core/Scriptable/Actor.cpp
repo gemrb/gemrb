@@ -5562,7 +5562,7 @@ void Actor::ReinitQuickSlots() const
 		// Note: we're now in the QSLOTn case
 		// If slot is empty, reset quickslot to 0xffff/0xffff
 
-		if (!inventory.HasItemInSlot("", slot)) {
+		if (inventory.IsSlotEmpty(slot)) {
 			SetupQuickSlot(which, 0xffff, 0xffff);
 		} else {
 			ieWord idx;
@@ -5602,7 +5602,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which) const
 	// If current quickweaponslot doesn't contain an item, reset it to fist
 	int slot = PCStats->QuickWeaponSlots[which];
 	int header = PCStats->QuickWeaponHeaders[which];
-	if (!inventory.HasItemInSlot("", slot) || header == 0xffff) {
+	if (inventory.IsSlotEmpty(slot) || header == 0xffff) {
 		//a quiver just went dry, falling back to fist
 		empty = true;
 	} else {
@@ -8745,7 +8745,7 @@ void Actor::Rest(int hours)
 int Actor::GetQuickSlot(int slot) const
 {
 	assert(slot<8);
-	if (inventory.HasItemInSlot("",inventory.GetMagicSlot())) {
+	if (!inventory.IsSlotEmpty(inventory.GetMagicSlot())) {
 		return inventory.GetMagicSlot();
 	}
 	if (!PCStats) {

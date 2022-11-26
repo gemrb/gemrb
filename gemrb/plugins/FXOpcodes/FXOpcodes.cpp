@@ -1027,7 +1027,7 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 	if (fx->IsVariable) {
 		//has a second weapon or shield, cannot deflect arrows
 		int slot = target->inventory.GetShieldSlot();
-		if (slot > 0 && target->inventory.HasItemInSlot("", slot)) return FX_APPLIED;
+		if (slot > 0 && !target->inventory.IsSlotEmpty(slot)) return FX_APPLIED;
 
 		//has a twohanded weapon equipped
 		slot = target->inventory.GetWeaponSlot();
@@ -1415,7 +1415,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// if the effect is waiting for SLOT_FIST, all effects after the op12 in the list fail to
 	// be evaluated, only (potentially) being evaluated a single time on being added to the actor
 	// NOTE: add a soft FX_ABORT-like return type if this queueing is really needed
-	if (fx->IsVariable & DamageFlags::FistOnly && source && !source->inventory.HasItemInSlot("", Inventory::GetFistSlot())) {
+	if (fx->IsVariable & DamageFlags::FistOnly && source && source->inventory.IsSlotEmpty(Inventory::GetFistSlot())) {
 		return FX_ABORT;
 	}
 
@@ -2571,7 +2571,7 @@ int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// ees added an upper word to tweak targetting of weapons in SLOT_MAGIC
 	int slot = Inventory::GetMagicSlot();
 	ieDword itemLevel;
-	if (fx->Parameter2 > 2 && target->inventory.HasItemInSlot("", slot)) {
+	if (fx->Parameter2 > 2 && !target->inventory.IsSlotEmpty(slot)) {
 		switch (fx->Parameter2 >> 16) {
 			case 0:
 			default: // always dispel, ignore undispellable
@@ -3634,7 +3634,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//modders can still force two handed weapons with Parameter2
 	if (!fx->Parameter2) {
 		if (target->inventory.GetItemFlag(slot)&IE_ITEM_TWO_HANDED) {
-			if (target->inventory.HasItemInSlot("",target->inventory.GetShieldSlot())) {
+			if (!target->inventory.IsSlotEmpty(target->inventory.GetShieldSlot())) {
 				target->inventory.RemoveItem(slot);
 				displaymsg->DisplayConstantStringNameString(STR_SPELL_FAILED, GUIColors::WHITE, STR_OFFHAND_USED, target);
 				return FX_NOT_APPLIED;

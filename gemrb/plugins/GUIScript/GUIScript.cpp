@@ -10891,7 +10891,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 	}
 	bool fistdrawn = true;
 	ieDword magicweapon = actor->inventory.GetMagicSlot();
-	if (!actor->inventory.HasItemInSlot("",magicweapon) ) {
+	if (actor->inventory.IsSlotEmpty(magicweapon)) {
 		magicweapon = 0xffff;
 	}
 	ieDword fistweapon = actor->inventory.GetFistSlot();

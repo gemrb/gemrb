@@ -233,6 +233,7 @@ public:
 	int CountItems(const ResRef &resRef, bool charges, bool checkBags = false) const;
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const ResRef& resref, unsigned int slot) const;
+	bool IsSlotEmpty(unsigned int slot) const;
 	/** returns true if contains one itemtype equipped */
 	bool HasItemType(ieDword type) const;
 	/** Looks for a particular item in the inventory.

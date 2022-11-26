@@ -274,6 +274,11 @@ bool Inventory::HasItemInSlot(const ResRef& resref, unsigned int slot) const
 	return false;
 }
 
+bool Inventory::IsSlotEmpty(unsigned int slot) const
+{
+	return !HasItemInSlot("", slot);
+}
+
 bool Inventory::HasItemType(ieDword type) const
 {
 	if (type>255) return false;
@@ -1261,7 +1266,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 	}
 
 	//unequipping (fist slot will be used now)
-	if (slotcode == IW_NO_EQUIPPED || !HasItemInSlot("", newslot)) {
+	if (slotcode == IW_NO_EQUIPPED || IsSlotEmpty(newslot)) {
 		Equipped = IW_NO_EQUIPPED;
 		//fist slot equipping effects
 		AddSlotEffects(SLOT_FIST);
@@ -1888,7 +1893,7 @@ bool Inventory::IsSlotBlocked(int slot) const
 	} else {
 		otherslot = SLOT_LEFT;
 	}
-	return HasItemInSlot("",otherslot);
+	return !IsSlotEmpty(otherslot);
 }
 
 inline bool Inventory::TwoHandedInSlot(int slot) const

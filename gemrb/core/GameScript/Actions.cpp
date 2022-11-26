@@ -4249,7 +4249,7 @@ void GameScript::FillSlot(Scriptable *Sender, Action* parameters)
 	actor->inventory.TryEquipAll(slot);
 
 	if (tmp) {
-		if (actor->inventory.HasItemInSlot("",slot) ) {
+		if (!actor->inventory.IsSlotEmpty(slot)) {
 			slot = SLOT_ONLYINVENTORY;
 		}
 
