@@ -485,7 +485,7 @@ namespace GemRB {
 
 #define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
 #define IE_EXISTANCEDELAY       184 // affects the displaying of EXISTANCE strings
-#define IE_ATTACKNUMBERDOUBLE   185 // used by haste option 2
+#define IE_ANIMATION_ONLY_HASTE 185 // free to reuse, redundant stat used by haste option 2
 #define IE_DISABLECHUNKING      186 // no permanent death
 #define IE_NOTURNABLE           187 // immune to turn
 //the IE sets this stat the same time as stat 150
