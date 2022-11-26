@@ -475,6 +475,7 @@ private:
 	tick_t remainingTalkSoundTime = 0;
 	tick_t lastTalkTimeCheckAt = 0;
 	ieDword lastScriptCheck = 0;
+	int lastConBonus;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Point& p, BlitFlags flags,
 						 const std::vector<AnimationPart>& anims, const Color& tint) const;
