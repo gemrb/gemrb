@@ -1575,6 +1575,10 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_set_hasted_state(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	target->fxqueue.RemoveAllEffects(fx_set_slow_state_ref);
 	target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
+	int old_type = -2, new_type = -2; // lowest priority by default
+	if (target->GetStat(IE_STATE_ID) & STATE_HASTED) {
+		old_type = (signed) target->GetStat(IE_IMPROVEDHASTE); // we cramp all three types into this stat now
+	}
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_STATE_CURE( STATE_SLOWED );
 		BASE_STATE_SET( STATE_HASTED );
@@ -1583,30 +1587,28 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STATE_SET( STATE_HASTED );
 	}
 	target->NewStat(IE_MOVEMENTRATE, 200, MOD_PERCENT);
+	// note that the number of attacks is handled separately, based on below stats, after effects are applied
 	switch (fx->Parameter2) {
 	case 0: //normal haste
 		target->AddPortraitIcon(PI_HASTED);
-		STAT_SET(IE_IMPROVEDHASTE,0);
-		STAT_SET(IE_ATTACKNUMBERDOUBLE,0);
-		STAT_ADD(IE_NUMBEROFATTACKS, 2);
+		new_type = 0;
 		// -2 initiative bonus
 		STAT_ADD(IE_PHYSICALSPEED, 2);
 		break;
 	case 1://improved haste
 		target->AddPortraitIcon(PI_IMPROVEDHASTE);
-		STAT_SET(IE_IMPROVEDHASTE,1);
-		STAT_SET(IE_ATTACKNUMBERDOUBLE,0);
-		target->NewStat(IE_NUMBEROFATTACKS, 200, MOD_PERCENT);
+		new_type = 1;
 		// -2 initiative bonus
 		STAT_ADD(IE_PHYSICALSPEED, 2);
 		break;
 	case 2://speed haste only
 		target->AddPortraitIcon(PI_HASTED);
-		STAT_SET(IE_IMPROVEDHASTE,0);
-		STAT_SET(IE_ATTACKNUMBERDOUBLE,1);
+		new_type = -1; // SCS detects imp. haste by checking if stat is > 0, so this correctly fails
 		break;
 	}
-
+	if (new_type > old_type) { // improved > normal > weak > none
+		STAT_SET(IE_IMPROVEDHASTE, new_type);
+	}
 	return FX_PERMANENT;
 }
 

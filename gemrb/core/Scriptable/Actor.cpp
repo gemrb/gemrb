@@ -2780,6 +2780,24 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 		if (!(BaseStats[IE_STATE_ID] & STATE_DEAD)) pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
+	// apply haste bonuses to attacks per round, possibly exceeding the limit of 5
+	// this must be done after ALL other modifiers, including skill effects in RefreshPCStats() above
+	if (GetStat(IE_STATE_ID) & STATE_HASTED) {
+		int apr = GetStat(IE_NUMBEROFATTACKS);
+		switch ((signed) GetStat(IE_IMPROVEDHASTE)) {
+		case 1: // improved
+			apr += apr; // x2
+			break;
+		case 0: // normal
+			apr += 2 - apr % 2; // +1, round down
+			break;
+		case -1: // weak
+			if (apr % 2) apr++; // round up
+			break;
+		}
+		Modified[IE_NUMBEROFATTACKS] = apr;
+	}
+
 	for (int i=0; i < MAX_STATS; ++i) {
 		if (first || Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
@@ -2986,7 +3004,6 @@ void Actor::RefreshPCStats() {
 			// the adjustment results in a base of 2-5 (2+[0-3]) and the modified stat degrades to 4+(4-[2-5]) = 8-[2-5] = 3-6
 			// instead of 4+[0-3] = 4-7
 			// For a master ranger at level 14, the difference ends up as 2 (1 apr).
-			// FIXME: but this isn't universally true or improved haste couldn't double the total apr! For the above case, we're half apr off.
 			ieDword warriorLevel = GetWarriorLevel();
 			if (warriorLevel) {
 				int mod = Modified[IE_NUMBEROFATTACKS] - BaseStats[IE_NUMBEROFATTACKS];
