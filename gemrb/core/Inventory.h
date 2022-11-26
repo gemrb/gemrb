@@ -227,9 +227,6 @@ public:
 
 	/** duplicates the source inventory into the current one, marking items as undroppable */
 	void CopyFrom(const Actor *source);
-	/** Removes an item from the inventory, destroys slot.
-	 * Use it for containers only */
-	CREItem *GetItem(unsigned int idx);
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
 	/** Returns number of items in the inventory */

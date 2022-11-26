@@ -156,17 +156,6 @@ void Inventory::CopyFrom(const Actor *source)
 	CalculateWeight();
 }
 
-CREItem *Inventory::GetItem(unsigned int slot)
-{
-	if (slot >= Slots.size() ) {
-		InvalidSlot(slot);
-	}
-	CREItem *item = Slots[slot];
-	Slots.erase(Slots.begin()+slot);
-	CalculateWeight();
-	return item;
-}
-
 void Inventory::AddItem(CREItem *item)
 {
 	if (!item) return; //invalid items get no slot
