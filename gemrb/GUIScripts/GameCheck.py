@@ -79,7 +79,9 @@ def HasWideScreenMod ():
 	gamePath = GemRB.GetSystemVariable (SV_GAMEPATH)
 	weiduLogPath = os.path.join (gamePath, "weidu.log")
 	try:
-		weiduLog = open (weiduLogPath)
+		# latin-1 accepts all 1B codes and we only check the ASCII subset;
+		# the log file appears to be inconsistent in some cases
+		weiduLog = open (weiduLogPath, encoding='latin-1')
 	except OSError:
 		return False
 
