@@ -1013,7 +1013,7 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 	if (resisted) {
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
 		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, GUIColors::WHITE, actor);
-		Log(MESSAGE, "EffectQueue", "effect resisted: {}", globals.Opcodes[fx->Opcode].Name);
+		Log(MESSAGE, "EffectQueue", "{} resisted effect: {}", fmt::WideToChar{actor->GetName()}, globals.Opcodes[fx->Opcode].Name);
 		return FX_NOT_APPLIED;
 	}
 	return -1;
