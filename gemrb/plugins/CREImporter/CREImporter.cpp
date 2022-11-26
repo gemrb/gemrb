@@ -693,8 +693,6 @@ void CREImporter::ReadChrHeader(Actor *act)
 		//fallthrough
 	case CREVersion::GemRB:
 		for (int i = 0; i < QSPCount; i++) {
-			// FIXME: we are reading 4 bytes then suspiciously discarding 3 of them
-			// I wonder if those the bytes are supposed to fill in the 3 byte holes we are leaving in QSlots
 			ieDword tmpDword;
 			str->ReadDword(tmpDword);
 			act->PCStats->QSlots[i+3] = (ieByte) tmpDword;
