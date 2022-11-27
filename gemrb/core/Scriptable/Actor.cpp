@@ -1200,7 +1200,9 @@ static void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
 static void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CON);
-	pcf_hitpoint(actor, 0, actor->BaseStats[IE_HITPOINTS]);
+	if (!actor->checkHP) {
+		pcf_hitpoint(actor, 0, actor->BaseStats[IE_HITPOINTS]);
+	}
 	if (third) {
 		int oldBonus = actor->GetAbilityBonus(IE_CON, oldValue);
 		actor->Modified[IE_SAVEFORTITUDE] += actor->GetAbilityBonus(IE_CON) - oldBonus;
@@ -2945,15 +2947,13 @@ void Actor::RefreshHP() {
 	//we still apply the maximum bonus to dead characters, but don't apply
 	//to current HP, or we'd have dead characters showing as having hp
 	Modified[IE_MAXHITPOINTS]+=bonus;
-	// applying the bonus to the current hitpoints is trickier, since we don't want to cause regeneration
-	/* the following is not reliable, since the hp may become exactly oldmax via other means too
-	ieDword oldmax = Modified[IE_MAXHITPOINTS];
-	if (!(BaseStats[IE_STATE_ID]&STATE_DEAD)) {
-		// for now only apply it to fully healed actors iff the bonus is positive (fixes starting hp)
-		if (BaseStats[IE_HITPOINTS] == oldmax && bonus > 0) {
-			BaseStats[IE_HITPOINTS] += bonus;
-		}
-	}*/
+
+	// temporary con bonuses also modify current HP; this can kill! (EE behavior)
+	// but skip on game load, while old bonuses are still re-applied
+	if (!(BaseStats[IE_STATE_ID]&STATE_DEAD) && checkHP != 2 && bonus != lastConBonus) {
+		BaseStats[IE_HITPOINTS] += bonus - lastConBonus;
+	}
+	lastConBonus = bonus;
 }
 
 // refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
