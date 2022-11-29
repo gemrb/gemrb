@@ -556,11 +556,39 @@ void Projectile::Payload()
 
 		if (effects) {
 			effects.SetOwner(Owner);
-			effects.AddAllEffects(target, Destination);
+			EffectQueue projQueue;
+			ProcessEffects(projQueue, Owner, target, true);
+			projQueue.AddAllEffects(target, Destination);
 		}
 	}
 
 	effects = EffectQueue();
+}
+
+// only add effects with two specific target modes like the original
+// apply the rest, disregarding the projectile (fixes spwish30 applying too many times)
+// we create new effects not to break repeating projectiles like web or cloudkill
+void Projectile::ProcessEffects(EffectQueue& projQueue, Scriptable* owner, Actor* target, bool apply) const
+{
+	EffectQueue selfQueue;
+	projQueue.SetOwner(owner);
+	selfQueue.SetOwner(owner);
+	auto fxIter = effects.GetFirstEffect();
+	const Effect* fx = effects.GetNextEffect(fxIter);
+	while (fx) {
+		if (fx->Target != FX_TARGET_PRESET && fx->Target != FX_TARGET_ORIGINAL) {
+			if (apply) {
+				selfQueue.AddEffect(new Effect(*fx));
+			}
+		} else {
+			projQueue.AddEffect(new Effect(*fx));
+		}
+		fx = effects.GetNextEffect(fxIter);
+	}
+
+	if (apply && selfQueue.GetEffectsCount()) {
+		core->ApplyEffectQueue(&selfQueue, target, owner);
+	}
 }
 
 void Projectile::ApplyDefault() const
@@ -1139,8 +1167,10 @@ void Projectile::SecondaryTarget()
 		extension_targetcount = 1;
 	}
 
+	Scriptable* owner = area->GetScriptableByGlobalID(Caster);
 	int radius = Extension->ExplosionRadius / 16;
 	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
+	bool first = true;
 	for (const Actor *actor : actors) {
 		ieDword targetID = actor->GetGlobalID();
 
@@ -1182,7 +1212,12 @@ void Projectile::SecondaryTarget()
 		}
 
 		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-		pro->SetEffectsCopy(effects, Pos);
+		// run special targetting modes on one child only, so target-all and similar don't run payload too often
+		EffectQueue projQueue;
+		ProcessEffects(projQueue, owner, nullptr, first);
+		pro->SetEffectsCopy(projQueue, Pos);
+		first = false;
+
 		//copy the additional effects reference to the child projectile
 		//but only when there is a spell to copy
 		if (!successSpell.IsEmpty()) {

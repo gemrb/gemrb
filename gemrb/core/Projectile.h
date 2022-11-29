@@ -429,6 +429,7 @@ private:
 	void Payload();
 	//if there is an extension, convert to exploding or wait for trigger
 	void EndTravel();
+	void ProcessEffects(EffectQueue& projQueue, Scriptable* owner, Actor* target, bool apply) const;
 	//apply default spell
 	void ApplyDefault() const;
 	//stops the current sound
