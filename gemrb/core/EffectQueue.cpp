@@ -1586,7 +1586,6 @@ void EffectQueue::RemoveAllNonPermanentEffects()
 
 //remove certain levels of effects, possibly matching school/secondary type
 //this method removes whole spells (tied together by their source)
-//FIXME: probably this isn't perfect
 void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match)
 {
 	ResRef removed;
