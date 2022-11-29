@@ -124,7 +124,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadResRef( s->SpellbookIcon );
 	//this hack is needed in ToB at least
 	if (!s->SpellbookIcon.IsEmpty() && core->HasFeature(GF_SPELLBOOKICONHACK)) {
-		s->SpellbookIcon.Format("{:.7}c", s->SpellbookIcon);
+		*s->SpellbookIcon.rbegin() = 'c'; // replace last character
 	}
 
 	str->ReadWord(s->unknown6);
