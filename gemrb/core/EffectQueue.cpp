@@ -651,6 +651,7 @@ all_party:
 
 			flg = ApplyEffect( actor, new_fx, 1 );
 			if( new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
+				new_fx->Target = FX_TARGET_SELF;
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			} else {
 				delete new_fx;
