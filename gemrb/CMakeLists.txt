@@ -114,39 +114,39 @@ create_icon("${CMAKE_SOURCE_DIR}/artwork/gemrb.bmp" "gemrb-icon.h" "gemrb_icon")
 
 SET_TARGET_PROPERTIES(gemrb PROPERTIES INSTALL_RPATH ${LIB_DIR})
 INCLUDE_DIRECTORIES( ${SDL_INCLUDE_DIR} )
-IF(WIN32)
- TARGET_LINK_LIBRARIES(gemrb gemrb_core)
-ELSE(WIN32)
- IF(APPLE)
-	# custom info.plist
-	SET(PRODUCT_BUNDLE_IDENTIFIER "org.gemrb.gemrb")
-	SET(EXECUTABLE_NAME "GemRB")
-	SET_TARGET_PROPERTIES(gemrb PROPERTIES BUNDLE True MACOSX_BUNDLE_INFO_PLIST ../platforms/apple/osx/Info.plist OUTPUT_NAME GemRB)
+IF(APPLE)
+  # custom info.plist
+  SET(PRODUCT_BUNDLE_IDENTIFIER "org.gemrb.gemrb")
+  SET(EXECUTABLE_NAME "GemRB")
+  SET_TARGET_PROPERTIES(gemrb PROPERTIES BUNDLE True MACOSX_BUNDLE_INFO_PLIST ../platforms/apple/osx/Info.plist OUTPUT_NAME GemRB)
 
-	# compile nib
-	ADD_CUSTOM_COMMAND (TARGET gemrb POST_BUILD 
+  # compile nib
+  ADD_CUSTOM_COMMAND (TARGET gemrb POST_BUILD
                       COMMAND ${IBTOOL} --errors --warnings --notices --output-format human-readable-text 
                               --compile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources/GemRB.nib 
                             ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/apple/CocoaWrapper/mac/nibs/GemRB.xib
                       COMMENT "Compiling GemRB.xib")
 
-	if (STATIC_LINK)
-		TARGET_LINK_LIBRARIES(gemrb
-			  ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
-			 gemrb_core ${plugins}  -Wl,-all_load)
-	else (STATIC_LINK)
-		TARGET_LINK_LIBRARIES(gemrb gemrb_core
-			  ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
-	endif (STATIC_LINK)
- ELSE(APPLE)
   if (STATIC_LINK)
-	  TARGET_LINK_LIBRARIES(gemrb ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
-		  -Wl,--whole-archive gemrb_core ${plugins} -Wl,--no-whole-archive)
+    TARGET_LINK_LIBRARIES(gemrb
+        ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
+       gemrb_core ${plugins}  -Wl,-all_load)
   else (STATIC_LINK)
-	  TARGET_LINK_LIBRARIES(gemrb gemrb_core ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+    TARGET_LINK_LIBRARIES(gemrb gemrb_core
+        ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
   endif (STATIC_LINK)
- ENDIF(APPLE)
-ENDIF(WIN32)
+ELSE(APPLE)
+  if (STATIC_LINK)
+    TARGET_LINK_LIBRARIES(gemrb ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
+      -Wl,--whole-archive gemrb_core ${plugins} -Wl,--no-whole-archive)
+  else (STATIC_LINK)
+    IF (MSVC)
+      TARGET_LINK_LIBRARIES(gemrb gemrb_core)
+    ELSE (MSVC)
+      TARGET_LINK_LIBRARIES(gemrb gemrb_core ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+    ENDIF (MSVC)
+  endif (STATIC_LINK)
+ENDIF(APPLE)
 
 # preconfigure the sample config with the selected paths
 CONFIGURE_FILE(
