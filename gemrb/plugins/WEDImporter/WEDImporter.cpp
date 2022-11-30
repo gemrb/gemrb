@@ -296,7 +296,16 @@ void WEDImporter::ReadWallPolygons()
 		str->ReadDword(PolygonHeaders[i].FirstVertex);
 		str->ReadDword(PolygonHeaders[i].CountVertex);
 		str->ReadWord(PolygonHeaders[i].Flags); // two bytes: mode and height in the original bg2
-		str->ReadRegion(PolygonHeaders[i].rect, true);
+
+		// Note: unlike the rest, the layout is minX, maxX, minY, maxY
+		auto& rect = PolygonHeaders[i].rect;
+		str->ReadScalar<int, ieWord>(rect.x);
+		str->ReadScalar<int, ieWord>(rect.w);
+		str->ReadScalar<int, ieWord>(rect.y);
+		str->ReadScalar<int, ieWord>(rect.h);
+
+		rect.w -= rect.x;
+		rect.h -= rect.y;
 	}
 
 	for (ieDword i=0; i < polygonCount; i++) {
