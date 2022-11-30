@@ -3938,13 +3938,10 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x7b Item:RemoveInventory
 int fx_remove_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_remove_inventory_item(%2d)", fx->Opcode);
-	//FIXME: now equipped items are only wielded weapons
-	//why would it not let equipped items to be destructed?
-	//changed to work on any items - book of infinite spells relies on this
-	//selective destruction is available if you set Parameter2 to nonzero
-	//and Parameter1 to the bitfield
-	target->inventory.DestroyItem(fx->Resource,fx->Parameter2?fx->Parameter1:0,1);
+	// changed to work on any items - book of infinite spells relies on this
+	// gemrb extension: selective destruction is available if you set Parameter2 to nonzero
+	// and Parameter1 to the bitfield
+	target->inventory.DestroyItem(fx->Resource, fx->Parameter2 ? fx->Parameter1 : 0, 0);
 	return FX_NOT_APPLIED;
 }
 
