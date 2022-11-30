@@ -10,6 +10,8 @@ MULTI     - if multi class, which classes are combined
 ID        - the class stat value
 HP        - the hp table for the class
 <racecolumns> - the rest of the columns enable or disable the class (2 means partially usable)
+STREXTRA  - is the extraordinary strength stat available to this class (17, 18/01-18/00, 19)
+CONBONLVL - up until which level does the class receive a constitution bonus to hp on level up?
 
 Rows - classes
 

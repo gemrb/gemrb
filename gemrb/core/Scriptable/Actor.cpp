@@ -1960,16 +1960,10 @@ static void InitActorTables()
 
 					AppendFormat(buffer, "Classis: {} ", classis);
 					levelStats[tmpindex][classis] = IE_LEVEL;
-					//get the last level when we can roll for HP
-					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP"), true);
-					if (hptm) {
-						int tmphp = 0;
-						TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
-						while (hptm->QueryFieldSigned<int>(tmphp, rollscolumn))
-							tmphp++;
-						AppendFormat(buffer, "HPROLLMAXLVL: {}", tmphp);
-						if (tmphp) maxLevelForHpRoll[tmpindex] = tmphp;
-					}
+					// get the last level when we can roll for HP / get a constitution bonus
+					int conBonLevel = tm->QueryFieldSigned<int>(classname, "CONBONLVL");
+					AppendFormat(buffer, "HPROLLMAXLVL: {}", conBonLevel);
+					if (conBonLevel) maxLevelForHpRoll[tmpindex] = conBonLevel;
 				}
 				Log(DEBUG, "Actor", "{}", buffer);
 				continue;
@@ -2009,16 +2003,9 @@ static void InitActorTables()
 						if (!foundwarrior) {
 							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
 								classis==ISBARBARIAN);
-							hptm = gamedata->LoadTable(tm->QueryField(currentname, "HP"), true);
-							if (hptm) {
-								int tmphp = 0;
-								TableMgr::index_t rollscolumn = hptm->GetColumnIndex("ROLLS");
-								while (hptm->QueryFieldSigned<int>(tmphp, rollscolumn))
-									tmphp++;
-								//make sure we at least set the first class
-								if ((tmphp > maxLevelForHpRoll[tmpindex]) || foundwarrior || numfound == 0) {
-									maxLevelForHpRoll[tmpindex] = tmphp;
-								}
+							int conBonLevel = tm->QueryFieldSigned<int>(classname, "CONBONLVL");
+							if ((conBonLevel > maxLevelForHpRoll[tmpindex]) || foundwarrior || numfound == 0) {
+								maxLevelForHpRoll[tmpindex] = conBonLevel;
 							}
 						}
 					}
