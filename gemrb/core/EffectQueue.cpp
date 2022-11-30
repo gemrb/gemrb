@@ -1586,7 +1586,7 @@ void EffectQueue::RemoveAllNonPermanentEffects()
 
 //remove certain levels of effects, possibly matching school/secondary type
 //this method removes whole spells (tied together by their source)
-void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match)
+void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match, const Scriptable* target)
 {
 	ResRef removed;
 	for (auto& fx : effects) {
@@ -1611,6 +1611,17 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		if (Flags & RL_REMOVEFIRST) {
 			removed = fx.SourceRef;
+		}
+
+		// provide feedback
+		if (Flags & RL_MATCHSCHOOL) {
+			AutoTable schoolTable = gamedata->LoadTable("mschool", true);
+			ieStrRef msg = schoolTable->QueryFieldAsStrRef(fx.PrimaryType, 0);
+			displaymsg->DisplayRollStringName(msg, GUIColors::WHITE, target);
+		} else if (Flags & RL_MATCHSECTYPE) {
+			AutoTable secTypeTable = gamedata->LoadTable("msectype", true);
+			ieStrRef msg = secTypeTable->QueryFieldAsStrRef(fx.SecondaryType, 0);
+			displaymsg->DisplayRollStringName(msg, GUIColors::WHITE, target);
 		}
 	}
 }

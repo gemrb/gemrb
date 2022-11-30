@@ -276,7 +276,7 @@ public:
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource);
 	void RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource);
 	void RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode);
-	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
+	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match, const Scriptable* target);
 	static bool RollDispelChance(ieDword casterLevel, ieDword level);
 	void DispelEffects(const Effect *dispeller, ieDword level);
 
