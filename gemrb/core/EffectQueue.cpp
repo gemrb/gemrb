@@ -1616,10 +1616,12 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 		// provide feedback
 		if (Flags & RL_MATCHSCHOOL) {
 			AutoTable schoolTable = gamedata->LoadTable("mschool", true);
+			if (!schoolTable) continue;
 			ieStrRef msg = schoolTable->QueryFieldAsStrRef(fx.PrimaryType, 0);
 			displaymsg->DisplayRollStringName(msg, GUIColors::WHITE, target);
 		} else if (Flags & RL_MATCHSECTYPE) {
 			AutoTable secTypeTable = gamedata->LoadTable("msectype", true);
+			if (!secTypeTable) continue;
 			ieStrRef msg = secTypeTable->QueryFieldAsStrRef(fx.SecondaryType, 0);
 			displaymsg->DisplayRollStringName(msg, GUIColors::WHITE, target);
 		}
