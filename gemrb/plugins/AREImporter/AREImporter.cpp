@@ -462,7 +462,7 @@ Ambient* AREImporter::SetupMainAmbients(const Map::MainAmbients& mainAmbients)
 
 	Ambient *ambi = new Ambient();
 	ambi->flags = IE_AMBI_ENABLED | IE_AMBI_LOOPING | IE_AMBI_MAIN | IE_AMBI_NOSAVE;
-	ambi->gain = mainAmbients.AmbientVol;
+	ambi->gain = static_cast<ieWord>(mainAmbients.AmbientVol);
 	// sounds and name
 	ambi->sounds.emplace_back(mainAmbient);
 	ambi->name = mainAmbient;
@@ -1248,7 +1248,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 			anim.startchance = 100; // percentage of starting a cycle
 		}
 		if (startFrameRange && (anim.Flags & A_ANI_RANDOM_START)) {
-			anim.frame = RAND(0, startFrameRange - 1);
+			anim.frame = RAND<AreaAnimation::index_t>(0, startFrameRange - 1);
 		}
 		anim.startFrameRange = 0; // this will never get resaved (iirc)
 		str->Read(&anim.skipcycle, 1); // how many cycles are skipped (100% skippage), "period" in bg2
@@ -1383,8 +1383,8 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 				// our MapControl wants them in large map space so we must convert
 				// its what other games use and its what our custom map note code uses
 				const Size mapsize = map->GetSize();
-				point.x = px * double(mapsize.w) / map->SmallMap->Frame.w;
-				point.y = py * double(mapsize.h) / map->SmallMap->Frame.h;
+				point.x = static_cast<int>(px * double(mapsize.w) / map->SmallMap->Frame.w);
+				point.y = static_cast<int>(py * double(mapsize.h) / map->SmallMap->Frame.h);
 
 				char bytes[501]; // 500 + null
 				str->Read(bytes, 500 );
@@ -1594,8 +1594,8 @@ int AREImporter::GetStoredFileSize(Map *map)
 
 	//this one removes empty heaps and counts items, should be before
 	//getting ContainersCount
-	ItemsCount = (ieDword) map->ConsolidateContainers();
-	ContainersCount = (ieDword) map->TMap->GetContainerCount();
+	ItemsCount = (ieWord) map->ConsolidateContainers();
+	ContainersCount = (ieWord) map->TMap->GetContainerCount();
 	headersize += ContainersCount * 0xc0;
 	ItemsOffset = headersize;
 	headersize += ItemsCount * 0x14;
@@ -1790,11 +1790,11 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteDword(d->Flags);
 		stream->WriteDword(VertIndex);
 		auto open = d->OpenTriggerArea();
-		ieWord tmpWord = open ? open->Count() : 0;
+		ieWord tmpWord = static_cast<ieWord>(open ? open->Count() : 0);
 		stream->WriteWord(tmpWord);
 		VertIndex += tmpWord;
 		auto closed = d->ClosedTriggerArea();
-		tmpWord = closed ? closed->Count() : 0;
+		tmpWord = static_cast<ieWord>(closed ? closed->Count() : 0);
 		stream->WriteWord(tmpWord);
 		stream->WriteDword(VertIndex);
 		VertIndex += tmpWord;
@@ -1951,7 +1951,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 			stream->WriteFilling(8);
 		}
 		//outline polygon index and count
-		ieWord tmpWord = (c->outline) ? c->outline->Count() : 0;
+		ieWord tmpWord = static_cast<ieWord>(c->outline ? c->outline->Count() : 0);
 		stream->WriteDword(VertIndex);
 		stream->WriteWord(tmpWord);
 		VertIndex +=tmpWord;
@@ -1982,7 +1982,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		stream->WriteWord(ip->BBox.y);
 		stream->WriteWord(ip->BBox.x + ip->BBox.w);
 		stream->WriteWord(ip->BBox.y + ip->BBox.h);
-		ieWord tmpWord = (ip->outline) ? ip->outline->Count() : 1;
+		ieWord tmpWord = static_cast<ieWord>(ip->outline ? ip->outline->Count() : 1);
 		stream->WriteWord(tmpWord);
 		stream->WriteDword(VertIndex);
 		VertIndex += tmpWord;
@@ -2228,8 +2228,8 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 		if (pst) {
 			// in PST the coordinates are stored in small map space
 			const Size& mapsize = map->GetSize();
-			stream->WriteDword(mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w);
-			stream->WriteDword(mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h);
+			stream->WriteDword(static_cast<ieDword>(mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w));
+			stream->WriteDword(static_cast<ieDword>(mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h));
 
 			size_t len = 0;
 			// limited to 500 *bytes* of text, convert to a multibyte encoding.
@@ -2307,7 +2307,7 @@ int AREImporter::PutTraps(DataStream *stream, const Map *map) const
 			name = proName;
 			const EffectQueue& fxqueue = pro->GetEffects();
 			if (fxqueue) {
-				tmpWord = fxqueue.GetSavedEffectsCount();
+				tmpWord = static_cast<ieWord>(fxqueue.GetSavedEffectsCount());
 			}
 			ieDword ID = pro->GetCaster();
 			// lookup caster via Game, since the the current map can already be empty when switching them
@@ -2360,7 +2360,7 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 
 ieWord AREImporter::SavedAmbientCount(const Map* map) const
 {
-	int count = 0;
+	ieWord count = 0;
 	for (const Ambient* am : map->GetAmbients())
 	{
 		if (am->flags & IE_AMBI_NOSAVE) continue;
