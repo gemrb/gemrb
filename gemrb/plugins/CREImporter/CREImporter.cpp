@@ -2227,8 +2227,7 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 	stream->WriteDword(actor->BaseStats[IE_XP_MAGE]);
 	stream->WriteDword(actor->BaseStats[IE_XP_THIEF]);
 	for (int i = 0; i < 10; i++) {
-		// uh FIXME? shouldnt this be IE_INTERNAL_0 + i
-		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_INTERNAL_0]);
+		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_INTERNAL_0 + i]);
 	}
 	for (const auto& counter : actor->DeathCounters) {
 		stream->WriteScalar(counter);
