@@ -458,6 +458,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 
 	#update our hp values
 	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, CurrentHP+OldHP)
+	GemRB.SetPlayerStat (pc, IE_HITPOINTS, CurrentHP + GemRB.GetPlayerStat (pc, IE_HITPOINTS))
 	return
 
 def ApplyFeats(MyChar):
