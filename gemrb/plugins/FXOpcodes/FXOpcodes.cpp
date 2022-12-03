@@ -1002,12 +1002,15 @@ static void Resurrect(const Scriptable *Owner, Actor *target, const Effect *fx, 
 
 
 // handles the percentage damage spread over time by converting it to absolute damage
-inline void HandlePercentageDamage(Effect *fx, const Actor *target) {
+inline int HandlePercentageDamage(Effect* fx, const Actor* target) {
+	int damage = 0;
 	if (fx->Parameter2 == RPD_PERCENT && fx->FirstApply) {
 		// distribute the damage to one second intervals
 		int seconds = (fx->Duration - core->GetGame()->GameTime) / core->Time.ai_update_time;
-		fx->Parameter1 = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100 / seconds;
+		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
+		fx->Parameter1 = static_cast<ieDword>(damage / seconds);
 	}
+	return damage;
 }
 // Effect opcodes
 
@@ -1916,7 +1919,18 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
 	tick_t timeStep = target->GetAdjustedTime(aRound);
 
-	HandlePercentageDamage(fx, target);
+	int totalDamage = HandlePercentageDamage(fx, target);
+	// ensure we deal at least 1 point of damage, but shorten the duration when rounding up
+	if (fx->Parameter2 == RPD_PERCENT) {
+		if (fx->FirstApply) {
+			fx->Parameter5 = totalDamage;
+			if (fx->Parameter1 == 0) fx->Parameter1++;
+		} else if (core->GetGame()->GameTime % timeStep == 0) { // only if we're dealing damage in this run
+			if (signed(fx->Parameter5) <= 0) return FX_ABORT;
+			fx->Parameter5 -= fx->Parameter1;
+		}
+	}
+
 	Scriptable *caster = GetCasterObject();
 
 	switch(fx->Parameter2) {
