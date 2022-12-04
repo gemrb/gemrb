@@ -10935,6 +10935,12 @@ void Actor::ApplyEffectCopy(const Effect *oldfx, EffectRef &newref, Scriptable *
 {
 	Effect *newfx = EffectQueue::CreateEffectCopy(oldfx, newref, param1, param2);
 	if (newfx) {
+		newfx->ProbabilityRangeMin = 0;
+		newfx->ProbabilityRangeMax = 100;
+		newfx->MinAffectedLevel = 0;
+		newfx->MaxAffectedLevel = 0;
+		newfx->SavingThrowType = 0;
+		newfx->Resistance = FX_NO_RESIST_CAN_DISPEL;
 		core->ApplyEffect(newfx, this, Owner);
 	} else {
 		Log(ERROR, "Actor", "Failed to create effect copy for {}! Target: {}, Owner: {}", newref.Name, fmt::WideToChar{GetName()}, fmt::WideToChar{Owner->GetName()});
