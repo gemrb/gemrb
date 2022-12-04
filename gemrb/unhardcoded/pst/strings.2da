@@ -188,9 +188,9 @@ WEAPONINEFFECTIVE       37087               1
 CONCEALED_MISS             -1               0
 SAVE_SPELL              38581               0
 SAVE_BREATH             38580               0
-SAVE_POLY               38579               0
-SAVE_WANDS              38578               0
 SAVE_DEATH              38577               0
+SAVE_WANDS              38578               0
+SAVE_POLY               38579               0
 ATTACK_ROLL             19275               0
 ATTACK_ROLL_L              -1               0
 HIT                     19276               0
