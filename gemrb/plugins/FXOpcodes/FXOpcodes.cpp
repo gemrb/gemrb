@@ -1111,6 +1111,7 @@ int fx_cure_sleep_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	BASE_STATE_CURE( STATE_SLEEP );
 	target->fxqueue.RemoveAllEffects(fx_set_sleep_state_ref);
 	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_SLEEP);
+	target->SetStance(IE_ANI_GET_UP);
 	return FX_NOT_APPLIED;
 }
 
@@ -2176,17 +2177,17 @@ int fx_set_silenced_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x27 State:Helpless, State:Sleep
 // this effect sets both bits, but 'awaken' only removes the sleep bit
-// FIXME: this is probably a persistent effect
 int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_set_unconscious_state(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-
 	if (target->HasSpellState(SS_BLOODRAGE)) {
 		return FX_NOT_APPLIED;
 	}
 
 	if (fx->FirstApply) {
 		target->ApplyEffectCopy(fx, fx_animation_stance_ref, Owner, 0, IE_ANI_SLEEP);
+		Effect* standUp = EffectQueue::CreateEffect(fx_animation_stance_ref, 0, IE_ANI_GET_UP, FX_DURATION_DELAY_LIMITED);
+		standUp->Duration = (fx->Duration - core->GetGame()->GameTime) / core->Time.ai_update_time;
+		core->ApplyEffect(standUp, target, target);
 	}
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
