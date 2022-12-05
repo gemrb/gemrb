@@ -92,6 +92,8 @@ def DisplayOverview(step):
 	BackButton = CharGenWindow.GetControl (11)
 	BackButton.SetText (15416)
 	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
+	if GemRB.GetVar ("ImportedChar"):
+		BackButton.SetState (IE_GUI_BUTTON_DISABLED)
 	BackButton.OnPress (BackPress)
 	BackButton.MakeEscape()
 
