@@ -313,6 +313,12 @@ def setAccept():
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
 
+	# don't reset most stats of imported chars
+	if GemRB.GetVar ("ImportedChar"):
+		CustomizeChar (MyChar) # FIXME: preveri potrebo, iwd ima recimo ImportDonePress, kjer naredi par teh stvari
+		RunGame (MyChar)
+		return
+
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	
 	#reputation
@@ -323,9 +329,8 @@ def setAccept():
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 
 	#lore, thac0, hp, and saves
-	if not GemRB.GetVar ("ImportedChar"):
-		GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
-		GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
+	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
+	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
 	LUCommon.SetupSavingThrows (MyChar)
 	LUCommon.SetupThaco (MyChar)
 	LUCommon.SetupLore (MyChar)
@@ -348,19 +353,24 @@ def setAccept():
 	GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
 	GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
-	#does all the rest
-	LargePortrait = GemRB.GetToken ("LargePortrait")
-	SmallPortrait = GemRB.GetToken ("SmallPortrait")
-	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
-	GemRB.SetPlayerString (MyChar, 74, 11863)
+	CustomizeChar (MyChar)
+
 	#10 is a weapon slot (see slottype.2da row 10)
-	if not GemRB.GetVar ("ImportedChar"):
-		GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
+	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# apply class/kit abilities
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
 
+	RunGame (MyChar)
+
+def CustomizeChar(MyChar):
+	LargePortrait = GemRB.GetToken ("LargePortrait")
+	SmallPortrait = GemRB.GetToken ("SmallPortrait")
+	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
+	GemRB.SetPlayerString (MyChar, 74, 11863)
+
+def RunGame(MyChar):
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
 	GemRB.SetVar ("ImportedChar", 0)

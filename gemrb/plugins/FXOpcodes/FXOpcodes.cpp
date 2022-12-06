@@ -662,7 +662,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("MovementRateModifier2", fx_movement_modifier, 0, -1 ),//slow (b0)
 	EffectDesc("MovementRateModifier3", fx_movement_modifier, 0, -1 ),//forced (IWD - 10a)
 	EffectDesc("MovementRateModifier4", fx_movement_modifier, 0, -1 ),//slow (IWD2 - 1b9)
-	EffectDesc("MoveToArea", fx_move_to_area, 0, -1 ), //0xba
+	EffectDesc("MoveToArea", fx_move_to_area, EFFECT_REINIT_ON_LOAD, -1 ), //0xba
 	EffectDesc("NoCircleState", fx_no_circle_state, 0, -1 ),
 	EffectDesc("NPCBump", fx_npc_bump, 0, -1 ),
 	EffectDesc("OffscreenAIModifier", fx_offscreenai_modifier, 0, -1 ),
@@ -5375,7 +5375,9 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			}
 		}
 		//move to area
-		MoveBetweenAreasCore(target, fx->Resource, fx->Pos, fx->Parameter2, true);
+		Point& targetPos = fx->Pos;
+		if (targetPos.IsZero() || targetPos.IsInvalid()) targetPos = fx->Source;
+		MoveBetweenAreasCore(target, fx->Resource, targetPos, fx->Parameter2, true);
 		//remove the effect now
 		return FX_NOT_APPLIED;
 	}

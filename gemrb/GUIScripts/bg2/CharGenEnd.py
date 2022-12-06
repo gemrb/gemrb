@@ -31,6 +31,13 @@ def OnLoad():
 	# Lay on hands, turn undead and backstab multiplier get set by the core
 	# set my character up
 	MyChar = GemRB.GetVar ("Slot")
+
+	# don't reset most stats of imported chars
+	if GemRB.GetVar ("ImportedChar"):
+		CustomizeChar (MyChar)
+		RunGame (MyChar)
+		return
+
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
@@ -78,6 +85,10 @@ def OnLoad():
 
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 
+	CustomizeChar (MyChar)
+	RunGame (MyChar)
+
+def CustomizeChar(MyChar):
 	# save the name and starting xp (can level right away in game)
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 
@@ -94,6 +105,7 @@ def OnLoad():
 		GemRB.CreateString (BioStrRef, Bio)
 	GemRB.SetPlayerString (MyChar, 74, BioStrRef)
 
+def RunGame(MyChar):
 	if GameCheck.IsTOB():
 		# will also add the starting inventory for tob
 		GemRB.GameSetExpansion (4)
@@ -126,7 +138,6 @@ def OnLoad():
 		else:
 			GemRB.SetToken ("NextScript","Start")
 		GemRB.SetNextScript ("ExportFile") #export
-	return
 
 def GiveEquipment(MyChar, ClassName, KitIndex):
 		# get the kit (or use class if no kit) to load the start table
