@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # GemRB - Infinity Engine Emulator
 # Copyright (C) 2009 The GemRB Project
 #
@@ -30,6 +30,13 @@
 
 num_coords = 20
 
+def print_y(y, i):
+	end = " "
+	if i == (num_coords - 1):
+		end = ""
+	print(y, end=end)
+
+
 def generate_header():
 	print("2DA V1.0")
 	print("-10")
@@ -38,7 +45,7 @@ def generate_header():
 	print("", end=' ')
 	for i in range(num_coords):
 		print("X" + str(i + 1), end=' ')
-		print("Y" + str(i + 1), end=' ')
+		print_y("Y" + str(i + 1), i)
 	print()
 
 # A simple spaced line formation.
@@ -47,7 +54,7 @@ def generate_line(name):
 	yloc = 0
 	for i in range(num_coords):
 		print(0, end=' ')
-		print(yloc, end=' ')
+		print_y(yloc, i)
 		yloc += 36
 	print()
 
@@ -70,7 +77,7 @@ def generate_t():
 		else:
 			# line member (36 deeper)
 			print(0, end=' ')
-			print(48 + ((i - 3) * 36), end=' ')
+			print_y(8 + ((i - 3) * 36), i)
 	print()
 
 # A 'gathered' formation around a centre point.
@@ -83,23 +90,23 @@ def generate_gather():
 				yloc = -36 # front
 			else:
 				xloc = 48 # right
-				yloc = 24 * (i / 3)
+				yloc = 24 * i // 3
 		elif i % 3 == 1:
 			if i < 3: # front row
 				xloc = 48 # right
 				yloc = -24
 			else:
 				xloc = -48 # left
-				yloc = 24 * (i / 3)
+				yloc = 24 * i // 3
 		else:
 			if i < 3: # front row
 				xloc = -48 # left
 				yloc = -24
 			else:
 				xloc = 0 # back
-				yloc = 36 * (i / 3)
+				yloc = 36 * i // 3
 		print(xloc, end=' ')
-		print(yloc, end=' ')
+		print_y(yloc, i)
 	print()
 
 # A block formation which places 4 on a row - first two in the 
@@ -118,8 +125,7 @@ def generate_4and2():
 		else:
 			xloc = 128
 		yloc = (i / 4) * 48
-		print(xloc, end=' ')
-		print(yloc, end=' ')
+		print_y(yloc, i)
 	print()
 
 # A wavy-line formation.
@@ -135,7 +141,7 @@ def generate_s(bg2style):
 			else: print(64, end=' ') # on right
 		
 		# y coordinate: 24 each
-		print(i * 24, end=' ')	
+		print_y(i * 24, i)
 	print()
 
 # Returns the position in a formation of party member 'actorno',
@@ -162,7 +168,7 @@ def generate_wavyline():
 			print(-15, end=' ') # on left
 		
 		# y coordinate: 24 each
-		print(pos * 24, end=' ')
+		print_y(pos * 24, i)
 	print()
 
 # A formation surrounding the main character. The next character goes
@@ -186,7 +192,7 @@ def generate_protect():
 			print("32 48", end=' ') # back right
 		else:
 			print(0, end=' ')
-			print(24 * (i - 5), end=' ')
+			print_y(24 * (i - 5), i)
 	print()
 
 # A simple 3-across block formation.
@@ -202,7 +208,7 @@ def generate_3by2():
 			print(-64, end=' ')
 
 		# y coordinate
-		print((i / 3) * 48, end=' ')
+		print_y((i // 3) * 48, i)
 	print()
 
 # A simple 2-across block formation.
@@ -214,10 +220,10 @@ def generate_2by3():
 	for i in range(num_coords):
 		if left_side: # left
 			print(-24, end=' ')
-			print(yloc, end=' ')
+			print_y(yloc, i)
 		else: # right
 			print(24, end=' ')
-			print(yloc, end=' ')
+			print_y(yloc, i)
 			# first step back is 48, then 36
 			if yloc == 0:
 				yloc = 48
@@ -233,10 +239,10 @@ def generate_rank():
 	for i in range(num_coords):
 		# lead character placed at focal point -32, spacing is 64
 		if i % 2 == 0:
-			print(-32 - ((i / 2) * 64), end=' ')
+			print(-32 - ((i // 2) * 64), end=' ')
 		else:
-			print(-32 + (((i + 1) / 2) * 64), end=' ')
-		print(0, end=' ')
+			print(-32 + (((i + 1) // 2) * 64), end=' ')
+		print_y(0, i)
 	print()
 
 def generate_v():
@@ -248,7 +254,7 @@ def generate_v():
 			xpos = 64 + (i / 2) * -15
 		ypos = (i / 2) * 48
 		print(xpos, end=' ')
-		print(ypos, end=' ')
+		print_y(ypos, i)
 	print()
 
 # A triangle with the lead character at the back. Focal point is at the
@@ -267,7 +273,7 @@ def generate_triangle():
 		else:
 			pos = pos - 3
 			# start 72 back, then move back 36 per row
-			ypos = 72 + ((pos / 3) * 36)
+			ypos = 72 + ((pos // 3) * 36)
 
 			if pos % 3 == 0: # middle
 				xpos = 0
@@ -277,7 +283,7 @@ def generate_triangle():
 				xpos = 64
 			
 			print(xpos, end=' ')
-			print(ypos, end=' ')
+			print_y(ypos, i)
 	print()
 
 # A wide triangle with the lead character at the front. Characters are placed
@@ -307,8 +313,8 @@ def generate_wedge():
 				print(-124, end=' ') # left
 			else:
 				print(124, end=' ') # right
-			ypos = 72 + (i / 3) * 36
-			print(ypos, end=' ')
+			ypos = 72 + (i // 3) * 36
+			print_y(ypos, i)
 	print()
 
 from sys import argv,exit
