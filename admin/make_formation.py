@@ -316,13 +316,7 @@ def generate_wedge():
 	print()
 
 def generate_none():
-	print("NONE", end=' ')
-	end = " "
-	for i in range(num_coords):
-		if i == (num_coords - 1):
-			end = ""
-		print("0 0", end=end)
-	print()
+	print("NONE "  + "0 0 " * (num_coords - 1) + "0 0")
 
 from sys import argv,exit
 
