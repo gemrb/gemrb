@@ -121,7 +121,8 @@ def generate_4and2():
 			xloc = -64
 		else:
 			xloc = 128
-		yloc = (i / 4) * 48
+		yloc = (i // 4) * 48
+		print(xloc, end=' ')
 		print_y(yloc, i)
 	print()
 
@@ -246,10 +247,10 @@ def generate_v():
 	print("V", end=' ')
 	for i in range(num_coords):
 		if i % 2 == 0:
-			xpos = (i / 2) * -15
+			xpos = (i // 2) * -15
 		else:
-			xpos = 64 + (i / 2) * -15
-		ypos = (i / 2) * 48
+			xpos = 64 + (i // 2) * -15
+		ypos = (i // 2) * 48
 		print(xpos, end=' ')
 		print_y(ypos, i)
 	print()
@@ -314,6 +315,15 @@ def generate_wedge():
 			print_y(ypos, i)
 	print()
 
+def generate_none():
+	print("NONE", end=' ')
+	end = " "
+	for i in range(num_coords):
+		if i == (num_coords - 1):
+			end = ""
+		print("0 0", end=end)
+	print()
+
 from sys import argv,exit
 
 if len(argv) != 2:
@@ -349,10 +359,7 @@ if argv[1] == "pst":
 	generate_wedge()
 	generate_s(False)
 	generate_line("LINE")
-	print("NONE", end=' ')
-	for i in range(num_coords):
-		print("0 0", end=' ')
-	print()
+	generate_none()
 
 if argv[1] == "bg2":
 	generate_line("FOLLOW") # TODO: should be hard-coded game logic
