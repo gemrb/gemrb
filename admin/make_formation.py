@@ -77,34 +77,31 @@ def generate_t():
 		else:
 			# line member (36 deeper)
 			print(0, end=' ')
-			print_y(8 + ((i - 3) * 36), i)
+			print_y(48 + ((i - 3) * 36), i)
 	print()
 
 # A 'gathered' formation around a centre point.
 def generate_gather():
 	print("GATHER", end=' ')
 	for i in range(num_coords):
-		if i % 3 == 0:
-			if i < 3: # front row
-				xloc = 0 # centre
-				yloc = -36 # front
-			else:
-				xloc = 48 # right
-				yloc = 24 * i // 3
+		if i == 0:
+			xloc = 0 # centre
+			yloc = -36 # front
+		elif i == 1:
+			xloc = 48 # right
+			yloc = -24
+		elif i == 2:
+			xloc = -48 # left
+			yloc = -24
+		elif i % 3 == 0:
+			xloc = 48 # right
+			yloc = 24 * i // 3
 		elif i % 3 == 1:
-			if i < 3: # front row
-				xloc = 48 # right
-				yloc = -24
-			else:
-				xloc = -48 # left
-				yloc = 24 * i // 3
+			xloc = -48 # left
+			yloc = 24 * (i - 1) // 3
 		else:
-			if i < 3: # front row
-				xloc = -48 # left
-				yloc = -24
-			else:
-				xloc = 0 # back
-				yloc = 36 * i // 3
+			xloc = 0 # centre
+			yloc = 12 + 24 * (i - 2) // 3
 		print(xloc, end=' ')
 		print_y(yloc, i)
 	print()
