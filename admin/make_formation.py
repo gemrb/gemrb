@@ -184,7 +184,7 @@ def generate_protect():
 	print("PROTECT", end=' ')
 	for i in range(num_coords):
 		if i == 0:
-			print("0 0".format(offset), end=' ') # centre
+			print("0 0", end=' ') # centre
 			pass
 		elif i == 1: # front
 			x = 0
