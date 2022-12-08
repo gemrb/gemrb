@@ -11950,6 +11950,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 	}
 
 	AutoTable pdtable = gamedata->LoadTable("pdialog");
+	assert(pdtable);
 	int ii = game->GetPartySize(true); // party size, only alive
 	bool bg2expansion = core->GetGame()->Expansion == GAME_TOB;
 	while (ii--) {
