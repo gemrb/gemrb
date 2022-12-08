@@ -583,10 +583,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	const Point& gameMousePos = GameMousePos();
 	// draw reticles
 	if (isFormationRotation) {
-		double angle = formationBaseAngle;
-		if (Distance(gameMousePos, gameClickPoint) > EventMgr::mouseDragRadius) {
-			angle = AngleFromPoints(gameMousePos, gameClickPoint);
-		}
+		double angle = AngleFromPoints(gameMousePos, gameClickPoint);
 		DrawFormation(game->selected, gameClickPoint, angle);
 	} else {
 		int max = game->GetPartySize(true);
@@ -2291,15 +2288,7 @@ void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryT
 	if (party.empty())
 		return;
 
-	double angle = 0.0;
-	if (isFormationRotation) {
-		angle = formationBaseAngle;
-		Point mp = GameMousePos();
-		if (Distance(mp, p) > EventMgr::mouseDragRadius) {
-			angle = AngleFromPoints(mp, p);
-		}
-	}
-
+	double angle = isFormationRotation ? AngleFromPoints(GameMousePos(), p) : formationBaseAngle;
 	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
 	
 	std::vector<Point> formationPoints = GetFormationPoints(p, party, angle);
