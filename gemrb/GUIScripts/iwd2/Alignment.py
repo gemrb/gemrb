@@ -86,6 +86,6 @@ def NextPress():
 	GemRB.SetNextScript("CharGen5") #appearance
 
 	pc = GemRB.GetVar ("Slot")
-	idx = GemRB.GetVar ("Alignment")
+	idx = GemRB.GetVar ("Alignment") - 1
 	GemRB.SetPlayerStat (pc, IE_ALIGNMENT, CommonTables.Aligns.GetValue (idx, 3))
 	return
