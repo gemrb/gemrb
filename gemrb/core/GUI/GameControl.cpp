@@ -224,7 +224,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 			continue;
 		}
 		
-		if (area->IsExplored(dest) == false || !(area->GetBlocked(dest) & PathMapFlags::PASSABLE)) {
+		if (area->IsExplored(dest) && !(area->GetBlocked(dest) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
 			dest = NextDest();
 			continue;
 		}
