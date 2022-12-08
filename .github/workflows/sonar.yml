@@ -35,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
-          sonar-scanner
+          sonar-scanner -X
           -Dsonar.cfamily.compile-commands=compile_commands.json
           -Dsonar.projectKey=gemrb_gemrb
           -Dsonar.organization=gemrb
