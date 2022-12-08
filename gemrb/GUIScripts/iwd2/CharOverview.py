@@ -26,6 +26,10 @@
 # CharOverview.py (GUICG)
 
 import GemRB
+
+import CommonTables
+import GUICommon
+import IDLUCommon
 from GUIDefines import *
 from ie_stats import *
 
@@ -135,7 +139,9 @@ def UpdateOverview(CurrentStep):
 	for tbl in ['races', 'classes', 'aligns', 'ability', 'skillsta', 'skills', 'featreq', 'feats']:
 		Tables.append(GemRB.LoadTable(tbl))
 	
-	if GemRB.GetVar('Gender') > 0:
+	MyChar = GemRB.GetVar ("Slot")
+
+	if CurrentStep > 1:
 		name = GemRB.GetToken('CHARNAME')
 		if not name:
 			TextAreaControl.SetText(12135)
@@ -144,56 +150,68 @@ def UpdateOverview(CurrentStep):
 			AddText(': ' + GemRB.GetToken('CHARNAME'), 1)
 			AddText(12135)
 		AddText(': ')
-		strref = 1049 + GemRB.GetVar('Gender')
+		strref = 1049 + GemRB.GetPlayerStat (MyChar, IE_SEX)
 		AddText(strref, 1)
-	
-	if GemRB.GetVar('Race') > 0:
+
+	RaceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (MyChar))
+	if CurrentStep > 2:
 		AddText(1048)
 		AddText(': ')
-		AddText(Tables[0].GetValue(Tables[0].FindValue(3, GemRB.GetVar('Race')), 2), 1)
-	
-	if GemRB.GetVar('Class') > 0:
+		AddText(Tables[0].GetValue(RaceName, "CAP_REF", GTV_INT), 1)
+
+	kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
+	ClassRowName = ""
+	# won't work for multikits, but it's just a cosmetic problem
+	if kit:
+		ClassRowName = Tables[1].GetRowName (Tables[1].FindValue ("ID", kit, 10))
+	if ClassRowName == "" and CurrentStep > 3:
+		ClassRowName = GUICommon.GetClassRowName (GemRB.GetPlayerStat (MyChar, IE_CLASS) - 1, "index")
+	ClassName = Tables[1].GetValue (ClassRowName, "NAME_REF", GTV_STR)
+	if ClassName != "*":
 		AddText(11959)
 		AddText(': ')
-		AddText(Tables[1].GetValue(GemRB.GetVar('Class') - 1, 0), 1)
-	
-	if GemRB.GetVar('Alignment') > 0:
+		AddText(int(ClassName), 1)
+
+	AlignName = Tables[2].FindValue ("VALUE", GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
+	if AlignName:
+		AlignName = Tables[2].GetValue (Tables[2].GetRowName (AlignName), "NAME_REF", GTV_INT)
 		AddText(11958)
 		AddText(': ')
-		AddText(Tables[2].GetValue(GemRB.GetVar('Alignment') - 1, 0), 1)
-	
-	if GemRB.GetVar('Ability 0') > 0:
+		AddText(AlignName, 1)
+
+	if CurrentStep > 5:
 		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]', 1)
+		Stats = [ IE_STR, IE_DEX, IE_CON, IE_INT, IE_WIS, IE_CHR ]
 		for i in range(0, 6):
-			strref = Tables[3].GetValue(i, 2)
+			abl = GemRB.GetPlayerStat (MyChar, Stats[i])
+			strref = Tables[3].GetValue (Tables[3].GetRowName (i), "CAP_REF", GTV_INT)
 			AddText(strref)
-			abl = GemRB.GetVar('Ability ' + str(i))
 			AddText(': %d (%+d)' % (abl, abl / 2 - 5), 1)
-	
+
+	ClericKitOffset = 0
 	if CurrentStep > 6:
 		AddText('\n[color=FFFF00]' + GemRB.GetString(11983) + '[/color]', 1)
 		
-		ClassColumn = Tables[1].GetValue(GemRB.GetVar('Class') - 1, 3, GTV_INT) # Finds base class row id
-		if ClassColumn < 1: ClassColumn = GemRB.GetVar('Class') - 1 # If 0 then already a base class so need actual row
+		ClassColumn = Tables[1].GetValue (ClassRowName, "CLASS", GTV_INT) # Finds base class row id
+		if ClassColumn < 1: ClassColumn = GemRB.GetPlayerStat (MyChar, IE_CLASS) - 1 # If 0 then already a base class so need actual row
 		else: ClassColumn -= 1 # 'CLASS' column in classes.2da is out by 1 for some reason
 		ClassColumn += 4 # There are 4 columns before the classes in skills.2da
 		# At the moment only cleric kits get skill bonuses but their column names in skills.2da don't match up
 		# to their kit names. All classes aren't covered in skills.2da either which is why I have to resort
 		# to calculating the base class. This isn't ideal. Recommend a new 2DA be created with *all* classes
 		# as rows and skills as columns. Something like SKILCLAS.2DA
-		
 		### Cleric kit hack:
-		if GemRB.GetVar('Class') in range(27, 36):
-			ClassColumn = GemRB.GetVar('Class') - 12
-		
-		RaceName = Tables[0].GetRowName(Tables[0].FindValue(3, GemRB.GetVar('Race')))
+		if ClassRowName[:7] == "CLERIC_":
+			ClericKitOffset = Tables[1].GetRowIndex (ClassRowName) - Tables[1].GetRowIndex ("CLERIC_ILMATER")
+			ClassColumn = 15 + ClericKitOffset
+
 		SkillColumn = Tables[0].GetValue(RaceName, 'SKILL_COLUMN', GTV_INT) + 1
-		Lookup = {'STR': 0, 'DEX': 1, 'CON': 2, 'INT': 3, 'WIS': 4, 'CHR': 5} # Probably a better way to do this
 		for i in range(Tables[4].GetRowCount()):
-			Abl = Tables[4].GetValue(i, 1, GTV_STR)
-			Ranks = GemRB.GetVar('Skill ' + str(i))
+			skill = Tables[4].GetValue (i, 0, GTV_STAT)
+			ability = Tables[4].GetValue (i, 1, GTV_STAT)
+			Ranks = GemRB.GetPlayerStat (MyChar, skill, 1)
 			value = Ranks
-			value += (GemRB.GetVar('Ability ' + str(Lookup[Abl])) // 2 - 5)
+			value += GemRB.GetPlayerStat (MyChar, ability) // 2 - 5
 			value += Tables[5].GetValue(i, SkillColumn, GTV_INT)
 			value += Tables[5].GetValue(i, ClassColumn, GTV_INT)
 			
@@ -211,7 +229,7 @@ def UpdateOverview(CurrentStep):
 		AddText('\n[color=FFFF00]' + GemRB.GetString(36310) + '[/color]', 1)
 		
 		for i in range(Tables[6].GetRowCount()):
-			value = GemRB.GetVar('Feat ' + str(i))
+			value = GemRB.HasFeat (MyChar, i)
 			if value:
 				strref = Tables[7].GetValue(i, 1)
 				AddText(strref)
@@ -221,9 +239,7 @@ def UpdateOverview(CurrentStep):
 				AddText('\n')
 
 		AddText('\n')
-		import CommonTables
 		import Spellbook
-		MyChar = GemRB.GetVar ("Slot")
 		BookTypes = { IE_IWD2_SPELL_BARD:39341, IE_IWD2_SPELL_CLERIC:11028, \
 			IE_IWD2_SPELL_DRUID:39342, IE_IWD2_SPELL_PALADIN:39343, IE_IWD2_SPELL_RANGER:39344, \
 			IE_IWD2_SPELL_SORCERER:39345, IE_IWD2_SPELL_WIZARD:11027, IE_IWD2_SPELL_DOMAIN:0 }
@@ -233,9 +249,7 @@ def UpdateOverview(CurrentStep):
 				BTName = BookTypes[bt]
 				# individual domains, luckily in kit order
 				if BTName == 0:
-					KitIndex = GemRB.GetVar ("Class") - 1
-					KitIndex -= CommonTables.Classes.FindValue ("CLASS", GemRB.GetVar ("BaseClass"))
-					BTName = 39346 + KitIndex
+					BTName = 39346 + ClericKitOffset
 				AddText ('\n[color=FFFF00]' + GemRB.GetString(BTName) + '[/color]\n')
 				for ks in KnownSpells:
 					AddText (GemRB.GetString(ks['SpellName'])+"\n")
