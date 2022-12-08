@@ -315,7 +315,7 @@ def setAccept():
 
 	# don't reset most stats of imported chars
 	if GemRB.GetVar ("ImportedChar"):
-		CustomizeChar (MyChar) # FIXME: preveri potrebo, iwd ima recimo ImportDonePress, kjer naredi par teh stvari
+		CustomizeChar (MyChar)
 		RunGame (MyChar)
 		return
 

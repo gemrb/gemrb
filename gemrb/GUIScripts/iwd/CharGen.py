@@ -341,6 +341,18 @@ def LearnSpells(MyChar):
 		GemRB.MemorizeSpell (MyChar, IE_SPELL_TYPE_PRIEST, 0, j, 1)
 
 def AcceptPress():
+	if ImportedChar:
+		GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
+		GemRB.SetToken ("CHARNAME","")
+		LargePortrait = GemRB.GetToken ("LargePortrait")
+		SmallPortrait = GemRB.GetToken ("SmallPortrait")
+		GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
+
+		if CharGenWindow:
+			CharGenWindow.Close ()
+		GemRB.SetNextScript ("PartyFormation")
+		return
+
 	# apply class/kit abilities
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
@@ -371,9 +383,7 @@ def AcceptPress():
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	GemRB.SetToken ("CHARNAME","")
-	# don't reset imported char's xp back to start
-	if not ImportedChar:
-		GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
+	GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
 
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
@@ -389,8 +399,7 @@ def AcceptPress():
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
 	#10 is a weapon slot (see slottype.2da row 10)
-	if not ImportedChar:
-		GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
+	GemRB.CreateItem (MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	if CharGenWindow:
