@@ -28,8 +28,6 @@
 # spacing (ie, coordinates have different offsets)
 # eg, pst seems to usually have the focus point always on the lead char
 
-import math
-
 num_coords = 20
 
 def print_y(y, i):
@@ -176,44 +174,24 @@ def generate_wavyline():
 # at the back, then other characters trail behind the main one (it goes
 # completely chaotic in real BG2, apparently).
 def generate_protect():
-	rad = 68 # radius
-	degrees_step = 72 # 360 / 5
-	# center point of the formation is not the center of the figure
-	offset = int(rad * math.sin(math.radians(90 + degrees_step)))
-	back_angle = 54 # 2 * degrees_step - 90
 	print("PROTECT", end=' ')
 	for i in range(num_coords):
 		if i == 0:
-			print("0 0", end=' ') # centre
-			pass
-		elif i == 1: # front
-			x = 0
-			y = offset - rad
-			print("{} {}".format(x,y) , end=' ')
-		elif i == 2: # front left
-			angle = math.radians(270 - degrees_step)
-			x = int(math.cos(angle) * rad)
-			y = 0
-			print("{} {}".format(x,y), end=' ')
-		elif i == 3: # front right
-			angle = math.radians(270 + degrees_step)
-			x = int(math.cos(angle) * rad)
-			y = 0
-			print("{} {}".format(x,y) , end=' ')
-		elif i == 4: # back left
-			angle = math.radians(180 - back_angle)
-			x = int(math.cos(angle) * rad)
-			y = int(math.sin(angle) * rad) + offset
-			print("{} {}".format(x,y) , end=' ')
-		elif i == 5: # back right
-			angle = math.radians(back_angle)
-			x = int(math.cos(angle) * rad)
-			y = int(math.sin(angle) * rad) + offset
-			print("{} {}".format(x,y) , end=' ')
+			print("0 0", end=' '), # centre
+		elif i == 1:
+			print("0 -48", end=' '), # front
+		elif i == 2:
+			print("-48 0", end=' '), # left
+		elif i == 3:
+			print("48 0", end=' '), # right
+		elif i == 4:
+			print("-24 64", end=' ') # back left
+		elif i == 5:
+			print("24 64", end=' ') # back right
 		else:
-			print(0, end=' ')
-			print_y(24 * (i - 5), i)
-	print()
+			print("0", end=' ')
+			print_y((24 * (i - 5)), i)
+	print
 
 # A simple 3-across block formation.
 def generate_3by2():
