@@ -3144,7 +3144,7 @@ void Actor::RollSaves()
 {
 	static int saveDiceSides = gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES");
 	if (InternalFlags&IF_USEDSAVE) {
-		for (auto& save : SavingThrow) {
+		for (auto& save : lastSave.savingThrow) {
 			save = static_cast<ieByte>(RAND(1, saveDiceSides));
 		}
 		InternalFlags&=~IF_USEDSAVE;
@@ -3191,7 +3191,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 	assert(type < savingThrows.size());
 	static int saveDiceSides = gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES");
 	InternalFlags|=IF_USEDSAVE;
-	int ret = SavingThrow[type];
+	int ret = lastSave.savingThrow[type];
 	// NOTE: assuming criticals apply to iwd2 too
 	if (ret == 1) return false;
 	if (ret == saveDiceSides) return true;

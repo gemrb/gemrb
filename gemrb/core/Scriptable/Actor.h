@@ -318,6 +318,8 @@ struct ModalState {
 };
 
 struct SaveInfo {
+	ieByte savingThrow[5]{};
+	// for feedback rate limiting
 	ieDword prevType = -1;
 	int prevRoll = -1;
 };
@@ -457,7 +459,6 @@ private:
 		std::vector<AnimationPart> shadow;
 	} currentStance;
 
-	ieByte SavingThrow[5]{};
 	SaveInfo lastSave;
 	ieByte weapSlotCount = 4;
 	int walkScale = 0;
