@@ -39,9 +39,6 @@ def OnLoad():
 		return
 
 	ClassName = GUICommon.GetClassRowName (MyChar)
-	IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
-	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
-			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
 
 	# weapon proficiencies
 	# set the base number of attacks; effects will add the proficiency bonus
@@ -55,19 +52,6 @@ def OnLoad():
 	LUCommon.SetupThaco (MyChar)
 	LUCommon.SetupLore (MyChar)
 	LUCommon.SetupHP (MyChar)
-
-	# mage spells
-	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
-	if TableName != "*":
-		index = 0
-		if IsMulti[0]>1:
-			#find out which class gets mage spells
-			for i in range (IsMulti[0]):
-				TmpClassName = GUICommon.GetClassRowName (IsMulti[i+1], "class")
-				if CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", GTV_STR) != "*":
-					index = i
-					break
-		Spellbook.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, Levels[index])
 
 	# apply class/kit abilities
 	GUICommon.ResolveClassAbilities (MyChar, ClassName)
@@ -110,7 +94,7 @@ def RunGame(MyChar):
 		# will also add the starting inventory for tob
 		GemRB.GameSetExpansion (4)
 		# no torture, let's refresh all the spells, at least for sorcerers
-		# TODO: add mage learning and memorisation step like in bg1, but to one of the earlier scripts
+		# TODO: add mage memorisation step like in bg1, but to one of the earlier scripts
 		GemRB.ChargeSpells (MyChar)
 
 	playmode = GemRB.GetVar ("PlayMode")

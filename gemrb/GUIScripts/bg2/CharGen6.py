@@ -42,8 +42,24 @@ def OnLoad():
 	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
 	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)
 
-	# learn divine spells if appropriate
+	# mage spells
 	ClassName = GUICommon.GetClassRowName (MyChar)
+	IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
+	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
+		GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
+	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
+	if TableName != "*":
+		levelIdx = 0
+		if IsMulti[0] > 1:
+			# find out which class gets mage spells
+			for i in range (IsMulti[0]):
+				TmpClassName = GUICommon.GetClassRowName (IsMulti[i + 1], "class")
+				if CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", GTV_STR) != "*":
+					levelIdx = i
+					break
+		Spellbook.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, Levels[levelIdx])
+
+	# learn divine spells if appropriate
 	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", GTV_STR) # cleric spells
 
 	if TableName == "*": # only druid spells or no spells at all
@@ -57,9 +73,6 @@ def OnLoad():
 	if TableName != "*":
 		#figure out which class casts spells and use the level of the class
 		#to setup the priest spells
-		Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
-				GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
-				GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
 		index = 0
 		IsMulti = GUICommon.IsMultiClassed (MyChar, 1)
 		if IsMulti[0]>1:
