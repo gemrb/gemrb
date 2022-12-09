@@ -252,6 +252,11 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	if (NOT APPLE AND NOT UNSAFE_PLUGIN)
 		string(APPEND CMAKE_MODULE_LINKER_FLAGS " -Wl,--no-undefined")
 	endif (NOT APPLE AND NOT UNSAFE_PLUGIN)
+
+	# Fast math helps us covering some things that need a little more rework soon
+	string(APPEND CMAKE_CXX_FLAGS " -ffast-math")
+ELSEIF(MSVC)
+	string(APPEND CMAKE_CXX_FLAGS " /fp:fast")
 ENDIF()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
