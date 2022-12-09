@@ -5991,6 +5991,10 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (fx->TimingMode!=FX_DURATION_INSTANT_PERMANENT) {
 		sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
+		if (!(sca->SequenceFlags & IE_VVC_LOOP) && sca->anims[P_HOLD * MAX_ORIENT]) {
+			// shorten effect duration to match vvc; Duration is sensible only for looping or frozen looping vvcs
+			fx->Duration = sca->anims[P_HOLD * MAX_ORIENT]->GetFrameCount() + core->GetGame()->GameTime;
+		}
 	}
 	if (fx->Parameter2 == 1) {
 		//play over target (sticky)
