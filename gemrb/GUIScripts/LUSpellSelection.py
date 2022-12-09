@@ -316,11 +316,16 @@ def SpellsDonePress ():
 				return
 
 		# bg1 lets you memorize spells too (iwd too, but it does it by itself)
+		# tob doesn't, but we could enhance it — need to add multilevel support
+		# enable below if GameCheck.IsTOB () and not Spellbook.HasSorcererBook (pc)
 		if chargen and sum(MemoBook) == 0 and \
 		(GameCheck.IsBG1() or (IWD2 and SpellBookType == IE_IWD2_SPELL_WIZARD)):
 			SpellLevel = 0
-			# bump it for specialists and iwd2 casters with high stats
-			SpellsSelectPointsLeft[SpellLevel] = 1 + BonusPoints[SpellLevel]
+			if GameCheck.IsTOB ():
+				SpellsSelectPointsLeft[SpellLevel] = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, SpellLevel, 1)
+			else:
+				# bump it for specialists and iwd2 casters with high stats
+				SpellsSelectPointsLeft[SpellLevel] = 1 + BonusPoints[SpellLevel]
 			# FIXME: setting the proper count here breaks original characters, see #680
 			#GemRB.SetMemorizableSpellsCount (pc, SpellsSelectPointsLeft[SpellLevel], SpellBookType, SpellLevel)
 			DoneButton.SetDisabled (True)
