@@ -317,6 +317,11 @@ struct ModalState {
 	bool FirstApply = true; // running for the first time?
 };
 
+struct SaveInfo {
+	ieDword prevType = -1;
+	int prevRoll = -1;
+};
+
 enum DamageFlags {
 	DrainFromTarget = 0,
 	DrainFromSource = 1,
@@ -453,6 +458,7 @@ private:
 	} currentStance;
 
 	ieByte SavingThrow[5]{};
+	SaveInfo lastSave;
 	ieByte weapSlotCount = 4;
 	int walkScale = 0;
 	// true when command has been played after select
