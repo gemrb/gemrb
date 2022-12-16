@@ -939,7 +939,7 @@ inline void Scriptable::ResetCastingState(Actor *caster) {
 	}
 }
 
-void Scriptable::CastSpellPointEnd(int level, int no_stance)
+void Scriptable::CastSpellPointEnd(int level, bool keepStance)
 {
 	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (!spl) {
@@ -949,7 +949,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	gamedata->FreeSpell(spl, SpellResRef, false);
 
 	Actor* caster = Scriptable::As<Actor>(this);
-	if (caster && !no_stance) {
+	if (caster && !keepStance) {
 		caster->SetStance(IE_ANI_CONJURE);
 	}
 	if (level == 0) {
@@ -981,11 +981,11 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	}
 
 	// a candidate for favourite spell? Not if we're forced cast (eg. from fx_cast_spell)
-	if (caster && caster->PCStats && !no_stance) {
+	if (caster && caster->PCStats && !keepStance) {
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
-	if (!no_stance) {
+	if (!keepStance) {
 		// yep, the original didn't use the casting channel for this!
 		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_MISSILE, Pos);
 	}
@@ -1016,7 +1016,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	ResetCastingState(caster);
 }
 
-void Scriptable::CastSpellEnd(int level, int no_stance)
+void Scriptable::CastSpellEnd(int level, bool keepStance)
 {
 	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (!spl) {
@@ -1026,7 +1026,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 	gamedata->FreeSpell(spl, SpellResRef, false);
 
 	Actor* caster = Scriptable::As<Actor>(this);
-	if (caster && !no_stance) {
+	if (caster && !keepStance) {
 		caster->SetStance(IE_ANI_CONJURE);
 	}
 	if (level == 0) {
@@ -1055,11 +1055,11 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		return;
 	}
 
-	if (caster && caster->PCStats && !no_stance) {
+	if (caster && caster->PCStats && !keepStance) {
 		caster->PCStats->RegisterFavourite(SpellResRef, FAV_SPELL);
 	}
 
-	if (!no_stance) {
+	if (!keepStance) {
 		core->GetAudioDrv()->Play(spl->CompletionSound, SFX_CHAN_MISSILE, Pos);
 	}
 
@@ -1209,9 +1209,9 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 
 // shortcut for internal use when there is no wait
 // if any user needs casting time support, they should use Spell* actions directly
-void Scriptable::DirectlyCastSpellPoint(const Point &target, const ResRef& spellref, int level, int no_stance, bool deplete)
+void Scriptable::DirectlyCastSpellPoint(const Point& target, const ResRef& spellRef, int level, bool keepStance, bool deplete)
 {
-	if (!gamedata->Exists(spellref, IE_SPL_CLASS_ID)) {
+	if (!gamedata->Exists(spellRef, IE_SPL_CLASS_ID)) {
 		return;
 	}
 
@@ -1220,9 +1220,9 @@ void Scriptable::DirectlyCastSpellPoint(const Point &target, const ResRef& spell
 	ieDword TmpTarget = LastSpellTarget;
 	int TmpHeader = SpellHeader;
 
-	SetSpellResRef(spellref);
+	SetSpellResRef(spellRef);
 	CastSpellPoint(target, deplete, true, true, level);
-	CastSpellPointEnd(level, no_stance);
+	CastSpellPointEnd(level, keepStance);
 
 	LastTargetPos = TmpPos;
 	LastSpellTarget = TmpTarget;
@@ -1231,9 +1231,9 @@ void Scriptable::DirectlyCastSpellPoint(const Point &target, const ResRef& spell
 
 // shortcut for internal use
 // if any user needs casting time support, they should use Spell* actions directly
-void Scriptable::DirectlyCastSpell(Scriptable *target, const ResRef& spellref, int level, int no_stance, bool deplete)
+void Scriptable::DirectlyCastSpell(Scriptable* target, const ResRef& spellRef, int level, bool keepStance, bool deplete)
 {
-	if (!gamedata->Exists(spellref, IE_SPL_CLASS_ID)) {
+	if (!gamedata->Exists(spellRef, IE_SPL_CLASS_ID)) {
 		return;
 	}
 
@@ -1242,9 +1242,9 @@ void Scriptable::DirectlyCastSpell(Scriptable *target, const ResRef& spellref, i
 	ieDword TmpTarget = LastSpellTarget;
 	int TmpHeader = SpellHeader;
 
-	SetSpellResRef(spellref);
+	SetSpellResRef(spellRef);
 	CastSpell(target, deplete, true, true, level);
-	CastSpellEnd(level, no_stance);
+	CastSpellEnd(level, keepStance);
 
 	LastTargetPos = TmpPos;
 	LastSpellTarget = TmpTarget;
@@ -1254,7 +1254,7 @@ void Scriptable::DirectlyCastSpell(Scriptable *target, const ResRef& spellref, i
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, bool nointerrupt, int level)
+int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, bool noInterrupt, int level)
 {
 	LastSpellTarget = 0;
 	LastTargetPos.Invalidate();
@@ -1263,10 +1263,10 @@ int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, 
 		Log(ERROR, "Scriptable", "Spell {} not known or memorized, aborting cast!", SpellResRef);
 		return -1;
 	}
-	if (!instant && !nointerrupt) {
+	if (!instant && !noInterrupt) {
 		AuraCooldown = core->Time.attack_round_size;
 	}
-	if(!nointerrupt && !CanCast(SpellResRef)) {
+	if(!noInterrupt && !CanCast(SpellResRef)) {
 		SpellResRef.Reset();
 		if (actor) {
 			actor->SetStance(IE_ANI_READY);
@@ -1289,7 +1289,7 @@ int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, 
 //set target as actor (if target isn't actor, use its position)
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool nointerrupt, int level)
+int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool noInterrupt, int level)
 {
 	LastSpellTarget = 0;
 	LastTargetPos.Invalidate();
@@ -1301,10 +1301,10 @@ int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool n
 
 	assert(target);
 
-	if (!instant && !nointerrupt) {
+	if (!instant && !noInterrupt) {
 		AuraCooldown = core->Time.attack_round_size;
 	}
-	if(!nointerrupt && !CanCast(SpellResRef)) {
+	if(!noInterrupt && !CanCast(SpellResRef)) {
 		SpellResRef.Reset();
 		if (actor) {
 			actor->SetStance(IE_ANI_READY);
@@ -1527,12 +1527,12 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 					caster->CastSpell(target, false, true, false, level);
 					newSpell = SpellResRef;
 					caster->WMLevelMod = tmp3;
-					caster->CastSpellEnd(level, 1);
+					caster->CastSpellEnd(level, true);
 				} else {
 					caster->CastSpellPoint(targetpos, false, true, false, level);
 					newSpell = SpellResRef;
 					caster->WMLevelMod = tmp3;
-					caster->CastSpellPointEnd(level, 1);
+					caster->CastSpellPointEnd(level, true);
 				}
 				// reset the ref, since CastSpell*End destroyed it
 				SpellResRef = newSpell;

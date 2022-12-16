@@ -1884,7 +1884,7 @@ void Game::CastOnRest() const
 			while (ps-- && wholeparty.back().hpneeded > 0) {
 				Actor *tar = GetPC(ps, true);
 				while (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0) && wholeparty.back().hpneeded > 0) {
-					tar->DirectlyCastSpell(tar, specialSpell.resref, 0, 1, true);
+					tar->DirectlyCastSpell(tar, specialSpell.resref, 0, true, true);
 					for (auto& injuree : wholeparty) {
 						injuree.hpneeded -= CastOnRestHealingAmount(tar, specialSpell);
 					}
@@ -1925,7 +1925,7 @@ void Game::CastOnRest() const
 	while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
 		Injured &mostInjured = wholeparty.back();
 		HealingResource &mostHealing = healingspells.back();
-		mostHealing.caster->DirectlyCastSpell(mostInjured.character, mostHealing.resRef, 0, 1, true);
+		mostHealing.caster->DirectlyCastSpell(mostInjured.character, mostHealing.resRef, 0, true, true);
 		mostHealing.amount--;
 		mostInjured.hpneeded -= mostHealing.amounthealed;
 		std::sort(wholeparty.begin(), wholeparty.end());
@@ -1939,7 +1939,7 @@ void Game::CastOnRest() const
 	ieWord spelltarget = 0;
 	while (!nonhealingspells.empty()) {
 		HealingResource &restingSpell = nonhealingspells.back();
-		restingSpell.caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, restingSpell.resRef, 0, 1, true);
+		restingSpell.caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, restingSpell.resRef, 0, true, true);
 		restingSpell.amount--;
 		if (restingSpell.amount == 0) {
 			nonhealingspells.pop_back();

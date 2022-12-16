@@ -460,7 +460,7 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	ResRef OldSpellResRef = Owner->SpellResRef;
 
 	// flags: no deplete, instant, no interrupt
-	Owner->DirectlyCastSpell(target, fx->Resource, fx->CasterLevel, 1, false);
+	Owner->DirectlyCastSpell(target, fx->Resource, fx->CasterLevel, true, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 
 	return FX_NOT_APPLIED;

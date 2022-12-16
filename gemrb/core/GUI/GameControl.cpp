@@ -816,9 +816,9 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 						src->SetSpellResRef(TestSpell);
 						src->CastSpell(target, false);
 						if (src->LastSpellTarget) {
-							src->CastSpellEnd(0, 0);
+							src->CastSpellEnd(0, false);
 						} else {
-							src->CastSpellPointEnd(0, 0);
+							src->CastSpellPointEnd(0, false);
 						}
 					}
 				}

@@ -6939,7 +6939,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	target->VerbalConstant(VB_TRAP_SET);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ResRef OldSpellResRef(Owner->SpellResRef);
-	Owner->DirectlyCastSpellPoint(fx->Pos, fx->Resource, level, 1, false);
+	Owner->DirectlyCastSpellPoint(fx->Pos, fx->Resource, level, true, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }

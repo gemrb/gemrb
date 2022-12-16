@@ -397,14 +397,14 @@ public:
 	int CheckWildSurge();
 	void SpellcraftCheck(const Actor *caster, const ResRef& spellRef);
 	/* internal spellcasting shortcuts */
-	void DirectlyCastSpellPoint(const Point &target, const ResRef& spellref, int level, int no_stance, bool deplete);
-	void DirectlyCastSpell(Scriptable *target, const ResRef& spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpellPoint(const Point& target, const ResRef& spellRef, int level, bool keepStance, bool deplete);
+	void DirectlyCastSpell(Scriptable* target, const ResRef& spellRef, int level, bool keepStance, bool deplete);
 	/* actor/scriptable casts spell */
-	int CastSpellPoint(const Point& Target, bool deplete, bool instant = false, bool nointerrupt = false, int level = 0);
-	int CastSpell(Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false, int level = 0);
+	int CastSpellPoint(const Point& target, bool deplete, bool instant = false, bool noInterrupt = false, int level = 0);
+	int CastSpell(Scriptable* target, bool deplete, bool instant = false, bool noInterrupt = false, int level = 0);
 	/* spellcasting finished */
-	void CastSpellPointEnd(int level, int no_stance);
-	void CastSpellEnd(int level, int no_stance);
+	void CastSpellPointEnd(int level, bool keepStance);
+	void CastSpellEnd(int level, bool keepStance);
 	ieDword GetGlobalID() const { return globalID; }
 	/** timer functions (numeric ID, not saved) */
 	bool TimerActive(ieDword ID);
