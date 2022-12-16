@@ -181,17 +181,17 @@ def generate_protect():
 		elif i == 1:
 			print("0 -48", end=' '), # front
 		elif i == 2:
-			print("-48 0", end=' '), # left
+			print("-64 0", end=' '), # left
 		elif i == 3:
-			print("48 0", end=' '), # right
+			print("64 0", end=' '), # right
 		elif i == 4:
-			print("-24 64", end=' ') # back left
+			print("-32 64", end=' ') # back left
 		elif i == 5:
-			print("24 64", end=' ') # back right
+			print("32 64", end=' ') # back right
 		else:
 			print("0", end=' ')
-			print_y((24 * (i - 5)), i)
-	print
+			print_y((32 * (i - 5)), i)
+	print()
 
 # A simple 3-across block formation.
 def generate_3by2():
