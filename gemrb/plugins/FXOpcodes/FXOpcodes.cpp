@@ -2194,7 +2194,7 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 		BASE_STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
 	} else {
 		STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
-		if (fx->Parameter2) {
+		if (fx->Parameter2 || !core->HasFeature(GF_HAS_EE_EFFECTS)) {
 			target->SetSpellState(SS_NOAWAKE);
 		}
 		if (fx->IsVariable) {
