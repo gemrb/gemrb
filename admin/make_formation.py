@@ -86,22 +86,22 @@ def generate_gather():
 	for i in range(num_coords):
 		if i == 0:
 			xloc = 0 # centre
-			yloc = -36 # front
+			yloc = -48 # front
 		elif i == 1:
 			xloc = 48 # right
-			yloc = -24
+			yloc = -32
 		elif i == 2:
 			xloc = -48 # left
-			yloc = -24
+			yloc = -32
 		elif i % 3 == 0:
 			xloc = 48 # right
-			yloc = 24 * i // 3
+			yloc = 32 * i // 3
 		elif i % 3 == 1:
 			xloc = -48 # left
-			yloc = 24 * (i - 1) // 3
+			yloc = 32 * (i - 1) // 3
 		else:
 			xloc = 0 # centre
-			yloc = 12 + 24 * (i - 2) // 3
+			yloc = 24 + 24 * (i - 2) // 3
 		print(xloc, end=' ')
 		print_y(yloc, i)
 	print()
