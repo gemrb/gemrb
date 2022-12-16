@@ -4684,10 +4684,14 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 		Owner->ImmediateEvent();
 	} else if (fx->Parameter2 == 1) {
 		// no deplete, instant, no interrupt, caster level
-		core->ApplySpell(fx->Resource, target, Owner, fx->CasterLevel);
+		ResRef OldSpellResRef(Owner->SpellResRef);
+		Owner->DirectlyCastSpell(target, fx->Resource, fx->CasterLevel, true, false);
+		Owner->SetSpellResRef(OldSpellResRef);
 	} else { // ees introduce 2
 		// no deplete, instant, no interrupt, provided level
-		core->ApplySpell(fx->Resource, target, Owner, fx->Parameter1);
+		ResRef OldSpellResRef(Owner->SpellResRef);
+		Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, true, false);
+		Owner->SetSpellResRef(OldSpellResRef);
 	}
 
 	return FX_NOT_APPLIED;
@@ -4722,10 +4726,14 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		Owner->ImmediateEvent();
 	} else if (fx->Parameter2 == 1) {
 		// no deplete, instant, no interrupt, caster level
-		core->ApplySpellPoint(fx->Resource, Owner->GetCurrentArea(), fx->Pos, Owner, fx->CasterLevel);
+		ResRef OldSpellResRef(Owner->SpellResRef);
+		Owner->DirectlyCastSpellPoint(fx->Pos, fx->Resource, fx->CasterLevel, true, false);
+		Owner->SetSpellResRef(OldSpellResRef);
 	} else { // gemrb extension to mirror fx_cast_spell
 		// no deplete, instant, no interrupt, provided level
-		core->ApplySpellPoint(fx->Resource, Owner->GetCurrentArea(), fx->Pos, Owner, fx->Parameter1);
+		ResRef OldSpellResRef(Owner->SpellResRef);
+		Owner->DirectlyCastSpellPoint(fx->Pos, fx->Resource, fx->Parameter1, true, false);
+		Owner->SetSpellResRef(OldSpellResRef);
 	}
 
 	return FX_NOT_APPLIED;
