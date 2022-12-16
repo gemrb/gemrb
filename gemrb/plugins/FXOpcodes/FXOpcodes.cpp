@@ -1937,7 +1937,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case RPD_ROUNDS:
 		tmp = core->Time.round_sec;
-		damage = fx->Parameter1; // TODO: ee, fx->Parameter3 instead
+		damage = core->HasFeature(GF_HAS_EE_EFFECTS) ? fx->Parameter3 : fx->Parameter1;
 		break;
 	case RPD_TURNS:
 		tmp = core->Time.turn_sec;
@@ -6099,7 +6099,7 @@ int fx_power_word_sleep (Scriptable* Owner, Actor* target, Effect* fx)
 	fx->Duration = core->GetGame()->GameTime+x*core->Time.round_size;
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_set_sleep_state_ref);
-	fx->Parameter2 = 0; // TODO: ees preserve this
+	if (!core->HasFeature(GF_HAS_EE_EFFECTS)) fx->Parameter2 = 0;
 	return fx_set_unconscious_state(Owner,target,fx);
 }
 
