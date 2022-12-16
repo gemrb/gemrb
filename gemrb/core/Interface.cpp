@@ -1620,7 +1620,7 @@ static const StringView game_flags[GF_COUNT + 1]={
 		"HasDPLAYER",         //10GF_HAS_DPLAYER
 		"HasEXPTABLE",        //11GF_HAS_EXPTABLE
 		"HasBeastsIni",       //12GF_HAS_BEASTS_INI
-		"HasDescIcon",        //13GF_HAS_DESC_ICON
+		"HasEEEffects",       //13GF_HAS_EE_EFFECTS
 		"HasPickSound",       //14GF_HAS_PICK_SOUND
 		"IWDMapDimensions",   //15GF_IWD_MAP_DIMENSIONS
 		"AutomapINI",         //16GF_AUTOMAP_INI

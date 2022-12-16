@@ -269,16 +269,15 @@ Whether original game data contains beasts.ini and quests.ini files
 with descriptions of monsters and quests (PST only).
 
 
-HasDescIcon = <bool>
-- - - - - - - - - - -
-If set to 1, items have a description icon, instead of a pick up sound.
-BG2 has this option. (Mutually exclusive with the HasPickSound option).
-
-
 HasDPLAYER = <bool>
 - - - - - - - - - - 
 If set to 1, then NPCs will get a default player script (DPLAYER2) set
 when they join the party. PST has no such feature. 
+
+
+HasEEEffects = <bool>
+- - - - - - - - - - -
+If set to 1, then certain enhanced edition effect behaviours will be used.
 
 
 HasEXPTABLE = <bool>
@@ -329,8 +328,7 @@ parties. Normally only IWD2 has this option set.
 HasPickSound = <bool>
 - - - - - - - - - - -
 If set to 1, items have a pick up sound resource reference instead of a
-description icon. PST has this option. (Mutually exclusive with the 
-HasDescIcon option).
+description icon. PST has this option.
 
 
 HasResDataIni = <bool>

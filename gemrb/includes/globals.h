@@ -69,7 +69,7 @@ enum GameFeatureFlags : uint32_t {
 	GF_HAS_DPLAYER,         			// not pst
 	GF_HAS_EXPTABLE,        			// iwd, iwd2
 	GF_HAS_BEASTS_INI,      			//pst; also for quests.ini
-	GF_HAS_DESC_ICON,       			//bg
+	GF_HAS_EE_EFFECTS,       			//ees
 	GF_HAS_PICK_SOUND,      			//pst
 	GF_IWD_MAP_DIMENSIONS,  			//iwd, iwd2
 	GF_AUTOMAP_INI,         			//pst
