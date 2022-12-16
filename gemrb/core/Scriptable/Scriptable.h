@@ -400,8 +400,8 @@ public:
 	void DirectlyCastSpellPoint(const Point &target, const ResRef& spellref, int level, int no_stance, bool deplete);
 	void DirectlyCastSpell(Scriptable *target, const ResRef& spellref, int level, int no_stance, bool deplete);
 	/* actor/scriptable casts spell */
-	int CastSpellPoint( const Point &Target, bool deplete, bool instant = false, bool nointerrupt = false );
-	int CastSpell( Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false );
+	int CastSpellPoint(const Point& Target, bool deplete, bool instant = false, bool nointerrupt = false, int level = 0);
+	int CastSpell(Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false, int level = 0);
 	/* spellcasting finished */
 	void CastSpellPointEnd(int level, int no_stance);
 	void CastSpellEnd(int level, int no_stance);
@@ -414,7 +414,7 @@ public:
 	bool AuraPolluted();
 private:
 	/* used internally to handle start of spellcasting */
-	int SpellCast(bool instant, Scriptable *target = NULL);
+	int SpellCast(bool instant, Scriptable* target = nullptr, int level = 0);
 	/* also part of the spellcasting process, creating the projectile */
 	void CreateProjectile(const ResRef& spellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
