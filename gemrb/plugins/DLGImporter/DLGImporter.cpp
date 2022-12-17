@@ -100,10 +100,10 @@ DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index) const
 	return ds;
 }
 
-DialogTransition** DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count) const
+std::vector<DialogTransition*> DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count) const
 {
-	DialogTransition** trans = ( DialogTransition** )
-		malloc( count*sizeof( DialogTransition* ) );
+	
+	std::vector<DialogTransition*> trans(count);
 	for (unsigned int i = 0; i < count; i++) {
 		trans[i] = GetTransition( firstIndex + i );
 	}

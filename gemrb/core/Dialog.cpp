@@ -53,7 +53,7 @@ void Dialog::FreeDialogState(DialogState* ds)
 			delete trans->condition;
 		delete trans;
 	}
-	free( ds->transitions );
+
 	if (ds->condition) {
 		delete ds->condition;
 	}
