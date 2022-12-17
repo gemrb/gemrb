@@ -26,9 +26,9 @@ import Spellbook
 import CommonTables
 import LUCommon
 import LevelUp
-import GUIWORLD
 import DualClass
 import GUIRECCommon
+import PartyReform
 from GUIDefines import *
 from GUICommonWindows import CreateTopWinLoader, ToggleWindow, OpenWindowOnce, DefaultWinPos
 from ie_stats import *
@@ -224,7 +224,7 @@ OpenRecordsWindow = CreateTopWinLoader(2, "GUIREC", OpenWindowOnce, InitRecordsW
 #original returns to game before continuing...
 def OpenRecReformPartyWindow ():
 	ToggleRecordsWindow()
-	GUIWORLD.OpenReformPartyWindow()
+	PartyReform.OpenReformPartyWindow()
 	return
 
 #don't allow exporting polymorphed or dead characters

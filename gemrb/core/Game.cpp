@@ -1535,7 +1535,7 @@ void Game::UpdateScripts()
 
 	if (PartyOverflow()) {
 		partysize = 0;
-		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "OpenReformPartyWindow");
+		core->GetGUIScriptEngine()->RunFunction("PartyReform", "OpenReformPartyWindow");
 		return;
 	}
 }

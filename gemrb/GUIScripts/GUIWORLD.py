@@ -22,21 +22,15 @@
 #################################################################
 
 import GemRB
+
+import CommonWindow
+import Container
 import GameCheck
 import GUICommon
 import GUICommonWindows
-from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
-from ie_stats import *
-import CommonWindow
-import Container
-
-FRAME_PC_SELECTED = 0
-FRAME_PC_TARGET   = 1
 
 ContinueWindow = None
-
-removable_pcs = []
 
 def OpenDialogButton(id):
 	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack())
@@ -124,142 +118,6 @@ def OpenContinueMessageWindow ():
 	Button.OnPress (CloseContinueWindow)
 	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
 	Button.MakeDefault(True)
-
-def UpdateReformWindow (Window, select):
-	need_to_drop = GemRB.GetPartySize ()-MAX_PARTY_SIZE
-	if need_to_drop<0:
-		need_to_drop = 0
-
-	#excess player number
-	Label = Window.GetControl (0x1000000f)
-	Label.SetText (str(need_to_drop) )
-
-	#done
-	Button = Window.GetControl (8)
-	if need_to_drop:
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-
-	#remove
-	Button = Window.GetControl (15)
-	Button.SetText (17507)
-	Button.OnPress (lambda: RemovePlayer(select))
-	if select:
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-	else:
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window, 1, "horizontal")
-	for i in PortraitButtons:
-		Button = PortraitButtons[i]
-		if i+1 not in removable_pcs:
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetState (IE_GUI_BUTTON_LOCKED)
-
-	for i in removable_pcs:
-		index = removable_pcs.index(i)
-		if index not in PortraitButtons:
-			continue # for saved games with higher party count than the current setup supports
-		Button = PortraitButtons[index]
-		Button.EnableBorder (FRAME_PC_SELECTED, select == i)
-		Portrait = GemRB.GetPlayerPortrait (i, 1)
-		pic = Portrait["Sprite"]
-		if not pic and not Portrait["ResRef"]:
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			continue
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
-		Button.SetPicture (pic, "NOPORTSM")
-	GUICommonWindows.UpdatePortraitWindow ()
-	return
-
-def RemovePlayer (select):
-	hideflag = CommonWindow.IsGameGUIHidden()
-
-	wid = 25
-	if GameCheck.IsHOW ():
-		wid = 0 # at least in guiw08, this is the correct window
-	Window = GemRB.LoadWindow (wid, GUICommon.GetWindowPack(), WINDOW_BOTTOM | WINDOW_HCENTER)
-
-	#are you sure
-	Label = Window.GetControl (0x0fffffff)
-	Label.SetText (17518)
-
-	#confirm
-	def RemovePlayerConfirm ():
-		if GameCheck.IsBG2():
-			GemRB.LeaveParty (select, 2)
-		elif GameCheck.IsBG1():
-			GemRB.LeaveParty (select, 1)
-		else:
-			GemRB.LeaveParty (select)
-
-		Window.Close()
-		GemRB.GetView ("WIN_REFORM", 0).Close ()
-		return
-
-	Button = Window.GetControl (1)
-	Button.SetText (17507)
-	Button.OnPress (RemovePlayerConfirm)
-	Button.MakeDefault()
-
-	#cancel
-	Button = Window.GetControl (2)
-	Button.SetText (13727)
-	Button.OnPress (Window.Close)
-	Button.MakeEscape()
-
-	CommonWindow.SetGameGUIHidden(hideflag)
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def OpenReformPartyWindow ():
-	global removable_pcs
-
-	hideflag = CommonWindow.IsGameGUIHidden()
-
-	Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_HCENTER|WINDOW_BOTTOM)
-	Window.AddAlias ("WIN_REFORM", 0)
-
-	# skip exportable party members (usually only the protagonist)
-	removable_pcs = []
-	for i in range (1, GemRB.GetPartySize()+1):
-		if not GemRB.GetPlayerStat (i, IE_MC_FLAGS)&MC_EXPORTABLE:
-			removable_pcs.append(i)
-
-	#PC portraits
-	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window, 1, "horizontal")
-	for j in PortraitButtons:
-		Button = PortraitButtons[j]
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
-		color = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
-		Button.SetBorder (FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame(1,1,2,2))
-		if j < len(removable_pcs):
-			Button.SetValue (removable_pcs[j])
-		else:
-			Button.SetValue (None)
-
-		Button.OnPress (lambda btn: UpdateReformWindow(Window, btn.Value))
-
-	# Done
-	Button = Window.GetControl (8)
-	Button.SetText (11973)
-	Button.OnPress (Window.Close)
-
-	# if nobody can be removed, just close the window
-	if not removable_pcs:
-		Window.Close()
-		CommonWindow.SetGameGUIHidden(hideflag)
-		return
-
-	UpdateReformWindow (Window, None)
-	CommonWindow.SetGameGUIHidden(hideflag)
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
 
 def DeathWindow ():
 	# break out of any cutscenes, so we get mouse input back
