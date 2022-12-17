@@ -2252,23 +2252,12 @@ bool Game::IsTimestopActive() const
 
 bool Game::RandomEncounter(ResRef &BaseArea)
 {
-	if (bntrows == TableMgr::npos) {
-		AutoTable table = gamedata->LoadTable("bntychnc");
-
-		if (table) {
-			bntrows = table->GetRowCount();
-			bntchnc = (int *) calloc(sizeof(int),bntrows);
-			for (TableMgr::index_t i = 0; i < bntrows; ++i) {
-				bntchnc[i] = table->QueryFieldSigned<int>(i, 0);
-			}
-		} else {
-			bntrows = 0;
-		}
-	}
+	AutoTable table = gamedata->LoadTable("bntychnc");
+	if (!table) return false;
 
 	ieDword rep = Reputation / 10;
-	if (rep>=bntrows) return false;
-	if (core->Roll(1, 100, 0)>bntchnc[rep]) return false;
+	if (rep >= table->GetRowCount()) return false;
+	if (RAND(1, 100) > table->QueryFieldSigned<int>(rep, 0)) return false;
 	// there are non-encounter areas matching the pattern, but they are
 	// not reachable via the worldmap
 	BaseArea.Format("{:.4}10", BaseArea);

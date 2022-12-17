@@ -234,8 +234,6 @@ private:
 	std::vector< GAMLocationEntry*> planepositions;
 	std::vector<ResRef> mastarea;
 	std::vector<std::vector<ResRef> > npclevels;
-	int *bntchnc = nullptr;
-	TableMgr::index_t bntrows = TableMgr::npos;
 	CRRow *crtable = nullptr;
 	ResRef restmovies[8];
 	ResRef daymovies[8];
