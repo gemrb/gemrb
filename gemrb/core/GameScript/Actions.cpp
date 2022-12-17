@@ -2859,7 +2859,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 	int xp = parameters->int0Parameter;
 	core->GetTokenDictionary()->SetAtAsString("EXPERIENCEAMOUNT", xp);
 	if (core->HasFeedback(FT_MISC)) {
-		if (displaymsg->HasStringReference(STR_GOTQUESTXP)) {
+		if (DisplayMessage::HasStringReference(STR_GOTQUESTXP)) {
 			displaymsg->DisplayConstantStringName(STR_GOTQUESTXP, GUIColors::XPCHANGE, actor);
 		} else {
 			displaymsg->DisplayConstantStringValue(STR_GOTXP, GUIColors::XPCHANGE, (ieDword)xp);
@@ -3919,7 +3919,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	if (!act) {
 		return;
 	}
-	act->ApplyKit(true, act->GetClassID(ISPALADIN));
+	act->ApplyKit(true, Actor::GetClassID(ISPALADIN));
 	act->SetMCFlag(MC_FALLEN_PALADIN, BitOp::OR);
 	Effect *fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_TURN, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
@@ -3934,7 +3934,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	if (!act) {
 		return;
 	}
-	act->ApplyKit(true, act->GetClassID(ISRANGER));
+	act->ApplyKit(true, Actor::GetClassID(ISRANGER));
 	act->SetMCFlag(MC_FALLEN_RANGER, BitOp::OR);
 	Effect *fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
@@ -3956,7 +3956,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	act->SetMCFlag(MC_FALLEN_PALADIN, BitOp::NAND);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_CAST);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_TURN);
-	act->ApplyKit(false, act->GetClassID(ISPALADIN));
+	act->ApplyKit(false, Actor::GetClassID(ISPALADIN));
 }
 
 void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -3972,7 +3972,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	act->SetMCFlag(MC_FALLEN_RANGER, BitOp::NAND);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_CAST);
 	act->fxqueue.RemoveAllEffectsWithParam(fx_disable_button_ref, ACT_STEALTH);
-	act->ApplyKit(false, act->GetClassID(ISRANGER));
+	act->ApplyKit(false, Actor::GetClassID(ISRANGER));
 }
 
 //transfering item from Sender to target, target must be an actor

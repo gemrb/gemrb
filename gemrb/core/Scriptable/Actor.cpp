@@ -4387,7 +4387,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
 			//TODO: handle pst properly (decay, queueing, color)
 			SetOverheadText(fmt::to_wstring(damage), true);
-		} else if (!displaymsg->HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
+		} else if (!DisplayMessage::HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
@@ -4411,7 +4411,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 					core->GetTokenDictionary()->SetAt("TYPE", type_name);
 					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, GUIColors::WHITE, hitter);
-				} else if (displaymsg->HasStringReference(STR_DAMAGE_IMMUNITY) && displaymsg->HasStringReference(STR_DAMAGE1)) {
+				} else if (DisplayMessage::HasStringReference(STR_DAMAGE_IMMUNITY) && DisplayMessage::HasStringReference(STR_DAMAGE1)) {
 					// bg2
 					//<DAMAGEE> was immune to my damage.
 					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
@@ -4986,9 +4986,9 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	//we get the modified level
 	if (turnlevel >= level + turnDeathLevelMod) {
 		if (evilcleric) {
-			Effect *fx = fxqueue.CreateEffect(control_creature_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
+			Effect* fx = EffectQueue::CreateEffect(control_creature_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			if (!fx) {
-				fx = fxqueue.CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
+				fx = EffectQueue::CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			}
 			if (fx) {
 				fx->Duration = core->Time.round_sec;

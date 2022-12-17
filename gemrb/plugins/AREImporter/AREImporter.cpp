@@ -134,7 +134,7 @@ private:
 
 static int GetTrackString(const ResRef &areaName)
 {
-	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
+	bool trackflag = DisplayMessage::HasStringReference(STR_TRACKING);
 
 	if (tracks.empty()) {
 		AutoTable tm = gamedata->LoadTable("tracking", true);
