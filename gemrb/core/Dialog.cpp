@@ -27,13 +27,10 @@ namespace GemRB {
 
 Dialog::~Dialog(void)
 {
-	if (initialStates) {
-		for (unsigned int i = 0; i < TopLevelCount; i++) {
-			if (initialStates[i]) {
-				FreeDialogState( initialStates[i] );
-			}
+	for (auto& state : initialStates) {
+		if (state) {
+			FreeDialogState(state);
 		}
-		free(initialStates);
 	}
 }
 

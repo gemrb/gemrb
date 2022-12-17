@@ -74,7 +74,7 @@ Dialog* DLGImporter::GetDialog() const
 	d->Flags = Flags;
 	d->TopLevelCount = StatesCount;
 	d->Order.resize(StatesCount);
-	d->initialStates = (DialogState **) calloc (StatesCount, sizeof(DialogState *) );
+	d->initialStates.resize(StatesCount);
 	for (unsigned int i = 0; i < StatesCount; i++) {
 		DialogState* ds = GetDialogState( d, i );
 		d->initialStates[i] = ds;

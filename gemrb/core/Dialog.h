@@ -84,7 +84,7 @@ public:
 	ieDword Flags = 0; // freeze flags (bg2)
 	unsigned int TopLevelCount = 0;
 	std::vector<unsigned int> Order;
-	DialogState** initialStates = nullptr;
+	std::vector<DialogState*> initialStates;
 };
 
 }
