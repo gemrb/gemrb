@@ -1033,8 +1033,8 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 		if (slot > 0 && !target->inventory.IsSlotEmpty(slot)) return FX_APPLIED;
 
 		//has a twohanded weapon equipped
-		slot = target->inventory.GetWeaponSlot();
-		if (slot>0) {
+		slot = Inventory::GetWeaponSlot();
+		if (slot > 0) {
 			const CREItem* item = target->inventory.GetSlotItem(slot);
 			if (item && item->Flags & IE_INV_ITEM_TWOHANDED) return FX_APPLIED;
 		}
@@ -3643,7 +3643,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//charge count is the same for all slots by default
 	if (!fx->Parameter3) fx->Parameter3 = fx->Parameter1;
 	if (!fx->Parameter4) fx->Parameter4 = fx->Parameter1;
-	int slot = target->inventory.GetMagicSlot();
+	int slot = Inventory::GetMagicSlot();
 	target->inventory.SetSlotItemRes(fx->Resource, slot, fx->Parameter1, fx->Parameter3, fx->Parameter4);
 	//IWD doesn't let you create two handed weapons (actually only decastave) if shield slot is filled
 	//modders can still force two handed weapons with Parameter2
@@ -3662,7 +3662,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// fixes infinite loop with wm_sqrl spell from "wild mage additions" mod
 	const Item *itm = gamedata->GetItem(fx->Resource, true);
 	if (!itm) return FX_NOT_APPLIED;
-	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
+	target->inventory.SetEquippedSlot(slot - Inventory::GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
 	gamedata->FreeItem(itm, fx->Resource);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
 		//if this effect has expiration, then it will remain as a remove_item
@@ -4338,7 +4338,7 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//kill all polymorph effects
 		target->fxqueue.RemoveAllEffectsWithParam(fx_polymorph_ref, fx->Parameter2);
 		//destroy the magic item slot
-		target->inventory.RemoveItem(target->inventory.GetMagicSlot() );
+		target->inventory.RemoveItem(Inventory::GetMagicSlot());
 		return FX_NOT_APPLIED;
 	}
 

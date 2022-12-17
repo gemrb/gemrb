@@ -5855,7 +5855,7 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 		goto has_slot;
 	}
 	//WARNING:idx isn't used any more, recycling it
-	idx = actor->inventory.GetWeaponSlot();
+	idx = Inventory::GetWeaponSlot();
 	if (tmp<idx || tmp>idx+3) {
 		goto has_slot;
 	}
@@ -10865,11 +10865,11 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 		actor->GetActionButtonRow(myrow);
 	}
 	bool fistdrawn = true;
-	ieDword magicweapon = actor->inventory.GetMagicSlot();
+	ieDword magicweapon = Inventory::GetMagicSlot();
 	if (actor->inventory.IsSlotEmpty(magicweapon)) {
 		magicweapon = 0xffff;
 	}
-	ieDword fistweapon = actor->inventory.GetFistSlot();
+	ieDword fistweapon = Inventory::GetFistSlot();
 	ieDword usedslot = actor->inventory.GetEquippedSlot();
 	int tmp;
 	for (int i=0;i<GUIBT_COUNT;i++) {
@@ -11033,7 +11033,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 				//no slot translation required
 				int launcherslot = actor->inventory.FindSlotRangedWeapon(slot);
 				ResRef Item2ResRef;
-				if (launcherslot != actor->inventory.GetFistSlot()) {
+				if (launcherslot != Inventory::GetFistSlot()) {
 					// launcher/projectile in this slot
 					const CREItem* item2;
 					item2 = actor->inventory.GetSlotItem(launcherslot);
@@ -11413,7 +11413,7 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 			if (NoTrans) {
 				return PyLong_FromLong(i);
 			}
-			ret = i + actor->inventory.GetWeaponSlot();
+			ret = i + Inventory::GetWeaponSlot();
 			break;
 		}
 	}

@@ -6457,7 +6457,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	int slot = parameters->int0Parameter;
-	int wslot = scr->inventory.GetWeaponSlot();
+	int wslot = Inventory::GetWeaponSlot();
 	//weapon
 	if (core->QuerySlotType(slot)&SLOT_WEAPON) {
 		slot-=wslot;
@@ -6468,7 +6468,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//quick item
-	wslot = scr->inventory.GetQuickSlot();
+	wslot = Inventory::GetQuickSlot();
 	if (core->QuerySlotType(slot)&SLOT_ITEM) {
 		slot-=wslot;
 		if (slot<0 || slot>=MAX_QUICKITEMSLOT) {

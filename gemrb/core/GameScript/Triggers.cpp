@@ -3572,7 +3572,7 @@ int GameScript::OutOfAmmo(Scriptable *Sender, const Trigger *parameters)
 	}
 
 	//if a bow is equipped, but out of ammo, the core system will swap to fist anyway
-	if (actor->inventory.GetEquippedSlot() == actor->inventory.GetFistSlot()) {
+	if (actor->inventory.GetEquippedSlot() == Inventory::GetFistSlot()) {
 		return 1;
 	}
 
@@ -3589,7 +3589,7 @@ int GameScript::HaveUsableWeaponEquipped(Scriptable *Sender, const Trigger */*pa
 	}
 
 	//if a bow is equipped, but out of ammo, the core system will swap to fist anyway
-	if (actor->inventory.GetEquippedSlot() == actor->inventory.GetFistSlot()) {
+	if (actor->inventory.GetEquippedSlot() == Inventory::GetFistSlot()) {
 		return 0;
 	}
 
@@ -3605,7 +3605,7 @@ int GameScript::HasWeaponEquipped(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (actor->inventory.GetEquippedSlot() == actor->inventory.GetFistSlot()) {
+	if (actor->inventory.GetEquippedSlot() == Inventory::GetFistSlot()) {
 		return 0;
 	}
 	return 1;

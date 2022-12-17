@@ -5523,16 +5523,16 @@ void Actor::ReinitQuickSlots() const
 				slot = 0;
 				break;
 				//WARNING:this cannot be condensed, because the symbols don't come in order!!!
-			case ACT_QSLOT1: slot = inventory.GetQuickSlot(); break;
-			case ACT_QSLOT2: slot = inventory.GetQuickSlot()+1; break;
-			case ACT_QSLOT3: slot = inventory.GetQuickSlot()+2; break;
-			case ACT_QSLOT4: slot = inventory.GetQuickSlot()+3; break;
-			case ACT_QSLOT5: slot = inventory.GetQuickSlot()+4; break;
-			case ACT_IWDQITEM: slot = inventory.GetQuickSlot(); break;
-			case ACT_IWDQITEM+1: slot = inventory.GetQuickSlot()+1; break;
-			case ACT_IWDQITEM+2: slot = inventory.GetQuickSlot()+2; break;
-			case ACT_IWDQITEM+3: slot = inventory.GetQuickSlot()+3; break;
-			case ACT_IWDQITEM+4: slot = inventory.GetQuickSlot()+4; break;
+			case ACT_QSLOT1: slot = Inventory::GetQuickSlot(); break;
+			case ACT_QSLOT2: slot = Inventory::GetQuickSlot() + 1; break;
+			case ACT_QSLOT3: slot = Inventory::GetQuickSlot() + 2; break;
+			case ACT_QSLOT4: slot = Inventory::GetQuickSlot() + 3; break;
+			case ACT_QSLOT5: slot = Inventory::GetQuickSlot() + 4; break;
+			case ACT_IWDQITEM: slot = Inventory::GetQuickSlot(); break;
+			case ACT_IWDQITEM + 1: slot = Inventory::GetQuickSlot() + 1; break;
+			case ACT_IWDQITEM + 2: slot = Inventory::GetQuickSlot() + 2; break;
+			case ACT_IWDQITEM + 3: slot = Inventory::GetQuickSlot() + 3; break;
+			case ACT_IWDQITEM + 4: slot = Inventory::GetQuickSlot() + 4; break;
 			// the rest are unavailable - only three slots in the actual inventory layout, 5 in the class for pst
 			// case ACT_IWDQITEM+9:
 			default:
@@ -5600,7 +5600,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which) const
 			if (ext_header) {
 				int type = ext_header->ProjectileQualifier;
 				int weaponslot = inventory.FindTypedRangedWeapon(type);
-				if (weaponslot == inventory.GetFistSlot()) {
+				if (weaponslot == Inventory::GetFistSlot()) {
 					empty = true;
 				}
 			} else {
@@ -5611,7 +5611,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which) const
 	}
 
 	if (empty)
-		SetupQuickSlot(ACT_WEAPON1+which, inventory.GetFistSlot(), 0);
+		SetupQuickSlot(ACT_WEAPON1 + which, Inventory::GetFistSlot(), 0);
 }
 
 //if dual stuff needs to be handled on load too, improve this method with it
@@ -5849,7 +5849,7 @@ int Actor::IsDualWielding() const
 	int slot;
 	//if the shield slot is a weapon, we're dual wielding
 	const CREItem *wield = inventory.GetUsedWeapon(true, slot);
-	if (!wield || slot == inventory.GetFistSlot() || slot == inventory.GetMagicSlot()) {
+	if (!wield || slot == Inventory::GetFistSlot() || slot == Inventory::GetMagicSlot()) {
 		return 0;
 	}
 
@@ -8728,11 +8728,11 @@ void Actor::Rest(int hours)
 int Actor::GetQuickSlot(int slot) const
 {
 	assert(slot<8);
-	if (!inventory.IsSlotEmpty(inventory.GetMagicSlot())) {
-		return inventory.GetMagicSlot();
+	if (!inventory.IsSlotEmpty(Inventory::GetMagicSlot())) {
+		return Inventory::GetMagicSlot();
 	}
 	if (!PCStats) {
-		return slot+inventory.GetWeaponSlot();
+		return slot + Inventory::GetWeaponSlot();
 	}
 	return PCStats->QuickWeaponSlots[slot];
 }
@@ -8749,11 +8749,11 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 
 	if ((slot<0) || (slot == IW_NO_EQUIPPED) ) {
 		if (slot == IW_NO_EQUIPPED) {
-			slot = inventory.GetFistSlot();
+			slot = Inventory::GetFistSlot();
 		}
 		int i;
 		for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
-			if(slot+inventory.GetWeaponSlot()==PCStats->QuickWeaponSlots[i]) {
+			if (slot + Inventory::GetWeaponSlot() == PCStats->QuickWeaponSlots[i]) {
 				slot = i;
 				break;
 			}
@@ -8772,7 +8772,7 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 	else {
 		PCStats->QuickWeaponHeaders[slot]=header;
 	}
-	slot = inventory.GetWeaponQuickSlot(PCStats->QuickWeaponSlots[slot]);
+	slot = Inventory::GetWeaponQuickSlot(PCStats->QuickWeaponSlots[slot]);
 	if (inventory.SetEquippedSlot(slot, header)) {
 		return 0;
 	}
@@ -10717,7 +10717,7 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 		penalty = 0;
 	}
 	bool magical = false;
-	int armorSlot = inventory.GetArmorSlot();
+	int armorSlot = Inventory::GetArmorSlot();
 	const CREItem *armorItem = inventory.GetSlotItem(armorSlot);
 	if (armorItem) {
 		magical = armorItem->Flags&IE_INV_ITEM_MAGICAL;
@@ -11058,7 +11058,7 @@ char Actor::GetArmorCode() const
 {
 	bool mageAnimation = (BaseStats[IE_ANIMATION_ID] & 0xF00) == 0x200;
 	// IE_ARMOR_TYPE + 1 is the armor code, but we also need to look up robes specifically as they have 3 types :(
-	const CREItem *itm = inventory.GetSlotItem(inventory.GetArmorSlot());
+	const CREItem* itm = inventory.GetSlotItem(Inventory::GetArmorSlot());
 	if (!itm) return '1';
 	const Item *item = gamedata->GetItem(itm->ItemResRef, true);
 	if (!item) return '1';
