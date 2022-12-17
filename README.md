@@ -10,7 +10,7 @@
 
 [GemRB](https://gemrb.org) (Game Engine Made with preRendered Background) is a portable open-source
 reimplementation of the Infinity Engine that underpinned Baldur's Gate,
-Icewind Dale and Planescape: Torment. It sports a cleaner design, greater
+Icewind Dale and Planescape: Torment. It supports a cleaner design, greater
 extensibility and several innovations.
 Would you like to create a game like Baldur's Gate?
 
