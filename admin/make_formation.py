@@ -55,7 +55,7 @@ def generate_line(name):
 	for i in range(num_coords):
 		print(0, end=' ')
 		print_y(yloc, i)
-		yloc += 36
+		yloc += 48
 	print()
 
 # A 'T' shape formation, with 3 actors at the front.
@@ -67,17 +67,17 @@ def generate_t():
 			print("0 0", end=' ')
 		elif i == 1:
 			# right
-			print("48 0", end=' ')
+			print("64 0", end=' ')
 		elif i == 2:
 			# left
-			print("-48 0", end=' ')
+			print("-64 0", end=' ')
 		elif i == 3:
 			# first line member (48 deeper)
-			print("0 48", end=' ')
+			print("0 64", end=' ')
 		else:
 			# line member (36 deeper)
 			print(0, end=' ')
-			print_y(48 + ((i - 3) * 36), i)
+			print_y(64 + ((i - 3) * 48), i)
 	print()
 
 # A 'gathered' formation around a centre point.
@@ -139,7 +139,7 @@ def generate_s(bg2style):
 			else: print(64, end=' ') # on right
 		
 		# y coordinate: 24 each
-		print_y(i * 24, i)
+		print_y(i * 32, i)
 	print()
 
 # Returns the position in a formation of party member 'actorno',
@@ -206,7 +206,7 @@ def generate_3by2():
 			print(-64, end=' ')
 
 		# y coordinate
-		print_y((i // 3) * 48, i)
+		print_y((i // 3) * 64, i)
 	print()
 
 # A simple 2-across block formation.
@@ -217,16 +217,16 @@ def generate_2by3():
 	yloc = 0
 	for i in range(num_coords):
 		if left_side: # left
-			print(-24, end=' ')
+			print(-32, end=' ')
 			print_y(yloc, i)
 		else: # right
-			print(24, end=' ')
+			print(32, end=' ')
 			print_y(yloc, i)
 			# first step back is 48, then 36
 			if yloc == 0:
-				yloc = 48
+				yloc = 64
 			else:
-				yloc += 36
+				yloc += 48
 		left_side = not left_side
 	print()
 
@@ -265,13 +265,13 @@ def generate_triangle():
 		if pos == 0:
 			print("0 0", end=' ') # front
 		elif pos == 1:
-			print("-32 36", end=' ') # middle left
+			print("-32 48", end=' ') # middle left
 		elif pos == 2:
-			print("32 36", end=' ') # middle right
+			print("32 48", end=' ') # middle right
 		else:
 			pos = pos - 3
 			# start 72 back, then move back 36 per row
-			ypos = 72 + ((pos // 3) * 36)
+			ypos = 96 + ((pos // 3) * 48)
 
 			if pos % 3 == 0: # middle
 				xpos = 0
@@ -294,15 +294,15 @@ def generate_wedge():
 		if i == 0:
 			print("0 0", end=' ') # front
 		elif i == 1:
-			print("64 36", end=' ') # second row: right
+			print("64 48", end=' ') # second row: right
 		elif i == 2:
-			print("-64 36", end=' ') # second row: left
+			print("-64 48", end=' ') # second row: left
 		elif i == 3:
-			print("-124 72", end=' ') # third row: left
+			print("-124 96", end=' ') # third row: left
 		elif i == 4:
-			print("124 72", end=' ') # third row: right
+			print("124 96", end=' ') # third row: right
 		elif i == 5:
-			print("0 72", end=' ') # third row: middle
+			print("0 96", end=' ') # third row: middle
 		else:
 			pos = i - 6
 			if pos % 3 == 0:
@@ -311,7 +311,7 @@ def generate_wedge():
 				print(-124, end=' ') # left
 			else:
 				print(124, end=' ') # right
-			ypos = 72 + (i // 3) * 36
+			ypos = 96 + (i // 3) * 48
 			print_y(ypos, i)
 	print()
 
