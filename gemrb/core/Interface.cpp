@@ -278,7 +278,6 @@ Interface::~Interface() noexcept
 	PluginMgr::Get()->RunCleanup();
 
 	slotTypes.clear();
-	free( slotmatrix );
 	itemtypedata.clear();
 
 	delete sgiterator;
@@ -2845,10 +2844,6 @@ void Interface::UpdateMasterScript()
 
 bool Interface::InitItemTypes()
 {
-	if (slotmatrix) {
-		free(slotmatrix);
-	}
-
 	AutoTable it = gamedata->LoadTable("itemtype");
 	ItemTypes = 0;
 	if (it) {
@@ -2859,7 +2854,7 @@ bool Interface::InitItemTypes()
 			InvSlotTypes = 32;
 		}
 		//make sure unsigned int is 32 bits
-		slotmatrix = (ieDword *) malloc(ItemTypes * sizeof(ieDword) );
+		slotmatrix.resize(ItemTypes);
 		for (TableMgr::index_t i = 0; i < ItemTypes; i++) {
 			unsigned int value = 0;
 			unsigned int k = 1;

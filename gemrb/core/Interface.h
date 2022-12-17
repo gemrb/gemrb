@@ -403,7 +403,7 @@ private:
 	std::vector<ColorPal<32>>  palettes32;
 	std::vector<ColorPal<16>>  palettes16;
 
-	ieDword* slotmatrix = nullptr; // itemtype vs slottype
+	std::vector<ieDword> slotmatrix; // itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	std::vector<SlotType> slotTypes;
 	TableMgr::index_t ItemTypes = 0;
