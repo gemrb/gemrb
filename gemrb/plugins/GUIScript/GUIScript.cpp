@@ -5158,7 +5158,7 @@ static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (Which<0) {
-		Formation = game->WhichFormation;
+		Formation = game->WhichFormation; // an index, not actual formation
 	} else {
 		if (Which>4) {
 			return NULL;
@@ -5194,7 +5194,7 @@ static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (Which<0) {
-		game->WhichFormation = Formation;
+		game->WhichFormation = Formation; // an index, not actual formation
 	} else {
 		if (Which>4) {
 			return NULL;

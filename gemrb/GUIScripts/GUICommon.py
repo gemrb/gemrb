@@ -73,10 +73,6 @@ def LocationPressed ():
 
 	return
 
-def SelectFormation (btn):
-	GemRB.GameSetFormation (btn.Value)
-	return
-
 def OpenFloatMenuWindow (p):
 	if GameCheck.IsPST():
 		import FloatMenuWindow

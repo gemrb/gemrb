@@ -262,7 +262,7 @@ public:
 	size_t partysize = 6;
 	std::atomic_uint32_t GameTime {0};
 	ieDword RealTime = 0;
-	ieWord  WhichFormation = 0;
+	ieWord WhichFormation = 0; // 0-4 index into Formations, not an actual formation!
 	ieWord  Formations[5]{};
 	ieDword PartyGold = 0;
 	ieWord NPCAreaViewed = 0;

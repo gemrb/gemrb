@@ -356,9 +356,14 @@ def EmptyControls ():
 		Button.SetVisible (False)
 	return
 
+def SelectFormation (btn):
+	GemRB.GameSetFormation (btn.Value)
+	return
+
 def SelectFormationPreset ():
 	"""Choose the default formation."""
-	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
+	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation")) # save
+	GemRB.GameSetFormation (GemRB.GetVar ("Formation")) # set
 	GroupControls ()
 	return
 
@@ -395,18 +400,19 @@ def GroupControls ():
 	Button.SetActionIcon (globals(), -1, 6)
 	Button = CurrentWindow.GetControl (6+ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1, 7)
-	formation = GemRB.GameGetFormation ()
+
+	formation = GemRB.GameGetFormation () # formation index
+	formations = [ GemRB.GameGetFormation (i) for i in range(5) ]
 	GemRB.SetVar ("Formation", formation)
 	for i in range (5):
 		Button = CurrentWindow.GetControl (7+ActionBarControlOffset+i)
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		idx = GemRB.GameGetFormation (i)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
 		# kill the previous sprites or they show through
 		Button.SetSprites ("GUIBTBUT",0,0,1,2,3)
 		Button.SetBAM ("FORM%x"%idx,0,0,-1)
 		Button.SetVarAssoc ("Formation", i)
-		Button.OnPress (GUICommon.SelectFormation)
+		Button.OnPress (SelectFormation)
 		Button.OnRightPress (SetupFormation)
 		Button.SetTooltip (4935)
 		# 0x90 = F1 key
