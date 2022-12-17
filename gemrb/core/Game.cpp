@@ -2250,7 +2250,7 @@ bool Game::IsTimestopActive() const
 	return timestop_end > GameTime;
 }
 
-bool Game::RandomEncounter(ResRef &BaseArea)
+bool Game::RandomEncounter(ResRef& BaseArea) const
 {
 	AutoTable table = gamedata->LoadTable("bntychnc");
 	if (!table) return false;

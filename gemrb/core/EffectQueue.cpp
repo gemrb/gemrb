@@ -807,7 +807,7 @@ static int check_type(Actor *actor, const Effect& fx)
 	//the protective effect (if any)
 	Effect *efx;
 
-	Actor *caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
+	const Actor* caster = core->GetGame()->GetActorByGlobalID(fx.CasterID);
 	// Cannot resist own spells!  This even applies to bounced hostile spells, but notably excludes source immunity.
 	bool self = (caster == actor);
 	// MagicAttack: these spells pierce most generic magical defences (because they need to be able to dispel them).

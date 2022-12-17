@@ -693,9 +693,9 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		if (VertexCount <= 1) {
 			// this is exactly the same as bbox.origin
 			if (VertexCount == 1) {
-				Point pos;
-				str->ReadPoint(pos);
-				assert(pos == bbox.origin);
+				Point pos2;
+				str->ReadPoint(pos2);
+				assert(pos2 == bbox.origin);
 			}
 
 			if (bbox.size.IsInvalid()) {

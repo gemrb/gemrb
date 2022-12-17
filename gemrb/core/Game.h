@@ -481,7 +481,7 @@ public:
 	Actor *GetTimestopOwner() const { return timestop_owner; };
 	void SetTimestopOwner(Actor *owner) { timestop_owner = owner; };
 	/** Checks the bounty encounters (used in bg1) */
-	bool RandomEncounter(ResRef &BaseArea);
+	bool RandomEncounter(ResRef& BaseArea) const;
 	/** Resets the area and bored comment timers of the whole party */
 	void ResetPartyCommentTimes() const;
 	void ReversePCs() const;

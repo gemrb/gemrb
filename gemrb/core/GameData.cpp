@@ -553,7 +553,7 @@ bool GameData::HasInfravision(const std::string& raceName)
 {
 	AutoTable racialInfravision = LoadTable("racefeat", true);
 
-	if (!racialInfravision) return 0;
+	if (!racialInfravision) return false;
 	return racialInfravision->QueryFieldSigned<int>(raceName, "VALUE") & 1;
 }
 

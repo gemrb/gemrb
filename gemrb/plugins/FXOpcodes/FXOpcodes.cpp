@@ -6517,7 +6517,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 			}
 			//core->ApplySpell(refs[i], actor, Owner, fx->Power);
 			// no casting animation, no deplete, instant, no interrupt
-			Owner->DirectlyCastSpell(actor, refs[i], fx->Power, 1, false);
+			Owner->DirectlyCastSpell(actor, refs[i], fx->Power, true, false);
 
 			// save a marker, so we can avoid two fireshielded mages almost instantly kill each other
 			fx->Parameter4 = actor->GetGlobalID();
