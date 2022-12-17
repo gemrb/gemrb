@@ -83,12 +83,12 @@ def RedrawContainerWindow ():
 		Button = Window.GetControl (i)
 		if Slot:
 			Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
-			function = TakeItemContainer
+			callback = TakeItemContainer
 		else:
 			Button.SetVarAssoc ("LeftIndex", -1)
-			function = None
+			callback = None
 		if GameCheck.IsPST():
-			GUICommonWindows.SetItemButton (Window, Button, Slot, function, None)
+			GUICommonWindows.SetItemButton (Window, Button, Slot, callback, None)
 		else:
 			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "container")
 
@@ -104,12 +104,12 @@ def RedrawContainerWindow ():
 
 		if Slot:
 			Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
-			function = DropItemContainer
+			callback = DropItemContainer
 		else:
 			Button.SetVarAssoc ("RightIndex", -1)
-			function = None
+			callback = None
 		if GameCheck.IsPST():
-			GUICommonWindows.SetItemButton (Window, Button, Slot, function, None)
+			GUICommonWindows.SetItemButton (Window, Button, Slot, callback, None)
 		else:
 			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
 

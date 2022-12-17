@@ -499,7 +499,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		TableMgr::index_t row = TableMgr::npos;
 		if (extspeed) {
 			const std::string& animHex = fmt::format("{:#04x}", AnimID);
-			row = extspeed->FindTableValue(0ul, animHex);
+			row = extspeed->FindTableValue(0UL, animHex);
 			if (row != TableMgr::npos) {
 				int rate = extspeed->QueryFieldSigned<int>(row, 1);
 				SetBase(IE_MOVEMENTRATE, rate);

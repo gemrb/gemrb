@@ -1035,7 +1035,7 @@ void CREImporter::GetActorPST(Actor *act)
 	//good, law, lady, murder
 	for (auto& counter : act->DeathCounters) {
 		str->Read( &tmpByte, 1);
-		counter = (ieByteSigned) tmpByte;
+		counter = tmpByte;
 	}
 	ieVariable KillVar; //use this as needed
 	str->ReadVariable(KillVar);
