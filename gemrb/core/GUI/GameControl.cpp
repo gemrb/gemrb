@@ -590,11 +590,10 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		DrawFormation(game->selected, gameClickPoint, angle);
 	} else {
 		int max = game->GetPartySize(true);
-		for (int idx = 1; idx <= max; idx++) {
-			const Actor* actor = game->FindPC(idx);
-			assert(actor);
-			if (actor->ShouldDrawReticle()) {
-				DrawTargetReticle(actor, actor->Destination - vpOrigin);
+		for (const auto& selectee : game->selected) {
+			assert(selectee);
+			if (selectee->ShouldDrawReticle()) {
+				DrawTargetReticle(selectee, selectee->Destination - vpOrigin);
 			}
 		}
 	}
