@@ -886,19 +886,22 @@ bool Game::CheckForReplacementActor(size_t i)
 
 	const Actor *act = NPCs[i];
 	ieDword level = GetTotalPartyLevel(false) / GetPartySize(false);
-	if ((act->Modified[IE_MC_FLAGS] & MC_BEENINPARTY) || (act->Modified[IE_STATE_ID] & STATE_DEAD) || act->GetXPLevel(false) >= level) {
+	if ((act->Modified[IE_MC_FLAGS] & MC_BEENINPARTY) || (act->Modified[IE_STATE_ID] & STATE_DEAD)) {
+		return false;
+	}
+	if (level == 1 || act->GetXPLevel(false) >= level) {
 		return false;
 	}
 
 	ResRef newcre = "****"; // default table value
 	for (const auto& nl : npclevels) {
-		if (act->GetScriptName().BeginsWith(nl[0]) && level > 2) {
-			// the tables have entries only up to level 24
+		if (act->GetScriptName().BeginsWith(nl[0])) {
+			// the tables have entries only up to level 24, starting at 2 and in gemrb with the row name at index 0
 			ieDword safeLevel = static_cast<ieDword>(npclevels[0].size());
 			if (level < safeLevel) {
 				safeLevel = level;
 			}
-			newcre = nl[safeLevel - 2];
+			newcre = nl[safeLevel - 1];
 			break;
 		}
 	}
