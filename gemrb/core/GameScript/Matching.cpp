@@ -284,9 +284,6 @@ Scriptable *GetActorObject(const TileMap *TMap, const ieVariable& name)
 
 	//No... it was not a container ... maybe an InfoPoint?
 	aC = TMap->GetInfoPoint( name );
-	if (aC) {
-		return aC;
-	}
 	return aC;
 }
 
