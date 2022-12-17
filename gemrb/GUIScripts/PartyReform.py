@@ -51,7 +51,7 @@ def UpdateReformWindow (Window, select):
 
 	# remove
 	Button = Window.GetControl (15)
-	Button.SetText (17507)
+	Button.SetText (42514 if GameCheck.IsPST () else 17507)
 	Button.OnPress (lambda: RemovePlayer(select))
 	if select:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -89,11 +89,13 @@ def RemovePlayer (select):
 	winID = 25
 	if GameCheck.IsHOW ():
 		winID = 0 # at least in guiw08, this is the correct window
+	elif GameCheck.IsPST ():
+		winID = 26 # so we get two buttons
 	Window = GemRB.LoadWindow (winID, GUICommon.GetWindowPack (), WINDOW_BOTTOM | WINDOW_HCENTER)
 
 	# are you sure
 	Label = Window.GetControl (0x0fffffff)
-	Label.SetText (17518)
+	Label.SetText (28071 if GameCheck.IsPST () else 17518)
 
 	# confirm
 	def RemovePlayerConfirm ():
@@ -109,13 +111,13 @@ def RemovePlayer (select):
 		return
 
 	Button = Window.GetControl (1)
-	Button.SetText (17507)
+	Button.SetText (42514 if GameCheck.IsPST () else 17507)
 	Button.OnPress (RemovePlayerConfirm)
 	Button.MakeDefault()
 
 	#cancel
 	Button = Window.GetControl (2)
-	Button.SetText (13727)
+	Button.SetText (4196 if GameCheck.IsPST () else 13727)
 	Button.OnPress (Window.Close)
 	Button.MakeEscape()
 
@@ -154,7 +156,7 @@ def OpenReformPartyWindow ():
 
 	# Done
 	Button = Window.GetControl (8)
-	Button.SetText (11973)
+	Button.SetText (1403 if GameCheck.IsPST () else 11973)
 	Button.OnPress (Window.Close)
 
 	# if nobody can be removed, just close the window

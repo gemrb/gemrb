@@ -70,6 +70,7 @@ import LevelUp
 import LUCommon
 import GUICommonWindows
 import NewLife
+import PartyReform
 from GUIDefines import *
 from ie_stats import *
 import GUIWORLD
@@ -105,7 +106,7 @@ def InitRecordsWindow (Window):
 	# Reform Party
 	Button = Window.GetControl (8)
 	Button.SetText (4244)
-	Button.OnPress (GUIWORLD.OpenReformPartyWindow)
+	Button.OnPress (PartyReform.OpenReformPartyWindow)
 
 	# Level Up
 	Button = Window.GetControl (9)

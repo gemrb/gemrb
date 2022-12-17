@@ -31,7 +31,6 @@ from GUIDefines import *
 import MessageWindow
 
 FormationWindow = None
-ReformPartyWindow = None
 
 def DialogStarted ():
 	global ContinueWindow
@@ -84,24 +83,6 @@ def OpenContinueMessageWindow ():
 	Button.OnPress (CloseContinueWindow)
 	Button.MakeDefault(True)
 	Button.SetDisabled(False)
-
-def OpenReformPartyWindow ():
-	global ReformPartyWindow
-
-	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	ReformPartyWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-
-	# Remove
-	Button = Window.GetControl (15)
-	Button.SetText (42514)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	# TODO: implement removal
-
-	# Done
-	Button = Window.GetControl (8)
-	Button.SetText (1403)
-	Button.OnPress (ReformPartyWindow.Close)
-
 
 last_formation = None
 
