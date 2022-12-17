@@ -589,7 +589,6 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		double angle = AngleFromPoints(gameMousePos, gameClickPoint);
 		DrawFormation(game->selected, gameClickPoint, angle);
 	} else {
-		int max = game->GetPartySize(true);
 		for (const auto& selectee : game->selected) {
 			assert(selectee);
 			if (selectee->ShouldDrawReticle()) {
