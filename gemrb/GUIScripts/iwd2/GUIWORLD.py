@@ -30,11 +30,7 @@ import MessageWindow
 import CommonWindow
 import Container
 
-FRAME_PC_SELECTED = 0
-FRAME_PC_TARGET   = 1
-
 ContinueWindow = None
-ReformPartyWindow = None
 
 def OpenDialogButton(id):
 	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
@@ -95,34 +91,6 @@ def OpenContinueMessageWindow ():
 	Button.OnPress (CloseContinueWindow)
 	Button.MakeDefault(True)
 	ContinueWindow.Focus()
-
-def OpenReformPartyWindow ():
-	global ReformPartyWindow
-
-	hideflag = CommonWindow.IsGameGUIHidden()
-
-	if ReformPartyWindow:
-		if ReformPartyWindow:
-			ReformPartyWindow.Close ()
-		ReformPartyWindow = None
-
-		CommonWindow.SetGameGUIHidden(hideflag)
-		return
-
-	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
-
-	# Remove
-	Button = Window.GetControl (15)
-	Button.SetText (42514)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	# TODO: implement removal for minmaxers
-
-	# Done
-	Button = Window.GetControl (8)
-	Button.SetText (1403)
-	Button.OnPress (OpenReformPartyWindow)
-	
-	CommonWindow.SetGameGUIHidden(hideflag)
 
 def DeathWindowPlot():
 	#no death movie, but music is changed
