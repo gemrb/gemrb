@@ -182,6 +182,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 		stepVec.x = radius * direction;
 	}
 	
+	vec.y *= 0.75f; // isometric projection
 	Point dest = vec + origin;
 	int step = 0;
 	constexpr int maxStep = 4;
@@ -210,7 +211,9 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 			}
 		}
 		
-		return origin + start + RotatePoint(stepVec, angle + stepAngle);
+		Point rotated = RotatePoint(stepVec, angle + stepAngle);
+		rotated.y *= 0.75f; // isometric projection
+		return origin + start + rotated;
 	};
 
 	while (step < maxStep) {
