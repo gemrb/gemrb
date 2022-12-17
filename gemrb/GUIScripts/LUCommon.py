@@ -97,6 +97,9 @@ def CanLevelUp(actor):
 	Multi = GUICommon.IsMultiClassed (actor, 1)
 	Dual = GUICommon.IsDualClassed (actor, 1)
 
+	if Class == "":
+		return 0
+
 	# get all the levels and overall xp here
 	xp = GemRB.GetPlayerStat (actor, IE_XP)
 	Levels = [GemRB.GetPlayerStat (actor, IE_LEVEL), GemRB.GetPlayerStat (actor, IE_LEVEL2),\
