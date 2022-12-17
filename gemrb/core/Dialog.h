@@ -83,7 +83,7 @@ public:
 	ResRef resRef;
 	ieDword Flags = 0; // freeze flags (bg2)
 	unsigned int TopLevelCount = 0;
-	ieDword* Order = nullptr;
+	std::vector<unsigned int> Order;
 	DialogState** initialStates = nullptr;
 };
 

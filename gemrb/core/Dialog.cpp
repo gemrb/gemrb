@@ -35,7 +35,6 @@ Dialog::~Dialog(void)
 		}
 		free(initialStates);
 	}
-	if (Order) free(Order);
 }
 
 DialogState* Dialog::GetState(unsigned int index) const
