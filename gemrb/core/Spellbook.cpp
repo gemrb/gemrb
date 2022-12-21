@@ -715,8 +715,6 @@ CRESpellMemorization *Spellbook::GetSpellMemorization(unsigned int type, unsigne
 //bonus is cumulative, but not saved
 void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int level, bool bonus)
 {
-	int diff;
-
 	if (type >= NUM_BOOK_TYPES) {
 		return;
 	}
@@ -731,9 +729,9 @@ void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int leve
 			sm->SlotCountWithBonus = (ieWord) (sm->SlotCountWithBonus + Value);
 		}
 	} else {
-		diff=sm->SlotCountWithBonus-sm->SlotCount;
-		sm->SlotCount=(ieWord) Value;
-		sm->SlotCountWithBonus=(ieWord) (Value+diff);
+		int oldBonus = sm->SlotCountWithBonus - sm->SlotCount;
+		sm->SlotCount = (ieWord) Value;
+		sm->SlotCountWithBonus = (ieWord) (Value + oldBonus);
 	}
 }
 
