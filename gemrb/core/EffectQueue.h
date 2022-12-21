@@ -366,6 +366,7 @@ private:
 	int MaxParam1(ieDword opcode, bool positive) const;
 	int BonusAgainstCreature(ieDword opcode, const Actor *actor) const;
 	bool WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const;
+	void RemoveBonusMemorizations(const Effect& fx);
 };
 
 }

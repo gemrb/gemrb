@@ -1328,6 +1328,71 @@ void EffectQueue::RemoveAllEffects(ieDword opcode)
 	}
 }
 
+static bool RemoveMemo(Actor* ownerActor, unsigned int type, unsigned int idx, ieDword bonus = 0)
+{
+	CRESpellMemorization* sm = ownerActor->spellbook.GetSpellMemorization(type, idx);
+	size_t diff = sm->SlotCountWithBonus - sm->SlotCount;
+	if (diff == 0) return false;
+
+	if (sm->SlotCount >= sm->memorized_spells.size()) return false;
+	diff = std::min(diff, sm->memorized_spells.size());
+	if (bonus) diff = std::min<size_t>(diff, bonus);
+	for (size_t j = 0; j < diff; j++) {
+		delete sm->memorized_spells.back();
+		sm->memorized_spells.pop_back();
+	}
+	return true;
+}
+
+void EffectQueue::RemoveBonusMemorizations(const Effect& fx)
+{
+	static EffectRef fx_spell_bonus1_ref = { "WizardSpellSlotsModifier", -1 };
+	static EffectRef fx_spell_bonus2_ref = { "PriestSpellSlotsModifier", -1 };
+	if (fx_spell_bonus1_ref.opcode < 0) {
+		Globals::ResolveEffectRef(fx_spell_bonus1_ref);
+		Globals::ResolveEffectRef(fx_spell_bonus2_ref);
+	}
+
+	Actor* ownerActor = Scriptable::As<Actor>(Owner);
+	if (!ownerActor) return;
+
+	unsigned int type;
+	if ((int) fx.Opcode == fx_spell_bonus1_ref.opcode) {
+		type = IE_SPELL_TYPE_WIZARD;
+	} else if ((int) fx.Opcode == fx_spell_bonus2_ref.opcode) {
+		type = IE_SPELL_TYPE_PRIEST;
+	} else {
+		return;
+	}
+
+	// delete granted memorizations
+	if (fx.Parameter2 == 0) {
+		// doubled counts up to fx.Parameter1 level
+		unsigned int level = std::min(fx.Parameter1, ownerActor->spellbook.GetSpellLevelCount(type));
+		for (unsigned int i = 0; i < level; i++) {
+			if (!RemoveMemo(ownerActor, type, i)) continue;
+		}
+	} else if (fx.Parameter2 == 0x200) {
+		// doubled counts at fx.Parameter1 level
+		unsigned int level = fx.Parameter1;
+		if (level > ownerActor->spellbook.GetSpellLevelCount(type)) return;
+		RemoveMemo(ownerActor, type, level);
+	} else {
+		// fx.Parameter1 bonus to all levels in param2 mask
+		unsigned int level = ownerActor->spellbook.GetSpellLevelCount(type);
+		int mask = 1;
+		for (unsigned int i = 0; i < level; i++) {
+			if (!(fx.Parameter2 & mask)) {
+				mask <<= 1;
+				continue;
+			}
+
+			RemoveMemo(ownerActor, type, i, fx.Parameter1);
+			mask <<= 1;
+		}
+	}
+}
+
 //removes all equipping effects that match slotcode
 bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode)
 {
@@ -1337,6 +1402,7 @@ bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode)
 		MATCH_SLOTCODE()
 
 		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
+		RemoveBonusMemorizations(fx);
 		removed = true;
 	}
 	return removed;
