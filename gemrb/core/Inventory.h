@@ -117,9 +117,10 @@ using ieCREItemFlagBits = enum ieCREItemFlagBits : uint32_t {
 #define IE_INV_DEPLETABLE (IE_INV_ITEM_MAGICAL|IE_INV_ITEM_DESTRUCTIBLE)
 
 //equip flags
-#define EQUIP_ANY   0
+#define EQUIP_NONE   0
 #define EQUIP_MELEE 1
 #define EQUIP_RANGED 2
+#define EQUIP_FORCE 4
 
 //FIXME:
 //actually this header shouldn't be THIS large, i was just

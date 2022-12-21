@@ -1672,7 +1672,7 @@ void Inventory::EquipBestWeapon(int flags)
 	ieWord MeleeAnimation[3]={100,0,0};
 
 	//cannot change equipment when holding magic weapons
-	if (Equipped == SLOT_MAGIC-SLOT_MELEE) {
+	if (Equipped == SLOT_MAGIC - SLOT_MELEE && !(flags & EQUIP_FORCE)) {
 		return;
 	}
 
