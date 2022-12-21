@@ -2987,6 +2987,10 @@ bool Map::CanFree()
 		if (actor == core->GetCutSceneRunner()) {
 			return false;
 		}
+
+		if (actor->GetStat(IE_MC_FLAGS) & MC_LIMBO_CREATURE) {
+			return false;
+		}
 	}
 	//we expect the area to be swapped out, so we simply remove the corpses now
 	PurgeArea(false);
