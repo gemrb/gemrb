@@ -400,9 +400,13 @@ void Inventory::KillSlot(unsigned int index)
 		case SLOT_EFFECT_MELEE:
 			// reset Equipped if it was the removed item
 			if (eqslot == (int)index) {
+				recache = false;
+				if ((int) index == SLOT_MAGIC) {
+					EquipBestWeapon(EQUIP_MELEE | EQUIP_RANGED | EQUIP_FORCE);
+					break;
+				}
 				SetEquippedSlot(IW_NO_EQUIPPED, 0);
 				UpdateWeaponAnimation();
-				recache = false;
 				break;
 			}
 
