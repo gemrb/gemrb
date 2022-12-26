@@ -97,26 +97,10 @@ def OpenFormationWindow ():
 	Button.SetText (1403)
 	Button.OnPress (FormationWindow.Close)
 
-	tooltips = (
-		44957,  # Follow
-		44958,  # T
-		44959,  # Gather
-		44960,  # 4 and 2
-		44961,  # 3 by 2
-		44962,  # Protect
-		48152,  # 2 by 3
-		44964,  # Rank
-		44965,  # V
-		44966,  # Wedge
-		44967,  # S
-		44968,  # Line
-		44969,  # None
-	)
-
 	for i in range (13):
 		Button = Window.GetControl (i)
 		Button.SetVarAssoc ("SelectedFormation", i)
-		Button.SetTooltip (tooltips[i])
+		Button.SetTooltip (48152 if i == 6 else 44957 + i)
 		Button.OnPress (SelectFormation)
 
 	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation (0))
