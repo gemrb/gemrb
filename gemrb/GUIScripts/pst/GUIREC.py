@@ -37,31 +37,6 @@
 # 16 - some 2 panel window
 # 17 - some 2 panel window
 
-
-# MainWindow:
-# 0 - main textarea
-# 1 - its scrollbar
-# 2 - WMCHRP character portrait
-# 5 - STALIGN alignment
-# 6 - STFCTION faction
-# 7,8,9 - STCSTM (info, reform party, level up)
-# 0x1000000a - name
-#0x1000000b - ac
-#0x1000000c, 0x1000000d hp now, hp max
-#0x1000000e str
-#0x1000000f int
-#0x10000010 wis
-#0x10000011 dex
-#0x10000012 con
-#0x10000013 chr
-#x10000014 race
-#x10000015 sex
-#0x10000016 class
-
-#31-36 stat buts
-#37 ac but
-#38 hp but?
-
 ###################################################
 import GemRB
 import GUICommon
