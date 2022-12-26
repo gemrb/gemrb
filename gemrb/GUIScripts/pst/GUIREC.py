@@ -189,28 +189,17 @@ def UpdateRecordsWindow (Window):
 	Label.SetTooltip (4199)
 
 	# stats
+	statIdx = [ IE_STR, IE_INT, IE_WIS, IE_DEX, IE_CON, IE_CHR ]
+	stats = [ GemRB.GetPlayerStat (pc, stat) for stat in statIdx ]
+	basestats = [ GemRB.GetPlayerStat (pc, stat, 1) for stat in statIdx ]
 
-	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	bstr = GemRB.GetPlayerStat (pc, IE_STR,1)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-	bstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA,1)
-	if (sstrx > 0) and (sstr==18):
-		sstr = "%d/%02d" %(sstr, sstrx % 100)
-	if (bstrx > 0) and (bstr==18):
-		bstr = "%d/%02d" %(bstr, bstrx % 100)
-	sint = GemRB.GetPlayerStat (pc, IE_INT)
-	bint = GemRB.GetPlayerStat (pc, IE_INT,1)
-	swis = GemRB.GetPlayerStat (pc, IE_WIS)
-	bwis = GemRB.GetPlayerStat (pc, IE_WIS,1)
-	sdex = GemRB.GetPlayerStat (pc, IE_DEX)
-	bdex = GemRB.GetPlayerStat (pc, IE_DEX,1)
-	scon = GemRB.GetPlayerStat (pc, IE_CON)
-	bcon = GemRB.GetPlayerStat (pc, IE_CON,1)
-	schr = GemRB.GetPlayerStat (pc, IE_CHR)
-	bchr = GemRB.GetPlayerStat (pc, IE_CHR,1)
+	bstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA, 1)
+	if sstrx > 0 and stats[0] == 18:
+		stats[0] = "%d/%02d" %(stats[0], sstrx % 100)
+	if bstrx > 0 and basestats[0] == 18:
+		basestats[0] = "%d/%02d" %(basestats[0], bstrx % 100)
 
-	stats = (sstr, sint, swis, sdex, scon, schr)
-	basestats = (bstr, bint, bwis, bdex, bcon, bchr)
 	for i in range (6):
 		Label = Window.GetControl (0x1000000e + i)
 		if stats[i]!=basestats[i]:
