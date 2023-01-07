@@ -186,6 +186,8 @@ public:
 	 *  Returns NULL on failure.
 	 **/
 	virtual DataStream* Clone() const noexcept;
+
+	void SetBigEndianness(bool) noexcept;
 protected:
 	strpos_t Pos = 0;
 	strpos_t size = 0;

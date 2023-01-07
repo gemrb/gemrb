@@ -162,4 +162,8 @@ DataStream* DataStream::Clone() const noexcept
 	return NULL;
 }
 
+void DataStream::SetBigEndianness(bool isBE) noexcept {
+	IsDataBigEndian = isBE;
+}
+
 }
