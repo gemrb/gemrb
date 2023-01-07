@@ -90,6 +90,17 @@ struct GEM_EXPORT PixelFormat {
 			true, std::move(pal)
 		};
 	}
+
+	static PixelFormat ARGB32Bit() {
+		return PixelFormat {
+			0, 0, 0, 0,
+			16, 8, 0, 24,
+			0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000,
+			4, 32,
+			0, false,
+			false, {}
+		};
+	}
 };
 
 #pragma pack(push,1)
