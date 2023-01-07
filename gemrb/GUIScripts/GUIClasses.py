@@ -24,7 +24,16 @@ from GUIDefines import *
 from MetaClasses import metaIDWrapper, add_metaclass
 from GemRB import GetView, CreateView, RemoveView, RemoveScriptingRef
 
-DefaultScrollbars = { "bg1" : "GUIWSBR", "bg2" : "GUISCRCW", "pst" : "CGSCRL1", "iwd" : "GUISBR", "how" : "GUISBR", "iwd2" : "GBTNSCRL", "demo" : "scrlbar1" }
+DefaultScrollbars = {
+	"bg1": "GUIWSBR",
+	"bg2": "GUISCRCW",
+	"bg2ee": "GUISCRCW",
+	"iwd": "GUISBR",
+	"how": "GUISBR",
+	"iwd2": "GBTNSCRL",
+	"pst": "CGSCRL1",
+	"demo": "scrlbar1"
+}
 
 def CreateScrollbarARGs(bam = None):
 	bamframes = list(range(6))
