@@ -41,6 +41,8 @@ public:
 public:
 	/** Returns a \ref Sprite2D containing the image. */
 	virtual Holder<Sprite2D> GetSprite2D() = 0;
+
+	virtual Holder<Sprite2D> GetSprite2D(Region&&) = 0;
 	/**
 	 * Returns image palette.
 	 *

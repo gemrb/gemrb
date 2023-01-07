@@ -29,6 +29,7 @@
 #                                                   #
 #  bg1       Baldur's Gate                          #
 #  bg2       Baldur's Gate 2 : SoA or ToB           #
+#  bg2ee     Baldur's Gate 2 : EE (experimental!)   #
 #  how       Icewind Dale : HoW or ToTL             #
 #  (iwd)     Icewind Dale (no How or ToTL installed)#
 #  iwd2      Icewind Dale 2                         #
@@ -262,6 +263,30 @@ PluginsPath=./gemrb/plugins/
 
 #GemRBOverridePath=/usr/share/games/gemrb
 #GemRBUnhardcodedPath=/usr/share/games/gemrb
+
+#####################################################
+#  Game Language Path [String]                      #
+#                                                   #
+#  This is the subdirectory under GamePath where    #
+#  the desired text localization of a               #
+#  multi-language edition (EE) resides.             #
+#                                                   #
+#  You may want to change this if you do not wish   #
+#  to use English.                                  #
+#####################################################
+
+#GameLanguagePath=lang/en_US
+
+#####################################################
+#  GemRB Movies Path [String]                       #
+#                                                   #
+#  This is the path where GemRB looks for the       #
+#  game's movies (EE).                              #
+#                                                   #
+#  You probably do NOT want to specify this!        #
+#####################################################
+
+#GameMoviesPath=movies
 
 #####################################################
 #  Input Parameters                                 #

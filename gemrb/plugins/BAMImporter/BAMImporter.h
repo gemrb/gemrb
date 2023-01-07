@@ -32,11 +32,29 @@ namespace GemRB {
 struct FrameEntry {
 	Region bounds;
 	bool RLE = false;
-	strpos_t dataOffset = 0;
+	union {
+		strpos_t dataOffset = 0;
+		struct {
+			uint16_t dataBlockIdx;
+			uint16_t dataBlockCount;
+		} v2;
+	} location;
 };
 
+class ImageMgr;
 class Palette;
 using PaletteHolder = Holder<Palette>;
+
+enum class BAMVersion {
+	V1, V2
+};
+
+struct BAMV2DataBlock {
+	ieDword pvrzPage;
+	Point source;
+	Size size;
+	Point destination;
+};
 
 class BAMImporter : public AnimationMgr {
 public:
@@ -53,16 +71,22 @@ public:
 private:
 	using CycleEntry = AnimationFactory::CycleEntry;
 
+	BAMVersion version = BAMVersion::V1;
 	std::vector<FrameEntry> frames;
 	std::vector<CycleEntry> cycles;
 	PaletteHolder palette;
 	ieByte CompressedColorIndex = 0;
-	ieDword FramesOffset = 0;
-	ieDword PaletteOffset = 0;
 	ieDword FLTOffset = 0;
+	ieDword CyclesOffset = 0;
+	ieDword FramesOffset = 0;
 	strpos_t DataStart = 0;
-	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data);
+	std::shared_ptr<ImageMgr> lastPVRZ;
+	ieDword lastPVRZPage;
+
+	void Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock, uint8_t* data);
 	std::vector<index_t> CacheFLT();
+	Holder<Sprite2D> GetV2Frame(const FrameEntry& frame);
+	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data);
 };
 
 }
