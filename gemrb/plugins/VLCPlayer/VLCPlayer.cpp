@@ -156,5 +156,5 @@ GEMRB_PLUGIN(0x218963DD, "VLC Video Player")
 // it seems silly to hardcode a single value or add formats piecemeal.
 // it would be a shame to force modders or new content creators to use a specific format
 PLUGIN_RESOURCE(VLCPlayer, "mov") // at least some mac ports used Quicktime MOV format
-PLUGIN_RESOURCE(VLCPlayer, "webm") // EE movies
+PLUGIN_RESOURCE(VLCPlayer, "wbm") // EE movies
 END_PLUGIN()
