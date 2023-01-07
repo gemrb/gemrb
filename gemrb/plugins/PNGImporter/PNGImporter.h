@@ -40,6 +40,7 @@ public:
 	void Close();
 	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
+	Holder<Sprite2D> GetSprite2D(Region&&) override { return {}; };
 	int GetPalette(int colors, Color* pal) override;
 };
 

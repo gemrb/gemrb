@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2023 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,45 +18,43 @@
  *
  */
 
-#ifndef BMPIMP_H
-#define BMPIMP_H
+#ifndef PVRZIMP_H
+#define PVRZIMP_H
+
+#include <array>
+#include <tuple>
+#include <vector>
 
 #include "ImageMgr.h"
 
 namespace GemRB {
 
-class BMPImporter : public ImageMgr {
-private:
-	//BITMAPINFOHEADER
-	ieDword Size = 0;
-	ieDword Compression = 0;
-	ieDword ImageSize = 0;
-	/*, ColorsUsed, ColorsImportant*/
-	ieWord Planes = 0;
-	ieWord BitCount = 0;
+enum class PVRZFormat {
+	DXT1 = 0x7,
+	DXT5 = 0xB,
+	UNSUPPORTED = 0xFF
+};
 
-	//COLORTABLE
-	ieDword NumColors = 0;
-	Color* PaletteColors = nullptr;
-
-	//RASTERDATA
-	void* pixels = nullptr;
-
-	//OTHER
-	unsigned int PaddedRowLength = 0;
+class PVRZImporter : public ImageMgr {
 public:
-	BMPImporter() noexcept = default;
-	BMPImporter(const BMPImporter&) = delete;
-	~BMPImporter() override;
-	BMPImporter& operator=(const BMPImporter&) = delete;
+	PVRZImporter() noexcept = default;
+	PVRZImporter(const PVRZImporter&) = delete;
+	PVRZImporter& operator=(const PVRZImporter&) = delete;
+
 	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
-	Holder<Sprite2D> GetSprite2D(Region&&) override { return {}; }
+	Holder<Sprite2D> GetSprite2D(Region&&) override;
 	int GetPalette(int colors, Color* pal) override;
 
 private:
-	void Read8To8(const void *rpixels);
-	void Read4To8(const void *rpixels);
+	std::tuple<uint16_t, uint16_t> extractPalette(size_t offset, std::array<uint8_t, 6>& colors) const;
+	Holder<Sprite2D> getSprite2DDXT1(Region&&) const;
+	Holder<Sprite2D> getSprite2DDXT5(Region&&) const;
+
+	PVRZFormat format = PVRZFormat::UNSUPPORTED;
+	std::vector<uint8_t> data;
+
+	static uint16_t getBlockPixelMask(const Region& region, const Region& grid, int x, int y);
 };
 
 }

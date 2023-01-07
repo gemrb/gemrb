@@ -1523,6 +1523,7 @@ const char* Interface::TypeExt(SClass_ID type) const
 		{ IE_OGG_CLASS_ID, "ogg" },
 		{ IE_PLT_CLASS_ID, "plt" },
 		{ IE_PRO_CLASS_ID, "pro" },
+		{ IE_PVRZ_CLASS_ID, "pvrz" },
 		{ IE_SAV_CLASS_ID, "sav" },
 		{ IE_SPL_CLASS_ID, "spl" },
 		{ IE_SRC_CLASS_ID, "src" },
