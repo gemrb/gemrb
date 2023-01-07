@@ -3962,10 +3962,18 @@ void AreaAnimation::BlendAnimation()
 		if (animation.empty()) return;
 		Holder<Sprite2D> spr = animation[0].GetFrame(0);
 		if (!spr) return;
-		palette = spr->GetPalette()->Copy();
-		PaletteRef.Reset();
+
+		// BAMv2 anims don't have palettes
+		auto spritePalette = spr->GetPalette();
+		if (spritePalette) {
+			palette = spr->GetPalette()->Copy();
+			PaletteRef.Reset();
+		}
 	}
-	palette->CreateShadedAlphaChannel();
+
+	if (palette) {
+		palette->CreateShadedAlphaChannel();
+	}
 }
 
 bool AreaAnimation::Schedule(ieDword gametime) const

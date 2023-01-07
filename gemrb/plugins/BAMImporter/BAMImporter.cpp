@@ -24,6 +24,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
+#include "PluginMgr.h"
 #include "Video/Video.h"
 #include "Video/RLE.h"
 #include "Streams/FileStream.h"
@@ -41,41 +42,82 @@ bool BAMImporter::Import(DataStream* str)
 			return false;
 		str->Read( Signature, 8 );
 	}
-	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
+
+	version = BAMVersion::V1;
+	if (strncmp(Signature, "BAM V2  ", 8) == 0) {
+		version = BAMVersion::V2;
+	} else if (strncmp(Signature, "BAM V1  ", 8) != 0) {
 		return false;
 	}
 
-	ieWord frameCount;
-	str->ReadWord(frameCount);
+	ieDword frameCount;
+	if (version == BAMVersion::V1) {
+		str->ReadScalar<ieDword, ieWord>(frameCount);
+	} else {
+		str->ReadDword(frameCount);
+	}
 	frames.resize(frameCount);
 
-	ieByte cycleCount;
-	str->Read(&cycleCount, 1);
+	ieDword cycleCount;
+	if (version == BAMVersion::V1) {
+		str->ReadScalar<ieDword, ieByte>(cycleCount);
+	} else {
+		str->ReadDword(cycleCount);
+	}
 	cycles.resize(cycleCount);
-	
-	str->Read( &CompressedColorIndex, 1 );
+
+	ieDword dataBlockCount = 0;
+	if (version == BAMVersion::V1) {
+		str->Read(&CompressedColorIndex, 1);
+	} else {
+		str->ReadDword(dataBlockCount);
+	}
+
+	ieDword PaletteOffset = 0;
+
 	str->ReadDword(FramesOffset);
-	str->ReadDword(PaletteOffset);
-	str->ReadDword(FLTOffset);
-	str->Seek( FramesOffset, GEM_STREAM_START );
-	
-	DataStart = str->Size();
+	if (version == BAMVersion::V1) {
+		str->ReadDword(PaletteOffset);
+		str->ReadDword(FLTOffset);
+		DataStart = str->Size();
+	} else {
+		str->ReadDword(CyclesOffset);
+		str->ReadScalar<strpos_t, ieDword>(DataStart);
+	}
+
+	str->Seek(FramesOffset, GEM_STREAM_START);
+
 	for (auto& frame : frames) {
 		// ReadRegion is ordered x,y,w,h
 		// for some reason these rects are w,h,x,y
 		str->ReadSize(frame.bounds.size);
 		str->ReadPoint(frame.bounds.origin);
-		ieDword offset;
-		str->ReadScalar(offset);
-		frame.RLE = (offset & 0x80000000) == 0;
-		frame.dataOffset = offset & 0x7FFFFFFF;
-		DataStart = std::min(DataStart, frame.dataOffset);
+
+		if (version == BAMVersion::V1) {
+			ieDword offset;
+			str->ReadScalar(offset);
+			frame.RLE = (offset & 0x80000000) == 0;
+			frame.location.dataOffset = offset & 0x7FFFFFFF;
+			DataStart = std::min(DataStart, frame.location.dataOffset);
+		} else {
+			str->ReadWord(frame.location.v2.dataBlockIdx);
+			str->ReadWord(frame.location.v2.dataBlockCount);
+		}
 	}
-	
+
+	if (version == BAMVersion::V2) {
+		str->Seek(CyclesOffset, GEM_STREAM_START);
+	}
+
 	for (auto& cycle : cycles) {
 		str->ReadWord(cycle.FramesCount);
 		str->ReadWord(cycle.FirstFrame);
 	}
+
+	if (version == BAMVersion::V2) {
+		return true;
+	}
+
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = MakeHolder<Palette>();
 	// no need to switch this
@@ -107,8 +149,8 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 	Holder<Sprite2D> spr;
 	Video* video = core->GetVideoDriver();
 	const Region& rgn = frameInfo.bounds;
-	uint8_t* dataBegin = data + frameInfo.dataOffset;
-	
+	uint8_t* dataBegin = data + frameInfo.location.dataOffset;
+
 	if (RLESprite) {
 		PixelFormat fmt = PixelFormat::RLE8Bit(palette, CompressedColorIndex);
 		const uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
@@ -132,6 +174,62 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 	return spr;
 }
 
+Holder<Sprite2D> BAMImporter::GetV2Frame(const FrameEntry& frame) {
+	size_t frameSize = frame.bounds.size.Area() * 4;
+	uint8_t *frameData = reinterpret_cast<uint8_t*>(malloc(frameSize));
+	std::fill(frameData, frameData + frameSize, 0);
+
+	size_t dataBlockOffset = DataStart + frame.location.v2.dataBlockIdx * sizeof(BAMV2DataBlock);
+	str->Seek(dataBlockOffset, GEM_STREAM_START);
+
+	BAMV2DataBlock dataBlock;
+	for (uint16_t i = 0; i < frame.location.v2.dataBlockCount; ++i) {
+		str->ReadDword(dataBlock.pvrzPage);
+		str->ReadScalar<int, ieDword>(dataBlock.source.x);
+		str->ReadScalar<int, ieDword>(dataBlock.source.y);
+		str->ReadScalar<int, ieDword>(dataBlock.size.w);
+		str->ReadScalar<int, ieDword>(dataBlock.size.h);
+		str->ReadScalar<int, ieDword>(dataBlock.destination.x);
+		str->ReadScalar<int, ieDword>(dataBlock.destination.y);
+
+		Blit(frame, dataBlock, frameData);
+	}
+
+	PixelFormat fmt = PixelFormat::ARGB32Bit();
+	return {core->GetVideoDriver()->CreateSprite(frame.bounds, frameData, fmt)};
+}
+
+void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock, uint8_t *frameData) {
+	// The page is likely to be the same for many sequential accesses
+	if (!lastPVRZ || dataBlock.pvrzPage != lastPVRZPage) {
+		auto resRef = fmt::format("mos{:04d}", dataBlock.pvrzPage);
+		StringView resRefView(resRef.c_str(), 7);
+
+		lastPVRZ = GetResourceHolder<ImageMgr>(resRefView);
+		lastPVRZPage = dataBlock.pvrzPage;
+	}
+
+	auto sprite = lastPVRZ->GetSprite2D(Region{dataBlock.source.x, dataBlock.source.y, dataBlock.size.w, dataBlock.size.h});
+	if (!sprite) {
+		return;
+	}
+
+	const uint8_t* spritePixels = reinterpret_cast<uint8_t*>(sprite->LockSprite());
+	for (int h = 0; h < dataBlock.size.h; ++h) {
+		size_t offset = h * sprite->Frame.w * 4;
+		size_t destOffset =
+			4 * (frame.bounds.w * (dataBlock.destination.y + h) + dataBlock.destination.x);
+
+		std::copy(
+			spritePixels + offset,
+			spritePixels + offset + sprite->Frame.w * 4,
+			frameData + destOffset
+		);
+	}
+
+	sprite->UnlockSprite();
+}
+
 std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 {
 	index_t count = 0;
@@ -151,22 +249,37 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 
 AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
 {
-	str->Seek( DataStart, GEM_STREAM_START );
-	strpos_t length = str->Remains();
-	if (length == 0) return nullptr;
-	
-	auto FLT = CacheFLT();
-	uint8_t *data = (uint8_t*)malloc(length);
-	str->Read(data, length);
-
 	std::vector<Holder<Sprite2D>> animframes;
-	for (const auto& frameInfo : frames) {
-		bool RLECompressed = allowCompression && frameInfo.RLE;
-		animframes.push_back(GetFrameInternal(frameInfo, RLECompressed, data - DataStart));
-	}
-	free(data);
 
-	return new AnimationFactory(resref, std::move(animframes), cycles, std::move(FLT));
+	if (version == BAMVersion::V1) {
+		str->Seek( DataStart, GEM_STREAM_START );
+		strpos_t length = str->Remains();
+		if (length == 0) return nullptr;
+
+		auto FLT = CacheFLT();
+		uint8_t *data = (uint8_t*)malloc(length);
+		str->Read(data, length);
+
+		for (const auto& frameInfo : frames) {
+			bool RLECompressed = allowCompression && frameInfo.RLE;
+			animframes.push_back(GetFrameInternal(frameInfo, RLECompressed, data - DataStart));
+		}
+		free(data);
+
+		return new AnimationFactory(resref, std::move(animframes), cycles, std::move(FLT));
+	} else {
+		std::vector<index_t> FLT(frames.size());
+
+		for (index_t i = 0; i < frames.size(); ++i) {
+			FLT[i] = i;
+		}
+
+		for (const auto& frame : frames) {
+			animframes.push_back(GetV2Frame(frame));
+		}
+
+		return new AnimationFactory(resref, std::move(animframes), cycles, std::move(FLT));
+	}
 }
 
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
