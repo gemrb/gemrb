@@ -308,6 +308,8 @@ struct CFGConfigData {
 	char GameScriptsPath[_MAX_PATH]{};
 	char GamePortraitsPath[_MAX_PATH]{};
 	char GameCharactersPath[_MAX_PATH]{};
+	char GameLanguagePath[_MAX_PATH]{};
+	char GameMoviesPath[_MAX_PATH]{};
 	char SavePath[_MAX_PATH]{};
 	char CachePath[_MAX_PATH]{};
 	std::vector<std::string> CD[MAX_CD];

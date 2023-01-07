@@ -278,6 +278,30 @@ CachePath=@DEFAULT_CACHE_DIR@
 #GemRBUnhardcodedPath=@DATA_DIR@
 
 #####################################################
+#  Game Language Path [String]                      #
+#                                                   #
+#  This is the subdirectory under GamePath where    #
+#  the desired text localization of a               #
+#  multi-language edition (EE) resides.             #
+#                                                   #
+#  You may want to change this if you do not wish   #
+#  to use English.                                  #
+#####################################################
+
+#GameLanguagePath=lang/en_US
+
+#####################################################
+#  GemRB Movies Path [String]                       #
+#                                                   #
+#  This is the path where GemRB looks for the       #
+#  game's movies (EE).                              #
+#                                                   #
+#  You probably do NOT want to specify this!        #
+#####################################################
+
+#GameMoviesPath=movies
+
+#####################################################
 #  Input Parameters                                 #
 #####################################################
 

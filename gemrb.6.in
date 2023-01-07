@@ -303,6 +303,17 @@ Path to the original game's installed data files, relative to GamePath.
 Usually it's
 .IR sounds .
 
+.BR GameLanguagePath =PATH
+Path to the original game's installed data files, relative to GamePath.
+By default, it is
+.IR lang/en_US .
+
+.TP
+.BR GameMoviesPath =PATH
+Path to the original game's installed data files, relative to GamePath.
+Usually it's
+.IR movies .
+
 .TP
 .BR ModPath =PATH
 Path where GemRB looks for additional engine override files.

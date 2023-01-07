@@ -880,6 +880,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 	CONFIG_PATH("GamePortraitsPath", config.GamePortraitsPath, "portraits");
 	CONFIG_PATH("GameScriptsPath", config.GameScriptsPath, "scripts");
 	CONFIG_PATH("GameSoundsPath", config.GameSoundsPath, "sounds");
+	CONFIG_PATH("GameLanguagePath", config.GameLanguagePath, "lang/en_US");
+	CONFIG_PATH("GameMoviesPath", config.GameMoviesPath, "movies");
 
 	// Path configuration
 	CONFIG_PATH("GemRBPath", config.GemRBPath,
@@ -1090,6 +1092,9 @@ int Interface::Init(const InterfaceConfig* cfg)
 	PathJoin(path, config.GamePath, config.GameSoundsPath, nullptr);
 	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
+	PathJoin(path, config.GamePath, config.GameMoviesPath, nullptr);
+	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY);
+
 	PathJoin(path, config.GamePath, config.GameScriptsPath, nullptr);
 	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
@@ -1241,9 +1246,16 @@ int Interface::Init(const InterfaceConfig* cfg)
 	char strpath[_MAX_PATH];
 	PathJoin(strpath, config.GamePath, "dialog.tlk", nullptr);
 	FileStream* fs = FileStream::OpenFile(strpath);
+
 	if (!fs) {
-		Log(FATAL, "Core", "Cannot find Dialog.tlk.");
-		return GEM_ERROR;
+		// EE multi language deployment
+		PathJoin(strpath, config.GamePath, config.GameLanguagePath, "dialog.tlk", nullptr);
+		fs = FileStream::OpenFile(strpath);
+
+		if (!fs) {
+			Log(FATAL, "Core", "Cannot find Dialog.tlk.");
+			return GEM_ERROR;
+		}
 	}
 	strings->Open(fs);
 
