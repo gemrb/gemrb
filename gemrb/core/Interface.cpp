@@ -2710,6 +2710,11 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	saveGameAREExtractor.changeSaveGame(sg);
 
+	// These are here because of the goto
+	PluginHolder<SaveGameMgr> gam_mgr;
+	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
+	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
+
 	if (sg == NULL) {
 		//Load the Default Game
 		gam_str = gamedata->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
@@ -2721,6 +2726,17 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	} else {
 		gam_str = sg->GetGame();
 		sav_str = sg->GetSave();
+
+		// extract the save early for ees, since they moved the wmp inside
+		if (core->HasFeature(GF_HAS_EE_EFFECTS)) {
+			PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
+			if (ai && ai->DecompressSaveGame(sav_str, saveGameAREExtractor) != GEM_OK) {
+				goto cleanup;
+			}
+			delete sav_str;
+			sav_str = nullptr;
+		}
+
 		wmp_str1 = sg->GetWmap(0);
 		if (!WorldMapName[1].IsEmpty()) {
 			wmp_str2 = sg->GetWmap(1);
@@ -2731,15 +2747,11 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		}
 	}
 
-	// These are here because of the goto
-	PluginHolder<SaveGameMgr> gam_mgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gam_str);
-	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
-	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
-
 	if (!gam_str || !(wmp_str1 || wmp_str2) )
 		goto cleanup;
 
 	// Load GAM file
+	gam_mgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gam_str);
 	if (!gam_mgr)
 		goto cleanup;
 
@@ -2761,7 +2773,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	wmp_str2 = NULL;
 
 	LoadProgress(20);
-	// Unpack SAV (archive) file to Cache dir
+	// Unpack SAV (archive) file to Cache dir, if we haven't done it above
 	if (sav_str) {
 		PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 		if (ai) {
