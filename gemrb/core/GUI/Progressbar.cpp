@@ -81,7 +81,7 @@ void Progressbar::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 	//animated progressbar (bg2)
 	Count=val*KnobStepsCount/100;
-	for(unsigned int i=0; i<Count ;i++ ) {
+	for (unsigned int i = 0; i < Count && PBarAnim; i++) {
 		Holder<Sprite2D> Knob = PBarAnim->GetFrame(i);
 		core->GetVideoDriver()->BlitSprite(Knob, Point());
 	}
