@@ -29,3 +29,12 @@ def OnLoad():
 	MusicTable = GemRB.LoadTable("songlist")
 	theme = MusicTable.GetValue("33", "RESOURCE")
 	GemRB.LoadMusicPL(theme, 1)
+
+	GemRB.SetToken ("SaveDir", "save")
+
+	tobButton = StartWindow.GetControl (2)
+	tobButton.OnPress (LoadSingle)
+
+def LoadSingle():
+	GemRB.SetVar ("PlayMode", 2)
+	GemRB.SetNextScript ("GUILOAD")
