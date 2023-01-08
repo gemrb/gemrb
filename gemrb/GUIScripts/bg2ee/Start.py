@@ -37,4 +37,5 @@ def OnLoad():
 
 def LoadSingle():
 	GemRB.SetVar ("PlayMode", 2)
+	GemRB.SetMasterScript ("BALDUR25", "WORLDM25")
 	GemRB.SetNextScript ("GUILOAD")

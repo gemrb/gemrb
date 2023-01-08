@@ -2735,10 +2735,12 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 			}
 			delete sav_str;
 			sav_str = nullptr;
+			wmp_str1 = gamedata->GetResource(WorldMapName[0], IE_WMP_CLASS_ID, true);
+		} else {
+			wmp_str1 = sg->GetWmap(0);
 		}
 
-		wmp_str1 = sg->GetWmap(0);
-		if (!WorldMapName[1].IsEmpty()) {
+		if (!WorldMapName[1].IsEmpty()) { // TODO: ee
 			wmp_str2 = sg->GetWmap(1);
 			if (!wmp_str2) {
 				//upgrade an IWD game to HOW
