@@ -249,6 +249,9 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		return false;
 	}
 
+	// no worldmaps in saves in ees
+	if (core->HasFeature(GF_HAS_EE_EFFECTS)) return true;
+
 	PathJoinExt(ftmp, dtmp, core->WorldMapName[0].c_str(), "wmp");
 	if (access( ftmp, R_OK )) {
 		return false;
