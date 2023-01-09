@@ -21,9 +21,15 @@
 #ifndef TISIMPORTER_H
 #define TISIMPORTER_H
 
+#include "ImageMgr.h"
 #include "Plugins/TileSetMgr.h"
 
 namespace GemRB {
+
+struct TISPVRBlock {
+	ieDword pvrzPage;
+	Point source;
+};
 
 class TISImporter : public TileSetMgr {
 private:
@@ -31,9 +37,16 @@ private:
 	ieDword headerShift = 0;
 	ieDword TilesCount = 0;
 	ieDword TilesSectionLen = 0;
-	ieDword TileSize = 0;
-	
+	ieDword TileSize = 64;
+	bool hasPVRData = false;
+
 	Holder<Sprite2D> badTile; // blank tile to use to fill in bad data
+	std::shared_ptr<ImageMgr> lastPVRZ;
+	ieDword lastPVRZPage;
+
+	Holder<Sprite2D> GetTilePaletted(int index);
+	Holder<Sprite2D> GetTilePVR(int index);
+	void Blit(const TISPVRBlock& dataBlock, uint8_t* frameData);
 public:
 	TISImporter() noexcept = default;
 	TISImporter(const TISImporter&) = delete;
@@ -43,7 +56,6 @@ public:
 	Tile* GetTile(const std::vector<ieWord>& indexes,
 		unsigned short* secondary = NULL) override;
 	Holder<Sprite2D> GetTile(int index);
-public:
 };
 
 }

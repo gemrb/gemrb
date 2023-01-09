@@ -52,7 +52,14 @@ bool TISImporter::Open(DataStream* stream)
 		str->ReadDword(TilesSectionLen);
 		str->ReadDword(headerShift);
 		str->ReadDword(TileSize);
+		if (TilesSectionLen == 0xc) { // 0xc for PVR, 0x1400 for palette
+			hasPVRData = true;
+		}
 	} else {
+		if (core->HasFeature(GF_HAS_EE_EFFECTS)) { // hack!
+			hasPVRData = true;
+			TilesSectionLen = 0xc;
+		}
 		str->Seek( -8, GEM_CURRENT_POS );
 	}
 	return true;
@@ -86,6 +93,70 @@ Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
 }
 
 Holder<Sprite2D> TISImporter::GetTile(int index)
+{
+	if (hasPVRData) return GetTilePVR(index);
+	return GetTilePaletted(index);
+}
+
+Holder<Sprite2D> TISImporter::GetTilePVR(int index)
+{
+	size_t imageSize = TileSize * TileSize * 4;
+	uint8_t* imageData = reinterpret_cast<uint8_t*>(malloc(imageSize));
+	std::fill(imageData, imageData + imageSize, 0);
+
+	str->Seek(headerShift + index * TilesSectionLen, GEM_STREAM_START);
+
+	TISPVRBlock dataBlock;
+	str->ReadDword(dataBlock.pvrzPage);
+	str->ReadScalar<int, ieDword>(dataBlock.source.x);
+	str->ReadScalar<int, ieDword>(dataBlock.source.y);
+	Blit(dataBlock, imageData);
+
+	PixelFormat fmt = PixelFormat::ARGB32Bit();
+	Region region{0, 0, static_cast<int>(TileSize), static_cast<int>(TileSize)};
+
+	return {core->GetVideoDriver()->CreateSprite(region, imageData, fmt)};
+}
+
+void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
+{
+	// optimization for when pages get used multiple times
+	if (!lastPVRZ || dataBlock.pvrzPage != lastPVRZPage) {
+		// AR2600N.TIS would refer to A2600Nxx.PVRZ, supposedly:
+		//   - the first character of the TIS filename
+		//   - the four digits of the area code, the optional 'N' from night tilesets
+		//   - this page value as a zero-padded two digits number
+		// we cheat and just derive the middle from the tis name as well
+		ResRef suffix(&str->filename[2], 5);
+		if (suffix[4] == '.') suffix.erase(4, 1);
+		auto resRef = fmt::format("{}{}{:02d}", str->filename[0], suffix.c_str(), dataBlock.pvrzPage);
+		StringView resRefView(resRef.c_str(), 7);
+
+		lastPVRZ = GetResourceHolder<ImageMgr>(resRefView, true);
+		lastPVRZPage = dataBlock.pvrzPage;
+	}
+
+	auto sprite = lastPVRZ->GetSprite2D(Region{dataBlock.source.x, dataBlock.source.y, static_cast<int>(TileSize), static_cast<int>(TileSize)});
+	if (!sprite) {
+		return;
+	}
+
+	const uint8_t* spritePixels = reinterpret_cast<uint8_t*>(sprite->LockSprite());
+	for (ieDword h = 0; h < TileSize; ++h) {
+		size_t offset = h * sprite->Frame.w * 4;
+		size_t destOffset = 4 * (TileSize * h);
+
+		std::copy(
+			spritePixels + offset,
+			spritePixels + offset + sprite->Frame.w * 4,
+			frameData + destOffset
+		);
+	}
+
+	sprite->UnlockSprite();
+}
+
+Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 {
 	strpos_t pos = index *(1024+4096) + headerShift;
 	if (str->Size() < pos + 1024 + 4096) {
