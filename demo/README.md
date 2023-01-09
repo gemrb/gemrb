@@ -27,6 +27,18 @@ KUKU
 
 Run: `gemrb/gemrb -c demo.cfg`
 
+## Development
+
+When adding new resources, please put them into `override/` and run
+```
+$ python tools/demo_key_file.py demo
+```
+from the project root directory. Add the updated `chitin.key` to the
+commit stage.
+
+While not necessary for GemRB, only this way makes the demo compatible for
+exploring the resources with *Near Infinity*.
+
 # AUTHORS
 
 Authors are noted in the Debian-compatible `copyright` file.

@@ -201,6 +201,11 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 
 	unsigned int bifnum = ( *ResLocator & 0xFFF00000 ) >> 20;
 
+	// supports BIFF-less, KEY'd games (demo)
+	if (bifnum >= biffiles.size()) {
+		return nullptr;
+	}
+
 	if (!biffiles[bifnum].found) {
 		Log(ERROR, "KEYImporter", "Cannot find {}... Resource unavailable.",
 				biffiles[bifnum].name.c_str());
