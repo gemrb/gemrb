@@ -248,7 +248,7 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT1(Region&& region) const {
 			bool col1IsGreater = std::get<0>(color1n2) > std::get<1>(color1n2);
 
 			auto pixelMask = getBlockPixelMask(region, grid, x, y);
-			uint32_t blockValue = *(reinterpret_cast<const uint32_t*>(&data[srcDataOffset + 12])); // 4x4x2 bit
+			uint32_t blockValue = *(reinterpret_cast<const uint32_t*>(&data[srcDataOffset + 4])); // 4x4x2 bit
 			for (uint8_t i = 0; i < 16; ++i) {
 				if ((pixelMask & (1 << i)) == 0) {
 					continue;
