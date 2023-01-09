@@ -32,8 +32,6 @@ namespace GemRB {
 
 class GEM_EXPORT Tile {
 public:
-	using Map = std::array<Color, 16>;
-	
 	Tile(Animation a1, Animation a2) noexcept
 	: anim{GemRB::make_unique<Animation>(std::move(a1)), GemRB::make_unique<Animation>(std::move(a2))}
 	{}
@@ -61,12 +59,7 @@ public:
 
 	unsigned char tileIndex = 0;
 	unsigned char om = 0;
-	
-	Map SearchMap;
-	Map HeightMap;
-	Map LightMap;
-	Map NLightMap;
-	
+
 private:
 	std::unique_ptr<Animation> anim[2];
 };
