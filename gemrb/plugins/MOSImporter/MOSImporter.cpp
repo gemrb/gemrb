@@ -73,7 +73,7 @@ void MOSImporter::Blit(const MOSV2DataBlock& dataBlock, uint8_t *frameData) {
 		return;
 	}
 
-	const uint8_t* spritePixels = reinterpret_cast<uint8_t*>(sprite->LockSprite());
+	const uint8_t* spritePixels = static_cast<uint8_t*>(sprite->LockSprite());
 	for (int h = 0; h < dataBlock.size.h; ++h) {
 		size_t offset = h * sprite->Frame.w * 4;
 		size_t destOffset =
@@ -99,7 +99,7 @@ Holder<Sprite2D> MOSImporter::GetSprite2D() {
 
 Holder<Sprite2D> MOSImporter::GetSprite2Dv2() {
 	size_t imageSize = size.Area() * 4;
-	uint8_t *imageData = reinterpret_cast<uint8_t*>(malloc(imageSize));
+	uint8_t *imageData = static_cast<uint8_t*>(malloc(imageSize));
 	std::fill(imageData, imageData + imageSize, 0);
 
 	str->Seek(layout.v2.BlockOffset, GEM_STREAM_START);

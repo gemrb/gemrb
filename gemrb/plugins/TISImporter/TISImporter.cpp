@@ -101,7 +101,7 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 Holder<Sprite2D> TISImporter::GetTilePVR(int index)
 {
 	size_t imageSize = TileSize * TileSize * 4;
-	uint8_t* imageData = reinterpret_cast<uint8_t*>(malloc(imageSize));
+	uint8_t* imageData = static_cast<uint8_t*>(malloc(imageSize));
 	std::fill(imageData, imageData + imageSize, 0);
 
 	str->Seek(headerShift + index * TilesSectionLen, GEM_STREAM_START);
@@ -141,7 +141,7 @@ void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
 		return;
 	}
 
-	const uint8_t* spritePixels = reinterpret_cast<uint8_t*>(sprite->LockSprite());
+	const uint8_t* spritePixels = static_cast<uint8_t*>(sprite->LockSprite());
 	for (ieDword h = 0; h < TileSize; ++h) {
 		size_t offset = h * sprite->Frame.w * 4;
 		size_t destOffset = 4 * (TileSize * h);

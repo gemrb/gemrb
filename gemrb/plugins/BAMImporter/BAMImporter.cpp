@@ -176,7 +176,7 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 
 Holder<Sprite2D> BAMImporter::GetV2Frame(const FrameEntry& frame) {
 	size_t frameSize = frame.bounds.size.Area() * 4;
-	uint8_t *frameData = reinterpret_cast<uint8_t*>(malloc(frameSize));
+	uint8_t *frameData = static_cast<uint8_t*>(malloc(frameSize));
 	std::fill(frameData, frameData + frameSize, 0);
 
 	size_t dataBlockOffset = DataStart + frame.location.v2.dataBlockIdx * sizeof(BAMV2DataBlock);
@@ -214,7 +214,7 @@ void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock,
 		return;
 	}
 
-	const uint8_t* spritePixels = reinterpret_cast<uint8_t*>(sprite->LockSprite());
+	const uint8_t* spritePixels = static_cast<uint8_t*>(sprite->LockSprite());
 	for (int h = 0; h < dataBlock.size.h; ++h) {
 		size_t offset = h * sprite->Frame.w * 4;
 		size_t destOffset =
