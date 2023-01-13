@@ -1047,6 +1047,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 		return GEM_ERROR;
 	}
 
+	fogRenderer = std::make_shared<FogRenderer>(video.get(), false);
+
 	// ask the driver if a touch device is in use
 	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
 
@@ -1502,6 +1504,11 @@ ProjectileServer* Interface::GetProjectileServer() const noexcept
 Video* Interface::GetVideoDriver() const
 {
 	return video.get();
+}
+
+FogRenderer& Interface::GetFogRenderer()
+{
+	return *fogRenderer.get();
 }
 
 Audio* Interface::GetAudioDrv(void) const {

@@ -550,7 +550,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	}
 
 	//drawmap should be here so it updates fog of war
-	area->DrawMap(Viewport(), DebugFlags);
+	area->DrawMap(Viewport(), core->GetFogRenderer(), DebugFlags);
 
 	if (trackerID) {
 		const Actor *actor = area->GetActorByGlobalID(trackerID);
