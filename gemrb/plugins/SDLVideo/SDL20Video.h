@@ -238,9 +238,12 @@ public:
 	bool InTextInput() override;
 	
 	bool TouchInputEnabled() override;
+	bool CanDrawRawGeometry() const override;
 
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
 						 Color tint = Color()) override;
+
+	void DrawRawGeometry(const std::vector<float>& vertices, const std::vector<Color>& colors, BlitFlags blitFlags) override;
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) override;
 

@@ -159,6 +159,7 @@ public:
 	virtual bool InTextInput() = 0;
 
 	virtual bool TouchInputEnabled() = 0;
+	virtual bool CanDrawRawGeometry() const { return false; }
 
 	virtual Holder<Sprite2D> CreateSprite(const Region&, void* pixels, const PixelFormat&) = 0;
 	
@@ -195,6 +196,11 @@ public:
 	/** Draws a line segment */
 	void DrawLine(const Point& p1, const Point& p2, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	void DrawLines(const std::vector<Point>& points, const Color& color, BlitFlags flags = BlitFlags::NONE);
+	virtual void DrawRawGeometry(
+		const std::vector<float>& /*vertices*/,
+		const std::vector<Color>& /*colors*/,
+		BlitFlags /*blitFlags*/
+	) {};
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 

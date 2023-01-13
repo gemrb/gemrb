@@ -511,6 +511,37 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, nullptr, flipflags);
 }
 
+void SDL20VideoDriver::DrawRawGeometry(
+	const std::vector<float>& vertices,
+	const std::vector<Color>& colors,
+	BlitFlags blitFlags
+) {
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+	if (blitFlags & BlitFlags::BLENDED) {
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	}
+
+	SDL_RenderGeometryRaw(
+		renderer,
+		nullptr,
+		vertices.data(),
+		2 * sizeof(float),
+		reinterpret_cast<const SDL_Color*>(colors.data()),
+		sizeof(Color),
+		nullptr,
+		0,
+		vertices.size() / 2,
+		nullptr,
+		0,
+		0
+	);
+#else
+	(void)vertices;
+	(void)colors;
+	(void)blitFlags;
+#endif
+}
+
 void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
 	DrawSDLPoints(reinterpret_cast<const std::vector<SDL_Point>&>(points), reinterpret_cast<const SDL_Color&>(color), flags);
@@ -875,6 +906,14 @@ bool SDL20VideoDriver::TouchInputEnabled()
 {
 	// note from upstream: on some platforms a device may become seen only after use
 	return SDL_GetNumTouchDevices() > 0;
+}
+
+bool SDL20VideoDriver::CanDrawRawGeometry() const {
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+	return true;
+#else
+	return false;
+#endif
 }
 
 void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
