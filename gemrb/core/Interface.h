@@ -339,6 +339,7 @@ struct CFGConfigData {
 	int Height = 480;
 	int Bpp = 32;
 	bool DrawFPS = false;
+	bool SpriteFoW = false;
 	int debugMode = 0;
 	bool CheatFlag = false; /** Cheats enabled? */
 	int MaxPartySize = 6;
