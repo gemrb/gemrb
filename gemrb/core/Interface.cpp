@@ -812,6 +812,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	CONFIG_INT("MultipleQuickSaves", config.MultipleQuickSaves =);
 	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay =);
 	CONFIG_INT("SaveAsOriginal", config.SaveAsOriginal =);
+	CONFIG_INT("SpriteFogOfWar", config.SpriteFoW =);
 	CONFIG_INT("DebugMode", config.debugMode =);
 	int touchInput = -1;
 	CONFIG_INT("TouchInput", touchInput =);
@@ -1046,6 +1047,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 		Log(FATAL, "Core", "Cannot Initialize Video Driver.");
 		return GEM_ERROR;
 	}
+
+	fogRenderer = std::make_shared<FogRenderer>(video.get(), config.SpriteFoW);
 
 	// ask the driver if a touch device is in use
 	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
@@ -1502,6 +1505,11 @@ ProjectileServer* Interface::GetProjectileServer() const noexcept
 Video* Interface::GetVideoDriver() const
 {
 	return video.get();
+}
+
+FogRenderer& Interface::GetFogRenderer()
+{
+	return *fogRenderer.get();
 }
 
 Audio* Interface::GetAudioDrv(void) const {

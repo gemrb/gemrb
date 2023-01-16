@@ -38,6 +38,7 @@
 #include "GUI/Tooltip.h"
 #include "GUI/Window.h"
 #include "GUI/GUIFactory.h"
+#include "FogRenderer.h"
 #include "Holder.h"
 #include "ImageMgr.h"
 #include "InterfaceConfig.h"
@@ -338,6 +339,7 @@ struct CFGConfigData {
 	int Height = 480;
 	int Bpp = 32;
 	bool DrawFPS = false;
+	bool SpriteFoW = false;
 	int debugMode = 0;
 	bool CheatFlag = false; /** Cheats enabled? */
 	int MaxPartySize = 6;
@@ -368,6 +370,7 @@ private:
 	WindowManager* winmgr = nullptr;
 	std::shared_ptr<GUIFactory> guifact;
 	std::shared_ptr<ScriptEngine> guiscript;
+	std::shared_ptr<FogRenderer> fogRenderer;
 	GameControl* gamectrl = nullptr;
 	SaveGameIterator *sgiterator = nullptr;
 	Variables * vars;
@@ -466,6 +469,7 @@ public:
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const noexcept;
 	Video * GetVideoDriver() const;
+	FogRenderer& GetFogRenderer();
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;
 	/* returns a newly created string */

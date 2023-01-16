@@ -75,6 +75,11 @@ Bpp=32
 #Fullscreen [Boolean]
 Fullscreen=0
 
+# Use sprited fog of war [Boolean]. For nostalgia. By
+# default it looks more like accelerated FoW in BG2.
+
+#SpriteFogOfWar=1
+
 #####################################################
 #  Audio Parameters                                 #
 #####################################################

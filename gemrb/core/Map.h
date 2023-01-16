@@ -25,6 +25,7 @@
 #include "globals.h"
 
 #include "Bitmap.h"
+#include "FogRenderer.h"
 #include "Interface.h"
 #include "MapReverb.h"
 #include "Scriptable/Scriptable.h"
@@ -484,7 +485,7 @@ public:
 	/* transfers all ever visible piles (loose items) to the specified position */
 	void MoveVisibleGroundPiles(const Point &Pos);
 
-	void DrawMap(const Region& viewport, uint32_t debugFlags);
+	void DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
 	void AddAnimation(AreaAnimation anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
@@ -691,25 +692,24 @@ private:
 	VEFObject *GetNextScriptedAnimation(const scaIterator &iter) const;
 	Actor *GetNextActor(int &q, size_t &index) const;
 	Container *GetNextPile (int &index) const;
-	
+
 	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
 	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const;
 	WallPolygonSet WallsIntersectingRegion(Region, bool includeDisabled = false, const Point* loc = nullptr) const;
-	
+
 	void SetDrawingStencilForObject(const void*, const Region&, const WallPolygonSet&, const Point& viewPortOrigin);
 	BlitFlags SetDrawingStencilForScriptable(const Scriptable*, const Region& viewPort);
 	BlitFlags SetDrawingStencilForAreaAnimation(const AreaAnimation*, const Region& viewPort);
-	
+
 	void DrawDebugOverlay(const Region &vp, uint32_t dFlags) const;
 	void DrawPortal(const InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport) const;
-	void DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& viewport) const;
-	
+
 	Size PropsSize() const noexcept;
 	Size FogMapSize() const;
 	bool FogTileUncovered(const Point &p, const Bitmap*) const;
 	Point ConvertPointToFog(const Point &p) const;
-	
+
 	void GenerateQueues();
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);

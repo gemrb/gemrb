@@ -949,231 +949,6 @@ bool Map::FogTileUncovered(const Point &p, const Bitmap* mask) const
 	return mask->GetAt(p, false);
 }
 
-void Map::DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& vp) const
-{
-	// Size of Fog-Of-War shadow tile (and bitmap)
-	constexpr int CELL_SIZE = 32;
-	
-	// the amount of fuzzing to apply to map edges wehn the viewport overscans
-	constexpr int FUZZ_AMT = 8;
-
-	// size for explored_mask and visible_mask
-	const Size fogSize = FogMapSize();
-
-	const int largefog = Explore::Get().LargeFog;
-	const Point start = Clamp(ConvertPointToFog(vp.origin), Point(), Point(fogSize.w, fogSize.h));
-	const Point end = Clamp(ConvertPointToFog(vp.Maximum()) + Point(2 + largefog, 2 + largefog), Point(), Point(fogSize.w, fogSize.h));
-	const int x0 = (start.x * CELL_SIZE - vp.x) - (largefog * CELL_SIZE / 2);
-	const int y0 = (start.y * CELL_SIZE - vp.y) - (largefog * CELL_SIZE / 2);
-	
-	const Size mapSize = GetSize();
-	
-	enum Directions : uint8_t {
-		N = 1,
-		W = 2,
-		NW = N|W, // 3
-		S = 4,
-		SW = S|W, // 6
-		E = 8,
-		NE = N|E, // 9
-		SE = S|E // 12
-	};
-	
-	static const BlitFlags fogFlags[] {
-		BlitFlags::NONE, BlitFlags::NONE, BlitFlags::NONE, BlitFlags::NONE,
-		BlitFlags::MIRRORY, BlitFlags::NONE, BlitFlags::MIRRORY,
-		BlitFlags::NONE, BlitFlags::MIRRORX, BlitFlags::MIRRORX,
-		BlitFlags::NONE, BlitFlags::NONE, BlitFlags::MIRRORX | BlitFlags::MIRRORY
-	};
-		
-	Video* vid = core->GetVideoDriver();
-	if (vp.y < 0) { // north border
-		Region r(0, 0, vp.w, -vp.y);
-		vid->DrawRect(r, ColorBlack, true);
-		r.y += r.h;
-		r.h = FUZZ_AMT;
-		for (int x = r.x + x0; x < r.w; x += CELL_SIZE) {
-			vid->BlitSprite(core->FogSprites[N], Point(x, r.y), &r, fogFlags[N]);
-		}
-	}
-	
-	if (vp.y + vp.h > mapSize.h) { // south border
-		Region r(0, mapSize.h - vp.y, vp.w, vp.y + vp.h - mapSize.h);
-		vid->DrawRect(r, ColorBlack, true);
-		r.y -= FUZZ_AMT;
-		r.h = FUZZ_AMT;
-		for (int x = r.x + x0; x < r.w; x += CELL_SIZE) {
-			vid->BlitSprite(core->FogSprites[S], Point(x, r.y), &r, fogFlags[S]);
-		}
-	}
-	
-	if (vp.x < 0) { // west border
-		Region r(0, std::max(0, -vp.y), -vp.x, mapSize.h);
-		vid->DrawRect(r, ColorBlack, true);
-		r.x += r.w;
-		r.w = FUZZ_AMT;
-		for (int y = r.y + y0; y < r.h; y += CELL_SIZE) {
-			vid->BlitSprite(core->FogSprites[W], Point(r.x, y), &r, fogFlags[W]);
-		}
-	}
-	
-	if (vp.x + vp.w > mapSize.w) { // east border
-		Region r(mapSize.w -vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
-		vid->DrawRect(r, ColorBlack, true);
-		r.x -= FUZZ_AMT;
-		r.w = FUZZ_AMT;
-		for (int y = r.y + y0; y < r.h; y += CELL_SIZE) {
-			vid->BlitSprite(core->FogSprites[E], Point(r.x, y), &r, fogFlags[E]);
-		}
-	}
-	
-	auto IsExplored = [=, &explored_mask](int x, int y) {
-		return FogTileUncovered(Point(x, y), explored_mask);
-	};
-	
-	auto IsVisible = [=, &visible_mask](int x, int y) {
-		return FogTileUncovered(Point(x, y), visible_mask);
-	};
-	
-	auto ConvertPointToScreen = [=](int x, int y) {
-		x = (x - start.x) * CELL_SIZE + x0;
-		y = (y - start.y) * CELL_SIZE + y0;
-		return Point(x, y);
-	};
-	
-	auto FillFog = [=](int x, int y, int count, BlitFlags flags) {
-		Region r(ConvertPointToScreen(x, y), Size(CELL_SIZE * count, CELL_SIZE));
-		vid->DrawRect(r, ColorBlack, true, flags);
-	};
-	
-	auto Fill = [=](int x, int y, uint8_t dirs, BlitFlags flags) {
-		// If an explored tile is adjacent to an
-		//   unexplored one, we draw border sprite
-		//   (gradient black <-> transparent)
-		// Tiles in four cardinal directions have these
-		//   values.
-		//
-		//      1
-		//    2   8
-		//      4
-		//
-		// Values of those unexplored are
-		//   added together, the resulting number being
-		//   an index of shadow sprite to use. For now,
-		//   some tiles are made 'on the fly' by
-		//   drawing two or more tiles
-
-		assert((dirs & 0xf0) == 0);
-
-		Point p = ConvertPointToScreen(x, y);
-		switch (dirs & 0x0f) {
-			case N:
-			case W:
-			case NW:
-			case S:
-			case SW:
-			case E:
-			case NE:
-			case SE:
-				vid->BlitGameSprite(core->FogSprites[dirs], p, flags | fogFlags[dirs]);
-				return true;
-			case N|S:
-				vid->BlitGameSprite(core->FogSprites[N], p, flags | fogFlags[N]);
-				vid->BlitGameSprite(core->FogSprites[S], p, flags | fogFlags[S]);
-				return true;
-			case NW|SW:
-				vid->BlitGameSprite(core->FogSprites[NW], p, flags | fogFlags[NW]);
-				vid->BlitGameSprite(core->FogSprites[SW], p, flags | fogFlags[SW]);
-				return true;
-			case W|E:
-				vid->BlitGameSprite(core->FogSprites[W], p, flags | fogFlags[W]);
-				vid->BlitGameSprite(core->FogSprites[E], p, flags | fogFlags[E]);
-				return true;
-			case NW|NE:
-				vid->BlitGameSprite(core->FogSprites[NW], p, flags | fogFlags[NW]);
-				vid->BlitGameSprite(core->FogSprites[NE], p, flags | fogFlags[NE]);
-				return true;
-			case NE|SE:
-				vid->BlitGameSprite(core->FogSprites[NE], p, flags | fogFlags[NE]);
-				vid->BlitGameSprite(core->FogSprites[SE], p, flags | fogFlags[SE]);
-				return true;
-			case SW|SE:
-				vid->BlitGameSprite(core->FogSprites[SW], p, flags | fogFlags[SW]);
-				vid->BlitGameSprite(core->FogSprites[SE], p, flags | fogFlags[SE]);
-				return true;
-			default: // a fully surrounded tile is filled
-				return false;
-		}
-	};
-	
-	const static BlitFlags opaque = BlitFlags::NONE;
-	const static BlitFlags trans = BlitFlags::HALFTRANS | BlitFlags::BLENDED;
-	
-	auto FillExplored = [=](int x, int y) {
-		int dirs = !IsExplored(x, y - 1); // N
-		if (!IsExplored(x - 1, y)) dirs |= W;
-		if (!IsExplored(x, y + 1)) dirs |= S;
-		if (!IsExplored(x + 1, y )) dirs |= E;
-
-		if (dirs && !Fill(x, y, dirs, BlitFlags::BLENDED)) {
-			FillFog(x, y, 1, opaque);
-		}
-	};
-	
-	auto FillVisible = [=](int x, int y) {
-		int dirs = !IsVisible( x, y - 1); // N
-		if (!IsVisible(x - 1, y)) dirs |= W;
-		if (!IsVisible(x, y + 1)) dirs |= S;
-		if (!IsVisible(x + 1, y)) dirs |= E;
-
-		if (dirs && !Fill(x, y, dirs, trans)) {
-			FillFog(x, y, 1, trans);
-		}
-	};
-
-	for (int y = start.y; y < end.y; y++) {
-		int unexploredQueue = 0;
-		int shroudedQueue = 0;
-		int x = start.x;
-		for (; x < end.x; x++) {
-			if (IsExplored(x, y)) {
-				if (unexploredQueue) {
-					FillFog(x - unexploredQueue, y, unexploredQueue, opaque);
-					unexploredQueue = 0;
-				}
-				
-				if (IsVisible(x, y)) {
-					if (shroudedQueue) {
-						FillFog(x - shroudedQueue, y, shroudedQueue, trans);
-						shroudedQueue = 0;
-					}
-					FillVisible(x, y);
-				} else {
-					// coalese all horizontally adjacent shrouded cells
-					++shroudedQueue;
-				}
-				
-				FillExplored(x, y);
-			} else {
-				// coalese all horizontally adjacent unexplored cells
-				++unexploredQueue;
-				if (shroudedQueue) {
-					FillFog(x - shroudedQueue, y, shroudedQueue, trans);
-					shroudedQueue = 0;
-				}
-			}
-		}
-		
-		if (shroudedQueue) {
-			FillFog(x - (shroudedQueue + unexploredQueue), y, shroudedQueue, trans);
-		}
-		
-		if (unexploredQueue) {
-			FillFog(x - unexploredQueue, y, unexploredQueue, opaque);
-		}
-	}
-}
-
 void Map::DrawHighlightables(const Region& viewport) const
 {
 	// NOTE: piles are drawn in the main queue
@@ -1342,7 +1117,7 @@ VEFObject *Map::GetNextScriptedAnimation(const scaIterator &iter) const
 }
 
 //Draw the game area (including overlays, actors, animations, weather)
-void Map::DrawMap(const Region& viewport, uint32_t dFlags)
+void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFlags)
 {
 	assert(TMap);
 	debugFlags = dFlags;
@@ -1582,7 +1357,15 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	const Bitmap* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : &ExploredBitmap;
 	const Bitmap* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : &VisibleBitmap;
 
-	DrawFogOfWar(exploredBits, visibleBits, viewport);
+	FogMapData mapData{
+		exploredBits,
+		visibleBits,
+		viewport,
+		GetSize(),
+		FogMapSize(),
+		Explore::Get().LargeFog
+	};
+	fogRenderer.DrawFog(mapData);
 
 	int ipCount = 0;
 	while (true) {
