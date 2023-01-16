@@ -129,7 +129,7 @@ Holder<Sprite2D> MOSImporter::GetSprite2Dv1() {
 	unsigned char * blockpixels = ( unsigned char * )
 	malloc( layout.v1.BlockSize * layout.v1.BlockSize );
 	ieDword blockoffset;
-	ieDword& PalOffset = layout.v1.PalOffset;
+	const ieDword& PalOffset = layout.v1.PalOffset;
 
 	for (int y = 0; y < Rows; y++) {
 		int bh = ( y == Rows - 1 ) ?

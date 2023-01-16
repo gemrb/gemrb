@@ -402,7 +402,6 @@ def GroupControls ():
 	Button.SetActionIcon (globals(), -1, 7)
 
 	formation = GemRB.GameGetFormation () # formation index
-	formations = [ GemRB.GameGetFormation (i) for i in range(5) ]
 	GemRB.SetVar ("Formation", formation)
 	for i in range (5):
 		Button = CurrentWindow.GetControl (7+ActionBarControlOffset+i)

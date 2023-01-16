@@ -57,7 +57,7 @@ bool PVRZImporter::Import(DataStream* str) {
 
 	// if upper 4B are non-zero, it's some customization; ignored
 	if ((rawFormat & (0xFFFFFFFFULL << 32)) == 0) {
-		switch (rawFormat & (0xFFFFFFFF)) {
+		switch (rawFormat & 0xFFFFFFFF) {
 			case 7:
 				format = PVRZFormat::DXT1;
 				break;

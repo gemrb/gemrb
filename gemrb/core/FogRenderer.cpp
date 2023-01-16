@@ -199,7 +199,7 @@ void FogRenderer::DrawFogCellVertices(Point p, FogDirection direction, BlitFlags
 	Color baseColor{0, 0, 0, 255};
 	if (flags & BlitFlags::HALFTRANS) {
 		baseColor = {0, 0, 0, 128};
-	};
+	}
 
 	for (size_t i = 0; i < fogColors.size(); ++i) {
 		fogColors[i] = baseColor;
@@ -250,7 +250,7 @@ void FogRenderer::DrawFogSmoothing(Point p, FogDirection direction, BlitFlags fl
 	Color baseColor{0, 0, 0, 255};
 	if (flags & BlitFlags::HALFTRANS) {
 		baseColor = {0, 0, 0, 128};
-	};
+	}
 
 	for (size_t i = 0; i < fogColors.size(); ++i) {
 		fogColors[i] = baseColor;
