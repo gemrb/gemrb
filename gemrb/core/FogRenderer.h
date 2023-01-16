@@ -38,9 +38,9 @@ struct FogMapData {
 	FogMapData(
 		const Bitmap *exploredMask,
 		const Bitmap *visibleMask,
-		Region vp,
-		Size mapSize,
-		Size fogSize,
+		const Region& vp,
+		const Size& mapSize,
+		const Size& fogSize,
 		int largeFog
 	) : exploredMask(exploredMask),
 		visibleMask(visibleMask),
