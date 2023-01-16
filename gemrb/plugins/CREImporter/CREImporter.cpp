@@ -274,6 +274,7 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 		return EmptyResRef;
 	}
 
+	const SpellEntry* entry;
 	switch (type) {
 	case IE_IWD2_SPELL_INNATE:
 		if (index >= static_cast<int>(innlist.size())) {
@@ -297,13 +298,11 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 		// translate the actual kit to a column index to make them comparable
 		// luckily they are in order
 		kit = std::log2(kit/0x8000); // 0x8000 is the first cleric kit
-		{
-			const SpellEntry* entry = domList[index];
-			if (entry) {
-				const ResRef& ret = entry->FindSpell(level, kit);
-				if (!ret.IsEmpty()) {
-					return ret;
-				}
+		entry = domList[index];
+		if (entry) {
+			const ResRef& ret = entry->FindSpell(level, kit);
+			if (!ret.IsEmpty()) {
+				return ret;
 			}
 		}
 		// sigh, retry with wizard spells, since the table does not cover everything npcs have
@@ -317,13 +316,11 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 		// translate the actual kit to a column index to make them comparable
 		kit = std::log2(kit/0x40); // 0x40 is the first mage kit
 		//if it is a specialist spell, return it now
-		{
-			const SpellEntry* entry = magList[index];
-			if (entry) {
-				const ResRef& ret = entry->FindSpell(level, kit);
-				if (!ret.IsEmpty()) {
-					return ret;
-				}
+		entry = magList[index];
+		if (entry) {
+			const ResRef& ret = entry->FindSpell(level, kit);
+			if (!ret.IsEmpty()) {
+				return ret;
 			}
 		}
 		//fall through
