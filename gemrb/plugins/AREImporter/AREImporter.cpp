@@ -471,7 +471,7 @@ Ambient* AREImporter::SetupMainAmbients(const Map::MainAmbients& mainAmbients)
 	return ambi;
 }
 
-void AREImporter::GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& ambients)
+void AREImporter::GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& ambients) const
 {
 	// 5 is the number of song indices
 	for (auto& list : map->SongList) {
@@ -510,7 +510,7 @@ void AREImporter::GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& amb
 	}
 }
 
-void AREImporter::GetRestHeader(DataStream* str, Map* map)
+void AREImporter::GetRestHeader(DataStream* str, Map* map) const
 {
 	for (auto& ref : map->RestHeader.Strref) {
 		str->ReadStrRef(ref);
@@ -533,7 +533,7 @@ void AREImporter::GetRestHeader(DataStream* str, Map* map)
 	// 14 reserved dwords
 }
 
-void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map)
+void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map) const
 {
 	str->Seek(InfoPointsOffset + idx * 0xC4, GEM_STREAM_START);
 
@@ -789,7 +789,7 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 	c->OpenFail = openFail;
 }
 
-void AREImporter::GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm)
+void AREImporter::GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm) const
 {
 	str->Seek(DoorsOffset + idx * 0xC8, GEM_STREAM_START);
 
@@ -976,7 +976,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, Plugi
 	door->SetDialog(dialog);
 }
 
-void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map)
+void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map) const
 {
 	str->Seek(SpawnOffset + idx * 0xC8, GEM_STREAM_START);
 
@@ -1037,7 +1037,7 @@ void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map)
 	// the rest is not read, we seek for every record
 }
 
-bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map)
+bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map) const
 {
 	static int pst = core->HasFeature(GF_AUTOMAP_INI);
 
@@ -1165,7 +1165,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	return true;
 }
 
-void AREImporter::GetAreaAnimation(DataStream* str, Map* map)
+void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 {
 	AreaAnimation anim = AreaAnimation();
 
@@ -1209,7 +1209,7 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map)
 	map->AddAnimation(std::move(anim));
 }
 
-void AREImporter::GetAmbient(DataStream* str, std::vector<Ambient*>& ambients)
+void AREImporter::GetAmbient(DataStream* str, std::vector<Ambient*>& ambients) const
 {
 	ResRef sounds[MAX_RESCOUNT];
 	ieWord soundCount;
@@ -1246,7 +1246,7 @@ void AREImporter::GetAmbient(DataStream* str, std::vector<Ambient*>& ambients)
 	ambients.push_back(ambient);
 }
 
-void AREImporter::GetAutomapNotes(DataStream* str, Map* map)
+void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 {
 	static int pst = core->HasFeature(GF_AUTOMAP_INI);
 	Point point;
@@ -1333,7 +1333,7 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map)
 	}
 }
 
-bool AREImporter::GetTrap(DataStream* str, int idx, Map* map)
+bool AREImporter::GetTrap(DataStream* str, int idx, Map* map) const
 {
 	str->Seek(TrapOffset + idx * 0x1C, GEM_STREAM_START);
 
@@ -1385,7 +1385,7 @@ bool AREImporter::GetTrap(DataStream* str, int idx, Map* map)
 	return true;
 }
 
-void AREImporter::GetTile(DataStream* str, Map* map)
+void AREImporter::GetTile(DataStream* str, Map* map) const
 {
 	ieVariable tileName;
 	ResRef tileID;

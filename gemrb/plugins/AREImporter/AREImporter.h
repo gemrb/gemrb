@@ -97,18 +97,18 @@ private:
 	int PutRestHeader(DataStream *stream, const Map *map) const;
 	int PutMapAmbients(DataStream *stream, const Map *map) const;
 
-	void GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& ambients);
-	void GetRestHeader(DataStream* str, Map* map);
-	void GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map);
+	void GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& ambients) const;
+	void GetRestHeader(DataStream* str, Map* map) const;
+	void GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map) const;
 	void GetContainer(DataStream* str, int idx, Map* map);
-	void GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm);
-	void GetSpawnPoint(DataStream* str, int idx, Map* map);
-	bool GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map);
-	void GetAreaAnimation(DataStream* str, Map* map);
-	void GetAmbient(DataStream* str, std::vector<Ambient*>& ambients);
-	void GetAutomapNotes(DataStream* str, Map* map);
-	bool GetTrap(DataStream* str, int idx, Map* map);
-	void GetTile(DataStream* str, Map* map);
+	void GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm) const;
+	void GetSpawnPoint(DataStream* str, int idx, Map* map) const;
+	bool GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map) const;
+	void GetAreaAnimation(DataStream* str, Map* map) const;
+	void GetAmbient(DataStream* str, std::vector<Ambient*>& ambients) const;
+	void GetAutomapNotes(DataStream* str, Map* map) const;
+	bool GetTrap(DataStream* str, int idx, Map* map) const;
+	void GetTile(DataStream* str, Map* map) const;
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };
