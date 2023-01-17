@@ -22,6 +22,7 @@
 #define AREIMPORTER_H
 
 #include "MapMgr.h"
+#include "PluginMgr.h"
 
 #include "Map.h"
 
@@ -30,6 +31,7 @@ namespace GemRB {
 class Animation;
 class AnimationFactory;
 class EffectQueue;
+class TileMapMgr;
 
 class AREImporter : public MapMgr {
 private:
@@ -96,6 +98,7 @@ private:
 
 	void GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map);
 	void GetContainer(DataStream* str, int idx, Map* map);
+	void GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };

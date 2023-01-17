@@ -727,6 +727,193 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 	c->OpenFail = openFail;
 }
 
+void AREImporter::GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm)
+{
+	str->Seek(DoorsOffset + idx * 0xC8, GEM_STREAM_START);
+
+	ieDword doorFlags;
+	ieDword openFirstVertex;
+	ieDword closedFirstVertex;
+	ieDword openFirstImpeded;
+	ieDword closedFirstImpeded;
+	ieDword cursor;
+	ieDword discoveryDiff;
+	ieDword lockRemoval;
+	ieVariable longName;
+	ieVariable linkedInfo;
+	ResRef shortName;
+	ResRef openResRef;
+	ResRef closeResRef;
+	ResRef keyResRef;
+	ResRef script0;
+	ResRef dialog;
+	ieWord openVerticesCount;
+	ieWord closedVerticesCount;
+	ieWord openImpededCount;
+	ieWord closedImpededCount;
+	ieWord trapDetect;
+	ieWord trapRemoval;
+	ieWord trapped;
+	ieWord trapDetected;
+	ieWord hp;
+	ieWord ac;
+	Point launchP;
+	Point toOpen[2];
+	Region closedBBox;
+	Region openedBBox;
+	ieStrRef openStrRef;
+	ieStrRef nameStrRef;
+
+	str->ReadVariable(longName);
+	str->ReadResRef(shortName);
+	str->ReadDword(doorFlags);
+	if (map->version == 16) {
+		doorFlags = FixIWD2DoorFlags(doorFlags, false);
+	}
+	if (AreaType & AT_OUTDOOR) doorFlags |= DOOR_TRANSPARENT; // actually true only for fog-of-war, excluding other actors
+	str->ReadDword(openFirstVertex);
+	str->ReadWord(openVerticesCount);
+	str->ReadWord(closedVerticesCount);
+	str->ReadDword(closedFirstVertex);
+	str->ReadRegion(openedBBox, true);
+	str->ReadRegion(closedBBox, true);
+	str->ReadDword(openFirstImpeded);
+	str->ReadWord(openImpededCount);
+	str->ReadWord(closedImpededCount);
+	str->ReadDword(closedFirstImpeded);
+	str->ReadWord(hp); // hitpoints
+	str->ReadWord(ac); // AND armorclass, according to IE dev info
+	str->ReadResRef(openResRef);
+	str->ReadResRef(closeResRef);
+	str->ReadDword(cursor);
+	str->ReadWord(trapDetect);
+	str->ReadWord(trapRemoval);
+	str->ReadWord(trapped);
+	str->ReadWord(trapDetected);
+	str->ReadPoint(launchP);
+	str->ReadResRef(keyResRef);
+	str->ReadResRef(script0);
+	str->ReadDword(discoveryDiff);
+	str->ReadDword(lockRemoval);
+	str->ReadPoint(toOpen[0]);
+	str->ReadPoint(toOpen[1]);
+	str->ReadStrRef(openStrRef);
+	if (core->HasFeature(GF_AUTOMAP_INI) ) {
+		char tmp[25];
+		str->Read(tmp, 24);
+		tmp[24] = 0;
+		linkedInfo = tmp; // linkedInfo unused in pst anyway?
+	} else {
+		str->ReadVariable(linkedInfo);
+	}
+	str->ReadStrRef(nameStrRef); // trigger name
+	str->ReadResRef(dialog);
+	if (core->HasFeature(GF_AUTOMAP_INI)) {
+		// maybe this is important? but seems not
+		str->Seek(8, GEM_CURRENT_POS);
+	}
+
+	// Reading Open Polygon
+	std::shared_ptr<Gem_Polygon> open = nullptr;
+	str->Seek(VerticesOffset + openFirstVertex * 4, GEM_STREAM_START);
+	if (openVerticesCount) {
+		std::vector<Point> points(openVerticesCount);
+		for (int x = 0; x < openVerticesCount; x++) {
+			str->ReadPoint(points[x]);
+		}
+		open = std::make_shared<Gem_Polygon>(std::move(points), &openedBBox);
+	}
+
+	// Reading Closed Polygon
+	std::shared_ptr<Gem_Polygon> closed = nullptr;
+	str->Seek(VerticesOffset + closedFirstVertex * 4, GEM_STREAM_START);
+	if (closedVerticesCount) {
+		std::vector<Point> points(closedVerticesCount);
+		for (int x = 0; x < closedVerticesCount; x++) {
+			str->ReadPoint(points[x]);
+		}
+		closed = std::make_shared<Gem_Polygon>(std::move(points), &closedBBox);
+	}
+
+	// Getting Door Information from the WED File
+	bool baseClosed;
+	auto indices = tmm->GetDoorIndices(shortName, baseClosed);
+	if (core->HasFeature(GF_REVERSE_DOOR)) {
+		baseClosed = !baseClosed;
+	}
+
+	auto closedPolys = tmm->ClosedDoorPolygons();
+	auto openPolys = tmm->OpenDoorPolygons();
+
+	DoorTrigger dt(open, std::move(openPolys), closed, std::move(closedPolys));
+	Door* door = tm->AddDoor(shortName, longName, doorFlags, baseClosed, std::move(indices), std::move(dt));
+	door->OpenBBox = openedBBox;
+	door->ClosedBBox = closedBBox;
+
+	// Reading Open Impeded blocks
+	str->Seek(VerticesOffset + openFirstImpeded * 4, GEM_STREAM_START);
+	door->open_ib.resize(openImpededCount);
+	for (Point& point : door->open_ib) {
+		str->ReadPoint(point);
+	}
+
+	// Reading Closed Impeded blocks
+	str->Seek(VerticesOffset + closedFirstImpeded * 4, GEM_STREAM_START);
+
+	door->closed_ib.resize(closedImpededCount);
+	for (Point& point : door->closed_ib) {
+		str->ReadPoint(point);
+	}
+	door->SetMap(map);
+
+	door->hp = hp;
+	door->ac = ac;
+	door->TrapDetectionDiff = trapDetect;
+	door->TrapRemovalDiff = trapRemoval;
+	door->Trapped = trapped;
+	door->TrapDetected = trapDetected;
+	door->TrapLaunch = launchP;
+
+	door->Cursor = cursor;
+	door->KeyResRef = keyResRef;
+	if (script0.IsEmpty()) {
+		door->Scripts[0] = nullptr;
+	} else {
+		door->Scripts[0] = new GameScript(script0, door);
+	}
+
+	door->toOpen[0] = toOpen[0];
+	door->toOpen[1] = toOpen[1];
+	// Leave the default sound untouched
+	if (!openResRef.IsEmpty()) {
+		door->OpenSound = openResRef;
+	} else {
+		if (doorFlags & DOOR_SECRET) {
+			door->OpenSound = gamedata->defaultSounds[DEF_HOPEN];
+		} else {
+			door->OpenSound = gamedata->defaultSounds[DEF_OPEN];
+		}
+	}
+	if (!closeResRef.IsEmpty()) {
+		door->CloseSound = closeResRef;
+	} else {
+		if (doorFlags & DOOR_SECRET) {
+			door->CloseSound = gamedata->defaultSounds[DEF_HCLOSE];
+		} else {
+			door->CloseSound = gamedata->defaultSounds[DEF_CLOSE];
+		}
+	}
+	if (!openStrRef) openStrRef = ieStrRef(-1); // rewrite 0 to -1
+	door->OpenStrRef = openStrRef;
+
+	door->DiscoveryDiff = discoveryDiff;
+	door->LockDifficulty = lockRemoval;
+	door->LinkedInfo = MakeVariable(linkedInfo);
+	// these 2 fields are not sure
+	door->NameStrRef = nameStrRef;
+	door->SetDialog(dialog);
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -890,178 +1077,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading doors");
 	for (ieDword i = 0; i < DoorsCount; i++) {
-		str->Seek( DoorsOffset + ( i * 0xc8 ), GEM_STREAM_START );
-		ieDword Flags;
-		ieDword OpenFirstVertex, ClosedFirstVertex;
-		ieDword OpenFirstImpeded, ClosedFirstImpeded;
-		ieWord OpenVerticesCount, ClosedVerticesCount;
-		ieWord OpenImpededCount, ClosedImpededCount;
-		ieVariable LongName, LinkedInfo;
-		ResRef ShortName;
-		ieDword cursor;
-		ResRef KeyResRef;
-		ResRef script0;
-		ieWord TrapDetect, TrapRemoval;
-		ieWord Trapped, TrapDetected;
-		Point launchP;
-		ieDword DiscoveryDiff, LockRemoval;
-		Region BBClosed, BBOpen;
-		ieStrRef OpenStrRef;
-		ieStrRef NameStrRef;
-		ResRef Dialog;
-		ieWord hp, ac;
-
-		str->ReadVariable(LongName);
-		str->ReadResRef( ShortName );
-		str->ReadDword(Flags);
-		if (map->version == 16) {
-			Flags = FixIWD2DoorFlags(Flags, false);
-		}
-		if (AreaType & AT_OUTDOOR) Flags |= DOOR_TRANSPARENT; // actually true only for fog-of-war, excluding other actors
-		str->ReadDword(OpenFirstVertex);
-		str->ReadWord(OpenVerticesCount);
-		str->ReadWord(ClosedVerticesCount);
-		str->ReadDword(ClosedFirstVertex);
-		str->ReadRegion(BBOpen, true);
-		str->ReadRegion(BBClosed, true);
-		str->ReadDword(OpenFirstImpeded);
-		str->ReadWord(OpenImpededCount);
-		str->ReadWord(ClosedImpededCount);
-		str->ReadDword(ClosedFirstImpeded);
-		str->ReadWord(hp); // hitpoints
-		str->ReadWord(ac); // AND armorclass, according to IE dev info
-		ResRef OpenResRef, CloseResRef;
-		str->ReadResRef( OpenResRef );
-		str->ReadResRef( CloseResRef );
-		str->ReadDword(cursor);
-		str->ReadWord(TrapDetect);
-		str->ReadWord(TrapRemoval);
-		str->ReadWord(Trapped);
-		str->ReadWord(TrapDetected);
-		str->ReadPoint(launchP);
-		str->ReadResRef( KeyResRef );
-		str->ReadResRef(script0);
-		str->ReadDword(DiscoveryDiff);
-		str->ReadDword(LockRemoval);
-		Point toOpen[2];
-		str->ReadPoint(toOpen[0]);
-		str->ReadPoint(toOpen[1]);
-		str->ReadStrRef(OpenStrRef);
-		if (core->HasFeature(GF_AUTOMAP_INI) ) {
-			char tmp[25];
-			str->Read(tmp, 24);
-			tmp[24] = 0;
-			LinkedInfo = tmp; // LinkedInfo unused in pst anyway?
-		} else {
-			str->ReadVariable(LinkedInfo);
-		}
-		str->ReadStrRef(NameStrRef); // trigger name
-		str->ReadResRef( Dialog );
-		if (core->HasFeature(GF_AUTOMAP_INI) ) {
-			// maybe this is important? but seems not
-			str->Seek( 8, GEM_CURRENT_POS );
-		}
-
-		//Reading Open Polygon
-		std::shared_ptr<Gem_Polygon> open = nullptr;
-		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
-		if (OpenVerticesCount) {
-			std::vector<Point> points(OpenVerticesCount);
-			for (int x = 0; x < OpenVerticesCount; x++) {
-				str->ReadPoint(points[x]);
-			}
-			open = std::make_shared<Gem_Polygon>(std::move(points), &BBOpen );
-		}
-
-		//Reading Closed Polygon
-		std::shared_ptr<Gem_Polygon> closed = nullptr;
-		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
-				GEM_STREAM_START );
-		if (ClosedVerticesCount) {
-			std::vector<Point> points(ClosedVerticesCount);
-			for (int x = 0; x < ClosedVerticesCount; x++) {
-				str->ReadPoint(points[x]);
-			}
-			closed = std::make_shared<Gem_Polygon>(std::move(points), &BBClosed);
-		}
-
-		//Getting Door Information from the WED File
-		bool BaseClosed;
-		auto indices = tmm->GetDoorIndices( ShortName, BaseClosed );
-		if (core->HasFeature(GF_REVERSE_DOOR)) {
-			BaseClosed = !BaseClosed;
-		}
-
-		auto closedPolys = tmm->ClosedDoorPolygons();
-		auto openPolys = tmm->OpenDoorPolygons();
-
-		DoorTrigger dt(open, std::move(openPolys), closed, std::move(closedPolys));
-		Door* door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
-								 std::move(indices), std::move(dt) );
-		door->OpenBBox = BBOpen;
-		door->ClosedBBox = BBClosed;
-
-		//Reading Open Impeded blocks
-		str->Seek( VerticesOffset + ( OpenFirstImpeded * 4 ),
-				GEM_STREAM_START );
-		door->open_ib.resize(OpenImpededCount);
-		for (Point& point : door->open_ib) {
-			str->ReadPoint(point);
-		}
-
-		//Reading Closed Impeded blocks
-		str->Seek( VerticesOffset + ( ClosedFirstImpeded * 4 ),
-				GEM_STREAM_START );
-		
-		door->closed_ib.resize(ClosedImpededCount);
-		for (Point& point : door->closed_ib) {
-			str->ReadPoint(point);
-		}
-		door->SetMap(map);
-
-		door->hp = hp;
-		door->ac = ac;
-		door->TrapDetectionDiff = TrapDetect;
-		door->TrapRemovalDiff = TrapRemoval;
-		door->Trapped = Trapped;
-		door->TrapDetected = TrapDetected;
-		door->TrapLaunch = launchP;
-
-		door->Cursor = cursor;
-		door->KeyResRef = KeyResRef;
-		if (script0.IsEmpty()) {
-			door->Scripts[0] = nullptr;
-		} else {
-			door->Scripts[0] = new GameScript(script0, door);
-		}
-
-		door->toOpen[0] = toOpen[0];
-		door->toOpen[1] = toOpen[1];
-		//Leave the default sound untouched
-		if (!OpenResRef.IsEmpty())
-			door->OpenSound = OpenResRef;
-		else {
-			if (Flags & DOOR_SECRET)
-				door->OpenSound = gamedata->defaultSounds[DEF_HOPEN];
-			else
-				door->OpenSound = gamedata->defaultSounds[DEF_OPEN];
-		}
-		if (!CloseResRef.IsEmpty())
-			door->CloseSound = CloseResRef;
-		else {
-			if (Flags & DOOR_SECRET)
-				door->CloseSound = gamedata->defaultSounds[DEF_HCLOSE];
-			else
-				door->CloseSound = gamedata->defaultSounds[DEF_CLOSE];
-		}
-		door->DiscoveryDiff=DiscoveryDiff;
-		door->LockDifficulty=LockRemoval;
-		if (!OpenStrRef) OpenStrRef = ieStrRef(-1); // rewrite 0 to -1
-		door->OpenStrRef=OpenStrRef;
-		door->LinkedInfo = MakeVariable(LinkedInfo);
-		//these 2 fields are not sure
-		door->NameStrRef=NameStrRef;
-		door->SetDialog(Dialog);
+		GetDoor(str, i, tm, map, tmm);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading spawnpoints");
