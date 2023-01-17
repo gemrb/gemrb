@@ -1246,6 +1246,93 @@ void AREImporter::GetAmbient(DataStream* str, std::vector<Ambient*>& ambients)
 	ambients.push_back(ambient);
 }
 
+void AREImporter::GetAutomapNotes(DataStream* str, Map* map)
+{
+	static int pst = core->HasFeature(GF_AUTOMAP_INI);
+	Point point;
+
+	if (!pst) {
+		for (ieDword i = 0; i < NoteCount; i++) {
+			str->ReadPoint(point);
+			ieStrRef strref = ieStrRef::INVALID;
+			str->ReadStrRef(strref);
+			ieWord location; // (0=External (TOH/TOT), 1=Internal (TLK)
+			str->ReadWord(location);
+			ieWord color;
+			str->ReadWord(color);
+			// dword: ID in bg2
+			str->Seek(40, GEM_CURRENT_POS);
+			// FIXME: do any other games have read only notes?
+			// BG2 allows editing the builtin notes, PST does not, what about others?
+			map->AddMapNote(point, color, strref, false);
+		}
+		return;
+	}
+
+	// Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
+	AnimationFactory* flag = static_cast<AnimationFactory*>(gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID));
+	if (flag == nullptr) {
+		ResourceHolder<ImageMgr> roImg = GetResourceHolder<ImageMgr>("RONOTE");
+		ResourceHolder<ImageMgr> userImg = GetResourceHolder<ImageMgr>("USERNOTE");
+
+		flag = new AnimationFactory("FLAG1", {roImg->GetSprite2D(), userImg->GetSprite2D()}, {{1, 0}, {1, 1}}, {0, 1});
+		gamedata->AddFactoryResource(flag);
+	}
+
+	if (NoteCount) {
+		for (ieDword i = 0; i < NoteCount; i++) {
+			ieDword px;
+			ieDword py;
+			str->ReadDword(px);
+			str->ReadDword(py);
+
+			// in PST the coordinates are stored in small map space
+			// our MapControl wants them in large map space so we must convert
+			// its what other games use and its what our custom map note code uses
+			const Size mapsize = map->GetSize();
+			point.x = static_cast<int>(px * double(mapsize.w) / map->SmallMap->Frame.w);
+			point.y = static_cast<int>(py * double(mapsize.h) / map->SmallMap->Frame.h);
+
+			char bytes[501]; // 500 + null
+			str->Read(bytes, 500);
+			bytes[500] = '\0';
+			String* text = StringFromCString(bytes);
+			ieDword readonly;
+			str->ReadDword(readonly); // readonly == 1
+			if (readonly) {
+				map->AddMapNote(point, 0, std::move(*text), true);
+			} else {
+				map->AddMapNote(point, 1, std::move(*text), false);
+			}
+			delete text;
+			str->Seek(20, GEM_CURRENT_POS);
+		}
+	} else {
+		if (!INInote) {
+			ReadAutonoteINI();
+		}
+		if (!INInote) return;
+
+		// add autonote.ini entries
+		const ieVariable& scriptName = map->GetScriptName();
+		int count = INInote->GetKeyAsInt(scriptName, "count", 0);
+		while (count) {
+			ieVariable key;
+			int value;
+			key.Format("xPos{}", count);
+			value = INInote->GetKeyAsInt(scriptName, key, 0);
+			point.x = value;
+			key.Format("yPos{}", count);
+			value = INInote->GetKeyAsInt(scriptName, key, 0);
+			point.y = value;
+			key.Format("text{}", count);
+			value = INInote->GetKeyAsInt(scriptName, key, 0);
+			map->AddMapNote(point, 0, ieStrRef(value), true);
+			count--;
+		}
+	}
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -1362,8 +1449,6 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		GetSpawnPoint(str, i, map);
 	}
 
-	int pst = core->HasFeature(GF_AUTOMAP_INI);
-
 	core->LoadProgress(75);
 	Log(DEBUG, "AREImporter", "Loading actors");
 	str->Seek(ActorOffset, GEM_STREAM_START);
@@ -1414,90 +1499,8 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	map->SetAmbients(std::move(ambients), reverbID);
 
 	Log(DEBUG, "AREImporter", "Loading automap notes");
-	str->Seek( NoteOffset, GEM_STREAM_START );
-
-	Point point;
-	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
-
-	if (pst) {
-		AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID);
-		if (flags == NULL) {
-			ResourceHolder<ImageMgr> roimg = GetResourceHolder<ImageMgr>("RONOTE");
-			ResourceHolder<ImageMgr> userimg = GetResourceHolder<ImageMgr>("USERNOTE");
-
-			flags = new AnimationFactory("FLAG1", {roimg->GetSprite2D(), userimg->GetSprite2D()},
-										 {{1, 0}, {1, 1}}, {0, 1});
-			gamedata->AddFactoryResource(flags);
-		}
-
-		if (!NoteCount) {
-			if( !INInote ) {
-				ReadAutonoteINI();
-			}
-
-			//add autonote.ini entries
-			if( INInote ) {
-				const ieVariable& scriptName = map->GetScriptName();
-				int count = INInote->GetKeyAsInt(scriptName, "count", 0);
-				while (count) {
-					ieVariable key;
-					int value;
-					key.Format("xPos{}", count);
-					value = INInote->GetKeyAsInt(scriptName, key, 0);
-					point.x = value;
-					key.Format("yPos{}", count);
-					value = INInote->GetKeyAsInt(scriptName, key, 0);
-					point.y = value;
-					key.Format("text{}", count);
-					value = INInote->GetKeyAsInt(scriptName, key, 0);
-					map->AddMapNote(point, 0, ieStrRef(value), true);
-					count--;
-				}
-			}
-		} else {
-			for (ieDword i = 0; i < NoteCount; i++) {
-				ieDword px,py;
-				str->ReadDword(px);
-				str->ReadDword(py);
-
-				// in PST the coordinates are stored in small map space
-				// our MapControl wants them in large map space so we must convert
-				// its what other games use and its what our custom map note code uses
-				const Size mapsize = map->GetSize();
-				point.x = static_cast<int>(px * double(mapsize.w) / map->SmallMap->Frame.w);
-				point.y = static_cast<int>(py * double(mapsize.h) / map->SmallMap->Frame.h);
-
-				char bytes[501]; // 500 + null
-				str->Read(bytes, 500 );
-				bytes[500] = '\0';
-				String* text = StringFromCString(bytes);
-				ieDword readonly;
-				str->ReadDword(readonly); //readonly == 1
-				if (readonly) {
-					map->AddMapNote(point, 0, std::move(*text), true);
-				} else {
-					map->AddMapNote(point, 1, std::move(*text), false);
-				}
-				delete text;
-				str->Seek(20, GEM_CURRENT_POS);
-			}
-		}
-	} else {
-		for (ieDword i = 0; i < NoteCount; i++) {
-			str->ReadPoint(point);
-			ieStrRef strref = ieStrRef::INVALID;
-			str->ReadStrRef(strref);
-			ieWord location; // (0=Extenal (TOH/TOT), 1=Internal (TLK)
-			str->ReadWord(location);
-			ieWord color;
-			str->ReadWord(color);
-			// dword: ID in bg2
-			str->Seek( 40, GEM_CURRENT_POS );
-			// FIXME: do any other games have read only notes?
-			// BG2 allows editing the builtin notes, PST does not, what about others?
-			map->AddMapNote(point, color, strref, false);
-		}
-	}
+	str->Seek(NoteOffset, GEM_STREAM_START);
+	GetAutomapNotes(str, map);
 
 	//this is a ToB feature (saves the unexploded projectiles)
 	Log(DEBUG, "AREImporter", "Loading traps");
@@ -1506,6 +1509,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		ieDword TrapEffOffset;
 		ieWord TrapSize, ProID;
 		Point pos;
+		Point point;
 		ieDword Ticks;
 		ieByte TargetType;
 		ieByte Owner;

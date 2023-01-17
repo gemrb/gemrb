@@ -106,6 +106,7 @@ private:
 	bool GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map);
 	void GetAreaAnimation(DataStream* str, Map* map);
 	void GetAmbient(DataStream* str, std::vector<Ambient*>& ambients);
+	void GetAutomapNotes(DataStream* str, Map* map);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };
