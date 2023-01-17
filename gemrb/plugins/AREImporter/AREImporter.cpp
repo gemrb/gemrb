@@ -471,6 +471,45 @@ Ambient* AREImporter::SetupMainAmbients(const Map::MainAmbients& mainAmbients)
 	return ambi;
 }
 
+void AREImporter::GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& ambients)
+{
+	// 5 is the number of song indices
+	for (auto& list : map->SongList) {
+		str->ReadDword(list);
+	}
+
+	Map::MainAmbients& dayAmbients = map->dayAmbients;
+	str->ReadResRef(dayAmbients.Ambient1);
+	str->ReadResRef(dayAmbients.Ambient2);
+	str->ReadDword(dayAmbients.AmbientVol);
+
+	Map::MainAmbients& nightAmbients = map->nightAmbients;
+	str->ReadResRef(nightAmbients.Ambient1);
+	str->ReadResRef(nightAmbients.Ambient2);
+	str->ReadDword(nightAmbients.AmbientVol);
+
+	// check for existence of main ambients (bg1)
+	constexpr int dayBits = ((1 << 18) - 1) ^ ((1 << 6) - 1); // day: bits 6-18 per DLTCEP
+	Ambient* ambi = SetupMainAmbients(dayAmbients);
+	if (!ambi) return;
+
+	// schedule for day/night
+	// if the two ambients are the same, just add one, so there's no restart
+	if (dayAmbients.Ambient2 != nightAmbients.Ambient2) {
+		ambi->appearance = dayBits;
+		ambients.push_back(ambi);
+		// night
+		ambi = SetupMainAmbients(nightAmbients);
+		if (ambi) {
+			ambi->appearance ^= dayBits; // night: bits 0-5 + 19-23, [dusk till dawn]
+		}
+	}
+	// bgt ar7300 has a nigth ambient only in the first slot
+	if (ambi) {
+		ambients.push_back(ambi);
+	}
+}
+
 void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map)
 {
 	str->Seek(InfoPointsOffset + idx * 0xC4, GEM_STREAM_START);
@@ -1228,46 +1267,9 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading songs");
-	str->Seek( SongHeader, GEM_STREAM_START );
-	//5 is the number of song indices
-	for (auto& list : map->SongList) {
-		str->ReadDword(list);
-	}
-	
-	Map::MainAmbients& dayAmbients = map->dayAmbients;
-
-	str->ReadResRef(dayAmbients.Ambient1);
-	str->ReadResRef(dayAmbients.Ambient2);
-	str->ReadDword(dayAmbients.AmbientVol);
-	
-	Map::MainAmbients& nightAmbients = map->nightAmbients;
-
-	str->ReadResRef(nightAmbients.Ambient1);
-	str->ReadResRef(nightAmbients.Ambient2);
-	str->ReadDword(nightAmbients.AmbientVol);
-	
 	std::vector<Ambient*> ambients;
-	// check for existence of main ambients (bg1)
-	#define DAY_BITS (((1<<18) - 1) ^ ((1<<6) - 1)) // day: bits 6-18 per DLTCEP
-	Ambient *ambi = SetupMainAmbients(dayAmbients);
-	if (ambi) {
-		// schedule for day/night
-		// if the two ambients are the same, just add one, so there's no restart
-		if (dayAmbients.Ambient2 != nightAmbients.Ambient2) {
-			ambi->appearance = DAY_BITS;
-			ambients.push_back(ambi);
-			// night
-			ambi = SetupMainAmbients(nightAmbients);
-			if (ambi) {
-				ambi->appearance ^= DAY_BITS; // night: bits 0-5 + 19-23, [dusk till dawn]
-			}
-		}
-		// bgt ar7300 has a nigth ambient only in the first slot
-		if (ambi) {
-			ambients.push_back(ambi);
-		}
-	}
-
+	str->Seek(SongHeader, GEM_STREAM_START);
+	GetSongs(str, map, ambients);
 	// reverb to match against reverb.2da or iwd reverb.ids
 	// (if the 2da doesn't exist - which we provide for all; they use the same values)
 	ieDword reverbID = EFX_PROFILE_REVERB_INVALID; // non PST data has it at 0, so we don't bother reading

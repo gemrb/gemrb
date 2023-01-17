@@ -97,6 +97,7 @@ private:
 	int PutRestHeader(DataStream *stream, const Map *map) const;
 	int PutMapAmbients(DataStream *stream, const Map *map) const;
 
+	void GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& ambients);
 	void GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map);
 	void GetContainer(DataStream* str, int idx, Map* map);
 	void GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm);
