@@ -914,6 +914,67 @@ void AREImporter::GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, Plugi
 	door->SetDialog(dialog);
 }
 
+void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map)
+{
+	str->Seek(SpawnOffset + idx * 0xC8, GEM_STREAM_START);
+
+	ieVariable spName;
+	Point pos;
+	ieWord difficulty;
+	ieWord spawningFrequency;
+	ieWord spawningMethod;
+	ieWord maximumSpawns;
+	ieWord spEnabled;
+	ieWord randWalkDist;
+	ieWord otherWalkDist;
+	ieWord dayChance;
+	ieWord nightChance;
+	ieWord creatureCount;
+	ieDword spSchedule;
+	ieDword spDuration;
+	std::vector<ResRef> creatures(MAX_RESCOUNT);
+
+	str->ReadVariable(spName);
+	str->ReadPoint(pos);
+	for (auto& creature : creatures) {
+		str->ReadResRef(creature);
+	}
+	str->ReadWord(creatureCount);
+	assert(creatureCount <= MAX_RESCOUNT);
+	creatures.resize(creatureCount);
+	str->ReadWord(difficulty);
+	str->ReadWord(spawningFrequency);
+	str->ReadWord(spawningMethod);
+	str->ReadDword(spDuration); // time to live for spawns
+	str->ReadWord(randWalkDist); // random walk distance (0 is unlimited), hunting range
+	str->ReadWord(otherWalkDist); // other walk distance (inactive in all engines?), follow range
+	str->ReadWord(maximumSpawns);
+	str->ReadWord(spEnabled);
+	str->ReadDword(spSchedule);
+	str->ReadWord(dayChance);
+	str->ReadWord(nightChance);
+	// 14 reserved dwords
+
+	Spawn* sp = map->AddSpawn(spName, pos, std::move(creatures));
+	sp->Difficulty = difficulty;
+	// this value is used in a division, better make it nonzero now
+	// this will fix any old gemrb saves vs. the original engine
+	if (!spawningFrequency) {
+		spawningFrequency = 1;
+	}
+	sp->Frequency = spawningFrequency;
+	sp->Method = spawningMethod;
+	sp->sduration = spDuration;
+	sp->rwdist = randWalkDist;
+	sp->owdist = otherWalkDist;
+	sp->Maximum = maximumSpawns;
+	sp->Enabled = spEnabled;
+	sp->appearance = spSchedule;
+	sp->DayChance = dayChance;
+	sp->NightChance = nightChance;
+	// the rest is not read, we seek for every record
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -1082,58 +1143,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading spawnpoints");
 	for (ieDword i = 0; i < SpawnCount; i++) {
-		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
-		ieVariable Name;
-		Point Pos;
-		ieWord Difficulty, Frequency, Method;
-		ieWord Maximum, Enabled;
-		
-		std::vector<ResRef> creatures(MAX_RESCOUNT);
-		ieWord DayChance, NightChance;
-		ieDword Schedule;
-		ieDword sduration;
-		ieWord rwdist, owdist;
-
-		str->ReadVariable(Name);
-		str->ReadPoint(Pos);
-		for (auto& creature : creatures) {
-			str->ReadResRef(creature);
-		}
-		ieWord count;
-		str->ReadWord(count);
-		assert(count <= MAX_RESCOUNT);
-		creatures.resize(count);
-		str->ReadWord(Difficulty);
-		str->ReadWord(Frequency);
-		str->ReadWord(Method);
-		str->ReadDword(sduration); //time to live for spawns
-		str->ReadWord(rwdist);     // random walk distance (0 is unlimited), hunting range
-		str->ReadWord(owdist);     // other walk distance (inactive in all engines?), follow range
-		str->ReadWord(Maximum);
-		str->ReadWord(Enabled);
-		str->ReadDword(Schedule);
-		str->ReadWord(DayChance);
-		str->ReadWord(NightChance);
-		// 14 reserved dwords
-
-		Spawn *sp = map->AddSpawn(Name, Pos, std::move(creatures));
-		sp->Difficulty = Difficulty;
-		//this value is used in a division, better make it nonzero now
-		//this will fix any old gemrb saves vs. the original engine
-		if (!Frequency) {
-			Frequency = 1;
-		}
-		sp->Frequency = Frequency;
-		sp->Method = Method;
-		sp->sduration = sduration;
-		sp->rwdist = rwdist;
-		sp->owdist = owdist;
-		sp->Maximum = Maximum;
-		sp->Enabled = Enabled;
-		sp->appearance = Schedule;
-		sp->DayChance = DayChance;
-		sp->NightChance = NightChance;
-		//the rest is not read, we seek for every record
+		GetSpawnPoint(str, i, map);
 	}
 
 	int pst = core->HasFeature(GF_AUTOMAP_INI);

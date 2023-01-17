@@ -99,6 +99,7 @@ private:
 	void GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map);
 	void GetContainer(DataStream* str, int idx, Map* map);
 	void GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm);
+	void GetSpawnPoint(DataStream* str, int idx, Map* map);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };
