@@ -471,6 +471,161 @@ Ambient* AREImporter::SetupMainAmbients(const Map::MainAmbients& mainAmbients)
 	return ambi;
 }
 
+void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map)
+{
+	str->Seek(InfoPointsOffset + idx * 0xC4, GEM_STREAM_START);
+
+	ieWord ipType;
+	ieWord vertexCount;
+	ieDword firstVertex;
+	ieDword cursor;
+	ieDword ipFlags;
+	ieWord trapDetDiff;
+	ieWord trapRemDiff;
+	ieWord trapped;
+	ieWord trapDetected;
+	Point launchP;
+	Point pos;
+	Point talkPos;
+	Region bbox;
+	ieVariable ipName;
+	ieVariable entrance;
+	ResRef script0;
+	ResRef keyResRef;
+	ResRef destination;
+	// two adopted pst specific fields
+	ResRef dialogResRef;
+	ResRef wavResRef;
+	ieStrRef dialogName;
+
+	str->ReadVariable(ipName);
+	str->ReadWord(ipType);
+	str->ReadRegion(bbox, true);
+	str->ReadWord(vertexCount);
+	str->ReadDword(firstVertex);
+	ieDword triggerValue;
+	str->ReadDword(triggerValue); // named triggerValue in the IE source
+	str->ReadDword(cursor);
+	str->ReadResRef(destination);
+	str->ReadVariable(entrance);
+	str->ReadDword(ipFlags);
+	ieStrRef overheadRef;
+	str->ReadStrRef(overheadRef);
+	str->ReadWord(trapDetDiff);
+	str->ReadWord(trapRemDiff);
+	str->ReadWord(trapped);
+	str->ReadWord(trapDetected);
+	str->ReadPoint(launchP);
+	str->ReadResRef(keyResRef);
+	str->ReadResRef(script0);
+	// ARE 9.1: 4B per position after that.
+	if (16 == map->version) {
+		str->ReadPoint(pos); // OverridePoint in NI
+		if (pos.IsZero()) {
+			str->ReadPoint(pos); // AlternatePoint in NI
+		} else {
+			str->Seek(8, GEM_CURRENT_POS);
+		}
+		str->Seek(26, GEM_CURRENT_POS);
+	} else {
+		str->ReadPoint(pos); // TransitionWalkToX, TransitionWalkToY
+		// maybe we have to store this
+		// bg2: 15 reserved dwords, the above point is actually in dwords (+1),
+		// but since it's the last thing the underseek doesn't matter
+		str->Seek(36, GEM_CURRENT_POS);
+	}
+
+	if (core->HasFeature(GF_INFOPOINT_DIALOGS)) {
+		str->ReadResRef(wavResRef);
+		str->ReadPoint(talkPos);
+		str->ReadStrRef(dialogName);
+		str->ReadResRef(dialogResRef);
+	} else {
+		wavResRef.Reset();
+		dialogName = ieStrRef::INVALID;
+		dialogResRef.Reset();
+	}
+
+	InfoPoint* ip = nullptr;
+	str->Seek(VerticesOffset + firstVertex * 4, GEM_STREAM_START);
+	if (vertexCount <= 1) {
+		// this is exactly the same as bbox.origin
+		if (vertexCount == 1) {
+			Point pos2;
+			str->ReadPoint(pos2);
+			assert(pos2 == bbox.origin);
+		}
+
+		if (bbox.size.IsInvalid()) {
+			// we approximate a bounding box equivalent to a small radius
+			// we copied this from the Container code that seems to indicate
+			// this is how the originals behave. It is probably "good enough"
+			bbox.x = pos.x - 7;
+			bbox.y = pos.y - 5;
+			bbox.w = 16;
+			bbox.h = 12;
+		}
+
+		ip = tm->AddInfoPoint(ipName, ipType, nullptr);
+		ip->BBox = bbox;
+	} else if (vertexCount == 2) {
+#define MSG "Encountered a bogus polygon with 2 vertices!"
+#if NDEBUG
+		Log(ERROR, "AREImporter", MSG);
+		return;
+#else // make this fatal on debug builds
+		error("AREImporter", MSG);
+#endif
+#undef MSG
+	} else {
+		std::vector<Point> points(vertexCount);
+		for (int x = 0; x < vertexCount; x++) {
+			str->ReadPoint(points[x]);
+		}
+		auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
+		ip = tm->AddInfoPoint(ipName, ipType, poly);
+	}
+
+	ip->TrapDetectionDiff = trapDetDiff;
+	ip->TrapRemovalDiff = trapRemDiff;
+	ip->Trapped = trapped;
+	ip->TrapDetected = trapDetected;
+	ip->TrapLaunch = launchP;
+	// translate door cursor on infopoint to correct cursor
+	if (cursor == IE_CURSOR_DOOR) cursor = IE_CURSOR_PASS;
+	ip->Cursor = cursor;
+	ip->SetOverheadText(core->GetString(overheadRef), false);
+	ip->StrRef = overheadRef; //we need this when saving area
+	ip->SetMap(map);
+	ip->Flags = ipFlags;
+	ip->UsePoint = pos;
+	// FIXME: PST doesn't use this field
+	if (ip->GetUsePoint()) {
+		ip->Pos = ip->UsePoint;
+	} else {
+		ip->Pos = bbox.Center();
+	}
+	ip->Destination = destination;
+	ip->EntranceName = entrance;
+	ip->KeyResRef = keyResRef;
+
+	// these appear only in PST, but we could support them everywhere
+	// HOWEVER they did not use them as witnessed in ar0101 (0101prt1 and 0101prt2) :(
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		talkPos = ip->Pos;
+	}
+	ip->TalkPos = talkPos;
+	ip->DialogName= dialogName;
+	ip->SetDialog(dialogResRef);
+	ip->SetEnter(wavResRef);
+
+	if (script0.IsEmpty()) {
+		ip->Scripts[0] = nullptr;
+	} else {
+		ip->Scripts[0] = new GameScript(script0, ip);
+	}
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -624,148 +779,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	core->LoadProgress(70);
 	//Loading InfoPoints
 	for (int i = 0; i < InfoPointsCount; i++) {
-		str->Seek( InfoPointsOffset + ( i * 0xC4 ), GEM_STREAM_START );
-		ieWord Type, VertexCount;
-		ieDword FirstVertex, Cursor, Flags;
-		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
-		Point launchP;
-		Point pos;
-		Point talkPos;
-		ieVariable Name, Entrance;
-		ResRef script0;
-		ResRef KeyResRef;
-		ResRef Destination;
-		// two adopted pst specific fields
-		ResRef DialogResRef;
-		ResRef WavResRef;
-		ieStrRef DialogName;
-		str->ReadVariable(Name);
-		str->ReadWord(Type);
-		Region bbox;
-		str->ReadRegion(bbox, true);
-		str->ReadWord(VertexCount);
-		str->ReadDword(FirstVertex);
-		ieDword tmp2;
-		str->ReadDword(tmp2); //named triggerValue in the IE source
-		str->ReadDword(Cursor);
-		str->ReadResRef( Destination );
-		str->ReadVariable(Entrance);
-		str->ReadDword(Flags);
-		ieStrRef StrRef;
-		str->ReadStrRef(StrRef);
-		str->ReadWord(TrapDetDiff);
-		str->ReadWord(TrapRemDiff);
-		str->ReadWord(Trapped);
-		str->ReadWord(TrapDetected);
-		str->ReadPoint(launchP);
-		str->ReadResRef( KeyResRef );
-		str->ReadResRef(script0);
-		/* ARE 9.1: 4B per position after that. */
-		if (16 == map->version) {
-			str->ReadPoint(pos); // OverridePoint in NI
-			if (pos.IsZero()) {
-				str->ReadPoint(pos); // AlternatePoint in NI
-			} else {
-				str->Seek(8, GEM_CURRENT_POS);
-			}
-			str->Seek(26, GEM_CURRENT_POS);
-		} else {
-			str->ReadPoint(pos); // TransitionWalkToX, TransitionWalkToY
-			//maybe we have to store this
-			// bg2: 15 reserved dwords, the above point is actually in dwords (+1),
-			// but since it's the last thing the underseek doesn't matter
-			str->Seek( 36, GEM_CURRENT_POS );
-		}
-
-		if (core->HasFeature(GF_INFOPOINT_DIALOGS)) {
-			str->ReadResRef( WavResRef );
-			str->ReadPoint(talkPos);
-			str->ReadStrRef(DialogName);
-			str->ReadResRef( DialogResRef );
-		} else {
-			WavResRef.Reset();
-			DialogName = ieStrRef::INVALID;
-			DialogResRef.Reset();
-		}
-
-		InfoPoint* ip = nullptr;
-		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
-		if (VertexCount <= 1) {
-			// this is exactly the same as bbox.origin
-			if (VertexCount == 1) {
-				Point pos2;
-				str->ReadPoint(pos2);
-				assert(pos2 == bbox.origin);
-			}
-
-			if (bbox.size.IsInvalid()) {
-				// we approximate a bounding box equivalent to a small radius
-				// we copied this from the Container code that seems to indicate
-				// this is how the originals behave. It is probably "good enough"
-				bbox.x = pos.x - 7;
-				bbox.y = pos.y - 5;
-				bbox.w = 16;
-				bbox.h = 12;
-			}
-
-			ip = tm->AddInfoPoint( Name, Type, nullptr );
-			ip->BBox = bbox;
-		} else if (VertexCount == 2) {
-#define MSG "Encountered a bogus polygon with 2 vertices!"
-#if NDEBUG
-			Log(ERROR, "AREImporter", MSG);
-			continue;
-#else // make this fatal on debug builds
-			error("AREImporter", MSG);
-#endif
-#undef MSG
-		} else {
-			std::vector<Point> points(VertexCount);
-			for (int x = 0; x < VertexCount; x++) {
-				str->ReadPoint(points[x]);
-			}
-			auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
-			ip = tm->AddInfoPoint( Name, Type, poly );
-		}
-
-		ip->TrapDetectionDiff = TrapDetDiff;
-		ip->TrapRemovalDiff = TrapRemDiff;
-		ip->Trapped = Trapped;
-		ip->TrapDetected = TrapDetected;
-		ip->TrapLaunch = launchP;
-		// translate door cursor on infopoint to correct cursor
-		if (Cursor == IE_CURSOR_DOOR) Cursor = IE_CURSOR_PASS;
-		ip->Cursor = Cursor;
-		ip->SetOverheadText(core->GetString(StrRef), false);
-		ip->StrRef = StrRef; //we need this when saving area
-		ip->SetMap(map);
-		ip->Flags = Flags;
-		ip->UsePoint = pos;
-		//FIXME: PST doesn't use this field
-		if (ip->GetUsePoint()) {
-			ip->Pos = ip->UsePoint;
-		} else {
-			ip->Pos = bbox.Center();
-		}
-		ip->Destination = Destination;
-		ip->EntranceName = Entrance;
-		ip->KeyResRef = KeyResRef;
-
-		//these appear only in PST, but we could support them everywhere
-		// HOWEVER they did not use them as witnessed in ar0101 (0101prt1 and 0101prt2) :(
-		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-			talkPos = ip->Pos;
-		}
-		ip->TalkPos = talkPos;
-		ip->DialogName=DialogName;
-		ip->SetDialog(DialogResRef);
-		ip->SetEnter(WavResRef);
-
-		if (script0.IsEmpty()) {
-			ip->Scripts[0] = nullptr;
-		} else {
-			ip->Scripts[0] = new GameScript(script0, ip);
-		}
+		GetInfoPoint(str, i, tm, map);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading containers");
