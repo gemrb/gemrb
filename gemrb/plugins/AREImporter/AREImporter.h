@@ -108,6 +108,7 @@ private:
 	void GetAmbient(DataStream* str, std::vector<Ambient*>& ambients);
 	void GetAutomapNotes(DataStream* str, Map* map);
 	bool GetTrap(DataStream* str, int idx, Map* map);
+	void GetTile(DataStream* str, Map* map);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };

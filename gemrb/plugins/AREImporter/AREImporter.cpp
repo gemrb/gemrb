@@ -1385,6 +1385,32 @@ bool AREImporter::GetTrap(DataStream* str, int idx, Map* map)
 	return true;
 }
 
+void AREImporter::GetTile(DataStream* str, Map* map)
+{
+	ieVariable tileName;
+	ResRef tileID;
+	ieDword tileFlags;
+	// these fields could be different size: ieDword ClosedCount, OpenCount;
+	ieWord closedCount;
+	ieWord openCount;
+	ieDword closedIndex;
+	ieDword openIndex;
+	str->ReadVariable(tileName);
+	str->ReadResRef(tileID);
+	str->ReadDword(tileFlags);
+	// IE dev info says this:
+	str->ReadDword(openIndex); // PrimarySearchSquareStart in bg2
+	str->ReadWord(openCount); // PrimarySearchSquareCount
+	str->ReadWord(closedCount); // SecondarySearchSquareCount
+	str->ReadDword(closedIndex); // SecondarySearcHSquareStart
+	// end of disputed section
+
+	str->Seek(48, GEM_CURRENT_POS); // 12 reserved dwords
+	// absolutely no idea where these 'tile indices' are stored
+	// are they tileset tiles or impeded block tiles
+	map->TMap->AddTile(tileID, tileName, tileFlags, nullptr, 0, nullptr, 0);
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -1562,28 +1588,9 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading tiles");
 	//Loading Tiled objects (if any)
-	str->Seek( TileOffset, GEM_STREAM_START );
+	str->Seek(TileOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < TileCount; i++) {
-		ieVariable Name;
-		ResRef ID;
-		ieDword Flags;
-		// these fields could be different size: ieDword ClosedCount, OpenCount;
-		ieWord ClosedCount, OpenCount;
-		ieDword ClosedIndex, OpenIndex;
-		str->ReadVariable(Name);
-		str->ReadResRef( ID );
-		str->ReadDword(Flags);
-		//IE dev info says this:
-		str->ReadDword(OpenIndex); // PrimarySearchSquareStart in bg2
-		str->ReadWord(OpenCount); // PrimarySearchSquareCount
-		str->ReadWord(ClosedCount); // SecondarySearchSquareCount
-		str->ReadDword(ClosedIndex); // SecondarySearcHSquareStart
-		//end of disputed section
-
-		str->Seek(48, GEM_CURRENT_POS); // 12 reserved dwords
-		//absolutely no idea where these 'tile indices' are stored
-		//are they tileset tiles or impeded block tiles
-		map->TMap->AddTile( ID, Name, Flags, NULL,0, NULL, 0 );
+		GetTile(str, map);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading explored bitmap");
