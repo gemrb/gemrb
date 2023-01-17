@@ -105,6 +105,7 @@ private:
 	void GetSpawnPoint(DataStream* str, int idx, Map* map);
 	bool GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map);
 	void GetAreaAnimation(DataStream* str, Map* map);
+	void GetAmbient(DataStream* str, std::vector<Ambient*>& ambients);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };

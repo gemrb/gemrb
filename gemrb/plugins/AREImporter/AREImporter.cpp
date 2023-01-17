@@ -1209,6 +1209,43 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map)
 	map->AddAnimation(std::move(anim));
 }
 
+void AREImporter::GetAmbient(DataStream* str, std::vector<Ambient*>& ambients)
+{
+	ResRef sounds[MAX_RESCOUNT];
+	ieWord soundCount;
+	ieDword interval;
+	Ambient* ambient = new Ambient();
+
+	str->Read(&ambient->name, 32);
+	str->ReadPoint(ambient->origin);
+	str->ReadWord(ambient->radius);
+	str->Seek(2, GEM_CURRENT_POS); // alignment padding
+	str->ReadDword(ambient->pitchVariance);
+	str->ReadWord(ambient->gainVariance);
+	str->ReadWord(ambient->gain);
+	for (auto& sound : sounds) {
+		str->ReadResRef(sound);
+	}
+	str->ReadWord(soundCount);
+	str->Seek(2, GEM_CURRENT_POS); // alignment padding
+	str->ReadDword(interval);
+	ambient->interval = interval * 1000;
+	str->ReadDword(interval);
+	ambient->intervalVariance = interval * 1000;
+	// schedule bits
+	str->ReadDword(ambient->appearance);
+	str->ReadDword(ambient->flags);
+	str->Seek(64, GEM_CURRENT_POS);
+	// this is a physical limit
+	if (soundCount > MAX_RESCOUNT) {
+		soundCount = MAX_RESCOUNT;
+	}
+	for (int j = 0; j < soundCount; j++) {
+		ambient->sounds.emplace_back(sounds[j]);
+	}
+	ambients.push_back(ambient);
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -1344,7 +1381,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading entrances");
-	str->Seek( EntrancesOffset, GEM_STREAM_START );
+	str->Seek(EntrancesOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < EntrancesCount; i++) {
 		ieVariable Name;
 		Point Pos;
@@ -1358,7 +1395,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading variables");
 	map->locals->LoadInitialValues(resRef);
-	str->Seek( VariablesOffset, GEM_STREAM_START );
+	str->Seek(VariablesOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < VariablesCount; i++) {
 		ieVariable Name;
 		ieDword Value;
@@ -1366,47 +1403,14 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->Seek(8, GEM_CURRENT_POS); // type + resreftype, part of the partly implemented type system (uint, int, float, str)
 		str->ReadDword(Value);
 		str->Seek(40, GEM_CURRENT_POS); // values as an int32, float64, string
-		map->locals->SetAt( Name, Value );
+		map->locals->SetAt(Name, Value);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading ambients");
-	str->Seek( AmbiOffset, GEM_STREAM_START );
+	str->Seek(AmbiOffset, GEM_STREAM_START);
 	for (int i = 0; i < AmbiCount; ++i) {
-		ResRef sounds[MAX_RESCOUNT];
-		ieWord tmpWord;
-
-		Ambient *ambient = new Ambient();
-		str->Read(&ambient->name, 32);
-		str->ReadPoint(ambient->origin);
-		str->ReadWord(ambient->radius);
-		str->Seek(2, GEM_CURRENT_POS); // alignment padding
-		str->ReadDword(ambient->pitchVariance);
-		str->ReadWord(ambient->gainVariance);
-		str->ReadWord(ambient->gain);
-		for (auto& sound : sounds) {
-			str->ReadResRef(sound);
-		}
-		str->ReadWord(tmpWord);
-		str->Seek(2, GEM_CURRENT_POS); // alignment padding
-		ieDword interval;
-		str->ReadDword(interval);
-		ambient->interval = interval * 1000;
-		str->ReadDword(interval);
-		ambient->intervalVariance = interval * 1000;
-		// schedule bits
-		str->ReadDword(ambient->appearance);
-		str->ReadDword(ambient->flags);
-		str->Seek( 64, GEM_CURRENT_POS );
-		//this is a physical limit
-		if (tmpWord>MAX_RESCOUNT) {
-			tmpWord=MAX_RESCOUNT;
-		}
-		for (int j = 0; j < tmpWord; j++) {
-			ambient->sounds.emplace_back(sounds[j]);
-		}
-		ambients.push_back(ambient);
+		GetAmbient(str, ambients);
 	}
-	
 	map->SetAmbients(std::move(ambients), reverbID);
 
 	Log(DEBUG, "AREImporter", "Loading automap notes");
