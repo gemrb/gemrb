@@ -975,6 +975,134 @@ void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map)
 	// the rest is not read, we seek for every record
 }
 
+bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map)
+{
+	static int pst = core->HasFeature(GF_AUTOMAP_INI);
+
+	ieVariable defaultName;
+	ResRef creResRef;
+	ResRef dialog;
+	ResRef scripts[8]; // the original order is shown in scrlev.ids
+	ieDword talkCount;
+	ieDword orientation;
+	ieDword schedule;
+	ieDword removalTime;
+	ieDword flags;
+	ieDword creOffset;
+	ieDword creSize;
+	Point pos;
+	Point destination;
+	ieWord maxDistance;
+	ieWord spawned;
+	ieByte difficultyMargin;
+	DataStream* creFile;
+
+	str->ReadVariable(defaultName);
+	str->ReadPoint(pos);
+	str->ReadPoint(destination);
+	str->ReadDword(flags);
+	str->ReadWord(spawned); // "type"
+	str->Seek(1, GEM_CURRENT_POS); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
+	str->Read(&difficultyMargin, 1); // iwd2 only, "alignbyte" in bg2 (padding)
+	str->Seek(4, GEM_CURRENT_POS); //actor animation, unused
+	str->ReadDword(orientation); // was word + padding in bg2
+	str->ReadDword(removalTime);
+	str->ReadWord(maxDistance); // hunting range
+	str->Seek(2, GEM_CURRENT_POS); // apparently unused https://gibberlings3.net/forums/topic/21724-a (follow range)
+	str->ReadDword(schedule);
+	str->ReadDword(talkCount);
+	str->ReadResRef(dialog);
+
+	str->ReadResRef(scripts[SCR_OVERRIDE]);
+	str->ReadResRef(scripts[SCR_GENERAL]);
+	str->ReadResRef(scripts[SCR_CLASS]);
+	str->ReadResRef(scripts[SCR_RACE]);
+	str->ReadResRef(scripts[SCR_DEFAULT]);
+	str->ReadResRef(scripts[SCR_SPECIFICS]);
+	str->ReadResRef(creResRef);
+	str->ReadDword(creOffset);
+	str->ReadDword(creSize);
+	// another iwd2 script slot
+	str->ReadResRef(scripts[SCR_AREA]);
+	str->Seek(120, GEM_CURRENT_POS);
+	// not iwd2, this field is garbage
+	if (!core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		scripts[SCR_AREA].Reset();
+	}
+
+	// actually, Flags&1 signs that the creature
+	// is not loaded yet, so !(Flags&1) means it is embedded
+	if (creOffset != 0 && !(flags & 1)) {
+		creFile = SliceStream(str, creOffset, creSize, true);
+	} else {
+		creFile = gamedata->GetResource(creResRef, IE_CRE_CLASS_ID);
+	}
+	if (!actorMgr->Open(creFile)) {
+		Log(ERROR, "AREImporter", "Couldn't read actor: {}!", creResRef);
+		return false;
+	}
+	Actor* act = actorMgr->GetActor(0);
+	if (!act) return false;
+
+	// PST generally doesn't appear to use the starting MC_ bits, but for some reason
+	// there's a coaxmetal copy in the mortuary with both KEEP and REMOVE corpse
+	// set that should never be seen. The actor is also already dead, so we don't end
+	// up doing any of the regular cleanup on it (it's mrtghost.cre). Banish it instead.
+	if (pst && act->GetBase(IE_STATE_ID) & STATE_DEAD && act->GetBase(IE_MC_FLAGS) & MC_REMOVE_CORPSE) {
+		return false;
+	}
+
+	map->AddActor(act, false);
+	act->Pos = pos;
+	act->Destination = destination;
+	act->HomeLocation = destination;
+	act->maxWalkDistance = maxDistance;
+	act->Spawned = spawned;
+	act->appearance = schedule;
+	// copying the scripting name into the actor
+	// if the CreatureAreaFlag was set to 8
+	if ((flags & AF_NAME_OVERRIDE) || core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+		act->SetScriptName(defaultName);
+	}
+	// IWD2 specific hacks
+	if (core->HasFeature(GF_3ED_RULES)) {
+		// This flag is used for something else in IWD2
+		if (flags & AF_NAME_OVERRIDE) {
+			act->BaseStats[IE_EA] = EA_EVILCUTOFF;
+		}
+		if (flags & AF_SEEN_PARTY) {
+			act->SetMCFlag(MC_SEENPARTY, BitOp::OR);
+		}
+		if (flags & AF_INVULNERABLE) {
+			act->SetMCFlag(MC_INVULNERABLE, BitOp::OR);
+		}
+		if (!(flags & AF_ENABLED)) {
+			// DifficultyMargin - only enable actors that are difficult enough vs the area difficulty
+			// 1 - area difficulty 1
+			// 2 - area difficulty 2
+			// 4 - area difficulty 3
+			if (difficultyMargin && !(difficultyMargin & map->AreaDifficulty)) {
+				act->DestroySelf();
+			}
+		}
+	}
+	act->DifficultyMargin = difficultyMargin;
+
+	if (!dialog.IsEmpty()) {
+		act->SetDialog(dialog);
+	}
+	for (int j = 0; j < 8; j++) {
+		if (!scripts[j].IsEmpty()) {
+			act->SetScript(scripts[j], j);
+		}
+	}
+	act->SetOrientation(ClampToOrientation(orientation), false);
+	act->TalkCount = talkCount;
+	act->RemovalTime = removalTime;
+	act->RefreshEffects();
+	return true;
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -1150,129 +1278,11 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	core->LoadProgress(75);
 	Log(DEBUG, "AREImporter", "Loading actors");
-	str->Seek( ActorOffset, GEM_STREAM_START );
+	str->Seek(ActorOffset, GEM_STREAM_START);
 	assert(core->IsAvailable(IE_CRE_CLASS_ID));
 	auto actmgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	for (int i = 0; i < ActorCount; i++) {
-		ieVariable defaultName;
-		ResRef creResRef;
-		ieDword talkCount;
-		ieDword orientation;
-		ieDword schedule;
-		ieDword removalTime;
-		Point pos;
-		Point des;
-		ieWord maxDistance;
-		ieWord spawned;
-		ResRef dialog;
-		ResRef scripts[8]; //the original order is shown in scrlev.ids
-		ieDword flags;
-		ieByte difficultyMargin;
-
-		str->ReadVariable(defaultName);
-		str->ReadPoint(pos);
-		str->ReadPoint(des);
-		str->ReadDword(flags);
-		str->ReadWord(spawned); // "type"
-		str->Seek(1, GEM_CURRENT_POS); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
-		str->Read(&difficultyMargin, 1); // iwd2 only, "alignbyte" in bg2 (padding)
-		str->Seek(4, GEM_CURRENT_POS); //actor animation, unused
-		str->ReadDword(orientation); // was word + padding in bg2
-		str->ReadDword(removalTime);
-		str->ReadWord(maxDistance); // hunting range
-		str->Seek(2, GEM_CURRENT_POS); // apparently unused https://gibberlings3.net/forums/topic/21724-a (follow range)
-		str->ReadDword(schedule);
-		str->ReadDword(talkCount);
-		str->ReadResRef(dialog);
-
-		str->ReadResRef(scripts[SCR_OVERRIDE]);
-		str->ReadResRef(scripts[SCR_GENERAL]);
-		str->ReadResRef(scripts[SCR_CLASS]);
-		str->ReadResRef(scripts[SCR_RACE]);
-		str->ReadResRef(scripts[SCR_DEFAULT]);
-		str->ReadResRef(scripts[SCR_SPECIFICS]);
-		str->ReadResRef(creResRef);
-		DataStream* creFile;
-		Actor *act;
-		ieDword CreOffset, CreSize;
-		str->ReadDword(CreOffset);
-		str->ReadDword(CreSize);
-		// another iwd2 script slot
-		str->ReadResRef(scripts[SCR_AREA]);
-		str->Seek(120, GEM_CURRENT_POS);
-		//not iwd2, this field is garbage
-		if (!core->HasFeature(GF_IWD2_SCRIPTNAME)) {
-			scripts[SCR_AREA].Reset();
-		}
-		//actually, Flags&1 signs that the creature
-		//is not loaded yet, so !(Flags&1) means it is embedded
-		if (CreOffset != 0 && !(flags & 1)) {
-			creFile = SliceStream(str, CreOffset, CreSize, true);
-		} else {
-			creFile = gamedata->GetResource(creResRef, IE_CRE_CLASS_ID);
-		}
-		if(!actmgr->Open(creFile)) {
-			Log(ERROR, "AREImporter", "Couldn't read actor: {}!", creResRef);
-			continue;
-		}
-		act = actmgr->GetActor(0);
-		if (!act) continue;
-
-		// PST generally doesn't appear to use the starting MC_ bits, but for some reason
-		// there's a coaxmetal copy in the mortuary with both KEEP and REMOVE corpse
-		// set that should never be seen. The actor is also already dead, so we don't end
-		// up doing any of the regular cleanup on it (it's mrtghost.cre). Banish it instead.
-		if (pst && act->GetBase(IE_STATE_ID) & STATE_DEAD && act->GetBase(IE_MC_FLAGS) & MC_REMOVE_CORPSE) {
-			continue;
-		}
-		map->AddActor(act, false);
-		act->Pos = pos;
-		act->Destination = des;
-		act->HomeLocation = des;
-		act->maxWalkDistance = maxDistance;
-		act->Spawned = spawned;
-		act->appearance = schedule;
-		//copying the scripting name into the actor
-		//if the CreatureAreaFlag was set to 8
-		if ((flags & AF_NAME_OVERRIDE) || core->HasFeature(GF_IWD2_SCRIPTNAME)) {
-			act->SetScriptName(defaultName);
-		}
-		//IWD2 specific hacks
-		if (core->HasFeature(GF_3ED_RULES)) {
-			//This flag is used for something else in IWD2
-			if (flags & AF_NAME_OVERRIDE) {
-				act->BaseStats[IE_EA] = EA_EVILCUTOFF;
-			}
-			if (flags & AF_SEEN_PARTY) {
-				act->SetMCFlag(MC_SEENPARTY, BitOp::OR);
-			}
-			if (flags & AF_INVULNERABLE) {
-				act->SetMCFlag(MC_INVULNERABLE, BitOp::OR);
-			}
-			if (!(flags & AF_ENABLED)) {
-				// DifficultyMargin - only enable actors that are difficult enough vs the area difficulty
-				// 1 - area difficulty 1
-				// 2 - area difficulty 2
-				// 4 - area difficulty 3
-				if (difficultyMargin && !(difficultyMargin & map->AreaDifficulty)) {
-					act->DestroySelf();
-				}
-			}
-		}
-		act->DifficultyMargin = difficultyMargin;
-
-		if (!dialog.IsEmpty()) {
-			act->SetDialog(dialog);
-		}
-		for (int j=0;j<8;j++) {
-			if (!scripts[j].IsEmpty()) {
-				act->SetScript(scripts[j], j);
-			}
-		}
-		act->SetOrientation(ClampToOrientation(orientation), false);
-		act->TalkCount = talkCount;
-		act->RemovalTime = removalTime;
-		act->RefreshEffects();
+		if (!GetActor(str, actmgr, map)) continue;
 	}
 
 	core->LoadProgress(90);

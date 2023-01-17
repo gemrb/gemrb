@@ -28,6 +28,7 @@
 
 namespace GemRB {
 
+class ActorMgr;
 class Animation;
 class AnimationFactory;
 class EffectQueue;
@@ -100,6 +101,7 @@ private:
 	void GetContainer(DataStream* str, int idx, Map* map);
 	void GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm);
 	void GetSpawnPoint(DataStream* str, int idx, Map* map);
+	bool GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };
