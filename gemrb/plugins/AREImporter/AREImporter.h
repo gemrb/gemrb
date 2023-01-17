@@ -102,6 +102,7 @@ private:
 	void GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm);
 	void GetSpawnPoint(DataStream* str, int idx, Map* map);
 	bool GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map);
+	void GetAreaAnimation(DataStream* str, Map* map);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };

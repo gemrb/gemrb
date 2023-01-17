@@ -1103,6 +1103,50 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	return true;
 }
 
+void AREImporter::GetAreaAnimation(DataStream* str, Map* map)
+{
+	AreaAnimation anim = AreaAnimation();
+
+	str->ReadVariable(anim.Name);
+	str->ReadPoint(anim.Pos);
+	str->ReadDword(anim.appearance);
+	str->ReadResRef(anim.BAM);
+	str->ReadWord(anim.sequence);
+	str->ReadWord(anim.frame);
+	str->ReadDword(anim.Flags);
+	anim.originalFlags = anim.Flags;
+	str->ReadScalar(anim.height);
+	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND)) {
+		anim.height = ANI_PRI_BACKGROUND;
+		anim.Flags |= A_ANI_NO_WALL;
+	}
+	str->ReadWord(anim.transparency);
+	ieWord startFrameRange;
+	str->ReadWord(startFrameRange);
+	str->Read(&anim.startchance, 1);
+	if (anim.startchance <= 0) {
+		anim.startchance = 100; // percentage of starting a cycle
+	}
+	if (startFrameRange && (anim.Flags & A_ANI_RANDOM_START)) {
+		anim.frame = RAND<AreaAnimation::index_t>(0, startFrameRange - 1);
+	}
+	anim.startFrameRange = 0; // this will never get resaved (iirc)
+	str->Read(&anim.skipcycle, 1); // how many cycles are skipped (100% skippage), "period" in bg2
+	str->ReadResRef(anim.PaletteRef);
+	// TODO: EE: word with anim width for PVRZ/WBM resources (if flag bits are set, see A_ANI_ defines)
+	// 0x4a holds the height
+	str->ReadDword(anim.unknown48);
+
+	static int pst = core->HasFeature(GF_AUTOMAP_INI);
+	if (pst) {
+		AdjustPSTFlags(anim);
+	}
+
+	// set up the animation, it cannot be done here
+	// because a StaticSequence action can change it later
+	map->AddAnimation(std::move(anim));
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -1287,46 +1331,9 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	core->LoadProgress(90);
 	Log(DEBUG, "AREImporter", "Loading animations");
-	str->Seek( AnimOffset, GEM_STREAM_START );
+	str->Seek(AnimOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < AnimCount; i++) {
-		AreaAnimation anim = AreaAnimation();
-		str->ReadVariable(anim.Name);
-		ieWord startFrameRange;
-		str->ReadPoint(anim.Pos);
-		str->ReadDword(anim.appearance);
-		str->ReadResRef(anim.BAM);
-		str->ReadWord(anim.sequence);
-		str->ReadWord(anim.frame);
-		str->ReadDword(anim.Flags);
-		anim.originalFlags = anim.Flags;
-		str->ReadScalar(anim.height);
-		if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND)) {
-			anim.height = ANI_PRI_BACKGROUND;
-			anim.Flags |= A_ANI_NO_WALL;
-		}
-		str->ReadWord(anim.transparency);
-		str->ReadWord(startFrameRange);
-		str->Read(&anim.startchance, 1);
-		if (anim.startchance <= 0) {
-			anim.startchance = 100; // percentage of starting a cycle
-		}
-		if (startFrameRange && (anim.Flags & A_ANI_RANDOM_START)) {
-			anim.frame = RAND<AreaAnimation::index_t>(0, startFrameRange - 1);
-		}
-		anim.startFrameRange = 0; // this will never get resaved (iirc)
-		str->Read(&anim.skipcycle, 1); // how many cycles are skipped (100% skippage), "period" in bg2
-		str->ReadResRef(anim.PaletteRef);
-		// TODO: EE: word with anim width for PVRZ/WBM resources (if flag bits are set, see A_ANI_ defines)
-		// 0x4a holds the height
-		str->ReadDword(anim.unknown48);
-
-		if (pst) {
-			AdjustPSTFlags(anim);
-		}
-
-		// set up the animation, it cannot be done here
-		// because a StaticSequence action can change it later
-		map->AddAnimation(std::move(anim));
+		GetAreaAnimation(str, map);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading entrances");
