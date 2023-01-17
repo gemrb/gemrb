@@ -510,6 +510,29 @@ void AREImporter::GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& amb
 	}
 }
 
+void AREImporter::GetRestHeader(DataStream* str, Map* map)
+{
+	for (auto& ref : map->RestHeader.Strref) {
+		str->ReadStrRef(ref);
+	}
+	for (auto& ref : map->RestHeader.CreResRef) {
+		str->ReadResRef(ref);
+	}
+	str->ReadWord(map->RestHeader.CreatureNum);
+	if (map->RestHeader.CreatureNum > MAX_RESCOUNT) {
+		map->RestHeader.CreatureNum = MAX_RESCOUNT;
+	}
+	str->ReadWord(map->RestHeader.Difficulty); // difficulty?
+	str->ReadDword(map->RestHeader.sduration); // spawn duration, lifespan
+	str->ReadWord(map->RestHeader.rwdist); // random walk distance, hunting range
+	str->ReadWord(map->RestHeader.owdist); // other walk distance, follow range
+	str->ReadWord(map->RestHeader.Maximum); // maximum number of creatures
+	str->ReadWord(map->RestHeader.Enabled);
+	str->ReadWord(map->RestHeader.DayChance);
+	str->ReadWord(map->RestHeader.NightChance);
+	// 14 reserved dwords
+}
+
 void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map)
 {
 	str->Seek(InfoPointsOffset + idx * 0xC4, GEM_STREAM_START);
@@ -1278,25 +1301,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	}
 
 	str->Seek(RestHeader + 32, GEM_STREAM_START); // skip the name
-	for (auto& ref : map->RestHeader.Strref) {
-		str->ReadStrRef(ref);
-	}
-	for (auto& ref : map->RestHeader.CreResRef) {
-		str->ReadResRef(ref);
-	}
-	str->ReadWord(map->RestHeader.CreatureNum);
-	if( map->RestHeader.CreatureNum>MAX_RESCOUNT ) {
-		map->RestHeader.CreatureNum = MAX_RESCOUNT;
-	}
-	str->ReadWord(map->RestHeader.Difficulty);  //difficulty?
-	str->ReadDword(map->RestHeader.sduration);  //spawn duration, lifespan
-	str->ReadWord(map->RestHeader.rwdist);      //random walk distance, hunting range
-	str->ReadWord(map->RestHeader.owdist);      //other walk distance, follow range
-	str->ReadWord(map->RestHeader.Maximum);     //maximum number of creatures
-	str->ReadWord(map->RestHeader.Enabled);
-	str->ReadWord(map->RestHeader.DayChance);
-	str->ReadWord(map->RestHeader.NightChance);
-	// 14 reserved dwords
+	GetRestHeader(str, map);
 
 	Log(DEBUG, "AREImporter", "Loading regions");
 	core->LoadProgress(70);
