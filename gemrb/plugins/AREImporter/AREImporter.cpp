@@ -626,6 +626,107 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map)
 	}
 }
 
+void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
+{
+	str->Seek(ContainersOffset + idx * 0xC0, GEM_STREAM_START);
+
+	ieVariable containerName;
+	ieWord containerType;
+	ieWord lockDiff;
+	ieWord trapDetDiff;
+	ieWord trapRemDiff;
+	ieWord trapped;
+	ieWord trapDetected;
+	ieWord vertCount;
+	ieWord unknown;
+	Point pos;
+	Point launchPos;
+	Region bbox;
+	ieDword containerFlags;
+	ieDword itemIndex;
+	ieDword itemCount;
+	ieDword firstIndex;
+	ResRef keyResRef;
+	ieStrRef openFail;
+
+	str->ReadVariable(containerName);
+	str->ReadPoint(pos);
+	str->ReadWord(containerType);
+	str->ReadWord(lockDiff);
+	str->ReadDword(containerFlags);
+	str->ReadWord(trapDetDiff);
+	str->ReadWord(trapRemDiff);
+	str->ReadWord(trapped);
+	str->ReadWord(trapDetected);
+	str->ReadPoint(launchPos);
+	str->ReadRegion(bbox, true);
+	str->ReadDword(itemIndex);
+	str->ReadDword(itemCount);
+	str->ReadResRef(Script);
+
+	str->ReadDword(firstIndex);
+	// the vertex count is only 16 bits, there is a weird flag
+	// after it, which is usually 0, but sometimes set to 1
+	str->ReadWord(vertCount);
+	str->ReadWord(unknown); // trigger range
+	//str->Read(Name, 32); // owner's scriptname
+	str->Seek(32, GEM_CURRENT_POS);
+	str->ReadResRef(keyResRef);
+	str->Seek(4, GEM_CURRENT_POS); // break difficulty
+	str->ReadStrRef(openFail);
+	// 14 reserved dwords
+
+	str->Seek(VerticesOffset + firstIndex * 4, GEM_STREAM_START);
+
+	Container* c = nullptr;
+	if (vertCount == 0) {
+		// piles have no polygons and no bounding box in some areas,
+		// but bg2 gives them this bounding box at first load,
+		// should we specifically check for Type == IE_CONTAINER_PILE?
+		if (bbox.size.IsInvalid()) {
+			bbox.x = pos.x - 7;
+			bbox.y = pos.y - 5;
+			bbox.w = 16;
+			bbox.h = 12;
+		}
+		c = map->AddContainer(containerName, containerType, nullptr);
+		c->BBox = bbox;
+	} else {
+		std::vector<Point> points(vertCount);
+		for (int x = 0; x < vertCount; x++) {
+			str->ReadPoint(points[x]);
+		}
+		auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
+		c = map->AddContainer(containerName, containerType, poly);
+	}
+
+	c->Pos = pos;
+	c->LockDifficulty = lockDiff;
+	c->Flags = containerFlags;
+	c->TrapDetectionDiff = trapDetDiff;
+	c->TrapRemovalDiff = trapRemDiff;
+	c->Trapped = trapped;
+	c->TrapDetected = trapDetected;
+	c->TrapLaunch = launchPos;
+	// reading items into a container
+	str->Seek(ItemsOffset + itemIndex * 0x14, GEM_STREAM_START);
+	while (itemCount--) {
+		// cannot add directly to inventory (ground piles)
+		c->AddItem(core->ReadItem(str));
+	}
+
+	if (containerType == IE_CONTAINER_PILE) Script.Reset();
+
+	if (Script.IsEmpty()) {
+		c->Scripts[0] = nullptr;
+	} else {
+		c->Scripts[0] = new GameScript(Script, c);
+	}
+	c->KeyResRef = keyResRef;
+	if (!openFail) openFail = ieStrRef(-1); // rewrite 0 to -1
+	c->OpenFail = openFail;
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -784,95 +885,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading containers");
 	for (int i = 0; i < ContainersCount; i++) {
-		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
-		ieVariable Name;
-		ieWord Type, LockDiff;
-		ieDword Flags;
-		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
-		Point pos;
-		Point launchPos;
-		ieDword ItemIndex, ItemCount;
-		ResRef KeyResRef;
-		ieStrRef OpenFail;
-
-		str->ReadVariable(Name);
-		str->ReadPoint(pos);
-		str->ReadWord(Type);
-		str->ReadWord(LockDiff);
-		str->ReadDword(Flags);
-		str->ReadWord(TrapDetDiff);
-		str->ReadWord(TrapRemDiff);
-		str->ReadWord(Trapped);
-		str->ReadWord(TrapDetected);
-		str->ReadPoint(launchPos);
-		Region bbox;
-		str->ReadRegion(bbox, true);
-		str->ReadDword(ItemIndex);
-		str->ReadDword(ItemCount);
-		str->ReadResRef( Script );
-		ieDword firstIndex;
-		ieWord vertCount, unknown;
-		str->ReadDword(firstIndex);
-		//the vertex count is only 16 bits, there is a weird flag
-		//after it, which is usually 0, but sometimes set to 1
-		str->ReadWord(vertCount);
-		str->ReadWord(unknown);   //trigger range
-		//str->Read( Name, 32 );     //owner's scriptname
-		str->Seek( 32, GEM_CURRENT_POS);
-		str->ReadResRef( KeyResRef);
-		str->Seek( 4, GEM_CURRENT_POS); //break difficulty
-		str->ReadStrRef(OpenFail);
-		// 14 reserved dwords
-
-		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
-
-		Container* c = nullptr;
-		if (vertCount == 0) {
-			/* piles have no polygons and no bounding box in some areas,
-			 * but bg2 gives them this bounding box at first load,
-			 * should we specifically check for Type==IE_CONTAINER_PILE? */
-			if (bbox.size.IsInvalid()) {
-				bbox.x = pos.x - 7;
-				bbox.y = pos.y - 5;
-				bbox.w = 16;
-				bbox.h = 12;
-			}
-			c = map->AddContainer( Name, Type, nullptr );
-			c->BBox = bbox;
-		} else {
-			std::vector<Point> points(vertCount);
-			for (int x = 0; x < vertCount; x++) {
-				str->ReadPoint(points[x]);
-			}
-			auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
-			c = map->AddContainer( Name, Type, poly );
-		}
-
-		c->Pos = pos;
-		c->LockDifficulty = LockDiff;
-		c->Flags = Flags;
-		c->TrapDetectionDiff = TrapDetDiff;
-		c->TrapRemovalDiff = TrapRemDiff;
-		c->Trapped = Trapped;
-		c->TrapDetected = TrapDetected;
-		c->TrapLaunch = launchPos;
-		//reading items into a container
-		str->Seek( ItemsOffset+( ItemIndex * 0x14 ), GEM_STREAM_START);
-		while(ItemCount--) {
-			//cannot add directly to inventory (ground piles)
-			c->AddItem( core->ReadItem(str));
-		}
-
-		if (Type == IE_CONTAINER_PILE) Script.Reset();
-
-		if (Script.IsEmpty()) {
-			c->Scripts[0] = nullptr;
-		} else {
-			c->Scripts[0] = new GameScript(Script, c);
-		}
-		c->KeyResRef = KeyResRef;
-		if (!OpenFail) OpenFail = ieStrRef(-1); // rewrite 0 to -1
-		c->OpenFail = OpenFail;
+		GetContainer(str, i, map);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading doors");

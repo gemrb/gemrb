@@ -95,6 +95,7 @@ private:
 	int PutMapAmbients(DataStream *stream, const Map *map) const;
 
 	void GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map);
+	void GetContainer(DataStream* str, int idx, Map* map);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };
