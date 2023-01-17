@@ -1333,6 +1333,58 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map)
 	}
 }
 
+bool AREImporter::GetTrap(DataStream* str, int idx, Map* map)
+{
+	str->Seek(TrapOffset + idx * 0x1C, GEM_STREAM_START);
+
+	ResRef trapResRef;
+	ieDword trapEffOffset;
+	ieWord trapSize;
+	ieWord proID;
+	ieByte owner;
+	Point pos;
+	// currently unused:
+	Point point;
+	ieDword ticks;
+	ieByte targetType;
+
+	str->ReadResRef(trapResRef);
+	str->ReadDword(trapEffOffset);
+	str->ReadWord(trapSize);
+	int trapEffectCount = trapSize / 0x108;
+	if (trapEffectCount * 0x108 != trapSize) {
+		Log(ERROR, "AREImporter", "TrapEffectSize in game: {} != {}. Clearing it", trapSize, trapEffectCount * 0x108);
+		return false;
+	}
+	str->ReadWord(proID);
+	str->ReadDword(ticks);  // actually, delaycount/repetitioncount
+	str->ReadPoint(point);
+	str->Seek(2, GEM_CURRENT_POS); // unknown/unused 'Z'
+	str->Read(&targetType, 1); // according to dev info, this is 'targettype'; "Enemy-ally targeting" on IESDP
+	str->Read(&owner, 1); // party member index that created this projectile (0-5)
+	// The projectile is always created, the worst that can happen
+	// is a dummy projectile
+	// The projectile ID is 214 for TRAPSNAR
+	// It is off by one compared to projectl.ids, but the same as missile.ids
+	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(proID - 1);
+
+	EffectQueue fxqueue = EffectQueue();
+	DataStream* fs = new SlicedStream(str, trapEffOffset, trapSize);
+	ReadEffects(fs, &fxqueue, trapEffectCount);
+	const Actor* caster = core->GetGame()->FindPC(owner + 1);
+	pro->SetEffects(std::move(fxqueue));
+	if (caster) {
+		// Since the level info isn't stored, we assume it's the same as if the trap was just placed.
+		// It matters for the normal thief traps (they scale with level 4 times), while the rest don't scale.
+		// To be more flexible and better handle disabled dualclasses, we don't hardcode it to the thief level.
+		// Perhaps simplify and store the level in Z? Would need a check in the original (don't break saves).
+		ieDword level = caster->GetThiefLevel();
+		pro->SetCaster(caster->GetGlobalID(), level ? level : caster->GetXPLevel(false));
+	}
+	map->AddProjectile(pro, pos, pos);
+	return true;
+}
+
 Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
@@ -1505,53 +1557,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	//this is a ToB feature (saves the unexploded projectiles)
 	Log(DEBUG, "AREImporter", "Loading traps");
 	for (ieDword i = 0; i < TrapCount; i++) {
-		ResRef TrapResRef;
-		ieDword TrapEffOffset;
-		ieWord TrapSize, ProID;
-		Point pos;
-		Point point;
-		ieDword Ticks;
-		ieByte TargetType;
-		ieByte Owner;
-
-		str->Seek( TrapOffset + ( i * 0x1c ), GEM_STREAM_START );
-
-		str->ReadResRef( TrapResRef );
-		str->ReadDword(TrapEffOffset);
-		str->ReadWord(TrapSize);
-		str->ReadWord(ProID);
-		str->ReadDword(Ticks);  //actually, delaycount/repetitioncount
-		str->ReadPoint(point);
-		str->Seek(2, GEM_CURRENT_POS); // unknown/unused 'Z'
-		str->Read(&TargetType, 1); //according to dev info, this is 'targettype'; "Enemy-ally targeting" on IESDP
-		str->Read(&Owner, 1); // party member index that created this projectile (0-5)
-		int TrapEffectCount = TrapSize/0x108;
-		if(TrapEffectCount*0x108!=TrapSize) {
-			Log(ERROR, "AREImporter", "TrapEffectSize in game: {} != {}. Clearing it",
-				TrapSize, TrapEffectCount*0x108);
-				continue;
-		}
-		//The projectile is always created, the worst that can happen
-		//is a dummy projectile
-		//The projectile ID is 214 for TRAPSNAR
-		//It is off by one compared to projectl.ids, but the same as missile.ids
-		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ProID-1);
-
-		EffectQueue fxqueue = EffectQueue();
-		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
-
-		ReadEffects(fs, &fxqueue, TrapEffectCount);
-		const Actor *caster = core->GetGame()->FindPC(Owner + 1);
-		pro->SetEffects(std::move(fxqueue));
-		if (caster) {
-			// Since the level info isn't stored, we assume it's the same as if the trap was just placed.
-			// It matters for the normal thief traps (they scale with level 4 times), while the rest don't scale.
-			// To be more flexible and better handle disabled dualclasses, we don't hardcode it to the thief level.
-			// Perhaps simplify and store the level in Z? Would need a check in the original (don't break saves).
-			ieDword level = caster->GetThiefLevel();
-			pro->SetCaster(caster->GetGlobalID(), level ? level : caster->GetXPLevel(false));
-		}
-		map->AddProjectile(pro, pos, pos);
+		if (!GetTrap(str, i, map)) continue;
 	}
 
 	Log(DEBUG, "AREImporter", "Loading tiles");

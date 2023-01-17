@@ -107,6 +107,7 @@ private:
 	void GetAreaAnimation(DataStream* str, Map* map);
 	void GetAmbient(DataStream* str, std::vector<Ambient*>& ambients);
 	void GetAutomapNotes(DataStream* str, Map* map);
+	bool GetTrap(DataStream* str, int idx, Map* map);
 
 	static Ambient* SetupMainAmbients(const Map::MainAmbients& mainAmbients);
 };
