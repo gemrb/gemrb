@@ -982,18 +982,8 @@ void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map) const
 
 	ieVariable spName;
 	Point pos;
-	ieWord difficulty;
 	ieWord spawningFrequency;
-	ieWord spawningMethod;
-	ieWord maximumSpawns;
-	ieWord spEnabled;
-	ieWord randWalkDist;
-	ieWord otherWalkDist;
-	ieWord dayChance;
-	ieWord nightChance;
 	ieWord creatureCount;
-	ieDword spSchedule;
-	ieDword spDuration;
 	std::vector<ResRef> creatures(MAX_RESCOUNT);
 
 	str->ReadVariable(spName);
@@ -1004,37 +994,26 @@ void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map) const
 	str->ReadWord(creatureCount);
 	assert(creatureCount <= MAX_RESCOUNT);
 	creatures.resize(creatureCount);
-	str->ReadWord(difficulty);
-	str->ReadWord(spawningFrequency);
-	str->ReadWord(spawningMethod);
-	str->ReadDword(spDuration); // time to live for spawns
-	str->ReadWord(randWalkDist); // random walk distance (0 is unlimited), hunting range
-	str->ReadWord(otherWalkDist); // other walk distance (inactive in all engines?), follow range
-	str->ReadWord(maximumSpawns);
-	str->ReadWord(spEnabled);
-	str->ReadDword(spSchedule);
-	str->ReadWord(dayChance);
-	str->ReadWord(nightChance);
-	// 14 reserved dwords
-
 	Spawn* sp = map->AddSpawn(spName, pos, std::move(creatures));
-	sp->Difficulty = difficulty;
+
+	str->ReadWord(sp->Difficulty);
+	str->ReadWord(spawningFrequency);
 	// this value is used in a division, better make it nonzero now
 	// this will fix any old gemrb saves vs. the original engine
 	if (!spawningFrequency) {
 		spawningFrequency = 1;
 	}
 	sp->Frequency = spawningFrequency;
-	sp->Method = spawningMethod;
-	sp->sduration = spDuration;
-	sp->rwdist = randWalkDist;
-	sp->owdist = otherWalkDist;
-	sp->Maximum = maximumSpawns;
-	sp->Enabled = spEnabled;
-	sp->appearance = spSchedule;
-	sp->DayChance = dayChance;
-	sp->NightChance = nightChance;
-	// the rest is not read, we seek for every record
+	str->ReadWord(sp->Method);
+	str->ReadDword(sp->sduration); // time to live for spawns
+	str->ReadWord(sp->rwdist); // random walk distance (0 is unlimited), hunting range
+	str->ReadWord(sp->owdist); // other walk distance (inactive in all engines?), follow range
+	str->ReadWord(sp->Maximum);
+	str->ReadWord(sp->Enabled);
+	str->ReadDword(sp->appearance);
+	str->ReadWord(sp->DayChance);
+	str->ReadWord(sp->NightChance);
+	// 14 reserved dwords
 }
 
 bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map) const
