@@ -533,7 +533,7 @@ void AREImporter::GetRestHeader(DataStream* str, Map* map) const
 	// 14 reserved dwords
 }
 
-void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map) const
+void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 {
 	str->Seek(InfoPointsOffset + idx * 0xC4, GEM_STREAM_START);
 
@@ -628,7 +628,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map) 
 			bbox.h = 12;
 		}
 
-		ip = tm->AddInfoPoint(ipName, ipType, nullptr);
+		ip = map->TMap->AddInfoPoint(ipName, ipType, nullptr);
 		ip->BBox = bbox;
 	} else if (vertexCount == 2) {
 #define MSG "Encountered a bogus polygon with 2 vertices!"
@@ -645,7 +645,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map) 
 			str->ReadPoint(points[x]);
 		}
 		auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
-		ip = tm->AddInfoPoint(ipName, ipType, poly);
+		ip = map->TMap->AddInfoPoint(ipName, ipType, poly);
 	}
 
 	ip->TrapDetectionDiff = trapDetDiff;
@@ -789,7 +789,7 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 	c->OpenFail = openFail;
 }
 
-void AREImporter::GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm) const
+void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileMapMgr> tmm) const
 {
 	str->Seek(DoorsOffset + idx * 0xC8, GEM_STREAM_START);
 
@@ -908,7 +908,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, Plugi
 	auto openPolys = tmm->OpenDoorPolygons();
 
 	DoorTrigger dt(open, std::move(openPolys), closed, std::move(closedPolys));
-	Door* door = tm->AddDoor(shortName, longName, doorFlags, baseClosed, std::move(indices), std::move(dt));
+	Door* door = map->TMap->AddDoor(shortName, longName, doorFlags, baseClosed, std::move(indices), std::move(dt));
 	door->OpenBBox = openedBBox;
 	door->ClosedBBox = closedBBox;
 
@@ -1509,7 +1509,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	core->LoadProgress(70);
 	//Loading InfoPoints
 	for (int i = 0; i < InfoPointsCount; i++) {
-		GetInfoPoint(str, i, tm, map);
+		GetInfoPoint(str, i, map);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading containers");
@@ -1519,7 +1519,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading doors");
 	for (ieDword i = 0; i < DoorsCount; i++) {
-		GetDoor(str, i, tm, map, tmm);
+		GetDoor(str, i, map, tmm);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading spawnpoints");
@@ -1602,7 +1602,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading wallgroups");
 	map->SetWallGroups(tmm->GetWallGroups());
-	//setting up doors
+	// setting up doors - doing it here instead when reading doors, so actors can be bumped if needed
 	for (ieDword i = 0; i < DoorsCount; i++) {
 		Door *door = tm->GetDoor(i);
 		door->SetDoorOpen(door->IsOpen(), false, 0);

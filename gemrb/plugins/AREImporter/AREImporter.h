@@ -99,9 +99,9 @@ private:
 
 	void GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& ambients) const;
 	void GetRestHeader(DataStream* str, Map* map) const;
-	void GetInfoPoint(DataStream* str, int idx, TileMap* tm, Map* map) const;
+	void GetInfoPoint(DataStream* str, int idx, Map* map) const;
 	void GetContainer(DataStream* str, int idx, Map* map);
-	void GetDoor(DataStream* str, int idx, TileMap* tm, Map* map, PluginHolder<TileMapMgr> tmm) const;
+	void GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileMapMgr> tmm) const;
 	void GetSpawnPoint(DataStream* str, int idx, Map* map) const;
 	bool GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map) const;
 	void GetAreaAnimation(DataStream* str, Map* map) const;
