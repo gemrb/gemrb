@@ -1241,8 +1241,7 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 			str->ReadWord(color);
 			// dword: ID in bg2
 			str->Seek(40, GEM_CURRENT_POS);
-			// FIXME: do any other games have read only notes?
-			// BG2 allows editing the builtin notes, PST does not, what about others?
+			// BG2 allows editing the builtin notes, PST does not, iwd1 and bg1 have no notes and iwd2 only user notes
 			map->AddMapNote(point, color, strref, false);
 		}
 		return;
