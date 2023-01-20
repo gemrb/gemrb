@@ -8,6 +8,8 @@ THEN
 		MoveViewPoint([533.359],6)
 		Wait(4)
 		ScreenShake([10.10],30)
+		CreateVisualEffect("firescis",[533.359])
+		Wait(1)
 		TriggerActivation("Caveentrance",TRUE)
 		OpenDoor("swirldoor")
 		AmbientActivate("swirl",FALSE)
