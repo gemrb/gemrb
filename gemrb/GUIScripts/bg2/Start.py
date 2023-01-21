@@ -48,6 +48,29 @@ def RunStart2(isTOB):
 	theme = MusicTable.GetValue ("33", "RESOURCE")
 	GemRB.LoadMusicPL (theme, 1)
 
+# TODO: mimic RunStart2 and plug back into Start2 at the end
+def RunStartEE():
+	StartWindow = GemRB.LoadWindow (11, "START")
+	Label = StartWindow.CreateLabel (0x0fff0000, 0, 0, 1024, 30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
+	Label.SetText (GemRB.Version)
+
+	MusicTable = GemRB.LoadTable("songlist")
+	theme = MusicTable.GetValue("33", "RESOURCE")
+	GemRB.LoadMusicPL(theme, 1)
+
+	GemRB.SetToken ("SaveDir", "save")
+
+	tobButton = StartWindow.GetControl (2)
+	tobButton.OnPress (LoadSingleEE)
+	ExitButton = StartWindow.GetControl (4)
+	ExitButton.SetText (13731)
+	ExitButton.OnPress (lambda: GemRB.Quit())
+	ExitButton.MakeEscape ()
+
+def LoadSingleEE():
+	GemRB.SetVar ("PlayMode", 2)
+	GemRB.SetMasterScript ("BALDUR25", "WORLDM25")
+	GemRB.SetNextScript ("GUILOAD")
 
 def OnLoad():
 	global skip_videos
@@ -57,17 +80,27 @@ def OnLoad():
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos and not GemRB.GetVar ("SeenIntroVideos"):
-		GemRB.PlayMovie ("BISLOGO", 1)
-		GemRB.PlayMovie ("BWDRAGON", 1)
-		GemRB.PlayMovie ("WOTC", 1)
+		if GameCheck.IsBG2EE ():
+			GemRB.PlayMovie ("logo", 1)
+			GemRB.PlayMovie ("intro", 1)
+		else:
+			GemRB.PlayMovie ("BISLOGO", 1)
+			GemRB.PlayMovie ("BWDRAGON", 1)
+			GemRB.PlayMovie ("WOTC", 1)
 		# don't replay the intros on subsequent reentries
 		GemRB.SetVar ("SeenIntroVideos", 1)
 
-	#if not detected tob, we go right to the main menu
+	# if not detected ToB, we go right to the main SoA menu
 	if not GameCheck.HasTOB():
 		RunStart2(False)
 		return
 
+	# if EE, show the SoA / ToB / BP2 menu
+	if GameCheck.IsBG2EE ():
+		RunStartEE()
+		return
+
+	# SoA / ToB choice
 	StartWindow = GemRB.LoadWindow(7, "START")
 	Label = StartWindow.CreateLabel(0x0fff0000, 0,0,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText(GemRB.Version)

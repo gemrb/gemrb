@@ -38,7 +38,7 @@ def StartLoadScreen ():
 	Middle = LoadScreen.GetControl (3)
 	Progress = GemRB.GetVar ("Progress")
 
-	if not GameCheck.IsBG2Demo():
+	if not GameCheck.IsBG2Demo () and not GameCheck.IsBG2EE ():
 		LoadPic = GemRB.GetGameString (STR_LOADMOS)
 		if LoadPic == "":
 			#the addition of 1 is not an error, bg2 loadpic resrefs are GTRSK002-GTRSK006

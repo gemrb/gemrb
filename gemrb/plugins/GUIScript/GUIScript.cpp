@@ -13522,9 +13522,12 @@ bool GUIScript::Init(void)
 	}
 
 	// use the iwd guiscripts for how, but leave its override
+	// same for bg2 vs bg2ee and bg1ee, while iwdee might need a different approach
 	char path2[_MAX_PATH];
 	if (core->config.GameType == "how") {
 		PathJoin(path2, path, "iwd", nullptr);
+	} else if (core->config.GameType == "bg2ee") {
+		PathJoin(path2, path, "bg2", nullptr);
 	} else {
 		PathJoin(path2, path, core->config.GameType.c_str(), nullptr);
 	}
