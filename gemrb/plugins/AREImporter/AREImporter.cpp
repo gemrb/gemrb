@@ -949,21 +949,17 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	// Leave the default sound untouched
 	if (!openResRef.IsEmpty()) {
 		door->OpenSound = openResRef;
+	} else if (doorFlags & DOOR_SECRET) {
+		door->OpenSound = gamedata->defaultSounds[DEF_HOPEN];
 	} else {
-		if (doorFlags & DOOR_SECRET) {
-			door->OpenSound = gamedata->defaultSounds[DEF_HOPEN];
-		} else {
-			door->OpenSound = gamedata->defaultSounds[DEF_OPEN];
-		}
+		door->OpenSound = gamedata->defaultSounds[DEF_OPEN];
 	}
 	if (!closeResRef.IsEmpty()) {
 		door->CloseSound = closeResRef;
+	} else if (doorFlags & DOOR_SECRET) {
+		door->CloseSound = gamedata->defaultSounds[DEF_HCLOSE];
 	} else {
-		if (doorFlags & DOOR_SECRET) {
-			door->CloseSound = gamedata->defaultSounds[DEF_HCLOSE];
-		} else {
-			door->CloseSound = gamedata->defaultSounds[DEF_CLOSE];
-		}
+		door->CloseSound = gamedata->defaultSounds[DEF_CLOSE];
 	}
 	if (!openStrRef) openStrRef = ieStrRef(-1); // rewrite 0 to -1
 	door->OpenStrRef = openStrRef;
