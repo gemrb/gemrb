@@ -44,8 +44,7 @@ Region Container::DrawingRegion() const
 {
 	Region r(Pos.x, Pos.y, 0, 0);
 	
-	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; ++i) {
-		const Holder<Sprite2D> icon = groundicons[i];
+	for (const auto& icon : groundicons) {
 		if (icon) {
 			Region frame = icon->Frame;
 			frame.x = Pos.x - frame.x;
@@ -61,19 +60,18 @@ void Container::Draw(bool highlight, const Region& vp, Color tint, BlitFlags fla
 {
 	Video* video = core->GetVideoDriver();
 
-	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
-		const Holder<Sprite2D> icon = groundicons[i];
-		if (icon) {
-			if (highlight) {
-				video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
-			} else {
-				const Color trans;
-				PaletteHolder p = icon->GetPalette();
-				Color tmpc = p->col[1];
-				p->CopyColorRange(&trans, &trans + 1, 1);
-				video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
-				p->CopyColorRange(&tmpc, &tmpc + 1, 1);
-			}
+	for (const auto& icon : groundicons) {
+		if (!icon) continue;
+
+		if (highlight) {
+			video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
+		} else {
+			const Color trans;
+			PaletteHolder p = icon->GetPalette();
+			Color tmpc = p->col[1];
+			p->CopyColorRange(&trans, &trans + 1, 1);
+			video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
+			p->CopyColorRange(&tmpc, &tmpc + 1, 1);
 		}
 	}
 }
