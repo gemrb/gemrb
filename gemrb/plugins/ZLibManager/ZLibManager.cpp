@@ -80,8 +80,9 @@ int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int s
 			return GEM_ERROR;
 		}
 		if (result == Z_STREAM_END) {
-			if (stream.avail_in > 0)
-				source->Seek( -stream.avail_in, GEM_CURRENT_POS );
+			if (stream.avail_in > 0) {
+				source->Seek((stroff_t) (-(int) (stream.avail_in)), GEM_CURRENT_POS);
+			}
 			result = inflateEnd( &stream );
 			if (result != Z_OK)
 				return GEM_ERROR;
@@ -133,8 +134,9 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 			return GEM_ERROR;
 		}
 		if (result == Z_STREAM_END) {
-			if (stream.avail_in > 0)
-				source->Seek( -stream.avail_in, GEM_CURRENT_POS );
+			if (stream.avail_in > 0) {
+				source->Seek((stroff_t) (-(int) (stream.avail_in)), GEM_CURRENT_POS);
+			}
 			result = deflateEnd( &stream );
 			if (result != Z_OK)
 				return GEM_ERROR;

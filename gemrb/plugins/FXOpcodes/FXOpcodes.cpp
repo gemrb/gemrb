@@ -5609,7 +5609,7 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	core->ApplyEffect(newfx, master, master);
 
 	//remove the maximum hp bonus
-	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
+	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, (ieDword) (-(signed) (fx->Parameter1)), 3, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
 
 	//damage for half of the familiar's hitpoints
