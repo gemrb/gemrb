@@ -1461,38 +1461,38 @@ MAX_LEVEL,MAX_LEVEL,0,0,0,0,0,0//ff
 
 using PostChangeFunctionType = void (*)(Actor *actor, ieDword oldValue, ieDword newValue);
 static const PostChangeFunctionType post_change_functions[MAX_STATS] = {
-pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, pcf_intoxication, //1f
-NULL,NULL,pcf_level_fighter,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
-pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, pcf_xp, pcf_gold, pcf_morale, NULL, //2f
-pcf_reputation,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
-pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level_mage, pcf_level_thief, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
-NULL,NULL,NULL,pcf_minhitpoint, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //5f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //6f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //7f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, pcf_berserk, NULL, //8f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //9f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,pcf_avatarremoval,NULL,NULL, pcf_dbutton, pcf_animid,pcf_state, pcf_extstate, //cf
-pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
-NULL, pcf_alignment, pcf_dbutton, pcf_armorlevel, NULL, NULL, NULL, NULL, //df
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
-pcf_level_barbarian,pcf_level_bard,pcf_level_cleric,pcf_level_druid, pcf_level_monk, pcf_level_paladin, pcf_level_ranger, pcf_level_sorcerer,
-NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
+	pcf_hitpoint, pcf_maxhitpoint, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, //0f
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, pcf_intoxication, //1f
+	nullptr, nullptr, pcf_level_fighter, nullptr, pcf_stat_str, nullptr, pcf_stat_int, pcf_stat_wis,
+	pcf_stat_dex, pcf_stat_con, pcf_stat_cha, nullptr, pcf_xp, pcf_gold, pcf_morale, nullptr, //2f
+	pcf_reputation, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, pcf_entangle, pcf_sanctuary, //3f
+	pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level_mage, pcf_level_thief, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, //4f
+	nullptr, nullptr, nullptr, pcf_minhitpoint, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, //5f
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, //6f
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, //7f
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, pcf_berserk, nullptr, //8f
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, //9f
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, //af
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, //bf
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	nullptr, pcf_avatarremoval, nullptr, nullptr, pcf_dbutton, pcf_animid, pcf_state, pcf_extstate, //cf
+	pcf_color, pcf_color, pcf_color, pcf_color, pcf_color, pcf_color, pcf_color, nullptr,
+	nullptr, pcf_alignment, pcf_dbutton, pcf_armorlevel, nullptr, nullptr, nullptr, nullptr, //df
+	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+	pcf_class, nullptr, pcf_ea, nullptr, nullptr, nullptr, nullptr, nullptr, //ef
+	pcf_level_barbarian, pcf_level_bard, pcf_level_cleric, pcf_level_druid, pcf_level_monk, pcf_level_paladin, pcf_level_ranger, pcf_level_sorcerer,
+	nullptr, nullptr, nullptr, nullptr, pcf_morale, pcf_bounce, nullptr, nullptr //ff
 };
 
 /** call this from ~Interface() */
