@@ -184,7 +184,6 @@ static int QslotTranslation = false;
 static int DeathOnZeroStat = true;
 static int IWDSound = false;
 static ieDword TranslucentShadows = 0;
-static size_t ProjectileSize = 0; //the size of the projectile immunity bitfield (dwords)
 static unsigned int SpellStatesSize = 0; //and this is for the spellStates bitfield
 
 static const char iwd2gemrb[32] = {
@@ -354,15 +353,9 @@ Actor::Actor()
 
 		TranslucentShadows = 0;
 		core->GetDictionary()->Lookup("Translucent Shadows", TranslucentShadows);
-		//get the needed size to store projectile immunity bitflags in Dwords
-		ProjectileSize = (core->GetProjectileServer()->GetHighestProjectileNumber() + 31) / 32;
-		//allowing 1024 bits (1024 projectiles ought to be enough for everybody)
-		//the rest of the projectiles would still work, but couldn't be resisted
-		if (ProjectileSize>32) {
-			ProjectileSize=32;
-		}
 	}
-	projectileImmunity = (ieDword *) calloc(ProjectileSize,sizeof(ieDword));
+	static size_t maxProjectileCount = core->GetProjectileServer()->GetHighestProjectileNumber();
+	projectileImmunity.resize(maxProjectileCount);
 
 	//these are used only in iwd2 so we have to default them
 	for (int i = 0; i < 7; i++) {
@@ -388,7 +381,6 @@ Actor::~Actor(void)
 	delete attackProjectile;
 	delete polymorphCache;
 
-	free(projectileImmunity);
 	free(spellStates);
 }
 
@@ -2644,7 +2636,7 @@ Actor::stats_t Actor::ResetStats(bool init)
 	}
 	spellbook.ClearBonus();
 	BardSong.Reset();
-	memset(projectileImmunity,0,ProjectileSize*sizeof(ieDword));
+	projectileImmunity.clear();
 
 	if (PCStats) {
 		PCStats->States = PCStatsStruct::StateArray();
@@ -9793,16 +9785,16 @@ bool Actor::HasFeat(unsigned int featindex) const
 
 ieDword Actor::ImmuneToProjectile(ieDword projectile) const
 {
-	size_t idx = projectile / 32;
-	if (idx > ProjectileSize) {
+	if (projectile >= projectileImmunity.size()) {
 		return 0;
 	}
-	return projectileImmunity[idx]&(1<<(projectile&31));
+	return projectileImmunity[projectile];
 }
 
-void Actor::AddProjectileImmunity(ieDword projectile) const
+void Actor::AddProjectileImmunity(ieDword projectile)
 {
-	projectileImmunity[projectile/32]|=1<<(projectile&31);
+	std::vector<bool>::reference proBit = projectileImmunity[projectile];
+	proBit = true;
 }
 
 //2nd edition rules

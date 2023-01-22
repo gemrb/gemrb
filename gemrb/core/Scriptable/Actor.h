@@ -417,7 +417,7 @@ public:
 	
 	vvcDict vfxDict;
 	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
-	ieDword* projectileImmunity = nullptr; // classic bitfield
+	std::vector<bool> projectileImmunity; // classic bitfield
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime = 0;           // these are timers for attack rounds
 	ieDword panicMode = PANIC_NONE;  // runaway, berserk or randomwalk
@@ -917,7 +917,7 @@ public:
 	/* Reports projectile immunity, nonzero if immune */
 	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */
-	void AddProjectileImmunity(ieDword projectile) const;
+	void AddProjectileImmunity(ieDword projectile);
 	/* Apply feats */
 	void ApplyFeats();
 	/* reapply modal feat spells */
