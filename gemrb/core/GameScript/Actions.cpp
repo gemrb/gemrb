@@ -4480,6 +4480,18 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		return;
 	}
 
+	// determine slot to steal from and potentially adjust difficulty
+	int slot = -1;
+	if ((RandomNumValue & 3) || scr->GetStat(IE_GOLD) <= 0) {
+		slot = scr->inventory.FindStealableItem();
+	}
+	int checkDC = 50;
+	AutoTable slotStealDC = gamedata->LoadTable("sltsteal", true);
+	if (slotStealDC && slot != -1) {
+		int realSlot = core->QuerySlot(slot);
+		checkDC = slotStealDC->QueryFieldSigned<int>(realSlot, 0);
+	}
+
 	int skill = snd->GetStat(IE_PICKPOCKET);
 	int tgt = scr->GetStat(IE_PICKPOCKET);
 	int check;
@@ -4504,7 +4516,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 			skill = 0;
 		}
 		//and change this 50 to 0.
-		check = skill < 50;
+		check = skill < checkDC;
 	}
 	if (check) {
 		//noticed attempt
@@ -4524,15 +4536,12 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	int ret = MIC_NOITEM;
-	if ((RandomNumValue&3) || (scr->GetStat(IE_GOLD)<=0) ) {
-		int slot = scr->inventory.FindStealableItem();
-		if (slot != -1) {
-			CREItem *item = scr->inventory.RemoveItem(slot);
-			ret = snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
-			if (ret!=ASI_SUCCESS) {
-				map->AddItemToLocation(snd->Pos, item);
-				ret = MIC_FULL;
-			}
+	if (slot != -1) {
+		CREItem* item = scr->inventory.RemoveItem(slot);
+		ret = snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
+		if (ret != ASI_SUCCESS) {
+			map->AddItemToLocation(snd->Pos, item);
+			ret = MIC_FULL;
 		}
 	}
 
