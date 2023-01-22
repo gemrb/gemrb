@@ -68,7 +68,7 @@ public:
 	Inventory inventory;
 	ieStrRef OpenFail = ieStrRef::INVALID;
 	//these are not saved
-	std::array<Holder<Sprite2D>, 3> groundicons;
+	std::array<Holder<Sprite2D>, MAX_GROUND_ICON_DRAWN> groundicons;
 	//keyresref is stored in Highlightable
 };
 
