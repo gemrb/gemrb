@@ -901,10 +901,24 @@ static void pcf_reputation(Actor *actor, ieDword oldValue, ieDword newValue)
 	static ieDword reputationFallCutOff = 10 * gamedata->GetMiscRule("REPUTATION_FALL_CUT_OFF");
 	if (oldValue == newValue) return;
 	if (actor->InParty && newValue <= reputationFallCutOff) {
+		int match = 0;
 		if (actor->GetRangerLevel()) {
-			GameScript::RemoveRangerHood(actor, NULL);
+			match = 1;
 		} else if (actor->GetPaladinLevel()) {
-			GameScript::RemovePaladinHood(actor, NULL);
+			match = 2;
+		}
+		if (match == 0) return;
+
+		// check if there is an exception for this kit
+		AutoTable tm = gamedata->LoadTable("fallen", true);
+		if (tm) {
+			ieDword kit = actor->GetStat(IE_KIT);
+			if (tm->QueryFieldSigned<int>(actor->GetKitName(kit), "FALLEN") == 0) return;
+		}
+		if (match == 1) {
+			GameScript::RemoveRangerHood(actor, nullptr);
+		} else {
+			GameScript::RemovePaladinHood(actor, nullptr);
 		}
 	}
 	UpdateHappiness(actor);
