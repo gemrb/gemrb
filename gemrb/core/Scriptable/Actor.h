@@ -254,7 +254,7 @@ struct WildSurgeSpellMods {
 	int saving_throw_mod;
 };
 
-using ActionButtonRow = ieByte[GUIBT_COUNT];
+using ActionButtonRow = std::array<ieByte, GUIBT_COUNT>;
 struct ActionButtonRow2 {
 	ActionButtonRow buttons;
 	ieByte clss;

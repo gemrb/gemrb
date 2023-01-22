@@ -67,7 +67,6 @@ const ieDword ref_lightness = 43;
 
 static int sharexp = SX_DIVIDE|SX_COMBAT;
 static int classcount = -1;
-static int extraslots = -1;
 static std::vector<int> turnLevelOffset;
 static std::vector<int> bookTypes;
 static std::vector<int> xpCap;
@@ -175,8 +174,8 @@ static ieByte featmax[MAX_FEATS]={0
 #define CLASS_INNOCENT 155
 #define CLASS_FLAMINGFIST 156
 
-static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
-static ActionButtonRow2 *OtherGUIButtons = NULL;
+static std::vector<ActionButtonRow> GUIBTDefaults; // qslots per-class rows
+static std::vector<ActionButtonRow2> OtherGUIButtons;
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 	ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3, ACT_CAST, ACT_USE, ACT_QSLOT1, ACT_QSLOT2,
 	ACT_QSLOT3, ACT_INNATE};
@@ -1499,13 +1498,6 @@ void Actor::ReleaseMemory()
 
 		BABClassMap.clear();
 	}
-	if (GUIBTDefaults) {
-		free (GUIBTDefaults);
-		GUIBTDefaults=NULL;
-	}
-	if (OtherGUIButtons) {
-		free (OtherGUIButtons);
-	}
 	classcount = -1;
 }
 
@@ -1785,30 +1777,30 @@ static void InitActorTables()
 	}
 
 	tm = gamedata->LoadTable("qslots");
-	GUIBTDefaults = (ActionButtonRow *) calloc( classcount+1,sizeof(ActionButtonRow) );
+	GUIBTDefaults.resize(classcount + 1);
 
 	//leave room for default row at 0
 	for (int i = 0; i <= classcount; i++) {
-		memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
+		GUIBTDefaults[i] = DefaultButtons;
 		if (tm && i) {
 			for (int j = 0; j < MAX_QSLOTS; j++) {
-				GUIBTDefaults[i][j+3] = tm->QueryFieldUnsigned<ieByte>(i-1,j);
+				GUIBTDefaults[i][j + 3] = tm->QueryFieldUnsigned<ieByte>(i - 1, j);
 			}
 		}
 	}
 
 	tm = gamedata->LoadTable("qslot2", true);
 	if (tm) {
-		extraslots = tm->GetRowCount();
-		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
+		TableMgr::index_t extraSlots = tm->GetRowCount();
+		OtherGUIButtons.resize(extraSlots);;
 
-		for (int i = 0; i < extraslots; i++) {
+		for (TableMgr::index_t i = 0; i < extraSlots; i++) {
 			ieByte cls = 0;
 			valid_unsignednumber(tm->QueryField(i, 0).c_str(), cls);
 			OtherGUIButtons[i].clss = cls;
-			memcpy(OtherGUIButtons[i].buttons, &DefaultButtons, sizeof(ActionButtonRow));
+			OtherGUIButtons[i].buttons = DefaultButtons;
 			for (int j = 0; j < GUIBT_COUNT; j++) {
-				OtherGUIButtons[i].buttons[j] = tm->QueryFieldUnsigned<ieByte>(i,j+1);
+				OtherGUIButtons[i].buttons[j] = tm->QueryFieldUnsigned<ieByte>(i, j + 1);
 			}
 		}
 	}
@@ -8517,8 +8509,7 @@ int Actor::IWD2GemrbQslot (int slotindex) const
 // debug function; only works on pc classes
 void Actor::dumpQSlots() const
 {
-	ActionButtonRow r;
-	memcpy(&r, GUIBTDefaults + GetActiveClass(), sizeof(ActionButtonRow));
+	const ActionButtonRow& r = GUIBTDefaults[GetActiveClass()];
 	std::string buffer, buffer2, buffer3;
 
 	buffer.append("Current  default: ");
@@ -9358,17 +9349,16 @@ void Actor::InitButtons(ieDword cls, bool forced) const
 		return;
 	}
 
-	ActionButtonRow myrow;
+	ActionButtonRow& myrow = DefaultButtons;
 	if (cls >= (ieDword) classcount) {
-		memcpy(&myrow, &DefaultButtons, sizeof(ActionButtonRow));
-		for (int i=0;i<extraslots;i++) {
-			if (cls==OtherGUIButtons[i].clss) {
-				memcpy(&myrow, &OtherGUIButtons[i].buttons, sizeof(ActionButtonRow));
+		for (auto& otherButtons : OtherGUIButtons) {
+			if (cls == otherButtons.clss) {
+				myrow  = otherButtons.buttons;
 				break;
 			}
 		}
 	} else {
-		memcpy(&myrow, GUIBTDefaults+cls, sizeof(ActionButtonRow));
+		myrow = GUIBTDefaults[cls];
 	}
 	SetActionButtonRow(myrow);
 }
