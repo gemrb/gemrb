@@ -5054,7 +5054,7 @@ void Actor::Resurrect(const Point &destPoint)
 		}
 	// not bothering with checking actor->SetDeathVar, since the SetAt nocreate parameter is true
 	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
-		if (!DeathVar.Format(core->GetDeathVarFormat(), scriptName)) {
+		if (!DeathVar.Format(Interface::GetDeathVarFormat(), scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals (on resurrect)!", scriptName, fmt::WideToChar{GetName()});
 		}
 		game->locals->SetAt(DeathVar, 0, true);
@@ -5292,7 +5292,7 @@ void Actor::SetPersistent(int partyslot)
 	if (PCStats->QuickWeaponSlots[0] != 0xffff) return;
 	// ReinitQuickSlots does not take care of weapon slots, so do it manually
 	for (int i = 0; i < 4; i++) {
-		SetupQuickSlot(i + ACT_WEAPON1, inventory.GetWeaponSlot(i), 0);
+		SetupQuickSlot(i + ACT_WEAPON1, Inventory::GetWeaponSlot(i), 0);
 	}
 	// call ReinitQuickSlots here if something needs it
 }
@@ -5372,7 +5372,7 @@ bool Actor::CheckOnDeath()
 
 	} else {
 		IncrementDeathVariable(game->locals, "{}", KillVar);
-		IncrementDeathVariable(game->locals, core->GetDeathVarFormat(), scriptName);
+		IncrementDeathVariable(game->locals, Interface::GetDeathVarFormat(), scriptName);
 	}
 
 	IncrementDeathVariable(game->locals, "{}", IncKillVar);
