@@ -6493,6 +6493,13 @@ bool Actor::GetCombatDetails(int& toHit, bool leftOrRight, int& damageBonus, \
 	if (ReverseToHit) {
 		prof = -prof;
 	}
+	AutoTable classBonus = gamedata->LoadTable("clasthac", true);
+	if (classBonus) { // bonuses are stored negative, so we apply them after the inversion above
+		ieDword kit = Modified[IE_KIT];
+		std::string className = GetClassName(GetActiveClass());
+		prof += classBonus->QueryFieldSigned<int>("BONUS", GetKitName(kit));
+		prof += classBonus->QueryFieldSigned<int>("BONUS", className);
+	}
 	ToHit.SetProficiencyBonus(prof);
 
 	// get the remaining boni
