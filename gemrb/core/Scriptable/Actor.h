@@ -538,8 +538,6 @@ public:
 	Actor(const Actor&) = delete;
 	~Actor() override;
 	Actor& operator=(const Actor&) = delete;
-	/** releases memory */
-	static void ReleaseMemory();
 	/** sets game specific parameter (which stat should determine the fist weapon type */
 	static void SetFistStat(ieDword stat);
 	/** sets game specific default data about action buttons */

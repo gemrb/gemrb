@@ -1486,21 +1486,6 @@ static const PostChangeFunctionType post_change_functions[MAX_STATS] = {
 	nullptr, nullptr, nullptr, nullptr, pcf_morale, pcf_bounce, nullptr, nullptr //ff
 };
 
-/** call this from ~Interface() */
-void Actor::ReleaseMemory()
-{
-	if (classcount>=0) {
-		skillstats.clear();
-		skilldex.clear();
-		skillrac.clear();
-		IWD2HitTable.clear();
-		ModalStates.clear();
-
-		BABClassMap.clear();
-	}
-	classcount = -1;
-}
-
 #define COL_MAIN       0
 #define COL_SPARKS     1
 #define COL_GRADIENT   2

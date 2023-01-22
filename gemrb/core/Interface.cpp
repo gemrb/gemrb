@@ -298,8 +298,6 @@ Interface::~Interface() noexcept
 		delete lists;
 	}
 
-	Actor::ReleaseMemory();
-
 	gamedata->ClearCaches();
 	delete gamedata;
 	gamedata = NULL;
