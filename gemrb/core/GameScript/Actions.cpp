@@ -4464,8 +4464,18 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		return;
 	}
 
+	static bool turnHostile = core->HasFeature(GF_STEAL_IS_ATTACK);
+	static bool reportFailure = core->HasFeedback(FT_MISC);
+	static bool breakInvisibility = true;
+	AutoTable ppBehave = gamedata->LoadTable("ppbehave");
+	if (ppBehave) {
+		turnHostile = ppBehave->QueryFieldSigned<int>("TURN_HOSTILE", "VALUE") == 1;
+		reportFailure &= ppBehave->QueryFieldSigned<int>("REPORT_FAILURE", "VALUE") == 1;
+		breakInvisibility = ppBehave->QueryFieldSigned<int>("BREAK_INVISIBILITY", "VALUE") == 1;
+	}
+
 	if (scr->GetStat(IE_EA)>EA_EVILCUTOFF) {
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_EVIL, GUIColors::WHITE, Sender);
+		if (reportFailure) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_EVIL, GUIColors::WHITE, Sender);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -4498,8 +4508,12 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 	if (check) {
 		//noticed attempt
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_FAIL, GUIColors::WHITE, Sender);
-		if (core->HasFeature(GF_STEAL_IS_ATTACK) ) {
+		if (reportFailure) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_FAIL, GUIColors::WHITE, Sender);
+		if (breakInvisibility) {
+			snd->SetModal(MS_NONE);
+			snd->CureInvisibility();
+		}
+		if (turnHostile) {
 			scr->AttackedBy(snd);
 		} else {
 			//pickpocket failed trigger
@@ -4530,7 +4544,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		if (!money) {
 			//no stuff to steal
-			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_NONE, GUIColors::WHITE, Sender);
+			if (reportFailure) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_NONE, GUIColors::WHITE, Sender);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -4554,7 +4568,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 
 	if (ret == MIC_FULL && snd->InParty) {
 		if (!core->HasFeature(GF_PST_STATE_FLAGS)) snd->VerbalConstant(VB_INVENTORY_FULL);
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_INVFUL, GUIColors::WHITE, Sender);
+		if (reportFailure) displaymsg->DisplayConstantStringName(STR_PICKPOCKET_INVFUL, GUIColors::WHITE, Sender);
 	}
 	Sender->ReleaseCurrentAction();
 }
