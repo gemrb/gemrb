@@ -8727,8 +8727,7 @@ int Actor::GetQuickSlot(int slot) const
 int Actor::SetEquippedQuickSlot(int slot, int header)
 {
 	if (!PCStats) {
-		if (header<0) header=0;
-		inventory.SetEquippedSlot(slot, header);
+		inventory.SetEquippedSlot(ieWordSigned(slot), std::max<ieWord>(0, header));
 		return 0;
 	}
 
@@ -8754,12 +8753,11 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 	assert(slot<MAX_QUICKWEAPONSLOT);
 	if (header==-1) {
 		header = PCStats->QuickWeaponHeaders[slot];
-	}
-	else {
-		PCStats->QuickWeaponHeaders[slot]=header;
+	} else {
+		PCStats->QuickWeaponHeaders[slot] = ieWord(header);
 	}
 	slot = Inventory::GetWeaponQuickSlot(PCStats->QuickWeaponSlots[slot]);
-	if (inventory.SetEquippedSlot(slot, header)) {
+	if (inventory.SetEquippedSlot(ieWordSigned(slot), ieWord(header))) {
 		return 0;
 	}
 	return STR_MAGICWEAPON;
