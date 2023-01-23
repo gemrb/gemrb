@@ -1545,7 +1545,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			// for monsters also try their 2da/ini file sounds
 			if (!attacker->InParty) {
 				ResRef sound;
-				attacker->GetSoundFromFile(sound, 200);
+				attacker->GetSoundFromFile(sound, 200U);
 				core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, attacker->Pos);
 			}
 		}

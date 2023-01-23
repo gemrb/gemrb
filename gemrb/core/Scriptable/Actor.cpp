@@ -4529,7 +4529,7 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 		// monsters with non-standard items, none or something else
 		int stance = GetStance();
 		if (stance == IE_ANI_ATTACK_SLASH || stance == IE_ANI_ATTACK_BACKSLASH || stance == IE_ANI_ATTACK_JAB || stance == IE_ANI_SHOOT) {
-			GetSoundFromFile(sound, 100 + stance);
+			GetSoundFromFile(sound, TableMgr::index_t(100 + stance));
 		}
 	} else {
 		// swing sounds start at column 3 (index 2)
@@ -8246,7 +8246,7 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-bool Actor::GetSoundFromFile(ResRef &Sound, unsigned int index) const
+bool Actor::GetSoundFromFile(ResRef& Sound, TableMgr::index_t index) const
 {
 	// only dying ignores the incapacity to vocalize
 	if (index != VB_DIE) {
@@ -8316,7 +8316,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 
 //Get the monster sound from a global .ini file.
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
-bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
+bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
 {
 	unsigned int animid=BaseStats[IE_ANIMATION_ID];
 	if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {

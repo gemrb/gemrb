@@ -801,8 +801,8 @@ public:
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void GetVerbalConstantSound(ResRef& sound, size_t index) const;
-	bool GetSoundFromFile(ResRef &Sound, unsigned int index) const;
-	bool GetSoundFromINI(ResRef &Sound, unsigned int index) const;
+	bool GetSoundFromFile(ResRef& Sound, TableMgr::index_t index) const;
+	bool GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const;
 	bool GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
