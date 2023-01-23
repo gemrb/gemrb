@@ -858,7 +858,7 @@ public:
 	/* returns the monk wisdom AC adjusted by armor (iwd2) */
 	int GetWisdomAC() const;
 	/* PST specific criticals */
-	int GetCriticalType() const;
+	ieWord GetCriticalType() const;
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
 	/* rememorizes spells, cures fatigue, etc */

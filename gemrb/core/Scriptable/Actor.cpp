@@ -2342,16 +2342,14 @@ int Actor::GetWisdomAC() const
 }
 
 //Returns the personal critical damage type in a binary compatible form (PST)
-int Actor::GetCriticalType() const
+ieWord Actor::GetCriticalType() const
 {
 	AutoTable tm = gamedata->LoadTable("crits", true);
 	if (!tm) return 0;
 	//the ID of this PC (first 2 rows are empty)
 	int row = BaseStats[IE_SPECIFIC];
 	//defaults to 0
-	int ret;
-	valid_signednumber(tm->QueryField(row, 1).c_str(), ret);
-	return ret;
+	return tm->QueryFieldUnsigned<ieWord>(row, 1);
 }
 
 //Plays personal critical damage animation for PST PC's melee attacks
