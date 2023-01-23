@@ -5491,8 +5491,8 @@ void Actor::ReinitQuickSlots() const
 
 	int i=sizeof(PCStats->QSlots);
 	while (i--) {
-		ieWord slot;
-		int which = IWD2GemrbQslot(i);
+		int slot;
+		ieByte which = IWD2GemrbQslot(i);
 
 		switch (which) {
 			case ACT_WEAPON1:
@@ -5525,7 +5525,7 @@ void Actor::ReinitQuickSlots() const
 		// Note: we're now in the QSLOTn case
 		// If slot is empty, reset quickslot to 0xffff/0xffff
 
-		if (inventory.IsSlotEmpty(slot)) {
+		if (inventory.IsSlotEmpty(unsigned(slot))) {
 			SetupQuickSlot(which, 0xffff, 0xffff);
 		} else {
 			ieWord idx;
@@ -5533,7 +5533,7 @@ void Actor::ReinitQuickSlots() const
 			PCStats->GetSlotAndIndex(which, idx, headerIndex);
 			if (idx != slot || headerIndex == 0xffff) {
 				// If slot just became filled, set it to filled
-				SetupQuickSlot(which, slot, 0);
+				SetupQuickSlot(which, ieWord(slot), 0);
 			}
 		}
 	}
@@ -5548,7 +5548,7 @@ void Actor::ReinitQuickSlots() const
 	} else {
 		// disabling quick weapon slots for certain classes
 		for (unsigned int i = 0; i < 2; i++) {
-			ieByte which = ACT_WEAPON3 + i;
+			unsigned int which = ACT_WEAPON3 + i;
 			// Assuming that ACT_WEAPON3 and 4 are always in the first two spots
 			if (PCStats->QSlots[i + 3] != which) {
 				SetupQuickSlot(which, 0xffff, 0xffff);
@@ -8470,12 +8470,12 @@ int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 	return actslot;
 }
 
-int Actor::IWD2GemrbQslot (int slotindex) const
+ieByte Actor::IWD2GemrbQslot(int slotIndex) const
 {
-	ieByte qslot = PCStats->QSlots[slotindex];
+	ieByte qslot = PCStats->QSlots[slotIndex];
 	//the first three buttons are hardcoded in gemrb
 	//don't mess with them
-	if (QslotTranslation && slotindex>2) {
+	if (QslotTranslation && slotIndex > 2) {
 		if (qslot >= 110) { //quick songs
 			qslot = ACT_IWDQSONG + qslot % 10;
 		} else if (qslot >= 90) { // quick abilities

@@ -817,7 +817,7 @@ public:
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs);
 	/* converts the iwd2 qslot index to our internal representation */
-	int IWD2GemrbQslot (int slotindex) const;
+	ieByte IWD2GemrbQslot(int slotindex) const;
 	int Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const;
 	void dumpQSlots() const;
 
