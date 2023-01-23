@@ -65,7 +65,7 @@ extern Gem_Polygon **polygons;
 #define MIC_GOTITEM 1
 
 GEM_EXPORT int GetReaction(const Actor *target, const Scriptable *Sender);
-GEM_EXPORT int GetHappiness(const Scriptable *Sender, int reputation);
+GEM_EXPORT ieWordSigned GetHappiness(const Scriptable* Sender, int reputation);
 int GetHPPercent(const Scriptable *Sender);
 unsigned int StoreCountItems(const ResRef& storeName, const ResRef& itemName);
 bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname);

@@ -49,7 +49,7 @@ namespace GemRB {
 // of morale, since the uses suggest being able to detect panic
 int GameScript::BreakingPoint(Scriptable *Sender, const Trigger */*parameters*/)
 {
-	int value=GetHappiness(Sender, core->GetGame()->Reputation );
+	ieWordSigned value = GetHappiness(Sender, core->GetGame()->Reputation);
 	return value < -300;
 }
 
@@ -106,19 +106,19 @@ int GameScript::ReactionLT(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::Happiness(Scriptable *Sender, const Trigger *parameters)
 {
-	int value=GetHappiness(Sender, core->GetGame()->Reputation );
+	ieWordSigned value = GetHappiness(Sender, core->GetGame()->Reputation);
 	return value == parameters->int0Parameter;
 }
 
 int GameScript::HappinessGT(Scriptable *Sender, const Trigger *parameters)
 {
-	int value=GetHappiness(Sender, core->GetGame()->Reputation );
+	ieWordSigned value = GetHappiness(Sender, core->GetGame()->Reputation);
 	return value > parameters->int0Parameter;
 }
 
 int GameScript::HappinessLT(Scriptable *Sender, const Trigger *parameters)
 {
-	int value=GetHappiness(Sender, core->GetGame()->Reputation );
+	ieWordSigned value = GetHappiness(Sender, core->GetGame()->Reputation);
 	return value < parameters->int0Parameter;
 }
 

@@ -866,7 +866,7 @@ static void UpdateHappiness(Actor *actor) {
 	if (!actor->InParty) return;
 	if (!core->HasFeature(GF_HAPPINESS)) return;
 
-	int newHappiness = GetHappiness(actor, core->GetGame()->Reputation);
+	ieWordSigned newHappiness = GetHappiness(actor, core->GetGame()->Reputation);
 	if (newHappiness == actor->PCStats->Happiness) return;
 
 	actor->PCStats->Happiness = newHappiness;

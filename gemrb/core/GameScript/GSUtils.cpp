@@ -83,7 +83,7 @@ int RandomNumValue;
 #define MAX_CHR_COLUMN 25
 int rmodrep[MAX_REP_COLUMN];
 int rmodchr[MAX_CHR_COLUMN];
-int happiness[3][MAX_REP_COLUMN];
+ieWordSigned happiness[3][MAX_REP_COLUMN];
 Gem_Polygon **polygons;
 
 void InitScriptTables()
@@ -93,7 +93,7 @@ void InitScriptTables()
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
-				happiness[alignment][reputation] = tab->QueryFieldSigned<int>(reputation,alignment);
+				happiness[alignment][reputation] = tab->QueryFieldSigned<ieWordSigned>(reputation, alignment);
 			}
 		}
 	}
@@ -146,7 +146,7 @@ int GetReaction(const Actor *target, const Scriptable *Sender)
 	return reaction;
 }
 
-int GetHappiness(const Scriptable *Sender, int reputation)
+ieWordSigned GetHappiness(const Scriptable* Sender, int reputation)
 {
 	const Actor* ab = Scriptable::As<Actor>(Sender);
 	if (!ab) {
