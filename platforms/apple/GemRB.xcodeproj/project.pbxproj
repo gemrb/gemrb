@@ -100,7 +100,6 @@
 		A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */; };
 		A22E6D6E2694A74D000675E4 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; };
 		A22E6D6F2694A74D000675E4 /* SDL2.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A22E6D702694BEC7000675E4 /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
 		A232B0FE1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
@@ -276,6 +275,13 @@
 		A298DD1614EB4EDE00F59F56 /* SDL12Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */; };
 		A298DD1914EB4EEB00F59F56 /* SDL20Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */; };
 		A298DD1A14EB4EEB00F59F56 /* SDL20Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */; };
+		A29943F6297F2F2100947AA3 /* FogRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A29943F4297F2F2100947AA3 /* FogRenderer.cpp */; };
+		A29943F7297F2F2100947AA3 /* FogRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = A29943F5297F2F2100947AA3 /* FogRenderer.h */; };
+		A29943FF297F2FDB00947AA3 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2994408297F303B00947AA3 /* PVRZImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2994407297F303B00947AA3 /* PVRZImporter.cpp */; };
+		A299440B297F306900947AA3 /* PVRZImporter.so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = A2994403297F2FDB00947AA3 /* PVRZImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A299440C297F315700947AA3 /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
+		A299440D297F315700947AA3 /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
 		A29BF81313A03C2600C812DD /* AREImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86A8139F0A7D0002DC13 /* AREImporter.cpp */; };
 		A29BF85213A0420300C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A29BF85513A0420A00C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -398,7 +404,6 @@
 		A2AAF33A13A14A4500AE8402 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
 		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
-		A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
 		A2B67A6B16B1DFC100577415 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B67A6816B1DF6500577415 /* CoreFoundation.framework */; };
 		A2BC43392822246400BD4D73 /* BlitRGBA.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
 		A2BC433B28224A7B00BD4D73 /* BlitRGBA.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
@@ -988,6 +993,20 @@
 			remoteGlobalIDString = A276B46C13A28A5000D41A8A;
 			remoteInfo = PNGImporter;
 		};
+		A29943FA297F2FDB00947AA3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2E66337139E875400310FC8;
+			remoteInfo = gemrb_core;
+		};
+		A2994409297F305B00947AA3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A29943F8297F2FDB00947AA3;
+			remoteInfo = PVRZImporter;
+		};
 		A2AF8FCC14DDCEBD005CAC5D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -1143,6 +1162,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				A299440B297F306900947AA3 /* PVRZImporter.so in Copy Plugins */,
 				A24C80AC232C9B56004CB41A /* VLCPlayer.so in Copy Plugins */,
 				A2042A7919DB4A6800011F05 /* TTFImporter.so in Copy Plugins */,
 				A272F8FA1762AF0E0048C004 /* PNGImporter.so in Copy Plugins */,
@@ -1456,6 +1476,11 @@
 		A298DD1414EB4EDE00F59F56 /* SDL12Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL12Video.h; sourceTree = "<group>"; };
 		A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL20Video.cpp; sourceTree = "<group>"; };
 		A298DD1814EB4EEB00F59F56 /* SDL20Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL20Video.h; sourceTree = "<group>"; };
+		A29943F4297F2F2100947AA3 /* FogRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FogRenderer.cpp; sourceTree = "<group>"; };
+		A29943F5297F2F2100947AA3 /* FogRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FogRenderer.h; sourceTree = "<group>"; };
+		A2994403297F2FDB00947AA3 /* PVRZImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = PVRZImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2994406297F303B00947AA3 /* PVRZImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PVRZImporter.h; sourceTree = "<group>"; };
+		A2994407297F303B00947AA3 /* PVRZImporter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PVRZImporter.cpp; sourceTree = "<group>"; };
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2A05CE027A47E29000FB625 /* StringConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringConversion.cpp; sourceTree = "<group>"; };
@@ -4254,6 +4279,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A29943FE297F2FDB00947AA3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A29943FF297F2FDB00947AA3 /* libgemrb_core.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A29BF7B013A0380F00C812DD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -4419,6 +4452,7 @@
 				A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */,
 				A29504771609721300BB22AA /* TTFImporter.so */,
 				A2FE2C8116F2316400DDC6C7 /* NullSource.so */,
+				A2994403297F2FDB00947AA3 /* PVRZImporter.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4569,6 +4603,7 @@
 				A27B8744139F0A7D0002DC13 /* PNGImporter */,
 				A27B8749139F0A7D0002DC13 /* PROImporter */,
 				A27B874E139F0A7D0002DC13 /* PSTOpcodes */,
+				A2994404297F303B00947AA3 /* PVRZImporter */,
 				A27979A913ABA4F7009A6FEF /* SAVImporter */,
 				A27B8752139F0A7D0002DC13 /* SDLAudio */,
 				A27B8757139F0A7D0002DC13 /* SDLVideo */,
@@ -5004,6 +5039,15 @@
 			path = ZLibManager;
 			sourceTree = "<group>";
 		};
+		A2994404297F303B00947AA3 /* PVRZImporter */ = {
+			isa = PBXGroup;
+			children = (
+				A2994406297F303B00947AA3 /* PVRZImporter.h */,
+				A2994407297F303B00947AA3 /* PVRZImporter.cpp */,
+			);
+			path = PVRZImporter;
+			sourceTree = "<group>";
+		};
 		A29BF91C13A04B3900C812DD /* Resources-iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -5130,6 +5174,8 @@
 		A2BF9F8C1395FF61006ADC12 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				A29943F4297F2F2100947AA3 /* FogRenderer.cpp */,
+				A29943F5297F2F2100947AA3 /* FogRenderer.h */,
 				A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */,
 				A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */,
 				A2BF9F901395FF61006ADC12 /* Ambient.h */,
@@ -7971,6 +8017,7 @@
 				A2E663E7139E884B00310FC8 /* TileMap.h in Headers */,
 				A232B0FF1A15B6E600E5342E /* GemMarkup.h in Headers */,
 				71BA4BF91D5C177000889EE2 /* PythonErrors.h in Headers */,
+				A29943F7297F2F2100947AA3 /* FogRenderer.h in Headers */,
 				A2E663EB139E884B00310FC8 /* TileOverlay.h in Headers */,
 				A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */,
 				A2E663EE139E884B00310FC8 /* TypeID.h in Headers */,
@@ -8040,6 +8087,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A299440A297F305B00947AA3 /* PBXTargetDependency */,
 				A2042A7819DB4A4E00011F05 /* PBXTargetDependency */,
 				A2E6633C139E876900310FC8 /* PBXTargetDependency */,
 				A2FE2C8316F231CB00DDC6C7 /* PBXTargetDependency */,
@@ -8755,6 +8803,23 @@
 			productReference = A298DD1114EB4E8C00F59F56 /* SDLVideo.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		A29943F8297F2FDB00947AA3 /* PVRZImporter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2994400297F2FDB00947AA3 /* Build configuration list for PBXNativeTarget "PVRZImporter" */;
+			buildPhases = (
+				A29943FB297F2FDB00947AA3 /* Sources */,
+				A29943FE297F2FDB00947AA3 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A29943F9297F2FDB00947AA3 /* PBXTargetDependency */,
+			);
+			name = PVRZImporter;
+			productName = BAMImporter;
+			productReference = A2994403297F2FDB00947AA3 /* PVRZImporter.so */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		A29BF7B113A0380F00C812DD /* BAMImporter */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A29BF7B913A0381D00C812DD /* Build configuration list for PBXNativeTarget "BAMImporter" */;
@@ -8950,6 +9015,7 @@
 				A276B4AE13A28AEE00D41A8A /* ZLibManager */,
 				A2F0505013ABB80B0023B7EB /* SAVImporter */,
 				A2F8708C14AE439000F9CC1F /* ReleasePackage */,
+				A29943F8297F2FDB00947AA3 /* PVRZImporter */,
 			);
 		};
 /* End PBXProject section */
@@ -9450,12 +9516,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A29943FB297F2FDB00947AA3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2994408297F303B00947AA3 /* PVRZImporter.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A29BF7AF13A0380F00C812DD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A22E6D702694BEC7000675E4 /* BAMImporter.cpp in Sources */,
-				A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */,
+				A299440C297F315700947AA3 /* BAMFontManager.cpp in Sources */,
+				A299440D297F315700947AA3 /* BAMImporter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9690,6 +9764,7 @@
 				A2E6639D139E883E00310FC8 /* LRUCache.cpp in Sources */,
 				A2A05D0D27A4826C000FB625 /* Logger.cpp in Sources */,
 				A2E6639F139E883E00310FC8 /* Map.cpp in Sources */,
+				A29943F6297F2F2100947AA3 /* FogRenderer.cpp in Sources */,
 				A2E663A3139E883E00310FC8 /* MoviePlayer.cpp in Sources */,
 				A2E663A7139E883E00310FC8 /* Palette.cpp in Sources */,
 				A2E663A9139E883E00310FC8 /* PalettedImageMgr.cpp in Sources */,
@@ -10006,6 +10081,16 @@
 			isa = PBXTargetDependency;
 			target = A276B46C13A28A5000D41A8A /* PNGImporter */;
 			targetProxy = A295049016097F9D00BB22AA /* PBXContainerItemProxy */;
+		};
+		A29943F9297F2FDB00947AA3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A2E66337139E875400310FC8 /* gemrb_core */;
+			targetProxy = A29943FA297F2FDB00947AA3 /* PBXContainerItemProxy */;
+		};
+		A299440A297F305B00947AA3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A29943F8297F2FDB00947AA3 /* PVRZImporter */;
+			targetProxy = A2994409297F305B00947AA3 /* PBXContainerItemProxy */;
 		};
 		A2AF8FCD14DDCEBD005CAC5D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -11365,6 +11450,34 @@
 			};
 			name = Release;
 		};
+		A2994401297F2FDB00947AA3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A2994402297F2FDB00947AA3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = so;
+				EXECUTABLE_PREFIX = "";
+				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
+				MACH_O_TYPE = mh_bundle;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		A29BF7B313A0380F00C812DD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -12228,6 +12341,15 @@
 			buildConfigurations = (
 				A298DD0F14EB4E8C00F59F56 /* Debug */,
 				A298DD1014EB4E8C00F59F56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2994400297F2FDB00947AA3 /* Build configuration list for PBXNativeTarget "PVRZImporter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2994401297F2FDB00947AA3 /* Debug */,
+				A2994402297F2FDB00947AA3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
