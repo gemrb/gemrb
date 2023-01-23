@@ -104,6 +104,7 @@ strret_t CTlkOverride::GetLength(strpos_t offset)
 			length += SEGMENT_SIZE;
 		}
 	} while (tmp != DataStream::InvalidPos);
+	buffer[SEGMENT_SIZE - 1] = 0;
 	length += strlen(buffer);
 	return length;
 }
