@@ -280,7 +280,7 @@ struct WeaponInfo {
 	unsigned int range = 0;
 	ieDword itemtype = 0;
 	ieDword itemflags = 0;
-	ieDword prof = 0;
+	ieByte prof = 0;
 	bool backstabbing = false;
 	ieDword wflags = 0;
 	int critmulti = 0; // critical hit multiplier (usually 2)

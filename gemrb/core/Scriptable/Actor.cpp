@@ -257,7 +257,7 @@ ResRefMap<std::vector<BABTable>> IWD2HitTable;
 std::map<int, ResRef> BABClassMap; // maps classis (not id!) to the BAB table
 
 std::vector<ModalStatesStruct> ModalStates;
-std::map<int, int> numWeaponSlots;
+std::map<int, ieByte> numWeaponSlots;
 
 //for every game except IWD2 we need to reverse TOHIT
 static int ReverseToHit=true;
@@ -560,7 +560,7 @@ void Actor::SetCircleSize()
 			 * Approximation: pulsating at about 2Hz over a notable radius growth.
 			 * Maybe check this relation for dragons and rats, too.
 			 */
-			oscillationFactor = 1.1f + std::sin(remainingTalkSoundTime * (4 * M_PI) / 1000) * 0.1f;
+			oscillationFactor = 1.1F + float(std::sin(double(remainingTalkSoundTime) * (4 * M_PI) / 1000)) * 0.1F;
 		}
 	} else {
 		switch (Modified[IE_EA]) {
@@ -2023,7 +2023,7 @@ static void InitActorTables()
 				auto it = className2ID.find(cls);
 				int id = 0;
 				if (it != className2ID.end()) id = it->second;
-				numWeaponSlots[id] = std::min(4, tm->QueryFieldSigned<int>(i, 0));
+				numWeaponSlots[id] = std::min<ieByte>(4, tm->QueryFieldUnsigned<ieByte>(i, 0));
 			}
 		}
 	}
@@ -2195,7 +2195,7 @@ static void InitActorTables()
 			} else {
 				avStance = -1;
 			}
-			for (size_t i = 0; i < avPrefix.size(); i++) {
+			for (TableMgr::index_t i = 0; i < avPrefix.size(); i++) {
 				avPrefix[i].avresref = tm->QueryField(i + 1, 0);
 				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
@@ -3565,11 +3565,11 @@ static int CheckInteract(const ieVariable& talker, const ieVariable& target)
 
 	int offset = 0;
 	int x = 0;
-	int ln = strlen(value);
+	int length = int(strlen(value));
 
-	if (ln>1) { // PST
+	if (length > 1) { // PST
 		//we round the length up, so the last * will be also chosen
-		x = core->Roll(1,(ln+1)/2,-1)*2;
+		x = core->Roll(1, (length + 1) / 2, -1) * 2;
 		//convert '1', '2' and '3' to 0x100,0x200,0x300 respectively, all the rest becomes 0
 		//it is no problem if we hit the zero terminator in case of an odd length
 		offset = value[x + 1] - '0';
@@ -3858,9 +3858,9 @@ void Actor::PlayExistenceSounds()
 			return;
 		}
 
-		unsigned int vol = 100;
+		ieDword vol = 100;
 		core->GetDictionary()->Lookup("Volume Ambients", vol);
-		int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
+		int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, ieWord(vol), true, 50); // REFERENCE_DISTANCE
 		if (stream != -1) {
 			tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
 			if (audioLength > 0) {
@@ -4416,10 +4416,10 @@ void Actor::PlayWalkSound()
 {
 	tick_t thisTime = GetMilliseconds();
 	if (thisTime<nextWalk) return;
-	int cnt = anims->GetWalkSoundCount();
-	if (!cnt) return;
+	int chosenWalkSnd = anims->GetWalkSoundCount();
+	if (!chosenWalkSnd) return;
 
-	cnt=core->Roll(1,cnt,-1);
+	chosenWalkSnd = core->Roll(1, chosenWalkSnd, -1);
 	ResRef walkSound = anims->GetWalkSound();
 	ResRef Sound = area->ResolveTerrainSound(walkSound, Pos);
 	if (Sound.IsEmpty()) Sound = walkSound;
@@ -4430,9 +4430,9 @@ void Actor::PlayWalkSound()
 	uint8_t l = Sound.length();
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
 	if (core->HasFeature(GF_SOUNDFOLDERS) && Sound.BeginsWith("FS_")) {
-		suffix = cnt + 0x31;
-	} else if (cnt) {
-		suffix = cnt + 0x60; // 'a'-'g'
+		suffix = char(chosenWalkSnd + 0x31);
+	} else if (chosenWalkSnd) {
+		suffix = char(chosenWalkSnd + 0x60); // 'a'-'g'
 	}
 	if (l < 8 && suffix != 0) {
 		Sound.Format("{:.8}{}", soundBase, suffix);
@@ -4441,7 +4441,7 @@ void Actor::PlayWalkSound()
 	tick_t len = 0;
 	unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
 	core->GetAudioDrv()->Play(Sound, channel, Pos, 0, &len);
-	nextWalk = thisTime + len;
+	nextWalk = ieDword(thisTime + len);
 }
 
 // guesses from audio:               bone  chain studd leather splint none other plate
@@ -4723,7 +4723,7 @@ ieDword Actor::GetXPLevel(int modified) const
 	const stats_t& stats = modified ? Modified : BaseStats;
 
 	size_t clscount = 0;
-	float average = 0;
+	stat_t average = 0;
 	if (iwd2class) {
 		// iwd2
 		return stats[IE_CLASSLEVELSUM];
@@ -4737,15 +4737,14 @@ ieDword Actor::GetXPLevel(int modified) const
 				clscount++;
 				average += levels[1];
 			}
-		}
-		else if (IsMultiClassed()) {
+		} else if (IsMultiClassed()) {
 			//clscount is the number of on bits in the MULTI field
 			clscount = CountBits (multiclass);
 			assert(clscount && clscount <= 3);
 			for (size_t i=1; i<clscount; i++)
 				average += levels[i];
 		} //else single classed
-		average = average / (float) clscount + 0.5;
+		average = stat_t(average / (float) clscount + 0.5);
 	}
 	return ieDword(average);
 }
@@ -4800,7 +4799,7 @@ int Actor::GetWildMod(int level)
 	}
 
 	level = Clamp(level, 1, MAX_LEVEL);
-	static int modRange = wmLevelMods.size();
+	static int modRange = int(wmLevelMods.size());
 	WMLevelMod = wmLevelMods[core->Roll(1, modRange, -1)][level - 1];
 
 	core->GetTokenDictionary()->SetAtAsString("LEVELDIF", abs(WMLevelMod));
@@ -5594,7 +5593,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which) const
 	}
 
 	if (empty)
-		SetupQuickSlot(ACT_WEAPON1 + which, Inventory::GetFistSlot(), 0);
+		SetupQuickSlot(ACT_WEAPON1 + which, ieWord(Inventory::GetFistSlot()), 0);
 }
 
 //if dual stuff needs to be handled on load too, improve this method with it
@@ -7608,7 +7607,7 @@ int Actor::GetFavoredPenalties() const
 
 	std::list<int> classLevels(PCStats->ClassLevels);
 	classLevels.remove_if(is_zero);
-	int classCount = classLevels.size();
+	size_t classCount = classLevels.size();
 	if (classCount == 1) return 0;
 
 	unsigned int race = GetSubRace();
@@ -7636,9 +7635,9 @@ int Actor::GetFavoredPenalties() const
 	} else {
 		// remove() kills all elements with the same value, so we have to jump through hoops
 		classLevels.remove(flevel);
-		int diff = classCount - classLevels.size();
+		size_t diff = classCount - classLevels.size();
 		if (diff == classCount) return 0; // all class were at the same level
-		for (int i=1; i < diff; i++) {
+		for (size_t i = 1; i < diff; i++) {
 			// re-add missing levels (all but one)
 			classLevels.push_back(flevel);
 		}
@@ -8072,7 +8071,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 
 	//explored or visibilitymap (bird animations are visible in fog)
 	//0 means opaque
-	uint8_t trans = std::min<int>(Modified[IE_TRANSLUCENT], 255);
+	uint8_t trans = std::min<uint8_t>(Modified[IE_TRANSLUCENT], 255);
 
 	int State = Modified[IE_STATE_ID];
 
@@ -10296,8 +10295,8 @@ bool Actor::IsBehind(const Actor* target) const
 	orient_t my_orient = GetOrient(target->Pos, Pos);
 
 	signed char diff;
-	for (int i=-2; i <= 2; i++) {
-		diff = my_orient+i;
+	for (int i = -2; i <= 2; i++) {
+		diff = (signed char) (my_orient + i);
 		if (diff >= MAX_ORIENT) diff -= MAX_ORIENT;
 		if (diff <= -1) diff += MAX_ORIENT;
 		if (diff == (signed)tar_orient) return true;
