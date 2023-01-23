@@ -340,7 +340,7 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT5(Region&& region) const {
 
 			auto pixelMask = getBlockPixelMask(region, grid, x, y);
 			uint32_t blockValue = *(reinterpret_cast<const uint32_t*>(&data[srcDataOffset + 12])); // 4x4x2 bit
-			uint64_t alphaBlock = *reinterpret_cast<const uint64_t*>(&data[srcDataOffset + 2]); // 6bit (ignoring the top 2)
+			uint64_t alphaBlock = *reinterpret_cast<const uint64_t*>(&data[srcDataOffset + 2]); // 6 bytes (ignoring the top 2)
 
 			for (uint8_t i = 0; i < 16; ++i) {
 				if ((pixelMask & (1 << i)) == 0) {
@@ -364,7 +364,7 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT5(Region&& region) const {
 					fullColor |= ((colors[0] + colors[3] * 2) / 3);
 				}
 
-				uint8_t alphaValue = alpha[(alphaBlock & (0x7UL << (3 * i))) >> (3 *i)];
+				uint8_t alphaValue = alpha[(alphaBlock & (uint64_t(7) << (3 * i))) >> (3 * i)];
 				fullColor |= alphaValue << 24;
 
 				uint8_t row = i / 4;
