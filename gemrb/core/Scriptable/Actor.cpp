@@ -10286,16 +10286,13 @@ void Actor::ResetState()
 // orientation match with a +/-2 allowed difference
 bool Actor::IsBehind(const Actor* target) const
 {
-	orient_t tar_orient = target->GetOrientation();
+	orient_t tarOrient = target->GetOrientation();
 	// computed, since we don't care where we face
-	orient_t my_orient = GetOrient(target->Pos, Pos);
+	orient_t myOrient = GetOrient(target->Pos, Pos);
 
-	signed char diff;
 	for (int i = -2; i <= 2; i++) {
-		diff = (signed char) (my_orient + i);
-		if (diff >= MAX_ORIENT) diff -= MAX_ORIENT;
-		if (diff <= -1) diff += MAX_ORIENT;
-		if (diff == (signed)tar_orient) return true;
+		orient_t side = NextOrientation(myOrient, i);
+		if (side == tarOrient) return true;
 	}
 	return false;
 }
