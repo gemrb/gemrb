@@ -1725,7 +1725,7 @@ int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 	//golem / outer planar gets hit
 	int chance = 0;
 	switch (race) {
-		case 156: // outsider
+		case 164: // tanari
 			chance = 5;
 			break;
 		case 108: case 115: case 167: //ghoul, skeleton, undead
