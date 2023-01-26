@@ -4083,18 +4083,12 @@ int Interface::GetStrengthBonus(int column, int value, int ex) const
 	if (column<0 || column>3)
 		return -9999;
 
-	if (value<0)
-		value = 0;
-	else if (value>MaximumAbility)
-		value = MaximumAbility;
+	value = Clamp(value, 0, MaximumAbility);
 
 	int bonus = 0;
 	// only 18 (human max) has the differentiating extension
 	if (value == 18 && !HasFeature(GF_3ED_RULES)) {
-		if (ex<0)
-			ex=0;
-		else if (ex>100)
-			ex=100;
+		ex = Clamp(ex, 0, 100);
 		bonus += abilityTables->strmodex[column*101+ex];
 	}
 
