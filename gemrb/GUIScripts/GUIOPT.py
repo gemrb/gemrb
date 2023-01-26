@@ -276,7 +276,7 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptSlider (18042, 18018, HelpTextArea, Window, 2, 22, 17144, 'Mouse Scroll Speed', DisplayHelpMouseScrollingSpeed, 5)
 	GUIOPTControls.OptSlider (18042, 18019, HelpTextArea, Window, 3, 23, 17145, 'Keyboard Scroll Speed', None, 5)
 
-	GUIOPTControls.OptSlider (18042, 18020, HelpTextArea, Window, 12, 24, 13911, 'Difficulty Level', None, 0)
+	GUIOPTControls.OptSlider (18042, 18020, HelpTextArea, Window, 12, 24, 13911, 'Difficulty Level', None)
 	if GemRB.GetVar ("Nightmare Mode") == 1:
 		# lock the slider
 		Slider = Window.GetControl (12)
