@@ -341,7 +341,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 		NavmapPoint nmptCurrent = open.top().point;
 		open.pop();
 		SearchmapPoint smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
-		if (parents[smptCurrent.y * mapSize.w + smptCurrent.x] == Point(0, 0)) {
+		if (parents[smptCurrent.y * mapSize.w + smptCurrent.x].IsZero()) {
 			continue;
 		}
 
