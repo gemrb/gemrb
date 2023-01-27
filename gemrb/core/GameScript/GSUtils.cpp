@@ -122,20 +122,18 @@ void InitScriptTables()
 
 int GetReaction(const Actor *target, const Scriptable *Sender)
 {
-	int chr, rep, reaction;
-
-	chr = target->GetStat(IE_CHR)-1;
+	int rep;
 	if (target->GetStat(IE_EA) == EA_PC) {
 		rep = core->GetGame()->Reputation/10-1;
 	} else {
 		rep = target->GetStat(IE_REPUTATION)/10-1;
 	}
-	if (rep<0) rep = 0;
-	else if (rep>=MAX_REP_COLUMN) rep=MAX_REP_COLUMN-1;
-	if (chr<0) chr = 0;
-	else if (chr>=MAX_CHR_COLUMN) chr=MAX_CHR_COLUMN-1;
+	rep = Clamp(rep, 0, MAX_REP_COLUMN - 1);
 
-	reaction = 10 + rmodrep[rep] + rmodchr[chr];
+	int chr = target->GetStat(IE_CHR) - 1;
+	chr = Clamp(chr, 0, MAX_CHR_COLUMN - 1);
+
+	int reaction = 10 + rmodrep[rep] + rmodchr[chr];
 
 	// add -4 penalty when dealing with racial enemies
 	const Actor* scr = Scriptable::As<Actor>(Sender);
