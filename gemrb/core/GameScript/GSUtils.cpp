@@ -797,7 +797,7 @@ static bool InspectEdges(Point& walkableStartPoint, const Region& vp, int curren
 }
 
 // this complicated search has been reverse-engineered from the original
-static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatureSize, int phase)
+static Point FindOffScreenPoint(const Scriptable* Sender, int flags, int phase)
 {
 	Region vp0 = core->GetGameControl()->Viewport();
 	// go for 640x480, so large viewports are less likely to interfere with scripting
@@ -838,7 +838,8 @@ static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatur
 
 			if (flags & CC_OBJECT) {
 				// Check if walkableStartPoint can traverse to walkableGoal
-				bool isWalkable = map->FindPath(walkableStartPoint, walkableGoal, creatureSize) != nullptr;
+				// finding a full path via Map::FindPath is too expensive, just consider the searchmap
+				bool isWalkable = map->IsWalkableTo(walkableStartPoint, walkableGoal, true, nullptr);
 				if (isWalkable) return walkableStartPoint;
 			} else {
 				// walkableStartPoint is the final point
@@ -894,9 +895,9 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		case CC_OFFSCREEN:
 			// handle also the combo with CC_OBJECT, so we don't have fallthrough problems
 			if (flags & CC_OBJECT && tmp) referer = tmp;
-			pnt = FindOffScreenPoint(referer, flags, ab->circleSize, 0);
+			pnt = FindOffScreenPoint(referer, flags, 0);
 			if (pnt.IsZero()) {
-				pnt = FindOffScreenPoint(referer, flags, ab->circleSize, 1);
+				pnt = FindOffScreenPoint(referer, flags, 1);
 			}
 			break;
 		case CC_OBJECT://use object + offset
@@ -3089,15 +3090,9 @@ void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flag
 
 	Point dest = to->Pos;
 	if (flags & CC_OFFSCREEN) {
-		int minDistance = 2;
-		const Actor* actor2 = Scriptable::As<Actor>(to);
-		if (actor2) {
-			minDistance = actor2->circleSize;
-		}
-
-		dest = FindOffScreenPoint(to, CC_OBJECT, minDistance, 0);
+		dest = FindOffScreenPoint(to, CC_OBJECT, 0);
 		if (dest.IsZero()) {
-			dest = FindOffScreenPoint(to, CC_OBJECT, minDistance, 1);
+			dest = FindOffScreenPoint(to, CC_OBJECT, 1);
 		}
 	}
 
