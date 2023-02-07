@@ -207,6 +207,10 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 			}
 			break;
+#ifdef SDL_DISABLE_CONTROLLER_API
+		default:
+			break;
+#else
 		case SDL_JOYAXISMOTION:
 			{
 				float pct = event.jaxis.value / float(sizeof(Sint16));
@@ -227,6 +231,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
+#endif
 	}
 	return GEM_OK;
 }
