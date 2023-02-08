@@ -558,7 +558,9 @@ bool Window::DispatchEvent(const Event& event)
 			DispatchTouchUp(target, event.touch, event.mod);
 			break;
 		default:
-			assert(false); // others should be handled above
+			// assert(false); // others should be handled above
+			// NO! DO NOTHING!!!!
+			break;
 	}
 	// absorb other screen events i guess
 	return true;
