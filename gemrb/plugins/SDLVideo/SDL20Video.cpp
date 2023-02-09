@@ -132,7 +132,25 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 #endif
 
+
+#ifdef PORTMASTER_RENDER
+	SDL_DisplayMode current;
+
+    int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
+
+	if (should_be_zero != 0) {
+		Log(ERROR, "SDL 2 Driver", "couldnt get resolution: {}", SDL_GetError());
+		return GEM_ERROR;
+	}
+
+	Log(DEBUG, "SDL 2 Driver", "Game Resolution: {}x{}, Screen Resolution: {}x{}",
+		screenSize.w, screenSize.h, current.w, current.h);
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, current.w, current.h, winFlags);
+#else
+
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenSize.w, screenSize.h, winFlags);
+#endif
+
 	if (window == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create window: {}", SDL_GetError());
 		return GEM_ERROR;
@@ -143,6 +161,15 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 #endif
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+
+	// Moved this here to see if it makes a difference.
+
+	// we set logical size so that platforms where the window can be a diffrent size then requested
+	// function properly. eg iPhone and Android the requested size may be 640x480,
+	// but the window will always be the size of the screen
+	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
+	//SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
+
 	SDL_RendererInfo info;
 	SDL_GetRendererInfo(renderer, &info);
 	Log(DEBUG, "SDL20Video", "Renderer: {}", info.name);
@@ -196,12 +223,6 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	}
 #endif
 #endif
-
-	// we set logical size so that platforms where the window can be a diffrent size then requested
-	// function properly. eg iPhone and Android the requested size may be 640x480,
-	// but the window will always be the size of the screen
-	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
-	//SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
 	SDL_StopTextInput(); // for some reason this is enabled from start
 
