@@ -25,6 +25,7 @@
 using namespace GemRB;
 
 #define PORTMASTER_RENDER 1
+#define SDL_DISABLE_JOYSTICK_API_BECAUSE_I_DO_NOT_NEED_IT 1
 
 #ifdef BAKE_ICON
 #include "gemrb-icon.h"
@@ -681,6 +682,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	Event e;
 
 	switch (event.type) {
+#ifndef SDL_DISABLE_JOYSTICK_API_BECAUSE_I_DO_NOT_NEED_IT
 		case SDL_CONTROLLERDEVICEREMOVED:
 			if (gameController != nullptr) {
 				const SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
@@ -716,6 +718,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
+#endif
 		case SDL_FINGERDOWN: // fallthough
 		case SDL_FINGERUP:
 			{
