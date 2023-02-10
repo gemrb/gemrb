@@ -86,6 +86,7 @@ int SDL20VideoDriver::Init()
 {
 	int ret = SDLVideoDriver::Init();
 
+#ifdef USE_SDL_CONTROLLER_API
 	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
 		Log(ERROR, "SDL2", "InitSubSystem failed: {}", SDL_GetError());
 		return ret;
@@ -99,6 +100,7 @@ int SDL20VideoDriver::Init()
 			}
 		}
 	}
+#endif
 
 	return ret;
 }
@@ -696,7 +698,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	Event e;
 
 	switch (event.type) {
-#ifndef SDL_DISABLE_CONTROLLER_API
+#ifdef USE_SDL_CONTROLLER_API
 		case SDL_CONTROLLERDEVICEREMOVED:
 			if (gameController != nullptr) {
 				const SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);

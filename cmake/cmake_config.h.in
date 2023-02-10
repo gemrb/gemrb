@@ -25,6 +25,6 @@
 #cmakedefine HAVE_MMAP ${HAVE_MMAP}
 #cmakedefine SUPPORTS_MEMSTREAM ${SUPPORTS_MEMSTREAM}
 #cmakedefine BAKE_ICON 1
-#cmakedefine SDL_DISABLE_CONTROLLER_API 1
+#cmakedefine USE_SDL_CONTROLLER_API 1
 #cmakedefine SDL_RESOLUTION_INDEPENDANCE 1
 #endif

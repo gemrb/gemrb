@@ -207,7 +207,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 			}
 			break;
-#ifdef SDL_DISABLE_CONTROLLER_API
+#ifndef USE_SDL_CONTROLLER_API
 		default:
 			break;
 #else

@@ -97,7 +97,7 @@ OPTION(USE_FREETYPE "Enable FreeType support" ON)
 OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 
-OPTION(SDL_DISABLE_CONTROLLER_API "Don't use the SDL controller APIs." OFF)
+OPTION(USE_SDL_CONTROLLER_API "Enable SDL controller APIs. (disable if you plan on handling controller input in an external program like gptokeyb)" ON)
 OPTION(SDL_RESOLUTION_INDEPENDANCE "Scale the window to the size of the screen with pixel scaling." OFF)
 
 #VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
@@ -674,7 +674,7 @@ PRINT_OPTION(INSOURCEBUILD)
 PRINT_OPTION(DISABLE_WERROR)
 PRINT_OPTION(WIN32_USE_STDIO)
 PRINT_OPTION(SDL_BACKEND)
-PRINT_OPTION(SDL_RESOLUTION_INDEPENDANCE)
+PRINT_OPTION(USE_SDL_CONTROLLER_API)
 PRINT_OPTION(SDL_DISABLE_CONTROLLER_API)
 PRINT_OPTION(PYTHON_VERSION)
 PRINT_OPTION(OPENGL_BACKEND)
