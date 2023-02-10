@@ -558,8 +558,9 @@ bool Window::DispatchEvent(const Event& event)
 			DispatchTouchUp(target, event.touch, event.mod);
 			break;
 		default:
-			// assert(false); // others should be handled above
-			// NO! DO NOTHING!!!!
+#ifndef SDL_DISABLE_CONTROLLER_API
+			assert(false); // others should be handled above
+#endif
 			break;
 	}
 	// absorb other screen events i guess
