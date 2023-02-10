@@ -71,9 +71,6 @@ for the OPENGL_BACKEND option.
 Note: the Pi4 does not support the legacy/Broadcom GLES drivers, so you'll have to explicitely
 pass -DDISABLE_VIDEOCORE to the 'cmake' build options.
 
-Building for Anbernic RK3326, RK3399, RK3566 based devices requires a few special flags.
-These devices do not currently support the GLSL shaders that GemRB uses it requires the following flags:
--DSDL_BACKEND=SDL2 -DOPENGL_BACKEND=GLES -DUSE_ICONV=OFF -DDISABLE_VIDEOCORE=ON -DUSE_LIBVLC=OFF -DUSE_NO_GLSL="ON" -DSDL_DISABLE_CONTROLLER_API="ON" -DSDL_RESOLUTION_INDEPENDANCE="ON"
 
 Please let us know if you encounter any problems while building.
 

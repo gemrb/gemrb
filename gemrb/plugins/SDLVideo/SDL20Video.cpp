@@ -210,7 +210,6 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&rgbaProgramID));
 	assert(rgbaProgramID > 0);
 
-#ifndef USE_NO_GLSL
 	// Now, replace this program's shader units
 	this->blitRGBAShader =
 		GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/BlitRGBA.glsl", rgbaProgramID);
@@ -218,7 +217,6 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 		Log(ERROR, "SDL 2 GL Driver", "RGBA shader setup failed: {}", GLSLProgram::GetLastError());
 		return GEM_ERROR;
 	}
-#endif
 #endif
 
 	SDL_StopTextInput(); // for some reason this is enabled from start
@@ -242,14 +240,12 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 
 void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
-#ifndef USE_NO_GLSL
 #if USE_OPENGL_BACKEND
 	// we have coopted SDLs shader, so we need to reset uniforms to values appropriate for the render targets
 	blitRGBAShader->SetUniformValue("u_greyMode", 1, 0);
 	blitRGBAShader->SetUniformValue("u_stencil", 1, 0);
 	blitRGBAShader->SetUniformValue("u_dither", 1, 0);
 	blitRGBAShader->SetUniformValue("u_rgba", 1, 1);
-#endif
 #endif
 
 	SDL_SetRenderTarget(renderer, NULL);
@@ -323,7 +319,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const Region& src, const Region& dst, BlitFlags flags, const SDL_Color* tint)
 {
 	BlitFlags version = BlitFlags::NONE;
-#if !USE_OPENGL_BACKEND || USE_NO_GLSL
+#if !USE_OPENGL_BACKEND
 	// we need to isolate flags that require software rendering to use as the "version"
 	version = (BlitFlags::GREY | BlitFlags::SEPIA) & flags;
 #endif
@@ -345,7 +341,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 	SDL_Rect drect = RectFromRegion(drgn);
 	
 	int ret = 0;
-#if USE_OPENGL_BACKEND && !USE_NO_GLSL
+#if USE_OPENGL_BACKEND
 	UpdateRenderTarget();
 	ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 #if SDL_VERSION_ATLEAST(2, 0, 10)
@@ -408,7 +404,7 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
 									   const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* tint)
 {
-#if USE_OPENGL_BACKEND && !USE_NO_GLSL
+#if USE_OPENGL_BACKEND
 #if SDL_VERSION_ATLEAST(2, 0, 10)
 	SDL_RenderFlush(renderer);
 #endif
