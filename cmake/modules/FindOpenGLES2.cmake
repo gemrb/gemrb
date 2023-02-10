@@ -12,25 +12,20 @@ if(NOT HINT_GLES_LIBNAME)
  set(HINT_GLES_LIBNAME GLESv2)
 endif()
 
-# find_path(OPENGLES2_INCLUDE_DIR GLES2/gl2.h
-#     PATHS "${CMAKE_FIND_ROOT_PATH}/usr/include"
-#     HINTS ${HINT_GLES_INCDIR}
-# )
+find_path(OPENGLES2_INCLUDE_DIR GLES2/gl2.h
+    PATHS "${CMAKE_FIND_ROOT_PATH}/usr/include"
+    HINTS ${HINT_GLES_INCDIR}
+)
 
-# find_library(OPENGLES2_gl_LIBRARY
-#     NAMES ${HINT_GLES_LIBNAME}
-#     HINTS ${HINT_GLES_LIBDIR}
-# )
+find_library(OPENGLES2_gl_LIBRARY
+    NAMES ${HINT_GLES_LIBNAME}
+    HINTS ${HINT_GLES_LIBDIR}
+)
 
-# include(FindPackageHandleStandardArgs)
-# find_package_handle_standard_args(OpenGLES2
-#             REQUIRED_VARS OPENGLES2_gl_LIBRARY OPENGLES2_INCLUDE_DIR)
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(OpenGLES2
+            REQUIRED_VARS OPENGLES2_gl_LIBRARY OPENGLES2_INCLUDE_DIR)
 
-
-find_path(OPENGLES2_INCLUDE_DIR GLES2/gl2.h)
-find_library(OPENGLES2_gl_LIBRARY NAMES GLESv2)
-
-set(OPENGLES2_FOUND TRUE)
 
 if(OPENGLES2_FOUND)
     set(OPENGLES2_LIBRARIES ${OPENGLES2_gl_LIBRARY})
