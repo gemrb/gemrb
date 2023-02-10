@@ -97,7 +97,7 @@ OPTION(USE_FREETYPE "Enable FreeType support" ON)
 OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 
-OPTION(SDL_DISABLE_CONTROLLER_API "Don't use the sdl controller apis." OFF)
+OPTION(SDL_DISABLE_CONTROLLER_API "Don't use the SDL controller APIs." OFF)
 OPTION(SDL_RESOLUTION_INDEPENDANCE "Scale the window to the size of the screen with pixel scaling." OFF)
 
 #VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
@@ -393,14 +393,6 @@ IF(NOT OPENGL_BACKEND STREQUAL "None")
 		IF(NOT OPENGLES2_FOUND)
 			MESSAGE(FATAL_ERROR "OpenGLES2 library not found!")
 		ENDIF()
-	ENDIF()
-
-	IF(SDL_DISABLE_CONTROLLER_API)
-		ADD_DEFINITIONS("-DSDL_DISABLE_CONTROLLER_API")
-	ENDIF()
-
-	IF(SDL_RESOLUTION_INDEPENDANCE)
-		ADD_DEFINITIONS("-DSDL_RESOLUTION_INDEPENDANCE")
 	ENDIF()
 ENDIF()
 

@@ -37,7 +37,7 @@ Architectures and platforms that successfully run or ran GemRB:
 * various Macintosh systems (even pre x86)
 * some smart phones (Symbian, Android, other Linux-based, iOS)
 * some consoles (OpenPandora, Dingoo)
-* some exotic OSes (ReactOS, SyllableOS, Haiku, AmigaOS)
+* some exotic OSes (ReactOS, SyllableOS, Haiku, AmigaOS, AmberElec, ArkOS, UnofficialOS)
 
 If you have something to add to the list or if an entry doesn't work any more, do let us know!
 
