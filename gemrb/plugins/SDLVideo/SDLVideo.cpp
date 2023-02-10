@@ -207,10 +207,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 			}
 			break;
-#ifndef USE_SDL_CONTROLLER_API
-		default:
-			break;
-#else
+#ifdef USE_SDL_CONTROLLER_API
 		case SDL_JOYAXISMOTION:
 			{
 				float pct = event.jaxis.value / float(sizeof(Sint16));
