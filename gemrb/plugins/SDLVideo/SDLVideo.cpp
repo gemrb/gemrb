@@ -26,8 +26,6 @@
 
 using namespace GemRB;
 
-#define SDL_DISABLE_JOYSTICK_API_BECAUSE_I_DO_NOT_NEED_IT 1
-
 SDLVideoDriver::~SDLVideoDriver(void)
 {
 	SDL_Quit();
@@ -209,7 +207,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 			}
 			break;
-#ifdef SDL_DISABLE_JOYSTICK_API_BECAUSE_I_DO_NOT_NEED_IT
+#ifdef SDL_DISABLE_CONTROLLER_API
 		default:
 			break;
 #else
