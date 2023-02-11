@@ -327,12 +327,6 @@ private:
 	}
 };
 
-// TODO: fix this hardcoded resource reference
-static const ResRef PortalResRef = "EF03TPR3";
-static unsigned int PortalTime = 15;
-
-static ieDword oldGameTime = 0;
-
 static inline AnimationObjectType SelectObject(const Actor *actor, int q, const AreaAnimation *a, const VEFObject *sca, const Particles *spark, const Projectile *pro, const Container *pile)
 {
 	int actorh;
@@ -637,18 +631,21 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 //PlayOnce makes sure that if we stop drawing them, they will go away
 void Map::DrawPortal(const InfoPoint *ip, int enable)
 {
-	ieDword gotportal = HasVVCCell(PortalResRef, ip->Pos);
+	// TODO: fix this hardcoded resource reference
+	static const ResRef portalResRef = "EF03TPR3";
+	static unsigned int portalTime = 15;
+	ieDword gotPortal = HasVVCCell(portalResRef, ip->Pos);
 
 	if (enable) {
-		if (gotportal>PortalTime) return;
-		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(PortalResRef, false);
+		if (gotPortal > portalTime) return;
+		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(portalResRef, false);
 		if (sca) {
 			sca->SetBlend();
 			sca->PlayOnce();
 			//exact position, because HasVVCCell depends on the coordinates, PST had no coordinate offset anyway
 			sca->Pos = ip->Pos;
 			//this is actually ordered by time, not by height
-			sca->ZOffset = gotportal;
+			sca->ZOffset = gotPortal;
 			AddVVCell( new VEFObject(sca));
 		}
 		return;
@@ -1128,6 +1125,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 	Game *game = core->GetGame();
 	ieDword gametime = game->GameTime;
+	static ieDword oldGameTime = 0;
 	bool timestop = game->IsTimestopActive();
 
 	//area specific spawn.ini files (a PST feature)
