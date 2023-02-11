@@ -512,6 +512,7 @@ static int CanSave()
 	if (map->GetProjectileCount(pIter)) {
 		// can't save while AOE spells are in effect
 		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
+		return 10;
 	}
 
 	if (map->AreaFlags&AF_NOSAVE) {
