@@ -228,10 +228,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
-#else
+#endif
 		default:
 			break;
-#endif
 	}
 	return GEM_OK;
 }
