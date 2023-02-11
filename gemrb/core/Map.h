@@ -571,7 +571,7 @@ public:
 	//count of unexploded projectiles that are saved
 	int GetTrapCount(proIterator &iter) const;
 	//get the next saved projectile
-	const Projectile *GetNextTrap(proIterator &iter) const;
+	const Projectile* GetNextTrap(proIterator& iter, int flags = 0) const;
 	//add a projectile to the area
 	void AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake);
 	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);

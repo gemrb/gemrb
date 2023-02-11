@@ -1075,16 +1075,20 @@ Projectile *Map::GetNextProjectile(const proIterator &iter) const
 	return *iter;
 }
 
-const Projectile *Map::GetNextTrap(proIterator &iter) const
+const Projectile* Map::GetNextTrap(proIterator& iter, int flags) const
 {
-	const Projectile *pro;
+	const Projectile* pro;
 
 	do {
-		pro=GetNextProjectile(iter);
-		if (pro) iter++;
+		pro = GetNextProjectile(iter);
+		if (!pro) break;
+
+		iter++;
 		// find dormant traps (thieves', skull traps, glyphs of warding ...)
-		if (pro && pro->GetPhase() == P_TRIGGER) break;
-	} while(pro);
+		if (flags == 0 && pro->GetPhase() == P_TRIGGER) break;
+		// find AOE projectiles like stinking cloud
+		if (flags == 1 && pro->Extension  && pro->GetPhase() != P_TRIGGER) break;
+	} while (pro);
 	return pro;
 }
 
