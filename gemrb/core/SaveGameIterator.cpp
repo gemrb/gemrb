@@ -507,9 +507,9 @@ static int CanSave()
 		return -1;
 	}
 
-	// hopefully not too strict — we check for any projectile, not just repeating AOE
 	proIterator pIter;
-	if (map->GetProjectileCount(pIter)) {
+	map->GetProjectileCount(pIter);
+	if (map->GetNextTrap(pIter, 1)) {
 		// can't save while AOE spells are in effect
 		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
 		return 10;
