@@ -207,6 +207,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 			}
 			break;
+#ifdef USE_SDL_CONTROLLER_API
 		case SDL_JOYAXISMOTION:
 			{
 				float pct = event.jaxis.value / float(sizeof(Sint16));
@@ -226,6 +227,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				e = EvntManager->CreateControllerButtonEvent(btn, down);
 				EvntManager->DispatchEvent(std::move(e));
 			}
+			break;
+#endif
+		default:
 			break;
 	}
 	return GEM_OK;
