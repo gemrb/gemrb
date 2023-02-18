@@ -2425,6 +2425,18 @@ static bool CheckSleepException(const Scriptable* sender, int actionID)
 	return false;
 }
 
+// allow only instants to run on dead actors
+static bool CheckDeadException(const Scriptable* sender, int actionID)
+{
+	const Actor* actor = Scriptable::As<Actor>(sender);
+	if (!actor) return false;
+	if (!(actor->GetStat(IE_STATE_ID) & STATE_DEAD)) return false;
+
+	// original also required AF_SLEEP, but we're probably fine without
+	if (actionflags[actionID] & AF_INSTANT) return false;
+	return true;
+}
+
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	int actionID = aC->actionID;
@@ -2437,7 +2449,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	// check for ActionOverride
 	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)
 	if (aC->objects[0]) {
-		Scriptable* scr = GetScriptableFromObject(Sender, aC->objects[0], GA_NO_DEAD);
+		Scriptable* scr = GetScriptableFromObject(Sender, aC->objects[0]);
+		if (CheckDeadException(scr, actionID)) {
+			scr = GetScriptableFromObject(Sender, aC->objects[0], GA_NO_DEAD);
+		}
 		aC->IncRef(); // if aC is us, we don't want it deleted!
 		Sender->ReleaseCurrentAction();
 
