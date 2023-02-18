@@ -2328,8 +2328,10 @@ int ResponseSet::Execute(Scriptable* Sender)
 			return 0;
 		case 1:
 			return responses[0]->Execute(Sender);
+		default:
+			break;
 	}
-	/*default*/
+
 	int randWeight;
 	int maxWeight = 0;
 
