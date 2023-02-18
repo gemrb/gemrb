@@ -260,17 +260,16 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 }
 
 //this is the implementation of the weapon glow effect in PST
-static EffectRef glow_ref = { "Color:PulseRGB", -1 };
-
 Effect *Item::BuildGlowEffect(int gradient) const
 {
+	static EffectRef glowRef = { "Color:PulseRGB", -1 };
 	//this type of colour uses PAL32, a PST specific palette
-	//palette entry to to RGB conversion
-	const auto& pal32 = core->GetPalette32( gradient );
-	ieDword rgb = (pal32[16].r<<16) | (pal32[16].g<<8) | pal32[16].b;
+	//palette entry to RGB conversion
+	const auto& pal32 = core->GetPalette32(gradient);
+	ieDword rgb = (pal32[16].r << 16) | (pal32[16].g << 8) | pal32[16].b;
 	ieDword location = 0;
-	ieDword speed = 128;
-	Effect *fx = EffectQueue::CreateEffect(glow_ref, rgb, location|(speed<<16), FX_DURATION_INSTANT_WHILE_EQUIPPED);
+	ieDword speed = 128 << 16;
+	Effect* fx = EffectQueue::CreateEffect(glowRef, rgb, location | speed, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 	return fx;
 }
 
