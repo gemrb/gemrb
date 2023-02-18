@@ -4867,14 +4867,17 @@ void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
 	act->Panic(NULL, PANIC_RANDOMWALK);
 }
 
-/* as of now: removes panic and berserk */
+// All Calm() does is apply op4 on the target as if it was applied by the script runner
+// NB: if berserking was caused by panic, we don't also cure the panic or stop any attacks
 void GameScript::Calm(Scriptable* Sender, Action* /*parameters*/)
 {
+	static EffectRef fx_cure_berserk_state_ref = { "Cure:Berserk", -1 };
 	Actor* act = Scriptable::As<Actor>(Sender);
 	if (!act) {
 		return;
 	}
-	act->SetBaseBit(IE_STATE_ID, STATE_BERSERK|STATE_PANIC, false);
+	Effect* fx = EffectQueue::CreateEffect(fx_cure_berserk_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(fx, act, Sender);
 }
 
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
