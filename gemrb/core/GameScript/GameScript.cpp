@@ -2412,6 +2412,19 @@ static void HandleActionOverride(Scriptable* target, const Action* aC)
 	}
 }
 
+static bool CheckSleepException(const Scriptable* sender, int actionID)
+{
+	const Actor* actor = Scriptable::As<Actor>(sender);
+	if (!actor) return false;
+	if (actionflags[actionID] & AF_SLEEP) return false;
+
+	// action is not in actsleep.ids, so better be awake
+	if (actor->GetStat(IE_STATE_ID) & STATE_SLEEP) {
+		return true;
+	}
+	return false;
+}
+
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	int actionID = aC->actionID;
@@ -2429,6 +2442,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		Sender->ReleaseCurrentAction();
 
 		if (scr) {
+			if (CheckSleepException(scr, actionID)) {
+				ScriptDebugLog(ID_ACTIONS, "Sender {} tried to run ActionOverride on a sleeping {} with incompatible action {}", Sender->GetScriptName(), scr->GetScriptName(), actionID);
+				return;
+			}
 			ScriptDebugLog(ID_ACTIONS, "Sender {} ran ActionOverride on {}", Sender->GetScriptName(), scr->GetScriptName());
 			HandleActionOverride(scr, aC);
 		} else {
@@ -2437,6 +2454,11 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			aC->dump();
 		}
 		aC->Release();
+		return;
+	}
+	if (CheckSleepException(Sender, actionID)) {
+		ScriptDebugLog(ID_ACTIONS, "Sleeping sender {} tried to run non-compatible action {}", Sender->GetScriptName(), actionID);
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (core->InDebugMode(ID_ACTIONS)) {
