@@ -1647,8 +1647,8 @@ void InitializeIEScript()
 				printFunction(buffer, overrideTriggersTable, static_cast<int>(j));
 				continue;
 			}
-			int tf = poi->Flags | (was_condition?TF_CONDITION:0);
-			if (triggers[i] && ( (triggers[i]!=poi->Function) || (triggerflags[i]!=tf) ) ) {
+			short tf = poi->Flags | (was_condition ? TF_CONDITION : 0);
+			if (triggers[i] && (triggers[i] != poi->Function || triggerflags[i] != tf)) {
 				std::string buffer = fmt::format("{} overrides existing trigger ", trName);
 				int x = triggersTable->FindValue(i);
 				if (x<0) x = triggersTable->FindValue(i|0x4000);
@@ -2569,7 +2569,7 @@ Action* GenerateAction(std::string actionString)
 		i = overrideActionsTable->FindString(key);
 		if (i >= 0) {
 			str = overrideActionsTable->GetStringIndex(i).c_str() + len;
-			actionID = overrideActionsTable->GetValueIndex(i);
+			actionID = static_cast<unsigned short>(overrideActionsTable->GetValueIndex(i));
 		}
 	}
 	if (i<0) {
@@ -2579,7 +2579,7 @@ Action* GenerateAction(std::string actionString)
 			return action;
 		}
 		str = actionsTable->GetStringIndex(i).c_str() + len;
-		actionID = actionsTable->GetValueIndex(i);
+		actionID = static_cast<unsigned short>(actionsTable->GetValueIndex(i));
 	}
 	action = GenerateActionCore( src, str, actionID);
 	if (!action) {
