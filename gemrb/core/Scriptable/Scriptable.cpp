@@ -184,11 +184,11 @@ void OverHeadText::FixPos()
 	pos = owner->Pos;
 }
 
-int Scriptable::GetOverheadOffset() const
+int OverHeadText::GetOffset() const
 {
 	int offset = 100;
-	if (Type == ST_ACTOR) {
-		offset = static_cast<const Selectable*>(this)->circleSize * 50;
+	if (owner->Type == ST_ACTOR) {
+		offset = static_cast<const Selectable*>(owner)->circleSize * 50;
 	}
 
 	return offset;
@@ -216,7 +216,7 @@ void Scriptable::DrawOverheadText()
 		}
 	}
 
-	int cs = GetOverheadOffset();
+	int cs = overHead.GetOffset();
 	Point p = (overHead.pos.IsInvalid()) ? Pos : overHead.pos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));

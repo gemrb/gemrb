@@ -2672,7 +2672,7 @@ int GameControl::GetOverheadOffset() const
 {
 	const Actor* actor = GetLastActor();
 	if (actor) {
-		return actor->GetOverheadOffset();
+		return actor->overHead.GetOffset();
 	}
 	return 0;
 }

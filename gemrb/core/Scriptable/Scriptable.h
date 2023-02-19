@@ -239,6 +239,7 @@ struct GEM_EXPORT OverHeadText {
 	void SetText(String text, bool display = true, const Color& color = ColorBlack);
 	bool Display(bool);
 	void FixPos();
+	int GetOffset() const;
 };
 
 class GEM_EXPORT Scriptable {
@@ -393,7 +394,6 @@ public:
 	void SendTriggerToAll(TriggerEntry entry);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText();
-	int GetOverheadOffset() const;
 	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
 	int CanCast(const ResRef& SpellRef, bool verbose = true);
