@@ -553,7 +553,7 @@ public:
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 
 	bool Update(bool *continuing = NULL, bool *done = NULL);
-	void EvaluateAllBlocks();
+	void EvaluateAllBlocks(bool testConditions = false);
 private: //Internal Functions
 	Script* CacheScript(const ResRef& ResRef, bool AIScript);
 	ResponseBlock* ReadResponseBlock(DataStream* stream);

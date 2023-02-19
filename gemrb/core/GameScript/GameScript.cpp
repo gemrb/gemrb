@@ -2082,27 +2082,26 @@ bool GameScript::Update(bool *continuing, bool *done)
  * NOTE: After calling, callers should deallocate this object if `dead==true`.
  *  Scripts can replace themselves while running but it's up to the caller to clean up.
  */
-void GameScript::EvaluateAllBlocks()
+void GameScript::EvaluateAllBlocks(bool testConditions)
 {
-	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
+	if (!MySelf || !(MySelf->GetInternalFlag() & IF_ACTIVE) || !script) {
 		return;
 	}
 
-	if (!script) {
-		return;
-	}
-
-#ifdef GEMRB_CUTSCENES
-	// this is the (unused) more logical way of executing a cutscene, which
-	// evaluates conditions and doesn't just use the first response
-	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
-		ResponseBlock* rB = script->responseBlocks[a];
-		if (rB->Condition->Evaluate(MySelf)) {
-			// TODO: this no longer works since the cutscene changes
-			rB->Execute(MySelf);
+	// pst and ee StartCutSceneEx don't skip trigger evaluation when the second param is set
+	// not needed in vanilla pst, since the only two uses point to cutscenes with just True conditions
+	if (testConditions) {
+		// this is the more logical way of executing a cutscene, which
+		// evaluates conditions and doesn't just use the first response
+		for (const auto& rB : script->responseBlocks) {
+			if (!rB->condition || !rB->responseSet) continue;
+			if (rB->condition->Evaluate(MySelf)) {
+				rB->responseSet->Execute(MySelf);
+			}
 		}
+		return;
 	}
-#else
+
 	// this is the original IE behaviour:
 	// cutscenes don't evaluate conditions - they just choose the
 	// first response, take the object from the first action,
@@ -2130,7 +2129,6 @@ void GameScript::EvaluateAllBlocks()
 			}
 		}
 	}
-#endif
 }
 
 ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
