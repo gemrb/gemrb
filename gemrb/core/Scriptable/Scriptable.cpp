@@ -179,9 +179,9 @@ bool OverHeadText::Display(bool show)
 }
 
 /* 'fix' the current overhead text in the current position */
-void Scriptable::FixHeadTextPos()
+void OverHeadText::FixPos()
 {
-	overHead.pos = Pos;
+	pos = owner->Pos;
 }
 
 int Scriptable::GetOverheadOffset() const

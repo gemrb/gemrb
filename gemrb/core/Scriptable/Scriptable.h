@@ -233,9 +233,12 @@ struct GEM_EXPORT OverHeadText {
 	tick_t timeStartDisplaying = 0;
 	String text;
 	Color color = ColorBlack;
+	const Scriptable* owner = nullptr;
 
+	OverHeadText(const Scriptable* head) : owner(head) {};
 	void SetText(String text, bool display = true, const Color& color = ColorBlack);
 	bool Display(bool);
+	void FixPos();
 };
 
 class GEM_EXPORT Scriptable {
@@ -282,7 +285,7 @@ public:
 	Point Pos;
 
 	ieStrRef DialogName = ieStrRef::INVALID;
-	OverHeadText overHead;
+	OverHeadText overHead{this};
 
 	GameScript* Scripts[MAX_SCRIPTS] = {};
 	int scriptlevel = 0;
@@ -362,7 +365,6 @@ public:
 	const ieVariable& GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
-	void FixHeadTextPos();
 	void SetScriptName(const ieVariable& text);
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();

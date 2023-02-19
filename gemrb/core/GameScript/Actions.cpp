@@ -1607,7 +1607,7 @@ static void FloatMessageAtPoint(Scriptable* Sender, const Point& pos, const ieSt
 	surrogate->SetPosition(pos, 0);
 	String msg = core->GetString(msgRef);
 	surrogate->overHead.SetText(msg);
-	surrogate->FixHeadTextPos();
+	surrogate->overHead.FixPos();
 }
 
 // only used three times by cranium rats

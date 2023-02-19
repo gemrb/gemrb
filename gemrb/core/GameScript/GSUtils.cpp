@@ -532,7 +532,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 			if (flags & (DS_HEAD | DS_AREA)) {
 				Sender->overHead.SetText(sb.text);
 				if (flags & DS_AREA) {
-					Sender->FixHeadTextPos();
+					Sender->overHead.FixPos();
 				}
 			}
 		}
