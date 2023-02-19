@@ -30,12 +30,12 @@ namespace GemRB {
 void OverHeadText::SetText(String newText, bool display, const Color& newColor)
 {
 	pos.Invalidate();
-	if (!newText.empty()) {
+	if (newText.empty()) {
+		Display(false);
+	} else {
 		text = std::move(newText);
 		color = newColor;
 		Display(display);
-	} else {
-		Display(false);
 	}
 }
 
@@ -45,7 +45,7 @@ bool OverHeadText::Display(bool show)
 		isDisplaying = true;
 		timeStartDisplaying = GetMilliseconds();
 		return true;
-	} else if (!show && isDisplaying) {
+	} else if (isDisplaying) {
 		isDisplaying = false;
 		timeStartDisplaying = 0;
 		return true;
