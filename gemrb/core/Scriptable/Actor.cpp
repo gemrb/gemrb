@@ -4367,8 +4367,12 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			}
 			displaymsg->DisplayConstantStringName(strref, GUIColors::WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
-			//TODO: handle pst properly (decay, queueing, color)
-			SetOverheadText(fmt::to_wstring(damage), true);
+			// TODO: handle pst properly (decay, queueing)
+			auto color = GUIColors::WHITE;
+			if (InParty) {
+				color = GUIColors::RED;
+			}
+			SetOverheadText(fmt::to_wstring(damage), true, displaymsg->GetColor(color));
 		} else if (!DisplayMessage::HasStringReference(STR_DAMAGE2) || !damager) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
