@@ -621,8 +621,8 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 {
 	const Game *game = core->GetGame();
-	game->MovePCs(ResRef(parameters->string0Parameter), parameters->pointParameter, parameters->int0Parameter);
-	game->MoveFamiliars(ResRef(parameters->string0Parameter), parameters->pointParameter, parameters->int0Parameter);
+	game->MovePCs(parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter);
+	game->MoveFamiliars(parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter);
 }
 
 //5 is the ToB value, but it might be useful to have multiple expansions
@@ -824,7 +824,7 @@ void GameScript::EndCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 
 void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 {
-	GameScript* gs = new GameScript(ResRef(parameters->string0Parameter), Sender);
+	GameScript* gs = new GameScript(parameters->resref0Parameter, Sender);
 	gs->EvaluateAllBlocks();
 	delete gs;
 }
@@ -832,7 +832,7 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 // StartCutScene("my_nifty_cut_scene") = StartCutSceneEx("my_nifty_cut_scene",FALSE)
 void GameScript::StartCutSceneEx(Scriptable* Sender, Action* parameters)
 {
-	GameScript *gs = new GameScript(ResRef(parameters->string0Parameter), Sender);
+	GameScript* gs = new GameScript(parameters->resref0Parameter, Sender);
 	gs->EvaluateAllBlocks(parameters->int0Parameter != 0);
 	delete gs;
 }
@@ -5214,7 +5214,7 @@ void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	actor->LearnSpell(ResRef(parameters->string0Parameter), parameters->int0Parameter | LS_MEMO | LS_LEARN);
+	actor->LearnSpell(parameters->resref0Parameter, parameters->int0Parameter | LS_MEMO | LS_LEARN);
 	core->SetEventFlag(EF_ACTION);
 }
 
@@ -6115,7 +6115,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* parameters)
 {
-	WorldMap *wmap = core->GetWorldMap(ResRef(parameters->string0Parameter));
+	WorldMap* wmap = core->GetWorldMap(parameters->resref0Parameter);
 	if (!wmap) {
 		//no such starting area
 		return;
