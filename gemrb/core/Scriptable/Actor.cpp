@@ -4323,6 +4323,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 	// skip in dialogs to avoid Saradush spam in non-pausing ones
 	if (core->GetGameControl()->InDialog()) return;
 
+	const Actor* damager = Scriptable::As<Actor>(hitter);
 	bool detailed = false;
 	String type_name = L"unknown";
 	if (DisplayMessage::HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
@@ -4358,8 +4359,8 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
 				strref = STR_DAMAGE_DETAIL1;
 			}
-			if (hitter && hitter->Type == ST_ACTOR) {
-				core->GetTokenDictionary()->SetAt("DAMAGER", hitter->GetName());
+			if (damager) {
+				core->GetTokenDictionary()->SetAt("DAMAGER", damager->GetName());
 			} else {
 				// variant without damager
 				strref -= (STR_DAMAGE_DETAIL1 - STR_DAMAGE1);
@@ -4368,7 +4369,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
 			//TODO: handle pst properly (decay, queueing, color)
 			SetOverheadText(fmt::to_wstring(damage), true);
-		} else if (!DisplayMessage::HasStringReference(STR_DAMAGE2) || !hitter || hitter->Type != ST_ACTOR) {
+		} else if (!DisplayMessage::HasStringReference(STR_DAMAGE2) || !damager) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
@@ -4385,7 +4386,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		}
 	} else if (resisted == DR_IMMUNE) {
 		Log(COMBAT, "Actor", "is immune to damage type: {}.\n", fmt::WideToChar{type_name});
-		if (hitter && hitter->Type == ST_ACTOR) {
+		if (damager) {
 			if (detailed) {
 				//<DAMAGEE> was immune to my <TYPE> damage
 				core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
