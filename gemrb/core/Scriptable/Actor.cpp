@@ -4383,25 +4383,23 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
 			displaymsg->DisplayConstantStringName(STR_DAMAGE2, GUIColors::WHITE, hitter);
 		}
-	} else {
-		if (resisted == DR_IMMUNE) {
-			Log(COMBAT, "Actor", "is immune to damage type: {}.\n", fmt::WideToChar{type_name});
-			if (hitter && hitter->Type == ST_ACTOR) {
-				if (detailed) {
-					//<DAMAGEE> was immune to my <TYPE> damage
-					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
-					core->GetTokenDictionary()->SetAt("TYPE", type_name);
-					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, GUIColors::WHITE, hitter);
-				} else if (DisplayMessage::HasStringReference(STR_DAMAGE_IMMUNITY) && DisplayMessage::HasStringReference(STR_DAMAGE1)) {
-					// bg2
-					//<DAMAGEE> was immune to my damage.
-					core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
-					displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, GUIColors::WHITE, hitter);
-				} // else: other games don't display anything
-			}
-		} else {
-			// mirror image or stoneskin: no message
+	} else if (resisted == DR_IMMUNE) {
+		Log(COMBAT, "Actor", "is immune to damage type: {}.\n", fmt::WideToChar{type_name});
+		if (hitter && hitter->Type == ST_ACTOR) {
+			if (detailed) {
+				//<DAMAGEE> was immune to my <TYPE> damage
+				core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
+				core->GetTokenDictionary()->SetAt("TYPE", type_name);
+				displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, GUIColors::WHITE, hitter);
+			} else if (DisplayMessage::HasStringReference(STR_DAMAGE_IMMUNITY) && DisplayMessage::HasStringReference(STR_DAMAGE1)) {
+				// bg2
+				//<DAMAGEE> was immune to my damage.
+				core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
+				displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, GUIColors::WHITE, hitter);
+			} // else: other games don't display anything
 		}
+	} else {
+		// mirror image or stoneskin: no message
 	}
 
 	hitsound:
