@@ -100,6 +100,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/Container.cpp
 	Scriptable/Door.cpp
 	Scriptable/InfoPoint.cpp
+	Scriptable/OverHeadText.cpp
 	Scriptable/Scriptable.cpp
 	Scriptable/PCStatStruct.cpp
 	Streams/DataStream.cpp

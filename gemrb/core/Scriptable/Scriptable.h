@@ -25,6 +25,7 @@
 #include "ie_cursors.h"
 
 #include "CharAnimations.h"
+#include "OverHeadText.h"
 #include "Variables.h"
 
 #include <list>
@@ -225,22 +226,6 @@ struct TriggerEntry {
 	ieDword param1 = 0;
 	ieDword param2 = 0;
 	unsigned int flags = 0;
-};
-
-struct GEM_EXPORT OverHeadText {
-	Point pos = Point(-1, -1);
-	bool isDisplaying = false;
-	tick_t timeStartDisplaying = 0;
-	String text;
-	Color color = ColorBlack;
-	const Scriptable* owner = nullptr;
-
-	OverHeadText(const Scriptable* head) : owner(head) {};
-	void SetText(String text, bool display = true, const Color& color = ColorBlack);
-	bool Display(bool);
-	void FixPos();
-	int GetOffset() const;
-	void Draw();
 };
 
 class GEM_EXPORT Scriptable {
