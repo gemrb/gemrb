@@ -1375,7 +1375,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
-		ip->DrawOverheadText();
+		ip->overHead.Draw();
 	}
 
 	int cnCount = 0;
@@ -1384,7 +1384,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		Container* cn = TMap->GetContainer( cnCount++ );
 		if (!cn)
 			break;
-		cn->DrawOverheadText();
+		cn->overHead.Draw();
 	}
 
 	int drCount = 0;
@@ -1393,7 +1393,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		Door* dr = TMap->GetDoor( drCount++ );
 		if (!dr)
 			break;
-		dr->DrawOverheadText();
+		dr->overHead.Draw();
 	}
 
 	size_t i = actors.size();
@@ -1401,7 +1401,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		//For each Actor present
 		//This must go AFTER the fog!
 		//(maybe we should be using the queue?)
-		actors[i]->DrawOverheadText();
+		actors[i]->overHead.Draw();
 	}
 
 	oldGameTime = gametime;

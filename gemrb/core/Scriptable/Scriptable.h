@@ -240,6 +240,7 @@ struct GEM_EXPORT OverHeadText {
 	bool Display(bool);
 	void FixPos();
 	int GetOffset() const;
+	void Draw();
 };
 
 class GEM_EXPORT Scriptable {

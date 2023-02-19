@@ -194,33 +194,33 @@ int OverHeadText::GetOffset() const
 	return offset;
 }
 
-#define MAX_DELAY  6000
-void Scriptable::DrawOverheadText()
+void OverHeadText::Draw()
 {
-	if (!overHead.isDisplaying)
+	static constexpr int maxDelay = 6000;
+	if (!isDisplaying)
 		return;
 
 	tick_t time = GetMilliseconds();
-	const Color& textColor = overHead.color == ColorBlack ? core->InfoTextColor : overHead.color;
+	const Color& textColor = color == ColorBlack ? core->InfoTextColor : color;
 	Font::PrintColors color = {textColor, ColorBlack};
 
-	time -= overHead.timeStartDisplaying;
-	if (time >= MAX_DELAY) {
-		overHead.Display(false);
+	time -= timeStartDisplaying;
+	if (time >= maxDelay) {
+		Display(false);
 		return;
 	} else {
-		time = (MAX_DELAY-time)/10;
+		time = (maxDelay - time) / 10;
 		// rapid fade-out
 		if (time < 256) {
 			color.fg.a = static_cast<unsigned char>(255 - time);
 		}
 	}
 
-	int cs = overHead.GetOffset();
-	Point p = (overHead.pos.IsInvalid()) ? Pos : overHead.pos;
+	int cs = GetOffset();
+	Point p = pos.IsInvalid() ? owner->Pos : pos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));
-	core->GetTextFont()->Print(rgn, overHead.text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
+	core->GetTextFont()->Print(rgn, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
 }
 
 Region Scriptable::DrawingRegion() const
