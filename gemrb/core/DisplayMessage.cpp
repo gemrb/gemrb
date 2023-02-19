@@ -203,7 +203,7 @@ void DisplayMessage::DisplayConstantString(size_t stridx, GUIColors color, Scrip
 {
 	if (stridx > STRREF_COUNT) return;
 	String text = core->GetString(SRefs.Get(stridx, target), STRING_FLAGS::SOUND);
-	DisplayString(text, DisplayMessage::GetColor(color), target);
+	DisplayString(text, GetColor(color), target);
 }
 
 void DisplayMessage::DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const
