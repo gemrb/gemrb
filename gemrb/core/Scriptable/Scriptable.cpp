@@ -152,11 +152,12 @@ void Scriptable::SetSpellResRef(const ResRef& resref) {
 	SpellResRef = resref;
 }
 
-void Scriptable::SetOverheadText(String text, bool display)
+void Scriptable::SetOverheadText(String text, bool display, const Color& color)
 {
 	overHead.pos.Invalidate();
 	if (!text.empty()) {
 		overHead.text = std::move(text);
+		overHead.color = color;
 		DisplayOverheadText(display);
 	} else {
 		DisplayOverheadText(false);
@@ -200,7 +201,8 @@ void Scriptable::DrawOverheadText()
 		return;
 
 	tick_t time = GetMilliseconds();
-	Font::PrintColors color = {core->InfoTextColor, ColorBlack};
+	const Color& textColor = overHead.color == ColorBlack ? core->InfoTextColor : overHead.color;
+	Font::PrintColors color = {textColor, ColorBlack};
 
 	time -= overHead.timeStartDisplaying;
 	if (time >= MAX_DELAY) {

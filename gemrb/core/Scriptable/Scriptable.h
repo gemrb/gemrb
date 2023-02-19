@@ -232,6 +232,7 @@ struct OverHeadText {
 	bool isDisplaying = false;
 	tick_t timeStartDisplaying = 0;
 	String text;
+	Color color = ColorBlack;
 };
 
 class GEM_EXPORT Scriptable {
@@ -358,7 +359,7 @@ public:
 	const ieVariable& GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
-	void SetOverheadText(String text, bool display = true);
+	void SetOverheadText(String text, bool display = true, const Color& color = ColorBlack);
 	const String& GetOverheadText() const { return overHead.text; };
 	bool DisplayOverheadText(bool);
 	bool OverheadTextIsDisplaying() const { return overHead.isDisplaying; }
