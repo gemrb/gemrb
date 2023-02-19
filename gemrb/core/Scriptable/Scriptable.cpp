@@ -154,9 +154,9 @@ void Scriptable::SetSpellResRef(const ResRef& resref) {
 
 void Scriptable::SetOverheadText(String text, bool display)
 {
-	overHeadTextPos.Invalidate();
+	overHead.pos.Invalidate();
 	if (!text.empty()) {
-		OverheadText = std::move(text);
+		overHead.text = std::move(text);
 		DisplayOverheadText(display);
 	} else {
 		DisplayOverheadText(false);
@@ -166,12 +166,12 @@ void Scriptable::SetOverheadText(String text, bool display)
 bool Scriptable::DisplayOverheadText(bool show)
 {
 	if (show) {
-		overheadTextDisplaying = true;
-		timeStartDisplaying = GetMilliseconds();
+		overHead.isDisplaying = true;
+		overHead.timeStartDisplaying = GetMilliseconds();
 		return true;
-	} else if (!show && overheadTextDisplaying) {
-		overheadTextDisplaying = false;
-		timeStartDisplaying = 0;
+	} else if (!show && overHead.isDisplaying) {
+		overHead.isDisplaying = false;
+		overHead.timeStartDisplaying = 0;
 		return true;
 	}
 	return false;
@@ -180,7 +180,7 @@ bool Scriptable::DisplayOverheadText(bool show)
 /* 'fix' the current overhead text in the current position */
 void Scriptable::FixHeadTextPos()
 {
-	overHeadTextPos = Pos;
+	overHead.pos = Pos;
 }
 
 int Scriptable::GetOverheadOffset() const
@@ -196,13 +196,13 @@ int Scriptable::GetOverheadOffset() const
 #define MAX_DELAY  6000
 void Scriptable::DrawOverheadText()
 {
-	if (!overheadTextDisplaying)
+	if (!overHead.isDisplaying)
 		return;
 
 	tick_t time = GetMilliseconds();
 	Font::PrintColors color = {core->InfoTextColor, ColorBlack};
 
-	time -= timeStartDisplaying;
+	time -= overHead.timeStartDisplaying;
 	if (time >= MAX_DELAY) {
 		DisplayOverheadText(false);
 		return;
@@ -215,10 +215,10 @@ void Scriptable::DrawOverheadText()
 	}
 
 	int cs = GetOverheadOffset();
-	Point p = (overHeadTextPos.IsInvalid()) ? Pos : overHeadTextPos;
+	Point p = (overHead.pos.IsInvalid()) ? Pos : overHead.pos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));
-	core->GetTextFont()->Print(rgn, OverheadText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
+	core->GetTextFont()->Print(rgn, overHead.text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
 }
 
 Region Scriptable::DrawingRegion() const
