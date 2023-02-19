@@ -1578,7 +1578,7 @@ void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		target=Sender;
 	}
-	target->DisplayOverheadText(false);
+	target->overHead.Display(false);
 }
 
 void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)
@@ -1606,7 +1606,7 @@ static void FloatMessageAtPoint(Scriptable* Sender, const Point& pos, const ieSt
 	surrogate->SetBase(IE_DONOTJUMP, DNJ_BIRD);
 	surrogate->SetPosition(pos, 0);
 	String msg = core->GetString(msgRef);
-	surrogate->SetOverheadText(msg);
+	surrogate->overHead.SetText(msg);
 	surrogate->FixHeadTextPos();
 }
 

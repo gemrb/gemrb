@@ -530,7 +530,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 				}
 			}
 			if (flags & (DS_HEAD | DS_AREA)) {
-				Sender->SetOverheadText(sb.text);
+				Sender->overHead.SetText(sb.text);
 				if (flags & DS_AREA) {
 					Sender->FixHeadTextPos();
 				}

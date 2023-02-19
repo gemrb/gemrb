@@ -1017,7 +1017,7 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		ieStrRef tmp = ieStrRef(fx->Parameter1);
 		if (!tmp) tmp = ieStrRef::PST_HICCUP;
 		String tmpstr = core->GetString(tmp, STRING_FLAGS::SPEECH | STRING_FLAGS::SOUND);
-		target->SetOverheadText(std::move(tmpstr));
+		target->overHead.SetText(std::move(tmpstr));
 		target->GetHit();
 	}
 	fx->Parameter4=fx->Parameter3;

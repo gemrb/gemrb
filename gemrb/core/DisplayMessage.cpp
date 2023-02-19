@@ -227,7 +227,7 @@ void DisplayMessage::DisplayString(String text, const Color &color, Scriptable *
 
 	if (target && l == nullptr && ta == nullptr) {
 		// overhead text only if we dont have somewhere else for the message
-		target->SetOverheadText(std::move(text));
+		target->overHead.SetText(std::move(text));
 	}
 }
 

@@ -1111,7 +1111,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			for (int pm = 0; pm < game->GetPartySize(false); pm++) {
 				Actor *pc = game->GetPC(pm, true);
 				if (!pc) continue;
-				pc->DisplayOverheadText(false);
+				pc->overHead.Display(false);
 			}
 			break;
 		default:
@@ -1966,8 +1966,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			}
 
 			// always display overhead text; totsc's ar0511 library relies on it
-			if (!trap->GetOverheadText().empty() && !trap->OverheadTextIsDisplaying()) {
-				trap->DisplayOverheadText(true);
+			if (!trap->overHead.text.empty() && !trap->overHead.isDisplaying) {
+				trap->overHead.Display(true);
 				DisplayString(trap);
 			}
 			//the importer shouldn't load the script
@@ -1993,8 +1993,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 				// recheck if there are other infopoints at this position
 				const Map* map = trap->GetCurrentArea();
 				InfoPoint* ip2 = map->TMap->GetInfoPoint(p, true);
-				if (ip2 && !ip2->GetOverheadText().empty() && !ip2->OverheadTextIsDisplaying()) {
-					ip2->DisplayOverheadText(true);
+				if (ip2 && !ip2->overHead.text.empty() && !ip2->overHead.isDisplaying) {
+					ip2->overHead.Display(true);
 					DisplayString(ip2);
 				}
 			}
@@ -2506,9 +2506,9 @@ void GameControl::DisplayString(const Scriptable* target) const
 	// add as a "subtitle" to the main message window
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
-	if (tmp && !target->GetOverheadText().empty()) {
+	if (tmp && !target->overHead.text.empty()) {
 		// pass NULL target so pst does not display multiple
-		displaymsg->DisplayString(target->GetOverheadText());
+		displaymsg->DisplayString(target->overHead.text);
 	}
 }
 

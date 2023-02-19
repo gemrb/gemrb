@@ -227,12 +227,15 @@ struct TriggerEntry {
 	unsigned int flags = 0;
 };
 
-struct OverHeadText {
+struct GEM_EXPORT OverHeadText {
 	Point pos = Point(-1, -1);
 	bool isDisplaying = false;
 	tick_t timeStartDisplaying = 0;
 	String text;
 	Color color = ColorBlack;
+
+	void SetText(String text, bool display = true, const Color& color = ColorBlack);
+	bool Display(bool);
 };
 
 class GEM_EXPORT Scriptable {
@@ -253,7 +256,6 @@ protected: //let Actor access this
 	ResRef Dialog;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction = nullptr;
-	OverHeadText overHead;
 public:
 	Region BBox;
 	// State relating to the currently-running action.
@@ -280,6 +282,7 @@ public:
 	Point Pos;
 
 	ieStrRef DialogName = ieStrRef::INVALID;
+	OverHeadText overHead;
 
 	GameScript* Scripts[MAX_SCRIPTS] = {};
 	int scriptlevel = 0;
@@ -359,10 +362,6 @@ public:
 	const ieVariable& GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
-	void SetOverheadText(String text, bool display = true, const Color& color = ColorBlack);
-	const String& GetOverheadText() const { return overHead.text; };
-	bool DisplayOverheadText(bool);
-	bool OverheadTextIsDisplaying() const { return overHead.isDisplaying; }
 	void FixHeadTextPos();
 	void SetScriptName(const ieVariable& text);
 	//call this to enable script running as soon as possible

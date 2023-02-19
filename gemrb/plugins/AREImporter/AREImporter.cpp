@@ -656,7 +656,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	// translate door cursor on infopoint to correct cursor
 	if (cursor == IE_CURSOR_DOOR) cursor = IE_CURSOR_PASS;
 	ip->Cursor = cursor;
-	ip->SetOverheadText(core->GetString(overheadRef), false);
+	ip->overHead.SetText(core->GetString(overheadRef), false);
 	ip->StrRef = overheadRef; //we need this when saving area
 	ip->SetMap(map);
 	ip->Flags = ipFlags;

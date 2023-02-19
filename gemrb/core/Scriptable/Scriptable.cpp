@@ -152,27 +152,27 @@ void Scriptable::SetSpellResRef(const ResRef& resref) {
 	SpellResRef = resref;
 }
 
-void Scriptable::SetOverheadText(String text, bool display, const Color& color)
+void OverHeadText::SetText(String text, bool display, const Color& color)
 {
-	overHead.pos.Invalidate();
+	pos.Invalidate();
 	if (!text.empty()) {
-		overHead.text = std::move(text);
-		overHead.color = color;
-		DisplayOverheadText(display);
+		this->text = std::move(text);
+		this->color = color;
+		Display(display);
 	} else {
-		DisplayOverheadText(false);
+		Display(false);
 	}
 }
 
-bool Scriptable::DisplayOverheadText(bool show)
+bool OverHeadText::Display(bool show)
 {
 	if (show) {
-		overHead.isDisplaying = true;
-		overHead.timeStartDisplaying = GetMilliseconds();
+		isDisplaying = true;
+		timeStartDisplaying = GetMilliseconds();
 		return true;
-	} else if (!show && overHead.isDisplaying) {
-		overHead.isDisplaying = false;
-		overHead.timeStartDisplaying = 0;
+	} else if (!show && isDisplaying) {
+		isDisplaying = false;
+		timeStartDisplaying = 0;
 		return true;
 	}
 	return false;
@@ -206,7 +206,7 @@ void Scriptable::DrawOverheadText()
 
 	time -= overHead.timeStartDisplaying;
 	if (time >= MAX_DELAY) {
-		DisplayOverheadText(false);
+		overHead.Display(false);
 		return;
 	} else {
 		time = (MAX_DELAY-time)/10;
@@ -1201,7 +1201,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 			// eg. .:Casts Word of Recall:.
 			const String castmsg = core->GetString(DisplayMessage::GetStringReference(STR_CASTS));
 			const String spellname = core->GetString(spl->SpellName);
-			SetOverheadText(fmt::format(L".:{} {}:.", castmsg, spellname));
+			overHead.SetText(fmt::format(L".:{} {}:.", castmsg, spellname));
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL15, GUIColors::LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}
