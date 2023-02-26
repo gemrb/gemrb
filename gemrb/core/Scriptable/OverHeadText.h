@@ -24,20 +24,26 @@
 #include "exports.h"
 #include "globals.h"
 
+#include <vector>
+
 namespace GemRB {
 
-struct GEM_EXPORT OverHeadText {
+struct OverHeadMsg {
 	Point pos{-1, -1};
-	bool isDisplaying = false;
+	Color color = ColorBlack;
 	tick_t timeStartDisplaying = 0;
 	String text;
-	Color color = ColorBlack;
+};
+
+struct GEM_EXPORT OverHeadText {
+	bool isDisplaying = false;
 	const Scriptable* owner = nullptr;
+	std::vector<OverHeadMsg> messages{1};
 
 	OverHeadText(const Scriptable* head) : owner(head) {};
 	const String& GetText() const;
 	void SetText(String newText, bool display = true, const Color& newColor = ColorBlack);
-	bool Empty() const { return text.empty(); }
+	bool Empty() const { return messages[0].text.empty(); }
 	bool Display(bool);
 	void FixPos();
 	int GetOffset() const;

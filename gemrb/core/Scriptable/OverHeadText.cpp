@@ -29,17 +29,17 @@ namespace GemRB {
 
 const String& OverHeadText::GetText() const
 {
-	return text;
+	return messages[0].text;
 }
 
 void OverHeadText::SetText(String newText, bool display, const Color& newColor)
 {
-	pos.Invalidate();
+	messages[0].pos.Invalidate();
 	if (newText.empty()) {
 		Display(false);
 	} else {
-		text = std::move(newText);
-		color = newColor;
+		messages[0].text = std::move(newText);
+		messages[0].color = newColor;
 		Display(display);
 	}
 }
@@ -48,11 +48,11 @@ bool OverHeadText::Display(bool show)
 {
 	if (show) {
 		isDisplaying = true;
-		timeStartDisplaying = GetMilliseconds();
+		messages[0].timeStartDisplaying = GetMilliseconds();
 		return true;
 	} else if (isDisplaying) {
 		isDisplaying = false;
-		timeStartDisplaying = 0;
+		messages[0].timeStartDisplaying = 0;
 		return true;
 	}
 	return false;
@@ -61,7 +61,7 @@ bool OverHeadText::Display(bool show)
 // 'fix' the current overhead text - follow owner's position
 void OverHeadText::FixPos()
 {
-	pos = owner->Pos;
+	messages[0].pos = owner->Pos;
 }
 
 int OverHeadText::GetOffset() const
@@ -81,10 +81,10 @@ void OverHeadText::Draw()
 		return;
 
 	tick_t time = GetMilliseconds();
-	const Color& textColor = color == ColorBlack ? core->InfoTextColor : color;
+	const Color& textColor = messages[0].color == ColorBlack ? core->InfoTextColor : messages[0].color;
 	Font::PrintColors color = { textColor, ColorBlack };
 
-	time -= timeStartDisplaying;
+	time -= messages[0].timeStartDisplaying;
 	if (time >= maxDelay) {
 		Display(false);
 		return;
@@ -97,10 +97,10 @@ void OverHeadText::Draw()
 	}
 
 	int cs = GetOffset();
-	Point p = pos.IsInvalid() ? owner->Pos : pos;
+	Point p = messages[0].pos.IsInvalid() ? owner->Pos : messages[0].pos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));
-	core->GetTextFont()->Print(rgn, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
+	core->GetTextFont()->Print(rgn, messages[0].text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
 }
 
 }
