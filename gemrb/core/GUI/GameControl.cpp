@@ -1966,10 +1966,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			}
 
 			// always display overhead text; totsc's ar0511 library relies on it
-			if (!trap->overHead.Empty() && !trap->overHead.IsDisplaying()) {
-				trap->overHead.Display(true);
-				DisplayString(trap);
-			}
+			DisplayString(trap);
+
 			//the importer shouldn't load the script
 			//if it is unallowed anyway (though
 			//deactivated scripts could be reactivated)
@@ -1993,10 +1991,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 				// recheck if there are other infopoints at this position
 				const Map* map = trap->GetCurrentArea();
 				InfoPoint* ip2 = map->TMap->GetInfoPoint(p, true);
-				if (ip2 && !ip2->overHead.Empty() && !ip2->overHead.IsDisplaying()) {
-					ip2->overHead.Display(true);
-					DisplayString(ip2);
-				}
+				DisplayString(ip2);
 			}
 
 			if (trap->GetUsePoint() ) {
@@ -2501,13 +2496,17 @@ void GameControl::SetCutSceneMode(bool active)
 
 //Create an overhead text over a scriptable target
 //Multiple texts are possible, as this code copies the text to a new object
-void GameControl::DisplayString(const Scriptable* target) const
+void GameControl::DisplayString(Scriptable* target) const
 {
+	if (!target || target->overHead.Empty() || target->overHead.IsDisplaying()) {
+		return;
+	}
+
+	target->overHead.Display(true);
 	// add as a "subtitle" to the main message window
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
-	if (tmp && !target->overHead.Empty()) {
-		// pass NULL target so pst does not display multiple
+	if (tmp) {
 		displaymsg->DisplayString(target->overHead.GetText());
 	}
 }

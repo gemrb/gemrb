@@ -226,7 +226,7 @@ public:
 	bool CanRun(const Actor *actor) const;
 	bool ShouldRun(const Actor *actor) const;
 	/** Displays a string over an object */
-	void DisplayString(const Scriptable* target) const;
+	void DisplayString(Scriptable* target) const;
 	/** Displays a string on screen */
 	void DisplayString(const Point &p, const char *Text);
 	Actor *GetLastActor() const;
