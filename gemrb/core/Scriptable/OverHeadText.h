@@ -47,7 +47,7 @@ public:
 	bool Empty() const { return messages[0].text.empty(); }
 	bool IsDisplaying() const { return isDisplaying; }
 	bool Display(bool);
-	void FixPos();
+	void FixPos(const Point& pos);
 	int GetHeightOffset() const;
 	void Draw();
 };

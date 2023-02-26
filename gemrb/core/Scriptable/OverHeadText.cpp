@@ -59,9 +59,9 @@ bool OverHeadText::Display(bool show)
 }
 
 // 'fix' the current overhead text - follow owner's position
-void OverHeadText::FixPos()
+void OverHeadText::FixPos(const Point& pos)
 {
-	messages[0].pos = owner->Pos;
+	messages[0].pos = pos;
 }
 
 int OverHeadText::GetHeightOffset() const
