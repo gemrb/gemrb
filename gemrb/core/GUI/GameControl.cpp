@@ -1966,7 +1966,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			}
 
 			// always display overhead text; totsc's ar0511 library relies on it
-			if (!trap->overHead.text.empty() && !trap->overHead.isDisplaying) {
+			if (!trap->overHead.Empty() && !trap->overHead.isDisplaying) {
 				trap->overHead.Display(true);
 				DisplayString(trap);
 			}
@@ -1993,7 +1993,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 				// recheck if there are other infopoints at this position
 				const Map* map = trap->GetCurrentArea();
 				InfoPoint* ip2 = map->TMap->GetInfoPoint(p, true);
-				if (ip2 && !ip2->overHead.text.empty() && !ip2->overHead.isDisplaying) {
+				if (ip2 && !ip2->overHead.Empty() && !ip2->overHead.isDisplaying) {
 					ip2->overHead.Display(true);
 					DisplayString(ip2);
 				}
@@ -2506,9 +2506,9 @@ void GameControl::DisplayString(const Scriptable* target) const
 	// add as a "subtitle" to the main message window
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
-	if (tmp && !target->overHead.text.empty()) {
+	if (tmp && !target->overHead.Empty()) {
 		// pass NULL target so pst does not display multiple
-		displaymsg->DisplayString(target->overHead.text);
+		displaymsg->DisplayString(target->overHead.GetText());
 	}
 }
 

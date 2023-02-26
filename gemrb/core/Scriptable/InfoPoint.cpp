@@ -262,7 +262,7 @@ std::string InfoPoint::dump() const
 		AppendFormat(buffer, "Trap detection: {}%, Trap removal: {}%\n", TrapDetectionDiff, TrapRemovalDiff);
 		break;
 	case ST_TRIGGER:
-			AppendFormat(buffer, "InfoString: {}\n", fmt::WideToChar{overHead.text});
+			AppendFormat(buffer, "InfoString: {}\n", fmt::WideToChar{overHead.GetText()});
 		break;
 	default:;
 	}

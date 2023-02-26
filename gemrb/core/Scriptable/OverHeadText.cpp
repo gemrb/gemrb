@@ -27,6 +27,11 @@
 
 namespace GemRB {
 
+const String& OverHeadText::GetText() const
+{
+	return text;
+}
+
 void OverHeadText::SetText(String newText, bool display, const Color& newColor)
 {
 	pos.Invalidate();

@@ -35,7 +35,9 @@ struct GEM_EXPORT OverHeadText {
 	const Scriptable* owner = nullptr;
 
 	OverHeadText(const Scriptable* head) : owner(head) {};
+	const String& GetText() const;
 	void SetText(String newText, bool display = true, const Color& newColor = ColorBlack);
+	bool Empty() const { return text.empty(); }
 	bool Display(bool);
 	void FixPos();
 	int GetOffset() const;
