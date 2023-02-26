@@ -64,7 +64,7 @@ void OverHeadText::FixPos()
 	messages[0].pos = owner->Pos;
 }
 
-int OverHeadText::GetOffset() const
+int OverHeadText::GetHeightOffset() const
 {
 	int offset = 100;
 	if (owner->Type == ST_ACTOR) {
@@ -96,7 +96,7 @@ void OverHeadText::Draw()
 		}
 	}
 
-	int cs = GetOffset();
+	int cs = GetHeightOffset();
 	Point p = messages[0].pos.IsInvalid() ? owner->Pos : messages[0].pos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));

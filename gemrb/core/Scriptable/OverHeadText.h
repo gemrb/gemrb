@@ -48,7 +48,7 @@ public:
 	bool IsDisplaying() const { return isDisplaying; }
 	bool Display(bool);
 	void FixPos();
-	int GetOffset() const;
+	int GetHeightOffset() const;
 	void Draw();
 };
 
