@@ -2964,7 +2964,7 @@ int GameScript::OwnsFloaterMessage(Scriptable *Sender, const Trigger *parameters
 	if (!tar) {
 		return 0;
 	}
-	return tar->overHead.isDisplaying;
+	return tar->overHead.IsDisplaying();
 }
 
 int GameScript::InCutSceneMode(Scriptable */*Sender*/, const Trigger */*parameters*/)

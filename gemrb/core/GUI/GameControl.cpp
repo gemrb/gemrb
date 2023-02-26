@@ -1966,7 +1966,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			}
 
 			// always display overhead text; totsc's ar0511 library relies on it
-			if (!trap->overHead.Empty() && !trap->overHead.isDisplaying) {
+			if (!trap->overHead.Empty() && !trap->overHead.IsDisplaying()) {
 				trap->overHead.Display(true);
 				DisplayString(trap);
 			}
@@ -1993,7 +1993,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 				// recheck if there are other infopoints at this position
 				const Map* map = trap->GetCurrentArea();
 				InfoPoint* ip2 = map->TMap->GetInfoPoint(p, true);
-				if (ip2 && !ip2->overHead.Empty() && !ip2->overHead.isDisplaying) {
+				if (ip2 && !ip2->overHead.Empty() && !ip2->overHead.IsDisplaying()) {
 					ip2->overHead.Display(true);
 					DisplayString(ip2);
 				}

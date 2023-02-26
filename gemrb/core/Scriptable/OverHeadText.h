@@ -35,15 +35,17 @@ struct OverHeadMsg {
 	String text;
 };
 
-struct GEM_EXPORT OverHeadText {
+class GEM_EXPORT OverHeadText {
 	bool isDisplaying = false;
 	const Scriptable* owner = nullptr;
 	std::vector<OverHeadMsg> messages{1};
 
+public:
 	OverHeadText(const Scriptable* head) : owner(head) {};
 	const String& GetText() const;
 	void SetText(String newText, bool display = true, const Color& newColor = ColorBlack);
 	bool Empty() const { return messages[0].text.empty(); }
+	bool IsDisplaying() const { return isDisplaying; }
 	bool Display(bool);
 	void FixPos();
 	int GetOffset() const;
