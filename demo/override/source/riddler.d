@@ -72,7 +72,7 @@ IF ~~ THEN BEGIN 8
 END
 
 IF ~~ THEN BEGIN 9
-  SAY #51 /* ~I know and old grey guy that reaches sky high.~ */
+  SAY #51 /* ~I know an old grey guy that reaches sky high.~ */
   IF ~~ THEN REPLY #52 /* ~A mountain.~ */ GOTO 12
   IF ~~ THEN REPLY #53 /* ~A baloon.~ */ GOTO 12
   IF ~~ THEN REPLY #54 /* ~A thrown rock.~ */ GOTO 12
