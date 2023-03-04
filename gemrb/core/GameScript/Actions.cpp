@@ -1578,7 +1578,8 @@ void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		target=Sender;
 	}
-	target->overHead.Display(false);
+	// we could kill the whole overhead queue, but no need has been shown so far
+	target->overHead.Display(false, 0);
 }
 
 void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)

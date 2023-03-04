@@ -27,9 +27,9 @@
 
 namespace GemRB {
 
-const String& OverHeadText::GetText() const
+const String& OverHeadText::GetText(size_t idx) const
 {
-	return messages[0].text;
+	return messages[idx].text;
 }
 
 void OverHeadText::SetText(String newText, bool display, const Color& newColor)
@@ -44,24 +44,34 @@ void OverHeadText::SetText(String newText, bool display, const Color& newColor)
 	}
 }
 
-bool OverHeadText::Display(bool show)
+bool OverHeadText::Display(bool show, size_t idx)
 {
 	if (show) {
 		isDisplaying = true;
-		messages[0].timeStartDisplaying = GetMilliseconds();
+		messages[idx].timeStartDisplaying = GetMilliseconds();
 		return true;
 	} else if (isDisplaying) {
-		isDisplaying = false;
-		messages[0].timeStartDisplaying = 0;
+		// is this the last displaying message?
+		if (messages.size() == 1) {
+			isDisplaying = false;
+			messages[idx].timeStartDisplaying = 0;
+		} else {
+			messages.erase(messages.begin() + idx);
+			bool show = false;
+			for (const auto& msg : messages) {
+				show = show || msg.timeStartDisplaying != 0;
+			}
+			if (!show) isDisplaying = false;
+		}
 		return true;
 	}
 	return false;
 }
 
 // 'fix' the current overhead text - follow owner's position
-void OverHeadText::FixPos(const Point& pos)
+void OverHeadText::FixPos(const Point& pos, size_t idx)
 {
-	messages[0].pos = pos;
+	messages[idx].pos = pos;
 }
 
 int OverHeadText::GetHeightOffset() const

@@ -1111,7 +1111,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			for (int pm = 0; pm < game->GetPartySize(false); pm++) {
 				Actor *pc = game->GetPC(pm, true);
 				if (!pc) continue;
-				pc->overHead.Display(false);
+				pc->overHead.Display(false, 0);
 			}
 			break;
 		default:
@@ -2502,13 +2502,13 @@ void GameControl::DisplayString(Scriptable* target) const
 		return;
 	}
 
-	target->overHead.Display(true);
 	// add as a "subtitle" to the main message window
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
 	if (tmp) {
 		displaymsg->DisplayString(target->overHead.GetText());
 	}
+	target->overHead.Display(true, 0);
 }
 
 /** changes displayed map to the currently selected PC */

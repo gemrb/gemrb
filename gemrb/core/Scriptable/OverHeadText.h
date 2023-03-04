@@ -38,16 +38,20 @@ struct OverHeadMsg {
 class GEM_EXPORT OverHeadText {
 	bool isDisplaying = false;
 	const Scriptable* owner = nullptr;
+	// the first message is reserved for regular overhead text
+	// all the rest are used only in pst by either:
+	// - actors (full queue at same position) or
+	// - areas (disparate messages at different positions)
 	std::vector<OverHeadMsg> messages{1};
 
 public:
 	OverHeadText(const Scriptable* head) : owner(head) {};
-	const String& GetText() const;
 	void SetText(String newText, bool display = true, const Color& newColor = ColorBlack);
-	bool Empty() const { return messages[0].text.empty(); }
+	const String& GetText(size_t idx = 0) const;
+	bool Empty(size_t idx = 0) const { return messages[idx].text.empty(); }
 	bool IsDisplaying() const { return isDisplaying; }
-	bool Display(bool);
-	void FixPos(const Point& pos);
+	bool Display(bool show, size_t idx = 0);
+	void FixPos(const Point& pos, size_t idx = 0);
 	int GetHeightOffset() const;
 	void Draw();
 };
