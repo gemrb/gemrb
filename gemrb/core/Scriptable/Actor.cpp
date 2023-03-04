@@ -4363,7 +4363,6 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			}
 			displaymsg->DisplayConstantStringName(strref, GUIColors::WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
-			// TODO: handle pst properly (decay, queueing)
 			auto color = GUIColors::WHITE;
 			if (InParty) {
 				color = GUIColors::RED;

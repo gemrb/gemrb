@@ -20,6 +20,7 @@
 
 #include "OverHeadText.h"
 
+#include "Game.h"
 #include "Interface.h"
 #include "Scriptable.h"
 
@@ -62,7 +63,7 @@ bool OverHeadText::Display(bool show, size_t idx)
 {
 	if (show) {
 		isDisplaying = true;
-		messages[idx].timeStartDisplaying = GetMilliseconds();
+		messages[idx].timeStartDisplaying = core->Time.Ticks2Ms(core->GetGame()->GameTime);
 		return true;
 	} else if (isDisplaying) {
 		// is this the last displaying message?
@@ -100,31 +101,68 @@ int OverHeadText::GetHeightOffset() const
 
 void OverHeadText::Draw()
 {
-	static constexpr int maxDelay = 6000;
-	if (!isDisplaying)
+	if (!isDisplaying) {
 		return;
+	}
 
-	tick_t time = GetMilliseconds();
-	const Color& textColor = messages[0].color == ColorBlack ? core->InfoTextColor : messages[0].color;
+	int height = GetHeightOffset();
+	bool show = false;
+	for (auto msgIter = messages.begin(); msgIter != messages.end(); ++msgIter) {
+		auto& msg = *msgIter;
+		if (msg.timeStartDisplaying == 0) continue;
+		if (msg.Draw(height, owner->Pos)) {
+			show = true;
+		} else if (msgIter != messages.begin()) { // always keep the one reserved slot
+			msgIter = messages.erase(msgIter);
+			--msgIter;
+		}
+	}
+
+	// if all messages are done, mark as done
+	if (!show) {
+		isDisplaying = false;
+	}
+}
+
+// *******************************************************************
+// OverHeadMsg methods
+bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos)
+{
+	static constexpr tick_t maxDelay = 6000;
+	tick_t delay = maxDelay;
+	if (core->HasFeature(GF_ONSCREEN_TEXT) && !scrollOffset.IsInvalid()) {
+		// empirically determined estimate to get the right speed and distance and 2px/tick
+		delay = 1800;
+	}
+
+	tick_t time = core->Time.Ticks2Ms(core->GetGame()->GameTime);
+	const Color& textColor = color == ColorBlack ? core->InfoTextColor : color;
 	Font::PrintColors color = { textColor, ColorBlack };
 
-	time -= messages[0].timeStartDisplaying;
-	if (time >= maxDelay) {
-		Display(false);
-		return;
+	time -= timeStartDisplaying;
+	if (time >= delay) {
+		timeStartDisplaying = 0;
+		return false;
 	} else {
-		time = (maxDelay - time) / 10;
+		time = (delay - time) / 10;
 		// rapid fade-out
 		if (time < 256) {
 			color.fg.a = static_cast<unsigned char>(255 - time);
 		}
 	}
 
-	int cs = GetHeightOffset();
-	Point p = messages[0].pos.IsInvalid() ? owner->Pos : messages[0].pos;
+	Point p = pos.IsInvalid() ? fallbackPos : pos;
 	Region vp = core->GetGameControl()->Viewport();
-	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));
-	core->GetTextFont()->Print(rgn, messages[0].text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
+	// NOTE: in case we just printed a message, should we reduce the offset, so we can draw immediately without interference?
+	Region rgn(p - Point(100, heightOffset) - vp.origin, Size(200, 400));
+	if (delay != maxDelay) {
+		rgn.y -= maxScrollOffset - scrollOffset.y;
+		// rgn.h will be adjusted automatically, we don't need to worry about accidentally hiding other msgs
+		scrollOffset.y -= 2;
+	}
+	core->GetTextFont()->Print(rgn, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
+
+	return true;
 }
 
 }

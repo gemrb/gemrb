@@ -34,6 +34,8 @@ struct OverHeadMsg {
 	Color color = ColorBlack;
 	tick_t timeStartDisplaying = 0;
 	String text;
+
+	bool Draw(int heightOffset, const Point& fallbackPos);
 };
 
 class GEM_EXPORT OverHeadText {
