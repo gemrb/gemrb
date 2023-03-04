@@ -1597,18 +1597,11 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 
 static void FloatMessageAtPoint(Scriptable* Sender, const Point& pos, const ieStrRef& msgRef)
 {
-	// create invisible and invicible actor to host the text (lifted from Map::GetItemByDialog)
-	// replace once we have a generic solution, so we don't crowd the area
-	Actor *surrogate = gamedata->GetCreature("dmhead");
-	assert(surrogate);
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
-	map->AddActor(surrogate, true);
-	surrogate->SetBase(IE_DONOTJUMP, DNJ_BIRD);
-	surrogate->SetPosition(pos, 0);
 	String msg = core->GetString(msgRef);
-	surrogate->overHead.SetText(msg);
-	surrogate->overHead.FixPos(pos);
+	map->overHead.SetText(msg);
+	map->overHead.FixPos(pos);
 }
 
 // only used three times by cranium rats
