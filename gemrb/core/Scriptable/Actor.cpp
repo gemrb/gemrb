@@ -3002,15 +3002,11 @@ void Actor::RefreshPCStats() {
 	// regenerate actors with high enough constitution
 	int rate = GetConHealAmount();
 	if (rate && !(game->GameTime % rate)) {
-		if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
-			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
+		NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
+		if (core->HasFeature(GF_ONSCREEN_TEXT) && InParty && Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
 			// eeeh, no token (Heal: 1)
-			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
-				static const String text = fmt::format(L"{} 1", core->GetString(ieStrRef::HEAL));
-				overHead.SetText(text);
-			}
-		} else{
-			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
+			static const String text = fmt::format(L"{} 1", core->GetString(ieStrRef::HEAL));
+			overHead.SetText(text);
 		}
 	}
 
