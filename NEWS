@@ -1,16 +1,17 @@
-GemRB git (7d6f9c4):
+GemRB git (f457940):
   New features:
     - 
     - PVR(Z), BAM2, MOS2 and TIS2 support
-    - support for EE-style saves and TLK locations
+    - support for EE-style saves, TLK locations and many more tables
+    - pst's floating text and personalized pc comments
     - optional smooth fog of war on SDL >= 2.0.18
-    - pst's personalized pc comments
     - 3e-style sneak attack and crippling strike from HoW/iwdee
+    - Anbernic device support
 
   Improved features:
     - 
-    - performance
-    - combat, pathfinding, opcodes, ee compat, hp handling, formations
+    - performance, pathfinding, formations
+    - combat, opcodes, ee compat, hp handling, demo
     - bugfixes
 
 GemRB v0.9.1 (2022-08-29):
