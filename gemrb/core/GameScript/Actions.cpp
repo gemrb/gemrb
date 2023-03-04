@@ -2518,6 +2518,19 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters) {
 	Sender->ReleaseCurrentAction();
 }
 
+// move to GSUtils if it becomes useful elsewhere
+static void DisplayMsgAtLocation(int strIdx, FeedbackType type, Scriptable* owner, const Actor* trigger = nullptr)
+{
+	if (!core->HasFeedback(type)) return;
+
+	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+		ieStrRef complaint = DisplayMessage::GetStringReference(strIdx, trigger);
+		owner->overHead.SetText(core->GetString(complaint));
+	} else {
+		displaymsg->DisplayConstantString(strIdx, GUIColors::LIGHTGREY, owner);
+	}
+}
+
 void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
@@ -2539,7 +2552,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 		if (!door->TryUnlock(actor)) {
-			displaymsg->DisplayConstantString(STR_DOORLOCKED, GUIColors::LIGHTGREY, door);
+			DisplayMsgAtLocation(STR_DOORLOCKED, FT_MISC, door, actor);
 			door->AddTrigger(TriggerEntry(trigger_failedtoopen, actor->GetGlobalID()));
 
 			//playsound unsuccessful opening of door
@@ -5575,7 +5588,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 		if (!container->TryUnlock(actor)) {
 			//playsound can't open container
 			//display string, etc
-			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_CONTLOCKED, GUIColors::LIGHTGREY, container);
+			DisplayMsgAtLocation(STR_CONTLOCKED, FT_MISC, container, actor);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
