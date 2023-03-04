@@ -3006,8 +3006,8 @@ void Actor::RefreshPCStats() {
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
-				String text = core->GetString(ieStrRef::HEAL) + L'1';
-				displaymsg->DisplayString(text, GUIColors::XPCHANGE, this);
+				static const String text = fmt::format(L"{} 1", core->GetString(ieStrRef::HEAL));
+				overHead.SetText(text);
 			}
 		} else{
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
