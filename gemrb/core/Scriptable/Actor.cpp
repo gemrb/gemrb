@@ -4372,7 +4372,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			if (InParty) {
 				color = GUIColors::RED;
 			}
-			overHead.SetText(fmt::to_wstring(damage), true, displaymsg->GetColor(color));
+			overHead.SetText(fmt::to_wstring(damage), true, true, displaymsg->GetColor(color));
 		} else if (!DisplayMessage::HasStringReference(STR_DAMAGE2) || !damager) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
@@ -10859,7 +10859,7 @@ void Actor::DisplayHeadHPRatio()
 {
 	if (!HasVisibleHP()) return;
 
-	overHead.SetText(fmt::format(L"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]));
+	overHead.SetText(fmt::format(L"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]), true, false);
 }
 
 void Actor::ReleaseCurrentAction()

@@ -32,16 +32,30 @@ const String& OverHeadText::GetText(size_t idx) const
 	return messages[idx].text;
 }
 
-void OverHeadText::SetText(String newText, bool display, const Color& newColor)
+static constexpr int maxScrollOffset = 100;
+void OverHeadText::SetText(String newText, bool display, bool append, const Color& newColor)
 {
-	messages[0].pos.Invalidate();
+	size_t idx = 0;
 	if (newText.empty()) {
-		Display(false);
-	} else {
-		messages[0].text = std::move(newText);
-		messages[0].color = newColor;
-		Display(display);
+		messages[idx].pos.Invalidate();
+		Display(false, idx);
+		return;
 	}
+
+	// always append for actors and areas ... unless it's the head hp ratio
+	if (append && core->HasFeature(GF_ONSCREEN_TEXT) && (owner->Type == ST_ACTOR || owner->Type == ST_AREA)) {
+		idx = messages.size();
+		messages.emplace_back();
+		if (owner->Type == ST_ACTOR) {
+			messages[idx].scrollOffset = Point(0, maxScrollOffset);
+		}
+	} else {
+		messages[idx].scrollOffset.Invalidate();
+	}
+	messages[idx].pos.Invalidate();
+	messages[idx].text = std::move(newText);
+	messages[idx].color = newColor;
+	Display(display, idx);
 }
 
 bool OverHeadText::Display(bool show, size_t idx)
