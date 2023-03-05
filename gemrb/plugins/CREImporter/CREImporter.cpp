@@ -935,12 +935,12 @@ void CREImporter::GetActorPST(Actor *act)
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACPIERCINGMOD]);
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACSLASHINGMOD]);
 	ieByteSigned tmpByte;
-	str->Read( &tmpByte, 1 );
+	str->Read(&tmpByte, 1);
 	act->ToHit.SetBase(tmpByte);
-	str->Read( &tmpByte, 1 );
+	str->Read(&tmpByte, 1);
 	tmpByte = tmpByte * 2;
-	if (tmpByte>10) tmpByte-=11;
-	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
+	if (tmpByte > 10) tmpByte -= 11;
+	act->BaseStats[IE_NUMBEROFATTACKS] = tmpByte;
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSDEATH]);
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSWANDS]);
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSPOLY]);
@@ -956,7 +956,8 @@ void CREImporter::GetActorPST(Actor *act)
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTSLASHING]);
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTCRUSHING]);
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTPIERCING]);
-	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMISSILE]); //this is used for unused prof points count
+	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_RESISTMISSILE]);
+	// this is used for unused prof points count
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FREESLOTS]); //using another field than usually
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SETTRAPS]); //this is unused in pst
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LORE]);
@@ -977,39 +978,24 @@ void CREImporter::GetActorPST(Actor *act)
 	for (auto& ref : act->StrRefs) {
 		str->ReadStrRef(ref);
 	}
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL2]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL3]=tmpByte;
-	//this is rumoured to be IE_SEX, but we use the gender field for this
-	str->Read( &tmpByte, 1 );
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL2]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL3]);
+	// skipping, this is rumoured to be IE_SEX, but we use the gender field for this
+	str->Seek(1, GEM_CURRENT_POS);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STREXTRA]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INT]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_WIS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DEX]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CON]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CHR]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALEBREAK]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HATEDRACE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALERECOVERYTIME]);
 	//skipping a byte
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STR]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_STREXTRA]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_INT]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_WIS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_DEX]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_CON]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_CHR]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALEBREAK]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_HATEDRACE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	//skipping a byte
+	str->Seek(1, GEM_CURRENT_POS);
 	str->ReadDword(act->BaseStats[IE_KIT]);
 	ReadScript(act, SCR_OVERRIDE);
 	ReadScript(act, SCR_CLASS);
@@ -1031,47 +1017,33 @@ void CREImporter::GetActorPST(Actor *act)
 	}
 	//good, law, lady, murder
 	for (auto& counter : act->DeathCounters) {
-		str->Read( &tmpByte, 1);
-		counter = tmpByte;
+		str->ReadScalar(counter);
 	}
 	ieVariable KillVar; //use this as needed
 	str->ReadVariable(KillVar);
-	str->Read(&tmpByte, 1);
-	act->BaseStats[IE_DIALOGRANGE] = tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DIALOGRANGE]);
 	str->Seek(2, GEM_CURRENT_POS); // circle size is only here (not in resdata.ini), but we have it in our own avatars.2da; plus an unknown byte
 
-	str->Read( &tmpByte, 1 );
-
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_COLORCOUNT]);
 	str->ReadDword(act->AppearanceFlags);
 
 	// just overwrite the bg1 color stat range, since it's not used in pst
 	for (int i = 0; i < 7; i++) {
 		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_COLORS + i]);
 	}
-	act->BaseStats[IE_COLORCOUNT] = tmpByte;
 	str->Read(act->pstColorBytes, 10); // color location in IESDP, sort of a palette index and flags
 	str->Seek(21, GEM_CURRENT_POS);
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SPECIES]=tmpByte; // offset: 0x311
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_TEAM]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_FACTION]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_EA]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_GENERAL]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_RACE]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_CLASS]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SPECIFIC]=tmpByte;
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_SEX]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECIES]); // offset: 0x311
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TEAM]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FACTION]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_EA]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_GENERAL]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_RACE]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CLASS]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECIFIC]);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEX]);
 	str->Seek( 5, GEM_CURRENT_POS );
-	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_ALIGNMENT]=tmpByte;
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALIGNMENT]);
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
