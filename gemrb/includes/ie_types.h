@@ -76,6 +76,7 @@ enum class ieStrRef : ieDword {
 	MD_FAIL = 24197,
 	MD_SUCCESS = 24198,
 	HEAL = 28895,
+	DAMAGE = 22036,
 	
 	// params to DisplayRollStringName
 	ROLL0 = 112,

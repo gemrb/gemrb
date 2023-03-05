@@ -4367,7 +4367,9 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			if (InParty) {
 				color = GUIColors::RED;
 			}
-			overHead.SetText(fmt::to_wstring(damage), true, true, displaymsg->GetColor(color));
+			// eeeh, no token (Damage: x)
+			String text = fmt::format(L"{} {}", core->GetString(ieStrRef::DAMAGE), damage);
+			overHead.SetText(text, true, true, displaymsg->GetColor(color));
 		} else if (!DisplayMessage::HasStringReference(STR_DAMAGE2) || !damager) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
