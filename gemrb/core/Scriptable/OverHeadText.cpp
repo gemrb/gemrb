@@ -72,11 +72,11 @@ bool OverHeadText::Display(bool show, size_t idx)
 			messages[idx].timeStartDisplaying = 0;
 		} else {
 			messages.erase(messages.begin() + idx);
-			bool show = false;
+			bool showing = false;
 			for (const auto& msg : messages) {
-				show = show || msg.timeStartDisplaying != 0;
+				showing = showing || msg.timeStartDisplaying != 0;
 			}
-			if (!show) isDisplaying = false;
+			if (!showing) isDisplaying = false;
 		}
 		return true;
 	}
@@ -147,7 +147,7 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 			textColor = displaymsg->GetColor(GUIColors::FLOAT_TXT_OTHER);
 		}
 	}
-	Font::PrintColors color = { textColor, ColorBlack };
+	Font::PrintColors fontColor = { textColor, ColorBlack };
 
 	time -= timeStartDisplaying;
 	if (time >= delay) {
@@ -157,7 +157,7 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 		time = (delay - time) / 10;
 		// rapid fade-out
 		if (time < 256) {
-			color.fg.a = static_cast<unsigned char>(255 - time);
+			fontColor.fg.a = static_cast<unsigned char>(255 - time);
 		}
 	}
 
@@ -170,7 +170,7 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 		// rgn.h will be adjusted automatically, we don't need to worry about accidentally hiding other msgs
 		scrollOffset.y -= 2;
 	}
-	core->GetTextFont()->Print(rgn, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
+	core->GetTextFont()->Print(rgn, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, fontColor);
 
 	return true;
 }

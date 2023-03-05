@@ -48,7 +48,7 @@ class GEM_EXPORT OverHeadText {
 	std::vector<OverHeadMsg> messages{1};
 
 public:
-	OverHeadText(const Scriptable* head) : owner(head) {};
+	explicit OverHeadText(const Scriptable* head) : owner(head) {};
 	const String& GetText(size_t idx = 0) const;
 	void SetText(String newText, bool display = true, bool append = true, const Color& newColor = ColorBlack);
 	bool Empty(size_t idx = 0) const { return messages[idx].text.empty(); }
