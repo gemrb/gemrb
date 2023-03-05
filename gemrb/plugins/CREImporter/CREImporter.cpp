@@ -132,10 +132,10 @@ void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
 
 static int IsInnate(const ResRef& name)
 {
-	int innateCount = innlist.size();
-	for (int i = 0; i < innateCount; i++) {
+	size_t innateCount = innlist.size();
+	for (size_t i = 0; i < innateCount; i++) {
 		if (name == innlist[i]) {
-			return i;
+			return static_cast<int>(i);
 		}
 	}
 	return -1;
@@ -143,10 +143,10 @@ static int IsInnate(const ResRef& name)
 
 static int IsSong(const ResRef& name)
 {
-	int sngCount = snglist.size();
-	for (int i = 0; i < sngCount; i++) {
+	size_t sngCount = snglist.size();
+	for (size_t i = 0; i < sngCount; i++) {
 		if (name == snglist[i]) {
-			return i;
+			return static_cast<int>(i);
 		}
 	}
 	return -1;
@@ -154,10 +154,10 @@ static int IsSong(const ResRef& name)
 
 static int IsShape(const ResRef& name)
 {
-	int shpCount = shplist.size();
-	for (int i = 0; i < shpCount; i++) {
+	size_t shpCount = shplist.size();
+	for (size_t i = 0; i < shpCount; i++) {
 		if (name == shplist[i]) {
-			return i;
+			return static_cast<int>(i);
 		}
 	}
 	return -1;
@@ -174,8 +174,8 @@ static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 		if (domList[i] && domList[i]->Equals(name)) {
 			int lev = domList[i]->FindSpell(kit);
 			if (lev == -1) return -1;
-			level = lev;
-			return i;
+			level = static_cast<unsigned short>(lev);
+			return static_cast<int>(i);
 		}
 	}
 	return -1;
@@ -207,7 +207,7 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 	// still needs to happen first or the laxer check below can misclassify
 	// first translate the actual kit to a column index to make them comparable
 	// luckily they are in order
-	int kit2 = std::log2(kit/0x8000); // 0x8000 is the first cleric kit
+	int kit2 = static_cast<int>(std::log2(kit / 0x8000)); // 0x8000 is the first cleric kit
 	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
@@ -225,7 +225,7 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 				Log(ERROR, "CREImporter", "Spell ({} of type {}) found without a level set! Using 1!", name, type);
 				level2 = 0; // internal 0-indexed level
 			}
-			level = level2;
+			level = static_cast<unsigned short>(level2);
 			// FIXME: returning the first will misplace spells for multiclasses
 			return type;
 		}
@@ -1402,7 +1402,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		}
 
 		CREKnownSpell *known = new CREKnownSpell;
-		known->Level = level;
+		known->Level = static_cast<ieWord>(level);
 		known->Type = type;
 		known->SpellResRef = tmp;
 		sm->known_spells.push_back(known);
@@ -1791,7 +1791,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 	int headersize;
 	unsigned int Inventory_Size;
 
-	CREVersion = actor->creVersion;
+	CREVersion = static_cast<unsigned char>(actor->creVersion);
 	switch (CREVersion) {
 		case CREVersion::GemRB:
 			headersize = 0x2d4;
@@ -1905,8 +1905,8 @@ int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned i
 		stream->WriteWord(indices[i]);
 	}
 
-	stream->WriteWord(actor->inventory.GetEquipped());
-	stream->WriteWord(actor->inventory.GetEquippedHeader());
+	stream->WriteScalar<int, ieWord>(actor->inventory.GetEquipped());
+	stream->WriteScalar<int, ieWord>(actor->inventory.GetEquippedHeader());
 
 	for (unsigned int i = 0; i < size; i++) {
 		//ignore first element, getinventorysize makes space for fist
@@ -1951,7 +1951,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->WriteDword(actor->BaseStats[IE_XP]);
 	stream->WriteDword(actor->BaseStats[IE_GOLD]);
 	stream->WriteDword(actor->BaseStats[IE_STATE_ID]);
-	ieWord tmpWord = actor->BaseStats[IE_HITPOINTS];
+	ieWord tmpWord = static_cast<ieWord>(actor->BaseStats[IE_HITPOINTS]);
 	//decrease the hp back to the one without constitution bonus
 	// (but only player classes can have it)
 	tmpWord = (ieWord) (tmpWord - actor->GetHpAdjustment(actor->GetXPLevel(false), false));
@@ -1969,20 +1969,18 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_REPUTATION]);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HIDEINSHADOWS]);
 	//from here it differs, slightly
-	tmpWord = actor->AC.GetNatural();
-	stream->WriteWord(tmpWord);
+	stream->WriteScalar<int, ieWord>(actor->AC.GetNatural());
 	//iwd2 doesn't store this a second time,
 	//probably gemrb format shouldn't either?
 	if (actor->creVersion != CREVersion::V2_2) {
-		tmpWord = actor->AC.GetNatural();
-		stream->WriteWord(tmpWord);
+		stream->WriteScalar<int, ieWord>(actor->AC.GetNatural());
 	}
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACCRUSHINGMOD]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACMISSILEMOD]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACPIERCINGMOD]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACSLASHINGMOD]);
 	stream->WriteScalar<int, ieByte>(actor->ToHit.GetBase());
-	ieByte tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
+	ieByte tmpByte = static_cast<ieByte>(actor->BaseStats[IE_NUMBEROFATTACKS]);
 	if (actor->creVersion == CREVersion::V2_2) {
 		stream->Write( &tmpByte, 1);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEFORTITUDE]);
@@ -2030,8 +2028,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	if (actor->creVersion == CREVersion::V2_2) {
 		//this is rather fuzzy
 		//turnundead level, + 33 bytes of zero
-		tmpByte = actor->BaseStats[IE_TURNUNDEADLEVEL];
-		stream->Write(&tmpByte, 1);
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TURNUNDEADLEVEL]);
 		stream->WriteFilling(33);
 		//total levels
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASSLEVELSUM]);
@@ -2328,13 +2325,13 @@ int CREImporter::PutSpellPages(DataStream *stream, const Actor *actor) const
 
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
-		ieWord level = actor->spellbook.GetSpellLevelCount(i);
+		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (ieWord j = 0; j < level; ++j) {
 			stream->WriteScalar(j);
-			ieWord tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,false);
-			stream->WriteWord(tmpWord);
-			tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,true);
-			stream->WriteWord(tmpWord);
+			int tmp = actor->spellbook.GetMemorizableSpellsCount(i, j, false);
+			stream->WriteScalar<int, ieWord>(tmp);
+			tmp = actor->spellbook.GetMemorizableSpellsCount(i, j, true);
+			stream->WriteScalar<int, ieWord>(tmp);
 			stream->WriteScalar<int, ieWord>(i);
 			stream->WriteDword(SpellIndex);
 			ieDword tmpDword = actor->spellbook.GetMemorizedSpellsCount(i,j, false);
@@ -2474,7 +2471,7 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	}
 	assert(TotSCEFF==0 || TotSCEFF==1);
 
-	CREOffset = stream->GetPos(); // for asserts
+	CREOffset = static_cast<ieDword>(stream->GetPos()); // for asserts
 
 	ret = PutHeader( stream, actor);
 	if (ret) {
