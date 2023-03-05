@@ -438,7 +438,6 @@ public:
 	std::shared_ptr<StringMgr> strings;
 	std::shared_ptr<StringMgr> strings2;
 	GlobalTimer timer;
-	Color InfoTextColor = ColorWhite;
 	int QuitFlag = QF_NORMAL;
 	int EventFlag = EF_CONTROL;
 	Holder<SaveGame> LoadGameIndex;
@@ -475,8 +474,6 @@ public:
 	/* returns a newly created string */
 	String GetString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
 	std::string GetMBString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
-	/* sets the floattext color */
-	void SetInfoTextColor(const Color &color);
 	/** returns a gradient set */
 	const ColorPal<16>& GetPalette16(uint8_t idx) const { return (idx >= palettes16.size()) ? palettes16[0] : palettes16[idx]; }
 	const ColorPal<32>& GetPalette32(uint8_t idx) const { return (idx >= palettes32.size()) ? palettes32[0] : palettes32[idx]; }

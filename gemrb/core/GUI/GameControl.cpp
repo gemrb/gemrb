@@ -617,7 +617,8 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	}
 
 	if (core->HasFeature(GF_ONSCREEN_TEXT) && !DisplayText.empty()) {
-		core->GetTextFont()->Print(screen, DisplayText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, {core->InfoTextColor, ColorBlack});
+		Font::PrintColors colors = { displaymsg->GetColor(GUIColors::FLOAT_TXT_INFO), ColorBlack };
+		core->GetTextFont()->Print(screen, DisplayText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, colors);
 		if (!(DialogueFlags & DF_FREEZE_SCRIPTS)) {
 			// just replicating original engine behaviour
 			if (DisplayTextTime == 0) {

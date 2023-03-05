@@ -4231,11 +4231,6 @@ void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes) const
 	EffectQueue_RegisterOpcodes(count, opcodes);
 }
 
-void Interface::SetInfoTextColor(const Color &color)
-{
-	InfoTextColor = color;
-}
-
 //todo row?
 void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const
 {

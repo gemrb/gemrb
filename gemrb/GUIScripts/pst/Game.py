@@ -25,6 +25,5 @@ from GameCheck import MAX_PARTY_SIZE
 def EnterGame():
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(0)
-	GemRB.SetInfoTextColor({'r' : 0, 'g' : 255, 'b' : 255, 'a' : 255})
 
 	MessageWindow.OnLoad()

@@ -278,31 +278,6 @@ static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, boo
 	return 1;
 }
 
-PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
-"===== SetInfoTextColor =====\n\
-\n\
-**Prototype:** GemRB.SetInfoTextColor (red, green, blue[, alpha])\n\
-\n\
-**Description:**\n\
-Sets the color of floating messages in GameControl. Floating messages are\n\
- in-game messages issued by actors, or information text coming from game objects.\n\
-\n\
-**Parameters:** red, green, blue, alpha - color code, alpha defaults to 255 (completely opaque)\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [Control_SetColor](Control_SetColor.md)"
-);
-
-static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
-{
-	PyObject* pyColor = NULL;
-	if (PyArg_ParseTuple( args, "O", &pyColor)) {
-		core->SetInfoTextColor( ColorFromPy(pyColor) );
-	}
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_GetGameString__doc,
 "===== GetGameString =====\n\
 \n\
@@ -13285,7 +13260,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetFullScreen, METH_VARARGS),
 	METHOD(SetGamma, METH_VARARGS),
 	METHOD(SetGlobal, METH_VARARGS),
-	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(SetJournalEntry, METH_VARARGS),
 	METHOD(SetMapAnimation, METH_VARARGS),
 	METHOD(SetMapDoor, METH_VARARGS),
