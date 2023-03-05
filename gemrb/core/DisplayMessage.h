@@ -97,6 +97,7 @@ public:
 
 	DisplayMessage();
 	Color GetColor(const GUIColors color) const;
+	const std::string& GetColorName(GUIColors idx) const;
 	/** displays any string in the textarea */
 	void DisplayMarkupString(String txt) const;	
 	/** displays a string constant in the textarea */

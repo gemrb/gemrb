@@ -245,13 +245,19 @@ std::map<GUIColors, std::string> DisplayMessage::GetAllColors() const
 	return auxiliaryColors;
 }
 
-Color DisplayMessage::GetColor(GUIColors color) const
+static const std::string EmptyString = "";
+const std::string& DisplayMessage::GetColorName(GUIColors color) const
 {
 	const auto it = GUIColorNames.find(color);
 	if (it != GUIColorNames.end()) {
-		return gamedata->GetColor(it->second);
+		return it->second;
 	}
-	return gamedata->GetColor("");
+	return EmptyString;
+}
+
+Color DisplayMessage::GetColor(GUIColors color) const
+{
+	return gamedata->GetColor(GetColorName(color));
 }
 
 void DisplayMessage::DisplayString(ieStrRef stridx, GUIColors color, STRING_FLAGS flags) const
