@@ -639,6 +639,11 @@ const Color& GameData::GetColor(const TableMgr::key_t& row) const
 	return ColorRed;
 }
 
+void GameData::ModifyColor(GUIColors idx, const Color& newColor)
+{
+	colors[displaymsg->GetColorName(idx)] = newColor;
+}
+
 // wspatck bonus handling
 int GameData::GetWeaponStyleAPRBonus(int row, int col)
 {

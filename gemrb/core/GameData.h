@@ -27,6 +27,7 @@
 
 #include "Cache.h"
 #include "CharAnimations.h"
+#include "DisplayMessage.h"
 #include "Holder.h"
 #include "Palette.h"
 #include "Resource.h"
@@ -154,6 +155,7 @@ public:
 	int GetSummoningLimit(ieDword sex);
 	void PreloadColors();
 	const Color& GetColor(const TableMgr::key_t& row) const;
+	void ModifyColor(GUIColors idx, const Color& newColor);
 	int GetWeaponStyleAPRBonus(int row, int col);
 	int GetReputationMod(int column);
 	/** Returns the virtual worldmap entry of a sub-area (pst-only) */

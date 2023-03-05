@@ -3585,11 +3585,14 @@ void GameScript::SetCreatureAreaFlag(Scriptable* Sender, Action* parameters)
 	}
 }
 
-//this will be a global change, fixme if it should be local
+// unused and referencing a non-existing color.ids file
+// this is a global change, since it takes no target, but it's not clear which color it affected, if it worked
 void GameScript::SetTextColor(Scriptable* /*Sender*/, Action* parameters)
 {
 	Color c = Color::FromABGR(parameters->int0Parameter);
-	core->SetInfoTextColor(c);
+	gamedata->ModifyColor(GUIColors::FLOAT_TXT_ACTOR, c);
+	gamedata->ModifyColor(GUIColors::FLOAT_TXT_INFO, c);
+	gamedata->ModifyColor(GUIColors::FLOAT_TXT_OTHER, c);
 }
 
 void GameScript::BitGlobal(Scriptable* Sender, Action* parameters)
