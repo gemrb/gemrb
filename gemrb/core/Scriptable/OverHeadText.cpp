@@ -110,7 +110,7 @@ void OverHeadText::Draw()
 	for (auto msgIter = messages.begin(); msgIter != messages.end(); ++msgIter) {
 		auto& msg = *msgIter;
 		if (msg.timeStartDisplaying == 0) continue;
-		if (msg.Draw(height, owner->Pos)) {
+		if (msg.Draw(height, owner->Pos, owner->Type)) {
 			show = true;
 		} else if (msgIter != messages.begin()) { // always keep the one reserved slot
 			msgIter = messages.erase(msgIter);
@@ -126,7 +126,7 @@ void OverHeadText::Draw()
 
 // *******************************************************************
 // OverHeadMsg methods
-bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos)
+bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType)
 {
 	static constexpr tick_t maxDelay = 6000;
 	tick_t delay = maxDelay;
@@ -136,7 +136,17 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos)
 	}
 
 	tick_t time = core->Time.Ticks2Ms(core->GetGame()->GameTime);
-	const Color& textColor = color == ColorBlack ? core->InfoTextColor : color;
+	Color& textColor = color;
+	if (color == ColorBlack) {
+		// use defaults
+		if (ownerType == ST_ACTOR) {
+			textColor = displaymsg->GetColor(GUIColors::FLOAT_TXT_ACTOR);
+		} else if (ownerType == ST_TRIGGER) {
+			textColor = displaymsg->GetColor(GUIColors::FLOAT_TXT_INFO);
+		} else {
+			textColor = displaymsg->GetColor(GUIColors::FLOAT_TXT_OTHER);
+		}
+	}
 	Font::PrintColors color = { textColor, ColorBlack };
 
 	time -= timeStartDisplaying;

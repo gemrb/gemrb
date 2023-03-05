@@ -35,7 +35,7 @@ struct OverHeadMsg {
 	tick_t timeStartDisplaying = 0;
 	String text;
 
-	bool Draw(int heightOffset, const Point& fallbackPos);
+	bool Draw(int heightOffset, const Point& fallbackPos, int ownerType);
 };
 
 class GEM_EXPORT OverHeadText {
