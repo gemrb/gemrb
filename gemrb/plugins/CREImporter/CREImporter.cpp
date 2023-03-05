@@ -270,34 +270,40 @@ static int ResolveSpellName(const ResRef& name, int level, ieIWD2SpellType type)
 //input: index, level, type, kit
 static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
 {
-	if (level>=MAX_SPELL_LEVEL) {
+	size_t limit = 1000000;
+	switch (type) {
+		case IE_IWD2_SPELL_INNATE:
+			limit = innlist.size();
+			break;
+		case IE_IWD2_SPELL_SONG:
+			limit = snglist.size();
+			break;
+		case IE_IWD2_SPELL_SHAPE:
+			limit = shplist.size();
+			break;
+		case IE_IWD2_SPELL_DOMAIN:
+			limit = splList.size();
+			break;
+		default:
+			break;
+	}
+
+	if (level >= MAX_SPELL_LEVEL || index >= static_cast<int>(limit)) {
 		return EmptyResRef;
 	}
 
 	const SpellEntry* entry;
 	switch (type) {
 	case IE_IWD2_SPELL_INNATE:
-		if (index >= static_cast<int>(innlist.size())) {
-			return EmptyResRef;
-		}
 		return innlist[index];
 	case IE_IWD2_SPELL_SONG:
-		if (index >= static_cast<int>(snglist.size())) {
-			return EmptyResRef;
-		}
 		return snglist[index];
 	case IE_IWD2_SPELL_SHAPE:
-		if (index >= static_cast<int>(shplist.size())) {
-			return EmptyResRef;
-		}
 		return shplist[index];
 	case IE_IWD2_SPELL_DOMAIN:
-		if (index >= static_cast<int>(splList.size())) {
-			return EmptyResRef;
-		}
 		// translate the actual kit to a column index to make them comparable
 		// luckily they are in order
-		kit = std::log2(kit/0x8000); // 0x8000 is the first cleric kit
+		kit = static_cast<int>(std::log2(kit / 0x8000)); // 0x8000 is the first cleric kit
 		entry = domList[index];
 		if (entry) {
 			const ResRef& ret = entry->FindSpell(level, kit);
@@ -314,7 +320,7 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 			break;
 		}
 		// translate the actual kit to a column index to make them comparable
-		kit = std::log2(kit/0x40); // 0x40 is the first mage kit
+		kit = static_cast<int>(std::log2(kit / 0x40)); // 0x40 is the first mage kit
 		//if it is a specialist spell, return it now
 		entry = magList[index];
 		if (entry) {
