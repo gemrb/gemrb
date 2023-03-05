@@ -438,7 +438,7 @@ public:
 	std::shared_ptr<StringMgr> strings;
 	std::shared_ptr<StringMgr> strings2;
 	GlobalTimer timer;
-	Color InfoTextColor;
+	Color InfoTextColor = ColorWhite;
 	int QuitFlag = QF_NORMAL;
 	int EventFlag = EF_CONTROL;
 	Holder<SaveGame> LoadGameIndex;

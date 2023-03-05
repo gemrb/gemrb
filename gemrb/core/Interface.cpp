@@ -1056,8 +1056,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 
-	SetInfoTextColor(ColorWhite);
-
 	Log(MESSAGE, "Core", "Initializing search path...");
 	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {
 		Log(FATAL, "Core", "no DirectoryImporter!");
