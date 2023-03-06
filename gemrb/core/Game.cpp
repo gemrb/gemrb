@@ -1202,10 +1202,17 @@ void Game::ShareXP(int xp, int flags) const
 
 	//you have gained/lost ... xp
 	if (core->HasFeedback(FT_MISC)) {
-		if (xp > 0) {
-			displaymsg->DisplayConstantStringValue(STR_GOTXP, GUIColors::XPCHANGE, (ieDword) xp);
+		size_t strIdx = STR_GOTXP;
+		if (xp < 0) {
+			xp = -xp;
+			strIdx = STR_LOSTXP;
+		}
+		if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+			ieStrRef complaint = DisplayMessage::GetStringReference(strIdx);
+			String text = fmt::format(L"{}: {}", core->GetString(complaint), xp);
+			core->GetGameControl()->SetDisplayText(text, core->Time.ai_update_time * 4);
 		} else {
-			displaymsg->DisplayConstantStringValue(STR_LOSTXP, GUIColors::XPCHANGE, (ieDword) -xp);
+			displaymsg->DisplayConstantStringValue(strIdx, GUIColors::XPCHANGE, (ieDword) xp);
 		}
 	}
 	for (const auto& pc : PCs) {
