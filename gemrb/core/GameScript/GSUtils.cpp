@@ -718,7 +718,9 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 			myinv = NULL;
 			break;
 	}
-	if (lostitem&&!gotitem) displaymsg->DisplayConstantString(STR_LOSTITEM, GUIColors::XPCHANGE);
+	if (lostitem && !gotitem) {
+		displaymsg->DisplayMsgCentered(STR_LOSTITEM, FT_ANY, GUIColors::XPCHANGE);
+	}
 
 	if (!myinv) {
 		delete item;
@@ -732,11 +734,13 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 			if (tmp && tmp->InParty) {
 				tmp->VerbalConstant(VB_INVENTORY_FULL);
 			}
-			displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(STR_INVFULL_ITEMDROP, FT_ANY, GUIColors::XPCHANGE);
 		}
 		return MIC_FULL;
 	}
-	if (gotitem&&!lostitem) displaymsg->DisplayConstantString(STR_GOTITEM, GUIColors::XPCHANGE);
+	if (gotitem && !lostitem) {
+		displaymsg->DisplayMsgCentered(STR_GOTITEM, FT_ANY, GUIColors::XPCHANGE);
+	}
 	return MIC_GOTITEM;
 }
 
