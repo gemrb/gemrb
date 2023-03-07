@@ -40,7 +40,7 @@ namespace GemRB {
 #define STR_TRAP           5
 #define STR_CANNOTGO       6
 #define STR_    7
-#define STR_OVERSTOCKED    8
+#define STR_2    8
 #define STR_SLEEP          9
 #define STR_AMBUSH         10
 #define STR_CONTLOCKED     11
