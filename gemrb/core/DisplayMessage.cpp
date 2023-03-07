@@ -22,6 +22,8 @@
 
 #include "Interface.h"
 #include "TableMgr.h"
+
+#include "GUI/GameControl.h"
 #include "GUI/Label.h"
 #include "GUI/TextArea.h"
 #include "Scriptable/Actor.h"
@@ -381,6 +383,17 @@ void DisplayMessage::DisplayMsgAtLocation(int strIdx, int type, Scriptable* owne
 		owner->overHead.SetText(core->GetString(msg));
 	} else {
 		DisplayConstantString(strIdx, GUIColors::LIGHTGREY, owner);
+	}
+}
+
+void DisplayMessage::DisplayMsgCentered(int strIdx, int type, GUIColors color) const
+{
+	if (!core->HasFeedback(type)) return;
+
+	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+		core->GetGameControl()->SetDisplayText(strIdx, 30);
+	} else {
+		DisplayConstantString(strIdx, color);
 	}
 }
 

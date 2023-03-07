@@ -273,7 +273,9 @@ enum FeedbackType {
 	FT_STATES = 8,
 	FT_SELECTION = 16, // handled by Actor::PlaySelectionSound
 	FT_MISC = 32,
-	FT_CASTING = 64
+	FT_CASTING = 64,
+
+	FT_ANY = 0xffff
 };
 
 enum DebugModeBits {

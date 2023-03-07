@@ -622,24 +622,20 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 	GameControl *gc = core->GetGameControl();
 	assert(gc);
 	if (!CreateSavePath(Path, index, slotname)) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
-		gc->SetDisplayText(STR_CANTSAVE, 30);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
 	if (!DoSaveGame(Path, overrideRunning)) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
-		gc->SetDisplayText(STR_CANTSAVE, 30);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
 	// Save successful / Quick-save successful
 	if (qsave) {
-		displaymsg->DisplayConstantString(STR_QSAVESUCCEED, GUIColors::XPCHANGE);
-		gc->SetDisplayText(STR_QSAVESUCCEED, 30);
+		displaymsg->DisplayMsgCentered(STR_QSAVESUCCEED, FT_ANY, GUIColors::XPCHANGE);
 	} else {
-		displaymsg->DisplayConstantString(STR_SAVESUCCEED, GUIColors::XPCHANGE);
-		gc->SetDisplayText(STR_SAVESUCCEED, 30);
+		displaymsg->DisplayMsgCentered(STR_SAVESUCCEED, FT_ANY, GUIColors::XPCHANGE);
 	}
 	return GEM_OK;
 }
@@ -686,20 +682,17 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname,
 	assert(gc); //this is already checked in CanSave and core only has one if there is a game anyway
 	char Path[_MAX_PATH];
 	if (!CreateSavePath(Path, index, slotname)) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
-		gc->SetDisplayText(STR_CANTSAVE, 30);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
 	if (!DoSaveGame(Path, overrideRunning)) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
-		gc->SetDisplayText(STR_CANTSAVE, 30);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
 	// Save successful
-	displaymsg->DisplayConstantString(STR_SAVESUCCEED, GUIColors::XPCHANGE);
-	gc->SetDisplayText(STR_SAVESUCCEED, 30);
+	displaymsg->DisplayMsgCentered(STR_SAVESUCCEED, FT_ANY, GUIColors::XPCHANGE);
 	return GEM_OK;
 }
 
