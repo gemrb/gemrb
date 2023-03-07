@@ -372,4 +372,16 @@ void DisplayMessage::DisplayStringName(String text, GUIColors color, const Scrip
 	DisplayStringName(text, GetColor(color), speaker);
 }
 
+void DisplayMessage::DisplayMsgAtLocation(int strIdx, int type, Scriptable* owner, const Scriptable* trigger) const
+{
+	if (!core->HasFeedback(type)) return;
+
+	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+		ieStrRef msg = GetStringReference(strIdx, trigger);
+		owner->overHead.SetText(core->GetString(msg));
+	} else {
+		DisplayConstantString(strIdx, GUIColors::LIGHTGREY, owner);
+	}
+}
+
 }
