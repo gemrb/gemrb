@@ -87,7 +87,13 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 		} else {
 			msg += L"[/color]\n";
 		}
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayMarkupString(msg);
+		if (core->HasFeedback(FT_MISC)) {
+			if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+				core->GetGameControl()->SetDisplayText(STR_JOURNALCHANGE, 30);
+			} else {
+				displaymsg->DisplayMarkupString(msg);
+			}
+		}
 		// pst also has a sound attached to the base string, so play it manually
 		// NOTE: this doesn't display the string anywhere
 		DisplayStringCore(core->GetGame(), strJournalChange, 0);
