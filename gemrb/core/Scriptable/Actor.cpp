@@ -5960,7 +5960,7 @@ ResRef Actor::GetDialog(int flags) const
 	}
 
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
-		if (flags>1) {
+		if (flags > GD_CHECK) {
 			core->GetTokenDictionary()->SetAt("TARGET", ShortName);
 			displaymsg->DisplayConstantString(STR_TARGETBUSY, GUIColors::RED);
 		}
