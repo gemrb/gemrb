@@ -1155,7 +1155,7 @@ void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
+		actor->SetOrientation(parameters->pointParameter, actor->Pos, false);
 		actor->WalkTo(parameters->pointParameter, IF_NORETICLE | IF_RUNNING);
 	}
 	if (!actor->InMove()) {
@@ -1173,7 +1173,7 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->SetOrientation(GetOrient(parameters->pointParameter, actor->Pos), false);
+		actor->SetOrientation(parameters->pointParameter, actor->Pos, false);
 		actor->WalkTo(parameters->pointParameter, IF_RUNNING);
 	}
 	if (!actor->InMove()) {
@@ -1715,7 +1715,7 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->SetOrientation( GetOrient( target->Pos, actor->Pos ), false);
+	actor->SetOrientation(target->Pos, actor->Pos, false);
 	actor->SetWait( 1 );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -1733,7 +1733,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	Point p = CheckPointVariable(target, parameters->string0Parameter);
 
-	actor->SetOrientation ( GetOrient( p, actor->Pos ), false);
+	actor->SetOrientation(p, actor->Pos, false);
 	actor->SetWait( 1 );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -2386,7 +2386,7 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
+	actor->SetOrientation(*otherp, actor->Pos, false);
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		if (flags) {
 			switch(type) {
@@ -2460,7 +2460,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
+	actor->SetOrientation(*otherp, actor->Pos, false);
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		if (flags) {
 			if (type==ST_DOOR) {
@@ -2537,7 +2537,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 	Point *otherp = door->toOpen+1;
 	distance = FindNearPoint( Sender, p, otherp);
 	if (distance <= MAX_OPERATING_DISTANCE) {
-		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
+		actor->SetOrientation(*otherp, actor->Pos, false);
 		if (!door->TryUnlock(actor)) {
 			displaymsg->DisplayMsgAtLocation(STR_DOORLOCKED, FT_MISC, door, actor);
 			door->AddTrigger(TriggerEntry(trigger_failedtoopen, actor->GetGlobalID()));

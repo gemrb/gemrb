@@ -6092,7 +6092,7 @@ void Actor::AttackedBy(const Actor *attacker)
 void Actor::FaceTarget(const Scriptable *target)
 {
 	if (!target) return;
-	SetOrientation( GetOrient( target->Pos, Pos ), false );
+	SetOrientation(target->Pos, Pos, false);
 }
 
 //in case of LastTarget = 0

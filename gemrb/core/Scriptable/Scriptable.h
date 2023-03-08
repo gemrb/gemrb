@@ -548,6 +548,7 @@ public:
 
 	void SetStance(unsigned int arg);
 	void SetOrientation(orient_t value, bool slow);
+	void SetOrientation(const Point& from, const Point& to, bool slow);
 	void SetAttackMoveChances(const ieWord *amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);

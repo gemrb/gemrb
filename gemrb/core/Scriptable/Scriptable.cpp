@@ -1940,6 +1940,11 @@ void Movable::SetOrientation(orient_t value, bool slow) {
 	}
 }
 
+void Movable::SetOrientation(const Point& from, const Point& to, bool slow)
+{
+	SetOrientation(GetOrient(from, to), slow);
+}
+
 void Movable::SetAttackMoveChances(const ieWord *amc)
 {
 	AttackMovements[0]=amc[0];
