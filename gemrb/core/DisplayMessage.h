@@ -125,7 +125,7 @@ public:
 	void DisplayString(ieStrRef stridx, GUIColors color, STRING_FLAGS flags) const;
 	void DisplayString(const String& text, GUIColors color, Scriptable *target) const;
 	void DisplayString(ieStrRef stridx, const Color& color, STRING_FLAGS flags) const;
-	void DisplayMsgAtLocation(int strIdx, int type, Scriptable* owner, const Scriptable* trigger = nullptr) const;
+	void DisplayMsgAtLocation(int strIdx, int type, Scriptable* owner, const Scriptable* trigger = nullptr, GUIColors color = GUIColors::LIGHTGREY) const;
 	void DisplayMsgCentered(int strIdx, int type, GUIColors color = GUIColors::LIGHTGREY) const;
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>

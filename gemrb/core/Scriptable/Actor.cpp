@@ -7012,7 +7012,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Critical Miss]");
 		Log(COMBAT, "Attack", "{}", buffer);
 		if (!gc->InDialog()) {
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_MISS, GUIColors::WHITE, this);
+			displaymsg->DisplayMsgAtLocation(STR_CRITICAL_MISS, FT_COMBAT, this, this, GUIColors::WHITE);
 			VerbalConstant(VB_CRITMISS);
 		}
 		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
@@ -7054,7 +7054,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Critical Hit]");
 		Log(COMBAT, "Attack", "{}", buffer);
 		if (!gc->InDialog()) {
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CRITICAL_HIT, GUIColors::WHITE, this);
+			displaymsg->DisplayMsgAtLocation(STR_CRITICAL_HIT, FT_COMBAT, this, this, GUIColors::WHITE);
 			VerbalConstant(VB_CRITHIT);
 		}
 		ApplyCriticalEffect(this, target, wi, true);
