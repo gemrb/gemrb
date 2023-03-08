@@ -2138,7 +2138,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	if (!game->EveryoneNearPoint(map, actor->Pos, ENP_CANMOVE)) {
 		//we abort the command, everyone should be here
 		if (map->LastGoCloser < game->Ticks) {
-			displaymsg->DisplayConstantString(STR_WHOLEPARTY, GUIColors::WHITE);
+			displaymsg->DisplayMsgCentered(STR_WHOLEPARTY, FT_ANY, GUIColors::WHITE);
 			map->LastGoCloser = game->Ticks + core->Time.round_size;
 		}
 		Sender->ReleaseCurrentAction();
@@ -4077,10 +4077,10 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 		map->AddItemToLocation(tar->Pos, item);
 		if (act->InParty) {
 			act->VerbalConstant(VB_INVENTORY_FULL);
-			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(STR_INVFULL_ITEMDROP, FT_MISC, GUIColors::XPCHANGE);
 		}
-	} else {
-		if (act->InParty && core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_GOTITEM, GUIColors::XPCHANGE);
+	} else if (act->InParty) {
+		displaymsg->DisplayMsgCentered(STR_GOTITEM, FT_MISC, GUIColors::XPCHANGE);
 	}
 }
 
@@ -4116,10 +4116,10 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 		map->AddItemToLocation(Sender->Pos, item);
 		if (act->InParty) {
 			act->VerbalConstant(VB_INVENTORY_FULL);
-			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(STR_INVFULL_ITEMDROP, FT_MISC, GUIColors::XPCHANGE);
 		}
-	} else {
-		if (act->InParty && core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_GOTITEM, GUIColors::XPCHANGE);
+	} else if (act->InParty) {
+		displaymsg->DisplayMsgCentered(STR_GOTITEM, FT_MISC, GUIColors::XPCHANGE);
 	}
 }
 

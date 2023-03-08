@@ -472,38 +472,38 @@ static int CanSave()
 	// NOTE: can't save  during a rest, chapter information or movie (ref CANTSAVEMOVIE)
 	// is handled automatically, but without a message
 	if (core->InCutSceneMode()) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return 1;
 	}
 
 	const Store *store = core->GetCurrentStore();
 	if (store) {
-		displaymsg->DisplayConstantString(STR_CANTSAVESTORE, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVESTORE, FT_ANY, GUIColors::XPCHANGE);
 		return 1; //can't save while store is open
 	}
 	const GameControl *gc = core->GetGameControl();
 	if (!gc) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return -1; //no gamecontrol!!!
 	}
 	if (gc->InDialog()) {
-		displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVEDIALOG, FT_ANY, GUIColors::XPCHANGE);
 		return 2; //can't save while in dialog
 	}
 
 	const Game *game = core->GetGame();
 	if (!game) {
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return -1;
 	}
 	if (game->CombatCounter) {
-		displaymsg->DisplayConstantString(STR_CANTSAVECOMBAT, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVECOMBAT, FT_ANY, GUIColors::XPCHANGE);
 		return 3;
 	}
 
 	const Map *map = game->GetCurrentArea();
-	if (!map) {		
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
+	if (!map) {
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return -1;
 	}
 
@@ -511,13 +511,13 @@ static int CanSave()
 	map->GetProjectileCount(pIter);
 	if (map->GetNextTrap(pIter, 1)) {
 		// can't save while AOE spells are in effect
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return 10;
 	}
 
 	if (map->AreaFlags&AF_NOSAVE) {
 		//cannot save in area
-		displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 		return 4;
 	}
 
@@ -528,16 +528,16 @@ static int CanSave()
 		// STATE_NOSAVE tracks actors not to be stored in GAM, not game saveability
 		if (actor->GetStat(IE_STATE_ID) & (STATE_NOSAVE|STATE_MINDLESS)) {
 			//some actor is in nosave state
-			displaymsg->DisplayConstantString(STR_CANTSAVENOCTRL, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(STR_CANTSAVENOCTRL, FT_ANY, GUIColors::XPCHANGE);
 			return 5;
 		}
 		if (actor->GetCurrentArea()!=map) {
 			//scattered
-			displaymsg->DisplayConstantString(STR_CANTSAVE, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
 			return 6;
 		}
 		if (map->AnyEnemyNearPoint(actor->Pos)) {
-			displaymsg->DisplayConstantString( STR_CANTSAVEMONS, GUIColors::XPCHANGE );
+			displaymsg->DisplayMsgCentered(STR_CANTSAVEMONS, FT_ANY, GUIColors::XPCHANGE);
 			return 7;
 		}
 
@@ -554,7 +554,7 @@ static int CanSave()
 	for (const auto& neighbour : nearActors) {
 		if (neighbour->GetInternalFlag() & IF_NOINT) {
 			// dialog about to start or similar
-			displaymsg->DisplayConstantString(STR_CANTSAVEDIALOG2, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(STR_CANTSAVEDIALOG2, FT_ANY, GUIColors::XPCHANGE);
 			return 8;
 		}
 	}

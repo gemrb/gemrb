@@ -599,7 +599,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	switch(EveryOne) {
 	case CT_GO_CLOSER:
 		if (LastGoCloser<game->Ticks) {
-			displaymsg->DisplayConstantString(STR_WHOLEPARTY, GUIColors::WHITE); //white
+			displaymsg->DisplayMsgCentered(STR_WHOLEPARTY, FT_ANY, GUIColors::WHITE);
 			LastGoCloser = game->Ticks + core->Time.round_size;
 		}
 		if (game->EveryoneStopped()) {
