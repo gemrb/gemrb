@@ -461,7 +461,7 @@ public:
 	void SetCursor(unsigned char CursorIndex);
 
 	void SetTrapDetected(int x);
-	void TryDisarm(const Actor *actor);
+	void TryDisarm(Actor* actor);
 	//detect trap, set skill to 256 if you want sure fire
 	void DetectTrap(int skill, ieDword actorID);
 	//returns true if trap is visible, only_detected must be true

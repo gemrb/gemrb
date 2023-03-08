@@ -158,13 +158,13 @@ void Container::RefreshGroundIcons()
 	}
 }
 
-void Container::TryPickLock(const Actor *actor)
+void Container::TryPickLock(Actor* actor)
 {
 	if (LockDifficulty == 100) {
 		if (OpenFail != ieStrRef::INVALID) {
 			displaymsg->DisplayStringName(OpenFail, GUIColors::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
-			displaymsg->DisplayConstantStringName(STR_CONT_NOPICK, GUIColors::XPCHANGE, actor);
+			displaymsg->DisplayMsgAtLocation(STR_CONT_NOPICK, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		}
 		return;
 	}
@@ -181,14 +181,14 @@ void Container::TryPickLock(const Actor *actor)
 		}
 	}
 	if (stat < LockDifficulty) {
-		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, GUIColors::XPCHANGE, actor);
+		displaymsg->DisplayMsgAtLocation(STR_LOCKPICK_FAILED, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		core->PlaySound(DS_PICKFAIL, SFX_CHAN_HITS); //AMB_D21
 		return;
 	}
 	SetContainerLocked(false);
 	core->GetGameControl()->ResetTargetMode();
-	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, GUIColors::LIGHTGREY, actor);
+	displaymsg->DisplayMsgAtLocation(STR_LOCKPICK_DONE, FT_ANY, actor, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS); //AMB_D21D
 	ImmediateEvent();
@@ -221,11 +221,11 @@ void Container::TryBashLock(Actor *actor)
 
 	actor->FaceTarget(this);
 	if(roll < LockDifficulty || LockDifficulty == 100) {
-		displaymsg->DisplayConstantStringName(STR_CONTBASH_FAIL, GUIColors::XPCHANGE, actor);
+		displaymsg->DisplayMsgAtLocation(STR_CONTBASH_FAIL, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		return;
 	}
 
-	displaymsg->DisplayConstantStringName(STR_CONTBASH_DONE, GUIColors::LIGHTGREY, actor);
+	displaymsg->DisplayMsgAtLocation(STR_CONTBASH_DONE, FT_ANY, actor, actor);
 	SetContainerLocked(false);
 	core->GetGameControl()->ResetTargetMode();
 	//Is this really useful ?

@@ -1804,11 +1804,12 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 {
 	if (!CanDetectTrap()) return;
 	if (!Scripts[0]) return;
-	if ((skill>=100) && (skill!=256) ) skill = 100;
+	if (skill >= 100 && skill != 256) skill = 100;
+
 	int check = 0;
+	Actor* detective = core->GetGame()->GetActorByGlobalID(actorID);
 	if (third) {
 		//~Search (detect traps) check. Search skill %d vs. trap's difficulty %d (searcher's %d INT bonus).~
-		const Actor *detective = core->GetGame()->GetActorByGlobalID(actorID);
 		int bonus = 0;
 		if (detective) {
 			bonus = detective->GetAbilityBonus(IE_INT);
@@ -1821,7 +1822,7 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 	if (check > TrapDetectionDiff) {
 		SetTrapDetected(1); //probably could be set to the player #?
 		AddTrigger(TriggerEntry(trigger_detected, actorID));
-		displaymsg->DisplayConstantStringName(STR_TRAP_FOUND, GUIColors::WHITE, this);
+		displaymsg->DisplayMsgAtLocation(STR_TRAP_FOUND, FT_ANY, detective, detective, GUIColors::WHITE);
 	}
 }
 

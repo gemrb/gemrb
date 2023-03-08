@@ -319,7 +319,7 @@ void Highlightable::SetTrapDetected(int x)
 	}
 }
 
-void Highlightable::TryDisarm(const Actor *actor)
+void Highlightable::TryDisarm(Actor* actor)
 {
 	if (!Trapped || !TrapDetected) return;
 
@@ -350,7 +350,7 @@ void Highlightable::TryDisarm(const Actor *actor)
 			// ~Successful Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
-		displaymsg->DisplayConstantStringName(STR_DISARM_DONE, GUIColors::LIGHTGREY, actor);
+		displaymsg->DisplayMsgAtLocation(STR_DISARM_DONE, FT_ANY, actor, actor);
 		int xp = gamedata->GetXPBonus(XP_DISARM, actor->GetXPLevel(1));
 		const Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
@@ -362,19 +362,19 @@ void Highlightable::TryDisarm(const Actor *actor)
 			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
-		displaymsg->DisplayConstantStringName(STR_DISARM_FAIL, GUIColors::LIGHTGREY, actor);
+		displaymsg->DisplayMsgAtLocation(STR_DISARM_FAIL, FT_ANY, actor, actor);
 		TriggerTrap(skill, actor->GetGlobalID());
 	}
 	ImmediateEvent();
 }
 
-void Door::TryPickLock(const Actor *actor)
+void Door::TryPickLock(Actor* actor)
 {
 	if (LockDifficulty == 100) {
 		if (OpenStrRef != ieStrRef::INVALID) {
 			displaymsg->DisplayStringName(OpenStrRef, GUIColors::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
-			displaymsg->DisplayConstantStringName(STR_DOOR_NOPICK, GUIColors::XPCHANGE, actor);
+			displaymsg->DisplayMsgAtLocation(STR_DOOR_NOPICK, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		}
 		return;
 	}
@@ -391,14 +391,14 @@ void Door::TryPickLock(const Actor *actor)
 		}
 	}
 	if (stat < (signed)LockDifficulty) {
-		displaymsg->DisplayConstantStringName(STR_LOCKPICK_FAILED, GUIColors::XPCHANGE, actor);
+		displaymsg->DisplayMsgAtLocation(STR_LOCKPICK_FAILED, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		core->PlaySound(DS_PICKFAIL, SFX_CHAN_HITS);
 		return;
 	}
 	SetDoorLocked( false, true);
 	core->GetGameControl()->ResetTargetMode();
-	displaymsg->DisplayConstantStringName(STR_LOCKPICK_DONE, GUIColors::LIGHTGREY, actor);
+	displaymsg->DisplayMsgAtLocation(STR_LOCKPICK_DONE, FT_ANY, actor, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS);
 	ImmediateEvent();
@@ -430,11 +430,11 @@ void Door::TryBashLock(Actor *actor)
 	}
 
 	if(roll < LockDifficulty || LockDifficulty == 100) {
-		displaymsg->DisplayConstantStringName(STR_DOORBASH_FAIL, GUIColors::XPCHANGE, actor);
+		displaymsg->DisplayMsgAtLocation(STR_DOORBASH_FAIL, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		return;
 	}
 
-	displaymsg->DisplayConstantStringName(STR_DOORBASH_DONE, GUIColors::LIGHTGREY, actor);
+	displaymsg->DisplayMsgAtLocation(STR_DOORBASH_DONE, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 	SetDoorLocked(false, true);
 	core->GetGameControl()->ResetTargetMode();
 	Flags|=DOOR_BROKEN;
