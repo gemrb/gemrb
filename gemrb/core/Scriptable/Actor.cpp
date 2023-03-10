@@ -846,7 +846,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	bool lowMorale = actor->Modified[IE_MORALE] <= actor->Modified[IE_MORALEBREAK];
 	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
 		int panicMode = RAND(0, 2); // PANIC_RANDOMWALK etc.
-		displaymsg->DisplayConstantStringName(STR_MORALE_BERSERK + panicMode, GUIColors::WHITE, actor);
+		displaymsg->DisplayConstantStringName(HCStrings::MoraleBerserk + panicMode, GUIColors::WHITE, actor);
 		actor->Panic(game->GetActorByGlobalID(actor->LastAttacker), panicMode + 1);
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
 		// recover from panic, since morale has risen again
@@ -1231,7 +1231,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		ieDword NeedsLevelUp = 0;
 		core->GetDictionary()->Lookup(varName, NeedsLevelUp);
 		if (NeedsLevelUp == 1) {
-			displaymsg->DisplayConstantStringName(STR_LEVELUP, GUIColors::WHITE, actor);
+			displaymsg->DisplayConstantStringName(HCStrings::LevelUp, GUIColors::WHITE, actor);
 			actor->GotLUFeedback = true;
 			core->SetEventFlag(EF_PORTRAIT);
 		}
@@ -3185,7 +3185,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		if (core->HasFeedback(FT_COMBAT) && (lastSave.prevType != type || lastSave.prevRoll != ret)) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
-			String msg = core->GetString(DisplayMessage::GetStringReference(STR_SAVE_SPELL + type));
+			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::SaveSpell + type));
 			msg += L" " + fmt::to_wstring(ret);
 			displaymsg->DisplayStringName(std::move(msg), GUIColors::WHITE, this);
 		}
@@ -4322,7 +4322,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 	const Actor* damager = Scriptable::As<Actor>(hitter);
 	bool detailed = false;
 	String type_name = L"unknown";
-	if (DisplayMessage::HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
+	if (DisplayMessage::HasStringReference(HCStrings::DamageDetail1)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
@@ -4346,20 +4346,20 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
 				core->GetTokenDictionary()->SetAtAsString("RESISTED", abs(resisted));
-				strref = STR_DAMAGE_DETAIL3;
+				strref = HCStrings::DamageDetail3;
 			} else if (resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
 				core->GetTokenDictionary()->SetAtAsString("RESISTED", abs(resisted));
-				strref = STR_DAMAGE_DETAIL2;
+				strref = HCStrings::DamageDetail2;
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
-				strref = STR_DAMAGE_DETAIL1;
+				strref = HCStrings::DamageDetail1;
 			}
 			if (damager) {
 				core->GetTokenDictionary()->SetAt("DAMAGER", damager->GetName());
 			} else {
 				// variant without damager
-				strref -= (STR_DAMAGE_DETAIL1 - STR_DAMAGE1);
+				strref -= (HCStrings::DamageDetail1 - HCStrings::Damage1);
 			}
 			displaymsg->DisplayConstantStringName(strref, GUIColors::WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
@@ -4370,11 +4370,11 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// eeeh, no token (Damage: x)
 			String text = fmt::format(L"{} {}", core->GetString(ieStrRef::DAMAGE), damage);
 			overHead.SetText(text, true, true, displaymsg->GetColor(color));
-		} else if (!DisplayMessage::HasStringReference(STR_DAMAGE2) || !damager) {
+		} else if (!DisplayMessage::HasStringReference(HCStrings::Damage2) || !damager) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
-			String msg = core->GetString(DisplayMessage::GetStringReference(STR_DAMAGE1), STRING_FLAGS::NONE);
+			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::Damage1), STRING_FLAGS::NONE);
 			String dmg = fmt::format(L" ({})", damage);
 			displaymsg->DisplayStringName(msg + dmg, GUIColors::WHITE, this);
 		} else { //bg2
@@ -4383,7 +4383,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// wipe the DAMAGER token, so we can color it
 			core->GetTokenDictionary()->SetAt("DAMAGER", StringView(""));
 			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
-			displaymsg->DisplayConstantStringName(STR_DAMAGE2, GUIColors::WHITE, hitter);
+			displaymsg->DisplayConstantStringName(HCStrings::Damage2, GUIColors::WHITE, hitter);
 		}
 	} else if (resisted == DR_IMMUNE && damager) {
 		Log(COMBAT, "Actor", "is immune to damage type {} from {}.\n", fmt::WideToChar{type_name}, fmt::WideToChar{damager->GetName()});
@@ -4391,12 +4391,12 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			//<DAMAGEE> was immune to my <TYPE> damage
 			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
 			core->GetTokenDictionary()->SetAt("TYPE", type_name);
-			displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, GUIColors::WHITE, hitter);
-		} else if (DisplayMessage::HasStringReference(STR_DAMAGE_IMMUNITY) && DisplayMessage::HasStringReference(STR_DAMAGE1)) {
+			displaymsg->DisplayConstantStringName(HCStrings::DamageImmunity, GUIColors::WHITE, hitter);
+		} else if (DisplayMessage::HasStringReference(HCStrings::DamageImmunity) && DisplayMessage::HasStringReference(HCStrings::Damage1)) {
 			// bg2
 			//<DAMAGEE> was immune to my damage.
 			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
-			displaymsg->DisplayConstantStringName(STR_DAMAGE_IMMUNITY, GUIColors::WHITE, hitter);
+			displaymsg->DisplayConstantStringName(HCStrings::DamageImmunity, GUIColors::WHITE, hitter);
 		} // else: other games don't display anything
 	} else if (resisted == DR_IMMUNE) {
 		Log(COMBAT, "Actor", "is immune to damage type: {}.\n", fmt::WideToChar{type_name});
@@ -4803,9 +4803,9 @@ int Actor::GetWildMod(int level)
 	core->GetTokenDictionary()->SetAtAsString("LEVELDIF", abs(WMLevelMod));
 	if (core->HasFeedback(FT_STATES)) {
 		if (WMLevelMod > 0) {
-			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, GUIColors::WHITE, this);
+			displaymsg->DisplayConstantStringName(HCStrings::CasterLvlInc, GUIColors::WHITE, this);
 		} else if (WMLevelMod < 0) {
-			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, GUIColors::WHITE, this);
+			displaymsg->DisplayConstantStringName(HCStrings::CasterLvlDec, GUIColors::WHITE, this);
 		}
 	}
 	return WMLevelMod;
@@ -4853,12 +4853,12 @@ int Actor::GetEncumbranceFactor(bool feedback) const
 	}
 	if (encumbrance <= maxWeight * 2) {
 		if (feedback && core->HasFeedback(FT_STATES)) {
-			displaymsg->DisplayConstantStringName(STR_HALFSPEED, GUIColors::WHITE, this);
+			displaymsg->DisplayConstantStringName(HCStrings::HalfSpeed, GUIColors::WHITE, this);
 		}
 		return 2;
 	}
 	if (feedback && core->HasFeedback(FT_STATES)) {
-		displaymsg->DisplayConstantStringName(STR_CANTMOVE, GUIColors::WHITE, this);
+		displaymsg->DisplayConstantStringName(HCStrings::CantMove, GUIColors::WHITE, this);
 	}
 	return 123456789; // large enough to round to 0 when used as a divisor
 }
@@ -5093,7 +5093,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	Game *game = core->GetGame();
 	game->SelectActor(this, false, SELECT_NORMAL);
 
-	displaymsg->DisplayConstantStringName(STR_DEATH, GUIColors::WHITE, this);
+	displaymsg->DisplayConstantStringName(HCStrings::Death, GUIColors::WHITE, this);
 	VerbalConstant(VB_DIE);
 
 	// remove poison, hold, casterhold, stun and its icon
@@ -5911,13 +5911,13 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(spell->SpellName));
 		switch (spell->SpellType) {
 		case IE_SPL_INNATE:
-			message = STR_GOTABILITY;
+			message = HCStrings::GotAbility;
 			break;
 		case IE_SPL_SONG:
-			message = STR_GOTSONG;
+			message = HCStrings::GotSong;
 			break;
 		default:
-			message = STR_GOTSPELL;
+			message = HCStrings::GotSpell;
 			break;
 		}
 	}
@@ -5962,7 +5962,7 @@ ResRef Actor::GetDialog(int flags) const
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
 		if (flags > GD_CHECK) {
 			core->GetTokenDictionary()->SetAt("TARGET", ShortName);
-			displaymsg->DisplayConstantString(STR_TARGETBUSY, GUIColors::RED);
+			displaymsg->DisplayConstantString(HCStrings::TargetBusy, GUIColors::RED);
 		}
 		return ResRef();
 	}
@@ -6917,7 +6917,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
 			// Missed <TARGETNAME> due to concealment.
 			core->GetTokenDictionary()->SetAt("TARGETNAME", target->GetDefaultName());
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, GUIColors::WHITE, this);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(HCStrings::ConcealedMiss, GUIColors::WHITE, this);
 			buffer.append("[Concealment Miss]");
 			Log(COMBAT, "Attack", "{}", buffer);
 			ResetState();
@@ -6987,15 +6987,15 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (core->HasFeedback(FT_TOHIT) && !gc->InDialog()) {
 		// log the roll
 		String leftRight, hitMiss;
-		if (usedLeftHand && DisplayMessage::HasStringReference(STR_ATTACK_ROLL_L)) {
-			leftRight = core->GetString(DisplayMessage::GetStringReference(STR_ATTACK_ROLL_L));
+		if (usedLeftHand && DisplayMessage::HasStringReference(HCStrings::AttackRollLeft)) {
+			leftRight = core->GetString(DisplayMessage::GetStringReference(HCStrings::AttackRollLeft));
 		} else {
-			leftRight = core->GetString(DisplayMessage::GetStringReference(STR_ATTACK_ROLL));
+			leftRight = core->GetString(DisplayMessage::GetStringReference(HCStrings::AttackRoll));
 		}
 		if (success) {
-			hitMiss = core->GetString(DisplayMessage::GetStringReference(STR_HIT));
+			hitMiss = core->GetString(DisplayMessage::GetStringReference(HCStrings::Hit));
 		} else {
-			hitMiss = core->GetString(DisplayMessage::GetStringReference(STR_MISS));
+			hitMiss = core->GetString(DisplayMessage::GetStringReference(HCStrings::Miss));
 		}
 		String rollLog = fmt::format(L"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss);
 		displaymsg->DisplayStringName(std::move(rollLog), GUIColors::WHITE, this);
@@ -7012,7 +7012,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Critical Miss]");
 		Log(COMBAT, "Attack", "{}", buffer);
 		if (!gc->InDialog()) {
-			displaymsg->DisplayMsgAtLocation(STR_CRITICAL_MISS, FT_COMBAT, this, this, GUIColors::WHITE);
+			displaymsg->DisplayMsgAtLocation(HCStrings::CriticalMiss, FT_COMBAT, this, this, GUIColors::WHITE);
 			VerbalConstant(VB_CRITMISS);
 		}
 		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
@@ -7054,7 +7054,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Critical Hit]");
 		Log(COMBAT, "Attack", "{}", buffer);
 		if (!gc->InDialog()) {
-			displaymsg->DisplayMsgAtLocation(STR_CRITICAL_HIT, FT_COMBAT, this, this, GUIColors::WHITE);
+			displaymsg->DisplayMsgAtLocation(HCStrings::CriticalHit, FT_COMBAT, this, this, GUIColors::WHITE);
 			VerbalConstant(VB_CRITHIT);
 		}
 		ApplyCriticalEffect(this, target, wi, true);
@@ -7218,7 +7218,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	if (damage <= 0 && !core->InCutSceneMode()) {
 		if (attacker && attacker->InParty) {
 			if (core->HasFeedback(FT_COMBAT)) {
-				attacker->DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
+				attacker->DisplayStringOrVerbalConstant(HCStrings::WeaponIneffective, VB_TIMMUNE);
 			}
 			core->Autopause(AUTOPAUSE::UNUSABLE, this);
 		}
@@ -8760,7 +8760,7 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 	if (inventory.SetEquippedSlot(ieWordSigned(slot), ieWord(header))) {
 		return 0;
 	}
-	return STR_MAGICWEAPON;
+	return HCStrings::MagicWeapon;
 }
 
 // do we need Use magic device to succeed on a class usability check?
@@ -9032,7 +9032,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		damage = 0;
 		critical = false;
 		if (InParty) {
-			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(STR_WEAPONINEFFECTIVE, VB_TIMMUNE);
+			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(HCStrings::WeaponIneffective, VB_TIMMUNE);
 			core->Autopause(AUTOPAUSE::UNUSABLE, this);
 		}
 		return;
@@ -9046,7 +9046,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	if (critical) {
 		if (target->inventory.ProvidesCriticalAversion()) {
 			//critical hit is averted by helmet
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_NO_CRITICAL, GUIColors::WHITE, target);
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(HCStrings::NoCritical, GUIColors::WHITE, target);
 			critical = false;
 		} else {
 			//multiply the damage with the critical multiplier
@@ -9086,14 +9086,14 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	}
 
 	if (!target->Modified[IE_DISABLEBACKSTAB] && !weaponImmunity && !dodgy) {
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_FAIL, GUIColors::WHITE);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(HCStrings::BackstabFail, GUIColors::WHITE);
 		wi.backstabbing = false;
 		return 0;
 	}
 
 	if (!wi.backstabbing) {
 		// weapon is unsuitable for sneak attack
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, GUIColors::WHITE);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(HCStrings::BackstabBad, GUIColors::WHITE);
 		return 0;
 	}
 
@@ -9125,7 +9125,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 		sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
 		// ~Sneak Attack for %d~
 		//displaymsg->DisplayRollStringName(25053, GUIColors::LIGHTGREY, this, extraDamage);
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB_DAMAGE, GUIColors::WHITE, sneakAttackDamage);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(HCStrings::BackstabDamage, GUIColors::WHITE, sneakAttackDamage);
 	}
 
 	return sneakAttackDamage;
@@ -9152,7 +9152,7 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 
 	if (target->Modified[IE_DISABLEBACKSTAB]) {
 		// The backstab seems to have failed
-		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_FAIL, GUIColors::WHITE);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(HCStrings::BackstabFail, GUIColors::WHITE);
 		wi.backstabbing = false;
 	} else {
 		if (wi.backstabbing) {
@@ -9164,17 +9164,17 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 			if (multiplier >= 7) { // only in tob, but the strings are at a different offset
 				multiplierText = ieStrRef(int(ieStrRef::TOB_SEPTUPLE) + multiplier - 7);
 			} else {
-				multiplierText = ieStrRef(int(DisplayMessage::GetStringReference(STR_BACKSTAB_DOUBLE, this)) + multiplier - 2);
+				multiplierText = ieStrRef(int(DisplayMessage::GetStringReference(HCStrings::BackstabDouble, this)) + multiplier - 2);
 			}
 			if (multiplier < 7 || (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) && multiplier < 10)) {
 				displaymsg->DisplayStringName(multiplierText, GUIColors::WHITE, this, STRING_FLAGS::SOUND);
 			} else {
 				// display a simple message for all other cases
-				displaymsg->DisplayConstantStringValue(STR_BACKSTAB_DAMAGE, GUIColors::WHITE, multiplier);
+				displaymsg->DisplayConstantStringValue(HCStrings::BackstabDamage, GUIColors::WHITE, multiplier);
 			}
 		} else if (core->HasFeedback(FT_COMBAT)) {
 			// weapon is unsuitable for backstab
-			displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, GUIColors::WHITE);
+			displaymsg->DisplayConstantString(HCStrings::BackstabBad, GUIColors::WHITE);
 		}
 	}
 
@@ -9543,7 +9543,7 @@ int Actor::CheckUsability(const Item *item) const
 			if (stat & ~itemvalue) {
 				if (Modified[IE_KIT] == 0) continue;
 			} else {
-				return STR_CANNOT_USE_ITEM;
+				return HCStrings::CantUseItem;
 			}
 
 			// classes checked out, but we're kitted ...
@@ -9564,7 +9564,7 @@ int Actor::CheckUsability(const Item *item) const
 no_resolve:
 		if (stat&itemvalue) {
 			//Log(DEBUG, "Actor", "failed usability: itemvalue {}, stat {}, stat value {}", itemvalue, itemuse[i].stat, stat);
-			return STR_CANNOT_USE_ITEM;
+			return HCStrings::CantUseItem;
 		}
 	}
 
@@ -9597,7 +9597,7 @@ int Actor::Unusable(const Item *item) const
 	// skip regular usability check if permission is granted by effect or HLA
 	const Effect* fx = fxqueue.HasEffectWithSource(fx_item_usability_ref, item->Name);
 	if (fx && fx->Parameter3 == 1) {
-		return STR_CANNOT_USE_ITEM;
+		return HCStrings::CantUseItem;
 	}
 	if (!GetStat(IE_CANUSEANYITEM) && !fx) {
 		int unusable = CheckUsability(item);
@@ -9608,7 +9608,7 @@ int Actor::Unusable(const Item *item) const
 
 	// iesdp says this is always checked?
 	if (item->MinLevel>GetXPLevel(true)) {
-		return STR_CANNOT_USE_ITEM;
+		return HCStrings::CantUseItem;
 	}
 
 	if (!CheckAbilities) {
@@ -9616,31 +9616,31 @@ int Actor::Unusable(const Item *item) const
 	}
 
 	if (item->MinStrength>GetStat(IE_STR)) {
-		return STR_CANNOT_USE_ITEM;
+		return HCStrings::CantUseItem;
 	}
 
 	if (item->MinStrength==18) {
 		if (GetStat(IE_STR)==18) {
 			if (item->MinStrengthBonus>GetStat(IE_STREXTRA)) {
-				return STR_CANNOT_USE_ITEM;
+				return HCStrings::CantUseItem;
 			}
 		}
 	}
 
 	if (item->MinIntelligence>GetStat(IE_INT)) {
-		return STR_CANNOT_USE_ITEM;
+		return HCStrings::CantUseItem;
 	}
 	if (item->MinDexterity>GetStat(IE_DEX)) {
-		return STR_CANNOT_USE_ITEM;
+		return HCStrings::CantUseItem;
 	}
 	if (item->MinWisdom>GetStat(IE_WIS)) {
-		return STR_CANNOT_USE_ITEM;
+		return HCStrings::CantUseItem;
 	}
 	if (item->MinConstitution>GetStat(IE_CON)) {
-		return STR_CANNOT_USE_ITEM;
+		return HCStrings::CantUseItem;
 	}
 	if (item->MinCharisma>GetStat(IE_CHR)) {
-		return STR_CANNOT_USE_ITEM;
+		return HCStrings::CantUseItem;
 	}
 	//note, weapon proficiencies shouldn't be checked here
 	//missing proficiency causes only attack penalty

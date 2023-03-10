@@ -719,7 +719,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 			break;
 	}
 	if (lostitem && !gotitem) {
-		displaymsg->DisplayMsgCentered(STR_LOSTITEM, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::LostItem, FT_ANY, GUIColors::XPCHANGE);
 	}
 
 	if (!myinv) {
@@ -734,12 +734,12 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 			if (tmp && tmp->InParty) {
 				tmp->VerbalConstant(VB_INVENTORY_FULL);
 			}
-			displaymsg->DisplayMsgCentered(STR_INVFULL_ITEMDROP, FT_ANY, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(HCStrings::InventoryFullItemDrop, FT_ANY, GUIColors::XPCHANGE);
 		}
 		return MIC_FULL;
 	}
 	if (gotitem && !lostitem) {
-		displaymsg->DisplayMsgCentered(STR_GOTITEM, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::GotItem, FT_ANY, GUIColors::XPCHANGE);
 	}
 	return MIC_GOTITEM;
 }
@@ -1268,7 +1268,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && \
 	  (!curact && target->GetNextAction())) {
 		core->GetTokenDictionary()->SetAt("TARGET", target->GetName());
-		displaymsg->DisplayConstantString(STR_TARGETBUSY, GUIColors::RED);
+		displaymsg->DisplayConstantString(HCStrings::TargetBusy, GUIColors::RED);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1282,7 +1282,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			// added CurrentAction as part of blocking action fixes
 			if (tar->GetCurrentAction() || tar->GetNextAction()) {
 				core->GetTokenDictionary()->SetAt("TARGET", target->GetName());
-				displaymsg->DisplayConstantString(STR_TARGETBUSY, GUIColors::RED);
+				displaymsg->DisplayConstantString(HCStrings::TargetBusy, GUIColors::RED);
 				Sender->ReleaseCurrentAction();
 				return;
 			}
@@ -1340,7 +1340,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
 	if (!gc->dialoghandler->InitDialog(scr, tar, Dialog)) {
 		if (!(Flags & BD_NOEMPTY)) {
-			displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY, GUIColors::RED, tar);
+			displaymsg->DisplayConstantStringName(HCStrings::NothingToSay, GUIColors::RED, tar);
 		}
 	}
 
@@ -1556,7 +1556,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 		//display attack message
 		if (target->GetGlobalID() != Sender->LastTarget) {
-			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, GUIColors::WHITE, Sender, target);
+			displaymsg->DisplayConstantStringAction(HCStrings::ActionAttack, GUIColors::WHITE, Sender, target);
 		}
 	}
 
@@ -2618,9 +2618,9 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 	// ouch, we got hit
 	if (Sender->InterruptCasting) {
 		if (caster->InParty) {
-			displaymsg->DisplayConstantString(STR_SPELLDISRUPT, GUIColors::WHITE, Sender);
+			displaymsg->DisplayConstantString(HCStrings::SpellDisrupted, GUIColors::WHITE, Sender);
 		} else {
-			displaymsg->DisplayConstantStringName(STR_SPELL_FAILED, GUIColors::WHITE, Sender);
+			displaymsg->DisplayConstantStringName(HCStrings::SpellFailed, GUIColors::WHITE, Sender);
 		}
 		DisplayStringCoreVC(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE);
 		return true;

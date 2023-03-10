@@ -840,7 +840,7 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
 			if (spl->SpellType == IE_SPL_INNATE) {
 				str = fmt::format(L"{} : {}", spell, target->GetName());
 			} else {
-				const String msg = core->GetString(DisplayMessage::GetStringReference(STR_ACTION_CAST), STRING_FLAGS::NONE);
+				const String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::ActionCast), STRING_FLAGS::NONE);
 				str = fmt::format(L"{} {} : {}", msg, spell, target->GetName());
 			}
 		} else {
@@ -1033,12 +1033,12 @@ int Scriptable::CanCast(const ResRef& SpellRef, bool verbose) {
 	// check for area dead magic
 	// tob AR3004 is a dead magic area, but using a script with personal dead magic
 	if (area->GetInternalFlag()&AF_DEADMAGIC && !(spl->Flags&SF_HLA)) {
-		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, GUIColors::WHITE, this);
+		displaymsg->DisplayConstantStringName(HCStrings::DeadmagicFail, GUIColors::WHITE, this);
 		return 0;
 	}
 
 	if (spl->Flags&SF_NOT_INDOORS && !(area->AreaType&AT_OUTDOOR)) {
-		displaymsg->DisplayConstantStringName(STR_INDOOR_FAIL, GUIColors::WHITE, this);
+		displaymsg->DisplayConstantStringName(HCStrings::IndoorFail, GUIColors::WHITE, this);
 		return 0;
 	}
 
@@ -1061,7 +1061,7 @@ int Scriptable::CanCast(const ResRef& SpellRef, bool verbose) {
 
 	// check for personal dead magic
 	if (actor->Modified[IE_DEADMAGIC] && !(spl->Flags&SF_HLA)) {
-		displaymsg->DisplayConstantStringName(STR_DEADMAGIC_FAIL, GUIColors::WHITE, this);
+		displaymsg->DisplayConstantStringName(HCStrings::DeadmagicFail, GUIColors::WHITE, this);
 		return 0;
 	}
 
@@ -1089,7 +1089,7 @@ int Scriptable::CanCast(const ResRef& SpellRef, bool verbose) {
 		displaymsg->DisplayRollStringName(ieStrRef::ROLL21, GUIColors::LIGHTGREY, actor, roll, chance);
 	}
 	if (failed) {
-		displaymsg->DisplayConstantStringName(STR_MISCASTMAGIC, GUIColors::WHITE, this);
+		displaymsg->DisplayConstantStringName(HCStrings::MiscastMagic, GUIColors::WHITE, this);
 		return 0;
 	}
 
@@ -1128,7 +1128,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
 			// eg. .:Casts Word of Recall:.
-			const String castmsg = core->GetString(DisplayMessage::GetStringReference(STR_CASTS));
+			const String castmsg = core->GetString(DisplayMessage::GetStringReference(HCStrings::Casts));
 			const String spellname = core->GetString(spl->SpellName);
 			overHead.SetText(fmt::format(L".:{} {}:.", castmsg, spellname));
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL15, GUIColors::LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
@@ -1371,7 +1371,7 @@ int Scriptable::CheckWildSurge()
 			//avert the surge and decrease the chaos shield counter
 			check = 0;
 			caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref,1);
-			displaymsg->DisplayConstantStringName(STR_CHAOSSHIELD,GUIColors::LIGHTGREY,caster);
+			displaymsg->DisplayConstantStringName(HCStrings::ChaosShield,GUIColors::LIGHTGREY,caster);
 		}
 
 		// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
@@ -1379,7 +1379,7 @@ int Scriptable::CheckWildSurge()
 			// display feedback: Wild Surge: bla bla
 			// look up the spell in the "check" row of wildmag.2da
 			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
-			const String s1 = core->GetString(DisplayMessage::GetStringReference(STR_WILDSURGE), STRING_FLAGS::NONE);
+			const String s1 = core->GetString(DisplayMessage::GetStringReference(HCStrings::WildSurge), STRING_FLAGS::NONE);
 			const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
 			displaymsg->DisplayStringName(s1 + L" " + s2, GUIColors::WHITE, this);
 
@@ -1536,7 +1536,7 @@ bool Scriptable::AuraPolluted()
 	const Actor *actor = static_cast<const Actor*>(this);
 	if (actor->GetStat(IE_AURACLEANSING)) {
 		AuraCooldown = 0;
-		if (core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_AURACLEANSED, GUIColors::WHITE, this);
+		if (core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(HCStrings::AuraCleansed, GUIColors::WHITE, this);
 		return false;
 	}
 
@@ -1822,7 +1822,7 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 	if (check > TrapDetectionDiff) {
 		SetTrapDetected(1); //probably could be set to the player #?
 		AddTrigger(TriggerEntry(trigger_detected, actorID));
-		displaymsg->DisplayMsgAtLocation(STR_TRAP_FOUND, FT_ANY, detective, detective, GUIColors::WHITE);
+		displaymsg->DisplayMsgAtLocation(HCStrings::TrapFound, FT_ANY, detective, detective, GUIColors::WHITE);
 	}
 }
 

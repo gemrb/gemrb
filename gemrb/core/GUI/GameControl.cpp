@@ -1164,19 +1164,19 @@ String GameControl::TooltipText() const {
 		// a guess at a neutral check
 		bool enemy = actor->GetStat(IE_EA) != EA_NEUTRAL;
 		// test for an injured string being present for this game
-		ieStrRef strref = DisplayMessage::GetStringReference(STR_UNINJURED);
+		ieStrRef strref = DisplayMessage::GetStringReference(HCStrings::Uninjured);
 		if (enemy && strref != ieStrRef::INVALID) {
 			// non-neutral, not in party: display injured string
 			// these boundaries are just a guess
-			size_t strindex = STR_INJURED4;
+			size_t strindex = HCStrings::Injured4;
 			if (hp == maxhp) {
-				strindex = STR_UNINJURED;
+				strindex = HCStrings::Uninjured;
 			} else if (hp > (maxhp*3)/4) {
-				strindex = STR_INJURED1;
+				strindex = HCStrings::Injured1;
 			} else if (hp > maxhp/2) {
-				strindex = STR_INJURED2;
+				strindex = HCStrings::Injured2;
 			} else if (hp > maxhp/3) {
-				strindex = STR_INJURED3;
+				strindex = HCStrings::Injured3;
 			}
 			strref = DisplayMessage::GetStringReference(strindex);
 			String injuredstring = core->GetString(strref, STRING_FLAGS::NONE);
@@ -1805,7 +1805,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 	// cannot target spells on invisible or sanctuaried creatures
 	// invisible actors are invisible, so this is usually impossible by itself, but improved invisibility changes that
 	if (source != tgt && tgt->Untargetable(spellName)) {
-		displaymsg->DisplayConstantStringName(STR_NOSEE_NOCAST, GUIColors::RED, source);
+		displaymsg->DisplayConstantStringName(HCStrings::NoSeeNoCast, GUIColors::RED, source);
 		ResetTargetMode();
 		return;
 	}

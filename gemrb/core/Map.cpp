@@ -599,7 +599,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	switch(EveryOne) {
 	case CT_GO_CLOSER:
 		if (LastGoCloser<game->Ticks) {
-			displaymsg->DisplayMsgCentered(STR_WHOLEPARTY, FT_ANY, GUIColors::WHITE);
+			displaymsg->DisplayMsgCentered(HCStrings::WholeParty, FT_ANY, GUIColors::WHITE);
 			LastGoCloser = game->Ticks + core->Time.round_size;
 		}
 		if (game->EveryoneStopped()) {
@@ -3606,13 +3606,13 @@ bool Map::DisplayTrackString(const Actor *target) const
 		success = core->Roll(1, 100, trackDiff) > skill;
 	}
 	if (!success) {
-		displaymsg->DisplayConstantStringName(STR_TRACKINGFAILED, GUIColors::LIGHTGREY, target);
+		displaymsg->DisplayConstantStringName(HCStrings::TrackingFailed, GUIColors::LIGHTGREY, target);
 		return true;
 	}
 	if (trackFlag) {
 			String str = core->GetString(trackString);
 			core->GetTokenDictionary()->SetAt( "CREATURE", str);
-			displaymsg->DisplayConstantStringName(STR_TRACKING, GUIColors::LIGHTGREY, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Tracking, GUIColors::LIGHTGREY, target);
 			return false;
 	}
 	displaymsg->DisplayStringName(trackString, GUIColors::LIGHTGREY, target, STRING_FLAGS::NONE);

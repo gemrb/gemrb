@@ -1235,14 +1235,14 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	case 0: //charmed (target neutral after charm)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_CHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Charmed, GUIColors::WHITE, target);
 		}
 		// intentional fallthrough
 	case 1000:
 		break;
 	case 1: //charmed (target hostile after charm)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_CHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Charmed, GUIColors::WHITE, target);
 		}
 		// intentional fallthrough
 	case 1001:
@@ -1252,14 +1252,14 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 2: //dire charmed (target neutral after charm)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::DireCharmed, GUIColors::WHITE, target);
 		}
 		// intentional fallthrough
 	case 1002:
 		break;
 	case 3: //dire charmed (target hostile after charm)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::DireCharmed, GUIColors::WHITE, target);
 		}
 		// intentional fallthrough
 	case 1003:
@@ -1269,7 +1269,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 4: //controlled by cleric
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_CONTROLLED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Controlled, GUIColors::WHITE, target);
 		}
 		// intentional fallthrough
 	case 1004:
@@ -1280,7 +1280,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 5: //thrall (typo comes from original engine doc)
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_CHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Charmed, GUIColors::WHITE, target);
 		}
 		// intentional fallthrough
 	case 1005:
@@ -1958,7 +1958,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->SetSpellState(SS_HELD);
 		STATE_SET(STATE_HELPLESS);
 		if (fx->FirstApply) {
-			displaymsg->DisplayConstantStringName(STR_HELD, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::StateHeld, GUIColors::WHITE, target);
 		}
 		break;
 	case RPD_7:
@@ -3651,7 +3651,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (target->inventory.GetItemFlag(slot)&IE_ITEM_TWO_HANDED) {
 			if (!target->inventory.IsSlotEmpty(target->inventory.GetShieldSlot())) {
 				target->inventory.RemoveItem(slot);
-				displaymsg->DisplayConstantStringNameString(STR_SPELL_FAILED, GUIColors::WHITE, STR_OFFHAND_USED, target);
+				displaymsg->DisplayConstantStringNameString(HCStrings::SpellFailed, GUIColors::WHITE, HCStrings::OffhandUsed, target);
 				return FX_NOT_APPLIED;
 			}
 		}
@@ -3743,37 +3743,37 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (msk) {
 	case AL_EVIL:
 		if (color == ColorBlack) color = ColorRed;
-		displaymsg->DisplayConstantStringName(STR_EVIL, color, target);
+		displaymsg->DisplayConstantStringName(HCStrings::Evil, color, target);
 		//glow red
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xff, 0, 0, 0), 0);
 		break;
 	case AL_GOOD:
 		if (color == ColorBlack) color = ColorGreen;
-		displaymsg->DisplayConstantStringName(STR_GOOD, color, target);
+		displaymsg->DisplayConstantStringName(HCStrings::Good, color, target);
 		//glow green
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0, 0xff, 0, 0), 0);
 		break;
 	case AL_GE_NEUTRAL:
 		if (color == ColorBlack) color = ColorBlue;
-		displaymsg->DisplayConstantStringName(STR_GE_NEUTRAL, color, target);
+		displaymsg->DisplayConstantStringName(HCStrings::GENeutral, color, target);
 		//glow blue
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0, 0, 0xff, 0), 0);
 		break;
 	case AL_CHAOTIC:
 		if (color == ColorBlack) color = ColorMagenta;
-		displaymsg->DisplayConstantStringName(STR_CHAOTIC, color, target);
+		displaymsg->DisplayConstantStringName(HCStrings::Chaotic, color, target);
 		//glow purple
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xff, 0, 0xff, 0), 0);
 		break;
 	case AL_LAWFUL:
 		if (color == ColorBlack) color = ColorWhite;
-		displaymsg->DisplayConstantStringName(STR_LAWFUL, color, target);
+		displaymsg->DisplayConstantStringName(HCStrings::Lawful, color, target);
 		//glow white
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xff, 0xff, 0xff, 0), 0);
 		break;
 	case AL_LC_NEUTRAL:
 		if (color == ColorBlack) color = ColorBlue;
-		displaymsg->DisplayConstantStringName(STR_LC_NEUTRAL, color, target);
+		displaymsg->DisplayConstantStringName(HCStrings::LCNeutral, color, target);
 		//glow blue
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0, 0, 0xff, 0), 0);
 		break;
@@ -4653,7 +4653,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 	if (fx->FirstApply && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
-		if (display_warning) displaymsg->DisplayConstantStringName(STR_DISABLEDMAGE, GUIColors::RED, target);
+		if (display_warning) displaymsg->DisplayConstantStringName(HCStrings::DisabledMageSpells, GUIColors::RED, target);
 		core->SetEventFlag(EF_ACTION);
 	}
 	return FX_APPLIED;
@@ -5538,13 +5538,13 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	//FIXME: the familiar block field is not saved in the game and not set when the
 	//familiar is itemized, so a game reload will clear it (see how this is done in original)
 	if (game->familiarBlock) {
-		displaymsg->DisplayConstantStringName(STR_FAMBLOCK, GUIColors::RED, target);
+		displaymsg->DisplayConstantStringName(HCStrings::FamiliarBlock, GUIColors::RED, target);
 		return FX_NOT_APPLIED;
 	}
 
 	//The protagonist is ALWAYS in the first slot
 	if (game->GetPC(0, false)!=target) {
-		displaymsg->DisplayConstantStringName(STR_FAMPROTAGONIST, GUIColors::RED, target);
+		displaymsg->DisplayConstantStringName(HCStrings::FamiliarProtagonistOnly, GUIColors::RED, target);
 		return FX_NOT_APPLIED;
 	}
 
@@ -6515,12 +6515,12 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 			if (fx->Parameter2 == COND_GOTHIT) {
 				unsigned int dist = GetSpellDistance(refs[i], target, actor->Pos);
 				if (!dist) {
-					displaymsg->DisplayConstantStringName(STR_CONTFAIL, GUIColors::RED, target);
+					displaymsg->DisplayConstantStringName(HCStrings::ContingencyFail, GUIColors::RED, target);
 					continue;
 				}
 				if (!WithinPersonalRange(target, actor, dist)) {
 					//display 'One of the spells has failed.'
-					displaymsg->DisplayConstantStringName(STR_CONTFAIL, GUIColors::RED, target);
+					displaymsg->DisplayConstantStringName(HCStrings::ContingencyFail, GUIColors::RED, target);
 					continue;
 				}
 			}
@@ -6567,7 +6567,7 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (core->InCutSceneMode()) return FX_NOT_APPLIED;
 
 	if (target->fxqueue.HasEffectWithSource(fx_contingency_ref, fx->SourceRef)) {
-		displaymsg->DisplayConstantStringName(STR_CONTDUP, GUIColors::WHITE, target);
+		displaymsg->DisplayConstantStringName(HCStrings::ContingencyDupe, GUIColors::WHITE, target);
 		return FX_NOT_APPLIED;
 	}
 
@@ -6909,13 +6909,13 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	// check if the new trap count is cheesy (only saved traps count)
 	if (map->GetTrapCount(iter) + 1 > gamedata->GetTrapLimit(Owner)) {
-		displaymsg->DisplayConstantStringName(STR_NOMORETRAP, GUIColors::WHITE, target);
+		displaymsg->DisplayConstantStringName(HCStrings::NoMoreTraps, GUIColors::WHITE, target);
 		return FX_NOT_APPLIED;
 	}
 
 	//check if we are under attack
 	if (GetNearestEnemyOf(map, target, ORIGIN_SEES_ENEMY|ENEMY_SEES_ORIGIN)) {
-		displaymsg->DisplayConstantStringName(STR_MAYNOTSETTRAP, GUIColors::WHITE, target);
+		displaymsg->DisplayConstantStringName(HCStrings::MayNotSetTrap, GUIColors::WHITE, target);
 		return FX_NOT_APPLIED;
 	}
 
@@ -6935,7 +6935,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (roll>skill) {
 		//failure
-		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, GUIColors::WHITE, target);
+		displaymsg->DisplayConstantStringName(HCStrings::SnareFailed, GUIColors::WHITE, target);
 		if (target->LuckyRoll(1,100,0)<25) {
 			ResRef spl;
 			spl.Format("{:.7}F", fx->Resource);
@@ -6944,7 +6944,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	//success
-	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, GUIColors::WHITE, target);
+	displaymsg->DisplayConstantStringName(HCStrings::SnareSucceed, GUIColors::WHITE, target);
 	target->VerbalConstant(VB_TRAP_SET);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ResRef OldSpellResRef(Owner->SpellResRef);
@@ -7021,7 +7021,7 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_create_spell_sequencer(%2d): Level: %d, Count: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (target->fxqueue.HasEffectWithSource(fx_spell_sequencer_active_ref, fx->SourceRef)) {
-		displaymsg->DisplayConstantStringName(STR_SEQDUP, GUIColors::WHITE, target);
+		displaymsg->DisplayConstantStringName(HCStrings::SequencerDupe, GUIColors::WHITE, target);
 		return FX_NOT_APPLIED;
 	}
 	//just a call to activate the spell sequencer creation gui
@@ -8098,7 +8098,7 @@ int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect* fx)
 	if (sourceNameRef != ieStrRef(-1)) {
 		String sourceName = core->GetString(sourceNameRef, STRING_FLAGS::NONE);
 		core->GetTokenDictionary()->SetAt("RESOURCE", sourceName);
-		displaymsg->DisplayConstantStringName(STR_RES_RESISTED, GUIColors::WHITE, target);
+		displaymsg->DisplayConstantStringName(HCStrings::ResResisted, GUIColors::WHITE, target);
 	}
 	//this has effect only on first apply, it will stop applying the spell
 	return FX_ABORT;
@@ -8299,6 +8299,7 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// if the target is dead, this effect ceases to exist
 	if (STATE_GET(STATE_DEAD | STATE_PETRIFIED | STATE_FROZEN)) {
+		displaymsg->DisplayConstantStringName(HCStrings::StaticDissipate, GUIColors::WHITE, target);
 		return FX_NOT_APPLIED;
 	}
 

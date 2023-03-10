@@ -3075,7 +3075,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 	const WMPAreaEntry *linkdest = wm->GetEntry(wal->AreaIndex);
 	ResRef tmpresref = linkdest->AreaResRef;
 	if (core->GetGame()->RandomEncounter(tmpresref)) {
-		displaymsg->DisplayConstantString(STR_AMBUSH, GUIColors::XPCHANGE);
+		displaymsg->DisplayConstantString(HCStrings::Ambush, GUIColors::XPCHANGE);
 		PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromStringView, tmpresref));
 		PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
 		distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
@@ -3088,7 +3088,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 			ResRef &area = wal->EncounterAreaResRef[(i + j) % 5];
 
 			if (!area.IsEmpty()) {
-				displaymsg->DisplayConstantString(STR_AMBUSH, GUIColors::XPCHANGE);
+				displaymsg->DisplayConstantString(HCStrings::Ambush, GUIColors::XPCHANGE);
 				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromResRef, area));
 				//drop player in the middle of the map
 				PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
@@ -9348,9 +9348,9 @@ static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count
 	if (! actor->inventory.UnEquipItem( Slot, false )) {
 		// Item is currently undroppable/cursed
 		if (si->Flags&IE_INV_ITEM_CURSED) {
-			displaymsg->DisplayConstantString(STR_CURSED, GUIColors::WHITE);
+			displaymsg->DisplayConstantString(HCStrings::Cursed, GUIColors::WHITE);
 		} else {
-			displaymsg->DisplayConstantString(STR_CANT_DROP_ITEM, GUIColors::WHITE);
+			displaymsg->DisplayConstantString(HCStrings::CantDropItem, GUIColors::WHITE);
 		}
 		return NULL;
 	}
@@ -9539,7 +9539,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (current && current != actor &&
 		(actor->GetCurrentArea() != current->GetCurrentArea() ||
 		SquaredPersonalDistance(actor, current) > MAX_DISTANCE * MAX_DISTANCE)) {
-		displaymsg->DisplayConstantString(STR_TOOFARAWAY, GUIColors::WHITE);
+		displaymsg->DisplayConstantString(HCStrings::TooFarAway, GUIColors::WHITE);
 		return PyLong_FromLong(ASI_FAILED);
 	}
 
@@ -9553,7 +9553,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	// can't equip item because of similar already equipped
 	if (Effect) {
 		if (item->ItemExcl & actor->inventory.GetEquipExclusion(Slot)) {
-			displaymsg->DisplayConstantString(STR_ITEMEXCL, GUIColors::WHITE);
+			displaymsg->DisplayConstantString(HCStrings::ItemExclusion, GUIColors::WHITE);
 			//freeing the item before returning
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyLong_FromLong(ASI_FAILED);
@@ -9563,7 +9563,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if ((Slottype!=-1) && (Slottype & SLOT_WEAPON)) {
 		const CREItem* weapon = actor->inventory.GetUsedWeapon(false, Effect);
 		if (weapon && (weapon->Flags & IE_INV_ITEM_CURSED)) {
-			displaymsg->DisplayConstantString(STR_CURSED, GUIColors::WHITE);
+			displaymsg->DisplayConstantString(HCStrings::Cursed, GUIColors::WHITE);
 			return PyLong_FromLong(ASI_FAILED);
 		}
 	}
@@ -9572,7 +9572,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if ( (Slottype == SLOT_ITEM) && !(slotitem->Flags&IE_INV_ITEM_IDENTIFIED)) {
 		const ITMExtHeader *eh = item->GetExtHeader(0);
 		if (eh && eh->IDReq) {
-			displaymsg->DisplayConstantString(STR_ITEMID, GUIColors::WHITE);
+			displaymsg->DisplayConstantString(HCStrings::ItemNeedsId, GUIColors::WHITE);
 			gamedata->FreeItem( item, slotitem->ItemResRef, false );
 			return PyLong_FromLong(ASI_FAILED);
 		}
@@ -9614,7 +9614,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		}
 		// pst: also check TNO earing/eye silliness: both share the same slot type
 		if (Slottype == 1 && !CheckEyeEarMatch(slotitem, Slot)) {
-			displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, GUIColors::WHITE);
+			displaymsg->DisplayConstantString(HCStrings::WrongItemType, GUIColors::WHITE);
 			return PyLong_FromLong(ASI_FAILED);
 		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
@@ -9634,7 +9634,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			res = ASI_FAILED;
 		}
 	} else {
-		displaymsg->DisplayConstantString(STR_INVFULL, GUIColors::WHITE);
+		displaymsg->DisplayConstantString(HCStrings::InventoryFull, GUIColors::WHITE);
 	}
 
 	if (Sound && Sound[0]) {
@@ -11340,7 +11340,7 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 
 	const CREItem *item = actor->inventory.GetUsedWeapon(false, dummy);
 	if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
-		displaymsg->DisplayConstantString(STR_CURSED, GUIColors::WHITE);
+		displaymsg->DisplayConstantString(HCStrings::Cursed, GUIColors::WHITE);
 	} else {
 		ret = actor->SetEquippedQuickSlot(slot, ability);
 		if (ret) {
@@ -11964,7 +11964,7 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	// fall back to the generic: you may not rest at this time
 	if (err == ieStrRef::INVALID) {
 		if (core->HasFeature(GF_AREA_OVERRIDE)) {
-			err = DisplayMessage::GetStringReference(STR_MAYNOTREST);
+			err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
 		} else {
 			err = ieStrRef::NO_REST;
 		}

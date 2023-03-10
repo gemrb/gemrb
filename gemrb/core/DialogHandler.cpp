@@ -74,7 +74,7 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 
 	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
 		String msg(L"\n[color=bcefbc]");
-		ieStrRef strJournalChange = DisplayMessage::GetStringReference(STR_JOURNALCHANGE);
+		ieStrRef strJournalChange = DisplayMessage::GetStringReference(HCStrings::JournalChange);
 		msg += core->GetString(strJournalChange);
 		String str = core->GetString(tr->journalStrRef);
 		if (!str.empty()) {
@@ -89,7 +89,7 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 		}
 		if (core->HasFeedback(FT_MISC)) {
 			if (core->HasFeature(GF_ONSCREEN_TEXT)) {
-				core->GetGameControl()->SetDisplayText(STR_JOURNALCHANGE, 30);
+				core->GetGameControl()->SetDisplayText(HCStrings::JournalChange, 30);
 			} else {
 				displaymsg->DisplayMarkupString(msg);
 			}

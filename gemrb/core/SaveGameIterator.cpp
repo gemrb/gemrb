@@ -92,20 +92,26 @@ static std::string ParseGameDate(DataStream *ds)
 	// pst has a nice single string for everything 41277 (individual ones lack tokens)
 	core->GetTokenDictionary()->SetAtAsString("GAMEDAYS", days);
 	core->GetTokenDictionary()->SetAtAsString("HOUR", hours);
-	ieStrRef dayref = DisplayMessage::GetStringReference(STR_DAY);
-	ieStrRef daysref = DisplayMessage::GetStringReference(STR_DAYS);
-	if (dayref == daysref) {
+	ieStrRef dayMsg = DisplayMessage::GetStringReference(HCStrings::Day);
+	ieStrRef daysMsg = DisplayMessage::GetStringReference(HCStrings::Days);
+	if (dayMsg == daysMsg) {
 		return core->GetMBString(ieStrRef::DATE2);
 	}
 
 	if (days) {
-		if (days==1) a = core->GetMBString(dayref, STRING_FLAGS::NONE);
-		else a = core->GetMBString(daysref, STRING_FLAGS::NONE);
+		if (days == 1) {
+			a = core->GetMBString(dayMsg, STRING_FLAGS::NONE);
+		} else {
+			a = core->GetMBString(daysMsg, STRING_FLAGS::NONE);
+		}
 	}
 	if (hours || a.empty()) {
 		if (!a.empty()) b=core->GetMBString(ieStrRef::DATE1); // and
-		if (hours==1) c = core->GetMBString(DisplayMessage::GetStringReference(STR_HOUR), STRING_FLAGS::NONE);
-		else c = core->GetMBString(DisplayMessage::GetStringReference(STR_HOURS), STRING_FLAGS::NONE);
+		if (hours == 1) {
+			c = core->GetMBString(DisplayMessage::GetStringReference(HCStrings::Hour), STRING_FLAGS::NONE);
+		} else {
+			c = core->GetMBString(DisplayMessage::GetStringReference(HCStrings::Hours), STRING_FLAGS::NONE);
+		}
 	}
 	
 	if (!b.empty()) {
@@ -469,41 +475,41 @@ static EffectRef fx_disable_rest_ref = { "DisableRest", -1 };
 static int CanSave()
 {
 	//some of these restrictions might not be needed
-	// NOTE: can't save  during a rest, chapter information or movie (ref CANTSAVEMOVIE)
+	// NOTE: can't save  during a rest, chapter information or movie (ref CantSaveMovie)
 	// is handled automatically, but without a message
 	if (core->InCutSceneMode()) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return 1;
 	}
 
 	const Store *store = core->GetCurrentStore();
 	if (store) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVESTORE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSaveStore, FT_ANY, GUIColors::XPCHANGE);
 		return 1; //can't save while store is open
 	}
 	const GameControl *gc = core->GetGameControl();
 	if (!gc) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return -1; //no gamecontrol!!!
 	}
 	if (gc->InDialog()) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVEDIALOG, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSaveDialog, FT_ANY, GUIColors::XPCHANGE);
 		return 2; //can't save while in dialog
 	}
 
 	const Game *game = core->GetGame();
 	if (!game) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return -1;
 	}
 	if (game->CombatCounter) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVECOMBAT, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSaveCombat, FT_ANY, GUIColors::XPCHANGE);
 		return 3;
 	}
 
 	const Map *map = game->GetCurrentArea();
 	if (!map) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return -1;
 	}
 
@@ -511,13 +517,13 @@ static int CanSave()
 	map->GetProjectileCount(pIter);
 	if (map->GetNextTrap(pIter, 1)) {
 		// can't save while AOE spells are in effect
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return 10;
 	}
 
 	if (map->AreaFlags&AF_NOSAVE) {
 		//cannot save in area
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return 4;
 	}
 
@@ -528,16 +534,16 @@ static int CanSave()
 		// STATE_NOSAVE tracks actors not to be stored in GAM, not game saveability
 		if (actor->GetStat(IE_STATE_ID) & (STATE_NOSAVE|STATE_MINDLESS)) {
 			//some actor is in nosave state
-			displaymsg->DisplayMsgCentered(STR_CANTSAVENOCTRL, FT_ANY, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(HCStrings::CantSaveNoCtrl, FT_ANY, GUIColors::XPCHANGE);
 			return 5;
 		}
 		if (actor->GetCurrentArea()!=map) {
 			//scattered
-			displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 			return 6;
 		}
 		if (map->AnyEnemyNearPoint(actor->Pos)) {
-			displaymsg->DisplayMsgCentered(STR_CANTSAVEMONS, FT_ANY, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(HCStrings::CantSaveMonsters, FT_ANY, GUIColors::XPCHANGE);
 			return 7;
 		}
 
@@ -554,7 +560,7 @@ static int CanSave()
 	for (const auto& neighbour : nearActors) {
 		if (neighbour->GetInternalFlag() & IF_NOINT) {
 			// dialog about to start or similar
-			displaymsg->DisplayMsgCentered(STR_CANTSAVEDIALOG2, FT_ANY, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgCentered(HCStrings::CantSaveDialog2, FT_ANY, GUIColors::XPCHANGE);
 			return 8;
 		}
 	}
@@ -622,20 +628,20 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 	GameControl *gc = core->GetGameControl();
 	assert(gc);
 	if (!CreateSavePath(Path, index, slotname)) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
 	if (!DoSaveGame(Path, overrideRunning)) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
 	// Save successful / Quick-save successful
 	if (qsave) {
-		displaymsg->DisplayMsgCentered(STR_QSAVESUCCEED, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::QSaveSuccess, FT_ANY, GUIColors::XPCHANGE);
 	} else {
-		displaymsg->DisplayMsgCentered(STR_SAVESUCCEED, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::SaveSuccess, FT_ANY, GUIColors::XPCHANGE);
 	}
 	return GEM_OK;
 }
@@ -682,17 +688,17 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname,
 	assert(gc); //this is already checked in CanSave and core only has one if there is a game anyway
 	char Path[_MAX_PATH];
 	if (!CreateSavePath(Path, index, slotname)) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
 	if (!DoSaveGame(Path, overrideRunning)) {
-		displaymsg->DisplayMsgCentered(STR_CANTSAVE, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
 	// Save successful
-	displaymsg->DisplayMsgCentered(STR_SAVESUCCEED, FT_ANY, GUIColors::XPCHANGE);
+	displaymsg->DisplayMsgCentered(HCStrings::SaveSuccess, FT_ANY, GUIColors::XPCHANGE);
 	return GEM_OK;
 }
 

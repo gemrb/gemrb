@@ -62,7 +62,7 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 {
 	AutoTable tab = gamedata->LoadTable(name);
 	if (tab) {
-		for (int i = 0; i < STRREF_COUNT; i++) {
+		for (int i = 0; i < HCStrings::StringCount; i++) {
 			table[i] = tab->QueryFieldAsStrRef(i, 0);
 		}
 		loadedTable = name;
@@ -74,7 +74,7 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 	// only pst has flags and complications
 	// they could have repurposed more verbal constants, but no, they built another layer instead
 	if (tab->QueryField(0, 1) != tab->QueryDefault()) {
-		for (int i = 0; i < STRREF_COUNT; i++) {
+		for (int i = 0; i < HCStrings::StringCount; i++) {
 			std::string flag = tab->QueryField(i, 1);
 			if (flag.length() == 1) {
 				flags[i] = atoi(flag.c_str());
@@ -92,7 +92,7 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 
 ieStrRef DisplayMessage::StrRefs::Get(size_t idx, const Scriptable* speaker) const
 {
-	if (idx < STRREF_COUNT) {
+	if (idx < HCStrings::StringCount) {
 		if (flags[idx] == 0 || !speaker || speaker->Type != ST_ACTOR) {
 			return table[idx];
 		}
@@ -203,7 +203,7 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 //simply displaying a constant string
 void DisplayMessage::DisplayConstantString(size_t stridx, GUIColors color, Scriptable *target) const
 {
-	if (stridx > STRREF_COUNT) return;
+	if (stridx > HCStrings::StringCount) return;
 	String text = core->GetString(SRefs.Get(stridx, target), STRING_FLAGS::SOUND);
 	DisplayString(text, GetColor(color), target);
 }
@@ -276,7 +276,7 @@ void DisplayMessage::DisplayString(const String& text, GUIColors color, Scriptab
 // blah : whatever
 void DisplayMessage::DisplayConstantStringValue(size_t stridx, GUIColors color, ieDword value) const
 {
-	if (stridx > STRREF_COUNT) return;
+	if (stridx > HCStrings::StringCount) return;
 	String text = core->GetString(SRefs.Get(stridx, nullptr), STRING_FLAGS::SOUND);
 	DisplayMarkupString(fmt::format(DisplayFormatValue, GetColor(color).Packed(), text, value));
 }
@@ -285,7 +285,7 @@ void DisplayMessage::DisplayConstantStringValue(size_t stridx, GUIColors color, 
 // <charname> - blah blah : whatever
 void DisplayMessage::DisplayConstantStringNameString(size_t stridx, GUIColors color, size_t stridx2, const Scriptable *actor) const
 {
-	if (stridx > STRREF_COUNT) return;
+	if (stridx > HCStrings::StringCount) return;
 
 	String name;
 	Color actor_color = GetSpeakerColor(name, actor);
@@ -304,7 +304,7 @@ void DisplayMessage::DisplayConstantStringNameString(size_t stridx, GUIColors co
 // <charname> - blah blah
 void DisplayMessage::DisplayConstantStringName(size_t stridx, const Color &color, const Scriptable *speaker) const
 {
-	if (stridx > STRREF_COUNT) return;
+	if (stridx > HCStrings::StringCount) return;
 	if(!speaker) return;
 
 	String text = core->GetString(SRefs.Get(stridx, speaker), STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
@@ -321,7 +321,7 @@ void DisplayMessage::DisplayConstantStringName(size_t stridx, GUIColors color, c
 //Treats the constant string as a numeric format string, otherwise like the previous method
 void DisplayMessage::DisplayConstantStringNameValue(size_t stridx, GUIColors color, const Scriptable *speaker, int value) const
 {
-	if (stridx > STRREF_COUNT) return;
+	if (stridx > HCStrings::StringCount) return;
 	if(!speaker) return;
 	String fmt = core->GetString(SRefs.Get(stridx, speaker), STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::RESOLVE_TAGS);
 	DisplayStringName(fmt::format(fmt, value), GetColor(color), speaker);
@@ -331,7 +331,7 @@ void DisplayMessage::DisplayConstantStringNameValue(size_t stridx, GUIColors col
 // <charname> - blah blah <someoneelse>
 void DisplayMessage::DisplayConstantStringAction(size_t stridx, GUIColors color, const Scriptable *attacker, const Scriptable *target) const
 {
-	if (stridx > STRREF_COUNT) return;
+	if (stridx > HCStrings::StringCount) return;
 
 	String name1, name2;
 

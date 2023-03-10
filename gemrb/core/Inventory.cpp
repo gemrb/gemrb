@@ -533,7 +533,7 @@ unsigned int Inventory::DestroyItem(const ResRef& resref, ieDword flags, ieDword
 			break;
 	}
 	if (destructed && Owner && Owner->InParty) {
-		displaymsg->DisplayMsgCentered(STR_LOSTITEM, FT_ANY, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgCentered(HCStrings::LostItem, FT_ANY, GUIColors::XPCHANGE);
 	}
 
 	return destructed;
@@ -1922,7 +1922,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 	//magic items have the highest priority
 	if (MagicSlotEquipped()) {
 		//magic weapon is in use
-		return STR_MAGICWEAPON;
+		return HCStrings::MagicWeapon;
 	}
 
 	//can't equip in shield slot if a weapon slot is twohanded or ranged
@@ -1936,10 +1936,10 @@ int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 		}
 		if (slot==otherslot) {
 			if (TwoHandedInSlot(i)) {
-				return STR_TWOHANDED_USED;
+				return HCStrings::TwohandedUsed;
 			}
 			if (ranged) {
-				return STR_NO_RANGED_OFFHAND;
+				return HCStrings::NoRangedOffhand;
 			}
 		}
 	}
@@ -1947,14 +1947,14 @@ int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 	if (twohanded) {
 		if (IWD2) {
 			if (slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot-SLOT_MELEE)&1) {
-				return STR_NOT_IN_OFFHAND;
+				return HCStrings::NotInOffhand;
 			}
 		} else if (slot == SLOT_LEFT) {
-			return STR_NOT_IN_OFFHAND;
+			return HCStrings::NotInOffhand;
 		}
 		if (IsSlotBlocked(slot)) {
 		//cannot equip two handed while shield slot is in use?
-			return STR_OFFHAND_USED;
+			return HCStrings::OffhandUsed;
 		}
 	}
 	return 0;

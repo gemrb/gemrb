@@ -1950,7 +1950,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		int limit = gamedata->GetSummoningLimit(sex);
 		if (limit && sexmod && map->CountSummons(flag, sex) >= limit && summoner && summoner->InParty) {
 			//summoning limit reached
-			displaymsg->DisplayConstantString(STR_SUMMONINGLIMIT, GUIColors::WHITE);
+			displaymsg->DisplayConstantString(HCStrings::SummoningLimit, GUIColors::WHITE);
 			delete tmp;
 			break;
 		}
@@ -3127,14 +3127,14 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 		}
 		if (slottype&SLOT_SHIELD) {
 			//cannot equip twohanded in offhand
-			if (feedback) displaymsg->DisplayConstantString(STR_NOT_IN_OFFHAND, GUIColors::WHITE);
+			if (feedback) displaymsg->DisplayConstantString(HCStrings::NotInOffhand, GUIColors::WHITE);
 			return 0;
 		}
 	}
 
 	if (item->ItemType >= ItemTypes) {
 		//invalid itemtype
-		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, GUIColors::WHITE);
+		if (feedback) displaymsg->DisplayConstantString(HCStrings::WrongItemType, GUIColors::WHITE);
 		return 0;
 	}
 
@@ -3163,7 +3163,7 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 	}
 
 	if (!ret) {
-		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, GUIColors::WHITE);
+		if (feedback) displaymsg->DisplayConstantString(HCStrings::WrongItemType, GUIColors::WHITE);
 		return 0;
 	}
 
@@ -3196,7 +3196,7 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 	}
 
 	if (!flg) {
-		displaymsg->DisplayConstantString(STR_UNUSABLEITEM, GUIColors::WHITE);
+		displaymsg->DisplayConstantString(HCStrings::ItemUnusable, GUIColors::WHITE);
 		return 0;
 	}
 
@@ -4239,10 +4239,10 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 	if (gc && ((bool)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) != (bool)pause)) { // already paused
 		int strref;
 		if (pause) {
-			strref = STR_PAUSED;
+			strref = HCStrings::Paused;
 			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BitOp::OR);
 		} else {
-			strref = STR_UNPAUSED;
+			strref = HCStrings::Unpaused;
 			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BitOp::NAND);
 		}
 		if (!(flags&PF_QUIET) ) {
@@ -4267,7 +4267,7 @@ bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 		return false;
 	}
 
-	displaymsg->DisplayConstantString(STR_AP_UNUSABLE + ieDword(flag), GUIColors::RED);
+	displaymsg->DisplayConstantString(HCStrings::ApUnusable + ieDword(flag), GUIColors::RED);
 
 	ieDword centerOnAutoPause = 0;
 	vars->Lookup("Auto Pause Center", centerOnAutoPause);

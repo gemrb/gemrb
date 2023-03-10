@@ -134,7 +134,7 @@ private:
 
 static int GetTrackString(const ResRef &areaName)
 {
-	bool trackflag = DisplayMessage::HasStringReference(STR_TRACKING);
+	bool trackFlag = DisplayMessage::HasStringReference(HCStrings::Tracking);
 
 	if (tracks.empty()) {
 		AutoTable tm = gamedata->LoadTable("tracking", true);
@@ -148,7 +148,7 @@ static int GetTrackString(const ResRef &areaName)
 				tracks[i].trackFlag=false;
 				poi+=2;
 			} else {
-				tracks[i].trackFlag=trackflag;
+				tracks[i].trackFlag = trackFlag;
 			}
 			tracks[i].text = ieStrRef(atoi(poi));
 			tracks[i].difficulty = tm->QueryFieldSigned<int>(i,1);

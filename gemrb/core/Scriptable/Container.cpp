@@ -164,7 +164,7 @@ void Container::TryPickLock(Actor* actor)
 		if (OpenFail != ieStrRef::INVALID) {
 			displaymsg->DisplayStringName(OpenFail, GUIColors::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
-			displaymsg->DisplayMsgAtLocation(STR_CONT_NOPICK, FT_ANY, actor, actor, GUIColors::XPCHANGE);
+			displaymsg->DisplayMsgAtLocation(HCStrings::ContNotpickable, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		}
 		return;
 	}
@@ -181,14 +181,14 @@ void Container::TryPickLock(Actor* actor)
 		}
 	}
 	if (stat < LockDifficulty) {
-		displaymsg->DisplayMsgAtLocation(STR_LOCKPICK_FAILED, FT_ANY, actor, actor, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgAtLocation(HCStrings::LockpickFailed, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
 		core->PlaySound(DS_PICKFAIL, SFX_CHAN_HITS); //AMB_D21
 		return;
 	}
 	SetContainerLocked(false);
 	core->GetGameControl()->ResetTargetMode();
-	displaymsg->DisplayMsgAtLocation(STR_LOCKPICK_DONE, FT_ANY, actor, actor);
+	displaymsg->DisplayMsgAtLocation(HCStrings::LockpickDone, FT_ANY, actor, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS); //AMB_D21D
 	ImmediateEvent();
@@ -221,11 +221,11 @@ void Container::TryBashLock(Actor *actor)
 
 	actor->FaceTarget(this);
 	if(roll < LockDifficulty || LockDifficulty == 100) {
-		displaymsg->DisplayMsgAtLocation(STR_CONTBASH_FAIL, FT_ANY, actor, actor, GUIColors::XPCHANGE);
+		displaymsg->DisplayMsgAtLocation(HCStrings::ContBashFail, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		return;
 	}
 
-	displaymsg->DisplayMsgAtLocation(STR_CONTBASH_DONE, FT_ANY, actor, actor);
+	displaymsg->DisplayMsgAtLocation(HCStrings::ContBashDone, FT_ANY, actor, actor);
 	SetContainerLocked(false);
 	core->GetGameControl()->ResetTargetMode();
 	//Is this really useful ?

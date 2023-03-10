@@ -1202,10 +1202,10 @@ void Game::ShareXP(int xp, int flags) const
 
 	//you have gained/lost ... xp
 	if (core->HasFeedback(FT_MISC)) {
-		size_t strIdx = STR_GOTXP;
+		size_t strIdx = HCStrings::GotXP;
 		if (xp < 0) {
 			xp = -xp;
-			strIdx = STR_LOSTXP;
+			strIdx = HCStrings::LostXP;
 		}
 		if (core->HasFeature(GF_ONSCREEN_TEXT)) {
 			ieStrRef complaint = DisplayMessage::GetStringReference(strIdx);
@@ -1315,9 +1315,9 @@ void Game::SetReputation(ieDword r, ieDword min)
 {
 	r = Clamp<ieDword>(r, min, 200);
 	if (Reputation > r && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayConstantStringValue(STR_LOSTREP, GUIColors::GOLD, (Reputation - r) / 10);
+		displaymsg->DisplayConstantStringValue(HCStrings::LostRep, GUIColors::GOLD, (Reputation - r) / 10);
 	} else if (Reputation < r && core->HasFeedback(FT_MISC)) {
-		displaymsg->DisplayConstantStringValue(STR_GOTREP, GUIColors::GOLD, (r - Reputation) / 10);
+		displaymsg->DisplayConstantStringValue(HCStrings::GotRep, GUIColors::GOLD, (r - Reputation) / 10);
 	}
 	Reputation = r;
 	for (const auto& pc : PCs) {
@@ -1342,9 +1342,9 @@ void Game::AddGold(int add)
 	ieDword old = PartyGold;
 	PartyGold = std::max(0, signed(PartyGold) + add);
 	if (old<PartyGold) {
-		displaymsg->DisplayConstantStringValue( STR_GOTGOLD, GUIColors::GOLD, PartyGold-old);
+		displaymsg->DisplayConstantStringValue(HCStrings::GotGold, GUIColors::GOLD, PartyGold - old);
 	} else {
-		displaymsg->DisplayConstantStringValue( STR_LOSTGOLD, GUIColors::GOLD, old-PartyGold);
+		displaymsg->DisplayConstantStringValue(HCStrings::LostGold, GUIColors::GOLD, old - PartyGold);
 	}
 }
 
@@ -1647,7 +1647,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 		for (const auto& pc : PCs) {
 			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS) {
 				// You cannot rest at this time because you do not have control of all your party members
-				*err = DisplayMessage::GetStringReference(STR_CANTTRESTNOCONTROL);
+				*err = DisplayMessage::GetStringReference(HCStrings::CantRestNoControl);
 				return false;
 			}
 		}
@@ -1660,7 +1660,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	if (checks & REST_SCATTER) {
 		if (!EveryoneNearPoint(area, leader->Pos, 0)) {
 			//party too scattered
-			*err = DisplayMessage::GetStringReference(STR_SCATTERED);
+			*err = DisplayMessage::GetStringReference(HCStrings::Scattered);
 			return false;
 		}
 	}
@@ -1668,12 +1668,12 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	if (checks & REST_CRITTER) {
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
-			*err = DisplayMessage::GetStringReference(STR_CANTRESTMONS);
+			*err = DisplayMessage::GetStringReference(HCStrings::CantRestMonsters);
 			return false;
 		}
 		//don't allow resting if hostiles are nearby
 		if (area->AnyEnemyNearPoint(leader->Pos)) {
-			*err = DisplayMessage::GetStringReference(STR_CANTRESTMONS);
+			*err = DisplayMessage::GetStringReference(HCStrings::CantRestMonsters);
 			return false;
 		}
 	}
@@ -1682,7 +1682,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	if (checks & REST_AREA) {
 		//you cannot rest here
 		if (area->AreaFlags & AF_NOSAVE) {
-			*err = DisplayMessage::GetStringReference(STR_MAYNOTREST);
+			*err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
 			return false;
 		}
 
@@ -1699,7 +1699,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 				return false;
 			} else if (area->AreaFlags&AF_DEADMAGIC) {
 				// you cannot rest right now
-				*err = DisplayMessage::GetStringReference(STR_MAYNOTREST);
+				*err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
 				return false;
 			}
 		} else {
@@ -1709,7 +1709,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 				if (area->AreaType & AT_OUTDOOR && !core->HasFeature(GF_AREA_VISITED_VAR)) {
 					return true;
 				}
-				*err = DisplayMessage::GetStringReference(STR_MAYNOTREST);
+				*err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
 				return false;
 			}
 		}
@@ -1827,17 +1827,17 @@ bool Game::RestParty(int checks, int dream, int hp)
 	//bg1 has "You have rested for <DURATION>" while pst has "You have
 	//rested for <HOUR> <DURATION>" and then bg1 has "<HOUR> hours" while
 	//pst just has "Hours", so this works for both
-	ieStrRef restindex = DisplayMessage::GetStringReference(STR_REST);
-	ieStrRef hrsindex = DisplayMessage::GetStringReference(STR_HOURS);
+	ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::Rested);
+	ieStrRef hoursMsg = DisplayMessage::GetStringReference(HCStrings::Hours);
 
 	core->GetTokenDictionary()->SetAtAsString("HOUR", hours);
 
 	//this would be bad
-	if (hrsindex == ieStrRef::INVALID || restindex == ieStrRef::INVALID) return cutscene;
+	if (hoursMsg == ieStrRef::INVALID || restedMsg == ieStrRef::INVALID) return cutscene;
 	
-	String tmpstr = core->GetString(hrsindex, STRING_FLAGS::NONE);
+	String tmpstr = core->GetString(hoursMsg, STRING_FLAGS::NONE);
 	core->GetTokenDictionary()->SetAt("DURATION", tmpstr);
-	displaymsg->DisplayString(restindex, GUIColors::WHITE, STRING_FLAGS::NONE);
+	displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
 	return cutscene;
 }
 

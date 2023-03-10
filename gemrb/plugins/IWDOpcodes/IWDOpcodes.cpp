@@ -1246,23 +1246,23 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 		switch (fx->Parameter2) {
 		case 0: //charmed (target neutral after charm)
-			displaymsg->DisplayConstantStringName(STR_CHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Charmed, GUIColors::WHITE, target);
 			break;
 		case 1: //charmed (target hostile after charm)
-			displaymsg->DisplayConstantStringName(STR_CHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Charmed, GUIColors::WHITE, target);
 			target->SetBase(IE_EA, EA_ENEMY);
 			break;
 		case 2: //controlled by cleric
-			displaymsg->DisplayConstantStringName(STR_CONTROLLED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Controlled, GUIColors::WHITE, target);
 			target->SetSpellState(SS_DOMINATION);
 			break;
 		case 3: //controlled by cleric (hostile after charm)
-			displaymsg->DisplayConstantStringName(STR_CONTROLLED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Controlled, GUIColors::WHITE, target);
 			target->SetBase(IE_EA, EA_ENEMY);
 			target->SetSpellState(SS_DOMINATION);
 			break;
 		case 4: //turn undead
-			displaymsg->DisplayConstantStringName(STR_CONTROLLED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Controlled, GUIColors::WHITE, target);
 			target->SetBase(IE_EA, EA_ENEMY);
 			target->SetStat(IE_MORALE, 0, 0);
 			target->SetSpellState(SS_DOMINATION);
@@ -2199,13 +2199,13 @@ int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->FirstApply) {
 		switch (fx->Parameter2) {
 		case 0:
-			displaymsg->DisplayConstantStringName(STR_CHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Charmed, GUIColors::WHITE, target);
 			break;
 		case 1:
-			displaymsg->DisplayConstantStringName(STR_DIRECHARMED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::DireCharmed, GUIColors::WHITE, target);
 			break;
 		default:
-			displaymsg->DisplayConstantStringName(STR_CONTROLLED, GUIColors::WHITE, target);
+			displaymsg->DisplayConstantStringName(HCStrings::Controlled, GUIColors::WHITE, target);
 			break;
 		}
 	}
@@ -2912,7 +2912,7 @@ int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		const Actor *enemy = map->GetActorByGlobalID(target->LastSeen);
 		//50 is more like our current weapon range
 		if (enemy && (PersonalDistance(enemy, target)<50) && target->LastSeen!=target->LastTarget) {
-			displaymsg->DisplayConstantStringNameValue(STR_CLEAVE, GUIColors::WHITE, target, fx->Parameter1);
+			displaymsg->DisplayConstantStringNameValue(HCStrings::Cleave, GUIColors::WHITE, target, fx->Parameter1);
 			target->attackcount=fx->Parameter1;
 			target->FaceTarget(enemy);
 			target->LastTarget=target->LastSeen;
@@ -3095,7 +3095,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//calculate victim (an opponent of target)
 	Actor *victim = GetRandomEnemySeen(map, target);
 	if (!victim) {
-		displaymsg->DisplayConstantStringName(STR_LIGHTNING_DISS, GUIColors::WHITE, target);
+		displaymsg->DisplayConstantStringName(HCStrings::LightningDissipate, GUIColors::WHITE, target);
 		return ret;
 	}
 
@@ -3215,11 +3215,11 @@ int fx_power_attack (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->PCStats->ExtraSettings[ES_EXPERTISE] = 0;
 
 			//set new modal feat
-			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, GUIColors::WHITE, STR_POWERATTACK, target);
+			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::PowerAttack, target);
 		}
 	}
 
-	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, GUIColors::WHITE, STR_POWERATTACK, target);
+	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::PowerAttack, target);
 	return FX_NOT_APPLIED;
 }
 
@@ -3242,11 +3242,11 @@ int fx_expertise (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->PCStats->ExtraSettings[ES_POWERATTACK] = 0;
 
 			//set new modal feat
-			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, GUIColors::WHITE, STR_EXPERTISE, target);
+			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Expertise, target);
 		}
 	}
 
-	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, GUIColors::WHITE, STR_EXPERTISE, target);
+	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::Expertise, target);
 	return FX_NOT_APPLIED;
 }
 
@@ -3270,7 +3270,7 @@ int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->PCStats->ExtraSettings[ES_HAMSTRING] = 0;
 
 			//set new modal feat
-			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, GUIColors::WHITE, STR_ARTERIAL, target);
+			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Arterial, target);
 		}
 		if (IsStar(target->BackstabResRef)) {
 			target->BackstabResRef = fx->Resource;
@@ -3279,7 +3279,7 @@ int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//stop arterial
-	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, GUIColors::WHITE, STR_ARTERIAL, target);
+	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::Arterial, target);
 	return FX_NOT_APPLIED;
 }
 
@@ -3303,7 +3303,7 @@ int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->PCStats->ExtraSettings[ES_ARTERIAL] = 0;
 
 			//set new modal feat
-			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, GUIColors::WHITE, STR_HAMSTRING, target);
+			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Hamstring, target);
 		}
 		if (IsStar(target->BackstabResRef)) {
 			target->BackstabResRef = fx->Resource;
@@ -3312,7 +3312,7 @@ int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//stop hamstring
-	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, GUIColors::WHITE, STR_HAMSTRING, target);
+	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::Hamstring, target);
 	return FX_NOT_APPLIED;
 }
 
@@ -3333,14 +3333,14 @@ int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//none i know of
 
 			//set new modal feat
-			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, GUIColors::WHITE, STR_RAPIDSHOT, target);
+			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::RapidShot, target);
 		}
 
 		return FX_APPLIED;
 	}
 
 	//stop rapidshot
-	displaymsg->DisplayConstantStringNameString(STR_STOPPED_FEAT, GUIColors::WHITE, STR_RAPIDSHOT, target);
+	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::RapidShot, target);
 	return FX_NOT_APPLIED;
 }
 

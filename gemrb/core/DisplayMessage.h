@@ -71,8 +71,8 @@ class GEM_EXPORT DisplayMessage
 private:
 	struct StrRefs {
 		std::string loadedTable;
-		ieStrRef table[STRREF_COUNT];
-		int flags[STRREF_COUNT]{};
+		ieStrRef table[HCStrings::StringCount];
+		int flags[HCStrings::StringCount]{};
 		std::map<int, std::pair<ieStrRef, ieStrRef>> extraRefs;
 
 		StrRefs();

@@ -32,214 +32,201 @@
 
 namespace GemRB {
 
-#define STR_SCATTERED      0
-#define STR_WHOLEPARTY     1
-#define STR_DOORLOCKED     2
-#define STR_MAGICTRAP      3
-#define STR_NORMALTRAP     4
-#define STR_TRAP           5
-#define STR_CANNOTGO       6
-#define STR_    7
-#define STR_2    8
-#define STR_SLEEP          9
-#define STR_AMBUSH         10
-#define STR_CONTLOCKED     11
-#define STR_NOMONEY        12
-#define STR_CURSED         13
-#define STR_SPELLDISRUPT   14
-#define STR_DIED           15
-#define STR_MAYNOTREST     16
-#define STR_CANTRESTMONS   17
-#define STR_CANTSAVEMONS   18
-#define STR_CANTSAVE       19
-#define STR_NODIALOG       20
-#define STR_CANTSAVEDIALOG 21
-#define STR_CANTSAVEDIALOG2 22
-#define STR_CANTSAVEMOVIE   23
-#define STR_TARGETBUSY      24
-#define STR_CANTTALKTRANS   25
-#define STR_GOTGOLD         26
-#define STR_LOSTGOLD        27
-#define STR_GOTXP           28
-#define STR_LOSTXP          29
-#define STR_GOTITEM         30
-#define STR_LOSTITEM        31
-#define STR_GOTREP          32
-#define STR_LOSTREP         33
-#define STR_GOTABILITY      34
-#define STR_GOTSPELL        35
-#define STR_GOTSONG         36
-#define STR_NOTHINGTOSAY    37
-#define STR_JOURNALCHANGE   38
-#define STR_WORLDMAPCHANGE  39
-#define STR_PAUSED          40
-#define STR_UNPAUSED        41
-#define STR_SCRIPTPAUSED    42
-#define STR_AP_UNUSABLE     43
-#define STR_AP_ATTACKED     44
-#define STR_AP_HIT          45
-#define STR_AP_WOUNDED      46
-#define STR_AP_DEAD         47
-#define STR_AP_NOTARGET     48
-#define STR_AP_ENDROUND     49
-#define STR_AP_ENEMY        50
-#define STR_AP_TRAP         51
-#define STR_AP_SPELLCAST    52
-#define STR_AP_GENERIC      53
-#define STR_AP_RESERVED1    54
-#define STR_AP_RESERVED2    55
-#define STR_AP_RESERVED3    56
-#define STR_CHARMED         57
-#define STR_DIRECHARMED     58
-#define STR_CONTROLLED      59
-#define STR_EVIL            60
-#define STR_GE_NEUTRAL      61
-#define STR_GOOD            62
-#define STR_LAWFUL          63
-#define STR_LC_NEUTRAL      64
-#define STR_CHAOTIC         65
-#define STR_ACTION_CAST     66
-#define STR_ACTION_ATTACK   67
-#define STR_ACTION_TURN     68
-#define STR_ACTION_SONG     69
-#define STR_ACTION_FINDTRAP 70
-#define STR_MAGICWEAPON     71
-#define STR_OFFHAND_USED    72
-#define STR_TWOHANDED_USED  73
-#define STR_CANNOT_USE_ITEM 74
-#define STR_CANT_DROP_ITEM  75
-#define STR_NOT_IN_OFFHAND  76
-#define STR_ITEM_IS_CURSED  77
-#define STR_NO_CRITICAL	    78
-#define STR_TRACKING        79
-#define STR_TRACKINGFAILED  80
-#define STR_DOOR_NOPICK     81
-#define STR_CONT_NOPICK     82
-#define STR_CANTSAVECOMBAT  83
-#define STR_CANTSAVENOCTRL  84
-#define STR_LOCKPICK_DONE   85
-#define STR_LOCKPICK_FAILED 86
-#define STR_STATIC_DISS     87
-#define STR_LIGHTNING_DISS  88
-#define STR_UNUSABLEITEM    89      //item has no usable ability
-#define STR_ITEMID          90      //item needs identify
-#define STR_WRONGITEMTYPE   91
-#define STR_ITEMEXCL        92
-#define STR_PICKPOCKET_DONE 93      //done
-#define STR_PICKPOCKET_NONE 94      //no items to steal
-#define STR_PICKPOCKET_FAIL 95      //failed, noticed
-#define STR_PICKPOCKET_EVIL 96      //can't pick hostiles
-#define STR_PICKPOCKET_ARMOR 97     //armor restriction
-#define STR_USING_FEAT     98
-#define STR_STOPPED_FEAT   99
-#define STR_DISARM_DONE   100       //trap disarmed
-#define STR_DISARM_FAIL   101       //trap not disarmed
-#define STR_DOORBASH_DONE 102
-#define STR_DOORBASH_FAIL 103
-#define STR_CONTBASH_DONE 104
-#define STR_CONTBASH_FAIL 105
-#define STR_MAYNOTSETTRAP 106
-#define STR_SNAREFAILED   107
-#define STR_SNARESUCCEED  108
-#define STR_NOMORETRAP    109
-#define STR_DISABLEDMAGE  110
-#define STR_SAVESUCCEED   111
-#define STR_QSAVESUCCEED  112
-#define STR_UNINJURED     113       //uninjured
-#define STR_INJURED1      114
-#define STR_INJURED2      115
-#define STR_INJURED3      116
-#define STR_INJURED4      117       //near death
-#define STR_HOURS         118       //<HOUR> hours / Hours
-#define STR_HOUR          119       //<HOUR> hours / Hour
-#define STR_DAYS          120       //<GAMEDAYS> days
-#define STR_DAY           121
-#define STR_REST          122       //You have rested for <DURATION> / <HOUR> <DURATION>
-#define STR_JOURNEY       123       //The journey took <DURATION>
-#define STR_SUMMONINGLIMIT 124
-#define STR_INVFULL       125
-#define STR_TOOFARAWAY    126
-#define STR_DAMAGE_IMMUNITY 127
-#define STR_DAMAGE1       128
-#define STR_DAMAGE2       129
-#define STR_DAMAGE3       130
-#define STR_DMG_POISON    131
-#define STR_DMG_MAGIC     132
-#define STR_DMG_MISSILE   133
-#define STR_DMG_SLASHING  134
-#define STR_DMG_PIERCING  135
-#define STR_DMG_CRUSHING  136
-#define STR_DMG_FIRE      137
-#define STR_DMG_ELECTRIC  138
-#define STR_DMG_COLD      139
-#define STR_DMG_ACID      140
-#define STR_DMG_OTHER     141
-#define STR_GOTQUESTXP    142
-#define STR_LEVELUP       143
-#define STR_INVFULL_ITEMDROP 144
-#define STR_CONTDUP       145
-#define STR_CONTTRIG      146
-#define STR_CONTFAIL      147
-#define STR_SEQDUP        148
-#define STR_CRITICAL_HIT  149
-#define STR_CRITICAL_MISS 150
-#define STR_DEATH         151
-#define STR_BACKSTAB_DAMAGE 152
-#define STR_BACKSTAB_BAD  153
-#define STR_BACKSTAB_FAIL 154
-#define STR_CASTER_LVL_INC 155 // caster level bonus (wild mages)
-#define STR_CASTER_LVL_DEC 156
-#define STR_EXPORTED      157 // characters exported (iwd)
-#define STR_PALADIN_FALL  158
-#define STR_RANGER_FALL   159
-#define STR_RES_RESISTED  160
-#define STR_DEADMAGIC_FAIL 161
-#define STR_MISCASTMAGIC  162
-#define STR_WILDSURGE     163
-#define STR_FAMBLOCK      164
-#define STR_FAMPROTAGONIST 165
-#define STR_MAGIC_RESISTED 166
-#define STR_CANTSAVESTORE 167
-#define STR_NOSEE_NOCAST 168
-#define STR_AURACLEANSED 169
-#define STR_INDOOR_FAIL 170
-#define STR_SPELL_FAILED 171
-#define STR_CHAOSSHIELD 172
-#define STR_RAPIDSHOT 173
-#define STR_HAMSTRING 174
-#define STR_ARTERIAL 175
-#define STR_EXPERTISE 176
-#define STR_POWERATTACK 177
-#define STR_CLEAVE 178
-#define STR_HELD 179
-#define STR_HALFSPEED 180
-#define STR_CANTMOVE 181
-#define STR_CASTS 182
-#define STR_WEAPONINEFFECTIVE 183
-#define STR_CONCEALED_MISS 184
-#define STR_SAVE_SPELL 185
-#define STR_SAVE_BREATH 186
-#define STR_SAVE_DEATH 187
-#define STR_SAVE_WANDS 188
-#define STR_SAVE_POLY 189
-#define STR_ATTACK_ROLL 190
-#define STR_ATTACK_ROLL_L 191
-#define STR_HIT 192
-#define STR_MISS 193
-#define STR_NO_RANGED_OFFHAND 194
-#define STR_CANTTRESTNOCONTROL 195
-#define STR_DAMAGE_DETAIL1 196
-#define STR_DAMAGE_DETAIL2 197
-#define STR_DAMAGE_DETAIL3 198
-#define STR_TRAVEL_TIME 199
-#define STR_PICKPOCKET_INVFUL 200     // pst only
-#define STR_MORALE_BERSERK 201
-#define STR_MORALE_RUN 202
-#define STR_MORALE_PANIC 203
-#define STR_TRAP_FOUND 204
-#define STR_BACKSTAB_DOUBLE 205
+enum HCStrings {
+	Scattered,
+	WholeParty,
+	DoorLocked,
+	Ambush,
+	ContLocked,
+	Cursed,
+	SpellDisrupted,
+	MayNotRest,
+	CantRestMonsters,
+	CantSaveMonsters,
+	CantSave,
+	CantSaveDialog,
+	CantSaveDialog2,
+	CantSaveMovie,
+	TargetBusy,
+	DialogNoAreaMove, // maybe worth adding, could be triggered with non-pausing dialog - 62158
+	GotGold,
+	LostGold,
+	GotXP,
+	LostXP,
+	GotItem,
+	LostItem,
+	GotRep,
+	LostRep,
+	GotAbility,
+	GotSpell,
+	GotSong,
+	NothingToSay,
+	JournalChange,
+	WorldmapChange,
+	Paused,
+	Unpaused,
+	ScriptPaused,
+	ApUnusable,
+	ApAttacked, // this and the following are used via an offset to ApUnusable
+	ApHit,
+	ApWounded,
+	ApDead,
+	ApNotarget,
+	ApEndround,
+	ApEnemy,
+	ApTrap,
+	ApSpellcast,
+	ApGeneric,
+	ApReserved1,
+	ApReserved2,
+	ApReserved3,
+	Charmed,
+	DireCharmed,
+	Controlled,
+	Evil,
+	GENeutral,
+	Good,
+	Lawful,
+	LCNeutral,
+	Chaotic,
+	ActionCast,
+	ActionAttack,
+	MagicWeapon,
+	OffhandUsed,
+	TwohandedUsed,
+	CantUseItem,
+	CantDropItem, // not referenced, but unsure if useful
+	NotInOffhand,
+	NoCritical,
+	Tracking,
+	TrackingFailed,
+	DoorNotPickable,
+	ContNotpickable,
+	CantSaveCombat,
+	CantSaveNoCtrl,
+	LockpickDone,
+	LockpickFailed,
+	StaticDissipate,
+	LightningDissipate,
+	ItemUnusable, // item has no usable ability
+	ItemNeedsId, // item needs identify
+	WrongItemType,
+	ItemExclusion,
+	PickpocketDone,
+	PickpocketNone, // no items to steal
+	PickpocketFail, // failed, noticed
+	PickpocketEvil, // can't pick hostiles
+	PickpocketArmor, // unsure if useful, add check to action?
+	UsingFeat,
+	StoppedFeat,
+	DisarmDone,
+	DisarmFail,
+	DoorBashDone,
+	DoorBashFail,
+	ContBashDone,
+	ContBashFail,
+	MayNotSetTrap,
+	SnareFailed,
+	SnareSucceed,
+	NoMoreTraps,
+	DisabledMageSpells,
+	SaveSuccess,
+	QSaveSuccess,
+	Uninjured,
+	Injured1,
+	Injured2,
+	Injured3,
+	Injured4, // near death
+	Hours, // <HOUR> hours / Hours
+	Hour, // <HOUR> hours / Hour
+	Days, // <GAMEDAYS> days
+	Day,
+	Rested, // You have rested for <DURATION> / <HOUR> <DURATION>
+	SummoningLimit,
+	InventoryFull,
+	TooFarAway,
+	DamageImmunity,
+	Damage1,
+	Damage2,
+	Damage3, // used through an offset with Damage1 and DamageDetail1
+	DmgPoison, // all the following are used indirectly in dmgtypes.2da
+	DmgMagic,
+	DmgMissile,
+	DmgSlashing,
+	DmgPiercing,
+	DmgCrushing,
+	DmgFire,
+	DmgElectric,
+	DmgCold,
+	DmgAcid,
+	DmgOther,
+	GotQuestXP,
+	LevelUp,
+	InventoryFullItemDrop,
+	ContingencyDupe,
+	ContingencyFail,
+	SequencerDupe,
+	CriticalHit,
+	CriticalMiss,
+	Death,
+	BackstabDamage,
+	BackstabBad,
+	BackstabFail,
+	CasterLvlInc, // caster level bonus (wild mages)
+	CasterLvlDec,
+	Exported, // characters exported (iwd)
+	PaladinFall,
+	RangerFall,
+	ResResisted,
+	DeadmagicFail,
+	MiscastMagic,
+	WildSurge,
+	FamiliarBlock,
+	FamiliarProtagonistOnly,
+	MagicResisted,
+	CantSaveStore,
+	NoSeeNoCast,
+	AuraCleansed,
+	IndoorFail,
+	SpellFailed,
+	ChaosShield,
+	RapidShot,
+	Hamstring,
+	Arterial,
+	Expertise,
+	PowerAttack,
+	Cleave,
+	StateHeld,
+	HalfSpeed,
+	CantMove,
+	Casts,
+	WeaponIneffective,
+	ConcealedMiss,
+	SaveSpell,
+	SaveBreath, // the next few are used with an offset from SaveSpell
+	SaveDeath,
+	SaveWands,
+	SavePoly,
+	AttackRoll,
+	AttackRollLeft,
+	Hit,
+	Miss,
+	NoRangedOffhand,
+	CantRestNoControl,
+	DamageDetail1,
+	DamageDetail2,
+	DamageDetail3,
+	TravelTime,
+	PickpocketInventoryFull, // pst only
+	MoraleBerserk,
+	MoraleRun, // used with offset from MoraleBerserk
+	MoralePanic, // used with offset from MoraleBerserk
+	TrapFound,
+	BackstabDouble,
 
-#define STRREF_COUNT 206
+	StringCount
+};
+
 }
 
 #endif //! IE_STRINGS_H
