@@ -3535,7 +3535,48 @@ void Interface::SanitizeItem(CREItem *item) const
 	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 
-#define MAX_LOOP 10
+// special iwd logic for random loot UP entries
+static ResRef UpgradeRandomItem(const ResRef& pickedItem, const ResRef& workResRef)
+{
+	static const std::string upgradeProgressionStr = "lmrvvvvv";
+	ResRef inputResRef = workResRef;
+	StringToLower(inputResRef);
+	size_t nameLength = inputResRef.length();
+	char lastCharInInput = inputResRef[nameLength - 1];
+	int currentTierIndex = upgradeProgressionStr.find_first_of(lastCharInInput);
+	if (currentTierIndex == -1) {
+		// invalid tier
+		return inputResRef;
+	}
+
+	char lastCharInSelected = pickedItem[pickedItem.length() - 1];
+	int upgradeAmount;
+	switch (lastCharInSelected) {
+		case '1':
+		case '2':
+		case '3':
+			upgradeAmount = lastCharInSelected - '3' + 3;
+			break;
+		case 'P':
+		case 'p':
+			if (pickedItem.length() == 2) {
+				// was just "up"
+				upgradeAmount = 1;
+				break;
+			}
+			// intentional fallthrough
+		default:
+			// invalid input
+			return inputResRef;
+	}
+
+	char targetUpgradeTier = upgradeProgressionStr[currentTierIndex + upgradeAmount];
+	if (lastCharInInput != targetUpgradeTier) {
+		// replace last character in inputResRef to upgraded tier
+		inputResRef[nameLength - 1] = targetUpgradeTier;
+	}
+	return inputResRef;
+}
 
 //This function generates random items based on the randitem.2da file
 //there could be a loop, but we don't want to freeze, so there is a limit
@@ -3544,10 +3585,24 @@ void Interface::SanitizeItem(CREItem *item) const
 // - working items with a *N suffix, setting the stack count (eg. BOLT04*5)
 // - references to other random tables to be resolved (eg. RNDMAG02 meaning the second row of RNDMAG.2da)
 // - numbers only — gold amount
+// - "UP", which causes a pick from one of the next rows (RT01_L -> RT01_M -> RT01_R -> RT01_V)
 bool Interface::ResolveRandomItem(CREItem *itm) const
 {
 	if (RtRows.empty()) return true;
-	for(int loop=0;loop<MAX_LOOP;loop++) {
+
+	auto pickFromRow = [this](const ResRef& itemRef)  {
+		const ItemList& itemList = RtRows.at(itemRef);
+		int idx;
+		if (itemList.WeightOdds) {
+			// instead of 1d19 we calculate with 2d10 (which also has 19 possible values)
+			idx = Roll(2,(itemList.ResRefs.size() + 1) / 2, -2);
+		} else {
+			idx = Roll(1, itemList.ResRefs.size(), -1);
+		}
+		return itemList.ResRefs[idx];
+	};
+
+	for (int loop = 0; loop < 10; loop++) {
 		if (RtRows.count(itm->ItemResRef) == 0) {
 			const Item* item = gamedata->GetItem(itm->ItemResRef, true);
 			if (!item) {
@@ -3558,16 +3613,17 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 			gamedata->FreeItem(item, itm->ItemResRef, false);
 			return item->ItemName != ieStrRef::INVALID || item->ItemNameIdentified != ieStrRef::INVALID || item->ItemType || item->GetExtHeader(0);
 		}
-		const ItemList& itemlist = RtRows.at(itm->ItemResRef);
-		int i;
-		if (itemlist.WeightOdds) {
-			//instead of 1d19 we calculate with 2d10 (which also has 19 possible values)
-			i=Roll(2,(itemlist.ResRefs.size() + 1)/2, -2);
-		} else {
-			i=Roll(1, itemlist.ResRefs.size(), -1);
+
+		ResRef pickedItem = pickFromRow(itm->ItemResRef);
+		size_t nameLength = itm->ItemResRef.length();
+		if (pickedItem == "UP" && nameLength > 2 && itm->ItemResRef[nameLength - 2] == '_') {
+			ResRef newItem = UpgradeRandomItem(pickedItem, itm->ItemResRef);
+			if (newItem == pickedItem) return false;;
+			pickedItem = pickFromRow(newItem);
 		}
+
 		// Explode to ResRef, so that there is a null terminator for strtounsigned
-		auto parts = Explode<ResRef, ResRef>(itemlist.ResRefs[i], '*', 1);
+		auto parts = Explode<ResRef, ResRef>(pickedItem, '*', 1);
 		ieWord diceSides;
 		bool isGold = false;
 		if (parts.size() > 1) {
