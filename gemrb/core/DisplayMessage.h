@@ -27,6 +27,7 @@
 #ifndef DISPLAYMESSAGE_H
 #define DISPLAYMESSAGE_H
 
+#include "EnumIndex.h"
 #include "exports.h"
 #include "strrefs.h"
 #include "StringMgr.h"
@@ -71,9 +72,10 @@ class GEM_EXPORT DisplayMessage
 private:
 	struct StrRefs {
 		std::string loadedTable;
-		std::array<ieStrRef, static_cast<int>(HCStrings::StringCount)> table;
-		std::array<int, static_cast<int>(HCStrings::StringCount)> flags;
-		std::map<int, std::pair<ieStrRef, ieStrRef>> extraRefs;
+		EnumArray<HCStrings, ieStrRef> table;
+		EnumArray<HCStrings, int> flags;
+
+		std::map<HCStrings, std::pair<ieStrRef, ieStrRef>> extraRefs;
 
 		StrRefs();
 		bool LoadTable(const std::string& name);

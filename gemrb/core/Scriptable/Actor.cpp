@@ -5906,7 +5906,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		bookmask = GetBookMask();
 	}
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
-	HCStrings message = HCStrings::StringCount;
+	HCStrings message = HCStrings::count;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(spell->SpellName));
 		switch (spell->SpellType) {
@@ -5925,7 +5925,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 	if (!explev) {
 		return LSR_INVALID;
 	}
-	if (message != HCStrings::StringCount) {
+	if (message != HCStrings::count) {
 		displaymsg->DisplayConstantStringName(message, GUIColors::XPCHANGE, this);
 	}
 	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
@@ -8728,7 +8728,7 @@ HCStrings Actor::SetEquippedQuickSlot(int slot, int header)
 {
 	if (!PCStats) {
 		inventory.SetEquippedSlot(ieWordSigned(slot), std::max<ieWord>(0, header));
-		return HCStrings::StringCount;
+		return HCStrings::count;
 	}
 
 
@@ -8746,7 +8746,7 @@ HCStrings Actor::SetEquippedQuickSlot(int slot, int header)
 		//if it is the fist slot and not currently used, then set it up
 		if (i==MAX_QUICKWEAPONSLOT) {
 			inventory.SetEquippedSlot(IW_NO_EQUIPPED, 0);
-			return HCStrings::StringCount;
+			return HCStrings::count;
 		}
 	}
 
@@ -8758,7 +8758,7 @@ HCStrings Actor::SetEquippedQuickSlot(int slot, int header)
 	}
 	slot = Inventory::GetWeaponQuickSlot(PCStats->QuickWeaponSlots[slot]);
 	if (inventory.SetEquippedSlot(ieWordSigned(slot), ieWord(header))) {
-		return HCStrings::StringCount;
+		return HCStrings::count;
 	}
 	return HCStrings::MagicWeapon;
 }
@@ -9568,7 +9568,7 @@ no_resolve:
 		}
 	}
 
-	return HCStrings::StringCount;
+	return HCStrings::count;
 }
 
 //this one is the same, but returns strrefs based on effects
@@ -9601,7 +9601,7 @@ HCStrings Actor::Unusable(const Item* item) const
 	}
 	if (!GetStat(IE_CANUSEANYITEM) && !fx) {
 		HCStrings unusable = CheckUsability(item);
-		if (unusable != HCStrings::StringCount) {
+		if (unusable != HCStrings::count) {
 			return unusable;
 		}
 	}
@@ -9612,7 +9612,7 @@ HCStrings Actor::Unusable(const Item* item) const
 	}
 
 	if (!CheckAbilities) {
-		return HCStrings::StringCount;
+		return HCStrings::count;
 	}
 
 	if (item->MinStrength>GetStat(IE_STR)) {
@@ -9644,7 +9644,7 @@ HCStrings Actor::Unusable(const Item* item) const
 	}
 	//note, weapon proficiencies shouldn't be checked here
 	//missing proficiency causes only attack penalty
-	return HCStrings::StringCount;
+	return HCStrings::count;
 }
 
 //full palette will be shaded in gradient color

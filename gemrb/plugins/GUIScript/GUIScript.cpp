@@ -9606,7 +9606,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	} else if ( Slot >= 0 ) {
 		//swapping won't cure this
 		HCStrings msg = actor->inventory.WhyCantEquip(Slot, slotitem->Flags & IE_INV_ITEM_TWOHANDED, ranged);
-		if (msg != HCStrings::StringCount) {
+		if (msg != HCStrings::count) {
 			displaymsg->DisplayConstantString(msg, GUIColors::WHITE);
 			return PyLong_FromLong(ASI_FAILED);
 		}
@@ -11340,7 +11340,7 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 		displaymsg->DisplayConstantString(HCStrings::Cursed, GUIColors::WHITE);
 	} else {
 		HCStrings ret = actor->SetEquippedQuickSlot(slot, ability);
-		if (ret != HCStrings::StringCount) {
+		if (ret != HCStrings::count) {
 			displaymsg->DisplayConstantString(ret, GUIColors::WHITE);
 		}
 	}

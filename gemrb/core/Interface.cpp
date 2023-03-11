@@ -3142,7 +3142,7 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 
 		//constant strings
 		HCStrings idx = actor->Unusable(item);
-		if (idx != HCStrings::StringCount) {
+		if (idx != HCStrings::count) {
 			if (feedback) displaymsg->DisplayConstantString(idx, GUIColors::WHITE);
 			return 0;
 		}

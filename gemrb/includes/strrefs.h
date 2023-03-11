@@ -35,7 +35,7 @@
 namespace GemRB {
 
 enum class HCStrings : TableMgr::index_t {
-	Scattered,
+	Scattered = 0,
 	WholeParty,
 	DoorLocked,
 	Ambush,
@@ -226,7 +226,7 @@ enum class HCStrings : TableMgr::index_t {
 	TrapFound,
 	BackstabDouble,
 
-	StringCount
+	count,
 };
 
 }

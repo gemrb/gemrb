@@ -4030,7 +4030,7 @@ int GameScript::Unusable(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	int ret;
-	if (actor->Unusable(item) == HCStrings::StringCount) {
+	if (actor->Unusable(item) == HCStrings::count) {
 		ret = 1;
 	} else {
 		ret = 0;
