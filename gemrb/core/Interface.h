@@ -642,8 +642,6 @@ public:
 	void SetMouseScrollSpeed(int speed);
 	int GetMouseScrollSpeed() const;
 
-	//creates a standalone effect with opcode
-	Effect *GetEffect(ieDword opcode);
 	/** plays stock gui sound referenced by index */
 	Holder<SoundHandle> PlaySound(size_t idx, unsigned int channel);
 	/** returns the first selected PC, if forced is set, then it returns

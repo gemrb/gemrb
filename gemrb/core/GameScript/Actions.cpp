@@ -7029,6 +7029,20 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	SetVariable(Sender, variable, value, "GLOBAL");
 }
 
+static Effect* GetEffect(ieDword opcode)
+{
+	if (opcode == 0xffffffff) {
+		return nullptr;
+	}
+	Effect* fx = new Effect();
+	if (!fx) {
+		return nullptr;
+	}
+
+	fx->Opcode = opcode;
+	return fx;
+}
+
 //this action uses the sceffect.ids (which should be covered by our cgtable.2da)
 //The original engines solved cg by hardcoding either vvcs or sparkles
 //so either we include sparkles as possible CG or just simulate all of these with projectiles
@@ -7046,7 +7060,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	ieDword sparkle = parameters->int0Parameter;
 
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_casting_glow_ref);
-	Effect *fx = core->GetEffect(opcode);
+	Effect* fx = GetEffect(opcode);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return;
@@ -7109,7 +7123,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_visual_spell_hit_ref);
-	Effect *fx = core->GetEffect(opcode);
+	Effect* fx = GetEffect(opcode);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return;
@@ -7136,7 +7150,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	}
 
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_visual_spell_hit_ref);
-	Effect *fx = core->GetEffect(opcode);
+	Effect* fx = GetEffect(opcode);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return;

@@ -3655,19 +3655,6 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 	return false;
 }
 
-Effect *Interface::GetEffect(ieDword opcode)
-{
-	if (opcode==0xffffffff) {
-		return NULL;
-	}
-	Effect *fx = new Effect();
-	if (!fx) {
-		return NULL;
-	}
-	fx->Opcode=opcode;
-	return fx;
-}
-
 Container *Interface::GetCurrentContainer()
 {
 	return CurrentContainer;
