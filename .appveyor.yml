@@ -103,7 +103,10 @@ after_build:
       cmake --build . --target fetch-demo-data
     }
 
-    cmake --build . --target install --config Release || throw
+    cmake --build . --target install --config Release
+    if ($? -ne 0) {
+      throw
+    }
 
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
       popd
@@ -116,7 +119,10 @@ test_script:
     Add-Content -Path GemRB.cfg.bots -Encoding ascii -Value "GamePath=minimal"
     Add-Content -Path GemRB.cfg.bots -Encoding ascii -Value "GameType=test"
 
-    ./gemrb.exe -q -c GemRB.cfg.bots &&
+    ./gemrb.exe -q -c GemRB.cfg.bots
+    if ($? -ne 0) {
+      throw
+    }
     rm GemRB.cfg.bots
 artifacts:
 - path: gemrb*.zip
