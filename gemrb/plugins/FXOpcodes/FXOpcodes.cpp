@@ -4625,23 +4625,23 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	static const ieDword dsc_bits_iwd2[7] = { 1, 14, 6, 2, 4, 8, 16 };
 	static const ieDword dsc_bits_bg2[7] = { 1, 4, 2, 8, 16, 14, 6 };
-	bool display_warning = false;
+	static const int mageBooks = 1 << IE_IWD2_SPELL_BARD | 1 << IE_IWD2_SPELL_SORCERER | 1 << IE_IWD2_SPELL_WIZARD;
+	bool displayWarning = false;
 	ieDword tmp = fx->Parameter2+1;
 
 	//IWD2 Style spellbook
 	if (target->spellbook.IsIWDSpellBook()) {
 		int bookMask = target->GetBookMask();
-		if (fx->Parameter2 <= 2 && bookMask) { // is there a potential mage spellbook involved?
-			if (bookMask & 1 << IE_IWD2_SPELL_BARD) display_warning = true;
-			if (bookMask & 1 << IE_IWD2_SPELL_SORCERER ) display_warning = true;
-			if (bookMask & 1 << IE_IWD2_SPELL_WIZARD) display_warning = true;
+		 // is there a potential mage spellbook involved?
+		if (fx->Parameter2 <= 2 && bookMask & mageBooks) {
+			displayWarning = true;
 		}
 		if (tmp<7) {
 			STAT_BIT_OR(IE_CASTING, dsc_bits_iwd2[tmp] );
 		}
 	} else { // bg2
-		if (fx->Parameter2 == 0) {
-			if (target->spellbook.GetKnownSpellsCount(IE_SPELL_TYPE_WIZARD, 0)) display_warning = true;
+		if (fx->Parameter2 == 0 && target->spellbook.GetKnownSpellsCount(IE_SPELL_TYPE_WIZARD, 0)) {
+			displayWarning = true;
 		}
 		//-1->  1 (item)
 		//0 ->  4 (mage)
@@ -4653,7 +4653,7 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 	if (fx->FirstApply && target->GetStat(IE_EA) < EA_CONTROLLABLE) {
-		if (display_warning) displaymsg->DisplayConstantStringName(HCStrings::DisabledMageSpells, GUIColors::RED, target);
+		if (displayWarning) displaymsg->DisplayConstantStringName(HCStrings::DisabledMageSpells, GUIColors::RED, target);
 		core->SetEventFlag(EF_ACTION);
 	}
 	return FX_APPLIED;
