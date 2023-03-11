@@ -30,9 +30,11 @@
 #ifndef IE_STRINGS_H
 #define IE_STRINGS_H
 
+#include "TableMgr.h"
+
 namespace GemRB {
 
-enum class HCStrings {
+enum class HCStrings : TableMgr::index_t {
 	Scattered,
 	WholeParty,
 	DoorLocked,
