@@ -71,13 +71,13 @@ class GEM_EXPORT DisplayMessage
 private:
 	struct StrRefs {
 		std::string loadedTable;
-		ieStrRef table[HCStrings::StringCount];
-		int flags[HCStrings::StringCount]{};
+		ieStrRef table[static_cast<int>(HCStrings::StringCount)];
+		int flags[static_cast<int>(HCStrings::StringCount)]{};
 		std::map<int, std::pair<ieStrRef, ieStrRef>> extraRefs;
 
 		StrRefs();
 		bool LoadTable(const std::string& name);
-		ieStrRef Get(size_t, const Scriptable*) const;
+		ieStrRef Get(HCStrings, const Scriptable*) const;
 	};
 	static StrRefs SRefs;
 	static void LoadStringRefs();
@@ -95,8 +95,8 @@ private:
 	const std::map<GUIColors, std::string> GUIColorNames = DisplayMessage::GetAllColors();
 
 public:
-	static ieStrRef GetStringReference(size_t, const Scriptable* = nullptr);
-	static bool HasStringReference(size_t);
+	static ieStrRef GetStringReference(HCStrings idx, const Scriptable* = nullptr);
+	static bool HasStringReference(HCStrings idx);
 
 	DisplayMessage();
 	Color GetColor(const GUIColors color) const;
@@ -104,29 +104,29 @@ public:
 	/** displays any string in the textarea */
 	void DisplayMarkupString(String txt) const;	
 	/** displays a string constant in the textarea */
-	void DisplayConstantString(size_t stridx, GUIColors color, Scriptable *speaker = nullptr) const;
+	void DisplayConstantString(HCStrings stridx, GUIColors color, Scriptable* speaker = nullptr) const;
 	/** displays a string constant followed by a number in the textarea */
-	void DisplayConstantStringValue(size_t stridx, GUIColors color, ieDword value) const;	
+	void DisplayConstantStringValue(HCStrings stridx, GUIColors color, ieDword value) const;	
 	/** displays actor name - action : parameter */
-	void DisplayConstantStringName(size_t stridx, GUIColors color, const Scriptable *speaker) const;
-	void DisplayConstantStringName(size_t stridx, const Color &color, const Scriptable *speaker) const;
+	void DisplayConstantStringName(HCStrings stridx, GUIColors color, const Scriptable* speaker) const;
+	void DisplayConstantStringName(HCStrings stridx, const Color& color, const Scriptable* speaker) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(size_t stridx, GUIColors color, const Scriptable *actor, const Scriptable *target) const;	
+	void DisplayConstantStringAction(HCStrings stridx, GUIColors color, const Scriptable* actor, const Scriptable* target) const;	
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(String text, GUIColors color, const Scriptable *speaker) const;
 	void DisplayStringName(ieStrRef stridx, GUIColors color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
 	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
-	void DisplayConstantStringNameValue(size_t stridx, GUIColors color, const Scriptable *speaker, int value) const;
+	void DisplayConstantStringNameValue(HCStrings stridx, GUIColors color, const Scriptable* speaker, int value) const;
 	/** displays actor name - action : parameter */
-	void DisplayConstantStringNameString(size_t stridx, GUIColors color, size_t stridx2, const Scriptable *actor) const;
+	void DisplayConstantStringNameString(HCStrings stridx, GUIColors color, HCStrings stridx2, const Scriptable* actor) const;
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
 	void DisplayString(ieStrRef stridx, GUIColors color, STRING_FLAGS flags) const;
 	void DisplayString(const String& text, GUIColors color, Scriptable *target) const;
 	void DisplayString(ieStrRef stridx, const Color& color, STRING_FLAGS flags) const;
-	void DisplayMsgAtLocation(int strIdx, int type, Scriptable* owner, const Scriptable* trigger = nullptr, GUIColors color = GUIColors::LIGHTGREY) const;
-	void DisplayMsgCentered(int strIdx, int type, GUIColors color = GUIColors::LIGHTGREY) const;
+	void DisplayMsgAtLocation(HCStrings strIdx, int type, Scriptable* owner, const Scriptable* trigger = nullptr, GUIColors color = GUIColors::LIGHTGREY) const;
+	void DisplayMsgCentered(HCStrings strIdx, int type, GUIColors color = GUIColors::LIGHTGREY) const;
 	/** iwd2 hidden roll debugger */
 	template<typename ...ARGS>
 	void DisplayRollStringName(ieStrRef stridx, GUIColors color, const Scriptable *speaker, ARGS&& ...args) const {

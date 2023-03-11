@@ -4030,10 +4030,10 @@ int GameScript::Unusable(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	int ret;
-	if (actor->Unusable(item)) {
-		ret = 0;
-	} else {
+	if (actor->Unusable(item) == HCStrings::StringCount) {
 		ret = 1;
+	} else {
+		ret = 0;
 	}
 	gamedata->FreeItem(item, parameters->resref0Parameter, true);
 	return ret;

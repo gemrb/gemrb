@@ -846,7 +846,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	bool lowMorale = actor->Modified[IE_MORALE] <= actor->Modified[IE_MORALEBREAK];
 	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
 		int panicMode = RAND(0, 2); // PANIC_RANDOMWALK etc.
-		displaymsg->DisplayConstantStringName(HCStrings::MoraleBerserk + panicMode, GUIColors::WHITE, actor);
+		displaymsg->DisplayConstantStringName(HCStrings(int(HCStrings::MoraleBerserk) + panicMode), GUIColors::WHITE, actor);
 		actor->Panic(game->GetActorByGlobalID(actor->LastAttacker), panicMode + 1);
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
 		// recover from panic, since morale has risen again
@@ -3185,7 +3185,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		if (core->HasFeedback(FT_COMBAT) && (lastSave.prevType != type || lastSave.prevRoll != ret)) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
-			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::SaveSpell + type));
+			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings(ieDword(HCStrings::SaveSpell) + type)));
 			msg += L" " + fmt::to_wstring(ret);
 			displaymsg->DisplayStringName(std::move(msg), GUIColors::WHITE, this);
 		}
@@ -3481,7 +3481,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 	return found;
 }
 
-void Actor::DisplayStringOrVerbalConstant(size_t str, int vcstat, int vccount) const {
+void Actor::DisplayStringOrVerbalConstant(HCStrings str, int vcstat, int vccount) const {
 	ieStrRef strref = DisplayMessage::GetStringReference(str);
 	if (strref != ieStrRef::INVALID) {
 		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE|DS_CIRCLE);
@@ -4342,7 +4342,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			core->GetTokenDictionary()->SetAt( "TYPE", type_name);
 			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
 
-			int strref;
+			HCStrings strref;
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
 				core->GetTokenDictionary()->SetAtAsString("RESISTED", abs(resisted));
@@ -4359,7 +4359,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 				core->GetTokenDictionary()->SetAt("DAMAGER", damager->GetName());
 			} else {
 				// variant without damager
-				strref -= (HCStrings::DamageDetail1 - HCStrings::Damage1);
+				strref = HCStrings(int(strref) - (int(HCStrings::DamageDetail1) - int(HCStrings::Damage1)));
 			}
 			displaymsg->DisplayConstantStringName(strref, GUIColors::WHITE, this);
 		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
@@ -5906,7 +5906,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		bookmask = GetBookMask();
 	}
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
-	size_t message = 0;
+	HCStrings message = HCStrings::StringCount;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(spell->SpellName));
 		switch (spell->SpellType) {
@@ -5925,7 +5925,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 	if (!explev) {
 		return LSR_INVALID;
 	}
-	if (message) {
+	if (message != HCStrings::StringCount) {
 		displaymsg->DisplayConstantStringName(message, GUIColors::XPCHANGE, this);
 	}
 	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
@@ -8724,11 +8724,11 @@ int Actor::GetQuickSlot(int slot) const
 }
 
 //marks the quickslot as equipped
-int Actor::SetEquippedQuickSlot(int slot, int header)
+HCStrings Actor::SetEquippedQuickSlot(int slot, int header)
 {
 	if (!PCStats) {
 		inventory.SetEquippedSlot(ieWordSigned(slot), std::max<ieWord>(0, header));
-		return 0;
+		return HCStrings::StringCount;
 	}
 
 
@@ -8746,7 +8746,7 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 		//if it is the fist slot and not currently used, then set it up
 		if (i==MAX_QUICKWEAPONSLOT) {
 			inventory.SetEquippedSlot(IW_NO_EQUIPPED, 0);
-			return 0;
+			return HCStrings::StringCount;
 		}
 	}
 
@@ -8758,7 +8758,7 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 	}
 	slot = Inventory::GetWeaponQuickSlot(PCStats->QuickWeaponSlots[slot]);
 	if (inventory.SetEquippedSlot(ieWordSigned(slot), ieWord(header))) {
-		return 0;
+		return HCStrings::StringCount;
 	}
 	return HCStrings::MagicWeapon;
 }
@@ -9494,7 +9494,7 @@ static ieDword ResolveTableValue(const ResRef& resref, ieDword stat, ieDword mco
 	return 0;
 }
 
-int Actor::CheckUsability(const Item *item) const
+HCStrings Actor::CheckUsability(const Item* item) const
 {
 	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
 	int kitignore = 0;
@@ -9568,7 +9568,7 @@ no_resolve:
 		}
 	}
 
-	return 0;
+	return HCStrings::StringCount;
 }
 
 //this one is the same, but returns strrefs based on effects
@@ -9592,7 +9592,7 @@ ieStrRef Actor::Disabled(const ResRef& name, ieDword type) const
 }
 
 //checks usability only
-int Actor::Unusable(const Item *item) const
+HCStrings Actor::Unusable(const Item* item) const
 {
 	// skip regular usability check if permission is granted by effect or HLA
 	const Effect* fx = fxqueue.HasEffectWithSource(fx_item_usability_ref, item->Name);
@@ -9600,8 +9600,8 @@ int Actor::Unusable(const Item *item) const
 		return HCStrings::CantUseItem;
 	}
 	if (!GetStat(IE_CANUSEANYITEM) && !fx) {
-		int unusable = CheckUsability(item);
-		if (unusable) {
+		HCStrings unusable = CheckUsability(item);
+		if (unusable != HCStrings::StringCount) {
 			return unusable;
 		}
 	}
@@ -9612,7 +9612,7 @@ int Actor::Unusable(const Item *item) const
 	}
 
 	if (!CheckAbilities) {
-		return 0;
+		return HCStrings::StringCount;
 	}
 
 	if (item->MinStrength>GetStat(IE_STR)) {
@@ -9644,7 +9644,7 @@ int Actor::Unusable(const Item *item) const
 	}
 	//note, weapon proficiencies shouldn't be checked here
 	//missing proficiency causes only attack penalty
-	return 0;
+	return HCStrings::StringCount;
 }
 
 //full palette will be shaded in gradient color

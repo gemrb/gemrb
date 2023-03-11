@@ -621,7 +621,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype, bool ranged)
 		}
 
 		//check for equipping weapons
-		if (WhyCantEquip(slot, twohanded, ranged)) {
+		if (WhyCantEquip(slot, twohanded, ranged) != HCStrings::StringCount) {
 			return ASI_FAILED;
 		}
 
@@ -1912,11 +1912,11 @@ inline bool Inventory::TwoHandedInSlot(int slot) const
 	return false;
 }
 
-int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
+HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 {
 	// check only for hand slots
 	if ((slot<SLOT_MELEE || slot>LAST_MELEE) && (slot != SLOT_LEFT) ) {
-		return 0;
+		return HCStrings::StringCount;
 	}
 
 	//magic items have the highest priority
@@ -1957,7 +1957,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 			return HCStrings::OffhandUsed;
 		}
 	}
-	return 0;
+	return HCStrings::StringCount;
 }
 
 //recharge items on rest, if rest was partial, recharge only 'hours'

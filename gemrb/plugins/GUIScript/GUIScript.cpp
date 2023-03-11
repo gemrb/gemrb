@@ -9492,8 +9492,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int res;
-
 	if (Slot==-2) {
 		Map *map = actor->GetCurrentArea();
 		if (!map) {
@@ -9504,7 +9502,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "No current container!" );
 		}
 		CREItem *si = core->GetDraggedItem()->item;
-		res = cc->AddItem(si);
+		int res = cc->AddItem(si);
 		OverrideSound(si->ItemResRef, Sound, IS_DROP);
 		if (!Sound.IsEmpty()) {
 			core->GetAudioDrv()->PlayRelative(Sound, SFX_CHAN_GUI);
@@ -9595,7 +9593,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if ( !Slottype) {
 		return PyLong_FromLong(ASI_FAILED);
 	}
-	res = actor->inventory.AddSlotItem(slotitem, Slot, Slottype, ranged);
+	int res = actor->inventory.AddSlotItem(slotitem, Slot, Slottype, ranged);
 	if (res) {
 		//release it only when fully placed
 		if (res==ASI_SUCCESS) {
@@ -9607,9 +9605,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	//couldn't place item there, try swapping (only if slot is explicit)
 	} else if ( Slot >= 0 ) {
 		//swapping won't cure this
-		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED, ranged);
-		if (res) {
-			displaymsg->DisplayConstantString(res, GUIColors::WHITE);
+		HCStrings msg = actor->inventory.WhyCantEquip(Slot, slotitem->Flags & IE_INV_ITEM_TWOHANDED, ranged);
+		if (msg != HCStrings::StringCount) {
+			displaymsg->DisplayConstantString(msg, GUIColors::WHITE);
 			return PyLong_FromLong(ASI_FAILED);
 		}
 		// pst: also check TNO earing/eye silliness: both share the same slot type
@@ -11328,7 +11326,6 @@ Optionally sets the used ability.\n\
 
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
-	int ret;
 	int slot;
 	int dummy;
 	int globalID;
@@ -11342,8 +11339,8 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
 		displaymsg->DisplayConstantString(HCStrings::Cursed, GUIColors::WHITE);
 	} else {
-		ret = actor->SetEquippedQuickSlot(slot, ability);
-		if (ret) {
+		HCStrings ret = actor->SetEquippedQuickSlot(slot, ability);
+		if (ret != HCStrings::StringCount) {
 			displaymsg->DisplayConstantString(ret, GUIColors::WHITE);
 		}
 	}

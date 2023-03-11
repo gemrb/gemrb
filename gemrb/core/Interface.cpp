@@ -547,7 +547,7 @@ bool Interface::ReadDamageTypeTable() {
 
 	DamageInfoStruct di;
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
-		di.strref = DisplayMessage::GetStringReference(tm->QueryFieldUnsigned<uint16_t>(i, 0));
+		di.strref = DisplayMessage::GetStringReference(HCStrings(tm->QueryFieldUnsigned<uint16_t>(i, 0)));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
 		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2).c_str(), nullptr, 16);
 		di.iwd_mod_type = tm->QueryFieldSigned<int>(i, 3);
@@ -3148,8 +3148,8 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 		}
 
 		//constant strings
-		int idx = actor->Unusable(item);
-		if (idx) {
+		HCStrings idx = actor->Unusable(item);
+		if (idx != HCStrings::StringCount) {
 			if (feedback) displaymsg->DisplayConstantString(idx, GUIColors::WHITE);
 			return 0;
 		}
@@ -4237,7 +4237,7 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 	if (!(flags&PF_FORCED) && InCutSceneMode()) gc = NULL;
 
 	if (gc && ((bool)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) != (bool)pause)) { // already paused
-		int strref;
+		HCStrings strref;
 		if (pause) {
 			strref = HCStrings::Paused;
 			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BitOp::OR);
@@ -4267,7 +4267,7 @@ bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 		return false;
 	}
 
-	displaymsg->DisplayConstantString(HCStrings::ApUnusable + ieDword(flag), GUIColors::RED);
+	displaymsg->DisplayConstantString(HCStrings(ieDword(HCStrings::ApUnusable) + ieDword(flag)), GUIColors::RED);
 
 	ieDword centerOnAutoPause = 0;
 	vars->Lookup("Auto Pause Center", centerOnAutoPause);

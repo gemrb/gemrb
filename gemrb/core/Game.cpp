@@ -1202,7 +1202,7 @@ void Game::ShareXP(int xp, int flags) const
 
 	//you have gained/lost ... xp
 	if (core->HasFeedback(FT_MISC)) {
-		size_t strIdx = HCStrings::GotXP;
+		HCStrings strIdx = HCStrings::GotXP;
 		if (xp < 0) {
 			xp = -xp;
 			strIdx = HCStrings::LostXP;

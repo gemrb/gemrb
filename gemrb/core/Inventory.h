@@ -30,6 +30,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "strrefs.h"
 
 #include "Item.h"  //needs item for itmextheader
 #include "Store.h"
@@ -339,7 +340,7 @@ public:
 	/** returns true if a two handed weapon is in slot */
 	bool TwoHandedInSlot(int slot) const;
 	/** returns the strref for the reason why the item cannot be equipped */
-	int WhyCantEquip(int slot, int twohanded, bool ranged = false) const;
+	HCStrings WhyCantEquip(int slot, int twohanded, bool ranged = false) const;
 	/** returns a slot that has a stealable item */
 	int FindStealableItem();
 	/** checks if any equipped item provides critical hit aversion */

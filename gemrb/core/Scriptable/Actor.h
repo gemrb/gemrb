@@ -28,6 +28,7 @@
 #include "exports.h"
 #include "ie_stats.h" // using definitions as described in stats.ids
 #include "ie_types.h"
+#include "strrefs.h"
 
 #include "Audio.h"
 #include "CombatInfo.h"
@@ -494,7 +495,7 @@ private:
 	/* checks a weapon quick slot and resets it to fist if it is empty */
 	void CheckWeaponQuickSlot(unsigned int which) const;
 	/* helper for usability checks */
-	int CheckUsability(const Item *item) const;
+	HCStrings CheckUsability(const Item* item) const;
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsBG();
 	/* Set up all the missing stats on load time, or after level up */
@@ -670,7 +671,7 @@ public:
 	/* displaying a random verbal constant */
 	bool VerbalConstant(int start, int count=1, int flags=0) const;
 	/* display string or verbal constant depending on what is available */
-	void DisplayStringOrVerbalConstant(size_t str, int vcstat, int vccount=1) const;
+	void DisplayStringOrVerbalConstant(HCStrings str, int vcstat, int vccount = 1) const;
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
@@ -871,7 +872,7 @@ public:
 	/* returns which slot belongs to the quickweapon slot */
 	int GetQuickSlot(int slot) const;
 	/* Sets equipped Quick slot, if header is -1, then use the current one */
-	int SetEquippedQuickSlot(int slot, int header);
+	HCStrings SetEquippedQuickSlot(int slot, int header);
 	/* Uses an item on the target or point */
 	bool TryUsingMagicDevice(const Item* item, ieDword header);
 	bool RequiresUMD(const Item* item) const;
@@ -901,7 +902,7 @@ public:
 	/* Returns strref if the item is unusable due to name/type restrictions */
 	ieStrRef Disabled(const ResRef& name, ieDword type) const;
 	/* Returns constant string if the item is unusable */
-	int Unusable(const Item *item) const;
+	HCStrings Unusable(const Item* item) const;
 	/* Sets all clown colour to the given gradient */
 	void SetGradient(ieDword gradient);
 	/* Enables an overlay */

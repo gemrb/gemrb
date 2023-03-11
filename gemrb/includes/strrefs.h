@@ -32,7 +32,7 @@
 
 namespace GemRB {
 
-enum HCStrings {
+enum class HCStrings {
 	Scattered,
 	WholeParty,
 	DoorLocked,

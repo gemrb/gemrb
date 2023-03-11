@@ -1168,17 +1168,17 @@ String GameControl::TooltipText() const {
 		if (enemy && strref != ieStrRef::INVALID) {
 			// non-neutral, not in party: display injured string
 			// these boundaries are just a guess
-			size_t strindex = HCStrings::Injured4;
+			HCStrings strIdx = HCStrings::Injured4;
 			if (hp == maxhp) {
-				strindex = HCStrings::Uninjured;
+				strIdx = HCStrings::Uninjured;
 			} else if (hp > (maxhp*3)/4) {
-				strindex = HCStrings::Injured1;
+				strIdx = HCStrings::Injured1;
 			} else if (hp > maxhp/2) {
-				strindex = HCStrings::Injured2;
+				strIdx = HCStrings::Injured2;
 			} else if (hp > maxhp/3) {
-				strindex = HCStrings::Injured3;
+				strIdx = HCStrings::Injured3;
 			}
-			strref = DisplayMessage::GetStringReference(strindex);
+			strref = DisplayMessage::GetStringReference(strIdx);
 			String injuredstring = core->GetString(strref, STRING_FLAGS::NONE);
 			tip += L"\n" + injuredstring;
 		}
@@ -2657,7 +2657,7 @@ void GameControl::SetDisplayText(const String& text, unsigned int time)
 	DisplayText = text;
 }
 
-void GameControl::SetDisplayText(size_t text, unsigned int time)
+void GameControl::SetDisplayText(HCStrings text, unsigned int time)
 {
 	SetDisplayText(core->GetString(DisplayMessage::GetStringReference(text), STRING_FLAGS::NONE), time);
 }
