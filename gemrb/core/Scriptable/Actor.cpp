@@ -6144,7 +6144,7 @@ ieDword Actor::GetNumberOfAttacks()
 		base = SetBaseAPRandAB (true);
 		// effects and everything else is stored with double values
 		int modified = GetStat(IE_NUMBEROFATTACKS);
-		if (modified != base) base = modified; // a heavyhanded approach, but should work
+		if (modified > base) base = modified; // a heavyhanded approach, but should work
 		// add the offhand extra attack
 		bonus = 2 * IsDualWielding();
 		// handle special effects
