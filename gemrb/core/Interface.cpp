@@ -1265,6 +1265,11 @@ int Interface::Init(const InterfaceConfig* cfg)
 		PathJoin(strpath, config.GamePath, "dialogf.tlk", nullptr);
 		fs = FileStream::OpenFile(strpath);
 		if (!fs) {
+			// try EE-style paths
+			PathJoin(strpath, config.GamePath, config.GameLanguagePath, "dialogf.tlk", nullptr);
+			fs = FileStream::OpenFile(strpath);
+		}
+		if (!fs) {
 			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
 			Log(ERROR, "Core", "Falling back to main TLK file, so female text may be wrong!");
 			strings2 = strings;
