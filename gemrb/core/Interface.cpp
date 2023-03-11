@@ -132,7 +132,7 @@ struct AbilityTables {
 			Log(ERROR, "Interface", "unable to read 'hpconbon' ability table!");
 		}
 		
-		if (!core->HasFeature(GF_3ED_RULES)) {
+		if (!core->HasFeature(GFFlags::RULES_3ED)) {
 			//no lorebon in iwd2???
 			if (!ReadAbilityTable("lorebon", lorebon, 1, tableSize)) {
 				Log(ERROR, "Interface", "unable to read 'lorebon' ability table!");
@@ -237,7 +237,7 @@ Interface::Interface() noexcept
 	SystemEncoding = nl_langinfo(CODESET);
 #endif
 
-	MagicBit = HasFeature(GF_MAGICBIT);
+	MagicBit = HasFeature(GFFlags::MAGICBIT);
 
 	gamedata = new GameData();
 
@@ -1342,7 +1342,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 
 	Log(MESSAGE, "Core", "Loading music list...");
-	if (HasFeature( GF_HAS_SONGLIST )) {
+	if (HasFeature( GFFlags::HAS_SONGLIST )) {
 		ret = ReadMusicTable("songlist", 1);
 	} else {
 		/*since bg1 and pst has no .2da for songlist,
@@ -1354,8 +1354,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 		Log(WARNING, "Core", "Didn't find music list.");
 	}
 
-	int resdata = HasFeature( GF_RESDATA_INI );
-	if (resdata || HasFeature(GF_SOUNDS_INI) ) {
+	int resdata = HasFeature( GFFlags::RESDATA_INI );
+	if (resdata || HasFeature(GFFlags::SOUNDS_INI) ) {
 		Log(MESSAGE, "Core", "Loading resource data File...");
 		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		StringView sv(resdata ? "resdata" : "sounds");
@@ -1371,7 +1371,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 		Log(WARNING, "Core", "Failed to read channel table.");
 	}
 
-	if (HasFeature( GF_HAS_PARTY_INI )) {
+	if (HasFeature( GFFlags::HAS_PARTY_INI )) {
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIparty[_MAX_PATH];
@@ -1382,11 +1382,11 @@ int Interface::Init(const InterfaceConfig* cfg)
 		}
 	}
 
-	if (HasFeature(GF_IWD2_DEATHVARFORMAT)) {
+	if (HasFeature(GFFlags::IWD2_DEATHVARFORMAT)) {
 		DeathVarFormat = IWD2DeathVarFormat;
 	}
 
-	if (HasFeature( GF_HAS_BEASTS_INI )) {
+	if (HasFeature( GFFlags::HAS_BEASTS_INI )) {
 		Log(MESSAGE, "Core", "Loading beasts definition File...");
 		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
@@ -1563,7 +1563,7 @@ const char* Interface::TypeExt(SClass_ID type) const
 	};
 
 	if (type == IE_BIO_CLASS_ID) {
-		if (HasFeature(GF_BIOGRAPHY_RES)) {
+		if (HasFeature(GFFlags::BIOGRAPHY_RES)) {
 			return "res";
 		}
 		return "bio";
@@ -1595,7 +1595,7 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 		vars->Lookup( "Strref On", flags );
 	}
 	
-	if (core->HasFeature(GF_ALL_STRINGS_TAGGED)) {
+	if (core->HasFeature(GFFlags::ALL_STRINGS_TAGGED)) {
 		//tagged text, bg1 and iwd don't mark them specifically, all entries are tagged
 		options |= STRING_FLAGS::RESOLVE_TAGS;
 	}
@@ -1613,21 +1613,22 @@ std::string Interface::GetMBString(ieStrRef strref, STRING_FLAGS options) const
 	return MBStringFromString(string);
 }
 
-void Interface::SetFeature(int flag, int position)
+void Interface::SetFeature(GFFlags flag)
 {
-	if (flag) {
-		GameFeatures[position>>5] |= 1<<(position&31);
-	} else {
-		GameFeatures[position>>5] &= ~(1<<(position&31) );
-	}
+	GameFeatures[flag] = true;
 }
 
-ieDword Interface::HasFeature(int position) const
+void Interface::ClearFeature(GFFlags flag)
 {
-	return GameFeatures[position>>5] & (1<<(position&31));
+	GameFeatures[flag] = false;
 }
 
-static const StringView game_flags[GF_COUNT + 1]={
+bool Interface::HasFeature(GFFlags flag) const
+{
+	return GameFeatures[flag];
+}
+
+static const EnumArray<GFFlags, StringView> game_flags {
 		"HasKaputz",          //0 GF_HAS_KAPUTZ
 		"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
 		"HasSongList",        //2 GF_HAS_SONGLIST
@@ -1712,8 +1713,7 @@ static const StringView game_flags[GF_COUNT + 1]={
 		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
 		"ClearingActionOverride", //83GF_CLEARING_ACTIONOVERRIDE
 		"DamageInnocentRep",  //84GF_DAMAGE_INNOCENT_REP
-		"HasWeaponSets", // GF_HAS_WEAPON_SETS
-		StringView()          //for our own safety, this marks the end of the pole
+		"HasWeaponSets" // GF_HAS_WEAPON_SETS
 };
 
 /** Loads gemrb.ini */
@@ -1804,11 +1804,13 @@ bool Interface::LoadGemRBINI()
 	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
 	gamedata->SetTextSpeed(ini->GetKeyAsInt("resources", "TextScreenSpeed", 100));
 
-	for (uint32_t i = 0; i < GF_COUNT; i++) {
-		if (!game_flags[i]) {
-			error("Core", "Fix the game flags!");
+	for (const GFFlags flag : EnumIterator<GFFlags>()) {
+		const bool set = ini->GetKeyAsBool("resources", game_flags[flag], false);
+		if (set) {
+			SetFeature(flag);
+		} else {
+			ClearFeature(flag);
 		}
-		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
 	}
 
 	// fix the resolution default if needed
@@ -2456,7 +2458,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			break;
 		case DIRECTORY_CHR_SOUNDS:
 			resourcePath = config.GameSoundsPath;
-			if (!HasFeature( GF_SOUNDFOLDERS ))
+			if (!HasFeature( GFFlags::SOUNDFOLDERS ))
 				filter = new ExtFilter("WAV");
 			break;
 		case DIRECTORY_CHR_EXPORTS:
@@ -2725,7 +2727,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		sav_str = sg->GetSave();
 
 		// extract the save early for ees, since they moved the wmp inside
-		if (core->HasFeature(GF_HAS_EE_EFFECTS)) {
+		if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 			PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 			if (ai && ai->DecompressSaveGame(sav_str, saveGameAREExtractor) != GEM_OK) {
 				goto cleanup;
@@ -3472,7 +3474,7 @@ void Interface::SanitizeItem(CREItem *item) const
 		item->Flags |= IE_INV_ITEM_MAGICAL;
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
-	if (core->HasFeature(GF_NO_UNDROPPABLE)) {
+	if (core->HasFeature(GFFlags::NO_UNDROPPABLE)) {
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
 
@@ -3516,7 +3518,7 @@ void Interface::SanitizeItem(CREItem *item) const
 	}
 
 	// pst has no stolen flag, but "steel" in its place
-	if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GF_PST_STATE_FLAGS)) {
+	if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		item->Flags |= IE_INV_ITEM_STOLEN;
 	}
 
@@ -3789,7 +3791,7 @@ bool Interface::HasCurrentArea() const
 Holder<Sprite2D> Interface::GetCursorSprite()
 {
 	Holder<Sprite2D> spr = gamedata->GetBAMSprite(TextCursorBam, 0, 0);
-	if (spr && HasFeature(GF_OVERRIDE_CURSORPOS)) {
+	if (spr && HasFeature(GFFlags::OVERRIDE_CURSORPOS)) {
 		spr->Frame.x = 1;
 		spr->Frame.y = spr->Frame.h - 1;
 	}
@@ -3809,7 +3811,7 @@ Holder<Sprite2D> Interface::GetScrollCursorSprite(orient_t orient, int spriteNum
 int Interface::CanMoveItem(const CREItem *item) const
 {
 	//This is an inventory slot, switch to IE_ITEM_* if you use Item
-	if (item->Flags & IE_INV_ITEM_UNDROPPABLE && !HasFeature(GF_NO_DROP_CAN_MOVE)) {
+	if (item->Flags & IE_INV_ITEM_UNDROPPABLE && !HasFeature(GFFlags::NO_DROP_CAN_MOVE)) {
 		return 0;
 	}
 	//not gold, we allow only one single coin ResRef, this is good
@@ -3965,7 +3967,7 @@ int Interface::WriteCharacter(StringView name, const Actor *actor)
 	}
 
 	//write the BIO string
-	if (!HasFeature(GF_NO_BIOGRAPHY)) {
+	if (!HasFeature(GFFlags::NO_BIOGRAPHY)) {
 		str.Create(Path, name.c_str(), IE_BIO_CLASS_ID);
 		//never write the string reference into this string
 		std::string mbstr = GetMBString(actor->GetVerbalConstant(VB_BIO), STRING_FLAGS::STRREFOFF);
@@ -4121,7 +4123,7 @@ int Interface::GetStrengthBonus(int column, int value, int ex) const
 
 	int bonus = 0;
 	// only 18 (human max) has the differentiating extension
-	if (value == 18 && !HasFeature(GF_3ED_RULES)) {
+	if (value == 18 && !HasFeature(GFFlags::RULES_3ED)) {
 		ex = Clamp(ex, 0, 100);
 		bonus += abilityTables->strmodex[column*101+ex];
 	}
@@ -4141,7 +4143,7 @@ int Interface::GetIntelligenceBonus(int column, int value) const
 int Interface::GetDexterityBonus(int column, int value) const
 {
 	//no dexmod in iwd2 and only one type of modifier
-	if (HasFeature(GF_3ED_RULES)) {
+	if (HasFeature(GFFlags::RULES_3ED)) {
 		return value/2-5;
 	}
 
@@ -4155,7 +4157,7 @@ int Interface::GetDexterityBonus(int column, int value) const
 int Interface::GetConstitutionBonus(int column, int value) const
 {
 	//no conmod in iwd2 and also no regenation bonus
-	if (HasFeature(GF_3ED_RULES)) {
+	if (HasFeature(GFFlags::RULES_3ED)) {
 		if (column == STAT_CON_HP_REGEN) {
 			return 0;
 		}
@@ -4181,7 +4183,7 @@ int Interface::GetCharismaBonus(int column, int /*value*/) const
 int Interface::GetLoreBonus(int column, int value) const
 {
 	//no lorebon in iwd2 - lore is a skill
-	if (HasFeature(GF_3ED_RULES)) return 0;
+	if (HasFeature(GFFlags::RULES_3ED)) return 0;
 
 	if (column<0 || column>0)
 		return -9999;

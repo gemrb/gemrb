@@ -53,7 +53,7 @@ private:
 		EffectRef dmgref = { "Damage", -1 };
 		damageOpcode = EffectQueue::ResolveEffect(dmgref);
 
-		pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
+		pstflags = core->HasFeature(GFFlags::PST_STATE_FLAGS);
 		AutoTable tm = gamedata->LoadTable("splfocus", true);
 		if (tm) {
 			TableMgr::index_t schoolcount = tm->GetRowCount();
@@ -127,7 +127,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 			t = 'm';
 		}
 		//check if bg1
-		if (!core->HasFeature(GF_CASTING_SOUNDS) && !core->HasFeature(GF_CASTING_SOUNDS2)) {
+		if (!core->HasFeature(GFFlags::CASTING_SOUNDS) && !core->HasFeature(GFFlags::CASTING_SOUNDS2)) {
 			Resource.Format("CAS_P{}{:01d}{}", t, std::min(cgsound, 9), g);
 		} else {
 			Resource.Format("CHA_{}{}{:02d}", g, t, std::min(cgsound & 0xff, 99));

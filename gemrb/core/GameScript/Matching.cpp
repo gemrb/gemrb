@@ -195,7 +195,7 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 		// unless it's pst, which relies on it in 3012cut2-3012cut7.bcs
 		// FIXME: do we need more fine-grained control?
 		// FIXME: stop abusing old GF flags
-		if (!core->HasFeature(GF_AREA_OVERRIDE) && ac == Sender) continue;
+		if (!core->HasFeature(GFFlags::AREA_OVERRIDE) && ac == Sender) continue;
 
 		bool filtered = false;
 		if (!DoObjectIDSCheck(oC, ac, &filtered)) {

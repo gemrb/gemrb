@@ -86,7 +86,7 @@ Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam)
 ieDword WMPAreaEntry::GetAreaStatus() const
 {
 	ieDword tmp = AreaStatus;
-	if (core->HasFeature(GF_KNOW_WORLD) ) {
+	if (core->HasFeature(GFFlags::KNOW_WORLD) ) {
 		tmp |=WMP_ENTRY_VISITED;
 	}
 	return tmp;

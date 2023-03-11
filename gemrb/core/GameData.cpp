@@ -571,7 +571,7 @@ int GameData::GetSpellAbilityDie(const Actor *target, int which)
 
 int GameData::GetTrapSaveBonus(ieDword level, int cls)
 {
-	if (!core->HasFeature(GF_3ED_RULES)) return 0;
+	if (!core->HasFeature(GFFlags::RULES_3ED)) return 0;
 
 	AutoTable trapSaveBonus = LoadTable("trapsave", true);
 	if (!trapSaveBonus) return 0;
@@ -945,7 +945,7 @@ const std::vector<int>& GameData::GetBonusSpells(int ability)
 		// iwd2 has mxsplbon instead, since all casters get a bonus with high enough stats (which are not always wisdom)
 		// luckily, they both use the same format
 		AutoTable mxSplBon;
-		if (core->HasFeature(GF_3ED_RULES)) {
+		if (core->HasFeature(GFFlags::RULES_3ED)) {
 			mxSplBon = LoadTable("mxsplbon");
 		} else {
 			mxSplBon = LoadTable("mxsplwis");

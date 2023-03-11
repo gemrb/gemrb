@@ -387,7 +387,7 @@ private:
 	Game* game = nullptr;
 	Calendar* calendar = nullptr;
 	WorldMapArray* worldmap = nullptr;
-	ieDword GameFeatures[(GF_COUNT+31)/32]{};
+	EnumBitset<GFFlags> GameFeatures;
 	ResRef MainCursorsImage;
 	ResRef TextCursorBam;
 	ResRef ScrollCursorBam;
@@ -463,9 +463,9 @@ public:
 	
 	int Init(const InterfaceConfig* config);
 	//TODO: Core Methods in Interface Class
-	void SetFeature(int value, int position);
-	/* don't rely on the exact return value of this function */
-	ieDword HasFeature(int position) const;
+	void SetFeature(GFFlags flag);
+	void ClearFeature(GFFlags flag);
+	bool HasFeature(GFFlags flag) const;
 	bool IsAvailable(SClass_ID filetype) const;
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const noexcept;

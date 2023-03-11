@@ -314,7 +314,7 @@ void ITMImporter::GetExtHeader(const Item *s, ITMExtHeader* eh)
 		eh->ProjectileAnimation--;
 	}
 	// bg2 ignored the projectile for melee weapons (rarely set, but gives staf13 AOE effects)
-	if (!core->HasFeature(GF_MELEEHEADER_USESPROJECTILE) && eh->AttackType == ITEM_AT_MELEE) {
+	if (!core->HasFeature(GFFlags::MELEEHEADER_USESPROJECTILE) && eh->AttackType == ITEM_AT_MELEE) {
 		// HACK: use invtrav, so the effects are still applied on the attack target
 		eh->ProjectileAnimation = 78;
 	}

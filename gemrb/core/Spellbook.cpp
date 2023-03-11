@@ -61,12 +61,12 @@ void Spellbook::InitializeSpellbook()
 {
 	if (!SBInitialized) {
 		SBInitialized=true;
-		if (core->HasFeature(GF_HAS_SPELLLIST)) {
+		if (core->HasFeature(GFFlags::HAS_SPELLLIST)) {
 			NUM_BOOK_TYPES=NUM_IWD2_SPELLTYPES; //iwd2 spell types
 			IWD2Style = true;
 		} else {
 			NUM_BOOK_TYPES=NUM_SPELLTYPES; //bg/pst/iwd1 spell types
-			if (core->HasFeature(GF_IWD_MAP_DIMENSIONS)) NUM_BOOK_TYPES++; // make iwd songs full members
+			if (core->HasFeature(GFFlags::IWD_MAP_DIMENSIONS)) NUM_BOOK_TYPES++; // make iwd songs full members
 			IWD2Style = false;
 		}
 	}

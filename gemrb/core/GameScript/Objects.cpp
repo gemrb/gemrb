@@ -111,7 +111,7 @@ Targets *GameScript::Protagonist(const Scriptable *Sender, Targets *parameters, 
 {
 	parameters->Clear();
 	//this sucks but IWD2 is like that...
-	static bool charnameisgabber = core->HasFeature(GF_CHARNAMEISGABBER);
+	static bool charnameisgabber = core->HasFeature(GFFlags::CHARNAMEISGABBER);
 	if (charnameisgabber) {
 		const GameControl* gc = core->GetGameControl();
 		if (gc) {
@@ -1083,7 +1083,7 @@ inline bool idclass(const Actor *actor, int parameter, bool iwd2) {
 
 int GameScript::ID_Class(const Actor *actor, int parameter)
 {
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		//iwd2 has different values, see also the note for AVClass
 		return idclass(actor, parameter, true);
 	}

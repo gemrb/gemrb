@@ -81,7 +81,7 @@ ArmorClass::ArmorClass()
 {
 	ResetAll();
 
-	third = !!core->HasFeature(GF_3ED_RULES);
+	third = core->HasFeature(GFFlags::RULES_3ED);
 }
 
 void ArmorClass::SetOwner( Actor* owner)
@@ -199,7 +199,7 @@ ToHitStats::ToHitStats()
 {
 	ResetAll();
 
-	third = !!core->HasFeature(GF_3ED_RULES);
+	third = core->HasFeature(GFFlags::RULES_3ED);
 }
 
 void ToHitStats::SetOwner(Actor* owner)

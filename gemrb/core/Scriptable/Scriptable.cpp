@@ -53,9 +53,9 @@ static const unsigned short ClearActionsID = 133; // same for all games
  ***********************/
 Scriptable::Scriptable(ScriptableType type)
 {
-	startActive = core->HasFeature(GF_START_ACTIVE);
-	third = core->HasFeature(GF_3ED_RULES);
-	pst_flags = core->HasFeature(GF_PST_STATE_FLAGS);
+	startActive = core->HasFeature(GFFlags::START_ACTIVE);
+	third = core->HasFeature(GFFlags::RULES_3ED);
+	pst_flags = core->HasFeature(GFFlags::PST_STATE_FLAGS);
 
 	globalID = ++globalActorCounter;
 	if (globalActorCounter == 0) {
@@ -255,7 +255,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	// area scripts still run for at least the current area, in bg1 (see ar2631, confirmed by testing)
 	// but not in bg2 (kill Abazigal in ar6005)
 	if (gc->GetScreenFlags() & SF_CUTSCENE) {
-		if (! (core->HasFeature(GF_CUTSCENE_AREASCRIPTS) && Type == ST_AREA)) {
+		if (! (core->HasFeature(GFFlags::CUTSCENE_AREASCRIPTS) && Type == ST_AREA)) {
 			return;
 		}
 	}
@@ -280,8 +280,8 @@ void Scriptable::ExecuteScript(int scriptCount)
 	Actor* act = Scriptable::As<Actor>(this);
 
 	// don't run if the final dialog action queue is still playing out (we're already out of dialog!)
-	// currently limited with GF_CUTSCENE_AREASCRIPTS and to area scripts, to minimize risk into known test cases
-	if (Type == ST_AREA && !core->HasFeature(GF_CUTSCENE_AREASCRIPTS) && gc->GetDialogueFlags() & DF_POSTPONE_SCRIPTS) {
+	// currently limited with GFFlags::CUTSCENE_AREASCRIPTS and to area scripts, to minimize risk into known test cases
+	if (Type == ST_AREA && !core->HasFeature(GFFlags::CUTSCENE_AREASCRIPTS) && gc->GetDialogueFlags() & DF_POSTPONE_SCRIPTS) {
 		return;
 	}
 
@@ -1706,7 +1706,7 @@ void Highlightable::DrawOutline(Point origin) const
 	}
 	origin = outline->BBox.origin - origin;
 
-	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BlitFlags::MULTIPLY|BlitFlags::HALFTRANS );
 	} else {
 		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS );

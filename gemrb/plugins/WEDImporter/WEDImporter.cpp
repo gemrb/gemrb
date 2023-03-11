@@ -345,7 +345,7 @@ void WEDImporter::ReadWallPolygons()
 			if (flags&WF_BASELINE) {
 				polygonTable[i]->SetBaseline(base0, base1);
 			}
-			if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+			if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 				flags |= WF_COVERANIMS;
 			}
 			polygonTable[i]->SetPolygonFlag(flags);

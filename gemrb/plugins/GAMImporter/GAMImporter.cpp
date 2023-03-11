@@ -64,12 +64,12 @@ bool GAMImporter::Import(DataStream* str)
 		PCSize = 0x340;
 	} else if (strncmp( Signature, "GAMEV1.1", 8 ) == 0) {
 		//iwd, torment, totsc
-		if (core->HasFeature(GF_HAS_KAPUTZ) ) { //pst
+		if (core->HasFeature(GFFlags::HAS_KAPUTZ) ) { //pst
 			PCSize = 0x168;
 			version = GAM_VER_PST;
 			//sound folder name takes up this space,
 			//so it is handy to make this check
-		} else if ( core->HasFeature(GF_SOUNDFOLDERS) ) {
+		} else if ( core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
 			PCSize = 0x180;
 			version = GAM_VER_IWD;
 		} else {
@@ -206,7 +206,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	//apparently BG1/IWD2 relies on this, if chapter is unset, it is
 	//set to -1, hopefully it won't break anything
 	//PST has no chapter variable by default, and would crash on one
-	newGame->locals->SetAt("CHAPTER", (ieDword) -1, core->HasFeature(GF_NO_NEW_VARIABLES));
+	newGame->locals->SetAt("CHAPTER", (ieDword) -1, core->HasFeature(GFFlags::NO_NEW_VARIABLES));
 
 	// load initial values from var.var
 	newGame->locals->LoadInitialValues("GLOBAL");
@@ -222,7 +222,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		str->Seek( 40, GEM_CURRENT_POS );
 		newGame->locals->SetAt( Name, Value );
 	}
-	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if(core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
 		newGame->kaputz = new Variables();
 		newGame->kaputz->SetType( GEM_VARIABLES_INT );
 		newGame->kaputz->ParseKey( 1 );
@@ -548,7 +548,7 @@ void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
 
 	str->ReadResRef( ps->SoundSet );
 
-	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
+	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
 		str->ReadVariable(ps->SoundFolder);
 	}
 	
@@ -586,7 +586,7 @@ int GAMImporter::GetStoredFileSize(const Game *game)
 
 	//moved this here, so one can disable killvars in a pst style game
 	//or enable them in gemrb
-	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if(core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
 		KillVarsCount = game->kaputz->GetCount();
 	} else {
 		KillVarsCount = 0;
@@ -763,7 +763,7 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 		pos=game->locals->GetNextAssoc( pos, name, value);
 
 		/* PST hates to have some variables lowercased. */
-		if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
+		if (core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
 			if (strcmp("dictionary_githzerai_hjacknir", name.c_str()) == 0) {
 				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
@@ -1026,7 +1026,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 		stream->WriteWord(favCount);
 	}
 	stream->WriteResRefUC(ac->PCStats->SoundSet);
-	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
+	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
 		stream->WriteVariableLC(ac->PCStats->SoundFolder);
 	}
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
@@ -1230,7 +1230,7 @@ int GAMImporter::PutGame(DataStream *stream, Game *game) const
 		return ret;
 	}
 
-	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if (core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
 		ret = PutKillVars( stream, game);
 		if (ret) {
 			return ret;

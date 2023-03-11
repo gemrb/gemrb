@@ -342,7 +342,7 @@ bool AREImporter::Import(DataStream* str)
 	str->ReadDword(TileOffset);
 	str->ReadDword(SongHeader);
 	str->ReadDword(RestHeader);
-	if (core->HasFeature(GF_AUTOMAP_INI) ) {
+	if (core->HasFeature(GFFlags::AUTOMAP_INI) ) {
 		str->ReadDword(tmp); //skipping unknown in PST
 	}
 	str->ReadDword(NoteOffset);
@@ -597,7 +597,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 		str->Seek(36, GEM_CURRENT_POS);
 	}
 
-	if (core->HasFeature(GF_INFOPOINT_DIALOGS)) {
+	if (core->HasFeature(GFFlags::INFOPOINT_DIALOGS)) {
 		str->ReadResRef(wavResRef);
 		str->ReadPoint(talkPos);
 		str->ReadStrRef(dialogName);
@@ -673,7 +673,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 
 	// these appear only in PST, but we could support them everywhere
 	// HOWEVER they did not use them as witnessed in ar0101 (0101prt1 and 0101prt2) :(
-	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		talkPos = ip->Pos;
 	}
 	ip->TalkPos = talkPos;
@@ -860,7 +860,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	str->ReadPoint(toOpen[0]);
 	str->ReadPoint(toOpen[1]);
 	str->ReadStrRef(openStrRef);
-	if (core->HasFeature(GF_AUTOMAP_INI) ) {
+	if (core->HasFeature(GFFlags::AUTOMAP_INI) ) {
 		char tmp[25];
 		str->Read(tmp, 24);
 		tmp[24] = 0;
@@ -870,7 +870,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	}
 	str->ReadStrRef(nameStrRef); // trigger name
 	str->ReadResRef(dialog);
-	if (core->HasFeature(GF_AUTOMAP_INI)) {
+	if (core->HasFeature(GFFlags::AUTOMAP_INI)) {
 		// maybe this is important? but seems not
 		str->Seek(8, GEM_CURRENT_POS);
 	}
@@ -900,7 +900,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	// Getting Door Information from the WED File
 	bool baseClosed;
 	auto indices = tmm->GetDoorIndices(shortName, baseClosed);
-	if (core->HasFeature(GF_REVERSE_DOOR)) {
+	if (core->HasFeature(GFFlags::REVERSE_DOOR)) {
 		baseClosed = !baseClosed;
 	}
 
@@ -1014,7 +1014,7 @@ void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map) const
 
 bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map) const
 {
-	static int pst = core->HasFeature(GF_AUTOMAP_INI);
+	static int pst = core->HasFeature(GFFlags::AUTOMAP_INI);
 
 	ieVariable defaultName;
 	ResRef creResRef;
@@ -1063,7 +1063,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	str->ReadResRef(scripts[SCR_AREA]);
 	str->Seek(120, GEM_CURRENT_POS);
 	// not iwd2, this field is garbage
-	if (!core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+	if (!core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
 		scripts[SCR_AREA].Reset();
 	}
 
@@ -1098,11 +1098,11 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	act->appearance = schedule;
 	// copying the scripting name into the actor
 	// if the CreatureAreaFlag was set to 8
-	if ((flags & AF_NAME_OVERRIDE) || core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+	if ((flags & AF_NAME_OVERRIDE) || core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
 		act->SetScriptName(defaultName);
 	}
 	// IWD2 specific hacks
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		// This flag is used for something else in IWD2
 		if (flags & AF_NAME_OVERRIDE) {
 			act->BaseStats[IE_EA] = EA_EVILCUTOFF;
@@ -1153,7 +1153,7 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 	str->ReadDword(anim.Flags);
 	anim.originalFlags = anim.Flags;
 	str->ReadScalar(anim.height);
-	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND)) {
+	if (core->HasFeature(GFFlags::IMPLICIT_AREAANIM_BACKGROUND)) {
 		anim.height = ANI_PRI_BACKGROUND;
 		anim.Flags |= A_ANI_NO_WALL;
 	}
@@ -1174,7 +1174,7 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 	// 0x4a holds the height
 	str->ReadDword(anim.unknown48);
 
-	static int pst = core->HasFeature(GF_AUTOMAP_INI);
+	static int pst = core->HasFeature(GFFlags::AUTOMAP_INI);
 	if (pst) {
 		AdjustPSTFlags(anim);
 	}
@@ -1223,7 +1223,7 @@ void AREImporter::GetAmbient(DataStream* str, std::vector<Ambient*>& ambients) c
 
 void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 {
-	static int pst = core->HasFeature(GF_AUTOMAP_INI);
+	static int pst = core->HasFeature(GFFlags::AUTOMAP_INI);
 	Point point;
 
 	if (!pst) {
@@ -1454,7 +1454,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	
 	//if the Script field is empty, the area name will be copied into it on first load
 	//this works only in the iwd branch of the games
-	if (Script.IsEmpty() && core->HasFeature(GF_FORCE_AREA_SCRIPT)) {
+	if (Script.IsEmpty() && core->HasFeature(GFFlags::FORCE_AREA_SCRIPT)) {
 		Script = resRef;
 	}
 
@@ -1472,7 +1472,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	// reverb to match against reverb.2da or iwd reverb.ids
 	// (if the 2da doesn't exist - which we provide for all; they use the same values)
 	ieDword reverbID = EFX_PROFILE_REVERB_INVALID; // non PST data has it at 0, so we don't bother reading
-	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		str->ReadDword(reverbID);
 	}
 
@@ -1740,7 +1740,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += TrapCount * 0x1c;
 	NoteOffset = headersize;
 
-	int pst = core->HasFeature( GF_AUTOMAP_INI );
+	int pst = core->HasFeature( GFFlags::AUTOMAP_INI );
 	NoteCount = map->GetMapNoteCount();
 	headersize += NoteCount * (pst?0x214: 0x34);
 	SongHeader = headersize;
@@ -1755,7 +1755,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 {
 	char Signature[9];
-	int pst = core->HasFeature( GF_AUTOMAP_INI );
+	int pst = core->HasFeature( GFFlags::AUTOMAP_INI );
 
 	strlcpy(Signature, "AREAV1.0", 9);
 	if (map->version==16) {
@@ -1913,14 +1913,14 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WritePoint(d->toOpen[0]);
 		stream->WritePoint(d->toOpen[1]);
 		stream->WriteStrRef(d->OpenStrRef);
-		if (core->HasFeature(GF_AUTOMAP_INI) ) {
+		if (core->HasFeature(GFFlags::AUTOMAP_INI) ) {
 			stream->WriteString(d->LinkedInfo, 24);
 		} else {
 			stream->WriteVariable(d->LinkedInfo);
 		}
 		stream->WriteStrRef(d->NameStrRef);
 		stream->WriteResRef( d->GetDialog());
-		if (core->HasFeature(GF_AUTOMAP_INI) ) {
+		if (core->HasFeature(GFFlags::AUTOMAP_INI) ) {
 			stream->WriteFilling(8);
 		}
 	}
@@ -2207,7 +2207,7 @@ int AREImporter::PutAnimations(DataStream *stream, const Map *map) const
 		stream->WriteWord(an->sequence);
 		stream->WriteWord(an->frame);
 
-		if (core->HasFeature(GF_AUTOMAP_INI)) {
+		if (core->HasFeature(GFFlags::AUTOMAP_INI)) {
 			/* PST toggles the active bit only, and we need to keep the rest. */
 			ieDword flags = (an->originalFlags & ~A_ANI_ACTIVE) | (an->Flags & A_ANI_ACTIVE);
 			stream->WriteDword(flags);
@@ -2292,7 +2292,7 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 {
 	//different format
-	int pst = core->HasFeature( GF_AUTOMAP_INI );
+	int pst = core->HasFeature( GFFlags::AUTOMAP_INI );
 
 	for (unsigned int i=0;i<NoteCount;i++) {
 		const MapNote& mn = map->GetMapNote(i);

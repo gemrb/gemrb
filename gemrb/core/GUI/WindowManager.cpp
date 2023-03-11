@@ -445,11 +445,11 @@ void WindowManager::DrawMouse() const
 
 	// pst displays actor name tooltips overhead, not at the mouse position
 	const GameControl* gc = core->GetGameControl();
-	if (core->HasFeature(GF_ONSCREEN_TEXT) && gc) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && gc) {
 		tooltipPos.y -= gc->GetOverheadOffset();
 	}
 
-	if (tooltip.tt.TextSize().IsZero() || core->HasFeature(GF_ONSCREEN_TEXT)) {
+	if (tooltip.tt.TextSize().IsZero() || core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 		DrawCursor(cursorPos);
 	}
 	DrawTooltip(tooltipPos);

@@ -442,7 +442,7 @@ static void InitSpellbook()
 		return;
 	}
 
-	if (core->HasFeature(GF_HAS_SPELLLIST)) {
+	if (core->HasFeature(GFFlags::HAS_SPELLLIST)) {
 		GetSpellTable("listinnt", innlist);
 		GetSpellTable("listsong", snglist);
 		GetSpellTable("listshap", shplist);
@@ -1922,7 +1922,7 @@ int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned i
 		stream->WriteWord(it->Usages[2]);
 		ieDword tmpDword = it->Flags;
 		//IWD uses this bit differently
-		if (core->HasFeature(GF_MAGICBIT)) {
+		if (core->HasFeature(GFFlags::MAGICBIT)) {
 			if (it->Flags&IE_INV_ITEM_MAGICAL) {
 				tmpDword|=IE_INV_ITEM_UNDROPPABLE;
 			} else {

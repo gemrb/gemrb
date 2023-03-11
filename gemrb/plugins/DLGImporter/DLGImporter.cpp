@@ -60,7 +60,7 @@ bool DLGImporter::Import(DataStream* str)
 		// some games default to unpaused, while others don't
 		// iwd/how relies on this for ar2112 dialog with arundel
 		//  after returning from dragon's eye (double dialog break)
-		Flags = !core->HasFeature(GF_FORCE_DIALOGPAUSE);
+		Flags = !core->HasFeature(GFFlags::FORCE_DIALOGPAUSE);
 	}
 	return true;
 }

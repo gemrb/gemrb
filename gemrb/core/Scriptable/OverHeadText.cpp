@@ -44,7 +44,7 @@ void OverHeadText::SetText(String newText, bool display, bool append, const Colo
 	}
 
 	// always append for actors and areas ... unless it's the head hp ratio
-	if (append && core->HasFeature(GF_ONSCREEN_TEXT) && (owner->Type == ST_ACTOR || owner->Type == ST_AREA)) {
+	if (append && core->HasFeature(GFFlags::ONSCREEN_TEXT) && (owner->Type == ST_ACTOR || owner->Type == ST_AREA)) {
 		idx = messages.size();
 		messages.emplace_back();
 		if (owner->Type == ST_ACTOR) {
@@ -130,7 +130,7 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 {
 	static constexpr tick_t maxDelay = 6000;
 	tick_t delay = maxDelay;
-	if (core->HasFeature(GF_ONSCREEN_TEXT) && !scrollOffset.IsInvalid()) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && !scrollOffset.IsInvalid()) {
 		// empirically determined estimate to get the right speed and distance and 2px/tick
 		delay = 1800;
 	}

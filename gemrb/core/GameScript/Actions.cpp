@@ -1876,7 +1876,7 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	}
 	actor->DestroySelf();
 	// needeed in pst #532, but softly breaks bg2 #1179
-	if (actor == core->GetCutSceneRunner() && core->HasFeature(GF_PST_STATE_FLAGS)) {
+	if (actor == core->GetCutSceneRunner() && core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		core->SetCutSceneMode(false);
 	}
 }
@@ -2174,7 +2174,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	// pst enables worldmap travel only after visiting the lower ward
-	bool keyAreaVisited = core->HasFeature(GF_TEAM_MOVEMENT) && CheckVariable(Sender, "AR0500_Visited", "GLOBAL") == 1;
+	bool keyAreaVisited = core->HasFeature(GFFlags::TEAM_MOVEMENT) && CheckVariable(Sender, "AR0500_Visited", "GLOBAL") == 1;
 	if (direction == WMPDirection::NONE && !keyAreaVisited) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2319,7 +2319,7 @@ void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 	}
 	// take care of iwd2 flag bit differences as in AREIMporter's FixIWD2DoorFlags
 	// ... it matters for exactly 1 user from the original data (20ctord3.bcs)
-	if (core->HasFeature(GF_3ED_RULES) && flag == DOOR_KEY) {
+	if (core->HasFeature(GFFlags::RULES_3ED) && flag == DOOR_KEY) {
 		flag = DOOR_TRANSPARENT;
 	}
 
@@ -2722,7 +2722,7 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 	//PST allows deactivating of containers
 	//but IWD doesn't, ar9705 chests rely on it (if this is changed, make sure they are all still selectable!)
 	//FIXME: add a new game flag / differentiate more container flags
-	if (tar->Type == ST_CONTAINER && !core->HasFeature(GF_SPECIFIC_DMG_BONUS)) {
+	if (tar->Type == ST_CONTAINER && !core->HasFeature(GFFlags::SPECIFIC_DMG_BONUS)) {
 		static_cast<Container*>(tar)->Flags |= CONT_DISABLED;
 		return;
 	}
@@ -2876,7 +2876,7 @@ void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
 	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
-//this needs moncrate.2da, but otherwise independent from GF_CHALLENGERATING
+//this needs moncrate.2da, but otherwise independent from GFFlags::CHALLENGERATING
 void GameScript::AddExperiencePartyCR(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->ShareXP(parameters->int0Parameter, SX_DIVIDE|SX_CR);
@@ -2956,7 +2956,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	/* i'm not sure this is required here at all */
 	SetBeenInPartyFlags(Sender, parameters);
 	act->SetBase( IE_EA, EA_PC );
-	if (core->HasFeature( GF_HAS_DPLAYER )) {
+	if (core->HasFeature( GFFlags::HAS_DPLAYER )) {
 		/* we must reset various existing scripts */
 		act->SetScript( "DEFAULT", AI_SCRIPT_LEVEL, true );
 		act->SetScript(ResRef(), SCR_RACE, true);
@@ -4456,7 +4456,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		return;
 	}
 
-	static bool turnHostile = core->HasFeature(GF_STEAL_IS_ATTACK);
+	static bool turnHostile = core->HasFeature(GFFlags::STEAL_IS_ATTACK);
 	static bool reportFailure = core->HasFeedback(FT_MISC);
 	static bool breakInvisibility = true;
 	AutoTable ppBehave = gamedata->LoadTable("ppbehave");
@@ -4487,7 +4487,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	int skill = snd->GetStat(IE_PICKPOCKET);
 	int tgt = scr->GetStat(IE_PICKPOCKET);
 	int check;
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		skill = snd->GetSkill(IE_PICKPOCKET);
 		int roll = core->Roll(1, 20, 0);
 		int level = scr->GetXPLevel(true);
@@ -4568,7 +4568,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
 
 	if (ret == MIC_FULL && snd->InParty) {
-		if (!core->HasFeature(GF_PST_STATE_FLAGS)) snd->VerbalConstant(VB_INVENTORY_FULL);
+		if (!core->HasFeature(GFFlags::PST_STATE_FLAGS)) snd->VerbalConstant(VB_INVENTORY_FULL);
 		if (reportFailure) displaymsg->DisplayMsgAtLocation(HCStrings::PickpocketInventoryFull, FT_ANY, Sender, Sender, GUIColors::WHITE);
 	}
 	Sender->ReleaseCurrentAction();
@@ -5894,7 +5894,7 @@ void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
-	if (core->HasFeature(GF_STRREF_SAVEGAME)) {
+	if (core->HasFeature(GFFlags::STRREF_SAVEGAME)) {
 		std::string basename = "Auto-Save";
 		AutoTable tab = gamedata->LoadTable("savegame");
 		if (tab) {

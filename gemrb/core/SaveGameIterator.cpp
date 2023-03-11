@@ -62,7 +62,7 @@ static std::string ParseGameDate(DataStream *ds)
 		return "ERROR";
 	}
 	// bg1 displays 7 hours less in game, sigh
-	if (core->HasFeature(GF_BREAKABLE_WEAPONS)) {
+	if (core->HasFeature(GFFlags::BREAKABLE_WEAPONS)) {
 		GameTime -= 2100;
 
 		// also read the Chapter global, since bg1 displays it
@@ -256,7 +256,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	}
 
 	// no worldmaps in saves in ees
-	if (core->HasFeature(GF_HAS_EE_EFFECTS)) return true;
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) return true;
 
 	PathJoinExt(ftmp, dtmp, core->WorldMapName[0].c_str(), "wmp");
 	if (access( ftmp, R_OK )) {

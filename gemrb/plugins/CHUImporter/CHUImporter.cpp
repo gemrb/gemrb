@@ -86,7 +86,7 @@ static void GetButton(DataStream* str, Control*& ctrl, const Region& ctrlFrame, 
 	if (noImage) {
 		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::OR);
 	}
-	if (core->HasFeature(GF_UPPER_BUTTON_TEXT)) {
+	if (core->HasFeature(GFFlags::UPPER_BUTTON_TEXT)) {
 		btn->SetFlags(IE_GUI_BUTTON_CAPS, BitOp::OR);
 	}
 
@@ -114,7 +114,7 @@ static void GetButton(DataStream* str, Control*& ctrl, const Region& ctrlFrame, 
 	// work around several controls not setting all the indices
 	AnimationFactory::index_t cycleSize = bam->GetCycleSize(cycle);
 	bool resetIndex = false;
-	if (core->HasFeature(GF_IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
+	if (core->HasFeature(GFFlags::IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
 		resetIndex = true;
 	}
 	if (resetIndex) {

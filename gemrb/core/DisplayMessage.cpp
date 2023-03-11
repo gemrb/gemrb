@@ -375,7 +375,7 @@ void DisplayMessage::DisplayMsgAtLocation(HCStrings strIdx, int type, Scriptable
 {
 	if (!core->HasFeedback(type)) return;
 
-	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 		ieStrRef msg = GetStringReference(strIdx, trigger);
 		Color colorRef = GetColor(color);
 		owner->overHead.SetText(core->GetString(msg), true, true, colorRef);
@@ -392,7 +392,7 @@ void DisplayMessage::DisplayMsgCentered(HCStrings strIdx, int type, GUIColors co
 {
 	if (!core->HasFeedback(type)) return;
 
-	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 		core->GetGameControl()->SetDisplayText(strIdx, 30);
 	} else {
 		DisplayConstantString(strIdx, color);

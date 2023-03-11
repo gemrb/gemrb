@@ -341,7 +341,7 @@ int GameScript::InParty(Scriptable *Sender, const Trigger *parameters, bool allo
 
 int GameScript::InParty(Scriptable *Sender, const Trigger *parameters)
 {
-	return InParty(Sender, parameters, core->HasFeature(GF_IN_PARTY_ALLOWS_DEAD));
+	return InParty(Sender, parameters, core->HasFeature(GFFlags::IN_PARTY_ALLOWS_DEAD));
 }
 
 int GameScript::InPartyAllowDead(Scriptable *Sender, const Trigger *parameters)
@@ -639,7 +639,7 @@ int GameScript::NumDead(Scriptable *Sender, const Trigger *parameters)
 {
 	ieDword value;
 
-	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if (core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
@@ -653,7 +653,7 @@ int GameScript::NumDeadGT(Scriptable *Sender, const Trigger *parameters)
 {
 	ieDword value;
 
-	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if (core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
@@ -667,7 +667,7 @@ int GameScript::NumDeadLT(Scriptable *Sender, const Trigger *parameters)
 {
 	ieDword value;
 
-	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
+	if (core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
@@ -834,7 +834,7 @@ int GameScript::GlobalTimerExpired(Scriptable *Sender, const Trigger *parameters
 	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
-	if (valid && (core->HasFeature(GF_ZERO_TIMER_IS_VALID) || value1)) {
+	if (valid && (core->HasFeature(GFFlags::ZERO_TIMER_IS_VALID) || value1)) {
 		if ( value1 < core->GetGame()->GameTime ) return 1;
 	}
 	return 0;
@@ -1750,7 +1750,7 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 		ieVariable Variable;
 		bool valid;
 
-		if (core->HasFeature( GF_HAS_KAPUTZ )) {
+		if (core->HasFeature( GFFlags::HAS_KAPUTZ )) {
 			valid = Variable.Format("{}_DEAD", parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {

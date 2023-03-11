@@ -99,8 +99,8 @@ struct Globals {
 private:
 	Globals()
 	{
-		pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
-		iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
+		pstflags = core->HasFeature(GFFlags::PST_STATE_FLAGS);
+		iwd2fx = core->HasFeature(GFFlags::ENHANCED_EFFECTS);
 
 		AutoTable efftextTable = gamedata->LoadTable("efftext");
 
@@ -744,7 +744,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 		}
 		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
 		//this is a hack for PST style diced effects
-		if( core->HasFeature(GF_SAVE_FOR_HALF) ) {
+		if( core->HasFeature(GFFlags::SAVE_FOR_HALF) ) {
 			if (!fx->Resource.IsEmpty() && !fx->Resource.BeginsWith("NEG")) {
 				fx->IsSaveForHalfDamage=1;
 			}
@@ -985,7 +985,7 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 {
 	const auto& globals = Globals::Get();
 	//don't resist self
-	bool selective_mr = core->HasFeature(GF_SELECTIVE_MAGIC_RES);
+	bool selective_mr = core->HasFeature(GFFlags::SELECTIVE_MAGIC_RES);
 	if (fx->CasterID == actor->GetGlobalID() && selective_mr) {
 		return -1;
 	}
@@ -1064,7 +1064,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 	}
 
 	// handle modifiers of specialist mages
-	if (!core->HasFeature(GF_PST_STATE_FLAGS)) {
+	if (!core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		int specialist = KIT_BASECLASS;
 		if (caster) specialist = caster->GetStat(IE_KIT);
 		if (caster && caster->GetMageLevel() && specialist != KIT_BASECLASS) {
@@ -2432,7 +2432,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 			core->GetGame()->locals->Lookup("CHAPTER", chapter);
 			return DiffCore(chapter, val, rel);
 		case STI_EVASION:
-			if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+			if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 				// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)
 				// FIXME: check for evasion itself
 				if (target->GetThiefLevel() < 2 && target->GetMonkLevel() < 1) {

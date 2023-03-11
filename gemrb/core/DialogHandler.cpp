@@ -48,7 +48,7 @@ static const int noSections[4] = {0,0,0,0};
 
 DialogHandler::DialogHandler(void)
 {
-	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
+	if (core->HasFeature(GFFlags::JOURNAL_HAS_SECTIONS)) {
 		sectionMap = bg2Sections;
 	} else {
 		sectionMap = noSections;
@@ -88,7 +88,7 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 			msg += L"[/color]\n";
 		}
 		if (core->HasFeedback(FT_MISC)) {
-			if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+			if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 				core->GetGameControl()->SetDisplayText(HCStrings::JournalChange, 30);
 			} else {
 				displaymsg->DisplayMarkupString(msg);
@@ -364,7 +364,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			// FIXME: figure out if pst needs something similar (action missing)
 			//        (not conditional on GenerateAction to prevent console spam)
 			// iwd2 41nate.d breaks if this is included, since the original delayed execution in a different manner
-			if (!core->HasFeature(GF_AREA_OVERRIDE) && !core->HasFeature(GF_3ED_RULES) && !(tr->Flags & IE_DLG_IMMEDIATE)) {
+			if (!core->HasFeature(GFFlags::AREA_OVERRIDE) && !core->HasFeature(GFFlags::RULES_3ED) && !(tr->Flags & IE_DLG_IMMEDIATE)) {
 				target->AddAction(GenerateAction("BreakInstants()"));
 			}
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
@@ -418,7 +418,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				tgt = tgta;
 			}
 			// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
-			if (!tgt && core->HasFeature(GF_AREA_OVERRIDE)) {
+			if (!tgt && core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 				tgta = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
 				tgt = tgta;
 			}

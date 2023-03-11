@@ -276,7 +276,7 @@ private:
 	}
 
 	Explore() noexcept {
-		LargeFog = !core->HasFeature(GF_SMALL_FOG);
+		LargeFog = !core->HasFeature(GFFlags::SMALL_FOG);
 
 		//circle perimeter size for MaxVisibility
 		int x = MaxVisibility;
@@ -1828,9 +1828,9 @@ void Map::ActorSpottedByPlayer(const Actor *actor) const
 {
 	unsigned int animid;
 
-	if(core->HasFeature(GF_HAS_BEASTS_INI)) {
+	if(core->HasFeature(GFFlags::HAS_BEASTS_INI)) {
 		animid=actor->BaseStats[IE_ANIMATION_ID];
-		if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+		if(core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
 			animid&=0xff;
 		}
 		if (animid < (ieDword)CharAnimations::GetAvatarsCount()) {
@@ -1869,7 +1869,7 @@ void Map::InitActors()
 
 void Map::MarkVisited(const Actor *actor) const
 {
-	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
+	if (actor->InParty && core->HasFeature(GFFlags::AREA_VISITED_VAR)) {
 		ieVariable key;
 		if (!key.Format("{}_visited", scriptName)) {
 			Log(ERROR, "Map", "Area {} has a too long script name for generating _visited globals!", scriptName);
@@ -2203,7 +2203,7 @@ Scriptable *Map::GetScriptableByDialog(const ResRef &resref) const
 		}
 	}
 
-	if (!core->HasFeature(GF_INFOPOINT_DIALOGS)) {
+	if (!core->HasFeature(GFFlags::INFOPOINT_DIALOGS)) {
 		return NULL;
 	}
 
@@ -2327,7 +2327,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	// it's not the correct music, perhaps it needs the one from the master area
 	// it would match for ar2607 and ar2600, but very annoying (see GetMasterArea)
 	// ... but this is also definitely wrong for iwd
-	if (IsStar(*poi) && !MasterArea && SongType == SONG_BATTLE && core->HasFeature(GF_BREAKABLE_WEAPONS)) {
+	if (IsStar(*poi) && !MasterArea && SongType == SONG_BATTLE && core->HasFeature(GFFlags::BREAKABLE_WEAPONS)) {
 		poi = &core->GetMusicPlaylist(SongType);
 		pl = SongType;
 	}
@@ -3034,7 +3034,7 @@ const MapNote* Map::MapNoteAtPoint(const Point& point, unsigned int radius) cons
 //--------spawning------------------
 void Map::LoadIniSpawn()
 {
-	if (core->HasFeature(GF_RESDATA_INI)) {
+	if (core->HasFeature(GFFlags::RESDATA_INI)) {
 		// 85 cases where we'd miss the ini and 1 where we'd use the wrong one
 		INISpawn = new IniSpawn(this, ResRef(scriptName));
 	} else {
@@ -3601,7 +3601,7 @@ bool Map::DisplayTrackString(const Actor *target) const
 	// +5% for every three levels and +5% per point of wisdom
 	int skill = target->GetStat(IE_TRACKING);
 	int success;
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		// ~Wilderness Lore check. Wilderness Lore (skill + D20 roll + WIS modifier) =  %d vs. ((Area difficulty pct / 5) + 10) = %d ( Skill + WIS MOD = %d ).~
 		skill += target->LuckyRoll(1, 20, 0) + target->GetAbilityBonus(IE_WIS);
 		success = skill > (trackDiff/5 + 10);

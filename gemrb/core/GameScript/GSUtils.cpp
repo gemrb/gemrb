@@ -115,7 +115,7 @@ void InitScriptTables()
 	}
 
 	// see note in voodooconst.h
-	if (core->HasFeature(GF_AREA_OVERRIDE)) {
+	if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 		MAX_OPERATING_DISTANCE = 40*3;
 	}
 }
@@ -508,7 +508,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	// PST does not echo verbal constants in the console, their strings
 	// actually contain development related identifying comments
 	// thus the console flag is unset.
-	if (core->HasFeature(GF_ONSCREEN_TEXT) || !charactersubtitles) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) || !charactersubtitles) {
 		flags &= ~DS_CONSOLE;
 	}
 
@@ -1291,7 +1291,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 
 	// When dialog is initiated in IWD2 it directly clears the action queue of all party members.
 	// Bubb: in this case, and only this case as far as I can tell, it specifically preserves spell actions.
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		const Game* game = core->GetGame();
 		for (int i = game->GetPartySize(false) - 1; i >= 0; --i) {
 			Actor *pc = game->GetPC(i, false);
@@ -2002,7 +2002,7 @@ bool IsInObjectRect(const Point &pos, const Region &rect)
 	if (rect.w <= 0) return true;
 
 	// iwd2: testing shows the first point must be 0.0 for matching to work
-	if (core->HasFeature(GF_3ED_RULES) && !rect.origin.IsZero()) {
+	if (core->HasFeature(GFFlags::RULES_3ED) && !rect.origin.IsZero()) {
 		return false;
 	}
 
@@ -2659,7 +2659,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 {
 	ResRef spellResRef;
 	int level = 0;
-	static bool third = core->HasFeature(GF_3ED_RULES);
+	static bool third = core->HasFeature(GFFlags::RULES_3ED);
 
 	// handle iwd2 marked spell casting (MARKED_SPELL is 0)
 	// NOTE: supposedly only casting via SpellWait checks this, so refactor if needed
@@ -2920,7 +2920,7 @@ void AddXPCore(const Action *parameters, bool divide)
 {
 	AutoTable xptable;
 
-	if (core->HasFeature(GF_HAS_EXPTABLE)) {
+	if (core->HasFeature(GFFlags::HAS_EXPTABLE)) {
 		xptable = gamedata->LoadTable("exptable");
 	} else {
 		xptable = gamedata->LoadTable("xplist");

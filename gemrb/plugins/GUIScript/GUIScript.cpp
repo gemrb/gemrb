@@ -234,7 +234,7 @@ static int GetCreatureStat(const Actor *actor, unsigned int StatID, int Mod)
 		return ps->ExtraSettings[StatID];
 	}
 	if (Mod) {
-		if (core->HasFeature(GF_3ED_RULES) && StatIsASkill(StatID)) {
+		if (core->HasFeature(GFFlags::RULES_3ED) && StatIsASkill(StatID)) {
 			return actor->GetSkill(StatID);
 		} else {
 			if (StatID != IE_HITPOINTS || actor->HasVisibleHP()) {
@@ -2948,7 +2948,7 @@ static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
 	char *entrance;
 	int direction = 0;
 	PARSE_ARGS(args,  "Os|i", &area, &entrance, &direction);
-	if (core->HasFeature(GF_TEAM_MOVEMENT) ) {
+	if (core->HasFeature(GFFlags::TEAM_MOVEMENT) ) {
 		everyone = CT_WHOLE;
 	} else {
 		everyone = CT_GO_CLOSER;
@@ -4825,7 +4825,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			dirit.SetFilterPredicate(new EndsWithFilter(suffix), true);
 			break;
 		case DIRECTORY_CHR_SOUNDS:
-			if (core->HasFeature( GF_SOUNDFOLDERS )) {
+			if (core->HasFeature( GFFlags::SOUNDFOLDERS )) {
 				dirs = true;
 			} else {
 				dirit.SetFilterPredicate(new EndsWithFilter("A"), true);
@@ -6527,7 +6527,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	actor->InitButtons(actor->GetActiveClass(), true); // force re-init of actor's action bar
 
 	//what about multiplayer?
-	if ((globalID == 1) && core->HasFeature(GF_HAS_DPLAYER) ) {
+	if ((globalID == 1) && core->HasFeature(GFFlags::HAS_DPLAYER) ) {
 		actor->SetScript("DPLAYER3", SCR_DEFAULT, false);
 	}
 	Py_RETURN_NONE;
@@ -7041,7 +7041,7 @@ static void OverrideSound(const ResRef& itemRef, ResRef& soundRef, ieDword col)
 		candidate = item->DescriptionIcon;
 	}
 
-	if (core->HasFeature(GF_HAS_PICK_SOUND) && !candidate.IsEmpty()) {
+	if (core->HasFeature(GFFlags::HAS_PICK_SOUND) && !candidate.IsEmpty()) {
 		soundRef = candidate;
 	} else {
 		gamedata->GetItemSound(soundRef, item->ItemType, item->AnimationType, col);
@@ -8791,7 +8791,7 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	// auto-refresh innates (memorisation defaults to depleted)
-	if (core->HasFeature(GF_HAS_SPELLLIST)) {
+	if (core->HasFeature(GFFlags::HAS_SPELLLIST)) {
 		if (SpellType == IE_IWD2_SPELL_INNATE) enabled = 1;
 	} else {
 		if (SpellType == IE_SPELL_TYPE_INNATE) enabled = 1;
@@ -10736,7 +10736,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 static bool CanUseActionButton(const Actor *pcc, int type)
 {
 	int capability = -1;
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		switch (type) {
 		case ACT_STEALTH:
 			capability = pcc->GetSkill(IE_STEALTH) + pcc->GetSkill(IE_HIDEINSHADOWS);
@@ -11739,7 +11739,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	int count = 1;
 	switch (forcetarget) {
 		case TARGET_SELF:
-			if (core->HasFeature(GF_TEAM_MOVEMENT)) count += 1000; // pst inventory workaround to avoid another parameter
+			if (core->HasFeature(GFFlags::TEAM_MOVEMENT)) count += 1000; // pst inventory workaround to avoid another parameter
 			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, count);
 			gc->TryToCast(actor, actor);
 			break;
@@ -11960,7 +11960,7 @@ static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 	bool cannotRest = !game->CanPartyRest(noareacheck, &err);
 	// fall back to the generic: you may not rest at this time
 	if (err == ieStrRef::INVALID) {
-		if (core->HasFeature(GF_AREA_OVERRIDE)) {
+		if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 			err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
 		} else {
 			err = ieStrRef::NO_REST;
@@ -12301,7 +12301,7 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 
 	//not sure if this is ok
 	//owner->LastDisarmFailed = attacker->GetGlobalID();
-	if (core->HasFeature(GF_STEAL_IS_ATTACK)) {
+	if (core->HasFeature(GFFlags::STEAL_IS_ATTACK)) {
 		owner->AttackedBy(attacker);
 	}
 	owner->AddTrigger(TriggerEntry(trigger_stealfailed, attacker->GetGlobalID()));
@@ -13032,14 +13032,14 @@ PyDoc_STRVAR( GemRB_SetFeature__doc,
 **Description:** Set GameType flag FEATURE to VALUE, either True or False.\n\
 \n\
 **Parameters:**\n\
-  * FEATURE - GF_xxx constant defined in GUIDefines.py and globals.h\n\
+  * FEATURE - GFFlags::xxx constant defined in GUIDefines.py and globals.h\n\
   * VALUE - value to set the feature to. Either True or False\n\
 \n\
 **Return value:** N/A\n\
 \n\
 **Examples:**\n\
 \n\
-    GemRB.SetFeature(GF_ALL_STRINGS_TAGGED, True)\n\
+    GemRB.SetFeature(GFFlags::ALL_STRINGS_TAGGED, True)\n\
 \n\
 **See also:** [SetVar](SetVar.md)"
 );
@@ -13047,13 +13047,17 @@ PyDoc_STRVAR( GemRB_SetFeature__doc,
 static PyObject* GemRB_SetFeature(PyObject* /*self*/, PyObject* args)
 {
 	unsigned int feature;
-	bool value;
+	bool set;
 
-	if (!PyArg_ParseTuple(args, "ib", &feature, &value)) {
+	if (!PyArg_ParseTuple(args, "ib", &feature, &set)) {
 		return NULL;
 	}
 
-	core->SetFeature(value, feature);
+	if (set) {
+		core->SetFeature(EnumIndex<GFFlags>(feature));
+	} else {
+		core->ClearFeature(EnumIndex<GFFlags>(feature));
+	}
 	Py_RETURN_NONE;
 }
 

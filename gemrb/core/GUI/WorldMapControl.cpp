@@ -54,7 +54,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 
 	//if there is no trivial area, look harder
 	if (!worldmap->GetArea(currentArea, (unsigned int &) entry) &&
-		core->HasFeature(GF_FLEXIBLE_WMAP) ) {
+		core->HasFeature(GFFlags::FLEXIBLE_WMAP) ) {
 		const WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
 		if (m) {
 			currentArea = m->AreaResRef;
@@ -105,7 +105,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		Point offset = MapToScreen(m->pos);
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
 		if (icon) {
-			BlitFlags flags =  core->HasFeature(GF_AUTOMAP_INI) ? BlitFlags::BLENDED : (BlitFlags::BLENDED | BlitFlags::COLOR_MOD);
+			BlitFlags flags =  core->HasFeature(GFFlags::AUTOMAP_INI) ? BlitFlags::BLENDED : (BlitFlags::BLENDED | BlitFlags::COLOR_MOD);
 			if (m == Area && m->HighlightSelected()) {
 				video->BlitGameSprite(icon, offset, flags, hoverAnim.Current());
 			} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
@@ -120,7 +120,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				Point indicatorPos = offset - icon->Frame.origin;
 				indicatorPos.x += areaIndicator->Frame.x + icon->Frame.w / 2 - areaIndicator->Frame.w / 2;
 				// bg2 centered also vertically, while the rest didn't
-				if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
+				if (core->HasFeature(GFFlags::JOURNAL_HAS_SECTIONS)) {
 					indicatorPos.y += areaIndicator->Frame.y + icon->Frame.h / 2 - areaIndicator->Frame.h / 2;
 				}
 				potentialIndicators.push_back(indicatorPos);

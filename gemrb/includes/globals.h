@@ -55,94 +55,95 @@ namespace GemRB {
 //Global Variables
 
 /////feature flags
-enum GameFeatureFlags : uint32_t {
-	GF_HAS_KAPUTZ,          			//pst
-	GF_ALL_STRINGS_TAGGED,   			//bg1, pst, iwd1
-	GF_HAS_SONGLIST,        			//bg2
-	GF_TEAM_MOVEMENT,       			//pst
-	GF_UPPER_BUTTON_TEXT,   			//bg2
-	GF_LOWER_LABEL_TEXT,    			//bg2
-	GF_HAS_PARTY_INI,       			//iwd2
-	GF_SOUNDFOLDERS,        			//iwd2
-	GF_IGNORE_BUTTON_FRAMES,			// all?
-	GF_ONE_BYTE_ANIMID,     			// pst
-	GF_HAS_DPLAYER,         			// not pst
-	GF_HAS_EXPTABLE,        			// iwd, iwd2
-	GF_HAS_BEASTS_INI,      			//pst; also for quests.ini
-	GF_HAS_EE_EFFECTS,       			//ees
-	GF_HAS_PICK_SOUND,      			//pst
-	GF_IWD_MAP_DIMENSIONS,  			//iwd, iwd2
-	GF_AUTOMAP_INI,         			//pst
-	GF_SMALL_FOG,           			//bg1, pst
-	GF_REVERSE_DOOR,        			//pst
-	GF_PROTAGONIST_TALKS,   			//pst
-	GF_HAS_SPELLLIST,       			//iwd2
-	GF_IWD2_SCRIPTNAME,     			//iwd2, iwd, how
-	GF_DIALOGUE_SCROLLS,    			//pst
-	GF_KNOW_WORLD,          			//iwd2
-	GF_REVERSE_TOHIT,       			//all except iwd2
-	GF_SAVE_FOR_HALF,       			//pst
-	GF_CHARNAMEISGABBER,   				//iwd2
-	GF_MAGICBIT,            			//iwd, iwd2
-	GF_CHECK_ABILITIES,     			//bg2 (others?)
-	GF_CHALLENGERATING,     			//iwd2
-	GF_SPELLBOOKICONHACK,   			//bg2
-	GF_ENHANCED_EFFECTS,    			//iwd2 (maybe iwd/how too)
-	GF_DEATH_ON_ZERO_STAT,  			//not in iwd2
-	GF_SPAWN_INI,           			//pst, iwd, iwd2
-	GF_IWD2_DEATHVARFORMAT,  			//iwd branch (maybe pst)
-	GF_RESDATA_INI,         			//pst
-	GF_OVERRIDE_CURSORPOS,  			//pst, iwd2
-	GF_BREAKABLE_WEAPONS,     			//only bg1
-	GF_3ED_RULES,              			//iwd2
-	GF_LEVELSLOT_PER_CLASS,    			//iwd2
-	GF_SELECTIVE_MAGIC_RES,    			//bg2, iwd2, (how)
-	GF_HAS_HIDE_IN_SHADOWS,    			// bg2, iwd2
-	GF_AREA_VISITED_VAR,    			//iwd, iwd2
-	GF_PROPER_BACKSTAB,     			//bg2, iwd2, how?
-	GF_ONSCREEN_TEXT,       			//pst
-	GF_SPECIFIC_DMG_BONUS,				//how, iwd2
-	GF_STRREF_SAVEGAME,       			//iwd2
-	GF_SIMPLE_DISRUPTION,      			// ToBEx: simplified disruption
-	GF_BIOGRAPHY_RES,               	//iwd branch
-	GF_NO_BIOGRAPHY,                	//pst
-	GF_STEAL_IS_ATTACK,             	//bg2 for sure
-	GF_CUTSCENE_AREASCRIPTS,			//bg1, maybe more
-	GF_FLEXIBLE_WMAP,               	//iwd
-	GF_AUTOSEARCH_HIDDEN,           	//all except iwd2
-	GF_PST_STATE_FLAGS,             	//pst complicates this
-	GF_NO_DROP_CAN_MOVE,            	//bg1
-	GF_JOURNAL_HAS_SECTIONS,        	//bg2
-	GF_CASTING_SOUNDS,              	//all except pst and bg1
-	GF_CASTING_SOUNDS2,             	//bg2
-	GF_FORCE_AREA_SCRIPT,           	//how and iwd2 (maybe iwd1)
-	GF_AREA_OVERRIDE,               	//pst maze and other hardcode
-	GF_NO_NEW_VARIABLES,            	//pst
-	GF_SOUNDS_INI,                  	//iwd/how/iwd2
-	GF_USEPOINT_400,                	//all except pst and iwd2
-	GF_USEPOINT_200,                	//iwd2
-	GF_HAS_FLOAT_MENU,              	//pst
-	GF_RARE_ACTION_VB,              	//pst
-	GF_NO_UNDROPPABLE,              	//iwd,how
-	GF_START_ACTIVE,                	//bg1
-	GF_INFOPOINT_DIALOGS,           	//pst, but only bg1 has garbage there
-	GF_IMPLICIT_AREAANIM_BACKGROUND,	//idw,how,iwd2
-	GF_HEAL_ON_100PLUS,             	//bg1, bg2, pst
-	GF_IN_PARTY_ALLOWS_DEAD,			//all except bg2
-	GF_ZERO_TIMER_IS_VALID,         	// how, not bg2, other unknown
-	GF_SHOP_RECHARGE,               	// all?
-	GF_MELEEHEADER_USESPROJECTILE,  	// minimally bg2
-	GF_FORCE_DIALOGPAUSE,           	// all except if using v1.04 DLG files (bg2, special)
-	GF_RANDOM_BANTER_DIALOGS,       	// bg1
-	GF_FIXED_MORALE_OPCODE,         	// bg2
-	GF_HAPPINESS,                   	// all except pst and iwd2
-	GF_EFFICIENT_OR,                	// does the OR trigger shortcircuit on success or not? Only in iwd2
-	GF_LAYERED_WATER_TILES,				// TileOverlay for water has an extra half transparent layer (all but BG1)
-	GF_CLEARING_ACTIONOVERRIDE,         // bg2, not iwd2
-	GF_DAMAGE_INNOCENT_REP,             // not bg1
-	GF_HAS_WEAPON_SETS,             	// iwd2
+enum class GFFlags : uint32_t {
+	// this enum must begin at 0 for iteration
+	HAS_KAPUTZ = 0,          		//pst
+	ALL_STRINGS_TAGGED,   			//bg1, pst, iwd1
+	HAS_SONGLIST,        			//bg2
+	TEAM_MOVEMENT,       			//pst
+	UPPER_BUTTON_TEXT,   			//bg2
+	LOWER_LABEL_TEXT,    			//bg2
+	HAS_PARTY_INI,       			//iwd2
+	SOUNDFOLDERS,        			//iwd2
+	IGNORE_BUTTON_FRAMES,			// all?
+	ONE_BYTE_ANIMID,     			// pst
+	HAS_DPLAYER,         			// not pst
+	HAS_EXPTABLE,        			// iwd, iwd2
+	HAS_BEASTS_INI,      			//pst; also for quests.ini
+	HAS_EE_EFFECTS,       			//ees
+	HAS_PICK_SOUND,      			//pst
+	IWD_MAP_DIMENSIONS,  			//iwd, iwd2
+	AUTOMAP_INI,         			//pst
+	SMALL_FOG,           			//bg1, pst
+	REVERSE_DOOR,        			//pst
+	PROTAGONIST_TALKS,   			//pst
+	HAS_SPELLLIST,       			//iwd2
+	IWD2_SCRIPTNAME,     			//iwd2, iwd, how
+	DIALOGUE_SCROLLS,    			//pst
+	KNOW_WORLD,          			//iwd2
+	REVERSE_TOHIT,       			//all except iwd2
+	SAVE_FOR_HALF,       			//pst
+	CHARNAMEISGABBER,   				//iwd2
+	MAGICBIT,            			//iwd, iwd2
+	CHECK_ABILITIES,     			//bg2 (others?)
+	CHALLENGERATING,     			//iwd2
+	SPELLBOOKICONHACK,   			//bg2
+	ENHANCED_EFFECTS,    			//iwd2 (maybe iwd/how too)
+	DEATH_ON_ZERO_STAT,  			//not in iwd2
+	SPAWN_INI,           			//pst, iwd, iwd2
+	IWD2_DEATHVARFORMAT,  			//iwd branch (maybe pst)
+	RESDATA_INI,         			//pst
+	OVERRIDE_CURSORPOS,  			//pst, iwd2
+	BREAKABLE_WEAPONS,     			//only bg1
+	RULES_3ED,              			//iwd2
+	LEVELSLOT_PER_CLASS,    			//iwd2
+	SELECTIVE_MAGIC_RES,    			//bg2, iwd2, (how)
+	HAS_HIDE_IN_SHADOWS,    			// bg2, iwd2
+	AREA_VISITED_VAR,    			//iwd, iwd2
+	PROPER_BACKSTAB,     			//bg2, iwd2, how?
+	ONSCREEN_TEXT,       			//pst
+	SPECIFIC_DMG_BONUS,				//how, iwd2
+	STRREF_SAVEGAME,       			//iwd2
+	SIMPLE_DISRUPTION,      			// ToBEx: simplified disruption
+	BIOGRAPHY_RES,               	//iwd branch
+	NO_BIOGRAPHY,                	//pst
+	STEAL_IS_ATTACK,             	//bg2 for sure
+	CUTSCENE_AREASCRIPTS,			//bg1, maybe more
+	FLEXIBLE_WMAP,               	//iwd
+	AUTOSEARCH_HIDDEN,           	//all except iwd2
+	PST_STATE_FLAGS,             	//pst complicates this
+	NO_DROP_CAN_MOVE,            	//bg1
+	JOURNAL_HAS_SECTIONS,        	//bg2
+	CASTING_SOUNDS,              	//all except pst and bg1
+	CASTING_SOUNDS2,             	//bg2
+	FORCE_AREA_SCRIPT,           	//how and iwd2 (maybe iwd1)
+	AREA_OVERRIDE,               	//pst maze and other hardcode
+	NO_NEW_VARIABLES,            	//pst
+	SOUNDS_INI,                  	//iwd/how/iwd2
+	USEPOINT_400,                	//all except pst and iwd2
+	USEPOINT_200,                	//iwd2
+	HAS_FLOAT_MENU,              	//pst
+	RARE_ACTION_VB,              	//pst
+	NO_UNDROPPABLE,              	//iwd,how
+	START_ACTIVE,                	//bg1
+	INFOPOINT_DIALOGS,           	//pst, but only bg1 has garbage there
+	IMPLICIT_AREAANIM_BACKGROUND,	//idw,how,iwd2
+	HEAL_ON_100PLUS,             	//bg1, bg2, pst
+	IN_PARTY_ALLOWS_DEAD,			//all except bg2
+	ZERO_TIMER_IS_VALID,         	// how, not bg2, other unknown
+	SHOP_RECHARGE,               	// all?
+	MELEEHEADER_USESPROJECTILE,  	// minimally bg2
+	FORCE_DIALOGPAUSE,           	// all except if using v1.04 DLG files (bg2, special)
+	RANDOM_BANTER_DIALOGS,       	// bg1
+	FIXED_MORALE_OPCODE,         	// bg2
+	HAPPINESS,                   	// all except pst and iwd2
+	EFFICIENT_OR,                	// does the OR trigger shortcircuit on success or not? Only in iwd2
+	LAYERED_WATER_TILES,				// TileOverlay for water has an extra half transparent layer (all but BG1)
+	CLEARING_ACTIONOVERRIDE,         // bg2, not iwd2
+	DAMAGE_INNOCENT_REP,             // not bg1
+	HAS_WEAPON_SETS,             	// iwd2
 
-	GF_COUNT // sentinal count
+	count // must be last
 };
 
 //the number of item usage fields (used in CREItem and STOItem)

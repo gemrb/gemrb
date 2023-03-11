@@ -946,7 +946,7 @@ static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx
 	EffectRef mainStatRefs[] = { fx_str_ref, fx_str_ref, fx_int_ref, fx_wis_ref, fx_dex_ref, fx_con_ref, fx_chr_ref };
 
 	int bonus = fx->Parameter1;
-	if (!core->HasFeature(GF_3ED_RULES) || fx->Parameter2 != MOD_ADDITIVE) return;
+	if (!core->HasFeature(GFFlags::RULES_3ED) || fx->Parameter2 != MOD_ADDITIVE) return;
 
 	if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
 		// don't touch it, so eg. potion of holy transference still works 00POTN89
@@ -1121,7 +1121,7 @@ int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_set_berserk_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	// atleast how and bg2 allow this to only work on pcs
-	if (!core->HasFeature(GF_3ED_RULES) && !target->InParty) {
+	if (!core->HasFeature(GFFlags::RULES_3ED) && !target->InParty) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -1435,7 +1435,7 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	if (core->HasFeature(GF_3ED_RULES) && target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
+	if (core->HasFeature(GFFlags::RULES_3ED) && target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
 		Log(DEBUG, "fx_damage", "Attacking invulnerable target, skipping!");
 		return FX_NOT_APPLIED;
 	}
@@ -1758,7 +1758,7 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	switch (fx->Parameter2) {
 	case 0:
-		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 			STATE_SET( STATE_PST_INVIS );
 		} else {
 			STATE_SET( STATE_INVISIBLE );
@@ -1848,7 +1848,7 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	// EEs toggle this with fx->Special, but 0 stands for bg2, so we can't use it
 	// they will just use the same game flag instead
-	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
+	if (core->HasFeature(GFFlags::FIXED_MORALE_OPCODE)) {
 		BASE_SET(IE_MORALE, 10);
 		return FX_NOT_APPLIED;
 	}
@@ -1881,7 +1881,7 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		STATE_SET( STATE_PANIC );
 	}
-	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_PANIC);
 	}
 	return FX_PERMANENT;
@@ -1937,7 +1937,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case RPD_ROUNDS:
 		tmp = core->Time.round_sec;
-		damage = core->HasFeature(GF_HAS_EE_EFFECTS) ? fx->Parameter3 : fx->Parameter1;
+		damage = core->HasFeature(GFFlags::HAS_EE_EFFECTS) ? fx->Parameter3 : fx->Parameter1;
 		break;
 	case RPD_TURNS:
 		tmp = core->Time.turn_sec;
@@ -2194,7 +2194,7 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 		BASE_STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
 	} else {
 		STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
-		if (fx->Parameter2 || !core->HasFeature(GF_HAS_EE_EFFECTS)) {
+		if (fx->Parameter2 || !core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 			target->SetSpellState(SS_NOAWAKE);
 		}
 		if (fx->IsVariable) {
@@ -2361,7 +2361,7 @@ int fx_set_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 	STATE_SET( STATE_STUNNED );
-	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) { // all iwds
+	if (core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) { // all iwds
 		target->AddPortraitIcon(PI_STUN_IWD);
 	} else {
 		target->AddPortraitIcon(PI_STUN);
@@ -2391,7 +2391,7 @@ int fx_cure_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*
 	// print("fx_cure_invisible_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	const Game *game = core->GetGame();
 	if (!STATE_GET(STATE_NONDET) && !game->StateOverrideFlag && !game->StateOverrideTime) {
-		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 			BASE_STATE_CURE( STATE_PST_INVIS );
 		} else {
 			BASE_STATE_CURE( STATE_INVISIBLE | STATE_INVIS2 );
@@ -2749,7 +2749,7 @@ int fx_set_blur_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STATE_SET( STATE_BLUR );
 	}
 	//iwd2 specific
-	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_BLUR);
 	}
 	return FX_PERMANENT;
@@ -2997,7 +2997,7 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//don't do this effect twice (bug exists in BG2, but fixed in IWD2)
-	static bool reverse = core->HasFeature(GF_REVERSE_TOHIT);
+	static bool reverse = core->HasFeature(GFFlags::REVERSE_TOHIT);
 	if (!STATE_GET(STATE_BLIND)) {
 		STATE_SET( STATE_BLIND );
 		//the feat normally exists only in IWD2, but won't hurt
@@ -3039,7 +3039,7 @@ int fx_set_feebleminded_state (Scriptable* /*Owner*/, Actor* target, Effect* /*f
 	// print("fx_set_feebleminded_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	STATE_SET( STATE_FEEBLE );
 	STAT_SET( IE_INT, 3);
-	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_FEEBLEMIND);
 	}
 	//This state is better off with always stored, because of the portrait icon and the int stat
@@ -3118,7 +3118,7 @@ int fx_set_diseased_state(Scriptable* Owner, Actor* target, Effect* fx)
 		STAT_SUB(IE_CHR, fx->Parameter1 ? fx->Parameter1 : 2);
 		//fall through
 	case RPD_SLOW: //slow
-		if (core->HasFeature(GF_3ED_RULES)) {
+		if (core->HasFeature(GFFlags::RULES_3ED)) {
 			if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
 			if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
 			STAT_SUB(IE_ARMORCLASS, 2);
@@ -3197,7 +3197,7 @@ int fx_set_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
 
 	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
-	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_DEAFNESS);
 	}
 	return FX_APPLIED;
@@ -3454,7 +3454,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	// different in iwd2 only?
 	// x hp per 1 round
-	if (fx->Parameter2 == RPD_ROUNDS && core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (fx->Parameter2 == RPD_ROUNDS && core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		damage = fx->Parameter1;
 		fx->Parameter5 = gameTime + core->Time.round_sec * static_cast<ieDword>(timeStep);
 	}
@@ -3547,7 +3547,7 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//for party members, the gold is stored in the game object
 	switch( fx->Parameter2) {
 		case MOD_ADDITIVE:
-			if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
+			if (core->HasFeature(GFFlags::FIXED_MORALE_OPCODE)) {
 				gold = - signed(fx->Parameter1);
 			} else {
 				gold = fx->Parameter1;
@@ -4037,7 +4037,7 @@ int fx_movement_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (core->InCutSceneMode()) return FX_APPLIED;
 
 	// bg1 crashes on 13+, 9&10 are equal to 8 and 11 (boots of speed) equals to roughly 15.6 #129
-	if (core->HasFeature(GF_BREAKABLE_WEAPONS) && fx->Parameter2 == MOD_ABSOLUTE) {
+	if (core->HasFeature(GFFlags::BREAKABLE_WEAPONS) && fx->Parameter2 == MOD_ABSOLUTE) {
 		switch (fx->Parameter1) {
 			case 9:
 			case 10:
@@ -4137,7 +4137,7 @@ int fx_set_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//for permanent confusion
 	//the portrait icon cannot be made common because rigid thinking uses a different icon
 	//in bg2/how
-	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_CONFUSED);
 	}
 	return FX_PERMANENT;
@@ -4168,7 +4168,7 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//bless effect too?
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
-	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_AID);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(50, 50, 50, 0));
 	}
@@ -4193,7 +4193,7 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
 	if (target->ShouldModifyMorale()) STAT_ADD(IE_MORALE, fx->Parameter1);
-	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_BLESS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xc0, 0x80, 0, 0));
 	}
@@ -4225,7 +4225,7 @@ int fx_set_holy_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_STR, fx->Parameter1);
 	STAT_ADD( IE_CON, fx->Parameter1);
 	STAT_ADD( IE_DEX, fx->Parameter1);
-	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_HOLY);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x80, 0x80, 0x80, 0));
 	}
@@ -4395,7 +4395,7 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_force_visible(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		BASE_STATE_CURE(STATE_PST_INVIS);
 	} else {
 		BASE_STATE_CURE(STATE_INVISIBLE);
@@ -4894,7 +4894,7 @@ int fx_set_sanctuary_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET(IE_SANCTUARY, fx->Parameter2);
 	//a rare event, but this effect gives more in bg2 than in iwd2
 	//so we use this flag
-	if (!core->HasFeature(GF_ENHANCED_EFFECTS)) {
+	if (!core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->SetLockedPalette(fullwhite);
 	}
 	return FX_APPLIED;
@@ -4984,7 +4984,7 @@ int fx_mirror_image_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
-	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		STATE_SET( STATE_PST_MIRROR );
 	}
 	else {
@@ -5082,7 +5082,7 @@ int fx_magic_resistance_modifier (Scriptable* /*Owner*/, Actor* target, Effect* 
 	// iwd2 monk's Diamond soul
 	// for some silly reason the +1/level was not handled as a clab
 	// our clab adds the 10 and sets Special to the rate per level
-	if (core->HasFeature(GF_3ED_RULES) && fx->FirstApply) {
+	if (core->HasFeature(GFFlags::RULES_3ED) && fx->FirstApply) {
 		fx->Parameter1 += target->GetMonkLevel() * fx->IsVariable;
 	}
 
@@ -6097,7 +6097,7 @@ int fx_power_word_sleep (Scriptable* Owner, Actor* target, Effect* fx)
 	fx->Duration = core->GetGame()->GameTime+x*core->Time.round_size;
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_set_sleep_state_ref);
-	if (!core->HasFeature(GF_HAS_EE_EFFECTS)) fx->Parameter2 = 0;
+	if (!core->HasFeature(GFFlags::HAS_EE_EFFECTS)) fx->Parameter2 = 0;
 	return fx_set_unconscious_state(Owner,target,fx);
 }
 
@@ -6117,7 +6117,7 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is the bg2 style stoneskin, not normally using spell states
 	//but this way we can support hybrid games
-	if (core->HasFeature(GF_HAS_EE_EFFECTS)) {
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 		if (fx->Parameter2) {
 			fx->Parameter1 = DICE_ROLL((signed) fx->Parameter1);
 		}
@@ -6816,7 +6816,7 @@ int fx_cure_confused_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_drain_items (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// TODO: ee, optionally use fx->Resource, different draining, add extra gameflag check below
-	if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) return FX_NOT_APPLIED;
+	if (core->HasFeature(GFFlags::FIXED_MORALE_OPCODE)) return FX_NOT_APPLIED;
 
 	// deplete magic items = 0
 	// deplete also magic weapons = 1
@@ -6882,7 +6882,7 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_change_bardsong(%2d): %s", fx->Opcode, fx->Resource);
 	// remove any previous song effects, as they are used with permanent timing
 	unsigned int songType = IE_SPL_SONG;
-	if (core->HasFeature(GF_3ED_RULES)) songType = IE_IWD2_SPELL_SONG;
+	if (core->HasFeature(GFFlags::RULES_3ED)) songType = IE_IWD2_SPELL_SONG;
 	unsigned int count = target->fxqueue.CountEffects(fx_change_bardsong_ref, -1, -1);
 	unsigned int songCount = target->spellbook.GetSpellInfoSize(1 << songType);
 	if (count > 0 && songCount > 0) {
@@ -7755,7 +7755,7 @@ int fx_reveal_tracks (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	// iwd tracking is just the area description
-	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+	if (core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -8166,7 +8166,7 @@ int fx_set_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// in IWD2 we have 176 states (original had 256)
 	// ees can toggle between iwd2 and HoW mode
-	if (fx->IsVariable || core->HasFeature(GF_3ED_RULES)) {
+	if (fx->IsVariable || core->HasFeature(GFFlags::RULES_3ED)) {
 		target->SetSpellState(fx->Parameter2);
 	} else {
 		// in HoW this sets only the 10 last bits of extstate (until it runs out of bits)
