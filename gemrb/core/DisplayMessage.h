@@ -41,8 +41,7 @@ namespace GemRB {
 /** 
  * Indices for externalized GUI colors in colors.2da
  **/
-enum class GUIColors {
-	FIRST_COLOR,
+enum class GUIColors : uint8_t {
 	TOOLTIP = 0,
 	TOOLTIPBG,
 	MAPICNBG,
@@ -62,7 +61,8 @@ enum class GUIColors {
 	FLOAT_TXT_ACTOR,
 	FLOAT_TXT_INFO,
 	FLOAT_TXT_OTHER,
-	LAST_COLOR
+
+	count
 };
 
 class Scriptable;
