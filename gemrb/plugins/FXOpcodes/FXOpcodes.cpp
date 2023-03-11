@@ -4700,14 +4700,12 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 // 0x93 Spell:Learn
 int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_learn_spell(%2d): Resource:%s Flags: %d Mode: %d", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2);
 	//parameter1 is unused, gemrb lets you to make it not give XP
 	//probably we should also let this via a game flag if we want
 	//full compatibility with bg1
 	//parameter2 is used in bg1 and pst to specify the spell type; bg2 and iwd2 figure it out from the resource
 	//LS_STATS is on by default (int check)
-	int x= target->LearnSpell(fx->Resource, fx->Parameter1^LS_STATS);
-	Log(DEBUG, "FXOpcodes", "Learnspell returned: {}", x);
+	target->LearnSpell(fx->Resource, fx->Parameter1 ^ LS_STATS);
 	return FX_NOT_APPLIED;
 }
 // 0x94 Spell:CastSpellPoint
