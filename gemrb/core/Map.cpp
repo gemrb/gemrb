@@ -838,6 +838,10 @@ void Map::UpdateScripts()
 				if (actor->CannotPassEntrance(exitID)) {
 					continue;
 				}
+				if (core->GetGameControl()->InDialog()) {
+					displaymsg->DisplayConstantString(HCStrings::DialogNoAreaMove, GUIColors::WHITE, actor);
+					continue;
+				}
 				// this is needed, otherwise the travel
 				// trigger would be activated anytime
 				// Well, i don't know why is it here, but lets try this

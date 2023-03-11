@@ -48,7 +48,7 @@ enum class HCStrings {
 	CantSaveDialog2,
 	CantSaveMovie,
 	TargetBusy,
-	DialogNoAreaMove, // maybe worth adding, could be triggered with non-pausing dialog - 62158
+	DialogNoAreaMove,
 	GotGold,
 	LostGold,
 	GotXP,
