@@ -9795,13 +9795,13 @@ void Actor::CreateDerivedStatsBG()
 	for (int i=0;i<ISCLASSES;i++) {
 		if (classesiwd2[i]>=(ieDword) classcount) continue;
 		int tl = turnLevelOffset[classesiwd2[i]];
-		if (tl) {
-			int adjustedTL = GetClassLevel(i) + 1 - tl;
-			//adding up turn undead levels, but this is probably moot
-			//anyway, you will be able to create custom priest/paladin classes
-			if (adjustedTL > 0) {
-				turnundeadlevel += adjustedTL;
-			}
+		if (!tl) continue;
+
+		int adjustedTL = GetClassLevel(i) + 1 - tl;
+		// adding up turn undead levels, but this is probably moot
+		// anyway, you will be able to create custom priest/paladin classes
+		if (adjustedTL > 0) {
+			turnundeadlevel += adjustedTL;
 		}
 	}
 
@@ -9817,13 +9817,12 @@ void Actor::CreateDerivedStatsBG()
 			// it's just applied later
 			// stalkers work by just using the effect, since they're not thieves
 			if (tm)	{
-				TableMgr::index_t cols = tm->GetColumnCount();
-				if (backstabdamagemultiplier >= cols) backstabdamagemultiplier = cols;
+				backstabdamagemultiplier = std::min(backstabdamagemultiplier, tm->GetColumnCount());
 				backstabdamagemultiplier = tm->QueryFieldUnsigned<stat_t>(0, backstabdamagemultiplier);
 			} else {
 				backstabdamagemultiplier = (backstabdamagemultiplier+7)/4;
 			}
-			if (backstabdamagemultiplier>5) backstabdamagemultiplier=5;
+			backstabdamagemultiplier = std::min(backstabdamagemultiplier, 5U);
 		}
 	}
 
