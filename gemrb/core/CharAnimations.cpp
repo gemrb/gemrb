@@ -2791,10 +2791,10 @@ void CharAnimations::PulseRGBModifiers()
 		}
 	}
 
-	for (size_t i = 0; i < PAL_MAX; ++i) {
+	for (const PaletteType i : EnumIterator<PaletteType, PAL_MAIN, PAL_MAX>()) {
 		if (change[i]) {
 			change[i] = false;
-			SetupColors((PaletteType) i);
+			SetupColors(i);
 		}
 	}
 
