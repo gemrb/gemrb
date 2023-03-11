@@ -428,14 +428,14 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 {
 	if (mode==FX_DURATION_INSTANT_PERMANENT) {
-		if (target->IsReverseToHit()) {
+		if (Actor::IsReverseToHit()) {
 			BASE_SUB( stat, mod );
 		} else {
 			BASE_ADD( stat, mod );
 		}
 		return;
 	}
-	if (target->IsReverseToHit()) {
+	if (Actor::IsReverseToHit()) {
 		STAT_SUB( stat, mod );
 	} else {
 		STAT_ADD( stat, mod );

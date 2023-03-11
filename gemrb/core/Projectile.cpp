@@ -475,7 +475,7 @@ bool Projectile::FailedIDS(const Actor *target) const
 	// damage type, should be generic?
 	// ignore the armor bonus
 	int defense = target->GetDefense(0, WEAPON_BYPASS, caster);
-	if (target->IsReverseToHit()) {
+	if (Actor::IsReverseToHit()) {
 		fail = roll + defense < toHit;
 	} else {
 		fail = toHit + roll < defense;

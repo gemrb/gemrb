@@ -164,7 +164,7 @@ void ArmorClass::SetBonus(int& current, int bonus, int mod)
 void ArmorClass::HandleFxBonus(int mod, bool permanent)
 {
 	if (permanent) {
-		if (Owner->IsReverseToHit()) {
+		if (Actor::IsReverseToHit()) {
 			SetNatural(natural-mod);
 		} else {
 			SetNatural(natural+mod);
@@ -172,7 +172,7 @@ void ArmorClass::HandleFxBonus(int mod, bool permanent)
 		return;
 	}
 	// this was actually aditively modifying Modified directly before
-	if (Owner->IsReverseToHit()) {
+	if (Actor::IsReverseToHit()) {
 		SetGenericBonus(-mod, 0);
 	} else {
 		SetGenericBonus(mod, 0);
@@ -287,7 +287,7 @@ void ToHitStats::SetBonus(int& current, int bonus, int mod)
 void ToHitStats::HandleFxBonus(int mod, bool permanent)
 {
 	if (permanent) {
-		if (Owner->IsReverseToHit()) {
+		if (Actor::IsReverseToHit()) {
 			SetBase(base-mod);
 		} else {
 			SetBase(base+mod);
@@ -295,7 +295,7 @@ void ToHitStats::HandleFxBonus(int mod, bool permanent)
 		return;
 	}
 	// this was actually aditively modifying Modified directly before
-	if (Owner->IsReverseToHit()) {
+	if (Actor::IsReverseToHit()) {
 		SetFxBonus(-mod, 0);
 	} else {
 		SetFxBonus(mod, 0);

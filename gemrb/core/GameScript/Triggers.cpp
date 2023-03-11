@@ -643,7 +643,7 @@ int GameScript::NumDead(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		VariableName.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.Format(Interface::GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value == (ieDword) parameters->int0Parameter );
@@ -657,7 +657,7 @@ int GameScript::NumDeadGT(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		VariableName.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.Format(Interface::GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value > (ieDword) parameters->int0Parameter );
@@ -671,7 +671,7 @@ int GameScript::NumDeadLT(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		VariableName.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.Format(Interface::GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value < (ieDword) parameters->int0Parameter );
@@ -1754,7 +1754,7 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 			valid = Variable.Format("{}_DEAD", parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {
-			valid = Variable.Format(core->GetDeathVarFormat(), parameters->string0Parameter);
+			valid = Variable.Format(Interface::GetDeathVarFormat(), parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
 		}
 		if (!valid) {
