@@ -92,7 +92,7 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 
 ieStrRef DisplayMessage::StrRefs::Get(HCStrings idx, const Scriptable* speaker) const
 {
-	size_t sub = static_cast<size_t>(idx);
+	int sub = static_cast<int>(idx);
 	if (idx < HCStrings::StringCount) {
 		if (flags[sub] == 0 || !speaker || speaker->Type != ST_ACTOR) {
 			return table[sub];

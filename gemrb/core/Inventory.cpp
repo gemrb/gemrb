@@ -1934,13 +1934,13 @@ HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 		} else {
 			otherslot = SLOT_LEFT;
 		}
-		if (slot==otherslot) {
-			if (TwoHandedInSlot(i)) {
-				return HCStrings::TwohandedUsed;
-			}
-			if (ranged) {
-				return HCStrings::NoRangedOffhand;
-			}
+		if (slot != otherslot) continue;
+
+		if (TwoHandedInSlot(i)) {
+			return HCStrings::TwohandedUsed;
+		}
+		if (ranged) {
+			return HCStrings::NoRangedOffhand;
 		}
 	}
 

@@ -625,8 +625,6 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 		break;
 	}
 	char Path[_MAX_PATH];
-	GameControl *gc = core->GetGameControl();
-	assert(gc);
 	if (!CreateSavePath(Path, index, slotname)) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
@@ -684,8 +682,6 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname,
 		}
 	}
 
-	GameControl *gc = core->GetGameControl();
-	assert(gc); //this is already checked in CanSave and core only has one if there is a game anyway
 	char Path[_MAX_PATH];
 	if (!CreateSavePath(Path, index, slotname)) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);

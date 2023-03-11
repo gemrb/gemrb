@@ -3541,9 +3541,9 @@ static ResRef UpgradeRandomItem(const ResRef& pickedItem, const ResRef& workResR
 	static const std::string upgradeProgressionStr = "lmrvvvvv";
 	ResRef inputResRef = workResRef;
 	StringToLower(inputResRef);
-	size_t nameLength = inputResRef.length();
+	uint8_t nameLength = inputResRef.length();
 	char lastCharInInput = inputResRef[nameLength - 1];
-	int currentTierIndex = upgradeProgressionStr.find_first_of(lastCharInInput);
+	int currentTierIndex = int(upgradeProgressionStr.find_first_of(lastCharInInput));
 	if (currentTierIndex == -1) {
 		// invalid tier
 		return inputResRef;
@@ -3595,9 +3595,9 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		int idx;
 		if (itemList.WeightOdds) {
 			// instead of 1d19 we calculate with 2d10 (which also has 19 possible values)
-			idx = Roll(2,(itemList.ResRefs.size() + 1) / 2, -2);
+			idx = Roll(2, (int(itemList.ResRefs.size()) + 1) / 2, -2);
 		} else {
-			idx = Roll(1, itemList.ResRefs.size(), -1);
+			idx = Roll(1, int(itemList.ResRefs.size()), -1);
 		}
 		return itemList.ResRefs[idx];
 	};
@@ -3615,10 +3615,10 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		}
 
 		ResRef pickedItem = pickFromRow(itm->ItemResRef);
-		size_t nameLength = itm->ItemResRef.length();
+		uint8_t nameLength = itm->ItemResRef.length();
 		if (pickedItem == "UP" && nameLength > 2 && itm->ItemResRef[nameLength - 2] == '_') {
 			ResRef newItem = UpgradeRandomItem(pickedItem, itm->ItemResRef);
-			if (newItem == pickedItem) return false;;
+			if (newItem == pickedItem) return false;
 			pickedItem = pickFromRow(newItem);
 		}
 
