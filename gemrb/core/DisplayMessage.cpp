@@ -55,7 +55,7 @@ String DisplayMessage::ResolveStringRef(ieStrRef stridx)
 
 DisplayMessage::StrRefs::StrRefs()
 {
-	std::fill_n(table, static_cast<int>(HCStrings::StringCount), ieStrRef::INVALID);
+	table.fill(ieStrRef::INVALID);
 }
 
 bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
