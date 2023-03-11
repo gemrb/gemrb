@@ -25,7 +25,7 @@ environment:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
   VCPKG_TARGET_TRIPLET: "x64-windows"
   VCPKG_BUILD_TYPE: "release"
-  #APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
 install:
 - ps: |-
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
@@ -104,9 +104,6 @@ after_build:
     }
 
     cmake --build . --target install --config Release
-    if ($? -ne 0) {
-      throw
-    }
 
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
       popd
@@ -120,9 +117,10 @@ test_script:
     Add-Content -Path GemRB.cfg.bots -Encoding ascii -Value "GameType=test"
 
     ./gemrb.exe -q -c GemRB.cfg.bots
-    if ($? -ne 0) {
-      throw
+    if ($? -ne $true) {
+      throw "Failed test run!"
     }
+
     rm GemRB.cfg.bots
 artifacts:
 - path: gemrb*.zip
