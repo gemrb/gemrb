@@ -25,7 +25,7 @@ environment:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
   VCPKG_TARGET_TRIPLET: "x64-windows"
   VCPKG_BUILD_TYPE: "release"
-  APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  #APPVEYOR_SAVE_CACHE_ON_ERROR: true
 install:
 - ps: |-
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
