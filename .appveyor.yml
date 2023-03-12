@@ -4,7 +4,7 @@ branches:
   - master
   - /v\d+\.\d+\.\d+/
 
-image: Visual Studio 2022
+image: Visual Studio 2019
 configuration: Release
 clone_depth: 1
 skip_commits:
@@ -80,7 +80,7 @@ before_build:
     if ($env:APPVEYOR_REPO_TAG_NAME -Or $env:APPVEYOR_REPO_COMMIT_MESSAGE -like '*buildgl*') {
       $env:gl = "OpenGL"
     }
-    cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOPENGL_BACKEND="$env:gl" -DINSOURCEBUILD=1 -DWIN32_USE_STDIO=1 -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET="x64-windows" -A x64 .
+    cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOPENGL_BACKEND="$env:gl" -DINSOURCEBUILD=1 -DWIN32_USE_STDIO=1 -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET="x64-windows" -A x64 -DPYTHON_VERSION=3.10 .
 
     # set version to tag or version + commits since tag + commit hash
     $git_version = (git describe --always) | Out-String
