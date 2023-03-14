@@ -1838,7 +1838,7 @@ bool Interface::LoadEncoding()
 	// TODO: lists are incomplete
 	// maybe want to externalize this
 	// list compiled form wiki: https://gemrb.org/Text-encodings.html
-	const char* wideEncodings[] = {
+	std::vector<std::string> wideEncodings = {
 		// Chinese
 		"GBK", "BIG5",
 		// Korean
@@ -1846,22 +1846,20 @@ bool Interface::LoadEncoding()
 		// Japanese
 		"SJIS",
 	};
-	size_t listSize = sizeof(wideEncodings) / sizeof(wideEncodings[0]);
 
-	for (size_t i = 0; i < listSize; i++) {
-		if (TLKEncoding.encoding == wideEncodings[i]) {
+	for (const auto& encoding : wideEncodings) {
+		if (TLKEncoding.encoding == encoding) {
 			TLKEncoding.widechar = true;
 			break;
 		}
 	}
 
-	const char* multibyteEncodings[] = {
+	std::vector<std::string> multibyteEncodings = {
 		"UTF-8",
 	};
-	listSize = sizeof(multibyteEncodings) / sizeof(multibyteEncodings[0]);
 
-	for (size_t i = 0; i < listSize; i++) {
-		if (TLKEncoding.encoding == multibyteEncodings[i]) {
+	for (const auto& encoding : multibyteEncodings) {
+		if (TLKEncoding.encoding == encoding) {
 			TLKEncoding.multibyte = true;
 			break;
 		}
