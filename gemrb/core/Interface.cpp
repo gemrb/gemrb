@@ -1894,11 +1894,10 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 	return guiscript.get();
 }
 
-static EffectRef fx_summon_disable_ref = { "AvatarRemovalModifier", -1 };
-
 //NOTE: if there were more summoned creatures, it will return only the last
 Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, const Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
 {
+	static EffectRef fx_summon_disable_ref = { "AvatarRemovalModifier", -1 };
 	//maximum number of monsters summoned
 	int cnt=10;
 	Actor * ab = NULL;
@@ -1961,20 +1960,11 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		ab = tmp;
 		//Always use Base stats for the recently summoned creature
 
-		int enemyally;
-
-		if (eamod==EAM_SOURCEALLY || eamod==EAM_SOURCEENEMY) {
-			if (summoner) {
-				enemyally = summoner->GetStat(IE_EA) > EA_GOODCUTOFF;
-			} else {
-				enemyally = true;
-			}
-		} else {
-			if (target) {
-				enemyally = target->GetBase(IE_EA)>EA_GOODCUTOFF;
-			} else {
-				enemyally = true;
-			}
+		bool enemyally = true;
+		if (summoner && (eamod == EAM_SOURCEALLY || eamod == EAM_SOURCEENEMY)) {
+			enemyally = summoner->GetStat(IE_EA) > EA_GOODCUTOFF;
+		} else if (target) {
+			enemyally = target->GetBase(IE_EA) > EA_GOODCUTOFF;
 		}
 
 		switch (eamod) {
