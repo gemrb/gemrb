@@ -2187,7 +2187,7 @@ Tooltip Interface::CreateTooltip() const
 	return Tooltip(L"", GetFont(TooltipFontResRef), colors, bg);
 }
 
-/** Get the Sound Manager */
+/** Get the Save game manager */
 SaveGameIterator* Interface::GetSaveGameIterator() const
 {
 	return sgiterator;
