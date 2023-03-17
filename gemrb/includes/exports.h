@@ -86,10 +86,6 @@
 #	pragma warning( disable: 4244 )
 //  new behavior: elements of array will be default initialized
 #	pragma warning( disable: 4351 )
-//	disables annoying warning caused by STL:Map in msvc 6.0
-#	if _MSC_VER < 7000
-#		pragma warning(disable:4786)
-#	endif
 //	disables warnings about posix functions
 #	define _CRT_NONSTDC_NO_DEPRECATE 1
 #endif
