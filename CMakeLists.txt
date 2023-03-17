@@ -236,11 +236,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	endif ()
 	# mark chars explicitly signed (ARM defaults to unsigned)
 	string(APPEND CMAKE_CXX_FLAGS " -fsigned-char")
-	# only export symbols explicitly marked to be exported.
-	CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" VISIBILITY_HIDDEN)
-	IF (VISIBILITY_HIDDEN AND NOT WIN32)
-		string(APPEND CMAKE_CXX_FLAGS " -fvisibility=hidden")
-	ENDIF ()
+	
 	# use a more lenient regex for finding documented switch fallthroughs (gcc7)
 	CHECK_CXX_COMPILER_FLAG("-Wimplicit-fallthrough" FALLTHROUGH)
 	IF (FALLTHROUGH AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
