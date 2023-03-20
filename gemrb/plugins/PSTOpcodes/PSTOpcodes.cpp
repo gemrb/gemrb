@@ -31,6 +31,8 @@
 #include "TileMap.h"
 #include "VEFObject.h"
 #include "Video/Video.h" //for tints
+
+#include "GameScript/GSUtils.h"
 #include "Scriptable/Actor.h"
 #include "ScriptedAnimation.h"
 
@@ -1038,9 +1040,12 @@ int fx_speak_with_dead (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!STATE_GET( STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
+	if (fx->FirstApply) fx->Parameter4 = fx->Duration - core->GetGame()->GameTime;
 
-	//TODO: reverse engineer the original opcode
-	Log(ERROR, "PSTOpcodes","fx_speak_with_dead: not implemented! Source: {}", fx->Source);
+	if (fx->Parameter4 == 1) {
+		SetVariable(target, "Speak_with_Dead", 0, "GLOBAL");
+	}
+	fx->Parameter4--;
 	return FX_NOT_APPLIED;
 }
 
