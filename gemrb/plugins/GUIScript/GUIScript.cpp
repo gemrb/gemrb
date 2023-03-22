@@ -2827,8 +2827,8 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 
 	ResRef enc[5];
 	int k;
-	int links[4];
-	int indices[4];
+	EnumArray<WMPDirection, ieDword> links;
+	EnumArray<WMPDirection, ieDword> indices;
 	TableMgr::index_t rows = newarea->GetRowCount();
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
 		const ResRef area  = newarea->QueryField(i,0);
@@ -2840,19 +2840,19 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		int label          = newarea->QueryFieldSigned<int>(i,6);
 		int name           = newarea->QueryFieldSigned<int>(i,7);
 		ResRef ltab   = newarea->QueryField(i, 8);
-		links[static_cast<int>(WMPDirection::NORTH)] = newarea->QueryFieldSigned<int>(i, 9);
-		links[static_cast<int>(WMPDirection::EAST)] = newarea->QueryFieldSigned<int>(i, 10);
-		links[static_cast<int>(WMPDirection::SOUTH)] = newarea->QueryFieldSigned<int>(i, 11);
-		links[static_cast<int>(WMPDirection::WEST)] = newarea->QueryFieldSigned<int>(i, 12);
+		links[WMPDirection::NORTH] = newarea->QueryFieldUnsigned<ieDword>(i, 9);
+		links[WMPDirection::EAST] = newarea->QueryFieldUnsigned<ieDword>(i, 10);
+		links[WMPDirection::SOUTH] = newarea->QueryFieldUnsigned<ieDword>(i, 11);
+		links[WMPDirection::WEST] = newarea->QueryFieldUnsigned<ieDword>(i, 12);
 		//this is the number of links in the 2da, we don't need it
 		int linksto        = newarea->QueryFieldSigned<int>(i,13);
 
 		unsigned int local = 0;
 		int linkcnt = wmap->GetLinkCount();
-		for (k=0;k<4;k++) {
-			indices[k] = linkcnt;
-			linkcnt += links[k];
-			local += links[k];
+		for (WMPDirection dir : EnumIterator<WMPDirection>()) {
+			indices[dir] = linkcnt;
+			linkcnt += links[dir];
+			local += links[dir];
 		}
 		unsigned int total = linksto+local;
 
@@ -2872,8 +2872,8 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		entry.LocCaptionName = ieStrRef(label);
 		entry.LocTooltipName = ieStrRef(name);
 		entry.LoadScreenResRef.Reset();
-		memcpy(entry.AreaLinksIndex, indices, sizeof(entry.AreaLinksIndex) );
-		memcpy(entry.AreaLinksCount, links, sizeof(entry.AreaLinksCount) );
+		entry.AreaLinksIndex = std::move(indices);
+		entry.AreaLinksCount = std::move(links);
 
 		int newAreaIdx = wmap->GetEntryCount(); // once we add it in the next line
 		wmap->AddAreaEntry(std::move(entry));
@@ -2886,7 +2886,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			for(k=0;k<5;k++) {
 				enc[k]    = newlinks->QueryField(i,5+k);
 			}
-			int linktodir     = newlinks->QueryFieldSigned<int>(j,10);
+			WMPDirection linktodir = EnumIndex<WMPDirection>(newlinks->QueryFieldUnsigned<under_t<WMPDirection>>(j, 10));
 
 			unsigned int areaindex;
 			const WMPAreaEntry *oarea = wmap->GetArea(larea, areaindex);
@@ -2909,7 +2909,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 
 			//first come the local links, then 'links to' this area
 			// if the LINKTO_DIR column has a *, ignore it
-			if (j < local && linktodir != std::numeric_limits<int>::min()) {
+			if (j < local && linktodir != WMPDirection::NONE) {
 				link.AreaIndex = newAreaIdx;
 				//linktodir may need translation
 				wmap->InsertAreaLink(areaindex, linktodir, std::move(link));
