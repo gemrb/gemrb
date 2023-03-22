@@ -27,6 +27,7 @@
 #include "globals.h"
 
 #include "Bitmap.h"
+#include "EnumIndex.h"
 #include "Region.h"
 #include "Sprite2D.h"
 
@@ -71,7 +72,7 @@ class GEM_EXPORT FogRenderer {
 		Point end;
 		Point p0;
 
-		enum FogDirection : uint8_t {
+		enum class Direction : uint8_t {
 			O,
 			N = 1,
 			W = 2,
@@ -80,20 +81,24 @@ class GEM_EXPORT FogRenderer {
 			SW = S|W, // 6
 			E = 8,
 			NE = N|E, // 9
-			SE = S|E  // 12
+			SE = S|E, // 12
+			count
 		};
 
 		// Size of Fog-Of-War shadow tile (and bitmap)
 		static constexpr int CELL_SIZE = 32;
-		static constexpr BlitFlags BAM_FLAGS[] = {
+		static constexpr EnumArray<Direction, BlitFlags> BAM_FLAGS {
 			BlitFlags::NONE, BlitFlags::NONE, BlitFlags::NONE, BlitFlags::NONE,
 			BlitFlags::MIRRORY, BlitFlags::NONE, BlitFlags::MIRRORY,
 			BlitFlags::NONE, BlitFlags::MIRRORX, BlitFlags::MIRRORX,
-			BlitFlags::NONE, BlitFlags::NONE, static_cast<BlitFlags>(BlitFlags::MIRRORX | BlitFlags::MIRRORY)
+			BlitFlags::NONE, BlitFlags::NONE, BlitFlags::MIRRORX | BlitFlags::MIRRORY
 		};
 
 		static constexpr BlitFlags OPAQUE_FOG = BlitFlags::NONE;
-		static constexpr BlitFlags TRANSPARENT_FOG = static_cast<BlitFlags>(BlitFlags::HALFTRANS | BlitFlags::BLENDED);
+		static constexpr BlitFlags TRANSPARENT_FOG = BlitFlags::HALFTRANS | BlitFlags::BLENDED;
+	
+		static EnumArray<Direction, Holder<Sprite2D>> LoadFogSprites();
+		EnumArray<Direction, Holder<Sprite2D>> fogSprites;
 	public:
 		FogRenderer(Video*, bool doBAMRendering = false);
 
@@ -103,14 +108,14 @@ class GEM_EXPORT FogRenderer {
 		Point ConvertPointToScreen(int x, int y) const;
 		static Point ConvertPointToFog(Point p);
 		void DrawExploredCell(Point cellPoint, const Bitmap *mask);
-		void DrawFogCellBAM(Point p, FogDirection direction, BlitFlags flags);
-		void DrawFogCellVertices(Point p, FogDirection direction, BlitFlags flags);
-		bool DrawFogCellByDirection(Point p, FogDirection direction, BlitFlags flags);
-		bool DrawFogCellByDirectionBAMs(Point p, FogDirection direction, BlitFlags flags);
-		bool DrawFogCellByDirectionVertices(Point p, FogDirection direction, BlitFlags flags);
-		void DrawFogSmoothing(Point p, FogDirection direction, BlitFlags flags, FogDirection adjacentDir);
+		void DrawFogCellBAM(Point p, Direction direction, BlitFlags flags);
+		void DrawFogCellVertices(Point p, Direction direction, BlitFlags flags);
+		bool DrawFogCellByDirection(Point p, Direction direction, BlitFlags flags);
+		bool DrawFogCellByDirectionBAMs(Point p, Direction direction, BlitFlags flags);
+		bool DrawFogCellByDirectionVertices(Point p, Direction direction, BlitFlags flags);
+		void DrawFogSmoothing(Point p, Direction direction, BlitFlags flags, Direction adjacentDir);
 		void DrawVisibleCell(Point cellPoint, const Bitmap *mask);
-		void DrawVPBorder(Point p, FogDirection direction, const Region& r, BlitFlags flags);
+		void DrawVPBorder(Point p, Direction direction, const Region& r, BlitFlags flags);
 		void DrawVPBorders();
 		void FillFog(Point p, int numRowItems, BlitFlags flags);
 		static bool IsUncovered(Point cellPoint, const Bitmap *mask);

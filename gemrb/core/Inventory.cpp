@@ -112,7 +112,7 @@ void Inventory::Init()
 	LAST_QUICK=-1;
 	SLOT_LEFT=-1;
 	SLOT_ARMOR=-1;
-	IWD2 = core->HasFeature(GF_HAS_WEAPON_SETS);
+	IWD2 = core->HasFeature(GFFlags::HAS_WEAPON_SETS);
 }
 
 Inventory::~Inventory()
@@ -570,7 +570,7 @@ int Inventory::RemoveItem(const ResRef& resref, unsigned int flags, CREItem **re
 {
 	size_t slot = Slots.size();
 	unsigned int mask = (flags^IE_INV_ITEM_UNDROPPABLE);
-	if (core->HasFeature(GF_NO_DROP_CAN_MOVE) ) {
+	if (core->HasFeature(GFFlags::NO_DROP_CAN_MOVE) ) {
 		mask &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
 	while(slot--) {
@@ -621,7 +621,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype, bool ranged)
 		}
 
 		//check for equipping weapons
-		if (WhyCantEquip(slot, twohanded, ranged) != HCStrings::StringCount) {
+		if (WhyCantEquip(slot, twohanded, ranged) != HCStrings::count) {
 			return ASI_FAILED;
 		}
 
@@ -694,7 +694,7 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 
 		//except the Expired flag
 		temp->Expired=0;
-		if (action==STA_STEAL && !core->HasFeature(GF_PST_STATE_FLAGS)) {
+		if (action==STA_STEAL && !core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 			temp->Flags |= IE_INV_ITEM_STOLEN; // "steel" in pst
 		}
 		temp->Flags &= ~IE_INV_ITEM_SELECTED;
@@ -774,7 +774,7 @@ int Inventory::DepleteItem(ieDword flags) const
 int Inventory::FindItem(const ResRef &resref, unsigned int flags, unsigned int skip) const
 {
 	unsigned int mask = (flags^IE_INV_ITEM_UNDROPPABLE);
-	if (core->HasFeature(GF_NO_DROP_CAN_MOVE) ) {
+	if (core->HasFeature(GFFlags::NO_DROP_CAN_MOVE) ) {
 		mask &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
 	for (size_t i = 0; i < Slots.size(); i++) {
@@ -1012,7 +1012,7 @@ bool Inventory::UnEquipItem(ieDword slot, bool removecurse) const
 	if (!item) {
 		return false;
 	}
-	if (item->Flags & IE_INV_ITEM_UNDROPPABLE && !core->HasFeature(GF_NO_DROP_CAN_MOVE)) {
+	if (item->Flags & IE_INV_ITEM_UNDROPPABLE && !core->HasFeature(GFFlags::NO_DROP_CAN_MOVE)) {
 		return false;
 	}
 
@@ -1632,7 +1632,7 @@ void Inventory::BreakItemSlot(ieDword slot)
 	//if it is the magic weapon slot, don't break it, just remove it, because it couldn't be removed
 	//or for pst, just remove it as there is no breaking (the replacement item is a sound)
 	// also don't break ranged weapons (eg. when running out of throwing axes)
-	if (slot == (unsigned int) SLOT_MAGIC || core->HasFeature(GF_HAS_PICK_SOUND) || Owner->weaponInfo[0].wflags & WEAPON_RANGED) {
+	if (slot == (unsigned int) SLOT_MAGIC || core->HasFeature(GFFlags::HAS_PICK_SOUND) || Owner->weaponInfo[0].wflags & WEAPON_RANGED) {
 		newItem.Reset();
 	} else {
 		newItem = itm->ReplacementItem;
@@ -1916,7 +1916,7 @@ HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 {
 	// check only for hand slots
 	if ((slot<SLOT_MELEE || slot>LAST_MELEE) && (slot != SLOT_LEFT) ) {
-		return HCStrings::StringCount;
+		return HCStrings::count;
 	}
 
 	//magic items have the highest priority
@@ -1957,7 +1957,7 @@ HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 			return HCStrings::OffhandUsed;
 		}
 	}
-	return HCStrings::StringCount;
+	return HCStrings::count;
 }
 
 //recharge items on rest, if rest was partial, recharge only 'hours'

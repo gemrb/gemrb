@@ -131,7 +131,7 @@ void TileMap::UpdateDoors()
 // used during time compression in bg1 ... but potentially problematic, so we don't enable it elsewhere
 void TileMap::AutoLockDoors() const
 {
-	if (!core->HasFeature(GF_RANDOM_BANTER_DIALOGS)) return;
+	if (!core->HasFeature(GFFlags::RANDOM_BANTER_DIALOGS)) return;
 
 	for (Door *door : doors) {
 		if (door->CantAutoClose()) continue;

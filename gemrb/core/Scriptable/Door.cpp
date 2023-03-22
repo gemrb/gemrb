@@ -130,7 +130,7 @@ void Door::ToggleTiles(int State, int playsound)
 	}
 
 	//set door_open as state
-	Flags = (Flags & ~DOOR_OPEN) | (State == !core->HasFeature(GF_REVERSE_DOOR) );
+	Flags = (Flags & ~DOOR_OPEN) | (State == !core->HasFeature(GFFlags::REVERSE_DOOR) );
 }
 
 //this is the short name (not the scripting name)
@@ -157,7 +157,7 @@ void Door::SetDoorLocked(int Locked, int playsound)
 		if (Flags & DOOR_LOCKED) return;
 		Flags|=DOOR_LOCKED;
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
-		if (core->HasFeature(GF_REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
+		if (core->HasFeature(GFFlags::REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
 		if (playsound && !LockSound.IsEmpty())
 			core->GetAudioDrv()->PlayRelative(LockSound, SFX_CHAN_ACTIONS);
 	}
@@ -171,7 +171,7 @@ void Door::SetDoorLocked(int Locked, int playsound)
 
 int Door::IsOpen() const
 {
-	int ret = core->HasFeature(GF_REVERSE_DOOR);
+	int ret = core->HasFeature(GFFlags::REVERSE_DOOR);
 	if (Flags&DOOR_OPEN) {
 		ret = !ret;
 	}
@@ -260,7 +260,7 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigge
 		}
 
 		// in PS:T, opening a door does not unlock it
-		if (!core->HasFeature(GF_REVERSE_DOOR)) {
+		if (!core->HasFeature(GFFlags::REVERSE_DOOR)) {
 			SetDoorLocked(false,playsound);
 		}
 	} else if (addTrigger) {
@@ -282,7 +282,7 @@ bool Door::TryUnlock(Actor *actor) const
 	if (!(Flags&DOOR_LOCKED)) return true;
 
 	// don't remove key in PS:T!
-	bool removekey = !core->HasFeature(GF_REVERSE_DOOR) && Flags&DOOR_KEY;
+	bool removekey = !core->HasFeature(GFFlags::REVERSE_DOOR) && Flags&DOOR_KEY;
 	return Highlightable::TryUnlock(actor, removekey);
 }
 
@@ -328,7 +328,7 @@ void Highlightable::TryDisarm(Actor* actor)
 	int bonus = 0;
 	int trapDC = TrapRemovalDiff;
 
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		skill = actor->GetSkill(IE_TRAPS);
 		roll = core->Roll(1, 20, 0);
 		bonus = actor->GetAbilityBonus(IE_INT);
@@ -346,7 +346,7 @@ void Highlightable::TryDisarm(Actor* actor)
 		AddTrigger(TriggerEntry(trigger_disarmed, actor->GetGlobalID()));
 		//trap removed
 		Trapped = 0;
-		if (core->HasFeature(GF_3ED_RULES)) {
+		if (core->HasFeature(GFFlags::RULES_3ED)) {
 			// ~Successful Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
@@ -358,7 +358,7 @@ void Highlightable::TryDisarm(Actor* actor)
 		core->PlaySound(DS_DISARMED, SFX_CHAN_HITS);
 	} else {
 		AddTrigger(TriggerEntry(trigger_disarmfailed, actor->GetGlobalID()));
-		if (core->HasFeature(GF_3ED_RULES)) {
+		if (core->HasFeature(GFFlags::RULES_3ED)) {
 			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
 		}
@@ -379,7 +379,7 @@ void Door::TryPickLock(Actor* actor)
 		return;
 	}
 	int stat = actor->GetStat(IE_LOCKPICKING);
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		int skill = actor->GetSkill(IE_LOCKPICKING);
 		if (skill == 0) { // a trained skill, make sure we fail
 			stat = 0;
@@ -413,7 +413,7 @@ void Door::TryBashLock(Actor *actor)
 	int bonus;
 	unsigned int roll;
 
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		bonus = actor->GetAbilityBonus(IE_STR);
 		roll = actor->LuckyRoll(1, 100, bonus, 0);
 	} else {
@@ -424,7 +424,7 @@ void Door::TryBashLock(Actor *actor)
 	}
 
 	actor->FaceTarget(this);
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~
 		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, GUIColors::LIGHTGREY, actor, roll, bonus, LockDifficulty);
 	}

@@ -27,6 +27,7 @@
 #ifndef DISPLAYMESSAGE_H
 #define DISPLAYMESSAGE_H
 
+#include "EnumIndex.h"
 #include "exports.h"
 #include "strrefs.h"
 #include "StringMgr.h"
@@ -40,8 +41,7 @@ namespace GemRB {
 /** 
  * Indices for externalized GUI colors in colors.2da
  **/
-enum class GUIColors {
-	FIRST_COLOR,
+enum class GUIColors : uint8_t {
 	TOOLTIP = 0,
 	TOOLTIPBG,
 	MAPICNBG,
@@ -61,7 +61,8 @@ enum class GUIColors {
 	FLOAT_TXT_ACTOR,
 	FLOAT_TXT_INFO,
 	FLOAT_TXT_OTHER,
-	LAST_COLOR
+
+	count
 };
 
 class Scriptable;
@@ -71,9 +72,10 @@ class GEM_EXPORT DisplayMessage
 private:
 	struct StrRefs {
 		std::string loadedTable;
-		std::array<ieStrRef, static_cast<int>(HCStrings::StringCount)> table;
-		std::array<int, static_cast<int>(HCStrings::StringCount)> flags;
-		std::map<int, std::pair<ieStrRef, ieStrRef>> extraRefs;
+		EnumArray<HCStrings, ieStrRef> table;
+		EnumArray<HCStrings, int> flags;
+
+		std::map<HCStrings, std::pair<ieStrRef, ieStrRef>> extraRefs;
 
 		StrRefs();
 		bool LoadTable(const std::string& name);

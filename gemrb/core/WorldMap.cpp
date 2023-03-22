@@ -86,7 +86,7 @@ Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam)
 ieDword WMPAreaEntry::GetAreaStatus() const
 {
 	ieDword tmp = AreaStatus;
-	if (core->HasFeature(GF_KNOW_WORLD) ) {
+	if (core->HasFeature(GFFlags::KNOW_WORLD) ) {
 		tmp |=WMP_ENTRY_VISITED;
 	}
 	return tmp;
@@ -119,15 +119,15 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry&& ae)
 	}
 }
 
-void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLink&& arealink)
+void WorldMap::InsertAreaLink(unsigned int areaidx, WMPDirection dir, WMPAreaLink&& arealink)
 {
-	unsigned int idx = area_entries[areaidx].AreaLinksIndex[dir];
+	ieDword idx = area_entries[areaidx].AreaLinksIndex[dir];
 	area_links.emplace(area_links.begin()+idx, std::move(arealink));
 
 	size_t max = area_entries.size();
 	for (unsigned int pos = 0; pos < max; pos++) {
 		WMPAreaEntry& ae = area_entries[pos];
-		for (unsigned int k=0;k<4;k++) {
+		for (WMPDirection k : EnumIterator<WMPDirection>()) {
 			if ((pos==areaidx) && (k==dir)) {
 				ae.AreaLinksCount[k]++;
 				continue;
@@ -226,18 +226,13 @@ const WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned 
 
 //this is a pathfinding algorithm
 //you have to find the optimal path
-int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
+int WorldMap::CalculateDistances(const ResRef& areaName, WMPDirection direction)
 {
 	//first, update reachable/visible areas by worlde.2da if exists
 	UpdateReachableAreas();
 	UpdateAreaVisibility(areaName, direction);
-	if (direction==-1) {
+	if (direction == WMPDirection::NONE) {
 		return 0;
-	}
-
-	if (direction<0 || direction>3) {
-		Log(ERROR, "WorldMap", "CalculateDistances for invalid direction: {}", areaName);
-		return -1;
 	}
 
 	unsigned int i;
@@ -264,12 +259,12 @@ int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 		const WMPAreaEntry& ae = area_entries[i];
 		std::fill(seen_entry.begin(), seen_entry.end(), -1);
 		//all directions should be used
-		for(int d=0;d<4;d++) {
+		for (WMPDirection d : EnumIterator<WMPDirection>()) {
 			int j=ae.AreaLinksIndex[d];
 			int k=j+ae.AreaLinksCount[d];
 			if ((size_t) k>area_links.size()) {
 				Log(ERROR, "WorldMap", "The worldmap file is corrupted... and it would crash right now! Entry #: {} Direction: {}",
-					i, d);
+					i, UnderType(d));
 				break;
 			}
 			for(;j<k;j++) {
@@ -307,7 +302,7 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 	unsigned int cnt = GetEntryCount();
 	for (unsigned int i = 0; i < cnt; i++) {
 		const WMPAreaEntry& ae = area_entries[i];
-		for (int direction=0;direction<4;direction++)
+		for (WMPDirection direction : EnumIterator<WMPDirection>())
 		{
 			int j=ae.AreaLinksIndex[direction];
 			if (link_index < j) continue;
@@ -330,9 +325,9 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B)
 	}
 
 	//looking for destination area, returning the first link found
-	for (i = 0; i < 4; i++) {
-		unsigned int j = ae->AreaLinksCount[i];
-		unsigned int k = ae->AreaLinksIndex[i];
+	for (WMPDirection dir : EnumIterator<WMPDirection>()) {
+		unsigned int j = ae->AreaLinksCount[dir];
+		unsigned int k = ae->AreaLinksIndex[dir];
 		while(j--) {
 			WMPAreaLink& al = area_links[k++];
 			const WMPAreaEntry& ae2 = area_entries[al.AreaIndex];
@@ -440,13 +435,13 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	lsrc.DistanceScale /= 2;
 	lsrc.EncounterChance = 0;
 
-	size_t idx = area_links.size();
+	ieDword idx = Clamp<ieDword>(area_links.size());
 	AddAreaLink(std::move(ldest));
 	AddAreaLink(std::move(lsrc));
 
-	for (i = 0; i < 4; ++i) {
-		ae.AreaLinksCount[i] = 2;
-		ae.AreaLinksIndex[i] = static_cast<ieDword>(idx);
+	for (WMPDirection dir : EnumIterator<WMPDirection>()) {
+		ae.AreaLinksCount[dir] = 2;
+		ae.AreaLinksIndex[dir] = idx;
 	}
 	
 	encounterArea = area_entries.size();
@@ -464,8 +459,8 @@ void WorldMap::ClearEncounterArea()
 	//NOTE: if anything else added links after us we'd have to globally
 	//update all link indices, but since ambush areas do not allow
 	//saving/loading we should be okay with this
-	area_links.erase(area_links.begin() + ea.AreaLinksIndex[0],
-		area_links.begin() + ea.AreaLinksIndex[0] + ea.AreaLinksCount[0]);
+	auto begin = area_links.begin() + ea.AreaLinksIndex[WMPDirection::NORTH];
+	area_links.erase(begin, begin + ea.AreaLinksCount[WMPDirection::NORTH]);
 
 	area_entries.erase(area_entries.begin() + encounterArea);
 	encounterArea = -1;
@@ -480,7 +475,7 @@ int WorldMap::GetDistance(const ResRef& areaName) const
 	return -1;
 }
 
-void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
+void WorldMap::UpdateAreaVisibility(const ResRef& areaName, WMPDirection direction)
 {
 	unsigned int i;
 
@@ -491,8 +486,6 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 	Log(DEBUG, "WorldMap", "Updated Area visibility: {} (visited, accessible and visible)", areaName);
 
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
-	if (direction<0 || direction>3)
-		return;
 	i=ae->AreaLinksCount[direction];
 	while (i--) {
 		const WMPAreaLink& al = area_links[ae->AreaLinksIndex[direction] + i];

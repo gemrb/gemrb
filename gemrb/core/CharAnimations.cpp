@@ -660,7 +660,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	GlobalColorMod.rgb = Color();
 
 	AvatarsRowNum = GetAvatarsCount();
-	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
+	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID) ) {
 		ieDword tmp = AnimID&0xf000;
 		if (tmp==0x6000 || tmp==0xe000) {
 			AnimID&=0xff;
@@ -2791,10 +2791,10 @@ void CharAnimations::PulseRGBModifiers()
 		}
 	}
 
-	for (size_t i = 0; i < PAL_MAX; ++i) {
+	for (const PaletteType i : EnumIterator<PaletteType, PAL_MAIN, PAL_MAX>()) {
 		if (change[i]) {
 			change[i] = false;
-			SetupColors((PaletteType) i);
+			SetupColors(i);
 		}
 	}
 

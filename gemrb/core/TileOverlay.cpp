@@ -75,11 +75,11 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr> &over
 					const Tile &ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile.om & mask) {
 						//draw overlay tiles, they should be half transparent except for BG1
-						BlitFlags transFlag = (core->HasFeature(GF_LAYERED_WATER_TILES)) ? BlitFlags::HALFTRANS : BlitFlags::NONE;
+						BlitFlags transFlag = (core->HasFeature(GFFlags::LAYERED_WATER_TILES)) ? BlitFlags::HALFTRANS : BlitFlags::NONE;
 						// this is the water (or whatever)
 						vid->BlitGameSprite(ovtile.GetAnimation(0)->NextFrame(), p, flags | transFlag, tintcol);
 
-						if (core->HasFeature(GF_LAYERED_WATER_TILES)) {
+						if (core->HasFeature(GFFlags::LAYERED_WATER_TILES)) {
 							Animation* anim1 = tile.GetAnimation(1);
 							if (anim1) {
 								// this is the mask to blend the terrain tile with the water for everything but BG1

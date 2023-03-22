@@ -616,7 +616,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		}
 	}
 
-	if (core->HasFeature(GF_ONSCREEN_TEXT) && !DisplayText.empty()) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && !DisplayText.empty()) {
 		Font::PrintColors colors = { displaymsg->GetColor(GUIColors::FLOAT_TXT_INFO), ColorBlack };
 		core->GetTextFont()->Print(screen, DisplayText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, colors);
 		if (!(DialogueFlags & DF_FREEZE_SCRIPTS)) {
@@ -1139,7 +1139,7 @@ String GameControl::TooltipText() const {
 
 	static String tip; // only one game control and we return a const& so cant be temporary.
 	// pst ignores TalkCount
-	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		tip = actor->GetName();
 	} else {
 		tip = actor->GetDefaultName();
@@ -1149,7 +1149,7 @@ String GameControl::TooltipText() const {
 	int maxhp = actor->GetStat(IE_MAXHITPOINTS);
 
 	if (actor->InParty) {
-		if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 			tip += L": ";
 		} else {
 			tip += L"\n";
@@ -2044,7 +2044,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 
 	switch(me.button) {
 	case GEM_MB_MENU: //right click.
-		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
+		if (core->HasFeature(GFFlags::HAS_FLOAT_MENU) && !Mod) {
 			ScriptEngine::FunctionParameters params;
 			params.push_back(ScriptEngine::Parameter(p));
 			core->GetGUIScriptEngine()->RunFunction("GUICommon", "OpenFloatMenuWindow", params, false);
@@ -2081,7 +2081,7 @@ static const ResRefMap<std::vector<ResRef>> pstWMapExits {
 // has to be a plain travel region and on the whitelist
 bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 {
-	if (!core->HasFeature(GF_TEAM_MOVEMENT)) return false;
+	if (!core->HasFeature(GFFlags::TEAM_MOVEMENT)) return false;
 
 	bool keyAreaVisited = CheckVariable(pc, "AR0500_Visited", "GLOBAL") == 1;
 	if (!keyAreaVisited) return false;
@@ -2118,7 +2118,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	Point p = ConvertPointFromScreen(me.Pos()) + vpOrigin;
 	bool isDoubleClick = me.repeats == 2;
 	bool tryToRun = isDoubleClick;
-	if (core->HasFeature(GF_HAS_FLOAT_MENU)) {
+	if (core->HasFeature(GFFlags::HAS_FLOAT_MENU)) {
 		tryToRun |= Mod & GEM_MOD_SHIFT;
 	}
 
@@ -2127,7 +2127,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		ieDword actionLevel;
 		core->GetDictionary()->Lookup("ActionLevel", actionLevel);
 		if (target_mode != TARGET_MODE_NONE || actionLevel) {
-			if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
+			if (!core->HasFeature(GFFlags::HAS_FLOAT_MENU)) {
 				SetTargetMode(TARGET_MODE_NONE);
 			}
 			// update the action bar
@@ -2201,10 +2201,10 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	}
 
 	// handle movement/travel, but not if we just opened the float window
-	if ((!core->HasFeature(GF_HAS_FLOAT_MENU) || me.button != GEM_MB_MENU) && lastCursor != IE_CURSOR_BLOCKED && lastCursor != IE_CURSOR_NORMAL) {
+	if ((!core->HasFeature(GFFlags::HAS_FLOAT_MENU) || me.button != GEM_MB_MENU) && lastCursor != IE_CURSOR_BLOCKED && lastCursor != IE_CURSOR_NORMAL) {
 		// pst has different mod keys
 		int modKey = GEM_MOD_SHIFT;
-		if (core->HasFeature(GF_HAS_FLOAT_MENU)) modKey = GEM_MOD_CTRL;
+		if (core->HasFeature(GFFlags::HAS_FLOAT_MENU)) modKey = GEM_MOD_CTRL;
 		CommandSelectedMovement(p, Mod & modKey, tryToRun);
 	}
 	ClearMouseState();
@@ -2240,7 +2240,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	} else if (overInfoPoint) {
 		if (overInfoPoint->Type==ST_TRAVEL && target_mode == TARGET_MODE_NONE) {
 			ieDword exitID = overInfoPoint->GetGlobalID();
-			if (core->HasFeature(GF_TEAM_MOVEMENT)) {
+			if (core->HasFeature(GFFlags::TEAM_MOVEMENT)) {
 				// pst forces everyone to travel (eg. ar0201 outside_portal)
 				int i = game->GetPartySize(false);
 				while(i--) {
@@ -2401,7 +2401,7 @@ void GameControl::PerformActionOn(Actor *actor)
 			if (!game->selected.empty()) {
 				//if we are in PST modify this to NO!
 				Actor *source;
-				if (core->HasFeature(GF_PROTAGONIST_TALKS) ) {
+				if (core->HasFeature(GFFlags::PROTAGONIST_TALKS) ) {
 					source = game->GetPC(0, false); //protagonist
 				} else {
 					source = core->GetFirstSelectedPC(false);

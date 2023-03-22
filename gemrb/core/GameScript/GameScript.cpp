@@ -1430,8 +1430,8 @@ void InitializeIEScript()
 
 	PluginMgr::Get()->RegisterCleanup(CleanupIEScript);
 
-	NoCreate = core->HasFeature(GF_NO_NEW_VARIABLES);
-	HasKaputz = core->HasFeature(GF_HAS_KAPUTZ);
+	NoCreate = core->HasFeature(GFFlags::NO_NEW_VARIABLES);
+	HasKaputz = core->HasFeature(GFFlags::HAS_KAPUTZ);
 
 	InitScriptTables();
 	int tT = core->LoadSymbol( "trigger" );
@@ -2049,7 +2049,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 					// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
 					// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
 					// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
-					if (core->HasFeature(GF_3ED_RULES) && done) {
+					if (core->HasFeature(GFFlags::RULES_3ED) && done) {
 						*done = true;
 					}
 					return false;
@@ -2257,7 +2257,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 	for (const Trigger *tR : triggers) {
 		//do not evaluate triggers in an Or() block if one of them
 		//was already True() ... but this sane approach was only used in iwd2!
-		if (!core->HasFeature(GF_EFFICIENT_OR) || !ORcount || !subresult) {
+		if (!core->HasFeature(GFFlags::EFFICIENT_OR) || !ORcount || !subresult) {
 			result = tR->Evaluate(Sender);
 		}
 		if (result > 1) {
@@ -2389,10 +2389,10 @@ static void HandleActionOverride(Scriptable* target, const Action* aC)
 	// it shouldn't matter that we set it on all
 	newAction->flags |= ACF_OVERRIDE;
 
-	if (core->HasFeature(GF_CLEARING_ACTIONOVERRIDE)) {
+	if (core->HasFeature(GFFlags::CLEARING_ACTIONOVERRIDE)) {
 		// bg2, but not iwd2, clears the previous non-actionoverriden actions in the queue
 		target->ClearActions(1);
-	} else if (core->HasFeature(GF_3ED_RULES)) { // iwd2
+	} else if (core->HasFeature(GFFlags::RULES_3ED)) { // iwd2
 		// it was more complicated, always releasing if the game was paused — not something to replicate
 		if (target->CurrentActionInterruptable) {
 			target->ReleaseCurrentAction();

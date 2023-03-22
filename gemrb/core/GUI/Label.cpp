@@ -54,7 +54,7 @@ void Label::SetText(String string)
 {
 	Text = std::move(string);
 	if (Alignment == IE_FONT_ALIGN_CENTER
-		&& core->HasFeature( GF_LOWER_LABEL_TEXT )) {
+		&& core->HasFeature( GFFlags::LOWER_LABEL_TEXT )) {
 		StringToLower(Text);
 	}
 	MarkDirty();
@@ -76,7 +76,7 @@ void Label::SetAlignment(unsigned char newAlignment)
 		newAlignment |= IE_FONT_NO_CALC;
 	}
 	Alignment = newAlignment;
-	if (newAlignment == IE_FONT_ALIGN_CENTER && core->HasFeature(GF_LOWER_LABEL_TEXT)) {
+	if (newAlignment == IE_FONT_ALIGN_CENTER && core->HasFeature(GFFlags::LOWER_LABEL_TEXT)) {
 		StringToLower(Text);
 	}
 	MarkDirty();

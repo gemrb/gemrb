@@ -65,12 +65,12 @@ static int GetCGSound(ieDword CastingGraphics)
 		return -1;
 	}
 	int ret = -1;
-	if (core->HasFeature(GF_CASTING_SOUNDS) ) {
+	if (core->HasFeature(GFFlags::CASTING_SOUNDS) ) {
 		ret = gamedata->castingSounds[CastingGraphics];
-		if (core->HasFeature(GF_CASTING_SOUNDS2) ) {
+		if (core->HasFeature(GFFlags::CASTING_SOUNDS2) ) {
 			ret |= 0x100;
 		}
-	} else if (!core->HasFeature(GF_CASTING_SOUNDS2)) {
+	} else if (!core->HasFeature(GFFlags::CASTING_SOUNDS2)) {
 		ret = gamedata->castingSounds[CastingGraphics];
 	}
 	return ret;
@@ -123,7 +123,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadWord(s->unknown5);
 	str->ReadResRef( s->SpellbookIcon );
 	//this hack is needed in ToB at least
-	if (!s->SpellbookIcon.IsEmpty() && core->HasFeature(GF_SPELLBOOKICONHACK)) {
+	if (!s->SpellbookIcon.IsEmpty() && core->HasFeature(GFFlags::SPELLBOOKICONHACK)) {
 		*s->SpellbookIcon.rbegin() = 'c'; // replace last character
 	}
 

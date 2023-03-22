@@ -55,15 +55,15 @@ String DisplayMessage::ResolveStringRef(ieStrRef stridx)
 
 DisplayMessage::StrRefs::StrRefs()
 {
-	table.fill(ieStrRef::INVALID);
+	std::fill(table.begin(), table.end(), ieStrRef::INVALID);
 }
 
 bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 {
 	AutoTable tab = gamedata->LoadTable(name);
 	if (tab) {
-		for (int i = 0; i < static_cast<int>(HCStrings::StringCount); i++) {
-			table[i] = tab->QueryFieldAsStrRef(i, 0);
+		for (const HCStrings i : EnumIterator<HCStrings>()) {
+			table[i] = tab->QueryFieldAsStrRef(UnderType(i), 0);
 		}
 		loadedTable = name;
 	} else {
@@ -74,10 +74,10 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 	// only pst has flags and complications
 	// they could have repurposed more verbal constants, but no, they built another layer instead
 	if (tab->QueryField(0, 1) != tab->QueryDefault()) {
-		for (int i = 0; i < static_cast<int>(HCStrings::StringCount); i++) {
-			std::string flag = tab->QueryField(i, 1);
+		for (const HCStrings i : EnumIterator<HCStrings>()) {
+			const std::string& flag = tab->QueryField(UnderType(i), 1);
 			if (flag.length() == 1) {
-				flags[i] = atoi(flag.c_str());
+				flags[i] = flag[0] - '0';
 			} else {
 				flags[i] = -1;
 				const auto& parts = Explode(flag, ':');
@@ -92,18 +92,17 @@ bool DisplayMessage::StrRefs::LoadTable(const std::string& name)
 
 ieStrRef DisplayMessage::StrRefs::Get(HCStrings idx, const Scriptable* speaker) const
 {
-	int sub = static_cast<int>(idx);
-	if (idx < HCStrings::StringCount) {
-		if (flags[sub] == 0 || !speaker || speaker->Type != ST_ACTOR) {
-			return table[sub];
+	if (idx < HCStrings::count) {
+		if (flags[idx] == 0 || !speaker || speaker->Type != ST_ACTOR) {
+			return table[idx];
 		}
 
 		// handle PST personalized strings
 		const Actor* gabber = Scriptable::As<Actor>(speaker);
-		if (flags[sub] == -1) {
-			if (gabber->GetStat(IE_SPECIFIC) == 2) return table[sub]; // TNO
-			if (gabber->GetStat(IE_SPECIFIC) == 8) return extraRefs.at(sub).first; // Annah
-			return extraRefs.at(sub).second; // anyone else
+		if (flags[idx] == -1) {
+			if (gabber->GetStat(IE_SPECIFIC) == 2) return table[idx]; // TNO
+			if (gabber->GetStat(IE_SPECIFIC) == 8) return extraRefs.at(idx).first; // Annah
+			return extraRefs.at(idx).second; // anyone else
 		}
 
 		// handle flags mode 1 and 2
@@ -114,13 +113,13 @@ ieStrRef DisplayMessage::StrRefs::Get(HCStrings idx, const Scriptable* speaker) 
 		const std::array<int, 8> spec2offset = { 0, 7, 5, 6, 4, 3, 2, 1 };
 		if (specific >= 2 && specific <= 9) {
 			pcOffset = spec2offset[specific - 2];
-		} else if (flags[sub] == 2) {
+		} else if (flags[idx] == 2) {
 			pcOffset = spec2offset.size();
 		} else { // rare, but could happen
 			pcOffset = 6; // use Ignus as fallback
 		}
 
-		return ieStrRef(int(table[sub]) + pcOffset);
+		return ieStrRef(int(table[idx]) + pcOffset);
 	}
 	return ieStrRef::INVALID;
 }
@@ -204,7 +203,7 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 //simply displaying a constant string
 void DisplayMessage::DisplayConstantString(HCStrings stridx, GUIColors color, Scriptable* target) const
 {
-	if (stridx > HCStrings::StringCount) return;
+	if (stridx > HCStrings::count) return;
 	String text = core->GetString(SRefs.Get(stridx, target), STRING_FLAGS::SOUND);
 	DisplayString(text, GetColor(color), target);
 }
@@ -239,11 +238,8 @@ std::map<GUIColors, std::string> DisplayMessage::GetAllColors() const
 	std::map<GUIColors, std::string> auxiliaryColors;
 	AutoTable colorTable = gamedata->LoadTable("colors", true);
 	assert(colorTable);
-	TableMgr::index_t index = static_cast<TableMgr::index_t>(GUIColors::FIRST_COLOR);
-	TableMgr::index_t finish = static_cast<TableMgr::index_t>(GUIColors::LAST_COLOR);
-	while (index < finish) {
-		auxiliaryColors[static_cast<GUIColors>(index)] = colorTable->GetRowName(index);
-		index++;
+	for (const GUIColors c : EnumIterator<GUIColors>()) {
+		auxiliaryColors[c] = colorTable->GetRowName(UnderType(c));
 	}
 	return auxiliaryColors;
 }
@@ -277,7 +273,7 @@ void DisplayMessage::DisplayString(const String& text, GUIColors color, Scriptab
 // blah : whatever
 void DisplayMessage::DisplayConstantStringValue(HCStrings stridx, GUIColors color, ieDword value) const
 {
-	if (stridx > HCStrings::StringCount) return;
+	if (stridx > HCStrings::count) return;
 	String text = core->GetString(SRefs.Get(stridx, nullptr), STRING_FLAGS::SOUND);
 	DisplayMarkupString(fmt::format(DisplayFormatValue, GetColor(color).Packed(), text, value));
 }
@@ -286,7 +282,7 @@ void DisplayMessage::DisplayConstantStringValue(HCStrings stridx, GUIColors colo
 // <charname> - blah blah : whatever
 void DisplayMessage::DisplayConstantStringNameString(HCStrings stridx, GUIColors color, HCStrings stridx2, const Scriptable* actor) const
 {
-	if (stridx > HCStrings::StringCount) return;
+	if (stridx > HCStrings::count) return;
 
 	String name;
 	Color actor_color = GetSpeakerColor(name, actor);
@@ -305,7 +301,7 @@ void DisplayMessage::DisplayConstantStringNameString(HCStrings stridx, GUIColors
 // <charname> - blah blah
 void DisplayMessage::DisplayConstantStringName(HCStrings stridx, const Color& color, const Scriptable* speaker) const
 {
-	if (stridx > HCStrings::StringCount) return;
+	if (stridx > HCStrings::count) return;
 	if(!speaker) return;
 
 	String text = core->GetString(SRefs.Get(stridx, speaker), STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
@@ -322,7 +318,7 @@ void DisplayMessage::DisplayConstantStringName(HCStrings stridx, GUIColors color
 //Treats the constant string as a numeric format string, otherwise like the previous method
 void DisplayMessage::DisplayConstantStringNameValue(HCStrings stridx, GUIColors color, const Scriptable* speaker, int value) const
 {
-	if (stridx > HCStrings::StringCount) return;
+	if (stridx > HCStrings::count) return;
 	if(!speaker) return;
 	String fmt = core->GetString(SRefs.Get(stridx, speaker), STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::RESOLVE_TAGS);
 	DisplayStringName(fmt::format(fmt, value), GetColor(color), speaker);
@@ -332,7 +328,7 @@ void DisplayMessage::DisplayConstantStringNameValue(HCStrings stridx, GUIColors 
 // <charname> - blah blah <someoneelse>
 void DisplayMessage::DisplayConstantStringAction(HCStrings stridx, GUIColors color, const Scriptable* attacker, const Scriptable* target) const
 {
-	if (stridx > HCStrings::StringCount) return;
+	if (stridx > HCStrings::count) return;
 
 	String name1, name2;
 
@@ -379,7 +375,7 @@ void DisplayMessage::DisplayMsgAtLocation(HCStrings strIdx, int type, Scriptable
 {
 	if (!core->HasFeedback(type)) return;
 
-	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 		ieStrRef msg = GetStringReference(strIdx, trigger);
 		Color colorRef = GetColor(color);
 		owner->overHead.SetText(core->GetString(msg), true, true, colorRef);
@@ -396,7 +392,7 @@ void DisplayMessage::DisplayMsgCentered(HCStrings strIdx, int type, GUIColors co
 {
 	if (!core->HasFeedback(type)) return;
 
-	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 		core->GetGameControl()->SetDisplayText(strIdx, 30);
 	} else {
 		DisplayConstantString(strIdx, color);

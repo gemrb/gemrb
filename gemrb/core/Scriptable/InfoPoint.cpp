@@ -47,8 +47,8 @@ InfoPoint::InfoPoint(void)
 		//0     - PST - no such flag
 		//0x200 - IWD2 - it has no TRAP_NONPC flag, the usepoint flag takes it over
 		//0x400 - all other engines (some don't use it)
-		if (core->HasFeature(GF_USEPOINT_400)) TRAP_USEPOINT = _TRAP_USEPOINT;
-		else if (core->HasFeature(GF_USEPOINT_200)) TRAP_USEPOINT = _TRAVEL_NONPC;
+		if (core->HasFeature(GFFlags::USEPOINT_400)) TRAP_USEPOINT = _TRAP_USEPOINT;
+		else if (core->HasFeature(GFFlags::USEPOINT_200)) TRAP_USEPOINT = _TRAVEL_NONPC;
 		else TRAP_USEPOINT = 0;
 	}
 }
@@ -78,7 +78,7 @@ int InfoPoint::CheckTravel(const Actor *actor) const
 	}
 
 	// pst doesn't care about distance, selection or the party bit at all
-	static const bool teamMove = core->HasFeature(GF_TEAM_MOVEMENT);
+	static const bool teamMove = core->HasFeature(GFFlags::TEAM_MOVEMENT);
 	if (pm && ((Flags&TRAVEL_PARTY) || teamMove)) {
 		if (teamMove || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 			return CT_WHOLE;
@@ -109,12 +109,12 @@ bool InfoPoint::CanDetectTrap() const
 }
 
 // returns true if the infopoint is a PS:T portal
-// GF_REVERSE_DOOR is the closest game feature (exists only in PST, and about area objects)
+// GFFlags::REVERSE_DOOR is the closest game feature (exists only in PST, and about area objects)
 bool InfoPoint::IsPortal() const
 {
 	if (Type!=ST_TRAVEL) return false;
 	if (Cursor != IE_CURSOR_PORTAL) return false;
-	return core->HasFeature(GF_REVERSE_DOOR);
+	return core->HasFeature(GFFlags::REVERSE_DOOR);
 }
 
 // returns the appropriate cursor over an active region (trap, infopoint, travel region)

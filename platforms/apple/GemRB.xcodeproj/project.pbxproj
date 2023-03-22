@@ -405,6 +405,7 @@
 		A2A6A45C146893CC000F1688 /* TTFFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A6A459146893CC000F1688 /* TTFFontManager.cpp */; };
 		A2AAF33A13A14A4500AE8402 /* SDLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */; };
 		A2AF8FC714DDCE47005CAC5D /* Vorbis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */; };
+		A2AFB0DB29CA276D00771698 /* EnumIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = A2AFB0DA29CA276D00771698 /* EnumIndex.h */; };
 		A2B0CCD51486FF710074E54B /* FontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D2498143BEA4200A27897 /* FontManager.cpp */; };
 		A2B67A6B16B1DFC100577415 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B67A6816B1DF6500577415 /* CoreFoundation.framework */; };
 		A2BC43392822246400BD4D73 /* BlitRGBA.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
@@ -1532,6 +1533,7 @@
 		A2AAF38D13A150D700AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A2AAF39313A150F900AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		A2AF8FC614DDCE47005CAC5D /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = /Library/Frameworks/Vorbis.framework; sourceTree = "<absolute>"; };
+		A2AFB0DA29CA276D00771698 /* EnumIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumIndex.h; sourceTree = "<group>"; };
 		A2B67A6816B1DF6500577415 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		A2BC43372822246400BD4D73 /* BlitRGBA.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BlitRGBA.glsl; sourceTree = "<group>"; };
 		A2BC433C28296D5700BD4D73 /* Format.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Format.h; sourceTree = "<group>"; };
@@ -5178,8 +5180,6 @@
 		A2BF9F8C1395FF61006ADC12 /* core */ = {
 			isa = PBXGroup;
 			children = (
-				A29943F4297F2F2100947AA3 /* FogRenderer.cpp */,
-				A29943F5297F2F2100947AA3 /* FogRenderer.h */,
 				A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */,
 				A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */,
 				A2BF9F901395FF61006ADC12 /* Ambient.h */,
@@ -5218,10 +5218,13 @@
 				A2BF9FBC1395FF61006ADC12 /* EffectQueue.cpp */,
 				A2BF9FBD1395FF61006ADC12 /* EffectQueue.h */,
 				A25F91FB269CE6440045F07A /* EnumFlags.h */,
+				A2AFB0DA29CA276D00771698 /* EnumIndex.h */,
 				A2BF9FBE1395FF61006ADC12 /* Factory.cpp */,
 				A2BF9FBF1395FF61006ADC12 /* Factory.h */,
 				A2BF9FC11395FF61006ADC12 /* FactoryObject.h */,
 				A2D33FEA24C203110081AC31 /* FibonacciHeap.h */,
+				A29943F4297F2F2100947AA3 /* FogRenderer.cpp */,
+				A29943F5297F2F2100947AA3 /* FogRenderer.h */,
 				A28D2498143BEA4200A27897 /* FontManager.cpp */,
 				A28D249B143BEA5800A27897 /* FontManager.h */,
 				A2BF9FC41395FF61006ADC12 /* Game.cpp */,
@@ -7920,6 +7923,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */,
+				A2AFB0DB29CA276D00771698 /* EnumIndex.h in Headers */,
 				A281CE0F256F11BA00058D76 /* SDLPixelIterator.h in Headers */,
 				A2E66351139E882900310FC8 /* Ambient.h in Headers */,
 				A2E66353139E882900310FC8 /* AmbientMgr.h in Headers */,

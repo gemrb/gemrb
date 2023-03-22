@@ -119,7 +119,7 @@ namespace GemRB {
 #define AV_NO_BODY_HEAT                 1
 #define AV_BUFFET_IMMUNITY              0x1000
 
-enum PaletteType {
+enum PaletteType : uint8_t {
 	PAL_MAIN,
 	PAL_MAIN_2,
 	PAL_MAIN_3,

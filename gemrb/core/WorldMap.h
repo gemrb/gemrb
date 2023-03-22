@@ -32,6 +32,7 @@
 #include "ie_types.h"
 
 #include "AnimationFactory.h"
+#include "EnumIndex.h"
 #include "Sprite2D.h"
 
 #include <vector>
@@ -39,12 +40,13 @@
 namespace GemRB {
 
 /** this is the physical order the links appear in WMPAreaEntry */
-enum class WMPDirection {
-	NONE = -1,
+enum class WMPDirection : uint8_t {
+	NONE = 0xff,
 	NORTH = 0,
 	WEST = 1,
 	SOUTH = 2,
-	EAST = 3
+	EAST = 3,
+	count
 };
 
 /** Area is visible on WorldMap */
@@ -94,8 +96,8 @@ public:
 	ieStrRef LocCaptionName = ieStrRef::INVALID;
 	ieStrRef LocTooltipName = ieStrRef::INVALID;
 	ResRef LoadScreenResRef;
-	ieDword AreaLinksIndex[4]{};
-	ieDword AreaLinksCount[4]{};
+	EnumArray<WMPDirection, ieDword> AreaLinksIndex;
+	EnumArray<WMPDirection, ieDword> AreaLinksCount;
 };
 
 /**
@@ -150,12 +152,12 @@ public:
 	int GetLinkCount() const { return (int) area_links.size(); }
 	const WMPAreaLink *GetLink(unsigned int index) const { return &area_links[index]; }
 	void SetAreaEntry(unsigned int index, WMPAreaEntry&& areaentry);
-	void InsertAreaLink(unsigned int idx, unsigned int dir, WMPAreaLink&& arealink);
+	void InsertAreaLink(unsigned int idx, WMPDirection dir, WMPAreaLink&& arealink);
 	void SetAreaLink(unsigned int index, const WMPAreaLink *arealink);
 	void AddAreaEntry(WMPAreaEntry&& ae);
 	void AddAreaLink(WMPAreaLink&& al);
 	/** Calculates the distances from A, call this when first on an area */
-	int CalculateDistances(const ResRef& A, int direction);
+	int CalculateDistances(const ResRef& A, WMPDirection direction);
 	/** Returns the precalculated distance to area B */
 	int GetDistance(const ResRef& A) const;
 	/** Returns the link between area A and area B */
@@ -175,7 +177,7 @@ public:
 	void ClearEncounterArea();
 private:
 	/** updates visibility of adjacent areas, called from CalculateDistances */
-	void UpdateAreaVisibility(const ResRef& areaName, int direction);
+	void UpdateAreaVisibility(const ResRef& areaName, WMPDirection direction);
 	/** internal function to calculate the distances from areaindex */
 	void CalculateDistance(int areaindex, int direction);
 	unsigned int WhoseLinkAmI(int link_index) const;

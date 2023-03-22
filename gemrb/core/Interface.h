@@ -387,7 +387,7 @@ private:
 	Game* game = nullptr;
 	Calendar* calendar = nullptr;
 	WorldMapArray* worldmap = nullptr;
-	ieDword GameFeatures[(GF_COUNT+31)/32]{};
+	EnumBitset<GFFlags> GameFeatures;
 	ResRef MainCursorsImage;
 	ResRef TextCursorBam;
 	ResRef ScrollCursorBam;
@@ -450,7 +450,6 @@ public:
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
 
 	std::vector<Holder<Sprite2D> > Cursors;
-	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<ieVariable> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
@@ -463,9 +462,9 @@ public:
 	
 	int Init(const InterfaceConfig* config);
 	//TODO: Core Methods in Interface Class
-	void SetFeature(int value, int position);
-	/* don't rely on the exact return value of this function */
-	ieDword HasFeature(int position) const;
+	void SetFeature(GFFlags flag);
+	void ClearFeature(GFFlags flag);
+	bool HasFeature(GFFlags flag) const;
 	bool IsAvailable(SClass_ID filetype) const;
 	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const noexcept;

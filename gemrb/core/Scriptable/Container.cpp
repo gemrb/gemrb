@@ -169,7 +169,7 @@ void Container::TryPickLock(Actor* actor)
 		return;
 	}
 	int stat = actor->GetStat(IE_LOCKPICKING);
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		int skill = actor->GetSkill(IE_LOCKPICKING);
 		if (skill == 0) { // a trained skill, make sure we fail
 			stat = 0;
@@ -203,7 +203,7 @@ void Container::TryBashLock(Actor *actor)
 	int bonus;
 	unsigned int roll;
 
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		bonus = actor->GetAbilityBonus(IE_STR);
 		roll = actor->LuckyRoll(1, 100, bonus, 0);
 	} else {
@@ -213,7 +213,7 @@ void Container::TryBashLock(Actor *actor)
 		roll = actor->LuckyRoll(1, 10, bonus, 0);
 	}
 
-	if (core->HasFeature(GF_3ED_RULES)) {
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~
 		// there is no separate string for non-doors
 		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, GUIColors::LIGHTGREY, actor, roll, bonus, LockDifficulty);

@@ -56,7 +56,7 @@ bool TISImporter::Open(DataStream* stream)
 			hasPVRData = true;
 		}
 	} else {
-		if (core->HasFeature(GF_HAS_EE_EFFECTS)) { // hack!
+		if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) { // hack!
 			hasPVRData = true;
 			TilesSectionLen = 0xc;
 		}

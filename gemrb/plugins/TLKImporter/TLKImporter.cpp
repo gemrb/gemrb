@@ -43,7 +43,7 @@ TLKImporter::TLKImporter(void)
 	gtmap.RemoveAll(NULL);
 	gtmap.SetType(GEM_VARIABLES_POINTER);
 
-	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
+	if (core->HasFeature(GFFlags::CHARNAMEISGABBER)) {
 		charname=-1;
 	}
 

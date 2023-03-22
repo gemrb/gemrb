@@ -375,7 +375,7 @@ int Game::LeaveParty (Actor* actor)
 	actor->SetPersistent(0);
 	NPCs.push_back( actor );
 
-	if (core->HasFeature( GF_HAS_DPLAYER )) {
+	if (core->HasFeature( GFFlags::HAS_DPLAYER )) {
 		// we must reset various existing scripts
 		actor->SetScript("", SCR_DEFAULT );
 		actor->SetScript("", SCR_CLASS, false);
@@ -460,7 +460,7 @@ int Game::JoinParty(Actor* actor, int join)
 	if (join&JP_JOIN) {
 		//update kit abilities of actor
 		ieDword baseclass = 0;
-		if (core->HasFeature(GF_LEVELSLOT_PER_CLASS)) {
+		if (core->HasFeature(GFFlags::LEVELSLOT_PER_CLASS)) {
 			// get the class for iwd2; luckily there are no NPCs, everyone joins at level 1, so multi-kit annoyances can be ignored
 			baseclass = actor->GetBase(IE_CLASS);
 		}
@@ -704,7 +704,7 @@ Map *Game::GetMap(const ResRef &areaname, bool change)
 	// call area customization script for PST
 	// moved here because the current area is set here
 	ScriptEngine *sE = core->GetGUIScriptEngine();
-	if (core->HasFeature(GF_AREA_OVERRIDE) && sE) {
+	if (core->HasFeature(GFFlags::AREA_OVERRIDE) && sE) {
 		// area ResRef is accessible by GemRB.GetGameString (STR_AREANAME)
 		sE->RunFunction("Maze", "CustomizeArea");
 	}
@@ -866,7 +866,7 @@ int Game::LoadMap(const ResRef &resRef, bool loadscreen)
 	//this feature exists in all blackisle games but not in bioware games
 	// make sure to do it after other actors, so UpdateFog can run and
 	// the ignore_can_see key actually filters spawns
-	if (core->HasFeature(GF_SPAWN_INI)) {
+	if (core->HasFeature(GFFlags::SPAWN_INI)) {
 		newMap->UpdateFog();
 		newMap->LoadIniSpawn();
 	}
@@ -1014,7 +1014,7 @@ bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 			je->Section = (ieByte) Section;
 			je->Group = (ieByte) Group;
 			ieDword chapter = 0;
-			if (!core->HasFeature(GF_NO_NEW_VARIABLES)) {
+			if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
 				locals->Lookup("CHAPTER", chapter);
 			}
 			je->Chapter = (ieByte) chapter;
@@ -1025,7 +1025,7 @@ bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 	je = new GAMJournalEntry;
 	je->GameTime = GameTime;
 	ieDword chapter = 0;
-	if (!core->HasFeature(GF_NO_NEW_VARIABLES)) {
+	if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
 		locals->Lookup("CHAPTER", chapter);
 	}
 	je->Chapter = (ieByte) chapter;
@@ -1207,7 +1207,7 @@ void Game::ShareXP(int xp, int flags) const
 			xp = -xp;
 			strIdx = HCStrings::LostXP;
 		}
-		if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 			ieStrRef complaint = DisplayMessage::GetStringReference(strIdx);
 			String text = fmt::format(L"{}: {}", core->GetString(complaint), xp);
 			core->GetGameControl()->SetDisplayText(text, core->Time.ai_update_time * 4);
@@ -1303,7 +1303,7 @@ void Game::IncrementChapter() const
 	ieDword chapter = (ieDword) -1;
 	locals->Lookup("CHAPTER",chapter);
 	//increment chapter only if it exists
-	locals->SetAt("CHAPTER", chapter+1, core->HasFeature(GF_NO_NEW_VARIABLES) );
+	locals->SetAt("CHAPTER", chapter+1, core->HasFeature(GFFlags::NO_NEW_VARIABLES) );
 	//clear statistics
 	for (const auto& pc : PCs) {
 		//all PCs must have this!
@@ -1452,7 +1452,7 @@ bool Game::EveryoneDead() const
 	if (protagonist==PM_NO) {
 		const Actor *nameless = PCs[0];
 		// don't trigger this outside pst, our game loop depends on it
-		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE && core->HasFeature(GF_PST_STATE_FLAGS)) {
+		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE && core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 			if (area->INISpawn) {
 				area->INISpawn->RespawnNameless();
 			}
@@ -1686,7 +1686,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 			return false;
 		}
 
-		if (core->HasFeature(GF_AREA_OVERRIDE)) {
+		if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 			// pst doesn't care about area types (see comments near AF_NOSAVE definition)
 			// and repurposes these area flags!
 			if ((area->AreaFlags & (AF_TUTORIAL|AF_DEADMAGIC)) == (AF_TUTORIAL|AF_DEADMAGIC)) {
@@ -1706,7 +1706,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 			// you may not rest here, find an inn
 			if (!(area->AreaType & (AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS))) {
 				// at least in iwd1, the outdoor bit is not enough
-				if (area->AreaType & AT_OUTDOOR && !core->HasFeature(GF_AREA_VISITED_VAR)) {
+				if (area->AreaType & AT_OUTDOOR && !core->HasFeature(GFFlags::AREA_VISITED_VAR)) {
 					return true;
 				}
 				*err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
@@ -2030,7 +2030,7 @@ const Color *Game::GetGlobalTint() const
 	if (map->AreaFlags&AF_DREAM) {
 		return &DreamTint;
 	}
-	bool pstDayNight = map->AreaType & AT_PST_DAYNIGHT && core->HasFeature(GF_PST_STATE_FLAGS);
+	bool pstDayNight = map->AreaType & AT_PST_DAYNIGHT && core->HasFeature(GFFlags::PST_STATE_FLAGS);
 	if ((map->AreaType & (AT_OUTDOOR | AT_DAYNIGHT | AT_EXTENDED_NIGHT)) == (AT_OUTDOOR | AT_DAYNIGHT) || pstDayNight) {
 		//get daytime colour
 		ieDword daynight = core->Time.GetHour(GameTime);

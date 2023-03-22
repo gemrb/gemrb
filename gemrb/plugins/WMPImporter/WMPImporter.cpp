@@ -173,7 +173,7 @@ WMPAreaEntry WMPImporter::GetAreaEntry(DataStream *str) const
 	str->ReadStrRef(ae.LocTooltipName);
 	str->ReadResRef(ae.LoadScreenResRef);
 
-	for (unsigned int dir = 0; dir < 4; dir++) {
+	for (WMPDirection dir : EnumIterator<WMPDirection>()) {
 		str->ReadDword(ae.AreaLinksIndex[dir]);
 		str->ReadDword(ae.AreaLinksCount[dir]);
 	}
@@ -302,7 +302,7 @@ int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
 		stream->WriteStrRef(ae->LocTooltipName);
 		stream->WriteResRef( ae->LoadScreenResRef );
 
-		for (unsigned int dir = 0; dir < 4; dir++) {
+		for (WMPDirection dir : EnumIterator<WMPDirection>()) {
 			stream->WriteDword(ae->AreaLinksIndex[dir]);
 			stream->WriteDword(ae->AreaLinksCount[dir]);
 		}

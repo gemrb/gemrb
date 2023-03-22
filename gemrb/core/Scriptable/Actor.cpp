@@ -448,7 +448,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 
 	// hacking PST no palette
-	if (core->HasFeature(GF_ONE_BYTE_ANIMID) && (AnimID & 0xf000) == 0xe000) {
+	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID) && (AnimID & 0xf000) == 0xe000) {
 		if (BaseStats[IE_COLORCOUNT]) {
 			Log(WARNING, "Actor", "Animation ID {:#x} is supposed to be real colored (no recoloring), patched creature", AnimID);
 		}
@@ -485,7 +485,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 
 	// PST and EE 2.0+ use an ini to define animation data, including walk and run speed
 	// the rest had it hardcoded
-	if (!core->HasFeature(GF_RESDATA_INI)) {
+	if (!core->HasFeature(GFFlags::RESDATA_INI)) {
 		// handle default speed and per-animation overrides
 		TableMgr::index_t row = TableMgr::npos;
 		if (extspeed) {
@@ -864,7 +864,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 
 static void UpdateHappiness(Actor *actor) {
 	if (!actor->InParty) return;
-	if (!core->HasFeature(GF_HAPPINESS)) return;
+	if (!core->HasFeature(GFFlags::HAPPINESS)) return;
 
 	ieWordSigned newHappiness = GetHappiness(actor, core->GetGame()->Reputation);
 	if (newHappiness == actor->PCStats->Happiness) return;
@@ -1583,11 +1583,11 @@ static void ReadModalStates()
 static void InitActorTables()
 {
 	UpdateActorConfig();
-	pstflags = core->HasFeature(GF_PST_STATE_FLAGS) != 0;
-	nocreate = core->HasFeature(GF_NO_NEW_VARIABLES) != 0;
-	third = core->HasFeature(GF_3ED_RULES) != 0;
-	raresnd = core->HasFeature(GF_RARE_ACTION_VB) != 0;
-	iwd2class = core->HasFeature(GF_LEVELSLOT_PER_CLASS) != 0;
+	pstflags = core->HasFeature(GFFlags::PST_STATE_FLAGS) != 0;
+	nocreate = core->HasFeature(GFFlags::NO_NEW_VARIABLES) != 0;
+	third = core->HasFeature(GFFlags::RULES_3ED) != 0;
+	raresnd = core->HasFeature(GFFlags::RARE_ACTION_VB) != 0;
+	iwd2class = core->HasFeature(GFFlags::LEVELSLOT_PER_CLASS) != 0;
 	// iwd2 has some different base class names
 	if (iwd2class) {
 		isclassnames[ISTHIEF] = "ROGUE";
@@ -1600,15 +1600,15 @@ static void InitActorTables()
 		state_invisible=STATE_INVISIBLE;
 	}
 
-	if (core->HasFeature(GF_CHALLENGERATING)) {
+	if (core->HasFeature(GFFlags::CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_COMBAT|SX_CR;
 	} else {
 		sharexp=SX_DIVIDE|SX_COMBAT;
 	}
-	ReverseToHit = core->HasFeature(GF_REVERSE_TOHIT);
-	CheckAbilities = core->HasFeature(GF_CHECK_ABILITIES);
-	DeathOnZeroStat = core->HasFeature(GF_DEATH_ON_ZERO_STAT);
-	IWDSound = core->HasFeature(GF_SOUNDS_INI);
+	ReverseToHit = core->HasFeature(GFFlags::REVERSE_TOHIT);
+	CheckAbilities = core->HasFeature(GFFlags::CHECK_ABILITIES);
+	DeathOnZeroStat = core->HasFeature(GFFlags::DEATH_ON_ZERO_STAT);
+	IWDSound = core->HasFeature(GFFlags::SOUNDS_INI);
 	NUM_RARE_SELECT_SOUNDS = core->GetRareSelectSoundCount();
 
 	//this table lists skill groups assigned to classes
@@ -1746,7 +1746,7 @@ static void InitActorTables()
 
 	//csound for bg1/bg2
 	memset(csound,0,sizeof(csound));
-	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
+	if (!core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		tm = gamedata->LoadTable("csound");
 		if (tm) {
 			for (int i = 0; i < VCONST_COUNT; i++) {
@@ -3003,7 +3003,7 @@ void Actor::RefreshPCStats() {
 	int rate = GetConHealAmount();
 	if (rate && !(game->GameTime % rate)) {
 		NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
-		if (core->HasFeature(GF_ONSCREEN_TEXT) && InParty && Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
+		if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && InParty && Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
 			// eeeh, no token (Heal: 1)
 			static const String text = fmt::format(L"{} 1", core->GetString(ieStrRef::HEAL));
 			overHead.SetText(text);
@@ -3047,7 +3047,7 @@ int Actor::GetConHealAmount() const
 	const Game *game = core->GetGame();
 	if (!game) return rate;
 
-	if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
+	if (core->HasFeature(GFFlags::AREA_OVERRIDE) && game->GetPC(0, false) == this) {
 		rate = core->GetConstitutionBonus(STAT_CON_TNO_REGEN, Modified[IE_CON]);
 	} else {
 		rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
@@ -3080,7 +3080,7 @@ void Actor::UpdateFatigue()
 	}
 	LastFatigueCheck = game->GameTime;
 
-	if (!core->HasFeature(GF_AREA_OVERRIDE)) {
+	if (!core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 		// pst has TNO regeneration stored there
 		// shouldn't we check for our own flag, though?
 		// FIXME: the Con bonus is applied dynamically, but this doesn't appear to conform to
@@ -3639,7 +3639,7 @@ bool Actor::GetPartyComment()
 		if (target->BaseStats[IE_MC_FLAGS]&MC_EXPORTABLE) continue; //not NPC
 		if (target->GetCurrentArea()!=GetCurrentArea()) continue;
 
-		if (core->HasFeature(GF_RANDOM_BANTER_DIALOGS)) {
+		if (core->HasFeature(GFFlags::RANDOM_BANTER_DIALOGS)) {
 			if (core->Roll(1, 50, 0) == 1) { // TODO: confirm frequency
 				//V1 interact
 				HandleInteractV1(target);
@@ -3998,7 +3998,7 @@ bool Actor::CheckSpellDisruption(int damage) const
 	int spellLevel = spl->SpellLevel;
 	gamedata->FreeSpell(spl, SpellResRef, false);
 
-	if (core->HasFeature(GF_SIMPLE_DISRUPTION)) {
+	if (core->HasFeature(GFFlags::SIMPLE_DISRUPTION)) {
 		return LuckyRoll(1, 20, 0) < (damage + spellLevel);
 	}
 	if (!third) {
@@ -4216,7 +4216,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 	}
 
 	// also apply reputation damage if we hurt (but not killed) an innocent
-	if (core->HasFeature(GF_DAMAGE_INNOCENT_REP) &&
+	if (core->HasFeature(GFFlags::DAMAGE_INNOCENT_REP) &&
 			Modified[IE_CLASS] == CLASS_INNOCENT &&
 			!core->InCutSceneMode() &&
 			act && act->GetStat(IE_EA) <= EA_CONTROLLABLE) {
@@ -4362,7 +4362,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 				strref = HCStrings(int(strref) - (int(HCStrings::DamageDetail1) - int(HCStrings::Damage1)));
 			}
 			displaymsg->DisplayConstantStringName(strref, GUIColors::WHITE, this);
-		} else if (core->HasFeature(GF_ONSCREEN_TEXT) ) {
+		} else if (core->HasFeature(GFFlags::ONSCREEN_TEXT) ) {
 			auto color = GUIColors::WHITE;
 			if (InParty) {
 				color = GUIColors::RED;
@@ -4427,7 +4427,7 @@ void Actor::PlayWalkSound()
 	char suffix = 0;
 	uint8_t l = Sound.length();
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
-	if (core->HasFeature(GF_SOUNDFOLDERS) && Sound.BeginsWith("FS_")) {
+	if (core->HasFeature(GFFlags::SOUNDFOLDERS) && Sound.BeginsWith("FS_")) {
 		suffix = char(chosenWalkSnd + 0x31);
 	} else if (chosenWalkSnd) {
 		suffix = char(chosenWalkSnd + 0x60); // 'a'-'g'
@@ -4469,7 +4469,7 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 	int armor = 0;
 	if (resdata) {
 		unsigned int animid=BaseStats[IE_ANIMATION_ID];
-		if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+		if(core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
 			animid&=0xff;
 		}
 
@@ -4490,7 +4490,7 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 	}
 
 	ResRef Sound;
-	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+	if (core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
 		// TODO: RE and unhardcode, especially the "armor" mapping
 		// no idea what RK stands for, so use it for everything else
 		if (type > 5) type = 5;
@@ -4600,7 +4600,7 @@ std::string Actor::dump() const
 	AppendFormat(buffer, "Mod[IE_ANIMATION_ID]: 0x{:^4X} ResRef:{} Stance: {}\n", Modified[IE_ANIMATION_ID], anims->ResRefBase, GetStance());
 	AppendFormat(buffer, "TURNUNDEADLEVEL: {} current: {}\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
 	AppendFormat(buffer, "Colors:    ");
-	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
+	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID) ) {
 		for(unsigned int i = 0; i < Modified[IE_COLORCOUNT]; i++) {
 			AppendFormat(buffer, "   {}", Modified[IE_COLORS+i]);
 		}
@@ -4865,7 +4865,7 @@ int Actor::GetEncumbranceFactor(bool feedback) const
 
 int Actor::CalculateSpeed(bool feedback) const
 {
-	if (core->HasFeature(GF_RESDATA_INI)) {
+	if (core->HasFeature(GFFlags::RESDATA_INI)) {
 		return CalculateSpeedFromINI(feedback);
 	} else {
 		return CalculateSpeedFromRate(feedback);
@@ -4893,7 +4893,7 @@ int Actor::CalculateSpeedFromINI(bool feedback) const
 {
 	int encumbranceFactor = GetEncumbranceFactor(feedback);
 	ieDword animid = BaseStats[IE_ANIMATION_ID];
-	if (core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
 		animid = animid & 0xff;
 	}
 	assert(animid < (ieDword)CharAnimations::GetAvatarsCount());
@@ -5008,7 +5008,7 @@ void Actor::Resurrect(const Point &destPoint)
 	Game *game = core->GetGame();
 	//readjust death variable on resurrection
 	ieVariable DeathVar;
-	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
+	if (core->HasFeature(GFFlags::HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
 		if (!DeathVar.Format("{}_DEAD", scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", scriptName, fmt::WideToChar{GetName()});
 		}
@@ -5019,7 +5019,7 @@ void Actor::Resurrect(const Point &destPoint)
 			game->kaputz->SetAt(DeathVar, value-1);
 		}
 	// not bothering with checking actor->SetDeathVar, since the SetAt nocreate parameter is true
-	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
+	} else if (!core->HasFeature(GFFlags::HAS_KAPUTZ)) {
 		if (!DeathVar.Format(Interface::GetDeathVarFormat(), scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals (on resurrect)!", scriptName, fmt::WideToChar{GetName()});
 		}
@@ -5319,7 +5319,7 @@ bool Actor::CheckOnDeath()
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
 
 	// death variables are updated at the moment of death in the original
-	if (core->HasFeature(GF_HAS_KAPUTZ)) {
+	if (core->HasFeature(GFFlags::HAS_KAPUTZ)) {
 		const char* format = AppearanceFlags & APP_ADDKILL ? "KILL_{}" : "{}";
 
 		//don't use the raw killVar here (except when the flags explicitly ask for it)
@@ -5906,7 +5906,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		bookmask = GetBookMask();
 	}
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
-	HCStrings message = HCStrings::StringCount;
+	HCStrings message = HCStrings::count;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(spell->SpellName));
 		switch (spell->SpellType) {
@@ -5925,7 +5925,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 	if (!explev) {
 		return LSR_INVALID;
 	}
-	if (message != HCStrings::StringCount) {
+	if (message != HCStrings::count) {
 		displaymsg->DisplayConstantStringName(message, GUIColors::XPCHANGE, this);
 	}
 	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
@@ -6001,7 +6001,7 @@ ResRef Actor::GetScript(int ScriptIndex) const
 inline ieStrRef PersonalizePSTString(ieStrRef ref, const Actor* pc)
 {
 	if (pc->Modal.State != MS_STEALTH) return ref;
-	if (!core->HasFeature(GF_PST_STATE_FLAGS)) return ref;
+	if (!core->HasFeature(GFFlags::PST_STATE_FLAGS)) return ref;
 
 	int pcOffset = 8;
 	int specific = pc->GetStat(IE_SPECIFIC);
@@ -7017,7 +7017,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword) -2, target, UI_MISS|UI_NOAURA);
-		} else if (core->HasFeature(GF_BREAKABLE_WEAPONS) && InParty) {
+		} else if (core->HasFeature(GFFlags::BREAKABLE_WEAPONS) && InParty) {
 			//break sword
 			// a random roll on-hit (perhaps critical failure too)
 			//  in 0,5% (1d20*1d10==1) cases
@@ -7174,7 +7174,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			Log(ERROR, "ModifyDamage", "Unhandled damagetype: {}", damagetype);
 		} else if (it->second.resist_stat) {
 			// check for bonuses for specific damage types
-			if (core->HasFeature(GF_SPECIFIC_DMG_BONUS) && attacker) {
+			if (core->HasFeature(GFFlags::SPECIFIC_DMG_BONUS) && attacker) {
 				int bonus = attacker->fxqueue.BonusForParam2(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
 				if (bonus) {
 					resisted -= int (damage * bonus / 100.0);
@@ -7205,7 +7205,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			}
 			Log(COMBAT, "ModifyDamage", "Resisted {} of {} at {}% resistance to {}", resisted, damage + resisted, GetSafeStat(it->second.resist_stat), damagetype);
 			// PST and BG1 may actually heal on negative damage
-			if (!core->HasFeature(GF_HEAL_ON_100PLUS)) {
+			if (!core->HasFeature(GFFlags::HEAL_ON_100PLUS)) {
 				if (damage <= 0) {
 					resisted = DR_IMMUNE;
 					damage = 0;
@@ -7323,7 +7323,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	//actually, iwd2 has autosearch, also, this is useful for dayblindness
 	//apply the modal effect about every second (pst and iwds have round sizes that are not multiples of 15)
 	// FIXME: split dayblindness out of detect.spl and only run that each tick + simplify this check
-	if (InParty && core->HasFeature(GF_AUTOSEARCH_HIDDEN) && (third || (roundFraction % core->Time.ai_update_time == 0))) {
+	if (InParty && core->HasFeature(GFFlags::AUTOSEARCH_HIDDEN) && (third || (roundFraction % core->Time.ai_update_time == 0))) {
 		core->ApplySpell(ResRef("detect"), this, this, 0);
 	}
 
@@ -8165,7 +8165,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 				Color irTint = Color(255, 120, 120, tint.a);
 
 				/* IWD2: infravision is white, not red. */
-				if(core->HasFeature(GF_3ED_RULES)) {
+				if(core->HasFeature(GFFlags::RULES_3ED)) {
 					irTint = Color(255, 255, 255, tint.a);
 				}
 
@@ -8253,7 +8253,7 @@ bool Actor::GetSoundFromFile(ResRef& Sound, TableMgr::index_t index) const
 		if (Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
 	}
 
-	if (core->HasFeature(GF_RESDATA_INI)) {
+	if (core->HasFeature(GFFlags::RESDATA_INI)) {
 		return GetSoundFromINI(Sound, index);
 	} else {
 		return GetSoundFrom2DA(Sound, index);
@@ -8319,7 +8319,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
 {
 	unsigned int animid=BaseStats[IE_ANIMATION_ID];
-	if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+	if(core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
 		animid&=0xff;
 	}
 
@@ -8417,7 +8417,7 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, size_t index) const
 
 	Sound.Reset();
 
-	if (core->HasFeature(GF_RESDATA_INI)) {
+	if (core->HasFeature(GFFlags::RESDATA_INI)) {
 		GetSoundFromINI(Sound, index);
 	} else {
 		GetSoundFrom2DA(Sound, index);
@@ -8556,7 +8556,7 @@ void Actor::SetPortrait(const ResRef& portraitRef, int Which)
 
 void Actor::SetSoundFolder(const ieVariable& soundset) const
 {
-	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
+	if (!core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		PCStats->SoundSet = soundset;
 		PCStats->SoundFolder[0] = 0;
 		return;
@@ -8594,7 +8594,7 @@ std::string Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
 	}
 
 	std::string soundset;
-	if (core->HasFeature(GF_SOUNDFOLDERS)) {
+	if (core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		if (full) {
 			soundset = fmt::format("{}/{}", PCStats->SoundFolder, set);
 		} else {
@@ -8728,7 +8728,7 @@ HCStrings Actor::SetEquippedQuickSlot(int slot, int header)
 {
 	if (!PCStats) {
 		inventory.SetEquippedSlot(ieWordSigned(slot), std::max<ieWord>(0, header));
-		return HCStrings::StringCount;
+		return HCStrings::count;
 	}
 
 
@@ -8746,7 +8746,7 @@ HCStrings Actor::SetEquippedQuickSlot(int slot, int header)
 		//if it is the fist slot and not currently used, then set it up
 		if (i==MAX_QUICKWEAPONSLOT) {
 			inventory.SetEquippedSlot(IW_NO_EQUIPPED, 0);
-			return HCStrings::StringCount;
+			return HCStrings::count;
 		}
 	}
 
@@ -8758,7 +8758,7 @@ HCStrings Actor::SetEquippedQuickSlot(int slot, int header)
 	}
 	slot = Inventory::GetWeaponQuickSlot(PCStats->QuickWeaponSlots[slot]);
 	if (inventory.SetEquippedSlot(ieWordSigned(slot), ieWord(header))) {
-		return HCStrings::StringCount;
+		return HCStrings::count;
 	}
 	return HCStrings::MagicWeapon;
 }
@@ -9146,7 +9146,7 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 		return backstabDamage;
 	}
 
-	if ((!core->HasFeature(GF_PROPER_BACKSTAB) || !IsBehind(target)) && !(always & 0x5)) {
+	if ((!core->HasFeature(GFFlags::PROPER_BACKSTAB) || !IsBehind(target)) && !(always & 0x5)) {
 		return backstabDamage;
 	}
 
@@ -9166,7 +9166,7 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 			} else {
 				multiplierText = ieStrRef(int(DisplayMessage::GetStringReference(HCStrings::BackstabDouble, this)) + multiplier - 2);
 			}
-			if (multiplier < 7 || (core->HasFeature(GF_JOURNAL_HAS_SECTIONS) && multiplier < 10)) {
+			if (multiplier < 7 || (core->HasFeature(GFFlags::JOURNAL_HAS_SECTIONS) && multiplier < 10)) {
 				displaymsg->DisplayStringName(multiplierText, GUIColors::WHITE, this, STRING_FLAGS::SOUND);
 			} else {
 				// display a simple message for all other cases
@@ -9568,7 +9568,7 @@ no_resolve:
 		}
 	}
 
-	return HCStrings::StringCount;
+	return HCStrings::count;
 }
 
 //this one is the same, but returns strrefs based on effects
@@ -9601,7 +9601,7 @@ HCStrings Actor::Unusable(const Item* item) const
 	}
 	if (!GetStat(IE_CANUSEANYITEM) && !fx) {
 		HCStrings unusable = CheckUsability(item);
-		if (unusable != HCStrings::StringCount) {
+		if (unusable != HCStrings::count) {
 			return unusable;
 		}
 	}
@@ -9612,7 +9612,7 @@ HCStrings Actor::Unusable(const Item* item) const
 	}
 
 	if (!CheckAbilities) {
-		return HCStrings::StringCount;
+		return HCStrings::count;
 	}
 
 	if (item->MinStrength>GetStat(IE_STR)) {
@@ -9644,7 +9644,7 @@ HCStrings Actor::Unusable(const Item* item) const
 	}
 	//note, weapon proficiencies shouldn't be checked here
 	//missing proficiency causes only attack penalty
-	return HCStrings::StringCount;
+	return HCStrings::count;
 }
 
 //full palette will be shaded in gradient color
@@ -10438,7 +10438,7 @@ bool Actor::TryToHide()
 	bool seen = SeeAnyOne(true, true);
 
 	stat_t skill;
-	if (core->HasFeature(GF_HAS_HIDE_IN_SHADOWS)) {
+	if (core->HasFeature(GFFlags::HAS_HIDE_IN_SHADOWS)) {
 		skill = (GetStat(IE_HIDEINSHADOWS) + GetStat(IE_STEALTH))/2;
 	} else {
 		skill = GetStat(IE_STEALTH);
