@@ -450,7 +450,6 @@ public:
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
 
 	std::vector<Holder<Sprite2D> > Cursors;
-	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<ieVariable> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
