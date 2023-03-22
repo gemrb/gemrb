@@ -275,6 +275,14 @@ inline T Clamp(const T& n, const T& lower, const T& upper)
 	return std::max(lower, std::min(n, upper));
 }
 
+// this is like static_cast, but clamps to the range supported by DST instead of turning large positive numbers negative and large negatives 0
+template <typename DST, typename SRC>
+inline DST Clamp(const SRC& n)
+{
+	static_assert(sizeof(DST) <= sizeof(SRC), "Clamping a SRC smaller than DST has no effect.");
+	return static_cast<DST>(Clamp<SRC>(n, std::numeric_limits<DST>::min(), std::numeric_limits<DST>::max()));
+}
+
 template <>
 inline Point Clamp(const Point& p, const Point& lower, const Point& upper)
 {
