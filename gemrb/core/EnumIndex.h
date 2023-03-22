@@ -30,9 +30,6 @@
 
 namespace GemRB {
 
-template <typename ENUM>
-using under_t = typename std::underlying_type<ENUM>::type;
-
 template <typename ENUM, typename ARG = under_t<ENUM>>
 // constexpr // FIXME: make this constexpr in c++14, assert cannot be used in constexper before then
 ENUM EnumIndex(ARG val) noexcept

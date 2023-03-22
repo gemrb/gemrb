@@ -23,12 +23,15 @@
 
 #include <type_traits>
 
+template <typename ENUM>
+using under_t = typename std::underlying_type<ENUM>::type;
+
 template<typename ENUM_FLAGS>
 constexpr
-typename std::underlying_type<ENUM_FLAGS>::type
+under_t<ENUM_FLAGS>
 UnderType(ENUM_FLAGS a) noexcept
 {
-	return static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a);
+	return static_cast<under_t<ENUM_FLAGS>>(a);
 }
 
 template<typename ENUM_FLAGS>
