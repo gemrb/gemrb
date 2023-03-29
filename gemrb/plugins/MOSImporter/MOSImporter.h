@@ -54,7 +54,7 @@ private:
 	} layout;
 
 	std::shared_ptr<ImageMgr> lastPVRZ;
-	ieDword lastPVRZPage;
+	ieDword lastPVRZPage = 0;
 
 	void Blit(const MOSV2DataBlock& dataBlock, uint8_t* data);
 	Holder<Sprite2D> GetSprite2Dv1();

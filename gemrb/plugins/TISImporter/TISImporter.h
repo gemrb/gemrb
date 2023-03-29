@@ -42,7 +42,7 @@ private:
 
 	Holder<Sprite2D> badTile; // blank tile to use to fill in bad data
 	std::shared_ptr<ImageMgr> lastPVRZ;
-	ieDword lastPVRZPage;
+	ieDword lastPVRZPage = 0;
 
 	Holder<Sprite2D> GetTilePaletted(int index);
 	Holder<Sprite2D> GetTilePVR(int index);

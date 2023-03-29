@@ -81,7 +81,7 @@ private:
 	ieDword FramesOffset = 0;
 	strpos_t DataStart = 0;
 	std::shared_ptr<ImageMgr> lastPVRZ;
-	ieDword lastPVRZPage;
+	ieDword lastPVRZPage = 0;
 
 	void Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock, uint8_t* data);
 	std::vector<index_t> CacheFLT();

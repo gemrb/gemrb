@@ -65,7 +65,7 @@ class EnumArray {
 	static_assert(std::is_unsigned<under_t<ENUM>>::value, "EnumIndex must be unsigned");
 
 	using array_t = std::array<T, UnderType(ENUM::count)>;
-	array_t array;
+	array_t array{};
 public:
 	static constexpr auto size = UnderType(ENUM::count);
 	using KeyIterator_t = EnumIterator<ENUM>;
