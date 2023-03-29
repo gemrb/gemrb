@@ -1808,14 +1808,12 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 
 	int check = 0;
 	Actor* detective = core->GetGame()->GetActorByGlobalID(actorID);
+	assert(detective);
 	if (third) {
 		//~Search (detect traps) check. Search skill %d vs. trap's difficulty %d (searcher's %d INT bonus).~
-		int bonus = 0;
-		if (detective) {
-			bonus = detective->GetAbilityBonus(IE_INT);
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL13, GUIColors::LIGHTGREY, detective, skill-bonus, TrapDetectionDiff, bonus);
-		}
-		check = (skill + bonus)*7;
+		int bonus = detective->GetAbilityBonus(IE_INT);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL13, GUIColors::LIGHTGREY, detective, skill - bonus, TrapDetectionDiff, bonus);
+		check = (skill + bonus) * 7;
 	} else {
 		check = skill/2 + core->Roll(1, skill/2, 0);
 	}
