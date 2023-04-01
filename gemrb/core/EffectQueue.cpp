@@ -757,7 +757,8 @@ static inline bool check_level(const Actor *target, Effect *fx)
 	}
 	//there is no level based resistance, but Parameter1 cannot be precalculated
 	//these effects use the Dice fields in a special way
-	if( Opcodes[fx->Opcode].Flags & EFFECT_NO_LEVEL_CHECK ) {
+	// also makes no sense to attempt resistance checks on actorless effects (eg. fx_tint_screen hit this due to bad targeting set)
+	if (Opcodes[fx->Opcode].Flags & (EFFECT_NO_LEVEL_CHECK | EFFECT_NO_ACTOR)) {
 		return false;
 	}
 
