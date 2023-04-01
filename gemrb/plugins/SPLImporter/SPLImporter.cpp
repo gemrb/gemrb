@@ -177,6 +177,8 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 			GEM_STREAM_START );
 	for (int i = 0; i < s->CastingFeatureCount; i++) {
 		Effect* fx = GetFeature(s);
+		 // pst's fx_tint_screen has some instances and elsewhere it was noted to never use preset targets in global effects
+		if (fx->Target == FX_TARGET_PRESET) fx->Target = FX_TARGET_SELF;
 		s->casting_features.push_back(std::move(*fx));
 		delete fx;
 	}
