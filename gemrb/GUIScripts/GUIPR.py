@@ -33,6 +33,8 @@ from ie_action import ACT_CAST
 PriestSpellWindow = None
 PriestSpellLevel = 0
 
+FlashResRef = "FLASHBR" if GameCheck.IsBG2() else "FLASH"
+
 def InitPriestWindow (Window):
 	global PriestSpellWindow
 	PriestSpellWindow = Window
@@ -231,14 +233,10 @@ def OnPriestMemorizeSpell ():
 		UpdatePriestWindow (PriestSpellWindow)
 		GemRB.PlaySound ("GAM_24")
 		Button = PriestSpellWindow.GetControl(index + 27)
+		Button.SetAnimation (FlashResRef, 0, 0x80)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
 		Button2 = PriestSpellWindow.GetControl(mem_cnt + 2)
-		if GameCheck.IsBG2(): # no blending
-			Button.SetAnimation ("FLASH")
-			Button2.SetAnimation ("FLASH")
-		else:
-			Button.SetAnimation ("FLASH", 0, 1)
-			Button2.SetAnimation ("FLASH", 0, 1)
+		Button2.SetAnimation (FlashResRef, 0, 0x80)
 	return
 
 def OpenPriestSpellRemoveWindow ():
@@ -304,7 +302,7 @@ def OnPriestUnmemorizeSpell (btn):
 		UpdatePriestWindow (PriestSpellWindow)
 		GemRB.PlaySound ("GAM_44")
 		Button = PriestSpellWindow.GetControl(index + 3)
-		Button.SetAnimation ("FLASH", 0, GameCheck.IsBG2() is False) # no blending for bg2
+		Button.SetAnimation (FlashResRef, 0, 0x80)
 	return
 
 def OnPriestRemoveSpell ():

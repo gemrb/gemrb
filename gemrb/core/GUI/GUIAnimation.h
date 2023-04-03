@@ -22,6 +22,7 @@
 
 #include "Holder.h"
 #include "Region.h"
+#include "Sprite2d.h"
 
 #include "globals.h"
 
@@ -130,7 +131,6 @@ private:
 };
 
 class AnimationFactory;
-class Sprite2D;
 
 class GEM_EXPORT SpriteAnimation : public GUIAnimation<Holder<Sprite2D>> {
 private:
@@ -139,7 +139,6 @@ private:
 	uint8_t frame = 0;
 	unsigned int anim_phase = 0;
 	bool has_palette = false;
-	bool is_blended = false;
 	ieDword colors[8] {};
 	tick_t nextFrameTime = 0;
 
@@ -150,7 +149,6 @@ public:
 	//report if the current resource is the same as descripted by the params
 	void SetPaletteGradients(const ieDword *col);
 	bool SameResource(const SpriteAnimation*) const;
-	void SetBlend(bool b);
 	bool HasEnded() const override;
 
 	tick_t Time() const { return nextFrameTime; }
@@ -161,6 +159,8 @@ public:
 		PLAY_ONCE		= 2,  // play and stop at end
 		PLAY_ALWAYS		= 4   // play even when game is paused
 	} flags = PLAY_NORMAL;
+	
+	BlitFlags blitFlags = BlitFlags::BLENDED;
 };
 
 }

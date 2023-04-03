@@ -102,11 +102,6 @@ void SpriteAnimation::SetPaletteGradients(const ieDword *col)
 	has_palette = true;
 }
 
-void SpriteAnimation::SetBlend(bool b)
-{
-	is_blended = b;
-}
-
 tick_t SpriteAnimation::CalculateNextFrameDelta()
 {
 	tick_t delta = 0;
@@ -178,10 +173,7 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 		palette->SetupPaperdollColours(colors, 0);
 	}
 	
-	if (is_blended) {
-		PaletteHolder palette = pic->GetPalette();
-		palette->CreateShadedAlphaChannel();
-	}
+	pic->renderFlags |= blitFlags;
 
 	return pic;
 }

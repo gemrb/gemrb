@@ -3802,7 +3802,7 @@ a BAM file. Optionally an animation cycle could be set too.\n\
   * ControlID - the id of the target control\n\
   * BAMResRef - resref of the animation\
   * Cycle - (optional) number of the cycle to use\n\
-  * Blend - (optional) toggle use of blending\n\
+  * Blend - (optional) set the blend mode, default is BLENDED \n\
   * Cols - (optional) a list of Colors to apply as the palette\n\
 \n\
 **Return value:** N/A\n"
@@ -3812,7 +3812,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 {
 	PyObject* pyRef = nullptr;
 	int Cycle = 0;
-	int Blend = 0;
+	int Blend = BlitFlags::BLENDED;
 	PyObject* cols = nullptr;
 	PARSE_ARGS(args,  "OO|iiO", &self, &pyRef, &Cycle, &Blend, &cols);
 
@@ -3833,9 +3833,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(af);
 	SpriteAnimation* anim = new SpriteAnimation(af, Cycle);
 
-	if (Blend) {
-		anim->SetBlend(true);
-	}
+	anim->blitFlags = static_cast<BlitFlags>(Blend);
 	
 	if (cols) {
 		ieDword indicies[8]{};

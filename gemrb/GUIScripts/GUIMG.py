@@ -43,6 +43,8 @@ ContTarg = None
 SpellType = None
 Level = 1
 
+FlashResRef = "FLASHBR" if GameCheck.IsBG2() else "FLASH"
+
 def ToggleSpellWindow (btn):
 	global Sorcerer
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
@@ -282,18 +284,15 @@ def OnMageMemorizeSpell ():
 	spelltype = IE_SPELL_TYPE_WIZARD
 
 	index = GemRB.GetVar ("SpellButton") - 100
-	blend = 1
-	if GameCheck.IsBG2():
-		blend = 0
 
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		UpdateMageWindow (MageWindow)
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
-		Button.SetAnimation ("FLASH", 0, blend)
+		Button.SetAnimation (FlashResRef, 0, 0x80)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
 		Button = MageWindow.GetControl(mem_cnt + 2)
-		Button.SetAnimation ("FLASH", 0, blend)
+		Button.SetAnimation (FlashResRef, 0, 0x80)
 	return
 
 def OpenMageSpellRemoveWindow (parentWin):
@@ -364,15 +363,11 @@ def OnMageUnmemorizeSpell (btn):
 	spelltype = IE_SPELL_TYPE_WIZARD
 	index = btn.Value
 
-	blend = 1
-	if GameCheck.IsBG2():
-		blend = 0
-
 	if GemRB.UnmemorizeSpell (pc, spelltype, level, index):
 		UpdateMageWindow (MageWindow)
 		GemRB.PlaySound ("GAM_44")
 		Button = MageWindow.GetControl(index + 3)
-		Button.SetAnimation ("FLASH", 0, blend)
+		Button.SetAnimation (FlashResRef, 0, 0x80)
 	return
 
 def OnMageRemoveSpell ():

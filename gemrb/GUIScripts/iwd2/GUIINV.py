@@ -182,7 +182,7 @@ def RefreshInventoryWindow ():
 	if GemRB.HasResource (pdoll, RES_BAM):
 		pal = [GemRB.GetPlayerStat (pc, c) for c in range(IE_METAL_COLOR, IE_HAIR_COLOR + 1)]
 		Button.SetAnimation (None) # force reset
-		Button.SetAnimation (pdoll, 1, 0, pal)
+		Button.SetAnimation (pdoll, 1, 8, pal)
 
 	# portrait
 	Button = Window.GetControl (84)
