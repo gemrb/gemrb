@@ -48,6 +48,7 @@ enum BlitFlags : uint32_t {
 	BLENDED = 8, // dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA)), dstA = srcA + (dstA * (1-srcA))
 	ADD = 0x10, //  dstRGB = (srcRGB * srcA) + dstRGB
 	MOD = 0x20, // dstRGB = srcRGB * dstRGB
+	MUL = 0x40, // dstRGBA = (srcRGBA * dstRGBA) + (dstRGBA * (1 - srcA))
 	// color/alpha mod applies to color param
 	COLOR_MOD = 0x1000, // srcC = srcC * (color / 255)
 	ALPHA_MOD = 0x2000, // srcA = srcA * (alpha / 255)

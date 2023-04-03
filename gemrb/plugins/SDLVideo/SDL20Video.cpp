@@ -522,6 +522,8 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
 	} else if (flags & BlitFlags::MOD) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+	} else if (flags & BlitFlags::MUL) {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MUL);
 	} else if (flags & (BlitFlags::BLENDED | BlitFlags::HALFTRANS)) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 	} else {
