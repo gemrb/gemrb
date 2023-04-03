@@ -367,7 +367,7 @@ void SDL12VideoDriver::BlitWithPipeline(SDLPixelIterator& src, SDLPixelIterator&
 	void (*BlendFn)(const Color& src, Color& dst) = ShaderBlend<true>;
 	if (flags & BlitFlags::ADD) {
 		BlendFn = ShaderAdditive;
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		BlendFn = ShaderTint;
 	}
 	
@@ -425,7 +425,7 @@ void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlag
 {
 	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
 		DrawPointSurface<SHADER::BLEND>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		DrawPointSurface<SHADER::TINT>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
 	} else {
 		DrawPointSurface<SHADER::NONE>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
@@ -436,7 +436,7 @@ void SDL12VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Col
 {
 	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
 		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		DrawPointsSurface<SHADER::TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	} else {
 		DrawPointsSurface<SHADER::NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
@@ -447,7 +447,7 @@ void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const
 {
 	if (flags&BlitFlags::BLENDED && color.unused < 0xff) {
 		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		DrawPointsSurface<SHADER::TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	} else {
 		DrawPointsSurface<SHADER::NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
@@ -458,7 +458,7 @@ void SDL12VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& orig
 {
 	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
 		DrawPolygonSurface<SHADER::BLEND>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		DrawPolygonSurface<SHADER::TINT>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
 	} else {
 		DrawPolygonSurface<SHADER::NONE>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
@@ -469,7 +469,7 @@ void SDL12VideoDriver::DrawLineImp(const Point& start, const Point& end, const C
 {
 	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
 		DrawLineSurface<SHADER::BLEND>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		DrawLineSurface<SHADER::TINT>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
 	} else {
 		DrawLineSurface<SHADER::NONE>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
@@ -480,7 +480,7 @@ void SDL12VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Colo
 {
 	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
 		DrawLinesSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		DrawLinesSurface<SHADER::TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	} else {
 		DrawLinesSurface<SHADER::NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
@@ -512,7 +512,7 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 		DrawVLineSurface<SHADER::BLEND>(currentBuf, rgn.origin, rgn.y + rgn.h - 1, screenClip, color);
 		DrawHLineSurface<SHADER::BLEND>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
 		DrawVLineSurface<SHADER::BLEND>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		DrawHLineSurface<SHADER::TINT>(currentBuf, rgn.origin, rgn.x + rgn.w - 1, screenClip, color);
 		DrawVLineSurface<SHADER::TINT>(currentBuf, rgn.origin, rgn.y + rgn.h - 1, screenClip, color);
 		DrawHLineSurface<SHADER::TINT>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);

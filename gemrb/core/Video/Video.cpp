@@ -292,7 +292,7 @@ static Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags)
 	}
 
 	if (flags & BlitFlags::COLOR_MOD) {
-		flags |= BlitFlags::MULTIPLY;
+		flags |= BlitFlags::MOD;
 	}
 
 	// clear handled flags

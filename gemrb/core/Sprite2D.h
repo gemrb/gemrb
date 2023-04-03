@@ -44,16 +44,18 @@ namespace GemRB {
 enum BlitFlags : uint32_t {
 	NONE = 0,
 	HALFTRANS = 2,
-	BLENDED = 8,
-	MIRRORX = 0x10,
-	MIRRORY = 0x20,
-	COLOR_MOD = 0x00010000, // srcC = srcC * (color / 255)
-	ALPHA_MOD = 0x00020000, // srcA = srcA * (alpha / 255)
+	// blend modes are mutually exclusive
+	BLENDED = 8, // dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA)), dstA = srcA + (dstA * (1-srcA))
+	ADD = 0x10, //  dstRGB = (srcRGB * srcA) + dstRGB
+	MOD = 0x20, // dstRGB = srcRGB * dstRGB
+	// color/alpha mod applies to color param
+	COLOR_MOD = 0x1000, // srcC = srcC * (color / 255)
+	ALPHA_MOD = 0x2000, // srcA = srcA * (alpha / 255)
+	MIRRORX = 0x10000,
+	MIRRORY = 0x20000,
 	GREY = 0x80000, // timestop palette
 	SEPIA = 0x02000000, // dream scene palette
-	MULTIPLY = 0x00100000, // not implemented in SDLVideo yet
-	GLOW = 0x00200000, // not implemented in SDLVideo yet
-	ADD = 0x00400000,
+	// stencil flags operate on the stencil buffer
 	STENCIL_ALPHA = 0x00800000, // blend with the stencil buffer using the stencil's alpha channel as the stencil
 	STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
 	STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil

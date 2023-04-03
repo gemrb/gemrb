@@ -306,7 +306,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 	if (color) {
 		if (flags & BlitFlags::BLENDED) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		} else if (flags & BlitFlags::MULTIPLY) {
+		} else if (flags & BlitFlags::MOD) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MOD);
 		} else {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
@@ -520,7 +520,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	
 	if (flags & BlitFlags::ADD) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-	} else if (flags & BlitFlags::MULTIPLY) {
+	} else if (flags & BlitFlags::MOD) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
 	} else if (flags & (BlitFlags::BLENDED | BlitFlags::HALFTRANS)) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);

@@ -1707,7 +1707,7 @@ void Highlightable::DrawOutline(Point origin) const
 	origin = outline->BBox.origin - origin;
 
 	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
-		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BlitFlags::MULTIPLY|BlitFlags::HALFTRANS );
+		core->GetVideoDriver()->DrawPolygon(outline.get(), origin, outlineColor, true, BlitFlags::MOD | BlitFlags::HALFTRANS);
 	} else {
 		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS );
 		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, false );
