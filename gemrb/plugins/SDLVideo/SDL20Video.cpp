@@ -53,6 +53,18 @@ SDL20VideoDriver::SDL20VideoDriver() noexcept
 	stencilAlphaBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
 													 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
 													 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+	
+	oneMinusDstBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDFACTOR_ONE,
+													SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR,
+													SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+	
+	dstBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDFACTOR_ONE,
+											SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_DST_COLOR,
+											SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+	
+	srcBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_COLOR, SDL_BLENDFACTOR_ONE,
+											SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_SRC_COLOR,
+											SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
 
 	// WARNING: do _not_ call opengl here
 	// all function pointers will be NULL
@@ -524,6 +536,12 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
 	} else if (flags & BlitFlags::MUL) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MUL);
+	} else if (flags & BlitFlags::ONE_MINUS_DST) {
+		SDL_SetTextureBlendMode(texture, oneMinusDstBlender);
+	} else if (flags & BlitFlags::DST) {
+		SDL_SetTextureBlendMode(texture, dstBlender);
+	} else if (flags & BlitFlags::SRC) {
+		SDL_SetTextureBlendMode(texture, srcBlender);
 	} else if (flags & (BlitFlags::BLENDED | BlitFlags::HALFTRANS)) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 	} else {

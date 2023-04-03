@@ -215,6 +215,9 @@ private:
 	int sdl2_runtime_version;
 
 	SDL_BlendMode stencilAlphaBlender;
+	SDL_BlendMode oneMinusDstBlender;
+	SDL_BlendMode dstBlender;
+	SDL_BlendMode srcBlender;
 
 	SDL_GameController* gameController = nullptr;
 

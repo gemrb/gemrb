@@ -342,12 +342,26 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	if (!spr->HasTransparency()) {
 		flags &= ~BlitFlags::BLENDED;
 	}
+	
+	auto pal = spr->GetPalette();
+	Color ck = ColorBlack;
+	if (flags & (BlitFlags::ONE_MINUS_DST | BlitFlags::DST | BlitFlags::SRC)) {
+		// FIXME: this is a hack. the video driver just needs to be able to ignore the color key during any blending
+		if (pal->col[0] != ColorBlack) {
+			ck = pal->col[0];
+			pal->CopyColorRange(&ColorBlack, &ColorBlack + 1, 0);
+		}
+	}
 
 	if (spr->Format().RLE) {
 		BlitSpriteRLEClipped(spr, src, dclipped, flags, tint);
 	} else {
 		const sprite_t* native = static_cast<const sprite_t*>(spr.get ());
 		BlitSpriteNativeClipped(native, src, dclipped, flags, reinterpret_cast<const SDL_Color*>(tint));
+	}
+	
+	if (ck != ColorBlack) {
+		pal->CopyColorRange(&ck, &ck + 1, 0);
 	}
 }
 
