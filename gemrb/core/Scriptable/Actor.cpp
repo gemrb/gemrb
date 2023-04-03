@@ -8091,7 +8091,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 		if (vvc->YOffset >= 0) {
 			break;
 		}
-		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BlitFlags::ALPHA_MOD));
+		vvc->Draw(vp, baseTint, BBox.h, flags & (BlitFlags::STENCIL_MASK | BlitFlags::ALPHA_MOD));
 	}
 
 	if (ShouldDrawCircle()) {
@@ -8210,7 +8210,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
 		const ScriptedAnimation* vvc = *it;
-		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BlitFlags::ALPHA_MOD));
+		vvc->Draw(vp, baseTint, BBox.h, flags & (BlitFlags::STENCIL_MASK | BlitFlags::ALPHA_MOD));
 	}
 }
 

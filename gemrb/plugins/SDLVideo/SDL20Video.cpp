@@ -362,7 +362,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 	SDL_RenderFlush(renderer);
 #endif
 #else
-	if (flags&BLIT_STENCIL_MASK) {
+	if (flags & BlitFlags::STENCIL_MASK) {
 		// 1. clear scratchpad segment
 		// 2. blend stencil segment to scratchpad
 		// 3. blend texture to scratchpad
@@ -453,7 +453,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 
 	blitRGBAShader->SetUniformValue("u_channel", 1, channel);
 
-	bool doStencil = flags & BLIT_STENCIL_MASK;
+	bool doStencil = flags & BlitFlags::STENCIL_MASK;
 	blitRGBAShader->SetUniformValue("u_stencil", 1, doStencil ? 1 : 0);
 
 	if (doStencil) {

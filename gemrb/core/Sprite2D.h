@@ -65,10 +65,9 @@ enum BlitFlags : uint32_t {
 	STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
 	STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil
 	STENCIL_BLUE = 0x20000000, // blend with the stencil buffer using the stencil's b channel as the stencil
-	STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
+	STENCIL_DITHER = 0x10000000, // use dithering instead of transpanency. only affects stencil values of 128.
+	STENCIL_MASK = STENCIL_ALPHA | STENCIL_RED | STENCIL_GREEN | STENCIL_BLUE | STENCIL_DITHER
 };
-
-#define BLIT_STENCIL_MASK (BlitFlags::STENCIL_ALPHA|BlitFlags::STENCIL_RED|BlitFlags::STENCIL_GREEN|BlitFlags::STENCIL_BLUE|BlitFlags::STENCIL_DITHER)
 
 class GEM_EXPORT Sprite2D : public Held<Sprite2D> {
 public:

@@ -637,7 +637,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 	if (SequenceFlags & IE_VVC_HEIGHT) p.y -= height;
 
 	if (SequenceFlags & IE_VVC_NOCOVER) {
-		flags &= ~BLIT_STENCIL_MASK;
+		flags &= ~BlitFlags::STENCIL_MASK;
 	}
 
 	const Animation *anim = anims[Phase * MAX_ORIENT + Orientation];

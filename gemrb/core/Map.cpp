@@ -1609,7 +1609,7 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 		}
 	}
 	
-	assert(flags & BLIT_STENCIL_MASK); // we needed a stencil so we must require a stencil flag
+	assert(flags & BlitFlags::STENCIL_MASK); // we needed a stencil so we must require a stencil flag
 	return flags;
 }
 
