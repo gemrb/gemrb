@@ -338,7 +338,9 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	if (spr->renderFlags&BlitFlags::MIRRORY) {
 		flags ^= BlitFlags::MIRRORY;
 	}
-	
+
+	flags |= spr->renderFlags & (BlitFlags::BLEND_MASK);
+
 	if (!spr->HasTransparency()) {
 		flags &= ~BlitFlags::BLENDED;
 	}
