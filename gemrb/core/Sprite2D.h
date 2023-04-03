@@ -43,17 +43,16 @@ namespace GemRB {
 // Specifically: BlitFlags::GREY overrides BlitFlags::SEPIA
 enum BlitFlags : uint32_t {
 	NONE = 0,
-	HALFTRANS = 2, // IE_VVC_TRANSPARENT
-	BLENDED = 8, // IE_VVC_BLENDED, not implemented in SDLVideo yet
-	MIRRORX = 0x10, // IE_VVC_MIRRORX
-	MIRRORY = 0x20, // IE_VVC_MIRRORY
-	// IE_VVC_TINT = 0x00030000. which is (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)
+	HALFTRANS = 2,
+	BLENDED = 8,
+	MIRRORX = 0x10,
+	MIRRORY = 0x20,
 	COLOR_MOD = 0x00010000, // srcC = srcC * (color / 255)
 	ALPHA_MOD = 0x00020000, // srcA = srcA * (alpha / 255)
-	GREY = 0x80000, // IE_VVC_GREYSCALE, timestop palette
-	SEPIA = 0x02000000, // IE_VVC_SEPIA, dream scene palette
-	MULTIPLY = 0x00100000, // IE_VVC_DARKEN, not implemented in SDLVideo yet
-	GLOW = 0x00200000, // IE_VVC_GLOWING, not implemented in SDLVideo yet
+	GREY = 0x80000, // timestop palette
+	SEPIA = 0x02000000, // dream scene palette
+	MULTIPLY = 0x00100000, // not implemented in SDLVideo yet
+	GLOW = 0x00200000, // not implemented in SDLVideo yet
 	ADD = 0x00400000,
 	STENCIL_ALPHA = 0x00800000, // blend with the stencil buffer using the stencil's alpha channel as the stencil
 	STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil

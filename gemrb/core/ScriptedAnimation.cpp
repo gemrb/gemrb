@@ -609,7 +609,15 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 
 	Video *video = core->GetVideoDriver();
 	
-	flags |= static_cast<BlitFlags>(Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT));
+	if (Transparency & IE_VVC_TRANSPARENT) {
+		flags |= BlitFlags::HALFTRANS;
+	}
+	if (Transparency & IE_VVC_SEPIA) {
+		flags |= BlitFlags::SEPIA;
+	}
+	if (Transparency & IE_VVC_TINT) {
+		flags |= BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD;
+	}
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
 	//these are used in the original engine to implement weather/daylight effects
