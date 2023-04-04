@@ -48,6 +48,7 @@ Holder<Sprite2D> CreateLight(const Size& size, uint8_t intensity) noexcept
 	uint8_t* px = (uint8_t*)calloc(size.w, size.h);
 	
 	const Point& radii = size.Center();
+	const float maxr = std::max(radii.x, radii.y);
 	Region r(Point() - radii, size);
 	
 	const auto points = PlotEllipse(r);
@@ -60,13 +61,12 @@ Holder<Sprite2D> CreateLight(const Size& size, uint8_t intensity) noexcept
 		const Point& q4 = points[i + 3];
 		assert(q3.y == q4.y);
 		
-		int yint = (q1.y / float(radii.y)) * intensity;
 		for (int x = q1.x; x >= 0; --x) {
-			int xint = (x / float(radii.x)) * intensity;
 			// by the power of Pythagurus
-			int dist = std::hypot(xint, yint);
-			assert(dist >= 0);
-			uint8_t light = Clamp(255 - dist, 0, 255);
+			int hyp = std::hypot(x, q1.y);
+			int dist = (hyp / maxr) * intensity;
+			assert(dist >= 0 && dist <= intensity);
+			uint8_t light = Clamp<uint8_t>(intensity - dist, 0, intensity);
 			px[(radii.y + q1.y) * size.w + radii.x + x] = light; // quad 1
 			px[(radii.y + q2.y) * size.w + radii.x - x] = light; // quad 2
 			px[(radii.y + q3.y) * size.w + radii.x - x] = light; // quad 3

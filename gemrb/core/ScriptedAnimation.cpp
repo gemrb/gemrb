@@ -645,7 +645,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 		video->BlitGameSpriteWithPalette(anim->CurrentFrame(), palette, p, flags | BlitFlags::BLENDED, tint);
 
 	if (light) {
-		video->BlitGameSprite(light, p, flags | BlitFlags::BLENDED | BlitFlags::HALFTRANS, tint);
+		video->BlitGameSprite(light, p, flags | BlitFlags::BLENDED, tint);
 	}
 }
 
