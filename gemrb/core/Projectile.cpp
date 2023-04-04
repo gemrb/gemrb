@@ -1693,24 +1693,24 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 void Projectile::DrawTravel(const Region& viewport)
 {
 	const Game *game = core->GetGame();
-	BlitFlags flag;
+	BlitFlags flags;
 
 	if(ExtFlags&PEF_HALFTRANS) {
-		flag = BlitFlags::HALFTRANS;
+		flags = BlitFlags::HALFTRANS;
 	} else {
-		flag = BlitFlags::NONE;
+		flags = BlitFlags::NONE;
 	}
 
 	//static tint (use the tint field)
 	if(ExtFlags&PEF_TINT) {
-		flag |= BlitFlags::COLOR_MOD;
+		flags |= BlitFlags::COLOR_MOD;
 	}
 
 	//Area tint
 	if (TFlags&PTF_TINT) {
 		tint = area->GetLighting(Pos);
 		tint.a = 255;
-		flag |= BlitFlags::COLOR_MOD;
+		flags |= BlitFlags::COLOR_MOD;
 	}
 
 	unsigned int face = GetNextFace();
@@ -1751,14 +1751,13 @@ void Projectile::DrawTravel(const Region& viewport)
 
 	// set up the tint for the rest of the blits, but don't overwrite the saved one
 	Color tint2 = tint;
-	BlitFlags flags = flag;
 
 	if (TFlags&PTF_TINT && game) {
 		game->ApplyGlobalTint(tint2, flags);
 	}
 
 	if (light) {
-		Draw(light, pos, flags^flag, tint2);
+		Draw(light, pos, BlitFlags::NONE, tint2);
 	}
 
 	if (ExtFlags&PEF_POP) {
@@ -1788,7 +1787,7 @@ void Projectile::DrawTravel(const Region& viewport)
 	}
 	
 	if (ExtFlags&PEF_LINE) {
-		DrawLine(viewport, face, flag);
+		DrawLine(viewport, face, flags);
 		return;
 	}
 	
