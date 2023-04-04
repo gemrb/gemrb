@@ -304,9 +304,6 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 				anims[p_release] = PrepareAnimation(af, seq3, i);
 			}
 		}
-		if (Transparency&IE_VVC_BLENDED) {
-			GetPaletteCopy();
-		}
 	}
 
 	SetPhase(P_ONSET);
@@ -618,6 +615,9 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 	if (Transparency & IE_VVC_TINT) {
 		flags |= BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD;
 	}
+	if (Transparency & IE_VVC_BLENDED) {
+		flags |= BlitFlags::ONE_MINUS_DST;
+	}
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
 	//these are used in the original engine to implement weather/daylight effects
@@ -681,12 +681,9 @@ void ScriptedAnimation::SetEffectOwned(bool flag)
 
 void ScriptedAnimation::SetBlend()
 {
-	if ((Transparency&IE_VVC_BLENDED) == 0) {
-		Transparency |= IE_VVC_BLENDED;
-		palette = nullptr;
-		GetPaletteCopy();
-		if (twin)
-			twin->SetBlend();
+	Transparency |= IE_VVC_BLENDED;
+	if (twin) {
+		twin->SetBlend();
 	}
 }
 
@@ -710,13 +707,9 @@ void ScriptedAnimation::GetPaletteCopy()
 		if (!spr) continue;
 
 		palette = spr->GetPalette()->Copy();
-		if ((Transparency & IE_VVC_BLENDED) && palette->HasAlpha() == false) {
-			palette->CreateShadedAlphaChannel();
-		} else {
-			Color shadowalpha = palette->col[1];
-			shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
-			palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
-		}
+		Color shadowalpha = palette->col[1];
+		shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
+		palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
 		//we need only one palette, so break here
 		break;
 	}
