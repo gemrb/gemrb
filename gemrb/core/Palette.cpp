@@ -24,7 +24,6 @@
 
 namespace GemRB {
 
-#define MINCOL 2
 #define MUL    2
 
 Palette::Palette(const Color &color, const Color &back) noexcept
@@ -65,22 +64,6 @@ void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t d
 {
 	CopyColorRangePrivate(srcBeg, srcEnd, &col[dst]);
 	UpdateAlpha();
-	version++;
-}
-
-void Palette::CreateShadedAlphaChannel() noexcept
-{
-	for (int i = 1; i < 256; ++i) {
-		Color& c = col[i];
-		unsigned int m = (c.r + c.g + c.b) / 3;
-		if (m > MINCOL) {
-			int tmp = m * MUL;
-			c.a = std::min(tmp, 0xff);
-		} else {
-			c.a = 0;
-		}
-	}
-	alpha = true;
 	version++;
 }
 

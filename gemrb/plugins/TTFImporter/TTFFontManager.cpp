@@ -99,7 +99,19 @@ void TTFFontManager::Close()
 Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /*background*/)
 {
 	PaletteHolder pal = MakeHolder<Palette>(ColorWhite, ColorBlack);
-	pal->CreateShadedAlphaChannel();
+	
+	// FIXME: we probably dont need to do this
+	// Font already can do blending between fg and bg colors
+	for (int i = 1; i < 256; ++i) {
+		Color& c = pal->col[i];
+		unsigned int m = (c.r + c.g + c.b) / 3;
+		if (m > 2) {
+			int tmp = m * MUL;
+			c.a = std::min(tmp, 0xff);
+		} else {
+			c.a = 0;
+		}
+	}
 
 	FT_Error error = 0;
 	ieWord lineHeight = 0, baseline = 0;
