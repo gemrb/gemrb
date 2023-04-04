@@ -22,7 +22,7 @@
 
 #include "Holder.h"
 #include "Region.h"
-#include "Sprite2d.h"
+#include "Sprite2D.h"
 
 #include "globals.h"
 
