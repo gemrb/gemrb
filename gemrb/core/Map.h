@@ -290,7 +290,6 @@ public:
 
 	void InitAnimation();
 	void SetPalette(const ResRef &PaletteRef);
-	void BlendAnimation();
 	bool Schedule(ieDword gametime) const;
 	Region DrawingRegion() const;
 	void Draw(const Region &screen, Color tint, BlitFlags flags) const;

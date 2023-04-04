@@ -3725,9 +3725,6 @@ void AreaAnimation::InitAnimation()
 	if (Flags & A_ANI_PALETTE) {
 		SetPalette(PaletteRef);
 	}
-	if (Flags&A_ANI_BLEND) {
-		BlendAnimation();
-	}
 }
 
 void AreaAnimation::SetPalette(const ResRef &pal)
@@ -3735,34 +3732,6 @@ void AreaAnimation::SetPalette(const ResRef &pal)
 	Flags |= A_ANI_PALETTE;
 	PaletteRef = pal;
 	palette = gamedata->GetPalette(PaletteRef);
-	if (Flags&A_ANI_BLEND) {
-		//re-blending after palette change
-		BlendAnimation();
-	}
-}
-
-void AreaAnimation::BlendAnimation()
-{
-	//Warning! This function will modify a shared palette
-	if (!palette) {
-		// CHECKME: what should we do here? Currently copying palette
-		// from first frame of first animation
-
-		if (animation.empty()) return;
-		Holder<Sprite2D> spr = animation[0].GetFrame(0);
-		if (!spr) return;
-
-		// BAMv2 anims don't have palettes
-		auto spritePalette = spr->GetPalette();
-		if (spritePalette) {
-			palette = spr->GetPalette()->Copy();
-			PaletteRef.Reset();
-		}
-	}
-
-	if (palette) {
-		palette->CreateShadedAlphaChannel();
-	}
 }
 
 bool AreaAnimation::Schedule(ieDword gametime) const
@@ -3804,6 +3773,10 @@ void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) co
 		flags |= BlitFlags::ALPHA_MOD;
 	} else {
 		tint.a = 255;
+	}
+	
+	if (Flags & A_ANI_BLEND) {
+		flags |= BlitFlags::ONE_MINUS_DST;
 	}
 
 	size_t ac = animation.size();
