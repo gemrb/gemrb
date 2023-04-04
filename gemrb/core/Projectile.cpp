@@ -193,9 +193,6 @@ void Projectile::SetBlend(int brighten)
 	GetPaletteCopy(travel, palette);
 	if (!palette)
 		return;
-	if (!palette->HasAlpha()) {
-		palette->CreateShadedAlphaChannel();
-	}
 	if (brighten) {
 		palette->Brighten();
 	}
@@ -354,9 +351,7 @@ void Projectile::Setup()
 	if (TFlags&PTF_LIGHT) {
 		light = CreateLight(Size(LightX, LightY), LightZ);
 	}
-	if (TFlags&PTF_TRANS) {
-		SetBlend(TFlags&PTF_BRIGHTEN);
-	}
+
 	phase = P_TRAVEL;
 	travel_handle.sound = core->GetAudioDrv()->Play(FiringSound, SFX_CHAN_MISSILE,
 				Pos, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
@@ -1597,6 +1592,7 @@ void Projectile::DrawExplosion(const Region& vp)
 				pro->SetGradient(Extension->ExplColor, !(apflags&APF_PALETTE));
 			}
 			//i'm unsure if we need blending for all anims or just the tinted ones
+			// FIXME: this seems suspect
 			pro->TFlags|=PTF_TRANS;
 			//random frame is needed only for some of these, make it an areapro flag?
 			if( !(ExtFlags&PEF_CYCLE) || (ExtFlags&PEF_RANDOM) ) {
@@ -1802,6 +1798,16 @@ void Projectile::DrawTravel(const Region& viewport)
 	}
 
 	pos.y-=GetZPos();
+	
+	if (TFlags & PTF_TRANS) {
+		flags |= BlitFlags::ONE_MINUS_DST;
+	}
+	if (TFlags & PTF_BLEND) {
+		flags |= BlitFlags::DST;
+	}
+	if (TFlags & PTF_TRANS_BLEND) {
+		flags |= BlitFlags::SRC;
+	}
 
 	if (ExtFlags&PEF_PILLAR) {
 		//draw all frames simultaneously on top of each other
