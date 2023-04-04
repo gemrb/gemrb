@@ -236,7 +236,7 @@ BlitFlags SDLSurfaceSprite2D::RenderWithFlags(BlitFlags renderflags, const Color
 		if (oldVersion != newVersion || IsPaletteStale()) {
 			SDL_Palette* pal = static_cast<SDL_Palette*>(NewVersion(newVersion));
 
-			for (size_t i = 0; i < 256; ++i) {
+			for (size_t i = 1; i < 256; ++i) {
 				Color& dstc = reinterpret_cast<Color&>(pal->colors[i]);
 
 				if (renderflags&BlitFlags::COLOR_MOD) {
