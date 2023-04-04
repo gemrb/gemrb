@@ -70,7 +70,6 @@ public:
 	unsigned short GetVersion() const noexcept { return version; }
 
 	bool HasAlpha() const noexcept { return alpha; }
-	void Brighten() noexcept;
 
 	void SetupPaperdollColours(const ieDword* Colors, unsigned int type) noexcept;
 	void SetupRGBModification(const PaletteHolder& src, const RGBModifier* mods,

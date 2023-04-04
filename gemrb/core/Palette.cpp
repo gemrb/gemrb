@@ -67,16 +67,6 @@ void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t d
 	version++;
 }
 
-void Palette::Brighten() noexcept
-{
-	for (auto& c : col) {
-		c.r = (c.r + 256) / 2;
-		c.g = (c.g + 256) / 2;
-		c.b = (c.b + 256) / 2;
-	}
-	version++;
-}
-
 PaletteHolder Palette::Copy() const noexcept
 {
 	return MakeHolder<Palette>(std::begin(col), std::end(col));

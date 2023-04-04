@@ -423,7 +423,6 @@ private:
 	AnimArray CreateOrientedAnimations(const AnimationFactory *af, int Seq) const;
 	void GetPaletteCopy(const AnimArray&, PaletteHolder &pal) const;
 	void GetSmokeAnim();
-	void SetBlend(int brighten);
 	//apply spells and effects on the target, only in single travel mode
 	//area effect projectiles call a separate single travel projectile for each affected target
 	void Payload();

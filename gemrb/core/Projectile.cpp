@@ -188,16 +188,6 @@ void Projectile::GetPaletteCopy(const AnimArray& anims, PaletteHolder &pal) cons
 	}
 }
 
-void Projectile::SetBlend(int brighten)
-{
-	GetPaletteCopy(travel, palette);
-	if (!palette)
-		return;
-	if (brighten) {
-		palette->Brighten();
-	}
-}
-
 //create another projectile with type-1 (iterate magic missiles and call lightning)
 void Projectile::CreateIteration()
 {
