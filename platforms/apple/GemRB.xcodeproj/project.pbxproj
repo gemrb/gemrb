@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -1241,7 +1241,6 @@
 		A20A278A1A71E3200077077C /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
 		A2111CC81D0A49650044939E /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
 		A218A75114A8F3DB001142CF /* gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = gemrb.icns; path = ../../artwork/gemrb.icns; sourceTree = "<group>"; };
-		A22693781422931B004468E8 /* CocoaWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CocoaWrapper.h; path = ../gemrb/includes/CocoaWrapper.h; sourceTree = "<group>"; };
 		A228D24816A86FA00053375D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
 		A22B5D5D1583D816007B4AA4 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = ios/lib/iphonesimulator/libFreetype2.a; sourceTree = "<group>"; };
 		A22B5D5E1583D816007B4AA4 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = ios/lib/iphonesimulator/libPython.a; sourceTree = "<group>"; };
@@ -1528,6 +1527,213 @@
 		A2A3A7EE14A51B1800F705CF /* GEM_SDL_Keyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GEM_SDL_Keyboard.m; sourceTree = "<group>"; };
 		A2A6A459146893CC000F1688 /* TTFFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TTFFontManager.cpp; sourceTree = "<group>"; };
 		A2A6A45A146893CC000F1688 /* TTFFontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTFFontManager.h; sourceTree = "<group>"; };
+		A2A9A84629DE2CD000C61D90 /* ie_slots.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ie_slots.py; sourceTree = "<group>"; };
+		A2A9A84829DE2CD000C61D90 /* Autodetect.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
+		A2A9A84929DE2CD000C61D90 /* GUIMG.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMG.py; sourceTree = "<group>"; };
+		A2A9A84A29DE2CD000C61D90 /* Game.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
+		A2A9A84B29DE2CD000C61D90 /* QuitGame.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
+		A2A9A84C29DE2CD000C61D90 /* GUIPR.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIPR.py; sourceTree = "<group>"; };
+		A2A9A84D29DE2CD000C61D90 /* Start.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
+		A2A9A84E29DE2CD000C61D90 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		A2A9A84F29DE2CD000C61D90 /* SetupGame.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = SetupGame.py; sourceTree = "<group>"; };
+		A2A9A85029DE2CD000C61D90 /* GUIOPT.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIOPT.py; sourceTree = "<group>"; };
+		A2A9A85129DE2CD000C61D90 /* GUIJRNL.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
+		A2A9A85229DE2CD000C61D90 /* GUIINV.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
+		A2A9A85329DE2CD000C61D90 /* MessageWindow.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = MessageWindow.py; sourceTree = "<group>"; };
+		A2A9A85429DE2CD000C61D90 /* Tests.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Tests.py; sourceTree = "<group>"; };
+		A2A9A85529DE2CD000C61D90 /* GUIMA.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMA.py; sourceTree = "<group>"; };
+		A2A9A85629DE2CD000C61D90 /* LoadScreen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
+		A2A9A85729DE2CD000C61D90 /* ie_restype.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ie_restype.py; sourceTree = "<group>"; };
+		A2A9A85829DE2CD000C61D90 /* GUIMOVIE.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMOVIE.py; sourceTree = "<group>"; };
+		A2A9A85A29DE2CD000C61D90 /* Options.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Options.py; sourceTree = "<group>"; };
+		A2A9A85B29DE2CD000C61D90 /* CharGen9.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen9.py; sourceTree = "<group>"; };
+		A2A9A85C29DE2CD000C61D90 /* CGPortrait.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CGPortrait.py; sourceTree = "<group>"; };
+		A2A9A85D29DE2CD000C61D90 /* Autodetect.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
+		A2A9A85E29DE2CD000C61D90 /* SPParty.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = SPParty.py; sourceTree = "<group>"; };
+		A2A9A85F29DE2CD000C61D90 /* Skills.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Skills.py; sourceTree = "<group>"; };
+		A2A9A86029DE2CD000C61D90 /* Gender.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Gender.py; sourceTree = "<group>"; };
+		A2A9A86129DE2CD000C61D90 /* CharGen8.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen8.py; sourceTree = "<group>"; };
+		A2A9A86229DE2CD000C61D90 /* GUISPL.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUISPL.py; sourceTree = "<group>"; };
+		A2A9A86329DE2CD000C61D90 /* Alignment.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Alignment.py; sourceTree = "<group>"; };
+		A2A9A86429DE2CD000C61D90 /* Game.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
+		A2A9A86529DE2CD000C61D90 /* GUILOAD.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUILOAD.py; sourceTree = "<group>"; };
+		A2A9A86629DE2CD000C61D90 /* CharOverview.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharOverview.py; sourceTree = "<group>"; };
+		A2A9A86729DE2CD000C61D90 /* CharGen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen.py; sourceTree = "<group>"; };
+		A2A9A86829DE2CD000C61D90 /* Race.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Race.py; sourceTree = "<group>"; };
+		A2A9A86929DE2CD000C61D90 /* CharGen3.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen3.py; sourceTree = "<group>"; };
+		A2A9A86A29DE2CD000C61D90 /* CharGen7.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen7.py; sourceTree = "<group>"; };
+		A2A9A86B29DE2CD000C61D90 /* IDLUCommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = IDLUCommon.py; sourceTree = "<group>"; };
+		A2A9A86C29DE2CD000C61D90 /* QuitGame.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
+		A2A9A86D29DE2CD000C61D90 /* CharGen6.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen6.py; sourceTree = "<group>"; };
+		A2A9A86E29DE2CD000C61D90 /* Spells.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Spells.py; sourceTree = "<group>"; };
+		A2A9A86F29DE2CD000C61D90 /* Abilities.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Abilities.py; sourceTree = "<group>"; };
+		A2A9A87029DE2CD000C61D90 /* Songs.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Songs.py; sourceTree = "<group>"; };
+		A2A9A87129DE2CD000C61D90 /* GUIREC.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIREC.py; sourceTree = "<group>"; };
+		A2A9A87229DE2CD000C61D90 /* Start.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
+		A2A9A87329DE2CD000C61D90 /* CharGen2.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen2.py; sourceTree = "<group>"; };
+		A2A9A87429DE2CD000C61D90 /* CSound.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CSound.py; sourceTree = "<group>"; };
+		A2A9A87529DE2CD000C61D90 /* CharGen5.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen5.py; sourceTree = "<group>"; };
+		A2A9A87629DE2CD000C61D90 /* GUIJRNL.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
+		A2A9A87729DE2CD000C61D90 /* GUIWORLD.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIWORLD.py; sourceTree = "<group>"; };
+		A2A9A87829DE2CD000C61D90 /* Class.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Class.py; sourceTree = "<group>"; };
+		A2A9A87929DE2CD000C61D90 /* ImportFile.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ImportFile.py; sourceTree = "<group>"; };
+		A2A9A87A29DE2CD000C61D90 /* SubRaces.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = SubRaces.py; sourceTree = "<group>"; };
+		A2A9A87B29DE2CD000C61D90 /* SPParty2.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = SPParty2.py; sourceTree = "<group>"; };
+		A2A9A87C29DE2CD000C61D90 /* CharGen4.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen4.py; sourceTree = "<group>"; };
+		A2A9A87D29DE2CD000C61D90 /* GUIINV.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
+		A2A9A87E29DE2CD000C61D90 /* MessageWindow.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = MessageWindow.py; sourceTree = "<group>"; };
+		A2A9A87F29DE2CD000C61D90 /* Name.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Name.py; sourceTree = "<group>"; };
+		A2A9A88029DE2CD000C61D90 /* Feats.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Feats.py; sourceTree = "<group>"; };
+		A2A9A88129DE2CD000C61D90 /* LoadScreen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
+		A2A9A88229DE2CD000C61D90 /* Enemy.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Enemy.py; sourceTree = "<group>"; };
+		A2A9A88329DE2CD000C61D90 /* SPPartyFormation.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = SPPartyFormation.py; sourceTree = "<group>"; };
+		A2A9A88429DE2CD000C61D90 /* Appearance.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Appearance.py; sourceTree = "<group>"; };
+		A2A9A88529DE2CD000C61D90 /* Spellbook.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Spellbook.py; sourceTree = "<group>"; };
+		A2A9A88629DE2CD000C61D90 /* CommonWindow.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CommonWindow.py; sourceTree = "<group>"; };
+		A2A9A88729DE2CD000C61D90 /* Console.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Console.py; sourceTree = "<group>"; };
+		A2A9A88829DE2CD000C61D90 /* GUIMG.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMG.py; sourceTree = "<group>"; };
+		A2A9A88929DE2CD000C61D90 /* AutodetectCommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = AutodetectCommon.py; sourceTree = "<group>"; };
+		A2A9A88A29DE2CD000C61D90 /* LUSkillsSelection.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LUSkillsSelection.py; sourceTree = "<group>"; };
+		A2A9A88B29DE2CD000C61D90 /* PartyReform.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = PartyReform.py; sourceTree = "<group>"; };
+		A2A9A88D29DE2CD000C61D90 /* Autodetect.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
+		A2A9A88E29DE2CD000C61D90 /* Start.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
+		A2A9A88F29DE2CD000C61D90 /* Portrait.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Portrait.py; sourceTree = "<group>"; };
+		A2A9A89029DE2CD000C61D90 /* BGCommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = BGCommon.py; sourceTree = "<group>"; };
+		A2A9A89129DE2CD000C61D90 /* GUILOAD.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUILOAD.py; sourceTree = "<group>"; };
+		A2A9A89229DE2CD000C61D90 /* ExportFile.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ExportFile.py; sourceTree = "<group>"; };
+		A2A9A89329DE2CD000C61D90 /* Clock.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Clock.py; sourceTree = "<group>"; };
+		A2A9A89529DE2CD000C61D90 /* GUICG3.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG3.py; sourceTree = "<group>"; };
+		A2A9A89629DE2CD000C61D90 /* Autodetect.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
+		A2A9A89729DE2CD000C61D90 /* GUICG7.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG7.py; sourceTree = "<group>"; };
+		A2A9A89829DE2CD000C61D90 /* GUICG19.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG19.py; sourceTree = "<group>"; };
+		A2A9A89929DE2CD000C61D90 /* GUICG6.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG6.py; sourceTree = "<group>"; };
+		A2A9A89A29DE2CD000C61D90 /* GUICG2.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG2.py; sourceTree = "<group>"; };
+		A2A9A89B29DE2CD000C61D90 /* Game.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
+		A2A9A89C29DE2CD000C61D90 /* GUICG9.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG9.py; sourceTree = "<group>"; };
+		A2A9A89D29DE2CD000C61D90 /* CharGen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen.py; sourceTree = "<group>"; };
+		A2A9A89E29DE2CD000C61D90 /* CharGenGui.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGenGui.py; sourceTree = "<group>"; };
+		A2A9A89F29DE2CD000C61D90 /* QuitGame.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
+		A2A9A8A029DE2CD000C61D90 /* GUICG12.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG12.py; sourceTree = "<group>"; };
+		A2A9A8A129DE2CD000C61D90 /* GUIMP.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMP.py; sourceTree = "<group>"; };
+		A2A9A8A229DE2CD000C61D90 /* GUICG22.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG22.py; sourceTree = "<group>"; };
+		A2A9A8A329DE2CD000C61D90 /* GUICG8.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG8.py; sourceTree = "<group>"; };
+		A2A9A8A429DE2CD000C61D90 /* Start.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
+		A2A9A8A529DE2CD000C61D90 /* CharGenCommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGenCommon.py; sourceTree = "<group>"; };
+		A2A9A8A629DE2CD000C61D90 /* GUICG15.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG15.py; sourceTree = "<group>"; };
+		A2A9A8A729DE2CD100C61D90 /* GUIJRNL.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
+		A2A9A8A829DE2CD100C61D90 /* ImportFile.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ImportFile.py; sourceTree = "<group>"; };
+		A2A9A8A929DE2CD100C61D90 /* GUICG10.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG10.py; sourceTree = "<group>"; };
+		A2A9A8AA29DE2CD100C61D90 /* GUICG5.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG5.py; sourceTree = "<group>"; };
+		A2A9A8AB29DE2CD100C61D90 /* GUIINV.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
+		A2A9A8AC29DE2CD100C61D90 /* GUICG1.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG1.py; sourceTree = "<group>"; };
+		A2A9A8AD29DE2CD100C61D90 /* LoadScreen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
+		A2A9A8AE29DE2CD100C61D90 /* GUICG4.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG4.py; sourceTree = "<group>"; };
+		A2A9A8AF29DE2CD100C61D90 /* GUIOPTControls.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIOPTControls.py; sourceTree = "<group>"; };
+		A2A9A8B029DE2CD100C61D90 /* GUICG13.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG13.py; sourceTree = "<group>"; };
+		A2A9A8B129DE2CD100C61D90 /* LUProfsSelection.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LUProfsSelection.py; sourceTree = "<group>"; };
+		A2A9A8B229DE2CD100C61D90 /* GUIRECCommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIRECCommon.py; sourceTree = "<group>"; };
+		A2A9A8B329DE2CD100C61D90 /* GUIPR.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIPR.py; sourceTree = "<group>"; };
+		A2A9A8B429DE2CD100C61D90 /* GUIREC.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIREC.py; sourceTree = "<group>"; };
+		A2A9A8B529DE2CD100C61D90 /* Container.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Container.py; sourceTree = "<group>"; };
+		A2A9A8B629DE2CD100C61D90 /* ie_modal.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ie_modal.py; sourceTree = "<group>"; };
+		A2A9A8B729DE2CD100C61D90 /* ie_spells.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ie_spells.py; sourceTree = "<group>"; };
+		A2A9A8B829DE2CD100C61D90 /* InventoryCommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = InventoryCommon.py; sourceTree = "<group>"; };
+		A2A9A8B929DE2CD100C61D90 /* GUIOPT.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIOPT.py; sourceTree = "<group>"; };
+		A2A9A8BA29DE2CD100C61D90 /* ie_action.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ie_action.py; sourceTree = "<group>"; };
+		A2A9A8BB29DE2CD100C61D90 /* ie_stats.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ie_stats.py; sourceTree = "<group>"; };
+		A2A9A8BC29DE2CD100C61D90 /* LevelUp.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LevelUp.py; sourceTree = "<group>"; };
+		A2A9A8BD29DE2CD100C61D90 /* maze_defs.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = maze_defs.py; sourceTree = "<group>"; };
+		A2A9A8BE29DE2CD100C61D90 /* GUISAVE.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUISAVE.py; sourceTree = "<group>"; };
+		A2A9A8BF29DE2CD100C61D90 /* CommonTables.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CommonTables.py; sourceTree = "<group>"; };
+		A2A9A8C029DE2CD100C61D90 /* GUIDefines.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIDefines.py; sourceTree = "<group>"; };
+		A2A9A8C129DE2CD100C61D90 /* GUIWORLD.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIWORLD.py; sourceTree = "<group>"; };
+		A2A9A8C229DE2CD100C61D90 /* GameCheck.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GameCheck.py; sourceTree = "<group>"; };
+		A2A9A8C329DE2CD100C61D90 /* GUICommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICommon.py; sourceTree = "<group>"; };
+		A2A9A8C429DE2CD100C61D90 /* LUSpellSelection.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LUSpellSelection.py; sourceTree = "<group>"; };
+		A2A9A8C529DE2CD100C61D90 /* GUIMACommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMACommon.py; sourceTree = "<group>"; };
+		A2A9A8C629DE2CD100C61D90 /* GUISTORE.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUISTORE.py; sourceTree = "<group>"; };
+		A2A9A8C729DE2CD100C61D90 /* ie_sounds.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ie_sounds.py; sourceTree = "<group>"; };
+		A2A9A8C829DE2CD100C61D90 /* GUISONGS.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUISONGS.py; sourceTree = "<group>"; };
+		A2A9A8C929DE2CD100C61D90 /* GUIClasses.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIClasses.py; sourceTree = "<group>"; };
+		A2A9A8CA29DE2CD100C61D90 /* Actor.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Actor.py; sourceTree = "<group>"; };
+		A2A9A8CB29DE2CD100C61D90 /* MessageWindow.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = MessageWindow.py; sourceTree = "<group>"; };
+		A2A9A8CD29DE2CD100C61D90 /* NewLife.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = NewLife.py; sourceTree = "<group>"; };
+		A2A9A8CE29DE2CD100C61D90 /* Autodetect.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
+		A2A9A8CF29DE2CD100C61D90 /* GUIMG.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMG.py; sourceTree = "<group>"; };
+		A2A9A8D029DE2CD100C61D90 /* FloatMenuWindow.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = FloatMenuWindow.py; sourceTree = "<group>"; };
+		A2A9A8D129DE2CD100C61D90 /* Game.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
+		A2A9A8D229DE2CD100C61D90 /* GUILOAD.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUILOAD.py; sourceTree = "<group>"; };
+		A2A9A8D329DE2CD100C61D90 /* Clock.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Clock.py; sourceTree = "<group>"; };
+		A2A9A8D429DE2CD100C61D90 /* QuitGame.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
+		A2A9A8D529DE2CD100C61D90 /* GUIPR.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIPR.py; sourceTree = "<group>"; };
+		A2A9A8D629DE2CD100C61D90 /* GUIREC.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIREC.py; sourceTree = "<group>"; };
+		A2A9A8D729DE2CD100C61D90 /* Start.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
+		A2A9A8D829DE2CD100C61D90 /* GUIOPT.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIOPT.py; sourceTree = "<group>"; };
+		A2A9A8D929DE2CD100C61D90 /* GUIJRNL.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
+		A2A9A8DA29DE2CD100C61D90 /* GUISAVE.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUISAVE.py; sourceTree = "<group>"; };
+		A2A9A8DB29DE2CD100C61D90 /* Maze.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Maze.py; sourceTree = "<group>"; };
+		A2A9A8DC29DE2CD100C61D90 /* GUIWORLD.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIWORLD.py; sourceTree = "<group>"; };
+		A2A9A8DD29DE2CD100C61D90 /* GUIINV.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
+		A2A9A8DE29DE2CD100C61D90 /* MessageWindow.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = MessageWindow.py; sourceTree = "<group>"; };
+		A2A9A8DF29DE2CD100C61D90 /* GUIMA.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMA.py; sourceTree = "<group>"; };
+		A2A9A8E029DE2CD100C61D90 /* LoadScreen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
+		A2A9A8E129DE2CD100C61D90 /* Main.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Main.py; sourceTree = "<group>"; };
+		A2A9A8E229DE2CD100C61D90 /* LUCommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LUCommon.py; sourceTree = "<group>"; };
+		A2A9A8E429DE2CD100C61D90 /* Autodetect.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
+		A2A9A8E529DE2CD100C61D90 /* PartyFormation.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = PartyFormation.py; sourceTree = "<group>"; };
+		A2A9A8E629DE2CD100C61D90 /* Game.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
+		A2A9A8E729DE2CD100C61D90 /* CharGen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen.py; sourceTree = "<group>"; };
+		A2A9A8E829DE2CD100C61D90 /* QuitGame.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
+		A2A9A8E929DE2CD100C61D90 /* Start.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
+		A2A9A8EA29DE2CD100C61D90 /* GUIJRNL.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
+		A2A9A8EB29DE2CD100C61D90 /* GUIINV.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
+		A2A9A8EC29DE2CD100C61D90 /* LoadScreen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
+		A2A9A8EE29DE2CD100C61D90 /* CharGen9.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen9.py; sourceTree = "<group>"; };
+		A2A9A8EF29DE2CD100C61D90 /* GUICG3.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG3.py; sourceTree = "<group>"; };
+		A2A9A8F029DE2CD100C61D90 /* Autodetect.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
+		A2A9A8F129DE2CD100C61D90 /* GUICG7.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG7.py; sourceTree = "<group>"; };
+		A2A9A8F229DE2CD100C61D90 /* GUICG19.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG19.py; sourceTree = "<group>"; };
+		A2A9A8F329DE2CD100C61D90 /* GUICG6.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG6.py; sourceTree = "<group>"; };
+		A2A9A8F429DE2CD100C61D90 /* CharGen8.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen8.py; sourceTree = "<group>"; };
+		A2A9A8F529DE2CD100C61D90 /* GUICG2.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG2.py; sourceTree = "<group>"; };
+		A2A9A8F629DE2CD100C61D90 /* Game.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
+		A2A9A8F729DE2CD100C61D90 /* GUICG23.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG23.py; sourceTree = "<group>"; };
+		A2A9A8F829DE2CD100C61D90 /* GUICG9.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG9.py; sourceTree = "<group>"; };
+		A2A9A8F929DE2CD100C61D90 /* CharGen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen.py; sourceTree = "<group>"; };
+		A2A9A8FA29DE2CD100C61D90 /* CharGen3.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen3.py; sourceTree = "<group>"; };
+		A2A9A8FB29DE2CD100C61D90 /* CharGen7.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen7.py; sourceTree = "<group>"; };
+		A2A9A8FC29DE2CD100C61D90 /* QuitGame.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
+		A2A9A8FD29DE2CD100C61D90 /* GUICG12.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG12.py; sourceTree = "<group>"; };
+		A2A9A8FE29DE2CD100C61D90 /* CharGen6.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen6.py; sourceTree = "<group>"; };
+		A2A9A8FF29DE2CD100C61D90 /* LUHLASelection.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LUHLASelection.py; sourceTree = "<group>"; };
+		A2A9A90029DE2CD100C61D90 /* GUICG22.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG22.py; sourceTree = "<group>"; };
+		A2A9A90129DE2CD100C61D90 /* GUICG8.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG8.py; sourceTree = "<group>"; };
+		A2A9A90229DE2CD100C61D90 /* Start.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
+		A2A9A90329DE2CD100C61D90 /* ImportGame.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ImportGame.py; sourceTree = "<group>"; };
+		A2A9A90429DE2CD100C61D90 /* CharGen2.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen2.py; sourceTree = "<group>"; };
+		A2A9A90529DE2CD100C61D90 /* DemoEnd.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = DemoEnd.py; sourceTree = "<group>"; };
+		A2A9A90629DE2CD100C61D90 /* CharGen5.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen5.py; sourceTree = "<group>"; };
+		A2A9A90729DE2CD100C61D90 /* CharGenCommon.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGenCommon.py; sourceTree = "<group>"; };
+		A2A9A90829DE2CD100C61D90 /* GUICG15.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG15.py; sourceTree = "<group>"; };
+		A2A9A90929DE2CD100C61D90 /* GUIJRNL.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
+		A2A9A90A29DE2CD100C61D90 /* ImportFile.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ImportFile.py; sourceTree = "<group>"; };
+		A2A9A90B29DE2CD100C61D90 /* GUICG24.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG24.py; sourceTree = "<group>"; };
+		A2A9A90C29DE2CD100C61D90 /* GUICG10.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG10.py; sourceTree = "<group>"; };
+		A2A9A90D29DE2CD100C61D90 /* CharGen4.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGen4.py; sourceTree = "<group>"; };
+		A2A9A90E29DE2CD100C61D90 /* GUICG5.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG5.py; sourceTree = "<group>"; };
+		A2A9A90F29DE2CD100C61D90 /* GUIINV.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
+		A2A9A91029DE2CD100C61D90 /* CharGenEnd.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = CharGenEnd.py; sourceTree = "<group>"; };
+		A2A9A91129DE2CD100C61D90 /* GUICG1.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG1.py; sourceTree = "<group>"; };
+		A2A9A91229DE2CD100C61D90 /* LoadScreen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
+		A2A9A91329DE2CD100C61D90 /* Start2.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Start2.py; sourceTree = "<group>"; };
+		A2A9A91429DE2CD100C61D90 /* GUICG4.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICG4.py; sourceTree = "<group>"; };
+		A2A9A91529DE2CD100C61D90 /* StartOpt.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = StartOpt.py; sourceTree = "<group>"; };
+		A2A9A91629DE2CD100C61D90 /* GUIMA.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUIMA.py; sourceTree = "<group>"; };
+		A2A9A91729DE2CD100C61D90 /* ie_feats.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = ie_feats.py; sourceTree = "<group>"; };
+		A2A9A91829DE2CD100C61D90 /* TextScreen.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = TextScreen.py; sourceTree = "<group>"; };
+		A2A9A91929DE2CD100C61D90 /* GUICommonWindows.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = GUICommonWindows.py; sourceTree = "<group>"; };
+		A2A9A91A29DE2CD100C61D90 /* DualClass.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = DualClass.py; sourceTree = "<group>"; };
+		A2A9A91B29DE2CD100C61D90 /* MetaClasses.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = MetaClasses.py; sourceTree = "<group>"; };
 		A2AAC14615C1C2F500D27766 /* FreeType.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FreeType.framework; path = /Library/Frameworks/FreeType.framework; sourceTree = "<absolute>"; };
 		A2AAF36713A1507100AE8402 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A2AAF38D13A150D700AE8402 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -3698,213 +3904,6 @@
 		A2E7E93E266946720064423F /* spells.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = spells.2da; sourceTree = "<group>"; };
 		A2E7E93F266946720064423F /* ogmagi01.bcs */ = {isa = PBXFileReference; lastKnownFileType = text; path = ogmagi01.bcs; sourceTree = "<group>"; };
 		A2E7E940266946720064423F /* cut17d.bcs */ = {isa = PBXFileReference; lastKnownFileType = text; path = cut17d.bcs; sourceTree = "<group>"; };
-		A2E7E942266946720064423F /* ie_slots.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ie_slots.py; sourceTree = "<group>"; };
-		A2E7E944266946720064423F /* Autodetect.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
-		A2E7E945266946720064423F /* GUIMG.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMG.py; sourceTree = "<group>"; };
-		A2E7E946266946720064423F /* Game.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
-		A2E7E947266946720064423F /* GUIPR.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIPR.py; sourceTree = "<group>"; };
-		A2E7E948266946720064423F /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		A2E7E949266946720064423F /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		A2E7E94A266946720064423F /* SetupGame.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = SetupGame.py; sourceTree = "<group>"; };
-		A2E7E94B266946720064423F /* GUIOPT.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIOPT.py; sourceTree = "<group>"; };
-		A2E7E94C266946720064423F /* GUIJRNL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
-		A2E7E94D266946720064423F /* GUIINV.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
-		A2E7E94E266946720064423F /* MessageWindow.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = MessageWindow.py; sourceTree = "<group>"; };
-		A2E7E94F266946720064423F /* Tests.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Tests.py; sourceTree = "<group>"; };
-		A2E7E950266946720064423F /* GUIMA.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMA.py; sourceTree = "<group>"; };
-		A2E7E951266946720064423F /* LoadScreen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
-		A2E7E952266946720064423F /* ie_restype.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ie_restype.py; sourceTree = "<group>"; };
-		A2E7E953266946720064423F /* GUIMOVIE.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMOVIE.py; sourceTree = "<group>"; };
-		A2E7E955266946720064423F /* Options.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Options.py; sourceTree = "<group>"; };
-		A2E7E956266946720064423F /* CharGen9.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen9.py; sourceTree = "<group>"; };
-		A2E7E957266946720064423F /* CGPortrait.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CGPortrait.py; sourceTree = "<group>"; };
-		A2E7E958266946720064423F /* Autodetect.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
-		A2E7E959266946720064423F /* SPParty.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = SPParty.py; sourceTree = "<group>"; };
-		A2E7E95A266946720064423F /* Skills.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Skills.py; sourceTree = "<group>"; };
-		A2E7E95B266946720064423F /* Gender.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Gender.py; sourceTree = "<group>"; };
-		A2E7E95C266946720064423F /* CharGen8.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen8.py; sourceTree = "<group>"; };
-		A2E7E95D266946720064423F /* GUISPL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUISPL.py; sourceTree = "<group>"; };
-		A2E7E95E266946720064423F /* Alignment.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Alignment.py; sourceTree = "<group>"; };
-		A2E7E95F266946720064423F /* Game.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
-		A2E7E960266946720064423F /* GUILOAD.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUILOAD.py; sourceTree = "<group>"; };
-		A2E7E961266946720064423F /* CharOverview.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharOverview.py; sourceTree = "<group>"; };
-		A2E7E962266946720064423F /* CharGen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen.py; sourceTree = "<group>"; };
-		A2E7E963266946720064423F /* Race.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Race.py; sourceTree = "<group>"; };
-		A2E7E964266946720064423F /* CharGen3.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen3.py; sourceTree = "<group>"; };
-		A2E7E965266946720064423F /* CharGen7.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen7.py; sourceTree = "<group>"; };
-		A2E7E966266946720064423F /* IDLUCommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = IDLUCommon.py; sourceTree = "<group>"; };
-		A2E7E967266946720064423F /* QuitGame.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
-		A2E7E968266946720064423F /* CharGen6.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen6.py; sourceTree = "<group>"; };
-		A2E7E969266946720064423F /* Spells.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Spells.py; sourceTree = "<group>"; };
-		A2E7E96A266946720064423F /* Abilities.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Abilities.py; sourceTree = "<group>"; };
-		A2E7E96B266946720064423F /* Songs.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Songs.py; sourceTree = "<group>"; };
-		A2E7E96C266946720064423F /* GUIREC.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIREC.py; sourceTree = "<group>"; };
-		A2E7E96D266946720064423F /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		A2E7E96E266946720064423F /* CharGen2.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen2.py; sourceTree = "<group>"; };
-		A2E7E96F266946720064423F /* CSound.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CSound.py; sourceTree = "<group>"; };
-		A2E7E970266946720064423F /* CharGen5.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen5.py; sourceTree = "<group>"; };
-		A2E7E971266946720064423F /* GUIJRNL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
-		A2E7E972266946720064423F /* GUIWORLD.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIWORLD.py; sourceTree = "<group>"; };
-		A2E7E973266946720064423F /* Class.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Class.py; sourceTree = "<group>"; };
-		A2E7E974266946720064423F /* ImportFile.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ImportFile.py; sourceTree = "<group>"; };
-		A2E7E975266946720064423F /* SubRaces.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = SubRaces.py; sourceTree = "<group>"; };
-		A2E7E976266946720064423F /* SPParty2.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = SPParty2.py; sourceTree = "<group>"; };
-		A2E7E977266946720064423F /* CharGen4.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen4.py; sourceTree = "<group>"; };
-		A2E7E978266946720064423F /* GUIINV.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
-		A2E7E979266946720064423F /* MessageWindow.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = MessageWindow.py; sourceTree = "<group>"; };
-		A2E7E97A266946720064423F /* Name.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Name.py; sourceTree = "<group>"; };
-		A2E7E97B266946720064423F /* Feats.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Feats.py; sourceTree = "<group>"; };
-		A2E7E97C266946720064423F /* LoadScreen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
-		A2E7E97D266946720064423F /* Enemy.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Enemy.py; sourceTree = "<group>"; };
-		A2E7E97E266946720064423F /* SPPartyFormation.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = SPPartyFormation.py; sourceTree = "<group>"; };
-		A2E7E97F266946720064423F /* Appearance.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Appearance.py; sourceTree = "<group>"; };
-		A2E7E980266946720064423F /* Spellbook.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Spellbook.py; sourceTree = "<group>"; };
-		A2E7E981266946720064423F /* CommonWindow.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CommonWindow.py; sourceTree = "<group>"; };
-		A2E7E982266946720064423F /* Console.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Console.py; sourceTree = "<group>"; };
-		A2E7E983266946720064423F /* GUIMG.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMG.py; sourceTree = "<group>"; };
-		A2E7E984266946720064423F /* AutodetectCommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = AutodetectCommon.py; sourceTree = "<group>"; };
-		A2E7E985266946720064423F /* LUSkillsSelection.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LUSkillsSelection.py; sourceTree = "<group>"; };
-		A2E7E986266946720064423F /* GameWin.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GameWin.py; sourceTree = "<group>"; };
-		A2E7E988266946720064423F /* Autodetect.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
-		A2E7E989266946720064423F /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		A2E7E98A266946720064423F /* Portrait.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Portrait.py; sourceTree = "<group>"; };
-		A2E7E98B266946720064423F /* BGCommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = BGCommon.py; sourceTree = "<group>"; };
-		A2E7E98C266946720064423F /* GUILOAD.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUILOAD.py; sourceTree = "<group>"; };
-		A2E7E98D266946730064423F /* ExportFile.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ExportFile.py; sourceTree = "<group>"; };
-		A2E7E98E266946730064423F /* Clock.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Clock.py; sourceTree = "<group>"; };
-		A2E7E990266946730064423F /* GUICG3.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG3.py; sourceTree = "<group>"; };
-		A2E7E991266946730064423F /* Autodetect.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
-		A2E7E992266946730064423F /* GUICG7.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG7.py; sourceTree = "<group>"; };
-		A2E7E993266946730064423F /* GUICG19.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG19.py; sourceTree = "<group>"; };
-		A2E7E994266946730064423F /* GUICG6.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG6.py; sourceTree = "<group>"; };
-		A2E7E995266946730064423F /* GUICG2.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG2.py; sourceTree = "<group>"; };
-		A2E7E996266946730064423F /* Game.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
-		A2E7E997266946730064423F /* GUICG9.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG9.py; sourceTree = "<group>"; };
-		A2E7E998266946730064423F /* CharGen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen.py; sourceTree = "<group>"; };
-		A2E7E999266946730064423F /* CharGenGui.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGenGui.py; sourceTree = "<group>"; };
-		A2E7E99A266946730064423F /* GUICG13.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG13.py; sourceTree = "<group>"; };
-		A2E7E99B266946730064423F /* QuitGame.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
-		A2E7E99C266946730064423F /* GUICG12.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG12.py; sourceTree = "<group>"; };
-		A2E7E99D266946730064423F /* GUIMP.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMP.py; sourceTree = "<group>"; };
-		A2E7E99E266946730064423F /* GUICG22.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG22.py; sourceTree = "<group>"; };
-		A2E7E99F266946730064423F /* GUICG8.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG8.py; sourceTree = "<group>"; };
-		A2E7E9A0266946730064423F /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		A2E7E9A1266946730064423F /* CharGenCommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGenCommon.py; sourceTree = "<group>"; };
-		A2E7E9A2266946730064423F /* GUICG15.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG15.py; sourceTree = "<group>"; };
-		A2E7E9A3266946730064423F /* GUIJRNL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
-		A2E7E9A4266946730064423F /* ImportFile.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ImportFile.py; sourceTree = "<group>"; };
-		A2E7E9A5266946730064423F /* GUICG10.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG10.py; sourceTree = "<group>"; };
-		A2E7E9A6266946730064423F /* GUICG5.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG5.py; sourceTree = "<group>"; };
-		A2E7E9A7266946730064423F /* GUIINV.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
-		A2E7E9A8266946730064423F /* GUICG1.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG1.py; sourceTree = "<group>"; };
-		A2E7E9A9266946730064423F /* LoadScreen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
-		A2E7E9AA266946730064423F /* GUICG4.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG4.py; sourceTree = "<group>"; };
-		A2E7E9AB266946730064423F /* GUIOPTControls.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIOPTControls.py; sourceTree = "<group>"; };
-		A2E7E9AC266946730064423F /* LUProfsSelection.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LUProfsSelection.py; sourceTree = "<group>"; };
-		A2E7E9AD266946730064423F /* GUIRECCommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIRECCommon.py; sourceTree = "<group>"; };
-		A2E7E9AE266946730064423F /* types.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = types.py; sourceTree = "<group>"; };
-		A2E7E9AF266946730064423F /* GUIPR.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIPR.py; sourceTree = "<group>"; };
-		A2E7E9B0266946730064423F /* GUIREC.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIREC.py; sourceTree = "<group>"; };
-		A2E7E9B1266946730064423F /* ie_modal.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ie_modal.py; sourceTree = "<group>"; };
-		A2E7E9B2266946730064423F /* ie_spells.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ie_spells.py; sourceTree = "<group>"; };
-		A2E7E9B3266946730064423F /* InventoryCommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = InventoryCommon.py; sourceTree = "<group>"; };
-		A2E7E9B4266946730064423F /* GUIOPT.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIOPT.py; sourceTree = "<group>"; };
-		A2E7E9B5266946730064423F /* ie_action.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ie_action.py; sourceTree = "<group>"; };
-		A2E7E9B6266946730064423F /* ie_stats.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ie_stats.py; sourceTree = "<group>"; };
-		A2E7E9B7266946730064423F /* LevelUp.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LevelUp.py; sourceTree = "<group>"; };
-		A2E7E9B8266946730064423F /* maze_defs.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = maze_defs.py; sourceTree = "<group>"; };
-		A2E7E9B9266946730064423F /* GUISAVE.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUISAVE.py; sourceTree = "<group>"; };
-		A2E7E9BA266946730064423F /* CommonTables.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CommonTables.py; sourceTree = "<group>"; };
-		A2E7E9BB266946730064423F /* GUIDefines.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIDefines.py; sourceTree = "<group>"; };
-		A2E7E9BC266946730064423F /* GUIWORLD.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIWORLD.py; sourceTree = "<group>"; };
-		A2E7E9BD266946730064423F /* GameCheck.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GameCheck.py; sourceTree = "<group>"; };
-		A2E7E9BE266946730064423F /* GUICommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICommon.py; sourceTree = "<group>"; };
-		A2E7E9BF266946730064423F /* LUSpellSelection.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LUSpellSelection.py; sourceTree = "<group>"; };
-		A2E7E9C0266946730064423F /* GUIMACommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMACommon.py; sourceTree = "<group>"; };
-		A2E7E9C1266946730064423F /* GUISTORE.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUISTORE.py; sourceTree = "<group>"; };
-		A2E7E9C2266946730064423F /* ie_sounds.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ie_sounds.py; sourceTree = "<group>"; };
-		A2E7E9C3266946730064423F /* GUISONGS.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUISONGS.py; sourceTree = "<group>"; };
-		A2E7E9C4266946730064423F /* GUIClasses.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIClasses.py; sourceTree = "<group>"; };
-		A2E7E9C5266946730064423F /* Actor.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Actor.py; sourceTree = "<group>"; };
-		A2E7E9C6266946730064423F /* MessageWindow.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = MessageWindow.py; sourceTree = "<group>"; };
-		A2E7E9C8266946730064423F /* NewLife.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = NewLife.py; sourceTree = "<group>"; };
-		A2E7E9C9266946730064423F /* Autodetect.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
-		A2E7E9CA266946730064423F /* GUIMG.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMG.py; sourceTree = "<group>"; };
-		A2E7E9CB266946730064423F /* FloatMenuWindow.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = FloatMenuWindow.py; sourceTree = "<group>"; };
-		A2E7E9CC266946730064423F /* Game.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
-		A2E7E9CD266946730064423F /* GUILOAD.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUILOAD.py; sourceTree = "<group>"; };
-		A2E7E9CE266946730064423F /* Clock.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Clock.py; sourceTree = "<group>"; };
-		A2E7E9CF266946730064423F /* QuitGame.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
-		A2E7E9D0266946730064423F /* GUIPR.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIPR.py; sourceTree = "<group>"; };
-		A2E7E9D1266946730064423F /* GUIREC.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIREC.py; sourceTree = "<group>"; };
-		A2E7E9D2266946730064423F /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		A2E7E9D3266946730064423F /* GUIOPT.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIOPT.py; sourceTree = "<group>"; };
-		A2E7E9D4266946730064423F /* GUIJRNL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
-		A2E7E9D5266946730064423F /* GUISAVE.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUISAVE.py; sourceTree = "<group>"; };
-		A2E7E9D6266946730064423F /* Maze.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Maze.py; sourceTree = "<group>"; };
-		A2E7E9D7266946730064423F /* GUIWORLD.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIWORLD.py; sourceTree = "<group>"; };
-		A2E7E9D8266946730064423F /* GUIINV.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
-		A2E7E9D9266946730064423F /* MessageWindow.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = MessageWindow.py; sourceTree = "<group>"; };
-		A2E7E9DA266946730064423F /* GUIMA.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMA.py; sourceTree = "<group>"; };
-		A2E7E9DB266946730064423F /* LoadScreen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
-		A2E7E9DC266946730064423F /* Main.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Main.py; sourceTree = "<group>"; };
-		A2E7E9DD266946730064423F /* LUCommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LUCommon.py; sourceTree = "<group>"; };
-		A2E7E9DF266946730064423F /* Autodetect.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
-		A2E7E9E0266946730064423F /* PartyFormation.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = PartyFormation.py; sourceTree = "<group>"; };
-		A2E7E9E1266946730064423F /* Game.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
-		A2E7E9E2266946730064423F /* CharGen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen.py; sourceTree = "<group>"; };
-		A2E7E9E3266946730064423F /* QuitGame.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
-		A2E7E9E4266946730064423F /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		A2E7E9E5266946730064423F /* GUIJRNL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
-		A2E7E9E6266946730064423F /* GUIINV.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
-		A2E7E9E7266946730064423F /* LoadScreen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
-		A2E7E9E9266946730064423F /* CharGen9.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen9.py; sourceTree = "<group>"; };
-		A2E7E9EA266946730064423F /* GUICG3.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG3.py; sourceTree = "<group>"; };
-		A2E7E9EB266946730064423F /* Autodetect.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Autodetect.py; sourceTree = "<group>"; };
-		A2E7E9EC266946730064423F /* GUICG7.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG7.py; sourceTree = "<group>"; };
-		A2E7E9ED266946730064423F /* GUICG19.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG19.py; sourceTree = "<group>"; };
-		A2E7E9EE266946730064423F /* GUICG6.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG6.py; sourceTree = "<group>"; };
-		A2E7E9EF266946730064423F /* CharGen8.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen8.py; sourceTree = "<group>"; };
-		A2E7E9F0266946730064423F /* GUICG2.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG2.py; sourceTree = "<group>"; };
-		A2E7E9F1266946730064423F /* Game.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Game.py; sourceTree = "<group>"; };
-		A2E7E9F2266946730064423F /* GUICG23.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG23.py; sourceTree = "<group>"; };
-		A2E7E9F3266946730064423F /* GUICG9.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG9.py; sourceTree = "<group>"; };
-		A2E7E9F4266946730064423F /* CharGen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen.py; sourceTree = "<group>"; };
-		A2E7E9F5266946730064423F /* CharGen3.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen3.py; sourceTree = "<group>"; };
-		A2E7E9F6266946730064423F /* GUICG13.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG13.py; sourceTree = "<group>"; };
-		A2E7E9F7266946730064423F /* CharGen7.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen7.py; sourceTree = "<group>"; };
-		A2E7E9F8266946730064423F /* QuitGame.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = QuitGame.py; sourceTree = "<group>"; };
-		A2E7E9F9266946730064423F /* GUICG12.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG12.py; sourceTree = "<group>"; };
-		A2E7E9FA266946730064423F /* CharGen6.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen6.py; sourceTree = "<group>"; };
-		A2E7E9FB266946730064423F /* LUHLASelection.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LUHLASelection.py; sourceTree = "<group>"; };
-		A2E7E9FC266946730064423F /* GUICG22.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG22.py; sourceTree = "<group>"; };
-		A2E7E9FD266946730064423F /* GUICG8.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG8.py; sourceTree = "<group>"; };
-		A2E7E9FE266946730064423F /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		A2E7E9FF266946730064423F /* ImportGame.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ImportGame.py; sourceTree = "<group>"; };
-		A2E7EA00266946730064423F /* CharGen2.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen2.py; sourceTree = "<group>"; };
-		A2E7EA01266946730064423F /* DemoEnd.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = DemoEnd.py; sourceTree = "<group>"; };
-		A2E7EA02266946730064423F /* CharGen5.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen5.py; sourceTree = "<group>"; };
-		A2E7EA03266946730064423F /* CharGenCommon.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGenCommon.py; sourceTree = "<group>"; };
-		A2E7EA04266946730064423F /* GUICG15.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG15.py; sourceTree = "<group>"; };
-		A2E7EA05266946730064423F /* GUIJRNL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIJRNL.py; sourceTree = "<group>"; };
-		A2E7EA06266946730064423F /* ImportFile.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ImportFile.py; sourceTree = "<group>"; };
-		A2E7EA07266946730064423F /* GUICG24.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG24.py; sourceTree = "<group>"; };
-		A2E7EA08266946730064423F /* GUICG10.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG10.py; sourceTree = "<group>"; };
-		A2E7EA09266946730064423F /* CharGen4.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGen4.py; sourceTree = "<group>"; };
-		A2E7EA0A266946730064423F /* GUICG5.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG5.py; sourceTree = "<group>"; };
-		A2E7EA0B266946730064423F /* GUIINV.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIINV.py; sourceTree = "<group>"; };
-		A2E7EA0C266946730064423F /* CharGenEnd.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CharGenEnd.py; sourceTree = "<group>"; };
-		A2E7EA0D266946730064423F /* GUICG1.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG1.py; sourceTree = "<group>"; };
-		A2E7EA0E266946730064423F /* LoadScreen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = LoadScreen.py; sourceTree = "<group>"; };
-		A2E7EA0F266946730064423F /* Start2.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start2.py; sourceTree = "<group>"; };
-		A2E7EA10266946730064423F /* GUICG4.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICG4.py; sourceTree = "<group>"; };
-		A2E7EA11266946730064423F /* StartOpt.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = StartOpt.py; sourceTree = "<group>"; };
-		A2E7EA12266946730064423F /* GUIMA.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUIMA.py; sourceTree = "<group>"; };
-		A2E7EA13266946730064423F /* ie_feats.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ie_feats.py; sourceTree = "<group>"; };
-		A2E7EA14266946730064423F /* TextScreen.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = TextScreen.py; sourceTree = "<group>"; };
-		A2E7EA15266946730064423F /* GUICommonWindows.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = GUICommonWindows.py; sourceTree = "<group>"; };
-		A2E7EA16266946730064423F /* DualClass.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = DualClass.py; sourceTree = "<group>"; };
-		A2E7EA17266946730064423F /* MetaClasses.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = MetaClasses.py; sourceTree = "<group>"; };
 		A2E7EA1B266946AA0064423F /* SDLTextureV.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = SDLTextureV.glsl; sourceTree = "<group>"; };
 		A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDLSurfaceSprite2D.cpp; sourceTree = "<group>"; };
 		A2EC2F93176BD44C00FD960E /* SDLSurfaceSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLSurfaceSprite2D.h; sourceTree = "<group>"; };
@@ -4496,8 +4495,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A2A9A84529DE2CD000C61D90 /* GUIScripts */,
 				A2E7EA18266946AA0064423F /* Shaders */,
-				A2E7E941266946720064423F /* GUIScripts */,
 				A2E7E91E266946720064423F /* override */,
 				A2E7E1A9266946650064423F /* unhardcoded */,
 				A218A75114A8F3DB001142CF /* gemrb.icns */,
@@ -5123,7 +5122,6 @@
 		A2A3A7D614A5030600F705CF /* mac */ = {
 			isa = PBXGroup;
 			children = (
-				A22693781422931B004468E8 /* CocoaWrapper.h */,
 				A2A3A7D814A505FD00F705CF /* CocoaWrapper.mm */,
 				A2E27EFD16F12B6C0079E104 /* nibs */,
 			);
@@ -5165,6 +5163,277 @@
 				A2A2EA3716A5FC860092B903 /* Freetype.h */,
 			);
 			path = TTFImporter;
+			sourceTree = "<group>";
+		};
+		A2A9A84529DE2CD000C61D90 /* GUIScripts */ = {
+			isa = PBXGroup;
+			children = (
+				A2A9A84629DE2CD000C61D90 /* ie_slots.py */,
+				A2A9A84729DE2CD000C61D90 /* demo */,
+				A2A9A85729DE2CD000C61D90 /* ie_restype.py */,
+				A2A9A85829DE2CD000C61D90 /* GUIMOVIE.py */,
+				A2A9A85929DE2CD000C61D90 /* iwd2 */,
+				A2A9A88529DE2CD000C61D90 /* Spellbook.py */,
+				A2A9A88629DE2CD000C61D90 /* CommonWindow.py */,
+				A2A9A88729DE2CD000C61D90 /* Console.py */,
+				A2A9A88829DE2CD000C61D90 /* GUIMG.py */,
+				A2A9A88929DE2CD000C61D90 /* AutodetectCommon.py */,
+				A2A9A88A29DE2CD000C61D90 /* LUSkillsSelection.py */,
+				A2A9A88B29DE2CD000C61D90 /* PartyReform.py */,
+				A2A9A88C29DE2CD000C61D90 /* test */,
+				A2A9A88F29DE2CD000C61D90 /* Portrait.py */,
+				A2A9A89029DE2CD000C61D90 /* BGCommon.py */,
+				A2A9A89129DE2CD000C61D90 /* GUILOAD.py */,
+				A2A9A89229DE2CD000C61D90 /* ExportFile.py */,
+				A2A9A89329DE2CD000C61D90 /* Clock.py */,
+				A2A9A89429DE2CD000C61D90 /* bg1 */,
+				A2A9A8AF29DE2CD100C61D90 /* GUIOPTControls.py */,
+				A2A9A8B029DE2CD100C61D90 /* GUICG13.py */,
+				A2A9A8B129DE2CD100C61D90 /* LUProfsSelection.py */,
+				A2A9A8B229DE2CD100C61D90 /* GUIRECCommon.py */,
+				A2A9A8B329DE2CD100C61D90 /* GUIPR.py */,
+				A2A9A8B429DE2CD100C61D90 /* GUIREC.py */,
+				A2A9A8B529DE2CD100C61D90 /* Container.py */,
+				A2A9A8B629DE2CD100C61D90 /* ie_modal.py */,
+				A2A9A8B729DE2CD100C61D90 /* ie_spells.py */,
+				A2A9A8B829DE2CD100C61D90 /* InventoryCommon.py */,
+				A2A9A8B929DE2CD100C61D90 /* GUIOPT.py */,
+				A2A9A8BA29DE2CD100C61D90 /* ie_action.py */,
+				A2A9A8BB29DE2CD100C61D90 /* ie_stats.py */,
+				A2A9A8BC29DE2CD100C61D90 /* LevelUp.py */,
+				A2A9A8BD29DE2CD100C61D90 /* maze_defs.py */,
+				A2A9A8BE29DE2CD100C61D90 /* GUISAVE.py */,
+				A2A9A8BF29DE2CD100C61D90 /* CommonTables.py */,
+				A2A9A8C029DE2CD100C61D90 /* GUIDefines.py */,
+				A2A9A8C129DE2CD100C61D90 /* GUIWORLD.py */,
+				A2A9A8C229DE2CD100C61D90 /* GameCheck.py */,
+				A2A9A8C329DE2CD100C61D90 /* GUICommon.py */,
+				A2A9A8C429DE2CD100C61D90 /* LUSpellSelection.py */,
+				A2A9A8C529DE2CD100C61D90 /* GUIMACommon.py */,
+				A2A9A8C629DE2CD100C61D90 /* GUISTORE.py */,
+				A2A9A8C729DE2CD100C61D90 /* ie_sounds.py */,
+				A2A9A8C829DE2CD100C61D90 /* GUISONGS.py */,
+				A2A9A8C929DE2CD100C61D90 /* GUIClasses.py */,
+				A2A9A8CA29DE2CD100C61D90 /* Actor.py */,
+				A2A9A8CB29DE2CD100C61D90 /* MessageWindow.py */,
+				A2A9A8CC29DE2CD100C61D90 /* pst */,
+				A2A9A8E129DE2CD100C61D90 /* Main.py */,
+				A2A9A8E229DE2CD100C61D90 /* LUCommon.py */,
+				A2A9A8E329DE2CD100C61D90 /* iwd */,
+				A2A9A8ED29DE2CD100C61D90 /* bg2 */,
+				A2A9A91629DE2CD100C61D90 /* GUIMA.py */,
+				A2A9A91729DE2CD100C61D90 /* ie_feats.py */,
+				A2A9A91829DE2CD100C61D90 /* TextScreen.py */,
+				A2A9A91929DE2CD100C61D90 /* GUICommonWindows.py */,
+				A2A9A91A29DE2CD100C61D90 /* DualClass.py */,
+				A2A9A91B29DE2CD100C61D90 /* MetaClasses.py */,
+			);
+			name = GUIScripts;
+			path = ../../gemrb/GUIScripts;
+			sourceTree = "<group>";
+		};
+		A2A9A84729DE2CD000C61D90 /* demo */ = {
+			isa = PBXGroup;
+			children = (
+				A2A9A84829DE2CD000C61D90 /* Autodetect.py */,
+				A2A9A84929DE2CD000C61D90 /* GUIMG.py */,
+				A2A9A84A29DE2CD000C61D90 /* Game.py */,
+				A2A9A84B29DE2CD000C61D90 /* QuitGame.py */,
+				A2A9A84C29DE2CD000C61D90 /* GUIPR.py */,
+				A2A9A84D29DE2CD000C61D90 /* Start.py */,
+				A2A9A84E29DE2CD000C61D90 /* README */,
+				A2A9A84F29DE2CD000C61D90 /* SetupGame.py */,
+				A2A9A85029DE2CD000C61D90 /* GUIOPT.py */,
+				A2A9A85129DE2CD000C61D90 /* GUIJRNL.py */,
+				A2A9A85229DE2CD000C61D90 /* GUIINV.py */,
+				A2A9A85329DE2CD000C61D90 /* MessageWindow.py */,
+				A2A9A85429DE2CD000C61D90 /* Tests.py */,
+				A2A9A85529DE2CD000C61D90 /* GUIMA.py */,
+				A2A9A85629DE2CD000C61D90 /* LoadScreen.py */,
+			);
+			path = demo;
+			sourceTree = "<group>";
+		};
+		A2A9A85929DE2CD000C61D90 /* iwd2 */ = {
+			isa = PBXGroup;
+			children = (
+				A2A9A85A29DE2CD000C61D90 /* Options.py */,
+				A2A9A85B29DE2CD000C61D90 /* CharGen9.py */,
+				A2A9A85C29DE2CD000C61D90 /* CGPortrait.py */,
+				A2A9A85D29DE2CD000C61D90 /* Autodetect.py */,
+				A2A9A85E29DE2CD000C61D90 /* SPParty.py */,
+				A2A9A85F29DE2CD000C61D90 /* Skills.py */,
+				A2A9A86029DE2CD000C61D90 /* Gender.py */,
+				A2A9A86129DE2CD000C61D90 /* CharGen8.py */,
+				A2A9A86229DE2CD000C61D90 /* GUISPL.py */,
+				A2A9A86329DE2CD000C61D90 /* Alignment.py */,
+				A2A9A86429DE2CD000C61D90 /* Game.py */,
+				A2A9A86529DE2CD000C61D90 /* GUILOAD.py */,
+				A2A9A86629DE2CD000C61D90 /* CharOverview.py */,
+				A2A9A86729DE2CD000C61D90 /* CharGen.py */,
+				A2A9A86829DE2CD000C61D90 /* Race.py */,
+				A2A9A86929DE2CD000C61D90 /* CharGen3.py */,
+				A2A9A86A29DE2CD000C61D90 /* CharGen7.py */,
+				A2A9A86B29DE2CD000C61D90 /* IDLUCommon.py */,
+				A2A9A86C29DE2CD000C61D90 /* QuitGame.py */,
+				A2A9A86D29DE2CD000C61D90 /* CharGen6.py */,
+				A2A9A86E29DE2CD000C61D90 /* Spells.py */,
+				A2A9A86F29DE2CD000C61D90 /* Abilities.py */,
+				A2A9A87029DE2CD000C61D90 /* Songs.py */,
+				A2A9A87129DE2CD000C61D90 /* GUIREC.py */,
+				A2A9A87229DE2CD000C61D90 /* Start.py */,
+				A2A9A87329DE2CD000C61D90 /* CharGen2.py */,
+				A2A9A87429DE2CD000C61D90 /* CSound.py */,
+				A2A9A87529DE2CD000C61D90 /* CharGen5.py */,
+				A2A9A87629DE2CD000C61D90 /* GUIJRNL.py */,
+				A2A9A87729DE2CD000C61D90 /* GUIWORLD.py */,
+				A2A9A87829DE2CD000C61D90 /* Class.py */,
+				A2A9A87929DE2CD000C61D90 /* ImportFile.py */,
+				A2A9A87A29DE2CD000C61D90 /* SubRaces.py */,
+				A2A9A87B29DE2CD000C61D90 /* SPParty2.py */,
+				A2A9A87C29DE2CD000C61D90 /* CharGen4.py */,
+				A2A9A87D29DE2CD000C61D90 /* GUIINV.py */,
+				A2A9A87E29DE2CD000C61D90 /* MessageWindow.py */,
+				A2A9A87F29DE2CD000C61D90 /* Name.py */,
+				A2A9A88029DE2CD000C61D90 /* Feats.py */,
+				A2A9A88129DE2CD000C61D90 /* LoadScreen.py */,
+				A2A9A88229DE2CD000C61D90 /* Enemy.py */,
+				A2A9A88329DE2CD000C61D90 /* SPPartyFormation.py */,
+				A2A9A88429DE2CD000C61D90 /* Appearance.py */,
+			);
+			path = iwd2;
+			sourceTree = "<group>";
+		};
+		A2A9A88C29DE2CD000C61D90 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				A2A9A88D29DE2CD000C61D90 /* Autodetect.py */,
+				A2A9A88E29DE2CD000C61D90 /* Start.py */,
+			);
+			path = test;
+			sourceTree = "<group>";
+		};
+		A2A9A89429DE2CD000C61D90 /* bg1 */ = {
+			isa = PBXGroup;
+			children = (
+				A2A9A89529DE2CD000C61D90 /* GUICG3.py */,
+				A2A9A89629DE2CD000C61D90 /* Autodetect.py */,
+				A2A9A89729DE2CD000C61D90 /* GUICG7.py */,
+				A2A9A89829DE2CD000C61D90 /* GUICG19.py */,
+				A2A9A89929DE2CD000C61D90 /* GUICG6.py */,
+				A2A9A89A29DE2CD000C61D90 /* GUICG2.py */,
+				A2A9A89B29DE2CD000C61D90 /* Game.py */,
+				A2A9A89C29DE2CD000C61D90 /* GUICG9.py */,
+				A2A9A89D29DE2CD000C61D90 /* CharGen.py */,
+				A2A9A89E29DE2CD000C61D90 /* CharGenGui.py */,
+				A2A9A89F29DE2CD000C61D90 /* QuitGame.py */,
+				A2A9A8A029DE2CD000C61D90 /* GUICG12.py */,
+				A2A9A8A129DE2CD000C61D90 /* GUIMP.py */,
+				A2A9A8A229DE2CD000C61D90 /* GUICG22.py */,
+				A2A9A8A329DE2CD000C61D90 /* GUICG8.py */,
+				A2A9A8A429DE2CD000C61D90 /* Start.py */,
+				A2A9A8A529DE2CD000C61D90 /* CharGenCommon.py */,
+				A2A9A8A629DE2CD000C61D90 /* GUICG15.py */,
+				A2A9A8A729DE2CD100C61D90 /* GUIJRNL.py */,
+				A2A9A8A829DE2CD100C61D90 /* ImportFile.py */,
+				A2A9A8A929DE2CD100C61D90 /* GUICG10.py */,
+				A2A9A8AA29DE2CD100C61D90 /* GUICG5.py */,
+				A2A9A8AB29DE2CD100C61D90 /* GUIINV.py */,
+				A2A9A8AC29DE2CD100C61D90 /* GUICG1.py */,
+				A2A9A8AD29DE2CD100C61D90 /* LoadScreen.py */,
+				A2A9A8AE29DE2CD100C61D90 /* GUICG4.py */,
+			);
+			path = bg1;
+			sourceTree = "<group>";
+		};
+		A2A9A8CC29DE2CD100C61D90 /* pst */ = {
+			isa = PBXGroup;
+			children = (
+				A2A9A8CD29DE2CD100C61D90 /* NewLife.py */,
+				A2A9A8CE29DE2CD100C61D90 /* Autodetect.py */,
+				A2A9A8CF29DE2CD100C61D90 /* GUIMG.py */,
+				A2A9A8D029DE2CD100C61D90 /* FloatMenuWindow.py */,
+				A2A9A8D129DE2CD100C61D90 /* Game.py */,
+				A2A9A8D229DE2CD100C61D90 /* GUILOAD.py */,
+				A2A9A8D329DE2CD100C61D90 /* Clock.py */,
+				A2A9A8D429DE2CD100C61D90 /* QuitGame.py */,
+				A2A9A8D529DE2CD100C61D90 /* GUIPR.py */,
+				A2A9A8D629DE2CD100C61D90 /* GUIREC.py */,
+				A2A9A8D729DE2CD100C61D90 /* Start.py */,
+				A2A9A8D829DE2CD100C61D90 /* GUIOPT.py */,
+				A2A9A8D929DE2CD100C61D90 /* GUIJRNL.py */,
+				A2A9A8DA29DE2CD100C61D90 /* GUISAVE.py */,
+				A2A9A8DB29DE2CD100C61D90 /* Maze.py */,
+				A2A9A8DC29DE2CD100C61D90 /* GUIWORLD.py */,
+				A2A9A8DD29DE2CD100C61D90 /* GUIINV.py */,
+				A2A9A8DE29DE2CD100C61D90 /* MessageWindow.py */,
+				A2A9A8DF29DE2CD100C61D90 /* GUIMA.py */,
+				A2A9A8E029DE2CD100C61D90 /* LoadScreen.py */,
+			);
+			path = pst;
+			sourceTree = "<group>";
+		};
+		A2A9A8E329DE2CD100C61D90 /* iwd */ = {
+			isa = PBXGroup;
+			children = (
+				A2A9A8E429DE2CD100C61D90 /* Autodetect.py */,
+				A2A9A8E529DE2CD100C61D90 /* PartyFormation.py */,
+				A2A9A8E629DE2CD100C61D90 /* Game.py */,
+				A2A9A8E729DE2CD100C61D90 /* CharGen.py */,
+				A2A9A8E829DE2CD100C61D90 /* QuitGame.py */,
+				A2A9A8E929DE2CD100C61D90 /* Start.py */,
+				A2A9A8EA29DE2CD100C61D90 /* GUIJRNL.py */,
+				A2A9A8EB29DE2CD100C61D90 /* GUIINV.py */,
+				A2A9A8EC29DE2CD100C61D90 /* LoadScreen.py */,
+			);
+			path = iwd;
+			sourceTree = "<group>";
+		};
+		A2A9A8ED29DE2CD100C61D90 /* bg2 */ = {
+			isa = PBXGroup;
+			children = (
+				A2A9A8EE29DE2CD100C61D90 /* CharGen9.py */,
+				A2A9A8EF29DE2CD100C61D90 /* GUICG3.py */,
+				A2A9A8F029DE2CD100C61D90 /* Autodetect.py */,
+				A2A9A8F129DE2CD100C61D90 /* GUICG7.py */,
+				A2A9A8F229DE2CD100C61D90 /* GUICG19.py */,
+				A2A9A8F329DE2CD100C61D90 /* GUICG6.py */,
+				A2A9A8F429DE2CD100C61D90 /* CharGen8.py */,
+				A2A9A8F529DE2CD100C61D90 /* GUICG2.py */,
+				A2A9A8F629DE2CD100C61D90 /* Game.py */,
+				A2A9A8F729DE2CD100C61D90 /* GUICG23.py */,
+				A2A9A8F829DE2CD100C61D90 /* GUICG9.py */,
+				A2A9A8F929DE2CD100C61D90 /* CharGen.py */,
+				A2A9A8FA29DE2CD100C61D90 /* CharGen3.py */,
+				A2A9A8FB29DE2CD100C61D90 /* CharGen7.py */,
+				A2A9A8FC29DE2CD100C61D90 /* QuitGame.py */,
+				A2A9A8FD29DE2CD100C61D90 /* GUICG12.py */,
+				A2A9A8FE29DE2CD100C61D90 /* CharGen6.py */,
+				A2A9A8FF29DE2CD100C61D90 /* LUHLASelection.py */,
+				A2A9A90029DE2CD100C61D90 /* GUICG22.py */,
+				A2A9A90129DE2CD100C61D90 /* GUICG8.py */,
+				A2A9A90229DE2CD100C61D90 /* Start.py */,
+				A2A9A90329DE2CD100C61D90 /* ImportGame.py */,
+				A2A9A90429DE2CD100C61D90 /* CharGen2.py */,
+				A2A9A90529DE2CD100C61D90 /* DemoEnd.py */,
+				A2A9A90629DE2CD100C61D90 /* CharGen5.py */,
+				A2A9A90729DE2CD100C61D90 /* CharGenCommon.py */,
+				A2A9A90829DE2CD100C61D90 /* GUICG15.py */,
+				A2A9A90929DE2CD100C61D90 /* GUIJRNL.py */,
+				A2A9A90A29DE2CD100C61D90 /* ImportFile.py */,
+				A2A9A90B29DE2CD100C61D90 /* GUICG24.py */,
+				A2A9A90C29DE2CD100C61D90 /* GUICG10.py */,
+				A2A9A90D29DE2CD100C61D90 /* CharGen4.py */,
+				A2A9A90E29DE2CD100C61D90 /* GUICG5.py */,
+				A2A9A90F29DE2CD100C61D90 /* GUIINV.py */,
+				A2A9A91029DE2CD100C61D90 /* CharGenEnd.py */,
+				A2A9A91129DE2CD100C61D90 /* GUICG1.py */,
+				A2A9A91229DE2CD100C61D90 /* LoadScreen.py */,
+				A2A9A91329DE2CD100C61D90 /* Start2.py */,
+				A2A9A91429DE2CD100C61D90 /* GUICG4.py */,
+				A2A9A91529DE2CD100C61D90 /* StartOpt.py */,
+			);
+			path = bg2;
 			sourceTree = "<group>";
 		};
 		A2BD125715A7EE35000FAB95 /* VLCPlayer */ = {
@@ -7602,277 +7871,6 @@
 			path = bg2;
 			sourceTree = "<group>";
 		};
-		A2E7E941266946720064423F /* GUIScripts */ = {
-			isa = PBXGroup;
-			children = (
-				A2E7E942266946720064423F /* ie_slots.py */,
-				A2E7E943266946720064423F /* demo */,
-				A2E7E952266946720064423F /* ie_restype.py */,
-				A2E7E953266946720064423F /* GUIMOVIE.py */,
-				A2E7E954266946720064423F /* iwd2 */,
-				A2E7E980266946720064423F /* Spellbook.py */,
-				A2E7E981266946720064423F /* CommonWindow.py */,
-				A2E7E982266946720064423F /* Console.py */,
-				A2E7E983266946720064423F /* GUIMG.py */,
-				A2E7E984266946720064423F /* AutodetectCommon.py */,
-				A2E7E985266946720064423F /* LUSkillsSelection.py */,
-				A2E7E986266946720064423F /* GameWin.py */,
-				A2E7E987266946720064423F /* test */,
-				A2E7E98A266946720064423F /* Portrait.py */,
-				A2E7E98B266946720064423F /* BGCommon.py */,
-				A2E7E98C266946720064423F /* GUILOAD.py */,
-				A2E7E98D266946730064423F /* ExportFile.py */,
-				A2E7E98E266946730064423F /* Clock.py */,
-				A2E7E98F266946730064423F /* bg1 */,
-				A2E7E9AB266946730064423F /* GUIOPTControls.py */,
-				A2E7E9AC266946730064423F /* LUProfsSelection.py */,
-				A2E7E9AD266946730064423F /* GUIRECCommon.py */,
-				A2E7E9AE266946730064423F /* types.py */,
-				A2E7E9AF266946730064423F /* GUIPR.py */,
-				A2E7E9B0266946730064423F /* GUIREC.py */,
-				A2E7E9B1266946730064423F /* ie_modal.py */,
-				A2E7E9B2266946730064423F /* ie_spells.py */,
-				A2E7E9B3266946730064423F /* InventoryCommon.py */,
-				A2E7E9B4266946730064423F /* GUIOPT.py */,
-				A2E7E9B5266946730064423F /* ie_action.py */,
-				A2E7E9B6266946730064423F /* ie_stats.py */,
-				A2E7E9B7266946730064423F /* LevelUp.py */,
-				A2E7E9B8266946730064423F /* maze_defs.py */,
-				A2E7E9B9266946730064423F /* GUISAVE.py */,
-				A2E7E9BA266946730064423F /* CommonTables.py */,
-				A2E7E9BB266946730064423F /* GUIDefines.py */,
-				A2E7E9BC266946730064423F /* GUIWORLD.py */,
-				A2E7E9BD266946730064423F /* GameCheck.py */,
-				A2E7E9BE266946730064423F /* GUICommon.py */,
-				A2E7E9BF266946730064423F /* LUSpellSelection.py */,
-				A2E7E9C0266946730064423F /* GUIMACommon.py */,
-				A2E7E9C1266946730064423F /* GUISTORE.py */,
-				A2E7E9C2266946730064423F /* ie_sounds.py */,
-				A2E7E9C3266946730064423F /* GUISONGS.py */,
-				A2E7E9C4266946730064423F /* GUIClasses.py */,
-				A2E7E9C5266946730064423F /* Actor.py */,
-				A2E7E9C6266946730064423F /* MessageWindow.py */,
-				A2E7E9C7266946730064423F /* pst */,
-				A2E7E9DC266946730064423F /* Main.py */,
-				A2E7E9DD266946730064423F /* LUCommon.py */,
-				A2E7E9DE266946730064423F /* iwd */,
-				A2E7E9E8266946730064423F /* bg2 */,
-				A2E7EA12266946730064423F /* GUIMA.py */,
-				A2E7EA13266946730064423F /* ie_feats.py */,
-				A2E7EA14266946730064423F /* TextScreen.py */,
-				A2E7EA15266946730064423F /* GUICommonWindows.py */,
-				A2E7EA16266946730064423F /* DualClass.py */,
-				A2E7EA17266946730064423F /* MetaClasses.py */,
-			);
-			name = GUIScripts;
-			path = ../../gemrb/GUIScripts;
-			sourceTree = "<group>";
-		};
-		A2E7E943266946720064423F /* demo */ = {
-			isa = PBXGroup;
-			children = (
-				A2E7E944266946720064423F /* Autodetect.py */,
-				A2E7E945266946720064423F /* GUIMG.py */,
-				A2E7E946266946720064423F /* Game.py */,
-				A2E7E947266946720064423F /* GUIPR.py */,
-				A2E7E948266946720064423F /* Start.py */,
-				A2E7E949266946720064423F /* README */,
-				A2E7E94A266946720064423F /* SetupGame.py */,
-				A2E7E94B266946720064423F /* GUIOPT.py */,
-				A2E7E94C266946720064423F /* GUIJRNL.py */,
-				A2E7E94D266946720064423F /* GUIINV.py */,
-				A2E7E94E266946720064423F /* MessageWindow.py */,
-				A2E7E94F266946720064423F /* Tests.py */,
-				A2E7E950266946720064423F /* GUIMA.py */,
-				A2E7E951266946720064423F /* LoadScreen.py */,
-			);
-			path = demo;
-			sourceTree = "<group>";
-		};
-		A2E7E954266946720064423F /* iwd2 */ = {
-			isa = PBXGroup;
-			children = (
-				A2E7E955266946720064423F /* Options.py */,
-				A2E7E956266946720064423F /* CharGen9.py */,
-				A2E7E957266946720064423F /* CGPortrait.py */,
-				A2E7E958266946720064423F /* Autodetect.py */,
-				A2E7E959266946720064423F /* SPParty.py */,
-				A2E7E95A266946720064423F /* Skills.py */,
-				A2E7E95B266946720064423F /* Gender.py */,
-				A2E7E95C266946720064423F /* CharGen8.py */,
-				A2E7E95D266946720064423F /* GUISPL.py */,
-				A2E7E95E266946720064423F /* Alignment.py */,
-				A2E7E95F266946720064423F /* Game.py */,
-				A2E7E960266946720064423F /* GUILOAD.py */,
-				A2E7E961266946720064423F /* CharOverview.py */,
-				A2E7E962266946720064423F /* CharGen.py */,
-				A2E7E963266946720064423F /* Race.py */,
-				A2E7E964266946720064423F /* CharGen3.py */,
-				A2E7E965266946720064423F /* CharGen7.py */,
-				A2E7E966266946720064423F /* IDLUCommon.py */,
-				A2E7E967266946720064423F /* QuitGame.py */,
-				A2E7E968266946720064423F /* CharGen6.py */,
-				A2E7E969266946720064423F /* Spells.py */,
-				A2E7E96A266946720064423F /* Abilities.py */,
-				A2E7E96B266946720064423F /* Songs.py */,
-				A2E7E96C266946720064423F /* GUIREC.py */,
-				A2E7E96D266946720064423F /* Start.py */,
-				A2E7E96E266946720064423F /* CharGen2.py */,
-				A2E7E96F266946720064423F /* CSound.py */,
-				A2E7E970266946720064423F /* CharGen5.py */,
-				A2E7E971266946720064423F /* GUIJRNL.py */,
-				A2E7E972266946720064423F /* GUIWORLD.py */,
-				A2E7E973266946720064423F /* Class.py */,
-				A2E7E974266946720064423F /* ImportFile.py */,
-				A2E7E975266946720064423F /* SubRaces.py */,
-				A2E7E976266946720064423F /* SPParty2.py */,
-				A2E7E977266946720064423F /* CharGen4.py */,
-				A2E7E978266946720064423F /* GUIINV.py */,
-				A2E7E979266946720064423F /* MessageWindow.py */,
-				A2E7E97A266946720064423F /* Name.py */,
-				A2E7E97B266946720064423F /* Feats.py */,
-				A2E7E97C266946720064423F /* LoadScreen.py */,
-				A2E7E97D266946720064423F /* Enemy.py */,
-				A2E7E97E266946720064423F /* SPPartyFormation.py */,
-				A2E7E97F266946720064423F /* Appearance.py */,
-			);
-			path = iwd2;
-			sourceTree = "<group>";
-		};
-		A2E7E987266946720064423F /* test */ = {
-			isa = PBXGroup;
-			children = (
-				A2E7E988266946720064423F /* Autodetect.py */,
-				A2E7E989266946720064423F /* Start.py */,
-			);
-			path = test;
-			sourceTree = "<group>";
-		};
-		A2E7E98F266946730064423F /* bg1 */ = {
-			isa = PBXGroup;
-			children = (
-				A2E7E990266946730064423F /* GUICG3.py */,
-				A2E7E991266946730064423F /* Autodetect.py */,
-				A2E7E992266946730064423F /* GUICG7.py */,
-				A2E7E993266946730064423F /* GUICG19.py */,
-				A2E7E994266946730064423F /* GUICG6.py */,
-				A2E7E995266946730064423F /* GUICG2.py */,
-				A2E7E996266946730064423F /* Game.py */,
-				A2E7E997266946730064423F /* GUICG9.py */,
-				A2E7E998266946730064423F /* CharGen.py */,
-				A2E7E999266946730064423F /* CharGenGui.py */,
-				A2E7E99A266946730064423F /* GUICG13.py */,
-				A2E7E99B266946730064423F /* QuitGame.py */,
-				A2E7E99C266946730064423F /* GUICG12.py */,
-				A2E7E99D266946730064423F /* GUIMP.py */,
-				A2E7E99E266946730064423F /* GUICG22.py */,
-				A2E7E99F266946730064423F /* GUICG8.py */,
-				A2E7E9A0266946730064423F /* Start.py */,
-				A2E7E9A1266946730064423F /* CharGenCommon.py */,
-				A2E7E9A2266946730064423F /* GUICG15.py */,
-				A2E7E9A3266946730064423F /* GUIJRNL.py */,
-				A2E7E9A4266946730064423F /* ImportFile.py */,
-				A2E7E9A5266946730064423F /* GUICG10.py */,
-				A2E7E9A6266946730064423F /* GUICG5.py */,
-				A2E7E9A7266946730064423F /* GUIINV.py */,
-				A2E7E9A8266946730064423F /* GUICG1.py */,
-				A2E7E9A9266946730064423F /* LoadScreen.py */,
-				A2E7E9AA266946730064423F /* GUICG4.py */,
-			);
-			path = bg1;
-			sourceTree = "<group>";
-		};
-		A2E7E9C7266946730064423F /* pst */ = {
-			isa = PBXGroup;
-			children = (
-				A2E7E9C8266946730064423F /* NewLife.py */,
-				A2E7E9C9266946730064423F /* Autodetect.py */,
-				A2E7E9CA266946730064423F /* GUIMG.py */,
-				A2E7E9CB266946730064423F /* FloatMenuWindow.py */,
-				A2E7E9CC266946730064423F /* Game.py */,
-				A2E7E9CD266946730064423F /* GUILOAD.py */,
-				A2E7E9CE266946730064423F /* Clock.py */,
-				A2E7E9CF266946730064423F /* QuitGame.py */,
-				A2E7E9D0266946730064423F /* GUIPR.py */,
-				A2E7E9D1266946730064423F /* GUIREC.py */,
-				A2E7E9D2266946730064423F /* Start.py */,
-				A2E7E9D3266946730064423F /* GUIOPT.py */,
-				A2E7E9D4266946730064423F /* GUIJRNL.py */,
-				A2E7E9D5266946730064423F /* GUISAVE.py */,
-				A2E7E9D6266946730064423F /* Maze.py */,
-				A2E7E9D7266946730064423F /* GUIWORLD.py */,
-				A2E7E9D8266946730064423F /* GUIINV.py */,
-				A2E7E9D9266946730064423F /* MessageWindow.py */,
-				A2E7E9DA266946730064423F /* GUIMA.py */,
-				A2E7E9DB266946730064423F /* LoadScreen.py */,
-			);
-			path = pst;
-			sourceTree = "<group>";
-		};
-		A2E7E9DE266946730064423F /* iwd */ = {
-			isa = PBXGroup;
-			children = (
-				A2E7E9DF266946730064423F /* Autodetect.py */,
-				A2E7E9E0266946730064423F /* PartyFormation.py */,
-				A2E7E9E1266946730064423F /* Game.py */,
-				A2E7E9E2266946730064423F /* CharGen.py */,
-				A2E7E9E3266946730064423F /* QuitGame.py */,
-				A2E7E9E4266946730064423F /* Start.py */,
-				A2E7E9E5266946730064423F /* GUIJRNL.py */,
-				A2E7E9E6266946730064423F /* GUIINV.py */,
-				A2E7E9E7266946730064423F /* LoadScreen.py */,
-			);
-			path = iwd;
-			sourceTree = "<group>";
-		};
-		A2E7E9E8266946730064423F /* bg2 */ = {
-			isa = PBXGroup;
-			children = (
-				A2E7E9E9266946730064423F /* CharGen9.py */,
-				A2E7E9EA266946730064423F /* GUICG3.py */,
-				A2E7E9EB266946730064423F /* Autodetect.py */,
-				A2E7E9EC266946730064423F /* GUICG7.py */,
-				A2E7E9ED266946730064423F /* GUICG19.py */,
-				A2E7E9EE266946730064423F /* GUICG6.py */,
-				A2E7E9EF266946730064423F /* CharGen8.py */,
-				A2E7E9F0266946730064423F /* GUICG2.py */,
-				A2E7E9F1266946730064423F /* Game.py */,
-				A2E7E9F2266946730064423F /* GUICG23.py */,
-				A2E7E9F3266946730064423F /* GUICG9.py */,
-				A2E7E9F4266946730064423F /* CharGen.py */,
-				A2E7E9F5266946730064423F /* CharGen3.py */,
-				A2E7E9F6266946730064423F /* GUICG13.py */,
-				A2E7E9F7266946730064423F /* CharGen7.py */,
-				A2E7E9F8266946730064423F /* QuitGame.py */,
-				A2E7E9F9266946730064423F /* GUICG12.py */,
-				A2E7E9FA266946730064423F /* CharGen6.py */,
-				A2E7E9FB266946730064423F /* LUHLASelection.py */,
-				A2E7E9FC266946730064423F /* GUICG22.py */,
-				A2E7E9FD266946730064423F /* GUICG8.py */,
-				A2E7E9FE266946730064423F /* Start.py */,
-				A2E7E9FF266946730064423F /* ImportGame.py */,
-				A2E7EA00266946730064423F /* CharGen2.py */,
-				A2E7EA01266946730064423F /* DemoEnd.py */,
-				A2E7EA02266946730064423F /* CharGen5.py */,
-				A2E7EA03266946730064423F /* CharGenCommon.py */,
-				A2E7EA04266946730064423F /* GUICG15.py */,
-				A2E7EA05266946730064423F /* GUIJRNL.py */,
-				A2E7EA06266946730064423F /* ImportFile.py */,
-				A2E7EA07266946730064423F /* GUICG24.py */,
-				A2E7EA08266946730064423F /* GUICG10.py */,
-				A2E7EA09266946730064423F /* CharGen4.py */,
-				A2E7EA0A266946730064423F /* GUICG5.py */,
-				A2E7EA0B266946730064423F /* GUIINV.py */,
-				A2E7EA0C266946730064423F /* CharGenEnd.py */,
-				A2E7EA0D266946730064423F /* GUICG1.py */,
-				A2E7EA0E266946730064423F /* LoadScreen.py */,
-				A2E7EA0F266946730064423F /* Start2.py */,
-				A2E7EA10266946730064423F /* GUICG4.py */,
-				A2E7EA11266946730064423F /* StartOpt.py */,
-			);
-			path = bg2;
-			sourceTree = "<group>";
-		};
 		A2E7EA18266946AA0064423F /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
@@ -8959,7 +8957,8 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1330;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "GemRB" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -9111,7 +9110,10 @@
 			);
 			inputPaths = (
 			);
+			outputFileListPaths = (
+			);
 			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(PLUGINS_FOLDER_PATH)/SDLVideo.so",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
@@ -11099,7 +11101,6 @@
 				INSTALL_PATH = "$(HOME)/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
 				PRODUCT_NAME = SDLVideo;
-				STRIP_INSTALLED_PRODUCT = NO;
 				UNEXPORTED_SYMBOLS_FILE = "";
 			};
 			name = Release;
@@ -11541,7 +11542,6 @@
 					$GEM_IOS_LIB_PATH/$PLATFORM_NAME,
 					"$(PROJECT_DIR)/ios/lib/iphoneos",
 				);
-				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
 					"-DTARGET_OS_IPHONE",
 					"-isystem",
@@ -11584,7 +11584,6 @@
 					$GEM_IOS_LIB_PATH/$PLATFORM_NAME,
 					"$(PROJECT_DIR)/ios/lib/iphoneos",
 				);
-				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = (
 					"-isystem",
 					./,
@@ -11800,7 +11799,10 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.gemrb.gemrb;
 				PRODUCT_NAME = GemRB;
 				WRAPPER_EXTENSION = app;
@@ -11821,11 +11823,12 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.gemrb.gemrb;
 				PRODUCT_NAME = GemRB;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -11844,7 +11847,8 @@
 				CLANG_WARN_CXX0X_EXTENSIONS = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES_ERROR;
+				CLANG_WARN_FLOAT_CONVERSION = NO;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
@@ -11859,6 +11863,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -11869,6 +11874,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_PEDANTIC = YES;
@@ -11888,7 +11894,7 @@
 					"$(inherited)",
 					/opt/homebrew/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
@@ -11904,7 +11910,12 @@
 					"-DTARGET_OS_MAC=1",
 				);
 				SYSTEM_HEADER_SEARCH_PATHS = /opt/homebrew/include;
-				USER_HEADER_SEARCH_PATHS = "./ ../../gemrb/ ../../gemrb/core/ ../../gemrb/includes/";
+				USER_HEADER_SEARCH_PATHS = (
+					./,
+					../../gemrb/,
+					../../gemrb/core/,
+					../../gemrb/includes/,
+				);
 				USE_HEADERMAP = NO;
 				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
 			};
@@ -11924,7 +11935,8 @@
 				CLANG_WARN_CXX0X_EXTENSIONS = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES_ERROR;
+				CLANG_WARN_FLOAT_CONVERSION = NO;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
@@ -11939,6 +11951,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(FRAMEWORK_SEARCH_PATHS)",
@@ -11948,6 +11961,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_PEDANTIC = YES;
@@ -11967,7 +11981,7 @@
 					"$(inherited)",
 					/opt/homebrew/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
 					"-isystem",
@@ -11979,7 +11993,12 @@
 					"-DTARGET_OS_MAC=1",
 				);
 				SYSTEM_HEADER_SEARCH_PATHS = /opt/homebrew/include;
-				USER_HEADER_SEARCH_PATHS = "./ ../../gemrb/ ../../gemrb/core/ ../../gemrb/includes/";
+				USER_HEADER_SEARCH_PATHS = (
+					./,
+					../../gemrb/,
+					../../gemrb/core/,
+					../../gemrb/includes/,
+				);
 				USE_HEADERMAP = NO;
 				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
 			};
