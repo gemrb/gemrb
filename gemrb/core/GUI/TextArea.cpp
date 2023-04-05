@@ -289,7 +289,7 @@ void TextArea::SetMargins(ContentContainer::Margin m)
 		textContainer->SetMargin(textMargins);
 }
 
-ieDword TextArea::LineCount() const
+int TextArea::LineCount() const
 {
 	int rowHeight = LineHeight();
 	if (rowHeight > 0)
@@ -514,7 +514,7 @@ int TextArea::InsertText(const char* text, int pos)
 }
 */
 
-ieWord TextArea::LineHeight() const
+int TextArea::LineHeight() const
 {
 	return ftext->LineHeight;
 }

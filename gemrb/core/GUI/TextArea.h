@@ -162,8 +162,8 @@ public:
 	void ScrollToY(int y, ieDword lineduration = 0);
 	int ContentHeight() const;
 
-	ieDword LineCount() const;
-	ieWord LineHeight() const;
+	int LineCount() const;
+	int LineHeight() const;
 
 	void SetScrollbar(ScrollBar*);
 	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered);
