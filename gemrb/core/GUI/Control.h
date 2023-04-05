@@ -128,7 +128,7 @@ public: // Public attributes
 	
 	using varname_t = ieVariable;
 	using value_t = ieDword;
-	static constexpr value_t INVALID_VALUE = -1;
+	static constexpr value_t INVALID_VALUE = value_t(-1);
 
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID = 0;

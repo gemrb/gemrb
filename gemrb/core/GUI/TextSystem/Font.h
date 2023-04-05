@@ -139,7 +139,7 @@ private:
 
 	struct GlyphIndexEntry {
 		ieWord chr = 0;
-		ieWord pageIdx = -1;
+		ieWord pageIdx = ieWord(-1);
 		const Glyph* glyph = nullptr;
 
 		GlyphIndexEntry() noexcept = default;

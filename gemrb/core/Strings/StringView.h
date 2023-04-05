@@ -44,7 +44,7 @@ public:
 	using iterator = CharT*;
 	using const_iterator = const CharT*;
 	using size_type = size_t;
-	static constexpr size_type npos = -1;
+	static constexpr size_type npos = size_type(-1);
 	
 	StringViewImp() noexcept = default;
 

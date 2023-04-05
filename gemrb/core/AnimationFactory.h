@@ -32,7 +32,7 @@ namespace GemRB {
 class GEM_EXPORT AnimationFactory : public FactoryObject {
 public:
 	using index_t = Animation::index_t;
-	static constexpr index_t InvalidIndex = -1;
+	static constexpr index_t InvalidIndex = index_t(-1);
 	
 	struct CycleEntry {
 		index_t FramesCount;

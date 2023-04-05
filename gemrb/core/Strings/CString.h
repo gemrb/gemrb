@@ -76,7 +76,7 @@ public:
 	using value_type = char;
 	
 	static constexpr size_type Size = LEN;
-	static constexpr size_type npos = -1;
+	static constexpr size_type npos = size_type(-1);
 	
 	FixedSizeString() noexcept = default;
 	FixedSizeString(std::nullptr_t) noexcept = delete;

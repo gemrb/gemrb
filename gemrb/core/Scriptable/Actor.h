@@ -321,7 +321,7 @@ struct ModalState {
 struct SaveInfo {
 	ieByte savingThrow[5]{};
 	// for feedback rate limiting
-	ieDword prevType = -1;
+	ieDword prevType = ieDword(-1);
 	int prevRoll = -1;
 };
 
