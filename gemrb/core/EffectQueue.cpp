@@ -282,26 +282,29 @@ static inline bool NeedPrepare(ieWord timingmode)
 	return fx_relative[timingmode];
 }
 
-#define TIMING_INVALID  -1
-#define TIMING_PERMANENT 0
-#define TIMING_DELAYED   1
-#define TIMING_DURATION  2
+enum class TimingType {
+	Invalid = -1,
+	Permanent,
+	Delayed,
+	Duration
+};
 
-static const int fx_prepared[MAX_TIMING_MODE]={TIMING_DURATION,TIMING_PERMANENT,TIMING_PERMANENT,TIMING_DELAYED, //0-3
-	TIMING_DELAYED, TIMING_DELAYED, TIMING_DELAYED, TIMING_DELAYED, TIMING_PERMANENT, TIMING_PERMANENT, TIMING_DURATION, TIMING_PERMANENT}; //4-11
+static const TimingType fx_prepared[MAX_TIMING_MODE] = { TimingType::Duration, TimingType::Permanent, TimingType::Permanent, // 0-2
+	TimingType::Delayed, TimingType::Delayed, TimingType::Delayed, TimingType::Delayed, TimingType::Delayed, // 3-7
+	TimingType::Permanent, TimingType::Permanent, TimingType::Duration, TimingType::Permanent}; // 8-11
 
-static inline int DelayType(ieWord timingmode)
+static inline TimingType DelayType(ieWord timingmode)
 {
-	if( timingmode>=MAX_TIMING_MODE) return TIMING_INVALID;
+	if (timingmode >= MAX_TIMING_MODE) return TimingType::Invalid;
 	return fx_prepared[timingmode];
 }
 
 //which effects are removable
 static const bool fx_removable[MAX_TIMING_MODE] = { true, true, false, true, true, false, true, true, false, false, true, true };
 
-static inline int IsRemovable(ieWord timingmode)
+static inline bool IsRemovable(ieWord timingmode)
 {
-	if( timingmode>=MAX_TIMING_MODE) return TIMING_INVALID;
+	if (timingmode >= MAX_TIMING_MODE) return true;
 	return fx_removable[timingmode];
 }
 
@@ -1212,8 +1215,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		}
 	}
 	//check if the effect has triggered or expired
-	switch (DelayType(fx->TimingMode&0xff) ) {
-	case TIMING_DELAYED:
+	switch (DelayType(fx->TimingMode & 0xff)) {
+	case TimingType::Delayed:
 		if( fx->Duration>GameTime) {
 			return FX_NOT_APPLIED;
 		}
@@ -1226,18 +1229,18 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		}
 		fx->TimingMode=TriggeredEffect(fx->TimingMode);
 		break;
-	case TIMING_DURATION:
+	case TimingType::Duration:
 		if( fx->Duration<=GameTime) {
 			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 			//add a return here, if 0 duration effects shouldn't work
 		}
 		break;
 	//permanent effect (so there is no warning)
-	case TIMING_PERMANENT:
+	case TimingType::Permanent:
 		break;
 	//this shouldn't happen
 	default:
-		error("EffectQueue", "Unknown delay type: {} (from {})", DelayType(fx->TimingMode & 0xff), fx->TimingMode);
+		error("EffectQueue", "Unknown delay type: {} (from {})", int(DelayType(fx->TimingMode & 0xff)), fx->TimingMode);
 	}
 
 	int res = FX_ABORT;
@@ -1633,7 +1636,7 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 	for (auto& fx : effects) {
 		//FIXME: how this method handles delayed effects???
 		//it should remove them as well, i think
-		if (DelayType(fx.TimingMode) != TIMING_PERMANENT && fx.Duration <= GameTime) {
+		if (DelayType(fx.TimingMode) != TimingType::Permanent && fx.Duration <= GameTime) {
 			fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
