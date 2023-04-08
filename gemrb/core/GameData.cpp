@@ -933,6 +933,25 @@ int GameData::GetWeaponStyleBonus(int style, int stars, int bonusType)
 	return weaponStyleBoni[style][stars][bonusType];
 }
 
+int GameData::GetWSpecialBonus(int bonusType, int stars)
+{
+	static bool ignore = false;
+	if (ignore) {
+		return 0;
+	}
+
+	AutoTable wSpecial = LoadTable("wspecial", true);
+	if (!wSpecial) {
+		ignore = true;
+		return 0;
+	}
+
+	static int rows = static_cast<int>(wSpecial->GetRowCount());
+	if (stars >= rows) stars = rows - 1;
+
+	return wSpecial->QueryFieldSigned<int>(stars, bonusType);
+}
+
 const std::vector<int>& GameData::GetBonusSpells(int ability)
 {
 	static bool ignore = false;

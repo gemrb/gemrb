@@ -169,6 +169,7 @@ public:
 	ResRef GetFist(int cls, int level);
 	int GetMonkBonus(int bonusType, int level);
 	int GetWeaponStyleBonus(int style, int stars, int bonusType);
+	int GetWSpecialBonus(int bonusType, int stars);
 	const std::vector<int>& GetBonusSpells(int ability);
 	ieByte GetItemAnimation(const ResRef& itemRef);
 	const std::vector<ItemUseType>& GetItemUse();

@@ -117,7 +117,6 @@ static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
 static AutoTable extspeed;
-static AutoTable wspecial;
 
 static constexpr ieWord IT_SCROLL = 11;
 static constexpr ieWord IT_WAND = 35;
@@ -2050,9 +2049,6 @@ static void InitActorTables()
 			class2kits[classID].kitNames.emplace_back(kitName);
 		}
 	}
-
-	//pre-cache hit/damage/speed bonuses for weapons
-	wspecial = gamedata->LoadTable("wspecial", true);
 
 	//wild magic level modifiers
 	tm = gamedata->LoadTable("lvlmodwm", true);
@@ -6311,7 +6307,7 @@ int Actor::GetNonProficiencyPenalty(int stars) const
 
 	// iwd2 mode ... but everyone is proficient with fists
 	if (!inventory.FistsEquipped()) {
-		prof += wspecial->QueryFieldSigned<int>(stars, 0);
+		prof += gamedata->GetWSpecialBonus(0, stars);
 	}
 
 	// add non-proficiency penalty for the rest of the games
@@ -6464,18 +6460,12 @@ bool Actor::GetCombatDetails(int& toHit, bool leftOrRight, int& damageBonus, \
 		stars = 1;
 	}
 
-	// hit/damage/speed bonuses from wspecial (with tohit inverted in adnd)
-	static TableMgr::index_t wspecialMax = wspecial->GetRowCount() - 1;
-	if (stars > wspecialMax) {
-		stars = wspecialMax;
-	}
-
-	wi.profdmgbon = wspecial->QueryFieldSigned<int>(stars, 1);
+	wi.profdmgbon = gamedata->GetWSpecialBonus(1, stars);
 	damageBonus += wi.profdmgbon;
 	speed = - (int) GetStat(IE_PHYSICALSPEED);
 	// only bg2 wspecial.2da has this column, but all have 0 as the default
 	// table value, so this lookup is fine
-	speed += wspecial->QueryFieldSigned<int>(stars, 2);
+	speed += gamedata->GetWSpecialBonus(2, stars);
 
 	// racial enemies suffer 4hp more in all games
 	int favoredEnemy = GetRacialEnemyBonus(target);
