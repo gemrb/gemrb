@@ -403,35 +403,211 @@ int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xc3 fx_tint_screen
-//FIXME: implement bit4 which would mean duration
-// param2 is mostly used with 1 or 5; only one occurrence of 100 (our spells excluded)
-// timing is mostly 16, with one 8, one 48 and one 64
+// NOTE: it actually ignored actors, not tinting them
+// Most modes are untested, the original only used 1 and 5
+// Users in the original:
+//
+// Resref      name type color dice duration
+// SPIN108.SPL raise dead: 1 grey 16d8 5
+// SPPR204.SPL spiritual hammer: 1 grey 8d6 0
+// SPPR502.SPL raise dead: 1 grey 16d8 5
+// SPPR601.SPL heal: 5 grey 16d8 7
+// SPWI113.SPL missile of patience:  1 grey 16d6 0
+// SPWI115.SPL blindness: 5 grey 16d6 3
+// SPWI120.SPL vilquar's eye: 5 grey 16d6 3
+// SPWI202.SPL black-barbed curse: 5 grey 16d6 3
+// SPWI203.SPL black-barbed shield: 5 grey 16d6 3
+// SPWI301.SPL ball lightning: 5 grey 16d(-1) 4
+// SPWI305.SPL elysium's tears: 1 grey 16d6 0
+// SPWI307.SPL hold undead: 5 grey 16d6 5
+// SPWI308.SPL tasha's: 5 grey 16d6 12
+// SPWI310.SPL ax of torment: 1 grey 16d6 10
+// SPWI313.SPL fiery rain: 1 grey 16d6 6
+// SPWI406.SPL improved strength: 5 grey 16d(-1) 4
+// SPWI408.SPL shroud of shadows: 5 grey 16d(-1) 4
+// SPWI502.SPL cone of cold: 5 grey 16d6 10
+// SPWI504.SPL enoll eva's: 5 grey 16d6 3
+// SPWI506.SPL fire and ice: 1 grey 16d6 0
+// SPWI601.SPL antimagic shell: 5 grey 16d2 3
+// SPWI602.SPL globe of inv.: 5 grey 16d2 7
+// SPWI603.SPL howl of pan.: 5 purple 16d6 10
+// SPWI604.SPL chain light. storm: 1 grey 64d6 0
+// SPWI701.SPL acid storm: 5 grey 16d6 10
+// SPWI704.SPL guardian mantle: 5 grey 16d6 5
+// SPWI805.SPL pw blind: 5 grey 16d6 6
+// SPWI905.SPL elysium's fires: 1 grey 16d6 6
+// SPWI909.SPL pw kill: 5 darkgrey 48d6 10
+
+static int ColorBoundInfringed(const Color& curGlobalTint, const Color& tintMin, const Color& tintMax)
+{
+	// not the typical luminance calculation the engine used elsewhere (ITU-R BT.601)
+	auto zip = [](const Color& c) {
+		return c.r * 77 + c.b * 154 + c.g * 25;
+	};
+
+	if (zip(curGlobalTint) >= zip(tintMin)) {
+		if (zip(curGlobalTint) <= zip(tintMax)) {
+			// continue normally
+			return 0;
+		} else {
+			// bound infringed (max)
+			return 2;
+		}
+	} else {
+		// bound infringed (min)
+		return 1;
+	}
+}
+
 int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_tint_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	// some effects contain garbage in DiceSides
-	// FIXME: should we really be just using DiceThrown?
-	int fromTime = fx->DiceThrown;
-	int toTime = fromTime;
-	switch(fx->Parameter2&6) {
-		case 0: toTime = 0; break;
-		case 2: fromTime = 0; break;
+	Color fadeColor = Color::FromABGR(fx->Parameter1); // usually gray
+	ieDword type = fx->Parameter2;
+	if (!core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		// the game clearly fades to a darker tint than what the light gray most spells use represents
+		// remove this block if we switch to actual tinting
+		fadeColor = ColorBlack;
+		fadeColor.a = 0x80;
 	}
 
-	// set the fade color (usually gray)
-	// it was a gentle effect, so use a high dose of transparency
-	// since it was so high, we just skip setting the fade color
-/*	int r, g, b;
-	r = fx->Parameter1&255;
-	g = (fx->Parameter1>>8)&255;
-	b = (fx->Parameter1>>16)&255;
-	core->GetVideoDriver()->SetFadeColor(r, g, b); // will be permanent!
-*/
+	Color tintMin;
+	Color tintMax;
+	static const Color tintNone{};
+	Color step; // the amount the engine adds to each color parameter of the current area tint every AI tick
+	if (type & 8) {
+		tintMin = ColorBlack;
+		tintMax = tintNone;
+		step = fadeColor;
+		if (type & 1) {
+			// step is set to negated param1 components, basically stepping the opposite way
+			step *= -1;
+		}
+	} else {
+		// ensure the step will be constant
+		Color initialTint;
+		if (fx->FirstApply) {
+			initialTint = core->GetWindowManager()->FadeColor; // current global lighting
+			fx->Parameter4 = fx->Duration - core->GetGame()->GameTime; // estimate amount of steps
+			fx->Parameter5 = initialTint.Packed();
+			fx->Parameter3 = fx->Parameter4;
+		} else {
+			initialTint = Color(fx->Parameter5);
+		}
+		tintMin = initialTint;
+		tintMax = fadeColor;
+		ieDword div = fx->IsVariable == 0 ? fx->Parameter4 : fx->IsVariable;
+		step = (fadeColor - initialTint) / div;
+// 		if (ColorBoundInfringed(core->GetWindowManager()->FadeColor + step, tintMin, tintMax) != 0) {
+// 			core->GetWindowManager()->FadeColor = tintNone;
+// 			return FX_NOT_APPLIED;
+// 		}
+	}
 
-	// order matters here, as SetFadeToColor resets fadeFromCounter
-	core->timer.SetFadeToColor(toTime, 2);
-	core->timer.SetFadeFromColor(fromTime, 2);
-	return FX_NOT_APPLIED;
+	// only update the color during the initial fade in
+	// NOTE: alpha channel will be overwritten by the fade code
+	if (fx->Parameter3 && ColorBoundInfringed(core->GetWindowManager()->FadeColor + step, tintMin, tintMax) == 0) {
+		core->GetWindowManager()->FadeColor += step;
+		fx->Parameter3--;
+	}
+	if (fx->FirstApply) core->GetAudioDrv()->PlayRelative(fx->Resource, SFX_CHAN_HITS);
+
+	// only some types actually use duration, the rest are permanent
+	tick_t fromTime = core->Time.ai_update_time;
+	tick_t toTime = fromTime;
+
+	// NOTE: not really treating them as bits
+	// the original only used type 1 and type 5
+	switch (type) {
+		case 0:
+		case 1: // quick fade from light to dark, then quick fade to light
+			// order matters here, as SetFadeToColor resets fadeFromCounter
+			core->timer.SetFadeToColor(toTime, 2);
+			core->timer.SetFadeFromColor(fromTime, 2);
+			// we don't have to worry about these bit 1 details:
+			// temporary durations maintain starting global lighting on bounds infringement.
+			// if duration expires before a bound is infringed, fades back to starting global lighting.
+			// permanent duration (1) terminates on bounds infringement.
+			return FX_NOT_APPLIED;
+		case 2:
+		case 3: // quick fade from light to dark, then instant light
+			core->timer.SetFadeToColor(toTime, 2);
+			core->timer.SetFadeFromColor(1, 2);
+			// we don't have to worry about these bit 2 details:
+			// temporary durations maintain opposite bound on bounds infringement. (sounds crazy)
+			// permanent duration (1) maintains bounds infringement.
+			// this mode is permanent and does not terminate on its own, unless the infringed bound
+			// happens to be the starting global lighting.
+			return FX_NOT_APPLIED;
+		case 4:
+		case 5:
+		case 6:
+		case 7: // fade from light to target color, goes for duration of effect, then fade to light
+			// extend the duration for some time of the fade-in
+			if (fx->FirstApply) {
+				core->timer.SetFadeToColor(toTime, 2);
+				fx->Parameter6 = toTime + 1;
+				fx->Duration += toTime;
+			} else if (fx->Parameter6 != 0) {
+				fx->Parameter6--;
+				fx->Duration++;
+			}
+
+			// maintain color after fade-in
+			if (!fx->Parameter6) {
+				core->GetWindowManager()->FadeColor = fadeColor;
+				if (fx->Duration == core->GetGame()->GameTime) core->timer.SetFadeFromColor(fromTime, 2);
+			}
+
+			// bit (4) Temporary durations maintain first bound infringement, then fade back to starting global
+			// lighting when duration is expired.
+			//
+			// Permanent duration (1) inverts stepping and fades to the opposite bound on bounds infringement.
+			// This mode is permanent and does not terminate on its own.
+
+			// bit (6) Temporary durations maintain first bound infringement, then fade back to starting global
+			// lighting when duration is expired.
+			//
+			// Permanent duration (1) maintains bounds infringement.
+			// This mode is permanent and does not terminate on its own, unless the infringed bound
+			// happens to be the starting global lighting.
+			break;
+		case 8: // no effect
+			return FX_NOT_APPLIED;
+		case 9: // very fast light to black shift and back / Instant inverted 'RGB Colour' for the duration of the effect
+			core->GetWindowManager()->FadeColor = ColorBlack;
+			core->timer.SetFadeToColor(core->Time.ai_update_time / 2);
+			core->timer.SetFadeFromColor(core->Time.ai_update_time / 2);
+			return FX_NOT_APPLIED;
+		case 10: // instant black for the duration of the effect, then instant light
+			core->GetWindowManager()->FadeColor = ColorBlack;
+			if (fx->FirstApply) core->timer.SetFadeToColor(1);
+			core->timer.SetFadeFromColor(1);
+			break;
+		case 100: // maintains starting global lighting for the specified duration
+			// Bug(?) for 100/101: If param1 is more luminous than the starting global lighting,
+			//                     fades to param1 and terminates regardless of timing mode
+			// NOTE: both also used fx->IsVariable somehow (beyond the above?)
+			core->GetWindowManager()->FadeColor = tintNone;
+			break;
+		case 101: // instantly set area tint to param1, then fade back to starting global lighting when duration is expired
+			core->timer.SetFadeToColor(1);
+			// permanent duration does not terminate on its own unless param1 happens to be the starting global lighting
+			if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT && tintMax != tintNone) {
+				return FX_NOT_APPLIED;
+			}
+			// about to expire
+			if (fx->Duration == core->GetGame()->GameTime) core->timer.SetFadeFromColor(core->Time.ai_update_time);
+			break;
+		case 200: // supposed to fade currently active area tint back to its starting global lighting, but just kills it
+			core->timer.SetFadeToColor(1);
+			core->timer.SetFadeFromColor(1);
+			return FX_NOT_APPLIED;
+		default:
+			Log(ERROR, "PSTOpcodes", "fx_tint_screen: Unknown type passed: {} through {} by {}!", type, fx->SourceRef, fx->CasterID);
+			return FX_NOT_APPLIED;
+	}
+
+	return FX_APPLIED;
 }
 
 //0xc4 fx_special_effect
