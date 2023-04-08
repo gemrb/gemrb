@@ -45,6 +45,7 @@ namespace GemRB {
 
 // various special heights/Zs hardcoded in the originals
 enum ProHeights {
+	None = 0, // pst casting glows
 	Flying = 50, // this is the height of the projectile when Spark Flag Fly = 1
 	Normal = 0x23,
 	Dragon = 0x90,

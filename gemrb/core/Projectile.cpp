@@ -1985,7 +1985,7 @@ Point Projectile::GetStartOffset(const Actor* actor)
 {
 	// the original also set start to Scriptable->Pos, since this was called on all projectiles
 	Point start;
-	if (!actor) return start; // unlikely, but does happen
+	if (!actor || core->HasFeature(GFFlags::PST_STATE_FLAGS)) return start; // unlikely, but does happen
 
 	// check for the hardcoded offset of huge monsters
 	Point ptOffset = GetCastingOffset(actor);
