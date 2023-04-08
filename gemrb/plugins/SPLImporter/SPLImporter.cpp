@@ -188,8 +188,6 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 
 void SPLImporter::GetExtHeader(const Spell *s, SPLExtHeader* eh)
 {
-	ieByte tmpByte;
-
 	str->Read( &eh->SpellForm, 1 );
 	//this byte is used in PST
 	str->Read( &eh->Hostile, 1 );
@@ -204,11 +202,10 @@ void SPLImporter::GetExtHeader(const Spell *s, SPLExtHeader* eh)
 			eh->Target = 3;
 		}
 	}
-	str->Read( &tmpByte,1 );
-	if (!tmpByte) {
-		tmpByte = 1;
+	str->Read(&eh->TargetNumber, 1);
+	if (!eh->TargetNumber) {
+		eh->TargetNumber = 1;
 	}
-	eh->TargetNumber = tmpByte;
 	str->ReadWord(eh->Range);
 	str->ReadWord(eh->RequiredLevel);
 	str->ReadDword(eh->CastingTime);
