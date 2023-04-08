@@ -43,7 +43,35 @@ struct Color {
 	constexpr bool operator!=(const Color& rhs) const noexcept {
 		return !operator==(rhs);
 	}
-	
+
+	constexpr Color operator+(const Color& rhs) const noexcept {
+		return Color(r + rhs.r, b + rhs.b, g + rhs.g, a + rhs.a);
+	}
+
+	constexpr Color operator-(const Color& rhs) const noexcept {
+		return Color(r - rhs.r, b - rhs.b, g - rhs.g, a - rhs.a);
+	}
+
+	constexpr Color operator/(int rhs) const noexcept {
+		return Color(r / rhs, b / rhs, g / rhs, a / rhs);
+	}
+
+	Color& operator+=(const Color& rhs) noexcept {
+		r += rhs.r;
+		b += rhs.g;
+		g += rhs.b;
+		a += rhs.a;
+		return *this;
+	}
+
+	Color& operator*=(int rhs) noexcept {
+		r *= rhs;
+		b *= rhs;
+		g *= rhs;
+		a *= rhs;
+		return *this;
+	}
+
 	constexpr uint32_t Packed() const noexcept {
 		return (r << 24) | (g << 16) | (b << 8) | a;
 	}
