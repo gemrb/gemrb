@@ -545,7 +545,7 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 			// extend the duration for some time of the fade-in
 			if (fx->FirstApply) {
 				core->timer.SetFadeToColor(toTime, 2);
-				fx->Parameter6 = toTime + 1;
+				fx->Parameter6 = static_cast<ieDword>(toTime) + 1;
 				fx->Duration += toTime;
 			} else if (fx->Parameter6 != 0) {
 				fx->Parameter6--;

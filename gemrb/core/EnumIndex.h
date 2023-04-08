@@ -104,7 +104,7 @@ class EnumBitset {
 public:
 	static constexpr auto size = UnderType(ENUM::count);
 		
-	constexpr EnumBitset(under_t<ENUM> value) : bits(value) {}
+	explicit constexpr EnumBitset(under_t<ENUM> value) : bits(value) {}
 	constexpr EnumBitset() = default;
 	
 	constexpr
