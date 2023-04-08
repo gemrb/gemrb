@@ -592,6 +592,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 	Effect *newfx;
 
 	//special effects based on fx_param2
+	// PST:EE also exploded this into separate opcodes with more parameters and using a bam/vvc instead of an internal projectile
 	if (fx->FirstApply) {
 		switch(fx->Parameter2) {
 		case 0: //cloak of warding
