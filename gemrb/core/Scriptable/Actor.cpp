@@ -116,8 +116,6 @@ static bool raresnd = false;
 static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
-static AutoTable extspeed;
-
 static constexpr ieWord IT_SCROLL = 11;
 static constexpr ieWord IT_WAND = 35;
 
@@ -487,6 +485,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (!core->HasFeature(GFFlags::RESDATA_INI)) {
 		// handle default speed and per-animation overrides
 		TableMgr::index_t row = TableMgr::npos;
+		static AutoTable extspeed = gamedata->LoadTable("moverate", true);
 		if (extspeed) {
 			const std::string& animHex = fmt::format("{:#04x}", AnimID);
 			row = extspeed->FindTableValue(0UL, animHex);
@@ -2230,9 +2229,6 @@ static void InitActorTables()
 	} else {
 		SpellStatesSize = 6;
 	}
-
-	// movement rate adjustments
-	extspeed = gamedata->LoadTable("moverate", true);
 
 	// modal actions/state data
 	ReadModalStates();
