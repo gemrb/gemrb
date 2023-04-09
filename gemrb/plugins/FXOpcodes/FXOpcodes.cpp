@@ -3637,6 +3637,18 @@ int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+static int MaybeTransformTo(EffectRef& ref, Effect* fx)
+{
+	if ((fx->TimingMode & 0xff) == FX_DURATION_INSTANT_LIMITED) {
+		// if this effect has expiration, then it will remain as a remove_item or remove_inventory_item
+		// on the effect queue, inheriting all the parameters
+		fx->Opcode = EffectQueue::ResolveEffect(ref);
+		fx->TimingMode = FX_DURATION_DELAY_PERMANENT;
+		return FX_APPLIED;
+	}
+	return FX_NOT_APPLIED;
+}
+
 // 0x6f Item:CreateMagic
 int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3664,14 +3676,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!itm) return FX_NOT_APPLIED;
 	target->inventory.SetEquippedSlot(slot - Inventory::GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
 	gamedata->FreeItem(itm, fx->Resource);
-	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
-		//if this effect has expiration, then it will remain as a remove_item
-		//on the effect queue, inheriting all the parameters
-		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
-		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-		return FX_APPLIED;
-	}
-	return FX_NOT_APPLIED;
+	return MaybeTransformTo(fx_remove_item_ref, fx);
 }
 
 // 0x70 Item:Remove
@@ -3939,15 +3944,10 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int choice = RAND(0, count - 1);
 
 	target->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
-	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
-		//if this effect has expiration, then it will remain as a remove_item
-		//on the effect queue, inheriting all the parameters
-		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
-		fx->Resource = *refs[choice];
-		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-		return FX_APPLIED;
-	}
-	return FX_NOT_APPLIED;
+
+	int ret = MaybeTransformTo(fx_remove_inventory_item_ref, fx);
+	if (ret == FX_APPLIED) fx->Resource = *refs[choice];
+	return ret;
 }
 
 // 0x7b Item:RemoveInventory
@@ -4577,13 +4577,7 @@ int fx_create_item_in_slot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_create_item_in_slot(%2d): Button: %d", fx->Opcode, fx->Parameter2);
 	//create item and set it in target's slot
 	target->inventory.SetSlotItemRes( fx->Resource, core->QuerySlot(fx->Parameter2), fx->Parameter1, fx->Parameter3, fx->Parameter4 );
-	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
-		//convert it to a destroy item
-		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
-		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-		return FX_APPLIED;
-	}
-	return FX_NOT_APPLIED;
+	return MaybeTransformTo(fx_remove_item_ref, fx);
 }
 
 // 0x90 DisableButton
@@ -6978,17 +6972,12 @@ int fx_create_item_days (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_create_item_days(%2d)", fx->Opcode);
 	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
-	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
-		//if this effect has expiration, then it will remain as a remove_item
-		//on the effect queue, inheriting all the parameters
-		//duration needs a hack (recalculate it for days)
-		//no idea if this multiplier is ok
-		fx->Duration+=(fx->Duration-core->GetGame()->GameTime)*2400;
-		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
-		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-		return FX_APPLIED;
-	}
-	return FX_NOT_APPLIED;
+
+	int ret = MaybeTransformTo(fx_remove_inventory_item_ref, fx);
+	// duration needs recalculating for days
+	// no idea if this multiplier is ok
+	if (ret == FX_APPLIED) fx->Duration += (fx->Duration - core->GetGame()->GameTime) * core->Time.day_sec / 3;
+	return ret;
 }
 
 // 0x100 Sequencer:Store
