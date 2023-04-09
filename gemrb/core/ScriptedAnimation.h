@@ -102,7 +102,7 @@ public:
 	~ScriptedAnimation();
 	ScriptedAnimation& operator=(const ScriptedAnimation&) = delete;
 	explicit ScriptedAnimation(DataStream* stream);
-	void LoadAnimationFactory(AnimationFactory *af, int gettwin = 0);
+	void LoadAnimationFactory(const AnimationFactory& af, int gettwin = 0);
 	//there are 3 phases: start, hold, release
 	//it will usually cycle in the 2. phase
 	//the anims could also be used 'orientation based' if NumOrientations is
@@ -171,7 +171,7 @@ public:
 	/* returns possible twin after altering it to become underlay */
 	ScriptedAnimation *DetachTwin();
 private:
-	Animation *PrepareAnimation(const AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false) const;
+	Animation *PrepareAnimation(const AnimationFactory& af, unsigned int cycle, unsigned int i, bool loop = false) const;
 	bool UpdatePhase();
 	void GetPaletteCopy();
 	void IncrementPhase();

@@ -131,9 +131,23 @@ public:
 	Holder<Sprite2D> GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent = true);
 
 	/** returns factory resource, currently works only with animations */
-	FactoryObject* GetFactoryResource(const ResRef& resName, SClass_ID type, bool silent = false);
+	Factory::object_t GetFactoryResource(const ResRef& resName, SClass_ID type, bool silent = false);
+	
+	template <typename T>
+	std::shared_ptr<T> GetFactoryResourceAs(const ResRef& resName, SClass_ID type, bool silent = false)
+	{
+		static_assert(std::is_base_of<FactoryObject, T>::value, "T must be a FactoryObject.");
+		return std::static_pointer_cast<T>(GetFactoryResource(resName, type, silent));
+	}
 
-	void AddFactoryResource(FactoryObject* res);
+	template <typename T, typename... ARGS>
+	std::shared_ptr<T> AddFactoryResource(ARGS&&... args)
+	{
+		static_assert(std::is_base_of<FactoryObject, T>::value, "T must be a FactoryObject.");
+		auto obj = std::make_shared<T>(std::forward<ARGS>(args)...);
+		factory.AddFactoryObject(obj);
+		return obj;
+	}
 
 	Store* GetStore(const ResRef &resRef);
 	/// Saves a store to the cache and frees it.

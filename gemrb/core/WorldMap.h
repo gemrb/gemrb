@@ -132,7 +132,7 @@ public: //struct members
 	ResRef MapIconResRef;
 	ieDword Flags = 0;
 
-	AnimationFactory* bam = nullptr;
+	std::shared_ptr<AnimationFactory> bam;
 private: //non-struct members
 	Holder<Sprite2D> MapMOS = nullptr;
 	std::vector<WMPAreaEntry> area_entries;
@@ -143,7 +143,7 @@ private: //non-struct members
 public:
 	WorldMap() noexcept = default;
 
-	void SetMapIcons(AnimationFactory *bam);
+	void SetMapIcons(std::shared_ptr<AnimationFactory> bam);
 	Holder<Sprite2D> GetMapMOS() const { return MapMOS; }
 	void SetMapMOS(Holder<Sprite2D> newmos);
 	int GetEntryCount() const { return (int) area_entries.size(); }

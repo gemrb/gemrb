@@ -297,11 +297,10 @@ ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef &effect, bool dou
 		DataStream *ds = GetResourceStream(effect, IE_VVC_CLASS_ID);
 		ret = new ScriptedAnimation(ds);
 	} else {
-		AnimationFactory *af = (AnimationFactory *)
-			GetFactoryResource(effect, IE_BAM_CLASS_ID);
+		auto af = GetFactoryResourceAs<AnimationFactory>(effect, IE_BAM_CLASS_ID);
 		if (af) {
 			ret = new ScriptedAnimation();
-			ret->LoadAnimationFactory( af, doublehint?2:0);
+			ret->LoadAnimationFactory(*af, doublehint?2:0);
 		}
 	}
 	if (ret) {
@@ -338,8 +337,7 @@ VEFObject* GameData::GetVEFObject(const ResRef& vefRef, bool doublehint)
 Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent)
 {
 	Holder<Sprite2D> tspr;
-	const AnimationFactory* af = (const AnimationFactory *)
-		GetFactoryResource(resRef, IE_BAM_CLASS_ID, silent);
+	auto af = GetFactoryResourceAs<const AnimationFactory>(resRef, IE_BAM_CLASS_ID, silent);
 	if (!af) return 0;
 	if (cycle == -1)
 		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
@@ -361,7 +359,7 @@ Holder<Sprite2D> GameData::GetAnySprite(const ResRef& resRef, int cycle, int fra
 	return img;
 }
 
-FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID type, bool silent)
+Factory::object_t GameData::GetFactoryResource(const ResRef& resName, SClass_ID type, bool silent)
 {
 	if (resName.IsEmpty()) return nullptr;
 
@@ -379,7 +377,7 @@ FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID typ
 				return nullptr;
 			}
 
-			AnimationFactory* af = importer->GetAnimationFactory(resName);
+			auto af = importer->GetAnimationFactory(resName);
 			factory.AddFactoryObject(af);
 			return af;
 		}
@@ -389,7 +387,7 @@ FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID typ
 	{
 		ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resName, silent);
 		if (img) {
-			ImageFactory* fact = img->GetImageFactory(resName);
+			auto fact = img->GetImageFactory(resName);
 			factory.AddFactoryObject(fact);
 			return fact;
 		}
@@ -400,11 +398,6 @@ FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID typ
 		Log(MESSAGE, "KEYImporter", "{} files are not supported!", core->TypeExt(type));
 		return nullptr;
 	}
-}
-
-void GameData::AddFactoryResource(FactoryObject* res)
-{
-	factory.AddFactoryObject(res);
 }
 
 Store* GameData::GetStore(const ResRef &resRef)

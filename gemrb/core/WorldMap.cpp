@@ -154,9 +154,9 @@ void WorldMap::SetAreaLink(unsigned int x, const WMPAreaLink *arealink)
 	}
 }
 
-void WorldMap::SetMapIcons(AnimationFactory *newicons)
+void WorldMap::SetMapIcons(std::shared_ptr<AnimationFactory> newicons)
 {
-	bam = newicons;
+	bam = std::move(newicons);
 }
 
 void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)

@@ -1244,13 +1244,13 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 	}
 
 	// Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
-	AnimationFactory* flag = static_cast<AnimationFactory*>(gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID));
+	auto flag = gamedata->GetFactoryResourceAs<AnimationFactory>("FLAG1", IE_BAM_CLASS_ID);
 	if (flag == nullptr) {
 		ResourceHolder<ImageMgr> roImg = gamedata->GetResourceHolder<ImageMgr>("RONOTE");
 		ResourceHolder<ImageMgr> userImg = gamedata->GetResourceHolder<ImageMgr>("USERNOTE");
 
-		flag = new AnimationFactory("FLAG1", {roImg->GetSprite2D(), userImg->GetSprite2D()}, {{1, 0}, {1, 1}}, {0, 1});
-		gamedata->AddFactoryResource(flag);
+		AnimationFactory af("FLAG1", {roImg->GetSprite2D(), userImg->GetSprite2D()}, {{1, 0}, {1, 1}}, {0, 1});
+		gamedata->AddFactoryResource<AnimationFactory>(std::move(af));
 	}
 
 	if (NoteCount) {

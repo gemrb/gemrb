@@ -22,16 +22,9 @@
 
 namespace GemRB {
 
-Factory::~Factory(void)
+void Factory::AddFactoryObject(object_t fobject)
 {
-	for (auto& fObject : fobjects) {
-		delete fObject;
-	}
-}
-
-void Factory::AddFactoryObject(FactoryObject* fobject)
-{
-	fobjects.push_back( fobject );
+	fobjects.push_back(std::move(fobject));
 }
 
 int Factory::IsLoaded(const ResRef& resref, SClass_ID type) const
@@ -50,7 +43,7 @@ int Factory::IsLoaded(const ResRef& resref, SClass_ID type) const
 	return -1;
 }
 
-FactoryObject* Factory::GetFactoryObject(int pos) const
+Factory::object_t Factory::GetFactoryObject(int pos) const
 {
 	return fobjects[pos];
 }

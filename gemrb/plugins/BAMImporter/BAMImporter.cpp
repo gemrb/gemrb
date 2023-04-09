@@ -247,7 +247,7 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 	return FLT;
 }
 
-AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
+std::shared_ptr<AnimationFactory> BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
 {
 	std::vector<Holder<Sprite2D>> animframes;
 
@@ -266,7 +266,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool al
 		}
 		free(data);
 
-		return new AnimationFactory(resref, std::move(animframes), cycles, std::move(FLT));
+		return std::make_shared<AnimationFactory>(resref, std::move(animframes), cycles, std::move(FLT));
 	} else {
 		std::vector<index_t> FLT(frames.size());
 
@@ -278,7 +278,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool al
 			animframes.push_back(GetV2Frame(frame));
 		}
 
-		return new AnimationFactory(resref, std::move(animframes), cycles, std::move(FLT));
+		return std::make_shared<AnimationFactory>(resref, std::move(animframes), cycles, std::move(FLT));
 	}
 }
 

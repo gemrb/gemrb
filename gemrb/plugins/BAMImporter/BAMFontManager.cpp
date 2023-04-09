@@ -48,7 +48,7 @@ bool BAMFontManager::Import(DataStream* stream)
 
 Font* BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*style*/, bool background)
 {
-	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, false); // released by BAMFont
+	auto af = bamImp->GetAnimationFactory(resRef, false); // released by BAMFont
 	// FIXME: this test only exists to let the minimal test pass
 	// we should maybe instead use a *valid* font for such a "test"
 	if (af->GetFrame(0) == nullptr) {
@@ -116,6 +116,5 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*style*/, bo
 		}
 	}
 
-	delete af;
 	return fnt;
 }

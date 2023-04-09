@@ -419,9 +419,9 @@ private:
 	void CreateIteration();
 	AnimArray CreateAnimations(const ResRef& bam, int Seq);
 	//pillar type animations
-	AnimArray CreateCompositeAnimation(const AnimationFactory *af, int Seq) const;
+	AnimArray CreateCompositeAnimation(const AnimationFactory& af, int Seq) const;
 	//oriented animations (also simple ones)
-	AnimArray CreateOrientedAnimations(const AnimationFactory *af, int Seq) const;
+	AnimArray CreateOrientedAnimations(const AnimationFactory& af, int Seq) const;
 	void GetPaletteCopy(const AnimArray&, PaletteHolder &pal) const;
 	void GetSmokeAnim();
 	//apply spells and effects on the target, only in single travel mode

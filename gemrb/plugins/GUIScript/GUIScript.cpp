@@ -2168,7 +2168,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			PARSE_ARGS(constructArgs, "OO", &pyRef, &pyImgList);
 			ResRef resRef = ResRefFromPy(pyRef);
 
-			const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(resRef, IE_BAM_CLASS_ID);
+			auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(resRef, IE_BAM_CLASS_ID);
 			if (!af) {
 				return RuntimeError(fmt::format("{} BAM not found!", resRef));
 			}
@@ -2194,7 +2194,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 				PyErr_Clear(); //clearing the exception
 			}
 
-			AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID);
+			auto flags = gamedata->GetFactoryResourceAs<const AnimationFactory>("FLAG1", IE_BAM_CLASS_ID);
 			MapControl* map = new MapControl(rgn, flags);
 			map->LinkedLabel = GetView<Control>(pylabel);
 
@@ -2218,7 +2218,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 				wmap = new WorldMapControl(rgn, font);
 			}
 			
-			const AnimationFactory* bam = (AnimationFactory*) gamedata->GetFactoryResource(ResRefFromPy(anim), IE_BAM_CLASS_ID);
+			auto bam = gamedata->GetFactoryResourceAs<AnimationFactory>(ResRefFromPy(anim), IE_BAM_CLASS_ID);
 			if (bam) {
 				wmap->areaIndicator = bam->GetFrame(0, 0);
 			}
@@ -2559,7 +2559,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 			Py_RETURN_NONE;
 		}
 
-		const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID);
+		auto af = gamedata->GetFactoryResourceAs<AnimationFactory>(ResRef, IE_BAM_CLASS_ID);
 		if (!af) {
 			return RuntimeError(fmt::format("{} BAM not found!", ResRef));
 		}
@@ -3681,7 +3681,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	ResourceHolder<PalettedImageMgr> im = gamedata->GetResourceHolder<PalettedImageMgr>(ResRef, false, true);
 	if (!im) {
 		// the PLT doesn't exist or is bad, so try BAM
-		const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID);
+		auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(ResRef, IE_BAM_CLASS_ID);
 		if (!af) {
 			Log(WARNING, "GUISCript", "BAM/PLT not found for ref: {}", ResRef);
 			Py_RETURN_NONE;
@@ -3746,7 +3746,7 @@ static PyObject* SetButtonBAM(Button* btn, StringView ResRef, int CycleIndex, in
 		return Py_None;
 	}
 
-	const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID);
+	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(ResRef, IE_BAM_CLASS_ID);
 	if (!af)
 		return NULL;
 	Holder<Sprite2D> Picture = af->GetFrame (FrameIndex, CycleIndex);
@@ -3829,7 +3829,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	}
 	
 	const ResRef ref = ResRefFromPy(pyRef);
-	auto af = (AnimationFactory*)gamedata->GetFactoryResource(ref, IE_BAM_CLASS_ID);
+	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(ref, IE_BAM_CLASS_ID);
 	ABORT_IF_NULL(af);
 	SpriteAnimation* anim = new SpriteAnimation(af, Cycle);
 
@@ -6579,7 +6579,7 @@ static PyObject *SetSpellIcon(Button* btn, const ResRef& SpellResRef, int type, 
 	else {
 		iconResRef = spell->SpellbookIcon;
 	}
-	const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(iconResRef, IE_BAM_CLASS_ID, true);
+	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(iconResRef, IE_BAM_CLASS_ID, true);
 	if (!af) {
 		return RuntimeError(fmt::format("{} BAM not found", iconResRef));
 	}
@@ -10500,7 +10500,7 @@ static void ReadActionButtons()
 	}
 }
 
-static void SetButtonCycle(const AnimationFactory *bam, Button *btn, AnimationFactory::index_t cycle, unsigned char which)
+static void SetButtonCycle(std::shared_ptr<const AnimationFactory> bam, Button *btn, AnimationFactory::index_t cycle, unsigned char which)
 {
 	Holder<Sprite2D> tspr = bam->GetFrame(cycle, 0);
 	btn->SetImage((BUTTON_IMAGE_TYPE)which, tspr);
@@ -10547,7 +10547,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 		ReadActionButtons();
 	}
 
-	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(GUIResRef[Index], IE_BAM_CLASS_ID));
+	auto bam =gamedata->GetFactoryResourceAs<const AnimationFactory>(GUIResRef[Index], IE_BAM_CLASS_ID);
 	if (!bam) {
 		return RuntimeError(fmt::format("{} BAM not found", GUIResRef[Index]));
 	}
@@ -10668,7 +10668,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		}
 	}
 	// pst doesn't have a file, but uses the float window instead any way
-	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(GUIResRef[9], IE_BAM_CLASS_ID));
+	auto bam = gamedata->GetFactoryResourceAs<const AnimationFactory>(GUIResRef[9], IE_BAM_CLASS_ID);
 	if (!bam) {
 		return RuntimeError("guibtbut BAM not found");
 	}

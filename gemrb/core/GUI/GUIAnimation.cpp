@@ -78,8 +78,8 @@ bool ColorAnimation::HasEnded() const
 	return repeat ? false : current == end;
 }
 
-SpriteAnimation::SpriteAnimation(AnimationFactory* af, int cycle)
-: bam(af), cycle(cycle)
+SpriteAnimation::SpriteAnimation(std::shared_ptr<const AnimationFactory> af, int cycle)
+: bam(std::move(af)), cycle(cycle)
 {
 	assert(bam);
 	nextFrameTime = begintime + CalculateNextFrameDelta();

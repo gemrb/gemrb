@@ -56,9 +56,7 @@ Projectile::Projectile() noexcept
 
 Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bamres, int Seq)
 {
-	const AnimationFactory* af = static_cast<const AnimationFactory*>(
-		gamedata->GetFactoryResource(bamres, IE_BAM_CLASS_ID));
-
+	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(bamres, IE_BAM_CLASS_ID);
 	if (!af) {
 		return AnimArray(MAX_ORIENT);
 	}
@@ -78,20 +76,20 @@ Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bamres, int Seq
 
 	if(ExtFlags&PEF_PILLAR) {
 		Aim = Max;
-		return CreateCompositeAnimation(af, Seq);
+		return CreateCompositeAnimation(*af, Seq);
 	} else {
-		return CreateOrientedAnimations(af, Seq);
+		return CreateOrientedAnimations(*af, Seq);
 	}
 }
 
 //Seq is the first cycle to use in the composite
 //Aim is the number of cycles
-Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactory *af, int Seq) const
+Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactory& af, int Seq) const
 {
 	AnimArray anims(MAX_ORIENT);
 	for (int Cycle = 0; Cycle<Aim; Cycle++) {
 		int c = Cycle+Seq;
-		Animation* a = af->GetCycle( c );
+		Animation* a = af.GetCycle( c );
 		if (!a) continue;
 		
 		//animations are started at a random frame position
@@ -111,7 +109,7 @@ Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactor
 //Seq is the cycle to use in case of single orientations
 //Aim is the number of Orientations
 // FIXME: seems inefficient that we load up MAX_ORIENT animations even for those with a single orientation (default case)
-Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactory *af, int Seq) const
+Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactory& af, int Seq) const
 {
 	AnimArray anims(MAX_ORIENT);
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
@@ -143,7 +141,7 @@ Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactor
 			c = Seq;
 			break;
 		}
-		Animation* a = af->GetCycle( c );
+		Animation* a = af.GetCycle( c );
 		if (!a) continue;
 		
 		//animations are started at a random frame position

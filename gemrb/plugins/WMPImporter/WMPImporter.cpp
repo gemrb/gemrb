@@ -132,7 +132,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 	}
 
 	// Load location icon bam
-	AnimationFactory* af = static_cast<AnimationFactory*>(gamedata->GetFactoryResource(m->MapIconResRef, IE_BAM_CLASS_ID));
+	auto af = gamedata->GetFactoryResourceAs<AnimationFactory>(m->MapIconResRef, IE_BAM_CLASS_ID);
 	if (af) {
 		m->SetMapIcons(af);
 	}

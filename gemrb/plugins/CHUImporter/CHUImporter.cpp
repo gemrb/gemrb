@@ -99,7 +99,7 @@ static void GetButton(DataStream* str, Control*& ctrl, const Region& ctrlFrame, 
 		return;
 	}
 
-	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(bamFile, IE_BAM_CLASS_ID));
+	auto bam = gamedata->GetFactoryResourceAs<const AnimationFactory>(bamFile, IE_BAM_CLASS_ID);
 	if (!bam) {
 		Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
 		// iwd2 has fake BAM ResRefs for some Buttons, this will handle bad ResRefs
@@ -164,8 +164,7 @@ static void GetProgressbar(DataStream* str, Control*& ctrl, const Region& ctrlFr
 	}
 
 	if (knobStepsCount) {
-		const AnimationFactory* af = static_cast<const AnimationFactory*>(
-			gamedata->GetFactoryResource(bamFile, IE_BAM_CLASS_ID));
+		auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(bamFile, IE_BAM_CLASS_ID);
 		if (af) {
 			pbar->SetAnimation(af->GetCycle(cycle & 0xff));
 		} else {
@@ -206,7 +205,7 @@ static void GetSlider(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 	Holder<Sprite2D> img = mos->GetSprite2D();
 	sldr->SetImage(IE_GUI_SLIDER_BACKGROUND, img);
 
-	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(bamFile, IE_BAM_CLASS_ID));
+	auto bam = gamedata->GetFactoryResourceAs<const AnimationFactory>(bamFile, IE_BAM_CLASS_ID);
 	if (bam) {
 		img = bam->GetFrame(knob, 0);
 		sldr->SetImage(IE_GUI_SLIDER_KNOB, img);
@@ -251,7 +250,7 @@ static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame
 	// word: typeformat, unknown
 	Font* fnt = core->GetFont(fontResRef);
 
-	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(cursorResRef, IE_BAM_CLASS_ID));
+	auto bam = gamedata->GetFactoryResourceAs<const AnimationFactory>(cursorResRef, IE_BAM_CLASS_ID);
 	Holder<Sprite2D> cursor;
 	if (bam) {
 		cursor = bam->GetFrame(curCycle, curFrame);
@@ -356,7 +355,7 @@ static void GetScrollbar(DataStream* str, Control*& ctrl, const Region& ctrlFram
 	str->ReadResRef(bamResRef);
 	str->ReadWord(cycle);
 
-	const AnimationFactory* bam = static_cast<const AnimationFactory*>(gamedata->GetFactoryResource(bamResRef, IE_BAM_CLASS_ID));
+	auto bam =gamedata->GetFactoryResourceAs<const AnimationFactory>(bamResRef, IE_BAM_CLASS_ID);
 	if (!bam) {
 		Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: {}", bamResRef);
 		return;

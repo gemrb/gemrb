@@ -3681,8 +3681,7 @@ AreaAnimation::AreaAnimation(const AreaAnimation &src) noexcept
 
 void AreaAnimation::InitAnimation()
 {
-	const AnimationFactory* af = static_cast<const AnimationFactory*>(
-		gamedata->GetFactoryResource(BAM, IE_BAM_CLASS_ID));
+	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(BAM, IE_BAM_CLASS_ID);
 	if (!af) {
 		Log(ERROR, "Map", "Cannot load animation: {}", BAM);
 		return;

@@ -61,19 +61,19 @@ static const ieByte SixteenToFive[3*MAX_ORIENT]={
 	10,10,11,11,12,12,13,13,14,14,13,13,12,12,11,11
 };
 
-Animation *ScriptedAnimation::PrepareAnimation(const AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop) const
+Animation *ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, unsigned int cycle, unsigned int i, bool loop) const
 {
 	int c = cycle;
 
 	if (NumOrientations == 16 || OrientationFlags & IE_VVC_FACE_FIXED) {
-		if (af->GetCycleCount() > i) c = i;
+		if (af.GetCycleCount() > i) c = i;
 	} else if (NumOrientations == 5) {
 		c = SixteenToFive[i];
 	} else if (NumOrientations == 9) {
 		c = SixteenToNine[i];
 	}
 
-	Animation *anim = af->GetCycle(c);
+	Animation *anim = af.GetCycle(c);
 	if (anim) {
 		anim->MirrorAnimation(BlitFlags(Transparency) & (BlitFlags::MIRRORX | BlitFlags::MIRRORY));
 		//creature anims may start at random position, vvcs always start on 0
@@ -89,15 +89,15 @@ Animation *ScriptedAnimation::PrepareAnimation(const AnimationFactory *af, unsig
 }
 
 /* Creating animation from BAM */
-void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
+void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int gettwin)
 {
 	//getcycle returns NULL if there is no such cycle
 	//special case, PST double animations
 
-	ResName = af->resRef;
+	ResName = af.resRef;
 	// some anims like FIREL.BAM in IWD contain empty cycles
 	unsigned int cCount = 0;
-	for (unsigned int i = 0; i < af->GetCycleCount() && af->GetCycleSize(i) > 0; ++i) {
+	for (unsigned int i = 0; i < af.GetCycleCount() && af.GetCycleSize(i) > 0; ++i) {
 		++cCount;
 	}
 
@@ -157,7 +157,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 			p *= MAX_ORIENT;
 		}
 
-		anims[p] = af->GetCycle(c);
+		anims[p] = af.GetCycle(c);
 		if (anims[p]) {
 			anims[p]->frameIdx = 0;
 			anims[p]->MirrorAnimation(mirrorFlags);
@@ -283,8 +283,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	}
 
 	if (SequenceFlags & IE_VVC_BAM) {
-		const AnimationFactory* af = static_cast<const AnimationFactory*>(
-			gamedata->GetFactoryResource(Anim1ResRef, IE_BAM_CLASS_ID));
+		auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(Anim1ResRef, IE_BAM_CLASS_ID);
 		if (!af) {
 			Log(ERROR, "ScriptedAnimation", "Failed to load animation: {}!", Anim1ResRef);
 			return;
@@ -294,14 +293,14 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 
 			if (seq1 >= 0) {
 				unsigned int p_onset = P_ONSET * MAX_ORIENT + i;
-				anims[p_onset] = PrepareAnimation(af, seq1, i);
+				anims[p_onset] = PrepareAnimation(*af, seq1, i);
 			}
 
-			anims[p_hold] = PrepareAnimation(af, seq2, i, SequenceFlags & IE_VVC_LOOP);
+			anims[p_hold] = PrepareAnimation(*af, seq2, i, SequenceFlags & IE_VVC_LOOP);
 
 			if (seq3 >= 0) {
 				unsigned int p_release = P_RELEASE * MAX_ORIENT + i;
-				anims[p_release] = PrepareAnimation(af, seq3, i);
+				anims[p_release] = PrepareAnimation(*af, seq3, i);
 			}
 		}
 	}

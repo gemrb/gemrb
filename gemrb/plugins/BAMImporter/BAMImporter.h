@@ -60,7 +60,7 @@ class BAMImporter : public AnimationMgr {
 public:
 	bool Import(DataStream* stream) override;
 	index_t GetCycleSize(index_t Cycle) override;
-	AnimationFactory* GetAnimationFactory(const ResRef &resref, bool allowCompression = true) override;
+	std::shared_ptr<AnimationFactory> GetAnimationFactory(const ResRef &resref, bool allowCompression = true) override;
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	Holder<Sprite2D> GetPalette() override;

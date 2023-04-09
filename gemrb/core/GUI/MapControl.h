@@ -55,7 +55,7 @@ private:
 	Region mosRgn;
 	Point notePos;
 
-	AnimationFactory* mapFlags;
+	std::shared_ptr<const AnimationFactory> mapFlags;
 	
 public:
 	// Small map bitmap
@@ -65,7 +65,7 @@ public:
 	// The MapControl can set the text of this label directly
 	Control* LinkedLabel = nullptr;
 
-	MapControl(const Region& frame, AnimationFactory* af);
+	MapControl(const Region& frame, std::shared_ptr<const AnimationFactory> af);
 
 	bool IsAnimated() const override { return true; } // map must constantly update actor positions
 	

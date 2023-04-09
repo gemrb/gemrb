@@ -690,8 +690,7 @@ int Interface::LoadSprites()
 	}
 
 	Log(MESSAGE, "Core", "Loading Cursors...");
-	const AnimationFactory* anim;
-	anim = (const AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
+	auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(MainCursorsImage, IE_BAM_CLASS_ID);
 	size_t CursorCount = 0;
 	if (anim) {
 		CursorCount = anim->GetCycleCount();
@@ -725,7 +724,7 @@ int Interface::LoadSprites()
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (!GroundCircleBam[size].IsEmpty()) {
-			anim = (const AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
+			anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
 				Log(ERROR, "Core", "Failed Loading Ground circle bitmaps...");
@@ -1780,7 +1779,7 @@ bool Interface::LoadGemRBINI()
 	int ttMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", 10 );
 
 	if (!tooltipBG.IsEmpty()) {
-		const AnimationFactory* anim = (const AnimationFactory*) gamedata->GetFactoryResource(tooltipBG, IE_BAM_CLASS_ID);
+		auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(tooltipBG, IE_BAM_CLASS_ID);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (anim) {
 			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2) );

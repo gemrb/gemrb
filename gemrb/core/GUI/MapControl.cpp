@@ -30,8 +30,8 @@
 
 namespace GemRB {
 
-MapControl::MapControl(const Region& frame, AnimationFactory* af)
-: Control(frame), mapFlags(af)
+MapControl::MapControl(const Region& frame, std::shared_ptr<const AnimationFactory> af)
+: Control(frame), mapFlags(std::move(af))
 {
 	ControlType = IE_GUI_MAP;
 	SetValueRange({NO_NOTES, EDIT_NOTE});

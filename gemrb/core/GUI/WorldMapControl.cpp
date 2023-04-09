@@ -104,7 +104,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
 		Point offset = MapToScreen(m->pos);
-		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
+		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam.get());
 		if (icon) {
 			BlitFlags flags =  core->HasFeature(GFFlags::AUTOMAP_INI) ? BlitFlags::BLENDED : (BlitFlags::BLENDED | BlitFlags::COLOR_MOD);
 			if (m == Area && m->HighlightSelected()) {
@@ -146,7 +146,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		if (ftext == nullptr || caption.empty())
 			continue;
 
-		const Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
+		const Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam.get());
 		if (!icon) continue;
 		const Region& icon_frame = icon->Frame;
 		Point p = m->pos - icon_frame.origin;
@@ -222,7 +222,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			continue; //invisible or inaccessible
 		}
 
-		const Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam);
+		const Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam.get());
 		Region rgn(ae->pos, Size());
 		if (icon) {
 			rgn.x -= icon->Frame.x;

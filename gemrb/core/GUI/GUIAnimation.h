@@ -134,7 +134,7 @@ class AnimationFactory;
 
 class GEM_EXPORT SpriteAnimation : public GUIAnimation<Holder<Sprite2D>> {
 private:
-	AnimationFactory* bam = nullptr;
+	std::shared_ptr<const AnimationFactory> bam;
 	uint8_t cycle = 0;
 	uint8_t frame = 0;
 	unsigned int anim_phase = 0;
@@ -145,7 +145,7 @@ private:
 	tick_t CalculateNextFrameDelta();
 	Holder<Sprite2D> GenerateNext(tick_t time) override;
 public:
-	explicit SpriteAnimation(AnimationFactory* af, int Cycle = 0);
+	explicit SpriteAnimation(std::shared_ptr<const AnimationFactory> af, int Cycle = 0);
 	//report if the current resource is the same as descripted by the params
 	void SetPaletteGradients(const ieDword *col);
 	bool SameResource(const SpriteAnimation*) const;

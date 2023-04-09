@@ -27,19 +27,23 @@
 #include "AnimationFactory.h"
 #include "FactoryObject.h"
 
+#include <memory>
+
 namespace GemRB {
 
 class GEM_EXPORT Factory {
-private:
-	std::vector< FactoryObject*> fobjects;
 public:
+	using object_t = std::shared_ptr<FactoryObject>;
+
 	Factory() noexcept = default;
 	Factory(const Factory&) = delete;
-	~Factory();
 	Factory& operator=(const Factory&) = delete;
-	void AddFactoryObject(FactoryObject* fobject);
+
+	void AddFactoryObject(object_t fobject);
 	int IsLoaded(const ResRef& resRef, SClass_ID type) const;
-	FactoryObject* GetFactoryObject(int pos) const;
+	object_t GetFactoryObject(int pos) const;
+private:
+	std::vector<object_t> fobjects;
 };
 
 }

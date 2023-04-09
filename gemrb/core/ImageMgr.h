@@ -60,7 +60,7 @@ public:
 	 *
 	 * @param[in] ResRef name of image represented by factory.
 	 */
-	ImageFactory* GetImageFactory(const ResRef& ref);
+	std::shared_ptr<ImageFactory> GetImageFactory(const ResRef& ref);
 protected:
 	Size size;
 };

@@ -32,10 +32,9 @@ int ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
 	return -1;
 }
 
-ImageFactory* ImageMgr::GetImageFactory(const ResRef& ref)
+std::shared_ptr<ImageFactory> ImageMgr::GetImageFactory(const ResRef& ref)
 {
-	ImageFactory* fact = new ImageFactory(ref, GetSprite2D());
-	return fact;
+	return std::make_shared<ImageFactory>(ref, GetSprite2D());
 }
 
 }
