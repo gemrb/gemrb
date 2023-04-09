@@ -147,7 +147,7 @@ Holder<Sprite2D> SaveGame::GetPortrait(int index) const
 	}
 
 	std::string nPath = fmt::format("PORTRT{}", index);
-	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(nPath, manager, true);
+	ResourceHolder<ImageMgr> im = manager.GetResourceHolder<ImageMgr>(nPath, true);
 	if (!im)
 		return NULL;
 	return im->GetSprite2D();
@@ -155,7 +155,7 @@ Holder<Sprite2D> SaveGame::GetPortrait(int index) const
 
 Holder<Sprite2D> SaveGame::GetPreview() const
 {
-	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(Prefix, manager, true);
+	ResourceHolder<ImageMgr> im = manager.GetResourceHolder<ImageMgr>(Prefix, true);
 	if (!im)
 		return NULL;
 	return im->GetSprite2D();

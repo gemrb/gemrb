@@ -220,21 +220,6 @@ public:
 
 extern GEM_EXPORT GameData * gamedata;
 
-template <class T>
-using ResourceHolder = std::shared_ptr<T>;
-
-template <class T>
-inline ResourceHolder<T> GetResourceHolder(StringView resname, bool silent = false, bool useCorrupt = false)
-{
-	return ResourceHolder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
-}
-
-template <class T>
-inline ResourceHolder<T> GetResourceHolder(StringView resname, const ResourceManager& manager, bool silent = false)
-{
-	return ResourceHolder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
-}
-
 }
 
 #endif

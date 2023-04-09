@@ -132,7 +132,7 @@ void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
 		auto resRef = fmt::format("{}{}{:02d}", str->filename[0], suffix.c_str(), dataBlock.pvrzPage);
 		StringView resRefView(resRef.c_str(), 7);
 
-		lastPVRZ = GetResourceHolder<ImageMgr>(resRefView, true);
+		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRefView, true);
 		lastPVRZPage = dataBlock.pvrzPage;
 	}
 

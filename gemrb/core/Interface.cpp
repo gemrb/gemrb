@@ -706,7 +706,7 @@ int Interface::LoadSprites()
 		std::string fileName;
 		while (CursorCount < 99) {
 			fileName = fmt::format("{}{:02}", MainCursorsImage, CursorCount);
-			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
+			ResourceHolder<ImageMgr> im = gamedata->GetResourceHolder<ImageMgr>(fileName, true);
 			if (!im) break;
 			Cursors.push_back(im->GetSprite2D());
 			CursorCount++;
@@ -770,7 +770,7 @@ int Interface::LoadFonts()
 		bool background = tab->QueryFieldSigned<int>(rowName, "BACKGRND") != 0;
 
 		Font* fnt = NULL;
-		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
+		ResourceHolder<FontManager> fntMgr = gamedata->GetResourceHolder<FontManager>(font_name);
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, background);
 
 		if (!fnt) {
@@ -2344,7 +2344,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 	if (ambim) ambim->Deactivate();
 
-	ResourceHolder<MoviePlayer> mp = GetResourceHolder<MoviePlayer>(actualMovieRef);
+	ResourceHolder<MoviePlayer> mp = gamedata->GetResourceHolder<MoviePlayer>(actualMovieRef);
 	if (!mp) {
 		return -1;
 	}

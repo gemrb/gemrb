@@ -64,7 +64,7 @@ void MOSImporter::Blit(const MOSV2DataBlock& dataBlock, uint8_t *frameData) {
 		auto resRef = fmt::format("mos{:04d}", dataBlock.pvrzPage);
 		StringView resRefView(resRef.c_str(), 7);
 
-		lastPVRZ = GetResourceHolder<ImageMgr>(resRefView, true);
+		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRefView, true);
 		lastPVRZPage = dataBlock.pvrzPage;
 	}
 

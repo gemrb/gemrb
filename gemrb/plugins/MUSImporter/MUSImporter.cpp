@@ -281,7 +281,7 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 		strlcpy(FName, name.c_str(), _MAX_PATH);
 	}
 
-	ResourceHolder<SoundMgr> sound = GetResourceHolder<SoundMgr>(FName, manager, true);
+	ResourceHolder<SoundMgr> sound = manager.GetResourceHolder<SoundMgr>(FName, true);
 	if (sound) {
 		int soundID = core->GetAudioDrv()->CreateStream( sound );
 		if (soundID == -1) {

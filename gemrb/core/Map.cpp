@@ -3842,7 +3842,7 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 
 void Map::SetBackground(const ResRef &bgResRef, ieDword duration)
 {
-	ResourceHolder<ImageMgr> bmp = GetResourceHolder<ImageMgr>(bgResRef);
+	ResourceHolder<ImageMgr> bmp = gamedata->GetResourceHolder<ImageMgr>(bgResRef);
 
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;

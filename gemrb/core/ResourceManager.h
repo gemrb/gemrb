@@ -27,6 +27,7 @@
 #include "Resource.h"
 #include "ResourceSource.h"
 
+#include <memory>
 #include <vector>
 
 namespace GemRB {
@@ -35,6 +36,9 @@ namespace GemRB {
 
 class ResourceSource;
 class TypeID;
+
+template <class T>
+using ResourceHolder = std::shared_ptr<T>;
 
 class GEM_EXPORT ResourceManager {
 public:
@@ -56,7 +60,12 @@ public:
 	DataStream* GetResource(StringView resname, SClass_ID type, bool silent = false) const;
 	/** Returns Resource object associated to given resource */
 	Resource* GetResource(StringView resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
-
+	
+	template <class T>
+	inline ResourceHolder<T> GetResourceHolder(StringView resname, bool silent = false, bool useCorrupt = false) const
+	{
+		return ResourceHolder<T>(static_cast<T*>(GetResource(resname, &T::ID, silent, useCorrupt)));
+	}
 private:
 	std::vector<std::shared_ptr<ResourceSource> > searchPath;
 };

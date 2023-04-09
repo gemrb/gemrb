@@ -205,7 +205,7 @@ void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock,
 		auto resRef = fmt::format("mos{:04d}", dataBlock.pvrzPage);
 		StringView resRefView(resRef.c_str(), 7);
 
-		lastPVRZ = GetResourceHolder<ImageMgr>(resRefView, true);
+		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRefView, true);
 		lastPVRZPage = dataBlock.pvrzPage;
 	}
 

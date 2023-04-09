@@ -728,7 +728,7 @@ private:
 	{
 		static_assert(SIZE == 16 || SIZE == 32 || SIZE == 256, "invalid palette size");
 
-		ResourceHolder<ImageMgr> palim = GetResourceHolder<ImageMgr>(resref);
+		ResourceHolder<ImageMgr> palim = gamedata->GetResourceHolder<ImageMgr>(resref);
 		if (palim) {
 			auto image = palim->GetSprite2D();
 			int height = image->Frame.h;

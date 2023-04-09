@@ -166,7 +166,7 @@ static int GetTrackString(const ResRef &areaName)
 
 static Holder<Sprite2D> LoadImageAs8bit(const ResRef& resref)
 {
-	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resref);
+	ResourceHolder<ImageMgr> im = gamedata->GetResourceHolder<ImageMgr>(resref);
 	if (!im) {
 		return nullptr;
 	}
@@ -391,7 +391,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		TileProps props = MakeTileProps(tm, map->WEDResRef, day_or_night);
 		
 		// Small map for MapControl
-		ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
+		ResourceHolder<ImageMgr> sm = gamedata->GetResourceHolder<ImageMgr>(TmpResRef);
 
 		if (sm) {
 			// night small map is *optional*!
@@ -1246,8 +1246,8 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 	// Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 	AnimationFactory* flag = static_cast<AnimationFactory*>(gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID));
 	if (flag == nullptr) {
-		ResourceHolder<ImageMgr> roImg = GetResourceHolder<ImageMgr>("RONOTE");
-		ResourceHolder<ImageMgr> userImg = GetResourceHolder<ImageMgr>("USERNOTE");
+		ResourceHolder<ImageMgr> roImg = gamedata->GetResourceHolder<ImageMgr>("RONOTE");
+		ResourceHolder<ImageMgr> userImg = gamedata->GetResourceHolder<ImageMgr>("USERNOTE");
 
 		flag = new AnimationFactory("FLAG1", {roImg->GetSprite2D(), userImg->GetSprite2D()}, {{1, 0}, {1, 1}}, {0, 1});
 		gamedata->AddFactoryResource(flag);
@@ -1410,10 +1410,10 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	}
 
 	// Small map for MapControl
-	ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
+	ResourceHolder<ImageMgr> sm = gamedata->GetResourceHolder<ImageMgr>(TmpResRef);
 	if (!sm) {
 		//fall back to day minimap
-		sm = GetResourceHolder<ImageMgr>(WEDResRef);
+		sm = gamedata->GetResourceHolder<ImageMgr>(WEDResRef);
 	}
 	
 	Map* map = nullptr;

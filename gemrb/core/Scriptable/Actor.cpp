@@ -5944,7 +5944,7 @@ Holder<Sprite2D> Actor::CopyPortrait(int which) const
 	ResRef portrait = which ? SmallPortrait : LargePortrait;
 	if (portrait == "none") return nullptr; // skip our fallback
 
-	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(portrait, true);
+	ResourceHolder<ImageMgr> im = gamedata->GetResourceHolder<ImageMgr>(portrait, true);
 	return im ? im->GetSprite2D() : nullptr;
 }
 

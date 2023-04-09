@@ -155,11 +155,11 @@ static void GetProgressbar(DataStream* str, Control*& ctrl, const Region& ctrlFr
 	Holder<Sprite2D> img2;
 	Holder<Sprite2D> img3;
 	if (!mosFile.IsEmpty()) {
-		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(mosFile);
+		ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(mosFile);
 		img = mos->GetSprite2D();
 	}
 	if (!mosFile2.IsEmpty()) {
-		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(mosFile2);
+		ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(mosFile2);
 		img2 = mos->GetSprite2D();
 	}
 
@@ -172,7 +172,7 @@ static void GetProgressbar(DataStream* str, Control*& ctrl, const Region& ctrlFr
 			Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: {}", bamFile);
 		}
 	} else {
-		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(bamFile);
+		ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(bamFile);
 		img3 = mos->GetSprite2D();
 	}
 	pbar->SetBackground(img);
@@ -202,7 +202,7 @@ static void GetSlider(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 
 	Slider* sldr = new Slider(ctrlFrame, knobPos, knobStep, knobStepsCount);
 	ctrl = sldr;
-	ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(mosFile);
+	ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(mosFile);
 	Holder<Sprite2D> img = mos->GetSprite2D();
 	sldr->SetImage(IE_GUI_SLIDER_BACKGROUND, img);
 
@@ -257,7 +257,7 @@ static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame
 		cursor = bam->GetFrame(curCycle, curFrame);
 	}
 
-	ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(bgMos);
+	ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(bgMos);
 	Holder<Sprite2D> img;
 	if (mos) {
 		img = mos->GetSprite2D();
@@ -427,7 +427,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	Window* win = CreateWindow(windowID, rgn);
 	Holder<Sprite2D> bg;
 	if (backGround == 1) {
-		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(mosFile);
+		ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(mosFile);
 		if (mos) {
 			bg = mos->GetSprite2D();
 		}

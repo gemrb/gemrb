@@ -722,7 +722,7 @@ Holder<Sprite2D> WindowManager::WinFrameEdge(int edge) const
 	if (winframes.find(refstr) != winframes.end()) {
 		frame = winframes[refstr];
 	} else {
-		auto im = GetResourceHolder<ImageMgr>(refstr);
+		auto im = gamedata->GetResourceHolder<ImageMgr>(refstr);
 		if (im) {
 			frame = im->GetSprite2D();
 		}
