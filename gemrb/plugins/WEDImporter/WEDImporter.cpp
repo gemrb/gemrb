@@ -109,7 +109,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 			res[len] = '\0';
 		}
 	}
-	DataStream* tisfile = gamedata->GetResource(res, IE_TIS_CLASS_ID);
+	DataStream* tisfile = gamedata->GetResourceStream(res, IE_TIS_CLASS_ID);
 	if (!tisfile) {
 		return -1;
 	}

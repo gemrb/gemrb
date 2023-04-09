@@ -50,7 +50,7 @@ static std::shared_ptr<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 		return {};
 	}
 
-	DataStream* inifile = gamedata->GetResource( DefaultArea, IE_INI_CLASS_ID );
+	DataStream* inifile = gamedata->GetResourceStream(DefaultArea, IE_INI_CLASS_ID);
 	if (!inifile) {
 		return {};
 	}

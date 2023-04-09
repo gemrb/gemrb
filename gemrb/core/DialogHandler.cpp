@@ -111,7 +111,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	}
 
 	PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID);
-	dm->Open(gamedata->GetResource(dialogRef, IE_DLG_CLASS_ID));
+	dm->Open(gamedata->GetResourceStream(dialogRef, IE_DLG_CLASS_ID));
 	dlg = dm->GetDialog();
 
 	if (!dlg) {

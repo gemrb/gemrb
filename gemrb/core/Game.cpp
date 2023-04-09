@@ -837,7 +837,7 @@ int Game::LoadMap(const ResRef &resRef, bool loadscreen)
 		return GEM_ERROR;
 	}
 
-	DataStream* ds = gamedata->GetResource(resRef, IE_ARE_CLASS_ID);
+	DataStream* ds = gamedata->GetResourceStream(resRef, IE_ARE_CLASS_ID);
 	auto mM = GetImporter<MapMgr>(IE_ARE_CLASS_ID, ds);
 	if (!mM) {
 		core->LoadProgress(100);
@@ -1802,7 +1802,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 			cutscene = true;
 			PlayerDream();
 		// all games have these bg1 leftovers, but only bg2 replaced the content
-		} else if (gamedata->GetResource("drmtxt2", IE_2DA_CLASS_ID, true)->Size() > 0) {
+		} else if (gamedata->GetResourceStream("drmtxt2", IE_2DA_CLASS_ID, true)->Size() > 0) {
 			cutscene = true;
 			TextDream();
 		}

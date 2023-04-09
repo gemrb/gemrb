@@ -1816,7 +1816,7 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 		return newScript;
 	}
 
-	DataStream* stream = gamedata->GetResource(resRef, type);
+	DataStream* stream = gamedata->GetResourceStream(resRef, type);
 	if (!stream) {
 		return NULL;
 	}

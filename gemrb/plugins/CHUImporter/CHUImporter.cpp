@@ -497,7 +497,7 @@ bool CHUImporter::LoadWindowPack(const ScriptingGroup_t& ref)
 		return true; // already loaded
 	}
 
-	DataStream* stream = gamedata->GetResource(ref, IE_CHU_CLASS_ID);
+	DataStream* stream = gamedata->GetResourceStream(ref, IE_CHU_CLASS_ID);
 	if (stream == nullptr) {
 		Log(ERROR, "CHUImporter", "Error: Cannot find {}.chu!", ref);
 		return false;

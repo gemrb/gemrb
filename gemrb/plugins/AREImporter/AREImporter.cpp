@@ -368,7 +368,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		TmpResRef.Format("{:.7}N", map->WEDResRef);
 	}
 	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
-	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
+	DataStream* wedfile = gamedata->GetResourceStream(TmpResRef, IE_WED_CLASS_ID);
 	tmm->Open( wedfile );
 	tmm->SetExtendedNight( !day_or_night );
 
@@ -1072,7 +1072,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	if (creOffset != 0 && !(flags & 1)) {
 		creFile = SliceStream(str, creOffset, creSize, true);
 	} else {
-		creFile = gamedata->GetResource(creResRef, IE_CRE_CLASS_ID);
+		creFile = gamedata->GetResourceStream(creResRef, IE_CRE_CLASS_ID);
 	}
 	if (!actorMgr->Open(creFile)) {
 		Log(ERROR, "AREImporter", "Couldn't read actor: {}!", creResRef);
@@ -1392,7 +1392,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		day_or_night = true;
 	
 	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
-	DataStream* wedfile = gamedata->GetResource( WEDResRef, IE_WED_CLASS_ID );
+	DataStream* wedfile = gamedata->GetResourceStream(WEDResRef, IE_WED_CLASS_ID);
 	tmm->Open( wedfile );
 
 	//there was no tilemap set yet, so lets just send a NULL

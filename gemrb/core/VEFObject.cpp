@@ -104,7 +104,7 @@ VEFObject *VEFObject::CreateObject(const ResRef &res, SClass_ID id)
 		if (id==IE_2DA_CLASS_ID) {
 			obj->Load2DA(res);
 		} else {
-			DataStream* stream = gamedata->GetResource(res, id);
+			DataStream* stream = gamedata->GetResourceStream(res, id);
 			obj->ResName = res;
 			obj->LoadVEF(stream);
 		}

@@ -94,7 +94,7 @@ bool ResourceManager::Exists(StringView ResRef, const TypeID *type, bool silent)
 	return false;
 }
 
-DataStream* ResourceManager::GetResource(StringView ResRef, SClass_ID type, bool silent) const
+DataStream* ResourceManager::GetResourceStream(StringView ResRef, SClass_ID type, bool silent) const
 {
 	if (ResRef.empty())
 		return nullptr;

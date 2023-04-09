@@ -479,8 +479,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		}
 		actor->TalkCount = pcInfo.TalkCount;
 	} else {
-		DataStream* ds = gamedata->GetResource(
-				pcInfo.CREResRef, IE_CRE_CLASS_ID );
+		DataStream* ds = gamedata->GetResourceStream(pcInfo.CREResRef, IE_CRE_CLASS_ID);
 		//another plugin cannot free memory stream from this plugin
 		//so auto free is a no-no
 		if (ds) {

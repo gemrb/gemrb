@@ -55,9 +55,8 @@ public:
 	bool Exists(StringView resRef, SClass_ID type, bool silent=false) const;
 	/** returns true if resource exists */
 	bool Exists(StringView resRef, const TypeID *type, bool silent=false) const;
-
 	/** Returns stream associated to given resource */
-	DataStream* GetResource(StringView resname, SClass_ID type, bool silent = false) const;
+	DataStream* GetResourceStream(StringView resname, SClass_ID type, bool silent = false) const;
 	/** Returns Resource object associated to given resource */
 	Resource* GetResource(StringView resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
 	

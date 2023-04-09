@@ -163,17 +163,17 @@ Holder<Sprite2D> SaveGame::GetPreview() const
 
 DataStream* SaveGame::GetGame() const
 {
-	return manager.GetResource(Prefix, IE_GAM_CLASS_ID, true);
+	return manager.GetResourceStream(Prefix, IE_GAM_CLASS_ID, true);
 }
 
 DataStream* SaveGame::GetWmap(int idx) const
 {
-	return manager.GetResource(core->WorldMapName[idx], IE_WMP_CLASS_ID, true);
+	return manager.GetResourceStream(core->WorldMapName[idx], IE_WMP_CLASS_ID, true);
 }
 
 DataStream* SaveGame::GetSave() const
 {
-	return manager.GetResource(Prefix, IE_SAV_CLASS_ID, true);
+	return manager.GetResourceStream(Prefix, IE_SAV_CLASS_ID, true);
 }
 
 const std::string& SaveGame::GetGameDate() const

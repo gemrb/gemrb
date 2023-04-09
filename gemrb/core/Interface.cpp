@@ -1380,7 +1380,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 		Log(MESSAGE, "Core", "Loading resource data File...");
 		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		StringView sv(resdata ? "resdata" : "sounds");
-		DataStream* ds = gamedata->GetResource(sv, IE_INI_CLASS_ID);
+		DataStream* ds = gamedata->GetResourceStream(sv, IE_INI_CLASS_ID);
 		if (!INIresdata->Open(ds)) {
 			Log(WARNING, "Core", "Failed to load resource data.");
 		}
@@ -1740,7 +1740,7 @@ static const EnumArray<GFFlags, StringView> game_flags {
 /** Loads gemrb.ini */
 bool Interface::LoadGemRBINI()
 {
-	DataStream* inifile = gamedata->GetResource( "gemrb", IE_INI_CLASS_ID );
+	DataStream* inifile = gamedata->GetResourceStream("gemrb", IE_INI_CLASS_ID);
 	if (! inifile) {
 		return false;
 	}
@@ -1844,7 +1844,7 @@ bool Interface::LoadGemRBINI()
 /** Load the encoding table selected in gemrb.cfg */
 bool Interface::LoadEncoding()
 {
-	DataStream* inifile = gamedata->GetResource(config.Encoding, IE_INI_CLASS_ID);
+	DataStream* inifile = gamedata->GetResourceStream(config.Encoding, IE_INI_CLASS_ID);
 	if (! inifile) {
 		return false;
 	}
@@ -2255,7 +2255,7 @@ int Interface::LoadSymbol(const ResRef& ref)
 	if (ind != -1) {
 		return ind;
 	}
-	DataStream* str = gamedata->GetResource(ref, IE_IDS_CLASS_ID);
+	DataStream* str = gamedata->GetResourceStream(ref, IE_IDS_CLASS_ID);
 	if (!str) {
 		return -1;
 	}
@@ -2523,7 +2523,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	}
 
 	PluginHolder<DataFileMgr> gemINI = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-	DataStream* gemINIStream = gamedata->GetResource( "defaults", IE_INI_CLASS_ID );
+	DataStream* gemINIStream = gamedata->GetResourceStream("defaults", IE_INI_CLASS_ID);
 
 	if (!gemINIStream || !gemINI->Open(gemINIStream)) {
 		Log(WARNING, "Core", "Unable to load GemRB default values.");
@@ -2593,7 +2593,7 @@ bool Interface::SaveConfig()
 	}
 
 	PluginHolder<DataFileMgr> defaultsINI = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-	DataStream* INIStream = gamedata->GetResource( "defaults", IE_INI_CLASS_ID );
+	DataStream* INIStream = gamedata->GetResourceStream("defaults", IE_INI_CLASS_ID);
 
 	if (INIStream && defaultsINI->Open(INIStream)) {
 		// dump the formatted default config options to the file
@@ -2737,11 +2737,11 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	if (sg == NULL) {
 		//Load the Default Game
-		gam_str = gamedata->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
+		gam_str = gamedata->GetResourceStream(GameNameResRef, IE_GAM_CLASS_ID);
 		sav_str = NULL;
-		wmp_str1 = gamedata->GetResource( WorldMapName[0], IE_WMP_CLASS_ID );
+		wmp_str1 = gamedata->GetResourceStream(WorldMapName[0], IE_WMP_CLASS_ID);
 		if (!WorldMapName[1].IsEmpty()) {
-			wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
+			wmp_str2 = gamedata->GetResourceStream(WorldMapName[1], IE_WMP_CLASS_ID);
 		}
 	} else {
 		gam_str = sg->GetGame();
@@ -2755,7 +2755,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 			}
 			delete sav_str;
 			sav_str = nullptr;
-			wmp_str1 = gamedata->GetResource(WorldMapName[0], IE_WMP_CLASS_ID, true);
+			wmp_str1 = gamedata->GetResourceStream(WorldMapName[0], IE_WMP_CLASS_ID, true);
 		} else {
 			wmp_str1 = sg->GetWmap(0);
 		}
@@ -2764,7 +2764,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 			wmp_str2 = sg->GetWmap(1);
 			if (!wmp_str2) {
 				//upgrade an IWD game to HOW
-				wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
+				wmp_str2 = gamedata->GetResourceStream(WorldMapName[1], IE_WMP_CLASS_ID);
 			}
 		}
 	}
@@ -2836,7 +2836,7 @@ cleanup:
 /* replace the current world map but sync areas available in old and new */
 void Interface::UpdateWorldMap(const ResRef& wmResRef)
 {
-	DataStream* wmp_str = gamedata->GetResource(wmResRef, IE_WMP_CLASS_ID);
+	DataStream* wmp_str = gamedata->GetResourceStream(wmResRef, IE_WMP_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 
 	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, NULL)) {
@@ -2876,8 +2876,8 @@ void Interface::UpdateMasterScript()
 		return;
 
 	if (worldmap) {
-		DataStream *wmp_str1 = gamedata->GetResource( WorldMapName[0], IE_WMP_CLASS_ID );
-		DataStream *wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
+		DataStream *wmp_str1 = gamedata->GetResourceStream(WorldMapName[0], IE_WMP_CLASS_ID);
+		DataStream *wmp_str2 = gamedata->GetResourceStream(WorldMapName[1], IE_WMP_CLASS_ID);
 
 		if (!wmp_mgr->Open(wmp_str1, wmp_str2)) {
 			delete wmp_str1;
@@ -3741,7 +3741,7 @@ int Interface::GetMouseScrollSpeed() const {
 
 ieStrRef Interface::GetRumour(const ResRef& dlgref)
 {
-	PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID, gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
+	PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID, gamedata->GetResourceStream(dlgref, IE_DLG_CLASS_ID));
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {

@@ -57,7 +57,7 @@ SrcVector::SrcVector(const ResRef& resource)
 {
 	key = resource;
 
-	DataStream* str = gamedata->GetResource(resource, IE_SRC_CLASS_ID, true);
+	DataStream* str = gamedata->GetResourceStream(resource, IE_SRC_CLASS_ID, true);
 	if (!str) {
 		return;
 	}

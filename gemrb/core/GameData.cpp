@@ -92,7 +92,7 @@ void GameData::ClearCaches()
 
 Actor* GameData::GetCreature(const ResRef& creature, unsigned int PartySlot)
 {
-	DataStream* ds = GetResource(creature, IE_CRE_CLASS_ID);
+	DataStream* ds = GetResourceStream(creature, IE_CRE_CLASS_ID);
 	auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, ds);
 	if (!actormgr) {
 		return 0;
@@ -150,7 +150,7 @@ AutoTable GameData::LoadTable(const ResRef& tableRef, bool silent)
 		return tables.at(tableRef);
 	}
 
-	DataStream* str = GetResource(tableRef, IE_2DA_CLASS_ID, silent);
+	DataStream* str = GetResourceStream(tableRef, IE_2DA_CLASS_ID, silent);
 	if (!str) {
 		return nullptr;
 	}
@@ -196,7 +196,7 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 	if (item) {
 		return item;
 	}
-	DataStream* str = GetResource(resname, IE_ITM_CLASS_ID, silent);
+	DataStream* str = GetResourceStream(resname, IE_ITM_CLASS_ID, silent);
 	PluginHolder<ItemMgr> sm = GetImporter<ItemMgr>(IE_ITM_CLASS_ID, str);
 	if (!sm) {
 		return nullptr;
@@ -233,7 +233,7 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 	if (spell) {
 		return spell;
 	}
-	DataStream* str = GetResource( resname, IE_SPL_CLASS_ID, silent );
+	DataStream* str = GetResourceStream(resname, IE_SPL_CLASS_ID, silent);
 	PluginHolder<SpellMgr> sm = MakePluginHolder<SpellMgr>(IE_SPL_CLASS_ID);
 	if (!sm) {
 		delete str;
@@ -268,7 +268,7 @@ Effect* GameData::GetEffect(const ResRef &resname)
 	if (effect) {
 		return new Effect(*effect);
 	}
-	DataStream* str = GetResource( resname, IE_EFF_CLASS_ID );
+	DataStream* str = GetResourceStream(resname, IE_EFF_CLASS_ID);
 	PluginHolder<EffectMgr> em = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	if (!em) {
 		delete str;
@@ -304,7 +304,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef &effect, bool dou
 	ScriptedAnimation *ret = NULL;
 
 	if (Exists( effect, IE_VVC_CLASS_ID, true ) ) {
-		DataStream *ds = GetResource( effect, IE_VVC_CLASS_ID );
+		DataStream *ds = GetResourceStream(effect, IE_VVC_CLASS_ID);
 		ret = new ScriptedAnimation(ds);
 	} else {
 		AnimationFactory *af = (AnimationFactory *)
@@ -325,7 +325,7 @@ VEFObject* GameData::GetVEFObject(const ResRef& vefRef, bool doublehint)
 	VEFObject* ret = nullptr;
 
 	if (Exists(vefRef, IE_VEF_CLASS_ID, true)) {
-		DataStream* ds = GetResource(vefRef, IE_VEF_CLASS_ID);
+		DataStream* ds = GetResourceStream(vefRef, IE_VEF_CLASS_ID);
 		ret = new VEFObject();
 		ret->ResName = vefRef;
 		ret->LoadVEF(ds);
@@ -382,7 +382,7 @@ FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID typ
 	switch (type) {
 	case IE_BAM_CLASS_ID:
 	{
-		DataStream* str = GetResource(resName, type, silent);
+		DataStream* str = GetResourceStream(resName, type, silent);
 		if (str) {
 			auto importer = GetImporter<AnimationMgr>(IE_BAM_CLASS_ID, str);
 			if (importer == nullptr) {
@@ -424,7 +424,7 @@ Store* GameData::GetStore(const ResRef &resRef)
 		return it->second;
 	}
 
-	DataStream* str = GetResource(resRef, IE_STO_CLASS_ID);
+	DataStream* str = GetResourceStream(resRef, IE_STO_CLASS_ID);
 	PluginHolder<StoreMgr> sm = MakePluginHolder<StoreMgr>(IE_STO_CLASS_ID);
 	if (sm == nullptr) {
 		delete str;
