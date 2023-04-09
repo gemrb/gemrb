@@ -182,10 +182,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 
 		rgb.speed=-1;
 		rgb.phase=0;
-		rgb.rgb.r=fx->Parameter1;
-		rgb.rgb.g=fx->Parameter1 >> 8;
-		rgb.rgb.b=fx->Parameter1 >> 16;
-		rgb.rgb.a=0;
+		rgb.rgb = Color::FromABGR(fx->Parameter1);
 		rgb.type=RGBModifier::TINT;
 		sca->AlterPalette(rgb);
 	}
