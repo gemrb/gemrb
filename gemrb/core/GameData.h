@@ -28,6 +28,7 @@
 #include "Cache.h"
 #include "CharAnimations.h"
 #include "DisplayMessage.h"
+#include "Factory.h"
 #include "Holder.h"
 #include "Palette.h"
 #include "Resource.h"
@@ -45,8 +46,6 @@ static const ResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin1
 
 class Actor;
 struct Effect;
-class Factory;
-class FactoryObject;
 class Item;
 class ScriptedAnimation;
 class Spell;
@@ -91,9 +90,8 @@ struct ItemUseType {
 class GEM_EXPORT GameData : public ResourceManager
 {
 public:
-	GameData();
+	GameData() = default;
 	GameData(const GameData&) = delete;
-	~GameData();
 	GameData& operator=(const GameData&) = delete;
 
 	using index_t = uint16_t;
@@ -189,7 +187,7 @@ private:
 	Cache SpellCache;
 	Cache EffectCache;
 	ResRefMap<PaletteHolder> PaletteCache;
-	Factory* factory;
+	Factory factory;
 	ResRefMap<AutoTable> tables;
 	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;

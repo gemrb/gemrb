@@ -66,16 +66,6 @@ static void ReleaseEffect(void *poi)
 
 GEM_EXPORT GameData* gamedata;
 
-GameData::GameData()
-{
-	factory = new Factory();
-}
-
-GameData::~GameData()
-{
-	delete factory;
-}
-
 void GameData::ClearCaches()
 {
 	ItemCache.RemoveAll(ReleaseItem);
@@ -376,8 +366,8 @@ FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID typ
 	if (resName.IsEmpty()) return nullptr;
 
 	// already cached?
-	int objectIndex = factory->IsLoaded(resName, type);
-	if (objectIndex != -1) return factory->GetFactoryObject(objectIndex);
+	int objectIndex = factory.IsLoaded(resName, type);
+	if (objectIndex != -1) return factory.GetFactoryObject(objectIndex);
 
 	switch (type) {
 	case IE_BAM_CLASS_ID:
@@ -390,7 +380,7 @@ FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID typ
 			}
 
 			AnimationFactory* af = importer->GetAnimationFactory(resName);
-			factory->AddFactoryObject( af );
+			factory.AddFactoryObject(af);
 			return af;
 		}
 		return NULL;
@@ -400,7 +390,7 @@ FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID typ
 		ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resName, silent);
 		if (img) {
 			ImageFactory* fact = img->GetImageFactory(resName);
-			factory->AddFactoryObject( fact );
+			factory.AddFactoryObject(fact);
 			return fact;
 		}
 
@@ -414,7 +404,7 @@ FactoryObject* GameData::GetFactoryResource(const ResRef& resName, SClass_ID typ
 
 void GameData::AddFactoryResource(FactoryObject* res)
 {
-	factory->AddFactoryObject(res);
+	factory.AddFactoryObject(res);
 }
 
 Store* GameData::GetStore(const ResRef &resRef)
