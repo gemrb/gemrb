@@ -257,7 +257,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	endif (NOT APPLE AND NOT UNSAFE_PLUGIN)
 
 	# Fast math helps us covering some things that need a little more rework soon
-	string(APPEND CMAKE_CXX_FLAGS " -ffast-math")
+	string(APPEND CMAKE_CXX_FLAGS " -ffast-math -frounding-math")
 ELSEIF(MSVC)
 	string(APPEND CMAKE_CXX_FLAGS " /fp:fast")
 ENDIF()
