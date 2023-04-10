@@ -63,7 +63,7 @@ Holder<Sprite2D> CreateLight(const Size& size, uint8_t intensity) noexcept
 		
 		for (int x = q1.x; x >= 0; --x) {
 			// by the power of Pythagoras
-			float hyp = std::hypot(x, q1.y);
+			uint8_t hyp = std::hypot<uint8_t>(x, q1.y);
 			uint8_t dist = static_cast<uint8_t>((hyp / maxr) * intensity);
 			assert(dist <= intensity);
 			uint8_t light = Clamp<uint8_t>(intensity - dist, 0, intensity);
