@@ -118,7 +118,7 @@ private:
 	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
 	virtual void SwapBuffers(VideoBuffers&)=0;
 	virtual int PollEvents() = 0;
-	virtual int CreateDriverDisplay(const char* title) = 0;
+	virtual int CreateDriverDisplay(const char* title, bool vsync) = 0;
 
 	// the actual drawing implementations
 	virtual void DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags) = 0;
@@ -136,7 +136,7 @@ public:
 
 	virtual int Init(void) = 0;
 
-	int CreateDisplay(const Size&, int bpp, bool fullscreen, const char* title);
+	int CreateDisplay(const Size&, int bpp, bool fullscreen, const char* title, bool vsync);
 	virtual void SetWindowTitle(const char *title) = 0;
 
 	/** Toggles GemRB between fullscreen and windowed mode. */
@@ -144,7 +144,7 @@ public:
 	virtual bool SetFullscreenMode(bool set) = 0;
 	bool GetFullscreenMode() const;
 	/** Swaps displayed and back buffers */
-	int SwapBuffers(unsigned int fpscap = 30);
+	int SwapBuffers(int fpscap = 30);
 	VideoBufferPtr CreateBuffer(const Region&, BufferFormat = BufferFormat::DISPLAY);
 	void PushDrawingBuffer(const VideoBufferPtr&);
 	void PopDrawingBuffer();
@@ -153,6 +153,8 @@ public:
 	virtual bool ToggleGrabInput() = 0;
 	virtual void CaptureMouse(bool enabled) = 0;
 	const Size& GetScreenSize() const { return screenSize; }
+	virtual int GetDisplayRefreshRate() const = 0;
+	virtual int GetVirtualRefreshCap() const = 0;
 
 	virtual void StartTextInput() = 0;
 	virtual void StopTextInput() = 0;

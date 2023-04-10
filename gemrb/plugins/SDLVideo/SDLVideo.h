@@ -74,6 +74,8 @@ public:
 	void BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
 					BlitFlags flags, Color tint = Color()) override;
 	void BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color tint = Color()) override;
+	int GetDisplayRefreshRate() const override { return refreshRate; }
+	int GetVirtualRefreshCap() const override { return 0; }
 
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -85,8 +87,9 @@ protected:
 	using SDL_Point = Point;
 #endif
 	VideoBufferPtr scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
+	int refreshRate = 30;
 
-	int CreateDriverDisplay(const char* title) override;
+	int CreateDriverDisplay(const char* title, bool vsync) override;
 
 	virtual vid_buf_t* ScratchBuffer() const = 0;
 	virtual inline vid_buf_t* CurrentRenderBuffer() const=0;
@@ -103,7 +106,7 @@ protected:
 	void Wait(uint32_t w) override { SDL_Delay(w); }
 
 private:
-	virtual int CreateSDLDisplay(const char* title) = 0;
+	virtual int CreateSDLDisplay(const char* title, bool vsync) = 0;
 	virtual void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE)=0;
 
 	void DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags) override;

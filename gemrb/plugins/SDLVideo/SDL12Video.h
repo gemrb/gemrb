@@ -31,6 +31,7 @@ private:
 	bool inTextInput;
 	SDL_Joystick* gameController = nullptr;
 	DPadSoftKeyboard dPadSoftKeyboard;
+	bool vsyncRequest;
 
 public:
 	SDL12VideoDriver() noexcept;
@@ -59,9 +60,11 @@ public:
 private:
 	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt) override;
 
-	int CreateSDLDisplay(const char* title) override;
+	int CreateSDLDisplay(const char* title, bool vsync) override;
 	void SwapBuffers(VideoBuffers&) override;
-	
+	int GetDisplayRefreshRate() const override;
+	int GetVirtualRefreshCap() const override;
+
 	SDLVideoDriver::vid_buf_t* ScratchBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;

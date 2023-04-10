@@ -41,9 +41,9 @@ int SDLVideoDriver::Init(void)
 	return GEM_OK;
 }
 
-int SDLVideoDriver::CreateDriverDisplay(const char* title)
+int SDLVideoDriver::CreateDriverDisplay(const char* title, bool vsync)
 {
-	int ret = CreateSDLDisplay(title);
+	int ret = CreateSDLDisplay(title, vsync);
 	scratchBuffer = CreateBuffer(Region(Point(), screenSize), BufferFormat::DISPLAY_ALPHA);
 	scratchBuffer->Clear();
 	return ret;

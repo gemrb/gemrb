@@ -51,12 +51,12 @@ void Video::DestroyBuffers()
 	}
 }
 
-int Video::CreateDisplay(const Size& s, int bits, bool fs, const char* title)
+int Video::CreateDisplay(const Size& s, int bits, bool fs, const char* title, bool vsync)
 {
 	bpp = bits;
 	screenSize = s;
 
-	int ret = CreateDriverDisplay(title);
+	int ret = CreateDriverDisplay(title, vsync);
 	if (ret == GEM_OK) {
 		SetScreenClip(NULL);
 		if (fs) {
@@ -133,14 +133,19 @@ void Video::SetStencilBuffer(const VideoBufferPtr& stencil)
 	stencilBuffer = stencil;
 }
 
-int Video::SwapBuffers(unsigned int fpscap)
+int Video::SwapBuffers(int fpscap)
 {
 	SwapBuffers(drawingBuffers);
 	drawingBuffers.clear();
 	drawingBuffer = NULL;
 	SetScreenClip(NULL);
 
-	if (fpscap) {
+	int deviceCap = GetVirtualRefreshCap();
+	if (deviceCap > 0) {
+		fpscap = fpscap > 0 ? std::min(deviceCap, fpscap) : deviceCap;
+	}
+
+	if (fpscap > 0) {
 		tick_t lim = 1000/fpscap;
 		tick_t time = GetMilliseconds();
 		if (( time - lastTime ) < lim) {

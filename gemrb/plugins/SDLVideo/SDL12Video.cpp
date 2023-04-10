@@ -75,10 +75,11 @@ int SDL12VideoDriver::Init(void)
 	return ret;
 }
 
-int SDL12VideoDriver::CreateSDLDisplay(const char* title)
+int SDL12VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 {
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating display");
 	ieDword flags = SDL_SWSURFACE;
+	vsyncRequest = vsync;
 
 	Log(MESSAGE, "SDL 1.2 Driver", "SDL_SetVideoMode...");
 	disp = SDL_SetVideoMode(screenSize.w, screenSize.h, bpp, flags );
@@ -556,6 +557,15 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	}
 	
 	if (flip) SDL_Flip( disp );
+}
+
+int SDL12VideoDriver::GetDisplayRefreshRate() const {
+	return 30;
+}
+
+int SDL12VideoDriver::GetVirtualRefreshCap() const {
+	// We don't know the value in SDL1, so have it fixed or unlimited
+	return vsyncRequest ? GetDisplayRefreshRate() : 0;
 }
 
 SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::ScratchBuffer() const
