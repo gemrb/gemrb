@@ -672,8 +672,8 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(tab->QueryField(rows,2), true);
 		if (!sca) continue;
 		sca->SetBlend();
-		sca->SetDelay(AI_UPDATE_TIME*delay);
-		sca->SetDefaultDuration(AI_UPDATE_TIME*duration);
+		sca->SetDelay(core->Time.ai_update_time * delay);
+		sca->SetDefaultDuration(core->Time.ai_update_time * duration);
 		sca->Frame.x+=fx->PosX+offset.x;
 		sca->Frame.y+=fx->PosY+offset.y;
 		area->AddVVCell(sca);
@@ -770,7 +770,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		switch(fx->Parameter2) {
 		case 0: //cloak of warding
 			ConvertTiming (fx, 5 * fx->CasterLevel);
-			fx->Parameter3 = core->Roll(3,4,fx->CasterLevel);
+			fx->Parameter3 = RAND(3, 12) + fx->CasterLevel;
 			break;
 		case 1: //shield
 			ConvertTiming(fx, 25 * fx->CasterLevel);
@@ -784,7 +784,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			break;
 		case 2: //black barbed shield
-			ConvertTiming (fx, core->Roll(10,3,0));
+			ConvertTiming(fx, RAND(10, 30));
 			target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 2, 0);
 			fx->Parameter3=0xffffffff;
 			break;
@@ -797,7 +797,8 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			ConvertTiming (fx, 50 + 5 * fx->CasterLevel);
 			break;
 		case 5: //shroud of shadows
-
+			// should be 5d4 + 10 per level, but the original spell doesn't use the opcode
+			// our sshadow just hardcodes all to 150, but doesn't set the simplified duration bit and data FIXME
 			break;
 		case 6: //duplication
 			core->GetAudioDrv()->Play("magic02", SFX_CHAN_HITS, target->Pos);
@@ -851,7 +852,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			//terminate = FX_NOT_APPLIED;
 			break;
 		case 13: //conflagration
-			ConvertTiming (fx, 50);
+			ConvertTiming(fx, 50); // NOTE: the description is conflicting with itself, stating both 50s and 5s/level
 			playonce = true;
 			break;
 		case 14: //infernal shield
