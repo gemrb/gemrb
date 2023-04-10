@@ -1210,7 +1210,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 			if (inTicks) {
 				fx->Duration = (fx->Duration ? fx->Duration : 1) + GameTime;
 			} else {
-				PrepareDuration(fx);
+				fx->PrepareDuration(GameTime);
 			}
 		}
 	}
@@ -1225,7 +1225,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		if( NeedPrepare(fx->TimingMode) ) {
 			//prepare for delayed duration effects
 			fx->Duration = fx->SecondaryDelay;
-			PrepareDuration(fx);
+			fx->PrepareDuration(GameTime);
 		}
 		fx->TimingMode=TriggeredEffect(fx->TimingMode);
 		break;

@@ -182,6 +182,8 @@ public:
 	
 	//returns true if the effect must be saved
 	bool Persistent() const;
+
+	void PrepareDuration(ieDword gameTime);
 };
 
 }

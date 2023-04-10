@@ -96,10 +96,6 @@ class Scriptable;
 //sometimes damage doesn't comply with the calculated value
 #define DICE_ROLL(adjustment) (core->Roll( fx->DiceThrown, fx->DiceSides, adjustment) )
 
-// You will need to get GameTime somehow to use this macro
-// we add +1 so we can handle effects with 0 duration (apply once only)
-#define	PrepareDuration(fx) fx->Duration = ((fx->Duration? fx->Duration*AI_UPDATE_TIME : 1) + GameTime)
-
 //return the caster object
 #define GetCasterObject()  (core->GetGame()->GetActorByGlobalID(fx->CasterID))
 

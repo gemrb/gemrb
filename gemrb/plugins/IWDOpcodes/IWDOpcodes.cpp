@@ -879,8 +879,7 @@ int fx_lich_touch (Scriptable* Owner, Actor* target, Effect* fx)
 	fx->Opcode = EffectQueue::ResolveEffect(fx_hold_creature_ref);
 	fx->Duration = fx->Parameter1;
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	ieDword GameTime = core->GetGame()->GameTime;
-	PrepareDuration(fx);
+	fx->PrepareDuration(core->GetGame()->GameTime);
 	return FX_APPLIED;
 }
 
@@ -912,8 +911,7 @@ int fx_blinding_orb (Scriptable* Owner, Actor* target, Effect* fx)
 	fx->Opcode = EffectQueue::ResolveEffect(fx_state_blind_ref);
 	fx->Duration = core->Roll(1,6,0);
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	ieDword GameTime = core->GetGame()->GameTime;
-	PrepareDuration(fx);
+	fx->PrepareDuration(core->GetGame()->GameTime);
 	return FX_APPLIED;
 }
 

@@ -20,6 +20,7 @@
 
 #include "Effect.h"
 #include "EffectQueue.h" // this is only needed for a hack in Effect::Persistent
+#include "Interface.h"
 
 namespace GemRB {
 
@@ -178,6 +179,12 @@ bool Effect::Persistent() const
 			return false;
 	}
 	return true;
+}
+
+// we add +1 so we can handle effects with 0 duration (apply once only)
+void Effect::PrepareDuration(ieDword gameTime)
+{
+	Duration = (Duration ? Duration * core->Time.ai_update_time : 1) + gameTime;
 }
 
 } // namespace GemRB
