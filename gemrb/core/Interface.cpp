@@ -507,7 +507,6 @@ bool Interface::ReadGameTimeTable()
 		return false;
 	}
 
-	Time.ai_update_time = AI_UPDATE_TIME;
 	Time.round_sec = table->QueryFieldUnsigned<unsigned int>("ROUND_SECONDS", "DURATION");
 	Time.turn_sec = table->QueryFieldUnsigned<unsigned int>("TURN_SECONDS", "DURATION");
 	Time.round_size = Time.round_sec * Time.ai_update_time;
@@ -596,10 +595,25 @@ void Interface::DisableMusicPlaylist(size_t SongType)
 /** this is the main loop */
 void Interface::Main()
 {
-	ieDword speed = 10;
+	int speed = 10;
 
 	vars->Lookup("Mouse Scroll Speed", speed);
-	SetMouseScrollSpeed((int) speed);
+	SetMouseScrollSpeed(speed);
+
+	// We had 36 at 30fps originally, so more fps
+	// should not speed this up unless adjusted
+	auto scrollSpeed = [=](int fps) {
+		return std::max<int>(1080.0 * (speed / 36.0) / fps, 1);
+	};
+
+	if (config.CapFPS == 0) {
+		int refreshRate = video->GetDisplayRefreshRate();
+		if (refreshRate > 0) {
+			SetMouseScrollSpeed(scrollSpeed(refreshRate));
+		}
+	} else if (config.CapFPS >= 30) {
+		SetMouseScrollSpeed(scrollSpeed(config.CapFPS));
+	}
 
 	const Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
@@ -612,6 +626,8 @@ void Interface::Main()
 	tick_t frame = 0;
 	tick_t time = GetMilliseconds();
 	tick_t timebase = time;
+	tick_t lastGameUpdate = 0;
+
 	double frames = 0.0;
 
 	do {
@@ -637,12 +653,18 @@ void Interface::Main()
 			HandleGUIBehaviour(gamectrl);
 		}
 
-		GameLoop();
-		// TODO: find other animations that need to be synchronized
-		// we can create a manager for them and everything can be updated at once
-		GlobalColorCycle.AdvanceTime(time);
-		winmgr->DrawWindows();
 		time = GetMilliseconds();
+
+		bool doGameStateUpdate = time - lastGameUpdate >= 1000.0 / Time.ai_update_time;
+		if (doGameStateUpdate) {
+			GameLoop();
+			// TODO: find other animations that need to be synchronized
+			// we can create a manager for them and everything can be updated at once
+			GlobalColorCycle.AdvanceTime(time);
+			lastGameUpdate = time;
+		}
+
+		winmgr->DrawWindows();
 		if (config.DrawFPS) {
 			frame++;
 			if (time - timebase > 1000) {
@@ -655,7 +677,7 @@ void Interface::Main()
 			video->DrawRect( fpsRgn, ColorBlack );
 			fps->Print(fpsRgn, String(fpsstring), IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, {ColorWhite, ColorBlack});
 		}
-	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
+	} while (video->SwapBuffers(config.CapFPS) == GEM_OK && !(QuitFlag&QF_KILL));
 	QuitGame(0);
 }
 
@@ -781,6 +803,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	CONFIG_INT("CaseSensitive", config.CaseSensitive =);
 	CONFIG_INT("DoubleClickDelay", EventMgr::DCDelay = );
 	CONFIG_INT("DrawFPS", config.DrawFPS =);
+	CONFIG_INT("CapFPS", config.CapFPS =);
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
 	CONFIG_INT("GCDebug", GameControl::DebugFlags = );
 	CONFIG_INT("Height", config.Height =);
@@ -1156,7 +1179,16 @@ int Interface::Init(const InterfaceConfig* cfg)
 	// we also need the display to exist to create sprites using the display format
 	ieDword fullscreen = 0;
 	vars->Lookup("Full Screen", fullscreen);
-	if (video->CreateDisplay(Size(config.Width, config.Height), config.Bpp, fullscreen, config.GameName.c_str()) == GEM_ERROR) {
+	int createDisplayResult =
+		video->CreateDisplay(
+				Size(config.Width, config.Height),
+				config.Bpp,
+				fullscreen,
+				config.GameName.c_str(),
+				config.CapFPS == 0
+		);
+
+	if (createDisplayResult == GEM_ERROR) {
 		Log(FATAL, "Core", "Cannot initialize shaders.");
 		return GEM_ERROR;
 	}
@@ -1785,6 +1817,11 @@ bool Interface::LoadGemRBINI()
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
 	gamedata->SetTextSpeed(ini->GetKeyAsInt("resources", "TextScreenSpeed", 100));
+
+	// We use this for the game's state exclusively
+	ieDword maxRefreshRate = 30;
+	vars->Lookup("Maximum Frame Rate", maxRefreshRate);
+	Time.ai_update_time = maxRefreshRate / 2;
 
 	for (const GFFlags flag : EnumIterator<GFFlags>()) {
 		const bool set = ini->GetKeyAsBool("resources", game_flags[flag], false);

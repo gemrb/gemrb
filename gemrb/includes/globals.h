@@ -149,9 +149,6 @@ enum class GFFlags : uint32_t {
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
 
-/////AI global defines
-#define AI_UPDATE_TIME	15
-
 /////globally used functions
 
 class Scriptable;

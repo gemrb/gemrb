@@ -117,7 +117,7 @@ int SDL20VideoDriver::Init()
 	return ret;
 }
 
-int SDL20VideoDriver::CreateSDLDisplay(const char* title)
+int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 {
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
@@ -147,7 +147,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 #ifdef SDL_RESOLUTION_INDEPENDANCE
 	SDL_DisplayMode current;
 
-    int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
+	int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
 
 	if (should_be_zero != 0) {
 		Log(ERROR, "SDL 2 Driver", "couldnt get resolution: {}", SDL_GetError());
@@ -171,7 +171,12 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	SetWindowIcon(window);
 #endif
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+	int rendererFlags = SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED;
+	if (vsync) {
+		rendererFlags |= SDL_RENDERER_PRESENTVSYNC;
+	}
+
+	renderer = SDL_CreateRenderer(window, -1, rendererFlags);
 
 	// Moved this here to fix a weird rendering issue
 
@@ -232,6 +237,19 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 		return GEM_ERROR;
 	}
 #endif
+
+	if (SDL_GetNumVideoDisplays() > 1) {
+		Log(WARNING, "SDL 2", "More than one display reported, possibly reporting wrong refresh rate.");
+	}
+
+	SDL_DisplayMode dm = {};
+	int displayModeResult = SDL_GetCurrentDisplayMode(0, &dm);
+	if (displayModeResult != 0 || dm.refresh_rate == 0) {
+		Log(WARNING, "SDL 2", "Unable to fetch refresh rate.");
+		return 0;
+	}
+
+	refreshRate = dm.refresh_rate;
 
 	SDL_StopTextInput(); // for some reason this is enabled from start
 

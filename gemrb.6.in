@@ -146,6 +146,13 @@ Color depth of the game window (in bits per pixel).
 Whether the game should run in fullscreen mode.
 
 .TP
+.BR CapFPS =(-1|0|n)
+Set FPS handling:
+  -1: no limit
+   0: VSync (SDL2), 30 (SDL1)
+   n: cap to n FPS
+
+.TP
 .BR SkipIntroVideos =(0|1)
 If set to
 .IR 1 ,

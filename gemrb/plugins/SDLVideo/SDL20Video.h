@@ -252,7 +252,7 @@ private:
 
 	int ProcessEvent(const SDL_Event & event) override;
 
-	int CreateSDLDisplay(const char* title) override;
+	int CreateSDLDisplay(const char* title, bool vsync) override;
 	void SwapBuffers(VideoBuffers& buffers) override;
 
 	SDLVideoDriver::vid_buf_t* ScratchBuffer() const override;
