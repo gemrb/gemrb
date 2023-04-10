@@ -827,7 +827,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		default:
 			break;
 		case 11: //flame walk
-			ConvertTiming (fx, 10 * fx->CasterLevel);
+			ConvertTiming(fx, 10 + 10 * fx->CasterLevel);
 
 			target->ApplyEffectCopy(fx, fx_single_color_pulse_ref, Owner, 0xFF00, 0x400040);
 
@@ -890,7 +890,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 				bonus = std::max((ieDword) 0, target->Modified[IE_STR] + bonus - strLimit);
 			}
 
-			int duration = 60 * core->Time.hour_sec * fx->CasterLevel;
+			int duration = core->Time.hour_sec * fx->CasterLevel;
 			if (fx->SavingThrowBonus == 1) { // power of one
 				duration /= 2;
 			} else if (fx->SavingThrowBonus == 4) { // improved strength
