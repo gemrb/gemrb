@@ -152,6 +152,17 @@ int fx_set_status (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_PERMANENT;
 }
 
+static void SetRGBMod(ieDword color, ScriptedAnimation* sca)
+{
+	RGBModifier rgb;
+
+	rgb.speed = -1;
+	rgb.phase = 0;
+	rgb.rgb = Color::FromABGR(color);
+	rgb.type = RGBModifier::TINT;
+	sca->AlterPalette(rgb);
+}
+
 //bb fx_play_bam_bb (play multi-part blended sticky animation)
 // 1 repeats
 // 2 not sticky (override default)
@@ -178,13 +189,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	sca->SetBlend();
 	//the transparency is based on the original palette
 	if (fx->Parameter1) {
-		RGBModifier rgb;
-
-		rgb.speed=-1;
-		rgb.phase=0;
-		rgb.rgb = Color::FromABGR(fx->Parameter1);
-		rgb.type=RGBModifier::TINT;
-		sca->AlterPalette(rgb);
+		SetRGBMod(fx->Parameter1, sca);
 	}
 	if ((fx->TimingMode==FX_DURATION_INSTANT_LIMITED) && (fx->Parameter2&1) ) {
 		playonce=false;
@@ -267,13 +272,7 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	default:
 		if (fx->Parameter1) {
-			RGBModifier rgb;
-
-			rgb.speed=-1;
-			rgb.phase=0;
-			rgb.rgb = Color::FromABGR(fx->Parameter1);
-			rgb.type=RGBModifier::TINT;
-			sca->AlterPalette(rgb);
+			SetRGBMod(fx->Parameter1, sca);
 		}
 	}
 	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
@@ -914,14 +913,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, true);
 			if (sca) {
 				if (tint) {
-					RGBModifier rgb;
-
-					rgb.speed=-1;
-					rgb.phase=0;
-					rgb.rgb = Color::FromABGR(tint);
-					rgb.type=RGBModifier::TINT;
-
-					sca->AlterPalette(rgb);
+					SetRGBMod(tint, sca);
 				}
 				sca->SetBlend();
 				if (playonce) {
