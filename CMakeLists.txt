@@ -258,8 +258,8 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 
 	# Fast math helps us covering some things that need a little more rework soon
 	string(APPEND CMAKE_CXX_FLAGS " -ffast-math -frounding-math")
-#ELSEIF(MSVC)
-#	string(APPEND CMAKE_CXX_FLAGS " /fp:fast")
+ELSEIF(MSVC)
+	string(APPEND CMAKE_CXX_FLAGS " /fp:fast")
 ENDIF()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
