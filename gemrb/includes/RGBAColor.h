@@ -58,8 +58,8 @@ struct Color {
 
 	Color& operator+=(const Color& rhs) noexcept {
 		r += rhs.r;
-		b += rhs.g;
-		g += rhs.b;
+		b += rhs.b;
+		g += rhs.g;
 		a += rhs.a;
 		return *this;
 	}
