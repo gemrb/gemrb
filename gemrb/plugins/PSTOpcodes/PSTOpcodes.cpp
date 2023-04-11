@@ -921,7 +921,6 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 				} else {
 					sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 				}
-				sca->SetBlend();
 				sca->SetEffectOwned(true);
 				ScriptedAnimation *twin = sca->DetachTwin();
 				if (twin) {
