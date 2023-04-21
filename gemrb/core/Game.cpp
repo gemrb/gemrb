@@ -1210,7 +1210,7 @@ void Game::ShareXP(int xp, int flags) const
 		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 			ieStrRef complaint = DisplayMessage::GetStringReference(strIdx);
 			String text = fmt::format(L"{}: {}", core->GetString(complaint), xp);
-			core->GetGameControl()->SetDisplayText(text, core->Time.ai_update_time * 4);
+			core->GetGameControl()->SetDisplayText(text, core->Time.defaultTicksPerSec * 4);
 		} else {
 			displaymsg->DisplayConstantStringValue(strIdx, GUIColors::XPCHANGE, (ieDword) xp);
 		}

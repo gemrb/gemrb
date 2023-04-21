@@ -91,7 +91,7 @@ ScriptedAnimation *VEFObject::CreateCell(const ResRef &res, ieDword start, ieDwo
 {
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(res, false);
 	if (sca && end!=0xffffffff) {
-		sca->SetDefaultDuration(core->Time.ai_update_time * (end - start));
+		sca->SetDefaultDuration(core->Time.defaultTicksPerSec * (end - start));
 	}
 	return sca;
 }

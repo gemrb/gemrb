@@ -564,7 +564,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 		
 		tick_t len = 0;
 		core->GetAudioDrv()->Play(StringView(soundpath), channel, pos, speech, &len);
-		tick_t counter = (core->Time.ai_update_time * len) / 1000;
+		tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
 
 		if (actor && len > 0 && flags & DS_CIRCLE) {
 			actor->SetAnimatedTalking(len);
@@ -956,7 +956,7 @@ static ScriptedAnimation *GetVVCEffect(const ResRef& effect, int iterations)
 		return nullptr;
 	}
 	if (iterations > 1) {
-		vvc->SetDefaultDuration(vvc->GetSequenceDuration(core->Time.ai_update_time * iterations));
+		vvc->SetDefaultDuration(vvc->GetSequenceDuration(core->Time.defaultTicksPerSec * iterations));
 	} else {
 		vvc->PlayOnce();
 	}

@@ -1822,7 +1822,8 @@ bool Interface::LoadGemRBINI()
 	// We use this for the game's state exclusively
 	ieDword maxRefreshRate = 30;
 	vars->Lookup("Maximum Frame Rate", maxRefreshRate);
-	Time.ai_update_time = maxRefreshRate / 2;
+	// the originals used double ticks for haste handling
+	Time.ticksPerSec = maxRefreshRate / 2;
 
 	for (const GFFlags flag : EnumIterator<GFFlags>()) {
 		const bool set = ini->GetKeyAsBool("resources", game_flags[flag], false);
@@ -2035,7 +2036,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 				//set up the summon disable effect
 				Effect *newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);
 				if (newfx) {
-					newfx->Duration = vvc->GetSequenceDuration(Time.ai_update_time) * 9 / 10 + core->GetGame()->GameTime;
+					newfx->Duration = vvc->GetSequenceDuration(Time.defaultTicksPerSec) * 9 / 10 + core->GetGame()->GameTime;
 					ApplyEffect(newfx, ab, ab);
 				}
 			}

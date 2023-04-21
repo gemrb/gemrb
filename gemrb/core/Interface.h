@@ -122,7 +122,7 @@ struct DamageInfoStruct {
 
 struct TimeStruct {
 	const unsigned int defaultTicksPerSec = 15;
-	unsigned int ai_update_time;
+	unsigned int ticksPerSec;
 	unsigned int round_sec;
 	unsigned int turn_sec;
 	unsigned int round_size; // in ticks
@@ -134,8 +134,8 @@ struct TimeStruct {
 	unsigned int day_size;
 	unsigned int fade_reset;
 
-	int GetHour(unsigned int time) const { return (time / ai_update_time) % day_sec / hour_sec; }
-	tick_t Ticks2Ms(unsigned int ticks) const { return ticks * 1000 / ai_update_time; }
+	int GetHour(unsigned int time) const { return (time / defaultTicksPerSec) % day_sec / hour_sec; }
+	tick_t Ticks2Ms(unsigned int ticks) const { return ticks * 1000 / ticksPerSec; }
 };
 
 // cache of speldesc.2da entries

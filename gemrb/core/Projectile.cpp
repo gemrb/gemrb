@@ -736,7 +736,7 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 	// oddly, there's no visible difference in setting or not setting sca->ZOffset = ZPos
 	// the heights are still fine even for the large dragon offsets
 	area->AddVVCell(vef);
-	return sca->GetSequenceDuration(core->Time.ai_update_time);
+	return sca->GetSequenceDuration(core->Time.defaultTicksPerSec);
 }
 
 void Projectile::DoStep()

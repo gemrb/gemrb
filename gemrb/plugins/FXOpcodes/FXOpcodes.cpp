@@ -1006,7 +1006,7 @@ inline int HandlePercentageDamage(Effect* fx, const Actor* target) {
 	int damage = 0;
 	if (fx->Parameter2 == RPD_PERCENT && fx->FirstApply) {
 		// distribute the damage to one second intervals
-		int seconds = (fx->Duration - core->GetGame()->GameTime) / core->Time.ai_update_time;
+		int seconds = (fx->Duration - core->GetGame()->GameTime) / core->Time.defaultTicksPerSec;
 		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		fx->Parameter1 = static_cast<ieDword>(damage / seconds);
 	}
@@ -1917,7 +1917,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword damage = 0;
 	tick_t tmp = fx->Parameter1;
 	// fx->Parameter4 is an optional frequency multiplier
-	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
+	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.defaultTicksPerSec;
 	tick_t timeStep = target->GetAdjustedTime(aRound);
 
 	int totalDamage = HandlePercentageDamage(fx, target);
@@ -2186,7 +2186,7 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->FirstApply) {
 		target->ApplyEffectCopy(fx, fx_animation_stance_ref, Owner, 0, IE_ANI_SLEEP);
 		Effect* standUp = EffectQueue::CreateEffect(fx_animation_stance_ref, 0, IE_ANI_GET_UP, FX_DURATION_DELAY_LIMITED);
-		standUp->Duration = (fx->Duration - core->GetGame()->GameTime) / core->Time.ai_update_time;
+		standUp->Duration = (fx->Duration - core->GetGame()->GameTime) / core->Time.defaultTicksPerSec;
 		core->ApplyEffect(standUp, target, target);
 	}
 
@@ -3075,7 +3075,7 @@ int fx_set_diseased_state(Scriptable* Owner, Actor* target, Effect* fx)
 	ieDword damage = 0;
 	ieDword damageType = DAMAGE_POISON;
 	// fx->Parameter4 is an optional frequency multiplier
-	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
+	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.defaultTicksPerSec;
 
 	HandlePercentageDamage(fx, target);
 
@@ -3416,7 +3416,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int tmp = fx->Parameter1;
 	ieDword gameTime = core->GetGame()->GameTime;
 	// fx->Parameter4 is an optional frequency multiplier
-	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
+	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.defaultTicksPerSec;
 	tick_t timeStep = target->GetAdjustedTime(aRound);
 
 	if (fx->FirstApply) {
@@ -6486,7 +6486,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 		// make sure we don't apply once per tick to the same target, potentially triggering 2 actor recursion
 		// there could be more than one tick in between successful triggers; trying with a half a round limit
-		if (entry && actor->GetGlobalID() == fx->Parameter4 && core->GetGame()->GameTime - fx->Parameter5 < core->Time.ai_update_time / 2) {
+		if (entry && actor->GetGlobalID() == fx->Parameter4 && core->GetGame()->GameTime - fx->Parameter5 < core->Time.defaultTicksPerSec / 2) {
 			condition = false;
 			fx->Parameter4 = 0;
 			fx->Parameter5 = 0;
@@ -6632,8 +6632,8 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	Point newpos=target->Pos;
 
-	newpos.x += coords[dir][0] * (signed) fx->Parameter1 * ticks / 16; // / core->Time.ai_update_time;
-	newpos.y += coords[dir][1] * (signed) fx->Parameter1 * ticks / 12; // / core->Time.ai_update_time;
+	newpos.x += coords[dir][0] * (signed) fx->Parameter1 * ticks / 16; // / core->Time.defaultTicksPerSec;
+	newpos.y += coords[dir][1] * (signed) fx->Parameter1 * ticks / 12; // / core->Time.defaultTicksPerSec;
 
 	//change is minimal, lets try later
 	if (newpos == target->Pos)
@@ -7249,7 +7249,7 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	// fx->Parameter4 is an optional frequency multiplier
-	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.ai_update_time;
+	ieDword aRound = (fx->Parameter4 ? fx->Parameter4 : 1) * core->Time.defaultTicksPerSec;
 	Scriptable *caster = GetCasterObject();
 	switch (fx->Parameter2) {
 		case 0: //once per second

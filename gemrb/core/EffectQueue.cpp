@@ -418,7 +418,7 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 		newfx->Resource =  newfx->Resource3.IsEmpty() ? "SPGFLSH1" : newfx->Resource3;
 		if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
 			//unprepare duration
-			newfx->Duration = (newfx->Duration - core->GetGame()->GameTime) / core->Time.ai_update_time;
+			newfx->Duration = (newfx->Duration - core->GetGame()->GameTime) / core->Time.defaultTicksPerSec;
 		}
 	}
 

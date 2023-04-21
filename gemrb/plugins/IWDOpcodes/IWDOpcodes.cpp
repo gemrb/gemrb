@@ -1298,7 +1298,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 
 	//timing (set up next fire)
 	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-	fx->Duration = core->GetGame()->GameTime + 3 * core->Time.ai_update_time; // not rounds, that's the total duration!
+	fx->Duration = core->GetGame()->GameTime + 3 * core->Time.defaultTicksPerSec; // not rounds, that's the total duration!
 	fx->Parameter1--;
 
 	//iwd2 style
@@ -2388,7 +2388,7 @@ int fx_bleeding_wounds (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	}
 
-	tmp *= core->Time.ai_update_time;
+	tmp *= core->Time.defaultTicksPerSec;
 	if (tmp && (core->GetGame()->GameTime%tmp)) {
 		return FX_APPLIED;
 	}
@@ -2422,9 +2422,9 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->FirstApply) {
 		if (!fx->Parameter3) {
-			fx->Parameter3 = core->Time.ai_update_time;
+			fx->Parameter3 = core->Time.defaultTicksPerSec;
 		} else {
-			fx->Parameter3 *= core->Time.ai_update_time;
+			fx->Parameter3 *= core->Time.defaultTicksPerSec;
 		}
 		fx->Parameter4 = 0;
 	}

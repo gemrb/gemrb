@@ -3043,7 +3043,7 @@ int Actor::GetConHealAmount() const
 		rate = core->GetConstitutionBonus(STAT_CON_TNO_REGEN, Modified[IE_CON]);
 	} else {
 		rate = core->GetConstitutionBonus(STAT_CON_HP_REGEN, Modified[IE_CON]);
-		rate *= core->Time.ai_update_time;
+		rate *= core->Time.defaultTicksPerSec;
 	}
 	return rate;
 }
@@ -3519,7 +3519,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
 	core->GetAudioDrv()->PlayRelative(resRef, channel, &len);
 
-	tick_t counter = (core->Time.ai_update_time * len) / 1000;
+	tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
 	if (counter != 0) { // don't nullify it in case we're waiting already
 		SetWait(counter);
 	}
@@ -7309,7 +7309,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	//actually, iwd2 has autosearch, also, this is useful for dayblindness
 	//apply the modal effect about every second (pst and iwds have round sizes that are not multiples of 15)
 	// FIXME: split dayblindness out of detect.spl and only run that each tick + simplify this check
-	if (InParty && core->HasFeature(GFFlags::AUTOSEARCH_HIDDEN) && (third || (roundFraction % core->Time.ai_update_time == 0))) {
+	if (InParty && core->HasFeature(GFFlags::AUTOSEARCH_HIDDEN) && (third || (roundFraction % core->Time.defaultTicksPerSec == 0))) {
 		core->ApplySpell(ResRef("detect"), this, this, 0);
 	}
 
@@ -9040,7 +9040,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 
 			// check if critical hit needs a screenshake
 			if (crit_hit_scr_shake && (InParty || target->InParty) ) {
-				core->timer.SetScreenShake(Point(10, -10), core->Time.ai_update_time);
+				core->timer.SetScreenShake(Point(10, -10), core->Time.defaultTicksPerSec);
 			}
 
 			//apply the dirty fighting spell

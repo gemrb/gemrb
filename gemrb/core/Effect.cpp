@@ -184,7 +184,7 @@ bool Effect::Persistent() const
 // we add +1 so we can handle effects with 0 duration (apply once only)
 void Effect::PrepareDuration(ieDword gameTime)
 {
-	Duration = (Duration ? Duration * core->Time.ai_update_time : 1) + gameTime;
+	Duration = (Duration ? Duration * core->Time.defaultTicksPerSec : 1) + gameTime;
 }
 
 } // namespace GemRB

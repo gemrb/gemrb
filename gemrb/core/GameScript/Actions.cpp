@@ -153,7 +153,7 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
 	SetVariable( Sender, parameters->string0Parameter,
-		parameters->int0Parameter * core->Time.ai_update_time + mytime);
+		parameters->int0Parameter * core->Time.defaultTicksPerSec + mytime);
 }
 
 void GameScript::SetGlobalTimerRandom(Scriptable* Sender, Action* parameters)
@@ -171,7 +171,7 @@ void GameScript::SetGlobalTimerRandom(Scriptable* Sender, Action* parameters)
 		random = RandomNumValue % random + parameters->int1Parameter;
 	}
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
-	SetVariable(Sender, parameters->string0Parameter, random * core->Time.ai_update_time + mytime);
+	SetVariable(Sender, parameters->string0Parameter, random * core->Time.defaultTicksPerSec + mytime);
 }
 
 void GameScript::SetGlobalTimerOnce(Scriptable* Sender, Action* parameters)
@@ -182,7 +182,7 @@ void GameScript::SetGlobalTimerOnce(Scriptable* Sender, Action* parameters)
 	}
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
 	SetVariable( Sender, parameters->string0Parameter,
-		parameters->int0Parameter * core->Time.ai_update_time + mytime);
+		parameters->int0Parameter * core->Time.defaultTicksPerSec + mytime);
 }
 
 void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
@@ -190,7 +190,7 @@ void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
 	ieDword mytime=core->GetGame()->RealTime;
 
 	SetVariable( Sender, parameters->string0Parameter,
-		parameters->int0Parameter * core->Time.ai_update_time + mytime);
+		parameters->int0Parameter * core->Time.defaultTicksPerSec + mytime);
 }
 
 void GameScript::ChangeAllegiance(Scriptable* Sender, Action* parameters)
@@ -1012,7 +1012,7 @@ void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
 		} else {
 			width = RAND(0, width-1) + parameters->int0Parameter;
 		}
-		Sender->CurrentActionState = width * core->Time.ai_update_time;
+		Sender->CurrentActionState = width * core->Time.defaultTicksPerSec;
 	} else {
 		Sender->CurrentActionState--;
 	}
@@ -1028,7 +1028,7 @@ void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
 void GameScript::Wait(Scriptable* Sender, Action* parameters)
 {
 	if (!Sender->CurrentActionState) {
-		Sender->CurrentActionState = parameters->int0Parameter * core->Time.ai_update_time;
+		Sender->CurrentActionState = parameters->int0Parameter * core->Time.defaultTicksPerSec;
 	} else {
 		Sender->CurrentActionState--;
 	}
@@ -2130,7 +2130,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	const Game *game = core->GetGame();
 	if (!game->EveryoneStopped() ) {
 		//wait for a while
-		Sender->SetWait(1 * core->Time.ai_update_time);
+		Sender->SetWait(1 * core->Time.defaultTicksPerSec);
 		return;
 	}
 
@@ -3168,7 +3168,7 @@ void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait(core->Time.ai_update_time * 2);
+	actor->SetWait(core->Time.defaultTicksPerSec * 2);
 }
 
 /* this is not correct, see #92 */
@@ -3179,7 +3179,7 @@ void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait(core->Time.ai_update_time);
+	actor->SetWait(core->Time.defaultTicksPerSec);
 }
 
 void GameScript::Recoil(Scriptable* Sender, Action* /*parameters*/)
@@ -3621,7 +3621,7 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 {
-	Sender->UnselectableTimer = parameters->int0Parameter * core->Time.ai_update_time;
+	Sender->UnselectableTimer = parameters->int0Parameter * core->Time.defaultTicksPerSec;
 
 	//update color
 	Actor* actor = Scriptable::As<Actor>(Sender);
@@ -5261,7 +5261,7 @@ void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
 //This is in seconds according to IESDP
 void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->AdvanceTime(parameters->int0Parameter * core->Time.ai_update_time);
+	core->GetGame()->AdvanceTime(parameters->int0Parameter * core->Time.defaultTicksPerSec);
 	core->GetGame()->ResetPartyCommentTimes();
 }
 
@@ -5808,7 +5808,7 @@ void GameScript::RandomTurn(Scriptable* Sender, Action* parameters)
 	int diceSides = 40;
 	Region vp = core->GetGameControl()->Viewport();
 	if (vp.PointInside(actor->Pos)) diceSides = 10;
-	actor->SetWait(core->Time.ai_update_time * core->Roll(1, diceSides, 0));
+	actor->SetWait(core->Time.defaultTicksPerSec * core->Roll(1, diceSides, 0));
 }
 
 void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
@@ -6456,7 +6456,7 @@ void GameScript::FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	target->fxqueue.RemoveExpiredEffects(parameters->int0Parameter * core->Time.ai_update_time);
+	target->fxqueue.RemoveExpiredEffects(parameters->int0Parameter * core->Time.defaultTicksPerSec);
 }
 
 void GameScript::SetInterrupt(Scriptable* Sender, Action* parameters)
@@ -7088,7 +7088,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 		adjustedDuration = parameters->int1Parameter - caster->GetStat(IE_MENTALSPEED);
 		if (adjustedDuration < 0) adjustedDuration = 0;
 	}
-	adjustedDuration *= 10; // it's really not core->Time.ai_update_time
+	adjustedDuration *= 10; // it's really not core->Time.defaultTicksPerSec
 
 	// tell the effect to not use the main casting glow
 	fx->Parameter4 = 1;

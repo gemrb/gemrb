@@ -201,7 +201,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	} else {
 		if (fx->Parameter2&1) {
 			//four cycles, duration is in millisecond
-			sca->SetDefaultDuration(sca->GetSequenceDuration(core->Time.ai_update_time));
+			sca->SetDefaultDuration(sca->GetSequenceDuration(core->Time.defaultTicksPerSec));
 		} else {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 		}
@@ -508,7 +508,7 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if (fx->FirstApply) core->GetAudioDrv()->PlayRelative(fx->Resource, SFX_CHAN_HITS);
 
 	// only some types actually use duration, the rest are permanent
-	tick_t fromTime = core->Time.ai_update_time;
+	tick_t fromTime = core->Time.defaultTicksPerSec;
 	tick_t toTime = fromTime;
 
 	// NOTE: not really treating them as bits
@@ -571,8 +571,8 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 			return FX_NOT_APPLIED;
 		case 9: // very fast light to black shift and back / Instant inverted 'RGB Colour' for the duration of the effect
 			core->GetWindowManager()->FadeColor = ColorBlack;
-			core->timer.SetFadeToColor(core->Time.ai_update_time / 2);
-			core->timer.SetFadeFromColor(core->Time.ai_update_time / 2);
+			core->timer.SetFadeToColor(core->Time.defaultTicksPerSec / 2);
+			core->timer.SetFadeFromColor(core->Time.defaultTicksPerSec / 2);
 			return FX_NOT_APPLIED;
 		case 10: // instant black for the duration of the effect, then instant light
 			core->GetWindowManager()->FadeColor = ColorBlack;
@@ -592,7 +592,7 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 				return FX_NOT_APPLIED;
 			}
 			// about to expire
-			if (fx->Duration == core->GetGame()->GameTime) core->timer.SetFadeFromColor(core->Time.ai_update_time);
+			if (fx->Duration == core->GetGame()->GameTime) core->timer.SetFadeFromColor(core->Time.defaultTicksPerSec);
 			break;
 		case 200: // supposed to fade currently active area tint back to its starting global lighting, but just kills it
 			core->timer.SetFadeToColor(1);
@@ -671,8 +671,8 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(tab->QueryField(rows,2), true);
 		if (!sca) continue;
 		sca->SetBlend();
-		sca->SetDelay(core->Time.ai_update_time * delay);
-		sca->SetDefaultDuration(core->Time.ai_update_time * duration);
+		sca->SetDelay(core->Time.defaultTicksPerSec * delay);
+		sca->SetDefaultDuration(core->Time.defaultTicksPerSec * duration);
 		sca->Frame.x+=fx->PosX+offset.x;
 		sca->Frame.y+=fx->PosY+offset.y;
 		area->AddVVCell(sca);
@@ -745,7 +745,7 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 static inline void ConvertTiming(Effect *fx, int Duration)
 {
 	// GameTime will be added in by EffectQueue
-	fx->Duration = Duration ? Duration * core->Time.ai_update_time : 1;
+	fx->Duration = Duration ? Duration * core->Time.defaultTicksPerSec : 1;
 	if (fx->TimingMode == FX_DURATION_ABSOLUTE) {
 		fx->Duration += core->GetGame()->GameTime;
 	}
