@@ -655,7 +655,8 @@ void Interface::Main()
 
 		time = GetMilliseconds();
 
-		bool doGameStateUpdate = time - lastGameUpdate >= 1000.0 / Time.ai_update_time;
+		static tick_t oneTick = Time.Ticks2Ms(1);
+		bool doGameStateUpdate = time - lastGameUpdate >= oneTick;
 		if (doGameStateUpdate) {
 			GameLoop();
 			// TODO: find other animations that need to be synchronized
