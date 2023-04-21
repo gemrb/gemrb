@@ -655,7 +655,7 @@ void Interface::Main()
 
 		time = GetMilliseconds();
 
-		static tick_t oneTick = Time.Ticks2Ms(1);
+		static const tick_t oneTick = 1000 / Time.ticksPerSec;
 		bool doGameStateUpdate = time - lastGameUpdate >= oneTick;
 		if (doGameStateUpdate) {
 			GameLoop();

@@ -135,7 +135,7 @@ struct TimeStruct {
 	unsigned int fade_reset;
 
 	int GetHour(unsigned int time) const { return (time / defaultTicksPerSec) % day_sec / hour_sec; }
-	tick_t Ticks2Ms(unsigned int ticks) const { return ticks * 1000 / ticksPerSec; }
+	tick_t Ticks2Ms(unsigned int ticks) const { return ticks * 1000 / defaultTicksPerSec; }
 };
 
 // cache of speldesc.2da entries

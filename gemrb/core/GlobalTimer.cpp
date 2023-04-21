@@ -116,7 +116,7 @@ void GlobalTimer::DoStep(int count)
 bool GlobalTimer::UpdateViewport(tick_t thisTime)
 {
 	tick_t advance = thisTime - startTime;
-	static tick_t interval = core ? core->Time.Ticks2Ms(1) : 66; // length of a tick in ms
+	tick_t interval = core ? (1000 / core->Time.ticksPerSec) : 66; // length of a tick in ms
 	if ( advance < interval) {
 		return false;
 	}
