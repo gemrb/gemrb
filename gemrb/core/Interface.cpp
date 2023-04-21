@@ -1227,6 +1227,12 @@ int Interface::Init(const InterfaceConfig* cfg)
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
 
+	// We use this for the game's state exclusively
+	ieDword maxRefreshRate = 30;
+	vars->Lookup("Maximum Frame Rate", maxRefreshRate);
+	// the originals used double ticks for haste handling
+	Time.ticksPerSec = maxRefreshRate / 2;
+
 	// set up the tooltip delay which we store in milliseconds
 	ieDword tooltipDelay = 0;
 	GetDictionary()->Lookup("Tooltips", tooltipDelay);
@@ -1818,12 +1824,6 @@ bool Interface::LoadGemRBINI()
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
 	gamedata->SetTextSpeed(ini->GetKeyAsInt("resources", "TextScreenSpeed", 100));
-
-	// We use this for the game's state exclusively
-	ieDword maxRefreshRate = 30;
-	vars->Lookup("Maximum Frame Rate", maxRefreshRate);
-	// the originals used double ticks for haste handling
-	Time.ticksPerSec = maxRefreshRate / 2;
 
 	for (const GFFlags flag : EnumIterator<GFFlags>()) {
 		const bool set = ini->GetKeyAsBool("resources", game_flags[flag], false);
