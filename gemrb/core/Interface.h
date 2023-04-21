@@ -121,6 +121,7 @@ struct DamageInfoStruct {
 };
 
 struct TimeStruct {
+	const unsigned int defaultTicksPerSec = 15;
 	unsigned int ai_update_time;
 	unsigned int round_sec;
 	unsigned int turn_sec;

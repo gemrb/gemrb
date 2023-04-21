@@ -509,13 +509,13 @@ bool Interface::ReadGameTimeTable()
 
 	Time.round_sec = table->QueryFieldUnsigned<unsigned int>("ROUND_SECONDS", "DURATION");
 	Time.turn_sec = table->QueryFieldUnsigned<unsigned int>("TURN_SECONDS", "DURATION");
-	Time.round_size = Time.round_sec * Time.ai_update_time;
+	Time.round_size = Time.round_sec * Time.defaultTicksPerSec;
 	Time.rounds_per_turn = Time.turn_sec / Time.round_sec;
 	Time.attack_round_size = table->QueryFieldUnsigned<unsigned int>("ATTACK_ROUND", "DURATION");
 	Time.hour_sec = 300; // move to table if pst turns out to be different
-	Time.hour_size = Time.hour_sec * Time.ai_update_time;
+	Time.hour_size = Time.hour_sec * Time.defaultTicksPerSec;
 	Time.day_sec = Time.hour_sec * 24; // move to table if pst turns out to be different
-	Time.day_size = Time.day_sec * Time.ai_update_time;
+	Time.day_size = Time.day_sec * Time.defaultTicksPerSec;
 	Time.fade_reset = table->QueryFieldUnsigned<unsigned int>("FADE_RESET", "DURATION");
 
 	return true;
