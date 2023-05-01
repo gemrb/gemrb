@@ -2308,7 +2308,7 @@ void EffectQueue::AffectAllInRange(const Map *map, const Point &pos, int idstype
 			continue;
 		}
 		//distance
-		if( Distance(pos, actor)>range) {
+		if (!WithinRange(actor, pos, range)) {
 			continue;
 		}
 		//ids targeting
