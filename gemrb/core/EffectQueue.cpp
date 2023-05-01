@@ -1195,15 +1195,21 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		if( NeedPrepare(fx->TimingMode) ) {
 			//save delay for later
 			fx->SecondaryDelay = fx->Duration;
+			bool inTicks = false;
 			if (fx->TimingMode == FX_DURATION_INSTANT_LIMITED) {
 				fx->TimingMode = FX_DURATION_ABSOLUTE;
+			} else if (fx->TimingMode == FX_DURATION_DELAY_LIMITED && fx->IsVariable && globals.pstflags) {
+				// override onset delay, useful for effects with scaled (simplified) duration
+				fx->Duration = fx->IsVariable;
+				inTicks = true;
+				// also change TimingMode to FX_DURATION_DELAY_LIMITED_PENDING if needed
 			}
-			bool inTicks = false;
 			if (fx->TimingMode == FX_DURATION_INSTANT_LIMITED_TICKS) {
 				fx->TimingMode = FX_DURATION_ABSOLUTE;
 				inTicks = true;
 			} else if (globals.pstflags && !(fx->SourceFlags & SF_SIMPLIFIED_DURATION) && fx->TimingMode != FX_DURATION_ABSOLUTE) {
 				// pst stored the delay in ticks already, so we use a variant of PrepareDuration
+				// ... only FX_DURATION_INSTANT_LIMITED, FX_DURATION_DELAY_UNSAVED and FX_DURATION_DELAY_LIMITED_PENDING used seconds
 				// unless it's our unhardcoded spells which use iwd2-style simplified duration in rounds per level
 				inTicks = true;
 			}

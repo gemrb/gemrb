@@ -831,8 +831,8 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			target->ApplyEffectCopy(fx, fx_single_color_pulse_ref, Owner, 0xFF00, 0x400040);
 
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x64FA00, 0x50005);
-			//wtf is this
-			newfx->IsVariable = 0x23;
+			newfx->IsVariable = 0x23; // delay for 35 ticks
+			newfx->TimingMode = FX_DURATION_DELAY_LIMITED;
 			core->ApplyEffect(newfx, target, Owner);
 
 			target->ApplyEffectCopy(fx, fx_resistfire_ref, Owner, 50, 1);

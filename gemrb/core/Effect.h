@@ -129,7 +129,10 @@ struct GEM_EXPORT Effect {
 	ieDword DiceSides = 0;
 	ieDword SavingThrowType = 0;
 	ieDword SavingThrowBonus = 0;
-	ieWord IsVariable = 0; // "Special" field in EEs (use depends on opcode), personalized critical type in PST (Actor::GetCriticalType)
+	// IsVariable is the "Special" field in EEs (use depends on opcode) and has two meanings in PST:
+	// - personalized critical type (Actor::GetCriticalType)
+	// - onset delay override for FX_DURATION_DELAY_LIMITED
+	ieWord IsVariable = 0;
 	ieWord IsSaveForHalfDamage = 0;
 
 	// EFF V2.0 fields:
