@@ -3174,6 +3174,12 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 			ret = AdjustSaveVsSchool(ret, fx->PrimaryType, sfx);
 		}
 
+		// pst litany of curses has a bonus depending on number of curses known
+		// due to a bug, it was a malus in the original
+		if (pstflags && fx && fx->SourceRef == "spin101" && fx->Opcode != 45) {
+			ret -= CheckVariable(nullptr, "Morte_Taunt", "GLOBAL");
+		}
+
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		if (core->HasFeedback(FT_COMBAT) && (lastSave.prevType != type || lastSave.prevRoll != ret)) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
