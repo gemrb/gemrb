@@ -618,7 +618,6 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	//  adds a play bam opcode to the projectile
 	//2 - raise dead projectile - the projectile itself has the effect (why is it so complicated)
 
-	//TODO: create the spells
 	switch(fx->Parameter2) {
 		case 0:
 			fx->Resource = "ADDER";
@@ -1145,7 +1144,10 @@ int fx_hostile_image(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 //0xd2 fx_detect_evil
 int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_detect_evil(%2d): Par1: %d Par2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if (fx->FirstApply) {
+		// fix duration, which was hardcoded in the original (50 + 25/level, max 5 min)
+		ConvertTiming(fx, std::min<int>(50 + 25 * fx->CasterLevel, 300));
+	}
 	ieDword type = fx->Parameter2;
 	//default is alignment/evil/speed 30/range 10
 	if (!type) type = 0x08031e0a;
