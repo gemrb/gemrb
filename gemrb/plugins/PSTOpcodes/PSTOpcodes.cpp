@@ -797,7 +797,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			break;
 		case 5: //shroud of shadows
 			// should be 5d4 + 10 per level, but the original spell doesn't use the opcode
-			// our sshadow just hardcodes all to 150, but doesn't set the simplified duration bit and data FIXME
+			// unhardcoded in our sshadow.spl with 10s as the flat bonus instead of rolling
 			break;
 		case 6: //duplication
 			core->GetAudioDrv()->Play("magic02", SFX_CHAN_HITS, target->Pos);
