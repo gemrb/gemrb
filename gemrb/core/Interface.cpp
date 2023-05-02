@@ -1052,8 +1052,6 @@ int Interface::Init(const InterfaceConfig* cfg)
 		return GEM_ERROR;
 	}
 
-	fogRenderer = std::make_shared<FogRenderer>(video.get(), config.SpriteFoW);
-
 	// ask the driver if a touch device is in use
 	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
 
@@ -1147,6 +1145,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 		Log(ERROR, "Core", "The path must point to a game directory with a readable chitin.key file.");
 		return GEM_ERROR;
 	}
+
+	fogRenderer = std::make_shared<FogRenderer>(video.get(), config.SpriteFoW);
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	SetNextScript("Start"); // Start is the first script executed
