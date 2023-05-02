@@ -1304,6 +1304,16 @@ int fx_charisma_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_charisma_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
+	// ensure we don't stack in pst
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		// don't be cumulative — luckily the opcode is the first on the effect list of spwi114
+		// we remove the old spell, so the player benefits from renewed duration
+		ResRef tmp = fx->SourceRef;
+		fx->SourceRef = "";
+		target->fxqueue.RemoveAllEffects(tmp);
+		fx->SourceRef = tmp;
+	}
+
 	// in pst (only) this is a diced effect (eg. Friends)
 	if (fx->FirstApply == 1 && fx->Parameter1 == 0 && fx->Parameter2 == 0) {
 		fx->Parameter1 = DICE_ROLL(0);
@@ -2742,6 +2752,15 @@ int fx_set_blur_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//death stops this effect
 	if (STATE_GET( STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
+	}
+	// ensure we don't stack in pst
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS) && STATE_GET(STATE_BLUR)) {
+		// don't be cumulative — luckily the blur opcode is the first on the effect list of spwi216
+		// we remove the old spell, so the player benefits from renewed duration
+		ResRef tmp = fx->SourceRef;
+		fx->SourceRef = "";
+		target->fxqueue.RemoveAllEffects(tmp);
+		fx->SourceRef = tmp;
 	}
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_STATE_SET( STATE_BLUR );

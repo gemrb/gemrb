@@ -761,6 +761,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 	bool playonce = false;
 	ieDword tint = 0;
 	Effect *newfx;
+	ieDword tmp;
 
 	//special effects based on fx_param2
 	// PST:EE also exploded this into separate opcodes with more parameters and using a bam/vvc instead of an internal projectile
@@ -782,6 +783,12 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 			break;
 		case 2: //black barbed shield
+			// don't stack
+			tmp = fx->Projectile;
+			fx->Projectile = 0;
+			target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
+			fx->Projectile = tmp;
+
 			ConvertTiming(fx, RAND(10, 30));
 			target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 2, 0);
 			fx->Parameter3=0xffffffff;
@@ -889,12 +896,25 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 				bonus = std::max((ieDword) 0, target->Modified[IE_STR] + bonus - strLimit);
 			}
 
+			// don't stack strength spells
+			// potentially too agressive, since the durations vary a lot — did old ones just get suppressed?
 			int duration = core->Time.hour_sec * fx->CasterLevel;
-			if (fx->SavingThrowBonus == 1) { // power of one
+			if (fx->SavingThrowBonus == 1) { // power of one - 286
 				duration /= 2;
-			} else if (fx->SavingThrowBonus == 4) { // improved strength
+				target->fxqueue.RemoveAllEffectsWithProjectile(222);
+				target->fxqueue.RemoveAllEffectsWithProjectile(227);
+			} else if (fx->SavingThrowBonus == 4) { // improved strength - 227
 				duration = 5 * fx->CasterLevel;
+				target->fxqueue.RemoveAllEffectsWithProjectile(222);
+				target->fxqueue.RemoveAllEffectsWithProjectile(286);
+			} else { // strength - 222
+				target->fxqueue.RemoveAllEffectsWithProjectile(227);
+				target->fxqueue.RemoveAllEffectsWithProjectile(286);
 			}
+			tmp = fx->Projectile;
+			fx->Projectile = 0;
+			target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
+			fx->Projectile = tmp;
 			ConvertTiming (fx, duration);
 
 			// improved strength also has a pulse we need to adjust
