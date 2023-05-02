@@ -464,6 +464,8 @@ def GetProficiencies(pc, cdet):
 	tmp2 = str(tmp // 2)
 	if (tmp&1):
 		tmp2 += "[+int=" + str(189) + "]" #must use one higher than the frame count
+	else:
+		tmp2 += " " # add some trailing padding to ensure display in bg2
 
 	stats.append ( (9458, tmp2, '') )
 	return TypeSetStats (stats, pc)
