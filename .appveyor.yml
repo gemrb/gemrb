@@ -25,7 +25,7 @@ environment:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
   VCPKG_TARGET_TRIPLET: "x64-windows"
   VCPKG_BUILD_TYPE: "release"
-  #APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
 install:
 - ps: |-
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
@@ -76,6 +76,9 @@ before_build:
     $replace = "GemRBPath=."
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 
+    # add timer to work around appveyor cache problems, see build_script
+    $env:duration1 = Get-Date
+
     $env:gl = "None"
     if ($env:APPVEYOR_REPO_TAG_NAME -Or $env:APPVEYOR_REPO_COMMIT_MESSAGE -like '*buildgl*') {
       $env:gl = "OpenGL"
@@ -91,7 +94,14 @@ before_build:
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 build_script:
 - ps: |-
-    #exit 1
+    # break if things took too much time, so we can at least save the new cache
+    # it doesn't happen if the build gets killed after an hour
+    $duration2 = Get-Date
+    $span = New-TimeSpan -Start $env:duration1 -End $duration2
+    if ($span.TotalMinutes -ge 30) {
+      exit 1
+    }
+
     pushd c:\projects\gemrb
     cmake --build . -j 2 --config Release
 after_build:
