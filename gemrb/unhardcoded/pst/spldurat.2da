@@ -1,0 +1,45 @@
+2DA V1.0
+0
+            BASE   PER_LEVEL   SKIP_FX_IDX   DELAY   MAX
+# spells that were fixed in opcodes
+##sppr104     50          25 # fx_detect_evil
+##sppr106      0          10 # fx_overlay
+##sppr302     10          10 # fx_overlay
+##spwi111      0          25 # fx_overlay
+##spwi119      0          12 # fx_overlay
+##spwi203     20           0 # fx_overlay, 10-30
+##spwi209      0           5 # fx_overlay
+##spwi211      0        3600 # fx_overlay type 17, gemrb extension
+##spwi219      0        1800 # fx_overlay type 17, gemrb extension
+##spwi304      0           5 # fx_overlay
+##spwi312      0           5 # fx_overlay
+##spwi314      0           5 # fx_overlay
+##spwi406      0           5 # fx_overlay type 17, gemrb extension
+##spwi704     50           5 # fx_overlay
+##spwi902                    # fx_overlay, but the description has conflicting info
+##spwi201      0           2 # fx_special_effect / adder.spl
+
+# spells with dedicated projectiles that we unhardcode
+##sppr105      0          20 # ffire.pro with main payload in faerie.spl (duration ok); payload in original spell shouldn't be touched
+##spwi108     40           5 # pacify.pro/spl  (duration ok); hd limiting done in payload, target count in projectile
+##spwi408     15          10 # 5-20 + 10, not per level - everyone thinks it's a description bug
+# spwi705 is also special 5-30s, handled via projectile with fixed 30s duration; if it was 5s/level, it'd get maxed out anyway
+
+# spells with dedicated projectiles that we unhardcode, but have no extra payload
+spwi308      0           5        -1      7 # originally the delay was randomized for 174/191 (7 + pointer % 15)
+spwi401      10          0        -1    100 # really stupid, it's all doable by modifying the spell
+spwi402      10          1        -1     25
+spin101      0           5         2      0    30
+spwi602      0           5        -1      0
+
+# spells without projectiles that need per-effect handling
+spwi104      5           5        -1     15
+spwi114      15          5         2     15 # original had 5d3+5 (with luck) for base
+spwi214      0           5        -1     15
+spwi216      15          5        -1      0
+spwi311      0           5        -1     25
+
+# FIXME
+# spwi307     3           1 # 5-20 for base, retest if description is correct, we override with simpler durations (50/3l, then 50/5l); 1d3 targets but no hd limiting or autohit for <3HD
+# spwi603 10-60 minutes for main effect, but should be handled in projectile; howl.spl uses 150 durations (30 min), no hd-specific logic in either projectile hopand{,2}
+# spwi805 is also special, dependant on hp, projectile, we just limit it to 1-10hd and 5s/level
