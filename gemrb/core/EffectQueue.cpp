@@ -740,21 +740,19 @@ static inline bool check_level(const Actor *target, Effect *fx)
 	//skip non level based effects
 	//check if an effect has no level based resistance, but instead the dice sizes/count
 	//adjusts Parameter1 (like a damage causing effect)
-	if( Opcodes[fx->Opcode].Flags & EFFECT_DICED ) {
+	if (Opcodes[fx->Opcode].Flags & EFFECT_DICED) {
 		//add the caster level to the dice count
 		if (fx->IsVariable) {
-			fx->DiceThrown+=fx->CasterLevel;
+			fx->DiceThrown += fx->CasterLevel;
 		}
-		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
+		fx->Parameter1 = DICE_ROLL((signed) fx->Parameter1);
 		//this is a hack for PST style diced effects
-		if( core->HasFeature(GFFlags::SAVE_FOR_HALF) ) {
+		if (core->HasFeature(GFFlags::SAVE_FOR_HALF)) {
 			if (!fx->Resource.IsEmpty() && !fx->Resource.BeginsWith("NEG")) {
-				fx->IsSaveForHalfDamage=1;
+				fx->IsSaveForHalfDamage = 1;
 			}
-		} else {
-			if( (fx->Parameter2&3)==3) {
-				fx->IsSaveForHalfDamage=1;
-			}
+		} else if ((fx->Parameter2 & 3) == 3) {
+			fx->IsSaveForHalfDamage = 1;
 		}
 		return false;
 	}
@@ -765,10 +763,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 		return false;
 	}
 
-	if( !target) {
-		return false;
-	}
-	if(fx->Target == FX_TARGET_SELF) {
+	if (!target || fx->Target == FX_TARGET_SELF) {
 		return false;
 	}
 
