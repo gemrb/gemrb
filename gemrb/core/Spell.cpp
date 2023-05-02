@@ -144,6 +144,33 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 	fxqueue->AddEffect(fx);
 }
 
+// pst did some nasty hardcoding ...
+static void AdjustPSTDurations(const Spell* spl, Effect& fx, size_t ignoreFx)
+{
+	if (fx.TimingMode != 0 && fx.TimingMode != 3) return;
+	if (fx.Opcode == 195) return; // pointless to touch fx_tint_screen and at least spwi308 excluded it manually
+
+	static AutoTable durationOverride = gamedata->LoadTable("spldurat", true);
+	if (!durationOverride) return;
+	auto row = durationOverride->GetRowIndex(spl->Name);
+	if (row == TableMgr::npos) return;
+
+	size_t skipFx = durationOverride->QueryFieldUnsigned<size_t>(row, 2);
+	if (skipFx == ignoreFx) return;
+
+	fx.Duration = durationOverride->QueryFieldUnsigned<ieDword>(row, 0);
+	fx.Duration += durationOverride->QueryFieldUnsigned<ieDword>(row, 1) * fx.CasterLevel;
+	ieDword maxDuration = durationOverride->QueryFieldUnsigned<ieDword>(row, 4);
+	if (maxDuration != 0) {
+		fx.Duration = std::min(fx.Duration, maxDuration);
+	}
+	// onset delay override
+	ieWord special = durationOverride->QueryFieldUnsigned<ieWord>(row, 3);
+	if (special != 0) {
+		fx.IsVariable = special;
+	}
+}
+
 EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro)
 {
 	bool pstFriendly = false;
@@ -174,9 +201,16 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 	for (size_t i = 0; i < count; ++i) {
 		Effect& fx = features->at(i);
 
+		fx.CasterLevel = level;
 		// hack the effect according to Level
 		if ((Flags & SF_SIMPLIFIED_DURATION) && block_index >= 0 && fx.HasDuration()) {
 			fx.Duration = (TimePerLevel * block_index + TimeConstant) * core->Time.round_sec;
+		} else if (tables.pstflags) {
+			// many pst spells require unhacking and we can't use the simplified duration bit and custome projectiles for all
+			// luckily this was redone in pstee simply with extra extended headers
+			// NOTE: some of these have several headers for increased range per level, but
+			//       simplified duration always operates only on the first, so we can use it even less
+			AdjustPSTDurations(this, fx, i);
 		}
 		//fill these for completeness, inventoryslot is a good way
 		//to discern a spell from an item effect
@@ -190,7 +224,6 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 			fx.SourceFlags|=SF_HOSTILE;
 		}
 		fx.CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later
-		fx.CasterLevel = level;
 		fx.SpellLevel = SpellLevel;
 
 		// apply the stat-based spell duration modifier
