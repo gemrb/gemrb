@@ -286,11 +286,11 @@ void Projectile::Setup()
 		//getting the explosion count here, so an absent caster won't cut short
 		//on the explosion count
 		if(Extension->AFlags&PAF_DELAY) {
-			extension_delay=Extension->Delay;
+			extensionDelay = Extension->Delay;
 		} else {
-			extension_delay=0;
+			extensionDelay = 0;
 		}
-		extension_explosioncount=CalculateExplosionCount();
+		extensionExplosionCount = CalculateExplosionCount();
 	}
 
 	//set any static tint
@@ -322,12 +322,12 @@ void Projectile::Setup()
 		if(ExtFlags&PEF_POP) {
 			//the explosion consists of a pop in/hold/pop out of the travel projectile (dimension door)
 			if (travel[0] && shadow[0]) {
-				extension_delay = travel[0].GetFrameCount() * 2 + shadow[0].GetFrameCount();
+				extensionDelay = travel[0].GetFrameCount() * 2 + shadow[0].GetFrameCount();
 				travel[0].Flags |= A_ANI_PLAYONCE;
 				shadow[0].Flags |= A_ANI_PLAYONCE;
 			}
 		} else if (travel[0]) {
-			extension_delay = travel[0].GetFrameCount();
+			extensionDelay = travel[0].GetFrameCount();
 			travel[0].Flags |= A_ANI_PLAYONCE;
 		}
 	}
@@ -396,7 +396,7 @@ Actor *Projectile::GetTarget()
 
 void Projectile::SetDelay(int delay)
 {
-	extension_delay=delay;
+	extensionDelay = delay;
 	ExtFlags|=PEF_FREEZE;
 }
 
@@ -620,8 +620,8 @@ void Projectile::ChangePhase()
 		}
 	}
 
-	if (phase == P_TRAVEL && (ExtFlags & PEF_DELAY) && extension_delay) {
-		 extension_delay--;
+	if (phase == P_TRAVEL && (ExtFlags & PEF_DELAY) && extensionDelay) {
+		 extensionDelay--;
 		 UpdateSound();
 		 return;
 	}
@@ -645,16 +645,16 @@ void Projectile::ChangePhase()
 
 	// freeze on target, this is recommended only for child projectiles
 	// as the projectile won't go away on its own
-	if (ExtFlags & PEF_FREEZE && extension_delay) {
-		if (extension_delay > 0) {
-			extension_delay--;
+	if (ExtFlags & PEF_FREEZE && extensionDelay) {
+		if (extensionDelay > 0) {
+			extensionDelay--;
 			UpdateSound();
 		}
 		return;
 	}
 
-	if (phase == P_TRAVEL2 && extension_delay) {
-			extension_delay--;
+	if (phase == P_TRAVEL2 && extensionDelay) {
+			extensionDelay--;
 			return;
 	}
 
@@ -751,7 +751,7 @@ void Projectile::DoStep()
 	if (pathcounter==0x7ffe) {
 		for(int i=0;i<3;i++) {
 			if (!TrailSpeed[i] && !TrailBAM[i].IsEmpty()) {
-				extension_delay = AddTrail(TrailBAM[i], (ExtFlags&PEF_TINT)?Gradients:NULL);
+				extensionDelay = AddTrail(TrailBAM[i], (ExtFlags & PEF_TINT) ? Gradients : nullptr);
 			}
 		}
 	}
@@ -1038,7 +1038,7 @@ void Projectile::CheckTrigger(unsigned int radius)
 	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
 		if (phase == P_TRIGGER) {
 			phase = P_EXPLODING1;
-			extension_delay = Extension->Delay;
+			extensionDelay = Extension->Delay;
 		}
 	} else if (phase == P_EXPLODING1 && Extension->AFlags & PAF_SYNC) {
 		//the explosion is revoked
@@ -1146,10 +1146,10 @@ void Projectile::SecondaryTarget()
 
 	if (Extension->DiceCount) {
 		//precalculate the maximum affected target count in case of PAF_AFFECT_ONE 
-		extension_targetcount = core->Roll(Extension->DiceCount, Extension->DiceSize, 0);
+		extensionTargetCount = core->Roll(Extension->DiceCount, Extension->DiceSize, 0);
 	} else {
 		//this is the default case (for original engine)
-		extension_targetcount = 1;
+		extensionTargetCount = 1;
 	}
 
 	Scriptable* owner = area->GetScriptableByGlobalID(Caster);
@@ -1220,15 +1220,15 @@ void Projectile::SecondaryTarget()
 		//we already got one target affected in the AOE, this flag says
 		//that was enough (the GemRB extension can repeat this a random time (x d y)
 		if(Extension->AFlags&PAF_AFFECT_ONE) {
-			if (extension_targetcount<=0) {
+			if (extensionTargetCount <= 0) {
 				break;
 			}
 			//if target counting is per HD and this target is an actor, use the xp level field
 			//otherwise count it as one
 			if (Extension->APFlags & APF_COUNT_HD) {
-				extension_targetcount -= actor->GetXPLevel(true);
+				extensionTargetCount -= actor->GetXPLevel(true);
 			} else {
-				extension_targetcount--;
+				extensionTargetCount--;
 			}
 		}
 	}
@@ -1357,14 +1357,14 @@ void Projectile::DrawExplosion(const Region& vp)
 	}
 
 	//Delay explosion, it could even be revoked with PAF_SYNC (see skull trap)
-	if (extension_delay) {
-		extension_delay--;
+	if (extensionDelay) {
+		extensionDelay--;
 		return;
 	}
 
 	//0 and 1 have the same effect (1 explosion)
-	if (extension_explosioncount) {
-		extension_explosioncount--;
+	if (extensionExplosionCount) {
+		extensionExplosionCount--;
 	}
 
 	//Line targets are actors between source and destination point
@@ -1550,7 +1550,7 @@ void Projectile::DrawExplosion(const Region& vp)
 				//is not always wanted
 				pro->Speed-=RAND(0,7);
 
-				int delay = Extension->Delay * extension_explosioncount;
+				int delay = Extension->Delay * extensionExplosionCount;
 				if (apflags & APF_BOTH && delay) {
 					delay = RAND(0, delay - 1);
 				}
@@ -1612,8 +1612,8 @@ void Projectile::DrawExplosion(const Region& vp)
 		}
 	}
 
-	if (extension_explosioncount) {
-		extension_delay=Extension->Delay;
+	if (extensionExplosionCount) {
+		extensionDelay = Extension->Delay;
 	} else {
 		phase = P_EXPLODED;
 	}

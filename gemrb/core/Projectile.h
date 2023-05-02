@@ -276,9 +276,9 @@ private:
 	ResRef projectileName; // used also for namesake externalized spells
 	ieWord type = 0;
 	//these come from the extension area
-	int extension_delay = 0;
-	int extension_explosioncount = 0;
-	int extension_targetcount = 0;
+	int extensionDelay = 0;
+	int extensionExplosionCount = 0;
+	int extensionTargetCount = 0;
 	Color tint;
 
 	// special (not using char animations)
