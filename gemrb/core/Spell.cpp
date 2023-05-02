@@ -155,7 +155,7 @@ static void AdjustPSTDurations(const Spell* spl, Effect& fx, size_t ignoreFx)
 	auto row = durationOverride->GetRowIndex(spl->Name);
 	if (row == TableMgr::npos) return;
 
-	size_t skipFx = durationOverride->QueryFieldUnsigned<size_t>(row, 2);
+	size_t skipFx = durationOverride->QueryFieldUnsigned<ieDword>(row, 2);
 	if (skipFx == ignoreFx) return;
 
 	fx.Duration = durationOverride->QueryFieldUnsigned<ieDword>(row, 0);
