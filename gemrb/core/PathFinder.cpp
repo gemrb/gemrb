@@ -460,10 +460,9 @@ void Map::NormalizeDeltas(double &dx, double &dy, double factor)
 	} else if (dy == 0.0) {
 		dx = STEP_RADIUS;
 	} else {
-		double ql = dx * dx + dy * dy;
-		double q = 1.0f / std::sqrt(ql);
-		dx = dx * q * STEP_RADIUS;
-		dy = dy * q * STEP_RADIUS * 0.75f;
+		double q = STEP_RADIUS / std::hypot(dx, dy);
+		dx = dx * q;
+		dy = dy * q * 0.75f;
 	}
 	dx = std::min(dx * factor, dxOrig);
 	dy = std::min(dy * factor, dyOrig);
