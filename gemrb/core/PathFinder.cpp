@@ -120,8 +120,6 @@ PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor 
 	PathListNode *step = new PathListNode;
 	const Size& mapSize = PropsSize();
 	step->point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
-	step->Parent = nullptr;
-	step->Next = nullptr;
 	step->orient = GetOrient(p, s);
 	return step;
 }
@@ -181,8 +179,6 @@ PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, ori
 {
 	PathListNode *StartNode = new PathListNode;
 	PathListNode *Return = StartNode;
-	StartNode->Next = nullptr;
-	StartNode->Parent = nullptr;
 	StartNode->point = start;
 	StartNode->orient = Orientation;
 
@@ -209,7 +205,6 @@ PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, ori
 			StartNode->Next = new PathListNode;
 			StartNode->Next->Parent = StartNode;
 			StartNode = StartNode->Next;
-			StartNode->Next = nullptr;
 			Count = Speed;
 		} else {
 			Count--;
@@ -291,8 +286,6 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 	const Size& mapSize = PropsSize();
 	step->point = Clamp(step->point, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
 	step->orient = GetOrient(step->point, p);
-	step->Next = nullptr;
-	step->Parent = nullptr;
 	return step;
 }
 
@@ -427,7 +420,6 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			PathListNode *newStep = new PathListNode;
 			newStep->point = nmptCurrent;
 			newStep->Next = resultPath;
-			newStep->Parent = nullptr;
 			if (flags & PF_BACKAWAY) {
 				newStep->orient = GetOrient(nmptParent, nmptCurrent);
 			} else {

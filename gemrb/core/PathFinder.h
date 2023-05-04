@@ -69,8 +69,8 @@ struct PathNode {
 using Path = std::vector<PathNode>;
 
 struct PathListNode {
-	PathListNode* Parent;
-	PathListNode* Next;
+	PathListNode* Parent = nullptr;
+	PathListNode* Next = nullptr;
 	Point point;
 	orient_t orient;
 };
