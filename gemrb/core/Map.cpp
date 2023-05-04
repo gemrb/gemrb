@@ -2416,7 +2416,13 @@ PathMapFlags Map::GetBlockedInRadiusTile(const Point &tp, uint16_t size, const b
 	size = Clamp<uint16_t>(size, 2, MAX_CIRCLESIZE);
 	uint16_t r = size - 2;
 	
-	const auto points = PlotCircle(tp, r);
+	std::vector<Point> points;
+	if (r == 0) { // avoid generating 16 identical points
+		points.push_back(tp);
+		points.push_back(tp);
+	} else {
+		points = PlotCircle(tp, r);
+	}
 	for (size_t i = 0; i < points.size(); i += 2)
 	{
 		const Point& p1 = points[i];
