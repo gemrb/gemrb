@@ -5505,11 +5505,31 @@ void GameScript::RandomRun(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* /*parameters*/)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
+	if (!actor || !actor->GetCurrentArea()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->RandomWalk( false, false );
+
+	// unlike other randomwalk actions, this one queues its payload, so it can get interrupted;
+	// it just queues MoveToPoint and itself again
+	// ... that's why we don't use Movable::RandomWalk
+	const Map* area = actor->GetCurrentArea();
+	if (actor->BlocksSearchMap()) {
+		area->ClearSearchMapFor(actor);
+	}
+	const auto path = area->RandomWalk(actor->Pos, actor->circleSize, std::max<int>(5, actor->maxWalkDistance), actor);
+	if (actor->BlocksSearchMap()) {
+		area->BlockSearchMapFor(actor);
+	}
+	if (path) {
+		Action* moveAction = GenerateAction("MoveToPoint()");
+		moveAction->pointParameter = path->point;
+		Action* randomWalk = GenerateAction("RandomWalkContinuous()");
+		actor->AddActionInFront(randomWalk);
+		actor->AddActionInFront(moveAction);
+	}
+
+	actor->ReleaseCurrentAction();
 }
 
 void GameScript::RandomFly(Scriptable* Sender, Action* /*parameters*/)
