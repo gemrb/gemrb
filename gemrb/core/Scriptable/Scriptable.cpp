@@ -2221,7 +2221,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 			return;
 		}
 		// a 50/50 chance to move or do a spin (including its own wait)
-		if (RAND(1, 2) == 1) {
+		if (RandomFlip()) {
 			Action *me = ParamCopy(CurrentAction);
 			Action *turnAction = GenerateAction("RandomTurn()");
 			// only spin once before relinquishing control back
