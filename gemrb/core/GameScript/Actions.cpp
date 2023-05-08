@@ -5527,6 +5527,7 @@ void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* /*parameters*/
 		Action* randomWalk = GenerateAction("RandomWalkContinuous()");
 		actor->AddActionInFront(randomWalk);
 		actor->AddActionInFront(moveAction);
+		delete path;
 	}
 
 	actor->ReleaseCurrentAction();
