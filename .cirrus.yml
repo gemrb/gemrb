@@ -4,7 +4,7 @@ macos_instance:
 env:
   CIRRUS_CLONE_DEPTH: 1
 
-buid_task:
+build_task:
   brew_script: brew install sdl2 openal-soft sdl2_mixer libpng libvorbis openssh
 
   cmake_script:
