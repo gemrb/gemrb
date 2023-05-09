@@ -21,30 +21,26 @@ build_task:
     - if grep -q '^v[01]\.[0-9].[0-9]' <<< "${CIRRUS_TAG}"; then make fetch-demo-data; fi
     - make install
 
-test_task:
-  depends_on:
-    - build
-  script: true # noop, try real testing on this platform later
+  test_script:
+    - script: true # noop, try real testing on this platform later
+
+  pack_artifacts:
+    - path: /Applications/GemRB.app # unfortunately we can't set the resulting name dynamically
 
 publish_task:
   only_if: $CIRRUS_BRANCH == 'master' && $CIRRUS_REPO_OWNER == 'gemrb'
-  depends_on:
-    - test
   env:
     SSHKEY: ENCRYPTED[!c6a24980159e845aad3a28f4e25f7c75eab76e7e1c58a1f0e700dfa582f178d4e14856ca70b6802d3aa1a592283f3062!]
 
-  packnsend_script:
+  send_script:
     - # generate filename
     - # there are no tags, so improvise
     - v2=$CIRRUS_CHANGE_IN_REPO
     - if [[ -n CIRRUS_TAG ]]; then v2=$CIRRUS_TAG; fi
-    - version=$({ date +%F; echo $v2 } | tr -d '\n') || exit 14
-    - file=gemrb-$version.tar.bz2
-    - # pack
-    - tarpath=/Applications/GemRB.app
-    - tar cjf $file $tarpath || exit 15
+    - version=$({ date +%F; echo $v2; } | tr -d '\n') || exit 14
+    - filepath="Apple/ARM64/gemrb-$version.zip"
     - # unpack ssh key
     - echo $SSHKEY > testing/id_travissfbot.av
-    - # upload
-    - filepath="Apple/M2/$file"
-    - scp -v -oStrictHostKeyChecking=no -i testing/id_travissfbot.av "$file" gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath
+    - # down & upload
+    - wget https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/build/pack.zip
+    - scp -v -oStrictHostKeyChecking=no -i testing/id_travissfbot.av pack.zip gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath
