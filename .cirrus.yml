@@ -12,7 +12,7 @@ build_task:
     - openal="-DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/AL -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib"
     - mkdir build && cd build
     - export OPENALDIR="/usr/local/opt/openal-soft/"
-    - cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off ..
+    - cmake -DCMAKE_INSTALL_PREFIX=iprefix -DBIN_DIR="$CIRRUS_WORKING_DIR" $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off ..
 
   build_script:
     - cd build
@@ -25,7 +25,7 @@ build_task:
     - true # noop, try real testing on this platform later
 
   pack_artifacts:
-    - path: /Applications/GemRB.app # unfortunately we can't set the resulting name dynamically
+    - path: "$CIRRUS_WORKING_DIR/GemRB.app" # unfortunately we can't set the resulting artifact name dynamically
 
 publish_task:
   only_if: $CIRRUS_BRANCH == 'master' && $CIRRUS_REPO_OWNER == 'gemrb'
