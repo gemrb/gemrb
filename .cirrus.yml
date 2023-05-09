@@ -25,7 +25,7 @@ build_task:
     - true # noop, try real testing on this platform later
 
   pack_artifacts:
-    - path: "$CIRRUS_WORKING_DIR/GemRB.app" # unfortunately we can't set the resulting artifact name dynamically
+    - path: "GemRB.app" # unfortunately we can't set the resulting artifact name dynamically
 
 publish_task:
   only_if: $CIRRUS_BRANCH == 'master' && $CIRRUS_REPO_OWNER == 'gemrb'
