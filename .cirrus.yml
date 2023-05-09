@@ -1,5 +1,5 @@
 macos_instance:
-  image: ghcr.io/cirruslabs/macos-ventura-base:latest
+  image: ghcr.io/cirruslabs/macos-ventura-xcode:14.3
 
 env:
   CIRRUS_CLONE_DEPTH: 1
