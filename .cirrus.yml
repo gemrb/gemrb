@@ -3,6 +3,7 @@ macos_instance:
 
 env:
   CIRRUS_CLONE_DEPTH: 1
+  SSHKEY: ENCRYPTED[!c6a24980159e845aad3a28f4e25f7c75eab76e7e1c58a1f0e700dfa582f178d4e14856ca70b6802d3aa1a592283f3062!]
 
 build_task:
   brew_script: brew install sdl2 openal-soft sdl2_mixer libpng libvorbis openssh
@@ -24,25 +25,20 @@ build_task:
   test_script:
     - true # noop, try real testing on this platform later
 
-  pack_artifacts:
-    - path: "GemRB.app" # unfortunately we can't set the resulting artifact name dynamically
-
-publish_task:
-  only_if: $CIRRUS_BRANCH == 'master' && $CIRRUS_REPO_OWNER == 'gemrb'
-  depends_on:
-    - build
-  env:
-    SSHKEY: ENCRYPTED[!c6a24980159e845aad3a28f4e25f7c75eab76e7e1c58a1f0e700dfa582f178d4e14856ca70b6802d3aa1a592283f3062!]
-
-  send_script:
+  publish_script:
+    - if [[ $CIRRUS_BRANCH != 'master' || $CIRRUS_REPO_OWNER != 'gemrb' ]]; then exit 0; fi
     - # generate filename
     - # there are no tags, so improvise
+    - ls; ls build
     - v2=$CIRRUS_CHANGE_IN_REPO
     - if [[ -n CIRRUS_TAG ]]; then v2=$CIRRUS_TAG; fi
     - version=$({ date +%F; echo $v2; } | tr -d '\n') || exit 14
-    - filepath="Apple/ARM64/gemrb-$version.zip"
+    - file="gemrb-$version.tar.bz2"
+    - # pack
+    - tarPath="$CIRRUS_WORKING_DIR/GemRB.app"
+    - tar cjf "$file" "$tarPath"
     - # unpack ssh key
     - echo $SSHKEY > testing/id_travissfbot.av
-    - # down & upload
-    - wget https://api.cirrus-ci.com/v1/artifact/build/$CIRRUS_BUILD_ID/build/pack.zip
-    - scp -v -oStrictHostKeyChecking=no -i testing/id_travissfbot.av pack.zip gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath
+    - # upload
+    - filepath="Apple/ARM64/$file"
+    - scp -v -oStrictHostKeyChecking=no -i testing/id_travissfbot.av "$file" gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath
