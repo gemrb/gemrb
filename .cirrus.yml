@@ -3,7 +3,7 @@ macos_instance:
 
 env:
   CIRRUS_CLONE_DEPTH: 1
-  SSHKEY: ENCRYPTED[!c6a24980159e845aad3a28f4e25f7c75eab76e7e1c58a1f0e700dfa582f178d4e14856ca70b6802d3aa1a592283f3062!]
+  SSHKEY: ENCRYPTED[!55736b62f38817758b30fa42d741a6287a946d9201398343963b140be4e47df5658aa06523db4193329c70a0dfc17672!]
 
 build_task:
   brew_script: brew install sdl2 openal-soft sdl2_mixer libpng libvorbis openssh
@@ -34,10 +34,10 @@ build_task:
     - version=$({ date +%F; echo "-$v2"; } | tr -d '\n') || exit 14
     - file="gemrb-$version.zip"
     - # pack
-    - zip -r "$file" "$CIRRUS_WORKING_DIR/GemRB.app"
+    - zip -q -r "$file" "$CIRRUS_WORKING_DIR/GemRB.app"
     - # unpack ssh key
     - echo "$SSHKEY" > testing/id_travissfbot.av
     - chmod 600 testing/id_travissfbot.av
     - # upload
     - filepath="Apple/ARM64/$file"
-    - scp -v -oStrictHostKeyChecking=no -oHostKeyAlgorithms=+rsa-sha2-256 -oPubkeyAcceptedKeyTypes=+rsa-sha2-256 -i testing/id_travissfbot.av "$file" "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath"
+    - scp -vvv -oStrictHostKeyChecking=no -i testing/id_travissfbot.av "$file" "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath"
