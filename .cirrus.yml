@@ -29,17 +29,15 @@ build_task:
     - if [[ $CIRRUS_BRANCH != 'master' || $CIRRUS_REPO_OWNER != 'gemrb' ]]; then exit 0; fi
     - # generate filename
     - # there are no tags, so improvise
-    - echo $CIRRUS_WORKING_DIR; ls $CIRRUS_WORKING_DIR
-    - v2=$CIRRUS_CHANGE_IN_REPO
-    - if [[ -n CIRRUS_TAG ]]; then v2=$CIRRUS_TAG; fi
-    - version=$({ date +%F; echo $v2; } | tr -d '\n') || exit 14
-    - file="gemrb-$version.tar.bz2"
+    - v2=${CIRRUS_CHANGE_IN_REPO:0:8}
+    - if [[ -n $CIRRUS_TAG ]]; then v2=$CIRRUS_TAG; fi
+    - version=$({ date +%F; echo "-$v2"; } | tr -d '\n') || exit 14
+    - file="gemrb-$version.zip"
     - # pack
-    - tarPath="$CIRRUS_WORKING_DIR/GemRB.app"
-    - tar cjf "$file" "$tarPath"
+    - zip -r "$file" "$CIRRUS_WORKING_DIR/GemRB.app"
     - # unpack ssh key
-    - echo $SSHKEY > testing/id_travissfbot.av
+    - echo "$SSHKEY" > testing/id_travissfbot.av
     - chmod 600 testing/id_travissfbot.av
     - # upload
     - filepath="Apple/ARM64/$file"
-    - scp -v -oStrictHostKeyChecking=no -i testing/id_travissfbot.av "$file" gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath
+    - scp -v -oStrictHostKeyChecking=no -oPubkeyAcceptedKeyTypes=rsa-sha2-256 -i testing/id_travissfbot.av "$file" "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath"
