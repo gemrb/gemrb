@@ -22,13 +22,15 @@ build_task:
     - make install
 
   test_script:
-    - script: true # noop, try real testing on this platform later
+    - true # noop, try real testing on this platform later
 
   pack_artifacts:
     - path: /Applications/GemRB.app # unfortunately we can't set the resulting name dynamically
 
 publish_task:
   only_if: $CIRRUS_BRANCH == 'master' && $CIRRUS_REPO_OWNER == 'gemrb'
+  depends_on:
+    - build
   env:
     SSHKEY: ENCRYPTED[!c6a24980159e845aad3a28f4e25f7c75eab76e7e1c58a1f0e700dfa582f178d4e14856ca70b6802d3aa1a592283f3062!]
 
