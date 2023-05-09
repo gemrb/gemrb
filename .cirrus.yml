@@ -40,4 +40,4 @@ build_task:
     - chmod 600 testing/id_travissfbot.av
     - # upload
     - filepath="Apple/ARM64/$file"
-    - scp -v -oStrictHostKeyChecking=no -oPubkeyAcceptedKeyTypes=rsa-sha2-256 -i testing/id_travissfbot.av "$file" "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath"
+    - scp -v -oStrictHostKeyChecking=no -oHostKeyAlgorithms=+rsa-sha2-256 -oPubkeyAcceptedKeyTypes=+rsa-sha2-256 -i testing/id_travissfbot.av "$file" "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath"
