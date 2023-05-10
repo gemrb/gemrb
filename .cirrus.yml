@@ -34,9 +34,10 @@ build_task:
     - version=$({ date +%F; echo "-$v2"; } | tr -d '\n') || exit 14
     - file="gemrb-$version.zip"
     - # pack
-    - zip -q -r "$file" "$CIRRUS_WORKING_DIR/GemRB.app"
+    - zip -q -r "$file" "GemRB.app"
     - # unpack ssh key
     - echo "$SSHKEY" > testing/id_travissfbot.av
+    - sed -i '' 's/Y----$/&-/' testing/id_travissfbot.av # either there's a bug or I c/p the incomplete key
     - chmod 600 testing/id_travissfbot.av
     - # upload
     - filepath="Apple/ARM64/$file"
