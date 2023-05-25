@@ -301,7 +301,7 @@ def OpenGameplayOptionsWindow ():
 
 def DisplayHelpTooltipDelay ():
 	HelpTextArea.SetText (18017)
-	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") * TOOLTIP_DELAY_FACTOR/10)
+	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") * TOOLTIP_DELAY_FACTOR//10)
 
 def DisplayHelpMouseScrollingSpeed ():
 	HelpTextArea.SetText (18018)
