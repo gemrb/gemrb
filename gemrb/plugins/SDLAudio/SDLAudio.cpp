@@ -239,7 +239,7 @@ Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
 		return e->chunk;
 	}
 
-	ResourceHolder<SoundMgr> acm = GetResourceHolder<SoundMgr>(ResRef);
+	ResourceHolder<SoundMgr> acm = gamedata->GetResourceHolder<SoundMgr>(ResRef);
 	if (!acm) {
 		Log(ERROR, "SDLAudio", "Failed acm load!");
 		return chunk;
