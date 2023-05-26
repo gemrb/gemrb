@@ -64,7 +64,9 @@ bool p2DAImporter::Open(DataStream* str)
 	};
 	
 	NextLine();
-	colNames = Explode<StringView, cell_t>(StringView(line, line.find_first_not_of(WHITESPACE_STRING)), ' ');
+	size_t end = line.find_first_not_of(WHITESPACE_STRING);
+	if (end != std::string::npos)
+		colNames = Explode<StringView, cell_t>(StringView(line, end), ' ');
 	
 	rowNames.reserve(10);
 	rows.reserve(10);
