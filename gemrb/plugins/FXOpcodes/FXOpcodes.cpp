@@ -1789,16 +1789,16 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	ieDword Trans = fx->Parameter4;
 	if (fx->Parameter3) {
-		if (Trans>=240) {
+		if (Trans >= 240) {
 			fx->Parameter3 = 0;
 		} else {
-			Trans+=4;
+			Trans += 4;
 		}
 	} else {
-		if (Trans<=160) {
+		if (Trans <= 160) {
 			fx->Parameter3 = 1;
 		} else {
-			Trans-=4;
+			Trans -= 4;
 		}
 	}
 	fx->Parameter4 = Trans;
