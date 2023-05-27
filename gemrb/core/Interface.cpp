@@ -4269,7 +4269,7 @@ bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 		return false;
 	}
 
-	displaymsg->DisplayConstantString(HCStrings(ieDword(HCStrings::ApUnusable) + ieDword(flag)), GUIColors::RED);
+	displaymsg->DisplayConstantStringName(HCStrings(ieDword(HCStrings::ApUnusable) + ieDword(flag)), GUIColors::RED, target);
 
 	ieDword centerOnAutoPause = 0;
 	vars->Lookup("Auto Pause Center", centerOnAutoPause);
