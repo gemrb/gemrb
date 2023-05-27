@@ -7130,9 +7130,9 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 		}
 	}
 
-	// only check stone skins if damage type is physical or magical
+	// only check stone skins if damage type is physical
 	// DAMAGE_CRUSHING is 0, so we can't AND with it to check for its presence
-	if (!(damagetype & ~(DAMAGE_PIERCING|DAMAGE_SLASHING|DAMAGE_MISSILE|DAMAGE_MAGIC))) {
+	if (!(damagetype & ~(DAMAGE_PIERCING | DAMAGE_SLASHING | DAMAGE_MISSILE))) {
 		int stoneskins = Modified[IE_STONESKINS];
 		if (stoneskins) {
 			//pst style damage soaking from cloak of warding
