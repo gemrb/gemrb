@@ -1792,13 +1792,13 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (Trans>=240) {
 			fx->Parameter3 = 0;
 		} else {
-			Trans+=16;
+			Trans+=4;
 		}
 	} else {
-		if (Trans<=32) {
+		if (Trans<=160) {
 			fx->Parameter3 = 1;
 		} else {
-			Trans-=16;
+			Trans-=4;
 		}
 	}
 	fx->Parameter4 = Trans;
