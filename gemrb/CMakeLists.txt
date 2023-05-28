@@ -71,6 +71,9 @@ IF(APPLE) #application bundle generation
 		
 		# change the "install name" of the copied SDL
 		ADD_CUSTOM_COMMAND(TARGET gemrb PRE_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@loader_path/../Frameworks/${SDL_BASENAME}" "${SDL_LIB}")
+		IF(USE_SDLMIXER)
+			FILE(COPY "${SDL_FULL_PATH}/../libSDL2_mixer.dylib" DESTINATION ${BUNDLE_FRAMEWORK_PATH} FOLLOW_SYMLINK_CHAIN FILE_PERMISSIONS OWNER_READ OWNER_WRITE)
+		ENDIF()
 	ELSE()
 		SET(SDL_LIB "${SDL2_LIBDIR}")
 	ENDIF()
