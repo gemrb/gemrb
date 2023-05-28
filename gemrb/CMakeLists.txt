@@ -64,7 +64,9 @@ IF(APPLE) #application bundle generation
 	
 	
 	IF(NOT SDL_BASENAME MATCHES ".framework")
-		SET(SDL_BASENAME "libSDL2.dylib")
+		message(STATUS "Detected SDL name: ${SDL_BASENAME}")
+		file(GLOB SDL_BASENAME RELATIVE "${SDL2_LIBDIR}" "${SDL2_LIBDIR}/libSDL2*.dylib")
+		message(STATUS "Detected SDL name: ${SDL_BASENAME}")
 		SET(SDL_LIB "${SDL2_LIBDIR}/${SDL_BASENAME}")
 		get_filename_component(SDL_FULL_PATH "${SDL_LIB}" REALPATH)
 		FILE(COPY ${SDL_FULL_PATH} DESTINATION ${BUNDLE_FRAMEWORK_PATH} FILE_PERMISSIONS OWNER_READ OWNER_WRITE)
