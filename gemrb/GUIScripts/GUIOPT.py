@@ -111,15 +111,22 @@ def InitOptionsWindow (Window):
 ToggleOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.ToggleWindow, InitOptionsWindow, None, GUICommonWindows.DefaultWinPos, True)
 OpenOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.OpenWindowOnce, InitOptionsWindow, None, GUICommonWindows.DefaultWinPos, True)
 
-def TrySavingConfiguration():
-	if not GemRB.SaveConfig():
-		print("ARGH, could not write config to disk!!")
-
 ###################################################
 
-def CloseVideoOptionsWindow ():
-	GemRB.GetView("SUB_WIN", 0).Close()
-	TrySavingConfiguration()
+def SaveSettings(Window, settings):
+	# volume sliders are multiplers, so apply thay before commition
+	volumes = ['Volume Ambients', 'Volume SFX',
+				'Volume Voices', 'Volume Music',
+				'Volume Movie'];
+				
+	for var in volumes:
+		val = Window.GetVar(var)
+		if val is not None:
+			Window.SetVar(var, val * GemRB.GetVar(var))
+				
+	Window.StoreGlobalVariables(settings)
+	GemRB.SaveConfig()
+	Window.Close()
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
@@ -130,9 +137,15 @@ def OpenVideoOptionsWindow ():
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('VideoOptions', Window, 33, 18038)
+	
+	settings = ['Brightness Correction', 'Gamma Correction',
+			'BitsPerPixel', 'Full Screen', 'Translucent Shadows',
+			'SoftMirrorBlt', 'SoftSrcKeyBlt', 'SoftBltFast'];
+			
+	Window.LoadGlobalVariables(settings)
 
-	GUIOPTControls.OptDone (CloseVideoOptionsWindow, Window, 21)
-	GUIOPTControls.OptCancel (CloseVideoOptionsWindow, Window, 32)
+	GUIOPTControls.OptDone (lambda: SaveSettings(Window, settings), Window, 21)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 32)
 
 	GUIOPTControls.OptSlider (18038, 17203, HelpTextArea, Window, 3, 35, 17129, 'Brightness Correction', DisplayHelpBrightness, 4)
 	GUIOPTControls.OptSlider (18038, 17204, HelpTextArea, Window, 22, 36, 17128, 'Gamma Correction', DisplayHelpContrast)
@@ -179,10 +192,6 @@ def SetGfxCorrection ():
 
 ###################################################
 
-def CloseAudioOptionsWindow ():
-	GemRB.GetView("SUB_WIN", 0).Close()
-	TrySavingConfiguration()
-
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
 	global HelpTextArea
@@ -191,9 +200,15 @@ def OpenAudioOptionsWindow ():
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea = GUIOPTControls.OptHelpText ('AudioOptions', Window, 14, 18040)
+	
+	settings = ['Volume Ambients', 'Volume SFX',
+			'Volume Voices', 'Volume Music',
+			'Volume Movie', 'Environmental Audio'];
+			
+	Window.LoadGlobalVariables(settings)
 
-	GUIOPTControls.OptDone (CloseAudioOptionsWindow, Window, 24)
-	GUIOPTControls.OptCancel (CloseAudioOptionsWindow, Window, 25)
+	GUIOPTControls.OptDone (lambda: SaveSettings(Window, settings), Window, 24)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 25)
 	GUIOPTControls.OptButton (OpenCharacterSoundsWindow, Window, 13, 17778)
 
 	GUIOPTControls.OptSlider (18040, 18008, HelpTextArea, Window, 1, 16, 16514, 'Volume Ambients', DisplayHelpAmbientVolume, 10)
@@ -226,8 +241,14 @@ def OpenCharacterSoundsWindow ():
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
+	
+	settings = ['Subtitles', 'Attack Sounds',
+			'Footsteps', 'Command Sounds Frequency',
+			'Selection Sounds Frequency'];
+			
+	Window.LoadGlobalVariables(settings)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 24)
+	GUIOPTControls.OptDone (SaveSettings(Window, settings), Window, 24)
 	GUIOPTControls.OptCancel (Window.Close, Window, 25)
 
 	GUIOPTControls.OptCheckbox (18041, 18015, HelpTextArea2, Window, 5, 20, 17138, 'Subtitles')
@@ -252,12 +273,6 @@ def DisplayHelpSelectionSounds ():
 
 ###################################################
 
-def CloseGameplayOptionsWindow ():
-	# FIXME: don't need to do anything, since we save stuff immediately
-	# ergo canceling does not work
-	GemRB.GetView("SUB_WIN", 0).Close()
-	TrySavingConfiguration()
-
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
 	global HelpTextArea
@@ -268,9 +283,16 @@ def OpenGameplayOptionsWindow ():
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 40, 18042)
+	
+	settings = ['Tooltips', 'Mouse Scroll Speed',
+			'Keyboard Scroll Speed', 'Difficulty Level',
+			'Always Dither', 'Gore', 'Infravision',
+			'Weather', 'Heal Party on Rest', 'Maximum HP'];
+			
+	Window.LoadGlobalVariables(settings)
 
-	GUIOPTControls.OptDone (CloseGameplayOptionsWindow, Window, 7)
-	GUIOPTControls.OptCancel (CloseGameplayOptionsWindow, Window, 20)
+	GUIOPTControls.OptDone (lambda: SaveSettings(Window, settings), Window, 7)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 20)
 
 	GUIOPTControls.OptSlider (18042, 18017, HelpTextArea, Window, 1, 21, 17143, 'Tooltips', DisplayHelpTooltipDelay, 10)
 	GUIOPTControls.OptSlider (18042, 18018, HelpTextArea, Window, 2, 22, 17144, 'Mouse Scroll Speed', DisplayHelpMouseScrollingSpeed, 5)
@@ -326,8 +348,12 @@ def OpenFeedbackOptionsWindow ():
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 28, 18043)
 
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
+	
+	settings = ['Circle Feedback', 'Locator Feedback Level', 'Effect Text Level'];
+			
+	Window.LoadGlobalVariables(settings)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 26)
+	GUIOPTControls.OptDone (lambda: SaveSettings(Window, settings), Window, 26)
 	GUIOPTControls.OptCancel (Window.Close, Window, 27)
 
 	GUIOPTControls.OptSlider (18043, 18024, HelpTextArea2, Window, 8, 30, 13688, 'Circle Feedback', DisplayHelpMarkerFeedback)
@@ -364,8 +390,12 @@ def OpenAutopauseOptionsWindow ():
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
+	
+	settings = ['Auto Pause State', 'Auto Pause Center'];
+			
+	Window.LoadGlobalVariables(settings)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 11)
+	GUIOPTControls.OptDone (lambda: SaveSettings(Window, settings), Window, 11)
 	GUIOPTControls.OptCancel (Window.Close, Window, 14)
 
 	# checkboxes OR the values if they associate to the same variable

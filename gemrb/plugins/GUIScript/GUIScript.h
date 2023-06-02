@@ -27,7 +27,7 @@
 
 namespace GemRB {
 
-class Control;
+class View;
 
 enum {
    SV_BPP,
@@ -57,18 +57,21 @@ public:
 	/** Load Script */
 	bool LoadScript(const std::string& filename) override;
 	/** Run Function */
-	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
+	Parameter RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
+
+	PyObject *RunPyFunction(const char* moduleName, const char* fname, const FunctionParameters& params, bool report_error = true);
+	PyObject *RunPyFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 	/** Exec a single File */
 	bool ExecFile(const char* file);
 	/** Exec a single String */
 	bool ExecString(const std::string &string, bool feedback=false) override;
-	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
-	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);
-	PyObject* ConstructObject(const char* pyclassname, ScriptingId id);
-	PyObject* ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
+	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*) const;
+	PyObject* ConstructObject(const char* pyclassname, ScriptingId id) const;
+	PyObject* ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs = nullptr) const;
 	
 	const ScriptingRefBase* GetScriptingRef(PyObject* obj) const;
+	void AssignViewAttributes(PyObject* obj, View* view) const;
 };
 
 extern GUIScript *gs;

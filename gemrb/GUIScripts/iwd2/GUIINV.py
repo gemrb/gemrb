@@ -25,6 +25,8 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import InventoryCommon
+import PaperDoll
+
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -45,6 +47,7 @@ def InitInventoryWindow (Window):
 
 	Window.AddAlias("WIN_INV")
 	InventoryWindow = Window
+	InventoryWindow.SetAction(RefreshInventoryWindow, ACTION_WINDOW_FOCUS_GAINED)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
@@ -55,27 +58,32 @@ def InitInventoryWindow (Window):
 		Button = Window.GetControl (cid)
 		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
 		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
+		
+	def SelectColor(stat):
+		pc = GemRB.GetVar("SELECTED_PC")
+		Picker = PaperDoll.SelectColorForPC(stat, pc, "GUIINV")
+		Picker.SetAction (lambda: GemRB.SetPlayerStat(pc, stat, Picker.GetVar("PickedColor")), ACTION_WINDOW_CLOSED)
 
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MajorPress)
+	Button.OnPress (lambda: SelectColor(IE_MAJOR_COLOR))
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MinorPress)
+	Button.OnPress (lambda: SelectColor(IE_MINOR_COLOR))
 	Button.SetTooltip (12008)
 
 	#hair & skin color
 	Button = Window.GetControl (82)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.HairPress)
+	Button.OnPress (lambda: SelectColor(IE_HAIR_COLOR))
 	Button.SetTooltip (37560)
 
 	Button = Window.GetControl (83)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.SkinPress)
+	Button.OnPress (lambda: SelectColor(IE_SKIN_COLOR))
 	Button.SetTooltip (37559)
 
 	# paperdoll
@@ -133,7 +141,7 @@ def InitInventoryWindow (Window):
 	return
 
 def ChangeWeaponPressed ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Equipped = GemRB.GetVar ("Equipped")
 	GemRB.SetEquippedQuickSlot (pc, Equipped, -1)
 	return
@@ -143,7 +151,7 @@ def UpdateInventoryWindow (Window = None):
 	if Window == None:
 		Window = GemRB.GetView("WIN_INV")
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
 	Count = Container['ItemCount']
@@ -169,7 +177,7 @@ OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommon
 def RefreshInventoryWindow ():
 	Window = InventoryWindow
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# name
 	Label = Window.GetControl (0x10000032)
@@ -178,7 +186,7 @@ def RefreshInventoryWindow ():
 	# paperdoll
 	Button = Window.GetControl (50)
 	Button.SetFlags (IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
-	pdoll = GUICommonWindows.GetActorPaperDoll (pc)+"G11"
+	pdoll = PaperDoll.GetActorPaperDoll (pc)+"G11"
 	if GemRB.HasResource (pdoll, RES_BAM):
 		pal = [GemRB.GetPlayerStat (pc, c) for c in range(IE_METAL_COLOR, IE_HAIR_COLOR + 1)]
 		Button.SetAnimation (None) # force reset

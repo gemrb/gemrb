@@ -57,7 +57,7 @@ def UpdatePriestWindow (Window):
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	spelltype = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, spelltype, level)
@@ -183,7 +183,7 @@ def OpenPriestSpellInfoWindow ():
 
 
 def OnPriestMemorizeSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 
@@ -223,7 +223,7 @@ def OpenPriestSpellUnmemorizeWindow (btn):
 
 
 def OnPriestUnmemorizeSpell (btn):
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 

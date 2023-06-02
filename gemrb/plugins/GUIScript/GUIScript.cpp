@@ -194,8 +194,6 @@ static RETURN* GetView(PyObject* obj) {
 	return ScriptingRefCast<RETURN>(gs->GetScriptingRef(obj));
 }
 
-static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref);
-
 static ieStrRef GetCreatureStrRef(const Actor *actor, size_t Str)
 {
 	return actor->StrRefs[Str];
@@ -556,7 +554,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	Window* win = core->LoadWindow(WindowID, ScriptingGroup_t(ref), pos);
 	ABORT_IF_NULL(win);
 	win->SetFlags(Window::AlphaChannel, BitOp::OR);
-	PyObject* pyWin = ConstructObjectForScriptableView( win->GetScriptingRef() );
+	PyObject* pyWin = gs->ConstructObjectForScriptable(win->GetScriptingRef());
 	return pyWin;
 }
 
@@ -1098,7 +1096,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 			// plain old view
 			if (id != ScriptingId(-1)) {
 				const ViewScriptingRef* newref = subView->AssignScriptingRef(id, "VIEW");
-				return ConstructObjectForScriptableView(newref);
+				return gs->ConstructObjectForScriptable(newref);
 			}
 			// return the ref we already have
 			Py_IncRef(pySubview);
@@ -1109,12 +1107,12 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 			}
 			// replace the ref with a new one and return it
 			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), id, cref);
-			return ConstructObjectForScriptableView(newref);
+			return gs->ConstructObjectForScriptable(newref);
 		} else if (oldwin == NULL || id != ScriptingId(-1)) {
 			// create a new reference and return it
 			ScriptingId sid = (id == ScriptingId(-1)) ? cref->Id : id;
 			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
-			return ConstructObjectForScriptableView(newref);
+			return gs->ConstructObjectForScriptable(newref);
 		} else {
 			// return the ref we already have
 			Py_IncRef(pySubview);
@@ -1213,7 +1211,7 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 
 	if (view) {
 		// return retView->GetScriptingRef() so that Python objects compare correctly (instread of returning the alias ref)
-		return ConstructObjectForScriptableView(view->GetScriptingRef());
+		return gs->ConstructObjectForScriptable(view->GetScriptingRef());
 	}
 	Py_RETURN_NONE;
 }
@@ -1931,12 +1929,7 @@ static PyObject* GemRB_Control_SetValue(PyObject* self, PyObject* args)
 	}
 	val = ctrl->SetValue(val);
 
-	if (val == Control::INVALID_VALUE) {
-		PyObject_SetAttrString(self, "Value", Py_None);
-	} else {
-		PyObject_SetAttrString(self, "Value", DecRef(PyLong_FromUnsignedLong, val));
-	}
-
+	gs->AssignViewAttributes(self, ctrl);
 	Py_RETURN_NONE;
 }
 
@@ -1984,25 +1977,79 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	}
 	
 	Control::varname_t varname = Control::varname_t(VarName);
-	Control::value_t realVal = 0;
-	core->GetDictionary()->Lookup(varname, realVal);
-
-	ctrl->BindDictVariable(varname, val, Control::ValueRange(min, max));
-	// restore variable for sliders, since it's only a multiplier for them
-	if (ctrl->ControlType == IE_GUI_SLIDER) {
-		ctrl->UpdateState(realVal);
-		core->GetDictionary()->SetAt(varname, val * static_cast<Slider*>(ctrl)->GetPosition());
+	if (ctrl->BindDictVariable(varname, val, Control::ValueRange(min, max))) {
+		gs->AssignViewAttributes(self, ctrl);
+		Py_RETURN_TRUE;
 	}
+	
+	Py_RETURN_FALSE;
+}
 
-	// refresh python copies
-	val = ctrl->GetValue();
-	PyObject_SetAttrString(self, "VarName", DecRef(PyString_FromStringView, ctrl->DictVariable()));
+PyDoc_STRVAR( GemRB_Window_GetVar__doc,
+"===== Window_GetVar =====\n\
+\n\
+**Prototype:** GWindow.GetVar (var)\n\
+\n\
+**Metaclass Prototype:** GetVar (var)\n\
+\n\
+**Description:** Get the value of a window variable.\n\
+Variables are set as a result of calling SetVarAssoc on a GControl.\n\
+\n\
+**Parameters:**\n\
+  * var - the string name of the variable\n\
+\n\
+**Return value:** a Control::value_t representing the value of the variable."
+);
+
+static PyObject* GemRB_Window_GetVar(PyObject* self, PyObject* args)
+{
+	PyObject* varname = nullptr;
+	PARSE_ARGS(args, "OO", &self, &varname);
+
+	const Window* win = GetView<Window>(self);
+	ABORT_IF_NULL(win);
+	
+	Control::value_t val = win->GetDictVariable(VarFromPy(varname));
 	if (val == Control::INVALID_VALUE) {
-		PyObject_SetAttrString(self, "Value", Py_None);
-	} else {
-		PyObject_SetAttrString(self, "Value", DecRef(PyLong_FromUnsignedLong, val));
+		Py_RETURN_NONE;
+	}
+	return PyLong_FromUnsignedLong(val);
+}
+
+PyDoc_STRVAR( GemRB_Window_SetVar__doc,
+"===== Window_SetVar =====\n\
+\n\
+**Prototype:** GWindow.SetVar (var, val)\n\
+\n\
+**Metaclass Prototype:** SetVar (var, val)\n\
+\n\
+**Description:** Set the value of a window variable.\n\
+Variables are set as a result of calling SetVarAssoc on a GControl.\n\
+\n\
+**Parameters:**\n\
+  * var - the string name of the variable\n\
+  * val - the value to assign the variable\n\
+\n\
+**Return value:** N/A"
+);
+
+static PyObject* GemRB_Window_SetVar(PyObject* self, PyObject* args)
+{
+	PyObject* varname = nullptr;
+	PyObject* pynum = nullptr;
+	PARSE_ARGS(args, "OOO", &self, &varname, &pynum);
+	
+	Control::value_t val = Control::INVALID_VALUE;
+	if (PyLong_Check(pynum)) {
+		val = Control::value_t(PyLong_AsUnsignedLongMask(pynum));
+	} else if (pynum != Py_None) {
+		return RuntimeError("Expected a numeric or None type.");
 	}
 
+	Window* win = GetView<Window>(self);
+	ABORT_IF_NULL(win);
+	
+	win->SetDictVariable(VarFromPy(varname), val);
 	Py_RETURN_NONE;
 }
 
@@ -2079,7 +2126,7 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 			assert(delref);
 			view->RemoveFromSuperview();
 
-			return ConstructObjectForScriptableView(delref);
+			return gs->ConstructObjectForScriptable(delref);
 		}
 	}
 	return AttributeError("Invalid view");
@@ -2257,7 +2304,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		view->AssignScriptingRef(id, "VIEW");
 	}
 
-	return ConstructObjectForScriptableView(view->GetScriptingRef());
+	return gs->ConstructObjectForScriptable(view->GetScriptingRef());
 }
 
 PyDoc_STRVAR( GemRB_View_SetEventProxy__doc,
@@ -3623,17 +3670,17 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetPLT__doc,
 "===== Button_SetPLT =====\n\
 \n\
-**Prototype:** GemRB.SetButtonPLT (WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
+**Prototype:** GemRB.SetButtonPLT (WindowIndex, ControlIndex, PLTResRef, ColorDict[, type])\n\
 \n\
-**Metaclass Prototype:** SetPLT (PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
+**Metaclass Prototype:** SetPLT (PLTResRef, ColorDict[, type])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a PLT file. \n\
-Sets up the palette based on the eight given gradient colors.\n\
+Sets up the palette based on the colors contained in ColorDict, where the key is the stat coresponding to the color.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
   * PLTResRef - the name of the picture (a .plt resref)\n\
-  * col1-8 - color gradients\n\
+  * ColorDict - Dictionary of color stats mapped to indices in the global palette.\n\
   * type - the byte to use from the gradients:\n\
     * 0 Body (robe or armour)\n\
     * 1 Weapon\
@@ -3647,16 +3694,11 @@ Sets up the palette based on the eight given gradient colors.\n\
 
 static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 {
-	ieDword col[8];
+	PyObject* colors;
 	int type = 0;
 	PyObject* pyref;
 
-	memset(col,-1,sizeof(col));
-	if (!PyArg_ParseTuple( args, "OOiiiiiiii|i", &self,
-			&pyref, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
-			&(col[4]), &(col[5]), &(col[6]), &(col[7]), &type) ) {
-		return NULL;
-	}
+	PARSE_ARGS(args, "OOO|i", &self, &pyref, &colors, &type);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
@@ -3667,6 +3709,15 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	if (ResRef.IsEmpty() || IsStar(ResRef)) {
 		btn->SetPicture( NULL );
 		Py_RETURN_NONE;
+	}
+	
+	ieDword col[8] {ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1)};
+	Actor::stat_t keys[8] {IE_METAL_COLOR, IE_MINOR_COLOR, IE_MAJOR_COLOR, IE_SKIN_COLOR, IE_LEATHER_COLOR, IE_ARMOR_COLOR, IE_HAIR_COLOR};
+	for (int i = 0; i < 8; ++i) {
+		PyObject* obj = PyDict_GetItem(colors, PyLong_FromLong(keys[i]));
+		if (obj) {
+			col[i] = ieDword(PyLong_AsLong(obj));
+		}
 	}
 
 	Holder<Sprite2D> Picture;
@@ -4146,10 +4197,17 @@ core, these are described in different places:\n\
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
-	unsigned long value;
-	PARSE_ARGS(args, "Ok", &Variable, &value);
+	PyObject* pynum = nullptr;
+	PARSE_ARGS(args, "OO", &Variable, &pynum);
+	
+	Control::value_t val = Control::INVALID_VALUE;
+	if (PyLong_Check(pynum)) {
+		val = Control::value_t(PyLong_AsUnsignedLongMask(pynum));
+	} else if (pynum != Py_None) {
+		return RuntimeError("Expected a numeric or None type.");
+	}
 
-	core->GetDictionary()->SetAt(PyString_AsStringView(Variable), (ieDword) value);
+	core->GetDictionary()->SetAt(PyString_AsStringView(Variable), val);
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
@@ -4239,15 +4297,12 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
 	ieDword value;
-	PARSE_ARGS( args,  "O", &Variable );
+	PARSE_ARGS(args, "O", &Variable);
 
-	if (!core->GetDictionary()->Lookup(PyString_AsStringView(Variable), value)) {
-		return PyLong_FromLong(0);
+	if (!core->GetDictionary()->Lookup(PyString_AsStringView(Variable), value) || value == Control::INVALID_VALUE) {
+		Py_RETURN_NONE;
 	}
 
-	// A PyLong is internally (probably) a long. Since we sometimes set
-	// variables to -1, cast value to a signed integer first, so it is
-	// sign-extended into a long if long is larger than int.
 	return PyLong_FromLong((int)value);
 }
 
@@ -6011,9 +6066,9 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 
 	const Actor* MyActor = game->FindPC(PlayerSlot);
 	if (!MyActor) {
-		return PyLong_FromLong(0);
+		Py_RETURN_FALSE;
 	}
-	return PyLong_FromLong(MyActor->IsSelected());
+	return PyBool_FromLong(MyActor->IsSelected());
 }
 
 
@@ -6043,43 +6098,6 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 	game->SelectPCSingle( index );
 
 	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
-"===== GameGetSelectedPCSingle =====\n\
-\n\
-**Prototype:** GemRB.GameGetSelectedPCSingle (flag)\n\
-\n\
-**Description:** If flag is 0 or omitted, then returns currently active pc \n\
-in non-walk environment (i.e. in shops, inventory, ...).  If flag is set to \n\
-non-zero, then returns the currently speaking PC. \n\
-If there is no such PC, then returns 0.\n\
-\n\
-**Parameters:**\n\
-  * flag - 0/1\n\
-\n\
-**Return value:** PartyID (1-10)\n\
-\n\
-**See also:** [GameSelectPC](GameSelectPC.md), [GameSelectPCSingle](GameSelectPCSingle.md)"
-);
-
-static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
-{
-	int flag = 0;
-	PARSE_ARGS( args,  "|i", &flag );
-	GET_GAME();
-
-	if (flag) {
-		GET_GAMECONTROL();
-
-		const Actor *ac = gc->dialoghandler->GetSpeaker();
-		int ret = 0;
-		if (ac) {
-			ret = ac->InParty;
-		}
-		return PyLong_FromLong(ret);
-	}
-	return PyLong_FromLong(game->GetSelectedPCSingle());
 }
 
 PyDoc_STRVAR( GemRB_GameGetFirstSelectedPC__doc,
@@ -6795,6 +6813,12 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	core->SetCurrentStore(ResRefFromPy(StoreResRef), 0);
 
 	core->SetEventFlag(EF_OPENSTORE);
+	
+	const Actor *actor = core->GetFirstSelectedPC(false);
+	if (actor) {
+		core->GetDictionary()->SetAt("BARTER_PC", actor->InParty);
+	}
+	
 	Py_RETURN_NONE;
 }
 
@@ -6818,6 +6842,7 @@ static PyObject* GemRB_LeaveStore(PyObject * /*self*/, PyObject* /*args*/)
 	core->CloseCurrentStore();
 	core->ResetEventFlag(EF_OPENSTORE);
 	core->SetEventFlag(EF_PORTRAIT);
+	core->GetDictionary()->SetAt("BARTER_PC", ieDword(-1));
 	Py_RETURN_NONE;
 }
 
@@ -10242,18 +10267,14 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	/* see if the special function exists */
 	if (!callback.empty()) {
 		std::string fname = fmt::format("Check_{}", callback);
-		PyObject* param = PyTuple_New( 11 );
-		PyTuple_SetItem(param, 0, PyLong_FromLong(v[0]));
+
+		ScriptEngine::FunctionParameters params;
 		for (int i = 3; i < 13; i++) {
-			PyTuple_SetItem(param, i - 2, PyLong_FromLong(v[i]));
+			params.push_back(ScriptEngine::Parameter(v[i]));
 		}
-
-		PyObject *pValue = gs->RunFunction("Feats", fname.c_str(), param);
-
-		/* we created this parameter, now we don't need it*/
-		Py_DECREF( param );
+		
+		PyObject* pValue = gs->RunPyFunction("Feats", fname.c_str(), params);
 		if (pValue) {
-			/* don't think we need any incref */
 			return pValue;
 		}
 		return RuntimeError( "Callback failed" );
@@ -13138,7 +13159,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameGetFirstSelectedPC, METH_NOARGS),
 	METHOD(GameGetFormation, METH_VARARGS),
 	METHOD(GameGetPartyGold, METH_NOARGS),
-	METHOD(GameGetSelectedPCSingle, METH_VARARGS),
 	METHOD(GameIsBeastKnown, METH_VARARGS),
 	METHOD(GameIsPCSelected, METH_VARARGS),
 	METHOD(GamePause, METH_VARARGS),
@@ -13365,6 +13385,8 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_SetupControls, METH_VARARGS),
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
+	METHOD(Window_GetVar, METH_VARARGS),
+	METHOD(Window_SetVar, METH_VARARGS),
 	METHOD(WorldMap_GetDestinationArea, METH_VARARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
@@ -13595,44 +13617,91 @@ bool GUIScript::LoadScript(const std::string& filename)
 	return true;
 }
 
-bool GUIScript::RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error)
+PyObject* ParamToPython(const GUIScript::Parameter& p)
 {
-	size_t size = params.size();
-	PyObject* pyParams = PyTuple_New(size);
-
-	for (size_t i = 0; i < size; ++i) {
-		const Parameter& p = params[i];
-		const std::type_info& type = p.Type();
-		PyObject* pyParam = NULL; // a "stolen" reference for PyTuple_SetItem
-
-		if (type == typeid(const char*)) {
-			const char* cstring = p.Value<const char*>();
-			pyParam = PyUnicode_FromStringAndSize(cstring, strlen(cstring));
-		} else if (type == typeid(const Point)) {
-			const Point& point = p.Value<const Point>();
-			pyParam = Py_BuildValue("{s:i,s:i}", "x", point.x, "y", point.y);
-		} else if (type == typeid(const ieByte)) {
-			pyParam = PyLong_FromLong(p.Value<const ieByte>());
-		} else if (type == typeid(const int)) {
-			pyParam = PyLong_FromLong(p.Value<const int>());
-		} else if (type == typeid(const ieDword)) {
-			pyParam = PyLong_FromUnsignedLong(p.Value<const ieDword>());
+	const std::type_info& type = p.Type();
+	
+	if (type == typeid(char*)) {
+		return PyString_FromString(p.Value<char*>());
+	} else if (type == typeid(String&)) {
+		return PyString_FromStringObj(p.Value<String>());
+	} else if (type == typeid(std::string&)) {
+		return PyString_FromStringObj(p.Value<std::string>());
+	} else if (type == typeid(int)) {
+		return PyLong_FromLong(p.Value<int>());
+	} else if (type == typeid(Control::value_t)) {
+		Control::value_t val = p.Value<Control::value_t>();
+		if (val == Control::INVALID_VALUE) {
+			Py_RETURN_NONE;
 		} else {
-			// TODO: there are probably other types we should handle, but this is currently everything we are using
-			Log(ERROR, "GUIScript", "Unknown parameter type: {}", type.name());
-			// need to insert a None placeholder so remaining parameters are correct
-			pyParam = Py_None;
-			Py_IncRef(pyParam);
+			return PyLong_FromLong(val);
 		}
-		PyTuple_SetItem(pyParams, i, pyParam);
+	} else if (type == typeid(bool)) {
+		return PyBool_FromLong(p.Value<bool>());
+	} else if (type == typeid(Point)) {
+		const Point& point = p.Value<Point>();
+		return Py_BuildValue("{s:i,s:i}", "x", point.x, "y", point.y);
+	} else if (type == typeid(Region)) {
+		const Region& rgn = p.Value<Region>();
+		return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", rgn.x, "y", rgn.y, "w", rgn.w, "h", rgn.h);
+	} else if (type == typeid(View*)) {
+		const View* view = p.Value<View*>();
+		return gs->ConstructObjectForScriptable(view->GetScriptingRef());
+	} else {
+		Log(ERROR, "GUIScript", "Unknown parameter type: %s", type.name());
+		// need to insert a None placeholder so remaining parameters are correct
+		Py_RETURN_NONE;
 	}
-	bool ret = RunFunction(Modulename, FunctionName, pyParams, report_error);
-	Py_DecRef(pyParams);
+}
+
+GUIScript::Parameter GUIScript::RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error)
+{
+	// convert PyObject to C++ object
+	PyObject* pyret = RunPyFunction(Modulename, FunctionName, params, report_error);
+	Parameter ret; // failure state
+	
+	if (pyret) {
+		if (PyBool_Check(pyret)) {
+			ret = Parameter(bool(PyObject_IsTrue(pyret)));
+		} else if (PyLong_Check(pyret)) {
+			ret = Parameter(PyLong_AsLong(pyret));
+		} else if (PyUnicode_Check(pyret)) {
+			// FIXME: copy of a copy
+			ret = Parameter(*PyString_AsStringObj(pyret));
+		} else if (Py_IsNone(pyret)) {
+			// any python function that doesnt return a value returns None
+			ret = Parameter(pyret);
+		} else {
+			Log(ERROR, "GUIScript", "Unhandled return type in {}::{}", Modulename, FunctionName);
+			// this is a success, but we dont know how to convert it
+			// still needs a value of some kind
+			ret = Parameter(pyret);
+		}
+		Py_DecRef(pyret);
+	}
+
 	return ret;
 }
 
 /* Similar to RunFunction, but with parameters, and doesn't necessarily fail */
-PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionName, PyObject* pArgs, bool report_error)
+PyObject* GUIScript::RunPyFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error)
+{
+	size_t size = params.size();
+	
+	if (size) {
+		auto pyParams = DecRef(PyTuple_New, size);
+
+		for (size_t i = 0; i < size; ++i) {
+			PyObject* pyParam = ParamToPython(params[i]); // a "stolen" reference for PyTuple_SetItem
+			PyTuple_SetItem(pyParams, i, pyParam);
+		}
+		return RunPyFunction(Modulename, FunctionName, pyParams, report_error);
+	} else {
+		return RunPyFunction(Modulename, FunctionName, nullptr, report_error);
+	}
+}
+
+PyObject *GUIScript::RunPyFunction(const char* moduleName, const char* functionName, PyObject* pArgs, bool report_error)
 {
 	if (!Py_IsInitialized()) {
 		return NULL;
@@ -13739,21 +13808,22 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 	PyErr_Clear();
 	return false;
 }
-
-PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
-{
-	if (!ref) return RuntimeError("Cannot construct object with null ref.");
-
-	PyObject* obj = ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
-	if (!obj) return RuntimeError("Failed to construct object");
-	PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromStringView, ref->ScriptingGroup()));
-	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
 	
+void GUIScript::AssignViewAttributes(PyObject* obj, View* view) const
+{
 	static PyObject* controlClass = PyDict_GetItemString(pGUIClasses, "GControl");
 	static PyObject* windowClass = PyDict_GetItemString(pGUIClasses, "GWindow");
 	
+	PyObject_SetAttrString(obj, "Flags", DecRef(PyLong_FromLong, view->Flags()));
+	Window* win = view->GetWindow();
+	if (win) {
+		PyObject* pywin = ConstructObjectForScriptable(win->GetScriptingRef());
+		PyObject_SetAttrString(obj, "Window", pywin);
+		Py_DecRef(pywin);
+	}
+	
 	if (PyObject_IsInstance(obj, controlClass)) {
-		const Control* ctl = ScriptingRefCast<Control>(ref);
+		const Control* ctl = static_cast<Control*>(view);
 		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
 		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromStringView, ctl->DictVariable()));
 		Control::value_t val = ctl->GetValue();
@@ -13763,23 +13833,30 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 			PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, val));
 		}
 	} else if (PyObject_IsInstance(obj, windowClass)) {
-		const Window* win = ScriptingRefCast<Window>(ref);
+		const Window* win = static_cast<Window*>(view);
 		PyObject_SetAttrString(obj, "HasFocus", DecRef(PyBool_FromLong, win->HasFocus()));
+	}
+}
+
+PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref) const
+{
+	if (!ref) return RuntimeError("Cannot construct object with null ref.");
+
+	PyObject* obj = ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
+	if (!obj) return RuntimeError("Failed to construct object");
+	PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromStringView, ref->ScriptingGroup()));
+	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
+	
+	static PyObject* viewClass = PyDict_GetItemString(pGUIClasses, "GView");
+	if (PyObject_IsInstance(obj, viewClass)) {
+		View* view = ScriptingRefCast<View>(ref);
+		AssignViewAttributes(obj, view);
 	}
 	
 	return obj;
 }
 
-static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref)
-{
-	PyObject* pyView = gs->ConstructObjectForScriptable(ref);
-	if (pyView) {
-		PyObject_SetAttrString(pyView, "Flags", DecRef(PyLong_FromLong, ref->GetObject()->Flags()));
-	}
-	return pyView;
-}
-
-PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)
+PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id) const
 {
 	PyObject* kwargs = Py_BuildValue("{s:K}", "ID", id);
 	PyObject* ret = gs->ConstructObject(pyclassname, NULL, kwargs);
@@ -13787,7 +13864,7 @@ PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)
 	return ret;
 }
 
-PyObject* GUIScript::ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs)
+PyObject* GUIScript::ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs) const
 {
 	char classname[_MAX_PATH] = "G";
 	strncat(classname, pyclassname, _MAX_PATH - 2);

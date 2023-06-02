@@ -21,6 +21,8 @@ import GemRB
 import GameCheck
 import GUICommon
 import Portrait
+import PaperDoll
+
 from GUIDefines import *
 from ie_stats import IE_SEX, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
 from ie_restype import RES_WAV
@@ -61,17 +63,15 @@ OldVoiceSet = None
 Gender = None
 
 def OpenCustomizeWindow ():
-	import GUIREC
 	global CustomizeWindow, ScriptsTable, Gender
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
 		Exportable = 1
 	else:
 		Exportable = 0
 
 	ScriptsTable = GemRB.LoadTable ("SCRPDESC")
-	GUIREC.ColorTable = GemRB.LoadTable ("CLOWNCOL")
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
 	CustomizeWindow = GemRB.LoadWindow (17)
 
@@ -88,7 +88,7 @@ def OpenCustomizeWindow ():
 	if not GameCheck.IsIWD2():
 		ColorButton = CustomizeWindow.GetControl (2)
 		ColorButton.SetText (10646)
-		ColorButton.OnPress (GUIREC.OpenColorWindow)
+		ColorButton.OnPress (lambda: PaperDoll.OpenPaperDollWindow(pc))
 		if not Exportable:
 			ColorButton.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -159,7 +159,7 @@ def OpenPortraitSelectWindow ():
 	PortraitCustomButton.SetText (17545)
 
 	# get players gender and portrait
-	Pc = GemRB.GameGetSelectedPCSingle ()
+	Pc = GemRB.GetVar("SELECTED_PC")
 	PcPortrait = GemRB.GetPlayerPortrait (Pc, 0)["ResRef"]
 
 	# initialize and set portrait
@@ -171,7 +171,7 @@ def OpenPortraitSelectWindow ():
 	return
 
 def PortraitDonePress ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	# eh, different sizes
 	if GameCheck.IsBG2():
 		GemRB.FillPlayerInfo (pc, Portrait.Name () + "M", Portrait.Name () + "S")
@@ -234,7 +234,7 @@ def OpenCustomPortraitWindow ():
 	return
 
 def CustomPortraitDonePress ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	GemRB.FillPlayerInfo (pc, PortraitList1.QueryText () , PortraitList2.QueryText ())
 	
 	#closing the generic portraits, because we just set a custom one
@@ -294,7 +294,7 @@ def SmallCustomPortrait ():
 def OpenSoundWindow ():
 	global VoiceList, OldVoiceSet
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	OldVoiceSet = GemRB.GetPlayerSound (pc)
 	SubCustomizeWindow = GemRB.LoadWindow (20)
 	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
@@ -336,13 +336,13 @@ def OpenSoundWindow ():
 	return
 
 def CloseSoundWindow ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	GemRB.SetPlayerSound (pc, OldVoiceSet)
 	GemRB.GetView("SUB_WIN", 0).Close()
 	return
 
 def DoneSoundWindow ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	CharSound = VoiceList.QueryText ()
 	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
 	GemRB.SetPlayerSound (pc, CharSound)
@@ -358,7 +358,7 @@ def PlaySoundPressed():
 	if CharSound == "default":
 		SoundSeq = SoundSequence2
 	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		GemRB.SetPlayerSound (pc, CharSound)
@@ -436,7 +436,7 @@ def OpenScriptWindow ():
 
 	ScriptTextArea.SetOptions (list(options.values()))
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	script = GemRB.GetPlayerScript (pc)
 	if script == None:
 		script = "None"
@@ -472,7 +472,7 @@ def OpenScriptWindow ():
 	return
 
 def DoneScriptWindow ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	selected = GemRB.GetVar ("Selected")
 	script = FindScriptFile (selected)
 	GemRB.SetPlayerScript (pc, script)
@@ -485,7 +485,7 @@ def RevertBiography(ta):
 
 	if GameCheck.IsIWD2():
 		BioTable = GemRB.LoadTable ("bios")
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		ClassName = GUICommon.GetClassRowName (pc)
 		BioStrRef = BioTable.GetValue (ClassName, "BIO")
 	else:
@@ -500,7 +500,7 @@ def OpenBiographyEditWindow ():
 	global TextArea
 
 	Changed = 0
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	BioStrRef = GemRB.GetPlayerString (pc, BioStrRefSlot)
 	if BioStrRef != 33347:
 		Changed = 1
@@ -552,7 +552,7 @@ def ClearBiography(ta):
 	global BioStrRef
 	global RevertButton
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	#pc is 1 based
 	BioStrRef = 62015+pc
 	ta.SetText ("")
@@ -563,7 +563,7 @@ def ClearBiography(ta):
 def DoneBiographyWindow (ta):
 	global BioStrRef
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	if BioStrRef != 33347:
 		GemRB.CreateString (BioStrRef, ta.QueryText())
 	GemRB.SetPlayerString (pc, BioStrRefSlot, BioStrRef)
@@ -574,7 +574,7 @@ def OpenBiographyWindow ():
 	BiographyWindow = GemRB.LoadWindow (12)
 
 	TextArea = BiographyWindow.GetControl (0)
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	if GameCheck.IsBG1 () and GemRB.GetPlayerName (pc, 2) == 'none':
 		TextArea.SetText (GetProtagonistBiography (pc))
 	else:
@@ -629,7 +629,7 @@ def OpenExportWindow ():
 
 def ExportDonePress():
 	#save file under name from EditControl
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	GemRB.SaveCharacter (pc, NameField.QueryText ())
 	if ExportWindow:
 		ExportWindow.Close ()

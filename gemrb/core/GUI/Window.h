@@ -33,6 +33,7 @@
 #include "WindowManager.h"
 
 #include <set>
+#include <unordered_map>
 
 namespace GemRB {
 
@@ -143,7 +144,8 @@ public:
 	bool IsReceivingEvents() const override { return true; }
 
 	const VideoBufferPtr& DrawWithoutComposition();
-	void RedrawControls(const Control::varname_t& VarName) const;
+	void SetDictVariable(const Control::varname_t& var, Control::value_t val) noexcept;
+	Control::value_t GetDictVariable(const Control::varname_t& var) const noexcept;
 
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
@@ -159,9 +161,11 @@ public:
 	
 private: // Private attributes
 	using KeyMap = std::map<KeyboardKey, EventMgr::EventCallback>;
+	using ControlDict = std::unordered_map<Control::varname_t, Control::value_t, CstrHashCI<Control::varname_t>>;
 
 	std::set<Control*> Controls;
 	KeyMap HotKeys;
+	ControlDict Dictionary;
 
 	View* focusView = nullptr; // keyboard focus
 	View* trackingView = nullptr; // out of bounds mouse tracking

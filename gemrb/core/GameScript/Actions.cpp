@@ -2185,8 +2185,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		// DestEntryPoint is all zeroes, pst just didn't use it
 		direction = WMPDirection::WEST;
 	}
-	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
-	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );
+	core->GetGUIScriptEngine()->RunFunction("GUIMA", "OpenTravelWindow", direction);
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
 }

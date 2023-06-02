@@ -128,6 +128,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
+	
+	core->GetDictionary()->SetAt("SELECTED_PC", SelectedSingle);
 }
 
 Game::~Game(void)
@@ -541,8 +543,11 @@ bool Game::SelectPCSingle(int index)
 	if (!actor)
 		return false;
 
-	SelectedSingle = index;
-	core->SetEventFlag(EF_SELECTION);
+	if (index != SelectedSingle) {
+		SelectedSingle = index;
+		core->GetDictionary()->SetAt("SELECTED_PC", SelectedSingle);
+		core->SetEventFlag(EF_SELECTION);
+	}
 
 	return true;
 }

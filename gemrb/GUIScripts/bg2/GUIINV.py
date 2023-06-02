@@ -26,6 +26,8 @@ import GUICommon
 import GUICommonWindows
 import CommonTables
 import InventoryCommon
+import PaperDoll
+
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -47,18 +49,23 @@ def InitInventoryWindow (Window):
 		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
 		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 		Button.SetSprites ("STONSLOT",0,0,2,4,3)
+		
+	def SelectColor(stat):
+		pc = GemRB.GetVar("SELECTED_PC")
+		Picker = PaperDoll.SelectColorForPC(stat, pc, "GUIINV")
+		Picker.SetAction (lambda: GemRB.SetPlayerStat(pc, stat, Picker.GetVar("PickedColor")), ACTION_WINDOW_CLOSED)
 
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetSprites ("INVBUT",0,0,1,0,0)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MajorPress)
+	Button.OnPress (lambda: SelectColor(IE_MAJOR_COLOR))
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetSprites ("INVBUT",0,0,1,0,0)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MinorPress)
+	Button.OnPress (lambda: SelectColor(IE_MINOR_COLOR))
 	Button.SetTooltip (12008)
 
 	#portrait
@@ -108,7 +115,7 @@ def UpdateInventoryWindow (Window = None):
 	if Window == None:
 		Window = GemRB.GetView("WIN_INV")
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
 	Count = max (0, Container['ItemCount'] - 4)
@@ -129,7 +136,7 @@ InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 def RefreshInventoryWindow (Window):
 	"""Partial redraw without resetting TopIndex."""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# name
 	Label = Window.GetControl (0x10000032)
@@ -141,58 +148,51 @@ def RefreshInventoryWindow (Window):
 
 	# portrait
 	Button = Window.GetControl (50)
-	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
-	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
-	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
-	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
-	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
+	stats = PaperDoll.ColorStatsFromPC(pc)
 	# disable coloring and equipment for non-humanoid dolls (shapes/morphs, mod additions)
 	# ... which doesn't include ogres and flinds, who are also clown-colored
 	# if one more exception needs to be added, rather externalise this to a new pdolls.2da flags column
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	if (anim_id < 0x5000 or anim_id >= 0x7000 or anim_id == 0x6404) and (anim_id != 0x8000 and anim_id != 0x9000):
-		Color1 = -1
-	Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
-		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
+		stats[IE_METAL_COLOR] = -1
+	Button.SetPLT (PaperDoll.GetActorPaperDoll (pc), stats, 0)
 	# disable equipment for flinds and ogres and Sarevok (Recovery Mod)
 	if anim_id == 0x8000 or anim_id == 0x9000 or anim_id == 0x6404:
-		Color1 = -1
+		stats[IE_METAL_COLOR] = -1
 
 	row = "0x%04X" %anim_id
 	size = CommonTables.Pdolls.GetValue (row, "SIZE")
 
 	# Weapon
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
-	if slot_item and Color1 != -1:
+	if slot_item and stats[IE_METAL_COLOR] != -1:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
-			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
+			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", stats, 1)
 
 	# Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
-	if slot_item and Color1 != -1:
+	if slot_item and stats[IE_METAL_COLOR] != -1:
 		itemname = slot_item["ItemResRef"]
 		item = GemRB.GetItem (itemname)
 		if (item['AnimationType'] != ''):
 			if (GemRB.CanUseItemType (SLOT_WEAPON, itemname)):
 				#off-hand weapon
-				Button.SetPLT ("WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+				Button.SetPLT ("WP" + size + item['AnimationType'] + "OIN", stats, 2)
 			else:
 				#shield
-				Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+				Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", stats, 2)
 
 	# Helmet
 	slot_item = GemRB.GetSlotItem (pc, 1)
-	if slot_item and Color1 != -1:
+	if slot_item and stats[IE_METAL_COLOR] != -1:
 		# halflings use gnome helmet files
 		# only weapons exist with H, so this is fine for everyone
 		if size == "H":
 			size = "S"
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
-			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
+			Button.SetPLT ("WP" + size + item['AnimationType'] + "INV", stats, 3)
 
 	# encumbrance
 	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)

@@ -62,7 +62,7 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 	LevelUp = Type
 	if LevelUp:
 		# only TNO gets the main stat boosts
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 		if Specific != 2:
 			return

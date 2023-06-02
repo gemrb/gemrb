@@ -92,7 +92,7 @@ def OpenLevelUpWindow():
 	DoneButton.MakeEscape ()
 
 	# name
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	actor = Actor.Actor(pc)
 	Label = LevelUpWindow.GetControl (0x10000000+90)
 	Label.SetText (GemRB.GetPlayerName (pc))

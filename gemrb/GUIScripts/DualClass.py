@@ -64,7 +64,7 @@ def DualClassWindow ():
 	global DCMainWindow, DCMainClassButton, DCMainDoneButton, DCMainSkillsButton, DCMainStep
 
 	# get our basic globals
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	DCMainStep = 1
 
 	# make sure to nullify old values

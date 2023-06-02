@@ -62,7 +62,7 @@ def UpdateMageWindow (Window=None):
 	MageMemorizedSpellList = []
 	MageKnownSpellList = []
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	spelltype = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, spelltype, level)
@@ -182,7 +182,7 @@ def OpenMageSpellInfoWindow ():
 
 
 def OnMageMemorizeSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
@@ -220,7 +220,7 @@ def OpenMageSpellUnmemorizeWindow (btn):
 
 
 def OnMageUnmemorizeSpell (btn):
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 

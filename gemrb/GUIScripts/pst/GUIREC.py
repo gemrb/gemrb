@@ -126,7 +126,7 @@ avatar_header = {'PrimClass': "", 'SecoClass': "", 'PrimLevel': 0, 'SecoLevel': 
 def UpdateRecordsWindow (Window):
 	global stats_overview, faction_help, alignment_help
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# Setting up the character information
 	GetCharacterHeader (pc)
@@ -296,7 +296,7 @@ def OnRecordsHelpStat (row, col, strref, bon1=0, bon2=0):
 
 def OnRecordsHelpStrength ():
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# Getting the character's strength
 	s = GemRB.GetPlayerStat (pc, IE_STR)
@@ -318,7 +318,7 @@ def OnRecordsHelpDexterity ():
 	Table = GemRB.LoadTable("dexmod")
 
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# Getting the character's dexterity
 	Dex = GemRB.GetPlayerStat (pc, IE_DEX)
@@ -331,7 +331,7 @@ def OnRecordsHelpDexterity ():
 
 def OnRecordsHelpIntelligence ():
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# Getting the character's intelligence
 	Int = GemRB.GetPlayerStat (pc, IE_INT)
@@ -340,7 +340,7 @@ def OnRecordsHelpIntelligence ():
 
 def OnRecordsHelpWisdom ():
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# Getting the character's wisdom
 	Wis = GemRB.GetPlayerStat (pc, IE_WIS)
@@ -352,7 +352,7 @@ def OnRecordsHelpConstitution ():
 	Table = GemRB.LoadTable("hpconbon")
 
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# Getting the character's constitution
 	Con = GemRB.GetPlayerStat (pc, IE_CON)
@@ -365,7 +365,7 @@ def OnRecordsHelpConstitution ():
 
 def OnRecordsHelpCharisma ():
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# Getting the character's charisma
 	Cha = GemRB.GetPlayerStat (pc, IE_CHR)
@@ -673,7 +673,7 @@ def OpenInformationWindow ():
 		TotalPartyKills = TotalPartyKills + stat['KillsTotalCount']
 
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	stat = GemRB.GetPCStats (pc)
 
 	Label = Window.GetControl (0x10000001)
@@ -762,7 +762,7 @@ def OpenBiographyWindow ():
 	BiographyWindow = Window = GemRB.LoadWindow (12)
 
 	# These are used to get the bio
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	BioTable = GemRB.LoadTable ("bios")
 	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
@@ -783,7 +783,7 @@ def OpenBiographyWindow ():
 
 def AcceptLevelUp():
 	#do level up
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH, SavThrows[0])
 	GemRB.SetPlayerStat (pc, IE_SAVEVSWANDS, SavThrows[1])
 	GemRB.SetPlayerStat (pc, IE_SAVEVSPOLY, SavThrows[2])
@@ -851,7 +851,7 @@ def OpenLevelUpWindow ():
 	Button.SetText (4192)
 	Button.OnPress (AcceptLevelUp)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTable ("bios")

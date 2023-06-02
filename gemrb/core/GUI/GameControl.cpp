@@ -2045,9 +2045,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 	switch(me.button) {
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GFFlags::HAS_FLOAT_MENU) && !Mod) {
-			ScriptEngine::FunctionParameters params;
-			params.push_back(ScriptEngine::Parameter(p));
-			core->GetGUIScriptEngine()->RunFunction("GUICommon", "OpenFloatMenuWindow", params, false);
+			core->GetGUIScriptEngine()->RunFunction("GUICommon", "OpenFloatMenuWindow", p, false);
 		} else {
 			TryDefaultTalk();
 		}
@@ -2325,9 +2323,9 @@ bool GameControl::OnControllerButtonDown(const ControllerEvent& ce)
 {
 	switch (ce.button) {
 		case CONTROLLER_BUTTON_Y:
-			return core->GetGUIScriptEngine()->RunFunction("GUIINV", "ToggleInventoryWindow", false);
+			return !core->GetGUIScriptEngine()->RunFunction("GUIINV", "ToggleInventoryWindow", false).IsNull();
 		case CONTROLLER_BUTTON_X:
-			return core->GetGUIScriptEngine()->RunFunction("GUIMA", "ToggleMapWindow", false);
+			return !core->GetGUIScriptEngine()->RunFunction("GUIMA", "ToggleMapWindow", false).IsNull();
 		case CONTROLLER_BUTTON_BACK:
 			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
 			return true;

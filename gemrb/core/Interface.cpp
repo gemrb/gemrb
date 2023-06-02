@@ -381,7 +381,7 @@ void Interface::HandleEvents()
 	}
 	if (EventFlag&EF_OPENSTORE) {
 		EventFlag&=~EF_OPENSTORE;
-		guiscript->RunFunction( "GUISTORE", "OpenStoreWindow" );
+		guiscript->RunFunction( "GUISTORE", "OpenStore" );
 		return;
 	}
 
@@ -4403,9 +4403,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 
 void Interface::WaitForDisc(int disc_number, const char* path) const
 {
-	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
-
-	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
+	GetGUIScriptEngine()->RunFunction("GUICommonWindows", "OpenWaitForDiscWindow", disc_number);
 	do {
 		winmgr->DrawWindows();
 		for (const auto& cd : config.CD[disc_number - 1]) {

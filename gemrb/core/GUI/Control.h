@@ -179,7 +179,7 @@ public:
 	value_t SetValueRange(ValueRange range = MaxValueRange);
 	value_t SetValueRange(value_t min, value_t max = std::numeric_limits<value_t>::max());
 	
-	void BindDictVariable(const varname_t& var, value_t val, ValueRange valRange = MaxValueRange) noexcept;
+	bool BindDictVariable(const varname_t& var, value_t val, ValueRange valRange = MaxValueRange) noexcept;
 	bool IsDictBound() const noexcept;
 	const varname_t& DictVariable() const noexcept { return VarName; }
 

@@ -895,7 +895,7 @@ def DisplayMisc (pc):
 def UpdateRecordsWindow (Window):
 	global RecordsTextArea
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	#name
 	Label = Window.GetControl (0x1000000e)
@@ -1164,7 +1164,7 @@ def OpenLevelUpWindow ():
 	# the original ignored all but the fighter row in xplevel.2da
 	# we do the same, since IE_CLASS becomes useless for mc actors
 	# (iwd2 never updates it; it's not a bitfield like IE_KIT)
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	xp = GemRB.GetPlayerStat (pc, IE_XP)
 	nextLevel = LUCommon.GetNextLevelFromExp (xp, 5)
 	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
@@ -1239,7 +1239,7 @@ def LUClassPress ():
 
 	# increase/decrease level label by LevelDiff (usually 1)
 	if OldLevelLabel != i:
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		j = OldLevelLabel
 		Label = Window.GetControl (0x10000000 + j+15)
 		level = Label.QueryText ()
@@ -1314,7 +1314,7 @@ def OpenLUKitWindow ():
 	# does the class have any kits at all?
 	# if we're levelling up, we must also check we dont't already
 	# have a kit with this class
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	LUClass = GemRB.GetVar ("LUClass") # index, not ID
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
 	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
@@ -1392,7 +1392,7 @@ def LUKitPress ():
 	# set it to the kit value, so we don't need these gimnastics later
 	kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
 	GemRB.SetVar ("LUKit", kitID)
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	HandleSpecFlagExclusion(pc, LUClassID, kitID)
 
 	oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
@@ -1406,7 +1406,7 @@ def LUNextPress ():
 	GemRB.SetVar ("LevelDiff", LevelDiff)
 
 	# grant an ability point or three (each 4 levels)
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
 	rankDiff = (levelSum+LevelDiff)//4 - levelSum//4
 	if rankDiff > 0:
@@ -1419,7 +1419,7 @@ def LUNextPress ():
 
 def FinishLevelUp():
 	# kit
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	LUKit = GemRB.GetVar ("LUKit")
 
 	# saving throws

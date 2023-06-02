@@ -29,6 +29,7 @@ import GUICommon
 import Spellbook
 import CommonTables
 import LUSkillsSelection
+import PaperDoll
 
 CharGenWindow = 0
 CharGenState = 0
@@ -119,17 +120,6 @@ PriestMemorizeDoneButton = 0
 PriestMemorizePointsLeft = 0
 
 AppearanceButton = 0
-AppearanceWindow = 0
-AppearanceTable = 0
-AppearanceAvatarButton = 0
-AppearanceHairButton = 0
-AppearanceSkinButton = 0
-AppearanceMajorButton = 0
-AppearanceMinorButton = 0
-HairColor = 0
-SkinColor = 0
-MajorColor = 0
-MinorColor = 0
 
 CharSoundWindow = 0
 CharSoundTable = 0
@@ -2233,183 +2223,20 @@ def PriestMemorizeCancelPress():
 	return
 
 # Appearance Selection
-
 def AppearancePress():
-	global CharGenWindow, AppearanceWindow, AppearanceTable
-	global Portrait, AppearanceAvatarButton, PortraitName
-	global AppearanceHairButton, AppearanceSkinButton
-	global AppearanceMajorButton, AppearanceMinorButton
-	global HairColor, SkinColor, MajorColor, MinorColor
+	pc = GemRB.GetVar("Slot")
+	stats = PaperDoll.ColorStatsFromPortrait(Portrait)
+	AppearanceWindow = PaperDoll.OpenPaperDollWindow(pc, "GUICG", stats)
+	
+	def AppearanceDonePress():
+		PaperDoll.SaveStats(stats, pc)
+		AppearanceWindow.Close()
+		CharSoundSelect()
+		return
+		
+	DoneButton = AppearanceWindow.GetControl(0)
+	DoneButton.OnPress(AppearanceDonePress)
 
-	AppearanceWindow = GemRB.LoadWindow (13)
-	AppearanceTable = GemRB.LoadTable ("PORTCOLR")
-
-	if Portrait<0:
-		PortraitIndex = 0
-	else:
-		PortraitName = PortraitsTable.GetRowName (Portrait)
-		PortraitIndex = AppearanceTable.GetRowIndex (PortraitName + "L")
-
-	HairColor = AppearanceTable.GetValue (PortraitIndex, 1)
-	GemRB.SetVar ("HairColor", HairColor)
-	SkinColor = AppearanceTable.GetValue (PortraitIndex, 0)
-	GemRB.SetVar ("SkinColor", SkinColor)
-	MajorColor = AppearanceTable.GetValue (PortraitIndex, 2)
-	GemRB.SetVar ("MajorColor", MajorColor)
-	MinorColor = AppearanceTable.GetValue (PortraitIndex, 3)
-	GemRB.SetVar ("MinorColor", MinorColor)
-
-	AppearanceAvatarButton = AppearanceWindow.GetControl (1)
-	AppearanceAvatarButton.SetState (IE_GUI_BUTTON_LOCKED)
-	AppearanceAvatarButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-	DrawAvatar()
-
-	AppearanceHairButton = AppearanceWindow.GetControl (2)
-	AppearanceHairButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-	AppearanceHairButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceHairButton.OnPress (AppearanceHairPress)
-	AppearanceHairButton.SetBAM ("COLGRAD", 0, 0, HairColor)
-
-	AppearanceSkinButton = AppearanceWindow.GetControl (3)
-	AppearanceSkinButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-	AppearanceSkinButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceSkinButton.OnPress (AppearanceSkinPress)
-	AppearanceSkinButton.SetBAM ("COLGRAD", 0, 0, SkinColor)
-
-	AppearanceMajorButton = AppearanceWindow.GetControl (4)
-	AppearanceMajorButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-	AppearanceMajorButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceMajorButton.OnPress (AppearanceMajorPress)
-	AppearanceMajorButton.SetBAM ("COLGRAD", 0, 0, MajorColor)
-
-	AppearanceMinorButton = AppearanceWindow.GetControl (5)
-	AppearanceMinorButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-	AppearanceMinorButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceMinorButton.OnPress (AppearanceMinorPress)
-	AppearanceMinorButton.SetBAM ("COLGRAD", 0, 0, MinorColor)
-
-	AppearanceDoneButton = AppearanceWindow.GetControl (0)
-	AppearanceDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceDoneButton.OnPress (AppearanceDonePress)
-	AppearanceDoneButton.SetText (11973)
-	AppearanceDoneButton.MakeDefault()
-
-	AppearanceCancelButton = AppearanceWindow.GetControl (13)
-	AppearanceCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AppearanceCancelButton.OnPress (AppearanceCancelPress)
-	AppearanceCancelButton.SetText (13727)
-	AppearanceCancelButton.MakeEscape()
-
-	AppearanceWindow.ShowModal(MODAL_SHADOW_NONE)
-	return
-
-def DrawAvatar():
-	global AppearanceAvatarButton
-	global MyChar
-
-	AvatarID = 0x6000
-	table = GemRB.LoadTable ("avprefr")
-	lookup = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat(MyChar, IE_RACE))
-	lookup = CommonTables.Races.GetRowName (lookup)
-	AvatarID = AvatarID+table.GetValue (lookup, "RACE")
-	table = GemRB.LoadTable ("avprefc")
-	lookup = GUICommon.GetClassRowName (MyChar)
-	AvatarID = AvatarID + table.GetValue (lookup, "CLASS")
-	table = GemRB.LoadTable ("avprefg")
-	AvatarID = AvatarID + table.GetValue (GemRB.GetPlayerStat(MyChar,IE_SEX), GTV_STR)
-
-	AvatarRef = CommonTables.Pdolls.GetValue (hex(AvatarID), "LEVEL1")
-	AppearanceAvatarButton.SetPLT(AvatarRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
-
-	return
-
-def AppearanceHairPress():
-	GemRB.SetVar ("ColorType", 0)
-	AppearanceColorChoice (GemRB.GetVar ("HairColor"))
-	return
-
-def AppearanceSkinPress():
-	GemRB.SetVar ("ColorType", 1)
-	AppearanceColorChoice (GemRB.GetVar ("SkinColor"))
-	return
-
-def AppearanceMajorPress():
-	GemRB.SetVar ("ColorType", 2)
-	AppearanceColorChoice (GemRB.GetVar ("MajorColor"))
-	return
-
-def AppearanceMinorPress():
-	GemRB.SetVar ("ColorType", 3)
-	AppearanceColorChoice (GemRB.GetVar ("MinorColor"))
-	return
-
-def AppearanceColorChoice (CurrentColor):
-	global AppearanceWindow, AppearanceColorWindow
-
-	AppearanceWindow.SetVisible(False)
-	AppearanceColorWindow = GemRB.LoadWindow (14)
-	AppearanceColorTable = GemRB.LoadTable ("clowncol")
-	ColorType = GemRB.GetVar ("ColorType")
-	GemRB.SetVar ("SelectedColor", CurrentColor)
-
-	for i in range (34):
-		ColorButton = AppearanceColorWindow.GetControl (i)
-		ColorButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ColorButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-
-	for i in range (34):
-		Color = AppearanceColorTable.GetValue (ColorType, i)
-		if Color != "*":
-			ColorButton = AppearanceColorWindow.GetControl (i)
-			ColorButton.SetBAM ("COLGRAD", 2, 0, Color)
-			ColorButton.OnPress (AppearanceColorSelected)
-			ColorButton.SetVarAssoc ("SelectedColor", Color)
-
-	AppearanceColorWindow.ShowModal(MODAL_SHADOW_NONE)
-	return
-
-def AppearanceColorSelected():
-	global HairColor, SkinColor, MajorColor, MinorColor
-	global AppearanceWindow, AppearanceColorWindow
-	global AppearanceHairButton, AppearanceSkinButton
-	global AppearanceMajorButton, AppearanceMinorButton
-
-	if AppearanceColorWindow:
-		AppearanceColorWindow.Close ()
-	ColorType = GemRB.GetVar ("ColorType")
-	if ColorType == 0:
-		HairColor = GemRB.GetVar ("SelectedColor")
-		GemRB.SetVar ("HairColor", HairColor)
-		AppearanceHairButton.SetBAM ("COLGRAD", 0, 0, HairColor)
-	elif ColorType == 1:
-		SkinColor = GemRB.GetVar ("SelectedColor")
-		GemRB.SetVar ("SkinColor", SkinColor)
-		AppearanceSkinButton.SetBAM ("COLGRAD", 0, 0, SkinColor)
-	elif ColorType == 2:
-		MajorColor = GemRB.GetVar ("SelectedColor")
-		GemRB.SetVar ("MajorColor", MajorColor)
-		AppearanceMajorButton.SetBAM ("COLGRAD", 0, 0, MajorColor)
-	elif ColorType == 3:
-		MinorColor = GemRB.GetVar ("SelectedColor")
-		GemRB.SetVar ("MinorColor", MinorColor)
-		AppearanceMinorButton.SetBAM ("COLGRAD", 0, 0, MinorColor)
-	DrawAvatar()
-	AppearanceWindow.ShowModal(MODAL_SHADOW_NONE)
-	return
-
-def AppearanceDonePress():
-	global CharGenWindow, AppearanceWindow
-
-	if AppearanceWindow:
-		AppearanceWindow.Close ()
-	CharSoundSelect()
-	return
-
-def AppearanceCancelPress():
-	global CharGenWindow, AppearanceWindow
-
-	if AppearanceWindow:
-		AppearanceWindow.Close ()
 	return
 
 def CharSoundSelect():

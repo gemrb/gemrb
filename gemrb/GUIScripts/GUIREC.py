@@ -36,8 +36,6 @@ from ie_restype import *
 ###################################################
 InformationWindow = None
 KitInfoWindow = None
-ColorTable = None
-ColorIndex = None
 ScriptTextArea = None
 SelectedTextArea = None
 
@@ -89,7 +87,7 @@ def InitRecordsWindow (Window):
 def UpdateRecordsWindow (Window):
 	global alignment_help
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	GUICommon.UpdateMageSchool (pc)
 
 	# exportable
@@ -847,7 +845,7 @@ def OpenInformationWindow ():
 		ChapterCount = ChapterCount + stat['KillsChapterCount']
 
 	# These are used to get the stats
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	stat = GemRB.GetPCStats (pc)
 
 	Label = Window.GetControl (0x10000000)
@@ -937,7 +935,7 @@ def OpenKitInfoWindow ():
 	#kit or class description
 	TextArea = KitInfoWindow.GetControl (0)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 	ClassName = GUICommon.GetClassRowName (pc)
 	Multi = GUICommon.HasMultiClassBits (pc)
 	Dual = GUICommon.IsDualClassed (pc, 1)
@@ -974,149 +972,6 @@ def OpenKitInfoWindow ():
 def KitDonePress():
 	if KitInfoWindow:
 		KitInfoWindow.Close ()
-	return
-
-def OpenColorWindow ():
-	global PaperdollButton
-	global HairButton, SkinButton, MajorButton, MinorButton
-	global HairColor, SkinColor, MajorColor, MinorColor
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	MinorColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-	MajorColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	SkinColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
-	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	Window = GemRB.LoadWindow (21)
-	Window.AddAlias("SUB_WIN", 0)
-
-	PaperdollButton = Window.GetControl (0)
-	PaperdollButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	PaperdollButton.SetState (IE_GUI_BUTTON_LOCKED)
-
-	HairButton = Window.GetControl (3)
-	SkinButton = Window.GetControl (4)
-	MajorButton = Window.GetControl (5)
-	MinorButton = Window.GetControl (6)
-
-	DoneButton = Window.GetControl (12)
-	DoneButton.SetText (11973)
-	DoneButton.MakeDefault()
-
-	CancelButton = Window.GetControl (13)
-	CancelButton.SetText (13727)
-	CancelButton.MakeEscape()
-
-	HairButton.OnPress (SetHairColor)
-	SkinButton.OnPress (SetSkinColor)
-	MajorButton.OnPress (SetMajorColor)
-	MinorButton.OnPress (SetMinorColor)
-	DoneButton.OnPress (DoneColorWindow)
-	CancelButton.OnPress (Window.Close)
-	UpdatePaperDoll ()
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def DoneColorWindow ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.SetPlayerStat (pc, IE_MINOR_COLOR, MinorColor)
-	GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, MajorColor)
-	GemRB.SetPlayerStat (pc, IE_SKIN_COLOR, SkinColor)
-	GemRB.SetPlayerStat (pc, IE_HAIR_COLOR, HairColor)
-	GemRB.GetView("SUB_WIN", 0).Close()
-	return
-
-def UpdatePaperDoll ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
-	MinorButton.SetBAM ("COLGRAD", 0, 0, MinorColor&0xff)
-	MajorButton.SetBAM ("COLGRAD", 0, 0, MajorColor&0xff)
-	SkinButton.SetBAM ("COLGRAD", 0, 0, SkinColor&0xff)
-	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
-	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
-	HairButton.SetBAM ("COLGRAD", 0, 0, HairColor&0xff)
-	PaperdollButton.SetPLT (GUICommon.GetActorPaperDoll (pc),
-		Color1, MinorColor, MajorColor, SkinColor, Color5, Color6, HairColor, 0, 0)
-	return
-
-def SetHairColor ():
-	global ColorIndex, PickedColor
-
-	ColorIndex = 0
-	PickedColor = HairColor
-	OpenColorPicker ()
-	return
-
-def SetSkinColor ():
-	global ColorIndex, PickedColor
-
-	ColorIndex = 1
-	PickedColor = SkinColor
-	OpenColorPicker ()
-	return
-
-def SetMinorColor ():
-	global ColorIndex, PickedColor
-
-	ColorIndex = 2
-	PickedColor = MinorColor
-	OpenColorPicker ()
-	return
-
-def SetMajorColor ():
-	global ColorIndex, PickedColor
-
-	ColorIndex = 3
-	PickedColor = MajorColor
-	OpenColorPicker ()
-	return
-
-def OpenColorPicker ():
-	Window = GemRB.LoadWindow (22)
-	Window.AddAlias("SUB_WIN", 1)
-
-	GemRB.SetVar ("Selected",-1)
-	for i in range (1,35):
-		Button = Window.GetControl (i)
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-
-	for i in range (34):
-		MyColor = ColorTable.GetValue (ColorIndex, i)
-		if MyColor == "*":
-			break
-		Button = Window.GetControl (i+1)
-		Button.SetBAM("COLGRAD", 2, 0, MyColor)
-		if PickedColor == MyColor:
-			GemRB.SetVar ("Selected",i)
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetVarAssoc("Selected",i)
-		Button.OnPress (DonePress)
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def DonePress():
-	global HairColor, SkinColor, MajorColor, MinorColor
-	global PickedColor
-
-	GemRB.GetView("SUB_WIN", 1).Close()
-	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
-	if ColorIndex==0:
-		HairColor=PickedColor
-		UpdatePaperDoll ()
-		return
-	if ColorIndex==1:
-		SkinColor=PickedColor
-		UpdatePaperDoll ()
-		return
-	if ColorIndex==2:
-		MinorColor=PickedColor
-		UpdatePaperDoll ()
-		return
-
-	MajorColor=PickedColor
-	UpdatePaperDoll ()
 	return
 
 ###################################################

@@ -39,7 +39,7 @@ def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
 	if not CharGen:
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		Minimum = GemRB.GetPlayerStat (pc, Stats[Abidx], 1)
 		Maximum = 25
 		return
@@ -261,7 +261,7 @@ def NextPress():
 		GemRB.SetNextScript("CharGen6") #skills
 	else:
 		# set the upgraded stats
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		for i in range (len(Stats)):
 			newValue = GemRB.GetVar ("Ability "+str(i))
 			GemRB.SetPlayerStat (pc, Stats[i], newValue)

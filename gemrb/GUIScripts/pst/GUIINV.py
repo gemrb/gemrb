@@ -150,7 +150,7 @@ def UpdateInventoryWindow (Window = None):
 
 	GUICommonWindows.UpdateAnimation ()
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (45)
@@ -177,7 +177,7 @@ InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 def RefreshInventoryWindow (Window):
 	"""Partial redraw without resetting TopIndex."""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	# name
 	Label = Window.GetControl (0x10000039)
@@ -272,7 +272,7 @@ def OnAutoEquip ():
 	if not GemRB.IsDraggingItem ():
 		return
 
-	pc = GemRB.GameGetSelectedPCSingle ()
+	pc = GemRB.GetVar("SELECTED_PC")
 
 	item = GemRB.GetSlotItem (0,0)
 	ret = GemRB.DropDraggedItem (pc, -1)

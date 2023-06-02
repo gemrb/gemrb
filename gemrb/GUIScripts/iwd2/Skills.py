@@ -125,7 +125,7 @@ def OpenSkillsWindow(chargen, level=0):
 		LevelDiff = 1
 		ClassColumn = GemRB.GetVar ("BaseClass") - 1
 	else:
-		pc = GemRB.GameGetSelectedPCSingle ()
+		pc = GemRB.GetVar("SELECTED_PC")
 		LevelDiff = GemRB.GetVar ("LevelDiff")
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + LevelDiff
 		BaseClass = GemRB.GetVar ("LUClass")
@@ -289,7 +289,7 @@ def NextPress():
 		# the column holds the index into feats.2da, which has one less intro column
 		RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN") + 1
 	else:
-		MyChar = GemRB.GameGetSelectedPCSingle ()
+		MyChar = GemRB.GetVar("SELECTED_PC")
 		RacialBonus = 0
 
 	#setting skills
