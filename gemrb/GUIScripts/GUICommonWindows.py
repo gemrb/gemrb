@@ -1530,7 +1530,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	else:
 		# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
 		# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
-		maxHeight = windowHeight - buttonHeight*6 - buttonHeight // 2
+		maxHeight = windowHeight - buttonHeight * PartySize - buttonHeight // 2
 		if windowHeight != ScreenHeight:
 			maxHeight += buttonHeight // 2
 		limit = maxHeight
@@ -1539,9 +1539,11 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 			unused = -40 if GameCheck.IsBG1() else 20 # remaining unused space below the portraits
 			scale = 1
 			portraitGap = buttonHeight
-			buttonHeight = (buttonHeight * 6 + unused) // PartySize
+			buttonHeight = (windowHeight + unused) // PartySize
+			if portraitGap == buttonHeight:
+				scale = 0 # ensure idempotence, eg. when this gets called on click
 			portraitGap = portraitGap - buttonHeight - 2 # 2 for a quasi border
-			limit = windowHeight - buttonHeight*6 + unused
+			limit = windowHeight - buttonHeight * 6 + unused
 		limitStep = buttonHeight
 
 	for i in range(len(pairs), PartySize):
@@ -1576,7 +1578,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	# move the buttons back up, to combine the freed space
 	if scale:
-		for i in range(oldSlotCount):
+		for i in range(PartySize - 1):
 			button = pairs[i]
 			button.SetSize (buttonWidth, buttonHeight)
 			if i == 0:
