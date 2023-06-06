@@ -1536,7 +1536,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		limit = maxHeight
 		# for framed views, limited to 6, we downscale the buttons to fit, clipping their portraits
 		if maxHeight < buttonHeight:
-			unused = 20 # remaining unused space below the portraits
+			unused = -40 if GameCheck.IsBG1() else 20 # remaining unused space below the portraits
 			scale = 1
 			portraitGap = buttonHeight
 			buttonHeight = (buttonHeight * 6 + unused) // PartySize
