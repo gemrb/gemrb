@@ -1581,9 +1581,9 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 			button.SetSize (buttonWidth, buttonHeight)
 			if i == 0:
 				continue # don't move the first portrait
-			rect = button.GetRect ()
-			x = rect["X"]
-			y = rect["Y"]
+			rect = button.GetFrame ()
+			x = rect["x"]
+			y = rect["y"]
 			button.SetPos (x, y-portraitGap*i)
 
 	return pairs
