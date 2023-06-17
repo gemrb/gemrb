@@ -26,6 +26,7 @@
 #include "globals.h"
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 
 // in case unistd isn't there or nonconformant
 #ifndef R_OK

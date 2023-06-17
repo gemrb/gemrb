@@ -24,7 +24,6 @@
 #include "Freetype.h"
 
 #include "GUI/TextSystem/Font.h"
-#include "HashMap.h"
 #include "Holder.h"
 
 namespace GemRB {

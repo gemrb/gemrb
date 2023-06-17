@@ -26,6 +26,7 @@
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Map.h"
 #include "Palette.h"
 #include "RNG.h"

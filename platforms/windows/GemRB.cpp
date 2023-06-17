@@ -24,6 +24,7 @@
 #include <clocale> //language encoding
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Win32Console.h"
 
 using namespace GemRB;

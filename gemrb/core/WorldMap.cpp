@@ -22,6 +22,7 @@
 
 #include "Game.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "TableMgr.h"
 #include "Video/Video.h"
 #include "RNG.h"

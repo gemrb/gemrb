@@ -26,6 +26,7 @@
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "GUI/Button.h"
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"

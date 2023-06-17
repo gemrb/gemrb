@@ -30,6 +30,7 @@
 
 #include "Game.h"
 #include "GameData.h"
+#include "Logging/Logging.h"
 #include "Palette.h"
 
 #include <utility>

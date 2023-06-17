@@ -26,8 +26,9 @@
 #include "Plugins/IndexedArchive.h"
 #include "PluginMgr.h"
 #include "Resource.h"
-#include "StringMap.h"
 
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace GemRB {
@@ -43,6 +44,31 @@ struct BIFEntry {
 	bool found;
 };
 
+struct MapKey {
+	ResRef ref;
+	uint64_t type;
+
+	MapKey() : type(0) {}
+	MapKey(const ResRef& ref, uint64_t type) : ref{ref}, type{type} {}
+	MapKey(ResRef && ref, uint64_t type) : ref{std::move(ref)}, type{type} {}
+
+	bool operator==(const MapKey& other) const {
+		return ref == other.ref && type == other.type;
+	}
+};
+
+struct MapKeyHash {
+	size_t operator()(const MapKey& key) const {
+		size_t h{key.type};
+		const char *c = key.ref.c_str();
+
+		for (unsigned int i = 0; *c && i < 9; ++i)
+			h = (h << 5) + h + tolower(*c++);
+
+		return h;
+	}
+};
+
 struct KEYCache {
 	KEYCache() { bifnum = 0xffffffff; }
 
@@ -50,85 +76,10 @@ struct KEYCache {
 	PluginHolder<IndexedArchive> plugin;
 };
 
-// the key for this specific hashmap
-struct MapKey {
-	ResRef ref;
-	ieWord type;
-
-	MapKey() : type(0)
-	{
-	}
-};
-
-// hash template for the above key for this hashmap
-template<>
-struct HashKey<MapKey> {
-	// hash without MapKey construction
-	static inline uint32_t hash(const ResRef& ref, SClass_ID type)
-	{
-		unsigned long h = type;
-		const char *c = ref.c_str();
-
-		for (unsigned int i = 0; *c && i < 9; ++i)
-			h = (h << 5) + h + tolower(*c++);
-
-		return uint32_t(h);
-	}
-
-	static inline uint32_t hash(const MapKey &key)
-	{
-		return hash(key.ref, key.type);
-	}
-
-	// equal check without MapKey construction
-	static inline bool equals(const MapKey &a, const ResRef& ref, SClass_ID type)
-	{
-		if (a.type != type)
-			return false;
-
-		return a.ref == ref;
-	}
-
-	static inline bool equals(const MapKey &a, const MapKey &b)
-	{
-		return equals(a, b.ref, b.type);
-	}
-
-	static inline void copy(MapKey &a, const MapKey &b)
-	{
-		a.type = b.type;
-		a.ref = b.ref;
-	}
-};
-
-class KEYImpMap : public HashMap<MapKey, ieDword> {
-public:
-	// lookup without MapKey construction
-	const ieDword *get(const ResRef& ref, SClass_ID type) const
-	{
-		if (!isInitialized())
-			return NULL;
-
-		incAccesses();
-
-		for (Entry *e = getBucketByHash(HashKey<MapKey>::hash(ref, type)); e; e = e->next)
-			if (HashKey<MapKey>::equals(e->key, ref, type))
-				return &e->value;
-
-		return NULL;
-	}
-
-	// lookup without MapKey construction
-	bool has(const ResRef& ref, SClass_ID type) const
-	{
-		return get(ref, type) != NULL;
-	}
-};
-
 class KEYImporter : public ResourceSource {
 private:
 	std::vector< BIFEntry> biffiles;
-	KEYImpMap resources;
+	std::unordered_map<MapKey, ieDword, MapKeyHash> resources;
 
 	/** Gets the stream assoicated to a RESKey */
 	DataStream *GetStream(const ResRef&, ieWord type);

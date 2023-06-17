@@ -21,6 +21,7 @@
 #include "ResourceManager.h"
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "PluginMgr.h"
 #include "Resource.h"
 #include "ResourceDesc.h"

@@ -23,6 +23,7 @@
 #include <clocale> //language encoding
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Logging/Loggers/Stdio.h"
 
 using namespace GemRB;

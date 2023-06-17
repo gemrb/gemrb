@@ -24,6 +24,7 @@
 
 #include "ie_cursors.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Sprite2D.h"
 
 #include <cstdio>

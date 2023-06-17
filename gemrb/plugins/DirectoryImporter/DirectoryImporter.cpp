@@ -21,6 +21,7 @@
 #include "globals.h"
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "ResourceDesc.h"
 #include "Streams/FileStream.h"
 
@@ -104,17 +105,14 @@ void CachedDirectoryImporter::Refresh()
 		count++;
 	} while (++it);
 
-	// limit to 4k buckets
-	// less than 1% of the bg2+fixpack override are of bucket length >4
-	cache.init(count > 4 * 1024 ? 4 * 1024 : count, count);
-
 	it.Rewind();
 
 	do {
 		const char *name = it.GetName();
 		std::string buf = name;
 		StringToLower(buf);
-		if (cache.set(buf, name)) {
+		auto emplaceResult = cache.emplace(buf, name);
+		if (!emplaceResult.second) {
 			Log(ERROR, "CachedDirectoryImporter", "Duplicate '{}' files in '{}' directory", buf, path);
 		}
 	} while (++it);
@@ -133,36 +131,40 @@ static std::string ConstructFilename(StringView resname, const char* ext)
 bool CachedDirectoryImporter::HasResource(StringView resname, SClass_ID type)
 {
 	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
-	return cache.has(filename.c_str());
+	return cache.find(filename) != cache.cend();
 }
 
 bool CachedDirectoryImporter::HasResource(StringView resname, const ResourceDesc &type)
 {
 	const std::string& filename = ConstructFilename(resname, type.GetExt());
-	return cache.has(filename.c_str());
+	return cache.find(filename) != cache.cend();
 }
 
 DataStream* CachedDirectoryImporter::GetResource(StringView resname, SClass_ID type)
 {
 	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
-	const std::string *s = cache.get(filename.c_str());
-	if (!s)
-		return NULL;
+	const auto lookup = cache.find(filename);
+
+	if (lookup == cache.cend())
+		return nullptr;
+
 	char buf[_MAX_PATH];
 	strcpy(buf, path);
-	PathAppend(buf, s->c_str());
+	PathAppend(buf, lookup->second.c_str());
 	return FileStream::OpenFile(buf);
 }
 
 DataStream* CachedDirectoryImporter::GetResource(StringView resname, const ResourceDesc &type)
 {
 	const std::string& filename = ConstructFilename(resname, type.GetExt());
-	const std::string *s = cache.get(filename.c_str());
-	if (!s)
-		return NULL;
+	const auto lookup = cache.find(filename);
+
+	if (lookup == cache.cend())
+		return nullptr;
+
 	char buf[_MAX_PATH];
 	strcpy(buf, path);
-	PathAppend(buf, s->c_str());
+	PathAppend(buf, lookup->second.c_str());
 	return FileStream::OpenFile(buf);
 }
 

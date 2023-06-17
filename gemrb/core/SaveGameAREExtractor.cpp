@@ -16,6 +16,7 @@
  *
  */
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Streams/FileCache.h"
 #include "Streams/FileStream.h"
 #include "SaveGameAREExtractor.h"

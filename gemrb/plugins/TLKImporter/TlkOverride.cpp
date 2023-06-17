@@ -23,6 +23,7 @@
 #include "TlkOverride.h"
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 
 #include <algorithm>
 #include <cstdio>

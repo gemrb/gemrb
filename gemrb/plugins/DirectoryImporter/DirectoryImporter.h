@@ -19,8 +19,9 @@
 #ifndef DIRIMP_H
 #define DIRIMP_H
 
+#include <unordered_map>
+
 #include "ResourceSource.h"
-#include "StringMap.h"
 
 namespace GemRB {
 
@@ -43,7 +44,7 @@ public:
 
 class CachedDirectoryImporter : public DirectoryImporter {
 protected:
-	StringMap cache;
+	std::unordered_map<std::string, std::string> cache;
 
 public:
 	CachedDirectoryImporter() noexcept = default;

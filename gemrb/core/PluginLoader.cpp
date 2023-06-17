@@ -19,6 +19,7 @@
 #include "PluginLoader.h"
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Platform.h"
 #include "PluginMgr.h"
 #include "System/FileFilters.h"

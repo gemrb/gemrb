@@ -20,6 +20,7 @@
 
 #include "TTFFont.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Sprite2D.h"
 #include "Video/Video.h"
 

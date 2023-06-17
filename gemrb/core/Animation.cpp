@@ -22,6 +22,7 @@
 
 #include "Game.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Map.h"
 #include "Sprite2D.h"
 #include "RNG.h"
