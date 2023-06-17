@@ -21,32 +21,27 @@
 #include "globals.h"
 
 #include "InterfaceConfig.h"
+#include "Logging/Logging.h"
 
 #include "Streams/FileStream.h"
 #include "System/VFS.h"
 
 namespace GemRB {
 
-InterfaceConfig::InterfaceConfig(int /*argc*/, char** /**argv[]*/)
-{
-	// currently the base class has no CLI options.
-	configVars = new StringMap();
-	configVars->init(50, 10);
-}
+InterfaceConfig::InterfaceConfig(int /*argc*/, char** /**argv[]*/) { }
 
-InterfaceConfig::~InterfaceConfig() noexcept
-{
-	delete configVars;
-}
+InterfaceConfig::~InterfaceConfig() noexcept { }
 
 void InterfaceConfig::SetKeyValuePair(const key_t& key, const value_t& value)
 {
-	configVars->set(key, value);
+	configVars.emplace(key, value);
 }
 
 const InterfaceConfig::value_t* InterfaceConfig::GetValueForKey(const key_t& key) const
 {
-	return configVars->get(key);
+	const auto result = configVars.find(key);
+
+	return result != configVars.cend() ? &result->second : nullptr;
 }
 
 CFGConfig::CFGConfig(int argc, char *argv[])

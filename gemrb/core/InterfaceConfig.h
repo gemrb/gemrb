@@ -21,9 +21,9 @@
 #ifndef __GemRB__InterfaceConfig__
 #define __GemRB__InterfaceConfig__
 
-#include "exports.h"
+#include <unordered_map>
 
-#include "StringMap.h"
+#include "exports.h"
 
 #include "Streams/DataStream.h"
 
@@ -32,7 +32,7 @@ namespace GemRB {
 class GEM_EXPORT InterfaceConfig
 {
 private:
-	StringMap* configVars;
+	std::unordered_map<std::string, std::string> configVars;
 
 public:
 	using key_t = std::string;

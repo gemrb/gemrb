@@ -23,6 +23,7 @@
 #include "globals.h"
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "ResourceDesc.h"
 #include "Streams/FileStream.h"
 
@@ -160,19 +161,17 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 
 	MapKey key;
 	ieDword ResLocator;
-
-	// limit to 32k buckets
-	// only ~1% of the bg2 entries are of bucket lenght >4
-	resources.init(ResCount > 32 * 1024 ? 32 * 1024 : ResCount, ResCount);
+	ieWord type;
 
 	for (unsigned int i = 0; i < ResCount; i++) {
 		f->ReadResRef(key.ref);
-		f->ReadWord(key.type);
+		f->ReadWord(type);
 		f->ReadDword(ResLocator);
+		key.type = type;
 
 		// seems to be always the last entry?
 		if (!key.ref.IsEmpty())
-			resources.set(key, ResLocator);
+			resources.emplace(key, ResLocator);
 	}
 
 	Log(MESSAGE, "KEYImporter", "Resources Loaded...");
@@ -182,7 +181,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 
 bool KEYImporter::HasResource(StringView resname, SClass_ID type)
 {
-	return resources.has(ResRef(resname), type);
+	return resources.find({ResRef(resname), type}) != resources.cend();
 }
 
 bool KEYImporter::HasResource(StringView resname, const ResourceDesc &type)
@@ -195,11 +194,12 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 	if (type == 0)
 		return NULL;
 
-	const ieDword *ResLocator = resources.get(resname, type);
-	if (!ResLocator)
+	const auto lookup = resources.find({resname, type});
+	if (lookup == resources.cend())
 		return 0;
 
-	unsigned int bifnum = ( *ResLocator & 0xFFF00000 ) >> 20;
+	auto ResLocator = lookup->second;
+	unsigned int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
 
 	// supports BIFF-less, KEY'd games (demo)
 	if (bifnum >= biffiles.size()) {
@@ -218,7 +218,7 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 		return NULL;
 	}
 
-	DataStream* ret = ai->GetStream( *ResLocator, type );
+	DataStream* ret = ai->GetStream( ResLocator, type );
 	if (ret) {
 		auto it = StringToLower(resname.begin(), resname.end(), ret->filename);
 		*it = '\0';

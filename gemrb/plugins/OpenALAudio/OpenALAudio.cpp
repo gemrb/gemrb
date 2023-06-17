@@ -22,6 +22,7 @@
 
 #include "GameData.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 
 #include <cassert>
 #include <cstdio>

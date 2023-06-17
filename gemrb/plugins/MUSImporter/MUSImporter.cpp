@@ -22,6 +22,7 @@
 
 #include "Audio.h"
 #include "GameData.h" // For ResourceHolder
+#include "Logging/Logging.h"
 #include "Interface.h"
 #include "SoundMgr.h"
 

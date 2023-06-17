@@ -23,6 +23,7 @@
 
 #include "GUIScriptInterface.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

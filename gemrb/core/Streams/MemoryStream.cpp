@@ -23,6 +23,7 @@
 #include "errors.h"
 
 #include "Interface.h"
+#include "Logging/Logging.h"
 
 namespace GemRB {
 

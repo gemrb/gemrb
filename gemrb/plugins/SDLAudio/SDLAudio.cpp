@@ -23,6 +23,7 @@
 #include "AmbientMgr.h"
 #include "GameData.h"
 #include "Interface.h" // GetMusicMgr()
+#include "Logging/Logging.h"
 #include "MusicMgr.h"
 #include "SoundMgr.h"
 

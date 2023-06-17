@@ -20,6 +20,7 @@
 
 #include "GUI/EventMgr.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "Video/Video.h"
 
 #include "globals.h"

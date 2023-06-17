@@ -27,6 +27,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "ScriptedAnimation.h"
 #include "TableMgr.h"
 #include "Video/Video.h"

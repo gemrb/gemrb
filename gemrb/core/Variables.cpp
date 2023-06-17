@@ -21,6 +21,7 @@
 #include "Variables.h"
 
 #include "Interface.h" // for LoadInitialValues
+#include "Logging/Logging.h"
 #include "Streams/FileStream.h" // for LoadInitialValues
 #include "System/VFS.h"
 

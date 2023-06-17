@@ -25,6 +25,7 @@
 #include "DialogHandler.h"
 #include "Game.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "TableMgr.h"
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"

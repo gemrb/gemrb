@@ -20,6 +20,7 @@
 
 #include "Compressor.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "PluginMgr.h"
 #include "Streams/FileStream.h"
 #if defined(SUPPORTS_MEMSTREAM)

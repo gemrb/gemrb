@@ -29,6 +29,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Light.h"
+#include "Logging/Logging.h"
 #include "Map.h"
 #include "Video/Pixels.h"
 #include "Sprite2D.h"

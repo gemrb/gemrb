@@ -20,6 +20,7 @@
 
 #include "KeyMap.h"
 #include "Interface.h"
+#include "Logging/Logging.h"
 #include "TableMgr.h"
 #include "ScriptEngine.h"
 #include "Streams/FileStream.h"
