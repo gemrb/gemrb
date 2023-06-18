@@ -100,13 +100,6 @@ void CachedDirectoryImporter::Refresh()
 	if (!it)
 		return;
 
-	unsigned int count = 0;
-	do {
-		count++;
-	} while (++it);
-
-	it.Rewind();
-
 	do {
 		const char *name = it.GetName();
 		std::string buf = name;
