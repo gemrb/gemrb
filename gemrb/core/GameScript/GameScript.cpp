@@ -1790,37 +1790,23 @@ GameScript::GameScript(const ResRef& resref, Scriptable* MySelf,
 
 GameScript::~GameScript(void)
 {
-	if (script) {
-		//set 3. parameter to true if you want instant free
-		//and possible death
-		ScriptDebugLog(ID_REFERENCE, "One instance of {} is dropped from {}.", Name, BcsCache.RefCount(Name));
-		int res = BcsCache.DecRef(script, Name, true);
-
-		if (res<0) {
-			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: {}", Name);
-		}
-		if (!res) {
-			script->Release();
-		}
-		script = NULL;
-	}
+	BcsCache.DecRef(Name, true);
 }
 
 Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 {
 	SClass_ID type = AIScript ? IE_BS_CLASS_ID : IE_BCS_CLASS_ID;
 
-	Script *newScript = (Script *) BcsCache.GetResource(resRef);
-	if ( newScript ) {
-		ScriptDebugLog(ID_REFERENCE, "Caching {} for the {}-th time", resRef, BcsCache.RefCount(resRef));
-		return newScript;
+	Script *cachedScript = BcsCache.GetResource(resRef);
+	if (cachedScript) {
+		return cachedScript;
 	}
 
 	DataStream* stream = gamedata->GetResourceStream(resRef, type);
 	if (!stream) {
 		return NULL;
 	}
-	
+
 	std::string line;
 	stream->ReadLine(line, 10);
 	if (line.compare(0, 2, "SC") != 0) {
@@ -1828,9 +1814,8 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 		delete stream;
 		return nullptr;
 	}
-	newScript = new Script( );
-	BcsCache.SetAt(resRef, (void *) newScript);
-	ScriptDebugLog(ID_REFERENCE, "Caching {} for the {}-th time", resRef, BcsCache.RefCount(resRef));
+
+	auto newScript = BcsCache.SetAt(resRef).first;
 
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );

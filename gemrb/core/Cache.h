@@ -21,6 +21,10 @@
 #ifndef CACHE_H
 #define CACHE_H
 
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+
 #include "globals.h"
 
 namespace GemRB {
@@ -29,64 +33,93 @@ namespace GemRB {
 using ReleaseFun = void (*)(void*);
 #endif
 
-class Cache
-{
-protected:
-	// Association
-	struct MyAssoc {
-		MyAssoc* pNext;
-		MyAssoc** pPrev;
-		ResRef key;
-		ieDword nRefCount;
-		void* data;
-	};
-	struct MemBlock {
-		MemBlock* pNext;
-	};
+/* Reference counting cache, a layer between STL containers and existing interfaces. */
+template<typename K, typename V, typename H>
+class RCCache {
+	private:
+		struct Value {
+			V value;
+			int64_t refCount;
 
-public:
-	// Construction
-	explicit Cache(int nBlockSize = 10, int nHashTableSize = 129);
-	Cache(const Cache&) = delete;
-	~Cache();
-	Cache& operator=(const Cache&) = delete;
+			Value (V && value) : value(std::forward<V>(value)), refCount(1) {}
 
-	// Attributes
-	// number of elements
-	inline int GetCount() const
-	{
-		return m_nCount;
-	}
-	inline bool IsEmpty() const
-	{
-		return m_nCount==0;
-	}
-	// Lookup
-	void *GetResource(const ResRef& key) const;
-	// Operations
-	bool SetAt(const ResRef& key, void *rValue);
-	// decreases refcount or drops data
-	//if name is supplied it is faster, it will use rValue to validate the request
-	int DecRef(const void *rValue, const ResRef& name, bool free);
-	int RefCount(const ResRef& key) const;
-	void RemoveAll(ReleaseFun fun);//removes all refcounts
-	void Cleanup();  //removes only zero refcounts
-	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
+			template<typename ... ARGS>
+			Value (ARGS && ... args) : value(std::forward<ARGS>(args)...), refCount(1) {}
+		};
 
-	// Implementation
-protected:
-	MyAssoc** m_pHashTable = nullptr;
-	unsigned int m_nHashTableSize;
-	int m_nCount = 0;
-	MyAssoc* m_pFreeList = nullptr;
-	MemBlock* m_pBlocks = nullptr;
-	int m_nBlockSize;
+		std::unordered_map<K, Value, H> map;
 
-	Cache::MyAssoc* NewAssoc();
-	void FreeAssoc(Cache::MyAssoc*);
-	Cache::MyAssoc* GetAssocAt(const ResRef&) const;
-	Cache::MyAssoc *GetNextAssoc(Cache::MyAssoc * rNextPosition) const;
+	public:
+		V* GetResource(const K& key) {
+			auto lookup = map.find(key);
+			if (lookup != map.cend()) {
+				lookup->second.refCount++;
+
+				return &lookup->second.value;
+			}
+
+			return nullptr;
+		}
+
+		template<typename ... ARGS>
+		std::pair<V*, bool> SetAt(const K& key, ARGS && ... args) {
+			auto insertion =
+				map.emplace(
+					std::piecewise_construct,
+					std::forward_as_tuple(key),
+					std::forward_as_tuple(std::forward<ARGS>(args)...)
+				);
+
+			return {&insertion.first->second.value, insertion.second};
+		}
+
+		int64_t DecRef(const K& key, bool remove) {
+			auto lookup = map.find(key);
+
+			if (lookup != map.end()) {
+				auto& valueItem = lookup->second;
+
+				if (valueItem.refCount > 0) {
+					valueItem.refCount--;
+				}
+
+				if (remove && valueItem.refCount == 0) {
+					map.erase(lookup);
+
+					return 0;
+				} else {
+					return valueItem.refCount;
+				}
+			}
+
+			return -1;
+		}
+
+		int64_t RefCount(const K& key) const {
+			auto lookup = map.find(key);
+
+			if (lookup != map.cend()) {
+				return lookup->second.RefCount;
+			}
+
+			return -1;
+		}
 };
+
+struct ResRefHash {
+	size_t operator()(const ResRef& key) const {
+		size_t h = 0;
+		const char *c = key.c_str();
+
+		for (unsigned int i = 0; *c && i < 9; ++i)
+			h = (h << 5) + h + tolower(*c++);
+
+		return h;
+	}
+};
+
+template<typename V>
+using ResRefRCCache = RCCache<ResRef, V, ResRefHash>;
 
 }
 

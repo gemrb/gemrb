@@ -28,11 +28,14 @@
 #include "Cache.h"
 #include "CharAnimations.h"
 #include "DisplayMessage.h"
+#include "Effect.h"
 #include "Factory.h"
 #include "Holder.h"
+#include "Item.h"
 #include "Palette.h"
 #include "Resource.h"
 #include "ResourceManager.h"
+#include "Spell.h"
 #include "SrcMgr.h"
 #include "TableMgr.h"
 
@@ -45,10 +48,7 @@ namespace GemRB {
 static const ResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
 class Actor;
-struct Effect;
-class Item;
 class ScriptedAnimation;
-class Spell;
 class Sprite2D;
 class Store;
 class VEFObject;
@@ -93,9 +93,9 @@ public:
 	GameData() = default;
 	GameData(const GameData&) = delete;
 	GameData& operator=(const GameData&) = delete;
+	~GameData();
 
 	using index_t = uint16_t;
-	void ClearCaches();
 
 	/** Returns actor */
 	Actor* GetCreature(const ResRef& creature, unsigned int PartySlot = 0);
@@ -197,9 +197,9 @@ private:
 	void ReadItemSounds();
 	void ReadSpellProtTable();
 private:
-	Cache ItemCache;
-	Cache SpellCache;
-	Cache EffectCache;
+	ResRefRCCache<Item> ItemCache;
+	ResRefRCCache<Spell> SpellCache;
+	ResRefRCCache<Effect> EffectCache;
 	ResRefMap<PaletteHolder> PaletteCache;
 	Factory factory;
 	ResRefMap<AutoTable> tables;

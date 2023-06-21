@@ -47,7 +47,7 @@ extern short actionflags[MAX_ACTIONS];
 extern short triggerflags[MAX_TRIGGERS];
 extern ObjectFunction objects[MAX_OBJECTS];
 extern IDSFunction idtargets[MAX_OBJECT_FIELDS];
-extern Cache BcsCache; //cache for scripts
+extern ResRefRCCache<Script> BcsCache; //cache for scripts
 extern int ObjectIDSCount;
 extern int MaxObjectNesting;
 extern bool HasAdditionalRect;

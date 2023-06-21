@@ -4,7 +4,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Animation.cpp
 	AnimationFactory.cpp
 	Audio.cpp
-	Cache.cpp
 	Calendar.cpp
 	CharAnimations.cpp
 	Core.cpp

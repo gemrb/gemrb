@@ -298,7 +298,6 @@ Interface::~Interface() noexcept
 		delete lists;
 	}
 
-	gamedata->ClearCaches();
 	delete gamedata;
 	gamedata = NULL;
 
