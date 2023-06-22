@@ -504,7 +504,7 @@ int Game::JoinParty(Actor* actor, int join)
 
 	if (join&(JP_INITPOS|JP_SELECT)) {
 		actor->Selected = 0; // don't confuse SelectActor!
-		SelectActor(actor,true, SELECT_NORMAL);
+		SelectActor(actor, true, SELECT_NORMAL | SELECT_QUIET);
 	}
 
 	return ( int ) size;
