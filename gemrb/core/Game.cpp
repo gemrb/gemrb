@@ -201,10 +201,10 @@ Actor* Game::FindPC(unsigned int partyID) const
 	return NULL;
 }
 
-Actor* Game::FindPC(const ieVariable& scriptingname) const
+Actor* Game::FindPC(const ieVariable& scriptingName) const
 {
 	for (const auto& pc : PCs) {
-		if (pc->GetScriptName() == scriptingname) {
+		if (pc->GetScriptName() == scriptingName) {
 			return pc;
 		}
 	}
@@ -219,10 +219,10 @@ Actor* Game::FindNPC(unsigned int partyID) const
 	return NULL;
 }
 
-Actor* Game::FindNPC(const ieVariable& scriptingname) const
+Actor* Game::FindNPC(const ieVariable& scriptingName) const
 {
 	for (const auto& npc : NPCs) {
-		if (npc->GetScriptName() == scriptingname) {
+		if (npc->GetScriptName() == scriptingName) {
 			return npc;
 		}
 	}
@@ -244,12 +244,12 @@ Actor *Game::GetGlobalActorByGlobalID(ieDword globalID) const
 	return NULL;
 }
 
-Actor* Game::GetPC(size_t slot, bool onlyalive) const
+Actor* Game::GetPC(size_t slot, bool onlyAlive) const
 {
 	if (slot >= PCs.size()) {
 		return NULL;
 	}
-	if (onlyalive) {
+	if (onlyAlive) {
 		for (const auto& pc : PCs) {
 			if (IsAlive(pc) && !slot--) {
 				return pc;
@@ -391,9 +391,9 @@ int Game::LeaveParty (Actor* actor)
 }
 
 //determines if startpos.2da has rotation rows (it cannot have tutorial line)
-bool Game::DetermineStartPosType(const TableMgr *strta) const
+bool Game::DetermineStartPosType(const TableMgr* strTable) const
 {
-	if ((strta->GetRowCount()>=6) && strta->GetRowName(4) == "START_ROT")
+	if (strTable->GetRowCount() >=6 && strTable->GetRowName(4) == "START_ROT")
 	{
 		return true;
 	}
@@ -510,9 +510,9 @@ int Game::JoinParty(Actor* actor, int join)
 	return ( int ) size;
 }
 
-int Game::GetPartySize(bool onlyalive) const
+int Game::GetPartySize(bool onlyAlive) const
 {
-	if (onlyalive) {
+	if (onlyAlive) {
 		int count = 0;
 		for (const auto& pc : PCs) {
 			if (!IsAlive(pc)) {
@@ -526,11 +526,11 @@ int Game::GetPartySize(bool onlyalive) const
 }
 
 /* sends the hotkey trigger to all selected actors */
-void Game::SendHotKey(unsigned long Key) const
+void Game::SendHotKey(unsigned long key) const
 {
 	for (auto actor : selected) {
 		if (actor->IsSelected()) {
-			actor->AddTrigger(TriggerEntry(trigger_hotkey, (ieDword) Key));
+			actor->AddTrigger(TriggerEntry(trigger_hotkey, (ieDword) key));
 		}
 	}
 }
@@ -552,12 +552,12 @@ int Game::GetSelectedPCSingle() const
 	return SelectedSingle;
 }
 
-Actor* Game::GetSelectedPCSingle(bool onlyalive) const
+Actor* Game::GetSelectedPCSingle(bool onlyAlive) const
 {
 	Actor *pc = FindPC(SelectedSingle);
 	if (!pc) return NULL;
 
-	if (onlyalive && !IsAlive(pc)) {
+	if (onlyAlive && !IsAlive(pc)) {
 		return NULL;
 	}
 	return pc;
@@ -643,14 +643,14 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 	return true;
 }
 
-// Gets sum of party level, if onlyalive is true, then counts only living PCs
+// Gets sum of party level, if onlyAlive is true, then counts only living PCs
 // If you need average party level, divide this with GetPartySize
-int Game::GetTotalPartyLevel(bool onlyalive) const
+int Game::GetTotalPartyLevel(bool onlyAlive) const
 {
 	int amount = 0;
 
 	for (const auto& pc : PCs) {
-			if (onlyalive && pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
+			if (onlyAlive && pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
 				continue;
 			}
 			amount += pc->GetXPLevel(0);
@@ -680,9 +680,9 @@ Map* Game::GetMap(unsigned int index) const
 	return Maps[index];
 }
 
-Map *Game::GetMap(const ResRef &areaname, bool change)
+Map* Game::GetMap(const ResRef& areaName, bool change)
 {
-	int index = LoadMap(areaname, change);
+	int index = LoadMap(areaName, change);
 	if (index < 0) {
 		return nullptr;
 	}
@@ -693,8 +693,8 @@ Map *Game::GetMap(const ResRef &areaname, bool change)
 
 	MapIndex = index;
 	area = GetMap(index);
-	CurrentArea = areaname;
-	if (area->MasterArea) LastMasterArea = areaname;
+	CurrentArea = areaName;
+	if (area->MasterArea) LastMasterArea = areaName;
 	// change the tileset if needed
 	area->ChangeMap(IsDay());
 	area->SetupAmbients();
@@ -948,12 +948,12 @@ int Game::AddNPC(Actor* npc)
 	return (int) NPCs.size() - 1;
 }
 
-Actor* Game::GetNPC(unsigned int Index) const
+Actor* Game::GetNPC(unsigned int index) const
 {
-	if (Index >= NPCs.size()) {
+	if (index >= NPCs.size()) {
 		return NULL;
 	}
-	return NPCs[Index];
+	return NPCs[index];
 }
 
 void Game::SwapPCs(unsigned int pc1, unsigned int pc2) const
@@ -976,43 +976,43 @@ void Game::SwapPCs(unsigned int pc1, unsigned int pc2) const
 	}
 }
 
-void Game::DeleteJournalEntry(ieStrRef strref)
+void Game::DeleteJournalEntry(ieStrRef strRef)
 {
 	size_t i=Journals.size();
 	while(i--) {
-		if ((Journals[i]->Text==strref) || (strref == ieStrRef(-1)) ) {
+		if (Journals[i]->Text == strRef || strRef == ieStrRef(-1)) {
 			delete Journals[i];
 			Journals.erase(Journals.begin()+i);
 		}
 	}
 }
 
-void Game::DeleteJournalGroup(int Group)
+void Game::DeleteJournalGroup(int group)
 {
 	size_t i=Journals.size();
 	while(i--) {
-		if (Journals[i]->Group==(ieByte) Group) {
+		if (Journals[i]->Group == (ieByte) group) {
 			delete Journals[i];
 			Journals.erase(Journals.begin()+i);
 		}
 	}
 }
 /* returns true if it modified or added a journal entry */
-bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
+bool Game::AddJournalEntry(ieStrRef strRef, int section, int group)
 {
-	GAMJournalEntry *je = FindJournalEntry(strref);
+	GAMJournalEntry* je = FindJournalEntry(strRef);
 	if (je) {
 		//don't set this entry again in the same section
-		if (je->Section==Section) {
+		if (je->Section == section) {
 			return false;
 		}
-		if ((Section == IE_GAM_QUEST_DONE) && Group) {
+		if ((section == IE_GAM_QUEST_DONE) && group) {
 			//removing all of this group and adding a new entry
-			DeleteJournalGroup(Group);
+			DeleteJournalGroup(group);
 		} else {
 			//modifying existing entry
-			je->Section = (ieByte) Section;
-			je->Group = (ieByte) Group;
+			je->Section = (ieByte) section;
+			je->Group = (ieByte) group;
 			ieDword chapter = 0;
 			if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
 				locals->Lookup("CHAPTER", chapter);
@@ -1030,9 +1030,9 @@ bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 	}
 	je->Chapter = (ieByte) chapter;
 	je->unknown09 = 0;
-	je->Section = (ieByte) Section;
-	je->Group = (ieByte) Group;
-	je->Text = strref;
+	je->Section = (ieByte) section;
+	je->Group = (ieByte) group;
+	je->Text = strRef;
 
 	Journals.push_back( je );
 	return true;
@@ -1048,10 +1048,10 @@ unsigned int Game::GetJournalCount() const
 	return (unsigned int) Journals.size();
 }
 
-GAMJournalEntry* Game::FindJournalEntry(ieStrRef strref) const
+GAMJournalEntry* Game::FindJournalEntry(ieStrRef strRef) const
 {
 	for (auto entry : Journals) {
-		if (entry->Text == strref) {
+		if (entry->Text == strRef) {
 			return entry;
 		}
 	}
@@ -1059,12 +1059,12 @@ GAMJournalEntry* Game::FindJournalEntry(ieStrRef strref) const
 	return NULL;
 }
 
-GAMJournalEntry* Game::GetJournalEntry(unsigned int Index) const
+GAMJournalEntry* Game::GetJournalEntry(unsigned int index) const
 {
-	if (Index >= Journals.size()) {
+	if (index >= Journals.size()) {
 		return NULL;
 	}
-	return Journals[Index];
+	return Journals[index];
 }
 
 unsigned int Game::GetSavedLocationCount() const

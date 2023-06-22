@@ -294,7 +294,7 @@ public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID) const;
 	/** Returns actor by slot */
-	Actor* GetPC(size_t slot, bool onlyalive) const;
+	Actor* GetPC(size_t slot, bool onlyAlive) const;
 	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
 	Actor* FindPC(unsigned int partyID) const;
 	Actor* FindNPC(unsigned int partyID) const;
@@ -305,29 +305,29 @@ public:
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
 	int InStore(const Actor *pc) const;
 	/** Finds an actor in party by scripting name*/
-	Actor* FindPC(const ieVariable& deathvar) const;
+	Actor* FindPC(const ieVariable& deathVar) const;
 	/** Finds an actor in store by scripting name*/
-	Actor* FindNPC(const ieVariable& deathvar) const;
+	Actor* FindNPC(const ieVariable& deathVar) const;
 	/** Sets the area and position of the actor to the starting position */
 	void InitActorPos(Actor *actor) const;
 	/** Joins party */
 	int JoinParty(Actor* pc, int join=JP_JOIN);
 	/** Return current party size */
-	int GetPartySize(bool onlyalive) const;
+	int GetPartySize(bool onlyAlive) const;
 	/** Returns the npcs count */
 	int GetNPCCount() const { return (int)NPCs.size(); }
 	/** Sends the hotkey trigger to all selected pcs */
-	void SendHotKey(unsigned long Key) const;
+	void SendHotKey(unsigned long key) const;
 	/** Select PC for non-walking environment (shops, inventory, ...) */
 	bool SelectPCSingle(int index);
 	/** Get index of selected PC for non-walking env (shops, inventory, ...) */
 	int GetSelectedPCSingle() const;
-	Actor* GetSelectedPCSingle(bool onlyalive) const;
+	Actor* GetSelectedPCSingle(bool onlyAlive) const;
 	/** (De)selects actor. */
-	bool SelectActor( Actor* actor, bool select, unsigned flags );
+	bool SelectActor(Actor* actor, bool select, unsigned flags);
 
 	/** Return current party level count for xp calculations */
-	int GetTotalPartyLevel(bool onlyalive) const;
+	int GetTotalPartyLevel(bool onlyAlive) const;
 	/** Reassigns inparty numbers, call it after party creation */
 	void ConsolidateParty() const;
 	/** Removes actor from party (if in there) */
@@ -339,7 +339,7 @@ public:
 	Map* GetMap(unsigned int index) const;
 	/** Returns a map from area name, loads it if needed
 	 * use it for the biggest safety, change = true will change the current map */
-	Map* GetMap(const ResRef &areaname, bool change);
+	Map* GetMap(const ResRef& areaName, bool change);
 	/** Returns slot of the map if found */
 	int FindMap(const ResRef &resRef) const;
 	int AddMap(Map* map);
@@ -354,7 +354,7 @@ public:
 	/** Returns slot of the map, if it was already loaded,
 	 * don't load it again, set changepf == true,
 	 * if you want to change the pathfinder too. */
-	int LoadMap(const ResRef &ResRef, bool loadscreen);
+	int LoadMap(const ResRef& resRef, bool loadScreen);
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index) const;
@@ -365,43 +365,43 @@ public:
 
 	//journal entries
 	/** Deletes one or all journal entries if strref is -1 */
-	void DeleteJournalEntry(ieStrRef strref);
+	void DeleteJournalEntry(ieStrRef strRef);
 	/** Delete entries of the same group */
-	void DeleteJournalGroup(int Group);
+	void DeleteJournalGroup(int group);
 	/** Adds a journal entry from dialog data.
 	 * Time and chapter are calculated on the fly
 	 * Returns false if the entry already exists */
-	bool AddJournalEntry(ieStrRef strref, int section, int group);
+	bool AddJournalEntry(ieStrRef strRef, int section, int group);
 	/** Adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
 	unsigned int GetJournalCount() const;
-	GAMJournalEntry* FindJournalEntry(ieStrRef strref) const;
-	GAMJournalEntry* GetJournalEntry(unsigned int Index) const;
+	GAMJournalEntry* FindJournalEntry(ieStrRef strRef) const;
+	GAMJournalEntry* GetJournalEntry(unsigned int index) const;
 
 	//saved locations
 	unsigned int GetSavedLocationCount() const;
 	void ClearSavedLocations();
-	GAMLocationEntry* GetSavedLocationEntry(unsigned int Index);
+	GAMLocationEntry* GetSavedLocationEntry(unsigned int index);
 
 	//plane locations
 	unsigned int GetPlaneLocationCount() const;
 	void ClearPlaneLocations();
-	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);
+	GAMLocationEntry* GetPlaneLocationEntry(unsigned int index);
 
 	const ResRef& GetFamiliar(size_t index) const;
 	void SetFamiliar(const ResRef& familiar, size_t index);
 
-	bool IsBeastKnown(unsigned int Index) const {
-		if (Index>=BESTIARY_SIZE) {
+	bool IsBeastKnown(unsigned int index) const {
+		if (index >= BESTIARY_SIZE) {
 			return false;
 		}
-		return beasts[Index] != 0;
+		return beasts[index] != 0;
 	}
-	void SetBeastKnown(unsigned int Index) {
-		if (Index>=BESTIARY_SIZE) {
+	void SetBeastKnown(unsigned int index) {
+		if (index >= BESTIARY_SIZE) {
 			return;
 		}
-		beasts[Index] = 1;
+		beasts[index] = 1;
 	}
 	ieWord GetFormation() const {
 		if (WhichFormation>4) {
@@ -481,7 +481,7 @@ public:
 	Actor *GetTimestopOwner() const { return timestop_owner; };
 	void SetTimestopOwner(Actor *owner) { timestop_owner = owner; };
 	/** Checks the bounty encounters (used in bg1) */
-	bool RandomEncounter(ResRef& BaseArea) const;
+	bool RandomEncounter(ResRef& baseArea) const;
 	/** Resets the area and bored comment timers of the whole party */
 	void ResetPartyCommentTimes() const;
 	void ReversePCs() const;
@@ -489,7 +489,7 @@ public:
 	void MovePCs(const ResRef& targetArea, const Point& targetPoint, int orientation) const;
 	void MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int orientation) const;
 private:
-	bool DetermineStartPosType(const TableMgr *strta) const;
+	bool DetermineStartPosType(const TableMgr* strTable) const;
 	ResRef *GetDream(Map *area);
 	void CastOnRest() const;
 	void PlayerDream() const;
