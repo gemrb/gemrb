@@ -5304,7 +5304,7 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 		if (chapter == ieDword(-1)) {
 			game->locals->Lookup("CHAPTER", chapter);
 		}
-		game->AddJournalEntry(strref, chapter, section);
+		game->AddJournalEntry(strref, (ieByte) chapter, (ieByte) section);
 	}
 
 	Py_RETURN_NONE;

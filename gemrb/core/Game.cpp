@@ -987,18 +987,18 @@ void Game::DeleteJournalEntry(ieStrRef strRef)
 	}
 }
 
-void Game::DeleteJournalGroup(int group)
+void Game::DeleteJournalGroup(ieByte group)
 {
 	size_t i=Journals.size();
 	while(i--) {
-		if (Journals[i]->Group == (ieByte) group) {
+		if (Journals[i]->Group == group) {
 			delete Journals[i];
 			Journals.erase(Journals.begin()+i);
 		}
 	}
 }
 /* returns true if it modified or added a journal entry */
-bool Game::AddJournalEntry(ieStrRef strRef, int section, int group)
+bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 {
 	GAMJournalEntry* je = FindJournalEntry(strRef);
 	if (je) {
@@ -1011,8 +1011,8 @@ bool Game::AddJournalEntry(ieStrRef strRef, int section, int group)
 			DeleteJournalGroup(group);
 		} else {
 			//modifying existing entry
-			je->Section = (ieByte) section;
-			je->Group = (ieByte) group;
+			je->Section = section;
+			je->Group = group;
 			ieDword chapter = 0;
 			if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
 				locals->Lookup("CHAPTER", chapter);
@@ -1030,8 +1030,8 @@ bool Game::AddJournalEntry(ieStrRef strRef, int section, int group)
 	}
 	je->Chapter = (ieByte) chapter;
 	je->unknown09 = 0;
-	je->Section = (ieByte) section;
-	je->Group = (ieByte) group;
+	je->Section = section;
+	je->Group = group;
 	je->Text = strRef;
 
 	Journals.push_back( je );

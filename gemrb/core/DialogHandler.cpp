@@ -39,9 +39,9 @@
 namespace GemRB {
 
 //translate section values (journal, quests, solved, user)
-static const int *sectionMap;
-static const int bg2Sections[4] = {4,1,2,0};
-static const int noSections[4] = {0,0,0,0};
+static const ieByte* sectionMap;
+static const ieByte bg2Sections[4] = { 4, 1, 2, 0 };
+static const ieByte noSections[4] = { 0, 0, 0, 0 };
 
 // FIXME: arbitrary guess value
 #define DIALOG_MOVE_SPEED 75

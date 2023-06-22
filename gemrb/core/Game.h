@@ -367,11 +367,11 @@ public:
 	/** Deletes one or all journal entries if strref is -1 */
 	void DeleteJournalEntry(ieStrRef strRef);
 	/** Delete entries of the same group */
-	void DeleteJournalGroup(int group);
+	void DeleteJournalGroup(ieByte group);
 	/** Adds a journal entry from dialog data.
 	 * Time and chapter are calculated on the fly
 	 * Returns false if the entry already exists */
-	bool AddJournalEntry(ieStrRef strRef, int section, int group);
+	bool AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group);
 	/** Adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
 	unsigned int GetJournalCount() const;
