@@ -375,8 +375,9 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18044, 18035, HelpTextArea2, Window, 4, 20, 17158, 'Auto Pause State', None, 2) # attacked
 	GUIOPTControls.OptCheckbox (18044, 18036, HelpTextArea2, Window, 5, 21, 17159, 'Auto Pause State', None, 1) # weapon unusable
 	GUIOPTControls.OptCheckbox (18044, 18037, HelpTextArea2, Window, 13, 22, 17160, 'Auto Pause State', None, 32) # target gone
-	GUIOPTControls.OptCheckbox (18044, 10640, HelpTextArea2, Window, 25, 24, 10639, 'Auto Pause State', None, 64) # end of round
-	if GameCheck.IsIWD2():
+	GUIOPTControls.OptCheckbox (18044, 10640, HelpTextArea2, Window, 25, 24, 10639, 'Auto Pause State', None, 64) # end of roundthe check
+	# Added gamecheck for IWD1 below as the options do not appear to work in IWD1 without it
+	if GameCheck.IsIWD2() or GameCheck.IsIWD1():
 		GUIOPTControls.OptCheckbox (18044, 23514, HelpTextArea2, Window, 30, 31, 23516, 'Auto Pause State', None, 128) # enemy sighted
 		GUIOPTControls.OptCheckbox (18044, 18560, HelpTextArea2, Window, 26, 28, 16519, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (18044, 26311, HelpTextArea2, Window, 36, 37, 26310, 'Auto Pause State', None, 512) # spell cast
