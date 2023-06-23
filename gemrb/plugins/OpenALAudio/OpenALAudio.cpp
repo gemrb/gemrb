@@ -174,7 +174,7 @@ void AudioStream::ForceClear()
 	ClearIfStopped();
 }
 
-OpenALAudioDriver::OpenALAudioDriver(void)
+OpenALAudioDriver::OpenALAudioDriver(void) : buffercache(BUFFER_CACHE_SIZE)
 {
 	music_memory = (short*) malloc(ACM_BUFFERSIZE);
 	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));
@@ -347,7 +347,6 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	}
 	speech.ForceClear();
 	ResetMusics();
-	clearBufferCache(true);
 
 #ifdef HAVE_OPENAL_EFX_H
 	if (hasEFX) {
@@ -376,19 +375,14 @@ ALuint OpenALAudioDriver::loadSound(StringView ResRef, tick_t &time_length)
 {
 	ALuint Buffer = 0;
 
-	CacheEntry *e;
-	void* p;
-
 	if (ResRef.empty()) {
 		return 0;
 	}
-	
-	LRUCache::key_t key(ResRef);
-	if(buffercache.Lookup(key, p))
-	{
-		e = (CacheEntry*) p;
-		time_length = e->Length;
-		return e->Buffer;
+
+	auto entry = buffercache.Lookup(ResRef);
+	if (entry != nullptr) {
+		time_length = entry->Length;
+		return entry->Buffer;
 	}
 
 	//no cache entry...
@@ -423,16 +417,8 @@ ALuint OpenALAudioDriver::loadSound(StringView ResRef, tick_t &time_length)
 		return 0;
 	}
 
-	e = new CacheEntry;
-	e->Buffer = Buffer;
-	e->Length = time_length;
+	buffercache.SetAt(ResRef, Buffer, time_length);
 
-	buffercache.SetAt(key, (void*)e);
-	//print("LoadSound: added %s to cache: %d. Cache size now %d", ResRef, e->Buffer, buffercache.GetCount());
-
-	if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
-		evictBuffer();
-	}
 	return Buffer;
 }
 
@@ -811,55 +797,6 @@ void OpenALAudioDriver::SetAmbientStreamPitch(int stream, int pitch)
 	ALuint source = streams[stream].Source;
 	alSourcef( source, AL_PITCH, 0.01f * pitch );
 	checkALError("Unable to set ambient pitch", WARNING);
-}
-
-bool OpenALAudioDriver::evictBuffer()
-{
-	// Note: this function assumes the caller holds bufferMutex
-
-	// Room for optimization: this is O(n^2) in the number of buffers
-	// at the tail that are used. It can be O(n) if LRUCache supports it.
-
-	unsigned int n = 0;
-	void* p;
-	LRUCache::key_t k;
-	bool res;
-
-	while ((res = buffercache.getLRU(n, k, p)) == true) {
-		CacheEntry* e = (CacheEntry*)p;
-		alDeleteBuffers(1, &e->Buffer);
-		if (alGetError() == AL_NO_ERROR) {
-			// Buffer was unused. An error would have indicated
-			// the buffer was still attached to a source.
-
-			delete e;
-			buffercache.Remove(k);
-
-			//print("Removed buffer %s from ACMImp cache", k);
-			break;
-		}
-		++n;
-	}
-
-	return res;
-}
-
-void OpenALAudioDriver::clearBufferCache(bool force)
-{
-	// Room for optimization: any method of iterating over the buffers
-	// would suffice. It doesn't have to be in LRU-order.
-	void* p;
-	LRUCache::key_t k;
-	int n = 0;
-	while (buffercache.getLRU(n, k, p)) {
-		CacheEntry* e = (CacheEntry*)p;
-		alDeleteBuffers(1, &e->Buffer);
-		if (force || alGetError() == AL_NO_ERROR) {
-			delete e;
-			buffercache.Remove(k);
-		} else
-			++n;
-	}
 }
 
 ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits) const

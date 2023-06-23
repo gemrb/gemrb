@@ -32,7 +32,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Logging/Logger.cpp
 	Logging/Loggers/Stdio.cpp
 	Logging/Logging.cpp
-	LRUCache.cpp
 	Map.cpp
 	MapReverb.cpp
 	MoviePlayer.cpp

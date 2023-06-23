@@ -19,46 +19,179 @@
  */
 
 #ifndef LRUCACHE_H
-#define LRUCACHE_H 
+#define LRUCACHE_H
+
+#include <tuple>
+#include <unordered_map>
+#include <utility>
 
 #include "exports.h"
 
 #include "Strings/StringView.h"
-#include "Variables.h"
 
 namespace GemRB {
 
 struct VarEntry;
 
-class GEM_EXPORT LRUCache {
-public:
-	using key_t = Variables::key_t;
-	
-	LRUCache();
+/* Not thread-safe, PRED is an eviction predicate */
+template<typename T, class PRED>
+class LRUCache {
+	public:
+		using key_t = std::string;
+		using public_key_t = StringView;
 
-	// set value, overwriting any previous entry
-	void SetAt(key_t, void* value);
-	bool Lookup(key_t, void*& value) const;
-	bool Touch(key_t key);
-	bool Remove(key_t key);
+	private:
+		/* Queue items are placed into a doubly-linked list, the front element is the LRU. */
+		struct QueueItem {
+			QueueItem *prev;
+			QueueItem *next;
+			const key_t& key;
 
-	int GetCount() const;
+			QueueItem(const key_t& key) : prev(nullptr), next(nullptr), key(key) {}
+			QueueItem(const key_t& key, QueueItem *prev)
+				: prev(prev), next(nullptr), key(key)
+			{}
+		};
 
-	// return n-th LRU entry. key remains owned by LRUCache.
-	// (n = 0 is least recently used, n = 1 the next least recently used,
-	//  etc...)
-	bool getLRU(unsigned int n, key_t& key, void*& value) const;
+		/* Cache items hold the value and a short cut to the queue item to be moved to the end. */
+		struct CacheItem {
+			QueueItem *queueItem;
+			T value;
 
-private:
-	// internal storage
-	Variables v;
-	VarEntry* head = nullptr;
-	VarEntry* tail = nullptr;
+			template<typename ... ARGS>
+			CacheItem (ARGS && ... args) : queueItem(nullptr), value(std::forward<ARGS>(args)...)
+			{}
+		};
 
-	void removeFromList(VarEntry* e);
+		QueueItem *front;
+		QueueItem *back;
+		std::unordered_map<key_t, CacheItem> map;
+		size_t cacheSize;
+		PRED predicate;
+
+	public:
+		LRUCache (size_t size) : front(nullptr), back(nullptr), cacheSize(size) {}
+		~LRUCache () {
+			auto next = front;
+
+			while (next != nullptr) {
+				auto _next = next->next;
+				delete next;
+				next = _next;
+			}
+		}
+
+		template<typename ... ARGS>
+		void SetAt(const public_key_t& key, ARGS && ...args) {
+			if (map.size() == cacheSize) {
+				evict();
+			}
+
+			auto insertion =
+				map.emplace(
+					std::piecewise_construct,
+					std::forward_as_tuple(key.c_str()),
+					std::forward_as_tuple(std::forward<ARGS>(args)...)
+				);
+
+			if (!insertion.second) {
+				return;
+			}
+
+			if (back == nullptr) {
+				this->back = new QueueItem(insertion.first->first);
+			} else {
+				auto _back = back;
+				this->back = new QueueItem(insertion.first->first, _back);
+				_back->next = back;
+			}
+
+			if (front == nullptr) {
+				this->front = back;
+			}
+
+			insertion.first->second.queueItem = back;
+		}
+
+		const T* Lookup(const public_key_t& key) const {
+			std::string _key{key.c_str()};
+			auto lookup = map.find(_key);
+
+			return lookup != map.cend() ? &lookup->second.value : nullptr;
+		}
+
+		bool Touch(const public_key_t& key) {
+			std::string _key{key.c_str()};
+			auto lookup = map.find(_key);
+
+			if (lookup != map.cend()) {
+				moveToBack(lookup->second.queueItem);
+				return true;
+			}
+
+			return false;
+		}
+
+		bool Remove(const public_key_t& key) {
+			std::string _key{key.c_str()};
+			auto lookup = map.find(_key);
+
+			if (lookup != map.cend()) {
+				unlink(lookup->second.queueItem);
+				delete lookup->second.queueItem;
+				map.erase(lookup);
+
+				return true;
+			}
+
+			return false;
+		}
+
+	private:
+		void evict() {
+			auto next = front;
+			while (next != nullptr) {
+				auto lookup = map.find(next->key);
+
+				if (next->next == nullptr || predicate(lookup->second.value)) {
+					/* This is because OpenAL could have done stuff in predicate. */
+					lookup->second.value.evictionNotice();
+
+					map.erase(lookup);
+					unlink(next);
+					delete next;
+					break;
+				}
+				next = next->next;
+			}
+		}
+
+		void moveToBack(QueueItem *item) {
+			unlink(item);
+			item->prev = back;
+			if (item->prev != nullptr) {
+				item->prev->next = item;
+			}
+			this->back = item;
+		}
+
+		void unlink(QueueItem *item) {
+			if (item->prev != nullptr) {
+				item->prev->next = item->next;
+			} else {
+				this->front = item->next;
+			}
+
+			if (item->next != nullptr) {
+				item->next->prev = item->prev;
+			} else {
+				this->back = item->prev;
+			}
+
+			item->prev = nullptr;
+			item->next = nullptr;
+		}
 };
-
-
 
 }
 

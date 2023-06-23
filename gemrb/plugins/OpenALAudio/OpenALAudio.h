@@ -90,6 +90,37 @@ struct AudioStream {
 struct CacheEntry {
 	ALuint Buffer;
 	tick_t Length;
+
+	CacheEntry(ALuint buffer, tick_t length) : Buffer(buffer), Length(length) {}
+	CacheEntry(const CacheEntry&) = delete;
+	CacheEntry(CacheEntry && other) : Buffer(other.Buffer), Length(other.Length) {
+		other.Buffer = 0;
+	}
+	CacheEntry& operator=(const CacheEntry&) = delete;
+	CacheEntry& operator=(CacheEntry && other) {
+		this->Buffer = other.Buffer;
+		other.Buffer = 0;
+		this->Length = other.Length;
+
+		return *this;
+	}
+
+	void evictionNotice() {
+		Buffer = 0;
+	}
+
+	~CacheEntry() {
+		if (Buffer != 0) {
+			alDeleteBuffers(1, &Buffer);
+		}
+	}
+};
+
+struct OpenALPlaying {
+	bool operator()(const CacheEntry& entry) {
+		alDeleteBuffers(1, &entry.Buffer);
+		return alGetError() == AL_NO_ERROR;
+	}
 };
 
 class OpenALAudioDriver : public Audio {
@@ -131,7 +162,7 @@ private:
 	std::recursive_mutex musicMutex;
 	ALuint MusicBuffer[MUSICBUFFERS]{};
 	std::shared_ptr<SoundMgr> MusicReader;
-	LRUCache buffercache;
+	LRUCache<CacheEntry, OpenALPlaying> buffercache;
 	AudioStream speech;
 	AudioStream streams[MAX_STREAMS];
 	int num_streams = 0;

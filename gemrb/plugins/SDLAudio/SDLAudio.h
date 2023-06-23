@@ -66,6 +66,43 @@ struct SDLAudioStream {
 struct CacheEntry {
 	Mix_Chunk *chunk;
 	unsigned int Length;
+
+	CacheEntry(Mix_Chunk *chunk, tick_t length) : chunk(chunk), Length(length) {}
+	CacheEntry(const CacheEntry&) = delete;
+	CacheEntry(CacheEntry && other) : chunk(other.chunk), Length(other.Length) {
+		other.chunk = nullptr;
+	}
+	CacheEntry& operator=(const CacheEntry&) = delete;
+	CacheEntry& operator=(CacheEntry && other) {
+		this->chunk = other.chunk;
+		other.chunk = nullptr;
+		this->Length = other.Length;
+
+		return *this;
+	}
+
+	void evictionNotice() { }
+
+	~CacheEntry() {
+		if (chunk != nullptr) {
+			free(chunk->abuf);
+			free(chunk);
+		}
+	}
+};
+
+struct SDLAudioPlaying {
+	bool operator()(const CacheEntry& entry) {
+		int numChannels = Mix_AllocateChannels(-1);
+
+		for (int i = 0; i < numChannels; ++i) {
+			if (Mix_Playing(i) && Mix_GetChunk(i) == entry.chunk) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 };
 
 class SDLAudio : public Audio {
@@ -116,7 +153,7 @@ private:
 	int audio_channels = 0;
 
 	std::recursive_mutex MusicMutex;
-	LRUCache buffercache;
+	LRUCache<CacheEntry, SDLAudioPlaying> buffercache;
 	SDLAudioStream ambientStreams[AMBIENT_CHANNELS];
 };
 
