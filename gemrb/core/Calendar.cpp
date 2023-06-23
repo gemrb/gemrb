@@ -22,7 +22,6 @@
 
 #include "Interface.h"
 #include "TableMgr.h"
-#include "Variables.h"
 
 namespace GemRB {
 

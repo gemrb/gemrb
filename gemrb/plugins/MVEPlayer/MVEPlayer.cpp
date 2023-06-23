@@ -26,7 +26,6 @@
 #include "Interface.h"
 #include "Logging/Logging.h"
 #include "Palette.h"
-#include "Variables.h"
 #include "Video/Video.h"
 
 #include <cassert>

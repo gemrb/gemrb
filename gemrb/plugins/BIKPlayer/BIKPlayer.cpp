@@ -40,7 +40,6 @@
 #include "Audio.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
-#include "Variables.h"
 #include "Video/Video.h"
 
 #include <cassert>
