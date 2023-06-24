@@ -412,8 +412,7 @@ void Game::InitActorPos(Actor *actor) const
 		error("Game", "Game is missing character start data.");
 	}
 	// 0 - single player, 1 - tutorial, 2 - expansion
-	ieDword playmode = 0;
-	core->GetDictionary()->Lookup( "PlayMode", playmode );
+	ieDword playmode = core->GetVariable("PlayMode", 0);
 
 	//Sometimes playmode is set to -1 (in pregenerate)
 	//normally execution shouldn't ever come here, but it actually does
@@ -1830,13 +1829,13 @@ bool Game::RestParty(int checks, int dream, int hp)
 	ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::Rested);
 	ieStrRef hoursMsg = DisplayMessage::GetStringReference(HCStrings::Hours);
 
-	core->GetTokenDictionary()->SetAtAsString("HOUR", hours);
+	core->GetTokenDictionary()["HOUR"] = hours;
 
 	//this would be bad
 	if (hoursMsg == ieStrRef::INVALID || restedMsg == ieStrRef::INVALID) return cutscene;
 	
 	String tmpstr = core->GetString(hoursMsg, STRING_FLAGS::NONE);
-	core->GetTokenDictionary()->SetAt("DURATION", tmpstr);
+	core->GetTokenDictionary()["DURATION"] = tmpstr;
 	displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
 	return cutscene;
 }
@@ -1860,8 +1859,8 @@ void Game::CastOnRest() const
 	using RestSpells = std::vector<HealingResource>;
 	using RestTargets = std::vector<Injured>;
 
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
+	ieDword tmp = core->GetVariable("Heal Party on Rest", 0);
+
 	const auto& special_spells = gamedata->GetSpecialSpells();
 	size_t specialCount = special_spells.size();
 	if (!tmp || !specialCount) {
@@ -1987,8 +1986,7 @@ void Game::Infravision()
 	const Map *map = GetCurrentArea();
 	if (!map) return;
 
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("infravision", tmp);
+	ieDword tmp = core->GetVariable("infravision", 0);
 
 	bool someoneWithInfravision = false;
 	bool allSelectedWithInfravision = true;
@@ -2193,7 +2191,7 @@ void Game::SetExpansion(ieDword value)
 		break;
 	//TODO: move this hardcoded hack to the scripts
 	case 0:
-		core->GetDictionary()->SetAt( "PlayMode", 2 );
+		core->GetDictionary()["PlayMode"] = 2;
 
 		int i = GetPartySize(false);
 		while(i--) {

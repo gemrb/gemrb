@@ -104,8 +104,7 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count) const
 
 int MVEPlay::setAudioStream() const
 {
-	ieDword volume ;
-	core->GetDictionary()->Lookup( "Volume Movie", volume) ;
+	ieDword volume = core->GetVariable("Volume Movie", 0) ;
 	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, false) ;
 	return source;
 }

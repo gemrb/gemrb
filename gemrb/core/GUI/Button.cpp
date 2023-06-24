@@ -409,9 +409,7 @@ String Button::TooltipText() const
 		return L"";
 	}
 
-	ieDword showHotkeys = 0;
-	core->GetDictionary()->Lookup("Hotkeys On Tooltips", showHotkeys);
-
+	ieDword showHotkeys = core->GetVariable("Hotkeys On Tooltips", 0);
 	if (showHotkeys && hotKey) {
 		String s;
 		switch (hotKey.key) {

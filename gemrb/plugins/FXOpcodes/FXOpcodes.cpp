@@ -5949,12 +5949,13 @@ int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //GemRB extension: if fx->Parameter1 is set, it is the bitfield of spell types (could be priest spells)
 int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
+	auto& vars = core->GetDictionary();
 	// print("fx_select_spell(%2d) %d", fx->Opcode, fx->Parameter2);
 	Spellbook *sb = &target->spellbook;
 	if(fx->Parameter2) {
 		//all known spells, no need to memorize
 		// the details are all handled by the Spellbook guiscript
-		core->GetDictionary()->SetAt("ActionLevel", 5);
+		vars["ActionLevel"] = 5;
 	} else {
 		//all spells listed in 2da
 		// (ees) differentiate between 1 and 2 with some minor extra filtering, but we do that elsewhere
@@ -5962,11 +5963,11 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		gamedata->ReadResRefTable(fx->Resource, data);
 		sb->SetCustomSpellInfo(data, fx->SourceRef, 0);
 
-		core->GetDictionary()->SetAt("ActionLevel", 11);
+		vars["ActionLevel"] = 11;
 	}
 	// force a redraw of the action bar
 	//this is required, because not all of these opcodes are firing right at casting
-	core->GetDictionary()->SetAt("Type",-1);
+	vars["Type"] = -1;
 	core->SetEventFlag(EF_ACTION);
 	return FX_NOT_APPLIED;
 }
@@ -6589,11 +6590,11 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (target->InParty) {
-		Variables *dict = core->GetDictionary();
+		auto& dict = core->GetDictionary();
 
-		dict->SetAt( "P0", target->InParty );
-		dict->SetAt( "P1", fx->Parameter1 );
-		dict->SetAt( "P2", fx->Parameter2 );
+		dict["P0"] = target->InParty;
+		dict["P1"] = fx->Parameter1;
+		dict["P2"] = fx->Parameter2;
 		core->SetEventFlag(EF_SEQUENCER);
 		// set also this for GUIMG, since the spell won't be normally cast, but applied
 		target->LastSpellOnMe = ResolveSpellNumber(fx->SourceRef);
@@ -7038,11 +7039,11 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//just a call to activate the spell sequencer creation gui
 	if (target->InParty) {
-		Variables *dict = core->GetDictionary();
+		auto& vars = core->GetDictionary();
 
-		dict->SetAt( "P0", target->InParty );
-		dict->SetAt( "P1", fx->Parameter1 );           //maximum level
-		dict->SetAt( "P2", fx->Parameter2 | (2<<16) ); //count and target type
+		vars["P0"] = target->InParty;
+		vars["P1"] = fx->Parameter1;
+		vars["P2"] = fx->Parameter2 | (2 << 16);
 		core->SetEventFlag(EF_SEQUENCER);
 	}
 	return FX_NOT_APPLIED;
@@ -8109,7 +8110,7 @@ int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (sourceNameRef != ieStrRef(-1)) {
 		String sourceName = core->GetString(sourceNameRef, STRING_FLAGS::NONE);
-		core->GetTokenDictionary()->SetAt("RESOURCE", sourceName);
+		core->GetTokenDictionary()["RESOURCE"] = sourceName;
 		displaymsg->DisplayConstantStringName(HCStrings::ResResisted, GUIColors::WHITE, target);
 	}
 	//this has effect only on first apply, it will stop applying the spell

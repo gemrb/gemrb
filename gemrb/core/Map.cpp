@@ -1583,10 +1583,9 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 	if (walls.first.empty()) {
 		return BlitFlags::NONE; // not behind a wall, no stencil required
 	}
-	
-	ieDword always_dither;
-	core->GetDictionary()->Lookup("Always Dither", always_dither);
-	
+
+	ieDword always_dither = core->GetVariable("Always Dither", 0);
+
 	BlitFlags flags = BlitFlags::STENCIL_DITHER; // TODO: make dithering configurable
 	if (always_dither) {
 		flags |= BlitFlags::STENCIL_ALPHA;
@@ -3485,8 +3484,7 @@ bool Map::HasWeather() const
 	if ((AreaType & (AT_WEATHER|AT_OUTDOOR) ) != (AT_WEATHER|AT_OUTDOOR) ) {
 		return false;
 	}
-	ieDword tmp = 1;
-	core->GetDictionary()->Lookup("Weather", tmp);
+	ieDword tmp = core->GetVariable("Weather", 1);
 	return !!tmp;
 }
 
@@ -3621,7 +3619,7 @@ bool Map::DisplayTrackString(const Actor *target) const
 	}
 	if (trackFlag) {
 			String str = core->GetString(trackString);
-			core->GetTokenDictionary()->SetAt( "CREATURE", str);
+			core->GetTokenDictionary()["CREATURE"] = str;
 			displaymsg->DisplayConstantStringName(HCStrings::Tracking, GUIColors::LIGHTGREY, target);
 			return false;
 	}

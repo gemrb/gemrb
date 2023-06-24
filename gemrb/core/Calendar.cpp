@@ -54,13 +54,12 @@ void Calendar::GetMonthName(int dayandmonth) const
 
 	for (size_t i = 0; i < monthnamecount; ++i) {
 		if (dayandmonth<days[i]) {
-			core->GetTokenDictionary()->SetAtAsString("DAY", dayandmonth + 1);
+			SetTokenAsString("DAY", dayandmonth + 1);
 
 			String tmp = core->GetString(monthnames[i]);
-			core->GetTokenDictionary()->SetAt("MONTHNAME",tmp);
-			//must not free tmp, SetAt doesn't copy the pointer!
+			core->GetTokenDictionary()["MONTHNAME"] = tmp;
+			SetTokenAsString("MONTH", month);
 
-			core->GetTokenDictionary()->SetAtAsString("MONTH", month);
 			return;
 		}
 		dayandmonth-=days[i];

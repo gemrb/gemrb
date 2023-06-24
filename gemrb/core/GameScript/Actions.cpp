@@ -2185,7 +2185,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		// DestEntryPoint is all zeroes, pst just didn't use it
 		direction = WMPDirection::WEST;
 	}
-	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
+	core->GetDictionary()["Travel"] = (ieDword) direction;
 	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
@@ -2846,7 +2846,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	int xp = parameters->int0Parameter;
-	core->GetTokenDictionary()->SetAtAsString("EXPERIENCEAMOUNT", xp);
+	SetTokenAsString("EXPERIENCEAMOUNT", xp);
 	if (core->HasFeedback(FT_MISC)) {
 		if (DisplayMessage::HasStringReference(HCStrings::GotQuestXP)) {
 			displaymsg->DisplayConstantStringName(HCStrings::GotQuestXP, GUIColors::XPCHANGE, actor);
@@ -3096,14 +3096,14 @@ void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
 	//SetAt takes a newly created reference (no need of free/copy)
 	String str = core->GetString(ieStrRef(parameters->int0Parameter));
-	core->GetTokenDictionary()->SetAt(parameters->string0Parameter, str);
+	core->GetTokenDictionary()[parameters->string0Parameter.c_str()] = str;
 }
 
 //Assigns a numeric variable to the token
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
-	core->GetTokenDictionary()->SetAtAsString(parameters->string1Parameter, value);
+	SetTokenAsString(parameters->string1Parameter.c_str(), value);
 }
 
 //Assigns the target object's name (not scriptname) to the token
@@ -3114,7 +3114,8 @@ void GameScript::SetTokenObject(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	core->GetTokenDictionary()->SetAt(parameters->string0Parameter, actor->GetShortName());
+	core->GetTokenDictionary()[parameters->string0Parameter.c_str()] =
+		actor->GetShortName();
 }
 
 void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
@@ -4696,20 +4697,22 @@ void GameScript::ExpansionEndCredits(Scriptable *Sender, Action *parameters)
 //EndGame (display death screen with strref)
 void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
+	auto& vars = core->GetDictionary();
 	ClearAllActions(Sender, parameters);
-	core->GetDictionary()->SetAt("QuitGame1", (ieDword) parameters->int0Parameter);
-	core->GetDictionary()->SetAt("QuitGame2", (ieDword) parameters->int1Parameter);
-	core->GetDictionary()->SetAt("QuitGame3", (ieDword) parameters->int2Parameter);
+	vars["QuitGame1"] = (ieDword) parameters->int0Parameter;
+	vars["QuitGame2"] = (ieDword) parameters->int1Parameter;
+	vars["QuitGame3"] = (ieDword) parameters->int2Parameter;
 	core->SetNextScript("QuitGame");
 }
 
 //BG2 demo end, shows some pictures then goes to main screen
 void GameScript::DemoEnd(Scriptable* Sender, Action* parameters)
 {
+	auto& vars = core->GetDictionary();
 	ClearAllActions(Sender, parameters);
-	core->GetDictionary()->SetAt("QuitGame1", (ieDword)0);
-	core->GetDictionary()->SetAt("QuitGame2", (ieDword)0);
-	core->GetDictionary()->SetAt("QuitGame3", (ieDword)-1);
+	vars["QuitGame1"] = (ieDword)0;
+	vars["QuitGame2"] = (ieDword)0;
+	vars["QuitGame3"] = (ieDword)-1;
 	core->SetNextScript("QuitGame");
 }
 
@@ -7307,7 +7310,10 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 		//roll a random number between 0 and column #
 		TableMgr::index_t j = RAND<TableMgr::index_t>(0, tm->GetColumnCount(i) - 1);
 		ieVariable tokenname = tm->GetRowName(i);
-		core->GetTokenDictionary()->SetAt(tokenname, tm->QueryField(i, j));
+
+		auto wideString = StringFromCString(tm->QueryField(i, j).c_str());
+		core->GetTokenDictionary()[tokenname.c_str()] = *wideString;
+		delete wideString;
 	}
 }
 
@@ -7418,8 +7424,11 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 			favourite = spellRef;
 		}
 	}
-	core->GetTokenDictionary()->SetAt("FAVOURITESPELL", favourite);
-	core->GetTokenDictionary()->SetAt("FAVOURITESPELLNUM", maxUses);
+
+	auto favouriteWideString = StringFromCString(favourite.c_str());
+	core->GetTokenDictionary()["FAVOURITESPELL"] = *favouriteWideString;
+	delete favouriteWideString;
+	SetTokenAsString("FAVOURITESPELLNUM", maxUses);
 
 	// weapon
 	favourite = "/";
@@ -7434,13 +7443,16 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 			favourite = spellRef;
 		}
 	}
-	core->GetTokenDictionary()->SetAt("FAVOURITEWEAPON", favourite);
-	core->GetTokenDictionary()->SetAt("FAVOURITEWEAPONNUM", maxUses);
+
+	favouriteWideString = StringFromCString(favourite.c_str());
+	core->GetTokenDictionary()["FAVOURITEWEAPON"] = *favouriteWideString;
+	delete favouriteWideString;
+	SetTokenAsString("FAVOURITESPELLNUM", maxUses);
 
 	// kill stats
-	core->GetTokenDictionary()->SetAt("KILLCOUNT", actor->PCStats->KillsTotalCount);
-	core->GetTokenDictionary()->SetAt("KILLCOUNTCHAPTER", actor->PCStats->KillsChapterCount);
-	core->GetTokenDictionary()->SetAt("BESTKILL", core->GetMBString(actor->PCStats->BestKilledName));
+	SetTokenAsString("KILLCOUNT", actor->PCStats->KillsTotalCount);
+	SetTokenAsString("KILLCOUNTCHAPTER", actor->PCStats->KillsChapterCount);
+	core->GetTokenDictionary()["BESTKILL"] = core->GetString(actor->PCStats->BestKilledName);
 }
 
 }

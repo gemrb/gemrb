@@ -347,8 +347,7 @@ Actor::Actor()
 		//This block is executed only once, when the first actor is loaded
 		InitActorTables();
 
-		TranslucentShadows = 0;
-		core->GetDictionary()->Lookup("Translucent Shadows", TranslucentShadows);
+		TranslucentShadows = core->GetVariable("Translucent Shadows", 0);
 	}
 	static size_t maxProjectileCount = core->GetProjectileServer()->GetHighestProjectileNumber();
 	projectileImmunity.resize(maxProjectileCount);
@@ -1226,8 +1225,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		ScriptEngine::FunctionParameters params;
 		params.push_back(ScriptEngine::Parameter(pc));
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", params, true);
-		ieDword NeedsLevelUp = 0;
-		core->GetDictionary()->Lookup(varName, NeedsLevelUp);
+		ieDword NeedsLevelUp = core->GetVariable(varName, 0);
 		if (NeedsLevelUp == 1) {
 			displaymsg->DisplayConstantStringName(HCStrings::LevelUp, GUIColors::WHITE, actor);
 			actor->GotLUFeedback = true;
@@ -1500,41 +1498,42 @@ static int IsClassFromName (const std::string& name)
 
 GEM_EXPORT void UpdateActorConfig()
 {
-	unsigned int effectTextLevel = 0;
-	core->GetDictionary()->Lookup("Critical Hit Screen Shake", crit_hit_scr_shake);
-	core->GetDictionary()->Lookup("Selection Sounds Frequency", sel_snd_freq);
-	core->GetDictionary()->Lookup("Effect Text Level", effectTextLevel);
+	crit_hit_scr_shake = core->GetVariable("Critical Hit Screen Shake", 1);
+
+	unsigned int effectTextLevel = core->GetVariable("Effect Text Level", 0);
 	core->SetFeedbackLevel(effectTextLevel);
-	core->GetDictionary()->Lookup("Command Sounds Frequency", cmd_snd_freq);
+
+	sel_snd_freq = core->GetVariable("Selection Sounds Frequency", 0);
+	cmd_snd_freq = core->GetVariable("Command Sounds Frequency", 0);
 	// only pst has the whole gamut for these two options
 	if (!(effectTextLevel & FT_SELECTION)) sel_snd_freq = 0;
 	if (!(effectTextLevel & FT_ACTIONS)) cmd_snd_freq = 0;
-	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
-	core->GetDictionary()->Lookup("Footsteps", footsteps);
-	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
-	core->GetDictionary()->Lookup("3E Thief Sneak Attack", PreferSneakAttack);
+
+	bored_time = core->GetVariable("Bored Timeout", 3000);
+	footsteps = core->GetVariable("Footsteps", 1);
+	war_cries = core->GetVariable("Attack Sounds", 1);
+	PreferSneakAttack = core->GetVariable("3E Thief Sneak Attack", 0);
 
 	//Handle Game Difficulty and Nightmare Mode
 	// iwd2 had it saved in the GAM, iwd1 only relied on the ini value
-	GameDifficulty = 0;
-	core->GetDictionary()->Lookup("Nightmare Mode", GameDifficulty);
+	GameDifficulty = core->GetVariable("Nightmare Mode", 0);
+
+	auto& vars = core->GetDictionary();
 	Game *game = core->GetGame();
 	if (GameDifficulty || (game && game->HOFMode)) {
 		GameDifficulty = DIFF_INSANE;
 		if (game) game->HOFMode = true;
 		// also set it for GUIOPT
-		core->GetDictionary()->SetAt("Difficulty Level", DIFF_INSANE - 1);
+		vars["Difficulty Level"] = DIFF_INSANE - 1;
 	} else {
-		GameDifficulty = 0;
-		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
+		GameDifficulty = core->GetVariable("Difficulty Level", 0);
 		GameDifficulty++; // slider starts at 0, real levels at 1
 	}
-	ieDword newMode = 0;
-	core->GetDictionary()->Lookup("Story Mode", newMode);
+	ieDword newMode = core->GetVariable("Story Mode", 0);
 	if (newMode != StoryMode) {
 		if (newMode) {
 			GameDifficulty = DIFF_EASY;
-			core->GetDictionary()->SetAt("Difficulty Level", DIFF_EASY - 1U);
+			vars["Difficulty Level"] = DIFF_EASY - 1U;
 
 			// add all the immunities and bonuses to party
 			for (int i = 0; game && i < game->GetPartySize(false); i++) {
@@ -1557,7 +1556,7 @@ GEM_EXPORT void UpdateActorConfig()
 	DifficultySaveMod = gamedata->GetDifficultyMod(3, GameDifficulty);
 
 	// iwd has a config option for leniency
-	core->GetDictionary()->Lookup("Suppress Extra Difficulty Damage", NoExtraDifficultyDmg);
+	NoExtraDifficultyDmg = core->GetVariable("Suppress Extra Difficulty Damage", 0);
 }
 
 static void ReadModalStates()
@@ -3850,8 +3849,7 @@ void Actor::PlayExistenceSounds()
 			return;
 		}
 
-		ieDword vol = 100;
-		core->GetDictionary()->Lookup("Volume Ambients", vol);
+		ieDword vol = core->GetVariable("Volume Ambients", 100);
 		int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, ieWord(vol), true, 50); // REFERENCE_DISTANCE
 		if (stream != -1) {
 			tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
@@ -4061,8 +4059,7 @@ void Actor::CheckCleave()
 // NOTE: only does the visual part of chunking
 static void ChunkActor(Actor* actor)
 {
-	ieDword gore = 0;
-	core->GetDictionary()->Lookup("Gore", gore);
+	ieDword gore = core->GetVariable("Gore", 0);
 	if (!gore) return;
 
 	// TODO: play chunky animation / particles #128
@@ -4329,6 +4326,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		detailed = true;
 	}
 
+	auto& tokens = core->GetTokenDictionary();
 	if (damage > 0 && resisted != DR_IMMUNE) {
 		Log(COMBAT, "Actor", "{} {} damage taken.\n", damage, fmt::WideToChar{type_name});
 
@@ -4337,24 +4335,24 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		if (detailed) {
 			// 3 choices depending on resistance and boni
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
-			core->GetTokenDictionary()->SetAt( "TYPE", type_name);
-			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
+			tokens["TYPE"] = type_name;
+			SetTokenAsString("AMOUNT", damage);
 
 			HCStrings strref;
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
-				core->GetTokenDictionary()->SetAtAsString("RESISTED", abs(resisted));
+				SetTokenAsString("RESISTED", abs(resisted));
 				strref = HCStrings::DamageDetail3;
 			} else if (resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
-				core->GetTokenDictionary()->SetAtAsString("RESISTED", abs(resisted));
+				SetTokenAsString("RESISTED", abs(resisted));
 				strref = HCStrings::DamageDetail2;
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
 				strref = HCStrings::DamageDetail1;
 			}
 			if (damager) {
-				core->GetTokenDictionary()->SetAt("DAMAGER", damager->GetName());
+				tokens["DAMAGER"] = damager->GetName();
 			} else {
 				// variant without damager
 				strref = HCStrings(int(strref) - (int(HCStrings::DamageDetail1) - int(HCStrings::Damage1)));
@@ -4377,23 +4375,23 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			displaymsg->DisplayStringName(msg + dmg, GUIColors::WHITE, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
-			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
+			tokens["DAMAGEE"] = GetName();
 			// wipe the DAMAGER token, so we can color it
-			core->GetTokenDictionary()->SetAt("DAMAGER", StringView(""));
-			core->GetTokenDictionary()->SetAtAsString("AMOUNT", damage);
+			tokens["DAMAGER"] = String{};
+			SetTokenAsString("AMOUNT", damage);
 			displaymsg->DisplayConstantStringName(HCStrings::Damage2, GUIColors::WHITE, hitter);
 		}
 	} else if (resisted == DR_IMMUNE && damager) {
 		Log(COMBAT, "Actor", "is immune to damage type {} from {}.\n", fmt::WideToChar{type_name}, fmt::WideToChar{damager->GetName()});
 		if (detailed) {
 			//<DAMAGEE> was immune to my <TYPE> damage
-			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
-			core->GetTokenDictionary()->SetAt("TYPE", type_name);
+			tokens["DAMAGEE"] = GetName();
+			tokens["TYPE"] = type_name;
 			displaymsg->DisplayConstantStringName(HCStrings::DamageImmunity, GUIColors::WHITE, hitter);
 		} else if (DisplayMessage::HasStringReference(HCStrings::DamageImmunity) && DisplayMessage::HasStringReference(HCStrings::Damage1)) {
 			// bg2
 			//<DAMAGEE> was immune to my damage.
-			core->GetTokenDictionary()->SetAt("DAMAGEE", GetName());
+			tokens["DAMAGEE"] = GetName();
 			displaymsg->DisplayConstantStringName(HCStrings::DamageImmunity, GUIColors::WHITE, hitter);
 		} // else: other games don't display anything
 	} else if (resisted == DR_IMMUNE) {
@@ -4798,7 +4796,7 @@ int Actor::GetWildMod(int level)
 	static int modRange = int(wmLevelMods.size());
 	WMLevelMod = wmLevelMods[core->Roll(1, modRange, -1)][level - 1];
 
-	core->GetTokenDictionary()->SetAtAsString("LEVELDIF", abs(WMLevelMod));
+	SetTokenAsString("LEVELDIF", abs(WMLevelMod));
 	if (core->HasFeedback(FT_STATES)) {
 		if (WMLevelMod > 0) {
 			displaymsg->DisplayConstantStringName(HCStrings::CasterLvlInc, GUIColors::WHITE, this);
@@ -5906,7 +5904,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO, bookmask, kit, level);
 	HCStrings message = HCStrings::count;
 	if (flags&LS_LEARN) {
-		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(spell->SpellName));
+		core->GetTokenDictionary()["SPECIALABILITYNAME"] = core->GetString(spell->SpellName);
 		switch (spell->SpellType) {
 		case IE_SPL_INNATE:
 			message = HCStrings::GotAbility;
@@ -5959,7 +5957,7 @@ ResRef Actor::GetDialog(int flags) const
 
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
 		if (flags > GD_CHECK) {
-			core->GetTokenDictionary()->SetAt("TARGET", ShortName);
+			core->GetTokenDictionary()["TARGET"] = ShortName;
 			displaymsg->DisplayConstantString(HCStrings::TargetBusy, GUIColors::RED);
 		}
 		return ResRef();
@@ -6908,7 +6906,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		// can we retry?
 		if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
 			// Missed <TARGETNAME> due to concealment.
-			core->GetTokenDictionary()->SetAt("TARGETNAME", target->GetDefaultName());
+			core->GetTokenDictionary()["TARGETNAME"] = target->GetDefaultName();
 			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(HCStrings::ConcealedMiss, GUIColors::WHITE, this);
 			buffer.append("[Concealment Miss]");
 			Log(COMBAT, "Attack", "{}", buffer);
@@ -7247,8 +7245,7 @@ void Actor::UpdateActorState()
 
 	// display pc hitpoints if requested
 	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
-	ieDword overheadHP = 0;
-	core->GetDictionary()->Lookup("HP Over Head", overheadHP);
+	ieDword overheadHP = core->GetVariable("HP Over Head", 0);
 	assert(game->GameTime);
 	assert(core->Time.round_size);
 	if (overheadHP && Persistent() && (game->GameTime % (core->Time.round_size / 2) == 0)) { // smaller delta to skip fading
@@ -7897,8 +7894,7 @@ bool Actor::ShouldDrawCircle() const
 	bool drawcircle = true; // we always show circle/target on pause
 	if (!(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
-		ieDword markerfeedback = 4;
-		core->GetDictionary()->Lookup("GUI Feedback Level", markerfeedback);
+		ieDword markerfeedback = core->GetVariable("GUI Feedback Level", 4);
 		if (Selected) {
 			// selected creature
 			drawcircle = markerfeedback >= 2;

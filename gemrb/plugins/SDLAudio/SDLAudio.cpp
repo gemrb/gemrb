@@ -128,8 +128,7 @@ void SDLAudio::SetAudioStreamVolume(uint8_t *stream, int len, int volume)
 
 void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
 {
-	ieDword volume = 100;
-	core->GetDictionary()->Lookup("Volume Music", volume);
+	ieDword volume = core->GetVariable("Volume Music", 100);
 
 	// No point of bothering if it's off anyway
 	if (volume == 0) {
@@ -242,9 +241,9 @@ Holder<SoundHandle> SDLAudio::Play(StringView ResRef, unsigned int channel,
 	if (flags & GEM_SND_SPEECH) {
 		chan = 0;
 		loop = 0; // Speech ignores GEM_SND_LOOPING
-		core->GetDictionary()->Lookup("Volume Voices", volume);
+		volume = core->GetVariable("Volume Voices", 100);
 	} else {
-		core->GetDictionary()->Lookup("Volume SFX", volume);
+		volume = core->GetVariable("Volume SFX", 100);
 	}
 
 	if (volume == 0) {
@@ -327,10 +326,10 @@ void SDLAudio::ResetMusics()
 
 void SDLAudio::UpdateVolume(unsigned int flags)
 {
-	ieDword volume;
+	ieDword volume = 0;
 
 	if (flags & GEM_SND_VOL_AMBIENTS) {
-		core->GetDictionary()->Lookup("Volume Ambients", volume);
+		volume = core->GetVariable("Volume Ambients", 0);
 		((AmbientMgr*) ambim)->UpdateVolume(volume);
 	}
 }
@@ -359,9 +358,8 @@ Point SDLAudio::GetListenerPos()
 
 void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 {
-	ieDword volume = 100;
 	// Check only movie volume, since ambiens aren't supported right now
-	core->GetDictionary()->Lookup("Volume Movie", volume);
+	ieDword volume = core->GetVariable("Volume Movie", 100);
 
 	// No point of bothering if it's off anyway
 	if (volume == 0) {

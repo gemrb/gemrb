@@ -111,16 +111,13 @@ void GameControl::SetTracker(const Actor *actor, ieDword dist)
 GameControl::GameControl(const Region& frame)
 : View(frame)
 {
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("Always Run", tmp);
-	AlwaysRun = tmp != 0;
+	this->AlwaysRun = core->GetVariable("Always Run", 0);
 
 	ResetTargetMode();
 	SetCursor(nullptr);
 
-	tmp = 0;
-	core->GetDictionary()->Lookup("Center",tmp);
-	if (tmp) {
+	int lookup = core->GetVariable("Center", 0);
+	if (lookup) {
 		ScreenFlags |= SF_ALWAYSCENTER;
 	}
 	// the game always starts paused so nothing happens till we are ready
@@ -683,8 +680,8 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				case GEM_LEFT:
 				case GEM_RIGHT:
 					{
-						ieDword keyScrollSpd = 64;
-						core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
+						ieDword keyScrollSpd = core->GetVariable("Keyboard Scroll Speed", 64);
+
 						if (keycode >= GEM_UP) {
 							int v = (keycode == GEM_UP) ? -1 : 1;
 							Scroll( Point(0, keyScrollSpd * v) );
@@ -973,7 +970,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				core->GetGame()->kaputz->DebugDump();
 				break;
 			case 'V': // dump GemRB vars like the game ini settings
-				core->GetDictionary()->DebugDump();
+				core->DumpVariables();
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
 				area->ExploreMapChunk( gameMousePos, RAND(0,29), 1 );
@@ -2124,14 +2121,14 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 	// right click
 	if (me.button == GEM_MB_MENU) {
-		ieDword actionLevel;
-		core->GetDictionary()->Lookup("ActionLevel", actionLevel);
+		ieDword actionLevel = core->GetVariable("ActionLevel", 0);
+
 		if (target_mode != TARGET_MODE_NONE || actionLevel) {
 			if (!core->HasFeature(GFFlags::HAS_FLOAT_MENU)) {
 				SetTargetMode(TARGET_MODE_NONE);
 			}
 			// update the action bar
-			core->GetDictionary()->SetAt("ActionLevel", 0, false);
+			core->GetDictionary()["ActionLevel"] = 0;
 			core->SetEventFlag(EF_ACTION);
 			ClearMouseState();
 			return true;
@@ -2504,9 +2501,8 @@ void GameControl::DisplayString(Scriptable* target) const
 	}
 
 	// add as a "subtitle" to the main message window
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);
-	if (tmp) {
+	auto lookup = core->GetVariable("Duplicate Floating Text", 0);
+	if (lookup) {
 		displaymsg->DisplayString(target->overHead.GetText());
 	}
 	target->overHead.Display(true, 0);
@@ -2665,7 +2661,7 @@ void GameControl::SetDisplayText(HCStrings text, unsigned int time)
 void GameControl::ToggleAlwaysRun()
 {
 	AlwaysRun = !AlwaysRun;
-	core->GetDictionary()->SetAt("Always Run", AlwaysRun);
+	core->GetDictionary()["Always Run"] = AlwaysRun;
 }
 
 int GameControl::GetOverheadOffset() const

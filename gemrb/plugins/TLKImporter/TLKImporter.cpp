@@ -213,8 +213,7 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 
 	//these are hardcoded, all engines are the same or don't use them
 	if (Token == "DAYANDMONTH") {
-		ieDword dayandmonth=0;
-		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
+		ieDword dayandmonth = core->GetVariable("DAYANDMONTH", 0);
 		//preparing sub-tokens
 		core->GetCalendar()->GetMonthName((int) dayandmonth);
 		return GetString(ieStrRef::DAYANDMONTH, STRING_FLAGS::RESOLVE_TAGS);
@@ -254,9 +253,8 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 		return GetString(RaceStrRef(0), STRING_FLAGS::NONE);
 	}
 	if (Token == "MAGESCHOOL") {
-		ieDword row = 0; //default value is 0 (generalist)
-		//this is subject to change, the row number in magesch.2da
-		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
+		//this is subject to change, the row number in magesch.2da, default value is 0 (generalist)
+		ieDword row = core->GetVariable("MAGESCHOOL", 0);
 		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
 			ieStrRef value = tm->QueryFieldAsStrRef(row, 2);
@@ -293,10 +291,13 @@ String TLKImporter::ResolveTags(const String& source)
 			i = mystrncpy(Token, i + 1, L'>');
 			String resolvedToken = BuiltinToken(Token);
 			if (resolvedToken.empty()) {
-				String tokVal;
-				if (core->GetTokenDictionary()->Lookup(Token, tokVal)) {
-					dest.append(tokVal);
+
+				auto& tokens = core->GetTokenDictionary();
+				auto lookup = tokens.find(Token.c_str());
+				if (lookup != tokens.cend()) {
+					dest.append(lookup->second);
 				}
+
 			} else {
 				dest.append(resolvedToken);
 			}

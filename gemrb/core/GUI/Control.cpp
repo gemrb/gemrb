@@ -166,13 +166,20 @@ void Control::UpdateDictValue() noexcept
 	// set this even when the value doesn't change
 	// if a radio is clicked, then one of its siblings, the siblings value won't change
 	// but we expect the dictionary to reflect the selected value
+	auto& vars = core->GetDictionary();
 	BitOp op = GetDictOp();
 	value_t curVal = op == BitOp::SET ? INVALID_VALUE : 0;
-	core->GetDictionary()->Lookup(VarName, curVal);
+	std::string key{VarName.c_str()};
+
+	auto lookup = vars.find(key);
+	if (lookup != vars.cend()) {
+		curVal = lookup->second;
+	}
+
 	value_t newVal = curVal;
 	SetBits(newVal, Value, op);
-	core->GetDictionary()->SetAt(VarName, newVal);
-	
+	vars[key] = newVal;
+
 	const Window* win = GetWindow();
 	if (win) {
 		win->RedrawControls(VarName);
@@ -191,14 +198,15 @@ void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange val
 	SetValue(val);
 	// now that the value range is setup, we can change the dictionary variable
 	VarName = var;
-	
+
 	if (GetDictOp() == BitOp::SET) {
 		// SET implies the dictionary value should always mirror Value
 		UpdateDictValue();
 	} else {
-		value_t dictVal = INVALID_VALUE;
-		if (core->GetDictionary()->Lookup(VarName, dictVal)) {
-			UpdateState(VarName, dictVal);
+		auto& vars = core->GetDictionary();
+		auto lookup = vars.find(VarName.c_str());
+		if (lookup != vars.cend()) {
+			UpdateState(VarName, lookup->second);
 		}
 	}
 }

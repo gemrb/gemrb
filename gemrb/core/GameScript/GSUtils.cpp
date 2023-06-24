@@ -494,9 +494,8 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	if (Strref == ieStrRef::INVALID) return;
 
 	// Check if subtitles are not enabled
-	ieDword charactersubtitles = 0;
-	core->GetDictionary()->Lookup("Subtitles", charactersubtitles);
-	
+	ieDword charactersubtitles = core->GetVariable("Subtitles", 0);
+
 	// display the verbal constants in the console; some callers force this themselves
 	if (charactersubtitles) {
 		// to avoid spam in Saradush while subtitles are enabled, skip printing to MSGWIN if too far
@@ -1267,7 +1266,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	const Action *curact = target->GetCurrentAction();
 	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && \
 	  (!curact && target->GetNextAction())) {
-		core->GetTokenDictionary()->SetAt("TARGET", target->GetName());
+		core->GetTokenDictionary()["TARGET"] = target->GetName();
 		displaymsg->DisplayConstantString(HCStrings::TargetBusy, GUIColors::RED);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1281,7 +1280,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		} else if (!(Flags & BD_INTERRUPT)) {
 			// added CurrentAction as part of blocking action fixes
 			if (tar->GetCurrentAction() || tar->GetNextAction()) {
-				core->GetTokenDictionary()->SetAt("TARGET", target->GetName());
+				core->GetTokenDictionary()["TARGET"] = target->GetName();
 				displaymsg->DisplayConstantString(HCStrings::TargetBusy, GUIColors::RED);
 				Sender->ReleaseCurrentAction();
 				return;
@@ -1337,7 +1336,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		gc->SetDialogueFlags(DF_INTERACT, BitOp::OR);
 	}
 
-	core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
+	core->GetDictionary()["DialogChoose"] = (ieDword) -1;
 	if (!gc->dialoghandler->InitDialog(scr, tar, Dialog)) {
 		if (!(Flags & BD_NOEMPTY)) {
 			displaymsg->DisplayConstantStringName(HCStrings::NothingToSay, GUIColors::RED, tar);

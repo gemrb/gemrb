@@ -43,8 +43,8 @@ DisplayMessage::StrRefs DisplayMessage::SRefs;
 
 bool DisplayMessage::EnableRollFeedback()
 {
-	ieDword feedback = 0;
-	core->GetDictionary()->Lookup("EnableRollFeedback", feedback);
+	ieDword feedback = core->GetVariable("EnableRollFeedback", 0);
+
 	return bool(feedback);
 }
 

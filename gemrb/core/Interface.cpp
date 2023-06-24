@@ -240,20 +240,6 @@ Interface::Interface() noexcept
 	MagicBit = HasFeature(GFFlags::MAGICBIT);
 
 	gamedata = new GameData();
-
-	plugin_flags = new Variables();
-	plugin_flags->SetType( GEM_VARIABLES_INT );
-
-	lists = new Variables();
-	lists->SetType( GEM_VARIABLES_POINTER );
-
-	vars = new Variables();
-	vars->SetType( GEM_VARIABLES_INT );
-	vars->ParseKey(true);
-
-	tokens = new Variables();
-	tokens->SetType( GEM_VARIABLES_STRING );
-	
 	sgiterator = new SaveGameIterator();
 }
 
@@ -284,19 +270,10 @@ Interface::~Interface() noexcept
 
 	DamageInfoMap.clear();
 
-	delete plugin_flags;
-
 	delete projserv;
 
 	delete displaymsg;
 	delete TooltipBG;
-
-	delete vars;
-	delete tokens;
-	if (lists) {
-		lists->RemoveAll(free);
-		delete lists;
-	}
 
 	delete gamedata;
 	gamedata = NULL;
@@ -594,9 +571,7 @@ void Interface::DisableMusicPlaylist(size_t SongType)
 /** this is the main loop */
 void Interface::Main()
 {
-	int speed = 10;
-
-	vars->Lookup("Mouse Scroll Speed", speed);
+	int speed = GetVariable("Mouse Scroll Speed", 10);
 	SetMouseScrollSpeed(speed);
 
 	// We had 36 at 30fps originally, so more fps
@@ -809,7 +784,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	CONFIG_INT("KeepCache", config.KeepCache =);
 	CONFIG_INT("MaxPartySize", config.MaxPartySize =);
 	config.MaxPartySize = std::min(std::max(1, config.MaxPartySize), 10);
-	vars->SetAt("MaxPartySize", config.MaxPartySize); // for simple GUIScript access
+	vars["MaxPartySize"] = config.MaxPartySize; // for simple GUIScript access
 	CONFIG_INT("MouseFeedback", config.MouseFeedback =);
 	CONFIG_INT("MultipleQuickSaves", config.MultipleQuickSaves =);
 	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay =);
@@ -831,7 +806,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 #define CONFIG_VARS_MAP(var, key) \
 		value = cfg->GetValueForKey(key); \
 		if (value) \
-			vars->SetAt(var, atoi(value->c_str())); \
+			vars.emplace(var, atoi(value->c_str())); \
 		value = nullptr
 
 #define CONFIG_VARS(key) \
@@ -974,11 +949,11 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 	value = cfg->GetValueForKey("SkipPlugin");
 	if (value) {
-		plugin_flags->SetAt(*value, PLF_SKIP);
+		pluginFlags[*value] = PLF_SKIP;
 	}
 	value = cfg->GetValueForKey("DelayPlugin");
 	if (value) {
-		plugin_flags->SetAt(*value, PLF_DELAY);
+		pluginFlags[*value] = PLF_DELAY;
 	}
 
 	for (int i = 0; i < MAX_CD; i++) {
@@ -1053,10 +1028,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 	// ask the driver if a touch device is in use
 	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
 
-	ieDword brightness = 10;
-	ieDword contrast = 5;
-	vars->Lookup("Brightness Correction", brightness);
-	vars->Lookup("Gamma Correction", contrast);
+	ieDword brightness = GetVariable("Brightness Correction", 10);
+	ieDword contrast = GetVariable("Gamma Correction", 5);
 
 	Log(MESSAGE, "Core", "Initializing search path...");
 	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {
@@ -1176,8 +1149,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
 	// we also need the display to exist to create sprites using the display format
-	ieDword fullscreen = 0;
-	vars->Lookup("Full Screen", fullscreen);
+	ieDword fullscreen = GetVariable("Full Screen", 0);
+
 	int createDisplayResult =
 		video->CreateDisplay(
 				Size(config.Width, config.Height),
@@ -1226,14 +1199,12 @@ int Interface::Init(const InterfaceConfig* cfg)
 	}
 
 	// We use this for the game's state exclusively
-	ieDword maxRefreshRate = 30;
-	vars->Lookup("Maximum Frame Rate", maxRefreshRate);
+	ieDword maxRefreshRate = GetVariable("Maximum Frame Rate", 30);
 	// the originals used double ticks for haste handling
 	Time.ticksPerSec = maxRefreshRate / 2;
 
 	// set up the tooltip delay which we store in milliseconds
-	ieDword tooltipDelay = 0;
-	GetDictionary()->Lookup("Tooltips", tooltipDelay);
+	ieDword tooltipDelay = GetVariable("Tooltips", 0);
 	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
 
 	// restore the game config name if we read it from our version
@@ -1611,7 +1582,10 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 	STRING_FLAGS flags = STRING_FLAGS::NONE;
 
 	if (!(options & STRING_FLAGS::STRREFOFF)) {
-		vars->Lookup( "Strref On", flags );
+		flags =
+			static_cast<STRING_FLAGS>(
+				GetVariable("Strref On", static_cast<std::underlying_type<STRING_FLAGS>::type>(STRING_FLAGS::NONE))
+			);
 	}
 	
 	if (core->HasFeature(GFFlags::ALL_STRINGS_TAGGED)) {
@@ -2111,6 +2085,10 @@ void Interface::ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) 
 	SetGroupViewFlags(views, View::Disabled, enabled ? BitOp::NAND : BitOp::OR);
 }
 
+Interface::plugin_flags_t& Interface::GetPluginFlags() {
+	return pluginFlags;
+}
+
 bool Interface::IsFreezed() const
 {
 	return !update_scripts;
@@ -2152,8 +2130,8 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 		// -2 close
 		// -1 open
 		// choose option
-		ieDword var = (ieDword) -3;
-		vars->Lookup("DialogChoose", var);
+		ieDword var = GetVariable("DialogChoose", -3);
+
 		if ((int) var == -2) {
 			// TODO: this seems to never be called? (EndDialog is called from elsewhere instead)
 			gc->dialoghandler->EndDialog();
@@ -2166,9 +2144,10 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 				guiscript->RunFunction( "GUIWORLD", "NextDialogState" );
 
 			// the last node of a dialog can have a new-dialog action! don't interfere in that case
-			ieDword newvar = 0; vars->Lookup("DialogChoose", newvar);
+			ieDword newvar = GetVariable("DialogChoose", 0);
+
 			if (var == (ieDword) -1 || newvar != (ieDword) -1) {
-				vars->SetAt("DialogChoose", (ieDword) -3);
+				vars["DialogChoose"] = -3;
 			}
 		}
 		if (flg & DF_OPENCONTINUEWINDOW) {
@@ -2217,11 +2196,11 @@ SaveGameIterator* Interface::GetSaveGameIterator() const
 void Interface::AskAndExit()
 {
 	// if askExit is 1 then we are trying to quit a second time and should instantly do so
-	ieDword askExit = 0;
-	vars->Lookup("AskAndExit", askExit);
+	ieDword askExit = GetVariable("AskAndExit", 0);
+
 	if (game && !askExit) {
 		SetPause(PAUSE_ON);
-		vars->SetAt("AskAndExit", 1);
+		vars["AskAndExit"] = 1;
 
 		guifact->LoadWindowPack("GUIOPT");
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
@@ -2232,15 +2211,40 @@ void Interface::AskAndExit()
 }
 
 /** Returns the variables dictionary */
-Variables* Interface::GetDictionary() const
-{
+Interface::variables_t& Interface::GetDictionary() {
 	return vars;
 }
+
+void Interface::DumpVariables() const {
+	Log(DEBUG, "Variables", "Item count: {}", vars.size());
+	for (const auto& entry : vars) {
+		Log(DEBUG, "Variables", "{} = {}", entry.first, entry.second);
+	}
+}
+
+Interface::variables_t::mapped_type Interface::GetVariable(const variables_t::key_type& key, int fallback) const {
+	auto lookup = vars.find(key);
+	if (lookup != vars.cend()) {
+		return lookup->second;
+	}
+
+	return fallback;
+}
+
 /** Returns the token dictionary */
-Variables* Interface::GetTokenDictionary() const
-{
+Interface::tokens_t& Interface::GetTokenDictionary() {
 	return tokens;
 }
+
+String Interface::GetToken(const std::string& key, String && fallback) const {
+	auto lookup = tokens.find(key);
+	if (lookup != tokens.cend()) {
+		return lookup->second;
+	}
+
+	return {std::move(fallback)};
+}
+
 /** Get the Music Manager */
 MusicMgr* Interface::GetMusicMgr() const
 {
@@ -2348,10 +2352,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	}
 
 	//one of these two should exist (they both mean the same thing)
-	ieDword subtitles = true;
-	vars->Lookup("Display Movie Subtitles", subtitles);
+	ieDword subtitles = GetVariable("Dialog Movie Subtitles", 1);
 	if (!subtitles) {
-		vars->Lookup("Display Subtitles", subtitles);
+		subtitles = GetVariable("Dialog Subtitles", 0);
 	}
 
 	mp->EnableSubtitles(subtitles);
@@ -2440,7 +2443,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	if (ambim) ambim->Activate();
 
 	//Setting the movie name to 1
-	vars->SetAt(movieRef, 1);
+	vars[movieRef.c_str()] = 1;
 	return 0;
 }
 
@@ -2536,11 +2539,12 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	for (int i = 0; i < defaults->GetTagsCount(); i++) {
 		const StringView tag = defaults->GetTagNameByIndex(i);
 		for (int j = 0; j < defaults->GetKeysCount(tag); j++) {
-			auto key = Variables::key_t(defaults->GetKeyNameByIndex(tag, j));
+			auto key = std::string{defaults->GetKeyNameByIndex(tag, j).c_str()};
 			//skip any existing entries. GemRB.cfg has priority
-			if (!vars->HasKey(key)) {
+			auto lookup = vars.find(key);
+			if (lookup == vars.cend()) {
 				ieDword defaultVal = defaults->GetKeyAsInt(tag, key, 0);
-				vars->SetAt(key, overrides->GetKeyAsInt(tag, key, defaultVal));
+				vars.emplace(key, overrides->GetKeyAsInt(tag, key, defaultVal));
 			}
 		}
 	}
@@ -2555,7 +2559,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 
 	// copies
 	if (!overrides->GetKeyAsInt("Game Options", "Darkvision", 1)) {
-		vars->SetAt("Infravision", (ieDword)0);
+		vars["Infravision"] = 0;
 	}
 
 	if (!config.Width || !config.Height) {
@@ -2601,11 +2605,10 @@ bool Interface::SaveConfig()
 			// write section header
 			AppendFormat(contents, "[{}]\n", tag);
 			for (int j = 0; j < defaultsINI->GetKeysCount(tag); j++) {
-				auto key = Variables::key_t(defaultsINI->GetKeyNameByIndex(tag, j));
-				ieDword value = 0;
-				bool found = vars->Lookup(key, value);
-				assert(found);
-				AppendFormat(contents, "{} = {}\n", key, value);
+				auto key = std::string{defaultsINI->GetKeyNameByIndex(tag, j).c_str()};
+				auto lookup = vars.find(key);
+				assert(lookup != vars.cend());
+				AppendFormat(contents, "{} = {}\n", key, lookup->second);
 			}
 		}
 
@@ -2709,7 +2712,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	gamedata->SaveAllStores();
 	strings->CloseAux();
-	tokens->RemoveAll(NULL); //clearing the token dictionary
+	tokens.clear(); //clearing the token dictionary
 
 	if(calendar) delete calendar;
 	calendar = new Calendar;
@@ -3421,10 +3424,10 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 
 bool Interface::ReadRandomItems()
 {
-	ieDword difflev=0; //rt norm or rt fury
-	vars->Lookup("Nightmare Mode", difflev);
+	//rt norm or rt fury
+	ieDword difflev = GetVariable("Nightmare Mode", 0);
 	RtRows.clear();
-	
+
 	AutoTable tab = gamedata->LoadTable("randitem");
 	if (!tab) {
 		return false;
@@ -4257,8 +4260,10 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 
 bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 {
-	AUTOPAUSE autopause_flags = AUTOPAUSE::UNUSABLE;
-	vars->Lookup("Auto Pause State", autopause_flags);
+	AUTOPAUSE autopause_flags =
+		static_cast<AUTOPAUSE>(
+			GetVariable("Auto Pause State", static_cast<std::underlying_type<AUTOPAUSE>::type>(AUTOPAUSE::UNUSABLE))
+		);
 
 	if (!(autopause_flags & AUTOPAUSE(1 << ieDword(flag)))) {
 		return false;
@@ -4270,8 +4275,8 @@ bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 
 	displaymsg->DisplayConstantStringName(HCStrings(ieDword(HCStrings::ApUnusable) + ieDword(flag)), GUIColors::RED, target);
 
-	ieDword centerOnAutoPause = 0;
-	vars->Lookup("Auto Pause Center", centerOnAutoPause);
+	ieDword centerOnAutoPause = GetVariable("Auto Pause Center", 0);
+
 	if (centerOnAutoPause && target) {
 		GameControl* gc = GetGameControl();
 		gc->MoveViewportTo(target->Pos, true);
@@ -4309,32 +4314,34 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	}
 }
 
-std::vector<ieDword>* Interface::GetListFrom2DAInternal(const ResRef& resref)
+std::vector<ieDword> Interface::GetListFrom2DAInternal(const ResRef& resref)
 {
-	// FIXME: this is a new/free mismatch inside Variables
-	// luckily, ieDword is trivially destructable and we use the default global allocator
-	std::vector<ieDword>* ret = new std::vector<ieDword>;
+	std::vector<ieDword> ret;
 
 	AutoTable tab = gamedata->LoadTable(resref);
 	if (tab) {
-		ret->resize(tab->GetRowCount());
-		for (size_t i = 0; i < ret->size(); ++i) {
-			ret->at(i) = tab->QueryFieldUnsigned<ieDword>(i, 0);
+		ret.resize(tab->GetRowCount());
+		for (size_t i = 0; i < ret.size(); ++i) {
+			ret.at(i) = tab->QueryFieldUnsigned<ieDword>(i, 0);
 		}
 	}
+
 	return ret;
 }
 
 std::vector<ieDword>* Interface::GetListFrom2DA(const ResRef& tablename)
 {
-	std::vector<ieDword>* list = nullptr;
+	auto key = std::string{tablename.c_str()};
+	auto lookup = lists.find(key);
 
-	if (!lists->Lookup(tablename, (void *&) list)) {
-		list = GetListFrom2DAInternal(tablename);
-		lists->SetAt(tablename, list);
+	if (lookup != lists.cend()) {
+		return &lookup->second;
 	}
 
-	return list;
+	auto list = GetListFrom2DAInternal(tablename);
+	auto insertion = lists.emplace(key, std::move(list));
+
+	return &insertion.first->second;
 }
 
 //returns a numeric value associated with a stat name (symbol) from stats.ids
@@ -4400,9 +4407,9 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 	return ret;
 }
 
-void Interface::WaitForDisc(int disc_number, const char* path) const
+void Interface::WaitForDisc(int disc_number, const char* path)
 {
-	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
+	GetDictionary()["WaitForDisc"] = (ieDword) disc_number;
 
 	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
