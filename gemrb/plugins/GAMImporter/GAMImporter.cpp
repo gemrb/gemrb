@@ -211,7 +211,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	}
 
 	// load initial values from var.var
-	LoadInitialValues("GLOBAL", newGame->locals);
+	core->LoadInitialValues("GLOBAL", newGame->locals);
 
 	//Loading Global Variables
 	ieVariable Name;
@@ -226,7 +226,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	}
 	if(core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
 		// load initial values from var.var
-		LoadInitialValues("KAPUTZ", newGame->kaputz);
+		core->LoadInitialValues("KAPUTZ", newGame->kaputz);
 		str->Seek( KillVarsOffset, GEM_STREAM_START );
 		for (unsigned int i = 0; i < KillVarsCount; i++) {
 			ieDword Value;

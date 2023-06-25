@@ -24,9 +24,9 @@
 #include "exports.h"
 #include "ie_cursors.h"
 
+#include "Cache.h"
 #include "CharAnimations.h"
 #include "OverHeadText.h"
-#include "Variables.h"
 
 #include <list>
 #include <map>

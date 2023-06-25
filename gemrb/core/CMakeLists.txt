@@ -59,7 +59,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Store.cpp
 	TileMap.cpp
 	TileOverlay.cpp
-	Variables.cpp
 	VEFObject.cpp
 	WorldMap.cpp
 	GameScript/Actions.cpp

@@ -21,12 +21,12 @@
 #ifndef KEYMAP_H
 #define KEYMAP_H
 
+#include <unordered_map>
+
 #include "exports.h"
-#include "Variables.h"
+#include "ie_types.h"
 
 namespace GemRB {
-
-class Variables;
 
 class Function {
 public:
@@ -40,7 +40,7 @@ public:
 
 class GEM_EXPORT KeyMap {
 private:
-	Variables keymap;
+	std::unordered_map<std::string, Function> keymap;
 public:
 	KeyMap();
 	KeyMap(const KeyMap&) = delete;

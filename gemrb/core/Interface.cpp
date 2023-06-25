@@ -2089,6 +2089,38 @@ Interface::plugin_flags_t& Interface::GetPluginFlags() {
 	return pluginFlags;
 }
 
+void Interface::LoadInitialValues(const ResRef& name, std::unordered_map<ResRef, ieDword, ResRefHash>& map) {
+	char nPath[_MAX_PATH];
+	// we only support PST's var.var for now
+	PathJoin(nPath, config.GamePath, "var.var", nullptr);
+	FileStream fs;
+	if (!fs.Open(nPath)) {
+		return;
+	}
+
+	char buffer[41];
+	ieDword value;
+	buffer[40] = 0;
+	ieVariable varname;
+
+	// first value is useless
+	if (!fs.Read(buffer, 40)) return;
+	if (fs.ReadDword(value) != 4) return;
+
+	while (fs.Remains()) {
+		// read data
+		if (!fs.Read(buffer, 40)) return;
+		if (fs.ReadDword(value) != 4) return;
+		// is it the type we want? if not, skip
+		if (!name.BeginsWith(StringView(buffer, 6))) continue;
+		// copy variable (types got 2 extra spaces, and the name is padded too)
+		// (true = uppercase, needed for original engine save compat, see 315b8f2e)
+		varname = MakeVariable(StringView(buffer + 8, 32));
+		StringToUpper(varname);
+		map[varname] = value;
+	}
+}
+
 bool Interface::IsFreezed() const
 {
 	return !update_scripts;

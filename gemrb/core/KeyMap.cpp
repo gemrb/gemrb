@@ -18,6 +18,9 @@
  *
  */
 
+#include <tuple>
+#include <utility>
+
 #include "KeyMap.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
@@ -36,20 +39,8 @@ Function::Function(const ieVariable& m, const ieVariable& f, int g, int k)
 	key = k;
 }
 
-KeyMap::KeyMap()
-{
-	keymap.SetType(GEM_VARIABLES_POINTER);
-}
-
-static void ReleaseFunction(void *fun)
-{
-	delete (Function *) fun;
-}
-
-KeyMap::~KeyMap()
-{
-	keymap.RemoveAll(ReleaseFunction);
-}
+KeyMap::KeyMap() { }
+KeyMap::~KeyMap() { }
 
 bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 {
@@ -92,7 +83,7 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 		if (val.length() == 0) continue;
 		LTrim(val);
 
-		if (val.length() > 1 || keymap.HasKey(val)) {
+		if (val.length() > 1 || keymap.find(val) != keymap.cend()) {
 			Log(WARNING, "KeyMap", "Ignoring key {}", val);
 			continue;
 		}
@@ -115,11 +106,15 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 			function = defaultFunction;
 			group = defaultGroup;
 		}
-		Function *fun = new Function(moduleName, function, group, val[0]);
 
 		// lookup by either key or name
-		keymap.SetAt(val, fun);
-		keymap.SetAt(key, new Function(*fun));
+		auto insertion =
+			keymap.emplace(
+				std::piecewise_construct,
+				std::forward_as_tuple(val),
+				std::forward_as_tuple(moduleName, function, group, val[0])
+			);
+		keymap.emplace(key, insertion.first->second);
 	}
 	delete config;
 	return true;
@@ -138,19 +133,18 @@ bool KeyMap::ResolveKey(unsigned short key, int group) const
 
 bool KeyMap::ResolveName(const char* name, int group) const
 {
-	void *tmp;
-	if (!keymap.Lookup(Variables::key_t(name), tmp)) {
+	auto lookup = keymap.find(name);
+	if (lookup == keymap.cend()) {
 		return false;
 	}
 
-	Function* fun = (Function *)tmp;
-
-	if (fun->group!=group) {
+	auto& fun = lookup->second;
+	if (fun.group != group) {
 		return false;
 	}
 
-	Log(MESSAGE, "KeyMap", "RunFunction({}::{})", fun->moduleName, fun->function);
-	core->GetGUIScriptEngine()->RunFunction(fun->moduleName.c_str(), fun->function.c_str());
+	Log(MESSAGE, "KeyMap", "RunFunction({}::{})", fun.moduleName, fun.function);
+	core->GetGUIScriptEngine()->RunFunction(fun.moduleName.c_str(), fun.function.c_str());
 	return true;
 }
 
@@ -159,12 +153,12 @@ Function* KeyMap::LookupFunction(std::string key)
 	// FIXME: Variables::MyCompareKey is already case insensitive AFICT
 	StringToLower(key);
 
-	void *tmp;
-	if (!keymap.Lookup(key, tmp) ) {
+	auto lookup = keymap.find(key);
+	if (lookup != keymap.cend()) {
+		return &lookup->second;
+	} else {
 		return nullptr;
 	}
-
-	return (Function *)tmp;
 }
 
 }

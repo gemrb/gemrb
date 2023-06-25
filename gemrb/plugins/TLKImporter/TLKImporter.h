@@ -21,12 +21,19 @@
 #ifndef TLKIMPORTER_H
 #define TLKIMPORTER_H
 
+#include <unordered_map>
 
+#include "Cache.h"
 #include "StringMgr.h"
-#include "Variables.h"
 #include "TlkOverride.h"
 
 namespace GemRB {
+
+struct gt_type {
+	int type;
+	ieStrRef male;
+	ieStrRef female;
+};
 
 class TLKImporter : public StringMgr {
 private:
@@ -37,7 +44,7 @@ private:
 	ieDword StrRefCount = 0;
 	ieDword Offset = 0;
 	CTlkOverride *OverrideTLK = nullptr;
-	Variables gtmap;
+	std::unordered_map<ResRef, gt_type, ResRefHash> gtmap;
 	int charname = 0;
 
 public:

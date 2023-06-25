@@ -505,6 +505,7 @@ public:
 	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 	plugin_flags_t& GetPluginFlags();
+	void LoadInitialValues(const ResRef& name, std::unordered_map<ResRef, ieDword, ResRefHash>& map);
 
 	Tooltip CreateTooltip() const;
 	/** returns the label which should receive game messages (overrides messagetextarea) */
