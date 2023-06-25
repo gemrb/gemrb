@@ -1471,10 +1471,10 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	GetSongs(str, map, ambients);
 	// reverb to match against reverb.2da or iwd reverb.ids
 	// (if the 2da doesn't exist - which we provide for all; they use the same values)
-	ieDword reverbID = EFX_PROFILE_REVERB_INVALID; // non PST data has it at 0, so we don't bother reading
-	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
-		str->ReadDword(reverbID);
-	}
+	ieDword reverbID; // set in PST, IWD1, 0 (NO_REVERB) elsewhere
+	str->ReadDword(reverbID);
+	// ignore 0 and use an area-type heuristic instead
+	if (reverbID == 0) reverbID = EFX_PROFILE_REVERB_INVALID;
 
 	str->Seek(RestHeader + 32, GEM_STREAM_START); // skip the name
 	GetRestHeader(str, map);
