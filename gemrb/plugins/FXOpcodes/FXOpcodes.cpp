@@ -2331,15 +2331,19 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 static int power_word_stun_iwd2(Actor *target, Effect *fx)
 {
 	int hp = BASE_GET(IE_HITPOINTS);
-	if (hp>150) return FX_NOT_APPLIED;
+	if (hp > 150) return FX_NOT_APPLIED;
 	int stuntime;
-	if (hp>100) stuntime = core->Roll(1,4,0);
-	else if (hp>50) stuntime = core->Roll(2,4,0);
-	else stuntime = core->Roll(4,4,0);
+	if (hp > 100) {
+		stuntime = core->Roll(1, 4, 0);
+	} else if (hp > 50) {
+		stuntime = core->Roll(2, 4, 0);
+	} else {
+		stuntime = core->Roll(4, 4, 0);
+	}
 	fx->Parameter2 = 0;
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
-	fx->Duration = stuntime*6*core->Time.round_size + core->GetGame()->GameTime;
-	STATE_SET( STATE_STUNNED );
+	fx->Duration = stuntime * core->Time.round_size + core->GetGame()->GameTime;
+	STATE_SET(STATE_STUNNED);
 	STAT_SET(IE_HELD, 1);
 	target->AddPortraitIcon(PI_STUN_IWD);
 	return FX_APPLIED;
