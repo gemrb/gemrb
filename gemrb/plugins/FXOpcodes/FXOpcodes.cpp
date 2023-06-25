@@ -1138,6 +1138,7 @@ int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case 1: //always berserk
 		target->SetSpellState(SS_BERSERK);
+		STAT_SET(IE_BERSERKSTAGE2, 1);
 		// intentional fallthrough
 	default:
 		target->AddPortraitIcon(PI_BERSERK);
@@ -2339,6 +2340,7 @@ static int power_word_stun_iwd2(Actor *target, Effect *fx)
 	fx->TimingMode = FX_DURATION_ABSOLUTE;
 	fx->Duration = stuntime*6*core->Time.round_size + core->GetGame()->GameTime;
 	STATE_SET( STATE_STUNNED );
+	STAT_SET(IE_HELD, 1);
 	target->AddPortraitIcon(PI_STUN_IWD);
 	return FX_APPLIED;
 }
