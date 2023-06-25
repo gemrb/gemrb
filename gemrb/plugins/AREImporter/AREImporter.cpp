@@ -272,7 +272,7 @@ bool AREImporter::Import(DataStream* str)
 	} else {
 		bigheader = 0;
 	}
-	//TEST VERSION: SKIPPING VALUES
+
 	str->ReadResRef( WEDResRef );
 	str->ReadDword(LastSave);
 	str->ReadDword(AreaFlags);
