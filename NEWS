@@ -1,7 +1,8 @@
-GemRB git (f68eab2):
+GemRB git (c734907):
   New features:
     - 
     - PVR(Z), BAM2, MOS2 and TIS2 support
+    - support for higher AI speeds ("FPS") and VSync
     - support for EE-style saves, TLK locations and many more tables
     - pst's floating text and personalized pc comments
     - optional smooth fog of war on SDL >= 2.0.18
@@ -10,6 +11,7 @@ GemRB git (f68eab2):
 
   Improved features:
     - 
+    - pst effect durations
     - performance, pathfinding, formations
     - combat, opcodes, ee compat, hp handling, demo
     - bugfixes
