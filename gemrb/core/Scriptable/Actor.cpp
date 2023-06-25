@@ -10319,7 +10319,7 @@ bool Actor::ModalSpellSkillCheck()
 	switch(Modal.State) {
 	case MS_BATTLESONG:
 		if (GetBardLevel()) {
-			return !(Modified[IE_STATE_ID] & STATE_SILENCED);
+			return !CheckSilenced();
 		}
 		return false;
 	case MS_DETECTTRAPS:
