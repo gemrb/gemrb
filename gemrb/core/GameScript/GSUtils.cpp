@@ -2187,7 +2187,18 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 
 void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, VarContext context)
 {
-	Variables::key_t key(VarName);
+	ResRef key{VarName};
+
+	auto SetLocalVariable = [=](decltype(Game::locals)& vars, const ResRef& key, ieDword value) {
+		auto lookup = vars.find(key);
+
+		if (lookup != vars.cend()) {
+			lookup->second = value;
+		} else if (!NoCreate) {
+			vars[key] = value;
+		}
+	};
+
 	if (context.IsEmpty()) {
 		const char* varName = &VarName[6];
 		//some HoW triggers use a : to separate the scope from the variable name
@@ -2195,30 +2206,30 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 			varName++;
 		}
 		context.Format("{:.6}", VarName);
-		key = Variables::key_t(varName);
+		key = ResRef{varName};
 	}
 	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", context, VarName, value);
-	
+
 	if (context == "MYAREA") {
-		Sender->GetCurrentArea()->locals->SetAt(key, value, NoCreate);
+		SetLocalVariable(Sender->GetCurrentArea()->locals, key, value);
 		return;
 	}
 	if (context == "LOCALS") {
-		Sender->locals->SetAt(key, value, NoCreate);
+		SetLocalVariable(Sender->locals, key, value);
 		return;
 	}
 	Game *game = core->GetGame();
 	if (HasKaputz && context == "KAPUTZ") {
-		game->kaputz->SetAt(key, value, NoCreate);
+		SetLocalVariable(game->kaputz, key, value);
 		return;
 	}
 	if (context == "GLOBAL") {
-		game->locals->SetAt(key, value, NoCreate);
+		SetLocalVariable(game->locals, key, value);
 	} else {
 		// map name context, eg. AR1324
 		Map* map = game->GetMap(game->FindMap(context));
 		if (map) {
-			map->locals->SetAt(key, value, NoCreate);
+			SetLocalVariable(map->locals, key, value);
 		} else if (core->InDebugMode(ID_VARIABLES)) {
 			Log(WARNING, "GameScript", "Invalid variable {} {} in SetVariable", context, VarName);
 		}
@@ -2232,8 +2243,17 @@ void SetPointVariable(Scriptable *Sender, const StringParam& VarName, const Poin
 
 ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarContext context, bool *valid)
 {
-	Variables::key_t key(VarName);
-	ieDword value = 0;
+	ResRef key{VarName};
+
+	auto GetLocalVariable = [](const decltype(Game::locals)& vars, VarContext context, const ResRef& key) -> ieDword {
+		auto lookup = vars.find(key);
+		if (lookup != vars.cend()) {
+			ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, key, lookup->second);
+			return lookup->second;
+		}
+
+		return 0;
+	};
 
 	if (context.IsEmpty()) {
 		const char* varName = &VarName[6];
@@ -2242,42 +2262,36 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 			varName++;
 		}
 		context.Format("{:.6}", VarName);
-		key = Variables::key_t(varName);
+		key = ResRef{varName};
 	}
 	
 	if (context == "MYAREA") {
-		Sender->GetCurrentArea()->locals->Lookup(key, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, VarName, value);
-		return value;
+		return GetLocalVariable(Sender->GetCurrentArea()->locals, context, key);
 	}
 	
 	if (context == "LOCALS") {
-		Sender->locals->Lookup(key, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, VarName, value);
-		return value;
+		return GetLocalVariable(Sender->locals, context, key);
 	}
 	
 	const Game *game = core->GetGame();
 	if (HasKaputz && context == "KAPUTZ") {
-		game->kaputz->Lookup(key, value);
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, VarName, value);
-		return value;
+		return GetLocalVariable(game->kaputz, context, key);
 	}
 	
 	if (context == "GLOBAL") {
-		game->locals->Lookup(key, value);
+		return GetLocalVariable(game->locals, context, key);
 	} else {
 		// map name context, eg. AR1324
 		const Map* map = game->GetMap(game->FindMap(context));
 		if (map) {
-			map->locals->Lookup(key, value);
+			return GetLocalVariable(map->locals, context, key);
 		} else {
 			if (valid) *valid = false;
 			ScriptDebugLog(ID_VARIABLES, "Invalid variable {} {} in checkvariable", context, VarName);
 		}
 	}
-	ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, VarName, value);
-	return value;
+
+	return 0;
 }
 
 Point CheckPointVariable(const Scriptable *Sender, const StringParam& VarName, const VarContext& Context, bool *valid)
@@ -2289,20 +2303,23 @@ Point CheckPointVariable(const Scriptable *Sender, const StringParam& VarName, c
 // checks if a variable exists in any context
 bool VariableExists(const Scriptable *Sender, const StringParam& VarName, const VarContext& context)
 {
-	ieDword value = 0;
 	const Game *game = core->GetGame();
 
-	if (Sender->GetCurrentArea()->locals->Lookup(VarName, value)) {
+	auto hasLocalVariable = [](const decltype(game->locals)& vars, const StringParam& key) -> bool {
+		return vars.find(key) != vars.cend();
+	};
+
+	if (hasLocalVariable(Sender->GetCurrentArea()->locals, VarName)) {
 		return true;
-	} else if (Sender->locals->Lookup(VarName, value)) {
+	} else if (hasLocalVariable(Sender->locals, VarName)) {
 		return true;
-	} else if (HasKaputz && game->kaputz->Lookup(VarName, value)) {
+	} else if (HasKaputz && hasLocalVariable(game->kaputz, VarName)) {
 		return true;
-	} else if (game->locals->Lookup(VarName, value)) {
+	} else if (hasLocalVariable(game->locals, VarName)) {
 		return true;
 	} else {
 		const Map* map = game->GetMap(game->FindMap(context));
-		if (map && map->locals->Lookup(VarName, value)) {
+		if (map && hasLocalVariable(map->locals, VarName)) {
 			return true;
 		}
 	}

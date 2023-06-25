@@ -150,9 +150,6 @@ Game::~Game(void)
 	if (mazedata) {
 		free (mazedata);
 	}
-	if (kaputz) {
-		delete kaputz;
-	}
 
 	for (auto journal : Journals) {
 		delete journal;
@@ -1014,7 +1011,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 			je->Group = group;
 			ieDword chapter = 0;
 			if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-				locals->Lookup("CHAPTER", chapter);
+				chapter = GetLocal("CHAPTER", 0);
 			}
 			je->Chapter = (ieByte) chapter;
 			je->GameTime = GameTime;
@@ -1025,7 +1022,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 	je->GameTime = GameTime;
 	ieDword chapter = 0;
 	if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-		locals->Lookup("CHAPTER", chapter);
+		chapter = GetLocal("CHAPTER", 0);
 	}
 	je->Chapter = (ieByte) chapter;
 	je->unknown09 = 0;
@@ -1296,13 +1293,16 @@ void Game::PartyMemberDied(const Actor *actor)
 	}
 }
 
-void Game::IncrementChapter() const
-{
+void Game::IncrementChapter() {
 	//chapter first set to 0 (prologue)
-	ieDword chapter = (ieDword) -1;
-	locals->Lookup("CHAPTER",chapter);
+	auto lookup = locals.find("CHAPTER");
+	if (lookup != locals.cend()) {
+		lookup->second += 1;
 	//increment chapter only if it exists
-	locals->SetAt("CHAPTER", chapter+1, core->HasFeature(GFFlags::NO_NEW_VARIABLES) );
+	} else if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
+		locals["CHAPTER"] = 0;
+	}
+
 	//clear statistics
 	for (const auto& pc : PCs) {
 		//all PCs must have this!
@@ -1592,11 +1592,8 @@ void Game::PlayerDream() const
 //Start a TextScreen dream for the protagonist
 void Game::TextDream()
 {
-	ieDword dream, chapter;
-	locals->Lookup("CHAPTER", chapter);
-	if (!locals->Lookup("DREAM", dream)) {
-		dream = 1;
-	}
+	ieDword chapter = GetLocal("CHAPTER", 0);
+	ieDword dream = GetLocal("DREAM", 1);
 	TextScreen.Format("drmtxt{}", dream + 1);
 
 	if ((chapter > dream) && (core->Roll(1, 100, 0) <= 33)
@@ -1617,7 +1614,7 @@ void Game::TextDream()
 			}
 		}
 
-		locals->SetAt("DREAM", dream+1);
+		locals["DREAM"] = dream + 1;
 		core->SetEventFlag(EF_TEXTSCREEN);
 	}
 }
@@ -2304,6 +2301,13 @@ void Game::MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int
 		if (npc->GetBase(IE_EA) == EA_FAMILIAR) {
 			MoveBetweenAreasCore(npc, targetArea, targetPoint, orientation, true);
 		}
+	}
+}
+
+void Game::DumpKaputz() const {
+	Log(DEBUG, "Game", "Kaputz item count: {}", kaputz.size());
+	for (const auto& entry : kaputz) {
+		Log(DEBUG, "Game", "{} = {}", entry.first, entry.second);
 	}
 }
 

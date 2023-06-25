@@ -33,6 +33,7 @@
 #include "Audio.h"
 #include "CombatInfo.h"
 #include "EffectQueue.h"
+#include "Game.h"
 #include "Inventory.h"
 #include "Palette.h"
 #include "Polygon.h"
@@ -529,8 +530,8 @@ private:
 
 	int CalculateSpeedFromRate(bool feedback) const;
 	int CalculateSpeedFromINI(bool feedback) const;
-	void IncrementDeathVariable(Variables *vars, const char *format, StringView name) const;
-	
+	void IncrementDeathVariable(Game::kaputz_t& vars, const char *format, StringView name) const;
+
 	stats_t ResetStats(bool init);
 	void RefreshEffects(bool init, const stats_t& prev);
 

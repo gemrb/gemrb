@@ -573,8 +573,7 @@ void IniSpawn::RespawnNameless()
 	Actor* nameless = game->GetPC(0, false);
 
 	// the final fight is fatal
-	ieDword finale = 0;
-	game->locals->Lookup("Transcendent_Final_Speech", finale);
+	ieDword finale = game->GetLocal("Transcendent_Final_Speech", 0);
 	if (finale) {
 		nameless->Die(nullptr);
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "OpenPSTDeathWindow");

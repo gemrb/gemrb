@@ -36,11 +36,11 @@
 #include "Resource.h"
 #include "Scriptable/Scriptable.h"
 #include "Scriptable/PCStatStruct.h"
-#include "Variables.h"
 #include "Video/Video.h"
 
 #include <atomic>
 #include <array>
+#include <unordered_map>
 #include <vector>
 
 namespace GemRB {
@@ -223,6 +223,8 @@ using CRRow = int[MAX_CRLEVEL];
 
 class GEM_EXPORT Game : public Scriptable {
 public:
+	using kaputz_t = std::unordered_map<ResRef, ieDword, ResRefHash>;
+
 	Game(void);
 	~Game(void) override;
 private:
@@ -243,7 +245,7 @@ private:
 public:
 	std::vector< Actor*> selected;
 	int version = 0;
-	Variables* kaputz = nullptr;
+	kaputz_t kaputz;
 	std::array<ieByte, BESTIARY_SIZE> beasts;
 	ieByte* mazedata = nullptr; //only in PST
 	ieDword CombatCounter = 0;
@@ -426,7 +428,7 @@ public:
 	/** a party member just died now */
 	void PartyMemberDied(const Actor *);
 	/** Increments chapter variable and refreshes kill stats */
-	void IncrementChapter() const;
+	void IncrementChapter();
 	/** Sets party reputation */
 	void SetReputation(ieDword r, ieDword min = 10);
 	/** Sets the gamescreen control status (pane states, dialog textarea size) */
@@ -488,6 +490,7 @@ public:
 	bool OnlyNPCsSelected() const;
 	void MovePCs(const ResRef& targetArea, const Point& targetPoint, int orientation) const;
 	void MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int orientation) const;
+	void DumpKaputz() const;
 private:
 	bool DetermineStartPosType(const TableMgr* strTable) const;
 	ResRef *GetDream(Map *area);

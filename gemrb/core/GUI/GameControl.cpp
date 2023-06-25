@@ -964,10 +964,10 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				//refresh gui here once we got it
 				break;
 			case 'u': // dump GameScript GLOBAL vars
-				core->GetGame()->locals->DebugDump();
+				core->GetGame()->DumpLocals();
 				break;
 			case 'U': // dump death vars
-				core->GetGame()->kaputz->DebugDump();
+				core->GetGame()->DumpKaputz();
 				break;
 			case 'V': // dump GemRB vars like the game ini settings
 				core->DumpVariables();

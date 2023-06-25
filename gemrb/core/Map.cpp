@@ -1873,7 +1873,7 @@ void Map::MarkVisited(const Actor *actor) const
 		if (!key.Format("{}_visited", scriptName)) {
 			Log(ERROR, "Map", "Area {} has a too long script name for generating _visited globals!", scriptName);
 		}
-		core->GetGame()->locals->SetAt(key, 1);
+		core->GetGame()->locals[key] = 1;
 	}
 }
 

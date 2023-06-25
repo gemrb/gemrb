@@ -4367,16 +4367,12 @@ is what gamescripts know as GLOBAL variables. \n\
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
-	ieDword value;
 	PARSE_ARGS( args,  "O", &Variable );
 
 	GET_GAME();
 
-	if (!game->locals->Lookup(PyString_AsStringView(Variable), value)) {
-		return PyLong_FromLong(0);
-	}
-
-	return PyLong_FromLong((unsigned long) value);
+	StringView lookupVariable = static_cast<StringView>(PyString_AsStringView(Variable));
+	return PyLong_FromLong((unsigned long) game->GetLocal(lookupVariable, 0));
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
@@ -5302,7 +5298,7 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 		game->DeleteJournalEntry(strref);
 	} else {
 		if (chapter == ieDword(-1)) {
-			game->locals->Lookup("CHAPTER", chapter);
+			chapter = game->GetLocal("CHAPTER", -1);
 		}
 		game->AddJournalEntry(strref, (ieByte) chapter, (ieByte) section);
 	}

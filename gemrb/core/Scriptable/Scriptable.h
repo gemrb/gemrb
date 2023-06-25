@@ -267,7 +267,7 @@ public:
 	// The countdown for forced activation by triggers.
 	ieDword TriggerCountdown = 0;
 
-	Variables* locals;
+	std::unordered_map<ResRef, ieDword, ResRefHash> locals;
 	ScriptableType Type = ST_ACTOR;
 	Point Pos;
 
@@ -402,6 +402,8 @@ public:
 	void StartTimer(ieDword ID, ieDword expiration);
 	String GetName() const;
 	bool AuraPolluted();
+	ieDword GetLocal(const ResRef& key, ieDword fallback) const;
+	void DumpLocals() const;
 private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant, Scriptable* target = nullptr, int level = 0);

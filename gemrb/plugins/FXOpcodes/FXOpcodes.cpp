@@ -5415,7 +5415,7 @@ int fx_local_variable (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	//this is a hack, the variable name spreads across the resources
 	// print( "fx_local_variable (%2d) %s=%d", fx->Opcode, fx->Resource, fx->Parameter1 );
-	target->locals->SetAt(fx->VariableName, fx->Parameter1);
+	target->locals[fx->VariableName] = fx->Parameter1;
 	//local variable effects are not applied, they will be resaved though
 	return FX_NOT_APPLIED;
 }
@@ -7167,12 +7167,15 @@ int fx_modify_global_variable (Scriptable* /*Owner*/, Actor* /*target*/, Effect*
 
 	// print("fx_modify_global_variable(%2d): Variable: %s Value: %d Type: %d", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2);
 	if (fx->Parameter2) {
-		ieDword var = 0;
 		//use resource memory area as variable name
-		game->locals->Lookup(fx->Resource, var);
-		game->locals->SetAt(fx->Resource, var+fx->Parameter1);
+		auto lookup = game->locals.find(fx->Resource);
+		if (lookup != game->locals.cend()) {
+			lookup->second += fx->Parameter1;
+		} else {
+			game->locals[fx->Resource] = fx->Parameter1;
+		}
 	} else {
-		game->locals->SetAt(fx->Resource, fx->Parameter1);
+		game->locals[fx->Resource] = fx->Parameter1;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -7802,12 +7805,15 @@ int fx_modify_local_variable (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	// print("fx_modify_local_variable(%2d): %s, Mod: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 	if (fx->Parameter2) {
-		ieDword var = 0;
 		//use resource memory area as variable name
-		target->locals->Lookup(fx->Resource, var);
-		target->locals->SetAt(fx->Resource, var+fx->Parameter1);
+		auto lookup = target->locals.find(fx->Resource);
+		if (lookup != target->locals.cend()) {
+			lookup->second += fx->Parameter1;
+		} else {
+			target->locals[fx->Resource] = fx->Parameter1;
+		}
 	} else {
-		target->locals->SetAt(fx->Resource, fx->Parameter1);
+		target->locals[fx->Resource] = fx->Parameter1;
 	}
 	return FX_NOT_APPLIED;
 }

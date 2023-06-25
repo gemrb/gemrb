@@ -1781,7 +1781,7 @@ int fx_cutscene (Scriptable* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
 {
 	// print("fx_cutscene(%2d)", fx->Opcode);
 	Game *game = core->GetGame();
-	game->locals->SetAt("GEM_ACTIVE", 1);
+	game->locals["GEM_ACTIVE"] = 1;
 	return FX_NOT_APPLIED;
 }
 

@@ -206,10 +206,12 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	//apparently BG1/IWD2 relies on this, if chapter is unset, it is
 	//set to -1, hopefully it won't break anything
 	//PST has no chapter variable by default, and would crash on one
-	newGame->locals->SetAt("CHAPTER", (ieDword) -1, core->HasFeature(GFFlags::NO_NEW_VARIABLES));
+	if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
+		newGame->locals["CHAPTER"] = -1;
+	}
 
 	// load initial values from var.var
-	newGame->locals->LoadInitialValues("GLOBAL");
+	LoadInitialValues("GLOBAL", newGame->locals);
 
 	//Loading Global Variables
 	ieVariable Name;
@@ -220,14 +222,11 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->ReadDword(Value);
 		str->Seek( 40, GEM_CURRENT_POS );
-		newGame->locals->SetAt( Name, Value );
+		newGame->locals[Name] = Value;
 	}
 	if(core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
-		newGame->kaputz = new Variables();
-		newGame->kaputz->SetType( GEM_VARIABLES_INT );
-		newGame->kaputz->ParseKey( 1 );
 		// load initial values from var.var
-		newGame->kaputz->LoadInitialValues("KAPUTZ");
+		LoadInitialValues("KAPUTZ", newGame->kaputz);
 		str->Seek( KillVarsOffset, GEM_STREAM_START );
 		for (unsigned int i = 0; i < KillVarsCount; i++) {
 			ieDword Value;
@@ -235,7 +234,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			str->Seek( 8, GEM_CURRENT_POS );
 			str->ReadDword(Value);
 			str->Seek( 40, GEM_CURRENT_POS );
-			newGame->kaputz->SetAt( Name, Value );
+			newGame->kaputz[Name] = Value;
 		}
 	}
 
@@ -586,7 +585,7 @@ int GAMImporter::GetStoredFileSize(const Game *game)
 	//moved this here, so one can disable killvars in a pst style game
 	//or enable them in gemrb
 	if(core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
-		KillVarsCount = game->kaputz->GetCount();
+		KillVarsCount = game->kaputz.size();
 	} else {
 		KillVarsCount = 0;
 	}
@@ -642,7 +641,7 @@ int GAMImporter::GetStoredFileSize(const Game *game)
 
 	GlobalOffset = headersize;
 
-	GlobalCount = game->locals->GetCount();
+	GlobalCount = game->locals.size();
 	headersize += GlobalCount * 84;
 	JournalOffset = headersize;
 
@@ -734,16 +733,11 @@ int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game) const
 //only in PST
 int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 {
-	Variables::iterator pos=NULL;
-	ieDword value;
-
-	for (unsigned int i=0;i<KillVarsCount;i++) {
+	for (const auto& entry : game->kaputz) {
 		//global variables are locals for game, that's why the local/global confusion
-		Variables::key_t name;
-		pos=game->kaputz->GetNextAssoc( pos, name, value);
-		stream->WriteVariableUC(ieVariable(name));
+		stream->WriteVariableUC(ieVariable(entry.first));
 		stream->WriteFilling(8);
-		stream->WriteDword(value);
+		stream->WriteDword(entry.second);
 		//40 bytes of empty crap
 		stream->WriteFilling(40);
 	}
@@ -753,29 +747,25 @@ int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 {
 	ieVariable tmpname;
-	Variables::iterator pos=NULL;
-	ieDword value;
 
-	for (unsigned int i=0;i<GlobalCount;i++) {
+	for (const auto& entry : game->locals) {
 		//global variables are locals for game, that's why the local/global confusion
-		Variables::key_t name;
-		pos=game->locals->GetNextAssoc( pos, name, value);
 
 		/* PST hates to have some variables lowercased. */
 		if (core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
-			if (strcmp("dictionary_githzerai_hjacknir", name.c_str()) == 0) {
+			if (strcmp("dictionary_githzerai_hjacknir", entry.first.c_str()) == 0) {
 				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
 			} else {
-				tmpname = MakeVariable(name);
+				tmpname = MakeVariable(entry.first);
 			}
 		} else {
-			tmpname = MakeVariable(name);
+			tmpname = MakeVariable(entry.first);
 		}
 
 		stream->WriteVariableUC(tmpname);
 		stream->WriteFilling(8);
-		stream->WriteDword(value);
+		stream->WriteDword(entry.second);
 		//40 bytes of empty crap
 		stream->WriteFilling(40);
 	}

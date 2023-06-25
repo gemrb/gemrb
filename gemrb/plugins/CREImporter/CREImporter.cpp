@@ -1876,7 +1876,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 	EffectsOffset = headersize;
 	//adding effects
 	EffectsCount = actor->fxqueue.GetSavedEffectsCount();
-	VariablesCount = actor->locals->GetCount();
+	VariablesCount = actor->locals.size();
 	if (VariablesCount) {
 		TotSCEFF=1;
 	}
@@ -2399,12 +2399,10 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 //add as effect!
 int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 {
-	Variables::iterator pos=NULL;
-	Variables::key_t name;
-	ieDword tmpDword, value;
+	ieDword value, tmpDword;
 
-	for (unsigned int i=0;i<VariablesCount;i++) {
-		pos = actor->locals->GetNextAssoc(pos, name, value);
+	for (const auto& entry : actor->locals) {
+		value = entry.second;
 		stream->WriteFilling(8);
 		tmpDword = FAKE_VARIABLE_OPCODE;
 		stream->WriteDword(tmpDword);
@@ -2419,7 +2417,7 @@ int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 		tmpDword = FAKE_VARIABLE_MARKER;
 		stream->WriteDword(tmpDword); //variable marker
 		stream->WriteFilling(92); //23 * 4
-		stream->WriteVariable(ieVariable(name));
+		stream->WriteVariable(ieVariable(entry.first));
 		stream->WriteFilling(72); //32 + 72
 	}
 	return 0;

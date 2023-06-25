@@ -18,12 +18,13 @@
  *
  */
 
-#ifndef VARIABLES_H 
+#ifndef VARIABLES_H
 #define VARIABLES_H
 
 #include "exports.h"
 #include "globals.h"
 
+#include "Cache.h"
 #include "Strings/String.h"
 #include "Strings/StringView.h"
 
@@ -155,9 +156,11 @@ protected:
 	inline bool MyCopyKey(char*& dest, const key_t&) const;
 	inline bool MyCompareKey(const key_t&, key_t str) const;
 	inline unsigned int MyHashKey(const key_t&) const;
-	
+
 	void SetAtCString(const key_t&, const char* newValue);
 };
+
+void LoadInitialValues(const ResRef& name, std::unordered_map<ResRef, ieDword, ResRefHash>& map);
 
 }
 

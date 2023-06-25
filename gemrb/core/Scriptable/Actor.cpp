@@ -2725,7 +2725,7 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 	// but not if pst is playing disguise tricks (GameScript::SetNamelessDisguise)
 	ieDword pst_appearance = 0;
 	if (pstflags) {
-		game->locals->Lookup("APPEARANCE", pst_appearance);
+		pst_appearance = game->GetLocal("APPEARANCE", 0);
 	}
 	if (Modified[IE_SEX] != BaseStats[IE_SEX] && pst_appearance == 0) {
 		UpdateAnimationID(true);
@@ -5010,16 +5010,24 @@ void Actor::Resurrect(const Point &destPoint)
 		}
 		ieDword value=0;
 
-		game->kaputz->Lookup(DeathVar, value);
-		if (value>0) {
-			game->kaputz->SetAt(DeathVar, value-1);
+		auto lookup = game->kaputz.find(DeathVar);
+		if (lookup != game->kaputz.cend()) {
+			value = lookup->second;
+		}
+
+		if (value > 0) {
+			game->kaputz[DeathVar] = value - 1;
 		}
 	// not bothering with checking actor->SetDeathVar, since the SetAt nocreate parameter is true
 	} else if (!core->HasFeature(GFFlags::HAS_KAPUTZ)) {
 		if (!DeathVar.Format(Interface::GetDeathVarFormat(), scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals (on resurrect)!", scriptName, fmt::WideToChar{GetName()});
 		}
-		game->locals->SetAt(DeathVar, 0, true);
+
+		auto lookup = game->locals.find(DeathVar);
+		if (lookup != game->locals.cend()) {
+			lookup->second = 0;
+		}
 	}
 
 	ResetCommentTime();
@@ -5076,6 +5084,24 @@ void Actor::SendDiedTrigger() const
 		} else if (abs(ea - pea) > 30) {
 			neighbour->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
 		}
+	}
+}
+
+static void UpdateOrCreateVariable(decltype(Game::locals)& vars, const ResRef& key, ieDword value) {
+	auto lookup = vars.find(key);
+	if (lookup != vars.cend()) {
+		lookup->second = value;
+	} else if (!nocreate) {
+		vars[key] = value;
+	}
+}
+
+static void IncreamentOrCreateVariable(decltype(Game::locals)& vars, const ResRef& key, ieDword value) {
+	auto lookup = vars.find(key);
+	if (lookup != vars.cend()) {
+		lookup->second += value;
+	} else if (!nocreate) {
+		vars[key] = value;
 	}
 }
 
@@ -5202,7 +5228,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	SetModal( MS_NONE );
 
 	if (InParty && killerPC) {
-		game->locals->SetAt("PM_KILLED", 1, nocreate);
+		UpdateOrCreateVariable(game->locals, "PM_KILLED", 1);
 	}
 
 	// EXTRACOUNT is updated at the moment of death
@@ -5218,11 +5244,10 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		}
 
 		if (area) {
-			ieDword value = 0;
-			area->locals->Lookup(varname, value);
+			ieDword value = area->GetLocal(varname, 0);
 			// i am guessing that we shouldn't decrease below 0
 			if (value > 0) {
-				area->locals->SetAt(varname, value - 1);
+				area->locals[varname] = value - 1;
 			}
 		}
 	}
@@ -5339,18 +5364,15 @@ bool Actor::CheckOnDeath()
 
 	IncrementDeathVariable(game->locals, "{}", IncKillVar);
 
-	ieDword value;
 	if (scriptName[0] && SetDeathVar) {
 		ieVariable varname;
-		value = 0;
+
 		if (!varname.Format("{}_DEAD", scriptName)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", scriptName, fmt::WideToChar{GetName()});
 		}
-		game->locals->SetAt(varname, 1, nocreate);
-		game->locals->Lookup(varname, value);
-		if (value) {
-			IncrementDeathVariable(game->locals, "{}_KILL_CNT", scriptName);
-		}
+
+		UpdateOrCreateVariable(game->locals, varname, 1);
+		IncrementDeathVariable(game->locals, "{}_KILL_CNT", scriptName);
 	}
 
 	if (IncKillCount) {
@@ -5365,9 +5387,7 @@ bool Actor::CheckOnDeath()
 	// death counters for PST: APP_GOOD, APP_LAW, APP_LADY, APP_MURDER
 	for (int i = 0, j = APP_GOOD; i < 4; i++) {
 		if (AppearanceFlags & j) {
-			value = 0;
-			game->locals->Lookup(CounterNames[i], value);
-			game->locals->SetAt(CounterNames[i], value + DeathCounters[i], nocreate);
+			IncreamentOrCreateVariable(game->locals, CounterNames[i], DeathCounters[i]);
 		}
 		j += j;
 	}
@@ -5398,15 +5418,14 @@ bool Actor::CheckOnDeath()
 	return false;
 }
 
-void Actor::IncrementDeathVariable(Variables *vars, const char *format, StringView name) const {
+void Actor::IncrementDeathVariable(Game::kaputz_t& vars, const char *format, StringView name) const {
 	if (!name.empty()) {
 		ieVariable varname;
 		if (!varname.Format(format, name)) {
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", name, fmt::WideToChar{GetName()});
 		}
-		ieDword start = 0;
-		vars->Lookup(varname, start);
-		vars->SetAt(varname, start + 1, nocreate);
+
+		IncreamentOrCreateVariable(vars, varname, 1);
 	}
 }
 
