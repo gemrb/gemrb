@@ -73,8 +73,14 @@ bool p2DAImporter::Open(DataStream* str)
 	rows.reserve(10);
 	while (NextLine()) {
 		pos = line.find_first_of(' ');
-		if (pos == std::string::npos) continue;
-		
+		if (pos == std::string::npos) {
+			if (line.empty()) continue;
+			// row with no data, but a valid row name (eg. first row in iwd music.2da)
+			rowNames.emplace_back(line);
+			rows.emplace_back();
+			continue;
+		}
+
 		rowNames.emplace_back(line.substr(0, pos));
 		
 		auto sv = StringView(&line[pos + 1], line.length() - pos - 1);
