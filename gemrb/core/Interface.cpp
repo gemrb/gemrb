@@ -2089,7 +2089,7 @@ Interface::plugin_flags_t& Interface::GetPluginFlags() {
 	return pluginFlags;
 }
 
-void Interface::LoadInitialValues(const ResRef& name, std::unordered_map<ResRef, ieDword, ResRefHash>& map) {
+void Interface::LoadInitialValues(const ResRef& name, ResRefMap<ieDword>& map) {
 	char nPath[_MAX_PATH];
 	// we only support PST's var.var for now
 	PathJoin(nPath, config.GamePath, "var.var", nullptr);

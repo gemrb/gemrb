@@ -21,9 +21,8 @@
 #ifndef TLKIMPORTER_H
 #define TLKIMPORTER_H
 
-#include <unordered_map>
+#include "ie_types.h"
 
-#include "Cache.h"
 #include "StringMgr.h"
 #include "TlkOverride.h"
 
@@ -44,7 +43,7 @@ private:
 	ieDword StrRefCount = 0;
 	ieDword Offset = 0;
 	CTlkOverride *OverrideTLK = nullptr;
-	std::unordered_map<ResRef, gt_type, ResRefHash> gtmap;
+	ResRefMap<gt_type> gtmap;
 	int charname = 0;
 
 public:

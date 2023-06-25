@@ -5087,7 +5087,7 @@ void Actor::SendDiedTrigger() const
 	}
 }
 
-static void UpdateOrCreateVariable(decltype(Game::locals)& vars, const ResRef& key, ieDword value) {
+static void UpdateOrCreateVariable(ResRefMap<ieDword>& vars, const ResRef& key, ieDword value) {
 	auto lookup = vars.find(key);
 	if (lookup != vars.cend()) {
 		lookup->second = value;
@@ -5096,7 +5096,7 @@ static void UpdateOrCreateVariable(decltype(Game::locals)& vars, const ResRef& k
 	}
 }
 
-static void IncreamentOrCreateVariable(decltype(Game::locals)& vars, const ResRef& key, ieDword value) {
+static void IncrementOrCreateVariable(ResRefMap<ieDword>& vars, const ResRef& key, ieDword value) {
 	auto lookup = vars.find(key);
 	if (lookup != vars.cend()) {
 		lookup->second += value;
@@ -5387,7 +5387,7 @@ bool Actor::CheckOnDeath()
 	// death counters for PST: APP_GOOD, APP_LAW, APP_LADY, APP_MURDER
 	for (int i = 0, j = APP_GOOD; i < 4; i++) {
 		if (AppearanceFlags & j) {
-			IncreamentOrCreateVariable(game->locals, CounterNames[i], DeathCounters[i]);
+			IncrementOrCreateVariable(game->locals, CounterNames[i], DeathCounters[i]);
 		}
 		j += j;
 	}
@@ -5425,7 +5425,7 @@ void Actor::IncrementDeathVariable(Game::kaputz_t& vars, const char *format, Str
 			Log(ERROR, "Actor", "Scriptname {} (name: {}) is too long for generating death globals!", name, fmt::WideToChar{GetName()});
 		}
 
-		IncreamentOrCreateVariable(vars, varname, 1);
+		IncrementOrCreateVariable(vars, varname, 1);
 	}
 }
 

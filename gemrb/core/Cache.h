@@ -26,6 +26,7 @@
 #include <utility>
 
 #include "globals.h"
+#include "ie_types.h"
 
 namespace GemRB {
 
@@ -106,20 +107,8 @@ class RCCache {
 		}
 };
 
-struct ResRefHash {
-	size_t operator()(const ResRef& key) const {
-		size_t h = 0;
-		const char *c = key.c_str();
-
-		for (unsigned int i = 0; *c && i < 9; ++i)
-			h = (h << 5) + h + tolower(*c++);
-
-		return h;
-	}
-};
-
 template<typename V>
-using ResRefRCCache = RCCache<ResRef, V, ResRefHash>;
+using ResRefRCCache = RCCache<ResRef, V, CstrHashCI<ResRef>>;
 
 }
 

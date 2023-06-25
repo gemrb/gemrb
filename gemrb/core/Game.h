@@ -40,7 +40,6 @@
 
 #include <atomic>
 #include <array>
-#include <unordered_map>
 #include <vector>
 
 namespace GemRB {
@@ -223,7 +222,7 @@ using CRRow = int[MAX_CRLEVEL];
 
 class GEM_EXPORT Game : public Scriptable {
 public:
-	using kaputz_t = std::unordered_map<ResRef, ieDword, ResRefHash>;
+	using kaputz_t = ResRefMap<ieDword>;
 
 	Game(void);
 	~Game(void) override;

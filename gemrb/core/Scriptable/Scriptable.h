@@ -23,8 +23,8 @@
 
 #include "exports.h"
 #include "ie_cursors.h"
+#include "ie_types.h"
 
-#include "Cache.h"
 #include "CharAnimations.h"
 #include "OverHeadText.h"
 
@@ -267,7 +267,7 @@ public:
 	// The countdown for forced activation by triggers.
 	ieDword TriggerCountdown = 0;
 
-	std::unordered_map<ResRef, ieDword, ResRefHash> locals;
+	ResRefMap<ieDword> locals;
 	ScriptableType Type = ST_ACTOR;
 	Point Pos;
 

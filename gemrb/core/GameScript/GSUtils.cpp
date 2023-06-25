@@ -2189,7 +2189,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 {
 	ResRef key{VarName};
 
-	auto SetLocalVariable = [=](decltype(Game::locals)& vars, const ResRef& key, ieDword value) {
+	auto SetLocalVariable = [=](ResRefMap<ieDword>& vars, const ResRef& key, ieDword value) {
 		auto lookup = vars.find(key);
 
 		if (lookup != vars.cend()) {
@@ -2245,7 +2245,7 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 {
 	ResRef key{VarName};
 
-	auto GetLocalVariable = [](const decltype(Game::locals)& vars, VarContext context, const ResRef& key) -> ieDword {
+	auto GetLocalVariable = [](const ResRefMap<ieDword>& vars, VarContext context, const ResRef& key) -> ieDword {
 		auto lookup = vars.find(key);
 		if (lookup != vars.cend()) {
 			ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, key, lookup->second);
@@ -2305,7 +2305,7 @@ bool VariableExists(const Scriptable *Sender, const StringParam& VarName, const 
 {
 	const Game *game = core->GetGame();
 
-	auto hasLocalVariable = [](const decltype(game->locals)& vars, const StringParam& key) -> bool {
+	auto hasLocalVariable = [](const ResRefMap<ieDword>& vars, const StringParam& key) -> bool {
 		return vars.find(key) != vars.cend();
 	};
 

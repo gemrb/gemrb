@@ -21,13 +21,12 @@
 #ifndef SRCMGR_H
 #define SRCMGR_H
 
-#include <unordered_map>
 #include <vector>
 
 #include "exports.h"
 #include "ie_types.h"
 
-#include "Cache.h"
+#include "Resource.h"
 
 namespace GemRB {
 
@@ -52,7 +51,7 @@ public:
 
 class GEM_EXPORT SrcMgr {
 private:
-	std::unordered_map<ResRef, SrcVector, ResRefHash> srcs;
+	ResRefMap<SrcVector> srcs;
 
 public:
 	~SrcMgr();
