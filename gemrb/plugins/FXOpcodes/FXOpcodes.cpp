@@ -5336,6 +5336,7 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 // b6 generic effect ApplyEffectItem
 // didn't work in the originals or ees
+// didn't check immunities
 int fx_apply_effect_item (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_apply_effect_item(%2d)(%.8s)", fx->Opcode, fx->Resource);
@@ -5347,6 +5348,7 @@ int fx_apply_effect_item (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 // b7 generic effect ApplyEffectItemType
+// didn't check immunities
 int fx_apply_effect_item_type (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_apply_effect_item(%2d), Type: %d", fx->Opcode, fx->Parameter2);
