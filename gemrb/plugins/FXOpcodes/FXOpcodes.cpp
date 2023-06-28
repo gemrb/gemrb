@@ -5301,7 +5301,7 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!myfx)
 		return FX_NOT_APPLIED;
 
-	myfx->random_value = core->Roll(1,100,-1);
+	myfx->RandomValue = core->Roll(1, 100, -1);
 	myfx->Target = FX_TARGET_PRESET;
 	myfx->TimingMode = fx->TimingMode;
 	myfx->Duration = fx->Duration;
@@ -7490,7 +7490,7 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//this effect too
 		Effect *myfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 		if (myfx) {
-			myfx->random_value = fx->random_value;
+			myfx->RandomValue = fx->RandomValue;
 			myfx->TimingMode=fx->TimingMode;
 			myfx->Duration=fx->Duration;
 			myfx->Target = FX_TARGET_PRESET;

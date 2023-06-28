@@ -705,14 +705,14 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination)
 {
 	int res = FX_NOT_APPLIED;
 	// pre-roll dice for fx needing them and stow them in the effect
-	ieDword random_value = core->Roll( 1, 100, -1 );
+	ieDword randomValue = core->Roll(1, 100, -1);
 
 	if( target) {
 		target->RollSaves();
 	}
 	for (auto& fx : effects) {
 		//handle resistances and saving throws here
-		fx.random_value = random_value;
+		fx.RandomValue = randomValue;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
 
@@ -784,7 +784,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 static inline bool check_probability(const Effect* fx)
 {
 	//random value is 0-99
-	if (fx->random_value<fx->ProbabilityRangeMin || fx->random_value>fx->ProbabilityRangeMax) {
+	if (fx->RandomValue < fx->ProbabilityRangeMin || fx->RandomValue > fx->ProbabilityRangeMax) {
 		return false;
 	}
 	return true;
@@ -1008,7 +1008,7 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 		displaymsg->DisplayRollStringName(ieStrRef::ROLL16, GUIColors::LIGHTGREY, actor, val, roll, fx->CasterLevel, penetration);
 	} else {
 		// 2.5 style check
-		resisted = (signed) fx->random_value < (signed) val;
+		resisted = (signed) fx->RandomValue < (signed) val;
 	}
 	if (resisted) {
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore

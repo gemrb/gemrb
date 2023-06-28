@@ -82,7 +82,7 @@ Effect& Effect::operator=(const Effect& rhs) noexcept
 		SecondaryType = rhs.SecondaryType;
 		SecondaryDelay = rhs.SecondaryDelay;
 		CasterID = rhs.CasterID;
-		random_value = rhs.random_value;
+		RandomValue = rhs.RandomValue;
 		SpellLevel = rhs.SpellLevel;
 
 		IsVariable = rhs.IsVariable;
@@ -135,7 +135,7 @@ bool Effect::operator==(const Effect& rhs) const noexcept
 	if (SecondaryType != rhs.SecondaryType) return false;
 	if (SecondaryDelay != rhs.SecondaryDelay) return false;
 	if (CasterID != rhs.CasterID) return false;
-	if (random_value != rhs.random_value) return false;
+	if (RandomValue != rhs.RandomValue) return false;
 	if (SpellLevel != rhs.SpellLevel) return false;
 
 	if (IsVariable && VariableName != rhs.VariableName) return false;
