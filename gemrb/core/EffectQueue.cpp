@@ -2274,29 +2274,31 @@ int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 int EffectQueue::CheckImmunity(Actor *target) const
 {
 	//don't resist if target is non living
-	if( !target) {
+	if (!target) {
 		return 1;
 	}
 
-	if (!effects.empty()) {
-		const Effect& fx = *effects.begin();
-
-		//projectile immunity
-		if( target->ImmuneToProjectile(fx.Projectile)) return 0;
-
-		//Allegedly, the book of infinite spells needed this, but irresistable by level
-		//spells got fx->Power = 0, so i added those exceptions and removed returning here for fx->InventorySlot
-
-		//check level resistances
-		//check specific spell immunity
-		//check school/sectype immunity
-		int ret = check_type(target, fx);
-		if (ret < 0 && target->Modified[IE_SANCTUARY] & (1 << OV_BOUNCE)) {
-			target->Modified[IE_SANCTUARY]|=(1<<OV_BOUNCE2);
-		}
-		return ret;
+	if (effects.empty()) {
+		return 0;
 	}
-	return 0;
+
+	// projectile immunity
+	const Effect& fx = *effects.begin();
+	if (target->ImmuneToProjectile(fx.Projectile)) {
+		return 0;
+	}
+
+	// Allegedly, the book of infinite spells needed this, but irresistable by level
+	// spells got fx->Power = 0, so i added those exceptions and removed returning here for fx->InventorySlot
+
+	// check level resistances
+	// check specific spell immunity
+	// check school/sectype immunity
+	int ret = check_type(target, fx);
+	if (ret < 0 && target->Modified[IE_SANCTUARY] & (1 << OV_BOUNCE)) {
+		target->Modified[IE_SANCTUARY] |= 1 << OV_BOUNCE2;
+	}
+	return ret;
 }
 
 void EffectQueue::AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue,
