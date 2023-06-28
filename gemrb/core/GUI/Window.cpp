@@ -264,8 +264,8 @@ void Window::SetPosition(WindowPosition pos)
 
 void Window::RedrawControls(const Control::varname_t& VarName) const
 {
-	Control::value_t val = Control::INVALID_VALUE;
-	core->GetDictionary()->Lookup(VarName, val);
+	Control::value_t val = core->GetVariable(VarName.c_str(), Control::INVALID_VALUE);
+
 	for (auto ctrl : Controls) {
 		ctrl->UpdateState(VarName, val);
 	}

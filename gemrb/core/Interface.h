@@ -44,7 +44,6 @@
 #include "InterfaceConfig.h"
 #include "Resource.h"
 #include "Timer.h"
-#include "Variables.h"
 #include "SaveGameAREExtractor.h"
 #include "StringMgr.h"
 #include "System/VFS.h"
@@ -90,7 +89,6 @@ class Store;
 class SymbolMgr;
 class TableMgr;
 class TextArea;
-class Variables;
 class Video;
 class WindowManager;
 class WorldMap;
@@ -363,6 +361,11 @@ struct CFGConfigData {
 
 class GEM_EXPORT Interface
 {
+public:
+	using variables_t = std::unordered_map<std::string, int32_t>;
+	using tokens_t = std::unordered_map<std::string, String>;
+	using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
+
 private:
 	// dirvers must be deallocated last (keep them at the top)
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
@@ -377,9 +380,10 @@ private:
 	std::shared_ptr<FogRenderer> fogRenderer;
 	GameControl* gamectrl = nullptr;
 	SaveGameIterator *sgiterator = nullptr;
-	Variables * vars;
-	Variables * tokens;
-	Variables * lists;
+	tokens_t tokens;
+	std::unordered_map<std::string, std::vector<ieDword>> lists;
+	plugin_flags_t pluginFlags;
+	variables_t vars;
 	std::shared_ptr<MusicMgr> music;
 	std::vector<Symbol> symbols;
 	std::shared_ptr<DataFileMgr> INIparty;
@@ -500,6 +504,8 @@ public:
 	Window* CreateWindow(unsigned short WindowID, const Region&);
 	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
+	plugin_flags_t& GetPluginFlags();
+	void LoadInitialValues(const ResRef& name, ResRefMap<ieDword>& map);
 
 	Tooltip CreateTooltip() const;
 	/** returns the label which should receive game messages (overrides messagetextarea) */
@@ -512,9 +518,12 @@ public:
 	/** Get the SaveGameIterator */
 	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
-	Variables * GetDictionary() const;
+	variables_t& GetDictionary();
+	void DumpVariables() const;
+	variables_t::mapped_type GetVariable(const variables_t::key_type& key, int fallback) const;
 	/** Get the Token Dictionary */
-	Variables * GetTokenDictionary() const;
+	tokens_t& GetTokenDictionary();
+	String GetToken(const std::string& key, String && fallback) const;
 	/** Get the Music Manager */
 	MusicMgr * GetMusicMgr() const;
 	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
@@ -708,7 +717,7 @@ public:
 	/** resolves a stat bonus based on multiple stats */
 	int ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieDword flags = 0, int value = 0);
 	/** Opens CD prompt window and waits for the specified disc */
-	void WaitForDisc(int disc_number, const char* path) const;
+	void WaitForDisc(int disc_number, const char* path);
 	/** Returns the music playlist corresponding to the provided type */
 	const ieVariable& GetMusicPlaylist(size_t SongType) const;
 	void DisableMusicPlaylist(size_t SongType);
@@ -765,7 +774,7 @@ private:
 	/** Executes everything (non graphical) in the main game loop */
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */
-	std::vector<ieDword>* GetListFrom2DAInternal(const ResRef& resref);
+	std::vector<ieDword> GetListFrom2DAInternal(const ResRef& resref);
 
 public:
 	CFGConfigData config;
@@ -778,7 +787,6 @@ public:
 	bool UseCorruptedHack = false;
 	int FeedbackLevel = 0;
 
-	Variables *plugin_flags;
 	/** The Main program loop */
 	void Main(void);
 	/** returns true if the game is paused */
@@ -805,7 +813,7 @@ public:
 	}
 	inline void ResetActionBar()
 	{
-		vars->SetAt("ActionLevel", 0, false);
+		vars["ActionLevel"] = 0;
 		SetEventFlag(EF_ACTION);
 	}
 
@@ -820,6 +828,12 @@ public:
 };
 
 extern GEM_EXPORT Interface * core;
+
+template<typename T>
+void SetTokenAsString(const std::string& key, T&& newValue) {
+	const std::wstring wideString = fmt::format(L"{}", std::forward<T>(newValue));
+	core->GetTokenDictionary()[key] = wideString;
+}
 
 }
 

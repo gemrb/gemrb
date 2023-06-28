@@ -2431,10 +2431,10 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 			ieDword count;
 			count = target->GetCurrentArea()->CountSummons(GA_NO_DEAD, SEX_SUMMON);
 			return DiffCore(count, val, rel);
-		case STI_CHAPTER_CHECK:
-			ieDword chapter;
-			core->GetGame()->locals->Lookup("CHAPTER", chapter);
+		case STI_CHAPTER_CHECK: {
+			ieDword chapter = core->GetGame()->GetLocal("CHAPTER", 0);
 			return DiffCore(chapter, val, rel);
+		}
 		case STI_EVASION:
 			if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 				// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)

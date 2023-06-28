@@ -18,6 +18,9 @@
  *
  */
 
+#include <tuple>
+#include <utility>
+
 #include "TLKImporter.h"
 
 #include "Audio.h"
@@ -32,18 +35,8 @@
 
 using namespace GemRB;
 
-struct gt_type
-{
-	int type;
-	ieStrRef male;
-	ieStrRef female;
-};
-
 TLKImporter::TLKImporter(void)
 {
-	gtmap.RemoveAll(NULL);
-	gtmap.SetType(GEM_VARIABLES_POINTER);
-
 	if (core->HasFeature(GFFlags::CHARNAMEISGABBER)) {
 		charname=-1;
 	}
@@ -56,24 +49,21 @@ TLKImporter::TLKImporter(void)
 	for (TableMgr::index_t i = 0; i < gtcount; ++i) {
 		ieVariable key = tm->GetRowName(i);
 
-		gt_type *entry = new gt_type;
-		entry->type = tm->QueryFieldSigned<int>(i,0);
-		entry->male = tm->QueryFieldAsStrRef(i,1);
-		entry->female = tm->QueryFieldAsStrRef(i,2);
-		gtmap.SetAt(key, (void *) entry);
+		auto& entry =
+			gtmap.emplace(
+					std::piecewise_construct,
+					std::forward_as_tuple(key),
+					std::forward_as_tuple()
+			).first->second;
+		entry.type = tm->QueryFieldSigned<int>(i,0);
+		entry.male = tm->QueryFieldAsStrRef(i,1);
+		entry.female = tm->QueryFieldAsStrRef(i,2);
 	}
-}
-
-static void ReleaseGtEntry(void *poi)
-{
-	delete (gt_type *) poi;
 }
 
 TLKImporter::~TLKImporter(void)
 {
 	delete str;
-	
-	gtmap.RemoveAll(ReleaseGtEntry);
 
 	CloseAux();
 }
@@ -204,17 +194,16 @@ ieStrRef TLKImporter::GenderStrRef(int slot, ieStrRef malestrref, ieStrRef femal
 //if this function returns nullptr then it is not a built in token
 String TLKImporter::BuiltinToken(const ieVariable& Token)
 {
-	gt_type *entry = NULL;
-
 	//these are gender specific tokens, they are customisable by gender.2da
-	if (gtmap.Lookup(Token, (void *&) entry) ) {
-		return GetString(GenderStrRef(entry->type, entry->male, entry->female));
+	auto lookup = gtmap.find(Token);
+	if (lookup != gtmap.cend()) {
+		auto& entry = lookup->second;
+		return GetString(GenderStrRef(entry.type, entry.male, entry.female));
 	}
 
 	//these are hardcoded, all engines are the same or don't use them
 	if (Token == "DAYANDMONTH") {
-		ieDword dayandmonth=0;
-		core->GetDictionary()->Lookup("DAYANDMONTH",dayandmonth);
+		ieDword dayandmonth = core->GetVariable("DAYANDMONTH", 0);
 		//preparing sub-tokens
 		core->GetCalendar()->GetMonthName((int) dayandmonth);
 		return GetString(ieStrRef::DAYANDMONTH, STRING_FLAGS::RESOLVE_TAGS);
@@ -254,9 +243,8 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 		return GetString(RaceStrRef(0), STRING_FLAGS::NONE);
 	}
 	if (Token == "MAGESCHOOL") {
-		ieDword row = 0; //default value is 0 (generalist)
-		//this is subject to change, the row number in magesch.2da
-		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
+		//this is subject to change, the row number in magesch.2da, default value is 0 (generalist)
+		ieDword row = core->GetVariable("MAGESCHOOL", 0);
 		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
 			ieStrRef value = tm->QueryFieldAsStrRef(row, 2);
@@ -293,10 +281,13 @@ String TLKImporter::ResolveTags(const String& source)
 			i = mystrncpy(Token, i + 1, L'>');
 			String resolvedToken = BuiltinToken(Token);
 			if (resolvedToken.empty()) {
-				String tokVal;
-				if (core->GetTokenDictionary()->Lookup(Token, tokVal)) {
-					dest.append(tokVal);
+
+				auto& tokens = core->GetTokenDictionary();
+				auto lookup = tokens.find(Token.c_str());
+				if (lookup != tokens.cend()) {
+					dest.append(lookup->second);
 				}
+
 			} else {
 				dest.append(resolvedToken);
 			}

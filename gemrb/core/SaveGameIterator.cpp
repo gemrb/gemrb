@@ -80,7 +80,7 @@ static std::string ParseGameDate(DataStream *ds)
 			ds->Read(&chapter, 1);
 		}
 
-		core->GetTokenDictionary()->SetAtAsString("CHAPTER0", chapter);
+		SetTokenAsString("CHAPTER0", chapter);
 	}
 	delete ds;
 
@@ -90,8 +90,8 @@ static std::string ParseGameDate(DataStream *ds)
 	std::string a, b, c;
 
 	// pst has a nice single string for everything 41277 (individual ones lack tokens)
-	core->GetTokenDictionary()->SetAtAsString("GAMEDAYS", days);
-	core->GetTokenDictionary()->SetAtAsString("HOUR", hours);
+	SetTokenAsString("GAMEDAYS", days);
+	SetTokenAsString("HOUR", hours);
 	ieStrRef dayMsg = DisplayMessage::GetStringReference(HCStrings::Day);
 	ieStrRef daysMsg = DisplayMessage::GetStringReference(HCStrings::Days);
 	if (dayMsg == daysMsg) {
@@ -186,9 +186,7 @@ const std::string& SaveGame::GetGameDate() const
 // mission pack save dir or the main one?
 static std::string SaveDir()
 {
-	std::string saveDir("save");
-	core->GetTokenDictionary()->Lookup("SaveDir", saveDir);
-	return saveDir;
+	return MBStringFromString(core->GetToken("SaveDir", L"save"));
 }
 
 /*

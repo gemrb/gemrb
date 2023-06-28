@@ -30,27 +30,16 @@ namespace GemRB {
 
 SrcMgr::~SrcMgr()
 {
-	for (auto& src : srcs) {
-		int res = SrcCache.DecRef((const void *) src, src->key, false);
-		if (res < 0) {
-			error("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: {}", src->key);
-		}
-		delete src;
-	}
 }
 
 const SrcVector* SrcMgr::GetSrc(const ResRef& resource)
 {
-	// if we cached it already, we also have it in srcs
-	const SrcVector* src = static_cast<const SrcVector*>(SrcCache.GetResource(resource));
-	if (src) {
-		return src;
+	auto lookup = srcs.find(resource);
+	if (lookup != srcs.cend()) {
+		return &lookup->second;
 	}
 
-	src = new SrcVector(resource);
-	srcs.push_back(src);
-	SrcCache.SetAt(resource, (void *) src);
-	return src;
+	return &srcs.emplace(resource, resource).first->second;
 }
 
 SrcVector::SrcVector(const ResRef& resource)

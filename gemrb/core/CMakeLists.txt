@@ -4,7 +4,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Animation.cpp
 	AnimationFactory.cpp
 	Audio.cpp
-	Cache.cpp
 	Calendar.cpp
 	CharAnimations.cpp
 	Core.cpp
@@ -33,7 +32,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Logging/Logger.cpp
 	Logging/Loggers/Stdio.cpp
 	Logging/Logging.cpp
-	LRUCache.cpp
 	Map.cpp
 	MapReverb.cpp
 	MoviePlayer.cpp
@@ -61,7 +59,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Store.cpp
 	TileMap.cpp
 	TileOverlay.cpp
-	Variables.cpp
 	VEFObject.cpp
 	WorldMap.cpp
 	GameScript/Actions.cpp

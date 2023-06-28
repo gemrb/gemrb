@@ -150,9 +150,6 @@ Game::~Game(void)
 	if (mazedata) {
 		free (mazedata);
 	}
-	if (kaputz) {
-		delete kaputz;
-	}
 
 	for (auto journal : Journals) {
 		delete journal;
@@ -412,8 +409,7 @@ void Game::InitActorPos(Actor *actor) const
 		error("Game", "Game is missing character start data.");
 	}
 	// 0 - single player, 1 - tutorial, 2 - expansion
-	ieDword playmode = 0;
-	core->GetDictionary()->Lookup( "PlayMode", playmode );
+	ieDword playmode = core->GetVariable("PlayMode", 0);
 
 	//Sometimes playmode is set to -1 (in pregenerate)
 	//normally execution shouldn't ever come here, but it actually does
@@ -1015,7 +1011,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 			je->Group = group;
 			ieDword chapter = 0;
 			if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-				locals->Lookup("CHAPTER", chapter);
+				chapter = GetLocal("CHAPTER", 0);
 			}
 			je->Chapter = (ieByte) chapter;
 			je->GameTime = GameTime;
@@ -1026,7 +1022,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 	je->GameTime = GameTime;
 	ieDword chapter = 0;
 	if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-		locals->Lookup("CHAPTER", chapter);
+		chapter = GetLocal("CHAPTER", 0);
 	}
 	je->Chapter = (ieByte) chapter;
 	je->unknown09 = 0;
@@ -1297,13 +1293,16 @@ void Game::PartyMemberDied(const Actor *actor)
 	}
 }
 
-void Game::IncrementChapter() const
-{
+void Game::IncrementChapter() {
 	//chapter first set to 0 (prologue)
-	ieDword chapter = (ieDword) -1;
-	locals->Lookup("CHAPTER",chapter);
+	auto lookup = locals.find("CHAPTER");
+	if (lookup != locals.cend()) {
+		lookup->second += 1;
 	//increment chapter only if it exists
-	locals->SetAt("CHAPTER", chapter+1, core->HasFeature(GFFlags::NO_NEW_VARIABLES) );
+	} else if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
+		locals["CHAPTER"] = 0;
+	}
+
 	//clear statistics
 	for (const auto& pc : PCs) {
 		//all PCs must have this!
@@ -1593,11 +1592,8 @@ void Game::PlayerDream() const
 //Start a TextScreen dream for the protagonist
 void Game::TextDream()
 {
-	ieDword dream, chapter;
-	locals->Lookup("CHAPTER", chapter);
-	if (!locals->Lookup("DREAM", dream)) {
-		dream = 1;
-	}
+	ieDword chapter = GetLocal("CHAPTER", 0);
+	ieDword dream = GetLocal("DREAM", 1);
 	TextScreen.Format("drmtxt{}", dream + 1);
 
 	if ((chapter > dream) && (core->Roll(1, 100, 0) <= 33)
@@ -1618,7 +1614,7 @@ void Game::TextDream()
 			}
 		}
 
-		locals->SetAt("DREAM", dream+1);
+		locals["DREAM"] = dream + 1;
 		core->SetEventFlag(EF_TEXTSCREEN);
 	}
 }
@@ -1830,13 +1826,13 @@ bool Game::RestParty(int checks, int dream, int hp)
 	ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::Rested);
 	ieStrRef hoursMsg = DisplayMessage::GetStringReference(HCStrings::Hours);
 
-	core->GetTokenDictionary()->SetAtAsString("HOUR", hours);
+	core->GetTokenDictionary()["HOUR"] = hours;
 
 	//this would be bad
 	if (hoursMsg == ieStrRef::INVALID || restedMsg == ieStrRef::INVALID) return cutscene;
 	
 	String tmpstr = core->GetString(hoursMsg, STRING_FLAGS::NONE);
-	core->GetTokenDictionary()->SetAt("DURATION", tmpstr);
+	core->GetTokenDictionary()["DURATION"] = tmpstr;
 	displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
 	return cutscene;
 }
@@ -1860,8 +1856,8 @@ void Game::CastOnRest() const
 	using RestSpells = std::vector<HealingResource>;
 	using RestTargets = std::vector<Injured>;
 
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
+	ieDword tmp = core->GetVariable("Heal Party on Rest", 0);
+
 	const auto& special_spells = gamedata->GetSpecialSpells();
 	size_t specialCount = special_spells.size();
 	if (!tmp || !specialCount) {
@@ -1987,8 +1983,7 @@ void Game::Infravision()
 	const Map *map = GetCurrentArea();
 	if (!map) return;
 
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("infravision", tmp);
+	ieDword tmp = core->GetVariable("infravision", 0);
 
 	bool someoneWithInfravision = false;
 	bool allSelectedWithInfravision = true;
@@ -2193,7 +2188,7 @@ void Game::SetExpansion(ieDword value)
 		break;
 	//TODO: move this hardcoded hack to the scripts
 	case 0:
-		core->GetDictionary()->SetAt( "PlayMode", 2 );
+		core->GetDictionary()["PlayMode"] = 2;
 
 		int i = GetPartySize(false);
 		while(i--) {
@@ -2306,6 +2301,13 @@ void Game::MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int
 		if (npc->GetBase(IE_EA) == EA_FAMILIAR) {
 			MoveBetweenAreasCore(npc, targetArea, targetPoint, orientation, true);
 		}
+	}
+}
+
+void Game::DumpKaputz() const {
+	Log(DEBUG, "Game", "Kaputz item count: {}", kaputz.size());
+	for (const auto& entry : kaputz) {
+		Log(DEBUG, "Game", "{} = {}", entry.first, entry.second);
 	}
 }
 

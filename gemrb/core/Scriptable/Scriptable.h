@@ -23,10 +23,10 @@
 
 #include "exports.h"
 #include "ie_cursors.h"
+#include "ie_types.h"
 
 #include "CharAnimations.h"
 #include "OverHeadText.h"
-#include "Variables.h"
 
 #include <list>
 #include <map>
@@ -267,7 +267,7 @@ public:
 	// The countdown for forced activation by triggers.
 	ieDword TriggerCountdown = 0;
 
-	Variables* locals;
+	ResRefMap<ieDword> locals;
 	ScriptableType Type = ST_ACTOR;
 	Point Pos;
 
@@ -402,6 +402,8 @@ public:
 	void StartTimer(ieDword ID, ieDword expiration);
 	String GetName() const;
 	bool AuraPolluted();
+	ieDword GetLocal(const ResRef& key, ieDword fallback) const;
+	void DumpLocals() const;
 private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant, Scriptable* target = nullptr, int level = 0);

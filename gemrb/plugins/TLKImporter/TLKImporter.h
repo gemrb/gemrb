@@ -21,12 +21,18 @@
 #ifndef TLKIMPORTER_H
 #define TLKIMPORTER_H
 
+#include "ie_types.h"
 
 #include "StringMgr.h"
-#include "Variables.h"
 #include "TlkOverride.h"
 
 namespace GemRB {
+
+struct gt_type {
+	int type;
+	ieStrRef male;
+	ieStrRef female;
+};
 
 class TLKImporter : public StringMgr {
 private:
@@ -37,7 +43,7 @@ private:
 	ieDword StrRefCount = 0;
 	ieDword Offset = 0;
 	CTlkOverride *OverrideTLK = nullptr;
-	Variables gtmap;
+	ResRefMap<gt_type> gtmap;
 	int charname = 0;
 
 public:

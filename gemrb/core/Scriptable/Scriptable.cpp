@@ -73,9 +73,6 @@ Scriptable::Scriptable(ScriptableType type)
 	}
 
 	ResetCastingState(nullptr);
-	locals = new Variables();
-	locals->SetType( GEM_VARIABLES_INT );
-	locals->ParseKey( 1 );
 	ClearTriggers();
 	AddTrigger(TriggerEntry(trigger_oncreation));
 }
@@ -89,8 +86,22 @@ Scriptable::~Scriptable(void)
 	for (auto& script : Scripts) {
 		delete script;
 	}
+}
 
-	delete locals;
+ieDword Scriptable::GetLocal(const ResRef& key, ieDword fallback) const {
+	auto lookup = locals.find(key);
+	if (lookup != locals.cend()) {
+		return lookup->second;
+	}
+
+	return fallback;
+}
+
+void Scriptable::DumpLocals() const {
+	Log(DEBUG, "Scriptable", "Locals item count: {}", locals.size());
+	for (const auto& entry : locals) {
+		Log(DEBUG, "Scriptable", "{} = {}", entry.first, entry.second);
+	}
 }
 
 void Scriptable::SetScriptName(const ieVariable& text)

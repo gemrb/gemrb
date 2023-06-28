@@ -281,8 +281,7 @@ tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword tim
 	unsigned int channel = ambient->GetFlags() & IE_AMBI_LOOPING ? (ambient->GetFlags() & IE_AMBI_MAIN ? SFX_CHAN_AREA_AMB : SFX_CHAN_AMB_LOOP) : SFX_CHAN_AMB_OTHER;
 	totalgain = ambient->GetTotalGain() * core->GetAudioDrv()->GetVolume(channel) / 100;
 
-	unsigned int v = 100;
-	core->GetDictionary()->Lookup("Volume Ambients", v);
+	unsigned int v = core->GetVariable("Volume Ambients", 100);
 
 	if (stream < 0) {
 		// we need to allocate a stream

@@ -21,12 +21,12 @@
 #ifndef SRCMGR_H
 #define SRCMGR_H
 
+#include <vector>
+
 #include "exports.h"
 #include "ie_types.h"
 
-#include "Cache.h"
-
-#include <vector>
+#include "Resource.h"
 
 namespace GemRB {
 
@@ -51,8 +51,7 @@ public:
 
 class GEM_EXPORT SrcMgr {
 private:
-	std::vector<const SrcVector*> srcs;
-	Cache SrcCache;
+	ResRefMap<SrcVector> srcs;
 
 public:
 	~SrcMgr();

@@ -212,8 +212,9 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 void MapControl::ClickHandle(const MouseEvent&) const
 {
-	core->GetDictionary()->SetAt( "MapControlX", notePos.x );
-	core->GetDictionary()->SetAt( "MapControlY", notePos.y );
+	auto& vars = core->GetDictionary();
+	vars["MapControlX"] = notePos.x;
+	vars["MapControlY"] = notePos.y;
 }
 
 void MapControl::UpdateViewport(Point vp)

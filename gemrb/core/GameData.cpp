@@ -49,28 +49,10 @@
 
 namespace GemRB {
 
-static void ReleaseItem(void *poi)
-{
-	delete ((Item *) poi);
-}
-
-static void ReleaseSpell(void *poi)
-{
-	delete ((Spell *) poi);
-}
-
-static void ReleaseEffect(void *poi)
-{
-	delete ((Effect *) poi);
-}
-
 GEM_EXPORT GameData* gamedata;
 
-void GameData::ClearCaches()
+GameData::~GameData()
 {
-	ItemCache.RemoveAll(ReleaseItem);
-	SpellCache.RemoveAll(ReleaseSpell);
-	EffectCache.RemoveAll(ReleaseEffect);
 	PaletteCache.clear ();
 
 	while (!stores.empty()) {
@@ -182,7 +164,7 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 		return nullptr;
 	}
 
-	Item *item = (Item *) ItemCache.GetResource(resname);
+	Item *item = ItemCache.GetResource(resname);
 	if (item) {
 		return item;
 	}
@@ -192,25 +174,17 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 		return nullptr;
 	}
 
-	item = new Item();
-	item->Name = resname;
-	sm->GetItem( item );
+	auto newItem = ItemCache.SetAt(resname).first;
+	newItem->Name = resname;
+	sm->GetItem(newItem);
 
-	ItemCache.SetAt(resname, (void *) item);
-	return item;
+	return newItem;
 }
 
 //you can supply name for faster access
-void GameData::FreeItem(Item const *itm, const ResRef &name, bool free)
+void GameData::FreeItem(Item const* /*itm*/, const ResRef &name, bool free)
 {
-	int res;
-
-	res = ItemCache.DecRef((const void *) itm, name, free);
-	if (res<0) {
-		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: {}", name);
-	}
-	if (res) return;
-	if (free) delete itm;
+	ItemCache.DecRef(name, free);
 }
 
 Spell* GameData::GetSpell(const ResRef &resname, bool silent)
@@ -219,7 +193,7 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 		return nullptr;
 	}
 
-	Spell *spell = (Spell *) SpellCache.GetResource(resname);
+	Spell *spell = SpellCache.GetResource(resname);
 	if (spell) {
 		return spell;
 	}
@@ -233,28 +207,21 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 		return nullptr;
 	}
 
-	spell = new Spell();
-	spell->Name = resname;
-	sm->GetSpell( spell, silent );
+	auto newSpell = SpellCache.SetAt(resname).first;
+	newSpell->Name = resname;
+	sm->GetSpell(newSpell, silent);
 
-	SpellCache.SetAt(resname, (void *) spell);
-	return spell;
+	return newSpell;
 }
 
-void GameData::FreeSpell(const Spell *spl, const ResRef &name, bool free)
+void GameData::FreeSpell(const Spell* /*spl*/, const ResRef &name, bool free)
 {
-	int res = SpellCache.DecRef((const void *) spl, name, free);
-	if (res<0) {
-		error("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: {} or {}",
-			name, spl->Name);
-	}
-	if (res) return;
-	if (free) delete spl;
+	SpellCache.DecRef(name, free);
 }
 
 Effect* GameData::GetEffect(const ResRef &resname)
 {
-	const Effect *effect = (const Effect *) EffectCache.GetResource(resname);
+	const Effect *effect = EffectCache.GetResource(resname);
 	if (effect) {
 		return new Effect(*effect);
 	}
@@ -268,23 +235,22 @@ Effect* GameData::GetEffect(const ResRef &resname)
 		return nullptr;
 	}
 
-	effect = em->GetEffect();
-	if (effect == nullptr) {
+	auto newEffect = em->GetEffect();
+	if (newEffect == nullptr) {
 		return nullptr;
 	}
 
-	EffectCache.SetAt(resname, (void *) effect);
-	return new Effect(*effect);
+	EffectCache.SetAt(resname, *newEffect);
+
+	auto effectCopy = new Effect(std::move(*newEffect));
+	delete newEffect;
+
+	return effectCopy;
 }
 
-void GameData::FreeEffect(const Effect *eff, const ResRef &name, bool free)
+void GameData::FreeEffect(const Effect* /*eff*/, const ResRef &name, bool free)
 {
-	int res = EffectCache.DecRef((const void *) eff, name, free);
-	if (res<0) {
-		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: {}", name);
-	}
-	if (res) return;
-	if (free) delete eff;
+	EffectCache.DecRef(name, free);
 }
 
 //if the default setup doesn't fit for an animation

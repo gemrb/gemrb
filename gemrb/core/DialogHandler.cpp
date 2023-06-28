@@ -262,7 +262,7 @@ static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& op
 		if (ds->transitions[x]->textStrRef == ieStrRef::INVALID) {
 			// dialogchoose should be set to x
 			// it isn't important which END option was chosen, as it ends
-			core->GetDictionary()->SetAt("DialogOption", x);
+			core->GetDictionary()["DialogOption"] = x;
 			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
 				core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, BitOp::OR);
 				break;

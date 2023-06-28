@@ -174,7 +174,7 @@ void AudioStream::ForceClear()
 	ClearIfStopped();
 }
 
-OpenALAudioDriver::OpenALAudioDriver(void)
+OpenALAudioDriver::OpenALAudioDriver(void) : buffercache(BUFFER_CACHE_SIZE)
 {
 	music_memory = (short*) malloc(ACM_BUFFERSIZE);
 	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));
@@ -347,7 +347,6 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	}
 	speech.ForceClear();
 	ResetMusics();
-	clearBufferCache(true);
 
 #ifdef HAVE_OPENAL_EFX_H
 	if (hasEFX) {
@@ -376,19 +375,14 @@ ALuint OpenALAudioDriver::loadSound(StringView ResRef, tick_t &time_length)
 {
 	ALuint Buffer = 0;
 
-	CacheEntry *e;
-	void* p;
-
 	if (ResRef.empty()) {
 		return 0;
 	}
-	
-	LRUCache::key_t key(ResRef);
-	if(buffercache.Lookup(key, p))
-	{
-		e = (CacheEntry*) p;
-		time_length = e->Length;
-		return e->Buffer;
+
+	auto entry = buffercache.Lookup(ResRef);
+	if (entry != nullptr) {
+		time_length = entry->Length;
+		return entry->Buffer;
 	}
 
 	//no cache entry...
@@ -423,16 +417,8 @@ ALuint OpenALAudioDriver::loadSound(StringView ResRef, tick_t &time_length)
 		return 0;
 	}
 
-	e = new CacheEntry;
-	e->Buffer = Buffer;
-	e->Length = time_length;
+	buffercache.SetAt(ResRef, Buffer, time_length);
 
-	buffercache.SetAt(key, (void*)e);
-	//print("LoadSound: added %s to cache: %d. Cache size now %d", ResRef, e->Buffer, buffercache.GetCount());
-
-	if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
-		evictBuffer();
-	}
 	return Buffer;
 }
 
@@ -487,7 +473,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 			}
 		}
 
-		core->GetDictionary()->Lookup("Volume Voices", volume);
+		volume = core->GetVariable("Volume Voices", 100);
 
 		loop = 0; // Speech ignores GEM_SND_LOOPING
 	} else {
@@ -500,7 +486,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 			}
 		}
 
-		core->GetDictionary()->Lookup("Volume SFX", volume);
+		volume = core->GetVariable("Volume SFX", 100);
 
 		if (stream == NULL) {
 			// Failed to assign new sound.
@@ -529,8 +515,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 	checkALError("Unable to set audio parameters", WARNING);
 
 #ifdef HAVE_OPENAL_EFX_H
-	ieDword efxSetting;
-	core->GetDictionary()->Lookup("Environmental Audio", efxSetting);
+	ieDword efxSetting = core->GetVariable("Environmental Audio", 0);
 
 	if (efxSetting && hasReverbProperties && (!p.IsZero() || (flags & GEM_SND_RELATIVE))) {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, efxEffectSlot, 0, 0);
@@ -554,18 +539,18 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 
 void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 {
-	ieDword volume;
+	ieDword volume = 0;
 
 	if (flags & GEM_SND_VOL_MUSIC) {
 		musicMutex.lock();
-		core->GetDictionary()->Lookup("Volume Music", volume);
+		volume = core->GetVariable("Volume Music", 0);
 		if (MusicSource && alIsSource(MusicSource))
 			alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
 		musicMutex.unlock();
 	}
 
 	if (flags & GEM_SND_VOL_AMBIENTS) {
-		core->GetDictionary()->Lookup("Volume Ambients", volume);
+		volume = core->GetVariable("Volume Ambients", volume);
 		ambim->UpdateVolume(volume);
 	}
 }
@@ -680,8 +665,7 @@ int OpenALAudioDriver::CreateStream(std::shared_ptr<SoundMgr> newMusic)
 			0.0f, 0.0f, 0.0f
 		};
 
-		ieDword volume;
-		core->GetDictionary()->Lookup( "Volume Music", volume );
+		ieDword volume = core->GetVariable("Volume Music", 0);
 		alSourcef( MusicSource, AL_PITCH, 1.0f );
 		alSourcef( MusicSource, AL_GAIN, 0.01f * volume );
 		alSourcei( MusicSource, AL_SOURCE_RELATIVE, 1 );
@@ -811,55 +795,6 @@ void OpenALAudioDriver::SetAmbientStreamPitch(int stream, int pitch)
 	ALuint source = streams[stream].Source;
 	alSourcef( source, AL_PITCH, 0.01f * pitch );
 	checkALError("Unable to set ambient pitch", WARNING);
-}
-
-bool OpenALAudioDriver::evictBuffer()
-{
-	// Note: this function assumes the caller holds bufferMutex
-
-	// Room for optimization: this is O(n^2) in the number of buffers
-	// at the tail that are used. It can be O(n) if LRUCache supports it.
-
-	unsigned int n = 0;
-	void* p;
-	LRUCache::key_t k;
-	bool res;
-
-	while ((res = buffercache.getLRU(n, k, p)) == true) {
-		CacheEntry* e = (CacheEntry*)p;
-		alDeleteBuffers(1, &e->Buffer);
-		if (alGetError() == AL_NO_ERROR) {
-			// Buffer was unused. An error would have indicated
-			// the buffer was still attached to a source.
-
-			delete e;
-			buffercache.Remove(k);
-
-			//print("Removed buffer %s from ACMImp cache", k);
-			break;
-		}
-		++n;
-	}
-
-	return res;
-}
-
-void OpenALAudioDriver::clearBufferCache(bool force)
-{
-	// Room for optimization: any method of iterating over the buffers
-	// would suffice. It doesn't have to be in LRU-order.
-	void* p;
-	LRUCache::key_t k;
-	int n = 0;
-	while (buffercache.getLRU(n, k, p)) {
-		CacheEntry* e = (CacheEntry*)p;
-		alDeleteBuffers(1, &e->Buffer);
-		if (force || alGetError() == AL_NO_ERROR) {
-			delete e;
-			buffercache.Remove(k);
-		} else
-			++n;
-	}
 }
 
 ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits) const

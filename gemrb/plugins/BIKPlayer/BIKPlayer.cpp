@@ -40,7 +40,6 @@
 #include "Audio.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
-#include "Variables.h"
 #include "Video/Video.h"
 
 #include <cassert>
@@ -248,8 +247,8 @@ strret_t BIKPlayer::fileRead(strpos_t pos, void* buf, strpos_t count)
 
 int BIKPlayer::setAudioStream() const
 {
-	ieDword volume;
-	core->GetDictionary()->Lookup( "Volume Movie", volume) ;
+	ieDword volume = core->GetVariable("Volume Movie", 0);
+
 	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, false);
 	return source;
 }

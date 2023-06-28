@@ -65,7 +65,7 @@ void Slider::SetPosition(unsigned int pos)
 		Pos = pos;
 	}
 	if (IsDictBound()) {
-		core->GetDictionary()->SetAt(DictVariable(), pos * GetValue());
+		core->GetDictionary()[DictVariable().c_str()] = pos * GetValue();
 	}
 	MarkDirty();
 }

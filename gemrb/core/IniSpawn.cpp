@@ -67,7 +67,7 @@ static std::shared_ptr<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 IniSpawn::IniSpawn(Map* owner, const ResRef& defaultArea)
 : map(owner)
 {
-	core->GetDictionary()->Lookup("Detail Level", detail_level);
+	this->detail_level = core->GetVariable("Detail Level", 0);
 
 	const auto inifile = GetIniFile(defaultArea);
 	if (!inifile) {
@@ -573,8 +573,7 @@ void IniSpawn::RespawnNameless()
 	Actor* nameless = game->GetPC(0, false);
 
 	// the final fight is fatal
-	ieDword finale = 0;
-	game->locals->Lookup("Transcendent_Final_Speech", finale);
+	ieDword finale = game->GetLocal("Transcendent_Final_Speech", 0);
 	if (finale) {
 		nameless->Die(nullptr);
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "OpenPSTDeathWindow");
@@ -647,10 +646,9 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 	}
 
 	if (critter.Flags & CF_NO_DIFF_MASK) {
-		ieDword difficulty;
 		ieDword diff_bit;
 
-		core->GetDictionary()->Lookup("Difficulty Level", difficulty);
+		ieDword difficulty = core->GetVariable("Difficulty Level", 0);
 		switch (difficulty) {
 		case 0:
 			diff_bit = CF_NO_DIFF_1;

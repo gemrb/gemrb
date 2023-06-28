@@ -23,7 +23,6 @@
 #include "Platform.h"
 #include "PluginMgr.h"
 #include "System/FileFilters.h"
-#include "Variables.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -188,20 +187,24 @@ void LoadPlugins(const char* pluginpath)
 	char path[_MAX_PATH];
 	do {
 		const char *name = dirIt.GetName();
-		ieDword flags = 0;
-		core->plugin_flags->Lookup(Variables::key_t(name), flags);
 
-		// module is sent to the back
-		if (flags == PLF_DELAY) {
-			Log(MESSAGE, "PluginLoader", "Loading \"{}\" delayed.", name);
-			delayedPlugins.emplace(name);
-			continue;
-		}
+		auto& pluginFlags = core->GetPluginFlags();
+		auto lookup = pluginFlags.find(name);
+		if (lookup != pluginFlags.cend()) {
+			PluginFlagsType flags = lookup->second;
 
-		// module is skipped
-		if (flags == PLF_SKIP) {
-			Log(MESSAGE, "PluginLoader", "Loading \"{}\" skipped.", name);
-			continue;
+			// module is sent to the back
+			if (flags == PLF_DELAY) {
+				Log(MESSAGE, "PluginLoader", "Loading \"{}\" delayed.", name);
+				delayedPlugins.emplace(name);
+				continue;
+			}
+
+			// module is skipped
+			if (flags == PLF_SKIP) {
+				Log(MESSAGE, "PluginLoader", "Loading \"{}\" skipped.", name);
+				continue;
+			}
 		}
 
 		PathJoin(path, pluginpath, name, nullptr);

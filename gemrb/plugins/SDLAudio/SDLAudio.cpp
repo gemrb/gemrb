@@ -69,7 +69,7 @@ void SDLAudioSoundHandle::StopLooping()
 	Mix_FadeOutChannel(chunkChannel, 1000);
 }
 
-SDLAudio::SDLAudio(void)
+SDLAudio::SDLAudio(void) : buffercache(BUFFER_CACHE_SIZE)
 {
 }
 
@@ -77,7 +77,6 @@ SDLAudio::~SDLAudio(void)
 {
 	// TODO
 	Mix_HaltChannel(-1);
-	clearBufferCache();
 	delete ambim;
 	Mix_HookMusic(NULL, NULL);
 	FreeBuffers();
@@ -129,8 +128,7 @@ void SDLAudio::SetAudioStreamVolume(uint8_t *stream, int len, int volume)
 
 void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
 {
-	ieDword volume = 100;
-	core->GetDictionary()->Lookup("Volume Music", volume);
+	ieDword volume = core->GetVariable("Volume Music", 100);
 
 	// No point of bothering if it's off anyway
 	if (volume == 0) {
@@ -170,74 +168,18 @@ void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
 	SetAudioStreamVolume(mixerStream, mixerLen, MIX_MAX_VOLUME * volume / 100);
 }
 
-bool SDLAudio::evictBuffer()
-{
-	// Note: this function assumes the caller holds bufferMutex
-
-	// Room for optimization: this is O(n^2) in the number of buffers
-	// at the tail that are used. It can be O(n) if LRUCache supports it.
-	unsigned int n = 0;
-	void *p;
-	LRUCache::key_t k;
-	bool res;
-
-	while ((res = buffercache.getLRU(n, k, p)) == true && buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
-		CacheEntry *e = (CacheEntry*)p;
-		bool chunkPlaying = false;
-		int numChannels = Mix_AllocateChannels(-1);
-
-		for (int i = 0; i < numChannels; ++i) {
-			if (Mix_Playing(i) && Mix_GetChunk(i) == e->chunk) {
-				chunkPlaying = true;
-				break;
-			}
-		}
-
-		if (chunkPlaying) {
-			++n;
-		} else {		
-			//Mix_FreeChunk(e->chunk) fails to free anything here
-			free(e->chunk->abuf);
-			free(e->chunk);
-			delete e;
-			buffercache.Remove(k);
-		}
-	}
-
-	return res;
-}
-
-void SDLAudio::clearBufferCache()
-{
-	// Room for optimization: any method of iterating over the buffers
-	// would suffice. It doesn't have to be in LRU-order.
-	void *p;
-	LRUCache::key_t k;
-	int n = 0;
-	while (buffercache.getLRU(n, k, p)) {
-		CacheEntry *e = (CacheEntry*)p;
-		free(e->chunk->abuf);
-		free(e->chunk);
-		delete e;
-		buffercache.Remove(k);
-	}
-}
-
 Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
 {
 	Mix_Chunk *chunk = nullptr;
-	CacheEntry *e;
-	void *p;
 
 	if (ResRef.empty()) {
 		return chunk;
 	}
 
-	LRUCache::key_t key(ResRef);
-	if (buffercache.Lookup(key, p)) {
-		e = (CacheEntry*) p;
-		time_length = e->Length;
-		return e->chunk;
+	auto entry = buffercache.Lookup(ResRef);
+	if (entry != nullptr) {
+		time_length = entry->Length;
+		return entry->chunk;
 	}
 
 	ResourceHolder<SoundMgr> acm = gamedata->GetResourceHolder<SoundMgr>(ResRef);
@@ -275,15 +217,7 @@ Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
 		return chunk;
 	}
 
-	e = new CacheEntry;
-	e->chunk = chunk;
-	e->Length = time_length;
-
-	if (buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
-		evictBuffer();
-	}
-
-	buffercache.SetAt(key, (void*)e);
+	buffercache.SetAt(ResRef, chunk, time_length);
 
 	return chunk;
 }
@@ -307,9 +241,9 @@ Holder<SoundHandle> SDLAudio::Play(StringView ResRef, unsigned int channel,
 	if (flags & GEM_SND_SPEECH) {
 		chan = 0;
 		loop = 0; // Speech ignores GEM_SND_LOOPING
-		core->GetDictionary()->Lookup("Volume Voices", volume);
+		volume = core->GetVariable("Volume Voices", 100);
 	} else {
-		core->GetDictionary()->Lookup("Volume SFX", volume);
+		volume = core->GetVariable("Volume SFX", 100);
 	}
 
 	if (volume == 0) {
@@ -392,10 +326,10 @@ void SDLAudio::ResetMusics()
 
 void SDLAudio::UpdateVolume(unsigned int flags)
 {
-	ieDword volume;
+	ieDword volume = 0;
 
 	if (flags & GEM_SND_VOL_AMBIENTS) {
-		core->GetDictionary()->Lookup("Volume Ambients", volume);
+		volume = core->GetVariable("Volume Ambients", 0);
 		((AmbientMgr*) ambim)->UpdateVolume(volume);
 	}
 }
@@ -424,9 +358,8 @@ Point SDLAudio::GetListenerPos()
 
 void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 {
-	ieDword volume = 100;
 	// Check only movie volume, since ambiens aren't supported right now
-	core->GetDictionary()->Lookup("Volume Movie", volume);
+	ieDword volume = core->GetVariable("Volume Movie", 100);
 
 	// No point of bothering if it's off anyway
 	if (volume == 0) {

@@ -1982,16 +1982,15 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	{
 		val = static_cast<Control::value_t>(PyLong_AsUnsignedLongMask(Value));
 	}
-	
+
+	Control::value_t realVal = core->GetVariable(VarName, 0);
 	Control::varname_t varname = Control::varname_t(VarName);
-	Control::value_t realVal = 0;
-	core->GetDictionary()->Lookup(varname, realVal);
 
 	ctrl->BindDictVariable(varname, val, Control::ValueRange(min, max));
 	// restore variable for sliders, since it's only a multiplier for them
 	if (ctrl->ControlType == IE_GUI_SLIDER) {
 		ctrl->UpdateState(realVal);
-		core->GetDictionary()->SetAt(varname, val * static_cast<Slider*>(ctrl)->GetPosition());
+		core->GetDictionary()[VarName] = val * static_cast<Slider*>(ctrl)->GetPosition();
 	}
 
 	// refresh python copies
@@ -4108,7 +4107,9 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	PyObject* Variable;
 	char *value;
 	PARSE_ARGS( args,  "Os", &Variable, &value );
-	core->GetTokenDictionary()->SetAt(PyString_AsStringView(Variable), StringView(value));
+	auto wsValue = StringFromCString(value);
+	core->GetTokenDictionary()[PyString_AsStringView(Variable).CString()] = *wsValue;
+	delete wsValue;
 
 	Py_RETURN_NONE;
 }
@@ -4149,7 +4150,7 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 	unsigned long value;
 	PARSE_ARGS(args, "Ok", &Variable, &value);
 
-	core->GetDictionary()->SetAt(PyString_AsStringView(Variable), (ieDword) value);
+	core->GetDictionary()[PyString_AsStringView(Variable).CString()] = (ieDword) value;
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
@@ -4205,12 +4206,13 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 	PyObject* Variable;
 	PARSE_ARGS(args,  "O", &Variable);
 
-	std::string str;
-	if (!core->GetTokenDictionary()->Lookup(PyString_AsStringView(Variable), str)) {
-		Py_RETURN_NONE;
+	auto& tokens = core->GetTokenDictionary();
+	auto lookup = tokens.find(PyString_AsStringView(Variable).CString());
+	if (lookup != tokens.cend()) {
+		return PyString_FromStringObj(lookup->second);
 	}
 
-	return PyString_FromStringObj(str);
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_GetVar__doc,
@@ -4238,10 +4240,10 @@ controls could affect the same variable.\n\
 static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
-	ieDword value;
-	PARSE_ARGS( args,  "O", &Variable );
+	PARSE_ARGS( args, "O", &Variable );
 
-	if (!core->GetDictionary()->Lookup(PyString_AsStringView(Variable), value)) {
+	ieDword value = core->GetVariable(PyString_AsStringView(Variable).CString(), 0);
+	if (!value) {
 		return PyLong_FromLong(0);
 	}
 
@@ -4365,16 +4367,12 @@ is what gamescripts know as GLOBAL variables. \n\
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
-	ieDword value;
 	PARSE_ARGS( args,  "O", &Variable );
 
 	GET_GAME();
 
-	if (!game->locals->Lookup(PyString_AsStringView(Variable), value)) {
-		return PyLong_FromLong(0);
-	}
-
-	return PyLong_FromLong((unsigned long) value);
+	StringView lookupVariable = static_cast<StringView>(PyString_AsStringView(Variable));
+	return PyLong_FromLong((unsigned long) game->GetLocal(lookupVariable, 0));
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
@@ -4407,11 +4405,9 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 	int flag = 0;
 	PARSE_ARGS( args,  "O|i", &string, &flag );
 
-	ieDword ind = 0;
-
 	ResRef resref = ResRefFromPy(string);
 	//Lookup will leave the flag untouched if it doesn't exist yet
-	core->GetDictionary()->Lookup(resref, ind);
+	ieDword ind = core->GetVariable(resref.c_str(), 0);
 	if (flag)
 		ind = 0;
 	if (!ind) {
@@ -5302,7 +5298,7 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 		game->DeleteJournalEntry(strref);
 	} else {
 		if (chapter == ieDword(-1)) {
-			game->locals->Lookup("CHAPTER", chapter);
+			chapter = game->GetLocal("CHAPTER", -1);
 		}
 		game->AddJournalEntry(strref, (ieByte) chapter, (ieByte) section);
 	}
@@ -11564,8 +11560,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		}
 		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellBookType[spell]);
 	} else {
-		ieDword ActionLevel = 0;
-		core->GetDictionary()->Lookup("ActionLevel", ActionLevel);
+		ieDword ActionLevel = core->GetVariable("ActionLevel", 0);
 		if (ActionLevel == 5) {
 			// get the right spell, since the lookup below only checks the memorized list
 			actor->spellbook.SetCustomSpellInfo(data, ResRef(), type);

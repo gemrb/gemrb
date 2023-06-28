@@ -371,8 +371,6 @@ static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 
-static Variables tables;
-
 static void Cleanup()
 {
 	if (Enemy) {
@@ -1783,7 +1781,7 @@ int fx_cutscene (Scriptable* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
 {
 	// print("fx_cutscene(%2d)", fx->Opcode);
 	Game *game = core->GetGame();
-	game->locals->SetAt("GEM_ACTIVE", 1);
+	game->locals["GEM_ACTIVE"] = 1;
 	return FX_NOT_APPLIED;
 }
 

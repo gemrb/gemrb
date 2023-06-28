@@ -1531,7 +1531,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading variables");
-	map->locals->LoadInitialValues(resRef);
+	core->LoadInitialValues(resRef, map->locals);
 	str->Seek(VariablesOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < VariablesCount; i++) {
 		ieVariable Name;
@@ -1540,7 +1540,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		str->Seek(8, GEM_CURRENT_POS); // type + resreftype, part of the partly implemented type system (uint, int, float, str)
 		str->ReadDword(Value);
 		str->Seek(40, GEM_CURRENT_POS); // values as an int32, float64, string
-		map->locals->SetAt(Name, Value);
+		map->locals[Name] = Value;
 	}
 
 	Log(DEBUG, "AREImporter", "Loading ambients");
@@ -1708,7 +1708,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += SavedAmbientCount(map) * 0xd4;
 	VariablesOffset = headersize;
 
-	VariablesCount = (ieDword) map->locals->GetCount();
+	VariablesCount = (ieDword) map->locals.size();
 	headersize += VariablesCount * 0x54;
 	AnimOffset = headersize;
 
@@ -2242,18 +2242,13 @@ int AREImporter::PutEntrances(DataStream *stream, const Map *map) const
 
 int AREImporter::PutVariables(DataStream *stream, const Map *map) const
 {
-	Variables::iterator pos=NULL;
-	ieDword value;
-
-	for (unsigned int i=0;i<VariablesCount;i++) {
-		Variables::key_t name;
-		pos = map->locals->GetNextAssoc(pos, name, value);
-		size_t len = name.length();
-		stream->Write(name.c_str(), len);
+	for (const auto& entry : map->locals) {
+		size_t len = entry.first.length();
+		stream->Write(entry.first.c_str(), len);
 		if (len < 40) {
 			stream->WriteFilling(40 - len);
 		}
-		stream->WriteDword(value);
+		stream->WriteDword(entry.second);
 		//40 bytes of empty crap
 		stream->WriteFilling(40);
 	}
