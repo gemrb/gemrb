@@ -2571,7 +2571,7 @@ void Map::GenerateQueues()
 	}
 
 	ieDword gametime = core->GetGame()->GameTime;
-	bool hostiles_new = false;
+	bool hostilesNew = false;
 	while (i--) {
 		Actor* actor = actors[i];
 
@@ -2593,7 +2593,7 @@ void Map::GenerateQueues()
 				priority = PR_IGNORE; // don't run scripts for out of schedule actors
 			}
 			if (IsVisible(actor->Pos))
-				hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
+				hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
 		// dead actors are always visible on the map, but run no scripts
 		} else if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
 			priority = PR_DISPLAY;
@@ -2604,8 +2604,10 @@ void Map::GenerateQueues()
 				priority = PR_SCRIPT; // run scripts and display, activated now
 				// more like activate!
 				actor->Activate();
-				ActorSpottedByPlayer(actor);
-				hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
+				if (visible) {
+					ActorSpottedByPlayer(actor);
+					hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
+				}
 			} else {
 				priority = PR_IGNORE;
 			}
@@ -2616,7 +2618,7 @@ void Map::GenerateQueues()
 
 		queue[priority].push_back(actor);
 	}
-	hostiles_visible = hostiles_new;
+	hostilesVisible = hostilesNew;
 }
 
 void Map::SortQueues()

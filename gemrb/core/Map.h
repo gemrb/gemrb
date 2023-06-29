@@ -422,7 +422,7 @@ private:
 	std::vector< Spawn*> spawns;
 	std::vector<Actor*> queue[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT]{};
-	bool hostiles_visible = false;
+	bool hostilesVisible = false;
 
 	VideoBufferPtr wallStencil = nullptr;
 	Region stencilViewport;
