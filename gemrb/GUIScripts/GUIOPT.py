@@ -233,12 +233,22 @@ def OpenCharacterSoundsWindow ():
 	GUIOPTControls.OptCheckbox (18041, 18015, HelpTextArea2, Window, 5, 20, 17138, 'Subtitles')
 	GUIOPTControls.OptCheckbox (18041, 18013, HelpTextArea2, Window, 6, 18, 17139, 'Attack Sounds')
 	GUIOPTControls.OptCheckbox (18041, 18014, HelpTextArea2, Window, 7, 19, 17140, 'Footsteps')
+
+	frequency = GemRB.GetVar ('Command Sounds Frequency')
+	frequency2 = GemRB.GetVar ('Selection Sounds Frequency')
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 8, 21, 'Command Sounds Frequency', 3)
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 9, 21, 'Command Sounds Frequency', 2)
 	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Window, 10, 21, 'Command Sounds Frequency', 1)
 	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 58, 57, 'Selection Sounds Frequency', 3)
 	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 59, 57, 'Selection Sounds Frequency', 2)
 	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Window, 60, 57, 'Selection Sounds Frequency', 1)
+	# work around radiobutton preselection issues
+	for i in [8, 9, 10, 58, 59, 60]:
+		Button = Window.GetControl (i)
+		if (i <= 10 and (10 - i + 1) == frequency) or (i > 10 and (60 - i + 1) == frequency2):
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
