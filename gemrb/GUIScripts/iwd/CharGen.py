@@ -385,7 +385,8 @@ def AcceptPress():
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	GemRB.SetToken ("CHARNAME","")
 	GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
-	LUCommon.SetupSavingThrows (MyChar, Level=None)
+	
+	LUCommon.SetupSavingThrows (MyChar)
 	
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
