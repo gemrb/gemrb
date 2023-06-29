@@ -139,6 +139,7 @@ strret_t DataStream::ReadLine(std::string& buf, strpos_t maxlen)
 	}
 	
 	buf.clear();
+	buf.reserve(maxlen);
 	strpos_t i = 0;
 	//TODO: fix this to handle any combination of \r and \n
 	//Windows: \r\n
