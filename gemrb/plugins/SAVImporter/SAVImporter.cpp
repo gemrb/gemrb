@@ -59,7 +59,7 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 
 		strpos_t pos = fname.find(".are");
 		if (pos != std::string::npos && pos == fname.length() - 4) {
-			areExtractor.registerLocation(fname, position);
+			areExtractor.registerLocation(fname.substr(0, pos), position);
 			compressed->Seek(complen, GEM_CURRENT_POS);
 		} else {
 			Log(MESSAGE, "SAVImporter", "Decompressing {}", fname);

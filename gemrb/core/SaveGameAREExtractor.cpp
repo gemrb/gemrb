@@ -57,14 +57,14 @@ int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trac
 
 	size_t relativeLocation = 0;
 	for (auto it = areLocations.cbegin(); it != areLocations.cend(); ++it, ++i) {
-		relativeLocation += 4 + it->first.size() + 1;
+		relativeLocation += 4 + it->first.length() + 1;
 
 		ieDword complen, declen;
 		saveGameStream->Seek(it->second, GEM_STREAM_START);
 		saveGameStream->ReadDword(declen);
 		saveGameStream->ReadDword(complen);
 
-		ieDword nameLength = ieDword(it->first.size() + 1);
+		ieDword nameLength = ieDword(it->first.length() + 1);
 		destStream->WriteDword(nameLength);
 		destStream->Write(it->first.c_str(), nameLength);
 		destStream->WriteDword(declen);
@@ -110,10 +110,7 @@ int32_t SaveGameAREExtractor::createCacheBlob() {
 	return areEntries;
 }
 
-int32_t SaveGameAREExtractor::extractARE(std::string key) {
-	StringToLower(key);
-	key.append(".are");
-
+int32_t SaveGameAREExtractor::extractARE(const ResRef& key) {
 	auto it = areLocations.find(key);
 	if (it != areLocations.cend() && extractByEntry(key, it) != GEM_OK) {
 		return GEM_ERROR;
@@ -122,7 +119,7 @@ int32_t SaveGameAREExtractor::extractARE(std::string key) {
 	return GEM_OK;
 }
 
-int32_t SaveGameAREExtractor::extractByEntry(const std::string& key, RegistryT::const_iterator it) {
+int32_t SaveGameAREExtractor::extractByEntry(const ResRef& key, RegistryT::const_iterator it) {
 	auto saveGameStream = saveGame->GetSave();
 	if (saveGameStream == nullptr) {
 		return GEM_ERROR;
@@ -133,7 +130,8 @@ int32_t SaveGameAREExtractor::extractByEntry(const std::string& key, RegistryT::
 	saveGameStream->ReadDword(declen);
 	saveGameStream->ReadDword(complen);
 
-	DataStream* cached = CacheCompressedStream(saveGameStream, key, complen, true);
+	std::string fname = key.c_str();
+	DataStream* cached = CacheCompressedStream(saveGameStream, fname + ".are", complen, true);
 
 	int32_t returnValue = GEM_OK;
 	if (cached != nullptr) {
@@ -157,10 +155,8 @@ bool SaveGameAREExtractor::isRunningSaveGame(const SaveGame& otherGame) const
 	return saveGame->GetSaveID() == otherGame.GetSaveID();
 }
 
-void SaveGameAREExtractor::registerLocation(std::string key, unsigned long pos) {
-	StringToLower(key);
-
-	areLocations.emplace(std::move(key), pos);
+void SaveGameAREExtractor::registerLocation(const ResRef& resRef, unsigned long pos) {
+	areLocations.emplace(resRef, pos);
 }
 
 void SaveGameAREExtractor::changeSaveGame(SaveGame* newSave) {
