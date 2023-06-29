@@ -505,7 +505,7 @@ public:
 	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 	plugin_flags_t& GetPluginFlags();
-	void LoadInitialValues(const ResRef& name, ResRefMap<ieDword>& map);
+	void LoadInitialValues(const ResRef& name, ResRefMap<ieDword>& map) const;
 
 	Tooltip CreateTooltip() const;
 	/** returns the label which should receive game messages (overrides messagetextarea) */
@@ -774,7 +774,7 @@ private:
 	/** Executes everything (non graphical) in the main game loop */
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */
-	std::vector<ieDword> GetListFrom2DAInternal(const ResRef& resref);
+	std::vector<ieDword> GetListFrom2DAInternal(const ResRef& resref) const;
 
 public:
 	CFGConfigData config;

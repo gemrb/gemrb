@@ -2089,7 +2089,8 @@ Interface::plugin_flags_t& Interface::GetPluginFlags() {
 	return pluginFlags;
 }
 
-void Interface::LoadInitialValues(const ResRef& name, ResRefMap<ieDword>& map) {
+void Interface::LoadInitialValues(const ResRef& name, ResRefMap<ieDword>& map) const
+{
 	char nPath[_MAX_PATH];
 	// we only support PST's var.var for now
 	PathJoin(nPath, config.GamePath, "var.var", nullptr);
@@ -4346,7 +4347,7 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	}
 }
 
-std::vector<ieDword> Interface::GetListFrom2DAInternal(const ResRef& resref)
+std::vector<ieDword> Interface::GetListFrom2DAInternal(const ResRef& resref) const
 {
 	std::vector<ieDword> ret;
 

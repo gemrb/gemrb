@@ -93,11 +93,11 @@ struct CacheEntry {
 
 	CacheEntry(ALuint buffer, tick_t length) : Buffer(buffer), Length(length) {}
 	CacheEntry(const CacheEntry&) = delete;
-	CacheEntry(CacheEntry && other) : Buffer(other.Buffer), Length(other.Length) {
+	CacheEntry(CacheEntry && other) noexcept : Buffer(other.Buffer), Length(other.Length) {
 		other.Buffer = 0;
 	}
 	CacheEntry& operator=(const CacheEntry&) = delete;
-	CacheEntry& operator=(CacheEntry && other) {
+	CacheEntry& operator=(CacheEntry && other) noexcept {
 		this->Buffer = other.Buffer;
 		other.Buffer = 0;
 		this->Length = other.Length;
@@ -117,7 +117,7 @@ struct CacheEntry {
 };
 
 struct OpenALPlaying {
-	bool operator()(const CacheEntry& entry) {
+	bool operator()(const CacheEntry& entry) const {
 		alDeleteBuffers(1, &entry.Buffer);
 		return alGetError() == AL_NO_ERROR;
 	}

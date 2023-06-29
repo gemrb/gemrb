@@ -43,34 +43,34 @@ class LRUCache {
 	private:
 		/* Queue items are placed into a doubly-linked list, the front element is the LRU. */
 		struct QueueItem {
-			QueueItem *prev;
-			QueueItem *next;
+			QueueItem* prev = nullptr;
+			QueueItem* next = nullptr;
 			const key_t& key;
 
-			QueueItem(const key_t& key) : prev(nullptr), next(nullptr), key(key) {}
+			explicit QueueItem(const key_t& key) : key(key) {}
 			QueueItem(const key_t& key, QueueItem *prev)
-				: prev(prev), next(nullptr), key(key)
+				: prev(prev), key(key)
 			{}
 		};
 
 		/* Cache items hold the value and a short cut to the queue item to be moved to the end. */
 		struct CacheItem {
-			QueueItem *queueItem;
+			QueueItem* queueItem = nullptr;
 			T value;
 
 			template<typename ... ARGS>
-			CacheItem (ARGS && ... args) : queueItem(nullptr), value(std::forward<ARGS>(args)...)
+			explicit CacheItem(ARGS && ... args) : value(std::forward<ARGS>(args)...)
 			{}
 		};
 
-		QueueItem *front;
-		QueueItem *back;
+		QueueItem* front = nullptr;
+		QueueItem* back = nullptr;
 		std::unordered_map<key_t, CacheItem> map;
 		size_t cacheSize;
 		PRED predicate;
 
 	public:
-		LRUCache (size_t size) : front(nullptr), back(nullptr), cacheSize(size) {}
+		explicit LRUCache(size_t size) : cacheSize(size) {}
 		~LRUCache () {
 			auto next = front;
 

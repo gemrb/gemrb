@@ -40,12 +40,12 @@ class RCCache {
 	private:
 		struct Value {
 			V value;
-			int64_t refCount;
+			int64_t refCount = 1;
 
-			Value (V && value) : value(std::forward<V>(value)), refCount(1) {}
+			explicit Value(V && value) : value(std::forward<V>(value)) {}
 
 			template<typename ... ARGS>
-			Value (ARGS && ... args) : value(std::forward<ARGS>(args)...), refCount(1) {}
+			explicit Value(ARGS && ... args) : value(std::forward<ARGS>(args)...) {}
 		};
 
 		std::unordered_map<K, Value, H> map;

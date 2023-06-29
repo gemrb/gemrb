@@ -197,7 +197,7 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 	//these are gender specific tokens, they are customisable by gender.2da
 	auto lookup = gtmap.find(Token);
 	if (lookup != gtmap.cend()) {
-		auto& entry = lookup->second;
+		const auto& entry = lookup->second;
 		return GetString(GenderStrRef(entry.type, entry.male, entry.female));
 	}
 

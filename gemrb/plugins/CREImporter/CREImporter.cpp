@@ -2399,7 +2399,8 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 //add as effect!
 int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 {
-	ieDword value, tmpDword;
+	ieDword value;
+	ieDword tmpDword;
 
 	for (const auto& entry : actor->locals) {
 		value = entry.second;

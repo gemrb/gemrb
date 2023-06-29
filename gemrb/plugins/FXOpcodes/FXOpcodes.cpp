@@ -6660,8 +6660,8 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	Point newpos=target->Pos;
 
-	newpos.x += coords[dir][0] * (signed) fx->Parameter1 * ticks / 16; // / core->Time.defaultTicksPerSec;
-	newpos.y += coords[dir][1] * (signed) fx->Parameter1 * ticks / 12; // / core->Time.defaultTicksPerSec;
+	newpos.x += coords[dir][0] * (signed) fx->Parameter1 * ticks / 16;
+	newpos.y += coords[dir][1] * (signed) fx->Parameter1 * ticks / 12;
 
 	//change is minimal, lets try later
 	if (newpos == target->Pos)
