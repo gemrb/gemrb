@@ -144,9 +144,14 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18038, 18000, HelpTextArea, Window, 9, 38, 17131, 'Full Screen', DisplayHelpFullScreen)
 
 	GUIOPTControls.OptCheckbox (18038, 20620, HelpTextArea, Window, 51, 50, 20617, 'Translucent Shadows')
-	GUIOPTControls.OptCheckbox (18038, 18004, HelpTextArea, Window, 40, 44, 17134, 'SoftMirrorBlt')
+	GUIOPTControls.OptCheckbox (18038, 15135, HelpTextArea, Window, 40, 44, 17134, 'SoftMirrorBlt')
 	GUIOPTControls.OptCheckbox (18038, 18006, HelpTextArea, Window, 41, 46, 17136, 'SoftSrcKeyBlt') # software standard blit
 	GUIOPTControls.OptCheckbox (18038, 18007, HelpTextArea, Window, 42, 48, 17135, 'SoftBltFast') # software transparent blit
+
+	# maybe not present in original iwd, but definitely in how
+	if GameCheck.IsIWD1 () or GameCheck.IsIWD2 ():
+		GUIOPTControls.OptCheckbox (18038, 15141, HelpTextArea, Window, 56, 52, 14447, 'TranslucentBlt')
+		GUIOPTControls.OptCheckbox (18038, 18004, HelpTextArea, Window, 57, 54, 14578, 'StaticAnims')
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
