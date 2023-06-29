@@ -301,14 +301,14 @@ def CancelPress():
 	GemRB.SetNextScript ("PartyFormation")
 	return
 
-def LearnSpells(MyChar):
+def LearnSpells(MyChar, which):
 	Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 
 	# mage spells
 	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
-	if TableName != "*":
+	if TableName != "*" and which == "mage":
 		# setting up just the first spell level is enough, since the rest will be granted on level-up
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
 		Learnable = Spellbook.GetLearnableMageSpells (Kit, t, 1)
@@ -326,7 +326,7 @@ def LearnSpells(MyChar):
 	# druids and rangers have a column of their own
 	if TableName == "*":
 		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
-	if TableName != "*":
+	if TableName != "*" and which == "priest":
 		ClassFlag = GetClassFlag (TableName)
 		TableName = Spellbook.GetPriestSpellTable (TableName)
 
@@ -2111,7 +2111,7 @@ def MageMemorizeDonePress():
 
 	if MageMemorizeWindow:
 		MageMemorizeWindow.Close ()
-	LearnSpells (MyChar)
+	LearnSpells (MyChar, "mage")
 	SkillsState = 4
 	SkillsPress()
 	return
@@ -2219,7 +2219,7 @@ def PriestMemorizeDonePress():
 
 	if PriestMemorizeWindow:
 		PriestMemorizeWindow.Close ()
-	LearnSpells (MyChar)
+	LearnSpells (MyChar, "priest")
 	SkillsState = 5
 	SkillsPress()
 	return
