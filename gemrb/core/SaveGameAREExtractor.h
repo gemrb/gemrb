@@ -19,10 +19,9 @@
 #ifndef SAVE_GAME_ARE_EXTRACTOR_H
 #define SAVE_GAME_ARE_EXTRACTOR_H
 
-#include <unordered_map>
-#include <string>
-
 #include "exports.h"
+
+#include "Resource.h"
 #include "SaveGame.h"
 
 namespace GemRB {
@@ -33,11 +32,13 @@ namespace GemRB {
  */
 class GEM_EXPORT SaveGameAREExtractor {
 	private:
-		using RegistryT = std::unordered_map<std::string, unsigned long>;
-
+		using RegistryT = ResRefMap<unsigned long>;
+	
 		SaveGame *saveGame;
 		RegistryT areLocations;
 		RegistryT newAreLocations;
+	
+		int32_t extractByEntry(const ResRef&, RegistryT::const_iterator);
 
 	public:
 		explicit SaveGameAREExtractor(SaveGame *saveGame = nullptr);
@@ -50,14 +51,11 @@ class GEM_EXPORT SaveGameAREExtractor {
 		void changeSaveGame(SaveGame*);
 		int32_t copyRetainedAREs(DataStream*, bool trackLocations = false);
 		int32_t createCacheBlob();
-		int32_t extractARE(std::string);
+		int32_t extractARE(const ResRef& resRef);
 		bool isRunningSaveGame(const SaveGame&) const;
-		void registerLocation(std::string, unsigned long);
+		void registerLocation(const ResRef& resRef, unsigned long);
 		void registerNewLocation(const char*, unsigned long);
 		void updateSaveGame(size_t offset);
-
-	private:
-		int32_t extractByEntry(const std::string&, RegistryT::const_iterator);
 };
 
 }
