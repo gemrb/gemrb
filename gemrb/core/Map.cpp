@@ -3618,8 +3618,7 @@ bool Map::DisplayTrackString(const Actor *target) const
 		return true;
 	}
 	if (trackFlag) {
-			String str = core->GetString(trackString);
-			core->GetTokenDictionary()["CREATURE"] = str;
+			core->GetTokenDictionary()["CREATURE"] = core->GetString(trackString);
 			displaymsg->DisplayConstantStringName(HCStrings::Tracking, GUIColors::LIGHTGREY, target);
 			return false;
 	}

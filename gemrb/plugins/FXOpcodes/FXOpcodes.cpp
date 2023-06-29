@@ -8117,8 +8117,7 @@ int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (sourceNameRef != ieStrRef(-1)) {
-		String sourceName = core->GetString(sourceNameRef, STRING_FLAGS::NONE);
-		core->GetTokenDictionary()["RESOURCE"] = sourceName;
+		core->GetTokenDictionary()["RESOURCE"] = core->GetString(sourceNameRef, STRING_FLAGS::NONE);
 		displaymsg->DisplayConstantStringName(HCStrings::ResResisted, GUIColors::WHITE, target);
 	}
 	//this has effect only on first apply, it will stop applying the spell

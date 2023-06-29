@@ -55,11 +55,8 @@ void Calendar::GetMonthName(int dayandmonth) const
 	for (size_t i = 0; i < monthnamecount; ++i) {
 		if (dayandmonth<days[i]) {
 			SetTokenAsString("DAY", dayandmonth + 1);
-
-			String tmp = core->GetString(monthnames[i]);
-			core->GetTokenDictionary()["MONTHNAME"] = tmp;
+			core->GetTokenDictionary()["MONTHNAME"] = core->GetString(monthnames[i]);
 			SetTokenAsString("MONTH", month);
-
 			return;
 		}
 		dayandmonth-=days[i];

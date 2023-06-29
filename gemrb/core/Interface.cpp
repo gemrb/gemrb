@@ -4440,6 +4440,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 	return ret;
 }
 
+// see 8cff52b3c8 if this needs to be resurrected at some point
 void Interface::WaitForDisc(int disc_number, const char* path)
 {
 	GetDictionary()["WaitForDisc"] = (ieDword) disc_number;
@@ -4448,6 +4449,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 	do {
 		winmgr->DrawWindows();
 		for (const auto& cd : config.CD[disc_number - 1]) {
+			assert(cd.length() < _MAX_PATH / 2);
 			char name[_MAX_PATH];
 
 			PathJoin(name, cd.c_str(), path, nullptr);

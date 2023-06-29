@@ -1830,9 +1830,8 @@ bool Game::RestParty(int checks, int dream, int hp)
 
 	//this would be bad
 	if (hoursMsg == ieStrRef::INVALID || restedMsg == ieStrRef::INVALID) return cutscene;
-	
-	String tmpstr = core->GetString(hoursMsg, STRING_FLAGS::NONE);
-	core->GetTokenDictionary()["DURATION"] = tmpstr;
+
+	core->GetTokenDictionary()["DURATION"] = core->GetString(hoursMsg, STRING_FLAGS::NONE);
 	displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
 	return cutscene;
 }
