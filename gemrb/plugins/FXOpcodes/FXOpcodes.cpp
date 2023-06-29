@@ -1768,6 +1768,9 @@ int fx_intelligence_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	switch (fx->Parameter2) {
+	case 1:
+			STATE_SET(STATE_INVIS2); // TODO: actually use STATE_INVIS2 in code
+			// intentional fallthrough
 	case 0:
 		if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 			STATE_SET( STATE_PST_INVIS );
@@ -1778,13 +1781,8 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->ToHit.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		}
 		break;
-	case 1:
-		STATE_SET( STATE_INVIS2 );
-		if (fx->FirstApply || fx->TimingMode != FX_DURATION_INSTANT_PERMANENT) {
-			target->AC.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-		}
-		break;
-	// TODO: EE case 2: weak invisibility (check IESDP)
+	case 2:// EE: weak invisibility, like improved after being revelead (no backstabbing)
+		STATE_SET(STATE_INVIS2);
 	default:
 		break;
 	}
