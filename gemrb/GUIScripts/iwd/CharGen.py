@@ -29,6 +29,7 @@ import GUICommon
 import Spellbook
 import CommonTables
 import LUSkillsSelection
+import LUCommon
 
 CharGenWindow = 0
 CharGenState = 0
@@ -384,7 +385,8 @@ def AcceptPress():
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	GemRB.SetToken ("CHARNAME","")
 	GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
-
+	LUCommon.SetupSavingThrows (MyChar, Level=None)
+	
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
 	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
