@@ -4931,7 +4931,7 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 	}
 	//according to IESDP silenced creatures cannot use shout
 	// neither do dead ones or the paladin ogres turn Garren hostile
-	if (actor->GetStat(IE_STATE_ID) & (STATE_SILENCED|STATE_DEAD)) {
+	if (actor->GetStat(IE_STATE_ID) & STATE_DEAD || actor->CheckSilenced()) {
 		return;
 	}
 	const Map *map = Sender->GetCurrentArea();
@@ -4945,7 +4945,7 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//according to IESDP silenced creatures cannot use shout
-	if (actor->GetStat(IE_STATE_ID) & (STATE_SILENCED|STATE_DEAD)) {
+	if (actor->GetStat(IE_STATE_ID) & STATE_DEAD || actor->CheckSilenced()) {
 		return;
 	}
 	const Map *map = Sender->GetCurrentArea();

@@ -775,7 +775,7 @@ int GameData::CheckSpecialSpell(const ResRef& resRef, const Actor* actor)
 	}
 
 	// if actor is silenced, and spell cannot be cast in silence, disable it
-	if (!(sp & SpecialSpell::Silence) && actor->GetStat(IE_STATE_ID) & STATE_SILENCED) {
+	if (!(sp & SpecialSpell::Silence) && actor->CheckSilenced()) {
 		return SpecialSpell::Silence;
 	}
 
