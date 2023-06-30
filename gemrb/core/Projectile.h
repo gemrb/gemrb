@@ -417,11 +417,11 @@ public:
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
-	AnimArray CreateAnimations(const ResRef& bam, int Seq);
+	AnimArray CreateAnimations(const ResRef& bam, ieByte seq);
 	//pillar type animations
-	AnimArray CreateCompositeAnimation(const AnimationFactory& af, int Seq) const;
+	AnimArray CreateCompositeAnimation(const AnimationFactory& af, ieByte seq) const;
 	//oriented animations (also simple ones)
-	AnimArray CreateOrientedAnimations(const AnimationFactory& af, int Seq) const;
+	AnimArray CreateOrientedAnimations(const AnimationFactory& af, ieByte seq) const;
 	void GetPaletteCopy(const AnimArray&, PaletteHolder &pal) const;
 	void GetSmokeAnim();
 	//apply spells and effects on the target, only in single travel mode

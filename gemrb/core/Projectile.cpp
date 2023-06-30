@@ -54,9 +54,9 @@ Projectile::Projectile() noexcept
 	shadow.resize(MAX_ORIENT);
 }
 
-Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bamres, int Seq)
+Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bam, ieByte seq)
 {
-	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(bamres, IE_BAM_CLASS_ID);
+	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(bam, IE_BAM_CLASS_ID);
 	if (!af) {
 		return AnimArray(MAX_ORIENT);
 	}
@@ -66,8 +66,8 @@ Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bamres, int Seq
 		return AnimArray(MAX_ORIENT);
 	}
 
-	if((ExtFlags&PEF_CYCLE) && !Seq) {
-		Seq = static_cast<int>(RAND(size_t(0), Max - 1));
+	if ((ExtFlags & PEF_CYCLE) && !seq) {
+		seq = static_cast<ieByte>(RAND(size_t(0), Max - 1));
 	}
 
 	//this hack is needed because bioware .pro files are sometimes
@@ -76,20 +76,20 @@ Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bamres, int Seq
 
 	if(ExtFlags&PEF_PILLAR) {
 		Aim = Max;
-		return CreateCompositeAnimation(*af, Seq);
+		return CreateCompositeAnimation(*af, seq);
 	} else {
-		return CreateOrientedAnimations(*af, Seq);
+		return CreateOrientedAnimations(*af, seq);
 	}
 }
 
 //Seq is the first cycle to use in the composite
 //Aim is the number of cycles
-Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactory& af, int Seq) const
+Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactory& af, ieByte seq) const
 {
 	AnimArray anims(MAX_ORIENT);
-	for (int Cycle = 0; Cycle<Aim; Cycle++) {
-		int c = Cycle+Seq;
-		Animation* a = af.GetCycle( c );
+	for (ieByte cycle = 0; cycle < Aim; cycle++) {
+		AnimationFactory::index_t c = cycle + seq;
+		Animation* a = af.GetCycle(c);
 		if (!a) continue;
 		
 		//animations are started at a random frame position
@@ -100,7 +100,7 @@ Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactor
 
 		a->gameAnimation = true;
 		
-		anims[Cycle] = std::move(*a);
+		anims[cycle] = std::move(*a);
 		delete a;
 	}
 	return anims;
@@ -109,39 +109,39 @@ Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactor
 //Seq is the cycle to use in case of single orientations
 //Aim is the number of Orientations
 // FIXME: seems inefficient that we load up MAX_ORIENT animations even for those with a single orientation (default case)
-Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactory& af, int Seq) const
+Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactory& af, ieByte seq) const
 {
 	AnimArray anims(MAX_ORIENT);
-	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
+	for (ieByte cycle = 0; cycle < MAX_ORIENT; cycle++) {
 		BlitFlags mirrorFlags = BlitFlags::NONE;
-		int c;
+		AnimationFactory::index_t c;
 		switch(Aim) {
 		case 5:
-			c = SixteenToFive[Cycle];
+			c = SixteenToFive[cycle];
 			// orientations go counter-clockwise, starting south
-			if (Cycle <= 8) {
+			if (cycle <= 8) {
 				// top-right quadrant
 				mirrorFlags = BlitFlags::MIRRORY;
-			} else if (Cycle < 12) {
+			} else if (cycle < 12) {
 				// top-left quadrant
 				mirrorFlags = BlitFlags::MIRRORX | BlitFlags::MIRRORY;
-			} else if (Cycle > 4) {
+			} else if (cycle > 4) {
 				// bottom-left quadrant
 				mirrorFlags = BlitFlags::MIRRORX;
 			}
 			break;
 		case 9:
-			c = SixteenToNine[Cycle];
-			if (Cycle > 8) mirrorFlags = BlitFlags::MIRRORX;
+			c = SixteenToNine[cycle];
+			if (cycle > 8) mirrorFlags = BlitFlags::MIRRORX;
 			break;
 		case 16:
-			c=Cycle;
+			c = cycle;
 			break;
 		default:
-			c = Seq;
+			c = seq;
 			break;
 		}
-		Animation* a = af.GetCycle( c );
+		Animation* a = af.GetCycle(c);
 		if (!a) continue;
 		
 		//animations are started at a random frame position
@@ -153,7 +153,7 @@ Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactor
 		a->MirrorAnimation(mirrorFlags);
 		a->gameAnimation = true;
 		
-		anims[Cycle] = std::move(*a);
+		anims[cycle] = std::move(*a);
 		delete a;
 	}
 	return anims;
