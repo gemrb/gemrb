@@ -592,6 +592,7 @@ public: //Script Functions
 	static int AnyPCOnMap(Scriptable *Sender, const Trigger *parameters);
 	static int AnyPCSeesEnemy(Scriptable *Sender, const Trigger *parameters);
 	static int AreaCheck(Scriptable *Sender, const Trigger *parameter);
+	static int AreaCheckAllegiance(Scriptable* Sender, const Trigger* parameters);
 	static int AreaCheckObject(Scriptable *Sender, const Trigger *parameter);
 	static int AreaFlag(Scriptable *Sender, const Trigger *parameter);
 	static int AreaRestDisabled(Scriptable *Sender, const Trigger *parameter);
@@ -607,11 +608,13 @@ public: //Script Functions
 	static int BitGlobal_Trigger(Scriptable *Sender, const Trigger *parameters);
 	static int BouncingSpellLevel(Scriptable *Sender, const Trigger *parameters);
 	static int BreakingPoint(Scriptable *Sender, const Trigger *parameters);
+	static int ButtonDisabled(Scriptable* Sender, const Trigger* parameters);
 	static int CalendarDay(Scriptable *Sender, const Trigger *parameters);
 	static int CalendarDayGT(Scriptable *Sender, const Trigger *parameters);
 	static int CalendarDayLT(Scriptable *Sender, const Trigger *parameters);
 	static int CalledByName(Scriptable *Sender, const Trigger *parameters);
 	static int CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/);
+	static int CanTurn(Scriptable* Sender, const Trigger* parameters);
 	static int ChargeCount(Scriptable *Sender, const Trigger *parameters);
 	static int CharName(Scriptable *Sender, const Trigger *parameters);
 	static int CheckAreaDiffLevel(Scriptable */*Sender*/, const Trigger *parameters);
@@ -741,6 +744,7 @@ public: //Script Functions
 	static int InTrap(Scriptable *Sender, const Trigger *parameters);
 	static int InventoryFull(Scriptable *Sender, const Trigger *parameter);
 	static int InWeaponRange(Scriptable *Sender, const Trigger *parameter);
+	static int INI(Scriptable* /*Sender*/, const Trigger* parameters);
 	static int IsAClown(Scriptable *Sender, const Trigger *parameters);
 	static int IsActive(Scriptable *Sender, const Trigger *parameters);
 	static int IsCreatureAreaFlag( Scriptable* Sender, const Trigger *parameters);
@@ -825,6 +829,9 @@ public: //Script Functions
 	static int NumMirrorImages(Scriptable *Sender, const Trigger *parameters);
 	static int NumMirrorImagesGT(Scriptable *Sender, const Trigger *parameters);
 	static int NumMirrorImagesLT(Scriptable *Sender, const Trigger *parameters);
+	static int NumKilledByParty(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int NumKilledByPartyGT(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int NumKilledByPartyLT(Scriptable* /*Sender*/, const Trigger* parameters);
 	static int NumTimesInteracted(Scriptable *Sender, const Trigger *parameters);
 	static int NumTimesInteractedGT(Scriptable *Sender, const Trigger *parameters);
 	static int NumTimesInteractedLT(Scriptable *Sender, const Trigger *parameters);

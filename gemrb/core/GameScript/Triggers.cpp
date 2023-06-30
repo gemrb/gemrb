@@ -4614,6 +4614,60 @@ int GameScript::HasItemCategory(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
+int GameScript::INI(Scriptable* /*Sender*/, const Trigger* parameters)
+{
+	std::string search = fmt::format("SetPrivateProfileString('Script','{}','{}')", parameters->string0Parameter, parameters->int0Parameter);
+	std::string strBuf;
+	static DataStream* str = gamedata->GetResourceStream("baldur", IE_LUA_CLASS_ID);
+	if (!str) str = gamedata->GetResourceStream("engine", IE_LUA_CLASS_ID); // linux
+	if (!str) return 0;
+
+	str->Rewind();
+	while (str->ReadLine(strBuf) != DataStream::Error) {
+		if (strBuf.length() < 40) continue;
+		if (strBuf.find(search) != std::string::npos) return 1;
+	}
+	return 0;
+}
+
+int GameScript::NumKilledByParty(Scriptable* /*Sender*/, const Trigger* parameters)
+{
+	const Actor* actor = core->GetGame()->GetPC(0, false);
+	if (!actor) return 0;
+
+	return int(actor->PCStats->KillsTotalCount) == parameters->int0Parameter;
+}
+
+int GameScript::NumKilledByPartyGT(Scriptable* /*Sender*/, const Trigger* parameters)
+{
+	const Actor* actor = core->GetGame()->GetPC(0, false);
+	if (!actor) return 0;
+
+	return int(actor->PCStats->KillsTotalCount) > parameters->int0Parameter;
+}
+
+int GameScript::NumKilledByPartyLT(Scriptable* /*Sender*/, const Trigger* parameters)
+{
+	const Actor* actor = core->GetGame()->GetPC(0, false);
+	if (!actor) return 0;
+
+	return int(actor->PCStats->KillsTotalCount) < parameters->int0Parameter;
+}
+
+int GameScript::CanTurn(Scriptable* Sender, const Trigger* parameters)
+{
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Actor* target = Scriptable::As<Actor>(tar);
+	const Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!target || !actor) return 0;
+
+	if (target->GetStat(IE_GENERAL) == GEN_UNDEAD ||
+		(target->GetPaladinLevel() && GameScript::ID_Alignment(actor, AL_EVIL))) {
+		return int(actor->GetStat(IE_TURNUNDEADLEVEL) - target->GetXPLevel(true)) >= parameters->int0Parameter;
+	}
+	return 0;
+}
+
 int GameScript::CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/)
 {
 	const Actor* actor = Scriptable::As<Actor>(Sender);
@@ -4638,4 +4692,32 @@ int GameScript::SecretDoorDetected(Scriptable* Sender, const Trigger* parameters
 	return 0;
 }
 
+// is the specified button disabled? Values are from button.ids and match ACT_STEALTH ...
+// except ACT_QSLOT4 is their BATTLE_SONG and
+// ACT_DEFEND is SCREEN_INVENTORY, whatever that's supposed to mean
+int GameScript::ButtonDisabled(Scriptable* Sender, const Trigger* parameters)
+{
+	const Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!actor) return 0;
+	if (parameters->int0Parameter == 10) {
+		return actor->GetStat(IE_DISABLEDBUTTON) & (1 << ACT_BARDSONG);
+	} else if (parameters->int0Parameter == 14) {
+		return 0;
+	} else {
+		return actor->GetStat(IE_DISABLEDBUTTON) & (1 << parameters->int0Parameter);
+	}
+}
+
+int GameScript::AreaCheckAllegiance(Scriptable* Sender, const Trigger* parameters)
+{
+	const Map* area = Sender->GetCurrentArea();
+	if (!area) return 0;
+
+	const std::vector<Actor*>& actors = area->GetAllActors();
+	for (const auto& actor : actors) {
+		if (int(actor->GetStat(IE_EA)) == parameters->int0Parameter) return 1;
+	}
+
+	return 0;
+}
 }

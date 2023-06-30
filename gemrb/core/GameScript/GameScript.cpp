@@ -75,6 +75,7 @@ static const TriggerLink triggernames[] = {
 	{"anypcseesenemy", GameScript::AnyPCSeesEnemy, 0},
 	{"areacheck", GameScript::AreaCheck, 0},
 	{"areacheckobject", GameScript::AreaCheckObject, 0},
+	{"areacheckallegiance", GameScript::AreaCheckAllegiance, 0},
 	{"areaflag", GameScript::AreaFlag, 0},
 	{"arearestdisabled", GameScript::AreaRestDisabled, 0},
 	{"areatype", GameScript::AreaType, 0},
@@ -89,6 +90,7 @@ static const TriggerLink triggernames[] = {
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
 	{"bouncingspelllevel", GameScript::BouncingSpellLevel, 0},
 	{"breakingpoint", GameScript::BreakingPoint, 0},
+	{"buttondisabled", GameScript::ButtonDisabled, 0},
 	{"calanderday", GameScript::CalendarDay, 0}, //illiterate developers O_o
 	{"calendarday", GameScript::CalendarDay, 0},
 	{"calanderdaygt", GameScript::CalendarDayGT, 0},
@@ -97,6 +99,7 @@ static const TriggerLink triggernames[] = {
 	{"calendardaylt", GameScript::CalendarDayLT, 0},
 	{"calledbyname", GameScript::CalledByName, 0}, //this is still a question
 	{"canequipranged", GameScript::CanEquipRanged, 0},
+	{"canturn", GameScript::CanTurn, 0},
 	{"chargecount", GameScript::ChargeCount, 0},
 	{"charname", GameScript::CharName, 0}, //not scripting name
 	{"checkareadifflevel", GameScript::CheckAreaDiffLevel, 0}, //iwd2
@@ -203,6 +206,8 @@ static const TriggerLink triggernames[] = {
 	{"hasweaponequiped", GameScript::HasWeaponEquipped, 0},//a typo again
 	{"hasweaponequipped", GameScript::HasWeaponEquipped, 0},
 	{"haveanyspells", GameScript::HaveAnySpells, 0},
+	{"haveknownspell", GameScript::KnowSpell, 0},
+	{"haveknownspellres", GameScript::KnowSpell, 0},
 	{"havespell", GameScript::HaveSpell, 0}, //these must be the same
 	{"havespellparty", GameScript::HaveSpellParty, 0},
 	{"havespellres", GameScript::HaveSpell, 0}, //they share the same ID
@@ -226,6 +231,7 @@ static const TriggerLink triggernames[] = {
 	{"immunetospelllevel", GameScript::ImmuneToSpellLevel, 0},
 	{"inactivearea", GameScript::InActiveArea, 0},
 	{"incutscenemode", GameScript::InCutSceneMode, 0},
+	{"ini", GameScript::INI, 0},
 	{"inline", GameScript::InLine, 0},
 	{"inmyarea", GameScript::InMyArea, 0},
 	{"inmygroup", GameScript::InMyGroup, 0},
@@ -270,7 +276,7 @@ static const TriggerLink triggernames[] = {
 	{"joins", GameScript::Joins, 0},
 	{"killed", GameScript::Killed, 0},
 	{"kit", GameScript::Kit, 0},
-	{"knowspell", GameScript::KnowSpell, 0}, //gemrb specific
+	{"knowspell", GameScript::KnowSpell, 0}, // gemrb specific, but also reused for ees
 	{"lastmarkedobject", GameScript::LastMarkedObject_Trigger, 0},
 	{"lastpersontalkedto", GameScript::LastPersonTalkedTo, 0}, //pst
 	{"leaves", GameScript::Leaves, 0},
@@ -337,6 +343,9 @@ static const TriggerLink triggernames[] = {
 	{"numitemsparty", GameScript::NumItemsParty, 0},
 	{"numitemspartygt", GameScript::NumItemsPartyGT, 0},
 	{"numitemspartylt", GameScript::NumItemsPartyLT, 0},
+	{"numkilledbyparty", GameScript::NumKilledByParty, 0},
+	{"numkilledbypartygt", GameScript::NumKilledByPartyGT, 0},
+	{"numkilledbypartylt", GameScript::NumKilledByPartyLT, 0},
 	{"nummirrorimages", GameScript::NumMirrorImages, 0},
 	{"nummirrorimagesgt", GameScript::NumMirrorImagesGT, 0},
 	{"nummirrorimageslt", GameScript::NumMirrorImagesLT, 0},
