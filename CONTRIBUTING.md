@@ -207,9 +207,8 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.9.2 is to work on iwd2 completability, annoying pst oddities,
-implement BAMv2 and related format support for easier asset generation, deal
-with some postponed issues, and whatever piques the contributor's fancy.
+The plan for 0.9.3 is to work on iwd2 completability, annoying pst oddities,
+deal with some postponed issues, and whatever piques the contributor's fancy.
 
 We're looking for ninjas to help with GLESv2 support (no hw, see
 [#938](https://github.com/gemrb/gemrb/issues/938)) and a full-fledged installer
