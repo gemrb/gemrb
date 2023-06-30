@@ -127,6 +127,7 @@ static const TriggerLink triggernames[] = {
 	{"contains", GameScript::Contains, 0},
 	{"currentammo", GameScript::CurrentAmmo, 0},
 	{"currentareais", GameScript::CurrentAreaIs, 0},//checks object
+	{"cutscenebroken", GameScript::CutSceneBroken, 0},
 	{"creaturehidden", GameScript::CreatureHidden, 0},//this is the engine level hiding feature, not the skill
 	{"creatureinarea", GameScript::AreaCheck, 0}, //pst, checks this object
 	{"damagetaken", GameScript::DamageTaken, 0},
@@ -254,6 +255,7 @@ static const TriggerLink triggernames[] = {
 	{"iscreaturehiddeninshadows", GameScript::IsCreatureHiddenInShadows, 0},
 	{"isfacingobject", GameScript::IsFacingObject, 0},
 	{"isfacingsavedrotation", GameScript::IsFacingSavedRotation, 0},
+	{"isforcedrandomencounteractive", GameScript::IsForcedRandomEncounterActive, 0},
 	{"isgabber", GameScript::IsGabber, 0},
 	{"isheartoffurymodeon", GameScript::NightmareModeOn, 0},
 	{"isinguardianmantle", GameScript::IsInGuardianMantle, 0},
@@ -436,6 +438,7 @@ static const TriggerLink triggernames[] = {
 	{"summoninglimit", GameScript::SummoningLimit, 0},
 	{"summoninglimitgt", GameScript::SummoningLimitGT, 0},
 	{"summoninglimitlt", GameScript::SummoningLimitLT, 0},
+	{"switch", GameScript::Switch, 0},
 	{"systemvariable", GameScript::SystemVariable_Trigger, 0}, //gemrb
 	{"targetunreachable", GameScript::TargetUnreachable, 0},
 	{"team", GameScript::Team, 0},
@@ -471,6 +474,8 @@ static const TriggerLink triggernames[] = {
 	{"vacant",GameScript::Vacant, 0},
 	{"walkedtotrigger", GameScript::WalkedToTrigger, 0},
 	{"wasindialog", GameScript::WasInDialog, 0},
+	{"weaponcandamage", GameScript::WeaponCanDamage, 0},
+	{"weaponeffectivevs", GameScript::WeaponEffectiveVs, 0},
 	{"xor", GameScript::Xor,TF_MERGESTRINGS},
 	{"xp", GameScript::XP, 0},
 	{"xpgt", GameScript::XPGT, 0},

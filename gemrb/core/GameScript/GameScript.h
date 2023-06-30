@@ -642,6 +642,7 @@ public: //Script Functions
 	static int CreatureHidden( Scriptable* Sender, const Trigger *parameters);
 	static int CurrentAmmo(Scriptable *Sender, const Trigger *parameters);
 	static int CurrentAreaIs(Scriptable *Sender, const Trigger *parameters);
+	static int CutSceneBroken(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
 	static int DamageTaken(Scriptable *Sender, const Trigger *parameters);
 	static int DamageTakenGT(Scriptable *Sender, const Trigger *parameters);
 	static int DamageTakenLT(Scriptable *Sender, const Trigger *parameters);
@@ -753,6 +754,7 @@ public: //Script Functions
 	static int IsExtendedNight(Scriptable *Sender, const Trigger *parameters);
 	static int IsFacingObject(Scriptable *Sender, const Trigger *parameters);
 	static int IsFacingSavedRotation(Scriptable *Sender, const Trigger *parameters);
+	static int IsForcedRandomEncounterActive(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
 	static int IsInGuardianMantle(Scriptable *Sender, const Trigger *parameters);
 	static int IsLocked(Scriptable *Sender, const Trigger *parameters);
 	static int IsMarkedSpell(Scriptable *Sender, const Trigger *parameters);
@@ -913,6 +915,7 @@ public: //Script Functions
 	static int SummoningLimit(Scriptable *Sender, const Trigger *parameters);
 	static int SummoningLimitGT(Scriptable *Sender, const Trigger *parameters);
 	static int SummoningLimitLT(Scriptable *Sender, const Trigger *parameters);
+	static int Switch(Scriptable*/*Sender*/, const Trigger* /*parameters*/);
 	static int SystemVariable_Trigger(Scriptable *Sender, const Trigger *parameters);
 	static int TargetUnreachable(Scriptable *Sender, const Trigger *parameters);
 	static int Team(Scriptable *Sender, const Trigger *parameters);
@@ -947,6 +950,8 @@ public: //Script Functions
 	static int Vacant(Scriptable *Sender, const Trigger *parameters);
 	static int WalkedToTrigger(Scriptable *Sender, const Trigger *parameters);
 	static int WasInDialog(Scriptable *Sender, const Trigger *parameters);
+	static int WeaponCanDamage(Scriptable* Sender, const Trigger* parameters);
+	static int WeaponEffectiveVs(Scriptable* Sender, const Trigger* parameters);
 	static int Xor(Scriptable *Sender, const Trigger *parameters);
 	static int XP(Scriptable *Sender, const Trigger *parameters);
 	static int XPGT(Scriptable *Sender, const Trigger *parameters);

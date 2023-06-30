@@ -4614,6 +4614,42 @@ int GameScript::HasItemCategory(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
+// TODO: ee, returns true if a breakable cutscene has been terminated by the user
+int GameScript::CutSceneBroken(Scriptable* /*Sender*/, const Trigger* /*parameters*/)
+{
+	Log(ERROR, "GameScript", "CutSceneBroken has not been implemented yet!");
+	return 0;
+}
+
+// 0x40EC WeaponEffectiveVs(O:Object*,I:Hand*HAND)
+// Can the weapon equipped in the hand defined by the 2nd parameter (from hand.ids) hit the target object?
+// TODO: ee, test the details. Is it about just hitting, does stoneskin/pfmw/mirror image... matter?
+// look at where we return HCStrings::WeaponIneffective and refactor, so we can inspect it at will
+int GameScript::WeaponEffectiveVs(Scriptable* Sender, const Trigger* parameters)
+{
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Actor* target = Scriptable::As<Actor>(tar);
+	const Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!target || !actor) return 0;
+
+	Log(ERROR, "GameScript", "WeaponEffectiveVs has not been implemented yet!");
+	return 0;
+}
+
+// 0x40F2 WeaponCanDamage(O:Object*,I:Hand*HAND)
+// Can the weapon equipped in the hand defined by the 2nd parameter cause non-zero damage to the target?
+// TODO: ee, see WeaponEffectiveVs and figure out what matches what
+int GameScript::WeaponCanDamage(Scriptable* Sender, const Trigger* parameters)
+{
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Actor* target = Scriptable::As<Actor>(tar);
+	const Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!target || !actor) return 0;
+
+	Log(ERROR, "GameScript", "WeaponCanDamage has not been implemented yet!");
+	return 0;
+}
+
 int GameScript::INI(Scriptable* /*Sender*/, const Trigger* parameters)
 {
 	std::string search = fmt::format("SetPrivateProfileString('Script','{}','{}')", parameters->string0Parameter, parameters->int0Parameter);
@@ -4680,6 +4716,14 @@ int GameScript::CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/
 	return actor->inventory.CanEquipRanged(damage, bestSlot);
 }
 
+// 0x40FB IsForcedRandomEncounterActive(S:Area*)
+// TODO: ee, true only if a random encounter to the specified area has been initialized by a preceding call of ForceRandomEncounter() or ForceRandomEncounterEntry()
+int GameScript::IsForcedRandomEncounterActive(Scriptable* /*Sender*/, const Trigger* /*parameters*/)
+{
+	Log(ERROR, "GameScript", "IsForcedRandomEncounterActive has not been implemented yet!");
+	return 0;
+}
+
 int GameScript::SecretDoorDetected(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
@@ -4720,4 +4764,15 @@ int GameScript::AreaCheckAllegiance(Scriptable* Sender, const Trigger* parameter
 
 	return 0;
 }
+
+// 0x40E5 Switch(S:Global*,S:Area*)
+// TODO: ee, the switch trigger is used to change how the RESPONSE script sections are evaluated.
+// It turns them into a typical switch statement, causing the first RESPONSE with the given weight to be selected
+// The weight is chosen by evaluating the string0Parameter var in string1Parameter context
+int GameScript::Switch(Scriptable*/*Sender*/, const Trigger* /*parameters*/)
+{
+	Log(ERROR, "GameScript", "Switch has not been implemented yet!");
+	return 0;
+}
+
 }
