@@ -611,6 +611,7 @@ public: //Script Functions
 	static int CalendarDayGT(Scriptable *Sender, const Trigger *parameters);
 	static int CalendarDayLT(Scriptable *Sender, const Trigger *parameters);
 	static int CalledByName(Scriptable *Sender, const Trigger *parameters);
+	static int CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/);
 	static int ChargeCount(Scriptable *Sender, const Trigger *parameters);
 	static int CharName(Scriptable *Sender, const Trigger *parameters);
 	static int CheckAreaDiffLevel(Scriptable */*Sender*/, const Trigger *parameters);

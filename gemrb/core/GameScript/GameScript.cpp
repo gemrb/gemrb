@@ -96,6 +96,7 @@ static const TriggerLink triggernames[] = {
 	{"calanderdaylt", GameScript::CalendarDayLT, 0},
 	{"calendardaylt", GameScript::CalendarDayLT, 0},
 	{"calledbyname", GameScript::CalledByName, 0}, //this is still a question
+	{"canequipranged", GameScript::CanEquipRanged, 0},
 	{"chargecount", GameScript::ChargeCount, 0},
 	{"charname", GameScript::CharName, 0}, //not scripting name
 	{"checkareadifflevel", GameScript::CheckAreaDiffLevel, 0}, //iwd2

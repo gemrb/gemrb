@@ -4614,4 +4614,16 @@ int GameScript::HasItemCategory(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
+int GameScript::CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/)
+{
+	const Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!actor) return 0;
+
+	// check all weapon slots to see if any ranged weapon can be switched to
+	// we need to check for presence of ammo as well
+	int damage;
+	ieDword bestSlot;
+	return actor->inventory.CanEquipRanged(damage, bestSlot);
+}
+
 }
