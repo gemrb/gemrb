@@ -1893,6 +1893,7 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_PANIC);
 	}
+	target->SetCircleSize();
 	return FX_PERMANENT;
 }
 
