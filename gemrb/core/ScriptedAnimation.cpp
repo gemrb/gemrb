@@ -62,9 +62,9 @@ static const ieByte SixteenToFive[3*MAX_ORIENT]={
 	10,10,11,11,12,12,13,13,14,14,13,13,12,12,11,11
 };
 
-Animation *ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, unsigned int cycle, unsigned int i, bool loop) const
+Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Animation::index_t cycle, Animation::index_t i, bool loop) const
 {
-	int c = cycle;
+	Animation::index_t c = cycle;
 
 	if (NumOrientations == 16 || OrientationFlags & IE_VVC_FACE_FIXED) {
 		if (af.GetCycleCount() > i) c = i;
@@ -98,7 +98,7 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 	ResName = af.resRef;
 	// some anims like FIREL.BAM in IWD contain empty cycles
 	unsigned int cCount = 0;
-	for (unsigned int i = 0; i < af.GetCycleCount() && af.GetCycleSize(i) > 0; ++i) {
+	for (AnimationFactory::index_t i = 0; i < af.GetCycleCount() && af.GetCycleSize(i) > 0; ++i) {
 		++cCount;
 	}
 
@@ -137,9 +137,9 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 		NumOrientations = 0;
 	}
 
-	for (unsigned int i = 0; i < cCount; i++) {
+	for (Animation::index_t i = 0; i < cCount; i++) {
 		BlitFlags mirrorFlags = BlitFlags::NONE;
-		int c = i;
+		Animation::index_t c = i;
 		int p = i;
 		if (type & DOUBLE) {
 			c <<= 1;
@@ -289,19 +289,19 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 			Log(ERROR, "ScriptedAnimation", "Failed to load animation: {}!", Anim1ResRef);
 			return;
 		}
-		for (unsigned int i = 0; i < MAX_ORIENT; i++) {
-			unsigned int p_hold = P_HOLD * MAX_ORIENT + i;
+		for (AnimationFactory::index_t i = 0; i < MAX_ORIENT; i++) {
+			AnimationFactory::index_t phaseHold = P_HOLD * MAX_ORIENT + i;
 
 			if (seq1 >= 0) {
-				unsigned int p_onset = P_ONSET * MAX_ORIENT + i;
-				anims[p_onset] = PrepareAnimation(*af, seq1, i);
+				AnimationFactory::index_t phaseOnset = P_ONSET * MAX_ORIENT + i;
+				anims[phaseOnset] = PrepareAnimation(*af, static_cast<Animation::index_t>(seq1), i);
 			}
 
-			anims[p_hold] = PrepareAnimation(*af, seq2, i, SequenceFlags & IE_VVC_LOOP);
+			anims[phaseHold] = PrepareAnimation(*af, static_cast<Animation::index_t>(seq2), i, SequenceFlags & IE_VVC_LOOP);
 
 			if (seq3 >= 0) {
-				unsigned int p_release = P_RELEASE * MAX_ORIENT + i;
-				anims[p_release] = PrepareAnimation(*af, seq3, i);
+				AnimationFactory::index_t phaseRelease = P_RELEASE * MAX_ORIENT + i;
+				anims[phaseRelease] = PrepareAnimation(*af, static_cast<Animation::index_t>(seq3), i);
 			}
 		}
 	}
