@@ -42,7 +42,7 @@ class RCCache {
 			V value;
 			int64_t refCount = 1;
 
-			explicit Value(V && value) : value(std::forward<V>(value)) {}
+			explicit Value(V && value) : value(std::move(value)) {}
 
 			template<typename ... ARGS>
 			explicit Value(ARGS && ... args) : value(std::forward<ARGS>(args)...) {}
