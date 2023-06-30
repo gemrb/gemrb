@@ -4626,4 +4626,16 @@ int GameScript::CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/
 	return actor->inventory.CanEquipRanged(damage, bestSlot);
 }
 
+int GameScript::SecretDoorDetected(Scriptable* Sender, const Trigger* parameters)
+{
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Door* door = Scriptable::As<Door>(tar);
+	if (!door) return 0;
+
+	if (Sender->MatchTrigger(trigger_secreddoordetected, door->GetGlobalID())) {
+		return door->IsOpen() == parameters->int0Parameter;
+	}
+	return 0;
+}
+
 }

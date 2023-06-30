@@ -207,7 +207,8 @@ enum {
 	trigger_namelessbitthedust = 0xab, // pst
 	trigger_failedtoopen = 0xaf, // pst
 	trigger_tookdamage = 0xcc, // bg2
-	trigger_walkedtotrigger = 0xd6 // bg2
+	trigger_walkedtotrigger = 0xd6, // bg2
+	trigger_secreddoordetected = 0x100 // ees
 };
 
 // flags for TriggerEntry

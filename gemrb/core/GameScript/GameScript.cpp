@@ -407,6 +407,7 @@ static const TriggerLink triggernames[] = {
 	{"reputationgt", GameScript::ReputationGT, 0},
 	{"reputationlt", GameScript::ReputationLT, 0},
 	{"school", GameScript::School, 0}, //similar to kit
+	{"secretdoordetected", GameScript::SecretDoorDetected, 0},
 	{"see", GameScript::See, 0},
 	{"sequence", GameScript::Sequence, 0},
 	{"setlastmarkedobject", GameScript::SetLastMarkedObject, 0},

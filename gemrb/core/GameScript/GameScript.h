@@ -886,6 +886,7 @@ public: //Script Functions
 	static int ReputationGT(Scriptable *Sender, const Trigger *parameters);
 	static int ReputationLT(Scriptable *Sender, const Trigger *parameters);
 	static int School(Scriptable *Sender, const Trigger *parameters);
+	static int SecretDoorDetected(Scriptable* Sender, const Trigger* parameters);
 	static int See(Scriptable *Sender, const Trigger *parameters);
 	static int Sequence(Scriptable *Sender, const Trigger *parameters);
 	static int SetLastMarkedObject(Scriptable *Sender, const Trigger *parameters);

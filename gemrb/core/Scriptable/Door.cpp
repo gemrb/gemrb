@@ -294,6 +294,7 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 		Flags |= DOOR_FOUND;
 		core->PlaySound(DS_FOUNDSECRET, SFX_CHAN_HITS);
 		AddTrigger(TriggerEntry(trigger_detected, actorID));
+		AddTrigger(TriggerEntry(trigger_secreddoordetected, GetGlobalID())); // ee
 	}
 }
 
