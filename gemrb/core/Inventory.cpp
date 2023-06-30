@@ -1674,8 +1674,6 @@ void Inventory::EquipBestWeapon(int flags)
 	ieDword best_slot = SLOT_FIST;
 	const ITMExtHeader *header;
 	CREItem *Slot;
-	AnimRef AnimationType;
-	ieWord MeleeAnimation[3]={100,0,0};
 
 	//cannot change equipment when holding magic weapons
 	if (Equipped == SLOT_MAGIC - SLOT_MELEE && !(flags & EQUIP_FORCE)) {
@@ -1702,8 +1700,6 @@ void Inventory::EquipBestWeapon(int flags)
 			if (tmp>damage) {
 				best_slot = i;
 				damage = tmp;
-				AnimationType = itm->AnimationType;
-				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
 			gamedata->FreeItem( itm, Slot->ItemResRef, false );
 		}
@@ -1725,8 +1721,6 @@ void Inventory::EquipBestWeapon(int flags)
 			if (tmp>damage) {
 				best_slot = i;
 				damage = tmp;
-				AnimationType = itm->AnimationType;
-				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
 			gamedata->FreeItem( itm, Slot->ItemResRef, false );
 		}
