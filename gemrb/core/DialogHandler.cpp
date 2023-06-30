@@ -72,7 +72,7 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 		Section |= 2; // completed
 	}
 
-	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
+	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], ieByte(tr->Flags >> 16))) {
 		String msg(L"\n[color=bcefbc]");
 		ieStrRef strJournalChange = DisplayMessage::GetStringReference(HCStrings::JournalChange);
 		msg += core->GetString(strJournalChange);

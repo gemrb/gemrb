@@ -585,7 +585,7 @@ int GAMImporter::GetStoredFileSize(const Game *game)
 	//moved this here, so one can disable killvars in a pst style game
 	//or enable them in gemrb
 	if(core->HasFeature(GFFlags::HAS_KAPUTZ) ) {
-		KillVarsCount = game->kaputz.size();
+		KillVarsCount = static_cast<ieDword>(game->kaputz.size());
 	} else {
 		KillVarsCount = 0;
 	}
@@ -641,7 +641,7 @@ int GAMImporter::GetStoredFileSize(const Game *game)
 
 	GlobalOffset = headersize;
 
-	GlobalCount = game->locals.size();
+	GlobalCount = static_cast<ieDword>(game->locals.size());
 	headersize += GlobalCount * 84;
 	JournalOffset = headersize;
 

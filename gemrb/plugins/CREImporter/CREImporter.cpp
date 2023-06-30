@@ -1876,7 +1876,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 	EffectsOffset = headersize;
 	//adding effects
 	EffectsCount = actor->fxqueue.GetSavedEffectsCount();
-	VariablesCount = actor->locals.size();
+	VariablesCount = static_cast<ieDword>(actor->locals.size());
 	if (VariablesCount) {
 		TotSCEFF=1;
 	}
