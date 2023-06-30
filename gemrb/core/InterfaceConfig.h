@@ -37,10 +37,7 @@ private:
 public:
 	using key_t = std::string;
 	using value_t = std::string;
-	
-	InterfaceConfig(int argc, char *argv[]);
-	InterfaceConfig(const InterfaceConfig&) = delete;
-	virtual ~InterfaceConfig() noexcept;
+
 	InterfaceConfig& operator=(const InterfaceConfig&) = delete;
 
 	void SetKeyValuePair(const key_t& key, const value_t& value);

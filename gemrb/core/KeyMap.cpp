@@ -39,9 +39,6 @@ Function::Function(const ieVariable& m, const ieVariable& f, int g, int k)
 	key = k;
 }
 
-KeyMap::KeyMap() { }
-KeyMap::~KeyMap() { }
-
 bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 {
 	AutoTable kmtable = gamedata->LoadTable(tablefile);

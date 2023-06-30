@@ -28,10 +28,6 @@
 
 namespace GemRB {
 
-InterfaceConfig::InterfaceConfig(int /*argc*/, char** /**argv[]*/) { }
-
-InterfaceConfig::~InterfaceConfig() noexcept { }
-
 void InterfaceConfig::SetKeyValuePair(const key_t& key, const value_t& value)
 {
 	configVars.emplace(key, value);
@@ -45,7 +41,7 @@ const InterfaceConfig::value_t* InterfaceConfig::GetValueForKey(const key_t& key
 }
 
 CFGConfig::CFGConfig(int argc, char *argv[])
-	: InterfaceConfig(argc, argv)
+	: InterfaceConfig()
 {
 	FileStream* config = new FileStream();
 	// skip arg0 (it is just gemrb)

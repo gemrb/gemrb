@@ -42,10 +42,6 @@ class GEM_EXPORT KeyMap {
 private:
 	std::unordered_map<std::string, Function> keymap;
 public:
-	KeyMap();
-	KeyMap(const KeyMap&) = delete;
-	~KeyMap();
-	KeyMap& operator=(const KeyMap&) = delete;
 	bool InitializeKeyMap(const char* inifile, const ResRef& keyfile);
 	bool ResolveKey(unsigned short key, int group) const;
 	bool ResolveName(const char* name, int group) const;

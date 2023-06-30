@@ -28,10 +28,6 @@
 
 namespace GemRB {
 
-SrcMgr::~SrcMgr()
-{
-}
-
 const SrcVector* SrcMgr::GetSrc(const ResRef& resource)
 {
 	auto lookup = srcs.find(resource);

@@ -54,8 +54,6 @@ private:
 	ResRefMap<SrcVector> srcs;
 
 public:
-	~SrcMgr();
-
 	const SrcVector* GetSrc(const ResRef& resource);
 };
 
