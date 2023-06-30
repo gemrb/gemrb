@@ -166,7 +166,7 @@ using namespace GemRB;
 	ToggleLogging(true);
 
 	core = new Interface();
-	InterfaceConfig* config = new InterfaceConfig(0, NULL);
+	InterfaceConfig* config = new InterfaceConfig();
 
 	// load NSUserDefaults into config
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
