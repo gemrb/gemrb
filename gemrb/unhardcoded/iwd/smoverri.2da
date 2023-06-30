@@ -1,0 +1,14 @@
+2DA V1.0
+0
+           X     Y    VALUE
+ar1008    42    42        9
+ar1008    56    35        9
+ar1012    11    20        9
+ar1014    10    23        9
+ar2006    12    24        9
+ar2115    12    22        9
+ar2115    17    30        9
+ar9106    29    22        9
+# Table with searchmap overrides, currently only supporting making cells passable.
+# The value column contains the index of the pixel searchmap color in its palette,
+# eg. 9 is one of the passable wooden floors.

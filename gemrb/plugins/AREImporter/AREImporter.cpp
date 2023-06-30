@@ -181,6 +181,32 @@ static Holder<Sprite2D> LoadImageAs8bit(const ResRef& resref)
 	return spr;
 }
 
+// override some diagonal-only transitions to save on pathfinding time
+static void OverrideMaterialMap(const ResRef& wedRef, Holder<Sprite2D> searchMap)
+{
+	AutoTable smOverride = gamedata->LoadTable("smoverri", true);
+	if (!smOverride) return;
+
+	TableMgr::index_t areaCount = smOverride->GetRowCount();
+	for (TableMgr::index_t row = 0; row < areaCount; row++) {
+		if (wedRef != smOverride->GetRowName(row)) continue;
+
+		int x = smOverride->QueryFieldSigned<int>(row, 0);
+		int y = smOverride->QueryFieldSigned<int>(row, 1);
+		uint8_t material = smOverride->QueryFieldUnsigned<uint8_t>(row, 2);
+		Point badPoint(x, y);
+		auto it = searchMap->GetIterator();
+		auto end = PixelFormatIterator::end(it);
+		while (it != end) {
+			if (it.Position() == badPoint) {
+				*it = material;
+				break;
+			}
+			++it;
+		}
+	}
+}
+
 static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day_or_night)
 {
 	ResRef TmpResRef;
@@ -202,6 +228,7 @@ static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day
 	if (!searchmap) {
 		throw std::runtime_error("No searchmap available.");
 	}
+	OverrideMaterialMap(wedref, searchmap);
 
 	TmpResRef.Format("{:.6}HT", wedref);
 
