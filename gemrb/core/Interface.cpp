@@ -193,7 +193,6 @@ static const ieWord IDT_CRITRANGE = 1;
 static const ieWord IDT_CRITMULTI = 2;
 static const ieWord IDT_SKILLPENALTY = 3;
 
-static int MagicBit = 0;
 static const char* DefaultSystemEncoding = "UTF-8";
 
 // FIXME: DragOp should be initialized with the button we are dragging from
@@ -236,8 +235,6 @@ Interface::Interface() noexcept
 #elif defined(HAVE_LANGINFO_H)
 	SystemEncoding = nl_langinfo(CODESET);
 #endif
-
-	MagicBit = HasFeature(GFFlags::MAGICBIT);
 
 	gamedata = new GameData();
 	sgiterator = new SaveGameIterator();
@@ -3525,7 +3522,7 @@ void Interface::SanitizeItem(CREItem *item) const
 	item->Flags &= ~(IE_INV_ITEM_STACKED|IE_INV_ITEM_EQUIPPED);
 
 	//this is for converting IWD items magic flag
-	if (MagicBit && (item->Flags & IE_INV_ITEM_UNDROPPABLE)) {
+	if ((item->Flags & IE_INV_ITEM_UNDROPPABLE) && HasFeature(GFFlags::MAGICBIT)) {
 		item->Flags |= IE_INV_ITEM_MAGICAL;
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
