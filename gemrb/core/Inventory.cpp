@@ -1668,10 +1668,40 @@ std::string Inventory::dump(bool print) const
 	return buffer;
 }
 
+bool Inventory::CanEquipRanged(int& maxDamage, ieDword& bestSlot) const
+{
+	int maxSlot = static_cast<int>(Slots.size());
+	for (int i = 0; i < maxSlot; i++) {
+		// look only at ranged weapons and ranged melee weapons like throwing daggers
+		if (!(i >= SLOT_RANGED && i < LAST_RANGED) && !(i >= SLOT_MELEE && i < LAST_MELEE)) {
+			continue;
+		}
+
+		CREItem* slot;
+		const Item* itm = GetItemPointer(i, slot);
+		if (!itm) continue;
+		// cannot change equipment when holding a cursed weapon
+		if (slot->Flags & IE_INV_ITEM_CURSED) {
+			bestSlot = SLOT_FIST;
+			return false;
+		}
+
+		// best ranged
+		const ITMExtHeader* header;
+		int damage = itm->GetDamagePotential(true, header);
+		if (damage > maxDamage) {
+			bestSlot = i;
+			maxDamage = damage;
+		}
+		gamedata->FreeItem(itm, slot->ItemResRef, false);
+	}
+	return maxDamage != -1;
+}
+
 void Inventory::EquipBestWeapon(int flags)
 {
 	int damage = -1;
-	ieDword best_slot = SLOT_FIST;
+	ieDword bestSlot = SLOT_FIST;
 	const ITMExtHeader *header;
 	CREItem *Slot;
 
@@ -1680,29 +1710,9 @@ void Inventory::EquipBestWeapon(int flags)
 		return;
 	}
 
-	int maxSlot = static_cast<int>(Slots.size());
 	if (flags&EQUIP_RANGED) {
-		for (int i = 0; i < maxSlot; i++) {
-			// look only at ranged weapons and ranged melee weapons like throwing daggers
-			if (!(i >= SLOT_RANGED && i < LAST_RANGED) && !(i >= SLOT_MELEE && i < LAST_MELEE)) {
-				continue;
-			}
-
-			const Item *itm = GetItemPointer(i, Slot);
-			if (!itm) continue;
-			//cannot change equipment when holding a cursed weapon
-			if (Slot->Flags & IE_INV_ITEM_CURSED) {
-				return;
-			}
-
-			//best ranged
-			int tmp = itm->GetDamagePotential(true, header);
-			if (tmp>damage) {
-				best_slot = i;
-				damage = tmp;
-			}
-			gamedata->FreeItem( itm, Slot->ItemResRef, false );
-		}
+		CanEquipRanged(damage, bestSlot);
+		if (int(bestSlot) == SLOT_FIST) return;
 	}
 
 	if (flags&EQUIP_MELEE) {
@@ -1719,14 +1729,14 @@ void Inventory::EquipBestWeapon(int flags)
 			//best melee
 			int tmp = itm->GetDamagePotential(false, header);
 			if (tmp>damage) {
-				best_slot = i;
+				bestSlot = i;
 				damage = tmp;
 			}
 			gamedata->FreeItem( itm, Slot->ItemResRef, false );
 		}
 	}
 
-	EquipItem(best_slot);
+	EquipItem(bestSlot);
 	UpdateWeaponAnimation();
 }
 

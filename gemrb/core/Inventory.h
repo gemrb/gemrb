@@ -329,6 +329,8 @@ public:
 	void BreakItemSlot(ieDword slot);
 	/** Lists all items in the Inventory on terminal for debugging */
 	std::string dump(bool print = true) const;
+	/** Finds best ranged weapon if any and reports status */
+	bool CanEquipRanged(int& maxDamage, ieDword& bestSlot) const;
 	/** Equips best weapon */
 	void EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */
