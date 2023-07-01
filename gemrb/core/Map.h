@@ -376,6 +376,7 @@ public:
 	
 	void PaintSearchMap(const Point&, PathMapFlags value) const noexcept;
 	void PaintSearchMap(const Point& Pos, uint16_t blocksize, PathMapFlags value) const noexcept;
+	void PaintSearchMapNeg(const Point& Pos, uint16_t blocksize, PathMapFlags value) const noexcept;
 };
 
 class GEM_EXPORT Map : public Scriptable {
