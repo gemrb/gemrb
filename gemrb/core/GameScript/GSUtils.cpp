@@ -491,7 +491,7 @@ void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 
 void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, const char* soundpath)
 {
-	if (Strref == ieStrRef::INVALID) return;
+	if (Strref == ieStrRef::INVALID && soundpath == nullptr) return;
 
 	// Check if subtitles are not enabled
 	ieDword charactersubtitles = core->GetVariable("Subtitles", 0);
