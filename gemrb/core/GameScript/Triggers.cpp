@@ -4711,7 +4711,7 @@ int GameScript::CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/
 
 	// check all weapon slots to see if any ranged weapon can be switched to
 	// we need to check for presence of ammo as well
-	int damage;
+	int damage = -1;
 	ieDword bestSlot;
 	return actor->inventory.CanEquipRanged(damage, bestSlot);
 }
