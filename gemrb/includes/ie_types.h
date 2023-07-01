@@ -33,6 +33,7 @@
 #include "Strings/StringView.h"
 
 #include <cstdint>
+#include <unordered_map>
 
 namespace GemRB {
 
@@ -107,6 +108,8 @@ enum class ieStrRef : ieDword {
 
 using ieVariable = FixedSizeString<32, strnicmp>;
 using ResRef = FixedSizeString<8, strnicmp>;
+
+using ieVarsMap = std::unordered_map<ieVariable, ieDword, CstrHashCI<ieVariable>>;
 
 template <typename STR>
 inline bool IsStar(const STR& str) {

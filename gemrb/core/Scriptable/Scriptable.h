@@ -268,7 +268,7 @@ public:
 	// The countdown for forced activation by triggers.
 	ieDword TriggerCountdown = 0;
 
-	ResRefMap<ieDword> locals;
+	ieVarsMap locals;
 	ScriptableType Type = ST_ACTOR;
 	Point Pos;
 

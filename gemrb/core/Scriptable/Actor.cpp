@@ -5087,7 +5087,7 @@ void Actor::SendDiedTrigger() const
 	}
 }
 
-static void UpdateOrCreateVariable(ResRefMap<ieDword>& vars, const ResRef& key, ieDword value) {
+static void UpdateOrCreateVariable(ieVarsMap& vars, const ResRef& key, ieDword value) {
 	auto lookup = vars.find(key);
 	if (lookup != vars.cend()) {
 		lookup->second = value;
@@ -5096,7 +5096,7 @@ static void UpdateOrCreateVariable(ResRefMap<ieDword>& vars, const ResRef& key, 
 	}
 }
 
-static void IncrementOrCreateVariable(ResRefMap<ieDword>& vars, const ResRef& key, ieDword value) {
+static void IncrementOrCreateVariable(ieVarsMap& vars, const ResRef& key, ieDword value) {
 	auto lookup = vars.find(key);
 	if (lookup != vars.cend()) {
 		lookup->second += value;
