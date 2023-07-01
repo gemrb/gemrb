@@ -296,7 +296,7 @@ SDLTextureSprite2D::~SDLTextureSprite2D() noexcept
 }
 
 SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& other) noexcept
-	: SDLSurfaceSprite2D(other), texFormat(other.texFormat)
+	: SDLSurfaceSprite2D(other), texFormat(other.texFormat), texture(nullptr)
 {}
 
 Holder<Sprite2D> SDLTextureSprite2D::copy() const
