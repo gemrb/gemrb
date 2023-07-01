@@ -5,6 +5,7 @@ end_of_line = lf
 insert_final_newline = true
 charset = utf-8
 indent_style = tab
+trim_trailing_whitespace = false
 
 [*.{yml,baf,md,txt,sh}]
 indent_style = space
