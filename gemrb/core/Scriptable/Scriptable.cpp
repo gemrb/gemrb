@@ -88,7 +88,7 @@ Scriptable::~Scriptable(void)
 	}
 }
 
-ieDword Scriptable::GetLocal(const ResRef& key, ieDword fallback) const {
+ieDword Scriptable::GetLocal(const ieVariable& key, ieDword fallback) const {
 	auto lookup = locals.find(key);
 	if (lookup != locals.cend()) {
 		return lookup->second;
