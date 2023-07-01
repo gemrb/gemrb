@@ -244,7 +244,9 @@ def GetStatColor (pc, stat):
 	return {'r' : 0, 'g' : 255, 'b' : 0}
 
 # GemRB.GetPlayerStat wrapper that crosschecks skill availability
-SkillStatNames = { IE_PICKPOCKET : "PICK_POCKETS", IE_LOCKPICKING : "OPEN_LOCKS", IE_TRAPS : "FIND_TRAPS", IE_STEALTH : "MOVE_SILENTLY", IE_HIDEINSHADOWS : "HIDE_IN_SHADOWS", IE_DETECTILLUSIONS : "DETECT_ILLUSION", IE_SETTRAPS : "SET_TRAPS" }
+SkillStatNames = { IE_PICKPOCKET : "PICK_POCKETS", IE_LOCKPICKING : "OPEN_LOCKS", IE_TRAPS : "FIND_TRAPS", IE_STEALTH : "STEALTH", IE_HIDEINSHADOWS : "HIDE_IN_SHADOWS", IE_DETECTILLUSIONS : "DETECT_ILLUSION", IE_SETTRAPS : "SET_TRAPS" }
+if GameCheck.IsBG2 ():
+	SkillStatNames[IE_STEALTH] = "MOVE_SILENTLY"
 def GetValidSkill (pc, className, stat):
 	val = GemRB.GetPlayerStat (pc, stat)
 	if val < 0:
