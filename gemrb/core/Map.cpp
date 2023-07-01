@@ -909,7 +909,14 @@ void Map::DoStepForActor(Actor *actor, ieDword time) const
 
 void Map::BlockSearchMapFor(const Movable *actor) const
 {
-	auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
+	//auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
+	auto flag = PathMapFlags::PC;
+	tileProps.PaintSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, flag);
+}
+
+void Map::TravelSearchMapFor(const Movable *actor) const
+{
+	auto flag = PathMapFlags::NPC;
 	tileProps.PaintSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, flag);
 }
 
@@ -924,6 +931,9 @@ void Map::ClearSearchMapFor(const Movable *actor) const
 	for (const Actor *neighbour : nearActors) {
 		if (neighbour->BlocksSearchMap()) {
 			BlockSearchMapFor(neighbour);
+			if (neighbour->Moving) {
+				TravelSearchMapFor(neighbour);
+			}
 		}
 	}
 }
@@ -1651,6 +1661,8 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 			for (uint8_t i = 1; i < 255; ++i) {
 				if (i & uint8_t(PathMapFlags::SIDEWALL)) {
 					searchMapPal->col[uint8_t(PathMapFlags::SIDEWALL)] = Color(64, 64, 128, 128); // blues-ish
+				} else if (i & uint8_t(PathMapFlags::NPC)) {
+					searchMapPal->col[i] = Color(64, 128, 64, 128); // travel, green-ish
 				} else if (i & uint8_t(PathMapFlags::ACTOR)) {
 					searchMapPal->col[i] = Color(128, 64, 128, 128); // actor, purple-ish
 				} else if ((i & uint8_t(PathMapFlags::PASSABLE)) == 0) {
@@ -2390,7 +2402,7 @@ PathMapFlags Map::GetBlockedTile(const Point& p, int size) const
 PathMapFlags Map::GetBlockedTile(const Point& p) const
 {
 	PathMapFlags ret = tileProps.QuerySearchMap(p);
-	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::PC)) && !bool(ret & PathMapFlags::NPC)) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
 	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
@@ -2439,7 +2451,7 @@ PathMapFlags Map::GetBlockedInRadiusTile(const Point &tp, uint16_t size, const b
 		}
 	}
 
-	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR|PathMapFlags::SIDEWALL))) {
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::NPC|PathMapFlags::SIDEWALL)) && !bool(ret & PathMapFlags::NPC)) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
 	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
@@ -2487,7 +2499,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, const Actor *caller) cons
 bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const
 {
 	PathMapFlags ret = GetBlockedInLine(s, d, true, caller);
-	PathMapFlags mask = PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
+	PathMapFlags mask = PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | PathMapFlags::NPC | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
 	return bool(ret & mask);
 }
 

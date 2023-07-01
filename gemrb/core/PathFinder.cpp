@@ -46,11 +46,11 @@
 
 namespace GemRB {
 
-constexpr size_t DEGREES_OF_FREEDOM = 4;
+constexpr size_t DEGREES_OF_FREEDOM = 8;
 constexpr size_t RAND_DEGREES_OF_FREEDOM = 16;
 constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
-constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent{{1, 0, -1, 0}};
-constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent{{0, 1, 0, -1}};
+constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent{{1, 0, -1, 0, 1, 1, -1,	 -1}};
+constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent{{0, 1, 0, -1, 1, -1, -1, 1}};
 
 // Cosines
 constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};

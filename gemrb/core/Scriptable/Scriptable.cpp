@@ -2104,8 +2104,10 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Pos.y += dy;
 		oldPos = Pos;
 		if (actor && blocksSearch) {
-			auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
+			//auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
+			auto flag = PathMapFlags::PC;
 			area->tileProps.PaintSearchMap(Map::ConvertCoordToTile(Pos), circleSize, flag);
+			area->TravelSearchMapFor(this);
 		}
 
 		SetOrientation(step->orient, false);
@@ -2114,7 +2116,11 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			if (step->Next) {
 				step = step->Next;
 			} else {
+				// End??
 				ClearPath(true);
+				this->Moving = false;
+				area->ClearSearchMapFor(this);
+				area->BlockSearchMapFor(this);
 				NewOrientation = Orientation;
 				pathfindingDistance = circleSize;
 			}
@@ -2193,6 +2199,9 @@ void Movable::WalkTo(const Point &Des, int distance)
 		path = newPath;
 		step = path;
 		HandleAnkhegStance(false);
+		if (BlocksSearchMap()) { //??
+			area->TravelSearchMapFor(this);
+		}
 	}  else {
 		pathfindingDistance = std::max(circleSize, distance);
 		if (BlocksSearchMap()) {
@@ -2269,6 +2278,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	path = area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>());
 	if (BlocksSearchMap()) {
 		area->BlockSearchMapFor(this);
+		area->TravelSearchMapFor(this);
 	}
 	if (path) {
 		Destination = path->point;
@@ -2288,6 +2298,7 @@ void Movable::MoveTo(const Point &Des)
 	Destination = Des;
 	if (BlocksSearchMap()) {
 		area->BlockSearchMapFor(this);
+		area->TravelSearchMapFor(this);
 	}
 }
 
@@ -2295,6 +2306,9 @@ void Movable::Stop(int flags)
 {
 	Scriptable::Stop(flags);
 	ClearPath(true);
+	area->ClearSearchMapFor(this);
+	Moving = false;
+	//area->BlockSearchMapFor(this);
 }
 
 void Movable::ClearPath(bool resetDestination)

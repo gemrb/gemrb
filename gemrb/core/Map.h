@@ -607,6 +607,7 @@ public:
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(const Point &Pos, int range, int los);
 	void BlockSearchMapFor(const Movable *actor) const;
+	void TravelSearchMapFor(const Movable *actor) const;
 	void ClearSearchMapFor(const Movable *actor) const;
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
