@@ -96,7 +96,7 @@ struct AbilityTables {
 	
 	const int tableSize = 0;
 	AbilityTable strmod;
-	AbilityTable strmodex{101 * 4};
+	AbilityTable strmodex;
 	AbilityTable intmod;
 	AbilityTable dexmod;
 	AbilityTable conmod;
@@ -107,6 +107,7 @@ struct AbilityTables {
 	explicit AbilityTables(int MaximumAbility) noexcept
 	: tableSize(MaximumAbility + 1),
 	strmod(tableSize * 4),
+	strmodex(101 * 4),
 	intmod(tableSize * 5),
 	dexmod(tableSize * 3),
 	conmod(tableSize * 5),
