@@ -2187,9 +2187,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 
 void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, VarContext context)
 {
-	ResRef key{VarName};
+	ieVariable key{VarName};
 
-	auto SetLocalVariable = [=](ResRefMap<ieDword>& vars, const ResRef& key, ieDword value) {
+	auto SetLocalVariable = [=](ieVarsMap& vars, const ieVariable& key, ieDword value) {
 		auto lookup = vars.find(key);
 
 		if (lookup != vars.cend()) {
@@ -2206,7 +2206,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 			varName++;
 		}
 		context.Format("{:.6}", VarName);
-		key = ResRef{varName};
+		key = ieVariable{varName};
 	}
 	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", context, VarName, value);
 
@@ -2243,9 +2243,9 @@ void SetPointVariable(Scriptable *Sender, const StringParam& VarName, const Poin
 
 ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarContext context, bool *valid)
 {
-	ResRef key{VarName};
+	ieVariable key{VarName};
 
-	auto GetLocalVariable = [](const ResRefMap<ieDword>& vars, VarContext context, const ResRef& key) -> ieDword {
+	auto GetLocalVariable = [](const ieVarsMap& vars, VarContext context, const ieVariable& key) -> ieDword {
 		auto lookup = vars.find(key);
 		if (lookup != vars.cend()) {
 			ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, key, lookup->second);
@@ -2262,7 +2262,7 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 			varName++;
 		}
 		context.Format("{:.6}", VarName);
-		key = ResRef{varName};
+		key = ieVariable{varName};
 	}
 	
 	if (context == "MYAREA") {
@@ -2305,21 +2305,23 @@ bool VariableExists(const Scriptable *Sender, const StringParam& VarName, const 
 {
 	const Game *game = core->GetGame();
 
-	auto hasLocalVariable = [](const ResRefMap<ieDword>& vars, const StringParam& key) -> bool {
+	auto hasLocalVariable = [](const ieVarsMap& vars, const ieVariable& key) -> bool {
 		return vars.find(key) != vars.cend();
 	};
 
-	if (hasLocalVariable(Sender->GetCurrentArea()->locals, VarName)) {
+	ieVariable key{VarName};
+
+	if (hasLocalVariable(Sender->GetCurrentArea()->locals, key)) {
 		return true;
-	} else if (hasLocalVariable(Sender->locals, VarName)) {
+	} else if (hasLocalVariable(Sender->locals, key)) {
 		return true;
-	} else if (HasKaputz && hasLocalVariable(game->kaputz, VarName)) {
+	} else if (HasKaputz && hasLocalVariable(game->kaputz, key)) {
 		return true;
-	} else if (hasLocalVariable(game->locals, VarName)) {
+	} else if (hasLocalVariable(game->locals, key)) {
 		return true;
 	} else {
 		const Map* map = game->GetMap(game->FindMap(context));
-		if (map && hasLocalVariable(map->locals, VarName)) {
+		if (map && hasLocalVariable(map->locals, key)) {
 			return true;
 		}
 	}

@@ -222,7 +222,7 @@ using CRRow = int[MAX_CRLEVEL];
 
 class GEM_EXPORT Game : public Scriptable {
 public:
-	using kaputz_t = ResRefMap<ieDword>;
+	using kaputz_t = ieVarsMap;
 
 	Game(void);
 	~Game(void) override;

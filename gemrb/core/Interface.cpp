@@ -2086,7 +2086,7 @@ Interface::plugin_flags_t& Interface::GetPluginFlags() {
 	return pluginFlags;
 }
 
-void Interface::LoadInitialValues(const ResRef& name, ResRefMap<ieDword>& map) const
+void Interface::LoadInitialValues(const ResRef& name, ieVarsMap& map) const
 {
 	char nPath[_MAX_PATH];
 	// we only support PST's var.var for now

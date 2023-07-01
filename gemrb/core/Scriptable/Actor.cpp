@@ -81,7 +81,7 @@ static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static std::vector<std::vector<int>> areaComments;
 static std::vector<std::vector<int>> wmLevelMods;
-static const ResRef CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
+static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
 //verbal constant specific data
 static int VCMap[VCONST_COUNT];
@@ -5087,7 +5087,7 @@ void Actor::SendDiedTrigger() const
 	}
 }
 
-static void UpdateOrCreateVariable(ResRefMap<ieDword>& vars, const ResRef& key, ieDword value) {
+static void UpdateOrCreateVariable(ieVarsMap& vars, const ieVariable& key, ieDword value) {
 	auto lookup = vars.find(key);
 	if (lookup != vars.cend()) {
 		lookup->second = value;
@@ -5096,7 +5096,7 @@ static void UpdateOrCreateVariable(ResRefMap<ieDword>& vars, const ResRef& key, 
 	}
 }
 
-static void IncrementOrCreateVariable(ResRefMap<ieDword>& vars, const ResRef& key, ieDword value) {
+static void IncrementOrCreateVariable(ieVarsMap& vars, const ieVariable& key, ieDword value) {
 	auto lookup = vars.find(key);
 	if (lookup != vars.cend()) {
 		lookup->second += value;

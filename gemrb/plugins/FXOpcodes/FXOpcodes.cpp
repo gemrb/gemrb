@@ -7166,17 +7166,18 @@ int fx_modify_global_variable (Scriptable* /*Owner*/, Actor* /*target*/, Effect*
 		fx->VariableName = "RETURN_TO_LONELYWOOD";
 	}
 
+	ieVariable key{fx->Resource};
 	// print("fx_modify_global_variable(%2d): Variable: %s Value: %d Type: %d", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2);
 	if (fx->Parameter2) {
 		//use resource memory area as variable name
-		auto lookup = game->locals.find(fx->Resource);
+		auto lookup = game->locals.find(key);
 		if (lookup != game->locals.cend()) {
 			lookup->second += fx->Parameter1;
 		} else {
-			game->locals[fx->Resource] = fx->Parameter1;
+			game->locals[key] = fx->Parameter1;
 		}
 	} else {
-		game->locals[fx->Resource] = fx->Parameter1;
+		game->locals[key] = fx->Parameter1;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -7804,17 +7805,19 @@ int fx_modify_local_variable (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		memmove(&fx->VariableName[24], &fx->Resource4, 8);
 		fx->IsVariable=1;
 	}
+
+	ieVariable key{fx->Resource};
 	// print("fx_modify_local_variable(%2d): %s, Mod: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 	if (fx->Parameter2) {
 		//use resource memory area as variable name
-		auto lookup = target->locals.find(fx->Resource);
+		auto lookup = target->locals.find(key);
 		if (lookup != target->locals.cend()) {
 			lookup->second += fx->Parameter1;
 		} else {
-			target->locals[fx->Resource] = fx->Parameter1;
+			target->locals[key] = fx->Parameter1;
 		}
 	} else {
-		target->locals[fx->Resource] = fx->Parameter1;
+		target->locals[key] = fx->Parameter1;
 	}
 	return FX_NOT_APPLIED;
 }
