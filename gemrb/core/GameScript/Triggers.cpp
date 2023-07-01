@@ -4716,12 +4716,14 @@ int GameScript::CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/
 	return actor->inventory.CanEquipRanged(damage, bestSlot);
 }
 
-// 0x40FB IsForcedRandomEncounterActive(S:Area*)
-// TODO: ee, true only if a random encounter to the specified area has been initialized by a preceding call of ForceRandomEncounter() or ForceRandomEncounterEntry()
-int GameScript::IsForcedRandomEncounterActive(Scriptable* /*Sender*/, const Trigger* /*parameters*/)
+// true only if a random encounter to the specified area has been initialized by
+// a preceding call of ForceRandomEncounter() or ForceRandomEncounterEntry()
+// we cheat a bit, assuming it's always a new area
+int GameScript::IsForcedRandomEncounterActive(Scriptable* /*Sender*/, const Trigger* parameters)
 {
-	Log(ERROR, "GameScript", "IsForcedRandomEncounterActive has not been implemented yet!");
-	return 0;
+	WorldMap* worldMap = core->GetWorldMap();
+	unsigned int idx;
+	return worldMap->GetArea(parameters->resref0Parameter, idx) != nullptr;
 }
 
 int GameScript::SecretDoorDetected(Scriptable* Sender, const Trigger* parameters)

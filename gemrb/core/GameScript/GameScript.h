@@ -1133,6 +1133,7 @@ public: //Script Functions
 	static void ForceHide(Scriptable* Sender, Action* parameters);
 	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void ForceMarkedSpell(Scriptable* Sender, Action* parameters);
+	static void ForceRandomEncounter(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void ForceSpellRange(Scriptable* Sender, Action* parameters);
 	static void ForceSpellPoint(Scriptable* Sender, Action* parameters);

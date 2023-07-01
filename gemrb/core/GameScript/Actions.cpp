@@ -7455,4 +7455,16 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 	core->GetTokenDictionary()["BESTKILL"] = core->GetString(actor->PCStats->BestKilledName);
 }
 
+void GameScript::ForceRandomEncounter(Scriptable* Sender, Action* parameters)
+{
+	WorldMap* worldMap = core->GetWorldMap();
+	// potentially wrong area, should we postpone until the worldmap is brought up for traveling?
+	WMPAreaLink* link = worldMap->GetLink(Sender->GetCurrentArea()->GetScriptName(), parameters->resref0Parameter);
+	if (!link) {
+		return;
+	}
+	if (!parameters->variable1Parameter.IsEmpty()) link->DestEntryPoint = parameters->variable1Parameter;
+	worldMap->SetEncounterArea(parameters->resref0Parameter, link);
+}
+
 }

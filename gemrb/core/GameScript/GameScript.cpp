@@ -681,6 +681,8 @@ static const ActionLink actionnames[] = {
 	{"forcehide", GameScript::ForceHide, 0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcemarkedspell", GameScript::ForceMarkedSpell, 0},
+	{"forcerandomencounter", GameScript::ForceRandomEncounter, 0},
+	{"forcerandomencounterentry", GameScript::ForceRandomEncounter, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"forcespellpoint", GameScript::ForceSpellPoint, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"forcespellpointrange", GameScript::ForceSpellPointRange, AF_BLOCKING|AF_ALIVE},
