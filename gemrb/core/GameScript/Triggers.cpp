@@ -4765,12 +4765,10 @@ int GameScript::AreaCheckAllegiance(Scriptable* Sender, const Trigger* parameter
 	return 0;
 }
 
-// 0x40E5 Switch(S:Global*,S:Area*)
-// TODO: ee, the switch trigger is used to change how the RESPONSE script sections are evaluated.
-// It turns them into a typical switch statement, causing the first RESPONSE with the given weight to be selected
-// The weight is chosen by evaluating the string0Parameter var in string1Parameter context
-int GameScript::Switch(Scriptable*/*Sender*/, const Trigger* /*parameters*/)
+int GameScript::Switch(Scriptable* Sender, const Trigger* parameters)
 {
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
+	Sender->weightsAsCases = static_cast<unsigned char>(value);
 	Log(ERROR, "GameScript", "Switch has not been implemented yet!");
 	return 0;
 }

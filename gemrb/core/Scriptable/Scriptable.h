@@ -309,6 +309,7 @@ public:
 	int SpellHeader = 0;
 	ResRef SpellResRef;
 	bool InterruptCasting = false;
+	unsigned char weightsAsCases = 0;
 public:
 	
 	template <class RETURN, class PARAM>

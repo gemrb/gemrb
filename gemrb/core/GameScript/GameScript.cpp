@@ -2331,24 +2331,33 @@ int ResponseSet::Execute(Scriptable* Sender)
 			break;
 	}
 
-	int randWeight;
-	int maxWeight = 0;
-
-	for (const Response *response : responses) {
-		maxWeight += response->weight;
-	}
-	if (maxWeight) {
-		randWeight = RAND(0, maxWeight-1);
-	}
-	else {
-		randWeight = 0;
-	}
-
-	for (Response *response : responses) {
-		if (response->weight > randWeight) {
-			return response->Execute(Sender);
+	// ees added a switch-case mode with the Switch trigger
+	if (Sender->weightsAsCases) {
+		for (Response* response : responses) {
+			if (response->weight == Sender->weightsAsCases) {
+				Sender->weightsAsCases = 0;
+				return response->Execute(Sender);
+			}
 		}
-		randWeight -= response->weight;
+
+		Sender->weightsAsCases = 0;
+	} else {
+		int randWeight = 0;
+		int maxWeight = 0;
+
+		for (const Response* response : responses) {
+			maxWeight += response->weight;
+		}
+		if (maxWeight) {
+			randWeight = RAND(0, maxWeight - 1);
+		}
+
+		for (Response* response : responses) {
+			if (response->weight > randWeight) {
+				return response->Execute(Sender);
+			}
+			randWeight -= response->weight;
+		}
 	}
 	return 0;
 }
