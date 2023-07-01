@@ -42,10 +42,12 @@ namespace GemRB {
  * from GUIScripts can be used.
  */
 
+constexpr size_t HistoryMaxSize = 10;
+
 class GEM_EXPORT Console : public TextEdit {
 private:
 	/** History Buffer */
-	CircularBuffer<SelectOption> History;
+	CircularBuffer<SelectOption> History{HistoryMaxSize};
 	/** History Position and size */
 	TextArea* textArea = nullptr;
 	// an index into Hiostory, except when > History.size() which indicates a new entry

@@ -25,10 +25,8 @@
 
 namespace GemRB {
 
-constexpr size_t HistoryMaxSize = 10;
-
 Console::Console(const Region& frame, TextArea* ta)
-: TextEdit(frame, -1, Point(3, 3)), History(HistoryMaxSize)
+: TextEdit(frame, -1, Point(3, 3))
 {
 	ControlEventHandler OnReturn = [this](const Control*) {
 		Execute(QueryText());

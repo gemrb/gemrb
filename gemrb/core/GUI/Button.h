@@ -175,7 +175,7 @@ private: // Private attributes
 	bool pulseBorder = false;
 	Color textColor = ColorWhite;
 
-	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT];
+	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT]{};
 	/** Pictures to Apply when the hasPicture flag is set */
 	Holder<Sprite2D> Picture = nullptr;
 	SpriteAnimation* animation = nullptr;

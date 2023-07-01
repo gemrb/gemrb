@@ -174,7 +174,7 @@ void AudioStream::ForceClear()
 	ClearIfStopped();
 }
 
-OpenALAudioDriver::OpenALAudioDriver(void) : buffercache(BUFFER_CACHE_SIZE)
+OpenALAudioDriver::OpenALAudioDriver(void)
 {
 	music_memory = (short*) malloc(ACM_BUFFERSIZE);
 	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));

@@ -89,11 +89,11 @@ private:
 class GetBitContext
 {
 public:
-	const uint8_t *buffer, *buffer_end;
-	int index;
-	int size_in_bits;
+	const uint8_t* buffer = nullptr;
+	const uint8_t* buffer_end = nullptr;
+	int index = 0;
+	int size_in_bits = 0;
 public:
-	GetBitContext() : buffer(NULL), buffer_end(NULL), index(0), size_in_bits(0) {};
 	void debug(const char *prefix) const;
 	float get_float();
 	void skip_bits(int x) { index+=x; }

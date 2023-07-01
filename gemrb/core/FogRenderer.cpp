@@ -51,9 +51,7 @@ EnumArray<FogRenderer::Direction, Holder<Sprite2D>> FogRenderer::LoadFogSprites(
 
 FogRenderer::FogRenderer(Video *video, bool doBAMRendering) :
 	video(video),
-	videoCanRenderGeometry(!doBAMRendering && video->CanDrawRawGeometry()),
-	fogVertices(24),
-	fogColors(12)
+	videoCanRenderGeometry(!doBAMRendering && video->CanDrawRawGeometry())
 {
 	fogSprites = LoadFogSprites();
 }

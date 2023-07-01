@@ -1774,7 +1774,7 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("qslot2", true);
 	if (tm) {
 		TableMgr::index_t extraSlots = tm->GetRowCount();
-		OtherGUIButtons.resize(extraSlots);;
+		OtherGUIButtons.resize(extraSlots);
 
 		for (TableMgr::index_t i = 0; i < extraSlots; i++) {
 			ieByte cls = 0;
@@ -9345,7 +9345,7 @@ void Actor::InitButtons(ieDword cls, bool forced) const
 
 	ActionButtonRow& myrow = DefaultButtons;
 	if (cls >= (ieDword) classcount) {
-		for (auto& otherButtons : OtherGUIButtons) {
+		for (const auto& otherButtons : OtherGUIButtons) {
 			if (cls == otherButtons.clss) {
 				myrow  = otherButtons.buttons;
 				break;

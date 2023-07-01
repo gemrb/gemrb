@@ -70,15 +70,13 @@ public:
 };
 
 struct AudioStream {
-	AudioStream() : Buffer(0), Source(0), Duration(0), free(true), ambient(false), locked(false), delete_buffers(false) { }
-
-	ALuint Buffer;
-	ALuint Source;
-	int Duration;
-	bool free;
-	bool ambient;
-	bool locked;
-	bool delete_buffers;
+	ALuint Buffer = 0;
+	ALuint Source = 0;
+	int Duration = 0;
+	bool free = true;
+	bool ambient = false;
+	bool locked = false;
+	bool delete_buffers = false;
 
 	void ClearIfStopped();
 	void ClearProcessedBuffers() const;
@@ -162,7 +160,7 @@ private:
 	std::recursive_mutex musicMutex;
 	ALuint MusicBuffer[MUSICBUFFERS]{};
 	std::shared_ptr<SoundMgr> MusicReader;
-	LRUCache<CacheEntry, OpenALPlaying> buffercache;
+	LRUCache<CacheEntry, OpenALPlaying> buffercache{BUFFER_CACHE_SIZE};
 	AudioStream speech;
 	AudioStream streams[MAX_STREAMS];
 	int num_streams = 0;

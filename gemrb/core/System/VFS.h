@@ -154,9 +154,9 @@ public:
 	explicit operator bool () const noexcept { return Entry != nullptr; }
 	void Rewind();
 private:
-	FileFilterPredicate* predicate;
-	void* Directory;
-	void* Entry;
+	FileFilterPredicate* predicate{};
+	void* Directory = nullptr;
+	void* Entry = nullptr;
 	char* Path;
 	Flags entrySkipFlags;
 };

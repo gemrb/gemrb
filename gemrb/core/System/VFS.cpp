@@ -520,7 +520,6 @@ void* readonly_mmap(void *vfd) {
 #endif
 
 DirectoryIterator::DirectoryIterator(const char *path)
-	: predicate(), Directory(nullptr), Entry(nullptr)
 {
 	SetFlags(Files|Directories);
 	Path = strdup(path);

@@ -34,7 +34,7 @@ namespace GemRB {
 #endif
 
 FileStream::FileStream(File&& f)
-: str(std::move(f)), opened(true), created(true)
+: str(std::move(f))
 {}
 
 FileStream::FileStream(void)

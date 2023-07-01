@@ -26,12 +26,12 @@
 class CSubbandDecoder {
 private:
 	int levels, block_size;
-	int* memory_buffer;
+	int* memory_buffer = nullptr;
 	void sub_4d3fcc(short* memory, int* buffer, int sb_size, int blocks) const;
 	void sub_4d420c(int* memory, int* buffer, int sb_size, int blocks) const;
 public:
 	explicit CSubbandDecoder(int lev_cnt)
-		: levels( lev_cnt ), block_size( 1 << lev_cnt ), memory_buffer( NULL )
+		: levels(lev_cnt), block_size(1 << lev_cnt)
 	{
 	}
 	virtual ~CSubbandDecoder()

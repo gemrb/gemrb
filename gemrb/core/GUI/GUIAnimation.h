@@ -104,16 +104,12 @@ class GEM_EXPORT ColorAnimation : public GUIAnimation<Color> {
 public:
 	Color begin;
 	Color end;
-	bool repeat;
-	ColorCycle cycle;
-	int timeOffset;
+	bool repeat = false;
+	ColorCycle cycle{0};
+	int timeOffset = 0;
 
 public:
-	ColorAnimation()
-	: GUIAnimation(), cycle(0) {
-		repeat = false;
-		timeOffset = 0;
-	}
+	ColorAnimation() : GUIAnimation() {}
 
 	ColorAnimation(const Color& begin, const Color& end, bool repeat)
 	: GUIAnimation(), begin(begin), end(end), repeat(repeat), cycle(7) {

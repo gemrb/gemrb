@@ -36,14 +36,15 @@ private:
 	//FILE* file;
 	DataStream* stream;
 	// Bits
-	unsigned int next_bits; // new bits
-	int avail_bits; // count of new bits
+	unsigned int next_bits = 0; // new bits
+	int avail_bits = 0; // count of new bits
 	unsigned char bits_buffer[UNPACKER_BUFFER_SIZE];
-	std::ptrdiff_t buffer_bit_offset;
+	std::ptrdiff_t buffer_bit_offset{UNPACKER_BUFFER_SIZE};
 
 	int sb_size;
-	short* amp_buffer, * buff_middle;
-	int* block_ptr;
+	short* amp_buffer = nullptr;
+	short* buff_middle = nullptr;
+	int* block_ptr = nullptr;
 
 	// Reading routines
 	void prepare_bits(int bits); // request bits
@@ -72,11 +73,7 @@ public:
 
 
 	CValueUnpacker(int lev_cnt, int sb_count, DataStream* stream)
-		: levels( lev_cnt ), subblocks( sb_count ), next_bits( 0 ),
-		avail_bits( 0 ), buffer_bit_offset( UNPACKER_BUFFER_SIZE ),
-		sb_size( 1 << levels ),
-		amp_buffer( NULL ),
-		buff_middle( NULL ), block_ptr( NULL )
+		: levels(lev_cnt), subblocks(sb_count), sb_size(1 << levels)
 	{
 		this->stream = stream;
 	}

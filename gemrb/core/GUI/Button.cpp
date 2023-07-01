@@ -40,8 +40,7 @@
 namespace GemRB {
 
 Button::Button(const Region& frame)
-	: Control(frame),
-	buttonImages()
+	: Control(frame)
 {
 	ControlType = IE_GUI_BUTTON;
 	HotKeyCallback = METHOD_CALLBACK(&Button::HandleHotKey, this);

@@ -63,8 +63,8 @@ class GEM_EXPORT FogRenderer {
 	private:
 		Video* video;
 		bool videoCanRenderGeometry = false;
-		std::vector<float> fogVertices;
-		std::vector<Color> fogColors;
+		std::vector<float> fogVertices{24};
+		std::vector<Color> fogColors{12};
 
 		Region vp;
 		Size mapSize;

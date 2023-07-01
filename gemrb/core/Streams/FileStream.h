@@ -102,7 +102,8 @@ public:
 class GEM_EXPORT FileStream : public DataStream {
 private:
 	File str;
-	bool opened, created;
+	bool opened = true;
+	bool created = true;
 public:
 	explicit FileStream(File&&);
 	FileStream(void);
