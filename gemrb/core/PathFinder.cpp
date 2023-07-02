@@ -294,6 +294,7 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
 	if (core->InDebugMode(ID_PATHFINDER)) Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}", s, d, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
+	bool actors_are_blocking = flags & PF_ACTORS_ARE_BLOCKING;
 	
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	NavmapPoint nmptDest = d;
@@ -362,14 +363,15 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			if (smptChild.x < 0 ||	smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
 			if (isClosed[smptChild.y * mapSize.w + smptChild.x]) continue;
+
+			PathMapFlags childBlockStatus = GetBlocked(nmptChild);
+			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | (actors_are_blocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR) | PathMapFlags::TRAVEL));
+			if (childBlocked) continue;
+
 			// If there's an actor, check it can be bumped away
 			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
-			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
+			bool childIsUnbumpable = childActor && childActor != caller && (actors_are_blocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
-
-			PathMapFlags childBlockStatus = GetBlockedInRadius(nmptChild, size);
-			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR | PathMapFlags::TRAVEL));
-			if (childBlocked) continue;
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 			const float HEURISTIC_WEIGHT = 1.5;
@@ -377,7 +379,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
 			unsigned short oldDist = distFromStart[smptChild.y * mapSize.w + smptChild.x];
 			// Theta-star path if there is LOS
-			if (IsWalkableTo(nmptParent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
+			if (IsWalkableTo(nmptParent, nmptChild, actors_are_blocking, caller)) {
 				SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
@@ -385,7 +387,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
 				}
 			// Fall back to A-star path
-			} else if (IsWalkableTo(nmptCurrent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
+			} else {
 				unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChild.y * mapSize.w + smptChild.x] = nmptCurrent;
