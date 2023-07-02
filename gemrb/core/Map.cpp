@@ -2452,6 +2452,7 @@ PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	Point p = s;
+	const SearchmapPoint sms = ConvertCoordToTile(s);
 	while (p != d) {
 		double dx = d.x - p.x;
 		double dy = d.y - p.y;
@@ -2459,6 +2460,8 @@ PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
+		if (sms == ConvertCoordToTile(p)) continue;
+
 		PathMapFlags blockStatus = GetBlocked(p);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
