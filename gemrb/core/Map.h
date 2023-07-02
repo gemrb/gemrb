@@ -628,7 +628,7 @@ public:
 	PathListNode* GetLine(const Point &start, const Point &dest, int speed, orient_t Orientation, int flags) const;
 	Path GetLinePath(const Point &start, const Point &dest, int speed, orient_t Orientation, int flags) const;
 	/* Finds the path which leads to near d */
-	PathListNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL) const;
+	PathListNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = nullptr) const;
 
 	bool IsVisible(const Point &p) const;
 	bool IsExplored(const Point &p) const;
