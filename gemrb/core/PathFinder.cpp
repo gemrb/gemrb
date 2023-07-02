@@ -72,6 +72,8 @@ PathListNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, in
 		if (!(GetBlockedInRadius(rad, size) & PathMapFlags::PASSABLE)) {
 			tries++;
 			// Give up and call the pathfinder if backed into a corner
+			// should we return nullptr instead, so we don't accidentally get closer to d?
+			// it matches more closely the iwd beetles in ar1015, but is too restrictive — then they can't move at all
 			if (tries > RAND_DEGREES_OF_FREEDOM) break;
 			// Random rotation
 			xSign = RandomFlip() ? -1 : 1;
@@ -420,7 +422,12 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			PathListNode *newStep = new PathListNode;
 			newStep->point = nmptCurrent;
 			newStep->Next = resultPath;
-			if (flags & PF_BACKAWAY) {
+			// movement in general allows characters to walk backwards given that
+			// the destination is behind the character (within a threshold), and
+			// that the distance isn't too far away
+			// we approximate that with a relaxed collinearity check and intentionally
+			// skip the first step, otherwise it doesn't help with iwd beetles in ar1015
+			if (flags & PF_BACKAWAY && resultPath && std::abs(area2(nmptCurrent, resultPath->point, nmptParent)) < 300) {
 				newStep->orient = GetOrient(nmptParent, nmptCurrent);
 			} else {
 				newStep->orient = GetOrient(nmptCurrent, nmptParent);
