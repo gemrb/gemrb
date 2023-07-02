@@ -65,10 +65,10 @@ void MapControl::DrawFog(const Region& rgn) const
 	points.reserve(rgn.w * rgn.h);
 
 	for (; p.y < rgn.h; ++p.y) {
-		gameP.y = p.y * double(mapsize.h) / mosRgn.h;
+		gameP.y = int(p.y * double(mapsize.h) / mosRgn.h);
 
 		for (p.x = 0; p.x < rgn.w; ++p.x) {
-			gameP.x = p.x * double(mapsize.w) / mosRgn.w;
+			gameP.x = int(p.x * double(mapsize.w) / mosRgn.w);
 			
 			bool visible = MyMap->IsExplored(gameP);
 			if (!visible) {
@@ -88,8 +88,8 @@ Point MapControl::ConvertPointToGame(Point p) const
 	// mos is in win coordinates (to make things easy elsewhere)
 	p = ConvertPointToSuper(p) - mosRgn.origin;
 	
-	p.x *= double(mapsize.w) / mosRgn.w;
-	p.y *= double(mapsize.h) / mosRgn.h;
+	p.x *= int(double(mapsize.w) / mosRgn.w);
+	p.y *= int(double(mapsize.h) / mosRgn.h);
 	
 	return p;
 }
@@ -98,8 +98,8 @@ Point MapControl::ConvertPointFromGame(Point p) const
 {
 	const Size mapsize = MyMap->GetSize();
 	
-	p.x *= double(mosRgn.w) / mapsize.w;
-	p.y *= double(mosRgn.h) / mapsize.h;
+	p.x *= int(double(mosRgn.w) / mapsize.w);
+	p.y *= int(double(mosRgn.h) / mapsize.h);
 	
 	// mos is centered... convert p from mos coordinates
 	return p + mosRgn.origin;
@@ -139,10 +139,10 @@ Region MapControl::GetViewport() const
 	Region vp = gc->Viewport();
 	const Size& mapsize = MyMap->GetSize();
 
-	vp.x *= double(mosRgn.w) / mapsize.w;
-	vp.y *= double(mosRgn.h) / mapsize.h;
-	vp.w *= double(mosRgn.w) / mapsize.w;
-	vp.h *= double(mosRgn.h) / mapsize.h;
+	vp.x *= int(double(mosRgn.w) / mapsize.w);
+	vp.y *= int(double(mosRgn.h) / mapsize.h);
+	vp.w *= int(double(mosRgn.w) / mapsize.w);
+	vp.h *= int(double(mosRgn.h) / mapsize.h);
 
 	vp.x += mosRgn.x;
 	vp.y += mosRgn.y;
@@ -252,8 +252,8 @@ const MapNote* MapControl::MapNoteAtPoint(const Point& p) const
 	Point gamePoint = ConvertPointToGame(p);
 	Size mapsize = MyMap->GetSize();
 
-	float scalar = float(mapsize.w) / mosRgn.w;
-	unsigned int radius = (mapFlags ? mapFlags->GetFrame(0)->Frame.w / 2 : 5) * scalar;
+	float scalar = float(mapsize.w) / float(mosRgn.w);
+	unsigned int radius = (unsigned int) ((mapFlags ? mapFlags->GetFrame(0)->Frame.w / 2 : 5) * scalar);
 
 	return MyMap->MapNoteAtPoint(gamePoint, radius);
 }
