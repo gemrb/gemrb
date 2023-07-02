@@ -293,6 +293,7 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
+	bool lazyThetaStarFlag = true;
 	if (core->InDebugMode(ID_PATHFINDER)) Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}", s, d, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
 	bool actors_are_blocking = flags & PF_ACTORS_ARE_BLOCKING;
 	
@@ -378,36 +379,85 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			SearchmapPoint smptCurrent2 = Map::ConvertCoordToTile(nmptCurrent);
 			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
 			unsigned short oldDist = distFromStart[smptChild.y * mapSize.w + smptChild.x];
-			// Theta-star path if there is LOS
-			if (IsWalkableTo(nmptParent, nmptChild, actors_are_blocking, caller)) {
+			
+			// TODO remove standard Theta-star when lazy version is verified
+			if (!lazyThetaStarFlag) {
+				// Theta-star path if there is LOS
+				if (IsWalkableTo(nmptParent, nmptChild, actors_are_blocking, caller)) {
+					SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
+					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+					if (newDist < oldDist) {
+						parents[smptChild.y * mapSize.w + smptChild.x] = nmptParent;
+						distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
+					}
+				// Fall back to A-star path
+				} else {
+					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
+					if (newDist < oldDist) {
+						parents[smptChild.y * mapSize.w + smptChild.x] = nmptCurrent;
+						distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
+					}
+				}
+
+				if (distFromStart[smptChild.y * mapSize.w + smptChild.x] < oldDist) {
+					// Calculate heuristic
+					int xDist = smptChild.x - smptDest.x;
+					int yDist = smptChild.y - smptDest.y;
+					// Tie-breaking used to smooth out the path
+					int dxCross = smptDest.x - smptSource.x;
+					int dyCross = smptDest.y - smptSource.y;
+					int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
+					double distance = std::hypot(xDist, yDist);
+					double heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
+					double estDist = distFromStart[smptChild.y * mapSize.w + smptChild.x] + heuristic;
+					PQNode newNode(nmptChild, estDist);
+					open.emplace(newNode);
+				}
+			} else {
+				// Lazy Theta star*
 				SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChild.y * mapSize.w + smptChild.x] = nmptParent;
 					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
 				}
-			// Fall back to A-star path
-			} else {
-				unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
-				if (newDist < oldDist) {
-					parents[smptChild.y * mapSize.w + smptChild.x] = nmptCurrent;
-					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
-				}
-			}
 
-			if (distFromStart[smptChild.y * mapSize.w + smptChild.x] < oldDist) {
-				// Calculate heuristic
-				int xDist = smptChild.x - smptDest.x;
-				int yDist = smptChild.y - smptDest.y;
-				// Tie-breaking used to smooth out the path
-				int dxCross = smptDest.x - smptSource.x;
-				int dyCross = smptDest.y - smptSource.y;
-				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
-				double distance = std::hypot(xDist, yDist);
-				double heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
-				double estDist = distFromStart[smptChild.y * mapSize.w + smptChild.x] + heuristic;
-				PQNode newNode(nmptChild, estDist);
-				open.emplace(newNode);
+				if (distFromStart[smptChild.y * mapSize.w + smptChild.x] < oldDist) {
+					// Theta-star path if there is LOS
+					if (!IsWalkableTo(nmptParent, nmptChild, actors_are_blocking, caller)) {
+						// Fall back to A-star path
+						distFromStart[smptChild.y * mapSize.w + smptChild.x] = std::numeric_limits<unsigned short>::max();
+						// Find already visited neighbour with shortest: path from start + path to child
+						for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
+							NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
+							SearchmapPoint smptVis = Map::ConvertCoordToTile(nmptVis);
+							// Outside map
+							if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
+							// Only consider already visited
+							if (!isClosed[smptVis.y * mapSize.w + smptVis.x]) continue;
+
+							unsigned short oldVisDist = distFromStart[smptChild.y * mapSize.w + smptChild.x];
+							unsigned short newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
+							if (newDist < oldVisDist) {
+								parents[smptChild.y * mapSize.w + smptChild.x] = nmptVis;
+								distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
+							}
+						}
+						if (distFromStart[smptChild.y * mapSize.w + smptChild.x] >= oldDist) continue;
+					}
+					// Calculate heuristic
+					int xDist = smptChild.x - smptDest.x;
+					int yDist = smptChild.y - smptDest.y;
+					// Tie-breaking used to smooth out the path
+					int dxCross = smptDest.x - smptSource.x;
+					int dyCross = smptDest.y - smptSource.y;
+					int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
+					double distance = std::hypot(xDist, yDist);
+					double heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
+					double estDist = distFromStart[smptChild.y * mapSize.w + smptChild.x] + heuristic;
+					PQNode newNode(nmptChild, estDist);
+					open.emplace(newNode);
+				}
 			}
 		}
 	}
