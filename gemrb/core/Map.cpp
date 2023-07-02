@@ -2453,10 +2453,10 @@ PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	Point p = s;
 	const SearchmapPoint sms = ConvertCoordToTile(s);
+	double factor = caller && caller->GetSpeed() ? double(gamedata->GetStepTime()) / double(caller->GetSpeed()) : 1;
 	while (p != d) {
 		double dx = d.x - p.x;
 		double dy = d.y - p.y;
-		double factor = caller && caller->GetSpeed() ? double(gamedata->GetStepTime()) / double(caller->GetSpeed()) : 1;
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
