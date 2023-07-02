@@ -2391,7 +2391,7 @@ PathMapFlags Map::GetBlockedTile(const Point& p) const
 {
 	PathMapFlags ret = tileProps.QuerySearchMap(p);
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
-		ret &= ~PathMapFlags::PASSABLE;
+		ret &= ~(PathMapFlags::PASSABLE | PathMapFlags::TRAVEL);
 	}
 	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
 		ret = PathMapFlags::SIDEWALL;
@@ -2440,7 +2440,7 @@ PathMapFlags Map::GetBlockedInRadiusTile(const Point &tp, uint16_t size, const b
 	}
 
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR|PathMapFlags::SIDEWALL))) {
-		ret &= ~PathMapFlags::PASSABLE;
+		ret &= ~(PathMapFlags::PASSABLE|PathMapFlags::TRAVEL);
 	}
 	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
 		ret = PathMapFlags::SIDEWALL;
@@ -2467,7 +2467,7 @@ PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 		ret |= blockStatus;
 	}
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR|PathMapFlags::SIDEWALL))) {
-		ret &= ~PathMapFlags::PASSABLE;
+		ret &= ~(PathMapFlags::PASSABLE | PathMapFlags::TRAVEL);
 	}
 	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
 		ret = PathMapFlags::SIDEWALL;
