@@ -716,17 +716,17 @@ private:
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised
-	bool AdjustPositionX(Point &goal, int radiusx, int radiusy, int size = -1) const;
-	bool AdjustPositionY(Point &goal, int radiusx, int radiusy, int size = -1) const;
+	bool AdjustPositionX(SearchmapPoint& goal, int radiusx, int radiusy, int size = -1) const;
+	bool AdjustPositionY(SearchmapPoint& goal, int radiusx, int radiusy, int size = -1) const;
 	
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 	void AddProjectile(Projectile* pro);
 	
 	// same as GetBlocked, but in TileCoords
-	PathMapFlags GetBlockedTile(const Point&) const;
-	PathMapFlags GetBlockedTile(const Point&, int size) const;
-	PathMapFlags GetBlockedInRadiusTile(const Point&, uint16_t size, bool stopOnImpassable = true) const;
+	PathMapFlags GetBlockedTile(const SearchmapPoint&) const;
+	PathMapFlags GetBlockedTile(const SearchmapPoint&, int size) const;
+	PathMapFlags GetBlockedInRadiusTile(const SearchmapPoint&, uint16_t size, bool stopOnImpassable = true) const;
 };
 
 }

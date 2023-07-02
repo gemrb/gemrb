@@ -2376,7 +2376,7 @@ PathMapFlags Map::GetBlocked(const Point &p) const
 }
 
 // p is in tile coords
-PathMapFlags Map::GetBlockedTile(const Point& p, int size) const
+PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p, int size) const
 {
 	if (size == -1) {
 		return GetBlockedTile(p);
@@ -2386,7 +2386,7 @@ PathMapFlags Map::GetBlockedTile(const Point& p, int size) const
 }
 
 // p is in tile coords
-PathMapFlags Map::GetBlockedTile(const Point& p) const
+PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p) const
 {
 	PathMapFlags ret = tileProps.QuerySearchMap(p);
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
@@ -2405,7 +2405,7 @@ PathMapFlags Map::GetBlockedInRadius(const Point& p, unsigned int size, bool sto
 }
 
 // p is in tile coords
-PathMapFlags Map::GetBlockedInRadiusTile(const Point &tp, uint16_t size, const bool stopOnImpassable) const
+PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size, const bool stopOnImpassable) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// TODO: recheck that this matches originals
@@ -2430,7 +2430,7 @@ PathMapFlags Map::GetBlockedInRadiusTile(const Point &tp, uint16_t size, const b
 		assert(p2.x <= p1.x);
 		
 		for (int x = p2.x; x <= p1.x; ++x) {
-			PathMapFlags flags = GetBlockedTile(Point(x, p1.y));
+			PathMapFlags flags = GetBlockedTile(SearchmapPoint(x, p1.y));
 			if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
 				return PathMapFlags::IMPASSABLE;
 			}
@@ -2828,7 +2828,7 @@ std::string Map::dump(bool show_actors) const
 	return buffer;
 }
 
-bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
+bool Map::AdjustPositionX(SearchmapPoint& goal, int radiusx, int radiusy, int size) const
 {
 	int minx = 0;
 	if (goal.x > radiusx)
@@ -2842,7 +2842,7 @@ bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
 
 	for (int scanx = minx; scanx < maxx; scanx++) {
 		if (goal.y >= radiusy) {
-			const Point p(scanx, (goal.y - radiusy));
+			const SearchmapPoint p(scanx, (goal.y - radiusy));
 			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y - radiusy;
@@ -2850,7 +2850,7 @@ bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
 			}
 		}
 		if (goal.y + radiusy < mapSize.h) {
-			const Point p(scanx, (goal.y + radiusy));
+			const SearchmapPoint p(scanx, (goal.y + radiusy));
 			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y + radiusy;
@@ -2861,7 +2861,7 @@ bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
 	return false;
 }
 
-bool Map::AdjustPositionY(Point &goal, int radiusx, int radiusy, int size) const
+bool Map::AdjustPositionY(SearchmapPoint& goal, int radiusx, int radiusy, int size) const
 {
 	int miny = 0;
 	if (goal.y > radiusy)
@@ -2873,7 +2873,7 @@ bool Map::AdjustPositionY(Point &goal, int radiusx, int radiusy, int size) const
 		maxy = mapSize.h;
 	for (int scany = miny; scany < maxy; scany++) {
 		if (goal.x >= radiusx) {
-			const Point p((goal.x - radiusx), scany);
+			const SearchmapPoint p((goal.x - radiusx), scany);
 			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x - radiusx;
 				goal.y = scany;
@@ -2881,7 +2881,7 @@ bool Map::AdjustPositionY(Point &goal, int radiusx, int radiusy, int size) const
 			}
 		}
 		if (goal.x + radiusx < mapSize.w) {
-			const Point p((goal.x + radiusx), scany);
+			const SearchmapPoint p((goal.x + radiusx), scany);
 			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x + radiusx;
 				goal.y = scany;
