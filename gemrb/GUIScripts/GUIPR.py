@@ -230,13 +230,13 @@ def OnPriestMemorizeSpell ():
 	index = GemRB.GetVar ("SpellButton") - 100
 
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
-		UpdatePriestWindow (PriestSpellWindow)
 		GemRB.PlaySound ("GAM_24")
 		Button = PriestSpellWindow.GetControl(index + 27)
 		Button.SetAnimation (FlashResRef, 0, 0x80)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
 		Button2 = PriestSpellWindow.GetControl(mem_cnt + 2)
 		Button2.SetAnimation (FlashResRef, 0, 0x80)
+		UpdatePriestWindow (PriestSpellWindow)
 	return
 
 def OpenPriestSpellRemoveWindow ():
@@ -299,10 +299,10 @@ def OnPriestUnmemorizeSpell (btn):
 	index = btn.Value
 
 	if GemRB.UnmemorizeSpell (pc, spelltype, level, index):
-		UpdatePriestWindow (PriestSpellWindow)
 		GemRB.PlaySound ("GAM_44")
 		Button = PriestSpellWindow.GetControl(index + 3)
 		Button.SetAnimation (FlashResRef, 0, 0x80)
+		UpdatePriestWindow (PriestSpellWindow)
 	return
 
 def OnPriestRemoveSpell ():
