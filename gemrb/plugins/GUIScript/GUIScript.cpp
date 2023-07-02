@@ -457,10 +457,10 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 
 		ta->SetFlags(View::IgnoreEvents, BitOp::OR);
 		int lines = ta->ContentHeight() / rowHeight;
-		float heightScale = 12.0f / rowHeight; // scale based on text size so smaller text scrolls more slowly
-		float widthScale = 640.0f / w;  // scale based on width to become more slow as we get wider
-		int textSpeed = gamedata->GetTextSpeed();
-		int ticksPerLine = 11.0f * heightScale * widthScale * textSpeed;
+		float heightScale = 12.0f / float(rowHeight); // scale based on text size so smaller text scrolls more slowly
+		float widthScale = 640.0f / float(w);  // scale based on width to become more slow as we get wider
+		float textSpeed = static_cast<float>(gamedata->GetTextSpeed());
+		int ticksPerLine = int(11.0f * heightScale * widthScale * textSpeed);
 		ta->ScrollToY(-ta->ContentHeight(), lines * ticksPerLine);
 	}
 	Py_RETURN_NONE;
@@ -1041,7 +1041,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 		return PyLong_FromLong(val);
 	}
 	if (PyObject_TypeCheck(sym, &PyLong_Type)) {
-		int symi = PyLong_AsLong(sym);
+		int symi = static_cast<int>(PyLong_AsLong(sym));
 		return PyString_FromStringView(sm->GetValue(symi));
 	}
 
@@ -2175,11 +2175,11 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
 			for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
 				PyErr_Clear();
-				long frame = PyLong_AsLong(PyList_GetItem(pyImgList, i));
+				AnimationFactory::index_t frame = static_cast<AnimationFactory::index_t>(PyLong_AsLong(PyList_GetItem(pyImgList, i)));
 				if (PyErr_Occurred()) {
 					return AttributeError("Error retrieving image from list");
 				}
-				images[i] = af->GetFrame( frame, 0 );
+				images[i] = af->GetFrame(frame);
 			}
 
 			view = new ScrollBar(rgn, images);
@@ -2239,7 +2239,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		}
 			break;
 		case IE_GUI_INVALID:
-			view = core->CreateWindow(id, rgn);
+			view = core->CreateWindow((unsigned short) id, rgn);
 			break;
 		default:
 			view = new View(rgn);
@@ -2562,13 +2562,14 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 		if (!af) {
 			return RuntimeError(fmt::format("{} BAM not found!", ResRef));
 		}
-		Holder<Sprite2D> tspr = af->GetFrame(unpressed, (unsigned char)cycle);
+		Holder<Sprite2D> tspr;
+		tspr = af->GetFrame((AnimationFactory::index_t) unpressed, (unsigned char) cycle);
 		btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
-		tspr = af->GetFrame( pressed, (unsigned char) cycle);
+		tspr = af->GetFrame((AnimationFactory::index_t) pressed, (unsigned char) cycle);
 		btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
-		tspr = af->GetFrame( selected, (unsigned char) cycle);
+		tspr = af->GetFrame((AnimationFactory::index_t) selected, (unsigned char) cycle);
 		btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
-		tspr = af->GetFrame( disabled, (unsigned char) cycle);
+		tspr = af->GetFrame((AnimationFactory::index_t) disabled, (unsigned char) cycle);
 		btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
 
 		Py_RETURN_NONE;
@@ -3735,7 +3736,7 @@ uses 12 colors palette, it has issues in PST.\n\
 **See also:** [Button_SetPLT](Button_SetPLT.md), [Button_SetPicture](Button_SetPicture.md), [Button_SetSprites](Button_SetSprites.md)"
 );
 
-static PyObject* SetButtonBAM(Button* btn, StringView ResRef, int CycleIndex, int FrameIndex, int col1)
+static PyObject* SetButtonBAM(Button* btn, StringView ResRef, AnimationFactory::index_t CycleIndex, AnimationFactory::index_t FrameIndex, int col1)
 {
 	ABORT_IF_NULL(btn);
 
@@ -3779,7 +3780,7 @@ static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
 			   &ResRef, &CycleIndex, &FrameIndex, &col1);
 
 	Button* btn = GetView<Button>(self);
-	PyObject *ret = SetButtonBAM(btn, PyString_AsStringView(ResRef), CycleIndex, FrameIndex,col1);
+	PyObject* ret = SetButtonBAM(btn, PyString_AsStringView(ResRef), (AnimationFactory::index_t) CycleIndex, (AnimationFactory::index_t) FrameIndex, col1);
 	if (ret) {
 		Py_INCREF(ret);
 	}
@@ -9032,7 +9033,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	MaxCount = core->SlotTypes;
+	MaxCount = static_cast<int>(core->SlotTypes);
 	Count = 0;
 	for (int i = 0; i < MaxCount; i++) {
 		int id = core->QuerySlot(i);
@@ -10200,23 +10201,23 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	if (!PyObject_TypeCheck(p[0], &PyLong_Type)) {
 		return NULL;
 	}
-	v[0] = PyLong_AsLong(p[0]); //slot
+	v[0] = static_cast<int>(PyLong_AsLong(p[0])); //slot
 
 	if (PyObject_TypeCheck(p[1], &PyLong_Type)) {
-		v[1] = PyLong_AsLong(p[1]); //a_stat
+		v[1] = static_cast<int>(PyLong_AsLong(p[1])); //a_stat
 	} else {
 		if (!PyObject_TypeCheck(p[1], &PyUnicode_Type)) {
 			return NULL;
 		}
 		callback = ASCIIStringFromPy<std::string>(p[1]); // callback
 	}
-	v[0] = PyLong_AsLong(p[0]);
+	v[0] = static_cast<int>(PyLong_AsLong(p[0]));
 
 	for (int i = 2; i < 9; i++) {
 		if (!PyObject_TypeCheck(p[i], &PyLong_Type)) {
 			return NULL;
 		}
-		v[i] = PyLong_AsLong(p[i]);
+		v[i] = static_cast<int>(PyLong_AsLong(p[i]));
 	}
 
 	if (p[9]) {
@@ -10224,7 +10225,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 			if (!PyObject_TypeCheck(p[i], &PyLong_Type)) {
 				return NULL;
 			}
-			v[i] = PyLong_AsLong(p[i]);
+			v[i] = static_cast<int>(PyLong_AsLong(p[i]));
 		}
 	}
 
@@ -10826,7 +10827,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			if (!PyObject_TypeCheck(x, &PyLong_Type)) {
 				return NULL;
 			}
-			myrow[i] = PyLong_AsLong(x);
+			myrow[i] = static_cast<ieByte>(PyLong_AsLong(x));
 		}
 	} else {
 		actor->GetActionButtonRow(myrow);
@@ -11291,7 +11292,7 @@ static PyObject* GemRB_SetupQuickSlot(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	slot = core->QuerySlot(slot);
+	slot = static_cast<ieWord>(core->QuerySlot(slot));
 	// recache info for potentially changed ammo or weapon ability
 	actor->inventory.SetEquipped(static_cast<ieWordSigned>(actor->inventory.GetEquipped()), headerIndex); // reset EquippedHeader
 	actor->SetupQuickSlot(qslotID, slot, headerIndex);

@@ -66,7 +66,7 @@ class Window;
 
 // 0x90 - 0x9f reserved for function keys (1-16)
 #define GEM_FUNCTIONX(x) \
-	(0x8F + x)
+	((KeyboardKey)(0x8F + x))
 
 #define GEM_MOD_SHIFT           1
 #define GEM_MOD_CTRL            2
