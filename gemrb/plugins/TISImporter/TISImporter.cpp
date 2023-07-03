@@ -88,7 +88,7 @@ Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
 			frames.push_back(GetTile(secondary[i]));
 		}
 		Animation sec = Animation(frames);
-		return new Tile(ani, sec);
+		return new Tile(ani, std::move(sec));
 	}
 	return new Tile(ani);
 }
@@ -166,7 +166,7 @@ Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 		if (badTile == nullptr) {
 			// we only want to generate a single bad tile on demand
 			PaletteHolder pal = MakeHolder<Palette>();
-			PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
+			PixelFormat fmt = PixelFormat::Paletted8Bit(std::move(pal));
 			badTile = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 		}
 		

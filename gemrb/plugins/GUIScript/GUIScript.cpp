@@ -2194,7 +2194,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			}
 
 			auto flags = gamedata->GetFactoryResourceAs<const AnimationFactory>("FLAG1", IE_BAM_CLASS_ID);
-			MapControl* map = new MapControl(rgn, flags);
+			MapControl* map = new MapControl(rgn, std::move(flags));
 			map->LinkedLabel = GetView<Control>(pylabel);
 
 			view = map;
@@ -6210,7 +6210,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	const Actor* actor = game->FindPC(PartyID);
 	if (actor) {
 		Holder<Sprite2D> portrait = actor->CopyPortrait(which);
-		CObject<Sprite2D> obj(portrait);
+		CObject<Sprite2D> obj(std::move(portrait));
 		PyObject* dict = PyDict_New();
 		PyDict_SetItemString(dict, "Sprite", obj);
 		PyObject* pystr = PyString_FromResRef(which ? actor->SmallPortrait : actor->LargePortrait);
@@ -10500,7 +10500,7 @@ static void ReadActionButtons()
 static void SetButtonCycle(std::shared_ptr<const AnimationFactory> bam, Button *btn, AnimationFactory::index_t cycle, unsigned char which)
 {
 	Holder<Sprite2D> tspr = bam->GetFrame(cycle, 0);
-	btn->SetImage((BUTTON_IMAGE_TYPE)which, tspr);
+	btn->SetImage((BUTTON_IMAGE_TYPE) which, std::move(tspr));
 }
 
 PyDoc_STRVAR( GemRB_Button_SetActionIcon__doc,

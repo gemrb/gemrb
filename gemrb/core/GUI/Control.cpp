@@ -145,7 +145,7 @@ Control::value_t Control::SetValue(value_t val)
 
 Control::value_t Control::SetValueRange(ValueRange r)
 {
-	range = r;
+	range = std::move(r);
 	if (Value != INVALID_VALUE) {
 		return SetValue(Value); // update the value if it falls outside the range
 	}

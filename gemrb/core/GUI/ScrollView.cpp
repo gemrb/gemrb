@@ -157,7 +157,7 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 			ScrollbarValueChange(static_cast<ScrollBar*>(sb));
 		};
 		
-		sbar->SetAction(handler, Control::ValueChange);
+		sbar->SetAction(std::move(handler), Control::ValueChange);
 	}
 }
 

@@ -1600,7 +1600,7 @@ static void FloatMessageAtPoint(Scriptable* Sender, const Point& pos, const ieSt
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	String msg = core->GetString(msgRef);
-	map->overHead.SetText(msg);
+	map->overHead.SetText(std::move(msg));
 	map->overHead.FixPos(pos);
 }
 

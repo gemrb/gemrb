@@ -205,7 +205,7 @@ void DisplayMessage::DisplayConstantString(HCStrings stridx, GUIColors color, Sc
 {
 	if (stridx > HCStrings::count) return;
 	String text = core->GetString(SRefs.Get(stridx, target), STRING_FLAGS::SOUND);
-	DisplayString(text, GetColor(color), target);
+	DisplayString(std::move(text), GetColor(color), target);
 }
 
 void DisplayMessage::DisplayString(ieStrRef stridx, const Color &color, STRING_FLAGS flags) const
@@ -368,7 +368,7 @@ void DisplayMessage::DisplayStringName(ieStrRef stridx, GUIColors color, const S
 
 void DisplayMessage::DisplayStringName(String text, GUIColors color, const Scriptable *speaker) const
 {
-	DisplayStringName(text, GetColor(color), speaker);
+	DisplayStringName(std::move(text), GetColor(color), speaker);
 }
 
 void DisplayMessage::DisplayMsgAtLocation(HCStrings strIdx, int type, Scriptable* owner, const Scriptable* trigger, GUIColors color) const

@@ -68,7 +68,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 		map->CalculateDistances(currentArea, EnumIndex<WMPDirection>(dir));
 	};
 	
-	SetAction(handler, Control::ValueChange);
+	SetAction(std::move(handler), Control::ValueChange);
 }
 
 WorldMapControl::WorldMapControl(const Region& frame, Font *font)

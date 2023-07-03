@@ -88,7 +88,7 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*style*/, bo
 	}
 
 	auto pal = af->GetFrameWithoutCycle(0)->GetPalette();
-	Font* fnt = new Font(pal, lineHeight, baseLine, background);
+	Font* fnt = new Font(std::move(pal), lineHeight, baseLine, background);
 
 	std::map<Sprite2D*, ieWord> tmp;
 	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {

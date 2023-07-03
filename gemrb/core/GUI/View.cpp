@@ -233,7 +233,7 @@ void View::DrawBackground(const Region* rgn) const
 			Region intersect = rgn->Intersect(background->Frame);
 			Point screenPt = ConvertPointToWindow(intersect.origin);
 			Region toClip(screenPt, intersect.size);
-			video->BlitSprite(background, intersect, toClip, BlitFlags::BLENDED);
+			video->BlitSprite(background, intersect, std::move(toClip), BlitFlags::BLENDED);
 		} else {
 			Point dp = ConvertPointToWindow(Point(background->Frame.x, background->Frame.y));
 			video->BlitSprite(background, dp);

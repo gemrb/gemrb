@@ -28,10 +28,10 @@ namespace GemRB {
 Console::Console(const Region& frame, TextArea* ta)
 : TextEdit(frame, -1, Point(3, 3))
 {
-	ControlEventHandler OnReturn = [this](const Control*) {
+	ControlEventHandler onReturn = [this](const Control*) {
 		Execute(QueryText());
 	};
-	SetAction(OnReturn, TextEdit::Action::Done);
+	SetAction(std::move(onReturn), TextEdit::Action::Done);
 
 	if (ta) {
 		textArea = ta;
@@ -48,7 +48,7 @@ Console::Console(const Region& frame, TextArea* ta)
 			}
 			SetFocus();
 		};
-		textArea->SetAction(handler, TextArea::Action::Select);
+		textArea->SetAction(std::move(handler), TextArea::Action::Select);
 	}
 
 	LoadHistory();

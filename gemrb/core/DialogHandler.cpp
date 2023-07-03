@@ -465,7 +465,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	ControlEventHandler handler = [this](const Control* c) {
 		DialogChoose(c->GetValue());
 	};
-	ta->SetAction(handler, TextArea::Action::Select);
+	ta->SetAction(std::move(handler), TextArea::Action::Select);
 
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {

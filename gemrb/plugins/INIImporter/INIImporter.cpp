@@ -43,8 +43,8 @@ bool INITag::AddLine(std::string iniLine)
 	if (valueEnd == std::string::npos) return true;
 	std::string value = iniLine.substr(valueStart, valueEnd - valueStart + 1);
 
-	INIPair p = { key, value };
-	pairs.push_back(p);
+	INIPair p = { key, std::move(value) };
+	pairs.push_back(std::move(p));
 	return true;
 }
 

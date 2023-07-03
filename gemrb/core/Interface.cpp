@@ -1167,7 +1167,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 	if (config.GameName == GEMRB_STRING) {
 		if (DefaultWindowTitle != GEMRB_STRING) {
 			std::string title = GEMRB_STRING" running " + DefaultWindowTitle;
-			config.GameName = title;
+			config.GameName = std::move(title);
 		} else {
 			config.GameName = GEMRB_STRING" running unknown game";
 		}

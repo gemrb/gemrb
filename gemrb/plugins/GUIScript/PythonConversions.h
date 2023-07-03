@@ -252,7 +252,7 @@ PyObject* PyObject_FromPtr(T* p)
 template <typename T>
 PyObject* PyObject_FromHolder(Holder<T> h)
 {
-	return CObject<T>(h);
+	return CObject<T>(std::move(h));
 }
 
 template <typename T, PyObject* (*F)(T), class Container>

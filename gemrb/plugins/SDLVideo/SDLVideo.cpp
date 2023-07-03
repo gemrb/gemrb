@@ -265,7 +265,7 @@ void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p,
 {
 	Region srect(Point(0, 0), spr->Frame.size);
 	Region drect = Region(p - spr->Frame.origin, spr->Frame.size);
-	BlitSpriteClipped(spr, srect, drect, flags, &tint);
+	BlitSpriteClipped(spr, std::move(srect), drect, flags, &tint);
 }
 
 Region SDLVideoDriver::CurrentRenderClip() const

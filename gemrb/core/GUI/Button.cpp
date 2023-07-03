@@ -381,7 +381,7 @@ void Button::SetBorder(int index, const Region& rgn, const Color &color, bool en
 		return;
 
 	ButtonBorder fr = { rgn, color, filled, enabled };
-	borders[index] = fr;
+	borders[index] = std::move(fr);
 
 	MarkDirty();
 }
@@ -641,7 +641,7 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 		unsigned int ratio = CeilDiv(Picture->Frame.w, frame.w);
 		if (ratio > 1) {
 			Holder<Sprite2D> img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
-			Picture = img;
+			Picture = std::move(img);
 		}
 		flags |= IE_GUI_BUTTON_PICTURE;
 	} else {
