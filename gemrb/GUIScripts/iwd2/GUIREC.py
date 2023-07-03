@@ -1465,6 +1465,8 @@ def FinishLevelUp():
 	GemRB.SetVar ("LUClass", -1)
 	GemRB.SetVar ("LUKit", 0)
 
+	UpdateRecordsWindow (RecordsWindow)
+
 
 ###################################################
 # End of file GUIREC.py
