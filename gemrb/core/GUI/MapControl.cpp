@@ -242,7 +242,7 @@ void MapControl::UpdateCursor()
 			break;
 		default:
 			Holder<Sprite2D> cursor = EventMgr::MouseButtonState(GEM_MB_ACTION) ? core->Cursors[IE_CURSOR_PRESSED] : nullptr;
-			SetCursor(cursor);
+			SetCursor(std::move(cursor));
 			break;
 	}
 }

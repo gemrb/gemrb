@@ -32,7 +32,7 @@ namespace GemRB
 	private:
 		static std::string errMessage;
 
-		GLuint program;
+		GLuint program = 0;
 		std::map<std::string, GLint> uniforms;
 		bool buildProgram(const std::string& vertexSource, const std::string& fragmentSource, GLuint programID);
 		GLuint buildShader(GLenum type, std::string source) const;
