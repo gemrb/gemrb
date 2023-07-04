@@ -426,7 +426,7 @@ def GetLevelUpNews():
 			# only display classes with new spells
 			if (NewDSpells[i]-OldDSpells[i]) == 0:
 				continue
-			GemRB.SetToken("level", str(i+1))
+			GemRB.SetToken ("LEVEL", str(i + 1))
 			News += GemRB.GetString(61269)+": " + str(NewDSpells[i]-OldDSpells[i]) + '\n'
 		News += '\n'
 	if DeltaWSpells > 0: # new wizard spells
@@ -435,7 +435,7 @@ def GetLevelUpNews():
 			# only display classes with new spells
 			if (NewWSpells[i]-OldWSpells[i]) == 0:
 				continue
-			GemRB.SetToken("level", str(i+1))
+			GemRB.SetToken ("LEVEL", str(i + 1))
 			News += GemRB.GetString(61269)+": " + str(NewWSpells[i]-OldWSpells[i]) + '\n'
 		News += '\n'
 

@@ -76,7 +76,6 @@ def BackPress():
 	return
 
 def NextPress():
-	GemRB.SetToken("VoiceSet", TextAreaControl.QueryText())
 	if SoundWindow:
 		SoundWindow.Close ()
 	GemRB.SetNextScript("CharGen8") #name
