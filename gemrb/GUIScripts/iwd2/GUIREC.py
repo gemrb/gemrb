@@ -1452,9 +1452,9 @@ def FinishLevelUp():
 	BABTable = CommonTables.Classes.GetValue (LUClassName, "TOHIT")
 	BABTable = GemRB.LoadTable (BABTable)
 	currentBAB = GemRB.GetPlayerStat (pc, IE_TOHIT, 1)
-	oldBAB = BABTable.GetValue (str(oldLevel), "BASE_ATTACK")
+	oldBAB = BABTable.GetValue (str(oldLevel), "BASE_ATTACK", GTV_INT)
 	newLevel = oldLevel + LevelDiff
-	newBAB = BABTable.GetValue (str(newLevel), "BASE_ATTACK")
+	newBAB = BABTable.GetValue (str(newLevel), "BASE_ATTACK", GTV_INT)
 	GemRB.SetPlayerStat (pc, IE_TOHIT, currentBAB + newBAB - oldBAB)
 
 	# class level
