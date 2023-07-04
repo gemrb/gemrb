@@ -1034,9 +1034,12 @@ void CREImporter::GetActorPST(Actor *act)
 	str->ReadDword(act->AppearanceFlags);
 
 	// just overwrite the bg1 color stat range, since it's not used in pst
+	// however there are 7 fields, so make sure not to overwrite IE_COLORCOUNT (same as IE_HAIR_COLOR)
+	Actor::stat_t colorCount = act->BaseStats[IE_COLORCOUNT];
 	for (int i = 0; i < 7; i++) {
 		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_COLORS + i]);
 	}
+	act->BaseStats[IE_COLORCOUNT] = colorCount;
 	str->Read(act->pstColorBytes, 10); // color location in IESDP, sort of a palette index and flags
 	str->Seek(21, GEM_CURRENT_POS);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECIES]); // offset: 0x311
