@@ -16,6 +16,7 @@ def Imprt():
 def setPlayer():
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
+	GemRB.SetVar ("ImportedChar", 0)
 	return False
 
 def unsetPlayer():
@@ -26,6 +27,7 @@ def unsetPlayer():
 def unsetGender():
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, 0)
+	GemRB.SetVar ("ImportedChar", 0)
 
 def unsetPortrait():
 	GemRB.SetToken("SmallPortrait","")
