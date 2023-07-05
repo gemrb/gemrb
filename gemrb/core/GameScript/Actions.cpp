@@ -130,9 +130,9 @@ void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
 {
 	int max=parameters->int1Parameter-parameters->int0Parameter+1;
 	if (max>0) {
-		SetVariable( Sender, parameters->string0Parameter, RandomNumValue%max+parameters->int0Parameter );
+		SetVariable(Sender, parameters->string0Parameter, RandomNumValue % max + parameters->int0Parameter, parameters->resref1Parameter);
 	} else {
-		SetVariable( Sender, parameters->string0Parameter, 0);
+		SetVariable(Sender, parameters->string0Parameter, 0, parameters->resref1Parameter);
 	}
 }
 
