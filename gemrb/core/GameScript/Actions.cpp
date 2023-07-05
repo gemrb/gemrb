@@ -7475,4 +7475,29 @@ void GameScript::RemoveStoreItem(Scriptable* /*Sender*/, Action* parameters)
 	::GemRB::RemoveStoreItem(parameters->resref0Parameter, parameters->resref1Parameter, parameters->int0Parameter);
 }
 
+void GameScript::AddStoreItem(Scriptable* /*Sender*/, Action* parameters)
+{
+	Store* store = gamedata->GetStore(parameters->resref0Parameter);
+	if (!store) {
+		Log(ERROR, "GameScript", "AddStoreItem: store {} cannot be opened!", parameters->resref0Parameter);
+		return;
+	}
+
+	CREItem* itm = new CREItem();
+	if (!CreateItemCore(itm, parameters->resref1Parameter, 1, 0, 0)) {
+		delete itm;
+		return;
+	}
+	itm->Flags |= parameters->int1Parameter; // should we just set instead?
+
+	// we could complicate and take item->MaxStackAmount into account, but AddItem can take care of everything
+	while (parameters->int0Parameter--) {
+		store->AddItem(itm);
+	}
+	delete itm;
+	// store changed, save it
+	gamedata->SaveStore(store);
+	return;
+}
+
 }

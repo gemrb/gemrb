@@ -972,6 +972,7 @@ public: //Script Functions
 	static void AddKit(Scriptable* Sender, Action* parameters);
 	static void AddMapnote(Scriptable* Sender, Action* parameters);
 	static void AddSpecialAbility(Scriptable* Sender, Action* parameters);
+	static void AddStoreItem(Scriptable* /*Sender*/, Action* parameters);
 	static void AddSuperKit(Scriptable* Sender, Action* parameters);
 	static void AddWayPoint(Scriptable* Sender, Action* parameters);
 	static void AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);

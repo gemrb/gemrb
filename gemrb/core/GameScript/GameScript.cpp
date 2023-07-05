@@ -503,6 +503,7 @@ static const ActionLink actionnames[] = {
 	{"addpartyexperience", GameScript::AddExperienceParty, 0},
 	{"addspecialability", GameScript::AddSpecialAbility, 0},
 	{"addsuperkit", GameScript::AddSuperKit, 0},
+	{"addstoreitem", GameScript::AddStoreItem, 0},
 	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
 	{"addworldmapareaflag", GameScript::AddWorldmapAreaFlag, 0},
 	{"addxp2da", GameScript::AddXP2DA, 0},
