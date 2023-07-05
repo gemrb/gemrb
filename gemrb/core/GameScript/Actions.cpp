@@ -6124,6 +6124,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 			has_current = true;
 			current = store->Name;
 			owner = store->GetOwnerID();
+			store = core->SetCurrentStore(parameters->resref0Parameter, 0);
 		}
 	}
 	store->BuyMarkup = parameters->int0Parameter;
