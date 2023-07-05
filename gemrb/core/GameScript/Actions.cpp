@@ -4124,6 +4124,7 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	}
 }
 
+// supports invitem.ids in ees
 void GameScript::SetItemFlags(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar;
@@ -4972,6 +4973,7 @@ void GameScript::GiveOrder(Scriptable* Sender, Action* parameters)
 	}
 }
 
+// ees support mapnotes.ids
 void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();

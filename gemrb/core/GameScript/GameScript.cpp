@@ -499,6 +499,7 @@ static const ActionLink actionnames[] = {
 	{"addjournalentry", GameScript::AddJournalEntry, 0},
 	{"addkit", GameScript::AddKit, 0},
 	{"addmapnote", GameScript::AddMapnote, 0},
+	{"addmapnotecolor", GameScript::AddMapnote, 0},
 	{"addpartyexperience", GameScript::AddExperienceParty, 0},
 	{"addspecialability", GameScript::AddSpecialAbility, 0},
 	{"addsuperkit", GameScript::AddSuperKit, 0},
@@ -623,6 +624,7 @@ static const ActionLink actionnames[] = {
 	{"displaystringheaddead", GameScript::DisplayStringHead, 0}, //same?
 	{"displaystringnoname", GameScript::DisplayStringNoName, 0},
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead, 0},
+	{"displaystringpoint", GameScript::FloatMessageFixed, 0}, // can customize color, maybe a different font, otherwise the same
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
 	{"doubleclicklbuttonobject", GameScript::DoubleClickLButtonObject, AF_BLOCKING},
 	{"doubleclicklbuttonpoint", GameScript::DoubleClickLButtonPoint, AF_BLOCKING},
@@ -763,6 +765,7 @@ static const ActionLink actionnames[] = {
 	{"log", GameScript::Debug, 0}, //the same until we know better
 	{"losegame", GameScript::QuitGame, 0}, // tobex
 	{"makeglobal", GameScript::MakeGlobal, 0},
+	{"makeglobaloverride", GameScript::MakeGlobalOverride, 0},
 	{"makeunselectable", GameScript::MakeUnselectable, 0},
 	{"markobject", GameScript::MarkObject, 0},
 	{"markspellandobject", GameScript::MarkSpellAndObject, 0},

@@ -2601,6 +2601,7 @@ int GameScript::Level(Scriptable *Sender, const Trigger *parameters)
 }
 
 // works intuitively only with single-classed characters — the way the originals use it
+// ees support classcat.ids
 int GameScript::ClassLevel(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
@@ -4583,7 +4584,7 @@ int GameScript::CurrentAmmo(Scriptable *Sender, const Trigger *parameters)
 	return actor->inventory.HasItemInSlot(parameters->resref0Parameter, ammoslot);
 }
 
-// does the object have an item of the specified type? Is it equipped as well?
+// does the object have an item of the specified type (itemcat.ids)? Is it equipped as well?
 int GameScript::HasItemCategory(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
@@ -4637,7 +4638,7 @@ int GameScript::WeaponEffectiveVs(Scriptable* Sender, const Trigger* parameters)
 }
 
 // 0x40F2 WeaponCanDamage(O:Object*,I:Hand*HAND)
-// Can the weapon equipped in the hand defined by the 2nd parameter cause non-zero damage to the target?
+// Can the weapon equipped in the hand defined by the 2nd parameter (hand.ids) cause non-zero damage to the target?
 // TODO: ee, see WeaponEffectiveVs and figure out what matches what
 int GameScript::WeaponCanDamage(Scriptable* Sender, const Trigger* parameters)
 {
