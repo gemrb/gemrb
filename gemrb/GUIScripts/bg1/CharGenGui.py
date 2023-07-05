@@ -87,14 +87,14 @@ def unsetAlignment():
 	
 def getAlignment(area):
 	MyChar = GemRB.GetVar ("Slot")
-	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
+	AlignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	
 	area.Append("\n")
 	area.Append(1049)
 	area.Append(": ")
-	AllignIndex = CommonTables.Aligns.FindValue (3, AllignID)
-	AllignCap = CommonTables.Aligns.GetValue (AllignIndex, 2)
-	area.Append(AllignCap)
+	AlignIndex = CommonTables.Aligns.FindValue (3, AlignID)
+	AlignCap = CommonTables.Aligns.GetValue (AlignIndex, 2)
+	area.Append(AlignCap)
 	area.Append("\n")
 
 #Abilties
@@ -324,11 +324,12 @@ def setAccept():
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	
 	#reputation
-	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-	
+	AlignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	TmpTable=GemRB.LoadTable ("repstart")
-	t = TmpTable.GetValue (AllignID,0) * 10
+	t = TmpTable.GetValue (AlignID, 0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
+	if MyChar == 1: # only do it once
+		GemRB.GameSetReputation( t )
 
 	#lore, thac0, hp, and saves
 	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
@@ -337,10 +338,6 @@ def setAccept():
 	LUCommon.SetupThaco (MyChar)
 	LUCommon.SetupLore (MyChar)
 	LUCommon.SetupHP (MyChar)
-
-	#slot 1 is the protagonist
-	if MyChar == 1:
-		GemRB.GameSetReputation( t )
 
 	#gold
 	TmpTable=GemRB.LoadTable ("strtgold")
