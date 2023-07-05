@@ -506,7 +506,7 @@ unsigned int Inventory::DestroyItem(const ResRef& resref, ieDword flags, ieDword
 		if ( (flags&item->Flags)!=flags) {
 			continue;
 		}
-		if (item->ItemResRef != resref) {
+		if (!resref.IsEmpty() && item->ItemResRef != resref) {
 			continue;
 		}
 		//we need to acknowledge that the item was destroyed
