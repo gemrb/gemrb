@@ -30,7 +30,7 @@ namespace GemRB {
 
 void InterfaceConfig::SetKeyValuePair(const key_t& key, const value_t& value)
 {
-	configVars.emplace(key, value);
+	configVars[key] = value;
 }
 
 const InterfaceConfig::value_t* InterfaceConfig::GetValueForKey(const key_t& key) const
