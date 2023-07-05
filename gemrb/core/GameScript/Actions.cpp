@@ -128,12 +128,16 @@ void GameScript::SetGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
 {
-	int max=parameters->int1Parameter-parameters->int0Parameter+1;
-	if (max>0) {
-		SetVariable(Sender, parameters->string0Parameter, RandomNumValue % max + parameters->int0Parameter, parameters->resref1Parameter);
-	} else {
-		SetVariable(Sender, parameters->string0Parameter, 0, parameters->resref1Parameter);
+	// in iwd2 all the calls but one (1, 6) are with 0, 1 — plain rolls would always give a 0
+	// while SetGlobalRandomPlus supposedly rolls
+	int max = parameters->int1Parameter - parameters->int0Parameter + 1;
+	ieDword value = 0;
+	if (parameters->int2Parameter) {
+		value = core->Roll(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+	} else if (max > 0) {
+		value = RandomNumValue % max + parameters->int0Parameter; // should be +1 instead?
 	}
+	SetVariable(Sender, parameters->string0Parameter, value, parameters->resref1Parameter);
 }
 
 void GameScript::StartTimer(Scriptable* Sender, Action* parameters)

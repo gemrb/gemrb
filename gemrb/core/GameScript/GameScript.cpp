@@ -923,6 +923,7 @@ static const ActionLink actionnames[] = {
 	{"setgabber", GameScript::SetGabber, 0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobalrandom", GameScript::SetGlobalRandom, AF_MERGESTRINGS},
+	{"setglobalrandomplus", GameScript::SetGlobalRandom, AF_MERGESTRINGS},
 	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
 	{"setglobaltimeronce", GameScript::SetGlobalTimerOnce,AF_MERGESTRINGS},
 	{"setglobaltimerrandom", GameScript::SetGlobalTimerRandom,AF_MERGESTRINGS},
