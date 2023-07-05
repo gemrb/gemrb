@@ -172,6 +172,8 @@ def RefreshInventoryWindow (Window):
 				Button.SetPLT("WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 			else:
 				#shield
+				if size == 'N':
+					size = 'M'
 				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 
 	# Helmet
