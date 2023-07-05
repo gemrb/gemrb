@@ -7390,6 +7390,7 @@ void GameScript::DestroyAllFragileEquipment(Scriptable* Sender, Action* paramete
 	}
 
 	// TODO: ensure it's using the inventory/CREItem flags, not Item — IE_ITEM_ADAMANTINE won't work as an input otherwise
+	// merge with DestroyAllDestructableEquipment
 	actor->inventory.DestroyItem("", parameters->int0Parameter, ~0);
 }
 
@@ -7502,6 +7503,22 @@ void GameScript::AddStoreItem(Scriptable* /*Sender*/, Action* parameters)
 	// store changed, save it
 	gamedata->SaveStore(store);
 	return;
+}
+
+void GameScript::DestroyGroundPiles(Scriptable* Sender, Action* /*parameters*/)
+{
+	const Map* map = Sender->GetCurrentArea();
+	if (!map) return;
+	size_t containerCount = map->GetTileMap()->GetContainerCount();
+	TileMap* tm = map->GetTileMap();
+	while (containerCount--) {
+		Container* pile = tm->GetContainer(containerCount);
+		if (pile->containerType != IE_CONTAINER_PILE) continue;
+
+		pile->inventory.DestroyItem("", 0,(ieDword) ~0); //destroy any and all
+		pile->RemoveItem(0, 0); // force ground icon refresh
+		tm->CleanupContainer(pile);
+	}
 }
 
 }
