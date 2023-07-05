@@ -69,7 +69,7 @@ GEM_EXPORT ieWordSigned GetHappiness(const Scriptable* Sender, int reputation);
 int GetHPPercent(const Scriptable *Sender);
 unsigned int StoreCountItems(const ResRef& storeName, const ResRef& itemName);
 bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname);
-bool RemoveStoreItem(const ResRef& storeName, const ResRef& itemName);
+bool RemoveStoreItem(const ResRef& storeName, const ResRef& itemName, ieDword count = 0);
 bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword flags);
 void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed);
 void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::index_t value);

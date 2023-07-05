@@ -7470,4 +7470,9 @@ void GameScript::ForceRandomEncounter(Scriptable* Sender, Action* parameters)
 	worldMap->SetEncounterArea(parameters->resref0Parameter, link);
 }
 
+void GameScript::RemoveStoreItem(Scriptable* /*Sender*/, Action* parameters)
+{
+	::GemRB::RemoveStoreItem(parameters->resref0Parameter, parameters->resref1Parameter, parameters->int0Parameter);
+}
+
 }

@@ -351,12 +351,16 @@ void Store::RemoveItem(const STOItem *itm)
 	}
 }
 
-void Store::RemoveItemByName(const ResRef& itemName)
+void Store::RemoveItemByName(const ResRef& itemName, ieDword count)
 {
 	unsigned int idx = FindItem(itemName, false);
 	if (idx == (unsigned int) -1) return;
-	const STOItem* si = GetItem(idx, false);
-	RemoveItem(si);
+	STOItem* si = GetItem(idx, false);
+	if (count && si->AmountInStock > count) {
+		si->AmountInStock -= count;
+	} else {
+		RemoveItem(si);
+	}
 }
 
 ieDword Store::GetOwnerID() const

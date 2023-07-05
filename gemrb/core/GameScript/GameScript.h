@@ -1277,6 +1277,7 @@ public: //Script Functions
 	static void RemovePaladinHood(Scriptable* Sender, Action* parameters);
 	static void RemoveRangerHood(Scriptable* Sender, Action* parameters);
 	static void RemoveSpell(Scriptable* Sender, Action* parameters);
+	static void RemoveStoreItem(Scriptable* /*Sender*/, Action* parameters);
 	static void RemoveTraps(Scriptable* Sender, Action* parameters);
 	static void RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
