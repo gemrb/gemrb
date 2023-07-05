@@ -1419,7 +1419,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		return;
 	}
 
-	Point dest = target->Pos;
+	Point dest = target->Pos + parameters->pointParameter; // MoveToObjectOffset adds an offset
 	if (target->Type == ST_TRIGGER && static_cast<const InfoPoint*>(target)->GetUsePoint()) {
 		dest = static_cast<const InfoPoint*>(target)->UsePoint;
 	}

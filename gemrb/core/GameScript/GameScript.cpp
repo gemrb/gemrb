@@ -509,6 +509,8 @@ static const ActionLink actionnames[] = {
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},
 	{"addxpvar", GameScript::AddXPVar, AF_INSTANT},
+	{"addxpworth", GameScript::AddXPWorth, 0},
+	{"addxpworthonce", GameScript::AddXPWorth, 0},
 	{"advancetime", GameScript::AdvanceTime, 0},
 	{"allowarearesting", GameScript::SetAreaRestFlag, 0},//iwd2
 	{"ally", GameScript::Ally, 0},
@@ -622,11 +624,14 @@ static const ActionLink actionnames[] = {
 	{"displaymessage", GameScript::DisplayMessage, 0},
 	{"displaystring", GameScript::DisplayString, 0},
 	{"displaystringhead", GameScript::DisplayStringHead, 0},
+	{"displaystringheadnolog", GameScript::DisplayStringHeadNoLog, 0},
 	{"displaystringheadowner", GameScript::DisplayStringHeadOwner, 0},
 	{"displaystringheaddead", GameScript::DisplayStringHead, 0}, //same?
 	{"displaystringnoname", GameScript::DisplayStringNoName, 0},
+	{"displaystringnonamedlg", GameScript::DisplayStringNoName, 0},
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead, 0},
 	{"displaystringpoint", GameScript::FloatMessageFixed, 0}, // can customize color, maybe a different font, otherwise the same
+	{"displaystringpointlog", GameScript::FloatMessageFixed, 0}, // same, but force also printing to message window?
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
 	{"doubleclicklbuttonobject", GameScript::DoubleClickLButtonObject, AF_BLOCKING},
 	{"doubleclicklbuttonpoint", GameScript::DoubleClickLButtonPoint, AF_BLOCKING},
@@ -697,6 +702,7 @@ static const ActionLink actionnames[] = {
 	{"formation", GameScript::Formation, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
 	{"fullhealex", GameScript::FullHeal, 0}, //pst, not sure what's different
+	{"gameover", GameScript::QuitGame, 0},
 	{"generatemodronmaze", GameScript::GenerateMaze, 0},
 	{"generatepartymember", GameScript::GeneratePartyMember, 0},
 	{"getitem", GameScript::GetItem, 0},
@@ -705,6 +711,7 @@ static const ActionLink actionnames[] = {
 	{"givegoldforce", GameScript::CreatePartyGold, 0}, //this is the same
 	{"giveitem", GameScript::GiveItem, 0},
 	{"giveitemcreate", GameScript::CreateItem, 0}, //actually this is a targeted createitem
+	{"giveobjectgoldglobal", GameScript::GiveObjectGoldGlobal, 0},
 	{"giveorder", GameScript::GiveOrder, 0},
 	{"givepartyallequipment", GameScript::GivePartyAllEquipment, 0},
 	{"givepartygold", GameScript::GivePartyGold, 0},
@@ -743,11 +750,13 @@ static const ActionLink actionnames[] = {
 	{"incrementchapter", GameScript::IncrementChapter, 0},
 	{"incrementextraproficiency", GameScript::IncrementExtraProficiency, 0},
 	{"incrementglobal", GameScript::IncrementGlobal,AF_MERGESTRINGS},
-	{"incrementglobalonce", GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
+	{"incrementglobalonce", GameScript::IncrementGlobalOnce, AF_MERGESTRINGS},
+	{"incrementglobalonceex", GameScript::IncrementGlobalOnce, 0},
 	{"incrementkillstat", GameScript::IncrementKillStat, 0},
 	{"incrementproficiency", GameScript::IncrementProficiency, 0},
 	{"interact", GameScript::Interact, 0},
 	{"joinparty", GameScript::JoinParty, 0}, //this action appears to be blocking in bg2
+	{"joinpartyoverride", GameScript::JoinParty, 0}, // TODO: ee, seems to be there just to enable use in ActionOverride?? Why another action?
 	{"journalentrydone", GameScript::SetQuestDone, 0},
 	{"jumptoobject", GameScript::JumpToObject, 0},
 	{"jumptopoint", GameScript::JumpToPoint, 0},
@@ -777,6 +786,7 @@ static const ActionLink actionnames[] = {
 	{"matchhp", GameScript::MatchHP, 0},
 	{"movebetweenareas", GameScript::MoveBetweenAreas, 0},
 	{"movebetweenareaseffect", GameScript::MoveBetweenAreas, 0},
+	{"movecontainercontents", GameScript::MoveContainerContents, 0},
 	{"movecursorpoint", GameScript::MoveCursorPoint, 0},//immediate move
 	{"moveglobal", GameScript::MoveGlobal, 0},
 	{"moveglobalobject", GameScript::MoveGlobalObject, 0},
@@ -784,10 +794,12 @@ static const ActionLink actionnames[] = {
 	{"moveglobalsto", GameScript::MoveGlobalsTo, 0},
 	{"transferinventory", GameScript::MoveInventory, 0},
 	{"movetocenterofscreen", GameScript::MoveToCenterOfScreen,AF_BLOCKING},
+	{"movetocampaign", GameScript::MoveToCampaign, AF_BLOCKING},
 	{"movetoexpansion", GameScript::MoveToExpansion,AF_BLOCKING},
 	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING|AF_ALIVE},
 	{"movetoobjectfollow", GameScript::MoveToObjectFollow,AF_BLOCKING|AF_ALIVE},
 	{"movetoobjectnointerrupt", GameScript::MoveToObjectNoInterrupt,AF_BLOCKING|AF_ALIVE},
+	{"movetoobjectoffset", GameScript::MoveToObject, AF_BLOCKING | AF_ALIVE},
 	{"movetoobjectuntilsee", GameScript::MoveToObjectUntilSee,AF_BLOCKING|AF_ALIVE},
 	{"movetooffset", GameScript::MoveToOffset,AF_BLOCKING|AF_ALIVE},
 	{"movetopoint", GameScript::MoveToPoint,AF_BLOCKING|AF_ALIVE},
@@ -868,6 +880,8 @@ static const ActionLink actionnames[] = {
 	{"reputationinc", GameScript::ReputationInc, 0},
 	{"reputationset", GameScript::ReputationSet, 0},
 	{"resetfogofwar", GameScript::UndoExplore, 0}, //pst
+	{"resetmorale", GameScript::ResetMorale, 0},
+	{"resetplayerai", GameScript::ResetPlayerAI, 0},
 	{"rest", GameScript::Rest, AF_ALIVE},
 	{"restnospells", GameScript::RestNoSpells, 0},
 	{"restorepartylocations", GameScript:: RestorePartyLocation, 0},
@@ -903,7 +917,7 @@ static const ActionLink actionnames[] = {
 	{"setapparentnamestrref", GameScript::SetApparentName, 0},
 	{"setareaflags", GameScript::SetAreaFlags, 0},
 	{"setarearestflag", GameScript::SetAreaRestFlag, 0},
-	{"setareascript", GameScript::ChangeAIScript, 0},
+	{"setareascript", GameScript::SetAreaScript, 0},
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags, 0},
 	{"setbestweapon", GameScript::SetBestWeapon, 0},
 	{"setcorpseenabled", GameScript::AmbientActivate, 0},//another weird name
@@ -911,6 +925,7 @@ static const ActionLink actionnames[] = {
 	{"setcursorstate", GameScript::SetCursorState, 0},
 	{"setcreatureareaflag", GameScript::SetCreatureAreaFlag, 0},
 	{"setcriticalpathobject", GameScript::SetCriticalPathObject, 0},
+	{"setcutscenebreakable", GameScript::SetCutSceneBreakable, 0},
 	{"setdialog", GameScript::SetDialogue,0},
 	{"setdialogrange", GameScript::SetDialogueRange, 0},
 	{"setdialogue", GameScript::SetDialogue,0},
@@ -974,6 +989,7 @@ static const ActionLink actionnames[] = {
 	{"setupwish", GameScript::SetupWish, 0},
 	{"setupwishobject", GameScript::SetupWishObject, 0},
 	{"setvisualrange", GameScript::SetVisualRange, 0},
+	{"setworldmap", GameScript::SetWorldmap, 0},
 	{"sg", GameScript::SG, 0},
 	{"shout", GameScript::Shout, 0},
 	{"sinisterpoof", GameScript::CreateVisualEffect, 0},
@@ -1026,10 +1042,12 @@ static const ActionLink actionnames[] = {
 	{"storepartylocations", GameScript::StorePartyLocation, 0},
 	{"swing", GameScript::Swing, AF_ALIVE},
 	{"swingonce", GameScript::SwingOnce, AF_ALIVE},
+	{"takecreatureitems", GameScript::TakeCreatureItems, 0},
 	{"takeitemlist", GameScript::TakeItemList, 0},
 	{"takeitemlistparty", GameScript::TakeItemListParty, 0},
 	{"takeitemlistpartynum", GameScript::TakeItemListPartyNum, 0},
 	{"takeitemreplace", GameScript::TakeItemReplace, 0},
+	{"takeobjectgoldglobal", GameScript::TakeObjectGoldGlobal, 0},
 	{"takepartygold", GameScript::TakePartyGold, 0},
 	{"takepartyitem", GameScript::TakePartyItem, 0},
 	{"takepartyitemall", GameScript::TakePartyItemAll, 0},
@@ -1064,6 +1082,7 @@ static const ActionLink actionnames[] = {
 	{"verbalconstant", GameScript::VerbalConstant, 0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead, 0},
 	{"wait", GameScript::Wait, AF_BLOCKING},
+	{"waitsync", GameScript::Wait, AF_BLOCKING},
 	{"waitanimation", GameScript::WaitAnimation,AF_BLOCKING},//iwd2
 	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING|AF_ALIVE},
 	{"weather", GameScript::Weather, 0},

@@ -979,6 +979,7 @@ public: //Script Functions
 	static void AddXP2DA(Scriptable *Sender, Action* parameters);
 	static void AddXPObject(Scriptable *Sender, Action* parameters);
 	static void AddXPVar(Scriptable *Sender, Action* parameters);
+	static void AddXPWorth(Scriptable* Sender, Action* parameters);
 	static void AdvanceTime(Scriptable *Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
@@ -1081,6 +1082,7 @@ public: //Script Functions
 	static void DisplayMessage(Scriptable* Sender, Action* parameters);
 	static void DisplayString(Scriptable* Sender, Action* parameters);
 	static void DisplayStringHead(Scriptable* Sender, Action* parameters);
+	static void DisplayStringHeadNoLog(Scriptable* Sender, Action* parameters);
 	static void DisplayStringHeadOwner(Scriptable* Sender, Action* parameters);
 	static void DisplayStringNoName(Scriptable* Sender, Action* parameters);
 	static void DisplayStringNoNameHead(Scriptable* Sender, Action* parameters);
@@ -1148,6 +1150,7 @@ public: //Script Functions
 	static void GetItem(Scriptable* Sender, Action* parameters);
 	static void GetStat(Scriptable* Sender, Action* parameters);
 	static void GiveItem(Scriptable* Sender, Action* parameters);
+	static void GiveObjectGoldGlobal(Scriptable* Sender, Action* parameters);
 	static void GiveOrder(Scriptable* Sender, Action* parameters);
 	static void GivePartyAllEquipment(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
@@ -1213,12 +1216,14 @@ public: //Script Functions
 	static void MoraleSet(Scriptable* Sender, Action* parameters);
 	static void MoveBetweenAreas(Scriptable* Sender, Action* parameters);
 	static void MoveBetweenAreasEffect(Scriptable* Sender, Action* parameters);
+	static void MoveContainerContents(Scriptable* Sender, Action* parameters);
 	static void MoveCursorPoint(Scriptable* Sender, Action* parameters);
 	static void MoveGlobal(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalObject(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalsTo(Scriptable* Sender, Action* parameters);
 	static void MoveInventory(Scriptable *Sender, Action* parameters);
+	static void MoveToCampaign(Scriptable* /*Sender*/, Action* parameters);
 	static void MoveToCenterOfScreen(Scriptable* Sender, Action* parameters);
 	static void MoveToExpansion(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
@@ -1284,6 +1289,8 @@ public: //Script Functions
 	static void RemoveWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
 	static void ReputationSet(Scriptable* Sender, Action* parameters);
+	static void ResetMorale(Scriptable* Sender, Action* parameters);
+	static void ResetPlayerAI(Scriptable* Sender, Action* parameters);
 	static void RestorePartyLocation(Scriptable *Sender, Action* parameters);
 	static void Rest(Scriptable *Sender, Action* parameters);
 	static void RestNoSpells(Scriptable *Sender, Action* parameters);
@@ -1313,12 +1320,14 @@ public: //Script Functions
 	static void SetApparentName(Scriptable* Sender, Action* parameters);
 	static void SetAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
+	static void SetAreaScript(Scriptable* Sender, Action* parameters);
 	static void SetArmourLevel(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
 	static void SetBestWeapon(Scriptable *Sender, Action *parameters);
 	static void SetCursorState(Scriptable* Sender, Action* parameters);
 	static void SetCreatureAreaFlag(Scriptable* Sender, Action* parameters);
 	static void SetCriticalPathObject(Scriptable* Sender, Action* parameters);
+	static void SetCutSceneBreakable(Scriptable* /*Sender*/, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetDialogueRange(Scriptable* Sender, Action* parameters);
 	static void SetDoorFlag(Scriptable* Sender, Action* parameters);
@@ -1376,6 +1385,7 @@ public: //Script Functions
 	static void SetupWish(Scriptable* Sender, Action* parameters);
 	static void SetupWishObject(Scriptable* Sender, Action* parameters);
 	static void SetVisualRange(Scriptable* Sender, Action* parameters);
+	static void SetWorldmap(Scriptable* /*Sender*/, Action* parameters);
 	static void SG(Scriptable* Sender, Action* parameters);
 	static void Shout(Scriptable* Sender, Action* parameters);
 	static void SmallWait(Scriptable* Sender, Action* parameters);
@@ -1419,10 +1429,12 @@ public: //Script Functions
 	static void StorePartyLocation(Scriptable *Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);
 	static void SwingOnce(Scriptable* Sender, Action* parameters);
+	static void TakeCreatureItems(Scriptable* Sender, Action* parameters);
 	static void TakeItemList(Scriptable* Sender, Action* parameters);
 	static void TakeItemListParty(Scriptable* Sender, Action* parameters);
 	static void TakeItemListPartyNum(Scriptable* Sender, Action* parameters);
 	static void TakeItemReplace(Scriptable* Sender, Action* parameters);
+	static void TakeObjectGoldGlobal(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TakePartyItem(Scriptable* Sender, Action* parameters);
 	static void TakePartyItemAll(Scriptable* Sender, Action* parameters);

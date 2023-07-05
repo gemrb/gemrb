@@ -847,6 +847,15 @@ void GameScript::CutSceneID(Scriptable *Sender, Action* /*parameters*/)
 	Log(DEBUG, "GameScript", "CutSceneID was called by {}!", Sender->GetScriptName());
 }
 
+// can the cutscene be skipped by pressing ESC?
+// use eg. SetAreaScript("cutskip2",OVERRIDE) to define a "failsafe" script
+// to execute when the cutscene is interrupted
+void GameScript::SetCutSceneBreakable(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	Log(ERROR, "GameScript", "SetCutSceneBreakable is not implemented yet!");
+	// TODO: ee, breakable = bool(parameters->int0Parameter)
+}
+
 static EffectRef fx_charm_ref = { "State:Charmed", -1 };
 
 void GameScript::Enemy(Scriptable* Sender, Action* /*parameters*/)
@@ -894,6 +903,27 @@ void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
 
 	//clearing the queue, and checking script level was intentionally removed
 	actor->SetScript( parameters->resref0Parameter, parameters->int0Parameter, false );
+}
+
+void GameScript::ResetPlayerAI(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* actor = Scriptable::As<Actor>(tar);
+	if (!actor) return;
+
+	static AutoTable partyAI = gamedata->LoadTable("partyai", true);
+	ResRef defaultAI = partyAI->QueryField(actor->GetScriptName(), "AI_SCRIPT");
+	// should we set 0 (SCR_OVERRIDE) instead, now it's the class slot?
+	// ees don't use .bs any more, so the false is always good
+	actor->SetScript(defaultAI, AI_SCRIPT_LEVEL, false);
+}
+
+// basically ChangeAIScript, but anyone can run it and it affects the area instead
+void GameScript::SetAreaScript(Scriptable* Sender, Action* parameters)
+{
+	Map* map = Sender->GetCurrentArea();
+	if (!map) return;
+	map->SetScript(parameters->resref0Parameter, parameters->int0Parameter, false);
 }
 
 // see sndslot.ids for strref1 meanings
@@ -1641,6 +1671,15 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	DisplayStringCore(target, strList->RandomRef(), DS_CONSOLE | DS_HEAD);
+}
+
+void GameScript::DisplayStringHeadNoLog(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* target = GetScriptableFromObject(Sender, parameters->objects[1]);
+	if (!target) return;
+
+	String msg = core->GetString(ieStrRef(parameters->int0Parameter));
+	target->overHead.SetText(std::move(msg));
 }
 
 //apparently this should not display over head (for actors)
@@ -2842,6 +2881,28 @@ void GameScript::TakePartyGold(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::TakeObjectGoldGlobal(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* actor = Scriptable::As<Actor>(tar);
+	if (!actor) return;
+
+	Actor::stat_t gold = actor->GetBase(IE_GOLD);
+	actor->SetBase(IE_GOLD, 0);
+	SetVariable(Sender, parameters->variable0Parameter, gold, parameters->resref1Parameter);
+}
+
+void GameScript::GiveObjectGoldGlobal(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* actor = Scriptable::As<Actor>(tar);
+	if (!actor) return;
+
+	ieDword gold = CheckVariable(Sender, parameters->string0Parameter, parameters->resref1Parameter);
+	actor->SetBase(IE_GOLD, actor->GetBase(IE_GOLD) + gold);
+	// no need to nullify the var, it was done manually
+}
+
 void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
@@ -2872,6 +2933,18 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::AddXPVar(Scriptable* /*Sender*/, Action* parameters)
 {
 	AddXPCore(parameters, true);
+}
+
+void GameScript::AddXPWorth(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* actor = Scriptable::As<Actor>(tar);
+	if (!actor) return;
+
+	int xp = actor->GetStat(IE_XPVALUE); // I guess
+	if (parameters->int0Parameter) actor->SetBase(IE_XPVALUE, 0);
+	core->GetGame()->ShareXP(xp, SX_DIVIDE);
+	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
@@ -2941,6 +3014,20 @@ void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	act->SetBase(IE_MORALE, act->GetBase(IE_MORALE) - parameters->int0Parameter);
+}
+
+// ee oddity
+void GameScript::ResetMorale(Scriptable* Sender, Action* parameters)
+{
+	Actor* act = Scriptable::As<Actor>(Sender);
+	if (!act) return;
+
+	act->SetBase(IE_MORALEBREAK, 1);
+	if (parameters->int0Parameter) {
+		act->SetBase(IE_MORALE, 0);
+	} else {
+		act->SetBase(IE_MORALE, 10);
+	}
 }
 
 void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
@@ -3253,22 +3340,18 @@ void GameScript::IncrementGlobal(Scriptable* Sender, Action* parameters)
 		value + parameters->int0Parameter );
 }
 
-/* adding the number to the global ONLY if the first global is zero */
+// adding the number to the global ONLY if the first global is zero
+// only user: 0901tria.baf:    IncrementGlobalOnce("Evil_Trias_2","GLOBAL","Good","GLOBAL",-1)
 void GameScript::IncrementGlobalOnce(Scriptable* Sender, Action* parameters)
 {
-	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	if (value != 0) {
 		return;
 	}
-	//todo:the actual behaviour of this opcode may need to be verified, as this is
-	//just a best guess at how the two parameters are changed, and could
-	//well be more complex; the original usage of this function is currently
-	//not well understood (relates to hardcoded alignment changes)
-	SetVariable( Sender, parameters->string0Parameter, 1 );
+	SetVariable(Sender, parameters->string0Parameter, 1);
 
-	value = CheckVariable( Sender, parameters->string1Parameter );
-	SetVariable( Sender, parameters->string1Parameter,
-		value + parameters->int0Parameter );
+	value = CheckVariable(Sender, parameters->string1Parameter);
+	SetVariable(Sender, parameters->string1Parameter, ieDword(int(value) + parameters->int0Parameter));
 }
 
 void GameScript::GlobalSubGlobal(Scriptable* Sender, Action* parameters)
@@ -4182,6 +4265,38 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 	if (ASI_SUCCESS != scr->inventory.AddSlotItem(item,slot)) {
 		Map *map = scr->GetCurrentArea();
 		map->AddItemToLocation(Sender->Pos, item);
+	}
+}
+
+void GameScript::TakeCreatureItems(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Actor* victim = Scriptable::As<Actor>(tar);
+	Actor* taker = Scriptable::As<Actor>(Sender);
+	if (!victim || !taker) return;
+
+	// slot types are special, see takeitm.ids
+	// 2 EQUIPPED has to be handled separately
+	std::vector<ieDword> takeItm = { SLOT_ALL, SLOT_INVENTORY, 0, SLOT_WEAPON, SLOT_ITEM };
+	if (parameters->int0Parameter == 2) {
+		int eqs = victim->inventory.GetEquippedSlot();
+		const CREItem* slot = victim->inventory.GetSlotItem(eqs);
+		if (!slot) return;
+		MoveItemCore(victim, taker, slot->ItemResRef, 0, 0);
+		return;
+	}
+
+	int maxCount = static_cast<int>(core->SlotTypes);
+	for (int i = 0; i < maxCount; i++) {
+		ieDword id = core->QuerySlot(i);
+		ieDword sType = core->QuerySlotType(id);
+		if (!(sType & takeItm[parameters->int0Parameter])) {
+			continue;
+		}
+
+		const CREItem* slot = victim->inventory.GetSlotItem(id);
+		if (!slot) continue;
+		MoveItemCore(victim, taker, slot->ItemResRef, 0, 0);
 	}
 }
 
@@ -5725,6 +5840,42 @@ void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 			CREItem* item = pile->RemoveItem(i, 0);
 			otherPile->AddItem(item);
 		}
+	}
+}
+
+void GameScript::MoveContainerContents(Scriptable* Sender, Action* parameters)
+{
+	const Map* map1 = Sender->GetCurrentArea();
+	const Map* map2 = map1;
+	ieVariable con1;
+	ieVariable con2;
+	Game* game = core->GetGame();
+	// do the container names have area name prefixes? Eg. BD0103.BCS:
+	// MoveContainerContents("BD0120*Imoen_import_eq","BD0103*Imoen_equipment")
+	auto strParam = Explode<StringParam, ieVariable>(parameters->string0Parameter, '*');
+	if (strParam.size() > 1) {
+		map1 = game->GetMap(strParam[0], false);
+		if (!map1) return;
+		con1 = strParam[1];
+	} else {
+		con1 = parameters->variable0Parameter;
+	}
+
+	strParam = Explode<StringParam, ieVariable>(parameters->string1Parameter, '*');
+	if (strParam.size() > 1) {
+		map2 = game->GetMap(strParam[0], false);
+		if (!map2) return;
+		con2 = strParam[1];
+	} else {
+		con2 = parameters->variable1Parameter;
+	}
+
+	Container* cont1 = map1->GetTileMap()->GetContainer(con1);
+	Container* cont2 = map2->GetTileMap()->GetContainer(con2);
+	unsigned int i = cont1->inventory.GetSlotCount();
+	while (i--) {
+		CREItem* item = cont1->RemoveItem(i, 0);
+		cont2->AddItem(item);
 	}
 }
 
@@ -7520,5 +7671,48 @@ void GameScript::DestroyGroundPiles(Scriptable* Sender, Action* /*parameters*/)
 		tm->CleanupContainer(pile);
 	}
 }
+
+void GameScript::SetWorldmap(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->UpdateWorldMap(parameters->resref0Parameter);
+}
+
+// TODO: ee, this action reinitializes important default values and resource
+// references based on definitions from campaign.2da, such as world scripts,
+// save folder name or starting area. Campaign refers to the name defined in
+// the first column of that table. Used eg. to switch from BGEE to SOD.
+// this approach complements our start.2da and should be unified
+// also check MoveToExpansion
+void GameScript::MoveToCampaign(Scriptable* /*Sender*/, Action* parameters)
+{
+	Log(ERROR, "GameScript", "MoveToCampaign is not implemented yet!");
+	core->UpdateWorldMap(parameters->resref0Parameter);
+}
+
+// TODO: ee, unknown SetNoWaitX(I:SetReset*Boolean); prevents WaitCounter being set??
+// TODO: ee, unknown ContinueGame(I:State*Boolean) unknown, called only before EndCredits, so potentially useless
+// TODO: ee, unclear if really useful DisableAI(O:Object*,I:Disable*Boolean) used in cutscenes
+// IESDP says: this action activates or deactivates all creature scripts of the given target depending on the second parameter.
+// ... but they're already disabled; is this used more to enable them despite cutscene logic?
+
+// TODO: ee, zoom actions
+// 412 ZoomLock(I:Lock*Boolean)
+// 	This action can be used to set zoom to 100%. When set to TRUE zoom factor is locked at 100% and can not be changed by user input. Setting it to FALSE restores the original zoom factor. The zoom lock state is not saved.
+//
+// 463 SetZoomViewport(P:Point*)
+// 	Changes the current zoom level to match the viewport size specified by the point parameter. The action has no effect if Zoom Lock has been enabled in the game options.
+//
+// 464 StoreZoomLevel()
+// 	Stores the current zoom level internally. It can be restored with RestoreZoomLevel(). The stored zoom level is not saved.
+//
+// 465 RestoreZoomLevel()
+// 	Restores the zoom level stored by a previous call of StoreZoomLevel(). The action has no effect if Zoom Lock has been enabled in the game options.
+
+// TODO: ee, voice channels actions
+// 470 WaitForVoiceChannel()
+// 	Delays actions until the voice channel of the active creature is ready to play a new sound.
+//
+// 471 PlaySoundThroughVoice(S:Sound*)
+// 	Plays the specified sound through the actor's voice channel. Uses GEM_SND_RELATIVE.
 
 }
