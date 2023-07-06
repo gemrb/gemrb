@@ -2747,13 +2747,13 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if(calendar) delete calendar;
 	calendar = new Calendar;
 
-	DataStream* gam_str = NULL;
-	DataStream* sav_str = NULL;
-	DataStream* wmp_str1 = NULL;
-	DataStream* wmp_str2 = NULL;
+	DataStream* gamStr = nullptr;
+	DataStream* savStr = nullptr;
+	DataStream* wmpStr1 = nullptr;
+	DataStream* wmpStr2 = nullptr;
 
-	Game* new_game = NULL;
-	WorldMapArray* new_worldmap = NULL;
+	Game* newGame = nullptr;
+	WorldMapArray* newWorldmap = nullptr;
 
 	LoadProgress(10);
 	if (!config.KeepCache) DelTree((const char *) config.CachePath, true);
@@ -2762,80 +2762,75 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	saveGameAREExtractor.changeSaveGame(sg);
 
 	// These are here because of the goto
-	PluginHolder<SaveGameMgr> gam_mgr;
-	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
+	PluginHolder<SaveGameMgr> gamMgr;
+	PluginHolder<WorldMapMgr> wmpMgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
 
-	if (sg == NULL) {
+	if (sg == nullptr) {
 		//Load the Default Game
-		gam_str = gamedata->GetResourceStream(GameNameResRef, IE_GAM_CLASS_ID);
-		sav_str = NULL;
-		wmp_str1 = gamedata->GetResourceStream(WorldMapName[0], IE_WMP_CLASS_ID);
+		gamStr = gamedata->GetResourceStream(GameNameResRef, IE_GAM_CLASS_ID);
+		savStr = nullptr;
+		wmpStr1 = gamedata->GetResourceStream(WorldMapName[0], IE_WMP_CLASS_ID);
 		if (!WorldMapName[1].IsEmpty()) {
-			wmp_str2 = gamedata->GetResourceStream(WorldMapName[1], IE_WMP_CLASS_ID);
+			wmpStr2 = gamedata->GetResourceStream(WorldMapName[1], IE_WMP_CLASS_ID);
 		}
 	} else {
-		gam_str = sg->GetGame();
-		sav_str = sg->GetSave();
+		gamStr = sg->GetGame();
+		savStr = sg->GetSave();
 
 		// extract the save early for ees, since they moved the wmp inside
 		if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 			PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
-			if (ai && ai->DecompressSaveGame(sav_str, saveGameAREExtractor) != GEM_OK) {
+			if (ai && ai->DecompressSaveGame(savStr, saveGameAREExtractor) != GEM_OK) {
 				goto cleanup;
 			}
-			delete sav_str;
-			sav_str = nullptr;
-			wmp_str1 = gamedata->GetResourceStream(WorldMapName[0], IE_WMP_CLASS_ID, true);
+			delete savStr;
+			savStr = nullptr;
+			wmpStr1 = gamedata->GetResourceStream(WorldMapName[0], IE_WMP_CLASS_ID, true);
 		} else {
-			wmp_str1 = sg->GetWmap(0);
+			wmpStr1 = sg->GetWmap(0);
 		}
 
 		if (!WorldMapName[1].IsEmpty()) { // TODO: ee
-			wmp_str2 = sg->GetWmap(1);
-			if (!wmp_str2) {
+			wmpStr2 = sg->GetWmap(1);
+			if (!wmpStr2) {
 				//upgrade an IWD game to HOW
-				wmp_str2 = gamedata->GetResourceStream(WorldMapName[1], IE_WMP_CLASS_ID);
+				wmpStr2 = gamedata->GetResourceStream(WorldMapName[1], IE_WMP_CLASS_ID);
 			}
 		}
 	}
 
-	if (!gam_str || !(wmp_str1 || wmp_str2) )
+	if (!gamStr || !(wmpStr1 || wmpStr2)) {
 		goto cleanup;
+	}
 
 	// Load GAM file
-	gam_mgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gam_str);
-	if (!gam_mgr)
-		goto cleanup;
+	gamMgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gamStr);
+	if (!gamMgr) goto cleanup;
 
-	new_game = gam_mgr->LoadGame(new Game(), ver_override);
-	if (!new_game)
-		goto cleanup;
+	newGame = gamMgr->LoadGame(new Game(), ver_override);
+	if (!newGame) goto cleanup;
 	UpdateActorConfig(); // so things that require Game can properly rerun
 
 	// Load WMP (WorldMap) file
-	if (!wmp_mgr)
-		goto cleanup;
+	if (!wmpMgr) goto cleanup;
+	if (!wmpMgr->Open(wmpStr1, wmpStr2)) goto cleanup;
 
-	if (!wmp_mgr->Open(wmp_str1, wmp_str2))
-		goto cleanup;
-
-	new_worldmap = wmp_mgr->GetWorldMapArray( );
-
-	wmp_str1 = NULL;
-	wmp_str2 = NULL;
+	newWorldmap = wmpMgr->GetWorldMapArray();
+	wmpStr1 = nullptr;
+	wmpStr2 = nullptr;
 
 	LoadProgress(20);
 	// Unpack SAV (archive) file to Cache dir, if we haven't done it above
-	if (sav_str) {
+	if (savStr) {
 		PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 		if (ai) {
-			if (ai->DecompressSaveGame(sav_str, saveGameAREExtractor) != GEM_OK) {
+			if (ai->DecompressSaveGame(savStr, saveGameAREExtractor) != GEM_OK) {
 				goto cleanup;
 			}
 		}
-		delete sav_str;
-		sav_str = NULL;
+		delete savStr;
+		savStr = nullptr;
 	}
 
 	// rarely caused crashes while loading, so stop the ambients
@@ -2847,19 +2842,19 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	delete game;
 	delete worldmap;
 
-	game = new_game;
-	worldmap = new_worldmap;
+	game = newGame;
+	worldmap = newWorldmap;
 
 	strings->OpenAux();
 	LoadProgress(70);
 	return;
 cleanup:
 	// Something went wrong, so try to clean after itself
-	delete new_game;
-	delete new_worldmap;
-	delete wmp_str1;
-	delete wmp_str2;
-	delete sav_str;
+	delete newGame;
+	delete newWorldmap;
+	delete wmpStr1;
+	delete wmpStr2;
+	delete savStr;
 
 	error("Core", "Unable to load game.");
 }
