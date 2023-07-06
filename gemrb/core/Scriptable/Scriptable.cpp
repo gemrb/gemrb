@@ -1815,6 +1815,7 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 void Highlightable::DetectTrap(int skill, ieDword actorID)
 {
 	if (!CanDetectTrap()) return;
+	if (TrapDetected) return;
 	if (!Scripts[0]) return;
 	if (skill >= 100 && skill != 256) skill = 100;
 
