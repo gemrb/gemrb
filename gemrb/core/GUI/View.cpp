@@ -83,39 +83,17 @@ void View::SetEventProxy(View* proxy)
 // TODO: while GemRB does support nested subviews, it does not (fully) support overlapping subviews (same superview, intersecting frame)
 // expect weird things to happen with them
 // this method takes the dirty region so the framework exists, but currently this just invalidates any intersecting subviews
-void View::MarkDirty(const Region* rgn)
+void View::MarkDirty(const Region* /*rgn*/)
 {
 	// TODO: we could implement partial redraws by storing the dirty region
 	// not much to gain at the moment, however
 
-	if (dirty) return;
-
 	dirty = true;
-
-	if (superView && !IsOpaque()) {
-		superView->DirtyBGRect(frame);
-	}
-
-	for (const auto& view : subViews) {
-		if (rgn) {
-			Region intersect = view->frame.Intersect(*rgn);
-			const Size& idims = intersect.size;
-			if (!idims.IsInvalid()) {
-				Point p = view->ConvertPointFromSuper(intersect.origin);
-				Region r = Region(p, idims);
-				view->MarkDirty(&r);
-			}
-		} else {
-			Point p = view->ConvertPointFromSuper(Point());
-			Region r = Region(p, Dimensions());
-			view->MarkDirty(&r);
-		}
-	}
 }
 
 void View::MarkDirty()
 {
-	return MarkDirty(NULL);
+	return MarkDirty(nullptr);
 }
 
 bool View::NeedsDraw() const
@@ -132,17 +110,14 @@ bool View::NeedsDraw() const
 	return false;
 }
 
-bool View::NeedsDrawRecursive() const
+void View::InvalidateSubviews()
 {
-	if (NeedsDraw()) {
-		return true;
+	for (View* subview : subViews) {
+		Region r = ConvertRegionFromSuper(frame);
+		r = r.Intersect(subview->frame);
+		r.origin = subview->ConvertPointFromSuper(r.origin);
+		subview->MarkDirty(&r);
 	}
-	
-	if (superView) {
-		return superView->NeedsDrawRecursive();
-	}
-	
-	return false;
 }
 
 bool View::IsVisible() const
@@ -171,34 +146,41 @@ bool View::IsReceivingEvents() const
 	return getEvents;
 }
 
-void View::DirtyBGRect(const Region& r, bool force) noexcept
+Regions View::DirtySuperViewRegions() const
 {
-	// no need to draw the parent BG for opaque views
-	if (superView && !IsOpaque()) {
-		Region rgn = frame.Intersect(Region(ConvertPointToSuper(r.origin), r.size));
-		superView->DirtyBGRect(rgn, force);
+	// since we dont support overlapping views...
+	// if we are opaque we cover everything and dont care about the superview
+	// if we arent but we need to redraw then we simply report our entire area
+
+	if (IsOpaque()) {
+		return {};
 	}
 
-	// if we are going to draw the entire BG, no need to compute and store this
-	if (!force && NeedsDrawRecursive())
-		return;
-
-	// do we want to intersect this too?
-	//Region bgRgn = Region(background->Frame.x, background->Frame.y, background->Frame.w, background->Height);
-	Region clip(Point(), Dimensions());
-	Region dirtyRect = r.Intersect(clip);
-	dirtyBGRects.push_back(dirtyRect);
+	if (NeedsDraw()) {
+		return { frame };
+	}
 	
-	MarkDirty(&dirtyRect);
+	Regions dirtyAreas;
+	for (const View* subview : subViews) {
+		Regions r = subview->DirtySuperViewRegions();
+		dirtyAreas.reserve(dirtyAreas.size() + r.size());
+		std::transform(r.begin(), r.end(), std::back_inserter(dirtyAreas), [this](const Region& rgn) {
+			return ConvertRegionToSuper(rgn);
+		});
+	}
+	return dirtyAreas;
 }
 
-void View::DrawSubviews()
+void View::DrawSubviews(bool drawBG)
 {
+	drawBG = drawBG && HasBackground();
 	for (View* subview : subViews) {
-		subview->Draw();
-		if (subview->IsAnimated() && !subview->IsOpaque()) {
-			DirtyBGRect(subview->frame, true);
+		if (drawBG && !subview->IsOpaque()) {
+			for (const Region& r : subview->DirtySuperViewRegions()) {
+				DrawBackground(&r);
+			}
 		}
+		subview->Draw();
 	}
 }
 
@@ -207,17 +189,22 @@ Region View::DrawingFrame() const
 	return Region(ConvertPointToWindow(Point(0,0)), Dimensions());
 }
 
+bool View::HasBackground() const
+{
+	return backgroundColor.a > 0 || background;
+}
+
 void View::DrawBackground(const Region* rgn) const
 {
 	Video* video = core->GetVideoDriver();
 	if (backgroundColor.a > 0) {
 		if (rgn) {
-			Point p = ConvertPointToWindow(rgn->origin);
-			video->DrawRect(Region(p, rgn->size), backgroundColor, true);
+			Region r = ConvertRegionToWindow(*rgn);
+			video->DrawRect(r, backgroundColor, true);
 		} else if (window) {
 			assert(superView);
-			Point p = superView->ConvertPointToWindow(frame.origin);
-			video->DrawRect(Region(p, Dimensions()), backgroundColor, true);
+			Region r = superView->ConvertRegionToWindow(frame);
+			video->DrawRect(r, backgroundColor, true);
 		} else {
 			// FIXME: this is a Window and we need this hack becasue Window::WillDraw() changed the coordinate system
 			video->DrawRect(Region(Point(), Dimensions()), backgroundColor, true);
@@ -233,7 +220,7 @@ void View::DrawBackground(const Region* rgn) const
 			Region intersect = rgn->Intersect(background->Frame);
 			Point screenPt = ConvertPointToWindow(intersect.origin);
 			Region toClip(screenPt, intersect.size);
-			video->BlitSprite(background, intersect, std::move(toClip), BlitFlags::BLENDED);
+			video->BlitSprite(background, intersect, toClip, BlitFlags::BLENDED);
 		} else {
 			Point dp = ConvertPointToWindow(Point(background->Frame.x, background->Frame.y));
 			video->BlitSprite(background, dp);
@@ -254,24 +241,18 @@ void View::Draw()
 	// clip drawing to the view bounds, then restore after drawing
 	video->SetScreenClip(&intersect);
 
-	bool needsDraw = NeedsDrawRecursive(); // check this before WillDraw else an animation update might get missed
+	bool needsDraw = NeedsDraw(); // check this before WillDraw else an animation update might get missed
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
 	WillDraw(drawFrame, intersect);
 
 	if (needsDraw) {
-		DrawBackground(NULL);
+		InvalidateSubviews();
+		DrawBackground(nullptr);
 		DrawSelf(drawFrame, intersect);
-	} else {
-		Regions::iterator it = dirtyBGRects.begin();
-		while (it != dirtyBGRects.end()) {
-			DrawBackground(&(*it++));
-		}
 	}
 
-	dirtyBGRects.clear();
-
 	// always call draw on subviews because they can be dirty without us
-	DrawSubviews();
+	DrawSubviews(!needsDraw);
 	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
 	dirty = false;
 
@@ -450,7 +431,7 @@ View* View::RemoveSubview(const View* view) noexcept
 	View* subView = *it;
 	assert(subView == view);
 	subViews.erase(it);
-	DirtyBGRect(subView->Frame());
+	MarkDirty();
 
 	subView->superView = NULL;
 	subView->RemovedFromView(this);
@@ -621,9 +602,9 @@ void View::SetFrameOrigin(const Point& p)
 	Point oldP = frame.origin;
 	if (oldP == p) return;
 	
-	MarkDirty(); // refresh the old position in the superview
 	frame.origin = p;
 	
+	MarkDirty();
 	OriginChanged(oldP);
 }
 
@@ -632,7 +613,6 @@ void View::SetFrameSize(const Size& s)
 	const Size oldSize = frame.size;
 	if (oldSize == s) return;
 
-	MarkDirty(); // refresh the old position in the superview
 	frame.w = std::max(0, s.w);
 	frame.h = std::max(0, s.h);
 
