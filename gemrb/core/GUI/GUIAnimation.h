@@ -144,7 +144,6 @@ public:
 	explicit SpriteAnimation(std::shared_ptr<const AnimationFactory> af, int Cycle = 0);
 	//report if the current resource is the same as descripted by the params
 	void SetPaletteGradients(const ieDword *col);
-	bool SameResource(const SpriteAnimation*) const;
 	bool HasEnded() const override;
 
 	tick_t Time() const { return nextFrameTime; }

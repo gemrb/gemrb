@@ -85,17 +85,6 @@ SpriteAnimation::SpriteAnimation(std::shared_ptr<const AnimationFactory> af, int
 	nextFrameTime = begintime + CalculateNextFrameDelta();
 }
 
-bool SpriteAnimation::SameResource(const SpriteAnimation *anim) const
-{
-	if (!anim || anim->bam->resRef != bam->resRef) return false;
-	uint8_t c = cycle;
-	if (flags & PLAY_RANDOM) {
-		c &= ~1;
-	}
-	if (anim->cycle != c) return false;
-	return true;
-}
-
 void SpriteAnimation::SetPaletteGradients(const ieDword *col)
 {
 	memcpy(colors, col, 8*sizeof(ieDword));

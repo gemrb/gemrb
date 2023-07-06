@@ -172,7 +172,6 @@ def UpdateMageWindow (MageWindow):
 	i = 0
 	for i in range (known_cnt):
 		Button = MageWindow.GetControl (27 + i)
-		Button.SetAnimation (None)
 		
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
@@ -188,7 +187,6 @@ def UpdateMageWindow (MageWindow):
 	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
 		Button = MageWindow.GetControl (27 + i)
-		Button.SetAnimation (None)
 		
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 		Button.OnPress (None)

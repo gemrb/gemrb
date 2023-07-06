@@ -652,17 +652,9 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 
 void Button::SetAnimation(SpriteAnimation* anim)
 {
-	// if this button says the resource is the same
-	// we wanted to set, we don't reset it
-	// but we must reinitialize it, if it was play once
-	if (animation && animation->SameResource(anim) && !(animation->flags & SpriteAnimation::PLAY_ONCE)) {
-		delete anim;
-		return;
-	} else {
-		delete animation;
-		animation = anim;
-		FlagsChanged(flags); // sync animation flags
-	}
+	delete animation;
+	animation = anim;
+	FlagsChanged(flags); // sync animation flags
 	
 	MarkDirty();
 }
