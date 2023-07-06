@@ -360,16 +360,14 @@ bool Button::IsAnimated() const
 
 bool Button::IsOpaque() const
 {
-	if (animation) {
-		// we are dirty every frame anyway
-		// so no need to get fancy
-		// just redraw everything
-		return false;
-	}
-
 	bool opaque = View::IsOpaque();
-	if (!opaque && Picture) {
-		opaque = !(flags&IE_GUI_BUTTON_NO_IMAGE) && !Picture->HasTransparency();
+	if (!opaque && animation && animation->Current())
+	{
+		auto AnimPicture = animation->Current();
+		opaque = !AnimPicture->HasTransparency();
+	}
+	if (!opaque && Picture && !(flags&IE_GUI_BUTTON_NO_IMAGE)) {
+		opaque = !Picture->HasTransparency();
 	}
 	
 	return opaque;
