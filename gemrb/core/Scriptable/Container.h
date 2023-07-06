@@ -57,6 +57,7 @@ public:
 	bool TryUnlock(Actor *actor) const;
 	std::string dump() const;
 	int TrapResets() const override { return Flags & CONT_RESET; }
+	bool CanDetectTrap() const override;
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();

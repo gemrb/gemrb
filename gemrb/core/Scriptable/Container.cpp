@@ -260,5 +260,9 @@ bool Container::TryUnlock(Actor *actor) const
 	return Highlightable::TryUnlock(actor, false);
 }
 
+bool Container::CanDetectTrap() const
+{
+	return Trapped && TrapDetectionDiff != 0;
+}
 
 }
