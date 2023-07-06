@@ -78,11 +78,6 @@ private:
 	std::vector<ViewScriptingRef*> scriptingRefs;
 
 	mutable bool dirty = true;
-
-	// TODO: we could/should generalize this
-	// MarkDirty could take a region, and more complicated views could potentially
-	// save a lot of drawing time by only drawing their dirty portions (GameControl?)
-	Regions dirtyBGRects;
 	
 	View* eventProxy = nullptr;
 
@@ -101,11 +96,12 @@ protected:
 	unsigned short autoresizeFlags = ResizeNone; // these flags don't produce notifications
 
 private:
-	void DirtyBGRect(const Region&, bool force = false) noexcept;
+	Regions DirtySuperViewRegions() const;
 	void DrawBackground(const Region*) const;
-	void DrawSubviews();
+	bool HasBackground() const;
+	void DrawSubviews(bool drawBG);
 	void MarkDirty(const Region*);
-	bool NeedsDrawRecursive() const;
+	void InvalidateSubviews();
 
 	// TODO: to support partial redraws, we should change the clip parameter to a list of dirty rects
 	// that have all been clipped to the video ScreenClip
@@ -159,6 +155,9 @@ protected:
 	virtual bool OnControllerAxis(const ControllerEvent&);
 	virtual bool OnControllerButtonDown(const ControllerEvent&);
 	virtual bool OnControllerButtonUp(const ControllerEvent&);
+	
+	virtual bool IsAnimated() const { return false; }
+	virtual bool IsOpaque() const;
 
 public:
 	#include "ViewInterfaces.h"
@@ -176,8 +175,6 @@ public:
 	void MarkDirty();
 	bool NeedsDraw() const;
 
-	virtual bool IsAnimated() const { return false; }
-	virtual bool IsOpaque() const;
 	virtual bool HitTest(const Point& p) const;
 
 	bool SetFlags(unsigned int arg_flags, BitOp opcode);
