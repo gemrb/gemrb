@@ -21,46 +21,17 @@
 #ifndef __GemRB__InterfaceConfig__
 #define __GemRB__InterfaceConfig__
 
+#include <string>
 #include <unordered_map>
 
 #include "exports.h"
 
-#include "Streams/DataStream.h"
-
 namespace GemRB {
 
-class GEM_EXPORT InterfaceConfig
-{
-private:
-	std::unordered_map<std::string, std::string> configVars;
+using InterfaceConfig = std::unordered_map<std::string, std::string>;
 
-public:
-	using key_t = std::string;
-	using value_t = std::string;
-
-	InterfaceConfig& operator=(const InterfaceConfig&) = delete;
-
-	void SetKeyValuePair(const key_t& key, const value_t& value);
-	const value_t* GetValueForKey(const key_t& key) const;
-	//const std::string* GetValueForKey(std::string* key) const;
-};
-
-// the defacto config class
-// any platform can use it, but many will want to have their own
-// that coan create a InterfaceConfig instance from non cfg sources
-class GEM_EXPORT CFGConfig : public InterfaceConfig
-{
-private:
-	bool isValid = false;
-
-private:
-	bool InitWithINIData(DataStream* cfgStream);
-
-public:
-	CFGConfig(int argc, char *argv[]);
-
-	bool IsValidConfig() const { return isValid; };
-};
+GEM_EXPORT InterfaceConfig LoadFromArgs(int argc, char *argv[]);
+GEM_EXPORT InterfaceConfig LoadFromCFG(const char* file);
 
 }
 

@@ -18,137 +18,22 @@
  *
  */
 
-#include "globals.h"
-
 #include "InterfaceConfig.h"
-#include "Logging/Logging.h"
 
+#include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 #include "System/VFS.h"
 
+#include <stdexcept>
+
 namespace GemRB {
 
-void InterfaceConfig::SetKeyValuePair(const key_t& key, const value_t& value)
+static InterfaceConfig LoadFromStream(DataStream& cfgStream)
 {
-	configVars[key] = value;
-}
-
-const InterfaceConfig::value_t* InterfaceConfig::GetValueForKey(const key_t& key) const
-{
-	const auto result = configVars.find(key);
-
-	return result != configVars.cend() ? &result->second : nullptr;
-}
-
-CFGConfig::CFGConfig(int argc, char *argv[])
-	: InterfaceConfig()
-{
-	FileStream* config = new FileStream();
-	// skip arg0 (it is just gemrb)
-	for (int i=1; i < argc; i++) {
-		if (stricmp(argv[i], "-c") == 0) {
-			const char* filename = argv[++i];
-
-			if (!config->Open(filename)) {
-				// Explicitly specified cfg file HAS to be present
-				Log(FATAL, "Config", "Failed to open config file \"{}\".", filename);
-			}
-			isValid = InitWithINIData(config);
-		} else if (stricmp(argv[i], "-q") == 0) {
-			// quiet mode
-			SetKeyValuePair("AudioDriver", "none");
-		} else {
-			// assume a path was passed, soft force configless startup
-			SetKeyValuePair("GamePath", argv[i]);
-			isValid = true;
-		}
-	}
-	if (!isValid) {
-		// nothing passed in on CLI, so search for gemrb.cfg
-		char datadir[_MAX_PATH];
-		char path[_MAX_PATH];
-		char name[_MAX_PATH];
-
-		// Find basename of this program. It does the same as basename (3),
-		// but that's probably missing on some archs
-		const char* appName = strrchr(argv[0], PathDelimiter);
-		if (appName) {
-			appName++;
-		} else {
-			appName = argv[0];
-		}
-
-		strlcpy(name, appName, _MAX_PATH);
-		assert(name[0]);
-
-#if TARGET_OS_MAC
-		// CopyGemDataPath would give us bundle resources dir
-		CopyHomePath(datadir, _MAX_PATH);
-		PathAppend(datadir, PACKAGE);
-#else
-		CopyGemDataPath(datadir, _MAX_PATH);
-#endif
-		PathJoinExt( path, datadir, name, "cfg" );
-
-#define ATTEMPT_INIT \
-if (config->Open(path) \
-	&& InitWithINIData(config)) { \
-		goto done; \
-	}
-
-		ATTEMPT_INIT;
-
-#ifdef SYSCONF_DIR
-		PathJoinExt( path, SYSCONF_DIR, name, "cfg" );
-		ATTEMPT_INIT
-#endif
-
-#ifndef ANDROID
-		// Now try ~/.gemrb folder
-		CopyHomePath(datadir, _MAX_PATH);
-		char confpath[_MAX_PATH] = ".";
-		strcat(confpath, name);
-		PathJoin(datadir, datadir, confpath, nullptr);
-		PathJoinExt( path, datadir, name, "cfg" );
-		ATTEMPT_INIT;
-#endif
-		// Don't try with default binary name if we have tried it already
-		if (strcmp( name, PACKAGE ) != 0) {
-			PathJoinExt( path, datadir, PACKAGE, "cfg" );
-
-			ATTEMPT_INIT;
-
-#ifdef SYSCONF_DIR
-			PathJoinExt( path, SYSCONF_DIR, PACKAGE, "cfg" );
-			ATTEMPT_INIT;
-#endif
-		}
-		// if all else has failed try current directory
-		PathJoinExt(path, "./", PACKAGE, "cfg");
-		ATTEMPT_INIT;
-	}
-#undef ATTEMPT_INIT
-done:
-	delete config;
-}
-
-bool CFGConfig::InitWithINIData(DataStream* cfgStream)
-{
-	if (cfgStream == NULL) {
-		return false;
-	}
-
-	if (isValid) {
-		Log(WARNING, "Config", "attempting to replace config values with contents of {}", cfgStream->filename);
-	} else {
-		Log(MESSAGE, "Config", "attempting to initialize config with {} found at:", cfgStream->filename);
-	}
-	Log(MESSAGE, "Config", "{}", cfgStream->originalfile);
-
-	isValid = false;
+	InterfaceConfig settings;
 	int lineno = 0;
 	std::string line;
-	while (cfgStream->ReadLine(line) != DataStream::Error) {
+	while (cfgStream.ReadLine(line) != DataStream::Error) {
 		lineno++;
 
 		// skip leading blanks from name
@@ -171,11 +56,130 @@ bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 		auto& val = parts[1];
 		TrimString(val);
 
-		SetKeyValuePair(key, val);
+		settings[key] = std::move(val);
 	}
-	isValid = true;
-	return true;
+	return settings;
 }
 
+static InterfaceConfig LoadDefaultCFG(const char* appName)
+{
+	// nothing passed in on CLI, so search for gemrb.cfg
+	char datadir[_MAX_PATH];
+	char path[_MAX_PATH];
+	char name[_MAX_PATH];
+
+	strlcpy(name, appName, _MAX_PATH);
+	assert(name[0]);
+
+#if TARGET_OS_MAC
+	// CopyGemDataPath would give us bundle resources dir
+	CopyHomePath(datadir, _MAX_PATH);
+	PathAppend(datadir, PACKAGE);
+#else
+	CopyGemDataPath(datadir, _MAX_PATH);
+#endif
+	PathJoinExt(path, datadir, name, "cfg");
+	
+	FileStream cfgStream;
+	if (cfgStream.Open(path)) {
+		return LoadFromStream(cfgStream);
+	}
+
+#ifdef SYSCONF_DIR
+	PathJoinExt( path, SYSCONF_DIR, name, "cfg" );
+	if (cfgStream.Open(path))
+	{
+		return LoadFromStream(cfgStream);
+	}
+#endif
+
+#ifndef ANDROID
+	// Now try ~/.gemrb folder
+	CopyHomePath(datadir, _MAX_PATH);
+	char confpath[_MAX_PATH] = ".";
+	strcat(confpath, name);
+	PathJoin(datadir, datadir, confpath, nullptr);
+	PathJoinExt( path, datadir, name, "cfg" );
+	
+	if (cfgStream.Open(path))
+	{
+		return LoadFromStream(cfgStream);
+	}
+#endif
+	// Don't try with default binary name if we have tried it already
+	if (strcmp( name, PACKAGE ) != 0) {
+		PathJoinExt(path, datadir, PACKAGE, "cfg");
+
+		if (cfgStream.Open(path))
+		{
+			return LoadFromStream(cfgStream);
+		}
+
+#ifdef SYSCONF_DIR
+		PathJoinExt(path, SYSCONF_DIR, PACKAGE, "cfg");
+		
+		if (cfgStream.Open(path))
+		{
+			return LoadFromStream(cfgStream);
+		}
+#endif
+	}
+	// if all else has failed try current directory
+	PathJoinExt(path, "./", PACKAGE, "cfg");
+	
+	if (cfgStream.Open(path))
+	{
+		return LoadFromStream(cfgStream);
+	}
+	
+	return {}; // we don't require a config
 }
 
+InterfaceConfig LoadFromArgs(int argc, char *argv[])
+{
+	InterfaceConfig settings;
+	bool loadedCFG = false;
+	// skip arg0 (it is just gemrb)
+	for (int i=1; i < argc; i++) {
+		if (stricmp(argv[i], "-c") == 0) {
+			auto CFGsettings = LoadFromCFG(argv[++i]);
+			// settings passed on the CLI override anything in the file
+			settings.insert(CFGsettings.begin(), CFGsettings.end());
+			loadedCFG = true;
+		} else if (stricmp(argv[i], "-q") == 0) {
+			// quiet mode
+			settings["AudioDriver"] = "none";
+		} else {
+			// assume a path was passed, soft force configless startup
+			settings["GamePath"] = argv[i];
+		}
+	}
+	
+	if (loadedCFG == false)
+	{
+		// Find basename of this program. It does the same as basename (3),
+		// but that's probably missing on some archs
+		const char* appName = strrchr(argv[0], PathDelimiter);
+		if (appName) {
+			appName++;
+		} else {
+			appName = argv[0];
+		}
+		auto CFGsettings = LoadDefaultCFG(appName);
+		// settings passed on the CLI override anything in the file
+		settings.insert(CFGsettings.begin(), CFGsettings.end());
+	}
+	return settings;
+}
+
+InterfaceConfig LoadFromCFG(const char* file)
+{
+	FileStream cfgStream;
+	if (!cfgStream.Open(file)) {
+		throw std::runtime_error(std::string("File not found: ") + file);
+	}
+
+	return LoadFromStream(cfgStream);
+}
+
+} // namespace GemRB

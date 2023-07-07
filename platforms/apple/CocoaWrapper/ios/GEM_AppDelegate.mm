@@ -107,19 +107,17 @@ using namespace GemRB;
 		setenv("PYTHONHOME", "Documents/python", 1);
 		setenv("PYTHONPATH", "Documents/python/lib/python27", 1);
 		core = new Interface();
-		CFGConfig* config = new CFGConfig(argc, argv);
-		free(argv);
-		if ((ret = core->Init(config)) == GEM_ERROR) {
-			delete config;
-			delete( core );
+		if ((ret = core->Init(LoadFromArgs(argc, argv))) == GEM_ERROR) {
+			free(argv);
+			delete core;
 			Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Relaunching wraper.");
 			// reload the wrapper interface so we can try again instead of dying
 			[self setupWrapper];
 		} else {
+			free(argv);
 			// pass control to GemRB
-			delete config;
 			core->Main();
-			delete( core );
+			delete core;
 			// We must exit since the application runloop never returns.
 			exit(ret);
 		}

@@ -466,7 +466,7 @@ public:
 	
 	Interface(const Interface&) = delete;
 	
-	int Init(const InterfaceConfig* config);
+	int Init(InterfaceConfig config);
 	//TODO: Core Methods in Interface Class
 	void SetFeature(GFFlags flag);
 	void ClearFeature(GFFlags flag);

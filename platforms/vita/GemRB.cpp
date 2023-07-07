@@ -90,11 +90,9 @@ int main(int argc, char* argv[])
 	Py_NoUserSiteDirectory = 1;
 
 	core = new Interface();
-	CFGConfig* config = new CFGConfig(argc, argv);
 
-	if (core->Init( config ) == GEM_ERROR) {
-		delete config;
-		delete( core );
+	if (core->Init(LoadFromArgs(argc, argv)) == GEM_ERROR) {
+		delete core;
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ToggleLogging(false);
 		return sceKernelExitProcess(-1);
