@@ -62,9 +62,9 @@ namespace GemRB {
 // represents the byte position of the stream
 using strpos_t = size_t;
 // represents the number of bytes read or written. -1 on error
-using strret_t = typename std::make_signed<strpos_t>::type;
+using strret_t = std::make_signed_t<strpos_t>;
 // represents on offset to a strpos_t
-using stroff_t = typename std::make_signed<strpos_t>::type;
+using stroff_t = std::make_signed_t<strpos_t>;
 
 class GEM_EXPORT DataStream {
 public:
@@ -105,9 +105,9 @@ public:
 	}
 	
 	template <typename ENUM>
-	typename std::enable_if<std::is_enum<ENUM>::value, strret_t>::type
+	std::enable_if_t<std::is_enum<ENUM>::value, strret_t>
 	ReadEnum(ENUM& dest) {
-		typename std::underlying_type<ENUM>::type scalar;
+		std::underlying_type_t<ENUM> scalar;
 		strret_t ret = ReadScalar(scalar);
 		dest = static_cast<ENUM>(scalar);
 		return ret;
@@ -134,9 +134,9 @@ public:
 	}
 	
 	template <typename ENUM>
-	typename std::enable_if<std::is_enum<ENUM>::value, strret_t>::type
+	std::enable_if_t<std::is_enum<ENUM>::value, strret_t>
 	WriteEnum(const ENUM& dest) {
-		return WriteScalar(static_cast<typename std::underlying_type<ENUM>::type>(dest));
+		return WriteScalar(static_cast<std::underlying_type_t<ENUM>>(dest));
 	}
 	
 	strret_t WriteFilling(strpos_t len);

@@ -42,7 +42,7 @@ namespace GemRB {
 using String = std::basic_string<wchar_t>;
 
 template <typename STR>
-using StringViewT = StringViewImp<typename std::add_const<typename STR::value_type>::type>;
+using StringViewT = StringViewImp<std::add_const_t<typename STR::value_type>>;
 
 template <typename STR>
 STR StringFromView(StringViewT<STR> sv)

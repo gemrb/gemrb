@@ -31,7 +31,7 @@
 namespace GemRB {
 
 template <typename ENUM, typename ARG = under_t<ENUM>>
-// constexpr // FIXME: make this constexpr in c++14, assert cannot be used in constexper before then
+constexpr
 ENUM EnumIndex(ARG val) noexcept
 {
 	static_assert(std::is_same<under_t<ENUM>, ARG>::value, "Will not implicitly convert to EnumIndex");

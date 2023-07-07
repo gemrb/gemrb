@@ -257,7 +257,7 @@ View::UniqueDragOp Control::DragOperation()
 
 		actionTimer = &core->SetTimer(h, 0, 0);
 	}
-	return GemRB::make_unique<ControlDragOp>(this);
+	return std::make_unique<ControlDragOp>(this);
 }
 
 bool Control::AcceptsDragOperation(const DragOp& dop) const

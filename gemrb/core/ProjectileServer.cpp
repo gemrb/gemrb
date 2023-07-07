@@ -101,7 +101,7 @@ Projectile *ProjectileServer::CreateDefaultProjectile(size_t idx)
 	}
 
 	pro->SetIdentifiers(projectiles[idx].resname, idx);
-	projectiles[idx].projectile = make_unique<Projectile>(*pro);
+	projectiles[idx].projectile = std::make_unique<Projectile>(*pro);
 	
 	return pro;
 }
@@ -203,7 +203,7 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 		pro->Extension->APFlags = explosions[Type].flags;
 	}
 
-	projectiles[idx].projectile = make_unique<Projectile>(*pro);
+	projectiles[idx].projectile = std::make_unique<Projectile>(*pro);
 	return pro;
 }
 

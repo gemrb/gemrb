@@ -85,13 +85,13 @@ public:
 
 /* MSVC must not see an abstract type _anywhere_ going into a `new` or `make_shared`. */
 template<class T>
-	std::shared_ptr<typename std::enable_if<!std::is_abstract<T>::value, T>::type>
+	std::shared_ptr<std::enable_if_t<!std::is_abstract<T>::value, T>>
 MakeImporter() noexcept {
 	return std::make_shared<T>();
 }
 
 template<class T>
-	std::shared_ptr<typename std::enable_if<std::is_abstract<T>::value, T>::type>
+	std::shared_ptr<std::enable_if_t<std::is_abstract<T>::value, T>>
 MakeImporter() noexcept {
 	return {};
 }

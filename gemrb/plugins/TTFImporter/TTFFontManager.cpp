@@ -53,8 +53,7 @@ bool TTFFontManager::Import(DataStream* stream)
 	Close();
 	if (stream) {
 		FT_Error error;
-
-		ftStream = new std::remove_pointer<FT_Stream>::type{};
+		ftStream = new std::remove_pointer_t<FT_Stream>{};
 		ftStream->read = [](FT_Stream TTFStream, unsigned long	offset, unsigned char* buffer, unsigned long count)
 		-> unsigned long {
 			DataStream* dstream = static_cast<DataStream*>(TTFStream->descriptor.pointer);

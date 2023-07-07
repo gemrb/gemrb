@@ -129,7 +129,7 @@ public:
 		TypeInterface* ptr = nullptr;
 		
 		template<typename T>
-		using Concrete_t = ConcreteType<typename std::add_const<T>::type>;
+		using Concrete_t = ConcreteType<std::add_const_t<T>>;
 
 	public:
 		template <typename T>
