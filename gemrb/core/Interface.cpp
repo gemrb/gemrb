@@ -2266,13 +2266,13 @@ Interface::tokens_t& Interface::GetTokenDictionary() {
 	return tokens;
 }
 
-String Interface::GetToken(const std::string& key, String && fallback) const {
+const String& Interface::GetToken(const std::string& key, const String& fallback) const {
 	auto lookup = tokens.find(key);
 	if (lookup != tokens.cend()) {
 		return lookup->second;
 	}
 
-	return {std::move(fallback)};
+	return fallback;
 }
 
 /** Get the Music Manager */

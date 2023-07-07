@@ -523,7 +523,7 @@ public:
 	variables_t::mapped_type GetVariable(const variables_t::key_type& key, int fallback) const;
 	/** Get the Token Dictionary */
 	tokens_t& GetTokenDictionary();
-	String GetToken(const std::string& key, String && fallback) const;
+	const String& GetToken(const std::string& key, const String& fallback) const;
 	/** Get the Music Manager */
 	MusicMgr * GetMusicMgr() const;
 	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
