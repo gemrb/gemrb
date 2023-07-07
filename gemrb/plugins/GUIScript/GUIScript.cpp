@@ -4109,7 +4109,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	char *value;
 	PARSE_ARGS( args,  "Os", &Variable, &value );
 	auto wsValue = StringFromCString(value);
-	core->GetTokenDictionary()[ieVariableFromPy(Variable)] = *wsValue;
+	core->GetTokenDictionary()[ieVariableFromPy(Variable)] = std::move(*wsValue);
 	delete wsValue;
 
 	Py_RETURN_NONE;

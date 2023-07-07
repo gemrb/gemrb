@@ -7470,7 +7470,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 		ieVariable tokenname = tm->GetRowName(i);
 
 		auto wideString = StringFromCString(tm->QueryField(i, j).c_str());
-		core->GetTokenDictionary()[tokenname] = *wideString;
+		core->GetTokenDictionary()[tokenname] = std::move(*wideString);
 		delete wideString;
 	}
 }
@@ -7585,7 +7585,7 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 	}
 
 	auto favouriteWideString = StringFromCString(favourite.c_str());
-	core->GetTokenDictionary()["FAVOURITESPELL"] = *favouriteWideString;
+	core->GetTokenDictionary()["FAVOURITESPELL"] = std::move(*favouriteWideString);
 	delete favouriteWideString;
 	SetTokenAsString("FAVOURITESPELLNUM", maxUses);
 
@@ -7604,7 +7604,7 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 	}
 
 	favouriteWideString = StringFromCString(favourite.c_str());
-	core->GetTokenDictionary()["FAVOURITEWEAPON"] = *favouriteWideString;
+	core->GetTokenDictionary()["FAVOURITEWEAPON"] = std::move(*favouriteWideString);
 	delete favouriteWideString;
 	SetTokenAsString("FAVOURITESPELLNUM", maxUses);
 
