@@ -3183,14 +3183,14 @@ void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
 	//SetAt takes a newly created reference (no need of free/copy)
 	String str = core->GetString(ieStrRef(parameters->int0Parameter));
-	core->GetTokenDictionary()[parameters->string0Parameter.c_str()] = std::move(str);
+	core->GetTokenDictionary()[parameters->variable0Parameter] = std::move(str);
 }
 
 //Assigns a numeric variable to the token
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = CheckVariable( Sender, parameters->string0Parameter );
-	SetTokenAsString(parameters->string1Parameter.c_str(), value);
+	SetTokenAsString(parameters->variable1Parameter, value);
 }
 
 //Assigns the target object's name (not scriptname) to the token
@@ -3201,7 +3201,7 @@ void GameScript::SetTokenObject(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	core->GetTokenDictionary()[parameters->string0Parameter.c_str()] =
+	core->GetTokenDictionary()[parameters->variable0Parameter] =
 		actor->GetShortName();
 }
 
@@ -7466,7 +7466,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 		ieVariable tokenname = tm->GetRowName(i);
 
 		auto wideString = StringFromCString(tm->QueryField(i, j).c_str());
-		core->GetTokenDictionary()[tokenname.c_str()] = *wideString;
+		core->GetTokenDictionary()[tokenname] = *wideString;
 		delete wideString;
 	}
 }

@@ -4109,7 +4109,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	char *value;
 	PARSE_ARGS( args,  "Os", &Variable, &value );
 	auto wsValue = StringFromCString(value);
-	core->GetTokenDictionary()[PyString_AsStringView(Variable).CString()] = *wsValue;
+	core->GetTokenDictionary()[ieVariableFromPy(Variable)] = *wsValue;
 	delete wsValue;
 
 	Py_RETURN_NONE;
@@ -4208,7 +4208,7 @@ static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS(args,  "O", &Variable);
 
 	auto& tokens = core->GetTokenDictionary();
-	auto lookup = tokens.find(PyString_AsStringView(Variable).CString());
+	auto lookup = tokens.find(ieVariableFromPy(Variable));
 	if (lookup != tokens.cend()) {
 		return PyString_FromStringObj(lookup->second);
 	}
