@@ -177,6 +177,7 @@ void Animation::MirrorAnimation(BlitFlags flags)
 	}
 
 	for (frame_t& sprite : frames) {
+		if (!sprite) continue;
 		sprite = sprite->copy();
 
 		if (flags & BlitFlags::MIRRORX) {
