@@ -62,9 +62,8 @@ void MOSImporter::Blit(const MOSV2DataBlock& dataBlock, uint8_t *frameData) {
 	// Pages appear to be used multiple times
 	if (!lastPVRZ || dataBlock.pvrzPage != lastPVRZPage) {
 		auto resRef = fmt::format("mos{:04d}", dataBlock.pvrzPage);
-		StringView resRefView(resRef.c_str(), 7);
 
-		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRefView, true);
+		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRef, true);
 		lastPVRZPage = dataBlock.pvrzPage;
 	}
 

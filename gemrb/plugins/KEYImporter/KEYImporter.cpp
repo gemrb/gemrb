@@ -208,7 +208,7 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 
 	if (!biffiles[bifnum].found) {
 		Log(ERROR, "KEYImporter", "Cannot find {}... Resource unavailable.",
-				biffiles[bifnum].name.c_str());
+				biffiles[bifnum].name);
 		return NULL;
 	}
 

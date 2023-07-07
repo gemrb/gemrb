@@ -754,7 +754,7 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 		/* PST hates to have some variables lowercased. */
 		if (core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
-			if (strcmp("dictionary_githzerai_hjacknir", entry.first.c_str()) == 0) {
+			if (entry.first == "dictionary_githzerai_hjacknir") {
 				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
 			} else {
 				tmpname = MakeVariable(entry.first);

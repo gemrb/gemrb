@@ -130,10 +130,9 @@ void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
 		// we cheat and just derive the middle from the tis name as well
 		ResRef suffix(&str->filename[2], 5);
 		if (suffix[4] == '.') suffix.erase(4, 1);
-		auto resRef = fmt::format("{}{}{:02d}", str->filename[0], suffix.c_str(), dataBlock.pvrzPage);
-		StringView resRefView(resRef.c_str(), 7);
+		auto resRef = fmt::format("{:.1}{:.4}{:02d}", str->filename[0], suffix, dataBlock.pvrzPage);
 
-		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRefView, true);
+		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRef, true);
 		lastPVRZPage = dataBlock.pvrzPage;
 	}
 

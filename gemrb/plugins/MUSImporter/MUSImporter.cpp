@@ -279,7 +279,7 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 		*end = '\0';
 		PathJoin(FName, PLName.c_str(), File, nullptr);
 	} else {
-		strlcpy(FName, name.c_str(), _MAX_PATH);
+		std::copy(name.begin(), name.end(), FName);
 	}
 
 	ResourceHolder<SoundMgr> sound = manager.GetResourceHolder<SoundMgr>(FName, true);

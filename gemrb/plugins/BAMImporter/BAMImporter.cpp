@@ -203,9 +203,8 @@ void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock,
 	// The page is likely to be the same for many sequential accesses
 	if (!lastPVRZ || dataBlock.pvrzPage != lastPVRZPage) {
 		auto resRef = fmt::format("mos{:04d}", dataBlock.pvrzPage);
-		StringView resRefView(resRef.c_str(), 7);
 
-		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRefView, true);
+		lastPVRZ = gamedata->GetResourceHolder<ImageMgr>(resRef, true);
 		lastPVRZPage = dataBlock.pvrzPage;
 	}
 
