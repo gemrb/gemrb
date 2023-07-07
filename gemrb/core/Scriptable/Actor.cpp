@@ -3113,7 +3113,7 @@ void Actor::RollSaves()
 	static int saveDiceSides = gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES");
 	if (InternalFlags&IF_USEDSAVE) {
 		for (auto& save : lastSave.savingThrow) {
-			save = static_cast<ieByte>(RAND(1, saveDiceSides));
+			save = RAND<ieByte>(1, saveDiceSides);
 		}
 		InternalFlags&=~IF_USEDSAVE;
 	}

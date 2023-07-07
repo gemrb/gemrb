@@ -2052,7 +2052,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 	bool continueExecution = false;
 	if (continuing) continueExecution = *continuing;
 
-	RandomNumValue = RAND_ALL();
+	RandomNumValue = RAND<int>();
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (!rB->condition->Evaluate(MySelf)) {

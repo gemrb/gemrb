@@ -315,7 +315,7 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		int x = 0;
 		int y = 0;
 		if (fx->Parameter2&1) {
-			ieWord tmp =(ieWord) RAND_ALL();
+			ieWord tmp = RAND<ieWord>();
 			x = tmp&31;
 			y = (tmp>>5)&31;
 		}

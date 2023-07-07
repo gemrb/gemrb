@@ -61,13 +61,13 @@ Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bam, ieByte seq
 		return AnimArray(MAX_ORIENT);
 	}
 
-	size_t Max = af->GetCycleCount();
+	auto Max = af->GetCycleCount();
 	if (!Max) {
 		return AnimArray(MAX_ORIENT);
 	}
 
 	if ((ExtFlags & PEF_CYCLE) && !seq) {
-		seq = static_cast<ieByte>(RAND(size_t(0), Max - 1));
+		seq = RAND<ieByte>(0, Max - 1);
 	}
 
 	//this hack is needed because bioware .pro files are sometimes

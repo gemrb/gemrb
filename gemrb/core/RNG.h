@@ -30,8 +30,6 @@
 #include <random>
 #include <type_traits>
 
-#define RAND_ALL() RAND()
-
 namespace GemRB {
 
 // silence bogus warning
@@ -81,8 +79,15 @@ class GEM_EXPORT RNG {
 };
 
 template<typename NUM_T = int32_t>
-static NUM_T RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept {
+std::enable_if_t<sizeof(NUM_T) >= sizeof(short), NUM_T>
+RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept {
 	return RNG::getInstance().rand(min, max);
+}
+
+template<typename NUM_T>
+std::enable_if_t<sizeof(NUM_T) < sizeof(short), NUM_T>
+RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept {
+	return NUM_T(RNG::getInstance().rand<short>(min, max));
 }
 
 inline Point RandomPoint(int xmin = 0, int xmax = std::numeric_limits<int>::max() - 1,
