@@ -372,7 +372,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 	encounter=false;
 	do {
 		lastpath = *p;
-		if (lastpath->EncounterChance > (unsigned int) RAND(0, 99)) {
+		if (lastpath->EncounterChance > RAND<ieDword>(0, 99)) {
 			encounter=true;
 			break;
 		}
