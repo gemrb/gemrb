@@ -39,20 +39,17 @@ int main(int argc, char* argv[])
 	Interface::SanityCheck(VERSION_GEMRB);
 
 	core = new Interface();
-	CFGConfig* config = new CFGConfig(argc, argv);
 
-	if (core->Init( config ) == GEM_ERROR) {
-		delete config;
-		delete( core );
+	if (core->Init(LoadFromArgs(argc, argv)) == GEM_ERROR) {
+		delete core;
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 
 		ToggleLogging(false); // Windows build will hang if we leave the logging thread running
 		return -1;
 	}
-	delete config;
 
 	core->Main();
-	delete( core );
+	delete core;
 
 	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
 	return 0;

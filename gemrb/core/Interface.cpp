@@ -755,20 +755,16 @@ int Interface::LoadFonts()
 	return GEM_OK;
 }
 
-int Interface::Init(const InterfaceConfig* cfg)
+int Interface::Init(InterfaceConfig cfg)
 {
 	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
-	if (!cfg) {
-		Log(FATAL, "Core", "No Configuration context.");
-		return GEM_ERROR;
-	}
 
-	const InterfaceConfig::value_t* value = nullptr;
+	std::string value;
 #define CONFIG_INT(key, var) \
-		value = cfg->GetValueForKey(key); \
-		if (value) \
-			var ( atoi( value->c_str() ) ); \
-		value = nullptr
+		value = cfg[key]; \
+		if (value.length()) \
+			var ( atoi( value.c_str() ) ); \
+		value = "";
 
 	CONFIG_INT("Bpp", config.Bpp =);
 	CONFIG_INT("CaseSensitive", config.CaseSensitive =);
@@ -801,10 +797,10 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 // first param is the preference name, second is the key from gemrb.cfg.
 #define CONFIG_VARS_MAP(var, key) \
-		value = cfg->GetValueForKey(key); \
-		if (value) \
-			vars.emplace(var, atoi(value->c_str())); \
-		value = nullptr
+		value = cfg[key]; \
+		if (value.length()) \
+			vars.emplace(var, atoi(value.c_str())); \
+		value = ""
 
 #define CONFIG_VARS(key) \
 		CONFIG_VARS_MAP(key, key)
@@ -822,13 +818,13 @@ int Interface::Init(const InterfaceConfig* cfg)
 #undef CONFIG_VARS_MAP
 
 #define CONFIG_STRING(key, var, default) \
-		value = cfg->GetValueForKey(key); \
-		if (value && value->length()) { \
-			var = *value; \
+		value = cfg[key]; \
+		if (value.length()) { \
+			var = value; \
 		} else if (default && default[0]) { \
 			var = default; \
 		} else var[0] = '\0'; \
-		value = nullptr
+		value = ""
 
 	CONFIG_STRING("GameName", config.GameName, GEMRB_STRING); // NOTE: potentially overriden below, once auto GameType is resolved
 	CONFIG_STRING("GameType", config.GameType, "auto");
@@ -837,15 +833,15 @@ int Interface::Init(const InterfaceConfig* cfg)
 
 // assumes that default value does not need to be resolved or fixed in any way
 #define CONFIG_PATH(key, var, default) \
-		value = cfg->GetValueForKey(key); \
-		if (value && value->length()) { \
-			strlcpy(var, value->c_str(), sizeof(var)); \
+		value = cfg[key]; \
+		if (value.length()) { \
+			strlcpy(var, value.c_str(), sizeof(var)); \
 			ResolveFilePath(var); \
 			FixPath(var, true); \
 		} else if (default && default[0]) { \
 			strlcpy(var, default, sizeof(var)); \
 		} else var[0] = '\0'; \
-		value = nullptr
+		value = ""
 
 	// TODO: make CustomFontPath default cross platform
 	CONFIG_PATH("CustomFontPath", config.CustomFontPath, "/usr/share/fonts/TTF");
@@ -927,37 +923,37 @@ int Interface::Init(const InterfaceConfig* cfg)
 #undef CONFIG_PATH
 
 #define CONFIG_STRING(key, var) \
-		value = cfg->GetValueForKey(key); \
-		if (value) \
-			var = *value; \
-		value = nullptr
+		value = cfg[key]; \
+		if (value.length()) \
+			var = value; \
+		value = ""
 
 	CONFIG_STRING("AudioDriver", config.AudioDriverName);
 	CONFIG_STRING("VideoDriver", config.VideoDriverName);
 	CONFIG_STRING("Encoding", config.Encoding);
 #undef CONFIG_STRING
 
-	value = cfg->GetValueForKey("ModPath");
-	if (value) {
-		config.ModPath = Explode<std::string, std::string>(*value, PathListSeparator);
+	value = cfg["ModPath"];
+	if (value.length()) {
+		config.ModPath = Explode<std::string, std::string>(value, PathListSeparator);
 		for (std::string& path : config.ModPath) {
 			ResolveFilePath(path);
 		}
 	}
-	value = cfg->GetValueForKey("SkipPlugin");
-	if (value) {
-		pluginFlags[*value] = PLF_SKIP;
+	value = cfg["SkipPlugin"];
+	if (value.length()) {
+		pluginFlags[value] = PLF_SKIP;
 	}
-	value = cfg->GetValueForKey("DelayPlugin");
-	if (value) {
-		pluginFlags[*value] = PLF_DELAY;
+	value = cfg["DelayPlugin"];
+	if (value.length()) {
+		pluginFlags[value] = PLF_DELAY;
 	}
 
 	for (int i = 0; i < MAX_CD; i++) {
 		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
-		value = cfg->GetValueForKey(keyname);
-		if (value) {
-			config.CD[i] = Explode<std::string, std::string>(*value, PathListSeparator);
+		value = cfg[keyname];
+		if (value.length()) {
+			config.CD[i] = Explode<std::string, std::string>(value, PathListSeparator);
 			for (std::string& path : config.CD[i]) {
 				ResolveFilePath(path);
 			}
@@ -983,8 +979,8 @@ int Interface::Init(const InterfaceConfig* cfg)
 	if (!config.KeepCache) DelTree((const char *) config.CachePath, false);
 
 	// potentially disable logging before plugins are loaded (the log file is a plugin)
-	value = cfg->GetValueForKey("Logging");
-	if (value) ToggleLogging(atoi(value->c_str()));
+	value = cfg["Logging"];
+	if (value.length()) ToggleLogging(atoi(value.c_str()));
 
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");
 	const PluginMgr *plugin = PluginMgr::Get();

@@ -166,7 +166,7 @@ using namespace GemRB;
 	ToggleLogging(true);
 
 	core = new Interface();
-	InterfaceConfig* config = new InterfaceConfig();
+	InterfaceConfig config;
 
 	// load NSUserDefaults into config
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -194,22 +194,20 @@ using namespace GemRB;
 			value = (NSString*)obj;
 		}
 		if (value && ![value isEqualToString:@""]) {
-			config->SetKeyValuePair([key cStringUsingEncoding:NSASCIIStringEncoding],
-								[value cStringUsingEncoding:NSASCIIStringEncoding]);
+			std::string ckey = [key cStringUsingEncoding:NSASCIIStringEncoding];
+			config[ckey] = [value cStringUsingEncoding:NSASCIIStringEncoding];
 		}
 	}
 	
-	if (core->Init(config) == GEM_ERROR) {
-		delete config;
-		delete( core );
+	if (core->Init(std::move(config)) == GEM_ERROR) {
+		delete core;
 		core = NULL;
 		Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Terminating.");
 	} else {
 		[_configWindow close];
 		// pass control to GemRB
-		delete config;
 		core->Main();
-		delete( core );
+		delete core;
 		core = NULL;
 
 		if ([defaults boolForKey:@"TerminateOnClose"]) {

@@ -71,11 +71,9 @@ int main(int argc, char* argv[])
 	Interface::SanityCheck(VERSION_GEMRB);
 
 	core = new Interface();
-	CFGConfig* config = new CFGConfig(argc, argv);
 	
-	if (core->Init( config ) == GEM_ERROR) {
-		delete config;
-		delete( core );
+	if (core->Init(LoadFromArgs(argc, argv)) == GEM_ERROR) {
+		delete core;
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 
 		return -1;
