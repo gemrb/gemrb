@@ -546,8 +546,12 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		}
 	}
 
+	uint32_t tmpflags = DebugFlags;
+	if (EventMgr::ModState(GEM_MOD_ALT)) {
+		tmpflags |= DEBUG_SHOW_CONTAINERS | DEBUG_SHOW_DOORS;
+	}
 	//drawmap should be here so it updates fog of war
-	area->DrawMap(Viewport(), core->GetFogRenderer(), DebugFlags);
+	area->DrawMap(Viewport(), core->GetFogRenderer(), tmpflags);
 
 	if (trackerID) {
 		const Actor *actor = area->GetActorByGlobalID(trackerID);
@@ -659,19 +663,12 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 
 	KeyboardKey keycode = Key.keycode;
 	if (mod) {
-		switch (keycode) {
-			case GEM_ALT:
-				DebugFlags |= DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS;
-				break;
-			default:
-				// the random bitshift is to skip checking hotkeys with mods
-				// eg. ctrl-j should be ignored for keymap.ini handling and
-				// passed straight on
-				if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
-					game->SendHotKey(towupper(Key.character));
-					return View::OnKeyPress(Key, mod);
-				}
-				break;
+		// the random bitshift is to skip checking hotkeys with mods
+		// eg. ctrl-j should be ignored for keymap.ini handling and
+		// passed straight on
+		if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
+			game->SendHotKey(towupper(Key.character));
+			return View::OnKeyPress(Key, mod);
 		}
 	} else {
 			switch (keycode) {
@@ -691,12 +688,6 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 						}
 					}
 					break;
-				#ifdef ANDROID
-				case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
-
-					DebugFlags |= DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS;
-					break;
-				#endif
 				case GEM_TAB: // show partymember hp/maxhp as overhead text
 				// fallthrough
 				case GEM_ESCAPE: // redraw actionbar
@@ -1098,12 +1089,6 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 //FIXME: move these to guiscript
 		case ' ': //soft pause
 			core->TogglePause();
-			break;
-		case GEM_ALT: //alt key (shows containers)
-#ifdef ANDROID
-		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
-#endif
-			DebugFlags &= ~(DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS);
 			break;
 		case GEM_TAB: // remove overhead partymember hp/maxhp
 			for (int pm = 0; pm < game->GetPartySize(false); pm++) {
