@@ -60,10 +60,11 @@ struct MapKey {
 struct MapKeyHash {
 	size_t operator()(const MapKey& key) const {
 		size_t h{key.type};
-		const char *c = key.ref.c_str();
-
-		for (unsigned int i = 0; *c && i < 9; ++i)
-			h = (h << 5) + h + tolower(*c++);
+		
+		for (const char c : key.ref)
+		{
+			h = (h << 5) + h + tolower(c);
+		}
 
 		return h;
 	}

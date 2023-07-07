@@ -35,7 +35,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	std::string fragmentContent;
 
 	// first check the build dir then fallback to DATA_DIR
-	std::ifstream fileStream(vertexSourceFileName.c_str());
+	std::ifstream fileStream(vertexSourceFileName);
 #if __APPLE__
 	if (!fileStream.is_open()) {
 		char bundleShaderPath[_MAX_PATH];
@@ -48,7 +48,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	if (!fileStream.is_open()) {
 		vertexSourceFileName.insert(0, 1, PathDelimiter);
 		vertexSourceFileName.insert(0, DATA_DIR);
-		fileStream.open(vertexSourceFileName.c_str());
+		fileStream.open(vertexSourceFileName);
 	}
 #endif
 	if (!fileStream.is_open()) {
@@ -67,7 +67,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	}
 	fileStream.close();
 
-	std::ifstream fileStream2(fragmentSourceFileName.c_str());
+	std::ifstream fileStream2(fragmentSourceFileName);
 #if __APPLE__
 	if (!fileStream2.is_open()) {
 		char bundleShaderPath[_MAX_PATH];
@@ -80,7 +80,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	if (!fileStream2.is_open()) {
 		fragmentSourceFileName.insert(0, 1, PathDelimiter);
 		fragmentSourceFileName.insert(0, DATA_DIR);
-		fileStream2.open(fragmentSourceFileName.c_str());
+		fileStream2.open(fragmentSourceFileName);
 	}
 #endif
 	if (!fileStream2.is_open()) {
