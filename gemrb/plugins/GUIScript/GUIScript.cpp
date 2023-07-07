@@ -3087,7 +3087,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 		for (int j = 0; j < 5; j++) {
 			ResRef &area = wal->EncounterAreaResRef[(i + j) % 5];
 
-			if (!area.IsEmpty()) {
+			if (!area.IsEmpty() && area != core->GetGame()->CurrentArea) {
 				displaymsg->DisplayConstantString(HCStrings::Ambush, GUIColors::XPCHANGE);
 				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromResRef, area));
 				//drop player in the middle of the map
