@@ -2266,7 +2266,7 @@ Interface::tokens_t& Interface::GetTokenDictionary() {
 	return tokens;
 }
 
-const String& Interface::GetToken(const std::string& key, const String& fallback) const {
+const String& Interface::GetToken(const ieVariable& key, const String& fallback) const {
 	auto lookup = tokens.find(key);
 	if (lookup != tokens.cend()) {
 		return lookup->second;

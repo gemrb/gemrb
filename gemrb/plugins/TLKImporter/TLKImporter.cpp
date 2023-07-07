@@ -283,7 +283,7 @@ String TLKImporter::ResolveTags(const String& source)
 			if (resolvedToken.empty()) {
 
 				auto& tokens = core->GetTokenDictionary();
-				auto lookup = tokens.find(Token.c_str());
+				auto lookup = tokens.find(Token);
 				if (lookup != tokens.cend()) {
 					dest.append(lookup->second);
 				}

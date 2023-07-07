@@ -215,6 +215,10 @@ inline ResRef ResRefFromPy(PyObject* obj) {
 	return ASCIIStringFromPy<ResRef>(obj);
 }
 
+inline ResRef ieVariableFromPy(PyObject* obj) {
+	return ASCIIStringFromPy<ieVariable>(obj);
+}
+
 ieStrRef StrRefFromPy(PyObject* obj);
 
 std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj);

@@ -363,7 +363,7 @@ class GEM_EXPORT Interface
 {
 public:
 	using variables_t = std::unordered_map<std::string, int32_t>;
-	using tokens_t = std::unordered_map<std::string, String>;
+	using tokens_t = std::unordered_map<ieVariable, String, CstrHashCI<ieVariable>>;
 	using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
 
 private:
@@ -523,7 +523,7 @@ public:
 	variables_t::mapped_type GetVariable(const variables_t::key_type& key, int fallback) const;
 	/** Get the Token Dictionary */
 	tokens_t& GetTokenDictionary();
-	const String& GetToken(const std::string& key, const String& fallback) const;
+	const String& GetToken(const ieVariable& key, const String& fallback) const;
 	/** Get the Music Manager */
 	MusicMgr * GetMusicMgr() const;
 	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
@@ -830,7 +830,7 @@ public:
 extern GEM_EXPORT Interface * core;
 
 template<typename T>
-void SetTokenAsString(const std::string& key, T&& newValue) {
+void SetTokenAsString(const ieVariable& key, T&& newValue) {
 	const std::wstring wideString = fmt::format(L"{}", std::forward<T>(newValue));
 	core->GetTokenDictionary()[key] = wideString;
 }
