@@ -44,6 +44,8 @@
 
 namespace GemRB {
 
+using path_t = std::string;
+
 #ifdef WIN32
 
 // prevents warnings of unused `p`
@@ -58,7 +60,7 @@ enum BundleDirectory {
 	RESOURCES,
 	PLUGINS
 };
-GEM_EXPORT void CopyBundlePath(char* outPath, unsigned short maxLen, BundleDirectory dir = BUNDLE);
+GEM_EXPORT path_t BundlePath(BundleDirectory dir = BUNDLE);
 #endif
 
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */
@@ -97,19 +99,20 @@ GEM_EXPORT bool file_exists(const char* path);
  */
 GEM_EXPORT bool PathJoin (char* target, const char* base, ...) SENTINEL;
 GEM_EXPORT bool PathJoinExt (char* target, const char* dir, const char* file, const char* ext = NULL);
-GEM_EXPORT void FixPath (char *path, bool needslash);
+GEM_EXPORT void FixPath(path_t& path, bool needslash);
 
 GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);
 
-GEM_EXPORT char* PathAppend (char* target, const char* name);
+GEM_EXPORT char* PathAppend(char* target, const char* name);
+GEM_EXPORT void PathAppend(path_t& target, const char* name);
 
 GEM_EXPORT bool MakeDirectories(const char* path) WARN_UNUSED;
 GEM_EXPORT bool MakeDirectory(const char* path) WARN_UNUSED;
 
-GEM_EXPORT char* CopyHomePath(char* outPath, unsigned short maxLen);
+GEM_EXPORT path_t HomePath();
 
 // default directory housing GUIScripts/Override/Unhardcoded
-GEM_EXPORT char* CopyGemDataPath(char* outPath, unsigned short maxLen);
+GEM_EXPORT path_t GemDataPath();
 
 #ifdef SUPPORTS_MEMSTREAM
 void* readonly_mmap(void *fd);
@@ -149,7 +152,7 @@ public:
 	 * The returned string is only valid until the iterator is advanced.
 	 */
 	const char *GetName();
-	void GetFullPath(char *);
+	path_t GetFullPath();
 	DirectoryIterator& operator++();
 	explicit operator bool () const noexcept { return Entry != nullptr; }
 	void Rewind();

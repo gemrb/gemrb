@@ -336,7 +336,7 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 	char nPath[_MAX_PATH];
 	char Signature[] = "TLK ";
 
-	PathJoin(nPath, core->config.CachePath, "default.toh", nullptr);
+	PathJoin(nPath, core->config.CachePath.c_str(), "default.toh", nullptr);
 	FileStream* fs = new FileStream();
 
 	while (true) {
@@ -358,7 +358,7 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 DataStream* CTlkOverride::GetAuxTlk(bool create)
 {
 	char nPath[_MAX_PATH];
-	PathJoin(nPath, core->config.CachePath, "default.tot", nullptr);
+	PathJoin(nPath, core->config.CachePath.c_str(), "default.tot", nullptr);
 	FileStream* fs = new FileStream();
 
 	while (true) {

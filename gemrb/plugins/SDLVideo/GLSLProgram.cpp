@@ -38,8 +38,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	std::ifstream fileStream(vertexSourceFileName);
 #if __APPLE__
 	if (!fileStream.is_open()) {
-		char bundleShaderPath[_MAX_PATH];
-		CopyBundlePath(bundleShaderPath, sizeof(bundleShaderPath), RESOURCES);
+		path_t bundleShaderPath = BundlePath(RESOURCES);
 		PathAppend(bundleShaderPath, vertexSourceFileName.c_str());
 		ResolveFilePath(bundleShaderPath);
 		fileStream.open(bundleShaderPath);
@@ -70,8 +69,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	std::ifstream fileStream2(fragmentSourceFileName);
 #if __APPLE__
 	if (!fileStream2.is_open()) {
-		char bundleShaderPath[_MAX_PATH];
-		CopyBundlePath(bundleShaderPath, sizeof(bundleShaderPath), RESOURCES);
+		path_t bundleShaderPath = BundlePath(RESOURCES);
 		PathAppend(bundleShaderPath, fragmentSourceFileName.c_str());
 		ResolveFilePath(bundleShaderPath);
 		fileStream2.open(bundleShaderPath);

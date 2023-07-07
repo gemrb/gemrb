@@ -278,7 +278,7 @@ bool SaveGameIterator::RescanSaveGames()
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
-	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), nullptr);
+	PathJoin(Path, core->config.SavePath.c_str(), SaveDir().c_str(), nullptr);
 
 	DirectoryIterator dir(Path);
 	// create the save game directory at first access
@@ -332,7 +332,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(std::string slotname)
 	int prtrt = 0;
 	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), slotname.c_str(), nullptr);
+	PathJoin(Path, core->config.SavePath.c_str(), SaveDir().c_str(), slotname.c_str(), nullptr);
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
@@ -568,7 +568,7 @@ static int CanSave()
 
 static bool CreateSavePath(char *Path, int index, StringView slotname)
 {
-	PathJoin(Path, core->config.SavePath, SaveDir().c_str(), nullptr);
+	PathJoin(Path, core->config.SavePath.c_str(), SaveDir().c_str(), nullptr);
 
 	//if the path exists in different case, don't make it again
 	if (!MakeDirectory(Path)) {

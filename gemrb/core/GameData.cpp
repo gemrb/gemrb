@@ -81,7 +81,7 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 	if (character) {
 		char nPath[_MAX_PATH];
 		std::string file = fmt::format("{}.chr", creature);
-		PathJoin(nPath, core->config.GamePath, "characters", file.c_str(), nullptr);
+		PathJoin(nPath, core->config.GamePath.c_str(), "characters", file.c_str(), nullptr);
 		stream = FileStream::OpenFile(nPath);
 		auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, stream);
 		if (!actormgr) {

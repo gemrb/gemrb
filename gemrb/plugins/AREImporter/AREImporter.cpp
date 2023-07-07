@@ -72,7 +72,7 @@ static void ReadAutonoteINI()
 {
 	INInote = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	char tINInote[_MAX_PATH];
-	PathJoin(tINInote, core->config.GamePath, "autonote.ini", nullptr);
+	PathJoin(tINInote, core->config.GamePath.c_str(), "autonote.ini", nullptr);
 	FileStream* fs = FileStream::OpenFile( tINInote );
 	INInote->Open(fs);
 }
