@@ -217,7 +217,7 @@ public:
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, const Point& p);
 
 	void MakeSelection(bool extend = false);
-	void InitFormation(const Point &);
+	void InitFormation(const Point&, bool rotating);
 	Point GetFormationOffset(size_t formation, uint8_t pos) const;
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p, bool append = true, bool tryToRun = false) const;

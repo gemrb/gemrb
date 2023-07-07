@@ -1414,7 +1414,7 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 	}
 	
 	if (me.ButtonState(GEM_MB_MENU)) {
-		InitFormation(gameClickPoint);
+		InitFormation(gameClickPoint, true);
 		return true;
 	}
 
@@ -1489,7 +1489,7 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 				isFormationRotation = false;
 			} else {
 				screenMousePos = gesture.fingers[1].Pos();
-				InitFormation(screenMousePos);
+				InitFormation(screenMousePos, true);
 			}
 		} else { // scroll viewport
 			MoveViewportTo( vpOrigin - gesture.Delta(), false );
@@ -1990,7 +1990,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 
 // Calculate the angle between a clicked point and the first selected character,
 // so that we can set a sensible orientation for the formation.
-void GameControl::InitFormation(const Point &clickPoint)
+void GameControl::InitFormation(const Point &clickPoint, bool rotating)
 {
 	// Of course single actors don't get rotated, but we need to ensure
 	// isFormationRotation is set in all cases where we initiate movement,
@@ -2001,7 +2001,7 @@ void GameControl::InitFormation(const Point &clickPoint)
 
 	const Actor *selectedActor = GetMainSelectedActor();
 
-	isFormationRotation = true;
+	isFormationRotation = rotating;
 	formationBaseAngle = AngleFromPoints(clickPoint, selectedActor->Pos);
 	SetCursor(core->Cursors[IE_CURSOR_USE]);
 }
@@ -2038,7 +2038,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 		// PST uses alt + left click for formation rotation
 		// is there any harm in this being true in all games?
 		if (me.repeats != 2 && EventMgr::ModState(GEM_MOD_ALT)) {
-			InitFormation(gameClickPoint);
+			InitFormation(gameClickPoint, true);
 		}
 
 		break;
@@ -2179,7 +2179,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 		// Ensure that left-click movement also orients the formation
 		// in the direction of movement.
-		InitFormation(p);
+		InitFormation(p, false);
 	}
 
 	// handle movement/travel, but not if we just opened the float window
