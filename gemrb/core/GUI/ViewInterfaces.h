@@ -46,8 +46,8 @@ public:
 		
 		template <typename F,
 			// SFINE magic to prevent std::forward infinite recursion
-			typename std::enable_if<
-			   !std::is_same<typename std::decay<F>::type, Responder>::value, bool>::type = false
+			std::enable_if_t<
+			   !std::is_same<std::decay_t<F>, Responder>::value, bool> = false
 		>
 		Responder(F&& func) {
 			callback = std::forward<F>(func);
@@ -55,10 +55,10 @@ public:
 		
 		template <typename F>
 		// SFINE magic to disambiguate the multiple assignment operators
-		auto operator=(F&& func) -> typename std::enable_if<
-		! std::is_same<typename std::decay<F>::type, Responder>::value,
+		auto operator=(F&& func) -> std::enable_if_t<
+		! std::is_same<std::decay_t<F>, Responder>::value,
 		Responder&
-		>::type {
+		> {
 			callback = std::forward<F>(func);
 			return *this;
 		}

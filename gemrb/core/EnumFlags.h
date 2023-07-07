@@ -24,7 +24,7 @@
 #include <type_traits>
 
 template <typename ENUM>
-using under_t = typename std::underlying_type<ENUM>::type;
+using under_t = std::underlying_type_t<ENUM>;
 
 template<typename ENUM_FLAGS>
 constexpr
@@ -36,7 +36,7 @@ UnderType(ENUM_FLAGS a) noexcept
 
 template<typename ENUM_FLAGS>
 constexpr
-typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
+std::enable_if_t<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>
 operator |(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
 	return static_cast<ENUM_FLAGS>(UnderType(a) | UnderType(b));
@@ -44,7 +44,7 @@ operator |(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 
 template<typename ENUM_FLAGS>
 constexpr
-typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>::type
+std::enable_if_t<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>
 operator |=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 {
 	return a = a | b;
@@ -52,7 +52,7 @@ operator |=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 
 template<typename ENUM_FLAGS>
 constexpr
-typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
+std::enable_if_t<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>
 operator &(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
 	return static_cast<ENUM_FLAGS>(UnderType(a) & UnderType(b));
@@ -60,7 +60,7 @@ operator &(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 
 template<typename ENUM_FLAGS>
 constexpr
-typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>::type
+std::enable_if_t<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>
 operator &=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 {
 	return a = a & b;
@@ -68,7 +68,7 @@ operator &=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 
 template<typename ENUM_FLAGS>
 constexpr
-typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
+std::enable_if_t<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>
 operator ^(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
 	return static_cast<ENUM_FLAGS>(UnderType(a) ^ UnderType(b));
@@ -76,7 +76,7 @@ operator ^(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 
 template<typename ENUM_FLAGS>
 constexpr
-typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>::type
+std::enable_if_t<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>
 operator ^=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 {
 	return a = a ^ b;
@@ -84,7 +84,7 @@ operator ^=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 
 template<typename ENUM_FLAGS>
 constexpr
-typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
+std::enable_if_t<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>
 operator ~(ENUM_FLAGS a) noexcept
 {
 	return static_cast<ENUM_FLAGS>(~UnderType(a));
@@ -92,7 +92,7 @@ operator ~(ENUM_FLAGS a) noexcept
 
 template<typename ENUM_FLAGS>
 constexpr
-typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, bool>::type
+std::enable_if_t<std::is_enum<ENUM_FLAGS>::value, bool>
 operator !(ENUM_FLAGS a) noexcept
 {
 	return !UnderType(a);

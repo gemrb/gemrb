@@ -93,7 +93,7 @@ void Particles::SetBitmap(unsigned int FragAnimID)
 {
 	//int i;
 
-	fragments = GemRB::make_unique<CharAnimations>(FragAnimID, 0);
+	fragments = std::make_unique<CharAnimations>(FragAnimID, 0);
 /*
 	for (i=0;i<MAX_SPARK_PHASE;i++) {
 		delete( bitmap[i] );

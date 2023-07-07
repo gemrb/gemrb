@@ -4,7 +4,7 @@ if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 # skip verbose make install output
 set(CMAKE_INSTALL_MESSAGE "NEVER")

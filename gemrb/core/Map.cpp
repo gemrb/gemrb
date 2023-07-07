@@ -2992,9 +2992,9 @@ void Map::SetAmbients(std::vector<Ambient*> ambs, MapReverb::id_t id)
 	
 	reverbID = id;
 	if (reverbID != EFX_PROFILE_REVERB_INVALID) {
-		reverb = make_unique<MapReverb>(AreaType, reverbID);
+		reverb = std::make_unique<MapReverb>(AreaType, reverbID);
 	} else {
-		reverb = make_unique<MapReverb>(AreaType, WEDResRef);
+		reverb = std::make_unique<MapReverb>(AreaType, WEDResRef);
 	}
 }
 

@@ -502,7 +502,7 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 			++it;
 			count -= step + 1;
 		} else {
-			std::advance(it, -std::make_signed<size_t>::type(step));
+			std::advance(it, -std::make_signed_t<size_t>(step));
 			count = step;
 		}
 	}

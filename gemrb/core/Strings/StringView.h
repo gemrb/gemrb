@@ -25,10 +25,10 @@
 
 // SFINAE garbage to only enable funtions for strings of known size
 // i'm sure its not perfect, but it meets our needs
-#define ENABLE_CHAR_RANGE(PARAM) typename std::enable_if< \
+#define ENABLE_CHAR_RANGE(PARAM) std::enable_if_t< \
 (!std::is_enum<PARAM>::value && !std::is_fundamental<PARAM>::value && !std::is_pointer<PARAM>::value) \
 || std::is_same<PARAM, decltype("")>::value \
-, int>::type = 0
+, int> = 0
 
 namespace GemRB {
 
@@ -60,13 +60,13 @@ public:
 	{}
 
 	template<typename STR, typename CharT2 = CharT, ENABLE_CHAR_RANGE(STR),
-	typename std::enable_if<std::is_const<CharT2>::value && !std::is_convertible<STR, StringViewImp>::value, int>::type = 0>
+	std::enable_if_t<std::is_const<CharT2>::value && !std::is_convertible<STR, StringViewImp>::value, int> = 0>
 	StringViewImp(const STR& s, size_type begpos = 0, size_type endpos = npos) noexcept
 	: StringViewImp(&s[0], begpos, endpos == npos ? std::distance(std::begin(s), std::end(s)) : endpos)
 	{}
 	
 	template<typename STR, typename CharT2 = CharT, ENABLE_CHAR_RANGE(STR),
-	typename std::enable_if<!std::is_const<CharT2>::value && !std::is_convertible<STR, StringViewImp>::value, int>::type = 0>
+	std::enable_if_t<!std::is_const<CharT2>::value && !std::is_convertible<STR, StringViewImp>::value, int> = 0>
 	StringViewImp(STR& s, size_type begpos = 0, size_type endpos = npos) noexcept
 	: StringViewImp(&s[0], begpos, endpos == npos ? std::distance(std::begin(s), std::end(s)) : endpos)
 	{}

@@ -46,7 +46,7 @@ std::unique_ptr<Logger> logger;
 void ToggleLogging(bool enable)
 {
 	if (enable && logger == nullptr) {
-		logger = GemRB::make_unique<Logger>(writers);
+		logger = std::make_unique<Logger>(writers);
 	} else if (!enable) {
 		logger = nullptr;
 	}

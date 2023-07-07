@@ -1405,7 +1405,7 @@ int Interface::Init(InterfaceConfig cfg)
 		Log(WARNING, "Core", "Failed to initialize random treasure.");
 	}
 	
-	abilityTables = GemRB::make_unique<AbilityTables>(MaximumAbility);
+	abilityTables = std::make_unique<AbilityTables>(MaximumAbility);
 
 	Log(MESSAGE, "Core", "Reading game time table...");
 	ret = ReadGameTimeTable();
@@ -1577,7 +1577,7 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 	if (!(options & STRING_FLAGS::STRREFOFF)) {
 		flags =
 			static_cast<STRING_FLAGS>(
-				GetVariable("Strref On", static_cast<std::underlying_type<STRING_FLAGS>::type>(STRING_FLAGS::NONE))
+				GetVariable("Strref On", static_cast<std::underlying_type_t<STRING_FLAGS>>(STRING_FLAGS::NONE))
 			);
 	}
 	
@@ -4283,7 +4283,7 @@ bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 {
 	AUTOPAUSE autopause_flags =
 		static_cast<AUTOPAUSE>(
-			GetVariable("Auto Pause State", static_cast<std::underlying_type<AUTOPAUSE>::type>(AUTOPAUSE::UNUSABLE))
+			GetVariable("Auto Pause State", static_cast<std::underlying_type_t<AUTOPAUSE>>(AUTOPAUSE::UNUSABLE))
 		);
 
 	if (!(autopause_flags & AUTOPAUSE(1 << ieDword(flag)))) {

@@ -25,10 +25,6 @@
 
 namespace GemRB {
 
-/*
- If we ever move to C++11 we can simpy use a variadic template for these...
-*/
-
 Color ColorFromPy(PyObject* obj) {
 	if (obj && PyDict_Check(obj)) {
 		Color c;
