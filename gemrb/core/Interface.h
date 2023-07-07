@@ -303,26 +303,26 @@ private:
 };
 
 struct CFGConfigData {
-	char GamePath[_MAX_PATH]{};
-	char GameDataPath[_MAX_PATH]{};
-	char GameOverridePath[_MAX_PATH]{};
-	char GameSoundsPath[_MAX_PATH]{};
-	char GameScriptsPath[_MAX_PATH]{};
-	char GamePortraitsPath[_MAX_PATH]{};
-	char GameCharactersPath[_MAX_PATH]{};
-	char GameLanguagePath[_MAX_PATH]{};
-	char GameMoviesPath[_MAX_PATH]{};
-	char SavePath[_MAX_PATH]{};
-	char CachePath[_MAX_PATH]{};
+	path_t GamePath;
+	path_t GameDataPath;
+	path_t GameOverridePath;
+	path_t GameSoundsPath;
+	path_t GameScriptsPath;
+	path_t GamePortraitsPath;
+	path_t GameCharactersPath;
+	path_t GameLanguagePath;
+	path_t GameMoviesPath;
+	path_t SavePath;
+	path_t CachePath;
 	std::vector<std::string> CD[MAX_CD];
 	std::vector<std::string> ModPath;
-	char CustomFontPath[_MAX_PATH]{};
+	path_t CustomFontPath;
 
-	char GemRBPath[_MAX_PATH]{};
-	char GemRBOverridePath[_MAX_PATH]{};
-	char GemRBUnhardcodedPath[_MAX_PATH]{};
-	char PluginsPath[_MAX_PATH]{};
-	char GUIScriptsPath[_MAX_PATH]{};
+	path_t GemRBPath;
+	path_t GemRBOverridePath;
+	path_t GemRBUnhardcodedPath;
+	path_t PluginsPath;
+	path_t GUIScriptsPath;
 	bool CaseSensitive = true;
 
 	std::string GameName;

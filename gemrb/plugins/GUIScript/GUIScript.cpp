@@ -9670,19 +9670,19 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
 static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 {
 	int Variable, value = 0;
-	char path[_MAX_PATH] = { '\0' };
+	path_t path;
 	PARSE_ARGS( args,  "i", &Variable);
 	switch(Variable) {
 		case SV_BPP: value = core->config.Bpp; break;
 		case SV_WIDTH: value = core->config.Width; break;
 		case SV_HEIGHT: value = core->config.Height; break;
-		case SV_GAMEPATH: strlcpy(path, core->config.GamePath, _MAX_PATH); break;
+		case SV_GAMEPATH: path = core->config.GamePath; break;
 		case SV_TOUCH: value = EventMgr::TouchInputEnabled; break;
-		case SV_SAVEPATH: strlcpy(path, core->config.SavePath, _MAX_PATH); break;
+		case SV_SAVEPATH: path = core->config.SavePath; break;
 		default: value = -1; break;
 	}
-	if (path[0]) {
-		return PyString_FromString(path);
+	if (path.length()) {
+		return PyString_FromStringObj(path);
 	} else {
 		return PyLong_FromLong(value);
 	}
@@ -13461,7 +13461,7 @@ bool GUIScript::Init(void)
 	/* pMainDic is a borrowed reference */
 
 	char path[_MAX_PATH];
-	PathJoin(path, core->config.GUIScriptsPath, "GUIScripts", nullptr);
+	PathJoin(path, core->config.GUIScriptsPath.c_str(), "GUIScripts", nullptr);
 
 	char string[256] = "path";
 	PyObject* sysPath = PySys_GetObject(string);
@@ -13526,7 +13526,7 @@ bool GUIScript::Autodetect(void)
 	Log(MESSAGE, "GUIScript", "Detecting GameType.");
 
 	char path[_MAX_PATH];
-	PathJoin(path, core->config.GUIScriptsPath, "GUIScripts", nullptr);
+	PathJoin(path, core->config.GUIScriptsPath.c_str(), "GUIScripts", nullptr);
 	DirectoryIterator iter( path );
 	if (!iter)
 		return false;
@@ -13538,7 +13538,7 @@ bool GUIScript::Autodetect(void)
 
 		// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
 		// Method1:
-		PathJoin(moduleName, core->config.GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", nullptr);
+		PathJoin(moduleName, core->config.GUIScriptsPath.c_str(), "GUIScripts", dirent, "Autodetect.py", nullptr);
 		ExecFile(moduleName);
 		// Method2:
 		//strcpy( module, dirent );

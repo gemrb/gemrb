@@ -72,13 +72,13 @@ static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist
 static void FindBIF(BIFEntry *entry)
 {
 	entry->cd = 0;
-	entry->found = PathExists(entry, core->config.GamePath);
+	entry->found = PathExists(entry, core->config.GamePath.c_str());
 	if (entry->found) {
 		return;
 	}
 	// also check the data/Data path for gog
 	char path[_MAX_PATH];
-	PathJoin(path, core->config.GamePath, core->config.GameDataPath, nullptr);
+	PathJoin(path, core->config.GamePath.c_str(), core->config.GameDataPath.c_str(), nullptr);
 	entry->found = PathExists(entry, path);
 	if (entry->found) {
 		return;

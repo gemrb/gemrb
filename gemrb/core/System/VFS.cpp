@@ -127,7 +127,7 @@ static void closedir(DIR* dirp)
 namespace GemRB {
 #if __APPLE__
 //bundle path functions
-void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir)
+path_t BundlePath(BundleDirectory dir)
 {
 	CFBundleRef mainBundle = CFBundleGetMainBundle();
 	CFURLRef bundleDirURL = NULL;
@@ -145,14 +145,17 @@ void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir)
 			bundleDirURL = CFBundleCopyBundleURL(mainBundle);
 			break;
 	}
+	
+	path_t outPath;
 	if (bundleDirURL) {
 		CFURLRef absoluteURL = CFURLCopyAbsoluteURL(bundleDirURL);
 		CFRelease(bundleDirURL);
 		CFStringRef bundleDirPath = CFURLCopyFileSystemPath( absoluteURL, kCFURLPOSIXPathStyle );
 		CFRelease(absoluteURL);
-		CFStringGetCString( bundleDirPath, outPath, maxLen, kCFStringEncodingASCII );
+		outPath = CFStringGetCStringPtr(bundleDirPath, kCFStringEncodingUTF8);
 		CFRelease(bundleDirPath);
 	}
+	return outPath;
 }
 #endif
 
@@ -210,6 +213,22 @@ char* PathAppend (char* target, const char* name)
 	strncat( target+len, name, _MAX_PATH - len - 1 );
 
 	return target;
+}
+
+void PathAppend(path_t& target, const char* name)
+{
+	size_t len = target.length();
+
+	if (target[0] != 0 && target[len-1] != PathDelimiter && len+1 < _MAX_PATH) {
+		target.push_back(PathDelimiter);
+	}
+	// strip possible leading backslash, since it is not ignored on all platforms
+	// totl has '\data\zcMHar.bif' in the key file, and also the CaseSensitive
+	// code breaks with that extra slash, so simple fix: remove it
+	if (name[0] == '\\') {
+		name = name+1;
+	}
+	target += name;
 }
 
 static bool FindInDir(const char* Dir, char *Filename)
@@ -309,34 +328,28 @@ bool PathJoinExt (char* target, const char* dir, const char* base, const char* e
  * needslash = true : we add a slash
  * needslash = false: we remove the slash
  */
-void FixPath (char *path, bool needslash)
+void FixPath(path_t& path, bool needslash)
 {
-	size_t i = strlen( path ) - 1;
+	size_t i = path.length();
 
 	if (needslash) {
-		if (path[i] == PathDelimiter) return;
-
-		// if path is already too long, don't do anything
-		if (i >= _MAX_PATH - 2) return;
-		i++;
-		path[i++] = PathDelimiter;
+		if (i && path[i - 1] == PathDelimiter) return;
+		path.push_back(PathDelimiter);
+	} else if (i) {
+		if (path[i - 1] != PathDelimiter) return;
+		path.pop_back();
 	}
-	else {
-		if (path[i] != PathDelimiter) return;
-	}
-	path[i] = 0;
 }
 
 #ifndef WIN32
 
 void ResolveFilePath(char* FilePath)
 {
-	char TempFilePath[_MAX_PATH];
-
 	if (FilePath[0]=='~') {
-		if (CopyHomePath(TempFilePath, _MAX_PATH)) {
-			PathAppend(TempFilePath, FilePath+1);
-			strcpy(FilePath, TempFilePath);
+		path_t home = HomePath();
+		if (home.length()) {
+			PathAppend(home, FilePath+1);
+			strcpy(FilePath, home.c_str());
 			return;
 		}
 	}
@@ -344,6 +357,7 @@ void ResolveFilePath(char* FilePath)
 	if (core && !core->config.CaseSensitive) {
 		return;
 	}
+	char TempFilePath[_MAX_PATH];
 	if (strlcpy(TempFilePath, FilePath, _MAX_PATH-1) >= _MAX_PATH-1) {
 		Log(ERROR, "VFS", "Too long path to resolve: {}!", FilePath);
 		return;
@@ -353,12 +367,11 @@ void ResolveFilePath(char* FilePath)
 
 void ResolveFilePath(std::string& FilePath)
 {
-	char TempFilePath[_MAX_PATH];
-
 	if (FilePath[0]=='~') {
-		if (CopyHomePath(TempFilePath, _MAX_PATH)) {
-			PathAppend(TempFilePath, FilePath.c_str()+1);
-			FilePath = TempFilePath;
+		path_t home = HomePath();
+		if (home.length()) {
+			PathAppend(home, FilePath.c_str()+1);
+			FilePath = home;
 			return;
 		}
 	}
@@ -366,6 +379,8 @@ void ResolveFilePath(std::string& FilePath)
 	if (core && !core->config.CaseSensitive) {
 		return;
 	}
+
+	char TempFilePath[_MAX_PATH];
 	PathJoin(TempFilePath, FilePath[0] == PathDelimiter ? SPathDelimiter : "", FilePath.c_str(), nullptr);
 	FilePath = TempFilePath;
 }
@@ -426,12 +441,11 @@ bool MakeDirectory(const char* path)
 #endif
 }
 
-GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
+GEM_EXPORT path_t HomePath()
 {
 	const char* home = getenv("HOME");
 	if (home) {
-		strlcpy(outPath, home, maxLen);
-		return outPath;
+		return home;
 	}
 #ifdef WIN32
 	else {
@@ -440,39 +454,40 @@ GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
 		home = getenv("HOMEPATH");
 
 		if (home) {
-			outPath[0] = '\0'; //ensure start string length is 0
+			path_t outPath;
 			if (homedrive) {
-				strlcpy(outPath, homedrive, maxLen);
+				outPath = homedrive;
 			}
 			PathAppend(outPath, home);
 			return outPath;
 		}
 	}
 #endif
-	return NULL;
+	return "";
 }
 
-GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen)
+path_t GemDataPath()
 {
 	// check env var; used by the Android wrapper
 #ifdef HAVE_SETENV
 	const char* dataDir = getenv("GEMRB_DATA");
 	if (dataDir) {
-		strlcpy(outPath, dataDir, maxLen);
-		return outPath;
+		return dataDir;
 	}
 #endif
 
+	path_t outPath;
 	// apple bundle, build time supplied directory or home and then cwd fallback
 #ifdef __APPLE__
-	CopyBundlePath(outPath, maxLen, RESOURCES);
+	outPath = BundlePath(RESOURCES);
 #elif defined(DATA_DIR)
-	strlcpy(outPath, DATA_DIR, maxLen);
+	outPath = DATA_DIR;
 #else
-	if (CopyHomePath(outPath, maxLen)) {
+	outPath = HomePath();
+	if (!outPath.empty()) {
 		PathAppend(outPath, PACKAGE);
 	} else {
-		snprintf(outPath, maxLen, "%c%s", '.', SPathDelimiter);
+		outPath = path_t(".") + SPathDelimiter;
 	}
 #endif
 
@@ -554,11 +569,10 @@ void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)
 
 bool DirectoryIterator::IsDirectory()
 {
-	char dtmp[_MAX_PATH];
-	GetFullPath(dtmp);
+	path_t path = GetFullPath();
 	//this is needed on windows!!!
-	FixPath(dtmp, false);
-	return dir_exists(dtmp);
+	FixPath(path, false);
+	return dir_exists(path.c_str());
 }
 
 const char* DirectoryIterator::GetName()
@@ -567,9 +581,9 @@ const char* DirectoryIterator::GetName()
 	return static_cast<dirent*>(Entry)->d_name;
 }
 
-void DirectoryIterator::GetFullPath(char *name)
+path_t DirectoryIterator::GetFullPath()
 {
-	snprintf(name, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, static_cast<dirent*>(Entry)->d_name);
+	return fmt::format("{}{}{}", Path, SPathDelimiter, static_cast<dirent*>(Entry)->d_name);
 }
 
 DirectoryIterator& DirectoryIterator::operator++()

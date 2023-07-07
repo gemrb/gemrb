@@ -64,21 +64,18 @@ static InterfaceConfig LoadFromStream(DataStream& cfgStream)
 static InterfaceConfig LoadDefaultCFG(const char* appName)
 {
 	// nothing passed in on CLI, so search for gemrb.cfg
-	char datadir[_MAX_PATH];
+	path_t datadir;
 	char path[_MAX_PATH];
-	char name[_MAX_PATH];
-
-	strlcpy(name, appName, _MAX_PATH);
-	assert(name[0]);
+	path_t name = appName;
 
 #if TARGET_OS_MAC
-	// CopyGemDataPath would give us bundle resources dir
-	CopyHomePath(datadir, _MAX_PATH);
+	// GemDataPath would give us bundle resources dir
+	datadir = HomePath();
 	PathAppend(datadir, PACKAGE);
 #else
-	CopyGemDataPath(datadir, _MAX_PATH);
+	datadir = GemDataPath();
 #endif
-	PathJoinExt(path, datadir, name, "cfg");
+	PathJoinExt(path, datadir.c_str(), name.c_str(), "cfg");
 	
 	FileStream cfgStream;
 	if (cfgStream.Open(path)) {
@@ -86,7 +83,7 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	}
 
 #ifdef SYSCONF_DIR
-	PathJoinExt( path, SYSCONF_DIR, name, "cfg" );
+	PathJoinExt( path, SYSCONF_DIR, name.c_str(), "cfg" );
 	if (cfgStream.Open(path))
 	{
 		return LoadFromStream(cfgStream);
@@ -95,11 +92,14 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 
 #ifndef ANDROID
 	// Now try ~/.gemrb folder
-	CopyHomePath(datadir, _MAX_PATH);
+	datadir = HomePath();
 	char confpath[_MAX_PATH] = ".";
-	strcat(confpath, name);
-	PathJoin(datadir, datadir, confpath, nullptr);
-	PathJoinExt( path, datadir, name, "cfg" );
+	strcat(confpath, name.c_str());
+	char tmp[_MAX_PATH];
+	strlcpy(tmp, datadir.c_str(), _MAX_PATH);
+	PathJoin(tmp, datadir.c_str(), confpath, nullptr);
+	datadir = tmp;
+	PathJoinExt(path, datadir.c_str(), name.c_str(), "cfg");
 	
 	if (cfgStream.Open(path))
 	{
@@ -107,8 +107,8 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	}
 #endif
 	// Don't try with default binary name if we have tried it already
-	if (strcmp( name, PACKAGE ) != 0) {
-		PathJoinExt(path, datadir, PACKAGE, "cfg");
+	if (name != PACKAGE) {
+		PathJoinExt(path, datadir.c_str(), PACKAGE, "cfg");
 
 		if (cfgStream.Open(path))
 		{

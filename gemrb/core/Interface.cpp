@@ -276,7 +276,7 @@ Interface::~Interface() noexcept
 	gamedata = NULL;
 
 	// Removing all stuff from Cache, except bifs
-	if (!config.KeepCache) DelTree((const char *) config.CachePath, true);
+	if (!config.KeepCache) DelTree(config.CachePath.c_str(), true);
 }
 
 GameControl* Interface::StartGameControl()
@@ -835,30 +835,29 @@ int Interface::Init(InterfaceConfig cfg)
 #define CONFIG_PATH(key, var, default) \
 		value = cfg[key]; \
 		if (value.length()) { \
-			strlcpy(var, value.c_str(), sizeof(var)); \
+			var = value; \
 			ResolveFilePath(var); \
 			FixPath(var, true); \
-		} else if (default && default[0]) { \
-			strlcpy(var, default, sizeof(var)); \
-		} else var[0] = '\0'; \
+		} else if (default.length()) { \
+			var = default; \
+		}; \
 		value = ""
 
 	// TODO: make CustomFontPath default cross platform
-	CONFIG_PATH("CustomFontPath", config.CustomFontPath, "/usr/share/fonts/TTF");
-	CONFIG_PATH("GameCharactersPath", config.GameCharactersPath, "characters");
-	CONFIG_PATH("GameDataPath", config.GameDataPath, "data");
-	CONFIG_PATH("GameOverridePath", config.GameOverridePath, "override");
-	CONFIG_PATH("GamePortraitsPath", config.GamePortraitsPath, "portraits");
-	CONFIG_PATH("GameScriptsPath", config.GameScriptsPath, "scripts");
-	CONFIG_PATH("GameSoundsPath", config.GameSoundsPath, "sounds");
-	CONFIG_PATH("GameLanguagePath", config.GameLanguagePath, "lang/en_US");
-	CONFIG_PATH("GameMoviesPath", config.GameMoviesPath, "movies");
+	CONFIG_PATH("CustomFontPath", config.CustomFontPath, path_t("/usr/share/fonts/TTF"));
+	CONFIG_PATH("GameCharactersPath", config.GameCharactersPath, path_t("characters"));
+	CONFIG_PATH("GameDataPath", config.GameDataPath, path_t("data"));
+	CONFIG_PATH("GameOverridePath", config.GameOverridePath, path_t("override"));
+	CONFIG_PATH("GamePortraitsPath", config.GamePortraitsPath, path_t("portraits"));
+	CONFIG_PATH("GameScriptsPath", config.GameScriptsPath, path_t("scripts"));
+	CONFIG_PATH("GameSoundsPath", config.GameSoundsPath, path_t("sounds"));
+	CONFIG_PATH("GameLanguagePath", config.GameLanguagePath, path_t("lang/en_US"));
+	CONFIG_PATH("GameMoviesPath", config.GameMoviesPath, path_t("movies"));
 
 	// Path configuration
-	CONFIG_PATH("GemRBPath", config.GemRBPath,
-				CopyGemDataPath(config.GemRBPath, _MAX_PATH));
+	CONFIG_PATH("GemRBPath", config.GemRBPath, GemDataPath());
 
-	CONFIG_PATH("CachePath", config.CachePath, "./Cache2");
+	CONFIG_PATH("CachePath", config.CachePath, path_t("./Cache2"));
 	FixPath(config.CachePath, false);
 
 	// AppImage doesn't support relative urls at all
@@ -879,17 +878,17 @@ int Interface::Init(InterfaceConfig cfg)
 #endif
 
 	CONFIG_PATH("GUIScriptsPath", config.GUIScriptsPath, config.GemRBPath);
-	CONFIG_PATH("GamePath", config.GamePath, ".");
+	CONFIG_PATH("GamePath", config.GamePath, path_t("."));
 	// guess a few paths in case this one is bad; two levels deep for the fhs layout
 	char testPath[_MAX_PATH];
 	bool gameFound = true;
-	if (!PathJoin(testPath, config.GamePath, "chitin.key", nullptr)) {
+	if (!PathJoin(testPath, config.GamePath.c_str(), "chitin.key", nullptr)) {
 		Log(WARNING, "Interface", "Invalid GamePath detected ({}), guessing from the current dir!", testPath);
 		if (PathJoin(testPath, "..", "chitin.key", nullptr)) {
-			strlcpy(config.GamePath, "..", sizeof(config.GamePath));
+			config.GamePath = "..";
 		} else {
 			if (PathJoin(testPath, "..", "..", "chitin.key", nullptr)) {
-				strlcpy(config.GamePath, "../..", sizeof(config.GamePath));
+				config.GamePath = "../..";
 			} else {
 				gameFound = false;
 			}
@@ -900,10 +899,12 @@ int Interface::Init(InterfaceConfig cfg)
 	if (!gameFound) {
 		Log(WARNING, "Interface", "Invalid GamePath detected, looking for the GemRB demo!");
 		if (PathJoin(testPath, "..", "demo", "chitin.key", nullptr)) {
-			PathJoin(config.GamePath, "..", "demo", nullptr);
+			PathJoin(testPath, "..", "demo", nullptr);
+			config.GamePath = testPath;
 			config.GameType = "demo";
-		} else if (PathJoin(testPath, config.GemRBPath, "demo", "chitin.key", nullptr)) {
-			PathJoin(config.GamePath, config.GemRBPath, "demo", nullptr);
+		} else if (PathJoin(testPath, config.GemRBPath.c_str(), "demo", "chitin.key", nullptr)) {
+			PathJoin(testPath, config.GemRBPath.c_str(), "demo", nullptr);
+			config.GamePath = testPath;
 			config.GameType = "demo";
 		}
 	}
@@ -913,9 +914,10 @@ int Interface::Init(InterfaceConfig cfg)
 #ifdef PLUGIN_DIR
 	CONFIG_PATH("PluginsPath", config.PluginsPath, PLUGIN_DIR);
 #else
-	CONFIG_PATH("PluginsPath", config.PluginsPath, "");
+	CONFIG_PATH("PluginsPath", config.PluginsPath, path_t(""));
 	if (!config.PluginsPath[0]) {
-		PathJoin(config.PluginsPath, config.GemRBPath, "plugins", nullptr);
+		PathJoin(testPath, config.GemRBPath.c_str(), "plugins", nullptr);
+		config.PluginsPath = testPath;
 	}
 #endif
 
@@ -961,22 +963,22 @@ int Interface::Init(InterfaceConfig cfg)
 			// nothing in config so create our own
 			char name[_MAX_PATH];
 
-			PathJoin(name, config.GamePath, keyname, nullptr);
+			PathJoin(name, config.GamePath.c_str(), keyname, nullptr);
 			config.CD[i].emplace_back(name);
-			PathJoin(name, config.GamePath, config.GameDataPath, keyname, nullptr);
+			PathJoin(name, config.GamePath.c_str(), config.GameDataPath.c_str(), keyname, nullptr);
 			config.CD[i].emplace_back(name);
 		}
 	}
 
-	if (!MakeDirectories(config.CachePath)) {
+	if (!MakeDirectories(config.CachePath.c_str())) {
 		error("Core", "Unable to create cache directory '{}'", config.CachePath);
 	}
 
-	if (StupidityDetector(config.CachePath)) {
+	if (StupidityDetector(config.CachePath.c_str())) {
 		Log(ERROR, "Core", "Cache path {} doesn't exist, not a folder or contains alien files!", config.CachePath);
 		return GEM_ERROR;
 	}
-	if (!config.KeepCache) DelTree((const char *) config.CachePath, false);
+	if (!config.KeepCache) DelTree(config.CachePath.c_str(), false);
 
 	// potentially disable logging before plugins are loaded (the log file is a plugin)
 	value = cfg["Logging"];
@@ -988,15 +990,14 @@ int Interface::Init(InterfaceConfig cfg)
 	// search the bundle plugins first
 	// since bundle plugins are loaded first dyld will give them precedence
 	// if duplicates are found in the PluginsPath
-	char bundlePluginsPath[_MAX_PATH];
-	CopyBundlePath(bundlePluginsPath, sizeof(bundlePluginsPath), PLUGINS);
+	path_t bundlePluginsPath = BundlePath(PLUGINS);
 	ResolveFilePath(bundlePluginsPath);
 #ifndef STATIC_LINK
-	LoadPlugins(bundlePluginsPath);
+	LoadPlugins(bundlePluginsPath.c_str());
 #endif
 #endif
 #ifndef STATIC_LINK
-	LoadPlugins(config.PluginsPath);
+	LoadPlugins(config.PluginsPath.c_str());
 #endif
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
@@ -1031,7 +1032,7 @@ int Interface::Init(InterfaceConfig cfg)
 	}
 
 	char path[_MAX_PATH];
-	PathJoin(path, config.CachePath, nullptr);
+	PathJoin(path, config.CachePath.c_str(), nullptr);
 	if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
 		Log(FATAL, "Core", "The cache path couldn't be registered, please check!");
 		return GEM_ERROR;
@@ -1041,38 +1042,38 @@ int Interface::Init(InterfaceConfig cfg)
 		gamedata->AddSource(modPath.c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
-	PathJoin(path, config.GemRBOverridePath, "override", config.GameType.c_str(), nullptr);
+	PathJoin(path, config.GemRBOverridePath.c_str(), "override", config.GameType.c_str(), nullptr);
 	if (config.GameType == "auto") {
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
 	} else {
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
-	PathJoin(path, config.GemRBOverridePath, "override", "shared", nullptr);
+	PathJoin(path, config.GemRBOverridePath.c_str(), "override", "shared", nullptr);
 	gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	PathJoin(path, config.GamePath, config.GameOverridePath, nullptr);
+	PathJoin(path, config.GamePath.c_str(), config.GameOverridePath.c_str(), nullptr);
 	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	// GAME sounds are intentionally not cached, in IWD there are directory structures,
 	// that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
-	PathJoin(path, config.GamePath, config.GameSoundsPath, nullptr);
+	PathJoin(path, config.GamePath.c_str(), config.GameSoundsPath.c_str(), nullptr);
 	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
-	PathJoin(path, config.GamePath, config.GameMoviesPath, nullptr);
+	PathJoin(path, config.GamePath.c_str(), config.GameMoviesPath.c_str(), nullptr);
 	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY);
 
-	PathJoin(path, config.GamePath, config.GameScriptsPath, nullptr);
+	PathJoin(path, config.GamePath.c_str(), config.GameScriptsPath.c_str(), nullptr);
 	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	PathJoin(path, config.GamePath, config.GamePortraitsPath, nullptr);
+	PathJoin(path, config.GamePath.c_str(), config.GamePortraitsPath.c_str(), nullptr);
 	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	PathJoin(path, config.GamePath, config.GameDataPath, nullptr);
+	PathJoin(path, config.GamePath.c_str(), config.GameDataPath.c_str(), nullptr);
 	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	// accomodating silly installers that create a data/Data/.* structure
-	PathJoin(path, config.GamePath, config.GameDataPath, "Data", nullptr);
+	PathJoin(path, config.GamePath.c_str(), config.GameDataPath.c_str(), "Data", nullptr);
 	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	// IWD2 movies are on the CD but not in the BIF
@@ -1080,7 +1081,7 @@ int Interface::Init(InterfaceConfig cfg)
 	for (size_t i = 0; i < MAX_CD; i++) {
 		for (size_t j = 0; j < config.CD[i].size(); j++) {
 			description[2] = '1' + i;
-			PathJoin(path, config.CD[i][j].c_str(), config.GameDataPath, nullptr);
+			PathJoin(path, config.CD[i][j].c_str(), config.GameDataPath.c_str(), nullptr);
 			gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
 		}
 	}
@@ -1088,18 +1089,18 @@ int Interface::Init(InterfaceConfig cfg)
 
 	// most of the old gemrb override files can be found here,
 	// so they have a lower priority than the game files and can more easily be modded
-	PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType.c_str(), nullptr);
+	PathJoin(path, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", config.GameType.c_str(), nullptr);
 	if (config.GameType == "auto") {
 		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
 	} else {
 		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
-	PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", "shared", nullptr);
+	PathJoin(path, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", "shared", nullptr);
 	gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	Log(MESSAGE, "Core", "Initializing KEY Importer...");
 	char ChitinPath[_MAX_PATH];
-	PathJoin(ChitinPath, config.GamePath, "chitin.key", nullptr);
+	PathJoin(ChitinPath, config.GamePath.c_str(), "chitin.key", nullptr);
 	if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
 		Log(FATAL, "Core", "Failed to load \"chitin.key\"");
 		Log(ERROR, "Core", "This means:\n- you set the GamePath config variable incorrectly,\n\
@@ -1125,14 +1126,14 @@ int Interface::Init(InterfaceConfig cfg)
 	}
 
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
-	PathJoin(path, config.GemRBOverridePath, "override", config.GameType.c_str(), nullptr);
+	PathJoin(path, config.GemRBOverridePath.c_str(), "override", config.GameType.c_str(), nullptr);
 	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 	char unhardcodedTypePath[_MAX_PATH * 2];
-	PathJoin(unhardcodedTypePath, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType.c_str(), nullptr);
+	PathJoin(unhardcodedTypePath, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", config.GameType.c_str(), nullptr);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
-	if (config.CustomFontPath[0]) gamedata->AddSource(config.CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
+	if (config.CustomFontPath[0]) gamedata->AddSource(config.CustomFontPath.c_str(), "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
 
 	Log(MESSAGE, "Core", "Reading Game Options...");
 	if (!LoadGemRBINI()) {
@@ -1176,15 +1177,15 @@ int Interface::Init(InterfaceConfig cfg)
 	std::string gemrbINI;
 	std::string tmp;
 	gemrbINI = "gem-" + INIConfig;
-	PathJoin(ini_path, config.SavePath, gemrbINI.c_str(), nullptr);
+	PathJoin(ini_path, config.SavePath.c_str(), gemrbINI.c_str(), nullptr);
 	if (!file_exists(ini_path)) {
-		PathJoin(ini_path, config.GamePath, gemrbINI.c_str(), nullptr);
+		PathJoin(ini_path, config.GamePath.c_str(), gemrbINI.c_str(), nullptr);
 	}
 	if (file_exists(ini_path)) {
 		tmp = INIConfig;
 		INIConfig = gemrbINI;
 	} else {
-		PathJoin(ini_path, config.GamePath, INIConfig.c_str(), nullptr);
+		PathJoin(ini_path, config.GamePath.c_str(), INIConfig.c_str(), nullptr);
 		Log(MESSAGE,"Core", "Loading original game options from {}", ini_path);
 	}
 	if (!InitializeVarsWithINI(ini_path)) {
@@ -1226,12 +1227,12 @@ int Interface::Init(InterfaceConfig cfg)
 	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	char strpath[_MAX_PATH];
-	PathJoin(strpath, config.GamePath, "dialog.tlk", nullptr);
+	PathJoin(strpath, config.GamePath.c_str(), "dialog.tlk", nullptr);
 	FileStream* fs = FileStream::OpenFile(strpath);
 
 	if (!fs) {
 		// EE multi language deployment
-		PathJoin(strpath, config.GamePath, config.GameLanguagePath, "dialog.tlk", nullptr);
+		PathJoin(strpath, config.GamePath.c_str(), config.GameLanguagePath.c_str(), "dialog.tlk", nullptr);
 		fs = FileStream::OpenFile(strpath);
 
 		if (!fs) {
@@ -1245,11 +1246,11 @@ int Interface::Init(InterfaceConfig cfg)
 	if (strings->HasAltTLK()) {
 		strings2 = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
-		PathJoin(strpath, config.GamePath, "dialogf.tlk", nullptr);
+		PathJoin(strpath, config.GamePath.c_str(), "dialogf.tlk", nullptr);
 		fs = FileStream::OpenFile(strpath);
 		if (!fs) {
 			// try EE-style paths
-			PathJoin(strpath, config.GamePath, config.GameLanguagePath, "dialogf.tlk", nullptr);
+			PathJoin(strpath, config.GamePath.c_str(), config.GameLanguagePath.c_str(), "dialogf.tlk", nullptr);
 			fs = FileStream::OpenFile(strpath);
 		}
 		if (!fs) {
@@ -1358,7 +1359,7 @@ int Interface::Init(InterfaceConfig cfg)
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIparty[_MAX_PATH];
-		PathJoin(tINIparty, config.GamePath, "Party.ini", nullptr);
+		PathJoin(tINIparty, config.GamePath.c_str(), "Party.ini", nullptr);
 		fs = FileStream::OpenFile(tINIparty);
 		if (!INIparty->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load precreated teams.");
@@ -1373,7 +1374,7 @@ int Interface::Init(InterfaceConfig cfg)
 		Log(MESSAGE, "Core", "Loading beasts definition File...");
 		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
-		PathJoin(tINIbeasts, config.GamePath, "beast.ini", nullptr);
+		PathJoin(tINIbeasts, config.GamePath.c_str(), "beast.ini", nullptr);
 		fs = FileStream::OpenFile(tINIbeasts);
 		if (!INIbeasts->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
@@ -1382,7 +1383,7 @@ int Interface::Init(InterfaceConfig cfg)
 		Log(MESSAGE, "Core", "Loading quests definition File...");
 		INIquests = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIquests[_MAX_PATH];
-		PathJoin(tINIquests, config.GamePath, "quests.ini", nullptr);
+		PathJoin(tINIquests, config.GamePath.c_str(), "quests.ini", nullptr);
 		FileStream* fs2 = FileStream::OpenFile( tINIquests );
 		if (!INIquests->Open(fs2)) {
 			Log(WARNING, "Core", "Failed to load quest definitions.");
@@ -1444,7 +1445,7 @@ int Interface::Init(InterfaceConfig cfg)
 #endif
 	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
 	std::string pathString = fmt::format("GemRB_Data_Path = {}", unhardcodedTypePath);
-	PathJoin(strpath, config.GamePath, "gemrb_path.txt", nullptr);
+	PathJoin(strpath, config.GamePath.c_str(), "gemrb_path.txt", nullptr);
 	FileStream *pathFile = new FileStream();
 	// don't abort if something goes wrong, since it should never happen and it's not critical
 	if (pathFile->Create(strpath)) {
@@ -2086,7 +2087,7 @@ void Interface::LoadInitialValues(const ResRef& name, ieVarsMap& map) const
 {
 	char nPath[_MAX_PATH];
 	// we only support PST's var.var for now
-	PathJoin(nPath, config.GamePath, "var.var", nullptr);
+	PathJoin(nPath, config.GamePath.c_str(), "var.var", nullptr);
 	FileStream fs;
 	if (!fs.Open(nPath)) {
 		return;
@@ -2493,7 +2494,7 @@ int Interface::Roll(int dice, int size, int add) const
 DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 {
 	char Path[_MAX_PATH];
-	const char* resourcePath = NULL;
+	path_t resourcePath;
 	DirectoryIterator::FileFilterPredicate* filter = NULL;
 	switch (dir) {
 		case DIRECTORY_CHR_PORTRAITS:
@@ -2522,7 +2523,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			error("Interface", "Unknown resource directory type: {}!", dir);
 	}
 
-	PathJoin(Path, config.GamePath, resourcePath, nullptr);
+	PathJoin(Path, config.GamePath.c_str(), resourcePath.c_str(), nullptr);
 	DirectoryIterator dirIt(Path);
 	dirIt.SetFilterPredicate(filter);
 	return dirIt;
@@ -2610,10 +2611,10 @@ bool Interface::SaveConfig()
 	if (strncmp(INIConfig.c_str(), "gem-", 4) != 0) {
 		gemrbINI = "gem-" + INIConfig;
 	}
-	PathJoin(ini_path, config.GamePath, gemrbINI.c_str(), nullptr);
+	PathJoin(ini_path, config.GamePath.c_str(), gemrbINI.c_str(), nullptr);
 	FileStream *fs = new FileStream();
 	if (!fs->Create(ini_path)) {
-		PathJoin(ini_path, config.SavePath, gemrbINI.c_str(), nullptr);
+		PathJoin(ini_path, config.SavePath.c_str(), gemrbINI.c_str(), nullptr);
 		if (!fs->Create(ini_path)) {
 			delete fs;
 			return false;
@@ -2752,7 +2753,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	WorldMapArray* newWorldmap = nullptr;
 
 	LoadProgress(10);
-	if (!config.KeepCache) DelTree((const char *) config.CachePath, true);
+	if (!config.KeepCache) DelTree(config.CachePath.c_str(), true);
 	LoadProgress(15);
 
 	saveGameAREExtractor.changeSaveGame(sg);
@@ -3307,7 +3308,7 @@ void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID) const
 {
 	char filename[_MAX_PATH];
 
-	PathJoinExt(filename, config.CachePath, resref.c_str(), TypeExt(ClassID));
+	PathJoinExt(filename, config.CachePath.c_str(), resref.c_str(), TypeExt(ClassID));
 	unlink ( filename);
 }
 
@@ -3368,9 +3369,8 @@ void Interface::DelTree(const char* Pt, bool onlysave) const
 	do {
 		const char *name = dir.GetName();
 		if (!onlysave || SavedExtension(name) ) {
-			char dtmp[_MAX_PATH];
-			dir.GetFullPath(dtmp);
-			unlink( dtmp );
+			path_t dtmp = dir.GetFullPath();
+			unlink(dtmp.c_str());
 		}
 	} while (++dir);
 }
@@ -3993,7 +3993,7 @@ int Interface::WriteCharacter(StringView name, const Actor *actor)
 {
 	char Path[_MAX_PATH];
 
-	PathJoin(Path, config.GamePath, config.GameCharactersPath, nullptr);
+	PathJoin(Path, config.GamePath.c_str(), config.GameCharactersPath.c_str(), nullptr);
 	if (!actor) {
 		return -1;
 	}
@@ -4101,7 +4101,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 	FileStream str;
 
 	str.Create(folder, GameNameResRef.c_str(), IE_SAV_CLASS_ID);
-	DirectoryIterator dir(config.CachePath);
+	DirectoryIterator dir(config.CachePath.c_str());
 	if (!dir) {
 		return GEM_ERROR;
 	}
@@ -4123,14 +4123,13 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 		do {
 			const char *name = dir.GetName();
 			if (SavedExtension(name)==priority) {
-				char dtmp[_MAX_PATH];
-				dir.GetFullPath(dtmp);
+				path_t dtmp = dir.GetFullPath();
 				FileStream fs;
-				if (!fs.Open(dtmp)) {
+				if (!fs.Open(dtmp.c_str())) {
 					Log(ERROR, "Interface", "Failed to open \"{}\".", dtmp);
 				}
 
-				if (IsBlobSaveItem(dtmp)) {
+				if (IsBlobSaveItem(dtmp.c_str())) {
 					if (overrideRunning) {
 						saveGameAREExtractor.updateSaveGame(str.GetPos());
 						ai->AddToSaveGameCompressed(&str, &fs);
