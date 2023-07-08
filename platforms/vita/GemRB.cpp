@@ -88,14 +88,14 @@ int main(int argc, char* argv[])
 	Py_NoSiteFlag = 1;
 	Py_IgnoreEnvironmentFlag = 1;
 	Py_NoUserSiteDirectory = 1;
-
-	core = new Interface();
-
-	if (core->Init(LoadFromArgs(argc, argv)) == GEM_ERROR) {
-		delete core;
-		Log(MESSAGE, "Main", "Aborting due to fatal error...");
+	
+	try {
+		Interface gemrb(LoadFromArgs(argc, argv));
+		gemrb.Main();
+	} catch (std::exception& e) {
+		Log(FATAL, "Main", "Aborting due to fatal error... {}", e.what());
 		ToggleLogging(false);
-		return sceKernelExitProcess(-1);
+		return sceKernelExitProcess(GEM_ERROR);
 	}
 	
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
@@ -138,10 +138,6 @@ int main(int argc, char* argv[])
 		SDL_SetVideoModeScaling(vitaDestRect.x, vitaDestRect.y, vitaDestRect.w, vitaDestRect.h);
 	}
 #endif
-	delete config;
-
-	core->Main();
-	delete( core );
 	ToggleLogging(false);
 
 	return sceKernelExitProcess(0);

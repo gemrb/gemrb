@@ -37,20 +37,16 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, "");
 
 	Interface::SanityCheck(VERSION_GEMRB);
-
-	core = new Interface();
-
-	if (core->Init(LoadFromArgs(argc, argv)) == GEM_ERROR) {
-		delete core;
-		Log(MESSAGE, "Main", "Aborting due to fatal error...");
-
+	
+	try {
+		Interface gemrb(LoadFromArgs(argc, argv));
+		gemrb.Main();
+	} catch (std::exception& e) {
+		Log(FATAL, "Main", "Aborting due to fatal error... {}", e.what());
 		ToggleLogging(false); // Windows build will hang if we leave the logging thread running
-		return -1;
+		return GEM_ERROR;
 	}
 
-	core->Main();
-	delete core;
-
 	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
-	return 0;
+	return GEM_OK;
 }

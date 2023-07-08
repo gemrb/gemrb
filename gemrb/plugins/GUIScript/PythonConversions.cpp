@@ -153,7 +153,7 @@ PyStringWrapper PyString_AsStringView(PyObject* obj)
 	// TODO: this is the same as PyString_AsString
 	// it exists to diferentiate uses so that we can weed out PyString_AsString
 	// and replace them with PyUnicode_Decode or other alternatives
-	return PyStringWrapper(obj, core->SystemEncoding);
+	return PyStringWrapper(obj, core->config.SystemEncoding.c_str());
 }
 
 }

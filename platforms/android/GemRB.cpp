@@ -69,22 +69,17 @@ int main(int argc, char* argv[])
 	ToggleLogging(true);
 
 	Interface::SanityCheck(VERSION_GEMRB);
-
-	core = new Interface();
 	
-	if (core->Init(LoadFromArgs(argc, argv)) == GEM_ERROR) {
-		delete core;
-		Log(MESSAGE, "Main", "Aborting due to fatal error...");
-
-		return -1;
-	}
-	delete config;
-
+	try {
+		Interface gemrb(LoadFromArgs(argc, argv));
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
-    SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);
+	SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);
 #endif
+		gemrb.Main();
+	} catch (std::exception& e) {
+		Log(FATAL, "Main", "Aborting due to fatal error... {}", e.what());
+		return GEM_ERROR;
+	}
 
-	core->Main();
-	delete( core );
-	return 0;
+	return GEM_OK;
 }

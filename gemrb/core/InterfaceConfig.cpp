@@ -170,6 +170,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_INT("NumFingKboard", config.NumFingKboard);
 	CONFIG_INT("NumFingInfo", config.NumFingInfo);
 	CONFIG_INT("GamepadPointerSpeed", config.GamepadPointerSpeed);
+	CONFIG_INT("Logging", config.Logging);
 	
 	auto CONFIG_STRING = [&cfg](const std::string& key, auto& field) {
 		if (cfg.count(key)) {
