@@ -222,7 +222,7 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 		auto it = StringToLower(resname.begin(), resname.end(), ret->filename);
 		*it = '\0';
 		strcat( ret->filename, "." );
-		strcat( ret->filename, core->TypeExt( type ) );
+		strcat(ret->filename, core->TypeExt(type).c_str());
 		return ret;
 	}
 

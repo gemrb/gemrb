@@ -371,7 +371,7 @@ private:
 	int mousescrollspd = 10;
 	bool update_scripts = false;
 	/** Next Script Name */
-	std::string nextScript;
+	path_t nextScript;
 
 	std::deque<Timer> timers;
 	KeyMap *keymap = nullptr;
@@ -409,7 +409,7 @@ public:
 	void ClearFeature(GFFlags flag);
 	bool HasFeature(GFFlags flag) const;
 	bool IsAvailable(SClass_ID filetype) const;
-	const char * TypeExt(SClass_ID type) const;
+	path_t TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const noexcept;
 	Video * GetVideoDriver() const;
 	FogRenderer& GetFogRenderer();
@@ -474,8 +474,6 @@ public:
 	int PlayMovie(const ResRef& movieRef);
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add) const;
-	/** Loads a Game Compiled Script */
-	int LoadScript(const char * ResRef);
 	/** store the scriptable running the cutscene */
 	void SetCutSceneRunner(Scriptable *runner);
 	Scriptable *GetCutSceneRunner() const { return CutSceneRunner; };
@@ -558,13 +556,13 @@ public:
 	/*removes single file from cache*/
 	void RemoveFromCache(const ResRef& resref, SClass_ID SClassID) const;
 	/*removes all files from directory*/
-	void DelTree(const char *path, bool onlysaved) const;
+	void DelTree(const path_t& path, bool onlysaved) const;
 	/*returns 0,1,2 based on how the file should be saved */
-	int SavedExtension(const char *filename) const;
+	int SavedExtension(const path_t& filename) const;
 	/*returns true if the file should never be deleted accidentally */
-	bool ProtectedExtension(const char *filename) const;
+	bool ProtectedExtension(const path_t& filename) const;
 	/*returns true if the directory path isn't good as a Cache */
-	bool StupidityDetector(const char* Pt) const;
+	bool StupidityDetector(const path_t& Pt) const;
 	bool InDebugMode(int mode) const { return config.debugMode & mode; };
 	void SetDebugMode(int mode) { config.debugMode = mode; };
 	/*handles the load screen*/
@@ -628,11 +626,11 @@ public:
 	/** saves (exports a character to the characters folder */
 	int WriteCharacter(StringView name, const Actor *actor);
 	/** saves the game object to the destination folder */
-	int WriteGame(const char *folder);
+	int WriteGame(const path_t& folder);
 	/** saves the worldmap object to the destination folder */
-	int WriteWorldMap(const char *folder);
+	int WriteWorldMap(const path_t& folder);
 	/** saves the .are and .sto files to the destination folder */
-	int CompressSave(const char *folder, bool overrideRunning);
+	int CompressSave(const path_t& folder, bool overrideRunning);
 	/** toggles the pause. returns either PAUSE_ON or PAUSE_OFF to reflect the script state after toggling. */
 	PauseSetting TogglePause() const;
 	/** returns true the passed pause setting was applied. false otherwise. */
@@ -653,7 +651,7 @@ public:
 	/** resolves a stat bonus based on multiple stats */
 	int ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieDword flags = 0, int value = 0);
 	/** Opens CD prompt window and waits for the specified disc */
-	void WaitForDisc(int disc_number, const char* path);
+	void WaitForDisc(int disc_number, const path_t& path);
 	/** Returns the music playlist corresponding to the provided type */
 	const ieVariable& GetMusicPlaylist(size_t SongType) const;
 	void DisableMusicPlaylist(size_t SongType);
@@ -694,10 +692,10 @@ private:
 		return false;
 	}
 
-	bool InitializeVarsWithINI(const char * iniFileName);
+	bool InitializeVarsWithINI(const path_t& iniFileName);
 	void InitItemTypes();
 	bool ReadRandomItems();
-	bool ReadItemTable(const ResRef& item, const char *Prefix);
+	bool ReadItemTable(const ResRef& item, const path_t& Prefix);
 	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
 	bool ReadGameTimeTable();
@@ -760,7 +758,7 @@ public:
 	static void SanityCheck(const char *ver);
 
 	/** Set Next Script */
-	void SetNextScript(const char *script);
+	void SetNextScript(const path_t& script);
 
 	Audio* GetAudioDrv(void) const;
 

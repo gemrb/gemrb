@@ -39,12 +39,12 @@ bool DirectoryImporter::Open(const path_t& dir, const char *desc)
 	return true;
 }
 
-static bool FindIn(const path_t& path, StringView resRef, const char *type)
+static bool FindIn(const path_t& path, StringView resRef, const path_t& type)
 {
 	return FileExists(PathJoinExt(path, resRef, type));
 }
 
-static FileStream *SearchIn(const path_t& path, StringView resRef, const char *type)
+static FileStream *SearchIn(const path_t& path, StringView resRef, const path_t& type)
 {
 	return FileStream::OpenFile(PathJoinExt(path, resRef, type));
 }
