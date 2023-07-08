@@ -64,8 +64,7 @@ GEM_EXPORT path_t BundlePath(BundleDirectory dir = BUNDLE);
 #endif
 
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */
-GEM_EXPORT void ResolveFilePath(char* FilePath);
-GEM_EXPORT void ResolveFilePath(std::string& FilePath);
+GEM_EXPORT void ResolveFilePath(path_t& FilePath);
 
 #endif  // ! WIN32
 
@@ -104,7 +103,7 @@ GEM_EXPORT void FixPath(path_t& path, bool needslash);
 GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);
 
 GEM_EXPORT char* PathAppend(char* target, const char* name);
-GEM_EXPORT void PathAppend(path_t& target, const char* name);
+GEM_EXPORT void PathAppend(path_t& target, const path_t& name);
 
 GEM_EXPORT bool MakeDirectories(const char* path) WARN_UNUSED;
 GEM_EXPORT bool MakeDirectory(const char* path) WARN_UNUSED;

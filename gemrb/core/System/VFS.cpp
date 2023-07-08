@@ -215,20 +215,21 @@ char* PathAppend (char* target, const char* name)
 	return target;
 }
 
-void PathAppend(path_t& target, const char* name)
+void PathAppend(path_t& target, const path_t& name)
 {
 	size_t len = target.length();
 
-	if (target[0] != 0 && target[len-1] != PathDelimiter && len+1 < _MAX_PATH) {
+	if (target[0] != 0 && target[len-1] != PathDelimiter) {
 		target.push_back(PathDelimiter);
 	}
 	// strip possible leading backslash, since it is not ignored on all platforms
 	// totl has '\data\zcMHar.bif' in the key file, and also the CaseSensitive
 	// code breaks with that extra slash, so simple fix: remove it
 	if (name[0] == '\\') {
-		name = name+1;
+		target.append(name, 1, path_t::npos);
+	} else {
+		target += name;
 	}
-	target += name;
 }
 
 static bool FindInDir(const char* Dir, char *Filename)
@@ -344,29 +345,7 @@ void FixPath(path_t& path, bool needslash)
 
 #ifndef WIN32
 
-void ResolveFilePath(char* FilePath)
-{
-	if (FilePath[0]=='~') {
-		path_t home = HomePath();
-		if (home.length()) {
-			PathAppend(home, FilePath+1);
-			strcpy(FilePath, home.c_str());
-			return;
-		}
-	}
-
-	if (core && !core->config.CaseSensitive) {
-		return;
-	}
-	char TempFilePath[_MAX_PATH];
-	if (strlcpy(TempFilePath, FilePath, _MAX_PATH-1) >= _MAX_PATH-1) {
-		Log(ERROR, "VFS", "Too long path to resolve: {}!", FilePath);
-		return;
-	}
-	PathJoin(FilePath, TempFilePath[0] == PathDelimiter ? SPathDelimiter : "", TempFilePath, nullptr);
-}
-
-void ResolveFilePath(std::string& FilePath)
+void ResolveFilePath(path_t& FilePath)
 {
 	if (FilePath[0]=='~') {
 		path_t home = HomePath();

@@ -278,7 +278,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	auto value = cfg["ModPath"];
 	if (value.length()) {
 		config.ModPath = Explode<std::string, std::string>(value, PathListSeparator);
-		for (std::string& path : config.ModPath) {
+		for (path_t& path : config.ModPath) {
 			ResolveFilePath(path);
 		}
 	}
@@ -288,7 +288,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 		value = cfg[keyname];
 		if (value.length()) {
 			config.CD[i] = Explode<std::string, std::string>(value, PathListSeparator);
-			for (std::string& path : config.CD[i]) {
+			for (path_t& path : config.CD[i]) {
 				ResolveFilePath(path);
 			}
 		} else {
