@@ -23,6 +23,8 @@
 
 namespace GemRB {
 
+using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
+
 /**
  * Loads GemRB plugins from shared libraries or DLLs.
  *
