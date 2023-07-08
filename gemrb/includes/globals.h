@@ -33,11 +33,6 @@
 
 #include <cmath>
 
-#define VERSION_GEMRB "0.9.2-git"
-
-#define GEMRB_STRING "GemRB v" VERSION_GEMRB
-#define PACKAGE "GemRB"
-
 #include "RGBAColor.h"
 #include "errors.h"
 
@@ -319,9 +314,6 @@ inline T CeilDiv(T dividend, T divisor)
 		return CeilDivSlow(dividend, divisor);
 	}
 }
-
-//the maximum supported game CD count
-#define MAX_CD               6
 
 }
 

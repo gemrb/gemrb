@@ -88,7 +88,7 @@ before_build:
     # set version to tag or version + commits since tag + commit hash
     $git_version = (git describe --always) | Out-String
     $git_version = $git_version -replace "`t|`n|`r|^v",""
-    $file = 'gemrb/includes/globals.h'
+    $file = 'gemrb/core/InterfaceConfig.h'
     $find = 'define VERSION_GEMRB .*$'
     $replace = "define VERSION_GEMRB `"$git_version`""
     (Get-Content $file) -replace $find, $replace | Set-Content $file

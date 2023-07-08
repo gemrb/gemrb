@@ -23,14 +23,89 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "exports.h"
+#include "System/VFS.h"
+
+// This is changed by both cmake and AppVeyor (CmakeLists.txt and .appveyor.yml)
+#define VERSION_GEMRB "0.9.2-git"
+
+#define GEMRB_STRING "GemRB v" VERSION_GEMRB
+#define PACKAGE "GemRB"
+
+//the maximum supported game CD count
+#define MAX_CD 6
 
 namespace GemRB {
 
+using variables_t = std::unordered_map<std::string, int32_t>;
+
+struct CoreSettings {
+	path_t GamePath = ".";
+	path_t GameDataPath = "data";
+	path_t GameOverridePath = "override";
+	path_t GameSoundsPath = "sounds";
+	path_t GameScriptsPath = "scripts";
+	path_t GamePortraitsPath = "portraits";
+	path_t GameCharactersPath = "characters";
+	path_t GameLanguagePath = "lang/en_US";
+	path_t GameMoviesPath = "movies";
+	path_t SavePath;
+	path_t CachePath = "./Cache2";
+	std::vector<path_t> CD[MAX_CD];
+	std::vector<path_t> ModPath;
+	path_t CustomFontPath = "/usr/share/fonts/TTF";
+
+	path_t GemRBPath = GemDataPath();
+	path_t GemRBOverridePath;
+	path_t GemRBUnhardcodedPath;
+	path_t PluginsPath;
+	path_t GUIScriptsPath;
+	bool CaseSensitive = true;
+
+	std::string GameName = GEMRB_STRING;
+	std::string GameType = "auto";
+	std::string Encoding = "default";
+
+	int GamepadPointerSpeed = 10;
+	bool UseSoftKeyboard = false; // TODO: reevaluate the need for this, see comments in StartTextInput
+	unsigned short NumFingScroll = 2;
+	unsigned short NumFingKboard = 3;
+	unsigned short NumFingInfo = 2;
+	int MouseFeedback = 0;
+
+	int Width = 640;
+	int Height = 480;
+	int Bpp = 32;
+	bool DrawFPS = false;
+	int CapFPS = 0;
+	bool SpriteFoW = false;
+	int debugMode = 0;
+	bool CheatFlag = false; /** Cheats enabled? */
+	int MaxPartySize = 6;
+
+	bool KeepCache = false;
+	bool MultipleQuickSaves = false;
+	// once GemRB own format is working well, this might be set to 0
+	int SaveAsOriginal = 1; // if true, saves files in compatible mode
+	std::string VideoDriverName = "sdl"; // consider deprecating? It's now a hidden option
+	std::string AudioDriverName = "openal";
+	std::string SkipPlugin;
+	std::string DelayPlugin;
+	
+	int DoubleClickDelay = 250;
+	uint32_t DebugFlags = 0;
+	uint32_t ActionRepeatDelay = 250;
+	int TouchInput = -1;
+
+	variables_t vars;
+};
+
 using InterfaceConfig = std::unordered_map<std::string, std::string>;
 
-GEM_EXPORT InterfaceConfig LoadFromArgs(int argc, char *argv[]);
+GEM_EXPORT CoreSettings LoadFromArgs(int argc, char *argv[]);
+GEM_EXPORT CoreSettings LoadFromDictionary(InterfaceConfig);
 GEM_EXPORT InterfaceConfig LoadFromCFG(const char* file);
 
 }

@@ -198,8 +198,8 @@ using namespace GemRB;
 			config[ckey] = [value cStringUsingEncoding:NSASCIIStringEncoding];
 		}
 	}
-	
-	if (core->Init(std::move(config)) == GEM_ERROR) {
+
+	if (core->Init(LoadFromDictionary(std::move(config))) == GEM_ERROR) {
 		delete core;
 		core = NULL;
 		Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Terminating.");
