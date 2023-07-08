@@ -137,7 +137,7 @@ SaveGame::SaveGame(std::string path, std::string name, const ResRef& prefix, std
 		strftime(tmp, _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
 		Date = tmp;
 	}
-	manager.AddSource(Path.c_str(), Name.c_str(), PLUGIN_RESOURCE_DIRECTORY);
+	manager.AddSource(Path, Name.c_str(), PLUGIN_RESOURCE_DIRECTORY);
 }
 
 Holder<Sprite2D> SaveGame::GetPortrait(int index) const

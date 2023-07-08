@@ -80,7 +80,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	}
 	path_t path = PathJoin(core->config.GamePath, musicsubfolder, name);
 	Log(MESSAGE, "MUSImporter", "Loading {}...", path);
-	if (!str->Open(path.c_str())) {
+	if (!str->Open(path)) {
 		Log(ERROR, "MUSImporter", "Didn't find playlist '{}'.", path);
 		return false;
 	}

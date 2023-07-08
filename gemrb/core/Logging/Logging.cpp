@@ -126,11 +126,11 @@ static void addGemRBLog(const CoreSettings& config)
 {
 	FileStream* log_file = new FileStream();
 	path_t log_path = PathJoin(config.GamePath, "GemRB.log");
-	if (log_file->Create(log_path.c_str())) {
+	if (log_file->Create(log_path)) {
 		AddLogWriter(createStreamLogWriter(log_file));
 	} else {
 		log_path = PathJoin(config.CachePath, "GemRB.log");
-		if (log_file->Create(log_path.c_str())) {
+		if (log_file->Create(log_path)) {
 			AddLogWriter(createStreamLogWriter(log_file));
 		} else {
 			Log (WARNING, "Logger", "Could not create a log file, skipping!");
