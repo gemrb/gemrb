@@ -224,7 +224,7 @@ static int IsQuickSaveSlot(StringView match, StringView slotname)
  * Return true if directory Path/slotname is a potential save game
  * slot, otherwise return false.
  */
-static bool IsSaveGameSlot(const char* Path, const char* slotname)
+static bool IsSaveGameSlot(const path_t& Path, const path_t& slotname)
 {
 	char savegameName[_MAX_PATH];
 	int savegameNumber = 0;
@@ -232,7 +232,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	if (slotname[0] == '.')
 		return false;
 
-	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
+	int cnt = sscanf(slotname.c_str(), SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName);
 	if (cnt != 2) {
 		//The matcher didn't match: either this is not a valid dir
 		//or the SAVEGAME_DIRECTORY_MATCHER needs updating.
@@ -243,7 +243,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	//The matcher got matched correctly.
 	char dtmp[_MAX_PATH];
-	PathJoin(dtmp, Path, slotname, nullptr);
+	PathJoin(dtmp, Path.c_str(), slotname.c_str(), nullptr);
 
 	char ftmp[_MAX_PATH];
 	PathJoinExt(ftmp, dtmp, core->GameNameResRef.c_str(), "bmp");
@@ -297,7 +297,7 @@ bool SaveGameIterator::RescanSaveGames()
 	dir.SetFlags(DirectoryIterator::Directories);
 	do {
 		const path_t& name = dir.GetName();
-		if (IsSaveGameSlot(Path, name.c_str())) {
+		if (IsSaveGameSlot(Path, name)) {
 			slots.emplace(name);
 		}
 	} while (++dir);
