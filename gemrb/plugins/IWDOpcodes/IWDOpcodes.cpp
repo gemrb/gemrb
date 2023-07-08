@@ -379,7 +379,7 @@ static void Cleanup()
 	Enemy=NULL;
 }
 
-static void RegisterIWDOpcodes()
+static void RegisterIWDOpcodes(const CoreSettings&)
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 

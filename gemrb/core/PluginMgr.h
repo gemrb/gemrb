@@ -42,6 +42,7 @@
 namespace GemRB {
 
 class TypeID;
+struct CoreSettings;
 
 /**
  * @class PluginMgr
@@ -63,7 +64,7 @@ private:
 	std::map< SClass_ID, PluginFunc> plugins;
 	std::map< const TypeID*, std::vector<ResourceDesc> > resources;
 	/** Array of initializer functions */
-	std::vector<void (*)(void)> initializerFunctions;
+	std::vector<void (*)(const CoreSettings&)> initializerFunctions;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
 	using driver_map = std::map<std::string, PluginFunc>;
@@ -98,7 +99,7 @@ public:
 	 *
 	 * @param[in] init Function to call on startup.
 	 */
-	void RegisterInitializer(void (*init)(void));
+	void RegisterInitializer(void (*init)(const CoreSettings&));
 	/**
 	 * Registers a static cleanup.
 	 *
@@ -107,7 +108,7 @@ public:
 	void RegisterCleanup(void (*cleanup)(void));
 
 	/** Run intializer functions. */
-	void RunInitializers() const;
+	void RunInitializers(const CoreSettings&) const;
 	/** Run cleanup functions */
 	void RunCleanup() const;
 

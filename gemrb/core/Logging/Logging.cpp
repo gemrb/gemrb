@@ -20,7 +20,6 @@
 #include "Streams/FileStream.h"
 #include "Logging/Loggers/Stdio.h"
 
-#include "Interface.h"
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/TextArea.h"
 
@@ -123,15 +122,15 @@ void AddLogWriter(Logger::WriterPtr&& writer)
 	}
 }
 
-static void addGemRBLog()
+static void addGemRBLog(const CoreSettings& config)
 {
 	char log_path[_MAX_PATH];
 	FileStream* log_file = new FileStream();
-	PathJoin(log_path, core->config.GamePath.c_str(), "GemRB.log", nullptr);
+	PathJoin(log_path, config.GamePath.c_str(), "GemRB.log", nullptr);
 	if (log_file->Create(log_path)) {
 		AddLogWriter(createStreamLogWriter(log_file));
 	} else {
-		PathJoin(log_path, core->config.CachePath.c_str(), "GemRB.log", nullptr);
+		PathJoin(log_path, config.CachePath.c_str(), "GemRB.log", nullptr);
 		if (log_file->Create(log_path)) {
 			AddLogWriter(createStreamLogWriter(log_file));
 		} else {

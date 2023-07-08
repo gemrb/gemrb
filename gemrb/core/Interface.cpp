@@ -804,7 +804,7 @@ int Interface::Init(CoreSettings&& cfg)
 		Log(FATAL, "Core", "Plugin Loading Failed, check path...");
 		return GEM_ERROR;
 	}
-	plugin->RunInitializers();
+	plugin->RunInitializers(config);
 
 	Log(MESSAGE, "Core", "GemRB Core Initialization...");
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
