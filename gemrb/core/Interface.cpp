@@ -46,9 +46,7 @@
 #include "MoviePlayer.h"
 #include "MusicMgr.h"
 #include "Palette.h"
-#ifndef STATIC_LINK
 #include "PluginLoader.h"
-#endif
 #include "PluginMgr.h"
 #include "Predicates.h"
 #include "ProjectileServer.h"
@@ -776,6 +774,7 @@ int Interface::Init(CoreSettings&& cfg)
 	// potentially disable logging before plugins are loaded (the log file is a plugin)
 	ToggleLogging(vars["Logging"]);
 	
+	plugin_flags_t pluginFlags;
 	if (!cfg.SkipPlugin.empty()) {
 		pluginFlags[config.SkipPlugin] = PLF_SKIP;
 	}
@@ -793,11 +792,11 @@ int Interface::Init(CoreSettings&& cfg)
 	path_t bundlePluginsPath = BundlePath(PLUGINS);
 	ResolveFilePath(bundlePluginsPath);
 #ifndef STATIC_LINK
-	LoadPlugins(bundlePluginsPath.c_str());
+	LoadPlugins(bundlePluginsPath.c_str(), pluginFlags);
 #endif
 #endif
 #ifndef STATIC_LINK
-	LoadPlugins(config.PluginsPath.c_str());
+	LoadPlugins(config.PluginsPath.c_str(), pluginFlags);
 #endif
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
@@ -809,7 +808,7 @@ int Interface::Init(CoreSettings&& cfg)
 
 	Log(MESSAGE, "Core", "GemRB Core Initialization...");
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str())));
+	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName)));
 	if (!video) {
 		Log(FATAL, "Core", "No Video Driver Available.");
 		return GEM_ERROR;
@@ -1880,10 +1879,6 @@ void Interface::ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) 
 {
 	std::vector<View*> views = GetViews(group);
 	SetGroupViewFlags(views, View::Disabled, enabled ? BitOp::NAND : BitOp::OR);
-}
-
-Interface::plugin_flags_t& Interface::GetPluginFlags() {
-	return pluginFlags;
 }
 
 void Interface::LoadInitialValues(const ResRef& name, ieVarsMap& map) const

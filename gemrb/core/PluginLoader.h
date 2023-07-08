@@ -21,7 +21,16 @@
 #ifndef PLUGINLOADER_H
 #define PLUGINLOADER_H
 
+#include <string>
+#include <unordered_map>
+
 namespace GemRB {
+
+enum PluginFlagsType {
+	PLF_NORMAL,
+	PLF_SKIP,
+	PLF_DELAY
+};
 
 using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
 
@@ -31,7 +40,7 @@ using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
  * It goes over all appropriately named files in PluginPath directory
  * and tries to load them one after another.
  */
-void LoadPlugins(const char* pluginpath);
+void LoadPlugins(const char* pluginpath, const plugin_flags_t& flags);
 
 }
 
