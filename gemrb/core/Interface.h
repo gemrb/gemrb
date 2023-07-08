@@ -311,7 +311,6 @@ class GEM_EXPORT Interface
 {
 public:
 	using tokens_t = std::unordered_map<ieVariable, String, CstrHashCI<ieVariable>>;
-	using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
 
 private:
 	// dirvers must be deallocated last (keep them at the top)
