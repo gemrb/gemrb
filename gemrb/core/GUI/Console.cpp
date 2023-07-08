@@ -158,7 +158,7 @@ void Console::SaveHistory() const noexcept
 
 	path_t filePath = PathJoin(core->config.GamePath, "gemrb_console.txt");
 	FileStream *histFile = new FileStream();
-	if (histFile->Create(filePath.c_str())) {
+	if (histFile->Create(filePath)) {
 		histFile->Write(commands.c_str(), commands.size());
 		histFile->Close();
 	}
@@ -168,7 +168,7 @@ void Console::SaveHistory() const noexcept
 void Console::LoadHistory()
 {
 	path_t filePath = PathJoin(core->config.GamePath, "gemrb_console.txt");
-	FileStream *histFile = FileStream::OpenFile(filePath.c_str());
+	FileStream *histFile = FileStream::OpenFile(filePath);
 	if (histFile) {
 		std::string line;
 		while (histFile->ReadLine(line) != DataStream::Error) {

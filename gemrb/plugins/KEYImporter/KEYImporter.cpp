@@ -94,7 +94,7 @@ static void FindBIF(BIFEntry *entry)
 	Log(ERROR, "KEYImporter", "Cannot find {}...", entry->name);
 }
 
-bool KEYImporter::Open(const char *resfile, const char *desc)
+bool KEYImporter::Open(const path_t& resfile, const char *desc)
 {
 	description = desc;
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
@@ -108,7 +108,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	if (!f) {
 		// Check for backslashes (false escape characters)
 		// this check probably belongs elsewhere (e.g. ResolveFilePath)
-		if (strstr( resfile, "\\ " )) {
+		if (resfile.find("\\ ") != path_t::npos) {
 			Log(MESSAGE, "KEYImporter", "Escaped space(s) detected in path!. Do not escape spaces in your GamePath!");
 		}
 		Log(ERROR, "KEYImporter", "Cannot open Chitin.key");

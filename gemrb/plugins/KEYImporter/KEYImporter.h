@@ -85,7 +85,7 @@ private:
 	/** Gets the stream assoicated to a RESKey */
 	DataStream *GetStream(const ResRef&, ieWord type);
 public:
-	bool Open(const char *file, const char *desc) override;
+	bool Open(const path_t& file, const char *desc) override;
 	/* predicts the availability of a resource */
 	bool HasResource(StringView resname, SClass_ID type) override;
 	bool HasResource(StringView resname, const ResourceDesc &type) override;

@@ -34,7 +34,7 @@ class ResourceDesc;
 
 class GEM_EXPORT ResourceSource : public Plugin {
 public:
-	virtual bool Open(const char *filename, const char *description) = 0;
+	virtual bool Open(const path_t& filename, const char *description) = 0;
 	virtual bool HasResource(StringView resname, SClass_ID type) = 0;
 	virtual bool HasResource(StringView resname, const ResourceDesc &type) = 0;
 	virtual DataStream* GetResource(StringView resname, SClass_ID type) = 0;

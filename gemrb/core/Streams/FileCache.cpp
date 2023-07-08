@@ -37,7 +37,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const std::string& filenam
 
 	if (overwrite || !FileExists(path)) {
 		FileStream out;
-		if (!out.Create(path.c_str())) {
+		if (!out.Create(path)) {
 			Log(ERROR, "FileCache", "Cannot write {}.", path);
 			return NULL;
 		}

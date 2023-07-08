@@ -446,12 +446,12 @@ Interface::Interface(CoreSettings&& cfg)
 	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	path_t strpath = PathJoin(config.GamePath, "dialog.tlk");
-	FileStream* fs = FileStream::OpenFile(strpath.c_str());
+	FileStream* fs = FileStream::OpenFile(strpath);
 
 	if (!fs) {
 		// EE multi language deployment
 		strpath = PathJoin(config.GamePath, config.GameLanguagePath, "dialog.tlk");
-		fs = FileStream::OpenFile(strpath.c_str());
+		fs = FileStream::OpenFile(strpath);
 
 		if (!fs) {
 			throw std::runtime_error("Cannot find Dialog.tlk.");
@@ -464,11 +464,11 @@ Interface::Interface(CoreSettings&& cfg)
 		strings2 = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
 		strpath = PathJoin(config.GamePath, "dialogf.tlk");
-		fs = FileStream::OpenFile(strpath.c_str());
+		fs = FileStream::OpenFile(strpath);
 		if (!fs) {
 			// try EE-style paths
 			strpath = PathJoin(config.GamePath, config.GameLanguagePath, "dialogf.tlk");
-			fs = FileStream::OpenFile(strpath.c_str());
+			fs = FileStream::OpenFile(strpath);
 		}
 		if (!fs) {
 			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
@@ -520,7 +520,7 @@ Interface::Interface(CoreSettings&& cfg)
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		path_t tINIparty = PathJoin(config.GamePath, "Party.ini");
-		fs = FileStream::OpenFile(tINIparty.c_str());
+		fs = FileStream::OpenFile(tINIparty);
 		if (!INIparty->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load precreated teams.");
 		}
@@ -534,7 +534,7 @@ Interface::Interface(CoreSettings&& cfg)
 		Log(MESSAGE, "Core", "Loading beasts definition File...");
 		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		path_t tINIbeasts = PathJoin(config.GamePath, "beast.ini");
-		fs = FileStream::OpenFile(tINIbeasts.c_str());
+		fs = FileStream::OpenFile(tINIbeasts);
 		if (!INIbeasts->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
 		}
@@ -542,7 +542,7 @@ Interface::Interface(CoreSettings&& cfg)
 		Log(MESSAGE, "Core", "Loading quests definition File...");
 		INIquests = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		path_t tINIquests = PathJoin(config.GamePath, "quests.ini");
-		FileStream* fs2 = FileStream::OpenFile(tINIquests.c_str());
+		FileStream* fs2 = FileStream::OpenFile(tINIquests);
 		if (!INIquests->Open(fs2)) {
 			Log(WARNING, "Core", "Failed to load quest definitions.");
 		}
@@ -601,7 +601,7 @@ Interface::Interface(CoreSettings&& cfg)
 	strpath = PathJoin(config.GamePath, "gemrb_path.txt");
 	FileStream *pathFile = new FileStream();
 	// don't abort if something goes wrong, since it should never happen and it's not critical
-	if (pathFile->Create(strpath.c_str())) {
+	if (pathFile->Create(strpath)) {
 		pathFile->Write(pathString.c_str(), pathString.length());
 		pathFile->Close();
 	}
@@ -2357,9 +2357,9 @@ bool Interface::SaveConfig()
 	}
 	path_t ini_path = PathJoin(config.GamePath, gemrbINI);
 	FileStream *fs = new FileStream();
-	if (!fs->Create(ini_path.c_str())) {
+	if (!fs->Create(ini_path)) {
 		ini_path = PathJoin(config.SavePath, gemrbINI);
-		if (!fs->Create(ini_path.c_str())) {
+		if (!fs->Create(ini_path)) {
 			delete fs;
 			return false;
 		}
@@ -3743,7 +3743,7 @@ int Interface::WriteCharacter(StringView name, const Actor *actor)
 	}
 
 	FileStream str;
-	if (!str.Create(Path.c_str(), name.c_str(), IE_CHR_CLASS_ID)
+	if (!str.Create(Path, name.c_str(), IE_CHR_CLASS_ID)
 		|| gm->PutActor(&str, actor, true) < 0) {
 		Log(WARNING, "Core", "Character cannot be saved: {}", name);
 		return -1;
@@ -3751,7 +3751,7 @@ int Interface::WriteCharacter(StringView name, const Actor *actor)
 
 	//write the BIO string
 	if (!HasFeature(GFFlags::NO_BIOGRAPHY)) {
-		str.Create(Path.c_str(), name.c_str(), IE_BIO_CLASS_ID);
+		str.Create(Path, name.c_str(), IE_BIO_CLASS_ID);
 		//never write the string reference into this string
 		std::string mbstr = GetMBString(actor->GetVerbalConstant(VB_BIO), STRING_FLAGS::STRREFOFF);
 		str.Write(mbstr.data(), mbstr.length());
@@ -3865,7 +3865,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 			if (SavedExtension(name.c_str()) == priority) {
 				path_t dtmp = dir.GetFullPath();
 				FileStream fs;
-				if (!fs.Open(dtmp.c_str())) {
+				if (!fs.Open(dtmp)) {
 					Log(ERROR, "Interface", "Failed to open \"{}\".", dtmp);
 				}
 

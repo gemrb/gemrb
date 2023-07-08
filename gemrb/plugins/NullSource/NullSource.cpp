@@ -26,7 +26,7 @@
 
 using namespace GemRB;
 
-bool NullSource::Open(const char *, const char *desc)
+bool NullSource::Open(const path_t&, const char *desc)
 {
 	description = desc;
 	return true;

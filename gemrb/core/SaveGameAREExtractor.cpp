@@ -99,7 +99,7 @@ int32_t SaveGameAREExtractor::createCacheBlob() {
 
 	FileStream cacheStream;
 
-	if (!cacheStream.Create(path.c_str())) {
+	if (!cacheStream.Create(path)) {
 		Log(ERROR, "SaveGameAREExtractor", "Cannot write to cache: {}.", path);
 		return GEM_ERROR;
 	}

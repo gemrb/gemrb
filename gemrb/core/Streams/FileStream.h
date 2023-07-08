@@ -70,14 +70,14 @@ public:
 		fseek(file, 0, SEEK_SET);
 		return size;
 	}
-	bool OpenRO(const char *name) {
-		return (file = fopen(name, "rb"));
+	bool OpenRO(const path_t& name) {
+		return (file = fopen(name.c_str(), "rb"));
 	}
-	bool OpenRW(const char *name) {
-		return (file = fopen(name, "r+b"));
+	bool OpenRW(const path_t& name) {
+		return (file = fopen(name.c_str(), "r+b"));
 	}
-	bool OpenNew(const char *name) {
-		return (file = fopen(name, "wb"));
+	bool OpenNew(const path_t& name) {
+		return (file = fopen(name.c_str(), "wb"));
 	}
 	strret_t Read(void* ptr, size_t length) {
 		return fread(ptr, 1, length, file);
@@ -110,11 +110,11 @@ public:
 
 	DataStream* Clone() const noexcept override;
 
-	bool Open(const char* filename);
-	bool Modify(const char* filename);
-	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
-	bool Create(const char* filename, SClass_ID ClassID);
-	bool Create(const char* filename);
+	bool Open(const path_t& filename);
+	bool Modify(const path_t& filename);
+	bool Create(const path_t& folder, const path_t& filename, SClass_ID ClassID);
+	bool Create(const path_t& filename, SClass_ID ClassID);
+	bool Create(const path_t& filename);
 	strret_t Read(void* dest, strpos_t length) override;
 	strret_t Write(const void* src, strpos_t length) override;
 	strret_t Seek(stroff_t pos, strpos_t startpos) override;
@@ -125,7 +125,7 @@ public:
 	 *
 	 *  Returns NULL, if the file can't be opened.
 	 */
-	static FileStream* OpenFile(const char* filename);
+	static FileStream* OpenFile(const path_t& filename);
 private:
 	void FindLength();
 };
