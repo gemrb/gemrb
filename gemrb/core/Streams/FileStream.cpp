@@ -45,7 +45,7 @@ FileStream::FileStream(void)
 
 DataStream* FileStream::Clone() const noexcept
 {
-	return OpenFile(originalfile.c_str());
+	return OpenFile(originalfile);
 }
 
 void FileStream::Close()
@@ -61,7 +61,7 @@ void FileStream::FindLength()
 	Pos = 0;
 }
 
-bool FileStream::Open(const char* fname)
+bool FileStream::Open(const path_t& fname)
 {
 	Close();
 
@@ -81,7 +81,7 @@ bool FileStream::Open(const char* fname)
 	return true;
 }
 
-bool FileStream::Modify(const char* fname)
+bool FileStream::Modify(const path_t& fname)
 {
 	Close();
 
@@ -99,20 +99,20 @@ bool FileStream::Modify(const char* fname)
 }
 
 //Creating file in the cache
-bool FileStream::Create(const char* fname, SClass_ID ClassID)
+bool FileStream::Create(const path_t& fname, SClass_ID ClassID)
 {
-	return Create(core->config.CachePath.c_str(), fname, ClassID);
+	return Create(core->config.CachePath, fname, ClassID);
 }
 
-bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID)
+bool FileStream::Create(const path_t& folder, const path_t& fname, SClass_ID ClassID)
 {
 	path_t filename = ExtractFileFromPath(fname);
 	path_t path = PathJoinExt(folder, filename, core->TypeExt(ClassID));
-	return Create(path.c_str());
+	return Create(path);
 }
 
 //Creating file outside of the cache
-bool FileStream::Create(const char *path)
+bool FileStream::Create(const path_t& path)
 {
 	Close();
 
@@ -120,7 +120,7 @@ bool FileStream::Create(const char *path)
 	path_t name = ExtractFileFromPath(path);
 	strlcpy(filename, name.c_str(), sizeof(filename));
 
-	if (!str.OpenNew(originalfile.c_str())) {
+	if (!str.OpenNew(originalfile)) {
 		return false;
 	}
 	opened = true;
@@ -199,7 +199,7 @@ strret_t FileStream::Seek(stroff_t newpos, strpos_t type)
 	return 0;
 }
 
-FileStream* FileStream::OpenFile(const char* filename)
+FileStream* FileStream::OpenFile(const path_t& filename)
 {
 	FileStream *fs = new FileStream();
 	if (fs->Open(filename))

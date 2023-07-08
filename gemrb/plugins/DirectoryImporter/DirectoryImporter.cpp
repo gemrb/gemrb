@@ -27,7 +27,7 @@
 
 using namespace GemRB;
 
-bool DirectoryImporter::Open(const char *dir, const char *desc)
+bool DirectoryImporter::Open(const path_t& dir, const char *desc)
 {
 	path_t p = dir;
 	ResolveCase(p);
@@ -46,7 +46,7 @@ static bool FindIn(const path_t& path, StringView resRef, const char *type)
 
 static FileStream *SearchIn(const path_t& path, StringView resRef, const char *type)
 {
-	return FileStream::OpenFile(PathJoinExt(path, resRef, type).c_str());
+	return FileStream::OpenFile(PathJoinExt(path, resRef, type));
 }
 
 bool DirectoryImporter::HasResource(StringView resname, SClass_ID type)
@@ -69,7 +69,7 @@ DataStream* DirectoryImporter::GetResource(StringView resname, const ResourceDes
 	return SearchIn( path, resname, type.GetExt() );
 }
 
-bool CachedDirectoryImporter::Open(const char *dir, const char *desc)
+bool CachedDirectoryImporter::Open(const path_t& dir, const char *desc)
 {
 	if (!DirectoryImporter::Open(dir, desc))
 		return false;
@@ -127,7 +127,7 @@ DataStream* CachedDirectoryImporter::GetResource(StringView resname, SClass_ID t
 
 	path_t buf = path;
 	PathAppend(buf, *lookup);
-	return FileStream::OpenFile(buf.c_str());
+	return FileStream::OpenFile(buf);
 }
 
 DataStream* CachedDirectoryImporter::GetResource(StringView resname, const ResourceDesc &type)
@@ -140,7 +140,7 @@ DataStream* CachedDirectoryImporter::GetResource(StringView resname, const Resou
 
 	path_t buf = path;
 	PathAppend(buf, *lookup);
-	return FileStream::OpenFile(buf.c_str());
+	return FileStream::OpenFile(buf);
 }
 
 #include "plugindef.h"

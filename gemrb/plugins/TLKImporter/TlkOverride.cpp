@@ -339,7 +339,7 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 	FileStream* fs = new FileStream();
 
 	while (true) {
-		if (fs->Modify(nPath.c_str())) {
+		if (fs->Modify(nPath)) {
 			return fs;
 		}
 		if (create) {
@@ -360,7 +360,7 @@ DataStream* CTlkOverride::GetAuxTlk(bool create)
 	FileStream* fs = new FileStream();
 
 	while (true) {
-		if (fs->Modify(nPath.c_str())) {
+		if (fs->Modify(nPath)) {
 			if (fs->Size() % (SEGMENT_SIZE + 12) == 0) {
 				return fs;
 			}

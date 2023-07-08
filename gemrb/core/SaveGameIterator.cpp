@@ -437,7 +437,7 @@ static bool DoSaveGame(const char *Path, bool overrideRunning)
 		if (portrait) {
 			std::string fname = fmt::format("PORTRT{}", i);
 			FileStream outfile;
-			outfile.Create(Path, fname.c_str(), IE_BMP_CLASS_ID);
+			outfile.Create(Path, fname, IE_BMP_CLASS_ID);
 			// NOTE: we save the true portrait size, even tho the preview buttons arent (always) the same
 			// we do this because: 1. the GUI should be able to use whatever size it wants
 			// and 2. its more appropriate to have a flag on the buttons to do the scaling/cropping

@@ -48,7 +48,7 @@ bool KeyMap::InitializeKeyMap(const char* inifile, const ResRef& tablefile)
 	}
 
 	path_t tINIkeymap = PathJoin(core->config.GamePath, inifile);
-	FileStream* config = FileStream::OpenFile(tINIkeymap.c_str());
+	FileStream* config = FileStream::OpenFile(tINIkeymap);
 
 	if (config == NULL) {
 		Log(WARNING, "KeyMap", "There is no '{}' file...", inifile);
