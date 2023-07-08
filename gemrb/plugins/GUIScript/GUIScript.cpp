@@ -13771,7 +13771,7 @@ static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref)
 	return pyView;
 }
 
-PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)
+PyObject* GUIScript::ConstructObject(const std::string& pyclassname, ScriptingId id)
 {
 	PyObject* kwargs = Py_BuildValue("{s:K}", "ID", id);
 	PyObject* ret = gs->ConstructObject(pyclassname, NULL, kwargs);
@@ -13779,15 +13779,14 @@ PyObject* GUIScript::ConstructObject(const char* pyclassname, ScriptingId id)
 	return ret;
 }
 
-PyObject* GUIScript::ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs)
+PyObject* GUIScript::ConstructObject(const std::string& pyclassname, PyObject* pArgs, PyObject* kwArgs)
 {
-	char classname[_MAX_PATH] = "G";
-	strncat(classname, pyclassname, _MAX_PATH - 2);
+	std::string classname = "G" + pyclassname;
 	if (!pGUIClasses) {
 		return RuntimeError(fmt::format("Tried to use an object ({}) before script compiled!", classname));
 	}
 
-	PyObject* cobj = PyDict_GetItemString( pGUIClasses, classname );
+	PyObject* cobj = PyDict_GetItemString(pGUIClasses, classname.c_str());
 	if (!cobj) {
 		return RuntimeError(fmt::format("Failed to lookup name '{}'", classname));
 	}

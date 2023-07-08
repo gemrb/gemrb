@@ -133,8 +133,8 @@ SaveGame::SaveGame(std::string path, std::string name, const ResRef& prefix, std
 		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
 		Date = "Sun 31 Feb 00:00:01 2099";
 	} else {
-		char tmp[_MAX_PATH];
-		strftime(tmp, _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
+		char tmp[255];
+		strftime(tmp, sizeof(tmp), "%c", localtime(&my_stat.st_mtime));
 		Date = tmp;
 	}
 	manager.AddSource(Path, Name.c_str(), PLUGIN_RESOURCE_DIRECTORY);
@@ -208,13 +208,13 @@ static int GetHole(int n)
  */
 static int IsQuickSaveSlot(StringView match, StringView slotname)
 {
-	char savegameName[_MAX_PATH];
+	char savegameName[255];
 	int savegameNumber = 0;
 	int cnt = sscanf(slotname.c_str(), SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName);
 	if (cnt != 2) {
 		return 0;
 	}
-	if (stricmp(savegameName, match.c_str()) != 0)
+	if (strnicmp(savegameName, match.c_str(), sizeof(savegameName)) != 0)
 	{
 		return 0;
 	}
@@ -226,7 +226,7 @@ static int IsQuickSaveSlot(StringView match, StringView slotname)
  */
 static bool IsSaveGameSlot(const path_t& Path, const path_t& slotname)
 {
-	char savegameName[_MAX_PATH];
+	char savegameName[255];
 	int savegameNumber = 0;
 
 	if (slotname[0] == '.')
@@ -330,7 +330,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(std::string slotname)
 	//lets leave space for the filenames
 	path_t Path = PathJoin(core->config.SavePath, SaveDir(), slotname);
 
-	char savegameName[_MAX_PATH]={0};
+	char savegameName[255]={0};
 	int savegameNumber = 0;
 
 	sscanf(slotname.c_str(), SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName);

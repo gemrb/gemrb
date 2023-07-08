@@ -4166,7 +4166,6 @@ void Interface::WaitForDisc(int disc_number, const path_t& path)
 	do {
 		winmgr->DrawWindows();
 		for (const auto& cd : config.CD[disc_number - 1]) {
-			assert(cd.length() < _MAX_PATH / 2);
 			path_t name = PathJoin(cd, path);
 			if (FileExists(name)) {
 				GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );

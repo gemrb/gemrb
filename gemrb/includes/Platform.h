@@ -27,15 +27,6 @@
 
 #include "exports.h"
 
-#ifndef _MAX_PATH
-	#ifdef WIN32
-		#define _MAX_PATH 260
-	#else
-		#include <cstdio> // for FILENAME_MAX...
-		#define _MAX_PATH FILENAME_MAX
-	#endif
-#endif
-
 #ifdef WIN32
 	#include "win32def.h"
 #elif defined(HAVE_UNISTD_H)

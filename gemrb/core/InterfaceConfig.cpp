@@ -214,7 +214,6 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 		Log(DEBUG, "Interface", "Found AppImage/ARGV0: {}", appImageFile);
 	}
 	if (appDir && appImageFile && strcasestr(appImageFile, "gemrb") != nullptr) {
-		assert(strnlen(appDir, _MAX_PATH/2) < _MAX_PATH/2);
 		config.GemRBPath = PathJoin(appDir, DATA_DIR);
 	}
 #endif

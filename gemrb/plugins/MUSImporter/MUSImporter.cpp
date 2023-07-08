@@ -272,10 +272,8 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 	} else if (name.BeginsWith("mx0000")) { //iwd
 		FName = PathJoin("mx0000", name);
 	} else if (!name.BeginsWith("SPC")) { //bg2
-		char File[_MAX_PATH];
-		auto end = fmt::format_to(File, "{}{}", PLName, name);
-		*end = '\0';
-		FName = PathJoin(PLName, File);
+		path_t file = fmt::format("{}{}", PLName, name);
+		FName = PathJoin(PLName, file);
 	} else {
 		FName = path_t(name);
 	}

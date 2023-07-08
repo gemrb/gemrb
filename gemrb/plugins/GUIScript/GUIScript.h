@@ -65,8 +65,8 @@ public:
 	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
 	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);
-	PyObject* ConstructObject(const char* pyclassname, ScriptingId id);
-	PyObject* ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
+	PyObject* ConstructObject(const std::string& pyclassname, ScriptingId id);
+	PyObject* ConstructObject(const std::string& pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
 	
 	const ScriptingRefBase* GetScriptingRef(PyObject* obj) const;
 };
