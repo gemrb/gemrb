@@ -45,7 +45,7 @@ FileStream::FileStream(void)
 
 DataStream* FileStream::Clone() const noexcept
 {
-	return OpenFile(originalfile);
+	return OpenFile(originalfile.c_str());
 }
 
 void FileStream::Close()
@@ -75,8 +75,9 @@ bool FileStream::Open(const char* fname)
 	opened = true;
 	created = false;
 	FindLength();
-	ExtractFileFromPath( filename, fname );
-	strlcpy( originalfile, fname, _MAX_PATH);
+	originalfile = fname;
+	path_t name = ExtractFileFromPath(fname);
+	strlcpy(filename, name.c_str(), sizeof(filename));
 	return true;
 }
 
@@ -90,8 +91,9 @@ bool FileStream::Modify(const char* fname)
 	opened = true;
 	created = true;
 	FindLength();
-	ExtractFileFromPath( filename, fname );
-	strlcpy( originalfile, fname, _MAX_PATH);
+	originalfile = fname;
+	path_t name = ExtractFileFromPath(fname);
+	strlcpy(filename, name.c_str(), sizeof(filename));
 	Pos = 0;
 	return true;
 }
@@ -104,8 +106,7 @@ bool FileStream::Create(const char* fname, SClass_ID ClassID)
 
 bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID)
 {
-	char filename[_MAX_PATH];
-	ExtractFileFromPath( filename, fname );
+	path_t filename = ExtractFileFromPath(fname);
 	path_t path = PathJoinExt(folder, filename, core->TypeExt(ClassID));
 	return Create(path.c_str());
 }
@@ -115,10 +116,11 @@ bool FileStream::Create(const char *path)
 {
 	Close();
 
-	ExtractFileFromPath( filename, path );
-	strlcpy(originalfile, path, _MAX_PATH);
+	originalfile = path;
+	path_t name = ExtractFileFromPath(path);
+	strlcpy(filename, name.c_str(), sizeof(filename));
 
-	if (!str.OpenNew(originalfile)) {
+	if (!str.OpenNew(originalfile.c_str())) {
 		return false;
 	}
 	opened = true;

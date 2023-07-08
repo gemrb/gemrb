@@ -96,8 +96,7 @@ int BIFImporter::OpenArchive(const char* path)
 	delete stream;
 	stream = nullptr;
 
-	char filename[_MAX_PATH];
-	ExtractFileFromPath(filename, path);
+	path_t filename = ExtractFileFromPath(path);
 
 	path_t cachePath = PathJoin(core->config.CachePath, filename);
 	char Signature[8];

@@ -280,7 +280,7 @@ bool SaveGameIterator::RescanSaveGames()
 	DirectoryIterator dir(Path);
 	// create the save game directory at first access
 	if (!dir) {
-		if (!MakeDirectories(Path.c_str())) {
+		if (!MakeDirectories(Path)) {
 			Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", Path);
 			return false;
 		}
@@ -562,7 +562,7 @@ static bool CreateSavePath(path_t& path, int index, StringView slotname)
 	path = PathJoin(core->config.SavePath, SaveDir());
 
 	//if the path exists in different case, don't make it again
-	if (!MakeDirectory(path.c_str())) {
+	if (!MakeDirectory(path)) {
 		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", path);
 		return false;
 	}
@@ -572,7 +572,7 @@ static bool CreateSavePath(path_t& path, int index, StringView slotname)
 	path = PathJoin(path, dir);
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(path.c_str(), false);
-	if (!MakeDirectory(path.c_str())) {
+	if (!MakeDirectory(path)) {
 		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", path);
 		return false;
 	}

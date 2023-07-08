@@ -40,7 +40,7 @@ bool VLCPlayer::Import(DataStream* stream)
 	DestroyPlayer();
 	if (stream) {
 		// we don't actually need anything from the stream. libVLC will open and use the file internally
-		libvlc_media_t* media = libvlc_media_new_path(libvlc, stream->originalfile);
+		libvlc_media_t* media = libvlc_media_new_path(libvlc, stream->originalfile.c_str());
 		mediaPlayer = libvlc_media_player_new_from_media(media);
 		libvlc_media_release(media); //player retains the media
 

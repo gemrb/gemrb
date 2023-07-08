@@ -35,7 +35,7 @@ SlicedStream::SlicedStream(const DataStream* cfs, strpos_t startPos, strpos_t st
 	assert(str);
 	size = streamSize;
 	startpos = startPos;
-	strlcpy(originalfile, cfs->originalfile, _MAX_PATH);
+	originalfile = cfs->originalfile;
 	strlcpy(filename, cfs->filename, sizeof(filename));
 	str->Seek(startpos, GEM_STREAM_START);
 }
@@ -111,7 +111,7 @@ DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool 
 		if (preservepos)
 			str->Seek(oldpos, GEM_STREAM_START);
 
-		DataStream *mem = new MemoryStream(str->originalfile, data, size);
+		DataStream *mem = new MemoryStream(str->originalfile.c_str(), data, size);
 		return mem;
 	} else
 		return new SlicedStream(str, startpos, size);
