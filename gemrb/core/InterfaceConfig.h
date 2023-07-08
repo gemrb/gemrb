@@ -62,7 +62,11 @@ struct CoreSettings {
 	path_t GemRBUnhardcodedPath;
 	path_t PluginsPath;
 	path_t GUIScriptsPath;
+#ifdef WIN32
+	bool CaseSensitive = false; // this is just the default value, so CD1/CD2 will be resolved
+#else
 	bool CaseSensitive = true;
+#endif
 
 	std::string GameName = GEMRB_STRING;
 	std::string GameType = "auto";
@@ -81,7 +85,8 @@ struct CoreSettings {
 	bool DrawFPS = false;
 	int CapFPS = 0;
 	bool SpriteFoW = false;
-	int debugMode = 0;
+	uint32_t debugMode = 0;
+	bool Logging = true;
 	bool CheatFlag = false; /** Cheats enabled? */
 	int MaxPartySize = 6;
 
@@ -98,6 +103,7 @@ struct CoreSettings {
 	uint32_t DebugFlags = 0;
 	uint32_t ActionRepeatDelay = 250;
 	int TouchInput = -1;
+	std::string SystemEncoding = "UTF-8";
 
 	variables_t vars;
 };

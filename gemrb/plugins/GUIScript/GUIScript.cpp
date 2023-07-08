@@ -4611,7 +4611,7 @@ static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	const std::string& name = save->GetName();
-	return PyUnicode_Decode(name.c_str(), name.length(), core->SystemEncoding, "strict");
+	return PyUnicode_Decode(name.c_str(), name.length(), core->config.SystemEncoding.c_str(), "strict");
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
@@ -4635,7 +4635,7 @@ static PyObject* GemRB_SaveGame_GetDate(PyObject * /*self*/, PyObject* args)
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	const std::string& date = save->GetDate();
-	return PyUnicode_Decode(date.c_str(), date.length(), core->SystemEncoding, "strict");
+	return PyUnicode_Decode(date.c_str(), date.length(), core->config.SystemEncoding.c_str(), "strict");
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetGameDate__doc,
@@ -4659,7 +4659,7 @@ static PyObject* GemRB_SaveGame_GetGameDate(PyObject * /*self*/, PyObject* args)
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	const std::string& date = save->GetGameDate();
-	return PyUnicode_Decode(date.c_str(), date.length(), core->SystemEncoding, "strict");
+	return PyUnicode_Decode(date.c_str(), date.length(), core->config.SystemEncoding.c_str(), "strict");
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetSaveID__doc,
@@ -4843,7 +4843,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			if (name[0] == '.' || dirit.IsDirectory() != dirs)
 				continue;
 
-			char *str = ConvertCharEncoding(name, core->SystemEncoding, core->TLKEncoding.encoding.c_str());
+			char *str = ConvertCharEncoding(name, core->config.SystemEncoding.c_str(), core->TLKEncoding.encoding.c_str());
 			String* string = StringFromCString(str);
 			free(str);
 

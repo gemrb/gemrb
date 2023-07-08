@@ -52,17 +52,13 @@ int main(int argc, char* argv[])
 
 	Interface::SanityCheck(VERSION_GEMRB);
 
-	core = new Interface();
-
-	if (core->Init(LoadFromArgs(argc, argv)) == GEM_ERROR) {
-		delete core;
-		Log(MESSAGE, "Main", "Aborting due to fatal error...");
-
-		return -1;
+	try {
+		Interface gemrb(LoadFromArgs(argc, argv));
+		gemrb.Main();
+	} catch (std::exception& e) {
+		Log(FATAL, "Main", "Aborting due to fatal error... {}", e.what());
+		return GEM_ERROR;
 	}
 
-	core->Main();
-	delete core;
-
-	return 0;
+	return GEM_OK;
 }

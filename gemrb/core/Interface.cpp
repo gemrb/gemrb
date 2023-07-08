@@ -191,8 +191,6 @@ static const ieWord IDT_CRITRANGE = 1;
 static const ieWord IDT_CRITMULTI = 2;
 static const ieWord IDT_SKILLPENALTY = 3;
 
-static const char* DefaultSystemEncoding = "UTF-8";
-
 // FIXME: DragOp should be initialized with the button we are dragging from
 // for now use a dummy until we truly implement this as a drag event
 Control ItemDragOp::dragDummy = Control(Region());
@@ -213,29 +211,510 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	dragDummy.BindDictVariable("itembutton", Control::INVALID_VALUE);
 }
 
-Interface::Interface() noexcept
+Interface::Interface(CoreSettings&& cfg)
+: config(std::move(cfg))
 {
-	displaymsg = nullptr;
+	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
 
-#ifdef WIN32
-	config.CaseSensitive = false; // this is just the default value, so CD1/CD2 will be resolved
-#endif
-
-	SystemEncoding = DefaultSystemEncoding;
+	core = this;
 #if defined(WIN32)
 	const uint32_t codepage = GetACP();
 	const char* iconvCode = GetIconvNameForCodepage(codepage);
 
 	if (nullptr == iconvCode) {
-		error("Interface", "Mapping of codepage {} unknown to iconv.", codepage);
+		throw std::runtime_error(fmt::format("Mapping of codepage {} unknown to iconv.", codepage));
 	}
-	SystemEncoding = iconvCode;
+	config.SystemEncoding = iconvCode;
 #elif defined(HAVE_LANGINFO_H)
-	SystemEncoding = nl_langinfo(CODESET);
+	config.SystemEncoding = nl_langinfo(CODESET);
 #endif
 
 	gamedata = new GameData();
 	sgiterator = new SaveGameIterator();
+
+	if (!MakeDirectories(config.CachePath.c_str())) {
+		throw std::runtime_error(fmt::format("Unable to create cache directory '{}'", config.CachePath));
+	}
+
+	if (StupidityDetector(config.CachePath.c_str())) {
+		throw std::runtime_error(fmt::format("Cache path {} doesn't exist, not a folder or contains alien files!", config.CachePath));
+	}
+	if (!config.KeepCache) DelTree(config.CachePath.c_str(), false);
+	
+	vars = std::move(config.vars);
+	vars["MaxPartySize"] = config.MaxPartySize; // for simple GUIScript access
+
+	// potentially disable logging before plugins are loaded (the log file is a plugin)
+	ToggleLogging(config.Logging);
+	
+	plugin_flags_t pluginFlags;
+	if (!cfg.SkipPlugin.empty()) {
+		pluginFlags[config.SkipPlugin] = PLF_SKIP;
+	}
+
+	if (!cfg.DelayPlugin.empty()) {
+		pluginFlags[config.DelayPlugin] = PLF_DELAY;
+	}
+
+	Log(MESSAGE, "Core", "Starting Plugin Manager...");
+	const PluginMgr *plugin = PluginMgr::Get();
+#if TARGET_OS_MAC
+	// search the bundle plugins first
+	// since bundle plugins are loaded first dyld will give them precedence
+	// if duplicates are found in the PluginsPath
+	path_t bundlePluginsPath = BundlePath(PLUGINS);
+	ResolveFilePath(bundlePluginsPath);
+#ifndef STATIC_LINK
+	LoadPlugins(bundlePluginsPath.c_str(), pluginFlags);
+#endif
+#endif
+#ifndef STATIC_LINK
+	LoadPlugins(config.PluginsPath.c_str(), pluginFlags);
+#endif
+	if (plugin && plugin->GetPluginCount()) {
+		Log(MESSAGE, "Core", "Plugin Loading Complete...");
+	} else {
+		throw std::runtime_error("Plugin Loading Failed, check path...");
+	}
+	plugin->RunInitializers(config);
+
+	Log(MESSAGE, "Core", "GemRB Core Initialization...");
+	Log(MESSAGE, "Core", "Initializing Video Driver...");
+	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str())));
+	if (!video) {
+		throw std::runtime_error("No Video Driver Available.");
+	}
+	if (video->Init() == GEM_ERROR) {
+		throw std::runtime_error("Cannot Initialize Video Driver.");
+	}
+
+	// ask the driver if a touch device is in use
+	EventMgr::TouchInputEnabled = config.TouchInput < 0 ? video->TouchInputEnabled() : config.TouchInput;
+	EventMgr::DCDelay = config.DoubleClickDelay;
+	Control::ActionRepeatDelay = config.ActionRepeatDelay;
+	GameControl::DebugFlags = config.DebugFlags;
+
+	ieDword brightness = GetVariable("Brightness Correction", 10);
+	ieDword contrast = GetVariable("Gamma Correction", 5);
+
+	Log(MESSAGE, "Core", "Initializing search path...");
+	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {
+		throw std::runtime_error("no DirectoryImporter!");
+	}
+
+	char path[_MAX_PATH];
+	PathJoin(path, config.CachePath.c_str(), nullptr);
+	if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
+		throw std::runtime_error("The cache path couldn't be registered, please check!");
+	}
+
+	for (const auto& modPath : config.ModPath) {
+		gamedata->AddSource(modPath.c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	}
+
+	PathJoin(path, config.GemRBOverridePath.c_str(), "override", config.GameType.c_str(), nullptr);
+	if (config.GameType == "auto") {
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
+	} else {
+		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	}
+
+	PathJoin(path, config.GemRBOverridePath.c_str(), "override", "shared", nullptr);
+	gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	PathJoin(path, config.GamePath.c_str(), config.GameOverridePath.c_str(), nullptr);
+	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	// GAME sounds are intentionally not cached, in IWD there are directory structures,
+	// that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
+	PathJoin(path, config.GamePath.c_str(), config.GameSoundsPath.c_str(), nullptr);
+	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
+
+	PathJoin(path, config.GamePath.c_str(), config.GameMoviesPath.c_str(), nullptr);
+	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY);
+
+	PathJoin(path, config.GamePath.c_str(), config.GameScriptsPath.c_str(), nullptr);
+	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	PathJoin(path, config.GamePath.c_str(), config.GamePortraitsPath.c_str(), nullptr);
+	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	PathJoin(path, config.GamePath.c_str(), config.GameDataPath.c_str(), nullptr);
+	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	// accomodating silly installers that create a data/Data/.* structure
+	PathJoin(path, config.GamePath.c_str(), config.GameDataPath.c_str(), "Data", nullptr);
+	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	// IWD2 movies are on the CD but not in the BIF
+	char* description = strdup("CD1/data");
+	for (size_t i = 0; i < MAX_CD; i++) {
+		for (size_t j = 0; j < config.CD[i].size(); j++) {
+			description[2] = '1' + i;
+			PathJoin(path, config.CD[i][j].c_str(), config.GameDataPath.c_str(), nullptr);
+			gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		}
+	}
+	free(description);
+
+	// most of the old gemrb override files can be found here,
+	// so they have a lower priority than the game files and can more easily be modded
+	PathJoin(path, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", config.GameType.c_str(), nullptr);
+	if (config.GameType == "auto") {
+		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
+	} else {
+		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	}
+	PathJoin(path, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", "shared", nullptr);
+	gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+
+	Log(MESSAGE, "Core", "Initializing KEY Importer...");
+	char ChitinPath[_MAX_PATH];
+	PathJoin(ChitinPath, config.GamePath.c_str(), "chitin.key", nullptr);
+	if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
+		Log(FATAL, "Core", "Failed to load \"chitin.key\"");
+		Log(ERROR, "Core", "This means:\n- you set the GamePath config variable incorrectly,\n\
+- you passed a bad game path to GemRB on the command line,\n\
+- you are not running GemRB from within a game dir,\n\
+- or the game is running (Windows only).");
+		throw std::runtime_error("The path must point to a game directory with a readable chitin.key file.");
+	}
+
+	fogRenderer = std::make_shared<FogRenderer>(video.get(), config.SpriteFoW);
+
+	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
+	SetNextScript("Start"); // Start is the first script executed
+	guiscript = MakePluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
+	if (guiscript == nullptr) {
+		throw std::runtime_error("Missing GUI Script Engine.");
+	}
+	if (!guiscript->Init()) {
+		throw std::runtime_error("Failed to initialize GUI Script.");
+	}
+
+	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
+	PathJoin(path, config.GemRBOverridePath.c_str(), "override", config.GameType.c_str(), nullptr);
+	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+	char unhardcodedTypePath[_MAX_PATH * 2];
+	PathJoin(unhardcodedTypePath, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", config.GameType.c_str(), nullptr);
+	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+
+	// Purposely add the font directory last since we will only ever need it at engine load time.
+	if (config.CustomFontPath[0]) gamedata->AddSource(config.CustomFontPath.c_str(), "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
+
+	Log(MESSAGE, "Core", "Reading Game Options...");
+	if (!LoadGemRBINI()) {
+		throw std::runtime_error("Cannot Load INI.");
+	}
+
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	ieDword fullscreen = GetVariable("Full Screen", 0);
+
+	int createDisplayResult =
+		video->CreateDisplay(
+				Size(config.Width, config.Height),
+				config.Bpp,
+				fullscreen,
+				config.GameName.c_str(),
+				config.CapFPS == 0
+		);
+
+	if (createDisplayResult == GEM_ERROR) {
+		throw std::runtime_error("Cannot initialize shaders.");
+	}
+	video->SetGamma(brightness, contrast);
+	
+	// if unset, manually populate GameName (window title)
+	if (config.GameName == GEMRB_STRING) {
+		if (DefaultWindowTitle != GEMRB_STRING) {
+			std::string title = GEMRB_STRING" running " + DefaultWindowTitle;
+			config.GameName = std::move(title);
+		} else {
+			config.GameName = GEMRB_STRING" running unknown game";
+		}
+		video->SetWindowTitle(config.GameName.c_str());
+	}
+
+	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
+	// read from our version of the config if it is present
+	char ini_path[_MAX_PATH+4] = { '\0' };
+	std::string gemrbINI;
+	std::string tmp;
+	gemrbINI = "gem-" + INIConfig;
+	PathJoin(ini_path, config.SavePath.c_str(), gemrbINI.c_str(), nullptr);
+	if (!file_exists(ini_path)) {
+		PathJoin(ini_path, config.GamePath.c_str(), gemrbINI.c_str(), nullptr);
+	}
+	if (file_exists(ini_path)) {
+		tmp = INIConfig;
+		INIConfig = gemrbINI;
+	} else {
+		PathJoin(ini_path, config.GamePath.c_str(), INIConfig.c_str(), nullptr);
+		Log(MESSAGE,"Core", "Loading original game options from {}", ini_path);
+	}
+	if (!InitializeVarsWithINI(ini_path)) {
+		Log(WARNING, "Core", "Unable to set dictionary default values!");
+	}
+
+	// We use this for the game's state exclusively
+	ieDword maxRefreshRate = GetVariable("Maximum Frame Rate", 30);
+	// the originals used double ticks for haste handling
+	Time.ticksPerSec = maxRefreshRate / 2;
+
+	// set up the tooltip delay which we store in milliseconds
+	ieDword tooltipDelay = GetVariable("Tooltips", 0);
+	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
+
+	// restore the game config name if we read it from our version
+	if (!tmp.empty()) {
+		INIConfig = tmp;
+	} else {
+		tmp = INIConfig;
+	}
+	// also store it for base GAM and SAV files
+	strtok(&tmp[0], ".");
+	GameNameResRef = tmp;
+
+	Log(MESSAGE, "Core", "Reading Encoding Table...");
+	if (!LoadEncoding()) {
+		Log(ERROR, "Core", "Cannot Load Encoding.");
+	}
+
+	Log(MESSAGE, "Core", "Creating Projectile Server...");
+	projserv = new ProjectileServer();
+
+	Log(MESSAGE, "Core", "Checking for Dialogue Manager...");
+	if (!IsAvailable( IE_TLK_CLASS_ID )) {
+		throw std::runtime_error("No TLK Importer Available.");
+	}
+	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
+	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
+	char strpath[_MAX_PATH];
+	PathJoin(strpath, config.GamePath.c_str(), "dialog.tlk", nullptr);
+	FileStream* fs = FileStream::OpenFile(strpath);
+
+	if (!fs) {
+		// EE multi language deployment
+		PathJoin(strpath, config.GamePath.c_str(), config.GameLanguagePath.c_str(), "dialog.tlk", nullptr);
+		fs = FileStream::OpenFile(strpath);
+
+		if (!fs) {
+			throw std::runtime_error("Cannot find Dialog.tlk.");
+		}
+	}
+	strings->Open(fs);
+
+	// does the language use an extra tlk?
+	if (strings->HasAltTLK()) {
+		strings2 = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
+		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
+		PathJoin(strpath, config.GamePath.c_str(), "dialogf.tlk", nullptr);
+		fs = FileStream::OpenFile(strpath);
+		if (!fs) {
+			// try EE-style paths
+			PathJoin(strpath, config.GamePath.c_str(), config.GameLanguagePath.c_str(), "dialogf.tlk", nullptr);
+			fs = FileStream::OpenFile(strpath);
+		}
+		if (!fs) {
+			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
+			Log(ERROR, "Core", "Falling back to main TLK file, so female text may be wrong!");
+			strings2 = strings;
+		} else {
+			strings2->Open(fs);
+		}
+	}
+
+	Log(MESSAGE, "Core", "Loading palettes...");
+	LoadPalette<16>(Palette16, palettes16);
+	LoadPalette<32>(Palette32, palettes32);
+	LoadPalette<256>(Palette256, palettes256);
+	Log(MESSAGE, "Core", "Palettes loaded.");
+
+	if (!IsAvailable( IE_BAM_CLASS_ID )) {
+		throw std::runtime_error("No BAM Importer Available.");
+	}
+
+	Log(MESSAGE, "Core", "Initializing stock sounds...");
+	if (!gamedata->ReadResRefTable(ResRef("defsound"), gamedata->defaultSounds)) {
+		throw std::runtime_error("Cannot find defsound.2da.");
+	}
+
+	int ret = LoadSprites();
+	if (ret) throw std::runtime_error("Cannot load sprites.");
+
+	ret = LoadFonts();
+	if (ret) throw std::runtime_error("Cannot load fonts.");
+	gamedata->PreloadColors();
+
+	Log(MESSAGE, "Core", "Initializing string constants...");
+	displaymsg = new DisplayMessage();
+	if (!displaymsg) {
+		throw std::runtime_error("Failed to initialize string constants.");
+	}
+
+	Log(MESSAGE, "Core", "Initializing Window Manager...");
+	winmgr = new WindowManager(video);
+	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
+	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
+
+	guifact = GetImporter<GUIFactory>(IE_CHU_CLASS_ID);
+	if (!guifact) {
+		throw std::runtime_error("Failed to load Window Manager.");
+	}
+	guifact->SetWindowManager(*winmgr);
+
+	QuitFlag = QF_CHANGESCRIPT;
+
+	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
+	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str())));
+	if (AudioDriver == nullptr) {
+		throw std::runtime_error("Failed to load sound driver.");
+	}
+	if (!AudioDriver->Init()) {
+		throw std::runtime_error("Failed to initialize sound driver.");
+	}
+
+	Log(MESSAGE, "Core", "Initializing Music Manager...");
+	music = MakePluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
+	if (!music) {
+		throw std::runtime_error("Failed to load Music Manager.");
+	}
+
+	Log(MESSAGE, "Core", "Loading music list...");
+	if (HasFeature( GFFlags::HAS_SONGLIST )) {
+		ret = ReadMusicTable("songlist", 1);
+	} else {
+		/*since bg1 and pst has no .2da for songlist,
+		we must supply one in the gemrb/override folder.
+		It should be: music.2da, first column is a .mus filename*/
+		ret = ReadMusicTable("music", 0);
+	}
+	if (!ret) {
+		Log(WARNING, "Core", "Didn't find music list.");
+	}
+
+	int resdata = HasFeature( GFFlags::RESDATA_INI );
+	if (resdata || HasFeature(GFFlags::SOUNDS_INI) ) {
+		Log(MESSAGE, "Core", "Loading resource data File...");
+		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		StringView sv(resdata ? "resdata" : "sounds");
+		DataStream* ds = gamedata->GetResourceStream(sv, IE_INI_CLASS_ID);
+		if (!INIresdata->Open(ds)) {
+			Log(WARNING, "Core", "Failed to load resource data.");
+		}
+	}
+
+	Log(MESSAGE, "Core", "Setting up SFX channels...");
+	ret = ReadSoundChannelsTable();
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to read channel table.");
+	}
+
+	if (HasFeature( GFFlags::HAS_PARTY_INI )) {
+		Log(MESSAGE, "Core", "Loading precreated teams setup...");
+		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		char tINIparty[_MAX_PATH];
+		PathJoin(tINIparty, config.GamePath.c_str(), "Party.ini", nullptr);
+		fs = FileStream::OpenFile(tINIparty);
+		if (!INIparty->Open(fs)) {
+			Log(WARNING, "Core", "Failed to load precreated teams.");
+		}
+	}
+
+	if (HasFeature(GFFlags::IWD2_DEATHVARFORMAT)) {
+		DeathVarFormat = IWD2DeathVarFormat;
+	}
+
+	if (HasFeature( GFFlags::HAS_BEASTS_INI )) {
+		Log(MESSAGE, "Core", "Loading beasts definition File...");
+		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		char tINIbeasts[_MAX_PATH];
+		PathJoin(tINIbeasts, config.GamePath.c_str(), "beast.ini", nullptr);
+		fs = FileStream::OpenFile(tINIbeasts);
+		if (!INIbeasts->Open(fs)) {
+			Log(WARNING, "Core", "Failed to load beast definitions.");
+		}
+
+		Log(MESSAGE, "Core", "Loading quests definition File...");
+		INIquests = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		char tINIquests[_MAX_PATH];
+		PathJoin(tINIquests, config.GamePath.c_str(), "quests.ini", nullptr);
+		FileStream* fs2 = FileStream::OpenFile( tINIquests );
+		if (!INIquests->Open(fs2)) {
+			Log(WARNING, "Core", "Failed to load quest definitions.");
+		}
+	}
+	game = NULL;
+	calendar = NULL;
+	keymap = NULL;
+
+	Log(MESSAGE, "Core", "Initializing Inventory Management...");
+	ret = InitItemTypes();
+	if (!ret) {
+		throw std::runtime_error("Failed to initialize inventory.");
+	}
+
+	Log(MESSAGE, "Core", "Initializing random treasure...");
+	ret = ReadRandomItems();
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to initialize random treasure.");
+	}
+	
+	abilityTables = std::make_unique<AbilityTables>(MaximumAbility);
+
+	Log(MESSAGE, "Core", "Reading game time table...");
+	ret = ReadGameTimeTable();
+	if (!ret) {
+		throw std::runtime_error("Failed to read game time table...");
+	}
+
+	ret = ReadDamageTypeTable();
+	Log(MESSAGE, "Core", "Reading damage type table...");
+	if (!ret) {
+		Log(WARNING, "Core", "Reading damage type table...");
+	}
+
+	Log(MESSAGE, "Core", "Reading game script tables...");
+	InitializeIEScript();
+
+	Log(MESSAGE, "Core", "Initializing keymap tables...");
+	keymap = new KeyMap();
+	ret = keymap->InitializeKeyMap("keymap.ini", "keymap");
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to initialize keymaps.");
+	}
+
+	Log(MESSAGE, "Core", "Core Initialization Complete!");
+
+#ifdef HAVE_REALPATH
+	if (unhardcodedTypePath[0] == '.') {
+		// canonicalize the relative path; usually from running from the build dir
+		char *absolutePath = realpath(unhardcodedTypePath, NULL);
+		if (absolutePath) {
+			strlcpy(unhardcodedTypePath, absolutePath, sizeof(unhardcodedTypePath));
+			free(absolutePath);
+		}
+	}
+#endif
+	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
+	std::string pathString = fmt::format("GemRB_Data_Path = {}", unhardcodedTypePath);
+	PathJoin(strpath, config.GamePath.c_str(), "gemrb_path.txt", nullptr);
+	FileStream *pathFile = new FileStream();
+	// don't abort if something goes wrong, since it should never happen and it's not critical
+	if (pathFile->Create(strpath)) {
+		pathFile->Write(pathString.c_str(), pathString.length());
+		pathFile->Close();
+	}
+	delete pathFile;
+
+	EventMgr::EventCallback ToggleConsole = [this](const Event& e) {
+		if (e.type != Event::KeyDown) return false;
+
+		guiscript->RunFunction("Console", "ToggleConsole");
+		return true;
+	};
+	EventMgr::RegisterHotKeyCallback(ToggleConsole, ' ', GEM_MOD_CTRL);
 }
 
 Interface::~Interface() noexcept
@@ -750,520 +1229,6 @@ int Interface::LoadFonts()
 	}
 
 	Log(MESSAGE, "Core", "Fonts Loaded...");
-	return GEM_OK;
-}
-
-int Interface::Init(CoreSettings&& cfg)
-{
-	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
-	config = std::move(cfg);
-
-	if (!MakeDirectories(config.CachePath.c_str())) {
-		error("Core", "Unable to create cache directory '{}'", config.CachePath);
-	}
-
-	if (StupidityDetector(config.CachePath.c_str())) {
-		Log(ERROR, "Core", "Cache path {} doesn't exist, not a folder or contains alien files!", config.CachePath);
-		return GEM_ERROR;
-	}
-	if (!config.KeepCache) DelTree(config.CachePath.c_str(), false);
-	
-	vars = std::move(config.vars);
-	vars["MaxPartySize"] = config.MaxPartySize; // for simple GUIScript access
-
-	// potentially disable logging before plugins are loaded (the log file is a plugin)
-	ToggleLogging(vars["Logging"]);
-	
-	plugin_flags_t pluginFlags;
-	if (!cfg.SkipPlugin.empty()) {
-		pluginFlags[config.SkipPlugin] = PLF_SKIP;
-	}
-
-	if (!cfg.DelayPlugin.empty()) {
-		pluginFlags[config.DelayPlugin] = PLF_DELAY;
-	}
-
-	Log(MESSAGE, "Core", "Starting Plugin Manager...");
-	const PluginMgr *plugin = PluginMgr::Get();
-#if TARGET_OS_MAC
-	// search the bundle plugins first
-	// since bundle plugins are loaded first dyld will give them precedence
-	// if duplicates are found in the PluginsPath
-	path_t bundlePluginsPath = BundlePath(PLUGINS);
-	ResolveFilePath(bundlePluginsPath);
-#ifndef STATIC_LINK
-	LoadPlugins(bundlePluginsPath.c_str(), pluginFlags);
-#endif
-#endif
-#ifndef STATIC_LINK
-	LoadPlugins(config.PluginsPath.c_str(), pluginFlags);
-#endif
-	if (plugin && plugin->GetPluginCount()) {
-		Log(MESSAGE, "Core", "Plugin Loading Complete...");
-	} else {
-		Log(FATAL, "Core", "Plugin Loading Failed, check path...");
-		return GEM_ERROR;
-	}
-	plugin->RunInitializers(config);
-
-	Log(MESSAGE, "Core", "GemRB Core Initialization...");
-	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName)));
-	if (!video) {
-		Log(FATAL, "Core", "No Video Driver Available.");
-		return GEM_ERROR;
-	}
-	if (video->Init() == GEM_ERROR) {
-		Log(FATAL, "Core", "Cannot Initialize Video Driver.");
-		return GEM_ERROR;
-	}
-
-	// ask the driver if a touch device is in use
-	EventMgr::TouchInputEnabled = config.TouchInput < 0 ? video->TouchInputEnabled() : config.TouchInput;
-	EventMgr::DCDelay = config.DoubleClickDelay;
-	Control::ActionRepeatDelay = config.ActionRepeatDelay;
-	GameControl::DebugFlags = config.DebugFlags;
-
-	ieDword brightness = GetVariable("Brightness Correction", 10);
-	ieDword contrast = GetVariable("Gamma Correction", 5);
-
-	Log(MESSAGE, "Core", "Initializing search path...");
-	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {
-		Log(FATAL, "Core", "no DirectoryImporter!");
-		return GEM_ERROR;
-	}
-
-	char path[_MAX_PATH];
-	PathJoin(path, config.CachePath.c_str(), nullptr);
-	if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
-		Log(FATAL, "Core", "The cache path couldn't be registered, please check!");
-		return GEM_ERROR;
-	}
-
-	for (const auto& modPath : config.ModPath) {
-		gamedata->AddSource(modPath.c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-	}
-
-	PathJoin(path, config.GemRBOverridePath.c_str(), "override", config.GameType.c_str(), nullptr);
-	if (config.GameType == "auto") {
-		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
-	} else {
-		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-	}
-
-	PathJoin(path, config.GemRBOverridePath.c_str(), "override", "shared", nullptr);
-	gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	PathJoin(path, config.GamePath.c_str(), config.GameOverridePath.c_str(), nullptr);
-	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	// GAME sounds are intentionally not cached, in IWD there are directory structures,
-	// that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
-	PathJoin(path, config.GamePath.c_str(), config.GameSoundsPath.c_str(), nullptr);
-	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
-
-	PathJoin(path, config.GamePath.c_str(), config.GameMoviesPath.c_str(), nullptr);
-	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY);
-
-	PathJoin(path, config.GamePath.c_str(), config.GameScriptsPath.c_str(), nullptr);
-	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	PathJoin(path, config.GamePath.c_str(), config.GamePortraitsPath.c_str(), nullptr);
-	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	PathJoin(path, config.GamePath.c_str(), config.GameDataPath.c_str(), nullptr);
-	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	// accomodating silly installers that create a data/Data/.* structure
-	PathJoin(path, config.GamePath.c_str(), config.GameDataPath.c_str(), "Data", nullptr);
-	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	// IWD2 movies are on the CD but not in the BIF
-	char* description = strdup("CD1/data");
-	for (size_t i = 0; i < MAX_CD; i++) {
-		for (size_t j = 0; j < config.CD[i].size(); j++) {
-			description[2] = '1' + i;
-			PathJoin(path, config.CD[i][j].c_str(), config.GameDataPath.c_str(), nullptr);
-			gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
-		}
-	}
-	free(description);
-
-	// most of the old gemrb override files can be found here,
-	// so they have a lower priority than the game files and can more easily be modded
-	PathJoin(path, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", config.GameType.c_str(), nullptr);
-	if (config.GameType == "auto") {
-		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
-	} else {
-		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-	}
-	PathJoin(path, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", "shared", nullptr);
-	gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	Log(MESSAGE, "Core", "Initializing KEY Importer...");
-	char ChitinPath[_MAX_PATH];
-	PathJoin(ChitinPath, config.GamePath.c_str(), "chitin.key", nullptr);
-	if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
-		Log(FATAL, "Core", "Failed to load \"chitin.key\"");
-		Log(ERROR, "Core", "This means:\n- you set the GamePath config variable incorrectly,\n\
-- you passed a bad game path to GemRB on the command line,\n\
-- you are not running GemRB from within a game dir,\n\
-- or the game is running (Windows only).");
-		Log(ERROR, "Core", "The path must point to a game directory with a readable chitin.key file.");
-		return GEM_ERROR;
-	}
-
-	fogRenderer = std::make_shared<FogRenderer>(video.get(), config.SpriteFoW);
-
-	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
-	SetNextScript("Start"); // Start is the first script executed
-	guiscript = MakePluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
-	if (guiscript == nullptr) {
-		Log(FATAL, "Core", "Missing GUI Script Engine.");
-		return GEM_ERROR;
-	}
-	if (!guiscript->Init()) {
-		Log(FATAL, "Core", "Failed to initialize GUI Script.");
-		return GEM_ERROR;
-	}
-
-	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
-	PathJoin(path, config.GemRBOverridePath.c_str(), "override", config.GameType.c_str(), nullptr);
-	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
-	char unhardcodedTypePath[_MAX_PATH * 2];
-	PathJoin(unhardcodedTypePath, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", config.GameType.c_str(), nullptr);
-	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
-
-	// Purposely add the font directory last since we will only ever need it at engine load time.
-	if (config.CustomFontPath[0]) gamedata->AddSource(config.CustomFontPath.c_str(), "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
-
-	Log(MESSAGE, "Core", "Reading Game Options...");
-	if (!LoadGemRBINI()) {
-		Log(FATAL, "Core", "Cannot Load INI.");
-		return GEM_ERROR;
-	}
-
-	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
-	// we also need the display to exist to create sprites using the display format
-	ieDword fullscreen = GetVariable("Full Screen", 0);
-
-	int createDisplayResult =
-		video->CreateDisplay(
-				Size(config.Width, config.Height),
-				config.Bpp,
-				fullscreen,
-				config.GameName.c_str(),
-				config.CapFPS == 0
-		);
-
-	if (createDisplayResult == GEM_ERROR) {
-		Log(FATAL, "Core", "Cannot initialize shaders.");
-		return GEM_ERROR;
-	}
-	video->SetGamma(brightness, contrast);
-	
-	// if unset, manually populate GameName (window title)
-	if (config.GameName == GEMRB_STRING) {
-		if (DefaultWindowTitle != GEMRB_STRING) {
-			std::string title = GEMRB_STRING" running " + DefaultWindowTitle;
-			config.GameName = std::move(title);
-		} else {
-			config.GameName = GEMRB_STRING" running unknown game";
-		}
-		video->SetWindowTitle(config.GameName.c_str());
-	}
-
-	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
-	// read from our version of the config if it is present
-	char ini_path[_MAX_PATH+4] = { '\0' };
-	std::string gemrbINI;
-	std::string tmp;
-	gemrbINI = "gem-" + INIConfig;
-	PathJoin(ini_path, config.SavePath.c_str(), gemrbINI.c_str(), nullptr);
-	if (!file_exists(ini_path)) {
-		PathJoin(ini_path, config.GamePath.c_str(), gemrbINI.c_str(), nullptr);
-	}
-	if (file_exists(ini_path)) {
-		tmp = INIConfig;
-		INIConfig = gemrbINI;
-	} else {
-		PathJoin(ini_path, config.GamePath.c_str(), INIConfig.c_str(), nullptr);
-		Log(MESSAGE,"Core", "Loading original game options from {}", ini_path);
-	}
-	if (!InitializeVarsWithINI(ini_path)) {
-		Log(WARNING, "Core", "Unable to set dictionary default values!");
-	}
-
-	// We use this for the game's state exclusively
-	ieDword maxRefreshRate = GetVariable("Maximum Frame Rate", 30);
-	// the originals used double ticks for haste handling
-	Time.ticksPerSec = maxRefreshRate / 2;
-
-	// set up the tooltip delay which we store in milliseconds
-	ieDword tooltipDelay = GetVariable("Tooltips", 0);
-	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
-
-	// restore the game config name if we read it from our version
-	if (!tmp.empty()) {
-		INIConfig = tmp;
-	} else {
-		tmp = INIConfig;
-	}
-	// also store it for base GAM and SAV files
-	strtok(&tmp[0], ".");
-	GameNameResRef = tmp;
-
-	Log(MESSAGE, "Core", "Reading Encoding Table...");
-	if (!LoadEncoding()) {
-		Log(ERROR, "Core", "Cannot Load Encoding.");
-	}
-
-	Log(MESSAGE, "Core", "Creating Projectile Server...");
-	projserv = new ProjectileServer();
-
-	Log(MESSAGE, "Core", "Checking for Dialogue Manager...");
-	if (!IsAvailable( IE_TLK_CLASS_ID )) {
-		Log(FATAL, "Core", "No TLK Importer Available.");
-		return GEM_ERROR;
-	}
-	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
-	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
-	char strpath[_MAX_PATH];
-	PathJoin(strpath, config.GamePath.c_str(), "dialog.tlk", nullptr);
-	FileStream* fs = FileStream::OpenFile(strpath);
-
-	if (!fs) {
-		// EE multi language deployment
-		PathJoin(strpath, config.GamePath.c_str(), config.GameLanguagePath.c_str(), "dialog.tlk", nullptr);
-		fs = FileStream::OpenFile(strpath);
-
-		if (!fs) {
-			Log(FATAL, "Core", "Cannot find Dialog.tlk.");
-			return GEM_ERROR;
-		}
-	}
-	strings->Open(fs);
-
-	// does the language use an extra tlk?
-	if (strings->HasAltTLK()) {
-		strings2 = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
-		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
-		PathJoin(strpath, config.GamePath.c_str(), "dialogf.tlk", nullptr);
-		fs = FileStream::OpenFile(strpath);
-		if (!fs) {
-			// try EE-style paths
-			PathJoin(strpath, config.GamePath.c_str(), config.GameLanguagePath.c_str(), "dialogf.tlk", nullptr);
-			fs = FileStream::OpenFile(strpath);
-		}
-		if (!fs) {
-			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
-			Log(ERROR, "Core", "Falling back to main TLK file, so female text may be wrong!");
-			strings2 = strings;
-		} else {
-			strings2->Open(fs);
-		}
-	}
-
-	Log(MESSAGE, "Core", "Loading palettes...");
-	LoadPalette<16>(Palette16, palettes16);
-	LoadPalette<32>(Palette32, palettes32);
-	LoadPalette<256>(Palette256, palettes256);
-	Log(MESSAGE, "Core", "Palettes loaded.");
-
-	if (!IsAvailable( IE_BAM_CLASS_ID )) {
-		Log(FATAL, "Core", "No BAM Importer Available.");
-		return GEM_ERROR;
-	}
-
-	Log(MESSAGE, "Core", "Initializing stock sounds...");
-	if (!gamedata->ReadResRefTable(ResRef("defsound"), gamedata->defaultSounds)) {
-		Log(FATAL, "Core", "Cannot find defsound.2da.");
-		return GEM_ERROR;
-	}
-
-	int ret = LoadSprites();
-	if (ret) return ret;
-
-	ret = LoadFonts();
-	gamedata->PreloadColors();
-	if (ret) return ret;
-
-	Log(MESSAGE, "Core", "Initializing string constants...");
-	displaymsg = new DisplayMessage();
-	if (!displaymsg) {
-		Log(FATAL, "Core", "Failed to initialize string constants.");
-		return GEM_ERROR;
-	}
-
-	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	winmgr = new WindowManager(video);
-	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
-	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
-
-	guifact = GetImporter<GUIFactory>(IE_CHU_CLASS_ID);
-	if (!guifact) {
-		Log(FATAL, "Core", "Failed to load Window Manager.");
-		return GEM_ERROR;
-	}
-	guifact->SetWindowManager(*winmgr);
-
-	QuitFlag = QF_CHANGESCRIPT;
-
-	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str())));
-	if (AudioDriver == nullptr) {
-		Log(FATAL, "Core", "Failed to load sound driver.");
-		return GEM_ERROR;
-	}
-	if (!AudioDriver->Init()) {
-		Log(FATAL, "Core", "Failed to initialize sound driver.");
-		return GEM_ERROR;
-	}
-
-	Log(MESSAGE, "Core", "Initializing Music Manager...");
-	music = MakePluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
-	if (!music) {
-		Log(FATAL, "Core", "Failed to load Music Manager.");
-		return GEM_ERROR;
-	}
-
-	Log(MESSAGE, "Core", "Loading music list...");
-	if (HasFeature( GFFlags::HAS_SONGLIST )) {
-		ret = ReadMusicTable("songlist", 1);
-	} else {
-		/*since bg1 and pst has no .2da for songlist,
-		we must supply one in the gemrb/override folder.
-		It should be: music.2da, first column is a .mus filename*/
-		ret = ReadMusicTable("music", 0);
-	}
-	if (!ret) {
-		Log(WARNING, "Core", "Didn't find music list.");
-	}
-
-	int resdata = HasFeature( GFFlags::RESDATA_INI );
-	if (resdata || HasFeature(GFFlags::SOUNDS_INI) ) {
-		Log(MESSAGE, "Core", "Loading resource data File...");
-		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		StringView sv(resdata ? "resdata" : "sounds");
-		DataStream* ds = gamedata->GetResourceStream(sv, IE_INI_CLASS_ID);
-		if (!INIresdata->Open(ds)) {
-			Log(WARNING, "Core", "Failed to load resource data.");
-		}
-	}
-
-	Log(MESSAGE, "Core", "Setting up SFX channels...");
-	ret = ReadSoundChannelsTable();
-	if (!ret) {
-		Log(WARNING, "Core", "Failed to read channel table.");
-	}
-
-	if (HasFeature( GFFlags::HAS_PARTY_INI )) {
-		Log(MESSAGE, "Core", "Loading precreated teams setup...");
-		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		char tINIparty[_MAX_PATH];
-		PathJoin(tINIparty, config.GamePath.c_str(), "Party.ini", nullptr);
-		fs = FileStream::OpenFile(tINIparty);
-		if (!INIparty->Open(fs)) {
-			Log(WARNING, "Core", "Failed to load precreated teams.");
-		}
-	}
-
-	if (HasFeature(GFFlags::IWD2_DEATHVARFORMAT)) {
-		DeathVarFormat = IWD2DeathVarFormat;
-	}
-
-	if (HasFeature( GFFlags::HAS_BEASTS_INI )) {
-		Log(MESSAGE, "Core", "Loading beasts definition File...");
-		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		char tINIbeasts[_MAX_PATH];
-		PathJoin(tINIbeasts, config.GamePath.c_str(), "beast.ini", nullptr);
-		fs = FileStream::OpenFile(tINIbeasts);
-		if (!INIbeasts->Open(fs)) {
-			Log(WARNING, "Core", "Failed to load beast definitions.");
-		}
-
-		Log(MESSAGE, "Core", "Loading quests definition File...");
-		INIquests = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		char tINIquests[_MAX_PATH];
-		PathJoin(tINIquests, config.GamePath.c_str(), "quests.ini", nullptr);
-		FileStream* fs2 = FileStream::OpenFile( tINIquests );
-		if (!INIquests->Open(fs2)) {
-			Log(WARNING, "Core", "Failed to load quest definitions.");
-		}
-	}
-	game = NULL;
-	calendar = NULL;
-	keymap = NULL;
-
-	Log(MESSAGE, "Core", "Initializing Inventory Management...");
-	ret = InitItemTypes();
-	if (!ret) {
-		Log(FATAL, "Core", "Failed to initialize inventory.");
-		return GEM_ERROR;
-	}
-
-	Log(MESSAGE, "Core", "Initializing random treasure...");
-	ret = ReadRandomItems();
-	if (!ret) {
-		Log(WARNING, "Core", "Failed to initialize random treasure.");
-	}
-	
-	abilityTables = std::make_unique<AbilityTables>(MaximumAbility);
-
-	Log(MESSAGE, "Core", "Reading game time table...");
-	ret = ReadGameTimeTable();
-	if (!ret) {
-		Log(FATAL, "Core", "Failed to read game time table...");
-		return GEM_ERROR;
-	}
-
-	ret = ReadDamageTypeTable();
-	Log(MESSAGE, "Core", "Reading damage type table...");
-	if (!ret) {
-		Log(WARNING, "Core", "Reading damage type table...");
-	}
-
-	Log(MESSAGE, "Core", "Reading game script tables...");
-	InitializeIEScript();
-
-	Log(MESSAGE, "Core", "Initializing keymap tables...");
-	keymap = new KeyMap();
-	ret = keymap->InitializeKeyMap("keymap.ini", "keymap");
-	if (!ret) {
-		Log(WARNING, "Core", "Failed to initialize keymaps.");
-	}
-
-	Log(MESSAGE, "Core", "Core Initialization Complete!");
-
-#ifdef HAVE_REALPATH
-	if (unhardcodedTypePath[0] == '.') {
-		// canonicalize the relative path; usually from running from the build dir
-		char *absolutePath = realpath(unhardcodedTypePath, NULL);
-		if (absolutePath) {
-			strlcpy(unhardcodedTypePath, absolutePath, sizeof(unhardcodedTypePath));
-			free(absolutePath);
-		}
-	}
-#endif
-	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
-	std::string pathString = fmt::format("GemRB_Data_Path = {}", unhardcodedTypePath);
-	PathJoin(strpath, config.GamePath.c_str(), "gemrb_path.txt", nullptr);
-	FileStream *pathFile = new FileStream();
-	// don't abort if something goes wrong, since it should never happen and it's not critical
-	if (pathFile->Create(strpath)) {
-		pathFile->Write(pathString.c_str(), pathString.length());
-		pathFile->Close();
-	}
-	delete pathFile;
-
-	EventMgr::EventCallback ToggleConsole = [this](const Event& e) {
-		if (e.type != Event::KeyDown) return false;
-
-		guiscript->RunFunction("Console", "ToggleConsole");
-		return true;
-	};
-	EventMgr::RegisterHotKeyCallback(ToggleConsole, ' ', GEM_MOD_CTRL);
-
 	return GEM_OK;
 }
 

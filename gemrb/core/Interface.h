@@ -380,7 +380,6 @@ private:
 	int MaximumAbility = 0;
 
 public:
-	const char * SystemEncoding;
 	EncodingStruct TLKEncoding;
 	std::shared_ptr<StringMgr> strings;
 	std::shared_ptr<StringMgr> strings2;
@@ -400,12 +399,11 @@ public:
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	TimeStruct Time{};
 public:
-	Interface() noexcept;
+	explicit Interface(CoreSettings&& config);
 	~Interface() noexcept;
 	
 	Interface(const Interface&) = delete;
 	
-	int Init(CoreSettings&& config);
 	//TODO: Core Methods in Interface Class
 	void SetFeature(GFFlags flag);
 	void ClearFeature(GFFlags flag);

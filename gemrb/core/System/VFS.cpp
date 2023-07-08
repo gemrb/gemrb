@@ -244,7 +244,7 @@ static bool FindInDir(const char* Dir, char *Filename)
 		return true;
 	}
 
-	if (!core->config.CaseSensitive) {
+	if (core && !core->config.CaseSensitive) {
 		return false;
 	}
 

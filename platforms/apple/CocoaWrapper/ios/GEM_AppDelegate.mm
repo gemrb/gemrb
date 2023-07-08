@@ -106,21 +106,19 @@ using namespace GemRB;
 		[[NSFileManager defaultManager] changeCurrentDirectoryPath:NSHomeDirectory()];
 		setenv("PYTHONHOME", "Documents/python", 1);
 		setenv("PYTHONPATH", "Documents/python/lib/python27", 1);
-		core = new Interface();
-		if ((ret = core->Init(LoadFromArgs(argc, argv))) == GEM_ERROR) {
+		
+		try {
+			Interface gemrb(LoadFromArgs(argc, argv));
 			free(argv);
-			delete core;
-			Log(MESSAGE, "Cocoa Wrapper", "Unable to initialize core. Relaunching wraper.");
+			gemrb.Main(); // pass control to GemRB
+		} catch (std::exception& e) {
+			Log(FATAL, "Main", "Aborting due to fatal error... {}", e.what());
 			// reload the wrapper interface so we can try again instead of dying
 			[self setupWrapper];
-		} else {
-			free(argv);
-			// pass control to GemRB
-			core->Main();
-			delete core;
-			// We must exit since the application runloop never returns.
-			exit(ret);
 		}
+
+		// We must exit since the application runloop never returns.
+		exit(GEM_OK);
 	}
 }
 
