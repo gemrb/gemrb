@@ -100,6 +100,8 @@
 #define PLUGINDEF_H
 
 #include "exports.h"
+
+#include "InterfaceConfig.h"
 #include "PluginMgr.h"
 #include "Platform.h"
 

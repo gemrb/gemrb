@@ -110,7 +110,7 @@ IF(WIN32 AND _VCPKG_INSTALLED_DIR)
 ENDIF()
 
 # try to extract the version from the source
-FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/includes/globals.h GLOBALS)
+FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/core/InterfaceConfig.h GLOBALS)
 SET(GEMRB_VERSION "")
 STRING(REGEX MATCH "define VERSION_GEMRB .([^\"]*)" GEMRB_VERSION "${GLOBALS}")
 STRING(REGEX REPLACE "define VERSION_GEMRB .([^\"]*)$" "\\1" GEMRB_VERSION "${GEMRB_VERSION}")

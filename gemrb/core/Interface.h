@@ -302,58 +302,6 @@ private:
 	static Control dragDummy;
 };
 
-struct CFGConfigData {
-	path_t GamePath;
-	path_t GameDataPath;
-	path_t GameOverridePath;
-	path_t GameSoundsPath;
-	path_t GameScriptsPath;
-	path_t GamePortraitsPath;
-	path_t GameCharactersPath;
-	path_t GameLanguagePath;
-	path_t GameMoviesPath;
-	path_t SavePath;
-	path_t CachePath;
-	std::vector<std::string> CD[MAX_CD];
-	std::vector<std::string> ModPath;
-	path_t CustomFontPath;
-
-	path_t GemRBPath;
-	path_t GemRBOverridePath;
-	path_t GemRBUnhardcodedPath;
-	path_t PluginsPath;
-	path_t GUIScriptsPath;
-	bool CaseSensitive = true;
-
-	std::string GameName;
-	std::string GameType;
-	std::string Encoding = "default";
-
-	int GamepadPointerSpeed = 10;
-	bool UseSoftKeyboard = false; // TODO: reevaluate the need for this, see comments in StartTextInput
-	unsigned short NumFingScroll = 2;
-	unsigned short NumFingKboard = 3;
-	unsigned short NumFingInfo = 2;
-	int MouseFeedback = 0;
-
-	int Width = 640;
-	int Height = 480;
-	int Bpp = 32;
-	bool DrawFPS = false;
-	int CapFPS = 0;
-	bool SpriteFoW = false;
-	int debugMode = 0;
-	bool CheatFlag = false; /** Cheats enabled? */
-	int MaxPartySize = 6;
-
-	bool KeepCache = false;
-	bool MultipleQuickSaves = false;
-	// once GemRB own format is working well, this might be set to 0
-	int SaveAsOriginal = 1; // if true, saves files in compatible mode
-	std::string VideoDriverName = "sdl"; // consider deprecating? It's now a hidden option
-	std::string AudioDriverName = "openal";
-};
-
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -362,7 +310,6 @@ struct CFGConfigData {
 class GEM_EXPORT Interface
 {
 public:
-	using variables_t = std::unordered_map<std::string, int32_t>;
 	using tokens_t = std::unordered_map<ieVariable, String, CstrHashCI<ieVariable>>;
 	using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
 
@@ -466,7 +413,7 @@ public:
 	
 	Interface(const Interface&) = delete;
 	
-	int Init(InterfaceConfig config);
+	int Init(CoreSettings&& config);
 	//TODO: Core Methods in Interface Class
 	void SetFeature(GFFlags flag);
 	void ClearFeature(GFFlags flag);
@@ -777,7 +724,7 @@ private:
 	std::vector<ieDword> GetListFrom2DAInternal(const ResRef& resref) const;
 
 public:
-	CFGConfigData config;
+	CoreSettings config;
 	ResRef GameNameResRef;
 	ResRef GoldResRef; //MISC07.itm
 	ResRefMap<ItemList> RtRows;

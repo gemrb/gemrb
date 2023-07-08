@@ -755,220 +755,10 @@ int Interface::LoadFonts()
 	return GEM_OK;
 }
 
-int Interface::Init(InterfaceConfig cfg)
+int Interface::Init(CoreSettings&& cfg)
 {
 	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
-
-	std::string value;
-#define CONFIG_INT(key, var) \
-		value = cfg[key]; \
-		if (value.length()) \
-			var ( atoi( value.c_str() ) ); \
-		value = "";
-
-	CONFIG_INT("Bpp", config.Bpp =);
-	CONFIG_INT("CaseSensitive", config.CaseSensitive =);
-	CONFIG_INT("DoubleClickDelay", EventMgr::DCDelay = );
-	CONFIG_INT("DrawFPS", config.DrawFPS =);
-	CONFIG_INT("CapFPS", config.CapFPS =);
-	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
-	CONFIG_INT("GCDebug", GameControl::DebugFlags = );
-	CONFIG_INT("Height", config.Height =);
-	CONFIG_INT("KeepCache", config.KeepCache =);
-	CONFIG_INT("MaxPartySize", config.MaxPartySize =);
-	config.MaxPartySize = std::min(std::max(1, config.MaxPartySize), 10);
-	vars["MaxPartySize"] = config.MaxPartySize; // for simple GUIScript access
-	CONFIG_INT("MouseFeedback", config.MouseFeedback =);
-	CONFIG_INT("MultipleQuickSaves", config.MultipleQuickSaves =);
-	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay =);
-	CONFIG_INT("SaveAsOriginal", config.SaveAsOriginal =);
-	CONFIG_INT("SpriteFogOfWar", config.SpriteFoW =);
-	CONFIG_INT("DebugMode", config.debugMode =);
-	int touchInput = -1;
-	CONFIG_INT("TouchInput", touchInput =);
-	CONFIG_INT("Width", config.Width =);
-	CONFIG_INT("UseSoftKeyboard", config.UseSoftKeyboard =);
-	CONFIG_INT("NumFingScroll", config.NumFingScroll =);
-	CONFIG_INT("NumFingKboard", config.NumFingKboard =);
-	CONFIG_INT("NumFingInfo", config.NumFingInfo =);
-	CONFIG_INT("GamepadPointerSpeed", config.GamepadPointerSpeed =);
-
-#undef CONFIG_INT
-
-// first param is the preference name, second is the key from gemrb.cfg.
-#define CONFIG_VARS_MAP(var, key) \
-		value = cfg[key]; \
-		if (value.length()) \
-			vars.emplace(var, atoi(value.c_str())); \
-		value = ""
-
-#define CONFIG_VARS(key) \
-		CONFIG_VARS_MAP(key, key)
-
-	// using vars because my hope is to expose (some of) these in a customized GUIOPT
-	// map gemrb.cfg value to the value used by the options (usually an option from game.ini)
-	CONFIG_VARS("GUIEnhancements");
-	CONFIG_VARS("SkipIntroVideos");
-
-	//put into vars so that reading from game.ini won't overwrite
-	CONFIG_VARS_MAP("BitsPerPixel", "Bpp");
-	CONFIG_VARS_MAP("Full Screen", "Fullscreen");
-
-#undef CONFIG_VARS
-#undef CONFIG_VARS_MAP
-
-#define CONFIG_STRING(key, var, default) \
-		value = cfg[key]; \
-		if (value.length()) { \
-			var = value; \
-		} else if (default && default[0]) { \
-			var = default; \
-		} else var[0] = '\0'; \
-		value = ""
-
-	CONFIG_STRING("GameName", config.GameName, GEMRB_STRING); // NOTE: potentially overriden below, once auto GameType is resolved
-	CONFIG_STRING("GameType", config.GameType, "auto");
-
-#undef CONFIG_STRING
-
-// assumes that default value does not need to be resolved or fixed in any way
-#define CONFIG_PATH(key, var, default) \
-		value = cfg[key]; \
-		if (value.length()) { \
-			var = value; \
-			ResolveFilePath(var); \
-			FixPath(var, true); \
-		} else if (default.length()) { \
-			var = default; \
-		}; \
-		value = ""
-
-	// TODO: make CustomFontPath default cross platform
-	CONFIG_PATH("CustomFontPath", config.CustomFontPath, path_t("/usr/share/fonts/TTF"));
-	CONFIG_PATH("GameCharactersPath", config.GameCharactersPath, path_t("characters"));
-	CONFIG_PATH("GameDataPath", config.GameDataPath, path_t("data"));
-	CONFIG_PATH("GameOverridePath", config.GameOverridePath, path_t("override"));
-	CONFIG_PATH("GamePortraitsPath", config.GamePortraitsPath, path_t("portraits"));
-	CONFIG_PATH("GameScriptsPath", config.GameScriptsPath, path_t("scripts"));
-	CONFIG_PATH("GameSoundsPath", config.GameSoundsPath, path_t("sounds"));
-	CONFIG_PATH("GameLanguagePath", config.GameLanguagePath, path_t("lang/en_US"));
-	CONFIG_PATH("GameMoviesPath", config.GameMoviesPath, path_t("movies"));
-
-	// Path configuration
-	CONFIG_PATH("GemRBPath", config.GemRBPath, GemDataPath());
-
-	CONFIG_PATH("CachePath", config.CachePath, path_t("./Cache2"));
-	FixPath(config.CachePath, false);
-
-	// AppImage doesn't support relative urls at all
-	// we set the path to the data dir to cover unhardcoded and co,
-	// while plugins are statically linked, so it doesn't matter for them
-	// Also, support running from eg. KDevelop AppImages by checking the name.
-#if defined(DATA_DIR) && defined(__linux__)
-	const char* appDir = getenv("APPDIR");
-	const char* appImageFile = getenv("ARGV0");
-	if (appDir) {
-		Log(DEBUG, "Interface", "Found APPDIR: {}", appDir);
-		Log(DEBUG, "Interface", "Found AppImage/ARGV0: {}", appImageFile);
-	}
-	if (appDir && appImageFile && strcasestr(appImageFile, "gemrb") != nullptr) {
-		assert(strnlen(appDir, _MAX_PATH/2) < _MAX_PATH/2);
-		PathJoin(config.GemRBPath, appDir, DATA_DIR, nullptr);
-	}
-#endif
-
-	CONFIG_PATH("GUIScriptsPath", config.GUIScriptsPath, config.GemRBPath);
-	CONFIG_PATH("GamePath", config.GamePath, path_t("."));
-	// guess a few paths in case this one is bad; two levels deep for the fhs layout
-	char testPath[_MAX_PATH];
-	bool gameFound = true;
-	if (!PathJoin(testPath, config.GamePath.c_str(), "chitin.key", nullptr)) {
-		Log(WARNING, "Interface", "Invalid GamePath detected ({}), guessing from the current dir!", testPath);
-		if (PathJoin(testPath, "..", "chitin.key", nullptr)) {
-			config.GamePath = "..";
-		} else {
-			if (PathJoin(testPath, "..", "..", "chitin.key", nullptr)) {
-				config.GamePath = "../..";
-			} else {
-				gameFound = false;
-			}
-		}
-	}
-	// if nothing was found still, check for the internal demo
-	// it's generic, but not likely to work outside of AppImages and maybe apple bundles
-	if (!gameFound) {
-		Log(WARNING, "Interface", "Invalid GamePath detected, looking for the GemRB demo!");
-		if (PathJoin(testPath, "..", "demo", "chitin.key", nullptr)) {
-			PathJoin(testPath, "..", "demo", nullptr);
-			config.GamePath = testPath;
-			config.GameType = "demo";
-		} else if (PathJoin(testPath, config.GemRBPath.c_str(), "demo", "chitin.key", nullptr)) {
-			PathJoin(testPath, config.GemRBPath.c_str(), "demo", nullptr);
-			config.GamePath = testPath;
-			config.GameType = "demo";
-		}
-	}
-
-	CONFIG_PATH("GemRBOverridePath", config.GemRBOverridePath, config.GemRBPath);
-	CONFIG_PATH("GemRBUnhardcodedPath", config.GemRBUnhardcodedPath, config.GemRBPath);
-#ifdef PLUGIN_DIR
-	CONFIG_PATH("PluginsPath", config.PluginsPath, PLUGIN_DIR);
-#else
-	CONFIG_PATH("PluginsPath", config.PluginsPath, path_t(""));
-	if (!config.PluginsPath[0]) {
-		PathJoin(testPath, config.GemRBPath.c_str(), "plugins", nullptr);
-		config.PluginsPath = testPath;
-	}
-#endif
-
-	CONFIG_PATH("SavePath", config.SavePath, config.GamePath);
-#undef CONFIG_PATH
-
-#define CONFIG_STRING(key, var) \
-		value = cfg[key]; \
-		if (value.length()) \
-			var = value; \
-		value = ""
-
-	CONFIG_STRING("AudioDriver", config.AudioDriverName);
-	CONFIG_STRING("VideoDriver", config.VideoDriverName);
-	CONFIG_STRING("Encoding", config.Encoding);
-#undef CONFIG_STRING
-
-	value = cfg["ModPath"];
-	if (value.length()) {
-		config.ModPath = Explode<std::string, std::string>(value, PathListSeparator);
-		for (std::string& path : config.ModPath) {
-			ResolveFilePath(path);
-		}
-	}
-	value = cfg["SkipPlugin"];
-	if (value.length()) {
-		pluginFlags[value] = PLF_SKIP;
-	}
-	value = cfg["DelayPlugin"];
-	if (value.length()) {
-		pluginFlags[value] = PLF_DELAY;
-	}
-
-	for (int i = 0; i < MAX_CD; i++) {
-		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
-		value = cfg[keyname];
-		if (value.length()) {
-			config.CD[i] = Explode<std::string, std::string>(value, PathListSeparator);
-			for (std::string& path : config.CD[i]) {
-				ResolveFilePath(path);
-			}
-		} else {
-			// nothing in config so create our own
-			char name[_MAX_PATH];
-
-			PathJoin(name, config.GamePath.c_str(), keyname, nullptr);
-			config.CD[i].emplace_back(name);
-			PathJoin(name, config.GamePath.c_str(), config.GameDataPath.c_str(), keyname, nullptr);
-			config.CD[i].emplace_back(name);
-		}
-	}
+	config = std::move(cfg);
 
 	if (!MakeDirectories(config.CachePath.c_str())) {
 		error("Core", "Unable to create cache directory '{}'", config.CachePath);
@@ -979,10 +769,20 @@ int Interface::Init(InterfaceConfig cfg)
 		return GEM_ERROR;
 	}
 	if (!config.KeepCache) DelTree(config.CachePath.c_str(), false);
+	
+	vars = std::move(config.vars);
+	vars["MaxPartySize"] = config.MaxPartySize; // for simple GUIScript access
 
 	// potentially disable logging before plugins are loaded (the log file is a plugin)
-	value = cfg["Logging"];
-	if (value.length()) ToggleLogging(atoi(value.c_str()));
+	ToggleLogging(vars["Logging"]);
+	
+	if (!cfg.SkipPlugin.empty()) {
+		pluginFlags[config.SkipPlugin] = PLF_SKIP;
+	}
+
+	if (!cfg.DelayPlugin.empty()) {
+		pluginFlags[config.DelayPlugin] = PLF_DELAY;
+	}
 
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");
 	const PluginMgr *plugin = PluginMgr::Get();
@@ -1020,7 +820,10 @@ int Interface::Init(InterfaceConfig cfg)
 	}
 
 	// ask the driver if a touch device is in use
-	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
+	EventMgr::TouchInputEnabled = config.TouchInput < 0 ? video->TouchInputEnabled() : config.TouchInput;
+	EventMgr::DCDelay = config.DoubleClickDelay;
+	Control::ActionRepeatDelay = config.ActionRepeatDelay;
+	GameControl::DebugFlags = config.DebugFlags;
 
 	ieDword brightness = GetVariable("Brightness Correction", 10);
 	ieDword contrast = GetVariable("Gamma Correction", 5);
@@ -2238,7 +2041,7 @@ void Interface::AskAndExit()
 }
 
 /** Returns the variables dictionary */
-Interface::variables_t& Interface::GetDictionary() {
+variables_t& Interface::GetDictionary() {
 	return vars;
 }
 
@@ -2249,7 +2052,7 @@ void Interface::DumpVariables() const {
 	}
 }
 
-Interface::variables_t::mapped_type Interface::GetVariable(const variables_t::key_type& key, int fallback) const {
+variables_t::mapped_type Interface::GetVariable(const variables_t::key_type& key, int fallback) const {
 	auto lookup = vars.find(key);
 	if (lookup != vars.cend()) {
 		return lookup->second;
