@@ -29,19 +29,15 @@
 
 using namespace GemRB;
 
-static char* AddCBF(const char *file)
+static path_t AddCBF(path_t file)
 {
-	assert(strnlen(file, _MAX_PATH/2) < _MAX_PATH/2);
-	// This is safe in single-threaded, since the
-	// return value is passed straight to PathJoin.
-	static char cbf[_MAX_PATH];
-	strcpy(cbf,file);
-	char *dot = strrchr(cbf, '.');
-	if (dot)
-		strcpy(dot, ".cbf");
-	else
-		strcat(cbf, ".cbf");
-	return cbf;
+	size_t pos = file.find_last_of('.');
+	if (pos != path_t::npos) {
+		file.replace(pos, 4, ".cbf");
+	} else {
+		file += ".cbf";
+	}
+	return file;
 }
 
 static bool PathExists(BIFEntry *entry, const char *path)
