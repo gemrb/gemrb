@@ -72,7 +72,7 @@ before_build:
     $find = '#PluginsPath=@DEFAULT_PLUGINS_DIR@'
     $replace = "PluginsPath=.\plugins"
     (Get-Content $file) -replace $find, $replace | Set-Content $file
-    $find = '#GemRBPath=`.'
+    $find = '#GemRBPath=\.'
     $replace = "GemRBPath=."
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 
