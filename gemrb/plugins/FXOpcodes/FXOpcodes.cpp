@@ -898,7 +898,7 @@ static EffectRef fx_dex_ref = { "DexterityModifier", -1 };
 static EffectRef fx_con_ref = { "ConstitutionModifier", -1 };
 static EffectRef fx_chr_ref = { "CharismaModifier", -1 };
 
-static void RegisterCoreOpcodes()
+static void RegisterCoreOpcodes(const CoreSettings&)
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 	default_spell_hit.SequenceFlags|=IE_VVC_BAM;

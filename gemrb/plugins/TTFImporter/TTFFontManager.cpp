@@ -18,16 +18,17 @@
  *
  */
 
-#include "Interface.h"
 #include "Palette.h"
 #include "TTFFont.h"
 #include "TTFFontManager.h"
 
-using namespace GemRB;
+namespace GemRB {
+
+struct CoreSettings;
 
 FT_Library library = NULL;
 
-static void loadFT()
+static void loadFT(const CoreSettings&)
 {
 	FT_Error error = FT_Init_FreeType( &library );
 	if ( error ) {
@@ -60,7 +61,7 @@ bool TTFFontManager::Import(DataStream* stream)
 			dstream->Seek(offset, GEM_STREAM_START);
 			return dstream->Read(buffer, count);
 		};
-
+		
 		ftStream->close = [](FT_Stream TTFStream){
 			delete static_cast<DataStream*>(TTFStream->descriptor.pointer);
 			delete TTFStream;
@@ -68,18 +69,18 @@ bool TTFFontManager::Import(DataStream* stream)
 		ftStream->descriptor.pointer = stream->Clone();
 		ftStream->pos = stream->GetPos();
 		ftStream->size = stream->Size();
-
+		
 		FT_Open_Args args = FT_Open_Args();
 		args.flags = FT_OPEN_STREAM;
 		args.stream = ftStream;
-
+		
 		error = FT_Open_Face( library, &args, 0, &face );
 		if( error ) {
 			LogFTError(error);
 			Close();
 			return false;
 		}
-
+		
 		// we always convert to UTF-16
 		// TODO: maybe we should allow an override encoding?
 		FT_Select_Charmap(face, FT_ENCODING_UNICODE);
@@ -111,7 +112,7 @@ Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /
 			c.a = 0;
 		}
 	}
-
+	
 	FT_Error error = 0;
 	ieWord lineHeight = 0, baseline = 0;
 	/* Make sure that our font face is scalable (global metrics) */
@@ -138,11 +139,11 @@ Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /
 		 * */
 		if ( pxSize >= face->num_fixed_sizes )
 			pxSize = face->num_fixed_sizes - 1;
-
+		
 		error = FT_Set_Pixel_Sizes( face,
 								   face->available_sizes[pxSize].height,
 								   face->available_sizes[pxSize].width );
-
+		
 		if (error) {
 			LogFTError(error);
 		}
@@ -151,14 +152,16 @@ Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /
 		 * non-scalable fonts must be determined differently
 		 * or sometimes cannot be determined.
 		 * */
-
+		
 		lineHeight = face->available_sizes[pxSize].height;
 		//font->lineskip = FT_CEIL(font->ascent);
 		//font->underline_offset = FT_FLOOR(face->underline_position);
 		//font->underline_height = FT_FLOOR(face->underline_thickness);
 	}
-
+	
 	return new TTFFont(pal, face, lineHeight, baseline);
+}
+
 }
 
 #include "plugindef.h"

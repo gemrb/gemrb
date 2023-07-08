@@ -96,7 +96,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc(nullptr, nullptr, 0, 0),
 };
 
-static void RegisterTormentOpcodes()
+static void RegisterTormentOpcodes(const CoreSettings&)
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
 }
