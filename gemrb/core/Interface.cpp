@@ -247,46 +247,8 @@ Interface::Interface(CoreSettings&& cfg)
 	// potentially disable logging before plugins are loaded (the log file is a plugin)
 	ToggleLogging(config.Logging);
 	
-	plugin_flags_t pluginFlags;
-	if (!cfg.SkipPlugin.empty()) {
-		pluginFlags[config.SkipPlugin] = PLF_SKIP;
-	}
-
-	if (!cfg.DelayPlugin.empty()) {
-		pluginFlags[config.DelayPlugin] = PLF_DELAY;
-	}
-
-	Log(MESSAGE, "Core", "Starting Plugin Manager...");
-	const PluginMgr *plugin = PluginMgr::Get();
-#if TARGET_OS_MAC
-	// search the bundle plugins first
-	// since bundle plugins are loaded first dyld will give them precedence
-	// if duplicates are found in the PluginsPath
-	path_t bundlePluginsPath = BundlePath(PLUGINS);
-	ResolveFilePath(bundlePluginsPath);
-#ifndef STATIC_LINK
-	LoadPlugins(bundlePluginsPath.c_str(), pluginFlags);
-#endif
-#endif
-#ifndef STATIC_LINK
-	LoadPlugins(config.PluginsPath.c_str(), pluginFlags);
-#endif
-	if (plugin && plugin->GetPluginCount()) {
-		Log(MESSAGE, "Core", "Plugin Loading Complete...");
-	} else {
-		throw std::runtime_error("Plugin Loading Failed, check path...");
-	}
-	plugin->RunInitializers(config);
-
-	Log(MESSAGE, "Core", "GemRB Core Initialization...");
-	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str())));
-	if (!video) {
-		throw std::runtime_error("No Video Driver Available.");
-	}
-	if (video->Init() == GEM_ERROR) {
-		throw std::runtime_error("Cannot Initialize Video Driver.");
-	}
+	LoadPlugins();
+	InitVideo();
 
 	// ask the driver if a touch device is in use
 	EventMgr::TouchInputEnabled = config.TouchInput < 0 ? video->TouchInputEnabled() : config.TouchInput;
@@ -403,9 +365,7 @@ Interface::Interface(CoreSettings&& cfg)
 	if (config.CustomFontPath[0]) gamedata->AddSource(config.CustomFontPath.c_str(), "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
 
 	Log(MESSAGE, "Core", "Reading Game Options...");
-	if (!LoadGemRBINI()) {
-		throw std::runtime_error("Cannot Load INI.");
-	}
+	LoadGemRBINI();
 
 	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
 	// we also need the display to exist to create sprites using the display format
@@ -540,18 +500,12 @@ Interface::Interface(CoreSettings&& cfg)
 		throw std::runtime_error("Cannot find defsound.2da.");
 	}
 
-	int ret = LoadSprites();
-	if (ret) throw std::runtime_error("Cannot load sprites.");
-
-	ret = LoadFonts();
-	if (ret) throw std::runtime_error("Cannot load fonts.");
+	LoadSprites();
+	LoadFonts();
 	gamedata->PreloadColors();
 
 	Log(MESSAGE, "Core", "Initializing string constants...");
 	displaymsg = new DisplayMessage();
-	if (!displaymsg) {
-		throw std::runtime_error("Failed to initialize string constants.");
-	}
 
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
 	winmgr = new WindowManager(video);
@@ -566,51 +520,8 @@ Interface::Interface(CoreSettings&& cfg)
 
 	QuitFlag = QF_CHANGESCRIPT;
 
-	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str())));
-	if (AudioDriver == nullptr) {
-		throw std::runtime_error("Failed to load sound driver.");
-	}
-	if (!AudioDriver->Init()) {
-		throw std::runtime_error("Failed to initialize sound driver.");
-	}
-
-	Log(MESSAGE, "Core", "Initializing Music Manager...");
-	music = MakePluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
-	if (!music) {
-		throw std::runtime_error("Failed to load Music Manager.");
-	}
-
-	Log(MESSAGE, "Core", "Loading music list...");
-	if (HasFeature( GFFlags::HAS_SONGLIST )) {
-		ret = ReadMusicTable("songlist", 1);
-	} else {
-		/*since bg1 and pst has no .2da for songlist,
-		we must supply one in the gemrb/override folder.
-		It should be: music.2da, first column is a .mus filename*/
-		ret = ReadMusicTable("music", 0);
-	}
-	if (!ret) {
-		Log(WARNING, "Core", "Didn't find music list.");
-	}
-
-	int resdata = HasFeature( GFFlags::RESDATA_INI );
-	if (resdata || HasFeature(GFFlags::SOUNDS_INI) ) {
-		Log(MESSAGE, "Core", "Loading resource data File...");
-		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		StringView sv(resdata ? "resdata" : "sounds");
-		DataStream* ds = gamedata->GetResourceStream(sv, IE_INI_CLASS_ID);
-		if (!INIresdata->Open(ds)) {
-			Log(WARNING, "Core", "Failed to load resource data.");
-		}
-	}
-
-	Log(MESSAGE, "Core", "Setting up SFX channels...");
-	ret = ReadSoundChannelsTable();
-	if (!ret) {
-		Log(WARNING, "Core", "Failed to read channel table.");
-	}
-
+	InitAudio();
+	
 	if (HasFeature( GFFlags::HAS_PARTY_INI )) {
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
@@ -650,13 +561,10 @@ Interface::Interface(CoreSettings&& cfg)
 	keymap = NULL;
 
 	Log(MESSAGE, "Core", "Initializing Inventory Management...");
-	ret = InitItemTypes();
-	if (!ret) {
-		throw std::runtime_error("Failed to initialize inventory.");
-	}
+	InitItemTypes();
 
 	Log(MESSAGE, "Core", "Initializing random treasure...");
-	ret = ReadRandomItems();
+	bool ret = ReadRandomItems();
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to initialize random treasure.");
 	}
@@ -1130,11 +1038,105 @@ void Interface::Main()
 	QuitGame(0);
 }
 
-int Interface::LoadSprites()
+void Interface::InitVideo()
+{
+	Log(MESSAGE, "Core", "Initializing Video Driver...");
+	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str())));
+	if (!video) {
+		throw std::runtime_error("No Video Driver Available.");
+	}
+	if (video->Init() == GEM_ERROR) {
+		throw std::runtime_error("Cannot Initialize Video Driver.");
+	}
+}
+
+void Interface::InitAudio()
+{
+	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
+	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str())));
+	if (AudioDriver == nullptr) {
+		throw std::runtime_error("Failed to load sound driver.");
+	}
+	if (!AudioDriver->Init()) {
+		throw std::runtime_error("Failed to initialize sound driver.");
+	}
+
+	Log(MESSAGE, "Core", "Initializing Music Manager...");
+	music = MakePluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
+	if (!music) {
+		throw std::runtime_error("Failed to load Music Manager.");
+	}
+
+	Log(MESSAGE, "Core", "Loading music list...");
+	bool ret = true;
+	if (HasFeature( GFFlags::HAS_SONGLIST )) {
+		ret = ReadMusicTable("songlist", 1);
+	} else {
+		/*since bg1 and pst has no .2da for songlist,
+		we must supply one in the gemrb/override folder.
+		It should be: music.2da, first column is a .mus filename*/
+		ret = ReadMusicTable("music", 0);
+	}
+	if (!ret) {
+		Log(WARNING, "Core", "Didn't find music list.");
+	}
+
+	int resdata = HasFeature( GFFlags::RESDATA_INI );
+	if (resdata || HasFeature(GFFlags::SOUNDS_INI) ) {
+		Log(MESSAGE, "Core", "Loading resource data File...");
+		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		StringView sv(resdata ? "resdata" : "sounds");
+		DataStream* ds = gamedata->GetResourceStream(sv, IE_INI_CLASS_ID);
+		if (!INIresdata->Open(ds)) {
+			Log(WARNING, "Core", "Failed to load resource data.");
+		}
+	}
+
+	Log(MESSAGE, "Core", "Setting up SFX channels...");
+	ret = ReadSoundChannelsTable();
+	if (!ret) {
+		Log(WARNING, "Core", "Failed to read channel table.");
+	}
+}
+
+void Interface::LoadPlugins() const
+{
+	plugin_flags_t pluginFlags;
+	if (!config.SkipPlugin.empty()) {
+		pluginFlags[config.SkipPlugin] = PLF_SKIP;
+	}
+
+	if (!config.DelayPlugin.empty()) {
+		pluginFlags[config.DelayPlugin] = PLF_DELAY;
+	}
+
+	Log(MESSAGE, "Core", "Starting Plugin Manager...");
+	const PluginMgr *plugin = PluginMgr::Get();
+#if TARGET_OS_MAC
+	// search the bundle plugins first
+	// since bundle plugins are loaded first dyld will give them precedence
+	// if duplicates are found in the PluginsPath
+	path_t bundlePluginsPath = BundlePath(PLUGINS);
+	ResolveFilePath(bundlePluginsPath);
+#ifndef STATIC_LINK
+	GemRB::LoadPlugins(bundlePluginsPath.c_str(), pluginFlags);
+#endif
+#endif
+#ifndef STATIC_LINK
+	GemRB::LoadPlugins(config.PluginsPath.c_str(), pluginFlags);
+#endif
+	if (plugin && plugin->GetPluginCount()) {
+		Log(MESSAGE, "Core", "Plugin Loading Complete...");
+	} else {
+		throw std::runtime_error("Plugin Loading Failed, check path...");
+	}
+	plugin->RunInitializers(config);
+}
+
+void Interface::LoadSprites()
 {
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
-		Log(ERROR, "Core", "No 2DA Importer Available.");
-		return GEM_ERROR;
+		throw std::runtime_error("No 2DA Importer Available.");
 	}
 
 	Log(MESSAGE, "Core", "Loading Cursors...");
@@ -1162,8 +1164,7 @@ int Interface::LoadSprites()
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
-		Log(ERROR, "Core", "Failed to load enough cursors ({} < {}).", CursorCount, IE_CURSOR_WAY);
-		return GEM_ERROR;
+		throw std::runtime_error(fmt::format("Failed to load enough cursors ({} < {}).", CursorCount, IE_CURSOR_WAY));
 	}
 	WindowManager::CursorMouseUp = Cursors[0];
 	WindowManager::CursorMouseDown = Cursors[1];
@@ -1175,8 +1176,7 @@ int Interface::LoadSprites()
 			anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
-				Log(ERROR, "Core", "Failed Loading Ground circle bitmaps...");
-				return GEM_ERROR;
+				throw std::runtime_error("Failed Loading Ground circle bitmaps...");
 			}
 
 			for (int i = 0; i < 6; i++) {
@@ -1188,17 +1188,14 @@ int Interface::LoadSprites()
 			}
 		}
 	}
-
-	return GEM_OK;
 }
 
-int Interface::LoadFonts()
+void Interface::LoadFonts()
 {
 	Log(MESSAGE, "Core", "Loading Fonts...");
 	AutoTable tab = gamedata->LoadTable("fonts");
 	if (!tab) {
-		Log(ERROR, "Core", "Cannot find fonts.2da.");
-		return GEM_ERROR;
+		throw std::runtime_error("Cannot find fonts.2da.");
 	}
 
 	// FIXME: we used to try and share like fonts
@@ -1229,7 +1226,6 @@ int Interface::LoadFonts()
 	}
 
 	Log(MESSAGE, "Core", "Fonts Loaded...");
-	return GEM_OK;
 }
 
 bool Interface::IsAvailable(SClass_ID filetype) const
@@ -1471,19 +1467,18 @@ static const EnumArray<GFFlags, StringView> game_flags {
 };
 
 /** Loads gemrb.ini */
-bool Interface::LoadGemRBINI()
+void Interface::LoadGemRBINI()
 {
 	DataStream* inifile = gamedata->GetResourceStream("gemrb", IE_INI_CLASS_ID);
-	if (! inifile) {
-		return false;
+	if (!inifile) {
+		throw std::runtime_error("could not open gemrb.ini");
 	}
 
 	Log(MESSAGE, "Core", "Loading game type-specific GemRB setup '{}'",
 		inifile->originalfile);
 
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
-		Log(ERROR, "Core", "No INI Importer Available.");
-		return false;
+		throw std::runtime_error("No INI Importer Available.");
 	}
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
@@ -1570,8 +1565,6 @@ bool Interface::LoadGemRBINI()
 	// fix the resolution default if needed
 	config.Width = std::max(config.Width, ini->GetKeyAsInt("resources", "MinWidth", 800));
 	config.Height = std::max(config.Height, ini->GetKeyAsInt("resources", "MinHeight", 600));
-
-	return true;
 }
 
 /** Load the encoding table selected in gemrb.cfg */
@@ -2675,31 +2668,31 @@ void Interface::UpdateMasterScript()
 	}
 }
 
-bool Interface::InitItemTypes()
+void Interface::InitItemTypes()
 {
 	AutoTable it = gamedata->LoadTable("itemtype");
-	ItemTypes = 0;
-	if (it) {
-		ItemTypes = it->GetRowCount(); //number of itemtypes
+	if (!it) {
+		throw std::runtime_error("Could not open itemtype table.");
+	}
+	ItemTypes = it->GetRowCount(); //number of itemtypes
 
-		TableMgr::index_t InvSlotTypes = it->GetColumnCount();
-		if (InvSlotTypes > 32) { //bit count limit
-			InvSlotTypes = 32;
-		}
-		//make sure unsigned int is 32 bits
-		slotmatrix.resize(ItemTypes);
-		for (TableMgr::index_t i = 0; i < ItemTypes; i++) {
-			unsigned int value = 0;
-			unsigned int k = 1;
-			for (TableMgr::index_t j = 0; j < InvSlotTypes; ++j) {
-				if (it->QueryFieldSigned<long>(i,j)) {
-					value |= k;
-				}
-				k <<= 1;
+	TableMgr::index_t InvSlotTypes = it->GetColumnCount();
+	if (InvSlotTypes > 32) { //bit count limit
+		InvSlotTypes = 32;
+	}
+	//make sure unsigned int is 32 bits
+	slotmatrix.resize(ItemTypes);
+	for (TableMgr::index_t i = 0; i < ItemTypes; i++) {
+		unsigned int value = 0;
+		unsigned int k = 1;
+		for (TableMgr::index_t j = 0; j < InvSlotTypes; ++j) {
+			if (it->QueryFieldSigned<long>(i,j)) {
+				value |= k;
 			}
-			//we let any items in the inventory
-			slotmatrix[i] = value | SLOT_INVENTORY;
+			k <<= 1;
 		}
+		//we let any items in the inventory
+		slotmatrix[i] = value | SLOT_INVENTORY;
 	}
 
 	//itemtype data stores (armor failure and critical damage multipliers), critical range
@@ -2732,61 +2725,61 @@ bool Interface::InitItemTypes()
 	//slottype describes the inventory structure
 	Inventory::Init();
 	AutoTable st = gamedata->LoadTable("slottype");
-	SlotTypes = 0;
-	if (st) {
-		SlotTypes = st->GetRowCount();
-		//make sure unsigned int is 32 bits
-		slotTypes.resize(SlotTypes);
-		for (unsigned int row = 0; row < SlotTypes; row++) {
-			bool alias;
-			ieDword i = strtounsigned<ieDword>(st->GetRowName(row).c_str());
-			if (i>=SlotTypes) continue;
-			if (slotTypes[i].slotEffects != 100) { // SLOT_EFFECT_ALIAS
-				slotTypes[row].slot = i;
-				i=row;
-				alias = true;
+	if (!it) {
+		throw std::runtime_error("Could not open slottype table.");
+	}
+	
+	SlotTypes = st->GetRowCount();
+	//make sure unsigned int is 32 bits
+	slotTypes.resize(SlotTypes);
+	for (unsigned int row = 0; row < SlotTypes; row++) {
+		bool alias;
+		ieDword i = strtounsigned<ieDword>(st->GetRowName(row).c_str());
+		if (i>=SlotTypes) continue;
+		if (slotTypes[i].slotEffects != 100) { // SLOT_EFFECT_ALIAS
+			slotTypes[row].slot = i;
+			i=row;
+			alias = true;
+		} else {
+			slotTypes[row].slot = i;
+			alias = false;
+		}
+		slotTypes[i].slotType = st->QueryFieldUnsigned<ieDword>(row, 0);
+		slotTypes[i].slotID = st->QueryFieldUnsigned<ieDword>(row, 1);
+		slotTypes[i].slotResRef = st->QueryField(row, 2);
+		slotTypes[i].slotTip = st->QueryFieldUnsigned<ieDword>(row, 3);
+		slotTypes[i].slotFlags = st->QueryFieldUnsigned<ieDword>(row, 5);
+		//don't fill sloteffects for aliased slots (pst)
+		if (alias) {
+			continue;
+		}
+		slotTypes[i].slotEffects = st->QueryFieldUnsigned<ieDword>(row, 4);
+		//setting special slots
+		if (slotTypes[i].slotType & SLOT_ITEM) {
+			if (slotTypes[i].slotType & SLOT_INVENTORY) {
+				Inventory::SetInventorySlot(i);
 			} else {
-				slotTypes[row].slot = i;
-				alias = false;
-			}
-			slotTypes[i].slotType = st->QueryFieldUnsigned<ieDword>(row, 0);
-			slotTypes[i].slotID = st->QueryFieldUnsigned<ieDword>(row, 1);
-			slotTypes[i].slotResRef = st->QueryField(row, 2);
-			slotTypes[i].slotTip = st->QueryFieldUnsigned<ieDword>(row, 3);
-			slotTypes[i].slotFlags = st->QueryFieldUnsigned<ieDword>(row, 5);
-			//don't fill sloteffects for aliased slots (pst)
-			if (alias) {
-				continue;
-			}
-			slotTypes[i].slotEffects = st->QueryFieldUnsigned<ieDword>(row, 4);
-			//setting special slots
-			if (slotTypes[i].slotType & SLOT_ITEM) {
-				if (slotTypes[i].slotType & SLOT_INVENTORY) {
-					Inventory::SetInventorySlot(i);
-				} else {
-					Inventory::SetQuickSlot(i);
-				}
-			}
-			switch (slotTypes[i].slotEffects) {
-				//fist slot, not saved, default weapon
-			case SLOT_EFFECT_FIST: Inventory::SetFistSlot(i); break;
-				//magic weapon slot, overrides all weapons
-			case SLOT_EFFECT_MAGIC: Inventory::SetMagicSlot(i); break;
-				//weapon slot, Equipping marker is relative to it
-			case SLOT_EFFECT_MELEE: Inventory::SetWeaponSlot(i); break;
-				//ranged slot
-			case SLOT_EFFECT_MISSILE: Inventory::SetRangedSlot(i); break;
-				//right hand
-			case SLOT_EFFECT_LEFT: Inventory::SetShieldSlot(i); break;
-				//head (for averting critical hit)
-			case SLOT_EFFECT_HEAD: Inventory::SetHeadSlot(i); break;
-				//armor slot
-			case SLOT_EFFECT_ITEM: Inventory::SetArmorSlot(i); break;
-			default:;
+				Inventory::SetQuickSlot(i);
 			}
 		}
+		switch (slotTypes[i].slotEffects) {
+			//fist slot, not saved, default weapon
+		case SLOT_EFFECT_FIST: Inventory::SetFistSlot(i); break;
+			//magic weapon slot, overrides all weapons
+		case SLOT_EFFECT_MAGIC: Inventory::SetMagicSlot(i); break;
+			//weapon slot, Equipping marker is relative to it
+		case SLOT_EFFECT_MELEE: Inventory::SetWeaponSlot(i); break;
+			//ranged slot
+		case SLOT_EFFECT_MISSILE: Inventory::SetRangedSlot(i); break;
+			//right hand
+		case SLOT_EFFECT_LEFT: Inventory::SetShieldSlot(i); break;
+			//head (for averting critical hit)
+		case SLOT_EFFECT_HEAD: Inventory::SetHeadSlot(i); break;
+			//armor slot
+		case SLOT_EFFECT_ITEM: Inventory::SetArmorSlot(i); break;
+		default:;
+		}
 	}
-	return (it && st);
 }
 
 ieDword Interface::FindSlot(unsigned int idx) const
