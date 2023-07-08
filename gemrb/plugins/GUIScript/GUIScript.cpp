@@ -4839,11 +4839,11 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	std::vector<String> strings;
 	if (dirit) {
 		do {
-			const char *name = dirit.GetName();
+			const path_t& name = dirit.GetName();
 			if (name[0] == '.' || dirit.IsDirectory() != dirs)
 				continue;
 
-			char *str = ConvertCharEncoding(name, core->config.SystemEncoding.c_str(), core->TLKEncoding.encoding.c_str());
+			char *str = ConvertCharEncoding(name.c_str(), core->config.SystemEncoding.c_str(), core->TLKEncoding.encoding.c_str());
 			String* string = StringFromCString(str);
 			free(str);
 
@@ -13533,12 +13533,12 @@ bool GUIScript::Autodetect(void)
 
 	iter.SetFlags(DirectoryIterator::Directories);
 	do {
-		const char *dirent = iter.GetName();
+		const path_t& dirent = iter.GetName();
 		char moduleName[_MAX_PATH];
 
 		// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
 		// Method1:
-		PathJoin(moduleName, core->config.GUIScriptsPath.c_str(), "GUIScripts", dirent, "Autodetect.py", nullptr);
+		PathJoin(moduleName, core->config.GUIScriptsPath.c_str(), "GUIScripts", dirent.c_str(), "Autodetect.py", nullptr);
 		ExecFile(moduleName);
 		// Method2:
 		//strcpy( module, dirent );

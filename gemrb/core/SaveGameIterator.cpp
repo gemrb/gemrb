@@ -296,8 +296,8 @@ bool SaveGameIterator::RescanSaveGames()
 	std::set<std::string> slots;
 	dir.SetFlags(DirectoryIterator::Directories);
 	do {
-		const char *name = dir.GetName();
-		if (IsSaveGameSlot( Path, name )) {
+		const path_t& name = dir.GetName();
+		if (IsSaveGameSlot(Path, name.c_str())) {
 			slots.emplace(name);
 		}
 	} while (++dir);
@@ -349,7 +349,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(std::string slotname)
 		return NULL;
 	}
 	do {
-		if (strnicmp( dir.GetName(), "PORTRT", 6 ) == 0)
+		if (strnicmp(dir.GetName().c_str(), "PORTRT", 6) == 0)
 			prtrt++;
 	} while (++dir);
 

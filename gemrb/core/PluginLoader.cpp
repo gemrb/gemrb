@@ -186,7 +186,7 @@ void LoadPlugins(const char* pluginpath, const plugin_flags_t& pluginFlags)
 
 	char path[_MAX_PATH];
 	do {
-		const char *name = dirIt.GetName();
+		const path_t& name = dirIt.GetName();
 
 		auto lookup = pluginFlags.find(name);
 		if (lookup != pluginFlags.cend()) {
@@ -206,7 +206,7 @@ void LoadPlugins(const char* pluginpath, const plugin_flags_t& pluginFlags)
 			}
 		}
 
-		PathJoin(path, pluginpath, name, nullptr);
+		PathJoin(path, pluginpath, name.c_str(), nullptr);
 		LoadPlugin(path);
 	} while (++dirIt);
 
