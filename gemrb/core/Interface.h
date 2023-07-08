@@ -247,12 +247,6 @@ enum class AUTOPAUSE : ieDword {
 #define SLOT_EFFECT_HEAD     7 //head slot
 #define SLOT_EFFECT_ALIAS    100 // marker for aliased slots
 
-enum PluginFlagsType {
-	PLF_NORMAL,
-	PLF_SKIP,
-	PLF_DELAY
-};
-
 enum PauseSetting {
 	PAUSE_OFF = 0,
 	PAUSE_ON = 1
@@ -328,7 +322,6 @@ private:
 	SaveGameIterator *sgiterator = nullptr;
 	tokens_t tokens;
 	std::unordered_map<std::string, std::vector<ieDword>> lists;
-	plugin_flags_t pluginFlags;
 	variables_t vars;
 	std::shared_ptr<MusicMgr> music;
 	std::vector<Symbol> symbols;
@@ -450,7 +443,6 @@ public:
 	Window* CreateWindow(unsigned short WindowID, const Region&);
 	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
-	plugin_flags_t& GetPluginFlags();
 	void LoadInitialValues(const ResRef& name, ieVarsMap& map) const;
 
 	Tooltip CreateTooltip() const;

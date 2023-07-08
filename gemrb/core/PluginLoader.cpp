@@ -158,7 +158,7 @@ static bool LoadPlugin(const char* pluginpath)
 	return true;
 }
 
-void LoadPlugins(const char* pluginpath)
+void LoadPlugins(const char* pluginpath, const plugin_flags_t& pluginFlags)
 {
 	Log(MESSAGE, "PluginMgr", "Loading Plugins from {}", pluginpath);
 
@@ -188,7 +188,6 @@ void LoadPlugins(const char* pluginpath)
 	do {
 		const char *name = dirIt.GetName();
 
-		auto& pluginFlags = core->GetPluginFlags();
 		auto lookup = pluginFlags.find(name);
 		if (lookup != pluginFlags.cend()) {
 			PluginFlagsType flags = lookup->second;
