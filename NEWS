@@ -1,6 +1,5 @@
-GemRB git (c734907):
+GemRB v0.9.2 (2023-07-08):
   New features:
-    - 
     - PVR(Z), BAM2, MOS2 and TIS2 support
     - support for higher AI speeds ("FPS") and VSync
     - support for EE-style saves, TLK locations and many more tables
@@ -10,7 +9,6 @@ GemRB git (c734907):
     - Anbernic device support
 
   Improved features:
-    - 
     - pst effect durations
     - performance, pathfinding, formations
     - combat, opcodes, ee compat, hp handling, demo
