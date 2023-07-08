@@ -256,9 +256,10 @@ static bool FindInDir(const char* Dir, char *Filename)
 	// Exact match not found, so try to search for Filename
 	// with different case
 	do {
-		const char *name = dir.GetName();
-		if (stricmp( name, Filename ) == 0) {
-			strcpy( Filename, name );
+		path_t name = dir.GetName();
+		// FIXME: this is case sensitve. should check core->config.CaseSensitive
+		if (name == Filename) {
+			strcpy(Filename, name.c_str());
 			return true;
 		}
 	} while (++dir);
@@ -534,10 +535,10 @@ void* readonly_mmap(void *vfd) {
 
 #endif
 
-DirectoryIterator::DirectoryIterator(const char *path)
+DirectoryIterator::DirectoryIterator(path_t path)
+: Path(std::move(path))
 {
 	SetFlags(Files|Directories);
-	Path = strdup(path);
 	Rewind();
 }
 
@@ -545,7 +546,6 @@ DirectoryIterator::~DirectoryIterator()
 {
 	if (Directory)
 		closedir(static_cast<DIR*>(Directory));
-	free(Path);
 	delete predicate;
 }
 
@@ -575,9 +575,9 @@ bool DirectoryIterator::IsDirectory()
 	return dir_exists(path.c_str());
 }
 
-const char* DirectoryIterator::GetName()
+path_t DirectoryIterator::GetName()
 {
-	if (Entry == NULL) return NULL;
+	if (Entry == nullptr) return "";
 	return static_cast<dirent*>(Entry)->d_name;
 }
 
@@ -594,7 +594,7 @@ DirectoryIterator& DirectoryIterator::operator++()
 		Entry = readdir(static_cast<DIR*>(Directory));
 		cont = false;
 		if (Entry) {
-			const char* name = GetName();
+			const path_t& name = GetName();
 
 			if (entrySkipFlags&Directories) {
 				cont = IsDirectory();
@@ -606,8 +606,8 @@ DirectoryIterator& DirectoryIterator::operator++()
 				cont = name[0] == '.';
 			}
 			if (cont == false && predicate) {
-				size_t len = strnlen(name, _MAX_PATH);
-				const char* nameEnd = name; // make sure to take the end of the name, since we'll likely truncate it
+				size_t len = name.length();
+				const char* nameEnd = name.c_str(); // make sure to take the end of the name, since we'll likely truncate it
 				while (--len >= 8U) {
 					nameEnd++;
 				}
@@ -625,7 +625,7 @@ void DirectoryIterator::Rewind()
 {
 	if (Directory)
 		closedir(static_cast<DIR*>(Directory));
-	Directory = opendir(Path);
+	Directory = opendir(Path.c_str());
 	if (Directory == NULL) {
 		Entry = NULL;
 		//Log(WARNING, "DirectoryIterator", "Cannot open directory: {}\nError: {}", Path, strerror(errno));

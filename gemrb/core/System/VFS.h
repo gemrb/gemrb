@@ -137,7 +137,7 @@ public:
 	 * WARNING: the lifetime of path must be longer than the lifetime
 	 * of DirectoryIterator.
 	 */
-	explicit DirectoryIterator(const char *path);
+	explicit DirectoryIterator(path_t path);
 	DirectoryIterator(const DirectoryIterator&) = delete;
 	DirectoryIterator(DirectoryIterator&&) noexcept = default;
 	~DirectoryIterator();
@@ -151,7 +151,7 @@ public:
 	 *
 	 * The returned string is only valid until the iterator is advanced.
 	 */
-	const char *GetName();
+	path_t GetName();
 	path_t GetFullPath();
 	DirectoryIterator& operator++();
 	explicit operator bool () const noexcept { return Entry != nullptr; }
@@ -160,7 +160,7 @@ private:
 	FileFilterPredicate* predicate{};
 	void* Directory = nullptr;
 	void* Entry = nullptr;
-	char* Path;
+	path_t Path;
 	Flags entrySkipFlags;
 };
 

@@ -3087,7 +3087,7 @@ bool Interface::StupidityDetector(const char* Pt) const
 		return true;
 	}
 	do {
-		const char *name = dir.GetName();
+		const path_t& name = dir.GetName();
 		if (dir.IsDirectory()) {
 			// since we can't use DirectoryIterator::Hidden, exclude the special dirs manually
 			if (name[0] == '.' && name[1] == '\0') {
@@ -3099,7 +3099,7 @@ bool Interface::StupidityDetector(const char* Pt) const
 			Log(ERROR, "Interface", "**contains another dir**");
 			return true; //a directory in there???
 		}
-		if (ProtectedExtension(name) ) {
+		if (ProtectedExtension(name.c_str()) ) {
 			Log(ERROR, "Interface", "**contains alien files**");
 			return true; //an executable file in there???
 		}
@@ -3123,8 +3123,8 @@ void Interface::DelTree(const char* Pt, bool onlysave) const
 		return;
 	}
 	do {
-		const char *name = dir.GetName();
-		if (!onlysave || SavedExtension(name) ) {
+		const path_t& name = dir.GetName();
+		if (!onlysave || SavedExtension(name.c_str()) ) {
 			path_t dtmp = dir.GetFullPath();
 			unlink(dtmp.c_str());
 		}
@@ -3857,7 +3857,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 	FileStream str;
 
 	str.Create(folder, GameNameResRef.c_str(), IE_SAV_CLASS_ID);
-	DirectoryIterator dir(config.CachePath.c_str());
+	DirectoryIterator dir(config.CachePath);
 	if (!dir) {
 		return GEM_ERROR;
 	}
@@ -3877,8 +3877,8 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 	int priority=2;
 	while(priority) {
 		do {
-			const char *name = dir.GetName();
-			if (SavedExtension(name)==priority) {
+			const path_t& name = dir.GetName();
+			if (SavedExtension(name.c_str()) == priority) {
 				path_t dtmp = dir.GetFullPath();
 				FileStream fs;
 				if (!fs.Open(dtmp.c_str())) {

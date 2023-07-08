@@ -101,12 +101,11 @@ void CachedDirectoryImporter::Refresh()
 		return;
 
 	do {
-		const char *name = it.GetName();
-		std::string buf = name;
-		StringToLower(buf);
-		auto emplaceResult = cache.emplace(buf, name);
+		path_t name = it.GetName();
+		StringToLower(name);
+		auto emplaceResult = cache.emplace(name, name);
 		if (!emplaceResult.second) {
-			Log(ERROR, "CachedDirectoryImporter", "Duplicate '{}' files in '{}' directory", buf, path);
+			Log(ERROR, "CachedDirectoryImporter", "Duplicate '{}' files in '{}' directory", name, path);
 		}
 	} while (++it);
 }
