@@ -77,12 +77,12 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	path_t path = PathJoinExt(datadir, name, "cfg");
 	
 	FileStream cfgStream;
-	if (cfgStream.Open(path.c_str())) {
+	if (cfgStream.Open(path)) {
 		return LoadFromStream(cfgStream);
 	}
 
 #ifdef SYSCONF_DIR
-	path = PathJoinExt(SYSCONF_DIR, name.c_str(), "cfg" );
+	path = PathJoinExt(SYSCONF_DIR, name, "cfg" );
 	if (cfgStream.Open(path))
 	{
 		return LoadFromStream(cfgStream);
@@ -92,13 +92,12 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 #ifndef ANDROID
 	// Now try ~/.gemrb folder
 	datadir = HomePath();
-	char confpath[_MAX_PATH] = ".";
-	strcat(confpath, name.c_str());
+	path_t confpath = "." + name;
 	path_t tmp = PathJoin(datadir, confpath);
 
 	path = PathJoinExt(datadir, name, "cfg");
 	
-	if (cfgStream.Open(path.c_str()))
+	if (cfgStream.Open(path))
 	{
 		return LoadFromStream(cfgStream);
 	}
@@ -107,7 +106,7 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	if (name != PACKAGE) {
 		path = PathJoinExt(datadir, PACKAGE, "cfg");
 
-		if (cfgStream.Open(path.c_str()))
+		if (cfgStream.Open(path))
 		{
 			return LoadFromStream(cfgStream);
 		}
@@ -115,7 +114,7 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 #ifdef SYSCONF_DIR
 		path = PathJoinExt(SYSCONF_DIR, PACKAGE, "cfg");
 		
-		if (cfgStream.Open(path.c_str()))
+		if (cfgStream.Open(path))
 		{
 			return LoadFromStream(cfgStream);
 		}
@@ -124,7 +123,7 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	// if all else has failed try current directory
 	path = PathJoinExt("./", PACKAGE, "cfg");
 	
-	if (cfgStream.Open(path.c_str()))
+	if (cfgStream.Open(path))
 	{
 		return LoadFromStream(cfgStream);
 	}

@@ -270,7 +270,7 @@ Interface::Interface(CoreSettings&& cfg)
 	}
 
 	for (const auto& modPath : config.ModPath) {
-		gamedata->AddSource(modPath.c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(modPath, "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
 	path = PathJoin(config.GemRBOverridePath, "override", config.GameType);
@@ -359,7 +359,7 @@ Interface::Interface(CoreSettings&& cfg)
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
-	if (config.CustomFontPath[0]) gamedata->AddSource(config.CustomFontPath.c_str(), "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
+	if (config.CustomFontPath[0]) gamedata->AddSource(config.CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
 
 	Log(MESSAGE, "Core", "Reading Game Options...");
 	LoadGemRBINI();
@@ -1032,7 +1032,7 @@ void Interface::Main()
 void Interface::InitVideo()
 {
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str())));
+	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName)));
 	if (!video) {
 		throw std::runtime_error("No Video Driver Available.");
 	}
@@ -1044,7 +1044,7 @@ void Interface::InitVideo()
 void Interface::InitAudio()
 {
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str())));
+	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName)));
 	if (AudioDriver == nullptr) {
 		throw std::runtime_error("Failed to load sound driver.");
 	}
@@ -1835,7 +1835,7 @@ void Interface::LoadInitialValues(const ResRef& name, ieVarsMap& map) const
 	// we only support PST's var.var for now
 	path_t nPath = PathJoin(config.GamePath, "var.var");
 	FileStream fs;
-	if (!fs.Open(nPath.c_str())) {
+	if (!fs.Open(nPath)) {
 		return;
 	}
 
@@ -2352,7 +2352,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 bool Interface::SaveConfig()
 {
 	std::string gemrbINI;
-	if (strncmp(INIConfig.c_str(), "gem-", 4) != 0) {
+	if (INIConfig.compare(0, 4, "gem-") != 0) {
 		gemrbINI = "gem-" + INIConfig;
 	}
 	path_t ini_path = PathJoin(config.GamePath, gemrbINI);

@@ -13560,7 +13560,7 @@ bool GUIScript::LoadScript(const std::string& filename)
 	}
 	Log(MESSAGE, "GUIScript", "Loading Script {}.", filename);
 
-	PyObject* pName = PyString_FromString(filename.c_str());
+	PyObject* pName = PyString_FromStringObj(filename);
 	/* Error checking of pName left out */
 	if (pName == NULL) {
 		Log(ERROR, "GUIScript", "Failed to create filename for script \"{}\".", filename);
