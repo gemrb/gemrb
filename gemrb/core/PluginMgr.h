@@ -118,7 +118,7 @@ public:
 	 * @param[in] name Name of driver.
 	 * @param[in] create Function to create instance of plugin.
 	 */
-	bool RegisterDriver(const TypeID* type, const char* name, PluginFunc create);
+	bool RegisterDriver(const TypeID* type, const std::string& name, PluginFunc create);
 
 	/**
 	 * Gets driver of specified type.
@@ -128,7 +128,7 @@ public:
 	 *
 	 * Tries to get driver associated to name, or falls back to a random one.
 	 */
-	Plugin* GetDriver(const TypeID* type, const char* name);
+	Plugin* GetDriver(const TypeID* type, const std::string& name);
 };
 
 template <typename T>
