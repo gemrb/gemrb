@@ -662,11 +662,15 @@ public:
 	/** Saves config variables to a file */
 	bool SaveConfig();
 private:
-	int LoadSprites();
-	int LoadFonts();
-	bool LoadGemRBINI();
+	void LoadPlugins() const;
+	void LoadSprites();
+	void LoadFonts();
+	void LoadGemRBINI();
 	/** Load the encoding table selected in gemrb.cfg */
 	bool LoadEncoding();
+	
+	void InitVideo();
+	void InitAudio();
 
 	template<int SIZE>
 	bool LoadPalette(const ResRef& resref, std::vector<ColorPal<SIZE>>& palettes) const
@@ -691,7 +695,7 @@ private:
 	}
 
 	bool InitializeVarsWithINI(const char * iniFileName);
-	bool InitItemTypes();
+	void InitItemTypes();
 	bool ReadRandomItems();
 	bool ReadItemTable(const ResRef& item, const char *Prefix);
 	bool ReadMusicTable(const ResRef& name, int col);
