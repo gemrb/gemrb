@@ -36,7 +36,7 @@ class GEM_EXPORT SaveGame : public Held<SaveGame> {
 public:
 	static const TypeID ID;
 public:
-	SaveGame(std::string path, std::string name, const ResRef& prefix, std::string slotname, int pCount, int saveID);
+	SaveGame(path_t path, path_t name, const ResRef& prefix, std::string slotname, int pCount, int saveID);
 	~SaveGame() override = default;
 	int GetPortraitCount() const
 	{
@@ -46,7 +46,7 @@ public:
 	{
 		return SaveID;
 	}
-	const std::string& GetName() const
+	const path_t& GetName() const
 	{
 		return Name;
 	}
@@ -54,11 +54,11 @@ public:
 	{
 		return Prefix;
 	}
-	const std::string& GetPath() const
+	const path_t& GetPath() const
 	{
 		return Path;
 	}
-	const std::string& GetDate() const
+	const path_t& GetDate() const
 	{
 		return Date;
 	}
@@ -74,8 +74,8 @@ public:
 	DataStream* GetWmap(int idx) const;
 	DataStream* GetSave() const;
 private:
-	std::string Path;
-	std::string Name;
+	path_t Path;
+	path_t Name;
 	ResRef Prefix;
 	std::string Date;
 	mutable std::string GameDate;
