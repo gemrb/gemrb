@@ -26,7 +26,7 @@ build_task:
     - true # noop, try real testing on this platform later
 
   publish_script:
-    - if [[ $CIRRUS_BRANCH != 'master' || $CIRRUS_REPO_OWNER != 'gemrb' ]]; then exit 0; fi
+    - if [[ $CIRRUS_REPO_OWNER != 'gemrb' ]]; then exit 0; fi
     - # generate filename
     - # there are no tags, so improvise
     - v2=${CIRRUS_CHANGE_IN_REPO:0:8}
