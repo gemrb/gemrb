@@ -196,30 +196,6 @@ bool FileExists(const path_t& path)
 	return true;
 }
 
-
-/**
- * Appends 'name' to path 'target' and returns 'target'.
- * It takes care of inserting PathDelimiter ('/' or '\\') if needed
- */
-char* PathAppend (char* target, const char* name)
-{
-	size_t len = strlen(target);
-
-	if (target[0] != 0 && target[len-1] != PathDelimiter && len+1 < _MAX_PATH) {
-		target[len++] = PathDelimiter;
-		target[len] = 0;
-	}
-	// strip possible leading backslash, since it is not ignored on all platforms
-	// totl has '\data\zcMHar.bif' in the key file, and also the CaseSensitive
-	// code breaks with that extra slash, so simple fix: remove it
-	if (name[0] == '\\') {
-		name = name+1;
-	}
-	strncat( target+len, name, _MAX_PATH - len - 1 );
-
-	return target;
-}
-
 void PathAppend(path_t& target, const path_t& name)
 {
 	size_t len = target.length();
@@ -329,7 +305,7 @@ void ResolveFilePath(path_t& filePath)
 	if (filePath[0] == '~') {
 		path_t home = HomePath();
 		if (home.length()) {
-			PathAppend(home, filePath.c_str() + 1);
+			PathAppend(home, filePath.substr(1));
 			filePath.swap(home);
 		}
 	}
@@ -339,15 +315,15 @@ void ResolveFilePath(path_t& filePath)
 
 #endif
 
-void ExtractFileFromPath(char *file, const char *full_path)
+path_t ExtractFileFromPath(const path_t& fullPath)
 {
-	const char *p;
-	if ((p = strrchr (full_path, PathDelimiter)))
-		strcpy(file, p+1);
-	else if ((p = strchr (full_path, ':')))
-		strcpy(file, p+1);
+	size_t pos = fullPath.find_last_of(PathDelimiter);
+	if (pos != path_t::npos)
+		return fullPath.substr(pos + 1);
+	else if ((pos = fullPath.find_last_of(PathListSeparator)) != path_t::npos)
+		return fullPath.substr(pos + 1);
 	else
-		strcpy(file, full_path);
+		return fullPath;
 }
 
 static bool MakeDirectory(StringView path)

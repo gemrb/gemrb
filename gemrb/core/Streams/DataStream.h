@@ -31,6 +31,7 @@
 #include "Platform.h"
 #include "Region.h"
 #include "System/swab.h"
+#include "System/VFS.h"
 #include "Strings/StringConversion.h"
 
 namespace GemRB {
@@ -69,7 +70,7 @@ using stroff_t = std::make_signed_t<strpos_t>;
 class GEM_EXPORT DataStream {
 public:
 	char filename[16] {}; //8+1+3+1 padded to dword
-	char originalfile[_MAX_PATH] {};
+	path_t originalfile;
 public:
 	static constexpr strpos_t InvalidPos = strpos_t(-1);
 	static constexpr strret_t Error = -1;

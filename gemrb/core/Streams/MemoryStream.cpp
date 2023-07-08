@@ -31,8 +31,9 @@ MemoryStream::MemoryStream(const char *name, void* data, strpos_t size)
 	: data((char*)data)
 {
 	this->size = size;
-	ExtractFileFromPath(filename, name);
-	strlcpy(originalfile, name, _MAX_PATH);
+	originalfile = name;
+	path_t fname = ExtractFileFromPath(name);
+	strlcpy(filename, fname.c_str(), sizeof(filename));
 }
 
 MemoryStream::~MemoryStream()
@@ -44,7 +45,7 @@ DataStream* MemoryStream::Clone() const noexcept
 {
 	void *copy = malloc(size);
 	memcpy(copy, data, size);
-	return new MemoryStream(originalfile, copy, size);
+	return new MemoryStream(originalfile.c_str(), copy, size);
 }
 
 strret_t MemoryStream::Read(void* dest, strpos_t length)

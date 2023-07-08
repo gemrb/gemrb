@@ -148,9 +148,8 @@ path_t PathJoinExt(const DIR_T& dir, const BASE_T& base, const EXT_T& ext)
 
 GEM_EXPORT void FixPath(path_t& path, bool needslash);
 
-GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);
+GEM_EXPORT path_t ExtractFileFromPath(const path_t&);
 
-GEM_EXPORT char* PathAppend(char* target, const char* name);
 GEM_EXPORT void PathAppend(path_t& target, const path_t& name);
 
 GEM_EXPORT bool MakeDirectories(const path_t& path) WARN_UNUSED;
