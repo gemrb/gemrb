@@ -236,10 +236,10 @@ Interface::Interface(CoreSettings&& cfg)
 		throw std::runtime_error(fmt::format("Unable to create cache directory '{}'", config.CachePath));
 	}
 
-	if (StupidityDetector(config.CachePath.c_str())) {
+	if (StupidityDetector(config.CachePath)) {
 		throw std::runtime_error(fmt::format("Cache path {} doesn't exist, not a folder or contains alien files!", config.CachePath));
 	}
-	if (!config.KeepCache) DelTree(config.CachePath.c_str(), false);
+	if (!config.KeepCache) DelTree(config.CachePath, false);
 	
 	vars = std::move(config.vars);
 	vars["MaxPartySize"] = config.MaxPartySize; // for simple GUIScript access
@@ -408,7 +408,7 @@ Interface::Interface(CoreSettings&& cfg)
 		ini_path = PathJoin(config.GamePath, INIConfig);
 		Log(MESSAGE,"Core", "Loading original game options from {}", ini_path);
 	}
-	if (!InitializeVarsWithINI(ini_path.c_str())) {
+	if (!InitializeVarsWithINI(ini_path)) {
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
 
@@ -652,7 +652,7 @@ Interface::~Interface() noexcept
 	gamedata = NULL;
 
 	// Removing all stuff from Cache, except bifs
-	if (!config.KeepCache) DelTree(config.CachePath.c_str(), true);
+	if (!config.KeepCache) DelTree(config.CachePath, true);
 }
 
 GameControl* Interface::StartGameControl()
@@ -1255,9 +1255,9 @@ Audio* Interface::GetAudioDrv(void) const {
 	return AudioDriver.get();
 }
 
-const char* Interface::TypeExt(SClass_ID type) const
+path_t Interface::TypeExt(SClass_ID type) const
 {
-	static const std::map<SClass_ID, const char*> extensions = {
+	static const std::map<SClass_ID, path_t> extensions = {
 		{ IE_2DA_CLASS_ID, "2da" },
 		{ IE_ACM_CLASS_ID, "acm" },
 		{ IE_ARE_CLASS_ID, "are" },
@@ -2274,7 +2274,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 	return dirIt;
 }
 
-bool Interface::InitializeVarsWithINI(const char* iniFileName)
+bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 {
 	if (!core->IsAvailable( IE_INI_CLASS_ID ))
 		return false;
@@ -2497,7 +2497,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	WorldMapArray* newWorldmap = nullptr;
 
 	LoadProgress(10);
-	if (!config.KeepCache) DelTree(config.CachePath.c_str(), true);
+	if (!config.KeepCache) DelTree(config.CachePath, true);
 	LoadProgress(15);
 
 	saveGameAREExtractor.changeSaveGame(sg);
@@ -3019,16 +3019,16 @@ static const char* const saved_extensions_last[] = { ".tot", ".toh", nullptr };
 //2 - save
 //1 - save last
 //0 - don't save
-int Interface::SavedExtension(const char *filename) const
+int Interface::SavedExtension(const path_t& filename) const
 {
-	const char *str=strchr(filename,'.');
-	if (!str) return 0;
+	size_t pos = filename.find_first_of('.');
+	if (pos == path_t::npos) return 0;
 
 	for (const auto ext : saved_extensions) {
-		if (ext && !stricmp(ext, str)) return 2;
+		if (ext && !stricmp(ext, &filename[pos])) return 2;
 	}
 	for (const auto ext : saved_extensions_last) {
-		if (ext && !stricmp(ext, str)) return 1;
+		if (ext && !stricmp(ext, &filename[pos])) return 1;
 	}
 	return 0;
 }
@@ -3036,13 +3036,13 @@ int Interface::SavedExtension(const char *filename) const
 static const char* const protected_extensions[] = { ".exe", ".dll", ".so", nullptr };
 
 //returns true if file should be saved
-bool Interface::ProtectedExtension(const char *filename) const
+bool Interface::ProtectedExtension(const path_t& filename) const
 {
-	const char *str=strchr(filename,'.');
-	if (!str) return false;
+	size_t pos = filename.find_first_of('.');
+	if (pos == path_t::npos) return false;
 	int i=0;
 	while(protected_extensions[i]) {
-		if (!stricmp(protected_extensions[i], str) ) return true;
+		if (!stricmp(protected_extensions[i], &filename[pos])) return true;
 		i++;
 	}
 	return false;
@@ -3057,14 +3057,9 @@ void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID) const
 //this function checks if the path is eligible as a cache
 //if it contains a directory, or suspicious file extensions
 //we bail out, because the cache will be purged regularly.
-bool Interface::StupidityDetector(const char* Pt) const
+bool Interface::StupidityDetector(const path_t& path) const
 {
-	char Path[_MAX_PATH];
-	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
-		Log(ERROR, "Interface", "Trying to check too long path: {}!", Pt);
-		return true;
-	}
-	DirectoryIterator dir(Path);
+	DirectoryIterator dir(path);
 	// scan everything
 	dir.SetFlags(DirectoryIterator::All, true);
 
@@ -3085,7 +3080,7 @@ bool Interface::StupidityDetector(const char* Pt) const
 			Log(ERROR, "Interface", "**contains another dir**");
 			return true; //a directory in there???
 		}
-		if (ProtectedExtension(name.c_str()) ) {
+		if (ProtectedExtension(name) ) {
 			Log(ERROR, "Interface", "**contains alien files**");
 			return true; //an executable file in there???
 		}
@@ -3094,23 +3089,18 @@ bool Interface::StupidityDetector(const char* Pt) const
 	return false;
 }
 
-void Interface::DelTree(const char* Pt, bool onlysave) const
+void Interface::DelTree(const path_t& path, bool onlysave) const
 {
-	char Path[_MAX_PATH];
+	if (path.empty()) return; //Don't delete the root filesystem :)
 
-	if (!Pt[0]) return; //Don't delete the root filesystem :)
-	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
-		Log(ERROR, "Interface", "Trying to delete too long path: {}!", Pt);
-		return;
-	}
-	DirectoryIterator dir(Path);
+	DirectoryIterator dir(path);
 	dir.SetFlags(DirectoryIterator::Files);
 	if (!dir) {
 		return;
 	}
 	do {
 		const path_t& name = dir.GetName();
-		if (!onlysave || SavedExtension(name.c_str()) ) {
+		if (!onlysave || SavedExtension(name) ) {
 			path_t dtmp = dir.GetFullPath();
 			unlink(dtmp.c_str());
 		}
@@ -3157,7 +3147,7 @@ void Interface::DragItem(CREItem *item, const ResRef& /*Picture*/)
 	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 
-bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
+bool Interface::ReadItemTable(const ResRef& TableName, const path_t& Prefix)
 {
 	AutoTable tab = gamedata->LoadTable(TableName);
 	if (!tab) {
@@ -3167,7 +3157,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 	TableMgr::index_t i = tab->GetRowCount();
 	for (TableMgr::index_t j = 0; j < i; j++) {
 		ResRef ItemName;
-		if (Prefix) {
+		if (!Prefix.empty()) {
 			ItemName.Format("{}{:02d}", Prefix, (j + 1) % 100);
 		} else {
 			ItemName = tab->GetRowName(j);
@@ -3207,7 +3197,7 @@ bool Interface::ReadRandomItems()
 	ResRef randTreasureRef = tab->QueryField(1, difflev);
 	int i = atoi(randTreasureRef.c_str());
 	if (i<1) {
-		ReadItemTable(randTreasureRef, 0); //reading the table itself
+		ReadItemTable(randTreasureRef, ""); //reading the table itself
 		return true;
 	}
 	if (i>5) {
@@ -3215,7 +3205,7 @@ bool Interface::ReadRandomItems()
 	}
 	while(i--) {
 		randTreasureRef = tab->QueryField(2 + i, difflev);
-		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i).c_str());
+		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i));
 	}
 	return true;
 }
@@ -3759,7 +3749,7 @@ int Interface::WriteCharacter(StringView name, const Actor *actor)
 	return 0;
 }
 
-int Interface::WriteGame(const char *folder)
+int Interface::WriteGame(const path_t& folder)
 {
 	PluginHolder<SaveGameMgr> gm = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID);
 	if (gm == nullptr) {
@@ -3785,7 +3775,7 @@ int Interface::WriteGame(const char *folder)
 	return 0;
 }
 
-int Interface::WriteWorldMap(const char *folder)
+int Interface::WriteWorldMap(const path_t& folder)
 {
 	PluginHolder<WorldMapMgr> wmm = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 	if (wmm == nullptr) {
@@ -3836,7 +3826,7 @@ static bool IsBlobSaveItem(const char *path) {
 	return areExt != nullptr && path + pathLength - 4 == areExt;
 }
 
-int Interface::CompressSave(const char *folder, bool overrideRunning)
+int Interface::CompressSave(const path_t& folder, bool overrideRunning)
 {
 	FileStream str;
 
@@ -3862,7 +3852,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 	while(priority) {
 		do {
 			const path_t& name = dir.GetName();
-			if (SavedExtension(name.c_str()) == priority) {
+			if (SavedExtension(name) == priority) {
 				path_t dtmp = dir.GetFullPath();
 				FileStream fs;
 				if (!fs.Open(dtmp)) {
@@ -4168,7 +4158,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 }
 
 // see 8cff52b3c8 if this needs to be resurrected at some point
-void Interface::WaitForDisc(int disc_number, const char* path)
+void Interface::WaitForDisc(int disc_number, const path_t& path)
 {
 	GetDictionary()["WaitForDisc"] = (ieDword) disc_number;
 
@@ -4193,7 +4183,7 @@ Timer& Interface::SetTimer(const EventHandler& handler, tick_t interval, int rep
 	return timers.back();
 }
 
-void Interface::SetNextScript(const char *script)
+void Interface::SetNextScript(const path_t& script)
 {
 	nextScript = script;
 	QuitFlag |= QF_CHANGESCRIPT;
