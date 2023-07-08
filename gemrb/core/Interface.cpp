@@ -264,8 +264,7 @@ Interface::Interface(CoreSettings&& cfg)
 		throw std::runtime_error("no DirectoryImporter!");
 	}
 
-	char path[_MAX_PATH];
-	PathJoin(path, config.CachePath.c_str(), nullptr);
+	path_t path = config.CachePath;
 	if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
 		throw std::runtime_error("The cache path couldn't be registered, please check!");
 	}
@@ -274,38 +273,38 @@ Interface::Interface(CoreSettings&& cfg)
 		gamedata->AddSource(modPath.c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
-	PathJoin(path, config.GemRBOverridePath.c_str(), "override", config.GameType.c_str(), nullptr);
+	path = PathJoin(config.GemRBOverridePath, "override", config.GameType);
 	if (config.GameType == "auto") {
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
 	} else {
 		gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
-	PathJoin(path, config.GemRBOverridePath.c_str(), "override", "shared", nullptr);
+	path = PathJoin(config.GemRBOverridePath, "override", "shared");
 	gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	PathJoin(path, config.GamePath.c_str(), config.GameOverridePath.c_str(), nullptr);
+	path = PathJoin(config.GamePath, config.GameOverridePath);
 	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	// GAME sounds are intentionally not cached, in IWD there are directory structures,
 	// that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
-	PathJoin(path, config.GamePath.c_str(), config.GameSoundsPath.c_str(), nullptr);
+	path = PathJoin(config.GamePath, config.GameSoundsPath);
 	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
-	PathJoin(path, config.GamePath.c_str(), config.GameMoviesPath.c_str(), nullptr);
+	path = PathJoin(config.GamePath, config.GameMoviesPath);
 	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY);
 
-	PathJoin(path, config.GamePath.c_str(), config.GameScriptsPath.c_str(), nullptr);
+	path = PathJoin(config.GamePath, config.GameScriptsPath);
 	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	PathJoin(path, config.GamePath.c_str(), config.GamePortraitsPath.c_str(), nullptr);
+	path = PathJoin(config.GamePath, config.GamePortraitsPath);
 	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	PathJoin(path, config.GamePath.c_str(), config.GameDataPath.c_str(), nullptr);
+	path = PathJoin(config.GamePath, config.GameDataPath);
 	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	// accomodating silly installers that create a data/Data/.* structure
-	PathJoin(path, config.GamePath.c_str(), config.GameDataPath.c_str(), "Data", nullptr);
+	path = PathJoin(config.GamePath, config.GameDataPath, "Data");
 	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	// IWD2 movies are on the CD but not in the BIF
@@ -313,7 +312,7 @@ Interface::Interface(CoreSettings&& cfg)
 	for (size_t i = 0; i < MAX_CD; i++) {
 		for (size_t j = 0; j < config.CD[i].size(); j++) {
 			description[2] = '1' + i;
-			PathJoin(path, config.CD[i][j].c_str(), config.GameDataPath.c_str(), nullptr);
+			path = PathJoin(config.CD[i][j], config.GameDataPath);
 			gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
 		}
 	}
@@ -321,18 +320,17 @@ Interface::Interface(CoreSettings&& cfg)
 
 	// most of the old gemrb override files can be found here,
 	// so they have a lower priority than the game files and can more easily be modded
-	PathJoin(path, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", config.GameType.c_str(), nullptr);
+	path = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", config.GameType);
 	if (config.GameType == "auto") {
 		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
 	} else {
 		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
-	PathJoin(path, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", "shared", nullptr);
+	path = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", "shared");
 	gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	Log(MESSAGE, "Core", "Initializing KEY Importer...");
-	char ChitinPath[_MAX_PATH];
-	PathJoin(ChitinPath, config.GamePath.c_str(), "chitin.key", nullptr);
+	path_t ChitinPath = PathJoin(config.GamePath, "chitin.key");
 	if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
 		Log(FATAL, "Core", "Failed to load \"chitin.key\"");
 		Log(ERROR, "Core", "This means:\n- you set the GamePath config variable incorrectly,\n\
@@ -355,10 +353,9 @@ Interface::Interface(CoreSettings&& cfg)
 	}
 
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
-	PathJoin(path, config.GemRBOverridePath.c_str(), "override", config.GameType.c_str(), nullptr);
+	path = PathJoin(config.GemRBOverridePath, "override", config.GameType);
 	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
-	char unhardcodedTypePath[_MAX_PATH * 2];
-	PathJoin(unhardcodedTypePath, config.GemRBUnhardcodedPath.c_str(), "unhardcoded", config.GameType.c_str(), nullptr);
+	path_t unhardcodedTypePath = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", config.GameType);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
@@ -398,22 +395,20 @@ Interface::Interface(CoreSettings&& cfg)
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
 	// read from our version of the config if it is present
-	char ini_path[_MAX_PATH+4] = { '\0' };
-	std::string gemrbINI;
-	std::string tmp;
-	gemrbINI = "gem-" + INIConfig;
-	PathJoin(ini_path, config.SavePath.c_str(), gemrbINI.c_str(), nullptr);
+	path_t gemrbINI = "gem-" + INIConfig;
+	path_t tmp;
+	path_t ini_path = PathJoin(config.SavePath, gemrbINI);
 	if (!FileExists(ini_path)) {
-		PathJoin(ini_path, config.GamePath.c_str(), gemrbINI.c_str(), nullptr);
+		ini_path = PathJoin(config.GamePath, gemrbINI);
 	}
 	if (FileExists(ini_path)) {
 		tmp = INIConfig;
 		INIConfig = gemrbINI;
 	} else {
-		PathJoin(ini_path, config.GamePath.c_str(), INIConfig.c_str(), nullptr);
+		ini_path = PathJoin(config.GamePath, INIConfig);
 		Log(MESSAGE,"Core", "Loading original game options from {}", ini_path);
 	}
-	if (!InitializeVarsWithINI(ini_path)) {
+	if (!InitializeVarsWithINI(ini_path.c_str())) {
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
 
@@ -450,14 +445,13 @@ Interface::Interface(CoreSettings&& cfg)
 	}
 	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
-	char strpath[_MAX_PATH];
-	PathJoin(strpath, config.GamePath.c_str(), "dialog.tlk", nullptr);
-	FileStream* fs = FileStream::OpenFile(strpath);
+	path_t strpath = PathJoin(config.GamePath, "dialog.tlk");
+	FileStream* fs = FileStream::OpenFile(strpath.c_str());
 
 	if (!fs) {
 		// EE multi language deployment
-		PathJoin(strpath, config.GamePath.c_str(), config.GameLanguagePath.c_str(), "dialog.tlk", nullptr);
-		fs = FileStream::OpenFile(strpath);
+		strpath = PathJoin(config.GamePath, config.GameLanguagePath, "dialog.tlk");
+		fs = FileStream::OpenFile(strpath.c_str());
 
 		if (!fs) {
 			throw std::runtime_error("Cannot find Dialog.tlk.");
@@ -469,12 +463,12 @@ Interface::Interface(CoreSettings&& cfg)
 	if (strings->HasAltTLK()) {
 		strings2 = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
-		PathJoin(strpath, config.GamePath.c_str(), "dialogf.tlk", nullptr);
-		fs = FileStream::OpenFile(strpath);
+		strpath = PathJoin(config.GamePath, "dialogf.tlk");
+		fs = FileStream::OpenFile(strpath.c_str());
 		if (!fs) {
 			// try EE-style paths
-			PathJoin(strpath, config.GamePath.c_str(), config.GameLanguagePath.c_str(), "dialogf.tlk", nullptr);
-			fs = FileStream::OpenFile(strpath);
+			strpath = PathJoin(config.GamePath, config.GameLanguagePath, "dialogf.tlk");
+			fs = FileStream::OpenFile(strpath.c_str());
 		}
 		if (!fs) {
 			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
@@ -525,9 +519,8 @@ Interface::Interface(CoreSettings&& cfg)
 	if (HasFeature( GFFlags::HAS_PARTY_INI )) {
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		char tINIparty[_MAX_PATH];
-		PathJoin(tINIparty, config.GamePath.c_str(), "Party.ini", nullptr);
-		fs = FileStream::OpenFile(tINIparty);
+		path_t tINIparty = PathJoin(config.GamePath, "Party.ini");
+		fs = FileStream::OpenFile(tINIparty.c_str());
 		if (!INIparty->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load precreated teams.");
 		}
@@ -540,18 +533,16 @@ Interface::Interface(CoreSettings&& cfg)
 	if (HasFeature( GFFlags::HAS_BEASTS_INI )) {
 		Log(MESSAGE, "Core", "Loading beasts definition File...");
 		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		char tINIbeasts[_MAX_PATH];
-		PathJoin(tINIbeasts, config.GamePath.c_str(), "beast.ini", nullptr);
-		fs = FileStream::OpenFile(tINIbeasts);
+		path_t tINIbeasts = PathJoin(config.GamePath, "beast.ini");
+		fs = FileStream::OpenFile(tINIbeasts.c_str());
 		if (!INIbeasts->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
 		}
 
 		Log(MESSAGE, "Core", "Loading quests definition File...");
 		INIquests = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-		char tINIquests[_MAX_PATH];
-		PathJoin(tINIquests, config.GamePath.c_str(), "quests.ini", nullptr);
-		FileStream* fs2 = FileStream::OpenFile( tINIquests );
+		path_t tINIquests = PathJoin(config.GamePath, "quests.ini");
+		FileStream* fs2 = FileStream::OpenFile(tINIquests.c_str());
 		if (!INIquests->Open(fs2)) {
 			Log(WARNING, "Core", "Failed to load quest definitions.");
 		}
@@ -598,19 +589,19 @@ Interface::Interface(CoreSettings&& cfg)
 #ifdef HAVE_REALPATH
 	if (unhardcodedTypePath[0] == '.') {
 		// canonicalize the relative path; usually from running from the build dir
-		char *absolutePath = realpath(unhardcodedTypePath, NULL);
+		char *absolutePath = realpath(unhardcodedTypePath.c_str(), NULL);
 		if (absolutePath) {
-			strlcpy(unhardcodedTypePath, absolutePath, sizeof(unhardcodedTypePath));
+			unhardcodedTypePath = absolutePath;
 			free(absolutePath);
 		}
 	}
 #endif
 	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
 	std::string pathString = fmt::format("GemRB_Data_Path = {}", unhardcodedTypePath);
-	PathJoin(strpath, config.GamePath.c_str(), "gemrb_path.txt", nullptr);
+	strpath = PathJoin(config.GamePath, "gemrb_path.txt");
 	FileStream *pathFile = new FileStream();
 	// don't abort if something goes wrong, since it should never happen and it's not critical
-	if (pathFile->Create(strpath)) {
+	if (pathFile->Create(strpath.c_str())) {
 		pathFile->Write(pathString.c_str(), pathString.length());
 		pathFile->Close();
 	}
@@ -1841,11 +1832,10 @@ void Interface::ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) 
 
 void Interface::LoadInitialValues(const ResRef& name, ieVarsMap& map) const
 {
-	char nPath[_MAX_PATH];
 	// we only support PST's var.var for now
-	PathJoin(nPath, config.GamePath.c_str(), "var.var", nullptr);
+	path_t nPath = PathJoin(config.GamePath, "var.var");
 	FileStream fs;
-	if (!fs.Open(nPath)) {
+	if (!fs.Open(nPath.c_str())) {
 		return;
 	}
 
@@ -2249,7 +2239,6 @@ int Interface::Roll(int dice, int size, int add) const
 
 DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 {
-	char Path[_MAX_PATH];
 	path_t resourcePath;
 	DirectoryIterator::FileFilterPredicate* filter = NULL;
 	switch (dir) {
@@ -2279,8 +2268,8 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			error("Interface", "Unknown resource directory type: {}!", dir);
 	}
 
-	PathJoin(Path, config.GamePath.c_str(), resourcePath.c_str(), nullptr);
-	DirectoryIterator dirIt(Path);
+	path_t path = PathJoin(config.GamePath, resourcePath);
+	DirectoryIterator dirIt(path);
 	dirIt.SetFilterPredicate(filter);
 	return dirIt;
 }
@@ -2362,16 +2351,15 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
  */
 bool Interface::SaveConfig()
 {
-	char ini_path[_MAX_PATH] = { '\0' };
 	std::string gemrbINI;
 	if (strncmp(INIConfig.c_str(), "gem-", 4) != 0) {
 		gemrbINI = "gem-" + INIConfig;
 	}
-	PathJoin(ini_path, config.GamePath.c_str(), gemrbINI.c_str(), nullptr);
+	path_t ini_path = PathJoin(config.GamePath, gemrbINI);
 	FileStream *fs = new FileStream();
-	if (!fs->Create(ini_path)) {
-		PathJoin(ini_path, config.SavePath.c_str(), gemrbINI.c_str(), nullptr);
-		if (!fs->Create(ini_path)) {
+	if (!fs->Create(ini_path.c_str())) {
+		ini_path = PathJoin(config.SavePath, gemrbINI);
+		if (!fs->Create(ini_path.c_str())) {
 			delete fs;
 			return false;
 		}
@@ -3062,10 +3050,8 @@ bool Interface::ProtectedExtension(const char *filename) const
 
 void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID) const
 {
-	char filename[_MAX_PATH];
-
-	PathJoinExt(filename, config.CachePath.c_str(), resref.c_str(), TypeExt(ClassID));
-	unlink ( filename);
+	path_t filename = PathJoinExt(config.CachePath, resref, TypeExt(ClassID));
+	unlink(filename.c_str());
 }
 
 //this function checks if the path is eligible as a cache
@@ -3747,9 +3733,7 @@ int Interface::SwapoutArea(Map *map) const
 
 int Interface::WriteCharacter(StringView name, const Actor *actor)
 {
-	char Path[_MAX_PATH];
-
-	PathJoin(Path, config.GamePath.c_str(), config.GameCharactersPath.c_str(), nullptr);
+	path_t Path = PathJoin(config.GamePath, config.GameCharactersPath);
 	if (!actor) {
 		return -1;
 	}
@@ -3759,7 +3743,7 @@ int Interface::WriteCharacter(StringView name, const Actor *actor)
 	}
 
 	FileStream str;
-	if (!str.Create(Path, name.c_str(), IE_CHR_CLASS_ID)
+	if (!str.Create(Path.c_str(), name.c_str(), IE_CHR_CLASS_ID)
 		|| gm->PutActor(&str, actor, true) < 0) {
 		Log(WARNING, "Core", "Character cannot be saved: {}", name);
 		return -1;
@@ -3767,7 +3751,7 @@ int Interface::WriteCharacter(StringView name, const Actor *actor)
 
 	//write the BIO string
 	if (!HasFeature(GFFlags::NO_BIOGRAPHY)) {
-		str.Create(Path, name.c_str(), IE_BIO_CLASS_ID);
+		str.Create(Path.c_str(), name.c_str(), IE_BIO_CLASS_ID);
 		//never write the string reference into this string
 		std::string mbstr = GetMBString(actor->GetVerbalConstant(VB_BIO), STRING_FLAGS::STRREFOFF);
 		str.Write(mbstr.data(), mbstr.length());
@@ -4193,9 +4177,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 		winmgr->DrawWindows();
 		for (const auto& cd : config.CD[disc_number - 1]) {
 			assert(cd.length() < _MAX_PATH / 2);
-			char name[_MAX_PATH];
-
-			PathJoin(name, cd.c_str(), path, nullptr);
+			path_t name = PathJoin(cd, path);
 			if (FileExists(name)) {
 				GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 				return;

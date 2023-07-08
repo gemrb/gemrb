@@ -46,11 +46,11 @@ static char* AddCBF(const char *file)
 
 static bool PathExists(BIFEntry *entry, const char *path)
 {
-	PathJoin(entry->path, path, entry->name.c_str(), nullptr);
+	entry->path = PathJoin(path, entry->name);
 	if (FileExists(entry->path)) {
 		return true;
 	}
-	PathJoin(entry->path, path, AddCBF(entry->name.c_str()), nullptr);
+	entry->path = PathJoin(path, AddCBF(entry->name.c_str()));
 	if (FileExists(entry->path)) {
 		return true;
 	}
@@ -77,9 +77,8 @@ static void FindBIF(BIFEntry *entry)
 		return;
 	}
 	// also check the data/Data path for gog
-	char path[_MAX_PATH];
-	PathJoin(path, core->config.GamePath.c_str(), core->config.GameDataPath.c_str(), nullptr);
-	entry->found = PathExists(entry, path);
+	path_t path = PathJoin(core->config.GamePath, core->config.GameDataPath);
+	entry->found = PathExists(entry, path.c_str());
 	if (entry->found) {
 		return;
 	}
@@ -213,7 +212,7 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 	}
 
 	PluginHolder<IndexedArchive> ai = MakePluginHolder<IndexedArchive>(IE_BIF_CLASS_ID);
-	if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
+	if (ai->OpenArchive(biffiles[bifnum].path.c_str()) == GEM_ERROR) {
 		Log(ERROR, "KEYImporter", "Cannot open archive {}", biffiles[bifnum].path);
 		return NULL;
 	}

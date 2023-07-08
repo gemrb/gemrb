@@ -95,12 +95,11 @@ int32_t SaveGameAREExtractor::createCacheBlob() {
 	}
 
 	const char *blobFile = "ares.blb";
-	char path[_MAX_PATH];
-	PathJoin(path, core->config.CachePath.c_str(), blobFile, nullptr);
+	path_t path = PathJoin(core->config.CachePath, blobFile);
 
 	FileStream cacheStream;
 
-	if (!cacheStream.Create(path)) {
+	if (!cacheStream.Create(path.c_str())) {
 		Log(ERROR, "SaveGameAREExtractor", "Cannot write to cache: {}.", path);
 		return GEM_ERROR;
 	}

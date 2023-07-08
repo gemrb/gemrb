@@ -126,16 +126,16 @@ SaveGame::SaveGame(std::string path, std::string name, const ResRef& prefix, std
 {
 	PortraitCount = pCount;
 	SaveID = saveID;
-	char nPath[_MAX_PATH + 1] = {};
 	struct stat my_stat;
-	PathJoinExt(nPath, Path.c_str(), Prefix.c_str(), "bmp");
+	path_t nPath = PathJoinExt(Path, Prefix, "bmp");
 	memset(&my_stat, 0, sizeof(my_stat));
-	if (stat(nPath, &my_stat)) {
+	if (stat(nPath.c_str(), &my_stat)) {
 		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
 		Date = "Sun 31 Feb 00:00:01 2099";
 	} else {
-		strftime(nPath, _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
-		Date = nPath;
+		char tmp[_MAX_PATH];
+		strftime(tmp, _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
+		Date = tmp;
 	}
 	manager.AddSource(Path.c_str(), Name.c_str(), PLUGIN_RESOURCE_DIRECTORY);
 }
@@ -242,13 +242,11 @@ static bool IsSaveGameSlot(const path_t& Path, const path_t& slotname)
 	}
 
 	//The matcher got matched correctly.
-	char dtmp[_MAX_PATH];
-	PathJoin(dtmp, Path.c_str(), slotname.c_str(), nullptr);
+	path_t dtmp = PathJoin(Path, slotname);
 
-	char ftmp[_MAX_PATH];
-	PathJoinExt(ftmp, dtmp, core->GameNameResRef.c_str(), "bmp");
+	path_t ftmp = PathJoinExt(dtmp, core->GameNameResRef, "bmp");
 
-	if (access( ftmp, R_OK )) {
+	if (access(ftmp.c_str(), R_OK)) {
 		Log(WARNING, "SaveGameIterator", "Ignoring slot {} because of no appropriate preview!", dtmp);
 		return false;
 	}
@@ -256,14 +254,14 @@ static bool IsSaveGameSlot(const path_t& Path, const path_t& slotname)
 	// no worldmaps in saves in ees
 	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) return true;
 
-	PathJoinExt(ftmp, dtmp, core->WorldMapName[0].c_str(), "wmp");
-	if (access( ftmp, R_OK )) {
+	ftmp = PathJoinExt(dtmp, core->WorldMapName[0], "wmp");
+	if (access(ftmp.c_str(), R_OK)) {
 		return false;
 	}
 
 	if (core->WorldMapName[1]) {
-		PathJoinExt(ftmp, dtmp, core->WorldMapName[1].c_str(), "wmp");
-		if (access(ftmp, R_OK)) {
+		ftmp = PathJoinExt(dtmp, core->WorldMapName[1], "wmp");
+		if (access(ftmp.c_str(), R_OK)) {
 			Log(WARNING, "SaveGameIterator", "Ignoring slot {} because of no appropriate second worldmap!", dtmp);
 			return false;
 		}
@@ -277,13 +275,12 @@ bool SaveGameIterator::RescanSaveGames()
 	// delete old entries
 	save_slots.clear();
 
-	char Path[_MAX_PATH];
-	PathJoin(Path, core->config.SavePath.c_str(), SaveDir().c_str(), nullptr);
+	path_t Path = PathJoin(core->config.SavePath, SaveDir());
 
 	DirectoryIterator dir(Path);
 	// create the save game directory at first access
 	if (!dir) {
-		if (!MakeDirectories(Path)) {
+		if (!MakeDirectories(Path.c_str())) {
 			Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", Path);
 			return false;
 		}
@@ -330,19 +327,13 @@ Holder<SaveGame> SaveGameIterator::GetSaveGame(StringView name)
 Holder<SaveGame> SaveGameIterator::BuildSaveGame(std::string slotname)
 {
 	int prtrt = 0;
-	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	PathJoin(Path, core->config.SavePath.c_str(), SaveDir().c_str(), slotname.c_str(), nullptr);
+	path_t Path = PathJoin(core->config.SavePath, SaveDir(), slotname);
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
 
-	int cnt = sscanf(slotname.c_str(), SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName);
-	//maximum pathlength == 240, without 8+3 filenames
-	if ( (cnt != 2) || (strlen(Path)>240) ) {
-		Log(WARNING, "SaveGame", "Invalid savegame directory '{}' in {}.", slotname, Path);
-		return NULL;
-	}
+	sscanf(slotname.c_str(), SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName);
 
 	DirectoryIterator dir(Path);
 	if (!dir) {
@@ -566,23 +557,23 @@ static int CanSave()
 	return 0;
 }
 
-static bool CreateSavePath(char *Path, int index, StringView slotname)
+static bool CreateSavePath(path_t& path, int index, StringView slotname)
 {
-	PathJoin(Path, core->config.SavePath.c_str(), SaveDir().c_str(), nullptr);
+	path = PathJoin(core->config.SavePath, SaveDir());
 
 	//if the path exists in different case, don't make it again
-	if (!MakeDirectory(Path)) {
-		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", Path);
+	if (!MakeDirectory(path.c_str())) {
+		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", path);
 		return false;
 	}
 	//keep the first part we already determined existing
 
 	std::string dir = fmt::format("{:09d}-{}", index, slotname);
-	PathJoin(Path, Path, dir.c_str(), nullptr);
+	path = PathJoin(path, dir);
 	//this is required in case the old slot wasn't recognised but still there
-	core->DelTree(Path, false);
-	if (!MakeDirectory(Path)) {
-		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", Path);
+	core->DelTree(path.c_str(), false);
+	if (!MakeDirectory(path.c_str())) {
+		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", path);
 		return false;
 	}
 	return true;
@@ -622,13 +613,13 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 		DeleteSaveGame(save);
 		break;
 	}
-	char Path[_MAX_PATH];
+	path_t Path;
 	if (!CreateSavePath(Path, index, slotname)) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
-	if (!DoSaveGame(Path, overrideRunning)) {
+	if (!DoSaveGame(Path.c_str(), overrideRunning)) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
@@ -680,13 +671,13 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname,
 		}
 	}
 
-	char Path[_MAX_PATH];
+	path_t Path;
 	if (!CreateSavePath(Path, index, slotname)) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
 
-	if (!DoSaveGame(Path, overrideRunning)) {
+	if (!DoSaveGame(Path.c_str(), overrideRunning)) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}

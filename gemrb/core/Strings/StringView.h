@@ -78,7 +78,7 @@ public:
 	{}
 
 	// this is mainly replacing std::string&, so i tried to keep it compatible
-	const CharT* c_str() const noexcept {
+	CharT* c_str() const noexcept {
 		return data;
 	}
 
@@ -106,12 +106,16 @@ public:
 		return std::reverse_iterator<iterator>(begin());
 	}
 
-	const CharT& operator[](size_t i) const noexcept {
+	CharT& operator[](size_t i) const noexcept {
 		return *(data + i);
 	}
 
 	explicit operator bool() const noexcept {
 		return data != nullptr;
+	}
+	
+	explicit operator std::string() const noexcept {
+		return std::string(data, len);
 	}
 	
 private:

@@ -29,29 +29,24 @@ using namespace GemRB;
 
 bool DirectoryImporter::Open(const char *dir, const char *desc)
 {
-	if (!DirExists(dir))
+	path_t p = dir;
+	ResolveCase(p);
+	if (!DirExists(p))
 		return false;
 
 	description = desc;
-	path = dir;
+	path.swap(p);
 	return true;
 }
 
 static bool FindIn(const path_t& path, StringView resRef, const char *type)
 {
-	char p[_MAX_PATH] = {0};
-
-	return PathJoinExt(p, path.c_str(), resRef.c_str(), type);
+	return FileExists(PathJoinExt(path, resRef, type));
 }
 
 static FileStream *SearchIn(const path_t& path, StringView resRef, const char *type)
 {
-	char p[_MAX_PATH] = {0};
-
-	if (!PathJoinExt(p, path.c_str(), resRef.c_str(), type))
-		return nullptr;
-
-	return FileStream::OpenFile(p);
+	return FileStream::OpenFile(PathJoinExt(path, resRef, type).c_str());
 }
 
 bool DirectoryImporter::HasResource(StringView resname, SClass_ID type)

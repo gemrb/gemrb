@@ -104,11 +104,10 @@ bool FileStream::Create(const char* fname, SClass_ID ClassID)
 
 bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID)
 {
-	char path[_MAX_PATH];
 	char filename[_MAX_PATH];
 	ExtractFileFromPath( filename, fname );
-	PathJoinExt(path, folder, filename, core->TypeExt(ClassID));
-	return Create(path);
+	path_t path = PathJoinExt(folder, filename, core->TypeExt(ClassID));
+	return Create(path.c_str());
 }
 
 //Creating file outside of the cache

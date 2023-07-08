@@ -13460,8 +13460,7 @@ bool GUIScript::Init(void)
 	pMainDic = PyModule_GetDict( pMainMod );
 	/* pMainDic is a borrowed reference */
 
-	char path[_MAX_PATH];
-	PathJoin(path, core->config.GUIScriptsPath.c_str(), "GUIScripts", nullptr);
+	path_t path = PathJoin(core->config.GUIScriptsPath, "GUIScripts");
 
 	char string[256] = "path";
 	PyObject* sysPath = PySys_GetObject(string);
@@ -13471,13 +13470,12 @@ bool GUIScript::Init(void)
 	}
 
 	// Add generic script path early, so GameType detection works
-	PyList_Append(sysPath, PyString_FromString(path));
+	PyList_Append(sysPath, PyString_FromStringObj(path));
 
 	PyModule_AddStringConstant(pGemRB, "GEMRB_VERSION", GEMRB_STRING);
 
-	char main[_MAX_PATH];
-	PathJoin(main, path, "Main.py", nullptr);
-	if (!ExecFile(main)) {
+	path_t main = PathJoin(path, "Main.py");
+	if (!ExecFile(main.c_str())) {
 		Log(ERROR, "GUIScript", "Failed to execute {}", main);
 		return false;
 	}
@@ -13492,18 +13490,18 @@ bool GUIScript::Init(void)
 
 	// use the iwd guiscripts for how, but leave its override
 	// same for bg2 vs bg2ee and bg1ee, while iwdee might need a different approach
-	char path2[_MAX_PATH];
+	path_t path2;
 	if (core->config.GameType == "how") {
-		PathJoin(path2, path, "iwd", nullptr);
+		path2 = PathJoin(path, "iwd");
 	} else if (core->config.GameType == "bg2ee") {
-		PathJoin(path2, path, "bg2", nullptr);
+		path2 = PathJoin(path, "bg2");
 	} else {
-		PathJoin(path2, path, core->config.GameType.c_str(), nullptr);
+		path2 = PathJoin(path, core->config.GameType);
 	}
 
 	// GameType-specific import path must have a higher priority than
 	// the generic one, so insert it before it
-	PyList_Insert(sysPath, -1, PyString_FromString(path2));
+	PyList_Insert(sysPath, -1, PyString_FromStringObj(path2));
 	PyModule_AddStringConstant(pGemRB, "GameType", core->config.GameType.c_str());
 
 	PyObject *pClassesMod = PyImport_AddModule( "GUIClasses" );
@@ -13525,21 +13523,19 @@ bool GUIScript::Autodetect(void)
 {
 	Log(MESSAGE, "GUIScript", "Detecting GameType.");
 
-	char path[_MAX_PATH];
-	PathJoin(path, core->config.GUIScriptsPath.c_str(), "GUIScripts", nullptr);
-	DirectoryIterator iter( path );
+	path_t path = PathJoin(core->config.GUIScriptsPath, "GUIScripts");
+	DirectoryIterator iter(path);
 	if (!iter)
 		return false;
 
 	iter.SetFlags(DirectoryIterator::Directories);
 	do {
 		const path_t& dirent = iter.GetName();
-		char moduleName[_MAX_PATH];
 
 		// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
 		// Method1:
-		PathJoin(moduleName, core->config.GUIScriptsPath.c_str(), "GUIScripts", dirent.c_str(), "Autodetect.py", nullptr);
-		ExecFile(moduleName);
+		path_t moduleName = PathJoin(core->config.GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py");
+		ExecFile(moduleName.c_str());
 		// Method2:
 		//strcpy( module, dirent );
 		//strcat( module, ".Autodetect");
