@@ -81,7 +81,7 @@ void PluginMgr::RunCleanup() const
 	}
 }
 
-bool PluginMgr::RegisterDriver(const TypeID* type, const char* name, PluginFunc create)
+bool PluginMgr::RegisterDriver(const TypeID* type, const std::string& name, PluginFunc create)
 {
 	driver_map &map = drivers[type];
 	driver_map::const_iterator iter = map.find(name);
@@ -91,7 +91,7 @@ bool PluginMgr::RegisterDriver(const TypeID* type, const char* name, PluginFunc 
 	return true;
 }
 
-Plugin* PluginMgr::GetDriver(const TypeID* type, const char* name)
+Plugin* PluginMgr::GetDriver(const TypeID* type, const std::string& name)
 {
 	driver_map &map = drivers[type];
 	if (map.begin() == map.end())
