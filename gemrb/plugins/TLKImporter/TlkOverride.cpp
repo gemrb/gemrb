@@ -333,14 +333,13 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
 
 DataStream* CTlkOverride::GetAuxHdr(bool create)
 {
-	char nPath[_MAX_PATH];
 	char Signature[] = "TLK ";
 
-	PathJoin(nPath, core->config.CachePath.c_str(), "default.toh", nullptr);
+	path_t nPath = PathJoin(core->config.CachePath, "default.toh");
 	FileStream* fs = new FileStream();
 
 	while (true) {
-		if (fs->Modify(nPath)) {
+		if (fs->Modify(nPath.c_str())) {
 			return fs;
 		}
 		if (create) {
@@ -357,12 +356,11 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 
 DataStream* CTlkOverride::GetAuxTlk(bool create)
 {
-	char nPath[_MAX_PATH];
-	PathJoin(nPath, core->config.CachePath.c_str(), "default.tot", nullptr);
+	path_t nPath = PathJoin(core->config.CachePath, "default.tot");
 	FileStream* fs = new FileStream();
 
 	while (true) {
-		if (fs->Modify(nPath)) {
+		if (fs->Modify(nPath.c_str())) {
 			if (fs->Size() % (SEGMENT_SIZE + 12) == 0) {
 				return fs;
 			}

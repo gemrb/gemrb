@@ -33,8 +33,7 @@ static char musicsubfolder[6] = "music";
 MUSImporter::MUSImporter()
 {
 	str = new FileStream();
-	char path[_MAX_PATH];
-	PathJoin(path, core->config.GamePath.c_str(), musicsubfolder, nullptr);
+	path_t path = PathJoin(core->config.GamePath, musicsubfolder);
 	manager.AddSource(path, "Music", PLUGIN_RESOURCE_DIRECTORY);
 }
 
@@ -79,10 +78,9 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	if (IsStar(name)) {
 		return false;
 	}
-	char path[_MAX_PATH];
-	PathJoin(path, core->config.GamePath.c_str(), musicsubfolder, name.c_str(), nullptr);
+	path_t path = PathJoin(core->config.GamePath, musicsubfolder, name);
 	Log(MESSAGE, "MUSImporter", "Loading {}...", path);
-	if (!str->Open(path)) {
+	if (!str->Open(path.c_str())) {
 		Log(ERROR, "MUSImporter", "Didn't find playlist '{}'.", path);
 		return false;
 	}
@@ -268,18 +266,18 @@ void MUSImporter::PlayMusic(int pos)
 
 void MUSImporter::PlayMusic(const ieVariable& name)
 {
-	char FName[_MAX_PATH];
+	path_t FName;
 	if (name.BeginsWith("mx9000")) { //iwd2
-		PathJoin(FName, "mx9000", name, nullptr);
+		FName = PathJoin("mx9000", name);
 	} else if (name.BeginsWith("mx0000")) { //iwd
-		PathJoin(FName, "mx0000", name, nullptr);
+		FName = PathJoin("mx0000", name);
 	} else if (!name.BeginsWith("SPC")) { //bg2
 		char File[_MAX_PATH];
 		auto end = fmt::format_to(File, "{}{}", PLName, name);
 		*end = '\0';
-		PathJoin(FName, PLName.c_str(), File, nullptr);
+		FName = PathJoin(PLName, File);
 	} else {
-		std::copy(name.begin(), name.end(), FName);
+		FName = path_t(name);
 	}
 
 	ResourceHolder<SoundMgr> sound = manager.GetResourceHolder<SoundMgr>(FName, true);

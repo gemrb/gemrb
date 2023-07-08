@@ -34,12 +34,11 @@ DataStream* CacheCompressedStream(DataStream *stream, const std::string& filenam
 {
 	char fname[_MAX_PATH];
 	ExtractFileFromPath(fname, filename.c_str());
-	char path[_MAX_PATH];
-	PathJoin(path, core->config.CachePath.c_str(), fname, nullptr);
+	path_t path = PathJoin(core->config.CachePath, fname);
 
 	if (overwrite || !FileExists(path)) {
 		FileStream out;
-		if (!out.Create(path)) {
+		if (!out.Create(path.c_str())) {
 			Log(ERROR, "FileCache", "Cannot write {}.", path);
 			return NULL;
 		}

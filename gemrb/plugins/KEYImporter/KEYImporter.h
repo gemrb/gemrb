@@ -39,7 +39,7 @@ class ResourceDesc;
 struct BIFEntry {
 	std::string name;
 	ieWord BIFLocator;
-	char path[_MAX_PATH];
+	std::string path;
 	int cd;
 	bool found;
 };

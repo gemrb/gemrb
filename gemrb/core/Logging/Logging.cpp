@@ -124,14 +124,13 @@ void AddLogWriter(Logger::WriterPtr&& writer)
 
 static void addGemRBLog(const CoreSettings& config)
 {
-	char log_path[_MAX_PATH];
 	FileStream* log_file = new FileStream();
-	PathJoin(log_path, config.GamePath.c_str(), "GemRB.log", nullptr);
-	if (log_file->Create(log_path)) {
+	path_t log_path = PathJoin(config.GamePath, "GemRB.log");
+	if (log_file->Create(log_path.c_str())) {
 		AddLogWriter(createStreamLogWriter(log_file));
 	} else {
-		PathJoin(log_path, config.CachePath.c_str(), "GemRB.log", nullptr);
-		if (log_file->Create(log_path)) {
+		log_path = PathJoin(config.CachePath, "GemRB.log");
+		if (log_file->Create(log_path.c_str())) {
 			AddLogWriter(createStreamLogWriter(log_file));
 		} else {
 			Log (WARNING, "Logger", "Could not create a log file, skipping!");

@@ -160,19 +160,24 @@ path_t BundlePath(BundleDirectory dir)
 #endif
 
 /** Returns true if path is an existing directory */
-bool DirExists(const path_t& path)
+static bool DirExists(StringView path)
 {
+	// 'path' may be in the middle of a string
+	// so we cheat to avoid copying, we will change it back
+	char term = '\0';
+	char* end = const_cast<char*>(path.end());
+	std::swap(*end, term); // use swap because end may be a delimiter or a terminator
+
 	struct stat buf;
 	buf.st_mode = 0;
+	bool ret = stat(path.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode);
+	std::swap(*end, term);
+	return ret;
+}
 
-	if (stat(path.c_str(), &buf) < 0) {
-		return false;
-	}
-	if (!S_ISDIR(buf.st_mode)) {
-		return false;
-	}
-
-	return true;
+bool DirExists(const path_t& path)
+{
+	return DirExists(StringView(path));
 }
 
 /** Returns true if path is an existing file */
@@ -232,98 +237,72 @@ void PathAppend(path_t& target, const path_t& name)
 	}
 }
 
-static bool FindInDir(const char* Dir, char *Filename)
+static bool FindMatchInDir(const char* dir, char* item)
 {
-	// First test if there's a Filename with exactly same name
-	// and if yes, return it and do not search in the Dir
-	char TempFilePath[_MAX_PATH];
-	assert(strnlen(Dir, _MAX_PATH/2) < _MAX_PATH/2);
-	strcpy(TempFilePath, Dir);
-	PathAppend( TempFilePath, Filename );
-
-	if (!access( TempFilePath, R_OK )) {
-		return true;
-	}
-
-	if (core && !core->config.CaseSensitive) {
-		return false;
-	}
-
-	DirectoryIterator dir(Dir);
-	if (!dir) {
-		return false;
-	}
-
-	// Exact match not found, so try to search for Filename
-	// with different case
-	do {
-		path_t name = dir.GetName();
-		// FIXME: this is case sensitve. should check core->config.CaseSensitive
-		if (name == Filename) {
-			strcpy(Filename, name.c_str());
+	for (DirectoryIterator dirit(dir); dirit; ++dirit) {
+		const path_t& name = dirit.GetName();
+		if (stricmp(name.c_str(), item) == 0) {
+			std::copy(name.begin(), name.end(), item);
 			return true;
 		}
-	} while (++dir);
+	}
+
 	return false;
 }
 
-bool PathJoin (char *target, const char *base, ...)
+static void ResolveCase(MutableStringView path, size_t itempos)
 {
-	if (base == NULL) {
-		target[0] = '\0';
-		return false;
-	}
-	if (base != target) {
-		strcpy(target, base);
+	if (!DirExists(StringView(path.c_str(), itempos))) {
+		return;
 	}
 
-	va_list ap;
-	va_start(ap, base);
-
-	while (char *source = va_arg(ap, char*)) {
-		char *slash;
-		do {
-			char filename[_MAX_PATH] = { '\0' };
-			slash = strchr(source, PathDelimiter);
-			if (slash == source) {
-				++source;
-				continue;
-			} else if (slash) {
-				strncat(filename, source, slash-source);
-			} else {
-				strlcpy(filename, source, _MAX_PATH/4);
-			}
-			if (!FindInDir(target, filename)) {
-				PathAppend(target, source);
-				goto finish;
-			}
-			PathAppend(target, filename);
-			if (slash) source = slash + 1;
-		} while (slash);
+	size_t next = FindFirstOf(path, SPathDelimiter, itempos);
+	if (next == MutableStringView::npos) {
+		next = path.length();
 	}
 
-	va_end( ap );
-	return true;
+	char* nextDelim = &path[next];
+	*nextDelim = '\0';
 
-finish:
-	while (const char *source = va_arg(ap, char*)) {
-		PathAppend(target, source);
+	bool found = access(path.c_str(), F_OK) == 0;
+	if (!found) {
+		// Exact match not found, so try to search for Filename
+		// with different case
+		char* curDelim = &path[itempos - 1];
+		*curDelim = '\0';
+
+		char* item = &path[itempos];
+		found = FindMatchInDir(path.c_str(), item);
+		*curDelim = PathDelimiter;
 	}
-	va_end( ap );
-	return false;
+
+	if (next < path.length()) {
+		*nextDelim = PathDelimiter;
+		if (found) return ResolveCase(path, next + 1);
+	}
 }
 
-bool PathJoinExt (char* target, const char* dir, const char* base, const char* ext)
+path_t& ResolveCase(path_t& filePath)
 {
-	char file[_MAX_PATH];
-	assert(strnlen(ext, 5) < 5);
-	if (strlcpy(file, base, _MAX_PATH-5) >= _MAX_PATH-5) {
-		Log(ERROR, "VFS", "Too long base path: {}!", base);
-		return false;
+	if (core && !core->config.CaseSensitive) {
+		return filePath;
 	}
-	strcat(file, ".");
-	strcat(file, ext);
-	return PathJoin(target, dir, file, nullptr);
+
+	// First test if there's a Filename with exactly same name
+	// and if yes, return it and do not search in the Dir
+	if (!access(filePath.c_str(), F_OK)) {
+		return filePath;
+	}
+
+	size_t nextItem = filePath.find_first_of(PathDelimiter, 1);
+	if (nextItem != path_t::npos) {
+		MutableStringView msv(filePath);
+		ResolveCase(msv, nextItem);
+	} else if (!DirExists(filePath)) { // filePath is a single component
+		FindMatchInDir(".", &filePath[0]);
+	}
+
+	return filePath;
 }
 
 /** Fixes path delimiter character (slash).
@@ -345,24 +324,17 @@ void FixPath(path_t& path, bool needslash)
 
 #ifndef WIN32
 
-void ResolveFilePath(path_t& FilePath)
+void ResolveFilePath(path_t& filePath)
 {
-	if (FilePath[0]=='~') {
+	if (filePath[0] == '~') {
 		path_t home = HomePath();
 		if (home.length()) {
-			PathAppend(home, FilePath.c_str()+1);
-			FilePath = home;
-			return;
+			PathAppend(home, filePath.c_str() + 1);
+			filePath.swap(home);
 		}
 	}
 
-	if (core && !core->config.CaseSensitive) {
-		return;
-	}
-
-	char TempFilePath[_MAX_PATH];
-	PathJoin(TempFilePath, FilePath[0] == PathDelimiter ? SPathDelimiter : "", FilePath.c_str(), nullptr);
-	FilePath = TempFilePath;
+	ResolveCase(filePath);
 }
 
 #endif
@@ -559,7 +531,7 @@ path_t DirectoryIterator::GetName()
 
 path_t DirectoryIterator::GetFullPath()
 {
-	return fmt::format("{}{}{}", Path, SPathDelimiter, static_cast<dirent*>(Entry)->d_name);
+	return PathJoin<false>(Path, static_cast<dirent*>(Entry)->d_name);
 }
 
 DirectoryIterator& DirectoryIterator::operator++()

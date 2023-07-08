@@ -156,10 +156,9 @@ void Console::SaveHistory() const noexcept
 		commands += fmt::format("{}\n", fmt::WideToChar{cmd});
 	}
 
-	char filePath[_MAX_PATH + 20];
-	PathJoin(filePath, core->config.GamePath.c_str(), "gemrb_console.txt", nullptr);
+	path_t filePath = PathJoin(core->config.GamePath, "gemrb_console.txt");
 	FileStream *histFile = new FileStream();
-	if (histFile->Create(filePath)) {
+	if (histFile->Create(filePath.c_str())) {
 		histFile->Write(commands.c_str(), commands.size());
 		histFile->Close();
 	}
@@ -168,9 +167,8 @@ void Console::SaveHistory() const noexcept
 
 void Console::LoadHistory()
 {
-	char filePath[_MAX_PATH + 20];
-	PathJoin(filePath, core->config.GamePath.c_str(), "gemrb_console.txt", nullptr);
-	FileStream *histFile = FileStream::OpenFile(filePath);
+	path_t filePath = PathJoin(core->config.GamePath, "gemrb_console.txt");
+	FileStream *histFile = FileStream::OpenFile(filePath.c_str());
 	if (histFile) {
 		std::string line;
 		while (histFile->ReadLine(line) != DataStream::Error) {

@@ -80,24 +80,72 @@ const char SPathDelimiter[] = { PathDelimiter, '\0' };
 GEM_EXPORT bool DirExists(const path_t& path);
 GEM_EXPORT bool FileExists(const path_t& path);
 
+inline const path_t& to_string(const path_t& path)
+{
+	return path;
+}
+
+// when case sensitivity is enabled dir will be transformed to fit the case of the actual items composing the path
+GEM_EXPORT path_t& ResolveCase(path_t& dir);
+
 /**
  * Joins NULL-terminated list of directories and copies it to 'target'.
  *
- * @param[out] target Joined path.
- * @param[in] base Properly cased path to join to.
- * @param[in] ... NULL terminated list of paths to join.
+ * @param[in] ... list of path components to join
+ * @return the joined path
  *
- * This does a case-sensitive look up for all path components after the first and
  * properly handles the case when paramater contain slashes.
  *
- * NOTE: This no longer handles target==base.
- *
  * Example:
- * char filepath[_MAX_PATH];
- * PathJoin( filepath, core->GUIScriptsPath, core->GameType, 'GUIDefines.py', NULL );
+ * path_t path = PathJoin(core->GUIScriptsPath, core->GameType, 'GUIDefines.py');
  */
-GEM_EXPORT bool PathJoin (char* target, const char* base, ...) SENTINEL;
-GEM_EXPORT bool PathJoinExt (char* target, const char* dir, const char* file, const char* ext = NULL);
+template<bool FixCase = true, typename... Args>
+path_t PathJoin(Args const&... args)
+{
+	// eh, there is no std::to_string for things that are already strings
+	using namespace std; // to use std::to_string for everything else
+
+	path_t result;
+	path_t s; // the holder for each of 'args' converted to a string
+	// TODO: this could be much cleaner with a fold expression (c++17)
+	// this voodoo relies on expanding args which requires a valid context
+	// the only way I know how to do this with c++14 is to build an unbounded array
+	// the type doesnt matter, nor do the element values
+	int IGNORE_UNUSED unpack[] {0, // we need at least one value to form a valid array, so start with one
+		// append to 'result'...
+		(result +=
+		 // if the next argument begins with a delimiter...
+		 ((!(s = to_string(args)).empty() && (s[0] == PathDelimiter
+			// or the current result ends with a delimiter...
+			|| result.empty() || result.back() == PathDelimiter))
+		  // don't add another one, otherwise append a delimiter
+		  ? "" : SPathDelimiter)
+		 // now append the current argument
+		 + s
+	,0)...}; // the other half of the voodoo is the comma operator to allow us to execute
+			 // an expression then return an unrelated value which is another 0
+	if (FixCase) {
+		ResolveCase(result);
+	}
+	return result;
+}
+
+template<bool FixCase = true, typename DIR_T, typename BASE_T, typename EXT_T>
+path_t PathJoinExt(const DIR_T& dir, const BASE_T& base, const EXT_T& ext)
+{
+	using namespace std;
+
+	path_t path = to_string(dir) + SPathDelimiter + to_string(base);
+	if (ext[0] != '\0') {
+		path = path + "." + ext;
+	}
+
+	if (FixCase) {
+		ResolveCase(path);
+	}
+	return path;
+}
+
 GEM_EXPORT void FixPath(path_t& path, bool needslash);
 
 GEM_EXPORT void ExtractFileFromPath(char *file, const char *full_path);

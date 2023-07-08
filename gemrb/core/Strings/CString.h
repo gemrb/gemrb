@@ -199,6 +199,10 @@ public:
 		return str[0] != '\0';
 	}
 	
+	explicit operator std::string() const noexcept {
+		return std::string(str, length());
+	}
+	
 	const_iterator begin() const noexcept {
 		return str;
 	}
@@ -239,6 +243,9 @@ public:
 		return std::reverse_iterator<iterator>(begin());
 	}
 };
+
+template <typename STR_T, ENABLE_CHAR_RANGE(STR_T)>
+std::string to_string(const STR_T& s) { return std::string(s); }
 
 }
 

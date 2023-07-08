@@ -184,7 +184,6 @@ void LoadPlugins(const char* pluginpath, const plugin_flags_t& pluginFlags)
 		return;
 	}
 
-	char path[_MAX_PATH];
 	do {
 		const path_t& name = dirIt.GetName();
 
@@ -206,8 +205,7 @@ void LoadPlugins(const char* pluginpath, const plugin_flags_t& pluginFlags)
 			}
 		}
 
-		PathJoin(path, pluginpath, name.c_str(), nullptr);
-		LoadPlugin(path);
+		LoadPlugin(PathJoin(pluginpath, name).c_str());
 	} while (++dirIt);
 
 	PathSet::iterator it = delayedPlugins.begin();

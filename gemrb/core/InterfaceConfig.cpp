@@ -65,7 +65,6 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 {
 	// nothing passed in on CLI, so search for gemrb.cfg
 	path_t datadir;
-	char path[_MAX_PATH];
 	path_t name = appName;
 
 #if TARGET_OS_MAC
@@ -75,15 +74,15 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 #else
 	datadir = GemDataPath();
 #endif
-	PathJoinExt(path, datadir.c_str(), name.c_str(), "cfg");
+	path_t path = PathJoinExt(datadir, name, "cfg");
 	
 	FileStream cfgStream;
-	if (cfgStream.Open(path)) {
+	if (cfgStream.Open(path.c_str())) {
 		return LoadFromStream(cfgStream);
 	}
 
 #ifdef SYSCONF_DIR
-	PathJoinExt( path, SYSCONF_DIR, name.c_str(), "cfg" );
+	path = PathJoinExt(SYSCONF_DIR, name.c_str(), "cfg" );
 	if (cfgStream.Open(path))
 	{
 		return LoadFromStream(cfgStream);
@@ -95,39 +94,37 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	datadir = HomePath();
 	char confpath[_MAX_PATH] = ".";
 	strcat(confpath, name.c_str());
-	char tmp[_MAX_PATH];
-	strlcpy(tmp, datadir.c_str(), _MAX_PATH);
-	PathJoin(tmp, datadir.c_str(), confpath, nullptr);
-	datadir = tmp;
-	PathJoinExt(path, datadir.c_str(), name.c_str(), "cfg");
+	path_t tmp = PathJoin(datadir, confpath);
+
+	path = PathJoinExt(datadir, name, "cfg");
 	
-	if (cfgStream.Open(path))
+	if (cfgStream.Open(path.c_str()))
 	{
 		return LoadFromStream(cfgStream);
 	}
 #endif
 	// Don't try with default binary name if we have tried it already
 	if (name != PACKAGE) {
-		PathJoinExt(path, datadir.c_str(), PACKAGE, "cfg");
+		path = PathJoinExt(datadir, PACKAGE, "cfg");
 
-		if (cfgStream.Open(path))
+		if (cfgStream.Open(path.c_str()))
 		{
 			return LoadFromStream(cfgStream);
 		}
 
 #ifdef SYSCONF_DIR
-		PathJoinExt(path, SYSCONF_DIR, PACKAGE, "cfg");
+		path = PathJoinExt(SYSCONF_DIR, PACKAGE, "cfg");
 		
-		if (cfgStream.Open(path))
+		if (cfgStream.Open(path.c_str()))
 		{
 			return LoadFromStream(cfgStream);
 		}
 #endif
 	}
 	// if all else has failed try current directory
-	PathJoinExt(path, "./", PACKAGE, "cfg");
+	path = PathJoinExt("./", PACKAGE, "cfg");
 	
-	if (cfgStream.Open(path))
+	if (cfgStream.Open(path.c_str()))
 	{
 		return LoadFromStream(cfgStream);
 	}
@@ -219,24 +216,24 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	}
 	if (appDir && appImageFile && strcasestr(appImageFile, "gemrb") != nullptr) {
 		assert(strnlen(appDir, _MAX_PATH/2) < _MAX_PATH/2);
-		char tmp[_MAX_PATH];
-		PathJoin(tmp, appDir, DATA_DIR, nullptr);
-		config.GemRBPath = tmp;
+		config.GemRBPath = PathJoin(appDir, DATA_DIR);
 	}
 #endif
 
 	CONFIG_PATH("GUIScriptsPath", config.GUIScriptsPath, config.GemRBPath);
 	CONFIG_PATH("GamePath", config.GamePath);
 	// guess a few paths in case this one is bad; two levels deep for the fhs layout
-	char testPath[_MAX_PATH];
 	bool gameFound = true;
-	if (!PathJoin(testPath, config.GamePath.c_str(), "chitin.key", nullptr)) {
+	path_t testPath = PathJoin(config.GamePath, "chitin.key");
+	if (!FileExists(testPath)) {
 		Log(WARNING, "Interface", "Invalid GamePath detected ({}), guessing from the current dir!", testPath);
-		if (PathJoin(testPath, "..", "chitin.key", nullptr)) {
+		testPath = PathJoin("..", "chitin.key");
+		if (FileExists(testPath)) {
 			config.GamePath = "..";
 		} else {
-			if (PathJoin(testPath, "..", "..", "chitin.key", nullptr)) {
-				config.GamePath = "../..";
+			testPath = PathJoin("..", "..", "chitin.key");
+			if (FileExists(testPath)) {
+				config.GamePath = PathJoin("..", "..");
 			} else {
 				gameFound = false;
 			}
@@ -246,14 +243,16 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	// it's generic, but not likely to work outside of AppImages and maybe apple bundles
 	if (!gameFound) {
 		Log(WARNING, "Interface", "Invalid GamePath detected, looking for the GemRB demo!");
-		if (PathJoin(testPath, "..", "demo", "chitin.key", nullptr)) {
-			PathJoin(testPath, "..", "demo", nullptr);
-			config.GamePath = testPath;
+		testPath = PathJoin("..", "demo", "chitin.key");
+		if (FileExists(testPath)) {
+			config.GamePath = PathJoin("..", "demo");
 			config.GameType = "demo";
-		} else if (PathJoin(testPath, config.GemRBPath.c_str(), "demo", "chitin.key", nullptr)) {
-			PathJoin(testPath, config.GemRBPath.c_str(), "demo", nullptr);
-			config.GamePath = testPath;
-			config.GameType = "demo";
+		} else {
+			testPath = PathJoin(config.GemRBPath, "demo", "chitin.key");
+			if (FileExists(testPath)) {
+				config.GamePath = PathJoin(config.GemRBPath, "demo");
+				config.GameType = "demo";
+			}
 		}
 	}
 
@@ -264,8 +263,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 #else
 	CONFIG_PATH("PluginsPath", config.PluginsPath, "");
 	if (!config.PluginsPath[0]) {
-		PathJoin(testPath, config.GemRBPath.c_str(), "plugins", nullptr);
-		config.PluginsPath = testPath;
+		config.PluginsPath = PathJoin(config.GemRBPath, "plugins");
 	}
 #endif
 
@@ -293,11 +291,9 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 			}
 		} else {
 			// nothing in config so create our own
-			char name[_MAX_PATH];
-
-			PathJoin(name, config.GamePath.c_str(), keyname, nullptr);
+			path_t name = PathJoin(config.GamePath, keyname);
 			config.CD[i].emplace_back(name);
-			PathJoin(name, config.GamePath.c_str(), config.GameDataPath.c_str(), keyname, nullptr);
+			name = PathJoin(config.GamePath, config.GameDataPath, keyname);
 			config.CD[i].emplace_back(name);
 		}
 	}
