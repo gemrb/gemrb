@@ -2595,8 +2595,9 @@ void Map::GenerateQueues()
 			} else {
 				priority = PR_IGNORE; // don't run scripts for out of schedule actors
 			}
-			if (IsVisible(actor->Pos))
+			if (IsVisible(actor->Pos) && !actor->GetStat(IE_AVATARREMOVAL)) {
 				hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
+			}
 		// dead actors are always visible on the map, but run no scripts
 		} else if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
 			priority = PR_DISPLAY;
@@ -2607,7 +2608,7 @@ void Map::GenerateQueues()
 				priority = PR_SCRIPT; // run scripts and display, activated now
 				// more like activate!
 				actor->Activate();
-				if (visible) {
+				if (visible && !actor->GetStat(IE_AVATARREMOVAL)) {
 					ActorSpottedByPlayer(actor);
 					hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
 				}
