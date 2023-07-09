@@ -88,7 +88,7 @@ DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*pat
 	compressed->ReadDword(declen);
 	compressed->ReadDword(complen);
 	Log(MESSAGE, "BIFImporter", "Decompressing {} ...", compressed->filename);
-	return CacheCompressedStream(compressed, compressed->filename, complen);
+	return CacheCompressedStream(compressed, std::string(compressed->filename), complen);
 }
 
 int BIFImporter::OpenArchive(const char* path)

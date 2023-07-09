@@ -58,7 +58,7 @@ protected:
 
 protected:
 	DataStream* DecompressStream(DataStream* stream) {
-		DataStream* cstream = CacheCompressedStream(stream, stream->filename);
+		DataStream* cstream = CacheCompressedStream(stream, std::string(stream->filename));
 		if (!cstream) {
 			return nullptr;
 		}

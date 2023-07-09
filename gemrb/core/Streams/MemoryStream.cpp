@@ -32,8 +32,7 @@ MemoryStream::MemoryStream(const char *name, void* data, strpos_t size)
 {
 	this->size = size;
 	originalfile = name;
-	path_t fname = ExtractFileFromPath(name);
-	strlcpy(filename, fname.c_str(), sizeof(filename));
+	filename = ExtractFileFromPath(name);
 }
 
 MemoryStream::~MemoryStream()
