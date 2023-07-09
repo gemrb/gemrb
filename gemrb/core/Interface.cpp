@@ -597,7 +597,7 @@ Interface::Interface(CoreSettings&& cfg)
 	}
 #endif
 	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
-	std::string pathString = fmt::format("GemRB_Data_Path = {}", unhardcodedTypePath);
+	path_t pathString = fmt::format("GemRB_Data_Path = {}", unhardcodedTypePath);
 	strpath = PathJoin(config.GamePath, "gemrb_path.txt");
 	FileStream *pathFile = new FileStream();
 	// don't abort if something goes wrong, since it should never happen and it's not critical
@@ -1143,7 +1143,7 @@ void Interface::LoadSprites()
 		// support non-BAM cursors
 		// load MainCursorsImage + XX until all images are exhausted
 		// same layout as in the originals, with odd indices having the pressed cursor image
-		std::string fileName;
+		path_t fileName;
 		while (CursorCount < 99) {
 			fileName = fmt::format("{}{:02}", MainCursorsImage, CursorCount);
 			ResourceHolder<ImageMgr> im = gamedata->GetResourceHolder<ImageMgr>(fileName, true);
@@ -2351,7 +2351,7 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
  */
 bool Interface::SaveConfig()
 {
-	std::string gemrbINI;
+	path_t gemrbINI;
 	if (INIConfig.compare(0, 4, "gem-") != 0) {
 		gemrbINI = "gem-" + INIConfig;
 	}

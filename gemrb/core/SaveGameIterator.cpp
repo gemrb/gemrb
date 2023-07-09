@@ -121,7 +121,7 @@ static std::string ParseGameDate(DataStream *ds)
 	}
 }
 
-SaveGame::SaveGame(std::string path, std::string name, const ResRef& prefix, std::string slotname, int pCount, int saveID)
+SaveGame::SaveGame(path_t path, path_t name, const ResRef& prefix, std::string slotname, int pCount, int saveID)
 : Path(std::move(path)), Name(std::move(name)), Prefix(prefix), SlotName(std::move(slotname))
 {
 	PortraitCount = pCount;
@@ -146,7 +146,7 @@ Holder<Sprite2D> SaveGame::GetPortrait(int index) const
 		return NULL;
 	}
 
-	std::string nPath = fmt::format("PORTRT{}", index);
+	path_t nPath = fmt::format("PORTRT{}", index);
 	ResourceHolder<ImageMgr> im = manager.GetResourceHolder<ImageMgr>(nPath, true);
 	if (!im)
 		return NULL;
@@ -184,7 +184,7 @@ const std::string& SaveGame::GetGameDate() const
 }
 
 // mission pack save dir or the main one?
-static std::string SaveDir()
+static path_t SaveDir()
 {
 	return MBStringFromString(core->GetToken("SaveDir", L"save"));
 }
@@ -435,7 +435,7 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 		Holder<Sprite2D> portrait = actor->CopyPortrait(true);
 
 		if (portrait) {
-			std::string fname = fmt::format("PORTRT{}", i);
+			path_t fname = fmt::format("PORTRT{}", i);
 			FileStream outfile;
 			outfile.Create(Path, fname, IE_BMP_CLASS_ID);
 			// NOTE: we save the true portrait size, even tho the preview buttons arent (always) the same
@@ -568,7 +568,7 @@ static bool CreateSavePath(path_t& path, int index, StringView slotname)
 	}
 	//keep the first part we already determined existing
 
-	std::string dir = fmt::format("{:09d}-{}", index, slotname);
+	path_t dir = fmt::format("{:09d}-{}", index, slotname);
 	path = PathJoin(path, dir);
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(path, false);
