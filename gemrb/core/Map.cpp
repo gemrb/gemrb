@@ -386,6 +386,53 @@ static inline AnimationObjectType SelectObject(const Actor *actor, int q, const 
 	return AOT_ACTOR;
 }
 
+MapNote& MapNote::operator=(MapNote mn) {
+	// note the pass by value
+	mn.swap(*this);
+	return *this;
+}
+
+MapNote::MapNote(String txt, ieWord c, bool readonly)
+: text(std::move(txt)), readonly(readonly)
+{
+	color = Clamp<ieWord>(c, 0, 8);
+	//update custom strref
+	strref = core->UpdateString(ieStrRef::INVALID, text);
+}
+
+MapNote::MapNote(ieStrRef ref, ieWord c, bool readonly)
+: strref(ref), readonly(readonly)
+{
+	color = Clamp<ieWord>(c, 0, 8);
+	text = core->GetString(ref);
+}
+
+const Color& MapNote::GetColor() const
+{
+	static const Color colors[]={
+	 ColorBlack,
+	 ColorGray,
+	 ColorViolet,
+	 ColorGreen,
+	 ColorOrange,
+	 ColorRed,
+	 ColorBlue,
+	 ColorBlueDark,
+	 ColorGreenDark
+	};
+
+	return colors[color];
+}
+
+void MapNote::swap(MapNote& mn) noexcept
+{
+	if (&mn == this) return;
+	std::swap(strref, mn.strref);
+	std::swap(color, mn.color);
+	std::swap(text, mn.text);
+	std::swap(Pos, mn.Pos);
+}
+
 //returns true if creature must be embedded in the area
 //npcs in saved game shouldn't be embedded either
 static inline bool MustSave(const Actor *actor)

@@ -159,14 +159,8 @@ struct Entrance {
 	ieWord Face;
 };
 
-class MapNote {
-	void swap(MapNote& mn) noexcept {
-		if (&mn == this) return;
-		std::swap(strref, mn.strref);
-		std::swap(color, mn.color);
-		std::swap(text, mn.text);
-		std::swap(Pos, mn.Pos);
-	}
+class GEM_EXPORT MapNote {
+	void swap(MapNote& mn) noexcept;
 public:
 	// FIXME: things can get messed up by exposing these (specifically strref and text)
 	ieStrRef strref = ieStrRef::INVALID;
@@ -175,43 +169,13 @@ public:
 	Point Pos;
 	bool readonly;
 
-	MapNote& operator=( MapNote mn ) {
-		// note the pass by value
-		mn.swap(*this);
-		return *this;
-	}
 	MapNote(const MapNote &rhs) = default;
+	MapNote(String txt, ieWord c, bool readonly);
+	MapNote(ieStrRef ref, ieWord c, bool readonly);
+	
+	MapNote& operator=(MapNote mn);
 
-	MapNote(String txt, ieWord c, bool readonly)
-	: text(std::move(txt)), readonly(readonly)
-	{
-		color = Clamp<ieWord>(c, 0, 8);
-		//update custom strref
-		strref = core->UpdateString(ieStrRef::INVALID, text);
-	}
-
-	MapNote(ieStrRef ref, ieWord c, bool readonly)
-	: strref(ref), readonly(readonly)
-	{
-		color = Clamp<ieWord>(c, 0, 8);
-		text = core->GetString(ref);
-	}
-
-	const Color& GetColor() const {
-		static const Color colors[]={
-		 ColorBlack,
-		 ColorGray,
-		 ColorViolet,
-		 ColorGreen,
-		 ColorOrange,
-		 ColorRed,
-		 ColorBlue,
-		 ColorBlueDark,
-		 ColorGreenDark
-		};
-
-		return colors[color];
-	}
+	const Color& GetColor() const;
 };
 
 class Spawn {
