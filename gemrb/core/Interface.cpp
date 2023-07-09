@@ -545,9 +545,6 @@ Interface::Interface(CoreSettings&& cfg)
 			Log(WARNING, "Core", "Failed to load quest definitions.");
 		}
 	}
-	game = NULL;
-	calendar = NULL;
-	keymap = NULL;
 
 	Log(MESSAGE, "Core", "Initializing Inventory Management...");
 	InitItemTypes();
