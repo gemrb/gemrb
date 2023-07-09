@@ -33,8 +33,6 @@
 
 namespace GemRB {
 
-class Video;
-
 struct FogMapData {
 	FogMapData(
 		const Bitmap *exploredMask,
@@ -61,7 +59,6 @@ struct FogMapData {
 
 class GEM_EXPORT FogRenderer {
 	private:
-		Video* video;
 		bool videoCanRenderGeometry = false;
 		std::vector<float> fogVertices;
 		std::vector<Color> fogColors;
@@ -100,7 +97,7 @@ class GEM_EXPORT FogRenderer {
 		static EnumArray<Direction, Holder<Sprite2D>> LoadFogSprites();
 		EnumArray<Direction, Holder<Sprite2D>> fogSprites;
 	public:
-		FogRenderer(Video*, bool doBAMRendering = false);
+		explicit FogRenderer(bool doBAMRendering = false);
 
 		void DrawFog(const FogMapData& mapData);
 

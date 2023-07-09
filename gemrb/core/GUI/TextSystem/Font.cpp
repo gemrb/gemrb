@@ -73,7 +73,7 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 }
 
 Font::GlyphAtlasPage::GlyphAtlasPage(Size pageSize, Font* font)
-: SpriteSheet<ieWord>(core->GetVideoDriver()), font(font)
+: SpriteSheet<ieWord>(), font(font)
 {
 	SheetRegion.w = pageSize.w;
 	SheetRegion.h = pageSize.h;
@@ -143,7 +143,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 	if (Sheet == NULL) {
 		//Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pageData, pal, true, 0);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(font->palette, true, 0);
-		Sheet = core->GetVideoDriver()->CreateSprite(SheetRegion, pageData, fmt);
+		Sheet = VideoDriver->CreateSprite(SheetRegion, pageData, fmt);
 		if (font->background) {
 			invertedSheet = Sheet->copy();
 			auto invertedPalette = font->palette->Copy();
@@ -175,12 +175,11 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 
 void Font::GlyphAtlasPage::DumpToScreen(const Region& r) const
 {
-	Video* video = core->GetVideoDriver();
-	video->SetScreenClip(NULL);
+	VideoDriver->SetScreenClip(NULL);
 	Region drawRgn = Region(0, 0, 1024, Sheet->Frame.h);
-	video->DrawRect(drawRgn, ColorBlack, true);
-	video->DrawRect(Sheet->Frame.Intersect(r), ColorWhite, false);
-	video->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn, BlitFlags::BLENDED);
+	VideoDriver->DrawRect(drawRgn, ColorBlack, true);
+	VideoDriver->DrawRect(Sheet->Frame.Intersect(r), ColorWhite, false);
+	VideoDriver->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn, BlitFlags::BLENDED);
 }
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)
@@ -262,7 +261,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 
 	bool singleLine = (alignment&IE_FONT_SINGLE_LINE);
 	Point dp = point ? *point : Point();
-	const Region& sclip = core->GetVideoDriver()->GetScreenClip();
+	const Region& sclip = VideoDriver->GetScreenClip();
 
 	size_t charCount = 0;
 	bool lineBreak = false;
@@ -353,8 +352,8 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 					}
 				}
 				if (InDebugMode(DebugMode::FONTS)) {
-					core->GetVideoDriver()->DrawRect(lineRgn, ColorGreen, false);
-					core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.origin,
+					VideoDriver->DrawRect(lineRgn, ColorGreen, false);
+					VideoDriver->DrawRect(Region(linePoint + lineRgn.origin,
 												 Size(lineSize.w, LineHeight)), ColorWhite, false);
 				}
 				linePos = RenderLine(line, lineRgn, linePoint, colors, canvas);
@@ -465,7 +464,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			// use intersection because some rare glyphs can sometimes overlap lines
 			if (!lineRgn.IntersectsRegion(Region(blitPoint, curGlyph.size))) {
 				if (InDebugMode(DebugMode::FONTS)) {
-					core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
+					VideoDriver->DrawRect(lineRgn, ColorRed, false);
 				}
 				assert(metrics.forceBreak == false || dp.x > 0);
 				done = true;
@@ -561,7 +560,7 @@ Holder<Sprite2D> Font::RenderTextAsSprite(const String& string, const Size& size
 		rgn.y = -(size.h - rgn.h);
 	}
 	PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, 0);
-	return core->GetVideoDriver()->CreateSprite(rgn, canvasPx, fmt);
+	return VideoDriver->CreateSprite(rgn, canvasPx, fmt);
 }
 
 size_t Font::Print(const Region& rgn, const String& string, ieByte alignment, Point* point) const

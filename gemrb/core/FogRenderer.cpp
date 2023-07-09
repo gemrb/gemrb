@@ -49,9 +49,8 @@ EnumArray<FogRenderer::Direction, Holder<Sprite2D>> FogRenderer::LoadFogSprites(
 	return sprites;
 }
 
-FogRenderer::FogRenderer(Video *video, bool doBAMRendering) :
-	video(video),
-	videoCanRenderGeometry(!doBAMRendering && video->CanDrawRawGeometry()),
+FogRenderer::FogRenderer(bool doBAMRendering) :
+	videoCanRenderGeometry(!doBAMRendering && VideoDriver->CanDrawRawGeometry()),
 	fogVertices(24),
 	fogColors(12)
 {
@@ -198,7 +197,7 @@ void FogRenderer::DrawVisibleCell(Point p, const Bitmap *visibleMask) {
 }
 
 void FogRenderer::DrawFogCellBAM(Point p, Direction direction, BlitFlags flags) {
-	video->BlitGameSprite(fogSprites[direction], p, flags | BAM_FLAGS[direction]);
+	VideoDriver->BlitGameSprite(fogSprites[direction], p, flags | BAM_FLAGS[direction]);
 }
 
 void FogRenderer::DrawFogCellVertices(Point p, Direction direction, BlitFlags flags) {
@@ -240,7 +239,7 @@ void FogRenderer::DrawFogCellVertices(Point p, Direction direction, BlitFlags fl
 		}
 	}
 
-	video->DrawRawGeometry(fogVertices, fogColors, BlitFlags::BLENDED);
+	VideoDriver->DrawRawGeometry(fogVertices, fogColors, BlitFlags::BLENDED);
 }
 
 void FogRenderer::DrawFogSmoothing(Point p, Direction direction, BlitFlags flags, Direction adjacentDir) {
@@ -285,7 +284,7 @@ void FogRenderer::DrawFogSmoothing(Point p, Direction direction, BlitFlags flags
 		}
 	}
 
-	video->DrawRawGeometry(fogVertices, fogColors, BlitFlags::BLENDED);
+	VideoDriver->DrawRawGeometry(fogVertices, fogColors, BlitFlags::BLENDED);
 }
 
 bool FogRenderer::DrawFogCellByDirection(Point p, Direction direction, BlitFlags flags) {
@@ -344,7 +343,7 @@ void FogRenderer::DrawVPBorder(Point p, Direction direction, const Region& r, Bl
 	if (videoCanRenderGeometry) {
 		DrawFogCellVertices(p, direction, OPAQUE_FOG);
 	} else {
-		video->BlitSprite(fogSprites[direction], p, &r, flags);
+		VideoDriver->BlitSprite(fogSprites[direction], p, &r, flags);
 	}
 }
 
@@ -354,7 +353,7 @@ void FogRenderer::DrawVPBorders() {
 
 	if (vp.y < 0) { // north border
 		Region r(0, 0, vp.w, -vp.y);
-		video->DrawRect(r, ColorBlack, true);
+		VideoDriver->DrawRect(r, ColorBlack, true);
 		r.y += r.h;
 		r.h = FUZZ_AMT;
 		for (int x = r.x + p0.x; x < r.w; x += CELL_SIZE) {
@@ -364,7 +363,7 @@ void FogRenderer::DrawVPBorders() {
 
 	if (vp.y + vp.h > mapSize.h) { // south border
 		Region r(0, mapSize.h - vp.y, vp.w, vp.y + vp.h - mapSize.h);
-		video->DrawRect(r, ColorBlack, true);
+		VideoDriver->DrawRect(r, ColorBlack, true);
 		r.y -= FUZZ_AMT;
 		r.h = FUZZ_AMT;
 		for (int x = r.x + p0.x; x < r.w; x += CELL_SIZE) {
@@ -374,7 +373,7 @@ void FogRenderer::DrawVPBorders() {
 
 	if (vp.x < 0) { // west border
 		Region r(0, std::max(0, -vp.y), -vp.x, mapSize.h);
-		video->DrawRect(r, ColorBlack, true);
+		VideoDriver->DrawRect(r, ColorBlack, true);
 		r.x += r.w;
 		r.w = FUZZ_AMT;
 		for (int y = r.y + p0.y; y < r.h; y += CELL_SIZE) {
@@ -384,7 +383,7 @@ void FogRenderer::DrawVPBorders() {
 
 	if (vp.x + vp.w > mapSize.w) { // east border
 		Region r(mapSize.w -vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
-		video->DrawRect(r, ColorBlack, true);
+		VideoDriver->DrawRect(r, ColorBlack, true);
 		r.x -= FUZZ_AMT;
 		r.w = FUZZ_AMT;
 		for (int y = r.y + p0.y; y < r.h; y += CELL_SIZE) {
@@ -395,7 +394,7 @@ void FogRenderer::DrawVPBorders() {
 
 void FogRenderer::FillFog(Point p, int numRowItems, BlitFlags flags) {
 	Region r(p, Size(CELL_SIZE * numRowItems, CELL_SIZE));
-	video->DrawRect(r, ColorBlack, true, flags);
+	VideoDriver->DrawRect(r, ColorBlack, true, flags);
 }
 
 bool FogRenderer::IsUncovered(Point p, const Bitmap *mask) {

@@ -59,19 +59,17 @@ Region Container::DrawingRegion() const
 
 void Container::Draw(bool highlight, const Region& vp, Color tint, BlitFlags flags) const
 {
-	Video* video = core->GetVideoDriver();
-
 	for (const auto& icon : groundicons) {
 		if (!icon) continue;
 
 		if (highlight) {
-			video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
+			VideoDriver->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
 		} else {
 			const Color trans;
 			PaletteHolder p = icon->GetPalette();
 			Color tmpc = p->col[1];
 			p->CopyColorRange(&trans, &trans + 1, 1);
-			video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
+			VideoDriver->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
 			p->CopyColorRange(&tmpc, &tmpc + 1, 1);
 		}
 	}

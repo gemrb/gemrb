@@ -94,8 +94,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	
 	WorldMap* worldmap = core->GetWorldMap();
 
-	Video* video = core->GetVideoDriver();
-	video->BlitSprite( worldmap->GetMapMOS(), MapToScreen(Point()));
+	VideoDriver->BlitSprite( worldmap->GetMapMOS(), MapToScreen(Point()));
 
 	std::vector<Point> potentialIndicators;
 	unsigned int ec = worldmap->GetEntryCount();
@@ -108,11 +107,11 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		if (icon) {
 			BlitFlags flags =  core->HasFeature(GFFlags::AUTOMAP_INI) ? BlitFlags::BLENDED : (BlitFlags::BLENDED | BlitFlags::COLOR_MOD);
 			if (m == Area && m->HighlightSelected()) {
-				video->BlitGameSprite(icon, offset, flags, hoverAnim.Current());
+				VideoDriver->BlitGameSprite(icon, offset, flags, hoverAnim.Current());
 			} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-				video->BlitGameSprite(icon, offset, flags, color_notvisited);
+				VideoDriver->BlitGameSprite(icon, offset, flags, color_notvisited);
 			} else {
-				video->BlitGameSprite(icon, offset, flags, displaymsg->GetColor(GUIColors::MAPICNBG));
+				VideoDriver->BlitGameSprite(icon, offset, flags, displaymsg->GetColor(GUIColors::MAPICNBG));
 			}
 
 			// intro and late-chapter candlekeep share the same entry, so we need to check both names
@@ -133,9 +132,9 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	// so far only one bad example is known, hence the simple logic
 	size_t indicatorCount = potentialIndicators.size();
 	if (indicatorCount == 1) {
-		video->BlitSprite(areaIndicator, potentialIndicators[0]);
+		VideoDriver->BlitSprite(areaIndicator, potentialIndicators[0]);
 	} else if (indicatorCount > 1) {
-		video->BlitSprite(areaIndicator, potentialIndicators[1]);
+		VideoDriver->BlitSprite(areaIndicator, potentialIndicators[1]);
 	}
 
 	// draw labels in separate pass, so icons don't overlap them

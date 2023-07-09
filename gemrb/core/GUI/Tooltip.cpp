@@ -19,7 +19,7 @@
 
 #include "Tooltip.h"
 
-#include "Interface.h"
+#include "Video/Video.h"
 
 #include <utility>
 
@@ -80,24 +80,22 @@ void TooltipBackground::Draw(Region rgn) const
 	dp.x += (rgn.w / 2);
 	dp.x -= (animationPos / 2); // start @ left curl pos
 
-	Video* video = core->GetVideoDriver();
-
 	// calculate the unrolled region
 	Region bgclip(dp + Point(leftbg->Frame.w, -background->Frame.y), Size(animationPos+1, background->Frame.h));
 	bgclip.w -= leftbg->Frame.w + rightbg->Frame.w;
 
 	// draw unrolled paper
 	// note that there is transparency at the edges... this will get covered up by the right curl's Xpos offset
-	video->BlitSprite(background, Point(dp.x + background->Frame.x+3, dp.y), &bgclip);
+	VideoDriver->BlitSprite(background, Point(dp.x + background->Frame.x+3, dp.y), &bgclip);
 	
 	// draw left paper curl
-	video->BlitSprite(leftbg, dp);
+	VideoDriver->BlitSprite(leftbg, dp);
 	
 	// draw right paper curl (note it's sprite has a non 0 xpos)
-	video->BlitSprite(rightbg, Point(dp.x + animationPos - 1, dp.y));
+	VideoDriver->BlitSprite(rightbg, Point(dp.x + animationPos - 1, dp.y));
 
 	// clip the tooltip text to the background
-	video->SetScreenClip(&bgclip);
+	VideoDriver->SetScreenClip(&bgclip);
 
 	// advance the animation
 	int maxw = std::min(MaxTextSize().w, rgn.w) + leftbg->Frame.w + rightbg->Frame.w;

@@ -452,7 +452,7 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 	Holder<Sprite2D> preview = wm->GetScreenshot(wm->GetGameWindow());
 
 	// scale down to get more of the screen and reduce the size
-	preview = core->GetVideoDriver()->SpriteScaleDown(preview, 5);
+	preview = VideoDriver->SpriteScaleDown(preview, 5);
 	FileStream outfile;
 	outfile.Create( Path, core->GameNameResRef.c_str(), IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );

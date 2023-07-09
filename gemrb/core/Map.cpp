@@ -1197,14 +1197,13 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	// 9. draw text (BlitFlags::BLENDED)
 
 	//Blit the Background Map Animations (before actors)
-	Video* video = core->GetVideoDriver();
 	int bgoverride = false;
 
 	if (Background) {
 		if (BgDuration < gametime) {
 			Background = nullptr;
 		} else {
-			video->BlitSprite(Background, Point());
+			VideoDriver->BlitSprite(Background, Point());
 			bgoverride = true;
 		}
 	}
@@ -1229,7 +1228,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 	const auto& viewportWalls = WallsIntersectingRegion(viewport, false);
 	RedrawScreenStencil(viewport, viewportWalls.first);
-	video->SetStencilBuffer(wallStencil);
+	VideoDriver->SetStencilBuffer(wallStencil);
 	
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
@@ -1348,7 +1347,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				delete sca;
 				scaidx = vvcCells.erase(scaidx);
 			} else {
-				video->SetStencilBuffer(wallStencil);
+				VideoDriver->SetStencilBuffer(wallStencil);
 				Color tint = GetLighting(sca->Pos);
 				tint.a = 255;
 
@@ -1399,7 +1398,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		}
 	}
 
-	video->SetStencilBuffer(NULL);
+	VideoDriver->SetStencilBuffer(NULL);
 	
 	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
 	game->DrawWeather(update_scripts);
@@ -1463,7 +1462,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 			if (poly->wall_flag&WF_DISABLED) {
 				if (debugFlags & DEBUG_SHOW_DOORS_DISABLED) {
-					video->DrawPolygon( poly.get(), origin, ColorGray, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
+					VideoDriver->DrawPolygon( poly.get(), origin, ColorGray, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
 				}
 				continue;
 			}
@@ -1484,10 +1483,10 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				continue;
 			}
 
-			video->DrawPolygon( poly.get(), origin, c, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
+			VideoDriver->DrawPolygon( poly.get(), origin, c, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
 			
 			if (poly->wall_flag & WF_BASELINE) {
-				video->DrawLine(poly->base0 - viewport.origin, poly->base1 - viewport.origin, ColorMagenta);
+				VideoDriver->DrawLine(poly->base0 - viewport.origin, poly->base1 - viewport.origin, ColorMagenta);
 			}
 		}
 	}
@@ -1550,7 +1549,6 @@ WallPolygonSet Map::WallsIntersectingRegion(Region r, bool includeDisabled, cons
 void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn, const WallPolygonSet& walls, const Point& viewPortOrigin)
 {
 	VideoBufferPtr stencil = nullptr;
-	Video* video = core->GetVideoDriver();
 	Color debugColor = ColorGray;
 	
 	const bool behindWall = !walls.first.empty();
@@ -1573,7 +1571,7 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 			if (stencilRgn.size.IsInvalid()) {
 				stencil = wallStencil;
 			} else {
-				stencil = video->CreateBuffer(stencilRgn, Video::BufferFormat::DISPLAY_ALPHA);
+				stencil = VideoDriver->CreateBuffer(stencilRgn, Video::BufferFormat::DISPLAY_ALPHA);
 				DrawStencil(stencil, objectRgn, walls.first);
 				objectStencils[object] = std::make_pair(stencil, objectRgn);
 			}
@@ -1598,11 +1596,11 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 	}
 	
 	assert(stencil);
-	video->SetStencilBuffer(stencil);
+	VideoDriver->SetStencilBuffer(stencil);
 	
 	if (debugFlags & DEBUG_SHOW_WALLS) {
 		const Region& r = Region(objectRgn.origin - viewPortOrigin, objectRgn.size);
-		video->DrawRect(r, debugColor, false);
+		VideoDriver->DrawRect(r, debugColor, false);
 	}
 }
 
@@ -1728,7 +1726,6 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		}
 	} debugPalettes;
 	
-	Video *vid=core->GetVideoDriver();
 	Region block(0,0,16,12);
 
 	int w = vp.w/16+2;
@@ -1760,7 +1757,7 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 				col = tileProps.QueryLighting(p);
 			}
 			
-			vid->DrawRect(block, col, true, flags);
+			VideoDriver->DrawRect(block, col, true, flags);
 		}
 	}
 	
@@ -1779,7 +1776,7 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 			block.x = (step->point.x+64) - vp.x;
 			block.y = (step->point.y+6) - vp.y;
 			Log(DEBUG, "Map", "Waypoint {} at {}", i, step->point);
-			vid->DrawRect(block, waypoint);
+			VideoDriver->DrawRect(block, waypoint);
 			step = step->Next;
 			i++;
 		}
@@ -2555,8 +2552,7 @@ void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 		// FIXME: this should be forced 8bit*4 color format
 		// but currently that is forcing some performance killing conversion issues on some platforms
 		// for now things will break if we use 16 bit color settings
-		Video* video = core->GetVideoDriver();
-		wallStencil = video->CreateBuffer(Region(Point(), vp.size), Video::BufferFormat::DISPLAY_ALPHA);
+		wallStencil = VideoDriver->CreateBuffer(Region(Point(), vp.size), Video::BufferFormat::DISPLAY_ALPHA);
 	}
 
 	wallStencil->Clear();
@@ -2566,8 +2562,6 @@ void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 
 void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const
 {
-	Video* video = core->GetVideoDriver();
-
 	// color is used as follows:
 	// the 'r' channel is for the native value for all walls
 	// the 'g' channel is for the native value for only WF_COVERANIMS walls
@@ -2575,7 +2569,7 @@ void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, con
 	// the 'a' channel is for always dithered (always 0x80, 50% transparent)
 	// IMPORTANT: 'a' channel must be always dithered because the "raw" SDL2 driver can only do one stencil and it must be 'a'
 	Color stencilcol(0, 0, 0xff, 0x80);
-	video->PushDrawingBuffer(stencilBuffer);
+	VideoDriver->PushDrawingBuffer(stencilBuffer);
 
 	for (const auto& wp : walls) {
 		const Point& origin = wp->BBox.origin - vp.origin;
@@ -2592,10 +2586,10 @@ void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, con
 			stencilcol.g = 0;
 		}
 
-		video->DrawPolygon(wp.get(), origin, stencilcol, true);
+		VideoDriver->DrawPolygon(wp.get(), origin, stencilcol, true);
 	}
 
-	video->PopDrawingBuffer();
+	VideoDriver->PopDrawingBuffer();
 }
 
 bool Map::BehindWall(const Point& pos, const Region& r) const
@@ -3823,9 +3817,7 @@ Region AreaAnimation::DrawingRegion() const
 }
 
 void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) const
-{
-	Video* video = core->GetVideoDriver();
-	
+{	
 	if (transparency) {
 		tint.a = 255 - transparency;
 		flags |= BlitFlags::ALPHA_MOD;
@@ -3842,7 +3834,7 @@ void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) co
 		Animation &anim = animation[ac];
 		Holder<Sprite2D> nextFrame = anim.NextFrame();
 		
-		video->BlitGameSpriteWithPalette(nextFrame, palette, Pos - viewport.origin, flags, tint);
+		VideoDriver->BlitGameSpriteWithPalette(nextFrame, palette, Pos - viewport.origin, flags, tint);
 	}
 }
 

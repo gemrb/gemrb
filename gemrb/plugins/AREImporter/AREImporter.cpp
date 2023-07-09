@@ -240,7 +240,7 @@ static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day
 
 	PixelFormat fmt = TileProps::pixelFormat;
 	fmt.palette = lightmap->GetPalette();
-	auto propImg = core->GetVideoDriver()->CreateSprite(Region(Point(), propsize), nullptr, fmt);
+	auto propImg = VideoDriver->CreateSprite(Region(Point(), propsize), nullptr, fmt);
 
 	auto propit = propImg->GetIterator();
 	auto end = propit.end(propit);

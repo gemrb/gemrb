@@ -7730,8 +7730,6 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 		flags |= BlitFlags::COLOR_MOD;
 	}
 	flags |= BlitFlags::ALPHA_MOD;
-	
-	Video* video = core->GetVideoDriver();
 
 	for (const auto& part : animParts) {
 		const Animation* anim = part.first;
@@ -7742,10 +7740,10 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 			if (TranslucentShadows && palette) {
 				ieByte tmpa = palette->col[1].a;
 				palette->col[1].a /= 2;
-				video->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
+				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 				palette->col[1].a = tmpa;
 			} else {
-				video->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
+				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 			}
 		}
 	}

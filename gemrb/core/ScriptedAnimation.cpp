@@ -603,8 +603,6 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 	if (justCreated) {
 		return;
 	}
-
-	Video *video = core->GetVideoDriver();
 	
 	if (Transparency & IE_VVC_TRANSPARENT) {
 		flags |= BlitFlags::HALFTRANS;
@@ -642,10 +640,10 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 
 	const Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim)
-		video->BlitGameSpriteWithPalette(anim->CurrentFrame(), palette, p, flags | BlitFlags::BLENDED, tint);
+		VideoDriver->BlitGameSpriteWithPalette(anim->CurrentFrame(), palette, p, flags | BlitFlags::BLENDED, tint);
 
 	if (light) {
-		video->BlitGameSprite(light, p, flags | BlitFlags::BLENDED, tint);
+		VideoDriver->BlitGameSprite(light, p, flags | BlitFlags::BLENDED, tint);
 	}
 }
 

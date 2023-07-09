@@ -119,7 +119,7 @@ Holder<Sprite2D> MOSImporter::GetSprite2Dv2() {
 	PixelFormat fmt = PixelFormat::ARGB32Bit();
 	Region region{0, 0, size.w, size.h};
 
-	return {core->GetVideoDriver()->CreateSprite(region, imageData, fmt)};
+	return {VideoDriver->CreateSprite(region, imageData, fmt)};
 }
 
 Holder<Sprite2D> MOSImporter::GetSprite2Dv1() {
@@ -178,7 +178,7 @@ Holder<Sprite2D> MOSImporter::GetSprite2Dv1() {
 	fmt.HasColorKey = true;
 	fmt.ColorKey = green_mask;
 	
-	return core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), pixels,fmt);
+	return VideoDriver->CreateSprite(Region(0,0, size.w, size.h), pixels,fmt);
 }
 
 #include "plugindef.h"

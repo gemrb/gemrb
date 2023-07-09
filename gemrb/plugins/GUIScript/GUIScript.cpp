@@ -11787,7 +11787,7 @@ static PyObject* GemRB_SetGamma(PyObject * /*self*/, PyObject* args)
 	if (contrast<0 || contrast>5) {
 		return RuntimeError( "Contrast must be 0-5" );
 	}
-	core->GetVideoDriver()->SetGamma(brightness, contrast);
+	VideoDriver->SetGamma(brightness, contrast);
 	Py_RETURN_NONE;
 }
 
@@ -11859,7 +11859,7 @@ static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
 {
 	int fullscreen;
 	PARSE_ARGS(args, "i", &fullscreen);
-	core->GetVideoDriver()->SetFullscreenMode(fullscreen);
+	VideoDriver->SetFullscreenMode(fullscreen);
 	Py_RETURN_NONE;
 }
 

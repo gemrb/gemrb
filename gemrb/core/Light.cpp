@@ -21,7 +21,6 @@
 #include "Light.h"
 
 #include "Geometry.h"
-#include "Interface.h"
 #include "Video/Video.h"
 
 namespace GemRB {
@@ -76,7 +75,7 @@ Holder<Sprite2D> CreateLight(const Size& size, uint8_t intensity) noexcept
 
 	r.origin = radii;
 	PixelFormat fmt = PixelFormat::Paletted8Bit(GetLightPalette(), true, 0);
-	return core->GetVideoDriver()->CreateSprite(r, px, fmt);
+	return VideoDriver->CreateSprite(r, px, fmt);
 }
 
 }

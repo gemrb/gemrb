@@ -36,18 +36,16 @@ protected:
 	Region SheetRegion; // FIXME: this is only needed because of a subclass
 	std::map<KeyType, Region> RegionMap;
 
-	explicit SpriteSheet(Video* video)
-	: video(video) {};
-
 public:
 	Holder<Sprite2D> Sheet;
-	Video* video;
 
 public:
-	SpriteSheet(Video* video, Holder<Sprite2D> sheet)
-	: Sheet(std::move(sheet)), video(video) {
+	explicit SpriteSheet(Holder<Sprite2D> sheet)
+	: Sheet(std::move(sheet)) {
 		SheetRegion = Sheet->Frame;
 	};
+	
+	SpriteSheet() noexcept = default;
 
 	virtual ~SpriteSheet() noexcept = default;
 
@@ -72,7 +70,7 @@ public:
 	void Draw(KeyType key, const Region& dest, BlitFlags flags, const Color& tint) const {
 		const auto& i = RegionMap.find(key);
 		if (i != RegionMap.end()) {
-			video->BlitSprite(Sheet, i->second, dest, flags, tint);
+			VideoDriver->BlitSprite(Sheet, i->second, dest, flags, tint);
 		}
 	}
 };

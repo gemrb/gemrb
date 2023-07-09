@@ -322,7 +322,7 @@ void GameControl::DrawArrowMarker(const Point& p, const Color& color) const
 	Holder<Sprite2D> arrow = core->GetScrollCursorSprite(dir, 0);
 	
 	const Point& dp = bounds.Intercept(p) - bounds.origin;
-	core->GetVideoDriver()->BlitGameSprite(arrow, dp, BlitFlags::COLOR_MOD | BlitFlags::BLENDED, color);
+	VideoDriver->BlitGameSprite(arrow, dp, BlitFlags::COLOR_MOD | BlitFlags::BLENDED, color);
 }
 
 void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Point& p) const
@@ -344,9 +344,7 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	const Point adj(size + 1, 0);
 	Point b1 = r.origin - adj;
 	Point b2 = r.Maximum() + adj;
-	
-	Video* video = core->GetVideoDriver();
-	
+
 	size_t i = 0;
 	// points are ordered per quadrant, so we can process 4 each iteration
 	// at first, 2 points will be the left segment and 2 will be the right segment
@@ -362,19 +360,19 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 			break;
 		}
 		
-		video->DrawPoint(q1 + offsetH, color);
-		video->DrawPoint(q2 - offsetH, color);
-		video->DrawPoint(q3 - offsetH, color);
-		video->DrawPoint(q4 + offsetH, color);
+		VideoDriver->DrawPoint(q1 + offsetH, color);
+		VideoDriver->DrawPoint(q2 - offsetH, color);
+		VideoDriver->DrawPoint(q3 - offsetH, color);
+		VideoDriver->DrawPoint(q4 + offsetH, color);
 	}
 	
 	assert(i < points.size() - 4);
 	
 	// the current points are the ends of the side segments
-	video->DrawLine(points[i++] + offsetH, p + offsetH, color);   // begin right segment
-	video->DrawLine(points[i++] - offsetH, p - offsetH, color);   // begin left segment
-	video->DrawLine(points[i++] - offsetH, p - offsetH, color);   // end left segment
-	video->DrawLine(points[i++] + offsetH, p + offsetH, color);   // end right segment
+	VideoDriver->DrawLine(points[i++] + offsetH, p + offsetH, color);   // begin right segment
+	VideoDriver->DrawLine(points[i++] - offsetH, p - offsetH, color);   // begin left segment
+	VideoDriver->DrawLine(points[i++] - offsetH, p - offsetH, color);   // end left segment
+	VideoDriver->DrawLine(points[i++] + offsetH, p + offsetH, color);   // end right segment
 	
 	b1 = r.origin + adj;
 	b2 = r.Maximum() - adj;
@@ -387,10 +385,10 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	}
 	
 	// the current points are the ends of the top/bottom segments
-	video->DrawLine(points[i++] + offsetV, p + offsetV, color); // begin top segement
-	video->DrawLine(points[i++] + offsetV, p + offsetV, color); // end top segment
-	video->DrawLine(points[i++] - offsetV, p - offsetV, color); // begin bottom segment
-	video->DrawLine(points[i++] - offsetV, p - offsetV, color); // end bottom segment
+	VideoDriver->DrawLine(points[i++] + offsetV, p + offsetV, color); // begin top segement
+	VideoDriver->DrawLine(points[i++] + offsetV, p + offsetV, color); // end top segment
+	VideoDriver->DrawLine(points[i++] - offsetV, p - offsetV, color); // begin bottom segment
+	VideoDriver->DrawLine(points[i++] - offsetV, p - offsetV, color); // end bottom segment
 	
 	// remaining points are top/bottom segments
 	for (; i < points.size(); i += 4) {
@@ -399,10 +397,10 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 		const Point& q3 = points[i + 2];
 		const Point& q4 = points[i + 3];
 		
-		video->DrawPoint(q1 + offsetV, color);
-		video->DrawPoint(q2 + offsetV, color);
-		video->DrawPoint(q3 - offsetV, color);
-		video->DrawPoint(q4 - offsetV, color);
+		VideoDriver->DrawPoint(q1 + offsetV, color);
+		VideoDriver->DrawPoint(q2 + offsetV, color);
+		VideoDriver->DrawPoint(q3 - offsetV, color);
+		VideoDriver->DrawPoint(q4 - offsetV, color);
 	}
 }
 
@@ -575,13 +573,12 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		}
 	}
 
-	Video* video = core->GetVideoDriver();
 	// Draw selection rect
 	if (isSelectionRect) {
 		Region r = SelectionRect();
 		r.x -= vpOrigin.x;
 		r.y -= vpOrigin.y;
-		video->DrawRect(r, ColorGreen, false );
+		VideoDriver->DrawRect(r, ColorGreen, false );
 	}
 
 	const Point& gameMousePos = GameMousePos();
@@ -604,13 +601,13 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		while (true) {
 			Point p = Map::ConvertCoordFromTile(node->point) + Point(8, 6);
 			if (!node->Parent) {
-				video->DrawCircle( p, 2, ColorRed );
+				VideoDriver->DrawCircle( p, 2, ColorRed );
 			} else {
 				Point old = Map::ConvertCoordFromTile(node->Parent->point) + Point(8, 6);
-				video->DrawLine(old, p, ColorGreen);
+				VideoDriver->DrawLine(old, p, ColorGreen);
 			}
 			if (!node->Next) {
-				video->DrawCircle( p, 2, ColorGreen );
+				VideoDriver->DrawCircle( p, 2, ColorGreen );
 				break;
 			}
 			node = node->Next;
@@ -1495,8 +1492,6 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 			MoveViewportTo( vpOrigin - gesture.Delta(), false );
 		}
 	} else if (gesture.numFingers == 3) { // keyboard/console
-		Video* video = core->GetVideoDriver();
-
 		enum class SWIPE { DOWN = -1, NONE = 0, UP = 1 };
 		SWIPE swipe = SWIPE::NONE;
 		if (gesture.deltaY < -EventMgr::mouseDragRadius) {
@@ -1514,14 +1509,14 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 		switch (swipe) {
 			case SWIPE::DOWN:
 				consoleWin->Close();
-				video->StopTextInput();
+				VideoDriver->StopTextInput();
 				consoleWin->Close();
 				break;
 			case SWIPE::UP:
-				if (video->InTextInput()) {
+				if (VideoDriver->InTextInput()) {
 					consoleWin->Focus();
 				}
-				video->StartTextInput();
+				VideoDriver->StartTextInput();
 				break;
 			case SWIPE::NONE:
 				break;

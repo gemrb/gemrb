@@ -130,16 +130,15 @@ bool ScrollBar::IsOpaque() const
 /** Draws the ScrollBar control */
 void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 {
-	Video *video=core->GetVideoDriver();
 	int upMy = GetFrameHeight(IMAGE_UP_UNPRESSED);
 	int doMy = GetFrameHeight(IMAGE_DOWN_UNPRESSED);
 	unsigned int domy = (frame.h - doMy);
 
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
-		video->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.origin);
+		VideoDriver->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.origin);
 	} else {
-		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.origin);
+		VideoDriver->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.origin);
 	}
 	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED);
 	int stepy = GetFrameHeight(IMAGE_TROUGH);
@@ -154,7 +153,7 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 				Point p = Frames[IMAGE_TROUGH]->Frame.origin;
 				p.x += ((frame.w - Frames[IMAGE_TROUGH]->Frame.w - 1) / 2) + drawFrame.x;
 				p.y += dy;
-				video->BlitSprite(Frames[IMAGE_TROUGH], p, &rgn);
+				VideoDriver->BlitSprite(Frames[IMAGE_TROUGH], p, &rgn);
 			}
 		}
 		// draw the slider
@@ -164,13 +163,13 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 		Point p = drawFrame.origin + Frames[IMAGE_SLIDER]->Frame.origin;
 		p.x += slx;
 		p.y += upMy + sly;
-		video->BlitSprite(Frames[IMAGE_SLIDER], p);
+		VideoDriver->BlitSprite(Frames[IMAGE_SLIDER], p);
 	}
 	//draw the down button
 	if (( State & DOWN_PRESS ) != 0) {
-		video->BlitSprite(Frames[IMAGE_DOWN_PRESSED], Point(drawFrame.x, maxy));
+		VideoDriver->BlitSprite(Frames[IMAGE_DOWN_PRESSED], Point(drawFrame.x, maxy));
 	} else {
-		video->BlitSprite(Frames[IMAGE_DOWN_UNPRESSED], Point(drawFrame.x, maxy));
+		VideoDriver->BlitSprite(Frames[IMAGE_DOWN_UNPRESSED], Point(drawFrame.x, maxy));
 	}
 }
 

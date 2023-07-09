@@ -1640,12 +1640,12 @@ void Selectable::DrawCircle(const Point& p) const
 	}
 
 	if (sprite) {
-		core->GetVideoDriver()->BlitSprite(sprite, Pos - p);
+		VideoDriver->BlitSprite(sprite, Pos - p);
 	} else {
 		float baseSize = CircleSize2Radius() * sizeFactor;
 		const Size s(baseSize * 8, baseSize * 6);
 		const Region r(Pos - p - s.Center(), s);
-		core->GetVideoDriver()->DrawEllipse(r, *col);
+		VideoDriver->DrawEllipse(r, *col);
 	}
 }
 
@@ -1720,10 +1720,10 @@ void Highlightable::DrawOutline(Point origin) const
 	origin = outline->BBox.origin - origin;
 
 	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
-		core->GetVideoDriver()->DrawPolygon(outline.get(), origin, outlineColor, true, BlitFlags::MOD | BlitFlags::HALFTRANS);
+		VideoDriver->DrawPolygon(outline.get(), origin, outlineColor, true, BlitFlags::MOD | BlitFlags::HALFTRANS);
 	} else {
-		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS );
-		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, false );
+		VideoDriver->DrawPolygon( outline.get(), origin, outlineColor, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS );
+		VideoDriver->DrawPolygon( outline.get(), origin, outlineColor, false );
 	}
 }
 

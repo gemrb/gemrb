@@ -197,18 +197,17 @@ bool View::HasBackground() const
 
 void View::DrawBackground(const Region* rgn) const
 {
-	Video* video = core->GetVideoDriver();
 	if (backgroundColor.a > 0) {
 		if (rgn) {
 			Region r = ConvertRegionToWindow(*rgn);
-			video->DrawRect(r, backgroundColor, true);
+			VideoDriver->DrawRect(r, backgroundColor, true);
 		} else if (window) {
 			assert(superView);
 			Region r = superView->ConvertRegionToWindow(frame);
-			video->DrawRect(r, backgroundColor, true);
+			VideoDriver->DrawRect(r, backgroundColor, true);
 		} else {
 			// FIXME: this is a Window and we need this hack becasue Window::WillDraw() changed the coordinate system
-			video->DrawRect(Region(Point(), Dimensions()), backgroundColor, true);
+			VideoDriver->DrawRect(Region(Point(), Dimensions()), backgroundColor, true);
 		}
 	}
 		
@@ -221,10 +220,10 @@ void View::DrawBackground(const Region* rgn) const
 			Region intersect = rgn->Intersect(background->Frame);
 			Point screenPt = ConvertPointToWindow(intersect.origin);
 			Region toClip(screenPt, intersect.size);
-			video->BlitSprite(background, intersect, toClip, BlitFlags::BLENDED);
+			VideoDriver->BlitSprite(background, intersect, toClip, BlitFlags::BLENDED);
 		} else {
 			Point dp = ConvertPointToWindow(Point(background->Frame.x, background->Frame.y));
-			video->BlitSprite(background, dp);
+			VideoDriver->BlitSprite(background, dp);
 		}
 	}
 }
@@ -233,14 +232,13 @@ void View::Draw()
 {
 	if (flags&Invisible) return;
 
-	Video* video = core->GetVideoDriver();
-	const Region clip = video->GetScreenClip();
+	const Region clip = VideoDriver->GetScreenClip();
 	const Region& drawFrame = DrawingFrame();
 	const Region& intersect = clip.Intersect(drawFrame);
 	if (intersect.size.IsInvalid()) return; // outside the window/screen
 
 	// clip drawing to the view bounds, then restore after drawing
-	video->SetScreenClip(&intersect);
+	VideoDriver->SetScreenClip(&intersect);
 
 	bool needsDraw = NeedsDraw(); // check this before WillDraw else an animation update might get missed
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
@@ -260,12 +258,12 @@ void View::Draw()
 	if (InDebugMode(DebugMode::VIEWS)) {
 		const Window* win = GetWindow();
 		if (win == nullptr) {
-			video->DrawRect(drawFrame, ColorBlue, false);
+			VideoDriver->DrawRect(drawFrame, ColorBlue, false);
 			debuginfo = EventMgr::ModState(GEM_MOD_SHIFT);
 		} else if (NeedsDraw()) {
-			video->DrawRect(drawFrame, ColorRed, false);
+			VideoDriver->DrawRect(drawFrame, ColorRed, false);
 		} else {
-			video->DrawRect(drawFrame, ColorGreen, false);
+			VideoDriver->DrawRect(drawFrame, ColorGreen, false);
 		}
 		debuginfo = debuginfo || EventMgr::ModState(GEM_MOD_CTRL);
 
@@ -286,8 +284,8 @@ void View::Draw()
 				fnt->StringSize(*string, &metrics);
 				r.h = metrics.size.h;
 				r.w = metrics.size.w;
-				video->SetScreenClip(nullptr);
-				video->DrawRect(r, ColorBlack, true);
+				VideoDriver->SetScreenClip(nullptr);
+				VideoDriver->DrawRect(r, ColorBlack, true);
 				fnt->Print(r, *string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT, {ColorWhite, ColorBlack});
 				delete string;
 			}
@@ -295,7 +293,7 @@ void View::Draw()
 	}
 
 	// restore the screen clip
-	video->SetScreenClip(&clip);
+	VideoDriver->SetScreenClip(&clip);
 }
 
 Point View::ConvertPointToSuper(const Point& p) const
@@ -854,7 +852,7 @@ bool View::OnControllerButtonDown(const ControllerEvent& ce)
 	
 	if (ce.button == CONTROLLER_BUTTON_GUIDE)
 	{
-		core->GetVideoDriver()->StartTextInput();
+		VideoDriver->StartTextInput();
 		return true;
 	}
 	
