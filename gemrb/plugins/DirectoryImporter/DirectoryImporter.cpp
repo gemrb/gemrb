@@ -20,7 +20,6 @@
 
 #include "globals.h"
 
-#include "Interface.h"
 #include "Logging/Logging.h"
 #include "ResourceDesc.h"
 #include "Streams/FileStream.h"
@@ -51,7 +50,7 @@ static FileStream *SearchIn(const path_t& path, StringView resRef, const path_t&
 
 bool DirectoryImporter::HasResource(StringView resname, SClass_ID type)
 {
-	return FindIn( path, resname, core->TypeExt(type) );
+	return FindIn( path, resname, TypeExt(type) );
 }
 
 bool DirectoryImporter::HasResource(StringView resname, const ResourceDesc &type)
@@ -61,7 +60,7 @@ bool DirectoryImporter::HasResource(StringView resname, const ResourceDesc &type
 
 DataStream* DirectoryImporter::GetResource(StringView resname, SClass_ID type)
 {
-	return SearchIn( path, resname, core->TypeExt(type) );
+	return SearchIn( path, resname, TypeExt(type) );
 }
 
 DataStream* DirectoryImporter::GetResource(StringView resname, const ResourceDesc &type)
@@ -107,7 +106,7 @@ static path_t ConstructFilename(StringView resname, const path_t& ext)
 
 bool CachedDirectoryImporter::HasResource(StringView resname, SClass_ID type)
 {
-	const path_t& filename = ConstructFilename(resname, core->TypeExt(type));
+	const path_t& filename = ConstructFilename(resname, TypeExt(type));
 	return cache.find(filename) != cache.cend();
 }
 
@@ -119,7 +118,7 @@ bool CachedDirectoryImporter::HasResource(StringView resname, const ResourceDesc
 
 DataStream* CachedDirectoryImporter::GetResource(StringView resname, SClass_ID type)
 {
-	const path_t& filename = ConstructFilename(resname, core->TypeExt(type));
+	const path_t& filename = ConstructFilename(resname, TypeExt(type));
 	const auto lookup = cache.find(filename);
 
 	if (lookup == cache.cend())
