@@ -774,18 +774,17 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 
 int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 {
-	char Signature[9];
+	ResRef signature = "GAMEV0.0";
 	ieDword tmpDword;
 
-	strlcpy(Signature, "GAMEV0.0", 9);
-	Signature[5]+=game->version/10;
+	signature[5] += game->version / 10;
 	if (game->version==GAM_VER_PST || game->version==GAM_VER_BG) { //pst/bg1 saved version
-		Signature[7]+=1;
+		signature[7] += 1;
 	}
 	else {
-		Signature[7]+=game->version%10;
+		signature[7] += game->version % 10;
 	}
-	stream->Write( Signature, 8);
+	stream->WriteResRef(signature);
 
 	tmpDword = game->GameTime / core->Time.defaultTicksPerSec;
 	stream->WriteDword(tmpDword);

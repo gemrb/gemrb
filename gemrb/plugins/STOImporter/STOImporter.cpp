@@ -275,13 +275,12 @@ void STOImporter::PutPurchasedCategories(DataStream *stream, const Store* s) con
 
 void STOImporter::PutHeader(DataStream *stream, const Store *s)
 {
-	char Signature[9];
+	ResRef signature = "STORV0.0";
 
 	version = s->version;
-	strlcpy(Signature, "STORV0.0", 9);
-	Signature[5]+=version/10;
-	Signature[7]+=version%10;
-	stream->Write( Signature, 8);
+	signature[5] += version / 10;
+	signature[7] += version % 10;
+	stream->WriteResRef(signature);
 	stream->WriteDword(static_cast<ieDword>(s->Type));
 	stream->WriteStrRef(s->StoreName);
 	stream->WriteDword(s->Flags);

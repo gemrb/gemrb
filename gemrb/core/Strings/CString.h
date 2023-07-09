@@ -40,10 +40,6 @@
 
 namespace GemRB {
 
-#ifndef HAVE_STRLCPY
-GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
-#endif
-
 constexpr int NoTransform(int c) { return c; }
 
 template <typename STR_T, int(*TRANS)(int) = NoTransform>

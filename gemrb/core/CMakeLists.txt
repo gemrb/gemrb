@@ -105,7 +105,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Streams/FileStream.cpp
 	Streams/MemoryStream.cpp
 	Streams/SlicedStream.cpp
-	Strings/CString.cpp
 	Strings/String.cpp
 	Strings/StringConversion.cpp
 	System/swab.cpp

@@ -365,7 +365,6 @@
 		A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD01395FF62006ADC12 /* Objects.cpp */; };
 		A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD11395FF62006ADC12 /* Triggers.cpp */; };
 		A2A05CE627A47E29000FB625 /* StringConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CE027A47E29000FB625 /* StringConversion.cpp */; };
-		A2A05CE727A47E29000FB625 /* CString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2A05CE127A47E29000FB625 /* CString.cpp */; };
 		A2A05CE827A47E29000FB625 /* StringConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CE227A47E29000FB625 /* StringConversion.h */; };
 		A2A05CEA27A47E29000FB625 /* CString.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CE427A47E29000FB625 /* CString.h */; };
 		A2A05CEB27A47E29000FB625 /* String.h in Headers */ = {isa = PBXBuildFile; fileRef = A2A05CE527A47E29000FB625 /* String.h */; };
@@ -1481,7 +1480,6 @@
 		A29BF7B213A0380F00C812DD /* BAMImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BAMImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A29BF85C13A0427900C812DD /* GemRB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GemRB.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2A05CE027A47E29000FB625 /* StringConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringConversion.cpp; sourceTree = "<group>"; };
-		A2A05CE127A47E29000FB625 /* CString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CString.cpp; sourceTree = "<group>"; };
 		A2A05CE227A47E29000FB625 /* StringConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringConversion.h; sourceTree = "<group>"; };
 		A2A05CE427A47E29000FB625 /* CString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CString.h; sourceTree = "<group>"; };
 		A2A05CE527A47E29000FB625 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = String.h; sourceTree = "<group>"; };
@@ -5055,7 +5053,6 @@
 		A2A05CDF27A47E29000FB625 /* Strings */ = {
 			isa = PBXGroup;
 			children = (
-				A2A05CE127A47E29000FB625 /* CString.cpp */,
 				A2A05CE427A47E29000FB625 /* CString.h */,
 				A2BC433C28296D5700BD4D73 /* Format.h */,
 				A2A05CE527A47E29000FB625 /* String.h */,
@@ -9742,7 +9739,6 @@
 				A25F91F8269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */,
 				A2E6638F139E883E00310FC8 /* ImageMgr.cpp in Sources */,
 				A2E66393139E883E00310FC8 /* IniSpawn.cpp in Sources */,
-				A2A05CE727A47E29000FB625 /* CString.cpp in Sources */,
 				A2E66395139E883E00310FC8 /* Interface.cpp in Sources */,
 				A2E7E1982668977F0064423F /* PluginLoader.cpp in Sources */,
 				A2E66397139E883E00310FC8 /* Inventory.cpp in Sources */,

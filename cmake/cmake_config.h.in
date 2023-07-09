@@ -3,8 +3,6 @@
 
 // automatically generated file from cmake!
 
-#cmakedefine HAVE_STRNDUP 1
-#cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_REALPATH 1
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
 #cmakedefine HAVE_MEMALIGN 1
