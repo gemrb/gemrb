@@ -1,57 +1,46 @@
-#####################################################
-#                                                   #
-#  This is the GemRB Configuration file.            #
-#  Here are defined some default parameters for     #
-#  basic configuration and path definitions.        #
-#                                                   #
-#  Lines starting with # are ignored                #
-#                                                   #
-#####################################################
+###############################################################################
+#  This is the GemRB Configuration file. Lines starting with # are ignored    #
+###############################################################################
 
-#####################################################
-#  Game Paths [String]                              #
-#                                                   #
-#  These are the paths where the Game you want to   #
-#  play is installed.                               #
-#  Enter the full path to the directory.            #
-#                                                   #
-#  Remember, EE versions are not supported!         #
-#####################################################
+###############################################################################
+#  Game Paths [String]                                                        #
+#                                                                             #
+#  These are the paths where the Game you want to play is installed.          #
+#  Enter the full path to the directory.                                      #
+#                                                                             #
+#  Remember, EE versions are not supported!                                   #
+###############################################################################
 
 #GamePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 
-#####################################################
-#                                                   #
-#  Game Type [String] Use one of the following:     #
-#                                                   #
-#  auto      Attempt to autodetect game type        #
-#                                                   #
-#  bg1       Baldur's Gate                          #
-#  bg2       Baldur's Gate 2 : SoA or ToB           #
-#  bg2ee     Baldur's Gate 2 : EE (experimental!)   #
-#  how       Icewind Dale : HoW or ToTL             #
-#  (iwd)     Icewind Dale (no How or ToTL installed)#
-#  iwd2      Icewind Dale 2                         #
-#  pst       Planescape Torment                     #
-#                                                   #
-#  demo      GemRB demo                             #
-#  test      Minimal test mode                      #
-#  (More will come)                                 #
-#                                                   #
-#####################################################
+###############################################################################
+#                                                                             #
+#  Game Type [String] Use one of the following:                               #
+#                                                                             #
+#  auto      Attempt to autodetect game type                                  #
+#                                                                             #
+#  bg1       Baldur's Gate                                                    #
+#  bg2       Baldur's Gate 2 : SoA or ToB                                     #
+#  bg2ee     Baldur's Gate 2 : EE (experimental!)                             #
+#  how       Icewind Dale : HoW or ToTL                                       #
+#  (iwd)     Icewind Dale (no How or ToTL installed)                          #
+#  iwd2      Icewind Dale 2                                                   #
+#  pst       Planescape Torment                                               #
+#                                                                             #
+#  demo      GemRB demo                                                       #
+#  test      Minimal test mode                                                #
+#  (More will come)                                                           #
+#                                                                             #
+###############################################################################
 
 GameType=auto
 
-#####################################################
-#  Encoding [default|polish|czech|german] Language  #
-#  used by game data.                               #
-#####################################################
-
+# Encoding [default|polish|czech|german] Language used by game data.
 # Encoding=default
 
-#####################################################
-#  Video Parameters                                 #
-#####################################################
+###############################################################################
+#  Video Parameters                                                           #
+###############################################################################
 #Resolutions supported by the original games are:
 # * 640x480 (except in iwd2)
 # * 800x600 (bg2, iwd:how, iwd2)
@@ -74,41 +63,26 @@ Fullscreen=0
 # Cap FPS, 0 = request VSync (SDL2 only, default), -1 = no limit, 30+ = cap value
 #CapFPS=0
 
-# Use sprited fog of war [Boolean]. For nostalgia. By
-# default it looks more like accelerated FoW in BG2.
+# Use sprited fog of war [Boolean]
+# For nostalgia. By default it looks more like accelerated FoW in BG2.
 #SpriteFogOfWar=1
 
-#####################################################
-#  Audio Parameters                                 #
-#####################################################
+###############################################################################
+#  Audio Parameters                                                           #
+###############################################################################
 
 # Choices: openal (default), sdlaudio (faster, but limited featureset), none
 #AudioDriver = openal
 
-#####################################################
-#  Case Sensitive Filesystem [Boolean]              #
-#                                                   #
-#  If your installed game files are residing on a   #
-#  case sensitive filesystem (ext2 on Linux) then   #
-#  you need to set this value to 1, it has no       #
-#  effect on Windows                                #
-#####################################################
-
-#CaseSensitive=1
-
-#####################################################
-#  GUI Parameters                                   #
-#####################################################
-#                                                   #
-# GemRB may enhance the GUI of the Infinity Engine  #
-# games (so far only in bg2) creating functionally  #
-# new buttons or scrollbars where they weren't      #
-# present in original games. It may improve its     #
-# usability, but is not quite compatible with       #
-# mods changing graphics and alignment in the *.chu #
-# files (e.g. the buttons will appear in old        #
-# coordinates and may stop being clickable).        #
-#####################################################
+###############################################################################
+#  GUI Parameters                                                             #
+###############################################################################
+#                                                                             #
+#  GemRB may enhance the GUI of the original games creating functionally new  #
+#  buttons or scrollbars, QoL improvements and more. Note that this may       #
+#  conflict with mods changing graphics and alignment in the CHU files.       #
+#                                                                             #
+###############################################################################
 
 # Enable all gui enhancements ? [Integer]
 GUIEnhancements = 15
@@ -123,18 +97,13 @@ GUIEnhancements = 15
 # Enable or disable (0) logging
 #Logging = 1
 
-#####################################################
-#  Game Name [String] Title for GemRB window, use   #
-#  anything you wish, e.g. Baldur's Gate 3: RotFL   #
-#                                                   #
-#  Defaults to GemRB: <actual game name>            #
-#####################################################
+# Title for GemRB window, use anything you wish, e.g. Baldur's Gate 3: RotFL
+# Defaults to GemRB: <actual game name>
+#GameName=Baldur's Gate 2
 
-# GameName=Baldur's Gate 2
-
-#####################################################
-#  Debug                                            #
-#####################################################
+###############################################################################
+#  Debug                                                                      #
+###############################################################################
 
 # Do not play intro videos [Boolean], useful for development
 #SkipIntroVideos=1
@@ -145,49 +114,45 @@ GUIEnhancements = 15
 # Show unexplored parts of a map
 #GCDebug=1536
 
-# Enable debug and cheat keystrokes, see docs/en/CheatKeys.txt
-#   full listing
+# Enable debug and cheat keystrokes, see docs/en/CheatKeys.txt for full listing
 #EnableCheatKeys=1
 
 # Developer debug mode toggle (see DebugModeBits enum)
 #DebugMode=0
 
-#####################################################
-#  Input Parameters                                 #
-#####################################################
+###############################################################################
+#  Input Parameters                                                           #
+###############################################################################
 
-#whether or not to use software keyboard on devices that support one
+# Whether or not to use software keyboard on devices that support one
 #UseSoftKeyboard=1
 
-#Adds a gutter around the screen for scrolling
+# Adds a gutter around the screen for scrolling
 #TouchScrollAreas=1
 
-#####################################################
-#  MouseFeedback                                    #
-#  Bitfield with reserved bits for disabling        #
-#  the mouse. Those bits cannot be set via config   #
-#                                                   #
-#  Show mouse+tooltips = 0                          #
-#  Hide mouse          = 1                          #
-#  Hide tooltips       = 2                          #
-#  Hide mouse+tooltips = 3                          #
-#####################################################
+###############################################################################
+#  MouseFeedback                                                              #
+#  Bitfield with reserved bits for disabling the mouse.                       #
+#                                                                             #
+#  Show mouse+tooltips = 0                                                    #
+#  Hide mouse          = 1                                                    #
+#  Hide tooltips       = 2                                                    #
+#  Hide mouse+tooltips = 3                                                    #
+###############################################################################
 
 # For a strictly touchscreen device we recommend
 # Changing this to 3.
-
-# default is 0
+# Default is 0
 #MouseFeedback=0
 
-# force enable touch input (in case autodetection fails or for hybrids)
+# Force enable touch input (in case autodetection fails or for hybrids)
 #TouchInput=1
 
-#####################################################
-#  Touch Gesture Input Parameters                   #
-#  Requires SDL 1.3 or later                        #
-#  All "NumFing" settings must be > 1 and < 5       #
-#  NumFingScroll and NumFingKboard cannot be equal  #
-#####################################################
+###############################################################################
+#  Touch Gesture Input Parameters                                             #
+#  All "NumFing" settings must be > 1 and < 5                                 #
+#  NumFingScroll and NumFingKboard cannot be equal                            #
+###############################################################################
 
 #NumFingScroll=2
 
@@ -195,43 +160,29 @@ GUIEnhancements = 15
 
 #NumFingInfo=2
 
-#Pointer speed with thumbstick
-GamepadPointerSpeed=10
+# Pointer speed with thumbstick
+#GamepadPointerSpeed=10
 
-#Vita specific options
+# Vita specific options
 VitaKeepAspectRatio=1
 
-#####################################################
-#  Paths                                            #
-#####################################################
+###############################################################################
+#  Paths                                                                      #
+###############################################################################
 
 # only set these if the folders are not in your GamePath
-# really, you can ignore the warnings
+# really, you can ignore the warnings; never needed on full and GOG installs
 #CD1=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 #CD2=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD2/
 #CD3=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD3/
 #CD4=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD4/
 #CD5=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD5/
 
-#####################################################
-#  GemRB Cache Path [String]                        #
-#                                                   #
-#  This is the path where GemRB will store the      #
-#  cached files, enter the full path to the GemRB   #
-#  Cache directory.                                 #
-#####################################################
-
-CachePath=@DEFAULT_CACHE_DIR@
-
-###### HERE BE DRAGONS #############################
-# You shouldn't need to change any paths below this point.
-
-#####################################################
-#  GemRB Path [String]                              #
-#                                                   #
-#  This is the path where GemRB is stored, just     #
-#  enter the full path to the GemRB executable      #
-#####################################################
+###############################################################################
+#  GemRB Path [String]                                                        #
+#                                                                             #
+#  The path where GemRB is stored, just enter the full path to the executable #
+###############################################################################
 
 # preconfigured path
 #GemRBPath=@DATA_DIR@
@@ -239,113 +190,92 @@ CachePath=@DEFAULT_CACHE_DIR@
 # path for official binaries
 #GemRBPath=.
 
-#####################################################
-#  GemRB GUI Scripts Path [String]                  #
-#                                                   #
-#  This is the path where GemRB GUI scripts are     #
-#  stored, usually these are in the GemRB directory #
-#  Enter the full path to the directory containing  #
-#  the 'GUIScript' subdirectory.                    #
-#####################################################
-
-#GUIScriptsPath=@DATA_DIR@
-
-#####################################################
-#  GemRB Plugins Path [String]                      #
-#                                                   #
-#  This is the path containing GemRB plugins        #
-#  - shared libraries (.so) on Unixes, or           #
-#  DLLs (.dll) on windows.                          #
-#  Enter the full path to the directory.            #
-#                                                   #
-#  You may need to specify this path if running     #
-#  GemRB from source directory on Linux.            #
-#####################################################
+###############################################################################
+#  GemRB Plugins Path [String]                                                #
+#                                                                             #
+#  This is the path containing GemRB plugins - shared libraries (.so) on      #
+#  Unixes, or DLLs (.dll) on windows. Enter the full path to the directory.   #
+#                                                                             #
+#  You may need to specify this path if running GemRB without installing it.  #
+###############################################################################
 
 #PluginsPath=@DEFAULT_PLUGINS_DIR@
 
-#####################################################
-#  Custom Font Path [String]                        #
-#                                                   #
-#  This is the path where GemRB looks for non-BAM   #
-#  fonts (ex TTF)                                   #
-#                                                   #
-#####################################################
+# This is the path where GemRB will store cached files, enter the full path.
+CachePath=@DEFAULT_CACHE_DIR@
 
+# The path where GemRB looks for non-BAM fonts (eg. TTF)
 #CustomFontPath=
 
-#####################################################
-#  Game Data Path [String]                          #
-#                                                   #
-#  This is the subdirectory under GamePath where    #
-#  game data files are stored.                      #
-#                                                   #
-#  You probably do NOT want to specify this!        #
-#####################################################
+###### HERE BE DRAGONS ########################################################
+# You shouldn't need to change anything below this point.
+
+# If your installed game files are residing on a case sensitive filesystem
+# then you need to set this value to 1, it has no effect on Windows.
+#CaseSensitive=1
+
+###############################################################################
+#  GemRB GUI Scripts Path [String]                                            #
+#                                                                             #
+#  The path to where GemRB GUI scripts are stored; usually these are in the   #
+#  GemRBPath directory. Enter the full path to the directory containing the   #
+#  'GUIScript' subdirectory.                                                  #
+###############################################################################
+
+#GUIScriptsPath=@DATA_DIR@
+
+###############################################################################
+#  Game Data Path [String]                                                    #
+#                                                                             #
+#  The subdirectory under GamePath where game data files are stored.          #
+#  You probably do NOT want to specify this!                                  #
+###############################################################################
 
 #GameDataPath=data
 
-#####################################################
-#  GemRB Save Path [String]                         #
-#                                                   #
-#  This is the path where GemRB looks for saved     #
-#  games.                                           #
-#  Enter the full path to the directory containing  #
-#  e.g. the 'save' subdirectory.                    #
-#                                                   #
-#  You do not have to specify this if you use save  #
-#  subdir in the GamePath directory.                #
-#####################################################
+###############################################################################
+#  GemRB Save Path [String]                                                   #
+#                                                                             #
+#  The path where GemRB looks for saved games. Enter the full path to the     #
+#  directory containing eg. the 'save' subdirectory if it's not in GamePath.  #
+###############################################################################
 
 #SavePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 
-#####################################################
-#  Game Data Override Path [String]                 #
-#                                                   #
-#  This is the subdirectory under GamePath where    #
-#  game data override files are stored.             #
-#                                                   #
-#  You probably do NOT want to specify this!        #
-#####################################################
+###############################################################################
+#  Game Data Override Path [String]                                           #
+#                                                                             #
+#  The subdirectory under GamePath where game data override files are stored. #
+#  You probably do NOT want to specify this!                                  #
+###############################################################################
 
 #GameOverridePath=override
 
-#####################################################
-#  GemRB Data Override Path [String]                #
-#                                                   #
-#  This is the path where GemRB looks for the GemRB #
-#  data override directory.                         #
-#                                                   #
-#  You probably do NOT want to specify this!        #
-#####################################################
+###############################################################################
+#  GemRB Data Override Paths [String]                                         #
+#                                                                             #
+#  The path where GemRB looks for the GemRB data override directories         #
+#  You probably do NOT want to specify this!                                  #
+###############################################################################
 
 #GemRBOverridePath=@DATA_DIR@
 #GemRBUnhardcodedPath=@DATA_DIR@
 
-#####################################################
-#  Game Language Path [String]                      #
-#                                                   #
-#  This is the subdirectory under GamePath where    #
-#  the desired text localization of a               #
-#  multi-language edition (EE) resides.             #
-#                                                   #
-#  You may want to change this if you do not wish   #
-#  to use English.                                  #
-#####################################################
+###############################################################################
+#  Game Language Path [String]                                                #
+#                                                                             #
+#  The subdirectory under GamePath where the desired text localization of a   #
+#  multi-language edition (EE) resides.                                       #
+#  You may want to change this if you do not wish to use English.             #
+###############################################################################
 
 #GameLanguagePath=lang/en_US
 
-#####################################################
-#  GemRB Movies Path [String]                       #
-#                                                   #
-#  This is the path where GemRB looks for the       #
-#  game's movies (EE).                              #
-#                                                   #
-#  You probably do NOT want to specify this!        #
-#####################################################
+###############################################################################
+#  GemRB Movies Path [String]                                                 #
+#                                                                             #
+#  This is the path where GemRB looks for the game's movies (EE).             #
+#  You probably do NOT want to specify this!                                  #
+###############################################################################
 
 #GameMoviesPath=movies
-
-#####################################################
-#  END                                              #
-#####################################################
