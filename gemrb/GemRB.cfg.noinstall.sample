@@ -2,28 +2,27 @@
 #                                                   #
 #  This is the GemRB Configuration file.            #
 #  Here are defined some default parameters for     #
-#  basic configuration and paths definition.        #
-#                                                   #
-#  Parameters are defined as a Name=Value pair      #
-#  The Value can be of three types:                 #
-#      - String                                     #
-#      - Integer                                    #
-#      - Boolean                                    #
-#                                                   #
-#  The String value is represented as follows       #
-#  i.e. H:\GemRB\plugins                            #
-#  Integers are defined as follows                  #
-#  i.e. 12723                                       #
-#  Booleans are represented as 1 or 0 in this file  #
+#  basic configuration and path definitions.        #
 #                                                   #
 #  Lines starting with # are ignored                #
 #                                                   #
 #####################################################
 
 #####################################################
+#  Game Paths [String]                              #
 #                                                   #
-#  Game Type [String] Use one of the following      #
-#  values:                                          #
+#  These are the paths where the Game you want to   #
+#  play is installed.                               #
+#  Enter the full path to the directory.            #
+#                                                   #
+#  Remember, EE versions are not supported!         #
+#####################################################
+
+GamePath=../gemrb/tests/minimal
+
+#####################################################
+#                                                   #
+#  Game Type [String] Use one of the following:     #
 #                                                   #
 #  auto      Attempt to autodetect game type        #
 #                                                   #
@@ -44,15 +43,6 @@
 GameType=test
 
 #####################################################
-#  Game Name [String] Title for GemRB window, use   #
-#  anything you wish, e.g. Baldur's Gate 3: RotFL   #
-#                                                   #
-#  Defaults to GemRB: <actual game name>            #
-#####################################################
-
-# GameName=Baldur's Gate 2
-
-#####################################################
 #  Encoding [default|polish|czech|german] Language  #
 #  used by game data.                               #
 #####################################################
@@ -62,7 +52,7 @@ GameType=test
 #####################################################
 #  Video Parameters                                 #
 #####################################################
-#Resolutions supported by the original games (gemrb) are:
+#Resolutions supported by the original games are:
 # * 640x480 (except in iwd2)
 # * 800x600 (bg2, iwd:how, iwd2)
 # * 1024x768 (bg2, iwd:how, iwd2)
@@ -86,7 +76,6 @@ Fullscreen=0
 
 # Use sprited fog of war [Boolean]. For nostalgia. By
 # default it looks more like accelerated FoW in BG2.
-
 #SpriteFogOfWar=1
 
 #####################################################
@@ -135,6 +124,15 @@ GUIEnhancements = 15
 #Logging = 1
 
 #####################################################
+#  Game Name [String] Title for GemRB window, use   #
+#  anything you wish, e.g. Baldur's Gate 3: RotFL   #
+#                                                   #
+#  Defaults to GemRB: <actual game name>            #
+#####################################################
+
+# GameName=Baldur's Gate 2
+
+#####################################################
 #  Debug                                            #
 #####################################################
 
@@ -155,21 +153,60 @@ GUIEnhancements = 15
 #DebugMode=0
 
 #####################################################
+#  Input Parameters                                 #
+#####################################################
+
+#whether or not to use software keyboard on devices that support one
+#UseSoftKeyboard=1
+
+#Adds a gutter around the screen for scrolling
+#TouchScrollAreas=1
+
+#####################################################
+#  MouseFeedback                                    #
+#  Bitfield with reserved bits for disabling        #
+#  the mouse. Those bits cannot be set via config   #
+#                                                   #
+#  Show mouse+tooltips = 0                          #
+#  Hide mouse          = 1                          #
+#  Hide tooltips       = 2                          #
+#  Hide mouse+tooltips = 3                          #
+#####################################################
+
+# For a strictly touchscreen device we recommend
+# Changing this to 3.
+
+# default is 0
+#MouseFeedback=0
+
+# force enable touch input (in case autodetection fails or for hybrids)
+#TouchInput=1
+
+#####################################################
+#  Touch Gesture Input Parameters                   #
+#  Requires SDL 1.3 or later                        #
+#  All "NumFing" settings must be > 1 and < 5       #
+#  NumFingScroll and NumFingKboard cannot be equal  #
+#####################################################
+
+#NumFingScroll=2
+
+#NumFingKboard=3
+
+#NumFingInfo=2
+
+#Pointer speed with thumbstick
+GamepadPointerSpeed=10
+
+#Vita specific options
+VitaKeepAspectRatio=1
+
+#####################################################
 #  Paths                                            #
 #####################################################
 
-#####################################################
-#  Game Paths [String]                              #
-#                                                   #
-#  These are the paths where the Game you want to   #
-#  play is installed.                               #
-#  Enter the full path to the directory.            #
-#                                                   #
-#  Remember, EE versions are not supported!         #
-#####################################################
-
-GamePath=../gemrb/tests/minimal
 # only set these if the folders are not in your GamePath
+# really, you can ignore the warnings
 #CD1=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 #CD2=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD2/
 #CD3=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD3/
@@ -185,20 +222,6 @@ GamePath=../gemrb/tests/minimal
 #####################################################
 
 CachePath=./gemrb/Cache2/
-
-#####################################################
-#  GemRB Save Path [String]                         #
-#                                                   #
-#  This is the path where GemRB looks for saved     #
-#  games.                                           #
-#  Enter the full path to the directory containing  #
-#  e.g. the 'save' subdirectory.                    #
-#                                                   #
-#  You do not have to specify this if you use save  #
-#  subdir in the GamePath directory.                #
-#####################################################
-
-#SavePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 
 ###### HERE BE DRAGONS #############################
 # You shouldn't need to change any paths below this point.
@@ -259,6 +282,20 @@ PluginsPath=./gemrb/plugins/
 #GameDataPath=data
 
 #####################################################
+#  GemRB Save Path [String]                         #
+#                                                   #
+#  This is the path where GemRB looks for saved     #
+#  games.                                           #
+#  Enter the full path to the directory containing  #
+#  e.g. the 'save' subdirectory.                    #
+#                                                   #
+#  You do not have to specify this if you use save  #
+#  subdir in the GamePath directory.                #
+#####################################################
+
+#SavePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
+
+#####################################################
 #  Game Data Override Path [String]                 #
 #                                                   #
 #  This is the subdirectory under GamePath where    #
@@ -304,55 +341,6 @@ PluginsPath=./gemrb/plugins/
 #####################################################
 
 #GameMoviesPath=movies
-
-#####################################################
-#  Input Parameters                                 #
-#####################################################
-
-#whether or not to use software keyboard on devices that support one
-#UseSoftKeyboard=1
-
-#Adds a gutter around the screen for scrolling
-#TouchScrollAreas=1
-
-#####################################################
-#  MouseFeedback                                    #
-#  Bitfield with reserved bits for disabling        #
-#  the mouse. Those bits cannot be set via config   #
-#                                                   #
-#  Show mouse+tooltips = 0                          #
-#  Hide mouse          = 1                          #
-#  Hide tooltips       = 2                          #
-#  Hide mouse+tooltips = 3                          #
-#####################################################
-
-# For a strictly touchscreen device we recommend
-# Changing this to 3.
-
-# default is 0
-#MouseFeedback=0
-
-# force enable touch input (in case autodetection fails or for hybrids)
-#TouchInput=1
-
-#####################################################
-#  Touch Gesture Input Parameters                   #
-#  Requires SDL 1.3 or later                        #
-#  All "NumFing" settings must be > 1 and < 5       #
-#  NumFingScroll and NumFingKboard cannot be equal  #
-#####################################################
-
-#NumFingScroll=2
-
-#NumFingKboard=3
-
-#NumFingInfo=2
-
-#Pointer speed with thumbstick
-GamepadPointerSpeed=10
-
-#Vita specific options
-VitaKeepAspectRatio=1
 
 #####################################################
 #  END                                              #
