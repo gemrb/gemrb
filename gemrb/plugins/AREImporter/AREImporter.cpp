@@ -1780,15 +1780,14 @@ int AREImporter::GetStoredFileSize(Map *map)
 
 int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 {
-	char Signature[9];
+	ResRef signature = "AREAV1.0";
 	int pst = core->HasFeature( GFFlags::AUTOMAP_INI );
 
-	strlcpy(Signature, "AREAV1.0", 9);
 	if (map->version==16) {
-		Signature[5]='9';
-		Signature[7]='1';
+		signature[5] = '9';
+		signature[7] = '1';
 	}
-	stream->Write( Signature, 8);
+	stream->WriteResRef(signature);
 	stream->WriteResRef( map->WEDResRef);
 	uint32_t time = core->GetGame()->GameTime;
 	stream->WriteDword(time); //lastsaved

@@ -92,9 +92,7 @@ int SAVImporter::CreateArchive(DataStream *compressed)
 		return GEM_ERROR;
 	}
 
-	char Signature[9];
-	strlcpy(Signature, "SAV V1.0", 9);
-	compressed->Write(Signature, 8);
+	compressed->Write("SAV V1.0", 8);
 
 	return GEM_OK;
 }
