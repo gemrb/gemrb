@@ -341,7 +341,7 @@ CoreSettings LoadFromArgs(int argc, char *argv[])
 	return LoadFromDictionary(std::move(settings));
 }
 
-InterfaceConfig LoadFromCFG(const char* file)
+InterfaceConfig LoadFromCFG(const path_t& file)
 {
 	FileStream cfgStream;
 	if (!cfgStream.Open(file)) {

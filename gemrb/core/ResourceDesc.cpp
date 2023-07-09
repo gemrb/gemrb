@@ -22,12 +22,12 @@
 
 namespace GemRB {
 
-ResourceDesc::ResourceDesc(const TypeID* type, CreateFunc create, const char *ext, ieWord keyType)
+ResourceDesc::ResourceDesc(const TypeID* type, CreateFunc create, const path_t& ext, ieWord keyType)
 	: type(type), ext(ext), keyType(keyType), create(create)
 {
 }
 
-const char* ResourceDesc::GetExt() const
+const path_t& ResourceDesc::GetExt() const
 {
 	return ext;
 }

@@ -54,7 +54,7 @@ class GEM_EXPORT SaveGameAREExtractor {
 		int32_t extractARE(const ResRef& resRef);
 		bool isRunningSaveGame(const SaveGame&) const;
 		void registerLocation(const ResRef& resRef, unsigned long);
-		void registerNewLocation(const char*, unsigned long);
+		void registerNewLocation(const path_t&, unsigned long);
 		void updateSaveGame(size_t offset);
 };
 

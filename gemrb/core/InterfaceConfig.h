@@ -112,7 +112,7 @@ using InterfaceConfig = std::unordered_map<std::string, std::string>;
 
 GEM_EXPORT CoreSettings LoadFromArgs(int argc, char *argv[]);
 GEM_EXPORT CoreSettings LoadFromDictionary(InterfaceConfig);
-GEM_EXPORT InterfaceConfig LoadFromCFG(const char* file);
+GEM_EXPORT InterfaceConfig LoadFromCFG(const path_t& file);
 
 }
 

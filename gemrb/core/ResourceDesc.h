@@ -37,7 +37,7 @@ public:
 	using CreateFunc = Resource* (*)(DataStream*);
 private:
 	const TypeID *type;
-	const char *ext;
+	path_t ext;
 	ieWord keyType; // IE Specific
 	CreateFunc create;
 public:
@@ -49,8 +49,8 @@ public:
 	 * @param[in] ext Extension used for resource files.
 	 * @param[in] keyType \iespecific Type identifier used in key/biff files.
 	 */
-	ResourceDesc(const TypeID* type, CreateFunc create, const char *ext, ieWord keyType = 0);
-	const char* GetExt() const;
+	ResourceDesc(const TypeID* type, CreateFunc create, const path_t& ext, ieWord keyType = 0);
+	const path_t& GetExt() const;
 	const TypeID* GetType() const;
 	ieWord GetKeyType() const;
 	Resource* Create(DataStream*) const;

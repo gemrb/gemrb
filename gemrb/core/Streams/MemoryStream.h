@@ -32,7 +32,7 @@ class GEM_EXPORT MemoryStream : public DataStream
 protected:
 	char *data;
 public:
-	MemoryStream(const char *name, void* data, strpos_t size);
+	MemoryStream(const path_t& name, void* data, strpos_t size);
 	~MemoryStream() override;
 	DataStream* Clone() const noexcept override;
 

@@ -58,11 +58,11 @@ public:
 	BIFImporter(const BIFImporter&) = delete;
 	~BIFImporter() override;
 	BIFImporter& operator=(const BIFImporter&) = delete;
-	int OpenArchive(const char* filename) override;
+	int OpenArchive(const path_t& filename) override;
 	DataStream* GetStream(unsigned long Resource, unsigned long Type) override;
 private:
-	static DataStream* DecompressBIF(DataStream* compressed, const char* path);
-	static DataStream* DecompressBIFC(DataStream* compressed, const char* path);
+	static DataStream* DecompressBIF(DataStream* compressed, const path_t& path);
+	static DataStream* DecompressBIFC(DataStream* compressed, const path_t& path);
 	int ReadBIF();
 };
 

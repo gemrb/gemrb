@@ -90,7 +90,7 @@ public:
 	 * @param[in] ext Extension used for resource files.
 	 * @param[in] keyType \iespecific Type identifier used in key/biff files.
 	 */
-	void RegisterResource(const TypeID* type, ResourceFunc create, const char *ext, ieWord keyType = 0);
+	void RegisterResource(const TypeID* type, ResourceFunc create, const path_t& ext, ieWord keyType = 0);
 
 	const std::vector<ResourceDesc>& GetResourceDesc(const TypeID*);
 
