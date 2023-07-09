@@ -1,6 +1,5 @@
 #include "BMPWriter.h"
 
-#include "Interface.h"
 #include "Video/Video.h"
 
 #include <cstring>

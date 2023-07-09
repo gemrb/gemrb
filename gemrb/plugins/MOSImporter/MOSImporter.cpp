@@ -20,7 +20,8 @@
 
 #include "MOSImporter.h"
 
-#include "Interface.h"
+#include "GameData.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
 

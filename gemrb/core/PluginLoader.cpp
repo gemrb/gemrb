@@ -18,7 +18,7 @@
 
 #include "PluginLoader.h"
 
-#include "Interface.h"
+#include "InterfaceConfig.h"
 #include "Logging/Logging.h"
 #include "Platform.h"
 #include "PluginMgr.h"

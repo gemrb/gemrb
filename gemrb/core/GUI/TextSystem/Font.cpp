@@ -22,7 +22,6 @@
 
 #include "Debug.h"
 #include "GameData.h"
-#include "Interface.h"
 #include "Logging/Logging.h"
 #include "Palette.h"
 

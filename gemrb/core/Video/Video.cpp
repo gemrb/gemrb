@@ -20,7 +20,6 @@
 
 #include "Video.h"
 
-#include "Interface.h"
 #include "Palette.h"
 #include "Sprite2D.h"
 

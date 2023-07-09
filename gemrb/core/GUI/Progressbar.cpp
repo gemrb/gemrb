@@ -20,8 +20,6 @@
 
 #include "GUI/Progressbar.h"
 
-#include "Interface.h"
-
 #include "GUI/Window.h"
 
 #include <cstring>

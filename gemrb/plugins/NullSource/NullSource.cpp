@@ -20,7 +20,6 @@
 
 #include "globals.h"
 
-#include "Interface.h"
 #include "ResourceDesc.h"
 #include "Streams/FileStream.h"
 
