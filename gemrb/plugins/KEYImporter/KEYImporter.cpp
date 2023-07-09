@@ -215,10 +215,8 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 
 	DataStream* ret = ai->GetStream( ResLocator, type );
 	if (ret) {
-		auto it = StringToLower(resname.begin(), resname.end(), ret->filename);
-		*it = '\0';
-		strcat( ret->filename, "." );
-		strcat(ret->filename, core->TypeExt(type).c_str());
+		ret->filename.Format("{}.{}", resname, core->TypeExt(type));
+		StringToLower(ret->filename);
 		return ret;
 	}
 

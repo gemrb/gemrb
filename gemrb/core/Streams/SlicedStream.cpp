@@ -36,7 +36,7 @@ SlicedStream::SlicedStream(const DataStream* cfs, strpos_t startPos, strpos_t st
 	size = streamSize;
 	startpos = startPos;
 	originalfile = cfs->originalfile;
-	strlcpy(filename, cfs->filename, sizeof(filename));
+	filename = cfs->filename;
 	str->Seek(startpos, GEM_STREAM_START);
 }
 

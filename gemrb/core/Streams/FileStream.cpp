@@ -76,8 +76,7 @@ bool FileStream::Open(const path_t& fname)
 	created = false;
 	FindLength();
 	originalfile = fname;
-	path_t name = ExtractFileFromPath(fname);
-	strlcpy(filename, name.c_str(), sizeof(filename));
+	filename = ExtractFileFromPath(fname);
 	return true;
 }
 
@@ -92,8 +91,7 @@ bool FileStream::Modify(const path_t& fname)
 	created = true;
 	FindLength();
 	originalfile = fname;
-	path_t name = ExtractFileFromPath(fname);
-	strlcpy(filename, name.c_str(), sizeof(filename));
+	filename = ExtractFileFromPath(fname);
 	Pos = 0;
 	return true;
 }
@@ -117,8 +115,7 @@ bool FileStream::Create(const path_t& path)
 	Close();
 
 	originalfile = path;
-	path_t name = ExtractFileFromPath(path);
-	strlcpy(filename, name.c_str(), sizeof(filename));
+	filename = ExtractFileFromPath(path);
 
 	if (!str.OpenNew(originalfile)) {
 		return false;

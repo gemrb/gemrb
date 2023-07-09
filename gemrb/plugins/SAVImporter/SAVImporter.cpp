@@ -101,10 +101,10 @@ int SAVImporter::CreateArchive(DataStream *compressed)
 
 int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 {
-	size_t fnlen = strlen(uncompressed->filename)+1;
+	size_t fnlen = uncompressed->filename.length() + 1;
 	strpos_t declen = uncompressed->Size();
 	str->WriteScalar<size_t, ieDword>(fnlen);
-	str->Write( uncompressed->filename, fnlen);
+	str->Write(uncompressed->filename.begin(), fnlen);
 	str->WriteScalar<strpos_t, ieDword>(declen);
 	//baaah, we dump output right in the stream, we get the compressed length
 	//only after the compressed data was written
