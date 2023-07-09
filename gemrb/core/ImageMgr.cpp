@@ -21,7 +21,6 @@
 #include "ImageMgr.h"
 
 #include "ImageFactory.h"
-#include "Interface.h"
 
 namespace GemRB {
 

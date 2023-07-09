@@ -24,7 +24,6 @@
 #include "globals.h"
 
 #include "ImageFactory.h"
-#include "Interface.h"
 #include "Video/Video.h"
 
 // CHECKME: how should we include png.h ? (And how should we check for it?)

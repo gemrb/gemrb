@@ -22,7 +22,6 @@
 
 #include "GameData.h"
 #include "ImageMgr.h"
-#include "Interface.h"
 #include "Logging/Logging.h"
 
 using namespace GemRB;

@@ -21,7 +21,6 @@
 
 #include <cstdio>
 
-#include "Interface.h"
 #include "plugindef.h"
 
 namespace GemRB {

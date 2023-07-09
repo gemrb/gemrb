@@ -20,8 +20,6 @@
 
 #include "ImageFactory.h"
 
-#include "Interface.h"
-
 #include <utility>
 
 namespace GemRB {

@@ -22,7 +22,7 @@
 #include "BAMImporter.h"
 
 #include "GameData.h"
-#include "Interface.h"
+#include "ImageMgr.h"
 #include "Palette.h"
 #include "PluginMgr.h"
 #include "Video/Video.h"

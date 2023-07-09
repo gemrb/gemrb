@@ -19,7 +19,7 @@
 
 #include "Polygon.h"
 
-#include "Interface.h"
+#include "Geometry.h"
 
 #include <algorithm>
 #include <cstring>

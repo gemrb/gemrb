@@ -21,7 +21,6 @@
 #include "PROImporter.h"
 
 #include "EffectMgr.h"
-#include "Interface.h"
 
 using namespace GemRB;
 
