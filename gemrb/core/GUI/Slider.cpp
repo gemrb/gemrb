@@ -43,11 +43,11 @@ void Slider::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
-			core->GetVideoDriver()->BlitSprite(Knob, p);
+			VideoDriver->BlitSprite(Knob, p);
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
-			core->GetVideoDriver()->BlitSprite(GrabbedKnob, p);
+			VideoDriver->BlitSprite(GrabbedKnob, p);
 			break;
 	}
 }

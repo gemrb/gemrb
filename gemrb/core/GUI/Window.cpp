@@ -149,10 +149,8 @@ void Window::FlagsChanged(unsigned int oldflags)
 
 void Window::RecreateBuffer()
 {
-	Video* video = core->GetVideoDriver();
-
 	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::BufferFormat::DISPLAY_ALPHA : Video::BufferFormat::DISPLAY;
-	backBuffer = video->CreateBuffer(frame, fmt);
+	backBuffer = VideoDriver->CreateBuffer(frame, fmt);
 
 	// the entire window must be invalidated, because the new buffer is blank
 	// TODO: we *could* optimize this to instead blit the old buffer to the new one
@@ -163,40 +161,39 @@ const VideoBufferPtr& Window::DrawWithoutComposition()
 {
 	View::Draw();
 
-	core->GetVideoDriver()->PopDrawingBuffer();
+	VideoDriver->PopDrawingBuffer();
 	return backBuffer;
 }
 
 void Window::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	backBuffer->SetOrigin(frame.origin);
-	core->GetVideoDriver()->PushDrawingBuffer(backBuffer);
+	VideoDriver->PushDrawingBuffer(backBuffer);
 }
 
 void Window::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (!InDebugMode(DebugMode::WINDOWS)) return;
 
-	Video* video = core->GetVideoDriver();
-	video->SetScreenClip(nullptr);
+	VideoDriver->SetScreenClip(nullptr);
 	
 	auto lock = manager.DrawHUD();
 
 	if (focusView) {
 		Region r = focusView->ConvertRegionToScreen(Region(Point(), focusView->Dimensions()));
-		video->DrawRect(r, ColorWhite, false);
+		VideoDriver->DrawRect(r, ColorWhite, false);
 	}
 	
 	if (hoverView) {
 		Region r = hoverView->ConvertRegionToScreen(Region(Point(), hoverView->Dimensions()));
 		r.ExpandAllSides(-5);
-		video->DrawRect(r, ColorBlue, false);
+		VideoDriver->DrawRect(r, ColorBlue, false);
 	}
 	
 	if (trackingView) {
 		Region r = trackingView->ConvertRegionToScreen(Region(Point(), trackingView->Dimensions()));
 		r.ExpandAllSides(-10);
-		video->DrawRect(r, ColorRed, false);
+		VideoDriver->DrawRect(r, ColorRed, false);
 	}
 }
 

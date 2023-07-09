@@ -57,7 +57,6 @@ void MapControl::UpdateMap()
 // Draw fog on the small bitmap
 void MapControl::DrawFog(const Region& rgn) const
 {
-	Video *video = core->GetVideoDriver();
 	const Size mapsize = MyMap->GetSize();
 	Point p;
 	Point gameP = p;
@@ -78,7 +77,7 @@ void MapControl::DrawFog(const Region& rgn) const
 		}
 	}
 
-	video->DrawPoints(points, ColorBlack);
+	VideoDriver->DrawPoints(points, ColorBlack);
 }
 	
 Point MapControl::ConvertPointToGame(Point p) const
@@ -153,22 +152,21 @@ Region MapControl::GetViewport() const
 /** Draws the Control on the Output Display */
 void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
-	Video* video = core->GetVideoDriver();
-	video->DrawRect(rgn, ColorBlack, true);
+	VideoDriver->DrawRect(rgn, ColorBlack, true);
 		
 	if (MyMap == nullptr) {
 		return;
 	}
 
 	if (MapMOS) {
-		video->BlitSprite(MapMOS, mosRgn.origin);
+		VideoDriver->BlitSprite(MapMOS, mosRgn.origin);
 	}
 
 	if ((core->GetGameControl()->DebugFlags & DEBUG_SHOW_FOG_UNEXPLORED) == 0)
 		DrawFog(mosRgn);
 
 	Region vp = GetViewport();
-	video->DrawRect(vp, ColorGreen, false );
+	VideoDriver->DrawRect(vp, ColorGreen, false );
 	
 	// Draw PCs' ellipses
 	const Game *game = core->GetGame();
@@ -179,7 +177,7 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			const Point pos = ConvertPointFromGame(actor->Pos);
 			const Size s(6, 4);
 			const Region r(pos - s.Center(), s);
-			video->DrawEllipse(r, actor->Selected ? ColorGreen : ColorGreenDark );
+			VideoDriver->DrawEllipse(r, actor->Selected ? ColorGreen : ColorGreenDark );
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
@@ -201,11 +199,11 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			Holder<Sprite2D> anim = mapFlags ? mapFlags->GetFrame(0, mn.color) : nullptr;
 			if (anim) {
 				Point p(anim->Frame.w / 2, anim->Frame.h / 2);
-				video->BlitSprite(anim, pos - p);
+				VideoDriver->BlitSprite(anim, pos - p);
 			} else {
 				const Size s(12, 10);
 				const Region r(pos - s.Center(), s);
-				video->DrawEllipse(r, mn.GetColor());
+				VideoDriver->DrawEllipse(r, mn.GetColor());
 			}
 		}
 	}

@@ -89,7 +89,6 @@ class Store;
 class SymbolMgr;
 class TableMgr;
 class TextArea;
-class Video;
 class WindowManager;
 class WorldMap;
 class WorldMapArray;
@@ -296,7 +295,6 @@ public:
 private:
 	// dirvers must be deallocated last (keep them at the top)
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
-	std::shared_ptr<Video> video;
 	std::shared_ptr<Audio> AudioDriver;
 
 	ProjectileServer* projserv = nullptr;
@@ -398,7 +396,6 @@ public:
 	bool IsAvailable(SClass_ID filetype) const;
 	path_t TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const noexcept;
-	Video * GetVideoDriver() const;
 	FogRenderer& GetFogRenderer();
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;
@@ -653,7 +650,7 @@ private:
 	/** Load the encoding table selected in gemrb.cfg */
 	bool LoadEncoding();
 	
-	void InitVideo();
+	void InitVideo() const;
 	void InitAudio();
 
 	template<int SIZE>

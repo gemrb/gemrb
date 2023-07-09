@@ -157,7 +157,6 @@ bool Particles::AddNew(const Point &point)
 
 void Particles::Draw(Point p)
 {
-	Video *video=core->GetVideoDriver();
 	const Game *game = core->GetGame();
 
 	if (owner) {
@@ -215,21 +214,21 @@ void Particles::Draw(Point p)
 				BlitFlags flags = BlitFlags::NONE;
 				if (game) game->ApplyGlobalTint(clr, flags);
 
-				video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
+				VideoDriver->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
 													points[i].pos - p, flags, clr);
 			}
 			break;
 		case SP_TYPE_CIRCLE:
-			video->DrawCircle (points[i].pos - p, 2, clr);
+			VideoDriver->DrawCircle (points[i].pos - p, 2, clr);
 			break;
 		case SP_TYPE_POINT:
 		default:
-			video->DrawPoint(points[i].pos - p, clr);
+			VideoDriver->DrawPoint(points[i].pos - p, clr);
 			break;
 		// this is more like a raindrop
 		case SP_TYPE_LINE:
 			if (length) {
-				video->DrawLine (points[i].pos - p, points[i].pos - p + Point((i&1), length), clr);
+				VideoDriver->DrawLine (points[i].pos - p, points[i].pos - p + Point((i&1), length), clr);
 			}
 			break;
 		}

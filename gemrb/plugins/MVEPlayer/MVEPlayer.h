@@ -38,7 +38,7 @@ class MVEPlay : public MoviePlayer {
 	PaletteHolder g_palette;
 
 private:
-	Video *video;
+	std::shared_ptr<Video> video;
 	bool validVideo;
 	int doPlay();
 	unsigned int fileRead(void* buf, unsigned int count);

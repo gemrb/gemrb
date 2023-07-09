@@ -88,6 +88,7 @@
 
 namespace GemRB {
 
+GEM_EXPORT std::shared_ptr<Video> VideoDriver;
 GEM_EXPORT Interface* core = NULL;
 
 struct AbilityTables {
@@ -255,7 +256,7 @@ Interface::Interface(CoreSettings&& cfg)
 	InitVideo();
 
 	// ask the driver if a touch device is in use
-	EventMgr::TouchInputEnabled = config.TouchInput < 0 ? video->TouchInputEnabled() : config.TouchInput;
+	EventMgr::TouchInputEnabled = config.TouchInput < 0 ? VideoDriver->TouchInputEnabled() : config.TouchInput;
 	EventMgr::DCDelay = config.DoubleClickDelay;
 	Control::ActionRepeatDelay = config.ActionRepeatDelay;
 	GameControl::DebugFlags = config.DebugFlags;
@@ -342,7 +343,7 @@ Interface::Interface(CoreSettings&& cfg)
 		throw std::runtime_error("The path must point to a game directory with a readable chitin.key file.");
 	}
 
-	fogRenderer = std::make_shared<FogRenderer>(video.get(), config.SpriteFoW);
+	fogRenderer = std::make_shared<FogRenderer>(config.SpriteFoW);
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	SetNextScript("Start"); // Start is the first script executed
@@ -371,7 +372,7 @@ Interface::Interface(CoreSettings&& cfg)
 	ieDword fullscreen = GetVariable("Full Screen", 0);
 
 	int createDisplayResult =
-		video->CreateDisplay(
+	VideoDriver->CreateDisplay(
 				Size(config.Width, config.Height),
 				config.Bpp,
 				fullscreen,
@@ -382,7 +383,7 @@ Interface::Interface(CoreSettings&& cfg)
 	if (createDisplayResult == GEM_ERROR) {
 		throw std::runtime_error("Cannot initialize shaders.");
 	}
-	video->SetGamma(brightness, contrast);
+	VideoDriver->SetGamma(brightness, contrast);
 	
 	// if unset, manually populate GameName (window title)
 	if (config.GameName == GEMRB_STRING) {
@@ -392,7 +393,7 @@ Interface::Interface(CoreSettings&& cfg)
 		} else {
 			config.GameName = GEMRB_STRING" running unknown game";
 		}
-		video->SetWindowTitle(config.GameName.c_str());
+		VideoDriver->SetWindowTitle(config.GameName.c_str());
 	}
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
@@ -504,7 +505,7 @@ Interface::Interface(CoreSettings&& cfg)
 	displaymsg = new DisplayMessage();
 
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	winmgr = new WindowManager(video);
+	winmgr = new WindowManager(VideoDriver);
 	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
 	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
 
@@ -953,7 +954,7 @@ void Interface::Main()
 	};
 
 	if (config.CapFPS == 0) {
-		int refreshRate = video->GetDisplayRefreshRate();
+		int refreshRate = VideoDriver->GetDisplayRefreshRate();
 		if (refreshRate > 0) {
 			SetMouseScrollSpeed(scrollSpeed(refreshRate));
 		}
@@ -1021,21 +1022,21 @@ void Interface::Main()
 				fpsstring = fmt::format(L"{:.3f} fps", frames);
 			}
 			auto lock = winmgr->DrawHUD();
-			video->DrawRect( fpsRgn, ColorBlack );
+			VideoDriver->DrawRect( fpsRgn, ColorBlack );
 			fps->Print(fpsRgn, String(fpsstring), IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, {ColorWhite, ColorBlack});
 		}
-	} while (video->SwapBuffers(config.CapFPS) == GEM_OK && !(QuitFlag&QF_KILL));
+	} while (VideoDriver->SwapBuffers(config.CapFPS) == GEM_OK && !(QuitFlag&QF_KILL));
 	QuitGame(0);
 }
 
-void Interface::InitVideo()
+void Interface::InitVideo() const
 {
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName)));
-	if (!video) {
+	VideoDriver = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName)));
+	if (!VideoDriver) {
 		throw std::runtime_error("No Video Driver Available.");
 	}
-	if (video->Init() == GEM_ERROR) {
+	if (VideoDriver->Init() == GEM_ERROR) {
 		throw std::runtime_error("Cannot Initialize Video Driver.");
 	}
 }
@@ -1172,7 +1173,7 @@ void Interface::LoadSprites()
 			for (int i = 0; i < 6; i++) {
 				Holder<Sprite2D> sprite = anim->GetFrame(0, (ieByte) i);
 				if (GroundCircleScale[size]) {
-					sprite = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
+					sprite = VideoDriver->SpriteScaleDown(sprite, GroundCircleScale[size]);
 				}
 				GroundCircles[size][i] = sprite;
 			}
@@ -1238,11 +1239,6 @@ WorldMap *Interface::GetWorldMap(const ResRef& area) const
 ProjectileServer* Interface::GetProjectileServer() const noexcept
 {
 	return projserv;
-}
-
-Video* Interface::GetVideoDriver() const
-{
-	return video.get();
 }
 
 FogRenderer& Interface::GetFogRenderer()
@@ -3120,7 +3116,7 @@ void Interface::LoadProgress(int percent)
 		if (percent == 100) prog->SetDisabled(true);
 	}
 
-	video->SwapBuffers();
+	VideoDriver->SwapBuffers();
 }
 
 void Interface::ReleaseDraggedItem()
@@ -4172,7 +4168,7 @@ void Interface::WaitForDisc(int disc_number, const path_t& path)
 			}
 		}
 
-	} while (video->SwapBuffers() == GEM_OK);
+	} while (VideoDriver->SwapBuffers() == GEM_OK);
 }
 
 Timer& Interface::SetTimer(const EventHandler& handler, tick_t interval, int repeats)

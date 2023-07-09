@@ -133,8 +133,6 @@ void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 /** Draws the Control on the Output Display */
 void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
-	Video * video = core->GetVideoDriver();
-
 	// Button image
 	if (!( flags & IE_GUI_BUTTON_NO_IMAGE )) {
 		Holder<Sprite2D> Image;
@@ -158,7 +156,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		if (Image) {
 			// FIXME: maybe it's useless...
 			Point offset((frame.w / 2) - (Image->Frame.w / 2), (frame.h / 2) - (Image->Frame.h / 2));
-			video->BlitSprite(Image, rgn.origin + offset);
+			VideoDriver->BlitSprite(Image, rgn.origin + offset);
 		}
 	}
 
@@ -188,14 +186,14 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			if (overlayHeight) {
 				// TODO: Add an option to add BlitFlags::GREY to the flags
 				const Color& col = overlayAnim.Current();
-				video->BlitGameSprite(Picture, picPos, BlitFlags::COLOR_MOD, col);
+				VideoDriver->BlitGameSprite(Picture, picPos, BlitFlags::COLOR_MOD, col);
 			}
 
 			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
-			video->BlitSprite( Picture, rb.origin, &rb );
+			VideoDriver->BlitSprite( Picture, rb.origin, &rb );
 		} else {
 			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
-			video->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r);
+			VideoDriver->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r);
 		}
 	}
 
@@ -207,9 +205,9 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, r.origin + AnimPicture->Frame.origin, &r );
+			VideoDriver->BlitSprite( AnimPicture, r.origin + AnimPicture->Frame.origin, &r );
 		} else {
-			video->BlitSprite( AnimPicture, r.origin, &r );
+			VideoDriver->BlitSprite( AnimPicture, r.origin, &r );
 		}
 	}
 
@@ -234,7 +232,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			blitFlags = BlitFlags::HALFTRANS;
 		}
 		for (; iter != PictureList.end(); ++iter) {
-			video->BlitSprite(*iter, rgn.origin + offset, nullptr, blitFlags);
+			VideoDriver->BlitSprite(*iter, rgn.origin + offset, nullptr, blitFlags);
 		}
 	}
 
@@ -302,9 +300,9 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			Region r = Region( rgn.origin + frRect.origin, frRect.size );
 			if (pulseBorder && !fr->filled) {
 				Color mix = GlobalColorCycle.Blend(ColorWhite, fr->color);
-				video->DrawRect( r, mix, fr->filled, BlitFlags::BLENDED );
+				VideoDriver->DrawRect( r, mix, fr->filled, BlitFlags::BLENDED );
 			} else {
-				video->DrawRect( r, fr->color, fr->filled, BlitFlags::BLENDED );
+				VideoDriver->DrawRect( r, fr->color, fr->filled, BlitFlags::BLENDED );
 			}
 		}
 	}
@@ -639,7 +637,7 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
 		unsigned int ratio = CeilDiv(Picture->Frame.w, frame.w);
 		if (ratio > 1) {
-			Holder<Sprite2D> img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
+			Holder<Sprite2D> img = VideoDriver->SpriteScaleDown(Picture, ratio);
 			Picture = std::move(img);
 		}
 		flags |= IE_GUI_BUTTON_PICTURE;

@@ -262,7 +262,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		// the situation is benign and nothing even looks wrong because all that this means is that there was more space allocated than was actually needed
 		if (InDebugMode(DebugMode::TEXT)) {
 			assert(charsPrinted < text.length());
-			core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
+			VideoDriver->DrawRect(drawRect, ColorRed, true);
 		}
 		// FIXME: layout assumes left alignment, so alignment is mostly broken
 		// we only use it for TextEdit tho which is single line and therefore works as long as the text ends in a newline
@@ -273,7 +273,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		}
 
 		if (InDebugMode(DebugMode::TEXT)) {
-			core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
+			VideoDriver->DrawRect(drawRect, ColorWhite, false);
 		}
 	}
 }
@@ -290,7 +290,7 @@ void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& of
 	Region r = rgns.front()->region;
 	r.x += offset.x;
 	r.y += offset.y;
-	core->GetVideoDriver()->BlitSprite(image, r.origin, &r);
+	VideoDriver->BlitSprite(image, r.origin, &r);
 }
 
 ContentContainer::ContentContainer(const Region& frame)
@@ -337,27 +337,26 @@ void ContentContainer::WillDraw(const Region& drawFrame, const Region& clip)
 	sc.y += margin.top;
 	sc.h -= margin.top + margin.bottom;
 
-	core->GetVideoDriver()->SetScreenClip(&sc);
+	VideoDriver->SetScreenClip(&sc);
 }
 
 void ContentContainer::DidDraw(const Region& /*drawFrame*/, const Region& clip)
 {
-	core->GetVideoDriver()->SetScreenClip(&clip);
+	VideoDriver->SetScreenClip(&clip);
 }
 
 void ContentContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 {
-	Video* video = core->GetVideoDriver();
 	if (InDebugMode(DebugMode::TEXT)) {
 		Region r = clip;
-		video->DrawRect(r, ColorYellow, true);
+		VideoDriver->DrawRect(r, ColorYellow, true);
 		
 		r.x += margin.left;
 		r.y += margin.top;
 		r.w -= margin.left + margin.right;
 		r.h -= margin.bottom + margin.top;
 		
-		video->DrawRect(r, ColorGreen, true);
+		VideoDriver->DrawRect(r, ColorGreen, true);
 	}
 
 	// layout shouldn't be empty unless there is no content anyway...
@@ -755,7 +754,7 @@ void TextContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 	if (layout.empty() && Editable()) {
 		Holder<Sprite2D> cursor = core->GetCursorSprite();
 		Point p(drawFrame.x + margin.left, drawFrame.y + margin.top + cursor->Frame.y);
-		core->GetVideoDriver()->BlitSprite(cursor, p);
+		VideoDriver->BlitSprite(cursor, p);
 	}
 }
 
@@ -796,7 +795,7 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 
 		Holder<Sprite2D> cursor = core->GetCursorSprite();
 		dp.y += cursor->Frame.y;
-		core->GetVideoDriver()->BlitSprite(cursor, cursorPoint + dp);
+		VideoDriver->BlitSprite(cursor, cursorPoint + dp);
 	}
 	printPos += textLength;
 }
@@ -857,12 +856,12 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 
 void TextContainer::DidFocus()
 {
-	core->GetVideoDriver()->StartTextInput();
+	VideoDriver->StartTextInput();
 }
 
 void TextContainer::DidUnFocus()
 {
-	core->GetVideoDriver()->StopTextInput();
+	VideoDriver->StopTextInput();
 }
 
 bool TextContainer::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
@@ -885,7 +884,7 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 	if (Editable() == false)
 		return false;
 
-	core->GetVideoDriver()->StartTextInput();
+	VideoDriver->StartTextInput();
 
 	switch (key.keycode) {
 		case GEM_HOME:
@@ -961,7 +960,7 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 void TextContainer::OnTextInput(const TextEvent& te)
 {
 	InsertText(te.text);
-	core->GetVideoDriver()->StartTextInput();
+	VideoDriver->StartTextInput();
 }
 
 // move cursor to beginning of text

@@ -259,7 +259,7 @@ TextArea::~TextArea()
 void TextArea::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 {
 	if (speakerPic) {
-		core->GetVideoDriver()->BlitSprite(speakerPic, drawFrame.origin);
+		VideoDriver->BlitSprite(speakerPic, drawFrame.origin);
 	}
 }
 

@@ -39,7 +39,7 @@ static const int MVE_SIGNATURE_LEN = 19;
 MVEPlay::MVEPlay() noexcept
 : decoder(this)
 {
-	video = core->GetVideoDriver();
+	video = VideoDriver;
 	validVideo = false;
 	vidBuf = NULL;
 	g_palette = MakeHolder<Palette>();

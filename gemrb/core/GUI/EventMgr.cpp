@@ -147,8 +147,6 @@ void EventMgr::DispatchEvent(Event&& e) const
 		return;
 	}
 
-	Video* video = core->GetVideoDriver();
-
 	e.time = GetMilliseconds();
 
 	if (e.type == Event::TextInput) {
@@ -210,9 +208,9 @@ void EventMgr::DispatchEvent(Event&& e) const
 			EventButton btn = (e.type == Event::MouseDown) ? e.mouse.button : 0;
 
 			if (e.type == Event::MouseDown || e.type == Event::TouchDown) {
-				core->GetVideoDriver()->CaptureMouse(true);
-				if (video->InTextInput())
-					video->StopTextInput();
+				VideoDriver->CaptureMouse(true);
+				if (VideoDriver->InTextInput())
+					VideoDriver->StopTextInput();
 
 				if (btn == repeatButton
 					&& e.time <= lastMouseDown + DCDelay
@@ -226,7 +224,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 				repeatButton = btn;
 				lastMouseDown = GetMilliseconds();
 			} else if (e.type == Event::MouseUp && e.mouse.buttonStates == 0) {
-				core->GetVideoDriver()->CaptureMouse(false);
+				VideoDriver->CaptureMouse(false);
 			}
 
 			se.repeats = repeatCount;
@@ -266,8 +264,8 @@ void EventMgr::DispatchEvent(Event&& e) const
 			}
 		}
 	} else {
-		if (video->InTextInput())
-			video->StopTextInput();
+		if (VideoDriver->InTextInput())
+			VideoDriver->StopTextInput();
 	}
 
 	// no hot keys or their listeners refused the event...

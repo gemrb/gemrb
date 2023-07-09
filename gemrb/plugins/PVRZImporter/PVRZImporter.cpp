@@ -293,7 +293,7 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT1(Region&& region) const {
 		}
 	}
 
-	auto spr = core->GetVideoDriver()->CreateSprite(Region{0, 0, region.w, region.h}, uncompressedData, fmt);
+	auto spr = VideoDriver->CreateSprite(Region{0, 0, region.w, region.h}, uncompressedData, fmt);
 	return {spr};
 }
 
@@ -379,7 +379,7 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT5(Region&& region) const {
 		}
 	}
 
-	auto spr = core->GetVideoDriver()->CreateSprite(Region{0, 0, region.w, region.h}, uncompressedData, fmt);
+	auto spr = VideoDriver->CreateSprite(Region{0, 0, region.w, region.h}, uncompressedData, fmt);
 	return {spr};
 }
 

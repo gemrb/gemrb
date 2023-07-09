@@ -1885,13 +1885,12 @@ void Projectile::Cleanup()
 
 void Projectile::Draw(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color overrideTint) const
 {
-	Video *video = core->GetVideoDriver();
 	PaletteHolder pal = (spr->Format().Bpp == 1) ? palette : nullptr;
 	if (flags & BlitFlags::COLOR_MOD) {
 		// FIXME: this may not apply universally
 		flags |= BlitFlags::ALPHA_MOD;
 	}
-	video->BlitGameSpriteWithPalette(spr, pal, p, flags | BlitFlags::BLENDED, overrideTint);
+	VideoDriver->BlitGameSpriteWithPalette(spr, pal, p, flags | BlitFlags::BLENDED, overrideTint);
 }
 
 // all but a few dragons get 0,0 offset

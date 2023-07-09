@@ -147,7 +147,6 @@ BAMImporter::index_t BAMImporter::GetCycleSize(index_t cycle)
 Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool RLESprite, uint8_t* data)
 {
 	Holder<Sprite2D> spr;
-	Video* video = core->GetVideoDriver();
 	const Region& rgn = frameInfo.bounds;
 	uint8_t* dataBegin = data + frameInfo.location.dataOffset;
 
@@ -158,7 +157,7 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 		if (dataLen == 0) return nullptr;
 		void* pixels = malloc(dataLen);
 		memcpy(pixels, dataBegin, dataLen);
-		spr = video->CreateSprite(rgn, pixels, fmt);
+		spr = VideoDriver->CreateSprite(rgn, pixels, fmt);
 	} else {
 		void* pixels = nullptr;
 		if (frameInfo.RLE) {
@@ -168,7 +167,7 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 			memcpy(pixels, dataBegin, rgn.w * rgn.h);
 		}
 		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
-		spr = video->CreateSprite(rgn, pixels, fmt);
+		spr = VideoDriver->CreateSprite(rgn, pixels, fmt);
 	}
 
 	return spr;
@@ -196,7 +195,7 @@ Holder<Sprite2D> BAMImporter::GetV2Frame(const FrameEntry& frame) {
 	}
 
 	PixelFormat fmt = PixelFormat::ARGB32Bit();
-	return {core->GetVideoDriver()->CreateSprite(frame.bounds, frameData, fmt)};
+	return {VideoDriver->CreateSprite(frame.bounds, frameData, fmt)};
 }
 
 void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock, uint8_t *frameData) {
@@ -291,7 +290,7 @@ Holder<Sprite2D> BAMImporter::GetPalette()
 		*p++ = ( unsigned char ) i;
 	}
 	PixelFormat fmt = PixelFormat::Paletted8Bit(palette);
-	return core->GetVideoDriver()->CreateSprite(Region(0,0,16,16), pixels, fmt);
+	return VideoDriver->CreateSprite(Region(0,0,16,16), pixels, fmt);
 }
 
 #include "BAMFontManager.h"

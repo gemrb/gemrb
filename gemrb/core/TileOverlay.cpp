@@ -51,7 +51,6 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr> &over
 	}
 	const Color tintcol = globalTint ? * globalTint : Color();
 
-	Video* vid = core->GetVideoDriver();
 	for (int y = sy; y < dy && y < size.h; y++) {
 		for (int x = sx; x < dx && x < size.w; x++) {
 			const Tile &tile = tiles[(y * size.w) + x];
@@ -62,7 +61,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr> &over
 
 			// this is the base terrain tile
 			Point p = Point(x * 64, y * 64) - viewport.origin;
-			vid->BlitGameSprite(anim->NextFrame(), p, flags, tintcol);
+			VideoDriver->BlitGameSprite(anim->NextFrame(), p, flags, tintcol);
 
 			if (!tile.om || tile.tileIndex) {
 				continue;
@@ -77,18 +76,18 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr> &over
 						//draw overlay tiles, they should be half transparent except for BG1
 						BlitFlags transFlag = (core->HasFeature(GFFlags::LAYERED_WATER_TILES)) ? BlitFlags::HALFTRANS : BlitFlags::NONE;
 						// this is the water (or whatever)
-						vid->BlitGameSprite(ovtile.GetAnimation(0)->NextFrame(), p, flags | transFlag, tintcol);
+						VideoDriver->BlitGameSprite(ovtile.GetAnimation(0)->NextFrame(), p, flags | transFlag, tintcol);
 
 						if (core->HasFeature(GFFlags::LAYERED_WATER_TILES)) {
 							Animation* anim1 = tile.GetAnimation(1);
 							if (anim1) {
 								// this is the mask to blend the terrain tile with the water for everything but BG1
-								vid->BlitGameSprite(anim1->NextFrame(), p,
+								VideoDriver->BlitGameSprite(anim1->NextFrame(), p,
 													flags | BlitFlags::BLENDED, tintcol);
 							}
 						} else {
 							// in BG 1 this is the mask to blend the terrain tile with the water
-							vid->BlitGameSprite(tile.GetAnimation(0)->NextFrame(), p,
+							VideoDriver->BlitGameSprite(tile.GetAnimation(0)->NextFrame(), p,
 												flags | BlitFlags::BLENDED, tintcol);
 						}
 					}

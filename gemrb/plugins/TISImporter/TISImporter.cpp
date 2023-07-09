@@ -116,7 +116,7 @@ Holder<Sprite2D> TISImporter::GetTilePVR(int index)
 	PixelFormat fmt = PixelFormat::ARGB32Bit();
 	Region region{0, 0, static_cast<int>(TileSize), static_cast<int>(TileSize)};
 
-	return {core->GetVideoDriver()->CreateSprite(region, imageData, fmt)};
+	return {VideoDriver->CreateSprite(region, imageData, fmt)};
 }
 
 void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
@@ -166,7 +166,7 @@ Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 			// we only want to generate a single bad tile on demand
 			PaletteHolder pal = MakeHolder<Palette>();
 			PixelFormat fmt = PixelFormat::Paletted8Bit(std::move(pal));
-			badTile = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+			badTile = VideoDriver->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 		}
 		
 		// try to only report error once per file
@@ -202,7 +202,7 @@ Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 	fmt.ColorKey = ck;
 	fmt.HasColorKey = pal->col[ck] == ColorGreen;
 
-	auto spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+	auto spr = VideoDriver->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 	uint8_t* pixels = static_cast<uint8_t*>(spr->LockSprite());
 	str->Read(pixels, 4096);
 	

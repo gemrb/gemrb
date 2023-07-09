@@ -22,8 +22,8 @@
 #include "GUI/ScrollBar.h"
 
 #include "GUIScriptInterface.h"
-#include "Interface.h"
 #include "Logging/Logging.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -95,13 +95,12 @@ void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region
 	if (intersect.size.IsInvalid()) return; // outside the window/screen
 	
 	// clip drawing to the ContentRegion, then restore after drawing
-	Video* video = core->GetVideoDriver();
-	video->SetScreenClip(&intersect);
+	VideoDriver->SetScreenClip(&intersect);
 }
 
 void ScrollView::ContentView::DidDraw(const Region& /*drawFrame*/, const Region& clip)
 {
-	core->GetVideoDriver()->SetScreenClip(&clip);
+	VideoDriver->SetScreenClip(&clip);
 }
 
 ScrollView::ScrollView(const Region& frame)

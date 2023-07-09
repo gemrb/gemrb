@@ -171,14 +171,14 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 		PaletteHolder pal = MakeHolder<Palette>();
 		int ck = GetPalette(256, pal->col);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, (ck >= 0), ck);
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), buffer, fmt);
+		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), buffer, fmt);
 	} else {
 		constexpr ieDword blue_mask = 0x00ff0000;
 		constexpr ieDword green_mask = 0x0000ff00;
 		constexpr ieDword red_mask = 0x000000ff;
 		constexpr ieDword alpha_mask = 0xff000000;
 		static const PixelFormat fmt(4, red_mask, green_mask, blue_mask, alpha_mask);
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h),
+		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h),
 												   buffer, fmt);
 	}
 
