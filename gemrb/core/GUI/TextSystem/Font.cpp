@@ -20,6 +20,7 @@
 
 #include "Font.h"
 
+#include "Debug.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
@@ -295,7 +296,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 			int vGrow = (numLines * LineHeight);
 			rgn.h += vGrow;
 
-			if (core->InDebugMode(ID_FONTS)) {
+			if (InDebugMode(DebugMode::FONTS)) {
 				Log(MESSAGE, "Font", "Resizing canvas from {}x{} to {}x{}",
 					rgn.w, rgn.h - vGrow, rgn.w, rgn.h);
 			}
@@ -335,7 +336,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 							// we have to rewind, word by word, until X >= 0
 							linePos = line.find_last_of(L' ', prevPos);
 							if (linePos == String::npos) {
-								if (core->InDebugMode(ID_FONTS)) {
+								if (InDebugMode(DebugMode::FONTS)) {
 									Log(MESSAGE, "Font", "Horizontal alignment invalidated for '{}' due to insufficient width {}", fmt::WideToChar{line}, lineSize.w);
 								}
 								linePoint.x = 0;
@@ -351,7 +352,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 						linePoint.x /= 2;
 					}
 				}
-				if (core->InDebugMode(ID_FONTS)) {
+				if (InDebugMode(DebugMode::FONTS)) {
 					core->GetVideoDriver()->DrawRect(lineRgn, ColorGreen, false);
 					core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.origin,
 												 Size(lineSize.w, LineHeight)), ColorWhite, false);
@@ -463,7 +464,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			Point blitPoint = dp + lineRgn.origin + curGlyph.pos;
 			// use intersection because some rare glyphs can sometimes overlap lines
 			if (!lineRgn.IntersectsRegion(Region(blitPoint, curGlyph.size))) {
-				if (core->InDebugMode(ID_FONTS)) {
+				if (InDebugMode(DebugMode::FONTS)) {
 					core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
 				}
 				assert(metrics.forceBreak == false || dp.x > 0);
@@ -727,7 +728,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		metrics->numChars = charCount;
 		metrics->size = Size(w, (LineHeight * lines));
 		metrics->numLines = lines;
-		if (core->InDebugMode(ID_FONTS)) {
+		if (InDebugMode(DebugMode::FONTS)) {
 			assert(metrics->numChars <= string.length());
 			assert(w <= stop->w);
 		}

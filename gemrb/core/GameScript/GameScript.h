@@ -23,7 +23,7 @@
 
 #include "exports.h"
 
-#include "Interface.h"
+#include "Debug.h"
 #include "SymbolMgr.h"
 #include "Scriptable/Actor.h"
 #include "Streams/DataStream.h"
@@ -527,9 +527,9 @@ struct IDSLink {
 #define AI_SCRIPT_LEVEL 4             //the script level of special ai scripts
 
 template<typename... ARGS>
-extern void ScriptDebugLog(int bit, const char* message, ARGS&&... args)
+extern void ScriptDebugLog(DebugMode bit, const char* message, ARGS&&... args)
 {
-	if (!core->InDebugMode(bit)) return;
+	if (!InDebugMode(bit)) return;
 
 	Log(DEBUG, "GameScript", message, std::forward<ARGS>(args)...);
 }

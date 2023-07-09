@@ -18,6 +18,7 @@
 
 #include "WindowManager.h"
 
+#include "Debug.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "ImageMgr.h"
@@ -646,7 +647,7 @@ void WindowManager::DrawWindows() const
 		DrawWindowFrame(frame_flags);
 	}
 	
-	if (core->InDebugMode(ID_WINDOWS)) {
+	if (InDebugMode(DebugMode::WINDOWS)) {
 		// ensure this is drawing over the window frames
 		if (trackingWin) {
 			Region r = trackingWin->Frame();

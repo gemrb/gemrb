@@ -19,6 +19,7 @@
 
 #include "View.h"
 
+#include "Debug.h"
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/TextSystem/Font.h"
@@ -131,7 +132,7 @@ bool View::IsVisible() const
 
 bool View::IsDisabledCursor() const
 {
-	if (core->InDebugMode(ID_VIEWS)) {
+	if (InDebugMode(DebugMode::VIEWS)) {
 		return IsDisabled();
 	}
 	return false;
@@ -256,7 +257,7 @@ void View::Draw()
 	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
 	dirty = false;
 
-	if (core->InDebugMode(ID_VIEWS)) {
+	if (InDebugMode(DebugMode::VIEWS)) {
 		const Window* win = GetWindow();
 		if (win == nullptr) {
 			video->DrawRect(drawFrame, ColorBlue, false);
@@ -699,7 +700,7 @@ void View::TextInput(const TextEvent& te)
 
 void View::MouseEnter(const MouseEvent& me, const DragOp* op)
 {
-	if (core->InDebugMode(ID_VIEWS)) {
+	if (InDebugMode(DebugMode::VIEWS)) {
 		debuginfo = true;
 	}
 
@@ -708,7 +709,7 @@ void View::MouseEnter(const MouseEvent& me, const DragOp* op)
 
 void View::MouseLeave(const MouseEvent& me, const DragOp* op)
 {
-	if (core->InDebugMode(ID_VIEWS)) {
+	if (InDebugMode(DebugMode::VIEWS)) {
 		debuginfo = false;
 		MarkDirty();
 	}

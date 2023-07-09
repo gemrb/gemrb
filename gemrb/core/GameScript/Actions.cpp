@@ -3722,7 +3722,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->SetDebugMode(parameters->int0Parameter);
+	SetDebugMode(DebugMode(parameters->int0Parameter));
 	Log(WARNING, "GameScript", "DEBUG: {}", parameters->string0Parameter);
 }
 
@@ -6088,7 +6088,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 /*EscapeAreaMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 {
-	ScriptDebugLog(ID_ACTIONS, "EscapeArea/EscapeAreaMove");
+	ScriptDebugLog(DebugMode::ACTIONS, "EscapeArea/EscapeAreaMove");
 
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -6115,7 +6115,7 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 
 void GameScript::EscapeAreaNoSee(Scriptable* Sender, Action* parameters)
 {
-	ScriptDebugLog(ID_ACTIONS, "EscapeAreaNoSee");
+	ScriptDebugLog(DebugMode::ACTIONS, "EscapeAreaNoSee");
 
 	if (Sender->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();

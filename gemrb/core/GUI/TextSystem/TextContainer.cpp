@@ -18,6 +18,7 @@
 
 #include "TextContainer.h"
 
+#include "Debug.h"
 #include "Interface.h"
 #include "Palette.h"
 #include "Sprite2D.h"
@@ -259,7 +260,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		// FIXME: this shouldnt happen, but it does (BG2 belt03 unidentified).
 		// for now only assert when ID_TEXT is set
 		// the situation is benign and nothing even looks wrong because all that this means is that there was more space allocated than was actually needed
-		if (core->InDebugMode(ID_TEXT)) {
+		if (InDebugMode(DebugMode::TEXT)) {
 			assert(charsPrinted < text.length());
 			core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
 		}
@@ -271,7 +272,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 			charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), Alignment);
 		}
 
-		if (core->InDebugMode(ID_TEXT)) {
+		if (InDebugMode(DebugMode::TEXT)) {
 			core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
 		}
 	}
@@ -347,7 +348,7 @@ void ContentContainer::DidDraw(const Region& /*drawFrame*/, const Region& clip)
 void ContentContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 {
 	Video* video = core->GetVideoDriver();
-	if (core->InDebugMode(ID_TEXT)) {
+	if (InDebugMode(DebugMode::TEXT)) {
 		Region r = clip;
 		video->DrawRect(r, ColorYellow, true);
 		

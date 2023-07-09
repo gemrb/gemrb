@@ -2534,7 +2534,7 @@ int GameScript::OpenState(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
 	if (!tar) {
-		if (core->InDebugMode(ID_TRIGGERS)) {
+		if (InDebugMode(DebugMode::TRIGGERS)) {
 			Log(ERROR, "GameScript", "Couldn't find door/container: {}",
 				parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
 			Log(DEBUG, "GameScript", "Sender: {}", Sender->GetScriptName());

@@ -271,19 +271,6 @@ enum FeedbackType {
 	FT_ANY = 0xffff
 };
 
-enum DebugModeBits {
-	ID_REFERENCE = 1,
-	ID_CUTSCENE = 2,
-	ID_VARIABLES = 4,
-	ID_ACTIONS = 8,
-	ID_TRIGGERS = 16,
-	ID_VIEWS = 32,
-	ID_WINDOWS = 64,
-	ID_FONTS = 128,
-	ID_TEXT = 256,
-	ID_PATHFINDER = 512
-};
-
 // TODO: there is no reason why this can't be generated directly from
 // the inventory button drag event using the button value as the slot id
 // to get the appropriate CREItem
@@ -563,8 +550,7 @@ public:
 	bool ProtectedExtension(const path_t& filename) const;
 	/*returns true if the directory path isn't good as a Cache */
 	bool StupidityDetector(const path_t& Pt) const;
-	bool InDebugMode(int mode) const { return config.debugMode & mode; };
-	void SetDebugMode(int mode) { config.debugMode = mode; };
+
 	/*handles the load screen*/
 	void LoadProgress(int percent);
 

@@ -1105,7 +1105,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 {
 	Scriptable* tar = NULL, *scr = NULL;
 
-	ScriptDebugLog(ID_VARIABLES, "BeginDialog core");
+	ScriptDebugLog(DebugMode::VARIABLES, "BeginDialog core");
 
 	tar = GetStoredActorFromObject(Sender, parameters->objects[1], GA_NO_DEAD);
 	if (Flags & BD_OWN) {
@@ -2208,7 +2208,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 		context.Format("{:.6}", VarName);
 		key = ieVariable{varName};
 	}
-	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"{}{}\", {})", context, VarName, value);
+	ScriptDebugLog(DebugMode::VARIABLES, "Setting variable(\"{}{}\", {})", context, VarName, value);
 
 	if (context == "MYAREA") {
 		SetLocalVariable(Sender->GetCurrentArea()->locals, key, value);
@@ -2230,7 +2230,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 		Map* map = game->GetMap(game->FindMap(context));
 		if (map) {
 			SetLocalVariable(map->locals, key, value);
-		} else if (core->InDebugMode(ID_VARIABLES)) {
+		} else if (InDebugMode(DebugMode::VARIABLES)) {
 			Log(WARNING, "GameScript", "Invalid variable {} {} in SetVariable", context, VarName);
 		}
 	}
@@ -2248,7 +2248,7 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 	auto GetLocalVariable = [](const ieVarsMap& vars, VarContext context, const ieVariable& key) -> ieDword {
 		auto lookup = vars.find(key);
 		if (lookup != vars.cend()) {
-			ScriptDebugLog(ID_VARIABLES, "CheckVariable {}{}: {}", context, key, lookup->second);
+			ScriptDebugLog(DebugMode::VARIABLES, "CheckVariable {}{}: {}", context, key, lookup->second);
 			return lookup->second;
 		}
 
@@ -2287,7 +2287,7 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 			return GetLocalVariable(map->locals, context, key);
 		} else {
 			if (valid) *valid = false;
-			ScriptDebugLog(ID_VARIABLES, "Invalid variable {} {} in checkvariable", context, VarName);
+			ScriptDebugLog(DebugMode::VARIABLES, "Invalid variable {} {} in checkvariable", context, VarName);
 		}
 	}
 

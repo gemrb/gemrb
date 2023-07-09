@@ -20,6 +20,7 @@
 
 #include "Window.h"
 
+#include "Debug.h"
 #include "Interface.h"
 #include "ScrollBar.h"
 
@@ -174,7 +175,7 @@ void Window::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 void Window::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
-	if (!core->InDebugMode(ID_WINDOWS)) return;
+	if (!InDebugMode(DebugMode::WINDOWS)) return;
 
 	Video* video = core->GetVideoDriver();
 	video->SetScreenClip(nullptr);
