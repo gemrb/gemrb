@@ -308,15 +308,13 @@ Interface::Interface(CoreSettings&& cfg)
 	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	// IWD2 movies are on the CD but not in the BIF
-	char* description = strdup("CD1/data");
 	for (size_t i = 0; i < MAX_CD; i++) {
+		const std::string description = fmt::format("CD{}/data", i);
 		for (size_t j = 0; j < config.CD[i].size(); j++) {
-			description[2] = '1' + i;
 			path = PathJoin(config.CD[i][j], config.GameDataPath);
 			gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
 		}
 	}
-	free(description);
 
 	// most of the old gemrb override files can be found here,
 	// so they have a lower priority than the game files and can more easily be modded

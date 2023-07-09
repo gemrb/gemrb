@@ -28,7 +28,7 @@
 
 namespace GemRB {
 
-bool ResourceManager::AddSource(const path_t& path, const char *description, PluginID type, int flags)
+bool ResourceManager::AddSource(const path_t& path, const std::string& description, PluginID type, int flags)
 {
 	PluginHolder<ResourceSource> source = MakePluginHolder<ResourceSource>(type);
 	if (!source->Open(path, description)) {

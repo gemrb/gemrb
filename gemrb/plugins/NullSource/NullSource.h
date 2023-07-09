@@ -27,7 +27,7 @@ namespace GemRB {
 
 class NullSource : public ResourceSource {
 public:
-	bool Open(const path_t& filename, const char *description) override;
+	bool Open(const path_t& filename, std::string description) override;
 	bool HasResource(StringView resname, SClass_ID type) override;
 	bool HasResource(StringView resname, const ResourceDesc &type) override;
 	DataStream* GetResource(StringView resname, SClass_ID type) override;

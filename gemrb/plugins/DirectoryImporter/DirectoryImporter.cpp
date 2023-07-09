@@ -27,14 +27,14 @@
 
 using namespace GemRB;
 
-bool DirectoryImporter::Open(const path_t& dir, const char *desc)
+bool DirectoryImporter::Open(const path_t& dir, std::string desc)
 {
 	path_t p = dir;
 	ResolveCase(p);
 	if (!DirExists(p))
 		return false;
 
-	description = desc;
+	description = std::move(desc);
 	path.swap(p);
 	return true;
 }
@@ -69,9 +69,9 @@ DataStream* DirectoryImporter::GetResource(StringView resname, const ResourceDes
 	return SearchIn( path, resname, type.GetExt() );
 }
 
-bool CachedDirectoryImporter::Open(const path_t& dir, const char *desc)
+bool CachedDirectoryImporter::Open(const path_t& dir, std::string desc)
 {
-	if (!DirectoryImporter::Open(dir, desc))
+	if (!DirectoryImporter::Open(dir, std::move(desc)))
 		return false;
 
 	Refresh();

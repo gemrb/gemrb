@@ -90,9 +90,9 @@ static void FindBIF(BIFEntry *entry)
 	Log(ERROR, "KEYImporter", "Cannot find {}...", entry->name);
 }
 
-bool KEYImporter::Open(const path_t& resfile, const char *desc)
+bool KEYImporter::Open(const path_t& resfile, std::string desc)
 {
-	description = desc;
+	description = std::move(desc);
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
 		Log(ERROR, "KEYImporter", "An Archive Plug-in is not Available");
 		return false;
