@@ -31,6 +31,7 @@
 #include "ArchiveImporter.h"
 #include "Calendar.h"
 #include "DataFileMgr.h"
+#include "Debug.h"
 #include "DialogHandler.h"
 #include "DialogMgr.h"
 #include "DisplayMessage.h"
@@ -217,6 +218,9 @@ Interface::Interface(CoreSettings&& cfg)
 	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
 
 	core = this;
+	
+	SetDebugMode(DebugMode(config.debugMode));
+	
 #if defined(WIN32)
 	const uint32_t codepage = GetACP();
 	const char* iconvCode = GetIconvNameForCodepage(codepage);

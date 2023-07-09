@@ -1551,7 +1551,7 @@ void InitializeIEScript()
 				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", "{}", buffer);
 			} else {
-				if (core->InDebugMode(ID_TRIGGERS)) {
+				if (InDebugMode(DebugMode::TRIGGERS)) {
 					std::string buffer = fmt::format("{} is a synonym of ", triggersTable->GetStringIndex(j));
 					printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
 					Log(DEBUG, "GameScript", "{}", buffer);
@@ -1585,7 +1585,7 @@ void InitializeIEScript()
 		if (f) {
 			for (int i = 0; triggernames[i].Name; i++) {
 				if (f == triggernames[i].Function) {
-					ScriptDebugLog(ID_TRIGGERS, "{} is a synonym of {}", triggersTable->GetStringIndex(j), triggernames[i].Name);
+					ScriptDebugLog(DebugMode::TRIGGERS, "{} is a synonym of {}", triggersTable->GetStringIndex(j), triggernames[i].Name);
 					break;
 				}
 			}
@@ -1613,7 +1613,7 @@ void InitializeIEScript()
 				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", "{}", buffer);
 			} else {
-				if (core->InDebugMode(ID_ACTIONS)) {
+				if (InDebugMode(DebugMode::ACTIONS)) {
 					std::string buffer = fmt::format("{} is a synonym of ",
 						actionsTable->GetStringIndex( j ) );
 					printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
@@ -1722,7 +1722,7 @@ void InitializeIEScript()
 		if (f) {
 			for (int i = 0; actionnames[i].Name; i++) {
 				if (f == actionnames[i].Function) {
-					ScriptDebugLog(ID_ACTIONS, "{} is a synonym of {}", actionsTable->GetStringIndex(j), actionnames[i].Name);
+					ScriptDebugLog(DebugMode::ACTIONS, "{} is a synonym of {}", actionsTable->GetStringIndex(j), actionnames[i].Name);
 					break;
 				}
 			}
@@ -2153,7 +2153,7 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 			target->ReleaseCurrentAction();
 		} else {
 			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
-			if (core->InDebugMode(ID_CUTSCENE) && action->objects[1]) {
+			if (InDebugMode(DebugMode::CUTSCENE) && action->objects[1]) {
 				action->objects[1]->dump();
 			}
 		}
@@ -2337,7 +2337,7 @@ int Trigger::Evaluate(Scriptable *Sender) const
 			triggerID, tmpstr );
 		return 0;
 	}
-	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: {:#x} {} (Sender: {} / {})", triggerID, tmpstr, Sender->GetScriptName(), fmt::WideToChar{Sender->GetName()});
+	ScriptDebugLog(DebugMode::TRIGGERS, "Executing trigger code: {:#x} {} (Sender: {} / {})", triggerID, tmpstr, Sender->GetScriptName(), fmt::WideToChar{Sender->GetName()});
 
 	int ret = func( Sender, this );
 	if (flags & TF_NEGATE) {
@@ -2494,10 +2494,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 		if (scr) {
 			if (CheckSleepException(scr, actionID)) {
-				ScriptDebugLog(ID_ACTIONS, "Sender {} tried to run ActionOverride on a sleeping {} with incompatible action {}", Sender->GetScriptName(), scr->GetScriptName(), actionID);
+				ScriptDebugLog(DebugMode::ACTIONS, "Sender {} tried to run ActionOverride on a sleeping {} with incompatible action {}", Sender->GetScriptName(), scr->GetScriptName(), actionID);
 				return;
 			}
-			ScriptDebugLog(ID_ACTIONS, "Sender {} ran ActionOverride on {}", Sender->GetScriptName(), scr->GetScriptName());
+			ScriptDebugLog(DebugMode::ACTIONS, "Sender {} ran ActionOverride on {}", Sender->GetScriptName(), scr->GetScriptName());
 			HandleActionOverride(scr, aC);
 		} else {
 			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
@@ -2508,11 +2508,11 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		return;
 	}
 	if (CheckSleepException(Sender, actionID)) {
-		ScriptDebugLog(ID_ACTIONS, "Sleeping sender {} tried to run non-compatible action {}", Sender->GetScriptName(), actionID);
+		ScriptDebugLog(DebugMode::ACTIONS, "Sleeping sender {} tried to run non-compatible action {}", Sender->GetScriptName(), actionID);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (core->InDebugMode(ID_ACTIONS)) {
+	if (InDebugMode(DebugMode::ACTIONS)) {
 		std::string buffer;
 		PrintAction(buffer, actionID);
 		AppendFormat(buffer, "Sender: {}\n", Sender->GetScriptName());
@@ -2563,7 +2563,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 Trigger* GenerateTrigger(std::string string)
 {
 	StringToLower(string);
-	ScriptDebugLog(ID_TRIGGERS, "Compiling: '{}'", string);
+	ScriptDebugLog(DebugMode::TRIGGERS, "Compiling: '{}'", string);
 
 	int negate = 0;
 	strpos_t start = 0;
@@ -2592,7 +2592,7 @@ Action* GenerateAction(std::string actionString)
 	Action* action = NULL;
 	
 	StringToLower(actionString);
-	ScriptDebugLog(ID_ACTIONS, "Compiling: '{}'", actionString);
+	ScriptDebugLog(DebugMode::ACTIONS, "Compiling: '{}'", actionString);
 
 	auto len = actionString.find_first_of('(') + 1; //including (
 	assert(len != std::string::npos);

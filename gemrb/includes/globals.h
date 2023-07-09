@@ -35,7 +35,7 @@
 
 #include "RGBAColor.h"
 #include "errors.h"
-
+#include "EnumFlags.h"
 #include "Region.h"
 #include "Streams/DataStream.h"
 

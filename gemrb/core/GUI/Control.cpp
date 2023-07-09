@@ -22,6 +22,7 @@
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/Window.h"
 
+#include "Debug.h"
 #include "ie_cursors.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
@@ -274,7 +275,7 @@ bool Control::AcceptsDragOperation(const DragOp& dop) const
 
 Holder<Sprite2D> Control::DragCursor() const
 {
-	if (core->InDebugMode(ID_VIEWS)) {
+	if (InDebugMode(DebugMode::VIEWS)) {
 		return core->Cursors[IE_CURSOR_SWAP];
 	}
 	return nullptr;

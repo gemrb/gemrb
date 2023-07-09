@@ -606,7 +606,7 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword scriptableID)
 				name = scr->GetScriptName();
 			}
 		}
-		ScriptDebugLog(ID_TRIGGERS, "Scriptable", "{}: Added LastTrigger: {} ({}) for trigger {}", scriptName, scriptableID, name, triggerID);
+		ScriptDebugLog(DebugMode::TRIGGERS, "Scriptable", "{}: Added LastTrigger: {} ({}) for trigger {}", scriptName, scriptableID, name, triggerID);
 		LastTrigger = scriptableID;
 	}
 }
