@@ -62,6 +62,12 @@ GameType=test
 #####################################################
 #  Video Parameters                                 #
 #####################################################
+#Resolutions supported by the original games (gemrb) are:
+# * 640x480 (except in iwd2)
+# * 800x600 (bg2, iwd:how, iwd2)
+# * 1024x768 (bg2, iwd:how, iwd2)
+# * 1280x960 (bg2, iwd:how, iwd2)
+# You can use others as well!
 
 #Screen width
 Width=640
@@ -157,7 +163,7 @@ GUIEnhancements = 15
 #                                                   #
 #  These are the paths where the Game you want to   #
 #  play is installed.                               #
-#  Enter the full path to the directory.             #
+#  Enter the full path to the directory.            #
 #                                                   #
 #  Remember, EE versions are not supported!         #
 #####################################################
@@ -193,6 +199,9 @@ CachePath=./gemrb/Cache2/
 #####################################################
 
 #SavePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
+
+###### HERE BE DRAGONS #############################
+# You shouldn't need to change any paths below this point.
 
 #####################################################
 #  GemRB Path [String]                              #
