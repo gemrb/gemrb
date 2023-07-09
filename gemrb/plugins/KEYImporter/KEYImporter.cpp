@@ -40,13 +40,13 @@ static path_t AddCBF(path_t file)
 	return file;
 }
 
-static bool PathExists(BIFEntry *entry, const char *path)
+static bool PathExists(BIFEntry *entry, const path_t& path)
 {
 	entry->path = PathJoin(path, entry->name);
 	if (FileExists(entry->path)) {
 		return true;
 	}
-	entry->path = PathJoin(path, AddCBF(entry->name.c_str()));
+	entry->path = PathJoin(path, AddCBF(entry->name));
 	if (FileExists(entry->path)) {
 		return true;
 	}
@@ -57,7 +57,7 @@ static bool PathExists(BIFEntry *entry, const char *path)
 static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist)
 {
 	for (const auto& path : pathlist) {
-		if (PathExists(entry, path.c_str())) {
+		if (PathExists(entry, path)) {
 			return true;
 		}
 	}
@@ -68,13 +68,13 @@ static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist
 static void FindBIF(BIFEntry *entry)
 {
 	entry->cd = 0;
-	entry->found = PathExists(entry, core->config.GamePath.c_str());
+	entry->found = PathExists(entry, core->config.GamePath);
 	if (entry->found) {
 		return;
 	}
 	// also check the data/Data path for gog
 	path_t path = PathJoin(core->config.GamePath, core->config.GameDataPath);
-	entry->found = PathExists(entry, path.c_str());
+	entry->found = PathExists(entry, path);
 	if (entry->found) {
 		return;
 	}
