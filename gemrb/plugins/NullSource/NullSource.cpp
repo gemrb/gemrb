@@ -26,9 +26,9 @@
 
 using namespace GemRB;
 
-bool NullSource::Open(const path_t&, const char *desc)
+bool NullSource::Open(const path_t&, std::string desc)
 {
-	description = desc;
+	description = std::move(desc);
 	return true;
 }
 

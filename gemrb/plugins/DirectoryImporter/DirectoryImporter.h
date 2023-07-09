@@ -34,7 +34,7 @@ protected:
 
 public:
 	DirectoryImporter() noexcept = default;
-	bool Open(const path_t& dir, const char *desc) override;
+	bool Open(const path_t& dir, std::string desc) override;
 	/** predicts the availability of a resource */
 	bool HasResource(StringView resname, SClass_ID type) override;
 	bool HasResource(StringView resname, const ResourceDesc &type) override;
@@ -50,7 +50,7 @@ protected:
 
 public:
 	CachedDirectoryImporter() noexcept = default;
-	bool Open(const path_t& dir, const char *desc) override;
+	bool Open(const path_t& dir, std::string desc) override;
 	void Refresh();
 	/** predicts the availability of a resource */
 	bool HasResource(StringView resname, SClass_ID type) override;
