@@ -702,7 +702,7 @@ public:
 	ResRef GoldResRef; //MISC07.itm
 	ResRefMap<ItemList> RtRows;
 
-	std::string INIConfig = "baldur.ini";
+	path_t INIConfig = "baldur.ini";
 	bool DitherSprites = true;
 	bool UseCorruptedHack = false;
 	int FeedbackLevel = 0;

@@ -25,6 +25,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "System/VFS.h"
 
 namespace GemRB {
 
@@ -42,7 +43,7 @@ class GEM_EXPORT KeyMap {
 private:
 	std::unordered_map<std::string, Function> keymap;
 public:
-	bool InitializeKeyMap(const char* inifile, const ResRef& keyfile);
+	bool InitializeKeyMap(const path_t& inifile, const ResRef& keyfile);
 	bool ResolveKey(unsigned short key, int group) const;
 	bool ResolveName(const char* name, int group) const;
 

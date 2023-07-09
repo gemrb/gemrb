@@ -52,7 +52,7 @@ bool PluginMgr::RegisterPlugin(SClass_ID id, PluginFunc create)
 	return true;
 }
 
-void PluginMgr::RegisterResource(const TypeID* type, ResourceFunc create, const char *ext, ieWord keyType)
+void PluginMgr::RegisterResource(const TypeID* type, ResourceFunc create, const path_t& ext, ieWord keyType)
 {
 	resources[type].emplace_back(type, create, ext, keyType);
 }

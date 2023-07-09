@@ -44,7 +44,7 @@ BIFImporter::~BIFImporter(void)
 	}
 }
 
-DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path)
+DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const path_t& path)
 {
 	Log(MESSAGE, "BIFImporter", "Decompressing {} ...", compressed->filename);
 	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
@@ -80,7 +80,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 #endif
 }
 
-DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*path*/)
+DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const path_t& /*path*/)
 {
 	ieDword fnlen, complen, declen;
 	compressed->ReadDword(fnlen);
@@ -91,7 +91,7 @@ DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*pat
 	return CacheCompressedStream(compressed, std::string(compressed->filename), complen);
 }
 
-int BIFImporter::OpenArchive(const char* path)
+int BIFImporter::OpenArchive(const path_t& path)
 {
 	delete stream;
 	stream = nullptr;

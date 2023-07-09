@@ -158,7 +158,7 @@ static bool LoadPlugin(const char* pluginpath)
 	return true;
 }
 
-void LoadPlugins(const char* pluginpath, const plugin_flags_t& pluginFlags)
+void LoadPlugins(const path_t& pluginpath, const plugin_flags_t& pluginFlags)
 {
 	Log(MESSAGE, "PluginMgr", "Loading Plugins from {}", pluginpath);
 

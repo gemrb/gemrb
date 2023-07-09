@@ -1110,11 +1110,11 @@ void Interface::LoadPlugins() const
 	path_t bundlePluginsPath = BundlePath(PLUGINS);
 	ResolveFilePath(bundlePluginsPath);
 #ifndef STATIC_LINK
-	GemRB::LoadPlugins(bundlePluginsPath.c_str(), pluginFlags);
+	GemRB::LoadPlugins(bundlePluginsPath, pluginFlags);
 #endif
 #endif
 #ifndef STATIC_LINK
-	GemRB::LoadPlugins(config.PluginsPath.c_str(), pluginFlags);
+	GemRB::LoadPlugins(config.PluginsPath, pluginFlags);
 #endif
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
@@ -3751,14 +3751,10 @@ int Interface::WriteWorldMap(const path_t& folder)
 	return 0;
 }
 
-static bool IsBlobSaveItem(const char *path) {
-	if (path == nullptr) {
-		return false;
-	}
-
-	auto areExt = strstr(path, ".blb");
-	auto pathLength = strlen(path);
-	return areExt != nullptr && path + pathLength - 4 == areExt;
+static bool IsBlobSaveItem(const path_t& path) {
+	auto areExt = path.find(".blb");
+	auto pathLength = path.length();
+	return areExt != path_t::npos && areExt == pathLength - 4;
 }
 
 int Interface::CompressSave(const path_t& folder, bool overrideRunning)
@@ -3794,7 +3790,7 @@ int Interface::CompressSave(const path_t& folder, bool overrideRunning)
 					Log(ERROR, "Interface", "Failed to open \"{}\".", dtmp);
 				}
 
-				if (IsBlobSaveItem(dtmp.c_str())) {
+				if (IsBlobSaveItem(dtmp)) {
 					if (overrideRunning) {
 						saveGameAREExtractor.updateSaveGame(str.GetPos());
 						ai->AddToSaveGameCompressed(&str, &fs);
