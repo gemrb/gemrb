@@ -360,7 +360,7 @@ Factory::object_t GameData::GetFactoryResource(const ResRef& resName, SClass_ID 
 		return NULL;
 	}
 	default:
-		Log(MESSAGE, "KEYImporter", "{} files are not supported!", core->TypeExt(type));
+		Log(MESSAGE, "KEYImporter", "{} files are not supported!", TypeExt(type));
 		return nullptr;
 	}
 }

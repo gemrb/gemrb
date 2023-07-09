@@ -28,6 +28,60 @@
 
 namespace GemRB {
 
+path_t TypeExt(SClass_ID type)
+{
+	static const std::map<SClass_ID, path_t> extensions = {
+		{ IE_2DA_CLASS_ID, "2da" },
+		{ IE_ACM_CLASS_ID, "acm" },
+		{ IE_ARE_CLASS_ID, "are" },
+		{ IE_BAM_CLASS_ID, "bam" },
+		{ IE_BCS_CLASS_ID, "bcs" },
+		{ IE_BS_CLASS_ID, "bs" },
+		{ IE_BIF_CLASS_ID, "bif" },
+		{ IE_BMP_CLASS_ID, "bmp" },
+		{ IE_PNG_CLASS_ID, "png" },
+		{ IE_CHR_CLASS_ID, "chr" },
+		{ IE_CHU_CLASS_ID, "chu" },
+		{ IE_CRE_CLASS_ID, "cre" },
+		{ IE_DLG_CLASS_ID, "dlg" },
+		{ IE_EFF_CLASS_ID, "eff" },
+		{ IE_GAM_CLASS_ID, "gam" },
+		{ IE_IDS_CLASS_ID, "ids" },
+		{ IE_INI_CLASS_ID, "ini" },
+		{ IE_ITM_CLASS_ID, "itm" },
+		{ IE_MOS_CLASS_ID, "mos" },
+		{ IE_MUS_CLASS_ID, "mus" },
+		{ IE_MVE_CLASS_ID, "mve" },
+		{ IE_OGG_CLASS_ID, "ogg" },
+		{ IE_PLT_CLASS_ID, "plt" },
+		{ IE_PRO_CLASS_ID, "pro" },
+		{ IE_PVRZ_CLASS_ID, "pvrz" },
+		{ IE_SAV_CLASS_ID, "sav" },
+		{ IE_SPL_CLASS_ID, "spl" },
+		{ IE_SRC_CLASS_ID, "src" },
+		{ IE_STO_CLASS_ID, "sto" },
+		{ IE_TIS_CLASS_ID, "tis" },
+		{ IE_TLK_CLASS_ID, "tlk" },
+		{ IE_TOH_CLASS_ID, "toh" },
+		{ IE_TOT_CLASS_ID, "tot" },
+		{ IE_VAR_CLASS_ID, "var" },
+		{ IE_VEF_CLASS_ID, "vef" },
+		{ IE_VVC_CLASS_ID, "vvc" },
+		{ IE_WAV_CLASS_ID, "wav" },
+		{ IE_WED_CLASS_ID, "wed" },
+		{ IE_WFX_CLASS_ID, "wfx" },
+		{ IE_WMP_CLASS_ID, "wmp" },
+		{ IE_BIO_CLASS_ID, core->HasFeature(GFFlags::BIOGRAPHY_RES) ? "res" : "bio" }
+	};
+
+	const auto extIt = extensions.find(type);
+	if (extIt == extensions.end()) {
+		Log(ERROR, "Interface", "No extension associated to class ID: {}", type);
+		return nullptr;
+	}
+	return extIt->second;
+}
+
 bool ResourceManager::AddSource(const path_t& path, const std::string& description, PluginID type, int flags)
 {
 	PluginHolder<ResourceSource> source = MakePluginHolder<ResourceSource>(type);
@@ -69,7 +123,7 @@ bool ResourceManager::Exists(StringView ResRef, SClass_ID type, bool silent) con
 	}
 	if (!silent) {
 		Log(WARNING, "ResourceManager", "'{}.{}' not found...",
-			ResRef, core->TypeExt(type));
+			ResRef, TypeExt(type));
 	}
 	return false;
 }
@@ -103,13 +157,13 @@ DataStream* ResourceManager::GetResourceStream(StringView ResRef, SClass_ID type
 		DataStream *ds = path->GetResource(ResRef, type);
 		if (ds) {
 			if (!silent) {
-				Log(MESSAGE, "ResourceManager", "Found '{}.{}' in '{}'.", ResRef, core->TypeExt(type), path->GetDescription());
+				Log(MESSAGE, "ResourceManager", "Found '{}.{}' in '{}'.", ResRef, TypeExt(type), path->GetDescription());
 			}
 			return ds;
 		}
 	}
 	if (!silent) {
-		Log(ERROR, "ResourceManager", "Couldn't find '{}.{}'.", ResRef, core->TypeExt(type));
+		Log(ERROR, "ResourceManager", "Couldn't find '{}.{}'.", ResRef, TypeExt(type));
 	}
 	return NULL;
 }

@@ -105,7 +105,7 @@ bool FileStream::Create(const path_t& fname, SClass_ID ClassID)
 bool FileStream::Create(const path_t& folder, const path_t& fname, SClass_ID ClassID)
 {
 	path_t filename = ExtractFileFromPath(fname);
-	path_t path = PathJoinExt(folder, filename, core->TypeExt(ClassID));
+	path_t path = PathJoinExt(folder, filename, TypeExt(ClassID));
 	return Create(path);
 }
 

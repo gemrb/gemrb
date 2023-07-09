@@ -33,6 +33,8 @@ namespace GemRB {
 class DataStream;
 class ResourceDesc;
 
+GEM_EXPORT path_t TypeExt(SClass_ID type);
+
 class GEM_EXPORT ResourceSource : public Plugin {
 public:
 	virtual bool Open(const path_t& filename, std::string description) = 0;

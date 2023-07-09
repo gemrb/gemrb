@@ -394,7 +394,6 @@ public:
 	void ClearFeature(GFFlags flag);
 	bool HasFeature(GFFlags flag) const;
 	bool IsAvailable(SClass_ID filetype) const;
-	path_t TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const noexcept;
 	FogRenderer& GetFogRenderer();
 	/* create or change a custom string */

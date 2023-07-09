@@ -1250,66 +1250,6 @@ Audio* Interface::GetAudioDrv(void) const {
 	return AudioDriver.get();
 }
 
-path_t Interface::TypeExt(SClass_ID type) const
-{
-	static const std::map<SClass_ID, path_t> extensions = {
-		{ IE_2DA_CLASS_ID, "2da" },
-		{ IE_ACM_CLASS_ID, "acm" },
-		{ IE_ARE_CLASS_ID, "are" },
-		{ IE_BAM_CLASS_ID, "bam" },
-		{ IE_BCS_CLASS_ID, "bcs" },
-		{ IE_BS_CLASS_ID, "bs" },
-		{ IE_BIF_CLASS_ID, "bif" },
-		{ IE_BMP_CLASS_ID, "bmp" },
-		{ IE_PNG_CLASS_ID, "png" },
-		{ IE_CHR_CLASS_ID, "chr" },
-		{ IE_CHU_CLASS_ID, "chu" },
-		{ IE_CRE_CLASS_ID, "cre" },
-		{ IE_DLG_CLASS_ID, "dlg" },
-		{ IE_EFF_CLASS_ID, "eff" },
-		{ IE_GAM_CLASS_ID, "gam" },
-		{ IE_IDS_CLASS_ID, "ids" },
-		{ IE_INI_CLASS_ID, "ini" },
-		{ IE_ITM_CLASS_ID, "itm" },
-		{ IE_MOS_CLASS_ID, "mos" },
-		{ IE_MUS_CLASS_ID, "mus" },
-		{ IE_MVE_CLASS_ID, "mve" },
-		{ IE_OGG_CLASS_ID, "ogg" },
-		{ IE_PLT_CLASS_ID, "plt" },
-		{ IE_PRO_CLASS_ID, "pro" },
-		{ IE_PVRZ_CLASS_ID, "pvrz" },
-		{ IE_SAV_CLASS_ID, "sav" },
-		{ IE_SPL_CLASS_ID, "spl" },
-		{ IE_SRC_CLASS_ID, "src" },
-		{ IE_STO_CLASS_ID, "sto" },
-		{ IE_TIS_CLASS_ID, "tis" },
-		{ IE_TLK_CLASS_ID, "tlk" },
-		{ IE_TOH_CLASS_ID, "toh" },
-		{ IE_TOT_CLASS_ID, "tot" },
-		{ IE_VAR_CLASS_ID, "var" },
-		{ IE_VEF_CLASS_ID, "vef" },
-		{ IE_VVC_CLASS_ID, "vvc" },
-		{ IE_WAV_CLASS_ID, "wav" },
-		{ IE_WED_CLASS_ID, "wed" },
-		{ IE_WFX_CLASS_ID, "wfx" },
-		{ IE_WMP_CLASS_ID, "wmp" },
-	};
-
-	if (type == IE_BIO_CLASS_ID) {
-		if (HasFeature(GFFlags::BIOGRAPHY_RES)) {
-			return "res";
-		}
-		return "bio";
-	}
-
-	const auto extIt = extensions.find(type);
-	if (extIt == extensions.end()) {
-		Log(ERROR, "Interface", "No extension associated to class ID: {}", type);
-		return nullptr;
-	}
-	return extIt->second;
-}
-
 ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
 {
 	String current = GetString(strref, STRING_FLAGS::NONE);
