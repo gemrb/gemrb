@@ -24,6 +24,7 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
+#include "Interface.h"
 #include "Projectile.h"
 #include "TileMap.h"
 #include "GameScript/GSUtils.h"

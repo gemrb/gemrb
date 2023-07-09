@@ -23,6 +23,7 @@
 
 #include "Game.h"
 #include "GlobalTimer.h"
+#include "Interface.h"
 #include "Map.h"
 #include "Sprite2D.h"
 #include "GUI/GameControl.h"

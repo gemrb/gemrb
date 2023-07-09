@@ -23,7 +23,6 @@
 #include "GUIScript.h"
 
 #include "Callback.h"
-#include "Interface.h"
 
 #include "GUI/Control.h"
 #include "GUI/GUIScriptInterface.h"

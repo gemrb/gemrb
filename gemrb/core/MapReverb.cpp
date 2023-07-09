@@ -1,4 +1,7 @@
+
 #include "MapReverb.h"
+
+#include "Interface.h"
 #include "Map.h"
 
 namespace GemRB {

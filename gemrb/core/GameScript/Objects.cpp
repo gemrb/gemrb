@@ -26,6 +26,7 @@
 #include "DialogHandler.h"
 #include "Game.h"
 #include "GUI/GameControl.h"
+#include "Interface.h"
 
 namespace GemRB {
 

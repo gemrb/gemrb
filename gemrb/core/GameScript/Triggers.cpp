@@ -30,6 +30,7 @@
 #include "DialogHandler.h"
 #include "Game.h"
 #include "GameData.h"
+#include "Interface.h"
 #include "Polygon.h"
 #include "TableMgr.h"
 #include "Video/Video.h"
@@ -3878,6 +3879,11 @@ int GameScript::TimeOfDay(Scriptable */*Sender*/, const Trigger *parameters)
 		return 1;
 	}
 	return 0;
+}
+
+static int Bones(ieDword value)
+{
+	return core->Roll((value&0xf000)>>12, (value&0xff0)>>8, value&15);
 }
 
 //this is a PST action, it's using delta.ids, not diffmode.ids

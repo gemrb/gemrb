@@ -33,6 +33,7 @@
 
 #include "Dialog.h"
 #include "Map.h"
+#include "strrefs.h"
 
 #include <vector>
 
