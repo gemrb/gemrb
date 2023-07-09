@@ -26,6 +26,7 @@
 #include "Plugins/IndexedArchive.h"
 #include "PluginMgr.h"
 #include "Resource.h"
+#include "System/VFS.h"
 
 #include <unordered_map>
 #include <utility>
@@ -37,9 +38,9 @@ class DataStream;
 class ResourceDesc;
 
 struct BIFEntry {
-	std::string name;
+	path_t name;
 	ieWord BIFLocator;
-	std::string path;
+	path_t path;
 	int cd;
 	bool found;
 };
