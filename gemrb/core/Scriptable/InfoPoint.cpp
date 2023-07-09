@@ -25,6 +25,7 @@
 
 #include "Game.h"
 #include "GameData.h"
+#include "Interface.h"
 #include "TileMap.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"

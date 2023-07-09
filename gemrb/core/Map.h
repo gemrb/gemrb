@@ -26,10 +26,11 @@
 
 #include "Bitmap.h"
 #include "FogRenderer.h"
-#include "Interface.h"
 #include "MapReverb.h"
 #include "Scriptable/Scriptable.h"
 #include "PathFinder.h"
+#include "Polygon.h"
+#include "Video/Video.h"
 #include "WorldMap.h"
 
 #include <algorithm>

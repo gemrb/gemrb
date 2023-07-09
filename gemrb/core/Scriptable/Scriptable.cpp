@@ -26,6 +26,7 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
+#include "Interface.h"
 #include "Projectile.h"
 #include "Spell.h"
 #include "Sprite2D.h"

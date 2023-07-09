@@ -34,6 +34,7 @@
 #include "DialogHandler.h" // checking for dialog
 #include "Game.h"
 #include "GlobalTimer.h"
+#include "Interface.h"
 #include "DisplayMessage.h"
 #include "GameData.h"
 #include "ImageMgr.h"

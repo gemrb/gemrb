@@ -27,6 +27,7 @@
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "ImageMgr.h"
+#include "Interface.h"
 #include "PluginMgr.h"
 #include "ScriptEngine.h"
 #include "TableMgr.h"

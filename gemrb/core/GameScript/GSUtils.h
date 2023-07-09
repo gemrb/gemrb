@@ -20,13 +20,14 @@
 #ifndef GSUTILS_H
 #define GSUTILS_H
 
+#include "Cache.h"
 #include "GameScript/GameScript.h"
+#include "GUI/EventMgr.h"
+#include "SrcMgr.h"
 
 #include "defsounds.h"
 #include "exports.h"
 #include "strrefs.h"
-
-#include "Interface.h"
 
 namespace GemRB {
 
@@ -148,11 +149,6 @@ unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parame
 int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters);
 void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags);
 void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flags);
-
-inline int Bones(ieDword value)
-{
-	return core->Roll((value&0xf000)>>12, (value&0xff0)>>8, value&15);
-}
 
 }
 

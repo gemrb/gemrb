@@ -34,6 +34,7 @@
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "IniSpawn.h"
+#include "Interface.h"
 #include "Item.h"
 #include "Map.h"
 #include "MusicMgr.h"
