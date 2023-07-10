@@ -2556,14 +2556,52 @@ bool Map::BehindWall(const Point& pos, const Region& r) const
 	return !polys.first.empty();
 }
 
+size_t Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime)
+{
+	ieDword stance = actor->GetStance();
+	ieDword internalFlag = actor->GetInternalFlag();
+	bool scheduled = actor->Schedule(gameTime, false);
+
+	int priority;
+	if (internalFlag & IF_ACTIVE) {
+		if (stance == IE_ANI_TWITCH && (internalFlag & IF_IDLE)) {
+			priority = PR_DISPLAY; // only draw
+		} else if (scheduled) {
+			priority = PR_SCRIPT; // run scripts and display
+		} else {
+			priority = PR_IGNORE; // don't run scripts for out of schedule actors
+		}
+
+		if (IsVisible(actor->Pos) && !actor->GetStat(IE_AVATARREMOVAL)) {
+			hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
+		}
+		// dead actors are always visible on the map, but run no scripts
+	} else if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
+		priority = PR_DISPLAY;
+	} else {
+		bool visible = IsVisible(actor->Pos);
+		// even if a creature is offscreen, they should still get an AI update every 3 ticks
+		if (scheduled && (visible || actor->ForceScriptCheck()))  {
+			priority = PR_SCRIPT; // run scripts and display, activated now
+			// more like activate!
+			actor->Activate();
+			if (visible && !actor->GetStat(IE_AVATARREMOVAL)) {
+				ActorSpottedByPlayer(actor);
+				hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
+			}
+		} else {
+			priority = PR_IGNORE;
+		}
+	}
+	return priority;
+}
+
 //this function determines actor drawing order
 //it should be extended to wallgroups, animations, effects!
 void Map::GenerateQueues()
 {
-	int priority;
-
 	unsigned int i=(unsigned int) actors.size();
-	for (priority=0;priority<QUEUE_COUNT;priority++) {
+	for (int priority = 0; priority < QUEUE_COUNT; priority++) {
 		if (lastActorCount[priority] != i) {
 			lastActorCount[priority] = i;
 		}
@@ -2580,40 +2618,7 @@ void Map::GenerateQueues()
 			continue;
 		}
 
-		ieDword stance = actor->GetStance();
-		ieDword internalFlag = actor->GetInternalFlag();
-		bool scheduled = actor->Schedule(gametime, false);
-
-		if (internalFlag&IF_ACTIVE) {
-			if ((stance == IE_ANI_TWITCH) && (internalFlag&IF_IDLE) ) {
-				priority = PR_DISPLAY; //display
-			} else if (scheduled) {
-				priority = PR_SCRIPT; // run scripts and display
-			} else {
-				priority = PR_IGNORE; // don't run scripts for out of schedule actors
-			}
-			if (IsVisible(actor->Pos) && !actor->GetStat(IE_AVATARREMOVAL)) {
-				hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
-			}
-		// dead actors are always visible on the map, but run no scripts
-		} else if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
-			priority = PR_DISPLAY;
-		} else {
-			bool visible = IsVisible(actor->Pos);
-			// even if a creature is offscreen, they should still get an AI update every 3 ticks
-			if (scheduled && (visible || actor->ForceScriptCheck()))  {
-				priority = PR_SCRIPT; // run scripts and display, activated now
-				// more like activate!
-				actor->Activate();
-				if (visible && !actor->GetStat(IE_AVATARREMOVAL)) {
-					ActorSpottedByPlayer(actor);
-					hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
-				}
-			} else {
-				priority = PR_IGNORE;
-			}
-		}
-
+		int priority = SetPriority(actor, hostilesNew, gametime);
 		//we ignore priority 2
 		if (priority>=PR_IGNORE) continue;
 
