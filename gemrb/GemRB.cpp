@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
 	try {
 		Interface gemrb(LoadFromArgs(argc, argv));
 		gemrb.Main();
-	} catch (std::exception& e) {
-		Log(FATAL, "Main", "Aborting due to fatal error... {}", e.what());
+	} catch (CoreInitializationException& cie) {
+		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie.what());
 		return GEM_ERROR;
 	}
 

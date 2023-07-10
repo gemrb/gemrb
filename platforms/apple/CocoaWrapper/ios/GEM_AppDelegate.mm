@@ -111,8 +111,8 @@ using namespace GemRB;
 			Interface gemrb(LoadFromArgs(argc, argv));
 			free(argv);
 			gemrb.Main(); // pass control to GemRB
-		} catch (std::exception& e) {
-			Log(FATAL, "Main", "Aborting due to fatal error... {}", e.what());
+		} catch (CoreInitializationException& cie) {
+			Log(FATAL, "Main", "Aborting due to fatal error... {}", cie.what());
 			// reload the wrapper interface so we can try again instead of dying
 			[self setupWrapper];
 		}
