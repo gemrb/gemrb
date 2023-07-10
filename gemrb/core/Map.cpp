@@ -915,7 +915,7 @@ void Map::UpdateScripts()
 ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 {
 	struct TerrainSounds {
-		std::map<ResRef, std::array<ResRef, 16>> refs;
+		ResRefMap<std::array<ResRef, 16>> refs;
 		
 		TerrainSounds() noexcept {
 			AutoTable tm = gamedata->LoadTable("terrain");

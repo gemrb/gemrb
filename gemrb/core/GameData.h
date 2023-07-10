@@ -203,7 +203,7 @@ private:
 	ResRefMap<PaletteHolder> PaletteCache;
 	Factory factory;
 	ResRefMap<AutoTable> tables;
-	using StoreMap = std::map<ResRef, Store*>;
+	using StoreMap = ResRefMap<Store*>;
 	StoreMap stores;
 	std::map<size_t, std::vector<ResRef>> ItemSounds;
 	ResRefMap<ieDword> AreaAliasTable;
@@ -218,7 +218,7 @@ private:
 	Size weaponStyleAPRBonusMax{};
 	// 4 styles and 4 star levels, 7 bonus types
 	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni{};
-	std::map<ResRef, ieByte> itemAnims;
+	ResRefMap<ieByte> itemAnims;
 	std::vector<ItemUseType> itemUse;
 
 public:

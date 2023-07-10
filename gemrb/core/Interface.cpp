@@ -630,7 +630,7 @@ Interface::~Interface() noexcept
 	delete worldmap;
 	delete keymap;
 
-	std::map<ResRef, Font*>::iterator fit = fonts.begin();
+	ResRefMap<Font*>::iterator fit = fonts.begin();
 	for (; fit != fonts.end(); ++fit)
 		delete (*fit).second;
 	// fonts need to be destroyed before TTF plugin
@@ -1546,7 +1546,7 @@ bool Interface::LoadEncoding()
 /** Returns a preloaded Font */
 Font* Interface::GetFont(const ResRef& ResRef) const
 {
-	std::map<GemRB::ResRef,Font *>::const_iterator i = fonts.find(ResRef);
+	auto i = fonts.find(ResRef);
 	if (i != fonts.end()) {
 		return i->second;
 	}
