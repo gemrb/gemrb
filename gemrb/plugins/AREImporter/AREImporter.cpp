@@ -1975,8 +1975,8 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map) const
 		}
 	}
 	//containers
-	for (unsigned int i = 0; i < ContainersCount; i++) {
-		const Container *c = map->TMap->GetContainer(i);
+	for (size_t i = 0; i < ContainersCount; i++) {
+		const Container* c = map->TMap->GetContainer(i);
 		if (c->outline) {
 			PutPoints(stream, c->outline->vertices);
 		}
@@ -1998,8 +1998,8 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map) const
 
 int AREImporter::PutItems(DataStream *stream, const Map *map) const
 {
-	for (unsigned int i=0;i<ContainersCount;i++) {
-		const Container *c = map->TMap->GetContainer(i);
+	for (size_t i = 0; i < ContainersCount; i++) {
+		const Container* c = map->TMap->GetContainer(i);
 
 		for(int j=0;j<c->inventory.GetSlotCount();j++) {
 			const CREItem *ci = c->inventory.GetSlotItem(j);
@@ -2019,8 +2019,8 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 {
 	ieDword ItemIndex = 0;
 
-	for (unsigned int i=0;i<ContainersCount;i++) {
-		const Container *c = map->TMap->GetContainer(i);
+	for (size_t i = 0; i < ContainersCount; i++) {
+		const Container* c = map->TMap->GetContainer(i);
 
 		//this is the editor name
 		stream->WriteVariable(c->GetScriptName());

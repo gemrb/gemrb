@@ -170,7 +170,7 @@ void TileMap::AddContainer(Container *c)
 	containers.push_back(c);
 }
 
-Container* TileMap::GetContainer(unsigned int idx) const
+Container* TileMap::GetContainer(size_t idx) const
 {
 	if (idx >= containers.size()) {
 		return NULL;

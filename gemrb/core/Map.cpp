@@ -790,7 +790,7 @@ void Map::UpdateScripts()
 	}
 
 	//Check if we need to start some container scripts
-	int containerCount = 0;
+	size_t containerCount = 0;
 	while (true) {
 		Container* container = TMap->GetContainer( containerCount++ );
 		if (!container)
@@ -953,8 +953,8 @@ bool Map::FogTileUncovered(const Point &p, const Bitmap* mask) const
 void Map::DrawHighlightables(const Region& viewport) const
 {
 	// NOTE: piles are drawn in the main queue
-	unsigned int count = static_cast<unsigned int>(TMap->GetContainerCount());
-	for (unsigned  int idx = 0; idx < count; idx++) {
+	size_t count = TMap->GetContainerCount();
+	for (size_t idx = 0; idx < count; idx++) {
 		Container* c = TMap->GetContainer(idx);
 		if (!c || c->containerType == IE_CONTAINER_PILE) continue;
 
@@ -1006,9 +1006,9 @@ void Map::DrawHighlightables(const Region& viewport) const
 	}
 }
 
-Container *Map::GetNextPile(int &index) const
+Container* Map::GetNextPile(size_t& index) const
 {
-	Container *c = TMap->GetContainer(index++);
+	Container* c = TMap->GetContainer(index++);
 
 	while (c) {
 		if (c->containerType == IE_CONTAINER_PILE) {
@@ -1016,7 +1016,7 @@ Container *Map::GetNextPile(int &index) const
 		}
 		c = TMap->GetContainer(index++);
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor *Map::GetNextActor(int &q, size_t &index) const
@@ -1225,8 +1225,8 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	scaIterator scaidx = vvcCells.begin();
 	proIterator proidx = projectiles.begin();
 	spaIterator spaidx = particles.begin();
-	int pileidx = 0;
-	const Container *pile = GetNextPile(pileidx);
+	size_t pileIdx = 0;
+	const Container* pile = GetNextPile(pileIdx);
 
 	VEFObject *sca = GetNextScriptedAnimation(scaidx);
 	Projectile *pro = GetNextProjectile(proidx);
@@ -1270,7 +1270,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		case AOT_PILE:
 			// draw piles
 			if (!bgoverride) {
-				const Container* c = TMap->GetContainer(pileidx - 1);
+				const Container* c = TMap->GetContainer(pileIdx - 1);
 				
 				BlitFlags flags = SetDrawingStencilForScriptable(c, viewport);
 				flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
@@ -1287,7 +1287,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				} else {
 					c->Draw(false, viewport, tint, flags);
 				}
-				pile = GetNextPile(pileidx);
+				pile = GetNextPile(pileIdx);
 			}
 			break;
 		case AOT_AREA:
@@ -1373,30 +1373,27 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	};
 	fogRenderer.DrawFog(mapData);
 
-	int ipCount = 0;
+	size_t ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
-		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
-		if (!ip)
-			break;
+		InfoPoint* ip = TMap->GetInfoPoint(ipCount++);
+		if (!ip) break;
 		ip->overHead.Draw();
 	}
 
-	int cnCount = 0;
+	size_t cnCount = 0;
 	while (true) {
 		//For each Container in the map
-		Container* cn = TMap->GetContainer( cnCount++ );
-		if (!cn)
-			break;
+		Container* cn = TMap->GetContainer(cnCount++);
+		if (!cn) break;
 		cn->overHead.Draw();
 	}
 
-	int drCount = 0;
+	size_t drCount = 0;
 	while (true) {
 		//For each Door in the map
-		Door* dr = TMap->GetDoor( drCount++ );
-		if (!dr)
-			break;
+		Door* dr = TMap->GetDoor(drCount++);
+		if (!dr) break;
 		dr->overHead.Draw();
 	}
 
@@ -2149,9 +2146,9 @@ void Map::PurgeArea(bool items)
 	}
 	//2. remove any non critical items
 	if (items) {
-		i=(int) TMap->GetContainerCount();
+		size_t i = TMap->GetContainerCount();
 		while (i--) {
-			Container *c = TMap->GetContainer(i);
+			Container* c = TMap->GetContainer(i);
 			unsigned int j=c->inventory.GetSlotCount();
 			while (j--) {
 				const CREItem *itemslot = c->inventory.GetSlotItem(j);
@@ -3336,9 +3333,9 @@ Spawn *Map::GetSpawnRadius(const Point &point, unsigned int radius) const
 int Map::ConsolidateContainers()
 {
 	int itemcount = 0;
-	int containercount = (int) TMap->GetContainerCount();
+	size_t containercount = TMap->GetContainerCount();
 	while (containercount--) {
-		Container * c = TMap->GetContainer( containercount);
+		Container* c = TMap->GetContainer(containercount);
 
 		if (TMap->CleanupContainer(c) ) {
 			objectStencils.erase(c);

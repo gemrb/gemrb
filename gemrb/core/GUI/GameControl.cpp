@@ -522,7 +522,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 
 	// FIXME: some of this should happen during mouse events
 	Container *c;
-	for (unsigned int idx = 0; (c = area->TMap->GetContainer(idx)); ++idx) {
+	for (size_t idx = 0; (c = area->TMap->GetContainer(idx)); ++idx) {
 		c->Highlight = false;
 		if (c->Flags & CONT_DISABLED) {
 			continue;

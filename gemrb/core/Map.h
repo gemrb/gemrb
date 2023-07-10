@@ -690,7 +690,7 @@ private:
 	Particles *GetNextSpark(const spaIterator &iter) const;
 	VEFObject *GetNextScriptedAnimation(const scaIterator &iter) const;
 	Actor *GetNextActor(int &q, size_t &index) const;
-	Container *GetNextPile (int &index) const;
+	Container* GetNextPile (size_t& index) const;
 
 	void RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls);
 	void DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const;

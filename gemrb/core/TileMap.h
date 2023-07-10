@@ -64,7 +64,7 @@ public:
 	//gets container by activation position (spell target)
 	Container* GetContainerByPosition(const Point &position, int type=-1) const;
 	Container* GetContainer(const ieVariable& Name) const;
-	Container* GetContainer(unsigned int idx) const;
+	Container* GetContainer(size_t idx) const;
 	/* cleans up empty heaps, returns 1 if container removed*/
 	int CleanupContainer(Container *container);
 	size_t GetContainerCount() const { return containers.size(); }

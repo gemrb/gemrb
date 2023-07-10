@@ -4805,7 +4805,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	const TileMap *TMap = target->GetCurrentArea()->TMap;
 
-	int Count = 0;
+	size_t Count = 0;
 	while (true) {
 		Door* door = TMap->GetDoor( Count++ );
 		if (!door)
