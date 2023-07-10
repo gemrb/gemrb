@@ -89,7 +89,7 @@ private:
 
 	// these are mutable instead of statice because Sprite2Ds must be released before the video driver is unloaded
 	mutable ToolTipData tooltip;
-	mutable std::map<ResRef, Holder<Sprite2D>> winframes;
+	mutable ResRefMap<Holder<Sprite2D>> winframes;
 
 	static tick_t ToolTipDelay;
 	static tick_t TooltipTime;

@@ -48,7 +48,6 @@
 #include "StringMgr.h"
 #include "System/VFS.h"
 
-#include <map>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -324,7 +323,7 @@ private:
 	ResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE]{};
 
-	std::map<ResRef, Font*> fonts;
+	ResRefMap<Font*> fonts;
 	ResRef ButtonFontResRef;
 	ResRef MovieFontResRef;
 	ResRef TextFontResRef;
