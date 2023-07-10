@@ -708,7 +708,7 @@ Map* Game::GetMap(const ResRef& areaName, bool change)
 
 	// call area customization script for PST
 	// moved here because the current area is set here
-	ScriptEngine *sE = core->GetGUIScriptEngine();
+	auto sE = core->GetGUIScriptEngine();
 	if (core->HasFeature(GFFlags::AREA_OVERRIDE) && sE) {
 		// area ResRef is accessible by GemRB.GetGameString (STR_AREANAME)
 		sE->RunFunction("Maze", "CustomizeArea");
@@ -825,7 +825,7 @@ void Game::PlacePersistents(Map *newMap, const ResRef &resRef)
 /* Loads an area */
 int Game::LoadMap(const ResRef &resRef, bool loadscreen)
 {
-	ScriptEngine *sE = core->GetGUIScriptEngine();
+	auto sE = core->GetGUIScriptEngine();
 
 	int index = FindMap(resRef);
 	if (index>=0) {

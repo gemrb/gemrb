@@ -1243,11 +1243,12 @@ ProjectileServer* Interface::GetProjectileServer() const noexcept
 
 FogRenderer& Interface::GetFogRenderer()
 {
-	return *fogRenderer.get();
+	return *fogRenderer;
 }
 
-Audio* Interface::GetAudioDrv(void) const {
-	return AudioDriver.get();
+PluginHolder<Audio> Interface::GetAudioDrv() const
+{
+	return AudioDriver;
 }
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
@@ -1564,9 +1565,9 @@ Font* Interface::GetButtonFont() const
 }
 
 /** Get GUI Script Manager */
-ScriptEngine* Interface::GetGUIScriptEngine() const
+PluginHolder<ScriptEngine> Interface::GetGUIScriptEngine() const
 {
-	return guiscript.get();
+	return guiscript;
 }
 
 //NOTE: if there were more summoned creatures, it will return only the last
@@ -1954,9 +1955,9 @@ const String& Interface::GetToken(const ieVariable& key, const String& fallback)
 }
 
 /** Get the Music Manager */
-MusicMgr* Interface::GetMusicMgr() const
+PluginHolder<MusicMgr> Interface::GetMusicMgr() const
 {
-	return music.get();
+	return music;
 }
 /** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
 int Interface::LoadSymbol(const ResRef& ref)
@@ -2214,8 +2215,8 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 	if (!core->IsAvailable( IE_INI_CLASS_ID ))
 		return false;
 
-	const DataFileMgr* defaults = nullptr;
-	const DataFileMgr* overrides = nullptr;
+	PluginHolder<DataFileMgr> defaults = nullptr;
+	PluginHolder<DataFileMgr>  overrides = nullptr;
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	FileStream* iniStream = FileStream::OpenFile(iniFileName);
@@ -2224,7 +2225,7 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 	if (iniFileName[0] && !opened) {
 		Log(WARNING, "Core", "Unable to read defaults from '{}'. Using GemRB default values.", iniFileName);
 	} else {
-		overrides = ini.get();
+		overrides = ini;
 	}
 	if (!opened || iniFileName[0] == 0) {
 		delete iniStream; // Open deletes it itself on success
@@ -2235,9 +2236,9 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 
 	if (!gemINIStream || !gemINI->Open(gemINIStream)) {
 		Log(WARNING, "Core", "Unable to load GemRB default values.");
-		defaults = ini.get();
+		defaults = ini;
 	} else {
-		defaults = gemINI.get();
+		defaults = gemINI;
 	}
 	if (!overrides) {
 		overrides = defaults;
