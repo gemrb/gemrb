@@ -634,7 +634,7 @@ bool OpenALAudioDriver::Resume()
 	return true;
 }
 
-int OpenALAudioDriver::CreateStream(std::shared_ptr<SoundMgr> newMusic)
+int OpenALAudioDriver::CreateStream(ResourceHolder<SoundMgr> newMusic)
 {
 	std::lock_guard<std::recursive_mutex> l(musicMutex);
 

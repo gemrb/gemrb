@@ -289,7 +289,7 @@ bool SDLAudio::Resume()
 	return true;
 }
 
-int SDLAudio::CreateStream(std::shared_ptr<SoundMgr> newMusic)
+int SDLAudio::CreateStream(ResourceHolder<SoundMgr> newMusic)
 {
 	std::lock_guard<std::recursive_mutex> l(MusicMutex);
 

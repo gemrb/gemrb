@@ -38,9 +38,6 @@ namespace GemRB {
 class ResourceSource;
 class TypeID;
 
-template <class T>
-using ResourceHolder = std::shared_ptr<T>;
-
 class GEM_EXPORT ResourceManager {
 public:
 	/**

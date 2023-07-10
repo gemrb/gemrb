@@ -46,6 +46,9 @@ using ResRefMap = std::unordered_map<ResRef, T, CstrHashCI<ResRef>>;
 
 using Resource = ImporterBase;
 
+template <class T>
+using ResourceHolder = std::shared_ptr<T>; // TODO: this should be type constrained
+
 }
 
 #endif

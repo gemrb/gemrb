@@ -137,7 +137,7 @@ public:
 	bool Stop() override;
 	bool Pause() override;
 	bool Resume() override;
-	int CreateStream(std::shared_ptr<SoundMgr>) override;
+	int CreateStream(ResourceHolder<SoundMgr>) override;
 	void UpdateListenerPos(const Point&) override;
 	Point GetListenerPos() override;
 	bool ReleaseStream(int stream, bool HardStop) override;
@@ -159,7 +159,7 @@ private:
 	bool MusicPlaying = false;
 	std::recursive_mutex musicMutex;
 	ALuint MusicBuffer[MUSICBUFFERS]{};
-	std::shared_ptr<SoundMgr> MusicReader;
+	ResourceHolder<SoundMgr> MusicReader;
 	LRUCache<CacheEntry, OpenALPlaying> buffercache{BUFFER_CACHE_SIZE};
 	AudioStream speech;
 	AudioStream streams[MAX_STREAMS];
