@@ -166,7 +166,7 @@ Regions View::DirtySuperViewRegions() const
 		Regions r = subview->DirtySuperViewRegions();
 		dirtyAreas.reserve(dirtyAreas.size() + r.size());
 		std::transform(r.begin(), r.end(), std::back_inserter(dirtyAreas), [this](const Region& rgn) {
-			return ConvertRegionToSuper(rgn);
+			return ConvertRegionToSuper(rgn).Intersect(frame);
 		});
 	}
 	return dirtyAreas;
