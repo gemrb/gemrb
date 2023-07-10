@@ -207,7 +207,7 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 	return pro;
 }
 
-size_t ProjectileServer::PrepareSymbols(const std::shared_ptr<SymbolMgr>& projlist) const
+size_t ProjectileServer::PrepareSymbols(const PluginHolder<SymbolMgr>& projlist) const
 {
 	size_t count = 0;
 
@@ -227,7 +227,7 @@ size_t ProjectileServer::PrepareSymbols(const std::shared_ptr<SymbolMgr>& projli
 	return count;
 }
 
-void ProjectileServer::AddSymbols(const std::shared_ptr<SymbolMgr>& projlist) {
+void ProjectileServer::AddSymbols(const PluginHolder<SymbolMgr>& projlist) {
 	size_t rows = projlist->GetSize();
 	while(rows--) {
 		unsigned int value = projlist->GetValueIndex(rows);

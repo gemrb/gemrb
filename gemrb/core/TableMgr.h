@@ -98,7 +98,7 @@ public:
 	virtual bool Open(DataStream* stream) = 0;
 };
 
-using AutoTable = std::shared_ptr<TableMgr>;
+using AutoTable = PluginHolder<TableMgr>;
 
 }
 

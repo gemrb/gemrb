@@ -87,9 +87,9 @@ PyObject* PyLong_FromStrRef(ieStrRef str)
 	return PyLong_FromLong(ieDword(str));
 }
 
-std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj)
+PluginHolder<SymbolMgr> GetSymbols(PyObject* obj)
 {
-	std::shared_ptr<SymbolMgr> sm;
+	PluginHolder<SymbolMgr> sm;
 
 	PyObject* id = PyObject_GetAttrString(obj, "ID");
 	if (!id) {

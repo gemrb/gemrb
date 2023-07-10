@@ -68,7 +68,7 @@ private:
 	/** Returns Resource object associated to given resource */
 	Resource* GetResource(StringView resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
 
-	std::vector<std::shared_ptr<ResourceSource> > searchPath;
+	std::vector<PluginHolder<ResourceSource>> searchPath;
 };
 
 }

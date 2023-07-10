@@ -218,7 +218,7 @@ public:
 	Color SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio) const;
 };
 
-extern GEM_EXPORT std::shared_ptr<Video> VideoDriver;
+extern GEM_EXPORT PluginHolder<Video> VideoDriver;
 
 }
 

@@ -94,7 +94,7 @@ class WorldMap;
 class WorldMapArray;
 
 struct Symbol {
-	std::shared_ptr<SymbolMgr> sm;
+	PluginHolder<SymbolMgr> sm;
 	ResRef symbolName;
 };
 
@@ -295,25 +295,25 @@ public:
 private:
 	// dirvers must be deallocated last (keep them at the top)
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
-	std::shared_ptr<Audio> AudioDriver;
+	PluginHolder<Audio> AudioDriver;
 
 	ProjectileServer* projserv = nullptr;
 
 	WindowManager* winmgr = nullptr;
 	std::shared_ptr<GUIFactory> guifact;
-	std::shared_ptr<ScriptEngine> guiscript;
+	PluginHolder<ScriptEngine> guiscript;
 	std::shared_ptr<FogRenderer> fogRenderer;
 	GameControl* gamectrl = nullptr;
 	SaveGameIterator *sgiterator = nullptr;
 	tokens_t tokens;
 	std::unordered_map<std::string, std::vector<ieDword>> lists;
 	variables_t vars;
-	std::shared_ptr<MusicMgr> music;
+	PluginHolder<MusicMgr> music;
 	std::vector<Symbol> symbols;
-	std::shared_ptr<DataFileMgr> INIparty;
-	std::shared_ptr<DataFileMgr> INIbeasts;
-	std::shared_ptr<DataFileMgr> INIquests;
-	std::shared_ptr<DataFileMgr> INIresdata;
+	PluginHolder<DataFileMgr> INIparty;
+	PluginHolder<DataFileMgr> INIbeasts;
+	PluginHolder<DataFileMgr> INIquests;
+	PluginHolder<DataFileMgr> INIresdata;
 	Game* game = nullptr;
 	Calendar* calendar = nullptr;
 	WorldMapArray* worldmap = nullptr;
@@ -366,8 +366,8 @@ private:
 
 public:
 	EncodingStruct TLKEncoding;
-	std::shared_ptr<StringMgr> strings;
-	std::shared_ptr<StringMgr> strings2;
+	PluginHolder<StringMgr> strings;
+	PluginHolder<StringMgr> strings2;
 	GlobalTimer timer;
 	int QuitFlag = QF_NORMAL;
 	int EventFlag = EF_CONTROL;
@@ -450,7 +450,7 @@ public:
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
 	int GetSymbolIndex(const ResRef&) const;
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
-	std::shared_ptr<SymbolMgr> GetSymbol(unsigned int index) const;
+	PluginHolder<SymbolMgr> GetSymbol(unsigned int index) const;
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */
