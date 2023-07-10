@@ -50,6 +50,10 @@ public:
 	virtual ~Plugin() noexcept = default;
 };
 
+// TODO: this should be constrained to a Plugin type, but I cant get that to work in C++14
+template <typename T>
+using PluginHolder = std::shared_ptr<T>;
+
 class GEM_EXPORT ImporterBase
 {
 protected:

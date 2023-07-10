@@ -66,7 +66,7 @@ struct ResRefToStrRef {
 };
 
 static std::vector<ResRefToStrRef> tracks;
-std::shared_ptr<DataFileMgr> INInote;
+PluginHolder<DataFileMgr> INInote;
 
 static void ReadAutonoteINI()
 {

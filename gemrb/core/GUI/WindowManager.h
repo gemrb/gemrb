@@ -84,7 +84,7 @@ private:
 
 	EventMgr eventMgr;
 
-	std::shared_ptr<Video> video;
+	PluginHolder<Video> video;
 	VideoBufferPtr HUDBuf = nullptr; // heads up display layer. Contains cursors/tooltips/borders and whatever gets drawn via DrawHUD()
 
 	// these are mutable instead of statice because Sprite2Ds must be released before the video driver is unloaded
@@ -112,7 +112,7 @@ private:
 	void MarkAllDirty() const;
 
 public:
-	explicit WindowManager(const std::shared_ptr<Video>& vid);
+	explicit WindowManager(PluginHolder<Video> vid);
 	~WindowManager();
 	
 	WindowManager(const WindowManager&) = delete;

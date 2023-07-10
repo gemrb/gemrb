@@ -721,7 +721,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	ResRef clab;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
-	std::shared_ptr<TableMgr> tm;
+	PluginHolder<TableMgr> tm;
 
 	// iwd2 has support for multikit characters, so we have more work
 	// at the same time each baseclass has its own level stat, so the logic is cleaner
@@ -2143,8 +2143,8 @@ static void InitActorTables()
 	int value = 0;
 	int racetable = core->LoadSymbol("race");
 	int subracetable = core->LoadSymbol("subrace");
-	std::shared_ptr<SymbolMgr> race;
-	std::shared_ptr<SymbolMgr> subrace;
+	PluginHolder<SymbolMgr> race;
+	PluginHolder<SymbolMgr> subrace;
 	if (racetable != -1) {
 		race = core->GetSymbol(racetable);
 	}

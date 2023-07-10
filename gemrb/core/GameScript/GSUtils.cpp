@@ -55,11 +55,12 @@
 namespace GemRB {
 
 //these tables will get freed by Core
-std::shared_ptr<SymbolMgr> triggersTable;
-std::shared_ptr<SymbolMgr> actionsTable;
-std::shared_ptr<SymbolMgr> overrideTriggersTable;
-std::shared_ptr<SymbolMgr> overrideActionsTable;
-std::shared_ptr<SymbolMgr> objectsTable;
+PluginHolder<SymbolMgr> triggersTable;
+PluginHolder<SymbolMgr> actionsTable;
+PluginHolder<SymbolMgr> overrideTriggersTable;
+PluginHolder<SymbolMgr> overrideActionsTable;
+PluginHolder<SymbolMgr> objectsTable;
+
 TriggerFunction triggers[MAX_TRIGGERS];
 ActionFunction actions[MAX_ACTIONS];
 short actionflags[MAX_ACTIONS];

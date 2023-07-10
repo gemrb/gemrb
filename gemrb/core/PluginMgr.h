@@ -133,9 +133,6 @@ public:
 };
 
 template <typename T>
-using PluginHolder = std::shared_ptr<T>;
-
-template <typename T>
 PluginHolder<T> MakePluginHolder(PluginID id) {
 	return PluginHolder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)));
 }

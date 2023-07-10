@@ -88,7 +88,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT std::shared_ptr<Video> VideoDriver;
+GEM_EXPORT PluginHolder<Video> VideoDriver;
 GEM_EXPORT Interface* core = NULL;
 
 struct AbilityTables {
@@ -1032,7 +1032,7 @@ void Interface::Main()
 void Interface::InitVideo() const
 {
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	VideoDriver = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName)));
+	VideoDriver = PluginHolder<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName)));
 	if (!VideoDriver) {
 		throw std::runtime_error("No Video Driver Available.");
 	}
@@ -1044,7 +1044,7 @@ void Interface::InitVideo() const
 void Interface::InitAudio()
 {
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName)));
+	AudioDriver = PluginHolder<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName)));
 	if (AudioDriver == nullptr) {
 		throw std::runtime_error("Failed to load sound driver.");
 	}
@@ -2004,7 +2004,7 @@ int Interface::GetSymbolIndex(const ResRef& ref) const
 	return -1;
 }
 /** Gets a Loaded Symbol Table by its index, returns NULL on error */
-std::shared_ptr<SymbolMgr> Interface::GetSymbol(unsigned int index) const
+PluginHolder<SymbolMgr> Interface::GetSymbol(unsigned int index) const
 {
 	if (index >= symbols.size()) {
 		return {};

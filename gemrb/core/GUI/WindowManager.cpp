@@ -43,10 +43,10 @@ void WindowManager::SetTooltipDelay(int delay)
 	ToolTipDelay = delay;
 }
 
-WindowManager::WindowManager(const std::shared_ptr<Video>& vid)
-: tooltip(core->CreateTooltip())
+WindowManager::WindowManager(PluginHolder<Video> vid)
+: video(vid), tooltip(core->CreateTooltip())
 {
-	assert(vid);
+	assert(video);
 
 	cursorFeedback = MOUSE_ALL;
 
@@ -57,20 +57,19 @@ WindowManager::WindowManager(const std::shared_ptr<Video>& vid)
 	eventMgr.RegisterHotKeyCallback(cb, 'f', GEM_MOD_CTRL);
 	eventMgr.RegisterHotKeyCallback(cb, GEM_GRAB, 0);
 
-	screen = Region(Point(), vid->GetScreenSize());
+	screen = Region(Point(), video->GetScreenSize());
 	// FIXME: technically we should unset the current video event manager...
-	vid->SetEventMgr(&eventMgr);
+	video->SetEventMgr(&eventMgr);
 
 	gameWin = new Window(screen, *this);
 	gameWin->SetFlags(Window::Borderless|View::Invisible, BitOp::SET);
 	gameWin->SetFrame(screen);
 
-	HUDBuf = vid->CreateBuffer(screen, Video::BufferFormat::DISPLAY_ALPHA);
+	HUDBuf = video->CreateBuffer(screen, Video::BufferFormat::DISPLAY_ALPHA);
 
 	// set the buffer that always gets cleared just in case anything
 	// tries to draw
-	vid->PushDrawingBuffer(HUDBuf);
-	video = vid;
+	video->PushDrawingBuffer(HUDBuf);
 	// TODO: changing screen size should adjust window positions too
 	// TODO: how do we get notified if the Video driver changes size?
 }

@@ -43,7 +43,7 @@ static const int StatValues[9]={
 IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC,
 IE_SEX, IE_ALIGNMENT };
 
-static std::shared_ptr<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
+static PluginHolder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
 	if (!gamedata->Exists( DefaultArea, IE_INI_CLASS_ID)) {

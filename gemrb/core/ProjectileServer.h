@@ -80,9 +80,9 @@ private:
 	std::vector<ProjectileEntry> projectiles; //this is the list of projectiles
 	std::vector<ExplosionEntry> explosions;   //this is the list of explosion resources
 	// internal function: what is max valid projectile id?
-	size_t PrepareSymbols(const std::shared_ptr<SymbolMgr>& projlist) const;
+	size_t PrepareSymbols(const PluginHolder<SymbolMgr>& projlist) const;
 	// internal function: read projectiles
-	void AddSymbols(const std::shared_ptr<SymbolMgr>& projlist);
+	void AddSymbols(const PluginHolder<SymbolMgr>& projlist);
 	//this method is used internally
 	Projectile *GetProjectile(size_t idx);
 	//creates a clone from the cached projectiles

@@ -1421,7 +1421,7 @@ static void CleanupIEScript()
 	overrideTriggersTable.reset();
 }
 
-static void printFunction(std::string& buffer, const std::shared_ptr<SymbolMgr>& table, int index)
+static void printFunction(std::string& buffer, const PluginHolder<SymbolMgr>& table, int index)
 {
 	const auto& str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
