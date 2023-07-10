@@ -343,7 +343,7 @@ Interface::Interface(CoreSettings&& cfg)
 		throw CIE("The path must point to a game directory with a readable chitin.key file.");
 	}
 
-	fogRenderer = std::make_shared<FogRenderer>(config.SpriteFoW);
+	fogRenderer = std::make_unique<FogRenderer>(config.SpriteFoW);
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	SetNextScript("Start"); // Start is the first script executed
