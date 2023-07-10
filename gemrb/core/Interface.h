@@ -302,7 +302,7 @@ private:
 	WindowManager* winmgr = nullptr;
 	std::shared_ptr<GUIFactory> guifact;
 	PluginHolder<ScriptEngine> guiscript;
-	std::shared_ptr<FogRenderer> fogRenderer;
+	std::unique_ptr<FogRenderer> fogRenderer;
 	GameControl* gamectrl = nullptr;
 	SaveGameIterator *sgiterator = nullptr;
 	tokens_t tokens;
