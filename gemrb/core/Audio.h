@@ -27,6 +27,7 @@
 
 #include "MapReverb.h"
 #include "Plugin.h"
+#include "Resource.h"
 #include "Holder.h"
 
 #include <string>
@@ -116,7 +117,7 @@ public:
 	virtual bool Stop() = 0;
 	virtual bool Pause() = 0;
 	virtual bool Resume() = 0;
-	virtual int CreateStream(std::shared_ptr<SoundMgr>) = 0;
+	virtual int CreateStream(ResourceHolder<SoundMgr>) = 0;
 	virtual void UpdateListenerPos(const Point&) = 0;
 	virtual Point GetListenerPos() = 0;
 	virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;

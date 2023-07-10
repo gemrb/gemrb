@@ -53,7 +53,7 @@ private:
 		} v2;
 	} layout;
 
-	std::shared_ptr<ImageMgr> lastPVRZ;
+	ResourceHolder<ImageMgr> lastPVRZ;
 	ieDword lastPVRZPage = 0;
 
 	void Blit(const MOSV2DataBlock& dataBlock, uint8_t* data);

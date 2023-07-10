@@ -80,7 +80,7 @@ private:
 	ieDword CyclesOffset = 0;
 	ieDword FramesOffset = 0;
 	strpos_t DataStart = 0;
-	std::shared_ptr<ImageMgr> lastPVRZ;
+	ResourceHolder<ImageMgr> lastPVRZ;
 	ieDword lastPVRZPage = 0;
 
 	void Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock, uint8_t* data);

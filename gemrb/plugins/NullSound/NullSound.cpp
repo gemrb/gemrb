@@ -46,7 +46,7 @@ Holder<SoundHandle> NullSound::Play(StringView, unsigned int, const Point&, unsi
 	return Holder<SoundHandle>();
 }
 
-int NullSound::CreateStream(std::shared_ptr<SoundMgr>)
+int NullSound::CreateStream(ResourceHolder<SoundMgr>)
 {
 	return 0;
 }

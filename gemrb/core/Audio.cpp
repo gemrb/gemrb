@@ -19,7 +19,6 @@
  */
 
 #include "Audio.h"
-#include "Resource.h"
 
 namespace GemRB {
 

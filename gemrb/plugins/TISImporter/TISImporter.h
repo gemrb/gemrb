@@ -41,7 +41,7 @@ private:
 	bool hasPVRData = false;
 
 	Holder<Sprite2D> badTile; // blank tile to use to fill in bad data
-	std::shared_ptr<ImageMgr> lastPVRZ;
+	ResourceHolder<ImageMgr> lastPVRZ;
 	ieDword lastPVRZPage = 0;
 
 	Holder<Sprite2D> GetTilePaletted(int index);
