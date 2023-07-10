@@ -410,7 +410,7 @@ public:
 	/** Returns the button font */
 	Font * GetButtonFont() const;
 	/** Get GUI Script Manager */
-	ScriptEngine * GetGUIScriptEngine() const;
+	PluginHolder<ScriptEngine> GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
 	Actor *SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, const Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod = true);
@@ -443,7 +443,7 @@ public:
 	tokens_t& GetTokenDictionary();
 	const String& GetToken(const ieVariable& key, const String& fallback) const;
 	/** Get the Music Manager */
-	MusicMgr * GetMusicMgr() const;
+	PluginHolder<MusicMgr> GetMusicMgr() const;
 	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
 	int LoadSymbol(const ResRef&);
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
@@ -741,7 +741,7 @@ public:
 	/** Set Next Script */
 	void SetNextScript(const path_t& script);
 
-	Audio* GetAudioDrv(void) const;
+	PluginHolder<Audio> GetAudioDrv(void) const;
 
 	Timer& SetTimer(const EventHandler&, tick_t interval, int repeats = -1);
 };

@@ -3834,7 +3834,7 @@ void Actor::PlayExistenceSounds()
 		delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
 	}
 
-	Audio *audio = core->GetAudioDrv();
+	auto audio = core->GetAudioDrv();
 	Point listener = audio->GetListenerPos();
 	if (nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
 		//setup as an ambient
