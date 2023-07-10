@@ -21,6 +21,7 @@
 #ifndef __GemRB__InterfaceConfig__
 #define __GemRB__InterfaceConfig__
 
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -38,6 +39,14 @@
 #define MAX_CD 6
 
 namespace GemRB {
+
+class CoreInitializationException : public std::runtime_error
+{
+public:
+	using std::runtime_error::runtime_error;
+};
+
+#define CIE CoreInitializationException
 
 using variables_t = std::unordered_map<std::string, int32_t>;
 

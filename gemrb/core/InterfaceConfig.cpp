@@ -24,8 +24,6 @@
 #include "Streams/FileStream.h"
 #include "System/VFS.h"
 
-#include <stdexcept>
-
 namespace GemRB {
 
 static InterfaceConfig LoadFromStream(DataStream& cfgStream)
@@ -345,7 +343,7 @@ InterfaceConfig LoadFromCFG(const path_t& file)
 {
 	FileStream cfgStream;
 	if (!cfgStream.Open(file)) {
-		throw std::runtime_error(std::string("File not found: ") + file);
+		throw CIE(std::string("File not found: ") + file);
 	}
 
 	return LoadFromStream(cfgStream);
