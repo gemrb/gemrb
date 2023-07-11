@@ -33,29 +33,22 @@ bool DirectoryImporter::Open(const char *dir, const char *desc)
 		return false;
 
 	description = desc;
-	if (strlcpy(path, dir, _MAX_PATH) >= _MAX_PATH) {
-		Log(ERROR, "DirectoryImporter", "Directory with too long path: {}!", dir);
-		return false;
-	}
+	path = dir;
 	return true;
 }
 
-static bool FindIn(const char *Path, StringView ResRef, const char *Type)
+static bool FindIn(const path_t& path, StringView resRef, const char *type)
 {
 	char p[_MAX_PATH] = {0};
-	std::string f(ResRef.c_str(), ResRef.length());
-	StringToLower(f);
 
-	return PathJoinExt(p, Path, f.c_str(), Type);
+	return PathJoinExt(p, path.c_str(), resRef.c_str(), type);
 }
 
-static FileStream *SearchIn(const char * Path, StringView ResRef, const char *Type)
+static FileStream *SearchIn(const path_t& path, StringView resRef, const char *type)
 {
 	char p[_MAX_PATH] = {0};
-	std::string f(ResRef.c_str(), ResRef.length());
-	StringToLower(f);
 
-	if (!PathJoinExt(p, Path, f.c_str(), Type))
+	if (!PathJoinExt(p, path.c_str(), resRef.c_str(), type))
 		return nullptr;
 
 	return FileStream::OpenFile(p);
@@ -101,20 +94,17 @@ void CachedDirectoryImporter::Refresh()
 		return;
 
 	do {
-		path_t name = it.GetName();
-		StringToLower(name);
-		auto emplaceResult = cache.emplace(name, name);
+		const path_t name = it.GetName();
+		auto emplaceResult = cache.emplace(name);
 		if (!emplaceResult.second) {
 			Log(ERROR, "CachedDirectoryImporter", "Duplicate '{}' files in '{}' directory", name, path);
 		}
 	} while (++it);
 }
 
-static std::string ConstructFilename(StringView resname, const char* ext)
+static path_t ConstructFilename(StringView resname, const path_t& ext)
 {
-	assert(strnlen(ext, 5) < 5);
-	std::string buf(resname.c_str(), resname.length());
-	StringToLower(buf);
+	path_t buf(resname.c_str(), resname.length());
 	buf.push_back('.');
 	buf += ext;
 	return buf;
@@ -122,42 +112,40 @@ static std::string ConstructFilename(StringView resname, const char* ext)
 
 bool CachedDirectoryImporter::HasResource(StringView resname, SClass_ID type)
 {
-	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
+	const path_t& filename = ConstructFilename(resname, core->TypeExt(type));
 	return cache.find(filename) != cache.cend();
 }
 
 bool CachedDirectoryImporter::HasResource(StringView resname, const ResourceDesc &type)
 {
-	const std::string& filename = ConstructFilename(resname, type.GetExt());
+	const path_t& filename = ConstructFilename(resname, type.GetExt());
 	return cache.find(filename) != cache.cend();
 }
 
 DataStream* CachedDirectoryImporter::GetResource(StringView resname, SClass_ID type)
 {
-	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
+	const path_t& filename = ConstructFilename(resname, core->TypeExt(type));
 	const auto lookup = cache.find(filename);
 
 	if (lookup == cache.cend())
 		return nullptr;
 
-	char buf[_MAX_PATH];
-	strcpy(buf, path);
-	PathAppend(buf, lookup->second.c_str());
-	return FileStream::OpenFile(buf);
+	path_t buf = path;
+	PathAppend(buf, *lookup);
+	return FileStream::OpenFile(buf.c_str());
 }
 
 DataStream* CachedDirectoryImporter::GetResource(StringView resname, const ResourceDesc &type)
 {
-	const std::string& filename = ConstructFilename(resname, type.GetExt());
+	const path_t& filename = ConstructFilename(resname, type.GetExt());
 	const auto lookup = cache.find(filename);
 
 	if (lookup == cache.cend())
 		return nullptr;
 
-	char buf[_MAX_PATH];
-	strcpy(buf, path);
-	PathAppend(buf, lookup->second.c_str());
-	return FileStream::OpenFile(buf);
+	path_t buf = path;
+	PathAppend(buf, *lookup);
+	return FileStream::OpenFile(buf.c_str());
 }
 
 #include "plugindef.h"
