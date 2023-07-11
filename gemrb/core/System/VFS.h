@@ -46,13 +46,6 @@ namespace GemRB {
 
 using path_t = std::string;
 
-#ifdef WIN32
-
-// prevents warnings of unused `p`
-#define ResolveFilePath(p) (void)p
-
-#else  // ! WIN32
-
 #ifdef __APPLE__
 // bundle path functions
 enum BundleDirectory {
@@ -63,11 +56,6 @@ enum BundleDirectory {
 GEM_EXPORT path_t BundlePath(BundleDirectory dir = BUNDLE);
 #endif
 
-/** Handle ~ -> $HOME mapping and do initial case-sensitity check */
-GEM_EXPORT void ResolveFilePath(path_t& FilePath);
-
-#endif  // ! WIN32
-
 #ifdef WIN32
 const char PathDelimiter = '\\';
 const char PathListSeparator = ';';
@@ -76,6 +64,9 @@ const char PathDelimiter = '/';
 const char PathListSeparator = ':';
 #endif
 const char SPathDelimiter[] = { PathDelimiter, '\0' };
+
+/** Handle ~ -> $HOME mapping and do initial case-sensitity check */
+GEM_EXPORT void ResolveFilePath(path_t& FilePath);
 
 GEM_EXPORT bool DirExists(const path_t& path);
 GEM_EXPORT bool FileExists(const path_t& path);
