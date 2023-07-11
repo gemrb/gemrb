@@ -19,9 +19,10 @@
 #ifndef DIRIMP_H
 #define DIRIMP_H
 
-#include <unordered_map>
+#include <set>
 
 #include "ResourceSource.h"
+#include "System/VFS.h"
 
 namespace GemRB {
 
@@ -29,7 +30,7 @@ class ResourceDesc;
 
 class DirectoryImporter : public ResourceSource {
 protected:
-	char path[_MAX_PATH] {};
+	path_t path;
 
 public:
 	DirectoryImporter() noexcept = default;
@@ -44,7 +45,8 @@ public:
 
 class CachedDirectoryImporter : public DirectoryImporter {
 protected:
-	std::unordered_map<std::string, std::string> cache;
+	// the case is case insensitive, but we will only store valid names
+	std::set<path_t, CstrCmpCI<path_t>> cache;
 
 public:
 	CachedDirectoryImporter() noexcept = default;

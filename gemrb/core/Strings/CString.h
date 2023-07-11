@@ -63,6 +63,17 @@ struct GEM_EXPORT CstrHash
 template <typename STR_T>
 using CstrHashCI = CstrHash<STR_T, std::tolower>;
 
+template <typename STR_T, int(*CMP)(const char*, const char*) = strcmp>
+struct GEM_EXPORT CstrCmp
+{
+	bool operator() (const STR_T& lhs, const STR_T& rhs) const {
+		return CMP(lhs.c_str(), rhs.c_str()) < 0;
+	}
+};
+
+template <typename STR_T>
+using CstrCmpCI = CstrCmp<STR_T, stricmp>;
+
 template<size_t LEN, int(*CMP)(const char*, const char*, size_t) = strncmp>
 class FixedSizeString {
 	// we use uint8_t and an object of massive size is not wanted
