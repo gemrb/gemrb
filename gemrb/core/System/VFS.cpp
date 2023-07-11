@@ -298,10 +298,9 @@ void FixPath(path_t& path, bool needslash)
 	}
 }
 
-#ifndef WIN32
-
 void ResolveFilePath(path_t& filePath)
 {
+#ifndef WIN32
 	if (filePath[0] == '~') {
 		path_t home = HomePath();
 		if (home.length()) {
@@ -309,11 +308,10 @@ void ResolveFilePath(path_t& filePath)
 			filePath.swap(home);
 		}
 	}
+#endif
 
 	ResolveCase(filePath);
 }
-
-#endif
 
 path_t ExtractFileFromPath(const path_t& fullPath)
 {
