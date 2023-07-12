@@ -736,8 +736,6 @@ public:
 		SetEventFlag(EF_ACTION);
 	}
 
-	static void SanityCheck(const char *ver);
-
 	/** Set Next Script */
 	void SetNextScript(const path_t& script);
 

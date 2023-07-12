@@ -33,7 +33,7 @@
 
 #include <cassert>
 
-using namespace GemRB;
+namespace GemRB {
 
 #define FAMILIAR_FILL_SIZE 324
 // if your compiler chokes on this, use -1 or 0xff whichever works for you
@@ -1246,6 +1246,8 @@ int GAMImporter::PutGame(DataStream *stream, Game *game) const
 
 	return 0;
 }
+
+} // namespace GemRB
 
 #include "plugindef.h"
 

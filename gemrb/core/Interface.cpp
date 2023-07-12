@@ -4120,10 +4120,4 @@ void Interface::SetNextScript(const path_t& script)
 	QuitFlag |= QF_CHANGESCRIPT;
 }
 
-void Interface::SanityCheck(const char *ver) {
-	if (strcmp(ver, VERSION_GEMRB) != 0) {
-		error("Core", "Version check failed: core version {} doesn't match caller's version {}!", VERSION_GEMRB, ver);
-	}
-}
-
 }
