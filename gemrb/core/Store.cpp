@@ -134,10 +134,14 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 		if ((invflags&IE_INV_ITEM_CRITICAL) && !(Flags&IE_STORE_BUYCRITS)) {
 			ret &= ~IE_STORE_SELL;
 		}
-		
+
 		//...the shop is special (iwd/how/bg1)
-		if ((core->HasFeature(GFFlags::NO_UNDROPPABLE)) || (core->HasFeature(GFFlags::RANDOM_BANTER_DIALOGS))) {
-			ret |= IE_STORE_SELL;
+		if ((core->HasFeature(GFFlags::NO_UNDROPPABLE)) || (core->HasFeature(GFFlags::BREAKABLE_WEAPONS))) {
+			if (invflags&IE_INV_ITEM_CONVERSABLE) {
+				ret &= ~IE_STORE_SELL;
+			} else {
+				ret |= IE_STORE_SELL;
+			}
 		}
 
 		//check if store buys stolen items
