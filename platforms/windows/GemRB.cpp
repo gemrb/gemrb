@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
 	setlocale(LC_ALL, "");
 
-	Interface::SanityCheck(VERSION_GEMRB);
+	SanityCheck();
 	
 	try {
 		Interface gemrb(LoadFromArgs(argc, argv));

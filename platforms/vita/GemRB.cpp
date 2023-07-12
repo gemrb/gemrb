@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 	AddLogWriter(createVitaLogger());
 	ToggleLogging(true);
 
-	Interface::SanityCheck(VERSION_GEMRB);
+	SanityCheck();
 	
 	//Py_Initialize crashes on Vita otherwise
 	Py_NoSiteFlag = 1;

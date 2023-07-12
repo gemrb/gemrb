@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 	AddLogWriter(createAndroidLogger());
 	ToggleLogging(true);
 
-	Interface::SanityCheck(VERSION_GEMRB);
+	SanityCheck();
 	
 	try {
 		Interface gemrb(LoadFromArgs(argc, argv));

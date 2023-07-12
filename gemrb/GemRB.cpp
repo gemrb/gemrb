@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	setenv("MALLOC_TRIM_THRESHOLD_", fmt::format("{}", 5 * pagesize), 1);
 #endif
 
-	Interface::SanityCheck(VERSION_GEMRB);
+	SanityCheck();
 
 	try {
 		Interface gemrb(LoadFromArgs(argc, argv));
