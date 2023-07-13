@@ -136,7 +136,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 		}
 
 		//...the shop is special (iwd/how/bg1)
-		if ((core->HasFeature(GFFlags::NO_UNDROPPABLE)) || (core->HasFeature(GFFlags::BREAKABLE_WEAPONS))) {
+		if ((core->config.GameType == "how") || (core->config.GameType == "bg1")) {
 			if (invflags&IE_INV_ITEM_CONVERSABLE) {
 				ret &= ~IE_STORE_SELL;
 			} else {
