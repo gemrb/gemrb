@@ -1703,7 +1703,8 @@ static const EnumArray<GFFlags, StringView> game_flags {
 		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
 		"ClearingActionOverride", //83GF_CLEARING_ACTIONOVERRIDE
 		"DamageInnocentRep",  //84GF_DAMAGE_INNOCENT_REP
-		"HasWeaponSets" // GF_HAS_WEAPON_SETS
+		"HasWeaponSets", // GF_HAS_WEAPON_SETS
+		"SellableCritsNoConv"	//SELLABLE_CRITS_NO_CONV
 };
 
 /** Loads gemrb.ini */

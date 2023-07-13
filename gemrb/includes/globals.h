@@ -142,6 +142,7 @@ enum class GFFlags : uint32_t {
 	CLEARING_ACTIONOVERRIDE,         // bg2, not iwd2
 	DAMAGE_INNOCENT_REP,             // not bg1
 	HAS_WEAPON_SETS,             	// iwd2
+	SELLABLE_CRITS_NO_CONV,			//bg1, iwd, how conversable/unsellable vs critical items
 
 	count // must be last
 };
