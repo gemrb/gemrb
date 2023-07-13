@@ -232,7 +232,7 @@ Interface::Interface(CoreSettings&& cfg)
 	gamedata = new GameData();
 	sgiterator = new SaveGameIterator();
 
-	if (!MakeDirectories(config.CachePath.c_str())) {
+	if (!MakeDirectories(config.CachePath)) {
 		throw std::runtime_error(fmt::format("Unable to create cache directory '{}'", config.CachePath));
 	}
 

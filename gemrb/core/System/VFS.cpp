@@ -378,47 +378,44 @@ void ExtractFileFromPath(char *file, const char *full_path)
 		strcpy(file, full_path);
 }
 
-bool MakeDirectories(const char* path)
+static bool MakeDirectory(StringView path)
 {
-	char TempFilePath[_MAX_PATH] = "";
-	char Tokenized[_MAX_PATH];
-	assert(strnlen(path, _MAX_PATH/2) < _MAX_PATH/2);
-	strcpy(Tokenized, path);
-
-	char* Token = strtok(Tokenized, SPathDelimiter);
-	while(Token != NULL) {
-		if(TempFilePath[0] == 0) {
-			if(path[0] == PathDelimiter) {
-				TempFilePath[0] = PathDelimiter;
-				TempFilePath[1] = 0;
-			}
-			assert(strnlen(Token, _MAX_PATH/2) < _MAX_PATH/2);
-			strcat(TempFilePath, Token);
-		} else
-			PathJoin(TempFilePath, TempFilePath, Token, nullptr);
-
-		if(!MakeDirectory(TempFilePath))
-			return false;
-
-		Token = strtok(NULL, SPathDelimiter);
-	}
-	return true;
-}
-
-bool MakeDirectory(const char* path)
-{
+	// 'path' may be in the middle of a string
+	// so we cheat to avoid copying, we will change it back
+	char term = '\0';
+	char* end = const_cast<char*>(path.end());
+	std::swap(*end, term); // use swap because end may be a delimiter or a terminator
 #ifdef WIN32
 #define mkdir(path, mode) _mkdir(path)
 #endif
-	if (mkdir(path, S_IRWXU) < 0) {
-		if (errno != EEXIST) {
-			return false;
-		}
-	}
-	return true;
+	bool ret = mkdir(path.c_str(), S_IRWXU) == 0 || errno == EEXIST;
+	std::swap(*end, term);
+	return ret;
 #ifdef WIN32
 #undef mkdir
 #endif
+}
+
+bool MakeDirectory(const path_t& path)
+{
+	return MakeDirectory(StringView(path));
+}
+
+bool MakeDirectories(const path_t& path)
+{
+	auto parts = Explode<path_t, StringView>(path, PathDelimiter);
+	const char* begin = path.data();
+
+	for (const auto& part : parts) {
+		if (part.length() == 0) continue;
+
+		const char* end = part.begin() + part.length();
+		if(!MakeDirectory(StringView(begin, end - begin))) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 GEM_EXPORT path_t HomePath()
