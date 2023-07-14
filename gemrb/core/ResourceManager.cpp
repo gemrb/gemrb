@@ -168,7 +168,7 @@ DataStream* ResourceManager::GetResourceStream(StringView ResRef, SClass_ID type
 	return NULL;
 }
 
-Resource* ResourceManager::GetResource(StringView ResRef, const TypeID *type, bool silent, bool useCorrupt) const
+ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const TypeID *type, bool silent, bool useCorrupt) const
 {
 	if (ResRef.empty())
 		return nullptr;
@@ -186,7 +186,7 @@ Resource* ResourceManager::GetResource(StringView ResRef, const TypeID *type, bo
 			}
 			core->UseCorruptedHack = false;
 			if (str) {
-				Resource *res = type2.Create(str);
+				auto res = type2.Create(str);
 				if (res) {
 					if (!silent) {
 						Log(MESSAGE, "ResourceManager", "Found '{}.{}' in '{}'.",

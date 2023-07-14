@@ -1021,7 +1021,7 @@ void Interface::Main()
 void Interface::InitVideo() const
 {
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	VideoDriver = PluginHolder<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName)));
+	VideoDriver = std::static_pointer_cast<Video>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName));
 	if (!VideoDriver) {
 		throw CIE("No Video Driver Available.");
 	}
@@ -1033,7 +1033,7 @@ void Interface::InitVideo() const
 void Interface::InitAudio()
 {
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = PluginHolder<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName)));
+	AudioDriver = std::static_pointer_cast<Audio>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName));
 	if (AudioDriver == nullptr) {
 		throw CIE("Failed to load sound driver.");
 	}

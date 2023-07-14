@@ -59,11 +59,11 @@ public:
 	template <class T>
 	inline ResourceHolder<T> GetResourceHolder(StringView resname, bool silent = false, bool useCorrupt = false) const
 	{
-		return ResourceHolder<T>(static_cast<T*>(GetResource(resname, &T::ID, silent, useCorrupt)));
+		return std::static_pointer_cast<T>(GetResource(resname, &T::ID, silent, useCorrupt));
 	}
 private:
 	/** Returns Resource object associated to given resource */
-	Resource* GetResource(StringView resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
+	ResourceHolder<Resource> GetResource(StringView resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
 
 	std::vector<PluginHolder<ResourceSource>> searchPath;
 };

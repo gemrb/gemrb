@@ -53,8 +53,8 @@ struct CoreSettings;
 
 class GEM_EXPORT PluginMgr {
 public:
-	using ResourceFunc = Resource* (*)(DataStream*);
-	using PluginFunc = Plugin* (*)();
+	using ResourceFunc = ResourceHolder<Resource> (*)(DataStream*);
+	using PluginFunc = PluginHolder<Plugin> (*)();
 public:
 	/** Return global instance of PluginMgr */
 	static PluginMgr* Get();
@@ -72,7 +72,7 @@ private:
 public:
 	size_t GetPluginCount() const { return plugins.size(); }
 	bool IsAvailable(SClass_ID plugintype) const;
-	Plugin* GetPlugin(SClass_ID plugintype) const;
+	PluginHolder<Plugin> GetPlugin(SClass_ID plugintype) const;
 
 
 	/**
@@ -129,12 +129,12 @@ public:
 	 *
 	 * Tries to get driver associated to name, or falls back to a random one.
 	 */
-	Plugin* GetDriver(const TypeID* type, const std::string& name);
+	PluginHolder<Plugin> GetDriver(const TypeID* type, const std::string& name);
 };
 
 template <typename T>
 PluginHolder<T> MakePluginHolder(PluginID id) {
-	return PluginHolder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)));
+	return std::static_pointer_cast<T>(PluginMgr::Get()->GetPlugin(id));
 }
 
 template <typename T>
