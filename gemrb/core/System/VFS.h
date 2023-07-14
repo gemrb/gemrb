@@ -71,11 +71,6 @@ GEM_EXPORT path_t& ResolveFilePath(path_t& FilePath);
 GEM_EXPORT bool DirExists(const path_t& path);
 GEM_EXPORT bool FileExists(const path_t& path);
 
-inline const path_t& to_string(const path_t& path)
-{
-	return path;
-}
-
 // when case sensitivity is enabled dir will be transformed to fit the case of the actual items composing the path
 GEM_EXPORT path_t& ResolveCase(path_t& dir);
 
@@ -93,9 +88,6 @@ GEM_EXPORT path_t& ResolveCase(path_t& dir);
 template<bool FixCase = true, typename... Args>
 path_t PathJoin(Args const&... args)
 {
-	// eh, there is no std::to_string for things that are already strings
-	using namespace std; // to use std::to_string for everything else
-
 	path_t result;
 	path_t s; // the holder for each of 'args' converted to a string
 	// TODO: this could be much cleaner with a fold expression (c++17)
@@ -106,7 +98,7 @@ path_t PathJoin(Args const&... args)
 		// append to 'result'...
 		(result +=
 		 // if the next argument begins with a delimiter...
-		 ((!(s = to_string(args)).empty() && (s[0] == PathDelimiter
+		 ((!(s = fmt::to_string(args)).empty() && (s[0] == PathDelimiter
 			// or the current result ends with a delimiter...
 			|| result.empty() || result.back() == PathDelimiter))
 		  // don't add another one, otherwise append a delimiter
@@ -124,9 +116,7 @@ path_t PathJoin(Args const&... args)
 template<bool FixCase = true, typename DIR_T, typename BASE_T, typename EXT_T>
 path_t PathJoinExt(const DIR_T& dir, const BASE_T& base, const EXT_T& ext)
 {
-	using namespace std;
-
-	path_t path = to_string(dir) + SPathDelimiter + to_string(base);
+	path_t path = fmt::to_string(dir) + SPathDelimiter + fmt::to_string(base);
 	if (ext[0] != '\0') {
 		path = path + "." + ext;
 	}

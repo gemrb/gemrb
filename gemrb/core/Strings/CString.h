@@ -240,9 +240,6 @@ public:
 	}
 };
 
-template <typename STR_T, ENABLE_CHAR_RANGE(STR_T)>
-std::string to_string(const STR_T& s) { return std::string(s); }
-
 }
 
 #endif
