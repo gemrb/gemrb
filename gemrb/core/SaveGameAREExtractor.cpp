@@ -95,7 +95,7 @@ int32_t SaveGameAREExtractor::createCacheBlob() {
 	}
 
 	const path_t& blobFile = "ares.blb";
-	path_t path = PathJoin(core->config.CachePath, blobFile);
+	path_t path = PathJoin<false>(core->config.CachePath, blobFile);
 
 	FileStream cacheStream;
 

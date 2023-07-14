@@ -125,7 +125,7 @@ void AddLogWriter(Logger::WriterPtr&& writer)
 static void addGemRBLog(const CoreSettings& config)
 {
 	FileStream* log_file = new FileStream();
-	path_t log_path = PathJoin(config.GamePath, "GemRB.log");
+	path_t log_path = PathJoin<false>(config.GamePath, "GemRB.log");
 	if (log_file->Create(log_path)) {
 		AddLogWriter(createStreamLogWriter(log_file));
 	} else {
