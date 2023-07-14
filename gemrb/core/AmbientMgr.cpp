@@ -21,6 +21,7 @@
 #include "AmbientMgr.h"
 
 #include "Ambient.h"
+#include "Audio.h"
 #include "Game.h"
 #include "Interface.h"
 #include "RNG.h"

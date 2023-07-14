@@ -28,6 +28,7 @@
 #include "defsounds.h"
 #include "ie_cursors.h"
 
+#include "Audio.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"

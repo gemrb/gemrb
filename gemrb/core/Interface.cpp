@@ -505,16 +505,15 @@ Interface::Interface(CoreSettings&& cfg)
 	Log(MESSAGE, "Core", "Initializing string constants...");
 	displaymsg = new DisplayMessage();
 
-	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	winmgr = new WindowManager(VideoDriver);
-	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
-	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
-
-	guifact = GetImporter<GUIFactory>(IE_CHU_CLASS_ID);
+	auto guifact = GetImporter<GUIFactory>(IE_CHU_CLASS_ID);
 	if (!guifact) {
 		throw CIE("Failed to load Window Manager.");
 	}
-	guifact->SetWindowManager(*winmgr);
+
+	Log(MESSAGE, "Core", "Initializing Window Manager...");
+	winmgr = new WindowManager(VideoDriver, guifact);
+	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
+	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
 
 	QuitFlag = QF_CHANGESCRIPT;
 
@@ -1716,32 +1715,6 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 	return ab;
 }
 
-/** Loads a Window in the Window Manager */
-Window* Interface::LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition pos)
-{
-	if (ref) // is the winpack changing?
-		guifact->LoadWindowPack(ref);
-
-	Window* win = GetWindow(WindowID, ref);
-	if (!win) {
-		win = guifact->GetWindow( WindowID );
-	}
-	if (win) {
-		assert(win->GetScriptingRef());
-		win->SetPosition(pos);
-		winmgr->FocusWindow( win );
-	}
-	return win;
-}
-
-/** Creates a Window in the Window Manager */
-Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame)
-{
-	// FIXME: this will create a window under the current "window pack"
-	// obviously its possible the id can conflict with an existing window
-	return guifact->CreateWindow(WindowID, frame);
-}
-
 inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flags, BitOp op)
 {
 	std::vector<View*>::const_iterator it = views.begin();
@@ -1912,7 +1885,6 @@ void Interface::AskAndExit()
 		SetPause(PAUSE_ON);
 		vars["AskAndExit"] = 1;
 
-		guifact->LoadWindowPack("GUIOPT");
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
 		Log(MESSAGE, "Info", "Press ctrl-c (or close the window) again to quit GemRB.\n");
 	} else {

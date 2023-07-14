@@ -59,6 +59,7 @@
 #include "GUI/Slider.h"
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
+#include "GUI/WindowManager.h"
 #include "GUI/WorldMapControl.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
@@ -553,7 +554,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	char* ref = NULL;
 	PARSE_ARGS(args, "i|si", &WindowID, &ref, &pos);
 
-	Window* win = core->LoadWindow(WindowID, ScriptingGroup_t(ref), pos);
+	Window* win = core->GetWindowManager()->LoadWindow(WindowID, ScriptingGroup_t(ref), pos);
 	ABORT_IF_NULL(win);
 	win->SetFlags(Window::AlphaChannel, BitOp::OR);
 	PyObject* pyWin = ConstructObjectForScriptableView( win->GetScriptingRef() );
@@ -2239,7 +2240,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		}
 			break;
 		case IE_GUI_INVALID:
-			view = core->CreateWindow((unsigned short) id, rgn);
+			view = core->GetWindowManager()->CreateWindow((unsigned short) id, rgn);
 			break;
 		default:
 			view = new View(rgn);

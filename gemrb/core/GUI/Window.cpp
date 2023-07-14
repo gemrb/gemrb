@@ -23,6 +23,7 @@
 #include "Debug.h"
 #include "Interface.h"
 #include "ScrollBar.h"
+#include "WindowManager.h"
 
 #include "GUI/GUIScriptInterface.h"
 

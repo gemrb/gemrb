@@ -41,7 +41,7 @@
 #include "GameScript/GSUtils.h"
 #include "GUI/EventMgr.h"
 #include "GUI/TextArea.h"
-#include "GUI/Window.h"
+#include "GUI/WindowManager.h"
 #include "RNG.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"

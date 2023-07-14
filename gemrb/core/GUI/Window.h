@@ -30,13 +30,14 @@
 
 #include "Control.h"
 #include "ScrollView.h"
-#include "WindowManager.h"
+#include "Video/Video.h"
 
 #include <set>
 
 namespace GemRB {
 
 class Sprite2D;
+class WindowManager;
 
 /**
  * @class Window
