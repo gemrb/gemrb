@@ -141,8 +141,10 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CoreSettings config;
 	
 	auto CONFIG_INT = [&cfg](const std::string& key, auto& field) {
+		using INT = std::remove_reference_t<decltype(field)>;
+
 		if (cfg.count(key)) {
-			field = atoi(cfg[key].c_str());
+			field = INT(atoi(cfg[key].c_str()));
 			cfg.erase(key);
 		}
 	};
