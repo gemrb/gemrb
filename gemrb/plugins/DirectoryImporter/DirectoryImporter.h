@@ -22,6 +22,7 @@
 #include <set>
 
 #include "ResourceSource.h"
+#include "Strings/CString.h"
 #include "System/VFS.h"
 
 namespace GemRB {

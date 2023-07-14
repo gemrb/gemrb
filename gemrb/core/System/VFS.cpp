@@ -28,11 +28,6 @@
 #include "Interface.h"
 #include "Logging/Logging.h"
 
-// in case unistd isn't there or nonconformant
-#ifndef R_OK
-#define R_OK 04
-#endif
-
 #include <cstdarg>
 #include <cstring>
 #include <cerrno>

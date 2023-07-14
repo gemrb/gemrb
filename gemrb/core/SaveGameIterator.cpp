@@ -36,10 +36,6 @@
 #include "Scriptable/Actor.h"
 #include "Streams/FileStream.h"
 
-#ifndef R_OK
-#define R_OK 04
-#endif
-
 #include <cassert>
 #include <set>
 #include <ctime>
