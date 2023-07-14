@@ -45,6 +45,7 @@
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"
+#include "GUI/WindowManager.h"
 #include "RNG.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"

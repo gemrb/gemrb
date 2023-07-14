@@ -20,8 +20,9 @@
 
 #include "MoviePlayer.h"
 
-#include "GUI/Label.h"
 #include "Interface.h"
+#include "GUI/Label.h"
+#include "GUI/WindowManager.h"
 
 #include <chrono>
 #include <thread>

@@ -26,12 +26,14 @@
 #include "Tooltip.h"
 #include "Video/Video.h"
 
+#include "GUI/Window.h"
+
 #include <deque>
 
 namespace GemRB {
 
+class GUIFactory;
 class Sprite2D;
-class Window;
 
 using WindowList = std::deque<Window*>;
 
@@ -46,7 +48,7 @@ struct ToolTipData
 	: tt(std::move(tt)) {}
 };
 
-class WindowManager {
+class GEM_EXPORT WindowManager {
 public:
 	enum CursorFeedback {
 		MOUSE_ALL			= 0,
@@ -74,6 +76,8 @@ public:
 	};
 
 private:
+	std::shared_ptr<GUIFactory> guifact;
+
 	WindowList windows;
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
@@ -112,12 +116,15 @@ private:
 	void MarkAllDirty() const;
 
 public:
-	explicit WindowManager(PluginHolder<Video> vid);
+	WindowManager(PluginHolder<Video> vid, std::shared_ptr<GUIFactory>);
 	~WindowManager();
 	
 	WindowManager(const WindowManager&) = delete;
-
+	
+	Window* LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition = Window::PosCentered);
+	Window* CreateWindow(ScriptingId WindowID, const Region&);
 	Window* MakeWindow(const Region& rgn);
+	
 	void CloseWindow(Window* win);
 	void CloseAllWindows() const;
 

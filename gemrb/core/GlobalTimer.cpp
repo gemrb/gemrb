@@ -24,6 +24,7 @@
 #include "Interface.h"
 #include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
+#include "GUI/WindowManager.h"
 #include "RNG.h"
 
 namespace GemRB {

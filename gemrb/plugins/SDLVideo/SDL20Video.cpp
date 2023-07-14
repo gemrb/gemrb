@@ -20,6 +20,7 @@
 
 #include "SDL20Video.h"
 
+#include "Audio.h"
 #include "Interface.h"
 
 using namespace GemRB;

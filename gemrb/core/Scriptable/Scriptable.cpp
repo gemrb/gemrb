@@ -33,6 +33,7 @@
 #include "Video/Video.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
+#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
 #include "GUI/TextSystem/Font.h"
 #include "RNG.h"

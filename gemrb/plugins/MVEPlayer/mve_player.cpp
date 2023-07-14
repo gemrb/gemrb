@@ -30,6 +30,7 @@
 #include "gstmvedemux.h"
 #include "mve.h"
 
+#include "Audio.h"
 #include "Interface.h"
 
 using namespace std::chrono;

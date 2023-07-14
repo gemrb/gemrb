@@ -34,7 +34,6 @@
 #include "GlobalTimer.h"
 #include "GUI/Control.h"
 #include "GUI/Tooltip.h"
-#include "GUI/Window.h"
 #include "Holder.h"
 #include "ImageMgr.h"
 #include "InterfaceConfig.h"
@@ -63,7 +62,6 @@ class FogRenderer;
 class Font;
 class Game;
 class GameControl;
-class GUIFactory;
 class Item;
 class KeyMap;
 class Label;
@@ -292,7 +290,6 @@ private:
 	ProjectileServer* projserv = nullptr;
 
 	WindowManager* winmgr = nullptr;
-	std::shared_ptr<GUIFactory> guifact;
 	PluginHolder<ScriptEngine> guiscript;
 	std::unique_ptr<FogRenderer> fogRenderer;
 	GameControl* gamectrl = nullptr;
@@ -409,11 +406,7 @@ public:
 	Actor *SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, const Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod = true);
 	/** Get the Window Manager */
 	WindowManager *GetWindowManager() const { return winmgr; };
-	/** Loads a Window in the Window Manager */
-	Window* LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition = Window::PosCentered);
-	/** Creates a Window in the Window Manager */
-#undef CreateWindow // Win32 might define this, so nix it
-	Window* CreateWindow(unsigned short WindowID, const Region&);
+	
 	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 	void LoadInitialValues(const ResRef& name, ieVarsMap& map) const;

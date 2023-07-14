@@ -24,6 +24,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
+#include "GUI/WindowManager.h"
 #include "Interface.h"
 #include "Map.h"
 #include "RNG.h"

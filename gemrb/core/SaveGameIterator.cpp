@@ -32,6 +32,7 @@
 #include "Sprite2D.h"
 #include "TableMgr.h"
 #include "GUI/GameControl.h"
+#include "GUI/WindowManager.h"
 #include "Scriptable/Actor.h"
 #include "Streams/FileStream.h"
 

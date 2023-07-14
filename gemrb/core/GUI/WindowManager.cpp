@@ -24,6 +24,7 @@
 #include "ImageMgr.h"
 #include "Window.h"
 #include "GUI/GameControl.h"
+#include "GUI/GUIFactory.h"
 
 #include "defsounds.h"
 
@@ -43,10 +44,13 @@ void WindowManager::SetTooltipDelay(int delay)
 	ToolTipDelay = delay;
 }
 
-WindowManager::WindowManager(PluginHolder<Video> vid)
-: video(vid), tooltip(core->CreateTooltip())
+WindowManager::WindowManager(PluginHolder<Video> vid, std::shared_ptr<GUIFactory> fact)
+: guifact(fact), video(vid), tooltip(core->CreateTooltip())
 {
 	assert(video);
+	assert(guifact);
+
+	guifact->SetWindowManager(*this);
 
 	cursorFeedback = MOUSE_ALL;
 
@@ -89,6 +93,30 @@ WindowManager::~WindowManager()
 	assert(closedWindows.empty());
 
 	delete gameWin;
+}
+
+Window* WindowManager::LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition pos)
+{
+	if (ref) // is the winpack changing?
+		guifact->LoadWindowPack(ref);
+
+	Window* win = GetWindow(WindowID, ref);
+	if (!win) {
+		win = guifact->GetWindow( WindowID );
+	}
+	if (win) {
+		assert(win->GetScriptingRef());
+		win->SetPosition(pos);
+		FocusWindow( win );
+	}
+	return win;
+}
+
+Window* WindowManager::CreateWindow(ScriptingId WindowID, const Region& frame)
+{
+	// FIXME: this will create a window under the current "window pack"
+	// obviously its possible the id can conflict with an existing window
+	return guifact->CreateWindow(WindowID, frame);
 }
 
 void WindowManager::DestroyClosedWindows()
