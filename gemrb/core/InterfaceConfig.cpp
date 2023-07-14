@@ -188,7 +188,6 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 		}
 		
 		ResolveFilePath(field);
-		FixPath(field, true);
 	};
 
 	// TODO: make CustomFontPath default cross platform
@@ -205,7 +204,6 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	// Path configuration
 	CONFIG_PATH("GemRBPath", config.GemRBPath);
 	CONFIG_PATH("CachePath", config.CachePath);
-	FixPath(config.CachePath, false);
 
 	// AppImage doesn't support relative urls at all
 	// we set the path to the data dir to cover unhardcoded and co,
