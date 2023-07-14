@@ -109,22 +109,21 @@ namespace GemRB {
 
 template <typename T>
 struct CreatePlugin {
-	static Plugin *func()
+	static PluginHolder<Plugin> func()
 	{
-		return new T();
+		return std::make_shared<T>();
 	}
 };
 
 template <typename Res>
 struct CreateResource {
-	static Resource* func(DataStream *str)
+	static ResourceHolder<Resource> func(DataStream *str)
 	{
-		Res *res = new Res();
+		auto res = std::make_shared<Res>();
 		if (res->Open(str)) {
 			return res;
 		} else {
-			delete res;
-			return NULL;
+			return nullptr;
 		}
 	}
 };

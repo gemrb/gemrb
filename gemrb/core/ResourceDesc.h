@@ -34,7 +34,7 @@ class TypeID;
  */
 class GEM_EXPORT ResourceDesc {
 public:
-	using CreateFunc = Resource* (*)(DataStream*);
+	using CreateFunc = ResourceHolder<Resource> (*)(DataStream*);
 private:
 	const TypeID *type;
 	path_t ext;
@@ -53,7 +53,7 @@ public:
 	const path_t& GetExt() const;
 	const TypeID* GetType() const;
 	ieWord GetKeyType() const;
-	Resource* Create(DataStream*) const;
+	ResourceHolder<Resource> Create(DataStream*) const;
 };
 
 }

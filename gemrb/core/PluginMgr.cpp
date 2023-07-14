@@ -31,7 +31,7 @@ bool PluginMgr::IsAvailable(SClass_ID plugintype) const
 	return plugins.find(plugintype) != plugins.end();
 }
 
-Plugin* PluginMgr::GetPlugin(SClass_ID plugintype) const
+PluginHolder<Plugin> PluginMgr::GetPlugin(SClass_ID plugintype) const
 {
 	std::map<SClass_ID, PluginFunc>::const_iterator iter = plugins.find(plugintype);
 	if (iter != plugins.end())
@@ -91,7 +91,7 @@ bool PluginMgr::RegisterDriver(const TypeID* type, const std::string& name, Plug
 	return true;
 }
 
-Plugin* PluginMgr::GetDriver(const TypeID* type, const std::string& name)
+PluginHolder<Plugin> PluginMgr::GetDriver(const TypeID* type, const std::string& name)
 {
 	driver_map &map = drivers[type];
 	if (map.begin() == map.end())

@@ -42,7 +42,7 @@ ieWord ResourceDesc::GetKeyType() const
 	return keyType;
 }
 
-Resource* ResourceDesc::Create(DataStream *stream) const
+ResourceHolder<Resource> ResourceDesc::Create(DataStream *stream) const
 {
 	return create(stream);
 }
