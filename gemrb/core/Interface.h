@@ -26,27 +26,22 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include "SClassID.h"
 #include "exports.h"
+#include "globals.h"
 
-#include "Audio.h" // needed for _MSC_VER and SoundHandle (everywhere)
-#include "Cache.h"
-#include "Callback.h"
+#include "EnumIndex.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "GUI/Control.h"
 #include "GUI/Tooltip.h"
 #include "GUI/Window.h"
-#include "GUI/GUIFactory.h"
-#include "FogRenderer.h"
 #include "Holder.h"
 #include "ImageMgr.h"
 #include "InterfaceConfig.h"
-#include "Resource.h"
-#include "Timer.h"
+#include "Orientation.h"
 #include "SaveGameAREExtractor.h"
 #include "StringMgr.h"
-#include "System/VFS.h"
+#include "TableMgr.h"
 
 #include <string>
 #include <vector>
@@ -64,11 +59,11 @@ struct Effect;
 class EffectQueue;
 class EffectDesc;
 class Factory;
+class FogRenderer;
 class Font;
 class Game;
 class GameControl;
-class GlobalTimer;
-class ITMExtHeader;
+class GUIFactory;
 class Item;
 class KeyMap;
 class Label;
@@ -77,16 +72,14 @@ class MusicMgr;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 class ProjectileServer;
-class SPLExtHeader;
 class SaveGame;
 class SaveGameIterator;
 class ScriptEngine;
-class ScriptedAnimation;
+class SoundHandle;
 class Spell;
 class Sprite2D;
 class Store;
 class SymbolMgr;
-class TableMgr;
 class TextArea;
 class WindowManager;
 class WorldMap;
