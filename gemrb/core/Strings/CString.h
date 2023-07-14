@@ -43,7 +43,7 @@ namespace GemRB {
 constexpr int NoTransform(int c) { return c; }
 
 template <typename STR_T, int(*TRANS)(int) = NoTransform>
-struct GEM_EXPORT CstrHash
+struct CstrHash
 {
 	size_t operator() (const STR_T &str) const {
 		size_t nHash = 0;
@@ -60,7 +60,7 @@ template <typename STR_T>
 using CstrHashCI = CstrHash<STR_T, std::tolower>;
 
 template <typename STR_T, int(*CMP)(const char*, const char*) = strcmp>
-struct GEM_EXPORT CstrCmp
+struct CstrCmp
 {
 	bool operator() (const STR_T& lhs, const STR_T& rhs) const {
 		return CMP(lhs.c_str(), rhs.c_str()) < 0;

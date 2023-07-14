@@ -42,6 +42,11 @@
 #include <io.h>
 #endif
 
+#ifndef R_OK
+#define R_OK 04
+#define F_OK 0
+#endif
+
 namespace GemRB {
 
 using path_t = std::string;
