@@ -403,10 +403,10 @@ Interface::Interface(CoreSettings&& cfg)
 	std::string tmp;
 	gemrbINI = "gem-" + INIConfig;
 	PathJoin(ini_path, config.SavePath.c_str(), gemrbINI.c_str(), nullptr);
-	if (!file_exists(ini_path)) {
+	if (!FileExists(ini_path)) {
 		PathJoin(ini_path, config.GamePath.c_str(), gemrbINI.c_str(), nullptr);
 	}
-	if (file_exists(ini_path)) {
+	if (FileExists(ini_path)) {
 		tmp = INIConfig;
 		INIConfig = gemrbINI;
 	} else {
@@ -4196,7 +4196,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 			char name[_MAX_PATH];
 
 			PathJoin(name, cd.c_str(), path, nullptr);
-			if (file_exists (name)) {
+			if (FileExists(name)) {
 				GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 				return;
 			}

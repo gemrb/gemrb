@@ -65,7 +65,7 @@ bool FileStream::Open(const char* fname)
 {
 	Close();
 
-	if (!file_exists(fname)) {
+	if (!FileExists(fname)) {
 		return false;
 	}
 

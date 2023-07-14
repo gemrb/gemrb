@@ -77,8 +77,8 @@ const char PathListSeparator = ':';
 #endif
 const char SPathDelimiter[] = { PathDelimiter, '\0' };
 
-GEM_EXPORT bool dir_exists(const char* path);
-GEM_EXPORT bool file_exists(const char* path);
+GEM_EXPORT bool DirExists(const path_t& path);
+GEM_EXPORT bool FileExists(const path_t& path);
 
 /**
  * Joins NULL-terminated list of directories and copies it to 'target'.

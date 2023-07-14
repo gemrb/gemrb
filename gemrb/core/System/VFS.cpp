@@ -160,12 +160,12 @@ path_t BundlePath(BundleDirectory dir)
 #endif
 
 /** Returns true if path is an existing directory */
-bool dir_exists(const char* path)
+bool DirExists(const path_t& path)
 {
 	struct stat buf;
 	buf.st_mode = 0;
 
-	if (stat(path, &buf) < 0) {
+	if (stat(path.c_str(), &buf) < 0) {
 		return false;
 	}
 	if (!S_ISDIR(buf.st_mode)) {
@@ -176,12 +176,12 @@ bool dir_exists(const char* path)
 }
 
 /** Returns true if path is an existing file */
-bool file_exists(const char* path)
+bool FileExists(const path_t& path)
 {
 	struct stat buf;
 	buf.st_mode = 0;
 
-	if (stat(path, &buf) < 0) {
+	if (stat(path.c_str(), &buf) < 0) {
 		return false;
 	}
 	if (!S_ISREG(buf.st_mode)) {
@@ -548,7 +548,7 @@ bool DirectoryIterator::IsDirectory()
 	path_t path = GetFullPath();
 	//this is needed on windows!!!
 	FixPath(path, false);
-	return dir_exists(path.c_str());
+	return DirExists(path);
 }
 
 path_t DirectoryIterator::GetName()

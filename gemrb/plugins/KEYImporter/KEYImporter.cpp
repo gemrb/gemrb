@@ -47,11 +47,11 @@ static char* AddCBF(const char *file)
 static bool PathExists(BIFEntry *entry, const char *path)
 {
 	PathJoin(entry->path, path, entry->name.c_str(), nullptr);
-	if (file_exists(entry->path)) {
+	if (FileExists(entry->path)) {
 		return true;
 	}
 	PathJoin(entry->path, path, AddCBF(entry->name.c_str()), nullptr);
-	if (file_exists(entry->path)) {
+	if (FileExists(entry->path)) {
 		return true;
 	}
 

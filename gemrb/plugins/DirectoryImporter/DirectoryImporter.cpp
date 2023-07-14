@@ -29,7 +29,7 @@ using namespace GemRB;
 
 bool DirectoryImporter::Open(const char *dir, const char *desc)
 {
-	if (!dir_exists(dir))
+	if (!DirExists(dir))
 		return false;
 
 	description = desc;
