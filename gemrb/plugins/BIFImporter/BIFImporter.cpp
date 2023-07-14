@@ -96,9 +96,7 @@ int BIFImporter::OpenArchive(const path_t& path)
 	delete stream;
 	stream = nullptr;
 
-	path_t filename = ExtractFileFromPath(path);
-
-	path_t cachePath = PathJoin(core->config.CachePath, filename);
+	path_t cachePath = PathJoin(core->config.CachePath, ExtractFileFromPath(path));
 	char Signature[8];
 #if defined(SUPPORTS_MEMSTREAM)
 	auto cacheStream = new MappedFileMemoryStream{cachePath.c_str()};

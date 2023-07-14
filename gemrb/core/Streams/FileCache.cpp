@@ -30,7 +30,7 @@
 
 namespace GemRB {
 
-DataStream* CacheCompressedStream(DataStream *stream, const std::string& filename, int length, bool overwrite)
+DataStream* CacheCompressedStream(DataStream *stream, const path_t& filename, int length, bool overwrite)
 {
 	path_t fname = ExtractFileFromPath(filename);
 	path_t path = PathJoin(core->config.CachePath, fname);

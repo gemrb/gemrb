@@ -156,7 +156,7 @@ void Console::SaveHistory() const noexcept
 		commands += fmt::format("{}\n", fmt::WideToChar{cmd});
 	}
 
-	path_t filePath = PathJoin(core->config.GamePath, "gemrb_console.txt");
+	path_t filePath = PathJoin<false>(core->config.GamePath, "gemrb_console.txt");
 	FileStream *histFile = new FileStream();
 	if (histFile->Create(filePath)) {
 		histFile->Write(commands.c_str(), commands.size());
