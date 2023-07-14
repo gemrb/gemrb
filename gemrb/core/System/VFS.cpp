@@ -281,24 +281,43 @@ path_t& ResolveCase(path_t& filePath)
 	return filePath;
 }
 
-/** Fixes path delimiter character (slash).
- * needslash = true : we add a slash
- * needslash = false: we remove the slash
- */
-void FixPath(path_t& path, bool needslash)
+path_t& FixPath(path_t& path)
 {
-	size_t i = path.length();
+	if (path.empty()) {
+		return path;
+	}
 
-	if (needslash) {
-		if (i && path[i - 1] == PathDelimiter) return;
-		path.push_back(PathDelimiter);
-	} else if (i) {
-		if (path[i - 1] != PathDelimiter) return;
+	size_t count = 0;
+	size_t last = path.find_first_of(PathDelimiter, 0);
+	size_t cur = 0;
+	while ((cur = path.find_first_of(PathDelimiter, last + 1)) != path_t::npos) {
+		if (cur - last == 1) {
+			// two or more neighboring delimiters
+			size_t next = path.find_first_not_of(PathDelimiter, last);
+			if (next == path_t::npos) {
+				// truncate the rest
+				path.resize(last);
+				break;
+			}
+			std::copy(path.begin() + next, path.end(), &path[cur]);
+			count += next - last - 1;
+		} else {
+			last = cur;
+		}
+	}
+	
+	if (count) {
+		path.erase(path.length() - count);
+	}
+
+	if (path.back() == PathDelimiter) {
 		path.pop_back();
 	}
+
+	return ResolveCase(path);
 }
 
-void ResolveFilePath(path_t& filePath)
+path_t& ResolveFilePath(path_t& filePath)
 {
 #ifndef WIN32
 	if (filePath[0] == '~') {
@@ -310,7 +329,7 @@ void ResolveFilePath(path_t& filePath)
 	}
 #endif
 
-	ResolveCase(filePath);
+	return FixPath(filePath);
 }
 
 path_t ExtractFileFromPath(const path_t& fullPath)
@@ -458,7 +477,7 @@ void* readonly_mmap(void *vfd) {
 #endif
 
 DirectoryIterator::DirectoryIterator(path_t path)
-: Path(std::move(path))
+: Path(std::move(FixPath(path)))
 {
 	SetFlags(Files|Directories);
 	Rewind();
@@ -491,10 +510,7 @@ void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)
 
 bool DirectoryIterator::IsDirectory()
 {
-	path_t path = GetFullPath();
-	//this is needed on windows!!!
-	FixPath(path, false);
-	return DirExists(path);
+	return DirExists(GetFullPath());
 }
 
 path_t DirectoryIterator::GetName()
@@ -505,7 +521,11 @@ path_t DirectoryIterator::GetName()
 
 path_t DirectoryIterator::GetFullPath()
 {
-	return PathJoin<false>(Path, static_cast<dirent*>(Entry)->d_name);
+	if (Entry) {
+		return PathJoin<false>(Path, static_cast<dirent*>(Entry)->d_name);
+	} else {
+		return Path;
+	}
 }
 
 DirectoryIterator& DirectoryIterator::operator++()

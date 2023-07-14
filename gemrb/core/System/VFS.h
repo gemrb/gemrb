@@ -66,7 +66,7 @@ const char PathListSeparator = ':';
 const char SPathDelimiter[] = { PathDelimiter, '\0' };
 
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */
-GEM_EXPORT void ResolveFilePath(path_t& FilePath);
+GEM_EXPORT path_t& ResolveFilePath(path_t& FilePath);
 
 GEM_EXPORT bool DirExists(const path_t& path);
 GEM_EXPORT bool FileExists(const path_t& path);
@@ -137,7 +137,9 @@ path_t PathJoinExt(const DIR_T& dir, const BASE_T& base, const EXT_T& ext)
 	return path;
 }
 
-GEM_EXPORT void FixPath(path_t& path, bool needslash);
+// collapse extra path separators and call ResolveFilePath
+// result will not have a trailing separator
+GEM_EXPORT path_t& FixPath(path_t& path);
 
 GEM_EXPORT path_t ExtractFileFromPath(const path_t&);
 
