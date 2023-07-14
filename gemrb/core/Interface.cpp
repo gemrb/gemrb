@@ -385,17 +385,6 @@ Interface::Interface(CoreSettings&& cfg)
 		throw CIE("Cannot initialize shaders.");
 	}
 	VideoDriver->SetGamma(brightness, contrast);
-	
-	// if unset, manually populate GameName (window title)
-	if (config.GameName == GEMRB_STRING) {
-		if (DefaultWindowTitle != GEMRB_STRING) {
-			std::string title = GEMRB_STRING" running " + DefaultWindowTitle;
-			config.GameName = std::move(title);
-		} else {
-			config.GameName = GEMRB_STRING" running unknown game";
-		}
-		VideoDriver->SetWindowTitle(config.GameName.c_str());
-	}
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
 	// read from our version of the config if it is present
@@ -1445,8 +1434,15 @@ void Interface::LoadGemRBINI()
 		}
 	}
 
-	auto sv = ini->GetKeyAsString("resources", "WindowTitle", GEMRB_STRING);
-	DefaultWindowTitle = StringFromView<std::string>(sv);
+	// if unset, manually populate GameName (window title)
+	if (config.GameName == GEMRB_STRING) {
+		auto sv = ini->GetKeyAsString("resources", "WindowTitle", GEMRB_STRING);
+		if (sv.empty()) {
+			config.GameName += " running unknown game";
+		} else {
+			config.GameName += " running " + StringFromView<std::string>(sv);
+		}
+	}
 
 	// These are values for how long a single step is, see Movable::DoStep.
 	// They were found via trial-and-error, trying to match
@@ -1458,7 +1454,7 @@ void Interface::LoadGemRBINI()
 	// to denote that the bitmap should be scaled down 3x
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		const std::string& name =  fmt::format("GroundCircleBAM{}", size + 1);
-		sv = ini->GetKeyAsString("resources", name);
+		auto sv = ini->GetKeyAsString("resources", name);
 		if (sv) {
 			const char *pos = strchr(sv.c_str(), '/');
 			if (pos) {
@@ -1472,7 +1468,7 @@ void Interface::LoadGemRBINI()
 		}
 	}
 
-	sv = ini->GetKeyAsString("resources", "INIConfig");
+	auto sv = ini->GetKeyAsString("resources", "INIConfig");
 	if (sv)
 		INIConfig = StringFromView<std::string>(sv);
 

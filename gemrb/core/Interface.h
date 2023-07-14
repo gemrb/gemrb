@@ -318,7 +318,6 @@ private:
 	ResRef MovieFontResRef;
 	ResRef TextFontResRef;
 	ResRef TooltipFontResRef;
-	std::string DefaultWindowTitle;
 
 	TooltipBackground* TooltipBG = nullptr;
 
