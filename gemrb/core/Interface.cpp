@@ -1456,12 +1456,10 @@ void Interface::LoadGemRBINI()
 		const std::string& name =  fmt::format("GroundCircleBAM{}", size + 1);
 		auto sv = ini->GetKeyAsString("resources", name);
 		if (sv) {
-			const char *pos = strchr(sv.c_str(), '/');
-			if (pos) {
-				GroundCircleScale[size] = atoi( pos+1 );
-				ResRef tmp;
-				std::copy(sv.begin(), pos, tmp.begin());
-				GroundCircleBam[size] = tmp;
+			size_t pos = FindFirstOf(sv, "/");
+			if (pos != StringView::npos) {
+				GroundCircleScale[size] = atoi(&sv[pos] + 1);
+				GroundCircleBam[size] = ResRef(sv.begin(), pos);
 			} else {
 				GroundCircleBam[size] = sv;
 			}

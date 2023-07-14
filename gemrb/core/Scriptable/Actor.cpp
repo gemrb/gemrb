@@ -8577,11 +8577,11 @@ void Actor::SetSoundFolder(const ieVariable& soundset) const
 	if (dirIt) {
 		do {
 			const path_t& name = dirIt.GetName();
-			const char* end = strchr(name.c_str(), '.');
-			if (end != nullptr) {
+			size_t end = FindFirstOf(name, ".");
+			if (end != path_t::npos) {
 				// need to truncate the "01" from the name, eg. HaFT_01.wav -> HaFT
 				// but also 2df_007.wav -> 2df_0, meaning the data is less diverse than it may seem
-				PCStats->SoundSet.Format("{:.{}}", name, int(end - 2 - name.c_str()));
+				PCStats->SoundSet.Format("{:.{}}", name, int(&name[end] - 2 - name.c_str()));
 				break;
 			}
 		} while (++dirIt);
