@@ -125,27 +125,25 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 		ret &= ~IE_STORE_BUY;
 
 	if (pc && Type < StoreType::BG2CONT) {
-		//don't allow selling of non destructible items
-		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
-			ret &= ~IE_STORE_SELL;
-		}
 
 		//don't allow selling of critical items (they could still be put in bags) ... unless the shop is special
-		if ((invflags&IE_INV_ITEM_CRITICAL) && !(Flags&IE_STORE_BUYCRITS)) {
+		if ((invflags&IE_INV_ITEM_CRITICAL) && (!(Flags&IE_STORE_BUYCRITS))) {
 			ret &= ~IE_STORE_SELL;
 		}
-
-		//...the shop is special (iwd/how/bg1)
-		if (core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
+		if ((invflags&IE_INV_ITEM_CRITICAL) && (core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV))) {
 			if (invflags&IE_INV_ITEM_CONVERSABLE) {
 				ret &= ~IE_STORE_SELL;
-			} else {
+			} else { 
 				ret |= IE_STORE_SELL;
 			}
 		}
-
+				//don't allow selling of non destructible items
+		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
+			ret &= ~IE_STORE_SELL;
+		}
+	
 		//check if store buys stolen items
-		if ((invflags&IE_INV_ITEM_STOLEN) && !(Flags&IE_STORE_FENCE) ) {
+		if ((invflags&IE_INV_ITEM_STOLEN) && !(Flags&IE_STORE_FENCE)) {
 			ret &= ~IE_STORE_SELL;
 		}
 	}
