@@ -771,6 +771,7 @@ int Inventory::DepleteItem(ieDword flags) const
 // if flags is 0, skips undroppable items
 // if flags is IE_INV_ITEM_UNDROPPABLE, doesn't skip undroppable items
 // TODO: once all callers have been checked, this can be reversed to make more sense
+// you can pass "" for the name to scan the whole inventory
 int Inventory::FindItem(const ResRef &resref, unsigned int flags, unsigned int skip) const
 {
 	unsigned int mask = (flags^IE_INV_ITEM_UNDROPPABLE);
@@ -785,7 +786,7 @@ int Inventory::FindItem(const ResRef &resref, unsigned int flags, unsigned int s
 		if ( mask & item->Flags ) {
 			continue;
 		}
-		if (item->ItemResRef != resref) {
+		if (!resref.IsEmpty() && item->ItemResRef != resref) {
 			continue;
 		}
 		if (skip) {
