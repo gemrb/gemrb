@@ -213,7 +213,7 @@ namespace GemRB {
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt
 #define MC_IGNORE_RETURN        0x100000 // iwd2, won't be moved to start position when party rests, TODO: ee, prevent chunking death
 #define MC_IGNORE_INHIBIT_AI    0x200000 // iwd2 version of IE_ENABLEOFFSCREENAI (guess), elsewhere unused
-#define MC_NO_NIGHTMARE_MODS    0x400000 // TODO: ee
+#define MC_NO_NIGHTMARE_MODS    0x400000 // basically MC_HOF_UPGRADED, but only if don't add downgrading as well
 #define MC_NO_TOOLTIPS          0x800000 // bit 23, TODO: ee
 // the following bits are set in some files in iwd2 and iwd1
 // it's in the range of the bg2 randomwalk bits 24-30, so likely the same between all the games

@@ -9912,7 +9912,7 @@ void Actor::CreateDerivedStats()
 
 	// check for HoF upgrade
 	const Game *game = core->GetGame();
-	if (!InParty && game && game->HOFMode && !(BaseStats[IE_MC_FLAGS] & MC_HOF_UPGRADED)) {
+	if (!InParty && game && game->HOFMode && !(BaseStats[IE_MC_FLAGS] & (MC_HOF_UPGRADED | MC_NO_NIGHTMARE_MODS))) {
 		BaseStats[IE_MC_FLAGS] |= MC_HOF_UPGRADED;
 
 		// our summons get less of an hp boost
