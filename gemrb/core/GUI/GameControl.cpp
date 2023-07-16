@@ -1115,7 +1115,7 @@ String GameControl::TooltipText() const {
 	}
 
 	const Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-	if (actor == NULL) {
+	if (!actor || actor->GetStat(IE_MC_FLAGS) & MC_NO_TOOLTIPS) {
 		return View::TooltipText();
 	}
 
