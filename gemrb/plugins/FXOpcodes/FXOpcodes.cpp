@@ -2313,8 +2313,16 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	////pst power of one also depends on this!
 	if (fx->Parameter2==3) {
 		fx->Parameter1 = core->Roll(1, gamedata->GetSpellAbilityDie(target, 1), 0);
-		fx->Parameter2 = 0;
+		fx->Parameter2 = MOD_ADDITIVE;
 	}
+	if (fx->Parameter2 == 3 && core->HasFeature(GFFlags::IWD_MAP_DIMENSIONS)) {
+		// how had a max of 18/00, so clamp
+		if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+			if (target->GetBase(IE_STR) + fx->Parameter1 > 18) fx->Parameter1 = 18 - target->GetBase(IE_STR);
+		} else {
+			if (target->GetStat(IE_STR) + fx->Parameter1 > 18) fx->Parameter1 = 18 - target->GetStat(IE_STR);
+		}
+}
 
 	HandleMainStatBonus(target, IE_STR, fx);
 
@@ -2322,6 +2330,12 @@ int fx_strength_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		BASE_MOD( IE_STR );
 	} else {
 		STAT_MOD( IE_STR );
+	}
+
+	// handle IE_STREXTRA (how, tobex, likely pst)
+	if (fx->Parameter2 == 3 && target->GetStat(IE_STR) == 18) {
+		int maxStrExtra = Clamp(gamedata->GetSpellAbilityDie(target, 2), 0, 100);
+		target->SetStat(IE_STREXTRA, maxStrExtra, 0);
 	}
 	return FX_PERMANENT;
 }
