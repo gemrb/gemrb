@@ -10467,7 +10467,7 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 			actor->AddAction( GenerateAction("Dialogue([PC])") );
 		}
 	}
-	game->LeaveParty (actor);
+	game->LeaveParty(actor, false);
 
 	Py_RETURN_NONE;
 }

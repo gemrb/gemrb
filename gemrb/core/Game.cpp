@@ -342,7 +342,7 @@ void Game::ConsolidateParty() const
 	}
 }
 
-int Game::LeaveParty (Actor* actor)
+int Game::LeaveParty(Actor* actor, bool returnCriticalItems)
 {
 	core->SetEventFlag(EF_PORTRAIT);
 	actor->CreateStats(); //create or update stats for leaving
@@ -383,6 +383,15 @@ int Game::LeaveParty (Actor* actor)
 		}
 	}
 	actor->SetBase( IE_EA, EA_NEUTRAL );
+	// bgs also gave away any IE_ITEM_CRITICAL items, but not if the actor was kicked out?!
+	if (returnCriticalItems && core->HasFeature(GFFlags::HEAL_ON_100PLUS)) { // TODO: change to !SELLABLE_CRITS_NO_CONV once that is merged
+		int slot = actor->inventory.FindItem("", IE_INV_ITEM_CRITICAL);
+		while (slot != -1) {
+			const CREItem* si = actor->inventory.RemoveItem(slot);
+			MoveItemCore(actor, PCs[0], si->ItemResRef, 0, 0);
+			slot = actor->inventory.FindItem("", IE_INV_ITEM_CRITICAL);
+		}
+	}
 	AddTrigger(TriggerEntry(trigger_leaves, actor->GetGlobalID()));
 	return ( int ) NPCs.size() - 1;
 }

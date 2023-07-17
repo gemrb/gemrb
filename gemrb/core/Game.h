@@ -332,7 +332,7 @@ public:
 	/** Reassigns inparty numbers, call it after party creation */
 	void ConsolidateParty() const;
 	/** Removes actor from party (if in there) */
-	int LeaveParty(Actor* pc);
+	int LeaveParty(Actor* pc, bool returnCriticalItems = true);
 	/** Returns slot*/
 	int DelPC(unsigned int slot, bool autoFree = false);
 	int DelNPC(unsigned int slot, bool autoFree = false);
