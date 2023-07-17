@@ -60,7 +60,6 @@ namespace GemRB {
 void GameScript::SetExtendedNight(Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	//sets the 'can rest other' bit
 	if (parameters->int0Parameter) {
 		map->AreaType|=AT_EXTENDED_NIGHT;
 	} else {
@@ -2001,10 +2000,7 @@ void GameScript::ChangeTileState(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	int state = parameters->int0Parameter;
-	if(door) {
-		door->ToggleTiles(state); /* default is false for playsound */
-	}
+	door->ToggleTiles(parameters->int0Parameter); // default is false for playsound
 }
 
 void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
