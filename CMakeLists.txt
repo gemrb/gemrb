@@ -239,6 +239,10 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	endif ()
 	string(APPEND CMAKE_CXX_FLAGS " -Wall -W -Wpointer-arith")
 	string(APPEND CMAKE_CXX_FLAGS " -pedantic -Wno-format-y2k -Wno-long-long")
+	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 13)
+		# too much noise from false positives
+		string(APPEND CMAKE_CXX_FLAGS " -Wno-stringop-truncation -Wno-stringop-overflow -Wno-stringop-overread")
+	endif ()
 	# only later c++ standards conditionally allow function/object pointer casts
 	# gcc pragmas for disabling are broken: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
 	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7)
