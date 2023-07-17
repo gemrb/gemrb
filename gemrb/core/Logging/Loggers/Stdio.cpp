@@ -103,12 +103,6 @@ void StdioLogWriter::printBracket(const char* status, log_color color)
 	Print("]");
 }
 
-void StdioLogWriter::printStatus(const char* status, log_color color)
-{
-	printBracket(status, color);
-	Print("\n");
-}
-
 void StdioLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 {
 	if (useColor) {

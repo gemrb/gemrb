@@ -54,7 +54,6 @@ private:
 
 	void textcolor(log_color);
 	void printBracket(const char *status, log_color color);
-	void printStatus(const char* status, log_color color);
 };
 
 GEM_EXPORT Logger::WriterPtr createStdioLogWriter();
