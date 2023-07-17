@@ -155,7 +155,7 @@ std::string MBStringFromString(const String& string)
 
 	if (newlen == static_cast<size_t>(-1)) {
 		// invalid multibyte sequence
-		Log(ERROR, "String", "wcstombs failed to covert string {} with error: {}", fmt::WideToChar{string}, strerror(errno));
+		Log(ERROR, "String", "wcstombs failed to covert string. error: {}\n@:", strerror(errno), ret);
 		return ret;
 	}
 	assert(newlen <= ret.length());
