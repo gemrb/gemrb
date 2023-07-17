@@ -179,6 +179,8 @@ jobs:
         filepath=Linux
         filei=build/GemRB-*-x86_64.AppImage
         fileo=GemRB-${GITHUB_REF##*/}-${GITHUB_SHA:0:10}-x86_64.AppImage
+        realpath *AppImage build/*AppImage
+        ls *AppImage build/*AppImage
 
         filepath="$filepath/$fileo"
         scp $filei \
