@@ -79,6 +79,8 @@ GEM_EXPORT bool FileExists(const path_t& path);
 // when case sensitivity is enabled dir will be transformed to fit the case of the actual items composing the path
 GEM_EXPORT path_t& ResolveCase(path_t& dir);
 
+GEM_EXPORT void PathAppend(path_t& target, const path_t& name);
+
 /**
  * Joins NULL-terminated list of directories and copies it to 'target'.
  *
@@ -94,22 +96,13 @@ template<bool FixCase = true, typename... Args>
 path_t PathJoin(Args const&... args)
 {
 	path_t result;
-	path_t s; // the holder for each of 'args' converted to a string
 	// TODO: this could be much cleaner with a fold expression (c++17)
 	// this voodoo relies on expanding args which requires a valid context
 	// the only way I know how to do this with c++14 is to build an unbounded array
 	// the type doesnt matter, nor do the element values
 	int IGNORE_UNUSED unpack[] {0, // we need at least one value to form a valid array, so start with one
 		// append to 'result'...
-		(result +=
-		 // if the next argument begins with a delimiter...
-		 ((!(s = fmt::to_string(args)).empty() && (s[0] == PathDelimiter
-			// or the current result ends with a delimiter...
-			|| result.empty() || result.back() == PathDelimiter))
-		  // don't add another one, otherwise append a delimiter
-		  ? "" : SPathDelimiter)
-		 // now append the current argument
-		 + s
+		(PathAppend(result, fmt::to_string(args))
 	,0)...}; // the other half of the voodoo is the comma operator to allow us to execute
 			 // an expression then return an unrelated value which is another 0
 	if (FixCase) {
@@ -137,8 +130,6 @@ path_t PathJoinExt(const DIR_T& dir, const BASE_T& base, const EXT_T& ext)
 GEM_EXPORT path_t& FixPath(path_t& path);
 
 GEM_EXPORT path_t ExtractFileFromPath(const path_t&);
-
-GEM_EXPORT void PathAppend(path_t& target, const path_t& name);
 
 GEM_EXPORT bool MakeDirectories(const path_t& path) WARN_UNUSED;
 GEM_EXPORT bool MakeDirectory(const path_t& path) WARN_UNUSED;

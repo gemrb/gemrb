@@ -193,11 +193,14 @@ bool FileExists(const path_t& path)
 
 void PathAppend(path_t& target, const path_t& name)
 {
-	size_t len = target.length();
+	if (name.empty()) {
+		return;
+	}
 
-	if (target[0] != 0 && target[len-1] != PathDelimiter) {
+	if (!target.empty() && target.back() != PathDelimiter && name.front() != PathDelimiter) {
 		target.push_back(PathDelimiter);
 	}
+
 	// strip possible leading backslash, since it is not ignored on all platforms
 	// totl has '\data\zcMHar.bif' in the key file, and also the CaseSensitive
 	// code breaks with that extra slash, so simple fix: remove it
