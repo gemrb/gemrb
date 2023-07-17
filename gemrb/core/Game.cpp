@@ -1831,7 +1831,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::Rested);
 	ieStrRef hoursMsg = DisplayMessage::GetStringReference(HCStrings::Hours);
 
-	core->GetTokenDictionary()["HOUR"] = hours;
+	core->GetTokenDictionary()["HOUR"] = fmt::format(L"{}", hours);
 
 	//this would be bad
 	if (hoursMsg == ieStrRef::INVALID || restedMsg == ieStrRef::INVALID) return cutscene;
