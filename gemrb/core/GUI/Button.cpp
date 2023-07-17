@@ -78,7 +78,7 @@ void Button::UnregisterHotKey()
 void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 {
 	if (type >= BUTTON_IMAGE_TYPE_COUNT) {
-		Log(ERROR, "Button", "Trying to set a button image index out of range: {}", type);
+		Log(ERROR, "Button", "Trying to set a button image index out of range: {}", fmt::underlying(type));
 		return;
 	}
 

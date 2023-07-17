@@ -2168,7 +2168,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			filter = new OrPredicate<ResRef>(filter, new ExtFilter("BCS"));
 			break;
 		default:
-			error("Interface", "Unknown resource directory type: {}!", dir);
+			error("Interface", "Unknown resource directory type: {}!", fmt::underlying(dir));
 	}
 
 	path_t path = PathJoin(config.GamePath, resourcePath);
