@@ -317,8 +317,8 @@ inline T CeilDiv(T dividend, T divisor)
 
 template<typename ENUM>
 constexpr
-std::enable_if_t<std::is_enum<ENUM>::value, under_t<ENUM>>
-format_as(ENUM e) { return std::underlying_type_t<ENUM>(e); }
+std::enable_if_t<std::is_enum<ENUM>::value, std::underlying_type_t<ENUM>>
+format_as(ENUM e) { return static_cast<std::underlying_type_t<ENUM>>(e); }
 
 }
 
