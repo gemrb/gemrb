@@ -1171,11 +1171,7 @@ int Game::GetXPFromCR(int cr) const
 	// NOTE: this is an average of averages; if it turns out to be wrong,
 	// compute the party average directly
 	int level = GetTotalPartyLevel(true) / size;
-	if (cr >= MAX_CRLEVEL) {
-		cr = MAX_CRLEVEL;
-	} else if (cr-1 < 0) {
-		cr = 1;
-	}
+	cr = Clamp(cr, 1, MAX_CRLEVEL);
 	Log(MESSAGE, "Game", "Challenge Rating: {}, party level: {}", cr, level);
 	// it also has a column for cr 0.25 and 0.5, so let's treat cr as a 1-based index
 	// but testing shows something else affects it further, so we divide by 2 to match
