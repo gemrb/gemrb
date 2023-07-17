@@ -56,6 +56,9 @@ if(SCCACHE_PROGRAM)
 	set(CMAKE_CXX_COMPILER_LAUNCHER "${SCCACHE_PROGRAM}" CACHE STRING "" FORCE)
 endif()
 
+# use relative rpaths for build relocation / reproducibility
+set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
+
 IF(APPLE)
 	# favor mac frameworks over unix libraries
 	set(CMAKE_FIND_FRAMEWORK FIRST)
