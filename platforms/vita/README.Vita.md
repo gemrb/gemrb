@@ -32,7 +32,7 @@ are both working fine
 ### Build & installation
 ```
 mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=$DOLCESDK/share/dolce.toolchain.cmake -DSDL_BACKEND=SDL -DSTATIC_LINK=enabled -DDISABLE_WERROR=enabled -DCMAKE_MAKE_PROGRAM=make -DVITA=true -DUSE_OPENAL=false -DUSE_FREETYPE=false -DCMAKE_BUILD_TYPE=None -DNOCOLOR=1
+cmake .. -DCMAKE_TOOLCHAIN_FILE=$DOLCESDK/share/dolce.toolchain.cmake -DSDL_BACKEND=SDL -DSTATIC_LINK=enabled -DDISABLE_WERROR=enabled -DCMAKE_MAKE_PROGRAM=make -DVITA=true -DUSE_OPENAL=false -DUSE_FREETYPE=false -DCMAKE_BUILD_TYPE=None
 make
 ```
 Generated VPK file is located in build/gemrb folder. Install it to your Vita system.
