@@ -3906,6 +3906,20 @@
 		A2EC8066146056B40033754A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		A2EDA0451F99B39600F0866A /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		A2F0505113ABB80B0023B7EB /* SAVImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SAVImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2F420872A65D3D500F3263D /* CocoaWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CocoaWrapper.h; sourceTree = "<group>"; };
+		A2F420892A65D3D500F3263D /* ostream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ostream.h; sourceTree = "<group>"; };
+		A2F4208A2A65D3D500F3263D /* format-inl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "format-inl.h"; sourceTree = "<group>"; };
+		A2F4208B2A65D3D500F3263D /* ranges.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ranges.h; sourceTree = "<group>"; };
+		A2F4208C2A65D3D500F3263D /* xchar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xchar.h; sourceTree = "<group>"; };
+		A2F4208D2A65D3D500F3263D /* core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
+		A2F4208E2A65D3D500F3263D /* chrono.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chrono.h; sourceTree = "<group>"; };
+		A2F4208F2A65D3D500F3263D /* os.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = os.h; sourceTree = "<group>"; };
+		A2F420902A65D3D500F3263D /* color.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = color.h; sourceTree = "<group>"; };
+		A2F420912A65D3D500F3263D /* args.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = args.h; sourceTree = "<group>"; };
+		A2F420922A65D3D500F3263D /* printf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = printf.h; sourceTree = "<group>"; };
+		A2F420932A65D3D500F3263D /* compile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compile.h; sourceTree = "<group>"; };
+		A2F420942A65D3D500F3263D /* format.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = format.h; sourceTree = "<group>"; };
+		A2F420952A65D3D500F3263D /* std.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = std.h; sourceTree = "<group>"; };
 		A2F5F064246102D70073802C /* RNG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNG.h; sourceTree = "<group>"; };
 		A2F5F065246102D70073802C /* RNG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RNG.cpp; sourceTree = "<group>"; };
 		A2F5F06F246103B90073802C /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
@@ -5719,6 +5733,8 @@
 		A2D4C51D13A978110086BCC4 /* includes */ = {
 			isa = PBXGroup;
 			children = (
+				A2F420872A65D3D500F3263D /* CocoaWrapper.h */,
+				A2F420882A65D3D500F3263D /* fmt */,
 				A24E7B9E1884CA8600431DEE /* CircularBuffer.h */,
 				A2D4C51E13A978110086BCC4 /* defsounds.h */,
 				A2D4C51F13A978110086BCC4 /* errors.h */,
@@ -7862,6 +7878,26 @@
 			);
 			name = Shaders;
 			path = ../../gemrb/plugins/SDLVideo/Shaders;
+			sourceTree = "<group>";
+		};
+		A2F420882A65D3D500F3263D /* fmt */ = {
+			isa = PBXGroup;
+			children = (
+				A2F420892A65D3D500F3263D /* ostream.h */,
+				A2F4208A2A65D3D500F3263D /* format-inl.h */,
+				A2F4208B2A65D3D500F3263D /* ranges.h */,
+				A2F4208C2A65D3D500F3263D /* xchar.h */,
+				A2F4208D2A65D3D500F3263D /* core.h */,
+				A2F4208E2A65D3D500F3263D /* chrono.h */,
+				A2F4208F2A65D3D500F3263D /* os.h */,
+				A2F420902A65D3D500F3263D /* color.h */,
+				A2F420912A65D3D500F3263D /* args.h */,
+				A2F420922A65D3D500F3263D /* printf.h */,
+				A2F420932A65D3D500F3263D /* compile.h */,
+				A2F420942A65D3D500F3263D /* format.h */,
+				A2F420952A65D3D500F3263D /* std.h */,
+			);
+			path = fmt;
 			sourceTree = "<group>";
 		};
 		A2FA1E051EE788C600E51C25 /* Frameworks */ = {
