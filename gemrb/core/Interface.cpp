@@ -3563,10 +3563,13 @@ void Interface::SanitizeItem(CREItem *item) const
 	// some slot flags might be affected by the item flags
 	if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
 		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-	} else if ((core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) && (!(item->Flags & IE_INV_ITEM_CONVERSABLE))) {
+	} else if (core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
 		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-	}
-
+		}
+	if  (item->Flags & IE_INV_ITEM_CONVERSABLE) {
+		item->Flags |= ~IE_INV_ITEM_DESTRUCTIBLE;
+		}
+		
 	// pst has no stolen flag, but "steel" in its place
 	if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		item->Flags |= IE_INV_ITEM_STOLEN;

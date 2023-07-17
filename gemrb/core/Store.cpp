@@ -127,7 +127,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 	if (pc && Type < StoreType::BG2CONT) {
 
 		//don't allow selling of critical items (they could still be put in bags) ... unless the shop is special
-		if ((invflags&IE_INV_ITEM_CRITICAL) && (!(Flags&IE_STORE_BUYCRITS))) {
+		if ((invflags&IE_INV_ITEM_CRITICAL) && !(Flags&IE_STORE_BUYCRITS)) {
 			ret &= ~IE_STORE_SELL;
 		}
 		if ((invflags&IE_INV_ITEM_CRITICAL) && (core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV))) {
@@ -137,7 +137,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 				ret |= IE_STORE_SELL;
 			}
 		}
-				//don't allow selling of non destructible items
+		//don't allow selling of non destructible items
 		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
 			ret &= ~IE_STORE_SELL;
 		}
