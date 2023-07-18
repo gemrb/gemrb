@@ -3566,7 +3566,7 @@ void Interface::SanitizeItem(CREItem *item) const
 	} else if (core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
 		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
 		}
-	if  (item->Flags & IE_INV_ITEM_CONVERSABLE && core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
+	if  ((item->Flags & IE_INV_ITEM_CONVERSABLE) && core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
 		item->Flags &= ~IE_INV_ITEM_DESTRUCTIBLE;
 		}
 		
