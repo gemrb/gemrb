@@ -101,13 +101,9 @@ static void PrintDLError()
 static bool LoadPlugin(const char* pluginpath)
 {
 #ifdef WIN32
-	TCHAR path[_MAX_PATH];
-	TCHAR t_pluginpath[_MAX_PATH] = {0};
-
-	mbstowcs(t_pluginpath, pluginpath, _MAX_PATH - 1);
-	StringCbCopy(path, _MAX_PATH, t_pluginpath);
-
-	HMODULE hMod = LoadLibrary(path);
+	std::wstring path(_MAX_PATH, L'\0');
+	mbstowcs(const_cast<wchar_t*>(path.data()), pluginpath, path.length());
+	HMODULE hMod = LoadLibraryW(path.data());
 #else
 	// Note: the RTLD_GLOBAL is necessary to export symbols to modules
 	//       which python may have to dlopen (-wjp, 20060716)

@@ -26,50 +26,59 @@
 
 struct DIR
 {
+	DIR() : is_first(true) {}
+
 	bool is_first;
 	SceUID descriptor;
 };
 
 struct dirent
 {
-	char d_name[_MAX_PATH];
+	dirent() : d_name(nullptr) {}
+
+	void assign(std::string&& value) {
+		buffer = std::move(value);
+		d_name = buffer.data();
+	}
+
+	std::string buffer;
+	char *d_name;
 };
 
 inline DIR* opendir(const char *filename)
 {
-	DIR *dirp = (DIR*) malloc(sizeof(DIR));
-	dirp->is_first = 1;
-	dirp->descriptor = sceIoDopen(filename);
+	auto *dir = new DIR{};
+	dir->descriptor = sceIoDopen(filename);
 
-	if (dirp->descriptor <= 0) {
-		free(dirp);
-		return NULL;
+	if (dir->descriptor <= 0) {
+		delete dir;
+		return nullptr;
 	}
 
-	return dirp;
+	return dir;
 }
 
-inline dirent* readdir(DIR *dirp)
+inline dirent* readdir(DIR *dir)
 {
 	static dirent de;
 	//vitasdk kind of skips current directory entry..
-	if (dirp->is_first) {
-		dirp->is_first = 0;
-		strncpy(de.d_name, ".", 1);
+	if (dir->is_first) {
+		dir->is_first = false;
+		de.assign(".");
 	} else {
-		SceIoDirent dir;
-		if (sceIoDread(dirp->descriptor, &dir) <= 0)
-			return NULL;
-		strncpy(de.d_name, dir.d_name, 256);
+		SceIoDirent entry;
+		if (sceIoDread(dir->descriptor, &entry) <= 0)
+			return nullptr;
+		de.assign(std::string(entry.d_name, _MAX_PATH));
 	}
 
 	return &de;
 }
 
-inline void closedir(DIR *dirp)
+inline void closedir(DIR *dir)
 {
-	sceIoDclose(dirp->descriptor);
-	free(dirp);
+	sceIoDclose(dir->descriptor);
+	delete dir;
 }
 
 inline int mkdir(const char *path, SceMode mode)
