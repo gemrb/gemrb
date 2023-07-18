@@ -177,10 +177,8 @@ jobs:
       run: |
         # NOTE: only do it on gcc builds if we ever add more compilers
         filepath=Linux
-        filei=build/GemRB-*-x86_64.AppImage
+        filei=build/GemRB-*.AppImage
         fileo=GemRB-${GITHUB_REF##*/}-${GITHUB_SHA:0:10}-x86_64.AppImage
-        realpath *AppImage build/*AppImage
-        ls *AppImage build/*AppImage
 
         filepath="$filepath/$fileo"
         scp $filei \
