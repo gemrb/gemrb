@@ -3566,8 +3566,8 @@ void Interface::SanitizeItem(CREItem *item) const
 	} else if (core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
 		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
 		}
-	if  (item->Flags & IE_INV_ITEM_CONVERSABLE) {
-		item->Flags |= ~IE_INV_ITEM_DESTRUCTIBLE;
+	if  (item->Flags & IE_INV_ITEM_CONVERSABLE && core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
+		item->Flags &= ~IE_INV_ITEM_DESTRUCTIBLE;
 		}
 		
 	// pst has no stolen flag, but "steel" in its place
