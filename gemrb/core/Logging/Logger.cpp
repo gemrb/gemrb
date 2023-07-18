@@ -24,6 +24,17 @@
 
 namespace GemRB {
 
+const std::array<LOG_FMT, 6> Logger::LevelFormat {
+	fmt::fg(fmt::color::red) | fmt::emphasis::bold,
+	fmt::fg(fmt::color::red) | fmt::emphasis::bold,
+	fmt::fg(fmt::color::yellow) | fmt::emphasis::bold,
+	fmt::fg(fmt::color::white),
+	fmt::fg(fmt::color::green) | fmt::emphasis::bold,
+	fmt::fg(fmt::color::blue)
+};
+
+const LOG_FMT Logger::MSG_STYLE = fmt::fg(fmt::color::ghost_white);
+
 Logger::Logger(std::deque<WriterPtr> writers)
 : writers(std::move(writers))
 {
@@ -63,9 +74,9 @@ void Logger::ProcessMessages(QueueType queue)
 	}
 }
 
-void Logger::LogMsg(log_level level, const char* owner, const char* message, log_color color)
+void Logger::LogMsg(log_level level, const char* owner, const char* message, LOG_FMT fmt)
 {
-	LogMsg(LogMessage(level, owner, message, color));
+	LogMsg(LogMessage(level, owner, message, fmt));
 }
 
 void Logger::LogMsg(LogMessage&& msg)
@@ -86,14 +97,5 @@ void Logger::LogMsg(LogMessage&& msg)
 		cv.notify_all();
 	}
 }
-
-const char* const log_level_text[] = {
-	"FATAL",
-	"ERROR",
-	"WARNING",
-	"", // MESSAGE
-	"COMBAT",
-	"DEBUG"
-};
 
 }

@@ -26,7 +26,10 @@
 #define LOGGER_H
 
 #include "exports.h"
+#include "Strings/Format.h"
+#include <fmt/color.h>
 
+#include <array>
 #include <atomic>
 #include <condition_variable>
 #include <deque>
@@ -48,35 +51,21 @@ enum log_level : int {
 	DEBUG = 5
 };
 
-enum log_color : int {
-	DEFAULT,
-	BLACK,
-	RED,
-	GREEN,
-	BROWN,
-	BLUE,
-	MAGENTA,
-	CYAN,
-	WHITE,
-	LIGHT_RED,
-	LIGHT_GREEN,
-	YELLOW,
-	LIGHT_BLUE,
-	LIGHT_MAGENTA,
-	LIGHT_CYAN,
-	LIGHT_WHITE
-};
+using LOG_FMT = fmt::text_style;
 
 class GEM_EXPORT Logger final {
 public:
+	static const std::array<LOG_FMT, 6> LevelFormat;
+	static const LOG_FMT MSG_STYLE;
+
 	struct LogMessage {
 		log_level level = DEBUG;
 		std::string owner;
 		std::string message;
-		log_color color = DEFAULT;
+		LOG_FMT format;
 		
-		LogMessage(log_level level, std::string owner, std::string message, log_color color = DEFAULT)
-		: level(level), owner(std::move(owner)), message(std::move(message)), color(color) {}
+		LogMessage(log_level level, std::string owner, std::string message, LOG_FMT fmt)
+		: level(level), owner(std::move(owner)), message(std::move(message)), format(fmt) {}
 	};
 
 	class LogWriter {
@@ -86,8 +75,8 @@ public:
 		explicit LogWriter(log_level level) : level(level) {}
 		virtual ~LogWriter() noexcept = default;
 		
-		void WriteLogMessage(log_level level, const char* owner, const char* message, log_color color) {
-			WriteLogMessage(LogMessage(level, owner, message, color));
+		void WriteLogMessage(log_level level, const char* owner, const char* message, LOG_FMT fmt) {
+			WriteLogMessage(LogMessage(level, owner, message, fmt));
 		}
 		virtual void WriteLogMessage(const Logger::LogMessage& msg)=0;
 	};
@@ -113,11 +102,9 @@ public:
 	
 	void AddLogWriter(WriterPtr writer);
 
-	void LogMsg(log_level, const char* owner, const char* message, log_color color);
+	void LogMsg(log_level, const char* owner, const char* message, LOG_FMT fmt);
 	void LogMsg(LogMessage&& msg);
 };
-
-extern const char* const log_level_text[];
 
 }
 

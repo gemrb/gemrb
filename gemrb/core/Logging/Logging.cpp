@@ -58,48 +58,26 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 	TextArea* ta = GetControl<TextArea>("CONSOLE", 1);
 	
 	if (ta) {
-		static const wchar_t* colors[] = {
-			L"[color=FFFFFF]",	// DEFAULT
-			L"[color=000000]",	// BLACK
-			L"[color=FF0000]",	// RED
-			L"[color=00FF00]",	// GREEN
-			L"[color=603311]",	// BROWN
-			L"[color=0000FF]",	// BLUE
-			L"[color=8B008B]",	// MAGENTA
-			L"[color=00CDCD]",	// CYAN
-			L"[color=FFFFFF]",	// WHITE
-			L"[color=CD5555]",	// LIGHT_RED
-			L"[color=90EE90]",	// LIGHT_GREEN
-			L"[color=FFFF00]",	// YELLOW
-			L"[color=BFEFFF]",	// LIGHT_BLUE
-			L"[color=FF00FF]",	// LIGHT_MAGENTA
-			L"[color=B4CDCD]",	// LIGHT_CYAN
-			L"[color=CDCDCD]"	// LIGHT_WHITE
+		auto GetRGB = [](const fmt::text_style& style) {
+			return style.get_foreground().value.rgb_color;
 		};
-		static constexpr log_color log_level_color[] = {
-			RED,
-			RED,
-			YELLOW,
-			LIGHT_WHITE,
-			GREEN,
-			BLUE
-		};
-
+		
 		int level = msg.level == INTERNAL ? 0 : msg.level;
-		ta->AppendText(fmt::format(L"{}{}: [/color]{}{}[/color]\n", colors[msg.color],
-								   StringFromCString(msg.owner.c_str()),
-								   colors[log_level_color[level]],
-								   StringFromCString(msg.message.c_str())));
+		const auto& format = Logger::LevelFormat[level];
+		const auto& FMT = FMT_STRING(L"[color={:X}]{}: [/color][color={:X}]{}[/color]\n");
+		// MessageWindow supports only colors
+		ta->AppendText(fmt::format(FMT, GetRGB(msg.format), StringFromCString(msg.owner.c_str()),
+								   GetRGB(format), StringFromCString(msg.message.c_str())));
 	}
 }
 
 void SetConsoleWindowLogLevel(log_level level)
 {
 	if (level <= INTERNAL) {
-		static const LogMessage offMsg(INTERNAL, "Logger", "MessageWindow logging disabled.", LIGHT_RED);
+		static const LogMessage offMsg(INTERNAL, "Logger", "MessageWindow logging disabled.", fmt::fg(fmt::color::red));
 		ConsoleWinLogMsg(offMsg);
 	} else if (level <= DEBUG) {
-		static const LogMessage onMsg(INTERNAL, "Logger", "MessageWindow logging active.", LIGHT_GREEN);
+		static const LogMessage onMsg(INTERNAL, "Logger", "MessageWindow logging active.", fmt::fg(fmt::color::green));
 		ConsoleWinLogMsg(onMsg);
 	}
 	CWLL = level;
@@ -123,17 +101,17 @@ void AddLogWriter(Logger::WriterPtr&& writer)
 
 static void addGemRBLog(const CoreSettings& config)
 {
-	FileStream* log_file = new FileStream();
-	path_t log_path = PathJoin<false>(config.GamePath, "GemRB.log");
-	if (log_file->Create(log_path)) {
-		AddLogWriter(createStreamLogWriter(log_file));
+	path_t path = PathJoin<false>(config.GamePath, "GemRB.log");
+	FILE* file = fopen(path.c_str(), "wb");
+	if (file) {
+		AddLogWriter(createStreamLogWriter(file));
 	} else {
-		log_path = PathJoin(config.CachePath, "GemRB.log");
-		if (log_file->Create(log_path)) {
-			AddLogWriter(createStreamLogWriter(log_file));
+		path = PathJoin(config.CachePath, "GemRB.log");
+		FILE* file = fopen(path.c_str(), "wb");
+		if (file) {
+			AddLogWriter(createStreamLogWriter(file));
 		} else {
 			Log (WARNING, "Logger", "Could not create a log file, skipping!");
-			delete log_file;
 		}
 	}
 }

@@ -26,7 +26,7 @@
 
 namespace GemRB {
 
-class Win32ConsoleLogger : public StdioLogWriter {
+class Win32ConsoleLogger : public StreamLogWriter {
 public:
 	Win32ConsoleLogger(log_level level, bool useColor);
 	~Win32ConsoleLogger();

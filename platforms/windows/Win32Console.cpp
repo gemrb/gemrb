@@ -18,18 +18,30 @@
 
 #include "Win32Console.h"
 
-#include <cstdio>
+#include "config.h"
 
 #define ADV_TEXT
 #include <conio.h>
+#include <fcntl.h>
 
 namespace GemRB {
 
+static FILE* HandleToFile(HANDLE handle) {
+	if (handle == INVALID_HANDLE_VALUE) {
+		return nullptr;
+	}
+	int fd = _open_osfhandle((intptr_t)handle, _O_TEXT);
+	if (fd == -1) {
+		return nullptr;
+	}
+	return _fdopen(fd, "w");
+}
+
 Win32ConsoleLogger::Win32ConsoleLogger(log_level level, bool useColor)
-: StdioLogWriter(level, useColor)
+: StreamLogWriter(level, HandleToFile(GetStdHandle(STD_OUTPUT_HANDLE)), useColor)
 {
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	
+
 	GetConsoleMode(hConsole, &dwMode);
 	SetConsoleMode(hConsole, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 }

@@ -44,7 +44,7 @@ template<typename... ARGS>
 void Log(log_level level, const char* owner, const char* message, ARGS&&... args)
 {
 	auto formattedMsg = fmt::format(message, std::forward<ARGS>(args)...);
-	LogMsg(Logger::LogMessage(level, owner, std::move(formattedMsg), WHITE));
+	LogMsg(Logger::LogMessage(level, owner, std::move(formattedMsg), Logger::MSG_STYLE));
 }
 
 /// Log an error and exit.
