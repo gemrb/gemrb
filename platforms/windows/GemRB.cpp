@@ -20,14 +20,23 @@
 
 // GemRB.cpp : Defines the entry point for the application.
 
-#include "win32def.h" // logging
+#include "win32def.h"
 #include <clocale> //language encoding
 
 #include "Interface.h"
 #include "Logging/Logging.h"
-#include "Win32Console.h"
+#include "Logging/Loggers/Stdio.h"
 
 using namespace GemRB;
+
+Logger::WriterPtr createWin32ConsoleLogger()
+{
+	auto hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD dwMode = 0;
+	GetConsoleMode(hConsole, &dwMode);
+	SetConsoleMode(hConsole, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	return createStdioLogWriter();
+}
 
 int main(int argc, char* argv[])
 {
