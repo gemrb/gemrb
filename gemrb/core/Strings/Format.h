@@ -23,18 +23,24 @@
 #define FMT_EXCEPTIONS 0
 #include <fmt/format.h>
 
-namespace fmt {
+namespace GemRB {
 
-template <typename STR>
-struct formatter<STR, char,
-// ignore the junk after STR... its just SFINAE garbage to hide the ctor from certain useages
-enable_if_t<std::is_class<STR>::value && !std::is_same<STR, basic_string_view<char>>::value && !std::is_same<STR, std::string>::value>
-> : formatter<const char*, char> {
-	template <typename FormatContext>
-	auto format(const STR& str, FormatContext &ctx) -> decltype(ctx.out()) {
-		return formatter<const char*, char>::format(str.begin(), ctx);
-	}
-};
+// C++17 provides void_t...
+template<typename... Ts>
+struct make_void { typedef void type; };
+ 
+template<typename... Ts>
+using void_t = typename make_void<Ts...>::type;
+
+template <typename, typename = void>
+struct has_c_str : std::false_type {};
+
+template <typename T>
+struct has_c_str<T, void_t<decltype(&T::c_str)>> : std::is_same<char const*, decltype(std::declval<T>().c_str())>
+{};
+
+template <typename STR, FMT_ENABLE_IF(has_c_str<STR>::value && !std::is_same<std::string, STR>::value)>
+auto format_as(const STR& str) { return str.c_str(); }
 
 }
 
