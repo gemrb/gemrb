@@ -865,24 +865,3 @@ def OverrideDefaultVoiceSet (Gender, CharSound):
 			Gender2Sound = [ "", "male005", "female4" ]
 			CharSound = Gender2Sound[Gender]
 	return CharSound
-
-class _stdioWrapper(object):
-	def __init__(self, log_level):
-		self.log_level = log_level
-		self.buffer = ""
-	def write(self, message):
-		self.buffer += str(message)
-		if self.buffer.endswith("\n"):
-			out = self.buffer.rstrip("\n")
-			if out:
-				GemRB.Log(self.log_level, "Python", out)
-			self.buffer = ""
-	def flush(self):
-		pass
-
-def _wrapStdio():
-	import sys
-	sys.stdout = _stdioWrapper(LOG_MESSAGE)
-	sys.stderr = _stdioWrapper(LOG_ERROR)
-
-_wrapStdio()
