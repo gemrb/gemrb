@@ -223,6 +223,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	}
 #endif
 
+	CONFIG_STRING("GameType", config.GameType);
 	CONFIG_PATH("GUIScriptsPath", config.GUIScriptsPath, config.GemRBPath);
 	CONFIG_PATH("GamePath", config.GamePath);
 	// guess a few paths in case this one is bad; two levels deep for the fhs layout
