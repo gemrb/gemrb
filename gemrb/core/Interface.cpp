@@ -2468,10 +2468,8 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	// Unpack SAV (archive) file to Cache dir, if we haven't done it above
 	if (savStr) {
 		PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
-		if (ai) {
-			if (ai->DecompressSaveGame(savStr, saveGameAREExtractor) != GEM_OK) {
-				goto cleanup;
-			}
+		if (ai && ai->DecompressSaveGame(savStr, saveGameAREExtractor) != GEM_OK) {
+			goto cleanup;
 		}
 		delete savStr;
 		savStr = nullptr;

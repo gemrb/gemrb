@@ -109,7 +109,7 @@ public:
 	int timeOffset = 0;
 
 public:
-	ColorAnimation() : GUIAnimation() {}
+	using GUIAnimation::GUIAnimation;
 
 	ColorAnimation(const Color& begin, const Color& end, bool repeat)
 	: GUIAnimation(), begin(begin), end(end), repeat(repeat), cycle(7) {

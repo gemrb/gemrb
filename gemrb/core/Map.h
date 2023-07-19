@@ -678,7 +678,7 @@ private:
 	void SortQueues();
 	int SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const;
 	//Actor* GetRoot(int priority, int &index);
-	void DeleteActor(int i);
+	void DeleteActor(size_t idx);
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised

@@ -1950,9 +1950,9 @@ bool Map::AnyPCSeesEnemy() const
 //If the actor is in the NPC storage, its area and some other fields
 //that are needed for proper reentry will be zeroed out
 //If the actor isn't in the NPC storage, it is destructed
-void Map::DeleteActor(int i)
+void Map::DeleteActor(size_t idx)
 {
-	Actor *actor = actors[i];
+	Actor* actor = actors[idx];
 	if (actor) {
 		actor->Stop(); // just in case
 		Game *game = core->GetGame();
@@ -1971,7 +1971,7 @@ void Map::DeleteActor(int i)
 		}
 	}
 	//remove the actor from the area's actor list
-	actors.erase( actors.begin()+i );
+	actors.erase(actors.begin() + idx);
 }
 
 Scriptable *Map::GetScriptableByGlobalID(ieDword objectID)
@@ -2166,7 +2166,7 @@ void Map::PurgeArea(bool items)
 	InternalFlags |= IF_JUSTDIED; //area marked for swapping out
 
 	//1. remove dead actors without 'keep corpse' flag
-	int i=(int) actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor *ac = actors[i];
 		//we're going to drop the map from memory so clear the reference
@@ -2191,7 +2191,7 @@ void Map::PurgeArea(bool items)
 	}
 	//2. remove any non critical items
 	if (items) {
-		size_t i = TMap->GetContainerCount();
+		i = TMap->GetContainerCount();
 		while (i--) {
 			Container* c = TMap->GetContainer(i);
 			unsigned int j=c->inventory.GetSlotCount();

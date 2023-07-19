@@ -521,11 +521,11 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		blitRGBAShader->SetUniformMatrixValue("u_stencilMat", 3, 1, reinterpret_cast<GLfloat*>(&mat));
 		
 		// Ask OpenGL about the texture handle (that lies hidden in SDL_Texture otherwise)
-		auto texture = std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
-		SDL_GL_BindTexture(texture, nullptr, nullptr);
+		auto curTexture = std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
+		SDL_GL_BindTexture(curTexture, nullptr, nullptr);
 		GLuint stencilTextureID;
 		glGetIntegerv(GL_TEXTURE_BINDING_2D, reinterpret_cast<GLint*>(&stencilTextureID));
-		SDL_GL_UnbindTexture(texture);
+		SDL_GL_UnbindTexture(curTexture);
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, stencilTextureID);

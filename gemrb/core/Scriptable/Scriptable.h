@@ -314,7 +314,7 @@ public:
 	
 	template <class RETURN, class PARAM>
 	static constexpr auto As(PARAM* obj)
-	-> typename std::conditional<std::is_const<PARAM>::value, const RETURN*, RETURN*>::type {
+	-> typename std::conditional_t<std::is_const<PARAM>::value, const RETURN*, RETURN*> {
 		static_assert(std::is_base_of<Scriptable, RETURN>::value, "Attempted bad Scriptable cast!");
 		// dynamic_cast will return nullptr if the cast is invalid
 		return dynamic_cast<decltype(As<RETURN, PARAM>(obj))>(obj);

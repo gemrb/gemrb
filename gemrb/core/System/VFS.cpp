@@ -372,7 +372,7 @@ bool MakeDirectories(const path_t& path)
 	const char* begin = path.data();
 
 	for (const auto& part : parts) {
-		if (part.length() == 0) continue;
+		if (part.empty()) continue;
 
 		const char* end = part.begin() + part.length();
 		if(!MakeDirectory(StringView(begin, end - begin))) {
