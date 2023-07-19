@@ -81,7 +81,7 @@ typename STR::size_type FindFirstNotOf(const STR& s, StringViewT<STR> sv, typena
 		return pos;
 	}
 	auto iter = FindNotOf<STR>(s.begin() + pos, s.end(), sv);
-	return iter == s.end() ? STR::npos : std::distance(s.begin(), iter);
+	return iter == s.end() ? STR::npos : static_cast<typename STR::size_type>(std::distance(s.begin(), iter));
 }
 
 template <typename STR>
@@ -95,7 +95,7 @@ typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typenam
 	}
 	if (!reverse) pos = s.length() - (pos + 1);
 	auto iter = FindNotOf<STR>(s.rbegin() + (reverse ? 0 : pos), s.rend() - (reverse ? pos : 0), sv);
-	return iter == s.rend() ? STR::npos : s.length() - 1 - std::distance(s.rbegin(), iter);
+	return iter == s.rend() ? STR::npos : s.length() - 1 - static_cast<typename STR::size_type>(std::distance(s.rbegin(), iter));
 }
 
 template <typename STR>
@@ -134,7 +134,7 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 	{
 		if (str[cur] == delim) {
 			elements.emplace_back(&str[beg], cur - beg);
-			beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR), cur + 1);
+			beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR), static_cast<typename STR::size_type>(cur + 1));
 			if (beg == STR::npos || (lim && elements.size() == lim)) {
 				break;
 			}
@@ -144,7 +144,7 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 
 	if (beg != STR::npos && beg != cur) {
 		// trim any trailing spaces
-		size_t last = FindLastNotOf(str, WHITESPACE_STRING_VIEW(STR), beg, true);
+		size_t last = FindLastNotOf(str, WHITESPACE_STRING_VIEW(STR), static_cast<typename STR::size_type>(beg), true);
 		if (last != STR::npos) {
 			elements.emplace_back(&str[beg], last - beg + 1);
 		}

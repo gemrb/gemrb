@@ -495,8 +495,8 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		stencilRect.y -= stencilBuffer->Origin().y;
 
 		if (stencilRect.x < dstrect->x && stencilRect.y < dstrect->y) {
-			stencilTexX = -dstrect->x;
-			stencilTexY = -dstrect->y;
+			stencilTexX = -static_cast<GLfloat>(dstrect->x);
+			stencilTexY = -static_cast<GLfloat>(dstrect->y);
 		}
 
 #if !SDL_VERSION_ATLEAST(2, 0, 18)
@@ -509,8 +509,8 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		}
 #endif
 
-		stencilTexW = 1.0f / (texW * scaleX);
-		stencilTexH = 1.0f / (texH * scaleY);
+		stencilTexW = 1.0f / (static_cast<float>(texW) * scaleX);
+		stencilTexH = 1.0f / (static_cast<float>(texH) * scaleY);
 
 		GLfloat mat[3][3] = {
 			{ stencilTexW,        0.0f, 0.0f },

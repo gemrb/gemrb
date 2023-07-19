@@ -676,7 +676,7 @@ private:
 
 	void GenerateQueues();
 	void SortQueues();
-	size_t SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime);
+	int SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime);
 	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);
 	//actor uses travel region

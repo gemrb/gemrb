@@ -67,7 +67,7 @@ Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bam, ieByte seq
 	}
 
 	if ((ExtFlags & PEF_CYCLE) && !seq) {
-		seq = RAND<ieByte>(0, Max - 1);
+		seq = RAND<ieByte>(int(0), Max - 1);
 	}
 
 	//this hack is needed because bioware .pro files are sometimes

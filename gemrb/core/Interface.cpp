@@ -1459,7 +1459,7 @@ void Interface::LoadGemRBINI()
 			size_t pos = FindFirstOf(sv, "/");
 			if (pos != StringView::npos) {
 				GroundCircleScale[size] = atoi(&sv[pos] + 1);
-				GroundCircleBam[size] = ResRef(sv.begin(), pos);
+				GroundCircleBam[size] = ResRef(sv.begin(), ResRef::size_type(pos));
 			} else {
 				GroundCircleBam[size] = sv;
 			}
