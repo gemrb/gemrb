@@ -31,14 +31,10 @@ namespace GemRB {
 template <class T>
 class GUIAnimation {
 protected:
-	tick_t begintime;
+	tick_t begintime = GetMilliseconds();
 	T current;
 	
 public:
-	GUIAnimation() {
-		begintime = GetMilliseconds();
-	}
-	
 	virtual ~GUIAnimation() noexcept = default;
 	
 	explicit operator bool() const {
@@ -65,11 +61,11 @@ class GEM_EXPORT PointAnimation : public GUIAnimation<Point> {
 public:
 	Point begin;
 	Point end;
-	tick_t endtime;
+	tick_t endtime = 0;
 	
 public:
-	PointAnimation() : GUIAnimation(), endtime(0) {}
-	
+	PointAnimation() = default;
+
 	PointAnimation(const Point& begin, const Point& end, tick_t duration)
 	: GUIAnimation(), begin(begin), end(end), endtime(begintime + duration) {
 		Next(begintime);
@@ -82,7 +78,7 @@ private:
 
 class GEM_EXPORT ColorCycle {
 	uint8_t step = 0;
-	uint8_t speed;
+	uint8_t speed = 0;
 
 public:
 	explicit ColorCycle(uint8_t speed) : speed(speed) {}
