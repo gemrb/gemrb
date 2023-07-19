@@ -242,9 +242,7 @@ def getProfi(TextAreaControl):
 		Weapon = TmpTable.GetValue (i, 1, GTV_REF)
 		Value = GemRB.GetPlayerStat (MyChar, stat)
 		if Value:
-			pluses = " "
-			for plus in range(0, Value):
-				pluses += "+"
+			pluses = " " + "+" * Value
 			TextAreaControl.Append (Weapon + pluses + "\n")
 
 #Appearance
