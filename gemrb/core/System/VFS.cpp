@@ -55,66 +55,68 @@
 
 #ifdef WIN32
 
-#include <tchar.h>
+#include <array>
 
 using namespace GemRB;
 
-struct DIR {
-	TCHAR path[_MAX_PATH];
-	bool is_first;
-	struct _finddata_t c_file;
-	intptr_t hFile;
-};
-
 struct dirent {
-	char d_name[_MAX_PATH];
+	dirent() : buffer(_MAX_PATH, L'\0'), d_name(const_cast<char*>(buffer.data())) {}
+
+	std::string buffer;
+	const char *d_name;
 };
 
+struct DIR {
+	DIR() : path(), is_first(true), hFile(0) {}
+	~DIR() {
+		_findclose(hFile);
+	}
 
-// buffer which readdir returns
-static dirent de;
+	std::wstring path;
+	bool is_first;
+	struct _wfinddata_t c_file;
+	intptr_t hFile;
+	dirent entry;
+};
 
-#define STRSAFE_NO_DEPRECATE
-#include <strsafe.h>
+static DIR* opendir(const char* filename) {
+	auto dir = new DIR{};
 
-static DIR* opendir(const char* filename)
-{
-	TCHAR t_filename[_MAX_PATH] = {0};
-	DIR* dirp = ( DIR* ) malloc( sizeof( DIR ) );
-	dirp->is_first = 1;
+	// consider $PATH\*.*\0 for _wfindfirst
+	if (strlen(filename) > _MAX_PATH - 5) {
+		return nullptr;
+	}
 
-	mbstowcs(t_filename, filename, _MAX_PATH - 1);
-	StringCbPrintf(dirp->path, _MAX_PATH * sizeof(TCHAR), TEXT("%s%s*.*"), t_filename, TEXT("\\"));
+	std::wstring buffer(_MAX_PATH, L'\0');
+	mbstowcs(const_cast<wchar_t*>(buffer.data()), filename, buffer.length() - 1);
+	dir->path = fmt::format(L"{}\\*.*", buffer.c_str());
 
-	return dirp;
+	return dir;
 }
 
-static dirent* readdir(DIR* dirp)
-{
-	struct _tfinddata_t c_file;
+static dirent* readdir(DIR *dir) {
+	struct _wfinddata_t c_file;
 
-	if (dirp->is_first) {
-		dirp->is_first = 0;
-		dirp->hFile = _tfindfirst(dirp->path, &c_file);
-		if (dirp->hFile == -1L)
-			return NULL;
+	if (dir->is_first) {
+		dir->is_first = false;
+		dir->hFile = _wfindfirst(dir->path.data(), &c_file);
+		if (dir->hFile == -1L)
+			return nullptr;
 	} else {
-		if (_tfindnext(dirp->hFile, &c_file) != 0) {
-			return NULL;
+		if (_wfindnext(dir->hFile, &c_file) != 0) {
+			return nullptr;
 		}
 	}
 
-	TCHAR td_name[_MAX_PATH];
-	StringCbCopy(td_name, _MAX_PATH, c_file.name);
-	wcstombs(de.d_name, td_name, _MAX_PATH);
+	auto& de = dir->entry;
+	auto n = wcstombs(const_cast<char*>(de.d_name), c_file.name, de.buffer.length() - 1);
+	de.buffer[n] = 0;
 
 	return &de;
 }
 
-static void closedir(DIR* dirp)
-{
-	_findclose( dirp->hFile );
-	free( dirp );
+static void closedir(DIR *dir) {
+	delete dir;
 }
 
 #endif // WIN32
