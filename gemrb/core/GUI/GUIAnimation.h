@@ -29,7 +29,7 @@
 namespace GemRB {
 
 template <class T>
-class GEM_EXPORT GUIAnimation {
+class GUIAnimation {
 protected:
 	tick_t begintime;
 	T current;
@@ -100,7 +100,7 @@ extern ColorCycle GlobalColorCycle;
 
 // This is supposed to be a fast optionally infinitely repeating transition
 // between 2 colors. We will create a global instance to syncronize many elements with the same animation.
-class GEM_EXPORT ColorAnimation : public GUIAnimation<Color> {
+class ColorAnimation : public GUIAnimation<Color> {
 public:
 	Color begin;
 	Color end;
@@ -109,7 +109,7 @@ public:
 	int timeOffset = 0;
 
 public:
-	using GUIAnimation::GUIAnimation;
+	using GUIAnimation<Color>::GUIAnimation;
 
 	ColorAnimation(const Color& begin, const Color& end, bool repeat)
 	: GUIAnimation(), begin(begin), end(end), repeat(repeat), cycle(7) {
