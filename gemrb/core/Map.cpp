@@ -2598,7 +2598,7 @@ bool Map::BehindWall(const Point& pos, const Region& r) const
 	return !polys.first.empty();
 }
 
-int Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime)
+int Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const
 {
 	ieDword stance = actor->GetStance();
 	ieDword internalFlag = actor->GetInternalFlag();

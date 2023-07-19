@@ -590,7 +590,7 @@ public:
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map) const;
 	/** saves (exports a character to the characters folder */
-	int WriteCharacter(StringView name, const Actor *actor);
+	int WriteCharacter(StringView name, const Actor* actor) const;
 	/** saves the game object to the destination folder */
 	int WriteGame(const path_t& folder);
 	/** saves the worldmap object to the destination folder */

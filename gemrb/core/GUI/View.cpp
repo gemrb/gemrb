@@ -111,7 +111,7 @@ bool View::NeedsDraw() const
 	return false;
 }
 
-void View::InvalidateSubviews()
+void View::InvalidateSubviews() const
 {
 	for (View* subview : subViews) {
 		Region r = ConvertRegionFromSuper(frame);
@@ -172,7 +172,7 @@ Regions View::DirtySuperViewRegions() const
 	return dirtyAreas;
 }
 
-void View::DrawSubviews(bool drawBG)
+void View::DrawSubviews(bool drawBG) const
 {
 	drawBG = drawBG && HasBackground();
 	for (View* subview : subViews) {

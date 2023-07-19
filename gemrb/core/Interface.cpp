@@ -3624,7 +3624,7 @@ int Interface::SwapoutArea(Map *map) const
 	return 0;
 }
 
-int Interface::WriteCharacter(StringView name, const Actor *actor)
+int Interface::WriteCharacter(StringView name, const Actor* actor) const
 {
 	path_t Path = PathJoin(config.GamePath, config.GameCharactersPath);
 	if (!actor) {
