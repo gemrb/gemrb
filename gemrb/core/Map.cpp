@@ -3707,7 +3707,7 @@ AreaAnimation& AreaAnimation::operator=(const AreaAnimation& src) noexcept
 		Name = src.Name;
 		BAM = src.BAM;
 
-		palette = src.palette ? src.palette->Copy() : NULL;
+		palette = src.palette ? MakeHolder<Palette>(*src.palette) : nullptr;
 
 		// handles the rest: animation, resets animcount
 		InitAnimation();

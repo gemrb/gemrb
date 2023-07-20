@@ -3735,7 +3735,7 @@ static PyObject* SetButtonBAM(Button* btn, StringView ResRef, AnimationFactory::
 	if (col1 >= 0) {
 		Picture = Picture->copy();
 
-		Holder<Palette> newpal = Picture->GetPalette()->Copy();
+		Holder<Palette> newpal = MakeHolder<Palette>(*Picture->GetPalette());
 		const auto& pal16 = core->GetPalette16(static_cast<uint8_t>(col1));
 		newpal->CopyColorRange(&pal16[0],&pal16[12], 4);
 		Picture->SetPalette( newpal );

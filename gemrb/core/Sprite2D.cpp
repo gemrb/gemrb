@@ -123,7 +123,7 @@ void Sprite2D::SetPalette(const Holder<Palette>& pal)
 		format.palette = pal;
 	} else {
 		// we don't use shared palettes because it is a performance bottleneck on SDL2
-		format.palette = pal->Copy();
+		format.palette = MakeHolder<Palette>(*pal);
 	}
 	
 	UpdatePalette();

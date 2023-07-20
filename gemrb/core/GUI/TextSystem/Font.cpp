@@ -145,7 +145,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 		Sheet = VideoDriver->CreateSprite(SheetRegion, pageData, fmt);
 		if (font->background) {
 			invertedSheet = Sheet->copy();
-			auto invertedPalette = font->palette->Copy();
+			auto invertedPalette = MakeHolder<Palette>(*font->palette);
 			for (auto& c : invertedPalette->col) {
 				c.r = 255 - c.r;
 				c.g = 255 - c.g;

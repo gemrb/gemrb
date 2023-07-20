@@ -704,7 +704,7 @@ void ScriptedAnimation::GetPaletteCopy()
 		Holder<Sprite2D> spr = anim->GetFrame(0);
 		if (!spr) continue;
 
-		palette = spr->GetPalette()->Copy();
+		palette = MakeHolder<Palette>(*spr->GetPalette());
 		Color shadowalpha = palette->col[1];
 		shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
 		palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);

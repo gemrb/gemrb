@@ -67,11 +67,6 @@ void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t d
 	version++;
 }
 
-Holder<Palette> Palette::Copy() const noexcept
-{
-	return MakeHolder<Palette>(std::begin(col), std::end(col));
-}
-
 bool Palette::operator==(const Palette& other) const noexcept {
 	return memcmp(col, other.col, sizeof(col)) == 0;
 }

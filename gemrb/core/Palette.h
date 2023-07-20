@@ -23,7 +23,6 @@
 #include "RGBAColor.h"
 #include "exports.h"
 #include "ie_types.h"
-#include "Holder.h"
 
 #include <algorithm>
 #include <cassert>
@@ -67,8 +66,6 @@ public:
 	unsigned short GetVersion() const noexcept { return version; }
 
 	bool HasAlpha() const noexcept { return alpha; }
-
-	Holder<Palette> Copy() const noexcept;
 
 	void CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst) noexcept;
 	bool operator==(const Palette&) const noexcept;

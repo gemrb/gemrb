@@ -308,7 +308,7 @@ void CharAnimations::MaybeUpdateMainPalette(const Animation& anim) {
 		if (*PartPalettes[PAL_MAIN] != *anim.GetFrame(0)->GetPalette()) {
 			PaletteResRef[PAL_MAIN].Reset();
 
-			PartPalettes[PAL_MAIN] = anim.GetFrame(0)->GetPalette()->Copy();
+			PartPalettes[PAL_MAIN] = MakeHolder<Palette>(*anim.GetFrame(0)->GetPalette());
 			SetupColors(PAL_MAIN);
 		}
 	}
@@ -1040,7 +1040,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			if(!PartPalettes[ptype]) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
-				PartPalettes[ptype] = newanim->GetFrame(0)->GetPalette()->Copy();
+				PartPalettes[ptype] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
 				// ...and setup the colours properly
 				SetupColors(ptype);
 			} else if (ptype == PAL_MAIN) {
@@ -1048,17 +1048,17 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			}
 		} else if (part == actorPartCount) {
 			if (!PartPalettes[PAL_WEAPON]) {
-				PartPalettes[PAL_WEAPON] = newanim->GetFrame(0)->GetPalette()->Copy();
+				PartPalettes[PAL_WEAPON] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
 				SetupColors(PAL_WEAPON);
 			}
 		} else if (part == actorPartCount+1) {
 			if (!PartPalettes[PAL_OFFHAND]) {
-				PartPalettes[PAL_OFFHAND] = newanim->GetFrame(0)->GetPalette()->Copy();
+				PartPalettes[PAL_OFFHAND] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
 				SetupColors(PAL_OFFHAND);
 			}
 		} else if (part == actorPartCount+2) {
 			if (!PartPalettes[PAL_HELMET]) {
-				PartPalettes[PAL_HELMET] = newanim->GetFrame(0)->GetPalette()->Copy();
+				PartPalettes[PAL_HELMET] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
 				SetupColors(PAL_HELMET);
 			}
 		}
@@ -1253,7 +1253,7 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 	newparts[0] = animation;
 
 	if (!shadowPalette) {
-		shadowPalette = animation->GetFrame(0)->GetPalette()->Copy();
+		shadowPalette = MakeHolder<Palette>(*animation->GetFrame(0)->GetPalette());
 	}
 
 	switch (newStanceID) {

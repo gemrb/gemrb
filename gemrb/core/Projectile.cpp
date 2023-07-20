@@ -180,7 +180,7 @@ void Projectile::GetPaletteCopy(const AnimArray& anims, Holder<Palette> &pal) co
 	for (const auto& anim : anims) {
 		Holder<Sprite2D> spr = anim.GetFrame(0);
 		if (spr) {
-			pal = spr->GetPalette()->Copy();
+			pal = MakeHolder<Palette>(*spr->GetPalette());
 			break;
 		}
 	}
