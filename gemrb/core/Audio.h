@@ -78,6 +78,7 @@ public:
 	virtual void SetPos(const Point&) = 0;
 	virtual void Stop() = 0;
 	virtual void StopLooping() = 0;
+	virtual ~SoundHandle() = default;
 };
 
 class GEM_EXPORT Channel {

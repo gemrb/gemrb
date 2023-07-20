@@ -144,7 +144,6 @@ bool PNGImporter::Import(DataStream* stream)
 
 Holder<Sprite2D> PNGImporter::GetSprite2D()
 {
-	Holder<Sprite2D> spr;
 	unsigned char* buffer = 0;
 	png_bytep* row_pointers = new png_bytep[size.h];
 	buffer = (unsigned char *) malloc((hasPalette?1:4) * size.Area());
@@ -166,6 +165,7 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	// the end_info struct isn't used, but passing it anyway for now
 	png_read_end(inf->png_ptr, inf->end_info);
 
+	Holder<Sprite2D> spr;
 	if (hasPalette) {
 		Holder<Palette> pal = MakeHolder<Palette>();
 		int ck = GetPalette(256, pal->col);
