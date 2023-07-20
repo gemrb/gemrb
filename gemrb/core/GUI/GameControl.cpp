@@ -471,7 +471,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	for (size_t idx = 0; (i = area->TMap->GetInfoPoint(idx)); idx++) {
 		i->Highlight = false;
 		if (i->VisibleTrap(0)) {
-			if (overInfoPoint == i && target_mode) {
+			if (overMe == i && target_mode) {
 				i->outlineColor = ColorGreen;
 			} else {
 				i->outlineColor = ColorRed;
@@ -498,7 +498,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 			}
 		}
 
-		if (overDoor == d) {
+		if (overMe == d) {
 			d->Highlight = true;
 			if (target_mode) {
 				if (d->Visible() && (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED))) {
@@ -526,7 +526,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 			continue;
 		}
 
-		if (overContainer == c) {
+		if (overMe == c) {
 			c->Highlight = true;
 			if (target_mode) {
 				if (c->Flags & CONT_LOCKED) {
@@ -773,6 +773,7 @@ static EffectRef damage_ref = { "Damage", -1 };
 bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 {
 	Point gameMousePos = GameMousePos();
+	Highlightable* over = Scriptable::As<Highlightable>(overMe);;
 	//cheatkeys with ctrl-
 	if (Mod & GEM_MOD_CTRL) {
 		if (!core->CheatEnabled()) {
@@ -796,8 +797,8 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				if (!game->selected.empty()) {
 					Actor *src = game->selected[0];
 					Scriptable *target = lastActor;
-					if (overDoor) {
-						target = overDoor;
+					if (overMe) {
+						target = overMe;
 					}
 					if (target) {
 						src->SetSpellResRef(TestSpell);
@@ -811,15 +812,9 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				}
 				break;
 			case 'd': //detect a trap or door
-				if (overInfoPoint) {
-					overInfoPoint->DetectTrap(256, lastActorID);
-				}
-				if (overContainer) {
-					overContainer->DetectTrap(256, lastActorID);
-				}
-				if (overDoor) {
-					overDoor->TryDetectSecret(256, lastActorID);
-					overDoor->DetectTrap(256, lastActorID);
+				if (over) {
+					if (overMe->Type == ST_DOOR) Scriptable::As<Door>(overMe)->TryDetectSecret(256, lastActorID);
+					over->DetectTrap(256, lastActorID);
 				}
 				break;
 			case 'e':// reverses pc order (useful for parties bigger than 6)
@@ -903,16 +898,16 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					lastActor->dump();
 					break;
 				}
-				if (overDoor) {
-					overDoor->dump();
+				if (overMe->Type == ST_DOOR) {
+					Scriptable::As<Door>(overMe)->dump();
 					break;
 				}
-				if (overContainer) {
-					overContainer->dump();
+				if (overMe->Type == ST_CONTAINER) {
+					Scriptable::As<Container>(overMe)->dump();
 					break;
 				}
-				if (overInfoPoint) {
-					overInfoPoint->dump();
+				if (overMe->Type <= ST_TRAVEL) { // safe while we check lastActor first
+					Scriptable::As<InfoPoint>(overMe)->dump();
 					break;
 				}
 				core->GetGame()->GetCurrentArea()->dump(false);
@@ -997,10 +992,12 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
 					}
-				} else if (overContainer) {
-					overContainer->SetContainerLocked(false);
-				} else if (overDoor) {
-					overDoor->SetDoorLocked(0,0);
+				} else if (!overMe) {
+					break;
+				} else if (overMe->Type == ST_CONTAINER) {
+					Scriptable::As<Container>(overMe)->SetContainerLocked(false);
+				} else if (overMe->Type == ST_DOOR) {
+					Scriptable::As<Door>(overMe)->SetDoorLocked(0, 0);
 				}
 				break;
 			case 'z': //shift through the avatar animations backward
@@ -1258,23 +1255,26 @@ void GameControl::UpdateCursor()
 		return;
 	}
 	
+	Door* overDoor = Scriptable::As<Door>(overMe);
 	if (overDoor) {
 		overDoor->Highlight = false;
 	}
+	Container* overContainer = Scriptable::As<Container>(overMe);
 	if (overContainer) {
 		overContainer->Highlight = false;
 	}
 	
-	overDoor = area->TMap->GetDoor(gameMousePos);
+	overMe = overDoor = area->TMap->GetDoor(gameMousePos);
 	// ignore infopoints and containers beneath doors
 	if (overDoor) {
 		if (overDoor->Visible()) {
 			nextCursor = overDoor->GetCursor(target_mode, lastCursor);
 		} else {
-			overDoor = nullptr;
+			overMe = nullptr;
 		}
 	} else {
-		overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, false);
+		InfoPoint* overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, false);
+		overMe = overInfoPoint;
 		if (overInfoPoint) {
 			nextCursor = overInfoPoint->GetCursor(target_mode);
 		}
@@ -1290,7 +1290,9 @@ void GameControl::UpdateCursor()
 			return;
 		}
 
-		overContainer = area->TMap->GetContainer( gameMousePos );
+		if (!overMe) {
+			overMe = overContainer = area->TMap->GetContainer(gameMousePos);
+		}
 	}
 
 	if (overContainer) {
@@ -1337,7 +1339,7 @@ void GameControl::UpdateCursor()
 		}
 	} else if (target_mode == TARGET_MODE_ATTACK) {
 		nextCursor = IE_CURSOR_ATTACK;
-		if (!overDoor && !lastActor && !overContainer) {
+		if (!lastActor && (!overMe || overMe->Type <= ST_TRIGGER)) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
 	} else if (target_mode == TARGET_MODE_CAST) {
@@ -1354,10 +1356,8 @@ void GameControl::UpdateCursor()
 	} else if (target_mode == TARGET_MODE_PICK) {
 		if (lastActor) {
 			nextCursor = IE_CURSOR_PICK;
-		} else {
-			if (!overContainer && !overDoor && !overInfoPoint) {
-				nextCursor = IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
-			}
+		} else if (!overMe) {
+			nextCursor = IE_CURSOR_STEALTH | IE_CURSOR_GRAY;
 		}
 	}
 
@@ -1420,7 +1420,7 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 		return true;
 	}
 
-	if (overDoor || overContainer || overInfoPoint) {
+	if (overMe) {
 		return true;
 	}
 
@@ -2063,14 +2063,14 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 	bool keyAreaVisited = CheckVariable(pc, "AR0500_Visited", "GLOBAL") == 1;
 	if (!keyAreaVisited) return false;
 
-	bool teamMoved = (pc->GetInternalFlag() & IF_USEEXIT) && overInfoPoint && overInfoPoint->Type == ST_TRAVEL;
+	bool teamMoved = (pc->GetInternalFlag() & IF_USEEXIT) && overMe && overMe->Type == ST_TRAVEL;
 	if (!teamMoved) return false;
 
 	teamMoved = false;
 	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptRef());
 	if (wmapExits != pstWMapExits.end()) {
 		for (const auto& exit : wmapExits->second) {
-			if (exit == overInfoPoint->GetScriptName()) {
+			if (exit == overMe->GetScriptName()) {
 				teamMoved = true;
 				break;
 			}
@@ -2156,17 +2156,17 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			return false;
 		}
 		
-		if (overContainer || overDoor || (overInfoPoint && overInfoPoint->Type==ST_TRAVEL && target_mode == TARGET_MODE_NONE)) {
+		if (overMe && (overMe->Type == ST_DOOR || overMe->Type == ST_CONTAINER || (overMe->Type == ST_TRAVEL && target_mode == TARGET_MODE_NONE))) {
 			// move to the object before trying to interact with it
 			Actor* mainActor = GetMainSelectedActor();
-			if (mainActor && overContainer) {
+			if (mainActor && overMe->Type == ST_CONTAINER) {
 				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle loot and containers
 			} else {
 				CommandSelectedMovement(p, true, false, tryToRun);
 			}
 		}
 		
-		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
+		if (target_mode != TARGET_MODE_NONE || (overMe && overMe->Type != ST_ACTOR)) {
 			PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
@@ -2190,9 +2190,6 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 void GameControl::PerformSelectedAction(const Point& p)
 {
-	// TODO: consolidate the 'over' members into a single Scriptable*
-	// then we simply switch on its type
-
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
 	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
@@ -2210,28 +2207,32 @@ void GameControl::PerformSelectedAction(const Point& p)
 	if (target_mode == TARGET_MODE_CAST) {
 		//the player is using an item or spell on the ground
 		TryToCast(selectedActor, p);
-	} else if (overDoor) {
-		HandleDoor(overDoor, selectedActor);
-	} else if (overContainer) {
-		HandleContainer(overContainer, selectedActor);
-	} else if (overInfoPoint) {
-		if (overInfoPoint->Type==ST_TRAVEL && target_mode == TARGET_MODE_NONE) {
-			ieDword exitID = overInfoPoint->GetGlobalID();
-			if (core->HasFeature(GFFlags::TEAM_MOVEMENT)) {
-				// pst forces everyone to travel (eg. ar0201 outside_portal)
-				int i = game->GetPartySize(false);
-				while(i--) {
-					game->GetPC(i, false)->UseExit(exitID);
-				}
-			} else {
-				size_t i = game->selected.size();
-				while(i--) {
-					game->selected[i]->UseExit(exitID);
-				}
+	} else if (!overMe) {
+		return;
+	} else if (overMe->Type == ST_DOOR) {
+		HandleDoor(Scriptable::As<Door>(overMe), selectedActor);
+	} else if (overMe->Type == ST_CONTAINER) {
+		HandleContainer(Scriptable::As<Container>(overMe), selectedActor);
+	} else if (overMe->Type == ST_TRAVEL && target_mode == TARGET_MODE_NONE) {
+		ieDword exitID = overMe->GetGlobalID();
+		if (core->HasFeature(GFFlags::TEAM_MOVEMENT)) {
+			// pst forces everyone to travel (eg. ar0201 outside_portal)
+			int i = game->GetPartySize(false);
+			while(i--) {
+				game->GetPC(i, false)->UseExit(exitID);
 			}
-			CommandSelectedMovement(p, false);
+		} else {
+			size_t i = game->selected.size();
+			while(i--) {
+				game->selected[i]->UseExit(exitID);
+			}
 		}
-		if (HandleActiveRegion(overInfoPoint, selectedActor, p)) {
+		CommandSelectedMovement(p, false);
+		if (HandleActiveRegion(Scriptable::As<InfoPoint>(overMe), selectedActor, p)) {
+			core->SetEventFlag(EF_RESETTARGET);
+		}
+	} else if (overMe->Type == ST_TRAVEL || overMe->Type == ST_PROXIMITY || overMe->Type == ST_TRIGGER) {
+		if (HandleActiveRegion(Scriptable::As<InfoPoint>(overMe), selectedActor, p)) {
 			core->SetEventFlag(EF_RESETTARGET);
 		}
 	}
@@ -2500,9 +2501,7 @@ void GameControl::ChangeMap(const Actor *pc, bool forced)
 		ClearMouseState();
 
 		dialoghandler->EndDialog();
-		overInfoPoint = NULL;
-		overContainer = NULL;
-		overDoor = NULL;
+		overMe = nullptr;
 		/*this is loadmap, because we need the index, not the pointer*/
 		if (pc) {
 			game->GetMap(pc->Area, true);

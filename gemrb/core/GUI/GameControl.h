@@ -108,9 +108,7 @@ private:
 	bool AlwaysRun = false;
 	Actor *user = nullptr; //the user of item or spell
 
-	Door* overDoor = nullptr;
-	Container* overContainer = nullptr;
-	InfoPoint* overInfoPoint = nullptr;
+	Scriptable* overMe = nullptr;
 
 	EventMgr::TapMonitorId eventMonitors[2];
 
