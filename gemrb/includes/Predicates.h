@@ -29,49 +29,47 @@
 #endif
 
 #include <functional>
+#include <memory>
 
 namespace GemRB {
 
 template<typename PT>
 struct Predicate {
 	virtual ~Predicate() noexcept = default;
-	virtual bool operator()(PT param) const=0;
+	virtual bool operator()(const PT& param) const = 0;
 };
+
+template <typename T>
+using SharedPredicate = std::shared_ptr<Predicate<T>>;
 
 template<typename PT>
 struct CompoundPredicate : Predicate<PT> {
 protected:
-	Predicate<PT>* pred1;
-	Predicate<PT>* pred2;
+	SharedPredicate<PT> pred1;
+	SharedPredicate<PT> pred2;
 public:
-	CompoundPredicate(Predicate<PT>* p1, Predicate<PT>* p2) {
+	CompoundPredicate(SharedPredicate<PT> p1, SharedPredicate<PT> p2) {
 		pred1 = p1;
 		pred2 = p2;
 	}
-	CompoundPredicate(const CompoundPredicate&) = delete;
-	~CompoundPredicate() override {
-		delete pred1;
-		delete pred2;
-	}
-	CompoundPredicate& operator=(const CompoundPredicate&) = delete;
 };
 
 template<typename PT>
 struct AndPredicate : CompoundPredicate<PT> {
-	AndPredicate(Predicate<PT>* p1, Predicate<PT>* p2)
+	AndPredicate(SharedPredicate<PT> p1, SharedPredicate<PT> p2)
 	: CompoundPredicate<PT>(p1, p2) {}
 
-	bool operator()(PT param) const override {
+	bool operator()(const PT& param) const override {
 		return (*this->pred1)(param) && (*this->pred2)(param);
 	}
 };
 
 template<typename PT>
 struct OrPredicate : CompoundPredicate<PT> {
-	OrPredicate(Predicate<PT>* p1, Predicate<PT>* p2)
+	OrPredicate(SharedPredicate<PT> p1, SharedPredicate<PT> p2)
 	: CompoundPredicate<PT>(p1, p2) {}
 
-	bool operator()(PT param) const override {
+	bool operator()(const PT& param) const override {
 		return (*this->pred1)(param) || (*this->pred2)(param);
 	}
 };

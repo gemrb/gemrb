@@ -33,6 +33,7 @@
 #include "Platform.h"
 #include "Predicates.h"
 
+#include <memory>
 #include <string>
 
 #ifdef WIN32
@@ -154,7 +155,7 @@ public:
 		All = ~0
 	};
 
-	using FileFilterPredicate = Predicate<ResRef>;
+	using FileFilterPredicate = SharedPredicate<path_t>;
 	/**
 	 * @param[in] path Path to directory to search.
 	 *
@@ -167,7 +168,7 @@ public:
 	~DirectoryIterator();
 	DirectoryIterator& operator=(const DirectoryIterator&) = delete;
 
-	void SetFilterPredicate(FileFilterPredicate* p, bool chain = false);
+	void SetFilterPredicate(FileFilterPredicate p, bool chain = false);
 	bool IsDirectory();
 	void SetFlags(int flags, bool reset = false);
 	/**
@@ -181,7 +182,7 @@ public:
 	explicit operator bool () const noexcept { return Entry != nullptr; }
 	void Rewind();
 private:
-	FileFilterPredicate* predicate{};
+	FileFilterPredicate predicate;
 	void* Directory = nullptr;
 	void* Entry = nullptr;
 	path_t Path;

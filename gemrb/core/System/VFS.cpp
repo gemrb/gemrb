@@ -489,7 +489,6 @@ DirectoryIterator::~DirectoryIterator()
 {
 	if (Directory)
 		closedir(static_cast<DIR*>(Directory));
-	delete predicate;
 }
 
 void DirectoryIterator::SetFlags(int flags, bool reset)
@@ -499,12 +498,11 @@ void DirectoryIterator::SetFlags(int flags, bool reset)
 	if (reset) Rewind();
 }
 
-void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)
+void DirectoryIterator::SetFilterPredicate(FileFilterPredicate p, bool chain)
 {
 	if (chain && predicate) {
-		predicate = new AndPredicate<ResRef>(predicate, p);
+		predicate = std::make_shared<AndPredicate<path_t>>(predicate, p);
 	} else {
-		delete predicate;
 		predicate = p;
 	}
 	Rewind();
@@ -550,12 +548,7 @@ DirectoryIterator& DirectoryIterator::operator++()
 				cont = name[0] == '.';
 			}
 			if (cont == false && predicate) {
-				size_t len = name.length();
-				const char* nameEnd = name.c_str(); // make sure to take the end of the name, since we'll likely truncate it
-				while (--len >= 8U) {
-					nameEnd++;
-				}
-				cont = !(*predicate)(ResRef(nameEnd));
+				cont = !predicate->operator()(name);
 			}
 		} else if (errno) {
 			//Log(WARNING, "DirectoryIterator", "Cannot readdir: {}\nError: {}", Path, strerror(errno));

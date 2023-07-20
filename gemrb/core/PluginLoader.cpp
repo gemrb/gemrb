@@ -165,13 +165,13 @@ void LoadPlugins(const path_t& pluginpath, const plugin_flags_t& pluginFlags)
 	}
 
 #ifdef WIN32
-	ResRef pluginExt = "dll";
+	auto pluginExt = "dll";
 #else
-	ResRef pluginExt = "so";
+	auto pluginExt = "so";
 #endif
 
 	dirIt.SetFlags(DirectoryIterator::Files);
-	dirIt.SetFilterPredicate(new ExtFilter(pluginExt)); // rewinds
+	dirIt.SetFilterPredicate(std::make_shared<ExtFilter>(pluginExt)); // rewinds
 
 	using PathSet = std::set<std::string>;
 	PathSet delayedPlugins;

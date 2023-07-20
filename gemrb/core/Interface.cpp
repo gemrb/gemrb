@@ -2143,29 +2143,29 @@ int Interface::Roll(int dice, int size, int add) const
 DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 {
 	path_t resourcePath;
-	DirectoryIterator::FileFilterPredicate* filter = NULL;
+	DirectoryIterator::FileFilterPredicate filter;
 	switch (dir) {
 		case DIRECTORY_CHR_PORTRAITS:
 			resourcePath = config.GamePortraitsPath;
-			filter = new ExtFilter("BMP");
+			filter = std::make_shared<ExtFilter>("BMP");
 			if (IsAvailable(IE_PNG_CLASS_ID)) {
 				// chain an ORed filter for png
-				filter = new OrPredicate<ResRef>(filter, new ExtFilter("PNG"));
+				filter = std::make_shared<OrPredicate<path_t>>(filter, std::make_shared<ExtFilter>("PNG"));
 			}
 			break;
 		case DIRECTORY_CHR_SOUNDS:
 			resourcePath = config.GameSoundsPath;
 			if (!HasFeature( GFFlags::SOUNDFOLDERS ))
-				filter = new ExtFilter("WAV");
+				filter = std::make_shared<ExtFilter>("WAV");
 			break;
 		case DIRECTORY_CHR_EXPORTS:
 			resourcePath = config.GameCharactersPath;
-			filter = new ExtFilter("CHR");
+			filter = std::make_shared<ExtFilter>("CHR");
 			break;
 		case DIRECTORY_CHR_SCRIPTS:
 			resourcePath = config.GameScriptsPath;
-			filter = new ExtFilter("BS");
-			filter = new OrPredicate<ResRef>(filter, new ExtFilter("BCS"));
+			filter = std::make_shared<ExtFilter>("BS");
+			filter = std::make_shared<OrPredicate<path_t>>(filter, std::make_shared<ExtFilter>("BCS"));
 			break;
 		default:
 			error("Interface", "Unknown resource directory type: {}!", fmt::underlying(dir));

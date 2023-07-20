@@ -4793,18 +4793,18 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 
 	DirectoryIterator dirit = core->GetResourceDirectory(type);
 	bool dirs = false;
-	ResRef suffix = "S";
+	auto suffix = "S";
 	switch (type) {
 		case DIRECTORY_CHR_PORTRAITS:
 			if (flags&1) suffix = "M";
 			if (flags&2) suffix = "L";
-			dirit.SetFilterPredicate(new EndsWithFilter(suffix), true);
+			dirit.SetFilterPredicate(std::make_shared<EndsWithFilter>(suffix), true);
 			break;
 		case DIRECTORY_CHR_SOUNDS:
 			if (core->HasFeature( GFFlags::SOUNDFOLDERS )) {
 				dirs = true;
 			} else {
-				dirit.SetFilterPredicate(new EndsWithFilter("A"), true);
+				dirit.SetFilterPredicate(std::make_shared<EndsWithFilter>("A"), true);
 			}
 			break;
 		case DIRECTORY_CHR_EXPORTS:

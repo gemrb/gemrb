@@ -23,55 +23,47 @@
 
 namespace GemRB {
 
-struct ExtFilter : DirectoryIterator::FileFilterPredicate {
-	ResRef extension;
-	explicit ExtFilter(const ResRef& ext) {
-		extension = ext;
-	}
+struct ExtFilter : Predicate<path_t> {
+	path_t extension;
 
-	bool operator()(ResRef filename) const override {
-		const char* extpos = strrchr(filename.c_str(), '.');
-		if (extpos) {
-			return ResRef(++extpos) == extension;
+	explicit ExtFilter(path_t ext)
+	: extension(std::move(ext))
+	{}
+
+	bool operator()(const path_t& filename) const override {
+		size_t extpos = filename.find_last_of('.');
+		if (extpos != path_t::npos) {
+			return stricmp(&filename[extpos + 1], extension.data()) == 0;
 		}
 		return false;
 	}
 };
 
-struct EndsWithFilter : DirectoryIterator::FileFilterPredicate {
-	ResRef endMatch;
-	size_t len;
+struct EndsWithFilter : Predicate<path_t> {
+	path_t endMatch;
 
-	explicit EndsWithFilter(const ResRef& endString) {
-		endMatch = endString;
-		len = endMatch.length();
-	}
+	explicit EndsWithFilter(path_t endString)
+	: endMatch(std::move(endString))
+	{}
 
-	bool operator()(ResRef filename) const override {
+	bool operator()(const path_t& fname) const override {
+		if (fname.empty()) return false;
 		// this filter ignores file extension
-		const char* fname = filename.c_str();
-		const char* rpos = strrchr(fname, '.');
-		if (rpos) {
+		size_t rpos = fname.find_last_of('.');
+		if (rpos != path_t::npos) {
 			// has an extension
 			--rpos;
 		} else {
-			rpos = fname + strlen(fname)-1;
+			rpos = fname.length() - 1;
 		}
 
-		const char* fpos = rpos - len + 1;
-		if (fpos < fname) {
+		size_t fpos = rpos - endMatch.length() + 1;
+		if (fpos >= fname.length()) {
 			// impossible to be equal. this length is out of bounds
 			return false;
 		}
 
-		const char* cmp = endMatch.c_str();
-		while (fpos <= rpos) {
-			// our fileters are case insensitive
-			if (tolower(*cmp++) != tolower(*fpos++)) {
-				return false;
-			}
-		}
-		return true;
+		return stricmp(endMatch.data(), &fname[fpos]) == 0;
 	}
 };
 
