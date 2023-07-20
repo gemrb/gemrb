@@ -2162,7 +2162,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			if (mainActor && overContainer) {
 				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle loot and containers
 			} else {
-				CommandSelectedMovement(p, false, tryToRun);
+				CommandSelectedMovement(p, true, false, tryToRun);
 			}
 		}
 		
@@ -2182,7 +2182,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		// pst has different mod keys
 		int modKey = GEM_MOD_SHIFT;
 		if (core->HasFeature(GFFlags::HAS_FLOAT_MENU)) modKey = GEM_MOD_CTRL;
-		CommandSelectedMovement(p, Mod & modKey, tryToRun);
+		CommandSelectedMovement(p, lastCursor != IE_CURSOR_TRAVEL, Mod & modKey, tryToRun);
 	}
 	ClearMouseState();
 	return true;
@@ -2237,7 +2237,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 }
 
-void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryToRun) const
+void GameControl::CommandSelectedMovement(const Point& p, bool formation, bool append, bool tryToRun) const
 {
 	const Game* game = core->GetGame();
 
@@ -2273,7 +2273,7 @@ void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryT
 			actor->Stop();
 		}
 		
-		if (party.size() > 1) {
+		if (formation && party.size() > 1) {
 			CreateMovement(actor, formationPoints[i], append, tryToRun);
 		} else {
 			CreateMovement(actor, p, append, tryToRun);

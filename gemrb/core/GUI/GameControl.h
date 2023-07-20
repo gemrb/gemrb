@@ -152,7 +152,7 @@ private:
 	bool IsDisabledCursor() const override;
 
 	void PerformSelectedAction(const Point& p);
-	void CommandSelectedMovement(const Point& p, bool append = false, bool tryToRun = false) const;
+	void CommandSelectedMovement(const Point& p, bool formation = true, bool append = false, bool tryToRun = false) const;
 
 	bool OnGlobalMouseMove(const Event&);
 
