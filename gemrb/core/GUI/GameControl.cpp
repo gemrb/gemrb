@@ -2229,7 +2229,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 					game->selected[i]->UseExit(exitID);
 				}
 			}
-			CommandSelectedMovement(p);
+			CommandSelectedMovement(p, false);
 		}
 		if (HandleActiveRegion(overInfoPoint, selectedActor, p)) {
 			core->SetEventFlag(EF_RESETTARGET);
