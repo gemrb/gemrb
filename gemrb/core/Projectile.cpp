@@ -169,7 +169,7 @@ void Projectile::SetupPalette(const AnimArray& anim, Holder<Palette> &pal, const
 	}
 	GetPaletteCopy(anim, pal);
 	if (pal) {
-		pal->SetupPaperdollColours(Colors, 0);
+		*pal = SetupPaperdollColours(Colors, 0);
 	}
 }
 

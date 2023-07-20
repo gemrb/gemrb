@@ -159,7 +159,7 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 
 	if (has_palette) {
 		Holder<Palette> palette = pic->GetPalette();
-		palette->SetupPaperdollColours(colors, 0);
+		*palette = SetupPaperdollColours(colors, 0);
 	}
 	
 	pic->renderFlags |= blitFlags;

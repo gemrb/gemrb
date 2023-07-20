@@ -76,48 +76,6 @@ Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(index_t index) const
 	return frames[index];
 }
 
-Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
-		Holder<Sprite2D> &Picture2, unsigned int type) const
-{
-	if (frames.size()<2) {
-		return nullptr;
-	}
-
-	// mod paperdolls can be unsorted (Longer Road Irenicus cycle: 1 1 0)
-	index_t first = InvalidIndex; // top half
-	index_t second = InvalidIndex; // bottom half
-	index_t ff = cycles[0].FirstFrame;
-	for (index_t f = 0; f < cycles[0].FramesCount; f++) {
-		index_t idx = FLTable[ff + f];
-		if (first == InvalidIndex) {
-			first = idx;
-		} else if (second == InvalidIndex && idx != first) {
-			second = idx;
-			break;
-		}
-	}
-	if (second == InvalidIndex) {
-		return NULL;
-	}
-
-	Picture2 = frames[second]->copy();
-	Picture2->Frame.x = frames[second]->Frame.x;
-	Picture2->Frame.y = frames[second]->Frame.y - 80;
-
-	Holder<Sprite2D> spr = frames[first]->copy();
-	spr->Frame.x = frames[first]->Frame.x;
-	spr->Frame.y = frames[first]->Frame.y;
-	
-	if (Colors) {
-		Holder<Palette> pal = spr->GetPalette()->Copy();
-		pal->SetupPaperdollColours(Colors, type);
-		spr->SetPalette(pal);
-		Picture2->SetPalette(pal);
-	}
-	
-	return spr;
-}
-
 AnimationFactory::index_t AnimationFactory::GetCycleSize(index_t idx) const
 {
 	if (idx >= cycles.size())

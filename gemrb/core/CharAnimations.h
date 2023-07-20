@@ -310,6 +310,12 @@ private:
 	AnimRef OffhandRef;
 };
 
+GEM_EXPORT Palette SetupPaperdollColours(const ieDword* Colors, unsigned int type) noexcept;
+GEM_EXPORT Palette SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods, unsigned int type) noexcept;
+GEM_EXPORT Palette SetupGlobalRGBModification(const Holder<Palette>& src, const RGBModifier& mod) noexcept;
+
+GEM_EXPORT Holder<Sprite2D> GetPaperdollImage(const ResRef& resref, const ieDword* colors, Holder<Sprite2D>& picture2, unsigned int type);
+
 }
 
 #endif

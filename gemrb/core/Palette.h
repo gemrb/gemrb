@@ -68,12 +68,6 @@ public:
 
 	bool HasAlpha() const noexcept { return alpha; }
 
-	void SetupPaperdollColours(const ieDword* Colors, unsigned int type) noexcept;
-	void SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods,
-		unsigned int type) noexcept;
-	void SetupGlobalRGBModification(const Holder<Palette>& src,
-		const RGBModifier& mod) noexcept;
-
 	Holder<Palette> Copy() const noexcept;
 
 	void CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst) noexcept;

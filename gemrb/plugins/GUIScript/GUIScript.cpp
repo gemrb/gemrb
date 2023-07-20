@@ -3664,13 +3664,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	ResourceHolder<PalettedImageMgr> im = gamedata->GetResourceHolder<PalettedImageMgr>(ResRef, false, true);
 	if (!im) {
 		// the PLT doesn't exist or is bad, so try BAM
-		auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(ResRef, IE_BAM_CLASS_ID);
-		if (!af) {
-			Log(WARNING, "GUISCript", "BAM/PLT not found for ref: {}", ResRef);
-			Py_RETURN_NONE;
-		}
-
-		Picture = af->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
+		Picture = GetPaperdollImage(ResRef, col[0] == 0xFFFFFFFF ? 0 : col, Picture2,(unsigned int)type);
 		if (Picture == NULL) {
 			Log(ERROR, "Button_SetPLT", "Paperdoll picture is null ({})", ResRef);
 			Py_RETURN_NONE;

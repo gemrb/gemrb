@@ -51,8 +51,6 @@ public:
 	index_t GetCycleCount() const { return cycles.size(); }
 	index_t GetFrameCount() const { return frames.size(); }
 	index_t GetCycleSize(index_t idx) const;
-	Holder<Sprite2D> GetPaperdollImage(const ieDword *Colors, Holder<Sprite2D> &Picture2,
-		unsigned int type) const;
 	
 private:
 	std::vector<Holder<Sprite2D>> frames;
