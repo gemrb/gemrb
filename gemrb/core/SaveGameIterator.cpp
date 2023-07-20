@@ -40,6 +40,8 @@
 #include <set>
 #include <ctime>
 
+#include <fmt/chrono.h>
+
 #ifdef VITA
 #include <dirent.h>
 #endif
@@ -121,6 +123,7 @@ static std::string ParseGameDate(DataStream *ds)
 SaveGame::SaveGame(path_t path, path_t name, const ResRef& prefix, std::string slotname, int pCount, int saveID)
 : Path(std::move(path)), Name(std::move(name)), Prefix(prefix), SlotName(std::move(slotname))
 {
+	static const auto DATE_FMT = FMT_STRING("{:%a %Od %b %T %EY}");
 	PortraitCount = pCount;
 	SaveID = saveID;
 	struct stat my_stat;
@@ -128,11 +131,9 @@ SaveGame::SaveGame(path_t path, path_t name, const ResRef& prefix, std::string s
 	memset(&my_stat, 0, sizeof(my_stat));
 	if (stat(nPath.c_str(), &my_stat)) {
 		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
-		Date = "Sun 31 Feb 00:00:01 2099";
+		Date = fmt::format(DATE_FMT, fmt::localtime(0));
 	} else {
-		char tmp[255];
-		strftime(tmp, sizeof(tmp), "%c", localtime(&my_stat.st_mtime));
-		Date = tmp;
+		Date = fmt::format(DATE_FMT, fmt::localtime(my_stat.st_mtime));
 	}
 	manager.AddSource(Path, Name.c_str(), PLUGIN_RESOURCE_DIRECTORY);
 }
