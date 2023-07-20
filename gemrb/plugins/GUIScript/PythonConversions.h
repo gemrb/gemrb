@@ -238,7 +238,7 @@ PyObject* PyString_FromStringView(StringView sv);
 PyObject* PyString_FromStringObj(const std::string&);
 PyObject* PyString_FromStringObj(const String&);
 
-String* PyString_AsStringObj(PyObject *obj);
+String PyString_AsStringObj(PyObject *obj);
 
 template <typename STR>
 PyObject* PyString_FromASCII(const STR& str)

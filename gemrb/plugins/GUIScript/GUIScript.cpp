@@ -442,28 +442,26 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(ta);
 
 	ta->ClearText();
-	String* chapText = StringFromUtf8(text);
-	if (chapText) {
-		// insert enough newlines to push the text offscreen
-		auto margins = ta->GetMargins();
-		int rowHeight = ta->LineHeight();
-		int h = ta->Frame().h - (margins.top + margins.bottom);
-		int w = ta->Frame().w - (margins.left + margins.right);
-		int newlines = CeilDiv(h, rowHeight);
-		ta->AppendText(String(newlines - 1, L'\n'));
-		ta->AppendText(std::move(*chapText));
-		delete chapText;
-		// append again (+1 since there may not be a trailing newline) after the chtext so it will scroll out of view
-		ta->AppendText(String(newlines + 1, L'\n'));
+	
+	// insert enough newlines to push the text offscreen
+	auto margins = ta->GetMargins();
+	int rowHeight = ta->LineHeight();
+	int h = ta->Frame().h - (margins.top + margins.bottom);
+	int w = ta->Frame().w - (margins.left + margins.right);
+	int newlines = CeilDiv(h, rowHeight);
+	ta->AppendText(String(newlines - 1, L'\n'));
+	ta->AppendText(StringFromUtf8(text));
+	// append again (+1 since there may not be a trailing newline) after the chtext so it will scroll out of view
+	ta->AppendText(String(newlines + 1, L'\n'));
 
-		ta->SetFlags(View::IgnoreEvents, BitOp::OR);
-		int lines = ta->ContentHeight() / rowHeight;
-		float heightScale = 12.0f / float(rowHeight); // scale based on text size so smaller text scrolls more slowly
-		float widthScale = 640.0f / float(w);  // scale based on width to become more slow as we get wider
-		float textSpeed = static_cast<float>(gamedata->GetTextSpeed());
-		int ticksPerLine = int(11.0f * heightScale * widthScale * textSpeed);
-		ta->ScrollToY(-ta->ContentHeight(), lines * ticksPerLine);
-	}
+	ta->SetFlags(View::IgnoreEvents, BitOp::OR);
+	int lines = ta->ContentHeight() / rowHeight;
+	float heightScale = 12.0f / float(rowHeight); // scale based on text size so smaller text scrolls more slowly
+	float widthScale = 640.0f / float(w);  // scale based on width to become more slow as we get wider
+	float textSpeed = static_cast<float>(gamedata->GetTextSpeed());
+	int ticksPerLine = int(11.0f * heightScale * widthScale * textSpeed);
+	ta->ScrollToY(-ta->ContentHeight(), lines * ticksPerLine);
+	
 	Py_RETURN_NONE;
 }
 
@@ -1421,13 +1419,9 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 		ctrl->SetText(L"");
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
 		const char *tmp = PyByteArray_AS_STRING(str);
-		String* string = StringFromCString(tmp);
-		ctrl->SetText(std::move(*string));
-		delete string;
+		ctrl->SetText(StringFromCString(tmp));
 	} else { // string value of the object
-		String* string = PyString_AsStringObj(str);
-		ctrl->SetText(std::move(*string));
-		delete string;
+		ctrl->SetText(PyString_AsStringObj(str));
 	}
 
 	Py_RETURN_NONE;
@@ -1469,11 +1463,7 @@ static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(ta);
 
 	if (PyObject_TypeCheck(pystr, &PyUnicode_Type)) {
-		String* str = PyString_AsStringObj(pystr);
-		if (str) {
-			ta->AppendText(std::move(*str));
-			delete str;
-		}
+		ta->AppendText(PyString_AsStringObj(pystr));
 	} else if (PyObject_TypeCheck(pystr, &PyLong_Type)) {
 		ta->AppendText(core->GetString(StrRefFromPy(pystr), STRING_FLAGS(flags)));
 	}
@@ -1525,11 +1515,7 @@ static PyObject* GemRB_View_SetTooltip(PyObject* self, PyObject* args)
 	}
 
 	if (PyObject_TypeCheck(str, &PyUnicode_Type)) {
-		String* string = PyString_AsStringObj(str);
-		if (string) {
-			view->SetTooltip(*string);
-			delete string;
-		}
+		view->SetTooltip(PyString_AsStringObj(str));
 	} else {
 		ieStrRef StrRef = StrRefFromPy(str);
 		SetViewTooltipFromRef(view, StrRef);
@@ -2132,9 +2118,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 
 			TextEdit* edit = new TextEdit(rgn, 500, Point());
 			edit->SetFont(core->GetFont(ResRefFromPy(font)));
-			String* text = StringFromUtf8(cstr);
-			edit->Control::SetText(std::move(*text));
-			delete text;
+			edit->Control::SetText(StringFromUtf8(cstr));
 
 			view = edit;
 		}
@@ -2153,9 +2137,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			const char* text;
 			PARSE_ARGS(constructArgs, "Osb", &font, &text, &alignment);
 
-			String* string = StringFromUtf8(text);
-			Label* lbl = new Label(rgn, core->GetFont(ResRefFromPy(font)), string ? *string : L"");
-			delete string;
+			Label* lbl = new Label(rgn, core->GetFont(ResRefFromPy(font)), StringFromUtf8(text));
 
 			lbl->SetAlignment(alignment);
 			view = lbl;
@@ -4109,9 +4091,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	PyObject* Variable;
 	char *value;
 	PARSE_ARGS( args,  "Os", &Variable, &value );
-	auto wsValue = StringFromCString(value);
-	core->GetTokenDictionary()[ieVariableFromPy(Variable)] = std::move(*wsValue);
-	delete wsValue;
+	core->GetTokenDictionary()[ieVariableFromPy(Variable)] = StringFromCString(value);
 
 	Py_RETURN_NONE;
 }
@@ -4845,19 +4825,17 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 				continue;
 
 			char *str = ConvertCharEncoding(name.c_str(), core->config.SystemEncoding.c_str(), core->TLKEncoding.encoding.c_str());
-			String* string = StringFromCString(str);
+			String string = StringFromCString(str);
 			free(str);
 
 			if (dirs == false) {
-				size_t pos = string->find_last_of(L'.');
+				size_t pos = string.find_last_of(L'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
-					delete string;
 					continue;
 				}
-				string->resize(pos);
+				string.resize(pos);
 			}
-			strings.emplace_back(std::move(*string));
-			delete string;
+			strings.emplace_back(std::move(string));
 		} while (++dirit);
 	}
 
@@ -4905,18 +4883,17 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 	PyObject* item = NULL;
 	for (int i = 0; i < PyList_Size(list); i++) {
 		item = PyList_GetItem(list, i);
-		String* string = NULL;
+		String string;
 		if(!PyUnicode_Check(item)) {
 			if (PyLong_Check(item)) {
-				string = new String(core->GetString(StrRefFromPy(item)));
+				string = String(core->GetString(StrRefFromPy(item)));
 			} else {
 				return NULL;
 			}
 		} else {
 			string = PyString_AsStringObj(item);
 		}
-		TAOptions.emplace_back(i, std::move(*string));
-		delete string;
+		TAOptions.emplace_back(i, std::move(string));
 	}
 	ta->SetSelectOptions(TAOptions, false);
 
@@ -5644,11 +5621,8 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 	
-	String* name = PyString_AsStringObj(pyName);
-	assert(name);
-	actor->SetName(std::move(*name), whichName);
+	actor->SetName(PyString_AsStringObj(pyName), whichName);
 	actor->SetMCFlag(MC_EXPORTABLE, BitOp::OR);
-	delete name;
 	Py_RETURN_NONE;
 }
 
@@ -5671,13 +5645,7 @@ static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "OO", &pyref, &Text );
 	GET_GAME();
 	
-	ieStrRef strref = ieStrRef::INVALID;
-	String* str = PyString_AsStringObj(Text);
-	if (str) {
-		strref = core->UpdateString(StrRefFromPy(pyref), *str);
-		delete str;
-	}
-	
+	ieStrRef strref = core->UpdateString(StrRefFromPy(pyref), PyString_AsStringObj(Text));
 	return PyLong_FromStrRef(strref);
 }
 
@@ -9850,10 +9818,8 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	GET_MAP();
 
 	if (txt && txt[0]) {
-		String* str = StringFromUtf8(txt);
-		MapNote mn(std::move(*str), color, false);
+		MapNote mn(StringFromUtf8(txt), color, false);
 		map->AddMapNote(point, mn);
-		delete str;
 	} else {
 		map->RemoveMapNote(point);
 	}
@@ -13699,9 +13665,7 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 			PyObject* catcher = PyObject_GetAttrString(pyGUI, "outputFunnel");
 			if (catcher) {
 				PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
-				String* msg = PyString_AsStringObj(output);
-				displaymsg->DisplayString(std::move(*msg), GUIColors::WHITE, nullptr);
-				delete msg;
+				displaymsg->DisplayString(PyString_AsStringObj(output), GUIColors::WHITE, nullptr);
 				Py_DECREF(catcher);
 			}
 			Py_DECREF(pyGUI);
@@ -13715,14 +13679,11 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 		PyErr_Fetch(&ptype, &pvalue, &ptraceback);
 
 		//Get error message
-		String* errorString = PyString_AsStringObj(pvalue);
-		if (errorString) {
-			if (displaymsg) {
-				displaymsg->DisplayString(L"Error: " + *errorString, GUIColors::RED, nullptr);
-			} else {
-				Log(ERROR, "GUIScript", "{}", fmt::WideToChar{*errorString});
-			}
-			delete errorString;
+		String errorString = PyString_AsStringObj(pvalue);
+		if (displaymsg) {
+			displaymsg->DisplayString(L"Error: " + errorString, GUIColors::RED, nullptr);
+		} else {
+			Log(ERROR, "GUIScript", "{}", fmt::WideToChar{errorString});
 		}
 
 		Py_DECREF(ptype);

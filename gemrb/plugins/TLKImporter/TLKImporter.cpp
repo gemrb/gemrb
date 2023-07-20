@@ -335,10 +335,8 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		if (OverrideTLK) {
 			size_t Length;
 			char* cstr = OverrideTLK->ResolveAuxString(strref, Length);
-			String* tmp = StringFromCString(cstr);
-			std::swap(string, *tmp);
+			string = StringFromCString(cstr);
 			free(cstr);
-			delete tmp;
 		}
 		type = 0;
 		SoundResRef.Reset();
@@ -360,9 +358,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 			str->Seek( StrOffset + Offset, GEM_STREAM_START );
 			std::string mbstr(l, '\0');
 			str->Read(&mbstr[0], l);
-			String* tmp = StringFromCString(mbstr.c_str());
-			std::swap(string, *tmp);
-			delete tmp;
+			string = StringFromCString(mbstr.c_str());
 		}
 	}
 

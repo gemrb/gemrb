@@ -644,10 +644,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 	str->Read (Signature, 8);
 	str->ReadVariable(name);
 	if (name[0]) {
-		String* str = StringFromCString(name.c_str());
-		assert(str);
-		act->SetName(std::move(*str), 0); //setting longname
-		delete str;
+		act->SetName(StringFromCString(name.c_str()), 0); //setting longname
 	}
 	str->ReadDword(offset);
 	str->ReadDword(size);

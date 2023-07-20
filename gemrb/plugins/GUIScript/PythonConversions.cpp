@@ -142,7 +142,7 @@ PyObject* PyString_FromStringObj(const String& s)
 	return PyString_FromStringObj(mbstr);
 }
 
-String* PyString_AsStringObj(PyObject* obj)
+String PyString_AsStringObj(PyObject* obj)
 {
 	auto wrap = PyStringWrapper(obj, core->TLKEncoding.encoding.c_str());
 	return StringFromCString(wrap.CString());

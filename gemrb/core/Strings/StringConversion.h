@@ -34,8 +34,8 @@ struct EncodingStruct
 
 // String creators
 GEM_EXPORT char* ConvertCharEncoding(const char * string, const char * from, const char* to);
-GEM_EXPORT String* StringFromCString(const char* string);
-GEM_EXPORT String* StringFromUtf8(const char* string);
+GEM_EXPORT String StringFromCString(const char* string);
+GEM_EXPORT String StringFromUtf8(const char* string);
 GEM_EXPORT std::string MBStringFromString(const String& string);
 
 }

@@ -448,13 +448,7 @@ Event EventMgr::CreateTouchGesture(const TouchEvent& touch, float rotation, floa
 
 Event EventMgr::CreateTextEvent(const char* text)
 {
-	Event e = {};
-	String* string = StringFromUtf8(text);
-	if (string) {
-		e = EventMgr::CreateTextEvent(*string);
-		delete string;
-	}
-	return e;
+	return EventMgr::CreateTextEvent(StringFromUtf8(text));
 }
 
 Event EventMgr::CreateTextEvent(const String& text)

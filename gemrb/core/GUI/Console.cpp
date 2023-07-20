@@ -172,9 +172,7 @@ void Console::LoadHistory()
 	if (histFile) {
 		std::string line;
 		while (histFile->ReadLine(line) != DataStream::Error) {
-			String* tmp = StringFromCString(line.c_str());
-			History.Append(std::make_pair(-1, std::move(*tmp)));
-			delete tmp;
+			History.Append(std::make_pair(-1, StringFromCString(line.c_str())));
 		}
 	}
 	delete histFile;

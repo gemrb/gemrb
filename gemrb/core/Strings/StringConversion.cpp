@@ -26,9 +26,9 @@
 
 namespace GemRB {
 
-static String* StringFromEncodedData(const ieByte* string, const EncodingStruct& encoded)
+static String StringFromEncodedData(const ieByte* string, const EncodingStruct& encoded)
 {
-	if (!string) return NULL;
+	if (!string) return L"";
 
 	bool convert = encoded.widechar || encoded.multibyte;
 	// assert that its something we know how to handle
@@ -36,8 +36,8 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 	assert(!convert || (encoded.widechar || encoded.encoding == "UTF-8"));
 
 	size_t len = strlen((const char*) string);
-	String* dbString = new String();
-	dbString->reserve(len);
+	String dbString;
+	dbString.reserve(len);
 	size_t dbLen = 0;
 	for(size_t i=0; i<len; ++i) {
 		ieWord currentChr = string[i];
@@ -80,9 +80,9 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 			} else {
 				ch = (string[++i] << 8) + currentChr;
 			}
-			dbString->push_back(ch);
+			dbString.push_back(ch);
 		} else {
-			dbString->push_back(currentChr);
+			dbString.push_back(currentChr);
 		}
 		++dbLen;
 	}
@@ -90,7 +90,7 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 	// we dont always use everything we allocated.
 	// realloc in this case to avoid static anylizer warnings about "garbage values"
 	// since this realloc always truncates it *should* be quick
-	dbString->resize(dbLen);
+	dbString.resize(dbLen);
 	return dbString;
 }
 
@@ -130,14 +130,14 @@ char* ConvertCharEncoding(const char* string, const char* from, const char* to) 
 	return buf;
 }
 
-String* StringFromCString(const char* string)
+String StringFromCString(const char* string)
 {
 	// if multibyte is false this is basic expansion of cstring to wchar_t
 	// the only reason this is special, is because it allows characters 128-256.
 	return StringFromEncodedData((const ieByte*) string, core->TLKEncoding);
 }
 
-String* StringFromUtf8(const char* string)
+String StringFromUtf8(const char* string)
 {
 	EncodingStruct enc;
 	enc.encoding = "UTF-8";

@@ -1296,15 +1296,9 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 			char bytes[501]; // 500 + null
 			str->Read(bytes, 500);
 			bytes[500] = '\0';
-			String* text = StringFromCString(bytes);
 			ieDword readonly;
 			str->ReadDword(readonly); // readonly == 1
-			if (readonly) {
-				map->AddMapNote(point, 0, std::move(*text), true);
-			} else {
-				map->AddMapNote(point, 1, std::move(*text), false);
-			}
-			delete text;
+			map->AddMapNote(point, 0, StringFromCString(bytes), readonly);
 			str->Seek(20, GEM_CURRENT_POS);
 		}
 	} else {

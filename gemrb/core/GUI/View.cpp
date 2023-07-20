@@ -275,19 +275,17 @@ void View::Draw()
 				id &= 0x00000000ffffffff; // control id is lower 32bits
 
 				std::string formatted = fmt::format("id: {}  grp: {}  \nflgs: {}\ntype:{}", id, ref->ScriptingGroup(), flags, typeid(*this).name());
-				const String* string = StringFromCString(formatted.c_str());
-				assert(string);
+				const String& string = StringFromCString(formatted.c_str());
 				
 				Region r = drawFrame;
 				r.w = win ? win->Frame().w - r.x : Frame().w - r.x;
 				Font::StringSizeMetrics metrics = {r.size, 0, 0, true};
-				fnt->StringSize(*string, &metrics);
+				fnt->StringSize(string, &metrics);
 				r.h = metrics.size.h;
 				r.w = metrics.size.w;
 				VideoDriver->SetScreenClip(nullptr);
 				VideoDriver->DrawRect(r, ColorBlack, true);
-				fnt->Print(r, *string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT, {ColorWhite, ColorBlack});
-				delete string;
+				fnt->Print(r, string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT, {ColorWhite, ColorBlack});
 			}
 		}
 	}

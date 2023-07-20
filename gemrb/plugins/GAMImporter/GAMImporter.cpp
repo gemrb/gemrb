@@ -471,10 +471,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 
 		//torment has them as 0 or -1
 		if (pcInfo.Name[0] != 0) {
-			String* name = StringFromCString(pcInfo.Name.c_str());
-			assert(name);
-			actor->SetName(std::move(*name), 0);
-			delete name;
+			actor->SetName(StringFromCString(pcInfo.Name.c_str()), 0);
 		}
 		actor->TalkCount = pcInfo.TalkCount;
 	} else {

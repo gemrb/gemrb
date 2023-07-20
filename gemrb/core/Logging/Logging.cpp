@@ -86,11 +86,10 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 		};
 
 		int level = msg.level == INTERNAL ? 0 : msg.level;
-		String* decodedMsg = StringFromCString(msg.message.c_str());
-		String* decodedOwner = StringFromCString(msg.owner.c_str());
-		ta->AppendText(fmt::format(L"{}{}: [/color]{}{}[/color]\n", colors[msg.color], *decodedOwner, colors[log_level_color[level]], *decodedMsg));
-		delete decodedMsg;
-		delete decodedOwner;
+		ta->AppendText(fmt::format(L"{}{}: [/color]{}{}[/color]\n", colors[msg.color],
+								   StringFromCString(msg.owner.c_str()),
+								   colors[log_level_color[level]],
+								   StringFromCString(msg.message.c_str())));
 	}
 }
 

@@ -3141,14 +3141,8 @@ int GameScript::CharName(Scriptable *Sender, const Trigger *parameters)
 	if (!actor) {
 		return 0;
 	}
-	
-	const String* str = StringFromCString(parameters->string0Parameter.c_str());
-	if (str) {
-		int ret = actor->GetShortName() == *str;
-		delete str;
-		return ret;
-	}
-	return 0;
+
+	return actor->GetShortName() == StringFromCString(parameters->string0Parameter.c_str());
 }
 
 int GameScript::AnimationID(Scriptable *Sender, const Trigger *parameters)
