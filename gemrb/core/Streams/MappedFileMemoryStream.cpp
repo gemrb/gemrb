@@ -23,6 +23,8 @@
 #include "MappedFileMemoryStream.h"
 #include "System/VFS.h"
 
+#include <sys/stat.h>
+
 namespace GemRB {
 
 MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)

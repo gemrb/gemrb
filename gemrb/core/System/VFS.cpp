@@ -40,6 +40,8 @@
 #include <sys/mman.h>
 #endif
 
+#include <sys/stat.h>
+
 #ifdef __APPLE__
 // for getting resources inside the bundle
 #include <CoreFoundation/CFBundle.h>

@@ -34,7 +34,6 @@
 #include "Predicates.h"
 
 #include <string>
-#include <sys/stat.h>
 
 #ifdef WIN32
 #include "win32def.h"

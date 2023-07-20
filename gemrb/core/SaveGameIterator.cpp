@@ -41,6 +41,7 @@
 #include <ctime>
 
 #include <fmt/chrono.h>
+#include <sys/stat.h>
 
 #ifdef VITA
 #include <dirent.h>
