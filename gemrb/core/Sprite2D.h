@@ -106,7 +106,7 @@ public:
 	Sprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	Sprite2D(const Sprite2D &obj) noexcept;
 	Sprite2D(Sprite2D&&) noexcept;
-	~Sprite2D() noexcept;
+	virtual ~Sprite2D() noexcept;
 
 	virtual Holder<Sprite2D> copy() const { return MakeHolder<Sprite2D>(*this); };
 
