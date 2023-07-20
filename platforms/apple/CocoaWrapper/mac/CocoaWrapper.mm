@@ -203,12 +203,12 @@ using namespace GemRB;
 		[_configWindow close];
 		// pass control to GemRB
 		gemrb.Main();
-
-		if ([defaults boolForKey:@"TerminateOnClose"]) {
-			[NSApp terminate:self];
-		}
 	} catch (std::exception& e) {
 		Log(FATAL, "Cocoa Wrapper", "Unable to initialize core: {}. Terminating.", e.what());
+	}
+
+	if ([defaults boolForKey:@"TerminateOnClose"]) {
+		[NSApp terminate:self];
 	}
 }
 
