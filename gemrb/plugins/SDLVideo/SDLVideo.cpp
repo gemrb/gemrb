@@ -244,12 +244,12 @@ Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, c
 		free(pixels);
 		PixelFormat newfmt = fmt;
 		newfmt.RLE = false;
-		return Holder<Sprite2D>(new sprite_t(rgn, newpixels, newfmt));
+		return MakeHolder<sprite_t>(rgn, newpixels, newfmt);
 #else
-		return MakeHolder<Sprite2D>(rgn, pixels, fmt);
+		return MakeHolder<sprite_t>(rgn, pixels, fmt);
 #endif
 	}
-	return Holder<Sprite2D>(new sprite_t(rgn, pixels, fmt));
+	return MakeHolder<sprite_t>(rgn, pixels, fmt);
 }
 
 void SDLVideoDriver::BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
