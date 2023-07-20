@@ -23,19 +23,9 @@
 
 namespace GemRB {
 
-SaveGameAREExtractor::SaveGameAREExtractor(SaveGame *saveGame)
-	: saveGame(saveGame)
-{
-	if (saveGame != nullptr) {
-		saveGame->acquire();
-	}
-}
-
-SaveGameAREExtractor::~SaveGameAREExtractor() {
-	if (saveGame != nullptr) {
-		saveGame->release();
-	}
-}
+SaveGameAREExtractor::SaveGameAREExtractor(Holder<SaveGame> saveGame)
+: saveGame(saveGame)
+{}
 
 int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trackLocations) {
 	if (saveGame == nullptr) {
@@ -158,15 +148,8 @@ void SaveGameAREExtractor::registerLocation(const ResRef& resRef, unsigned long 
 	areLocations.emplace(resRef, pos);
 }
 
-void SaveGameAREExtractor::changeSaveGame(SaveGame* newSave) {
-	if (saveGame != nullptr) {
-		saveGame->release();
-	}
-
+void SaveGameAREExtractor::changeSaveGame(Holder<SaveGame> newSave) {
 	saveGame = newSave;
-	if (saveGame != nullptr) {
-		saveGame->acquire();
-	}
 
 	areLocations.clear();
 	newAreLocations.clear();

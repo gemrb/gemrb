@@ -21,163 +21,17 @@
 #ifndef HOLDER_H
 #define HOLDER_H
 
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
+#include <memory>
 
 namespace GemRB {
 
-template <class T>
-class Held {
-public:
-	Held() noexcept = default;
-	virtual ~Held() noexcept = default;
-	void acquire() noexcept { ++RefCount; }
-	void release() noexcept {
-		assert(RefCount && "Broken Held usage.");
-		if (--RefCount == 0) delete static_cast<T*>(this);
-	}
-private:
-	size_t RefCount = 0;
-};
-
-/**
- * @class Holder
- * Intrusive smart pointer.
- *
- * The class T must have member function acquire and release, such that
- * acquire increases the refcount, and release decreses the refcount and
- * frees the object if needed.
- */
-
-template <class T>
-class Holder final {
-public:
-	Holder() noexcept = default;
-
-	Holder(std::nullptr_t) noexcept
-	{}
-
-	explicit Holder(T* ptr) noexcept
-	: ptr(ptr)
-	{
-		if (ptr)
-			ptr->acquire();
-	}
-
-	Holder(const Holder& rhs) noexcept
-	: ptr(rhs.ptr)
-	{
-		if (rhs.ptr)
-			rhs.ptr->acquire();
-	}
-	
-	Holder(Holder&& rhs) noexcept
-	{
-		std::swap(rhs.ptr, ptr);
-	}
-	
-	~Holder() noexcept
-	{
-		if (ptr)
-			ptr->release();
-	}
-	
-	Holder& operator=(const Holder& rhs) noexcept
-	{
-		if (rhs.ptr != ptr) {
-			if (rhs.ptr) {
-				rhs.ptr->acquire();
-			}
-			if (ptr) {
-				ptr->release();
-			}
-			ptr = rhs.ptr;
-		}
-		return *this;
-	}
-	
-	Holder& operator=(Holder&& rhs) noexcept
-	{
-		if (rhs.ptr != ptr) {
-			std::swap(rhs.ptr, ptr);
-		}
-		return *this;
-	}
-	
-	Holder& operator=(std::nullptr_t) noexcept
-	{
-		if (ptr) ptr->release();
-		ptr = nullptr;
-		return *this;
-	}
-	
-	T &operator*() const noexcept {
-		return *ptr;
-	}
-	
-	T *operator->() const noexcept {
-		return ptr;
-	}
-	
-	explicit operator bool() const noexcept {
-		return ptr != nullptr;
-	}
-
-	T *get() const noexcept {
-		return ptr;
-	}
-
-	void release() noexcept {
-		if (ptr)
-			ptr->release();
-		ptr = nullptr;
-	}
-
-private:
-	T *ptr = nullptr;
-};
-
-template<class T>
-inline bool operator==(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
-{
-	return lhs.get() == rhs.get();
-}
-
-template<class T>
-inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
-{
-	return !bool(lhs);
-}
-
-template<class T>
-inline bool operator==(std::nullptr_t, const Holder<T>& rhs) noexcept
-{
-	return !bool(rhs);
-}
-
-template<class T>
-inline bool operator!=(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
-{
-	return lhs.get() != rhs.get();
-}
-
-template<class T>
-inline bool operator!=(const Holder<T>& lhs, std::nullptr_t) noexcept
-{
-	return bool(lhs);
-}
-
-template<class T>
-inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
-{
-	return bool(rhs);
-}
+template<typename T>
+using Holder = std::shared_ptr<T>;
 
 template<class T, typename... ARGS>
 inline Holder<T> MakeHolder(ARGS&&... args) noexcept
 {
-	return Holder<T>(new T(std::forward<ARGS>(args)...));
+	return std::make_shared<T>(std::forward<ARGS>(args)...);
 }
 
 }

@@ -34,21 +34,21 @@ class GEM_EXPORT SaveGameAREExtractor {
 	private:
 		using RegistryT = ResRefMap<unsigned long>;
 	
-		SaveGame *saveGame;
+		Holder<SaveGame> saveGame;
 		RegistryT areLocations;
 		RegistryT newAreLocations;
 	
 		int32_t extractByEntry(const ResRef&, RegistryT::const_iterator);
 
 	public:
-		explicit SaveGameAREExtractor(SaveGame *saveGame = nullptr);
+		explicit SaveGameAREExtractor(Holder<SaveGame> saveGame = nullptr);
 		SaveGameAREExtractor(const SaveGameAREExtractor&) = delete;
 		SaveGameAREExtractor(SaveGameAREExtractor&&) = delete;
-		~SaveGameAREExtractor();
+
 		SaveGameAREExtractor& operator=(const SaveGameAREExtractor&) = delete;
 		SaveGameAREExtractor& operator=(SaveGameAREExtractor&&) = delete;
 
-		void changeSaveGame(SaveGame*);
+		void changeSaveGame(Holder<SaveGame>);
 		int32_t copyRetainedAREs(DataStream*, bool trackLocations = false);
 		int32_t createCacheBlob();
 		int32_t extractARE(const ResRef& resRef);

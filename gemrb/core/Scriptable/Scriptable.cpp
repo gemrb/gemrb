@@ -1916,7 +1916,7 @@ void Movable::SetStance(unsigned int arg)
 	if (StanceID == IE_ANI_CONJURE && StanceID != arg) {
 		if (caster && caster->casting_sound) {
 			caster->casting_sound->Stop();
-			caster->casting_sound.release();
+			caster->casting_sound.reset();
 		}
 	}
 

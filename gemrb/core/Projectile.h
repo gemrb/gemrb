@@ -172,7 +172,7 @@ enum ProHeights {
 #define APF_TILED 4096
 #define APF_PLAYONCE 8192
 
-struct ProjectileExtension : Held<ProjectileExtension>
+struct ProjectileExtension
 {
 	ieDword AFlags;
 	ieWord TriggerRadius;

@@ -21,6 +21,7 @@
 #ifndef PIXELS_H
 #define PIXELS_H
 
+#include "Holder.h"
 #include "Region.h"
 #include "Palette.h"
 

@@ -72,7 +72,7 @@ class AmbientMgr;
 class SoundMgr;
 class MapReverb;
 
-class GEM_EXPORT SoundHandle : public Held<SoundHandle> {
+class GEM_EXPORT SoundHandle {
 public:
 	virtual bool Playing() = 0;
 	virtual void SetPos(const Point&) = 0;

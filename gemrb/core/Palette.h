@@ -45,7 +45,7 @@ struct RGBModifier {
 	bool locked;
 };
 
-class GEM_EXPORT Palette : public Held<Palette>
+class GEM_EXPORT Palette
 {
 private:
 	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const noexcept;

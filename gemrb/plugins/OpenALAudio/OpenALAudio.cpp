@@ -157,7 +157,7 @@ void AudioStream::ClearIfStopped()
 		Source = 0;
 		Buffer = 0;
 		free = true;
-		if (handle) { handle->Invalidate(); handle.release(); }
+		if (handle) { handle->Invalidate(); handle.reset(); }
 		ambient = false;
 		locked = false;
 		delete_buffers = false;
@@ -534,7 +534,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 	}
 
 	stream->handle = MakeHolder<OpenALSoundHandle>(stream);
-	return Holder<SoundHandle>(stream->handle.get()); // TODO: we need something like static_ptr_cast
+	return stream->handle;
 }
 
 void OpenALAudioDriver::UpdateVolume(unsigned int flags)

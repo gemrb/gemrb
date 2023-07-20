@@ -657,7 +657,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname,
 		}
 
 		DeleteSaveGame(save);
-		save.release();
+		save.reset();
 	} else {
 		//leave space for autosaves
 		//probably the hardcoded slot names should be read by this object

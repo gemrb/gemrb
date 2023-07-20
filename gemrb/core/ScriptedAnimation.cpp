@@ -531,7 +531,7 @@ void ScriptedAnimation::StopSound()
 {
 	if (sound_handle) {
 		sound_handle->Stop();
-		sound_handle.release();
+		sound_handle.reset();
 	}
 }
 

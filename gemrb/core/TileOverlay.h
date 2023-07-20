@@ -23,7 +23,6 @@
 
 #include "exports.h"
 
-#include "Holder.h"
 #include "Tile.h"
 #include "Video/Video.h"
 
@@ -31,7 +30,7 @@
 
 namespace GemRB {
 
-class GEM_EXPORT TileOverlay : public Held<TileOverlay> {
+class GEM_EXPORT TileOverlay {
 public:
 	Size size;
 	std::vector<Tile> tiles;

@@ -493,7 +493,7 @@ public:
 	void SetupLoadGame(Holder<SaveGame> save, int ver_override);
 	/** load saved game by index (-1 is default), ver_override is an optional parameter
 	to override the saved game's version */
-	void LoadGame(SaveGame *save, int ver_override);
+	void LoadGame(Holder<SaveGame> save, int ver_override);
 	/** reloads the world map from a resource file */
 	void UpdateWorldMap(const ResRef& wmResRef);
 	/** fix changes in global script/worldmap*/

@@ -536,7 +536,7 @@ void WindowManager::DrawTooltip(Point pos) const
 			tooltip.tt.SetText(text);
 			if (tooltip.tooltip_sound) {
 				tooltip.tooltip_sound->Stop();
-				tooltip.tooltip_sound.release();
+				tooltip.tooltip_sound.reset();
 			}
 			if (text.length()) {
 				tooltip.tooltip_sound = core->PlaySound(DS_TOOLTIP, SFX_CHAN_GUI);

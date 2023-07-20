@@ -791,8 +791,8 @@ void Interface::HandleFlags() noexcept
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
 
-		LoadGame(LoadGameIndex.get(), VersionOverride );
-		LoadGameIndex.release();
+		LoadGame(LoadGameIndex, VersionOverride );
+		LoadGameIndex.reset();
 		//after loading a game, always check if the game needs to be upgraded
 	}
 
@@ -2110,7 +2110,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	SetCutSceneMode(false);
 	if (sound_override) {
 		sound_override->Stop();
-		sound_override.release();
+		sound_override.reset();
 	}
 
 	//restarting music
@@ -2376,7 +2376,7 @@ void Interface::SetupLoadGame(Holder<SaveGame> sg, int ver_override)
 	QuitFlag |= QF_LOADGAME;
 }
 
-void Interface::LoadGame(SaveGame *sg, int ver_override)
+void Interface::LoadGame(Holder<SaveGame> sg, int ver_override)
 {
 	// This function has rather painful error handling,
 	// as it should swap all the objects or none at all

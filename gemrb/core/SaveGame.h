@@ -23,7 +23,6 @@
 
 #include "exports.h"
 
-#include "Holder.h"
 #include "ResourceManager.h"
 #include "System/VFS.h"
 
@@ -32,12 +31,12 @@ namespace GemRB {
 class ImageMgr;
 class Sprite2D;
 
-class GEM_EXPORT SaveGame : public Held<SaveGame> {
+class GEM_EXPORT SaveGame {
 public:
 	static const TypeID ID;
 public:
 	SaveGame(path_t path, path_t name, const ResRef& prefix, std::string slotname, int pCount, int saveID);
-	~SaveGame() override = default;
+
 	int GetPortraitCount() const
 	{
 		return PortraitCount;

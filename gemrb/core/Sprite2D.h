@@ -69,7 +69,7 @@ enum BlitFlags : uint32_t {
 	STENCIL_MASK = STENCIL_ALPHA | STENCIL_RED | STENCIL_GREEN | STENCIL_BLUE | STENCIL_DITHER
 };
 
-class GEM_EXPORT Sprite2D : public Held<Sprite2D> {
+class GEM_EXPORT Sprite2D {
 public:
 	static const TypeID ID;
 	
@@ -106,7 +106,7 @@ public:
 	Sprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	Sprite2D(const Sprite2D &obj) noexcept;
 	Sprite2D(Sprite2D&&) noexcept;
-	~Sprite2D() noexcept override;
+	~Sprite2D() noexcept;
 
 	virtual Holder<Sprite2D> copy() const { return MakeHolder<Sprite2D>(*this); };
 
