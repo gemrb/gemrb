@@ -3057,10 +3057,10 @@ void Map::AddMapNote(const Point& point, ieWord color, ieStrRef strref, bool rea
 	AddMapNote(point, MapNote(strref, color, readonly));
 }
 
-void Map::AddMapNote(const Point &point, const MapNote& note)
+void Map::AddMapNote(const Point &point, MapNote note)
 {
 	RemoveMapNote(point);
-	mapnotes.push_back(note);
+	mapnotes.push_back(std::move(note));
 	mapnotes.back().Pos = point;
 }
 

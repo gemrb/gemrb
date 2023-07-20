@@ -9818,8 +9818,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	GET_MAP();
 
 	if (txt && txt[0]) {
-		MapNote mn(StringFromUtf8(txt), color, false);
-		map->AddMapNote(point, mn);
+		map->AddMapNote(point, MapNote(StringFromUtf8(txt), color, false));
 	} else {
 		map->RemoveMapNote(point);
 	}

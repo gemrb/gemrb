@@ -612,7 +612,7 @@ public:
 	//mapnotes
 	void AddMapNote(const Point &point, ieWord color, String text, bool readonly = false);
 	void AddMapNote(const Point &point, ieWord color, ieStrRef strref, bool readonly = false);
-	void AddMapNote(const Point &point, const MapNote& note);
+	void AddMapNote(const Point &point, MapNote note);
 	void RemoveMapNote(const Point &point);
 	const MapNote &GetMapNote(int i) const { return mapnotes[i]; }
 	const MapNote *MapNoteAtPoint(const Point &point, unsigned int radius) const;
