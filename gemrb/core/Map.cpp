@@ -387,12 +387,6 @@ static inline AnimationObjectType SelectObject(const Actor *actor, int q, const 
 	return AOT_ACTOR;
 }
 
-MapNote& MapNote::operator=(MapNote mn) {
-	// note the pass by value
-	mn.swap(*this);
-	return *this;
-}
-
 MapNote::MapNote(String txt, ieWord c, bool readonly)
 : text(std::move(txt)), readonly(readonly)
 {

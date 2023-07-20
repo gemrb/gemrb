@@ -170,11 +170,8 @@ public:
 	Point Pos;
 	bool readonly;
 
-	MapNote(const MapNote &rhs) = default;
 	MapNote(String txt, ieWord c, bool readonly);
 	MapNote(ieStrRef ref, ieWord c, bool readonly);
-	
-	MapNote& operator=(MapNote mn);
 
 	const Color& GetColor() const;
 };
