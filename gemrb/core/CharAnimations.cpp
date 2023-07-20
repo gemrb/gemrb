@@ -3027,8 +3027,6 @@ Holder<Sprite2D> GetPaperdollImage(const ResRef& resref, const ieDword* colors, 
 			break;
 		}
 	}
-
-	Animation* anim = af->GetCycle(0);
 	
 	picture2 = second->copy();
 	picture2->Frame.y -= 80;
