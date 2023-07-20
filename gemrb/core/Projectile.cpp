@@ -160,7 +160,7 @@ Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactor
 }
 
 //apply gradient colors
-void Projectile::SetupPalette(const AnimArray& anim, PaletteHolder &pal, const ieByte *gradients) const
+void Projectile::SetupPalette(const AnimArray& anim, Holder<Palette> &pal, const ieByte *gradients) const
 {
 	ieDword Colors[7];
 
@@ -173,7 +173,7 @@ void Projectile::SetupPalette(const AnimArray& anim, PaletteHolder &pal, const i
 	}
 }
 
-void Projectile::GetPaletteCopy(const AnimArray& anims, PaletteHolder &pal) const
+void Projectile::GetPaletteCopy(const AnimArray& anims, Holder<Palette> &pal) const
 {
 	if (pal)
 		return;
@@ -1885,7 +1885,7 @@ void Projectile::Cleanup()
 
 void Projectile::Draw(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color overrideTint) const
 {
-	PaletteHolder pal = (spr->Format().Bpp == 1) ? palette : nullptr;
+	Holder<Palette> pal = (spr->Format().Bpp == 1) ? palette : nullptr;
 	if (flags & BlitFlags::COLOR_MOD) {
 		// FIXME: this may not apply universally
 		flags |= BlitFlags::ALPHA_MOD;

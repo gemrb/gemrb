@@ -167,7 +167,7 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	png_read_end(inf->png_ptr, inf->end_info);
 
 	if (hasPalette) {
-		PaletteHolder pal = MakeHolder<Palette>();
+		Holder<Palette> pal = MakeHolder<Palette>();
 		int ck = GetPalette(256, pal->col);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, (ck >= 0), ck);
 		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), buffer, fmt);

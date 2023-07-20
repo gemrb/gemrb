@@ -35,7 +35,7 @@ class MVEPlay : public MoviePlayer {
 	friend class MVEPlayer;
 	MVEPlayer decoder;
 	VideoBuffer* vidBuf;
-	PaletteHolder g_palette;
+	Holder<Palette> g_palette;
 
 private:
 	PluginHolder<Video> video;

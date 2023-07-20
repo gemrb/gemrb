@@ -116,7 +116,7 @@ bool SDLSurfaceSprite2D::IsPaletteStale() const noexcept
 	// where we already compare the version with the requested one
 	// the version includes the color modification so for now we dont worry about it
 	
-	const PaletteHolder& pal = format.palette;
+	const Holder<Palette>& pal = format.palette;
 	assert(pal);
 	return pal->GetVersion() != palVersion;
 }

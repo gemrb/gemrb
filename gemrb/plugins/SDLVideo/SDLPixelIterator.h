@@ -27,7 +27,7 @@ namespace GemRB {
 
 using SDLPixelIterator = PixelFormatIterator;
 
-inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, PaletteHolder pal = nullptr)
+inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, Holder<Palette> pal = nullptr)
 {
 	const SDL_PixelFormat* fmt = surf->format;
 	if (fmt->palette && pal == nullptr) {

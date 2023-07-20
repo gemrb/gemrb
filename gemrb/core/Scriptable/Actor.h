@@ -455,7 +455,7 @@ private:
 
 	CharAnimations* anims = nullptr;
 	
-	using AnimationPart = std::pair<Animation*, PaletteHolder>;
+	using AnimationPart = std::pair<Animation*, Holder<Palette>>;
 	struct {
 		std::vector<AnimationPart> anim;
 		std::vector<AnimationPart> shadow;

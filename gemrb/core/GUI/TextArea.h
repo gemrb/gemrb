@@ -204,7 +204,7 @@ private: // Private attributes
 	ContentContainer::Margin textMargins;
 
 	Color colors[COLOR_TYPE_COUNT] = {ColorWhite};
-	PaletteHolder invertedText;
+	Holder<Palette> invertedText;
 
 private: //internal functions
 	void SetColor(const Color*, COLOR_TYPE);

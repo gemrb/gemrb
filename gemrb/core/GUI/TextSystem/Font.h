@@ -50,9 +50,6 @@ enum FontStyle {
 	UNDERLINE = 0x04
 };
 
-class Palette;
-using PaletteHolder = Holder<Palette>;
-
 #define IE_FONT_ALIGN_LEFT   0x00
 #define IE_FONT_ALIGN_CENTER 0x01
 #define IE_FONT_ALIGN_RIGHT  0x02
@@ -156,7 +153,7 @@ private:
 	GlyphAtlas Atlas;
 
 protected:
-	PaletteHolder palette;
+	Holder<Palette> palette;
 	bool background = false;
 
 public:
@@ -175,7 +172,7 @@ private:
 	size_t Print(Region rgn, const String& string, ieByte Alignment, const PrintColors* colors, Point* point = nullptr) const;
 
 public:
-	Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg);
+	Font(Holder<Palette> pal, ieWord lineheight, ieWord baseline, bool bg);
 	Font(const Font&) = delete;
 	virtual ~Font();
 	Font& operator=(const Font&) = delete;
@@ -201,7 +198,7 @@ public:
 	size_t Print(const Region& rgn, const String& string, ieByte Alignment, const PrintColors& colors, Point* point = nullptr) const;
 	
 	size_t Print(Region rgn, const String& string,
-				 PaletteHolder hicolor, ieByte Alignment, Point* point = nullptr) const;
+				 Holder<Palette> hicolor, ieByte Alignment, Point* point = nullptr) const;
 
 	/** Returns size of the string rendered in this font in pixels */
 	Size StringSize(const String&, StringSizeMetrics* metrics = NULL) const;

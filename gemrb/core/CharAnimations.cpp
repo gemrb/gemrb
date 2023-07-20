@@ -499,7 +499,7 @@ void CharAnimations::CheckColorMod()
 
 void CharAnimations::SetupColors(PaletteType type)
 {
-	PaletteHolder pal = PartPalettes[type];
+	Holder<Palette> pal = PartPalettes[type];
 
 	if (!pal) {
 		return;
@@ -568,7 +568,7 @@ void CharAnimations::SetupColors(PaletteType type)
 					PaletteResRef[type].Format("{:.4}_{:.2}", ResRefBase, paletteType);
 				}
 			}
-			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);
+			Holder<Palette> tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
 				PartPalettes[type] = tmppal;
 			} else {
@@ -615,7 +615,7 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 }
 
-PaletteHolder CharAnimations::GetPartPalette(int part) const
+Holder<Palette> CharAnimations::GetPartPalette(int part) const
 {
 	int actorPartCount = GetActorPartCount();
 	PaletteType type = PAL_MAIN;
@@ -636,7 +636,7 @@ PaletteHolder CharAnimations::GetPartPalette(int part) const
 	return PartPalettes[type];
 }
 
-PaletteHolder CharAnimations::GetShadowPalette() const {
+Holder<Palette> CharAnimations::GetShadowPalette() const {
 	return shadowPalette;
 }
 

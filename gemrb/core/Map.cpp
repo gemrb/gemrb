@@ -1674,9 +1674,9 @@ BlitFlags Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, cons
 void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 {
 	const static struct DebugPalettes {
-		PaletteHolder searchMapPal;
-		PaletteHolder materialMapPal;
-		PaletteHolder heightMapPal;
+		Holder<Palette> searchMapPal;
+		Holder<Palette> materialMapPal;
+		Holder<Palette> heightMapPal;
 		// lightmap pal is the sprite pal
 		
 		DebugPalettes() noexcept {

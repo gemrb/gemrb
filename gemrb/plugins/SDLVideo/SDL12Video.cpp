@@ -194,7 +194,7 @@ void SDL12VideoDriver::BlitSpriteRLEClipped(const Holder<Sprite2D>& spr, const R
 
 	// other combinations use general case
 
-	PaletteHolder palette = spr->GetPalette();
+	Holder<Palette> palette = spr->GetPalette();
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 
 	IAlphaIterator* maskit = StencilIterator(flags, dst);

@@ -36,7 +36,6 @@
 namespace GemRB {
 
 class Palette;
-using PaletteHolder = Holder<Palette>;
 
 /**
  * @class Label

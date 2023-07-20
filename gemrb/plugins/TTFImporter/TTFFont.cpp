@@ -185,7 +185,7 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 	return (int)(-kerning.x / 64);
 }
 
-TTFFont::TTFFont(PaletteHolder pal, FT_Face face, int lineheight, int baseline)
+TTFFont::TTFFont(Holder<Palette> pal, FT_Face face, int lineheight, int baseline)
 : Font(std::move(pal), lineheight, baseline, false), face(face)
 {
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it

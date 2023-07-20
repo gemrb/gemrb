@@ -212,7 +212,7 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 		memcpy(spr->LockSprite(), pixels, size.Area() * 4);
 		spr->UnlockSprite();
 	} else if (BitCount == 8) {
-		PaletteHolder pal = MakeHolder<Palette>(PaletteColors, PaletteColors + NumColors);
+		Holder<Palette> pal = MakeHolder<Palette>(PaletteColors, PaletteColors + NumColors);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, pal->col[0] == ColorGreen, 0);
 		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
 		const uint8_t* src = static_cast<uint8_t*>(pixels);

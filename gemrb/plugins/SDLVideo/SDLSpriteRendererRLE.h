@@ -343,7 +343,7 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 	if (drect.size.IsInvalid())
 		return;
 
-	PaletteHolder palette = spr->GetPalette();
+	Holder<Palette> palette = spr->GetPalette();
 	const Uint8* rledata = (const Uint8*)spr->LockSprite();
 	uint8_t ck = spr->GetColorKey();
 

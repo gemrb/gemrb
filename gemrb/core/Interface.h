@@ -68,7 +68,6 @@ class Label;
 class Map;
 class MusicMgr;
 class Palette;
-using PaletteHolder = Holder<Palette>;
 class ProjectileServer;
 class SaveGame;
 class SaveGameIterator;

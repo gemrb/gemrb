@@ -42,7 +42,6 @@ namespace GemRB {
 
 class EventMgr;
 class Palette;
-using PaletteHolder = Holder<Palette>;
 
 class GEM_EXPORT VideoBuffer {
 protected:
@@ -174,7 +173,7 @@ public:
 	virtual void BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p,
 								BlitFlags flags, Color tint = Color()) = 0;
 
-	void BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const PaletteHolder& pal, const Point& p,
+	void BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const Holder<Palette>& pal, const Point& p,
 								   BlitFlags flags, Color tint);
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,

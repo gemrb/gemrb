@@ -43,7 +43,6 @@ struct FrameEntry {
 
 class ImageMgr;
 class Palette;
-using PaletteHolder = Holder<Palette>;
 
 enum class BAMVersion {
 	V1, V2
@@ -74,7 +73,7 @@ private:
 	BAMVersion version = BAMVersion::V1;
 	std::vector<FrameEntry> frames;
 	std::vector<CycleEntry> cycles;
-	PaletteHolder palette;
+	Holder<Palette> palette;
 	ieByte CompressedColorIndex = 0;
 	ieDword FLTOffset = 0;
 	ieDword CyclesOffset = 0;

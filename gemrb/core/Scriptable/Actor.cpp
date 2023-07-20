@@ -427,7 +427,7 @@ void Actor::SetName(ieStrRef strref, unsigned char type)
 void Actor::SetAnimationID(unsigned int AnimID)
 {
 	//if the palette is locked, then it will be transferred to the new animation
-	PaletteHolder recover = nullptr;
+	Holder<Palette> recover = nullptr;
 	ResRef paletteResRef;
 
 	if (anims) {
@@ -7733,7 +7733,7 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 
 	for (const auto& part : animParts) {
 		const Animation* anim = part.first;
-		PaletteHolder palette = part.second;
+		Holder<Palette> palette = part.second;
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {

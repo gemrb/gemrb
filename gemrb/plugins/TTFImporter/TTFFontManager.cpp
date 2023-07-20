@@ -98,7 +98,7 @@ void TTFFontManager::Close()
 
 Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /*background*/)
 {
-	PaletteHolder pal = MakeHolder<Palette>(ColorWhite, ColorBlack);
+	Holder<Palette> pal = MakeHolder<Palette>(ColorWhite, ColorBlack);
 	
 	// FIXME: we probably dont need to do this
 	// Font already can do blending between fg and bg colors

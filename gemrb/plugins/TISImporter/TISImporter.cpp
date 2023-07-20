@@ -164,7 +164,7 @@ Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 		
 		if (badTile == nullptr) {
 			// we only want to generate a single bad tile on demand
-			PaletteHolder pal = MakeHolder<Palette>();
+			Holder<Palette> pal = MakeHolder<Palette>();
 			PixelFormat fmt = PixelFormat::Paletted8Bit(std::move(pal));
 			badTile = VideoDriver->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 		}
@@ -179,7 +179,7 @@ Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 		return badTile;
 	}
 	
-	PaletteHolder pal = MakeHolder<Palette>();
+	Holder<Palette> pal = MakeHolder<Palette>();
 	PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
 	colorkey_t ck = 0;
 	

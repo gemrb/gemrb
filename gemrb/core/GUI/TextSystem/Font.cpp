@@ -181,7 +181,7 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r) const
 	VideoDriver->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn, BlitFlags::BLENDED);
 }
 
-Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)
+Font::Font(Holder<Palette> pal, ieWord lineheight, ieWord baseline, bool bg)
 : palette(std::move(pal)), background(bg), LineHeight(lineheight), Baseline(baseline)
 {}
 

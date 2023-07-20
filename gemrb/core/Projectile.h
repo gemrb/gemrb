@@ -251,7 +251,7 @@ public:
 	unsigned int Range = 0;
 	//these are public but not in the .pro file
 	Holder<ProjectileExtension> Extension;
-	PaletteHolder palette = nullptr;
+	Holder<Palette> palette = nullptr;
 	//internals
 private:
 	ResRef smokebam;
@@ -422,7 +422,7 @@ private:
 	AnimArray CreateCompositeAnimation(const AnimationFactory& af, ieByte seq) const;
 	//oriented animations (also simple ones)
 	AnimArray CreateOrientedAnimations(const AnimationFactory& af, ieByte seq) const;
-	void GetPaletteCopy(const AnimArray&, PaletteHolder &pal) const;
+	void GetPaletteCopy(const AnimArray&, Holder<Palette> &pal) const;
 	void GetSmokeAnim();
 	//apply spells and effects on the target, only in single travel mode
 	//area effect projectiles call a separate single travel projectile for each affected target
@@ -465,7 +465,7 @@ private:
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
-	void SetupPalette(const AnimArray&, PaletteHolder &pal, const ieByte *gradients) const;
+	void SetupPalette(const AnimArray&, Holder<Palette> &pal, const ieByte *gradients) const;
 
 	void Draw(const Holder<Sprite2D>& spr, const Point& p,
 			  BlitFlags flags, Color overrideTint) const;

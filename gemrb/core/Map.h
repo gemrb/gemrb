@@ -49,7 +49,6 @@ class CREItem;
 class GameControl;
 class IniSpawn;
 class Palette;
-using PaletteHolder = Holder<Palette>;
 class Particles;
 struct PathListNode;
 class Projectile;
@@ -244,7 +243,7 @@ public:
 	ResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ResRef PaletteRef;
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
-	PaletteHolder palette;
+	Holder<Palette> palette;
 	AreaAnimation() noexcept = default;
 	AreaAnimation(const AreaAnimation& src) noexcept;
 	~AreaAnimation() noexcept = default;

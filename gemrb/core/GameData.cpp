@@ -138,7 +138,7 @@ AutoTable GameData::LoadTable(const ResRef& tableRef, bool silent)
 	return tm;
 }
 
-PaletteHolder GameData::GetPalette(const ResRef& resname)
+Holder<Palette> GameData::GetPalette(const ResRef& resname)
 {
 	auto iter = PaletteCache.find(resname);
 	if (iter != PaletteCache.end())
@@ -150,7 +150,7 @@ PaletteHolder GameData::GetPalette(const ResRef& resname)
 		return NULL;
 	}
 
-	PaletteHolder palette = MakeHolder<Palette>();
+	Holder<Palette> palette = MakeHolder<Palette>();
 	im->GetPalette(256,palette->col);
 	palette->named=true;
 	PaletteCache[resname] = palette;

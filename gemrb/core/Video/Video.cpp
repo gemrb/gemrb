@@ -211,11 +211,11 @@ void Video::BlitSprite(const Holder<Sprite2D>& spr, Point p, const Region* clip,
 	BlitSprite(spr, src, fClip, flags | BlitFlags::BLENDED);
 }
 
-void Video::BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const PaletteHolder& pal, const Point& p,
+void Video::BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const Holder<Palette>& pal, const Point& p,
 									  BlitFlags flags, Color tint)
 {
 	if (pal) {
-		PaletteHolder oldpal = spr->GetPalette();
+		Holder<Palette> oldpal = spr->GetPalette();
 		spr->SetPalette(pal);
 		BlitGameSprite(spr, p, flags, tint);
 		spr->SetPalette(oldpal);

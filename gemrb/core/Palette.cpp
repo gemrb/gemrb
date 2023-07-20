@@ -67,7 +67,7 @@ void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t d
 	version++;
 }
 
-PaletteHolder Palette::Copy() const noexcept
+Holder<Palette> Palette::Copy() const noexcept
 {
 	return MakeHolder<Palette>(std::begin(col), std::end(col));
 }
@@ -203,7 +203,7 @@ static inline void applyMod(const Color& src, Color& dest,
 	}
 }
 
-void Palette::SetupRGBModification(const PaletteHolder& src, const RGBModifier* mods,
+void Palette::SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods,
 	unsigned int type) noexcept
 {
 	const RGBModifier* tmods = mods+(8*type);
@@ -254,7 +254,7 @@ void Palette::SetupRGBModification(const PaletteHolder& src, const RGBModifier* 
 	version++;
 }
 
-void Palette::SetupGlobalRGBModification(const PaletteHolder& src,
+void Palette::SetupGlobalRGBModification(const Holder<Palette>& src,
 	const RGBModifier& mod) noexcept
 {
 	// don't modify the transparency and shadow colour

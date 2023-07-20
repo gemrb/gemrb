@@ -25,10 +25,10 @@
 
 namespace GemRB {
 
-static PaletteHolder GetLightPalette() noexcept
+static Holder<Palette> GetLightPalette() noexcept
 {
 	static struct Init {
-		PaletteHolder pal;
+		Holder<Palette> pal;
 		Init() noexcept {
 			Color cols[256] {ColorBlack};
 			for (int i = 1; i < 256; ++i) {

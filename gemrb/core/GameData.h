@@ -109,7 +109,7 @@ public:
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
 	AutoTable LoadTable(const ResRef& tableRef, bool silent = false);
 
-	PaletteHolder GetPalette(const ResRef& resname);
+	Holder<Palette> GetPalette(const ResRef& resname);
 
 	Item* GetItem(const ResRef &resname, bool silent=false);
 	void FreeItem(Item const *itm, const ResRef &name, bool free=false);
@@ -200,7 +200,7 @@ private:
 	ResRefRCCache<Item> ItemCache;
 	ResRefRCCache<Spell> SpellCache;
 	ResRefRCCache<Effect> EffectCache;
-	ResRefMap<PaletteHolder> PaletteCache;
+	ResRefMap<Holder<Palette>> PaletteCache;
 	Factory factory;
 	ResRefMap<AutoTable> tables;
 	using StoreMap = ResRefMap<Store*>;

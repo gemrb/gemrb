@@ -49,7 +49,7 @@ struct GEM_EXPORT PixelFormat {
 	colorkey_t ColorKey = 0;
 	bool HasColorKey = false;
 	bool RLE = false;
-	PaletteHolder palette;
+	Holder<Palette> palette;
 	
 	PixelFormat() noexcept = default;
 	PixelFormat(uint8_t bpp, uint32_t rmask, uint32_t gmask, uint32_t bmask, uint32_t amask) noexcept
@@ -61,7 +61,7 @@ struct GEM_EXPORT PixelFormat {
 				uint8_t rshift, uint8_t gshift, uint8_t bshift, uint8_t ashift,
 				uint32_t rmask, uint32_t gmask, uint32_t bmask, uint32_t amask,
 				uint8_t bpp, uint8_t depth,
-				colorkey_t ck, bool hasCk, bool rle, PaletteHolder pal) noexcept
+				colorkey_t ck, bool hasCk, bool rle, Holder<Palette> pal) noexcept
 	: Rloss(rloss), Gloss(gloss), Bloss(bloss), Aloss(aloss),
 	Rshift(rshift), Gshift(gshift), Bshift(bshift), Ashift(ashift),
 	Rmask(rmask), Gmask(gmask), Bmask(bmask), Amask(amask),
@@ -69,7 +69,7 @@ struct GEM_EXPORT PixelFormat {
 	RLE(rle), palette(std::move(pal))
 	{}
 	
-	static PixelFormat Paletted8Bit(PaletteHolder pal, bool hasColorKey = false, colorkey_t key = 0) {
+	static PixelFormat Paletted8Bit(Holder<Palette> pal, bool hasColorKey = false, colorkey_t key = 0) {
 		return PixelFormat {
 			0, 0, 0, 0,
 			0, 0, 0, 0,
@@ -80,7 +80,7 @@ struct GEM_EXPORT PixelFormat {
 		};
 	}
 	
-	static PixelFormat RLE8Bit(PaletteHolder pal, colorkey_t key) {
+	static PixelFormat RLE8Bit(Holder<Palette> pal, colorkey_t key) {
 		return PixelFormat {
 			0, 0, 0, 0,
 			0, 0, 0, 0,

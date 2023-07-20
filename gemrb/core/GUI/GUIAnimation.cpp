@@ -158,7 +158,7 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 	}
 
 	if (has_palette) {
-		PaletteHolder palette = pic->GetPalette();
+		Holder<Palette> palette = pic->GetPalette();
 		palette->SetupPaperdollColours(colors, 0);
 	}
 	

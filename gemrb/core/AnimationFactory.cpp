@@ -109,7 +109,7 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 	spr->Frame.y = frames[first]->Frame.y;
 	
 	if (Colors) {
-		PaletteHolder pal = spr->GetPalette()->Copy();
+		Holder<Palette> pal = spr->GetPalette()->Copy();
 		pal->SetupPaperdollColours(Colors, type);
 		spr->SetPalette(pal);
 		Picture2->SetPalette(pal);
