@@ -1338,7 +1338,7 @@ void Projectile::SpawnFragment(Point& dest) const
 	}
 }
 
-void Projectile::SpawnFragments(Holder<ProjectileExtension>& extension) const
+void Projectile::SpawnFragments(const Holder<ProjectileExtension>& extension) const
 {
 	int radius = extension->ExplosionRadius;
 

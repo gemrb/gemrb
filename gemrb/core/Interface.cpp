@@ -1085,11 +1085,11 @@ void Interface::LoadPlugins() const
 {
 	plugin_flags_t pluginFlags;
 	if (!config.SkipPlugin.empty()) {
-		pluginFlags[config.SkipPlugin] = PLF_SKIP;
+		pluginFlags[config.SkipPlugin] = PluginFlagsType::SKIP;
 	}
 
 	if (!config.DelayPlugin.empty()) {
-		pluginFlags[config.DelayPlugin] = PLF_DELAY;
+		pluginFlags[config.DelayPlugin] = PluginFlagsType::DELAY;
 	}
 
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");

@@ -188,14 +188,14 @@ void LoadPlugins(const path_t& pluginpath, const plugin_flags_t& pluginFlags)
 			PluginFlagsType flags = lookup->second;
 
 			// module is sent to the back
-			if (flags == PLF_DELAY) {
+			if (flags == PluginFlagsType::DELAY) {
 				Log(MESSAGE, "PluginLoader", "Loading \"{}\" delayed.", name);
 				delayedPlugins.emplace(name);
 				continue;
 			}
 
 			// module is skipped
-			if (flags == PLF_SKIP) {
+			if (flags == PluginFlagsType::SKIP) {
 				Log(MESSAGE, "PluginLoader", "Loading \"{}\" skipped.", name);
 				continue;
 			}

@@ -5489,13 +5489,6 @@ int fx_castinglevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0xc0 FindFamiliar
-// param2 = 1 alignment is in param1
-// param2 = 2 resource used
-#define FAMILIAR_NORMAL    0
-#define FAMILIAR_ALIGNMENT 1
-#define FAMILIAR_RESOURCE  2
-
 //returns the familiar if there was no error
 static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *fx, const ResRef& resource)
 {
@@ -5555,10 +5548,12 @@ static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *
 	return fam;
 }
 
+// 0xc0 FindFamiliar
+// param2 = 0 normal
+// param2 = 1 alignment is in param1
+// param2 = 2 resource used
 int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_find_familiar(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-
 	if (!target || !Owner) {
 		return FX_NOT_APPLIED;
 	}
@@ -5582,10 +5577,10 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (fx->Parameter2!=FAMILIAR_RESOURCE) {
+	if (fx->Parameter2 != 2) {
 		ieDword alignment;
 
-		if (fx->Parameter2==FAMILIAR_ALIGNMENT) {
+		if (fx->Parameter2 == 1) {
 			alignment = fx->Parameter1;
 		} else {
 			alignment = target->GetStat(IE_ALIGNMENT);
@@ -5602,7 +5597,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		} else {
 			fx->Resource = game->GetFamiliar(alignment);
 		}
-		fx->Parameter2=FAMILIAR_RESOURCE;
+		fx->Parameter2 = 2;
 	}
 
 	GetFamiliar(Owner, target, fx, fx->Resource);
@@ -6619,12 +6614,6 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-#define WB_AWAY 2
-#define WB_TOWARDS 4
-#define WB_FIXDIR 5
-#define WB_OWNDIR 6
-#define WB_AWAYOWNDIR 7
-
 // 0xeb WingBuffet
 int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -6656,20 +6645,20 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//create movement in actor
 	orient_t dir;
 	switch(fx->Parameter2) {
-		case WB_AWAY:
+		case 2: // away
 		default:
 			dir = GetOrient(target->Pos, fx->Source);
 			break;
-		case WB_TOWARDS:
+		case 4: // towards
 			dir = GetOrient(fx->Source, target->Pos);
 			break;
-		case WB_FIXDIR:
+		case 5: // fixed direction
 			dir = ClampToOrientation(fx->Parameter3);
 			break;
-		case WB_OWNDIR:
+		case 6: // own direction
 			dir = target->GetOrientation();
 			break;
-		case WB_AWAYOWNDIR:
+		case 7: // back away in own direction
 			dir = ReflectOrientation(target->GetOrientation());
 			break;
 	}
@@ -6783,11 +6772,6 @@ int fx_disintegrate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 2 param1=range (otherwise visualrange)
 // 4 point already set (otherwise use gui)
 // 8 use line of sight
-#define FS_UNEXPLORED  1
-#define FS_VISUALRANGE 2
-#define FS_HASPOINT    4
-#define FS_LOS         8
-
 int fx_farsee (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_farsee(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
@@ -6796,14 +6780,14 @@ int fx_farsee (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	if (!(fx->Parameter2&FS_VISUALRANGE)) {
+	if (!(fx->Parameter2 & 2)) {
 		fx->Parameter1=STAT_GET(IE_VISUALRANGE);
-		fx->Parameter2|=FS_VISUALRANGE;
+		fx->Parameter2 |= 2;
 	}
 
 	if (target->InParty) {
 		//don't start graphical interface if actor isn't in party
-		if (!(fx->Parameter2&FS_HASPOINT)) {
+		if (!(fx->Parameter2 & 4)) {
 			//start graphical interface
 			//it will do all the rest of the opcode
 			//using RevealMap guiscript action
@@ -6813,12 +6797,12 @@ int fx_farsee (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//don't explore unexplored points
-	if (!(fx->Parameter2&FS_UNEXPLORED)) {
+	if (!(fx->Parameter2 & 1)) {
 		if (!map->IsExplored(fx->Pos)) {
 			return FX_NOT_APPLIED;
 		}
 	}
-	map->ExploreMapChunk(fx->Pos, fx->Parameter1, fx->Parameter2&FS_LOS);
+	map->ExploreMapChunk(fx->Pos, fx->Parameter1, fx->Parameter2 & 8);
 	return FX_NOT_APPLIED;
 }
 

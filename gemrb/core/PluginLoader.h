@@ -28,10 +28,10 @@
 
 namespace GemRB {
 
-enum PluginFlagsType {
-	PLF_NORMAL,
-	PLF_SKIP,
-	PLF_DELAY
+enum class PluginFlagsType {
+	NORMAL,
+	SKIP,
+	DELAY
 };
 
 using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
