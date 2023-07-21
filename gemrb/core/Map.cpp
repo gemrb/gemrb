@@ -375,14 +375,14 @@ static inline AnimationObjectType SelectObject(const Actor *actor, int q, const 
 		return AOT_PILE;
 	}
 
-	if (proh<actorh && proh<scah && proh<aah && proh<spah) return AOT_PROJECTILE;
-
-	if (spah<actorh && spah<scah && spah<aah) return AOT_SPARK;
-
-	if (aah<actorh && aah<scah) return AOT_AREA;
-
-	if (scah<actorh) return AOT_SCRIPTED;
-
+	// one of them is guaranteed to have a sane value, so we don't need
+	// to care that 0x7fffffff can repeat; same heights for others are
+	// dealt with the chosen specific order of comparisons
+	int lowest = std::min({proh, spah, aah, scah, actorh});
+	if (lowest == proh) return AOT_PROJECTILE;
+	if (lowest == spah) return AOT_SPARK;
+	if (lowest == aah) return AOT_AREA;
+	if (lowest == scah) return AOT_SCRIPTED;
 	return AOT_ACTOR;
 }
 
