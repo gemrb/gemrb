@@ -773,7 +773,7 @@ static EffectRef damage_ref = { "Damage", -1 };
 bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 {
 	Point gameMousePos = GameMousePos();
-	Highlightable* over = Scriptable::As<Highlightable>(overMe);;
+	Highlightable* over = Scriptable::As<Highlightable>(overMe);
 	//cheatkeys with ctrl-
 	if (Mod & GEM_MOD_CTRL) {
 		if (!core->CheatEnabled()) {

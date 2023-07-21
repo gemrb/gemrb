@@ -61,21 +61,21 @@ Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bam, ieByte seq
 		return AnimArray(MAX_ORIENT);
 	}
 
-	auto Max = af->GetCycleCount();
-	if (!Max) {
+	ieByte maxCycle = static_cast<ieByte>(af->GetCycleCount());
+	if (!maxCycle) {
 		return AnimArray(MAX_ORIENT);
 	}
 
 	if ((ExtFlags & PEF_CYCLE) && !seq) {
-		seq = RAND<ieByte>(int(0), Max - 1);
+		seq = RAND<ieByte>(0, maxCycle - 1);
 	}
 
 	//this hack is needed because bioware .pro files are sometimes
 	//reporting bigger face count than possible by the animation
-	if (Aim>Max) Aim=Max;
+	if (Aim > maxCycle) Aim = maxCycle;
 
 	if(ExtFlags&PEF_PILLAR) {
-		Aim = Max;
+		Aim = maxCycle;
 		return CreateCompositeAnimation(*af, seq);
 	} else {
 		return CreateOrientedAnimations(*af, seq);

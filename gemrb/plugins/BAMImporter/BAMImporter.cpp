@@ -144,7 +144,7 @@ BAMImporter::index_t BAMImporter::GetCycleSize(index_t cycle)
 	return cycles[cycle].FramesCount;
 }
 
-Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool RLESprite, uint8_t* data)
+Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool RLESprite, uint8_t* data) const
 {
 	Holder<Sprite2D> spr;
 	const Region& rgn = frameInfo.bounds;

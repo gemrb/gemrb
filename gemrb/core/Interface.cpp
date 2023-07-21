@@ -3420,7 +3420,7 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 }
 
 //plays stock sound listed in defsound.2da
-Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel)
+Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel) const
 {
 	if (index <= gamedata->defaultSounds.size()) {
 		return AudioDriver->PlayRelative(gamedata->defaultSounds[index], channel);
@@ -3466,7 +3466,7 @@ bool Interface::HasCurrentArea() const
 }
 
 //this is used only for the console
-Holder<Sprite2D> Interface::GetCursorSprite()
+Holder<Sprite2D> Interface::GetCursorSprite() const
 {
 	Holder<Sprite2D> spr = gamedata->GetBAMSprite(TextCursorBam, 0, 0);
 	if (spr && HasFeature(GFFlags::OVERRIDE_CURSORPOS)) {

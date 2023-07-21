@@ -6935,10 +6935,11 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0xfc SetTrap
 int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_set_trap(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	ieDword skill, roll, level;
+	ieDword skill = 0;
+	ieDword roll = 0;
+	ieDword level = 0;
 	const Map *map = target->GetCurrentArea();
-	if (!map) return FX_NOT_APPLIED;
+	if (!map || !Owner) return FX_NOT_APPLIED;
 
 	proIterator iter;
 
@@ -6962,10 +6963,6 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		// thieves aren't casters, so 0 for a later spell type lookup is not good enough
 		level = caster->GetThiefLevel();
 		level = level ? level : caster->GetXPLevel(false);
-	} else {
-		roll=0;
-		skill=0;
-		level = 0;
 	}
 
 	if (roll>skill) {

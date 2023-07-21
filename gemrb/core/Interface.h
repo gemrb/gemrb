@@ -552,7 +552,7 @@ public:
 	int GetMouseScrollSpeed() const;
 
 	/** plays stock gui sound referenced by index */
-	Holder<SoundHandle> PlaySound(size_t idx, unsigned int channel);
+	Holder<SoundHandle> PlaySound(size_t idx, unsigned int channel) const;
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
@@ -560,7 +560,7 @@ public:
 	/** is an area loaded? (prefer Game::GetCurrentArea if including Game.h makes sense) */
 	bool HasCurrentArea() const;
 	/** returns a cursor sprite (not cached) */
-	Holder<Sprite2D> GetCursorSprite();
+	Holder<Sprite2D> GetCursorSprite() const;
 	/** returns a scroll cursor sprite */
 	Holder<Sprite2D> GetScrollCursorSprite(orient_t orient, int spriteNum) const;
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
