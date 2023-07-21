@@ -359,6 +359,9 @@ class GButton(GControl):
 		frame = self.GetFrame()
 		frame["x"] = frame["y"] = 0
 		return self.CreateSubview(btnid, IE_GUI_BUTTON, frame)
+		
+	def OnAnimEnd(self, handler):
+		self.SetAction(handler, IE_ACT_CUSTOM)
 
 class GWorldMap(GControl, Scrollable):
 	methods = {

@@ -102,6 +102,10 @@ enum class ButtonImage : unsigned int {
 
 class GEM_EXPORT Button : public Control {
 public:
+	struct Action {
+		static const Control::Action EndReached = ACTION_CUSTOM(0); // animation has finsihed
+	};
+
 	// NOTE: keep these synchronized with GUIDefines.py!!!
 	enum State : uint8_t {
 		UNPRESSED,

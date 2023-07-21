@@ -112,6 +112,7 @@ void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation && animation->HasEnded()) {
 		SetAnimation(nullptr);
+		PerformAction(Action::EndReached);
 	}
 }
 
@@ -484,7 +485,7 @@ Holder<Sprite2D> Button::DragCursor() const
 /** Mouse Button Down */
 bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	ActionKey key(Action::DragDropDest);
+	ActionKey key(Control::Action::DragDropDest);
 	if (core->GetDraggedItem() && !SupportsAction(key)) {
 		return true;
 	}
@@ -508,7 +509,7 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 	bool drag = core->GetDraggedItem () != NULL;
 
 	if (drag && me.repeats == 1) {
-		ActionKey key(Action::DragDropDest);
+		ActionKey key(Control::Action::DragDropDest);
 		if (SupportsAction(key)) {
 			return PerformAction(key);
 		} else {
