@@ -57,8 +57,6 @@ public:
 	/** Allows modification of the scrolling factor from outside */
 	void ScrollDelta(const Point& delta) override;
 	void ScrollTo(const Point& pos) override;
-	/** Sets the exit direction (we need this to calculate distances) */
-	void SetDirection(int direction);
 
 	Point Pos;
 	/** pointer to last pointed area */
