@@ -1322,7 +1322,7 @@ void Projectile::DrawExploded(const Region& viewport)
 	phase = P_EXPIRED;
 }
 
-void Projectile::SpawnFragment(Point &dest)
+void Projectile::SpawnFragment(Point& dest) const
 {
 	Projectile *pro = server->GetProjectileByIndex(Extension->FragProjIdx);
 	if (pro) {
@@ -1335,6 +1335,20 @@ void Projectile::SpawnFragment(Point &dest)
 			dest.y += core->Roll(1,Extension->tileCoord.y, -Extension->tileCoord.y / 2);
 		}
 		area->AddProjectile(pro, dest, dest);
+	}
+}
+
+void Projectile::SpawnFragments(Holder<ProjectileExtension>& extension) const
+{
+	int radius = extension->ExplosionRadius;
+
+	for (int i = -radius; i < radius; i += extension->tileCoord.x) {
+		for (int j = -radius; j < radius; j += extension->tileCoord.y) {
+			if (i * i + j * j < radius * radius) {
+				Point p(Pos.x + i, Pos.y + j);
+				SpawnFragment(p);
+			}
+		}
 	}
 }
 
@@ -1408,16 +1422,7 @@ void Projectile::DrawExplosion(const Region& vp)
   //remove PAF_SECONDARY if it is buggy, but that will break the 'HOLD' projectile
 	if ((Extension->AFlags&PAF_SECONDARY) && Extension->FragProjIdx) {
 		if (apflags&APF_TILED) {
-			int radius = Extension->ExplosionRadius;
-
-			for (int i = -radius; i < radius; i += Extension->tileCoord.x) {
-				for (int j = -radius; j < radius; j += Extension->tileCoord.y) {
-					if (i*i+j*j<radius*radius) {
-						Point p(Pos.x+i, Pos.y+j);
-						SpawnFragment(p);
-					}
-				}
-			}
+			SpawnFragments(Extension);
 		} else {
 			SpawnFragment(Pos);
 		}

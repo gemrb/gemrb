@@ -451,7 +451,8 @@ private:
 	void DrawTravel(const Region &screen);
 	bool DrawChildren(const Region &screen);
 	void DrawExplosion(const Region &screen);
-	void SpawnFragment(Point &pos);
+	void SpawnFragment(Point& pos) const;
+	void SpawnFragments(Holder<ProjectileExtension>& extension) const;
 	void DrawExploded(const Region &screen);
 	int GetTravelPos(int face) const;
 	int GetShadowPos(int face) const;
