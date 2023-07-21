@@ -318,7 +318,7 @@ void Control::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 
 bool Control::OnTouchDown(const TouchEvent& /*te*/, unsigned short /*mod*/)
 {
-	ControlEventHandler cb = METHOD_CALLBACK(&Control::HandleTouchActionTimer, this);
+	ControlEventHandler cb = &Control::HandleTouchActionTimer;
 	actionTimer = StartActionTimer(cb, 500); // TODO: this time value should be configurable
 	return true; // always handled
 }
@@ -345,9 +345,8 @@ bool Control::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 	return View::OnKeyPress(key, mod);
 }
 
-void Control::HandleTouchActionTimer(const Control* ctrl)
+void Control::HandleTouchActionTimer()
 {
-	assert(ctrl == this);
 	assert(actionTimer);
 
 	ClearActionTimer();

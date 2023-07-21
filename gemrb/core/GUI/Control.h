@@ -232,7 +232,7 @@ private:
 	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
-	void HandleTouchActionTimer(const Control*);
+	void HandleTouchActionTimer();
 	
 	virtual BitOp GetDictOp() const noexcept { return BitOp::SET; }
 };
