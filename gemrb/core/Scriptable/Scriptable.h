@@ -406,6 +406,7 @@ public:
 	bool AuraPolluted();
 	ieDword GetLocal(const ieVariable& key, ieDword fallback) const;
 	void DumpLocals() const;
+	virtual std::string dump() const = 0;
 private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant, Scriptable* target = nullptr, int level = 0);

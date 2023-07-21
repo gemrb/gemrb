@@ -471,7 +471,7 @@ public:
 	/** sets expansion mode */
 	void SetExpansion(ieDword value);
 	/** Dumps information about the object */
-	std::string dump() const;
+	std::string dump() const override;
 	/** Finds an actor by global ID */
 	Actor *GetActorByGlobalID(ieDword objectID) const;
 	/** Allocates maze data */

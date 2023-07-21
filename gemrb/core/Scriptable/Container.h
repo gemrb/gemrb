@@ -55,7 +55,7 @@ public:
 	void TryPickLock(Actor* actor);
 	void TryBashLock(Actor *actor);
 	bool TryUnlock(Actor *actor) const;
-	std::string dump() const;
+	std::string dump() const override;
 	int TrapResets() const override { return Flags & CONT_RESET; }
 	bool CanDetectTrap() const override;
 private:

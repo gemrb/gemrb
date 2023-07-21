@@ -545,7 +545,7 @@ public:
 	/** sets game specific default data about action buttons */
 	static void SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot3);
 	/** prints useful information on console */
-	std::string dump() const;
+	std::string dump() const override;
 	/** fixes the feet circle */
 	void SetCircleSize();
 	/** places the actor on the map */

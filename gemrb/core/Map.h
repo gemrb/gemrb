@@ -429,7 +429,8 @@ public:
 	static Point ConvertCoordFromTile(const Point&);
 
 	/** prints useful information on console */
-	std::string dump(bool show_actors = false) const;
+	std::string dump() const override { return dump(false); };
+	std::string dump(bool show_actors) const;
 	TileMap *GetTileMap() const { return TMap; }
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);

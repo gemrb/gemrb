@@ -898,16 +898,8 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					lastActor->dump();
 					break;
 				}
-				if (overMe->Type == ST_DOOR) {
-					Scriptable::As<Door>(overMe)->dump();
-					break;
-				}
-				if (overMe->Type == ST_CONTAINER) {
-					Scriptable::As<Container>(overMe)->dump();
-					break;
-				}
-				if (overMe->Type <= ST_TRAVEL) { // safe while we check lastActor first
-					Scriptable::As<InfoPoint>(overMe)->dump();
+				if (overMe && overMe->Type != ST_ACTOR) {
+					overMe->dump();
 					break;
 				}
 				core->GetGame()->GetCurrentArea()->dump(false);
