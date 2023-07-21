@@ -279,6 +279,7 @@ static EffectRef fx_to_hit_modifier_ref = { "ToHitModifier", -1 };
 static EffectRef fx_damage_bonus_modifier1_ref = { "DamageBonusModifier" , -1 };
 static EffectRef fx_damage_bonus_modifier_ref = { "DamageBonusModifier2", -1 };
 static EffectRef fx_display_portrait_icon_ref = { "Icon:Display", -1 };
+static EffectRef fx_set_stun_state_ref = { "State:Stun", -1 };
 //bg2 and iwd1
 static EffectRef control_creature_ref = { "ControlCreature", -1 };
 //iwd1 and iwd2
@@ -4266,6 +4267,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 	// do this after GetHit, so VB_HURT isn't overriden by VB_DAMAGE, just (dis)played later
 	if (damage != 0) {
 		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+		// unstun for that one special stun type
+		// run fx_cure_stun_state instead if it turns out not to be enough
+		if (HasSpellState(SS_AWAKE)) fxqueue.RemoveAllEffectsWithParam(fx_set_stun_state_ref, 1);
 	}
 
 	InternalFlags |= IF_ACTIVE;

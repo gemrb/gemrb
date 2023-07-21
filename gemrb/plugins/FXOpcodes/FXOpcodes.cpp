@@ -1835,6 +1835,8 @@ int fx_luck_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->FirstApply == 1 && fx->Parameter1 == 0 && fx->Parameter2 == 0) {
 		fx->Parameter1 = DICE_ROLL(0);
 	}
+	// iwd2 supposedly only supported MOD_ADDITIVE, with 1 being Lucky Streak and 2 Fortunes Favorite (perfect rolls)
+	// there are no users of that, so we don't bother
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_LUCK );
@@ -1869,7 +1871,7 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x18 State:Panic
-// TODO: Non-zero param2 -> Bypass opcode #101 (Immunity to effect)
+// TODO: Non-zero param2 -> Bypass opcode #101 (Immunity to effect); iwd thing, but no users
 int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_set_panic_state(%2d)", fx->Opcode);
