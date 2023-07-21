@@ -340,8 +340,7 @@ static inline AnimationObjectType SelectObject(const Actor *actor, int q, const 
 
 	int aah;
 	if (a) {
-		//aah = a->Pos.y;//+a->height;
-		aah = a->GetHeight();
+		aah = a->Pos.y + a->GetHeight();
 	} else {
 		aah = 0x7fffffff;
 	}
