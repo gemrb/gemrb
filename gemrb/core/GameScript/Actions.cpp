@@ -2220,10 +2220,9 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	// if we're now actually doing worldmap travel, pst ignores the direction and
+	// just dumps you to the FROMMAP entrance. But we need to circumvent the usual logic here
 	if (direction == WMPDirection::NONE && keyAreaVisited) {
-		// FIXME: not ideal, pst uses the infopoint links (ip->EntranceName), so direction doesn't matter
-		// but we're not travelling through them (the whole point of the world map), so how to pick a good entrance?
-		// DestEntryPoint is all zeroes, pst just didn't use it
 		direction = WMPDirection::WEST;
 	}
 	core->GetDictionary()["Travel"] = (ieDword) direction;

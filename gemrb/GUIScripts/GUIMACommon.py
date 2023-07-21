@@ -42,7 +42,11 @@ def MoveToNewArea ():
 		print ("Invalid target", travel)
 		return
 
-	GemRB.CreateMovement (travel["Destination"], travel["Entrance"], travel["Direction"])
+	# pst drops you off in the center
+	entrance = travel["Entrance"]
+	if not entrance:
+		entrance = "FROMMAP"
+	GemRB.CreateMovement (travel["Destination"], entrance, travel["Direction"])
 
 	if hours == 0:
 		return
