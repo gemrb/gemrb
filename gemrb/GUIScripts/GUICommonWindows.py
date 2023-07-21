@@ -1573,6 +1573,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		button.SetVarAssoc ("portrait", i + 1)
 		SetupButtonBorders (Window, button, i)
 		button.SetFont (StatesFont)
+		button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		button.OnRightPress (OpenInventoryWindowClick)
 		button.OnPress (PortraitButtonOnPress)
@@ -1657,13 +1658,6 @@ def SetupButtonBorders (Window, Button, i):
 	if GameCheck.IsIWD2 ():
 		Button.SetBorder (FRAME_PC_SELECTED, green)
 		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (2, 2, 3, 3))
-	elif GameCheck.IsPST ():
-		Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame (1, 1, 2, 2))
-		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (3, 3, 4, 4))
-		Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
-		ButtonHP = Window.GetControl (6 + i)
-		ButtonHP.OnPress (PortraitButtonHPOnPress)
-		ButtonHP.SetVarAssoc ("pid", i + 1) # storing so the callback knows which button it's operating on
 	else:
 		Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame (4, 3, 4, 3))
 		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (2, 2, 3, 3))
@@ -1678,7 +1672,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	PortraitWindow.AddAlias("PORTWIN")
 	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
-	if needcontrols and not GameCheck.IsPST(): #not in pst
+	if needcontrols:
 		# 1280 and higher don't have this control
 		Button = Window.GetControl (8)
 		if Button:
@@ -1729,11 +1723,8 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 
 		Button.SetVarAssoc("portrait", pcID)
 		Button.SetHotKey(chr(ord('1') + i), 0, True)
-
-		if not GameCheck.IsPST():
-			Button.SetFont (StatesFont)
-
-			AddStatusFlagLabel (Window, Button, i)
+		Button.SetFont (StatesFont)
+		AddStatusFlagLabel (Window, Button, i)
 
 		if needcontrols or GameCheck.IsIWD2():
 			Button.OnRightPress (OpenInventoryWindowClick)
@@ -1769,10 +1760,6 @@ def UpdatePortraitWindow ():
 		if (pcID <= GemRB.GetPartySize()):
 			Button.SetAction(lambda btn, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER);
 			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
-
-		if GameCheck.IsPST():
-			UpdateAnimatedPortrait(Window, i)
-			continue
 
 		Portrait = GemRB.GetPlayerPortrait (pcID, 1)
 		pic = Portrait["Sprite"]
@@ -1855,67 +1842,6 @@ def UpdatePortraitWindow ():
 		Button.SetText(states)
 	return
 
-def UpdateAnimatedPortrait (Window,i):
-	"""Selects the correct portrait cycle depending on character state"""
-	# note: there are actually two portraits per chr, eg PPPANN (static), WMPANN (animated)
-	Button = Window.GetControl (i)
-	ButtonHP = Window.GetControl (6 + i)
-	pic = GemRB.GetPlayerPortrait (i+1, 0)["ResRef"]
-	if not pic:
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetAnimation (None)
-		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		ButtonHP.SetText ("")
-		ButtonHP.SetBAM ("", 0, 0)
-		return
-
-	state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
-	hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
-	hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
-	if state & STATE_DEAD:
-			cycle = 9
-	elif state & STATE_HELPLESS:
-			cycle = 8
-	elif state & STATE_PETRIFIED:
-			cycle = 7
-	elif state & STATE_PANIC:
-			cycle = 6
-	elif state & STATE_POISONED:
-			cycle = 2
-	elif hp<hp_max/2:
-		cycle = 4
-	else:
-		cycle = 0
-
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
-	if cycle<6:
-		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
-
-	Button.SetAnimation (pic, cycle)
-	ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
-
-	if hp_max < 1 or hp == "?":
-		ratio = 0.0
-	else:
-		ratio = hp / float(hp_max)
-		if ratio > 1.0: ratio = 1.0
-
-	r = int (255 * (1.0 - ratio))
-	g = int (255 * ratio)
-
-	ButtonHP.SetText ("%s / %d" %(hp, hp_max))
-	ButtonHP.SetColor ({'r' : r, 'g' : g, 'b' : 0})
-	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
-	ButtonHP.SetPictureClipping (ratio)
-
-	if GemRB.GetVar('Health Bar Settings') & (1 << i):
-		op = OP_OR
-	else:
-		op = OP_NAND
-	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
-
-	return
-
 def PortraitButtonOnPress (btn):
 	"""Selects the portrait individually."""
 	pcID = btn.Value
@@ -1944,17 +1870,6 @@ def PortraitButtonOnShiftPress (btn):
 	else:
 		GemRB.GameSelectPCSingle (pcID)
 		SelectionChanged ()
-	return
-
-def PortraitButtonHPOnPress (btn, pcID): ##pst hitpoint display
-	hbs = GemRB.GetVar('Health Bar Settings')
-	if hbs & (1 << (pcID - 1)):
-		op = OP_NAND
-	else:
-		op = OP_OR
-
-	btn.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
-	GemRB.SetVar('Health Bar Settings', hbs ^ (1 << (pcID - 1)))
 	return
 
 def SelectionChanged ():
