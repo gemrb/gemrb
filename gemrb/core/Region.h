@@ -119,7 +119,6 @@ public:
 	Region(int x, int y, int w, int h) noexcept;
 	Region(const Point& p, const Size& s) noexcept;
 	Region(const Region&) noexcept;
-	Region(Region&&) noexcept;
 	
 	Region& operator=(const Region&) noexcept;
 

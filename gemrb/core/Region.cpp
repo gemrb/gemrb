@@ -130,10 +130,6 @@ Region::Region(const Region &r) noexcept
 : origin(r.origin), size(r.size)
 {}
 
-Region::Region(Region&& r) noexcept
-: origin(r.origin), size(r.size)
-{}
-
 Region& Region::operator=(const Region &rhs) noexcept
 {
 	if (&rhs != this) {
