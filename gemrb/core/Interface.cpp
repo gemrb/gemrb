@@ -2616,7 +2616,7 @@ void Interface::InitItemTypes()
 	//slottype describes the inventory structure
 	Inventory::Init();
 	AutoTable st = gamedata->LoadTable("slottype");
-	if (!it) {
+	if (!st) {
 		throw CIE("Could not open slottype table.");
 	}
 	
