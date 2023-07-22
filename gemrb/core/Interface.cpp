@@ -2173,8 +2173,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			error("Interface", "Unknown resource directory type: {}!", fmt::underlying(dir));
 	}
 
-	path_t path = PathJoin(config.GamePath, resourcePath);
-	DirectoryIterator dirIt(path);
+	DirectoryIterator dirIt(PathJoin(config.GamePath, resourcePath));
 	dirIt.SetFilterPredicate(filter);
 	return dirIt;
 }

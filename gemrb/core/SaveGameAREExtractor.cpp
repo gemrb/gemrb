@@ -149,7 +149,7 @@ void SaveGameAREExtractor::registerLocation(const ResRef& resRef, unsigned long 
 }
 
 void SaveGameAREExtractor::changeSaveGame(Holder<SaveGame> newSave) {
-	saveGame = newSave;
+	saveGame = std::move(newSave);
 
 	areLocations.clear();
 	newAreLocations.clear();

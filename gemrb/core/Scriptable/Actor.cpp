@@ -8573,9 +8573,8 @@ void Actor::SetSoundFolder(const ieVariable& soundset) const
 	}
 
 	PCStats->SoundFolder = soundset;
-	path_t filepath = PathJoin(core->config.GamePath, "sounds", PCStats->SoundFolder);
 
-	DirectoryIterator dirIt(filepath);
+	DirectoryIterator dirIt(PathJoin(core->config.GamePath, "sounds", PCStats->SoundFolder));
 	dirIt.SetFilterPredicate(std::make_shared<EndsWithFilter>("01"));
 	dirIt.SetFlags(DirectoryIterator::Directories);
 	if (dirIt) {

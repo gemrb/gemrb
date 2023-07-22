@@ -49,8 +49,8 @@ protected:
 	SharedPredicate<PT> pred2;
 public:
 	CompoundPredicate(SharedPredicate<PT> p1, SharedPredicate<PT> p2) {
-		pred1 = p1;
-		pred2 = p2;
+		pred1 = std::move(p1);
+		pred2 = std::move(p2);
 	}
 };
 

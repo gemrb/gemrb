@@ -13483,8 +13483,7 @@ bool GUIScript::Autodetect(void)
 {
 	Log(MESSAGE, "GUIScript", "Detecting GameType.");
 
-	path_t path = PathJoin(core->config.GUIScriptsPath, "GUIScripts");
-	DirectoryIterator iter(path);
+	DirectoryIterator iter(PathJoin(core->config.GUIScriptsPath, "GUIScripts"));
 	if (!iter)
 		return false;
 
