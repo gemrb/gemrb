@@ -4882,7 +4882,7 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 		break;
 	case 1: //chunky death
 		target->LastDamageType |= DAMAGE_CHUNKING;
-		target->NewBase(IE_HITPOINTS, (ieDword) -100, MOD_ABSOLUTE);
+		target->NewBase(IE_HITPOINTS, (Actor::stat_t) -100, MOD_ABSOLUTE);
 		target->Die(Owner);
 		// we also have to remove any party members or their corpses will stay around
 		if (target->InParty) {

@@ -582,14 +582,14 @@ public:
 	/** Returns a Stat Base Value */
 	ieDword GetBase(unsigned int StatIndex) const;
 	/** Sets a Base Stat Value */
-	bool SetBase(unsigned int StatIndex, ieDword Value);
-	bool SetBaseNoPCF(unsigned int StatIndex, ieDword Value);
+	bool SetBase(unsigned int StatIndex, stat_t Value);
+	bool SetBaseNoPCF(unsigned int StatIndex, stat_t Value);
 	/** set/resets a Base Stat bit */
-	bool SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset);
+	bool SetBaseBit(unsigned int StatIndex, stat_t Value, bool setreset);
 	/** Sets the modified value in different ways, returns difference */
-	int NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
+	int NewStat(unsigned int StatIndex, stat_t ModifierValue, ieDword ModifierType);
 	/** Modifies the base stat value in different ways, returns difference */
-	int NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
+	int NewBase(unsigned int StatIndex, stat_t ModifierValue, ieDword ModifierType);
 	void SetLeader(const Actor* actor, int offset = 0);
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small

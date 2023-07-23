@@ -2483,7 +2483,7 @@ ieDword Actor::GetBase(unsigned int StatIndex) const
 
 /** Sets a Stat Base Value */
 /** If required, modify the modified value and run the pcf function */
-bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
+bool Actor::SetBase(unsigned int StatIndex, stat_t Value)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
@@ -2500,7 +2500,7 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	return true;
 }
 
-bool Actor::SetBaseNoPCF(unsigned int StatIndex, ieDword Value)
+bool Actor::SetBaseNoPCF(unsigned int StatIndex, stat_t Value)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
@@ -2517,7 +2517,7 @@ bool Actor::SetBaseNoPCF(unsigned int StatIndex, ieDword Value)
 	return true;
 }
 
-bool Actor::SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset)
+bool Actor::SetBaseBit(unsigned int StatIndex, stat_t Value, bool setreset)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
@@ -2931,7 +2931,7 @@ void Actor::RefreshPCStats() {
 			if (morale < 10) {
 				NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			} else if (morale > 10) {
-				NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+				NewBase(IE_MORALE, (stat_t) -1, MOD_ADDITIVE);
 			}
 		}
 	}
@@ -3283,7 +3283,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 /** implements a generic opcode function, modify modified stats
 returns the change
 */
-int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType)
+int Actor::NewStat(unsigned int StatIndex, stat_t ModifierValue, ieDword ModifierType)
 {
 	int oldmod = Modified[StatIndex];
 
@@ -3338,7 +3338,7 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	return Modified[StatIndex] - oldmod;
 }
 
-int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType)
+int Actor::NewBase(unsigned int StatIndex, stat_t ModifierValue, ieDword ModifierType)
 {
 	int oldmod = BaseStats[StatIndex];
 
@@ -4246,11 +4246,11 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		int newRatio = 100 * (chp + damage) / (signed) BaseStats[IE_MAXHITPOINTS];
 		if (ShouldModifyMorale()) {
 			if (currentRatio > 50 && newRatio < 25) {
-				NewBase(IE_MORALE, (ieDword) -4, MOD_ADDITIVE);
+				NewBase(IE_MORALE, (stat_t) -4, MOD_ADDITIVE);
 			} else if (currentRatio > 50 && newRatio < 50) {
-				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
+				NewBase(IE_MORALE, (stat_t) -2, MOD_ADDITIVE);
 			} else if (currentRatio > 25 && newRatio < 25) {
-				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
+				NewBase(IE_MORALE, (stat_t) -2, MOD_ADDITIVE);
 			}
 		}
 
@@ -4266,7 +4266,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 	// can be negative if we're healing on 100%+ resistance
 	// do this after GetHit, so VB_HURT isn't overriden by VB_DAMAGE, just (dis)played later
 	if (damage != 0) {
-		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+		NewBase(IE_HITPOINTS, (stat_t) -damage, MOD_ADDITIVE);
 		// unstun for that one special stun type
 		// run fx_cure_stun_state instead if it turns out not to be enough
 		if (HasSpellState(SS_AWAKE)) fxqueue.RemoveAllEffectsWithParam(fx_set_stun_state_ref, 1);
@@ -5082,9 +5082,9 @@ void Actor::SendDiedTrigger() const
 		if (!neighbour->ShouldModifyMorale()) continue;
 		int pea = neighbour->GetStat(IE_EA);
 		if (ea == EA_PC && pea == EA_PC) {
-			neighbour->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+			neighbour->NewBase(IE_MORALE, (stat_t) -1, MOD_ADDITIVE);
 		} else if (OfType(this, neighbour)) {
-			neighbour->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+			neighbour->NewBase(IE_MORALE, (stat_t) -1, MOD_ADDITIVE);
 		// are we an enemy of neighbour, regardless if we're good or evil?
 		} else if (abs(ea - pea) > 30) {
 			neighbour->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
@@ -10827,8 +10827,8 @@ int Actor::UpdateAnimationID(bool derived)
 
 		AnimID += tm->QueryFieldSigned<int>(StatID, 0);
 	}
-	if (BaseStats[IE_ANIMATION_ID]!=(unsigned int) AnimID) {
-		SetBase(IE_ANIMATION_ID, (unsigned int) AnimID);
+	if (BaseStats[IE_ANIMATION_ID] != (stat_t) AnimID) {
+		SetBase(IE_ANIMATION_ID, (stat_t) AnimID);
 	}
 	if (!derived) {
 		SetAnimationID(AnimID);
