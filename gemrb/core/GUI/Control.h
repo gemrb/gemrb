@@ -135,7 +135,7 @@ public: // Public attributes
 	/** Type of control */
 	ieByte ControlType = IE_GUI_INVALID;
 
-	static unsigned int ActionRepeatDelay;
+	static tick_t ActionRepeatDelay;
 
 public:
 	explicit Control(const Region& frame);
@@ -161,7 +161,7 @@ public:
 	void SetAction(Responder handler, Action type, EventButton button = 0,
                    Event::EventMods mod = 0, short count = 0);
 	void SetAction(Responder handler, const ActionKey& key = ACTION_DEFAULT) override;
-	void SetActionInterval(unsigned int interval=ActionRepeatDelay);
+	void SetActionInterval(tick_t interval = ActionRepeatDelay);
 
 	bool PerformAction(); // perform default action (left mouse button up)
 	bool PerformAction(const ActionKey&) override;
@@ -216,10 +216,13 @@ protected:
 	
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
 
+	void ClearActionTimer();
+	void StartActionTimer(const ControlEventHandler& action, tick_t delay = 0);
+
 private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
 	// otherwise action fires on input release up only
-	unsigned int repeatDelay = 0;
+	tick_t repeatDelay = 0;
 	std::map<ActionKey, ControlEventHandler> actions;
 	Timer* actionTimer = nullptr;
 
@@ -228,15 +231,12 @@ private:
 	ValueRange range;
 	varname_t VarName;
 	
-	void ClearActionTimer();
-	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 	void HandleTouchActionTimer();
 	
 	virtual BitOp GetDictOp() const noexcept { return BitOp::SET; }
 };
-
 
 }
 
