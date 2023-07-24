@@ -77,7 +77,7 @@ path_t TypeExt(SClass_ID type)
 	const auto extIt = extensions.find(type);
 	if (extIt == extensions.end()) {
 		Log(ERROR, "Interface", "No extension associated to class ID: {}", type);
-		return nullptr;
+		return "";
 	}
 	return extIt->second;
 }
