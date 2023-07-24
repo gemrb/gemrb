@@ -2517,13 +2517,12 @@ void Interface::UpdateWorldMap(const ResRef& wmResRef)
 	WorldMap *wm = worldmap->GetWorldMap(0);
 	WorldMap *nwm = new_worldmap->GetWorldMap(0);
 
-	unsigned int ni;
 	unsigned int ec = wm->GetEntryCount();
 	//update status of the previously existing areas
 	for (unsigned int i = 0; i < ec; i++) {
 		const WMPAreaEntry *ae = wm->GetEntry(i);
-		WMPAreaEntry *nae = nwm->GetArea(ae->AreaResRef, ni);
-		if (nae != NULL) {
+		WMPAreaEntry* nae = nwm->GetArea(ae->AreaResRef);
+		if (nae) {
 			nae->SetAreaStatus(ae->GetAreaStatus(), BitOp::SET);
 		}
 	}

@@ -177,8 +177,7 @@ void WorldMapControl::ScrollTo(const Point& pos)
 
 	if (pos.IsZero()) {
 		// center worldmap on current area
-		size_t entry;
-		const WMPAreaEntry* areaEntry = worldmap->GetArea(currentArea, entry);
+		const WMPAreaEntry* areaEntry = worldmap->GetArea(currentArea);
 		if (areaEntry) {
 			Pos.x = areaEntry->pos.x - frame.w / 2;
 			Pos.y = areaEntry->pos.y - frame.h / 2;

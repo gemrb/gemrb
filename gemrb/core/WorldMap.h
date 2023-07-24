@@ -171,6 +171,8 @@ public:
 	 * also called from WorldMapArray to find the right map	*/
 	WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i);
 	const WMPAreaEntry* GetArea(const ResRef& areaName, size_t& i) const;
+	WMPAreaEntry* GetArea(const ResRef& areaName);
+	const WMPAreaEntry* GetArea(const ResRef& areaName) const;
 	/** Finds an area name closest to the given area */
 	const WMPAreaEntry* FindNearestEntry(const ResRef& areaName, size_t& i) const;
 	void SetEncounterArea(const ResRef& area, const WMPAreaLink *link);

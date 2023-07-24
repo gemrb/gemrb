@@ -2969,9 +2969,8 @@ static PyObject* GemRB_UpdateWorldMap(PyObject * /*self*/, PyObject* args)
 	bool update = true;
 	PARSE_ARGS(args,  "O|O", &wmResRef, &areaResRef);
 
-	if (areaResRef != NULL) {
-		unsigned int i;
-		update = (core->GetWorldMap()->GetArea(ResRefFromPy(areaResRef), i ) == NULL);
+	if (areaResRef != nullptr) {
+		update = core->GetWorldMap()->GetArea(ResRefFromPy(areaResRef)) == nullptr;
 	}
 
 	if (update)

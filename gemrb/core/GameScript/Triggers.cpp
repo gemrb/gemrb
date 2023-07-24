@@ -4723,8 +4723,7 @@ int GameScript::CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/
 int GameScript::IsForcedRandomEncounterActive(Scriptable* /*Sender*/, const Trigger* parameters)
 {
 	WorldMap* worldMap = core->GetWorldMap();
-	unsigned int idx;
-	return worldMap->GetArea(parameters->resref0Parameter, idx) != nullptr;
+	return worldMap->GetArea(parameters->resref0Parameter) != nullptr;
 }
 
 int GameScript::SecretDoorDetected(Scriptable* Sender, const Trigger* parameters)

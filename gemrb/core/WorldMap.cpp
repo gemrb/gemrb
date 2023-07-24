@@ -165,6 +165,18 @@ void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 	MapMOS = std::move(newmos);
 }
 
+WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName)
+{
+	unsigned int i;
+	return GetArea(areaName, i);
+}
+
+const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName) const
+{
+	size_t i;
+	return GetArea(areaName, i);
+}
+
 WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i)
 {
 	unsigned int entryCount = (unsigned int) area_entries.size();
@@ -335,11 +347,8 @@ size_t WorldMap::WhoseLinkAmI(int linkIndex) const
 
 WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B)
 {
-	unsigned int i;
-	const WMPAreaEntry *ae = GetArea(A, i);
-	if (!ae) {
-		return NULL;
-	}
+	const WMPAreaEntry* ae = GetArea(A);
+	if (!ae) return nullptr;
 
 	//looking for destination area, returning the first link found
 	for (WMPDirection dir : EnumIterator<WMPDirection>()) {
@@ -402,8 +411,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 //this entry has two links for each direction, leading to the two areas
 //we were travelling between when using the supplied link
 void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
-	size_t i;
-	if (GetArea(area, i)) {
+	if (GetArea(area)) {
 		return;
 	}
 
@@ -415,7 +423,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 		}
 	}
 
-	i = WhoseLinkAmI(j);
+	size_t i = WhoseLinkAmI(j);
 	if (i == (size_t) -1) {
 		Log(ERROR, "WorldMap", "Could not add encounter area");
 		return;
@@ -494,17 +502,15 @@ int WorldMap::GetDistance(const ResRef& areaName) const
 
 void WorldMap::UpdateAreaVisibility(const ResRef& areaName, WMPDirection direction)
 {
-	unsigned int i;
+	WMPAreaEntry* ae = GetArea(areaName);
+	if (!ae) return;
 
-	WMPAreaEntry* ae = GetArea(areaName, i);
-	if (!ae)
-		return;
 	//we are here, so we visited and it is visible too (i guess)
 	Log(DEBUG, "WorldMap", "Updated Area visibility: {} (visited, accessible and visible)", areaName);
 
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 	if (direction == WMPDirection::NONE) return;
-	i=ae->AreaLinksCount[direction];
+	unsigned int i = ae->AreaLinksCount[direction];
 	while (i--) {
 		const WMPAreaLink& al = area_links[ae->AreaLinksIndex[direction] + i];
 		WMPAreaEntry& ae2 = area_entries[al.AreaIndex];
@@ -517,10 +523,8 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, WMPDirection directi
 
 void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, BitOp Op)
 {
-	unsigned int i;
-	WMPAreaEntry* ae = GetArea(areaName, i);
-	if (!ae)
-		return;
+	WMPAreaEntry* ae = GetArea(areaName);
+	if (!ae) return;
 	ae->SetAreaStatus(Bits, Op);
 }
 
@@ -554,9 +558,8 @@ WorldMapArray::WorldMapArray(size_t count)
 
 size_t WorldMapArray::FindAndSetCurrentMap(const ResRef& area)
 {
-	unsigned int idx;
 	for (size_t i = 0; i < maps.size(); ++i) {
-		if (maps[i].GetArea (area, idx) ) {
+		if (maps[i].GetArea(area)) {
 			CurrentMap = i;
 			return i;
 		}

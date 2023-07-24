@@ -1382,8 +1382,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 		// update the worldmap if needed
 		if (actor->InParty) {
 			WorldMap* worldmap = core->GetWorldMap(area);
-			unsigned int areaindex;
-			WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
+			WMPAreaEntry* entry = worldmap->GetArea(area);
 			// make sure the area is marked as revealed and visited
 			if (entry && !(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
 				entry->SetAreaStatus(WMP_ENTRY_VISIBLE | WMP_ENTRY_VISITED, BitOp::OR);
