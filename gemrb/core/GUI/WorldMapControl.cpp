@@ -52,15 +52,6 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 		currentArea = m->AreaResRef;
 	}
 
-	//if there is no trivial area, look harder
-	if (!worldmap->GetArea(currentArea, (unsigned int &) entry) &&
-		core->HasFeature(GFFlags::FLEXIBLE_WMAP) ) {
-		const WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
-		if (m) {
-			currentArea = m->AreaResRef;
-		}
-	}
-
 	// ensure the current area and any variable triggered additions are
 	// visible immediately and without the need for area travel
 	worldmap->CalculateDistances(currentArea, WMPDirection::NONE);
