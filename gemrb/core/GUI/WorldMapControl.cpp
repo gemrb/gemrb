@@ -93,6 +93,10 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 	std::vector<Point> potentialIndicators;
 	unsigned int ec = worldmap->GetEntryCount();
+	ResRef current = currentArea;
+	const auto nearest = worldmap->FindNearestEntry(currentArea);
+	if (nearest) current = nearest->AreaName;
+
 	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
@@ -111,7 +115,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 			// intro and late-chapter candlekeep share the same entry, so we need to check both names
 			// but bg2 ar1700 has bad data (ar1800), causing two indicators to be displayed, so defer
-			if (areaIndicator && (m->AreaResRef == currentArea || m->AreaName == currentArea)) {
+			if (areaIndicator && (m->AreaResRef == current || m->AreaName == current)) {
 				Point indicatorPos = offset - icon->Frame.origin;
 				indicatorPos.x += areaIndicator->Frame.x + icon->Frame.w / 2 - areaIndicator->Frame.w / 2;
 				// bg2 centered also vertically, while the rest didn't
