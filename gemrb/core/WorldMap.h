@@ -90,7 +90,7 @@ private:
 public:
 	ResRef AreaName;
 	ResRef AreaResRef;
-	ieVariable AreaLongName;
+	ieVariable ScriptName;
 	ieDword IconSeq = 0;
 	Point pos;
 	ieStrRef LocCaptionName = ieStrRef::INVALID;

@@ -2847,7 +2847,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		WMPAreaEntry entry;
 		entry.AreaName = area;
 		entry.AreaResRef = area;
-		entry.AreaLongName = script;
+		entry.ScriptName = script;
 		entry.SetAreaStatus(flags, BitOp::SET);
 		entry.IconSeq = icon;
 		entry.pos.x = locx;

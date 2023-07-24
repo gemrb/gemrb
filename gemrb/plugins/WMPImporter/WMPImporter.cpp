@@ -158,7 +158,7 @@ WMPAreaEntry WMPImporter::GetAreaEntry(DataStream *str) const
 
 	str->ReadResRef(ae.AreaName);
 	str->ReadResRef(ae.AreaResRef);
-	str->ReadVariable(ae.AreaLongName);
+	str->ReadVariable(ae.ScriptName);
 	ieDword tmpDword;
 	str->ReadDword(tmpDword);
 	str->ReadDword(ae.IconSeq);
@@ -290,7 +290,7 @@ int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
 
 		stream->WriteResRefUC(ae->AreaName);
 		stream->WriteResRefUC(ae->AreaResRef);
-		stream->WriteVariableUC(ae->AreaLongName);
+		stream->WriteVariableUC(ae->ScriptName);
 		tmpDword = ae->GetAreaStatus();
 		stream->WriteDword(tmpDword);
 		stream->WriteDword(ae->IconSeq);
