@@ -522,7 +522,7 @@ void WorldMap::UpdateReachableAreas()
 		// 2da rows in format <name> <variable name> <area>
 		// we set the first three flags for <area> if <variable name> is set
 		const std::string& varname = tab->QueryField(idx, 0);
-		if (game->GetLocal(varname, 0)) {
+		if (game->GetGlobal(varname, 0)) {
 			const ResRef areaname = tab->QueryField(idx, 1);
 			SetAreaStatus(areaname, WMP_ENTRY_VISIBLE | WMP_ENTRY_ADJACENT | WMP_ENTRY_ACCESSIBLE, BitOp::OR);
 		}

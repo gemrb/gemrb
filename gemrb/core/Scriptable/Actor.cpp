@@ -2727,7 +2727,7 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 	// but not if pst is playing disguise tricks (GameScript::SetNamelessDisguise)
 	ieDword pst_appearance = 0;
 	if (pstflags) {
-		pst_appearance = game->GetLocal("APPEARANCE", 0);
+		pst_appearance = game->GetGlobal("APPEARANCE", 0);
 	}
 	if (Modified[IE_SEX] != BaseStats[IE_SEX] && pst_appearance == 0) {
 		UpdateAnimationID(true);

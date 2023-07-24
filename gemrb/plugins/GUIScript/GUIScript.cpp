@@ -4348,7 +4348,7 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	StringView lookupVariable = static_cast<StringView>(PyString_AsStringView(Variable));
-	return PyLong_FromLong((unsigned long) game->GetLocal(lookupVariable, 0));
+	return PyLong_FromLong((unsigned long) game->GetGlobal(lookupVariable, 0));
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
@@ -5271,7 +5271,7 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 		game->DeleteJournalEntry(strref);
 	} else {
 		if (chapter == ieDword(-1)) {
-			chapter = game->GetLocal("CHAPTER", -1);
+			chapter = game->GetGlobal("CHAPTER", -1);
 		}
 		game->AddJournalEntry(strref, (ieByte) chapter, (ieByte) section);
 	}

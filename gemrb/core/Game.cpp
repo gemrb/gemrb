@@ -1020,7 +1020,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 			je->Group = group;
 			ieDword chapter = 0;
 			if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-				chapter = GetLocal("CHAPTER", 0);
+				chapter = GetGlobal("CHAPTER", 0);
 			}
 			je->Chapter = (ieByte) chapter;
 			je->GameTime = GameTime;
@@ -1031,7 +1031,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 	je->GameTime = GameTime;
 	ieDword chapter = 0;
 	if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-		chapter = GetLocal("CHAPTER", 0);
+		chapter = GetGlobal("CHAPTER", 0);
 	}
 	je->Chapter = (ieByte) chapter;
 	je->unknown09 = 0;
@@ -1597,8 +1597,8 @@ void Game::PlayerDream() const
 //Start a TextScreen dream for the protagonist
 void Game::TextDream()
 {
-	ieDword chapter = GetLocal("CHAPTER", 0);
-	ieDword dream = GetLocal("DREAM", 1);
+	ieDword chapter = GetGlobal("CHAPTER", 0);
+	ieDword dream = GetGlobal("DREAM", 1);
 	TextScreen.Format("drmtxt{}", dream + 1);
 
 	if ((chapter > dream) && (core->Roll(1, 100, 0) <= 33)

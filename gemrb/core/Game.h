@@ -490,6 +490,8 @@ public:
 	void MovePCs(const ResRef& targetArea, const Point& targetPoint, int orientation) const;
 	void MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int orientation) const;
 	void DumpKaputz() const;
+	// GLOBAL is just the LOCALS of the Game Scriptable, but we want to avoid any confusion
+	ieDword GetGlobal(const ieVariable& key, ieDword fallback) const { return GetLocal(key, fallback); };
 private:
 	bool DetermineStartPosType(const TableMgr* strTable) const;
 	ResRef *GetDream(Map *area);

@@ -2434,7 +2434,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 			count = target->GetCurrentArea()->CountSummons(GA_NO_DEAD, SEX_SUMMON);
 			return DiffCore(count, val, rel);
 		case STI_CHAPTER_CHECK: {
-			ieDword chapter = core->GetGame()->GetLocal("CHAPTER", 0);
+			ieDword chapter = core->GetGame()->GetGlobal("CHAPTER", 0);
 			return DiffCore(chapter, val, rel);
 		}
 		case STI_EVASION:
