@@ -198,22 +198,24 @@ WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i)
 	return nullptr;
 }
 
+// revisit on c++17, where std::as_const can be used in many callers of the non-const version
 const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
 {
-	i=(unsigned int) area_entries.size();
+	unsigned int entryCount = (unsigned int) area_entries.size();
+	i = entryCount;
 	while (i--) {
 		if (areaName == area_entries[i].AreaName) {
 			return &area_entries[i];
 		}
 	}
 	// try also with the original name (needed for centering on Candlekeep)
-	i = (unsigned int) area_entries.size();
+	i = entryCount;
 	while (i--) {
 		if (areaName == area_entries[i].AreaResRef) {
 			return &area_entries[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 //Find Worldmap location by nearest area with a smaller number
