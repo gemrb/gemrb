@@ -291,7 +291,7 @@ String TLKImporter::ResolveTags(const String& source)
 			} else {
 				dest.append(resolvedToken);
 			}
-		} else if (srcch == L'%' && i + 1 < strLen - 1) {
+		} else if (srcch == L'%' && i + 1 <= strLen - 1) {
 			// also resolve format strings
 			// we assume they are % followed by a single character
 			auto nextch = source[i + 1];
