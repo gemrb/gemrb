@@ -2871,8 +2871,8 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			}
 			WMPDirection linktodir = EnumIndex<WMPDirection>(newlinks->QueryFieldUnsigned<under_t<WMPDirection>>(j, 10));
 
-			unsigned int areaindex;
-			const WMPAreaEntry *oarea = wmap->GetArea(larea, areaindex);
+			size_t areaIndex;
+			const WMPAreaEntry* oarea = wmap->GetArea(larea, areaIndex);
 			if (!oarea) {
 				//blabla
 				return RuntimeError("cannot establish area link!");
@@ -2895,9 +2895,9 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			if (j < local && linktodir != WMPDirection::NONE) {
 				link.AreaIndex = newAreaIdx;
 				//linktodir may need translation
-				wmap->InsertAreaLink(areaindex, linktodir, std::move(link));
+				wmap->InsertAreaLink(areaIndex, linktodir, std::move(link));
 			} else {
-				link.AreaIndex = areaindex;
+				link.AreaIndex = static_cast<ieDword>(areaIndex);
 				wmap->AddAreaLink(std::move(link));
 			}
 		}

@@ -120,16 +120,16 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry&& ae)
 	}
 }
 
-void WorldMap::InsertAreaLink(unsigned int areaidx, WMPDirection dir, WMPAreaLink&& arealink)
+void WorldMap::InsertAreaLink(size_t areaIdx, WMPDirection dir, WMPAreaLink&& arealink)
 {
-	ieDword idx = area_entries[areaidx].AreaLinksIndex[dir];
+	ieDword idx = area_entries[areaIdx].AreaLinksIndex[dir];
 	area_links.emplace(area_links.begin()+idx, std::move(arealink));
 
 	size_t max = area_entries.size();
-	for (unsigned int pos = 0; pos < max; pos++) {
+	for (size_t pos = 0; pos < max; pos++) {
 		WMPAreaEntry& ae = area_entries[pos];
 		for (WMPDirection k : EnumIterator<WMPDirection>()) {
-			if ((pos==areaidx) && (k==dir)) {
+			if (pos == areaIdx && k == dir) {
 				ae.AreaLinksCount[k]++;
 				continue;
 			}
@@ -167,7 +167,7 @@ void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 
 WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName)
 {
-	unsigned int i;
+	size_t i;
 	return GetArea(areaName, i);
 }
 
@@ -177,7 +177,7 @@ const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName) const
 	return GetArea(areaName, i);
 }
 
-WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i)
+WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, size_t& i)
 {
 	unsigned int entryCount = (unsigned int) area_entries.size();
 	i = entryCount;

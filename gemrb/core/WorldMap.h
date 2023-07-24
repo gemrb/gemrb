@@ -152,7 +152,7 @@ public:
 	int GetLinkCount() const { return (int) area_links.size(); }
 	const WMPAreaLink *GetLink(unsigned int index) const { return &area_links[index]; }
 	void SetAreaEntry(unsigned int index, WMPAreaEntry&& areaentry);
-	void InsertAreaLink(unsigned int idx, WMPDirection dir, WMPAreaLink&& arealink);
+	void InsertAreaLink(size_t idx, WMPDirection dir, WMPAreaLink&& arealink);
 	void SetAreaLink(unsigned int index, const WMPAreaLink *arealink);
 	void AddAreaEntry(WMPAreaEntry&& ae);
 	void AddAreaLink(WMPAreaLink&& al);
@@ -169,7 +169,7 @@ public:
 	void SetAreaStatus(const ResRef&, int Bits, BitOp Op);
 	/** Gets area pointer and index from area name.
 	 * also called from WorldMapArray to find the right map	*/
-	WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i);
+	WMPAreaEntry* GetArea(const ResRef& areaName, size_t& i);
 	const WMPAreaEntry* GetArea(const ResRef& areaName, size_t& i) const;
 	WMPAreaEntry* GetArea(const ResRef& areaName);
 	const WMPAreaEntry* GetArea(const ResRef& areaName) const;
