@@ -234,7 +234,7 @@ const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, size_t& i) const
 //Counting backwards, stop at 1000 boundaries.
 //It is not possible to simply round to 1000, because there are 
 //WMP entries like AR8001, and we need to find the best match
-const WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, size_t& i) const
+const WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName) const
 {
 	int value = 0;
 	ResRef tmp;
@@ -242,7 +242,7 @@ const WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, size_t& i
 	sscanf(areaName.c_str() + 2, "%4d", &value);
 	do {
 		tmp.Format("{:.2}{:04d}", areaName, value);
-		const WMPAreaEntry* ret = GetArea(tmp, i);
+		const WMPAreaEntry* ret = GetArea(tmp);
 		if (ret) {
 			return ret;
 		}

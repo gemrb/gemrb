@@ -174,7 +174,7 @@ public:
 	WMPAreaEntry* GetArea(const ResRef& areaName);
 	const WMPAreaEntry* GetArea(const ResRef& areaName) const;
 	/** Finds an area name closest to the given area */
-	const WMPAreaEntry* FindNearestEntry(const ResRef& areaName, size_t& i) const;
+	const WMPAreaEntry* FindNearestEntry(const ResRef& areaName) const;
 	void SetEncounterArea(const ResRef& area, const WMPAreaLink *link);
 	void ClearEncounterArea();
 private:
