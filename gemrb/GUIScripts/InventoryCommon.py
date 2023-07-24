@@ -468,7 +468,7 @@ def OpenItemInfoWindow (slot):
 
 	item = GemRB.GetItem (slotItem["ItemResRef"])
 
-	if TryAutoIdentification(pc, item, slot, slotItem, True):
+	if TryAutoIdentification(pc, item, slot, slotItem, True, True):
 		UpdateInventoryWindow ()
 
 	if slotItem["Flags"] & IE_INV_ITEM_IDENTIFIED:
@@ -478,13 +478,66 @@ def OpenItemInfoWindow (slot):
 	DisplayItem (slotItem, value)
 	return
 
-#auto identify when lore is high enough
-def TryAutoIdentification(pc, item, slot, slot_item, enabled=0):
-	if enabled and item["LoreToID"]<=GemRB.GetPlayerStat (pc, IE_LORE):
+# auto identify when lore is high enough
+def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
+	if not enabled or slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
+		return False
+
+	if not GameCheck.IsIWD2 ():
+		# simple logic for other games
+		if item["LoreToID"] <= GemRB.GetPlayerStat (pc, IE_LORE):
+			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+			return True
+		return False
+
+	# iwd2 has extra hidden feedback strings
+	# they're directly usable by the old-style python formatter, however our tokenizer
+	# replaces the specifiers with fmt-compatible {}
+	feedback = feedback and GemRB.GetVar ("EnableRollFeedback")
+	# 1. try general knowledge arcana
+	lore = GemRB.GetPlayerStat (pc, IE_LORE)
+	intBon = GUICommon.GetAbilityBonus(pc, IE_INT) # already included in lore
+	itemIdDC = item["LoreToID"]
+	success = lore >= itemIdDC
+	msgArea = GemRB.GetView ("MsgSys")
+	if success:
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 		slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
-		return True
-	return False
+	# @39263 = ~Failed identify item check! (Knowledge Arcana + Int mod) %d + %d vs. (item's lore) %d~
+	# @39264 = ~Successful identify item check! (Knowledge Arcana + Int mod) %d + %d vs. (item's lore) %d~
+	if feedback:
+		msgArea.Append (GemRB.GetString(39263 + success).format(lore, intBon, itemIdDC) + "\n")
+	if success:
+		return
+
+	# 2. try alchemy for potions
+	if item["Type"] == 9:
+		alchemy = GemRB.GetPlayerStat (pc, IE_ALCHEMY)
+		success = alchemy >= itemIdDC
+		if success:
+			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		# @39261 = ~Successful identify potion check! (Alchemy + Int mod) %d + %d vs. (potion's lore) %d~
+		# @39262 = ~Failed identify potion check! (Alchemy + Int mod) %d + %d vs. (potion's lore) %d~
+		if feedback:
+			msgArea.Append (GemRB.GetString(39262 - success).format(alchemy, intBon, itemIdDC) + "\n")
+		if success:
+			return
+
+	# 3. try bardic lore
+	bardLevel = GemRB.GetPlayerStat (pc, IE_LEVELBARD)
+	if bardLevel > 0:
+		success = (bardLevel + intBon) >= itemIdDC
+		if success:
+			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		# @39259 = ~Failed identify item check! Check Bardic Lore %d vs. item's lore %d (%d Intelligence Ability Mod)~
+		# @39260 = ~Successful identify item check! Check Bardic Lore %d vs. item's lore %d (%d Intelligence Ability Mod)~
+		if feedback:
+			msgArea.Append (GemRB.GetString(39259 + success).format(bardLevel, itemIdDC, intBon) + "\n")
+
+	return success
 
 def OpenGroundItemInfoWindow (btn):
 	global ItemInfoWindow
