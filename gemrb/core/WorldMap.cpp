@@ -167,20 +167,35 @@ void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 
 WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i)
 {
-	i=(unsigned int) area_entries.size();
+	unsigned int entryCount = (unsigned int) area_entries.size();
+	i = entryCount;
 	while (i--) {
 		if (areaName == area_entries[i].AreaName) {
 			return &area_entries[i];
 		}
 	}
 	// try also with the original name (needed for centering on Candlekeep)
-	i = (unsigned int) area_entries.size();
+	i = entryCount;
 	while (i--) {
 		if (areaName == area_entries[i].AreaResRef) {
 			return &area_entries[i];
 		}
 	}
-	return NULL;
+	if (!core->HasFeature(GFFlags::FLEXIBLE_WMAP)) return nullptr;
+
+	// try with rounded down names, which is needed for subareas in iwd2
+	// eg. ar4101 -> ar4100
+	// we take the first lowest area entry available that isn't too different,
+	// otherwise the wrong worldmap could get picked while testing for entry presence
+	i = entryCount;
+	int areaID = atoi(areaName.c_str() + 2);
+	while (i--) {
+		int curID = atoi(area_entries[i].AreaName.c_str() + 2);
+		if (areaID > curID && areaID - curID < 100) {
+			return &area_entries[i];
+		}
+	}
+	return nullptr;
 }
 
 const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
