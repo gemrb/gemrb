@@ -433,9 +433,6 @@ Interface::Interface(CoreSettings&& cfg)
 	projserv = new ProjectileServer();
 
 	Log(MESSAGE, "Core", "Checking for Dialogue Manager...");
-	if (!IsAvailable( IE_TLK_CLASS_ID )) {
-		throw CIE("No TLK Importer Available.");
-	}
 	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	path_t strpath = PathJoin(config.GamePath, "dialog.tlk");
@@ -477,10 +474,6 @@ Interface::Interface(CoreSettings&& cfg)
 	LoadPalette<32>(Palette32, palettes32);
 	LoadPalette<256>(Palette256, palettes256);
 	Log(MESSAGE, "Core", "Palettes loaded.");
-
-	if (!IsAvailable( IE_BAM_CLASS_ID )) {
-		throw CIE("No BAM Importer Available.");
-	}
 
 	Log(MESSAGE, "Core", "Initializing stock sounds...");
 	if (!gamedata->ReadResRefTable(ResRef("defsound"), gamedata->defaultSounds)) {
@@ -1113,14 +1106,16 @@ void Interface::LoadPlugins() const
 		throw CIE("Plugin Loading Failed, check path...");
 	}
 	plugin->RunInitializers(config);
+
+	for (const auto& type : {IE_2DA_CLASS_ID, IE_INI_CLASS_ID, IE_TLK_CLASS_ID, IE_BAM_CLASS_ID}) {
+		if (!IsAvailable(type)) {
+			throw CIE("Missing required plugin for " + TypeExt(type));
+		}
+	}
 }
 
 void Interface::LoadSprites()
 {
-	if (!IsAvailable( IE_2DA_CLASS_ID )) {
-		throw CIE("No 2DA Importer Available.");
-	}
-
 	Log(MESSAGE, "Core", "Loading Cursors...");
 	auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(MainCursorsImage, IE_BAM_CLASS_ID);
 	size_t CursorCount = 0;
@@ -1395,9 +1390,6 @@ void Interface::LoadGemRBINI()
 	Log(MESSAGE, "Core", "Loading game type-specific GemRB setup '{}'",
 		inifile->originalfile);
 
-	if (!IsAvailable( IE_INI_CLASS_ID )) {
-		throw CIE("No INI Importer Available.");
-	}
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
