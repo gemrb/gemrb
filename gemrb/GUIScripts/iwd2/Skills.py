@@ -63,7 +63,7 @@ def RedrawSkills():
 		ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 		if Cost>0:
 			#we use this function to retrieve the string
-			t = GemRB.GetString(SkillName, STRING_FLAGS_RESOLVE_TAGS).format(0, 0)
+			t = GemRB.GetString (SkillName).format(0, 0)
 			Label.SetText("%s (%d)"%(t,Cost) )
 			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 			if PointsLeft < 1 or ActPoint * Cost >= maxSkill:
