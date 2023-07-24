@@ -199,7 +199,7 @@ WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i)
 }
 
 // revisit on c++17, where std::as_const can be used in many callers of the non-const version
-const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
+const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, size_t& i) const
 {
 	unsigned int entryCount = (unsigned int) area_entries.size();
 	i = entryCount;
@@ -222,7 +222,7 @@ const WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) c
 //Counting backwards, stop at 1000 boundaries.
 //It is not possible to simply round to 1000, because there are 
 //WMP entries like AR8001, and we need to find the best match
-const WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned int &i) const
+const WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, size_t& i) const
 {
 	int value = 0;
 	ResRef tmp;
@@ -238,8 +238,7 @@ const WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned 
 		value--;
 	}
 	while (true); //value%1000 should protect us from infinite loops
-	i = -1;
-	return NULL;
+	return nullptr;
 }
 
 //this is a pathfinding algorithm
@@ -253,7 +252,7 @@ int WorldMap::CalculateDistances(const ResRef& areaName, WMPDirection direction)
 		return 0;
 	}
 
-	unsigned int i;
+	size_t i;
 	if (!GetArea(areaName, i)) {
 		Log(ERROR, "WorldMap", "CalculateDistances for invalid Area: {}", areaName);
 		return -1;
@@ -269,7 +268,7 @@ int WorldMap::CalculateDistances(const ResRef& areaName, WMPDirection direction)
 
 	std::vector<int> seen_entry(area_entries.size());
 
-	std::list<int> pending;
+	std::list<size_t> pending;
 	pending.push_back(i);
 	while(!pending.empty()) {
 		i=pending.front();
@@ -315,7 +314,7 @@ int WorldMap::CalculateDistances(const ResRef& areaName, WMPDirection direction)
 }
 
 //returns the index of the area owning this link
-unsigned int WorldMap::WhoseLinkAmI(int link_index) const
+size_t WorldMap::WhoseLinkAmI(int linkIndex) const
 {
 	unsigned int cnt = GetEntryCount();
 	for (unsigned int i = 0; i < cnt; i++) {
@@ -323,15 +322,15 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 		for (WMPDirection direction : EnumIterator<WMPDirection>())
 		{
 			int j=ae.AreaLinksIndex[direction];
-			if (link_index < j) continue;
+			if (linkIndex < j) continue;
 
 			j += ae.AreaLinksCount[direction];
-			if (link_index < j) {
+			if (linkIndex < j) {
 				return i;
 			}
 		}
 	}
-	return (ieDword) -1;
+	return (size_t) -1;
 }
 
 WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B)
@@ -363,7 +362,7 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B)
 //if it isn't the same, then a random encounter happened!
 WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 {
-	unsigned int i;
+	size_t i;
 	const WMPAreaEntry *ae = GetArea(areaName, i); //target area
 	if (!ae) {
 		Log(ERROR, "WorldMap", "No such area: {}", areaName);
@@ -375,7 +374,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 		Log(DEBUG, "WorldMap", "Adding path to {}", i);
 		walkpath.push_back(&area_links[GotHereFrom[i]]);
 		i = WhoseLinkAmI(GotHereFrom[i]);
-		if (i==(ieDword) -1) {
+		if (i == (size_t) -1) {
 			error("WorldMap", "Something has been screwed up here (incorrect path)!");
 		}
 	}
@@ -403,7 +402,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 //this entry has two links for each direction, leading to the two areas
 //we were travelling between when using the supplied link
 void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
-	unsigned int i;
+	size_t i;
 	if (GetArea(area, i)) {
 		return;
 	}
@@ -417,7 +416,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	}
 
 	i = WhoseLinkAmI(j);
-	if (i == (unsigned int) -1) {
+	if (i == (size_t) -1) {
 		Log(ERROR, "WorldMap", "Could not add encounter area");
 		return;
 	}
@@ -486,7 +485,7 @@ void WorldMap::ClearEncounterArea()
 
 int WorldMap::GetDistance(const ResRef& areaName) const
 {
-	unsigned int i;
+	size_t i;
 	if (GetArea(areaName, i)) {
 		return Distances[i];
 	}

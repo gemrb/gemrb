@@ -170,9 +170,9 @@ public:
 	/** Gets area pointer and index from area name.
 	 * also called from WorldMapArray to find the right map	*/
 	WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i);
-	const WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i) const;
+	const WMPAreaEntry* GetArea(const ResRef& areaName, size_t& i) const;
 	/** Finds an area name closest to the given area */
-	const WMPAreaEntry* FindNearestEntry(const ResRef& areaName, unsigned int &i) const;
+	const WMPAreaEntry* FindNearestEntry(const ResRef& areaName, size_t& i) const;
 	void SetEncounterArea(const ResRef& area, const WMPAreaLink *link);
 	void ClearEncounterArea();
 private:
@@ -180,7 +180,7 @@ private:
 	void UpdateAreaVisibility(const ResRef& areaName, WMPDirection direction);
 	/** internal function to calculate the distances from areaindex */
 	void CalculateDistance(int areaindex, int direction);
-	unsigned int WhoseLinkAmI(int link_index) const;
+	size_t WhoseLinkAmI(int linkIndex) const;
 	/** update reachable areas from worlde.2da */
 	void UpdateReachableAreas();
 };
