@@ -60,7 +60,11 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 			currentArea = m->AreaResRef;
 		}
 	}
-		
+
+	// ensure the current area and any variable triggered additions are
+	// visible immediately and without the need for area travel
+	worldmap->CalculateDistances(currentArea, WMPDirection::NONE);
+
 	ControlEventHandler handler = [this](const Control* /*this*/) {
 		//this also updates visible locations
 		WorldMap* map = core->GetWorldMap();

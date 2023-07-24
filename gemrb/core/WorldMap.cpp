@@ -487,6 +487,7 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, WMPDirection directi
 	Log(DEBUG, "WorldMap", "Updated Area visibility: {} (visited, accessible and visible)", areaName);
 
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BitOp::OR);
+	if (direction == WMPDirection::NONE) return;
 	i=ae->AreaLinksCount[direction];
 	while (i--) {
 		const WMPAreaLink& al = area_links[ae->AreaLinksIndex[direction] + i];
