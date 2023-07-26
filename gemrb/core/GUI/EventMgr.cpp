@@ -174,12 +174,9 @@ void EventMgr::DispatchEvent(Event&& e) const
 		flags |= e.keyboard.keycode;
 		modKeys = e.mod;
 
-		KeyMap::const_iterator hit = HotKeys.find(flags);
-		if (hit != HotKeys.end()) {
-			assert(!hit->second.empty());
-			KeyMap::value_type::second_type list = hit->second;
-			EventCallback cb = hit->second.front();
-			if (cb(e)) {
+		const auto& range = HotKeys.equal_range(flags);
+		for (auto it = range.first; it != range.second; ++it) {
+			if (it->second(e)) {
 				return;
 			}
 		}
@@ -283,13 +280,7 @@ bool EventMgr::RegisterHotKeyCallback(const EventCallback& cb, KeyboardKey key, 
 	int flags = mod << 16;
 	flags |= key;
 
-	KeyMap::iterator it = HotKeys.find(flags);
-	if (it != HotKeys.end()) {
-		it->second.push_front(cb);
-	} else {
-		HotKeys.emplace(flags, std::list<EventCallback>(1, cb));
-	}
-
+	HotKeys.emplace(flags, cb);
 	return true;
 }
 
@@ -298,17 +289,12 @@ void EventMgr::UnRegisterHotKeyCallback(const EventCallback& cb, KeyboardKey key
 	int flags = mod << 16;
 	flags |= key;
 
-	KeyMap::iterator it = HotKeys.find(flags);
-	if (it != HotKeys.end()) {
-		KeyMap::value_type::second_type::iterator cbit;
-		cbit = std::find_if(it->second.begin(), it->second.end(), [&cb](decltype(cb)& item) {
-			return FunctionTargetsEqual(cb, item);
-		});
-		if (cbit != it->second.end()) {
-			it->second.erase(cbit);
-			if (it->second.empty()) {
-				HotKeys.erase(it);
-			}
+	const auto& range = HotKeys.equal_range(flags);
+	for (auto item = range.first; item != range.second;) {
+		if (FunctionTargetsEqual(cb, item->second)) {
+			item = HotKeys.erase(item);
+		} else {
+			++item;
 		}
 	}
 }

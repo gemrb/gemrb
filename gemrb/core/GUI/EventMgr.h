@@ -39,7 +39,6 @@
 #include <bitset>
 #include <climits>
 #include <cstdint>
-#include <list>
 #include <map>
 #include <vector>
 
@@ -299,7 +298,7 @@ private:
 	// currently the delays are static so it makes sense for now that the HotKeys are...
 	// map combination of keyboard key and modifier keys to a callback
 	using EventTaps = std::map<TapMonitorId, std::pair<Event::EventTypeMask, EventCallback>>;
-	using KeyMap = std::map<int, std::list<EventCallback>>;
+	using KeyMap = std::multimap<int, EventCallback>;
 
 	static EventTaps Taps;
 	static KeyMap HotKeys;
