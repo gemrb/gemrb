@@ -24,7 +24,7 @@ import GemRB
 import CommonWindow
 import GameCheck
 import GUICommon
-import GUICommonWindows
+import PortraitWindow
 from GUIDefines import *
 from ie_stats import *
 
@@ -80,7 +80,7 @@ def UpdateReformWindow (Window, select):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		Button.SetPicture (pic, "NOPORTSM")
-	GUICommonWindows.UpdatePortraitWindow ()
+	PortraitWindow.UpdatePortraitWindow()
 	return
 
 def RemovePlayer (select):
