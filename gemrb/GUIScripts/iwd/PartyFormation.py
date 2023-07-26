@@ -55,11 +55,11 @@ def OnLoad ():
 		#removing this label, it just disturbs us
 		Label.SetSize (0, 0)
 		Button = PartyFormationWindow.GetControl (i-12)
-		ResRef = GemRB.GetPlayerPortrait (i-17, 1)["ResRef"]
-		if ResRef == "":
+		portrait = GemRB.GetPlayerPortrait (i-17, 1)
+		if portrait is None:
 			Button.SetFlags (IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
-			Button.SetPicture (ResRef, "NOPORTSM")
+			Button.SetPicture (portrait["ResRef"], "NOPORTSM")
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			Portraits = Portraits+1
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -69,7 +69,7 @@ def OnLoad ():
 		CreateCharButton.OnPress (CreateCharPress)
 		CreateCharButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 		CreateCharButton.SetFont ("NORMAL")
-		if ResRef == "":
+		if portrait is None:
 			CreateCharButton.SetText (10264)
 		else:
 			CreateCharButton.SetText (GemRB.GetPlayerName (i-17,0) )

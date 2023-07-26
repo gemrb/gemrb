@@ -94,8 +94,8 @@ def UpdatePortraitButton(Button):
 	"""Selects the correct portrait cycle depending on character state"""
 	# note: there are actually two portraits per chr, eg PPPANN (static), WMPANN (animated)
 	pcID = Button.ControlID + 1
-	pic = GemRB.GetPlayerPortrait (pcID, 0)["ResRef"]
-	if not pic:
+	portrait = GemRB.GetPlayerPortrait (pcID, 0)
+	if not portrait:
 		Button.SetVisible (False)
 		return
 
@@ -123,7 +123,7 @@ def UpdatePortraitButton(Button):
 	if cycle < 6:
 		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
 
-	Button.SetAnimation (pic, cycle)
+	Button.SetAnimation(portrait["ResRef"], cycle)
 
 	if hp_max < 1 or hp == "?":
 		ratio = 0.0

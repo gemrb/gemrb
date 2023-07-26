@@ -72,14 +72,13 @@ def UpdateReformWindow (Window, select):
 		Button = PortraitButtons[idx]
 		Button.EnableBorder (FRAME_PC_SELECTED, select == i)
 		portrait = GemRB.GetPlayerPortrait (i, 1)
-		pic = portrait["Sprite"]
-		if not pic and not portrait["ResRef"]:
+		if not portrait:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			continue
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
-		Button.SetPicture (pic, "NOPORTSM")
+		Button.SetPicture (portrait["Sprite"], "NOPORTSM")
 	PortraitWindow.UpdatePortraitWindow()
 	return
 

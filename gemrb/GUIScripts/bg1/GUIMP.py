@@ -48,11 +48,11 @@ def OnLoad():
 		#removing this label, it just disturbs us
 		Label.SetSize(0, 0)
 		Button = PartyFormationWindow.GetControl(i-12)
-		ResRef = GemRB.GetPlayerPortrait (i-17, 1)["ResRef"]
-		if ResRef == "":
+		portrait = GemRB.GetPlayerPortrait (i-17, 1)
+		if portrait is None:
 			Button.SetFlags(IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
-			Button.SetPicture(ResRef)
+			Button.SetPicture(portrait["ResRef"])
 			Button.SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR)
 			Portraits = Portraits+1
 
@@ -61,7 +61,7 @@ def OnLoad():
 
 		Button = PartyFormationWindow.GetControl(i)
 		Button.SetVarAssoc("Slot",i-17)
-		if ResRef == "":
+		if portrait is None:
 			Button.SetText(10264)
 		else:
 			Button.SetText(GemRB.GetPlayerName(i-17,0) )
@@ -107,8 +107,8 @@ def ExitCancelPress():
 def GeneratePress():
 	global PartyFormationWindow
 	slot = GemRB.GetVar("Slot")
-	ResRef = GemRB.GetPlayerPortrait (slot, 0)["ResRef"]
-	if ResRef:
+	portrait = GemRB.GetPlayerPortrait (slot, 0)
+	if portrait:
 		print("Already existing slot, we should drop it")
 	if PartyFormationWindow:
 		PartyFormationWindow.Close ()
