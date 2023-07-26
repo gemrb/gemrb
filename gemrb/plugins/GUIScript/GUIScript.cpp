@@ -6028,7 +6028,7 @@ new character you must use FillPlayerInfo().\n\
   * Slot         - the PC's position in the party\n\
   * SmallOrLarge - boolean, specify 1 if you want to get the large portrait\n\
 \n\
-**Return value:** dict\n\
+**Return value:** dict or None\n\
   * Sprite - the player's portrait (image)\n\
   * ResRef - the portrait's name (image resref)\n\
 \n\
@@ -6053,7 +6053,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 		Py_DecRef(pystr);
 		return dict;
 	} else {
-		return Py_BuildValue("{s:O,s:s}", "Sprite", Py_None, "ResRef", "");
+		Py_RETURN_NONE;
 	}
 }
 

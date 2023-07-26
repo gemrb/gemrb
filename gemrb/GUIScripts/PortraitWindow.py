@@ -278,18 +278,17 @@ def UpdatePortraitWindow ():
 			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
 
 		Portrait = GemRB.GetPlayerPortrait (pcID, 1)
-		pic = Portrait["Sprite"]
 		Hide = False
 		if Inventory and pc != pcID:
 			Hide = True
 
-		if pic and GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD:
+		if Portrait and GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD:
 			import GUISTORE
 			# dead pcs are hidden in all stores but temples
 			if GUISTORE.StoreWindow and not GUISTORE.StoreHealWindow:
 				Hide = True
 
-		if Hide or (not pic and not Portrait["ResRef"]):
+		if Hide or not Portrait:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetText ("")
@@ -300,9 +299,7 @@ def UpdatePortraitWindow ():
 		Button.SetFlags (portraitFlags, OP_SET)
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		if pic == None:
-			pic = ""
-		Button.SetPicture (pic, "NOPORTSM")
+		Button.SetPicture (Portrait["Sprite"], "NOPORTSM")
 		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 
 		# character - 1 == bam cycle, sometimes
