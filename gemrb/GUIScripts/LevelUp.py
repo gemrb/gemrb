@@ -486,7 +486,7 @@ def LevelUpDonePress():
 	"""Updates the PC with the new choices.
 
 	Closes the window when finished."""
-	import GUICommonWindows
+	import PortraitWindow
 	import GUIREC
 
 	# proficiencies
@@ -521,7 +521,7 @@ def LevelUpDonePress():
 
 	if LevelUpWindow:
 		LevelUpWindow.Close()
-	GUICommonWindows.UpdatePortraitWindow ()
+	PortraitWindow.UpdatePortraitWindow ()
 	return
 
 def LevelUpHLAPress ():
