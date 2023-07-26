@@ -1500,7 +1500,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	oldSlotCount = 6 + ExtraSlots
 
 	for i in range(min(oldSlotCount, MAX_PARTY_SIZE + ExtraSlots)): # the default chu/game limit or less
-		pairs[i] = Window.GetControl (i)
+		pairs[i] = Window.GetControl(i)
 
 	# nothing left to do
 	PartySize = GemRB.GetPartySize ()
@@ -1726,9 +1726,10 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.items():
 		pcID = i + 1
-		
+
 		Button.SetVarAssoc("portrait", pcID)
-		
+		Button.SetHotKey(chr(ord('1') + i), 0, True)
+
 		if not GameCheck.IsPST():
 			Button.SetFont (StatesFont)
 
@@ -1761,18 +1762,13 @@ def UpdatePortraitWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")
 	GSFlags = GemRB.GetGUIFlags()
-	indialog = GSFlags & GS_DIALOG
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.items():
 		pcID = i + 1
-		if indialog:
-			Button.SetHotKey(None)
 		if (pcID <= GemRB.GetPartySize()):
 			Button.SetAction(lambda btn, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER);
 			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
-			if (i < 6 and not indialog):
-				Button.SetHotKey(chr(ord('1') + i), 0, True)
 
 		if GameCheck.IsPST():
 			UpdateAnimatedPortrait(Window, i)

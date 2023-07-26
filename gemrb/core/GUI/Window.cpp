@@ -246,6 +246,11 @@ bool Window::IsDisabledCursor() const
 	return isDisabled;
 }
 
+bool Window::IsReceivingEvents() const
+{
+	return !IsDisabled();
+}
+
 void Window::SetPosition(WindowPosition pos)
 {
 	// start at top left
