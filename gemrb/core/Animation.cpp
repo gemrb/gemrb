@@ -156,11 +156,6 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 	return ret;
 }
 
-
-void Animation::release(void)
-{
-	delete this;
-}
 /** Gets the i-th frame */
 Animation::frame_t Animation::GetFrame(index_t i) const
 {

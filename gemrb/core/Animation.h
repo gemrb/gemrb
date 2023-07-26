@@ -60,7 +60,6 @@ public:
 	frame_t LastFrame();
 	frame_t NextFrame();
 	frame_t GetSyncedNextFrame(const Animation* master);
-	void release(void);
 	/** Gets the i-th frame */
 	frame_t GetFrame(index_t i) const;
 
