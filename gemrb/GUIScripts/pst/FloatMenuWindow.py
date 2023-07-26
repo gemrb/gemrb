@@ -107,9 +107,10 @@ def OpenFloatMenuWindow (x=0, y=0):
 	global FloatMenuWindow
 	global float_menu_mode, float_menu_index, float_menu_selected
 
+	handler = GUICommonWindows.SelectionChangeHandler
 	def OnClose():
 		GemRB.GamePause (False, 0)
-		GUICommonWindows.SetSelectionChangeMultiHandler (None)
+		GUICommonWindows.SetSelectionChangeHandler (handler)
 
 		if float_menu_selected==None:
 			return
@@ -233,7 +234,12 @@ def OpenFloatMenuWindow (x=0, y=0):
 
 	float_menu_index = 0
 
-	GUICommonWindows.SetSelectionChangeMultiHandler (FloatMenuSelectAnotherPC)
+	def SelChange():
+		FloatMenuSelectAnotherPC()
+		if handler:
+			handler()
+
+	GUICommonWindows.SetSelectionChangeHandler (SelChange)
 	UpdateFloatMenuWindow ()
 
 	return
