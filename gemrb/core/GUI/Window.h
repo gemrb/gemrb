@@ -142,7 +142,7 @@ public:
 	String TooltipText() const override;
 	Holder<Sprite2D> Cursor() const override;
 	bool IsDisabledCursor() const override;
-	bool IsReceivingEvents() const override { return true; }
+	bool IsReceivingEvents() const override;
 
 	const VideoBufferPtr& DrawWithoutComposition();
 	void RedrawControls(const Control::varname_t& VarName) const;
