@@ -66,8 +66,6 @@ public:
 	void MirrorAnimation(BlitFlags flags);
 	/** sets frame index */
 	void SetFrame(index_t index);
-	/** Sets ScriptName for area animation */
-	void SetScriptName(const char *name);
 	/** returns the frame count */
 	index_t GetFrameCount() const { return frames.size(); }
 	/** returns the current frame's index */
