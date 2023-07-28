@@ -37,10 +37,8 @@ namespace GemRB {
 using LogMessage = Logger::LogMessage;
 
 static std::atomic<log_level> CWLL;
-
-std::deque<Logger::WriterPtr> writers;
-
-std::unique_ptr<Logger> logger;
+static std::deque<Logger::WriterPtr> writers;
+static std::unique_ptr<Logger> logger;
 
 void ToggleLogging(bool enable)
 {
