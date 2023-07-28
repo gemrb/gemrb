@@ -19,6 +19,7 @@
 #include "Logging/Loggers/Stdio.h"
 
 #include "EnumIndex.h"
+#include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 
 #include <cstdio>
@@ -133,6 +134,39 @@ Logger::WriterPtr createStdioLogWriter(ANSIColor color)
 {
 	int fd = dup(fileno(stdout));
 	return createStreamLogWriter(fdopen(fd, "w"), color);
+}
+
+Logger::WriterPtr createStdioLogWriter()
+{
+	// see https://no-color.org
+	const char* nocolor = getenv("NO_COLOR");
+	if (nocolor && nocolor[0] != '\0') {
+		return createStdioLogWriter(ANSIColor::None);
+	}
+
+	ANSIColor color = ANSIColor::None;
+#ifdef WIN32
+	color = ANSIColor::Basic;
+#if defined(VER_PRODUCTBUILD) && VER_PRODUCTBUILD >= 8100
+	if (IsWindows10OrGreater()) { // FIXME: this isnt exactly right, true color support was added in 1703
+		color = ANSIColor::True;
+	}
+#endif
+#elif defined(HAVE_UNISTD_H)
+	if (isatty(STDOUT_FILENO)) {
+		color = ANSIColor::Basic;
+		// this COLORTERM detection is not comprehensive. Not all terminal emulators will follow this standard
+		// we can add known offenders to a list and check with TERM, (or they use the --color switch)
+		const char* colorterm = getenv("COLORTERM");
+		if (colorterm && (stricmp(colorterm, "truecolor") == 0 || stricmp(colorterm, "24bit") == 0)) {
+			color = ANSIColor::True;
+		}
+
+		Log(DEBUG, "Logging", "Using colorized terminal output: {}\nDetermined from COLORTERM={}", fmt::underlying(color), colorterm);
+	}
+#endif
+
+	return createStdioLogWriter(color);
 }
 
 Logger::WriterPtr createStreamLogWriter(FILE* stream)

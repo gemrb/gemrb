@@ -48,7 +48,8 @@ private:
 	FILE* stream;
 };
 
-GEM_EXPORT Logger::WriterPtr createStdioLogWriter(ANSIColor = ANSIColor::None);
+GEM_EXPORT Logger::WriterPtr createStdioLogWriter(ANSIColor);
+GEM_EXPORT Logger::WriterPtr createStdioLogWriter();
 GEM_EXPORT Logger::WriterPtr createStreamLogWriter(FILE*);
 
 }
