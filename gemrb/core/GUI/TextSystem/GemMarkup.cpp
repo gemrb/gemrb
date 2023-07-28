@@ -18,14 +18,52 @@
 
 #include "GemMarkup.h"
 
-#include <cwchar>
+#include <codecvt>
 
 namespace GemRB {
 
 static Color ParseColor(const String& colorString)
 {
 	Color color = ColorWhite;
-	swscanf(colorString.c_str(), L"%02hhx%02hhx%02hhx%02hhx", &color.r, &color.g, &color.b, &color.a);
+	uint8_t values[4] = {0, 0, 0, 0};
+
+	// That's a short way to interpret 4 groups of %02hhx,
+	// since `swscanf` does not work on our string type unless converting first
+	for (uint8_t i = 0; i < 4; ++i) {
+		uint8_t value = 0;
+
+		for (uint8_t j = 0; j < 2; ++j) {
+			uint8_t nibble = 0;
+			switch (colorString[i * 2 + j]) {
+				case u'0': nibble = 0x0; break;
+				case u'1': nibble = 0x1; break;
+				case u'2': nibble = 0x2; break;
+				case u'3': nibble = 0x3; break;
+				case u'4': nibble = 0x4; break;
+				case u'5': nibble = 0x5; break;
+				case u'6': nibble = 0x6; break;
+				case u'7': nibble = 0x7; break;
+				case u'8': nibble = 0x8; break;
+				case u'9': nibble = 0x9; break;
+				case u'a': case u'A': nibble = 0xA; break;
+				case u'b': case u'B': nibble = 0xB; break;
+				case u'c': case u'C': nibble = 0xC; break;
+				case u'd': case u'D': nibble = 0xD; break;
+				case u'e': case u'E': nibble = 0xE; break;
+				case u'f': case u'F': nibble = 0xF; break;
+			}
+
+			value |= (nibble << (4 * (1 - j)));
+		}
+
+		values[i] = value;
+	}
+
+	color.r = values[0];
+	color.g = values[1];
+	color.b = values[2];
+	color.a = values[3];
+
 	return color;
 }
 
@@ -85,10 +123,10 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 			case OPEN_TAG:
 				switch (*it) {
 					case '=':
-						if (token == L"color") {
+						if (token == u"color") {
 							state = COLOR;
 							token.clear();
-						} else if (token == L"int") {
+						} else if (token == u"int") {
 							state = INT;
 							token.clear();
 						}
@@ -96,17 +134,17 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						continue;
 					case ']':
 						state = TEXT;
-						if (token == L"cap") {
+						if (token == u"cap") {
 							attributes.SwapFonts();
 							//align = IE_FONT_SINGLE_LINE;
-						} else if (token == L"p") {
+						} else if (token == u"p") {
 							frame.w = -1;
 						}
 						token.clear();
 						continue;
 					case '[': // wasn't actually a tag after all
 						state = TEXT;
-						token.insert((String::size_type) 0, 1, L'[');
+						token.insert((String::size_type) 0, 1, u'[');
 						--it; // rewind so the TEXT node is created
 						continue;
 				}
@@ -114,12 +152,12 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 			case CLOSE_TAG:
 				switch (*it) {
 					case ']':
-						if (token == L"color") {
+						if (token == u"color") {
 							context.pop();
-						} else if (token == L"cap") {
+						} else if (token == u"cap") {
 							attributes.SwapFonts();
 							//align = 0;
-						} else if (token == L"p") {
+						} else if (token == u"p") {
 							frame.w = 0;
 						}
 						state = TEXT;
@@ -144,7 +182,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						
 						token = saved + token;
 						saved.clear();
-						if (token.length() && token != L"\n") {
+						if (token.length() && token != u"\n") {
 							// FIXME: lazy hack.
 							// we ought to ignore all white space between markup unless it contains other text
 							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextColor(), &frame));
@@ -155,7 +193,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 				break;
 			case COLOR:
 				switch (*it) {
-					case L']':
+					case u']':
 						context.emplace(attributes);
 						context.top().SetTextColor({ParseColor(token), textBg});
 						state = TEXT;
@@ -164,9 +202,14 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 				}
 				break;
 			case INT:
-				if (*it == L']') {
+				if (*it == u']') {
+					std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> conv;
+					std::wstring wToken = conv.from_bytes(
+						reinterpret_cast<const char*>(&token[0]),
+						reinterpret_cast<const char*>(&token[0] + token.size())
+					);
 					// state icons, invalid as unicode, so we cant translate in Python
-					wchar_t chr = (wchar_t)wcstoul(token.c_str(), nullptr, 0);
+					wchar_t chr = (wchar_t)wcstoul(wToken.c_str(), nullptr, 0);
 					token.clear();
 					token.push_back(chr);
 					state = TEXT;

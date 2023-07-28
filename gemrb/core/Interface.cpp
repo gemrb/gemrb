@@ -946,7 +946,7 @@ void Interface::Main()
 	const Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	Region fpsRgn(0, config.Height - 30, 80, 30);
-	String fpsstring = L"???.??? fps";
+	String fpsstring = u"???.??? fps";
 	// set for printing
 	fpsRgn.x = 5;
 	fpsRgn.y = 0;
@@ -1000,7 +1000,7 @@ void Interface::Main()
 				frames = ( frame * 1000.0 / ( time - timebase ) );
 				timebase = time;
 				frame = 0;
-				fpsstring = fmt::format(L"{:.3f} fps", frames);
+				fpsstring = fmt::format(u"{:.3f} fps", frames);
 			}
 			auto lock = winmgr->DrawHUD();
 			VideoDriver->DrawRect( fpsRgn, ColorBlack );
@@ -1852,7 +1852,7 @@ Tooltip Interface::CreateTooltip() const
 	if (TooltipBG) {
 		bg = new TooltipBackground(*TooltipBG);
 	}
-	return Tooltip(L"", GetFont(TooltipFontResRef), colors, bg);
+	return Tooltip(u"", GetFont(TooltipFontResRef), colors, bg);
 }
 
 /** Get the Save game manager */

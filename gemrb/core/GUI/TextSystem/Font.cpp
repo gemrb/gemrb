@@ -270,7 +270,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 		if (lineBreak) {
 			lineBreak = false;
 		} else {
-			size_t eolpos = string.find_first_of(L'\n', stringPos);
+			size_t eolpos = string.find_first_of(u'\n', stringPos);
 			if (eolpos == String::npos) {
 				eolpos = string.length();
 			} else {
@@ -332,7 +332,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 						while (linePoint.x < 0) {
 							// yuck, this is not optimal. not sure of a better way.
 							// we have to rewind, word by word, until X >= 0
-							linePos = line.find_last_of(L' ', prevPos);
+							linePos = line.find_last_of(u' ', prevPos);
 							if (linePos == String::npos) {
 								if (InDebugMode(DebugMode::FONTS)) {
 									Log(MESSAGE, "Font", "Horizontal alignment invalidated for '{}' due to insufficient width {}", fmt::WideToChar{line}, lineSize.w);
@@ -397,7 +397,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 
 	if (point) {
 		// deal with possible trailing newline
-		if (charCount > 0 && string[charCount - 1] == L'\n') {
+		if (charCount > 0 && string[charCount - 1] == u'\n') {
 			dp.y += LineHeight;
 		}
 		*point = Point(dp.x, dp.y - LineHeight);
@@ -426,10 +426,10 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 	// not as simple as adding it to find_first_of
 	bool done = false;
 	do {
-		wordBreak = line.find_first_of(L' ', linePos);
+		wordBreak = line.find_first_of(u' ', linePos);
 		String word;
 		if (wordBreak == linePos) {
-			word = L' ';
+			word = u' ';
 		} else {
 			word = line.substr(linePos, wordBreak - linePos);
 		}
@@ -446,12 +446,12 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 		}
 
 		// print the word
-		wchar_t currChar = '\0';
+		char16_t currChar = u'\0';
 		size_t i = 0;
 		for (; i < word.length(); i++) {
 			// process glyphs in word
 			currChar = word[i];
-			if (currChar == '\r' || currChar == '\n') {
+			if (currChar == u'\r' || currChar == u'\n') {
 				continue;
 			}
 			if (i > 0) { // kerning
@@ -617,7 +617,7 @@ size_t Font::StringSizeWidth(const String& string, size_t width, size_t* numChar
 	size_t length = string.length();
 	for (; i < length; ++i) {
 		wchar_t c = string[i];
-		if (c == L'\n') {
+		if (c == u'\n') {
 			break;
 		}
 
@@ -678,11 +678,11 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 			if (WILL_WRAP(spaceW + wordW)) {
 				newline = true;
 			} else {
-				if (string[i] == L'\n') {
+				if (string[i] == u'\n') {
 					// always append *everything* if there is \n
 					lineW += spaceW; // everything else appended later
 					newline = true;
-				} else if (ws && string[i] != L'\r') {
+				} else if (ws && string[i] != u'\r') {
 					spaceW += curGlyph.size.w;
 				}
 				APPEND_TO_LINE(wordW);

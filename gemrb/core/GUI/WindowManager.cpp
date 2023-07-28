@@ -552,7 +552,7 @@ void WindowManager::DrawTooltip(Point pos) const
 
 		tooltip.tt.Draw(pos);
 	} else {
-		tooltip.tt.SetText(L"");
+		tooltip.tt.SetText(u"");
 	}
 }
 

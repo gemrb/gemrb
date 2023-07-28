@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+GEM_EXPORT bool IsBigEndian();
 GEM_EXPORT void swab_const(const void *bfrom, void *bto, long n);
 GEM_EXPORT void swabs(void *buf, long n);
 

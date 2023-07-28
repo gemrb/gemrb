@@ -74,7 +74,7 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 	}
 
 	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], ieByte(tr->Flags >> 16))) {
-		String msg(L"\n[color=bcefbc]");
+		String msg(u"\n[color=bcefbc]");
 		ieStrRef strJournalChange = DisplayMessage::GetStringReference(HCStrings::JournalChange);
 		msg += core->GetString(strJournalChange);
 		String str = core->GetString(tr->journalStrRef);
@@ -84,9 +84,9 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 			if (newlinePos != String::npos) {
 				str.resize( newlinePos );
 			}
-			msg += L" - [/color][p][color=ffd4a9]" + str + L"[/color][/p]";
+			msg += u" - [/color][p][color=ffd4a9]" + str + u"[/color][/p]";
 		} else {
-			msg += L"[/color]\n";
+			msg += u"[/color]\n";
 		}
 		if (core->HasFeedback(FT_MISC)) {
 			if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
@@ -348,7 +348,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		UpdateJournalForTransition(tr);
 		if (tr->textStrRef != ieStrRef::INVALID) {
 			//allow_zero is for PST (deionarra's text)
-			ta->AppendText(L"\n");
+			ta->AppendText(u"\n");
 			displaymsg->DisplayStringName( tr->textStrRef, GUIColors::DIALOGPARTY, speaker, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::ALLOW_ZERO);
 		}
 		target->ImmediateEvent();
@@ -378,7 +378,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		if (tr->Flags & IE_DLG_TR_FINAL) {
 			if (!tr->actions.empty()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, BitOp::OR);
 			EndDialog();
-			ta->AppendText(L"\n");
+			ta->AppendText(u"\n");
 			return false;
 		}
 
@@ -456,7 +456,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		// displaying npc text and portrait
 		Holder<Sprite2D> portrait = tgta->CopyPortrait(1);
 		ta->SetSpeakerPicture(std::move(portrait));
-		ta->AppendText(L"\n");
+		ta->AppendText(u"\n");
 		displaymsg->DisplayStringName( ds->StrRef, GUIColors::DIALOG, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	}
 

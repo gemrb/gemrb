@@ -620,7 +620,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		if (!(DialogueFlags & DF_FREEZE_SCRIPTS)) {
 			// just replicating original engine behaviour
 			if (DisplayTextTime == 0) {
-				SetDisplayText(L"", 0);
+				SetDisplayText(u"", 0);
 			} else {
 				DisplayTextTime--;
 			}
@@ -1118,15 +1118,15 @@ String GameControl::TooltipText() const {
 
 	if (actor->InParty) {
 		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
-			tip += L": ";
+			tip += u": ";
 		} else {
-			tip += L"\n";
+			tip += u"\n";
 		}
 
 		if (actor->HasVisibleHP()) {
-			tip += fmt::format(L"{}/{}", hp, maxhp);
+			tip += fmt::format(u"{}/{}", hp, maxhp);
 		} else {
-			tip += L"?";
+			tip += u"?";
 		}
 	} else {
 		// a guess at a neutral check
@@ -1148,7 +1148,7 @@ String GameControl::TooltipText() const {
 			}
 			strref = DisplayMessage::GetStringReference(strIdx);
 			String injuredstring = core->GetString(strref, STRING_FLAGS::NONE);
-			tip += L"\n" + injuredstring;
+			tip += u"\n" + injuredstring;
 		}
 	}
 

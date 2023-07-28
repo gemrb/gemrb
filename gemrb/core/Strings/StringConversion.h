@@ -53,7 +53,6 @@ struct formatter<WideToChar> {
 
 	template <typename FormatContext>
 	auto format(const WideToChar& wstr, FormatContext& ctx) -> decltype(ctx.out()) {
-		// TODO: must call upon iconv here
 		const auto mbstr = GemRB::MBStringFromString(wstr.string);
 		return format_to(ctx.out(), "{}", mbstr);
 	}

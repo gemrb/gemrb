@@ -185,7 +185,7 @@ const std::string& SaveGame::GetGameDate() const
 // mission pack save dir or the main one?
 static path_t SaveDir()
 {
-	return MBStringFromString(core->GetToken("SaveDir", L"save"));
+	return MBStringFromString(core->GetToken("SaveDir", u"save"));
 }
 
 /*

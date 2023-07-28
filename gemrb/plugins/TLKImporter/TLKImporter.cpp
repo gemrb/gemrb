@@ -138,7 +138,7 @@ String TLKImporter::Gabber() const
 	if (act) {
 		return act->GetName();
 	}
-	return L"?";
+	return u"?";
 }
 
 String TLKImporter::CharName(int slot) const
@@ -147,7 +147,7 @@ String TLKImporter::CharName(int slot) const
 	if (act) {
 		return act->GetName();
 	}
-	return L"?";
+	return u"?";
 }
 
 ieStrRef TLKImporter::ClassStrRef(int slot) const
@@ -252,10 +252,10 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 		}
 	}
 	if (Token == "TM") {
-		return L"\x99";
+		return u"\x99";
 	}
 
-	return L"";
+	return u"";
 }
 
 String TLKImporter::ResolveTags(const String& source)
@@ -267,7 +267,7 @@ String TLKImporter::ResolveTags(const String& source)
 		auto maxlength = std::min(sizeof(ieVariable) - 1, strLen);
 		while (idx < source.length() && (source[idx] != delim) && maxlength--) {
 			char chr = source[idx++];
-			if (chr != ' ') *dest++ = chr;
+			if (chr != u' ') *dest++ = chr;
 		}
 		*dest = '\0';
 		return idx;
@@ -277,8 +277,8 @@ String TLKImporter::ResolveTags(const String& source)
 	String dest;
 	for (size_t i = 0; source[i]; i++) {
 		auto srcch = source[i];
-		if (srcch == L'<') {
-			i = mystrncpy(Token, i + 1, L'>');
+		if (srcch == u'<') {
+			i = mystrncpy(Token, i + 1, u'>');
 			String resolvedToken = BuiltinToken(Token);
 			if (resolvedToken.empty()) {
 
@@ -291,21 +291,21 @@ String TLKImporter::ResolveTags(const String& source)
 			} else {
 				dest.append(resolvedToken);
 			}
-		} else if (srcch == L'%' && i + 1 <= strLen - 1) {
+		} else if (srcch == u'%' && i + 1 <= strLen - 1) {
 			// also resolve format strings
 			// we assume they are % followed by a single character
 			auto nextch = source[i + 1];
 			// we are going to only work with %d
 			// the originals dont seem to use anything else so we will play it safe
-			if (nextch != L'd') {
+			if (nextch != u'd') {
 				dest.push_back(srcch);
 			} else {
-				dest.append(L"{}");
+				dest.append(u"{}");
 				++i;
 			}
-		} else if (srcch == L'[') {
+		} else if (srcch == u'[') {
 			// voice actor directives
-			i = source.find_first_of(L']', i + 1);
+			i = source.find_first_of(u']', i + 1);
 			if (i == String::npos) break;
 		} else {
 			dest.push_back(srcch);
@@ -344,7 +344,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		ieDword Volume, Pitch, StrOffset;
 		ieDword l;
 		if (str->Seek( 18 + (ieDword(strref) * 0x1A), GEM_STREAM_START ) == GEM_ERROR) {
-			return L"";
+			return u"";
 		}
 		str->ReadWord(type);
 		str->ReadResRef( SoundResRef );
@@ -371,7 +371,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
 	}
 	if (bool(flags & STRING_FLAGS::STRREFON)) {
-		string = fmt::to_wstring(ieDword(strref)) + L": " + string;
+		string = fmt::format(u"{}: {}", ieDword(strref), string);
 	}
 	return string;
 }

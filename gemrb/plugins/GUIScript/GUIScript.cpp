@@ -449,10 +449,10 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	int h = ta->Frame().h - (margins.top + margins.bottom);
 	int w = ta->Frame().w - (margins.left + margins.right);
 	int newlines = CeilDiv(h, rowHeight);
-	ta->AppendText(String(newlines - 1, L'\n'));
+	ta->AppendText(String(newlines - 1, u'\n'));
 	ta->AppendText(StringFromUtf8(text));
 	// append again (+1 since there may not be a trailing newline) after the chtext so it will scroll out of view
-	ta->AppendText(String(newlines + 1, L'\n'));
+	ta->AppendText(String(newlines + 1, u'\n'));
 
 	ta->SetFlags(View::IgnoreEvents, BitOp::OR);
 	int lines = ta->ContentHeight() / rowHeight;
@@ -1416,7 +1416,7 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 		ctrl->SetText(core->GetString(StrRef));
 	} else if (str == Py_None) {
 		// clear the text
-		ctrl->SetText(L"");
+		ctrl->SetText(u"");
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
 		const char *tmp = PyByteArray_AS_STRING(str);
 		ctrl->SetText(StringFromCString(tmp));
@@ -4822,7 +4822,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			free(str);
 
 			if (dirs == false) {
-				size_t pos = string.find_last_of(L'.');
+				size_t pos = string.find_last_of(u'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
 					continue;
 				}
@@ -6594,9 +6594,9 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 	if (!btn) return;
 
 	if (charges && (charges>1 || !oneisnone) ) {
-		btn->SetText(fmt::to_wstring(charges));
+		btn->SetText(fmt::format(u"{}", charges));
 	} else {
-		btn->SetText(L"");
+		btn->SetText(u"");
 	}
 }
 
@@ -9443,7 +9443,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	Label* l = core->GetMessageLabel();
 	if (l) {
 		// this is how BG2 behaves, not sure about others
-		l->SetText(L""); // clear previous message
+		l->SetText(u""); // clear previous message
 	}
 
 	GET_GAME();
@@ -10494,7 +10494,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
 		btn->SetAction(nullptr, Control::Click, GEM_MB_ACTION, 0, 1);
 		btn->SetAction(nullptr, Control::Click, GEM_MB_MENU, 0, 1);
-		btn->SetTooltip(L"");
+		btn->SetTooltip(u"");
 		//no incref
 		return Py_None;
 	}
@@ -10653,7 +10653,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		if (!Picture) {
 			btn->SetState(Button::DISABLED);
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::SET);
-			btn->SetTooltip(L"");
+			btn->SetTooltip(u"");
 		} else {
 			SetButtonCycle(bam, btn, 0, Button::UNPRESSED);
 			SetButtonCycle(bam, btn, 1, Button::PRESSED);
@@ -13672,7 +13672,7 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 		//Get error message
 		String errorString = PyString_AsStringObj(pvalue);
 		if (displaymsg) {
-			displaymsg->DisplayString(L"Error: " + errorString, GUIColors::RED, nullptr);
+			displaymsg->DisplayString(u"Error: " + errorString, GUIColors::RED, nullptr);
 		} else {
 			Log(ERROR, "GUIScript", "{}", fmt::WideToChar{errorString});
 		}

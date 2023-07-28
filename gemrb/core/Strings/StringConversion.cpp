@@ -28,75 +28,56 @@ namespace GemRB {
 
 static String StringFromEncodedData(const ieByte* string, const EncodingStruct& encoded)
 {
-	if (!string) return L"";
+	if (!string) return u"";
 
-	bool convert = encoded.widechar || encoded.multibyte;
-	// assert that its something we know how to handle
-	// TODO: add support for other encodings?
-	assert(!convert || (encoded.widechar || encoded.encoding == "UTF-8"));
+	char* in = reinterpret_cast<char*>(const_cast<ieByte*>(string));
+	size_t inLen = 0;
 
-	size_t len = strlen((const char*) string);
-	String dbString;
-	dbString.reserve(len);
-	size_t dbLen = 0;
-	for(size_t i=0; i<len; ++i) {
-		ieWord currentChr = string[i];
-		// we are assuming that every multibyte encoding uses single bytes for chars 32 - 127
-		if(convert && (i+1 < len) && (currentChr >= 128 || currentChr < 32) && (currentChr != '\n')) {
-			// this is a double byte char, or a multibyte sequence
-			ieWord ch = 0;
-			if (encoded.encoding == "UTF-8") {
-				size_t nb = 0;
-				if (currentChr >= 0xC0 && currentChr <= 0xDF) {
-					/* c0-df are first byte of two-byte sequences (5+6=11 bits) */
-					/* c0-c1 are noncanonical */
-					nb = 2;
-				} else if (currentChr >= 0xE0 && currentChr <= 0XEF) {
-					/* e0-ef are first byte of three-byte (4+6+6=16 bits) */
-					/* e0 80-9f are noncanonical */
-					nb = 3;
-				} else if (currentChr >= 0xF0 && currentChr <= 0XF7) {
-					/* f0-f7 are first byte of four-byte (3+6+6+6=21 bits) */
-					/* f0 80-8f are noncanonical */
-					nb = 4;
-				} else if (currentChr >= 0xF8 && currentChr <= 0XFB) {
-					/* f8-fb are first byte of five-byte (2+6+6+6+6=26 bits) */
-					/* f8 80-87 are noncanonical */
-					nb = 5;
-				} else if (currentChr >= 0xFC && currentChr <= 0XFD) {
-					/* fc-fd are first byte of six-byte (1+6+6+6+6+6=31 bits) */
-					/* fc 80-83 are noncanonical */
-					nb = 6;
-				} else {
-					Log(WARNING, "String", "Invalid UTF-8 character: {:#x}", currentChr);
-					continue;
-				}
-
-				ch = currentChr & ((1 << (7 - nb)) - 1);
-				while (--nb) {
-					ch <<= 6;
-					ch |= string[++i] & 0x3f;
-				}
-			} else {
-				ch = (string[++i] << 8) + currentChr;
-			}
-			dbString.push_back(ch);
-		} else {
-			dbString.push_back(currentChr);
-		}
-		++dbLen;
+	if (encoded.widechar) {
+		inLen = wcslen(reinterpret_cast<const wchar_t*>(in));
+	} else {
+		inLen = strlen(in);
 	}
 
-	// we dont always use everything we allocated.
-	// realloc in this case to avoid static anylizer warnings about "garbage values"
-	// since this realloc always truncates it *should* be quick
-	dbString.resize(dbLen);
-	return dbString;
+	if (inLen == 0) {
+		return u"";
+	}
+
+	iconv_t cd = nullptr;
+	// Must check since UTF-16 may fall back to UTF-16BE, even if platform is LE
+	if (IsBigEndian()) {
+		cd = iconv_open("UTF-16BE", encoded.encoding.c_str());
+	} else {
+		cd = iconv_open("UTF-16LE", encoded.encoding.c_str());
+	}
+
+	if (cd == (iconv_t)-1) {
+		Log(ERROR, "String", "iconv_open(UTF-16, {}) failed with error: {}", encoded.encoding, strerror(errno));
+		return u"";
+	}
+
+	size_t outLen = inLen * 4;
+	size_t outLenLeft = outLen;
+	std::u16string buffer(inLen * 2, u'\0');
+	auto outBuf = reinterpret_cast<char*>(const_cast<char16_t*>(buffer.data()));
+
+	size_t ret = iconv(cd, &in, &inLen, &outBuf, &outLenLeft);
+	iconv_close(cd);
+
+	if (ret == static_cast<size_t>(-1)) {
+		Log(ERROR, "String", "iconv failed to convert string {} from {} to UTF-16 with error: {}", reinterpret_cast<const char*>(string), encoded.encoding, strerror(errno));
+		return u"";
+	}
+
+	auto zero = buffer.find(u'\0');
+	if (zero != decltype(buffer)::npos) {
+		buffer.resize(zero);
+	}
+
+	return buffer;
 }
 
 // returns new string converted to given encoding
-// in case iconv is not available, requested encoding is the same as string encoding,
-// or there is encoding error, copy of original string is returned.
 char* ConvertCharEncoding(const char* string, const char* from, const char* to) {
 	if (strcmp(from, to) == 0) {
 		return strdup(string);
@@ -132,8 +113,6 @@ char* ConvertCharEncoding(const char* string, const char* from, const char* to) 
 
 String StringFromCString(const char* string)
 {
-	// if multibyte is false this is basic expansion of cstring to wchar_t
-	// the only reason this is special, is because it allows characters 128-256.
 	return StringFromEncodedData((const ieByte*) string, core->TLKEncoding);
 }
 
@@ -147,21 +126,39 @@ String StringFromUtf8(const char* string)
 
 std::string MBStringFromString(const String& string)
 {
-	std::string ret(string.length() * 2, '\0');
+	char* in = reinterpret_cast<char*>(const_cast<char16_t*>(string.c_str()));
+	size_t inLen = string.length() * sizeof(char16_t);
 
-	// FIXME: depends on locale setting
-	// FIXME: currently assumes a character-character mapping (Unicode -> ASCII)
-	size_t newlen = wcstombs(&ret[0], string.c_str(), ret.capacity());
-
-	if (newlen == static_cast<size_t>(-1)) {
-		// invalid multibyte sequence
-		Log(ERROR, "String", "wcstombs failed to covert string. error: {}\n@:", strerror(errno), ret);
-		return ret;
+	if (inLen == 0) {
+		return "";
 	}
-	assert(newlen <= ret.length());
-	ret.resize(newlen);
 
-	return ret;
+	iconv_t cd = nullptr;
+	if (IsBigEndian()) {
+		cd = iconv_open("UTF-8", "UTF-16BE");
+	} else {
+		cd = iconv_open("UTF-8", "UTF-16LE");
+	}
+
+	size_t outLen = string.length() * 4;
+	size_t outLenLeft = outLen;
+	std::string buffer(outLen, '\0');
+	auto outBuf = const_cast<char*>(buffer.data());
+
+	size_t ret = iconv(cd, &in, &inLen, &outBuf, &outLenLeft);
+	iconv_close(cd);
+
+	if (ret == static_cast<size_t>(-1)) {
+		Log(ERROR, "String", "iconv failed to convert string a string from UTF-16 to UTF-8 with error: {}", strerror(errno));
+		return "";
+	}
+
+	auto zero = buffer.find('\0');
+	if (zero != decltype(buffer)::npos) {
+		buffer.resize(zero);
+	}
+
+	return buffer;
 }
 
 }

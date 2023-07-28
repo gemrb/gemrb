@@ -851,13 +851,13 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
 		if (target) {
 			// no "Casts " prefix for special powers (the originals erroneously left the space in)
 			if (spl->SpellType == IE_SPL_INNATE) {
-				str = fmt::format(L"{} : {}", spell, target->GetName());
+				str = fmt::format(u"{} : {}", spell, target->GetName());
 			} else {
 				const String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::ActionCast), STRING_FLAGS::NONE);
-				str = fmt::format(L"{} {} : {}", msg, spell, target->GetName());
+				str = fmt::format(u"{} {} : {}", msg, spell, target->GetName());
 			}
 		} else {
-			str = fmt::format(L"{} : {}", spell, GetName());
+			str = fmt::format(u"{} : {}", spell, GetName());
 		}
 		displaymsg->DisplayStringName(std::move(str), GUIColors::WHITE, this);
 	}
@@ -1143,7 +1143,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 			// eg. .:Casts Word of Recall:.
 			const String castmsg = core->GetString(DisplayMessage::GetStringReference(HCStrings::Casts));
 			const String spellname = core->GetString(spl->SpellName);
-			overHead.SetText(fmt::format(L".:{} {}:.", castmsg, spellname));
+			overHead.SetText(fmt::format(u".:{} {}:.", castmsg, spellname));
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL15, GUIColors::LIGHTGREY, detective, Spellcraft+IntMod, AdjustedSpellLevel, IntMod);
 			break;
 		}
@@ -1395,7 +1395,7 @@ int Scriptable::CheckWildSurge()
 			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
 			const String s1 = core->GetString(DisplayMessage::GetStringReference(HCStrings::WildSurge), STRING_FLAGS::NONE);
 			const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
-			displaymsg->DisplayStringName(s1 + L" " + s2, GUIColors::WHITE, this);
+			displaymsg->DisplayStringName(s1 + u" " + s2, GUIColors::WHITE, this);
 
 			if (!gamedata->Exists(surgeSpell.spell, IE_SPL_CLASS_ID)) {
 				// handle the hardcoded cases - they'll also fail here
@@ -1526,15 +1526,15 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 String Scriptable::GetName() const
 {
 	switch (Type) {
-		case ST_PROXIMITY:	return L"Proximity";
-		case ST_TRIGGER:	return L"Trigger";
-		case ST_TRAVEL:		return L"Travel";
-		case ST_DOOR:		return L"Door";
-		case ST_CONTAINER:	return L"Container";
-		case ST_AREA:		return L"Area";
-		case ST_GLOBAL:		return L"Global";
+		case ST_PROXIMITY:	return u"Proximity";
+		case ST_TRIGGER:	return u"Trigger";
+		case ST_TRAVEL:		return u"Travel";
+		case ST_DOOR:		return u"Door";
+		case ST_CONTAINER:	return u"Container";
+		case ST_AREA:		return u"Area";
+		case ST_GLOBAL:		return u"Global";
 		case ST_ACTOR:		return As<const Actor>()->GetLongName();
-		default:	return L"NONE";
+		default:	return u"NONE";
 	}
 }
 

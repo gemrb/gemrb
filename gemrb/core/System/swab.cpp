@@ -16,6 +16,8 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#include <cstdint>
+
 #include "swab.h"
 
 // we use this because it works with overlapping buffers (undefined in POSIX)
@@ -36,4 +38,11 @@ void swab_const (const void *bfrom, void *bto, long n)
 void swabs (void *buf, long n)
 {
 	swab_const(buf, buf, n);
+}
+
+bool IsBigEndian() {
+	const static uint16_t endiantest = 1;
+	const static bool isBigEndian = ((char *)&endiantest)[1] == 1;
+
+	return isBigEndian;
 }
