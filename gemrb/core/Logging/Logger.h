@@ -95,7 +95,8 @@ private:
 	
 	void threadLoop();
 	void ProcessMessages(QueueType queue);
-	
+	void StartProcessingThread();
+
 public:
 	explicit Logger(std::deque<WriterPtr>);
 	~Logger();

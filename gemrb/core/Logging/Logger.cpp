@@ -37,6 +37,17 @@ const LOG_FMT Logger::MSG_STYLE = fmt::fg(fmt::color::ghost_white);
 
 Logger::Logger(std::deque<WriterPtr> writers)
 : writers(std::move(writers))
+{}
+
+Logger::~Logger()
+{
+	running = false;
+	cv.notify_all();
+	if (loggingThread.joinable())
+		loggingThread.join();
+}
+
+void Logger::StartProcessingThread()
 {
 	loggingThread = std::thread([this] {
 		while (running) {
@@ -50,17 +61,15 @@ Logger::Logger(std::deque<WriterPtr> writers)
 	});
 }
 
-Logger::~Logger()
-{
-	running = false;
-	cv.notify_all();
-	loggingThread.join();
-}
-
 void Logger::AddLogWriter(WriterPtr writer)
 {
 	std::lock_guard<std::mutex> l(writerLock);
 	writers.push_back(std::move(writer));
+
+	if (!loggingThread.joinable()) {
+		StartProcessingThread();
+		cv.notify_all(); // notify for anything already queued
+	}
 }
 
 void Logger::ProcessMessages(QueueType queue)
