@@ -56,7 +56,7 @@ static LPALEFFECTF alEffectf = NULL;
 static LPALAUXILIARYEFFECTSLOTI alAuxiliaryEffectSloti = NULL;
 #endif
 
-static bool checkALError(const char* msg, log_level level) {
+static bool checkALError(const char* msg, LogLevel level) {
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
 		Log(level, "OpenAL", "{}: {:#x} - {}", msg, error, alGetString(error));
@@ -65,7 +65,7 @@ static bool checkALError(const char* msg, log_level level) {
 	return false;
 }
 
-static void showALCError(const char* msg, log_level level, ALCdevice *device) {
+static void showALCError(const char* msg, LogLevel level, ALCdevice *device) {
 	int error = alcGetError(device);
 	if (error != AL_NO_ERROR) {
 		Log(level, "OpenAL", "{}: {:#x}", msg, error);

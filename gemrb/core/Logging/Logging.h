@@ -37,11 +37,11 @@ namespace GemRB {
 
 GEM_EXPORT void ToggleLogging(bool);
 GEM_EXPORT void AddLogWriter(Logger::WriterPtr&&);
-GEM_EXPORT void SetConsoleWindowLogLevel(log_level level);
+GEM_EXPORT void SetConsoleWindowLogLevel(LogLevel level);
 GEM_EXPORT void LogMsg(Logger::LogMessage&& msg);
 
 template<typename... ARGS>
-void Log(log_level level, const char* owner, const char* message, ARGS&&... args)
+void Log(LogLevel level, const char* owner, const char* message, ARGS&&... args)
 {
 	auto formattedMsg = fmt::format(message, std::forward<ARGS>(args)...);
 	LogMsg(Logger::LogMessage(level, owner, std::move(formattedMsg), Logger::MSG_STYLE));

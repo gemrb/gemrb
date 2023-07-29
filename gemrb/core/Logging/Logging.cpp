@@ -36,7 +36,7 @@ namespace GemRB {
 
 using LogMessage = Logger::LogMessage;
 
-static std::atomic<log_level> CWLL;
+static std::atomic<LogLevel> CWLL;
 static std::deque<Logger::WriterPtr> writers;
 static std::unique_ptr<Logger> logger;
 
@@ -60,7 +60,7 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 			return style.get_foreground().value.rgb_color;
 		};
 		
-		int level = msg.level == INTERNAL ? 0 : msg.level;
+		LogLevel level = msg.level == INTERNAL ? FATAL : msg.level;
 		const auto& format = Logger::LevelFormat[level];
 		const auto& FMT = FMT_STRING(L"[color={:X}]{}: [/color][color={:X}]{}[/color]\n");
 		// MessageWindow supports only colors
@@ -69,12 +69,13 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 	}
 }
 
-void SetConsoleWindowLogLevel(log_level level)
+void SetConsoleWindowLogLevel(LogLevel level)
 {
-	if (level <= INTERNAL) {
+	assert(level <= DEBUG);
+	if (level == INTERNAL) {
 		static const LogMessage offMsg(INTERNAL, "Logger", "MessageWindow logging disabled.", fmt::fg(fmt::color::red));
 		ConsoleWinLogMsg(offMsg);
-	} else if (level <= DEBUG) {
+	} else {
 		static const LogMessage onMsg(INTERNAL, "Logger", "MessageWindow logging active.", fmt::fg(fmt::color::green));
 		ConsoleWinLogMsg(onMsg);
 	}

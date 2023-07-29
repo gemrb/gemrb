@@ -24,7 +24,7 @@
 
 namespace GemRB {
 
-const std::array<LOG_FMT, 6> Logger::LevelFormat {
+const EnumArray<LogLevel, LOG_FMT> Logger::LevelFormat {
 	fmt::fg(fmt::color::red) | fmt::emphasis::bold,
 	fmt::fg(fmt::color::red) | fmt::emphasis::bold,
 	fmt::fg(fmt::color::yellow) | fmt::emphasis::bold,
@@ -83,17 +83,13 @@ void Logger::ProcessMessages(QueueType queue)
 	}
 }
 
-void Logger::LogMsg(log_level level, const char* owner, const char* message, LOG_FMT fmt)
+void Logger::LogMsg(LogLevel level, const char* owner, const char* message, LOG_FMT fmt)
 {
 	LogMsg(LogMessage(level, owner, message, fmt));
 }
 
 void Logger::LogMsg(LogMessage&& msg)
-{	
-	if (msg.level < FATAL) {
-		msg.level = FATAL;
-	}
-	
+{
 	if (msg.level == FATAL) {
 		// fatal errors must happen now!
 		std::lock_guard<std::mutex> l(writerLock);

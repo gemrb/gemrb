@@ -18,7 +18,6 @@
 
 #include "Logging/Loggers/Stdio.h"
 
-#include "EnumIndex.h"
 #include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 
@@ -28,7 +27,7 @@
 
 namespace GemRB {
 
-StreamLogWriter::StreamLogWriter(log_level level, FILE* stream, ANSIColor color)
+StreamLogWriter::StreamLogWriter(LogLevel level, FILE* stream, ANSIColor color)
 : Logger::LogWriter(level), color(color), stream(stream)
 {
 	assert(stream);
@@ -39,11 +38,11 @@ StreamLogWriter::~StreamLogWriter()
 	fclose(stream);
 }
 
-static const LOG_FMT& LevelFormat(ANSIColor color, log_level level)
+static const LOG_FMT& LevelFormat(ANSIColor color, LogLevel level)
 {
 	static LOG_FMT nullfmt;
 
-	static const std::array<LOG_FMT, 6> BasicFMT {
+	static const EnumArray<LogLevel, LOG_FMT> BasicFMT {
 		fmt::fg(fmt::terminal_color::bright_red),
 		fmt::fg(fmt::terminal_color::bright_red),
 		fmt::fg(fmt::terminal_color::bright_yellow),

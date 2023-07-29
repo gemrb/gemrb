@@ -34,7 +34,7 @@ enum class ANSIColor : uint8_t {
 
 class GEM_EXPORT StreamLogWriter : public Logger::LogWriter {
 public:
-	StreamLogWriter(log_level, FILE*, ANSIColor color);
+	StreamLogWriter(LogLevel, FILE*, ANSIColor color);
 	~StreamLogWriter() override;
 	
 	StreamLogWriter(const StreamLogWriter&) = delete;

@@ -8036,8 +8036,8 @@ PyDoc_STRVAR( GemRB_ConsoleWindowLog__doc,
 
 static PyObject* GemRB_ConsoleWindowLog(PyObject * /*self*/, PyObject* args)
 {
-	log_level logLevel;
-	PARSE_ARGS(args, "i", &logLevel);
+	LogLevel logLevel;
+	PARSE_ARGS(args, "b", &logLevel);
 
 	SetConsoleWindowLogLevel(logLevel);
 	Py_RETURN_NONE;
@@ -12964,11 +12964,11 @@ PyDoc_STRVAR( GemRB_Log__doc,
 
 static PyObject* GemRB_Log(PyObject* /*self*/, PyObject* args)
 {
-	log_level level;
+	LogLevel level;
 	char* owner;
 	char* message;
 
-	if (!PyArg_ParseTuple(args, "iss", &level, &owner, &message)) {
+	if (!PyArg_ParseTuple(args, "bss", &level, &owner, &message)) {
 		return NULL;
 	}
 

@@ -26,10 +26,10 @@
 #define LOGGER_H
 
 #include "exports.h"
+#include "EnumIndex.h"
 #include "Strings/Format.h"
 #include <fmt/color.h>
 
-#include <array>
 #include <atomic>
 #include <condition_variable>
 #include <deque>
@@ -41,41 +41,42 @@
 namespace GemRB {
 
 // !!! Keep this synchronized with GUIDefines !!!
-enum log_level : int {
-	INTERNAL = -1, // special value that can only be used by the logger itself. these messages cannot be supressed
+enum LogLevel : uint8_t {
+	INTERNAL = uint8_t(-1), // special value that can only be used by the logger itself. these messages cannot be supressed
 	FATAL = 0,
 	ERROR = 1,
 	WARNING = 2,
 	MESSAGE = 3,
 	COMBAT = 4,
-	DEBUG = 5
+	DEBUG = 5,
+	count
 };
 
 using LOG_FMT = fmt::text_style;
 
 class GEM_EXPORT Logger final {
 public:
-	static const std::array<LOG_FMT, 6> LevelFormat;
+	static const EnumArray<LogLevel, LOG_FMT> LevelFormat;
 	static const LOG_FMT MSG_STYLE;
 
 	struct LogMessage {
-		log_level level = DEBUG;
+		LogLevel level = DEBUG;
 		std::string owner;
 		std::string message;
 		LOG_FMT format;
 		
-		LogMessage(log_level level, std::string owner, std::string message, LOG_FMT fmt)
+		LogMessage(LogLevel level, std::string owner, std::string message, LOG_FMT fmt)
 		: level(level), owner(std::move(owner)), message(std::move(message)), format(fmt) {}
 	};
 
 	class LogWriter {
 	public:
-		std::atomic<log_level> level;
+		std::atomic<LogLevel> level;
 		
-		explicit LogWriter(log_level level) : level(level) {}
+		explicit LogWriter(LogLevel level) : level(level) {}
 		virtual ~LogWriter() noexcept = default;
 		
-		void WriteLogMessage(log_level level, const char* owner, const char* message, LOG_FMT fmt) {
+		void WriteLogMessage(LogLevel level, const char* owner, const char* message, LOG_FMT fmt) {
 			WriteLogMessage(LogMessage(level, owner, message, fmt));
 		}
 		virtual void WriteLogMessage(const Logger::LogMessage& msg)=0;
@@ -103,7 +104,7 @@ public:
 	
 	void AddLogWriter(WriterPtr writer);
 
-	void LogMsg(log_level, const char* owner, const char* message, LOG_FMT fmt);
+	void LogMsg(LogLevel, const char* owner, const char* message, LOG_FMT fmt);
 	void LogMsg(LogMessage&& msg);
 };
 
