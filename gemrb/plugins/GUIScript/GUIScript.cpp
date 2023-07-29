@@ -5722,7 +5722,16 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 
 	ResRef ignore;
 	std::string sound = actor->GetSoundFolder(flag, ignore);
-	return PyString_FromStringObj(sound);
+
+	// System encoding may fail if there is a save game loaded from the original
+	// game that uses TLK encoding for the path
+	PyObject* playerSound = PyString_FromSystemStringObj(sound);
+	if (playerSound == nullptr) {
+		PyErr_Clear();
+		playerSound = PyString_FromStringObj(sound);
+	}
+
+	return playerSound;
 }
 
 PyDoc_STRVAR( GemRB_GetSlotType__doc,

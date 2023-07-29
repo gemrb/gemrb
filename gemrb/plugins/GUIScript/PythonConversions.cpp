@@ -136,6 +136,11 @@ PyObject* PyString_FromStringObj(const std::string& s)
 {
 	return PyUnicode_Decode(s.c_str(), s.length(), core->TLKEncoding.encoding.c_str(), "strict");
 }
+
+PyObject* PyString_FromSystemStringObj(const std::string& s)
+{
+	return PyUnicode_Decode(s.c_str(), s.length(), core->config.SystemEncoding.c_str(), "strict");
+}
 	
 PyObject* PyString_FromStringObj(const String& s)
 {
