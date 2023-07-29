@@ -2110,19 +2110,6 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 	Region rgn = RectFromPy(pyRect);
 	View* view = NULL;
 	switch (type) {
-		case IE_GUI_EDIT:
-		{
-			PyObject* font;
-			const char* cstr;
-			PARSE_ARGS(constructArgs, "Os", &font, &cstr);
-
-			TextEdit* edit = new TextEdit(rgn, 500, Point());
-			edit->SetFont(core->GetFont(ResRefFromPy(font)));
-			edit->Control::SetText(StringFromUtf8(cstr));
-
-			view = edit;
-		}
-			break;
 		case IE_GUI_TEXTAREA:
 		{
 			PyObject* font;
@@ -2134,10 +2121,10 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		{
 			unsigned char alignment;
 			PyObject* font;
-			const char* text;
-			PARSE_ARGS(constructArgs, "Osb", &font, &text, &alignment);
+			PyObject* text;
+			PARSE_ARGS(constructArgs, "OOb", &font, &text, &alignment);
 
-			Label* lbl = new Label(rgn, core->GetFont(ResRefFromPy(font)), StringFromUtf8(text));
+			Label* lbl = new Label(rgn, core->GetFont(ResRefFromPy(font)), PyString_AsStringObj(text));
 
 			lbl->SetAlignment(alignment);
 			view = lbl;
@@ -4082,9 +4069,14 @@ be avoided. The hardcoded token list:\n\
 static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
-	char *value;
-	PARSE_ARGS( args,  "Os", &Variable, &value );
-	core->GetTokenDictionary()[ieVariableFromPy(Variable)] = StringFromCString(value);
+	PyObject* value;
+	PARSE_ARGS(args, "OO", &Variable, &value);
+
+	if(PyUnicode_Check(value)) {
+		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = PyString_AsStringObj(value);
+	} else {
+		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = StringFromCString(PyBytes_AsString(value));
+	}
 
 	Py_RETURN_NONE;
 }
@@ -9804,14 +9796,19 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 {
 	Point point;
 	ieWord color = 0;
-	const char *txt = NULL;
-	PARSE_ARGS( args,  "ii|hs", &point.x, &point.y, &color, &txt);
+	PyObject *textObject = nullptr;
+	PARSE_ARGS( args,  "ii|hO", &point.x, &point.y, &color, &textObject);
 
 	GET_GAME();
 	GET_MAP();
 
-	if (txt && txt[0]) {
-		map->AddMapNote(point, MapNote(StringFromUtf8(txt), color, false));
+	String text{u""};
+	if (textObject) {
+		text = PyString_AsStringObj(textObject);
+	}
+
+	if (text.length() > 0) {
+		map->AddMapNote(point, MapNote(text, color, false));
 	} else {
 		map->RemoveMapNote(point);
 	}

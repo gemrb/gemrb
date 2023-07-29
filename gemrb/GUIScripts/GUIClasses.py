@@ -196,10 +196,6 @@ class GView:
 	def CreateTextArea(self, control, *args):
 		frame = _ExtractFrame(args[0:4])
 		return self.CreateSubview(control, IE_GUI_TEXTAREA, frame, args[4:])
-  
-	def CreateTextEdit(self, control, *args):
-		frame = _ExtractFrame(args[0:4])
-		return self.CreateSubview(control, IE_GUI_EDIT, frame, args[4:])
 
 class GWindow(GView, Scrollable):
 	methods = {
