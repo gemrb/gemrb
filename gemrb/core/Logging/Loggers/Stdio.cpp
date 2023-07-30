@@ -131,6 +131,7 @@ static Logger::WriterPtr createStreamLogWriter(FILE* stream, ANSIColor color)
 
 Logger::WriterPtr createStdioLogWriter(ANSIColor color)
 {
+	Log(DEBUG, "Logging", "Creating console log with color setting: {}", fmt::underlying(color));
 	int fd = dup(fileno(stdout));
 	return createStreamLogWriter(fdopen(fd, "w"), color);
 }

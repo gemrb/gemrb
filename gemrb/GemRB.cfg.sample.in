@@ -97,6 +97,9 @@ GUIEnhancements = 15
 # Enable or disable (0) logging
 #Logging = 1
 
+# color setting for the console log. -1 = auto, 0 = none, 1 = Basic, 2 = truecolor
+#LogColor = -1
+
 # Title for GemRB window, use anything you wish, e.g. Baldur's Gate 3: RotFL
 # Defaults to GemRB: <actual game name>
 #GameName=Baldur's Gate 2

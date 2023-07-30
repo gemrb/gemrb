@@ -46,6 +46,10 @@ Use the specified configuration file
 of the default
 .IR gemrb.cfg .
 
+.TP
+.BI \--color OPTION
+Set the ANSI color option for terminal logging. -1 (the default) will attempt to automatically set this according to the terminal environment. 0 will disable color output, 1 will set it to the basic 8 color palette, and 2 will use full 24bit color codes.
+
 .B Note:
 You can also use the program's name as a mean to select the configuration file.
 For example, if the program's name is

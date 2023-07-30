@@ -96,6 +96,7 @@ struct CoreSettings {
 	bool SpriteFoW = false;
 	uint32_t debugMode = 0;
 	bool Logging = true;
+	int LogColor = -1; // -1 is to automatically determine
 	bool CheatFlag = false; /** Cheats enabled? */
 	int MaxPartySize = 6;
 
