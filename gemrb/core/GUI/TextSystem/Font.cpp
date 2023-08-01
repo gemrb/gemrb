@@ -644,7 +644,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 {
 	if (!string.length()) return Size();
 #define WILL_WRAP(val) \
-	(stop && stop->w && lineW + val > stop->w)
+	(stop && stop->w && lineW + (val) > stop->w)
 
 #define APPEND_TO_LINE(val) \
 	lineW += val; charCount = i + 1; val = 0
