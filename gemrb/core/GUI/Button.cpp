@@ -232,7 +232,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 
 	// Button label
-	if (hasText && ! ( flags & IE_GUI_BUTTON_NO_TEXT )) {
+	if (hasText) {
 		// FIXME: hopefully there's no button which sinks when selected
 		//   AND has text label
 		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
