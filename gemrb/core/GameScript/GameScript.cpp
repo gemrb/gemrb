@@ -1101,6 +1101,8 @@ static const ObjectLink objectnames[] = {
 	{"eigthnearestenemyof", GameScript::EighthNearestEnemyOf}, //typo in iwd
 	{"eigthnearestenemyoftype", GameScript::EighthNearestEnemyOfType}, //bg2
 	{"eigthnearestmygroupoftype", GameScript::EighthNearestEnemyOfType},//bg2
+	{"familiar", GameScript::Familiar},
+	{"familiarsummoner", GameScript::FamiliarSummoner},
 	{"farthest", GameScript::Farthest},
 	{"farthestenemyof", GameScript::FarthestEnemyOf},
 	{"fifthnearest", GameScript::FifthNearest},

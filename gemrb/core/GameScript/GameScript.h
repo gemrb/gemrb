@@ -1476,6 +1476,8 @@ public: //Script Functions
 	static Targets *EighthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flagss);
 	static Targets *EighthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flagss);
 	static Targets *EighthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* Familiar(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* FamiliarSummoner(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets *Farthest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *FarthestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *FifthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);

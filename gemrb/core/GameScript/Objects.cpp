@@ -961,6 +961,38 @@ Targets *GameScript::SelectedCharacter(const Scriptable *Sender, Targets *parame
 	return parameters;
 }
 
+Targets* GameScript::Familiar(const Scriptable* Sender, Targets* parameters, int ga_flags)
+{
+	const Map* cm = Sender->GetCurrentArea();
+	parameters->Clear();
+	int i = cm->GetActorCount(true);
+	while (i--) {
+		Actor* ac = cm->GetActor(i, true);
+		if (ac->GetCurrentArea() != cm) continue;
+		if (ac->GetStat(IE_EA) == EA_FAMILIAR) { // if this turns out to not be enough, check for the FamiliarMarker effect
+			parameters->AddTarget(ac, Distance(Sender, ac), ga_flags);
+		}
+	}
+	return parameters;
+}
+
+// the original assumed there can only be one here as well
+Targets* GameScript::FamiliarSummoner(const Scriptable* Sender, Targets* parameters, int ga_flags)
+{
+	static EffectRef fx_familiar_marker_ref = { "FamiliarMarker", -1 };
+	const Map* cm = Sender->GetCurrentArea();
+	parameters->Clear();
+	int i = cm->GetActorCount(true);
+	while (i--) {
+		Actor* ac = cm->GetActor(i, true);
+		if (ac->GetCurrentArea() != cm) continue;
+		if (ac->fxqueue.HasEffect(fx_familiar_marker_ref)) {
+			parameters->AddTarget(ac, Distance(Sender, ac), ga_flags);
+		}
+	}
+	return parameters;
+}
+
 Targets *GameScript::Nothing(const Scriptable */*Sender*/, Targets* parameters, int /*ga_flags*/)
 {
 	parameters->Clear();
