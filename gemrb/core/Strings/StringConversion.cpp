@@ -77,43 +77,17 @@ static String StringFromEncodedData(const ieByte* string, const EncodingStruct& 
 	return buffer;
 }
 
-// returns new string converted to given encoding
-char* ConvertCharEncoding(const char* string, const char* from, const char* to) {
-	if (strcmp(from, to) == 0) {
-		return strdup(string);
-	}
-
-	iconv_t cd = iconv_open(to, from);
-	if (cd == (iconv_t)-1) {
-		Log(ERROR, "String", "iconv_open({}, {}) failed with error: {}", to, from, strerror(errno));
-		return strdup(string);
-	}
-
-
-	char * in = (char *) string;
-	size_t in_len = strlen(string);
-	size_t out_len = (in_len + 1) * 4;
-	size_t out_len_left = out_len;
-	char* buf = (char*) malloc(out_len);
-	char* buf_out = buf;
-	size_t ret = iconv(cd, &in, &in_len, &buf_out, &out_len_left);
-	iconv_close(cd);
-
-	if (ret == (size_t)-1) {
-		Log(ERROR, "String", "iconv failed to convert string {} from {} to {} with error: {}", string, from, to, strerror(errno));
-		free(buf);
-		return strdup(string);
-	}
-
-	size_t used = out_len - out_len_left;
-	buf = (char*)realloc(buf, used + 1);
-	buf[used] = '\0';
-	return buf;
-}
-
 String StringFromCString(const char* string)
 {
 	return StringFromEncodedData((const ieByte*) string, core->TLKEncoding);
+}
+
+String StringFromFSString(const char* string)
+{
+	EncodingStruct enc;
+	enc.encoding = core->config.SystemEncoding.c_str();
+	enc.multibyte = true; // nobody ever complained so far
+	return StringFromEncodedData((const ieByte*) string, enc);
 }
 
 String StringFromUtf8(const char* string)

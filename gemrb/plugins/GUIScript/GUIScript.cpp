@@ -4809,9 +4809,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			if (name[0] == '.' || dirit.IsDirectory() != dirs)
 				continue;
 
-			char *str = ConvertCharEncoding(name.c_str(), core->config.SystemEncoding.c_str(), core->TLKEncoding.encoding.c_str());
-			String string = StringFromCString(str);
-			free(str);
+			String string = StringFromFSString(name.c_str());
 
 			if (dirs == false) {
 				size_t pos = string.find_last_of(u'.');

@@ -296,7 +296,12 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
 {
-	if (InDebugMode(DebugMode::PATHFINDER)) Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}", s, d, caller ? MBStringFromString(caller->GetShortName()) : "nullptr", minDistance, size);
+	if (InDebugMode(DebugMode::PATHFINDER))
+		Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}",
+			s, d,
+			fmt::WideToChar{caller ? caller->GetShortName() : u"nullptr"},
+			minDistance, size
+		);
 	
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	NavmapPoint nmptDest = d;
@@ -315,7 +320,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 	SearchmapPoint smptDest = Map::ConvertCoordToTile(nmptDest);
 	
 	if (minDistance < size && !(GetBlockedInRadiusTile(smptDest, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
-		Log(DEBUG, "FindPath", "{} can't fit in destination", caller ? MBStringFromString(caller->GetShortName()) : "nullptr");
+		Log(DEBUG, "FindPath", "{} can't fit in destination", fmt::WideToChar{caller ? caller->GetShortName() : u"nullptr"});
 		return nullptr;
 	}
 
