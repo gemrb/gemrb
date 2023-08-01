@@ -435,24 +435,24 @@ to beyond the top.\n\
 
 static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 {
-	char* text = NULL;
-	PARSE_ARGS(args, "Os", &self, &text);
+	PyObject* text = nullptr;
+	PARSE_ARGS(args, "OO", &self, &text);
 
 	TextArea* ta = GetView<TextArea>(self);
 	ABORT_IF_NULL(ta);
 
 	ta->ClearText();
-	
+
 	// insert enough newlines to push the text offscreen
 	auto margins = ta->GetMargins();
 	int rowHeight = ta->LineHeight();
 	int h = ta->Frame().h - (margins.top + margins.bottom);
 	int w = ta->Frame().w - (margins.left + margins.right);
 	int newlines = CeilDiv(h, rowHeight);
-	ta->AppendText(String(newlines - 1, u'\n'));
-	ta->AppendText(StringFromUtf8(text));
+	ta->AppendText(String(newlines - 1, L'\n'));
+	ta->AppendText(PyString_AsStringObj(text));
 	// append again (+1 since there may not be a trailing newline) after the chtext so it will scroll out of view
-	ta->AppendText(String(newlines + 1, u'\n'));
+	ta->AppendText(String(newlines + 1, L'\n'));
 
 	ta->SetFlags(View::IgnoreEvents, BitOp::OR);
 	int lines = ta->ContentHeight() / rowHeight;
@@ -461,7 +461,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	float textSpeed = static_cast<float>(gamedata->GetTextSpeed());
 	int ticksPerLine = int(11.0f * heightScale * widthScale * textSpeed);
 	ta->ScrollToY(-ta->ContentHeight(), lines * ticksPerLine);
-	
+
 	Py_RETURN_NONE;
 }
 

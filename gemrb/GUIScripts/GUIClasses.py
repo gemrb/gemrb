@@ -287,7 +287,7 @@ class GLabel(GControl):
 
 class GTextArea(GControl, Scrollable):
 	methods = {
-		'ChapterText': _GemRB.TextArea_SetChapterText,
+		'SetChapterText': _GemRB.TextArea_SetChapterText,
 		'Append': _GemRB.TextArea_Append,
 	}
 	__slots__ = ['DefaultText']

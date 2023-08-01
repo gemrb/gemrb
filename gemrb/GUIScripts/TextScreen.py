@@ -210,6 +210,6 @@ def ReplayTextScreen ():
 		text += "\n\n" if not GameCheck.IsGemRBDemo () else ""
 		text += GemRB.GetString(Table.GetValue (Row, i), 14)
 
-	TextArea.ChapterText (text)
+	TextArea.SetChapterText (text)
 
 	return
