@@ -11,14 +11,12 @@
 #cmakedefine PLUGIN_DIR "${PLUGIN_DIR}"
 #cmakedefine DATA_DIR "${DATA_DIR}"
 #cmakedefine SYSCONF_DIR "${SYSCONF_DIR}"
-#cmakedefine NO_COLOR ${NOCOLOR}
 #cmakedefine OPENGL_BACKEND ${OPENGL_BACKEND}
 #cmakedefine NOFPSLIMIT ${NOFPSLIMIT}
 #cmakedefine HAVE_UNISTD_H 1
 #cmakedefine HAVE_LANGINFO_H 1
 #cmakedefine HAVE_DLFCN_H 1
 #cmakedefine HAVE_OPENAL_EFX_H 1
-#cmakedefine WIN32_USE_STDIO 1
 #cmakedefine RPI 1
 #cmakedefine HAVE_MMAP ${HAVE_MMAP}
 #cmakedefine SUPPORTS_MEMSTREAM ${SUPPORTS_MEMSTREAM}

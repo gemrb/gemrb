@@ -20,33 +20,52 @@
 
 // GemRB.cpp : Defines the entry point for the application.
 
-#include "win32def.h" // logging
+#include "win32def.h"
 #include <clocale> //language encoding
 
 #include "Interface.h"
 #include "Logging/Logging.h"
-#include "Win32Console.h"
+#include "Logging/Loggers/Stdio.h"
 
 using namespace GemRB;
 
+void SetupLogging(const CoreSettings& cfg)
+{
+	if (cfg.Logging) {
+		ToggleLogging(cfg.Logging);
+	}
+
+	if (cfg.LogColor >= 0 && cfg.LogColor < int(ANSIColor::count)) {
+		AddLogWriter(createStdioLogWriter(ANSIColor(cfg.LogColor)));
+	} else {
+		AddLogWriter(createStdioLogWriter());
+	}
+}
+
 int main(int argc, char* argv[])
 {
-	AddLogWriter(createWin32ConsoleLogger());
-	ToggleLogging(true);
-
 	setlocale(LC_ALL, "");
 
-	SanityCheck();
-	
+	auto hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD dwMode = 0;
+	GetConsoleMode(hConsole, &dwMode);
+	SetConsoleMode(hConsole, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+
+	int ret = GEM_OK;
 	try {
-		Interface gemrb(LoadFromArgs(argc, argv));
+		auto cfg = LoadFromArgs(argc, argv);
+		SetupLogging(cfg);
+
+		SanityCheck();
+
+		Interface gemrb(std::move(cfg));
 		gemrb.Main();
 	} catch (CoreInitializationException& cie) {
 		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie.what());
-		ToggleLogging(false); // Windows build will hang if we leave the logging thread running
-		return GEM_ERROR;
+		ret = GEM_ERROR;
 	}
 
 	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
-	return GEM_OK;
+	SetConsoleMode(hConsole, dwMode);
+	return ret;
 }

@@ -250,9 +250,6 @@ Interface::Interface(CoreSettings&& cfg)
 	vars = std::move(config.vars);
 	vars["MaxPartySize"] = config.MaxPartySize; // for simple GUIScript access
 
-	// potentially disable logging before plugins are loaded (the log file is a plugin)
-	ToggleLogging(config.Logging);
-	
 	LoadPlugins();
 	InitVideo();
 

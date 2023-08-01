@@ -81,8 +81,6 @@ using namespace GemRB;
 // always called before openFile when launched via CLI/DragDrop
 - (void)applicationWillFinishLaunching:(NSNotification *) __unused aNotification
 {
-	AddLogWriter(Logger::WriterPtr(new AppleLogger()));
-
 	// Load default defaults
 	NSString* defaultsPath = [[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"];
 	NSMutableDictionary* defaultDict = [NSMutableDictionary dictionaryWithContentsOfFile:defaultsPath];
@@ -162,10 +160,6 @@ using namespace GemRB;
 		[[NSRunLoop mainRunLoop] performSelector:@selector(launchGame:) target:self argument:nil order:0 modes:modes];
 		return;
 	}
-	
-	ToggleLogging(true);
-
-	InterfaceConfig config;
 
 	// load NSUserDefaults into config
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -184,6 +178,8 @@ using namespace GemRB;
 		}
 	}
 
+	InterfaceConfig config;
+
 	for ( NSString* key in dict ) {
 		NSString* value = nil;
 		id obj = [dict objectForKey:key];
@@ -199,7 +195,16 @@ using namespace GemRB;
 	}
 	
 	try {
-		Interface gemrb(LoadFromDictionary(std::move(config)));
+		CoreSettings settings = LoadFromDictionary(std::move(config));
+		ToggleLogging(settings.Logging);
+
+		if (getenv("TERM") && isatty(STDOUT_FILENO)) {
+			AddLogWriter(createStdioLogWriter());
+		} else {
+			AddLogWriter(std::make_shared<AppleLogger>());
+		}
+
+		Interface gemrb(std::move(settings));
 		[_configWindow close];
 		// pass control to GemRB
 		gemrb.Main();

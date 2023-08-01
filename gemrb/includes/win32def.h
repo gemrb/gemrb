@@ -32,7 +32,6 @@
 #define UNICODE
 #define _UNICODE
 #define NOGDI
-#define NOCOLOR
 #define NOUSER
 
 #ifdef _DEBUG
@@ -40,5 +39,10 @@
 #endif
 
 #include <windows.h>
+
+#include <ntverp.h>
+#if defined(VER_PRODUCTBUILD) && VER_PRODUCTBUILD >= 8100
+#include <VersionHelpers.h>
+#endif
 
 #endif  //! WIN32DEF_H

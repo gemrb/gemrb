@@ -17,6 +17,8 @@
  */
 
 #include "Logging/Loggers/Stdio.h"
+
+#include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 
 #include <cstdio>
@@ -25,130 +27,151 @@
 
 namespace GemRB {
 
-StreamLogWriter::StreamLogWriter(log_level level, DataStream* stream)
-: Logger::LogWriter(level), stream(stream)
-{}
+StreamLogWriter::StreamLogWriter(LogLevel level, FILE* stream, ANSIColor color)
+: Logger::LogWriter(level), color(color), stream(stream)
+{
+	assert(stream);
+}
 
 StreamLogWriter::~StreamLogWriter()
 {
-	delete stream;
+	fclose(stream);
 }
 
-void StreamLogWriter::Print(const std::string& msg)
+static const LOG_FMT& LevelFormat(ANSIColor color, LogLevel level)
 {
-	stream->Write(msg.c_str(), (uint32_t)msg.length());
+	static LOG_FMT nullfmt;
+
+	static const EnumArray<LogLevel, LOG_FMT> BasicFMT {
+		fmt::fg(fmt::terminal_color::bright_red),
+		fmt::fg(fmt::terminal_color::bright_red),
+		fmt::fg(fmt::terminal_color::bright_yellow),
+		fmt::fg(fmt::terminal_color::white),
+		fmt::fg(fmt::terminal_color::bright_green),
+		fmt::fg(fmt::terminal_color::blue)
+	};
+
+	switch (color) {
+		case ANSIColor::Basic:
+			return BasicFMT[level];
+		case ANSIColor::True:
+			return Logger::LevelFormat[level];
+		default:
+			return nullfmt;
+	}
+}
+
+static const LOG_FMT& DefaultFormat(ANSIColor color)
+{
+	static EnumArray<ANSIColor, LOG_FMT> formats {
+		fmt::text_style(),
+		fmt::fg(fmt::terminal_color::bright_white),
+		fmt::fg(fmt::color::white) | fmt::emphasis::bold
+	};
+
+	return formats[color];
+}
+
+static const std::string& DefaultFormatCode(ANSIColor color)
+{
+	static EnumArray<ANSIColor, std::string> codes {
+		"",
+		fmt::to_string(fmt::styled("", DefaultFormat(ANSIColor::Basic))),
+		fmt::to_string(fmt::styled("", DefaultFormat(ANSIColor::True)))
+	};
+
+	return codes[color];
 }
 
 void StreamLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 {
-	Print("[" + msg.owner + "/" + log_level_text[msg.level] + "]: " + msg.message + "\n");
-}
-
-Logger::WriterPtr createStreamLogWriter(DataStream* stream)
-{
-	return Logger::WriterPtr(new StreamLogWriter(DEBUG, stream));
-}
-
-static FileStream* DupStdOut()
-{
-	int fd = dup(fileno(stdout));
-	assert(fd != -1);
-	FILE* fp = fdopen(fd, "w");
-	return new FileStream(File(fp));
-}
-
-StdioLogWriter::StdioLogWriter(log_level level, bool useColor)
-: StreamLogWriter(level, DupStdOut()), useColor(useColor)
-{}
-
-StdioLogWriter::~StdioLogWriter()
-{
-	textcolor(DEFAULT); // undo any changes to the terminal
-}
-
-void StdioLogWriter::textcolor(log_color c)
-{
-	// Shold this be in an ansi-term subclass?
-	// Probably not worth the bother
-	static const char* colors[] = {
-		"\033[0m",
-		"\033[0m\033[30;40m",
-		"\033[0m\033[31;40m",
-		"\033[0m\033[32;40m",
-		"\033[0m\033[33;40m",
-		"\033[0m\033[34;40m",
-		"\033[0m\033[35;40m",
-		"\033[0m\033[36;40m",
-		"\033[0m\033[37;40m",
-		"\033[1m\033[31;40m",
-		"\033[1m\033[32;40m",
-		"\033[1m\033[33;40m",
-		"\033[1m\033[34;40m",
-		"\033[1m\033[35;40m",
-		"\033[1m\033[36;40m",
-		"\033[1m\033[37;40m"
+	static constexpr char RESET[] = "\x1b[0m";
+	static const auto F_STRING = FMT_STRING("[{}{:/>{}}{}]: {}\n");
+	
+	static const std::string LogLevelText[] = {
+		"FATAL",
+		"ERROR",
+		"WARN",
+		"", // MESSAGE
+		"COMBAT",
+		"DEBUG"
 	};
 
-	if (useColor)
-		Print(colors[c]);
-}
+	const auto& lvlTxt = LogLevelText[msg.level];
+	const int hasLvl = !lvlTxt.empty();
+	if (color != ANSIColor::None) {
+		const LOG_FMT& defaultFmt = DefaultFormat(color);
+		const std::string& defaultStyle = DefaultFormatCode(color);
 
-void StdioLogWriter::printBracket(const char* status, log_color color)
-{
-	textcolor(WHITE);
-	Print("[");
-	textcolor(color);
-	Print(status);
-	textcolor(WHITE);
-	Print("]");
-}
-
-void StdioLogWriter::printStatus(const char* status, log_color color)
-{
-	printBracket(status, color);
-	Print("\n");
-}
-
-void StdioLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
-{
-	if (useColor) {
-		static constexpr log_color log_level_color[] = {
-			LIGHT_RED,
-			LIGHT_RED,
-			YELLOW,
-			LIGHT_WHITE,
-			GREEN,
-			BLUE
+		auto Style = [&](auto&& param, fmt::text_style style) {
+			if (param.empty()) {
+				return param;
+			}
+			std::string str = RESET;
+			str.reserve(param.length() + defaultStyle.length() * 2);
+			str += fmt::to_string(fmt::styled(param, style));
+			str.append(defaultStyle, 0, defaultStyle.length() - (sizeof(RESET) - 1));
+			return str;
 		};
 
-		textcolor(LIGHT_WHITE);
-		Print("[");
-		Print(msg.owner);
-		if (log_level_text[msg.level][0]) {
-			Print("/");
-			textcolor(log_level_color[msg.level]);
-			Print(log_level_text[int(msg.level)]);
-		}
-		textcolor(LIGHT_WHITE);
-		Print("]: ");
-
-		textcolor(msg.color);
-		Print(msg.message);
-		Print("\n");
+		const auto& lvlFmt = LevelFormat(color, msg.level);
+		fmt::print(stream, defaultFmt, F_STRING, msg.owner, "", hasLvl, Style(lvlTxt, lvlFmt), Style(msg.message, msg.format));
 	} else {
-		StreamLogWriter::WriteLogMessage(msg);
+		fmt::print(stream, F_STRING, msg.owner, "", hasLvl, lvlTxt, msg.message);
 	}
-	
-	fflush(stdout);
+}
+
+static Logger::WriterPtr createStreamLogWriter(FILE* stream, ANSIColor color)
+{
+	if (stream) {
+		return std::make_shared<StreamLogWriter>(DEBUG, stream, color);
+	}
+	return nullptr;
+}
+
+Logger::WriterPtr createStdioLogWriter(ANSIColor color)
+{
+	Log(DEBUG, "Logging", "Creating console log with color setting: {}", fmt::underlying(color));
+	int fd = dup(fileno(stdout));
+	return createStreamLogWriter(fdopen(fd, "w"), color);
 }
 
 Logger::WriterPtr createStdioLogWriter()
 {
-#ifndef NO_COLOR
-	return Logger::WriterPtr(new StdioLogWriter(DEBUG, true));
-#else
-	return Logger::WriterPtr(new StdioLogWriter(DEBUG, false));
+	// see https://no-color.org
+	const char* nocolor = getenv("NO_COLOR");
+	if (nocolor && nocolor[0] != '\0') {
+		return createStdioLogWriter(ANSIColor::None);
+	}
+
+	ANSIColor color = ANSIColor::None;
+#ifdef WIN32
+	color = ANSIColor::Basic;
+#if defined(VER_PRODUCTBUILD) && VER_PRODUCTBUILD >= 8100
+	if (IsWindows10OrGreater()) { // FIXME: this isnt exactly right, true color support was added in 1703
+		color = ANSIColor::True;
+	}
 #endif
+#elif defined(HAVE_UNISTD_H)
+	if (isatty(STDOUT_FILENO)) {
+		color = ANSIColor::Basic;
+		// this COLORTERM detection is not comprehensive. Not all terminal emulators will follow this standard
+		// we can add known offenders to a list and check with TERM, (or they use the --color switch)
+		const char* colorterm = getenv("COLORTERM");
+		if (colorterm && (stricmp(colorterm, "truecolor") == 0 || stricmp(colorterm, "24bit") == 0)) {
+			color = ANSIColor::True;
+		}
+
+		Log(DEBUG, "Logging", "Using colorized terminal output: {}\nDetermined from COLORTERM={}", fmt::underlying(color), colorterm);
+	}
+#endif
+
+	return createStdioLogWriter(color);
+}
+
+Logger::WriterPtr createStreamLogWriter(FILE* stream)
+{
+	return createStreamLogWriter(stream, ANSIColor::None);
 }
 
 }

@@ -30,9 +30,6 @@ using namespace GemRB;
 
 int main(int argc, char* argv[])
 {
-	AddLogWriter(createStdioLogWriter());
-	ToggleLogging(true);
-
 	setlocale(LC_ALL, "");
 #ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
@@ -50,10 +47,22 @@ int main(int argc, char* argv[])
 	setenv("MALLOC_TRIM_THRESHOLD_", fmt::format("{}", 5 * pagesize), 1);
 #endif
 
-	SanityCheck();
-
 	try {
-		Interface gemrb(LoadFromArgs(argc, argv));
+		auto cfg = LoadFromArgs(argc, argv);
+
+		if (cfg.Logging) {
+			ToggleLogging(cfg.Logging);
+		}
+
+		if (cfg.LogColor >= 0 && cfg.LogColor < int(ANSIColor::count)) {
+			AddLogWriter(createStdioLogWriter(ANSIColor(cfg.LogColor)));
+		} else {
+			AddLogWriter(createStdioLogWriter());
+		}
+
+		SanityCheck();
+
+		Interface gemrb(std::move(cfg));
 		gemrb.Main();
 	} catch (CoreInitializationException& cie) {
 		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie.what());

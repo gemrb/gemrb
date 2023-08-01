@@ -21,13 +21,20 @@
 
 #include "Logging/Logger.h" // for log_color
 
+#include <cstdio>
+
 namespace GemRB {
 
-class DataStream;
+enum class ANSIColor : uint8_t {
+	None,
+	Basic,
+	True,
+	count
+};
 
 class GEM_EXPORT StreamLogWriter : public Logger::LogWriter {
 public:
-	StreamLogWriter(log_level, DataStream*);
+	StreamLogWriter(LogLevel, FILE*, ANSIColor color);
 	~StreamLogWriter() override;
 	
 	StreamLogWriter(const StreamLogWriter&) = delete;
@@ -36,29 +43,14 @@ public:
 
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
 
-protected:
-	void Print(const std::string& message);
-
 private:
-	DataStream* stream;
+	ANSIColor color;
+	FILE* stream;
 };
 
-class GEM_EXPORT StdioLogWriter : public StreamLogWriter {
-public:
-	StdioLogWriter(log_level, bool useColor);
-	~StdioLogWriter() override;
-	
-	void WriteLogMessage(const Logger::LogMessage& msg) override;
-private:
-	bool useColor;
-
-	void textcolor(log_color);
-	void printBracket(const char *status, log_color color);
-	void printStatus(const char* status, log_color color);
-};
-
+GEM_EXPORT Logger::WriterPtr createStdioLogWriter(ANSIColor);
 GEM_EXPORT Logger::WriterPtr createStdioLogWriter();
-Logger::WriterPtr createStreamLogWriter(DataStream*);
+GEM_EXPORT Logger::WriterPtr createStreamLogWriter(FILE*);
 
 }
 

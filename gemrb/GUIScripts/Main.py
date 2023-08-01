@@ -18,6 +18,21 @@ def Init():
 	# this function is run after the game type is set
 	# this is where we would run initializations (even on a per-game type basis)
 	
+	class stdioWrapper(object):
+		def __init__(self, log_level):
+			self.log_level = log_level
+			self.buffer = ""
+		def write(self, message):
+			self.buffer += str(message)
+		def flush(self):
+			out = self.buffer.rstrip("\n")
+			if out:
+				GemRB.Log(self.log_level, "Python", out)
+			self.buffer = ""
+
+	sys.stdout = stdioWrapper(LOG_MESSAGE)
+	sys.stderr = stdioWrapper(LOG_ERROR)
+	
 	print("Python version: " + sys.version)
 	
 	# create a global scrollbar for the ScrollView to clone from

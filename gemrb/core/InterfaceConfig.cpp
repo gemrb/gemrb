@@ -174,7 +174,8 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_INT("NumFingInfo", config.NumFingInfo);
 	CONFIG_INT("GamepadPointerSpeed", config.GamepadPointerSpeed);
 	CONFIG_INT("Logging", config.Logging);
-	
+	CONFIG_INT("LogColor", config.LogColor);
+
 	auto CONFIG_STRING = [&cfg](const std::string& key, auto& field) {
 		if (cfg.count(key)) {
 			field = cfg[key];
@@ -324,12 +325,14 @@ CoreSettings LoadFromArgs(int argc, char *argv[])
 		} else if (stricmp(argv[i], "-q") == 0) {
 			// quiet mode
 			settings["AudioDriver"] = "none";
+		} else if (stricmp(argv[i], "--color") == 0) {
+			if (i < argc - 1) settings["LogColor"] = argv[++i];
 		} else {
 			// assume a path was passed, soft force configless startup
 			settings["GamePath"] = argv[i];
 		}
 	}
-	
+
 	if (loadedCFG == false)
 	{
 		// Find basename of this program. It does the same as basename (3),

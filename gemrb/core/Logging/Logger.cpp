@@ -24,8 +24,30 @@
 
 namespace GemRB {
 
+const EnumArray<LogLevel, LOG_FMT> Logger::LevelFormat {
+	fmt::fg(fmt::color::red) | fmt::emphasis::bold,
+	fmt::fg(fmt::color::red) | fmt::emphasis::bold,
+	fmt::fg(fmt::color::yellow) | fmt::emphasis::bold,
+	fmt::fg(fmt::color::white),
+	fmt::fg(fmt::color::green) | fmt::emphasis::bold,
+	fmt::fg(fmt::color::blue)
+};
+
+const LOG_FMT Logger::MSG_STYLE = fmt::fg(fmt::color::ghost_white);
+
 Logger::Logger(std::deque<WriterPtr> writers)
 : writers(std::move(writers))
+{}
+
+Logger::~Logger()
+{
+	running = false;
+	cv.notify_all();
+	if (loggingThread.joinable())
+		loggingThread.join();
+}
+
+void Logger::StartProcessingThread()
 {
 	loggingThread = std::thread([this] {
 		while (running) {
@@ -39,17 +61,15 @@ Logger::Logger(std::deque<WriterPtr> writers)
 	});
 }
 
-Logger::~Logger()
-{
-	running = false;
-	cv.notify_all();
-	loggingThread.join();
-}
-
 void Logger::AddLogWriter(WriterPtr writer)
 {
 	std::lock_guard<std::mutex> l(writerLock);
 	writers.push_back(std::move(writer));
+
+	if (!loggingThread.joinable()) {
+		StartProcessingThread();
+		cv.notify_all(); // notify for anything already queued
+	}
 }
 
 void Logger::ProcessMessages(QueueType queue)
@@ -63,17 +83,13 @@ void Logger::ProcessMessages(QueueType queue)
 	}
 }
 
-void Logger::LogMsg(log_level level, const char* owner, const char* message, log_color color)
+void Logger::LogMsg(LogLevel level, const char* owner, const char* message, LOG_FMT fmt)
 {
-	LogMsg(LogMessage(level, owner, message, color));
+	LogMsg(LogMessage(level, owner, message, fmt));
 }
 
 void Logger::LogMsg(LogMessage&& msg)
-{	
-	if (msg.level < FATAL) {
-		msg.level = FATAL;
-	}
-	
+{
 	if (msg.level == FATAL) {
 		// fatal errors must happen now!
 		std::lock_guard<std::mutex> l(writerLock);
@@ -86,14 +102,5 @@ void Logger::LogMsg(LogMessage&& msg)
 		cv.notify_all();
 	}
 }
-
-const char* const log_level_text[] = {
-	"FATAL",
-	"ERROR",
-	"WARNING",
-	"", // MESSAGE
-	"COMBAT",
-	"DEBUG"
-};
 
 }
