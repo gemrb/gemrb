@@ -9277,6 +9277,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 		attackProjectile = pro;
 	} else { // launch it now as we are not attacking
 		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
+		SetOrientation(target->Pos, Pos, false);
 	}
 	return true;
 }
