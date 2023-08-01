@@ -29,13 +29,8 @@ def GetPortraitButtonPairs(Window):
 def PortraitButtonHPOnPress (btn):
 	id = btn.ControlID - 6
 	hbs = GemRB.GetVar('Health Bar Settings')
-	if hbs & (1 << id):
-		op = OP_NAND
-	else:
-		op = OP_OR
-
-	btn.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 	GemRB.SetVar('Health Bar Settings', hbs ^ (1 << id))
+	UpdatePortraitButton(btn.Window.GetControl(id))
 	return
 
 def SetupButtonBorders (Button):
@@ -160,15 +155,16 @@ def UpdatePortraitButton(Button):
 	g = int (255 * ratio)
 
 	ButtonHP = Button.Window.GetControl(6 + Button.ControlID)
-	ButtonHP.SetText ("{} / {}".format(hp, hp_max))
+
 	ButtonHP.SetColor ({'r' : r, 'g' : g, 'b' : 0})
 	ButtonHP.SetPictureClipping (ratio)
 
 	if GemRB.GetVar('Health Bar Settings') & (1 << Button.ControlID):
-		op = OP_OR
+		ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+		ButtonHP.SetText ("")
 	else:
-		op = OP_NAND
-	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
+		ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+		ButtonHP.SetText ("{} / {}".format(hp, hp_max))
 
 	animated = GemRB.GetVar("{}_ANIM".format(Button.ControlID))
 	if animated:

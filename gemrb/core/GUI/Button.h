@@ -61,7 +61,6 @@ class Palette;
 #define IE_GUI_BUTTON_LOWERCASE    0x00002000
 //#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag; labeled "no word wrap"
 //end of hardcoded part
-#define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
 #define IE_GUI_BUTTON_PLAYONCE     0x00020000
 #define IE_GUI_BUTTON_PLAYALWAYS   0x00040000   // play even when game is paused
 
