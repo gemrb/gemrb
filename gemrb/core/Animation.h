@@ -33,7 +33,7 @@
 
 namespace GemRB {
 
-#define ANI_DEFAULT_FRAMERATE	15
+#define ANI_DEFAULT_FRAMERATE	15.0f
 
 class GEM_EXPORT Animation {
 public:
@@ -43,7 +43,7 @@ public:
 	bool endReached = false;
 	index_t frameIdx = 0;
 	Point pos;
-	unsigned char fps = ANI_DEFAULT_FRAMERATE;
+	float fps = ANI_DEFAULT_FRAMERATE;
 	bool playReversed = false;
 	bool gameAnimation = false; // is it affected by pausing?
 	Region animArea;
