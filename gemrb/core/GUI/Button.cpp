@@ -307,9 +307,6 @@ void Button::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (animation) {
 		animation->flags = 0;
-		if (flags & IE_GUI_BUTTON_PLAYONCE) {
-			animation->flags |= A_ANI_PLAYONCE;
-		}
 		animation->gameAnimation = !(flags & IE_GUI_BUTTON_PLAYALWAYS);
 	}
 }

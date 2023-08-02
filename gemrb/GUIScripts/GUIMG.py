@@ -95,7 +95,7 @@ def InitMageWindow (window):
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = MageWindow.GetControl (27 + i)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetValue (i)
 
@@ -138,7 +138,7 @@ def UpdateMageWindow (MageWindow):
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, spelltype, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
-				Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
+				Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 				if ms['Flags']:
 					Button.OnPress (OpenMageSpellUnmemorizeWindow)
 				else:
@@ -153,9 +153,9 @@ def UpdateMageWindow (MageWindow):
 				Button.SetTooltip (spell['SpellName'])
 			else:
 				if i < max_mem_cnt:
-					Button.SetFlags (IE_GUI_BUTTON_NORMAL | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
+					Button.SetFlags (IE_GUI_BUTTON_NORMAL | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 				else:
-					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
+					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 				Button.OnPress (None)
 				Button.OnRightPress (None)
 				Button.SetTooltip ('')
@@ -286,10 +286,10 @@ def OnMageMemorizeSpell (btn):
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
-		Button.SetAnimation (FlashResRef, 0, 11)
+		Button.SetAnimation (FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
 		Button = MageWindow.GetControl(mem_cnt + 2)
-		Button.SetAnimation (FlashResRef, 0, 11)
+		Button.SetAnimation (FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
 		UpdateMageWindow (MageWindow)
 	return
 
@@ -364,7 +364,7 @@ def OnMageUnmemorizeSpell (btn):
 	if GemRB.UnmemorizeSpell (pc, spelltype, level, index):
 		GemRB.PlaySound ("GAM_44")
 		Button = MageWindow.GetControl(index + 3)
-		Button.SetAnimation (FlashResRef, 0, 11)
+		Button.SetAnimation (FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
 		UpdateMageWindow (MageWindow)
 	return
 

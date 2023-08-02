@@ -56,7 +56,6 @@ IE_GUI_BUTTON_LOWERCASE    = 0x00002000
 #IE_GUI_BUTTON_MULTILINE    = 0x00004000 # don't set the SINGLE_LINE font rendering flag
 #end of hardcoded section
 
-IE_GUI_BUTTON_PLAYONCE   = 0x00020000   # the button animation won't restart
 IE_GUI_BUTTON_PLAYALWAYS = 0x00040000   # animation will play when game is paused
 
 IE_GUI_BUTTON_CENTER_PICTURES = 0x00100000 # center the button's PictureList
@@ -64,7 +63,7 @@ IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00200000 # BG1-style paperdoll
 IE_GUI_BUTTON_HORIZONTAL      = 0x00400000 # horizontal clipping of overlay
 IE_GUI_BUTTON_NO_TOOLTIP      = 0x00800000 # disable the tooltip
 
-IE_GUI_BUTTON_PORTRAIT    = IE_GUI_BUTTON_PLAYONCE|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE
+IE_GUI_BUTTON_PORTRAIT    = IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE
 
 #label flags
 IE_GUI_LABEL_USE_COLOR = 1
@@ -176,10 +175,12 @@ ACTION_WINDOW_FOCUS_GAINED	= 1
 ACTION_WINDOW_FOCUS_LOST	= 2
 
 # animation flags
-ANIM_PLAY_NORMAL		= 0,
-ANIM_PLAY_RANDOM		= 1, # the button animation is random
-ANIM_PLAY_ONCE			= 2, # the button animation won't restart
-ANIM_PLAY_ALWAYS		= 4  # animation will play when game is paused
+A_ANI_ACTIVE         = 1        # if not set, animation is invisible
+A_ANI_BLEND          = 2        # blend
+A_ANI_NO_SHADOW      = 4        # lightmap doesn't affect it
+A_ANI_PLAYONCE       = 8        # stop after endframe
+A_ANI_SYNC           = 16       # synchronised draw (skip frames if needed)
+A_ANI_RANDOM_START   = 32       # starts with a random frame in the start range
 
 # GameScreen flags
 GS_PARTYAI           = 1

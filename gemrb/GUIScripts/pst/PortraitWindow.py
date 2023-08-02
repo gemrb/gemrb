@@ -61,7 +61,6 @@ def OpenPortraitWindow (pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 		Button.SetVarAssoc("portrait", pcID) # neeeded for drag/drop
 		Button.SetHotKey(chr(ord('1') + i), 0, True)
-		Button.SetFlags (IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.OnAnimEnd (UpdateButtonAnimation)
 		SetupButtonBorders (Button)
 			
@@ -120,16 +119,16 @@ def UpdateButtonAnimation(Button):
 	if cycle < 6: # a "random" animation
 		def phase2(btn):
 			switch = random.randint(0, 29) == 0
-			btn.SetAnimation(pic, cycle + int(switch))
+			btn.SetAnimation(pic, cycle + int(switch), A_ANI_PLAYONCE)
 			btn.OnAnimEnd (UpdateButtonAnimation)
 		# note: the granularity of time should be
 		# one of twenty values from [500, 10000]
 		# but not the full range.
 		duration = 500 + 500 * random.randint(0, 19);
-		Button.SetAnimation([GemRB.GetSprite(pic, -1, cycle, 0)], duration)
+		Button.SetAnimation([GemRB.GetSprite(pic, -1, cycle, 0)], duration, A_ANI_PLAYONCE)
 		Button.OnAnimEnd (phase2)
 	else:
-		Button.SetAnimation(pic, cycle)
+		Button.SetAnimation(pic, cycle, A_ANI_PLAYONCE)
 	return
 
 def UpdatePortraitButton(Button):
