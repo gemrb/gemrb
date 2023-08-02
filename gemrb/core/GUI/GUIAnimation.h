@@ -31,10 +31,16 @@ namespace GemRB {
 template <class T>
 class GUIAnimation {
 protected:
-	tick_t begintime = GetMilliseconds();
+	tick_t begintime = 0;
 	T current;
 	
 public:
+	GUIAnimation(tick_t begin) noexcept
+	: begintime(begin) {}
+
+	GUIAnimation() noexcept
+	: GUIAnimation(GetMilliseconds()) {}
+
 	virtual ~GUIAnimation() noexcept = default;
 	
 	explicit operator bool() const {
@@ -122,33 +128,20 @@ private:
 	bool HasEnded() const override;
 };
 
-class AnimationFactory;
+class Animation;
 
 class GEM_EXPORT SpriteAnimation : public GUIAnimation<Holder<Sprite2D>> {
 private:
-	std::shared_ptr<const AnimationFactory> bam;
-	uint8_t frame = 0;
-	tick_t nextFrameTime = 0;
+	std::shared_ptr<Animation> anim;
 
-	tick_t CalculateNextFrameDelta();
 	Holder<Sprite2D> GenerateNext(tick_t time) override;
 public:
-	SpriteAnimation(float fps, std::shared_ptr<const AnimationFactory> af, int Cycle = 0);
-	//report if the current resource is the same as descripted by the params
+	SpriteAnimation(std::shared_ptr<Animation> anim);
+
 	bool HasEnded() const override;
-
-	tick_t Time() const { return nextFrameTime; }
 	
-	enum RepeatFlags : uint8_t {
-		PLAY_NORMAL		= 0,  // play in a loop
-		PLAY_ONCE		= 2,  // play and stop at end
-		PLAY_ALWAYS		= 4   // play even when game is paused
-	} flags = PLAY_NORMAL;
-	
-	BlitFlags blitFlags = BlitFlags::BLENDED;
-
-	uint8_t cycle = 0;
-	float fps = 10.0f;
+	ieDword& flags;
+	bool& gameAnimation;
 };
 
 }

@@ -193,16 +193,17 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 
 	// Button animation
-	if (animation && animation->Current()) {
+	if (animation) {
 		auto AnimPicture = animation->Current();
 		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
 		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
+		BlitFlags bf = (animation->flags & A_ANI_BLEND) ? BlitFlags::ONE_MINUS_DST : BlitFlags::BLENDED;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			VideoDriver->BlitSprite( AnimPicture, r.origin + AnimPicture->Frame.origin, &r );
+			VideoDriver->BlitSprite(AnimPicture, r.origin + AnimPicture->Frame.origin, &r, bf);
 		} else {
-			VideoDriver->BlitSprite( AnimPicture, r.origin, &r );
+			VideoDriver->BlitSprite(AnimPicture, r.origin, &r, bf);
 		}
 	}
 
@@ -305,13 +306,11 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 void Button::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (animation) {
-		animation->flags = SpriteAnimation::PLAY_NORMAL;
+		animation->flags = 0;
 		if (flags & IE_GUI_BUTTON_PLAYONCE) {
-			animation->flags |= SpriteAnimation::PLAY_ONCE;
+			animation->flags |= A_ANI_PLAYONCE;
 		}
-		if (flags & IE_GUI_BUTTON_PLAYALWAYS) {
-			animation->flags |= SpriteAnimation::PLAY_ALWAYS;
-		}
+		animation->gameAnimation = !(flags & IE_GUI_BUTTON_PLAYALWAYS);
 	}
 }
 

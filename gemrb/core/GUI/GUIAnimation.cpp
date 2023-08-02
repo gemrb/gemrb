@@ -19,7 +19,7 @@
 
 #include "GUIAnimation.h"
 
-#include "AnimationFactory.h"
+#include "Animation.h"
 #include "Interface.h"
 #include "RNG.h"
 
@@ -77,58 +77,23 @@ bool ColorAnimation::HasEnded() const
 	return repeat ? false : current == end;
 }
 
-SpriteAnimation::SpriteAnimation(float fps, std::shared_ptr<const AnimationFactory> af, int cycle)
-: bam(std::move(af)), cycle(cycle), fps(fps)
+SpriteAnimation::SpriteAnimation(std::shared_ptr<Animation> a)
+: GUIAnimation(/*anim->starttime*/ 0), anim(std::move(a)),
+flags(anim->Flags), gameAnimation(anim->gameAnimation)
 {
-	assert(bam);
-	nextFrameTime = begintime;
+	assert(anim);
+	current = anim->CurrentFrame();
 }
 
-tick_t SpriteAnimation::CalculateNextFrameDelta()
+Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t)
 {
-	return 1000.0f / fps;
-}
-
-Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
-{
-	if (time < nextFrameTime) return current;
-
-	// even if we are paused we need to generate the first frame
-	if (current && !(flags & PLAY_ALWAYS) && core->IsFreezed()) {
-		nextFrameTime = time + 1;
-		return current;
-	}
-
-	nextFrameTime = time + CalculateNextFrameDelta();
-	assert(nextFrameTime);
-
-	Holder<Sprite2D> pic = bam->GetFrame(frame, cycle);
-	frame++;
-
-	if (pic == nullptr) {
-		//stopping at end frame
-		if (flags & PLAY_ONCE) {
-			nextFrameTime = 0;
-			return current;
-		}
-		frame = 0;
-		pic = bam->GetFrame(0, cycle);
-	}
-
-	if (pic == nullptr) {
-		// I guess we just return the existing frame...
-		// we already did the palette manipulation (probably)
-		return current;
-	}
-
-	pic->renderFlags |= blitFlags;
-
-	return pic;
+	auto frame = anim->NextFrame();
+	return frame ? frame : current;
 }
 
 bool SpriteAnimation::HasEnded() const
 {
-	return nextFrameTime == 0;
+	return anim->endReached;
 }
 
 }

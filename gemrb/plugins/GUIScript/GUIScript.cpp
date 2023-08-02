@@ -3665,7 +3665,7 @@ Optionally Flags can be used to specify the animation flags.\n\
   * GButton - the button\n\
   * Animation - resref of the animation, or a list of Sprite2D\
   * Cycle - (optional) number of the cycle to use if using a BAM, otherwise the duration (in ticks) required for the animation.\n\
-  * Blend - (optional) set the blend mode, default is BLENDED \n\
+  * Flags - (optional) set the animation flags \n\
   * Cols - (optional) a list of Colors to apply as the palette\n\
 \n\
 **Return value:** N/A\n"
@@ -3674,10 +3674,10 @@ Optionally Flags can be used to specify the animation flags.\n\
 static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 {
 	PyObject* pyAnim = nullptr;
-	int Cycle = 0;
-	int Blend = BlitFlags::BLENDED;
+	int cycle = 0;
+	int flags = 0;
 	PyObject* cols = nullptr;
-	PARSE_ARGS(args,  "OO|iiO", &self, &pyAnim, &Cycle, &Blend, &cols);
+	PARSE_ARGS(args,  "OO|iiO", &self, &pyAnim, &cycle, &flags, &cols);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
@@ -3692,27 +3692,24 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	}
 
 	float fps = 10.0f;
-	std::shared_ptr<AnimationFactory> af;
+	std::shared_ptr<Animation> anim;
 	if (PyUnicode_Check(pyAnim)) {
 		const ResRef& ref = ResRefFromPy(pyAnim);
-		af = gamedata->GetFactoryResourceAs<AnimationFactory>(ref, IE_BAM_CLASS_ID);
+		auto af = gamedata->GetFactoryResourceAs<AnimationFactory>(ref, IE_BAM_CLASS_ID);
 		ABORT_IF_NULL(af);
+		anim.reset(af->GetCycle(cycle));
 	} else if (PyList_Check(pyAnim)) {
 		std::vector<Holder<Sprite2D>> frames;
 		for (Py_ssize_t i = 0; i < PyList_Size(pyAnim); ++i) {
 			PyObject* item = PyList_GetItem(pyAnim, i);
 			frames.push_back(SpriteFromPy(item));
 		}
-		std::vector<AnimationFactory::CycleEntry> cycles(1, {AnimationFactory::index_t(frames.size()), 0});
-		std::vector<AnimationFactory::index_t> flt(frames.size());
-		std::iota(flt.begin(), flt.end(), 0);
 
-		fps = frames.size() / (Cycle / 1000.0f);
-		Cycle = 0;
-		af = std::make_shared<AnimationFactory>("", std::move(frames), std::move(cycles), std::move(flt));
+		fps = frames.size() / (cycle / 1000.0f);
+		anim = std::make_shared<Animation>(std::move(frames));
 	}
 
-	ABORT_IF_NULL(af);
+	ABORT_IF_NULL(anim);
 
 	if (cols) {
 		ieDword indices[8] {};
@@ -3722,16 +3719,16 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 			indices[i] = static_cast<ieDword>(PyLong_AsLong(item));
 		}
 		// assumes all sprites share a palette
-		auto spr = af->GetFrameWithoutCycle(0);
+		auto spr = anim->GetFrame(0);
 		auto pal = spr->GetPalette();
 		*pal = SetupPaperdollColours(indices, 0);
 		fps = 10.0f; // FIXME: why do we slow these down?
 	}
 
-	SpriteAnimation* anim = new SpriteAnimation(fps, af, Cycle);
-	anim->blitFlags = static_cast<BlitFlags>(Blend);
+	anim->fps = fps;
+	anim->Flags = flags | A_ANI_ACTIVE;
 
-	btn->SetAnimation(anim);
+	btn->SetAnimation(new SpriteAnimation(anim));
 
 	Py_RETURN_NONE;
 }
