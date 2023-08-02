@@ -295,7 +295,7 @@ def UpdatePortraitWindow ():
 			Button.SetTooltip ("")
 			continue
 
-		portraitFlags = IE_GUI_BUTTON_PORTRAIT | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM
+		portraitFlags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM
 		Button.SetFlags (portraitFlags, OP_SET)
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)

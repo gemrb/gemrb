@@ -20,7 +20,6 @@
 
 #include "GUI/Button.h"
 
-#include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
@@ -33,11 +32,10 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
+#include "Map.h"
 #include "Palette.h"
 
 #include <utility>
-
-#define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
 
 namespace GemRB {
 
@@ -254,7 +252,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			align |= IE_FONT_ALIGN_MIDDLE;
 
 		Region r = rgn;
-		if (IS_PORTRAIT) {
+		if (Picture && flags & IE_GUI_BUTTON_PICTURE) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
@@ -422,29 +420,6 @@ String Button::TooltipText() const
 	return Control::TooltipText();
 }
 
-Holder<Sprite2D> Button::Cursor() const
-{
-	if (IS_PORTRAIT) {
-		const GameControl* gc = core->GetGameControl();
-		if (gc) {
-			Holder<Sprite2D> cur = gc->GetTargetActionCursor();
-			if (cur) return cur;
-		}
-	}
-	return Control::Cursor();
-}
-
-bool Button::AcceptsDragOperation(const DragOp& dop) const
-{
-	// FIXME: this implementation is obviously not future proof
-	// portrait buttons accept other portraits and dropped items
-	if (IS_PORTRAIT) {
-		return true;
-	}
-	
-	return Control::AcceptsDragOperation(dop);
-}
-
 void Button::CompleteDragOperation(const DragOp& dop)
 {
 	if (dop.dragView == this) {
@@ -457,10 +432,7 @@ void Button::CompleteDragOperation(const DragOp& dop)
 
 Holder<Sprite2D> Button::DragCursor() const
 {
-	if (IS_PORTRAIT) {
-		// TODO: would it be an enhancement to actually use the portrait for the drag icon?
-		return core->Cursors[IE_CURSOR_SWAP];
-	} else if (Picture) {
+	if (Picture) {
 		return Picture;
 	}
 	
