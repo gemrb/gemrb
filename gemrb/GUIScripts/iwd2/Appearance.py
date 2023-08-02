@@ -50,7 +50,7 @@ def RefreshPDoll():
 	global ColorWindow, PDollButton
 	global Color1, Color2, Color3, Color4, PDollResRef
 
-	PDollButton.SetFlags(IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
+	PDollButton.SetFlags(IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
 	PDollButton.SetBAM("", 0, 0, 0) # just hide or there is a tiny artifact
 	PDollButton.SetAnimation (None) # force reset
 	PDollButton.SetAnimation (PDollResRef, 1, A_ANI_ACTIVE, [0, Color4, Color3, Color2, 0, 0, Color1, 0])

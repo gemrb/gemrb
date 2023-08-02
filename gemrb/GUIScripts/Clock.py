@@ -28,7 +28,7 @@ def CreateClockButton(Button):
 	flags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NORMAL
 
 	# FIXME: display all animations: CPEN, CGEAR, CDIAL
-	Button.SetAnimation ("CGEAR")
+	Button.SetAnimation ("CGEAR", 0, A_ANI_GAMEANIM)
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 	Button.SetFlags (flags, OP_SET)
 	Button.OnPress (lambda: GemRB.GamePause (2, 0))
@@ -37,7 +37,7 @@ def CreateClockButton(Button):
 	elif GameCheck.IsBG2():
 		pen = Button.CreateButton (0x10000009)
 		pen.SetFlags (flags | IE_GUI_VIEW_IGNORE_EVENTS, OP_SET)
-		pen.SetAnimation ("CPEN")
+		pen.SetAnimation ("CPEN", 0, A_ANI_GAMEANIM)
 		
 	UpdateClock()
 
