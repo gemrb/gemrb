@@ -303,14 +303,6 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 }
 
-void Button::FlagsChanged(unsigned int /*oldflags*/)
-{
-	if (animation) {
-		animation->flags = 0;
-		animation->gameAnimation = !(flags & IE_GUI_BUTTON_PLAYALWAYS);
-	}
-}
-
 /** Sets the Button State */
 void Button::SetState(State state)
 {
@@ -642,7 +634,6 @@ void Button::SetAnimation(SpriteAnimation* anim)
 
 	const auto& key = fmt::format("{}_ANIM", ControlID);
 	if (animation) {
-		FlagsChanged(flags); // sync animation flags
 		core->GetDictionary().Set(key, true);
 	} else {
 		core->GetDictionary().Erase(key);

@@ -95,7 +95,7 @@ def InitMageWindow (window):
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = MageWindow.GetControl (27 + i)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetValue (i)
 
@@ -138,7 +138,7 @@ def UpdateMageWindow (MageWindow):
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, spelltype, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
-				Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
+				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 				if ms['Flags']:
 					Button.OnPress (OpenMageSpellUnmemorizeWindow)
 				else:
@@ -153,9 +153,9 @@ def UpdateMageWindow (MageWindow):
 				Button.SetTooltip (spell['SpellName'])
 			else:
 				if i < max_mem_cnt:
-					Button.SetFlags (IE_GUI_BUTTON_NORMAL | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
+					Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 				else:
-					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
+					Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 				Button.OnPress (None)
 				Button.OnRightPress (None)
 				Button.SetTooltip ('')

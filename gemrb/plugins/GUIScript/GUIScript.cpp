@@ -3725,8 +3725,10 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		fps = 10.0f; // FIXME: why do we slow these down?
 	}
 
+	constexpr auto A_ANI_GAMEANIM = A_ANI_NO_SHADOW; // repurpose this flag that isnt used for animations
 	anim->fps = fps;
-	anim->Flags = flags | A_ANI_ACTIVE;
+	anim->Flags = (flags | A_ANI_ACTIVE) & ~A_ANI_GAMEANIM;
+	anim->gameAnimation = (flags & A_ANI_GAMEANIM);
 
 	btn->SetAnimation(new SpriteAnimation(anim));
 
