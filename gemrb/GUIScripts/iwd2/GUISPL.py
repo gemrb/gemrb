@@ -64,13 +64,13 @@ def InitSpellBookWindow (Window):
 		color = {'r' : 0, 'g' : 0, 'b' : 0, 'a' : 160}
 		Button.SetBorder (0,color,0,1)
 		#Button.SetBAM ("SPELFRAM",0,0,0)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYALWAYS | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetValue (i)
 
 	# Setup book spells buttons
 	for i in range (8):
 		Button = Window.GetControl (30 + i)
-		Button.SetFlags (IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetValue (i)
 
@@ -187,7 +187,7 @@ def UpdateSpellBookWindow ():
 			ms = MemorizedSpellList[i]
 			spell = ms['SpellResRef']
 			Button.SetSpellIcon (spell)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 			Button.SetTooltip (ms['SpellName'])
 			Button.SetVarAssoc("Memorized", i)
 			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depleted)

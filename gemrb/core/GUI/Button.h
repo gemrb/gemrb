@@ -61,7 +61,6 @@ class Palette;
 #define IE_GUI_BUTTON_LOWERCASE    0x00002000
 //#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag; labeled "no word wrap"
 //end of hardcoded part
-#define IE_GUI_BUTTON_PLAYONCE     0x00020000
 #define IE_GUI_BUTTON_PLAYALWAYS   0x00040000   // play even when game is paused
 
 #define IE_GUI_BUTTON_CENTER_PICTURES 0x00100000 // center button's PictureList
@@ -71,7 +70,7 @@ class Palette;
 
 //composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
-#define IE_GUI_BUTTON_PORTRAIT     (IE_GUI_BUTTON_PLAYONCE|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE)   // portrait
+#define IE_GUI_BUTTON_PORTRAIT     (IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE)   // portrait
 
 /** Border/frame settings for a button */
 struct ButtonBorder {
