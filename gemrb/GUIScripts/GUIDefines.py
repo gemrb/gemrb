@@ -61,8 +61,6 @@ IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00200000 # BG1-style paperdoll
 IE_GUI_BUTTON_HORIZONTAL      = 0x00400000 # horizontal clipping of overlay
 IE_GUI_BUTTON_NO_TOOLTIP      = 0x00800000 # disable the tooltip
 
-IE_GUI_BUTTON_PORTRAIT    = IE_GUI_BUTTON_PICTURE
-
 #label flags
 IE_GUI_LABEL_USE_COLOR = 1
 

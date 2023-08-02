@@ -1198,10 +1198,10 @@ String GameControl::TooltipText() const {
 	return tip;
 }
 
-Holder<Sprite2D> GameControl::GetTargetActionCursor() const
+Holder<Sprite2D> GameControl::GetTargetActionCursor(TargetMode mode)
 {
 	int curIdx = -1;
-	switch (targetMode) {
+	switch (mode) {
 		case TargetMode::Talk:
 			curIdx = IE_CURSOR_TALK;
 			break;
@@ -2486,9 +2486,12 @@ void GameControl::PerformActionOn(Actor *actor)
 }
 
 //sets target mode, and resets the cursor
-void GameControl::SetTargetMode(TargetMode mode)
-{
+void GameControl::SetTargetMode(TargetMode mode) {
 	targetMode = mode;
+	Window* win = GemRB::GetWindow(0, "PORTWIN");
+	if (win) {
+		win->SetCursor(GetTargetActionCursor(mode));
+	}
 }
 
 void GameControl::ResetTargetMode() {

@@ -69,7 +69,6 @@ class Palette;
 
 //composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
-#define IE_GUI_BUTTON_PORTRAIT     (IE_GUI_BUTTON_PICTURE)   // portrait
 
 /** Border/frame settings for a button */
 struct ButtonBorder {
@@ -149,11 +148,8 @@ public:
 	String QueryText() const override { return Text; }
 	String TooltipText() const override;
 
-	bool AcceptsDragOperation(const DragOp&) const override;
 	void CompleteDragOperation(const DragOp&) override;
 	Holder<Sprite2D> DragCursor() const override;
-
-	Holder<Sprite2D> Cursor() const override;
 
 	/** Refreshes the button from a radio group */
 	void UpdateState(value_t Sum) override;
