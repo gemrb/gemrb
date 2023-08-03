@@ -946,6 +946,59 @@ Targets *GameScript::TenthNearest(const Scriptable */*Sender*/, Targets *paramet
 	return XthNearestOf(parameters, 9, ga_flags);
 }
 
+// IESDP says they have to have identical EA, which is quite restrictive, so we allow all below EA_GOODCUTOFF
+// for a start, before testing, we only support party-friendly runners
+// generalize XthNearestMyGroupOfType and use it here with IE_EA if it turns out this is wrong
+Targets* GameScript::NearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 0, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::SecondNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 1, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::ThirdNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 2, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::FourthNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 3, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::FifthNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 4, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::SixthNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 5, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::SeventhNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 6, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::EighthNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 7, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::NinthNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 8, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
+Targets* GameScript::TenthNearestAllyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestOf(parameters, 9, gaFlags | GA_NO_ENEMY | GA_NO_NEUTRAL);
+}
+
 Targets *GameScript::SelectedCharacter(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
 	const Map *cm = Sender->GetCurrentArea();
