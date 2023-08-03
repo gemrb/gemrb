@@ -673,43 +673,44 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 	return XthNearestOf(parameters,count, ga_flags);
 }
 
-Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
+Targets* XthNearestEnemyOf(Targets* parameters, int count, int gaFlags, bool farthest)
 {
-	const Actor *origin = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor* origin = (const Actor*) parameters->GetTarget(0, ST_ACTOR);
 	parameters->Clear();
 	if (!origin) {
 		return parameters;
 	}
-	//determining the allegiance of the origin
+	// determining the allegiance of the origin
 	int type = GetGroup(origin);
-
-	if (type==2) {
+	if (type == 2) {
 		return parameters;
 	}
-	const Map *map = origin->GetCurrentArea();
+
+	const Map* map = origin->GetCurrentArea();
 	int i = map->GetActorCount(true);
-	ga_flags |= GA_NO_UNSCHEDULED|GA_NO_DEAD;
+	gaFlags |= GA_NO_UNSCHEDULED | GA_NO_DEAD;
 	while (i--) {
-		Actor *ac = map->GetActor(i,true);
+		Actor* ac = map->GetActor(i, true);
 		if (ac == origin) continue;
-		int distance;
-		//int distance = Distance(ac, origin);
 		// TODO: if it turns out you need to check Sender here, beware you take the right distance!
 		// (n the original games, this is only used for NearestEnemyOf(Player1) in obsgolem.bcs)
+		int distance;
 		if (!DoObjectChecks(map, origin, ac, distance)) continue;
+		if (farthest) {
+			// deliberately underflow later, so we can reuse the rest of the code
+			distance = -distance;
+		}
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				parameters->AddTarget(ac, distance, ga_flags);
+				parameters->AddTarget(ac, distance, gaFlags);
 			}
-		}
-		else {
+		} else {
 			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				parameters->AddTarget(ac, distance, ga_flags);
+				parameters->AddTarget(ac, distance, gaFlags);
 			}
 		}
 	}
-	return XthNearestOf(parameters,count, ga_flags);
+	return XthNearestOf(parameters, count, gaFlags);
 }
-
 
 }

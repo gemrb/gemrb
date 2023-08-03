@@ -37,7 +37,7 @@ Scriptable *GetActorObject(const TileMap *TMap, const ieVariable& name);
 Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *parameters, int ga_flags);
 Targets *XthNearestOf(Targets *parameters, int count, int ga_flags);
 Targets *XthNearestDoor(Targets *parameters, unsigned int count);
-Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags);
+Targets *XthNearestEnemyOf(Targets *parameters, int count, int gaFlags, bool farthest = false);
 Targets *ClosestEnemySummoned(const Scriptable *origin, Targets *parameters, int ga_flags);
 Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
 Targets *XthNearestMyGroupOfType(const Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
