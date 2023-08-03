@@ -1500,6 +1500,7 @@ public: //Script Functions
 	static Targets *LastHeardBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *LastHelp(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *LastHitter(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* LastKilled(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *LastMarkedObject(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *LastSeenBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *LastSummonerOf(const Scriptable *Sender, Targets *parameters, int ga_flags);

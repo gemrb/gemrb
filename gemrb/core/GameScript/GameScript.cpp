@@ -1125,6 +1125,7 @@ static const ObjectLink objectnames[] = {
 	{"lastheardby", GameScript::LastHeardBy},
 	{"lasthelp", GameScript::LastHelp},
 	{"lasthitter", GameScript::LastHitter},
+	{"lastkilled", GameScript::LastKilled},
 	{"lastmarkedobject", GameScript::LastMarkedObject},
 	{"lastseenby", GameScript::LastSeenBy},
 	{"lastsummonerof", GameScript::LastSummonerOf},

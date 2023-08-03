@@ -296,6 +296,7 @@ public:
 	ieDword LastFollowed = 0; // gemrb extension (LeaderOf)
 	ieDword LastMarked = 0; // iwd2
 	ieDword MyTarget = 0; // iwd2, has nothing to do with LastTarget
+	ieDword LastKilled = 0; // ees
 
 	int LastMarkedSpell = 0; // iwd2
 

@@ -313,6 +313,22 @@ Targets *GameScript::LastCommandedBy(const Scriptable *Sender, Targets *paramete
 	return parameters;
 }
 
+Targets* GameScript::LastKilled(const Scriptable* Sender, Targets* parameters, int gaFlags)
+{
+	const Scriptable* actor = parameters->GetTarget(0, -1);
+	if (!actor) {
+		actor = Sender;
+	}
+	parameters->Clear();
+	if (actor) {
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastKilled);
+		if (target) {
+			parameters->AddTarget(target, 0, gaFlags);
+		}
+	}
+	return parameters;
+}
+
 // this is essentially a LastTargetedBy(0) - or MySelf
 // but IWD2 defines it
 Targets *GameScript::MyTarget(const Scriptable *Sender, Targets *parameters, int ga_flags)
