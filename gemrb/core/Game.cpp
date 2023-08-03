@@ -1210,7 +1210,7 @@ void Game::ShareXP(int xp, int flags) const
 		}
 		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 			ieStrRef complaint = DisplayMessage::GetStringReference(strIdx);
-			String text = fmt::format(L"{}: {}", core->GetString(complaint), xp);
+			String text = fmt::format(u"{}: {}", core->GetString(complaint), xp);
 			core->GetGameControl()->SetDisplayText(text, core->Time.defaultTicksPerSec * 4);
 		} else {
 			displaymsg->DisplayConstantStringValue(strIdx, GUIColors::XPCHANGE, (ieDword) xp);
@@ -1831,7 +1831,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::Rested);
 	ieStrRef hoursMsg = DisplayMessage::GetStringReference(HCStrings::Hours);
 
-	core->GetTokenDictionary()["HOUR"] = fmt::format(L"{}", hours);
+	core->GetTokenDictionary()["HOUR"] = fmt::format(u"{}", hours);
 
 	//this would be bad
 	if (hoursMsg == ieStrRef::INVALID || restedMsg == ieStrRef::INVALID) return cutscene;

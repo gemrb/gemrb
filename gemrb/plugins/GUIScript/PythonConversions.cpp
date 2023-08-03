@@ -16,6 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include <iconv.h>
+
 #include "PythonConversions.h"
 #include "PythonErrors.h"
 
@@ -134,18 +136,83 @@ PyObject* PyString_FromStringObj(const std::string& s)
 {
 	return PyUnicode_Decode(s.c_str(), s.length(), core->TLKEncoding.encoding.c_str(), "strict");
 }
+
+PyObject* PyString_FromSystemStringObj(const std::string& s)
+{
+	return PyUnicode_Decode(s.c_str(), s.length(), core->config.SystemEncoding.c_str(), "strict");
+}
 	
 PyObject* PyString_FromStringObj(const String& s)
 {
-	// FIXME: this is wrong, python needs to know the encoding
-	std::string mbstr = MBStringFromString(s);
-	return PyString_FromStringObj(mbstr);
+	return PyUnicode_Decode(reinterpret_cast<const char*>(s.c_str()), s.length() * sizeof(char16_t), "UTF-16", "strict");
 }
 
 String PyString_AsStringObj(PyObject* obj)
 {
-	auto wrap = PyStringWrapper(obj, core->TLKEncoding.encoding.c_str());
-	return StringFromCString(wrap.CString());
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION < 12
+	if (PyUnicode_READY(obj) != 0) {
+		Log(ERROR, "PythonConversions", "Failed to prepare a Python string for encoding.");
+		return u"";
+	}
+#endif
+
+	auto unicodeKind = PyUnicode_KIND(obj);
+	std::string encoding = "ISO-8859-1";
+	bool isWide = false;
+	uint8_t encodingSize = 1;
+
+	if (unicodeKind == PyUnicode_4BYTE_KIND) {
+		encoding = "UCS-4";
+		isWide = true;
+		encodingSize = 4;
+	} else if (unicodeKind == PyUnicode_2BYTE_KIND) {
+		encoding = "UCS-2";
+		isWide = true;
+		encodingSize = 2;
+	} else if (unicodeKind != PyUnicode_1BYTE_KIND) {
+		// technically there is PyUnicode_WCHAR_KIND before v3.12
+		assert(false);
+	}
+
+	if (isWide) {
+		encoding += (IsBigEndian() ? "BE" : "LE");
+	}
+
+	iconv_t cd = nullptr;
+	if (IsBigEndian()) {
+		cd = iconv_open("UTF-16BE", encoding.c_str());
+	} else {
+		cd = iconv_open("UTF-16LE", encoding.c_str());
+	}
+
+	if (cd == (iconv_t)-1) {
+		Log(ERROR, "PythonConversions", "iconv_open(UTF-16, {}) failed with error: {}", encoding, strerror(errno));
+		return u"";
+	}
+
+	auto numCodepoints = PyUnicode_GET_LENGTH(obj);
+	size_t inLen = numCodepoints * encodingSize;
+	size_t outLen = numCodepoints * 4;
+	size_t outLenLeft = outLen;
+	String buffer(numCodepoints * 2, u'\0');
+
+	auto in = reinterpret_cast<char*>(PyUnicode_DATA(obj));
+	auto outBuf = reinterpret_cast<char*>(const_cast<char16_t*>(buffer.data()));
+
+	size_t ret = iconv(cd, &in, &inLen, &outBuf, &outLenLeft);
+	iconv_close(cd);
+
+	if (ret == static_cast<size_t>(-1)) {
+		Log(ERROR, "PythonConversions", "iconv failed to convert a Pythong string from {} to UTF-16 with error: {}", encoding, strerror(errno));
+		return u"";
+	}
+
+	auto zero = buffer.find(u'\0');
+	if (zero != decltype(buffer)::npos) {
+		buffer.resize(zero);
+	}
+
+	return buffer;
 }
 
 PyStringWrapper PyString_AsStringView(PyObject* obj)

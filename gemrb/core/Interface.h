@@ -732,7 +732,7 @@ extern GEM_EXPORT Interface * core;
 
 template<typename T>
 void SetTokenAsString(const ieVariable& key, T&& newValue) {
-	core->GetTokenDictionary()[key] = fmt::format(L"{}", std::forward<T>(newValue));
+	core->GetTokenDictionary()[key] = fmt::format(u"{}", std::forward<T>(newValue));
 }
 
 }

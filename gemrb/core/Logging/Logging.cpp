@@ -62,7 +62,7 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 		
 		LogLevel level = msg.level == INTERNAL ? FATAL : msg.level;
 		const auto& format = Logger::LevelFormat[level];
-		const auto& FMT = FMT_STRING(L"[color={:X}]{}: [/color][color={:X}]{}[/color]\n");
+		const auto& FMT = FMT_STRING(u"[color={:X}]{}: [/color][color={:X}]{}[/color]\n");
 		// MessageWindow supports only colors
 		ta->AppendText(fmt::format(FMT, GetRGB(msg.format), StringFromCString(msg.owner.c_str()),
 								   GetRGB(format), StringFromCString(msg.message.c_str())));

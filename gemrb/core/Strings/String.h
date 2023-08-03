@@ -31,7 +31,7 @@
 #include "Format.h"
 #include <fmt/xchar.h>
 
-#define WHITESPACE_STRING_W L"\n\t\r "
+#define WHITESPACE_STRING_W u"\n\t\r "
 #define WHITESPACE_STRING "\n\t\r "
 
 #define WHITESPACE_STRING_VIEW(StrT) \
@@ -39,7 +39,7 @@ StringViewT<StrT>((sizeof(typename StrT::value_type) == 1) ? (const typename Str
 
 namespace GemRB {
 
-using String = std::basic_string<wchar_t>;
+using String = std::u16string;
 
 template <typename STR>
 using StringViewT = StringViewImp<std::add_const_t<typename STR::value_type>>;

@@ -32,12 +32,12 @@ namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = nullptr;
 
-static const auto DisplayFormatName = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{}[/color][/p]");
-static const auto DisplayFormatAction = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{} {}[/color][/p]");
-static const auto DisplayFormat = FMT_STRING(L"[p][color={:08X}]{}[/color][/p]");
-static const auto DisplayFormatValue = FMT_STRING(L"[p][color={:08X}]{}: {}[/color][/p]");
-static const auto DisplayFormatNameString = FMT_STRING(L"[color={:08X}]{} - [/color][p][color={:08X}]{}: {}[/color][/p]");
-static const auto DisplayFormatSimple = FMT_STRING(L"[p]{}[/p]");
+static const auto DisplayFormatName = FMT_STRING(u"[color={:08X}]{} - [/color][p][color={:08X}]{}[/color][/p]");
+static const auto DisplayFormatAction = FMT_STRING(u"[color={:08X}]{} - [/color][p][color={:08X}]{} {}[/color][/p]");
+static const auto DisplayFormat = FMT_STRING(u"[p][color={:08X}]{}[/color][/p]");
+static const auto DisplayFormatValue = FMT_STRING(u"[p][color={:08X}]{}: {}[/color][/p]");
+static const auto DisplayFormatNameString = FMT_STRING(u"[color={:08X}]{} - [/color][p][color={:08X}]{}: {}[/color][/p]");
+static const auto DisplayFormatSimple = FMT_STRING(u"[p]{}[/p]");
 
 DisplayMessage::StrRefs DisplayMessage::SRefs;
 
@@ -164,7 +164,7 @@ void DisplayMessage::DisplayString(const String& text) const
 Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) const
 {
 	if(!speaker) {
-		name = L"";
+		name = u"";
 		return {};
 	}
 
@@ -193,7 +193,7 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 			speaker_color = Color(0xc0, 0xc0, 0xc0, 0xff);
 			break;
 		default:
-			name = L"";
+			name = u"";
 			break;
 	}
 	
@@ -349,7 +349,7 @@ void DisplayMessage::DisplayStringName(ieStrRef str, const Color &color, const S
 
 void DisplayMessage::DisplayStringName(String text, const Color &color, const Scriptable *speaker) const
 {
-	if (!text.length() || !text.compare(L" ")) return;
+	if (!text.length() || !text.compare(u" ")) return;
 
 	String name;
 	Color speaker_color = GetSpeakerColor(name, speaker);

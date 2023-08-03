@@ -110,7 +110,7 @@ void Console::HistorySetPos(size_t pos)
 	HistPos = Clamp<size_t>(pos, 0, History.Size());
 
 	if (HistPos == History.Size()) {
-		SetText(L"");
+		SetText(u"");
 		if (textArea) {
 			textArea->SelectAvailableOption(-1);
 		}

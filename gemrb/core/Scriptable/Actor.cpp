@@ -2998,7 +2998,7 @@ void Actor::RefreshPCStats() {
 		NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 		if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && InParty && Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
 			// eeeh, no token (Heal: 1)
-			static const String text = fmt::format(L"{} 1", core->GetString(ieStrRef::HEAL));
+			static const String text = fmt::format(u"{} 1", core->GetString(ieStrRef::HEAL));
 			overHead.SetText(text);
 		}
 	}
@@ -3185,7 +3185,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		if (core->HasFeedback(FT_COMBAT) && (lastSave.prevType != type || lastSave.prevRoll != ret)) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings(ieDword(HCStrings::SaveSpell) + type)));
-			msg += L" " + fmt::to_wstring(ret);
+			msg += fmt::format(u" {}", ret);
 			displaymsg->DisplayStringName(std::move(msg), GUIColors::WHITE, this);
 		}
 		lastSave.prevType = type;
@@ -4321,7 +4321,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 
 	const Actor* damager = Scriptable::As<Actor>(hitter);
 	bool detailed = false;
-	String type_name = L"unknown";
+	String type_name = u"unknown";
 	if (DisplayMessage::HasStringReference(HCStrings::DamageDetail1)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
@@ -4369,14 +4369,14 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 				color = GUIColors::RED;
 			}
 			// eeeh, no token (Damage: x)
-			String text = fmt::format(L"{} {}", core->GetString(ieStrRef::DAMAGE), damage);
+			String text = fmt::format(u"{} {}", core->GetString(ieStrRef::DAMAGE), damage);
 			overHead.SetText(std::move(text), true, true, displaymsg->GetColor(color));
 		} else if (!DisplayMessage::HasStringReference(HCStrings::Damage2) || !damager) {
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
 			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::Damage1), STRING_FLAGS::NONE);
-			String dmg = fmt::format(L" ({})", damage);
+			String dmg = fmt::format(u" ({})", damage);
 			displaymsg->DisplayStringName(msg + dmg, GUIColors::WHITE, this);
 		} else { //bg2
 			//<DAMAGER> did <AMOUNT> damage to <DAMAGEE>
@@ -7012,7 +7012,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		} else {
 			hitMiss = core->GetString(DisplayMessage::GetStringReference(HCStrings::Miss));
 		}
-		String rollLog = fmt::format(L"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? L"+" : L"-", abs(rollMod), roll + rollMod, hitMiss);
+		String rollLog = fmt::format(u"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? u"+" : u"-", abs(rollMod), roll + rollMod, hitMiss);
 		displaymsg->DisplayStringName(std::move(rollLog), GUIColors::WHITE, this);
 	}
 
@@ -10865,7 +10865,7 @@ void Actor::DisplayHeadHPRatio()
 {
 	if (!HasVisibleHP()) return;
 
-	overHead.SetText(fmt::format(L"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]), true, false);
+	overHead.SetText(fmt::format(u"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]), true, false);
 }
 
 void Actor::ReleaseCurrentAction()

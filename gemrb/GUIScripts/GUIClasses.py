@@ -180,26 +180,22 @@ class GView:
 	def CreateMapControl(self, control, *args):
 		frame = _ExtractFrame(args[0:4])
 		return self.CreateSubview(control, IE_GUI_MAP, frame, args[4:])
-  
+
 	def CreateLabel(self, control, *args):
 		frame = _ExtractFrame(args[0:4])
 		return self.CreateSubview(control, IE_GUI_LABEL, frame, args[4:])
-  
+
 	def CreateButton(self, control, *args):
 		frame = _ExtractFrame(args[0:4])
 		return self.CreateSubview(control, IE_GUI_BUTTON, frame, args[4:])
-  
+
 	def CreateScrollBar(self, control, frame, bam=None):
 		view = CreateView (control, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs(bam))
 		return self.AddSubview (view)
-  
+
 	def CreateTextArea(self, control, *args):
 		frame = _ExtractFrame(args[0:4])
 		return self.CreateSubview(control, IE_GUI_TEXTAREA, frame, args[4:])
-  
-	def CreateTextEdit(self, control, *args):
-		frame = _ExtractFrame(args[0:4])
-		return self.CreateSubview(control, IE_GUI_EDIT, frame, args[4:])
 
 class GWindow(GView, Scrollable):
 	methods = {
@@ -291,7 +287,7 @@ class GLabel(GControl):
 
 class GTextArea(GControl, Scrollable):
 	methods = {
-		'ChapterText': _GemRB.TextArea_SetChapterText,
+		'SetChapterText': _GemRB.TextArea_SetChapterText,
 		'Append': _GemRB.TextArea_Append,
 	}
 	__slots__ = ['DefaultText']

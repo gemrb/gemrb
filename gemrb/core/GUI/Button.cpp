@@ -403,7 +403,7 @@ void Button::SetFont(Font* newfont)
 String Button::TooltipText() const
 {
 	if (IsDisabled() || flags & IE_GUI_BUTTON_NO_TOOLTIP) {
-		return L"";
+		return u"";
 	}
 
 	ieDword showHotkeys = core->GetVariable("Hotkeys On Tooltips", 0);
@@ -412,33 +412,33 @@ String Button::TooltipText() const
 		switch (hotKey.key) {
 			// FIXME: these arent localized...
 			case GEM_ESCAPE:
-				s += L"Esc";
+				s += u"Esc";
 				break;
 			case GEM_RETURN:
-				s += L"Enter";
+				s += u"Enter";
 				break;
 			case GEM_PGUP:
-				s += L"PgUp";
+				s += u"PgUp";
 				break;
 			case GEM_PGDOWN:
-				s += L"PgDn";
+				s += u"PgDn";
 				break;
 			default:
 				if (hotKey.key >= GEM_FUNCTIONX(1) && hotKey.key <= GEM_FUNCTIONX(16)) {
-					s.push_back(L'F');
+					s.push_back(u'F');
 					int offset = hotKey.key - GEM_FUNCTIONX(0);
 					if (hotKey.key > GEM_FUNCTIONX(9)) {
-						s.push_back(L'1');
+						s.push_back(u'1');
 						offset -= 10;
 					}
-					s.push_back(L'0' + offset);
+					s.push_back(u'0' + offset);
 				} else {
 					s.push_back(towupper(hotKey.key));
 				}
 				break;
 		}
 		String tt = ((tooltip.length()) ? tooltip : QueryText());
-		tt = (tt.length()) ? s + L": " + tt : s;
+		tt = (tt.length()) ? s + u": " + tt : s;
 		return tt;
 	}
 	return Control::TooltipText();

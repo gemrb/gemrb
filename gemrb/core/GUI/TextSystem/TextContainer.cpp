@@ -176,7 +176,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				assert(lineSegment.h == lineheight);
 				size_t numOnLine = 0;
 				// must limit our operation to this single line.
-				size_t nextLine = text.find_first_of(L'\n', numPrinted);
+				size_t nextLine = text.find_first_of(u'\n', numPrinted);
 				if (nextLine == numPrinted) {
 					// this is a new line, we dont have to actually size that
 					// simply occupy the entire area and advance.
@@ -733,7 +733,7 @@ String TextContainer::TextFrom(const Content* content) const
 String TextContainer::TextFrom(ContentList::const_iterator it) const
 {
 	if (it == contents.end()) {
-		return L""; // must bail or things will get screwed up!
+		return u""; // must bail or things will get screwed up!
 	}
 
 	// iterate all the content and pick out the TextSpans and concatonate them into a single string

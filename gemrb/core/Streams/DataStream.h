@@ -75,7 +75,7 @@ public:
 	static constexpr strpos_t InvalidPos = strpos_t(-1);
 	static constexpr strret_t Error = -1;
 
-	DataStream() noexcept;
+	DataStream() noexcept = default;
 	virtual ~DataStream() noexcept = default;
 	
 	DataStream(const DataStream&) = delete;
@@ -197,8 +197,6 @@ protected:
 	
 private:
 	bool NeedEndianSwap() const noexcept;
-
-	bool IsCPUBigEndian = false;
 };
 
 }

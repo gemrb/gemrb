@@ -435,14 +435,14 @@ to beyond the top.\n\
 
 static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 {
-	char* text = NULL;
-	PARSE_ARGS(args, "Os", &self, &text);
+	PyObject* text = nullptr;
+	PARSE_ARGS(args, "OO", &self, &text);
 
 	TextArea* ta = GetView<TextArea>(self);
 	ABORT_IF_NULL(ta);
 
 	ta->ClearText();
-	
+
 	// insert enough newlines to push the text offscreen
 	auto margins = ta->GetMargins();
 	int rowHeight = ta->LineHeight();
@@ -450,7 +450,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	int w = ta->Frame().w - (margins.left + margins.right);
 	int newlines = CeilDiv(h, rowHeight);
 	ta->AppendText(String(newlines - 1, L'\n'));
-	ta->AppendText(StringFromUtf8(text));
+	ta->AppendText(PyString_AsStringObj(text));
 	// append again (+1 since there may not be a trailing newline) after the chtext so it will scroll out of view
 	ta->AppendText(String(newlines + 1, L'\n'));
 
@@ -461,7 +461,7 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	float textSpeed = static_cast<float>(gamedata->GetTextSpeed());
 	int ticksPerLine = int(11.0f * heightScale * widthScale * textSpeed);
 	ta->ScrollToY(-ta->ContentHeight(), lines * ticksPerLine);
-	
+
 	Py_RETURN_NONE;
 }
 
@@ -1416,7 +1416,7 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 		ctrl->SetText(core->GetString(StrRef));
 	} else if (str == Py_None) {
 		// clear the text
-		ctrl->SetText(L"");
+		ctrl->SetText(u"");
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
 		const char *tmp = PyByteArray_AS_STRING(str);
 		ctrl->SetText(StringFromCString(tmp));
@@ -2110,19 +2110,6 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 	Region rgn = RectFromPy(pyRect);
 	View* view = NULL;
 	switch (type) {
-		case IE_GUI_EDIT:
-		{
-			PyObject* font;
-			const char* cstr;
-			PARSE_ARGS(constructArgs, "Os", &font, &cstr);
-
-			TextEdit* edit = new TextEdit(rgn, 500, Point());
-			edit->SetFont(core->GetFont(ResRefFromPy(font)));
-			edit->Control::SetText(StringFromUtf8(cstr));
-
-			view = edit;
-		}
-			break;
 		case IE_GUI_TEXTAREA:
 		{
 			PyObject* font;
@@ -2134,10 +2121,10 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		{
 			unsigned char alignment;
 			PyObject* font;
-			const char* text;
-			PARSE_ARGS(constructArgs, "Osb", &font, &text, &alignment);
+			PyObject* text;
+			PARSE_ARGS(constructArgs, "OOb", &font, &text, &alignment);
 
-			Label* lbl = new Label(rgn, core->GetFont(ResRefFromPy(font)), StringFromUtf8(text));
+			Label* lbl = new Label(rgn, core->GetFont(ResRefFromPy(font)), PyString_AsStringObj(text));
 
 			lbl->SetAlignment(alignment);
 			view = lbl;
@@ -4082,9 +4069,14 @@ be avoided. The hardcoded token list:\n\
 static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
-	char *value;
-	PARSE_ARGS( args,  "Os", &Variable, &value );
-	core->GetTokenDictionary()[ieVariableFromPy(Variable)] = StringFromCString(value);
+	PyObject* value;
+	PARSE_ARGS(args, "OO", &Variable, &value);
+
+	if(PyUnicode_Check(value)) {
+		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = PyString_AsStringObj(value);
+	} else {
+		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = StringFromCString(PyBytes_AsString(value));
+	}
 
 	Py_RETURN_NONE;
 }
@@ -4817,12 +4809,10 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			if (name[0] == '.' || dirit.IsDirectory() != dirs)
 				continue;
 
-			char *str = ConvertCharEncoding(name.c_str(), core->config.SystemEncoding.c_str(), core->TLKEncoding.encoding.c_str());
-			String string = StringFromCString(str);
-			free(str);
+			String string = StringFromFSString(name.c_str());
 
 			if (dirs == false) {
-				size_t pos = string.find_last_of(L'.');
+				size_t pos = string.find_last_of(u'.');
 				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
 					continue;
 				}
@@ -5730,7 +5720,16 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 
 	ResRef ignore;
 	std::string sound = actor->GetSoundFolder(flag, ignore);
-	return PyString_FromStringObj(sound);
+
+	// System encoding may fail if there is a save game loaded from the original
+	// game that uses TLK encoding for the path
+	PyObject* playerSound = PyString_FromSystemStringObj(sound);
+	if (playerSound == nullptr) {
+		PyErr_Clear();
+		playerSound = PyString_FromStringObj(sound);
+	}
+
+	return playerSound;
 }
 
 PyDoc_STRVAR( GemRB_GetSlotType__doc,
@@ -6594,9 +6593,9 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 	if (!btn) return;
 
 	if (charges && (charges>1 || !oneisnone) ) {
-		btn->SetText(fmt::to_wstring(charges));
+		btn->SetText(fmt::format(u"{}", charges));
 	} else {
-		btn->SetText(L"");
+		btn->SetText(u"");
 	}
 }
 
@@ -9443,7 +9442,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	Label* l = core->GetMessageLabel();
 	if (l) {
 		// this is how BG2 behaves, not sure about others
-		l->SetText(L""); // clear previous message
+		l->SetText(u""); // clear previous message
 	}
 
 	GET_GAME();
@@ -9804,14 +9803,19 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 {
 	Point point;
 	ieWord color = 0;
-	const char *txt = NULL;
-	PARSE_ARGS( args,  "ii|hs", &point.x, &point.y, &color, &txt);
+	PyObject *textObject = nullptr;
+	PARSE_ARGS( args,  "ii|hO", &point.x, &point.y, &color, &textObject);
 
 	GET_GAME();
 	GET_MAP();
 
-	if (txt && txt[0]) {
-		map->AddMapNote(point, MapNote(StringFromUtf8(txt), color, false));
+	String text{u""};
+	if (textObject) {
+		text = PyString_AsStringObj(textObject);
+	}
+
+	if (text.length() > 0) {
+		map->AddMapNote(point, MapNote(text, color, false));
 	} else {
 		map->RemoveMapNote(point);
 	}
@@ -10494,7 +10498,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
 		btn->SetAction(nullptr, Control::Click, GEM_MB_ACTION, 0, 1);
 		btn->SetAction(nullptr, Control::Click, GEM_MB_MENU, 0, 1);
-		btn->SetTooltip(L"");
+		btn->SetTooltip(u"");
 		//no incref
 		return Py_None;
 	}
@@ -10653,7 +10657,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		if (!Picture) {
 			btn->SetState(Button::DISABLED);
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::SET);
-			btn->SetTooltip(L"");
+			btn->SetTooltip(u"");
 		} else {
 			SetButtonCycle(bam, btn, 0, Button::UNPRESSED);
 			SetButtonCycle(bam, btn, 1, Button::PRESSED);
@@ -13672,7 +13676,7 @@ bool GUIScript::ExecString(const std::string &string, bool feedback)
 		//Get error message
 		String errorString = PyString_AsStringObj(pvalue);
 		if (displaymsg) {
-			displaymsg->DisplayString(L"Error: " + errorString, GUIColors::RED, nullptr);
+			displaymsg->DisplayString(u"Error: " + errorString, GUIColors::RED, nullptr);
 		} else {
 			Log(ERROR, "GUIScript", "{}", fmt::WideToChar{errorString});
 		}
