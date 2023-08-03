@@ -1471,6 +1471,7 @@ public: //Script Functions
 
 	//Objects
 	static Targets *BestAC(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* EighthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *EighthNearest(const Scriptable *Sender, Targets *parameters, int ga_flagss);
 	static Targets* EighthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *EighthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flagss);
@@ -1481,12 +1482,14 @@ public: //Script Functions
 	static Targets* FamiliarSummoner(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets *Farthest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *FarthestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* FifthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *FifthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets* FifthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *FifthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *FifthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *FifthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *FifthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* FourthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *FourthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets* FourthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *FourthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
@@ -1520,6 +1523,7 @@ public: //Script Functions
 	static Targets *NearestEnemySummoned(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *NearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *NearestPC(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* NinthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *NinthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets* NinthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *NinthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
@@ -1542,6 +1546,7 @@ public: //Script Functions
 	static Targets *Protagonist(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *ProtectedBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *ProtectorOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SecondFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *SecondNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets* SecondNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *SecondNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
@@ -1549,12 +1554,14 @@ public: //Script Functions
 	static Targets *SecondNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *SecondNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *SelectedCharacter(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SeventhFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *SeventhNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets* SeventhNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *SeventhNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *SeventhNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *SeventhNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *SeventhNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SixthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *SixthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets* SixthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *SixthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
@@ -1564,12 +1571,14 @@ public: //Script Functions
 	static Targets *SpellTarget(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *StrongestOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *StrongestOfMale(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* TenthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *TenthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets* TenthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *TenthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *TenthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *TenthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *TenthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* ThirdFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *ThirdNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets* ThirdNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets *ThirdNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);

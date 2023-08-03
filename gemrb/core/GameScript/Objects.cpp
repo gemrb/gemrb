@@ -726,6 +726,51 @@ Targets *GameScript::FarthestEnemyOf(const Scriptable */*Sender*/, Targets *para
 	return XthNearestEnemyOf(parameters, -1, ga_flags);
 }
 
+Targets* GameScript::SecondFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 1, gaFlags, true);
+}
+
+Targets* GameScript::ThirdFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 2, gaFlags, true);
+}
+
+Targets* GameScript::FourthFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 3, gaFlags, true);
+}
+
+Targets* GameScript::FifthFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 4, gaFlags, true);
+}
+
+Targets* GameScript::SixthFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 5, gaFlags, true);
+}
+
+Targets* GameScript::SeventhFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 6, gaFlags, true);
+}
+
+Targets* GameScript::EighthFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 7, gaFlags, true);
+}
+
+Targets* GameScript::NinthFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 8, gaFlags, true);
+}
+
+Targets* GameScript::TenthFarthestEnemyOf(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return XthNearestEnemyOf(parameters, 9, gaFlags, true);
+}
+
 Targets *GameScript::NearestEnemyOf(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
 	return XthNearestEnemyOf(parameters, 0, ga_flags);
