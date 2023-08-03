@@ -1,0 +1,10 @@
+2DA V1.0
+-1
+     EFFECT_NAME        STRREF
+25     POISON           14017
+13     DEATH            14026
+134    PETRIFICATION    14127
+#12     DAMAGE           14027
+39     SLEEP            20438
+68     UNSUMMON         14065
+
