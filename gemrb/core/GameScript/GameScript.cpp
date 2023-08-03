@@ -417,6 +417,10 @@ static const TriggerLink triggernames[] = {
 	{"reputation", GameScript::Reputation, 0},
 	{"reputationgt", GameScript::ReputationGT, 0},
 	{"reputationlt", GameScript::ReputationLT, 0},
+	{"reserved", nullptr, 0},
+	{"reserved1", nullptr, 0},
+	{"reserved2", nullptr, 0},
+	{"reserved3", nullptr, 0},
 	{"school", GameScript::School, 0}, //similar to kit
 	{"secretdoordetected", GameScript::SecretDoorDetected, 0},
 	{"see", GameScript::See, 0},
@@ -879,6 +883,7 @@ static const ActionLink actionnames[] = {
 	{"removeworldmapareaflag", GameScript::RemoveWorldmapAreaFlag, 0},
 	{"reputationinc", GameScript::ReputationInc, 0},
 	{"reputationset", GameScript::ReputationSet, 0},
+	{"reserved", nullptr, 0},
 	{"resetfogofwar", GameScript::UndoExplore, 0}, //pst
 	{"resetmorale", GameScript::ResetMorale, 0},
 	{"resetplayerai", GameScript::ResetPlayerAI, 0},

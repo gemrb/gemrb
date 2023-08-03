@@ -743,6 +743,7 @@ int Inventory::DepleteItem(ieDword flags) const
 		//don't harm critical items
 		//don't harm nonmagical items
 		//don't harm indestructible items
+		// ees supposedly also check if the item is droppable (IE_INV_ITEM_UNDROPPABLE)
 		if ( (item->Flags&(IE_INV_ITEM_CRITICAL|IE_INV_DEPLETABLE)) != IE_INV_DEPLETABLE) {
 			continue;
 		}
