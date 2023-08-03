@@ -248,6 +248,7 @@ protected: //let Actor access this
 	std::list< Action*> actionQueue;
 	Action* CurrentAction = nullptr;
 public:
+	bool Moving = false;
 	Region BBox;
 	// State relating to the currently-running action.
 	int CurrentActionState = 0;

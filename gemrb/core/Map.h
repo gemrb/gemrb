@@ -337,6 +337,7 @@ public:
 	
 	void PaintSearchMap(const Point&, PathMapFlags value) const noexcept;
 	void PaintSearchMap(const Point& Pos, uint16_t blocksize, PathMapFlags value) const noexcept;
+	void PaintSearchMapNeg(const Point& Pos, uint16_t blocksize, PathMapFlags value) const noexcept;
 };
 
 class GEM_EXPORT Map : public Scriptable {
@@ -569,6 +570,7 @@ public:
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(const Point &Pos, int range, int los);
 	void BlockSearchMapFor(const Movable *actor) const;
+	void TravelSearchMapFor(const Movable *actor) const;
 	void ClearSearchMapFor(const Movable *actor) const;
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();

@@ -4841,6 +4841,7 @@ void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	actor->ClearPath();
+	// TODO change Moving??
 }
 
 void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)

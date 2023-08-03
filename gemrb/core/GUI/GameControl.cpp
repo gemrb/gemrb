@@ -292,6 +292,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 
 	actor->CommandActor(action, !append);
 	actor->Destination = p; // just to force target reticle drawing if paused
+	actor->Moving = true;
 }
 
 // can we handle it (no movement impairments)?
@@ -2264,6 +2265,7 @@ void GameControl::CommandSelectedMovement(const Point& p, bool formation, bool a
 		// don't stop the party if we're just trying to add a waypoint
 		if (!append) {
 			actor->Stop();
+			actor->GetCurrentArea()->TravelSearchMapFor(actor);
 		}
 		
 		if (formation && party.size() > 1) {
