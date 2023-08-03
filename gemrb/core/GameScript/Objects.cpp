@@ -421,6 +421,8 @@ inline Targets *PlayerX(Targets *parameters, int ga_flags, unsigned int slot, bo
 {
 	parameters->Clear();
 	Actor *pc;
+	// some EE testing suggests the fill objects are identical to nonfill one, since it introduced partyslotN as well
+	// if that is true and becomes important, add another case here and break the aliasing of partyslot1 -> player1fill ...
 	if (fill) {
 		pc = core->GetGame()->FindPC(slot + 1);
 	} else {
