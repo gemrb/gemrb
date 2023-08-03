@@ -672,6 +672,7 @@
 		A2EC8067146056B40033754A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8066146056B40033754A /* CoreGraphics.framework */; };
 		A2F0505613ABB82D0023B7EB /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A2F0505B13ABB84C0023B7EB /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
+		A2F4209D2A7C568200F3263D /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2F5F06B246102D70073802C /* RNG.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F5F064246102D70073802C /* RNG.h */; };
 		A2F5F06C246102D70073802C /* RNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F065246102D70073802C /* RNG.cpp */; };
 		A2F5F070246103C30073802C /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
@@ -4047,6 +4048,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2F4209D2A7C568200F3263D /* libiconv.tbd in Frameworks */,
 				A2F94A1526C73E2E00928E46 /* Python.framework in Frameworks */,
 				A276B53013A28D0000D41A8A /* libgemrb_core.dylib in Frameworks */,
 			);
