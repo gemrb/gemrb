@@ -4635,7 +4635,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 			snd->SetModal(MS_NONE);
 			snd->CureInvisibility();
 		}
-		if (turnHostile) {
+		if (turnHostile && !core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 			scr->AttackedBy(snd);
 		} else {
 			//pickpocket failed trigger
