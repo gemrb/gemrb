@@ -65,14 +65,14 @@ def InitSpellBookWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		#Button.SetBAM ("SPELFRAM",0,0,0)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		Button.SetVarAssoc ("SpellButton", i)
+		Button.SetValue (i)
 
 	# Setup book spells buttons
 	for i in range (8):
 		Button = Window.GetControl (30 + i)
 		Button.SetFlags (IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetVarAssoc ("SpellButton", 100 + i)
+		Button.SetValue (i)
 
 	# Setup book selection
 	FetchActiveSpellbooks ()
@@ -189,10 +189,11 @@ def UpdateSpellBookWindow ():
 			Button.SetSpellIcon (spell)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 			Button.SetTooltip (ms['SpellName'])
+			Button.SetVarAssoc("Memorized", i)
 			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depleted)
 			if ms['MemoCount'] < ms['KnownCount']:
 				# already depleted, just remove
-				Button.OnPress (lambda btn, mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell(mc))
+				Button.OnPress (lambda btn, mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell(btn, mc))
 			else:
 				# deplete and remove
 				Button.OnPress (OpenSpellBookSpellRemoveWindow)
@@ -291,7 +292,7 @@ def RefreshSpellBookLevel (update=True):
 		UpdateSpellBookWindow ()
 	return
 
-def OpenSpellBookSpellInfoWindow ():
+def OpenSpellBookSpellInfoWindow (btn):
 	global SpellBookSpellInfoWindow
 	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3)
 
@@ -304,12 +305,11 @@ def OpenSpellBookSpellInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
 	BookType = GemRB.GetVar ("SelectedBook")
-	index = GemRB.GetVar ("SpellButton")
-	if index < 100:
-		ms = GemRB.GetMemorizedSpell (pc, BookType, level, index)
+	if btn.VarName == "Memorized":
+		ms = GemRB.GetMemorizedSpell (pc, BookType, level, btn.Value)
 		ResRef = ms['SpellResRef']
 	else:
-		ResRef = KnownSpellList[index - 100 + GemRB.GetVar ("SpellTopIndex")]["SpellResRef"]
+		ResRef = KnownSpellList[btn.Value + GemRB.GetVar ("SpellTopIndex")]["SpellResRef"]
 	spell = GemRB.GetSpell (ResRef)
 
 	Label = Window.GetControl (0x0fffffff)
@@ -329,14 +329,13 @@ def FlashOverButton (ControlID):
 	Button.SetAnimation ("FLASH")
 	Button.SetFlags (IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 
-def OnSpellBookMemorizeSpell ():
+def OnSpellBookMemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
 	BookType = GemRB.GetVar ("SelectedBook")
 
-	index = GemRB.GetVar ("SpellButton") - 100
 	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
-	if GemRB.MemorizeSpell (pc, BookType, level, index):
+	if GemRB.MemorizeSpell (pc, BookType, level, btn.Value):
 		RefreshSpellBookLevel () # calls also UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_24")
 		FlashOverButton (index - SpellTopIndex + 30) # FIXME: wrong button if the spell will be stacked
@@ -376,26 +375,24 @@ def OpenSpellBookSpellRemoveWindow ():
 	return
 
 # since we can have semidepleted stacks, first make sure we unmemorize the depleted ones, only then unmemorize
-def OnSpellBookUnmemorizeSpell (mem_cnt):
+def OnSpellBookUnmemorizeSpell (btn, mem_cnt):
 	if mem_cnt == 0:
 		# everything is depleted, so just remove
-		OnSpellBookRemoveSpell ()
+		OnSpellBookRemoveSpell (btn)
 		return
 
 	# remove one depleted spell without touching the still memorized
 	# we'd need a different spell index, but it's all handled in the core
-	index = GemRB.GetVar ("SpellButton")
-	UnmemoSpell (index, True)
+	UnmemoSpell (btn.Value, True)
 
 	return
 
 # not like removing spells in bg2, where you could delete known spells from the spellbook!
-def OnSpellBookRemoveSpell ():
+def OnSpellBookRemoveSpell (btn):
 	if SpellBookSpellUnmemorizeWindow:
 		OpenSpellBookSpellRemoveWindow ()
 
-	index = GemRB.GetVar ("SpellButton")
-	UnmemoSpell (index)
+	UnmemoSpell (btn.Value)
 
 	return
 

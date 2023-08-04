@@ -47,7 +47,7 @@ def InitPriestWindow (Window):
 		Icon = Window.GetControl (2 + i)
 		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
 		Icon.SetBorder (0,  color,  0, 1)
-		Icon.SetVarAssoc ("SpellButton", i)
+		Icon.SetVarAssoc ("Memorized", i)
 
 	return
 
@@ -119,7 +119,7 @@ def UpdatePriestWindow (Window):
 		spell = GemRB.GetSpell (ks['SpellResRef'])
 		Icon.SetTooltip (spell['SpellName'])
 		PriestKnownSpellList.append (ks['SpellResRef'])
-		Icon.SetVarAssoc ("SpellButton", 100 + i)
+		Icon.SetValue (i)
 
 	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
@@ -150,18 +150,18 @@ def PriestNextLevelPress ():
 		UpdatePriestWindow (PriestSpellWindow)
 
 
-def OpenPriestSpellInfoWindow ():
+def OpenPriestSpellInfoWindow (btn):
 	Window = GemRB.LoadWindow (4)
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
 	Button.OnPress (Window.Close)
 
-	index = GemRB.GetVar ("SpellButton")
-	if index < 100:
+	index = btn.Value
+	if btn.VarName == "Memorized":
 		ResRef = PriestMemorizedSpellList[index]
 	else:
-		ResRef = PriestKnownSpellList[index - 100]
+		ResRef = PriestKnownSpellList[index]
 
 	spell = GemRB.GetSpell (ResRef)
 
@@ -182,14 +182,12 @@ def OpenPriestSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
-def OnPriestMemorizeSpell ():
+def OnPriestMemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton") - 100
-
-	if GemRB.MemorizeSpell (pc, spelltype, level, index):
+	if GemRB.MemorizeSpell (pc, spelltype, level, btn.Value):
 		UpdatePriestWindow (PriestSpellWindow)
 
 	# FIXME: use FLASH.bam
