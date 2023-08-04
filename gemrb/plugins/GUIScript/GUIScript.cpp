@@ -1004,7 +1004,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 
 	auto sm = GetSymbols(self);
 
-	if (sm == NULL) {
+	if (!sm) {
 		return AttributeError("No such symbols");
 	}
 
@@ -1082,7 +1082,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 			// replace the ref with a new one and return it
 			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), id, cref);
 			return ConstructObjectForScriptableView(newref);
-		} else if (oldwin == NULL || id != ScriptingId(-1)) {
+		} else if (!oldwin || id != ScriptingId(-1)) {
 			// create a new reference and return it
 			ScriptingId sid = (id == ScriptingId(-1)) ? cref->Id : id;
 			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
@@ -1820,7 +1820,7 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 	PARSE_ARGS(args, "OB", &self, &status);
 
 	Control* ctrl = GetView<Control>(self);
-	if (ctrl == NULL) {
+	if (!ctrl) {
 		return RuntimeError( "Control is not found." );
 	}
 
@@ -2326,7 +2326,7 @@ static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 	} else {
 		Holder<Sprite2D> pic = SpriteFromPy(pybg);
 
-		if (pic == NULL) {
+		if (!pic) {
 			return RuntimeError("Failed to acquire the picture!\n");
 		}
 		view->SetBackground(pic);
@@ -3071,7 +3071,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		PARSE_ARGS(args, "Os|i", &self, &keymap, &global);
 
 		const Function* func = core->GetKeyMap()->LookupFunction(keymap);
-		if (func == NULL) {
+		if (!func) {
 			Py_RETURN_NONE;
 		}
 
@@ -3563,14 +3563,14 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	if (!im) {
 		// the PLT doesn't exist or is bad, so try BAM
 		Picture = GetPaperdollImage(ResRef, col[0] == 0xFFFFFFFF ? 0 : col, Picture2,(unsigned int)type);
-		if (Picture == NULL) {
+		if (!Picture) {
 			Log(ERROR, "Button_SetPLT", "Paperdoll picture is null ({})", ResRef);
 			Py_RETURN_NONE;
 		}
 	} else {
 		// use PLT
 		Picture = im->GetSprite2D(type, col);
-		if (Picture == NULL) {
+		if (!Picture) {
 			Log(ERROR, "Button_SetPLT", "Picture is null ({})", ResRef);
 		}
 	}
@@ -3623,7 +3623,7 @@ static PyObject* SetButtonBAM(Button* btn, StringView ResRef, AnimationFactory::
 		return NULL;
 	Holder<Sprite2D> Picture = af->GetFrame (FrameIndex, CycleIndex);
 
-	if (Picture == NULL) {
+	if (!Picture) {
 		return NULL;
 	}
 
@@ -3819,7 +3819,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	int index;
 
 	if (PyArg_ParseTuple( args, "i|z", &index, &channel_name) ) {
-		if (channel_name != NULL) {
+		if (channel_name) {
 			channel = core->GetAudioDrv()->GetChannel(channel_name);
 		}
 		core->PlaySound(index, channel);
@@ -3830,7 +3830,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 			return AttributeError( GemRB_PlaySound__doc );
 		}
 
-		if (channel_name != NULL) {
+		if (channel_name) {
 			channel = core->GetAudioDrv()->GetChannel(channel_name);
 		}
 
@@ -5801,14 +5801,12 @@ static PyObject* GemRB_GameSelectPC(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "ii|i", &PartyID, &Select, &Flags );
 	GET_GAME();
 
-	Actor* actor;
+	Actor* actor = nullptr;
 	if (PartyID > 0) {
 		actor = game->FindPC( PartyID );
 		if (!actor) {
 			Py_RETURN_NONE;
 		}
-	} else {
-		actor = NULL;
 	}
 
 	game->SelectActor( actor, (bool) Select, Flags );
@@ -8989,7 +8987,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 
 	ResRef resref = ResRefFromPy(cstr);
 	const Item* item = gamedata->GetItem(resref, true);
-	if (item == NULL) {
+	if (!item) {
 		Log(MESSAGE, "GUIScript", "Cannot get item {}!", resref);
 		Py_RETURN_NONE;
 	}
@@ -9165,7 +9163,7 @@ static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count
 	//we should use getslotitem, because
 	//getitem would remove the item from the inventory!
 	CREItem *si = actor->inventory.GetSlotItem(Slot);
-	if (si == NULL) return NULL;
+	if (!si) return nullptr;
 
 	//it is always possible to put these items into the inventory
 	// however in pst, we need to ensure immovable swappables are swappable
@@ -9313,7 +9311,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "ii", &globalID, &Slot);
 
 	// FIXME
-	if (core->GetDraggedItem() == NULL) {
+	if (!core->GetDraggedItem()) {
 		Py_RETURN_NONE;
 	}
 
@@ -13315,7 +13313,7 @@ bool GUIScript::Init(void)
 
 	char string[256] = "path";
 	PyObject* sysPath = PySys_GetObject(string);
-	if (sysPath == NULL) {
+	if (!sysPath) {
 		Log(ERROR, "GUIScripts", "Unable to set 'sys.path'.");
 		return false;
 	}
@@ -13361,7 +13359,7 @@ bool GUIScript::Init(void)
 	/* pGUIClasses is a borrowed reference */
 
 	PyObject *pFunc = PyDict_GetItemString(pMainDic, "Init");
-	if (PyObject_CallObject( pFunc, NULL ) == NULL) {
+	if (!PyObject_CallObject(pFunc, nullptr)) {
 		Log(ERROR, "GUIScript", "Failed to execute Init() in {}", main);
 		PyErr_Print();
 		return false;
@@ -13412,7 +13410,7 @@ bool GUIScript::LoadScript(const std::string& filename)
 
 	PyObject* pName = PyString_FromStringObj(filename);
 	/* Error checking of pName left out */
-	if (pName == NULL) {
+	if (!pName) {
 		Log(ERROR, "GUIScript", "Failed to create filename for script \"{}\".", filename);
 		return false;
 	}
@@ -13424,7 +13422,7 @@ bool GUIScript::LoadScript(const std::string& filename)
 	pModule = PyImport_Import( pName );
 	Py_DECREF( pName );
 
-	if (pModule != NULL) {
+	if (pModule) {
 		pDict = PyModule_GetDict( pModule );
 		if (PyDict_Merge( pDict, pMainDic, false ) == -1)
 			return false;
@@ -13487,7 +13485,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 		pyModule = pModule;
 		Py_XINCREF(pyModule);
 	}
-	if (pyModule == NULL) {
+	if (!pyModule) {
 		PyErr_Print();
 		return NULL;
 	}
@@ -13504,7 +13502,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 		return NULL;
 	}
 	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
-	if (pValue == NULL) {
+	if (!pValue) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
 		}
@@ -13635,7 +13633,7 @@ PyObject* GUIScript::ConstructObject(const std::string& pyclassname, PyObject* p
 	if (!cobj) {
 		return RuntimeError(fmt::format("Failed to lookup name '{}'", classname));
 	}
-	if (pArgs == NULL) {
+	if (!pArgs) {
 		// PyObject_Call requires pArgs not be NULL
 		pArgs = PyTuple_New(0);
 	} else {
