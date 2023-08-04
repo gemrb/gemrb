@@ -29,7 +29,6 @@ from ie_action import *
 from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
 from ie_sounds import CHAN_HITS
-from GameCheck import MAX_PARTY_SIZE
 from Clock import UpdateClock, CreateClockButton
 import GameCheck
 import GUICommon
@@ -1571,9 +1570,6 @@ def ActionDefendPressed ():
 
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
-
-def MinimizePortraits(): #bg2
-	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
 
 def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #relates to pst containers
 	if Slot != None:

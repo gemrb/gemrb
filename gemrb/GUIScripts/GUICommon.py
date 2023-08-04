@@ -678,58 +678,6 @@ def IsWarrior (actor):
 
 	return IsWarrior
 
-def SetupDamageInfo (pc, Button, Window):
-	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
-	hp_max = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
-	state = GemRB.GetPlayerStat (pc, IE_STATE_ID)
-
-	if hp_max < 1 or hp == "?":
-		ratio = 0.0
-	else:
-		ratio = hp / float(hp_max)
-
-	if hp < 1 or (state & STATE_DEAD):
-		c = {'r' : 64, 'g' : 64, 'b' : 64, 'a' : 255}
-		Button.SetOverlay (0, c, c)
-
-	if ratio == 1.0:
-		band = 0
-		color = {'r' : 255, 'g' : 255, 'b' : 255}  # white
-	elif ratio >= 0.75:
-		band = 1
-		color = {'r' : 0, 'g' : 255, 'b' : 0}  # green
-	elif ratio >= 0.50:
-		band = 2
-		color = {'r' : 255, 'g' : 255, 'b' : 0}  # yellow
-	elif ratio >= 0.25:
-		band = 3
-		color = {'r' : 255, 'g' : 128, 'b' : 0}  # orange
-	else:
-		band = 4
-		color = {'r' : 255, 'g' : 0, 'b' : 0}  # red
-
-	if GemRB.GetVar("Old Portrait Health") or not GameCheck.IsIWD2():
-		# draw the blood overlay
-		if hp >= 1 and not (state & STATE_DEAD):
-			c1 = {'r' : 0x70, 'g' : 0, 'b' : 0, 'a' : 0xff}
-			c2 = {'r' : 0xf7, 'g' : 0, 'b' : 0, 'a' : 0xff}
-			Button.SetOverlay (ratio, c1, c2)
-	else:
-		# scale the hp bar under the portraits and recolor it
-		# GUIHITPT has 5 frames with different severity colors
-		# luckily their ids follow a nice pattern
-		hpBar = Window.GetControl (pc-1 + 50)
-		hpBar.SetBAM ("GUIHITPT", band, 0)
-		hpBar.SetPictureClipping (ratio)
-		hpBar.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-
-	ratio_str = ""
-	if hp != "?":
-		ratio_str = "\n%d/%d" %(hp, hp_max)
-	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
-
-	return ratio_str, color
-
 # set MAGESCHOOL to mage school (kit) index
 def UpdateMageSchool(pc):
 	GemRB.SetVar ("MAGESCHOOL", 0)

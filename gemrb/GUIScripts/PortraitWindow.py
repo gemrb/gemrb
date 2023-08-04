@@ -17,14 +17,71 @@
 #
 
 import GemRB
+import GameCheck
 import GUICommon
+import GUICommonWindows
+import LUCommon
 
+from GameCheck import MAX_PARTY_SIZE
+from GUICommonWindows import FRAME_PC_SELECTED, FRAME_PC_TARGET
 from GUIDefines import *
-from GUICommonWindows import *
+from ie_stats import *
 
 StatesFont = "STATES2"
 if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 	StatesFont = "STATES"
+	
+def SetupDamageInfo (pc, Button, Window):
+	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
+	hp_max = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
+	state = GemRB.GetPlayerStat (pc, IE_STATE_ID)
+
+	if hp_max < 1 or hp == "?":
+		ratio = 0.0
+	else:
+		ratio = hp / float(hp_max)
+
+	if hp < 1 or (state & STATE_DEAD):
+		c = {'r' : 64, 'g' : 64, 'b' : 64, 'a' : 255}
+		Button.SetOverlay (0, c, c)
+
+	if ratio == 1.0:
+		band = 0
+		color = {'r' : 255, 'g' : 255, 'b' : 255}  # white
+	elif ratio >= 0.75:
+		band = 1
+		color = {'r' : 0, 'g' : 255, 'b' : 0}  # green
+	elif ratio >= 0.50:
+		band = 2
+		color = {'r' : 255, 'g' : 255, 'b' : 0}  # yellow
+	elif ratio >= 0.25:
+		band = 3
+		color = {'r' : 255, 'g' : 128, 'b' : 0}  # orange
+	else:
+		band = 4
+		color = {'r' : 255, 'g' : 0, 'b' : 0}  # red
+
+	if GemRB.GetVar("Old Portrait Health") or not GameCheck.IsIWD2():
+		# draw the blood overlay
+		if hp >= 1 and not (state & STATE_DEAD):
+			c1 = {'r' : 0x70, 'g' : 0, 'b' : 0, 'a' : 0xff}
+			c2 = {'r' : 0xf7, 'g' : 0, 'b' : 0, 'a' : 0xff}
+			Button.SetOverlay (ratio, c1, c2)
+	else:
+		# scale the hp bar under the portraits and recolor it
+		# GUIHITPT has 5 frames with different severity colors
+		# luckily their ids follow a nice pattern
+		hpBar = Window.GetControl (pc-1 + 50)
+		hpBar.SetBAM ("GUIHITPT", band, 0)
+		hpBar.SetPictureClipping (ratio)
+		hpBar.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+
+	ratio_str = ""
+	if hp != "?":
+		ratio_str = "\n%d/%d" %(hp, hp_max)
+	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
+
+	return ratio_str, color
 
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
 
@@ -118,12 +175,12 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		button.SetFont (StatesFont)
 		button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 
-		button.OnRightPress (OpenInventoryWindowClick)
-		button.OnPress (PortraitButtonOnPress)
-		button.OnShiftPress (PortraitButtonOnShiftPress)
-		button.SetAction (PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
-		button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
-		button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
+		button.OnRightPress (GUICommonWindows.OpenInventoryWindowClick)
+		button.OnPress (GUICommonWindows.PortraitButtonOnPress)
+		button.OnShiftPress (GUICommonWindows.PortraitButtonOnShiftPress)
+		button.SetAction (GUICommonWindows.PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
+		button.SetAction (GUICommonWindows.ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
+		button.SetAction (GUICommonWindows.ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
 		pairs[i] = button
 		limit -= limitStep
@@ -178,6 +235,9 @@ def SetupButtonBorders (Window, Button, i):
 		Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame (4, 3, 4, 3))
 		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (2, 2, 3, 3))
 
+def MinimizePortraits(): #bg2
+	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
+
 def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	#take care, this window is different in how/iwd
 	if GameCheck.HasHOW() and needcontrols:
@@ -195,7 +255,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			if GameCheck.IsIWD():
 				# Rest (iwd)
 				Button.SetTooltip (11942)
-				Button.OnPress (RestPress)
+				Button.OnPress (GUICommonWindows.RestPress)
 			else:
 				Button.OnPress (MinimizePortraits)
 		else:
@@ -205,7 +265,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 				Button = Window.CreateButton (8, 6, pos, 55, 37)
 				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 				Button.SetTooltip (11942)
-				Button.OnPress (RestPress)
+				Button.OnPress (GUICommonWindows.RestPress)
 
 				pos = pos - 37
 				Window.CreateButton (6, 6, pos, 27, 36)
@@ -214,8 +274,8 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button = Window.GetControl (6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
 		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
-		InitOptionButton(Window, 'Toggle_AI', AIPress)
-		AIPress(0) #this initialises the state and tooltip
+		GUICommonWindows.InitOptionButton(Window, 'Toggle_AI', GUICommonWindows.AIPress)
+		GUICommonWindows.AIPress(0) #this initialises the state and tooltip
 
 		#Select All
 		if GameCheck.HasHOW():
@@ -231,7 +291,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			Button = Window.GetControl (6)
 			if Button:
 				Button.SetTooltip (11942)
-				Button.OnPress (RestPress)
+				Button.OnPress (GUICommonWindows.RestPress)
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.items():
@@ -243,21 +303,21 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		AddStatusFlagLabel (Window, Button, i)
 
 		if needcontrols or GameCheck.IsIWD2():
-			Button.OnRightPress (OpenInventoryWindowClick)
+			Button.OnRightPress (GUICommonWindows.OpenInventoryWindowClick)
 		else:
-			Button.OnRightPress (PortraitButtonOnPress)
+			Button.OnRightPress (GUICommonWindows.PortraitButtonOnPress)
 
-		Button.OnPress (PortraitButtonOnPress)
-		Button.OnShiftPress (PortraitButtonOnShiftPress)
-		Button.SetAction (PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
-		Button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
-		Button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
+		Button.OnPress (GUICommonWindows.PortraitButtonOnPress)
+		Button.OnShiftPress (GUICommonWindows.PortraitButtonOnShiftPress)
+		Button.SetAction (GUICommonWindows.PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
+		Button.SetAction (GUICommonWindows.ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
+		Button.SetAction (GUICommonWindows.ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
 		AddHPLabel (Window, Button, i)
 		SetupButtonBorders (Window, Button, i)
 
 	UpdatePortraitWindow ()
-	SelectionChanged ()
+	GUICommonWindows.SelectionChanged ()
 	return Window
 
 def UpdatePortraitWindow ():
