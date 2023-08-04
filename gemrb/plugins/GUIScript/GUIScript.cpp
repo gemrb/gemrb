@@ -967,36 +967,6 @@ static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 	return gs->ConstructObject("Symbol", ind);
 }
 
-PyDoc_STRVAR( GemRB_Symbol_Unload__doc,
-"===== UnloadSymbol =====\n\
-\n\
-**Prototype:** GemRB.UnloadSymbol (SymbolIndex)\n\
-\n\
-**Metaclass Prototype:** Unload ()\n\
-\n\
-**Description:** Unloads an IDS symbol list.\n\
-\n\
-**Parameters:**\n\
-  * SymbolIndex - returned by a previous LoadSymbol command.\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [LoadSymbol](LoadSymbol.md), [UnloadTable](UnloadTable.md)"
-);
-
-static PyObject* GemRB_Symbol_Unload(PyObject * /*self*/, PyObject* args)
-{
-	int si;
-	PARSE_ARGS( args, "i", &si );
-
-	int ind = core->DelSymbol( si );
-	if (ind == -1) {
-		return NULL;
-	}
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Symbol_GetValue__doc,
 "===== GetSymbolValue =====\n\
 \n\
@@ -13233,7 +13203,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(SaveGame_GetSaveID, METH_VARARGS),
 	METHOD(Scrollable_Scroll, METH_VARARGS),
 	METHOD(Symbol_GetValue, METH_VARARGS),
-	METHOD(Symbol_Unload, METH_VARARGS),
 	METHOD(Table_FindValue, METH_VARARGS),
 	METHOD(Table_GetColumnCount, METH_VARARGS),
 	METHOD(Table_GetColumnIndex, METH_VARARGS),

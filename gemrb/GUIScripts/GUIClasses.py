@@ -72,8 +72,7 @@ class GTable:
 @add_metaclass(metaIDWrapper)
 class GSymbol:
 	methods = {
-		'GetValue': _GemRB.Symbol_GetValue,
-		'Unload': _GemRB.Symbol_Unload
+		'GetValue': _GemRB.Symbol_GetValue
 	}
 
 class Scrollable(object):
