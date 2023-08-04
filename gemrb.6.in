@@ -508,15 +508,8 @@ directory with Python scripts providing GUI setup and interaction. The files
 are sorted into directories for specific games.
 
 .TP
-.B ~/.gemrb/gemrb.cfg
-.TP
-.B ~/.gemrb/override/
-.TP
-.B ~/.gemrb/GUIScripts/
-user's own configuration and data files.
-.TP
-.B ~/.gemrb/cache/
-cache directory
+.B $XDG_CONFIG_PATH/gemrb/
+user's own configuration files.
 .PD
 
 .\"###################################################
