@@ -93,6 +93,9 @@ def GetLevelDiff (actor, Level):
 
 def CanLevelUp(actor):
 	"""Returns true if the actor can level up."""
+	
+	if GameCheck.IsGemRBDemo ():
+		return False
 
 	# get our class and placements for Multi'd and Dual'd characters
 	Class = GUICommon.GetClassRowName (actor)

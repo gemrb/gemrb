@@ -1268,7 +1268,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	// check if we reached a new level
 	ieByte pc = actor->InParty;
 	if (pc && !actor->GotLUFeedback) {
-		auto ret = core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", pc, true);
+		auto ret = core->GetGUIScriptEngine()->RunFunction("LUCommon", "CanLevelUp", pc, true);
 		if (ret.Value<bool>()) {
 			displaymsg->DisplayConstantStringName(HCStrings::LevelUp, GUIColors::WHITE, actor);
 			actor->GotLUFeedback = true;

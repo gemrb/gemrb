@@ -35,7 +35,6 @@ import GUICommon
 import CommonTables
 import CommonWindow
 import Container
-import LUCommon
 import InventoryCommon
 if not GameCheck.IsPST():
   import Spellbook  ##not used in pst - YET
@@ -1622,13 +1621,6 @@ def OpenWaitForDiscWindow (disc_num):
 	# 31571 - There is no disc in drive
 	# 31578 - No disc could be found in drive. Please place Disc 1 in drive.
 	# 49152 - To quit the game, press Alt-F4
-
-
-def CheckLevelUp(pc):
-	if GameCheck.IsGemRBDemo ():
-		return False
-		
-	return LUCommon.CanLevelUp (pc)
 
 def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
