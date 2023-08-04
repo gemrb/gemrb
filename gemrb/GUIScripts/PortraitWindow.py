@@ -33,7 +33,8 @@ if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
 
-def SetupDamageInfo (pc, Button, Window):
+def SetupDamageInfo (Button):
+	pc = Button.Value
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
 	hp_max = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
 	state = GemRB.GetPlayerStat (pc, IE_STATE_ID)
@@ -73,17 +74,20 @@ def SetupDamageInfo (pc, Button, Window):
 		# scale the hp bar under the portraits and recolor it
 		# GUIHITPT has 5 frames with different severity colors
 		# luckily their ids follow a nice pattern
-		hpBar = Window.GetControl (pc-1 + 50)
+		hpBar = Button.Window.GetControl (pc - 1 + 50)
 		hpBar.SetBAM ("GUIHITPT", band, 0)
 		hpBar.SetPictureClipping (ratio)
 		hpBar.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 	ratio_str = ""
 	if hp != "?":
-		ratio_str = "\n%d/%d" %(hp, hp_max)
+		ratio_str = "\n%d/%d" % (hp, hp_max)
 	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
 
-	return ratio_str, color
+	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+		HPLabel = Button.Window.GetControl(99 + pc)
+		HPLabel.SetText (ratio_str)
+		HPLabel.SetColor (color)
 
 # returns buttons and a numerical index
 # does nothing new in iwd2 due to layout
@@ -168,7 +172,7 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 
 		button.SetVarAssoc("PC", i + 1)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
-		SetupButtonBorders (Window, button, i)
+		SetupButtonBorders (button)
 		button.SetFont (StatesFont)
 		button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 
@@ -196,11 +200,7 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 
 	return list
 
-def AddStatusFlagLabel (Window, Button, i):
-	label = Window.GetControl (199 + i)
-	if label:
-		return label
-
+def AddStatusFlagLabel (Button, i):
 	# label for status flags (dialog, store, level up)
 	align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT | IE_FONT_SINGLE_LINE
 	if GameCheck.IsBG2 ():
@@ -211,15 +211,10 @@ def AddStatusFlagLabel (Window, Button, i):
 
 # overlay a label, so we can display the hp with the correct font. Regular button label
 #   is used by effect icons
-def AddHPLabel (Window, Button, i):
-	label = Window.GetControl (99 + i)
-	if label:
-		return label
+def AddHPLabel (Button, i):
+	return Button.CreateLabel (99 + i, "NUMFONT", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT | IE_FONT_SINGLE_LINE)
 
-	label = Button.CreateLabel (99 + i, "NUMFONT", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT | IE_FONT_SINGLE_LINE)
-	return label
-
-def SetupButtonBorders (Window, Button, i):
+def SetupButtonBorders (Button):
 	# unlike other buttons, this one lacks extra frames for a selection effect
 	# so we create it and shift it to cover the grooves of the image
 	# except iwd2's second frame already has it incorporated (but we miscolor it)
@@ -282,13 +277,11 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			Button = Window.GetControl (7)
 		Button.SetTooltip (10485)
 		Button.OnPress (GUICommon.SelectAllOnPress)
-	else:
-		# Rest
-		if not GameCheck.IsIWD2():
-			Button = Window.GetControl (6)
-			if Button:
-				Button.SetTooltip (11942)
-				Button.OnPress (GUICommonWindows.RestPress)
+	elif not GameCheck.IsIWD2(): # Rest
+		Button = Window.GetControl (6)
+		if Button:
+			Button.SetTooltip (11942)
+			Button.OnPress (GUICommonWindows.RestPress)
 
 	PortraitButtons = GetPortraitButtons (Window)
 	for Button in PortraitButtons:
@@ -297,7 +290,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetVarAssoc("portrait", pcID)
 		Button.SetHotKey(chr(ord('0') + pcID), 0, True)
 		Button.SetFont (StatesFont)
-		AddStatusFlagLabel (Window, Button, pcID)
+		AddStatusFlagLabel (Button, pcID)
 
 		if needcontrols or GameCheck.IsIWD2():
 			Button.OnRightPress (GUICommonWindows.OpenInventoryWindowClick)
@@ -309,9 +302,15 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetAction (GUICommonWindows.PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
 		Button.SetAction (GUICommonWindows.ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		Button.SetAction (GUICommonWindows.ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
+		Button.SetAction(lambda btn: GemRB.GameControlLocateActor(btn.Value), IE_ACT_MOUSE_ENTER);
+		Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
 
-		AddHPLabel (Window, Button, pcID)
-		SetupButtonBorders (Window, Button, pcID)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_SET)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+
+		SetupButtonBorders (Button)
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+			AddHPLabel (Button, pcID)
 
 	UpdatePortraitWindow ()
 	GUICommonWindows.SelectionChanged ()
@@ -321,60 +320,25 @@ def UpdatePortraitWindow ():
 	"""Updates all of the portraits."""
 
 	Window = GemRB.GetView("PORTWIN")
-	Window.Focus(None)
+	if not Window:
+		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Inventory = GemRB.GetVar ("Inventory")
-	GSFlags = GemRB.GetGUIFlags()
 
-	PortraitButtons = GetPortraitButtons (Window)
-	for Button in PortraitButtons:
+	def SetIcons(Button):
 		pcID = Button.Value
-		if (pcID <= GemRB.GetPartySize()):
-			Button.SetAction(lambda btn, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER);
-			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
-
-		Portrait = GemRB.GetPlayerPortrait (pcID, 1)
-		Hide = False
-		if Inventory and pc != pcID:
-			Hide = True
-
-		if Portrait and GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD:
-			import GUISTORE
-			# dead pcs are hidden in all stores but temples
-			if GUISTORE.StoreWindow and not GUISTORE.StoreHealWindow:
-				Hide = True
-
-		if Hide or not Portrait:
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetText ("")
-			Button.SetTooltip ("")
-			continue
-
-		portraitFlags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM
-		Button.SetFlags (portraitFlags, OP_SET)
-
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetPicture (Portrait["Sprite"], "NOPORTSM")
-		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
-
-		# character - 1 == bam cycle, sometimes
-		# only frames have all the glyphs
-		# only bg2 and iwds have a proper blank glyph
-		# so avoid using blanks except in bg2
-		flag = blank = bytearray([33])
+		# character - 1 == bam cycle
+		talk = store = flag = blank = bytearray([32])
 		if GameCheck.IsBG2():
-			# only BG2 has icons for talk or store
 			flag = blank = bytearray([238])
-			talk = bytearray([154]) # dialog icon
-			store = bytearray([155]) # shopping icon
+			# as far as I can tell only BG2 has icons for talk or store
+			flag = bytearray([238])
 
-			if pc == pcID and GemRB.GetStore() != None:
-				flag = store
-			# talk icon
-			elif GemRB.GameGetSelectedPCSingle(1) == pcID:
-				flag = talk
+			if pc == pcID:
+				if GemRB.GetView("WIN_STORE"):
+					flag = bytearray([155]) # shopping icon
+				elif GemRB.GetGUIFlags() & GS_DIALOG:
+					flag = bytearray([154]) # dialog icon
 
 		if LUCommon.CanLevelUp (pcID):
 			if GameCheck.IsBG2():
@@ -386,12 +350,8 @@ def UpdatePortraitWindow ():
 				flag = flag + blank + blank
 			else:
 				flag = ""
-			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-				HPLabel = AddHPLabel (Window, Button, pcID) # missing if new pc joined since the window was opened
-				HPLabel.SetText (ratio_str)
-				HPLabel.SetColor (color)
-			
-		FlagLabel = AddStatusFlagLabel (Window, Button, pcID) # missing if new pc joined since the window was opened
+
+		FlagLabel = Window.GetControl (199 + pcID)
 		FlagLabel.SetText(flag)
 
 		#add effects on the portrait
@@ -410,4 +370,29 @@ def UpdatePortraitWindow ():
 			states.append(effects[x])
 
 		Button.SetText(states)
+
+	def EnablePortrait(Button):
+		Button.SetVisible(True)
+
+		pcID = Button.Value
+		Portrait = GemRB.GetPlayerPortrait (pcID, 1)
+
+		pic = Portrait["Sprite"] if Portrait else ""
+		Button.SetPicture (pic, "NOPORTSM")
+		SetIcons(Button)
+		SetupDamageInfo(Button)
+
+	for Button in GetPortraitButtons(Window):
+		pcID = Button.Value
+		if pcID > GemRB.GetPartySize():
+			Button.SetVisible(False)
+		elif pcID != pc and GemRB.GetView("WIN_STORE") and GemRB.GetView("WIN_INV"):
+			# opened a bag in inventory
+			Button.SetVisible(False)
+		elif GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD and GemRB.GetView("WIN_STORE") and not GemRB.GetView("WINHEAL"):
+			# dead pcs are hidden in all stores but temples
+			Button.SetVisible(False)
+		else:
+			EnablePortrait(Button)
+
 	return
