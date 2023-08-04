@@ -95,15 +95,30 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 #endif
 
 #ifndef ANDROID
-	// Now try ~/.gemrb folder
+#ifndef WIN32
+	// Now try XDG_CONFIG_HOME, with the standard fallback of ~/.config/gemrb
 	datadir = HomePath();
-	path_t confpath = "." + name;
+	path_t confpath;
+	const char* home = getenv("XDG_CONFIG_HOME");
+	if (home) {
+		confpath = PathJoin(home, "gemrb");
+	} else {
+		confpath = PathJoin(datadir, ".config", "gemrb");
+	}
+	path = PathJoinExt(confpath, name, "cfg");
+	if (cfgStream.Open(path)) {
+		return LoadFromStream(cfgStream);
+	}
+#endif
+
+	// Now try ~/.gemrb folder
+	confpath = "." + name;
 	path_t tmp = PathJoin(datadir, confpath);
 
 	path = PathJoinExt(datadir, name, "cfg");
-	
 	if (cfgStream.Open(path))
 	{
+		Log(WARNING, "Interface", "~/.gemrb as a config location is deprecated, please use ~/.config/gemrb!");
 		return LoadFromStream(cfgStream);
 	}
 #endif
