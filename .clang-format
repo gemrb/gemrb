@@ -1,0 +1,176 @@
+---
+# last update based on clang 17 docs
+AccessModifierOffset: -8
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: None
+AlignConsecutiveAssignments: false
+AlignConsecutiveBitFields: false
+AlignConsecutiveDeclarations: false
+AlignConsecutiveMacros: true
+#AlignConsecutiveShortCaseStatements: false, 17+
+AlignEscapedNewlines: DontAlign
+AlignOperands: false
+AlignTrailingComments: Never
+AllowAllArgumentsOnNextLine: true
+AllowAllConstructorInitializersOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: true
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: Yes
+AttributeMacros: ['__declspec', '__unused', '__attribute__']
+BinPackArguments: true
+BinPackParameters: true
+BitFieldColonSpacing: Both
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: false
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterExternBlock: true
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyNamespace: false
+  SplitEmptyRecord: false
+BracedInitializerIndentWidth: 8
+BreakAfterAttributes: Leave
+BreakBeforeBinaryOperators: None
+BreakBeforeConceptDeclarations: Allowed
+BreakBeforeTernaryOperators: false
+BreakConstructorInitializers: BeforeColon
+BreakConstructorInitializersBeforeComma: false
+BreakInheritanceList: AfterComma
+BreakStringLiterals: true
+ColumnLimit: 0
+#CommentPragmas: used to preserve special comments
+CompactNamespaces: false
+ConstructorInitializerIndentWidth: 8
+ContinuationIndentWidth: 8
+Cpp11BracedListStyle: false
+DerivePointerAlignment: false
+DisableFormat: false
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: Always
+FixNamespaceComments: false
+IncludeBlocks: Regroup
+IncludeCategories:
+- Priority: 2
+  Regex: '^"(CircularBuffer|defsounds|errors|exports|globals|ie_.*|opcode_params|overlays|Platform|plugindef|Predicates|RGBAColor|SClassID|strrefs|voodooconst|win32def)\.h"'
+  SortPriority: 0
+- Priority: 3
+  Regex: '^"[^/]+"'
+  SortPriority: 0
+- Priority: 4
+  Regex: '^".*/'
+  SortPriority: 0
+- Priority: 5
+  Regex: '^<'
+  SortPriority: 0
+- Priority: 1
+  Regex: '.*'
+  SortPriority: 0
+IncludeIsMainRegex: $
+IncludeIsMainSourceRegex: ''
+IndentAccessModifiers: false
+IndentCaseBlocks: true
+IndentCaseLabels: true
+IndentExternBlock: true
+IndentGotoLabels: false
+IndentPPDirectives: BeforeHash
+IndentRequiresClause: true
+IndentWidth: 8
+IndentWrappedFunctionNames: true
+InsertBraces: false
+InsertNewlineAtEOF: true
+#IntegerLiteralSeparator: 0, 17+
+#KeepEmptyLinesAtEOF: false, 17+
+KeepEmptyLinesAtTheStartOfBlocks: false
+LambdaBodyIndentation: Signature
+Language: Cpp
+#LineStyle: LF, 17+
+MacroBlockBegin: ''
+MacroBlockEnd: ''
+#Macros: 17+, for macro hacks
+MaxEmptyLinesToKeep: 2
+NamespaceIndentation: Inner
+PPIndentWidth: -1
+PackConstructorInitializers: NextLine
+# not really needed, current values only cause the change of 1 line
+#PenaltyBreakAssignment: 0
+#PenaltyBreakBeforeFirstCallParameter: 21
+#PenaltyBreakComment: 411
+#PenaltyBreakFirstLessLess: 101
+#PenaltyBreakOpenParenthesis:
+#PenaltyBreakString: 460
+#PenaltyBreakTemplateDeclaration: 10
+#PenaltyExcessCharacter: 835460
+#PenaltyReturnTypeOnItsOwnLine: 199
+PointerAlignment: Left
+QualifierAlignment: Leave
+#QualifierOrder
+#RawStringFormats for formatting code in raw strings
+#ReferenceAlignment will use PointerAlignment
+ReflowComments: false
+RemoveBracesLLVM: false
+#RemoveParentheses: Leave, 17+
+RemoveSemicolon: false
+RequiresClausePosition: OwnLine
+RequiresExpressionIndentation: OuterScope
+SeparateDefinitionBlocks: Leave
+#ShortNamespaceLines: 3, useless without FixNamespaceComments
+SortIncludes: CaseSensitive
+SortUsingDeclarations: Never
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: false
+SpaceAroundPointerQualifiers: Default
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: Never
+SpacesInContainerLiterals: true
+#SpacesInLineCommentPrefix: -1, needs ReflowComments
+#SpacesInParens: Never, 17+
+SpacesInSquareBrackets: false
+Standard: c++14
+#StatementAttributeLikeMacros:
+#StatementMacros
+TabWidth: 8
+#TypeNames: 17+, for special type names
+#TypenameMacros
+UseTab: ForContinuationAndIndentation
+#WhitespaceSensitiveMacros
+---
+Language: ObjC
+ColumnLimit: 0
+UseTab: ForContinuationAndIndentation
+TabWidth: 8
+IndentWidth: 8
+AccessModifierOffset: -8
+ContinuationIndentWidth: 8
+IndentPPDirectives: BeforeHash
+PointerAlignment: Left
+SpaceInEmptyBlock: false
+...
