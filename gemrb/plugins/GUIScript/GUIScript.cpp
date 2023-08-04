@@ -509,7 +509,7 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_EndCutSceneMode__doc,
 "===== EndCutSceneMode =====\n\
 \n\
-**Prototype:** EndCutSceneMode ()\n\
+**Prototype:** GemRB.EndCutSceneMode ()\n\
 \n\
 **Description:** Exits the CutScene Mode. It is similar to the gamescript \n\
 command of the same name. It gives back the cursor and shows the game GUI \n\
@@ -531,16 +531,19 @@ static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 PyDoc_STRVAR( GemRB_LoadWindow__doc,
 "===== LoadWindow =====\n\
 \n\
-**Prototype:** GemRB.LoadWindow (WindowID)\n\
+**Prototype:** GemRB.LoadWindow (WindowID[, windowPack, position])\n\
 \n\
 **Description:** Returns a Window. You must call LoadWindowPack before using \n\
 this command. The window won't be displayed. If LoadWindowPack() set nonzero \n\
 natural screen size with Width and Height parameters, the loaded window is \n\
 then moved by (screen size - winpack size) / 2\n\
 \n\
-**Parameters:** a window ID, see the .chu file specification\n\
+**Parameters:**\n\
+  * a window ID, see the .chu file specification\n\
+  * windowPack: which window pack (.chu) to take the window from (defaults to current)\n\
+  * position: where to place it on screen (defaults to WINDOW_CENTER, see GUIDefines.py)\n\
 \n\
-**Return value:** GWindow (index)\n\
+**Return value:** GWindow\n\
 \n\
 **See also:** [LoadWindowPack](LoadWindowPack.md), [Window_GetControl](Window_GetControl.md), [Window_ShowModal](Window_ShowModal.md)"
 );
@@ -703,7 +706,7 @@ PyDoc_STRVAR( GemRB_Table_FindValue__doc,
 **Metaclass Prototype:** FindValue (ColumnIndex, Value[, StartRow])\n\
 \n\
 **Description:** Returns the first row index of a field value in a 2DA \n\
-Table. If StartRowis omitted, the search starts from the beginning.\n\
+Table. If StartRow is omitted, the search starts from the beginning.\n\
 \n\
 **Parameters:**\n\
   * TableIndex - integer, returned by a previous LoadTable command.\n\
@@ -945,7 +948,7 @@ it will return the list's existing reference (won't load it again).\n\
 **Parameters:**\n\
   * IDSResRef - the symbol list's name (.ids resref)\n\
 \n\
-**Return value:** Symbol table reference index\n\
+**Return value:** GSymbol object, None if loading failed\n\
 \n\
 **See also:** [UnloadSymbol](UnloadSymbol.md)\n\
 "
@@ -958,7 +961,7 @@ static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
 
 	int ind = core->LoadSymbol(ResRefFromPy(string));
 	if (ind == -1) {
-		return NULL;
+		Py_RETURN_NONE;
 	}
 
 	return gs->ConstructObject("Symbol", ind);
@@ -997,14 +1000,14 @@ static PyObject* GemRB_Symbol_Unload(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Symbol_GetValue__doc,
 "===== GetSymbolValue =====\n\
 \n\
-**Prototype:** GemRB.GetSymbolValue (SymbolIndex, StringVal|IntVal)\n\
+**Prototype:** GemRB.GetSymbolValue (GSymbol, StringVal|IntVal)\n\
 \n\
 **Metaclass Prototype:** GetValue (StringVal|IntVal)\n\
 \n\
 **Description:** Returns a field of a IDS Symbol Table.\n\
 \n\
 **Parameters:**\n\
-  * SymbolIndex - returned by a previous LoadSymbol command\n\
+  * GSymbol - returned by a previous LoadSymbol command\n\
   * StringVal - name of the symbol to resolve (first column of .ids file)\n\
   * IntVal - value of the symbol to find (second column of .ids file)\n\
 \n\
@@ -1311,16 +1314,13 @@ static PyObject* GemRB_Control_SetColor(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_QueryText__doc,
  "===== Control_QueryText =====\n\
  \n\
-**Prototype:** GemRB.QueryText (WindowIndex, ControlIndex)\n\
- \n\
 **Metaclass Prototype:** QueryText ()\n\
  \n\
  **Description:** Returns the Text of a TextEdit/TextArea/Label control. \n\
  In case of a TextArea, it will return the selected row, not the entire \n\
  textarea.\n\
  \n\
- **Parameters:**\n\
- * WindowIndex, ControlIndex - the control's reference\n\
+ **Parameters:** N/A\n\
  \n\
  **Return value:** string, may be empty\n\
  \n\
@@ -1350,16 +1350,12 @@ static PyObject* GemRB_Control_QueryText(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_TextEdit_SetBufferLength__doc,
 "===== TextEdit_SetBufferLength =====\n\
 \n\
-**Prototype:** GemRB.SetBufferLength (WindowIndex, ControlIndex, Length)\n\
-\n\
 **Metaclass Prototype:** SetBufferLength (Length)\n\
 \n\
 **Description:**  Sets the maximum text length of a TextEdit control. It \n\
 cannot be more than 65535.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex - the window control id\n\
-  * ControlID - the id of the target control\n\
   * Length - the maximum text length\n\
 \n\
 **Return value:** N/A"
@@ -1381,8 +1377,6 @@ static PyObject* GemRB_TextEdit_SetBufferLength(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_SetText__doc,
 "===== Control_SetText =====\n\
 \n\
-**Prototype:** GemRB.SetText (WindowIndex, ControlIndex, String|Strref)\n\
-\n\
 **Metaclass Prototype:** SetText (String|Strref)\n\
 \n\
 **Description:** Sets the Text of a control in a Window. In case of \n\
@@ -1392,11 +1386,10 @@ token.) -1 is a special Strref, it will be resolved to the name/version \n\
 of the running engine.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * String - an arbitrary string\n\
   * Strref - a string index from the dialog.tlk table.\n\
 \n\
-**Return value:** 0 on success, -1 otherwise\n\
+**Return value:** N/A\n\
 \n\
 **See also:** [Control_QueryText](Control_QueryText.md), [DisplayString](DisplayString.md), [Window_GetControl](Window_GetControl.md)"
 );
@@ -1430,15 +1423,12 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_TextArea_Append__doc,
 "===== TextArea_Append =====\n\
 \n\
-**Prototype:** GemRB.TextAreaAppend (WindowIndex, ControlIndex, String|Strref [, Row[, Flag]])\n\
-\n\
 **Metaclass Prototype:** Append (String|Strref [, Row[, Flag]])\n\
 \n\
 **Description:** Appends the Text to the TextArea Control in the Window. \n\
 If row is specificed, it can also append text to existing rows.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * String - literal text, it could have embedded colour codes\n\
   * Strref - a string index from the dialog.tlk table.\n\
   * Row - the row of text to add the text to, if omitted, the text will be added (in a new row) after the last row.\n\
@@ -1448,7 +1438,7 @@ If row is specificed, it can also append text to existing rows.\n\
     * 4 - speech (works only with if sound was set)\n\
     * 256 - strrefs not displayed (even if allowed by default)\n\
 \n\
-**Return value:** Index of the row appended or changed\n\
+**Return value:** N/A\n\
 \n\
 **See also:** [TextArea_Clear](TextArea_Clear.md), [Control_SetText](Control_SetText.md), [Control_QueryText](Control_QueryText.md)"
 );
@@ -1499,7 +1489,7 @@ The tooltip's visual properties must be set in the gemrb.ini file:\n\
   * Strref - a string index from the dialog.tlk table.\n\
   * Function - (optional) function key to prepend\n\
 \n\
-**Return value:** 0 on success, -1 on error\n\
+**Return value:** N/A\n\
 \n\
 **See also:** [Control_SetText](Control_SetText.md)"
 );
@@ -1525,9 +1515,18 @@ static PyObject* GemRB_View_SetTooltip(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR(GemRB_Window_Focus__doc,
-"Focus(GWindow)\n\n"
-"Brings window to front and makes it visible if it is not already.\n"
-"Optionally pass a subview to also make that the focused view of the window.");
+"===== Window_Focus =====\n\
+\n\
+**Metaclass Prototype:** Focus ([GView])\n\
+\n\
+**Description:** Brings window to front and makes it visible if it is not already.\n\
+Optionally pass a subview to also make that the focused view of the window..\n\
+\n\
+**Parameters:**\n\
+  * GView - the view to focus\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_Window_Focus(PyObject* self, PyObject* args)
 {
@@ -1588,8 +1587,6 @@ static PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Window_ShowModal__doc,
 "===== Window_ShowModal =====\n\
 \n\
-**Prototype:** GemRB.ShowModal (WindowIndex, [Shadow=MODAL_SHADOW_NONE])\n\
-\n\
 **Metaclass Prototype:** ShowModal ([Shadow=MODAL_SHADOW_NONE])\n\
 \n\
 **Description:** Show a Window on Screen setting the Modal Status. If \n\
@@ -1597,7 +1594,6 @@ Shadow is MODAL_SHADOW_GRAY, other windows are grayed. If Shadow is \n\
 MODAL_SHADOW_BLACK, they are blacked out.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex - the index returned by LoadWindow()\n\
   * Shadow:\n\
     * MODAL_SHADOW_NONE = 0\n\
     * MODAL_SHADOW_GRAY = 1 (translucent)\n\
@@ -1662,8 +1658,6 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Window_SetAction__doc,
 "===== Window_SetAction =====\n\
 \n\
-**Prototype:** _GemRB.Window_SetAction (GWindow, PythonFunction, EventType)\n\
-\n\
 **Metaclass Prototype:** SetAction (PythonFunction, EventType)\n\
 \n\
 **Description:** Ties an event of a control to a python function\
@@ -1703,8 +1697,6 @@ static PyObject* GemRB_Window_SetAction(PyObject* self, PyObject* args)
 
 PyDoc_STRVAR( GemRB_Control_SetAction__doc,
 "===== Control_SetAction =====\n\
-\n\
-**Prototype:** _GemRB.Control_SetAction (GControl, PythonFunction, EventType[, Button, Mod, Count])\n\
 \n\
 **Metaclass Prototype:** SetAction (PythonFunction, EventType[, Button, Mod, Count])\n\
 \n\
@@ -1760,8 +1752,6 @@ static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
 
 PyDoc_STRVAR( GemRB_Control_SetActionInterval__doc,
 "===== Control_SetActionInterval =====\n\
-\n\
-**Prototype:** _GemRB.Control_SetActionInterval (GControl [,interval])\n\
 \n\
 **Metaclass Prototype:** SetActionInterval ([interval])\n\
 \n\
@@ -1827,17 +1817,14 @@ static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_SetStatus__doc,
 "===== SetControlStatus =====\n\
 \n\
-**Prototype:** GemRB.SetControlStatus (WindowIndex, ControlIndex, State)\n\
-\n\
 **Metaclass Prototype:** SetStatus (State)\n\
 \n\
 **Description:** Sets the state of a Control. For buttons, this is the \n\
-same as SetButtonState.\n\
+same as Button_SetState.\n\
 For other controls, this command will set the common value of the \n\
 control, which has various uses.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * Button States:**\n\
     * IE_GUI_BUTTON_ENABLED    = 0x00000000, default state\n\
     * IE_GUI_BUTTON_UNPRESSED  = 0x00000000, same as above\n\
@@ -1888,14 +1875,11 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_SetValue__doc,
 "===== Control_SetValue =====\n\
 \n\
-**Prototype:** GemRB.Control_SetValue (WindowIndex, ControlIndex, LongValue)\n\
-\n\
 **Metaclass Prototype:** SetValue (LongValue)\n\
 \n\
 **Description:** Set the value of a control. \n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex  - the control's reference\n\
   * LongValue - numeric, a value associated with the control\n\
 \n\
 **Return value:** N/A\n\
@@ -1930,8 +1914,6 @@ static PyObject* GemRB_Control_SetValue(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Control_SetVarAssoc__doc,
 "===== Control_SetVarAssoc =====\n\
 \n\
-**Prototype:** GemRB.SetVarAssoc (WindowIndex, ControlIndex, VariableName, LongValue)\n\
-\n\
 **Metaclass Prototype:** SetVarAssoc (VariableName, LongValue)\n\
 \n\
 **Description:** It associates a variable name and an optionally bounded \n\
@@ -1940,7 +1922,6 @@ The control uses this associated value differently, depending on the \n\
 control. See more about this in 'data_exchange'.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex  - the control's reference\n\
   * Variablename - string, a Global Dictionary Name associated with the control\n\
   * LongValue - numeric, a value associated with the control\n\
   * min - numeric, minimum range value (optional)\n\
@@ -2074,12 +2055,12 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_CreateView__doc,
 "===== CreateView =====\n\
 \n\
-**Prototype:** GemRB.CreateWindow (ControlID, Type, FrameRect[, OtherArgs])\n\
+**Prototype:** GemRB.CreateView (ControlID, Type, FrameRect[, OtherArgs])\n\
 \n\
 **Description:** Creates a new empty view and returns it.\n\
 \n\
 **Parameters:** \n\
-  * ControlID - the window's ID\n\
+  * ControlID - the desired control ID\n\
   * Type - the View's type\n\
   * FrameRect - a dict with the View's frame (origin and size)\n\
   * OtherArgs - further arguments depending on the View type\n\
@@ -2275,7 +2256,8 @@ PyDoc_STRVAR( GemRB_View_GetFrame__doc,
 \n\
 **Description:** Return the View's frame rect.\n\
 \n\
-**Parameters:** N/A\n\
+**Parameters:** \n\
+  * GView - the control's reference\n\
 \n\
 **Examples:**\n\
 \n\
@@ -2460,11 +2442,9 @@ static PyObject* GemRB_View_SetResizeFlags(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_View_Focus__doc,
 "===== View_Focus =====\n\
 \n\
-**Prototype:** View_Focus ()\n\
-\n\
 **Metaclass Prototype:** Focus ()\n\
 \n\
-**Description:** Focuses the view in it's window to direct keyboard and certain other events to the view.\n\
+**Description:** Focuses the view in its window to direct keyboard and certain other events to the view.\n\
 \n\
 **Parameters:** N/A\n\
 \n\
@@ -2488,15 +2468,12 @@ static PyObject* GemRB_View_Focus(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetSprites__doc,
 "===== Button_SetSprites =====\n\
 \n\
-**Prototype:** GemRB.SetButtonSprites (WindowIndex, ControlIndex, ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)\n\
-\n\
 **Metaclass Prototype:** SetSprites (ResRef, Cycle, UnpressedFrame, PressedFrame, SelectedFrame, DisabledFrame)\n\
 \n\
 **Description:** Sets the Button's images. You can disable the images by \n\
 setting the IE_GUI_BUTTON_NO_IMAGE flag on the control.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * ResRef - a .bam animation resource (.bam resref)\n\
   * Cycle - the cycle of the .bam from which all frames of this button will come\n\
   * UnpressedFrame - the frame which will be displayed by default\n\
@@ -2550,8 +2527,6 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetOverlay__doc,
 "===== Button_SetOverlay =====\n\
 \n\
-**Prototype:** GemRB.SetButtonOverlay (WindowIndex, ControlIndex, Current, Max, r,g,b,a, r,g,b,a)\n\
-\n\
 **Metaclass Prototype:** SetOverlay (ratio, r1,g1,b1,a1, r2,g2,b2,a2)\n\
 \n\
 **Description:** Sets ratio (0-1.0) of height to which button picture will \n\
@@ -2559,7 +2534,6 @@ be overlaid in a different colour. The colour will fade from the first rgba \n\
 values to the second.\n\
 \n\
 **Parameters:** \n\
-  * Window, Button - the control's reference\n\
   * ClippingRatio  - a floating point value from the 0-1 interval\n\
   * rgba1          - source colour\n\
   * rgba2          - target colour\n\
@@ -2641,14 +2615,11 @@ static PyObject* GemRB_Button_SetBorder(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_EnableBorder__doc,
 "===== Button_EnableBorder =====\n\
 \n\
-**Prototype:** GemRB.EnableButtonBorder (WindowIndex, ControlIndex, BorderIndex, enabled)\n\
-\n\
 **Metaclass Prototype:** EnableBorder (BorderIndex, enabled)\n\
 \n\
 **Description:** Enable or disable specified button border/frame/overlay.\n\
 \n\
 **Parameters:** \n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * BorderIndex - 0, 1 or 2\n\
   * enabled - boolean, true enables the border\n\
 \n\
@@ -2673,14 +2644,11 @@ static PyObject* GemRB_Button_EnableBorder(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetFont__doc,
 "===== Button_SetFont =====\n\
 \n\
-**Prototype:** GemRB.SetButtonFont (WindowIndex, ControlIndex, FontResRef)\n\
-\n\
 **Metaclass Prototype:** SetFont (FontResRef)\n\
 \n\
 **Description:** Sets font used for drawing button text.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex  - the control's reference\n\
   * FontResref - a .bam resref which must be listed in fonts.2da\n\
 \n\
 **Return value:** N/A\n\
@@ -2704,14 +2672,11 @@ static PyObject* GemRB_Button_SetFont(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetAnchor__doc,
 "===== Button_SetAnchor =====\n\
 \n\
-**Prototype:** GemRB.SetButtonAnchor (WindowIndex, ControlIndex, x, y)\n\
-\n\
 **Metaclass Prototype:** SetAnchor (x, y)\n\
 \n\
 **Description:** Sets explicit anchor point used for drawing button label.\n\
 \n\
 **Parameters:** \n\
-  * WindowIndex, ControlIndex - control IDs\n\
   * x, y - anchor position \n\
 \n\
 **Return value:** N/A\n\
@@ -2735,14 +2700,11 @@ static PyObject* GemRB_Button_SetAnchor(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetPushOffset__doc,
 "===== Button_SetPushOffset =====\n\
 \n\
-**Prototype:** GemRB.SetButtonPushOffset (WindowIndex, ControlIndex, x, y)\n\
-\n\
 **Metaclass Prototype:** SetPushOffset (x, y)\n\
 \n\
 **Description:** Sets the amount pictures and label move on button press.\n\
 \n\
 **Parameters:** \n\
-  * WindowIndex, ControlIndex - control IDs\n\
   * x, y - anchor position \n\
 \n\
 **Return value:** N/A\n\
@@ -2774,9 +2736,7 @@ Used in bg2 with xnewarea.2da for ToB.\n\
 **Parameters:** \n\
   * 2daresref - 2da table with new area mappings\n\
 \n\
-**Return value:** N/A\n\
-\n\
-**See also:**"
+**Return value:** N/A"
 );
 
 static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
@@ -2969,8 +2929,6 @@ static PyObject* GemRB_UpdateWorldMap(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_WorldMap_GetDestinationArea__doc,
 "===== WorldMap_GetDestinationArea =====\n\
 \n\
-**Prototype:** GemRB.GetDestinationArea (WindowIndex, ControlID[, RndEncounter])\n\
-\n\
 **Metaclass Prototype:** GetDestinationArea ([RndEncounter])\n\
 \n\
 **Description:** Returns a dictionary of the selected area by the worldmap \n\
@@ -2980,7 +2938,6 @@ optionally evaluated. If the random encounter flag is set, the random \n\
 encounters will be evaluated too.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - designate a worldmap control\n\
   * RndEncounter - check for random encounters?\n\
 \n\
 **Return value:** Dictionary\n\
@@ -3077,15 +3034,12 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 PyDoc_STRVAR( GemRB_Label_SetFont__doc,
  "===== Label_SetFont =====\n\
  \n\
- **Prototype:** GemRB.SetLabelFont (WindowIndex, ControlIndex, FontResRef)\n\
- \n\
  **Metaclass Prototype:** SetFont (FontResRef)\n\
  \n\
  **Description:** Sets font used for drawing the label.\n\
  \n\
  **Parameters:**\n\
- * WindowIndex, ControlIndex  - the control's reference\n\
- * FontResref - a .bam resref which must be listed in fonts.2da\n\
+ * FontResref - a  font resref which must be listed in fonts.2da\n\
  \n\
  **Return value:** N/A\n\
  \n\
@@ -3108,7 +3062,7 @@ static PyObject* GemRB_Label_SetFont(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
 "===== Button_SetHotKey =====\n\
 \n\
-**Prototype:** _GemRB.Button_SetHotKey(char or keymaping[, modifiers=0, global=False])\n\
+**Metaclass Prototype:** SetHotKey(char or keymaping[, modifiers=0, global=False])\n\
 \n\
 **Description:** Binds a keyboard key to trigger the control event when its window is focused.\n\
 If global is set, the hot key works even if the window does not have focus.\n\
@@ -3248,7 +3202,7 @@ PyDoc_STRVAR( GemRB_GameGetExpansion__doc,
 \n\
 **Parameters:** N/A\n\
 \n\
-**Return value:** int\n\
+**Return value:** integer version of the current expansion\n\
 \n\
 **See also:** [GameSetExpansion](GameSetExpansion.md)"
 );
@@ -3271,7 +3225,7 @@ This command selects between these two modes.\n\
 **Parameters:**\n\
   * mode - 0 or 1\n\
 \n\
-**Return value:** false if already set\n\
+**Return value:** false if already set, true otherwise\n\
 \n\
 **See also:** [LoadGame](LoadGame.md), [GameGetExpansion](GameGetExpansion.md), GameType(variable)\n\
 "
@@ -3303,7 +3257,7 @@ status, dialog textarea size).\n\
   * Bits - This depends on the game. The lowest 2 bits are the message window size\n\
   * Operation - The usual bit operations\n\
 \n\
-**Return value:** N/A"
+**Return value:** boolean denoting success"
 );
 
 static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
@@ -3333,7 +3287,7 @@ Don't confuse it with the saved screen flags set by GameSetScreenFlags.\n\
     * 32 - cutscene (no action queueing)\n\
   * Operation - bit operation to use\n\
 \n\
-**Return value:** N/A\n\
+**Return value:** boolean denoting success\n\
 \n\
 **See also:** [GameSetScreenFlags](GameSetScreenFlags.md)"
 );
@@ -3468,15 +3422,12 @@ static PyObject* GemRB_GameControlToggleAlwaysRun(PyObject * /*self*/, PyObject*
 PyDoc_STRVAR( GemRB_Button_SetState__doc,
 "===== Button_SetState =====\n\
 \n\
-**Prototype:** GemRB.SetButtonState (WindowIndex, ControlIndex, State)\n\
-\n\
 **Metaclass Prototype:** SetState (State)\n\
 \n\
 **Description:** Sets the state of a Button Control. Doesn't work if the button \n\
 is a checkbox or a radio button though, their states are handled internally.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex  - the control's reference\n\
   * State - the new state of the button:\n\
     * IE_GUI_BUTTON_ENABLED    = 0x00000000, default state\n\
     * IE_GUI_BUTTON_UNPRESSED  = 0x00000000, same as above\n\
@@ -3508,8 +3459,6 @@ static PyObject* GemRB_Button_SetState(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetPictureClipping__doc,
 "===== Button_SetPictureClipping =====\n\
 \n\
-**Prototype:** GemRB.SetButtonPictureClipping (Window, Button, ClippingRatio)\n\
-\n\
 **Metaclass Prototype:** SetPictureClipping (ClippingRatio)\n\
 \n\
 **Description:** Sets percent (0-1.0) of width to which button picture \n\
@@ -3517,7 +3466,6 @@ will be clipped. This clipping cannot be used simultaneously with \n\
 SetButtonOverlay().\n\
 \n\
 **Parameters:** \n\
-  * Window, Button - the control's reference\n\
   * ClippingRatio  - a floating point value from the 0-1 interval\n\
 \n\
 **Return value:** N/A\n\
@@ -3543,14 +3491,11 @@ static PyObject* GemRB_Button_SetPictureClipping(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetPicture__doc,
 "===== Button_SetPicture =====\n\
 \n\
-**Prototype:** GemRB.SetButtonPicture (WindowIndex, ControlIndex, PictureResRef, DefaultResRef)\n\
-\n\
 **Metaclass Prototype:** SetPicture (PictureResRef, DefaultResRef)\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a BMP file or a Sprite2D.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * PictureResRef - the name of the picture (a .bmp resref) or a Sprite2D object\n\
   * DefaultResRef - an alternate bmp should the picture be nonexistent\n\
 \n\
@@ -3592,15 +3537,12 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetPLT__doc,
 "===== Button_SetPLT =====\n\
 \n\
-**Prototype:** GemRB.SetButtonPLT (WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
-\n\
 **Metaclass Prototype:** SetPLT (PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a PLT file. \n\
 Sets up the palette based on the eight given gradient colors.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * PLTResRef - the name of the picture (a .plt resref)\n\
   * col1-8 - color gradients\n\
   * type - the byte to use from the gradients:\n\
@@ -3679,8 +3621,6 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetBAM__doc,
 "===== Button_SetBAM =====\n\
 \n\
-**Prototype:** GemRB.SetButtonBAM (WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n\
-\n\
 **Metaclass Prototype:** SetBAM (BAMResRef, CycleIndex, FrameIndex[, col1])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a BAM file. If \n\
@@ -3689,7 +3629,6 @@ if it is >=0, then it changes the 4-16 palette entries of the bam. Since it \n\
 uses 12 colors palette, it has issues in PST.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * BAMResRef - the name of the BAM animation (a .bam resref)\n\
   * CycleIndex, FrameIndex - the cycle and frame index of the picture in the bam\n\
   * col1 - the gradient number, (-1 no gradient)\n\
@@ -3753,17 +3692,13 @@ static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetAnimation__doc,
 "===== Button_SetAnimation =====\n\
 \n\
-**Prototype:** GemRB.SetAnimation (WindowIndex, ControlIndex, BAMResRef[, Cycle, Blend, Cols])\n\
-\n\
-**Metaclass Prototype:** SetAnimation (BAMResRef[, Cycle, Blend])\n\
+**Metaclass Prototype:** SetAnimation (BAMResRef[, Cycle, Blend, Cols])\n\
 \n\
 **Description:**  Sets the animation of a Control (usually a Button) from \n\
 a BAM file. Optionally an animation cycle could be set too.\n\
 \n\
 **Parameters:** \n\
-  * WindowIndex - the window control id\n\
-  * ControlID - the id of the target control\n\
-  * BAMResRef - resref of the animation\
+  * BAMResRef - resref of the animation\n\
   * Cycle - (optional) number of the cycle to use\n\
   * Blend - (optional) set the blend mode, default is BLENDED \n\
   * Cols - (optional) a list of Colors to apply as the palette\n\
@@ -3894,6 +3829,7 @@ sound as if it was said by that PC (EAX).\n\
 \n\
 **Parameters:**\n\
   * SoundResource - a sound resref (the format could be raw pcm, wavc or  ogg; 8/16 bit; mono/stereo). Use the None python object to simply stop the previous sound.\n\
+  * DefSoundIndex - the sound index into defsound.2da\n\
   * channel - the name of the channel the sound should be played on (optional, defaults to 'GUI'\n\
   * xpos - x coordinate of the position where the sound should be played (optional)\n\
   * ypos - y coordinate of the position where the sound should be played (optional)\n\
@@ -3958,7 +3894,7 @@ static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 PyDoc_STRVAR( GemRB_LoadMusicPL__doc,
 "===== LoadMusicPL =====\n\
 \n\
-**Prototype:** LoadMusicPL (MusicPlayListResource[, HardEnd])\n\
+**Prototype:** GemRB.LoadMusicPL (MusicPlayListResource[, HardEnd])\n\
 \n\
 **Description:** Loads and starts a Music PlayList.\n\
 \n\
@@ -4133,10 +4069,7 @@ PyDoc_STRVAR( GemRB_GetGUIFlags__doc,
 \n\
 **Parameters:** N/A\n\
 \n\
-**Return value:** int (GS_ flag bits)\n\
-\n\
-**See also:**"
-);
+**Return value:** integer (GS_ flag bits)");
 
 static PyObject* GemRB_GetGUIFlags(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -4156,7 +4089,7 @@ string values, used both by the game scripts and the GUI scripts.\n\
 **Parameters:**\n\
   * VariableName - name of the variable (shorter than 32!)\n\
 \n\
-**Return value:** string, the value of the token\n\
+**Return value:** string value of the token or None if it doesn't exist\n\
 \n\
 **Examples:**\n\
 \n\
@@ -4322,7 +4255,7 @@ is what gamescripts know as GLOBAL variables. \n\
 **Parameters:**\n\
   * VariableName - name of the variable\n\
 \n\
-**Return value:**\n\
+**Return value:** numeric\n\
 \n\
 **Examples:**\n\
 \n\
@@ -4452,7 +4385,7 @@ PyDoc_STRVAR( GemRB_SaveConfig__doc,
 \n\
 **Description:** Exports the game configuration to a file.\n\
 \n\
-**Return value:** N/A"
+**Return value:** bool denoting success"
 );
 
 static PyObject* GemRB_SaveConfig(PyObject * /*self*/, PyObject * /*args*/)
@@ -4476,7 +4409,7 @@ to a specific SAV version.\n\
   * description - the string that will also appear in the filename\n\
   * version - an optional SAV version override\n\
 \n\
-**Return value:** N/A\n\
+**Return value:** 0 on success\n\
 \n\
 **Examples:** \n\
 \n\
@@ -4565,9 +4498,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetName__doc,
 \n\
 **Description:**  Returns name of the saved game.\n\
 \n\
-**Return value:** string/int\n\
-\n\
-**See also:**"
+**Return value:** string/int"
 );
 
 static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
@@ -4589,9 +4520,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
 \n\
 **Description:** Returns date of the saved game.\n\
 \n\
-**Return value:** string/int\n\
-\n\
-**See also:**"
+**Return value:** string/int"
 );
 
 static PyObject* GemRB_SaveGame_GetDate(PyObject * /*self*/, PyObject* args)
@@ -4613,9 +4542,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetGameDate__doc,
 \n\
 **Description:** Returns game date of the saved game.\n\
 \n\
-**Return value:** string/int\n\
-\n\
-**See also:**"
+**Return value:** string/int"
 );
 
 static PyObject* GemRB_SaveGame_GetGameDate(PyObject * /*self*/, PyObject* args)
@@ -4637,9 +4564,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetSaveID__doc,
 \n\
 **Description:** Returns ID of the saved game.\n\
 \n\
-**Return value:** string/int\n\
-\n\
-**See also:**"
+**Return value:** string/int"
 );
 
 static PyObject* GemRB_SaveGame_GetSaveID(PyObject * /*self*/, PyObject* args)
@@ -4660,9 +4585,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetPreview__doc,
 \n\
 **Description:** Returns preview of the saved game.\n\
 \n\
-**Return value:** string/int\n\
-\n\
-**See also:**"
+**Return value:** string/int"
 );
 
 static PyObject* GemRB_SaveGame_GetPreview(PyObject * /*self*/, PyObject* args)
@@ -4687,9 +4610,7 @@ PyDoc_STRVAR( GemRB_SaveGame_GetPortrait__doc,
   * save - save game object\n\
   * index - portrait index\n\
 \n\
-**Return value:** string/int\n\
-\n\
-**See also:**"
+**Return value:** string/int"
 );
 
 static PyObject* GemRB_SaveGame_GetPortrait(PyObject * /*self*/, PyObject* args)
@@ -4753,14 +4674,11 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_TextArea_ListResources__doc,
 "===== TextArea_ListResources =====\n\
 \n\
-**Prototype:** GemRB.ListResources (WindowIndex, ControlIndex, type [, flags])\n\
-\n\
 **Metaclass Prototype:** ListResources (type [, flags])\n\
 \n\
 **Description:** Lists the resources of 'type' as selectable options in the TextArea.\n\
 \n\
 **Parameters:** \n\
-  * WindowIndex, ControlIndex - control IDs\n\
   * type - one of CHR_PORTRAITS, CHR_SOUNDS, CHR_EXPORTS or CHR_SCRIPTS\n\
   * flags:\n\
     - for CHR_PORTRAITS chooses suffix: 0 'M', 1 'S', 2 'L'\n\
@@ -4835,14 +4753,11 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_TextArea_SetOptions__doc,
 "===== TextArea_SetOptions =====\n\
 \n\
-**Prototype:** GemRB.SetOptions (WindowIndex, ControlIndex, Options)\n\
-\n\
 **Metaclass Prototype:** SetOptions (Options)\n\
 \n\
 **Description:** Set the selectable options for the TextArea\n\
 \n\
 **Parameters:** \n\
-  * WindowIndex, ControlIndex - control IDs\n\
   * Options - python list of options\n\
 \n\
 **Return value:** N/A"
@@ -5271,7 +5186,7 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 PyDoc_STRVAR( GemRB_GameIsBeastKnown__doc,
 "===== GameIsBeastKnown =====\n\
 \n\
-**Prototype:** GameIsBeastKnown (index)\n\
+**Prototype:** GemRB.GameIsBeastKnown (index)\n\
 \n\
 **Description:** Returns whether beast with given index is known to PCs. \n\
 Works only in PST.\n\
@@ -5422,7 +5337,7 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_CreatePlayer__doc,
 "===== CreatePlayer =====\n\
 \n\
-**Prototype:** CreatePlayer (CREResRef, Slot [,Import, VersionOverride])\n\
+**Prototype:** GemRB.CreatePlayer (CREResRef, Slot [,Import, VersionOverride])\n\
 \n\
 **Description:** Adds an actor (PC) to the current game. It works only \n\
 after a LoadGame() was executed, and should be used before an EnterGame(). \n\
@@ -5618,7 +5533,9 @@ PyDoc_STRVAR( GemRB_CreateString__doc,
 \n\
 **Parameters:**\n\
   * Strref - string index to use\n\
-  * Text - string contents"
+  * Text - string contents\n\
+\n\
+**Return value:** the actual strref of the new string"
 );
 
 static PyObject* GemRB_CreateString(PyObject * /*self*/, PyObject* args)
@@ -5738,16 +5655,19 @@ PyDoc_STRVAR( GemRB_GetSlotType__doc,
 **Prototype:** GemRB.GetSlotType (idx[, PartyID])\n\
 \n\
 **Description:** Returns dictionary of an itemslot type (slottype.2da).\n\
+Alternatively if idx is -1, returns the 'Count' of inventory items.\n\
 \n\
 **Parameters:**\n\
   * idx - a row number of slottype.2da\n\
   * PartyID - optional actor ID for a richer dictionary\n\
 \n\
 **Return value:** dictionary\n\
-'Type'   - bitfield, The inventory slot's type.\n\
-'ID'     - the gui button's controlID which belongs to this slot.\n\
-'Tip'    - the tooltip resref for this slot.\n\
-'ResRef' - the background .bam of the slot.\n\
+  * 'Type'   - bitfield, The inventory slot's type.\n\
+  * 'ID'     - the gui button's controlID which belongs to this slot.\n\
+  * 'Tip'    - the tooltip resref for this slot.\n\
+  * 'ResRef' - the background .bam of the slot.\n\
+  * 'Flags'  - the slot flags.\n\
+  * 'Effects'- the slot effects.\n\
 \n\
 **See also:** [Button_SetItemIcon](Button_SetItemIcon.md)\n\
 "
@@ -6006,17 +5926,16 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
 "===== GameGetSelectedPCSingle =====\n\
 \n\
-**Prototype:** GemRB.GameGetSelectedPCSingle (flag)\n\
+**Prototype:** GemRB.GameGetSelectedPCSingle ([flag=0])\n\
 \n\
 **Description:** If flag is 0 or omitted, then returns currently active pc \n\
 in non-walk environment (i.e. in shops, inventory, ...).  If flag is set to \n\
 non-zero, then returns the currently speaking PC. \n\
-If there is no such PC, then returns 0.\n\
 \n\
 **Parameters:**\n\
   * flag - 0/1\n\
 \n\
-**Return value:** PartyID (1-10)\n\
+**Return value:** PartyID (1-10) or 0 if there is no such PC\n\
 \n\
 **See also:** [GameSelectPC](GameSelectPC.md), [GameSelectPCSingle](GameSelectPCSingle.md)"
 );
@@ -6092,7 +6011,11 @@ static PyObject* GemRB_GameGetFirstSelectedActor(PyObject * /*self*/, PyObject* 
 PyDoc_STRVAR( GemRB_GameSwapPCs__doc,
 "===== GameSwapPCs =====\n\
 \n\
-**Prototype:** GemRB.GameSwapPCs (int PC1, int PC2)\n\
+**Prototype:** GemRB.GameSwapPCs (PC1, PC2)\n\
+\n\
+**Parameters:**\n\
+  * PC1 - party ID of the first PC\n\
+  * PC2 - party ID of the second PC\n\
 \n\
 **Description:**  Swap the party order of PC1 with PC2.\n\
 \n\
@@ -6492,8 +6415,6 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetSpellIcon__doc,
 "===== Button_SetSpellIcon =====\n\
 \n\
-**Prototype:** GemRB.SetSpellIcon (WindowIndex, ControlIndex, SPLResRef[, Type, Tooltip, Function])\n\
-\n\
 **Metaclass Prototype:** SetSpellIcon (SPLResRef[, Type, Tooltip, Function])\n\
 \n\
 **Description:** Sets Spell icon image on a Button control. Type determines \n\
@@ -6501,7 +6422,6 @@ the icon type, if set to 1 it will use the Memorised Icon instead of the \n\
 Spellbook Icon\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * SPLResRef - the name of the spell (.spl resref)\n\
   * Type - 0 (default, use parchment background) or 1 (use stone background)\n\
   * Tooltip - 0 (default); if 1, set the tooltip 'F<n> <spell_name>'\n\
@@ -6602,14 +6522,11 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 PyDoc_STRVAR( GemRB_Button_SetItemIcon__doc,
 "===== Button_SetItemIcon =====\n\
 \n\
-**Prototype:** GemRB.SetItemIcon (WindowIndex, ControlIndex, ITMResRef[, type, tooltip, Function, ITM2ResRef, BAM3ResRef])\n\
-\n\
-**Metaclass Prototype:** SetItemIcon (ITMResRef[, Type, Tooltip, ITM2ResRef])\n\
+**Metaclass Prototype:** SetItemIcon (ITMResRef[, Type, Tooltip, ITM2ResRef, BAM3ResRef]])\n\
 \n\
 **Description:** Sets Item icon image on a Button control.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
   * ITMResRef                 - the name of the item (.itm resref)\n\
   * Type                      - the icon's type\n\
     * 0 - Inventory Icon1\n\
@@ -6928,6 +6845,7 @@ and should be at the feet of the player.\n\
 **Return value:** dictionary\n\
   * 'ItemResRef' - the ResRef of the item\n\
   * 'ItemName'   - the StrRef of the item's name (identified or not)\n\
+  * 'ItemDesc'   - the StrRef of the item's description (identified or not)\n\
   * 'Usages0'    - The primary charges of the item (or the item's stack amount if the item is stackable).\n\
   * 'Usages1'    - The secondary charges of the item.\n\
   * 'Usages2'    - The tertiary charges of the item.\n\
@@ -7151,11 +7069,18 @@ returns it in a dictionary.\n\
   * 'StoreCureCount'  - the count of cures served (temple)\n\
   * 'StoreItemCount'  - the count of items sold, in case of PST the availability trigger is also checked\n\
   * 'StoreCapacity'   - the capacity of the store\n\
+  * 'StoreOwner   '   - the ID of the owner of the store\n\
   * 'StoreRoomPrices' - a four elements tuple, negative if the room type is unavailable\n\
   * 'StoreButtons'    - a four elements tuple, possible actions\n\
   * 'StoreFlags'      - the store flags if you ever need them, StoreButtons is a digested information, but you might have something else in mind based on these\n\
   * 'TavernRumour'    - ResRef of tavern rumour dialog\n\
   * 'TempleRumour'    - ResRef of temple rumour dialog\n\
+  * 'IDPrice'    - price for identification\n\
+  * 'Lore'    - lore requirement\n\
+  * 'Depreciation'    - price depreciation\n\
+  * 'SellMarkup'    - markup for selling\n\
+  * 'BuyMarkup'    - markup for buying\n\
+  * 'StealFailure'    - chance to succeed at stealing\n\
 \n\
 **See also:** [EnterStore](EnterStore.md), [GetStoreCure](GetStoreCure.md), [GetStoreDrink](GetStoreDrink.md), [GetRumour](GetRumour.md)\n\
 "
@@ -8172,7 +8097,7 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 PyDoc_STRVAR( GemRB_CountSpells__doc,
 "===== CountSpells =====\n\
 \n\
-**Prototype:** GemRB.CountSpells (PartyID, SpellName, SpellType, Flag)\n\
+**Prototype:** GemRB.CountSpells (PartyID, SpellName[, SpellType, Flag])\n\
 \n\
 **Description:** Returns number of memorized spells of given name and type \n\
 in PC's spellbook. If flag is set then spent spells are also count.\n\
@@ -8609,6 +8534,8 @@ This is useful for removing class abilities (CLAB/HLA AP_* entries).\n\
   * globalID  - party ID or global ID of the actor to use\n\
   * SpellResRef - a spell or item resource reference (source of effects)\n\
 \n\
+**Return value:** N/A\n\
+\n\
 **See also:** [RemoveSpell](RemoveSpell.md), [RemoveItem](RemoveItem.md)\n\
 "
 );
@@ -8887,7 +8814,7 @@ identifies an item.\n\
     * IE_INV_ITEM_STACKED       = 0x80 - the item is a stacked item\n\
   * mode    - binary operation type\n\
 \n\
-**Return value:** Returns 0 if the item was not found.\n\
+**Return value:** Returns 0 if the item was not found, 1 otherwise.\n\
 \n\
 **See also:** [GetSlotItem](GetSlotItem.md)"
 );
@@ -9035,7 +8962,7 @@ PyDoc_STRVAR( GemRB_FindItem__doc,
 **Description:** Returns the slot number of the actor's item (or -1).\n\
 \n\
 **Parameters:**\n\
-  * globalID  - party ID or global ID of the actor to use\n\
+  * globalID - party ID or global ID of the actor to use\n\
   * itemname - item resource reference\n\
 \n\
 **Return value:** integer, -1 if not found\n\
@@ -9062,7 +8989,7 @@ static PyObject* GemRB_FindItem(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_GetItem__doc,
 "===== GetItem =====\n\
 \n\
-**Prototype:** GemRB.GetItem (ResRef[, PartyID])\n\
+**Prototype:** GemRB.GetItem (ResRef)\n\
 \n\
 **Description:** Returns dictionary with the specified item's data.\n\
 \n\
@@ -9598,8 +9525,18 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_IsDraggingItem__doc,
-"IsDraggingItem()=>bool\n\n"
-"Returns true if we are dragging some item." );
+"===== IsDraggingItem =====\n\
+\n\
+**Prototype:** GemRB.IsDraggingItem ()\n\
+\n\
+**Description:** Returns true if we are dragging some item.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** boolean\n\
+\n\
+**See also:** [DragItem](DragItem.md), [DropDraggedItem](DropDraggedItem.md)\n\
+");
 
 static PyObject* GemRB_IsDraggingItem(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -9622,7 +9559,7 @@ PyDoc_STRVAR( GemRB_GetSystemVariable__doc,
     * SV_TOUCH = 4 - are we using touch input mode?\n\
     * SV_SAVEPATH = 5 - path to the parent of save/mpsave/bpsave dir\n\
 \n\
-**Return value:** This function returns -1 if the index is invalid.\n\
+**Return value:** -1 if the index is invalid, otherwise the requested value.\n\
 \n\
 **See also:** [GetGameString](GetGameString.md)\n\
 "
@@ -9784,7 +9721,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetMapnote__doc,
 "===== SetMapnote =====\n\
 \n\
-**Prototype:** GemRB.SetMapnote(X, Y, color, text)\n\
+**Prototype:** GemRB.SetMapnote(X, Y[, color, text])\n\
 \n\
 **Description:** Adds or removes a mapnote to the current map (area).\n\
 \n\
@@ -10020,7 +9957,7 @@ static PyObject* GemRB_RevealArea(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_ExploreArea__doc,
 "===== ExploreArea =====\n\
 \n\
-**Prototype:** ExploreArea ([explored=True])\n\
+**Prototype:** GemRB.ExploreArea ([explored=True])\n\
 \n\
 **Description:** Explores or unexplores the whole area.\n\
 \n\
@@ -10469,16 +10406,14 @@ static void SetButtonCycle(std::shared_ptr<const AnimationFactory> bam, Button *
 PyDoc_STRVAR( GemRB_Button_SetActionIcon__doc,
 "===== Button_SetActionIcon =====\n\
 \n\
-**Prototype:** GemRB.SetActionIcon (Window, Button, Dict, ActionIndex[, Function])\n\
-\n\
-**Metaclass Prototype:** SetActionIcon (ActionIndex[, Function])\n\
+**Metaclass Prototype:** SetActionIcon (Dict, ActionIndex[, Function])\n\
 \n\
 **Description:** Sets up an action button based on the guibtact table. \n\
 The ActionIndex should be less than 34. This action will set the button's \n\
 image, the tooltip and the push button event handler.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex, ControlIndex - the button's reference\n\
+  * Dict - the environment you want to have access to\n\
   * ActionIndex - the row number in the guibtact.2da file\n\
   * Function - function key to assign\
 \n\
@@ -10580,9 +10515,7 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_Window_SetupEquipmentIcons__doc,
 "===== Window_SetupEquipmentIcons =====\n\
 \n\
-**Prototype:** GemRB.SetupEquipmentIcons (WindowIndex, dict, slot[, Start, Offset])\n\
-\n\
-**Metaclass Prototype:** SetupEquipmentIcons (Slot[, Start, Offset])\n\
+**Metaclass Prototype:** SetupEquipmentIcons (Dict, Slot[, Start, Offset])\n\
 \n\
 **Description:** Sets up all 12 action buttons for a player character \n\
 with the usable equipment functions. \n\
@@ -10590,7 +10523,7 @@ It also sets up the scroll buttons left and right if needed. \n\
 If Start is supplied, it will skip the first few items.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex - the buttons' window index\n\
+  * Dict - the environment you want to have access to\n\
   * Slot        - the player character's index in the party\n\
   * Start       - start the equipment list from this value\n\
   * Offset      - control ID offset to the first usable button\n\
@@ -10730,17 +10663,16 @@ static bool CanUseActionButton(const Actor *pcc, int type)
 PyDoc_STRVAR( GemRB_Window_SetupControls__doc,
 "===== Window_SetupControls =====\n\
 \n\
-**Prototype:** GemRB.SetupControls (WindowIndex, dict, slot[, Start])\n\
-\n\
-**Metaclass Prototype:** SetupControls (Slot[, Start])\n\
+**Metaclass Prototype:** SetupControls (Dict, Slot[, Start, Bar])\n\
 \n\
 **Description:** Sets up all 12 action buttons for a player character, \n\
 based on preset preferences and the character's class.\n\
 \n\
 **Parameters:**\n\
-  * WindowIndex - the buttons' window index\n\
+  * Dict - the environment you want to have access to\n\
   * Slot        - the player character's index in the party\n\
   * Start       - action offset\n\
+  * Bar - a tuple with the action bar buttons to use\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -11188,7 +11120,7 @@ target type of the selected spell.\n\
   * spellindex - spell to assign\n\
   * type - spell(book) type (255 means any)\n\
 \n\
-**Return value:** integer, target type constant\n\
+**Return value:** integer, target type constant — or None for actors with no quick slots\n\
 "
 );
 
@@ -11276,7 +11208,7 @@ Optionally sets the used ability.\n\
   * QWeaponSlot - the quickslot to equip\n\
   * ability     - optional integer, sets the used extended header\n\
 \n\
-**Return value:** 0 success, -1 silent failure\n\
+**Return value:** N/A\n\
 \n\
 **See also:** [GetEquippedQuickSlot](GetEquippedQuickSlot.md), [SetupQuickSlot](SetupQuickSlot.md)\n\
 "
@@ -11785,7 +11717,7 @@ PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
 **Description:** Sets the tooltip delay.\n\
 \n\
 **Parameters:**\n\
-  * time - 0-10\n\
+  * time - delay in fifteenth of a second\n\
 \n\
 **See also:** [View_SetTooltip](View_SetTooltip.md), [SetMouseScrollSpeed](SetMouseScrollSpeed.md)\n\
 "
@@ -11897,9 +11829,7 @@ scattered). It is possible to play a movie or dream too.\n\
   * Error: True if resting was prevented by one of the checks\n\
   * ErrorMsg: a strref with a reason for the error\n\
   * Cutscene: True if a cutscene needs to run\n\
-\n\
-**See also:** StartStore(gamescript)"
-);
+");
 
 static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
 {
@@ -12152,7 +12082,7 @@ If a parameter is set to -1, it will be ignored.\n\
   * param2   - parameter 2 for the opcode\n\
   * resref   - optional resource reference to match the effect\n\
 \n\
-**Return value:** N/A\n\
+**Return value:** the count\n\
 \n\
 **Examples:**\n\
 \n\
@@ -12316,8 +12246,9 @@ equipped weapon.\n\
 \n\
 **Return value:** dict: 'ToHit', 'Flags', 'DamageBonus', 'Speed', \n\
 'CriticalBonus', 'Style', 'Proficiency', 'Range', 'Enchantment', 'Slot', \n\
-'APR', 'CriticalMultiplier', 'CriticalRange', 'ProfDmgBon', \n\
-'LauncherDmgBon', 'WeaponStrBonus', 'AC' (dict), 'ToHitStats' (dict)\n\
+'APR', 'CriticalMultiplier', 'CriticalRange', 'ProfDmgBon', 'HitHeaderNumDice', \n\
+'HitHeaderDiceSides', 'HitHeaderDiceBonus', 'LauncherDmgBon', 'WeaponStrBonus', \n\
+'AC' (dict), 'ToHitStats' (dict), 'DamageOpcodes' (dict)\n\
 \n\
 **See also:** [IsDualWielding](IsDualWielding.md)"
 );
@@ -12581,7 +12512,7 @@ static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetTimer__doc,
 "===== SetTimer =====\n\
 \n\
-**Prototype:** GemRB.SetTimer (callback[, interval, repeats])\n\
+**Prototype:** GemRB.SetTimer (callback, interval[, repeats])\n\
 \n\
 **Description:** Set callback to be called repeatedly at given interval. \n\
 This is useful for things like running a twisted reactor.\n\
@@ -12614,7 +12545,7 @@ static PyObject* GemRB_SetTimer(PyObject* /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetupMaze__doc,
 "===== SetupMaze =====\n\
 \n\
-**Prototype:** GemRB.SetupMaze (x,y)\n\
+**Prototype:** GemRB.SetupMaze (x, y)\n\
 \n\
 **Description:** Initializes a maze of size XxY. The dimensions shouldn't \n\
 exceed the maximum possible maze size (8x8).\n\
@@ -12897,7 +12828,7 @@ int gameTypeHintWeight = 0;
 PyDoc_STRVAR( GemRB_AddGameTypeHint__doc,
 "===== AddGameTypeHint =====\n\
 \n\
-**Prototype:** GemRB.AddGameTypeHint (type, weight, flags=0)\n\
+**Prototype:** GemRB.AddGameTypeHint (type, weight[, flags=0])\n\
 \n\
 **Description:** Asserts that GameType should be TYPE, with confidence WEIGHT. \n\
 This is used by Autodetect.py scripts when GameType was set to 'auto'.\n\
@@ -12927,8 +12858,15 @@ static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetAreaInfo__doc,
-"GetAreaInfo()=>mapping\n\n"
-"Returns important values about the current area.\n");
+"===== GetAreaInfo =====\n\
+\n\
+**Prototype:** GemRB.GetAreaInfo ()\n\
+\n\
+**Description:** Returns important values about the current area.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** dict with 'CurrentArea', 'PositionX', 'PositionY'");
 
 static PyObject* GemRB_GetAreaInfo(PyObject* /*self*/, PyObject* /*args*/)
 {
