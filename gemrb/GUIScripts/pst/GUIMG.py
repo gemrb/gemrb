@@ -46,11 +46,11 @@ def InitMageWindow (Window):
 		Icon = Window.GetControl (2 + i)
 		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
 		Icon.SetBorder (0, color,  0, 1)
-		Icon.SetVarAssoc ("SpellButton", i)
+		Icon.SetVarAssoc ("Memorized", i)
 
 	for i in range (20):
 		Icon = Window.GetControl (14 + i)
-		Icon.SetVarAssoc ("SpellButton", 100 + i)
+		Icon.SetValue (i)
 	return
 
 def UpdateMageWindow (Window=None):
@@ -148,18 +148,18 @@ def MageNextLevelPress ():
 		MageSpellLevel = MageSpellLevel + 1
 		UpdateMageWindow ()
 
-def OpenMageSpellInfoWindow ():
+def OpenMageSpellInfoWindow (btn):
 	Window = GemRB.LoadWindow (4)
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
 	Button.OnPress (Window.Close)
 
-	index = GemRB.GetVar ("SpellButton")
-	if index < 100:
+	index = btn.Value
+	if btn.VarName == "Memorized":
 		ResRef = MageMemorizedSpellList[index]
 	else:
-		ResRef = MageKnownSpellList[index - 100]
+		ResRef = MageKnownSpellList[index]
 
 	spell = GemRB.GetSpell (ResRef)
 
@@ -181,14 +181,12 @@ def OpenMageSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
-def OnMageMemorizeSpell ():
+def OnMageMemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = GemRB.GetVar ("SpellButton") - 100
-
-	if GemRB.MemorizeSpell (pc, spelltype, level, index):
+	if GemRB.MemorizeSpell (pc, spelltype, level, btn.Value):
 		UpdateMageWindow ()
 
 	# FIXME: use FLASH.bam

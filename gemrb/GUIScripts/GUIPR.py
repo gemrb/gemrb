@@ -63,7 +63,7 @@ def InitPriestWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		Button.SetSprites ("SPELFRAM",0,0,0,0,0)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetVarAssoc ("SpellButton", i)
+		Button.SetVarAssoc ("Memorized", i)
 		Button.SetAnimation (None)
 
 	# Setup book spells buttons
@@ -147,7 +147,7 @@ def UpdatePriestWindow (Window):
 		spell = GemRB.GetSpell (ks['SpellResRef'])
 		Button.SetTooltip (spell['SpellName'])
 		PriestKnownSpellList.append (ks['SpellResRef'])
-		Button.SetVarAssoc ("SpellButton", 100 + i)
+		Button.SetVarAssoc ("Memorized", i)
 
 	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
@@ -189,7 +189,7 @@ def RefreshPriestLevel ():
 	UpdatePriestWindow (PriestSpellWindow)
 	return
 
-def OpenPriestSpellInfoWindow ():
+def OpenPriestSpellInfoWindow (btn):
 	Window = GemRB.LoadWindow (3)
 
 	#back
@@ -197,11 +197,11 @@ def OpenPriestSpellInfoWindow ():
 	Button.SetText (15416)
 	Button.OnPress (Window.Close)
 
-	index = GemRB.GetVar ("SpellButton")
-	if index < 100:
+	index = btn.Value
+	if btn.VarName == "Memorized":
 		ResRef = PriestMemorizedSpellList[index]
 	else:
-		ResRef = PriestKnownSpellList[index - 100]
+		ResRef = PriestKnownSpellList[index]
 
 	spell = GemRB.GetSpell (ResRef)
 
@@ -220,12 +220,12 @@ def OpenPriestSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def OnPriestMemorizeSpell ():
+def OnPriestMemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton") - 100
+	index = btn.Value
 
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		GemRB.PlaySound ("GAM_24")
@@ -247,8 +247,8 @@ def OpenPriestSpellRemoveWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	def RemoveSpell ():
-		OnPriestRemoveSpell()
+	def RemoveSpell (btn):
+		OnPriestRemoveSpell(btn)
 		Window.Close()
 
 	Button.OnPress (RemoveSpell)
@@ -303,16 +303,16 @@ def OnPriestUnmemorizeSpell (btn):
 		UpdatePriestWindow (PriestSpellWindow)
 	return
 
-def OnPriestRemoveSpell ():
+def OnPriestRemoveSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton") - 100
+	index = btn.Value
 
 	#remove spell from memory
 	GemRB.RemoveSpell (pc, spelltype, level, index)
-	OpenPriestSpellInfoWindow()
+	OpenPriestSpellInfoWindow(btn)
 	return
 
 ###################################################

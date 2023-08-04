@@ -90,14 +90,14 @@ def InitMageWindow (window):
 			Button.SetSprites ("SPELFRAM",0,0,0,0,0)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetAnimation (None)
-			Button.SetVarAssoc ("SpellButton", i)
+			Button.SetVarAssoc ("Memorized", i)
 
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_SET)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetVarAssoc ("SpellButton", 100 + i)
+		Button.SetValue (i)
 
 	UpdateMageWindow (MageWindow)
 	return
@@ -239,7 +239,7 @@ def RefreshMageLevel ():
 	UpdateMageWindow (MageWindow)
 	return
 
-def OpenMageSpellInfoWindow ():
+def OpenMageSpellInfoWindow (btn):
 	Window = GemRB.LoadWindow (3, "GUIMG")
 
 	#back
@@ -248,19 +248,19 @@ def OpenMageSpellInfoWindow ():
 	Button.OnPress (Window.Close)
 
 	#erase
-	index = GemRB.GetVar ("SpellButton")
+	index = btn.Value
 	Button = Window.GetControl (6)
 	if Button:
-		if index < 100 or Sorcerer:
+		if btn.VarName == "Memorized" or Sorcerer:
 			Button.OnPress (None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
 			Button.OnPress (lambda: OpenMageSpellRemoveWindow(Window))
 			Button.SetText (63668)
-	if index < 100:
+	if btn.VarName == "Memorized":
 		ResRef = MageMemorizedSpellList[index]
 	else:
-		ResRef = MageKnownSpellList[index - 100]
+		ResRef = MageKnownSpellList[index]
 
 	spell = GemRB.GetSpell (ResRef)
 
@@ -276,12 +276,12 @@ def OpenMageSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def OnMageMemorizeSpell ():
+def OnMageMemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = GemRB.GetVar ("SpellButton") - 100
+	index = btn.Value
 
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		GemRB.PlaySound ("GAM_24")
@@ -307,8 +307,8 @@ def OpenMageSpellRemoveWindow (parentWin):
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	
-	def RemoveSpell ():
-		OnMageRemoveSpell()
+	def RemoveSpell (btn):
+		OnMageRemoveSpell(btn)
 		Window.Close()
 		parentWin.Close()
 	
@@ -368,12 +368,12 @@ def OnMageUnmemorizeSpell (btn):
 		UpdateMageWindow (MageWindow)
 	return
 
-def OnMageRemoveSpell ():
+def OnMageRemoveSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = GemRB.GetVar ("SpellButton")-100
+	index = btn.Value
 
 	#remove spell from book
 	GemRB.RemoveSpell (pc, spelltype, level, index)
