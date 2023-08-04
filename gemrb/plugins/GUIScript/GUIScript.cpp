@@ -5739,44 +5739,25 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "KillsTotalCount", DecRef(PyLong_FromLong, ps->KillsTotalCount));
 
 	if (!ps->FavouriteSpells[0].IsEmpty()) {
-		int largest = 0;
-
-		// 0 already has the top candidate, but we double check for old saves
-		for (int i = 1; i < 4; ++i) {
-			if (ps->FavouriteSpellsCount[i] > ps->FavouriteSpellsCount[largest]) {
-				largest = i;
-			}
-		}
-
-		const Spell* spell = gamedata->GetSpell(ps->FavouriteSpells[largest]);
-		if (spell == NULL) {
-			return NULL;
-		}
+		auto max = *std::max_element(ps->FavouriteSpellsCount.begin(), ps->FavouriteSpellsCount.end());
+		ResRef mostUsed = ps->FavouriteSpells[max];
+		const Spell* spell = gamedata->GetSpell(mostUsed);
+		if (!spell) return RuntimeError("Spell not found!\n");
 
 		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromStrRef, spell->SpellName));
-
-		gamedata->FreeSpell( spell, ps->FavouriteSpells[largest], false );
+		gamedata->FreeSpell(spell, mostUsed, false);
 	} else {
 		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromLong, -1));
 	}
 
 	if (!ps->FavouriteWeapons[0].IsEmpty()) {
-		int largest = 0;
-
-		for (int i = 1; i < 4; ++i) {
-			if (ps->FavouriteWeaponsCount[i] > ps->FavouriteWeaponsCount[largest]) {
-				largest = i;
-			}
-		}
-
-		const Item* item = gamedata->GetItem(ps->FavouriteWeapons[largest]);
-		if (item == NULL) {
-			return RuntimeError( "Item not found!\n" );
-		}
+		auto max = *std::max_element(ps->FavouriteWeaponsCount.begin(), ps->FavouriteWeaponsCount.end());
+		ResRef mostUsed = ps->FavouriteWeapons[max];
+		const Item* item = gamedata->GetItem(mostUsed);
+		if (!item) return RuntimeError("Item not found!\n");
 
 		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromStrRef, item->GetItemName(true)));
-
-		gamedata->FreeItem( item, ps->FavouriteWeapons[largest], false );
+		gamedata->FreeItem(item, mostUsed, false);
 	} else {
 		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromLong, -1));
 	}

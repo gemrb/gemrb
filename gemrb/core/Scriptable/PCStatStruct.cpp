@@ -41,9 +41,9 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	KillsTotalXP = source.KillsTotalXP;
 	KillsTotalCount = source.KillsTotalCount;
 	std::copy(std::begin(source.FavouriteSpells), std::end(source.FavouriteSpells), std::begin(FavouriteSpells));
-	memcpy(FavouriteSpellsCount, source.FavouriteSpellsCount, sizeof(FavouriteSpellsCount));
+	FavouriteSpellsCount = source.FavouriteSpellsCount;
 	std::copy(std::begin(source.FavouriteWeapons), std::end(source.FavouriteWeapons), std::begin(FavouriteWeapons));
-	memcpy(FavouriteWeaponsCount, source.FavouriteWeaponsCount, sizeof(FavouriteWeaponsCount));
+	FavouriteWeaponsCount = source.FavouriteWeaponsCount;
 	memcpy(QSlots, source.QSlots, sizeof(QSlots));
 	for (int i = 0; i < MAX_QSLOTS; i++) {
 		QuickSpells[i] = source.QuickSpells[i];
@@ -234,7 +234,7 @@ int PCStatsStruct::GetHeaderForSlot(int slot) const
 void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
 {
 	ResRef *respoi;
-	ieWord *cntpoi;
+	std::array<ieWord, MAX_FAVOURITES> cntpoi;
 
 	switch (what) {
 		case FAV_SPELL:

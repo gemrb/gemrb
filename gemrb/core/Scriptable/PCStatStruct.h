@@ -121,9 +121,9 @@ public:
 	ieDword   KillsTotalXP = 0;
 	ieDword   KillsTotalCount = 0;
 	ResRef  FavouriteSpells[MAX_FAVOURITES];
-	ieWord    FavouriteSpellsCount[MAX_FAVOURITES] {0};
+	std::array<ieWord, MAX_FAVOURITES> FavouriteSpellsCount {0};
 	ResRef  FavouriteWeapons[MAX_FAVOURITES];
-	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES] {0};
+	std::array<ieWord, MAX_FAVOURITES> FavouriteWeaponsCount {0};
 	ResRef  SoundSet;
 	ieVariable SoundFolder;
 	ieDword   ExtraSettings[ES_COUNT] {0};     //iwd2 - expertise, hamstring, arterial strike, etc
