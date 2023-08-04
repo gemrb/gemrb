@@ -112,10 +112,8 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 #endif
 
 	// Now try ~/.gemrb folder
-	confpath = "." + name;
-	path_t tmp = PathJoin(datadir, confpath);
-
-	path = PathJoinExt(datadir, name, "cfg");
+	path_t tmp = PathJoin(datadir, ".gemrb");
+	path = PathJoinExt(tmp, name, "cfg");
 	if (cfgStream.Open(path))
 	{
 		Log(WARNING, "Interface", "~/.gemrb as a config location is deprecated, please use ~/.config/gemrb!");
