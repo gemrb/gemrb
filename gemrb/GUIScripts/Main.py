@@ -24,6 +24,8 @@ def Init():
 			self.buffer = ""
 		def write(self, message):
 			self.buffer += str(message)
+			if self.buffer.endswith("\n"):
+				self.flush()
 		def flush(self):
 			out = self.buffer.rstrip("\n")
 			if out:
