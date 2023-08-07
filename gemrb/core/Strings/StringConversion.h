@@ -21,6 +21,7 @@
 
 #include "CString.h"
 #include "String.h"
+#include "ie_types.h"
 
 namespace GemRB {
 
@@ -36,8 +37,10 @@ struct EncodingStruct
 GEM_EXPORT char* ConvertCharEncoding(const char * string, const char * from, const char* to);
 GEM_EXPORT String StringFromCString(const char* string);
 GEM_EXPORT String StringFromFSString(const char* string);
+GEM_EXPORT String StringFromResRef(const ResRef& string);
 GEM_EXPORT String StringFromUtf8(const char* string);
 GEM_EXPORT std::string MBStringFromString(const String& string);
+GEM_EXPORT std::string TLKStringFromString(const String& string);
 
 }
 

@@ -3463,8 +3463,8 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 		do {
 			count--;
 			GetVerbalConstantSound(soundRef, start + count);
-			std::string chrsound = GetSoundFolder(1, soundRef);
-			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound, IE_OGG_CLASS_ID, true)) {
+			auto soundFolder = GetSoundFolder(1, soundRef);
+			if (gamedata->Exists(soundFolder, IE_WAV_CLASS_ID, true) || gamedata->Exists(soundFolder, IE_OGG_CLASS_ID, true)) {
 				DisplayStringCoreVC((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
 				found = true;
 				break;
@@ -8566,17 +8566,17 @@ void Actor::SetPortrait(const ResRef& portraitRef, int Which)
 	}
 }
 
-void Actor::SetSoundFolder(const ieVariable& soundset) const
+void Actor::SetSoundFolder(const String& soundset) const
 {
 	if (!core->HasFeature(GFFlags::SOUNDFOLDERS)) {
-		PCStats->SoundSet = soundset;
-		PCStats->SoundFolder[0] = 0;
+		PCStats->SoundSet = TLKStringFromString(soundset);
 		return;
 	}
 
 	PCStats->SoundFolder = soundset;
 
-	DirectoryIterator dirIt(PathJoin(core->config.GamePath, "sounds", PCStats->SoundFolder));
+	auto soundFolder = MBStringFromString(PCStats->SoundFolder);
+	DirectoryIterator dirIt(PathJoin(core->config.GamePath, "sounds", soundFolder));
 	dirIt.SetFilterPredicate(std::make_shared<EndsWithFilter>("01"));
 	dirIt.SetFlags(DirectoryIterator::Directories);
 	if (dirIt) {
@@ -8593,7 +8593,7 @@ void Actor::SetSoundFolder(const ieVariable& soundset) const
 	}
 }
 
-std::string Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
+String Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
 {
 	ResRef set;
 	if (overrideSet.IsEmpty()) {
@@ -8602,16 +8602,18 @@ std::string Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
 		set = overrideSet;
 	}
 
-	std::string soundset;
+	String wSet = StringFromResRef(set);
+	String soundset;
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		if (full) {
-			soundset = fmt::format("{}/{}", PCStats->SoundFolder, set);
+			soundset = fmt::format(u"{}/{}", PCStats->SoundFolder, wSet);
 		} else {
-			soundset = fmt::format("{}", PCStats->SoundFolder);
+			soundset = fmt::format(u"{}", PCStats->SoundFolder);
 		}
 	} else {
-		soundset = set.c_str();
+		soundset = wSet;
 	}
+
 	return soundset;
 }
 

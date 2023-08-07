@@ -125,7 +125,7 @@ public:
 	ResRef  FavouriteWeapons[MAX_FAVOURITES];
 	std::array<ieWord, MAX_FAVOURITES> FavouriteWeaponsCount {0};
 	ResRef  SoundSet;
-	ieVariable SoundFolder;
+	String SoundFolder;
 	ieDword   ExtraSettings[ES_COUNT] {0};     //iwd2 - expertise, hamstring, arterial strike, etc
 	ResRef    QuickSpells[MAX_QSLOTS]; //iwd2 uses 9, others use only 3
 	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT] {0xffff}; //iwd2 uses 8, others use only 4

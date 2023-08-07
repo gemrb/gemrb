@@ -111,6 +111,13 @@ static void PrintPossibleFiles(std::string& buffer, StringView ResRef, const Typ
 	}
 }
 
+bool ResourceManager::Exists(const String& resource, SClass_ID type, bool silent) const {
+		auto mbString = MBStringFromString(resource);
+		auto mbResource = StringView{mbString.c_str()};
+
+		return Exists(mbResource, type, silent);
+}
+
 bool ResourceManager::Exists(StringView ResRef, SClass_ID type, bool silent) const
 {
 	if (ResRef.empty())
