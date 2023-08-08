@@ -139,7 +139,7 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 #endif
 	}
 	// if all else has failed try current directory
-	path = PathJoinExt("./", PACKAGE, "cfg");
+	path = PathJoinExt(".", PACKAGE, "cfg");
 	
 	if (cfgStream.Open(path))
 	{

@@ -8606,7 +8606,7 @@ String Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
 	String soundset;
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		if (full) {
-			soundset = fmt::format(u"{}/{}", PCStats->SoundFolder, wSet);
+			soundset = fmt::format(u"{}{}{}", PCStats->SoundFolder, PathDelimiterW, wSet);
 		} else {
 			soundset = fmt::format(u"{}", PCStats->SoundFolder);
 		}

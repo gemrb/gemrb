@@ -88,14 +88,6 @@ String StringFromResRef(const ResRef& string)
 	return StringFromEncodedData(string.c_str(), ResRef::Size, core->TLKEncoding.encoding);
 }
 
-String StringFromFSString(const char* string)
-{
-	EncodingStruct enc;
-	enc.encoding = core->config.SystemEncoding.c_str();
-	enc.multibyte = true; // nobody ever complained so far
-	return StringFromEncodedData(string, enc);
-}
-
 String StringFromUtf8(const char* string)
 {
 	EncodingStruct enc;
@@ -104,12 +96,11 @@ String StringFromUtf8(const char* string)
 	return StringFromEncodedData(string, enc);
 }
 
-static std::string RecodedStringFromString(const String& string, const std::string& encoding)
+std::string RecodedStringFromWideStringBytes(const char16_t* bytes, size_t bytesLength, const std::string& encoding)
 {
-	char* in = reinterpret_cast<char*>(const_cast<char16_t*>(string.c_str()));
-	size_t inLen = string.length() * sizeof(char16_t);
+	char* in = reinterpret_cast<char*>(const_cast<char16_t*>(bytes));
 
-	if (inLen == 0) {
+	if (bytesLength == 0) {
 		return "";
 	}
 
@@ -120,20 +111,24 @@ static std::string RecodedStringFromString(const String& string, const std::stri
 		cd = iconv_open(encoding.c_str(), "UTF-16LE");
 	}
 
-	size_t outLen = string.length() * 4;
+	size_t outLen = bytesLength * 2;
 	size_t outLenLeft = outLen;
 	std::string buffer(outLen, '\0');
 	auto outBuf = const_cast<char*>(buffer.data());
 
-	size_t ret = iconv(cd, &in, &inLen, &outBuf, &outLenLeft);
+	size_t ret = iconv(cd, &in, &bytesLength, &outBuf, &outLenLeft);
 	iconv_close(cd);
 
 	if (ret == static_cast<size_t>(-1)) {
-		Log(ERROR, "String", "iconv failed to convert string a string from UTF-16 to {} with error: {}", strerror(errno), encoding);
+		Log(ERROR, "String", "iconv failed to convert string a string from UTF-16 to {} with error: {}", encoding, strerror(errno));
 		return "";
 	}
 
 	return buffer;
+}
+
+static std::string RecodedStringFromString(const String& string, const std::string& encoding) {
+	return RecodedStringFromWideStringBytes(string.c_str(), string.length() * sizeof(char16_t), encoding);
 }
 
 std::string MBStringFromString(const String& string)

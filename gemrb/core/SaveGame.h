@@ -35,7 +35,7 @@ class GEM_EXPORT SaveGame {
 public:
 	static const TypeID ID;
 public:
-	SaveGame(path_t path, path_t name, const ResRef& prefix, std::string slotname, int pCount, int saveID);
+	SaveGame(path_t path, const path_t& name, const ResRef& prefix, std::string slotname, int pCount, int saveID);
 
 	int GetPortraitCount() const
 	{
@@ -45,7 +45,7 @@ public:
 	{
 		return SaveID;
 	}
-	const path_t& GetName() const
+	const String& GetName() const
 	{
 		return Name;
 	}
@@ -74,7 +74,7 @@ public:
 	DataStream* GetSave() const;
 private:
 	path_t Path;
-	path_t Name;
+	String Name;
 	ResRef Prefix;
 	std::string Date;
 	mutable std::string GameDate;

@@ -4481,8 +4481,9 @@ static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS(args, "O", &Slot);
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-	const std::string& name = save->GetName();
-	return PyUnicode_Decode(name.c_str(), name.length(), core->config.SystemEncoding.c_str(), "strict");
+	auto name = save->GetName();
+
+	return PyString_FromStringObj(name);
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
@@ -4701,7 +4702,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			if (name[0] == '.' || dirit.IsDirectory() != dirs)
 				continue;
 
-			String string = StringFromFSString(name.c_str());
+			String string = StringFromUtf8(name.c_str());
 
 			if (dirs == false) {
 				size_t pos = string.find_last_of(u'.');

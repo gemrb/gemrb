@@ -36,6 +36,8 @@
 #include <memory>
 #include <string>
 
+#include <sys/stat.h>
+
 #ifdef WIN32
 #include "win32def.h"
 #include <direct.h>
@@ -63,9 +65,11 @@ GEM_EXPORT path_t BundlePath(BundleDirectory dir = BUNDLE);
 
 #ifdef WIN32
 const char PathDelimiter = '\\';
+const char16_t PathDelimiterW = u'\\';
 const char PathListSeparator = ';';
 #else
 const char PathDelimiter = '/';
+const char16_t PathDelimiterW = u'/';
 const char PathListSeparator = ':';
 #endif
 const char SPathDelimiter[] = { PathDelimiter, '\0' };

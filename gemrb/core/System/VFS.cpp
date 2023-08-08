@@ -32,15 +32,19 @@
 #include <cstring>
 #include <cerrno>
 
-#ifndef WIN32
+#ifdef WIN32
+// that's a workaround to live with `NOUSER` in `win32def.h`
+#define LPMSG void*
+#include <shlwapi.h>
+// there is a macro in shlwapi.h that turns `PathAppendW` into `PathAppend`
+#undef PathAppend
+#else
 #include <dirent.h>
 #endif
 
 #ifdef HAVE_MMAP
 #include <sys/mman.h>
 #endif
-
-#include <sys/stat.h>
 
 #ifdef __APPLE__
 // for getting resources inside the bundle
@@ -62,10 +66,20 @@
 using namespace GemRB;
 
 struct dirent {
-	dirent() : buffer(_MAX_PATH, L'\0'), d_name(const_cast<char*>(buffer.data())) {}
+	dirent() : buffer(_MAX_PATH, '\0'), d_name(const_cast<char*>(buffer.data())) {}
 
 	std::string buffer;
-	const char *d_name;
+	char *d_name;
+
+	dirent& operator=(std::string&& entryName) {
+		auto cutOff = entryName.length();
+		buffer = std::move(entryName);
+		buffer.resize(_MAX_PATH);
+		buffer[cutOff] = 0;
+		d_name = const_cast<char*>(buffer.data());
+
+		return *this;
+	}
 };
 
 struct DIR {
@@ -84,14 +98,14 @@ struct DIR {
 static DIR* opendir(const char* filename) {
 	auto dir = new DIR{};
 
-	// consider $PATH\*.*\0 for _wfindfirst
+	// consider $PATH\\*.*\0 for _wfindfirst
 	if (strlen(filename) > _MAX_PATH - 5) {
 		return nullptr;
 	}
 
-	std::wstring buffer(_MAX_PATH, L'\0');
-	mbstowcs(const_cast<wchar_t*>(buffer.data()), filename, buffer.length() - 1);
-	dir->path = fmt::format(L"{}\\*.*", buffer.c_str());
+	auto buffer = StringFromUtf8(filename);
+	buffer.resize(_MAX_PATH);
+	dir->path = fmt::format(L"{}\\*.*", reinterpret_cast<const wchar_t*>(buffer.c_str()));
 
 	return dir;
 }
@@ -110,11 +124,13 @@ static dirent* readdir(DIR *dir) {
 		}
 	}
 
-	auto& de = dir->entry;
-	auto n = wcstombs(const_cast<char*>(de.d_name), c_file.name, de.buffer.length() - 1);
-	de.buffer[n] = 0;
+	char16_t *c = reinterpret_cast<char16_t*>(c_file.name);
+	size_t n = 0;
+	for (; n < _MAX_PATH && *c != u'\0'; ++c, ++n) {}
 
-	return &de;
+	dir->entry = RecodedStringFromWideStringBytes(reinterpret_cast<char16_t*>(c_file.name), n * 2, "UTF-8");
+
+	return &dir->entry;
 }
 
 static void closedir(DIR *dir) {
@@ -167,10 +183,23 @@ static bool DirExists(StringView path)
 	char* end = const_cast<char*>(path.end());
 	std::swap(*end, term); // use swap because end may be a delimiter or a terminator
 
+#ifdef WIN32
+	auto buffer = StringFromUtf8(path.c_str());
+	auto wideChars = reinterpret_cast<const wchar_t*>(buffer.c_str());
+
+	// `stat` does not work reliably with non-ASCII names
+	if (!PathFileExists(wideChars)) {
+		return false;
+	}
+
+	bool ret = (GetFileAttributes(wideChars) & FILE_ATTRIBUTE_DIRECTORY) > 0;
+#else
 	struct stat buf;
 	buf.st_mode = 0;
 	bool ret = stat(path.c_str(), &buf) == 0 && S_ISDIR(buf.st_mode);
 	std::swap(*end, term);
+#endif
+
 	return ret;
 }
 
@@ -182,6 +211,19 @@ bool DirExists(const path_t& path)
 /** Returns true if path is an existing file */
 bool FileExists(const path_t& path)
 {
+#ifdef WIN32
+	auto buffer = StringFromUtf8(path.c_str());
+	auto wideChars = reinterpret_cast<const wchar_t*>(buffer.c_str());
+
+	// `stat` does not work reliably with non-ASCII names
+	if (!PathFileExists(wideChars)) {
+		return false;
+	}
+
+	if (GetFileAttributes(wideChars) & FILE_ATTRIBUTE_DIRECTORY) {
+		return false;
+	}
+#else
 	struct stat buf;
 	buf.st_mode = 0;
 
@@ -191,6 +233,7 @@ bool FileExists(const path_t& path)
 	if (!S_ISREG(buf.st_mode)) {
 		return false;
 	}
+#endif
 
 	return true;
 }
