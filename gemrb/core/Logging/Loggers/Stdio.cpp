@@ -121,7 +121,7 @@ void StreamLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 	}
 }
 
-static Logger::WriterPtr createStreamLogWriter(FILE* stream, ANSIColor color)
+static Logger::WriterPtr createStreamLogWriter(FILE* stream, ANSIColor color) noexcept
 {
 	if (stream) {
 		return std::make_shared<StreamLogWriter>(DEBUG, stream, color);
@@ -133,7 +133,11 @@ Logger::WriterPtr createStdioLogWriter(ANSIColor color)
 {
 	Log(DEBUG, "Logging", "Creating console log with color setting: {}", fmt::underlying(color));
 	int fd = dup(fileno(stdout));
-	return createStreamLogWriter(fdopen(fd, "w"), color);
+	if (fd >= 0) {
+		return createStreamLogWriter(fdopen(fd, "w"), color);
+	} else {
+		return nullptr;
+	}
 }
 
 Logger::WriterPtr createStdioLogWriter()
