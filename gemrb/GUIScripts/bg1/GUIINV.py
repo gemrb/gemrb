@@ -132,6 +132,7 @@ def UpdateInventoryWindow (Window = None):
 	if Window == None:
 		Window = GemRB.GetView("WIN_INV")
 
+	Window.OnClose(InventoryCommon.InventoryClosed)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)

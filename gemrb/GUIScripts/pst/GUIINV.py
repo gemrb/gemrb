@@ -149,6 +149,7 @@ def UpdateInventoryWindow (Window = None):
 	if Window == None:
 		Window = GemRB.GetView("WIN_INV")
 
+	Window.OnClose(InventoryCommon.InventoryClosed)
 	GUICommonWindows.UpdateAnimation ()
 
 	pc = GemRB.GameGetSelectedPCSingle ()
