@@ -63,6 +63,7 @@ def InitInventoryWindow (Window):
 	global AvSlotsTable
 
 	Window.AddAlias("WIN_INV")
+	Window.OnFocus(UpdateInventoryWindow)
 
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)

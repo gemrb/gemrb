@@ -115,7 +115,6 @@ if ResolutionH < 600 or (GameCheck.IsIWD2 () and ResolutionH < 934):
 	StoreWindowPlacement = WINDOW_HCENTER | WINDOW_TOP
 
 def CloseStoreWindow ():
-	import GUIINV
 	global StoreWindow, CureTable
 	
 	if StoreWindow:
@@ -131,8 +130,9 @@ def CloseStoreWindow ():
 
 	CureTable = None
 
-	if GemRB.GetVar ("Inventory"):
-		GemRB.SetVar ("Inventory", 0)
+	if Inventory:
+		# reopen the inventory
+		import GUIINV
 		GUIINV.OpenInventoryWindow ()
 	else:
 		GemRB.GamePause (0, 3)
@@ -169,7 +169,9 @@ def OpenStoreWindow ():
 	global SpellTable, RepModTable
 	global Inventory, BarteringPC
 	global CureTable
-	
+
+	Inventory = GemRB.GetView ("WIN_INV") is not None
+
 	def ChangeStoreView(func):
 		# WIN_TOP needs to be focused for us to change it (see CreateTopWinLoader)
 		top = GemRB.GetView("WIN_TOP")
@@ -202,10 +204,7 @@ def OpenStoreWindow ():
 			RepModTable = GemRB.LoadTable ("repmodst")
 		SpellTable = GemRB.LoadTable ("storespl", 1)
 
-	if GemRB.GetVar ("Inventory"):
-		Inventory = 1
-	else:
-		Inventory = None
+	if not Inventory:
 		# pause the game, so we don't get interrupted
 		GemRB.GamePause (1, 3)
 
@@ -309,10 +308,6 @@ def InitStoreShoppingWindow (Window):
 	ScrollBarRight.OnChange (lambda: RedrawStoreShoppingWindow(Window))
 	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('RBTN0'))
 
-	if GemRB.GetVar ("Inventory"):
-		Inventory = 1
-	else:
-		Inventory = None
 	if Inventory:
 		# Title
 		Label = Window.GetControl (0xfffffff)
