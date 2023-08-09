@@ -5168,12 +5168,12 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		// TODO: is this right?
 		killer = area->GetActorByGlobalID(LastHitter);
 	}
-	Actor* act = nullptr;
+	
 	if (killer) {
 		killer->LastKilled = GetGlobalID();
-		act = Scriptable::As<Actor>(killer);
 	}
 	
+	Actor* act = Scriptable::As<Actor>(killer);
 	bool killerPC = false;
 	if (act) {
 		// for unknown reasons the original only sends the trigger if the killer is ok
