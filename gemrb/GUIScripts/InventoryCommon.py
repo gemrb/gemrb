@@ -30,11 +30,7 @@ from ie_spells import *
 from ie_sounds import DEF_IDENTIFY
 
 UsedSlot = None
-ItemInfoWindow = None
 ItemAmountWindow = None
-ItemIdentifyWindow = None
-ItemAbilitiesWindow = None
-ErrorWindow = None
 ColorPicker = None
 StackAmount = 0
 
@@ -230,12 +226,6 @@ def MouseLeaveGround (Button):
 		Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 	return
 
-def CloseItemInfoWindow ():
-	if ItemInfoWindow:
-		ItemInfoWindow.Close ()
-	UpdateInventoryWindow ()
-	return
-
 def GetItemDescription (item, itemtype):
 	text = item["ItemDescIdentified"]
 	if (itemtype & 2):
@@ -253,19 +243,9 @@ def GetItemDescription (item, itemtype):
 	return text
 
 def DisplayItem (slotItem, itemtype):
-	global ItemInfoWindow
-
 	item = GemRB.GetItem (slotItem["ItemResRef"])
 	
-	#window can be refreshed by cycling to next/prev item, so it may still exist
-	if not ItemInfoWindow:
-		ItemInfoWindow = GemRB.LoadWindow (5)
-
-	Window = ItemInfoWindow
-	def OnClose():
-		global ItemInfoWindow
-		ItemInfoWindow = None
-	Window.SetAction (OnClose, ACTION_WINDOW_CLOSED)
+	Window = GemRB.LoadWindow (5)
 
 	if GameCheck.IsPST():
 		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
@@ -295,7 +275,7 @@ def DisplayItem (slotItem, itemtype):
 	#middle button
 	Button = Window.GetControl (4)
 	Button.SetText (strrefs[0])
-	Button.OnPress (CloseItemInfoWindow)
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeDefault()
 
 	#textarea
@@ -370,7 +350,10 @@ def DisplayItem (slotItem, itemtype):
 		drink = True # "Use"
 		
 	def ItemPress(func, *args):
-		return lambda: func(slotItem, *args)
+		def Pressed():
+			func(slotItem, *args)
+			Window.Close()
+		return Pressed
 
 	if drink and not dialog:
 		# Standard consumable item
@@ -383,6 +366,7 @@ def DisplayItem (slotItem, itemtype):
 		# Just skip the redundant info page and go directly to the container
 		if GemRB.GetVar("GUIEnhancements")&GE_ALWAYS_OPEN_CONTAINER_ITEMS:
 			OpenItemWindow(slotItem)
+			Window.Close()
 			return
 		if GameCheck.IsIWD2() or GameCheck.IsHOW():
 			Button.SetText (24891) # Open Container
@@ -430,7 +414,7 @@ def DisplayItem (slotItem, itemtype):
 		Button = Window.GetControl (14)
 		Button.OnPress (ItemPress(CycleDisplayItem, 1))
 
-	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
+	Window.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def CycleDisplayItem(slot_item, direction):
@@ -534,8 +518,6 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 	return success
 
 def OpenGroundItemInfoWindow (btn):
-	global ItemInfoWindow
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = btn.Value
 	slot_item = GemRB.GetContainerItem (pc, slot)
@@ -852,7 +834,6 @@ def ReleaseFamiliar (item):
 	pc = item["PC"]
 	# the header is always the first, target is always self
 	GemRB.UseItem (pc, item["Slot"], 0, 5)
-	CloseItemInfoWindow ()
 	return
 
 def ConsumeItem (item):
@@ -862,32 +843,23 @@ def ConsumeItem (item):
 	# the drink item header is always the first
 	# pst also requires forcing the target (eg. clot charms), which doesn't hurt elsewhere
 	GemRB.UseItem (pc, item["Slot"], 0, 5)
-	CloseItemInfoWindow ()
 	return
 
 def OpenErrorWindow (strref):
 	"""Opens the error window and displays the string."""
 
-	global ErrorWindow
-
-	ErrorWindow = Window = GemRB.LoadWindow (7)
+	Window = GemRB.LoadWindow (7)
 	Button = Window.GetControl (0)
 	if GameCheck.IsPST():
 		Button.SetText (1403)
 	else:
 		Button.SetText (11973)
-	Button.OnPress (CloseErrorWindow)
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeDefault()
 
 	TextArea = Window.GetControl (3)
 	TextArea.SetText (strref)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CloseErrorWindow ():
-	if ErrorWindow:
-		ErrorWindow.Close ()
-	UpdateInventoryWindow ()
 	return
 
 def ReadItemWindow (item):
@@ -916,7 +888,6 @@ def ReadItemWindow (item):
 		else:
 			strref = 10831
 
-		CloseItemInfoWindow ()
 		GemRB.PlaySound ("EFF_M10") # failure!
 		OpenErrorWindow (strref)
 		return
@@ -938,7 +909,6 @@ def ReadItemWindow (item):
 		else:
 			strref = 10831
 
-	CloseItemInfoWindow ()
 	OpenErrorWindow (strref)
 
 def GetPSTPersonalizedRef(pc, baseRef):
@@ -953,13 +923,7 @@ def GetPSTPersonalizedRef(pc, baseRef):
 def OpenItemWindow (slot_item):
 	"""Displays information about the item."""
 
-	#close inventory
-	GemRB.SetVar ("Inventory", 1)
-	if ItemInfoWindow:
-		ItemInfoWindow.Close ()
-
 	ResRef = slot_item['ItemResRef']
-	#the store will have to reopen the inventory
 	GemRB.EnterStore (ResRef)
 	return
 
@@ -971,8 +935,6 @@ def DialogItemWindow (slot_item):
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
-	if ItemInfoWindow:
-		ItemInfoWindow.Close ()
 
 	GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
 	return
@@ -980,34 +942,23 @@ def DialogItemWindow (slot_item):
 def IdentifyUseSpell (btn):
 	"""Identifies the item with a memorized spell."""
 
-	global ItemIdentifyWindow
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = btn.Value
-	if ItemIdentifyWindow:
-		ItemIdentifyWindow.Close ()
 	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
-	if ItemInfoWindow:
-		ItemInfoWindow.Close ()
 	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
 	else:
 		GemRB.PlaySound (DEF_IDENTIFY)
+	btn.Window.Close()
 	OpenItemInfoWindow(GemRB.GetSlotItem (pc, btn.Value))
 	return
 
 def IdentifyUseScroll (btn):
 	"""Identifies the item with a scroll or other item."""
 
-	global ItemIdentifyWindow
-
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if ItemIdentifyWindow:
-		ItemIdentifyWindow.Close ()
-	if ItemInfoWindow:
-		ItemInfoWindow.Close ()
 	if GemRB.HasSpecialItem (pc, 1, 1):
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	if GameCheck.IsPST ():
@@ -1015,25 +966,14 @@ def IdentifyUseScroll (btn):
 		GemRB.GetString (strRef, 2) # play the attached sound
 	else:
 		GemRB.PlaySound (DEF_IDENTIFY)
+	btn.Window.Close()
 	OpenItemInfoWindow(GemRB.GetSlotItem (pc, btn.Value))
 	return
 
-def CloseIdentifyItemWindow ():
-	global ItemIdentifyWindow, ItemInfoWindow
-
-	if ItemIdentifyWindow:
-		ItemIdentifyWindow.Close ()
-		ItemIdentifyWindow = None
-	if ItemInfoWindow:
-		ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
 def IdentifyItemWindow ():
-	global ItemIdentifyWindow
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
+	Window = GemRB.LoadWindow (9)
 	Button = Window.GetControl (0)
 	if GameCheck.IsPST():
 		Button.SetText (4259)
@@ -1057,7 +997,7 @@ def IdentifyItemWindow ():
 		Button.SetText (4196)
 	else:
 		Button.SetText (13727)
-	Button.OnPress (CloseIdentifyItemWindow)
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	TextArea = Window.GetControl (3)
@@ -1074,20 +1014,8 @@ def DoneAbilitiesItemWindow (btn):
 	CloseAbilitiesItemWindow ()
 	return
 
-def CloseAbilitiesItemWindow ():
-	global ItemAbilitiesWindow, ItemInfoWindow
-
-	if ItemAbilitiesWindow:
-		ItemAbilitiesWindow.Close ()
-		ItemAbilitiesWindow = None
-	if ItemInfoWindow:
-		ItemInfoWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
 def AbilitiesItemWindow (btn):
-	global ItemAbilitiesWindow
-
-	ItemAbilitiesWindow = Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot_item = GemRB.GetSlotItem (pc, btn.Value)
@@ -1121,7 +1049,7 @@ def AbilitiesItemWindow (btn):
 
 	Button = Window.GetControl (10)
 	Button.SetText (13727)
-	Button.OnPress (CloseAbilitiesItemWindow)
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

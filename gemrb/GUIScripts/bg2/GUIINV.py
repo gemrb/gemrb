@@ -36,6 +36,8 @@ def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
 	Window.AddAlias("WIN_INV")
+	Window.OnFocus(UpdateInventoryWindow)
+
 	# info label, game paused, etc
 	if GameCheck.IsBG2EE ():
 		Feedback = Window.GetControl (64)

@@ -240,6 +240,9 @@ class GWindow(GView, Scrollable):
 
 	def Close(self, *args):
 		RemoveView(self, False)
+		
+	def OnFocus(self, handler):
+		self.SetAction(handler, ACTION_WINDOW_FOCUS_GAINED)
 
 class GControl(GView):
 	methods = {
