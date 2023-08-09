@@ -1342,22 +1342,7 @@ def TopWindowClosed(window):
 		GemRB.GetView ("ACTWIN").SetVisible (True)
 		GemRB.GetView ("MSGWIN").SetVisible(True)
 
-	# TODO: this should be moved to GUIINV and that window should have a custom close handler
-	# that does this stuff then calls this manually
-
-	GemRB.LeaveContainer()
-	if GemRB.IsDraggingItem () == 1:
-		pc = GemRB.GameGetSelectedPCSingle ()
-		#store the item in the inventory before window is closed
-		GemRB.DropDraggedItem (pc, -3)
-		#dropping on ground if cannot store in inventory
-		if GemRB.IsDraggingItem () == 1:
-			GemRB.DropDraggedItem (pc, -2)
-
-	#don't go back to multi selection mode when going to the store screen
-	if not GemRB.GetView("WIN_INV"):
-		SetSelectionChangeHandler (None)
-
+	SetSelectionChangeHandler (None)
 	SelectionChanged()
 
 if GameCheck.IsIWD2():

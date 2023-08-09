@@ -39,6 +39,19 @@ SlotMap = None
 
 UpdateInventoryWindow = None
 
+def InventoryClosed(win):
+	GemRB.LeaveContainer()
+	if GemRB.IsDraggingItem () == 1:
+		pc = GemRB.GameGetSelectedPCSingle ()
+		#store the item in the inventory before window is closed
+		GemRB.DropDraggedItem (pc, -3)
+		#dropping on ground if cannot store in inventory
+		if GemRB.IsDraggingItem () == 1:
+			GemRB.DropDraggedItem (pc, -2)
+	
+	import GUICommonWindows
+	GUICommonWindows.TopWindowClosed(win)
+
 def OnDragItemGround (btn):
 	"""Drops and item to the ground."""
 	
