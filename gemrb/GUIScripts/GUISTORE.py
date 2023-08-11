@@ -508,6 +508,8 @@ def InitStoreIdentifyWindow (Window):
 
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range (ItemButtonCount):
+		Button = Window.GetControlAlias ("IDBTN" + str(i))
+
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 			color = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
@@ -518,7 +520,6 @@ def InitStoreIdentifyWindow (Window):
 		else:
 			color = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
 
-		Button = Window.GetControlAlias ("IDBTN" + str(i))
 		Button.SetBorder (0, color, 0, 1)
 		Button.OnPress (lambda: SelectID (Window))
 		Button.OnRightPress (InfoIdentifyWindow)
