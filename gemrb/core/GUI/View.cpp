@@ -177,8 +177,12 @@ void View::DrawSubviews(bool drawBG) const
 	drawBG = drawBG && HasBackground();
 	for (View* subview : subViews) {
 		if (drawBG && !subview->IsOpaque()) {
-			for (const Region& r : subview->DirtySuperViewRegions()) {
-				DrawBackground(&r);
+			Regions dirtyRgns = subview->DirtySuperViewRegions();
+			if (!dirtyRgns.empty()) {
+				subview->MarkDirty();
+				for (const Region& r : dirtyRgns) {
+					DrawBackground(&r);
+				}
 			}
 		}
 		subview->Draw();
