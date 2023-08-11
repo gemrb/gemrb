@@ -1850,7 +1850,7 @@ def DonateGold ():
 
 	Button = Window.GetControl (10)
 	if Button:
-		Button.SetAnimation ("DONATE")
+		Button.SetAnimation ("DONATE", 0, A_ANI_PLAYONCE)
 
 	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
