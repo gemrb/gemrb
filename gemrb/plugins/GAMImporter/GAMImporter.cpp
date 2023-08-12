@@ -984,7 +984,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
-		std::string tmpstr = MBStringFromString(ac->GetLongName());
+		std::string tmpstr = TLKStringFromString(ac->GetLongName());
 		stream->WriteVariable(ieVariable(tmpstr));
 	} else {
 		std::string tmpstr = core->GetMBString(ac->LongStrRef, STRING_FLAGS::STRREFOFF);
