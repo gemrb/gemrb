@@ -1,9 +1,0 @@
-Header file include order.
-
-- Header file associated to cpp file, or plugin base class header.
-- Additional plugin headers.
-- Headers in includes.
-- Headers in core followed by subdirectories.
-- System and library headers.
-
-Each item should be sorted in ascii order, and separated by blank lines.
