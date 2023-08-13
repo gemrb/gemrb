@@ -105,6 +105,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Streams/FileCache.cpp
 	Streams/FileStream.cpp
 	Streams/MemoryStream.cpp
+	Streams/PosixFile.cpp
 	Streams/SlicedStream.cpp
 	Strings/String.cpp
 	Strings/StringConversion.cpp
@@ -133,6 +134,7 @@ IF(WIN32)
 		${gemrb_core_LIB_SRCS}
 		../../platforms/windows/CodepageToIconv.cpp
 		../../platforms/windows/CodepageToIconvMap.cpp
+		../../platforms/windows/WindowsFile.cpp
 	)
 	INCLUDE_DIRECTORIES(${Iconv_INCLUDE_DIR})
 ENDIF()
