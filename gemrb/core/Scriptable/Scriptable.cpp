@@ -1576,8 +1576,8 @@ bool Scriptable::AuraPolluted()
 
 bool Scriptable::TimerActive(ieDword ID)
 {
-	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
-	if (tit == script_timers.end()) {
+	const auto& tit = scriptTimers.find(ID);
+	if (tit == scriptTimers.end()) {
 		return false;
 	}
 	return tit->second > core->GetGame()->GameTime;
@@ -1585,13 +1585,13 @@ bool Scriptable::TimerActive(ieDword ID)
 
 bool Scriptable::TimerExpired(ieDword ID)
 {
-	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
-	if (tit == script_timers.end()) {
+	const auto& tit = scriptTimers.find(ID);
+	if (tit == scriptTimers.end()) {
 		return false;
 	}
 	if (tit->second <= core->GetGame()->GameTime) {
 		// expired timers become inactive after being checked
-		script_timers.erase(tit);
+		scriptTimers.erase(tit);
 		return true;
 	}
 	return false;
@@ -1600,12 +1600,12 @@ bool Scriptable::TimerExpired(ieDword ID)
 void Scriptable::StartTimer(ieDword ID, ieDword expiration)
 {
 	ieDword newTime = core->GetGame()->GameTime + expiration * core->Time.defaultTicksPerSec;
-	std::map<ieDword,ieDword>::iterator tit = script_timers.find(ID);
-	if (tit != script_timers.end()) {
+	const auto& tit = scriptTimers.find(ID);
+	if (tit != scriptTimers.end()) {
 		tit->second = newTime;
 		return;
 	}
-	script_timers.insert(std::pair<ieDword,ieDword>(ID, newTime));
+	scriptTimers.emplace(ID, newTime);
 }
 
 /********************

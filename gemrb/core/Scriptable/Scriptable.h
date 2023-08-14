@@ -267,7 +267,7 @@ public:
 	Scriptable& operator=(const Scriptable&) = delete;
 private:
 	tick_t WaitCounter = 0;
-	std::map<ieDword,ieDword> script_timers;
+	std::map<ieDword, ieDword> scriptTimers;
 	ieDword globalID = 0;
 protected: //let Actor access this
 	std::list<TriggerEntry> triggers;
