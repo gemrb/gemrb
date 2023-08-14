@@ -641,16 +641,16 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
-			Sender->LastTrigger = tar->GetGlobalID();
+			Sender->objects.LastTrigger = tar->GetGlobalID();
 			return 1;
 		}
 		// NOTE: Detect supposedly doesn't set LastMarked — disable on GA_DETECT if needed
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR && Sender!=tar) {
 			Actor* snd = static_cast<Actor*>(Sender);
-			snd->LastSeen = tar->GetGlobalID();
-			snd->LastMarked = tar->GetGlobalID();
+			snd->objects.LastSeen = tar->GetGlobalID();
+			snd->objects.LastMarked = tar->GetGlobalID();
 		}
-		Sender->LastTrigger = tar->GetGlobalID();
+		Sender->objects.LastTrigger = tar->GetGlobalID();
 		return 1;
 	}
 	return 0;
@@ -928,7 +928,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	// also set it as Sender's LastMarkedObject (fixes worg rider dismount killing players)
 	if (Sender->Type == ST_ACTOR) {
 		Actor *actor = static_cast<Actor*>(Sender);
-		actor->LastMarked = ab->GetGlobalID();
+		actor->objects.LastMarked = ab->GetGlobalID();
 	}
 
 	//if string1 is animation, then we can't use it for a DV too
@@ -1424,7 +1424,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		dest = static_cast<const InfoPoint*>(target)->UsePoint;
 	}
 	if (untilsee && CanSee(actor, target, true, 0, true)) {
-		Sender->LastSeen = target->GetGlobalID();
+		Sender->objects.LastSeen = target->GetGlobalID();
 		Sender->ReleaseCurrentAction();
 		actor->ClearPath(true);
 		return;
@@ -1554,7 +1554,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			}
 		}
 		//display attack message
-		if (target->GetGlobalID() != Sender->LastTarget) {
+		if (target->GetGlobalID() != Sender->objects.LastTarget) {
 			displaymsg->DisplayConstantStringAction(HCStrings::ActionAttack, GUIColors::WHITE, Sender, target);
 		}
 	}
@@ -1585,8 +1585,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	//action performed
 	attacker->FaceTarget(target);
 
-	Sender->LastTarget = target->GetGlobalID();
-	Sender->LastTargetPersistent = Sender->LastTarget;
+	Sender->objects.LastTarget = target->GetGlobalID();
+	Sender->objects.LastTargetPersistent = Sender->objects.LastTarget;
 	attacker->PerformAttack(core->GetGame()->GameTime);
 }
 
@@ -2646,8 +2646,8 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 
 	// abort casting on invisible or dead targets
 	// not all spells should be interrupted on death - some for chunking, some for raising the dead
-	if (Sender->LastSpellTarget) {
-		const Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
+	if (Sender->objects.LastSpellTarget) {
+		const Actor* target = core->GetGame()->GetActorByGlobalID(Sender->objects.LastSpellTarget);
 		if (!target) return false; // shouldn't happen, though perhaps it would be better to return true
 
 		ieDword state = target->GetStat(IE_STATE_ID);
@@ -2682,12 +2682,12 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	// handle iwd2 marked spell casting (MARKED_SPELL is 0)
 	// NOTE: supposedly only casting via SpellWait checks this, so refactor if needed
 	if (third && parameters->int0Parameter == 0 && parameters->resref0Parameter.IsEmpty()) {
-		if (!Sender->LastMarkedSpell) {
+		if (!Sender->objects.LastMarkedSpell) {
 			// otherwise we spam a lot
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		ResolveSpellName(spellResRef, Sender->LastMarkedSpell);
+		ResolveSpellName(spellResRef, Sender->objects.LastMarkedSpell);
 	}
 
 	//resolve spellname
@@ -2809,10 +2809,10 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	}
 
-	if (Sender->LastSpellTarget) {
+	if (Sender->objects.LastSpellTarget) {
 		//if target was set, fire spell
 		Sender->CastSpellEnd(level, flags&SC_INSTANT);
-	} else if(!Sender->LastTargetPos.IsInvalid()) {
+	} else if (!Sender->objects.LastTargetPos.IsInvalid()) {
 		//the target was converted to a point
 		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {
@@ -2925,7 +2925,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	}
 
-	if(!Sender->LastTargetPos.IsInvalid()) {
+	if (!Sender->objects.LastTargetPos.IsInvalid()) {
 		//if target was set, fire spell
 		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {

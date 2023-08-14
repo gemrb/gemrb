@@ -480,7 +480,7 @@ Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *para
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastTarget);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}

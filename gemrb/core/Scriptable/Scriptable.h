@@ -229,6 +229,36 @@ struct TriggerEntry {
 	unsigned int flags = 0;
 };
 
+// Stored objects.
+struct StoredObjects {
+	ieDword LastAttacker = 0;
+	ieDword LastCommander = 0;
+	ieDword LastProtector = 0;
+	ieDword LastProtectee = 0;
+	// LastTargetedBy we always compute
+	ieDword LastHitter = 0;
+	ieDword LastHelp = 0;
+	ieDword LastTrigger = 0;
+	ieDword LastSeen = 0;
+	ieDword LastTalker = 0;
+	ieDword LastHeard = 0;
+	ieDword LastSummoner = 0;
+	ieDword LastFollowed = 0; // gemrb extension (LeaderOf)
+	ieDword LastMarked = 0; // iwd2
+	ieDword MyTarget = 0; // iwd2, has nothing to do with LastTarget
+	ieDword LastKilled = 0; // ees
+	int LastMarkedSpell = 0; // iwd2
+
+	ieDword LastSpellTarget = 0;
+	Point LastTargetPos;
+	ieDword LastTarget = 0;
+	// gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
+	ieDword LastTargetPersistent = 0;
+
+	// this is used by GUIScript :(
+	ieDword LastSpellOnMe = 0xffffffff; // last spell cast on this scriptable
+};
+
 class GEM_EXPORT Scriptable {
 public:
 	explicit Scriptable(ScriptableType type);
@@ -281,33 +311,8 @@ public:
 	ieDword UnselectableTimer = 0;
 	ieDword UnselectableType = 0;
 
-	// Stored objects.
-	ieDword LastAttacker = 0;
-	ieDword LastCommander = 0;
-	ieDword LastProtector = 0;
-	ieDword LastProtectee = 0;
-	ieDword LastTargetedBy = 0;
-	ieDword LastHitter = 0;
-	ieDword LastHelp = 0;
-	ieDword LastTrigger = 0;
-	ieDword LastSeen = 0;
-	ieDword LastTalker = 0;
-	ieDword LastHeard = 0;
-	ieDword LastSummoner = 0;
-	ieDword LastFollowed = 0; // gemrb extension (LeaderOf)
-	ieDword LastMarked = 0; // iwd2
-	ieDword MyTarget = 0; // iwd2, has nothing to do with LastTarget
-	ieDword LastKilled = 0; // ees
+	StoredObjects objects {};
 
-	int LastMarkedSpell = 0; // iwd2
-
-	// this is used by GUIScript :(
-	ieDword LastSpellOnMe = 0xffffffff;  // Last spell cast on this scriptable
-
-	ieDword LastTarget = 0;
-	ieDword LastSpellTarget = 0;
-	ieDword LastTargetPersistent = 0; // gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
-	Point LastTargetPos;
 	int SpellHeader = 0;
 	ResRef SpellResRef;
 	bool InterruptCasting = false;

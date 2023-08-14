@@ -448,10 +448,10 @@ void Scriptable::ClearActions(int skipFlags)
 	if (savedCurrentAction) return;
 
 	WaitCounter = 0;
-	LastTarget = 0;
-	LastTargetPos.Invalidate();
+	objects.LastTarget = 0;
+	objects.LastTargetPos.Invalidate();
 	// intentionally not resetting LastTargetPersistent
-	LastSpellTarget = 0;
+	objects.LastSpellTarget = 0;
 
 	if (Type == ST_ACTOR) {
 		Interrupt();
@@ -625,7 +625,7 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword scriptableID)
 			}
 		}
 		ScriptDebugLog(DebugMode::TRIGGERS, "Scriptable", "{}: Added LastTrigger: {} ({}) for trigger {}", scriptName, scriptableID, name, triggerID);
-		LastTrigger = scriptableID;
+		objects.LastTrigger = scriptableID;
 	}
 }
 
@@ -684,7 +684,7 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 			// we need to fetch the projectile, so the effect queue is created
 			// (skipped above)
 			delete pro;
-			pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+			pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 			pro->SetCaster(GetGlobalID(), level);
 			break;
 		case WSTC_ADDTYPE:
@@ -700,7 +700,7 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 			}
 			// we need to refetch the projectile, so the effect queue is created
 			delete pro; // don't leak the original one
-			pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+			pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 			pro->SetCaster(GetGlobalID(), level);
 			break;
 		case WSTC_RANDOMIZE:
@@ -712,11 +712,11 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 				}
 			}
 			if (tgt) {
-				LastSpellTarget = newact->GetGlobalID();
-				LastTargetPos = newact->Pos;
+				objects.LastSpellTarget = newact->GetGlobalID();
+				objects.LastTargetPos = newact->Pos;
 			} else {
 				// no better idea; I wonder if the original randomized point targets at all
-				LastTargetPos = newact->Pos;
+				objects.LastTargetPos = newact->Pos;
 			}
 
 			// make it also work for self-targeting spells:
@@ -730,7 +730,7 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 			// we need to fetch the projectile, so the effect queue is created
 			// (skipped above)
 			delete pro;
-			pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+			pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 			pro->SetCaster(GetGlobalID(), level);
 			break;
 		default: //0 - do nothing
@@ -758,7 +758,7 @@ void Scriptable::ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int
 		}
 		// we need to refetch the projectile, so the new one is used
 		delete pro; // don't leak the original one
-		pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+		pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 		pro->SetCaster(GetGlobalID(), level);
 	}
 
@@ -803,7 +803,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 			tct = caster->wildSurgeMods.target_change_type;
 		}
 		if (!caster || !tct || tct == WSTC_ADDTYPE || !caster->wildSurgeMods.projectile_id) {
-			pro = spl->GetProjectile(this, SpellHeader, level, LastTargetPos);
+			pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 			if (!pro) {
 				return;
 			}
@@ -825,7 +825,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		if (tgt) {
 			area->AddProjectile(pro, origin, tgt, fake);
 		} else {
-			area->AddProjectile(pro, origin, LastTargetPos);
+			area->AddProjectile(pro, origin, objects.LastTargetPos);
 		}
 	}
 
@@ -892,8 +892,8 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 inline void Scriptable::ResetCastingState(Actor *caster) {
 	SpellHeader = -1;
 	SpellResRef.Reset();
-	LastTargetPos.Invalidate();
-	LastSpellTarget = 0;
+	objects.LastTargetPos.Invalidate();
+	objects.LastSpellTarget = 0;
 	if (caster) {
 		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
 	}
@@ -922,11 +922,11 @@ void Scriptable::CastSpellPointEnd(int level, bool keepStance)
 	}
 
 	if (SpellHeader == -1) {
-		LastTargetPos.Invalidate();
+		objects.LastTargetPos.Invalidate();
 		return;
 	}
 
-	if (LastTargetPos.IsInvalid()) {
+	if (objects.LastTargetPos.IsInvalid()) {
 		SpellHeader = -1;
 		return;
 	}
@@ -967,10 +967,10 @@ void Scriptable::CastSpellPointEnd(int level, bool keepStance)
 		break;
 	}
 
-	Actor *target = area->GetActor(LastTargetPos, GA_NO_UNSCHEDULED|GA_NO_HIDDEN);
+	Actor* target = area->GetActor(objects.LastTargetPos, GA_NO_UNSCHEDULED | GA_NO_HIDDEN);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
-		target->LastSpellOnMe = spellID;
+		target->objects.LastSpellOnMe = spellID;
 	}
 
 	ResetCastingState(caster);
@@ -999,10 +999,10 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 	}
 
 	if (SpellHeader == -1) {
-		LastSpellTarget = 0;
+		objects.LastSpellTarget = 0;
 		return;
 	}
-	if (!LastSpellTarget) {
+	if (!objects.LastSpellTarget) {
 		SpellHeader = -1;
 		return;
 	}
@@ -1024,7 +1024,7 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
-	CreateProjectile(SpellResRef, LastSpellTarget, level, GetSpellDistance(SpellResRef, this)==0xffffffff);
+	CreateProjectile(SpellResRef, objects.LastSpellTarget, level, GetSpellDistance(SpellResRef, this) == 0xffffffff);
 
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
 	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
@@ -1041,10 +1041,10 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 		break;
 	}
 
-	Actor *target = area->GetActorByGlobalID(LastSpellTarget);
+	Actor* target = area->GetActorByGlobalID(objects.LastSpellTarget);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
-		target->LastSpellOnMe = spellID;
+		target->objects.LastSpellOnMe = spellID;
 	}
 
 	ResetCastingState(caster);
@@ -1176,16 +1176,16 @@ void Scriptable::DirectlyCastSpellPoint(const Point& target, const ResRef& spell
 	}
 
 	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
-	Point TmpPos = LastTargetPos;
-	ieDword TmpTarget = LastSpellTarget;
+	Point TmpPos = objects.LastTargetPos;
+	ieDword TmpTarget = objects.LastSpellTarget;
 	int TmpHeader = SpellHeader;
 
 	SetSpellResRef(spellRef);
 	CastSpellPoint(target, deplete, true, true, level);
 	CastSpellPointEnd(level, keepStance);
 
-	LastTargetPos = TmpPos;
-	LastSpellTarget = TmpTarget;
+	objects.LastTargetPos = TmpPos;
+	objects.LastSpellTarget = TmpTarget;
 	SpellHeader = TmpHeader;
 }
 
@@ -1198,16 +1198,16 @@ void Scriptable::DirectlyCastSpell(Scriptable* target, const ResRef& spellRef, i
 	}
 
 	// save and restore the casting targets, so we don't interrupt any gui triggered casts with spells like true seeing (repeated fx_cast_spell)
-	Point TmpPos = LastTargetPos;
-	ieDword TmpTarget = LastSpellTarget;
+	Point TmpPos = objects.LastTargetPos;
+	ieDword TmpTarget = objects.LastSpellTarget;
 	int TmpHeader = SpellHeader;
 
 	SetSpellResRef(spellRef);
 	CastSpell(target, deplete, true, true, level);
 	CastSpellEnd(level, keepStance);
 
-	LastTargetPos = TmpPos;
-	LastSpellTarget = TmpTarget;
+	objects.LastTargetPos = TmpPos;
+	objects.LastSpellTarget = TmpTarget;
 	SpellHeader = TmpHeader;
 }
 
@@ -1216,8 +1216,8 @@ void Scriptable::DirectlyCastSpell(Scriptable* target, const ResRef& spellRef, i
 //if spell is illegal stop casting
 int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, bool noInterrupt, int level)
 {
-	LastSpellTarget = 0;
-	LastTargetPos.Invalidate();
+	objects.LastSpellTarget = 0;
+	objects.LastTargetPos.Invalidate();
 	Actor* actor = Scriptable::As<Actor>(this);
 	if (actor && actor->HandleCastingStance(SpellResRef, deplete, instant)) {
 		Log(ERROR, "Scriptable", "Spell {} not known or memorized, aborting cast!", SpellResRef);
@@ -1234,7 +1234,7 @@ int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, 
 		return -1;
 	}
 
-	LastTargetPos = target;
+	objects.LastTargetPos = target;
 
 	if(!CheckWildSurge()) {
 		return -1;
@@ -1251,8 +1251,8 @@ int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, 
 //if spell is illegal stop casting
 int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool noInterrupt, int level)
 {
-	LastSpellTarget = 0;
-	LastTargetPos.Invalidate();
+	objects.LastSpellTarget = 0;
+	objects.LastTargetPos.Invalidate();
 	Actor* actor = Scriptable::As<Actor>(this);
 	if (actor && actor->HandleCastingStance(SpellResRef, deplete, instant)) {
 		Log(ERROR, "Scriptable", "Spell {} not known or memorized, aborting cast!", SpellResRef);
@@ -1272,9 +1272,9 @@ int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool n
 		return -1;
 	}
 
-	LastTargetPos = target->Pos;
+	objects.LastTargetPos = target->Pos;
 	if (target->Type==ST_ACTOR) {
-		LastSpellTarget = target->GetGlobalID();
+		objects.LastSpellTarget = target->GetGlobalID();
 	}
 
 	if(!CheckWildSurge()) {
@@ -1470,14 +1470,14 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl
 			tmp = caster->Modified[IE_FORCESURGE];
 			tmp3 = caster->WMLevelMod; // also save caster level; the original didn't reroll the bonus
 			caster->Modified[IE_FORCESURGE] = 7;
-			if (LastSpellTarget) {
-				target = area->GetActorByGlobalID(LastSpellTarget);
+			if (objects.LastSpellTarget) {
+				target = area->GetActorByGlobalID(objects.LastSpellTarget);
 				if (!target) {
-					target = core->GetGame()->GetActorByGlobalID(LastSpellTarget);
+					target = core->GetGame()->GetActorByGlobalID(objects.LastSpellTarget);
 				}
 			}
-			if (LastTargetPos.IsInvalid()) {
-				targetpos = LastTargetPos;
+			if (objects.LastTargetPos.IsInvalid()) {
+				targetpos = objects.LastTargetPos;
 			} else if (target) {
 				targetpos = target->Pos;
 			}

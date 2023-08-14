@@ -803,7 +803,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					if (target) {
 						src->SetSpellResRef(TestSpell);
 						src->CastSpell(target, false);
-						if (src->LastSpellTarget) {
+						if (src->objects.LastSpellTarget) {
 							src->CastSpellEnd(0, false);
 						} else {
 							src->CastSpellPointEnd(0, false);
@@ -1924,7 +1924,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 	switch(trap->Type) {
 		case ST_TRAVEL:
 			trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-			actor->LastMarked = trap->GetGlobalID();
+			actor->objects.LastMarked = trap->GetGlobalID();
 			//clear the go closer flag
 			trap->GetCurrentArea()->LastGoCloser = 0;
 			return false;
@@ -1947,7 +1947,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags & TRAP_DEACTIVATED) && !(GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 					trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-					actor->LastMarked = trap->GetGlobalID();
+					actor->objects.LastMarked = trap->GetGlobalID();
 					//directly feeding the event, even if there are actions in the queue
 					//trap->Scripts[0]->Update();
 					// FIXME

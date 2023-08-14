@@ -1438,11 +1438,11 @@ int fx_damage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter3) {
 		if(caster && caster->Type==ST_ACTOR) {
 			target->AddTrigger(TriggerEntry(trigger_hitby, caster->GetGlobalID()));
-			target->LastHitter=caster->GetGlobalID();
+			target->objects.LastHitter = caster->GetGlobalID();
 		} else {
 			//Maybe it should be something impossible like 0xffff, and use 'Someone'
 			Log(ERROR, "Actor", "LastHitter (type {}) falling back to target: {}.", caster ? caster->Type : -1, fmt::WideToChar{target->GetName()});
-			target->LastHitter=target->GetGlobalID();
+			target->objects.LastHitter = target->GetGlobalID();
 		}
 	}
 
@@ -5494,7 +5494,7 @@ static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *
 
 	//when upgrading, there is no need for the script to be triggered again, so this isn't a problem
 	if (Owner) {
-		fam->LastSummoner = Owner->GetGlobalID();
+		fam->objects.LastSummoner = Owner->GetGlobalID();
 	}
 
 	Map *map = target->GetCurrentArea();
@@ -6360,7 +6360,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 1:
 		// LastHitter
-		actor = map->GetActorByGlobalID(target->LastHitter);
+		actor = map->GetActorByGlobalID(target->objects.LastHitter);
 		// but don't attack yourself
 		if (actor && actor->GetGlobalID() == Owner->GetGlobalID()) return FX_APPLIED;
 		break;
@@ -6602,7 +6602,7 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		dict["P2"] = fx->Parameter2;
 		core->SetEventFlag(EF_SEQUENCER);
 		// set also this for GUIMG, since the spell won't be normally cast, but applied
-		target->LastSpellOnMe = ResolveSpellNumber(fx->SourceRef);
+		target->objects.LastSpellOnMe = ResolveSpellNumber(fx->SourceRef);
 	}
 	return FX_NOT_APPLIED;
 }

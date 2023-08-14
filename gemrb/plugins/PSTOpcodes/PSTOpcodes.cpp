@@ -721,7 +721,7 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 	}
 
 	const Map *map = target->GetCurrentArea();
-	Actor *actor = map->GetActorByGlobalID(target->LastHitter);
+	Actor* actor = map->GetActorByGlobalID(target->objects.LastHitter);
 	if (actor && PersonalDistance(target, actor) < 30) {
 		const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
 		if (entry) {
@@ -969,12 +969,12 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		target->Modified[IE_STONESKINS]=1;
 		break;
 	case 2: //black barbed shield (damage opponents)
-		if (target->LastHitter) {
+		if (target->objects.LastHitter) {
 			terminate = DamageLastHitter(fx, target, core->Roll(2, 6, 0), 16);
 		}
 		break;
 	case 3: case 16: //pain mirror or balance in all things
-		if (target->LastHitter) {
+		if (target->objects.LastHitter) {
 			terminate = DamageLastHitter(fx, target, target->LastDamage, target->LastDamageType);
 		}
 		break;

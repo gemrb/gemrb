@@ -150,10 +150,10 @@ Targets *GameScript::LastTrigger(const Scriptable *Sender, Targets *parameters, 
 	Scriptable *target = parameters->GetTarget(0, -1);
 	parameters->Clear();
 	if (target) {
-		target = Sender->GetCurrentArea()->GetActorByGlobalID(target->LastTrigger);
+		target = Sender->GetCurrentArea()->GetActorByGlobalID(target->objects.LastTrigger);
 		parameters->AddTarget(target, 0, ga_flags);
-	} else if (Sender->LastTrigger) {
-		target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
+	} else if (Sender->objects.LastTrigger) {
+		target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->objects.LastTrigger);
 		parameters->AddTarget(target, 0, ga_flags);
 	}
 	return parameters;
@@ -167,7 +167,7 @@ Targets *GameScript::LastMarkedObject(const Scriptable *Sender, Targets *paramet
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastMarked);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastMarked);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -183,7 +183,7 @@ Targets *GameScript::SpellTarget(const Scriptable *Sender, Targets *parameters, 
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastSpellTarget);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastSpellTarget);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -200,7 +200,7 @@ Targets *GameScript::LastSeenBy(const Scriptable *Sender, Targets *parameters, i
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastSeen);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastSeen);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -216,7 +216,7 @@ Targets *GameScript::LastHelp(const Scriptable *Sender, Targets *parameters, int
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHelp);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastHelp);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -232,7 +232,7 @@ Targets *GameScript::LastHeardBy(const Scriptable *Sender, Targets *parameters, 
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHeard);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastHeard);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -273,7 +273,7 @@ Targets *GameScript::ProtectorOf(const Scriptable *Sender, Targets *parameters, 
 	parameters->Clear();
 
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtector);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastProtector);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -289,7 +289,7 @@ Targets *GameScript::ProtectedBy(const Scriptable *Sender, Targets *parameters, 
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtectee);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastProtectee);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -305,7 +305,7 @@ Targets *GameScript::LastCommandedBy(const Scriptable *Sender, Targets *paramete
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastCommander);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastCommander);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -321,7 +321,7 @@ Targets* GameScript::LastKilled(const Scriptable* Sender, Targets* parameters, i
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastKilled);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastKilled);
 		if (target) {
 			parameters->AddTarget(target, 0, gaFlags);
 		}
@@ -339,7 +339,7 @@ Targets *GameScript::MyTarget(const Scriptable *Sender, Targets *parameters, int
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->MyTarget);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.MyTarget);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -361,7 +361,7 @@ Targets *GameScript::LastAttackerOf(const Scriptable *Sender, Targets *parameter
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastAttacker);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastAttacker);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -377,7 +377,7 @@ Targets *GameScript::LastHitter(const Scriptable *Sender, Targets *parameters, i
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHitter);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastHitter);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -393,7 +393,7 @@ Targets *GameScript::LeaderOf(const Scriptable *Sender, Targets *parameters, int
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastFollowed);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastFollowed);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -409,7 +409,7 @@ Targets *GameScript::LastTalkedToBy(const Scriptable *Sender, Targets *parameter
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTalker);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastTalker);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
@@ -425,7 +425,7 @@ Targets *GameScript::LastSummonerOf(const Scriptable *Sender, Targets *parameter
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastSummoner);
+		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastSummoner);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}

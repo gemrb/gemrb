@@ -1807,10 +1807,10 @@ void Map::Shout(const Actor* actor, int shoutID, bool global) const
 		}
 		if (shoutID) {
 			listener->AddTrigger(TriggerEntry(trigger_heard, actor->GetGlobalID(), shoutID));
-			listener->LastHeard = actor->GetGlobalID();
+			listener->objects.LastHeard = actor->GetGlobalID();
 		} else {
 			listener->AddTrigger(TriggerEntry(trigger_help, actor->GetGlobalID()));
-			listener->LastHelp = actor->GetGlobalID();
+			listener->objects.LastHelp = actor->GetGlobalID();
 		}
 	}
 }

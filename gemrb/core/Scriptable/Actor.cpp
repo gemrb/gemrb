@@ -846,7 +846,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
 		int panicMode = RAND(0, 2); // PANIC_RANDOMWALK etc.
 		displaymsg->DisplayConstantStringName(HCStrings(int(HCStrings::MoraleBerserk) + panicMode), GUIColors::WHITE, actor);
-		actor->Panic(game->GetActorByGlobalID(actor->LastAttacker), panicMode + 1);
+		actor->Panic(game->GetActorByGlobalID(actor->objects.LastAttacker), panicMode + 1);
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
 		// recover from panic, since morale has risen again
 		// but only if we have really just recovered, so panic from other
@@ -2693,7 +2693,7 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 
 		// snap out of charm if the charmer hurt us
 		if (trigger.triggerID == trigger_attackedby) {
-			const Actor* attacker = game->GetActorByGlobalID(LastAttacker);
+			const Actor* attacker = game->GetActorByGlobalID(objects.LastAttacker);
 			if (attacker) {
 				int revertToEA = 0;
 				if (Modified[IE_EA] == EA_CHARMED && attacker->GetStat(IE_EA) <= EA_GOODCUTOFF) {
@@ -3591,7 +3591,7 @@ static int CheckInteract(const ieVariable& talker, const ieVariable& target)
 
 void Actor::HandleInteractV1(const Actor *target)
 {
-	LastTalker = target->GetGlobalID();
+	objects.LastTalker = target->GetGlobalID();
 	std::string interAction = fmt::format("Interact(\"{}\")", target->GetScriptName());
 	AddAction(GenerateAction(std::move(interAction)));
 }
@@ -3652,7 +3652,7 @@ bool Actor::GetPartyComment()
 		case 1: return true;
 		default:
 			//V2 interact
-			LastTalker = target->GetGlobalID();
+			objects.LastTalker = target->GetGlobalID();
 			Action *action = GenerateActionDirect("Interact([-1])", target);
 			if (action) {
 				AddActionInFront(action);
@@ -3986,7 +3986,7 @@ void Actor::GetHit(int damage, bool killingBlow)
 // - concentration is checked when casting is taking place <= 5' from an enemy
 bool Actor::CheckSpellDisruption(int damage) const
 {
-	if (!LastSpellTarget && LastTargetPos.IsInvalid()) {
+	if (!objects.LastSpellTarget && objects.LastTargetPos.IsInvalid()) {
 		// not casting, nothing to do
 		return false;
 	}
@@ -4165,8 +4165,8 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 			LastDamageType |= DAMAGE_CHUNKING;
 		}
 		// mark LastHitter for repeating damage effects (eg. to get xp from melfing trolls)
-		if (act && LastHitter == 0) {
-			LastHitter = act->GetGlobalID();
+		if (act && objects.LastHitter == 0) {
+			objects.LastHitter = act->GetGlobalID();
 		}
 	}
 
@@ -4239,7 +4239,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		//fixme: implement applytrigger, copy int0 into LastDamage there
 		LastDamage = damage;
 		AddTrigger(TriggerEntry(trigger_tookdamage, damage)); // FIXME: lastdamager? LastHitter is not set for spell damage
-		AddTrigger(TriggerEntry(trigger_hitby, LastHitter, damagetype)); // FIXME: currently lastdamager, should it always be set regardless of damage?
+		AddTrigger(TriggerEntry(trigger_hitby, objects.LastHitter, damagetype)); // FIXME: currently lastdamager, should it always be set regardless of damage?
 
 		// impact morale when hp thresholds (50 %, 25 %) are crossed for the first time
 		int currentRatio = 100 * chp / (signed) BaseStats[IE_MAXHITPOINTS];
@@ -4612,9 +4612,9 @@ std::string Actor::dump() const
 	}
 	buffer.append("\n");
 	AppendFormat(buffer, "WaitCounter: {}\n", GetWait());
-	AppendFormat(buffer, "LastTarget: {} {}    ", LastTarget, GetActorNameByID(LastTarget));
-	AppendFormat(buffer, "LastSpellTarget: {} {}\n", LastSpellTarget, GetActorNameByID(LastSpellTarget));
-	AppendFormat(buffer, "LastTalked: {} {}\n", LastTalker, GetActorNameByID(LastTalker));
+	AppendFormat(buffer, "LastTarget: {} {}    ", objects.LastTarget, GetActorNameByID(objects.LastTarget));
+	AppendFormat(buffer, "LastSpellTarget: {} {}\n", objects.LastSpellTarget, GetActorNameByID(objects.LastSpellTarget));
+	AppendFormat(buffer, "LastTalked: {} {}\n", objects.LastTalker, GetActorNameByID(objects.LastTalker));
 	buffer.append(inventory.dump(false));
 	buffer.append(spellbook.dump(false));
 	buffer.append(fxqueue.dump(false));
@@ -5166,9 +5166,9 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 
 	if (!killer) {
 		// TODO: is this right?
-		killer = area->GetActorByGlobalID(LastHitter);
+		killer = area->GetActorByGlobalID(objects.LastHitter);
 	}
-	if (killer) killer->LastKilled = GetGlobalID();
+	if (killer) killer->objects.LastKilled = GetGlobalID();
 	Actor* act = Scriptable::As<Actor>(killer);
 	bool killerPC = false;
 	if (act) {
@@ -6102,7 +6102,7 @@ void Actor::AttackedBy(const Actor *attacker)
 {
 	AddTrigger(TriggerEntry(trigger_attackedby, attacker->GetGlobalID()));
 	if (attacker->GetStat(IE_EA) != EA_PC && Modified[IE_EA] != EA_PC) {
-		LastAttacker = attacker->GetGlobalID();
+		objects.LastAttacker = attacker->GetGlobalID();
 	}
 	if (InParty) {
 		core->Autopause(AUTOPAUSE::ATTACKED, this);
@@ -6809,12 +6809,12 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
-	if (!LastTarget) {
+	if (!objects.LastTarget) {
 		Log(ERROR, "Actor", "Attack without valid target ID!");
 		return;
 	}
 	//get target
-	Actor *target = area->GetActorByGlobalID(LastTarget);
+	Actor* target = area->GetActorByGlobalID(objects.LastTarget);
 	if (!target) {
 		Log(WARNING, "Actor", "Attack without valid target!");
 		return;
@@ -7285,7 +7285,7 @@ void Actor::UpdateActorState()
 		//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
 		// however some critters don't have that long animations (eg. squirrel 0xC400)
 		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, objects.LastTarget, false);
 			attackProjectile = NULL;
 		}
 	}
@@ -7378,7 +7378,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 			return;
 		}
 
-		if (Modified[IE_CHECKFORBERSERK] && !LastTarget && SeeAnyOne(false, false) ) {
+		if (Modified[IE_CHECKFORBERSERK] && !objects.LastTarget && SeeAnyOne(false, false)) {
 			Action *action = GenerateAction( "Berserk()" );
 			if (action) {
 				ReleaseCurrentAction();
@@ -7392,8 +7392,8 @@ void Actor::UpdateModalState(ieDword gameTime)
 	// but we shouldn't be resetting rounds/attacks just because the actor
 	// wandered away, the action code should probably be responsible somehow
 	// see also line above (search for comment containing UpdateActorState)!
-	if (LastTarget && lastattack && lastattack < (gameTime - 1)) {
-		const Actor *target = area->GetActorByGlobalID(LastTarget);
+	if (objects.LastTarget && lastattack && lastattack < (gameTime - 1)) {
+		const Actor* target = area->GetActorByGlobalID(objects.LastTarget);
 		if (!target || target->GetStat(IE_STATE_ID) & STATE_DEAD ||
 			(target->GetStance() == IE_ANI_WALK && target->GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE)) {
 			StopAttack();
@@ -7551,7 +7551,7 @@ void Actor::SetColorMod(ieDword location, RGBModifier::Type type, int speed,
 
 void Actor::SetLeader(const Actor* actor, int offset)
 {
-	LastFollowed = actor->GetGlobalID();
+	objects.LastFollowed = actor->GetGlobalID();
 	FollowOffset.x = offset;
 	FollowOffset.y = offset;
 }
@@ -7764,11 +7764,11 @@ bool Actor::HibernateIfAble()
 	//finding an excuse why we don't hybernate the actor
 	if (Modified[IE_ENABLEOFFSCREENAI])
 		return false;
-	if (LastTarget) //currently attacking someone
+	if (objects.LastTarget) // currently attacking someone
 		return false;
-	if (!LastTargetPos.IsInvalid()) //currently casting at the ground
+	if (!objects.LastTargetPos.IsInvalid()) // currently casting at the ground
 		return false;
-	if (LastSpellTarget) //currently casting at someone
+	if (objects.LastSpellTarget) // currently casting at someone
 		return false;
 	if (InternalFlags&IF_JUSTDIED) // didn't have a chance to run a script
 		return false;

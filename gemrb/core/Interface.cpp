@@ -1592,7 +1592,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		ieDword flag = GA_NO_DEAD|GA_NO_ALLY|GA_NO_ENEMY;
 
 		if (summoner) {
-			tmp->LastSummoner = Owner->GetGlobalID();
+			tmp->objects.LastSummoner = Owner->GetGlobalID();
 			ieDword ea = summoner->GetStat(IE_EA);
 			if (ea<=EA_GOODCUTOFF) {
 				flag &= ~GA_NO_ALLY;

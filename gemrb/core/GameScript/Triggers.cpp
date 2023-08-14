@@ -1244,7 +1244,7 @@ int GameScript::HaveSpell(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (parameters->int0Parameter == 0 && Sender->LastMarkedSpell == 0) {
+	if (parameters->int0Parameter == 0 && Sender->objects.LastMarkedSpell == 0) {
 		return false;
 	}
 
@@ -1252,7 +1252,7 @@ int GameScript::HaveSpell(Scriptable *Sender, const Trigger *parameters)
 		return actor->spellbook.HaveSpell(parameters->resref0Parameter, 0);
 	}
 	int spellNum = parameters->int0Parameter;
-	if (!spellNum) spellNum = Sender->LastMarkedSpell;
+	if (!spellNum) spellNum = Sender->objects.LastMarkedSpell;
 	return actor->spellbook.HaveSpell(spellNum, 0);
 }
 
@@ -1505,7 +1505,7 @@ int GameScript::Range(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	if (Sender->Type == ST_ACTOR) {
-		Sender->LastMarked = scr->GetGlobalID();
+		Sender->objects.LastMarked = scr->GetGlobalID();
 	}
 	int distance = SquaredMapDistance(Sender, scr);
 	bool matched = DiffCore(distance, (parameters->int0Parameter + 1) * (parameters->int0Parameter + 1), parameters->int1Parameter);
@@ -1735,7 +1735,7 @@ int GameScript::IsOverMe(Scriptable *Sender, const Trigger *parameters)
 
 	// manually set LastTrigger, since IsOverMe is not in svtriobj
 	if (ret != 0) {
-		Sender->LastTrigger = ret;
+		Sender->objects.LastTrigger = ret;
 		ret = 1;
 	}
 	return ret;
@@ -2180,7 +2180,7 @@ int GameScript::SetLastMarkedObject(Scriptable *Sender, const Trigger *parameter
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
-	scr->LastMarked = tar->GetGlobalID();
+	scr->objects.LastMarked = tar->GetGlobalID();
 	return 1;
 }
 
@@ -2196,12 +2196,12 @@ int GameScript::SetSpellTarget(Scriptable *Sender, const Trigger *parameters)
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter);
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
-		scr->LastSpellTarget = 0;
-		scr->LastTargetPos.Invalidate();
+		scr->objects.LastSpellTarget = 0;
+		scr->objects.LastTargetPos.Invalidate();
 		return 1;
 	}
-	scr->LastTargetPos.Invalidate();
-	scr->LastSpellTarget = tar->GetGlobalID();
+	scr->objects.LastTargetPos.Invalidate();
+	scr->objects.LastSpellTarget = tar->GetGlobalID();
 	return 1;
 }
 
@@ -2259,7 +2259,7 @@ int GameScript::ForceMarkedSpell_Trigger(Scriptable *Sender, const Trigger *para
 		return 0;
 	}
 
-	scr->LastMarkedSpell = parameters->int0Parameter;
+	scr->objects.LastMarkedSpell = parameters->int0Parameter;
 	return 1;
 }
 
@@ -2270,7 +2270,7 @@ int GameScript::IsMarkedSpell(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	return scr->LastMarkedSpell == parameters->int0Parameter;
+	return scr->objects.LastMarkedSpell == parameters->int0Parameter;
 }
 
 
@@ -3251,7 +3251,7 @@ int GameScript::LastPersonTalkedTo(Scriptable *Sender, const Trigger *parameters
 		return 0;
 	}
 
-	if (MatchActor(Sender, scr->LastTalker, parameters->objectParameter)) {
+	if (MatchActor(Sender, scr->objects.LastTalker, parameters->objectParameter)) {
 		return 1;
 	}
 	return 0;
@@ -3309,7 +3309,7 @@ int GameScript::AttackedBy(Scriptable *Sender, const Trigger *parameters)
 	bool match = Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
 	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
 	if (match && target && Sender->Type == ST_ACTOR) {
-		Sender->LastMarked = target->GetGlobalID();
+		Sender->objects.LastMarked = target->GetGlobalID();
 	}
 	return match;
 }
@@ -3341,7 +3341,7 @@ int GameScript::LastMarkedObject_Trigger(Scriptable *Sender, const Trigger *para
 		return 0;
 	}
 
-	if (MatchActor(Sender, actor->LastMarked, parameters->objectParameter)) {
+	if (MatchActor(Sender, actor->objects.LastMarked, parameters->objectParameter)) {
 		//don't mark this object for clear
 		//Sender->AddTrigger(&actor->LastSeen);
 		return 1;
@@ -3361,7 +3361,7 @@ int GameScript::HelpEX(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	const Actor *help = Sender->GetCurrentArea()->GetActorByGlobalID(actor->LastHelp);
+	const Actor* help = Sender->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastHelp);
 	if (!help) {
 		//no help required
 		return 0;
@@ -3388,7 +3388,7 @@ int GameScript::HelpEX(Scriptable *Sender, const Trigger *parameters)
 		match = true;
 	}
 	if (match && Sender->Type == ST_ACTOR) {
-		Sender->LastMarked = actor->GetGlobalID();
+		Sender->objects.LastMarked = actor->GetGlobalID();
 	}
 	return match;
 }
@@ -3398,7 +3398,7 @@ int GameScript::Help_Trigger(Scriptable *Sender, const Trigger *parameters)
 	 bool match = Sender->MatchTriggerWithObject(trigger_help, parameters->objectParameter);
 	 const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
 	 if (match && target && Sender->Type == ST_ACTOR) {
-		 Sender->LastMarked = target->GetGlobalID();
+		 Sender->objects.LastMarked = target->GetGlobalID();
 	 }
 	 return match;
 }

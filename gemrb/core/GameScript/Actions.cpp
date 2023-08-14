@@ -2080,10 +2080,10 @@ void GameScript::SetMyTarget(Scriptable* Sender, Action* parameters)
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
-		Sender->MyTarget = 0;
+		Sender->objects.MyTarget = 0;
 		return;
 	}
-	Sender->MyTarget = tar->GetGlobalID();
+	Sender->objects.MyTarget = tar->GetGlobalID();
 }
 
 // PlaySequence without object parameter defaults to Sender
@@ -5279,7 +5279,7 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 	// if same target as before, don't play the war cry again, as they'd pop up too often
 	int flags = 0;
-	if (Sender->LastTargetPersistent == tar->GetGlobalID()) {
+	if (Sender->objects.LastTargetPersistent == tar->GetGlobalID()) {
 		flags = AC_NO_SOUND;
 	}
 
@@ -5488,7 +5488,7 @@ void GameScript::MarkObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	actor->LastMarked = tar->GetGlobalID();
+	actor->objects.LastMarked = tar->GetGlobalID();
 }
 
 void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
@@ -5497,7 +5497,7 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 	if (!me) {
 		return;
 	}
-	if (me->LastMarkedSpell) {
+	if (me->objects.LastMarkedSpell) {
 		return;
 	}
 
@@ -5547,8 +5547,8 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 			goto end_mso_loop;
 		}
 		//mark spell and target
-		me->LastMarkedSpell = splnum;
-		me->LastSpellTarget = tar->GetGlobalID();
+		me->objects.LastMarkedSpell = splnum;
+		me->objects.LastSpellTarget = tar->GetGlobalID();
 		break;
 end_mso_loop:
 		pos++;
@@ -5564,7 +5564,7 @@ void GameScript::ForceMarkedSpell(Scriptable* Sender, Action* parameters)
 	if (!actor) {
 		return;
 	}
-	actor->LastMarkedSpell = parameters->int0Parameter;
+	actor->objects.LastMarkedSpell = parameters->int0Parameter;
 }
 
 void GameScript::SetMarkedSpell(Scriptable* Sender, Action* parameters)
@@ -5574,7 +5574,7 @@ void GameScript::SetMarkedSpell(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->int0Parameter) {
-		if (actor->LastMarkedSpell) {
+		if (actor->objects.LastMarkedSpell) {
 			return;
 		}
 		if (!actor->spellbook.HaveSpell(parameters->int0Parameter, 0) ) {
@@ -5582,7 +5582,7 @@ void GameScript::SetMarkedSpell(Scriptable* Sender, Action* parameters)
 		}
 	}
 
-	actor->LastMarkedSpell = parameters->int0Parameter;
+	actor->objects.LastMarkedSpell = parameters->int0Parameter;
 }
 
 void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
@@ -6968,7 +6968,7 @@ void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	scr->LastFollowed = actor->GetGlobalID();
+	scr->objects.LastFollowed = actor->GetGlobalID();
 	scr->FollowOffset.Invalidate();
 	if (!scr->InMove() || scr->Destination != actor->Pos) {
 		scr->WalkTo(actor->Pos, 0, 1);
@@ -6990,7 +6990,7 @@ void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	scr->LastFollowed = actor->GetGlobalID();
+	scr->objects.LastFollowed = actor->GetGlobalID();
 	scr->FollowOffset.Invalidate();
 	if (!scr->InMove() || scr->Destination != actor->Pos) {
 		scr->WalkTo(actor->Pos, IF_RUNNING, 1);
@@ -7027,9 +7027,9 @@ void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	scr->LastFollowed = actor->GetGlobalID();
-	scr->LastProtectee = actor->GetGlobalID();
-	actor->LastProtector = scr->GetGlobalID();
+	scr->objects.LastFollowed = actor->GetGlobalID();
+	scr->objects.LastProtectee = actor->GetGlobalID();
+	actor->objects.LastProtector = scr->GetGlobalID();
 	//not exactly range
 	scr->FollowOffset.x = parameters->int0Parameter;
 	scr->FollowOffset.y = parameters->int0Parameter;
@@ -7061,7 +7061,7 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	scr->LastFollowed = actor->GetGlobalID();
+	scr->objects.LastFollowed = actor->GetGlobalID();
 	ieDword formation = parameters->int0Parameter;
 	ieDword pos = parameters->int1Parameter;
 	scr->FollowOffset = gc->GetFormationOffset(formation, pos);

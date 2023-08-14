@@ -133,8 +133,8 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	if (tgt->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) tgt;
 		// TODO: verify
-		spk->LastTalker=targetID;
-		tar->LastTalker=speakerID;
+		spk->objects.LastTalker = targetID;
+		tar->objects.LastTalker = speakerID;
 		tar->SetCircleSize();
 	}
 	if (oldTarget) oldTarget->SetCircleSize();

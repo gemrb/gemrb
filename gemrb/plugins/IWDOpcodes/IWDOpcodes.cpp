@@ -1627,7 +1627,7 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//if enemy is in sight
 	//attack them
-	if (!target->LastTarget) {
+	if (!target->objects.LastTarget) {
 		//depends on whom it considers enemy
 		if (STAT_GET(IE_EA)<EA_EVILCUTOFF) {
 			Enemy->objectParameter->objectFields[0] = EA_ENEMY;
@@ -1636,7 +1636,7 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		//see the nearest enemy
 		if (SeeCore(target, Enemy, false)) {
-			target->FaceTarget(target->GetCurrentArea()->GetActorByGlobalID(target->LastSeen));
+			target->FaceTarget(target->GetCurrentArea()->GetActorByGlobalID(target->objects.LastSeen));
 			//this is highly unsure
 			//fx->Parameter1=1;
 		}
@@ -2622,7 +2622,7 @@ int fx_effects_on_struck (Scriptable* Owner, Actor* target, Effect* fx)
 	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 
-	Actor *actor = map->GetActorByGlobalID(target->LastHitter);
+	Actor* actor = map->GetActorByGlobalID(target->objects.LastHitter);
 	if (!actor) {
 		return FX_APPLIED;
 	}
@@ -2905,14 +2905,14 @@ int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//SeeCore returns the closest living enemy
 	//FIXME:the previous opponent must be dead by now, or this code won't work
 	if (SeeCore(target, Enemy, false) ) {
-		const Actor *enemy = map->GetActorByGlobalID(target->LastSeen);
+		const Actor* enemy = map->GetActorByGlobalID(target->objects.LastSeen);
 		//50 is more like our current weapon range
-		if (enemy && (PersonalDistance(enemy, target)<50) && target->LastSeen!=target->LastTarget) {
+		if (enemy && PersonalDistance(enemy, target) < 50 && target->objects.LastSeen != target->objects.LastTarget) {
 			displaymsg->DisplayConstantStringNameValue(HCStrings::Cleave, GUIColors::WHITE, target, fx->Parameter1);
 			target->attackcount=fx->Parameter1;
 			target->FaceTarget(enemy);
-			target->LastTarget=target->LastSeen;
-			target->LastTargetPersistent = target->LastSeen;
+			target->objects.LastTarget = target->objects.LastSeen;
+			target->objects.LastTargetPersistent = target->objects.LastSeen;
 			//linger around for more
 			return FX_APPLIED;
 		}
