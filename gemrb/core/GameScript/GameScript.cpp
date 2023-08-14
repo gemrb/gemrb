@@ -2176,7 +2176,7 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 		const ResponseSet *rS = rB->responseSet;
 		if (rS->responses.empty()) continue;
 
-		const Response *response = rS->responses[0];
+		Response* response = rS->responses[0];
 		if (response->actions.empty()) continue;
 
 		const Action *action = response->actions[0];
@@ -2184,8 +2184,14 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 		if (target) {
 			// save the target in case it selfdestructs and we need to manually exit the cutscene
 			core->SetCutSceneRunner(target);
-			// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
+
+			// the original first queued them all similarly to DialogHandler::DialogChoose
+			if (target->Type != ST_ACTOR) {
+				response->actions.insert(response->actions.begin(), GenerateAction("SetInterrupt(FALSE)"));
+				response->actions.push_back(GenerateAction("SetInterrupt(TRUE)"));
+			}
 			rS->responses[0]->Execute(target);
+
 			// NOTE: this will break blocking instants, if there are any
 			target->ReleaseCurrentAction();
 		} else {
