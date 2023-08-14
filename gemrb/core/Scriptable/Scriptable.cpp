@@ -321,8 +321,11 @@ void Scriptable::ExecuteScript(int scriptCount)
 			scriptCount = 1;
 		// hardcoded action overrides like charm, confusion, panic and berserking
 		// TODO: check why everything else but charm is handled separately and unify if possible
-		//       and if this should skip updating if it returns true
-		changed |= act->OverrideActions();
+		if (act->OverrideActions()) {
+			// we just need to execute, no more processing needed
+			ClearTriggers();
+			return;
+		}
 	}
 
 	bool continuing = false, done = false;
