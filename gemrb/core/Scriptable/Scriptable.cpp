@@ -197,6 +197,7 @@ void Scriptable::Update()
 				core->SetEventFlag(EF_PORTRAIT);
 			}
 		}
+		if (!UnselectableTimer) UnselectableType = 0;
 	}
 
 	TickScripting();

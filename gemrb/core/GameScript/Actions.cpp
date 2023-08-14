@@ -3707,6 +3707,8 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 {
 	Sender->UnselectableTimer = parameters->int0Parameter * core->Time.defaultTicksPerSec;
+	// hidden EE mode option, not enabled by shipped action.ids
+	Sender->UnselectableType = parameters->int1Parameter;
 
 	//update color
 	Actor* actor = Scriptable::As<Actor>(Sender);

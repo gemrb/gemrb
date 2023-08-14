@@ -279,6 +279,7 @@ public:
 	int scriptLevel = 0; // currently running script slot
 
 	ieDword UnselectableTimer = 0;
+	ieDword UnselectableType = 0;
 
 	// Stored objects.
 	ieDword LastAttacker = 0;
