@@ -314,13 +314,11 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	bool continuing = false, done = false;
-	for (scriptlevel = 0;scriptlevel<scriptCount;scriptlevel++) {
-		GameScript *Script = Scripts[scriptlevel];
-		if (Script) {
-			changed |= Script->Update(&continuing, &done);
-			if (Script->dead) {
-				delete Script;
-			}
+	for (scriptLevel = 0; scriptLevel < scriptCount; scriptLevel++) {
+		GameScript* script = Scripts[scriptLevel];
+		if (script) {
+			changed |= script->Update(&continuing, &done);
+			if (script->dead) delete script;
 		}
 
 		/* scripts are not concurrent, see WAITPC override script for example */
@@ -356,7 +354,7 @@ void Scriptable::AddAction(Action* aC)
 	}
 	aC->IncRef();
 	if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
-		aC->int0Parameter = scriptlevel;
+		aC->int0Parameter = scriptLevel;
 	}
 
 	// attempt to handle 'instant' actions, from instant.ids, which run immediately

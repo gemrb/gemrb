@@ -276,7 +276,7 @@ public:
 	OverHeadText overHead{this};
 
 	GameScript* Scripts[MAX_SCRIPTS] = {};
-	int scriptlevel = 0;
+	int scriptLevel = 0; // currently running script slot
 
 	ieDword UnselectableTimer = 0;
 
