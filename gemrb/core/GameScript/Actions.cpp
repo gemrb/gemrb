@@ -5254,9 +5254,15 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	if (!Sender->CurrentActionState) {
+	if (Sender->CurrentActionState) {
+		// check if our target is still ok, otherwise try to reevaluate it
+		const Scriptable* curTar = core->GetGame()->GetActorByGlobalID(Sender->CurrentActionTarget);
+		const Actor* curAct = Scriptable::As<Actor>(curTar);
+		if (!curTar || (curAct && !curAct->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_HIDDEN))) {
+			Sender->CurrentActionTarget = 0; // grab the target object anew below
+		}
+	} else {
 		Sender->CurrentActionState = parameters->int0Parameter;
-		// TODO: reevaluate target (set CurrentActionTarget to 0) if we are not actively in combat
 	}
 
 	Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1], GA_NO_DEAD);
@@ -5287,7 +5293,6 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 	Sender->CurrentActionState--;
 	if (Sender->CurrentActionState <= 0) {
-		Sender->CurrentActionState = 0;
 		Sender->ReleaseCurrentAction();
 	}
 }
