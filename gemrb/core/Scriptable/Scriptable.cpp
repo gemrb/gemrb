@@ -227,6 +227,8 @@ void Scriptable::TickScripting()
 	ScriptTicks++;
 
 	// If no action is running, we've had triggers set recently or we haven't checked recently, do a script update.
+	// we potentially delay a forced update for 1 tick, since TriggerCountdown is only set later (like the original)
+	// NOTE: however the original also had another bool for when a condition returned true, avoiding this
 	bool needsUpdate = (!CurrentAction) || (TriggerCountdown > 0) || (IdleTicks > 15);
 
 	// Also do a script update if one was forced..
@@ -311,6 +313,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 			scriptCount = 1;
 		// hardcoded action overrides like charm, confusion, panic and berserking
 		// TODO: check why everything else but charm is handled separately and unify if possible
+		//       and if this should skip updating if it returns true
 		changed |= act->OverrideActions();
 	}
 

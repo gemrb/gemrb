@@ -767,12 +767,11 @@ void Map::UpdateScripts()
 		//definitely try to move it up if you experience freezes after timestop
 		actor->fxqueue.Cleanup();
 
-		//if the actor is immobile, don't run the scripts
-		//FIXME: this is not universally true, only some states have this effect
+		// if the actor is immobile (only some states), don't run the scripts
 		// paused targets do something similar, but are handled in the effect
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
-			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
-			//if that isn't true either, remove this block completely
+			// STATE_SLEEP allows actions if they are in actsleep.ids, so don't skip it here
+			// most holders and stunners set STATE_HELPLESS (while the original checked IE_HELD)
 			if (actor->GetStat(IE_STATE_ID) & STATE_HELPLESS) {
 				actor->SetInternalFlag(IF_JUSTDIED, BitOp::NAND);
 				continue;
@@ -788,7 +787,7 @@ void Map::UpdateScripts()
 		 * doing this differently (for example by storing the cutscene state at the
 		 * start of this function, or by changing the cutscene state at a later
 		 * point, etc), but i did it this way for now because it seems least painful
-		 * and we should probably be staggering the script executions anyway
+		 * and we should probably be staggering the script executions anyway (we do)
 		 */
 		actor->Update();
 		actor->UpdateActorState();
