@@ -4771,7 +4771,6 @@ int GameScript::Switch(Scriptable* Sender, const Trigger* parameters)
 {
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	Sender->weightsAsCases = static_cast<unsigned char>(value);
-	Log(ERROR, "GameScript", "Switch has not been implemented yet!");
 	return 0;
 }
 
