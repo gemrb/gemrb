@@ -3867,7 +3867,9 @@ void Actor::PlayExistenceSounds()
 
 bool Actor::OverrideActions()
 {
-	//TODO:: implement forced actions that mess with scripting (panic, confusion, etc)
+	// TODO: consolidate forced actions that mess with scripting (eg. panic, confusion, berserking)
+	// most are handled elsewhere now
+
 	// domination and dire charm: force the actors to be useful (trivial ai)
 	Action *action;
 	if ((Modified[IE_STATE_ID] & STATE_CHARMED) && (BaseStats[IE_EA] <= EA_GOODCUTOFF) && Modified[IE_EA] == EA_CHARMEDPC) {

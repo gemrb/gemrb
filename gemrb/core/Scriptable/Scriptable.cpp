@@ -320,7 +320,6 @@ void Scriptable::ExecuteScript(int scriptCount)
 		if (act->InParty && !(core->GetGame()->ControlStatus & CS_PARTY_AI))
 			scriptCount = 1;
 		// hardcoded action overrides like charm, confusion, panic and berserking
-		// TODO: check why everything else but charm is handled separately and unify if possible
 		if (act->OverrideActions()) {
 			// we just need to execute, no more processing needed
 			ClearTriggers();
