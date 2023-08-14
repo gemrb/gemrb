@@ -547,9 +547,7 @@ def HasSorcererBook (pc, cls=-1):
 		return False
 	return IsSorcererBook (SorcererBook)
 
-def CannotLearnSlotSpell (slot_item):
-	pc = slot_item["PC"]
-
+def CannotLearnSlotSpell (slot_item, pc):
 	# disqualify sorcerers immediately
 	if HasSorcererBook (pc):
 		return LSR_STAT

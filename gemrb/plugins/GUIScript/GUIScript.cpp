@@ -8809,7 +8809,6 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Flags", PyLong_FromLong(si->Flags));
 	PyDict_SetItemString(dict, "Header", PyLong_FromLong(header));
 	PyDict_SetItemString(dict, "Slot", PyLong_FromLong(idx));
-	PyDict_SetItemString(dict, "PC", PyLong_FromLong(globalID));
 
 	return dict;
 }

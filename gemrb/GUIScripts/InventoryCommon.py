@@ -371,10 +371,10 @@ def DisplayItem (slotItem, itemtype):
 	if drink and not dialog:
 		# Standard consumable item
 		Button.SetText (strrefs[3])
-		Button.OnPress (ItemPress(ConsumeItem))
+		Button.OnPress (ItemPress(ConsumeItem, pc))
 	elif read:
 		Button.SetText (strrefs[4])
-		Button.OnPress (ItemPress(ReadItemWindow))
+		Button.OnPress (ItemPress(ReadItemWindow, pc))
 	elif container:
 		# Just skip the redundant info page and go directly to the container
 		if GemRB.GetVar("GUIEnhancements")&GE_ALWAYS_OPEN_CONTAINER_ITEMS:
@@ -396,12 +396,12 @@ def DisplayItem (slotItem, itemtype):
 		else:
 			# Dialog item that is 'talked to'
 			Button.SetText (strrefs[5])
-		Button.OnPress (ItemPress(DialogItemWindow))
+		Button.OnPress (ItemPress(DialogItemWindow, pc))
 	elif familiar and not GameCheck.IsPST():
 		# PST earings share a type with familiars, so no
 		# mods that allow familiars would be possible in PST
 		Button.SetText (4373)
-		Button.OnPress (ItemPress(ReleaseFamiliar))
+		Button.OnPress (ItemPress(ReleaseFamiliar, pc))
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -421,18 +421,16 @@ def DisplayItem (slotItem, itemtype):
 
 		#left scroll
 		Button = Window.GetControl (13)
-		Button.OnPress (ItemPress(CycleDisplayItem, -1))
+		Button.OnPress (ItemPress(CycleDisplayItem, pc, -1))
 
 		#right scroll
 		Button = Window.GetControl (14)
-		Button.OnPress (ItemPress(CycleDisplayItem, 1))
+		Button.OnPress (ItemPress(CycleDisplayItem, pc, 1))
 
 	Window.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
-def CycleDisplayItem(slot_item, direction):
-	pc = GemRB.GameGetSelectedPCSingle ()
-	
+def CycleDisplayItem(slot_item, pc, direction):
 	#try the next slot for an item. if the slot is empty, loop until one is found.
 	while not slot_item:
 		slot += direction
@@ -446,10 +444,9 @@ def CycleDisplayItem(slot_item, direction):
 		slot_item = GemRB.GetSlotItem (pc, slot)
 
 	if slot_item:
-		OpenItemInfoWindow (slot_item)
+		OpenItemInfoWindow(slot_item, pc)
 
-def OpenItemInfoWindow (slotItem):
-	pc = slotItem["PC"]
+def OpenItemInfoWindow (slotItem, pc):
 	slotType = GemRB.GetSlotType (slotItem["Slot"], pc)
 
 	# PST: if the slot is empty but is also the first quick weapon slot, display the info for the "default" weapon
@@ -691,7 +688,7 @@ def UpdateSlot (pc, slot):
 	if slot_item:
 		Button.SetAction(OnDragItem, IE_ACT_DRAG_DROP_CRT)
 		Button.OnPress (OnDragItem)
-		Button.OnRightPress (lambda: OpenItemInfoWindow (slot_item))
+		Button.OnRightPress (lambda: OpenItemInfoWindow (slot_item, pc))
 		Button.OnShiftPress (OpenItemAmountWindow)
 		#If the slot is being used to display the 'default' weapon, disable dragging.
 		if SlotType["ID"] == 10 and using_fists:
@@ -841,18 +838,16 @@ def GetColor():
 	ColorPicker.Focus()
 	return
 
-def ReleaseFamiliar (item):
+def ReleaseFamiliar (item, pc):
 	"""Simple Use Item"""
 
-	pc = item["PC"]
 	# the header is always the first, target is always self
 	GemRB.UseItem (pc, item["Slot"], 0, 5)
 	return
 
-def ConsumeItem (item):
+def ConsumeItem (item, pc):
 	"""Drink the potion"""
 
-	pc = item["PC"]
 	# the drink item header is always the first
 	# pst also requires forcing the target (eg. clot charms), which doesn't hurt elsewhere
 	GemRB.UseItem (pc, item["Slot"], 0, 5)
@@ -875,12 +870,10 @@ def OpenErrorWindow (strref):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def ReadItemWindow (item):
+def ReadItemWindow (item, pc):
 	"""Tries to learn the mage scroll."""
 
-	pc = item["PC"]
-	ret = Spellbook.CannotLearnSlotSpell(item)
-
+	ret = Spellbook.CannotLearnSlotSpell(item, pc)
 	if ret:
 		# these failures are soft - the scroll is not destroyed
 		if ret == LSR_KNOWN and GameCheck.HasTOB():
@@ -940,10 +933,8 @@ def OpenItemWindow (slot_item):
 	GemRB.EnterStore (ResRef)
 	return
 
-def DialogItemWindow (slot_item):
+def DialogItemWindow (slot_item, pc):
 	"""Converse with an item."""
-
-	pc = GemRB.GameGetSelectedPCSingle ()
 
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
@@ -965,7 +956,7 @@ def IdentifyUseSpell (btn):
 	else:
 		GemRB.PlaySound (DEF_IDENTIFY)
 	btn.Window.Close()
-	OpenItemInfoWindow(GemRB.GetSlotItem (pc, btn.Value))
+	OpenItemInfoWindow(GemRB.GetSlotItem(pc, btn.Value), pc)
 	return
 
 def IdentifyUseScroll (btn):
@@ -980,7 +971,7 @@ def IdentifyUseScroll (btn):
 	else:
 		GemRB.PlaySound (DEF_IDENTIFY)
 	btn.Window.Close()
-	OpenItemInfoWindow(GemRB.GetSlotItem (pc, btn.Value))
+	OpenItemInfoWindow(GemRB.GetSlotItem(pc, btn.Value), pc)
 	return
 
 def IdentifyItemWindow ():
@@ -1101,7 +1092,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	if Slot["Flags"] & IE_INV_ITEM_IDENTIFIED and GemRB.GetVar ("GUIEnhancements") & GE_MARK_SCROLLS:
 		scroll = item["Function"] & ITM_F_READ
 	if scroll and not Spellbook.HasSorcererBook (pc):
-		knowsScroll = Spellbook.CannotLearnSlotSpell (Slot) == LSR_KNOWN
+		knowsScroll = Spellbook.CannotLearnSlotSpell (Slot, pc) == LSR_KNOWN
 
 	# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
 	if item["MaxStackAmount"] > 1:
