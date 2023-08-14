@@ -360,19 +360,19 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			}
 
 			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
-			target->AddAction( GenerateAction( "SetInterrupt(FALSE)" ) );
+			target->AddAction("SetInterrupt(FALSE)");
 			// delay all other actions until the next cycle (needed for the machine of Lum the Mad (gorlum2.dlg))
 			// FIXME: figure out if pst needs something similar (action missing)
 			//        (not conditional on GenerateAction to prevent console spam)
 			// iwd2 41nate.d breaks if this is included, since the original delayed execution in a different manner
 			if (!core->HasFeature(GFFlags::AREA_OVERRIDE) && !core->HasFeature(GFFlags::RULES_3ED) && !(tr->Flags & IE_DLG_IMMEDIATE)) {
-				target->AddAction(GenerateAction("BreakInstants()"));
+				target->AddAction("BreakInstants()");
 			}
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {
 				if (i == tr->actions.size() - 1) tr->actions[i]->flags |= ACF_REALLOW_SCRIPTS;
 				target->AddAction(tr->actions[i]);
 			}
-			target->AddAction( GenerateAction( "SetInterrupt(TRUE)" ) );
+			target->AddAction("SetInterrupt(TRUE)");
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {

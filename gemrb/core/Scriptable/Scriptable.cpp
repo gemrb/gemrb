@@ -337,6 +337,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 }
 
+void Scriptable::AddAction(std::string actStr)
+{
+	Action* aC = GenerateAction(std::move(actStr));
+	AddAction(aC);
+}
+
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {

@@ -5241,7 +5241,7 @@ void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 			scr->AddAction(GenerateActionDirect("NIDSpecial3()", static_cast<Actor*>(tar)));
 		}
 	} else {
-		scr->AddAction(GenerateAction(fmt::format("BashDoor({})", tar->GetScriptName())));
+		scr->AddAction(fmt::format("BashDoor({})", tar->GetScriptName()));
 	}
 }
 

@@ -850,7 +850,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'k': //kicks out actor
 				if (lastActor && lastActor->InParty) {
 					lastActor->Stop();
-					lastActor->AddAction( GenerateAction("LeaveParty()") );
+					lastActor->AddAction("LeaveParty()");
 				}
 				break;
 			case 'l': //play an animation (vvc/bam) over an actor
@@ -915,7 +915,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'q': //joins actor to the party
 				if (lastActor && !lastActor->InParty) {
 					lastActor->Stop();
-					lastActor->AddAction( GenerateAction("JoinParty()") );
+					lastActor->AddAction("JoinParty()");
 				}
 				break;
 			case 'r'://resurrects actor
@@ -1931,7 +1931,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 		case ST_TRIGGER:
 			// pst, eg. ar1500
 			if (!trap->GetDialog().IsEmpty()) {
-				trap->AddAction(GenerateAction("Dialogue([PC])"));
+				trap->AddAction("Dialogue([PC])");
 				return true;
 			}
 
@@ -2278,7 +2278,7 @@ void GameControl::CommandSelectedMovement(const Point& p, bool formation, bool a
 
 	// p is a searchmap travel region or a plain travel region in pst (matching several other criteria)
 	if (party[0]->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL || doWorldMap) {
-		party[0]->AddAction(GenerateAction("NIDSpecial2()"));
+		party[0]->AddAction("NIDSpecial2()");
 	}
 }
 bool GameControl::OnMouseWheelScroll(const Point& delta)

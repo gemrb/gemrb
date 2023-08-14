@@ -362,6 +362,7 @@ public:
 	virtual void Update();
 	void TickScripting();
 	virtual void ExecuteScript(int scriptCount);
+	void AddAction(std::string actStr);
 	void AddAction(Action* aC);
 	void AddActionInFront(Action* aC);
 	Action* GetCurrentAction() const { return CurrentAction; }

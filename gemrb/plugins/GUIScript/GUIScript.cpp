@@ -10313,7 +10313,7 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 		}
 		if(actor->GetBase(IE_HITPOINTS) > 0) {
 			actor->Stop();
-			actor->AddAction( GenerateAction("Dialogue([PC])") );
+			actor->AddAction("Dialogue([PC])");
 		}
 	}
 	game->LeaveParty(actor, false);
