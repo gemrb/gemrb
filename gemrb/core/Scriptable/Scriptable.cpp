@@ -296,6 +296,13 @@ void Scriptable::ExecuteScript(int scriptCount)
 	Actor* act = Scriptable::As<Actor>(this);
 	if (act && (act->GetStat(IE_CASTERHOLD) || act->GetStat(IE_SUMMONDISABLE))) return;
 
+	// (EE-only?) bg2 special casing, probably fine elsewhere, so not ifdefing to bg2/bg2ee just yet
+	// don't touch if we're on autopilot for everything but the party, except for Edwin
+	// TODO: check if the Edwin hack is really needed (his quests once he joins, other MakeUnselectable calls)
+	if (UnselectableTimer && (UnselectableType & 1) == 0) {
+		if (!act || !act->InParty || act->GetName() != u"Edwin") return;
+	}
+
 	// don't run if the final dialog action queue is still playing out (we're already out of dialog!)
 	// currently limited with GFFlags::CUTSCENE_AREASCRIPTS and to area scripts, to minimize risk into known test cases
 	if (Type == ST_AREA && !core->HasFeature(GFFlags::CUTSCENE_AREASCRIPTS) && gc->GetDialogueFlags() & DF_POSTPONE_SCRIPTS) {
