@@ -294,6 +294,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	bool changed = false;
 	Actor* act = Scriptable::As<Actor>(this);
+	if (act && (act->GetStat(IE_CASTERHOLD) || act->GetStat(IE_SUMMONDISABLE))) return;
 
 	// don't run if the final dialog action queue is still playing out (we're already out of dialog!)
 	// currently limited with GFFlags::CUTSCENE_AREASCRIPTS and to area scripts, to minimize risk into known test cases
