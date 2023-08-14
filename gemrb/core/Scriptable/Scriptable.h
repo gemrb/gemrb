@@ -278,12 +278,19 @@ protected: //let Actor access this
 	std::list< Action*> actionQueue;
 	Action* CurrentAction = nullptr;
 public:
+	ScriptableType Type = ST_ACTOR;
+	Point Pos;
 	Region BBox;
+	ieStrRef DialogName = ieStrRef::INVALID;
+
 	// State relating to the currently-running action.
 	int CurrentActionState = 0;
 	ieDword CurrentActionTarget = 0;
 	bool CurrentActionInterruptable = true;
 	ieDword CurrentActionTicks = 0;
+
+	std::array<GameScript*, MAX_SCRIPTS> Scripts {};
+	int scriptLevel = 0; // currently running script slot
 
 	// The number of times this was updated.
 	ieDword Ticks = 0;
@@ -298,25 +305,18 @@ public:
 	// The countdown for forced activation by triggers.
 	ieDword TriggerCountdown = 0;
 
+	// more scripting state
 	ieVarsMap locals;
-	ScriptableType Type = ST_ACTOR;
-	Point Pos;
-
-	ieStrRef DialogName = ieStrRef::INVALID;
 	OverHeadText overHead{this};
-
-	GameScript* Scripts[MAX_SCRIPTS] = {};
-	int scriptLevel = 0; // currently running script slot
-
+	StoredObjects objects {};
 	ieDword UnselectableTimer = 0;
 	ieDword UnselectableType = 0;
+	unsigned char weightsAsCases = 0;
 
-	StoredObjects objects {};
-
+	// spellcasting state
 	int SpellHeader = 0;
 	ResRef SpellResRef;
 	bool InterruptCasting = false;
-	unsigned char weightsAsCases = 0;
 public:
 	
 	template <class RETURN, class PARAM>
