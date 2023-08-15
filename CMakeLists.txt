@@ -78,6 +78,12 @@ if(APPIMAGE)
 endif()
 
 CHECK_IS_RELEASE_VERSION()
+# install pre-commit hook and set up git blame
+IF(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/.git" AND NOT EXISTS "${CMAKE_SOURCE_DIR}/.git/hooks/pre-commit")
+  message(STATUS "Installing git pre-commit hook and .git-blame-ignore-revs file")
+  file(COPY admin/pre-commit DESTINATION "${CMAKE_SOURCE_DIR}/.git/hooks")
+  execute_process(COMMAND git "config" "--add" "blame.ignoreRevsFile" ".git-blame-ignore-revs")
+ENDIF()
 
 IF(NOT STATIC_LINK)
 	# prevent static libraries from being selected by FIND_LIBRARY
