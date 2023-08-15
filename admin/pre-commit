@@ -1,0 +1,45 @@
+#!/usr/bin/python
+import re
+import sys
+import shutil
+import subprocess as sp
+
+# Copy this file to .git/hooks if you're not using cmake
+minVersion = 17
+binary = "clang-format"
+
+# ensure clang-format is there
+cf = shutil.which(binary)
+if cf is None:
+	cf = shutil.which(binary + "-" + str(minVersion))
+if cf is None:
+	print("Bailing out, make sure clang-format is installed!")
+	sys.exit(1)
+
+# ensure it's of sufficient version
+args = [binary, "--version"]
+test = sp.run(args, stdout=sp.PIPE, stderr=sp.PIPE)
+version = str(test.stdout, encoding="utf-8")
+regex = r"clang-format version ((?:\d+\.)+[\d+_\+\-a-z]+)"
+search = re.search(regex, version)
+if not search:
+	print("Error determining clang-format version, bailing out!")
+	sys.exit(2)
+version = search.group(1).split(".")[0]
+if int(version) < minVersion:
+	print("Too old clang-format version, bailing out!")
+	sys.exit(3)
+
+# test both the working tree and staged tree
+args0 = ["git", binary, "--extensions", "c,cpp,h", "--diff"]
+for suffix in "", "--staged":
+	if suffix: # sp can't handle empty params
+		args = args0 + [suffix]
+	else:
+		args = args0
+	test = sp.run(args, stdout=sp.PIPE, stderr=sp.STDOUT)
+	if test.returncode != 0:
+		print(test.stdout.decode())
+		print("\nTrying to commit unformatted changes, bailing out!")
+		print("Use `git clang-format -f {}` to fix it and/or configure your editor to use clang-format!".format(suffix))
+		sys.exit(3)
