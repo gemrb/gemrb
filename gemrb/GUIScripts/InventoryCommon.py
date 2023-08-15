@@ -257,8 +257,8 @@ def GetItemDescription (item, itemtype):
 
 def DisplayItem (slotItem, itemtype):
 	item = GemRB.GetItem (slotItem["ItemResRef"])
-	
-	Window = GemRB.LoadWindow (5)
+
+	Window = GemRB.LoadWindow (5, "GUIINV")
 
 	if GameCheck.IsPST():
 		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
@@ -418,20 +418,20 @@ def DisplayItem (slotItem, itemtype):
 
 	# in pst one can cycle through all the items from the description window
 	if GameCheck.IsPST():
-
 		#left scroll
 		Button = Window.GetControl (13)
-		Button.OnPress (ItemPress(CycleDisplayItem, pc, -1))
+		Button.OnPress (lambda: CycleDisplayItem(slotItem["Slot"], pc, -1))
 
 		#right scroll
 		Button = Window.GetControl (14)
-		Button.OnPress (ItemPress(CycleDisplayItem, pc, 1))
+		Button.OnPress (lambda: CycleDisplayItem(slotItem["Slot"], pc, 1))
 
 	Window.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
-def CycleDisplayItem(slot_item, pc, direction):
+def CycleDisplayItem(slot, pc, direction):
 	#try the next slot for an item. if the slot is empty, loop until one is found.
+	slot_item = None
 	while not slot_item:
 		slot += direction
 
@@ -580,7 +580,7 @@ def OpenItemAmountWindow (btn, location = "inventory"):
 		UpdateSlot (pc, UsedSlot-1)
 		return
 
-	ItemAmountWindow = Window = GemRB.LoadWindow (4)
+	ItemAmountWindow = Window = GemRB.LoadWindow (4, "GUIINV")
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	Window.SetAction(ItemAmountWindowClosed, ACTION_WINDOW_CLOSED)
 
@@ -810,7 +810,7 @@ def GetColor():
 	ColorTable = GemRB.LoadTable ("clowncol")
 	InventoryWindow = GemRB.GetView ("WIN_INV")
 	InventoryWindow.SetDisabled (True) #darken it
-	ColorPicker = GemRB.LoadWindow (3)
+	ColorPicker = GemRB.LoadWindow (3, "GUIINV")
 	GemRB.SetVar ("Selected", None)
 	if GameCheck.IsIWD2 () or GameCheck.IsGemRBDemo ():
 		Button = ColorPicker.GetControl (35)
@@ -856,7 +856,7 @@ def ConsumeItem (item, pc):
 def OpenErrorWindow (strref):
 	"""Opens the error window and displays the string."""
 
-	Window = GemRB.LoadWindow (7)
+	Window = GemRB.LoadWindow (7, "GUIINV")
 	Button = Window.GetControl (0)
 	if GameCheck.IsPST():
 		Button.SetText (1403)
@@ -977,7 +977,7 @@ def IdentifyUseScroll (btn):
 def IdentifyItemWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	Window = GemRB.LoadWindow (9)
+	Window = GemRB.LoadWindow (9, "GUIINV")
 	Button = Window.GetControl (0)
 	if GameCheck.IsPST():
 		Button.SetText (4259)
@@ -1019,7 +1019,7 @@ def DoneAbilitiesItemWindow (btn):
 	return
 
 def AbilitiesItemWindow (btn):
-	Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6, "GUIINV")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot_item = GemRB.GetSlotItem (pc, btn.Value)
