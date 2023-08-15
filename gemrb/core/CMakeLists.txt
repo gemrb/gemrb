@@ -107,6 +107,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Streams/MemoryStream.cpp
 	Streams/PosixFile.cpp
 	Streams/SlicedStream.cpp
+	Strings/UTF8Comparison.cpp
 	Strings/String.cpp
 	Strings/StringConversion.cpp
 	System/swab.cpp

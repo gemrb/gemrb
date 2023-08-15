@@ -21,6 +21,7 @@
 // VFS.cpp : functions to access filesystem in os-independent way
 // and POSIX-like compatibility layer for win
 
+#include "Strings/UTF8Comparison.h"
 #include "System/VFS.h"
 
 #include "globals.h"
@@ -28,6 +29,8 @@
 #include "Interface.h"
 #include "Logging/Logging.h"
 
+#include <cctype>
+#include <locale>
 #include <cstdarg>
 #include <cstring>
 #include <cerrno>
@@ -258,12 +261,21 @@ void PathAppend(path_t& target, const path_t& name)
 	}
 }
 
-static bool FindMatchInDir(const char* dir, char* item)
+static bool FindMatchInDir(const char* dir, MutableStringView item)
 {
+	// this is specifically designed over a UTF-8 default, so most things except Win
+	bool multibyteCheck =
+		std::any_of(item.begin(), item.end(), [](char c) { return c < 0; });
+
 	for (DirectoryIterator dirit(dir); dirit; ++dirit) {
 		const path_t& name = dirit.GetName();
-		if (stricmp(name.c_str(), item) == 0) {
-			std::copy(name.begin(), name.end(), item);
+		bool equal =
+			multibyteCheck
+				? UTF8_stricmp(name.c_str(), item.c_str())
+				: stricmp(name.c_str(), item.c_str()) == 0;
+
+		if (equal) {
+			std::copy(name.begin(), name.end(), item.begin());
 			return true;
 		}
 	}
@@ -292,8 +304,7 @@ static void ResolveCase(MutableStringView path, size_t itempos)
 		char* curDelim = &path[itempos - 1];
 		*curDelim = '\0';
 
-		char* item = &path[itempos];
-		found = FindMatchInDir(path.c_str(), item);
+		found = FindMatchInDir(path.c_str(), MutableStringView{path.c_str(), itempos, path.length()});
 		*curDelim = PathDelimiter;
 	}
 
@@ -320,7 +331,7 @@ path_t& ResolveCase(path_t& filePath)
 		MutableStringView msv(filePath);
 		ResolveCase(msv, nextItem);
 	} else if (!DirExists(filePath)) { // filePath is a single component
-		FindMatchInDir(".", &filePath[0]);
+		FindMatchInDir(".", MutableStringView{filePath});
 	}
 
 	return filePath;
