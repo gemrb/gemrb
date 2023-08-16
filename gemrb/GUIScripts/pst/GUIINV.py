@@ -141,13 +141,10 @@ def InitInventoryWindow (Window):
 
 	return
 
-def UpdateInventoryWindow (Window = None):
+def UpdateInventoryWindow (Window):
 	"""Redraws the inventory window and resets TopIndex."""
 
 	global SlotMap
-
-	if Window == None:
-		Window = GemRB.GetView("WIN_INV")
 
 	Window.OnClose(InventoryCommon.InventoryClosed)
 	GUICommonWindows.UpdateAnimation ()
@@ -173,8 +170,6 @@ def UpdateInventoryWindow (Window = None):
 
 ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
 OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
-
-InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
 def RefreshInventoryWindow (Window):
 	"""Partial redraw without resetting TopIndex."""
@@ -264,13 +259,7 @@ def RefreshInventoryWindow (Window):
 			Button.OnDoublePress (None)
 	return
 
-def DefaultWeapon ():
-	pc = GemRB.GameGetFirstSelectedActor ()
-	GemRB.SetEquippedQuickSlot (pc, 1000, -1)
-	UpdateInventoryWindow ()
-	return
-
-def OnAutoEquip ():
+def OnAutoEquip (btn):
 	if not GemRB.IsDraggingItem ():
 		return
 
@@ -283,7 +272,7 @@ def OnAutoEquip ():
 	if ret == 2 and item and (item['ItemResRef'] == "dustrobe"):
 		GemRB.SetGlobal("APPEARANCE","GLOBAL",2)
 
-	UpdateInventoryWindow ()
+	UpdateInventoryWindow (btn.Window)
 	return
 
 ###################################################

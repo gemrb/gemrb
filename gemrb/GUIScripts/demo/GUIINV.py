@@ -145,10 +145,7 @@ def ChangeWeaponPressed ():
 	return
 
 #complete update
-def UpdateInventoryWindow (Window = None):
-	if Window == None:
-		Window = GemRB.GetView("WIN_INV")
-
+def UpdateInventoryWindow (Window):
 	Window.OnClose(InventoryCommon.InventoryClosed)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
@@ -167,8 +164,6 @@ def UpdateInventoryWindow (Window = None):
 	for i in range (SlotCount):
 		InventoryCommon.UpdateSlot (pc, i)
 	return
-
-InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
 ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
 OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
