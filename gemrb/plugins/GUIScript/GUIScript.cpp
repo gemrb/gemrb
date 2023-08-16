@@ -195,11 +195,6 @@ static RETURN* GetView(PyObject* obj) {
 	return ScriptingRefCast<RETURN>(gs->GetScriptingRef(obj));
 }
 
-static inline bool CheckStat(const Actor * actor, ieDword stat, ieDword value, int op)
-{
-	return DiffCore(actor->GetBase(stat), value, op);
-}
-
 static bool StatIsASkill(unsigned int StatID) {
 	// traps, lore, stealth, lockpicking, pickpocket
 	if (StatID >= IE_LORE && StatID <= IE_PICKPOCKET) return true;
@@ -10114,12 +10109,7 @@ operator is >=.\n\
 static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 {
 	std::string callback;
-	PyObject* p[13];
-	int v[13];
-	for (int i = 9; i < 13; i++) {
-		p[i]=NULL;
-		v[i]=GREATER_OR_EQUALS;
-	}
+	PyObject* p[13] {};
 
 	if (!PyArg_UnpackTuple( args, "ref", 9, 13, &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &p[6], &p[7], &p[8], &p[9], &p[10], &p[11], &p[12] )) {
 		return NULL;
@@ -10128,37 +10118,15 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	if (!PyObject_TypeCheck(p[0], &PyLong_Type)) {
 		return NULL;
 	}
-	v[0] = static_cast<int>(PyLong_AsLong(p[0])); //slot
+	int pc = static_cast<int>(PyLong_AsLong(p[0]));
 
-	if (PyObject_TypeCheck(p[1], &PyLong_Type)) {
-		v[1] = static_cast<int>(PyLong_AsLong(p[1])); //a_stat
-	} else {
-		if (!PyObject_TypeCheck(p[1], &PyUnicode_Type)) {
-			return NULL;
-		}
+	if (PyObject_TypeCheck(p[1], &PyUnicode_Type)) {
 		callback = ASCIIStringFromPy<std::string>(p[1]); // callback
-	}
-	v[0] = static_cast<int>(PyLong_AsLong(p[0]));
-
-	for (int i = 2; i < 9; i++) {
-		if (!PyObject_TypeCheck(p[i], &PyLong_Type)) {
-			return NULL;
-		}
-		v[i] = static_cast<int>(PyLong_AsLong(p[i]));
-	}
-
-	if (p[9]) {
-		for (int i = 9; i < 13; i++) {
-			if (!PyObject_TypeCheck(p[i], &PyLong_Type)) {
-				return NULL;
-			}
-			v[i] = static_cast<int>(PyLong_AsLong(p[i]));
-		}
 	}
 
 	GET_GAME();
 
-	const Actor *actor = game->FindPC(v[0]);
+	const Actor *actor = game->FindPC(pc);
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
@@ -10168,10 +10136,11 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 		std::string fname = fmt::format("Check_{}", callback);
 
 		ScriptEngine::FunctionParameters params;
+		params.push_back(ScriptEngine::Parameter(p[0]));
 		for (int i = 3; i < 13; i++) {
-			params.push_back(ScriptEngine::Parameter(v[i]));
+			params.push_back(ScriptEngine::Parameter(p[i]));
 		}
-		
+
 		PyObject* pValue = gs->RunPyFunction("Feats", fname.c_str(), params);
 		if (pValue) {
 			return pValue;
@@ -10180,25 +10149,39 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	}
 
 	bool ret = true;
+	auto CheckStat = [actor](PyObject* o1, PyObject* o2, int op)
+	{
+		int stat = static_cast<int>(PyLong_AsLong(o1));
+		int value = static_cast<int>(PyLong_AsLong(o2));
+		return DiffCore(actor->GetBase(stat), value, op);
+	};
 
-	if (v[1] || v[2]) {
-		ret = CheckStat(actor, v[1], v[2], v[9]);
+	if (p[1] || p[2]) {
+		int op = p[9] ? static_cast<int>(PyLong_AsLong(p[9])) : GREATER_OR_EQUALS;
+		ret = CheckStat(p[1], p[2], op);
 	}
 
-	if (v[3] || v[4]) {
-		ret |= CheckStat(actor, v[3], v[4], v[10]);
+	if (p[3] || p[4]) {
+		int op = p[10] ? static_cast<int>(PyLong_AsLong(p[10])) : GREATER_OR_EQUALS;
+		ret |= CheckStat(p[3], p[4], op);
 	}
 
 	if (!ret)
 		goto endofquest;
 
-	if (v[5] || v[6]) {
+	if (p[5] || p[6]) {
 		// no | because the formula is (a|b) & (c|d)
-		ret = CheckStat(actor, v[5], v[6], v[11]);
+		int op = p[11] ? static_cast<int>(PyLong_AsLong(p[11])) : GREATER_OR_EQUALS;
+		ret = CheckStat(p[5], p[6], op);
 	}
 
-	if (v[7] || v[8]) {
-		ret |= CheckStat(actor, v[7], v[8], v[12]);
+	if (p[7] || p[8]) {
+		int op = p[12] ? static_cast<int>(PyLong_AsLong(p[12])) : GREATER_OR_EQUALS;
+		ret |= CheckStat(p[7], p[8], op);
+	}
+	
+	if (PyErr_Occurred()) {
+		return RuntimeError("Invalid parameter; expected a number.");
 	}
 
 endofquest:
@@ -13549,6 +13532,8 @@ static PyObject* ParamToPython(const GUIScript::Parameter& p)
 	} else if (type == typeid(View*)) {
 		const View* view = p.Value<View*>();
 		return gs->ConstructObjectForScriptable(view->GetScriptingRef());
+	} else if (type == typeid(PyObject*)) {
+		return p.Value<PyObject*>();
 	} else {
 		Log(ERROR, "GUIScript", "Unknown parameter type: %s", type.name());
 		// need to insert a None placeholder so remaining parameters are correct
