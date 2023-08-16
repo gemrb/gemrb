@@ -126,9 +126,9 @@ def OpenSkillsWindow(chargen, level=0):
 		ClassColumn = GemRB.GetVar ("BaseClass") - 1
 	else:
 		pc = GemRB.GameGetSelectedPCSingle ()
-		LevelDiff = GemRB.GetVar ("LevelDiff")
+		LevelDiff = GemRB.GetVar ("LevelDiff") or 0
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + LevelDiff
-		BaseClass = GemRB.GetVar ("LUClass")
+		BaseClass = GemRB.GetVar ("LUClass") or 0
 		ClassColumn = BaseClass
 
 	PointsLeft = SkillPtsTable.GetValue (0, ClassColumn)

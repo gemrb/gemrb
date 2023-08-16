@@ -1550,7 +1550,7 @@ def SkillsPress():
 		AppearanceButton.SetState (IE_GUI_BUTTON_ENABLED)
 		AppearanceButton.MakeDefault()
 
-		Race = GemRB.GetVar ("HatedRace")
+		Race = GemRB.GetVar ("HatedRace") or 0
 		GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, Race)
 
 		ProfCount = ProficienciesTable.GetRowCount ()
