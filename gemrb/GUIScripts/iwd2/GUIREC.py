@@ -1236,7 +1236,7 @@ def LUClassPress ():
 
 	# display class info
 	TextArea = Window.GetControl (13)
-	i = GemRB.GetVar ("LUClass")
+	i = GemRB.GetVar ("LUClass") or 0
 	ClassDesc = CommonTables.Classes.GetRowName (i)
 	ClassDesc = CommonTables.Classes.GetValue (ClassDesc, "DESC_REF", GTV_REF)
 	TextArea.SetText (ClassDesc)
@@ -1384,8 +1384,8 @@ def LUKitPress ():
 
 	# display kit info
 	TextArea = Window.GetControl (13)
-	i = GemRB.GetVar ("LUKit")
-	LUClass = GemRB.GetVar ("LUClass")
+	i = GemRB.GetVar ("LUKit") or 0
+	LUClass = GemRB.GetVar ("LUClass") or 0
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
 	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
 	kitOffset = CommonTables.Classes.FindValue ("CLASS", LUClassID)
@@ -1429,17 +1429,17 @@ def LUNextPress ():
 def FinishLevelUp():
 	# kit
 	pc = GemRB.GameGetSelectedPCSingle ()
-	LUKit = GemRB.GetVar ("LUKit")
+	LUKit = GemRB.GetVar ("LUKit") or 0
 
 	# saving throws
-	LUClass = GemRB.GetVar ("LUClass") # index, not ID
+	LUClass = GemRB.GetVar ("LUClass") or 0 # index, not ID
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
 	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
 	IDLUCommon.SetupSavingThrows (pc, LUClassID)
 
 	# hit points
 	Levels = [ GemRB.GetPlayerStat (pc, l) for l in IDLUCommon.Levels ]
-	LevelDiff = GemRB.GetVar ("LevelDiff")
+	LevelDiff = GemRB.GetVar ("LevelDiff") or 0
 	LevelDiffs = [ 0 ] * len(Levels)
 	LevelDiffs[LUClass] = LevelDiff
 	# SetupHP expects the target level already

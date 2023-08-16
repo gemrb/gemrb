@@ -99,7 +99,7 @@ def OnLoad():
 	return
 
 def RacePress():
-	Race = GemRB.GetVar("HatedRace")
+	Race = GemRB.GetVar("HatedRace") or 0
 	Row = RaceTable.FindValue(1, Race)
 	TextAreaControl.SetText(RaceTable.GetValue(Row, 2) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)

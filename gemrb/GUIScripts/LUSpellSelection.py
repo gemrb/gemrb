@@ -162,7 +162,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	Memorization = 0
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	if IWD2 and not chargen:
-		LUClass = GemRB.GetVar ("LUClass")
+		LUClass = GemRB.GetVar ("LUClass") or 0
 		LUClassName = CommonTables.Classes.GetRowName (LUClass)
 		LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
 		Class = LUClassID

@@ -40,12 +40,12 @@ def SetupSpellsWindow(chargen=0):
 		KitValue = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	else:
 		MyChar = GemRB.GameGetSelectedPCSingle ()
-		ClassIndex = GemRB.GetVar ("LUClass")
+		ClassIndex = GemRB.GetVar ("LUClass") or 0
 		ClassName = GUICommon.GetClassRowName (ClassIndex, "index")
-		LevelDiff = GemRB.GetVar ("LevelDiff")
+		LevelDiff = GemRB.GetVar ("LevelDiff") or 0
 		Level = GemRB.GetPlayerStat (MyChar, IE_CLASSLEVELSUM)
 		# this is only used for detecting specialists!
-		KitValue = GemRB.GetVar ("LUKit")
+		KitValue = GemRB.GetVar ("LUKit") or 0
 
 	SpellTableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL")
 

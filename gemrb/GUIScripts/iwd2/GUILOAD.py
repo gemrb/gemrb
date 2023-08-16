@@ -81,7 +81,7 @@ def OnLoad ():
 
 def ScrollBarPress ():
 	#draw load game portraits
-	Pos = GemRB.GetVar ("TopIndex")
+	Pos = GemRB.GetVar ("TopIndex") or 0
 	for i in range (5):
 		ActPos = Pos + i
 

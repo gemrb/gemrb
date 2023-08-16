@@ -77,7 +77,7 @@ def IsFeatUsable(feat):
 		vals = [ a_value, b_value, c_value, d_value ]
 		for i in range(len(stats)):
 			if stats[i] == LUStat:
-				vals[i] -= GemRB.GetVar ("LevelDiff")
+				vals[i] -= GemRB.GetVar ("LevelDiff") or 0
 				vals[i] = max(0, vals[i])
 				# there must be a better way (using append() to construct the list (same id) is not enough)!?
 				a_value = vals[0]
@@ -225,15 +225,15 @@ def OpenFeatsWindow(chargen=0):
 		RaceIndex = Race
 		# instead of the base class, lookup its kit if any
 		# luckily you can only have one kit per class
-		ClassIndex = GemRB.GetVar ("LUClass")
-		KitID = GemRB.GetVar ("LUKit")
+		ClassIndex = GemRB.GetVar ("LUClass") or 0
+		KitID = GemRB.GetVar ("LUKit") or 0
 		# for faking having leveled up already, so the level checks work
 		LUStat = IDLUCommon.Levels[ClassIndex]
 		if KitID != 0:
 			KitIndex = CommonTables.Classes.FindValue ("ID", KitID)
 			ClassIndex = KitIndex
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + 1
-		LevelDiff = GemRB.GetVar ("LevelDiff")
+		LevelDiff = GemRB.GetVar ("LevelDiff") or 0
 		ButtonCount = 9
 		# give monks their free improved evasion at level 9, so we don't have to add a feat granting opcode
 		# just check for monk tohit table, so we get the kits too

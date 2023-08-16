@@ -77,8 +77,8 @@ def OpenEnemyWindow(chargen=0):
 	else:
 		RaceWindow = GemRB.LoadWindow (16, "GUIREC")
 		pc = GemRB.GameGetSelectedPCSingle ()
-		Class = GemRB.GetVar ("LUClass") + 1
-		LevelDiff = GemRB.GetVar ("LevelDiff")
+		Class = (GemRB.GetVar ("LUClass") or 0) + 1
+		LevelDiff = GemRB.GetVar ("LevelDiff") or 0
 		rangerLevel = GemRB.GetPlayerStat (pc, IE_LEVELRANGER)
 		rankDiff = (rangerLevel+LevelDiff)//5 - rangerLevel//5
 
@@ -171,7 +171,7 @@ def NextPress(save=1):
 
 		# save, but note that racial enemies are stored in many stats
 		pc = GemRB.GameGetSelectedPCSingle ()
-		newHated = GemRB.GetVar ("HatedRace")
+		newHated = GemRB.GetVar ("HatedRace") or 0
 		GemRB.SetPlayerStat (pc, RacialStats[last], newHated)
 
 	# open up the next levelup window
