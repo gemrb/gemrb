@@ -261,11 +261,26 @@ def ItemPress(func, slotItem, *args):
 		btn.Window.Close()
 	return Pressed
 
-def DisplayItem (slotItem, itemtype):
-	item = GemRB.GetItem (slotItem["ItemResRef"])
-
+def DisplayItem (slotItem, ground = False):
 	Window = GemRB.LoadWindow (5, "GUIINV")
 
+	def Update():
+		#the ground items are only displayable
+		if slotItem["Flags"] & IE_INV_ITEM_IDENTIFIED:
+			value = 0
+		else:
+			value = 2
+
+		if not ground:
+			value += 1
+
+		UpdateItemDisplay(Window, slotItem, value)
+
+	Window.OnFocus(Update)
+	Update()
+
+def UpdateItemDisplay(Window, slotItem, itemtype):
+	item = GemRB.GetItem (slotItem["ItemResRef"])
 	if GameCheck.IsPST():
 		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
 	elif GameCheck.IsGemRBDemo ():
@@ -451,7 +466,7 @@ def OpenItemInfoWindow (slotItem, pc):
 
 	# PST: if the slot is empty but is also the first quick weapon slot, display the info for the "default" weapon
 	if GameCheck.IsPST() and slotItem is None and slotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
-		DisplayItem (GemRB.GetSlotItem (pc, 0), 1)
+		DisplayItem (GemRB.GetSlotItem (pc, 0))
 		return
 
 	item = GemRB.GetItem (slotItem["ItemResRef"])
@@ -459,11 +474,7 @@ def OpenItemInfoWindow (slotItem, pc):
 	if TryAutoIdentification(pc, item, slotItem["Slot"], slotItem, True, True):
 		UpdateInventoryWindow ()
 
-	if slotItem["Flags"] & IE_INV_ITEM_IDENTIFIED:
-		value = 1
-	else:
-		value = 3
-	DisplayItem (slotItem, value)
+	DisplayItem (slotItem)
 	return
 
 # auto identify when lore is high enough
@@ -532,12 +543,7 @@ def OpenGroundItemInfoWindow (btn):
 	slot = btn.Value
 	slot_item = GemRB.GetContainerItem (pc, slot)
 
-	#the ground items are only displayable
-	if slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
-		value = 0
-	else:
-		value = 2
-	DisplayItem(slot_item, value)
+	DisplayItem(slot_item, True)
 	return
 
 def OpenGroundItemAmountWindow (btn):
@@ -948,6 +954,7 @@ def IdentifyUseSpell (slotItem, pc):
 
 	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
 	GemRB.ChangeItemFlag (pc, slotItem["Slot"], IE_INV_ITEM_IDENTIFIED, OP_OR)
+	slotItem["Flags"] |= IE_INV_ITEM_IDENTIFIED
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
@@ -962,6 +969,7 @@ def IdentifyUseScroll (slotItem, pc):
 
 	if GemRB.HasSpecialItem (pc, 1, 1):
 		GemRB.ChangeItemFlag (pc, slotItem["Slot"], IE_INV_ITEM_IDENTIFIED, OP_OR)
+		slotItem["Flags"] |= IE_INV_ITEM_IDENTIFIED
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
