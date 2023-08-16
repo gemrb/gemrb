@@ -255,6 +255,12 @@ def GetItemDescription (item, itemtype):
 	text = searchRE.sub(replacement, text)
 	return text
 
+def ItemPress(func, slotItem, *args):
+	def Pressed(btn):
+		func(slotItem, *args)
+		btn.Window.Close()
+	return Pressed
+
 def DisplayItem (slotItem, itemtype):
 	item = GemRB.GetItem (slotItem["ItemResRef"])
 
@@ -303,14 +309,15 @@ def DisplayItem (slotItem, itemtype):
 	#left button
 	Button = Window.GetControl(8)
 	select = (itemtype & 1) and (item["Function"]&ITM_F_ABILITIES)
+	pc = GemRB.GameGetSelectedPCSingle ()
 
 	if itemtype & 2:
 		Button.SetText (strrefs[1])
-		Button.OnPress (IdentifyItemWindow)
+		Button.OnPress (lambda: IdentifyItemWindow(slotItem, pc))
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	elif select and not GameCheck.IsPST():
 		Button.SetText (strrefs[2])
-		Button.OnPress (AbilitiesItemWindow)
+		Button.OnPress (lambda: AbilitiesItemWindow(slotItem, pc))
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	else:
 		Button.SetText ("")
@@ -334,7 +341,6 @@ def DisplayItem (slotItem, itemtype):
 	drink = (itemtype & 1) and (item["Function"]&ITM_F_DRINK)
 	read = (itemtype & 1) and (item["Function"]&ITM_F_READ)
 	# only mages and bards can learn spells
-	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassName = GUICommon.GetClassRowName (pc)
 	if not (GemRB.GetPlayerStat (pc, IE_LEVELBARD) or GemRB.GetPlayerStat (pc, IE_LEVELMAGE) or ClassName != "MAGE"):
 		read = 0
@@ -361,20 +367,14 @@ def DisplayItem (slotItem, itemtype):
 	if GameCheck.IsPST() and slotItem["Flags"] & IE_INV_ITEM_CONVERSABLE:
 
 		drink = True # "Use"
-		
-	def ItemPress(func, *args):
-		def Pressed():
-			func(slotItem, *args)
-			Window.Close()
-		return Pressed
 
 	if drink and not dialog:
 		# Standard consumable item
 		Button.SetText (strrefs[3])
-		Button.OnPress (ItemPress(ConsumeItem, pc))
+		Button.OnPress (ItemPress(ConsumeItem, slotItem, pc))
 	elif read:
 		Button.SetText (strrefs[4])
-		Button.OnPress (ItemPress(ReadItemWindow, pc))
+		Button.OnPress (ItemPress(ReadItemWindow, slotItem, pc))
 	elif container:
 		# Just skip the redundant info page and go directly to the container
 		if GemRB.GetVar("GUIEnhancements")&GE_ALWAYS_OPEN_CONTAINER_ITEMS:
@@ -388,7 +388,7 @@ def DisplayItem (slotItem, itemtype):
 		else:
 			# a fallback, since the originals have nothing appropriate from not having any bags
 			Button.SetText ("Open container")
-		Button.OnPress (ItemPress(OpenItemWindow))
+		Button.OnPress (ItemPress(OpenItemWindow, slotItem))
 	elif dialog:
 		if drink:
 			# Dialog item that is 'used'
@@ -396,12 +396,12 @@ def DisplayItem (slotItem, itemtype):
 		else:
 			# Dialog item that is 'talked to'
 			Button.SetText (strrefs[5])
-		Button.OnPress (ItemPress(DialogItemWindow, pc))
+		Button.OnPress (ItemPress(DialogItemWindow, slotItem, pc))
 	elif familiar and not GameCheck.IsPST():
 		# PST earings share a type with familiars, so no
 		# mods that allow familiars would be possible in PST
 		Button.SetText (4373)
-		Button.OnPress (ItemPress(ReleaseFamiliar, pc))
+		Button.OnPress (ItemPress(ReleaseFamiliar, slotItem, pc))
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -943,47 +943,41 @@ def DialogItemWindow (slot_item, pc):
 	GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
 	return
 
-def IdentifyUseSpell (btn):
+def IdentifyUseSpell (slotItem, pc):
 	"""Identifies the item with a memorized spell."""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = btn.Value
 	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
-	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	GemRB.ChangeItemFlag (pc, slotItem["Slot"], IE_INV_ITEM_IDENTIFIED, OP_OR)
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
 	else:
 		GemRB.PlaySound (DEF_IDENTIFY)
 	btn.Window.Close()
-	OpenItemInfoWindow(GemRB.GetSlotItem(pc, btn.Value), pc)
+	OpenItemInfoWindow(slotItem, pc)
 	return
 
-def IdentifyUseScroll (btn):
+def IdentifyUseScroll (slotItem, pc):
 	"""Identifies the item with a scroll or other item."""
 
-	pc = GemRB.GameGetSelectedPCSingle ()
 	if GemRB.HasSpecialItem (pc, 1, 1):
-		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+		GemRB.ChangeItemFlag (pc, slotItem["Slot"], IE_INV_ITEM_IDENTIFIED, OP_OR)
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
 	else:
 		GemRB.PlaySound (DEF_IDENTIFY)
-	btn.Window.Close()
-	OpenItemInfoWindow(GemRB.GetSlotItem(pc, btn.Value), pc)
+	OpenItemInfoWindow(slotItem, pc)
 	return
 
-def IdentifyItemWindow ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-
+def IdentifyItemWindow (slotItem, pc):
 	Window = GemRB.LoadWindow (9, "GUIINV")
 	Button = Window.GetControl (0)
 	if GameCheck.IsPST():
 		Button.SetText (4259)
 	else:
 		Button.SetText (17105)
-	Button.OnPress (IdentifyUseSpell)
+	Button.OnPress (ItemPress(IdentifyUseSpell, slotItem, pc))
 	if not GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -992,7 +986,7 @@ def IdentifyItemWindow ():
 		Button.SetText (4260)
 	else:
 		Button.SetText (17106)
-	Button.OnPress (IdentifyUseScroll)
+	Button.OnPress (ItemPress(IdentifyUseScroll, slotItem, pc))
 	if not GemRB.HasSpecialItem (pc, 1, 0):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
@@ -1012,17 +1006,13 @@ def IdentifyItemWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def DoneAbilitiesItemWindow (btn):
-	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.SetupQuickSlot (pc, 0, btn.Value, GemRB.GetVar ("Ability"))
-	CloseAbilitiesItemWindow ()
+def DoneAbilitiesItemWindow (slot_item, pc):
+	GemRB.SetupQuickSlot (pc, 0, slot_item["Slot"], GemRB.GetVar ("Ability"))
 	return
 
-def AbilitiesItemWindow (btn):
+def AbilitiesItemWindow (slot_item, pc):
 	Window = GemRB.LoadWindow (6, "GUIINV")
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot_item = GemRB.GetSlotItem (pc, btn.Value)
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 	Tips = item["Tooltips"]
 
@@ -1048,7 +1038,7 @@ def AbilitiesItemWindow (btn):
 
 	Button = Window.GetControl (7)
 	Button.SetText (11973)
-	Button.OnPress (DoneAbilitiesItemWindow)
+	Button.OnPress (ItemPress(DoneAbilitiesItemWindow, slot_item, pc))
 	Button.MakeDefault()
 
 	Button = Window.GetControl (10)
