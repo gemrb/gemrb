@@ -8775,6 +8775,7 @@ the slot will not be looked up again.\n\
     * IE_INV_ITEM_STACKED = 0x80,   The item is a stacked item.\n\
   * 'Header'  - Item's extended header assigned to the inventory slot (the\n\
   ability to use). Only applicable to quickslots.\n\
+  * 'Slot'  - The same as the slot parameter.\n\
 \n\
 **See also:** [GetItem](GetItem.md), [Button_SetItemIcon](Button_SetItemIcon.md), [ChangeItemFlag](ChangeItemFlag.md)"
 );
