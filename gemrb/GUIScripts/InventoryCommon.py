@@ -37,8 +37,6 @@ StackAmount = 0
  # A map that defines which inventory slots are used per character (PST)
 SlotMap = None
 
-UpdateInventoryWindow = None
-
 def InventoryClosed(win):
 	GemRB.LeaveContainer()
 	if GemRB.IsDraggingItem () == 1:
@@ -69,7 +67,6 @@ def OnDragItemGround (btn):
 	else:
 		GemRB.DropDraggedItem (pc, -2) #dropping on ground
 
-	UpdateInventoryWindow ()
 	return
 
 def OnAutoEquip ():
@@ -86,7 +83,6 @@ def OnAutoEquip ():
 	if GemRB.IsDraggingItem ()==1:
 		GemRB.PlaySound("GAM_47") #failed equip
 
-	UpdateInventoryWindow ()
 	return
 
 def OnDragItem (btn):
@@ -152,7 +148,6 @@ def OnDragItem (btn):
 			if GemRB.GetPlayerStat (pc, IE_STATE_ID) & (STATE_BERSERK) and GemRB.IsDraggingItem ():
 				GemRB.DropDraggedItem (pc, -3)
 
-	UpdateInventoryWindow ()
 	return
 
 def OnDropItemToPC (pc):
@@ -165,7 +160,6 @@ def OnDropItemToPC (pc):
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
-	UpdateInventoryWindow ()
 	return
 
 def DecreaseStackAmount ():
@@ -471,9 +465,7 @@ def OpenItemInfoWindow (slotItem, pc):
 
 	item = GemRB.GetItem (slotItem["ItemResRef"])
 
-	if TryAutoIdentification(pc, item, slotItem["Slot"], slotItem, True, True):
-		UpdateInventoryWindow ()
-
+	TryAutoIdentification(pc, item, slotItem["Slot"], slotItem, True, True)
 	DisplayItem (slotItem)
 	return
 
@@ -554,7 +546,6 @@ def ItemAmountWindowClosed(win):
 
 	ItemAmountWindow = None
 	UsedSlot = None
-	UpdateInventoryWindow()
 
 def OpenItemAmountWindow (btn, location = "inventory"):
 	"""Open the split window."""
@@ -767,7 +758,6 @@ def ColorDonePress():
 		GUICommon.SetColorStat (pc, IE_MAJOR_COLOR, PickedColor)
 	else:
 		GUICommon.SetColorStat (pc, IE_MINOR_COLOR, PickedColor)
-	UpdateInventoryWindow ()
 	return
 
 def HairPress():

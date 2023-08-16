@@ -126,11 +126,8 @@ def InitInventoryWindow (Window):
 	GemRB.GamePause(0, 0)
 	return
 
-def UpdateInventoryWindow (Window = None):
+def UpdateInventoryWindow (Window):
 	"""Redraws the inventory window and resets TopIndex."""
-
-	if Window == None:
-		Window = GemRB.GetView("WIN_INV")
 
 	Window.OnClose(InventoryCommon.InventoryClosed)
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -148,8 +145,6 @@ def UpdateInventoryWindow (Window = None):
 
 ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
 OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
-
-InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
 def RefreshInventoryWindow (Window):
 	"""Partial redraw without resetting TopIndex."""
