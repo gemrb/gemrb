@@ -9263,6 +9263,10 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 		AttackEffect->Projectile = projectileAnim;
 		AttackEffect->Target = FX_TARGET_PRESET;
 		AttackEffect->Parameter3 = 1;
+		AttackEffect->SourceType = 1;
+		AttackEffect->SourceRef = itemRef;
+		AttackEffect->CasterID = GetGlobalID();
+		AttackEffect->VariableName = scriptName;
 		if (pstflags) {
 			AttackEffect->IsVariable = GetCriticalType();
 		} else {
