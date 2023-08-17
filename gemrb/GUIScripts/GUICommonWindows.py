@@ -1385,12 +1385,12 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 
 			optwin = GemRB.GetView("OPTWIN")
 			if optwin:
+				if btn:
+					btn.SetState(IE_GUI_BUTTON_SELECTED)
+					GemRB.SetVar ("OPTBTN", btn.ID)
 				rtgbtn = optwin.GetControl(0) # return to game button
-			if optwin and rtgbtn: # not in PST or IWD2
-				rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
-			if btn:
-				btn.SetState(IE_GUI_BUTTON_SELECTED)
-				GemRB.SetVar ("OPTBTN", btn.ID)
+				if rtgbtn: # not in PST or IWD2
+					rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
 			
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
