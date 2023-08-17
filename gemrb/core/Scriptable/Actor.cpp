@@ -203,6 +203,8 @@ static void InitActorTables();
 
 #define DAMAGE_LEVELS 19
 
+// ANIMATION1 in dmgtypes.2da, except it only has fire, electricity, cold AND no levels
+// we have both maps in damage.2da, plus the gradient info in d_gradient
 static ResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
 	"BLOODCR","BLOODS","BLOODM","BLOODL", //blood
@@ -212,6 +214,7 @@ static ResRef d_main[DAMAGE_LEVELS] = {
 	"SHACID","SHACID","SHACID",           //acid
 	"SPDUSTY2","SPDUSTY2","SPDUSTY2"      //disintegrate
 };
+// ANIMATION2 in dmgtypes.2da with the same limitations
 static ResRef d_splash[DAMAGE_LEVELS] = {
 	"","","","",
 	"SPBURN","SPBURN","SPBURN", //flames
@@ -4453,15 +4456,24 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 	int type;
 	bool levels = true;
 
+	// SOUND column in ee dmgtypes.2da
 	switch(damagetype) {
 		case DAMAGE_PIERCING: type = 1; break; //piercing
 		case DAMAGE_SLASHING: type = 2; break; //slashing
 		case DAMAGE_CRUSHING: type = 3; break; //crushing
 		case DAMAGE_MISSILE: type = 4; break;  //missile
 		case DAMAGE_ELECTRICITY: type = 5; levels = false; break; //electricity
-		case DAMAGE_COLD: type = 6; levels = false; break;     //cold
+		case DAMAGE_COLD:
+		case DAMAGE_MAGICCOLD:
+			type = 6;
+			levels = false;
+			break;
 		case DAMAGE_MAGIC: type = 7; levels = false; break;
 		case DAMAGE_STUNNING: type = -3; break;
+		case DAMAGE_FIRE: // the only odd one out
+		case DAMAGE_MAGICFIRE:
+			core->GetAudioDrv()->Play("FIRE", SFX_CHAN_HITS, Pos);
+			return;
 		default: return;                       //other
 	}
 
