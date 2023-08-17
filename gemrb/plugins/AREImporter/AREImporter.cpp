@@ -2320,9 +2320,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 			size_t len = 0;
 			// limited to 500 *bytes* of text, convert to a multibyte encoding.
 			// we convert to MB because it fits more than if we wrote the wide characters
-			std::string mbstring = MBStringFromString(mn.text);
-			// FIXME: depends on locale blah blah (see MBStringFromString definition)
-			// only care about number of bytes before null so strlen is what we want despite being MB string
+			std::string mbstring = TLKStringFromString(mn.text);
 			len = std::min<size_t>(mbstring.length(), 500);
 			stream->Write(mbstring.c_str(), len);
 

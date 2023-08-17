@@ -34,6 +34,14 @@
 #include "globals.h"
 #include "SClassID.h"
 
+#ifdef WIN32
+#include "../../platforms/windows/WindowsFile.h"
+using FileT = GemRB::WindowsFile;
+#else
+#include "PosixFile.h"
+using FileT = GemRB::PosixFile;
+#endif
+
 namespace GemRB {
 
 /**
@@ -41,71 +49,13 @@ namespace GemRB {
  * Reads and writes data from/to files on a filesystem
  */
 
-struct File {
-private:
-	FILE* file = nullptr;
-public:
-	explicit File(FILE* f) : file(f) {}
-	File() noexcept = default;
-	File(const File&) = delete;
-	File(File&& f) noexcept {
-		file = f.file;
-		f.file = nullptr;
-	}
-	~File() {
-		if (file) fclose(file);
-	}
-	
-	File& operator=(const File&) = delete;
-	File& operator=(File&& f) noexcept {
-		if (&f != this) {
-			std::swap(file, f.file);
-		}
-		return *this;
-	}
-
-	strpos_t Length() {
-		fseek(file, 0, SEEK_END);
-		strpos_t size = ftell(file);
-		fseek(file, 0, SEEK_SET);
-		return size;
-	}
-	bool OpenRO(const path_t& name) {
-		return (file = fopen(name.c_str(), "rb"));
-	}
-	bool OpenRW(const path_t& name) {
-		return (file = fopen(name.c_str(), "r+b"));
-	}
-	bool OpenNew(const path_t& name) {
-		return (file = fopen(name.c_str(), "wb"));
-	}
-	strret_t Read(void* ptr, size_t length) {
-		return fread(ptr, 1, length, file);
-	}
-	strret_t Write(const void* ptr, strpos_t length) {
-		return fwrite(ptr, 1, length, file);
-	}
-	bool SeekStart(stroff_t offset)
-	{
-		return !fseek(file, offset, SEEK_SET);
-	}
-	bool SeekCurrent(stroff_t offset)
-	{
-		return !fseek(file, offset, SEEK_CUR);
-	}
-	bool SeekEnd(stroff_t offset)
-	{
-		return !fseek(file, offset, SEEK_END);
-	}
-};
-
 class GEM_EXPORT FileStream : public DataStream {
 private:
-	File str;
+	FileT str;
 	bool opened = true;
 	bool created = true;
 public:
-	explicit FileStream(File&&);
+	explicit FileStream(FileT&&);
 	FileStream(void);
 
 	DataStream* Clone() const noexcept override;

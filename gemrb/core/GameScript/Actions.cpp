@@ -6080,14 +6080,15 @@ void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
 	if (core->HasFeature(GFFlags::STRREF_SAVEGAME)) {
-		std::string basename = "Auto-Save";
+		String basename = u"Auto-Save";
 		AutoTable tab = gamedata->LoadTable("savegame");
 		if (tab) {
-			basename = tab->QueryDefault();
+			basename = StringFromCString(tab->QueryDefault().c_str());
 		}
 		String str = core->GetString(ieStrRef(parameters->int0Parameter), STRING_FLAGS::STRREFOFF);
-		std::string FolderName = fmt::format("{} - {}", basename, fmt::WideToChar{str});
-		core->GetSaveGameIterator()->CreateSaveGame(core->GetSaveGameIterator()->GetSaveGame(FolderName), FolderName, true);
+		String FolderName = fmt::format(u"{} - {}", basename, str);
+		auto saveGame = core->GetSaveGameIterator()->GetSaveGame(FolderName);
+		core->GetSaveGameIterator()->CreateSaveGame(saveGame, FolderName);
 	} else {
 		core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter);
 	}

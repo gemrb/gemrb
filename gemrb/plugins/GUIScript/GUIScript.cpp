@@ -3779,7 +3779,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	}
 
 	//get soundset based string constant
-	std::string sound = fmt::format("{}/{}{:02d}", actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
+	std::string sound = fmt::format("{}{}{}{:02d}", fmt::WideToChar{actor->PCStats->SoundFolder}, PathDelimiter, actor->PCStats->SoundSet, str);
 	channel = actor->InParty ? SFX_CHAN_CHAR0 + actor->InParty - 1 : SFX_CHAN_DIALOG;
 	core->GetAudioDrv()->Play(sound, channel, Point(), GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	Py_RETURN_NONE;
@@ -3834,7 +3834,11 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 			channel = core->GetAudioDrv()->GetChannel(channel_name);
 		}
 
-		core->GetAudioDrv()->Play(PyString_AsStringView(pyref), channel, pos, flags);
+		if (PyUnicode_Check(pyref)) {
+			core->GetAudioDrv()->Play(PyString_AsStringObj(pyref), channel, pos, flags);
+		} else {
+			core->GetAudioDrv()->Play(PyString_AsStringView(pyref), channel, pos, flags);
+		}
 	}
 
 	Py_RETURN_NONE;
@@ -3978,7 +3982,7 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	PyObject* value;
 	PARSE_ARGS(args, "OO", &Variable, &value);
 
-	if(PyUnicode_Check(value)) {
+	if (PyUnicode_Check(value)) {
 		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = PyString_AsStringObj(value);
 	} else {
 		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = StringFromCString(PyBytes_AsString(value));
@@ -4477,8 +4481,9 @@ static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS(args, "O", &Slot);
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-	const std::string& name = save->GetName();
-	return PyUnicode_Decode(name.c_str(), name.length(), core->config.SystemEncoding.c_str(), "strict");
+	auto name = save->GetName();
+
+	return PyString_FromStringObj(name);
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetDate__doc,
@@ -4697,7 +4702,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			if (name[0] == '.' || dirit.IsDirectory() != dirs)
 				continue;
 
-			String string = StringFromFSString(name.c_str());
+			String string = StringFromUtf8(name.c_str());
 
 			if (dirs == false) {
 				size_t pos = string.find_last_of(u'.');
@@ -4752,7 +4757,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 	for (int i = 0; i < PyList_Size(list); i++) {
 		item = PyList_GetItem(list, i);
 		String string;
-		if(!PyUnicode_Check(item)) {
+		if (!PyUnicode_Check(item)) {
 			if (PyLong_Check(item)) {
 				string = String(core->GetString(StrRefFromPy(item)));
 			} else {
@@ -5571,13 +5576,13 @@ PyDoc_STRVAR( GemRB_SetPlayerSound__doc,
 
 static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 {
-	const char *Sound=NULL;
+	PyObject *Sound = nullptr;
 	int globalID;
-	PARSE_ARGS( args,  "is", &globalID, &Sound );
+	PARSE_ARGS(args,  "iO", &globalID, &Sound);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	actor->SetSoundFolder(ieVariable(Sound));
+	actor->SetSoundFolder(PyString_AsStringObj(Sound));
 	Py_RETURN_NONE;
 }
 
@@ -5606,17 +5611,9 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	ResRef ignore;
-	std::string sound = actor->GetSoundFolder(flag, ignore);
+	auto sound = actor->GetSoundFolder(flag, ignore);
 
-	// System encoding may fail if there is a save game loaded from the original
-	// game that uses TLK encoding for the path
-	PyObject* playerSound = PyString_FromSystemStringObj(sound);
-	if (playerSound == nullptr) {
-		PyErr_Clear();
-		playerSound = PyString_FromStringObj(sound);
-	}
-
-	return playerSound;
+	return PyString_FromStringObj(sound);
 }
 
 PyDoc_STRVAR( GemRB_GetSlotType__doc,
@@ -10458,7 +10455,13 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 	int ResType;
 	int silent = 0;
 	PARSE_ARGS( args,  "Oi|i", &ResRef, &ResType, &silent );
-	RETURN_BOOL(gamedata->Exists(PyString_AsStringView(ResRef), ResType, silent));
+
+	if (PyUnicode_Check(ResRef)) {
+		// This may be checking of IWD2 sound folders
+		RETURN_BOOL(gamedata->Exists(PyString_AsStringObj(ResRef), ResType, silent));
+	} else {
+		RETURN_BOOL(gamedata->Exists(PyString_AsStringView(ResRef), ResType, silent));
+	}
 }
 
 PyDoc_STRVAR( GemRB_Window_SetupEquipmentIcons__doc,

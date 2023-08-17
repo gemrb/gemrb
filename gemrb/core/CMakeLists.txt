@@ -105,7 +105,9 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Streams/FileCache.cpp
 	Streams/FileStream.cpp
 	Streams/MemoryStream.cpp
+	Streams/PosixFile.cpp
 	Streams/SlicedStream.cpp
+	Strings/UTF8Comparison.cpp
 	Strings/String.cpp
 	Strings/StringConversion.cpp
 	System/swab.cpp
@@ -133,6 +135,7 @@ IF(WIN32)
 		${gemrb_core_LIB_SRCS}
 		../../platforms/windows/CodepageToIconv.cpp
 		../../platforms/windows/CodepageToIconvMap.cpp
+		../../platforms/windows/WindowsFile.cpp
 	)
 	INCLUDE_DIRECTORIES(${Iconv_INCLUDE_DIR})
 ENDIF()
@@ -151,6 +154,10 @@ else (STATIC_LINK)
 	  INSTALL(TARGETS gemrb_core LIBRARY DESTINATION ${LIB_DIR})
 	ENDIF(WIN32)
 endif (STATIC_LINK)
+
+IF(WIN32)
+	TARGET_LINK_LIBRARIES(gemrb_core shlwapi)
+ENDIF()
 
 target_compile_definitions(gemrb_core PRIVATE _USE_MATH_DEFINES)
 

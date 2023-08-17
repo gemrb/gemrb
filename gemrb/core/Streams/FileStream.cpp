@@ -33,7 +33,7 @@ namespace GemRB {
 
 #endif
 
-FileStream::FileStream(File&& f)
+FileStream::FileStream(FileT&& f)
 : str(std::move(f))
 {}
 
@@ -50,7 +50,7 @@ DataStream* FileStream::Clone() const noexcept
 
 void FileStream::Close()
 {
-	str = File();
+	str = FileT();
 	opened = false;
 	created = false;
 }

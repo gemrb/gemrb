@@ -236,7 +236,6 @@ PyObject* PyString_FromResRef(const ResRef& resRef);
 PyObject* PyString_FromString(const char* s);
 PyObject* PyString_FromStringView(StringView sv);
 PyObject* PyString_FromStringObj(const std::string&);
-PyObject* PyString_FromSystemStringObj(const std::string&);
 PyObject* PyString_FromStringObj(const String&);
 
 String PyString_AsStringObj(PyObject *obj);

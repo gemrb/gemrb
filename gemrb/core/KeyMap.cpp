@@ -122,7 +122,12 @@ bool KeyMap::ResolveKey(unsigned short key, int group) const
 {
 	// FIXME: key is 2 bytes, but we ignore one. Some non english keyboards won't like this.
 	char keystr[2] = {(char)key, 0};
-	Log(MESSAGE, "KeyMap", "Looking up key: {}({}) ", key, keystr);
+	if (key < 128) {
+		Log(MESSAGE, "KeyMap", "Looking up key: {} ({}) ", key, keystr);
+	} else {
+		// We'd have to convert the codepoint into UTF-8 for non-ASCII numbers
+		Log(MESSAGE, "KeyMap", "Looking up key: {}", key);
+	}
 
 	return ResolveName(keystr, group);
 }

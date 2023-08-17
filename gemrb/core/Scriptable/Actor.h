@@ -594,9 +594,9 @@ public:
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const ResRef&, int Which=0);
-	void SetSoundFolder(const ieVariable& soundset) const;
+	void SetSoundFolder(const String& soundset) const;
 	/* Use overrideSet to replace PCStats->SoundSet */
-	std::string GetSoundFolder(int flag, const ResRef& overrideSet) const;
+	String GetSoundFolder(int flag, const ResRef& overrideSet) const;
 	
 	/** Gets the Character Long Name/Short Name */
 	const String& GetShortName() const

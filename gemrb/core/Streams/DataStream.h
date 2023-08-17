@@ -153,7 +153,7 @@ public:
 	
 	template <typename STR>
 	strret_t WriteString(const STR& src, size_t len) {
-		return Write(src.begin(), len);
+		return Write(src.c_str(), len);
 	}
 	
 	template <typename STR>

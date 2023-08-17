@@ -544,7 +544,9 @@ void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
 	str->ReadResRef( ps->SoundSet );
 
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
-		str->ReadVariable(ps->SoundFolder);
+		ieVariable soundFolder;
+		str->ReadVariable(soundFolder);
+		ps->SoundFolder = StringFromCString(soundFolder.c_str());
 	}
 	
 	//iwd2 has some PC only stats that the player can set (this can be done via a guiscript interface)
@@ -982,7 +984,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
-		std::string tmpstr = MBStringFromString(ac->GetLongName());
+		std::string tmpstr = TLKStringFromString(ac->GetLongName());
 		stream->WriteVariable(ieVariable(tmpstr));
 	} else {
 		std::string tmpstr = core->GetMBString(ac->LongStrRef, STRING_FLAGS::STRREFOFF);
@@ -1012,7 +1014,8 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 	stream->WriteResRefUC(ac->PCStats->SoundSet);
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
-		stream->WriteVariableLC(ac->PCStats->SoundFolder);
+		auto soundFolder = TLKStringFromString(ac->PCStats->SoundFolder);
+		stream->WriteStringLC(soundFolder, ieVariable::Size);
 	}
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		//I don't know how many fields are actually used in IWD2 saved game

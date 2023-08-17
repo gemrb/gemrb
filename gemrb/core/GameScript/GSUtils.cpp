@@ -481,7 +481,7 @@ void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 		actor->GetVerbalConstantSound(soundRef, vc);
 		std::string sound;
 		if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
-			sound = fmt::format("{}/{}", actor->PCStats->SoundFolder, soundRef);
+			sound = fmt::format("{}{}{}", fmt::WideToChar{actor->PCStats->SoundFolder}, PathDelimiter, soundRef);
 		} else {
 			sound = soundRef.c_str();
 		}

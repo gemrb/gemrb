@@ -50,8 +50,8 @@ public:
 	bool AddSource(const path_t& path, const std::string& description, PluginID type, int flags = 0);
 
 	/** returns true if resource exists */
+	bool Exists(const String& resRef, SClass_ID type, bool silent=false) const;
 	bool Exists(StringView resRef, SClass_ID type, bool silent=false) const;
-	/** returns true if resource exists */
 	bool Exists(StringView resRef, const TypeID *type, bool silent=false) const;
 	/** Returns stream associated to given resource */
 	DataStream* GetResourceStream(StringView resname, SClass_ID type, bool silent = false) const;

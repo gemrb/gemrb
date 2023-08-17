@@ -565,7 +565,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 			return;
 	}
 	stream->Write( Signature, 8);
-	std::string tmpstr = MBStringFromString(act->GetShortName());
+	std::string tmpstr = TLKStringFromString(act->GetShortName());
 	stream->WriteVariable(ieVariable(tmpstr));
 	stream->WriteDword(hdrSize); //cre offset (chr header size)
 	stream->WriteDword(CRESize);  //cre size
@@ -620,7 +620,10 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 			stream->WriteDword(act->PCStats->QSlots[i+3]);
 		}
 		stream->WriteFilling(26);
-		stream->WriteVariableLC(act->PCStats->SoundFolder);
+		{
+			auto soundFolder = TLKStringFromString(act->PCStats->SoundFolder);
+			stream->WriteStringLC(soundFolder, ieVariable::Size);
+		}
 		stream->WriteResRef(act->PCStats->SoundSet);
 		for (const auto& setting : act->PCStats->ExtraSettings) {
 			stream->WriteDword(setting);
@@ -698,7 +701,11 @@ void CREImporter::ReadChrHeader(Actor *act)
 			act->PCStats->QSlots[i+3] = (ieByte) tmpDword;
 		}
 		str->Seek(26, GEM_CURRENT_POS);
-		str->ReadVariable(act->PCStats->SoundFolder);
+		{
+			ieVariable soundFolder;
+			str->ReadVariable(soundFolder);
+			act->PCStats->SoundFolder = StringFromCString(soundFolder.c_str());
+		}
 		str->ReadResRef(act->PCStats->SoundSet);
 		for (auto& setting : act->PCStats->ExtraSettings) {
 			str->ReadDword(setting);

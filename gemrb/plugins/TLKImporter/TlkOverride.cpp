@@ -149,8 +149,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 		assert(strref != ieStrRef::INVALID);
 	}
 
-	// FIXME: newvalue could be a multibyte string in an encoding incompatible with ASCII
-	std::string newvalue = MBStringFromString(string);
+	std::string newvalue = TLKStringFromString(string);
 	size_t length = std::min<size_t>(newvalue.length(), std::numeric_limits<uint16_t>::max());
 
 	//set the backpointer of the first string segment
