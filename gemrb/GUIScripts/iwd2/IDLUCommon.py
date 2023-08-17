@@ -35,7 +35,7 @@ Levels = [ IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
 
 def AddResistances(MyChar, rowname, table):
 	resistances = GemRB.LoadTable (table)
-	# add it to dmgtypes.2da if we ever need it elsewhere
+	# add it to dmginfo.2da if we ever need it elsewhere
 	titles = { IE_RESISTFIRE:"FIRE", IE_RESISTCOLD:"COLD", IE_RESISTELECTRICITY:"ELEC", \
 		IE_RESISTACID:"ACID", IE_RESISTMAGIC:"SPELL", IE_RESISTMAGICFIRE:"MAGIC_FIRE", \
 		IE_RESISTMAGICCOLD:"MAGIC_COLD", IE_RESISTSLASHING:"SLASHING", \

@@ -7,4 +7,4 @@ Columns -
 
 Rows - damage types
 
-See also: dmgtypes.txt
+See also: dmginfo.txt

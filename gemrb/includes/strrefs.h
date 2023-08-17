@@ -151,7 +151,7 @@ enum class HCStrings : TableMgr::index_t {
 	Damage1,
 	Damage2,
 	Damage3, // used through an offset with Damage1 and DamageDetail1
-	DmgPoison, // all the following are used indirectly in dmgtypes.2da
+	DmgPoison, // all the following are used indirectly in dmginfo.2da
 	DmgMagic,
 	DmgMissile,
 	DmgSlashing,

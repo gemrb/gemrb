@@ -3068,7 +3068,7 @@
 		A2E7E5F72669466C0064423F /* shearth6.pro */ = {isa = PBXFileReference; lastKnownFileType = file; path = shearth6.pro; sourceTree = "<group>"; };
 		A2E7E5F82669466C0064423F /* demoend.chu */ = {isa = PBXFileReference; lastKnownFileType = file; path = demoend.chu; sourceTree = "<group>"; };
 		A2E7E5F92669466C0064423F /* sanctuc.vvc */ = {isa = PBXFileReference; lastKnownFileType = file; path = sanctuc.vvc; sourceTree = "<group>"; };
-		A2E7E5FA2669466C0064423F /* dmgtypes.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = dmgtypes.2da; sourceTree = "<group>"; };
+		A2E7E5FA2669466C0064423F /* dmgtypes.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = dmginfo.2da; sourceTree = "<group>"; };
 		A2E7E5FB2669466C0064423F /* traplimt.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = traplimt.2da; sourceTree = "<group>"; };
 		A2E7E5FC2669466C0064423F /* gemtrig.ids */ = {isa = PBXFileReference; lastKnownFileType = text; path = gemtrig.ids; sourceTree = "<group>"; };
 		A2E7E5FD2669466C0064423F /* containr.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = containr.2da; sourceTree = "<group>"; };

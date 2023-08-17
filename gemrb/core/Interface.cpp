@@ -870,7 +870,7 @@ bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 }
 
 bool Interface::ReadDamageTypeTable() {
-	AutoTable tm = gamedata->LoadTable("dmgtypes");
+	AutoTable tm = gamedata->LoadTable("dmginfo");
 	if (!tm)
 		return false;
 
