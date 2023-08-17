@@ -29,32 +29,14 @@ from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_CAST
 
-SpellBookWindow = None
-SpellBookSpellInfoWindow = None
-SpellBookSpellLevel = 0
-SpellBookSpellUnmemorizeWindow = None
-
-ActiveSpellBooks = []
-BookCount = 0
-BookTopIndex = 0
 BookNames = (1083,1079,1080,1078,1077,32,1081,39722)
 
 def InitSpellBookWindow (Window):
-	global SpellBookWindow
-
-	SpellBookWindow = Window
-
-	Button = Window.GetControl (92)
-	Button.OnPress (SpellBookPrevPress)
-
-	Button = Window.GetControl (93)
-	Button.OnPress (SpellBookNextPress)
-
 	#setup level buttons
 	# looping backwards so the selected button gets drawn properly
 	for i in range (8, -1, -1):
 		Button = Window.GetControl (55 + i)
-		Button.OnPress (RefreshSpellBookLevel)
+		Button.OnPress (lambda: UpdateSpellBookWindow(Window))
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("SpellBookSpellLevel", i)
 
@@ -65,106 +47,104 @@ def InitSpellBookWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		#Button.SetBAM ("SPELFRAM",0,0,0)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		Button.SetValue (i)
+		Button.SetVarAssoc("Memorized", i)
 
 	# Setup book spells buttons
 	for i in range (8):
 		Button = Window.GetControl (30 + i)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetValue (i)
+		Button.OnRightPress (OpenSpellBookSpellInfoWindow)
 
 	# Setup book selection
-	FetchActiveSpellbooks ()
 	for i in range(3, -1, -1):
-		Button = Window.GetControl (88+i)
-		if len(ActiveSpellBooks) > i:
-			BookType = ActiveSpellBooks[i]
-			Button.SetVarAssoc ("SelectedBook", BookType)
-		Button.OnPress (UpdateSpellBook)
+		Button = Window.GetControl (88 + i)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetVarAssoc ("SelectedBook", i)
+		Button.OnPress (ChangeBook)
+
+	# book left / right
+	Button = Window.GetControl (92)
+	Button.OnPress (SpellBookCycle)
+	Button = Window.GetControl (93)
+	Button.OnPress (SpellBookCycle)
 
 	# scrollbar for known spells
-	ScrollBar = SpellBookWindow.GetControl (54)
-	GemRB.SetVar ("SpellBookSpellLevel", 0)
-	RefreshSpellBookLevel (False)
-	ScrollBar.SetVarAssoc ("SpellTopIndex", 0, 0, len(KnownSpellList))
-	ScrollBar.OnChange (ScrollBarPress)
-
-	GemRB.SetVar ("SelectedBook", 0)
-	SelectFirstActiveBook ()
-	UpdateSpellBook ()
+	ScrollBar = Window.GetControl (54)
+	Window.SetEventProxy(ScrollBar)
+	ScrollBar.OnChange (lambda: UpdateSpellBookWindow(Window))
 
 	return
 
-def FetchActiveSpellbooks ():
-	global ActiveSpellBooks, BookCount
+def NewSpellBookWindow(Window):
+	Window.AddAlias("WIN_SPL")
+	InitSpellBookWindow(Window)
+	GemRB.SetVar ("SpellBookSpellLevel", 0)
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	ActiveSpellBooks = []
-	for i in range(8):
-		if GemRB.GetMemorizableSpellsCount (pc, i, 0) > 0:
-			ActiveSpellBooks += [i]
+def GetActiveSpellBooks(pc):
+	return [i for i in range(8) if GemRB.GetMemorizableSpellsCount(pc, i, 0) > 0]
+	
+def ChangeBook(btn):
+	UpdateSpellBookWindow (btn.Window)
 
-	BookCount = len(ActiveSpellBooks)
-
-def SelectFirstActiveBook ():
-	global BookTopIndex
-
-	BookTopIndex = 0
-	if GemRB.GetVar ("SelectedBook") == 0:
-		if BookCount:
-			SelectedBook = ActiveSpellBooks[0]
-		else:
-			SelectedBook = 0
-		GemRB.SetVar ("SelectedBook", SelectedBook)
+def GetBookType(pc):
+	BookIndex = GemRB.GetVar ("SelectedBook")
+	ActiveSpellBooks = GetActiveSpellBooks(pc)
+	return ActiveSpellBooks[BookIndex]
 
 def SelectedNewPlayer (Window):
-	FetchActiveSpellbooks ()
-	GemRB.SetVar ("SelectedBook", 0)
-	SelectFirstActiveBook ()
-	UpdateSpellBook ()
+	ScrollBar = Window.GetControl (54)
+	ScrollBar.ScrollTo (0, 0)
+	UpdateSpellBookWindow (Window)
 	return
 
-ToggleSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUICommonWindows.ToggleWindow, InitSpellBookWindow, SelectedNewPlayer)
-OpenSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUICommonWindows.OpenWindowOnce, InitSpellBookWindow, SelectedNewPlayer)
+ToggleSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUICommonWindows.ToggleWindow, NewSpellBookWindow, SelectedNewPlayer, True)
+OpenSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUICommonWindows.OpenWindowOnce, NewSpellBookWindow, SelectedNewPlayer, True)
 
-def ResetScrollBar ():
-	ScrollBar = SpellBookWindow.GetControl (54)
-	GemRB.SetVar ("SpellTopIndex",0)
-	SpellBookWindow.SetEventProxy(ScrollBar)
+def SpellBookCycle (btn):
+	Button = btn.Window.GetControl (88 + btn.Value)
+	Button.SetState (IE_GUI_BUTTON_SELECTED)
+	UpdateSpellBookWindow (btn.Window)
+	return
 
-def ScrollBarPress ():
-	UpdateSpellBookWindow ()
-
-def UpdateSpellBook ():
-	RefreshSpellBookLevel (False) # set up all the spell lists first
-	ResetScrollBar ()
-	UpdateSpellBookWindow ()
-
-def UpdateSpellBookWindow ():
-	global SpellBookSpellLevel
-
-	Window = SpellBookWindow
+def UpdateSpellBookWindow (Window):
 	pc = GemRB.GameGetSelectedPCSingle ()
+	ActiveSpellBooks = GetActiveSpellBooks(pc)
+	NumBooks = len(ActiveSpellBooks)
 
-	for i in range(4):
-		Button = Window.GetControl(88+i)
-
-		if len(ActiveSpellBooks)>BookTopIndex+i:
-			BookType = ActiveSpellBooks[BookTopIndex + i]
+	# update spellbook buttons
+	pc = GemRB.GameGetSelectedPCSingle ()
+	ActiveSpellBooks = GetActiveSpellBooks (pc)
+	for i in range(3, -1, -1):
+		Button = Window.GetControl (88 + i)
+		if len(ActiveSpellBooks) > i:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			BookType = ActiveSpellBooks[i]
 			Button.SetText (BookNames[BookType])
-			BookButtonIdx = ActiveSpellBooks.index(GemRB.GetVar ("SelectedBook"))
-			if BookTopIndex + i == BookButtonIdx:
-				Button.SetState (IE_GUI_BUTTON_SELECTED)
-			else:
-				Button.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetText ("")
 
-	BookType = GemRB.GetVar ("SelectedBook")
-	level = SpellBookSpellLevel
-	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, BookType, level)
+	if len(ActiveSpellBooks) == 0:
+		GemRB.SetVar ("SelectedBook", None)
+	else:
+		Button = Window.GetControl (88)
+		Button.SetState (IE_GUI_BUTTON_SELECTED)
+
+	BookIndex = GemRB.GetVar ("SelectedBook")
+	if BookIndex is not None:
+		Button = Window.GetControl (92)
+		Button.SetDisabled(BookIndex <= 0)
+		Button.SetValue(BookIndex - 1)
+
+		Button = Window.GetControl (93)
+		Button.SetDisabled(BookIndex >= NumBooks - 1)
+		Button.SetValue(BookIndex + 1)
+		BookType = ActiveSpellBooks[BookIndex]
+	else:
+		print ("no book selected")
+		BookType = 0
+
+	level = GemRB.GetVar("SpellBookSpellLevel")
 	sorcerer_style = (BookType == IE_IWD2_SPELL_BARD) or (BookType == IE_IWD2_SPELL_SORCERER)
 
 	Name = GemRB.GetPlayerName (pc, 0)
@@ -175,20 +155,25 @@ def UpdateSpellBookWindow ():
 	Button.SetPicture (GemRB.GetPlayerPortrait (pc, 0)["Sprite"])
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	mem_cnt = GetMemorizedSpellsCount () # count of unique memorized spells
-	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, BookType, level, True)
+	memorized = MemorizedSpellList(pc, BookType, level)
+	mem_cnt = len(memorized)
+
 	for i in range (24):
 		Button = Window.GetControl (6 + i)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		if GemRB.GetVar("{}_ANIM".format(Button.ControlID)): # we have an animation in progress, bail and it will refresh us after its done
+			Button.SetFlags(IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+			Button.SetVisible(True)
+			continue
+		else:
+			Button.SetFlags(IE_GUI_VIEW_IGNORE_EVENTS, OP_NAND)
+
 		Label = Window.GetControl (0x1000003f+i)
 		# actually, it doesn't display any memorized spells for sorcerer-style spellbooks
-		if i < len(MemorizedSpellList) and not sorcerer_style:
-			ms = MemorizedSpellList[i]
+		if i < mem_cnt and not sorcerer_style:
+			ms = memorized[i]
 			spell = ms['SpellResRef']
 			Button.SetSpellIcon (spell)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 			Button.SetTooltip (ms['SpellName'])
-			Button.SetVarAssoc("Memorized", i)
 			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depleted)
 			if ms['MemoCount'] < ms['KnownCount']:
 				# already depleted, just remove
@@ -199,37 +184,38 @@ def UpdateSpellBookWindow ():
 			Button.OnRightPress (OpenSpellBookSpellInfoWindow)
 			tmp = str(ms['MemoCount'])+"/"+str(ms['KnownCount'])
 			Label.SetText (tmp)
+			Button.SetVisible(True)
 		else:
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.OnPress (None)
-			Button.OnRightPress (None)
-			Button.EnableBorder (0, 0)
+			Button.SetVisible(False)
 			Label.SetText ('')
 
-	known_cnt = len (KnownSpellList)
-	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
+	known = KnownSpellList(pc, BookType, level)
+	known_cnt = len(known)
+	SpellTopIndex = GemRB.GetVar ("SpellTopIndex") or 0
 	for i in range (8):
 		Button = Window.GetControl (30 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		Label = Window.GetControl (0x10000025+i)
-		if i+SpellTopIndex < known_cnt:
-			ks = KnownSpellList[i+SpellTopIndex]
+		Label = Window.GetControl (0x10000025 + i)
+		SpellIdx = i + SpellTopIndex
+		if SpellIdx < known_cnt:
+			ks = known[SpellIdx]
 			spell = ks['SpellResRef']
 			Button.SetSpellIcon (spell)
+			Button.SetValue(SpellIdx)
 			if not sorcerer_style:
 				Button.OnPress (OnSpellBookMemorizeSpell)
-			Button.OnRightPress (OpenSpellBookSpellInfoWindow)
 			Label.SetText (ks['SpellName'])
+			Button.SetVisible(True)
 		else:
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.OnPress (None)
-			Button.OnRightPress (None)
-			Button.EnableBorder (0, 0)
-			Label.SetText ('')
+			Button.SetVisible(False)
+			Label.SetText("")
 
 	# number of available spell slots
 	# sorcerer-style books are different, since max_mem_cnt holds the total level capacity, not the slot count
 	# and they display just the current and total number of memorizations per level
+	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, BookType, level)
+	mem_cnt = GetMemorizedSpellsCount (memorized) # count of unique memorized spells
+	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, BookType, level, True)
 	Label = Window.GetControl (0x10000004)
 	if sorcerer_style:
 		available = "0"
@@ -238,16 +224,19 @@ def UpdateSpellBookWindow ():
 		Label.SetText (available+"/"+str(max_mem_cnt))
 	else:
 		# reset mem_cnt to take into account stacks
-		mem_cnt = GetMemorizedSpellsCount (True)
+		mem_cnt = GetMemorizedSpellsCount (memorized, True)
 		Label.SetText (str(max_mem_cnt-mem_cnt))
 
 	#if actor is uncontrollable, make this grayed
 	CantCast = GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
+	ScrollBar = Window.GetControl (54)
+	ScrollBar.SetVarAssoc ("SpellTopIndex", SpellTopIndex, 0, known_cnt - 8)
+
 	return
 
-def GetMemorizedSpellsCount (total=False):
+def GetMemorizedSpellsCount (memorized, total = False):
 	'''count the real number of spells in MemorizedSpellList'''
 	# can't use len here, since there could be more than one memorization (a "stack")
 	# put the counts into a list and sum it, but be careful about depleted spells
@@ -256,44 +245,17 @@ def GetMemorizedSpellsCount (total=False):
 	if total:
 		count = 'KnownCount' # all
 
-	counts = [max(x[count], 1) for x in MemorizedSpellList]
+	counts = [max(x[count], 1) for x in memorized]
 	return sum(counts)
 
-def SpellBookPrevPress ():
-	global BookTopIndex
+def MemorizedSpellList (pc, SelectedBook, SpellBookSpellLevel):
+	return Spellbook.GetMemorizedSpells (pc, SelectedBook, SpellBookSpellLevel)
 
-	BookTopIndex = GemRB.GetVar ("BookTopIndex")
-	if BookTopIndex>0:
-		BookTopIndex -= 1
-	GemRB.SetVar("BookTopIndex", BookTopIndex)
-	UpdateSpellBook ()
-	return
-
-def SpellBookNextPress ():
-	global BookTopIndex
-
-	BookTopIndex = GemRB.GetVar ("BookTopIndex")
-	if BookTopIndex<BookCount-4:
-		BookTopIndex += 1
-	GemRB.SetVar("BookTopIndex", BookTopIndex)
-	UpdateSpellBook ()
-	return
-
-def RefreshSpellBookLevel (update=True):
-	global SpellBookSpellLevel, KnownSpellList, MemorizedSpellList
-
-	SpellBookSpellLevel = GemRB.GetVar ("SpellBookSpellLevel")
-	SelectedBook = GemRB.GetVar ("SelectedBook")
-	pc = GemRB.GameGetSelectedPCSingle ()
-	KnownSpellList = Spellbook.GetKnownSpellsLevel (pc, SelectedBook, SpellBookSpellLevel)
-	MemorizedSpellList = Spellbook.GetMemorizedSpells (pc, SelectedBook, SpellBookSpellLevel)
-	if update:
-		UpdateSpellBookWindow ()
-	return
+def KnownSpellList (pc, SelectedBook, SpellBookSpellLevel):
+	return Spellbook.GetKnownSpellsLevel (pc, SelectedBook, SpellBookSpellLevel)
 
 def OpenSpellBookSpellInfoWindow (btn):
-	global SpellBookSpellInfoWindow
-	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3, "GUISPL")
+	Window = GemRB.LoadWindow (3, "GUISPL")
 
 	#back
 	Button = Window.GetControl (5)
@@ -302,13 +264,15 @@ def OpenSpellBookSpellInfoWindow (btn):
 	Button.OnPress (Window.Close)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	level = SpellBookSpellLevel
-	BookType = GemRB.GetVar ("SelectedBook")
+	level = GemRB.GetVar("SpellBookSpellLevel")
+	BookType = GetBookType(pc)
+
 	if btn.VarName == "Memorized":
 		ms = GemRB.GetMemorizedSpell (pc, BookType, level, btn.Value)
 		ResRef = ms['SpellResRef']
 	else:
-		ResRef = KnownSpellList[btn.Value + GemRB.GetVar ("SpellTopIndex")]["SpellResRef"]
+		known = KnownSpellList(pc, BookType, level)
+		ResRef = known[btn.Value]["SpellResRef"]
 	spell = GemRB.GetSpell (ResRef)
 
 	Label = Window.GetControl (0x0fffffff)
@@ -323,35 +287,28 @@ def OpenSpellBookSpellInfoWindow (btn):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def FlashOverButton (ControlID):
-	Button = SpellBookWindow.GetControl(ControlID)
-	Button.SetAnimation ("FLASH")
-
 def OnSpellBookMemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	level = SpellBookSpellLevel
-	BookType = GemRB.GetVar ("SelectedBook")
+	level = GemRB.GetVar("SpellBookSpellLevel")
+	BookType = GetBookType(pc)
+	Window = GemRB.GetView("WIN_SPL")
 
-	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")
+	def Complete():
+		mem_cnt = GemRB.GetMemorizedSpellsCount(pc, BookType, level, False)
+		AnimBtn = Window.GetControl(mem_cnt + 5)
+		AnimBtn.SetAnimation("FLASH", 0, A_ANI_PLAYONCE | A_ANI_BLEND)
+		AnimBtn.OnAnimEnd(lambda: UpdateSpellBookWindow (Window))
+
 	if GemRB.MemorizeSpell (pc, BookType, level, btn.Value):
-		RefreshSpellBookLevel () # calls also UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_24")
-		FlashOverButton (index - SpellTopIndex + 30) # FIXME: wrong button if the spell will be stacked
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, BookType, level, False)
-		# mimic the original, which staggered the two animations
-		GemRB.SetTimedEvent(lambda: FlashOverButton (mem_cnt + 5), 1)
+		btn.SetAnimation ("FLASH", 0, A_ANI_PLAYONCE | A_ANI_BLEND)
+		btn.OnAnimEnd(Complete)
+		UpdateSpellBookWindow (Window)
+
 	return
 
-def OpenSpellBookSpellRemoveWindow ():
-	global SpellBookSpellUnmemorizeWindow
-
-	if SpellBookSpellUnmemorizeWindow != None:
-		if SpellBookSpellUnmemorizeWindow:
-			SpellBookSpellUnmemorizeWindow.Close ()
-		SpellBookSpellUnmemorizeWindow = None
-		return
-
-	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5, "GUISPL")
+def OpenSpellBookSpellRemoveWindow (btn):
+	Window = GemRB.LoadWindow (5, "GUISPL")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -360,13 +317,14 @@ def OpenSpellBookSpellRemoveWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
+	Button.SetValue(btn.Value)
 	Button.OnPress (OnSpellBookRemoveSpell)
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.OnPress (OpenSpellBookSpellRemoveWindow)
+	Button.OnPress (lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -374,39 +332,32 @@ def OpenSpellBookSpellRemoveWindow ():
 
 # since we can have semidepleted stacks, first make sure we unmemorize the depleted ones, only then unmemorize
 def OnSpellBookUnmemorizeSpell (btn, mem_cnt):
-	if mem_cnt == 0:
-		# everything is depleted, so just remove
-		OnSpellBookRemoveSpell (btn)
-		return
-
 	# remove one depleted spell without touching the still memorized
 	# we'd need a different spell index, but it's all handled in the core
-	UnmemoSpell (btn.Value, True)
-
+	UnmemoSpell(btn, mem_cnt != 0)
 	return
 
 # not like removing spells in bg2, where you could delete known spells from the spellbook!
 def OnSpellBookRemoveSpell (btn):
-	if SpellBookSpellUnmemorizeWindow:
-		OpenSpellBookSpellRemoveWindow ()
-
-	UnmemoSpell (btn.Value)
-
+	UnmemoSpell (btn)
+	btn.Window.Close()
 	return
 
-def UnmemoSpell (index, onlydepleted=False):
+def UnmemoSpell (btn, onlydepleted = False):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	level = SpellBookSpellLevel
-	BookType = GemRB.GetVar ("SelectedBook")
+	level = GemRB.GetVar("SpellBookSpellLevel")
+	BookType = GetBookType(pc)
 
-	# remove spell from memory
-	if GemRB.UnmemorizeSpell (pc, BookType, level, index, onlydepleted):
-		RefreshSpellBookLevel (False)
-		UpdateSpellBookWindow ()
-		GemRB.PlaySound ("GAM_44")
-		FlashOverButton (index + 6)
-	else:
-		print("Spell unmemorization failed, huh?", pc, BookType, level, index, onlydepleted)
+	Window = GemRB.GetView("WIN_SPL")
+	def Complete(btn):
+		# remove spell from memory
+		GemRB.UnmemorizeSpell (pc, BookType, level, btn.Value, onlydepleted)
+		UpdateSpellBookWindow(Window)
+
+	GemRB.PlaySound ("GAM_44")
+	AnimBtn = Window.GetControl(6 + btn.Value)
+	AnimBtn.SetAnimation ("FLASH", 0, A_ANI_PLAYONCE | A_ANI_BLEND)
+	AnimBtn.OnAnimEnd(Complete)
 
 ###################################################
 # End of file GUISPL.py
