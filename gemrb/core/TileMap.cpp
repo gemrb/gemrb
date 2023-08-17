@@ -21,11 +21,12 @@
 #include "TileMap.h"
 
 #include "Interface.h"
-#include "Video/Video.h"
 
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+#include "Scriptable/TileObject.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -52,9 +53,9 @@ TileObject* TileMap::AddTile(const ResRef& ID, const ieVariable& Name, unsigned 
 	unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount)
 {
 	TileObject* tile = new TileObject();
-	tile->Flags=Flags;
-	tile->Name = Name; // would probably need MakeVariable if the whole class wasn't unused
-	tile->Tileset = ID;
+	tile->flags = Flags;
+	tile->name = Name; // would probably need MakeVariable if the whole class wasn't unused
+	tile->tileset = ID;
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );
 	tiles.push_back(tile);

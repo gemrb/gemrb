@@ -2366,38 +2366,4 @@ void Movable::HandleAnkhegStance(bool emerge)
 		SetWait(15); // both stances have 15 frames, at 15 fps
 	}
 }
-
-/**********************
- * Tiled Object Class *
- **********************/
-
-TileObject::~TileObject()
-{
-	if (opentiles) {
-		free( opentiles );
-	}
-	if (closedtiles) {
-		free( closedtiles );
-	}
-}
-
-void TileObject::SetOpenTiles(unsigned short* Tiles, int cnt)
-{
-	if (opentiles) {
-		free( opentiles );
-	}
-	opentiles = Tiles;
-	opencount = cnt;
-}
-
-void TileObject::SetClosedTiles(unsigned short* Tiles, int cnt)
-{
-	if (closedtiles) {
-		free( closedtiles );
-	}
-	closedtiles = Tiles;
-	closedcount = cnt;
-}
-
-
 }

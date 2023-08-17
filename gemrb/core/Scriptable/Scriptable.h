@@ -579,29 +579,6 @@ public:
 	Point GetMostLikelyPosition() const;
 	virtual bool BlocksSearchMap() const = 0;
 };
-
-//Tiled objects are not used (and maybe not even implemented correctly in IE)
-//they seem to be most closer to a door and probably obsoleted by it
-//are they scriptable?
-class GEM_EXPORT TileObject {
-public:
-	TileObject() noexcept = default;
-	TileObject(const TileObject&) = delete;
-	~TileObject();
-	TileObject& operator=(const TileObject&) = delete;
-	void SetOpenTiles(unsigned short *indices, int count);
-	void SetClosedTiles(unsigned short *indices, int count);
-
-public:
-	ieVariable Name;
-	ResRef Tileset; //or wed door ID?
-	ieDword Flags = 0;
-	unsigned short* opentiles = nullptr;
-	ieDword opencount = 0;
-	unsigned short* closedtiles = nullptr;
-	ieDword closedcount = 0;
-};
-
 }
 
 #endif

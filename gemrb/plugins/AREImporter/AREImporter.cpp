@@ -43,6 +43,7 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+#include "Scriptable/TileObject.h"
 #include "Streams/FileStream.h"
 #include "Streams/SlicedStream.h"
 
@@ -2428,13 +2429,13 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 {
 	for (unsigned int i=0;i<TileCount;i++) {
 		const TileObject *am = map->TMap->GetTile(i);
-		stream->WriteVariable(am->Name);
-		stream->WriteResRef( am->Tileset );
-		stream->WriteDword(am->Flags);
-		stream->WriteDword(am->opencount);
+		stream->WriteVariable(am->name);
+		stream->WriteResRef(am->tileset);
+		stream->WriteDword(am->flags);
+		stream->WriteDword(am->openCount);
 		//can't write tiles, otherwise now we should write a tile index
 		stream->WriteDword(0);
-		stream->WriteDword(am->closedcount);
+		stream->WriteDword(am->closedCount);
 		//can't write tiles otherwise now we should write a tile index
 		stream->WriteDword(0);
 		stream->WriteFilling(48);

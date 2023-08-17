@@ -101,6 +101,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/OverHeadText.cpp
 	Scriptable/Scriptable.cpp
 	Scriptable/PCStatStruct.cpp
+	Scriptable/TileObject.cpp
 	Streams/DataStream.cpp
 	Streams/FileCache.cpp
 	Streams/FileStream.cpp
