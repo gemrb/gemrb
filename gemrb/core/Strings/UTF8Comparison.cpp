@@ -111,3 +111,31 @@ bool UTF8_stricmp(const char *a, const char *b) {
 #endif
 
 }
+
+#ifdef WITH_TESTS
+#include "catch_amalgamated.hpp"
+
+namespace GemRB {
+
+#ifdef WIN32
+TEST_CASE("GemRB::UTF8_stricmp") {
+	SKIP("Not applicable on Windows.");
+}
+#else
+TEST_CASE("GemRB::UTF8_stricmp") {
+	CHECK(UTF8_stricmp("abc", "abc"));
+	CHECK(!UTF8_stricmp("abc", "ab"));
+	CHECK(!UTF8_stricmp("ab", "abc"));
+	CHECK(!UTF8_stricmp("abc", "def"));
+	CHECK(UTF8_stricmp("abc", "ABC"));
+	CHECK(UTF8_stricmp("ABC", "abc"));
+
+	CHECK(UTF8_stricmp("äbc", "äbc"));
+	CHECK(UTF8_stricmp("äbc", "ÄBC"));
+	// error demo
+	CHECK(UTF8_stricmp("äb", "ÄBC"));
+}
+#endif
+
+}
+#endif

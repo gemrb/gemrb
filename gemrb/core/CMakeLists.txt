@@ -174,3 +174,27 @@ IF (APPLE)
 	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/gemrb/${PROJECT_NAME}.app/Contents/Frameworks
 )
 ENDIF (APPLE)
+
+# List of sources with tests
+ADD_EXECUTABLE(TestRunner
+  catch_amalgamated.cpp
+  Strings/UTF8Comparison.cpp
+  System/VFS.cpp
+)
+# Need this to link a test-free gemrb_core to TestRunner with test
+# registrations
+TARGET_COMPILE_DEFINITIONS(TestRunner PUBLIC WITH_TESTS=1)
+TARGET_LINK_LIBRARIES(TestRunner gemrb_core ${Iconv_LIBRARY})
+IF (WIN32)
+  TARGET_LINK_LIBRARIES(TestRunner shlwapi)
+ENDIF()
+ADD_TEST(NAME TestRunner COMMAND TestRunner)
+
+# Quick workaround to get the DLL where needed
+IF (NOT STATIC_LINK)
+  IF(WIN32)
+    ADD_CUSTOM_COMMAND(TARGET TestRunner POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/gemrb/libgemrb_core.dll ${CMAKE_BINARY_DIR}/gemrb/core/libgemrb_core.dll
+    )
+  ENDIF()
+ENDIF()

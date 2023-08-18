@@ -626,3 +626,49 @@ void DirectoryIterator::Rewind()
 }
 
 }
+
+#ifdef WITH_TESTS
+#include "catch_amalgamated.hpp"
+
+namespace GemRB {
+
+TEST_CASE("GemRB::PathAppend") {
+	SECTION("plain path") {
+		path_t path = "dir";
+
+		SECTION("appending something") {
+			PathAppend(path, "subdir");
+#ifdef WIN32
+			CHECK(path == "dir\\subdir");
+#else
+			CHECK(path == "dir/subdir");
+#endif
+		}
+
+		SECTION("appending with leading \\") {
+			PathAppend(path, "\\data");
+#ifdef WIN32
+			// Fails for a good reason I guess
+			// result is `dirdata` on Win
+			CHECK(path == "dir\\data");
+#else
+			CHECK(path == "dir/data");
+#endif
+		}
+	}
+
+	SECTION("suffixed path") {
+#ifdef WIN32
+		path_t path = "dir\\";
+		PathAppend(path, "subdir");
+		CHECK(path == "dir\\subdir");
+#else
+		path_t path = "dir/";
+		PathAppend(path, "subdir");
+		CHECK(path == "dir/subdir");
+#endif
+	}
+}
+
+}
+#endif
