@@ -17,9 +17,16 @@
  *
  */
 
+#ifndef UTF8_COMPARSION_H
+#define UTF8_COMPARSION_H
+
+#include "exports.h"
+
 namespace GemRB {
 
 // true if equal under C.UTF-8 `tolower` regime
-bool UTF8_stricmp(const char *a, const char *b);
+GEM_EXPORT bool UTF8_stricmp(const char *a, const char *b);
 
 }
+
+#endif
