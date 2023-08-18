@@ -130,7 +130,7 @@ jobs:
         chmod +x run-or-dump.sh
 
     - name: Test 1
-      uses: GabrielBB/xvfb-action@v1.6
+      uses: coactions/setup-xvfb@v1
       with:
         run: ./run-or-dump.sh
         working-directory: build
@@ -155,7 +155,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Test 2
-      uses: GabrielBB/xvfb-action@v1
+      uses: coactions/setup-xvfb@v1
       with:
         run: ./grrr-gemrb.AppImage -q ../gemrb/tests/minimal/
         working-directory: build
