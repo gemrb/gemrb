@@ -6346,8 +6346,6 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_CONTINGENCY);
 	}
 
-	// TODO: resist source spell, if any
-
 	// get the actor to cast spells at
 	Actor *actor = NULL;
 	const Map *map = target->GetCurrentArea();
