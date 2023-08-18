@@ -111,3 +111,32 @@ bool UTF8_stricmp(const char *a, const char *b) {
 #endif
 
 }
+
+
+#ifdef WITH_TESTS
+#include <gtest/gtest.h>
+
+namespace GemRB {
+
+#ifdef WIN32
+TEST(UTF8Comparision_Test, UTF8_stricmp_Equality) {
+	GTEST_SKIP() << "Not applicable to Windows.";
+}
+#else
+TEST(UTF8Comparision_Test, UTF8_stricmp_Equality) {
+	EXPECT_TRUE(UTF8_stricmp("abc", "abc"));
+	EXPECT_TRUE(!UTF8_stricmp("abc", "ab"));
+	EXPECT_TRUE(!UTF8_stricmp("ab", "abc"));
+	EXPECT_TRUE(!UTF8_stricmp("abc", "def"));
+	EXPECT_TRUE(UTF8_stricmp("abc", "ABC"));
+	EXPECT_TRUE(UTF8_stricmp("ABC", "abc"));
+
+	EXPECT_TRUE(UTF8_stricmp("äbc", "äbc"));
+	EXPECT_TRUE(UTF8_stricmp("äbc", "ÄBC"));
+	// error demo
+	EXPECT_TRUE(UTF8_stricmp("äb", "ÄBC"));
+}
+#endif
+
+}
+#endif

@@ -626,3 +626,48 @@ void DirectoryIterator::Rewind()
 }
 
 }
+
+#ifdef WITH_TESTS
+#include <gtest/gtest.h>
+
+namespace GemRB {
+
+class VFS_Test : public ::testing::Test {
+	protected:
+		path_t path = "dir";
+};
+
+TEST_F(VFS_Test, PathAppend_PlainPath) {
+	PathAppend(path, "subdir");
+#ifdef WIN32
+	EXPECT_EQ(path, "dir\\subdir");
+#else
+	EXPECT_EQ(path, "dir/subdir");
+#endif
+}
+
+TEST_F(VFS_Test, PathAppend_PlainPathAndLeadingBackslash) {
+	PathAppend(path, "\\data");
+#ifdef WIN32
+	// Fails for a good reason I guess
+	// result is `dirdata` on Win
+	EXPECT_EQ(path, "dir\\data");
+#else
+	EXPECT_EQ(path, "dir/data");
+#endif
+}
+
+TEST_F(VFS_Test, PathAppend_SuffixedPath) {
+#ifdef WIN32
+	path_t path = "dir\\";
+	PathAppend(path, "subdir");
+	EXPECT_EQ(path, "dir\\subdir");
+#else
+	path_t path = "dir/";
+	PathAppend(path, "subdir");
+	EXPECT_EQ(path, "dir/subdir");
+#endif
+}
+
+}
+#endif

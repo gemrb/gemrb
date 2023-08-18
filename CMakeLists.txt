@@ -599,6 +599,19 @@ CONFIGURE_FILE(
 	IMMEDIATE @ONLY
 )
 
+# Test setup
+ENABLE_TESTING()
+LIST(APPEND CMAKE_CTEST_ARGUMENTS "--verbose")
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 ADD_SUBDIRECTORY( gemrb )
 IF (NOT APPLE)
 	INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/gemrb.6" DESTINATION ${MAN_DIR} )
@@ -701,3 +714,4 @@ if ((NOT DISABLE_WERROR) AND GIT_VERSION)
 	message(STATUS "If you hit one, let us know and rerun cmake with -DDISABLE_WERROR=1 to continue.")
 	message(STATUS "")
 endif()
+
