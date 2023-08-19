@@ -40,6 +40,12 @@
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A2111CCA1D0A49650044939E /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2111CC81D0A49650044939E /* Timer.h */; };
 		A218A75214A8F3DB001142CF /* gemrb.icns in Resources */ = {isa = PBXBuildFile; fileRef = A218A75114A8F3DB001142CF /* gemrb.icns */; };
+		A22216962A908D5E000920B6 /* UTF8Comparison.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A22216942A908D5E000920B6 /* UTF8Comparison.cpp */; };
+		A22216972A908D5E000920B6 /* UTF8Comparison.h in Headers */ = {isa = PBXBuildFile; fileRef = A22216952A908D5E000920B6 /* UTF8Comparison.h */; };
+		A222169A2A908D6E000920B6 /* PosixFile.h in Headers */ = {isa = PBXBuildFile; fileRef = A22216982A908D6E000920B6 /* PosixFile.h */; };
+		A222169B2A908D6E000920B6 /* PosixFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A22216992A908D6E000920B6 /* PosixFile.cpp */; };
+		A222169E2A908D7A000920B6 /* TileObject.h in Headers */ = {isa = PBXBuildFile; fileRef = A222169C2A908D7A000920B6 /* TileObject.h */; };
+		A222169F2A908D7A000920B6 /* TileObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A222169D2A908D7A000920B6 /* TileObject.cpp */; };
 		A22693791422934E004468E8 /* CocoaWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = A249187B141075A60038B170 /* CocoaWrapper.m */; settings = {COMPILER_FLAGS = "-DTARGET_OS_MAC"; }; };
 		A226F41013A119D8009CE75E /* 2DAImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8699139F0A7D0002DC13 /* 2DAImporter.cpp */; };
 		A226F41113A119E2009CE75E /* ACMReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B869E139F0A7D0002DC13 /* ACMReader.cpp */; };
@@ -1236,6 +1242,12 @@
 		A20A278A1A71E3200077077C /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
 		A2111CC81D0A49650044939E /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
 		A218A75114A8F3DB001142CF /* gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = gemrb.icns; path = ../../artwork/gemrb.icns; sourceTree = "<group>"; };
+		A22216942A908D5E000920B6 /* UTF8Comparison.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UTF8Comparison.cpp; sourceTree = "<group>"; };
+		A22216952A908D5E000920B6 /* UTF8Comparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTF8Comparison.h; sourceTree = "<group>"; };
+		A22216982A908D6E000920B6 /* PosixFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PosixFile.h; sourceTree = "<group>"; };
+		A22216992A908D6E000920B6 /* PosixFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PosixFile.cpp; sourceTree = "<group>"; };
+		A222169C2A908D7A000920B6 /* TileObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileObject.h; sourceTree = "<group>"; };
+		A222169D2A908D7A000920B6 /* TileObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TileObject.cpp; sourceTree = "<group>"; };
 		A228D24816A86FA00053375D /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
 		A22B5D5D1583D816007B4AA4 /* libFreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreetype2.a; path = ios/lib/iphonesimulator/libFreetype2.a; sourceTree = "<group>"; };
 		A22B5D5E1583D816007B4AA4 /* libPython.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPython.a; path = ios/lib/iphonesimulator/libPython.a; sourceTree = "<group>"; };
@@ -3068,7 +3080,7 @@
 		A2E7E5F72669466C0064423F /* shearth6.pro */ = {isa = PBXFileReference; lastKnownFileType = file; path = shearth6.pro; sourceTree = "<group>"; };
 		A2E7E5F82669466C0064423F /* demoend.chu */ = {isa = PBXFileReference; lastKnownFileType = file; path = demoend.chu; sourceTree = "<group>"; };
 		A2E7E5F92669466C0064423F /* sanctuc.vvc */ = {isa = PBXFileReference; lastKnownFileType = file; path = sanctuc.vvc; sourceTree = "<group>"; };
-		A2E7E5FA2669466C0064423F /* dmgtypes.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = dmginfo.2da; sourceTree = "<group>"; };
+		A2E7E5FA2669466C0064423F /* dmginfo.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = dmginfo.2da; sourceTree = "<group>"; };
 		A2E7E5FB2669466C0064423F /* traplimt.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = traplimt.2da; sourceTree = "<group>"; };
 		A2E7E5FC2669466C0064423F /* gemtrig.ids */ = {isa = PBXFileReference; lastKnownFileType = text; path = gemtrig.ids; sourceTree = "<group>"; };
 		A2E7E5FD2669466C0064423F /* containr.2da */ = {isa = PBXFileReference; lastKnownFileType = text; path = containr.2da; sourceTree = "<group>"; };
@@ -5079,6 +5091,8 @@
 				A2A05CE027A47E29000FB625 /* StringConversion.cpp */,
 				A2A05CE227A47E29000FB625 /* StringConversion.h */,
 				A2BC433E28296D7200BD4D73 /* StringView.h */,
+				A22216942A908D5E000920B6 /* UTF8Comparison.cpp */,
+				A22216952A908D5E000920B6 /* UTF8Comparison.h */,
 			);
 			path = Strings;
 			sourceTree = "<group>";
@@ -5096,6 +5110,8 @@
 				A2A05CF327A48093000FB625 /* MappedFileMemoryStream.h */,
 				A2A05CF027A48093000FB625 /* MemoryStream.cpp */,
 				A2A05CED27A48093000FB625 /* MemoryStream.h */,
+				A22216992A908D6E000920B6 /* PosixFile.cpp */,
+				A22216982A908D6E000920B6 /* PosixFile.h */,
 				A2A05CEE27A48093000FB625 /* SlicedStream.cpp */,
 				A2A05CEF27A48093000FB625 /* SlicedStream.h */,
 			);
@@ -5716,6 +5732,8 @@
 				A2BFA03C1395FF62006ADC12 /* PCStatStruct.h */,
 				A2BFA03D1395FF62006ADC12 /* Scriptable.cpp */,
 				A2BFA03E1395FF62006ADC12 /* Scriptable.h */,
+				A222169D2A908D7A000920B6 /* TileObject.cpp */,
+				A222169C2A908D7A000920B6 /* TileObject.h */,
 			);
 			path = Scriptable;
 			sourceTree = "<group>";
@@ -6942,7 +6960,7 @@
 				A2E7E5F72669466C0064423F /* shearth6.pro */,
 				A2E7E5F82669466C0064423F /* demoend.chu */,
 				A2E7E5F92669466C0064423F /* sanctuc.vvc */,
-				A2E7E5FA2669466C0064423F /* dmgtypes.2da */,
+				A2E7E5FA2669466C0064423F /* dmginfo.2da */,
 				A2E7E5FB2669466C0064423F /* traplimt.2da */,
 				A2E7E5FC2669466C0064423F /* gemtrig.ids */,
 				A2E7E5FD2669466C0064423F /* containr.2da */,
@@ -7983,6 +8001,7 @@
 				A2E66381139E883100310FC8 /* FactoryObject.h in Headers */,
 				A2E66383139E883100310FC8 /* Font.h in Headers */,
 				A2E66385139E883100310FC8 /* Game.h in Headers */,
+				A222169E2A908D7A000920B6 /* TileObject.h in Headers */,
 				A2FA8E4F1FB8C483004AAEF9 /* MapReverb.h in Headers */,
 				A2E66387139E883100310FC8 /* GameData.h in Headers */,
 				A2E66389139E883700310FC8 /* GlobalTimer.h in Headers */,
@@ -8058,6 +8077,8 @@
 				A2A05CFB27A48093000FB625 /* DataStream.h in Headers */,
 				A20A278D1A71E3200077077C /* View.h in Headers */,
 				A2A05D0A27A4826C000FB625 /* Stdio.h in Headers */,
+				A222169A2A908D6E000920B6 /* PosixFile.h in Headers */,
+				A22216972A908D5E000920B6 /* UTF8Comparison.h in Headers */,
 				A25F91FA269BBF290045F07A /* SaveGameAREExtractor.h in Headers */,
 				A2E66405139E885300310FC8 /* swab.h in Headers */,
 				A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */,
@@ -9773,6 +9794,7 @@
 				A2E66377139E883100310FC8 /* DisplayMessage.cpp in Sources */,
 				A2E6637C139E883100310FC8 /* EffectQueue.cpp in Sources */,
 				A2E6637E139E883100310FC8 /* Factory.cpp in Sources */,
+				A222169B2A908D6E000920B6 /* PosixFile.cpp in Sources */,
 				A2A05D0B27A4826C000FB625 /* Logging.cpp in Sources */,
 				A2E66382139E883100310FC8 /* Font.cpp in Sources */,
 				A2A05D0027A48093000FB625 /* MappedFileMemoryStream.cpp in Sources */,
@@ -9825,11 +9847,13 @@
 				A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */,
 				A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */,
 				A2E663EA139E884B00310FC8 /* TileOverlay.cpp in Sources */,
+				A22216962A908D5E000920B6 /* UTF8Comparison.cpp in Sources */,
 				A2D672DD1B30F24400264D16 /* GUIFactory.cpp in Sources */,
 				A2E663F6139E884B00310FC8 /* WorldMap.cpp in Sources */,
 				A28A7D2529120E02001376C0 /* Geometry.cpp in Sources */,
 				A2E66404139E885300310FC8 /* swab.cpp in Sources */,
 				A250F78F2A5B3855007161DA /* Debug.cpp in Sources */,
+				A222169F2A908D7A000920B6 /* TileObject.cpp in Sources */,
 				A2E66406139E885300310FC8 /* VFS.cpp in Sources */,
 				A2E66408139E885A00310FC8 /* Actor.cpp in Sources */,
 				A2E6640A139E885A00310FC8 /* Container.cpp in Sources */,
