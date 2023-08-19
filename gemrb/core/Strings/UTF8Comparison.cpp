@@ -31,7 +31,6 @@ bool UTF8_stricmp(const char*, const char*) {
 }
 
 #else
-static const auto C_LOCALE = std::locale{"C.UTF-8"};
 
 // Returns true if both strings are equal after lower-casing
 bool UTF8_stricmp(const char *a, const char *b) {
@@ -87,6 +86,7 @@ bool UTF8_stricmp(const char *a, const char *b) {
 
 			uint8_t widthA = getWidth(iA), widthB = getWidth(iB);
 
+			static const auto C_LOCALE = std::locale{"C.UTF-8"};
 			wchar_t aL = std::tolower(getCodepoint(itA, widthA), C_LOCALE);
 			wchar_t bL = std::tolower(getCodepoint(itB, widthB), C_LOCALE);
 
