@@ -277,6 +277,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	// Don't abort if there is a running non-interruptable action.
+	// NOTE: the original didn't check for the next action, causing odd timing bugs
 	if ((InternalFlags & IF_NOINT) && (CurrentAction || GetNextAction())) {
 		return;
 	}
