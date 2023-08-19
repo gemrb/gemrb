@@ -4551,6 +4551,24 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 // ... so they're just fully stored in itemsnd.2da
 // iwds also have five sounds of hitting armor (SW_SWD01) that we ignore
 // pst has a lot of duplicates (1&3&6, 2&5, 8&9, 4, 7, 10) and little variation (all 6 entries for 8 are identical)
+//
+// Overall, the sounds on attack are from:
+// - the CRE sound slots (VerbalConstant): VB_ATTACK x4, VB_BATTLE_CRY x5
+// - the animation 2da/ini with sounds per stance (shoot, and the 3 melee types)
+// - individual hardcoded item sound overrides (eg. for ankhegs in bg1)
+// - actual swing sounds associated to item types (itemsnd.2da)
+//
+// The order is:
+// - battle cry on target acquisition, not each attack or each round
+// - sound is looked up in the animation 2da/ini
+// - sound is looked up in the CRE and played at the same time if set
+//   - if it's also set in the 2da, the CRE choice will be exclusive for selection and battle cry slots
+//   - we extend that with damage, die, and the swing stances/slots to mimic Infinity Sounds
+//     - this way, creatures with the same animation can still have different combat sounds
+// - if there's a hardcoded item override it's played at the same time
+//   - like Infinity Sounds we disable them and just use the animation 2das that weren't available for bg1
+// - the item type based swing sound is played (item type is invalid for the hardcoded cases, so no overlap)
+//
 void Actor::PlaySwingSound(const WeaponInfo &wi) const
 {
 	ResRef sound;
