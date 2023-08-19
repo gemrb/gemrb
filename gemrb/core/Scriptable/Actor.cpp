@@ -8359,6 +8359,8 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 		case UnderType(Verbal::Select):
 		case UnderType(Verbal::Select) + 1:
 		case UnderType(Verbal::Select) + 2:
+		case UnderType(Verbal::Select) + 3:
+		case UnderType(Verbal::Select) + 4:
 			index = 36; // Selection (yes, the row names are inconsistently capitalized)
 			break;
 		// entries without VB equivalents
