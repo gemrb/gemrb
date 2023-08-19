@@ -3714,16 +3714,24 @@ void Actor::PlaySelectionSound(bool force)
 	}
 
 	//drop the rare selection comment 5% of the time
+	bool found = false;
 	if (InParty && core->Roll(1,100,0) <= RARE_SELECT_CHANCE){
 		//rare select on main character for BG1 won't work atm
-		VerbalConstant(Verbal::SelectRare, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
+		found = VerbalConstant(Verbal::SelectRare, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
 	} else {
 		//checks if we are main character to limit select sounds
 		if (PCStats && !PCStats->SoundSet.IsEmpty()) {
-			VerbalConstant(Verbal::Select, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
+			found = VerbalConstant(Verbal::Select, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
 		} else {
-			VerbalConstant(Verbal::Select, NUM_SELECT_SOUNDS, DS_CIRCLE);
+			found = VerbalConstant(Verbal::Select, NUM_SELECT_SOUNDS, DS_CIRCLE);
 		}
+	}
+
+	// if nothing was found, fall back to 2da/ini sounds
+	if (!found) {
+		ResRef sound;
+		GetSoundFromFile(sound, TableMgr::index_t(Verbal::Select));
+		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
 	}
 }
 
