@@ -22,6 +22,8 @@
 	<string>auto</string>
 	<key>TerminateOnClose</key>
 	<true/>
+	<key>Logging</key>
+	<true/>
 	<key>AdditionalPaths</key>
 	<dict>
 		<key>CustomFontPath</key>
