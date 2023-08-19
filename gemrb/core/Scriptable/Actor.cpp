@@ -4005,7 +4005,11 @@ void Actor::GetHit(int damage, bool killingBlow)
 {
 	if (!Immobile() && !(InternalFlags & IF_REALLYDIED) && !killingBlow) {
 		SetStance( IE_ANI_DAMAGE );
-		VerbalConstant(Verbal::Damage);
+		if (!VerbalConstant(Verbal::Damage)) {
+			ResRef sound;
+			GetSoundFromFile(sound, TableMgr::index_t(Verbal::Damage));
+			core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
+		}
 	}
 
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
@@ -5185,7 +5189,12 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	game->SelectActor(this, false, SELECT_NORMAL);
 
 	displaymsg->DisplayConstantStringName(HCStrings::Death, GUIColors::WHITE, this);
-	VerbalConstant(Verbal::Die);
+	bool found = VerbalConstant(Verbal::Die);
+	if (found) {
+		ResRef sound;
+		GetSoundFromFile(sound, TableMgr::index_t(Verbal::Die));
+		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
+	}
 
 	// remove poison, hold, casterhold, stun and its icon
 	Effect *newfx;
