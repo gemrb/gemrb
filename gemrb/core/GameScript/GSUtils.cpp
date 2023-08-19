@@ -1543,19 +1543,11 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	}
 
 	if (!(flags & AC_NO_SOUND) && !Sender->CurrentActionTicks && !core->GetGameControl()->InDialog()) {
-		// play the battle cry
-		// pick from all 5 possible verbal constants
-		if (!attacker->PlayWarCry(5)) {
-			// for monsters also try their 2da/ini file sounds
-			if (!attacker->InParty) {
-				ResRef sound;
-				attacker->GetSoundFromFile(sound, TableMgr::index_t(Verbal::BattleCry));
-				core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, attacker->Pos);
-			}
-		}
-		//display attack message
+		// if the target changed scream and display attack message
 		if (target->GetGlobalID() != Sender->objects.LastTarget) {
 			displaymsg->DisplayConstantStringAction(HCStrings::ActionAttack, GUIColors::WHITE, Sender, target);
+			// pick from all 5 possible verbal constants
+			attacker->PlayWarCry(5);
 		}
 	}
 

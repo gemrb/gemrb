@@ -3727,10 +3727,17 @@ void Actor::PlaySelectionSound(bool force)
 	}
 }
 
-bool Actor::PlayWarCry(int range) const
+void Actor::PlayWarCry(int range) const
 {
-	if (!war_cries) return false;
-	return VerbalConstant(Verbal::Attack, range, DS_CIRCLE);
+	if (!war_cries) return;
+
+	bool found = VerbalConstant(Verbal::BattleCry, range, DS_CIRCLE);
+	// for monsters also try their 2da/ini file sounds
+	if (!found && !InParty) {
+		ResRef sound;
+		GetSoundFromFile(sound, TableMgr::index_t(Verbal::BattleCry));
+		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
+	}
 }
 
 #define SEL_ACTION_COUNT_COMMON  3

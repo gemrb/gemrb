@@ -699,7 +699,7 @@ public:
 	/* call this on gui selects */
 	void PlaySelectionSound(bool force = false);
 	/* play a roar if the setting isn't disabled */
-	bool PlayWarCry(int range) const;
+	void PlayWarCry(int range) const;
 	/* call this when adding actions via gui */
 	void CommandActor(Action* action, bool clearPath=true);
 	/** handle panic and other involuntary actions that mess with scripting */
