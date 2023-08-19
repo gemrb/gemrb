@@ -1549,7 +1549,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			// for monsters also try their 2da/ini file sounds
 			if (!attacker->InParty) {
 				ResRef sound;
-				attacker->GetSoundFromFile(sound, 200U);
+				attacker->GetSoundFromFile(sound, TableMgr::index_t(Verbal::BattleCry));
 				core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, attacker->Pos);
 			}
 		}

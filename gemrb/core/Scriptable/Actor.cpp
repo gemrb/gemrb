@@ -8327,7 +8327,6 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 	if (!tab) return false;
 
 	switch (index) {
-		// TODO: research whether this VB should be split into 5x VB_BATTLE_CRY and 4x VB_ATTACK (like in NI)
 		// wasn't played if the weapon wasn't of type misc (so just the swing sound if any)
 		case UnderType(Verbal::Attack):
 			index = 0;
@@ -8338,7 +8337,9 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 		case UnderType(Verbal::Die):
 			index = 10;
 			break;
-		//TODO: one day we should implement verbal constant groups
+		case UnderType(Verbal::BattleCry):
+			index = 34; // Battle_Cry
+			break;
 		case UnderType(Verbal::Dialog):
 		case UnderType(Verbal::Select):
 		case UnderType(Verbal::Select) + 1:
@@ -8358,10 +8359,6 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 			break;
 		case 100+IE_ANI_ATTACK_JAB:
 			index = 26; // ATTACK_JAB
-			break;
-		// TODO: research whether this entry is ever different from ATTACK and what's the difference in use
-		case 200:
-			index = 34; // Battle_Cry
 			break;
 		default:
 			Log(WARNING, "Actor", "TODO: Cannot determine 2DA rowcount for index: {}", index);
@@ -8414,6 +8411,11 @@ bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
 				resource = core->GetResDataINI()->GetKeyAsString(section, "selected");
 			}
 			break;
+		case UnderType(Verbal::BattleCry):
+			if (IWDSound) {
+				resource = core->GetResDataINI()->GetKeyAsString(section, "btlcry");
+			}
+			break;
 		// entries without VB equivalents
 		case 100+IE_ANI_SHOOT:
 		case 100+IE_ANI_ATTACK_SLASH:
@@ -8422,11 +8424,9 @@ bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
 			// FIXME: complete guess
 			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "att2" : "at2sound"));
 			break;
-		case 200: // battle cry
-			if (IWDSound) {
-				resource = core->GetResDataINI()->GetKeyAsString(section, "btlcry");
-			}
-			break;
+		default:
+			Log(WARNING, "Actor", "TODO: Cannot determine INI entry for index: {}", index);
+			return false;
 	}
 
 	auto elements = Explode<StringView, ResRef>(resource);

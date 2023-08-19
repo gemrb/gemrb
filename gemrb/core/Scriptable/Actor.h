@@ -350,7 +350,8 @@ enum class Verbal {
 	Leader = 6,
 	Tired = 7,
 	Bored = 8,
-	Attack = 9, // 5 battle cries, 4 attacks
+	BattleCry = 9, // 5 battle cries
+	Attack = 14, // 4 attacks
 	Damage = 18,
 	Die = 19,
 	Hurt = 20,
