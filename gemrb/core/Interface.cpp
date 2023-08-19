@@ -3633,7 +3633,7 @@ int Interface::WriteCharacter(StringView name, const Actor* actor) const
 	if (!HasFeature(GFFlags::NO_BIOGRAPHY)) {
 		str.Create(Path, name.c_str(), IE_BIO_CLASS_ID);
 		//never write the string reference into this string
-		std::string mbstr = GetMBString(actor->GetVerbalConstant(VB_BIO), STRING_FLAGS::STRREFOFF);
+		std::string mbstr = GetMBString(actor->GetVerbalConstant(Verbal::Bio), STRING_FLAGS::STRREFOFF);
 		str.Write(mbstr.data(), mbstr.length());
 	}
 	return 0;

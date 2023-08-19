@@ -85,7 +85,7 @@ static std::vector<std::vector<int>> wmLevelMods;
 static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
 //verbal constant specific data
-static int VCMap[VCONST_COUNT];
+static std::array<Verbal, size_t(Verbal::LastVB)> VCMap;
 static ieDword sel_snd_freq = 0;
 static ieDword cmd_snd_freq = 0;
 static ieDword crit_hit_scr_shake = 1;
@@ -197,7 +197,7 @@ static const char gemrb2iwd[32] = {
 };
 
 //letters for char sound resolution bg1/bg2
-static char csound[VCONST_COUNT];
+static char csound[size_t(Verbal::LastVB)];
 
 static void InitActorTables();
 
@@ -877,13 +877,20 @@ static void UpdateHappiness(Actor *actor) {
 	const Effect* fx;
 	static EffectRef fx_ignore_breaking_point_ref = { "IgnoreReputationBreakingPoint", -1 };
 	switch (newHappiness) {
-		case -80: actor->VerbalConstant(VB_UNHAPPY, 1, DS_QUEUE); break;
-		case -160: actor->VerbalConstant(VB_UNHAPPY_SERIOUS, 1, DS_QUEUE); break;
-		case -300: actor->VerbalConstant(VB_BREAKING_POINT, 1, DS_QUEUE);
+		case -80:
+			actor->VerbalConstant(Verbal::Unhappy, 1, DS_QUEUE);
+			break;
+		case -160:
+			actor->VerbalConstant(Verbal::UnhappySerious, 1, DS_QUEUE);
+			break;
+		case -300:
+			actor->VerbalConstant(Verbal::BreakingPoint, 1, DS_QUEUE);
 			fx = actor->fxqueue.HasEffect(fx_ignore_breaking_point_ref);
 			if (!fx && actor != core->GetGame()->GetPC(0, false)) core->GetGame()->LeaveParty(actor);
 			break;
-		case 80: actor->VerbalConstant(VB_HAPPY, 1, DS_QUEUE); break;
+		case 80:
+			actor->VerbalConstant(Verbal::Happy, 1, DS_QUEUE);
+			break;
 		default: break; // case 0
 	}
 }
@@ -1136,7 +1143,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	} else {
 		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
 		if (signed(3*oldValue) > maxhp && signed(3*hp) < maxhp) {
-			actor->VerbalConstant(VB_HURT, 1, DS_QUEUE);
+			actor->VerbalConstant(Verbal::Hurt, 1, DS_QUEUE);
 		}
 	}
 
@@ -1751,7 +1758,7 @@ static void InitActorTables()
 	if (!core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		tm = gamedata->LoadTable("csound");
 		if (tm) {
-			for (int i = 0; i < VCONST_COUNT; i++) {
+			for (int i = 0; i < int(Verbal::LastVB); i++) {
 				const auto& suffix = tm->QueryField(i, 0);
 				switch(suffix[0]) {
 					case '*': break;
@@ -2071,8 +2078,8 @@ static void InitActorTables()
 
 	// verbal constant remapping, if omitted, it is an 1-1 mapping
 	// TODO: allow disabled VC slots
-	for (int i = 0; i < VCONST_COUNT; i++) {
-		VCMap[i]=i;
+	for (int i = 0; i < int(Verbal::LastVB); i++) {
+		VCMap[i] = static_cast<Verbal>(i);
 	}
 	tm = gamedata->LoadTable("vcremap");
 	if (tm) {
@@ -2080,10 +2087,10 @@ static void InitActorTables()
 
 		for (TableMgr::index_t i = 0; i < rows; i++) {
 			int row = tm->QueryFieldSigned<int>(i,0);
-			if (row<0 || row>=VCONST_COUNT) continue;
+			if (row < 0 || row >= int(Verbal::LastVB)) continue;
 			int value = tm->QueryFieldSigned<int>(i,1);
-			if (value<0 || value>=VCONST_COUNT) continue;
-			VCMap[row]=value;
+			if (value < 0 || value >= int(Verbal::LastVB)) continue;
+			VCMap[row] = static_cast<Verbal>(value);
 		}
 	}
 
@@ -3108,7 +3115,7 @@ void Actor::UpdateFatigue()
 	if (FatigueComplaintDelay) {
 		FatigueComplaintDelay--;
 		if (!FatigueComplaintDelay) {
-			VerbalConstant(VB_TIRED);
+			VerbalConstant(Verbal::Tired);
 		}
 	}
 }
@@ -3398,22 +3405,34 @@ int Actor::NewBase(unsigned int StatIndex, stat_t ModifierValue, ieDword Modifie
 
 void Actor::Interact(int type) const
 {
-	int start;
+	Verbal start;
 	int count;
 	bool queue = false;
 
 	switch(type&0xff) {
-		case I_INSULT: start=VB_INSULT; break;
-		case I_COMPLIMENT: start=VB_COMPLIMENT; break;
-		case I_SPECIAL: start=VB_SPECIAL; break;
-		case I_INSULT_RESP: start=VB_RESP_INS; queue=true; break;
-		case I_COMPL_RESP: start=VB_RESP_COMP; queue=true; break;
+		case I_INSULT:
+			start = Verbal::Insult;
+			break;
+		case I_COMPLIMENT:
+			start = Verbal::Compliment;
+			break;
+		case I_SPECIAL:
+			start = Verbal::Special;
+			break;
+		case I_INSULT_RESP:
+			start = Verbal::Resp2Insult;
+			queue = true;
+			break;
+		case I_COMPL_RESP:
+			start = Verbal::Resp2Compliment;
+			queue = true;
+			break;
 		default:
 			return;
 	}
 	if (type&0xff00) {
 		//PST style fixed slots
-		start+=((type&0xff00)>>8)-1;
+		start = Verbal(UnderType(start) + ((type & 0xff00) >> 8) - 1);
 		count = 1;
 	} else {
 		//BG1 style random slots
@@ -3422,33 +3441,34 @@ void Actor::Interact(int type) const
 	VerbalConstant(start, count, queue ? DS_QUEUE : 0);
 }
 
-ieStrRef Actor::GetVerbalConstant(size_t index) const
+ieStrRef Actor::GetVerbalConstant(Verbal index) const
 {
-	if (index >= VCONST_COUNT) {
+	if (index >= Verbal::LastVB) {
 		return ieStrRef::INVALID;
 	}
 
-	int idx = VCMap[index];
-	if (idx >= VCONST_COUNT) {
+	size_t idx = size_t(index);
+	if (VCMap[idx] >= Verbal::LastVB) {
 		return ieStrRef::INVALID;
 	}
 	return StrRefs[idx];
 }
 
-ieStrRef Actor::GetVerbalConstant(int start, int count) const
+ieStrRef Actor::GetVerbalConstant(Verbal start, int count) const
 {
-	while (count > 0 && GetVerbalConstant(start+count-1) == ieStrRef::INVALID) {
+	int firstVB = static_cast<int>(start);
+	while (count > 0 && GetVerbalConstant(Verbal(firstVB + count - 1)) == ieStrRef::INVALID) {
 		count--;
 	}
 	if (count > 0) {
-		return GetVerbalConstant(start+RAND(0, count-1));
+		return GetVerbalConstant(Verbal(firstVB + RAND(0, count - 1)));
 	}
 	return ieStrRef::INVALID;
 }
 
-bool Actor::VerbalConstant(int start, int count, int flags) const
+bool Actor::VerbalConstant(Verbal start, int count, int flags) const
 {
-	if (start!=VB_DIE) {
+	if (start != Verbal::Die) {
 		//can't talk when dead
 		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return false;
 	}
@@ -3465,10 +3485,11 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 		ResRef soundRef;
 		do {
 			count--;
-			GetVerbalConstantSound(soundRef, start + count);
+			int firstVB = static_cast<int>(start);
+			GetVerbalConstantSound(soundRef, Verbal(firstVB + count));
 			auto soundFolder = GetSoundFolder(1, soundRef);
 			if (gamedata->Exists(soundFolder, IE_WAV_CLASS_ID, true) || gamedata->Exists(soundFolder, IE_OGG_CLASS_ID, true)) {
-				DisplayStringCoreVC((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
+				DisplayStringCoreVC((Scriptable*) this, Verbal(firstVB + RAND(0, count)), flags | DS_CONST);
 				found = true;
 				break;
 			}
@@ -3483,12 +3504,13 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 	return found;
 }
 
-void Actor::DisplayStringOrVerbalConstant(HCStrings str, int vcstat, int vccount) const {
+void Actor::DisplayStringOrVerbalConstant(HCStrings str, Verbal vcStat, int vcCount) const
+{
 	ieStrRef strref = DisplayMessage::GetStringReference(str);
 	if (strref != ieStrRef::INVALID) {
 		DisplayStringCore((Scriptable *) this, strref, DS_CONSOLE|DS_CIRCLE);
 	} else {
-		VerbalConstant(vcstat, vccount);
+		VerbalConstant(vcStat, vcCount);
 	}
 }
 
@@ -3510,10 +3532,10 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	// if value is string - use playsound instead (pst)
 	std::string value = tm->QueryField(scriptName, deadname);
 	if (value[0] == '0') {
-		VerbalConstant(VB_REACT, 1, DS_QUEUE);
+		VerbalConstant(Verbal::React, 1, DS_QUEUE);
 		return;
 	} else if (value[0] == '1') {
-		VerbalConstant(VB_REACT_S, 1, DS_QUEUE);
+		VerbalConstant(Verbal::ReactSpecific, 1, DS_QUEUE);
 		return;
 	}
 
@@ -3540,9 +3562,9 @@ void Actor::GetAreaComment(int areaflag) const
 {
 	for (const auto& comment : areaComments) {
 		if (comment[0] & areaflag) {
-			int vc = comment[1];
+			Verbal vc = static_cast<Verbal>(comment[1]);
 			if (comment[2] && !core->GetGame()->IsDay()) {
-				vc++;
+				vc = static_cast<Verbal>(comment[1] + 1);
 			}
 			VerbalConstant(vc);
 			return;
@@ -3694,13 +3716,13 @@ void Actor::PlaySelectionSound(bool force)
 	//drop the rare selection comment 5% of the time
 	if (InParty && core->Roll(1,100,0) <= RARE_SELECT_CHANCE){
 		//rare select on main character for BG1 won't work atm
-		VerbalConstant(VB_SELECT_RARE, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
+		VerbalConstant(Verbal::SelectRare, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
 	} else {
 		//checks if we are main character to limit select sounds
 		if (PCStats && !PCStats->SoundSet.IsEmpty()) {
-			VerbalConstant(VB_SELECT, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
+			VerbalConstant(Verbal::Select, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
 		} else {
-			VerbalConstant(VB_SELECT, NUM_SELECT_SOUNDS, DS_CIRCLE);
+			VerbalConstant(Verbal::Select, NUM_SELECT_SOUNDS, DS_CIRCLE);
 		}
 	}
 }
@@ -3708,7 +3730,7 @@ void Actor::PlaySelectionSound(bool force)
 bool Actor::PlayWarCry(int range) const
 {
 	if (!war_cries) return false;
-	return VerbalConstant(VB_ATTACK, range, DS_CIRCLE);
+	return VerbalConstant(Verbal::Attack, range, DS_CIRCLE);
 }
 
 #define SEL_ACTION_COUNT_COMMON  3
@@ -3745,7 +3767,7 @@ void Actor::CommandActor(Action* action, bool clearPath)
 
 	if (core->GetFirstSelectedPC(false) == this) {
 		// bg2 uses up the traditional space for rare select sound slots for more action (command) sounds
-		VerbalConstant(VB_COMMAND, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON, DS_CIRCLE);
+		VerbalConstant(Verbal::Command, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON, DS_CIRCLE);
 	}
 }
 
@@ -3808,7 +3830,7 @@ void Actor::IdleActions(bool nonidle)
 		if (bored_time && nextBored && nextBored < time) {
 			int x = std::max(10U, bored_time / 10);
 			nextBored = time+core->Roll(1,30,x);
-			VerbalConstant(VB_BORED);
+			VerbalConstant(Verbal::Bored);
 		}
 
 		// display idle animation
@@ -3842,7 +3864,7 @@ void Actor::PlayExistenceSounds()
 	Point listener = audio->GetListenerPos();
 	if (nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
 		//setup as an ambient
-		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
+		ieStrRef strref = GetVerbalConstant(Verbal::Existence1, 5);
 		if (strref == ieStrRef::INVALID) {
 			nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
 			return;
@@ -3910,7 +3932,7 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 		return;
 	}
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-	VerbalConstant(VB_PANIC);
+	VerbalConstant(Verbal::Panic);
 
 	Action *action;
 	if (panicmode == PANIC_RUNAWAY && (!attacker || attacker->Type!=ST_ACTOR)) {
@@ -3956,13 +3978,11 @@ void Actor::DialogInterrupt() const
 
 	/* this part is unsure */
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
-		VerbalConstant(VB_HOSTILE);
+		VerbalConstant(Verbal::Hostile);
+	} else if (TalkCount) {
+		VerbalConstant(Verbal::Dialog);
 	} else {
-		if (TalkCount) {
-			VerbalConstant(VB_DIALOG);
-		} else {
-			VerbalConstant(VB_INITIALMEET);
-		}
+		VerbalConstant(Verbal::InitialMeet);
 	}
 }
 
@@ -3970,7 +3990,7 @@ void Actor::GetHit(int damage, bool killingBlow)
 {
 	if (!Immobile() && !(InternalFlags & IF_REALLYDIED) && !killingBlow) {
 		SetStance( IE_ANI_DAMAGE );
-		VerbalConstant(VB_DAMAGE);
+		VerbalConstant(Verbal::Damage);
 	}
 
 	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
@@ -5132,7 +5152,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	game->SelectActor(this, false, SELECT_NORMAL);
 
 	displaymsg->DisplayConstantStringName(HCStrings::Death, GUIColors::WHITE, this);
-	VerbalConstant(VB_DIE);
+	VerbalConstant(Verbal::Die);
 
 	// remove poison, hold, casterhold, stun and its icon
 	Effect *newfx;
@@ -7038,7 +7058,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		Log(COMBAT, "Attack", "{}", buffer);
 		if (!gc->InDialog()) {
 			displaymsg->DisplayMsgAtLocation(HCStrings::CriticalMiss, FT_COMBAT, this, this, GUIColors::WHITE);
-			VerbalConstant(VB_CRITMISS);
+			VerbalConstant(Verbal::CritMiss);
 		}
 		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
 			UseItem(wi.slot, (ieDword) -2, target, UI_MISS|UI_NOAURA);
@@ -7080,7 +7100,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		Log(COMBAT, "Attack", "{}", buffer);
 		if (!gc->InDialog()) {
 			displaymsg->DisplayMsgAtLocation(HCStrings::CriticalHit, FT_COMBAT, this, this, GUIColors::WHITE);
-			VerbalConstant(VB_CRITHIT);
+			VerbalConstant(Verbal::CritHit);
 		}
 		ApplyCriticalEffect(this, target, wi, true);
 	} else {
@@ -7243,7 +7263,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	if (damage <= 0 && !core->InCutSceneMode()) {
 		if (attacker && attacker->InParty) {
 			if (core->HasFeedback(FT_COMBAT)) {
-				attacker->DisplayStringOrVerbalConstant(HCStrings::WeaponIneffective, VB_TIMMUNE);
+				attacker->DisplayStringOrVerbalConstant(HCStrings::WeaponIneffective, Verbal::WeaponIneffective);
 			}
 			core->Autopause(AUTOPAUSE::UNUSABLE, this);
 		}
@@ -8270,7 +8290,7 @@ bool Actor::HandleActorStance()
 bool Actor::GetSoundFromFile(ResRef& Sound, TableMgr::index_t index) const
 {
 	// only dying ignores the incapacity to vocalize
-	if (index != VB_DIE) {
+	if (Verbal(index) != Verbal::Die) {
 		if (Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
 	}
 
@@ -8291,20 +8311,20 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
 	switch (index) {
 		// TODO: research whether this VB should be split into 5x VB_BATTLE_CRY and 4x VB_ATTACK (like in NI)
 		// wasn't played if the weapon wasn't of type misc (so just the swing sound if any)
-		case VB_ATTACK:
+		case UnderType(Verbal::Attack):
 			index = 0;
 			break;
-		case VB_DAMAGE:
+		case UnderType(Verbal::Damage):
 			index = 8;
 			break;
-		case VB_DIE:
+		case UnderType(Verbal::Die):
 			index = 10;
 			break;
 		//TODO: one day we should implement verbal constant groups
-		case VB_DIALOG:
-		case VB_SELECT:
-		case VB_SELECT+1:
-		case VB_SELECT+2:
+		case UnderType(Verbal::Dialog):
+		case UnderType(Verbal::Select):
+		case UnderType(Verbal::Select) + 1:
+		case UnderType(Verbal::Select) + 2:
 			index = 36; // Selection (yes, the row names are inconsistently capitalized)
 			break;
 		// entries without VB equivalents
@@ -8361,16 +8381,16 @@ bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
 	 */
 	StringView resource;
 	switch(index) {
-		case VB_ATTACK:
+		case UnderType(Verbal::Attack):
 			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "att1" : "at1sound"));
 			break;
-		case VB_DAMAGE:
+		case UnderType(Verbal::Damage):
 			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "damage" : "hitsound"));
 			break;
-		case VB_DIE:
+		case UnderType(Verbal::Die):
 			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "death" : "dfbsound"));
 			break;
-		case VB_SELECT:
+		case UnderType(Verbal::Select):
 			//this isn't in PST, apparently
 			if (IWDSound) {
 				resource = core->GetResDataINI()->GetKeyAsString(section, "selected");
@@ -8401,20 +8421,20 @@ bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
 	return true;
 }
 
-void Actor::GetVerbalConstantSound(ResRef& Sound, size_t index) const
+void Actor::GetVerbalConstantSound(ResRef& Sound, Verbal index) const
 {
+	TableMgr::index_t idx = TableMgr::index_t(index);
 	if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 		//resolving soundset (bg1/bg2 style)
 
 		// handle nonstandard bg1 "default" soundsets first
 		if (PCStats->SoundSet == "main") {
 			static const char *suffixes[] = { "03", "08", "09", "10", "11", "17", "18", "19", "20", "21", "22", "38", "39" };
-			static unsigned int VB2Suffix[] = { 9, 6, 7, 8, 20, 26, 27, 28, 32, 33, 34, 18, 19 };
+			static TableMgr::index_t VB2Suffix[] = { 9, 6, 7, 8, 20, 26, 27, 28, 32, 33, 34, 18, 19 };
 			bool found = false;
-
 			for (int i = 0; i < 13; i++) {
-				if (VB2Suffix[i] == index) {
-					index = i;
+				if (VB2Suffix[i] == idx) {
+					idx = i;
 					found = true;
 					break;
 				}
@@ -8424,24 +8444,24 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, size_t index) const
 				return;
 			}
 
-			Sound.Format("{:.5}{:.2}", PCStats->SoundSet, suffixes[index]);
+			Sound.Format("{:.5}{:.2}", PCStats->SoundSet, suffixes[idx]);
 			return;
-		} else if (csound[index]) {
-			Sound.Format("{}{}", PCStats->SoundSet, csound[index]);
+		} else if (csound[idx]) {
+			Sound.Format("{}{}", PCStats->SoundSet, csound[idx]);
 			return;
 		}
 
 		//icewind style
-		Sound.Format("{}{:02d}", PCStats->SoundSet, VCMap[index]);
+		Sound.Format("{}{:02d}", PCStats->SoundSet, int(VCMap[idx]));
 		return;
 	}
 
 	Sound.Reset();
 
 	if (core->HasFeature(GFFlags::RESDATA_INI)) {
-		GetSoundFromINI(Sound, index);
+		GetSoundFromINI(Sound, idx);
 	} else {
-		GetSoundFrom2DA(Sound, index);
+		GetSoundFrom2DA(Sound, idx);
 	}
 
 	//Empty resrefs
@@ -9053,7 +9073,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 		damage = 0;
 		critical = false;
 		if (InParty) {
-			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(HCStrings::WeaponIneffective, VB_TIMMUNE);
+			if (core->HasFeedback(FT_COMBAT)) DisplayStringOrVerbalConstant(HCStrings::WeaponIneffective, Verbal::WeaponIneffective);
 			core->Autopause(AUTOPAUSE::UNUSABLE, this);
 		}
 		return;
@@ -10490,7 +10510,7 @@ bool Actor::TryToHide()
 		HideFailed(this, 0, skill/7, roll);
 		return false;
 	}
-	if (!continuation) VerbalConstant(VB_HIDE);
+	if (!continuation) VerbalConstant(Verbal::Hide);
 	if (!third) return true;
 
 	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~

@@ -176,8 +176,6 @@ enum CREVersion {
 #define GA_CAN_BUMP 65536
 #define GA_BIGBAD 131072
 
-#define VCONST_COUNT 100
-
 //interact types
 #define I_NONE       0
 #define I_INSULT     1
@@ -340,6 +338,54 @@ enum DamageFlags {
 	NoAwake = 0x200
 };
 
+// verbal constant (bg2), we have a lookup table (vcremap) for other games
+// an index into VCMap
+enum class Verbal {
+	InitialMeet = 0,
+	Panic = 1,
+	Happy = 2,
+	Unhappy = 3, // UNHAPPY_ANNOYED
+	UnhappySerious = 4,
+	BreakingPoint = 5,
+	Leader = 6,
+	Tired = 7,
+	Bored = 8,
+	Attack = 9, // 5 battle cries, 4 attacks
+	Damage = 18,
+	Die = 19,
+	Hurt = 20,
+	AreaForest = 21, // these 5 are handled through comment.2da / Actor::GetAreaComment
+	AreaCity = 22,
+	AreaDungeon = 23,
+	AreaDay = 24,
+	AreaNight = 25,
+	Select = 26, // -31 select
+	Command = 32, // -34 select action; -38 rare select, -43 interaction
+	Insult = 44, // -46
+	Compliment = 47, // -49
+	Special = 50, // -52
+	React = 53, // REACT_TO_DIE_GENERAL
+	ReactSpecific = 54, // REACT_TO_DIE_SPECIFIC
+	Resp2Compliment = 55, // -57
+	Resp2Insult = 58, // -60
+	Hostile = 61,
+	Dialog = 62, // DIALOG_DEFAULT
+	SelectRare = 63, // -64
+	CritHit = 65,
+	CritMiss = 66,
+	WeaponIneffective = 67, // TARGET_IMMUNE
+	InventoryFull = 68,
+	PickedPocket = 69, // same as Existence1, but only used by joinables
+	Existence1 = 69, // same as PickedPocket
+	Hide = 70,
+	SpellDisrupted = 71,
+	TrapSet = 72,
+	Existence4 = 73, // unused in bg2, NI appears to have a gap of 1 — this should be Existence5 already
+	Bio = 74, // Existence5, biography for npcs
+
+	LastVB = 100
+};
+
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
 bool VVCSort(const ScriptedAnimation* lhs, const ScriptedAnimation* rhs);
@@ -368,7 +414,7 @@ public:
 	
 	ieStrRef ShortStrRef = ieStrRef(-1);
 	ieStrRef LongStrRef = ieStrRef(-1);
-	ieStrRef StrRefs[VCONST_COUNT]{};
+	ieStrRef StrRefs[size_t(Verbal::LastVB)] {};
 
 	ieDword AppearanceFlags = 0;
 
@@ -666,13 +712,13 @@ public:
 	/* inlined dialogue start */
 	void Interact(int type) const;
 	/* returns a remapped verbal constant strref */
-	ieStrRef GetVerbalConstant(size_t index) const;
+	ieStrRef GetVerbalConstant(Verbal index) const;
 	/* returns a random remapped verbal constant strref */
-	ieStrRef GetVerbalConstant(int start, int count) const;
+	ieStrRef GetVerbalConstant(Verbal start, int count) const;
 	/* displaying a random verbal constant */
-	bool VerbalConstant(int start, int count=1, int flags=0) const;
+	bool VerbalConstant(Verbal start, int count = 1, int flags = 0) const;
 	/* display string or verbal constant depending on what is available */
-	void DisplayStringOrVerbalConstant(HCStrings str, int vcstat, int vccount = 1) const;
+	void DisplayStringOrVerbalConstant(HCStrings str, Verbal vcStat, int vcCount = 1) const;
 	/* inlined dialogue response */
 	void Response(int type) const;
 	/* called when someone died in the party */
@@ -802,7 +848,7 @@ public:
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
-	void GetVerbalConstantSound(ResRef& sound, size_t index) const;
+	void GetVerbalConstantSound(ResRef& sound, Verbal index) const;
 	bool GetSoundFromFile(ResRef& Sound, TableMgr::index_t index) const;
 	bool GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const;
 	bool GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const;

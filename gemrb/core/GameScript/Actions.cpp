@@ -950,7 +950,7 @@ void GameScript::VerbalConstantHead(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	DisplayStringCoreVC(tar, parameters->int0Parameter, DS_HEAD|DS_CONSOLE);
+	DisplayStringCoreVC(tar, Verbal(parameters->int0Parameter), DS_HEAD | DS_CONSOLE);
 }
 
 void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
@@ -959,7 +959,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	DisplayStringCoreVC(tar, parameters->int0Parameter, DS_CONSOLE);
+	DisplayStringCoreVC(tar, Verbal(parameters->int0Parameter), DS_CONSOLE);
 }
 
 //bg2 - variable
@@ -4163,7 +4163,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 		// drop it at my feet
 		map->AddItemToLocation(tar->Pos, item);
 		if (act->InParty) {
-			act->VerbalConstant(VB_INVENTORY_FULL);
+			act->VerbalConstant(Verbal::InventoryFull);
 			displaymsg->DisplayMsgCentered(HCStrings::InventoryFullItemDrop, FT_MISC, GUIColors::XPCHANGE);
 		}
 	} else if (act->InParty) {
@@ -4202,7 +4202,7 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 		// drop it at my feet
 		map->AddItemToLocation(Sender->Pos, item);
 		if (act->InParty) {
-			act->VerbalConstant(VB_INVENTORY_FULL);
+			act->VerbalConstant(Verbal::InventoryFull);
 			displaymsg->DisplayMsgCentered(HCStrings::InventoryFullItemDrop, FT_MISC, GUIColors::XPCHANGE);
 		}
 	} else if (act->InParty) {
@@ -4682,13 +4682,13 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	if (core->HasFeedback(FT_MISC)) displaymsg->DisplayMsgAtLocation(HCStrings::PickpocketDone, FT_ANY, Sender, Sender, GUIColors::WHITE);
-	DisplayStringCoreVC(snd, VB_PP_SUCC, DS_CONSOLE);
+	DisplayStringCoreVC(snd, Verbal::PickedPocket, DS_CONSOLE);
 
 	int xp = gamedata->GetXPBonus(XP_PICKPOCKET, scr->GetXPLevel(1));
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
 
 	if (ret == MIC_FULL && snd->InParty) {
-		if (!core->HasFeature(GFFlags::PST_STATE_FLAGS)) snd->VerbalConstant(VB_INVENTORY_FULL);
+		if (!core->HasFeature(GFFlags::PST_STATE_FLAGS)) snd->VerbalConstant(Verbal::InventoryFull);
 		if (reportFailure) displaymsg->DisplayMsgAtLocation(HCStrings::PickpocketInventoryFull, FT_ANY, Sender, Sender, GUIColors::WHITE);
 	}
 	Sender->ReleaseCurrentAction();

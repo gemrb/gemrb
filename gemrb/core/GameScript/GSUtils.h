@@ -128,7 +128,7 @@ Point GetEntryPoint(const ResRef& areaname, const ResRef& entryname);
 GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead, bool halveRange = false);
 GEM_EXPORT int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos);
 GEM_EXPORT bool DiffCore(ieDword a, ieDword b, int diffMode);
-GEM_EXPORT void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags);
+GEM_EXPORT void DisplayStringCoreVC(Scriptable* Sender, Verbal vc, int flags);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, ieStrRef str, int flags, const char* sound = nullptr);
 bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point &position, int face);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust);

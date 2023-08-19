@@ -52,49 +52,6 @@ class GameScript;
 #define DS_QUEUE   256
 #define DS_CIRCLE  512
 
-//verbal constant (bg2), we have a lookup table (vcremap) for other games
-#define VB_INITIALMEET 0
-#define VB_PANIC     1
-#define VB_HAPPY     2
-#define VB_UNHAPPY   3 // UNHAPPY_ANNOYED
-#define VB_UNHAPPY_SERIOUS 4
-#define VB_BREAKING_POINT 5
-#define VB_LEADER    6
-#define VB_TIRED     7
-#define VB_BORED     8
-#define VB_ATTACK    9 // 5 battle cries, 4 attacks
-#define VB_DAMAGE    18
-#define VB_DIE       19
-#define VB_HURT 20
-#define VB_AREA_FOREST 21 // these are handled through comment.2da / Actor::GetAreaComment
-#define VB_AREA_CITY 22
-#define VB_AREA_DUNGEON 23
-#define VB_AREA_DAY 24
-#define VB_AREA_NIGHT 25
-#define VB_SELECT    26 // -31 select
-#define VB_COMMAND   32 // -34 select action; -38 rare select, -43 interaction
-#define VB_INSULT    44 // -46
-#define VB_COMPLIMENT 47 // -49
-#define VB_SPECIAL   50 // -52
-#define VB_REACT     53 // REACT_TO_DIE_GENERAL
-#define VB_REACT_S   54 // REACT_TO_DIE_SPECIFIC
-#define VB_RESP_COMP 55 // -57
-#define VB_RESP_INS  58 // -60
-#define VB_HOSTILE   61
-#define VB_DIALOG    62 // DIALOG_DEFAULT
-#define VB_SELECT_RARE 63 // -64
-#define VB_CRITHIT   65
-#define VB_CRITMISS  66
-#define VB_TIMMUNE   67
-#define VB_INVENTORY_FULL 68
-#define VB_PP_SUCC   69
-#define VB_EXISTENCE 69
-#define VB_HIDE      70
-#define VB_SPELL_DISRUPTED 71
-#define VB_TRAP_SET  72
-//#define VB_EXISTANCE_4 73
-#define VB_BIO       74
-
 //markspellandobject (iwd2)
 #define MSO_IGNORE_SEE     1
 #define MSO_IGNORE_INVALID 2

@@ -6952,7 +6952,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	//success
 	displaymsg->DisplayConstantStringName(HCStrings::SnareSucceed, GUIColors::WHITE, target);
-	target->VerbalConstant(VB_TRAP_SET);
+	target->VerbalConstant(Verbal::TrapSet);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ResRef OldSpellResRef(Owner->SpellResRef);
 	Owner->DirectlyCastSpellPoint(fx->Pos, fx->Resource, level, true, false);
@@ -8267,7 +8267,7 @@ int fx_floattext(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		return FX_APPLIED;
 	case 3: // gemrb extension, displays verbalconstant
-		DisplayStringCoreVC(target, fx->Parameter1, DS_HEAD);
+		DisplayStringCoreVC(target, Verbal(fx->Parameter1), DS_HEAD);
 		break;
 	default:
 		DisplayStringCore(target, ieStrRef(fx->Parameter1), DS_HEAD);

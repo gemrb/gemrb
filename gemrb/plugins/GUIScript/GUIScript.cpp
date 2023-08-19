@@ -3774,7 +3774,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	if (str<0 || str>=VCONST_COUNT) {
+	if (str < 0 || Verbal(str) >= Verbal::LastVB) {
 		return AttributeError( "SoundSet Entry is too large" );
 	}
 
@@ -5549,7 +5549,7 @@ static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	if (StringSlot>=VCONST_COUNT) {
+	if (StringSlot >= int(Verbal::LastVB)) {
 		return AttributeError( "StringSlot is out of range!\n" );
 	}
 
@@ -6079,7 +6079,7 @@ static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	if (Index>=VCONST_COUNT) {
+	if (Index >= int(Verbal::LastVB)) {
 		return RuntimeError("String reference is too high!\n");
 	}
 

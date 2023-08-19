@@ -451,7 +451,7 @@ static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, con
 	return false;
 }
 
-void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
+void DisplayStringCoreVC(Scriptable* Sender, Verbal vc, int flags)
 {
 	//no one hears you when you are in the Limbo!
 	if (!Sender || !Sender->GetCurrentArea()) {
@@ -469,7 +469,7 @@ void DisplayStringCoreVC(Scriptable* Sender, size_t vc, int flags)
 		return;
 	}
 
-	if (vc >= VCONST_COUNT) {
+	if (vc >= Verbal::LastVB) {
 		Log(ERROR, "GameScript", "Invalid verbal constant!");
 		return;
 	}
@@ -732,7 +732,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 		if (gotitem) {
 			tmp = Scriptable::As<Actor>(target);
 			if (tmp && tmp->InParty) {
-				tmp->VerbalConstant(VB_INVENTORY_FULL);
+				tmp->VerbalConstant(Verbal::InventoryFull);
 			}
 			displaymsg->DisplayMsgCentered(HCStrings::InventoryFullItemDrop, FT_ANY, GUIColors::XPCHANGE);
 		}
@@ -2640,7 +2640,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 		} else {
 			displaymsg->DisplayConstantStringName(HCStrings::SpellFailed, GUIColors::WHITE, Sender);
 		}
-		DisplayStringCoreVC(Sender, VB_SPELL_DISRUPTED, DS_CONSOLE);
+		DisplayStringCoreVC(Sender, Verbal::SpellDisrupted, DS_CONSOLE);
 		return true;
 	}
 
