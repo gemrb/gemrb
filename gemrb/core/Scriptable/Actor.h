@@ -392,6 +392,7 @@ enum class Verbal {
 	Existence4 = 73, // unused in bg2, NI appears to have a gap of 1 — this should be Existence5 already
 	Bio = 74, // Existence5, biography for npcs
 
+	Noop = 97, // to disable a VB
 	Select7 = 98, // iwd2-only, gets remapped in vcremap.2da
 	Attack0 = 99, // for our internal use only
 	LastVB = 100
