@@ -176,20 +176,11 @@ IF (BUILD_TESTING)
     tests/core/System/Test_VFS.cpp
   )
 
-  TARGET_LINK_LIBRARIES(Test_gemrb_core GTest::gtest_main gemrb_core ${Iconv_LIBRARY})
+  TARGET_LINK_LIBRARIES(Test_gemrb_core GTest::gtest GTest::gtest_main gemrb_core ${Iconv_LIBRARY})
   IF (WIN32)
-    TARGET_LINK_LIBRARIES(TestRunner shlwapi)
+    TARGET_LINK_LIBRARIES(Test_gemrb_core shlwapi)
   ENDIF()
 
   ADD_TEST(NAME Test_gemrb_core COMMAND Test_gemrb_core)
   FILE(COPY tests/resources DESTINATION ${CMAKE_BINARY_DIR}/gemrb/tests)
-
-  # Quick workaround to get the DLL where needed
-  IF (NOT STATIC_LINK)
-    IF(WIN32)
-      ADD_CUSTOM_COMMAND(TARGET Test_gemrb_core POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/gemrb/libgemrb_core.dll ${CMAKE_BINARY_DIR}/gemrb/core/libgemrb_core.dll
-      )
-    ENDIF()
-  ENDIF()
 ENDIF()

@@ -22,6 +22,8 @@ LIST(APPEND DLL_SET_DEBUG
 	bz2d.dll
 	freetyped.dll
 	glew32d.dll
+	gtestd.dll
+	gtest_maind.dll
 	charset-1.dll
 	iconv-2.dll
 	libpng16d.dll
@@ -42,6 +44,8 @@ LIST(APPEND DLL_SET_RELEASE
 	bz2.dll
 	freetype.dll
 	glew32.dll
+	gtest.dll
+	gtest_main.dll
 	charset-1.dll
 	iconv-2.dll
 	libpng16.dll
