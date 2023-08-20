@@ -17,16 +17,38 @@
  *
  */
 
-#ifndef UTF8_COMPARISON_H
-#define UTF8_COMPARISON_H
+#include <gtest/gtest.h>
 
-#include "exports.h"
+#include "Strings/UTF8Comparison.h"
 
 namespace GemRB {
 
-// true if equal under C.UTF-8 `tolower` regime
-GEM_EXPORT bool UTF8_stricmp(const char *a, const char *b);
+#ifdef WIN32
 
+TEST(UTF8Comparison_Test, UTF8_stricmp_Equality) {
+	GTEST_SKIP() << "Not applicable to Windows.";
+}
+
+#else
+
+TEST(UTF8Comparison_Test, UTF8_stricmp_Equality) {
+	EXPECT_TRUE(UTF8_stricmp("abc", "abc"));
+	EXPECT_FALSE(UTF8_stricmp("abc", "ab"));
+	EXPECT_FALSE(UTF8_stricmp("ab", "abc"));
+	EXPECT_FALSE(UTF8_stricmp("abc", "def"));
+	EXPECT_TRUE(UTF8_stricmp("abc", "ABC"));
+	EXPECT_TRUE(UTF8_stricmp("ABC", "abc"));
+
+	EXPECT_TRUE(UTF8_stricmp("äbc", "äbc"));
+	EXPECT_TRUE(UTF8_stricmp("äbc", "ÄBC"));
+	EXPECT_TRUE(UTF8_stricmp("", ""));
+
+	EXPECT_FALSE(UTF8_stricmp("abc", nullptr));
+	EXPECT_FALSE(UTF8_stricmp(nullptr, "abc"));
+	// no philosophical thoughts here
+	EXPECT_TRUE(UTF8_stricmp(nullptr, nullptr));
 }
 
 #endif
+
+}

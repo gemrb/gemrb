@@ -21,6 +21,7 @@ Optional dependencies:
   - (lib)VLC 2.0+ (for movies in some mac distributions of the games)
   - OpenGL/OpenGLES drivers and libraries.
   - GLEW libraries (Windows only, required for OpenGL support)
+  - Google Test (for automated tests)
 
 When choosing SDL 1.2 or SDL 2.0.x, pass -DSDL_BACKEND=SDL (for 1.2) or
 -DSDL_BACKEND=SDL2 (for 2.0) to cmake invocation. You can also invoke cmake

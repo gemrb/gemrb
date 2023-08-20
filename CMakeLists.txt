@@ -98,6 +98,7 @@ OPTION(USE_OPENAL "Enable OpenAL support" ON)
 OPTION(USE_LIBVLC "Enable LibVLC support" ON)
 OPTION(USE_FREETYPE "Enable FreeType support" ON)
 OPTION(USE_PNG "Enable LibPNG support" ON)
+OPTION(USE_TESTS "Enable building and running of tests" OFF)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(DISABLE_WERROR "Do not treat warnings as errors" OFF)
 
@@ -598,6 +599,15 @@ CONFIGURE_FILE(
 	"${CMAKE_CURRENT_BINARY_DIR}/gemrb.6"
 	IMMEDIATE @ONLY
 )
+
+# Tests (need init'd before subdirectories)
+IF (USE_TESTS)
+  FIND_PACKAGE(GTest REQUIRED)
+
+	INCLUDE(CTest)
+	ENABLE_TESTING()
+	LIST(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+ENDIF()
 
 ADD_SUBDIRECTORY( gemrb )
 IF (NOT APPLE)
