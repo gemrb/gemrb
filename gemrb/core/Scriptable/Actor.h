@@ -351,7 +351,10 @@ enum class Verbal {
 	Tired = 7,
 	Bored = 8,
 	BattleCry = 9, // 5 battle cries
-	Attack = 14, // 4 attacks
+	Attack1 = 14,
+	Attack2 = 15,
+	Attack3 = 16,
+	Attack4 = 17,
 	Damage = 18,
 	Die = 19,
 	Hurt = 20,
@@ -360,7 +363,12 @@ enum class Verbal {
 	AreaDungeon = 23,
 	AreaDay = 24,
 	AreaNight = 25,
-	Select = 26, // -31 select
+	Select = 26,
+	Select2 = 27,
+	Select3 = 28,
+	Select4 = 29,
+	Select5 = 30,
+	Select6 = 31,
 	Command = 32, // -34 select action; -38 rare select, -43 interaction
 	Insult = 44, // -46
 	Compliment = 47, // -49
@@ -384,6 +392,7 @@ enum class Verbal {
 	Existence4 = 73, // unused in bg2, NI appears to have a gap of 1 — this should be Existence5 already
 	Bio = 74, // Existence5, biography for npcs
 
+	Attack0 = 99, // for our internal use only
 	LastVB = 100
 };
 
@@ -850,9 +859,9 @@ public:
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void GetVerbalConstantSound(ResRef& sound, Verbal index) const;
-	bool GetSoundFromFile(ResRef& Sound, TableMgr::index_t index) const;
-	bool GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const;
-	bool GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const;
+	bool GetSoundFromFile(ResRef& sound, Verbal index) const;
+	bool GetSoundFromINI(ResRef& sound, Verbal index) const;
+	bool GetSoundFrom2DA(ResRef& sound, Verbal index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */

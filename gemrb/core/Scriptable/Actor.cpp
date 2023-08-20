@@ -3727,7 +3727,7 @@ void Actor::PlaySelectionSound(bool force)
 	// if nothing was found, fall back to 2da/ini sounds
 	if (!found) {
 		ResRef sound;
-		GetSoundFromFile(sound, TableMgr::index_t(Verbal::Select));
+		GetSoundFromFile(sound, Verbal::Select);
 		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
 	}
 }
@@ -3740,7 +3740,7 @@ void Actor::PlayWarCry(int range) const
 	// for monsters also try their 2da/ini file sounds
 	if (!found && !InParty) {
 		ResRef sound;
-		GetSoundFromFile(sound, TableMgr::index_t(Verbal::BattleCry));
+		GetSoundFromFile(sound, Verbal::BattleCry);
 		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
 	}
 }
@@ -4004,7 +4004,7 @@ void Actor::GetHit(int damage, bool killingBlow)
 		SetStance( IE_ANI_DAMAGE );
 		if (!VerbalConstant(Verbal::Damage)) {
 			ResRef sound;
-			GetSoundFromFile(sound, TableMgr::index_t(Verbal::Damage));
+			GetSoundFromFile(sound, Verbal::Damage);
 			core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
 		}
 	}
@@ -4570,6 +4570,7 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 //
 // Overall, the sounds on attack are from:
 // - the CRE sound slots (VerbalConstant): VB_ATTACK x4, VB_BATTLE_CRY x5
+//   - the player customizable soundset mapped to the same slots
 // - the animation 2da/ini with sounds per stance (shoot, and the 3 melee types)
 // - individual hardcoded item sound overrides (eg. for ankhegs in bg1)
 // - actual swing sounds associated to item types (itemsnd.2da)
@@ -4583,26 +4584,56 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 //     - this way, creatures with the same animation can still have different combat sounds
 // - if there's a hardcoded item override it's played at the same time
 //   - like Infinity Sounds we disable them and just use the animation 2das that weren't available for bg1
-// - the item type based swing sound is played (item type is invalid for the hardcoded cases, so no overlap)
+// - the item type based swing sound is played (item type is unset for the hardcoded cases, so no overlap)
 //
 void Actor::PlaySwingSound(const WeaponInfo &wi) const
 {
+	// VBs: there's the 4 attack ones, but there's 5 in the 2da: attack + 3x melee + shoot
+	// this extra ATTACK in 2das was always played, together with anything else
 	ResRef sound;
+	GetSoundFrom2DA(sound, Verbal::Attack0);
+	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos);
+
+	// the CRE attack was played only if the itemtype was 0/misc to avoid clashes with the hardcoded exceptions
+	// TobExAL and Infinity Sounds prefer both to be played, so we match that, giving more choice to modders
+	// they override any values in the 2da, which is something GetVerbalConstantSound handles for us
+	int stance = GetStance();
+	Verbal vb = Verbal::LastVB;
+	switch (stance) {
+		case IE_ANI_ATTACK_SLASH:
+			vb = Verbal::Attack1;
+			break;
+		case IE_ANI_ATTACK_BACKSLASH:
+			vb = Verbal::Attack2;
+			break;
+		case IE_ANI_ATTACK_JAB:
+			vb = Verbal::Attack3;
+			break;
+		case IE_ANI_SHOOT:
+			vb = Verbal::Attack4;
+			break;
+		default:
+			Log(WARNING, "Actor", "Unknown attack stance detected ({}) for {}, not playing creature swing sound!", stance, fmt::WideToChar { LongName });
+			break;
+	}
+	if (vb != Verbal::LastVB) {
+		bool found = VerbalConstant(vb);
+		// retry with 2da for soundsets, since they only checked one thing
+		if (!found) {
+			ResRef sound2;
+			GetSoundFromFile(sound2, vb);
+			if (sound != sound2) core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos);
+		}
+	}
+
+	// finally actual swing sounds
 	ieDword itemType = wi.itemtype;
 	int isCount = gamedata->GetSwingCount(itemType);
-
-	if (isCount == -2) {
-		// monsters with non-standard items, none or something else
-		int stance = GetStance();
-		if (stance == IE_ANI_ATTACK_SLASH || stance == IE_ANI_ATTACK_BACKSLASH || stance == IE_ANI_ATTACK_JAB || stance == IE_ANI_SHOOT) {
-			GetSoundFromFile(sound, TableMgr::index_t(100 + stance));
-		}
-	} else {
+	if (isCount != -2) {
 		// swing sounds start at column 3 (index 2)
 		int isChoice = core->Roll(1, isCount, -1) + 2;
 		if (!gamedata->GetItemSound(sound, itemType, AnimRef(), isChoice)) return;
 	}
-
 	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos);
 }
 
@@ -5189,7 +5220,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	bool found = VerbalConstant(Verbal::Die);
 	if (found) {
 		ResRef sound;
-		GetSoundFromFile(sound, TableMgr::index_t(Verbal::Die));
+		GetSoundFromFile(sound, Verbal::Die);
 		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
 	}
 
@@ -8326,76 +8357,78 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-bool Actor::GetSoundFromFile(ResRef& Sound, TableMgr::index_t index) const
+bool Actor::GetSoundFromFile(ResRef& sound, Verbal index) const
 {
 	// only dying ignores the incapacity to vocalize
-	if (Verbal(index) != Verbal::Die) {
+	if (index != Verbal::Die) {
 		if (Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
 	}
 
 	if (core->HasFeature(GFFlags::RESDATA_INI)) {
-		return GetSoundFromINI(Sound, index);
+		return GetSoundFromINI(sound, index);
 	} else {
-		return GetSoundFrom2DA(Sound, index);
+		return GetSoundFrom2DA(sound, index);
 	}
 }
 
-bool Actor::GetSoundFrom2DA(ResRef &Sound, TableMgr::index_t index) const
+// NOTE: picks a sound at random when the row has several
+bool Actor::GetSoundFrom2DA(ResRef& sound, Verbal index) const
 {
 	if (!anims) return false;
 
 	AutoTable tab = gamedata->LoadTable(anims->ResRefBase);
 	if (!tab) return false;
 
+	TableMgr::index_t idx = 0;
 	switch (index) {
-		// wasn't played if the weapon wasn't of type misc (so just the swing sound if any)
-		case UnderType(Verbal::Attack):
-			index = 0;
+		case Verbal::Attack0:
+			idx = 0;
 			break;
-		case UnderType(Verbal::Damage):
-			index = 8;
+		case Verbal::Damage:
+			idx = 8;
 			break;
-		case UnderType(Verbal::Die):
-			index = 10;
+		case Verbal::Die:
+			idx = 10;
 			break;
-		case UnderType(Verbal::BattleCry):
-			index = 34; // Battle_Cry
+		case Verbal::BattleCry:
+			idx = 34; // Battle_Cry
 			break;
-		case UnderType(Verbal::Dialog):
-		case UnderType(Verbal::Select):
-		case UnderType(Verbal::Select) + 1:
-		case UnderType(Verbal::Select) + 2:
-		case UnderType(Verbal::Select) + 3:
-		case UnderType(Verbal::Select) + 4:
-			index = 36; // Selection (yes, the row names are inconsistently capitalized)
+		case Verbal::Dialog:
+		case Verbal::Select:
+		case Verbal::Select2:
+		case Verbal::Select3:
+		case Verbal::Select4:
+		case Verbal::Select5:
+		case Verbal::Select6:
+			idx = 36; // Selection (yes, the row names are inconsistently capitalized)
 			break;
 		// entries without VB equivalents
-		case 100+IE_ANI_SHOOT:
-			index = 16; // SHOOT
+		case Verbal::Attack4:
+			idx = 16; // SHOOT
 			break;
 		// these three supposedly never worked, at least not in bg2 (https://www.gibberlings3.net/forums/topic/19034-animation-2da-files)
-		case 100+IE_ANI_ATTACK_SLASH:
-			index = 22; // ATTACK_SLASH
+		case Verbal::Attack1:
+			idx = 22; // ATTACK_SLASH
 			break;
-		case 100+IE_ANI_ATTACK_BACKSLASH:
-			index = 24; // ATTACK_BACKSLASH
+		case Verbal::Attack2:
+			idx = 24; // ATTACK_BACKSLASH
 			break;
-		case 100+IE_ANI_ATTACK_JAB:
-			index = 26; // ATTACK_JAB
+		case Verbal::Attack3:
+			idx = 26; // ATTACK_JAB
 			break;
 		default:
-			Log(WARNING, "Actor", "TODO: Cannot determine 2DA rowcount for index: {}", index);
+			Log(WARNING, "Actor", "Cannot determine 2DA rowcount for index {} for {}, let us know!", idx, fmt::WideToChar { LongName });
 			return false;
 	}
-	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(index));
-	TableMgr::index_t col = RAND<TableMgr::index_t>(0, tab->GetColumnCount(index) - 1);
-	Sound = tab->QueryField(index, col);
+	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(idx));
+	TableMgr::index_t col = RAND<TableMgr::index_t>(0, tab->GetColumnCount(idx) - 1);
+	sound = tab->QueryField(idx, col);
 	return true;
 }
 
 //Get the monster sound from a global .ini file.
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
-bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
+bool Actor::GetSoundFromINI(ResRef& sound, Verbal index) const
 {
 	unsigned int animid=BaseStats[IE_ANIMATION_ID];
 	if(core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
@@ -8419,36 +8452,38 @@ bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
 	 */
 	StringView resource;
 	switch(index) {
-		case UnderType(Verbal::Attack):
-			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "att1" : "at1sound"));
+		case Verbal::Attack0:
+			// disabled by design in ees
+			if (!core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+				resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "att1" : "at1sound"));
+			}
 			break;
-		case UnderType(Verbal::Damage):
+		case Verbal::Damage:
 			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "damage" : "hitsound"));
 			break;
-		case UnderType(Verbal::Die):
+		case Verbal::Die:
 			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "death" : "dfbsound"));
 			break;
-		case UnderType(Verbal::Select):
+		case Verbal::Select:
 			//this isn't in PST, apparently
 			if (IWDSound) {
 				resource = core->GetResDataINI()->GetKeyAsString(section, "selected");
 			}
 			break;
-		case UnderType(Verbal::BattleCry):
+		case Verbal::BattleCry:
 			if (IWDSound) {
 				resource = core->GetResDataINI()->GetKeyAsString(section, "btlcry");
 			}
 			break;
-		// entries without VB equivalents
-		case 100+IE_ANI_SHOOT:
-		case 100+IE_ANI_ATTACK_SLASH:
-		case 100+IE_ANI_ATTACK_BACKSLASH:
-		case 100+IE_ANI_ATTACK_JAB:
+		case Verbal::Attack1:
+		case Verbal::Attack2:
+		case Verbal::Attack3:
+		case Verbal::Attack4:
 			// FIXME: complete guess
 			resource = core->GetResDataINI()->GetKeyAsString(section, StringView(IWDSound ? "att2" : "at2sound"));
 			break;
 		default:
-			Log(WARNING, "Actor", "TODO: Cannot determine INI entry for index: {}", index);
+			Log(WARNING, "Actor", "Cannot determine INI entry for index {} for {}, let us know!", int(index), fmt::WideToChar { LongName });
 			return false;
 	}
 
@@ -8457,7 +8492,7 @@ bool Actor::GetSoundFromINI(ResRef& Sound, TableMgr::index_t index) const
 	if (count == 0) return false;
 
 	int choice = core->Roll(1, int(count), -1);
-	Sound = elements[choice];
+	sound = elements[choice];
 
 	return true;
 }
@@ -8500,9 +8535,9 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, Verbal index) const
 	Sound.Reset();
 
 	if (core->HasFeature(GFFlags::RESDATA_INI)) {
-		GetSoundFromINI(Sound, idx);
+		GetSoundFromINI(Sound, Verbal(idx));
 	} else {
-		GetSoundFrom2DA(Sound, idx);
+		GetSoundFrom2DA(Sound, Verbal(idx));
 	}
 
 	//Empty resrefs
