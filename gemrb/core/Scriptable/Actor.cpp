@@ -3720,7 +3720,7 @@ void Actor::PlaySelectionSound(bool force)
 		if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 			found = VerbalConstant(Verbal::Select, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
 		} else {
-			found = VerbalConstant(Verbal::Select, NUM_SELECT_SOUNDS, DS_CIRCLE);
+			found = VerbalConstant(Verbal::Select, NUM_SELECT_SOUNDS + iwd2class, DS_CIRCLE);
 		}
 	}
 
@@ -8400,6 +8400,7 @@ bool Actor::GetSoundFrom2DA(ResRef& sound, Verbal index) const
 		case Verbal::Select4:
 		case Verbal::Select5:
 		case Verbal::Select6:
+		case Verbal::Select7:
 			idx = 36; // Selection (yes, the row names are inconsistently capitalized)
 			break;
 		// entries without VB equivalents

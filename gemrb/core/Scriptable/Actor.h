@@ -369,7 +369,7 @@ enum class Verbal {
 	Select4 = 29,
 	Select5 = 30,
 	Select6 = 31,
-	Command = 32, // -34 select action; -38 rare select, -43 interaction
+	Command = 32, // -34 selected action; -38 rare action, -43 interaction
 	Insult = 44, // -46
 	Compliment = 47, // -49
 	Special = 50, // -52
@@ -392,6 +392,7 @@ enum class Verbal {
 	Existence4 = 73, // unused in bg2, NI appears to have a gap of 1 — this should be Existence5 already
 	Bio = 74, // Existence5, biography for npcs
 
+	Select7 = 98, // iwd2-only, gets remapped in vcremap.2da
 	Attack0 = 99, // for our internal use only
 	LastVB = 100
 };
