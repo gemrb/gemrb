@@ -173,10 +173,16 @@ ENDIF(VITA)
 IF (BUILD_TESTING)
   ADD_EXECUTABLE(Test_gemrb_core
     tests/core/Strings/Test_UTF8Comparison.cpp
+    tests/core/System/Test_VFS.cpp
   )
 
   TARGET_LINK_LIBRARIES(Test_gemrb_core GTest::gtest_main gemrb_core ${Iconv_LIBRARY})
+  IF (WIN32)
+    TARGET_LINK_LIBRARIES(TestRunner shlwapi)
+  ENDIF()
+
   ADD_TEST(NAME Test_gemrb_core COMMAND Test_gemrb_core)
+  FILE(COPY tests/resources DESTINATION ${CMAKE_BINARY_DIR}/gemrb/tests)
 
   # Quick workaround to get the DLL where needed
   IF (NOT STATIC_LINK)
