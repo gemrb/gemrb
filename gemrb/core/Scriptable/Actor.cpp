@@ -3468,13 +3468,10 @@ ieStrRef Actor::GetVerbalConstant(Verbal start, int count) const
 
 bool Actor::VerbalConstant(Verbal start, int count, int flags) const
 {
+	assert(count > 0);
 	if (start != Verbal::Die) {
 		//can't talk when dead
 		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return false;
-	}
-
-	if (count < 0) {
-		return false;
 	}
 
 	flags ^= DS_CONSOLE|DS_SPEECH|DS_CIRCLE;
