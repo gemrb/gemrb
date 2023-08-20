@@ -25,6 +25,7 @@ ACT        32         23
 7          38         29
 RARE1      63         30
 RARE2      64         31
+# 3 and 4 are handled by code (see NumRareSelectSounds)
 HIT        18         34
 DYING      19         37
 REACT      53         39
