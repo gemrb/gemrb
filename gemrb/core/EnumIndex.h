@@ -43,7 +43,7 @@ ENUM EnumIndex(ARG val) noexcept
 {
 	static_assert(std::is_same<under_t<ENUM>, ARG>::value, "Will not implicitly convert to EnumIndex");
 	static_assert(std::is_unsigned<under_t<ENUM>>::value, "EnumIndex must be unsigned");
-	assert(val < UnderType(ENUM::count));
+	val = Clamp(ARG(0), ARG(ENUM::count), val);
 	// cannot static assert here without c++17 if constexpr
 	// static_assert(val < UnderType(ENUM::count), "Trying to create an EnumIndex beoynd the limit.");
 	return static_cast<ENUM>(val);
@@ -57,17 +57,29 @@ class EnumIterator {
 public:
 	explicit EnumIterator(const ENUM& e) : val(UnderType(e)) {}
 	EnumIterator() : EnumIterator(BEGIN) {}
-	EnumIterator operator++() {
+	EnumIterator& operator++() {
 		++val;
 		return *this;
 	}
+
+	EnumIterator& operator+(int i) {
+		val += i;
+		return *this;
+	}
+
+	int distance(const EnumIterator& it) const {
+		return it.val - val;
+	}
+
 	ENUM operator*() const { return static_cast<ENUM>(val); }
-	EnumIterator begin() { return *this; }
-	EnumIterator end() { return EnumIterator(END); }
+
+	EnumIterator begin() const { return *this; }
+	EnumIterator end() const { return EnumIterator(END); }
+
 	bool operator!=(const EnumIterator& i) { return val != i.val; }
 };
 
-template <typename ENUM, typename T>
+template <typename ENUM, typename T = ENUM>
 class EnumArray {
 	static_assert(std::is_unsigned<under_t<ENUM>>::value, "EnumIndex must be unsigned");
 
@@ -86,19 +98,37 @@ public:
 	
 	constexpr
 	const T& operator[](ENUM key) const {
-	
 		return array[UnderType(key)];
 	}
-	
+
+	constexpr
 	T& operator[](ENUM key) {
 		return array[UnderType(key)];
 	}
-	
+
+	constexpr
+	T& operator[](under_t<ENUM> idx) const {
+		return array[idx];
+	}
+
+	constexpr
+	T& operator[](under_t<ENUM> idx) {
+		return array[idx];
+	}
+
 	typename array_t::iterator begin() {
 		return array.begin();
 	}
-	
+
+	typename array_t::const_iterator begin() const {
+		return array.begin();
+	}
+
 	typename array_t::iterator end() {
+		return array.end();
+	}
+
+	typename array_t::const_iterator end() const {
 		return array.end();
 	}
 };
