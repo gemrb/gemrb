@@ -30,6 +30,13 @@
 
 namespace GemRB {
 
+// This will get the int value for an enum
+// if you want a text value then add a more specific overload for a specific enum
+template <typename ENUM>
+constexpr
+std::enable_if_t<std::is_enum<ENUM>::value, under_t<ENUM>>
+format_as(const ENUM& e) { return UnderType(e); }
+
 template <typename ENUM, typename ARG = under_t<ENUM>>
 constexpr
 ENUM EnumIndex(ARG val) noexcept

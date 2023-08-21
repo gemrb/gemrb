@@ -131,7 +131,7 @@ static Logger::WriterPtr createStreamLogWriter(FILE* stream, ANSIColor color) no
 
 Logger::WriterPtr createStdioLogWriter(ANSIColor color)
 {
-	Log(DEBUG, "Logging", "Creating console log with color setting: {}", fmt::underlying(color));
+	Log(DEBUG, "Logging", "Creating console log with color setting: {}", color);
 	int fd = dup(fileno(stdout));
 	if (fd >= 0) {
 		return createStreamLogWriter(fdopen(fd, "w"), color);
@@ -166,7 +166,7 @@ Logger::WriterPtr createStdioLogWriter()
 			color = ANSIColor::True;
 		}
 
-		Log(DEBUG, "Logging", "Using colorized terminal output: {}\nDetermined from COLORTERM={}", fmt::underlying(color), colorterm);
+		Log(DEBUG, "Logging", "Using colorized terminal output: {}\nDetermined from COLORTERM={}", color, colorterm);
 	}
 #endif
 

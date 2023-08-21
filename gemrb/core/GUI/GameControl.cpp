@@ -1683,7 +1683,7 @@ void GameControl::TryToPick(Actor *source, const Scriptable *tgt) const
 			}
 			break;
 		default:
-			Log(ERROR, "GameControl", "Invalid pick target of type {}", fmt::underlying(tgt->Type));
+			Log(ERROR, "GameControl", "Invalid pick target of type {}", tgt->Type);
 			return;
 	}
 	source->CommandActor(GenerateActionDirect(std::move(cmdString), tgt));

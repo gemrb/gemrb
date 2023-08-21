@@ -1117,7 +1117,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	if (!scr) {
 		assert(Sender);
 		Log(ERROR, "GameScript", "Speaker for dialog couldn't be found (Sender: {}, Type: {}) Flags:{}.",
-			Sender->GetScriptName(), fmt::underlying(Sender->Type), Flags);
+			Sender->GetScriptName(), Sender->Type, Flags);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1129,7 +1129,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 
 	if (!tar || tar->Type!=ST_ACTOR) {
 		Log(ERROR, "GameScript", "Target for dialog couldn't be found (Sender: {}, Type: {}).",
-			Sender->GetScriptName(), fmt::underlying(Sender->Type));
+			Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
 			Sender->As<const Actor>()->dump();
 		}

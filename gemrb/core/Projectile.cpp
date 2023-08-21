@@ -1949,7 +1949,7 @@ static Point GetCastingOffset(const Actor* actor)
 			offset.y = -0x90;
 			break;
 		default:
-			error("Projectile", "Mishandled orientation mirroring: {}!", fmt::underlying(direction));
+			error("Projectile", "Mishandled orientation mirroring: {}!", direction);
 	}
 
 	if (origDirection > N) {

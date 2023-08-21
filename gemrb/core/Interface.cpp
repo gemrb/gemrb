@@ -2159,7 +2159,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			filter = std::make_shared<OrPredicate<path_t>>(filter, std::make_shared<ExtFilter>("BCS"));
 			break;
 		default:
-			error("Interface", "Unknown resource directory type: {}!", fmt::underlying(dir));
+			error("Interface", "Unknown resource directory type: {}!", dir);
 	}
 
 	DirectoryIterator dirIt(PathJoin(config.GamePath, resourcePath));

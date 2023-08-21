@@ -341,7 +341,7 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 	if (ret.IsEmpty()) {
 		// some npcs have spells at odd levels, so the lookup just failed
 		// eg. slayer knights of xvim with sppr325 at level 2 instead of 3
-		Log(ERROR, "CREImporter", "Spell ({} of type {}) found at unexpected level ({})!", index, fmt::underlying(type), level);
+		Log(ERROR, "CREImporter", "Spell ({} of type {}) found at unexpected level ({})!", index, type, level);
 		int level2 = splList[index]->FindSpell(type);
 		// grrr, some rows have no levels set - they're all 0, but with a valid resref, so just return that
 		if (level2 == -1) {
@@ -1405,7 +1405,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		const ResRef& tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
 		if (tmp.IsEmpty()) {
 			error("CREImporter", "Unresolved spell index: {} level:{}, type: {}",
-				  spellindex, level + 1, fmt::underlying(type));
+				  spellindex, level + 1, type);
 		}
 
 		CREKnownSpell *known = new CREKnownSpell;
