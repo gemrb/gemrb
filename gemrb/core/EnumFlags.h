@@ -26,9 +26,22 @@
 template <typename ENUM>
 using under_t = std::underlying_type_t<ENUM>;
 
+template <typename T, bool = std::is_enum<T>::value>
+struct under_sfinae {
+	using type = typename std::underlying_type<T>::type;
+};
+
+template <typename T>
+struct under_sfinae<T, false> {
+	using type = T;
+};
+
+template <typename ENUM>
+using under_sfinae_t = typename under_sfinae<ENUM>::type;
+
 template<typename ENUM_FLAGS>
 constexpr
-under_t<ENUM_FLAGS>
+under_sfinae_t<ENUM_FLAGS>
 UnderType(ENUM_FLAGS a) noexcept
 {
 	return static_cast<under_t<ENUM_FLAGS>>(a);

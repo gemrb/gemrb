@@ -32,9 +32,9 @@ namespace GemRB {
 
 // This will get the int value for an enum
 // if you want a text value then add a more specific overload for a specific enum
-template <typename ENUM, typename T = under_t<ENUM>>
+template <typename ENUM>
 constexpr
-std::enable_if_t<std::is_enum<ENUM>::value, T>
+std::enable_if_t<std::is_enum<ENUM>::value, under_sfinae_t<ENUM>>
 format_as(const ENUM& e) { return UnderType(e); }
 
 template <typename ENUM, typename ARG = under_t<ENUM>>
