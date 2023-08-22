@@ -43,7 +43,7 @@ ENUM EnumIndex(ARG val) noexcept
 {
 	static_assert(std::is_same<under_t<ENUM>, ARG>::value, "Will not implicitly convert to EnumIndex");
 	static_assert(std::is_unsigned<under_t<ENUM>>::value, "EnumIndex must be unsigned");
-	val = Clamp(ARG(0), ARG(ENUM::count), val);
+	val = Clamp(val, ARG(0), ARG(ENUM::count));
 	// cannot static assert here without c++17 if constexpr
 	// static_assert(val < UnderType(ENUM::count), "Trying to create an EnumIndex beoynd the limit.");
 	return static_cast<ENUM>(val);
