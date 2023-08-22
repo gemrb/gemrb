@@ -63,14 +63,14 @@ public:
 
 	explicit EnumIterator(const ENUM& e) : val(UnderType(e)) {}
 	EnumIterator() : EnumIterator(BEGIN) {}
+
 	EnumIterator& operator++() {
 		++val;
 		return *this;
 	}
 
-	EnumIterator& operator+(int i) {
-		val += i;
-		return *this;
+	EnumIterator operator+(int i) {
+		return EnumIterator(static_cast<ENUM>(val + i));
 	}
 
 	int distance(const EnumIterator& it) const {
@@ -113,7 +113,7 @@ public:
 	}
 
 	constexpr
-	T& operator[](under_t<ENUM> idx) const {
+	const T& operator[](under_t<ENUM> idx) const {
 		return array[idx];
 	}
 
