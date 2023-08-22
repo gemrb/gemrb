@@ -340,7 +340,7 @@ enum DamageFlags {
 
 // verbal constant (bg2), we have a lookup table (vcremap) for other games
 // an index into VCMap
-enum class Verbal {
+enum class Verbal : unsigned int {
 	InitialMeet = 0,
 	Panic = 1,
 	Happy = 2,
@@ -395,7 +395,7 @@ enum class Verbal {
 	Noop = 97, // to disable a VB
 	Select7 = 98, // iwd2-only, gets remapped in vcremap.2da
 	Attack0 = 99, // for our internal use only
-	LastVB = 100
+	count = 100
 };
 
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
@@ -426,7 +426,7 @@ public:
 	
 	ieStrRef ShortStrRef = ieStrRef(-1);
 	ieStrRef LongStrRef = ieStrRef(-1);
-	ieStrRef StrRefs[size_t(Verbal::LastVB)] {};
+	EnumArray<Verbal, ieStrRef> StrRefs;
 
 	ieDword AppearanceFlags = 0;
 

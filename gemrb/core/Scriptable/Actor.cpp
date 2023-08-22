@@ -85,7 +85,7 @@ static std::vector<std::vector<int>> wmLevelMods;
 static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
 //verbal constant specific data
-static std::array<Verbal, size_t(Verbal::LastVB)> VCMap;
+static EnumArray<Verbal> VCMap;
 static ieDword sel_snd_freq = 0;
 static ieDword cmd_snd_freq = 0;
 static ieDword crit_hit_scr_shake = 1;
@@ -197,7 +197,7 @@ static const char gemrb2iwd[32] = {
 };
 
 //letters for char sound resolution bg1/bg2
-static char csound[size_t(Verbal::LastVB)];
+static EnumArray<Verbal, char> csound {'\0'};
 
 static void InitActorTables();
 
@@ -1754,12 +1754,11 @@ static void InitActorTables()
 	}
 
 	//csound for bg1/bg2
-	memset(csound,0,sizeof(csound));
 	if (!core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		tm = gamedata->LoadTable("csound");
 		if (tm) {
-			for (int i = 0; i < int(Verbal::LastVB); i++) {
-				const auto& suffix = tm->QueryField(i, 0);
+			for (auto i : EnumIterator<Verbal>()) {
+				const auto& suffix = tm->QueryField(UnderType(i), 0);
 				switch(suffix[0]) {
 					case '*': break;
 					//I have no idea what this ! mean
@@ -2078,8 +2077,8 @@ static void InitActorTables()
 
 	// verbal constant remapping, if omitted, it is an 1-1 mapping
 	// TODO: allow disabled VC slots
-	for (int i = 0; i < int(Verbal::LastVB); i++) {
-		VCMap[i] = static_cast<Verbal>(i);
+	for (auto i : EnumIterator<Verbal>()) {
+		VCMap[i] = i;
 	}
 	tm = gamedata->LoadTable("vcremap");
 	if (tm) {
@@ -2087,10 +2086,10 @@ static void InitActorTables()
 
 		for (TableMgr::index_t i = 0; i < rows; i++) {
 			int row = tm->QueryFieldSigned<int>(i,0);
-			if (row < 0 || row >= int(Verbal::LastVB)) continue;
-			int value = tm->QueryFieldSigned<int>(i,1);
-			if (value < 0 || value >= int(Verbal::LastVB)) continue;
-			VCMap[row] = static_cast<Verbal>(value);
+			if (row < 0 || row >= int(Verbal::count)) continue;
+			Verbal value = EnumIndex<Verbal>(tm->QueryFieldUnsigned<under_t<Verbal>>(i, 1));
+			if (value >= Verbal::count) continue;
+			VCMap[row] = value;
 		}
 	}
 
@@ -3405,26 +3404,26 @@ int Actor::NewBase(unsigned int StatIndex, stat_t ModifierValue, ieDword Modifie
 
 void Actor::Interact(int type) const
 {
-	Verbal start;
+	EnumIterator<Verbal> start;
 	int count;
 	bool queue = false;
 
 	switch(type&0xff) {
 		case I_INSULT:
-			start = Verbal::Insult;
+			start = EnumIterator<Verbal>(Verbal::Insult);
 			break;
 		case I_COMPLIMENT:
-			start = Verbal::Compliment;
+			start = EnumIterator<Verbal>(Verbal::Compliment);
 			break;
 		case I_SPECIAL:
-			start = Verbal::Special;
+			start = EnumIterator<Verbal>(Verbal::Special);
 			break;
 		case I_INSULT_RESP:
-			start = Verbal::Resp2Insult;
+			start = EnumIterator<Verbal>(Verbal::Resp2Insult);
 			queue = true;
 			break;
 		case I_COMPL_RESP:
-			start = Verbal::Resp2Compliment;
+			start = EnumIterator<Verbal>(Verbal::Resp2Compliment);
 			queue = true;
 			break;
 		default:
@@ -3432,36 +3431,35 @@ void Actor::Interact(int type) const
 	}
 	if (type&0xff00) {
 		//PST style fixed slots
-		start = Verbal(UnderType(start) + ((type & 0xff00) >> 8) - 1);
+		start = start + (((type & 0xff00) >> 8) - 1);
 		count = 1;
 	} else {
 		//BG1 style random slots
 		count = 3;
 	}
-	VerbalConstant(start, count, queue ? DS_QUEUE : 0);
+	VerbalConstant(*start, count, queue ? DS_QUEUE : 0);
 }
 
 ieStrRef Actor::GetVerbalConstant(Verbal index) const
 {
-	if (index >= Verbal::LastVB) {
+	if (index >= Verbal::count) {
 		return ieStrRef::INVALID;
 	}
 
-	size_t idx = size_t(index);
-	if (VCMap[idx] >= Verbal::LastVB) {
-		return ieStrRef::INVALID;
-	}
-	return StrRefs[idx];
+	return StrRefs[index];
 }
 
 ieStrRef Actor::GetVerbalConstant(Verbal start, int count) const
 {
-	int firstVB = static_cast<int>(start);
-	while (count > 0 && GetVerbalConstant(Verbal(firstVB + count - 1)) == ieStrRef::INVALID) {
-		count--;
-	}
+	auto beg = EnumIterator<Verbal>(start);
+	auto end = beg + count;
+	end = std::find_if(beg, end, [this](Verbal vc) {
+		return GetVerbalConstant(vc) == ieStrRef::INVALID;
+	});
+
+	count = beg.distance(end);
 	if (count > 0) {
-		return GetVerbalConstant(Verbal(firstVB + RAND(0, count - 1)));
+		return GetVerbalConstant(*(beg + RAND(0, count - 1)));
 	}
 	return ieStrRef::INVALID;
 }
@@ -4598,30 +4596,30 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 	// TobExAL and Infinity Sounds prefer both to be played, so we match that, giving more choice to modders
 	// they override any values in the 2da, which is something GetVerbalConstantSound handles for us
 	int stance = GetStance();
-	Verbal vb = Verbal::LastVB;
+	EnumIterator<Verbal> vb(Verbal::count);
 	switch (stance) {
 		case IE_ANI_ATTACK_SLASH:
-			vb = Verbal::Attack1;
+			vb = EnumIterator<Verbal>(Verbal::Attack1);
 			break;
 		case IE_ANI_ATTACK_BACKSLASH:
-			vb = Verbal::Attack2;
+			vb = EnumIterator<Verbal>(Verbal::Attack2);
 			break;
 		case IE_ANI_ATTACK_JAB:
-			vb = Verbal::Attack3;
+			vb = EnumIterator<Verbal>(Verbal::Attack3);
 			break;
 		case IE_ANI_SHOOT:
-			vb = Verbal::Attack4;
+			vb = EnumIterator<Verbal>(Verbal::Attack4);
 			break;
 		default:
 			Log(WARNING, "Actor", "Unknown attack stance detected ({}) for {}, not playing creature swing sound!", stance, fmt::WideToChar { LongName });
 			break;
 	}
-	if (vb != Verbal::LastVB) {
-		bool found = VerbalConstant(vb);
+	if (vb != vb.end()) {
+		bool found = VerbalConstant(*vb);
 		// retry with 2da for soundsets, since they only checked one thing
 		if (!found) {
 			ResRef sound2;
-			GetSoundFromFile(sound2, vb);
+			GetSoundFromFile(sound2, *vb);
 			if (sound != sound2) core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos);
 		}
 	}
@@ -8529,7 +8527,7 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, Verbal index) const
 		}
 
 		//icewind style
-		Sound.Format("{}{:02d}", PCStats->SoundSet, int(VCMap[idx]));
+		Sound.Format("{}{:02d}", PCStats->SoundSet, VCMap[idx]);
 		return;
 	}
 
