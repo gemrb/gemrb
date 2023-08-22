@@ -469,11 +469,6 @@ void DisplayStringCoreVC(Scriptable* Sender, Verbal vc, int flags)
 		return;
 	}
 
-	if (vc >= Verbal::LastVB) {
-		Log(ERROR, "GameScript", "Invalid verbal constant!");
-		return;
-	}
-
 	Strref = actor->GetVerbalConstant(vc);
 	if (Strref == ieStrRef::INVALID || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 		//get soundset based string constant

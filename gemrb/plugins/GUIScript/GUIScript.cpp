@@ -197,12 +197,6 @@ static RETURN* GetView(PyObject* obj) {
 
 static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref);
 
-static ieStrRef GetCreatureStrRef(const Actor *actor, size_t Str)
-{
-	return actor->StrRefs[Str];
-}
-
-
 static inline bool CheckStat(const Actor * actor, ieDword stat, ieDword value, int op)
 {
 	return DiffCore(actor->GetBase(stat), value, op);
@@ -3764,17 +3758,18 @@ PyDoc_STRVAR( GemRB_VerbalConstant__doc,
 
 static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, str;
+	int globalID;
+	Verbal str;
 	unsigned int channel;
 
-	if (!PyArg_ParseTuple( args, "ii", &globalID, &str )) {
+	if (!PyArg_ParseTuple(args, "iI", &globalID, &str)) {
 		return AttributeError( GemRB_VerbalConstant__doc );
 	}
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	if (str < 0 || Verbal(str) >= Verbal::LastVB) {
+	if (str >= Verbal::count) {
 		return AttributeError( "SoundSet Entry is too large" );
 	}
 
@@ -5543,13 +5538,14 @@ Mostly useful for setting the biography.\n\
 
 static PyObject* GemRB_SetPlayerString(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, StringSlot;
+	int globalID;
+	Verbal StringSlot;
 	PyObject* pyref = nullptr;
-	PARSE_ARGS(args,  "iiO", &globalID, &StringSlot, &pyref);
+	PARSE_ARGS(args,  "iIO", &globalID, &StringSlot, &pyref);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	if (StringSlot >= int(Verbal::LastVB)) {
+	if (StringSlot >= Verbal::count) {
 		return AttributeError( "StringSlot is out of range!\n" );
 	}
 
@@ -6074,17 +6070,17 @@ The biography string is an example of such a string.\n\
 
 static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, Index;
-	PARSE_ARGS( args,  "ii", &globalID, &Index);
+	int globalID;
+	Verbal Index;
+	PARSE_ARGS(args,  "iI", &globalID, &Index);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	if (Index >= int(Verbal::LastVB)) {
+	if (Index >= Verbal::count) {
 		return RuntimeError("String reference is too high!\n");
 	}
 
-	ieStrRef StatValue = GetCreatureStrRef( actor, Index );
-	return PyLong_FromStrRef(StatValue);
+	return PyLong_FromStrRef(actor->StrRefs[Index]);
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
