@@ -2393,7 +2393,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, int ver_override)
 	if (!config.KeepCache) DelTree(config.CachePath, true);
 	LoadProgress(15);
 
-	saveGameAREExtractor.changeSaveGame(sg);
+	saveGameAREExtractor = SaveGameAREExtractor(sg);
 
 	// These are here because of the goto
 	PluginHolder<SaveGameMgr> gamMgr;

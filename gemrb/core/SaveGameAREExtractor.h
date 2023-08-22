@@ -42,13 +42,7 @@ class GEM_EXPORT SaveGameAREExtractor {
 
 	public:
 		explicit SaveGameAREExtractor(Holder<SaveGame> saveGame = nullptr);
-		SaveGameAREExtractor(const SaveGameAREExtractor&) = delete;
-		SaveGameAREExtractor(SaveGameAREExtractor&&) = delete;
 
-		SaveGameAREExtractor& operator=(const SaveGameAREExtractor&) = delete;
-		SaveGameAREExtractor& operator=(SaveGameAREExtractor&&) = delete;
-
-		void changeSaveGame(Holder<SaveGame>);
 		int32_t copyRetainedAREs(DataStream*, bool trackLocations = false);
 		int32_t createCacheBlob();
 		int32_t extractARE(const ResRef& resRef);
