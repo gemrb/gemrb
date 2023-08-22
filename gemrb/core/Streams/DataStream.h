@@ -150,7 +150,13 @@ public:
 		RTrim(dest);
 		return read;
 	}
-	
+
+	template <typename STR>
+	strret_t WriteString(const STR& src) {
+		auto beg = std::begin(src);
+		return Write(beg, std::end(src) - beg);
+	}
+
 	template <typename STR>
 	strret_t WriteString(const STR& src, size_t len) {
 		return Write(src.c_str(), len);
