@@ -55,6 +55,12 @@ class EnumIterator {
 
 	under_t<ENUM> val;
 public:
+	using reference = ENUM&;
+	using pointer = ENUM*;
+	using value_type = ENUM;
+	using iterator_category = std::forward_iterator_tag;
+	using difference_type = int;
+
 	explicit EnumIterator(const ENUM& e) : val(UnderType(e)) {}
 	EnumIterator() : EnumIterator(BEGIN) {}
 	EnumIterator& operator++() {
