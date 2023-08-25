@@ -71,7 +71,7 @@ struct CoreSettings {
 	path_t GemRBUnhardcodedPath;
 	path_t PluginsPath;
 	path_t GUIScriptsPath;
-#ifdef WIN32
+#ifdef WIN32 // TODO: we should make this a build time option
 	bool CaseSensitive = false; // this is just the default value, so CD1/CD2 will be resolved
 #else
 	bool CaseSensitive = true;

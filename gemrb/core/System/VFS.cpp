@@ -316,7 +316,12 @@ static void ResolveCase(MutableStringView path, size_t itempos)
 
 path_t& ResolveCase(path_t& filePath)
 {
+	// TODO: we should make this a build time option, it applies to mac and numerous other platforms too
+#ifdef WIN32 // windows is case insensitive by defult
+	if (!core || !core->config.CaseSensitive) {
+#else
 	if (core && !core->config.CaseSensitive) {
+#endif
 		return filePath;
 	}
 
