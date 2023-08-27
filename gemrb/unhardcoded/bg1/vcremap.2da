@@ -1,10 +1,10 @@
 2DA V1.0
 *
-	ORIGINAL	NEW          COMMENT
+          ORIGINAL      NEW     COMMENT
 SELR1     63            35      rare selects (in bg1 there are 4 in bg2 there are 2)
 SELR2     64            36
-SELR3     65            37
-SELR4     66            38
+SELR3     65            97      these two overlap with bg2 crit hit/miss, so disable them
+SELR4     66            97
 RESP1	  59            58      no second hostile response
 RESP2     60            58      no third hostile response
 #DLG1      61            59      hostile dialog shifts
