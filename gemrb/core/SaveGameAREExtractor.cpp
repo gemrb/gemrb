@@ -54,7 +54,7 @@ int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trac
 		saveGameStream->ReadDword(declen);
 		saveGameStream->ReadDword(complen);
 
-		destStream->WriteDword(it->first.length());
+		destStream->WriteDword(it->first.length() + 1 + 4);
 		destStream->WriteString(it->first);
 		destStream->WriteString(".are");
 		destStream->WriteDword(declen);
