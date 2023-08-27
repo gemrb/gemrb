@@ -1,11 +1,9 @@
 2DA V1.0
 *
-	ORIGINAL	NEW          COMMENT
+          ORIGINAL      NEW     COMMENT
 SELR1     63            35      rare selects
 SELR2     64            36
-SELR3     65            37
-SELR4     66            38
+SELR3     65            97      2 more rare selects compared to bg2, handled in code
+SELR4     66            97      critical hit/miss slots elsewhere
 RESP1     59            58      no second hostile response
 RESP2     60            58      no third hostile response
-CRITMISS  65            90      remap from pst rare select 3
-CRITHIT   66            91      remap from pst rare select 4
