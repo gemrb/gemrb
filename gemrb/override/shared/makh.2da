@@ -1,0 +1,41 @@
+MAKH/ANKHEG
+***
+                 SOUND
+ATTACK           ***
+ATTACK           0
+AWAKE            ***
+AWAKE            0
+CAST             ***
+CAST             0
+CONJURE          ***
+CONJURE          0
+DAMAGE           ankhg08
+DAMAGE           0
+DIE              ankhg09
+DIE              0
+HEAD_TURN        ***
+HEAD_TURN        0
+READY            ***
+READY            0
+SHOOT            ankhg06
+SHOOT            2
+TWITCH           ***
+TWITCH           0
+WALK             ***
+WALK             0
+ATTACK_SLASH     ankhg05
+ATTACK_SLASH     2
+ATTACK_BACKSLASH ankhg05
+ATTACK_BACKSLASH 2
+ATTACK_JAB       ankhg05
+ATTACK_JAB       2
+EMERGE           ankhg11
+EMERGE           2
+HIDE             ankhg12
+HIDE             2
+SLEEP            ***
+SLEEP            0
+Battle_Cry       ankhg03          ankhg04
+Battle_Cry       0                0
+Selection        ankhg01          ankhg02
+Selection        0                0

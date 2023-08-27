@@ -1,0 +1,41 @@
+MWLF2/WOLF_WINTER
+***
+                  SOUND
+ATTACK            ***
+ATTACK            0
+AWAKE             ***
+AWAKE             0
+CAST              ***
+CAST              0
+CONJURE           ***
+CONJURE           0
+DAMAGE            wwolf08
+DAMAGE            0
+DIE               wwolf09
+DIE               0
+HEAD_TURN         ***
+HEAD_TURN         0
+READY             ***
+READY             0
+SHOOT             wwolf7
+SHOOT             0
+TWITCH            ***
+TWITCH            0
+WALK              ***
+WALK              0
+ATTACK_SLASH      wwolf05
+ATTACK_SLASH      2
+ATTACK_BACKSLASH  wwolf06
+ATTACK_BACKSLASH  2
+ATTACK_JAB        wwolf05
+ATTACK_JAB        2
+EMERGE            ***
+EMERGE            0
+HIDE              ***
+HIDE              0
+SLEEP             ***
+SLEEP             0
+Battle_Cry        wwolf03           wwolf04
+Battle_Cry        0                 0
+Selection         wwolf01           wwolf02
+Selection         0                 0

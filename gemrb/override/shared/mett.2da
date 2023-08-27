@@ -1,0 +1,41 @@
+METT/ETTERCAP
+***
+                 SOUND
+ATTACK           ***
+ATTACK           0
+AWAKE            ***
+AWAKE            0
+CAST             ***
+CAST             0
+CONJURE          ***
+CONJURE          0
+DAMAGE           etter08
+DAMAGE           0
+DIE              etter09
+DIE              0
+HEAD_TURN        ***
+HEAD_TURN        0
+READY            ***
+READY            0
+SHOOT            ***
+SHOOT            0
+TWITCH           ***
+TWITCH           0
+WALK             ***
+WALK             0
+ATTACK_SLASH     etter05
+ATTACK_SLASH     8
+ATTACK_BACKSLASH etter06          etter07
+ATTACK_BACKSLASH 2                2
+ATTACK_JAB       etter05
+ATTACK_JAB       8
+EMERGE           ***
+EMERGE           0
+HIDE             ***
+HIDE             0
+SLEEP            ***
+SLEEP            0
+Battle_Cry       etter03          etter04
+Battle_Cry       0                0
+Selection        etter01          etter02
+Selection        0                0
