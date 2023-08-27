@@ -4583,7 +4583,7 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 	// this extra ATTACK in 2das was always played, together with anything else
 	ResRef sound;
 	GetSoundFrom2DA(sound, Verbal::Attack0);
-	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos);
+	if (!IsStar(sound)) core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos);
 
 	// the CRE attack was played only if the itemtype was 0/misc to avoid clashes with the hardcoded exceptions
 	// TobExAL and Infinity Sounds prefer both to be played, so we match that, giving more choice to modders
