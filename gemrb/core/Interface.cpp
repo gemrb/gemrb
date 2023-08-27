@@ -1354,7 +1354,6 @@ static const EnumArray<GFFlags, StringView> game_flags {
 		"HasNoNPCFlag",       //63GF_USEPOINT_400
 		"HasUsePointFlag",    //64GF_USEPOINT_200
 		"HasFloatMenu",       //65GF_HAS_FLOAT_MENU
-		"RareActionSounds",   //66GF_RARE_ACTION_VB
 		"NoUndroppable",      //67GF_NO_UNDROPPABLE
 		"StartActive",        //68GF_START_ACTIVE
 		"HasInfopointDialogs", //69GF_INFOPOINT_DIALOGS

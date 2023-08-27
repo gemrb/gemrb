@@ -118,7 +118,6 @@ enum class GFFlags : uint32_t {
 	USEPOINT_400,                	//all except pst and iwd2
 	USEPOINT_200,                	//iwd2
 	HAS_FLOAT_MENU,              	//pst
-	RARE_ACTION_VB,              	//pst
 	NO_UNDROPPABLE,              	//iwd,how
 	START_ACTIVE,                	//bg1
 	INFOPOINT_DIALOGS,           	//pst, but only bg1 has garbage there

@@ -4,5 +4,6 @@
 RARE_SELECT_SOUNDS       4
 MC_SELECT_SOUNDS         7
 SELECT_SOUNDS            7
+COMMAND_COUNT            7
 
 # a table with extra data about verbal constants and their ranges

@@ -106,7 +106,6 @@ static ResRef featSpells[ES_COUNT];
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
-static bool raresnd = false;
 static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
@@ -1588,7 +1587,6 @@ static void InitActorTables()
 	pstflags = core->HasFeature(GFFlags::PST_STATE_FLAGS) != 0;
 	nocreate = core->HasFeature(GFFlags::NO_NEW_VARIABLES) != 0;
 	third = core->HasFeature(GFFlags::RULES_3ED) != 0;
-	raresnd = core->HasFeature(GFFlags::RARE_ACTION_VB) != 0;
 	iwd2class = core->HasFeature(GFFlags::LEVELSLOT_PER_CLASS) != 0;
 	// iwd2 has some different base class names
 	if (iwd2class) {
@@ -3740,9 +3738,6 @@ void Actor::PlayWarCry(int range) const
 	}
 }
 
-#define SEL_ACTION_COUNT_COMMON  3
-#define SEL_ACTION_COUNT_ALL     7
-
 //call this when a PC receives a command from GUI
 void Actor::CommandActor(Action* action, bool clearPath)
 {
@@ -3770,7 +3765,8 @@ void Actor::CommandActor(Action* action, bool clearPath)
 
 	if (core->GetFirstSelectedPC(false) == this) {
 		// bg2 uses up the traditional space for rare select sound slots for more action (command) sounds
-		VerbalConstant(Verbal::Command, raresnd ? SEL_ACTION_COUNT_ALL : SEL_ACTION_COUNT_COMMON, DS_CIRCLE);
+		int numCommands = gamedata->GetVBData("COMMAND_COUNT");
+		VerbalConstant(Verbal::Command, numCommands, DS_CIRCLE);
 	}
 }
 

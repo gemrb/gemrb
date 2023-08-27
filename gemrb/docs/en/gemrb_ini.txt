@@ -503,12 +503,6 @@ RandomBanterDialogs = <bool>
 Toggles whether banter dialogs are randomly activated (as in BG1)
 rather than explicitly scripted (as in BG2).
 
-RareActionSounds = <bool>
-- - - - - - - - - - - - -
-Toggles the count of available verbal constants for commands. Most games
-had 3, but bg2 increased it to 7 by decreasing the amount of rare select
-sounds.
-
 
 ReverseDoor = <bool>
 - - - - - - - - - - -
