@@ -2066,7 +2066,6 @@ static void InitActorTables()
 	}
 
 	// verbal constant remapping, if omitted, it is an 1-1 mapping
-	// TODO: allow disabled VC slots
 	for (auto i : EnumIterator<Verbal>()) {
 		VCMap[i] = i;
 	}
@@ -8439,9 +8438,9 @@ bool Actor::GetSoundFromINI(ResRef& sound, Verbal index) const
 	 *   19x sf1sound (stand (normal) fidget)
 	 * 
 	 * TODO: iwd:
-	 *   att2-att4
-	 *   fall
-	 *   fidget
+	 *   att2-att4 used for 2nd-4th attack in the round?
+	 *   fall mentioned as optional "falling down" in sndlist.txt
+	 *   fidget (on IE_ANI_HEAD_TURN?)
 	 */
 	StringView resource;
 	switch(index) {

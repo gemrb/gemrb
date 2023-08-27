@@ -338,7 +338,7 @@ enum DamageFlags {
 	NoAwake = 0x200
 };
 
-// verbal constant (bg2), we have a lookup table (vcremap) for other games
+// verbal constant (bg2 soundoff.ids / sndslot.ids), we have a lookup table (vcremap) for other games
 // an index into VCMap
 enum class Verbal : unsigned int {
 	InitialMeet = 0,
@@ -375,7 +375,7 @@ enum class Verbal : unsigned int {
 	Special = 50, // -52
 	React = 53, // REACT_TO_DIE_GENERAL
 	ReactSpecific = 54, // REACT_TO_DIE_SPECIFIC
-	Resp2Compliment = 55, // -57
+	Resp2Compliment = 55, // -57; 55 also double labeled as MISCELLANEOUS in iwd/bg2ee sndslot.ids
 	Resp2Insult = 58, // -60
 	Hostile = 61,
 	Dialog = 62, // DIALOG_DEFAULT
