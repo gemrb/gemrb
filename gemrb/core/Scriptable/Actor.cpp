@@ -3837,7 +3837,7 @@ void Actor::IdleActions(bool nonidle)
 		}
 
 		// display idle animation
-		int x = RAND(0, 25);
+		int x = RAND(0, 24);
 		if (!x && (GetStance() == IE_ANI_AWAKE)) {
 			SetStance(IE_ANI_HEAD_TURN);
 		}
@@ -8328,7 +8328,7 @@ bool Actor::HandleActorStance()
 		ca->autoSwitchOnEnd = false;
 		return true;
 	}
-	int x = RAND(0, 25);
+	int x = RAND(0, 24);
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
 		SetStance( IE_ANI_HEAD_TURN );
 		return true;
