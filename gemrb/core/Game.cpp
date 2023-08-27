@@ -1293,7 +1293,7 @@ void Game::PartyMemberDied(const Actor *actor)
 			react = pc;
 		}
 	}
-	AddTrigger(TriggerEntry(trigger_partymemberdied, actor->GetGlobalID()));
+
 	if (react != NULL) {
 		react->ReactToDeath(actor->GetScriptName());
 	}

@@ -387,7 +387,7 @@ public:
 	bool MatchTrigger(unsigned short id, ieDword param = 0) const;
 	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0) const;
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
-	void SendTriggerToAll(TriggerEntry entry);
+	void SendTriggerToAll(TriggerEntry entry, int extraFlags = 0);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText();
 	virtual Region DrawingRegion() const;

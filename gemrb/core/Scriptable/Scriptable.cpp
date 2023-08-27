@@ -883,9 +883,10 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
 }
 
 // NOTE: currently includes the sender
-void Scriptable::SendTriggerToAll(TriggerEntry entry)
+void Scriptable::SendTriggerToAll(TriggerEntry entry, int extraFlags)
 {
-	std::vector<Actor *> nearActors = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15);
+	int flags = GA_NO_DEAD | GA_NO_UNSCHEDULED | extraFlags;
+	std::vector<Actor*> nearActors = area->GetAllActorsInRadius(Pos, flags, 15);
 	for (const auto& neighbour : nearActors) {
 		neighbour->AddTrigger(entry);
 	}
