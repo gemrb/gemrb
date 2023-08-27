@@ -3542,7 +3542,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	core->GetAudioDrv()->PlayRelative(resRef, channel, &len);
 
 	tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
-	if (counter != 0) { // don't nullify it in case we're waiting already
+	if (counter > GetWait()) { // don't nullify it in case we're waiting already
 		SetWait(counter);
 	}
 }
