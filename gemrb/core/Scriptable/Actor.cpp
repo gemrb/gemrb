@@ -3931,7 +3931,7 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 		return;
 	}
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-	VerbalConstant(Verbal::Panic);
+	VerbalConstant(Verbal::Panic, gamedata->GetVBData("SPECIAL_COUNT"));
 
 	Action *action;
 	if (panicmode == PANIC_RUNAWAY && (!attacker || attacker->Type!=ST_ACTOR)) {

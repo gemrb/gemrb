@@ -1,6 +1,9 @@
 2DA V1.0
 *
            ORIGINAL   NEW        
+PANIC      0          2
+# this is the original slot, so we reverse the order to enable normal addressing
+2          1          1
 BCRY       9          3          
 2          10         4          
 3          11         5          
