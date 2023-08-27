@@ -100,8 +100,6 @@ static int DifficultyLuckMod = 0;
 static int DifficultyDamageMod = 0;
 static int DifficultySaveMod = 0;
 
-//the chance to issue one of the rare select verbal constants
-#define RARE_SELECT_CHANCE 5
 //these are the max number of select sounds -- the size of the pool to choose from
 static int NUM_RARE_SELECT_SOUNDS = 2; //in bg and pst it is actually 4
 #define NUM_SELECT_SOUNDS 6 //in bg1 this is 4 but doesn't need to be checked
@@ -3711,7 +3709,8 @@ void Actor::PlaySelectionSound(bool force)
 
 	//drop the rare selection comment 5% of the time
 	bool found = false;
-	if (InParty && RAND(1, 100) <= RARE_SELECT_CHANCE) {
+	static int rareSelectChance = gamedata->GetMiscRule("RARE_SELECT_CHANCE");
+	if (InParty && RAND(1, 100) <= rareSelectChance) {
 		//rare select on main character for BG1 won't work atm
 		found = VerbalConstant(Verbal::SelectRare, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
 	} else {
