@@ -36,3 +36,8 @@ REACT      53         39
 CRITHIT    65         41
 #2                    42
 BIO        74         63
+# no attack sounds whatsoever
+ATTACK     14         97
+2          15         97
+3          16         97
+4          17         97
