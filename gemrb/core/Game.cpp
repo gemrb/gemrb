@@ -977,7 +977,7 @@ void Game::SwapPCs(unsigned int pc1, unsigned int pc2) const
 
 	if (idx1==0 || idx2==0) {
 		//leader changed
-		DisplayStringCoreVC(FindPC(1), Verbal::Leader, 0);
+		FindPC(1)->VerbalConstant(Verbal::Leader, gamedata->GetVBData("SPECIAL_COUNT"));
 	}
 }
 

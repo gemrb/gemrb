@@ -6,5 +6,6 @@ MC_SELECT_SOUNDS         4
 SELECT_SOUNDS            6
 COMMAND_COUNT            3
 SPECIAL_COUNT            1
+BEING_HIT_COUNT          1
 
 # a table with extra data about verbal constants and their ranges

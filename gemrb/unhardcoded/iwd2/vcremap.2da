@@ -10,9 +10,13 @@ BCRY       9          3
 4          12         6          
 5          13         7          
 LEAD       6          8          
+#2                    9
 TIRE       7          10         
-BORE       8          13         
-DMG        20         14         
+#2                    11
+BORE       8          12
+#2                    13
+HURT       20         14
+#2                    15
 SEL        26         16         
 2          27         17         
 3          28         18         
@@ -29,11 +33,16 @@ ACT        32         23
 7          38         29         
 RARE1      63         30         
 RARE2      64         31         
-# 3 and 4 are handled by code (see NumRareSelectSounds)
-HIT        18         34         
+# 3 and 4 are handled by code (see vcdetail.2da)
+BEINGHIT   18         34
+#2
+#3
 DYING      19         37         
+#2                    38
 REACT      53         39         
-2          54         40         
+#2         54         40
+CRITHIT    65         41
+#2                    42
 BIO        74         63         
 # no attack sounds whatsoever
 ATTACK     14         97

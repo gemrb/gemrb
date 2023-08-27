@@ -3,6 +3,7 @@
            ORIGINAL   NEW
 PANIC      0          2
 # this is the original slot, so we reverse the order to enable normal addressing
+2          1          1
 BCRY       9          3
 2          10         4
 3          11         5
@@ -10,7 +11,7 @@ BCRY       9          3
 5          13         7
 LEAD       6          8
 TIRE       7          10
-BORE       8          13
+BORE       8          12
 DMG        20         14
 SEL        26         16
 2          27         17
@@ -32,4 +33,6 @@ HIT        18         34
 DYING      19         37
 REACT      53         39
 2          54         40
+CRITHIT    65         41
+#2                    42
 BIO        74         63

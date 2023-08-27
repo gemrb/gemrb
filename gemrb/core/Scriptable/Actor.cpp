@@ -1135,7 +1135,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 	} else {
 		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
 		if (signed(3*oldValue) > maxhp && signed(3*hp) < maxhp) {
-			actor->VerbalConstant(Verbal::Hurt, 1, DS_QUEUE);
+			actor->VerbalConstant(Verbal::Hurt, gamedata->GetVBData("SPECIAL_COUNT"), DS_QUEUE);
 		}
 	}
 
@@ -3104,7 +3104,7 @@ void Actor::UpdateFatigue()
 	if (FatigueComplaintDelay) {
 		FatigueComplaintDelay--;
 		if (!FatigueComplaintDelay) {
-			VerbalConstant(Verbal::Tired);
+			VerbalConstant(Verbal::Tired, gamedata->GetVBData("SPECIAL_COUNT"));
 		}
 	}
 }
@@ -3511,7 +3511,11 @@ bool Actor::HasSpecialDeathReaction(const ieVariable& deadname) const
 void Actor::ReactToDeath(const ieVariable& deadname)
 {
 	AutoTable tm = gamedata->LoadTable("death");
-	if (!tm) return;
+	if (!tm) {
+		// iwds don't have joinable npcs, so they don't ship a death.2da
+		VerbalConstant(Verbal::React, gamedata->GetVBData("SPECIAL_COUNT"), DS_QUEUE);
+		return;
+	}
 	// lookup value based on died's scriptingname and ours
 	// if value is 0 - use reactdeath
 	// if value is 1 - use reactspecial
@@ -3829,7 +3833,7 @@ void Actor::IdleActions(bool nonidle)
 		if (bored_time && nextBored && nextBored < time) {
 			int x = std::max(10U, bored_time / 10);
 			nextBored = time+core->Roll(1,30,x);
-			VerbalConstant(Verbal::Bored);
+			VerbalConstant(Verbal::Bored, gamedata->GetVBData("SPECIAL_COUNT"));
 		}
 
 		// display idle animation
@@ -3989,7 +3993,8 @@ void Actor::GetHit(int damage, bool killingBlow)
 {
 	if (!Immobile() && !(InternalFlags & IF_REALLYDIED) && !killingBlow) {
 		SetStance( IE_ANI_DAMAGE );
-		if (!VerbalConstant(Verbal::Damage)) {
+		static int beingHitCount = gamedata->GetVBData("BEING_HIT_COUNT");
+		if (!VerbalConstant(Verbal::Damage, beingHitCount)) {
 			ResRef sound;
 			GetSoundFromFile(sound, Verbal::Damage);
 			core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
@@ -5204,7 +5209,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	game->SelectActor(this, false, SELECT_NORMAL);
 
 	displaymsg->DisplayConstantStringName(HCStrings::Death, GUIColors::WHITE, this);
-	bool found = VerbalConstant(Verbal::Die);
+	bool found = VerbalConstant(Verbal::Die, gamedata->GetVBData("SPECIAL_COUNT"));
 	if (found) {
 		ResRef sound;
 		GetSoundFromFile(sound, Verbal::Die);
@@ -7157,7 +7162,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		Log(COMBAT, "Attack", "{}", buffer);
 		if (!gc->InDialog()) {
 			displaymsg->DisplayMsgAtLocation(HCStrings::CriticalHit, FT_COMBAT, this, this, GUIColors::WHITE);
-			VerbalConstant(Verbal::CritHit);
+			VerbalConstant(Verbal::CritHit, gamedata->GetVBData("SPECIAL_COUNT"));
 		}
 		ApplyCriticalEffect(this, target, wi, true);
 	} else {
