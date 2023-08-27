@@ -3697,21 +3697,21 @@ void Actor::PlaySelectionSound(bool force)
 		case 1:
 			return;
 		case 2:
-			if (core->Roll(1,100,0) > 20) return;
+			if (RAND(1, 100) > 20) return;
 			break;
 		// pst-only
 		case 3:
-			if (core->Roll(1, 100, 0) > 50) return;
+			if (RAND(1, 100) > 50) return;
 			break;
 		case 4:
-			if (core->Roll(1, 100, 0) > 80) return;
+			if (RAND(1, 100) > 80) return;
 			break;
 		default:;
 	}
 
 	//drop the rare selection comment 5% of the time
 	bool found = false;
-	if (InParty && core->Roll(1,100,0) <= RARE_SELECT_CHANCE){
+	if (InParty && RAND(1, 100) <= RARE_SELECT_CHANCE) {
 		//rare select on main character for BG1 won't work atm
 		found = VerbalConstant(Verbal::SelectRare, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
 	} else {
@@ -3764,14 +3764,10 @@ void Actor::CommandActor(Action* action, bool clearPath)
 			// intentional fallthrough
 		case 3:
 			//PST has 4 states and rare sounds
-			if (pstflags) {
-				if (core->Roll(1,100,0)>50) return;
-			}
+			if (pstflags && RAND(1, 100) > 50) return;
 			break;
 		case 4:
-			if (pstflags) {
-				if (core->Roll(1, 100, 0) > 80) return;
-			}
+			if (pstflags && RAND(1, 100) > 80) return;
 			break;
 		default:;
 	}
@@ -4550,7 +4546,7 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 			default: armor = 6; break;
 		}
 
-		Sound.Format("H_{}_{}{}", dmg_types[type-1], armor_types[armor], core->Roll(1, 3, 0));
+		Sound.Format("H_{}_{}{}", dmg_types[type - 1], armor_types[armor], RAND(1, 3));
 	} else {
 		if (levels) {
 			Sound.Format("HIT_0{}{:c}{:c}", type, armor + 'A', suffix ? '1' : 0);
@@ -10330,7 +10326,7 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, const Actor* op
 		} else {
 			bonus = luck;
 		}
-		int roll = core->Roll(1, dice*size, 0);
+		int roll = RAND(1, dice * size);
 		if (critical && (roll == 1 || roll == size)) {
 			return roll;
 		} else {
@@ -10340,7 +10336,7 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, const Actor* op
 
 	int roll, result = 0, misses = 0, hits = 0;
 	for (int i = 0; i < dice; i++) {
-		roll = core->Roll(1, size, 0);
+		roll = RAND(1, size);
 		if (roll == 1) {
 			misses++;
 		} else if (roll == size) {
