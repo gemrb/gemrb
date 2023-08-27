@@ -1271,8 +1271,9 @@ void Game::PartyMemberDied(const Actor *actor)
 
 	size_t size = PCs.size();
 	Actor *react = NULL;
-	for (size_t i = core->Roll(1, static_cast<int>(size), 0), n = 0; n < size; i++, n++) {
-		Actor *pc = PCs[i%size];
+	size_t offset = RAND(1UL, size);
+	for (size_t idx = offset; idx < offset + size; idx++) {
+		Actor* pc = PCs[idx % size];
 		if (pc == actor) {
 			continue;
 		}
