@@ -112,13 +112,12 @@ public:
 		unsigned int flags = 0,
 		tick_t *length = nullptr
 	) = 0;
-	Holder<SoundHandle> Play(
+	Holder<SoundHandle> PlayMB(
 		const String& resource,
 		unsigned int channel,
 		const Point&,
 		unsigned int flags = 0,
-		tick_t *length = nullptr
-	);
+		tick_t* length = nullptr);
 	Holder<SoundHandle> PlayRelative(StringView ResRef, unsigned int channel, tick_t *length = 0)
 			{ return Play(ResRef, channel, Point(), GEM_SND_RELATIVE, length); }
 	

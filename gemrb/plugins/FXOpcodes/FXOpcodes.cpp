@@ -6765,7 +6765,6 @@ int fx_disintegrate (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 8 use line of sight
 int fx_farsee (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_farsee(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	Map *map = target->GetCurrentArea();
 	if (!map) {
 		return FX_APPLIED;
@@ -6776,15 +6775,13 @@ int fx_farsee (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Parameter2 |= 2;
 	}
 
-	if (target->InParty) {
-		//don't start graphical interface if actor isn't in party
-		if (!(fx->Parameter2 & 4)) {
-			//start graphical interface
-			//it will do all the rest of the opcode
-			//using RevealMap guiscript action
-			core->EventFlag|=EF_SHOWMAP;
-			return FX_NOT_APPLIED;
-		}
+	// don't open the map window if actor isn't in party
+	if (target->InParty && !(fx->Parameter2 & 4)) {
+		// start graphical interface
+		// it will do all the rest of the opcode
+		// using RevealMap guiscript action
+		core->EventFlag |= EF_SHOWMAP;
+		return FX_NOT_APPLIED;
 	}
 
 	//don't explore unexplored points

@@ -27,7 +27,7 @@ namespace GemRB {
 // encapsulating file handles + API that fit best on the respective platform
 class File {
 public:
-	virtual ~File() {}
+	virtual ~File() = default;
 
 	virtual strpos_t Length() = 0;
 	virtual bool OpenRO(const path_t& name) = 0;

@@ -34,11 +34,12 @@ bool UTF8_stricmp(const char*, const char*) {
 
 // Returns true if both strings are equal after lower-casing
 bool UTF8_stricmp(const char *a, const char *b) {
-	const unsigned char *itA = reinterpret_cast<const unsigned char*>(a),
-		*itB = reinterpret_cast<const unsigned char*>(b);
+	const unsigned char* itA = reinterpret_cast<const unsigned char*>(a);
+	const unsigned char* itB = reinterpret_cast<const unsigned char*>(b);
 
 	while (*itA != 0) {
-		unsigned char iA = *itA, iB = *itB;
+		unsigned char iA = *itA;
+		unsigned char iB = *itB;
 
 		// a is longer
 		if (iB == 0) {
@@ -56,7 +57,8 @@ bool UTF8_stricmp(const char *a, const char *b) {
 				return false;
 			}
 
-			itA++, itB++;
+			itA++;
+			itB++;
 		} else {
 			// multibyte range (assuming no broken encoding)
 			auto getWidth = [](unsigned char c) -> uint8_t {
@@ -84,7 +86,8 @@ bool UTF8_stricmp(const char *a, const char *b) {
 				}
 			};
 
-			uint8_t widthA = getWidth(iA), widthB = getWidth(iB);
+			uint8_t widthA = getWidth(iA);
+			uint8_t widthB = getWidth(iB);
 
 			static const auto C_LOCALE = std::locale{"C.UTF-8"};
 			wchar_t aL = std::tolower(getCodepoint(itA, widthA), C_LOCALE);

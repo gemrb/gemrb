@@ -28,7 +28,7 @@ using under_t = std::underlying_type_t<ENUM>;
 
 template <typename T, bool = std::is_enum<T>::value>
 struct under_sfinae {
-	using type = typename std::underlying_type<T>::type;
+	using type = typename std::underlying_type_t<T>;
 };
 
 template <typename T>

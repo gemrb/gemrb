@@ -3830,7 +3830,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 		}
 
 		if (PyUnicode_Check(pyref)) {
-			core->GetAudioDrv()->Play(PyString_AsStringObj(pyref), channel, pos, flags);
+			core->GetAudioDrv()->PlayMB(PyString_AsStringObj(pyref), channel, pos, flags);
 		} else {
 			core->GetAudioDrv()->Play(PyString_AsStringView(pyref), channel, pos, flags);
 		}

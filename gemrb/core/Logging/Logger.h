@@ -75,9 +75,10 @@ public:
 		
 		explicit LogWriter(LogLevel level) : level(level) {}
 		virtual ~LogWriter() noexcept = default;
-		
-		void WriteLogMessage(LogLevel level, const char* owner, const char* message, LOG_FMT fmt) {
-			WriteLogMessage(LogMessage(level, owner, message, fmt));
+
+		void WriteLogMessage(LogLevel logLevel, const char* owner, const char* message, LOG_FMT fmt)
+		{
+			WriteLogMessage(LogMessage(logLevel, owner, message, fmt));
 		}
 		virtual void WriteLogMessage(const Logger::LogMessage& msg)=0;
 	};
