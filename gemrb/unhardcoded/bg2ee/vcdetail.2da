@@ -2,6 +2,7 @@
 0
                          VALUE
 RARE_SELECT_SOUNDS       2
-
+MC_SELECT_SOUNDS         3
+SELECT_SOUNDS            6
 
 # a table with extra data about verbal constants and their ranges

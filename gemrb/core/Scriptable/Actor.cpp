@@ -100,10 +100,6 @@ static int DifficultyLuckMod = 0;
 static int DifficultyDamageMod = 0;
 static int DifficultySaveMod = 0;
 
-//these are the max number of select sounds -- the size of the pool to choose from
-#define NUM_SELECT_SOUNDS 6 //in bg1 this is 4 but doesn't need to be checked
-#define NUM_MC_SELECT_SOUNDS 4 //number of main charater select sounds
-
 #define MAX_FEATV 4294967295U // 1<<32-1 (used for the triple-stat feat handling)
 
 static ResRef featSpells[ES_COUNT];
@@ -3713,11 +3709,13 @@ void Actor::PlaySelectionSound(bool force)
 		int numRareSelects = gamedata->GetVBData("RARE_SELECT_SOUNDS");
 		found = VerbalConstant(Verbal::SelectRare, numRareSelects, DS_CIRCLE);
 	} else {
-		//checks if we are main character to limit select sounds
+		// in some games there are fewer soundset slots/files than the VBs
 		if (PCStats && !PCStats->SoundSet.IsEmpty()) {
-			found = VerbalConstant(Verbal::Select, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
+			static int numSelects = gamedata->GetVBData("MC_SELECT_SOUNDS");
+			found = VerbalConstant(Verbal::Select, numSelects, DS_CIRCLE);
 		} else {
-			found = VerbalConstant(Verbal::Select, NUM_SELECT_SOUNDS + iwd2class, DS_CIRCLE);
+			int numSelects = gamedata->GetVBData("SELECT_SOUNDS");
+			found = VerbalConstant(Verbal::Select, numSelects, DS_CIRCLE);
 		}
 	}
 

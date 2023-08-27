@@ -386,14 +386,14 @@ enum class Verbal : unsigned int {
 	InventoryFull = 68,
 	PickedPocket = 69, // same as Existence1, but only used by joinables
 	Existence1 = 69, // same as PickedPocket
-	Hide = 70,
+	Hide = 70, // ees have this as Existence1 in sndslot.ids??
 	SpellDisrupted = 71,
 	TrapSet = 72,
 	Existence4 = 73, // unused in bg2, NI appears to have a gap of 1 — this should be Existence5 already
 	Bio = 74, // Existence5, biography for npcs
 
 	Noop = 97, // to disable a VB
-	Select7 = 98, // iwd2-only, gets remapped in vcremap.2da
+	Select7 = 98, // iwd-only, gets remapped in vcremap.2da
 	Attack0 = 99, // for our internal use only
 	count = 100
 };
