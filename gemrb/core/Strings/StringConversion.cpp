@@ -69,6 +69,7 @@ static String StringFromEncodedData(const char* in, size_t length, const std::st
 static String StringFromEncodedData(const char* string, const EncodingStruct& encoding) {
 	size_t inLen = 0;
 
+	assert(string);
 	if (encoding.widechar) {
 		inLen = wcslen(reinterpret_cast<const wchar_t*>(string));
 	} else {
