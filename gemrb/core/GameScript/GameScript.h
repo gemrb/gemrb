@@ -51,6 +51,7 @@ class GameScript;
 #define DS_AREA    128
 #define DS_QUEUE   256
 #define DS_CIRCLE  512
+#define DS_RESOLVED 1024
 
 //markspellandobject (iwd2)
 #define MSO_IGNORE_SEE     1

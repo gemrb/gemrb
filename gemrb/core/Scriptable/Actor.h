@@ -860,7 +860,7 @@ public:
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
-	void GetVerbalConstantSound(ResRef& sound, Verbal index) const;
+	void GetVerbalConstantSound(ResRef& sound, Verbal index, bool resolved = false) const;
 	bool GetSoundFromFile(ResRef& sound, Verbal index) const;
 	bool GetSoundFromINI(ResRef& sound, Verbal index) const;
 	bool GetSoundFrom2DA(ResRef& sound, Verbal index) const;

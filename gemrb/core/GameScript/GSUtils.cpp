@@ -473,7 +473,7 @@ void DisplayStringCoreVC(Scriptable* Sender, Verbal vc, int flags)
 	if (Strref == ieStrRef::INVALID || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 		//get soundset based string constant
 		ResRef soundRef;
-		actor->GetVerbalConstantSound(soundRef, vc);
+		actor->GetVerbalConstantSound(soundRef, vc, flags & DS_RESOLVED);
 		std::string sound;
 		if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
 			sound = fmt::format("{}{}{}", fmt::WideToChar{actor->PCStats->SoundFolder}, PathDelimiter, soundRef);

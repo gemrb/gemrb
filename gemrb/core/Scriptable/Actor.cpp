@@ -3467,6 +3467,7 @@ ieStrRef Actor::GetVerbalConstant(Verbal start, int count) const
 bool Actor::VerbalConstant(Verbal start, int count, int flags) const
 {
 	assert(count > 0);
+	start = VCMap[start];
 	if (start != Verbal::Die) {
 		//can't talk when dead
 		if (Modified[IE_STATE_ID] & (STATE_CANTLISTEN)) return false;
@@ -3484,7 +3485,7 @@ bool Actor::VerbalConstant(Verbal start, int count, int flags) const
 			GetVerbalConstantSound(soundRef, Verbal(firstVB + count));
 			auto soundFolder = GetSoundFolder(1, soundRef);
 			if (gamedata->Exists(soundFolder, IE_WAV_CLASS_ID, true) || gamedata->Exists(soundFolder, IE_OGG_CLASS_ID, true)) {
-				DisplayStringCoreVC((Scriptable*) this, Verbal(firstVB + RAND(0, count)), flags | DS_CONST);
+				DisplayStringCoreVC((Scriptable*) this, Verbal(firstVB + RAND(0, count)), flags | DS_CONST | DS_RESOLVED);
 				found = true;
 				break;
 			}
@@ -8496,7 +8497,7 @@ bool Actor::GetSoundFromINI(ResRef& sound, Verbal index) const
 	return true;
 }
 
-void Actor::GetVerbalConstantSound(ResRef& Sound, Verbal index) const
+void Actor::GetVerbalConstantSound(ResRef& Sound, Verbal index, bool resolved) const
 {
 	TableMgr::index_t idx = TableMgr::index_t(index);
 	if (PCStats && !PCStats->SoundSet.IsEmpty()) {
@@ -8527,7 +8528,7 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, Verbal index) const
 		}
 
 		//icewind style
-		Sound.Format("{}{:02d}", PCStats->SoundSet, VCMap[idx]);
+		Sound.Format("{}{:02d}", PCStats->SoundSet, resolved ? Verbal(idx) : VCMap[idx]);
 		return;
 	}
 
