@@ -1,0 +1,11 @@
+2DA V1.0
+0
+                         VALUE
+RARE_SELECT_SOUNDS       4
+MC_SELECT_SOUNDS         3
+SELECT_SOUNDS            7
+COMMAND_COUNT            3
+SPECIAL_COUNT            1
+BEING_HIT_COUNT          1
+
+# a table with extra data about verbal constants and their ranges
