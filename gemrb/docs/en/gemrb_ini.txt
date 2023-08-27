@@ -459,11 +459,6 @@ NoNewVariables = <bool>
 Toggles whether the engine can create new variables in the Game structure.
 
 
-NumRareSelectSounds = <number>
-- - - - - - - - - - - -
-Data derived setting describing how many rare select sounds a game uses.
-
-
 OneByteAnimationID = <bool>
 - - - - - - - - - - - - - -
 If set to 1, then only the lower byte of the animation ID will be used 

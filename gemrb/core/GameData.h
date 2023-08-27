@@ -188,6 +188,7 @@ public:
 	int GetMiscRule(const TableMgr::key_t& rowName);
 	int GetDifficultyMod(ieDword mod, ieDword difficulty);
 	int GetXPBonus(ieDword bonusType, ieDword level);
+	int GetVBData(const TableMgr::key_t& rowName);
 
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }

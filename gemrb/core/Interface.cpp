@@ -187,7 +187,6 @@ static std::unique_ptr<AbilityTables> abilityTables;
 
 static const char* const IWD2DeathVarFormat = "_DEAD{}";
 static const char* DeathVarFormat = "SPRITE_IS_DEAD{}";
-static int NumRareSelectSounds = 2;
 
 static const ieWord IDT_FAILURE = 0;
 static const ieWord IDT_CRITRANGE = 1;
@@ -1462,7 +1461,6 @@ void Interface::LoadGemRBINI()
 		INIConfig = StringFromView<std::string>(sv);
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
-	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
 	gamedata->SetTextSpeed(ini->GetKeyAsInt("resources", "TextScreenSpeed", 100));
 
 	for (const GFFlags flag : EnumIterator<GFFlags>()) {
@@ -3766,8 +3764,6 @@ int Interface::CompressSave(const path_t& folder, bool overrideRunning)
 	Log(WARNING, "Core", "{} ms (compressing SAV file)", endTime - startTime);
 	return GEM_OK;
 }
-
-int Interface::GetRareSelectSoundCount() const { return NumRareSelectSounds; }
 
 int Interface::GetMaximumAbility() const { return MaximumAbility; }
 

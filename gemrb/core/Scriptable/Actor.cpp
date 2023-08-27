@@ -101,7 +101,6 @@ static int DifficultyDamageMod = 0;
 static int DifficultySaveMod = 0;
 
 //these are the max number of select sounds -- the size of the pool to choose from
-static int NUM_RARE_SELECT_SOUNDS = 2; //in bg and pst it is actually 4
 #define NUM_SELECT_SOUNDS 6 //in bg1 this is 4 but doesn't need to be checked
 #define NUM_MC_SELECT_SOUNDS 4 //number of main charater select sounds
 
@@ -1616,7 +1615,6 @@ static void InitActorTables()
 	CheckAbilities = core->HasFeature(GFFlags::CHECK_ABILITIES);
 	DeathOnZeroStat = core->HasFeature(GFFlags::DEATH_ON_ZERO_STAT);
 	IWDSound = core->HasFeature(GFFlags::SOUNDS_INI);
-	NUM_RARE_SELECT_SOUNDS = core->GetRareSelectSoundCount();
 
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
@@ -3712,7 +3710,8 @@ void Actor::PlaySelectionSound(bool force)
 	static int rareSelectChance = gamedata->GetMiscRule("RARE_SELECT_CHANCE");
 	if (InParty && RAND(1, 100) <= rareSelectChance) {
 		//rare select on main character for BG1 won't work atm
-		found = VerbalConstant(Verbal::SelectRare, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
+		int numRareSelects = gamedata->GetVBData("RARE_SELECT_SOUNDS");
+		found = VerbalConstant(Verbal::SelectRare, numRareSelects, DS_CIRCLE);
 	} else {
 		//checks if we are main character to limit select sounds
 		if (PCStats && !PCStats->SoundSet.IsEmpty()) {

@@ -1044,4 +1044,12 @@ int GameData::GetXPBonus(ieDword bonusType, ieDword level)
 	return xpBonus->QueryFieldSigned<int>(bonusType, level - 1);
 }
 
+int GameData::GetVBData(const TableMgr::key_t& rowName)
+{
+	AutoTable vbDetails = LoadTable("vcdetail", true);
+	assert(vbDetails);
+
+	return vbDetails->QueryFieldSigned<int>(rowName, "VALUE");
+}
+
 }
