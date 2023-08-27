@@ -1,0 +1,20 @@
+2DA V1.0
+****
+           File     Description
+0x7101     MBAS2    BASILISK_GREATER
+0x7200     MBER4    BEAR_BLACK
+0x7202     MBER3    BEAR_CAVE
+0x7203     MBER2    BEAR_POLAR
+0x7401     MDOG2    DOG_WAR
+0x7501     MDOP2    DOPPLEGANGER_GREATER
+0x7702     MGHL2    GHOUL_GHAST
+0x7B01     MWLF5    WOLF_WORG
+0x7B02     MWLF6    WOLF_DIRE
+0xA000     MWYV2    SMALL_WYVERN
+# some IA-modified slots
+0xE060     MLCH     LICH_WHITE
+0xE070     MMTA     MINOTAUR
+0xE090     MMAR     MARILITH
+0xE0B0     MTRL     TROLL_BLUE
+
+# table for overriding the animation id -> animation stance/sound 2da mapping

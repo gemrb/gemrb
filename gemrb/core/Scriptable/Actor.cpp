@@ -8367,7 +8367,16 @@ bool Actor::GetSoundFrom2DA(ResRef& sound, Verbal index) const
 {
 	if (!anims) return false;
 
-	AutoTable tab = gamedata->LoadTable(anims->ResRefBase);
+	// check if there is an override (ToBExAL),
+	// otherwise use the base animation prefix
+	ResRef prefix = anims->ResRefBase;
+	static AutoTable aniSndOverride = gamedata->LoadTable("anisndex", true);
+	const std::string& row = fmt::format("0x{:4X}", Modified[IE_ANIMATION_ID]);
+	ResRef file = aniSndOverride->QueryField(row, "File");
+	if (!IsStar(file)) {
+		prefix = file;
+	}
+	AutoTable tab = gamedata->LoadTable(prefix);
 	if (!tab) return false;
 
 	TableMgr::index_t idx = 0;
@@ -8412,7 +8421,7 @@ bool Actor::GetSoundFrom2DA(ResRef& sound, Verbal index) const
 			Log(WARNING, "Actor", "Cannot determine 2DA rowcount for index {} for {}, let us know!", idx, fmt::WideToChar { LongName });
 			return false;
 	}
-	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", anims->ResRefBase, tab->GetRowName(idx));
+	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", prefix, tab->GetRowName(idx));
 	TableMgr::index_t col = RAND<TableMgr::index_t>(0, tab->GetColumnCount(idx) - 1);
 	sound = tab->QueryField(idx, col);
 	return true;
