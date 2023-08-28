@@ -11947,6 +11947,8 @@
 					"-Wall",
 					"-Wno-long-long",
 					"-DTARGET_OS_MAC=1",
+					"-DFMT_HEADER_ONLY",
+					"-DFMT_EXCEPTIONS=0",
 				);
 				SYSTEM_HEADER_SEARCH_PATHS = /opt/homebrew/include;
 				USER_HEADER_SEARCH_PATHS = (
@@ -12029,6 +12031,8 @@
 					"-Wformat",
 					"-Wno-long-long",
 					"-DTARGET_OS_MAC=1",
+					"-DFMT_HEADER_ONLY",
+					"-DFMT_EXCEPTIONS=0",
 				);
 				SYSTEM_HEADER_SEARCH_PATHS = /opt/homebrew/include;
 				USER_HEADER_SEARCH_PATHS = (

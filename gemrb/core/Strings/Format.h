@@ -19,8 +19,6 @@
 #ifndef FORMAT_H
 #define FORMAT_H
 
-#define FMT_HEADER_ONLY
-#define FMT_EXCEPTIONS 0
 #include <fmt/format.h>
 
 namespace GemRB {

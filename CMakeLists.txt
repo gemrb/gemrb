@@ -497,6 +497,9 @@ if(NOT SANITIZE STREQUAL "None" AND NOT SANITIZE STREQUAL "none")
 	# also CMAKE_MODULE_LINKER_FLAGS for macs?
 endif()
 
+# ensure fmt gets included properly
+ADD_DEFINITIONS("-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0")
+
 # On Release builds cmake automatically defines NDEBUG, so we
 # explicitly undefine it:
 # This matches stripped (Release) and nonstripped (RelWithDebInfo) builds
