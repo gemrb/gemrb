@@ -392,11 +392,7 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 //RangedType could be weird, reducing its value to 0,1,2
 void CharAnimations::SetRangedType(int rt)
 {
-	if ((unsigned int) rt<2) {
-		RangedType=(ieByte) rt;
-	} else {
-		RangedType=2;
-	}
+	RangedType = Clamp<ieByte>(rt, 0, 2);
 }
 
 void CharAnimations::SetWeaponType(unsigned char wt)
