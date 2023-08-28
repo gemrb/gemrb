@@ -54,7 +54,7 @@ Button::Button(const Region& frame)
 Button::~Button()
 {
 	delete animation;
-	SetImage(BUTTON_IMAGE_NONE, NULL);
+	SetImage(ButtonImage::None, nullptr);
 	ClearPictureList();
 
 	if (hotKey.global) {
@@ -75,14 +75,9 @@ void Button::UnregisterHotKey()
 
 /** Sets the 'type' Image of the Button to 'img'.
  see 'BUTTON_IMAGE_TYPE' */
-void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
+void Button::SetImage(ButtonImage type, Holder<Sprite2D> img)
 {
-	if (type >= BUTTON_IMAGE_TYPE_COUNT) {
-		Log(ERROR, "Button", "Trying to set a button image index out of range: {}", type);
-		return;
-	}
-
-	if (type <= BUTTON_IMAGE_NONE) {
+	if (type == ButtonImage::None) {
 		for (auto& buttonImage : buttonImages) {
 			buttonImage = nullptr;
 		}
@@ -99,12 +94,12 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 			// check if we should set IE_GUI_BUTTON_NO_IMAGE
 
 			int i=0;
-			for (; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
+			for (; i < BUTTON_IMAGE_TYPE::None; i++) {
 				if (buttonImages[i] != NULL) {
 					break;
 				}
 			}
-			if (i == BUTTON_IMAGE_TYPE_COUNT) {
+			if (i == BUTTON_IMAGE_TYPE::None) {
 				// we made it to the end of the list without breaking so we have no images
 				Flags &= IE_GUI_BUTTON_NO_IMAGE;
 			}
@@ -141,17 +136,17 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		switch (ButtonState) {
 			case FAKEPRESSED:
 			case PRESSED:
-				Image = buttonImages[BUTTON_IMAGE_PRESSED];
+				Image = buttonImages[ButtonImage::Pressed];
 				break;
 			case SELECTED:
-				Image = buttonImages[BUTTON_IMAGE_SELECTED];
+				Image = buttonImages[ButtonImage::Selected];
 				break;
 			case DISABLED:
 			case FAKEDISABLED:
-				Image = buttonImages[BUTTON_IMAGE_DISABLED];
+				Image = buttonImages[ButtonImage::Disabled];
 				break;
 			default:
-				Image = buttonImages[BUTTON_IMAGE_UNPRESSED];
+				Image = buttonImages[ButtonImage::Unpressed];
 				break;
 		}
 		if (Image) {
@@ -678,7 +673,7 @@ bool Button::HitTest(const Point& p) const
 	if (hit) {
 		// some buttons have hollow Image frame filled w/ Picture
 		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
-		Holder<Sprite2D> Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
+		Holder<Sprite2D> Unpressed = buttonImages[ButtonImage::Unpressed];
 		if (Picture || !PictureList.empty() || !Unpressed) return true;
 
 		Point off;

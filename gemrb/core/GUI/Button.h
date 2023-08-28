@@ -28,12 +28,14 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include "GUI/GUIAnimation.h"
-#include "GUI/Control.h"
-#include "GUI/TextSystem/Font.h"
+#include "exports.h"
+
+#include "EnumIndex.h"
 #include "Sprite2D.h"
 
-#include "exports.h"
+#include "GUI/Control.h"
+#include "GUI/GUIAnimation.h"
+#include "GUI/TextSystem/Font.h"
 
 #include <vector>
 
@@ -83,13 +85,13 @@ struct ButtonBorder {
 
 #define MAX_NUM_BORDERS 3
 
-enum BUTTON_IMAGE_TYPE {
-	BUTTON_IMAGE_NONE = -1,
-	BUTTON_IMAGE_UNPRESSED,
-	BUTTON_IMAGE_PRESSED,
-	BUTTON_IMAGE_SELECTED,
-	BUTTON_IMAGE_DISABLED,
-	BUTTON_IMAGE_TYPE_COUNT
+enum class ButtonImage : unsigned int {
+	Unpressed,
+	Pressed,
+	Selected,
+	Disabled,
+	None,
+	count
 };
 
 /**
@@ -123,7 +125,7 @@ public:
 	bool IsOpaque() const override;
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
-	void SetImage(BUTTON_IMAGE_TYPE, Holder<Sprite2D> img);
+	void SetImage(ButtonImage, Holder<Sprite2D> img);
 	/** Sets the Button State */
 	void SetState(State state);
 	/** Sets the Text of the current control */
@@ -174,7 +176,7 @@ private: // Private attributes
 	bool pulseBorder = false;
 	Color textColor = ColorWhite;
 
-	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT]{};
+	EnumArray<ButtonImage, Holder<Sprite2D>> buttonImages {};
 	/** Pictures to Apply when the hasPicture flag is set */
 	Holder<Sprite2D> Picture = nullptr;
 	SpriteAnimation* animation = nullptr;

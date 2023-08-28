@@ -109,9 +109,9 @@ static void GetButton(DataStream* str, Control*& ctrl, const Region& ctrlFrame, 
 	// Cycle is only a byte for buttons
 	Holder<Sprite2D> tspr = bam->GetFrame(unpressedIndex, cycle);
 
-	btn->SetImage(BUTTON_IMAGE_UNPRESSED, tspr);
+	btn->SetImage(ButtonImage::Unpressed, tspr);
 	tspr = bam->GetFrame(pressedIndex, cycle);
-	btn->SetImage(BUTTON_IMAGE_PRESSED, tspr);
+	btn->SetImage(ButtonImage::Pressed, tspr);
 	// work around several controls not setting all the indices
 	AnimationFactory::index_t cycleSize = bam->GetCycleSize(cycle);
 	bool resetIndex = false;
@@ -123,9 +123,9 @@ static void GetButton(DataStream* str, Control*& ctrl, const Region& ctrlFrame, 
 		if (cycleSize == 4) disabledIndex = 3;
 	}
 	tspr = bam->GetFrame(selectedIndex, cycle);
-	btn->SetImage(BUTTON_IMAGE_SELECTED, tspr);
+	btn->SetImage(ButtonImage::Selected, tspr);
 	tspr = bam->GetFrame(disabledIndex, cycle);
-	btn->SetImage(BUTTON_IMAGE_DISABLED, tspr);
+	btn->SetImage(ButtonImage::Disabled, tspr);
 
 	return;
 }

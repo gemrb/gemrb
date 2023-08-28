@@ -2465,7 +2465,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 		StringView ResRef = wrapper;
 
 		if (ResRef[0] == 0) {
-			btn->SetImage( BUTTON_IMAGE_NONE, NULL );
+			btn->SetImage(ButtonImage::None, nullptr);
 			Py_RETURN_NONE;
 		}
 
@@ -2475,13 +2475,13 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 		}
 		Holder<Sprite2D> tspr;
 		tspr = af->GetFrame((AnimationFactory::index_t) unpressed, (unsigned char) cycle);
-		btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
+		btn->SetImage(ButtonImage::Unpressed, tspr);
 		tspr = af->GetFrame((AnimationFactory::index_t) pressed, (unsigned char) cycle);
-		btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
+		btn->SetImage(ButtonImage::Pressed, tspr);
 		tspr = af->GetFrame((AnimationFactory::index_t) selected, (unsigned char) cycle);
-		btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
+		btn->SetImage(ButtonImage::Selected, tspr);
 		tspr = af->GetFrame((AnimationFactory::index_t) disabled, (unsigned char) cycle);
-		btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
+		btn->SetImage(ButtonImage::Disabled, tspr);
 
 		Py_RETURN_NONE;
 	}
@@ -6408,10 +6408,10 @@ static PyObject *SetSpellIcon(Button* btn, const ResRef& SpellResRef, int type, 
 		btn->SetPicture( af->GetFrame(0, 0));
 	}
 	else { //pst
-		btn->SetImage( BUTTON_IMAGE_UNPRESSED, af->GetFrame(0, 0));
-		btn->SetImage( BUTTON_IMAGE_PRESSED, af->GetFrame(1, 0));
-		btn->SetImage( BUTTON_IMAGE_SELECTED, af->GetFrame(2, 0));
-		btn->SetImage( BUTTON_IMAGE_DISABLED, af->GetFrame(3, 0));
+		btn->SetImage(ButtonImage::Unpressed, af->GetFrame(0, 0));
+		btn->SetImage(ButtonImage::Pressed, af->GetFrame(1, 0));
+		btn->SetImage(ButtonImage::Selected, af->GetFrame(2, 0));
+		btn->SetImage(ButtonImage::Disabled, af->GetFrame(3, 0));
 	}
 	if (tooltip) {
 		SetViewTooltipFromRef(btn, spell->SpellName);
@@ -10339,10 +10339,10 @@ static void ReadActionButtons()
 	}
 }
 
-static void SetButtonCycle(std::shared_ptr<const AnimationFactory> bam, Button *btn, AnimationFactory::index_t cycle, unsigned char which)
+static void SetButtonCycle(std::shared_ptr<const AnimationFactory> bam, Button* btn, AnimationFactory::index_t cycle, ButtonImage which)
 {
 	Holder<Sprite2D> tspr = bam->GetFrame(cycle, 0);
-	btn->SetImage((BUTTON_IMAGE_TYPE) which, std::move(tspr));
+	btn->SetImage(which, std::move(tspr));
 }
 
 PyDoc_STRVAR( GemRB_Button_SetActionIcon__doc,
@@ -10372,7 +10372,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	ABORT_IF_NULL(btn);
 
 	if (Index<0) {
-		btn->SetImage( BUTTON_IMAGE_NONE, NULL );
+		btn->SetImage(ButtonImage::None, nullptr);
 		btn->SetAction(nullptr, Control::Click, GEM_MB_ACTION, 0, 1);
 		btn->SetAction(nullptr, Control::Click, GEM_MB_MENU, 0, 1);
 		btn->SetTooltip(u"");
@@ -10391,10 +10391,10 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	packtype row;
 
 	row.data = GUIAction[Index];
-	SetButtonCycle(bam, btn, (char) row.bytes[0], Button::UNPRESSED);
-	SetButtonCycle(bam, btn, (char) row.bytes[1], Button::PRESSED);
-	SetButtonCycle(bam, btn, (char) row.bytes[2], Button::SELECTED);
-	SetButtonCycle(bam, btn, (char) row.bytes[3], Button::DISABLED);
+	SetButtonCycle(bam, btn, (char) row.bytes[0], ButtonImage::Unpressed);
+	SetButtonCycle(bam, btn, (char) row.bytes[1], ButtonImage::Pressed);
+	SetButtonCycle(bam, btn, (char) row.bytes[2], ButtonImage::Selected);
+	SetButtonCycle(bam, btn, (char) row.bytes[3], ButtonImage::Disabled);
 	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BitOp::NAND);
 	PyObject *Event = PyUnicode_FromFormat("Action%sPressed", GUIEvent[Index].c_str());
 	PyObject *func = PyDict_GetItem(dict, Event);
@@ -10540,10 +10540,10 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::SET);
 			btn->SetTooltip(u"");
 		} else {
-			SetButtonCycle(bam, btn, 0, Button::UNPRESSED);
-			SetButtonCycle(bam, btn, 1, Button::PRESSED);
-			SetButtonCycle(bam, btn, 2, Button::SELECTED);
-			SetButtonCycle(bam, btn, 3, Button::DISABLED);
+			SetButtonCycle(bam, btn, 0, ButtonImage::Unpressed);
+			SetButtonCycle(bam, btn, 1, ButtonImage::Pressed);
+			SetButtonCycle(bam, btn, 2, ButtonImage::Selected);
+			SetButtonCycle(bam, btn, 3, ButtonImage::Disabled);
 			btn->SetPicture( Picture );
 			btn->SetState(Button::UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BitOp::SET);
