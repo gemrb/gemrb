@@ -319,7 +319,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	if (act) {
 		Game* game = core->GetGame();
 		if (act->InParty && game->nextBored > 100 && // throtle a bit, since it could get expensive
-		    (CurrentAction || act->Modal.State == MS_BATTLESONG || act->Modal.State == MS_SHAMANDANCE) &&
+		    (CurrentAction || act->Modal.State == Modal::BattleSong || act->Modal.State == Modal::ShamanDance) &&
 		    act->ValidTarget(GA_SELECT)) {
 			game->nextBored = 0;
 		}

@@ -10711,7 +10711,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 		}
 
 		Button::State state = Button::UNPRESSED;
-		ieDword modalstate = actor->Modal.State;
+		Modal modalState = actor->Modal.State;
 		int type;
 		std::vector<ItemExtHeader> itemdata; // not really used!
 		switch (action) {
@@ -10780,11 +10780,11 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 				type = 1<<IE_IWD2_SPELL_SONG;
 				if (!actor->spellbook.GetSpellInfoSize(type)) {
 					state = Button::DISABLED;
-				} else if (modalstate == MS_BATTLESONG) {
+				} else if (modalState == Modal::BattleSong) {
 					state = Button::SELECTED;
 				}
 			} else {
-				if (modalstate==MS_BATTLESONG) {
+				if (modalState == Modal::BattleSong) {
 					state = Button::SELECTED;
 				}
 			}
@@ -10793,7 +10793,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			if (actor->GetStat(IE_TURNUNDEADLEVEL)<1) {
 				state = Button::DISABLED;
 			} else {
-				if (modalstate==MS_TURNUNDEAD) {
+				if (modalState == Modal::TurnUndead) {
 					state = Button::SELECTED;
 				}
 			}
@@ -10802,7 +10802,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			if (!CanUseActionButton(actor, action)) {
 				state = Button::DISABLED;
 			} else {
-				if (modalstate==MS_STEALTH) {
+				if (modalState == Modal::Stealth) {
 					state = Button::SELECTED;
 				}
 			}
@@ -10812,7 +10812,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			if (!CanUseActionButton(actor, action)) {
 				state = Button::DISABLED;
 			} else {
-				if (modalstate == MS_DETECTTRAPS) {
+				if (modalState == Modal::DetectTraps) {
 					state = Button::SELECTED;
 				}
 			}
@@ -11021,7 +11021,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 	actor->Stop(); //stop pending action involved walking
-	actor->SetModal(MS_NONE);//stop modal actions
+	actor->SetModal(Modal::None); // stop modal actions
 	Py_RETURN_NONE;
 }
 
@@ -11298,8 +11298,8 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	actor->SetModal((ieDword) state, false);
-	actor->SetModalSpell(state, ResRefFromPy(spell));
+	actor->SetModal((Modal) state, false);
+	actor->SetModalSpell((Modal) state, ResRefFromPy(spell));
 	if (actor->ModalSpellSkillCheck()) {
 		actor->ApplyModal(actor->Modal.Spell); // force immediate effect
 	}

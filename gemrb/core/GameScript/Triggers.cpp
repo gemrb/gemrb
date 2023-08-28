@@ -3817,7 +3817,7 @@ int GameScript::ModalState( Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (actor->Modal.State == (ieDword) parameters->int0Parameter) {
+	if (actor->Modal.State == (Modal) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -3831,7 +3831,7 @@ int GameScript::IsCreatureHiddenInShadows( Scriptable *Sender, const Trigger */*
 		return 0;
 	}
 
-	if (actor->Modal.State == MS_STEALTH) {
+	if (actor->Modal.State == Modal::Stealth) {
 		return 1;
 	}
 	return 0;

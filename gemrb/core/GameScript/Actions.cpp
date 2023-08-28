@@ -2531,7 +2531,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters) {
 	// of all doors, or some doors, or whether it should still check for non-actors
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (actor) {
-		actor->SetModal(MS_NONE);
+		actor->SetModal(Modal::None);
 		if (!door->TryUnlock(actor)) {
 			return;
 		}
@@ -2565,7 +2565,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->SetModal(MS_NONE);
+	actor->SetModal(Modal::None);
 
 	Door* door = actor->GetCurrentArea()->GetDoorByGlobalID(actor->TargetDoor);
 	if (!door) {
@@ -3528,7 +3528,7 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 		Actor* act = map->GetActor(i,true);
 		if (act && act != Sender && act->ValidTarget(GA_NO_DEAD)) {
 			act->Stop(3);
-			act->SetModal(MS_NONE);
+			act->SetModal(Modal::None);
 		}
 	}
 
@@ -3559,7 +3559,7 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 
 	if (tar->Type == ST_ACTOR) {
 		Actor *actor = (Actor *) tar;
-		actor->SetModal(MS_NONE);
+		actor->SetModal(Modal::None);
 	}
 }
 
@@ -4634,7 +4634,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		//noticed attempt
 		if (reportFailure) displaymsg->DisplayMsgAtLocation(HCStrings::PickpocketFail, FT_ANY, Sender, Sender, GUIColors::WHITE);
 		if (breakInvisibility) {
-			snd->SetModal(MS_NONE);
+			snd->SetModal(Modal::None);
 			snd->CureInvisibility();
 		}
 		if (turnHostile && !core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
@@ -5731,7 +5731,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		actor->SetModal(MS_NONE);
+		actor->SetModal(Modal::None);
 		if (container->Trapped) {
 			container->AddTrigger(TriggerEntry(trigger_opened, actor->GetGlobalID()));
 		} else {
@@ -5894,8 +5894,8 @@ void GameScript::PlayBardSong(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	actor->SetModalSpell(MS_BATTLESONG, songs[songIdx]);
-	actor->SetModal(MS_BATTLESONG);
+	actor->SetModalSpell(Modal::BattleSong, songs[songIdx]);
+	actor->SetModal(Modal::BattleSong);
 }
 
 void GameScript::BattleSong(Scriptable* Sender, Action* /*parameters*/)
@@ -5904,7 +5904,7 @@ void GameScript::BattleSong(Scriptable* Sender, Action* /*parameters*/)
 	if (!actor) {
 		return;
 	}
-	actor->SetModal( MS_BATTLESONG);
+	actor->SetModal(Modal::BattleSong);
 }
 
 void GameScript::FindTraps(Scriptable* Sender, Action* /*parameters*/)
@@ -5913,7 +5913,7 @@ void GameScript::FindTraps(Scriptable* Sender, Action* /*parameters*/)
 	if (!actor) {
 		return;
 	}
-	actor->SetModal( MS_DETECTTRAPS);
+	actor->SetModal(Modal::DetectTraps);
 }
 
 void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
@@ -5924,7 +5924,7 @@ void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	if (actor->TryToHide()) {
-		actor->SetModal(MS_STEALTH);
+		actor->SetModal(Modal::Stealth);
 	}
 	//TODO: expiry isn't instant (skill based transition?)
 
@@ -5938,8 +5938,8 @@ void GameScript::Unhide(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 
-	if (actor->Modal.State == MS_STEALTH) {
-		actor->SetModal(MS_NONE);
+	if (actor->Modal.State == Modal::Stealth) {
+		actor->SetModal(Modal::None);
 	}
 	actor->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
 }
@@ -5958,8 +5958,7 @@ void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
 	int skill = actor->GetStat(IE_TURNUNDEADLEVEL);
 	if (skill < 1) return;
 
-	actor->SetModal(MS_TURNUNDEAD);
-
+	actor->SetModal(Modal::TurnUndead);
 }
 
 void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)

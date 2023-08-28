@@ -249,7 +249,7 @@ std::map<unsigned int, std::string> raceID2Name;
 ResRefMap<std::vector<BABTable>> IWD2HitTable;
 std::map<int, ResRef> BABClassMap; // maps classis (not id!) to the BAB table
 
-std::vector<ModalStatesStruct> ModalStates;
+EnumArray<Modal, ModalStatesStruct> ModalStates;
 std::map<int, ieByte> numWeaponSlots;
 
 //for every game except IWD2 we need to reverse TOHIT
@@ -1568,16 +1568,18 @@ static void ReadModalStates()
 	AutoTable table = gamedata->LoadTable("modal");
 	if (!table) return;
 
-	ModalStatesStruct ms;
-	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
-		ms.spell = table->QueryField(i, 0);
-		ms.action = table->QueryField(i, 1);
-		ms.entering_str = table->QueryFieldAsStrRef(i, 2);
-		ms.leaving_str = table->QueryFieldAsStrRef(i, 3);
-		ms.failed_str = table->QueryFieldAsStrRef(i, 4);
-		ms.aoe_spell = table->QueryFieldUnsigned<unsigned int>(i, 5);
-		ms.repeat_msg = table->QueryFieldUnsigned<unsigned int>(i, 6);
-		ModalStates.push_back(ms);
+	if (table->GetRowCount() > (size_t) Modal::count) {
+		Log(ERROR, "Actor", "Found new modal state in data! Nothing will happen.");
+	}
+
+	for (unsigned short i = 0; i < (size_t) Modal::count; i++) {
+		ModalStates[i].spell = table->QueryField(i, 0);
+		ModalStates[i].action = table->QueryField(i, 1);
+		ModalStates[i].entering_str = table->QueryFieldAsStrRef(i, 2);
+		ModalStates[i].leaving_str = table->QueryFieldAsStrRef(i, 3);
+		ModalStates[i].failed_str = table->QueryFieldAsStrRef(i, 4);
+		ModalStates[i].aoe_spell = table->QueryFieldUnsigned<unsigned int>(i, 5);
+		ModalStates[i].repeat_msg = table->QueryFieldUnsigned<unsigned int>(i, 6);
 	}
 }
 
@@ -5309,7 +5311,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 
 	ReleaseCurrentAction();
 	ClearPath(true);
-	SetModal( MS_NONE );
+	SetModal(Modal::None);
 
 	if (InParty && killerPC) {
 		UpdateOrCreateVariable(game->locals, "PM_KILLED", 1);
@@ -6099,7 +6101,7 @@ ResRef Actor::GetScript(int ScriptIndex) const
 // similar manipulation as PermanentStatChangeFeedback and DisplayMessage::StrRefs::Get
 inline ieStrRef PersonalizePSTString(ieStrRef ref, const Actor* pc)
 {
-	if (pc->Modal.State != MS_STEALTH) return ref;
+	if (pc->Modal.State != Modal::Stealth) return ref;
 	if (!core->HasFeature(GFFlags::PST_STATE_FLAGS)) return ref;
 
 	int pcOffset = 8;
@@ -6111,18 +6113,18 @@ inline ieStrRef PersonalizePSTString(ieStrRef ref, const Actor* pc)
 	return ieStrRef(int(ref) + pcOffset);
 }
 
-void Actor::SetModal(ieDword newstate, bool force)
+void Actor::SetModal(enum Modal newstate, bool force)
 {
 	switch(newstate) {
-		case MS_NONE:
+		case Modal::None:
 			break;
-		case MS_BATTLESONG:
+		case Modal::BattleSong:
 			break;
-		case MS_DETECTTRAPS:
+		case Modal::DetectTraps:
 			break;
-		case MS_STEALTH:
+		case Modal::Stealth:
 			break;
-		case MS_TURNUNDEAD:
+		case Modal::TurnUndead:
 			break;
 		default:
 			return;
@@ -6132,26 +6134,26 @@ void Actor::SetModal(ieDword newstate, bool force)
 		Modal.FirstApply = true;
 	}
 
-	if (Modal.State == MS_BATTLESONG && Modal.State != newstate && HasFeat(FEAT_LINGERING_SONG)) {
+	if (Modal.State == Modal::BattleSong && Modal.State != newstate && HasFeat(FEAT_LINGERING_SONG)) {
 		Modal.LingeringSpell = Modal.Spell;
 		Modal.LingeringCount = 2;
 	}
 
 	if (IsSelected()) {
 		// display the turning-off message
-		if (Modal.State != MS_NONE && core->HasFeedback(FT_MISC)) {
+		if (Modal.State != Modal::None && core->HasFeedback(FT_MISC)) {
 			ieStrRef leaving = PersonalizePSTString(ModalStates[Modal.State].leaving_str, this);
 			displaymsg->DisplayStringName(leaving, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		}
 
 		//update the action bar
-		if (Modal.State != newstate || newstate != MS_NONE) {
+		if (Modal.State != newstate || newstate != Modal::None) {
 			core->SetEventFlag(EF_ACTION);
 		}
 
 		// when called with the same state twice, toggle to MS_NONE
 		if (!force && Modal.State == newstate) {
-			Modal.State = MS_NONE;
+			Modal.State = Modal::None;
 		} else {
 			Modal.State = newstate;
 		}
@@ -6160,15 +6162,15 @@ void Actor::SetModal(ieDword newstate, bool force)
 	}
 }
 
-void Actor::SetModalSpell(ieDword state, const ResRef& spell)
+void Actor::SetModalSpell(enum Modal state, const ResRef& spell)
 {
 	if (spell) {
 		Modal.Spell = spell;
 	} else {
-		if (state >= ModalStates.size()) {
+		if (size_t(state) >= ModalStates.size) {
 			Modal.Spell.Reset();
 		} else {
-			if (state == MS_BATTLESONG && !BardSong.IsEmpty()) {
+			if (state == Modal::BattleSong && !BardSong.IsEmpty()) {
 				Modal.Spell = BardSong;
 				return;
 			}
@@ -7483,7 +7485,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 		lastattack = 0;
 	}
 
-	if (Modal.State == MS_NONE && !Modal.LingeringCount) {
+	if (Modal.State == Modal::None && !Modal.LingeringCount) {
 		return;
 	}
 
@@ -7494,7 +7496,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 			Modal.LingeringCount--;
 			ApplyModal(Modal.LingeringSpell);
 		}
-		if (Modal.State == MS_NONE) {
+		if (Modal.State == Modal::None) {
 			return;
 		}
 
@@ -7526,7 +7528,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 					ieStrRef failed = PersonalizePSTString(ModalStates[Modal.State].failed_str, this);
 					displaymsg->DisplayStringName(failed, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
-				Modal.State = MS_NONE;
+				Modal.State = Modal::None;
 			}
 		}
 
@@ -10387,7 +10389,7 @@ void Actor::ResetState()
 {
 	CureInvisibility();
 	CureSanctuary();
-	SetModal(MS_NONE);
+	SetModal(Modal::None);
 	ResetCommentTime();
 }
 
@@ -10435,20 +10437,20 @@ int Actor::GetRacialEnemyBonus(const Actor *target) const
 bool Actor::ModalSpellSkillCheck()
 {
 	switch(Modal.State) {
-	case MS_BATTLESONG:
-		if (GetBardLevel()) {
-			return !CheckSilenced();
-		}
-		return false;
-	case MS_DETECTTRAPS:
-		if (Modified[IE_TRAPS]<=0) return false;
-		return true;
-	case MS_TURNUNDEAD:
-		if (Modified[IE_TURNUNDEADLEVEL]<=0) return false;
+		case Modal::BattleSong:
+			if (GetBardLevel()) {
+				return !CheckSilenced();
+			}
+			return false;
+		case Modal::DetectTraps:
+			if (Modified[IE_TRAPS] <= 0) return false;
 			return true;
-	case MS_STEALTH:
+		case Modal::TurnUndead:
+			if (Modified[IE_TURNUNDEADLEVEL] <= 0) return false;
+			return true;
+		case Modal::Stealth:
 			return TryToHide();
-	case MS_NONE:
+		case Modal::None:
 		default:
 			return false;
 	}

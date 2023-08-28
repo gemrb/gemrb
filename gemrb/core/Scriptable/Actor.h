@@ -78,13 +78,17 @@ enum CREVersion {
 #define LR_DAMAGELUCK  2
 #define LR_NEGATIVE    4
 
-//modal states
-#define MS_NONE        0
-#define MS_BATTLESONG  1
-#define MS_DETECTTRAPS 2
-#define MS_STEALTH     3
-#define MS_TURNUNDEAD  4
-#define MS_SHAMANDANCE 5
+// modal states
+enum class Modal : unsigned int {
+	None,
+	BattleSong,
+	DetectTraps,
+	Stealth,
+	TurnUndead,
+	ShamanDance,
+
+	count
+};
 
 //stat modifier type
 #define MOD_ADDITIVE  0
@@ -310,7 +314,7 @@ struct ModalStatesStruct {
 };
 
 struct ModalState {
-	ieDword State = MS_NONE;
+	Modal State = Modal::None;
 	ResRef Spell; // apply this (modal) spell once per round
 	ResRef LingeringSpell; // apply this spell once per round if the effects are lingering
 	char LingeringCount = 0; // the count of rounds for which the modal spell will be reapplied after the state ends
@@ -808,9 +812,9 @@ public:
 	/* Receive experience (handle dual/multi class) */
 	void AddExperience(int exp, int combat);
 	/* Sets the modal state after checks */
-	void SetModal(ieDword newstate, bool force = true);
+	void SetModal(enum Modal newstate, bool force = true);
 	/* Sets the modal spell after checks */
-	void SetModalSpell(ieDword state, const ResRef& spell);
+	void SetModalSpell(enum Modal state, const ResRef& spell);
 	/* casts the modal spell if any */
 	void ApplyModal(const ResRef& modalSpell);
 	/* adds the combatants to the attackers list */

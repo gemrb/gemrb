@@ -2754,7 +2754,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 
 		//stop doing anything else
-		act->SetModal(MS_NONE);
+		act->SetModal(Modal::None);
 	}
 
 	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
@@ -2873,7 +2873,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		//face target
 		act->SetOrientation(parameters->pointParameter, act->Pos, false);
 		//stop doing anything else
-		act->SetModal(MS_NONE);
+		act->SetModal(Modal::None);
 	}
 
 	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {

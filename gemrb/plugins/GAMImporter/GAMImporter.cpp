@@ -507,8 +507,8 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->Area = pcInfo.Area;
 	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;
-	actor->Modal.State = pcInfo.ModalState;
-	actor->SetModalSpell(pcInfo.ModalState, {});
+	actor->Modal.State = Modal(pcInfo.ModalState);
+	actor->SetModalSpell(actor->Modal.State, {});
 	ps->Happiness = pcInfo.Happiness;
 	memcpy(ps->Interact, pcInfo.Interact, MAX_INTERACT *sizeof(ieDword) );
 
@@ -889,7 +889,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	//no viewport, we cheat
 	stream->WriteWord(ac->Pos.x - core->config.Width / 2);
 	stream->WriteWord(ac->Pos.y - core->config.Height / 2);
-	stream->WriteWord(ac->Modal.State);
+	stream->WriteWord((ieWord) ac->Modal.State);
 	stream->WriteWord(ac->PCStats->Happiness);
 	//interact counters
 	for (unsigned int& interact : ac->PCStats->Interact) {

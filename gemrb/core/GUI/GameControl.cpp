@@ -1658,7 +1658,7 @@ void GameControl::TryToAttack(Actor *source, const Actor *tgt) const
 //generate action code for source actor to try to defend a target
 void GameControl::TryToDefend(Actor *source, const Actor *tgt) const
 {
-	source->SetModal(MS_NONE);
+	source->SetModal(Modal::None);
 	source->CommandActor(GenerateActionDirect( "NIDSpecial4()", tgt));
 }
 
@@ -1667,7 +1667,7 @@ void GameControl::TryToDefend(Actor *source, const Actor *tgt) const
 // The -1 flag is a placeholder for dynamic target IDs
 void GameControl::TryToPick(Actor *source, const Scriptable *tgt) const
 {
-	source->SetModal(MS_NONE);
+	source->SetModal(Modal::None);
 	std::string cmdString;
 	cmdString.reserve(20);
 	switch (tgt->Type) {
@@ -1694,7 +1694,7 @@ void GameControl::TryToDisarm(Actor *source, const InfoPoint *tgt) const
 {
 	if (tgt->Type!=ST_PROXIMITY) return;
 
-	source->SetModal(MS_NONE);
+	source->SetModal(Modal::None);
 	source->CommandActor(GenerateActionDirect( "RemoveTraps([-1])", tgt ));
 }
 
@@ -1833,7 +1833,7 @@ void GameControl::TryToTalk(Actor *source, const Actor *tgt) const
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
 	//dialog initation
-	source->SetModal(MS_NONE);
+	source->SetModal(Modal::None);
 	dialoghandler->SetTarget(tgt); //this is a hack, but not so deadly
 	source->CommandActor(GenerateActionDirect( "NIDSpecial1()", tgt));
 }
