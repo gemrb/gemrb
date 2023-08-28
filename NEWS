@@ -1,13 +1,15 @@
-GemRB git (c0a45a4):
+GemRB git (5a785bb):
   New features:
     - 
+    - full i18n (language) support
+    - small test suite
     - iwd2 identification variants
 
   Improved features:
     - 
-    - i18n support, colored logging, pathfinding
+    - colored logging, pathfinding
     - switched to c++14
-    - ee compat, iwd2&pst worldmap
+    - ee compat, iwd2&pst worldmap, creature sounds
     - bugfixes
 
 GemRB v0.9.2 (2023-07-08):
