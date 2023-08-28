@@ -3815,8 +3815,8 @@ void Actor::IdleActions(bool nonidle)
 	//drop an area comment, party oneliner or initiate party banter (with Interact)
 	//party comments have a priority, but they happen half of the time, at most
 	if (nextComment<time) {
-		if (nextComment && !Immobile() && !GetPartyComment()) {
-			GetAreaComment(map->AreaType);
+		if (nextComment && !Immobile()) {
+			GetPartyComment();
 		}
 		nextComment = time+core->Roll(5,1000,bored_time/2);
 		return;

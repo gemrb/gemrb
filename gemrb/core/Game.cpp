@@ -2307,6 +2307,23 @@ void Game::CheckBored()
 	}
 }
 
+// drop area comments now and then
+void Game::CheckAreaComment()
+{
+	if (CombatCounter) return;
+	if (GameTime % 600 != 0) return;
+	if (RAND(1, 100) > 16) return; // yep, the original used 16 %
+
+	// randomly pick a pc
+	size_t offset = RAND<size_t>(1, PCs.size());
+	const Actor* pc = PCs[offset - 1];
+	static const Actor* prevPC = nullptr;
+	if (pc == prevPC && RAND(1, 10) != 1) return;
+
+	prevPC = pc;
+	pc->GetAreaComment(pc->GetCurrentArea()->AreaType);
+}
+
 bool Game::OnlyNPCsSelected() const
 {
 	bool hasPC = false;

@@ -165,6 +165,7 @@ bool GlobalTimer::Update()
 			//this measures in-world time (affected by effects, actions, etc)
 			game->AdvanceTime(1);
 			game->CheckBored();
+			game->CheckAreaComment();
 		}
 	}
 	//this measures time spent in the game (including pauses)

@@ -494,6 +494,7 @@ public:
 	// GLOBAL is just the LOCALS of the Game Scriptable, but we want to avoid any confusion
 	ieDword GetGlobal(const ieVariable& key, ieDword fallback) const { return GetLocal(key, fallback); };
 	void CheckBored();
+	void CheckAreaComment();
 
 private:
 	ResRef *GetDream(Map *area);
