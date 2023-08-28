@@ -3507,13 +3507,13 @@ bool Actor::HasSpecialDeathReaction(const ieVariable& deadname) const
 	return value[0] != '0';
 }
 
-void Actor::ReactToDeath(const ieVariable& deadname)
+tick_t Actor::ReactToDeath(const ieVariable& deadname) const
 {
 	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) {
 		// iwds don't have joinable npcs, so they don't ship a death.2da
 		VerbalConstant(Verbal::React, gamedata->GetVBData("SPECIAL_COUNT"), DS_QUEUE);
-		return;
+		return 0;
 	}
 	// lookup value based on died's scriptingname and ours
 	// if value is 0 - use reactdeath
@@ -3522,16 +3522,16 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	std::string value = tm->QueryField(scriptName, deadname);
 	if (value[0] == '0') {
 		VerbalConstant(Verbal::React, 1, DS_QUEUE);
-		return;
+		return 0;
 	} else if (value[0] == '1') {
 		VerbalConstant(Verbal::ReactSpecific, 1, DS_QUEUE);
-		return;
+		return 0;
 	}
 
 	// there can be several entries to choose from, eg.: NOR103,NOR104,NOR105
 	auto elements = Explode<std::string, std::string>(value);
 	size_t count = elements.size();
-	if (count <= 0) return;
+	if (count <= 0) return 0;
 
 	int choice = core->Roll(1, int(count), -1);
 	ResRef resRef = elements[choice];
@@ -3539,11 +3539,7 @@ void Actor::ReactToDeath(const ieVariable& deadname)
 	tick_t len = 0;
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
 	core->GetAudioDrv()->PlayRelative(resRef, channel, &len);
-
-	tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
-	if (counter > GetWait()) { // don't nullify it in case we're waiting already
-		SetWait(counter);
-	}
+	return len;
 }
 
 //issue area specific comments

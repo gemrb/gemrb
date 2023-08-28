@@ -425,7 +425,7 @@ public:
 	bool EveryoneStopped() const;
 	bool EveryoneNearPoint(const Map *map, const Point &p, int flags) const;
 	/** a party member just died now */
-	void PartyMemberDied(const Actor *);
+	void PartyMemberDied(const Actor*) const;
 	/** Increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
 	/** Sets party reputation */

@@ -1264,13 +1264,13 @@ bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 }
 
 //called when someone died
-void Game::PartyMemberDied(const Actor *actor)
+void Game::PartyMemberDied(const Actor* actor) const
 {
 	//this could be null, in some extreme cases...
 	const Map *area = actor->GetCurrentArea();
 
 	size_t size = PCs.size();
-	Actor *react = NULL;
+	Actor* react = nullptr;
 	size_t offset = RAND<size_t>(1, size);
 	for (size_t idx = offset; idx < offset + size; idx++) {
 		Actor* pc = PCs[idx % size];
@@ -1295,7 +1295,11 @@ void Game::PartyMemberDied(const Actor *actor)
 	}
 
 	if (react != NULL) {
-		react->ReactToDeath(actor->GetScriptName());
+		tick_t len = react->ReactToDeath(actor->GetScriptName());
+		tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
+		if (counter > react->GetWait()) { // don't nullify it in case we're waiting already
+			react->SetWait(counter);
+		}
 	}
 }
 
