@@ -677,6 +677,21 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname,
 				index = save2->GetSaveID() + 1;
 			}
 		}
+
+		// we were called with an empty slot, so make sure that's true
+		// normal and expansion saves could have the same name, but we skip them
+		path_t basePath = PathJoin(core->config.SavePath, SaveDir());
+		path_t path = basePath;
+		if (!MakeDirectory(basePath)) {
+			Log(ERROR, "SaveGameIterator", "Unable to create base save game directory '{}'", path);
+			return GEM_ERROR;
+		}
+		index--;
+		while (DirExists(path)) {
+			index++;
+			path_t dir = fmt::format("{:09d}-{}", index, slotname);
+			path = PathJoin(basePath, dir);
+		}
 	}
 
 	path_t Path;
