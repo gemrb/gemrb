@@ -317,9 +317,16 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	if (act) {
+		Game* game = core->GetGame();
+		if (act->InParty && game->nextBored > 100 && // throtle a bit, since it could get expensive
+		    (CurrentAction || act->Modal.State == MS_BATTLESONG || act->Modal.State == MS_SHAMANDANCE) &&
+		    act->ValidTarget(GA_SELECT)) {
+			game->nextBored = 0;
+		}
+
 		// if party AI is disabled, don't run non-override scripts
-		if (act->InParty && !(core->GetGame()->ControlStatus & CS_PARTY_AI))
-			scriptCount = 1;
+		if (act->InParty && !(game->ControlStatus & CS_PARTY_AI)) scriptCount = 1;
+
 		// hardcoded action overrides like charm, confusion, panic and berserking
 		if (act->OverrideActions()) {
 			// we just need to execute, no more processing needed

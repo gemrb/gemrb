@@ -3820,17 +3820,7 @@ void Actor::IdleActions(bool nonidle)
 		return;
 	}
 
-	//drop the bored one liner if there was no action for some time
-	//if bored timeout is disabled, don't bother to set the new time
-	if (nonidle || (!nextBored && bored_time) || InMove() || Immobile()) {
-		nextBored = time + core->Roll(1, 30, bored_time);
-	} else {
-		if (bored_time && nextBored && nextBored < time) {
-			int x = std::max(10U, bored_time / 10);
-			nextBored = time+core->Roll(1,30,x);
-			VerbalConstant(Verbal::Bored, gamedata->GetVBData("SPECIAL_COUNT"));
-		}
-
+	if (!nonidle && !InMove() && !Immobile()) {
 		// display idle animation
 		int x = RAND(0, 24);
 		if (!x && (GetStance() == IE_ANI_AWAKE)) {
@@ -10783,12 +10773,11 @@ bool Actor::IsPartyMember() const
 
 void Actor::ResetCommentTime()
 {
-	const Game *game = core->GetGame();
+	Game* game = core->GetGame();
 	if (bored_time) {
-		nextBored = game->GameTime + core->Roll(1, 30, bored_time);
 		nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
 	} else {
-		nextBored = 0;
+		game->nextBored = 0;
 		nextComment = game->GameTime + core->Roll(10, 500, 150);
 	}
 }

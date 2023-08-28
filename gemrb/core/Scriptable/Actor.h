@@ -84,6 +84,7 @@ enum CREVersion {
 #define MS_DETECTTRAPS 2
 #define MS_STEALTH     3
 #define MS_TURNUNDEAD  4
+#define MS_SHAMANDANCE 5
 
 //stat modifier type
 #define MOD_ADDITIVE  0
@@ -481,8 +482,7 @@ public:
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime = 0;           // these are timers for attack rounds
 	ieDword panicMode = PANIC_NONE;  // runaway, berserk or randomwalk
-	ieDword nextComment = 0;         // do something random (area comment, interaction)
-	ieDword nextBored = 0;           // do something when bored
+	ieDword nextComment = 0; // do something random (area comment, interaction)
 	int FatigueComplaintDelay = 0;   // stagger tired messages
 	ieDword lastInit = 0;
 	//how many attacks left in this round, must be public for cleave opcode

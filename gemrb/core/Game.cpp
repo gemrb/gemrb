@@ -2275,6 +2275,38 @@ void Game::ResetPartyCommentTimes() const
 	}
 }
 
+// drop the bored one liner if there was no action for some time
+// this function is deliberatly called only for normal passage of time
+void Game::CheckBored()
+{
+	static int boredTimeout = core->GetVariable("Bored Timeout", 3000);
+	if (!boredTimeout) return;
+
+	nextBored++;
+	if (nextBored < boredTimeout / 2) return; // likely stored in original double ticks
+
+	// randomly pick a pc, make sure he's "orderable"
+	bool complained = false;
+	size_t size = PCs.size();
+	size_t offset = RAND<size_t>(1, size);
+	for (size_t idx = offset; idx < offset + size; idx++) {
+		const Actor* pc = PCs[idx % size];
+		if (!pc->ValidTarget(GA_SELECT)) continue;
+
+		pc->VerbalConstant(Verbal::Bored, gamedata->GetVBData("SPECIAL_COUNT"));
+		complained = true;
+		break;
+	}
+
+	// reset, otherwise try again in a round
+	if (complained) {
+		// the original reset to (boredTimeout - boredTimeout / 2), which doesn't make much sense
+		nextBored = 0;
+	} else {
+		nextBored -= core->Time.round_size;
+	}
+}
+
 bool Game::OnlyNPCsSelected() const
 {
 	bool hasPC = false;

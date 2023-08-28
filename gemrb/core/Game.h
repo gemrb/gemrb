@@ -252,6 +252,7 @@ public:
 	ieDword StateOverrideTime = 0;
 	ieDword BanterBlockFlag = 0;
 	ieDword BanterBlockTime = 0;
+	int nextBored = 0;
 
 	/** Index of PC selected in non-walking environment (shops, inventory...) */
 	int SelectedSingle = 1;
@@ -492,6 +493,7 @@ public:
 	void DumpKaputz() const;
 	// GLOBAL is just the LOCALS of the Game Scriptable, but we want to avoid any confusion
 	ieDword GetGlobal(const ieVariable& key, ieDword fallback) const { return GetLocal(key, fallback); };
+	void CheckBored();
 
 private:
 	ResRef *GetDream(Map *area);
