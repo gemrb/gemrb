@@ -36,11 +36,11 @@
 #include <cerrno>
 
 #ifdef WIN32
-// that's a workaround to live with `NOUSER` in `win32def.h`
-#define LPMSG void*
-#include <shlwapi.h>
-// there is a macro in shlwapi.h that turns `PathAppendW` into `PathAppend`
-#undef PathAppend
+	// that's a workaround to live with `NOUSER` in `win32def.h`
+	#define LPMSG void*
+	#include <Shlwapi.h>
+	// there is a macro in shlwapi.h that turns `PathAppendW` into `PathAppend`
+	#undef PathAppend
 #else
 #include <dirent.h>
 #endif

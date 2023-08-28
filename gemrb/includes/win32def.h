@@ -38,8 +38,7 @@
 #include <crtdbg.h>
 #endif
 
-#include <windows.h>
-
+#include <Windows.h>
 #include <ntverp.h>
 #if defined(VER_PRODUCTBUILD) && VER_PRODUCTBUILD >= 8100
 #include <VersionHelpers.h>
