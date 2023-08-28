@@ -6,3 +6,4 @@ BARDSONG     BARDSONG   BattleSong   50705      50706       -1          1       
 DETECTTRAPS  FINDTRAP   FindTraps    50699      50700       -1          1         0
 STEALTH      SNEAK      Hide         19944      4188        17120       0         0
 TURNUNDEAD   TURN       Turn         50702      50703       -1          1         1
+SHAMANDANCE  *          *            32399      32400       -1          0         1
