@@ -557,12 +557,10 @@ void CharAnimations::SetupColors(PaletteType type)
 		if (paletteType != "1") {
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
 				PaletteResRef[type].Format("{:.4}_{:.2}{:c}", ResRefBase, paletteType, '1' + type);
+			} else if (ResRefBase == "MFIE") { // hack for magic golems
+				PaletteResRef[type].Format("{:.4}{:.2}B", ResRefBase, paletteType);
 			} else {
-				if (ResRefBase == "MFIE") { // hack for magic golems
-					PaletteResRef[type].Format("{:.4}{:.2}B", ResRefBase, paletteType);
-				} else {
-					PaletteResRef[type].Format("{:.4}_{:.2}", ResRefBase, paletteType);
-				}
+				PaletteResRef[type].Format("{:.4}_{:.2}", ResRefBase, paletteType);
 			}
 			Holder<Palette> tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
