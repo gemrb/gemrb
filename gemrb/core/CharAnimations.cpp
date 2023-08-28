@@ -587,10 +587,8 @@ void CharAnimations::SetupColors(PaletteType type)
 		if (GlobalColorMod.type != RGBModifier::NONE) {
 			needmod = true;
 		} else {
-			// TODO: should that -1 really be there??
-			for (size_t i = 0; i < PAL_MAX - 1; ++i) {
-				if (ColorMods[i+8*type].type != RGBModifier::NONE)
-					needmod = true;
+			for (size_t i = 0; i < PAL_MAX; ++i) {
+				if (ColorMods[i + 8 * type].type != RGBModifier::NONE) needmod = true;
 			}
 		}
 
