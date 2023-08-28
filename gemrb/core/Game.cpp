@@ -396,12 +396,6 @@ int Game::LeaveParty(Actor* actor, bool returnCriticalItems)
 	return ( int ) NPCs.size() - 1;
 }
 
-//determines if startpos.2da has rotation rows (it cannot have tutorial line)
-bool Game::DetermineStartPosType(const TableMgr* strTable) const
-{
-	return strTable->GetRowCount() >= 6 && strTable->GetRowName(4) == "START_ROT";
-}
-
 #define PMODE_COUNT 3
 
 void Game::InitActorPos(Actor *actor) const
