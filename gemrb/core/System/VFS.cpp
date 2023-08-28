@@ -86,15 +86,15 @@ struct dirent {
 };
 
 struct DIR {
-	DIR() : path(), is_first(true), hFile(0) {}
+	DIR() = default;
 	~DIR() {
 		_findclose(hFile);
 	}
 
 	std::wstring path;
-	bool is_first;
+	bool is_first = true;
 	struct _wfinddata_t c_file;
-	intptr_t hFile;
+	intptr_t hFile = 0;
 	dirent entry;
 };
 
@@ -453,7 +453,7 @@ GEM_EXPORT path_t HomePath()
 #ifdef WIN32
 	else {
 		// if home is null check HOMEDRIVE + HOMEPATH
-		char* homedrive = getenv("HOMEDRIVE");
+		const char* homedrive = getenv("HOMEDRIVE");
 		home = getenv("HOMEPATH");
 
 		if (home) {

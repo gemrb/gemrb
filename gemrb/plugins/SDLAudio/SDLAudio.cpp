@@ -493,8 +493,8 @@ bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 void SDLAudio::FreeBuffers()
 {
 	std::lock_guard<std::recursive_mutex> l(MusicMutex);
-	for (unsigned int i = 0; i < buffers.size(); i++) {
-		free(buffers[i].buf);
+	for (const auto& buffer : buffers) {
+		free(buffer.buf);
 	}
 	buffers.clear();
 }

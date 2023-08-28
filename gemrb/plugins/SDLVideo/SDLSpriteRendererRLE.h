@@ -22,14 +22,16 @@ using namespace GemRB;
 
 template<bool PALALPHA>
 struct SRTinter_NoTint {
-	void operator()(Uint8&, Uint8&, Uint8&, Uint8& a, unsigned int) const {
+	void operator()(const Uint8&, const Uint8&, const Uint8&, Uint8& a, unsigned int) const
+	{
 		if (!PALALPHA) a = 255;
 	}
 };
 
 template<bool PALALPHA, bool TINTALPHA>
 struct SRTinter_Tint {
-	SRTinter_Tint(const Color& t) : tint(t) { }
+	explicit SRTinter_Tint(const Color& t)
+		: tint(t) {}
 
 	void operator()(Uint8& r, Uint8& g, Uint8& b, Uint8& a, unsigned int) const {
 		r = (tint.r * r) >> 8;
@@ -46,7 +48,8 @@ struct SRTinter_Tint {
 // Always tint, and conditionally handle grey, red
 template<bool PALALPHA>
 struct SRTinter_Flags {
-	SRTinter_Flags(const Color& t) : tint(t) { }
+	explicit SRTinter_Flags(const Color& t)
+		: tint(t) {}
 
 	void operator()(Uint8& r, Uint8& g, Uint8& b, Uint8& a, unsigned int flags) const {
 		if (flags & BlitFlags::GREY) {
@@ -111,7 +114,7 @@ struct SRBlender_Alpha { };
 
 template<typename PTYPE, typename BLENDER>
 struct SRBlender {
-	SRBlender(const PixelFormat& format);
+	explicit SRBlender(const PixelFormat& format);
 
 	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const;
 };
@@ -121,8 +124,8 @@ struct SRBlender<Uint16, BLENDER> {
 	const PixelFormat& fmt;
 	Uint16 halfmask;
 
-	SRBlender(const PixelFormat& fmt)
-	: fmt(fmt)
+	explicit SRBlender(const PixelFormat& fmt)
+		: fmt(fmt)
 	{
 		halfmask = ((0xFFU >> (fmt.Rloss + 1)) << fmt.Rshift) | ((0xFFU >> (fmt.Gloss + 1)) << fmt.Gshift) | ((0xFFU >> (fmt.Bloss + 1)) << fmt.Bshift);
 	}
@@ -135,8 +138,8 @@ struct SRBlender<Uint32, BLENDER> {
 	const PixelFormat& fmt;
 	Uint32 halfmask;
 
-	SRBlender(const PixelFormat& fmt)
-	: fmt(fmt)
+	explicit SRBlender(const PixelFormat& fmt)
+		: fmt(fmt)
 	{
 		halfmask = ((0xFFU >> 1) << fmt.Rshift) | ((0xFFU >> 1) << fmt.Gshift) | ((0xFFU >> 1) << fmt.Bshift);
 	}

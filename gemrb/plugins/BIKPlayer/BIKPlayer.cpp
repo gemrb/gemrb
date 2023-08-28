@@ -937,7 +937,7 @@ const uint8_t bink_rlelens[4] = { 4, 8, 12, 32 };
 int BIKPlayer::read_block_types(Bundle *b)
 {
 	int t;
-	int last = 0;
+	int lastV = 0;
 
 	CHECK_READ_VAL(v_gb, b, t);
 	if (v_gb.get_bits(1)) {
@@ -948,12 +948,12 @@ int BIKPlayer::read_block_types(Bundle *b)
 		for (int i = 0; i < t; i++) {
 			int v = GET_HUFF(b->tree);
 			if (v < 12) {
-				last = v;
+				lastV = v;
 				*b->cur_dec++ = v;
 			} else {
 				int run = bink_rlelens[v - 12];
 
-				memset(b->cur_dec, last, run);
+				memset(b->cur_dec, lastV, run);
 				b->cur_dec += run;
 				i += run - 1;
 			}

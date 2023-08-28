@@ -47,9 +47,9 @@ struct BIFEntry {
 
 struct MapKey {
 	ResRef ref;
-	uint64_t type;
+	uint64_t type = 0;
 
-	MapKey() : type(0) {}
+	MapKey() = default;
 	MapKey(const ResRef& ref, uint64_t type) : ref{ref}, type{type} {}
 	MapKey(ResRef && ref, uint64_t type) : ref{std::move(ref)}, type{type} {}
 

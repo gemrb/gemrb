@@ -41,11 +41,12 @@ class SDLAudioSoundHandle : public SoundHandle
 {
 public:
 	SDLAudioSoundHandle(Mix_Chunk *chunk, int channel, bool relative) : mixChunk(chunk), chunkChannel(channel), sndRelative(relative) { };
-	virtual void SetPos(const Point&);
-	virtual bool Playing();
-	virtual void Stop();
-	virtual void StopLooping();
-	void Invalidate() { }
+	void SetPos(const Point&) final;
+	bool Playing() final;
+	void Stop() final;
+	void StopLooping() final;
+	void Invalidate() const {}
+
 private:
 	Mix_Chunk *mixChunk;
 	int chunkChannel;
@@ -81,7 +82,7 @@ struct CacheEntry {
 		return *this;
 	}
 
-	void evictionNotice() { }
+	void evictionNotice() const {}
 
 	~CacheEntry() {
 		if (chunk != nullptr) {
@@ -92,7 +93,8 @@ struct CacheEntry {
 };
 
 struct SDLAudioPlaying {
-	bool operator()(const CacheEntry& entry) {
+	bool operator()(const CacheEntry& entry) const
+	{
 		int numChannels = Mix_AllocateChannels(-1);
 
 		for (int i = 0; i < numChannels; ++i) {
@@ -111,7 +113,7 @@ public:
 	~SDLAudio(void) override;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(StringView ResRef, unsigned int channel,
-		const Point&, unsigned int flags = 0, tick_t *length = 0) override;
+				 const Point&, unsigned int flags = 0, tick_t* length = nullptr) override;
 	int CreateStream(ResourceHolder<SoundMgr>) override;
 	bool Play() override;
 	bool Stop() override;

@@ -1857,15 +1857,15 @@ bool Map::AnyEnemyNearPoint(const Point &p) const
 
 void Map::ActorSpottedByPlayer(const Actor *actor) const
 {
-	unsigned int animid;
+	size_t animID;
 
 	if(core->HasFeature(GFFlags::HAS_BEASTS_INI)) {
-		animid=actor->BaseStats[IE_ANIMATION_ID];
+		animID = actor->BaseStats[IE_ANIMATION_ID];
 		if(core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
-			animid&=0xff;
+			animID &= 0xff;
 		}
-		if (animid < (ieDword)CharAnimations::GetAvatarsCount()) {
-			const AvatarStruct &avatar = CharAnimations::GetAvatarStruct(animid);
+		if (animID < CharAnimations::GetAvatarsCount()) {
+			const AvatarStruct& avatar = CharAnimations::GetAvatarStruct(animID);
 			core->GetGame()->SetBeastKnown(avatar.Bestiary);
 		}
 	}
