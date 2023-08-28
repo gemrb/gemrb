@@ -80,7 +80,6 @@ static std::vector<int> multiclassIDs;
 static std::vector<int> maxLevelForHpRoll;
 static std::map<TableMgr::index_t, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
-static std::vector<std::vector<int>> areaComments;
 static std::vector<std::vector<int>> wmLevelMods;
 static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
@@ -2107,21 +2106,6 @@ static void InitActorTables()
 		}
 	}
 
-	//initializing area flag comments
-	tm = gamedata->LoadTable("comment");
-	if (tm) {
-		TableMgr::index_t rowcount = tm->GetRowCount();
-		if (rowcount) {
-			areaComments.resize(rowcount);
-			while(rowcount--) {
-				areaComments[rowcount].resize(3);
-				for (int i = 0; i < 3; i++) {
-					areaComments[rowcount][i] = tm->QueryFieldSigned<int>(rowcount, i);
-				}
-			}
-		}
-	}
-
 	// dexterity modifier for thieving skills
 	tm = gamedata->LoadTable("skilldex");
 	if (tm) {
@@ -3542,21 +3526,6 @@ tick_t Actor::ReactToDeath(const ieVariable& deadname) const
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
 	core->GetAudioDrv()->PlayRelative(resRef, channel, &len);
 	return len;
-}
-
-//issue area specific comments
-void Actor::GetAreaComment(int areaflag) const
-{
-	for (const auto& comment : areaComments) {
-		if (comment[0] & areaflag) {
-			Verbal vc = static_cast<Verbal>(comment[1]);
-			if (comment[2] && !core->GetGame()->IsDay()) {
-				vc = static_cast<Verbal>(comment[1] + 1);
-			}
-			VerbalConstant(vc);
-			return;
-		}
-	}
 }
 
 static int CheckInteract(const ieVariable& talker, const ieVariable& target)

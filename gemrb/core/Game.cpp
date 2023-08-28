@@ -2321,7 +2321,21 @@ void Game::CheckAreaComment()
 	if (pc == prevPC && RAND(1, 10) != 1) return;
 
 	prevPC = pc;
-	pc->GetAreaComment(pc->GetCurrentArea()->AreaType);
+	AutoTable tm = gamedata->LoadTable("comment", true);
+	if (!tm) return;
+
+	TableMgr::index_t rows = tm->GetRowCount();
+	while (rows--) {
+		int areaType = tm->QueryFieldSigned<int>(rows, 0);
+		if (!(pc->GetCurrentArea()->AreaType & areaType)) continue;
+
+		int vc = tm->QueryFieldSigned<int>(rows, 1);
+		if (tm->QueryFieldSigned<int>(rows, 2) && !core->GetGame()->IsDay()) {
+			vc++;
+		}
+		pc->VerbalConstant(static_cast<Verbal>(vc));
+		break;
+	}
 }
 
 bool Game::OnlyNPCsSelected() const
