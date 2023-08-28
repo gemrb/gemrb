@@ -168,3 +168,19 @@ ENDIF()
 IF(VITA)
 	INCLUDE(${CMAKE_SOURCE_DIR}/platforms/vita/vita_build_vpk.cmake)
 ENDIF(VITA)
+
+# Tests
+IF (BUILD_TESTING)
+  ADD_EXECUTABLE(Test_gemrb_core
+    tests/core/Strings/Test_UTF8Comparison.cpp
+    tests/core/System/Test_VFS.cpp
+  )
+
+  TARGET_LINK_LIBRARIES(Test_gemrb_core GTest::gtest GTest::gtest_main gemrb_core ${Iconv_LIBRARY})
+  IF (WIN32)
+    TARGET_LINK_LIBRARIES(Test_gemrb_core shlwapi)
+  ENDIF()
+
+  ADD_TEST(NAME Test_gemrb_core COMMAND Test_gemrb_core)
+  FILE(COPY tests/resources DESTINATION ${CMAKE_BINARY_DIR}/gemrb/tests)
+ENDIF()

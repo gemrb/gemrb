@@ -18,7 +18,7 @@ jobs:
 
     - name: Set up Homebrew
       run: |
-        brew install sdl2 openal-soft sdl2_mixer libpng libvorbis sccache
+        brew install sdl2 openal-soft sdl2_mixer libpng libvorbis sccache googletest
 
     - name: Set up build
       run: |
@@ -27,7 +27,7 @@ jobs:
         mkdir build && cd build &&
         export OPENALDIR="/usr/local/opt/openal-soft/" &&
         cmake --version &&
-        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off ..
+        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off -DUSE_TESTS=ON ..
         grep -i openal CMakeCache.txt
 
     - name: Compiler cache (sccache)
@@ -42,10 +42,11 @@ jobs:
           ${{ runner.os }}-sccache-v1-refs/heads/master-
           ${{ runner.os }}-sccache-v1-
 
-    - name: Build
+    - name: Build & Test
       run: |
         cd build &&
         make &&
+        make test &&
         # try to only run on tag pushes
         if grep -q '^v[01]\.[0-9].[0-9]' <<< "${GITHUB_REF}"; then make fetch-demo-data; fi &&
         make install
@@ -89,7 +90,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-7 gdb
+        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-7 gdb libgtest-dev
 
         SCCACHE_VERSION="v0.2.15"
         SCCACHE_LINUX_PACKAGE="sccache-${SCCACHE_VERSION}-x86_64-unknown-linux-musl"
@@ -103,7 +104,7 @@ jobs:
       run: |
         mkdir build && cd build
         cmake --version
-        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DSTATIC_LINK=1 -DAPPIMAGE=1
+        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DSTATIC_LINK=1 -DAPPIMAGE=1 -DUSE_TESTS=ON
 
     - name: Compiler cache (sccache)
       uses: actions/cache@v3
@@ -129,7 +130,12 @@ jobs:
         echo 'gdb -q -c core-* -ex bt -ex q -batch --args gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample' >> run-or-dump.sh
         chmod +x run-or-dump.sh
 
-    - name: Test 1
+    - name: Test Suite
+      run: |
+        cd build
+        make test
+
+    - name: Test Run
       uses: coactions/setup-xvfb@v1
       with:
         run: ./run-or-dump.sh
@@ -154,7 +160,7 @@ jobs:
         ./appimagelint GemRB-*.AppImage
         echo "::endgroup::"
 
-    - name: Test 2
+    - name: Test AppImage
       uses: coactions/setup-xvfb@v1
       with:
         run: ./grrr-gemrb.AppImage -q ../gemrb/tests/minimal/

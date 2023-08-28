@@ -247,18 +247,17 @@ void PathAppend(path_t& target, const path_t& name)
 		return;
 	}
 
-	if (!target.empty() && target.back() != PathDelimiter && name.front() != PathDelimiter) {
+	auto scope = StringView{name.c_str(), name.length()};
+	// TotL has '\data\zcMHar.bif' in the key file
+	if (name[0] == '\\') {
+		scope = StringView{name.c_str() + 1, name.length() - 1};
+	}
+
+	if (!target.empty() && target.back() != PathDelimiter && *scope.begin() != PathDelimiter) {
 		target.push_back(PathDelimiter);
 	}
 
-	// strip possible leading backslash, since it is not ignored on all platforms
-	// totl has '\data\zcMHar.bif' in the key file, and also the CaseSensitive
-	// code breaks with that extra slash, so simple fix: remove it
-	if (name[0] == '\\') {
-		target.append(name, 1, path_t::npos);
-	} else {
-		target += name;
-	}
+	target.append(scope.begin(), scope.end());
 }
 
 static bool FindMatchInDir(const char* dir, MutableStringView item)

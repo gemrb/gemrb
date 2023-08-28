@@ -37,6 +37,10 @@ bool UTF8_stricmp(const char *a, const char *b) {
 	const unsigned char* itA = reinterpret_cast<const unsigned char*>(a);
 	const unsigned char* itB = reinterpret_cast<const unsigned char*>(b);
 
+	if (itA == nullptr || itB == nullptr) {
+		return itA == itB;
+	}
+
 	while (*itA != 0) {
 		unsigned char iA = *itA;
 		unsigned char iB = *itB;
@@ -89,7 +93,10 @@ bool UTF8_stricmp(const char *a, const char *b) {
 			uint8_t widthA = getWidth(iA);
 			uint8_t widthB = getWidth(iB);
 
-			static const auto C_LOCALE = std::locale{"C.UTF-8"};
+			static const std::locale l1;
+			static const std::locale l2{"en_US.UTF-8"};
+			static const auto C_LOCALE = std::locale{l1, l2, std::locale::ctype};
+
 			wchar_t aL = std::tolower(getCodepoint(itA, widthA), C_LOCALE);
 			wchar_t bL = std::tolower(getCodepoint(itB, widthB), C_LOCALE);
 
