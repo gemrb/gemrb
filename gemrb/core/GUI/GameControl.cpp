@@ -1336,8 +1336,8 @@ void GameControl::UpdateCursor()
 		}
 	} else if (target_mode == TARGET_MODE_CAST) {
 		nextCursor = IE_CURSOR_CAST;
-		//point is always valid
-		if (!(target_types & GA_POINT) && !lastActor) {
+		// point is always valid if accessible
+		if (area->GetCursor(gameMousePos) == IE_CURSOR_BLOCKED || (!(target_types & GA_POINT) && !lastActor)) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
 	} else if (target_mode == TARGET_MODE_DEFEND) {
