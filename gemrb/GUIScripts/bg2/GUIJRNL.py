@@ -115,6 +115,17 @@ def SortByName (entry):
 def SortByDate (entry):
 	return entry["GameTime"]
 
+def GetGameTime (time):
+	hours = time // 4500
+	days = int(hours / 24)
+	year = str (StartYear + int(days / 365))
+	dayandmonth = int(StartTime + days % 365)
+	GemRB.SetToken ("GAMEDAYS", str(days)) # Other IE games use "GAMEDAY"
+	GemRB.SetToken ("HOUR", str(hours % 24))
+	GemRB.SetVar ("DAYANDMONTH", dayandmonth)
+	GemRB.SetToken ("YEAR", year)
+	return GemRB.GetString (15980)
+
 def UpdateLogWindow (JournalWindow):
 	global Order
 	if JournalWindow == None:
@@ -154,14 +165,7 @@ def UpdateLogWindow (JournalWindow):
 		Color = "003d00"
 	for i in range(len(EntryList)):
 		je = EntryList[i]
-		hours = je['GameTime'] // 4500
-		days = int(hours/24)
-		year = str (StartYear + int(days/365))
-		dayandmonth = int(StartTime + days % 365)
-		GemRB.SetToken ("GAMEDAYS", str(days) ) #Other IE games use "GAMEDAY"
-		GemRB.SetToken ("HOUR",str(hours%24 ) )
-		GemRB.SetVar ("DAYANDMONTH",dayandmonth)
-		GemRB.SetToken ("YEAR",year)
+		entryTime = GetGameTime (je['GameTime'])
 
 		# each journal entry consists of the title and description
 		# but the game displays the entry date between the two
@@ -173,7 +177,7 @@ def UpdateLogWindow (JournalWindow):
 		else:
 			JournalText = "\n" + je2[1] + "\n"
 
-		Text.Append (JournalTitle + GemRB.GetString(15980) + JournalText)
+		Text.Append (JournalTitle + entryTime + JournalText)
 	return
 
 ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateLogWindow, GUICommonWindows.DefaultWinPos, True)
