@@ -79,7 +79,7 @@ enum CREVersion {
 #define LR_NEGATIVE    4
 
 // modal states
-enum class Modal : unsigned int {
+enum class Modal : ieWord {
 	None,
 	BattleSong,
 	DetectTraps,

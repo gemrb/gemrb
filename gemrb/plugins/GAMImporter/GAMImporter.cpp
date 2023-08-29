@@ -317,7 +317,7 @@ struct PCStruct {
 	ResRef Area;
 	Point Pos;
 	Point   ViewPos;
-	ieWord   ModalState;
+	Modal   ModalState;
 	ieWordSigned   Happiness;
 	ieDword  Interact[MAX_INTERACT];
 	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
@@ -346,7 +346,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	str->ReadResRef( pcInfo.Area );
 	str->ReadPoint(pcInfo.Pos);
 	str->ReadPoint(pcInfo.ViewPos);
-	str->ReadWord(pcInfo.ModalState); //see Modal.ids
+	str->ReadEnum<Modal>(pcInfo.ModalState); //see Modal.ids
 	str->ReadScalar<ieWordSigned>(pcInfo.Happiness);
 	for (unsigned int& interact : pcInfo.Interact) {
 		str->ReadDword(interact); //interact counters
@@ -507,7 +507,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->Area = pcInfo.Area;
 	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;
-	actor->Modal.State = Modal(pcInfo.ModalState);
+	actor->Modal.State = pcInfo.ModalState;
 	actor->SetModalSpell(actor->Modal.State, {});
 	ps->Happiness = pcInfo.Happiness;
 	memcpy(ps->Interact, pcInfo.Interact, MAX_INTERACT *sizeof(ieDword) );
@@ -889,7 +889,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	//no viewport, we cheat
 	stream->WriteWord(ac->Pos.x - core->config.Width / 2);
 	stream->WriteWord(ac->Pos.y - core->config.Height / 2);
-	stream->WriteWord((ieWord) ac->Modal.State);
+	stream->WriteEnum(ac->Modal.State);
 	stream->WriteWord(ac->PCStats->Happiness);
 	//interact counters
 	for (unsigned int& interact : ac->PCStats->Interact) {
