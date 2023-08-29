@@ -5107,7 +5107,7 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 PyDoc_STRVAR( GemRB_SetJournalEntry__doc,
 "===== SetJournalEntry =====\n\
 \n\
-**Prototype:** GemRB.SetJournalEntry (strref[, section, chapter])\n\
+**Prototype:** GemRB.SetJournalEntry (strref[, section, chapter, feedback])\n\
 \n\
 **Description:** Sets a journal journal entry with given chapter and section. \n\
 If section was not given, then it will delete the entry. Chapter is \n\
@@ -5118,6 +5118,7 @@ strref is -1, then it will delete the whole journal.\n\
   * strref - strref of the journal entry\n\
   * section - the section of the journal (only if the journal has sections)\n\
   * chapter - the chapter of the journal entry\n\
+  * feedback - strref, optional different second half of the feedback message\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -5130,7 +5131,8 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 	PyObject* pyref = nullptr;
 	ieDword chapter = -1;
 	int section = -1;
-	PARSE_ARGS( args,  "O|ii", &pyref, &section, &chapter );
+	PyObject* feedback = nullptr;
+	PARSE_ARGS(args, "O|iiO", &pyref, &section, &chapter, &feedback);
 
 	GET_GAME();
 
@@ -5140,6 +5142,9 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 		section = -1;
 	}
 
+	ieStrRef msg2 = ieStrRef::INVALID;
+	if (feedback) msg2 = StrRefFromPy(feedback);
+
 	if (section==-1) {
 		//delete one or all entries
 		game->DeleteJournalEntry(strref);
@@ -5147,7 +5152,7 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 		if (chapter == ieDword(-1)) {
 			chapter = game->GetGlobal("CHAPTER", -1);
 		}
-		game->AddJournalEntry(strref, (ieByte) chapter, (ieByte) section);
+		game->AddJournalEntry(strref, (ieByte) chapter, (ieByte) section, msg2);
 	}
 
 	Py_RETURN_NONE;
