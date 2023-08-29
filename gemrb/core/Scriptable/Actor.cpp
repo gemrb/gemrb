@@ -5230,7 +5230,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 
 	if (InParty) {
-		SendTriggerToAll(TriggerEntry(trigger_partymemberdied, GetGlobalID()), GA_NO_SELF | GA_NO_ENEMY);
+		if (area) SendTriggerToAll(TriggerEntry(trigger_partymemberdied, GetGlobalID()), GA_NO_SELF | GA_NO_ENEMY);
 		game->PartyMemberDied(this);
 		core->Autopause(AUTOPAUSE::DEAD, this);
 	} else {
