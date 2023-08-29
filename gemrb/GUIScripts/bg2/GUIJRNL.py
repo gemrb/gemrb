@@ -136,9 +136,9 @@ def UpdateLogWindow (JournalWindow):
 	# CurrentChapter
 	Label = JournalWindow.GetControl (5)
 	Label.SetText (15873)
-	Label.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	Label.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR) # needed to prevent scrollbar appearing
 	Label.SetColor (ColorWhitish, TA_COLOR_INITIALS)
-	print("Chapter ", Chapter, "Section ", Section)
+	print ("Chapter", Chapter, "Section", Section)
 
 	Text = JournalWindow.GetControl (1)
 	Text.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -193,7 +193,6 @@ def PrevChapterPress ():
 
 	if Chapter > firstChapter:
 		Chapter = Chapter - 1
-		GemRB.SetToken ("CurrentChapter", str(Chapter) )
 		UpdateLogWindow (None)
 	return
 
@@ -203,7 +202,6 @@ def NextChapterPress ():
 
 	if Chapter < GemRB.GetGameVar("chapter"):
 		Chapter = Chapter + 1
-		GemRB.SetToken ("CurrentChapter", str(Chapter) )
 		UpdateLogWindow (None)
 	return
 
