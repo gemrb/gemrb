@@ -1029,7 +1029,33 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 	je->Group = group;
 	je->Text = strRef;
 
-	Journals.push_back( je );
+	Journals.push_back(je);
+
+	// print some feedback, but it has to be constructed first
+	String msg(u"\n[color=bcefbc]");
+	ieStrRef strJournalChange = DisplayMessage::GetStringReference(HCStrings::JournalChange);
+	msg += core->GetString(strJournalChange);
+	String str = core->GetString(strRef);
+	if (!str.empty()) {
+		// cutting off the strings at the first crlf
+		size_t newlinePos = str.find_first_of(L'\n');
+		if (newlinePos != String::npos) {
+			str.resize(newlinePos);
+		}
+		msg += u" - [/color][p][color=ffd4a9]" + str + u"[/color][/p]";
+	} else {
+		msg += u"[/color]\n";
+	}
+	if (core->HasFeedback(FT_MISC)) {
+		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
+			core->GetGameControl()->SetDisplayText(HCStrings::JournalChange, 30);
+		} else {
+			displaymsg->DisplayMarkupString(msg);
+		}
+	}
+	// pst/bg2 also has a sound attached to the base string, so play it manually
+	// NOTE: this doesn't display the string anywhere
+	DisplayStringCore(core->GetGame(), strJournalChange, 0);
 	return true;
 }
 

@@ -73,32 +73,7 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 		Section |= 2; // completed
 	}
 
-	if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], ieByte(tr->Flags >> 16))) {
-		String msg(u"\n[color=bcefbc]");
-		ieStrRef strJournalChange = DisplayMessage::GetStringReference(HCStrings::JournalChange);
-		msg += core->GetString(strJournalChange);
-		String str = core->GetString(tr->journalStrRef);
-		if (!str.empty()) {
-			//cutting off the strings at the first crlf
-			size_t newlinePos = str.find_first_of(L'\n');
-			if (newlinePos != String::npos) {
-				str.resize( newlinePos );
-			}
-			msg += u" - [/color][p][color=ffd4a9]" + str + u"[/color][/p]";
-		} else {
-			msg += u"[/color]\n";
-		}
-		if (core->HasFeedback(FT_MISC)) {
-			if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
-				core->GetGameControl()->SetDisplayText(HCStrings::JournalChange, 30);
-			} else {
-				displaymsg->DisplayMarkupString(msg);
-			}
-		}
-		// pst also has a sound attached to the base string, so play it manually
-		// NOTE: this doesn't display the string anywhere
-		DisplayStringCore(core->GetGame(), strJournalChange, 0);
-	}
+	core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], ieByte(tr->Flags >> 16));
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
