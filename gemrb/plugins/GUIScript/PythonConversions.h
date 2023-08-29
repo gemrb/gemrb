@@ -215,7 +215,8 @@ inline ResRef ResRefFromPy(PyObject* obj) {
 	return ASCIIStringFromPy<ResRef>(obj);
 }
 
-inline ResRef ieVariableFromPy(PyObject* obj) {
+inline ieVariable ieVariableFromPy(PyObject* obj)
+{
 	return ASCIIStringFromPy<ieVariable>(obj);
 }
 
