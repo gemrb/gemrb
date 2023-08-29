@@ -82,7 +82,6 @@ public:
 	ieStrRef UpdateString(ieStrRef strref, const String& newvalue);
 };
 
-#endif //TLKOVERRIDE_H
 }
 
-
+#endif //TLKOVERRIDE_H
