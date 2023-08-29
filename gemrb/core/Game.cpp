@@ -993,7 +993,7 @@ void Game::DeleteJournalGroup(ieByte group)
 	}
 }
 /* returns true if it modified or added a journal entry */
-bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
+bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group, ieStrRef feedback)
 {
 	GAMJournalEntry* je = FindJournalEntry(strRef);
 	if (je) {
@@ -1035,7 +1035,8 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group)
 	String msg(u"\n[color=bcefbc]");
 	ieStrRef strJournalChange = DisplayMessage::GetStringReference(HCStrings::JournalChange);
 	msg += core->GetString(strJournalChange);
-	String str = core->GetString(strRef);
+	if (feedback == ieStrRef::INVALID) feedback = strRef;
+	String str = core->GetString(feedback);
 	if (!str.empty()) {
 		// cutting off the strings at the first crlf
 		size_t newlinePos = str.find_first_of(L'\n');
