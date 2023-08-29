@@ -5136,10 +5136,17 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 
 	GET_GAME();
 
-	ieStrRef strref = StrRefFromPy(pyref);
-	if (strref == ieStrRef::INVALID) {
-		//delete the whole journal
-		section = -1;
+	ieStrRef strref;
+	if (PyObject_TypeCheck(pyref, &PyLong_Type)) {
+		strref = StrRefFromPy(pyref);
+		if (strref == ieStrRef::INVALID) {
+			// delete the whole journal
+			section = -1;
+		}
+	} else {
+		// create new ref and entry
+		String text = PyString_AsStringObj(pyref);
+		strref = core->UpdateString(ieStrRef::OVERRIDE_START, text);
 	}
 
 	ieStrRef msg2 = ieStrRef::INVALID;
