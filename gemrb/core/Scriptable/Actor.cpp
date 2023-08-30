@@ -3946,7 +3946,16 @@ bool Actor::OverrideActions()
 	int roundFraction = (game->GameTime - roundTime) % GetAdjustedTime(core->Time.attack_round_size);
 	if (!roundFraction && CheckConfusionOverride(this)) return true;
 
+	// feeblemind
+	if (Modified[IE_STATE_ID] & STATE_FEEBLE) {
+		Action* action = GenerateAction("NoAction()");
+		assert(action);
+		Stop();
+		AddAction(action);
+	}
+
 	// the original was adding NoAction in one more odd case that would break script processing
+	// and for (initially) enemies no longer charmed, confused and feebleminded, which is redundant
 
 	return false;
 }
