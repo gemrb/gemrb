@@ -3485,14 +3485,6 @@ void Actor::DisplayStringOrVerbalConstant(HCStrings str, Verbal vcStat, int vcCo
 	}
 }
 
-bool Actor::HasSpecialDeathReaction(const ieVariable& deadname) const
-{
-	AutoTable tm = gamedata->LoadTable("death");
-	if (!tm) return false;
-	const std::string& value = tm->QueryField(scriptName, deadname);
-	return value[0] != '0';
-}
-
 tick_t Actor::ReactToDeath(const ieVariable& deadname) const
 {
 	AutoTable tm = gamedata->LoadTable("death");

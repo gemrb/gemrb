@@ -1282,6 +1282,14 @@ bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 	return true;
 }
 
+static bool HasSpecialDeathReaction(const ieVariable& scriptName, const ieVariable& deadName)
+{
+	AutoTable tm = gamedata->LoadTable("death", true);
+	if (!tm) return false;
+	const std::string& value = tm->QueryField(scriptName, deadName);
+	return value[0] != '0';
+}
+
 //called when someone died
 void Game::PartyMemberDied(const Actor* actor) const
 {
@@ -1305,7 +1313,7 @@ void Game::PartyMemberDied(const Actor* actor) const
 		if (pc->GetCurrentArea()!=area) {
 			continue;
 		}
-		if (pc->HasSpecialDeathReaction(actor->GetScriptName())) {
+		if (HasSpecialDeathReaction(pc->GetScriptName(), actor->GetScriptName())) {
 			react = pc;
 			break;
 		} else if (react == NULL) {

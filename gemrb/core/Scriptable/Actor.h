@@ -737,8 +737,6 @@ public:
 	void DisplayStringOrVerbalConstant(HCStrings str, Verbal vcStat, int vcCount = 1) const;
 	/* inlined dialogue response */
 	void Response(int type) const;
-	/* called when someone died in the party */
-	bool HasSpecialDeathReaction(const ieVariable& deadname) const;
 	tick_t ReactToDeath(const ieVariable& deadname) const;
 	/* sends trigger_died to everyone in visual range */
 	void SendDiedTrigger() const;
