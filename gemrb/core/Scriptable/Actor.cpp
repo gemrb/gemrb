@@ -3919,6 +3919,9 @@ bool Actor::OverrideActions()
 {
 	// but maybe not: if we're in dialog, cutscene or running an overriden action
 	// the caller checks for this already
+	// the original didn't check this, but it can be considered a bug
+	const Game* game = core->GetGame();
+	if (game->StateOverrideFlag && game->StateOverrideTime) return false;
 
 	// domination and dire charm: force the actors to be useful (trivial ai)
 	if (CheckCharmOverride(this)) return true;
@@ -3938,16 +3941,12 @@ bool Actor::OverrideActions()
 		}
 	}
 
-	const Game* game = core->GetGame();
-	bool overriding = CurrentAction && CurrentAction->flags & ACF_OVERRIDE;
-	overriding = overriding || (game->StateOverrideFlag && game->StateOverrideTime);
+	// each round also re-confuse the actor
 	// use the combat round size as the original;  also skald song duration matches it
 	int roundFraction = (game->GameTime - roundTime) % GetAdjustedTime(core->Time.attack_round_size);
+	if (!roundFraction && CheckConfusionOverride(this)) return true;
 
-	// each round also re-confuse the actor
-	if (!roundFraction && !overriding) {
-		if (CheckConfusionOverride(this)) return true;
-	}
+	// the original was adding NoAction in one more odd case that would break script processing
 
 	return false;
 }
