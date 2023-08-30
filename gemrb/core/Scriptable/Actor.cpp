@@ -3907,7 +3907,11 @@ static bool CheckConfusionOverride(Actor* actor)
 			}
 			break;
 		case 2:
-			actionString = "RandomWalk()";
+			if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+				actionString = "RunAwayFromNoInterruptNoLeaveArea(Nearest,99999999)";
+			} else {
+				actionString = "RandomWalk()";
+			}
 			break;
 		default:
 			actionString = "NoAction()";
