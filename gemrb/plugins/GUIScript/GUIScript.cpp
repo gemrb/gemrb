@@ -5146,7 +5146,8 @@ static PyObject* GemRB_SetJournalEntry(PyObject * /*self*/, PyObject * args)
 	} else {
 		// create new ref and entry
 		String text = PyString_AsStringObj(pyref);
-		strref = core->UpdateString(ieStrRef::OVERRIDE_START, text);
+		strref = core->strings->GetNextStrRef();
+		strref = core->UpdateString(strref, text);
 	}
 
 	ieStrRef msg2 = ieStrRef::INVALID;

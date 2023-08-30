@@ -76,6 +76,7 @@ public:
 	virtual StringBlock GetStringBlock(ieStrRef strref, STRING_FLAGS flags = STRING_FLAGS::NONE) = 0;
 	virtual ieStrRef UpdateString(ieStrRef strref, const String& text) = 0;
 	virtual bool HasAltTLK() const = 0;
+	virtual ieStrRef GetNextStrRef() const = 0;
 };
 
 }

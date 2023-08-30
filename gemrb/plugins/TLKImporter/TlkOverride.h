@@ -66,7 +66,6 @@ private:
 	DataStream *GetAuxTlk(bool create);
 	ieStrRef GetNewStrRef(ieStrRef strref);
 	strpos_t LocateString(ieStrRef strref);
-	ieStrRef GetNextStrRef();
 	strpos_t ClaimFreeSegment();
 	void ReleaseSegment(strpos_t offset);
 	char *GetString(strpos_t offset);
@@ -80,6 +79,7 @@ public:
 	bool Init();
 	char *ResolveAuxString(ieStrRef strref, size_t &Length);
 	ieStrRef UpdateString(ieStrRef strref, const String& newvalue);
+	ieStrRef GetNextStrRef();
 };
 
 }
