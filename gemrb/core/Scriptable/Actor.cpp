@@ -3849,6 +3849,15 @@ void Actor::PlayExistenceSounds()
 	nextComment = time + RAND(delay*1/4, delay*7/4);
 }
 
+static void ForceOverrideAction(Actor* actor, std::string actionString)
+{
+	Action* action = GenerateAction(actionString);
+	assert(action);
+	// the original was as agressive, clearing the queue and stopping movement
+	actor->Stop();
+	actor->AddAction(action);
+}
+
 static bool CheckCharmOverride(Actor* actor)
 {
 	if (!(actor->GetStat(IE_STATE_ID) & STATE_CHARMED)) return false;
@@ -3863,7 +3872,6 @@ static bool CheckCharmOverride(Actor* actor)
 	if (!charm) return false;
 
 	// skip regular charm
-	Action* action;
 	switch (charm->Parameter2) {
 		case 2:
 		case 3:
@@ -3871,10 +3879,7 @@ static bool CheckCharmOverride(Actor* actor)
 		case 1002:
 		case 1003:
 		case 1005:
-			action = GenerateAction("AttackReevaluate([GOODCUTOFF],10)");
-			assert(action);
-			actor->Stop(); // the original was as agressive, clearing the queue and stopping movement
-			actor->AddAction(action);
+			ForceOverrideAction(actor, "AttackReevaluate([GOODCUTOFF],10)");
 			// EEs also marked a field as true to render the weapon over the portrait for slightly
 			// longer than the action itself (m_bJustAttacked in Bubb's dump)
 			return true;
@@ -3906,10 +3911,7 @@ static bool CheckConfusionOverride(Actor* actor)
 			actionString = "NoAction()";
 			break;
 	}
-	Action* action = GenerateAction(actionString);
-	assert(action);
-	actor->ReleaseCurrentAction();
-	actor->AddActionInFront(action);
+	ForceOverrideAction(actor, actionString);
 	Log(DEBUG, "Actor", "Confusion: added {} at {}", actionString, int(core->GetGame()->GameTime));
 	return true;
 }
@@ -3933,10 +3935,7 @@ bool Actor::OverrideActions()
 		}
 		// the original checked for Attack() / Berserk(), which LastTarget handled more generically
 		if (Modified[IE_CHECKFORBERSERK] && !objects.LastTarget) {
-			Action* action = GenerateAction("Berserk()");
-			assert(action);
-			Stop();
-			AddAction(action);
+			ForceOverrideAction(this, "Berserk()");
 			return true;
 		}
 	}
@@ -3948,10 +3947,7 @@ bool Actor::OverrideActions()
 
 	// feeblemind
 	if (Modified[IE_STATE_ID] & STATE_FEEBLE) {
-		Action* action = GenerateAction("NoAction()");
-		assert(action);
-		Stop();
-		AddAction(action);
+		ForceOverrideAction(this, "NoAction()");
 	}
 
 	// the original was adding NoAction in one more odd case that would break script processing
