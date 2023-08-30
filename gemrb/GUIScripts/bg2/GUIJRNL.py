@@ -175,7 +175,7 @@ def UpdateLogWindow (JournalWindow):
 			# broken entry, bg1 style (no title)
 			JournalText = ""
 		else:
-			JournalText = "\n" + je2[1] + "\n"
+			JournalText = "\n" + je2[1].rstrip() + "\n"
 
 		Text.Append (JournalTitle + entryTime + JournalText)
 	return
