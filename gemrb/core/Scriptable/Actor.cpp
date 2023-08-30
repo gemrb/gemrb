@@ -3917,8 +3917,26 @@ static bool CheckConfusionOverride(Actor* actor)
 // forced actions that mess with scripting, eg. panic, confusion, berserking
 bool Actor::OverrideActions()
 {
+	// but maybe not: if we're in dialog, cutscene or running an overriden action
+	// the caller checks for this already
+
 	// domination and dire charm: force the actors to be useful (trivial ai)
 	if (CheckCharmOverride(this)) return true;
+
+	// berserking
+	if (Modified[IE_STATE_ID] & STATE_BERSERK) {
+		if (BaseStats[IE_CHECKFORBERSERK]) {
+			BaseStats[IE_CHECKFORBERSERK]--;
+		}
+		// the original checked for Attack() / Berserk(), which LastTarget handled more generically
+		if (Modified[IE_CHECKFORBERSERK] && !objects.LastTarget) {
+			Action* action = GenerateAction("Berserk()");
+			assert(action);
+			Stop();
+			AddAction(action);
+			return true;
+		}
+	}
 
 	const Game* game = core->GetGame();
 	bool overriding = CurrentAction && CurrentAction->flags & ACF_OVERRIDE;
@@ -3928,18 +3946,7 @@ bool Actor::OverrideActions()
 
 	// each round also re-confuse the actor
 	if (!roundFraction && !overriding) {
-		if (BaseStats[IE_CHECKFORBERSERK]) {
-			BaseStats[IE_CHECKFORBERSERK]--;
-		}
 		if (CheckConfusionOverride(this)) return true;
-
-		if (Modified[IE_CHECKFORBERSERK] && !objects.LastTarget && SeeAnyOne(false, false)) {
-			Action* action = GenerateAction("Berserk()");
-			assert(action);
-			ReleaseCurrentAction();
-			AddActionInFront(action);
-			return true;
-		}
 	}
 
 	return false;
