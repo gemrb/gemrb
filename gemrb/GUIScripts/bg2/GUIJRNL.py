@@ -126,8 +126,78 @@ def GetGameTime (time):
 	GemRB.SetToken ("YEAR", year)
 	return GemRB.GetString (15980)
 
+def SaveEntry (Window, text):
+	if text:
+		GemRB.SetJournalEntry (text, Section, Chapter, 61434)
+	Window.Close ()
+	UpdateLogWindow (None)
+
+def DeleteEntry (Window):
+	Window.Close ()
+	Window = GemRB.LoadWindow (8, "GUIJRNL")
+
+	def ConfirmDeleteEntry ():
+		# TODO: pass entries' strref
+		# GemRB.SetJournalEntry (strref, -1, Chapter, 25301)
+		Window.Close ()
+
+	Button = Window.GetControl (0)
+	Button.SetText (11973)
+	Button.OnPress (ConfirmDeleteEntry)
+
+	Button = Window.GetControl (1)
+	Button.SetText (13727)
+	Button.OnPress (Window.Close)
+
+	TextArea = Window.GetControl (3)
+	TextArea.SetText (57669)
+
+def AddUserEntry ():
+	# used a separate, stripped down, window
+	Window = GemRB.LoadWindow (9, "GUIJRNL")
+
+	Text = Window.ReplaceSubview (0, IE_GUI_TEXTAREA, "NORMAL")
+	Text.SetFlags (IE_GUI_TEXTAREA_EDITABLE, OP_OR)
+	Text.SetColor (ColorBlackish, TA_COLOR_NORMAL)
+	Text.SetColor ({'r' : 126, 'g' : 126, 'b' : 126, 'a' : 255}, TA_COLOR_BACKGROUND)
+	# disable the 1-6 hotkeys, so we can't lose focus
+	if GemRB.GetView ("PORTWIN"):
+		PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (GemRB.GetView ("PORTWIN"))
+		for i, Button in PortraitButtons.items():
+			Button.SetHotKey (None)
+	Text.Focus ()
+
+	def OnClose ():
+		if GemRB.GetView ("PORTWIN"):
+			GUICommonWindows.UpdatePortraitWindow ()
+
+	# title
+	Label = Window.GetControl (0x10000005)
+	Label.SetText (GetGameTime (GemRB.GetGameTime ()))
+
+	Button = Window.GetControl (1)
+	Button.SetText (11973)
+	Button.OnPress (lambda: SaveEntry (Window, Text.QueryText ()))
+
+	Button = Window.GetControl (2)
+	Button.SetText (13727)
+	Button.OnPress (Window.Close)
+
+	# revert
+	Button = Window.GetControl (3)
+	Button.SetText (2240)
+	Button.SetDisabled (True)
+
+	Button = Window.GetControl (4)
+	Button.SetText (13957)
+	Button.OnPress (lambda: DeleteEntry (Window))
+
+	Window.SetAction (OnClose, ACTION_WINDOW_CLOSED)
+	Window.ShowModal (MODAL_SHADOW_GRAY)
+
 def UpdateLogWindow (JournalWindow):
-	global Order
+	global Order, Section
+
 	if JournalWindow == None:
 		JournalWindow = GemRB.GetView("WIN_JRNL")
 
@@ -159,25 +229,43 @@ def UpdateLogWindow (JournalWindow):
 		Label.SetText (45202)
 		EntryList.sort(key = SortByDate)
 
+	Button = JournalWindow.GetControl (10)
+	if Section == 0:
+		Label.SetText (None)
+		# "Add" button instead of sorting
+		Button.SetText (45488)
+		Button.OnPress (AddUserEntry)
+		# NOTE: too annoying to implement:
+		# - clicking on an entry allows editing
+		# - clicking on empty area added new entry
+	else:
+		Button.SetText (4627)
+		Button.OnPress (ToggleOrderWindow)
+
 	Color = "800000"
-	# only the personal journal section used a different title color
+	# only the personal and player journal sections used a different title color
 	if Section == 4:
 		Color = "003d00"
 	for i in range(len(EntryList)):
 		je = EntryList[i]
 		entryTime = GetGameTime (je['GameTime'])
 
-		# each journal entry consists of the title and description
-		# but the game displays the entry date between the two
-		je2 = GemRB.GetString(je['Text']).split("\n",1)
-		JournalTitle = "\n[color=" + Color + "]" + je2[0] + "[/color]\n"
-		if len(je2) == 1:
-			# broken entry, bg1 style (no title)
-			JournalText = ""
+		# user notes use date as the title
+		if Section == 0:
+			JournalTitle = "\n[color=003d00]" + entryTime + "[/color]\n"
+			JournalText = GemRB.GetString (je['Text']).rstrip() + "\n"
 		else:
-			JournalText = "\n" + je2[1].rstrip() + "\n"
+			# each journal entry consists of the title and description
+			# but the game displays the entry date between the two
+			je2 = GemRB.GetString(je['Text']).split("\n",1)
+			JournalTitle = "\n[color=" + Color + "]" + je2[0] + "[/color]\n" + entryTime
+			if len(je2) == 1:
+				# broken entry, bg1 style (no title)
+				JournalText = ""
+			else:
+				JournalText = "\n" + je2[1].rstrip() + "\n"
 
-		Text.Append (JournalTitle + entryTime + JournalText)
+		Text.Append (JournalTitle + JournalText)
 	return
 
 ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateLogWindow, GUICommonWindows.DefaultWinPos, True)

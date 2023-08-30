@@ -90,6 +90,7 @@ TA_COLOR_SELECTED = 5
 ColorWhite = {'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}
 ColorWhitish = {'r' : 215, 'g' : 215, 'b' : 215, 'a' : 255}
 ColorRed = {'r' : 255, 'g' : 0, 'b' : 0, 'a' : 255}
+ColorBlackish = {'r' : 33, 'g' : 44, 'b' : 44, 'a' : 205}
 
 #TextEdit
 IE_GUI_TEXTEDIT_ALPHACHARS = 1
