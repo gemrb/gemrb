@@ -1134,6 +1134,7 @@ public: //Script Functions
 	static void GlobalSubGlobal(Scriptable* Sender, Action* parameters);
 	static void GlobalXor(Scriptable* Sender, Action* parameters);
 	static void GlobalXorGlobal(Scriptable* Sender, Action* parameters);
+	static void GroupAttack(Scriptable* Sender, Action* parameters);
 	static void Help(Scriptable* Sender, Action* parameters);
 	static void Hide(Scriptable* Sender, Action* parameters);
 	static void HideAreaOnMap(Scriptable* Sender, Action* parameters);

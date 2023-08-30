@@ -3897,6 +3897,8 @@ static bool CheckConfusionOverride(Actor* actor)
 	actionString.reserve(35);
 	switch (RAND(1, 3)) {
 		case 1:
+			// ees, maybe vanilla, called "GroupAttack([ANYONE])"
+			// that's the same as Attack due to the param passed
 			// HACK: replace with [0] (ANYONE) once we support that (Nearest matches Sender like in the original)
 			if (RandomFlip()) {
 				actionString = "Attack(NearestEnemyOf(Myself))";

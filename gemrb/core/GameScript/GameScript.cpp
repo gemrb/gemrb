@@ -743,6 +743,7 @@ static const ActionLink actionnames[] = {
 	{"globalxor", GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal", GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
 	{"gotostartscreen", GameScript::QuitGame, 0},//ending
+	{"groupattack", GameScript::GroupAttack, 0},
 	{"help", GameScript::Help, 0},
 	{"hide", GameScript::Hide, 0},
 	{"hideareaonmap", GameScript::HideAreaOnMap, 0},

@@ -5297,6 +5297,22 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 	}
 }
 
+// attack creatures with the same specific value as the target creature
+void GameScript::GroupAttack(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* scr = GetScriptableFromObject(Sender, parameters->objects[1], GA_NO_DEAD);
+	if (!scr || scr->Type != ST_ACTOR) {
+		return;
+	}
+
+	Actor* actor = Scriptable::As<Actor>(scr);
+	int specific = actor->GetStat(IE_SPECIFIC);
+	Sender->ReleaseCurrentAction(); // it's not an instant
+	Action* attack = GenerateAction("Attack()");
+	attack->objects[1]->objectFields[4] = specific;
+	actor->AddActionInFront(attack);
+}
+
 void GameScript::Explore( Scriptable* Sender, Action* /*parameters*/)
 {
 	Sender->GetCurrentArea()->FillExplored(true);
