@@ -3853,7 +3853,11 @@ static bool CheckCharmOverride(Actor* actor)
 {
 	if (!(actor->GetStat(IE_STATE_ID) & STATE_CHARMED)) return false;
 	if (actor->GetBase(IE_EA) > EA_GOODCUTOFF) return false;
-	if (actor->GetStat(IE_EA) != EA_CHARMEDPC) return false;
+	if (actor->GetStat(IE_EA) != EA_CHARMEDPC) return false; // the original apparently didn't use EA_CHARMEDPC
+	// already running AttackReevaluate?
+	// the original ignored this condition for IE_EA > EA_GOODCUTOFF!?
+	constexpr unsigned short AttackReevaluateID = 134;
+	if (actor->GetCurrentAction() && actor->GetCurrentAction()->actionID == AttackReevaluateID) return false;
 
 	const Effect* charm = actor->fxqueue.HasEffect(fx_set_charmed_state_ref);
 	if (!charm) return false;
@@ -3869,7 +3873,10 @@ static bool CheckCharmOverride(Actor* actor)
 		case 1005:
 			action = GenerateAction("AttackReevaluate([GOODCUTOFF],10)");
 			assert(action);
-			actor->AddActionInFront(action);
+			actor->Stop(); // the original was as agressive, clearing the queue and stopping movement
+			actor->AddAction(action);
+			// EEs also marked a field as true to render the weapon over the portrait for slightly
+			// longer than the action itself (m_bJustAttacked in Bubb's dump)
 			return true;
 		default:
 			break;
