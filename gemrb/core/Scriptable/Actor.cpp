@@ -3877,13 +3877,63 @@ static bool CheckCharmOverride(Actor* actor)
 	return false;
 }
 
+static bool CheckConfusionOverride(Actor* actor)
+{
+	if (!(actor->GetStat(IE_STATE_ID) & STATE_CONFUSED)) return false;
+
+	std::string actionString;
+	actionString.reserve(35);
+	switch (RAND(1, 3)) {
+		case 1:
+			// HACK: replace with [0] (ANYONE) once we support that (Nearest matches Sender like in the original)
+			if (RandomFlip()) {
+				actionString = "Attack(NearestEnemyOf(Myself))";
+			} else {
+				actionString = "Attack([PC])";
+			}
+			break;
+		case 2:
+			actionString = "RandomWalk()";
+			break;
+		default:
+			actionString = "NoAction()";
+			break;
+	}
+	Action* action = GenerateAction(actionString);
+	assert(action);
+	actor->ReleaseCurrentAction();
+	actor->AddActionInFront(action);
+	Log(DEBUG, "Actor", "Confusion: added {} at {}", actionString, int(core->GetGame()->GameTime));
+	return true;
+}
+
+// forced actions that mess with scripting, eg. panic, confusion, berserking
 bool Actor::OverrideActions()
 {
-	// TODO: consolidate forced actions that mess with scripting (eg. panic, confusion, berserking)
-	// most are handled elsewhere now
-
 	// domination and dire charm: force the actors to be useful (trivial ai)
 	if (CheckCharmOverride(this)) return true;
+
+	const Game* game = core->GetGame();
+	bool overriding = CurrentAction && CurrentAction->flags & ACF_OVERRIDE;
+	overriding = overriding || (game->StateOverrideFlag && game->StateOverrideTime);
+	// use the combat round size as the original;  also skald song duration matches it
+	int roundFraction = (game->GameTime - roundTime) % GetAdjustedTime(core->Time.attack_round_size);
+
+	// each round also re-confuse the actor
+	if (!roundFraction && !overriding) {
+		if (BaseStats[IE_CHECKFORBERSERK]) {
+			BaseStats[IE_CHECKFORBERSERK]--;
+		}
+		if (CheckConfusionOverride(this)) return true;
+
+		if (Modified[IE_CHECKFORBERSERK] && !objects.LastTarget && SeeAnyOne(false, false)) {
+			Action* action = GenerateAction("Berserk()");
+			assert(action);
+			ReleaseCurrentAction();
+			AddActionInFront(action);
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -7395,54 +7445,6 @@ void Actor::UpdateModalState(ieDword gameTime)
 		core->ApplySpell(ResRef("detect"), this, this, 0);
 	}
 
-	ieDword state = Modified[IE_STATE_ID];
-	const Game* game = core->GetGame();
-	bool overriding = CurrentAction && CurrentAction->flags & ACF_OVERRIDE;
-	overriding = overriding || (game->StateOverrideFlag && game->StateOverrideTime);
-
-	// each round also re-confuse the actor
-	if (!roundFraction && !overriding) {
-		if (BaseStats[IE_CHECKFORBERSERK]) {
-			BaseStats[IE_CHECKFORBERSERK]--;
-		}
-		if (state & STATE_CONFUSED) {
-			std::string actionString;
-			actionString.reserve(32);
-			switch (RAND(1, 3)) {
-			case 2:
-				actionString = "RandomWalk()";
-				break;
-			case 1:
-				// HACK: replace with [0] (ANYONE) once we support that (Nearest matches Sender like in the original)
-				if (RandomFlip()) {
-					actionString = "Attack(NearestEnemyOf(Myself))";
-				} else {
-					actionString = "Attack([PC])";
-				}
-				break;
-			default:
-				actionString = "NoAction()";
-				break;
-			}
-			Action *action = GenerateAction(actionString);
-			if (action) {
-				ReleaseCurrentAction();
-				AddActionInFront(action);
-				Log(DEBUG, "Actor", "Confusion: added {} at {} ({})", actionString, gameTime - roundTime, roundTime);
-			}
-			return;
-		}
-
-		if (Modified[IE_CHECKFORBERSERK] && !objects.LastTarget && SeeAnyOne(false, false)) {
-			Action *action = GenerateAction( "Berserk()" );
-			if (action) {
-				ReleaseCurrentAction();
-				AddActionInFront(action);
-			}
-			return;
-		}
-	}
-
 	// this is a HACK, fuzzie can't work out where else to do this for now
 	// but we shouldn't be resetting rounds/attacks just because the actor
 	// wandered away, the action code should probably be responsible somehow
@@ -7462,6 +7464,9 @@ void Actor::UpdateModalState(ieDword gameTime)
 	if (Modal.State == Modal::None && !Modal.LingeringCount) {
 		return;
 	}
+
+	ieDword state = Modified[IE_STATE_ID];
+	const Game* game = core->GetGame();
 
 	//apply the modal effect on the beginning of each round
 	if (roundFraction == 0) {
