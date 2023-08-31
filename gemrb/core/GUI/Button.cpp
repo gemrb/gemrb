@@ -313,6 +313,9 @@ void Button::SetState(State state)
 	if (ButtonState != state) {
 		MarkDirty();
 		ButtonState = state;
+		if (ButtonState == SELECTED) {
+			UpdateDictValue();
+		}
 	}
 }
 
