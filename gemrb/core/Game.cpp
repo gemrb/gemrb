@@ -2318,6 +2318,7 @@ void Game::CheckBored()
 {
 	static int boredTimeout = core->GetVariable("Bored Timeout", 3000);
 	if (!boredTimeout) return;
+	if (core->InCutSceneMode()) return;
 
 	nextBored++;
 	if (nextBored < boredTimeout / 2) return; // likely stored in original double ticks
