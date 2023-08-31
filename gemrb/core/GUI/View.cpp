@@ -157,7 +157,7 @@ Regions View::DirtySuperViewRegions() const
 		return {};
 	}
 
-	if (NeedsDraw()) {
+	if (NeedsDraw() || !IsVisible()) {
 		return { frame };
 	}
 	
@@ -481,6 +481,10 @@ void View::RemovedFromView(const View*)
 
 bool View::IsOpaque() const
 {
+	if (!IsVisible()) {
+		return false;
+	}
+
 	if (backgroundColor.a == 0xff) {
 		return true;
 	}
