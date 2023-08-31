@@ -866,8 +866,6 @@ public:
 	bool GetSoundFromFile(ResRef& sound, Verbal index) const;
 	bool GetSoundFromINI(ResRef& sound, Verbal index) const;
 	bool GetSoundFrom2DA(ResRef& sound, Verbal index) const;
-	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
-	int HandleInteract(const Actor *target) const;
 	/* start bg1-style banter dialog */
 	void HandleInteractV1(const Actor *target);
 	/* generate party banter, return true if successful */

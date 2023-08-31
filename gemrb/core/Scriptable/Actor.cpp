@@ -3569,28 +3569,6 @@ void Actor::HandleInteractV1(const Actor *target)
 	AddAction(GenerateAction(std::move(interAction)));
 }
 
-int Actor::HandleInteract(const Actor *target) const
-{
-	int type = CheckInteract(scriptName, target->GetScriptName());
-
-	//no interaction at all
-	if (type==I_NONE) return -1;
-	//banter dialog interaction
-	if (type==I_DIALOG) return 0;
-
-	Interact(type);
-	switch(type)
-	{
-	case I_COMPLIMENT:
-		target->Interact(I_COMPL_RESP);
-		break;
-	case I_INSULT:
-		target->Interact(I_INSULT_RESP);
-		break;
-	}
-	return 1;
-}
-
 bool Actor::GetPartyComment(const Actor* target)
 {
 	// V1 interact
@@ -3599,21 +3577,28 @@ bool Actor::GetPartyComment(const Actor* target)
 		return true;
 	}
 
-	// simplified interact
-	switch (HandleInteract(target)) {
-		case -1:
-			return false;
-		case 1:
-			return true;
-		default:
-			// V2 interact
-			objects.LastTalker = target->GetGlobalID();
-			Action* action = GenerateActionDirect("Interact([-1])", target);
-			assert(action);
-			AddActionInFront(action);
-			return true;
+	int type = CheckInteract(scriptName, target->GetScriptName());
+	if (type == I_NONE) return false;
+	// V2 interact - banter dialog interaction
+	if (type == I_DIALOG) {
+		objects.LastTalker = target->GetGlobalID();
+		Action* action = GenerateActionDirect("Interact([-1])", target);
+		assert(action);
+		AddActionInFront(action);
+		return true;
 	}
-	return false;
+
+	// simplified interact
+	Interact(type);
+	switch (type) {
+		case I_COMPLIMENT:
+			target->Interact(I_COMPL_RESP);
+			break;
+		case I_INSULT:
+			target->Interact(I_INSULT_RESP);
+			break;
+	}
+	return true;
 }
 
 //call this only from gui selects
