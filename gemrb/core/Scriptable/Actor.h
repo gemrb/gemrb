@@ -871,7 +871,7 @@ public:
 	/* start bg1-style banter dialog */
 	void HandleInteractV1(const Actor *target);
 	/* generate party banter, return true if successful */
-	bool GetPartyComment();
+	bool GetPartyComment(const Actor* target);
 	/* sets the quick slots */
 	void SetActionButtonRow(const ActionButtonRow &ar) const;
 	/* updates the quick slots */

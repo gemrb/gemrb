@@ -493,6 +493,7 @@ public:
 	void DumpKaputz() const;
 	// GLOBAL is just the LOCALS of the Game Scriptable, but we want to avoid any confusion
 	ieDword GetGlobal(const ieVariable& key, ieDword fallback) const { return GetLocal(key, fallback); };
+	bool CheckPartyBanter() const;
 	void CheckBored();
 	void CheckAreaComment();
 

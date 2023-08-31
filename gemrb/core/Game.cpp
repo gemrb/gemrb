@@ -2344,6 +2344,55 @@ void Game::CheckBored()
 	}
 }
 
+bool Game::CheckPartyBanter() const
+{
+	// don't even bother
+	size_t size = PCs.size();
+	if (size < 2) return false;
+
+	// did scripts disable us
+	if (BanterBlockFlag || BanterBlockTime > GameTime) {
+		return false;
+	}
+	if (core->InCutSceneMode()) return false;
+
+	if (CombatCounter) return false;
+
+	AutoTable bantTiming = gamedata->LoadTable("banttimg", true);
+	// TODO: some guessing is involved and we don't use REPLAYDELAY at all
+	assert(bantTiming);
+	if (GameTime % bantTiming->QueryFieldSigned<int>("FREQUENCY", "VALUE") != 0) return false;
+	if (RAND(1, 100) > bantTiming->QueryFieldSigned<int>("PROBABILITY", "VALUE")) return false;
+
+	// randomly pick a pc
+	size_t offset = RAND<size_t>(1, size);
+	Actor* originator = PCs[offset - 1];
+	const Map* oMap = originator->GetCurrentArea();
+	if (oMap != GetCurrentArea()) return false;
+	static const Actor* prevPC = nullptr;
+	if (originator == prevPC && RAND(1, 100) > bantTiming->QueryFieldSigned<int>("SPECIALPROBABILITY", "VALUE")) return false;
+	prevPC = originator;
+
+	// find target
+	bool bantered = false;
+	for (size_t idx = offset; idx < offset + size; idx++) {
+		const Actor* pc = PCs[idx % size];
+		if (pc == originator) continue;
+
+		// not an NPC
+		if (pc->GetBase(IE_MC_FLAGS) & MC_EXPORTABLE) continue;
+		// don't bother if we're not around
+		if (pc->GetCurrentArea() != oMap) continue;
+		// immobile or otherwise impeded
+		if (!pc->ValidTarget(GA_SELECT)) continue;
+
+		bantered = originator->GetPartyComment(pc);
+		break;
+	}
+
+	return bantered;
+}
+
 // drop area comments now and then
 void Game::CheckAreaComment()
 {

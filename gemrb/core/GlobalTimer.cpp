@@ -164,8 +164,12 @@ bool GlobalTimer::Update()
 		if (thisTime) {
 			//this measures in-world time (affected by effects, actions, etc)
 			game->AdvanceTime(1);
+			// drop an area comment, party oneliner or initiate party banter (with Interact)
+			// party comments have a priority, but they happen half of the time, at most
+			if (!game->CheckPartyBanter()) {
+				game->CheckAreaComment();
+			}
 			game->CheckBored();
-			game->CheckAreaComment();
 		}
 	}
 	//this measures time spent in the game (including pauses)

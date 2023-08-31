@@ -3591,49 +3591,27 @@ int Actor::HandleInteract(const Actor *target) const
 	return 1;
 }
 
-bool Actor::GetPartyComment()
+bool Actor::GetPartyComment(const Actor* target)
 {
-	const Game *game = core->GetGame();
+	// V1 interact
+	if (core->HasFeature(GFFlags::RANDOM_BANTER_DIALOGS)) {
+		HandleInteractV1(target);
+		return true;
+	}
 
-	//not an NPC
-	if (BaseStats[IE_MC_FLAGS] & MC_EXPORTABLE) return false;
-	// don't bother if we're not around
-	if (GetCurrentArea() != game->GetCurrentArea()) return false;
-	ieDword size = game->GetPartySize(true);
-	//don't even bother, again
-	if (size<2) return false;
-
-	if (core->Roll(1, 2, -1)) return false;
-
-	for (unsigned int i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
-		const Actor *target = game->GetPC(i % size, true);
-		if (target==this) continue;
-		if (target->BaseStats[IE_MC_FLAGS]&MC_EXPORTABLE) continue; //not NPC
-		if (target->GetCurrentArea()!=GetCurrentArea()) continue;
-
-		if (core->HasFeature(GFFlags::RANDOM_BANTER_DIALOGS)) {
-			if (core->Roll(1, 50, 0) == 1) { // TODO: confirm frequency
-				//V1 interact
-				HandleInteractV1(target);
-				return true;
-			}
-		}
-
-		//simplified interact
-		switch(HandleInteract(target)) {
-		case -1: return false;
-		case 1: return true;
-		default:
-			//V2 interact
-			objects.LastTalker = target->GetGlobalID();
-			Action *action = GenerateActionDirect("Interact([-1])", target);
-			if (action) {
-				AddActionInFront(action);
-			} else {
-				Log(ERROR, "Actor", "Cannot generate banter action");
-			}
+	// simplified interact
+	switch (HandleInteract(target)) {
+		case -1:
+			return false;
+		case 1:
 			return true;
-		}
+		default:
+			// V2 interact
+			objects.LastTalker = target->GetGlobalID();
+			Action* action = GenerateActionDirect("Interact([-1])", target);
+			assert(action);
+			AddActionInFront(action);
+			return true;
 	}
 	return false;
 }
@@ -3760,26 +3738,6 @@ void Actor::IdleActions(bool nonidle)
 	//only party [N]PCs talk but others might play existence sounds
 	if (!InParty) {
 		PlayExistenceSounds();
-		return;
-	}
-
-	ieDword time = game->GameTime;
-	//did scripts disable us
-	if (game->BanterBlockFlag || (game->BanterBlockTime>time) ) {
-		return;
-	}
-
-	if (time/nextComment > 1) { // first run, not adjusted for game time yet
-		nextComment += time;
-	}
-
-	//drop an area comment, party oneliner or initiate party banter (with Interact)
-	//party comments have a priority, but they happen half of the time, at most
-	if (nextComment<time) {
-		if (nextComment && !Immobile()) {
-			GetPartyComment();
-		}
-		nextComment = time+core->Roll(5,1000,bored_time/2);
 		return;
 	}
 
