@@ -18,10 +18,11 @@
 
 #include "StringConversion.h"
 
-#include <iconv.h>
-
 #include "ie_types.h"
+
+#include "Iconv.h"
 #include "Interface.h"
+
 #include "Logging/Logging.h"
 
 namespace GemRB {
@@ -50,7 +51,7 @@ static String StringFromEncodedData(const char* in, size_t length, const std::st
 	std::u16string buffer(length * 2, u'\0');
 	auto outBuf = reinterpret_cast<char*>(const_cast<char16_t*>(buffer.data()));
 
-	size_t ret = iconv(cd, const_cast<char**>(&in), &length, &outBuf, &outLenLeft);
+	size_t ret = portableIconv(cd, &in, &length, &outBuf, &outLenLeft);
 	iconv_close(cd);
 
 	if (ret == static_cast<size_t>(-1)) {
@@ -117,7 +118,7 @@ std::string RecodedStringFromWideStringBytes(const char16_t* bytes, size_t bytes
 	std::string buffer(outLen, '\0');
 	auto outBuf = const_cast<char*>(buffer.data());
 
-	size_t ret = iconv(cd, &in, &bytesLength, &outBuf, &outLenLeft);
+	size_t ret = portableIconv(cd, &in, &bytesLength, &outBuf, &outLenLeft);
 	iconv_close(cd);
 
 	if (ret == static_cast<size_t>(-1)) {

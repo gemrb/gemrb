@@ -16,14 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <iconv.h>
-
 #include "PythonConversions.h"
-#include "PythonErrors.h"
 
 #include "GameData.h"
-#include "Interface.h"
 #include "ImageMgr.h"
+#include "Interface.h"
+#include "PythonErrors.h"
+
+#include "Strings/Iconv.h"
 
 namespace GemRB {
 
@@ -194,7 +194,7 @@ String PyString_AsStringObj(PyObject* obj)
 	auto in = reinterpret_cast<char*>(PyUnicode_DATA(obj));
 	auto outBuf = reinterpret_cast<char*>(const_cast<char16_t*>(buffer.data()));
 
-	size_t ret = iconv(cd, &in, &inLen, &outBuf, &outLenLeft);
+	size_t ret = portableIconv(cd, &in, &inLen, &outBuf, &outLenLeft);
 	iconv_close(cd);
 
 	if (ret == static_cast<size_t>(-1)) {

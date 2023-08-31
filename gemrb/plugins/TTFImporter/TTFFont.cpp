@@ -19,15 +19,17 @@
  */
 
 #include "TTFFont.h"
+
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "Sprite2D.h"
+
+#include "Logging/Logging.h"
+#include "Strings/Iconv.h"
 #include "Video/Video.h"
 
+#include <cerrno>
 #include <cstdint>
 #include <utility>
-#include <iconv.h>
-#include <cerrno>
 
 namespace GemRB {
 
@@ -49,7 +51,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		// TODO: make this work on BE systems
 		// TODO: maybe we want to work with non-unicode fonts?
 		iconv_t cd = iconv_open("UTF-16LE", core->TLKEncoding.encoding.c_str());
-		size_t ret = iconv(cd, &oldchar, &in, &newchar, &out);
+		size_t ret = portableIconv(cd, &oldchar, &in, &newchar, &out);
 
 		if (ret != GEM_OK) {
 			Log(ERROR, "FONT", "iconv error: {}", errno);
