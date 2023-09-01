@@ -8230,8 +8230,8 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 }
 
 
-PyDoc_STRVAR( GemRB_GetSpell__doc,
-"===== GetSpell =====\n\
+PyDoc_STRVAR(GemRB_GetSpell__doc,
+	     "===== GetSpell =====\n\
 \n\
 **Prototype:** GemRB.GetSpell (ResRef[, silent])\n\
 \n\
@@ -8257,10 +8257,10 @@ is set, nothing will be printed to the console.\n\
   * 'HeaderFlags'     - the spell's header flags\n\
   * 'NonHostile'      - is the spell considered hostile?\n\
   * 'SpellResRef'     - the spell's resource reference\n\
+  * 'SpellLocation'   - the spell's header ability location\n\
 \n\
 **See also:** [GetItem](GetItem.md), [Button_SetSpellIcon](Button_SetSpellIcon.md), spell_structure(IESDP)\n\
-"
-);
+");
 
 static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 {
@@ -8290,6 +8290,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellLevel", PyLong_FromLong(spell->SpellLevel));
 	PyDict_SetItemString(dict, "Completion", PyString_FromResRef(spell->CompletionSound));
 	PyDict_SetItemString(dict, "SpellTargetType", PyLong_FromLong(spell->GetExtHeader(0)->Target));
+	PyDict_SetItemString(dict, "SpellLocation", PyLong_FromLong(spell->GetExtHeader(0)->Location));
 	PyDict_SetItemString(dict, "HeaderFlags", PyLong_FromLong(spell->Flags));
 	PyDict_SetItemString(dict, "NonHostile", PyLong_FromLong(!(spell->Flags&SF_HOSTILE) && !spell->ContainsDamageOpcode()));
 	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef(spell->Name));
