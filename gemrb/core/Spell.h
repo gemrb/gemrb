@@ -61,7 +61,7 @@ class Projectile;
 #define  IE_SPL_INNATE 4
 #define  IE_SPL_SONG   5
 
-//this is not the same as the book types which is 3 or 11)
+// this is not the same as the book types (which is 3 or 11)
 #define NUM_SPELL_TYPES 6
 
 #define SPEC_IDENTIFY  1  //spells that don't appear in the casting bar
