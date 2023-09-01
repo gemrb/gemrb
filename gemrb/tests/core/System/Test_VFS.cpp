@@ -93,17 +93,6 @@ TEST(VFS_Test, PathAppend_PlainPath) {
 	EXPECT_EQ(path, fmt::format("dir{0}subdir", SPathDelimiter));
 }
 
-TEST(VFS_Test, PathAppend_PlainPathAndLeadingBackslash) {
-	path_t path{"dir"};
-	// sample from IWD TotL
-	PathAppend(path, "\\data\\zcMHar.bif");
-#ifdef WIN32
-	EXPECT_EQ(path, "dir\\data\\zcMHar.bif");
-#else
-	EXPECT_EQ(path, "dir/data\\zcMHar.bif");
-#endif
-}
-
 TEST(VFS_Test, PathAppend_SuffixedPath) {
 	path_t path = fmt::format("dir{0}", SPathDelimiter);
 	PathAppend(path, "subdir");

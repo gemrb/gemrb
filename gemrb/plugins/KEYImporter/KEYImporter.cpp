@@ -144,6 +144,13 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 		be.name.resize(ASCIIZLen);
 		f->Seek( ASCIIZOffset, GEM_STREAM_START );
 		f->Read(&be.name[0], ASCIIZLen);
+
+		// IWD ToTL: \\data\\zcHMar.bif
+		if (be.name[0] == '\\') {
+			be.name.erase(0, 1);
+			ASCIIZLen -= 1;
+		}
+
 		for (int p = 0; p < ASCIIZLen; p++) {
 			//some MAC versions use : as delimiter
 			if (be.name[p] == '\\' || be.name[p] == ':')
