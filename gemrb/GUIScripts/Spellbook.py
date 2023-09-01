@@ -248,8 +248,10 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0)
 	actionLevel = GemRB.GetVar ("ActionLevel")
 
-	#order is: mage, cleric, innate, class, song, (defaults to 1, item)
-	spellSections = [2, 4, 8, 16, 16]
+	# spellType will have IE_SPL_ITEM (...) not IE_SPELL_TYPE_PRIEST (...)!
+	# IE_CASTING order is: item, cleric, mage, innate, class, song
+	# bg2 spellType order: special, mage, priest, psionic, innate, song
+	spellSections = [1, 4, 2, 1, 8, 1]
 
 	# create the spell icon buttons
 	buttonCount = 12 - More * 2 # GUIBT_COUNT in PCStatsStruct
@@ -281,7 +283,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			specialSpell ^= SP_SILENCE
 
 		disabled = disabled_spellcasting & spellType
-		if disabled_spellcasting == 16: # ignore type
+		if disabled_spellcasting == 16: # class ("magical" spell in ee)
 			disabled = not (Spell["HeaderFlags"] & 0x4000) # SF_HLA
 		if specialSpell or disabled:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
