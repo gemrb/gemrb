@@ -3786,7 +3786,7 @@ void Actor::PlayExistenceSounds()
 
 static void ForceOverrideAction(Actor* actor, std::string actionString)
 {
-	Action* action = GenerateAction(actionString);
+	Action* action = GenerateAction(std::move(actionString));
 	assert(action);
 	// the original was as agressive, clearing the queue and stopping movement
 	actor->Stop();
