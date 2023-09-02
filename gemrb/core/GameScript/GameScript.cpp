@@ -1588,12 +1588,10 @@ void InitializeIEScript()
 				std::string buffer = fmt::format("{} is in collision with ", triggersTable->GetStringIndex(j));
 				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", "{}", buffer);
-			} else {
-				if (InDebugMode(DebugMode::TRIGGERS)) {
-					std::string buffer = fmt::format("{} is a synonym of ", triggersTable->GetStringIndex(j));
-					printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
-					Log(DEBUG, "GameScript", "{}", buffer);
-				}
+			} else if (InDebugMode(DebugMode::TRIGGERS)) {
+				std::string buffer = fmt::format("{} is a synonym of ", triggersTable->GetStringIndex(j));
+				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
+				Log(DEBUG, "GameScript", "{}", buffer);
 			}
 			continue; //we already found an alternative
 		}
@@ -1650,13 +1648,10 @@ void InitializeIEScript()
 					actionsTable->GetStringIndex( j ) );
 				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", "{}", buffer);
-			} else {
-				if (InDebugMode(DebugMode::ACTIONS)) {
-					std::string buffer = fmt::format("{} is a synonym of ",
-						actionsTable->GetStringIndex( j ) );
-					printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
-					Log(DEBUG, "GameScript", "{}", buffer);
-				}
+			} else if (InDebugMode(DebugMode::ACTIONS)) {
+				std::string buffer = fmt::format("{} is a synonym of ", actionsTable->GetStringIndex(j));
+				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
+				Log(DEBUG, "GameScript", "{}", buffer);
 			}
 			continue; //we already found an alternative
 		}
