@@ -23,6 +23,7 @@ build_task:
     - make install
 
   test_script:
+    - cd build
     - make test # also try real testing on this platform later if creating a display succeeds
 
   publish_script:
