@@ -2173,25 +2173,26 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 
 		const Action *action = response->actions[0];
 		Scriptable* target = GetScriptableFromObject(MySelf, action->objects[1]);
-		if (target) {
-			// save the target in case it selfdestructs and we need to manually exit the cutscene
-			core->SetCutSceneRunner(target);
-
-			// the original first queued them all similarly to DialogHandler::DialogChoose
-			if (target->Type != ST_ACTOR) {
-				response->actions.insert(response->actions.begin(), GenerateAction("SetInterrupt(FALSE)"));
-				response->actions.push_back(GenerateAction("SetInterrupt(TRUE)"));
-			}
-			rS->responses[0]->Execute(target);
-
-			// NOTE: this will break blocking instants, if there are any
-			target->ReleaseCurrentAction();
-		} else {
+		if (!target) {
 			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
 			if (InDebugMode(DebugMode::CUTSCENE) && action->objects[1]) {
 				action->objects[1]->dump();
 			}
+			continue;
 		}
+
+		// save the target in case it selfdestructs and we need to manually exit the cutscene
+		core->SetCutSceneRunner(target);
+
+		// the original first queued them all similarly to DialogHandler::DialogChoose
+		if (target->Type != ST_ACTOR) {
+			response->actions.insert(response->actions.begin(), GenerateAction("SetInterrupt(FALSE)"));
+			response->actions.push_back(GenerateAction("SetInterrupt(TRUE)"));
+		}
+		rS->responses[0]->Execute(target);
+
+		// NOTE: this will break blocking instants, if there are any
+		target->ReleaseCurrentAction();
 	}
 }
 
