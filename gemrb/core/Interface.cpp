@@ -1985,6 +1985,7 @@ bool Interface::DelSymbol(unsigned int index)
 /** Plays a Movie */
 int Interface::PlayMovie(const ResRef& movieRef)
 {
+	if (IsStar(movieRef)) return -1;
 	ResRef actualMovieRef = movieRef;
 
 	//check whether there is an override for this movie

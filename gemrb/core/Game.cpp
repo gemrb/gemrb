@@ -1446,9 +1446,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		} else {
 			res=&daymovies[areatype];
 		}
-		if (!IsStar(*res)) {
-			core->PlayMovie(*res);
-		}
+		core->PlayMovie(*res);
 	}
 }
 
@@ -1847,9 +1845,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 		} else {
 			movie = &restmovies[dream];
 		}
-		if (!IsStar(*movie)) {
-			core->PlayMovie(*movie);
-		}
+		core->PlayMovie(*movie);
 	}
 
 	//set partyrested flags
