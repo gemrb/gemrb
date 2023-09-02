@@ -152,6 +152,8 @@ You can use it for example this way (if running from the build dir):
 Check out `admin/enable-ie-git-diff` if you want `git log` and others to be able
 to display diffs of included binary files (spells and other overrides).
 
+- `make test` will run the core test suite if you built with googletest installed
+
 
 ## Version tracking
 
