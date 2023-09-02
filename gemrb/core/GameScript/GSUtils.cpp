@@ -823,9 +823,7 @@ static Point FindOffScreenPoint(const Scriptable* Sender, int flags, int phase)
 			bool isPassable = InspectEdges(walkableStartPoint, vp, currentStep, phase ? slowlyIncrements : finalRandStep);
 
 			++currentStep;
-			if (currentStep > 3) {
-				currentStep = 0;
-			}
+			currentStep %= 4;
 
 			if (isPassable) {
 				// Check if the search map allows a creature to be at walkableStartPoint (note: ignoring creatureSize)
