@@ -6,7 +6,7 @@ env:
   SSHKEY: ENCRYPTED[!55736b62f38817758b30fa42d741a6287a946d9201398343963b140be4e47df5658aa06523db4193329c70a0dfc17672!]
 
 build_task:
-  brew_script: brew install sdl2 openal-soft sdl2_mixer libpng libvorbis openssh
+  brew_script: brew install sdl2 openal-soft sdl2_mixer libpng libvorbis openssh googletest
 
   cmake_script:
     # FindOpenAL prefers the framework version by default ... which deprecated OpenAL
