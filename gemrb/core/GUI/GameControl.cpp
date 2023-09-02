@@ -667,69 +667,70 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 			game->SendHotKey(towupper(Key.character));
 			return View::OnKeyPress(Key, mod);
 		}
-	} else {
-			switch (keycode) {
-				case GEM_UP:
-				case GEM_DOWN:
-				case GEM_LEFT:
-				case GEM_RIGHT:
-					{
-						ieDword keyScrollSpd = core->GetVariable("Keyboard Scroll Speed", 64);
+		return true;
+	}
 
-						if (keycode >= GEM_UP) {
-							int v = (keycode == GEM_UP) ? -1 : 1;
-							Scroll( Point(0, keyScrollSpd * v) );
-						} else {
-							int v = (keycode == GEM_LEFT) ? -1 : 1;
-							Scroll( Point(keyScrollSpd * v, 0) );
-						}
-					}
-					break;
-				case GEM_TAB: // show partymember hp/maxhp as overhead text
-				// fallthrough
-				case GEM_ESCAPE: // redraw actionbar
-					// do nothing; these are handled in DispatchEvent due to tab having two functions
-					break;
-				case '0':
-					game->SelectActor( NULL, false, SELECT_NORMAL );
-					i = game->GetPartySize(false)/2+1;
-					while(i--) {
-						SelectActor(i, true);
-					}
-					break;
-				case '-':
-					game->SelectActor( NULL, true, SELECT_NORMAL );
-					i = game->GetPartySize(false)/2+1;
-					while(i--) {
-						SelectActor(i, false);
-					}
-					break;
-				case '=':
-					SelectActor(-1);
-					break;
-				case '7': // 1 & 2
-				case '8': // 3 & 4
-				case '9': // 5 & 6
-					// We do not handle the range 1..6, these are handled as hotkeys
-					// for the portrait buttons, so that they remain working when the
-					// inventory screen is open.
-					game->SelectActor( NULL, false, SELECT_NORMAL );
-					i = game->GetPartySize(false);
-					pc = 2*(keycode - '6')-1;
-					if (pc >= i) {
-						SelectActor(i, true);
-						break;
-					}
-					SelectActor(pc, true);
-					SelectActor(pc+1, true);
-					break;
-				default:
-					if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
-						game->SendHotKey(towupper(Key.character));
-						return View::OnKeyPress(Key, 0);
-					}
-					break;
+	switch (keycode) {
+		case GEM_UP:
+		case GEM_DOWN:
+		case GEM_LEFT:
+		case GEM_RIGHT:
+			{
+				ieDword keyScrollSpd = core->GetVariable("Keyboard Scroll Speed", 64);
+
+				if (keycode >= GEM_UP) {
+					int v = (keycode == GEM_UP) ? -1 : 1;
+					Scroll(Point(0, keyScrollSpd * v));
+				} else {
+					int v = (keycode == GEM_LEFT) ? -1 : 1;
+					Scroll(Point(keyScrollSpd * v, 0));
+				}
 			}
+			break;
+		case GEM_TAB: // show partymember hp/maxhp as overhead text
+		// fallthrough
+		case GEM_ESCAPE: // redraw actionbar
+			// do nothing; these are handled in DispatchEvent due to tab having two functions
+			break;
+		case '0':
+			game->SelectActor(nullptr, false, SELECT_NORMAL);
+			i = game->GetPartySize(false) / 2 + 1;
+			while (i--) {
+				SelectActor(i, true);
+			}
+			break;
+		case '-':
+			game->SelectActor(nullptr, true, SELECT_NORMAL);
+			i = game->GetPartySize(false) / 2 + 1;
+			while (i--) {
+				SelectActor(i, false);
+			}
+			break;
+		case '=':
+			SelectActor(-1);
+			break;
+		case '7': // 1 & 2
+		case '8': // 3 & 4
+		case '9': // 5 & 6
+			// We do not handle the range 1..6, these are handled as hotkeys
+			// for the portrait buttons, so that they remain working when the
+			// inventory screen is open.
+			game->SelectActor(nullptr, false, SELECT_NORMAL);
+			i = game->GetPartySize(false);
+			pc = 2 * (keycode - '6') - 1;
+			if (pc >= i) {
+				SelectActor(i, true);
+				break;
+			}
+			SelectActor(pc, true);
+			SelectActor(pc + 1, true);
+			break;
+		default:
+			if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
+				game->SendHotKey(towupper(Key.character));
+				return View::OnKeyPress(Key, 0);
+			}
+			break;
 	}
 	return true;
 }
