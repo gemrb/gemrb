@@ -13,7 +13,7 @@ build_task:
     - openal="-DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/AL -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib"
     - mkdir build && cd build
     - export OPENALDIR="/usr/local/opt/openal-soft/"
-    - cmake -DCMAKE_INSTALL_PREFIX=iprefix -DBIN_DIR="$CIRRUS_WORKING_DIR" $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off ..
+    - cmake -DCMAKE_INSTALL_PREFIX=iprefix -DBIN_DIR="$CIRRUS_WORKING_DIR" $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off -DUSE_TESTS=ON ..
 
   build_script:
     - cd build
@@ -23,7 +23,7 @@ build_task:
     - make install
 
   test_script:
-    - true # noop, try real testing on this platform later
+    - make test # also try real testing on this platform later if creating a display succeeds
 
   publish_script:
     - if [[ $CIRRUS_REPO_OWNER != 'gemrb' ]]; then exit 0; fi
