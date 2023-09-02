@@ -1306,14 +1306,11 @@ static const ObjectLink* FindObject(StringView objectname)
 	return NULL;
 }
 
-static const IDSLink* FindIdentifier(const char* idsname)
+static const IDSLink* FindIdentifier(const std::string& idsname)
 {
-	if (!idsname) {
-		return NULL;
-	}
-	int len = (int)strlen( idsname );
+	int len = static_cast<int>(idsname.size());
 	for (int i = 0; idsnames[i].Name; i++) {
-		if (!strnicmp( idsnames[i].Name, idsname, len )) {
+		if (!strnicmp(idsnames[i].Name, idsname.c_str(), len)) {
 			return idsnames + i;
 		}
 	}
@@ -1555,16 +1552,14 @@ void InitializeIEScript()
 
 	ObjectIDSTableNames.resize(ObjectIDSCount);
 	for (int i = 0; i < ObjectIDSCount; i++) {
-		const char *idsname;
-		idsname=objNameTable->QueryField( 0, i + 1 ).c_str();
-		const IDSLink *poi=FindIdentifier( idsname );
-		if (poi==NULL) {
-			idtargets[i]=NULL;
+		const std::string& idsName = objNameTable->QueryField(0, i + 1);
+		const IDSLink* poi = FindIdentifier(idsName.c_str());
+		if (poi == nullptr) {
+			idtargets[i] = nullptr;
+		} else {
+			idtargets[i] = poi->Function;
 		}
-		else {
-			idtargets[i]=poi->Function;
-		}
-		ObjectIDSTableNames[i] = ResRef(idsname);
+		ObjectIDSTableNames[i] = ResRef(idsName);
 	}
 	MaxObjectNesting = objNameTable->QueryFieldSigned<int>(1, 0);
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
