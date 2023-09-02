@@ -1503,6 +1503,17 @@ static void LoadActionFlags(const ResRef& tableName, int flag, bool critical)
 	}
 }
 
+template<typename L, typename F>
+static void CheckSynonym(const L& names, const F& func, const std::string& idx)
+{
+	for (int i = 0; names[i].Name; i++) {
+		if (func == names[i].Function) {
+			Log(MESSAGE, "GameScript", "{} is a synonym of {}", idx, names[i].Name);
+			break;
+		}
+	}
+}
+
 void InitializeIEScript()
 {
 	std::list<int> missing_triggers;
@@ -1619,12 +1630,7 @@ void InitializeIEScript()
 		
 		TriggerFunction f = triggers[ii];
 		if (f) {
-			for (int i = 0; triggernames[i].Name; i++) {
-				if (f == triggernames[i].Function) {
-					ScriptDebugLog(DebugMode::TRIGGERS, "{} is a synonym of {}", triggersTable->GetStringIndex(j), triggernames[i].Name);
-					break;
-				}
-			}
+			CheckSynonym(triggernames, f, triggersTable->GetStringIndex(j));
 			continue;
 		}
 
@@ -1753,12 +1759,7 @@ void InitializeIEScript()
 
 		ActionFunction f = actions[ii];
 		if (f) {
-			for (int i = 0; actionnames[i].Name; i++) {
-				if (f == actionnames[i].Function) {
-					ScriptDebugLog(DebugMode::ACTIONS, "{} is a synonym of {}", actionsTable->GetStringIndex(j), actionnames[i].Name);
-					break;
-				}
-			}
+			CheckSynonym(actionnames, f, actionsTable->GetStringIndex(j));
 			continue;
 		}
 		std::string buffer("Couldn't assign function to action: ");
@@ -1806,13 +1807,7 @@ void InitializeIEScript()
 
 		ObjectFunction f = objects[ii];
 		if (f) {
-			for (int i = 0; objectnames[i].Name; i++) {
-				if (f == objectnames[i].Function) {
-					Log(MESSAGE, "GameScript", "{} is a synonym of {}",
-						objectsTable->GetStringIndex( j ), objectnames[i].Name );
-					break;
-				}
-			}
+			CheckSynonym(objectnames, f, objectsTable->GetStringIndex(j));
 			continue;
 		}
 		std::string buffer("Couldn't assign function to object: ");
