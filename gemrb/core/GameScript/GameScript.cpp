@@ -1012,6 +1012,7 @@ static const ActionLink actionnames[] = {
 	{"spellnodec", GameScript::SpellNoDec, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"spellpointnodec", GameScript::SpellPointNoDec, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"spellwait", GameScript::Spell, AF_BLOCKING | AF_ALIVE | AF_IWD2_OVERRIDE},
 	{"startcombatcounter", GameScript::StartCombatCounter, 0},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutsceneex", GameScript::StartCutSceneEx, 0}, //pst (unknown), EE perhaps as of PST:EE
