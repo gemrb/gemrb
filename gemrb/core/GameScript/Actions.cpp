@@ -3602,7 +3602,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->SetPause(PAUSE_ON, PF_QUIET);
+	core->SetPause(PauseState::On, PF_QUIET);
 	// bg2 sometimes calls IncrementChapter("") right after a TextScreen("sometable"),
 	// so we make sure they don't cancel out
 	if (!parameters->resref0Parameter.IsEmpty()) {

@@ -9996,24 +9996,24 @@ movement. It doesn't affect the GUI.\n\
 
 static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 {
-	int pause, quiet;
+	int quiet;
 	int ret;
-	PARSE_ARGS( args,  "ii", &pause, &quiet);
+	PauseState pause;
+	PARSE_ARGS(args, "Ii", &pause, &quiet);
 
 	GET_GAMECONTROL();
 
 	//this will trigger when pause is not 0 or 1
-	switch(pause)
-	{
-	case 2:
-		ret = core->TogglePause();
-		break;
-	case 0:
-	case 1:
-		core->SetPause((PauseSetting)pause, quiet);
-		// fall through
-	default:
-		ret = gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
+	switch (pause) {
+		case PauseState::Toggle:
+			ret = int(core->TogglePause());
+			break;
+		case PauseState::Off:
+		case PauseState::On:
+			core->SetPause(pause, quiet);
+			// fall through
+		default:
+			ret = gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS;
 	}
 	RETURN_BOOL(ret);
 }

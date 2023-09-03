@@ -1864,7 +1864,7 @@ void Interface::AskAndExit()
 	ieDword askExit = GetVariable("AskAndExit", 0);
 
 	if (game && !askExit) {
-		SetPause(PAUSE_ON);
+		SetPause(PauseState::On);
 		vars["AskAndExit"] = 1;
 
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
@@ -3856,16 +3856,16 @@ int Interface::GetWisdomBonus(int column, int value) const
 	return abilityTables->wisbon[value];
 }
 
-PauseSetting Interface::TogglePause() const
+PauseState Interface::TogglePause() const
 {
 	const GameControl *gc = GetGameControl();
-	if (!gc) return PAUSE_OFF;
-	PauseSetting pause = (PauseSetting)(~gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
+	if (!gc) return PauseState::Off;
+	PauseState pause = (PauseState) ((gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0);
 	if (SetPause(pause)) return pause;
-	return (PauseSetting)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
+	return (PauseState) ((gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS) > 0);
 }
 
-bool Interface::SetPause(PauseSetting pause, int flags) const
+bool Interface::SetPause(PauseState pause, int flags) const
 {
 	GameControl *gc = GetGameControl();
 
@@ -3874,7 +3874,7 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 
 	if (gc && ((bool)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) != (bool)pause)) { // already paused
 		HCStrings strref;
-		if (pause) {
+		if (pause == PauseState::On) {
 			strref = HCStrings::Paused;
 			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BitOp::OR);
 		} else {
@@ -3882,7 +3882,7 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BitOp::NAND);
 		}
 		if (!(flags&PF_QUIET) ) {
-			if (pause) gc->SetDisplayText(strref, 0); // time 0 = removed instantly on unpause (for pst)
+			if (pause == PauseState::On) gc->SetDisplayText(strref, 0); // time 0 = removed instantly on unpause (for pst)
 			displaymsg->DisplayConstantString(strref, GUIColors::RED);
 		}
 		return true;
@@ -3901,7 +3901,7 @@ bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 		return false;
 	}
 
-	if (!SetPause(PAUSE_ON, PF_QUIET)) {
+	if (!SetPause(PauseState::On, PF_QUIET)) {
 		return false;
 	}
 

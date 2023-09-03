@@ -235,9 +235,10 @@ enum class AUTOPAUSE : ieDword {
 #define SLOT_EFFECT_HEAD     7 //head slot
 #define SLOT_EFFECT_ALIAS    100 // marker for aliased slots
 
-enum PauseSetting {
-	PAUSE_OFF = 0,
-	PAUSE_ON = 1
+enum class PauseState {
+	Off = 0,
+	On = 1,
+	Toggle = 2
 };
 
 enum RESOURCE_DIRECTORY {
@@ -596,9 +597,9 @@ public:
 	/** saves the .are and .sto files to the destination folder */
 	int CompressSave(const path_t& folder, bool overrideRunning);
 	/** toggles the pause. returns either PAUSE_ON or PAUSE_OFF to reflect the script state after toggling. */
-	PauseSetting TogglePause() const;
+	PauseState TogglePause() const;
 	/** returns true the passed pause setting was applied. false otherwise. */
-	bool SetPause(PauseSetting pause, int flags = 0) const;
+	bool SetPause(PauseState pause, int flags = 0) const;
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
 	bool Autopause(AUTOPAUSE flag, Scriptable *target) const;
 	/** registers engine opcodes */

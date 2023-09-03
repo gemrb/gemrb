@@ -872,7 +872,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					// but it's annoying on desktops, so we try to detect them
 					if (TouchInputEnabled()) {
 						core->GetAudioDrv()->Pause();//this is for ANDROID mostly
-						core->SetPause(PAUSE_ON);
+						core->SetPause(PauseState::On);
 					}
 					break;
 				case SDL_WINDOWEVENT_RESTORED: //SDL 1.3
