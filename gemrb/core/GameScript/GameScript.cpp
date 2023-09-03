@@ -1428,17 +1428,22 @@ static void CleanupIEScript()
 	overrideTriggersTable.reset();
 }
 
-static void printFunction(std::string& buffer, const PluginHolder<SymbolMgr>& table, int index)
+static void printFunction(std::string& buffer, const std::string& str, int value)
 {
-	const auto& str = table->GetStringIndex(index);
-	int value = table->GetValueIndex(index);
-
 	size_t len = str.find_first_of('(');
 	if (len == std::string::npos) {
 		AppendFormat(buffer, "{} {}", value, str);
 	} else {
 		AppendFormat(buffer, "{} {:*^{}}", value, str, len);
 	}
+}
+
+static void printFunction(std::string& buffer, const PluginHolder<SymbolMgr>& table, int index)
+{
+	const auto& str = table->GetStringIndex(index);
+	int value = table->GetValueIndex(index);
+
+	return printFunction(buffer, str, value);
 }
 
 static void LoadActionFlags(const ResRef& tableName, int flag, bool critical)
@@ -1502,11 +1507,11 @@ static void SetupTriggers()
 		if (triggers[i]) {
 			if (poi && triggers[i] != poi->Function) {
 				std::string buffer = fmt::format("{} is in collision with ", name);
-				printFunction(buffer, triggersTable, triggersTable->FindValue(i));
+				printFunction(buffer, name, i);
 				Log(WARNING, "GameScript", "{}", buffer);
 			} else if (InDebugMode(DebugMode::TRIGGERS)) {
 				std::string buffer = fmt::format("{} is a synonym of ", name);
-				printFunction(buffer, triggersTable, triggersTable->FindValue(i));
+				printFunction(buffer, name, i);
 				Log(DEBUG, "GameScript", "{}", buffer);
 			}
 			continue; // we already found an alternative
@@ -1562,11 +1567,11 @@ static void SetupActions()
 		if (actions[i]) {
 			if (poi && actions[i] != poi->Function) {
 				std::string buffer = fmt::format("{} is in collision with ", name);
-				printFunction(buffer, actionsTable, actionsTable->FindValue(i));
+				printFunction(buffer, name, i);
 				Log(WARNING, "GameScript", "{}", buffer);
 			} else if (InDebugMode(DebugMode::ACTIONS)) {
 				std::string buffer = fmt::format("{} is a synonym of ", name);
-				printFunction(buffer, actionsTable, actionsTable->FindValue(i));
+				printFunction(buffer, name, i);
 				Log(DEBUG, "GameScript", "{}", buffer);
 			}
 			continue; // we already found an alternative
@@ -1616,11 +1621,11 @@ static void SetupObjects()
 		if (objects[i]) {
 			if (poi && objects[i] != poi->Function) {
 				std::string buffer = fmt::format("{} is in collision with ", name);
-				printFunction(buffer, objectsTable, objectsTable->FindValue(i));
+				printFunction(buffer, name, i);
 				Log(WARNING, "GameScript", "{}", buffer);
 			} else {
 				std::string buffer = fmt::format("{} is a synonym of ", name);
-				printFunction(buffer, objectsTable, objectsTable->FindValue(i));
+				printFunction(buffer, name, i);
 				Log(DEBUG, "GameScript", "{}", buffer);
 			}
 			continue;
@@ -1666,7 +1671,7 @@ static void SetupOverrideActions()
 		const ActionLink* poi = FindLink<ActionLink>(name, actionnames);
 		if (!poi) {
 			std::string buffer("Couldn't assign function to override action: ");
-			printFunction(buffer, overrideActionsTable, static_cast<int>(j));
+			printFunction(buffer, name, i);
 			continue;
 		}
 		if (actions[i] && (actions[i] != poi->Function || actionflags[i] != poi->Flags)) {
@@ -1675,7 +1680,7 @@ static void SetupOverrideActions()
 			if (x >= 0) {
 				printFunction(buffer, actionsTable, actionsTable->FindValue(i));
 			} else {
-				printFunction(buffer, overrideActionsTable, overrideActionsTable->FindValue(i));
+				printFunction(buffer, name, i);
 			}
 			Log(MESSAGE, "GameScript", "{}", buffer);
 		}
@@ -1702,7 +1707,7 @@ static void SetupOverrideTriggers()
 		const TriggerLink* poi = FindLink<TriggerLink>(trName, triggernames);
 		if (!poi) {
 			std::string buffer("Couldn't assign function to override trigger: ");
-			printFunction(buffer, overrideTriggersTable, static_cast<int>(j));
+			printFunction(buffer, trName, i);
 			continue;
 		}
 
