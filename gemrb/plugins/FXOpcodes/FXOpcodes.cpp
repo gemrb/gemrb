@@ -4504,9 +4504,15 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		const SrcVector* strList = gamedata->SrcManager.GetSrc(fx->Resource);
 		if (!strList->IsEmpty()) {
 			ieStrRef str = strList->RandomRef();
-			fx->Parameter1 = ieDword(str);
-			DisplayStringCore(target, str, DS_HEAD);
-			target->overColor = Color(fx->Parameter2);
+			// mrttaunt.src has placeholder text, but valid audio, so enable just sound
+			if (fx->IsVariable) {
+				StringBlock sb = core->strings->GetStringBlock(str);
+				core->GetAudioDrv()->Play(StringView(sb.Sound), SFX_CHAN_ACTIONS, target->Pos);
+			} else {
+				fx->Parameter1 = ieDword(str);
+				DisplayStringCore(target, str, DS_HEAD);
+				target->overColor = Color(fx->Parameter2);
+			}
 			return FX_NOT_APPLIED;
 		}
 
