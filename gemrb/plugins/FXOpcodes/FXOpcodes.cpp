@@ -3256,7 +3256,10 @@ int fx_cure_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 // 0x52 SetAIScript
 int fx_set_ai_script (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_set_ai_state(%2d): Resource: %s, Type: %d", fx->Opcode, fx->Resource, fx->Parameter2);
+	// spin101 litany is supposed to sick enemies at Morte, but they didn't set the field ...
+	if (fx->Resource.IsEmpty() && fx->SourceRef == "spin101") {
+		fx->Resource = fx->SourceRef;
+	}
 	target->SetScript (fx->Resource, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
