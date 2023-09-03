@@ -1261,49 +1261,20 @@ static const IDSLink idsnames[] = {
 
 static int NextTriggerObjectID = 0;
 
-static const TriggerLink* FindTrigger(StringView triggername)
+template<typename L, typename L2>
+static const L* FindLink(StringView name, const L2& names)
 {
-	if (triggername.empty()) {
+	if (name.empty()) {
 		return nullptr;
 	}
 
-	auto len = std::min(FindFirstOf(triggername, "("), triggername.length());
-	for (int i = 0; triggernames[i].Name; i++) {
-		if (!strnicmp(triggernames[i].Name, triggername.c_str(), len)) {
-			return triggernames + i;
+	auto len = std::min(FindFirstOf(name, "("), name.length());
+	for (int i = 0; names[i].Name; i++) {
+		if (!strnicmp(names[i].Name, name.c_str(), len)) {
+			return &names[i];
 		}
 	}
-	return NULL;
-}
-
-static const ActionLink* FindAction(StringView actionname)
-{
-	if (actionname.empty()) {
-		return nullptr;
-	}
-
-	auto len = std::min(FindFirstOf(actionname, "("), actionname.length());
-	for (int i = 0; actionnames[i].Name; i++) {
-		if (!strnicmp(actionnames[i].Name, actionname.c_str(), len)) {
-			return actionnames + i;
-		}
-	}
-	return NULL;
-}
-
-static const ObjectLink* FindObject(StringView objectname)
-{
-	if (objectname.empty()) {
-		return nullptr;
-	}
-
-	auto len = std::min(FindFirstOf(objectname, "("), objectname.length());
-	for (int i = 0; objectnames[i].Name; i++) {
-		if (!strnicmp(objectnames[i].Name, objectname.c_str(), len)) {
-			return objectnames + i;
-		}
-	}
-	return NULL;
+	return nullptr;
 }
 
 static const IDSLink* FindIdentifier(const std::string& idsname)
@@ -1581,7 +1552,7 @@ void InitializeIEScript()
 	size_t max = triggersTable->GetSize();
 	for (size_t j = 0; j < max; j++) {
 		int i = triggersTable->GetValueIndex(j);
-		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ));
+		const TriggerLink* poi = FindLink<TriggerLink>(triggersTable->GetStringIndex(j), triggernames);
 
 		bool was_condition = (i & 0x4000);
 		i &= 0x3fff;
@@ -1643,7 +1614,7 @@ void InitializeIEScript()
 				i, actionsTable->GetStringIndex( j ) );
 			continue;
 		}
-		const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ));
+		const ActionLink* poi = FindLink<ActionLink>(actionsTable->GetStringIndex(j), actionnames);
 		if (actions[i]) {
 			if (poi && actions[i]!=poi->Function) {
 				std::string buffer = fmt::format("{} is in collision with ",
@@ -1680,7 +1651,7 @@ void InitializeIEScript()
 					i, overrideActionsTable->GetStringIndex( j ) );
 				continue;
 			}
-			const ActionLink *poi = FindAction( overrideActionsTable->GetStringIndex( j ));
+			const ActionLink* poi = FindLink<ActionLink>(overrideActionsTable->GetStringIndex(j), actionnames);
 			if (!poi) {
 				std::string buffer("Couldn't assign function to override action: ");
 				printFunction(buffer, overrideActionsTable, static_cast<int>(j));
@@ -1720,7 +1691,7 @@ void InitializeIEScript()
 			if (!NextTriggerObjectID && !stricmp(trName.c_str(), "NextTriggerObject(O:Object*)")) {
 				NextTriggerObjectID = i;
 			}
-			const TriggerLink *poi = FindTrigger(trName);
+			const TriggerLink* poi = FindLink<TriggerLink>(trName, triggernames);
 			if (!poi) {
 				std::string buffer("Couldn't assign function to override trigger: ");
 				printFunction(buffer, overrideTriggersTable, static_cast<int>(j));
@@ -1770,7 +1741,7 @@ void InitializeIEScript()
 			Log(ERROR, "GameScript", "object {} ({}) is too high, ignoring", i, objectsTable->GetStringIndex(j));
 			continue;
 		}
-		const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ));
+		const ObjectLink* poi = FindLink<ObjectLink>(objectsTable->GetStringIndex(j), objectnames);
 		if (objects[i]) {
 			if (poi && objects[i]!=poi->Function) {
 				std::string buffer = fmt::format("{} is in collision with ",
