@@ -245,8 +245,6 @@ bool OpenALAudioDriver::Init(void)
 	}
 
 	ambim = new AmbientMgr;
-	speech.free = true;
-	speech.ambient = false;
 	return true;
 }
 
