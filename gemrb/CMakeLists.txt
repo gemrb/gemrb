@@ -172,6 +172,7 @@ ENDIF(VITA)
 # Tests
 IF (BUILD_TESTING)
   ADD_EXECUTABLE(Test_gemrb_core
+    tests/core/Strings/Test_CString.cpp
     tests/core/Strings/Test_UTF8Comparison.cpp
     tests/core/System/Test_VFS.cpp
   )
