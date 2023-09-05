@@ -705,8 +705,14 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	}
 	ip->TalkPos = talkPos;
 	ip->DialogName= dialogName;
-	ip->SetDialog(dialogResRef);
-	ip->SetEnter(wavResRef);
+
+	// PST has garbage here and there
+	if (dialogResRef.IsASCII()) {
+		ip->SetDialog(dialogResRef);
+	}
+	if (wavResRef.IsASCII()) {
+		ip->SetEnter(wavResRef);
+	}
 
 	if (script0.IsEmpty()) {
 		ip->Scripts[0] = nullptr;
