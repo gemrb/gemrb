@@ -238,6 +238,10 @@ public:
 	std::reverse_iterator<iterator> rend() noexcept {
 		return std::reverse_iterator<iterator>(begin());
 	}
+
+	bool IsASCII() noexcept {
+		return std::none_of(begin(), end(), [](char c) { return c < 0; });
+	}
 };
 
 }
