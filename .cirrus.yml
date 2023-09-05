@@ -27,7 +27,7 @@ build_task:
     - make test # also try real testing on this platform later if creating a display succeeds
 
   publish_script:
-    - if [[ $CIRRUS_REPO_OWNER != 'gemrb' ]]; then exit 0; fi
+    - if [[ $CIRRUS_REPO_OWNER != 'gemrb' || -n $CIRRUS_PR ]]; then exit 0; fi
     - # generate filename
     - # there are no tags, so improvise
     - v2=${CIRRUS_CHANGE_IN_REPO:0:8}
