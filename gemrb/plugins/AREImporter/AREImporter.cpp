@@ -1596,7 +1596,6 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading explored bitmap");
 	ieDword mapSize = ieDword(map->ExploredBitmap.Bytes());
-	assert(ExploredBitmapSize <= mapSize);
 	mapSize = std::min(mapSize, ExploredBitmapSize);
 	str->Seek(ExploredBitmapOffset, GEM_STREAM_START);
 	str->Read(map->ExploredBitmap.begin(), mapSize);
