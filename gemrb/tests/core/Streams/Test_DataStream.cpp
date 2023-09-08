@@ -21,6 +21,7 @@
 
 #include "Streams/FileStream.h"
 #include "Streams/MappedFileMemoryStream.h"
+#include "Streams/MemoryStream.h"
 
 #include "System/VFS.h"
 
@@ -35,6 +36,7 @@ enum class DummyEnum : uint16_t {
 
 static const path_t READ_TEST_FILE = PathJoin("tests", "resources", "streams", "file_le.bin");
 static const path_t DECRYPTION_TEST_FILE = PathJoin("tests", "resources", "streams", "file_encrypted.bin");
+static const path_t WRITE_TEST_FILE = PathJoin("tests", "resources", "streams", "write_check_le.bin");
 
 class DataStream_Test : public testing::TestWithParam<DataStreamFactory> {
 protected:
@@ -163,6 +165,39 @@ TEST_P(DataStream_DecryptionTest, ReadEncryptedValues) {
 		uint8_t v;
 		stream->ReadScalar(v);
 		EXPECT_EQ(v, i);
+	}
+}
+
+TEST(DataStream_WritingTest, Writes) {
+	void *buffer = malloc(35);
+	MemoryStream stream{"", buffer, 35};
+
+	EXPECT_EQ(stream.WriteScalar(uint8_t{0x1}), 1);
+	EXPECT_EQ(stream.WriteScalar(uint16_t{0x203}), 2);
+	auto length = stream.WriteScalar<uint16_t, uint8_t>(uint16_t{0x0});
+	EXPECT_EQ(length, 1);
+	EXPECT_EQ(stream.WriteEnum(DummyEnum::VALUE_11), 2);
+	EXPECT_EQ(stream.WriteFilling(7), 7);
+
+	Point p{0x8, 0x9};
+	EXPECT_EQ(stream.WritePoint(p), 4);
+
+	EXPECT_EQ(stream.WriteString(std::string{"String"}, 6), 6);
+	EXPECT_EQ(stream.WriteStringLC(std::string{"StRING"}, 6), 6);
+	EXPECT_EQ(stream.WriteStringUC(std::string{"sTring"}, 6), 6);
+	stream.Rewind();
+
+	FileStream checkStream{};
+	checkStream.Open(WRITE_TEST_FILE);
+
+	EXPECT_EQ(checkStream.Size(), stream.Size());
+
+	uint8_t v = 0;
+	uint8_t c = 0;
+	for (strpos_t i = 0; i < checkStream.Size(); ++i) {
+		checkStream.Read(&c, 1);
+		stream.Read(&v, 1);
+		EXPECT_EQ(v, c);
 	}
 }
 
