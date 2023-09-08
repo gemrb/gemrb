@@ -131,24 +131,36 @@ strret_t DataStream::ReadLine(std::string& buf, strpos_t maxlen)
 	if (Pos >= size) {
 		return Error;
 	}
-	
+
 	buf.clear();
 	buf.reserve(maxlen);
 	strpos_t i = 0;
-	//TODO: fix this to handle any combination of \r and \n
-	//Windows: \r\n
-	//Old Mac: \r
-	//otherOS: \n
+
 	while (Pos < size && i < (maxlen - 1)) {
 		char ch;
 		i += Read(&ch, 1);
-		if (ch == '\n')
+
+		if (ch == '\r') {
+			i += Read(&ch, 1);
+
+			if (ch == '\n') {
+				break;
+			} else {
+				i -= 1;
+				Seek(-1, GEM_CURRENT_POS);
+				break;
+			}
+		} else if (ch == '\n') {
 			break;
-		if (ch == '\t')
+		}
+
+		if (ch == '\t') {
 			ch = ' ';
-		if (ch != '\r')
-			buf.push_back(ch);
+		}
+
+		buf.push_back(ch);
 	}
+
 	return i;
 }
 

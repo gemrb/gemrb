@@ -247,17 +247,11 @@ void PathAppend(path_t& target, const path_t& name)
 		return;
 	}
 
-	auto scope = StringView{name.c_str(), name.length()};
-	// TotL has '\data\zcMHar.bif' in the key file
-	if (name[0] == '\\') {
-		scope = StringView{name.c_str() + 1, name.length() - 1};
-	}
-
-	if (!target.empty() && target.back() != PathDelimiter && *scope.begin() != PathDelimiter) {
+	if (!target.empty() && target.back() != PathDelimiter && *name.begin() != PathDelimiter) {
 		target.push_back(PathDelimiter);
 	}
 
-	target.append(scope.begin(), scope.end());
+	target.append(name.begin(), name.end());
 }
 
 static bool FindMatchInDir(const char* dir, MutableStringView item)
