@@ -1193,7 +1193,14 @@ void Interface::LoadFonts()
 		if (!fnt) {
 			error("Core", "Unable to load font resource: {} for ResRef {} (check fonts.2da)", font_name, resref);
 		} else {
-			fonts[resref] = fnt;
+			auto result = fonts.find(resref);
+			if (result != fonts.cend()) {
+				delete result->second;
+				result->second = fnt;
+			} else {
+				fonts[resref] = fnt;
+			}
+
 			Log(MESSAGE, "Core", "Loaded Font: {} for ResRef {}", font_name, resref);
 		}
 	}
