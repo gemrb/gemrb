@@ -166,6 +166,27 @@ void ScrollView::SetHScroll(ScrollBar*)
 	// this is currently a limitation in the Scrollbar class
 }
 
+void ScrollView::ToggleScrollbar(ScrollBar* sb, bool visible)
+{
+	sb->SetVisible(visible);
+	Size dims = sb->Dimensions();
+	// We have to change the frame size because we dont support overlapping views
+	if (visible) {
+		if (sb == vscroll) {
+			dims.w = savedSBSize.w;
+		} else { // hscroll visible
+			dims.h = savedSBSize.h;
+		}
+	} else if (sb == vscroll) {
+		savedSBSize.w = dims.w;
+		dims.w = 0;
+	} else { // hscroll hidden
+		savedSBSize.h = dims.h;
+		dims.h = 0;
+	}
+	sb->SetFrameSize(dims);
+}
+
 void ScrollView::UpdateScrollbars()
 {
 	// FIXME: this is assuming an origin of 0,0
@@ -179,15 +200,15 @@ void ScrollView::UpdateScrollbars()
 		hscroll->SetValue(-contentFrame.origin.x);
 	}
 	if (vscroll) {
+		bool show = false;
 		if (contentFrame.h > mySize.h) {
-			vscroll->SetVisible((Flags()&View::IgnoreEvents) ? false : true);
+			show = Flags() & View::IgnoreEvents;
 
 			int maxVal = contentFrame.h - mySize.h;
 			Control::ValueRange range(0, maxVal);
 			vscroll->SetValueRange(range);
-		} else {
-			vscroll->SetVisible(false);
 		}
+		ToggleScrollbar(vscroll, show);
 		vscroll->SetValue(-contentFrame.origin.y);
 	}
 }
@@ -252,11 +273,11 @@ void ScrollView::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (Flags()&IgnoreEvents) {
 		if (hscroll) {
-			hscroll->SetVisible(false);
+			ToggleScrollbar(hscroll, false);
 		}
 		
 		if (vscroll) {
-			vscroll->SetVisible(false);
+			ToggleScrollbar(vscroll, false);
 		}
 	}
 }

@@ -50,6 +50,7 @@ namespace GemRB {
 
 		ScrollBar* hscroll = nullptr;
 		ScrollBar* vscroll = nullptr;
+		Size savedSBSize;
 
 		ContentView contentView;
 
@@ -61,6 +62,7 @@ namespace GemRB {
 		void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 		
 		void FlagsChanged(unsigned int /*oldflags*/) override;
+		void ToggleScrollbar(ScrollBar*, bool visible);
 
 	protected:
 		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
