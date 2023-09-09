@@ -39,6 +39,10 @@ TileMap::~TileMap(void)
 	for (const Door *door : doors) {
 		delete door;
 	}
+
+	for (const Container *container : containers) {
+		delete container;
+	}
 }
 
 //this needs in case of a tileset switch (for extended night)
