@@ -355,7 +355,7 @@ bool Button::IsAnimated() const
 
 bool Button::IsOpaque() const
 {
-	bool opaque = View::IsOpaque();
+	bool opaque = Control::IsOpaque();
 	if (!opaque && animation && animation->Current())
 	{
 		auto AnimPicture = animation->Current();

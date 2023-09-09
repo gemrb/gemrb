@@ -123,7 +123,11 @@ void ScrollBar::ScrollDown()
 
 bool ScrollBar::IsOpaque() const
 {
-	return Frames[IMAGE_TROUGH]->HasTransparency() == false;
+	bool opaque = Control::IsOpaque();
+	if (!opaque) {
+		opaque = Frames[IMAGE_TROUGH]->HasTransparency() == false;
+	}
+	return opaque;
 }
 
 /** Draws the ScrollBar control */
