@@ -631,8 +631,6 @@ Interface::~Interface() noexcept
 
 	// Removing all stuff from Cache, except bifs
 	if (!config.KeepCache) DelTree(config.CachePath, true);
-	
-	VideoDriver.reset();
 }
 
 GameControl* Interface::StartGameControl()

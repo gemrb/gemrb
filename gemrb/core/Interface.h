@@ -367,7 +367,7 @@ public:
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
 
 	std::vector<Holder<Sprite2D> > Cursors;
-	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
+	std::array<std::array<Holder<Sprite2D>, 6>, MAX_CIRCLE_SIZE> GroundCircles;
 	std::vector<ieVariable> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	TimeStruct Time{};
