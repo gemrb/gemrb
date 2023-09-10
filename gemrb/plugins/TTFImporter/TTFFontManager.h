@@ -41,7 +41,7 @@ public:
 	bool Import(DataStream* stream) override;
 	void Close();
 
-	Font* GetFont(unsigned short pxSize, FontStyle style, bool background) override;
+	Holder<Font> GetFont(unsigned short pxSize, FontStyle style, bool background) override;
 };
 
 }

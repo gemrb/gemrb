@@ -60,7 +60,7 @@ void TextEdit::SetAlignment(unsigned char align)
 }
 
 /** Set Font */
-void TextEdit::SetFont(Font* f)
+void TextEdit::SetFont(Holder<Font> f)
 {
 	textContainer.SetFont(f);
 }

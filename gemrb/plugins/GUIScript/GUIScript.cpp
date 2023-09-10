@@ -2124,7 +2124,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			PyObject* pyColorNotVisited = nullptr;
 			PARSE_ARGS(constructArgs, "|OOOOO", &fontname, &anim, &pyColorNormal, &pyColorSelected, &pyColorNotVisited);
 			
-			Font* font = fontname ? core->GetFont(ResRefFromPy(fontname)) : nullptr;
+			auto font = fontname ? core->GetFont(ResRefFromPy(fontname)) : nullptr;
 			WorldMapControl* wmap = nullptr;
 			if (pyColorNormal) {
 				wmap = new WorldMapControl(rgn, font, ColorFromPy(pyColorNormal), ColorFromPy(pyColorSelected), ColorFromPy(pyColorNotVisited));

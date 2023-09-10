@@ -313,7 +313,7 @@ private:
 	ResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE]{};
 
-	ResRefMap<Font*> fonts;
+	ResRefMap<Holder<Font>> fonts;
 	ResRef ButtonFontResRef;
 	ResRef MovieFontResRef;
 	ResRef TextFontResRef;
@@ -394,10 +394,10 @@ public:
 	const ColorPal<32>& GetPalette32(uint8_t idx) const { return (idx >= palettes32.size()) ? palettes32[0] : palettes32[idx]; }
 	const ColorPal<256>& GetPalette256(uint8_t idx) const { return (idx >= palettes256.size()) ? palettes256[0] : palettes256[idx]; }
 	/** Returns a preloaded Font */
-	Font* GetFont(const ResRef&) const;
-	Font* GetTextFont() const;
+	Holder<Font> GetFont(const ResRef&) const;
+	Holder<Font> GetTextFont() const;
 	/** Returns the button font */
-	Font * GetButtonFont() const;
+	Holder<Font> GetButtonFont() const;
 	/** Get GUI Script Manager */
 	PluginHolder<ScriptEngine> GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor

@@ -76,7 +76,7 @@ public:
 	TextEdit& operator=(const TextEdit&) = delete;
 
 	// these all forward to the underlying TextContainer
-	void SetFont(Font* f);
+	void SetFont(Holder<Font> f);
 
 	/** Sets the Text of the current control */
 	void SetText(String string) override;

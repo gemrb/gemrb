@@ -51,8 +51,8 @@ private:
 	void DrawSelf(const Region& drawFrame, const Region&) override;
 
 public:
-	WorldMapControl(const Region& frame, Font *font);
-	WorldMapControl(const Region& frame, Font *font, const Color &normal, const Color &selected, const Color &notvisited);
+	WorldMapControl(const Region& frame, Holder<Font> font);
+	WorldMapControl(const Region& frame, Holder<Font> font, const Color &normal, const Color &selected, const Color &notvisited);
 
 	/** Allows modification of the scrolling factor from outside */
 	void ScrollDelta(const Point& delta) override;
@@ -81,7 +81,7 @@ protected:
 
 private:
 	//font for printing area names
-	Font* ftext;
+	Holder<Font> ftext;
 	//current area
 	ResRef currentArea;
 

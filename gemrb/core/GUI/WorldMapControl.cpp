@@ -32,7 +32,7 @@
 
 namespace GemRB {
 
-WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &normal, const Color &selected, const Color &notvisited)
+WorldMapControl::WorldMapControl(const Region& frame, Holder<Font> font, const Color &normal, const Color &selected, const Color &notvisited)
 	: Control(frame), ftext(font)
 {
 	color_normal = normal;
@@ -66,7 +66,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 	SetAction(std::move(handler), Control::ValueChange);
 }
 
-WorldMapControl::WorldMapControl(const Region& frame, Font *font)
+WorldMapControl::WorldMapControl(const Region& frame, Holder<Font> font)
 : WorldMapControl(frame, font,
 				  Color(0xf0, 0xf0, 0xf0, 0xff),
 				  Color(0xff, 0, 0, 0xff),

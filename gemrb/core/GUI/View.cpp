@@ -274,7 +274,7 @@ void View::Draw()
 		if (debuginfo) {
 			const ViewScriptingRef* ref = GetScriptingRef();
 			if (ref) {
-				const Font* fnt = core->GetTextFont();
+				auto fnt = core->GetTextFont();
 				ScriptingId id = ref->Id;
 				id &= 0x00000000ffffffff; // control id is lower 32bits
 

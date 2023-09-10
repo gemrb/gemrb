@@ -221,11 +221,11 @@ void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op
 	ContentContainer::OnMouseLeave(me, op);
 }
 
-TextArea::TextArea(const Region& frame, Font* text)
+TextArea::TextArea(const Region& frame, Holder<Font> text)
 : TextArea(frame, text, text)
 {}
 
-TextArea::TextArea(const Region& frame, Font* text, Font* caps)
+TextArea::TextArea(const Region& frame, Holder<Font> text, Holder<Font> caps)
 : Control(frame), scrollview(Region(Point(), Dimensions())), ftext(text), colors()
 {
 	colors[COLOR_HOVER] = SelectOptionHover;

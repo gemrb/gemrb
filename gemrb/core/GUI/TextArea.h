@@ -72,7 +72,7 @@ private:
 	
 	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {
-			OptSpan(const Region& frame, Font* font, const Color& fg, const Color& bg)
+			OptSpan(const Region& frame, Holder<Font> font, const Color& fg, const Color& bg)
 			: TextContainer(frame, font)
 			{
 				SetColors(fg, bg);
@@ -137,8 +137,8 @@ public:
 		COLOR_TYPE_COUNT
 	};
 
-	TextArea(const Region& frame, Font* text);
-	TextArea(const Region& frame, Font* text, Font* caps);
+	TextArea(const Region& frame, Holder<Font> text);
+	TextArea(const Region& frame, Holder<Font> text, Holder<Font> caps);
 	
 	~TextArea() final;
 
@@ -199,7 +199,7 @@ private: // Private attributes
 	Timer* historyTimer = nullptr;
 
 	/** Fonts */
-	Font* finit, * ftext;
+	Holder<Font> finit, ftext;
 	GemMarkupParser parser;
 	ContentContainer::Margin textMargins;
 

@@ -42,7 +42,7 @@ public:
 
 	bool Import(DataStream* stream) override;
 
-	Font* GetFont(ieWord pxSize, FontStyle style, bool background) override;
+	Holder<Font> GetFont(ieWord pxSize, FontStyle style, bool background) override;
 };
 
 }

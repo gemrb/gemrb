@@ -72,14 +72,14 @@ GemMarkupParser::GemMarkupParser()
 	state = TEXT;
 }
 
-GemMarkupParser::GemMarkupParser(const Font* ftext, Font::PrintColors textCols,
-								 const Font* finit, Font::PrintColors initCols)
+GemMarkupParser::GemMarkupParser(const Holder<Font> ftext, Font::PrintColors textCols,
+								 const Holder<Font> finit, Font::PrintColors initCols)
 {
 	state = TEXT;
 	ResetAttributes(ftext, textCols, finit, initCols);
 }
 
-void GemMarkupParser::ResetAttributes(const Font* ftext, Font::PrintColors textCols, const Font* finit, Font::PrintColors initCols)
+void GemMarkupParser::ResetAttributes(const Holder<Font> ftext, Font::PrintColors textCols, const Holder<Font> finit, Font::PrintColors initCols)
 {
 	while(!context.empty()) context.pop();
 	textBg = textCols.bg;
