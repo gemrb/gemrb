@@ -107,7 +107,7 @@ void TooltipBackground::Draw(Region rgn) const
 }
 
 
-Tooltip::Tooltip(const String& s, Font* fnt, const Font::PrintColors& cols, TooltipBackground* bg)
+Tooltip::Tooltip(const String& s, Holder<Font> fnt, const Font::PrintColors& cols, TooltipBackground* bg)
 : font(fnt), background(bg), colors(cols)
 {
 	SetText(s);

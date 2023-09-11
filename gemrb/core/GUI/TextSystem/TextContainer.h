@@ -74,7 +74,7 @@ class TextSpan final : public Content
 friend class TextContainer;
 private:
 	String text;
-	const Font* font;
+	const Holder<Font> font;
 	Font::PrintColors* colors = nullptr;
 	
 	struct TextLayoutRegion : LayoutRegion {
@@ -88,8 +88,8 @@ private:
 public:
 	// make a "block" of text that always occupies the area of "size", or autosizes if size in NULL
 	// TODO: we should probably be able to align the text in the frame
-	TextSpan(String string, const Font* font, const Size* = nullptr);
-	TextSpan(String string, const Font* font, Font::PrintColors cols, const Size* = nullptr);
+	TextSpan(String string, const Holder<Font> font, const Size* = nullptr);
+	TextSpan(String string, const Holder<Font> font, Font::PrintColors cols, const Size* = nullptr);
 	TextSpan(const TextSpan&) = delete;
 	~TextSpan() final;
 	TextSpan& operator=(const TextSpan&) = delete;
@@ -106,7 +106,7 @@ protected:
 	LayoutRegions LayoutForPointInRegion(Point p, const Region&) const override;
 
 private:
-	inline const Font* LayoutFont() const;
+	inline const Holder<Font> LayoutFont() const;
 	inline Region LayoutInFrameAtPoint(const Point&, const Region&) const;
 };
 
@@ -243,7 +243,7 @@ class TextContainer : public ContentContainer {
 private:
 	using TextLayout = TextSpan::TextLayoutRegion;
 	// default font/palette for adding plain text
-	Font* font;
+	Holder<Font> font;
 	Font::PrintColors* colors = nullptr;
 	unsigned char alignment = IE_FONT_ALIGN_LEFT;
 
@@ -270,7 +270,7 @@ private:
 	ContentIndex FindContentForChar(size_t idx);
 
 public:
-	TextContainer(const Region& frame, Font* font);
+	TextContainer(const Region& frame, Holder<Font> font);
 	TextContainer(const TextContainer&) = delete;
 	~TextContainer() override;
 	TextContainer& operator=(const TextContainer&) = delete;
@@ -280,7 +280,7 @@ public:
 	void DeleteText(size_t len);
 
 	void AppendText(String text);
-	void AppendText(String text, const Font* fnt, const Font::PrintColors* = nullptr);
+	void AppendText(String text, const Holder<Font> fnt, const Font::PrintColors* = nullptr);
 	String TextFrom(const Content*) const;
 	String Text() const;
 
@@ -290,8 +290,8 @@ public:
 	void ClearColors();
 	void SetColors(const Color& fg, const Color& bg);
 	const Font::PrintColors* TextColors() const { return colors; }
-	void SetFont(Font* fnt) { font = fnt; }
-	const Font* TextFont() const { return font; }
+	void SetFont(Holder<Font> fnt) { font = fnt; }
+	const Holder<Font> TextFont() const { return font; }
 	void SetAlignment(unsigned char align) { alignment = align; }
 
 	void CursorHome();

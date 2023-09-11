@@ -38,12 +38,12 @@ public:
 	};
 
 	GemMarkupParser();
-	GemMarkupParser(const Font* ftext, Font::PrintColors textCols,
-					const Font* finit, Font::PrintColors initCols);
+	GemMarkupParser(const Holder<Font> ftext, Font::PrintColors textCols,
+					const Holder<Font> finit, Font::PrintColors initCols);
 	~GemMarkupParser() noexcept = default;
 
-	void ResetAttributes(const Font *ftext, Font::PrintColors textCols,
-						 const Font *finit, Font::PrintColors initCols);
+	void ResetAttributes(const Holder<Font> ftext, Font::PrintColors textCols,
+						 const Holder<Font> finit, Font::PrintColors initCols);
 
 	void Reset();
 
@@ -57,16 +57,14 @@ private:
 		Font::PrintColors swapColor;
 
 		public:
-		const Font* TextFont;
-		const Font* SwapFont;
+		Holder<Font> TextFont;
+		Holder<Font> SwapFont;
 
 		public:
-		TextAttributes(const Font *text, Font::PrintColors textColor,
-					   const Font *init, Font::PrintColors initColor)
-		: textColor(textColor), swapColor(initColor)
+		TextAttributes(const Holder<Font> text, Font::PrintColors textColor,
+					   const Holder<Font> init, Font::PrintColors initColor)
+		: textColor(textColor), swapColor(initColor), TextFont(text), SwapFont(init)
 		{
-			TextFont = text;
-			SwapFont = init;
 			assert(TextFont && SwapFont);
 		}
 

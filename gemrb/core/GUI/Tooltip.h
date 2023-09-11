@@ -51,13 +51,13 @@ public:
 
 class Tooltip {
 	String text;
-	Font* font;
+	Holder<Font> font;
 	std::unique_ptr<TooltipBackground> background;
 	Size textSize;
 	Font::PrintColors colors;
 
 public:
-	Tooltip(const String& s, Font* fnt, const Font::PrintColors& cols, TooltipBackground* bg);
+	Tooltip(const String& s, Holder<Font> fnt, const Font::PrintColors& cols, TooltipBackground* bg);
 
 	void SetText(const String& s);
 	Size TextSize() const;

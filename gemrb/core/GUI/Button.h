@@ -142,7 +142,7 @@ public:
 	/** Sets horizontal overlay, used in portrait hp overlay */
 	void SetHorizontalOverlay(double clip, const Color &src, const Color &dest);
 	/** Sets font used for drawing button label */
-	void SetFont(Font* newfont);
+	void SetFont(Holder<Font> newfont);
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
 
@@ -172,7 +172,7 @@ public:
 private: // Private attributes
 	String Text;
 	bool hasText = false;
-	Font* font = nullptr;
+	Holder<Font> font = nullptr;
 	bool pulseBorder = false;
 	Color textColor = ColorWhite;
 

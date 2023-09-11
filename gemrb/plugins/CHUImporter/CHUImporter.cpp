@@ -249,7 +249,7 @@ static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame
 	str->ReadWord(maxInput);
 	// word: caseformat: 0 normal, 1 upper, 2 lower TODO (Allowed case in NI)
 	// word: typeformat, unknown
-	Font* fnt = core->GetFont(fontResRef);
+	auto fnt = core->GetFont(fontResRef);
 
 	auto bam = gamedata->GetFactoryResourceAs<const AnimationFactory>(cursorResRef, IE_BAM_CLASS_ID);
 	Holder<Sprite2D> cursor;
@@ -281,8 +281,8 @@ static void GetTextArea(DataStream* str, Control*& ctrl, const Region& ctrlFrame
 
 	str->ReadResRef(fontResRef);
 	str->ReadResRef(initResRef);
-	Font* textFont = core->GetFont(fontResRef);
-	Font* initialsFont = core->GetFont(initResRef);
+	auto textFont = core->GetFont(fontResRef);
+	auto initialsFont = core->GetFont(initResRef);
 	str->Read(&fore, 4);
 	str->Read(&init, 4);
 	str->Read(&back, 4);
@@ -317,7 +317,7 @@ static void GetLabel(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 	str->Read(&bgCol, 4);
 	str->ReadWord(alignment);
 
-	Font* fnt = core->GetFont(fontResRef);
+	auto fnt = core->GetFont(fontResRef);
 	textCol.a = bgCol.a = 0xff;
 	String text = core->GetString(textRef);
 	Label* lab = new Label(ctrlFrame, fnt, text);

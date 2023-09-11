@@ -608,9 +608,6 @@ Interface::~Interface() noexcept
 	delete worldmap;
 	delete keymap;
 
-	ResRefMap<Font*>::iterator fit = fonts.begin();
-	for (; fit != fonts.end(); ++fit)
-		delete (*fit).second;
 	// fonts need to be destroyed before TTF plugin
 	PluginMgr::Get()->RunCleanup();
 
@@ -631,8 +628,6 @@ Interface::~Interface() noexcept
 
 	// Removing all stuff from Cache, except bifs
 	if (!config.KeepCache) DelTree(config.CachePath, true);
-	
-	VideoDriver.reset();
 }
 
 GameControl* Interface::StartGameControl()
@@ -942,7 +937,7 @@ void Interface::Main()
 		SetMouseScrollSpeed(scrollSpeed(config.CapFPS));
 	}
 
-	const Font* fps = GetTextFont();
+	auto fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	Region fpsRgn(0, config.Height - 30, 80, 30);
 	String fpsstring = u"???.??? fps";
@@ -1186,7 +1181,7 @@ void Interface::LoadFonts()
 		FontStyle font_style = (FontStyle)tab->QueryFieldSigned<int>(rowName, "STYLE"); // not available in BAM fonts.
 		bool background = tab->QueryFieldSigned<int>(rowName, "BACKGRND") != 0;
 
-		Font* fnt = NULL;
+		Holder<Font> fnt;
 		ResourceHolder<FontManager> fntMgr = gamedata->GetResourceHolder<FontManager>(font_name);
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, background);
 
@@ -1194,6 +1189,7 @@ void Interface::LoadFonts()
 			error("Core", "Unable to load font resource: {} for ResRef {} (check fonts.2da)", font_name, resref);
 		} else {
 			fonts[resref] = fnt;
+
 			Log(MESSAGE, "Core", "Loaded Font: {} for ResRef {}", font_name, resref);
 		}
 	}
@@ -1527,21 +1523,21 @@ bool Interface::LoadEncoding()
 }
 
 /** Returns a preloaded Font */
-Font* Interface::GetFont(const ResRef& ResRef) const
+Holder<Font> Interface::GetFont(const ResRef& ResRef) const
 {
 	auto i = fonts.find(ResRef);
 	if (i != fonts.end()) {
 		return i->second;
 	}
-	return NULL;
+	return nullptr;
 }
 
-Font* Interface::GetTextFont() const
+Holder<Font> Interface::GetTextFont() const
 {
 	return GetFont( TextFontResRef );
 }
 
-Font* Interface::GetButtonFont() const
+Holder<Font> Interface::GetButtonFont() const
 {
 	return GetFont( ButtonFontResRef );
 }
@@ -2032,7 +2028,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 
 	public:
 		// default color taken from BGEE.lua
-		IESubtitles(class Font* fnt, const AutoTable& sttable, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
+		IESubtitles(Holder<Font> fnt, const AutoTable& sttable, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
 			for (TableMgr::index_t i = 0; i < sttable->GetRowCount(); ++i) {
@@ -2066,7 +2062,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	};
 
 	AutoTable sttable = gamedata->LoadTable(movieRef);
-	Font* font = GetFont(MovieFontResRef);
+	auto font = GetFont(MovieFontResRef);
 	if (sttable && font) {
 		int r = sttable->QueryFieldSigned<int>("red", "frame");
 		int g = sttable->QueryFieldSigned<int>("green", "frame");

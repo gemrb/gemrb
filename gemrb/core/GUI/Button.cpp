@@ -390,7 +390,7 @@ void Button::EnableBorder(int index, bool enabled)
 	}
 }
 
-void Button::SetFont(Font* newfont)
+void Button::SetFont(Holder<Font> newfont)
 {
 	font = newfont;
 }

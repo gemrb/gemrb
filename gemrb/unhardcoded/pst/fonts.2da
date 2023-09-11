@@ -9,7 +9,6 @@ FONTDLG
 5	NUMBER2		NUMBER2		14			0		0
 6	NUMBER3		NUMBER3		14			0		0
 7	SYSFONT		SYSFONT		14			0		1
-8	FONTDLG		FONTDLG		14			0		1
-9	NORMAL		FONTDLG		14			0		1
+8	NORMAL		FONTDLG		14			0		1
 
 # Customization How To: https://gemrb.org/Fonts

@@ -33,7 +33,7 @@ public:
 	// Public data members
 	static const TypeID ID;
 public:
-	virtual Font* GetFont(ieWord pxSize, FontStyle style, bool background)=0;
+	virtual Holder<Font> GetFont(ieWord pxSize, FontStyle style, bool background)=0;
 };
 
 }
