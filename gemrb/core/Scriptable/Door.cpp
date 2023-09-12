@@ -33,8 +33,6 @@
 
 namespace GemRB {
 
-#define YESNO(x) ( (x)?"Yes":"No")
-
 DoorTrigger::DoorTrigger(std::shared_ptr<Gem_Polygon> openTrigger, WallPolygonGroup&& openWalls,
 			std::shared_ptr<Gem_Polygon> closedTrigger, WallPolygonGroup&& closedWalls)
 : openWalls(std::move(openWalls)), closedWalls(std::move(closedWalls)),
@@ -478,18 +476,18 @@ std::string Door::dump() const
 	AppendFormat(buffer, "Debugdump of Door {}:\n", GetScriptName() );
 	AppendFormat(buffer, "Door Global ID: {}\n", GetGlobalID());
 	AppendFormat(buffer, "Position: {}\n", Pos);
-	AppendFormat(buffer, "Door Open: {}\n", YESNO(IsOpen()));
-	AppendFormat(buffer, "Door Locked: {}	Difficulty: {}\n", YESNO(Flags&DOOR_LOCKED), LockDifficulty);
-	AppendFormat(buffer, "Door Trapped: {}	Difficulty: {}\n", YESNO(Trapped), TrapRemovalDiff);
+	AppendFormat(buffer, "Door Open: {}\n", YesNo(IsOpen()));
+	AppendFormat(buffer, "Door Locked: {}	Difficulty: {}\n", YesNo(Flags & DOOR_LOCKED), LockDifficulty);
+	AppendFormat(buffer, "Door Trapped: {}	Difficulty: {}\n", YesNo(Trapped), TrapRemovalDiff);
 	if (Trapped) {
-		AppendFormat(buffer, "Trap Permanent: {} Detectable: {}\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
+		AppendFormat(buffer, "Trap Permanent: {} Detectable: {}\n", YesNo(Flags & DOOR_RESET), YesNo(Flags & DOOR_DETECTABLE));
 	}
-	AppendFormat(buffer, "Secret door: {} (Found: {})\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
+	AppendFormat(buffer, "Secret door: {} (Found: {})\n", YesNo(Flags & DOOR_SECRET), YesNo(Flags & DOOR_FOUND));
 	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	AppendFormat(buffer, "Script: {}, Key ({}) removed: {}, Dialog: {}\n", name, KeyResRef, YESNO(Flags&DOOR_KEY), Dialog);
+	AppendFormat(buffer, "Script: {}, Key ({}) removed: {}, Dialog: {}\n", name, KeyResRef, YesNo(Flags & DOOR_KEY), Dialog);
 	Log(DEBUG, "Door", "{}", buffer);
 	return buffer;
 }

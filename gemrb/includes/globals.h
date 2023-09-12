@@ -314,6 +314,11 @@ inline T CeilDiv(T dividend, T divisor)
 	}
 }
 
+inline std::string YesNo(bool test)
+{
+	return test ? "Yes" : "No";
+}
+
 }
 
 #endif //! GLOBALS_H

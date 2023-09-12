@@ -33,8 +33,6 @@
 
 namespace GemRB {
 
-#define YESNO(x) ( (x)?"Yes":"No")
-
 //crazy programmers couldn't decide which bit marks the alternative point
 static ieDword TRAP_USEPOINT = _TRAP_USEPOINT;
 static bool inited = false;
@@ -252,14 +250,14 @@ std::string InfoPoint::dump() const
 	AppendFormat(buffer, "Region Global ID: {}\n", GetGlobalID());
 	AppendFormat(buffer, "Position: {}\n", Pos);
 	AppendFormat(buffer, "TalkPos: {}\n", TalkPos);
-	AppendFormat(buffer, "UsePoint: {}  (on: {})\n", UsePoint, YESNO(GetUsePoint()));
+	AppendFormat(buffer, "UsePoint: {}  (on: {})\n", UsePoint, YesNo(GetUsePoint()));
 	AppendFormat(buffer, "TrapLaunch: {}\n", TrapLaunch);
 	switch(Type) {
 	case ST_TRAVEL:
 		AppendFormat(buffer, "Destination Area: {} Entrance: {}\n", Destination, EntranceName);
 		break;
 	case ST_PROXIMITY:
-		AppendFormat(buffer, "TrapDetected: {}, Trapped: {}\n", TrapDetected, YESNO(Trapped));
+		AppendFormat(buffer, "TrapDetected: {}, Trapped: {}\n", TrapDetected, YesNo(Trapped));
 		AppendFormat(buffer, "Trap detection: {}%, Trap removal: {}%\n", TrapDetectionDiff, TrapRemovalDiff);
 		break;
 	case ST_TRIGGER:
@@ -272,8 +270,8 @@ std::string InfoPoint::dump() const
 		name = Scripts[0]->GetName();
 	}
 	AppendFormat(buffer, "Script: {}, Key: {}, Dialog: {}\n", name, KeyResRef, Dialog);
-	AppendFormat(buffer, "Deactivated: {}\n", YESNO(Flags&TRAP_DEACTIVATED));
-	AppendFormat(buffer, "Active: {}\n", YESNO(InternalFlags&IF_ACTIVE));
+	AppendFormat(buffer, "Deactivated: {}\n", YesNo(Flags & TRAP_DEACTIVATED));
+	AppendFormat(buffer, "Active: {}\n", YesNo(InternalFlags & IF_ACTIVE));
 	Log(DEBUG, "InfoPoint", "{}", buffer);
 	return buffer;
 }

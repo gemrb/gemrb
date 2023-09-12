@@ -213,8 +213,6 @@ void TileProps::PaintSearchMap(const Point& Pos, uint16_t blocksize, const PathM
 	}
 }
 
-#define YESNO(x) ( (x)?"Yes":"No")
-
 struct Spawns {
 	ResRefMap<SpawnGroup> vars;
 	
@@ -2844,12 +2842,12 @@ std::string Map::dump(bool show_actors) const
 	}
 	buffer.append("\n");
 	AppendFormat(buffer, "Area Global ID:  {}\n", GetGlobalID());
-	AppendFormat(buffer, "OutDoor: {}\n", YESNO(AreaType & AT_OUTDOOR ) );
-	AppendFormat(buffer, "Day/Night: {}\n", YESNO(AreaType & AT_DAYNIGHT ) );
-	AppendFormat(buffer, "Extended night: {}\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
-	AppendFormat(buffer, "Weather: {}\n", YESNO(AreaType & AT_WEATHER ) );
-	AppendFormat(buffer, "Area Type: {}\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON));
-	AppendFormat(buffer, "Can rest: {}\n", YESNO(core->GetGame()->CanPartyRest(REST_AREA)));
+	AppendFormat(buffer, "OutDoor: {}\n", YesNo(AreaType & AT_OUTDOOR));
+	AppendFormat(buffer, "Day/Night: {}\n", YesNo(AreaType & AT_DAYNIGHT));
+	AppendFormat(buffer, "Extended night: {}\n", YesNo(AreaType & AT_EXTENDED_NIGHT));
+	AppendFormat(buffer, "Weather: {}\n", YesNo(AreaType & AT_WEATHER));
+	AppendFormat(buffer, "Area Type: {}\n", AreaType & (AT_CITY | AT_FOREST | AT_DUNGEON));
+	AppendFormat(buffer, "Can rest: {}\n", YesNo(core->GetGame()->CanPartyRest(REST_AREA)));
 
 	if (show_actors) {
 		buffer.append("\n");

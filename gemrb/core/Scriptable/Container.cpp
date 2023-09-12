@@ -33,8 +33,6 @@
 
 namespace GemRB {
 
-#define YESNO(x) ( (x)?"Yes":"No")
-
 Container::Container(void)
 	: Highlightable( ST_CONTAINER )
 {
@@ -238,8 +236,8 @@ std::string Container::dump() const
 	AppendFormat(buffer, "Debugdump of Container {}\n", GetScriptName() );
 	AppendFormat(buffer, "Container Global ID: {}\n", GetGlobalID());
 	AppendFormat(buffer, "Position: {}\n", Pos);
-	AppendFormat(buffer, "Type: {}, Locked: {}, LockDifficulty: {}\n", containerType, YESNO(Flags&CONT_LOCKED), LockDifficulty);
-	AppendFormat(buffer, "Flags: {}, Trapped: {}, Detected: {}\n", Flags, YESNO(Trapped), TrapDetected );
+	AppendFormat(buffer, "Type: {}, Locked: {}, LockDifficulty: {}\n", containerType, YesNo(Flags & CONT_LOCKED), LockDifficulty);
+	AppendFormat(buffer, "Flags: {}, Trapped: {}, Detected: {}\n", Flags, YesNo(Trapped), TrapDetected);
 	AppendFormat(buffer, "Trap detection: {}%, Trap removal: {}%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
 	ResRef name = "NONE";
