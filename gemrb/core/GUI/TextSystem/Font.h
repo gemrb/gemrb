@@ -187,9 +187,6 @@ public:
 
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
-	Holder<Sprite2D> RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
-								 size_t* numPrinted = NULL, Point* = NULL) const;
-
 	// return the number of glyphs printed
 	// the "point" parameter can be passed with a start point for rendering
 	// it will be filled with the point inside 'rgn' where the string ends upon return
