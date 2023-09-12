@@ -288,17 +288,16 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 
 	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
-		for (const auto& border : borders) {
-			const ButtonBorder *fr = &border;
-			if (! fr->enabled) continue;
+		for (const ButtonBorder& border : borders) {
+			if (!border.enabled) continue;
 
-			const Region& frRect = fr->rect;
+			const Region& frRect = border.rect;
 			Region r = Region( rgn.origin + frRect.origin, frRect.size );
-			if (pulseBorder && !fr->filled) {
-				Color mix = GlobalColorCycle.Blend(ColorWhite, fr->color);
-				VideoDriver->DrawRect( r, mix, fr->filled, BlitFlags::BLENDED );
+			if (pulseBorder && !border.filled) {
+				Color mix = GlobalColorCycle.Blend(ColorWhite, border.color);
+				VideoDriver->DrawRect(r, mix, border.filled, BlitFlags::BLENDED);
 			} else {
-				VideoDriver->DrawRect( r, fr->color, fr->filled, BlitFlags::BLENDED );
+				VideoDriver->DrawRect(r, border.color, border.filled, BlitFlags::BLENDED);
 			}
 		}
 	}
@@ -547,10 +546,9 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 		SetState(PRESSED);
 	}
 
-	for (const auto& border : borders) {
-		const ButtonBorder *fr = &border;
-		if (fr->enabled) {
-			pulseBorder = !fr->filled;
+	for (const ButtonBorder& border : borders) {
+		if (border.enabled) {
+			pulseBorder = !border.filled;
 			MarkDirty();
 			break;
 		}
