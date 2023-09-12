@@ -7090,22 +7090,22 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "StoreItemCount", DecRef(PyLong_FromLong, store->GetRealStockSize() ));
 	PyDict_SetItemString(dict, "StoreCapacity", DecRef(PyLong_FromLong, store->Capacity ));
 	PyDict_SetItemString(dict, "StoreOwner", DecRef(PyLong_FromLong, store->GetOwnerID() ));
-	PyObject* p = PyTuple_New( 4 );
+	PyObject* p = PyTuple_New(store->RoomPrices.size());
 
-	int j=1;
-	int16_t k;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0, j = 1; i < 4; i++) {
+		int16_t k;
 		if (store->AvailableRooms&j) {
 			k = static_cast<int16_t>(store->RoomPrices[i]);
+		} else {
+			k = -1;
 		}
-		else k=-1;
 		PyTuple_SetItem(p, i, PyLong_FromLong(k));
 		j<<=1;
 	}
 	PyDict_SetItemString(dict, "StoreRoomPrices", p);
 
 	p = PyTuple_New( STOREBUTTON_COUNT );
-	j=0;
+	int j = 0;
 	for (auto k : storebuttons[static_cast<int>(store->Type)]) {
 		if (k&STA_OPTIONAL) {
 			k&=~STA_OPTIONAL;

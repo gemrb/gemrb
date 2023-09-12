@@ -154,7 +154,7 @@ public:
 	ieDword DrinksCount = 0;
 	ResRef RumoursTemple;
 	ieDword AvailableRooms = 0;
-	ieDword RoomPrices[4];
+	std::array<ieDword, 4> RoomPrices;
 	ieDword CuresOffset = 0;
 	ieDword CuresCount = 0;
 	bool HasTriggers = false;
