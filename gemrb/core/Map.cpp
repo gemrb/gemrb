@@ -1076,14 +1076,14 @@ Actor *Map::GetNextActor(int &q, size_t &index) const
 	}
 }
 
-const AreaAnimation *Map::GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const
+AreaAnimation* Map::GetNextAreaAnimation(aniIterator& iter, ieDword gametime) const
 {
 
 	while (true) {
 		if (iter == animations.end()) {
 			return nullptr;
 		}
-		const AreaAnimation &a = *(iter++);
+		AreaAnimation& a = *(iter++);
 		if (!a.Schedule(gametime)) {
 			continue;
 		}
@@ -1221,7 +1221,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
 
-	auto DrawAreaAnimation = [&, this](const AreaAnimation *a) {
+	auto DrawAreaAnimation = [&, this](AreaAnimation* a) {
 		BlitFlags flags = SetDrawingStencilForAreaAnimation(a, viewport);
 		flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
 		
@@ -1237,10 +1237,11 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		game->ApplyGlobalTint(tint, flags);
 
 		a->Draw(viewport, tint, flags);
+		a->Update();
 		return GetNextAreaAnimation(aniidx, gametime);
 	};
-	
-	const AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
+
+	AreaAnimation* a = GetNextAreaAnimation(aniidx, gametime);
 	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
 		a = DrawAreaAnimation(a);
 	}
@@ -3819,10 +3820,15 @@ void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) co
 
 	size_t ac = animation.size();
 	while (ac--) {
-		Animation &anim = animation[ac];
-		Holder<Sprite2D> nextFrame = anim.NextFrame();
-		
-		VideoDriver->BlitGameSpriteWithPalette(nextFrame, palette, Pos - viewport.origin, flags, tint);
+		const Animation& anim = animation[ac];
+		VideoDriver->BlitGameSpriteWithPalette(anim.CurrentFrame(), palette, Pos - viewport.origin, flags, tint);
+	}
+}
+
+void AreaAnimation::Update()
+{
+	for (auto& anim : animation) {
+		anim.NextFrame();
 	}
 }
 

@@ -219,8 +219,8 @@ public:
 class GEM_EXPORT AreaAnimation {
 public:
 	using index_t = Animation::index_t;
-	
-	mutable std::vector<Animation> animation; // FIXME: we need an "update" step, currently we do it in Draw() wich should remian const
+
+	std::vector<Animation> animation;
 	//dwords, or stuff combining to a dword
 	Point Pos;
 	ieDword appearance = 0;
@@ -254,6 +254,7 @@ public:
 	bool Schedule(ieDword gametime) const;
 	Region DrawingRegion() const;
 	void Draw(const Region &screen, Color tint, BlitFlags flags) const;
+	void Update();
 	int GetHeight() const;
 };
 
@@ -648,7 +649,7 @@ public:
 	void SetBackground(const ResRef &bgResref, ieDword duration);
 
 private:
-	const AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
+	AreaAnimation* GetNextAreaAnimation(aniIterator& iter, ieDword gametime) const;
 	Particles *GetNextSpark(const spaIterator &iter) const;
 	VEFObject *GetNextScriptedAnimation(const scaIterator &iter) const;
 	Actor *GetNextActor(int &q, size_t &index) const;
