@@ -3100,7 +3100,7 @@ bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, int radiusx, 
 		if (first || (level >= sg->Level())) {
 			count = sg->Count();
 		} else {
-			count = 0;
+			return false;
 		}
 	}
 
