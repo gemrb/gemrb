@@ -106,7 +106,7 @@ protected:
 	LayoutRegions LayoutForPointInRegion(Point p, const Region&) const override;
 
 private:
-	inline const Holder<Font> LayoutFont() const;
+	inline Holder<const Font> LayoutFont() const;
 	inline Region LayoutInFrameAtPoint(const Point&, const Region&) const;
 };
 
@@ -291,7 +291,7 @@ public:
 	void SetColors(const Color& fg, const Color& bg);
 	const Font::PrintColors* TextColors() const { return colors; }
 	void SetFont(Holder<Font> fnt) { font = fnt; }
-	const Holder<Font> TextFont() const { return font; }
+	Holder<const Font> TextFont() const { return font; }
 	void SetAlignment(unsigned char align) { alignment = align; }
 
 	void CursorHome();

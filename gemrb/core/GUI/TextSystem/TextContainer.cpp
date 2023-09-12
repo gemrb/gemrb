@@ -61,7 +61,7 @@ void TextSpan::SetColors(const Color& fg, const Color& bg)
 	colors = new Font::PrintColors {fg, bg};
 }
 
-inline const Holder<Font> TextSpan::LayoutFont() const
+inline Holder<const Font> TextSpan::LayoutFont() const
 {
 	if (font) return font;
 

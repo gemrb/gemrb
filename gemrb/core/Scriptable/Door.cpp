@@ -477,8 +477,8 @@ std::string Door::dump() const
 	AppendFormat(buffer, "Door Global ID: {}\n", GetGlobalID());
 	AppendFormat(buffer, "Position: {}\n", Pos);
 	AppendFormat(buffer, "Door Open: {}\n", YesNo(IsOpen()));
-	AppendFormat(buffer, "Door Locked: {}	Difficulty: {}\n", YesNo(Flags & DOOR_LOCKED), LockDifficulty);
-	AppendFormat(buffer, "Door Trapped: {}	Difficulty: {}\n", YesNo(Trapped), TrapRemovalDiff);
+	AppendFormat(buffer, "Door Locked: {}\tDifficulty: {}\n", YesNo(Flags & DOOR_LOCKED), LockDifficulty);
+	AppendFormat(buffer, "Door Trapped: {}\tDifficulty: {}\n", YesNo(Trapped), TrapRemovalDiff);
 	if (Trapped) {
 		AppendFormat(buffer, "Trap Permanent: {} Detectable: {}\n", YesNo(Flags & DOOR_RESET), YesNo(Flags & DOOR_DETECTABLE));
 	}
