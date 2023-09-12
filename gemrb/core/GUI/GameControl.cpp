@@ -440,7 +440,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	}
 
 	const Map* area = CurrentArea();
-	assert(area);
+	if (!area) return;
 
 	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL;
 	auto ab = area->GetActorsInRect(SelectionRect(), flags);
@@ -464,6 +464,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 {
 	const Game* game = core->GetGame();
 	Map *area = game->GetCurrentArea();
+	if (!area) return;
 
 	// FIXME: some of this should happen during mouse events
 	// setup outlines
