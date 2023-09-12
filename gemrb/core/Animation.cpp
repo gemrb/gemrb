@@ -78,12 +78,7 @@ Animation::frame_t Animation::LastFrame(void)
 	} else {
 		starttime = GetMilliseconds();
 	}
-	Holder<Sprite2D> ret;
-	if (playReversed)
-		ret = frames[GetFrameCount() - frameIdx - 1];
-	else
-		ret = frames[frameIdx];
-	return ret;
+	return frames[GetCurrentFrameIndex()];
 }
 
 Animation::frame_t Animation::NextFrame(void)
@@ -93,12 +88,7 @@ Animation::frame_t Animation::NextFrame(void)
 		return NULL;
 	}
 
-	Holder<Sprite2D> ret;
-	if (playReversed)
-		ret = frames[GetFrameCount() - frameIdx - 1];
-	else
-		ret = frames[frameIdx];
-
+	Holder<Sprite2D> ret = frames[GetCurrentFrameIndex()];
 	if (endReached && (Flags&A_ANI_PLAYONCE))
 		return ret;
 
@@ -141,12 +131,7 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive!");
 		return NULL;
 	}
-	Holder<Sprite2D> ret;
-	if (playReversed)
-		ret = frames[GetFrameCount() - frameIdx - 1];
-	else
-		ret = frames[frameIdx];
-
+	Holder<Sprite2D> ret = frames[GetCurrentFrameIndex()];
 	starttime = master->starttime;
 	endReached = master->endReached;
 
