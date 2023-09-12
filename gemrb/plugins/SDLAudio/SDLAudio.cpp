@@ -481,10 +481,7 @@ bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 	Log(MESSAGE, "SDLAudio", "Releasing stream...");
 
 	(void)HardStop;
-
-	assert(!MusicPlaying);
-
-	Mix_HookMusic(NULL, NULL);
+	Stop();
 	FreeBuffers();
 
 	return true;
