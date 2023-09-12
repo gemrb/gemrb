@@ -59,7 +59,7 @@ class CObject final {
 public:
 	using CAP_T = PTR<T>;
 	
-	operator PyObject* () const
+	explicit operator PyObject* () const
 	{
 		if (pycap) {
 			Py_INCREF(pycap);
@@ -247,17 +247,11 @@ PyObject* PyString_FromASCII(const STR& str)
 	// PyUnicode_FromStringAndSize expects UTF-8 data, ascii is compatible with that
 	return PyUnicode_FromStringAndSize(str.c_str(), str.length());
 }
-	
-template <typename T>
-PyObject* PyObject_FromPtr(T* p)
-{
-	return CObject<T>(p);
-}
 
 template <typename T>
 PyObject* PyObject_FromHolder(Holder<T> h)
 {
-	return CObject<T>(std::move(h));
+	return static_cast<PyObject*>(CObject<T>(std::move(h)));
 }
 
 template <typename T, PyObject* (*F)(T), class Container>

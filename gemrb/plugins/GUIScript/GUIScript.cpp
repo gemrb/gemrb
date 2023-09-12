@@ -612,8 +612,8 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Can't find resource");
 		}
 	}
-	
-	return CObject<TableMgr, std::shared_ptr>(tab);
+
+	return PyObject_FromHolder<TableMgr>(tab);
 }
 
 PyDoc_STRVAR( GemRB_Table_GetValue__doc,
@@ -4564,7 +4564,7 @@ static PyObject* GemRB_SaveGame_GetPreview(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "O", &Slot );
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-	return CObject<Sprite2D>(save->GetPreview());
+	return PyObject_FromHolder<Sprite2D>(save->GetPreview());
 }
 
 PyDoc_STRVAR( GemRB_SaveGame_GetPortrait__doc,
@@ -4590,7 +4590,7 @@ static PyObject* GemRB_SaveGame_GetPortrait(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "Oi", &Slot, &index );
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-	return CObject<Sprite2D>(save->GetPortrait(index));
+	return PyObject_FromHolder<Sprite2D>(save->GetPortrait(index));
 }
 
 PyDoc_STRVAR( GemRB_GetGamePreview__doc,
@@ -6049,9 +6049,8 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	const Actor* actor = game->FindPC(PartyID);
 	if (actor) {
 		Holder<Sprite2D> portrait = actor->CopyPortrait(which);
-		CObject<Sprite2D> obj(std::move(portrait));
 		PyObject* dict = PyDict_New();
-		PyDict_SetItemString(dict, "Sprite", obj);
+		PyDict_SetItemString(dict, "Sprite", PyObject_FromHolder(portrait));
 		PyObject* pystr = PyString_FromResRef(which ? actor->SmallPortrait : actor->LargePortrait);
 		PyDict_SetItemString(dict, "ResRef", pystr);
 		Py_DecRef(pystr);
