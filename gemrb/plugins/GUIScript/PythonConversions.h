@@ -107,7 +107,7 @@ public:
 				cap = newcap;
 			}
 
-			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
+			PyObject* kwargs = Py_BuildValue("{s:N}", "ID", obj);
 			pycap = gs->ConstructObject(T::ID.description, nullptr, kwargs);
 			Py_DECREF(kwargs);
 		}
@@ -121,6 +121,7 @@ private:
 	static void PyRelease(PyObject *obj)
 	{
 		void* ptr = PyCapsule_GetPointer(obj, T::ID.description);
+		assert(ptr);
 		delete static_cast<Capsule*>(ptr);
 	}
 	
