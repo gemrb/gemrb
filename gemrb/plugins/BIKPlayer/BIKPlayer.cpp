@@ -401,13 +401,13 @@ int BIKPlayer::video_init()
 	int bh = (header.height + 7) >> 3;
 	int blocks = bw * bh;
 
-	for (int i = 0; i < BINK_NB_SRC; i++) {
-		c_bundle[i].data = (uint8_t *) av_malloc(blocks * 64);
+	for (auto& bundle : c_bundle) {
+		bundle.data = (uint8_t*) av_malloc(blocks * 64);
 		//not enough memory
-		if(!c_bundle[i].data) {
+		if (!bundle.data) {
 			return 1;
 		}
-		c_bundle[i].data_end = c_bundle[i].data + blocks * 64;
+		bundle.data_end = bundle.data + blocks * 64;
 	}
 
 	return 0;

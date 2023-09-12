@@ -141,7 +141,7 @@ TEST(VFS_Test, PathJoinExt_WithoutActualCaseFix) {
 
 TEST(VFS_Test, ResolveCase) {
 	auto badPath = PathJoin<false>("tests", "resoUrces", "vfs", "encoding", "file_ÄÖÜ.txt");
-	auto path = ResolveCase(badPath);
+	const auto path = ResolveCase(badPath);
 #if IS_CASE_INSENSITIVE
 	EXPECT_EQ(path, fmt::format("tests{0}resoUrces{0}vfs{0}encoding{0}file_ÄÖÜ.txt", SPathDelimiter));
 #else

@@ -2660,8 +2660,8 @@ void Map::GenerateQueues()
 
 void Map::SortQueues()
 {
-	for (int q = 0; q < QUEUE_COUNT; ++q) {
-		std::sort(queue[q].begin(), queue[q].end(), [](const Actor* a, const Actor* b) {
+	for (auto& subq : queue) {
+		std::sort(subq.begin(), subq.end(), [](const Actor* a, const Actor* b) {
 			return b->Pos.y < a->Pos.y;
 		});
 	}

@@ -31,13 +31,13 @@ def usage(msg):
 def readAndGetMaxLength(f):
   global lines
 
-  max = i = 0
+  maxL = i = 0
   for line in f:
     lines.append(line.rstrip())
-    if len(lines[i]) > max:
-      max = len(lines[i])
+    if len(lines[i]) > maxL:
+      maxL = len(lines[i])
     i = i + 1
-  return max
+  return maxL
 
 def appendCol(f, max):
   global lines, data

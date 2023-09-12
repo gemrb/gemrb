@@ -7106,8 +7106,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 	p = PyTuple_New( STOREBUTTON_COUNT );
 	j=0;
-	for (int i = 0; i < STOREBUTTON_COUNT; i++) {
-		k = storebuttons[static_cast<int>(store->Type)][i];
+	for (auto k : storebuttons[static_cast<int>(store->Type)]) {
 		if (k&STA_OPTIONAL) {
 			k&=~STA_OPTIONAL;
 			//check if the type was disabled
