@@ -44,7 +44,7 @@ namespace GemRB {
 
 constexpr size_t HistoryMaxSize = 10;
 
-class GEM_EXPORT Console : public TextEdit {
+class GEM_EXPORT Console final : public TextEdit {
 private:
 	/** History Buffer */
 	CircularBuffer<SelectOption> History{HistoryMaxSize};
@@ -55,8 +55,8 @@ private:
 
 public:
 	Console(const Region& frame, TextArea* ta);
-	~Console() noexcept;
-	
+	~Console() noexcept final;
+
 	bool Execute(const String&);
 
 private:

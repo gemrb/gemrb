@@ -54,8 +54,8 @@ public:
 	SDLSurfaceSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLSurfaceSprite2D(const Region&, const PixelFormat& fmt) noexcept;
 	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept;
-	~SDLSurfaceSprite2D() noexcept;
-	
+	~SDLSurfaceSprite2D() noexcept override;
+
 	Holder<Sprite2D> copy() const override;
 
 	const void* LockSprite() const override;
@@ -87,8 +87,8 @@ public:
 	SDLTextureSprite2D(const SDLTextureSprite2D&) noexcept;
 	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLTextureSprite2D(const Region&, const PixelFormat& fmt) noexcept;
-	~SDLTextureSprite2D() noexcept;
-	
+	~SDLTextureSprite2D() noexcept override;
+
 	Holder<Sprite2D> copy() const override;
 	
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
