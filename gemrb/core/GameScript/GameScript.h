@@ -214,7 +214,7 @@ public:
 
 class GEM_EXPORT Condition final : protected Canary {
 public:
-	~Condition() noexcept final
+	~Condition() noexcept override
 	{
 		for (auto& trigger : triggers) {
 			if (trigger) {
@@ -244,7 +244,7 @@ public:
 			RefCount = 1; //one reference held by the script
 		}
 	}
-	~Action() noexcept final
+	~Action() noexcept override
 	{
 		for (auto& object : objects) {
 			if (object) {
@@ -309,7 +309,7 @@ public:
 class GEM_EXPORT Response final : protected Canary {
 public:
 	Response() noexcept = default;
-	~Response() noexcept final
+	~Response() noexcept override
 	{
 		for (auto& action : actions) {
 			if (action) {
@@ -352,7 +352,7 @@ public:
 class GEM_EXPORT ResponseBlock final : protected Canary {
 public:
 	ResponseBlock() noexcept = default;
-	~ResponseBlock() noexcept final
+	~ResponseBlock() noexcept override
 	{
 		if (condition) {
 			condition->Release();
@@ -374,7 +374,7 @@ public:
 
 class GEM_EXPORT Script final : protected Canary {
 public:
-	~Script() noexcept final
+	~Script() noexcept override
 	{
 		for (auto& responseBlock : responseBlocks) {
 			if (responseBlock) {

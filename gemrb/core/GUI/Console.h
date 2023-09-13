@@ -55,7 +55,7 @@ private:
 
 public:
 	Console(const Region& frame, TextArea* ta);
-	~Console() noexcept final;
+	~Console() noexcept override;
 
 	bool Execute(const String&);
 
