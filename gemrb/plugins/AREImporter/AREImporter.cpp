@@ -244,8 +244,8 @@ static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day
 	auto propImg = VideoDriver->CreateSprite(Region(Point(), propsize), nullptr, fmt);
 
 	auto propit = propImg->GetIterator();
-	auto end = propit.end(propit);
-	
+	auto end = Sprite2D::Iterator::end(propit);
+
 	auto hmpal = heightmap->GetPalette();
 	auto smit = searchmap->GetIterator();
 	auto hmit = heightmap->GetIterator();

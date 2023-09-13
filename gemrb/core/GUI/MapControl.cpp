@@ -162,7 +162,7 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		VideoDriver->BlitSprite(MapMOS, mosRgn.origin);
 	}
 
-	if ((core->GetGameControl()->DebugFlags & DEBUG_SHOW_FOG_UNEXPLORED) == 0)
+	if ((GameControl::DebugFlags & DEBUG_SHOW_FOG_UNEXPLORED) == 0)
 		DrawFog(mosRgn);
 
 	Region vp = GetViewport();

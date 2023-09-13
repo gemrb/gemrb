@@ -142,7 +142,7 @@ bool EventMgr::ControllerButtonState(EventButton btn)
 
 void EventMgr::DispatchEvent(Event&& e) const
 {
-	if (TouchInputEnabled == false && e.EventMaskFromType(e.type) & Event::AllTouchMask) {
+	if (TouchInputEnabled == false && Event::EventMaskFromType(e.type) & Event::AllTouchMask) {
 		return;
 	}
 
@@ -152,7 +152,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 		if (e.text.text.length() == 0) {
 			return;
 		}
-	} else if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
+	} else if (Event::EventMaskFromType(e.type) & Event::AllKeyMask) {
 		// first check for hot key listeners
 		static tick_t lastKeyDown = 0;
 		static unsigned char repeatCount = 0;
@@ -183,19 +183,17 @@ void EventMgr::DispatchEvent(Event&& e) const
 				return;
 			}
 		}
-	} else if (e.EventMaskFromType(e.type) & Event::ControllerAxisMask) {
+	} else if (Event::EventMaskFromType(e.type) & Event::ControllerAxisMask) {
 		// only the left stick moves the cursor
 		if (e.controller.axis == AXIS_LEFT_X) {
 			mousePos.x += e.controller.axisDelta;
 		} else if (e.controller.axis == AXIS_LEFT_Y) {
 			mousePos.y += e.controller.axisDelta;
 		}
-	} else if (e.EventMaskFromType(e.type) & (Event::ControllerButtonUpMask | Event::ControllerButtonDownMask)) {
+	} else if (Event::EventMaskFromType(e.type) & (Event::ControllerButtonUpMask | Event::ControllerButtonDownMask)) {
 		controllerButtonStates = e.controller.buttonStates;
 	} else if (e.isScreen) {
-		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask
-									    | Event::TouchUpMask | Event::TouchDownMask)
-		) {
+		if (Event::EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask | Event::TouchUpMask | Event::TouchDownMask)) {
 			// WARNING: these are shared between mouse and touch
 			// it is assumed we won't be using both simultaneously
 			static tick_t lastMouseDown = 0;
@@ -229,7 +227,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 			se.repeats = repeatCount;
 		}
 
-		if (e.EventMaskFromType(e.type) & Event::AllMouseMask) {
+		if (Event::EventMaskFromType(e.type) & Event::AllMouseMask) {
 			// set/clear the appropriate buttons
 			mouseButtonFlags = e.mouse.buttonStates;
 			mousePos = e.mouse.Pos();
@@ -272,7 +270,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 	EventTaps::iterator it = tapsCopy.begin();
 	for (; it != tapsCopy.end(); ++it) {
 		const std::pair<Event::EventTypeMask, EventCallback>& pair = it->second;
-		if (pair.first & e.EventMaskFromType(e.type)) {
+		if (pair.first & Event::EventMaskFromType(e.type)) {
 			// all matching taps get a copy of the event
 			pair.second(e);
 		}

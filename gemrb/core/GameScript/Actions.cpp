@@ -7175,12 +7175,12 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->GetGameControl()->DebugFlags |= DEBUG_SHOW_FOG_ALL;
+	GameControl::DebugFlags |= DEBUG_SHOW_FOG_ALL;
 }
 
 void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->GetGameControl()->DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
+	GameControl::DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
 }
 
 void GameScript::EnableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)

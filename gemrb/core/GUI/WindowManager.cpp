@@ -55,11 +55,11 @@ WindowManager::WindowManager(PluginHolder<Video> vid, std::shared_ptr<GUIFactory
 	cursorFeedback = MOUSE_ALL;
 
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&WindowManager::DispatchEvent, this);
-	eventMgr.RegisterEventMonitor(cb);
+	EventMgr::RegisterEventMonitor(cb);
 
 	cb = METHOD_CALLBACK(&WindowManager::HotKey, this);
-	eventMgr.RegisterHotKeyCallback(cb, 'f', GEM_MOD_CTRL);
-	eventMgr.RegisterHotKeyCallback(cb, GEM_GRAB, 0);
+	EventMgr::RegisterHotKeyCallback(cb, 'f', GEM_MOD_CTRL);
+	EventMgr::RegisterHotKeyCallback(cb, GEM_GRAB, 0);
 
 	screen = Region(Point(), video->GetScreenSize());
 	// FIXME: technically we should unset the current video event manager...
@@ -241,7 +241,7 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 			}
 		}
 
-		auto event = eventMgr.CreateMouseMotionEvent(eventMgr.MousePos());
+		auto event = EventMgr::CreateMouseMotionEvent(EventMgr::MousePos());
 		WindowList::const_iterator it = windows.begin();
 		hoverWin = NextEventWindow(event, it);
 		
@@ -401,7 +401,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 		return true;
 	}
 
-	if (eventMgr.MouseDown() == false && eventMgr.FingerDown() == false) {
+	if (EventMgr::MouseDown() == false && EventMgr::FingerDown() == false) {
 		if (event.type == Event::MouseUp || event.type == Event::TouchUp) {
 			// we don't deliver mouse up events if there isn't a corresponding mouse down (no trackingWin).
 			if (!trackingWin) return false;
@@ -417,15 +417,15 @@ bool WindowManager::DispatchEvent(const Event& event)
 			trackingWin = NULL;
 		}
 	} else if (event.isScreen && trackingWin) {
-			if (trackingWin->IsDisabled() == false) {
-				trackingWin->DispatchEvent(event);
-			}
-			return true;
+		if (trackingWin->IsDisabled() == false) {
+			trackingWin->DispatchEvent(event);
 		}
+		return true;
+	}
 
 	if (windows.empty()) return false;
 
-	if (event.EventMaskFromType(event.type) & Event::AllMouseMask) {
+	if (Event::EventMaskFromType(event.type) & Event::AllMouseMask) {
 		TooltipTime = GetMilliseconds();
 		
 		// handle when mouse leaves the window
@@ -468,7 +468,7 @@ void WindowManager::DrawMouse() const
 	if (cursorFeedback == MOUSE_NONE)
 		return;
 
-	Point cursorPos = eventMgr.MousePos();
+	Point cursorPos = EventMgr::MousePos();
 	Point tooltipPos = cursorPos;
 
 	// pst displays actor name tooltips overhead, not at the mouse position
@@ -502,7 +502,7 @@ void WindowManager::DrawCursor(const Point& pos) const
 
 	if (!cur) {
 		// no cursor override
-		cur = (eventMgr.MouseDown()) ? CursorMouseDown : CursorMouseUp;
+		cur = (EventMgr::MouseDown()) ? CursorMouseDown : CursorMouseUp;
 	}
 	assert(cur); // must have a cursor
 

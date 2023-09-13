@@ -723,7 +723,7 @@ int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], 
 		fingers[i].x = finger->x * screenSize.w;
 		fingers[i].y = finger->y * screenSize.h;
 
-		const TouchEvent::Finger* current = EvntManager->FingerState(finger->id);
+		const TouchEvent::Finger* current = EventMgr::FingerState(finger->id);
 		if (current) {
 			fingers[i].deltaX = fingers[i].x - current->x;
 			fingers[i].deltaY = fingers[i].y - current->y;
@@ -762,7 +762,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// FIXME: I'm sure this delta needs to be scaled
 				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
 				InputAxis axis = InputAxis(event.caxis.axis);
-				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
+				e = EventMgr::CreateControllerAxisEvent(axis, delta, pct);
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
@@ -771,7 +771,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			{
 				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
 				EventButton btn = EventButton(event.cbutton.button);
-				e = EvntManager->CreateControllerButtonEvent(btn, down);
+				e = EventMgr::CreateControllerButtonEvent(btn, down);
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
@@ -786,7 +786,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				fingers[0].deltaY = event.tfinger.dy * screenSize.h;
 				fingers[0].id = event.tfinger.fingerId;
 
-				e = EvntManager->CreateTouchEvent(fingers, 1, event.type == SDL_FINGERDOWN, event.tfinger.pressure);
+				e = EventMgr::CreateTouchEvent(fingers, 1, event.type == SDL_FINGERDOWN, event.tfinger.pressure);
 				e.mod = modstate;
 				EvntManager->DispatchEvent(std::move(e));
 			}
@@ -797,9 +797,9 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
 				int numf = GetTouchFingers(fingers, event.mgesture.touchId);
 
-				Event touch = EvntManager->CreateTouchEvent(fingers, numf, true, event.tfinger.pressure);
+				Event touch = EventMgr::CreateTouchEvent(fingers, numf, true, event.tfinger.pressure);
 				// TODO: it may make more sense to calculate a pinch/rotation from screen center?
-				e = EvntManager->CreateTouchGesture(touch.touch, 0.0, 0.0);
+				e = EventMgr::CreateTouchGesture(touch.touch, 0.0, 0.0);
 				e.mod = modstate;
 				EvntManager->DispatchEvent(std::move(e));
 			}
@@ -814,8 +814,8 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				int numf = GetTouchFingers(fingers, event.mgesture.touchId);
 
 				// TODO: it may make more sense to calculate the pressure as an avg?
-				Event touch = EvntManager->CreateTouchEvent(fingers, numf, true, 0.0);
-				e = EvntManager->CreateTouchGesture(touch.touch, event.mgesture.dTheta, event.mgesture.dDist);
+				Event touch = EventMgr::CreateTouchEvent(fingers, numf, true, 0.0);
+				e = EventMgr::CreateTouchGesture(touch.touch, event.mgesture.dTheta, event.mgesture.dDist);
 				if (e.gesture.deltaX != 0 || e.gesture.deltaY != 0)
 				{
 					e.mod = modstate;
@@ -839,9 +839,9 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				
 				int speed = unitIsPixels ? 1 : core->GetMouseScrollSpeed();
 				if (SDL_GetModState() & KMOD_SHIFT) {
-					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.y * speed, event.wheel.x * speed));
+					e = EventMgr::CreateMouseWheelEvent(Point(event.wheel.y * speed, event.wheel.x * speed));
 				} else {
-					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x * speed, event.wheel.y * speed));
+					e = EventMgr::CreateMouseWheelEvent(Point(event.wheel.x * speed, event.wheel.y * speed));
 				}
 				
 				EvntManager->DispatchEvent(std::move(e));
@@ -849,7 +849,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		/* not user input events */
 		case SDL_TEXTINPUT:
-			e = EvntManager->CreateTextEvent(event.text.text);
+			e = EventMgr::CreateTextEvent(event.text.text);
 			EvntManager->DispatchEvent(std::move(e));
 			break;
 		/* not user input events */
@@ -910,7 +910,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					char *pasteValue = SDL_GetClipboardText();
 
 					if (pasteValue != NULL) {
-						e = EvntManager->CreateTextEvent(pasteValue);
+						e = EventMgr::CreateTextEvent(pasteValue);
 						EvntManager->DispatchEvent(std::move(e));
 						SDL_free(pasteValue);
 					}
@@ -924,7 +924,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					case SDLK_v:
 						if (SDL_HasClipboardText()) {
 							char* text = SDL_GetClipboardText();
-							e = EvntManager->CreateTextEvent(text);
+							e = EventMgr::CreateTextEvent(text);
 							SDL_free(text);
 							EvntManager->DispatchEvent(std::move(e));
 							return GEM_OK;

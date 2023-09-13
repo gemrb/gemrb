@@ -647,7 +647,7 @@ private:
 			palettes.resize(height);
 			Region clip(0, 0, SIZE, height);
 			auto it = image->GetIterator(IPixelIterator::Direction::Forward, IPixelIterator::Direction::Forward, clip);
-			auto end = it.end(it);
+			auto end = Sprite2D::Iterator::end(it);
 			for (; it != end; ++it) {
 				const Point& p = it.Position();
 				palettes[p.y][p.x] = it.ReadRGBA();

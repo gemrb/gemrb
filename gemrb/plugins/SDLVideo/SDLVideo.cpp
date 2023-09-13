@@ -152,7 +152,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_KEYUP:
 			key = TranslateKeycode(sym);
 			if (key != 0) {
-				e = EvntManager->CreateKeyEvent(key, false, modstate);
+				e = EventMgr::CreateKeyEvent(key, false, modstate);
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
@@ -174,7 +174,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			key = TranslateKeycode(sym);
 
-			e = EvntManager->CreateKeyEvent(key, true, modstate);
+			e = EventMgr::CreateKeyEvent(key, true, modstate);
 			if (e.keyboard.character) {
 				if (InTextInput() && modstate == 0) {
 					return GEM_OK;
@@ -189,7 +189,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			EvntManager->DispatchEvent(std::move(e));
 			break;
 		case SDL_MOUSEMOTION:
-			e = EvntManager->CreateMouseMotionEvent(Point(event.motion.x, event.motion.y), modstate);
+			e = EventMgr::CreateMouseMotionEvent(Point(event.motion.x, event.motion.y), modstate);
 			EvntManager->DispatchEvent(std::move(e));
 			break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -202,7 +202,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					// on at least some platforms
 					bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
 					Point p(event.button.x, event.button.y);
-					e = EvntManager->CreateMouseBtnEvent(p, btn, down, modstate);
+					e = EventMgr::CreateMouseBtnEvent(p, btn, down, modstate);
 					EvntManager->DispatchEvent(std::move(e));
 				}
 			}
@@ -215,7 +215,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				// FIXME: I'm sure this delta needs to be scaled
 				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
 				InputAxis axis = InputAxis(event.jaxis.axis);
-				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
+				e = EventMgr::CreateControllerAxisEvent(axis, delta, pct);
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
@@ -224,7 +224,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			{
 				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
 				EventButton btn = EventButton(event.jbutton.button);
-				e = EvntManager->CreateControllerButtonEvent(btn, down);
+				e = EventMgr::CreateControllerButtonEvent(btn, down);
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;

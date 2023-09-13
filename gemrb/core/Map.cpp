@@ -3282,8 +3282,8 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 	Point Tile;
 	const Explore& explore = Explore::Get();
 
-	if (range > explore.MaxVisibility) {
-		range = explore.MaxVisibility;
+	if (range > Explore::MaxVisibility) {
+		range = Explore::MaxVisibility;
 	}
 	int p = explore.VisibilityPerimeter;
 	while (p--) {
