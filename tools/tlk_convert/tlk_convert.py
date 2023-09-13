@@ -2,25 +2,25 @@
 #coding=utf-8
 from tlk import Tlk
 
-PUNCTUATIONS = u"，。！“”－…,.!"
+PUNCTUATIONS = "，。！“”－…,.!"
 
 def insert_space(utf16_str, interval=1, codec = None):
     if codec:
         utf16_str = utf16_str.decode(codec)
 
-    utf16_str = utf16_str.replace(u" ", u"　")
+    utf16_str = utf16_str.replace(" ", "　")
     words = []
-    word = u""
+    word = ""
     for i, u in enumerate(utf16_str):
         word += u
         if ord(u) > 0x100 \
            and len(word) >= interval \
            and (i+1 < len(utf16_str) and utf16_str[i+1] not in PUNCTUATIONS):
             words.append(word)
-            word = u""
+            word = ""
     if len(word) > 0:
         words.append(word)
-    s = u" ".join(words)
+    s = " ".join(words)
     if codec:
         s = s.encode(codec)
     return s
@@ -31,8 +31,8 @@ def convert_to_utf8(tlk_name, codec = "GBK", need_space = True):
     for i, t in enumerate(tlk):
         try:
             txt = t["string"].decode(codec).encode("utf-8")
-        except:
-            print "Warning: ", i
+        except ValueError:
+            print("Warning: ", i)
             continue
         if need_space:
             txt = insert_space(txt, codec="utf-8")

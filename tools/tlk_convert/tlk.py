@@ -3,7 +3,7 @@
 from base import Base
 from struct import unpack, pack
 import os
-import cStringIO
+import io
 # based on https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
 
 class Tlk(Base, list):
@@ -11,9 +11,9 @@ class Tlk(Base, list):
     def _load(self, io):
         self.language_id, num, offset = unpack("<HII", io.read(0xa))
 
-        for i in range(num):
-            self.append(dict(zip(("flag", "sound_name", "volume", "pitch", "offset", "length"), 
-                                 unpack("<H 8s 4I", io.read(0x1a)))))
+        for _ in range(num):
+            self.append(dict(list(zip(("flag", "sound_name", "volume", "pitch", "offset", "length"), 
+                                 unpack("<H 8s 4I", io.read(0x1a))))))
 
         for t in self:
             io.seek(offset+t["offset"], os.SEEK_SET)
@@ -23,7 +23,7 @@ class Tlk(Base, list):
         offset = len(self)*0x1a + 0x12
         io.write(pack("<HII", self.language_id, len(self), offset))
 
-        string_io = cStringIO.StringIO()
+        string_io = io.BytesIO()
         for t in self:
             t["length"] = len(t["string"])
             if t["length"] == 0:
@@ -45,5 +45,5 @@ class Tlk(Base, list):
 if __name__ == "__main__":
     import sys
     t = Tlk(open(sys.argv[1], "rb"))
-    print t
+    print(t)
     #t.save(open("1.bin", "wb"))
