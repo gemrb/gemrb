@@ -481,13 +481,17 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		bool doDither = flags & BlitFlags::STENCIL_DITHER;
 		blitRGBAShader->SetUniformValue("u_dither", 1, doDither ? 1 : 0);
 
-		int texW = 0, texH = 0;
+		int texW = 0;
+		int texH = 0;
 		SDL_QueryTexture(CurrentStencilBuffer(), nullptr, nullptr, &texW, &texH);
 
-		GLfloat stencilTexW = 1.0f, stencilTexH = 1.0f,
-			stencilTexX = 0.0f, stencilTexY = 0.0f;
+		GLfloat stencilTexW = 1.0f;
+		GLfloat stencilTexH = 1.0f;
+		GLfloat stencilTexX = 0.0f;
+		GLfloat stencilTexY = 0.0f;
 
-		float scaleX = 0.0f, scaleY = 0.0f;
+		float scaleX = 0.0f;
+		float scaleY = 0.0f;
 		SDL_RenderGetScale(renderer, &scaleX, &scaleY);
 		
 		SDL_Rect stencilRect = *dstrect;

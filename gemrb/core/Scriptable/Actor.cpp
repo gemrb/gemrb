@@ -7064,7 +7064,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	const GameControl* gc = core->GetGameControl();
 	if (core->HasFeedback(FT_TOHIT) && !gc->InDialog()) {
 		// log the roll
-		String leftRight, hitMiss;
+		String leftRight;
+		String hitMiss;
 		if (usedLeftHand && DisplayMessage::HasStringReference(HCStrings::AttackRollLeft)) {
 			leftRight = core->GetString(DisplayMessage::GetStringReference(HCStrings::AttackRollLeft));
 		} else {
@@ -8544,7 +8545,9 @@ ieByte Actor::IWD2GemrbQslot(int slotIndex) const
 void Actor::dumpQSlots() const
 {
 	const ActionButtonRow& r = GUIBTDefaults[GetActiveClass()];
-	std::string buffer, buffer2, buffer3;
+	std::string buffer;
+	std::string buffer2;
+	std::string buffer3;
 
 	buffer.append("Current  default: ");
 	buffer2.append("IWD2gem  default: ");

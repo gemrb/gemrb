@@ -87,7 +87,9 @@ static std::string ParseGameDate(DataStream *ds)
 	int hours = ((int)GameTime)/core->Time.hour_sec;
 	int days = hours/24;
 	hours -= days*24;
-	std::string a, b, c;
+	std::string a;
+	std::string b;
+	std::string c;
 
 	// pst has a nice single string for everything 41277 (individual ones lack tokens)
 	SetTokenAsString("GAMEDAYS", days);

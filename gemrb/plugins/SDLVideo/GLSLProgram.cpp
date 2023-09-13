@@ -176,7 +176,8 @@ bool GLSLProgram::buildProgram(const std::string& vertexSource, const std::strin
 		int count = -1;
 		glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count); 
 		for (int i = 0; i < count; i++) {
-			int name_len = -1, num = -1;
+			int name_len = -1;
+			int num = -1;
 			GLenum type = GL_ZERO;
 			char name[64];
 			glGetActiveUniform(program, GLuint(i), sizeof(name) - 1, &name_len, &num, &type, name);

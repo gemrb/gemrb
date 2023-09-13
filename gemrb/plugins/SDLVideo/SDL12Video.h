@@ -219,7 +219,8 @@ public:
 			if (strides[plane] < size) {
 				size = strides[plane];
 			}
-			unsigned int srcoffset = 0, destoffset = 0;
+			unsigned int srcoffset = 0;
+			unsigned int destoffset = 0;
 			for (int i = 0; i < ((plane == 0) ? bufDest.h : (bufDest.h / 2)); i++) {
 				memcpy(overlay->pixels[plane] + destoffset,
 					   data + srcoffset, size);

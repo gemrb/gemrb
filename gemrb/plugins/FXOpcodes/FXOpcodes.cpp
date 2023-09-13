@@ -1590,7 +1590,8 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_set_hasted_state(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	target->fxqueue.RemoveAllEffects(fx_set_slow_state_ref);
 	target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
-	int old_type = -2, new_type = -2; // lowest priority by default
+	int old_type = -2;
+	int new_type = -2; // lowest priority by default
 	if (target->GetStat(IE_STATE_ID) & STATE_HASTED) {
 		old_type = (signed) target->GetStat(IE_IMPROVEDHASTE); // we cramp all three types into this stat now
 	}
