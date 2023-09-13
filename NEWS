@@ -1,7 +1,7 @@
-GemRB git (5a785bb):
+GemRB git (848cb1):
   New features:
     - 
-    - full i18n (language) support
+    - full i18n (language) support, custom journal entries
     - small test suite
     - iwd2 identification variants
 
