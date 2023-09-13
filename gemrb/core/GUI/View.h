@@ -99,9 +99,10 @@ private:
 	Regions DirtySuperViewRegions() const;
 	void DrawBackground(const Region*) const;
 	bool HasBackground() const;
-	void DrawSubviews(bool drawBG) const;
+	void DrawSubviews() const;
 	void MarkDirty(const Region*);
-	void InvalidateSubviews() const;
+	void InvalidateSubviews(const Region& rgn) const;
+	void InvalidateDirtySubviewRegions();
 
 	// TODO: to support partial redraws, we should change the clip parameter to a list of dirty rects
 	// that have all been clipped to the video ScreenClip
