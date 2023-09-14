@@ -280,17 +280,22 @@ def OnMageMemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
+	Window = btn.Window
+
+	def Complete():
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
+		AnimBtn = Window.GetControl(mem_cnt + 2)
+		AnimBtn.SetAnimation(FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
+		AnimBtn.OnAnimEnd(lambda: UpdateMageWindow(Window))
+		UpdateMageWindow(Window)
 
 	index = btn.Value
-
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
 		Button.SetAnimation (FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
-		Button = MageWindow.GetControl(mem_cnt + 2)
-		Button.SetAnimation (FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
-		UpdateMageWindow (MageWindow)
+		Button.OnAnimEnd(Complete)
+
 	return
 
 def OpenMageSpellRemoveWindow (parentWin):
@@ -365,7 +370,7 @@ def OnMageUnmemorizeSpell (btn):
 		GemRB.PlaySound ("GAM_44")
 		Button = MageWindow.GetControl(index + 3)
 		Button.SetAnimation (FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
-		UpdateMageWindow (MageWindow)
+		Button.OnAnimEnd(lambda: UpdateMageWindow (MageWindow))
 	return
 
 def OnMageRemoveSpell (btn):
