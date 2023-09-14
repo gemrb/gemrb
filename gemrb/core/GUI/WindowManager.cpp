@@ -645,14 +645,10 @@ void WindowManager::DrawWindows() const
 			drawFrame = true;
 		}
 
-		if (win->IsDisabled() && win->NeedsDraw()) {
-			// Important to only draw if the window itself is dirty
-			// controls on greyed out windows shouldn't be updating anyway
-			win->Draw();
+		win->Draw();
+		if (win->IsDisabled()) {
 			Region winrgn(Point(), win->Dimensions());
-			video->DrawRect(winrgn, ColorBlack, true, BlitFlags::HALFTRANS|BlitFlags::BLENDED);
-		} else {
-			win->Draw();
+			video->DrawRect(winrgn, ColorBlack, true, BlitFlags::HALFTRANS | BlitFlags::BLENDED);
 		}
 	}
 
