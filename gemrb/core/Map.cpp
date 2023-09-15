@@ -3229,28 +3229,31 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
 	bool interrupt = RAND(0, 99) < chance;
+	if (!interrupt) {
+		core->GetGame()->AdvanceTime(hours * core->Time.hour_size);
+		return 0;
+	}
+
 	unsigned int spawncount = 0;
 	int spawnamount = core->GetGame()->GetTotalPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
+	// this loop is a bit odd, since we only check the interrupt chance once
+	// the only way this not to return immediately at hour 0 is from a data error
 	for (int i=0;i<hours;i++) {
-		if (interrupt) {
-			int idx = RAND(0, RestHeader.CreatureNum-1);
-			const Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
-			if (!creature) {
-				core->GetGame()->AdvanceTime(core->Time.hour_size);
-				continue;
-			}
-
-			displaymsg->DisplayString(RestHeader.Strref[idx], GUIColors::GOLD, STRING_FLAGS::SOUND);
-			while (spawnamount > 0 && spawncount < RestHeader.Maximum) {
-				if (!SpawnCreature(pos, RestHeader.CreResRef[idx], Size(20, 20), RestHeader.rwdist, &spawnamount, &spawncount)) {
-					break;
-				}
-			}
-			return hours-i;
+		int idx = RAND(0, RestHeader.CreatureNum - 1);
+		const Actor* creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
+		if (!creature) {
+			core->GetGame()->AdvanceTime(core->Time.hour_size);
+			continue;
 		}
-		// advance the time in hourly steps, so an interruption is timed properly
-		core->GetGame()->AdvanceTime(core->Time.hour_size);
+
+		displaymsg->DisplayString(RestHeader.Strref[idx], GUIColors::GOLD, STRING_FLAGS::SOUND);
+		while (spawnamount > 0 && spawncount < RestHeader.Maximum) {
+			if (!SpawnCreature(pos, RestHeader.CreResRef[idx], Size(20, 20), RestHeader.rwdist, &spawnamount, &spawncount)) {
+				break;
+			}
+		}
+		return hours - i;
 	}
 	return 0;
 }
