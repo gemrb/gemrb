@@ -715,7 +715,7 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 			cre->SetBase(StatValues[x], critter.SetSpec[x]);
 		}
 	}
-	cre->SetPosition(critter.SpawnPoint, 1, 0);
+	cre->SetPosition(critter.SpawnPoint, true);
 	cre->SetOrientation(ClampToOrientation(critter.Orientation), false);
 
 	cre->SetScriptName(critter.ScriptName);

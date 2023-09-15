@@ -4033,11 +4033,11 @@ int fx_dimension_door (Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 		p=target->Pos;
-		target->SetPosition(Owner->Pos, true, 0);
+		target->SetPosition(Owner->Pos, true);
 		target = (Actor *) Owner;
 		break;
 	}
-	target->SetPosition(p, true, 0 );
+	target->SetPosition(p, true);
 	return FX_NOT_APPLIED;
 }
 
@@ -5511,7 +5511,7 @@ static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *
 	if (!map) return NULL;
 
 	map->AddActor(fam, true);
-	fam->SetPosition(fx->Pos, true, 0);
+	fam->SetPosition(fx->Pos, true);
 	fam->RefreshEffects();
 	//Make the familiar an NPC (MoveGlobal needs this)
 	Game *game = core->GetGame();
@@ -6201,7 +6201,7 @@ int fx_teleport_field (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Point p = Point(core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)),
 					core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1)) ) + fx->Pos;
 
-	target->SetPosition( p, true, 0);
+	target->SetPosition(p, true);
 	return FX_NOT_APPLIED;
 }
 
@@ -6672,7 +6672,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (newpos == target->Pos)
 		return FX_APPLIED;
 
-	target->SetPosition(newpos, true, 0);
+	target->SetPosition(newpos, true);
 
 	fx->Parameter4 = game->GameTime;
 	return FX_APPLIED;
@@ -7391,7 +7391,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 		const Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
 		delete tgts;
 		if (victim && PersonalDistance(victim, target)>20) {
-			target->SetPosition( victim->Pos, true, 0 );
+			target->SetPosition(victim->Pos, true);
 			target->SetColorMod(0xff, RGBModifier::ADD, 0x50, Color(0xff, 0xff, 0xff, 0), 0);
 		}
 	}

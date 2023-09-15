@@ -2291,7 +2291,7 @@ Actor *Map::GetItemByDialog(const ResRef &resref) const
 		}
 		Map *map = pc->GetCurrentArea();
 		map->AddActor(surrogate, true);
-		surrogate->SetPosition(pc->Pos, 0);
+		surrogate->SetPosition(pc->Pos, false);
 
 		return surrogate;
 	}
@@ -3116,7 +3116,7 @@ bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, int radiusx, 
 		// at least one creature if this is the first
 		if (level >= cpl || sg || first) {
 			AddActor(creature, true);
-			creature->SetPosition(pos, true, radiusx, radiusy);
+			creature->SetPosition(pos, true, Size(radiusx, radiusy));
 			creature->HomeLocation = pos;
 			creature->maxWalkDistance = rwdist;
 			creature->Spawned = true;

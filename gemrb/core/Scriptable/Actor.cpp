@@ -4745,7 +4745,7 @@ void Actor::SetMap(Map *map)
 }
 
 // Position should be a navmap point
-void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radiusy, int size)
+void Actor::SetPosition(const Point& nmptTarget, bool jump, const Size& radius, int size)
 {
 	ResetPathTries();
 	ClearPath(true);
@@ -4758,7 +4758,7 @@ void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radi
 		const Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
 		map->ClearSearchMapFor(this);
-		map->AdjustPosition(p, radiusx, radiusy, size);
+		map->AdjustPosition(p, radius.w, radius.h, size);
 	}
 	if (p==q) {
 		MoveTo(nmptTarget);
@@ -5053,7 +5053,7 @@ void Actor::Resurrect(const Point &destPoint)
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_AVATARREMOVAL, 0);
 	if (!destPoint.IsZero()) {
-		SetPosition(destPoint, CC_CHECK_IMPASSABLE, 0);
+		SetPosition(destPoint, true);
 	}
 	if (ShouldModifyMorale()) SetBase(IE_MORALE, 10);
 	//resurrect spell sets the hitpoints to maximum in a separate effect
@@ -10071,7 +10071,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->CreateDerivedStats();
 
 	area->AddActor(newActor, true);
-	newActor->SetPosition( Pos, CC_CHECK_IMPASSABLE, 0 );
+	newActor->SetPosition(Pos, true);
 	newActor->SetOrientation(GetOrientation(), false);
 	newActor->SetStance( IE_ANI_READY );
 

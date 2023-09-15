@@ -598,7 +598,7 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Point p(actor->GetStat(IE_SAVEDXPOS), actor->GetStat(IE_SAVEDYPOS));
-	actor->SetPosition(p, true );
+	actor->SetPosition(p, true);
 	actor->SetOrientation(ClampToOrientation(actor->GetStat(IE_SAVEDFACE)), false);
 }
 
@@ -1295,7 +1295,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 
 	Point p = CheckPointVariable(Sender, parameters->string0Parameter);
-	actor->SetPosition(p, true );
+	actor->SetPosition(p, true);
 	Sender->ReleaseCurrentAction();
 }
 /** iwd2 returntosavedlocation (with stats) */

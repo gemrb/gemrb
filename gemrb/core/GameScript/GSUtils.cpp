@@ -915,7 +915,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	Map *map = Sender->GetCurrentArea();
 	map->AddActor(ab, true);
-	ab->SetPosition(pnt, flags & CC_CHECK_IMPASSABLE, 0, 0);
+	ab->SetPosition(pnt, flags & CC_CHECK_IMPASSABLE);
 	ab->SetOrientation(ClampToOrientation(parameters->int0Parameter), false);
 
 	// also set it as Sender's LastMarkedObject (fixes worg rider dismount killing players)
@@ -998,7 +998,7 @@ void ChangeAnimationCore(Actor* src, const ResRef& replacement, bool effect)
 		src->DestroySelf();
 		// can't SetPosition while the old actor is taking the spot
 		map->AddActor(tar, true);
-		tar->SetPosition(pos, 1, 8*effect, 8*effect);
+		tar->SetPosition(pos, true, Size(8 * effect, 8 * effect));
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos, "spsmpuff", 1);
 		}

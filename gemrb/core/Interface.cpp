@@ -1646,7 +1646,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		}
 
 		map->AddActor(ab, true);
-		ab->SetPosition(position, true, 0, 0, ab->circleSize);
+		ab->SetPosition(position, true, Size(), ab->circleSize);
 		ab->RefreshEffects();
 
 		// guessing, since this trigger was unused in the originals — likely duplicating LastSummoner
@@ -1682,6 +1682,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		}
 
 		//this check should happen after the fact
+		// FIXME: shouldn't this be IE_XPVALUE, the CR? IE_XP holds the actual xp gained, only useful for pcs
 		level -= ab->GetBase(IE_XP);
 		if(level<0 || ab->GetBase(IE_XP) == 0) {
 			break;
