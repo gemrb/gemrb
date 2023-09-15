@@ -9870,7 +9870,7 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 		map->SpawnCreature(Point(PosX, PosY), CreResRef);
 	} else {
 		GET_ACTOR_GLOBAL();
-		map->SpawnCreature(actor->Pos, CreResRef, 10, 10);
+		map->SpawnCreature(actor->Pos, CreResRef, Size(10, 10));
 	}
 	Py_RETURN_NONE;
 }

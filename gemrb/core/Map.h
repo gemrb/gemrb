@@ -619,7 +619,7 @@ public:
 	/* May spawn creature(s), returns the remaining number of (unrested) hours for interrupted rest */
 	int CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day);
 	/* Spawns creature(s) in radius of position */
-	bool SpawnCreature(const Point& pos, const ResRef& creResRef, int radiusx = 0, int radiusy = 0, ieWord rwdist = 0, int* difficulty = nullptr, unsigned int* creCount = nullptr);
+	bool SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& radius = Size(), ieWord rwdist = 0, int* difficulty = nullptr, unsigned int* creCount = nullptr);
 
 	//spawns
 	void LoadIniSpawn();
