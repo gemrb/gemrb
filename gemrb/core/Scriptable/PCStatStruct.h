@@ -141,9 +141,6 @@ public:
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
-	PCStatsStruct() noexcept = default;
-	explicit PCStatsStruct(std::list<int> levels);
-
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);
 	void InitQuickSlot(unsigned int which, ieWord slot, ieWord headerIndex);
