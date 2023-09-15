@@ -1014,7 +1014,8 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 	stream->WriteResRefUC(ac->PCStats->SoundSet);
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
-		auto soundFolder = TLKStringFromString(ac->PCStats->SoundFolder);
+		std::string soundFolder = TLKStringFromString(ac->PCStats->SoundFolder);
+		soundFolder.resize(ieVariable::Size);
 		stream->WriteStringLC(soundFolder, ieVariable::Size);
 	}
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
