@@ -6344,7 +6344,6 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (clear) {
 		PCStatsStruct& oldstats = *actor->PCStats;
 		PCStatsStruct newstats;
-		newstats.ClassLevels = oldstats.ClassLevels;
 		newstats.AwayTime = oldstats.AwayTime;
 		newstats.unknown10 = oldstats.unknown10;
 		newstats.Happiness = oldstats.Happiness;

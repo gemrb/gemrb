@@ -25,11 +25,6 @@
 
 namespace GemRB {
 
-PCStatsStruct::PCStatsStruct(const std::list<int>& levels)
-{
-	UpdateClassLevels(levels);
-}
-
 // because of the levels list, the class isn't trivially copiable
 PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 {
@@ -63,12 +58,7 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	States = source.States;
 	LastLeft = source.LastLeft;
 	LastJoined = source.LastJoined;
-	UpdateClassLevels(source.ClassLevels);
 	return *this;
-}
-
-void PCStatsStruct::UpdateClassLevels(const std::list<int> &levels) {
-	ClassLevels = levels;
 }
 
 void PCStatsStruct::IncrementChapter()

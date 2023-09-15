@@ -951,9 +951,6 @@ static void pcf_level (Actor *actor, ieDword oldValue, ieDword newValue, ieDword
 		actor->ApplyKit(false, baseClass, newValue-oldValue);
 	}
 	actor->GotLUFeedback = false;
-	if (third && actor->PCStats) {
-		actor->PCStats->UpdateClassLevels(actor->ListLevels());
-	}
 }
 
 static void pcf_level_fighter (Actor *actor, ieDword oldValue, ieDword newValue)
@@ -6055,11 +6052,15 @@ ResRef Actor::GetDialog(int flags) const
 
 std::list<int> Actor::ListLevels() const
 {
-	std::list<int> levels (ISCLASSES, 0);
-	if (third) {
-		int i = 0;
-		for (auto& level : levels) {
-			level = GetClassLevel(i++);
+	if (!third) {
+		return {};
+	}
+
+	std::list<int> levels;
+	for (ieDword isclass = 0; isclass < ISCLASSES; ++isclass) {
+		auto level = GetClassLevel(isclass);
+		if (level) {
+			levels.push_back(level);
 		}
 	}
 	return levels;
@@ -6068,7 +6069,7 @@ std::list<int> Actor::ListLevels() const
 void Actor::CreateStats()
 {
 	if (!PCStats) {
-		PCStats = new PCStatsStruct(ListLevels());
+		PCStats = new PCStatsStruct();
 	}
 }
 
@@ -7625,19 +7626,13 @@ void Actor::AddExperience(int exp, int combat)
 	SetBase(xpStat, exp);
 }
 
-static bool is_zero(const int& value) {
-	return value == 0;
-}
-
 // for each class pair that is out of level sync for more than 1 level and
 // one of them isn't a favored class, incur a 20% xp penalty (cumulative)
 int Actor::GetFavoredPenalties() const
 {
 	if (!third) return 0;
-	if (!PCStats) return 0;
 
-	std::list<int> classLevels(PCStats->ClassLevels);
-	classLevels.remove_if(is_zero);
+	std::list<int> classLevels = ListLevels();
 	size_t classCount = classLevels.size();
 	if (classCount == 1) return 0;
 
