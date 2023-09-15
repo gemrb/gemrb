@@ -347,7 +347,7 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 				//set animation's cycle to parameters->int0Parameter;
 				anim->sequence=value;
 				anim->frame=0;
-				//what else to be done???
+				anim->animation.clear();
 				anim->InitAnimation();
 			}
 			return;

@@ -8439,6 +8439,7 @@ int fx_alter_animation(Scriptable* Owner, Actor* /*target*/, Effect* fx)
 			ieWord value = fx->Parameter1 >> 16;
 			SetBits(an->sequence, value, BitOp(fx->Parameter1 & 0xffff));
 			an->frame = 0;
+			an->animation.clear();
 			an->InitAnimation();
 		}
 		an = map->GetNextAnimation(iter);
