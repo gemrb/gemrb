@@ -584,12 +584,14 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 	if (QSPCount==9) {
 		//NOTE: the gemrb internal format stores
 		//0xff or 0xfe in case of innates and bardsongs
-		char filling[10] = {};
-		memcpy(filling,act->PCStats->QuickSpellBookType,MAX_QSLOTS);
-		for (int i = 0; i < MAX_QSLOTS; i++) {
-			if ( (ieByte) filling[i]>=0xfe) filling[i]=0;
+		for (ieByte qbyte : act->PCStats->QuickSpellBookType) {
+			if (qbyte >= 0xfe) {
+				stream->WriteScalar<ieByte>(0);
+			} else {
+				stream->WriteScalar(qbyte);
+			}
 		}
-		stream->Write( filling, 10);
+		stream->WriteScalar<ieByte>(0); // null terminator
 	}
 	for (int i = 0; i < QITCount; i++) {
 		stream->WriteWord(act->PCStats->QuickItemSlots[i]);
@@ -662,8 +664,8 @@ void CREImporter::ReadChrHeader(Actor *act)
 		str->ReadResRef (act->PCStats->QuickSpells[i]);
 	}
 	if (QSPCount==9) {
-		str->Read(act->PCStats->QuickSpellBookType, 9);
-		str->Seek(1, GEM_CURRENT_POS);
+		str->Read(act->PCStats->QuickSpellBookType.data(), 9);
+		str->Seek(1, GEM_CURRENT_POS); // null terminator
 	}
 	for (int i = 0; i < QITCount; i++) {
 		str->ReadScalar(act->PCStats->QuickItemSlots[i]);

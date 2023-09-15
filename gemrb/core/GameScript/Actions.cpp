@@ -7588,21 +7588,18 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	// spell
-	auto max = *std::max_element(actor->PCStats->FavouriteSpellsCount.begin(), actor->PCStats->FavouriteSpellsCount.end());
-	ResRef favourite = actor->PCStats->FavouriteSpells[max];
-	ieWord maxUses = actor->PCStats->FavouriteSpellsCount[max];
-	if (maxUses == 0) favourite = "/";
-	core->GetTokenDictionary()["FAVOURITESPELL"] = StringFromCString(favourite.c_str());
-	SetTokenAsString("FAVOURITESPELLNUM", maxUses);
+	static auto setfav = [](const auto& favs, ieVariable favtok, ieVariable cnttok) {
+		String token = u"/";
+		auto fav = std::max_element(favs.begin(), favs.end(), [] (const auto& lhs, const auto& rhs) {
+			return lhs.second < rhs.second;
+		});
+		if (fav->second != 0) token = StringFromCString(fav->first.c_str());
+		core->GetTokenDictionary()[favtok] = token;
+		SetTokenAsString(cnttok, fav->second);
+	};
 
-	// weapon
-	max = *std::max_element(actor->PCStats->FavouriteWeaponsCount.begin(), actor->PCStats->FavouriteWeaponsCount.end());
-	favourite = actor->PCStats->FavouriteWeapons[max];
-	maxUses = actor->PCStats->FavouriteWeaponsCount[max];
-	if (maxUses == 0) favourite = "/";
-	core->GetTokenDictionary()["FAVOURITEWEAPON"] = StringFromCString(favourite.c_str());
-	SetTokenAsString("FAVOURITEWEAPONNUM", maxUses);
+	setfav(actor->PCStats->FavouriteSpells, "FAVOURITESPELL", "FAVOURITESPELLNUM");
+	setfav(actor->PCStats->FavouriteWeapons, "FAVOURITEWEAPON", "FAVOURITEWEAPONNUM");
 
 	// kill stats
 	SetTokenAsString("KILLCOUNT", actor->PCStats->KillsTotalCount);

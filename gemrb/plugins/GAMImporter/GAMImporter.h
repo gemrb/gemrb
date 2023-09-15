@@ -67,7 +67,7 @@ private:
 	bool Import(DataStream* stream) override;
 
 	Actor* GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_party);
-	void GetPCStats(PCStatsStruct* ps, bool extended);
+	void GetPCStats(PCStatsStruct& ps, bool extended);
 	GAMJournalEntry* GetJournalEntry();
 
 	int PutHeader(DataStream *stream, const Game *game) const;

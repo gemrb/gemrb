@@ -25,42 +25,6 @@
 
 namespace GemRB {
 
-// because of the levels list, the class isn't trivially copiable
-PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
-{
-	if (&source == this) return *this;
-	BestKilledName = source.BestKilledName;
-	BestKilledXP = source.BestKilledXP;
-	KillsChapterXP = source.KillsChapterXP;
-	KillsChapterCount = source.KillsChapterCount;
-	KillsTotalXP = source.KillsTotalXP;
-	KillsTotalCount = source.KillsTotalCount;
-	std::copy(std::begin(source.FavouriteSpells), std::end(source.FavouriteSpells), std::begin(FavouriteSpells));
-	FavouriteSpellsCount = source.FavouriteSpellsCount;
-	std::copy(std::begin(source.FavouriteWeapons), std::end(source.FavouriteWeapons), std::begin(FavouriteWeapons));
-	FavouriteWeaponsCount = source.FavouriteWeaponsCount;
-	memcpy(QSlots, source.QSlots, sizeof(QSlots));
-	for (int i = 0; i < MAX_QSLOTS; i++) {
-		QuickSpells[i] = source.QuickSpells[i];
-	}
-	memcpy(QuickSpellBookType, source.QuickSpellBookType, sizeof(QuickSpellBookType));
-	memcpy(QuickItemSlots, source.QuickItemSlots, sizeof(QuickItemSlots));
-	memcpy(QuickItemHeaders, source.QuickItemHeaders, sizeof(QuickItemHeaders));
-	memcpy(QuickWeaponSlots, source.QuickWeaponSlots, sizeof(QuickWeaponSlots));
-	memcpy(QuickWeaponHeaders, source.QuickWeaponHeaders, sizeof(QuickWeaponHeaders));
-	memcpy(ExtraSettings, source.ExtraSettings, sizeof(ExtraSettings));
-	JoinDate = source.JoinDate;
-	AwayTime = source.AwayTime;
-	unknown10 = source.unknown10;
-	Happiness = source.Happiness;
-	SoundSet = source.SoundSet;
-	SoundFolder = source.SoundFolder;
-	States = source.States;
-	LastLeft = source.LastLeft;
-	LastJoined = source.LastJoined;
-	return *this;
-}
-
 void PCStatsStruct::IncrementChapter()
 {
 	KillsChapterXP = 0;
@@ -220,68 +184,47 @@ int PCStatsStruct::GetHeaderForSlot(int slot) const
 //if it is the new favourite candidate (last slot) then just increase the usage count
 //but also swap it with a previous slot if its usage count is now better, so the last slot is always the weakest
 //finally if it was not found anywhere, register it as the new candidate with 1 usage
-
-void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
+static void RegisterFavorite(PCStatsStruct::FavoriteList& favorites, const ResRef& fav) noexcept
 {
-	ResRef *respoi;
-	std::array<ieWord, MAX_FAVOURITES> cntpoi;
-
-	switch (what) {
-		case FAV_SPELL:
-			respoi = FavouriteSpells;
-			cntpoi = FavouriteSpellsCount;
-			break;
-		case FAV_WEAPON:
-			respoi = FavouriteWeapons;
-			cntpoi = FavouriteWeaponsCount;
-			break;
-		default:
-			error("PCStatsStruct", "Illegal RegisterFavourite call...");
-	}
 	//least favourite candidate position and count
-	int minpos = 0;
-	ieWord mincnt = cntpoi[0];
-	int pos = 0;
-	for (pos = 0; pos<MAX_FAVOURITES-1; pos++) {
-		if (fav == respoi[pos]) {
+	PCStatsStruct::FavoriteList::value_type* minpos = &favorites.front();
+	ieWord mincnt = favorites[0].second;
+	for (auto& pair : favorites) {
+		if (fav == pair.first) {
 			//found an old favourite, just increase its usage count and done
-			if (cntpoi[pos]<0xffff) {
-				if (cntpoi[pos] == mincnt) {
-					// we'll beat the record, update the order too
-					break;
+			if (pair.second < std::numeric_limits<ieWord>::max()) {
+				++pair.second;
+				if (pair.second > mincnt) {
+					// we beat the record, update the order too
+					std::swap(pair, *minpos);
 				}
-				cntpoi[pos]++;
 			}
 			return;
 		}
-		if (pos) {
-			//collect least favourite for possible swapping
-			if (cntpoi[pos]<mincnt) {
-				minpos = pos;
-				mincnt = cntpoi[pos];
-			}
+
+		//collect least favourite for possible swapping
+		if (pair.second < mincnt) {
+			minpos = &pair;
 		}
 	}
 
-	//pos is always MAX_FAVOURITES-1 here
-	if (fav != respoi[pos]) {
+	if (fav != favorites.back().first) {
 		//new favourite candidate, scrapping the old one
-		cntpoi[pos] = 1;
+		favorites.back() = std::make_pair(fav, 1);
 		return;
 	}
-	//increase the favourite candidate
-	cntpoi[pos]++;
-	if (cntpoi[pos]>mincnt) {
-		//if it is now exceeding an old favourite, swap them
+}
 
-		//move the old resref to the last position
-		respoi[pos] = respoi[minpos];
-		//store the new resref into the new position
-		respoi[minpos] = fav;
-		//store the new count to the new position
-		cntpoi[minpos] = cntpoi[pos];
-		//store the old count to the last position
-		cntpoi[pos] = mincnt;
+void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
+{
+	switch (what) {
+		case FAV_SPELL:
+			return RegisterFavorite(FavouriteSpells, fav);
+		case FAV_WEAPON:
+			return RegisterFavorite(FavouriteWeapons, fav);
+		default:
+			Log(ERROR, "PCStatsStruct", "Illegal RegisterFavourite call: {}", what);
+			return;
 	}
 }
 

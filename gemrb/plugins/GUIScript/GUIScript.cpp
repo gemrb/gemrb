@@ -5744,26 +5744,27 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "KillsTotalXP", DecRef(PyLong_FromLong, ps->KillsTotalXP));
 	PyDict_SetItemString(dict, "KillsTotalCount", DecRef(PyLong_FromLong, ps->KillsTotalCount));
 
-	if (!ps->FavouriteSpells[0].IsEmpty()) {
-		auto max = *std::max_element(ps->FavouriteSpellsCount.begin(), ps->FavouriteSpellsCount.end());
-		ResRef mostUsed = ps->FavouriteSpells[max];
-		const Spell* spell = gamedata->GetSpell(mostUsed);
-		if (!spell) return RuntimeError("Spell not found!\n");
+	static auto GetFav = [](const auto& favs) {
+		auto fav = std::max_element(favs.begin(), favs.end(), [] (const auto& lhs, const auto& rhs) {
+			return lhs.second < rhs.second;
+		});
+		return fav->first;
+	};
 
-		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromStrRef, spell->SpellName));
-		gamedata->FreeSpell(spell, mostUsed, false);
+	auto favorite = GetFav(ps->FavouriteSpells);
+	const Spell* favspell = gamedata->GetSpell(favorite);
+	if (favspell) {
+		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromStrRef, favspell->SpellName));
+		gamedata->FreeSpell(favspell, favorite, false);
 	} else {
 		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyLong_FromLong, -1));
 	}
 
-	if (!ps->FavouriteWeapons[0].IsEmpty()) {
-		auto max = *std::max_element(ps->FavouriteWeaponsCount.begin(), ps->FavouriteWeaponsCount.end());
-		ResRef mostUsed = ps->FavouriteWeapons[max];
-		const Item* item = gamedata->GetItem(mostUsed);
-		if (!item) return RuntimeError("Item not found!\n");
-
-		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromStrRef, item->GetItemName(true)));
-		gamedata->FreeItem(item, mostUsed, false);
+	favorite = GetFav(ps->FavouriteWeapons);
+	const Item* favweap = gamedata->GetItem(favorite);
+	if (favweap) {
+		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromStrRef, favweap->GetItemName(true)));
+		gamedata->FreeItem(favweap, favorite, false);
 	} else {
 		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromLong, -1));
 	}

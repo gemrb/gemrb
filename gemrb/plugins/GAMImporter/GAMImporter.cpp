@@ -318,24 +318,13 @@ struct PCStruct {
 	Point Pos;
 	Point   ViewPos;
 	Modal   ModalState;
-	ieWordSigned   Happiness;
-	ieDword  Interact[MAX_INTERACT];
-	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
-	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
-	ResRef QuickSpellResRef[MAX_QSLOTS];
-	ieWord   QuickItemSlot[MAX_QUICKITEMSLOT];
-	ieWord   QuickItemHeader[MAX_QUICKITEMSLOT];
 	ieVariable Name;
 	ieDword  TalkCount;
-	ieByte QSlots[GUIBT_COUNT];
-	ieByte QuickSpellClass[MAX_QSLOTS];
 };
 
 Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_party)
 {
 	PCStruct pcInfo{};
-	ieDword tmpDword;
-	ieWord tmpWord;
 
 	str->ReadWord(pcInfo.Selected);
 	str->ReadWord(pcInfo.PartyOrder);
@@ -347,63 +336,62 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	str->ReadPoint(pcInfo.Pos);
 	str->ReadPoint(pcInfo.ViewPos);
 	str->ReadEnum<Modal>(pcInfo.ModalState); //see Modal.ids
-	str->ReadScalar<ieWordSigned>(pcInfo.Happiness);
-	for (unsigned int& interact : pcInfo.Interact) {
+
+	PCStatsStruct ps;
+	str->ReadScalar<ieWordSigned>(ps.Happiness);
+
+	for (ieDword& interact : ps.Interact) {
 		str->ReadDword(interact); //interact counters
 	}
 
 	bool extended = version==GAM_VER_GEMRB || version==GAM_VER_IWD2;
 	if (extended) {
-		ResRef tmp;
-
 		for (unsigned int i = 0; i < 4; i++) {
-			str->ReadWord(pcInfo.QuickWeaponSlot[i]);
-			str->ReadWord(pcInfo.QuickWeaponSlot[i+4]);
+			str->ReadWord(ps.QuickWeaponSlots[i]);
+			str->ReadWord(ps.QuickWeaponSlots[i + 4]);
 		}
 		for (unsigned int i = 0; i < 4; i++) {
-			str->ReadWord(tmpWord);
-			SanityCheck( pcInfo.QuickWeaponSlot[i], tmpWord, "weapon");
-			pcInfo.QuickWeaponHeader[i]=tmpWord;
-			str->ReadWord(tmpWord);
-			SanityCheck( pcInfo.QuickWeaponSlot[i+4], tmpWord, "weapon");
-			pcInfo.QuickWeaponHeader[i+4]=tmpWord;
+			str->ReadWord(ps.QuickWeaponHeaders[i]);
+			SanityCheck(ps.QuickWeaponSlots[i], ps.QuickWeaponHeaders[i], "weapon");
+			str->ReadWord(ps.QuickWeaponHeaders[i + 4]);
+			SanityCheck(ps.QuickWeaponSlots[i + 4], ps.QuickWeaponHeaders[i + 4], "weapon");
 		}
-		for (auto& spell : pcInfo.QuickSpellResRef) {
+		for (auto& spell : ps.QuickSpells) {
 			str->ReadResRef(spell);
 		}
-		str->Read( &pcInfo.QuickSpellClass, MAX_QSLOTS ); //9 bytes
+		str->Read(&ps.QuickSpellBookType, MAX_QSLOTS); //9 bytes
 
 		str->Seek( 1, GEM_CURRENT_POS); //skipping a padding byte
 		for (unsigned int i = 0; i < 3; i++) {
-			str->ReadWord(pcInfo.QuickItemSlot[i]);
+			str->ReadWord(ps.QuickItemSlots[i]);
 		}
 		for (unsigned int i = 0; i < 3; i++) {
-			str->ReadWord(tmpWord);
-			SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
-			pcInfo.QuickItemHeader[i]=tmpWord;
+			str->ReadWord(ps.QuickItemHeaders[i]);
+			SanityCheck(ps.QuickItemSlots[i], ps.QuickItemHeaders[i], "item");
 		}
-		pcInfo.QuickItemHeader[3]=0xffff;
-		pcInfo.QuickItemHeader[4]=0xffff;
+		ps.QuickItemHeaders[3] = 0xffff;
+		ps.QuickItemHeaders[4] = 0xffff;
 		if (version == GAM_VER_IWD2) {
 			//quick innates
 			//we spare some memory and time by storing them in the same place
 			//this may be slightly buggy because IWD2 doesn't clear the
 			//fields, but QuickSpellClass is set correctly
+			ResRef tmp;
 			for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
 				str->ReadResRef(tmp);
-				if (!tmp.IsEmpty() && pcInfo.QuickSpellResRef[i].IsEmpty()) {
-					pcInfo.QuickSpellResRef[i] = tmp;
+				if (!tmp.IsEmpty() && ps.QuickSpells[i].IsEmpty()) {
+					ps.QuickSpells[i] = tmp;
 					//innates
-					pcInfo.QuickSpellClass[i]=0xff;
+					ps.QuickSpellBookType[i] = 0xff;
 				}
 			}
 			//recently discovered fields (bard songs)
 			for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
 				str->ReadResRef(tmp);
-				if (!tmp.IsEmpty() && pcInfo.QuickSpellResRef[i].IsEmpty()) {
-					pcInfo.QuickSpellResRef[i] = tmp;
+				if (!tmp.IsEmpty() && ps.QuickSpells[i].IsEmpty()) {
+					ps.QuickSpells[i] = tmp;
 					//bardsongs
-					pcInfo.QuickSpellClass[i]=0xfe;
+					ps.QuickSpellBookType[i] = 0xfe;
 				}
 			}
 		}
@@ -412,47 +400,45 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		//the first 3 slots are hardcoded anyway
 		// in iwd2 0 is guard, bg2 talk
 		// in iwd1 and bg1 0 is guard, 1 talk, everything shifted one further
-		pcInfo.QSlots[0] = ACT_DEFEND;
-		pcInfo.QSlots[1] = ACT_WEAPON1;
-		pcInfo.QSlots[2] = ACT_WEAPON2;
+		ps.QSlots[0] = ACT_DEFEND;
+		ps.QSlots[1] = ACT_WEAPON1;
+		ps.QSlots[2] = ACT_WEAPON2;
 		for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
-			str->ReadDword(tmpDword);
-			pcInfo.QSlots[i+3] = (ieByte) tmpDword;
+			ieDword tmp;
+			str->ReadDword(tmp);
+			ps.QSlots[i + 3] = static_cast<ieByte>(tmp);
 		}
 	} else {
 		for (unsigned int i = 0; i < 4; i++) {
-			str->ReadWord(pcInfo.QuickWeaponSlot[i]);
+			str->ReadWord(ps.QuickWeaponSlots[i]);
 		}
 		for (unsigned int i = 0; i < 4; i++) {
-			str->ReadWord(tmpWord);
-			SanityCheck( pcInfo.QuickWeaponSlot[i], tmpWord, "weapon");
-			pcInfo.QuickWeaponHeader[i]=tmpWord;
+			str->ReadWord(ps.QuickWeaponHeaders[i]);
+			SanityCheck(ps.QuickWeaponSlots[i], ps.QuickWeaponHeaders[i], "weapon");
 		}
 		for (unsigned int i = 0; i < 3; i++) {
-			str->ReadResRef(pcInfo.QuickSpellResRef[i]);
+			str->ReadResRef(ps.QuickSpells[i]);
 		}
 		if (version==GAM_VER_PST) { //Torment
-			for (unsigned short& slot : pcInfo.QuickItemSlot) {
+			for (unsigned short& slot : ps.QuickItemSlots) {
 				str->ReadWord(slot);
 			}
 			for (unsigned int i = 0; i < 5; i++) {
-				str->ReadWord(tmpWord);
-				SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
-				pcInfo.QuickItemHeader[i]=tmpWord;
+				str->ReadWord(ps.QuickItemHeaders[i]);
+				SanityCheck(ps.QuickItemSlots[i], ps.QuickItemHeaders[i], "item");
 			}
 			//str->Seek( 10, GEM_CURRENT_POS ); //enabler fields
 		} else {
 			for (unsigned int i = 0; i < 3; i++) {
-				str->ReadWord(pcInfo.QuickItemSlot[i]);
+				str->ReadWord(ps.QuickItemSlots[i]);
 			}
 			for (unsigned int i = 0; i < 3; i++) {
-				str->ReadWord(tmpWord);
-				SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
-				pcInfo.QuickItemHeader[i]=tmpWord;
+				str->ReadWord(ps.QuickItemHeaders[i]);
+				SanityCheck(ps.QuickItemSlots[i], ps.QuickItemHeaders[i], "item");
 			}
 			//str->Seek( 6, GEM_CURRENT_POS ); //enabler fields
 		}
-		pcInfo.QSlots[0] = 0xff; //(invalid, will be regenerated)
+		ps.QSlots[0] = 0xff; //(invalid, will be regenerated)
 	}
 	str->ReadVariable(pcInfo.Name);
 	str->ReadDword(pcInfo.TalkCount);
@@ -460,13 +446,13 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	size_t pos = str->GetPos();
 
 	Actor* actor = NULL;
-	tmpWord = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
+	int slot = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
 
 	if (pcInfo.OffsetToCRE) {
 		DataStream* ms = SliceStream( str, pcInfo.OffsetToCRE, pcInfo.CRESize );
 		if (ms) {
 			aM->Open(ms);
-			actor = aM->GetActor(tmpWord);
+			actor = aM->GetActor(slot);
 		}
 
 		//torment has them as 0 or -1
@@ -487,21 +473,10 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		return actor;
 	}
 
-	//
 	str->Seek(pos, GEM_STREAM_START);
-	//
-	actor->CreateStats();
-	PCStatsStruct *ps = actor->PCStats;
+
 	GetPCStats(ps, extended);
-	memcpy(ps->QSlots, pcInfo.QSlots, sizeof(pcInfo.QSlots) );
-	for (int i = 0; i < MAX_QSLOTS; i++) {
-		ps->QuickSpells[i] = pcInfo.QuickSpellResRef[i];
-	}
-	memcpy(ps->QuickSpellBookType, pcInfo.QuickSpellClass, MAX_QSLOTS);
-	memcpy(ps->QuickWeaponSlots, pcInfo.QuickWeaponSlot, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
-	memcpy(ps->QuickWeaponHeaders, pcInfo.QuickWeaponHeader, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
-	memcpy(ps->QuickItemSlots, pcInfo.QuickItemSlot, MAX_QUICKITEMSLOT*sizeof(ieWord) );
-	memcpy(ps->QuickItemHeaders, pcInfo.QuickItemHeader, MAX_QUICKITEMSLOT*sizeof(ieWord) );
+
 	actor->ReinitQuickSlots();
 	actor->Destination = actor->Pos = pcInfo.Pos;
 	actor->Area = pcInfo.Area;
@@ -509,44 +484,44 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->Modal.State = pcInfo.ModalState;
 	actor->SetModalSpell(actor->Modal.State, {});
-	ps->Happiness = pcInfo.Happiness;
-	memcpy(ps->Interact, pcInfo.Interact, MAX_INTERACT *sizeof(ieDword) );
 
-	actor->SetPersistent( tmpWord );
-
+	actor->SetPersistent(slot);
 	actor->Selected = pcInfo.Selected;
+	
+	actor->CreateStats();
+	*actor->PCStats = std::move(ps);
 	return actor;
 }
 
-void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
+void GAMImporter::GetPCStats(PCStatsStruct& ps, bool extended)
 {
-	str->ReadStrRef(ps->BestKilledName);
-	str->ReadDword(ps->BestKilledXP);
-	str->ReadDword(ps->AwayTime);
-	str->ReadDword(ps->JoinDate);
-	str->ReadDword(ps->unknown10);
-	str->ReadDword(ps->KillsChapterXP);
-	str->ReadDword(ps->KillsChapterCount);
-	str->ReadDword(ps->KillsTotalXP);
-	str->ReadDword(ps->KillsTotalCount);
+	str->ReadStrRef(ps.BestKilledName);
+	str->ReadDword(ps.BestKilledXP);
+	str->ReadDword(ps.AwayTime);
+	str->ReadDword(ps.JoinDate);
+	str->ReadDword(ps.unknown10);
+	str->ReadDword(ps.KillsChapterXP);
+	str->ReadDword(ps.KillsChapterCount);
+	str->ReadDword(ps.KillsTotalXP);
+	str->ReadDword(ps.KillsTotalCount);
 	for (int i = 0; i <= 3; i++) {
-		str->ReadResRef( ps->FavouriteSpells[i] );
+		str->ReadResRef(ps.FavouriteSpells[i].first);
 	}
 	for (int i = 0; i <= 3; i++)
-		str->ReadWord(ps->FavouriteSpellsCount[i]);
+		str->ReadWord(ps.FavouriteSpells[i].second);
 
 	for (int i = 0; i <= 3; i++) {
-		str->ReadResRef( ps->FavouriteWeapons[i] );
+		str->ReadResRef(ps.FavouriteWeapons[i].first);
 	}
 	for (int i = 0; i <= 3; i++)
-		str->ReadWord(ps->FavouriteWeaponsCount[i]);
+		str->ReadWord(ps.FavouriteWeapons[i].second);
 
-	str->ReadResRef( ps->SoundSet );
+	str->ReadResRef(ps.SoundSet);
 
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
 		ieVariable soundFolder;
 		str->ReadVariable(soundFolder);
-		ps->SoundFolder = StringFromCString(soundFolder.c_str());
+		ps.SoundFolder = StringFromCString(soundFolder.c_str());
 	}
 	
 	//iwd2 has some PC only stats that the player can set (this can be done via a guiscript interface)
@@ -556,7 +531,7 @@ void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
 		//5 - arterial strike
 		//6 - hamstring
 		//7 - rapid shot
-		for (unsigned int& extraSetting : ps->ExtraSettings) {
+		for (unsigned int& extraSetting : ps.ExtraSettings) {
 			str->ReadDword(extraSetting);
 		}
 	}
@@ -924,18 +899,21 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			}
 		}
-		//quick spell classes, clear the field for iwd2 if it is
-		//a bard song/innate slot (0xfe or 0xff)
-		char filling[10] = {};
-		memcpy(filling, ac->PCStats->QuickSpellBookType, MAX_QSLOTS);
+
 		if (GAMVersion == GAM_VER_IWD2) {
-			for (int i = 0; i < MAX_QSLOTS; i++) {
-				if((ieByte) filling[i]>=0xfe) {
-					filling[i]=0;
+			//quick spell classes, clear the field for iwd2 if it is
+			//a bard song/innate slot (0xfe or 0xff)
+			for (ieByte qbyte : ac->PCStats->QuickSpellBookType) {
+				if (qbyte >= 0xfe) {
+					stream->WriteScalar<ieByte>(0);
+				} else {
+					stream->WriteScalar(qbyte);
 				}
 			}
+			stream->WriteScalar<ieByte>(0); // null terminator
+		} else {
+			stream->WriteFilling(10);
 		}
-		stream->Write(filling,10);
 	} else {
 		for (int i = 0; i < 3; i++) {
 			stream->WriteResRef(ac->PCStats->QuickSpells[i]);
@@ -1000,17 +978,17 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	stream->WriteDword(ac->PCStats->KillsChapterCount);
 	stream->WriteDword(ac->PCStats->KillsTotalXP);
 	stream->WriteDword(ac->PCStats->KillsTotalCount);
-	for (const auto& favouriteSpell : ac->PCStats->FavouriteSpells) {
-		stream->WriteResRefUC(favouriteSpell);
+	for (const auto& favourite : ac->PCStats->FavouriteSpells) {
+		stream->WriteResRefUC(favourite.first);
 	}
-	for (unsigned short& favCount : ac->PCStats->FavouriteSpellsCount) {
-		stream->WriteWord(favCount);
+	for (const auto& favourite : ac->PCStats->FavouriteSpells) {
+		stream->WriteWord(favourite.second);
 	}
-	for (const auto& favouriteWeapon : ac->PCStats->FavouriteWeapons) {
-		stream->WriteResRefUC(favouriteWeapon);
+	for (const auto& favourite : ac->PCStats->FavouriteWeapons) {
+		stream->WriteResRefUC(favourite.first);
 	}
-	for (unsigned short& favCount : ac->PCStats->FavouriteWeaponsCount) {
-		stream->WriteWord(favCount);
+	for (const auto& favourite : ac->PCStats->FavouriteWeapons) {
+		stream->WriteWord(favourite.second);
 	}
 	stream->WriteResRefUC(ac->PCStats->SoundSet);
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {

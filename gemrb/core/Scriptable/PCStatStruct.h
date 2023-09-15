@@ -110,6 +110,7 @@ public:
 	};
 	
 	using StateArray = std::array<State, MAX_PORTRAIT_ICONS>;
+	using FavoriteList = std::array<std::pair<ResRef, ieWord>, MAX_FAVOURITES>;
 
 	ieStrRef  BestKilledName = ieStrRef::INVALID;
 	ieDword   BestKilledXP = 0;
@@ -120,33 +121,29 @@ public:
 	ieDword   KillsChapterCount = 0;
 	ieDword   KillsTotalXP = 0;
 	ieDword   KillsTotalCount = 0;
-	ResRef  FavouriteSpells[MAX_FAVOURITES];
-	std::array<ieWord, MAX_FAVOURITES> FavouriteSpellsCount {0};
-	ResRef  FavouriteWeapons[MAX_FAVOURITES];
-	std::array<ieWord, MAX_FAVOURITES> FavouriteWeaponsCount {0};
+	FavoriteList FavouriteSpells;
+	FavoriteList FavouriteWeapons;
 	ResRef  SoundSet;
 	String SoundFolder;
-	ieDword   ExtraSettings[ES_COUNT] {0};     //iwd2 - expertise, hamstring, arterial strike, etc
-	ResRef    QuickSpells[MAX_QSLOTS]; //iwd2 uses 9, others use only 3
-	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT] {0xffff}; //iwd2 uses 8, others use only 4
-	ieWord    QuickWeaponHeaders[MAX_QUICKWEAPONSLOT] {0xffff};
-	ieWord    QuickItemSlots[MAX_QUICKITEMSLOT] {0xffff};           //pst has 5, others use only 3
-	ieWord    QuickItemHeaders[MAX_QUICKITEMSLOT] {0xffff};
-	ieByte    QSlots[GUIBT_COUNT] {0xff, 0};          //iwd2 specific
-	ieByte    QuickSpellBookType[MAX_QSLOTS] { 0xff };
+	std::array<ieDword, ES_COUNT> ExtraSettings {0};					//iwd2 - expertise, hamstring, arterial strike, etc
+	std::array<ResRef, MAX_QSLOTS> QuickSpells;							//iwd2 uses 9, others use only 3
+	std::array<ieWord, MAX_QUICKWEAPONSLOT> QuickWeaponSlots {0xffff};	//iwd2 uses 8, others use only 4
+	std::array<ieWord, MAX_QUICKWEAPONSLOT> QuickWeaponHeaders {0xffff};
+	std::array<ieWord, MAX_QUICKITEMSLOT> QuickItemSlots {0xffff};  	//pst has 5, others use only 3
+	std::array<ieWord, MAX_QUICKITEMSLOT> QuickItemHeaders {0xffff};
+	std::array<ieByte, GUIBT_COUNT> QSlots {0xff, 0};          			//iwd2 specific
+	std::array<ieByte, MAX_QSLOTS> QuickSpellBookType {0xff};
 	StateArray States;
 	ieDword   LastLeft = 0;   //trigger
 	ieDword   LastJoined = 0; //trigger
-	ieDword   Interact[MAX_INTERACT] {0};
+	std::array<ieDword, MAX_INTERACT> Interact {0};
 	ieWordSigned Happiness = 0;
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
 	PCStatsStruct() noexcept = default;
-	explicit PCStatsStruct(const std::list<int>& levels);
-	PCStatsStruct(const PCStatsStruct&) = delete;
-	~PCStatsStruct() noexcept = default;
-	PCStatsStruct& operator=(const PCStatsStruct &source);
+	explicit PCStatsStruct(std::list<int> levels);
+
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);
 	void InitQuickSlot(unsigned int which, ieWord slot, ieWord headerIndex);
@@ -154,7 +151,6 @@ public:
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex) const;
 	int GetHeaderForSlot(int slot) const;
 	void RegisterFavourite(const ResRef& fav, int what);
-	void UpdateClassLevels(const std::list<int> &levels);
 	
 	std::string GetStateString() const;
 	void EnableState(state_t state);
