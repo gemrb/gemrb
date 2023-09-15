@@ -291,6 +291,7 @@ using aniIterator = std::list<AreaAnimation>::iterator;
 using scaIterator = std::list<VEFObject*>::const_iterator;
 using proIterator = std::list<Projectile*>::const_iterator;
 using spaIterator = std::list<Particles*>::const_iterator;
+static const Size ZeroSize;
 
 class GEM_EXPORT TileProps {
 	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
@@ -575,8 +576,8 @@ public:
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(Point &goal, int radiusx = 0, int radiusy = 0, int size = -1) const;
-	void AdjustPositionNavmap(Point &goal, int radiusx = 0, int radiusy = 0) const;
+	void AdjustPosition(Point& goal, const Size& startingRadius = ZeroSize, int size = -1) const;
+	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
 	/* Finds the path which leads the farthest from d */
 	PathListNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const;
 	PathListNode* RandomWalk(const Point &s, int size, int radius, const Actor *caller) const;
@@ -680,9 +681,9 @@ private:
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised
-	bool AdjustPositionX(SearchmapPoint& goal, int radiusx, int radiusy, int size = -1) const;
-	bool AdjustPositionY(SearchmapPoint& goal, int radiusx, int radiusy, int size = -1) const;
-	
+	bool AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size = -1) const;
+	bool AdjustPositionY(SearchmapPoint& goal, const Size& radius, int size = -1) const;
+
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 	void AddProjectile(Projectile* pro);

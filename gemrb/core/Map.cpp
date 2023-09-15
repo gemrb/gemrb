@@ -2862,32 +2862,33 @@ std::string Map::dump(bool show_actors) const
 	return buffer;
 }
 
-bool Map::AdjustPositionX(SearchmapPoint& goal, int radiusx, int radiusy, int size) const
+bool Map::AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size) const
 {
 	int minx = 0;
-	if (goal.x > radiusx)
-		minx = goal.x - radiusx;
-	int maxx = goal.x + radiusx + 1;
-	
+	if (goal.x > radius.w) {
+		minx = goal.x - radius.w;
+	}
+	int maxx = goal.x + radius.w + 1;
+
 	const Size& mapSize = PropsSize();
 	
 	if (maxx > mapSize.w)
 		maxx = mapSize.w;
 
 	for (int scanx = minx; scanx < maxx; scanx++) {
-		if (goal.y >= radiusy) {
-			const SearchmapPoint p(scanx, (goal.y - radiusy));
+		if (goal.y >= radius.h) {
+			const SearchmapPoint p(scanx, goal.y - radius.h);
 			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
-				goal.y = goal.y - radiusy;
+				goal.y = goal.y - radius.h;
 				return true;
 			}
 		}
-		if (goal.y + radiusy < mapSize.h) {
-			const SearchmapPoint p(scanx, (goal.y + radiusy));
+		if (goal.y + radius.h < mapSize.h) {
+			const SearchmapPoint p(scanx, goal.y + radius.h);
 			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
-				goal.y = goal.y + radiusy;
+				goal.y = goal.y + radius.h;
 				return true;
 			}
 		}
@@ -2895,29 +2896,30 @@ bool Map::AdjustPositionX(SearchmapPoint& goal, int radiusx, int radiusy, int si
 	return false;
 }
 
-bool Map::AdjustPositionY(SearchmapPoint& goal, int radiusx, int radiusy, int size) const
+bool Map::AdjustPositionY(SearchmapPoint& goal, const Size& radius, int size) const
 {
 	int miny = 0;
-	if (goal.y > radiusy)
-		miny = goal.y - radiusy;
-	int maxy = goal.y + radiusy + 1;
-	
+	if (goal.y > radius.h) {
+		miny = goal.y - radius.h;
+	}
+	int maxy = goal.y + radius.h + 1;
+
 	const Size& mapSize = PropsSize();
 	if (maxy > mapSize.h)
 		maxy = mapSize.h;
 	for (int scany = miny; scany < maxy; scany++) {
-		if (goal.x >= radiusx) {
-			const SearchmapPoint p((goal.x - radiusx), scany);
+		if (goal.x >= radius.w) {
+			const SearchmapPoint p(goal.x - radius.w, scany);
 			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
-				goal.x = goal.x - radiusx;
+				goal.x = goal.x - radius.w;
 				goal.y = scany;
 				return true;
 			}
 		}
-		if (goal.x + radiusx < mapSize.w) {
-			const SearchmapPoint p((goal.x + radiusx), scany);
+		if (goal.x + radius.w < mapSize.w) {
+			const SearchmapPoint p(goal.x + radius.w, scany);
 			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
-				goal.x = goal.x + radiusx;
+				goal.x = goal.x + radius.w;
 				goal.y = scany;
 				return true;
 			}
@@ -2926,17 +2928,18 @@ bool Map::AdjustPositionY(SearchmapPoint& goal, int radiusx, int radiusy, int si
 	return false;
 }
 
-void Map::AdjustPositionNavmap(NavmapPoint &goal, int radiusx, int radiusy) const
+void Map::AdjustPositionNavmap(NavmapPoint& goal, const Size& radius) const
 {
 	SearchmapPoint smptGoal = ConvertCoordToTile(goal);
-	AdjustPosition(smptGoal, radiusx, radiusy);
+	AdjustPosition(smptGoal, radius);
 	goal.x = smptGoal.x * 16 + 8;
 	goal.y = smptGoal.y * 12 + 6;
 }
 
-void Map::AdjustPosition(SearchmapPoint &goal, int radiusx, int radiusy, int size) const
+void Map::AdjustPosition(SearchmapPoint& goal, const Size& startingRadius, int size) const
 {
 	const Size& mapSize = PropsSize();
+	Size radius = startingRadius;
 
 	if (goal.x > mapSize.w) {
 		goal.x = mapSize.w;
@@ -2945,28 +2948,28 @@ void Map::AdjustPosition(SearchmapPoint &goal, int radiusx, int radiusy, int siz
 		goal.y = mapSize.h;
 	}
 
-	while(radiusx < mapSize.w || radiusy < mapSize.h) {
+	while (radius.w < mapSize.w || radius.h < mapSize.h) {
 		//lets make it slightly random where the actor will appear
 		if (RandomFlip()) {
-			if (AdjustPositionX(goal, radiusx, radiusy, size)) {
+			if (AdjustPositionX(goal, radius, size)) {
 				return;
 			}
-			if (AdjustPositionY(goal, radiusx, radiusy, size)) {
+			if (AdjustPositionY(goal, radius, size)) {
 				return;
 			}
 		} else {
-			if (AdjustPositionY(goal, radiusx, radiusy, size)) {
+			if (AdjustPositionY(goal, radius, size)) {
 				return;
 			}
-			if (AdjustPositionX(goal, radiusx, radiusy, size)) {
+			if (AdjustPositionX(goal, radius, size)) {
 				return;
 			}
 		}
-		if (radiusx < mapSize.w) {
-			radiusx++;
+		if (radius.w < mapSize.w) {
+			radius.w++;
 		}
-		if (radiusy < mapSize.h) {
-			radiusy++;
+		if (radius.h < mapSize.h) {
+			radius.h++;
 		}
 	}
 }

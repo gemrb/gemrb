@@ -4758,7 +4758,7 @@ void Actor::SetPosition(const Point& nmptTarget, bool jump, const Size& radius, 
 		const Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
 		map->ClearSearchMapFor(this);
-		map->AdjustPosition(p, radius.w, radius.h, size);
+		map->AdjustPosition(p, radius, size);
 	}
 	if (p==q) {
 		MoveTo(nmptTarget);
