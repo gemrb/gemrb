@@ -35,7 +35,7 @@ Console::Console(const Region& frame, TextArea* ta)
 
 	if (ta) {
 		textArea = ta;
-		ControlEventHandler handler = [this](const Control* c) {
+		textArea->SetAction([this](const Control* c) {
 			auto val = c->GetValue();
 			size_t histSize = History.Size();
 			size_t selected = histSize - val;
@@ -47,8 +47,7 @@ Console::Console(const Region& frame, TextArea* ta)
 				SetText(c->QueryText());
 			}
 			SetFocus();
-		};
-		textArea->SetAction(std::move(handler), TextArea::Action::Select);
+		}, TextArea::Action::Select);
 	}
 
 	LoadHistory();

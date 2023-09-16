@@ -55,15 +55,13 @@ WorldMapControl::WorldMapControl(const Region& frame, Holder<Font> font, const C
 	// ensure the current area and any variable triggered additions are
 	// visible immediately and without the need for area travel
 	worldmap->CalculateDistances(currentArea, WMPDirection::NONE);
-
-	ControlEventHandler handler = [this](const Control* /*this*/) {
+	
+	SetAction([this](const Control* /*this*/) {
 		//this also updates visible locations
 		WorldMap* map = core->GetWorldMap();
 		uint8_t dir = static_cast<uint8_t>(GetValue());
 		map->CalculateDistances(currentArea, EnumIndex<WMPDirection>(dir));
-	};
-	
-	SetAction(std::move(handler), Control::ValueChange);
+	}, Control::ValueChange);
 }
 
 WorldMapControl::WorldMapControl(const Region& frame, Holder<Font> font)

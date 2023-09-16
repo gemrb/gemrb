@@ -151,12 +151,10 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 	if (sbar) {
 		// ensure scrollbars are on top
 		View::AddSubviewInFrontOfView(sbar, &contentView);
-
-		ControlEventHandler handler = [this](Control* sb) {
-			ScrollbarValueChange(static_cast<ScrollBar*>(sb));
-		};
 		
-		sbar->SetAction(std::move(handler), Control::ValueChange);
+		sbar->SetAction([this](Control* sb) {
+			ScrollbarValueChange(static_cast<ScrollBar*>(sb));
+		}, Control::ValueChange);
 	}
 }
 
