@@ -391,7 +391,7 @@ void Button::EnableBorder(int index, bool enabled)
 
 void Button::SetFont(Holder<Font> newfont)
 {
-	font = newfont;
+	font = std::move(newfont);
 }
 
 String Button::TooltipText() const

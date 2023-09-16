@@ -59,7 +59,7 @@ public:
 	/** Sets the Foreground Font Color */
 	void SetColors(const Color& col, const Color& bg);
 	/** Set the font being used */
-	void SetFont(Holder<Font> newFont) { font = newFont; }
+	void SetFont(Holder<Font> newFont) { font = std::move(newFont); }
 	/** Sets the Alignment of Text */
 	void SetAlignment(unsigned char newAlignment);
 	/** Simply returns the pointer to the text, don't modify it! */

@@ -290,7 +290,7 @@ public:
 	void ClearColors();
 	void SetColors(const Color& fg, const Color& bg);
 	const Font::PrintColors* TextColors() const { return colors; }
-	void SetFont(Holder<Font> fnt) { font = fnt; }
+	void SetFont(Holder<Font> fnt) { font = std::move(fnt); }
 	Holder<const Font> TextFont() const { return font; }
 	void SetAlignment(unsigned char align) { alignment = align; }
 
