@@ -363,7 +363,6 @@ Actor::Actor()
 Actor::~Actor(void)
 {
 	delete anims;
-	delete PCStats;
 
 	for (ScriptedAnimation* vvc : vfxQueue) {
 		delete vvc;
@@ -5249,7 +5248,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		if (grantXP && act) {
 			if (act->InParty) {
 				//adjust kill statistics here
-				PCStatsStruct *stat = act->PCStats;
+				auto& stat = act->PCStats;
 				if (stat) {
 					stat->NotifyKill(Modified[IE_XPVALUE], ShortStrRef);
 				}
@@ -6069,7 +6068,7 @@ std::list<int> Actor::ListLevels() const
 void Actor::CreateStats()
 {
 	if (!PCStats) {
-		PCStats = new PCStatsStruct();
+		PCStats = std::make_unique<PCStatsStruct>();
 	}
 }
 
@@ -10058,8 +10057,7 @@ Actor *Actor::CopySelf(bool mislead) const
 	} else {
 		newActor->inventory.CopyFrom(this);
 		if (PCStats) {
-			newActor->CreateStats();
-			*newActor->PCStats = *PCStats;
+			newActor->PCStats = std::make_unique<PCStatsStruct>(*PCStats);
 		}
 	}
 

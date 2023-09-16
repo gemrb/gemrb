@@ -488,8 +488,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->SetPersistent(slot);
 	actor->Selected = pcInfo.Selected;
 	
-	actor->CreateStats();
-	*actor->PCStats = std::move(ps);
+	actor->PCStats = std::make_unique<PCStatsStruct>(std::move(ps));
 	return actor;
 }
 

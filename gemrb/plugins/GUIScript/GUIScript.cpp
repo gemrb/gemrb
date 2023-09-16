@@ -220,7 +220,7 @@ static int GetCreatureStat(const Actor *actor, unsigned int StatID, int Mod)
 {
 	//this is a hack, if more PCStats fields are needed, improve it
 	if (StatID&EXTRASETTINGS) {
-		const PCStatsStruct *ps = actor->PCStats;
+		const auto& ps = actor->PCStats;
 		if (!ps) {
 			//the official invalid value in GetStat
 			return 0xdadadada;
@@ -254,7 +254,7 @@ static int SetCreatureStat(Actor *actor, unsigned int StatID, int StatValue, boo
 	}
 	//this is a hack, if more PCStats fields are needed, improve it
 	if (StatID&EXTRASETTINGS) {
-		PCStatsStruct *ps = actor->PCStats;
+		const auto& ps = actor->PCStats;
 		if (!ps) {
 			return 0;
 		}
@@ -5732,7 +5732,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 
-	PCStatsStruct* ps = MyActor->PCStats;
+	const auto& ps = MyActor->PCStats;
 
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "BestKilledName", DecRef(PyLong_FromStrRef, ps->BestKilledName));

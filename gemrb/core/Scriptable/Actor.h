@@ -422,7 +422,7 @@ public:
 	ResRef BardSong;               //custom bard song (updated by fx)
 	ResRef BackstabResRef = "*";         //apply on successful backstab
 
-	PCStatsStruct* PCStats = nullptr;
+	std::unique_ptr<PCStatsStruct> PCStats;
 	PCStatsStruct::StateArray previousStates;
 	ResRef SmallPortrait;
 	ResRef LargePortrait;
