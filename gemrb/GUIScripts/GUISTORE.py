@@ -262,11 +262,6 @@ def InitStoreShoppingWindow (Window):
 	Window.AddAlias('WINSHOP')
 	PositionStoreWinRelativeTo(Window)
 
-	GemRB.SetVar ("LeftIndex", 0) # reset the shopkeeps list
-	GemRB.SetVar ("LeftTopIndex", 0)
-	GemRB.SetVar ("RightTopIndex", 0)
-	GemRB.SetVar ("LeftTopIndex", 0)
-
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		# strings must be able to fit into a resref (<= 8 char)
@@ -350,6 +345,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetBorder (0,color,0,1)
 		color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 		Button.SetBorder (1, color, 0,1)
+		Button.SetVarAssoc ("LeftIndex", i)
 		Button.OnPress (SelectBuy)
 		Button.OnDoublePress (lambda: OpenItemAmountWindow(Window))
 		Button.OnRightPress (InfoLeftWindow)
@@ -357,6 +353,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
 		Button = Window.GetControlAlias ('RBTN' + str(i))
+		Button.SetVarAssoc ("RightIndex", i)
 		if GameCheck.IsBG2():
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 
@@ -368,6 +365,8 @@ def InitStoreShoppingWindow (Window):
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
+	GemRB.SetVar ("RightIndex", 0)
+	GemRB.SetVar ("LeftIndex", 0)
 	UnselectNoRedraw ()
 
 	# Buy
@@ -437,24 +436,17 @@ def UpdateStoreShoppingWindow (Window):
 	if LeftCount<0:
 		LeftCount=0
 	ScrollBar = Window.GetControlAlias ('STOSBARL')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", GemRB.GetVar ("LeftTopIndex"), 0, LeftCount)
+	ScrollBar.SetVarAssoc("LeftTopIndex", GemRB.GetVar("LeftTopIndex") or 0, 0, LeftCount)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
-	if LeftTopIndex>LeftCount:
-		GemRB.SetVar ("LeftTopIndex", LeftCount)
 
 	if Bag:
 		RightCount = Bag['StoreItemCount'] - ItemButtonCount
 	else:
 		inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 		RightCount = len(inventory_slots) - ItemButtonCount
-	if RightCount<0:
-		RightCount=0
 
 	ScrollBar = Window.GetControlAlias ('STOSBARR')
-	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, RightCount)
-	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	if RightTopIndex>RightCount:
-		GemRB.SetVar ("RightTopIndex", RightCount)
+	ScrollBar.SetVarAssoc("RightTopIndex", GemRB.GetVar("RightTopIndex") or 0, 0, max(0, RightCount))
 
 	RedrawStoreShoppingWindow (Window)
 	return
@@ -466,9 +458,6 @@ def InitStoreIdentifyWindow (Window):
 	global LeftButton
 
 	PositionStoreWinRelativeTo(Window)
-
-	GemRB.SetVar ("Index", None)
-	GemRB.SetVar ("TopIndex", 0)
 
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
@@ -504,6 +493,7 @@ def InitStoreIdentifyWindow (Window):
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range (ItemButtonCount):
 		Button = Window.GetControlAlias ("IDBTN" + str(i))
+		Button.SetVarAssoc ("Index", i)
 
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
@@ -516,11 +506,12 @@ def InitStoreIdentifyWindow (Window):
 			color = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
 
 		Button.SetBorder (0, color, 0, 1)
-		Button.OnPress (lambda: SelectID (Window))
+		Button.OnPress (SelectID)
 		Button.OnRightPress (InfoIdentifyWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
+	GemRB.SetVar ("Index", None)
 	UnselectNoRedraw ()
 	return
 
@@ -532,7 +523,6 @@ def UpdateStoreIdentifyWindow (Window):
 	Count = len(inventory_slots)
 	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, max(0, Count - ItemButtonCount))
-	GemRB.SetVar ("Index", None)
 	RedrawStoreIdentifyWindow (Window)
 	return
 
@@ -543,11 +533,6 @@ def InitStoreStealWindow (Window):
 	global LeftButton
 
 	PositionStoreWinRelativeTo(Window)
-
-	GemRB.SetVar ("RightIndex", 0)
-	GemRB.SetVar ("LeftIndex", 0)
-	GemRB.SetVar ("RightTopIndex", 0)
-	GemRB.SetVar ("LeftTopIndex", 0)
 
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
@@ -589,17 +574,22 @@ def InitStoreStealWindow (Window):
 			color = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
 
 		Button = Window.GetControlAlias ('SWLBTN' + str(i))
+		Button.SetVarAssoc ("LeftIndex", i)
 		Button.SetBorder (0,color,0,1)
+		Button.OnRightPress (InfoLeftWindow)
 		Button.OnPress (lambda: RedrawStoreStealWindow(Window))
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
 		Button = Window.GetControlAlias ('SWRBTN' + str(i))
+		Button.SetVarAssoc ("RightIndex", i)
 		Button.SetBorder (0,color,0,1)
 		Button.OnRightPress (InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
+	GemRB.SetVar ("RightIndex", 0)
+	GemRB.SetVar ("LeftIndex", 0)
 	UnselectNoRedraw ()
 
 	# Steal
@@ -632,14 +622,13 @@ def UpdateStoreStealWindow (Window):
 	Store = GemRB.GetStore ()
 	LeftCount = Store['StoreItemCount']
 	ScrollBar = Window.GetControlAlias ('SWLSBAR')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", 0, 0, max(0, LeftCount - ItemButtonCount))
+	ScrollBar.SetVarAssoc("LeftTopIndex", GemRB.GetVar("LeftTopIndex") or 0, 0, max(0, LeftCount - ItemButtonCount))
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControlAlias ('SWRSBAR')
-	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, max(0, RightCount - ItemButtonCount))
-	GemRB.SetVar ("LeftIndex", None)
+	ScrollBar.SetVarAssoc("RightTopIndex", GemRB.GetVar("RightTopIndex") or 0, 0, max(0, RightCount - ItemButtonCount))
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow (Window)
 	return
@@ -718,9 +707,6 @@ ToggleStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"
 OpenStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreDonateWindow, UpdateStoreDonateWindow, False, StoreWindowPlacement)
 
 def InitStoreHealWindow (Window):
-	GemRB.SetVar ("Index", None)
-	GemRB.SetVar ("TopIndex", 0)
-
 	Window.AddAlias('WINHEAL')
 
 	PositionStoreWinRelativeTo(Window)
@@ -829,8 +815,6 @@ ToggleStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "
 OpenStoreHealWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["heal"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreHealWindow, UpdateStoreHealWindow, False, StoreWindowPlacement)
 
 def InitStoreRumourWindow (Window):
-	GemRB.SetVar ("TopIndex", 0)
-
 	Window.AddAlias('WINRUMOR')
 
 	PositionStoreWinRelativeTo(Window)
@@ -1048,16 +1032,16 @@ def UnselectNoRedraw ():
 			GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL|SHOP_SELECT)
 			# same code for ID, so no repeat needed
 
-def SelectID (Window):
+def SelectID (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Index = GemRB.GetVar ("Index")
+	Index = btn.Value + GemRB.GetVar ("TopIndex")
 	GemRB.ChangeStoreItem (pc, inventory_slots[Index], SHOP_ID|SHOP_SELECT)
-	RedrawStoreIdentifyWindow (Window)
+	RedrawStoreIdentifyWindow (btn.Window)
 	return
 
-def SelectBuy ():
+def SelectBuy (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	LeftIndex = GemRB.GetVar ("LeftIndex")
+	LeftIndex = btn.Value + GemRB.GetVar("LeftTopIndex")
 	GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_BUY|SHOP_SELECT)
 	RedrawStoreShoppingWindow (GemRB.GetView('WINSHOP'))
 	return
@@ -1097,9 +1081,9 @@ def BuyPressed ():
 	UpdateStoreShoppingWindow (GemRB.GetView('WINSHOP'))
 	return
 
-def SelectSell ():
+def SelectSell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	RightIndex = GemRB.GetVar ("RightIndex")
+	RightIndex = btn.Value + GemRB.GetVar("RightTopIndex")
 	if not Bag:
 		RightIndex = inventory_slots[RightIndex]
 	#bags may be clickable despite not being sellable
@@ -1197,10 +1181,8 @@ def RedrawStoreShoppingWindow (Window):
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
-	LeftIndex = GemRB.GetVar ("LeftIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	RightIndex = GemRB.GetVar ("RightIndex")
-	idx = [ LeftTopIndex, RightTopIndex, LeftIndex, RightIndex ]
+	idx = [LeftTopIndex, RightTopIndex, GemRB.GetVar("LeftIndex")]
 	LeftCount = Store['StoreItemCount']
 	BuySum = 0
 	selected_count = 0
@@ -1292,7 +1274,6 @@ def RedrawStoreShoppingWindow (Window):
 			Slot = None
 		Button = Window.GetControlAlias ('LBTN' + str(i))
 		Label = Window.GetControlAlias ('LLBL' + str(i))
-		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx)
 
 		if i+RightTopIndex<RightCount:
@@ -1304,7 +1285,6 @@ def RedrawStoreShoppingWindow (Window):
 			Slot = None
 		Button = Window.GetControlAlias ('RBTN' + str(i))
 		Label = Window.GetControlAlias ('RLBL' + str(i))
-		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_BAG if Bag else ITEM_PC, idx)
 
 	if GameCheck.IsPST():
@@ -1428,7 +1408,7 @@ def RedrawStoreIdentifyWindow (Window):
 			Label = Window.GetControl (0x10000009+i)
 		else:
 			Label = Window.GetControl (0x1000000c+i)
-		Button.SetVarAssoc ("Index", TopIndex+i)
+
 		if Slot:
 			Flags = GemRB.IsValidStoreItem (pc, inventory_slots[TopIndex+i], ITEM_PC)
 			Item = GemRB.GetItem (Slot['ItemResRef'])
@@ -1516,15 +1496,15 @@ def InfoIdentifyWindow ():
 	InfoWindow (Slot, Item)
 	return
 
-def InfoLeftWindow ():
-	Index = GemRB.GetVar ("LeftIndex")
+def InfoLeftWindow (btn):
+	Index = btn.Value + GemRB.GetVar("LeftTopIndex")
 	Slot = GemRB.GetStoreItem (Index)
 	Item = GemRB.GetItem (Slot['ItemResRef'])
 	InfoWindow (Slot, Item)
 	return
 
-def InfoRightWindow ():
-	Index = GemRB.GetVar ("RightIndex")
+def InfoRightWindow (btn):
+	Index = btn.Value + GemRB.GetVar("RightTopIndex")
 	if Bag:
 		Slot = GemRB.GetStoreItem (Index, STORE_BAG)
 		Item = GemRB.GetItem (Slot['ItemResRef'])
@@ -1621,8 +1601,7 @@ def RedrawStoreStealWindow (Window):
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	RightIndex = GemRB.GetVar ("RightIndex")
-	idx = [ LeftTopIndex, RightTopIndex, LeftIndex, RightIndex ]
+	idx = [LeftTopIndex, RightTopIndex, LeftIndex]
 	LeftCount = Store['StoreItemCount']
 	pc = GemRB.GameGetSelectedPCSingle ()
 	RightCount = len(inventory_slots)
@@ -1630,7 +1609,6 @@ def RedrawStoreStealWindow (Window):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
 		Button = Window.GetControlAlias ('SWLBTN' + str(i))
 		Label = Window.GetControlAlias ('SWLLBL' + str(i))
-		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx, 1)
 
 		if i+RightTopIndex<RightCount:
@@ -1639,7 +1617,6 @@ def RedrawStoreStealWindow (Window):
 			Slot = None
 		Button = Window.GetControlAlias ('SWRBTN' + str(i))
 		Label = Window.GetControlAlias ('SWRLBL' + str(i))
-		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx, 1)
 
 	selected_count = 0
@@ -1678,8 +1655,7 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, idx, steal=0):
 		Button.SetText ("")
 	else:
 		LeftTopIndex = idx[0]
-		RightTopIndex = idx[1]
-		LeftIndex = idx[2]
+		LeftIndex = LeftTopIndex + idx[2]
 
 		Item = GemRB.GetItem (Slot['ItemResRef'])
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
@@ -1715,6 +1691,7 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, idx, steal=0):
 					if Price <= 0:
 						Price = 1
 		else:
+			RightTopIndex = idx[1]
 			index = RightTopIndex + i
 			if not Bag:
 				index = inventory_slots[index]
@@ -1946,7 +1923,7 @@ def BuyHeal ():
 	UpdateStoreHealWindow (Window)
 	return
 
-def GulpDrink ():
+def GulpDrink (btn):
 	Window = GemRB.GetView('WINRUMOR')
 
 	TextArea = Window.GetControl (13)
@@ -1959,7 +1936,7 @@ def GulpDrink ():
 		return
 
 	gold = GemRB.GameGetPartyGold ()
-	Index = GemRB.GetVar ("TopIndex")+GemRB.GetVar ("Index")
+	Index = btn.Value + GemRB.GetVar("TopIndex")
 	Drink = GemRB.GetStoreDrink (Index)
 	if gold < Drink['Price']:
 		ErrorWindow (strrefs["drinktoocostly"])
