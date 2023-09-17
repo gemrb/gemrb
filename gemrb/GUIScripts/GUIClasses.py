@@ -251,6 +251,9 @@ class GWindow(GView, Scrollable):
 
 	def OnFocus(self, handler):
 		self.SetAction(handler, ACTION_WINDOW_FOCUS_GAINED)
+		
+	def OnUnFocus(self, handler):
+		self.SetAction(handler, ACTION_WINDOW_FOCUS_LOST)
 
 class GControl(GView):
 	methods = {
