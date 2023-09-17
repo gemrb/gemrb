@@ -545,8 +545,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	Window* win = core->GetWindowManager()->LoadWindow(WindowID, ScriptingGroup_t(ref), pos);
 	ABORT_IF_NULL(win);
 	win->SetFlags(Window::AlphaChannel, BitOp::OR);
-	PyObject* pyWin = gs->ConstructObjectForScriptable(win->GetScriptingRef());
-	return pyWin;
+	return gs->ConstructObjectForScriptable(win->GetScriptingRef());
 }
 
 PyDoc_STRVAR( GemRB_EnableCheatKeys__doc,
@@ -13732,11 +13731,10 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref) c
 
 	PyObject* obj = ConstructObject(ref->ScriptingClass(), ref->Id);
 	if (!obj) return RuntimeError("Failed to construct object");
-	PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromStringView, ref->ScriptingGroup()));
-	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
-	
+
 	static PyObject* viewClass = PyDict_GetItemString(pGUIClasses, "GView");
 	if (PyObject_IsInstance(obj, viewClass)) {
+		PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromStringView, ref->ScriptingGroup()));
 		View* view = ScriptingRefCast<View>(ref);
 		AssignViewAttributes(obj, view);
 	}
