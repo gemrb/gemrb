@@ -192,7 +192,12 @@ const ScriptingRefBase* GUIScript::GetScriptingRef(PyObject* obj) const
 
 template <class RETURN = View>
 static RETURN* GetView(PyObject* obj) {
-	return ScriptingRefCast<RETURN>(gs->GetScriptingRef(obj));
+	auto ref = gs->GetScriptingRef(obj);
+	if (!ref) {
+		PyErr_Clear();
+		return nullptr;
+	}
+	return ScriptingRefCast<RETURN>(ref);
 }
 
 static bool StatIsASkill(unsigned int StatID) {
