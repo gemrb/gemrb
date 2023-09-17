@@ -1168,6 +1168,10 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 	ScriptingId id = 0;
 	if (pyid && pyid != Py_None) {
 		id = PyLong_AsUnsignedLong(pyid);
+		if (PyErr_Occurred())
+		{
+			return nullptr;
+		}
 	}
 
 	const View* view = nullptr;
@@ -13739,7 +13743,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref) c
 
 	static PyObject* viewClass = PyDict_GetItemString(pGUIClasses, "GView");
 	if (PyObject_IsInstance(obj, viewClass)) {
-		PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromStringView, ref->ScriptingGroup()));
+		PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromASCII<ScriptingGroup_t>, ref->ScriptingGroup()));
 		View* view = ScriptingRefCast<View>(ref);
 		AssignViewAttributes(obj, view);
 	}

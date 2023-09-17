@@ -75,6 +75,8 @@ def InitInventoryWindow (Window):
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
 	for slot in range (SlotCount):
 		SlotType = GemRB.GetSlotType (slot)
+		if SlotType["ID"] == -1:
+			continue
 		Button = Window.GetControl (SlotType["ID"])
 		if Button:
 			Button.OnMouseEnter (InventoryCommon.MouseEnterSlot)
