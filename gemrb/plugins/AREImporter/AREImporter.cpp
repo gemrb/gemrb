@@ -1043,6 +1043,7 @@ void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map) const
 	str->ReadWord(sp->DayChance);
 	str->ReadWord(sp->NightChance);
 	// 14 reserved dwords
+	// TODO: ee added several more fields; check if they're actually used first
 }
 
 bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map* map) const
