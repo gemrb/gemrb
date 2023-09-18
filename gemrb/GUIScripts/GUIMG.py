@@ -27,6 +27,7 @@ import GUICommon
 import CommonTables
 import GUICommonWindows
 import Spellbook
+from GUICommon import BindControlCallbackParams
 from GUIDefines import *
 from ie_stats import *
 from ie_spells import LS_MEMO
@@ -103,11 +104,6 @@ def InitMageWindow (window):
 	return
 
 def UpdateMageWindow (MageWindow):
-	global MageMemorizedSpellList, MageKnownSpellList
-
-	MageMemorizedSpellList = []
-	MageKnownSpellList = []
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	spelltype = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
@@ -143,13 +139,9 @@ def UpdateMageWindow (MageWindow):
 					Button.OnPress (OpenMageSpellUnmemorizeWindow)
 				else:
 					Button.OnPress (OnMageUnmemorizeSpell)
-				Button.OnRightPress (OpenMageSpellInfoWindow)
-				MageMemorizedSpellList.append (ms['SpellResRef'])
-				Button.EnableBorder (0, ms['Flags'] == 0)
 				spell = GemRB.GetSpell (ms['SpellResRef'])
-				if not spell:
-					print("Missing memorised spell!", ms['SpellResRef'])
-					continue
+				Button.OnRightPress(BindControlCallbackParams(OpenMageSpellInfoWindow, spell, Button.VarName))
+				Button.EnableBorder (0, ms['Flags'] == 0)
 				Button.SetTooltip (spell['SpellName'])
 			else:
 				if i < max_mem_cnt:
@@ -176,12 +168,8 @@ def UpdateMageWindow (MageWindow):
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		Button.OnPress (OnMageMemorizeSpell)
-		Button.OnRightPress (OpenMageSpellInfoWindow)
-		MageKnownSpellList.append (ks['SpellResRef'])
 		spell = GemRB.GetSpell (ks['SpellResRef'])
-		if not spell:
-			print("Missing known spell!", ms['SpellResRef'])
-			continue
+		Button.OnRightPress (BindControlCallbackParams(OpenMageSpellInfoWindow, spell, Button.VarName))
 		Button.SetTooltip (spell['SpellName'])
 
 	if known_cnt == 0: i = -1
@@ -239,7 +227,7 @@ def RefreshMageLevel ():
 	UpdateMageWindow (MageWindow)
 	return
 
-def OpenMageSpellInfoWindow (btn):
+def OpenMageSpellInfoWindow (spell, kind):
 	Window = GemRB.LoadWindow (3, "GUIMG")
 
 	#back
@@ -248,27 +236,20 @@ def OpenMageSpellInfoWindow (btn):
 	Button.OnPress (Window.Close)
 
 	#erase
-	index = btn.Value
 	Button = Window.GetControl (6)
 	if Button:
-		if btn.VarName == "Memorized" or Sorcerer:
+		if kind == "Memorized" or Sorcerer:
 			Button.OnPress (None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
 			Button.OnPress (lambda: OpenMageSpellRemoveWindow(Window))
 			Button.SetText (63668)
-	if btn.VarName == "Memorized":
-		ResRef = MageMemorizedSpellList[index]
-	else:
-		ResRef = MageKnownSpellList[index]
-
-	spell = GemRB.GetSpell (ResRef)
 
 	Label = Window.GetControl (0x0fffffff)
 	Label.SetText (spell['SpellName'])
 
 	Button = Window.GetControl (2)
-	Button.SetSpellIcon (ResRef, 1)
+	Button.SetSpellIcon (spell['SpellResRef'], 1)
 
 	Text = Window.GetControl (3)
 	Text.SetText (spell['SpellDesc'])

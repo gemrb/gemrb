@@ -809,3 +809,6 @@ def OverrideDefaultVoiceSet (Gender, CharSound):
 			Gender2Sound = [ "", "male005", "female4" ]
 			CharSound = Gender2Sound[Gender]
 	return CharSound
+
+def BindControlCallbackParams(fn, *args):
+	return lambda ctl: fn(*args)

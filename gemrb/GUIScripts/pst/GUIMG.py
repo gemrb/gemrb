@@ -25,6 +25,7 @@ import GemRB
 import GUICommon
 import CommonTables
 import GUICommonWindows
+from GUICommon import BindControlCallbackParams
 from GUIDefines import *
 from ie_stats import *
 
@@ -54,13 +55,8 @@ def InitMageWindow (Window):
 	return
 
 def UpdateMageWindow (Window=None):
-	global MageMemorizedSpellList, MageKnownSpellList
-
 	if Window == None:
 		Window = MageWindow
-
-	MageMemorizedSpellList = []
-	MageKnownSpellList = []
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	spelltype = IE_SPELL_TYPE_WIZARD
@@ -88,10 +84,9 @@ def UpdateMageWindow (Window=None):
 				Icon.OnPress (OpenMageSpellUnmemorizeWindow)
 			else:
 				Icon.OnPress (OnMageUnmemorizeSpell)
-			Icon.OnRightPress (OpenMageSpellInfoWindow)
 			spell = GemRB.GetSpell (ms['SpellResRef'])
+			Icon.OnRightPress (BindControlCallbackParams(OpenMageSpellInfoWindow, spell))
 			Icon.SetTooltip (spell['SpellName'])
-			MageMemorizedSpellList.append (ms['SpellResRef'])
 			Icon.EnableBorder (0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:
@@ -116,10 +111,9 @@ def UpdateMageWindow (Window=None):
 		Icon.SetSpellIcon (ks['SpellResRef'])
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Icon.OnPress (OnMageMemorizeSpell)
-		Icon.OnRightPress (OpenMageSpellInfoWindow)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
+		Icon.OnRightPress (BindControlCallbackParams(OpenMageSpellInfoWindow, spell))
 		Icon.SetTooltip (spell['SpellName'])
-		MageKnownSpellList.append (ks['SpellResRef'])
 
 	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
@@ -148,27 +142,19 @@ def MageNextLevelPress ():
 		MageSpellLevel = MageSpellLevel + 1
 		UpdateMageWindow ()
 
-def OpenMageSpellInfoWindow (btn):
+def OpenMageSpellInfoWindow (spell):
 	Window = GemRB.LoadWindow (4, "GUIMG")
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
 	Button.OnPress (Window.Close)
 
-	index = btn.Value
-	if btn.VarName == "Memorized":
-		ResRef = MageMemorizedSpellList[index]
-	else:
-		ResRef = MageKnownSpellList[index]
-
-	spell = GemRB.GetSpell (ResRef)
-
 	Label = Window.GetControl (0x0fffffff)
 	Label.SetText (spell['SpellName'])
 	Label.SetFlags(IE_GUI_LABEL_USE_COLOR, OP_OR)
 
 	Icon = Window.GetControl (1)
-	Icon.SetSpellIcon (ResRef)
+	Icon.SetSpellIcon (spell['SpellResRef'])
 
 	Text = Window.GetControl (2)
 	Text.SetText (spell['SpellDesc'])
