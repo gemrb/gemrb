@@ -81,8 +81,8 @@ def SetupDamageInfo (Button):
 
 	ratio_str = ""
 	if hp != "?":
-		ratio_str = "\n%d/%d" % (hp, hp_max)
-	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
+		ratio_str = "%d/%d" % (hp, hp_max)
+	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + "\n" + ratio_str)
 
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		HPLabel = Button.Window.GetControl(99 + pc)
@@ -212,7 +212,10 @@ def AddStatusFlagLabel (Button, i):
 # overlay a label, so we can display the hp with the correct font. Regular button label
 #   is used by effect icons
 def AddHPLabel (Button, i):
-	return Button.CreateLabel (99 + i, "NUMFONT", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT | IE_FONT_SINGLE_LINE)
+	label = Button.CreateLabel (99 + i, "NUMFONT", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT | IE_FONT_SINGLE_LINE)
+	label.SetColor(ColorWhitish)
+	label.SetFrame(Button.GetInsetFrame(2, 2, 2, 2))
+	return label
 
 def SetupButtonBorders (Button):
 	# unlike other buttons, this one lacks extra frames for a selection effect
