@@ -26,6 +26,7 @@ import GameCheck
 import GUICommon
 import GUICommonWindows
 import CommonTables
+from GUICommon import BindControlCallbackParams
 from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_CAST
@@ -75,11 +76,6 @@ def InitPriestWindow (Window):
 	return
 
 def UpdatePriestWindow (Window):
-	global PriestMemorizedSpellList, PriestKnownSpellList
-
-	PriestMemorizedSpellList = []
-	PriestKnownSpellList = []
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	spelltype = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
@@ -119,10 +115,9 @@ def UpdatePriestWindow (Window):
 				Button.OnPress (OpenPriestSpellUnmemorizeWindow)
 			else:
 				Button.OnPress (OnPriestUnmemorizeSpell)
-			Button.OnRightPress (OpenPriestSpellInfoWindow)
 			spell = GemRB.GetSpell (ms['SpellResRef'])
+			Button.OnRightPress (BindControlCallbackParams(OpenPriestSpellInfoWindow, spell))
 			Button.SetTooltip (spell['SpellName'])
-			PriestMemorizedSpellList.append (ms['SpellResRef'])
 			Button.EnableBorder (0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:
@@ -143,10 +138,9 @@ def UpdatePriestWindow (Window):
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Button.OnPress (OnPriestMemorizeSpell)
-		Button.OnRightPress (OpenPriestSpellInfoWindow)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
+		Button.OnRightPress (BindControlCallbackParams(OpenPriestSpellInfoWindow, spell))
 		Button.SetTooltip (spell['SpellName'])
-		PriestKnownSpellList.append (ks['SpellResRef'])
 		Button.SetVarAssoc ("Memorized", i)
 
 	if known_cnt == 0: i = -1
@@ -189,21 +183,13 @@ def RefreshPriestLevel ():
 	UpdatePriestWindow (PriestSpellWindow)
 	return
 
-def OpenPriestSpellInfoWindow (btn):
+def OpenPriestSpellInfoWindow (spell):
 	Window = GemRB.LoadWindow (3, "GUIPR")
 
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
 	Button.OnPress (Window.Close)
-
-	index = btn.Value
-	if btn.VarName == "Memorized":
-		ResRef = PriestMemorizedSpellList[index]
-	else:
-		ResRef = PriestKnownSpellList[index]
-
-	spell = GemRB.GetSpell (ResRef)
 
 	if GameCheck.IsBG2():
 		Label = Window.GetControl (0x0fffffff)
@@ -212,7 +198,7 @@ def OpenPriestSpellInfoWindow (btn):
 	Label.SetText (spell['SpellName'])
 
 	Button = Window.GetControl (2)
-	Button.SetSpellIcon (ResRef, 1)
+	Button.SetSpellIcon (spell['SpellResRef'], 1)
 
 	Text = Window.GetControl (3)
 	Text.SetText (spell['SpellDesc'])
@@ -317,7 +303,7 @@ def OnPriestRemoveSpell (btn):
 
 	#remove spell from memory
 	GemRB.RemoveSpell (pc, spelltype, level, index)
-	OpenPriestSpellInfoWindow(btn)
+	UpdatePriestWindow(btn)
 	return
 
 ###################################################
