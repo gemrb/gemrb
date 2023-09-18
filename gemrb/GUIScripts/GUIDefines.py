@@ -307,9 +307,9 @@ SHOP_BUY    = 1
 SHOP_SELL   = 2
 SHOP_ID     = 4
 SHOP_STEAL  = 8
-SHOP_SELECT = 0x40
 SHOP_NOREPADJ = 0x2000 # StoreActionFlags::NOREPADJ
 SHOP_FULL   = 0x10000 # StoreActionFlags::CAPACITY
+SHOP_SELECT = 0x20000
 
 #game constants
 

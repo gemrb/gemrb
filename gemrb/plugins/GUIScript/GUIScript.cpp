@@ -7471,29 +7471,65 @@ the PC's inventory.\n\
 "
 );
 
-static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
+static PyObject* ChangeSelectedStoreItem(Store* store, int slot, Actor* actor, StoreActionFlags action)
 {
-	int globalID, Slot;
-	int actint;
 	int res = ASI_FAILED;
-	PARSE_ARGS( args,  "iii", &globalID, &Slot, &actint);
-	GET_GAME();
-	GET_ACTOR_GLOBAL();
 
-	Store *store = core->GetCurrentStore();
-	if (!store) {
-		return RuntimeError("No current store!");
+	switch (action) {
+	case StoreActionFlags::Buy:
+	{
+		STOItem* si = store->GetItem(slot, true);
+		if (!si) {
+			return RuntimeError("Store item not found!");
+		}
+		si->Flags ^= IE_INV_ITEM_SELECTED;
+		if (si->Flags & IE_INV_ITEM_SELECTED) {
+			si->PurchasedAmount = 1;
+		} else {
+			si->PurchasedAmount = 0;
+		}
+		res = ASI_SUCCESS;
+		break;
 	}
+	case StoreActionFlags::Sell:
+	case StoreActionFlags::ID:
+	{
+		if (!rhstore) {
+			//this is not removeitem, because the item is just marked
+			CREItem* si = actor->inventory.GetSlotItem(core->QuerySlot(slot));
+			if (!si) {
+				return RuntimeError( "Item not found!" );
+			}
+			si->Flags ^= IE_INV_ITEM_SELECTED;
+		} else {
+			STOItem* si = rhstore->GetItem(slot, true);
+			if (!si) {
+				return RuntimeError("Bag item not found!");
+			}
+			si->Flags ^= IE_INV_ITEM_SELECTED;
+			if (si->Flags & IE_INV_ITEM_SELECTED) {
+				si->PurchasedAmount = 1;
+			} else {
+				si->PurchasedAmount = 0;
+			}
+		}
+		res = ASI_SUCCESS;
+		break;
+	}
+	default: break;
+	}
+	return PyLong_FromLong(res);
+}
 
-	StoreActionFlags action = static_cast<StoreActionFlags>(actint);
-	
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
+static PyObject* ChangeStoreItem(Store* store, int slot, Actor* actor, StoreActionFlags action)
+{
+	int res = ASI_FAILED;
+
 	switch (action) {
 	case StoreActionFlags::Steal:
 	case StoreActionFlags::Buy:
 	{
-		STOItem* si = store->GetItem( Slot, true );
+		STOItem* si = store->GetItem(slot, true);
 		if (!si) {
 			return RuntimeError("Store item not found!");
 		}
@@ -7536,58 +7572,17 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	case StoreActionFlags::ID:
 	{
 		if (!rhstore) {
-			CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+			CREItem* si = actor->inventory.GetSlotItem(core->QuerySlot(slot));
 			if (!si) {
 				return RuntimeError( "Item not found!" );
 			}
 			si->Flags |= IE_INV_ITEM_IDENTIFIED;
 		} else {
-			STOItem* si = rhstore->GetItem( Slot, true );
+			STOItem* si = rhstore->GetItem(slot, true);
 			if (!si) {
 				return RuntimeError("Bag item not found!");
 			}
 			si->Flags |= IE_INV_ITEM_IDENTIFIED;
-		}
-		res = ASI_SUCCESS;
-		break;
-	}
-	case StoreActionFlags::Select | StoreActionFlags::Buy:
-	{
-		STOItem* si = store->GetItem( Slot, true );
-		if (!si) {
-			return RuntimeError("Store item not found!");
-		}
-		si->Flags ^= IE_INV_ITEM_SELECTED;
-		if (si->Flags & IE_INV_ITEM_SELECTED) {
-			si->PurchasedAmount=1;
-		} else {
-			si->PurchasedAmount=0;
-		}
-		res = ASI_SUCCESS;
-		break;
-	}
-
-	case StoreActionFlags::Select | StoreActionFlags::Sell:
-	case StoreActionFlags::Select | StoreActionFlags::ID:
-	{
-		if (!rhstore) {
-			//this is not removeitem, because the item is just marked
-			CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
-			if (!si) {
-				return RuntimeError( "Item not found!" );
-			}
-			si->Flags ^= IE_INV_ITEM_SELECTED;
-		} else {
-			STOItem* si = rhstore->GetItem( Slot, true );
-			if (!si) {
-				return RuntimeError("Bag item not found!");
-			}
-			si->Flags ^= IE_INV_ITEM_SELECTED;
-			if (si->Flags & IE_INV_ITEM_SELECTED) {
-				si->PurchasedAmount = 1;
-			} else {
-				si->PurchasedAmount = 0;
-			}
 		}
 		res = ASI_SUCCESS;
 		break;
@@ -7602,7 +7597,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		}
 
 		if (rhstore) {
-			STOItem *si = rhstore->GetItem(Slot, true);
+			STOItem *si = rhstore->GetItem(slot, true);
 			if (!si) {
 				return RuntimeError("Bag item not found!");
 			}
@@ -7617,7 +7612,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			}
 		} else {
 			//this is removeitem, because the item leaves our inventory
-			CREItem* si = actor->inventory.RemoveItem( core->QuerySlot(Slot) );
+			CREItem* si = actor->inventory.RemoveItem(core->QuerySlot(slot));
 			if (!si) {
 				return RuntimeError( "Item not found!" );
 			}
@@ -7635,8 +7630,29 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	default:
 		break;
 	}
-#pragma GCC diagnostic pop
 	return PyLong_FromLong(res);
+}
+
+static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
+{
+	int globalID;
+	int slot;
+	int actint;
+	PARSE_ARGS( args,  "iii", &globalID, &slot, &actint);
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		return RuntimeError("No current store!");
+	}
+
+	StoreActionFlags action = static_cast<StoreActionFlags>(actint);
+	if (bool(action & StoreActionFlags::Select)) {
+		return ChangeSelectedStoreItem(store, slot, actor, action ^ StoreActionFlags::Select);
+	}
+
+	return ChangeStoreItem(store, slot, actor, action);
 }
 
 PyDoc_STRVAR( GemRB_GetStoreItem__doc,
