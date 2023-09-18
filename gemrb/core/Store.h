@@ -55,7 +55,6 @@ FLAG_ENUM StoreActionFlags : uint32_t  {
 	Donate   = 16,     //gemrb extension
 	Cure     = 32,
 	Drink    = 64,
-	Select   = 0x40,   //valid when these flags used as store action
 	Rent     = 128,    //gemrb extension
 	//QUALITY  = 0x400 | 0x200,  //2 bits
 // unknown 0x800
@@ -63,7 +62,8 @@ FLAG_ENUM StoreActionFlags : uint32_t  {
 	NoRepAdj = 0x2000, // Reputation doesn't affect prices (BGEE)
 	ReCharge = 0x4000, //gemrb extension, if set, store won't recharge
 	BuyCrits = 0x8000, // User allowed to sell critical items (BGEE)
-	Capacity = 0x10000 //used for error reporting purposes
+	Capacity = 0x10000, //used for error reporting purposes
+	Select   = 0x20000
 };
 
 /**
