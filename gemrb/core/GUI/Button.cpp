@@ -301,7 +301,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 }
 
 /** Sets the Button State */
-void Button::SetState(State state)
+void Button::SetState(State state, bool setval)
 {
 	if (state > LOCKED_PRESSED) {// If wrong value inserted
 		return;
@@ -313,10 +313,15 @@ void Button::SetState(State state)
 	if (ButtonState != state) {
 		MarkDirty();
 		ButtonState = state;
-		if (ButtonState == SELECTED) {
+		if (setval && ButtonState == SELECTED) {
 			UpdateDictValue();
 		}
 	}
+}
+
+void Button::SetState(State state)
+{
+	return SetState(state, true);
 }
 
 bool Button::IsAnimated() const
@@ -562,19 +567,15 @@ void Button::UpdateState(value_t Sum)
 		return;
 	}
 	
-	State state = UNPRESSED;
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		//radio button, exact value
-		state = Sum == GetValue() ? SELECTED : UNPRESSED;
+		State state = Sum == GetValue() ? SELECTED : UNPRESSED;
+		SetState(state);
 	} else if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox, bitvalue
-		state = bool(Sum & GetValue()) ? SELECTED : UNPRESSED;
-	} else {
-		//other buttons, nothing to redraw
-		return;
+		State state = bool(Sum & GetValue()) ? SELECTED : UNPRESSED;
+		SetState(state, false);
 	}
-
-	SetState(state);
 }
 
 void Button::DoToggle()

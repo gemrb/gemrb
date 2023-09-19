@@ -212,9 +212,10 @@ private: // Private attributes
 	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
-	
+
 	BitOp GetDictOp() const noexcept override;
-	
+	void SetState(State state, bool setval);
+
 protected:
 	/** Mouse Enter */
 	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) override;
