@@ -108,7 +108,9 @@ void Button::SetImage(ButtonImage type, Holder<Sprite2D> img)
 void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation && animation->HasEnded()) {
+		auto sprite = animation->Current();
 		SetAnimation(nullptr);
+		SetPicture(sprite);
 		PerformAction(Action::EndReached);
 	}
 }
