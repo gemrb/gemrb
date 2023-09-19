@@ -83,25 +83,23 @@ def InitMapWindow (Window):
 	Button = Window.GetControl (1)
 	Button.OnPress (OpenWorldMap)
 
-	# Hide or Show mapnotes
-	if HasMapNotes ():
-		Button = Window.GetControl (3)
-		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		# Is this an option?
-		Button.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
-
-		Label = Window.GetControl (0x10000003)
-		Label.SetText ("")
+	Label = Window.GetControl (0x10000003)
 
 	# Map Control
-	if GameCheck.IsBG2() or GameCheck.IsIWD2():
+	if Label:
+		Label.SetText ("")
 		Map = Window.ReplaceSubview(2, IE_GUI_MAP, Label)
 	else:
 		Map = Window.ReplaceSubview(2, IE_GUI_MAP)
 
 	Map.SetAction(Window.Close, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
 
+	# Hide or Show mapnotes
 	if HasMapNotes ():
+		Button = Window.GetControl (3)
+		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		Button.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 		Map.OnRightPress (AddNoteWindow)
 		Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
