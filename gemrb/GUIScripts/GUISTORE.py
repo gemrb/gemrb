@@ -114,6 +114,13 @@ ResolutionH = GemRB.GetSystemVariable (SV_HEIGHT)
 if ResolutionH < 600 or (GameCheck.IsIWD2 () and ResolutionH < 934):
 	StoreWindowPlacement = WINDOW_HCENTER | WINDOW_TOP
 
+def SetupScrollBar(ScrollBar, VarName, Count, Proxy, Callback):
+	ScrollBar.SetVarAssoc(VarName, GemRB.GetVar(VarName) or 0, 0, max(0, Count))
+	ScrollBar.OnChange(Callback) # must come after SetVarAssoc
+	if Proxy:
+		AddScrollbarProxy(ScrollBar.Window, ScrollBar, Proxy)
+	return ScrollBar
+
 def CloseStoreWindow ():
 	global StoreWindow, CureTable
 	
@@ -293,16 +300,6 @@ def InitStoreShoppingWindow (Window):
 
 	Window.AliasControls (aliases)
 
-	# left scrollbar
-	ScrollBarLeft = Window.GetControlAlias ('STOSBARL')
-	ScrollBarLeft.OnChange (lambda: RedrawStoreShoppingWindow(Window))
-	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('LBTN0'))
-
-	# right scrollbar
-	ScrollBarRight = Window.GetControlAlias ('STOSBARR')
-	ScrollBarRight.OnChange (lambda: RedrawStoreShoppingWindow(Window))
-	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('RBTN0'))
-
 	if Inventory:
 		# Title
 		Label = Window.GetControl (0xfffffff)
@@ -432,12 +429,10 @@ def UpdateStoreShoppingWindow (Window):
 	pc = GetPC()
 	Bag = GemRB.GetStore (STORE_BAG)
 
+	callback = lambda: RedrawStoreShoppingWindow(Window)
 	LeftCount = Store['StoreItemCount'] - ItemButtonCount
-	if LeftCount<0:
-		LeftCount=0
-	ScrollBar = Window.GetControlAlias ('STOSBARL')
-	ScrollBar.SetVarAssoc("LeftTopIndex", GemRB.GetVar("LeftTopIndex") or 0, 0, LeftCount)
-	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
+	# left scrollbar
+	SetupScrollBar(Window.GetControlAlias('STOSBARL'), "LeftTopIndex", LeftCount, Window.GetControlAlias('LBTN0'), callback)
 
 	if Bag:
 		RightCount = Bag['StoreItemCount'] - ItemButtonCount
@@ -445,8 +440,8 @@ def UpdateStoreShoppingWindow (Window):
 		inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 		RightCount = len(inventory_slots) - ItemButtonCount
 
-	ScrollBar = Window.GetControlAlias ('STOSBARR')
-	ScrollBar.SetVarAssoc("RightTopIndex", GemRB.GetVar("RightTopIndex") or 0, 0, max(0, RightCount))
+	# right scrollbar
+	SetupScrollBar(Window.GetControlAlias('STOSBARR'), "RightTopIndex", RightCount, Window.GetControlAlias('RBTN0'), callback)
 
 	RedrawStoreShoppingWindow (Window)
 	return
@@ -472,10 +467,6 @@ def InitStoreIdentifyWindow (Window):
 								'STOTITLE' : 0x10000000, 'STONAME' : 0x10000005
 							  } )
 		Window.AliasControls ({'IDBTN' + str(x) : 8+x for x in range(ItemButtonCount)})
-
-	ScrollBar = Window.GetControlAlias ('IDSBAR')
-	ScrollBar.OnChange (lambda: RedrawStoreIdentifyWindow(Window))
-	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('IDBTN0'))
 
 	TextArea = Window.GetControlAlias ('IDTA')
 	TextArea.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -520,9 +511,12 @@ def UpdateStoreIdentifyWindow (Window):
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
-	Count = len(inventory_slots)
+
+	callback = lambda: RedrawStoreIdentifyWindow(Window)
+	Count = len(inventory_slots) - ItemButtonCount
 	ScrollBar = Window.GetControlAlias('IDSBAR')
-	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, max(0, Count - ItemButtonCount))
+	SetupScrollBar(Window.GetControlAlias('IDSBAR'), "TopIndex", Count, Window.GetControlAlias('IDBTN0'), callback)
+
 	RedrawStoreIdentifyWindow (Window)
 	return
 
@@ -554,16 +548,6 @@ def InitStoreStealWindow (Window):
 		Window.AliasControls ({'SWRBTN' + str(x) : x+11 for x in range(ItemButtonCount)} )
 		Window.AliasControls ({'SWRLBL' + str(x) : x+0x10000019 for x in range(ItemButtonCount)} )
 		Window.AliasControls ({'SWLLBL' + str(x) : x+0x1000000f for x in range(ItemButtonCount)} )
-
-	# left scrollbar
-	ScrollBarLeft = Window.GetControlAlias ('SWLSBAR')
-	ScrollBarLeft.OnChange (lambda: RedrawStoreStealWindow(Window))
-	AddScrollbarProxy(Window, ScrollBarLeft, Window.GetControlAlias('SWLBTN0'))
-
-	# right scrollbar
-	ScrollBarRight = Window.GetControlAlias ('SWRSBAR')
-	ScrollBarRight.OnChange (lambda: RedrawStoreStealWindow(Window))
-	AddScrollbarProxy(Window, ScrollBarRight, Window.GetControlAlias('SWRBTN0'))
 
 	for i in range (ItemButtonCount):
 		if GameCheck.IsBG2():
@@ -620,15 +604,19 @@ def UpdateStoreStealWindow (Window):
 
 	#reget store in case of a change
 	Store = GemRB.GetStore ()
-	LeftCount = Store['StoreItemCount']
-	ScrollBar = Window.GetControlAlias ('SWLSBAR')
-	ScrollBar.SetVarAssoc("LeftTopIndex", GemRB.GetVar("LeftTopIndex") or 0, 0, max(0, LeftCount - ItemButtonCount))
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
-	RightCount = len(inventory_slots)
-	ScrollBar = Window.GetControlAlias ('SWRSBAR')
-	ScrollBar.SetVarAssoc("RightTopIndex", GemRB.GetVar("RightTopIndex") or 0, 0, max(0, RightCount - ItemButtonCount))
+
+	# left scrollbar
+	callback = lambda: RedrawStoreStealWindow(Window)
+	LeftCount = Store['StoreItemCount'] - ItemButtonCount
+	SetupScrollBar(Window.GetControlAlias('SWLSBAR'), "LeftTopIndex", LeftCount, Window.GetControlAlias('SWLBTN0'), callback)
+
+	# right scrollbar
+	RightCount = len(inventory_slots) - ItemButtonCount
+	SetupScrollBar(Window.GetControlAlias('SWRSBAR'), "RightTopIndex", RightCount, Window.GetControlAlias('SWRBTN0'), callback)
+
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow (Window)
 	return
@@ -723,10 +711,6 @@ def InitStoreHealWindow (Window):
 								 } )
 		Window.AliasControls ({'HWLBTN' + str(x) : x+8 for x in range(ItemButtonCount)})
 
-	ScrollBar = Window.GetControlAlias ('HWSBAR')
-	ScrollBar.OnChange (lambda: UpdateStoreHealWindow(Window))
-	AddScrollbarProxy(Window, ScrollBar, Window.GetControlAlias('HWLBTN0'))
-
 	#spell buttons
 	for i in range (ItemButtonCount):
 		Button = Window.GetControlAlias ('HWLBTN' + str(i))
@@ -747,12 +731,10 @@ def InitStoreHealWindow (Window):
 	Button.OnPress (BuyHeal)
 	Button.SetDisabled (True)
 
-	Count = Store['StoreCureCount']
-	if Count>4:
-		Count = Count-4
-	else:
-		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, Count)
+	callback = lambda: UpdateStoreHealWindow(Window)
+	Count = Store['StoreCureCount'] - 4
+	SetupScrollBar(Window.GetControlAlias('HWSBAR'), "TopIndex", Count, Window.GetControlAlias('HWLBTN0'), callback)
+
 	return
 
 def UpdateStoreHealWindow (Window):
@@ -849,13 +831,12 @@ def InitStoreRumourWindow (Window):
 	# this scrollbar must be unhidden because it is falsely linked to a TextArea
 	ScrollBar = Window.GetControl (5)
 	ScrollBar.SetVisible(True)
-	ScrollBar.OnChange (lambda: UpdateStoreRumourWindow(Window))
-	Count = Store['StoreDrinkCount']
-	if Count>5:
-		Count = Count-5
-	else:
-		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+
+	callback = lambda: UpdateStoreRumourWindow(Window)
+	Count = Store['StoreDrinkCount'] - 5
+	SetupScrollBar(ScrollBar, "TopIndex", Count, None, callback)
+
+	UpdateStoreRumourWindow(Window)
 	return
 
 def UpdateStoreRumourWindow (Window):
