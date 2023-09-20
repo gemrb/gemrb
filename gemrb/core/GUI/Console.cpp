@@ -79,7 +79,7 @@ bool Console::Execute(const String& text)
 {
 	bool success = false;
 	if (text.length()) {
-		auto ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", MBStringFromString(text));
+		auto ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", text);
 		success = !ret.IsNull();
 		HistoryAdd();
 	}
