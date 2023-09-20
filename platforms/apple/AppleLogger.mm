@@ -57,7 +57,7 @@ void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 		default:
 			type = OS_LOG_TYPE_DEBUG;
 	}
-	os_log_with_type(OS_LOG_DEFAULT, type, "[%s] %s", msg.owner.c_str(), msg.message.c_str());
+	os_log_with_type(OS_LOG_DEFAULT, type, "[%{public}s] %{public}s", msg.owner.c_str(), msg.message.c_str());
 	if (msg.level == FATAL) {
 		// display a GUI alert for FATAL errors
 		NSString* alertTitle = [NSString stringWithFormat:@"Fatal Error in %s", msg.owner.c_str()];
