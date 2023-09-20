@@ -187,7 +187,8 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			VideoDriver->BlitSprite( Picture, rb.origin, &rb );
 		} else {
 			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
-			VideoDriver->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r);
+			BlitFlags bf = IsDisabled() ? BlitFlags::SEPIA : BlitFlags::NONE;
+			VideoDriver->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r, bf);
 		}
 	}
 
