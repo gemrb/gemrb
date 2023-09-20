@@ -20,6 +20,7 @@ import random
 
 import GemRB
 import GUICommonWindows
+from GUICommon import BindControlCallbackParams
 from GUIDefines import *
 from ie_stats import *
 
@@ -63,6 +64,8 @@ def OpenPortraitWindow (pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetAction (GUICommonWindows.PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
 		Button.SetAction (GUICommonWindows.ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		Button.SetAction (GUICommonWindows.ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
+		Button.SetAction(BindControlCallbackParams(GemRB.GameControlLocateActor, pcID), IE_ACT_MOUSE_ENTER)
+		Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE)
 		Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 		Button.SetHotKey(chr(ord('0') + pcID), 0, True)
 		Button.OnAnimEnd (UpdateButtonAnimation)
@@ -73,7 +76,7 @@ def OpenPortraitWindow (pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		ButtonHP.SetBAM('FILLBAR', 0, 0, -1)
 		ButtonHP.OnPress(PortraitButtonHPOnPress)
 
-	UpdatePortraitWindow ()
+	UpdatePortraitWindow()
 	return Window
 	
 def UpdatePortraitWindow ():
@@ -81,14 +84,17 @@ def UpdatePortraitWindow ():
 
 	Window = GemRB.GetView("PORTWIN")
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+
 	PortraitButtons = GetPortraitButtons (Window)
 	for Button in PortraitButtons:
 		pcID = Button.Value
 
-		if pcID <= GemRB.GetPartySize():
-			Button.SetAction(lambda btn, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER)
-			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE)
 		UpdatePortraitButton(Button)
+		if GUICommonWindows.SelectionChangeHandler:
+			Button.EnableBorder(0, pc == pcID)
+		else:
+			Button.EnableBorder(0, GemRB.GameIsPCSelected(pcID))
 
 	return
 

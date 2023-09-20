@@ -39,9 +39,6 @@ import InventoryCommon
 if not GameCheck.IsPST():
   import Spellbook  ##not used in pst - YET
 
-FRAME_PC_SELECTED = 0
-FRAME_PC_TARGET   = 1
-
 CurrentWindow = None
 ActionBarControlOffset = 0
 
@@ -1507,24 +1504,17 @@ def PortraitButtonOnShiftPress (btn):
 
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
-	from PortraitWindow import GetPortraitButtons
+	from PortraitWindow import UpdatePortraitWindow
 
-	PortraitWin = GemRB.GetView("PORTWIN")
 	# FIXME: hack. If defined, display single selection
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
-		PortraitButtons = GetPortraitButtons (PortraitWin)
-		for Button in PortraitButtons:
-			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (Button.Value))
 	else:
-		sel = GemRB.GameGetSelectedPCSingle ()
-		GUICommon.UpdateMageSchool (sel)
+		pc = GemRB.GameGetSelectedPCSingle();
+		GUICommon.UpdateMageSchool (pc)
 
-		PortraitButtons = GetPortraitButtons (PortraitWin)
-		for Button in PortraitButtons:
-			Button.EnableBorder (FRAME_PC_SELECTED, Button.Value == sel)
-
+	UpdatePortraitWindow()
 	Container.CloseContainerWindow()
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
