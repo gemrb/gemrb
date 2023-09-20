@@ -7279,6 +7279,9 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	StoreActionFlags ret = store->AcceptableItemType( item->ItemType, Flags, type == 0 || type == 2 );
+	if (actor->GetBase(IE_PICKPOCKET) <= 0) {
+		ret &= ~StoreActionFlags::Steal;
+	}
 
 	//don't allow putting a bag into itself
 	if (ItemResRef == store->Name) {
@@ -7461,7 +7464,7 @@ the PC's inventory.\n\
     * 2 - sell\n\
     * 4 - identify\n\
     * 8 - steal\n\
-    * Add 0x40 for selection (in case of buy/sell only)\n\
+    * Add 0x20000 for selection (in case of buy/sell only)\n\
 \n\
 **Return value:**\n\
   * 0 - failure\n\
@@ -7477,6 +7480,7 @@ static PyObject* ChangeSelectedStoreItem(Store* store, int slot, Actor* actor, S
 
 	switch (action) {
 	case StoreActionFlags::Buy:
+	case StoreActionFlags::Steal:
 	{
 		STOItem* si = store->GetItem(slot, true);
 		if (!si) {

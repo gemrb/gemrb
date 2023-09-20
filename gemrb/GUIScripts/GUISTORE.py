@@ -347,7 +347,7 @@ def InitStoreShoppingWindow (Window):
 		Button.OnDoublePress (lambda: OpenItemAmountWindow(Window))
 		Button.OnRightPress (InfoLeftWindow)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		Button = Window.GetControlAlias ('RBTN' + str(i))
 		Button.SetVarAssoc ("RightIndex", i)
@@ -360,7 +360,7 @@ def InitStoreShoppingWindow (Window):
 			Button.OnDoublePress (lambda: OpenBag(Window))
 		Button.OnRightPress (InfoRightWindow)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.SetVar ("RightIndex", 0)
 	GemRB.SetVar ("LeftIndex", 0)
@@ -561,25 +561,25 @@ def InitStoreStealWindow (Window):
 		Button.SetVarAssoc ("LeftIndex", i)
 		Button.SetBorder (0,color,0,1)
 		Button.OnRightPress (InfoLeftWindow)
-		Button.OnPress (lambda: RedrawStoreStealWindow(Window))
+		Button.OnPress (SelectSteal)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 		Button = Window.GetControlAlias ('SWRBTN' + str(i))
 		Button.SetVarAssoc ("RightIndex", i)
 		Button.SetBorder (0,color,0,1)
 		Button.OnRightPress (InfoRightWindow)
 		Button.SetFont ("NUMBER")
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
-	GemRB.SetVar ("RightIndex", 0)
-	GemRB.SetVar ("LeftIndex", 0)
+	GemRB.SetVar ("RightIndex", None)
+	GemRB.SetVar ("LeftIndex", None)
 	UnselectNoRedraw ()
 
 	# Steal
 	LeftButton = Button = Window.GetControlAlias ('STEAL')
 	Button.SetText (strrefs["steal"])
-	Button.OnPress (lambda: StealPressed (Window))
+	Button.OnPress (StealPressed)
 
 	Button = Window.GetControl (37)
 	if Button:
@@ -1026,6 +1026,19 @@ def SelectBuy (btn):
 	GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_BUY|SHOP_SELECT)
 	RedrawStoreShoppingWindow (GemRB.GetView('WINSHOP'))
 	return
+	
+def SelectSteal(btn):
+	pc = GemRB.GameGetSelectedPCSingle ()
+	LeftIndex = btn.Value + GemRB.GetVar("LeftTopIndex")
+	isSelected = GemRB.IsValidStoreItem (pc, LeftIndex, ITEM_STORE) & SHOP_SELECT
+	UnselectNoRedraw()
+
+	if not isSelected:
+		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL | SHOP_SELECT)
+	else:
+		GemRB.SetVar("LeftIndex", None)
+	RedrawStoreStealWindow (btn.Window)
+	return
 
 def ToBackpackPressed ():
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1163,7 +1176,6 @@ def RedrawStoreShoppingWindow (Window):
 
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	idx = [LeftTopIndex, RightTopIndex, GemRB.GetVar("LeftIndex")]
 	LeftCount = Store['StoreItemCount']
 	BuySum = 0
 	selected_count = 0
@@ -1255,7 +1267,7 @@ def RedrawStoreShoppingWindow (Window):
 			Slot = None
 		Button = Window.GetControlAlias ('LBTN' + str(i))
 		Label = Window.GetControlAlias ('LLBL' + str(i))
-		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx)
+		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE)
 
 		if i+RightTopIndex<RightCount:
 			if Bag:
@@ -1266,7 +1278,7 @@ def RedrawStoreShoppingWindow (Window):
 			Slot = None
 		Button = Window.GetControlAlias ('RBTN' + str(i))
 		Label = Window.GetControlAlias ('RLBL' + str(i))
-		SetupItems (pc, Slot, Button, Label, i, ITEM_BAG if Bag else ITEM_PC, idx)
+		SetupItems (pc, Slot, Button, Label, i, ITEM_BAG if Bag else ITEM_PC)
 
 	if GameCheck.IsPST():
 		GUICommon.SetEncumbranceLabels (Window, 25, None, pc)
@@ -1560,8 +1572,8 @@ def InfoWindow (Slot, Item):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def StealPressed (Window):
-	LeftIndex = GemRB.GetVar ("LeftIndex")
+def StealPressed (btn):
+	LeftIndex = GemRB.GetVar("LeftIndex")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	#percentage skill check, if fails, trigger StealFailed
 	#if difficulty = 0 and skill=100, automatic success
@@ -1571,7 +1583,7 @@ def StealPressed (Window):
 	if GUICommon.CheckStat100 (pc, IE_PICKPOCKET, Store['StealFailure']):
 		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
 		GemRB.PlaySound(DEF_STOLEN)
-		UpdateStoreStealWindow (Window)
+		UpdateStoreStealWindow (btn.Window)
 	else:
 		GemRB.StealFailed ()
 		CloseStoreWindow ()
@@ -1580,9 +1592,7 @@ def StealPressed (Window):
 def RedrawStoreStealWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
-	LeftIndex = GemRB.GetVar ("LeftIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	idx = [LeftTopIndex, RightTopIndex, LeftIndex]
 	LeftCount = Store['StoreItemCount']
 	pc = GemRB.GameGetSelectedPCSingle ()
 	RightCount = len(inventory_slots)
@@ -1590,7 +1600,7 @@ def RedrawStoreStealWindow (Window):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
 		Button = Window.GetControlAlias ('SWLBTN' + str(i))
 		Label = Window.GetControlAlias ('SWLLBL' + str(i))
-		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx, 1)
+		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, True)
 
 		if i+RightTopIndex<RightCount:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
@@ -1598,13 +1608,7 @@ def RedrawStoreStealWindow (Window):
 			Slot = None
 		Button = Window.GetControlAlias ('SWRBTN' + str(i))
 		Label = Window.GetControlAlias ('SWRLBL' + str(i))
-		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, idx, 1)
-
-	selected_count = 0
-	for i in range (LeftCount):
-		Flags = GemRB.IsValidStoreItem (pc, i, ITEM_STORE)
-		if Flags & SHOP_SELECT:
-			selected_count += 1
+		SetupItems (pc, Slot, Button, Label, i, ITEM_PC, True)
 
 	# shade the inventory icon if it is full
 	free_slots = len(GemRB.GetSlots (pc, SLOT_INVENTORY, -1))
@@ -1616,7 +1620,7 @@ def RedrawStoreStealWindow (Window):
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# also disable the button if the inventory is full
-	if LeftIndex is not None and selected_count <= free_slots:
+	if GemRB.GetVar("LeftIndex") is not None and free_slots:
 		LeftButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1627,111 +1631,91 @@ def RedrawStoreStealWindow (Window):
 		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
 
-def SetupItems (pc, Slot, Button, Label, i, storetype, idx, steal=0):
+def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 	if Slot == None:
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-		Label.SetText ("")
-		Button.SetText ("")
+		Button.SetVisible(False)
+		return
+
+	Item = GemRB.GetItem (Slot['ItemResRef'])
+	Button.SetItemIcon (Slot['ItemResRef'], 0)
+	Button.SetVisible(True)
+	if Item['MaxStackAmount'] > 1:
+		Button.SetText ( str(Slot['Usages0']) )
 	else:
-		LeftTopIndex = idx[0]
-		LeftIndex = LeftTopIndex + idx[2]
+		Button.SetText ("")
 
-		Item = GemRB.GetItem (Slot['ItemResRef'])
-		Button.SetItemIcon (Slot['ItemResRef'], 0)
-		if Item['MaxStackAmount']>1:
-			Button.SetText ( str(Slot['Usages0']) )
+	state = IE_GUI_BUTTON_DISABLED
+	Price = None
+
+	if storetype == ITEM_STORE:
+		LeftTopIndex = GemRB.GetVar("LeftTopIndex")
+		Price = max(1, GetRealPrice (pc, "buy", Item, Slot))
+		Flags = GemRB.IsValidStoreItem (pc, i + LeftTopIndex, storetype)
+		if Flags & SHOP_SELECT:
+			state = IE_GUI_BUTTON_SELECTED
+		elif (Flags & SHOP_STEAL) and steal:
+			state = IE_GUI_BUTTON_ENABLED
+		elif (Flags & SHOP_BUY) and not steal:
+			state = IE_GUI_BUTTON_ENABLED
+
+		if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
+			Button.EnableBorder (1, 0)
 		else:
-			Button.SetText ("")
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+			Button.EnableBorder (1, 1)
 
-		if storetype == ITEM_STORE:
-			Price = GetRealPrice (pc, "buy", Item, Slot)
-			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, storetype)
+		if not Inventory:
+			Price = max(1, GetRealPrice (pc, "sell", Item, Slot))
+	else:
+		RightTopIndex = GemRB.GetVar("RightTopIndex")
+		index = RightTopIndex + i
+		if not Bag:
+			index = inventory_slots[index]
 
-			if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
-				Button.EnableBorder (1, 0)
-			else:
-				Button.EnableBorder (1, 1)
-
-			if steal:
-				Button.SetState (IE_GUI_BUTTON_ENABLED)
-			else:
-				if Flags & SHOP_BUY:
-					if Flags & SHOP_SELECT:
-						Button.SetState (IE_GUI_BUTTON_SELECTED)
-					else:
-						Button.SetState (IE_GUI_BUTTON_ENABLED)
-				else:
-					Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-				if not Inventory:
-					Price = GetRealPrice (pc, "sell", Item, Slot)
-					if Price <= 0:
-						Price = 1
+		Flags = GemRB.IsValidStoreItem (pc, index, storetype)
+		if steal:
+			Button.EnableBorder (1, False)
 		else:
-			RightTopIndex = idx[1]
-			index = RightTopIndex + i
-			if not Bag:
-				index = inventory_slots[index]
-			Flags = GemRB.IsValidStoreItem (pc, index, storetype)
-			if Flags & SHOP_STEAL:
-				if LeftIndex == LeftTopIndex + i:
-					Button.SetState (IE_GUI_BUTTON_SELECTED)
-				else:
-					Button.SetState (IE_GUI_BUTTON_ENABLED)
-			else:
-				Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Price = 1 if Inventory else GetRealPrice(pc, "buy", Item, Slot)
 
-			if Inventory:
-				Price = 1
-			else:
-				Price = GetRealPrice (pc, "buy", Item, Slot)
-
-			if (Price>0) and (Flags & SHOP_SELL):
-				if Flags & SHOP_SELECT:
-					Button.SetState (IE_GUI_BUTTON_SELECTED)
-				else:
-					Button.SetState (IE_GUI_BUTTON_ENABLED)
-			elif Item['Function'] & ITM_F_CONTAINER and not Bag and not Inventory:
-				#containers are always clickable
-				Button.SetState (IE_GUI_BUTTON_ENABLED)
+			if Item['Function'] & ITM_F_CONTAINER and not Bag and not Inventory:
+				# containers are always clickable
+				state = IE_GUI_BUTTON_ENABLED
+			elif Flags & SHOP_SELECT:
+				state = IE_GUI_BUTTON_SELECTED
+			elif Flags & SHOP_SELL and Price > 0:
+				state = IE_GUI_BUTTON_ENABLED
 			else:
 				color = {'r': 61, 'g': 47, 'b': 24, 'a': 100}
 				Button.SetBorder (2, color, 1,1)
-				Button.SetState (IE_GUI_BUTTON_DISABLED)
+				state = IE_GUI_BUTTON_DISABLED
 
-		if Flags & SHOP_ID:
-			Name = GemRB.GetString (Item['ItemName'])
-			Button.EnableBorder (0, 1)
-			if not steal and storetype != ITEM_STORE:
-				Price = 1
+	Button.SetState(state)
+	if Flags & SHOP_ID:
+		Name = GemRB.GetString (Item['ItemName'])
+		Button.EnableBorder (0, True)
+	else:
+		Name = GemRB.GetString (Item['ItemNameIdentified'])
+		Button.EnableBorder (0, False)
+
+	GemRB.SetToken ("ITEMNAME", Name)
+	GemRB.SetToken ("ITEMCOST", str(Price))
+	# only show the item name?
+	if (Inventory or steal) and not GameCheck.IsPST():
+		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+			LabelText = GemRB.GetString (24890)
+		elif GameCheck.IsBG2():
+			LabelText = GemRB.GetString (28337)
+		elif steal:
+			LabelText = Name
 		else:
-			Name = GemRB.GetString (Item['ItemNameIdentified'])
-			Button.EnableBorder (0, 0)
+			LabelText = ""
+	else:
+		LabelText = GemRB.GetString (strrefs["itemnamecost"])
 
-		GemRB.SetToken ("ITEMNAME", Name)
-		GemRB.SetToken ("ITEMCOST", str(Price) )
-		if GameCheck.IsPST():
-			LabelText = GemRB.GetString (strrefs["itemnamecost"])
-		elif Inventory or (storetype == ITEM_STORE and steal):
-			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-				LabelText = GemRB.GetString (24890)
-			elif GameCheck.IsBG2():
-				LabelText = GemRB.GetString (28337)
-			elif steal:
-				LabelText = Name
-			else:
-				LabelText = ""
-		else:
-			LabelText = GemRB.GetString (strrefs["itemnamecost"])
-
-		if (storetype == ITEM_STORE and not steal) or storetype == ITEM_BAG:
-			if Slot["Amount"] != -1:
-				LabelText = LabelText + " (" + str(Slot["Amount"]) + ")"
-		Label.SetText (LabelText)
+	if (storetype == ITEM_STORE and not steal) or storetype == ITEM_BAG:
+		if Slot["Amount"] != -1:
+			LabelText = LabelText + " (" + str(Slot["Amount"]) + ")"
+	Label.SetText (LabelText)
 	return
 
 # handle raisdead.2da price override for raising and resurrecting
