@@ -23,9 +23,11 @@ import GUICommonWindows
 import LUCommon
 
 from GameCheck import MAX_PARTY_SIZE
-from GUICommonWindows import FRAME_PC_SELECTED, FRAME_PC_TARGET
 from GUIDefines import *
 from ie_stats import *
+
+FRAME_PC_SELECTED = 0
+FRAME_PC_TARGET   = 1
 
 StatesFont = "STATES2"
 if GameCheck.IsIWD1() or GameCheck.IsIWD2():
@@ -315,8 +317,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			AddHPLabel (Button, pcID)
 
-	UpdatePortraitWindow ()
-	GUICommonWindows.SelectionChanged ()
+	UpdatePortraitWindow()
 	return Window
 
 def UpdatePortraitWindow ():
@@ -384,11 +385,16 @@ def UpdatePortraitWindow ():
 		SetIcons(Button)
 		SetupDamageInfo(Button)
 
+		if GUICommonWindows.SelectionChangeHandler:
+			Button.EnableBorder(FRAME_PC_SELECTED, pc == pcID)
+		else:
+			Button.EnableBorder(FRAME_PC_SELECTED, GemRB.GameIsPCSelected(pcID))
+
 	for Button in GetPortraitButtons(Window):
 		pcID = Button.Value
 		if pcID > GemRB.GetPartySize():
 			Button.SetVisible(False)
-		elif pcID != pc and GemRB.GetView("WIN_STORE") and GemRB.GetView("WIN_INV"):
+		elif pc and pcID != pc and GemRB.GetView("WIN_STORE") and GemRB.GetView("WIN_INV"):
 			# opened a bag in inventory
 			Button.SetVisible(False)
 		elif GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD and GemRB.GetView("WIN_STORE") and not GemRB.GetView("WINHEAL"):

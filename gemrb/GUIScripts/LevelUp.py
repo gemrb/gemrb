@@ -521,7 +521,7 @@ def LevelUpDonePress():
 
 	if LevelUpWindow:
 		LevelUpWindow.Close()
-	PortraitWindow.UpdatePortraitWindow ()
+	PortraitWindow.UpdatePortraitWindow()
 	return
 
 def LevelUpHLAPress ():

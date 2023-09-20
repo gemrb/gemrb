@@ -674,7 +674,7 @@ void Interface::HandleEvents()
 
 		const Window* win = GetWindow(0, "PORTWIN");
 		if (win) {
-			guiscript->RunFunction("PortraitWindow", "UpdatePortraitWindow");
+			guiscript->RunFunction("PortraitWindow", "UpdatePortraitWindow", true);
 		}
 	}
 
