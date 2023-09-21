@@ -1892,7 +1892,7 @@ int fx_set_panic_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (target->InParty) core->GetGame()->SelectActor(target, false, SELECT_NORMAL);
 		target->VerbalConstant(Verbal::Panic, gamedata->GetVBData("SPECIAL_COUNT"));
 
-		Action* action;
+		Holder<Action> action;
 		const Actor* caster = GetCasterObject();
 		if (caster) {
 			if (core->HasFeature(GFFlags::IWD_MAP_DIMENSIONS)) { // iwd troll scripts are incompatible with full panic
@@ -1906,7 +1906,7 @@ int fx_set_panic_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		assert(action);
 		action->int0Parameter = core->Time.round_size;
 		action->int2Parameter = 1; // mark as our own
-		const Action* current = target->GetCurrentAction();
+		const Holder<Action> current = target->GetCurrentAction();
 		if (current && current->int2Parameter == 1) target->ReleaseCurrentAction();
 		target->AddActionInFront(action);
 	}
@@ -4759,7 +4759,7 @@ int fx_cast_spell(Scriptable* Owner, Actor* target, Effect* fx)
 		if (nonActor) target2 = Owner->GetCurrentArea()->GetScriptable(fx->Pos, 0); // refetch
 		if (!target2) target2 = target;
 		if (!target2) return FX_NOT_APPLIED;
-		Action* forceSpellAction = GenerateActionDirect(std::move(tmp), target2);
+		Holder<Action> forceSpellAction = GenerateActionDirect(std::move(tmp), target2);
 		Owner->AddActionInFront(forceSpellAction);
 		Owner->ImmediateEvent();
 	} else if (fx->Parameter2 == 1) {
@@ -4794,7 +4794,7 @@ int fx_cast_spell_point(Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	if (fx->Parameter2 == 0) {
 		// no deplete, no interrupt, caster or provided level
 		std::string tmp = fmt::format("ForceSpellPointRES(\"{}\",[{}.{}],{})", fx->Resource, fx->Pos.x, fx->Pos.y, fx->Parameter1);
-		Action* forceSpellAction = GenerateAction(std::move(tmp));
+		Holder<Action> forceSpellAction = GenerateAction(std::move(tmp));
 		Owner->AddActionInFront(forceSpellAction);
 		Owner->ImmediateEvent();
 	} else if (fx->Parameter2 == 1) {

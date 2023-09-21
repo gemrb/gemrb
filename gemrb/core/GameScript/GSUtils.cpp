@@ -148,7 +148,7 @@ static const StringView spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "SP
 
 //this function handles the polymorphism of Spell[RES] actions
 //it returns spellres
-bool ResolveSpellName(ResRef& spellRes, const Action* parameters)
+bool ResolveSpellName(ResRef& spellRes, const Holder<Action>parameters)
 {
 	if (!parameters->resref0Parameter.IsEmpty()) {
 		spellRes = parameters->resref0Parameter;
@@ -291,7 +291,7 @@ void ClickCore(Scriptable* Sender, const MouseEvent& me, int speed)
 	Sender->ReleaseCurrentAction();
 }
 
-void PlaySequenceCore(Scriptable* Sender, const Action* parameters, Animation::index_t value)
+void PlaySequenceCore(Scriptable* Sender, const Holder<Action>parameters, Animation::index_t value)
 {
 	Scriptable* tar;
 
@@ -348,7 +348,7 @@ void PlaySequenceCore(Scriptable* Sender, const Action* parameters, Animation::i
 	actor->SetWait(duration);
 }
 
-void TransformItemCore(Actor* actor, const Action* parameters, bool onlyone)
+void TransformItemCore(Actor* actor, const Holder<Action> parameters, bool onlyone)
 {
 	int i = actor->inventory.GetSlotCount();
 	while (i--) {
@@ -846,7 +846,7 @@ static Point FindOffScreenPoint(const Scriptable* Sender, int flags, int phase)
 	}
 }
 
-void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
+void CreateCreatureCore(Scriptable* Sender, Holder<Action> parameters, int flags)
 {
 	Scriptable* tmp = GetScriptableFromObject(Sender, parameters);
 	//if there is nothing to copy, don't spawn anything
@@ -1037,7 +1037,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, cons
 		Sender->SetWait(wait);
 	}
 	Sender->ReleaseCurrentAction();
-	Action* action = GenerateAction(std::move(Tmp));
+	auto action = GenerateAction(std::move(Tmp));
 	Sender->AddActionInFront(action);
 }
 
@@ -1106,7 +1106,7 @@ void GetPositionFromScriptable(const Scriptable* scr, Point& position, bool dest
 	}
 }
 
-void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
+void BeginDialog(Scriptable* Sender, const Holder<Action> parameters, int Flags)
 {
 	Scriptable* tar = nullptr;
 	Scriptable* scr = nullptr;
@@ -1274,7 +1274,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	// moved this here from InitDialog, because InitDialog doesn't know which side is which
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
-	const Action* curact = target->GetCurrentAction();
+	Holder<Action> curact = target->GetCurrentAction();
 	if ((speaker != target) && (target->GetInternalFlag() & IF_NOINT) &&
 	    (!curact && target->GetNextAction())) {
 		core->GetTokenDictionary()["TARGET"] = target->GetName();
@@ -1422,7 +1422,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef& area, const Point& positio
 //if int0parameter is !=0, then it will try only x times
 // for this family of actions, familiars cannot walk through a transition (that's flagged to allow NPCs to pass)
 // ... but we don't check areas/chasing here anyway
-void MoveToObjectCore(Scriptable* Sender, Action* parameters, ieDword flags, bool untilsee)
+void MoveToObjectCore(Scriptable* Sender, Holder<Action> parameters, ieDword flags, bool untilsee)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (!actor) {
@@ -1714,9 +1714,9 @@ static Object* ObjectCopy(const Object* object)
 	return newObject;
 }
 
-Action* ParamCopy(const Action* parameters)
+Holder<Action> ParamCopy(const Holder<Action>parameters)
 {
-	Action* newAction = new Action(true);
+	Holder<Action> newAction = Action::MakeAction();
 	newAction->actionID = parameters->actionID;
 	newAction->int0Parameter = parameters->int0Parameter;
 	newAction->int1Parameter = parameters->int1Parameter;
@@ -1730,9 +1730,9 @@ Action* ParamCopy(const Action* parameters)
 	return newAction;
 }
 
-Action* ParamCopyNoOverride(const Action* parameters)
+Holder<Action> ParamCopyNoOverride(const Holder<Action>parameters)
 {
-	Action* newAction = new Action(true);
+	Holder<Action>newAction = Action::MakeAction();
 	newAction->actionID = parameters->actionID;
 	newAction->int0Parameter = parameters->int0Parameter;
 	newAction->int1Parameter = parameters->int1Parameter;
@@ -2123,7 +2123,7 @@ void SetupWishCore(Scriptable* Sender, TableMgr::index_t column, int picks)
 	}
 }
 
-void AmbientActivateCore(const Scriptable* Sender, const Action* parameters, bool flag)
+void AmbientActivateCore(const Scriptable* Sender, Holder<Action> parameters, bool flag)
 {
 	AreaAnimation* anim = Sender->GetCurrentArea()->GetAnimation(parameters->variable0Parameter);
 	if (!anim) {
@@ -2229,7 +2229,7 @@ static bool InterruptSpellcasting(Scriptable* Sender)
 }
 
 // shared spellcasting action code for casting on scriptables
-void SpellCore(Scriptable* Sender, Action* parameters, int flags)
+void SpellCore(Scriptable* Sender, Holder<Action>parameters, int flags)
 {
 	ResRef spellResRef;
 	int level = 0;
@@ -2400,7 +2400,7 @@ void SpellCore(Scriptable* Sender, Action* parameters, int flags)
 
 
 // shared spellcasting action code for casting on the ground
-void SpellPointCore(Scriptable* Sender, Action* parameters, int flags)
+void SpellPointCore(Scriptable* Sender, Holder<Action>parameters, int flags)
 {
 	ResRef spellResRef;
 	int level = 0;
@@ -2512,7 +2512,7 @@ void SpellPointCore(Scriptable* Sender, Action* parameters, int flags)
 	Sender->ReleaseCurrentAction();
 }
 
-void AddXPCore(const Action* parameters, bool divide)
+void AddXPCore(const Holder<Action>parameters, bool divide)
 {
 	AutoTable xptable;
 
@@ -2610,7 +2610,7 @@ unsigned int NumImmuneToSpellLevelCore(Scriptable* Sender, const Trigger* parame
 	return bounceCount;
 }
 
-void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
+void RunAwayFromCore(Scriptable* Sender, const Holder<Action> parameters, int flags)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (!actor) {
@@ -2674,7 +2674,7 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 	}
 }
 
-void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flags)
+void MoveGlobalObjectCore(Scriptable* Sender, const Holder<Action> parameters, int flags)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	Actor* actor = Scriptable::As<Actor>(tar);

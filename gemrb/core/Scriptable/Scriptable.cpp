@@ -370,11 +370,11 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 void Scriptable::AddAction(std::string actStr)
 {
-	Action* aC = GenerateAction(std::move(actStr));
+	Holder<Action> aC = GenerateAction(std::move(actStr));
 	AddAction(aC);
 }
 
-void Scriptable::AddAction(Action* aC)
+void Scriptable::AddAction(Holder<Action> aC)
 {
 	if (!aC) {
 		Log(WARNING, "Scriptable", "AA: NULL action encountered for {}!", scriptName);
@@ -385,7 +385,6 @@ void Scriptable::AddAction(Action* aC)
 	if (startActive) {
 		InternalFlags &= ~IF_IDLE;
 	}
-	aC->IncRef();
 	if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
 		aC->int0Parameter = scriptLevel;
 	}
@@ -394,7 +393,7 @@ void Scriptable::AddAction(Action* aC)
 	// when added if the action queue is empty, even on actors which are Held/etc
 	// but try to ignore iwd2 ActionOverride for 41pstail.bcs
 	// FIXME: area check hack until fuzzie fixes scripts here
-	const Action* nextAction = GetNextAction();
+	auto nextAction = GetNextAction();
 	bool ignoreQueue = !nextAction || (third && nextAction->objects[0]);
 	if (!CurrentAction && ignoreQueue && area) {
 		int instant = AF_SCR_INSTANT;
@@ -411,7 +410,7 @@ void Scriptable::AddAction(Action* aC)
 	actionQueue.push_back(aC);
 }
 
-void Scriptable::AddActionInFront(Action* aC)
+void Scriptable::AddActionInFront(Holder<Action> aC)
 {
 	if (!aC) {
 		Log(WARNING, "Scriptable", "AAIF: null action encountered for {}!", scriptName);
@@ -419,20 +418,19 @@ void Scriptable::AddActionInFront(Action* aC)
 	}
 	InternalFlags |= IF_ACTIVE;
 	actionQueue.push_front(aC);
-	aC->IncRef();
 }
 
-Action* Scriptable::GetNextAction() const
+Holder<Action> Scriptable::GetNextAction() const
 {
 	if (actionQueue.empty()) return nullptr;
 	return actionQueue.front();
 }
 
-Action* Scriptable::PopNextAction()
+Holder<Action> Scriptable::PopNextAction()
 {
 	if (actionQueue.empty()) return nullptr;
 
-	Action* aC = actionQueue.front();
+	Holder<Action> aC = actionQueue.front();
 	actionQueue.pop_front();
 	return aC;
 }
@@ -463,14 +461,13 @@ void Scriptable::ClearActions(int skipFlags)
 		}
 
 		for (unsigned int i = 0; i < actionQueue.size(); i++) {
-			Action* aC = actionQueue.front();
+			Holder<Action> aC = actionQueue.front();
 			if (skipFlags == 1 && aC->flags & ACF_OVERRIDE) continue;
 			if (skipFlags == 2 && actionflags[aC->actionID] & AF_IWD2_OVERRIDE) continue;
 			if (skipFlags == 3 && aC == CurrentAction && savedCurrentAction) continue;
 
 			actionQueue.pop_front();
 			i--;
-			aC->Release();
 		}
 	}
 	if (savedCurrentAction) return;
@@ -497,7 +494,6 @@ void Scriptable::Stop(int flags)
 void Scriptable::ReleaseCurrentAction()
 {
 	if (CurrentAction) {
-		CurrentAction->Release();
 		CurrentAction = NULL;
 	}
 

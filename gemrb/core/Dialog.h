@@ -38,7 +38,7 @@ struct DialogTransition {
 	ieStrRef textStrRef;
 	ieStrRef journalStrRef;
 	Holder<Condition> condition;
-	std::vector<Action*> actions;
+	std::vector<Holder<Action>> actions;
 	ResRef Dialog;
 	ieDword stateIndex;
 };
@@ -52,16 +52,6 @@ struct DialogState {
 };
 
 class GEM_EXPORT Dialog {
-public:
-	Dialog() noexcept = default;
-	Dialog(const Dialog&) = delete;
-	Dialog(Dialog&&) noexcept = default;
-	~Dialog();
-	Dialog& operator=(const Dialog&) = delete;
-
-private:
-	void FreeDialogState(Holder<DialogState> ds) const;
-
 public:
 	Holder<DialogState> GetState(unsigned int index) const;
 	int FindFirstState(Scriptable* target) const;

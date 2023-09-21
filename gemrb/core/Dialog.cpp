@@ -13,31 +13,12 @@ namespace GemRB {
 
 enum BlitFlags : uint32_t;
 
-Dialog::~Dialog(void)
-{
-	for (const auto& state : initialStates) {
-		if (state) {
-			FreeDialogState(state);
-		}
-	}
-}
-
 Holder<DialogState> Dialog::GetState(unsigned int index) const
 {
 	if (index >= TopLevelCount) {
 		return nullptr;
 	}
 	return initialStates[index];
-}
-
-void Dialog::FreeDialogState(Holder<DialogState> ds) const
-{
-	for (auto& trans : ds->transitions) {
-		for (auto& action : trans->actions) {
-			action->Release();
-		}
-		trans = nullptr;
-	}
 }
 
 int Dialog::FindFirstState(Scriptable* target) const

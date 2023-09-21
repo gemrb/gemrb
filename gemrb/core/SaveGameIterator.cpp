@@ -535,7 +535,7 @@ static int CanSave()
 	Point pc1 = game->GetPC(0, true)->Pos;
 	std::vector<Actor*> nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD | GA_NO_UNSCHEDULED, 15);
 	for (const auto& neighbour : nearActors) {
-		const Action* action = neighbour->GetCurrentAction();
+		auto action = neighbour->GetCurrentAction();
 		if (action && action->flags & AF_DIALOG) {
 			// dialog about to start or similar
 			displaymsg->DisplayMsgCentered(HCStrings::CantSaveDialog2, FT_ANY, GUIColors::XPCHANGE);

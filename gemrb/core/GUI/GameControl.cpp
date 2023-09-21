@@ -258,7 +258,7 @@ void GameControl::ClearMouseState()
 // only PST supports RunToPoint
 void GameControl::CreateMovement(Actor* actor, const Point& p, bool append, bool tryToRun) const
 {
-	Action* action = nullptr;
+	Holder<Action> action;
 	tryToRun = tryToRun || AlwaysRun;
 
 	if (append) {
@@ -1877,7 +1877,7 @@ void GameControl::TryToCast(Actor* source, const Point& tgt)
 		//using item on target
 		tmp = "UseItemPoint(\"\",[0,0],0)";
 	}
-	Action* action = GenerateAction(std::move(tmp));
+	Holder<Action> action = GenerateAction(std::move(tmp));
 	action->pointParameter = tgt;
 	if (spellOrItem >= 0) {
 		if (spellIndex < 0) {
@@ -1888,7 +1888,6 @@ void GameControl::TryToCast(Actor* source, const Point& tgt)
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 			if (!si) {
 				ResetTargetMode();
-				delete action;
 				return;
 			}
 			action->resref0Parameter = si->SpellResRef;
@@ -1945,7 +1944,7 @@ void GameControl::TryToCast(Actor* source, const Actor* tgt)
 		//using item on target
 		tmp = "NIDSpecial5()";
 	}
-	Action* action = GenerateActionDirect(std::move(tmp), tgt);
+	Holder<Action> action = GenerateActionDirect(std::move(tmp), tgt);
 	if (spellOrItem >= 0) {
 		if (spellIndex < 0) {
 			action->resref0Parameter = spellName;
@@ -1955,7 +1954,6 @@ void GameControl::TryToCast(Actor* source, const Actor* tgt)
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 			if (!si) {
 				ResetTargetMode();
-				delete action;
 				return;
 			}
 			action->resref0Parameter = si->SpellResRef;
@@ -2063,7 +2061,7 @@ void GameControl::HandleDoor(Door* door, Actor* actor)
 
 	door->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
-	Action* toggle = GenerateAction("NIDSpecial9()");
+	auto toggle = GenerateAction("NIDSpecial9()");
 	toggle->int0Parameter = door->GetGlobalID();
 	actor->CommandActor(toggle);
 }

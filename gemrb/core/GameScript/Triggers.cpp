@@ -2342,10 +2342,9 @@ int GameScript::IsSpellTargetValid(Scriptable* Sender, const Trigger* parameters
 //Always manages to set spell to 0, otherwise it sets if there was nothing set earlier
 int GameScript::SetMarkedSpell_Trigger(Scriptable* Sender, const Trigger* parameters)
 {
-	Action* params = new Action(true);
+	auto params = Action::MakeAction();
 	params->int0Parameter = parameters->int0Parameter;
 	GameScript::SetMarkedSpell(Sender, params);
-	delete params;
 	return 1;
 }
 

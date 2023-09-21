@@ -232,7 +232,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 
 	while (true) {
 		// not autofreed, because it is referenced by the Script
-		Action* aC = new Action(false);
+		Holder<Action> aC = Action::MakeAction();
 		stream->ReadLine(line, 1024);
 		aC->actionID = strtounsigned<uint16_t>(line.c_str(), nullptr, 10);
 		for (int i = 0; i < 3; i++) {

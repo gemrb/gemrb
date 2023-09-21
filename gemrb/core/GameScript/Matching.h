@@ -7,6 +7,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include "Holder.h"
+
 namespace GemRB {
 
 class Action;
@@ -26,13 +28,13 @@ enum class GroupType {
 
 GEM_EXPORT Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Object* oC, int ga_flags, bool anyone = false);
 GEM_EXPORT Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Trigger* parameters, int gaFlags);
-GEM_EXPORT Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Action* parameters, int gaFlags);
+GEM_EXPORT Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Holder<Action> parameters, int gaFlags);
 Targets* GetAllActors(Scriptable* Sender, int ga_flags);
 Scriptable* GetScriptableFromObject(Scriptable* Sender, const Trigger* parameters, int gaFlags = 0);
-Scriptable* GetScriptableFromObject(Scriptable* Sender, const Action* parameters, int gaFlags = 0);
-Scriptable* GetScriptableFromObject2(Scriptable* Sender, const Action* parameters, int gaFlags = 0);
+Scriptable* GetScriptableFromObject(Scriptable* Sender, const Holder<Action> parameters, int gaFlags = 0);
+Scriptable* GetScriptableFromObject2(Scriptable* Sender, const Holder<Action> parameters, int gaFlags = 0);
 Scriptable* GetScriptableFromObject(Scriptable* Sender, const Object* oC, int gaFlags = 0, bool anyone = false);
-Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Action* parameters, int gaFlags = 0);
+Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Holder<Action> parameters, int gaFlags = 0);
 Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Object* oC, int ga_flags = 0, bool anyone = false);
 Scriptable* GetActorObject(const TileMap* TMap, const ieVariable& name);
 

@@ -214,7 +214,7 @@ static Targets* EvaluateObject(const Map* map, const Scriptable* Sender, const O
 	return tgts;
 }
 
-Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Action* parameters, int gaFlags)
+Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Holder<Action> parameters, int gaFlags)
 {
 	return GetAllObjects(map, Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
 }
@@ -302,7 +302,7 @@ Scriptable* GetActorObject(const TileMap* TMap, const ieVariable& name)
 }
 
 // blocking actions need to store some kinds of objects between ticks
-Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Action* parameters, int gaFlags)
+Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Holder<Action> parameters, int gaFlags)
 {
 	return GetStoredActorFromObject(Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
 }
@@ -335,12 +335,12 @@ Scriptable* GetScriptableFromObject(Scriptable* Sender, const Trigger* parameter
 	return GetScriptableFromObject(Sender, parameters->objectParameter, gaFlags, parameters->flags & TF_MISSING_OBJECT);
 }
 
-Scriptable* GetScriptableFromObject(Scriptable* Sender, const Action* parameters, int gaFlags)
+Scriptable* GetScriptableFromObject(Scriptable* Sender, const Holder<Action> parameters, int gaFlags)
 {
 	return GetScriptableFromObject(Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
 }
 
-Scriptable* GetScriptableFromObject2(Scriptable* Sender, const Action* parameters, int gaFlags)
+Scriptable* GetScriptableFromObject2(Scriptable* Sender, const Holder<Action> parameters, int gaFlags)
 {
 	return GetScriptableFromObject(Sender, parameters->objects[2], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
 }

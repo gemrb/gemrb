@@ -1964,7 +1964,7 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 		Response* response = rS->responses[0];
 		if (response->actions.empty()) continue;
 
-		const Action* action = response->actions[0];
+		auto action = response->actions[0];
 		Scriptable* target = GetScriptableFromObject(MySelf, action->objects[1]);
 		if (!target) {
 			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
@@ -1979,11 +1979,9 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 
 		// the original first queued them all similarly to DialogHandler::DialogChoose
 		if (target->Type != ST_ACTOR) {
-			Action* interrupt = GenerateAction("SetInterrupt(FALSE)");
-			interrupt->IncRef(); // SetInterrupt is an instant, so we need to ensure StartCutScene can safely delete it
+			Holder<Action> interrupt = GenerateAction("SetInterrupt(FALSE)");
 			response->actions.insert(response->actions.begin(), interrupt);
 			interrupt = GenerateAction("SetInterrupt(TRUE)");
-			interrupt->IncRef();
 			response->actions.push_back(interrupt);
 		}
 		response->Execute(target);
@@ -1998,7 +1996,7 @@ void GameScript::ExecuteString(Scriptable* Sender, std::string string)
 	if (string.empty()) {
 		return;
 	}
-	Action* act = GenerateAction(std::move(string));
+	Holder<Action> act = GenerateAction(std::move(string));
 	if (!act) {
 		return;
 	}
@@ -2149,14 +2147,14 @@ int Response::Execute(Scriptable* Sender)
 	if (actions.empty()) return ret;
 
 	bool iwd2 = core->HasFeature(GFFlags::EFFICIENT_OR);
-	const Action* last = actions.back();
+	Holder<Action> last = actions.back();
 	bool hasContinue = false;
 	if (iwd2 && actionflags[last->actionID] & AF_CONTINUE) {
 		hasContinue = true;
 	}
 
 	for (size_t i = 0; i < actions.size(); i++) {
-		Action* aC = actions[i];
+		Holder<Action> aC = actions[i];
 		bool iwd2Instant = hasContinue && actionflags[aC->actionID] & AF_SCR_INSTANT;
 		if ((actionflags[aC->actionID] & AF_MASK) == AF_IMMEDIATE || iwd2Instant) {
 			// mimicking AddAction
@@ -2180,9 +2178,9 @@ static void PrintAction(std::string& buffer, int actionID)
 	AppendFormat(buffer, "Action: {} {}\n", actionID, actionsTable->GetValue(actionID));
 }
 
-static void HandleActionOverride(Scriptable* target, const Action* aC)
+static void HandleActionOverride(Scriptable* target, const Holder<Action> aC)
 {
-	Action* newAction = ParamCopyNoOverride(aC);
+	auto newAction = ParamCopyNoOverride(aC);
 	// mark the target action, so other ActionOverrides don't clear it
 	// only happened for queued actions, but since instants are gone immediately,
 	// it shouldn't matter that we set it on all
@@ -2234,7 +2232,7 @@ static bool CheckDeadException(const Scriptable* sender, int actionID)
 	return true;
 }
 
-void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
+void GameScript::ExecuteAction(Scriptable* Sender, Holder<Action> aC)
 {
 	int actionID = aC->actionID;
 
@@ -2251,7 +2249,6 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		if (CheckDeadException(scr, actionID)) {
 			scr = GetScriptableFromObject(Sender, overrider, GA_NO_DEAD);
 		}
-		aC->IncRef(); // if aC is us, we don't want it deleted!
 		Sender->ReleaseCurrentAction();
 
 		if (scr) {
@@ -2270,7 +2267,6 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				aC->dump();
 			}
 		}
-		aC->Release();
 		return;
 	}
 	if (CheckSleepException(Sender, actionID)) {
@@ -2309,13 +2305,6 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 	//don't bother with special flow control actions
 	if (actionflags[actionID] & AF_IMMEDIATE) {
-		//this action never entered the action queue, therefore shouldn't be freed
-		if (aC->GetRef() != 1) {
-			std::string buffer("Immediate action got queued!\n");
-			PrintAction(buffer, actionID);
-			Log(ERROR, "GameScript", "{}", buffer);
-			error("GameScript", "aborting...");
-		}
 		return;
 	}
 
@@ -2386,6 +2375,12 @@ std::string Trigger::dump() const
 	return buffer;
 }
 
+Holder<Action> Action::MakeAction() noexcept
+{
+	// not using MakeHolder since the Action ctor is now private
+	return Holder<Action>(new Action);
+}
+
 std::string Action::dump() const
 {
 	AssertCanary(__func__);
@@ -2402,7 +2397,7 @@ std::string Action::dump() const
 		}
 	}
 
-	AppendFormat(buffer, "RefCount: {}\tactionID: {}\n", RefCount, actionID);
+	AppendFormat(buffer, "RefCount: {}\tactionID: {}\n", shared_from_this().use_count() - 1, actionID);
 	Log(DEBUG, "GameScript", "{}", buffer);
 	return buffer;
 }

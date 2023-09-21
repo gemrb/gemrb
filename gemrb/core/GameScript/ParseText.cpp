@@ -155,9 +155,9 @@ inline bool IsParamDelimiter(const char* src)
 }
 
 // this function was lifted from GenerateAction, to make it clearer
-Action* GenerateActionCore(const char* src, const char* str, unsigned short actionID)
+Holder<Action> GenerateActionCore(const char* src, const char* str, unsigned short actionID)
 {
-	Action* newAction = new Action(true);
+	auto newAction = Action::MakeAction();
 	newAction->actionID = actionID;
 	// this flag tells us to merge 2 consecutive strings together to get
 	// a variable (context+variablename)
@@ -179,7 +179,6 @@ Action* GenerateActionCore(const char* src, const char* str, unsigned short acti
 			switch (*str) {
 				default:
 					Log(WARNING, "GSUtils", "Invalid type: {}", str);
-					delete newAction;
 					return nullptr;
 
 				case 'p': // Point
@@ -231,14 +230,12 @@ Action* GenerateActionCore(const char* src, const char* str, unsigned short acti
 							i++;
 							src++;
 						}
-						Action* act = GenerateAction(std::move(action));
+						Holder<Action> act = GenerateAction(std::move(action));
 						if (!act) {
-							delete newAction;
 							return nullptr;
 						}
 						act->objects[0] = newAction->objects[0];
 						newAction->objects[0] = nullptr; // avoid freeing of object
-						delete newAction; // freeing action
 						newAction = act;
 					}
 					break;
@@ -246,7 +243,6 @@ Action* GenerateActionCore(const char* src, const char* str, unsigned short acti
 				case 'o': // Object
 					if (objectCount == 3) {
 						Log(ERROR, "GSUtils", "Invalid object count!");
-						delete newAction;
 						return nullptr;
 					}
 					ParseObject(str, src, newAction->objects[objectCount++]);
@@ -282,7 +278,6 @@ Action* GenerateActionCore(const char* src, const char* str, unsigned short acti
 						// NOTE: if strings ever need a ',' inside, this is will need to change
 						while (*src != ',' && !IsParamDelimiter(src)) {
 							if (*src == 0) {
-								delete newAction;
 								return nullptr;
 							}
 							// sizeof(context+name) = 40
@@ -301,7 +296,6 @@ Action* GenerateActionCore(const char* src, const char* str, unsigned short acti
 							str++;
 							if (*str != 's') {
 								Log(ERROR, "GSUtils", "Invalid mergestrings: {}", str);
-								delete newAction;
 								return nullptr;
 							}
 							SKIP_ARGUMENT();
@@ -319,7 +313,6 @@ Action* GenerateActionCore(const char* src, const char* str, unsigned short acti
 							i = 0;
 							while (*src != '"') {
 								if (*src == 0) {
-									delete newAction;
 									return nullptr;
 								}
 								if (i++ < 6) {
@@ -500,9 +493,9 @@ Trigger* GenerateTrigger(std::string string)
 	return trigger;
 }
 
-Action* GenerateAction(std::string actionString)
+Holder<Action> GenerateAction(std::string actionString)
 {
-	Action* action = nullptr;
+	Holder<Action> action = nullptr;
 
 	StringToLower(actionString);
 	ScriptDebugLog(DebugMode::ACTIONS, "Compiling: '{}'", actionString);
@@ -542,9 +535,9 @@ Action* GenerateAction(std::string actionString)
 	return action;
 }
 
-Action* GenerateActionDirect(std::string string, const Scriptable* object)
+Holder<Action> GenerateActionDirect(std::string string, const Scriptable* object)
 {
-	Action* action = GenerateAction(std::move(string));
+	Holder<Action> action = GenerateAction(std::move(string));
 	if (!action) return nullptr;
 	Object* tmp = action->objects[1];
 	if (tmp && tmp->objectFields[0] == -1) {

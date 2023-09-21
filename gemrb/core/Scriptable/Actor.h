@@ -32,6 +32,7 @@
 
 namespace GemRB {
 
+class Action;
 class Animation;
 class DataFileMgr;
 class Map;
@@ -725,7 +726,7 @@ public:
 	/* play a roar if the setting isn't disabled */
 	void PlayWarCry(int range) const;
 	/* call this when adding actions via gui */
-	void CommandActor(Action* action, bool clearPath = true);
+	void CommandActor(Holder<Action> action, bool clearPath = true);
 	/** handle panic and other involuntary actions that mess with scripting */
 	bool OverrideActions();
 	/** handle idle actions, that shouldn't mess with scripting */

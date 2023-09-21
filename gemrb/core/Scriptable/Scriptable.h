@@ -254,8 +254,8 @@ protected: //let Actor access this
 	ieVariable scriptName;
 	ieDword InternalFlags = 0; // for triggers
 	ResRef Dialog;
-	std::list<Action*> actionQueue;
-	Action* CurrentAction = nullptr;
+	std::list<Holder<Action>> actionQueue;
+	Holder<Action> CurrentAction = nullptr;
 
 public:
 	ScriptableType Type = ST_ACTOR;
@@ -354,11 +354,11 @@ public:
 	void TickScripting();
 	virtual void ExecuteScript(int scriptCount);
 	void AddAction(std::string actStr);
-	void AddAction(Action* aC);
-	void AddActionInFront(Action* aC);
-	Action* GetCurrentAction() const { return CurrentAction; }
-	Action* GetNextAction() const;
-	Action* PopNextAction();
+	void AddAction(Holder<Action> aC);
+	void AddActionInFront(Holder<Action> aC);
+	Holder<Action> GetCurrentAction() const { return CurrentAction; }
+	Holder<Action> GetNextAction() const;
+	Holder<Action> PopNextAction();
 	void ClearActions(int skipFlags = 0);
 	virtual void Stop(int flags = 0);
 	virtual void ReleaseCurrentAction();

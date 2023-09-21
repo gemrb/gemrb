@@ -628,8 +628,8 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		}
 		// a 50/50 chance to move or do a spin (including its own wait)
 		if (RandomFlip()) {
-			Action* me = ParamCopy(CurrentAction);
-			Action* turnAction = GenerateAction("RandomTurn()");
+			Holder<Action> me = ParamCopy(CurrentAction);
+			Holder<Action> turnAction = GenerateAction("RandomTurn()");
 			// only spin once before relinquishing control back
 			turnAction->int0Parameter = 3;
 			// remove and readd ourselves, so the turning gets a chance to run

@@ -3693,7 +3693,7 @@ bool Actor::GetPartyComment(const Actor* target)
 	// V2 interact - banter dialog interaction
 	if (type == I_DIALOG) {
 		objects.LastTalker = target->GetGlobalID();
-		Action* action = GenerateActionDirect("Interact([-1])", target);
+		Holder<Action> action = GenerateActionDirect("Interact([-1])", target);
 		assert(action);
 		AddActionInFront(action);
 		return true;
@@ -3778,7 +3778,7 @@ void Actor::PlayWarCry(int range) const
 }
 
 //call this when a PC receives a command from GUI
-void Actor::CommandActor(Action* action, bool clearPath)
+void Actor::CommandActor(Holder<Action> action, bool clearPath)
 {
 	ClearActions(); // stop what you were doing
 	if (clearPath) {
@@ -3901,7 +3901,7 @@ void Actor::PlayExistenceSounds()
 
 static void ForceOverrideAction(Actor* actor, std::string actionString)
 {
-	Action* action = GenerateAction(std::move(actionString));
+	Holder<Action> action = GenerateAction(std::move(actionString));
 	assert(action);
 	// the original was as aggressive, clearing the queue and stopping movement
 	actor->Stop();
@@ -4029,7 +4029,7 @@ void Actor::Panic(const Scriptable* attacker, PanicMode mode, bool extraFeedback
 	}
 	VerbalConstant(Verbal::Panic, gamedata->GetVBData("SPECIAL_COUNT"));
 
-	Action* action;
+	Holder<Action> action;
 	if (mode == PanicMode::RunAway && (!attacker || attacker->Type != ST_ACTOR)) {
 		mode = PanicMode::RandomWalk;
 	}

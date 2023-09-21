@@ -2611,7 +2611,7 @@ bool Map::CanFree() const
 			return false;
 		}
 
-		const Action* current = actor->GetCurrentAction();
+		auto current = actor->GetCurrentAction();
 		// maybe we should also catch non-interruptible actions (!actor->CurrentActionInterruptible)
 		// but it has not been needed yet
 		if (current && actionflags[current->actionID] & AF_CHASE) {
