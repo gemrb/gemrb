@@ -1782,7 +1782,6 @@ int AREImporter::GetStoredFileSize(Map *map)
 int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 {
 	ResRef signature = "AREAV1.0";
-	int pst = core->HasFeature( GFFlags::AUTOMAP_INI );
 
 	if (map->version==16) {
 		signature[5] = '9';
@@ -1860,7 +1859,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	stream->WriteDword(RestHeader);
 	//an empty dword for pst
 	int i = 56;
-	if (pst) {
+	if (core->HasFeature(GFFlags::AUTOMAP_INI)) {
 		stream->WriteDword(0xffffffff);
 		i=52;
 	}
