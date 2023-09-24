@@ -3141,6 +3141,8 @@ void Interface::SanitizeItem(CREItem *item) const
 	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (!itm) return;
 
+	if (itm->Flags & IE_ITEM_NO_DISPEL) item->Flags |= IE_INV_ITEM_NO_DISPEL;
+
 	item->MaxStackAmount = itm->MaxStackAmount;
 	//if item is stacked mark it as so
 	if (itm->MaxStackAmount) {

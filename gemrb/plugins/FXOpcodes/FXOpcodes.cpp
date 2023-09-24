@@ -2622,12 +2622,12 @@ int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		switch (fx->Parameter2 >> 16) {
 			case 0:
 			default: // always dispel, ignore undispellable
-				if (!(target->inventory.GetItemFlag(slot) & IE_ITEM_NO_DISPEL)) target->inventory.RemoveItem(slot);
+				if (!(target->inventory.GetItemFlag(slot) & IE_INV_ITEM_NO_DISPEL)) target->inventory.RemoveItem(slot);
 				break;
 			case 1: // never dispel, regardless of flags
 				break;
 			case 2: // use caster level, ignore undispellable
-				if (target->inventory.GetItemFlag(slot) & IE_ITEM_NO_DISPEL) break;
+				if (target->inventory.GetItemFlag(slot) & IE_INV_ITEM_NO_DISPEL) break;
 				itemLevel = std::max(1U, target->GetAnyActiveCasterLevel());
 				if (EffectQueue::RollDispelChance(fx->CasterLevel, itemLevel)) target->inventory.RemoveItem(slot);
 				break;
@@ -3704,7 +3704,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//IWD doesn't let you create two handed weapons (actually only decastave) if shield slot is filled
 	//modders can still force two handed weapons with Parameter2
 	if (!fx->Parameter2) {
-		if (target->inventory.GetItemFlag(slot)&IE_ITEM_TWO_HANDED) {
+		if (target->inventory.GetItemFlag(slot) & IE_INV_ITEM_TWOHANDED) {
 			if (!target->inventory.IsSlotEmpty(target->inventory.GetShieldSlot())) {
 				target->inventory.RemoveItem(slot);
 				displaymsg->DisplayConstantStringNameString(HCStrings::SpellFailed, GUIColors::WHITE, HCStrings::OffhandUsed, target);
