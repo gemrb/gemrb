@@ -74,12 +74,10 @@ IT FindNotOf(IT first, IT last, StringViewT<STR> s) noexcept
 template <typename STR>
 typename STR::size_type FindFirstNotOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = 0) noexcept
 {
-	if (pos >= s.length()) {
+	if (pos >= s.length() || s.length() == 0) {
 		return STR::npos;
 	}
-	if (s.length() == 0) {
-		return pos;
-	}
+
 	auto iter = FindNotOf<STR>(s.begin() + pos, s.end(), sv);
 	return iter == s.end() ? STR::npos : static_cast<typename STR::size_type>(std::distance(s.begin(), iter));
 }
@@ -94,8 +92,10 @@ typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typenam
 		return pos;
 	}
 	if (!reverse) pos = s.length() - (pos + 1);
-	auto iter = FindNotOf<STR>(s.rbegin() + (reverse ? 0 : pos), s.rend() - (reverse ? pos : 0), sv);
-	return iter == s.rend() ? STR::npos : s.length() - 1 - static_cast<typename STR::size_type>(std::distance(s.rbegin(), iter));
+
+	auto iterEnd = s.rend() - (reverse ? pos : 0);
+	auto iter = FindNotOf<STR>(s.rbegin() + (reverse ? 0 : pos), iterEnd, sv);
+	return iter == iterEnd ? STR::npos : s.length() - 1 - static_cast<typename STR::size_type>(std::distance(s.rbegin(), iter));
 }
 
 template <typename STR>
