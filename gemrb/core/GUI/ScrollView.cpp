@@ -146,6 +146,7 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 	
 	// this update must be done before binding an action
 	vscroll = sbar;
+	savedSBSize.w = vscroll->Dimensions().w;
 	UpdateScrollbars();
 	
 	if (sbar) {
@@ -166,6 +167,9 @@ void ScrollView::SetHScroll(ScrollBar*)
 
 void ScrollView::ToggleScrollbar(ScrollBar* sb, bool visible)
 {
+	assert(sb);
+	if (sb->IsVisible() == visible) return;
+
 	sb->SetVisible(visible);
 	Size dims = sb->Dimensions();
 	// We have to change the frame size because we dont support overlapping views
@@ -200,7 +204,7 @@ void ScrollView::UpdateScrollbars()
 	if (vscroll) {
 		bool show = false;
 		if (contentFrame.h > mySize.h) {
-			show = Flags() & View::IgnoreEvents;
+			show = !(Flags() & View::IgnoreEvents);
 
 			int maxVal = contentFrame.h - mySize.h;
 			Control::ValueRange range(0, maxVal);
