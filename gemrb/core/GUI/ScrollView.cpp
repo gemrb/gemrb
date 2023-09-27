@@ -141,14 +141,14 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 			
 			sbar->SetFrame(sbFrame);
 			sbar->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, BitOp::SET);
+			savedSBSize.w = sbFrame.w;
 		}
 	}
-	
+
 	// this update must be done before binding an action
 	vscroll = sbar;
-	savedSBSize.w = vscroll->Dimensions().w;
 	UpdateScrollbars();
-	
+
 	if (sbar) {
 		// ensure scrollbars are on top
 		View::AddSubviewInFrontOfView(sbar, &contentView);
