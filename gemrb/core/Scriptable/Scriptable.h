@@ -133,6 +133,8 @@ class Sprite2D;
 #define MAX_BUMP_BACK_TRIES 16
 #define MAX_RAND_WALK 10
 
+using ScriptID = ieDword;
+
 using ScriptableType = enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 	ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7, ST_ANY = 8 };
 
@@ -265,7 +267,7 @@ public:
 private:
 	tick_t WaitCounter = 0;
 	std::map<ieDword, ieDword> scriptTimers;
-	ieDword globalID = 0;
+	ScriptID globalID = 0;
 protected: //let Actor access this
 	std::list<TriggerEntry> triggers;
 	Map *area = nullptr;
@@ -400,7 +402,7 @@ public:
 	/* spellcasting finished */
 	void CastSpellPointEnd(int level, bool keepStance);
 	void CastSpellEnd(int level, bool keepStance);
-	ieDword GetGlobalID() const { return globalID; }
+	ScriptID GetGlobalID() const { return globalID; }
 	/** timer functions (numeric ID, not saved) */
 	bool TimerActive(ieDword ID);
 	bool TimerExpired(ieDword ID);
