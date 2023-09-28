@@ -27,7 +27,7 @@
 
 #include "exports.h"
 #include "EnumIndex.h"
-#include "Strings/Format.h"
+
 #include <fmt/color.h>
 
 #include <atomic>

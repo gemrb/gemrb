@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "Format.h"
 #include <fmt/xchar.h>
 
 #define WHITESPACE_STRING_W u"\n\t\r "

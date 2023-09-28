@@ -134,4 +134,26 @@ inline ieVariable MakeVariable(const StringView& sv) {
 
 }
 
+// FIXME: these specializations are only required due to something in fmt/ranges.h being prefered
+// over our own format_as (I've also tried formatter and operator<<)
+namespace fmt {
+
+template <>
+struct formatter<GemRB::ieVariable> : public fmt::formatter<const char*> {
+	template <typename FormatContext>
+	auto format(const GemRB::ieVariable& str, FormatContext &ctx) -> decltype(ctx.out()) {
+		return format_to(ctx.out(), "{}", str.c_str());
+	}
+};
+
+template <>
+struct formatter<GemRB::ResRef> : public fmt::formatter<const char*> {
+	template <typename FormatContext>
+	auto format(const GemRB::ResRef& str, FormatContext &ctx) -> decltype(ctx.out()) {
+		return format_to(ctx.out(), "{}", str.c_str());
+	}
+};
+
+}
+
 #endif  //! IE_TYPES_H
