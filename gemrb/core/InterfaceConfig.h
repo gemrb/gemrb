@@ -119,7 +119,7 @@ struct CoreSettings {
 	variables_t vars;
 };
 
-using InterfaceConfig = std::unordered_map<std::string, std::string>;
+using InterfaceConfig = StringMap<std::string>;
 
 GEM_EXPORT CoreSettings LoadFromArgs(int argc, char *argv[]);
 GEM_EXPORT CoreSettings LoadFromDictionary(InterfaceConfig);

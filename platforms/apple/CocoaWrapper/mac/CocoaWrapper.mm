@@ -190,7 +190,7 @@ using namespace GemRB;
 		}
 		if (value && ![value isEqualToString:@""]) {
 			std::string ckey = [key cStringUsingEncoding:NSASCIIStringEncoding];
-			config[ckey] = [value cStringUsingEncoding:NSASCIIStringEncoding];
+			config.Set(ckey, [value cStringUsingEncoding:NSASCIIStringEncoding]);
 		}
 	}
 	
