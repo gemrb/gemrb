@@ -21,6 +21,7 @@
 #ifndef PLUGINLOADER_H
 #define PLUGINLOADER_H
 
+#include "Strings/StringMap.h"
 #include "System/VFS.h"
 
 #include <string>
@@ -34,7 +35,7 @@ enum class PluginFlagsType {
 	DELAY
 };
 
-using plugin_flags_t = std::unordered_map<std::string, PluginFlagsType>;
+using plugin_flags_t = StringMap<PluginFlagsType>;
 
 /**
  * Loads GemRB plugins from shared libraries or DLLs.
