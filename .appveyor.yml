@@ -122,7 +122,7 @@ after_build:
 test_script:
 - ps: |-
     pushd c:\projects\gemrb
-    ctest -C Release
+    ctest -C Release --output-on-failure
     if ($? -ne $true) {
       throw "Test suite failed!"
     }
