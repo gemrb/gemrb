@@ -111,6 +111,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Strings/UTF8Comparison.cpp
 	Strings/String.cpp
 	Strings/StringConversion.cpp
+	Strings/StringMap.cpp
 	System/swab.cpp
 	System/VFS.cpp
 	Video/Pixels.cpp
