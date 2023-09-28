@@ -108,7 +108,7 @@ class RCCache {
 };
 
 template<typename V>
-using ResRefRCCache = RCCache<ResRef, V, CstrHashCI<ResRef>>;
+using ResRefRCCache = RCCache<ResRef, V, CstrHashCI>;
 
 }
 

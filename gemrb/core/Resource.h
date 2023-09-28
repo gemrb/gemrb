@@ -38,7 +38,7 @@ namespace GemRB {
 class DataStream;
 
 template <typename T>
-using ResRefMap = std::unordered_map<ResRef, T, CstrHashCI<ResRef>>;
+using ResRefMap = std::unordered_map<ResRef, T, CstrHashCI>;
 
 /**
  * Base class for all GemRB resources

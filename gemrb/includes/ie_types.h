@@ -109,7 +109,7 @@ enum class ieStrRef : ieDword {
 using ieVariable = FixedSizeString<32, strnicmp>;
 using ResRef = FixedSizeString<8, strnicmp>;
 
-using ieVarsMap = std::unordered_map<ieVariable, ieDword, CstrHashCI<ieVariable>>;
+using ieVarsMap = std::unordered_map<ieVariable, ieDword, CstrHashCI>;
 
 template <typename STR>
 inline bool IsStar(const STR& str) {

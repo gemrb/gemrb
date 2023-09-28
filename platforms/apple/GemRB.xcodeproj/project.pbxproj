@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -40,6 +40,7 @@
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A2111CCA1D0A49650044939E /* Timer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2111CC81D0A49650044939E /* Timer.h */; };
 		A218A75214A8F3DB001142CF /* gemrb.icns in Resources */ = {isa = PBXBuildFile; fileRef = A218A75114A8F3DB001142CF /* gemrb.icns */; };
+		A21A81642AC4F18300856C8B /* Format.h in Headers */ = {isa = PBXBuildFile; fileRef = A21A81632AC4F18300856C8B /* Format.h */; };
 		A22216962A908D5E000920B6 /* UTF8Comparison.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A22216942A908D5E000920B6 /* UTF8Comparison.cpp */; };
 		A22216972A908D5E000920B6 /* UTF8Comparison.h in Headers */ = {isa = PBXBuildFile; fileRef = A22216952A908D5E000920B6 /* UTF8Comparison.h */; };
 		A222169A2A908D6E000920B6 /* PosixFile.h in Headers */ = {isa = PBXBuildFile; fileRef = A22216982A908D6E000920B6 /* PosixFile.h */; };
@@ -414,7 +415,6 @@
 		A2B67A6B16B1DFC100577415 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B67A6816B1DF6500577415 /* CoreFoundation.framework */; };
 		A2BC43392822246400BD4D73 /* BlitRGBA.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
 		A2BC433B28224A7B00BD4D73 /* BlitRGBA.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = A2BC43372822246400BD4D73 /* BlitRGBA.glsl */; };
-		A2BC433D28296D5700BD4D73 /* Format.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BC433C28296D5700BD4D73 /* Format.h */; };
 		A2BC433F28296D7200BD4D73 /* StringView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BC433E28296D7200BD4D73 /* StringView.h */; };
 		A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */; };
@@ -1242,6 +1242,8 @@
 		A20A278A1A71E3200077077C /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
 		A2111CC81D0A49650044939E /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
 		A218A75114A8F3DB001142CF /* gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = gemrb.icns; path = ../../artwork/gemrb.icns; sourceTree = "<group>"; };
+		A21A81622AC497BB00856C8B /* StringMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringMap.h; sourceTree = "<group>"; };
+		A21A81632AC4F18300856C8B /* Format.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Format.h; sourceTree = "<group>"; };
 		A22216942A908D5E000920B6 /* UTF8Comparison.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UTF8Comparison.cpp; sourceTree = "<group>"; };
 		A22216952A908D5E000920B6 /* UTF8Comparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTF8Comparison.h; sourceTree = "<group>"; };
 		A22216982A908D6E000920B6 /* PosixFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PosixFile.h; sourceTree = "<group>"; };
@@ -1750,7 +1752,6 @@
 		A2AFB0DA29CA276D00771698 /* EnumIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumIndex.h; sourceTree = "<group>"; };
 		A2B67A6816B1DF6500577415 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		A2BC43372822246400BD4D73 /* BlitRGBA.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = BlitRGBA.glsl; sourceTree = "<group>"; };
-		A2BC433C28296D5700BD4D73 /* Format.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Format.h; sourceTree = "<group>"; };
 		A2BC433E28296D7200BD4D73 /* StringView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringView.h; sourceTree = "<group>"; };
 		A2BD125615A7EDFE000FAB95 /* VLCPlayer.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = VLCPlayer.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VLCPlayer.cpp; path = ../VLCPlayer/VLCPlayer.cpp; sourceTree = "<group>"; };
@@ -5086,10 +5087,11 @@
 			isa = PBXGroup;
 			children = (
 				A2A05CE427A47E29000FB625 /* CString.h */,
-				A2BC433C28296D5700BD4D73 /* Format.h */,
+				A21A81632AC4F18300856C8B /* Format.h */,
 				A2A05CE527A47E29000FB625 /* String.h */,
 				A2A05CE027A47E29000FB625 /* StringConversion.cpp */,
 				A2A05CE227A47E29000FB625 /* StringConversion.h */,
+				A21A81622AC497BB00856C8B /* StringMap.h */,
 				A2BC433E28296D7200BD4D73 /* StringView.h */,
 				A22216942A908D5E000920B6 /* UTF8Comparison.cpp */,
 				A22216952A908D5E000920B6 /* UTF8Comparison.h */,
@@ -7979,6 +7981,7 @@
 				A2E66368139E883100310FC8 /* CharAnimations.h in Headers */,
 				A2E6636A139E883100310FC8 /* Compressor.h in Headers */,
 				A25F91E9269931220045F07A /* RLE.h in Headers */,
+				A21A81642AC4F18300856C8B /* Format.h in Headers */,
 				A2E6636E139E883100310FC8 /* damages.h in Headers */,
 				A2E66370139E883100310FC8 /* DataFileMgr.h in Headers */,
 				A2E66372139E883100310FC8 /* Dialog.h in Headers */,
@@ -8106,7 +8109,6 @@
 				A2E66420139E886100310FC8 /* Label.h in Headers */,
 				A2E66422139E886100310FC8 /* MapControl.h in Headers */,
 				A2E66424139E886100310FC8 /* Progressbar.h in Headers */,
-				A2BC433D28296D5700BD4D73 /* Format.h in Headers */,
 				A2E66426139E886100310FC8 /* ScrollBar.h in Headers */,
 				A2E66428139E886100310FC8 /* Slider.h in Headers */,
 				A2E6642A139E886100310FC8 /* TextArea.h in Headers */,
