@@ -3940,19 +3940,14 @@ std::vector<ieDword> Interface::GetListFrom2DAInternal(const ResRef& resref) con
 	return ret;
 }
 
-std::vector<ieDword>* Interface::GetListFrom2DA(const ResRef& tablename)
+const std::vector<ieDword>* Interface::GetListFrom2DA(const ResRef& tablename)
 {
-	auto key = std::string{tablename.c_str()};
-	auto lookup = lists.find(key);
-
-	if (lookup != lists.cend()) {
-		return &lookup->second;
+	auto listptr = lists.Get(tablename);
+	if (listptr == nullptr) {
+		listptr = &lists.Set(tablename, GetListFrom2DAInternal(tablename));
 	}
 
-	auto list = GetListFrom2DAInternal(tablename);
-	auto insertion = lists.emplace(key, std::move(list));
-
-	return &insertion.first->second;
+	return listptr;
 }
 
 //returns a numeric value associated with a stat name (symbol) from stats.ids
