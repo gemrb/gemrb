@@ -47,7 +47,7 @@ public:
 class CachedDirectoryImporter : public DirectoryImporter {
 protected:
 	// the case is case insensitive, but we will only store valid names
-	std::set<path_t, CstrCmpCI<path_t>> cache;
+	std::set<path_t, CstrLessCI> cache;
 
 public:
 	CachedDirectoryImporter() noexcept = default;

@@ -44,9 +44,9 @@ public:
 	using iterator = CharT*;
 	using const_iterator = const CharT*;
 	using size_type = size_t;
-	using Traits = std::char_traits<CharT>;
+	using Traits = std::char_traits<std::remove_const_t<CharT>>;
 	static constexpr size_type npos = size_type(-1);
-	
+
 	StringViewImp() noexcept = default;
 
 	// explicit because strlen is inefficient
@@ -127,8 +127,8 @@ public:
 		return data != nullptr;
 	}
 
-	explicit operator std::string() const noexcept {
-		return std::string(data, len);
+	auto MakeString() const noexcept {
+		return std::basic_string<typename Traits::char_type, Traits>(data, len);
 	}
 
 private:

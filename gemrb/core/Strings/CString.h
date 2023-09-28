@@ -20,6 +20,8 @@
 #define CSTRING_H
 
 #include "exports.h"
+#include "StringView.h"
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <cassert>
@@ -30,9 +32,6 @@
 #include <cstring>
 #include <cwctype>
 
-#include "Format.h"
-#include "StringView.h"
-
 #ifndef WIN32
 # define stricmp strcasecmp
 # define strnicmp strncasecmp
@@ -42,10 +41,10 @@ namespace GemRB {
 
 constexpr int NoTransform(int c) { return c; }
 
-template <typename STR_T, int(*TRANS)(int) = NoTransform>
+template <int(*TRANS)(int) = NoTransform>
 struct CstrHash
 {
-	size_t operator() (const STR_T &str) const {
+	size_t operator() (const StringView& str) const {
 		size_t nHash = 0;
 		for (const auto& c : str) {
 			if (c == '\0')
@@ -56,19 +55,33 @@ struct CstrHash
 	}
 };
 
-template <typename STR_T>
-using CstrHashCI = CstrHash<STR_T, std::tolower>;
-
-template <typename STR_T, int(*CMP)(const char*, const char*) = strcmp>
-struct CstrCmp
+// work around linking issue on Mac where std::tolower is mangled differently in ObjC++
+inline int tolower(int ch)
 {
-	bool operator() (const STR_T& lhs, const STR_T& rhs) const {
+	return std::tolower(ch);
+}
+
+using CstrHashCI = CstrHash<tolower>;
+
+template <int(*CMP)(const char*, const char*) = strcmp>
+struct CstrLess
+{
+	int operator() (const StringView& lhs, const StringView& rhs) const {
 		return CMP(lhs.c_str(), rhs.c_str()) < 0;
 	}
 };
 
-template <typename STR_T>
-using CstrCmpCI = CstrCmp<STR_T, stricmp>;
+using CstrLessCI = CstrLess<stricmp>;
+
+template <int(*CMP)(const char*, const char*) = strcmp>
+struct CstrEq
+{
+	int operator() (const StringView& lhs, const StringView& rhs) const {
+		return CMP(lhs.c_str(), rhs.c_str()) == 0;
+	}
+};
+
+using CstrEqCI = CstrEq<stricmp>;
 
 template<size_t LEN, int(*CMP)(const char*, const char*, size_t) = strncmp>
 class FixedSizeString {
@@ -243,6 +256,11 @@ public:
 		return std::none_of(begin(), end(), [](char c) { return c < 0; });
 	}
 };
+
+template <size_t LEN, int(*CMP)(const char*, const char*, size_t)>
+auto format_as(const GemRB::FixedSizeString<LEN, CMP>& str) {
+	return str.c_str();
+}
 
 }
 
